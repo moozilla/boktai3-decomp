@@ -419,6 +419,7 @@ addr,name,mode,confidence,source,notes
 080135A8,ShadowTask_Create,thumb,low,src-alias,"Creates and configures the shadow-management task (Task_Create + Task_SetCallbacks with ShadowTask_Update/Destroy), rolling back via Task_Kill if Shad"
 080135E8,Shadow_Initialize,thumb,low,src-alias,
 08013684,Shadow_Destroy,thumb,low,src-alias,"Removes a shadow node's embedded effect and, if the shadow task is active, unlinks it from the shadow list via ShadowList_Remove; called from many act"
+080136A8,ScaledShadowTask_Destroy,thumb,low,src-alias,Clears scaled-shadow task singleton; callback ownership tentative
 080136B4,ScaledShadowManager_AddShadow,thumb,low,src-alias,Inserts a shadow node into the manager's doubly-linked list (head at manager+0x1C); only caller is ScaledShadow_Initialize.
 080136DC,ScaledShadowManager_RemoveShadow,thumb,low,src-alias,Unlinks a shadow node from the manager's list; called from the shadow teardown helper ScaledShadow_Destroy.
 0801370C,ScaledShadow_Enable,thumb,low,src-alias,Mirrors ActorShadow_Enable: clears the sprite's hidden bit and points the shadow's callback slot at ScaledShadow_Update to resume terrain-following.
@@ -433,9 +434,13 @@ addr,name,mode,confidence,source,notes
 080139F4,ScaledShadow_InitializeDefault,thumb,low,src-alias,Thin wrapper calling ScaledShadow_Initialize with a fixed default parameter set (scale/height/shift constants).
 08013A24,ScaledShadow_InitializeDefaultSmall,thumb,low,src-alias,"Same default ScaledShadow_Initialize call, then reloads the shadow sprite's graphic with frame param 6 via ScaledShadow_SetGraphic."
 08013A6C,ScaledShadow_InitializeDefaultLarge,thumb,low,src-alias,"Same default ScaledShadow_Initialize call, then reloads the shadow sprite's graphic with frame param 7 via ScaledShadow_SetGraphic (sibling of the ""Small"" varian"
+08013AB4,ScaledShadow_InitializeRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
+08013AE4,ScaledShadow_InitializeSmallRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
+08013B2C,ScaledShadow_InitializeLargeRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
 08013B74,ScaledShadow_Destroy,thumb,low,src-alias,"Removes the shadow's sprite and, if the manager exists, unlinks it from the manager's list; called from many actor teardown paths across the codebase."
 08013B98,ScaledShadow_SetGraphic,thumb,low,src-alias,"Reloads the shadow's anim resource and re-applies it to its sprite with a new frame/param value, same pattern used inline in ScaledShadow_Initialize."
 08013BBC,ScaledShadow_SetFlag,thumb,low,src-alias,"Sets or clears bit 2 of the shadow's status byte based on the ""on"" argument; exact consumer of the bit is outside this unit so semantics are a best gu"
+08013BDC,ScaledShadow_SetScaleRange,thumb,low,src-alias,Tentative: initialize or change the distance-dependent shadow scale range
 08013C14,ShadowRegistry_GetTask,thumb,low,src-alias,"cached accessor that returns the registry's task pointer, creating it via ShadowRegistry_CreateTask if unset"
 08013C2C,ShadowRegistry_FindEntry,thumb,low,src-alias,walks the registry task's linked list (offset 0x18) for a node matching the id key
 08013C4C,ShadowRegistry_LinkEntry,thumb,low,src-alias,"pushes a new entry onto the registry's list head, failing if already linked"
@@ -452,6 +457,7 @@ addr,name,mode,confidence,source,notes
 08013ED0,ShadowRegistry_SetModeFromScript,thumb,low,src-alias,reads id/mode keywords from script and calls ShadowRegistry_SetEntryMode
 08013EF4,ShadowRegistry_SetEntryPosition,thumb,low,src-alias,finds an entry by id and overwrites its position struct
 08013F24,ShadowRegistry_SetPositionFromScript,thumb,low,src-alias,reads id and x/y/z keywords from script and calls ShadowRegistry_SetEntryPosition
+08013F8C,ParticleManager_ClearTaskPtr,thumb,low,src-alias,Reset particle-group task singleton
 08013F98,ParticleGroup_Update,thumb,low,src-alias,
 08014330,ParticleGroup_UpdateFrozen,thumb,low,src-alias,
 08014498,ParticleManager_Update,thumb,low,src-alias,
@@ -463,6 +469,7 @@ addr,name,mode,confidence,source,notes
 08015074,FragmentManager_Destroy,thumb,low,src-alias,"Task destroy callback (2nd arg to Task_SetCallbacks) for the FragmentManager: removes sprites of all active fragment pieces and zeroes gUnk_02000064, "
 080150D0,FragmentManager_Initialize,thumb,low,src-alias,
 08015110,FragmentManager_Create,thumb,low,src-alias,"Creates the FragmentManager task, wires FragmentManager_Update/FragmentManager_Destroy as its callbacks, and calls FragmentManager_Initialize, matchin"
+08015154,AnimatedParticleManager_ClearSingleton,thumb,low,src-alias,Reset animated-particle manager singleton
 08015160,AnimatedParticleManager_Update,thumb,low,src-alias,
 0801537C,AnimatedParticleManager_Destroy,thumb,low,src-alias,Task kill callback paired with AnimatedParticleManager_Update; releases the 32 active particle sprites and clears gUnk_02000068
 080153B0,AnimatedParticleManager_Initialize,thumb,low,src-alias,
@@ -496,6 +503,7 @@ addr,name,mode,confidence,source,notes
 08016944,FloatingEffect_Bob,thumb,low,src-alias,
 08016990,FloatingEffect_Wait,thumb,low,src-alias,
 08016A0C,FloatingEffect_ShrinkAway,thumb,low,src-alias,
+08016AA0,FloatingEffect_RiseAndSettle,thumb,low,src-alias,Tentative: rise then settle; mode 3 adds screen jitter
 08016B78,FloatingEffect_RiseAndShrink,thumb,low,src-alias,
 08016C04,FloatingItemEffect_UpdateFlight,thumb,low,src-alias,draft ~97% (2 ROM / 4 draft insns differ; from 120/128): fixed by reading v->x; v->z into locals once; a separate temp for 3*v in Scale3; p->pad6 (offset 6) in the sound branch; and split -= 8 / += ... on position.x. Remaining: ldr r1;=0x2000580 and mov r6;sp order in the first projection; and ROM stores position.x once (a temp changes reload rotation).
 08016EA8,FloatingEffectManager_Update,thumb,low,src-alias,
@@ -504,6 +512,7 @@ addr,name,mode,confidence,source,notes
 08016FE0,FloatingEffectManager_Create,thumb,low,src-alias,"Creates the FloatingEffectManager singleton task if none exists, wires up its Update/Destroy callbacks, runs further init, and kills the task on failu"
 0801702C,FloatingEffectManager_GetOrCreate,thumb,low,src-alias,"Returns the existing FloatingEffectManager singleton pointer, or creates it via FloatingEffectManager_Create if not yet set"
 08017044,FloatingItemEffect_Spawn,thumb,low,src-alias,draft ~75% (93 ROM / 97 draft insns differ; from 127/129): do-while slot loop (ROM has no entry test); Effect size 0x84 (tail[0x84-0x5C]); idx temp for gUnknown_02000580[idx] order. With AGBCC_PRI=e:-2600 it is 55/59: e = NULL first-set doubles e's priority above item; reload rotation then 1 step off after line 52 (slot=-1).
+08017264,ScanlineWave_Reset,thumb,low,src-alias,Reset active scanline-wave singleton
 08017270,ScanlineWave_Update,thumb,low,src-alias,
 080172D8,ScanlineWave_Destroy,thumb,low,src-alias,Destroy callback paired with ScanlineWave_Update in Task_SetCallbacks for ScanlineWave_Create; deregisters the scanline effect and clears the active-w
 080172EC,ScanlineWave_Initialize,thumb,low,src-alias,
@@ -545,7 +554,9 @@ addr,name,mode,confidence,source,notes
 08018D84,OrbitingParticles_Stop,thumb,low,src-alias,"Sets duration=time on the manager so Update's end check fires on the next tick, triggering a graceful shutdown; called when an effect slot is being re"
 08018D94,BlendTransition_Update,thumb,low,src-alias,
 08018DFC,BlendTransition_Destroy,thumb,low,src-alias,"Trivial Task destroy callback (engine.h: ""called once after Task_Kill"") wired as the second arg of Task_SetCallbacks in BlendTransition_Create; no cleanup neede"
+08018E00,BlendTransition_InitializeFromScript,thumb,low,src-alias,Read blend mode; initial/final coefficients; target masks and duration
 08018EF0,BlendTransition_Create,thumb,low,src-alias,"Allocates a size-0x2C Task, wires BlendTransition_Update/Destroy as its callbacks, and runs sub_08018E00 to set up the blend params, killing the task "
+08018F2C,CircleWindow_InitManager,thumb,low,src-alias,Reset circle-window manager singleton
 08018F38,CircleWindow_GenerateScanlines,thumb,low,src-alias,
 0801901C,CircleWindow_ResetState,thumb,low,src-alias,Called only by CircleWindow_Destroy to zero/reset the circle window's static state variables
 08019044,CircleWindow_Update,thumb,low,src-alias,
@@ -771,8 +782,8 @@ addr,name,mode,confidence,source,notes
 08021044,SceneCommands_Fade,thumb,low,src-alias,"screen cutscene cmd 3 (on, speed, r, g, b, bg, obj, other, last): sub_082279A8 mode 3 (on) or 2"
 080210B0,SceneCommands_FadePalette,thumb,low,src-alias,
 0802113C,SceneCommands_BlendPalette,thumb,low,src-alias,
-080211B0,SceneCommands_SetPosition,thumb,low,src-alias,"Copies two fields from the command's parameter struct into the target struct, used as a Dispatch command handler"
-080211C0,SceneCommands_ClearPosition,thumb,low,src-alias,"Zeroes the same two fields SceneCommands_SetPosition writes, used as a Dispatch command handler"
+080211B0,SceneCommands_SetShake,thumb,low,src-alias,Set camera shake duration and strength from presentation message
+080211C0,SceneCommands_StopShake,thumb,low,src-alias,Clear camera shake duration and strength
 080211C8,SceneCommands_ConfigureBlendWindow,thumb,low,src-alias,"Builds a layer mask from a mode selector and a color/coefficient value then writes both through ColorFade_SetImmediate, matching blend/window register setup"
 0802123C,SceneCommands_Dispatch,thumb,low,src-alias,kind 7 (screen) cutscene receiver: switch on the command byte (10 cases)
 08021360,SceneCommands_TaskUpdate,thumb,low,src-alias,Task update callback that runs SceneCommands_Dispatch each tick and counts down p->a before invoking Camera_RequestShake
@@ -1627,6 +1638,7 @@ addr,name,mode,confidence,source,notes
 080426B0,DisplayAnimation_SetPosition,thumb,low,src-alias,
 080426D4,DisplayAnimation_SetFlags,thumb,low,src-alias,
 080426F8,DisplayAnimation_ClearFlags,thumb,low,src-alias,
+0804271C,DisplayAnimation_TestFlags,thumb,low,src-alias,Return selected drawable flags; zero for an inactive wrapper
 08042738,DisplayAnimation_SetPriority,thumb,low,src-alias,
 0804275C,DisplayAnimation_SetPalette,thumb,low,src-alias,
 08042798,DisplayAnimation_SelectPaletteBank,thumb,low,src-alias,
@@ -4119,6 +4131,7 @@ addr,name,mode,confidence,source,notes
 0810399C,ActorGroup_Destroy,thumb,low,src-alias,
 08103A54,NamedObject_InitManager,thumb,low,src-alias,Starts the manager's script procedure and initializes its allocation mask
 08103A84,NamedObject_CreateManager,thumb,low,src-alias,Creates the singleton named object task and installs its callbacks
+08103AD0,NamedObject_ResetManager,thumb,low,cleanup,Tentative named actor helper recovered from manager and body fields
 08103ADC,NamedActor_SetFlag20FromScript,thumb,low,src-alias,
 08103B14,ActorGroup_GetSelectedMemberId,thumb,low,src-alias,
 08103B94,NamedActor_SetMoveModeFromScript,thumb,low,src-alias,
@@ -4131,6 +4144,7 @@ addr,name,mode,confidence,source,notes
 08103E60,NamedActor_SetRangeFromScript,thumb,low,src-alias,
 08103EBC,NamedActor_ClearFlag1000FromScript,thumb,low,src-alias,Clears flag 0x1000 on the actor selected by script option n
 08103EF4,NamedObject_GetPositionByName,thumb,low,src-alias,Returns the named object's embedded position vector used by following objects
+08103F24,NamedObject_GetPosition,thumb,low,cleanup,Tentative named actor helper recovered from manager and body fields
 08103F44,NamedObject_PlayAdjacentExitSound,thumb,low,src-alias,
 081041DC,Pool184_AddStatusFlags,thumb,low,src-alias,Adds bits to the status flags of a 0x184-byte pooled object
 08104204,Pool184_TestStatusFlags,thumb,low,src-alias,Tests whether any requested status bits are set on a pooled object
@@ -4149,6 +4163,7 @@ addr,name,mode,confidence,source,notes
 08104F08,CallbackPool_UpdateShake,thumb,low,src-alias,
 08104F98,CallbackPool_ApplyDamage,thumb,low,src-alias,
 081050BC,CallbackPool_SpawnHitParticles,thumb,low,src-alias,
+08105194,CallbackPool_InitializeCollider,thumb,low,cleanup,Initializes the four-slot health actor collider
 0810523C,ActorGroup_EmitRemovalDebris,thumb,low,src-alias,
 081055C0,ProximityActor_SetState,thumb,low,src-alias,
 081056A0,CallbackPool_RefreshHealthDisplay,thumb,low,src-alias,
@@ -4156,10 +4171,12 @@ addr,name,mode,confidence,source,notes
 08105790,ProximityActor_IsPlayerInsideOriginRange,thumb,low,src-alias,
 08105808,ProximityActor_ApplyContactDamage,thumb,low,src-alias,
 08105998,ProximityActor_InitializeCollider,thumb,low,src-alias,
+08105A40,Pool128_OnStateNoOp,thumb,low,cleanup,Tentative region actor lifecycle helper
 08105A44,Pool128_Allocate,thumb,low,src-alias,Allocates and clears a 0x128-byte object in the first free slot of a 32-slot pool
 08105AB4,ProximityActor_UpdateDamageAnimation,thumb,low,src-alias,
 08105E6C,RegionActor_UpdateBehaviorAnimation,thumb,low,src-alias,
 0810621C,RegionActor_UpdateHealthAnimation,thumb,low,src-alias,
+0810638C,RegionActor_UnregisterTerrain,thumb,low,cleanup,Tentative region actor lifecycle helper
 081063D8,RegionActor_AnimateSparkleTransition,thumb,low,src-alias,
 081065F8,RegionActor_AnimateRemoval,thumb,low,src-alias,
 08106870,RegionActor_CreateFromScript,thumb,low,src-alias,
@@ -4172,6 +4189,7 @@ addr,name,mode,confidence,source,notes
 08106E98,TileTrigger_ApplyContactEffects,thumb,low,src-alias,Apply press contacts to players and registry actors; trigger tether and particle effects
 08107240,Pool1B8_Allocate,thumb,low,src-alias,
 08107298,TileTrigger_IsTetherNearby,thumb,low,src-alias,
+0810731C,Pool1B8_UpdateIdleState,thumb,low,cleanup,Tentative tile trigger lifecycle helper
 08107320,TileTrigger_TickIdle,thumb,low,src-alias,
 08107398,TileTrigger_EmitParticles,thumb,low,src-alias,Emits six randomized particle groups around sequence-0/1 tile triggers unless the global 0x800 flag suppresses them.
 0810764C,TileTrigger_TickDelay,thumb,low,src-alias,
@@ -4180,7 +4198,9 @@ addr,name,mode,confidence,source,notes
 08107A08,TileTrigger_StepActivation,thumb,low,src-alias,
 08107B9C,TileTrigger_StepRelease,thumb,low,src-alias,
 08107D48,Pool1B8_RunPendingScripts,thumb,low,src-alias,Forwards to the helper that invokes and clears pending object script callbacks
+08107D54,TileTrigger_RestartHold,thumb,low,cleanup,Tentative tile trigger lifecycle helper
 08107E90,Pool1B8_EnterStateThree,thumb,low,src-alias,Marks the object active and selects state three while clearing its counter and selected flags
+08107EBC,TileTrigger_CreateFromScript,thumb,low,cleanup,Tentative tile trigger lifecycle helper
 081081F0,Pool1B8_FindByName,thumb,low,src-alias,
 08108244,Tile_SetEnabledFromScript,thumb,low,src-alias,
 081082A8,Pool1B8_IsReadyFromScript,thumb,low,src-alias,
@@ -4193,9 +4213,11 @@ addr,name,mode,confidence,source,notes
 081084E4,AnimatedTile_Allocate,thumb,low,src-alias,Claims and clears the first free tile slot and records its index
 0810853C,Pool1BC_FindByName,thumb,low,src-alias,
 0810858C,AnimatedTile_CreateFromScript,thumb,low,src-alias,
+0810874C,AnimatedTile_UpdateIdleState,thumb,low,cleanup,Empty idle-state hook
 08108750,AnimatedTile_TickAlternateAnimation,thumb,low,src-alias,
 0810889C,Pool1BC_UpdateDelay,thumb,low,src-alias,
 081088DC,AnimatedTile_TickFadeOut,thumb,low,src-alias,
+08108968,AnimatedTile_OnStateComplete,thumb,low,cleanup,Empty completed-state hook
 0810896C,CallbackSlots_DispatchActive,thumb,low,src-alias,
 081089D8,AnimatedTile_OnManagerDestroy,thumb,low,src-alias,Manager destruction callback that removes every allocated tile sprite and clears the singleton
 08108A1C,AnimatedTile_InitManager,thumb,low,src-alias,Loads shared sequence resources and initializes the manager singleton and allocation mask
@@ -4472,9 +4494,11 @@ addr,name,mode,confidence,source,notes
 08113310,SceneDebrisPool_Destroy,thumb,low,src-alias,Task destruction callback releases occupied debris visuals and clears the singleton
 08113340,SceneDebrisPool_Initialize,thumb,low,src-alias,Registers the newly created debris pool as the singleton
 0811334C,SceneDebrisPool_EnsureSingleton,thumb,low,src-alias,Returns the existing 64-slot debris task or creates it with update and destruction callbacks
+08113398,SceneDebris_Create,thumb,low,cleanup,Allocate a debris visual and select animated or bouncing motion
 081134B0,ActorEffect_SpawnAtActorPos,thumb,low,src-alias,
 08113534,ActorParticles_CreateAtOffset,thumb,low,src-alias,
 081135B8,SpriteEffect_CreateAtPosition,thumb,low,src-alias,
+08113638,SceneDebrisPool_ResetSingleton,thumb,low,cleanup,Clear debris pool singleton
 08113644,SceneGroundEffect_IsBelowGround,thumb,low,src-alias,Compares queried terrain height with the effect position plus a vertical offset; tentative ground-effect identity
 08113678,NativeEffect_SetState,thumb,low,src-alias,Stores the state callback and marks its entry pending
 08113684,NativeEffect_DestroyEntry,thumb,low,src-alias,Removes the active sprite and clears the entry state and activity flags
@@ -4491,6 +4515,7 @@ addr,name,mode,confidence,source,notes
 081144A8,EffectPool_CheckCapacity,thumb,low,src-alias,
 0811453C,NativeEffect_OnColliderExpire,thumb,low,src-alias,Collider callback that schedules entry destruction
 0811454C,NativeEffect_OnColliderImpact,thumb,low,src-alias,Collider callback that schedules destruction with a secondary effect and sound
+0811455C,NativeEffect_OnColliderIgnore,thumb,low,cleanup,Empty collider callback for persistent threshold effects
 08114560,NativeEffect_InitDefaultCollider,thumb,low,src-alias,Initializes the entry collider with fixed dimensions and depth eight
 081145DC,NativeEffect_InitColliderWithDepth,thumb,low,src-alias,Initializes the same collider with a caller supplied depth
 08114664,NativeEffect_InitTypeZeroSprite,thumb,low,src-alias,Loads shared graphics and initializes the sprite with animation five variant zero
@@ -4501,10 +4526,14 @@ addr,name,mode,confidence,source,notes
 081148A8,NativeEffect_InitDirectionalTypeThreeSprite,thumb,low,src-alias,Uses animation eight and initializes opposite angle and rotation values for type three
 08114928,NativeEffect_CreateFromProfile,thumb,low,src-alias,
 08114C50,SlotRegistry_RemoveSprite,thumb,low,src-alias,
+08114CA0,NativeEffect_ResetManager,thumb,low,cleanup,Clear native effect singleton
+08114CAC,NativeEffect_IgnoreUpdate,thumb,low,cleanup,Empty lifecycle hook
 08114CB0,NativeParticle_UpdateAnimatedMotion,thumb,low,src-alias,
 08114E04,NativeParticle_ReleaseEntry,thumb,low,src-alias,Removes the indexed effect and clears the particle entry before invalidating its index
 08114E34,NativeParticle_AllocateEntry,thumb,low,src-alias,Reserves the first available entry in the thirty two slot particle pool
+08114E68,NativeParticle_CreateBatch,thumb,low,cleanup,Emit a batch of animated particles with randomized spread and velocity
 081150C4,NativeParticle_CreateWithFlag,thumb,low,src-alias,Forwards particle creation arguments with the final effect flag fixed to one
+081150E4,NativeParticle_CreateWithoutFlag,thumb,low,cleanup,Emit particles without the pause flag
 08115104,EffectPool_UpdateEntries,thumb,low,src-alias,
 08115190,NativeParticle_DestroyManager,thumb,low,src-alias,Task destruction callback that removes active particle effects and clears the singleton
 081151D0,NativeParticle_LoadResources,thumb,low,src-alias,Loads the particle animation resource and shared graphics entry into the manager
@@ -4671,6 +4700,7 @@ addr,name,mode,confidence,source,notes
 0811D358,GameState_ClearSlots7A8FromScript,thumb,low,src-alias,
 0811D384,SceneActorStyle_InitializeFromGameState,thumb,low,src-alias,
 0811D428,SceneActorStyle_Initialize,thumb,low,src-alias,
+0811D47C,ActorStats_SetChoices,thumb,low,cleanup,Copy up to four byte-sized parameter choices
 0811D4AC,ActorStats_ConfigureScaledParameters,thumb,low,src-alias,
 0811D524,GameState_GetChallengeBestRank,thumb,low,src-alias,Returns the indexed rank record from the twelve-entry table; challenge interpretation tentative
 0811D54C,GameState_ResetChallengeRecords,thumb,low,src-alias,Initializes all twelve paired score and rank records to -1
@@ -4829,13 +4859,16 @@ addr,name,mode,confidence,source,notes
 0812265C,SceneActor14_ResetSingleton,thumb,low,src-alias,Clears the category 14 manager pointer during scene reset
 0812266C,SceneActor14_UpdateAnimState,thumb,low,src-alias,
 08122824,SceneScheduledEffect_UpdateEntry,thumb,low,src-alias,Processes an effect entry then refreshes its active collider and advances its frame counter
+08122868,SceneScheduledEffect_FinalizeEntry,thumb,low,cleanup,Empty finalization hook
 0812286C,AnimatedBodyPool_Destroy,thumb,low,src-alias,
 081228F0,StateSpritePool_Tick,thumb,low,src-alias,
+0812298C,SceneScheduledEffect_Allocate,thumb,low,cleanup,Claim a free slot in the four-entry effect manager
 081229E0,SceneScheduledEffect_OnColliderContact,thumb,low,src-alias,Empty collider callback referenced by the scheduled effect collider initializer
 081229E4,StateSprite_InitCollider,thumb,low,src-alias,
 08122B00,StateSprite_InitAnimation,thumb,low,src-alias,
 08122B8C,SceneScheduledEffect_Create,thumb,low,src-alias,Allocates and initializes a scheduled sprite effect; optionally offsetting its body and registering it with the terrain overlay.
 08122D20,SceneScheduledEffect_LoadResource,thumb,low,src-alias,Loads resource 1BC7 and relocates its embedded header
+08122D58,SceneScheduledEffect_InitializeManager,thumb,low,cleanup,Load manager resources and mark slots unused
 08122DA0,SceneScheduledEffect_EnsureSingleton,thumb,low,src-alias,Creates the shared effect task when absent; called by scene effect schedule initialization
 08122DE4,SceneScheduledEffect_ResetSingleton,thumb,low,src-alias,Clears the shared effect manager pointer during scene reset
 08122DF4,SequencedSprite_StepAnimation,thumb,low,src-alias,

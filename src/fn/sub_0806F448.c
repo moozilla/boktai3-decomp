@@ -28,7 +28,7 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
     }
     entry = initial;
     for (i = 11; i >= 0; entry++, i--) {
-        if (entry->effect && entry->effect->state < 0) {
+        if (entry->effect && (s16)entry->effect->slot < 0) {
             s32 scale = Scale(entry->scaleValue);
             s32 random = Scale(entry->randomValue);
             entry->effect = SceneScheduledEffect_Create(&entry->position, entry->id, scale, entry->kind,

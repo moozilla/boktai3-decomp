@@ -5,11 +5,11 @@
 struct TemporaryAnimationSlot {
     u8 active, unknown1;
     s16 lifetime;
-    struct ProjectedDisplayEntry animation;
+    struct SceneInputWidget animation;
 };
 struct TemporaryAnimationPool {
-    u8 task[0x18];
-    struct ProjectedDisplayResource resource;
+    struct Task task;
+    struct SceneInputResource resource;
     struct TemporaryAnimationSlot slots[16];
 };
 /* 0x020000A8 */

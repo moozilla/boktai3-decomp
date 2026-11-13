@@ -5,34 +5,15 @@
 #include "display_sequence.h"
 #include "display_keyframe.h"
 #include "contact_position.h"
-struct DisplayAnimationResource {
-    u8 unknown0[6];
-    u16 paletteIndex;
-    u8 unknown8[4];
-    const void *paletteData;
-    u8 unknown10[0x18];
-    u32 flags;
-    u8 unknown2C[0x2C];
-    void *sequence;
-};
+#include "scene_animation.h"
+#include "scene_input_widget.h"
 struct DisplayPosition {
     u32 words[2]; /* observed word-aligned copy; packed coordinates remain untyped */
-};
-struct DisplayAnimation {
-    u32 kind;
-    u32 index;
-    u8 variant, flags, finished, unknownB;
-    struct DisplayAnimationResource resource;
-    u8 unknown68[0x74 - 0x68];
-    const void *keyframeTileSource;
-    u8 unknown78[0x8C - 0x78];
-    struct DisplayPosition *position;
-    u32 *displayFlags;
 };
 struct DisplaySequenceSprite {
     u32 flags;
     u8 unknown4[2];
-    u8 attribute, priority, palette, paletteVariant;
+    u8 attribute, priority, palette, paletteVariant; /* angle, priority, scale X/Y (legacy names) */
     u8 unknownA[2];
     const u8 *resource;
     u16 frame;
@@ -41,4 +22,28 @@ struct DisplaySequenceSprite {
     struct ContactPosition position;
     u8 unknown24[8];
 };
+/* Both modes begin at wrapper offset 0xC and occupy the same 0x80-byte storage. */
+struct DisplayAnimationSequence {
+    struct SceneAnimation graphics;
+    struct DisplaySequenceSprite sprite;
+    struct DisplaySequenceState playback;
+    void *sequence;
+};
+struct DisplayAnimationKeyframes {
+    struct SceneInputResource resource;
+    struct SceneInputWidget widget;
+};
+union DisplayAnimationBody {
+    struct DisplayAnimationSequence sequence;
+    struct DisplayAnimationKeyframes keyframes;
+};
+struct DisplayAnimation {
+    u32 kind;
+    u32 index;
+    u8 variant, flags, finished, unknownB;
+    union DisplayAnimationBody resource;
+    struct DisplayPosition *position;
+    u32 *displayFlags;
+};
+
 #endif
