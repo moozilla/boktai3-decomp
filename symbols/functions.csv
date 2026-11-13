@@ -4164,10 +4164,12 @@ addr,name,mode,confidence,source,notes
 08105790,ProximityActor_IsPlayerInsideOriginRange,thumb,low,src-alias,
 08105808,ProximityActor_ApplyContactDamage,thumb,low,src-alias,
 08105998,ProximityActor_InitializeCollider,thumb,low,src-alias,
+08105A40,Pool128_OnStateNoOp,thumb,low,cleanup,Tentative region actor lifecycle helper
 08105A44,Pool128_Allocate,thumb,low,src-alias,Allocates and clears a 0x128-byte object in the first free slot of a 32-slot pool
 08105AB4,ProximityActor_UpdateDamageAnimation,thumb,low,src-alias,
 08105E6C,RegionActor_UpdateBehaviorAnimation,thumb,low,src-alias,
 0810621C,RegionActor_UpdateHealthAnimation,thumb,low,src-alias,
+0810638C,RegionActor_UnregisterTerrain,thumb,low,cleanup,Tentative region actor lifecycle helper
 081063D8,RegionActor_AnimateSparkleTransition,thumb,low,src-alias,
 081065F8,RegionActor_AnimateRemoval,thumb,low,src-alias,
 08106870,RegionActor_CreateFromScript,thumb,low,src-alias,
