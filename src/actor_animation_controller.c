@@ -23,8 +23,7 @@ void ActorPalette_BeginFade(struct ActorAnimController *p)
     AnimData_SelectPaletteBank(p->effect, 344);
     p->savedPalette = p->palette;
     p->palette = p->output;
-    /* local adaptation: mode is a bitfield, whose address can't be taken */
-    if ((*(u8 *)((u8 *)p + 0xf5a) & 15) == 2)
+    if (p->mode == 2)
         p->previous = ActorPalette_UpdateFadeAndNotify;
     else
         p->previous = ActorPalette_UpdateFade;
