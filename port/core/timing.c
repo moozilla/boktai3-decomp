@@ -47,6 +47,7 @@ int port_irq_dispatch(void)
         if (!handler) return -2;
         saved_ie = REG16(0x200);
         saved_ime = REG16(0x208);
+        if (platform.acknowledge) platform.acknowledge(platform.context, order[slot]);
         REG16(0x202) &= (uint16_t)~order[slot];
         /* The SDK permits serial/timer/video nesting. Its timer selection
          * comes from the serial state pointer at 03006A50. */
@@ -84,6 +85,7 @@ int port_run_scanline(void)
     if (current_line >= 160 && current_line < 227) status |= 1;
     if (current_line == (status >> 8)) status |= 4;
     REG16(4) = status;
+    if (current_line == 160 && platform.blank) platform.blank(platform.context, current_line, 1);
     if (current_line == 160 && (status & 8)) port_irq_raise(1);
     if ((status & 4) && (status & 0x20)) port_irq_raise(4);
     result = port_irq_dispatch();
@@ -93,6 +95,7 @@ int port_run_scanline(void)
     if (current_line < PORT_VISIBLE_LINES && platform.scanline)
         platform.scanline(platform.context, current_line);
     REG16(4) |= 2;
+    if (platform.blank) platform.blank(platform.context, current_line, 0);
     if (REG16(4) & 0x10) port_irq_raise(2);
     result = port_irq_dispatch();
     if (result < 0) return result;

@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT / 'port/core'))
 from prepare import prepare_headers, prepare_source
 from link_slice import build_slice, find_linker
 from addresses import read_addresses, bind_ir
+from mmio import instrument_mmio
 
 
 def sources():
@@ -31,11 +32,14 @@ def main():
     ap.add_argument('-j', '--jobs', type=int, default=4)
     ap.add_argument('--source', action='append', help='repo-relative source (repeatable); default: every game C unit')
     ap.add_argument('--force', action='store_true')
+    ap.add_argument('--mmio', action='store_true', help='route volatile scalar accesses through port-hw in linked builds')
     ap.add_argument('--link-game', action='store_true', help='bind absolute data addresses and attempt the complete wasm game link')
     ap.add_argument('--slice', action='store_true', help='link the tested early-boot vertical slice')
     ap.add_argument('--hardware-root', help='port-hw port directory when testing before integration')
     args = ap.parse_args()
     os.chdir(ROOT)
+    if args.link_game:
+        args.mmio = True
     if args.slice:
         return build_slice(ROOT, args)
     out = Path('build/port') / (args.target + ('-bound' if args.link_game else ''))
@@ -54,8 +58,9 @@ def main():
         if args.target != 'wasm32':
             ap.error('--link-game requires wasm32')
         hardware = Path(args.hardware_root).resolve() if args.hardware_root else ROOT / 'port'
-        flags += ['-I' + str(hardware / 'include')]
-        units += [ROOT / p for p in ['port/core/memory.c', 'port/core/timing.c', 'port/core/boot.c', 'port/core/entry.c']]
+        flags += ['-Iport/core', '-I' + str(hardware / 'include'), '-I' + str(hardware / 'hw')]
+        units += [ROOT / 'port/core/bus.c', ROOT / 'port/core/devices.c']
+        units += [ROOT / p for p in ['port/core/memory.c', 'port/core/timing.c', 'port/core/boot.c', 'port/core/entry.c', 'port/core/callback.c', 'port/core/veneers.c']]
         # Keep external worker paths out of committed code and serialized names.
         units += sorted((hardware / 'hw').glob('*.c'))
     header_hash = hashlib.sha256()
@@ -63,7 +68,10 @@ def main():
         header_hash.update(str(p.relative_to(ROOT)).encode())
         header_hash.update(p.read_bytes())
     identity = subprocess.check_output([args.cc, '--version'])
-    context = identity + repr(flags).encode() + header_hash.digest() + (ROOT / 'port/core/prepare.py').read_bytes()
+    context = identity + repr(flags).encode() + header_hash.digest()
+    for helper in ('prepare.py', 'addresses.py', 'mmio.py'):
+        context += (ROOT / 'port/core' / helper).read_bytes()
+    context += json.dumps(address_map, sort_keys=True).encode() + str(args.mmio).encode()
 
     def compile_one(src):
         name = str(src.relative_to(ROOT)) if src.is_relative_to(ROOT) else 'port/hw/' + src.name
@@ -82,6 +90,9 @@ def main():
             result = subprocess.run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ir)], text=True, capture_output=True)
             if result.returncode == 0:
                 bound, resolved, unresolved = bind_ir(ir.read_text(), address_map)
+                if args.mmio and name.startswith('src/'):
+                    bound, metrics = instrument_mmio(bound)
+                    obj.with_suffix('.mmio.json').write_text(json.dumps(metrics))
                 ir.write_text(bound)
                 obj.with_suffix('.bindings.json').write_text(json.dumps({'resolved': resolved, 'unresolved': unresolved}, indent=2))
                 command = [args.cc, '--target=wasm32', '-O2', '-c', str(ir), '-o', str(obj)]
@@ -112,7 +123,9 @@ def main():
     (out / 'compile.json').write_text(json.dumps(report, indent=2) + '\n')
     print(f"{args.target}: {len(results) - len(failed)}/{len(results)} compiled; {len(failed)} failed")
     if args.link_game and not failed:
-        excluded = {'src/fn/AgbMain.c', 'src/fn/sub_08213F80.c'}
+        excluded = {'src/fn/AgbMain.c', 'src/fn/sub_08213F80.c',
+                    'src/fn/sub_082485EC.c', 'src/fn/sub_082486B4.c', 'src/fn/sub_08248778.c',
+                    'src/fn/sub_082488D8.c', 'src/fn/sub_08248764.c'}
         objects = [r['object'] for r in results if r['source'] not in excluded]
         command = [find_linker(), '--no-entry', '--gc-sections', '--export-memory',
                    '--initial-memory=167772160', '--max-memory=167772160',

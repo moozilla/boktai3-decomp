@@ -29,6 +29,23 @@ const assert = require('assert');
   fs.writeFileSync(dumpPath, clock);
   assert.strictEqual(e.port_boot_copy_iwram(), 0);
   assert.deepStrictEqual(bytes.slice(0x03000000, 0x0300110c), bytes.slice(0x08000350, 0x0800145c));
+  if (e.port_devices_init) {
+    e.port_devices_init(0, 0);
+    bytes.fill(0x5a, 0x05000000, 0x05000400);
+    bytes.fill(0x5a, 0x06000000, 0x06018000);
+    bytes.fill(0x5a, 0x07000000, 0x07000400);
+    e.InterruptsAndVideo_Initialize();
+    assert(bytes.slice(0x05000000, 0x05000400).every(x => x === 0));
+    assert(bytes.slice(0x06000000, 0x06018000).every(x => x === 0));
+    for (let address = 0x07000000; address < 0x07000400; address += 4)
+      assert.strictEqual(words.getUint32(address, true), 0xa0);
+    assert.deepStrictEqual(bytes.slice(0x03003a10, 0x03003a44), bytes.slice(0x0824ffa8, 0x0824ffdc));
+    assert.deepStrictEqual(bytes.slice(0x03003a60, 0x03004260), bytes.slice(0x080001f0, 0x080009f0));
+    assert.strictEqual(words.getUint16(0x04000200, true), 0x2001);
+    assert.strictEqual(words.getUint16(0x04000208, true), 1);
+    e.port_devices_init(0, 0); // Reset IRQ enables before the handler-free timing check.
+    console.log('wasm video init: original game C DMA clears and interrupt-table copy PASS');
+  }
   e.SceneLifecycle_InitFrameCounterPointer();
   assert.strictEqual(words.getUint32(0x030053f8, true), 0x030025c0);
   e.port_timing_reset();

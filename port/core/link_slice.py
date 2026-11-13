@@ -8,6 +8,7 @@ import sys
 
 from addresses import bind_ir, read_addresses
 from prepare import prepare_headers, prepare_source
+from mmio import instrument_mmio
 
 GAME = ['src/fn/sub_08248970.c', 'src/fn/sub_08249210.c',
         'src/fn/sub_082284F4.c', 'src/fn/sub_08219DD8.c', 'src/fn/sub_08224EEC.c']
@@ -47,11 +48,17 @@ def build_slice(root, args):
     flags = [*arch, '-O2', '-std=gnu89', '-fno-builtin', '-fno-strict-aliasing', '-fwrapv',
              '-ffunction-sections', '-fdata-sections', '-Wno-everything',
              '-I' + str(headers), '-Iport/include', '-Iport/core', '-I' + str(hardware / 'include'),
-             '-include', 'port/core/compat.h']
+             '-I' + str(hardware / 'hw'), '-include', 'port/core/compat.h']
     addresses = read_addresses(root)
     objects = []
     bindings = {}
-    for name in CORE + GAME + [str(bios)]:
+    units = CORE + GAME + [str(bios)]
+    exports = list(EXPORTS)
+    if args.mmio:
+        units += ['port/core/bus.c', 'port/core/devices.c', 'src/fn/sub_08213D10.c']
+        units += [str(p) for p in sorted((hardware / 'hw').glob('*.c')) if p != bios]
+        exports += ['port_devices_init', 'InterruptsAndVideo_Initialize']
+    for name in units:
         source = root / name
         key = name.replace('/', '_').replace('\\', '_').lstrip('_')
         prepared = out / (key + '.c')
@@ -59,8 +66,11 @@ def build_slice(root, args):
         ir = out / (key + '.ll')
         subprocess.run([args.cc, *flags, '-S', '-emit-llvm', str(prepared), '-o', str(ir)], check=True)
         text, resolved, unresolved = bind_ir(ir.read_text(), addresses)
-        bindings[name if not source.is_absolute() or source.is_relative_to(root) else 'port/hw/bios.c'] = {
+        bindings[name if not source.is_absolute() or source.is_relative_to(root) else 'port/hw/' + source.name] = {
             'resolved': resolved, 'unresolved': unresolved}
+        if args.mmio and name.startswith('src/'):
+            text, metrics = instrument_mmio(text)
+            (out / (key + '.mmio.json')).write_text(json.dumps(metrics))
         ir.write_text(text)
         obj = out / (key + '.o')
         subprocess.run([args.cc, *arch, '-O2', '-c', str(ir), '-o', str(obj)], check=True)
@@ -71,7 +81,7 @@ def build_slice(root, args):
         command = [find_linker(), '--no-entry', '--gc-sections', '--export-memory',
                    '--initial-memory=167772160', '--max-memory=167772160',
                    '--global-base=1048576', '-z', 'stack-size=1048576',
-                   *['--export=' + name for name in EXPORTS], *objects, '-o', str(destination)]
+                   *['--export=' + name for name in exports], *objects, '-o', str(destination)]
     else:
         destination = out / 'boot_test'
         ldflags = ['-Wl,-no_pie,-pagezero_size,0x10000,-dead_strip'] if sys.platform == 'darwin' else ['-no-pie', '-Wl,--gc-sections']

@@ -43,7 +43,7 @@ def bind_ir(text, addresses):
             raw = re.fullmatch(r'gUnk_(0[2389][0-9A-Fa-f]{6})', name)
             if raw:
                 address = int(raw[1], 16)
-        if address is not None and 0x02000000 <= address < 0x0a000000:
+        if address is not None and (0x02000000 <= address < 0x0a000000 or name in {'gNumMusicPlayers', 'gMaxLines'}):
             names[name] = address
         else:
             unresolved.append(name)

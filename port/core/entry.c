@@ -2,6 +2,7 @@
  * remain the ROM build's inputs. This file is linked only by the source port. */
 #include "platform.h"
 #include "boot.h"
+#include "devices.h"
 #include "hw.h"
 
 void Clock_CheckRtcDate(void);
@@ -33,7 +34,9 @@ int port_game_initialize(void)
 {
     uint16_t *ie = (uint16_t *)(uintptr_t)0x04000200;
     volatile uint16_t *ime = (volatile uint16_t *)(uintptr_t)0x04000208;
-    if (initialized || port_boot_early() < 0) return -1;
+    if (initialized) return -1;
+    port_devices_init(NULL, NULL);
+    if (port_boot_early() < 0) return -1;
     Clock_CheckRtcDate();
     m4aSoundInit();
     InterruptsAndVideo_Initialize();

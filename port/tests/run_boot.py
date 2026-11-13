@@ -21,7 +21,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     extra = ['--hardware-root', args.hardware_root] if args.hardware_root else []
     for target in ('host', 'wasm32'):
-        subprocess.run([sys.executable, 'port/build.py', '--slice', '--target', target, *extra], check=True)
+        subprocess.run([sys.executable, 'port/build.py', '--slice', '--target', target, *extra, *(['--mmio'] if target == 'wasm32' else [])], check=True)
     subprocess.run(['build/port/slice-host/boot_test', args.rom, str(out / 'native_clock.bin')], check=True)
     subprocess.run(['node', 'port/tests/boot_wasm.js', 'build/port/slice-wasm32/boot.wasm',
                     args.rom, str(out / 'wasm_clock.bin')], check=True)

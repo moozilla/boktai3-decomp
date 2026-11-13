@@ -45,6 +45,8 @@ struct PortPlatformHooks {
     void (*scanline)(void *context, unsigned line);
     PortIrqHandler (*resolve)(void *context, uint32_t gba_address);
     void (*trace)(void *context, const char *event, uint32_t value);
+    void (*blank)(void *context, unsigned line, int vblank);
+    void (*acknowledge)(void *context, uint16_t mask);
 };
 void port_set_hooks(const struct PortPlatformHooks *hooks);
 void port_irq_raise(uint16_t mask);
