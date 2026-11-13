@@ -12,9 +12,22 @@ static void publish_status(Hw *hw)
     hw_publish_io(hw, 0x84, 2);
 }
 
+static void wave_window(Hw *hw)
+{
+    unsigned cpu_bank = ((hw->io[0x70] >> 6) & 1) ^ 1;
+    hw_copy(hw->io + 0x90, hw->psg_wave[cpu_bank], 16);
+    hw_publish_io(hw, 0x90, 16);
+}
+
 void hw_audio_io_write(Hw *hw, unsigned offset, uint16_t value, uint16_t mask)
 {
     unsigned i;
+    if (offset >= 0x90 && offset <= 0x9e) {
+        unsigned cpu_bank = ((hw->io[0x70] >> 6) & 1) ^ 1;
+        hw_put16(hw->psg_wave[cpu_bank] + (offset - 0x90), value);
+        return;
+    }
+    if (offset == 0x70) wave_window(hw);
     if (offset == 0x84) {
         if (!(value & 0x80)) {
             hw_zero(hw->psg, sizeof(hw->psg));
@@ -118,13 +131,18 @@ static int oscillator(Hw *hw, unsigned i, uint32_t cycles)
     }
     period = (i == 2 ? 8u : 16u) * (2048 - frequency);
     if (i == 2) {
-        /* Wave RAM is the currently audible bank. Core may map the other bank
-         * separately when implementing 64-sample bank-switched playback. */
+        /* CPU sees the bank opposite the one currently playing. In 64-sample
+         * mode the playback bank switches every 32 samples. */
         unsigned code = (hw->io[0x73] >> 5) & 3;
         int value;
-        index = (unsigned)(c->phase / period) & 31;
+        if ((hw->io[0x70] & 0x20) && ((c->phase / (period * 32)) & 1)) {
+            hw->io[0x70] ^= 0x40;
+            hw_publish_io(hw, 0x70, 2);
+            wave_window(hw);
+        }
         c->phase %= period * 32;
-        value = hw->io[0x90 + index / 2];
+        index = (unsigned)(c->phase / period);
+        value = hw->psg_wave[(hw->io[0x70] >> 6) & 1][index / 2];
         value = index & 1 ? value & 15 : value >> 4;
         value = value * 2 - 15;
         if (hw->io[0x73] & 0x80) return value * 3 / 4;

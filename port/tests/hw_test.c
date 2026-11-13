@@ -37,6 +37,7 @@ static int64_t now(void *user) { (void)user; return clock_seconds; }
 static int bios_tests(void)
 {
     uint32_t src[16], dst[16];
+    static uint32_t maximum_copy[0x200001];
     unsigned i;
     int32_t rem;
     uint8_t result[64];
@@ -50,12 +51,20 @@ static int bios_tests(void)
     struct BgAffineSrcData affine_src = {10000, 20000, 10, 20, 256, 512, 0x4000};
     struct BgAffineDstData affine_dst;
     struct ObjAffineSrcData object_src = {256, 512, 0};
-    int16_t object_dst[16];
+    int16_t object_dst[32];
     for (i = 0; i < 16; ++i) { src[i] = i * 0x1020304; dst[i] = 0; }
     CpuSet(src, dst, 0x04000004);
     CHECK(dst[3] == src[3] && dst[4] == 0);
     CpuFastSet(src + 1, dst, 0x01000001);
     CHECK(dst[0] == src[1] && dst[7] == src[1] && dst[8] == 0);
+    for (i = 0; i < 16; ++i) dst[i] = i;
+    CpuFastSet(dst, dst + 1, 1);
+    CHECK(dst[0] == 0 && dst[1] == 0 && dst[8] == 7 && dst[9] == 9);
+    src[0] = 0x76543210;
+    maximum_copy[0x200000] = 0x13579bdf;
+    CpuFastSet(src, maximum_copy, 0x011fffff);
+    for (i = 0; i < 0x200000; ++i) CHECK(maximum_copy[i] == 0x76543210);
+    CHECK(maximum_copy[0x200000] == 0x13579bdf);
     CHECK(hw_bios_div(-11, 3, &rem) == -3 && rem == -2);
     CHECK(hw_bios_div(INT_MIN, -1, &rem) == INT_MIN && rem == 0);
     CHECK(hw_bios_div(5, 0, &rem) == -1 && rem == 5);
@@ -83,6 +92,106 @@ static int bios_tests(void)
     for (i = 0; i < 16; ++i) object_dst[i] = 99;
     ObjAffineSet(&object_src, object_dst, 1, 8);
     CHECK(object_dst[0] == 256 && object_dst[4] == 0 && object_dst[8] == 0 && object_dst[12] == 512 && object_dst[1] == 99);
+    {
+        struct ObjInput { struct ObjAffineSrcData transform; uint16_t padding; } inputs[2] = {
+            {{256,512,0},0xaaaa}, {{128,256,0x4000},0xbbbb}
+        };
+        for (i = 0; i < 32; ++i) object_dst[i] = 99;
+        ObjAffineSet(&inputs[0].transform, object_dst, 2, 8);
+        CHECK(object_dst[0] == 256 && object_dst[12] == 512 && object_dst[16] == 0);
+        CHECK(object_dst[20] == -128 && object_dst[24] == 256 && object_dst[28] == 0 && object_dst[31] == 99);
+    }
+    {
+        uint8_t input = 0xe4, info[] = {1,0,2,8,1,0,0,0};
+        uint32_t unpacked = 0xffffffff;
+        uintptr_t registers[] = {(uintptr_t)&input, (uintptr_t)&unpacked, (uintptr_t)info, 0};
+        CHECK(hw_bios_call(16, registers) == HW_OK && unpacked == 0x04030200);
+        info[7] = 0x80;
+        CHECK(hw_bios_call(16, registers) == HW_OK && unpacked == 0x04030201);
+        info[2] = 3;
+        CHECK(hw_bios_call(16, registers) == HW_BAD_DATA && unpacked == 0x04030201);
+    }
+    return 0;
+}
+
+static uint32_t fuzz_next(uint32_t *state)
+{
+    *state = *state * 1664525u + 1013904223u;
+    return *state;
+}
+
+static int decoder_fuzz_tests(void)
+{
+    static const unsigned operations[] = {0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18};
+    static const uint8_t types[] = {0x10,0x10,0x28,0x30,0x30,0x81,0x81,0x82};
+    uint32_t random = 0x74657374;
+    unsigned trial, i, length, kind;
+    uint8_t encoded[96], expected[80], guarded[96];
+    size_t written;
+    for (length = 0; length <= sizeof(expected); ++length) {
+        for (i = 0; i < length; ++i) expected[i] = (uint8_t)fuzz_next(&random);
+        for (kind = 0; kind < 5; ++kind) {
+            size_t size = 4;
+            unsigned operation = kind == 0 ? 0x11 : kind == 1 ? 0x14 : kind == 2 ? 0x16 : 0x13;
+            encoded[0] = kind == 0 ? 0x10 : kind == 1 ? 0x30 : kind == 2 ? 0x81 : kind == 3 ? 0x28 : 0x24;
+            encoded[1] = (uint8_t)length; encoded[2] = encoded[3] = 0;
+            if (kind == 0) {
+                for (i = 0; i < length; ++i) {
+                    if (!(i & 7)) encoded[size++] = 0; /* all literal symbols */
+                    encoded[size++] = expected[i];
+                }
+            } else if (kind == 1) {
+                if (length) encoded[size++] = (uint8_t)(length - 1);
+                for (i = 0; i < length; ++i) encoded[size++] = expected[i];
+            } else if (kind == 2) {
+                for (i = 0; i < length; ++i) encoded[size++] = (uint8_t)(expected[i] - (i ? expected[i - 1] : 0));
+            } else {
+                unsigned symbols = kind == 3 ? length : length * 2;
+                unsigned symbol, bits_left = 0;
+                uint32_t bits = 0;
+                encoded[4] = 1; encoded[5] = 0xc0;
+                encoded[6] = kind == 3 ? 0x32 : 3; encoded[7] = kind == 3 ? 0xa7 : 12;
+                size = 8;
+                for (i = 0; i < length; ++i) expected[i] = 0;
+                for (symbol = 0; symbol < symbols; ++symbol) {
+                    uint8_t value;
+                    if (!bits_left) {
+                        bits = fuzz_next(&random); bits_left = 32;
+                        for (i = 0; i < 4; ++i) encoded[size++] = (uint8_t)(bits >> (i * 8));
+                    }
+                    value = encoded[6 + (bits >> 31)]; bits <<= 1; --bits_left;
+                    if (kind == 3) expected[symbol] = value;
+                    else expected[symbol / 2] |= (uint8_t)(value << ((symbol & 1) * 4));
+                }
+            }
+            for (i = 0; i < sizeof(guarded); ++i) guarded[i] = 0xa5;
+            CHECK(hw_bios_decompress(operation, encoded, size, guarded + 8, length, &written) == HW_OK && written == length);
+            for (i = 0; i < length; ++i) CHECK(guarded[8 + i] == expected[i]);
+            for (i = 0; i < 8; ++i) CHECK(guarded[i] == 0xa5);
+            for (i = 8 + length; i < sizeof(guarded); ++i) CHECK(guarded[i] == 0xa5);
+        }
+    }
+    for (trial = 0; trial < 20000; ++trial) {
+        size_t input_size = fuzz_next(&random) % (sizeof(encoded) + 1);
+        size_t capacity = fuzz_next(&random) % (sizeof(expected) + 1);
+        uint8_t *input = encoded + sizeof(encoded) - input_size;
+        int result;
+        kind = (fuzz_next(&random) >> 16) % 8;
+        for (i = 0; i < input_size; ++i) input[i] = (uint8_t)(fuzz_next(&random) >> 24);
+        if (input_size >= 4 && (trial & 1)) {
+            input[0] = types[kind]; input[1] = (uint8_t)(fuzz_next(&random) % 81);
+            input[2] = input[3] = 0;
+        }
+        for (i = 0; i < sizeof(guarded); ++i) guarded[i] = 0xa5;
+        result = hw_bios_decompress(operations[kind], input, input_size, guarded + 8, capacity, &written);
+        CHECK(result == HW_OK || result == HW_TRUNCATED || result == HW_BAD_DATA || result == HW_NO_SPACE);
+        CHECK(written <= capacity);
+        if (result == HW_OK) {
+            CHECK(input_size >= 4 && written == ((unsigned)input[1] | (unsigned)input[2] << 8 | (unsigned)input[3] << 16));
+        }
+        for (i = 0; i < 8; ++i) CHECK(guarded[i] == 0xa5);
+        for (i = 8 + (unsigned)capacity; i < sizeof(guarded); ++i) CHECK(guarded[i] == 0xa5);
+    }
     return 0;
 }
 
@@ -256,6 +365,11 @@ static int rtc_sdk_tests(void)
     Rtc_Initialize();
     CHECK(Rtc_Reset() == 1 && Rtc_ReadStatus(&readback) == 1 && readback.status == 0x40);
     CHECK(Rtc_ReadDateTime(NULL) == 0 && Rtc_WriteStatus(NULL) == 0);
+    hw_write16(&machine, 0x080000c4, 1); hw_write16(&machine, 0x080000c4, 5);
+    hw_write16(&machine, 0x080000c6, 7); Rtc_WriteCommandByte(0x60);
+    hw_write16(&machine, 0x080000c4, 1);
+    CHECK(Rtc_ReadStatus(&readback) == 1 && readback.status == 0);
+    CHECK(Rtc_CheckAndReset() == 0x11 && Rtc_ReadStatus(&readback) == 1 && readback.status == 0x40);
     return 0;
 }
 
@@ -284,6 +398,15 @@ static int audio_tests(void)
     CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0 && c->envelopeVolume == 127);
     for (i = 0; i < 8; ++i) CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == 0);
     CHECK(!c->statusFlags);
+    for (i = 0; i < PCM_DMA_BUF_SIZE * 2; ++i) sound.pcmBuffer[i] = 0;
+    sound.pcmDmaCounter = 2; sound.pcmDmaPeriod = 3; sound.reverb = 64;
+    sound.pcmBuffer[0] = sound.pcmBuffer[PCM_DMA_BUF_SIZE] = -2;
+    sound.pcmBuffer[8] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 8] = -2;
+    sound.pcmBuffer[1] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 1] = 50;
+    sound.pcmBuffer[9] = sound.pcmBuffer[PCM_DMA_BUF_SIZE + 9] = -2;
+    CHECK(hw_mp2k_mix(&sound, pcm, 4, 8000) == HW_OK);
+    CHECK(pcm[0] == 0 && pcm[1] == 0 && pcm[2] == 3072 && pcm[3] == 3072);
+    CHECK(sound.pcmBuffer[9] == 12 && sound.pcmBuffer[1] == 50);
     hw_write16(&machine, HW_IO_BASE + 0x84, 0x80);
     hw_write16(&machine, HW_IO_BASE + 0x80, 0x1177);
     hw_write16(&machine, HW_IO_BASE + 0x82, 2);
@@ -317,6 +440,122 @@ static int audio_tests(void)
     CHECK(!machine.psg[3].enabled);
     hw_write16(&machine, HW_IO_BASE + 0x84, 0x8f);
     CHECK(hw_read16(&machine, HW_IO_BASE + 0x84) == 0x80);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0x40); /* CPU writes bank 0 */
+    for (i = 0; i < 16; ++i) hw_write8(&machine, HW_IO_BASE + 0x90 + i, 0x11);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0); /* CPU writes bank 1 */
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0);
+    for (i = 0; i < 16; ++i) hw_write8(&machine, HW_IO_BASE + 0x90 + i, 0xee);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0x40);
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0x11);
+    hw_write16(&machine, HW_IO_BASE + 0x80, 0x4477);
+    hw_write16(&machine, HW_IO_BASE + 0x82, 2);
+    hw_write16(&machine, HW_IO_BASE + 0x70, 0xa0); /* play both banks from 0 */
+    hw_write16(&machine, HW_IO_BASE + 0x72, 0x2000);
+    hw_write16(&machine, HW_IO_BASE + 0x74, 0x87ff);
+    hw_psg_render(&machine, pcm, 64, HW_CPU_HZ / 8, 0);
+    CHECK(pcm[0] < 0 && pcm[60] < 0 && pcm[62] > 0 && pcm[124] > 0 && pcm[126] < 0);
+    CHECK(hw_read8(&machine, HW_IO_BASE + 0x90) == 0xee);
+    return 0;
+}
+
+static struct SoundInfo bridge_sound;
+static struct MusicPlayerInfo bridge_player;
+static unsigned bridge_order, bridge_error, bridge_samples;
+
+static void bridge_sequence(struct MusicPlayerInfo *player)
+{
+    if (bridge_order != 0 || player != &bridge_player || bridge_sound.ident != ID_NUMBER + 1) bridge_error = 1;
+    bridge_order = 1;
+    SoundMain(); /* The SDK lock must reject reentry before another callback. */
+    if (bridge_order != 1) bridge_error = 1;
+}
+
+static void bridge_cgb(void)
+{
+    if (bridge_order != 1 || bridge_sound.ident != ID_NUMBER + 1) bridge_error = 1;
+    bridge_order = 2;
+    /* Simulate the game's direct register stores after SoundInit powered on. */
+    io[0x62] = 0x80; io[0x63] = 0xf0;
+    io[0x64] = 0x00; io[0x65] = 0x86;
+    io[0x80] = 0x77; io[0x81] = 0x11; io[0x82] = 2;
+}
+
+static void bridge_audio(void *user, const int16_t *stereo, size_t frames, uint32_t rate)
+{
+    size_t i;
+    unsigned audible = 0;
+    (void)user;
+    if (bridge_order != 2 || bridge_sound.ident != ID_NUMBER || frames != 16 || rate != 8000) bridge_error = 1;
+    for (i = 0; i < frames * 2; ++i) audible |= stereo[i] != 0;
+    if (!audible) bridge_error = 1;
+    bridge_samples += (unsigned)frames;
+    bridge_order = 3;
+}
+
+static int sound_bridge_tests(void)
+{
+    HwHost host = machine.host;
+    host.audio = bridge_audio;
+    hw_init(&machine, &host);
+    hw_m4a_attach(&machine, &bridge_sound);
+    bridge_sound.ident = ID_NUMBER;
+    bridge_sound.pcmSamplesPerVBlank = 16;
+    bridge_sound.pcmFreq = 8000;
+    bridge_sound.MPlayMainHead = bridge_sequence;
+    bridge_sound.musicPlayerHead = &bridge_player;
+    bridge_sound.CgbSound = bridge_cgb;
+    bridge_order = bridge_error = bridge_samples = 0;
+    io[0x84] = 0x80; /* SoundInit's direct store, pending import. */
+    SoundMain();
+    CHECK(!bridge_error && bridge_order == 3 && bridge_samples == 16 && machine.psg[0].enabled);
+    CHECK(!(io[0x65] & 0x80) && bridge_sound.ident == ID_NUMBER);
+    bridge_sound.ident = ID_NUMBER + 1;
+    SoundMain();
+    CHECK(bridge_samples == 16 && bridge_order == 3);
+    bridge_sound.ident = ID_NUMBER;
+    bridge_sound.pcmSamplesPerVBlank = PCM_DMA_BUF_SIZE + 1;
+    SoundMain();
+    CHECK(bridge_samples == 16);
+    hw_m4a_attach(&machine, NULL);
+    return 0;
+}
+
+static int sound_routing_tests(void)
+{
+    static struct SoundInfo sound;
+    static const struct {
+        uint16_t type, status;
+        uint32_t frequency, loop, size;
+        int8_t data[4];
+    } wave = {0,0x4000,8000 * 1024,0,1,{64,0,0,0}};
+    static const struct { uint16_t control; int16_t left, right; } cases[] = {
+        {0x210c,8128,16256}, {0x120c,16256,8128}, {0x3300,12192,12192},
+        {0x0100,0,8128}, {0x200c,8128,0}, {0,0,0}
+    };
+    HwHost host = machine.host;
+    unsigned i, j;
+    host.audio = NULL;
+    hw_init(&machine, &host);
+    hw_m4a_attach(&machine, &sound);
+    sound.ident = ID_NUMBER; sound.pcmSamplesPerVBlank = 4; sound.pcmFreq = 8000;
+    sound.masterVolume = 15; sound.maxChans = 1;
+    sound.chans[0].wav = (struct WaveData *)&wave;
+    sound.chans[0].type = TONEDATA_TYPE_FIX;
+    sound.chans[0].attack = 255; sound.chans[0].leftVolume = 128; sound.chans[0].rightVolume = 255;
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0x80);
+    for (i = 0; i < sizeof(cases) / sizeof(*cases); ++i) {
+        hw_write16(&machine, HW_IO_BASE + 0x82, cases[i].control);
+        sound.chans[0].statusFlags = SOUND_CHANNEL_SF_START;
+        SoundMain();
+        for (j = 0; j < 4; ++j) CHECK(machine.audio_buffer[j * 2] == cases[i].left && machine.audio_buffer[j * 2 + 1] == cases[i].right);
+    }
+    hw_write16(&machine, HW_IO_BASE + 0x82, 0x210c);
+    hw_write16(&machine, HW_IO_BASE + 0x84, 0);
+    sound.chans[0].statusFlags = SOUND_CHANNEL_SF_START;
+    SoundMain();
+    for (j = 0; j < 8; ++j) CHECK(machine.audio_buffer[j] == 0);
+    CHECK(sound.chans[0].statusFlags != 0); /* Muting output does not stop sequencing. */
+    hw_m4a_attach(&machine, NULL);
     return 0;
 }
 
@@ -328,8 +567,11 @@ int hw_test_run(void)
     host.map = map; host.interrupt = interrupt; host.wait = wait_irq; host.reset = reset; host.unix_time = now;
     hw_init(&machine, &host); hw_bind(&machine);
     result = bios_tests(); if (result) return result;
+    result = decoder_fuzz_tests(); if (result) return result;
     result = device_tests(); if (result) return result;
     result = cartridge_tests(); if (result) return result;
     result = rtc_sdk_tests(); if (result) return result;
-    return audio_tests();
+    result = audio_tests(); if (result) return result;
+    result = sound_bridge_tests(); if (result) return result;
+    return sound_routing_tests();
 }

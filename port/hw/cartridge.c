@@ -188,7 +188,7 @@ static void rtc_command(Hw *hw)
     hw->rtc_count = 0;
     if ((command & 0xf0) != 0x60) { hw->rtc_active = 0; return; }
     switch (command & 0x0e) {
-    case 0: hw->rtc_status = 0x40; hw->rtc_active = 0; break;
+    case 0: hw->rtc_status = 0; hw->rtc_active = 0; break;
     case 2: hw->rtc_data[0] = hw->rtc_status; hw->rtc_count = 1; break;
     case 4: hw_rtc_datetime(hw, hw->rtc_data); hw->rtc_count = 7; break;
     case 6: {
