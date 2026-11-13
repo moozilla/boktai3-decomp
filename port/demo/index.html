@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boktai 3 · Portable picture processor</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 system-ui,sans-serif;background:#0d1520;color:#eaf1f8}body{max-width:1120px;margin:auto;padding:40px 24px}h1{font-size:clamp(28px,5vw,48px);line-height:1.1;margin:10px 0 20px}.eyebrow{color:#efbd5d;letter-spacing:.12em;text-transform:uppercase;font-size:13px}.intro{max-width:760px;color:#aebfce}button,select,input{font:inherit}button,select,.picker{padding:9px 15px;border:1px solid #475b70;border-radius:6px;background:#1d3042;color:inherit}button:disabled{opacity:.4}.picker{display:inline-block;cursor:pointer}.picker input{display:none}.controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0}.screens{display:grid;grid-template-columns:1fr 1fr;gap:24px}figure{margin:0}canvas{display:block;background:#05090e;width:100%;image-rendering:pixelated;aspect-ratio:3/2;border:1px solid #35495b}figcaption{padding:10px 0;color:#aebfce}#status{color:#efbd5d;min-height:24px}details{margin-top:24px;color:#aebfce}code{color:#eaf1f8}.note{font-size:14px;color:#92a7b9}@media(max-width:700px){.screens{grid-template-columns:1fr}}
+</style>
+<div class="eyebrow">Boktai 3 source port · Graphics slice</div>
+<h1>The picture processor, running as C.</h1>
+<p class="intro">The left frame is drawn here by the portable C renderer compiled to WebAssembly. Select scanline captures to explore scenes or play a sequence. Every frame preserves the register and memory changes between scanlines.</p>
+<div class="controls">
+<label class="picker">Open captures + references<input id="files" type="file" multiple accept=".ppu,.gz,.ppm"></label>
+<select id="scene" aria-label="Scene" disabled><option>Select captures to begin</option></select>
+<button id="play" disabled>Play sequence</button>
+<label>Speed <select id="speed"><option value="15">15 fps</option><option value="30">30 fps</option><option value="5">5 fps</option></select></label>
+</div>
+<p id="status" role="status">Loading the WebAssembly renderer…</p>
+<div class="screens"><figure><canvas id="port" width="240" height="160"></canvas><figcaption>Portable C → WebAssembly · 240 × 160</figcaption></figure><figure><canvas id="reference" width="240" height="160"></canvas><figcaption>mGBA reference · same captured frame</figcaption></figure></div>
+<p class="note">Files stay on your computer. This page contains no ROM, game images or captured memory. It replays the graphics subsystem; it does not run the game’s main loop.</p>
+<details><summary>How to try it</summary><p>Open this HTML file directly; no server is required. Choose one or more <code>.ppu.gz</code> or <code>.ppu</code> captures from <code>build/ppu/</code>. Include the matching <code>.ppm</code> files in the same selection to compare pixel for pixel. Reference names must match capture names. For animation, select the numbered files in <code>build/demo/motion/</code>.</p><p>Regenerate the bundled module with <code>build/venv/bin/python port/demo/build.py</code>. See <code>port/README.md</code> for capture commands. The screenshot comparison uses mGBA’s RGB888 presentation arithmetic.</p></details>
+<script src="ppu-module.js"></script><script src="renderer.js"></script><script src="app.js"></script>
+</html>

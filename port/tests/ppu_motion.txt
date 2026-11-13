@@ -1,0 +1,140 @@
+trace off
+wait 300
+tap START
+wait 60
+tap A
+wait 150
+tap START
+wait 120
+tap A
+wait 120
+tap START
+wait 300
+tap START
+wait 120
+tap START
+wait 120
+tap A
+wait 150
+tap A
+wait 300
+shot motion_000
+hold UP 4
+shot motion_001
+hold UP 4
+shot motion_002
+hold UP 4
+shot motion_003
+hold UP 4
+shot motion_004
+hold UP 4
+shot motion_005
+hold UP 4
+shot motion_006
+hold UP 4
+shot motion_007
+hold UP 4
+shot motion_008
+hold UP 4
+shot motion_009
+hold UP 4
+shot motion_010
+hold UP 4
+shot motion_011
+hold UP 4
+shot motion_012
+hold UP 4
+shot motion_013
+hold UP 4
+shot motion_014
+hold UP 4
+shot motion_015
+hold UP 4
+shot motion_016
+hold UP 4
+shot motion_017
+hold UP 4
+shot motion_018
+hold UP 4
+shot motion_019
+hold UP 4
+shot motion_020
+hold UP 4
+shot motion_021
+hold UP 4
+shot motion_022
+hold UP 4
+shot motion_023
+hold UP 4
+shot motion_024
+hold UP 4
+shot motion_025
+hold UP 4
+shot motion_026
+hold UP 4
+shot motion_027
+hold UP 4
+shot motion_028
+hold UP 4
+shot motion_029
+hold UP 4
+shot motion_030
+hold DOWN 4
+shot motion_031
+hold DOWN 4
+shot motion_032
+hold DOWN 4
+shot motion_033
+hold DOWN 4
+shot motion_034
+hold DOWN 4
+shot motion_035
+hold DOWN 4
+shot motion_036
+hold DOWN 4
+shot motion_037
+hold DOWN 4
+shot motion_038
+hold DOWN 4
+shot motion_039
+hold DOWN 4
+shot motion_040
+hold DOWN 4
+shot motion_041
+hold DOWN 4
+shot motion_042
+hold DOWN 4
+shot motion_043
+hold DOWN 4
+shot motion_044
+hold DOWN 4
+shot motion_045
+hold DOWN 4
+shot motion_046
+hold DOWN 4
+shot motion_047
+hold DOWN 4
+shot motion_048
+hold DOWN 4
+shot motion_049
+hold DOWN 4
+shot motion_050
+hold DOWN 4
+shot motion_051
+hold DOWN 4
+shot motion_052
+hold DOWN 4
+shot motion_053
+hold DOWN 4
+shot motion_054
+hold DOWN 4
+shot motion_055
+hold DOWN 4
+shot motion_056
+hold DOWN 4
+shot motion_057
+hold DOWN 4
+shot motion_058
+hold DOWN 4
+shot motion_059
+hold DOWN 4
