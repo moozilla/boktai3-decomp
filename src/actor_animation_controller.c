@@ -2870,7 +2870,6 @@ void AnimatedParticles_EmitBurst(void *, s32, s32, s32, s32, s32, s32, s32);
 
 void sub_080148CC(s32, s32, void *, s32, s32, s32, s32, s32, s32, s32, s32);
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -2974,14 +2973,14 @@ void Actor_UpdateBlinkBurstDisappearance(struct ActorAnimController *p)
                 u8 reset = 1;
                 struct ActorChildCallbackView *child =
                     (struct ActorChildCallbackView *)&p->children[0].fn;
-                register s32 reserved asm("r7") = 0;
+                u32 extraFlags = 0;
                 s32 i;
                 for (i = 15; i >= 0; i--) {
                     union DisplaySequenceControl control;
                     control.raw = child->flags;
                     if (active & control.raw) {
                         child->fn = fn;
-                        child->flags = reset | control.raw;
+                        child->flags = reset | control.raw | extraFlags;
                     }
                     child++;
                 }
@@ -3708,7 +3707,6 @@ void Actor_UpdateRotatingAnimation9(struct ActorAnimController *p)
 /* Tentative role: initialize and advance an animation with a previous-state callback.
  * Cleanup: local flag, flip-mask, frame-factor and timer register hints. */
 
-// MATCHING_CONCESSION: register-pinning
 void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
 {
     struct ActorSprite *o;
@@ -3794,14 +3792,14 @@ void Actor_UpdateFinishingAnimation(struct ActorAnimController *p)
             u8 reset = 1;
             struct ActorChildCallbackView *child =
                 (struct ActorChildCallbackView *)&p->children[0].fn;
-            register s32 reserved asm("r7") = 0;
+            u32 extraFlags = 0;
             s32 i;
             for (i = 15; i >= 0; i--) {
                 union DisplaySequenceControl control;
                 control.raw = child->flags;
                 if (active & control.raw) {
                     child->fn = fn;
-                    child->flags = reset | control.raw;
+                    child->flags = reset | control.raw | extraFlags;
                 }
                 child++;
             }

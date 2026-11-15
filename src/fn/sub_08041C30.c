@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "modifier_list.h"
 void Modifier_LoadFirstSource(struct ModifierSelection *);
 void Modifier_LoadSecondSource(struct ModifierSelection *, const struct ModifierSelection *);
@@ -26,15 +25,8 @@ void ModifierMenu_LoadSavedSelection(struct ModifierMenu *menu)
     Modifier_LoadFourthSource(pending);
     pending->count = 0;
     for (i = 0; i < 4; i++) {
-        register struct GameState *state asm("r0") = gGameState;
-        s16 *row;
-        register s32 id asm("r0");
-        row = (s16 *)(i * 2 + (u32)state);
-        id = ((s16 *)((struct GameState *)row)->modifierIdsBytes)[0];
-        if (id >= 0) {
-            s32 argument = id;
-            Modifier_AddSelection(pending, argument);
-        }
+        if (((s16 *)gGameState->modifierIdsBytes)[i] >= 0)
+            Modifier_AddSelection(pending, ((s16 *)gGameState->modifierIdsBytes)[i]);
     }
     pending->selectedId = ((s16 *)gGameState->modifierIdsBytes)[0];
     if (pending->selectedId < 0)

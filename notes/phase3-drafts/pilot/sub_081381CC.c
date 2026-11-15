@@ -9,7 +9,10 @@ static inline u32 GetSelection(s32 player)
     struct AreaEffectLinkState *session = gLinkSession;
     if (!session)
         return 0;
-    return session->selectionBits[player + session->previousSelectionPage * 4];
+    {
+        s32 index = player + session->previousSelectionPage * 4;
+        return *(session->selectionBits + index);
+    }
 }
 
 void LinkSession_UpdatePlayerValueAverage(struct AreaEffectLinkState *session)

@@ -1,38 +1,32 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
+static inline void SceneActorAnimation_GetDirectionFrame(struct SceneActorAnimationView *actor, u8 *variant, u8 *mirror)
+{
+    s32 quadrant = ((actor->direction + 0x60) >> 6) & 3;
+    if (quadrant > 1) {
+        *mirror = 1;
+        *variant = 3 - quadrant;
+    } else {
+        *mirror = 0;
+        *variant = quadrant;
+    }
+}
+
 void SceneActorAnimation_SelectDirectionalFlags(struct SceneActorAnimationView *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
     u8 directionVariant, mirror;
     u32 selection;
-    u8 *mirrorPointer;
-    u8 *variantPointer = &directionVariant;
     u32 flags;
-    register u8 mirrorValue asm("r1");
-    register u16 entryFlags asm("r0");
-    u8 *variantReload;
+    u8 merged;
     u16 variant;
     u32 force;
     u8 *restart;
-    {
-        u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
-        mirrorPointer = mirrorAddress;
-        if (quadrant > 1) {
-            *mirrorPointer = 1;
-            *variantPointer = 3 - quadrant;
-        } else {
-            *mirrorPointer = 0;
-            *variantPointer = quadrant;
-        }
-    }
+    SceneActorAnimation_GetDirectionFrame(actor, &directionVariant, &mirror);
     variant = 0;
-    variantReload = &directionVariant;
-    mirrorValue = *mirrorPointer;
-    entryFlags = entry->flags;
+    merged = mirror | entry->flags;
     selection = entry->value;
-    flags = mirrorValue | entryFlags;
+    flags = merged;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
