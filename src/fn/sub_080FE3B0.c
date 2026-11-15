@@ -7,7 +7,6 @@
 void Axe_SelectRandomRoutePoint(void *);
 void Axe_SetMovementEndpoints(void *, void *);
 void sub_080FAA5C(void *);
-void CpuSet(const void *, void *, u32);
 
 struct AxeVec {
     s16 x, y, z;
@@ -73,16 +72,10 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->field2B1 = 1;
 }
 
-static inline void SetWords(const void *source, void *destination, u32 control)
-{
-    CpuSet(source, destination, control);
-}
-
 void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
     struct AxeContext *context = actor->context;
     u32 zero;
-    vu32 tmp;
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeVec *copy;
@@ -120,11 +113,7 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         deltaZ = copy->z;
         deltaX = target->x;
         *(((u8 *)actor) + 0x3cd) = Math_Atan2(deltaX, deltaZ);
-        {
-            u32 *clear = context->clearF14;
-            tmp = zero;
-            SetWords((void *)(&tmp), clear, 0x05000002);
-        }
+        ZeroFill8(context->clearF14);
     } else
         actor->counter2AC++;
 }

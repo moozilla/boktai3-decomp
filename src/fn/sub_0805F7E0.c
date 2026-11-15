@@ -6,8 +6,10 @@ s32 SceneItemValue_CalculateEquipment(u32 slot)
     s32 percent;
     s32 result;
     s32 comparison;
-    if (*(volatile u8 *)&equipment->kind == 0xFF ||
-        !(result = Equipment_GetDefinition(equipment->kind)->baseValue))
+    if (equipment->kind == 0xFF)
+        return 0;
+    result = Equipment_GetDefinition(equipment->kind)->baseValue;
+    if (!result)
         return 0;
     percent = 80;
     if (!equipment->condition)

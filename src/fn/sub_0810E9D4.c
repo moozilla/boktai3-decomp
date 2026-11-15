@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "record_menu.h"
 #define TileNumber_GetCell     Video_GetWrappedBackgroundMapEntry
@@ -15,12 +14,9 @@ void Video_DrawBackgroundRowMarkers(s32, u32);
 void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unused, s32 index)
 {
     s32 ticks, seconds, fraction;
-    {
-        register u16 *cell asm("r1") = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
-        u16 value = 31;
-        asm("" : "+r"(cell));
-        *cell = value;
-    }
+    u16 *cell;
+    cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 3, y);
+    *cell = 31;
     if (!records)
         Video_DrawBackgroundRowMarkers(x, y);
     if (index < 0)
@@ -40,12 +36,8 @@ void TimerDisplay_DrawRecord(struct TimerRecords *records, s32 x, u32 y, s32 unu
         }
         PanelText_DrawDigits(seconds, 100, x, y, 0);
         PanelText_DrawDigits(fraction, 100, x + 4, y, 0);
-        {
-            register u16 *cell asm("r1") = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
-            u16 value = 1;
-            asm("" : "+r"(cell));
-            *cell = value;
-        }
+        cell = (u16 *)Video_GetWrappedBackgroundMapEntry(3, x + 7, y);
+        *cell = 1;
     }
 }
 struct RecActor {

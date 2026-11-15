@@ -1,3 +1,4 @@
+#include "gba/gba.h"
 #include "particle_pool.h"
 
 void Palette_UpdateHighlightPulse(u16 *out, u8 *c)
@@ -297,10 +298,7 @@ void ParticlePool_InitParticles(struct ParticlePool *pool)
         tail->control.radius = ((RandomValue(table, index, mask) >> 3) & 0x5F) + 0x60;
         tail->control.riseSpeed = ((i & 3) << 1) + 1;
         tail->control.expandDelay = (RandomValue(table, index, mask) & 0x1F) + 8;
-        {
-            vu32 fill = zero;
-            CpuSet((const void *)&fill, tail->position.words, 0x05000002);
-        }
+        CpuFill32(zero, tail->position.words, 8);
         sprite->renderMode = 2;
         sprite->priority = 0xEC;
         {

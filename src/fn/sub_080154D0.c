@@ -1,15 +1,14 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 int AnimatedParticle_PriorityFromFlags(int flags)
 {
-    int p_2;
-    int p = flags & 0xf000;
+    int priority;
     int result;
-    DEBUG_NOP();
-    p_2 = (p >> 12) - 1;
+
+    flags &= 0xf000;
+    flags >>= 12;
+    priority = flags - 1;
     result = 2;
-    if (((u32)p_2) <= 3) {
-        result = p_2;
-    }
+    if ((u32)priority <= 3)
+        result = priority;
     return result;
 }

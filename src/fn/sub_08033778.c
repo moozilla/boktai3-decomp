@@ -47,52 +47,34 @@ struct TextWindow *TextWindowManager_FindWindow(struct WindowManager *, int);
 struct TextWindow *TextWindow_Find(int);
 int TextWindowManager_AllocateWindowId(struct WindowManager *);
 const u8 *TextWindow_ResolveString(struct TextWindow *, int);
-// MATCHING_CONCESSION: register-pinning
 int TextWindow_Destroy(int id)
 {
     struct WindowManager *p = gWindowManager;
     struct TextWindow *w;
+    struct TextWindow *previous;
     struct TextWindow **nextSlot;
     struct TextWindow **prevSlot;
-    struct TextWindow *next;
-    int result;
-    if (!p)
-        goto fail;
-    w = TextWindowManager_FindWindow(p, id);
-    if (w)
-        goto found;
-fail:
-    result = -1;
-    goto done;
-found:
+    struct TextWindow **link;
+    if (!p || !(w = TextWindowManager_FindWindow(p, id)))
+        return -1;
     TextWindow_BlankRect(w->x, w->y, w->width, w->height);
     w->callback = TextWindow_OnIdle;
-    {
-        struct TextWindow **initial = &w->next;
-        next = *initial;
-        nextSlot = initial;
-    }
-    if (next) {
-        register struct TextWindow **link asm("r2");
-        link = &next->previous;
+    link = (struct TextWindow **)w->next;
+    nextSlot = &w->next;
+    if (link) {
+        link = &((struct TextWindow *)link)->previous;
         prevSlot = &w->previous;
         *link = *prevSlot;
     } else {
         prevSlot = &w->previous;
         p->head = *prevSlot;
     }
-    {
-        struct TextWindow **last = prevSlot;
-        struct TextWindow *previous;
-        asm("" : "+r"(last));
-        previous = *last;
-        if (previous)
-            previous->next = *nextSlot;
-        *nextSlot = 0;
-        *last = 0;
-    }
+    link = prevSlot;
+    previous = *link;
+    if (previous)
+        previous->next = *nextSlot;
+    *nextSlot = NULL;
+    *link = NULL;
     Heap_Free(w);
-    result = id;
-done:
-    return result;
+    return id;
 }

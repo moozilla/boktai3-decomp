@@ -110,28 +110,12 @@ void SelectionMenu_SetActorIcon(struct SelectionMenu *p, struct SceneInputWidget
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Presentation_SetItemGraphic(struct SelectionMenu *p, struct SceneInputWidget *q, u32 item)
 {
     int index = Inventory_GetConsumableId(item);
     if (index >= 0) {
-        int offset = index * 16;
-        u8 *entry;
-        entry = (u8 *)((u32)gUnk_08E60F80 + offset);
-        {
-            void *context = &p->iconResource;
-            register int base asm("r0");
-            int resource;
-            base = 0x121;
-            asm("" : "+r"(base));
-            resource = base;
-            asm("" : "+r"(resource));
-            {
-                register int tile asm("r3") = entry[0];
-                resource += tile;
-            }
-            Anim_LoadKeyframe(q, context, resource, 0);
-        }
+        struct SelectionMenuItem *entry = &gUnk_08E60F80[index];
+        Anim_LoadKeyframe(q, &p->iconResource, (u16)(entry->graphic + 0x121), 0);
         q->flags &= ~1;
     } else
         q->flags |= 1;

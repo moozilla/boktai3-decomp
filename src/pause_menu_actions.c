@@ -11,18 +11,22 @@ void PauseMenu_RequestEffectMode(struct SceneHudState *p, u8 mode)
     p->statusRefreshRequested = 1;
 }
 
+static inline void PauseMenu_SetFlag(s16 *flag, s16 value)
+{
+    *flag = value;
+}
+
 void PauseMenu_ApplyCharacterSelection(struct SceneHudState *state)
 {
     u8 status = state->actionTransferBonus;
     if (status == 0) {
-        *(u16 *)((u8 *)gGameState + 0x610) = 1;
-        *(u16 *)((u8 *)gGameState + 0x612) = status;
+        PauseMenu_SetFlag(&gGameState->unk610, 1);
+        PauseMenu_SetFlag(&gGameState->unk612, status);
     } else {
-        *(u16 *)((u8 *)gGameState + 0x610) = 0;
-        *(u16 *)((u8 *)gGameState + 0x612) = 1;
+        PauseMenu_SetFlag(&gGameState->unk610, 0);
+        PauseMenu_SetFlag(&gGameState->unk612, 1);
     }
 }
-
 
 /* PauseMenu_RequestRecoveryRefresh: Clears the accumulated recovery value and sets pending refresh flags; recovery interpretation is tentative */
 

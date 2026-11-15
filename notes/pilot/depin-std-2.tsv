@@ -1,0 +1,20 @@
+address	name	outcome	minutes	note
+0800F9C4	BoardPiece_Initialize	clean	15	Only concession was the shared ZeroFill8 helper's vu32 local; the SDK CpuFill32 macro has the same vu32 and a plain u32 changes callers' frames, so it is excused in include/global.h.
+0801A218	sub_0801A218	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08029BF4	GridAttackActor_SpawnTargetedProjectile	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0806A160	SparkParticle_Spawn	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0806CA3C	SceneSteeringActor_CreateBobbingActor	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08083C38	SceneActorControl_AdvancePositionCurve	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08093810	Bee_FollowWanderRoute	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08098344	Ghost_BuildMovementCurve	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0809DA14	Lun_ChooseDelayedDestination	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+080DE6E0	sub_080DE6E0	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08128F98	FeatherEffectPool_SpawnGroundScatter	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+081B3DB8	Vanargand_ReleaseRadialEffects	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+080592F4	ScenePanel_InitScheduledAction	clean	5	Plain per-case assignments match: jump.c cross-jumping merges the shared tails the pinned goto version spelled out by hand.
+08059C48	ScenePanelRig_TickHoverSelection	clean	25	The dead ldr of 0x0403B714 is the shared ParticleRandom_ReadRelativeSample origin: using it for both random draws lets combine absorb every use and leave the set, so the pins and barriers go.
+0805F7E0	SceneItemValue_CalculateEquipment	clean	6	Splitting the kind check and the definition lookup into separate statements reloads kind like the ROM, so the volatile cast goes.
+08070070	SceneActorRegistry_SetMovementMode	clean	30	Rewritten from the ROM with the SetState/SetControl/RequestPath idioms of its matched relatives (UpdateRouteRecovery); mode 1 keeps one &flags2D4 pointer and an inline MoveTo shape, dropping all 51 pin/barrier lines.
+0807D2E0	SceneActorReaction_ApplyHitResponse	clean	4	The shared vu32 zero passed into a private clear helper is just ZeroFill8 at each call; with the header excuse no volatile local remains.
+080FE3B0	Axe_UpdateRouteDestinationPhase	clean	3	The vu32 copy into a private CpuSet wrapper is ZeroFill8(context->clearF14); with the header excuse no volatile local remains.
+081BDE94	Storage_BeginSwapTransition	clean	20	Barriers came out once each case stores frameBase[i] itself: jump2 still merges the tails but each copy's reload choices count, which shifts the spill rotation to the ROM's (scope spill pointed at it).

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_input_grid.h"
 #include "storage_screen.h"
@@ -21,31 +20,6 @@ s32 GameState_IsConsumableSlotEquipped(u32);
 void Storage_GetSlotPosition(struct SceneInputPosition *, u32);
 void Sound_PlaySong(u32);
 #define SWAP_OFFSET(field) ((u32) & ((struct StorageScreen *)0)->field)
-
-static inline struct SceneInputWidget *Storage_EquipmentWidget(u8 *menu, s32 slot)
-{
-    u32 base = slot * sizeof(struct SceneInputWidget);
-    register u32 offset;
-    base += (u32)menu;
-    offset = SWAP_OFFSET(categorySlots);
-    asm("" : "+r"(offset));
-    return (struct SceneInputWidget *)(base + offset);
-}
-
-static inline u8 *Storage_ConsumableSlots(u8 *menu)
-{
-    register u32 address = SWAP_OFFSET(slots);
-    asm("" : "+r"(address));
-    address += (u32)menu;
-    return (u8 *)address;
-}
-
-static inline struct SwapFlagWidget *Storage_ConsumableWidgets(u8 *menu)
-{
-    register u32 offset asm("r1") = SWAP_OFFSET(categorySlots[0].flags);
-    asm("" : "+r"(offset));
-    return (struct SwapFlagWidget *)(menu + offset);
-}
 
 static inline u8 *Storage_SlotTable(u8 *menu, s16 offset)
 {
@@ -71,7 +45,6 @@ void Storage_BeginSwapTransition(u8 *p)
         targetBase = targets;
          i < 2; i++) {
         u32 selected;
-        u32 frame;
         s32 item;
         slots = ((struct StorageScreen *)p)->slots;
         if (i == 0)
@@ -83,17 +56,19 @@ void Storage_BeginSwapTransition(u8 *p)
             case 0: {
                 item = Inventory_GetItemId(slots[selected]);
                 enabledBase[i] = item >= 0;
-                frame = Selection_GetDisplayFrame(item);
+                frameBase[i] = Selection_GetDisplayFrame(item);
                 break;
             }
 
             case 1: {
                 s32 slot = Storage_FindEquippedItemSlot(p, slots[selected]);
                 if (slot >= 0)
-                    Storage_EquipmentWidget(p, slot)->flags |= mode;
+                    ((struct SceneInputWidget *)(p + slot * sizeof(struct SceneInputWidget) +
+                                                 SWAP_OFFSET(categorySlots)))
+                        ->flags |= mode;
                 item = Inventory_GetEquipmentId(slots[selected]);
                 enabledBase[i] = item != 255;
-                frame = item + 0xF0;
+                frameBase[i] = item + 0xF0;
                 break;
             }
 
@@ -101,8 +76,10 @@ void Storage_BeginSwapTransition(u8 *p)
                 s32 slot;
                 u8 *consumables;
                 struct SwapFlagWidget *widget;
-                for (slot = 0, consumables = Storage_ConsumableSlots(p),
-                    widget = Storage_ConsumableWidgets(p);
+                for (slot = 0, consumables = ((struct StorageScreen *)p)->slots,
+                    widget = (struct SwapFlagWidget *)&((struct StorageScreen *)p)
+                                 ->categorySlots[0]
+                                 .flags;
                      slot < 32; slot++) {
                     if ((Inventory_GetConsumableId(consumables[slot]) != (-1)) &&
                         GameState_IsConsumableSlotEquipped(consumables[slot])) {
@@ -116,14 +93,10 @@ void Storage_BeginSwapTransition(u8 *p)
 
                 item = *(gGameState->table160 + Storage_SlotTable(p, SWAP_OFFSET(slots))[selected]);
                 enabledBase[i] = item >= 0;
-                frame = item + 0x121;
+                frameBase[i] = item + 0x121;
                 break;
             }
-            default:
-                goto noFrame;
         }
-        frameBase[i] = frame;
-    noFrame:
         attributeBase[i] = 0x373;
         Storage_GetSlotPosition(&starts[i], selected);
     }

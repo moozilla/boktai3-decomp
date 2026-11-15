@@ -31,7 +31,6 @@ struct PackedVector {
 void AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_InitUnlinked(void *, void *, s32);
-void CpuSet(const void *, void *, u32);
 void Position_GetHeightAdjustedCoordinates(void *, s32, void *);
 void SpatialIndex_InitEntry(void *, struct PackedVector *, struct PackedVector *,
                             struct PackedVector *, u32, u32, u32, u32, u32, void (*)(void *),
@@ -39,12 +38,6 @@ void SpatialIndex_InitEntry(void *, struct PackedVector *, struct PackedVector *
 void SpatialIndex_InsertEntry(void *);
 void MotionEffectPool_OnRenderComplete(void *);
 void SingletonSlot7_OnEffectMotionComplete(void *);
-
-static inline void SpriteTrail_ClearSpritePosition(void *position)
-{
-    vu32 zero = 0;
-    CpuSet((const void *)&zero, position, 0x05000002);
-}
 
 s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
 {
@@ -63,14 +56,14 @@ s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
         Sprite_InitUnlinked(sprite, p->animation, 0x11);
         sprite->order = 0x26 - (4 - i) * 2;
         sprite->enabled = 1;
-        SpriteTrail_ClearSpritePosition(&sprite->x);
+        ZeroFill8(&sprite->x);
     }
     sprite = p->tail;
     for (i = 0; i <= 2; i++, sprite++) {
         Sprite_InitUnlinked(sprite, p->animation, 0x11);
         sprite->order = 0x25 - (3 - i) * 2;
         sprite->enabled = 1;
-        SpriteTrail_ClearSpritePosition(&sprite->x);
+        ZeroFill8(&sprite->x);
     }
     collider = p->renderCollider;
     Position_GetHeightAdjustedCoordinates(&p->position, 0, &position);

@@ -1,23 +1,22 @@
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_reset.h"
+#include "debug.h"
+#include "scene_actor_reaction.h"
 #include "scene_actor_animation.h"
 void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    register u16 *field asm("r0");
-    register u32 mask asm("r1");
-    asm("" : "+r"(group));
-    if (actor->field2B2)
-        actor->field2B2 = 0;
-    if (actor->tracking.distance <= 0xFFFFF) {
-        field = &group->gate.flags;
-        mask = 1;
-        mask |= *field;
-    } else {
-        field = &group->gate.flags;
-        mask = ~1;
-        mask &= *field;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        DEBUG_PRINT();
     }
-    *field = mask;
+    if (actor->tracking.distance <= 0xFFFFF) {
+        u16 *field = &group->gate.flags;
+        u32 mask = 1;
+        mask |= *field;
+        *field = mask;
+    } else {
+        u16 *field = &group->gate.flags;
+        u32 mask = ~1;
+        mask &= *field;
+        *field = mask;
+    }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
 }

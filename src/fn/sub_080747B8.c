@@ -20,10 +20,6 @@ static inline s32 halve(s32 value)
         return value >> 1;
     return -(-value >> 1);
 }
-static inline void CpuSetC(const void *src, void *dst, u32 control)
-{
-    CpuSet(src, dst, control);
-}
 static inline void orFlags(u32 *flags, u32 mask)
 {
     *flags |= mask;
@@ -38,7 +34,6 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
     const struct ContactPosition *local;
     u8 *cell;
     s32 height, kind;
-    vu32 zero;
     struct BurstExtent extent;
     struct BurstExtent *burst;
     if (motionSquared(&actor->secondaryMotion) == 0 && *(s16 *)&actor->field2EA == 0) {
@@ -108,9 +103,7 @@ done:;
             bounce = *bouncePtr;
             burst = &extent;
             if (bounce == 0) {
-                struct ContactPosition *dst = &actor->secondaryMotion;
-                zero = bounce;
-                CpuSetC((void *)&zero, dst, 0x05000002);
+                ZeroFill8(&actor->secondaryMotion);
                 *elevation = bounce;
             } else {
                 s32 y;
@@ -132,8 +125,7 @@ done:;
     }
     if (motionSquared(&actor->secondaryMotion) == 0 && *(s16 *)&actor->field2EA == 0) {
         actor->field2EA = 0;
-        zero = 0;
-        CpuSetC((void *)&zero, &actor->secondaryMotion, 0x05000002);
+        ZeroFill8(&actor->secondaryMotion);
         orFlags(flags, 0x10);
         return 1;
     }

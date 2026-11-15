@@ -21,13 +21,7 @@ static inline u8 HitResponse_Test(u32 value)
         matches = 1;
     return matches;
 }
-static inline void ClearDamageOffset(vu32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet((const void *)zero, dst, 0x05000002);
-}
-
-static inline void ShowDamage(struct SceneActorRegistryResetView *a, vu32 *zero)
+static inline void ShowDamage(struct SceneActorRegistryResetView *a)
 {
     u32 buffer[2];
     s32 health = a->health;
@@ -35,7 +29,7 @@ static inline void ShowDamage(struct SceneActorRegistryResetView *a, vu32 *zero)
     s32 kind = (s16)a->fieldB2;
     s32 param = (s16)a->field9A;
     SceneHud_SetTimedState(a->body.id, health, max, kind, 0, param);
-    ClearDamageOffset(zero, buffer);
+    ZeroFill8(buffer);
     if (a->reactionSoundVariant || !(a->field2D8 & 0x20000))
         DamageNumberDisplay_Show(&a->colliderA, a->reactionSoundVariant, 0, &a->body.position,
                                  buffer, 1);
@@ -118,7 +112,6 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     struct SceneActorChaseGroup *group = &a->group;
     struct ContactCollider *collider = &a->colliderA;
     s32 category;
-    vu32 zero;
     struct HitMotionFlags *motion;
     u32 partFlag;
     struct SceneActorRegistryControl *control;
@@ -239,7 +232,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 SelectAnimationState(a, 3, 0, 0);
                 ResetEntry(a, 1);
                 if (SceneActorDamage_ShouldShow(a))
-                    ShowDamage(a, &zero);
+                    ShowDamage(a);
                 if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !ReadStatus(a, 0x800))
                     SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->body.id);
                 if (category == 4 || category == 1) {
@@ -275,7 +268,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                     left = 0;
                 a->health = left;
                 if (SceneActorDamage_ShouldShow(a))
-                    ShowDamage(a, &zero);
+                    ShowDamage(a);
             }
             break;
         }

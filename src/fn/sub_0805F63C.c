@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_input_compare.h"
 void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
                                              struct SceneInputWidget *second,
@@ -6,12 +5,9 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
                                              struct SceneInputResource *resource, s32 candidate)
 {
     s32 digits[3];
-    s32 current0, current1, current2, target2;
-    register s32 target0 asm("r5");
-    register s32 target1 asm("r6");
+    s32 current0, current1, current2, target0, target1, target2;
     s32 comparison;
     s32 i;
-    register struct SceneInputWidget *widget asm("r5");
     current0 = Player_GetCurrentAttribute(0);
     current1 = Player_GetCurrentAttribute(1);
     current2 = Player_GetCurrentAttribute(2);
@@ -24,23 +20,18 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
         if (current0 > target0)
             comparison = 2;
     }
+    SceneInputPanel_SplitThreeDigits(target0, digits);
     {
-        s32 *digit;
         s32 offset;
-        SceneInputPanel_SplitThreeDigits(target0, digits);
-        {
-            s32 product = comparison * 5;
-            offset = product * 2;
-        }
-        asm("" : "+l"(offset));
+        s32 *digit;
+        struct SceneInputWidget *widget;
+        offset = comparison * 10;
         digit = digits;
         widget = first;
-        i = 2;
-        do {
+        for (i = 2; i >= 0; i--) {
             Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
             widget++;
-            i--;
-        } while (i >= 0);
+        }
     }
     comparison = 1;
     if (current1 >= target1) {
@@ -48,23 +39,18 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
         if (current1 > target1)
             comparison = 2;
     }
+    SceneInputPanel_SplitThreeDigits(target1, digits);
     {
+        s32 offset;
         s32 *digit;
-        register s32 offset asm("r6");
-        SceneInputPanel_SplitThreeDigits(target1, digits);
-        {
-            register s32 product asm("r0") = comparison * 5;
-            asm("" : "+r"(product));
-            offset = product * 2;
-        }
+        struct SceneInputWidget *widget;
+        offset = comparison * 10;
         digit = digits;
         widget = second;
-        i = 2;
-        do {
+        for (i = 2; i >= 0; i--) {
             Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
             widget++;
-            i--;
-        } while (i >= 0);
+        }
     }
     comparison = 1;
     if (current2 >= target2) {
@@ -72,23 +58,17 @@ void SceneInputPanel_ShowAttributeComparison(struct SceneInputWidget *first,
         if (current2 > target2)
             comparison = 2;
     }
+    SceneInputPanel_SplitThreeDigits(target2, digits);
     {
+        s32 offset;
         s32 *digit;
-        register s32 offset asm("r6");
-        SceneInputPanel_SplitThreeDigits(target2, digits);
-        asm("" : "+r"(comparison));
-        {
-            register s32 product asm("r0") = comparison * 5;
-            asm("" : "+r"(product));
-            offset = product * 2;
-        }
+        struct SceneInputWidget *widget;
+        offset = comparison * 10;
         digit = digits;
         widget = third;
-        i = 2;
-        do {
+        for (i = 2; i >= 0; i--) {
             Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
             widget++;
-            i--;
-        } while (i >= 0);
+        }
     }
 }

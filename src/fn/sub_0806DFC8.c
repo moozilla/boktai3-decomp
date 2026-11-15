@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "route_sprite_actor.h"
 #include "display_animation.h"
 u8 Route_Start(void *, s32, s32, s32);
@@ -47,33 +46,10 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         s32 shadowResult;
         shadowResult = ScaledShadow_Initialize(actor->shadow, &actor->sprite.position, 64, 16, 96,
                                                100, 0xE00, one, 5, one, zero);
-        {
-            u32 offset = 0x15B;
-            s8 *dst;
-            dst = &actor->shadowAbsent;
-            *dst = shadowResult;
-        }
+        actor->shadowAbsent = shadowResult;
     }
-    {
-        struct ContactPosition *dst = &actor->elevatedPosition;
-        struct ContactPosition *low;
-        struct ContactPosition position;
-        low = savedAnchor;
-        position = *low;
-        *dst = position;
-    }
-    {
-        s16 *dst = &actor->elevatedPosition.y;
-        register u32 height asm("r2");
-        register u32 result asm("r0");
-        register u32 value asm("r3");
-        height = 0x2C8;
-        asm("" : "+r"(height));
-        result = height;
-        asm("" : "+r"(result));
-        value = (u16)*dst;
-        *dst = result + value;
-    }
+    actor->elevatedPosition = *savedAnchor;
+    actor->elevatedPosition.y += 0x2C8;
     graphics = actor->graphics;
     if (AnimData_Load(graphics, 0xD45E)) {
         Sprite_Init(&actor->sprite, graphics, 0);
@@ -81,12 +57,7 @@ void RouteSpriteActor_Create(struct ContactPosition *anchor, void *unused, s32 i
         Anim_SetSequence(&actor->sequence, pool->sequenceResource, 0x17, 0, zero);
         AnimData_SelectPaletteBank((void *)((struct DisplaySequenceSprite *)actor)->resource,
                                    0x140);
-        {
-            struct ContactPosition *low = savedAnchor;
-            struct ContactPosition position;
-            position = *low;
-            actor->sprite.position = position;
-        }
+        actor->sprite.position = *savedAnchor;
         actor->sprite.priority = one;
     }
 }

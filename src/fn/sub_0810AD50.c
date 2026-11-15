@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
@@ -24,28 +23,24 @@ static inline u16 Slot(struct AreaEffectLinkState *p, s32 i)
         return -1;
     return p->selection[i];
 }
-static inline u8 ModeInput(u32 input, u32 mask)
+static inline u8 ModeInput(u16 value)
 {
-    u32 value = input;
-    value &= mask;
-    if (value == 0xc00)
+    u16 mode = value & 0x3c00;
+    if (mode == 0xc00)
         return 1;
     return 0;
 }
-static inline u8 ModeLeave(u32 input, u32 mask)
+static inline u8 ModeLeave(u16 value)
 {
-    u32 value = input;
-    value &= mask;
-    if (value == 0x3400)
+    u16 mode = value & 0x3c00;
+    if (mode == 0x3400)
         return 1;
     return 0;
 }
-static inline u8 ModeCancel(u32 input, u32 mask)
+static inline u8 ModeCancel(u16 value)
 {
-    u32 value = input;
-    asm("" : "+r"(value));
-    value &= mask;
-    if (value == 0x2800)
+    u16 mode = value & 0x3c00;
+    if (mode == 0x2800)
         return 1;
     return 0;
 }
@@ -101,27 +96,20 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     keys = *(vu16 *)0x04000130;
     keys &= 0xfff3;
     flags = 0;
-    i = 0;
-    if (i < p->participantCount) {
-        register u32 initialMask asm("r1") = 0x3c00;
-        u32 mask;
-        asm("" : "+r"(initialMask));
-        mask = initialMask;
-        do {
-            u16 value = Slot(p, i);
-            if (ModeInput(value, mask) || ModeLeave(value, mask))
-                LinkSelection_RecordSlotState(p, value, i, &flags, 0);
-            else if (!ModeCancel(value, mask)) {
-                if (value == 0xffff) {
-                    Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
-                    return -1;
-                }
-            } else {
-                LinkSelection_RecordSlotState(p, value, i, &flags, 0);
-                if (i == p->localPlayer)
-                    Registry1745_SetState(p, 18, LinkSelection_WaitForInputCompletion);
+    for (i = 0; i < p->participantCount; i++) {
+        u16 value = Slot(p, i);
+        if (ModeInput(value) || ModeLeave(value))
+            LinkSelection_RecordSlotState(p, value, i, &flags, 0);
+        else if (!ModeCancel(value)) {
+            if (value == 0xffff) {
+                Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
+                return -1;
             }
-        } while (++i < p->participantCount);
+        } else {
+            LinkSelection_RecordSlotState(p, value, i, &flags, 0);
+            if (i == p->localPlayer)
+                Registry1745_SetState(p, 18, LinkSelection_WaitForInputCompletion);
+        }
     }
     LinkSelection_AdvanceBitExchange(p, flags, &keys);
     {
