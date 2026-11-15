@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "sun_orb_effect.h"
 struct RatatoskOrbTarget {
@@ -117,16 +116,19 @@ void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
         case 0:
             if (q->input) {
                 s32 slot = Ratatosk_GetSelectedPointIndex();
-                if (slot < 0)
-                    goto fail;
-                if (!SunOrb_IsFadingOut(slot)) {
-                    p->destination = *SunOrb_GetPosition(slot);
-                    p->duration = 32;
-                    {
-                        u32 animation = 4;
-                        q->animation = animation;
+                if (slot >= 0) {
+                    if (!SunOrb_IsFadingOut(slot)) {
+                        p->destination = *SunOrb_GetPosition(slot);
+                        p->duration = 32;
+                        {
+                            u32 animation = 4;
+                            q->animation = animation;
+                        }
+                        p->sequence = 1;
+                    } else {
+                        p->finished = 1;
+                        return;
                     }
-                    p->sequence = 1;
                 } else {
                     p->finished = 1;
                     return;
@@ -136,14 +138,7 @@ void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
         case 1:
             SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
             if (q->input) {
-                {
-                    register u32 offset asm("r2") = (u8 *)&p->sequence - (u8 *)p;
-                    asm("" : "+r"(offset));
-                    {
-                        register s32 *dest asm("r1") = (s32 *)((u8 *)p + offset);
-                        *dest = 2;
-                    }
-                }
+                p->sequence = 2;
                 p->repeat = 0;
             }
             break;
@@ -166,7 +161,6 @@ void Ratatosk_UpdateSunOrbRelocation(struct RatatoskOrbRelocation *p)
                 }
             } else {
                 if (p->repeat > 60 || !SlotController_IsSlotIdle(slot)) {
-                fail:
                     p->finished = 1;
                     return;
                 }
