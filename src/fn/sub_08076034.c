@@ -1,92 +1,68 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_animation.h"
-void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
+static inline void Dir(struct SceneActorAnimationView *actor, u8 *variant, u8 *mirror)
 {
-    struct SceneActorProfileEntry *entry =
-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
-    u8 directionVariant, mirror;
-    u32 selection;
-    u8 *mirrorPointer;
-    u8 *variantPointer = &directionVariant;
-    u32 flags;
-    u32 mirrorValue;
-    u8 variant;
-    u32 entryFlags;
-    u8 *variantReload;
+    s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+    if (quadrant > 1) {
+        *mirror = 1;
+        *variant = 3 - quadrant;
+    } else {
+        *mirror = 0;
+        *variant = quadrant;
+    }
+}
+static inline void Sel(struct SceneActorAnimationView *actor, u32 selection, u32 variant, u32 flags)
+{
     u32 force;
     u8 *restart;
-    {
-        u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
-        mirrorPointer = mirrorAddress;
-        if (quadrant > 1) {
-            *mirrorPointer = 1;
-            *variantPointer = 3 - quadrant;
-        } else {
-            *mirrorPointer = 0;
-            *variantPointer = quadrant;
-        }
-    }
-    variantReload = &directionVariant;
-    index = *mirrorPointer;
-    entryFlags = entry->flags;
-    DEBUG_NOP();
-    selection = entry->value;
-    variant = *variantReload;
-    flags = index | entryFlags;
     if (flags & 0x10) {
         force = 0x10;
         flags &= ~0x10;
-    } else {
+    } else
         force = 0;
-    }
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->selection = selection;
         drawable = actor->drawable;
-        {
-            void *sequence = drawable->sequence;
-            void *resource = (void *)drawable->resource;
-            u32 selected = (u16)selection;
-            u32 row;
-            row = variant;
-            Anim_SetSequence(sequence, resource, selected, (char)row, flags);
-        }
+        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+                         (u8)variant, flags);
         restart = &actor->restart;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
-
         selection += variant;
         savedSelection = &actor->selection;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
-            if ((flags == 1) && (tile->flags & 4)) {
+            if (flags == 1 && (tile->flags & 4))
                 return;
-            }
-            if ((flags == 0) && (!(tile->flags & 4))) {
+            if (flags == 0 && !(tile->flags & 4))
                 return;
-            }
         }
         *savedSelection = selection;
         {
             u32 mask = 4;
             u32 mode;
-            if (flags & mask) {
+            if (flags & mask)
                 mode = 6;
-            } else {
+            else
                 mode = 4;
-            }
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
-            if (flags) {
+            if (flags)
                 tile->flags |= mask;
-            } else {
+            else
                 tile->flags &= ~4;
-            }
         }
     }
     *restart = 0;
+}
+void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
+{
+    struct SceneActorProfileEntry *entry =
+        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
+    u8 directionVariant, mirror;
+    Dir(actor, &directionVariant, &mirror);
+    Sel(actor, entry->value, directionVariant, mirror | entry->flags);
 }
