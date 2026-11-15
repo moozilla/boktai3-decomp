@@ -15,3 +15,4 @@
 0809345C	Bee_BuildMovementCurve	clean	1	Its helper concession was Bee_InterpolatePoint reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 08097798	Ghost_AdvanceMovementCurve	clean	1	Its helper concession was MovementCurve_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 0809CCF4	sub_0809CCF4	clean	1	Its helper concession was MovementCurve_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
+080AA240	sub_080AA240	clean	1	Its helper concession was Tentacle_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
