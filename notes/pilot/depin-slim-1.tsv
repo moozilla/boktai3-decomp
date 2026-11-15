@@ -11,3 +11,18 @@ address	name	outcome	minutes	note
 080747B8	SceneActorMovement_UpdateAirborne	clean	5	Two hand-rolled vu32 CpuSet fills were ZeroFill8 calls; cse reuses the known-zero bounce register as the ROM does.
 0810E9D4	TimerDisplay_DrawRecord	clean	15	One u16 *cell variable for both map-entry stores: it spans blocks, so global alloc gives it r1 after local alloc puts the stored constant in r0.
 08248778	Eeprom_WriteBlock	clean	5	SDK EEPROM driver (tmc/libgbabackup lineage): its vu16/vu32 polling locals are the original source, excused with concession-ok(volatile) comments like the unit's cflags line.
+08051224	DirectionalForce_Tick	holdout	40	Down to 8 register-only rows: barrier was per-arm angle stores (jump2 merge) and pins were a random-table helper (offset-first form, if/else delay tails), but table vs mask priority (REG_EQUIV doubling of the table pointer) is still swapped.
+080597E0	ScenePanelRig_RandomizeMovement	holdout	10	Same random-table family: table/index/mask land in r7/r5/r6 instead of r5/r6/r7 because the table constant's REG_EQUIV halves its priority; not solved here.
+0805EB0C	SceneInputPanel_InitWidgets	holdout	2	Triaged only: 43 pins/barriers, 220 differing rows without them; too large for this pass.
+08067018	SceneActorControl_TickJitter	holdout	25	Natural C (flags via (s16) cast gives the ROM's subs #0x19) is 9 register-only rows: the table pointer stays block-local (r5) while the ROM's is global (r6); halves-union table did not help.
+0806BDB8	SceneSteeringActor_EmitRandomParticle	holdout	3	Triaged only: random-table family (see DirectionalForce_Tick); no-pin draft saved.
+0807F4B8	SceneActorTarget_ResetContactResponse	holdout	2	Triaged only: 8 pins/barriers, 154 differing rows without them.
+08078700	SceneActorBehavior_UpdateColliders	holdout	10	Goto-free rewrite from the ROM is 72 rows off: the mask-first Test/ReadControl shapes and separate early-return tails need more work.
+08082D80	SceneActorControl_ConvergeSavedMotion	holdout	5	Shares RestartPositionCurve's blocker: a u8 zero and a u32 zero set between the flags2D4 load and its OR, which cse merges in ordinary C.
+08084044	SceneActorControl_RestartPositionCurve	holdout	35	Field-level rewrite with mask-first flag helpers and a u8 SelectState is 2 rows off: the ROM keeps a separate byte zero (r3) for state/behavior that cse folds into the earlier word zero (r5).
+080A93F4	TentacleBody_RestartSegmentAnimations	holdout	2	Triaged only: 23 pins/barriers, 75 differing rows without them.
+0810A9D0	LinkSelection_WaitForEmptySlots	holdout	20	1 row off: the duplicated loop-entry test compares count instead of i because cse keeps the longest-lived zero (count) as class head; for/while/declaration-order variants did not change it.
+081381CC	LinkSession_UpdatePlayerValueAverage	holdout	35	selectionBits[player + previousSelectionPage * 4] through the real struct is 2 rows off: session prefers r0 in global alloc; only a u16 index cast fixes the registers (at the cost of a truncation).
+0815E1F0	PlayerContact_ApplyResponse	holdout	20	The dead power+60 and gEngineFlags&0x1000 look like an if/else with identical arms merged by jump2 after dead-code removal; partial merges reproduced, full one not yet.
+0816BC54	sub_0816BC54	holdout	5	Triaged only: four copy-pasted arrow blocks, 185 differing rows without the 5 pins.
+0819BB18	sub_0819BB18	holdout	3	Triaged only: random-table family with asm-retained table source; no-pin draft saved.
