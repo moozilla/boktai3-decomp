@@ -4,3 +4,4 @@
 08043FB0	ContactSwarm_InitializeSlot	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
 08058BD8	ScenePanel_DrawOverlay	holdout	20	1056-byte spill-heavy function: pin-free draft at 159/159 differing (36 mechanisms in why all), a natural rewrite at 270; deferred as too large for a per-function pilot pass.
 08059AC4	ScenePanelRig_TickRise	holdout	45	ROM reloads stateFrame after a twice-compared increment; CSE_NOFOLLOW=2 narrows it to 11/9 but no plain spelling stops cse folding stateFrame-8 into old-7.
+0805F63C	SceneInputPanel_ShowAttributeComparison	clean	20	Rewrote the three copy-pasted blocks plainly, then gave each block its own offset, digit and widget locals with one shared loop counter: why all named the i/widget allocation order and separate per-block pseudos fixed it.
