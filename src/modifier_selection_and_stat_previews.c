@@ -311,47 +311,51 @@ void Modifier_LoadFourthSource(struct ModifierSelection *selection)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
+// scope: put ModifierMenu_SelectPendingSource begin
 void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
+    s32 id;
     switch (menu->mode) {
         case 0: {
-            s32 index = menu->choice.cursor.index;
-            s32 category = menu->choice.cursor.category;
+            s32 category;
+            id = menu->choice.cursor.index;
+            category = menu->choice.cursor.category;
             if (category == 0) {
-                pending->sourceIds[0] = index;
+                pending->sourceIds[0] = id;
                 Modifier_LoadFirstSource(pending);
             } else if (category == 1) {
-                pending->sourceIds[1] = index;
-                goto secondSource;
+                pending->sourceIds[1] = id;
+                Modifier_LoadSecondSource(pending, &menu->current);
             } else if (category == 2) {
-                pending->sourceIds[2] = index;
+                pending->sourceIds[2] = id;
                 Modifier_LoadThirdSource(pending);
             } else {
-                pending->sourceIds[3] = index;
+                pending->sourceIds[3] = id;
                 Modifier_LoadFourthSource(pending);
             }
             break;
         }
-        case 1: {
-            register s32 category asm("r1") = menu->choice.cursor.category;
+        case 1:
+        {
+            s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
-            category = category * 3 * 2 + index;
-            pending->selectedId = category;
-        secondSource:
+            id = category * 6 + index;
+            pending->selectedId = id;
+        }
             Modifier_LoadSecondSource(pending, &menu->current);
             break;
-        }
-        case 2: {
-            register s32 category asm("r1") = menu->choice.cursor.category;
+        case 2:
+        {
+            s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
-            category = category * 3 * 2 + index;
-            pending->secondaryId = category;
-            break;
+            id = category * 6 + index;
+            pending->secondaryId = id;
         }
+            break;
     }
 }
+// scope: put ModifierMenu_SelectPendingSource end
 
 s32 ModifierMenu_CommitFirstSource(struct ModifierMenu *p)
 {
