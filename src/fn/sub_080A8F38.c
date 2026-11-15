@@ -2,7 +2,6 @@
 #include "tentacle_segment_animation.h"
 #include "display_animation.h"
 #include "display_sequence_inline.h"
-// MATCHING_CONCESSION: register-pinning
 
 // confidence=low: refreshes segment animations from their direction, keeping frame and timer.
 
@@ -73,78 +72,42 @@ static inline u32 Step(struct DisplaySequenceSprite *sprite, struct DisplaySeque
             ended = 0;
         command = state->commands + state->index;
         DisplaySequence_UpdateWeight(state, command);
-        if (!state->duration) {
-            u16 duration[] = {1};
-            state->duration = duration[0];
-        }
+        if (!state->duration)
+            state->duration = 1;
     } else
         ended = 0;
     return ended;
 }
 
-void TentacleBody_RefreshDirectionalAnimations(struct TentacleBodyAnimationView *input,
-                                               s32 inputKind)
+void TentacleBody_RefreshDirectionalAnimations(struct TentacleBodyAnimationView *body, s32 kind)
 {
-    struct TentacleBodyAnimationView *body = input;
-    struct {
-        s32 row, flags, kind;
-        u8 *profile, *actor;
-        s32 i;
-    } frame;
-    s32 offset;
-    s32 four;
+    s32 row, flags;
+    u8 *profile;
+    struct TentacleBodyAnimationView *actor;
+    s32 i;
     u16 frameSave, timerSave;
-    struct TentacleSegmentAnimation *a;
-    struct TentacleAnimationSegment *s;
-    frame.kind = inputKind;
-    frame.actor = (void *)body;
-    frame.profile = SceneActorProfiles_GetEntryAddress(body->profileId, body->profileMode, 0);
-    frame.i = 0;
-    if (frame.i >= body->segmentCount)
-        return;
-    offset = 0;
-    a = &body->segments[0].animation;
-    s = body->segments;
-    do {
-        if (!TestMask(a)) {
-            if (TentacleSegment_HasStatus(a, 4)) {
-                TentacleBody_GetDirectionFrame((a->direction + 128) & 255, &frame.row,
-                                               &frame.flags);
-                Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset), 1, (u8)frame.row,
-                                 (u8)frame.flags);
+    actor = body;
+    profile = SceneActorProfiles_GetEntryAddress(body->profileId, body->profileMode, 0);
+    for (i = 0; i < body->segmentCount; i++) {
+        if (!TestMask(&body->segments[i].animation)) {
+            if (TentacleSegment_HasStatus(&body->segments[i].animation, 4)) {
+                TentacleBody_GetDirectionFrame((body->segments[i].animation.direction + 128) & 255,
+                                               &row, &flags);
+                Anim_SetSequence(&body->segments[i].animation,
+                                 body->segments[i].animation.script, 1, (u8)row, (u8)flags);
             } else {
-                TentacleBody_GetDirectionFrame(a->direction, &frame.row, &frame.flags);
-                four = 4;
-                frameSave = a->sequence.index;
-                timerSave = a->sequence.elapsed;
-                Anim_SetSequence(a, TentacleSegment_ScriptAt(body, offset),
-                                 *(u8 *)(({
-                                             register s32 k asm("r2") = frame.kind;
-                                             register s32 x asm("r0") = k * four;
-                                             x;
-                                         }) +
-                                         (u32)frame.profile),
-                                 (u8)frame.row, (u8)frame.flags);
-                {
-                    register u8 *act asm("r1") = frame.actor;
-                    register u16 *ad asm("r0");
-                    ad = &((struct TentacleBodyAnimationView *)act)->speed;
-                    Anim_SetDurationScale(a, *ad);
-                }
-                a->sequence.index = frameSave;
-                a->sequence.elapsed = timerSave;
+                TentacleBody_GetDirectionFrame(body->segments[i].animation.direction, &row, &flags);
+                frameSave = body->segments[i].animation.sequence.index;
+                timerSave = body->segments[i].animation.sequence.elapsed;
+                Anim_SetSequence(&body->segments[i].animation,
+                                 body->segments[i].animation.script, profile[kind * 4], (u8)row,
+                                 (u8)flags);
+                Anim_SetDurationScale(&body->segments[i].animation, actor->speed);
+                body->segments[i].animation.sequence.index = frameSave;
+                body->segments[i].animation.sequence.elapsed = timerSave;
             }
-            Step((struct DisplaySequenceSprite *)s, &a->sequence);
+            Step((struct DisplaySequenceSprite *)&body->segments[i],
+                 &body->segments[i].animation.sequence);
         }
-        {
-            register u32 step asm("r1") = sizeof(struct TentacleAnimationSegment);
-            offset += step;
-            a = (void *)((u8 *)a + step);
-            s = (void *)((u8 *)s + step);
-        }
-    } while (({
-                 register s32 t asm("r2") = frame.i + 1;
-                 frame.i = t;
-                 t;
-             }) < body->segmentCount);
+    }
 }

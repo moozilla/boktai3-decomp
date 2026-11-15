@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "display_track.h"
 void Anim_SetDurationScale(void *, u32);
 void DisplayTrack_AddFromScript(void)
@@ -6,7 +5,7 @@ void DisplayTrack_AddFromScript(void)
     struct DisplayTrackManager *manager = gDisplayTrackManager;
     struct DisplayTrack *track;
     struct DisplayTrackGraphics *graphics;
-    register u32 value asm("r0");
+    u32 value;
     u32 resource;
     u32 frame;
     u32 shadow;
@@ -46,13 +45,12 @@ void DisplayTrack_AddFromScript(void)
         if (value) {
             sprite->position.x = Script_GetValue();
             sprite->position.y = Script_GetValue();
-            value = Script_GetValue();
+            sprite->position.z = Script_GetValue();
         } else {
-            register u16 zero asm("r0") = value;
-            sprite->position.x = zero;
-            sprite->position.y = zero;
+            sprite->position.x = value;
+            sprite->position.y = value;
+            sprite->position.z = value;
         }
-        sprite->position.z = value;
         value = Script_SeekToKeyword('A');
         if (value)
             value = Script_GetValue();
@@ -71,10 +69,8 @@ void DisplayTrack_AddFromScript(void)
             event = Script_SeekToKeyword('o');
             if (event)
                 track->sequenceEvent = Script_GetValue();
-            else {
-                asm("" : "+r"(event));
+            else
                 track->sequenceEvent = event;
-            }
             event = track->sequenceEvent;
             if (event && (event = Script_SeekToKeyword('e')))
                 track->sequenceEventValue = Script_GetValue();
@@ -88,7 +84,6 @@ void DisplayTrack_AddFromScript(void)
             DisplayTrack_StepSequence(track, &track->sprite, state);
             track->flags = 8;
         } else {
-            asm("" : "+r"(hasSequence));
             track->sequenceResource = (void *)hasSequence;
             track->sequenceEvent = hasSequence;
             track->sequenceEventValue = hasSequence;

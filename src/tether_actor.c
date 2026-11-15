@@ -2726,15 +2726,18 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     attributes &= 1;
     position = &actor->position;
     if (attributes == 0) {
-        s32 playerHeight = surfaceHeight((const struct ContactPosition *)&gPlayers[0]->position);
+        const struct ContactPosition *playerPosition =
+            (const struct ContactPosition *)&gPlayers[0]->position;
+        struct TetherActor *self = actor;
+        s32 playerHeight = surfaceHeight(playerPosition);
         s32 height, difference;
-        asm("" : "+r"(actor));
         {
-            struct ContactPosition *heightPosition = &actor->position;
+            struct ContactPosition *heightPosition = &self->position;
             s32 x = heightPosition->x >> 8, z = heightPosition->z >> 8;
             u8 *properties;
             u32 surface;
             position = heightPosition;
+            actor = self;
             properties = cellProperties(cellIndex_0804B6A4(x, z));
             surface = *properties >> 4;
             height = (*properties & 15) << 8;
@@ -3216,13 +3219,6 @@ void TetherActor_UpdateDisplayReturn(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-#define TETHER_CAPTURE_DISPLAY(out, actor)                                                         \
-    do {                                                                                           \
-        (out) = &(actor)->display.animation;                                                       \
-    } while (0)
-
 void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
 {
     u32 visible;
@@ -3284,7 +3280,7 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
     }
     if (visible) {
     show:
-        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
+        activeDisplay = &actor->display.animation;
         DisplayAnimation_ClearFlags(activeDisplay, 1);
         actor->auxiliarySprite.flags &= ~1;
         {
@@ -3310,15 +3306,10 @@ void TetherActor_UpdateAuxiliaryTransition(struct TetherActor *actor)
             actor->auxiliarySprite.position.y = height;
         }
     } else {
-        TETHER_CAPTURE_DISPLAY(activeDisplay, actor);
-        DisplayAnimation_SetFlags(activeDisplay, 1);
-        {
-            u32 *flags = &actor->auxiliarySprite.flags;
-            register u32 value asm("r0") = *flags;
-            value |= 1;
-            *flags = value;
-        }
-        display = activeDisplay;
+        struct DisplayAnimation *shown = &actor->display.animation;
+        DisplayAnimation_SetFlags(shown, 1);
+        actor->auxiliarySprite.flags |= 1;
+        display = shown;
     }
     if (emit)
         TetherActor_EmitPointEffect((const struct ContactPackedVector *)&actor->position,

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "vanargand_pair_attack.h"
 #include "vanargand_stage_colors.h"
@@ -80,6 +79,7 @@ static inline s16 ReadAccumulatedDamage(struct VanargandPairAttack *actor, s16 *
 
 s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
 {
+    u32 mask;
     s16 *hitTotal;
     struct VanargandPairAttack *self = p;
     void *display = &p->damageSource;
@@ -122,10 +122,8 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
             if (accumulated >= self->thresholds[transition]) {
                 s32 count = ScenePair_CountPositiveCounters(self->pair);
                 if (count == 0) {
-                    {
-                        register u32 mask asm("r2") = 1;
-                        setFlags(p, mask);
-                    }
+                    mask = 1;
+                    setFlags(p, mask);
                     *hitTotal = count;
                     return 1;
                 } else {
@@ -149,7 +147,8 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
             setFlags(p, 2);
         } else if (self->part.flags & 4) {
             changeState(p, 20, Vanargand_UpdatePaletteLeap);
-            setFlags(p, 0x10000);
+            mask = 0x10000;
+            setFlags(p, mask);
             return 1;
         }
     }

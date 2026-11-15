@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 #include "engine.h"
@@ -34,26 +33,6 @@ static inline s32 Tentacle_Cardinal(u8 direction)
     return ((direction + 32) & 255) >> 6;
 }
 
-#define TENTACLE_READ_ROUTE_CELL(value_, cell_)                                                    \
-    do {                                                                                           \
-        (value_) = *(cell_);                                                                       \
-    } while (0)
-
-static inline void Tentacle_AdvanceDirection(s32 *direction, const u32 *mask)
-{
-    *direction = (*direction + 1) & *mask;
-}
-
-#define TENTACLE_ADVANCE_CARDINAL(direction_, mask_)                                               \
-    do {                                                                                           \
-        Tentacle_AdvanceDirection(&(direction_), mask_);                                           \
-    } while (0)
-
-#define TENTACLE_COUNT_NEIGHBOR(remaining_)                                                        \
-    do {                                                                                           \
-        --(remaining_);                                                                            \
-    } while (0)
-
 static inline s16 Tentacle_MapWidth(void)
 {
     return SceneActorTerrain_Width();
@@ -68,43 +47,26 @@ static inline void Tentacle_CellCenter(struct ContactPosition *position, s32 cel
     position->z = ((u32)z << 8) + 128;
 }
 
-#define TENTACLE_NEXT_ROUTE_CELL(cell_)                                                            \
-    do {                                                                                           \
-        ++(cell_);                                                                                 \
-    } while (0)
-
-#define TENTACLE_NEXT_ROUTE_CANDIDATE(index_, cursor_)                                             \
-    do {                                                                                           \
-        TENTACLE_NEXT_ROUTE_CELL(cursor_);                                                         \
-        ++(index_);                                                                                \
-    } while (0)
-
 void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
 {
     struct TentacleWanderState *state = actor->context;
     struct TentacleWanderTarget *route = &state->target;
     s32 cells[4];
     s32 facing = Tentacle_Cardinal(actor->body.direction);
-    s32 *p;
     s32 count;
     s32 forward;
     s32 dir;
-    s32 n;
+    s32 *p;
     s32 i;
     s32 cell;
-    s32 currentCell;
     u32 surface;
-    union {
-        u32 mask;
-        s32 *cell;
-    } scan;
     {
         s32 empty = -1;
         p = &cells[3];
         do {
             *p = empty;
             p--;
-        } while (((s32)p) >= ((s32)cells));
+        } while ((s32)p >= (s32)cells);
     }
     count = 0;
     forward = -1;
@@ -122,38 +84,36 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
         state->preferred = ((actor->tracking.heading + 32) & 255) >> 6;
         state->attempts = 0;
     }
-    scan.mask = 3;
-    n = 3;
-    for (; n >= 0;) {
-        if ((Tentacle_Abs(dir - state->preferred) != 2) && (Tentacle_Abs(dir - facing) != 2)) {
-            cell = SceneActorTerrain_GetNeighborCell(actor, dir);
-            if (cell >= 0) {
-                if (dir == facing)
-                    forward = cell;
-                else
-                    cells[count++] = cell;
-            }
+    for (i = 0; i < 4; i++) {
+        if (Tentacle_Abs(dir - state->preferred) == 2) {
+            dir = (dir + 1) & 3;
+            continue;
         }
-        TENTACLE_ADVANCE_CARDINAL(dir, &scan.mask);
-        TENTACLE_COUNT_NEIGHBOR(n);
+        if (Tentacle_Abs(dir - facing) == 2) {
+            dir = (dir + 1) & 3;
+            continue;
+        }
+        cell = SceneActorTerrain_GetNeighborCell(actor, dir);
+        if (cell < 0) {
+            dir = (dir + 1) & 3;
+            continue;
+        }
+        if (dir == facing)
+            forward = cell;
+        else
+            cells[count++] = cell;
+        dir = (dir + 1) & 3;
     }
 
     if (count) {
-        i = 0;
-        if (i < count) {
-            scan.cell = cells;
-            do {
-                TENTACLE_READ_ROUTE_CELL(currentCell, scan.cell);
-                if (!TentacleActor_HasVisitedRoute(actor, currentCell)) {
-                    Tentacle_CellCenter(&route->position, *scan.cell);
-                    TENTACLE_READ_ROUTE_CELL(currentCell, scan.cell);
-                    TentacleActor_RecordVisitedRoute(actor, currentCell);
-                    state->attempts++;
-                    state->time = 40;
-                    return;
-                }
-                TENTACLE_NEXT_ROUTE_CANDIDATE(i, scan.cell);
-            } while (i < count);
+        for (i = 0; i < count; i++) {
+            if (!TentacleActor_HasVisitedRoute(actor, cells[i])) {
+                Tentacle_CellCenter(&route->position, cells[i]);
+                TentacleActor_RecordVisitedRoute(actor, cells[i]);
+                state->attempts++;
+                state->time = 40;
+                return;
+            }
         }
 
         i = Mod(Tentacle_Random(), count);
