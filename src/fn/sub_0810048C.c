@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning (empty asm operand hints)
 #include "global.h"
 struct FloorSwitch {
     u32 flags;
@@ -27,30 +26,15 @@ void AnimData_SelectPaletteBank(void *, u32);
 void Sound_PlaySong(u32);
 void FloorSwitch_SetOccupant(struct FloorSwitch *p, u32 occupant)
 {
-    u16 *flags;
-    u32 f;
-    u32 one;
-    u32 mask;
     p->field5A = occupant;
-    flags = &p->flags88;
-    f = *flags;
-    one = 1;
-    asm("" : "+r"(one));
-    if (one & f) {
-        u32 set = 2;
-        u32 zero;
-        u32 v;
-        v = set | f;
-        zero = 0;
-        asm("" : "+r"(zero));
-        v = v | zero;
-        mask = 0xFFFE;
-        *flags = v & mask;
+    if (p->flags88 & 1) {
+        p->flags88 |= 2;
+        p->flags88 &= ~1;
         p->field8C = 0;
         FloorSwitch_RunStateScript(p);
-        p->field10 = one;
+        p->field10 = 1;
         AnimData_SelectPaletteBank(p->anim, 0x16D);
-        if (*flags & 4)
+        if (p->flags88 & 4)
             Sound_PlaySong(0x389);
         else
             Sound_PlaySong(0x155);
