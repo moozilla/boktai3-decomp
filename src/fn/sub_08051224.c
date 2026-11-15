@@ -61,29 +61,34 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
             break;
         case 1:
             if (force->delay == 0) {
-            if (force->magnitudeRange == 0)
-                force->targetMagnitude = force->baseMagnitude << 4;
-            else
-                force->targetMagnitude = (force->baseMagnitude + Mod(Random_Next(), force->magnitudeRange)) << 4;
-            table = gRandomTable;
-            force->targetAngle = Random_NextByteFrom(table);
-            if (force->delayRange == 0)
-                force->delay = force->baseDelay;
-            else
-                force->delay = force->baseDelay + Mod(ParticleRandom_ReadSample(table), force->delayRange);
+                if (force->magnitudeRange == 0)
+                    force->targetMagnitude = force->baseMagnitude << 4;
+                else
+                    force->targetMagnitude =
+                        (force->baseMagnitude + Mod(Random_Next(), force->magnitudeRange)) << 4;
+                table = gRandomTable;
+                force->targetAngle = Random_NextByteFrom(table);
+                if (force->delayRange == 0)
+                    force->delay = force->baseDelay;
+                else
+                    force->delay =
+                        force->baseDelay + Mod(ParticleRandom_ReadSample(table), force->delayRange);
             } else
                 force->delay--;
             break;
         case 2:
             if (force->delay == 0) {
-            if (force->magnitudeRange == 0)
-                force->targetMagnitude = force->baseMagnitude << 4;
-            else
-                force->targetMagnitude = (force->baseMagnitude + Mod(Random_NextKeepTable(&table), force->magnitudeRange)) << 4;
-            if (force->delayRange == 0)
-                force->delay = force->baseDelay;
-            else
-                force->delay = force->baseDelay + Mod(Random_Next(), force->delayRange);
+                if (force->magnitudeRange == 0)
+                    force->targetMagnitude = force->baseMagnitude << 4;
+                else
+                    force->targetMagnitude =
+                        (force->baseMagnitude +
+                         Mod(Random_NextKeepTable(&table), force->magnitudeRange))
+                        << 4;
+                if (force->delayRange == 0)
+                    force->delay = force->baseDelay;
+                else
+                    force->delay = force->baseDelay + Mod(Random_Next(), force->delayRange);
             } else
                 force->delay--;
             break;
