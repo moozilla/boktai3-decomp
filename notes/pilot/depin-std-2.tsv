@@ -27,3 +27,4 @@ address	name	outcome	minutes	note
 08229440	Clock_CheckRtcStatus	holdout	25	Draft is 5/5: the ROM's shift temp of the u8 return gets r5, which needs a call-crossing life at flow time (likely a use after Clock_EndRtcAccess that combine later removes); a dozen typings and inline forms all give the tied r4.
 08176F70	sub_08176F70	holdout	90	Concession-free draft is 32/32, shape 2 (from 6 concessions): pinless StepAnimation idiom, header union flag read, CpuFill32, an index helper that fixes the PRE slot order (scope preorder). Left: the ROM keeps the fill/first-call zero apart from the later zero (r5 vs r4).
 081ADEAC	Vanargand_InitBackgroundAttachment	clean	3	Already concession-free after main's CpuFill32 ZeroFill8; dropped an unused alias define.
+081FAE0C	sub_081FAE0C	clean	2	Already concession-free after main's CpuFill32 ZeroFill8 (its only helper concession); check.py MATCH, no source change.
