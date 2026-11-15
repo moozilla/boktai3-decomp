@@ -2595,3 +2595,17 @@ which is exactly `10:1`. Not tested.
    identical tail is the sign). When the ROM recomputes something right after
    a loop that the loop body just computed, try the other loop statement
    before any allocation theory.
+227. **loop.c hoists an invariant only when `threshold * savings * lifetime >= insn_count`; helper types move the count.**
+   In sub_080AA688 the ROM recomputes `&trail->activeCount` on every iteration and
+   every plain draft hoisted it. `AGBCC_LOOP_TRACE=1` prints the numbers per
+   candidate (stderr.txt in the scope work directory): threshold starts at 13 on
+   Thumb in a loop with a call and drops by 3 for each invariant already moved in
+   that pass; the second loop pass starts at 13 again with a smaller count, since
+   the first pass replaced the multiply chains with giv increments. Here the
+   address had savings 1 and lifetime 3 (39) against 37 insns. The count is RTL
+   insns at loop time, including ones combine and flow delete later: byte
+   conversions of a `u8` helper parameter, a `u8` local and a `u8` return, and
+   dead giv increments. The matching form was the flag test as
+   `u8 hasFlag(segment, u8 mask)` behind `isRemoved`, three insns more than the
+   `u32 mask` form and invisible in the output. `AGBCC_NOMOVE=uid` confirms the
+   hoist is the only difference before searching for the form.
