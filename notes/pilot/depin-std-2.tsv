@@ -19,3 +19,4 @@ address	name	outcome	minutes	note
 080FE3B0	Axe_UpdateRouteDestinationPhase	clean	3	The vu32 copy into a private CpuSet wrapper is ZeroFill8(context->clearF14); with the header excuse no volatile local remains.
 081BDE94	Storage_BeginSwapTransition	clean	20	Barriers came out once each case stores frameBase[i] itself: jump2 still merges the tails but each copy's reload choices count, which shifts the spill rotation to the ROM's (scope spill pointed at it).
 08047338	TransientSpriteEffects_Update	holdout	40	Pin-free draft is 2/2 insns off: cse folds sprite=slot+0x2c into view+0x44, while the ROM keeps slot=(pool+off)+0x18 and adds 0x2c separately; inline-helper copies keep it unfolded but break elsewhere.
+08078430	SceneActorBehavior_AccelerateTowardDescriptor	holdout	30	Pin-free draft is 10/10 with shape 0: one local-alloc decision, the table-constant pseudo needs r0 (AGBCC_FORCE on it gives MATCH); no C form found that gives it r0.
