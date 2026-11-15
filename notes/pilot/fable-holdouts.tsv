@@ -28,3 +28,4 @@
 081E7F80	Actor_UpdateBlinkBurstDisappearance	clean	30	The dead movs r7,#0 is a zero flag operand ORed into child->flags inside the loop: set before the loop, it survives flow and combine folds its use afterwards (scope fact 94), so no r7 pin is needed.
 081E9574	Actor_UpdateFinishingAnimation	clean	3	Same child-callback loop as Actor_UpdateBlinkBurstDisappearance: a zero flag operand in the loop replaces the r7 pin.
 08010C10	sub_08010C10	clean	20	Reload's spill rotation was one step off: the first random draw indexes the table at its literal address (RANDOM_TABLE_ADDR), so reload loads that constant and the later ldrsh index lands in r2 with no r1 pin.
+0803198C	sub_0803198C	still-holdout	12	local-alloc: without the pin the callback address takes r0 (free after the 0xFFFF store) where the ROM has r1; not a reload choice (spill finds no shift), and no ordering of the two stores or helper form moved it.
