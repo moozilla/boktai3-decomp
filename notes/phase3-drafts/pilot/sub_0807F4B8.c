@@ -1,4 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
+// Holdout draft (no concessions), 74 rows. Tail is SceneActorBehavior_RecordDefeat's matched C.
+// AGBCC_FORCE=early:6,zero:7,<byteZero>:8 leaves 50 rows of local-alloc rotation in the 0x2B2..0x2B1 store block.
 #include "scene_actor_behavior.h"
 #include "scene_actor_reset.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
@@ -26,14 +27,10 @@ static inline void IncrementFirst(u16 *input)
 {
     u16 *counter = input;
     u32 value = *counter;
-    u32 result;
-    if (*(s16 *)counter <= 9998)
-        result = value + 1;
-    else {
-        u32 limit = 9999;
-        result = limit;
-    }
-    *counter = result;
+    if (*(s16 *)counter <= 9998) {
+        *counter = value + 1;
+    } else
+        *counter = 9999;
 }
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputActor)
 {
@@ -90,50 +87,52 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
         }
         SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
         {
-            register void *control = (void *)SceneActorControl_OnIdle;
+            void *control = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            u32 offset = 0x2B2;
             u32 one;
             u32 clearMask;
-            u8 *byteField;
-            byteField = (u8 *)early + offset;
-            one = 1;
-            *byteField = one;
-            offset -= 2;
-            byteField = (u8 *)early + offset;
-            *byteField = byteZero;
-            offset = 0x2B5;
-            *((u8 *)early + offset) = kind;
-            kind = 0x21C;
-            *(void **)((u8 *)early + kind) = control;
-            kind += 0xAC;
             {
-                u16 *half = (void *)((u8 *)early + kind);
-                *half = zero;
+                u32 offset = 0x2B2;
+                one = 1;
+                *((u8 *)early + offset) = one;
+                offset -= 2;
+                *((u8 *)early + offset) = byteZero;
             }
             {
-                register u32 *field = &early->flags114;
+                u32 offset = 0x2B5;
+                *((u8 *)early + offset) = kind;
+            }
+            {
+                u32 offset = 0x21C;
+                *(void **)((u8 *)early + offset) = control;
+                offset += 0xAC;
+                *(u16 *)((u8 *)early + offset) = zero;
+            }
+            {
+                u32 *field = &early->flags114;
                 clearMask = ~1;
                 *field &= clearMask;
             }
             ((struct SceneActorRegistryResetView *)early)->word104 = zero;
             {
-                register u32 state = 3;
-                offset = 0x2A8;
+                u32 state = 3;
+                u32 offset = 0x2A8;
                 *((u8 *)early + offset) = state;
             }
-            offset = 0x2A9;
-            *((u8 *)early + offset) = one;
-            offset++;
-            byteField = (u8 *)early + offset;
-            *byteField = byteZero;
-            offset = 0x2AC;
-            *(u32 *)((u8 *)early + offset) = zero;
-            offset += 5;
-            byteField = (u8 *)early + offset;
-            *byteField = one;
             {
-                register u32 mask = ~0x80;
+                u32 offset = 0x2A9;
+                *((u8 *)early + offset) = one;
+                offset++;
+                *((u8 *)early + offset) = byteZero;
+            }
+            {
+                u32 offset = 0x2AC;
+                *(u32 *)((u8 *)early + offset) = zero;
+                offset += 5;
+                *((u8 *)early + offset) = one;
+            }
+            {
+                u32 mask = ~0x80;
                 *actorFlags &= mask;
             }
             clearMask &= *flags;
@@ -159,7 +158,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
     {
         u16 *counter;
         u32 value;
-        register u32 result;
+        u32 result;
         if (slot == 0) {
             IncrementFirst(CounterAddress(0x884));
             counter = CounterAddress(0x530);
@@ -195,10 +194,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             return;
         }
         return;
-    capped: {
-        register u32 limit = 9999;
-        result = limit;
-    }
-        *counter = result;
+    capped:
+        *counter = 9999;
     }
 }
