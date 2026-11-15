@@ -76,7 +76,9 @@ struct SceneActorRegistryActor {
     void *fallbackCallback444;
     u8 unknown448[8];
     const struct ContactPosition *field450;
-    u8 unknown454[0x28];
+    u8 unknown454[4];
+    u8 pathId, unknown459, pathPointIndex; /* +0x458/+0x45A: Path_GetPointPositionById arguments (tentative). */
+    u8 unknown45B[0x21];
     u32 effectConfig[2];
     const struct ContactPosition *effectOrigin;
     u8 unknown488[0xE8];
