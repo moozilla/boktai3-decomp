@@ -1,206 +1,84 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-static inline u32 Unavailable(struct SceneActorRegistryResetView *actor, u32 flags)
+#include "scene_actor_init_actor.h"
+struct MotionFlags {
+    s16 bits : 16;
+};
+static inline void EnableMotionFlags(u32 mask, u16 *field)
 {
-    u32 result;
-    u32 test;
-    u32 mask;
+    struct MotionFlags *flags = (void *)field;
+    flags->bits |= mask;
+}
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+{
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
+    {
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
+    }
+    actor->word104 = 0;
+}
+static inline void ClearFlags(u32 *flags, u32 bits)
+{
+    u32 mask = ~bits;
+    *flags &= mask;
+}
+static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 *motion)
+{
     if (!actor)
-        goto available;
+        return 0;
+    if (*motion & 0x40)
+        return 1;
     {
-        test = flags & 0x40;
-        if (test)
-            goto unavailable;
+        u32 mask = 0x20000;
+        if (actor->flags2D0 & mask)
+            return 1;
     }
-    {
-        mask = 0x20000;
-        test = 0x2D0;
-        if (*(u32 *)((u8 *)actor + test) & mask)
-            goto unavailable;
-    }
-    {
-        s16 *health = &actor->health;
-        s32 value;
-        value = *health;
-        asm("" : "+r"(value), "+r"(test), "+r"(mask));
-        if (value > 0)
-            goto available;
-    }
-unavailable:
-    result = 1;
-    goto done;
-available:
-    result = 0;
-done:
-    asm("" : "+r"(result));
-    return result;
+    if (actor->health <= 0)
+        return 1;
+    return 0;
 }
 void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *actor,
-                                        const u16 *inputArgument)
+                                         const u16 *argument)
 {
-    const u16 *argument = inputArgument;
-    u32 prior, currentFlags;
-    register u32 mode asm("r5");
-    register u32 zero asm("r6");
-    {
-        u32 mask = 0x800;
-        u16 *flags;
-        flags = &actor->flags2D4;
-        {
-            register u32 loaded asm("r3") = *flags;
-            prior = (u16)(mask & loaded);
-            if (prior)
-                return;
-            zero = 0;
-            currentFlags = mask | loaded;
-            *flags = currentFlags;
-        }
-    }
-    mode = *argument;
-    switch (mode) {
-        default: {
-            u32 mask = 1;
-            if (actor->flags2CC & mask) {
-                u32 offset;
-                SceneActorRegistry_RestoreActorDefaults((void *)actor);
-                offset = 0x178;
-                {
-                    u16 *field = (void *)((u8 *)actor + offset);
-                    *field = prior;
-                }
-            }
-            return;
-        }
-        case 0: {
-            u32 *flags;
-            u32 value;
-            prior = 1;
+    u32 mask = 0x800;
+    u16 *flags = &actor->flags2D4;
+    u16 prior = mask & *flags;
+    if (prior)
+        return;
+    EnableMotionFlags(mask, flags);
+    switch (*argument) {
+        case 0:
             {
-                u32 offset = 0x2CC;
-                flags = (void *)((u8 *)actor + offset);
+                u32 bit = 1;
+                if (!(actor->flags2CC & bit))
+                    return;
             }
-            value = *flags;
-            if (!(value & prior))
-                return;
-            *flags = value & ~3;
+            ClearFlags(&actor->flags2CC, 3);
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
-            {
-                register u32 state asm("r1") = 3;
-                register u32 stateOffset asm("r2") = 0x2A8;
-                u32 phaseOffset;
-                u32 behaviorOffset;
-                void *control;
-                *((u8 *)actor + stateOffset) = state;
-                phaseOffset = 0x2A9;
-                *((u8 *)actor + phaseOffset) = zero;
-                behaviorOffset = 0x2AA;
-                *((u8 *)actor + behaviorOffset) = zero;
-                stateOffset += 4;
-                asm("" : "+r"(stateOffset));
-                {
-                    register u32 *field asm("r0") = (void *)((u8 *)actor + stateOffset);
-                    *field = mode;
-                }
-                phaseOffset += 8;
-                *((u8 *)actor + phaseOffset) = prior;
-                behaviorOffset -= 0x8A;
-                {
-                    void **field = (void *)((u8 *)actor + behaviorOffset);
-                    control = *field;
-                }
-                state = 12;
-                phaseOffset++;
-                *((u8 *)actor + phaseOffset) = prior;
-                phaseOffset -= 2;
-                {
-                    register u8 *field asm("r0") = (u8 *)actor + phaseOffset;
-                    *field = zero;
-                }
-                {
-                    register u32 kindOffset asm("r6") = 0x2B5;
-                    asm("" : "+r"(kindOffset));
-                    {
-                        register u8 *field asm("r0") = (u8 *)actor + kindOffset;
-                        *field = state;
-                    }
-                }
-                behaviorOffset = 0x21C;
-                asm("" : "+r"(behaviorOffset));
-                {
-                    void **field = (void *)((u8 *)actor + behaviorOffset);
-                    *field = control;
-                }
-            }
+            MonsterInit_SetState(actor, 3, 0, 0);
+            SetControl(actor, actor->field220, 12);
             break;
-        }
-        case 1: {
-            register u32 offset asm("r6");
-            u32 *flags;
-            u32 mask;
-            mode = Unavailable(actor, currentFlags);
-            if (mode)
+        case 1:
+            if (IsDown(actor, flags))
                 return;
-            offset = 0x2CC;
-            flags = (void *)((u8 *)actor + offset);
-            mask = ~3;
-            *flags &= mask;
+            ClearFlags(&actor->flags2CC, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
+            MonsterInit_SetState(actor, 3, 0, 0);
+            SetControl(actor, actor->field220, 12);
+            break;
+        default:
             {
-                u32 state = 3;
-                u32 stateOffset = 0x2A8;
-                register u32 phaseOffset asm("r3");
-                register void *control asm("r3");
-                *((u8 *)actor + stateOffset) = state;
-                phaseOffset = 0x2A9;
-                *((u8 *)actor + phaseOffset) = mode;
-                offset -= 0x22;
-                *((u8 *)actor + offset) = mode;
-                state = 0x2AC;
-                *(u32 *)((u8 *)actor + state) = mode;
-                stateOffset += 9;
-                {
-                    u8 *field = (u8 *)actor + stateOffset;
-                    *field = 1;
-                }
-                phaseOffset -= 0x89;
-                {
-                    register void **field asm("r0") = (void *)((u8 *)actor + phaseOffset);
-                    control = *field;
-                }
-                stateOffset = 12;
-                offset += 8;
-                *((u8 *)actor + offset) = 1;
-                state = 0x2B0;
-                *((u8 *)actor + state) = mode;
-                offset += 3;
-                {
-                    register u8 *field asm("r0") = (u8 *)actor + offset;
-                    *field = stateOffset;
-                }
-                state -= 0x94;
-                {
-                    void **field = (void *)((u8 *)actor + state);
-                    *field = control;
+                u32 bit = 1;
+                if (actor->flags2CC & bit) {
+                    SceneActorRegistry_RestoreActorDefaults((void *)actor);
+                    actor->colliderA.responseValue = 0;
                 }
             }
             break;
-        }
-    }
-    actor->field2C8 = mode;
-    {
-        u32 offset = 0x114;
-        u32 *field;
-        u32 mask;
-        field = (void *)((u8 *)actor + offset);
-        mask = ~1;
-        *field &= mask;
-    }
-    {
-        register u32 offset asm("r6") = 0x104;
-        asm("" : "+r"(offset));
-        {
-            register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
-            *field = mode;
-        }
     }
 }
