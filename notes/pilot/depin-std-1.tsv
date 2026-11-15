@@ -7,3 +7,4 @@
 0805F63C	SceneInputPanel_ShowAttributeComparison	clean	20	Rewrote the three copy-pasted blocks plainly, then gave each block its own offset, digit and widget locals with one shared loop counter: why all named the i/widget allocation order and separate per-block pseudos fixed it.
 08067BA8	sub_08067BA8	clean	5	Replaced the private IsUsed copy (asm clobber) with the header SceneActorControl_IsUsed and wrote the slot fields by name; matched first compile.
 0806C7B0	SceneSteeringActor_CreateTravelActor	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
+0806DFC8	RouteSpriteActor_Create	clean	6	The pins only forced the 0x2C8 height add; plain actor->elevatedPosition.y += 0x2C8 matches, and the struct copies collapse to direct assignments.
