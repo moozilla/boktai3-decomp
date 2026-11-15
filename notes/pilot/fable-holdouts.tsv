@@ -10,3 +10,4 @@
 0805704C	LevelAdvanceDisplay_UpdateParticle	clean	5	Field code with no locals: if (++particle->frame > 15), offsetY += velocityY, and the phase test read from particle->frame again; cse supplies the registers the pins forced.
 08100144	WoodenCrate_ReactToHit	still-holdout	45	ROM keeps p in r4 for the inlined hit test and a top-of-function copy in r5 for the tail; cse makes the copy the class head and deletes p in every ordinary form tried (copy, inline, early returns, goto).
 08033778	TextWindow_Destroy	clean	25	One slot variable carries the next window, then its previous-link address, then the window's own previous slot after the join; with separate variables the allocator puts next in r1.
+081D3620	sub_081D3620	still-holdout	60	Without the r0 pin the sample and the coordinate swap r0/r2: local-alloc ranks the coordinate quantity (12 refs) above the sample (8 refs) in every ordinary form tried (types, operand order, shared or per-block variables).
