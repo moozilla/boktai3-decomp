@@ -1,0 +1,1 @@
+08008AF4	Breakable_InitSlot	clean	25	Its only concession was the shared ZeroFill8 helper's vu32 zero; excused it in include/global.h with concession-ok(volatile) citing the SDK CPU_FILL macro's identical volatile temp (a plain u32 mismatches), which also clears every other ZeroFill8 caller.
