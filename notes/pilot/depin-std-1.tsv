@@ -17,3 +17,4 @@
 0809CCF4	sub_0809CCF4	clean	1	Its helper concession was MovementCurve_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 080AA240	sub_080AA240	clean	1	Its helper concession was Tentacle_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 080FC094	sub_080FC094	clean	1	Its two ZeroFill8 calls were its only concession; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
+0810BBD4	LinkSelection_UpdateParticipantScores	holdout	35	Plain rewrite reached 21/19; remaining bonus/positive allocation swap, the inline zero-return paths and a copied 0xFFFF did not yield to the spellings tried.
