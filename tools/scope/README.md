@@ -2609,3 +2609,24 @@ which is exactly `10:1`. Not tested.
    `u8 hasFlag(segment, u8 mask)` behind `isRemoved`, three insns more than the
    `u32 mask` form and invisible in the output. `AGBCC_NOMOVE=uid` confirms the
    hoist is the only difference before searching for the form.
+228. **cse decides which of two equal registers survives by where each is last used (make_regs_eqv).**
+   At a copy `p = actor`, cse rewrites later uses in the same extended block to
+   the class head. The older register stays head unless the new one (a) is used
+   past the end of the path cse is walking, or was first used before the path
+   began, and (b) has its last use (by insn order in the function) after the
+   older one's last use; then the new register becomes head and uses of the old
+   one are rewritten to it. Uses in later extended blocks keep the register the
+   C names. Three consequences used so far:
+   * A copy whose uses all sit in the copy's own path is folded away (the
+     "plain local copy is deleted" symptom). To keep it, give it a use past a
+     join, or make its last use the function's last use of either.
+   * Two variables that hold the same pointer are different expressions to gcse
+     PRE. In Hresvelgr_UpdateTurningCharge (0819FC34) each switch case starts
+     with `p = actor` into one function-scope `p`; the second `p->flags |=`
+     is then `(p + 0x9c)`, not the first site's `(actor + 0x9c)`, and PRE leaves
+     both computations in place (the ROM's two `adds r1, r5, #0; adds r1, #0x9c`).
+   * The two share one hard register only when the old one dies at the copy:
+     global-alloc records a conflict when the old one is still live after it.
+     One copy placed ahead of the switch failed for that reason: the path from
+     that copy reaches the new register's last use, cse rewrote those last uses
+     back to the old register, and the two then overlapped (an extra r7).
