@@ -1,4 +1,3 @@
-#define gDisplayControlShadow gDispCntShadow
 #include "global.h"
 #include "render.h"
 struct VanargandBackgroundAttachment {
