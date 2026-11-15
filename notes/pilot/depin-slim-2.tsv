@@ -8,3 +8,4 @@
 080FAA5C	sub_080FAA5C	clean	2	Shared ZeroFill8 (include/global.h) held a vu32 local; writing it as the SDK CpuFill32 macro inside the inline (gba/macro.h, library code) keeps the bytes and clears every caller (25 min for the whole group).
 081A4DF0	sub_081A4DF0	clean	2	Shared ZeroFill8 (include/global.h) held a vu32 local; writing it as the SDK CpuFill32 macro inside the inline (gba/macro.h, library code) keeps the bytes and clears every caller (25 min for the whole group).
 081B9334	MotionTrack_Initialize	clean	2	Shared ZeroFill8 (include/global.h) held a vu32 local; writing it as the SDK CpuFill32 macro inside the inline (gba/macro.h, library code) keeps the bytes and clears every caller (25 min for the whole group).
+081F2208	SpriteTrail_InitializeEntry	clean	3	Its per-file vu32 clear helper was a copy of ZeroFill8; calling the shared (now CpuFill32-based) helper matches.
