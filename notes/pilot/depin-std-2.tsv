@@ -23,3 +23,4 @@ address	name	outcome	minutes	note
 0808148C	SceneActorReaction_PlayStaggerBurst	holdout	45	Pin-free draft is 15/15 (shape 6): the ROM holds two separate constant-3 pseudos (state store in r1, random mask in r4); u32 variants = 3 at block top plus direct field stores got closest (README fact 65 territory).
 0810D8F4	RecordPanel_RefreshEntryLabels	holdout	35	Pin-free draft is 14/14 with shape 0: allocation priority of next vs i (AGBCC_PRI=next:+779 leaves 3/3); loop restructurings tried did not raise it.
 0815E034	sub_0815E034	holdout	30	Pin-free draft is 24/22: source vs common allocation after cse turns input into source; no ordinary C found that keeps them apart.
+08168A0C	SceneHud_RebuildPrimaryOptions	holdout	45	Pin- and volatile-free draft is 68/68 (shape 12), mostly a register permutation: count needs a much higher priority than the slots pointer, output pointer lands in r3 not r2.
