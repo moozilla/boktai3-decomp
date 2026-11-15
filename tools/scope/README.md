@@ -2630,3 +2630,37 @@ which is exactly `10:1`. Not tested.
      One copy placed ahead of the switch failed for that reason: the path from
      that copy reaches the new register's last use, cse rewrote those last uses
      back to the old register, and the two then overlapped (an extra r7).
+229. **A parameter copy the ROM keeps in a second register comes from cse rerunning the first block once per path, with last-use data from before the pass.**
+   The symptom is `adds rA, r0, #0; adds rB, rA, #0` at entry with both
+   registers read later, one in the early code and one in a tail
+   (Hresvelgr_PlayDescent 081A09C4, WoodenCrate_ReactToHit 08100144; 457 ROM
+   functions open this way). Four facts decide it.
+   * cse walks every path from a start insn, longest first as it finds them
+     (each conditional jump is TAKEN when its label has one use and follows a
+     barrier, else skipped AROUND when the skipped block has no label, else
+     fallen through), then again with the last followed jump not taken. The
+     `.cse` dump lists them: `;; Processing block from 1 to N`. The first block
+     is rewritten in every run.
+   * REGNO_LAST_UID is from the reg_scan before the pass. A run that rewrites a
+     tail from the copy to the parameter does not move the parameter's last use,
+     so a later, shorter run still sees the copy as "used past the path, and
+     last" and makes it head for the early code. Result: early code in the copy,
+     tail in the parameter, although the C names them the other way round.
+   * When the copy becomes head and the insn before it is the parameter's own
+     `p = rN`, cse swaps the two sets (`copy = rN; p = copy`). That needs the
+     copied parameter to be the last one declared; with another parameter after
+     it (PlayDescent's `tick`) the order stays `p = rN; copy = p`.
+   * gcse copy propagation does not undo it. `compute_cprop_data` passes the
+     transparency bitmap where the altered one belongs, so a copy is available
+     only in blocks all of whose predecessors hold the copy insn itself.
+   So the C is a plain typed copy at the top (`struct T *actor = p;`), the early
+   code written with `p`, the tail with the copy, and control flow whose first
+   path from entry reaches the tail. What changes the paths is the statement
+   form, not the registers: PlayDescent needed its body as an inline ending
+   `if (y > floor) return 0; ...; return 1;` under `if (!Body(p) && ...) Tail(actor)`;
+   WoodenCrate needed its shake as an inline called from two branches
+   (`if (a) Shake(p); else if (!b) Shake(p); else if ...`), which jump2 merges
+   into the one copy the ROM has, where `if (a || !b)` sends the first path into
+   the shake block and the copy swallows the parameter. A copy that only folds
+   at combine (`(u8 *)p + x - x`) reproduces the bytes and is a quick test that
+   this is the cause; it is not the form to land.
