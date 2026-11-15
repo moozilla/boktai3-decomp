@@ -1,6 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
-// MATCHING_CONCESSION: asm-barrier
 #include "scene_actor_control.h"
+#include "player.h"
 #include "player.h"
 struct SceneActorControlPlayerView {
     u8 unknown0[0x20];
@@ -34,6 +33,20 @@ static inline void ClearFlags(u16 *address, s32 clear)
     mask &= flags;
     *shared = mask;
 }
+static inline u32 HasFlag(u32 value, u32 bit)
+{
+    u32 mask = bit;
+    mask &= value;
+    return mask;
+}
+static inline void SetFlags(u16 *address, s32 set)
+{
+    u16 *shared = address;
+    u32 flags = *shared;
+    s32 mask = set;
+    mask |= flags;
+    *shared = mask;
+}
 void SceneActorControl_TickActive(struct SceneActorControlManager *p,
                                   struct SceneActorControlSlot *input)
 {
@@ -46,48 +59,35 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
     u32 clearValue;
     slot->position = slot->savedPosition;
     flags = &slot->flags;
-    initialFlags = *flags;
-    {
-        u32 mask = 0x10;
-        mask &= initialFlags;
-        delta = (s16)mask;
-    }
+    initialFlags = slot->flags;
+    delta = (s16)HasFlag(initialFlags, 0x10);
     if (delta) {
         s32 parameter = slot->parameter;
         s32 current = ((struct SceneActorControlPlayerView **)gPlayers)[0]->parameter;
-
+        u16 *address, *previous;
+        u32 stored;
         if (current < parameter) {
             s32 wrapped = parameter - 256;
             delta = current - wrapped;
-        } else
-            delta = current - parameter;
-        {
-            u16 *address;
-            u16 *previous;
-            u32 stored;
-            u32 changed;
             address = &slot->previousParameter;
             stored = *address;
-            flags = &slot->flags;
-            previous = address;
-            if (stored != delta && ((changed = 4), (changed &= delta))) {
-                u32 value = *flags;
-                u32 mask = 4;
-                mask |= value;
-                *flags = mask;
-            }
-            if (!sprite->active)
-                Sprite_LinkToList(sprite, 0);
-            if (*flags & 4) {
-                slot->timer = 60;
-                SceneActorControl_TickJitter(p, slot);
-                SceneActorControl_OnJitterPosition(&slot->position);
-                {
-                    u16 *target = previous;
-                    *target = delta;
-                }
-                ClearFlags(flags, 4);
-            }
+        } else {
+            delta = current - parameter;
+            address = &slot->previousParameter;
+            stored = *address;
+        }
+        flags = &slot->flags;
+        previous = address;
+        if (stored != delta && HasFlag(delta, 4))
+            SetFlags(flags, 4);
+        if (!sprite->active)
+            Sprite_LinkToList(sprite, 0);
+        if (*flags & 4) {
+            slot->timer = 60;
+            SceneActorControl_TickJitter(p, slot);
+            SceneActorControl_OnJitterPosition(&slot->position);
+            *previous = delta;
+            ClearFlags(flags, 4);
         }
         if (delta > 9 || (*flags & 2)) {
             slot->stateFrame = 0;
@@ -97,7 +97,7 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
             clearMask = ~0x12;
             goto applyMask;
         }
-    } else if (((clearMask = 0x40), (clearMask &= initialFlags))) {
+    } else if (HasFlag(initialFlags, 0x40)) {
         if (!slot->active)
             Sprite_LinkToList(slot, 0);
         if (*flags & 4) {
@@ -126,13 +126,10 @@ void SceneActorControl_TickActive(struct SceneActorControlManager *p,
         if (*flags & 2) {
             if (!sprite->active)
                 Sprite_LinkToList(sprite, 0);
-            clearMask = 0;
-            slot->stateFrame = clearMask;
+            slot->stateFrame = 0;
             slot->kind = 2;
-            clearValue = *flags;
-            asm("" : "+r"(clearMask));
-            clearMask -= 3;
-            goto applyMask;
+            ClearFlags(flags, 2);
+            return;
         }
     }
     goto normal;
