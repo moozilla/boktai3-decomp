@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contacts.h"
 static inline u8 SceneActorContacts_AreDisabled(void)
 {
@@ -12,7 +11,7 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
 {
     struct SceneActorRegistryActor *actor = argument;
     u32 kindMask = kindMaskArgument;
-    register struct SceneActorRegistryActor *owner asm("r9") = actor;
+    struct SceneActorRegistryActor *owner = actor;
     struct SceneActorContactManager *manager;
 
     struct SceneActorContactNode *node, *best;
@@ -58,11 +57,11 @@ SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 
         }
     }
     {
-        u32 clearMask = ~2;
-        u8 *flags;
-        flags = contactFlags;
-        clearMask &= flags[15];
-        flags[15] = clearMask;
+u32 clearMask = ~2;
+u8 *flags = contactFlags;
+u8 result;
+result = clearMask & flags[15];
+flags[15] = result;
     }
     return best;
 }
