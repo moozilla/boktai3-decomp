@@ -2726,15 +2726,18 @@ void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
     attributes &= 1;
     position = &actor->position;
     if (attributes == 0) {
-        s32 playerHeight = surfaceHeight((const struct ContactPosition *)&gPlayers[0]->position);
+        const struct ContactPosition *playerPosition =
+            (const struct ContactPosition *)&gPlayers[0]->position;
+        struct TetherActor *self = actor;
+        s32 playerHeight = surfaceHeight(playerPosition);
         s32 height, difference;
-        asm("" : "+r"(actor));
         {
-            struct ContactPosition *heightPosition = &actor->position;
+            struct ContactPosition *heightPosition = &self->position;
             s32 x = heightPosition->x >> 8, z = heightPosition->z >> 8;
             u8 *properties;
             u32 surface;
             position = heightPosition;
+            actor = self;
             properties = cellProperties(cellIndex_0804B6A4(x, z));
             surface = *properties >> 4;
             height = (*properties & 15) << 8;
