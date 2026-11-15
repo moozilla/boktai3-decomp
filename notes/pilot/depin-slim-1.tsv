@@ -21,7 +21,7 @@ address	name	outcome	minutes	note
 08082D80	SceneActorControl_ConvergeSavedMotion	holdout	5	Shares RestartPositionCurve's blocker: a u8 zero and a u32 zero set between the flags2D4 load and its OR, which cse merges in ordinary C.
 08084044	SceneActorControl_RestartPositionCurve	holdout	35	Field-level rewrite with mask-first flag helpers and a u8 SelectState is 2 rows off: the ROM keeps a separate byte zero (r3) for state/behavior that cse folds into the earlier word zero (r5).
 080A93F4	TentacleBody_RestartSegmentAnimations	holdout	2	Triaged only: 23 pins/barriers, 75 differing rows without them.
-0810A9D0	LinkSelection_WaitForEmptySlots	holdout	20	1 row off: the duplicated loop-entry test compares count instead of i because cse keeps the longest-lived zero (count) as class head; for/while/declaration-order variants did not change it.
+0810A9D0	LinkSelection_WaitForEmptySlots	clean	45	The display-slot fill is a plain for (i = 0; i < 4; i++) reusing i (loop.c reverses it into the ROM pointer loop); that later use makes i the cse class head over count, so the loop-entry test compares i; no pin.
 081381CC	LinkSession_UpdatePlayerValueAverage	holdout	35	selectionBits[player + previousSelectionPage * 4] through the real struct is 2 rows off: session prefers r0 in global alloc; only a u16 index cast fixes the registers (at the cost of a truncation).
 0815E1F0	PlayerContact_ApplyResponse	holdout	20	The dead power+60 and gEngineFlags&0x1000 look like an if/else with identical arms merged by jump2 after dead-code removal; partial merges reproduced, full one not yet.
 0816BC54	sub_0816BC54	holdout	5	Triaged only: four copy-pasted arrow blocks, 185 differing rows without the 5 pins.
