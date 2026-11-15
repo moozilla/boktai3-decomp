@@ -15,3 +15,4 @@ address	name	outcome	minutes	note
 08059C48	ScenePanelRig_TickHoverSelection	clean	25	The dead ldr of 0x0403B714 is the shared ParticleRandom_ReadRelativeSample origin: using it for both random draws lets combine absorb every use and leave the set, so the pins and barriers go.
 0805F7E0	SceneItemValue_CalculateEquipment	clean	6	Splitting the kind check and the definition lookup into separate statements reloads kind like the ROM, so the volatile cast goes.
 08070070	SceneActorRegistry_SetMovementMode	clean	30	Rewritten from the ROM with the SetState/SetControl/RequestPath idioms of its matched relatives (UpdateRouteRecovery); mode 1 keeps one &flags2D4 pointer and an inline MoveTo shape, dropping all 51 pin/barrier lines.
+0807D2E0	SceneActorReaction_ApplyHitResponse	clean	4	The shared vu32 zero passed into a private clear helper is just ZeroFill8 at each call; with the header excuse no volatile local remains.
