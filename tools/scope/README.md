@@ -2580,3 +2580,18 @@ which is exactly `10:1`. Not tested.
    the same registers. Existing copies, label-separated copies and copies of a
    different operand are not treated as this evidence. Inspect cse operand order
    and narrowing modes here; a later tie's allocation advice is a false lead.
+226. **A `for` loop's entry test changes what gcse PRE and cse2 do right after the loop.**
+   In Skeleton_TrySelectRetreatCell (080B77D0) a probe loop steps by a width read
+   through a global (`next += MapWidth()`), and the code after the loop reads the
+   width again (`chosen = next - MapWidth()`). Written `do { } while (i < steps)`,
+   the block after the loop has one predecessor, so gcse PRE replaces its
+   literal-pool load with a reaching register it sets at the loop bottom (an
+   extra `adds r0, r1, #0`), and with PRE off cse2 folds the whole second read
+   into the in-loop value. Written `i = 0; for (; i < steps; i++)`, the entry
+   test is an edge into the block after the loop that lasts through gcse and
+   into cse2; neither pass touches the second read, loop hoists its address as
+   its own constant, and reload inherits the register the loop body just
+   loaded (no second pool load; the ROM's branch into the middle of an
+   identical tail is the sign). When the ROM recomputes something right after
+   a loop that the loop body just computed, try the other loop statement
+   before any allocation theory.
