@@ -1,0 +1,13 @@
+address	name	outcome	minutes	note
+0800F9C4	BoardPiece_Initialize	clean	15	Only concession was the shared ZeroFill8 helper's vu32 local; the SDK CpuFill32 macro has the same vu32 and a plain u32 changes callers' frames, so it is excused in include/global.h.
+0801A218	sub_0801A218	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08029BF4	GridAttackActor_SpawnTargetedProjectile	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0806A160	SparkParticle_Spawn	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0806CA3C	SceneSteeringActor_CreateBobbingActor	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08083C38	SceneActorControl_AdvancePositionCurve	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08093810	Bee_FollowWanderRoute	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08098344	Ghost_BuildMovementCurve	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+0809DA14	Lun_ChooseDelayedDestination	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+080DE6E0	sub_080DE6E0	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+08128F98	FeatherEffectPool_SpawnGroundScatter	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+081B3DB8	Vanargand_ReleaseRadialEffects	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
