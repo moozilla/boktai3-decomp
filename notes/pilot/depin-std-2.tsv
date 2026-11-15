@@ -29,3 +29,4 @@ address	name	outcome	minutes	note
 081ADEAC	Vanargand_InitBackgroundAttachment	clean	3	Already concession-free after main's CpuFill32 ZeroFill8; dropped an unused alias define.
 081FAE0C	sub_081FAE0C	clean	2	Already concession-free after main's CpuFill32 ZeroFill8 (its only helper concession); check.py MATCH, no source change.
 0816E570	sub_0816E570	holdout	35	Pin-free draft is 26/22: the random-table pointer must land in r6 (then owner r5, kind sb follow); only a union-halves table source (sub_0816E570.union_table.c, 12/12) got r6, at the cost of hoisted 0xFFFF masks.
+081BB904	sub_081BB904	holdout	30	Pin-free draft is 8/8, shape 2: only reload's spill rotation differs (AGBCC_SPILL=16:1 gives MATCH); the ROM makes one more reload choice between line 83 and 102; local rewrites and a shared transfer helper did not supply it.
