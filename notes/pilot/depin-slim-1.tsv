@@ -1,0 +1,10 @@
+address	name	outcome	minutes	note
+08016F24	LinkedWidgetSet_Init	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+0801A3C0	SelectionMenu_InitCursors	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+080408A4	ModifierMenu_InitializeGraphics	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+0806D438	RouteSpriteActor_PlanWanderPath	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+080941F4	Bee_FollowAnchorRoute	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+08099660	Ghost_ChooseMovementDestination	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+080F421C	sub_080F421C	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+081B4040	Vanargand_EmitRadialPartEffects	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+081BF67C	Storage_InitWidgets	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.

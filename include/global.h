@@ -23,19 +23,20 @@ asm(".include \"asm/macros.inc\"");
     } while (0)
 #define RANDOM_TABLE_ADDR 0x0203B400 /* gRandomTable */
 
-/* libagbsyscall */
+/* libagbsyscall; the constants as in gba/syscall.h */
 void CpuSet(const void *src, void *dest, u32 control);
 void CpuFastSet(const void *src, void *dest, u32 control);
+#define CPU_SET_SRC_FIXED 0x01000000
+#define CPU_SET_32BIT 0x04000000
+#include "gba/macro.h"
 
-/* Zero the 8 bytes at dest (CpuSet, 32-bit, fixed zero source). The game's own
- * spelling: unlike the SDK's CpuFill32 it evaluates dest before the zero is
- * stored, which sets the stack order and registers of 128 call sites. Per-file
- * Fill/Clear helpers and asm barriers on CpuSet's arguments stand in for it.
- * The original name is unknown (confidence=low). */
+/* Zero the 8 bytes at dest with the SDK's CpuFill32. The game's own wrapper:
+ * as a function its argument is evaluated before the SDK macro stores the zero,
+ * which sets the stack order and registers of 128 call sites (a bare CpuFill32
+ * stores first). The original name is unknown (confidence=low). */
 static inline void ZeroFill8(void *dest)
 {
-    vu32 zero = 0;
-    CpuSet((void *)&zero, dest, 0x05000002);
+    CpuFill32(0, dest, 8);
 }
 
 #endif
