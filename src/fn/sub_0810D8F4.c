@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct RecordPanel {
     u8 pad0[0xCEC];
     const u8 *labelScript;
@@ -17,8 +16,6 @@ u8 StateFlags_TestIndexedFlag(s32);
 void RecordPanel_RefreshEntryLabels(struct RecordPanel *p)
 {
     s32 skip, base, i;
-    register s32 next asm("r4");
-    s32 *windows;
     switch ((s8)p->mode) {
         case 0:
             skip = gUnk_0860654C[0] + 1;
@@ -31,29 +28,17 @@ void RecordPanel_RefreshEntryLabels(struct RecordPanel *p)
         default:
             return;
     }
-    i = 0;
-    windows = p->windows;
-    for (; i <= 5; i = next) {
+    for (i = 0; i < 6; i++) {
         if (skip == i) {
-            s32 *w;
-            next = i + 1;
-            w = &windows[next];
-            TextWindow_Clear(*w);
+            TextWindow_Clear(p->windows[i + 1]);
         } else {
-            s32 *w;
-            next = i + 1;
-            w = &windows[next];
-            TextWindow_Clear(*w);
-            TextWindow_SetScript(*w, p->labelScript);
-            i += base;
-            if (StateFlags_TestIndexedFlag(i))
-                TextWindow_Refresh(*w, i);
+            TextWindow_Clear(p->windows[i + 1]);
+            TextWindow_SetScript(p->windows[i + 1], p->labelScript);
+            if (StateFlags_TestIndexedFlag(i + base))
+                TextWindow_Refresh(p->windows[i + 1], i + base);
             else
-                TextWindow_Refresh(*w, 12);
-            {
-                s32 *w2 = &windows[next];
-                TextWindow_StartPlayback(*w2);
-            }
+                TextWindow_Refresh(p->windows[i + 1], 12);
+            TextWindow_StartPlayback(p->windows[i + 1]);
         }
     }
 }
