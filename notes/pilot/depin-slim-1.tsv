@@ -15,7 +15,7 @@ address	name	outcome	minutes	note
 080597E0	ScenePanelRig_RandomizeMovement	holdout	10	Same random-table family: table/index/mask land in r7/r5/r6 instead of r5/r6/r7 because the table constant's REG_EQUIV halves its priority; not solved here.
 0805EB0C	SceneInputPanel_InitWidgets	holdout	2	Triaged only: 43 pins/barriers, 220 differing rows without them; too large for this pass.
 08067018	SceneActorControl_TickJitter	clean	40	Matched by the halves-union table and NextSample(table, seed, mask) idiom of SceneNpc_SpawnTransitionParticle (matched relative): the union read makes the table a non-constant global pseudo, so it ranks below the timer pointer as in the ROM.
-0806BDB8	SceneSteeringActor_EmitRandomParticle	holdout	3	Triaged only: random-table family (see DirectionalForce_Tick); no-pin draft saved.
+0806BDB8	SceneSteeringActor_EmitRandomParticle	clean	15	The r1 pin on the sine-table pointer goes when both lookups index gUnk_086149C4 directly (the variable was a constant pseudo with halved priority); last draw reads through ParticleRandom_ReadRelativeSample.
 0807F4B8	SceneActorTarget_ResetContactResponse	holdout	2	Triaged only: 8 pins/barriers, 154 differing rows without them.
 08078700	SceneActorBehavior_UpdateColliders	holdout	10	Goto-free rewrite from the ROM is 72 rows off: the mask-first Test/ReadControl shapes and separate early-return tails need more work.
 08082D80	SceneActorControl_ConvergeSavedMotion	holdout	5	Shares RestartPositionCurve's blocker: a u8 zero and a u32 zero set between the flags2D4 load and its OR, which cse merges in ordinary C.

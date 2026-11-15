@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_steering_actor.h"
 #include "engine.h"
 #include "ram.h"
@@ -43,32 +42,17 @@ void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *input)
     v = &velocity;
     speed = magnitude - 16;
     {
-        register const s16 *sine asm("r1") = gUnk_086149C4;
-        s32 product = sine[(angle + 64) & mask] * speed;
+        s32 product = gUnk_086149C4[(angle + 64) & mask] * speed;
         savedOrigin = origin;
         v->x = Truncate(product);
         v->y = 0;
         {
-            s32 product = sine[angle] * speed;
+            s32 product = gUnk_086149C4[angle] * speed;
 
             v->z = Truncate(product);
         }
     }
-    {
-        u32 offset;
-        const u16 *source;
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-        offset = savedOrigin + gRandomIndex * 2;
-        source = (const u16 *)RANDOM_TABLE_ADDR;
-        {
-            u32 value = ParticleRandom_ReadSampleAddress(offset, savedOrigin, source);
-            {
-                u32 mask = 63;
-                value &= mask;
-            }
-            value -= 48;
-            velocity.y = value;
-        }
-    }
+    velocity.y =
+        (ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) & 63) - 48;
     SceneMovingParticle_Create(position, &velocity, 60, 3);
 }
