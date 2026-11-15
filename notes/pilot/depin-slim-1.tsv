@@ -14,7 +14,7 @@ address	name	outcome	minutes	note
 08051224	DirectionalForce_Tick	clean	95	Shared ParticleRandom_ReadSample raised the case-1 table above the mask; case 2's first draw leaves its table in the function's table variable (a block-spanning pseudo, so global alloc gives r3 like the ROM), angle barrier became per-arm stores.
 080597E0	ScenePanelRig_RandomizeMovement	holdout	10	Same random-table family: table/index/mask land in r7/r5/r6 instead of r5/r6/r7 because the table constant's REG_EQUIV halves its priority; not solved here.
 0805EB0C	SceneInputPanel_InitWidgets	holdout	2	Triaged only: 43 pins/barriers, 220 differing rows without them; too large for this pass.
-08067018	SceneActorControl_TickJitter	holdout	25	Natural C (flags via (s16) cast gives the ROM's subs #0x19) is 9 register-only rows: the table pointer stays block-local (r5) while the ROM's is global (r6); halves-union table did not help.
+08067018	SceneActorControl_TickJitter	clean	40	Matched by the halves-union table and NextSample(table, seed, mask) idiom of SceneNpc_SpawnTransitionParticle (matched relative): the union read makes the table a non-constant global pseudo, so it ranks below the timer pointer as in the ROM.
 0806BDB8	SceneSteeringActor_EmitRandomParticle	holdout	3	Triaged only: random-table family (see DirectionalForce_Tick); no-pin draft saved.
 0807F4B8	SceneActorTarget_ResetContactResponse	holdout	2	Triaged only: 8 pins/barriers, 154 differing rows without them.
 08078700	SceneActorBehavior_UpdateColliders	holdout	10	Goto-free rewrite from the ROM is 72 rows off: the mask-first Test/ReadControl shapes and separate early-return tails need more work.
