@@ -4,7 +4,6 @@
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
 struct Action {
     u8 state, pad[3];
@@ -76,14 +75,12 @@ static inline s32 RandomValue(void)
 }
 static inline void SetFlags(struct Hresvelgr *p, u32 mask)
 {
-    register u8 *address asm("r1");
-    address = (u8 *)p;
-    address += (u8 *)&p->flags - (u8 *)p;
-    *(u32 *)address |= mask;
+    p->flags |= mask;
 }
 void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
 {
     struct Action *action = &actor->action;
+    struct Hresvelgr *p;
     if (actor->pending) {
         actor->pending = 0;
         ActionState_Reset(action);
@@ -98,39 +95,41 @@ void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
             ActionState_SetState(action, 1);
         switch (action->state) {
             case 0:
+                p = actor;
                 if (!action->frame) {
-                    Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 2, 1, 0);
+                    Hresvelgr_SetAnimation(p, p->animation, p->animationData, 2, 1, 0);
                     action->frame = 1;
                 } else {
-                    Actor_SetHeadingVelocity(actor, 32);
-                    if (!actor->turn) {
-                        u32 side = actor->side;
-                        struct ContactPosition *target = actor->target;
-                        u32 direction = ((actor->targetHeading + 96) >> 6) & 3;
+                    Actor_SetHeadingVelocity(p, 32);
+                    if (!p->turn) {
+                        u32 side = p->side;
+                        struct ContactPosition *target = p->target;
+                        u32 direction = ((p->targetHeading + 96) >> 6) & 3;
                         if (!side) {
                             if (direction != 3)
-                                actor->body.motion.z +=
-                                    Math_StepTowardTarget(actor->body.position.z, target->z, 10) -
-                                    actor->body.position.z;
+                                p->body.motion.z +=
+                                    Math_StepTowardTarget(p->body.position.z, target->z, 10) -
+                                    p->body.position.z;
                         } else if (direction != 0)
-                            actor->body.motion.x +=
-                                Math_StepTowardTarget(actor->body.position.x, target->x, 10) -
-                                actor->body.position.x;
+                            p->body.motion.x +=
+                                Math_StepTowardTarget(p->body.position.x, target->x, 10) -
+                                p->body.position.x;
                     }
-                    if (actor->targetDistance <= 0x3fff) {
-                        if (PlayerCanMove(actor->player, 0x40000))
-                            SetFlags(actor, 0x20000000);
-                        actor->finished = 1;
+                    if (p->targetDistance <= 0x3fff) {
+                        if (PlayerCanMove(p->player, 0x40000))
+                            SetFlags(p, 0x20000000);
+                        p->finished = 1;
                         ActionState_SetState(action, 2);
-                    } else if (OutsideChargeBounds(actor))
+                    } else if (OutsideChargeBounds(p))
                         ActionState_SetState(action, 2);
                 }
                 break;
             case 1:
+                p = actor;
                 if (!action->frame) {
-                    if (!actor->turn)
-                        actor->turn = (((RandomValue() >> 3) % 2) << 5) - 16;
-                    SetHeading(actor, actor->turn + actor->body.direction);
+                    if (!p->turn)
+                        p->turn = (((RandomValue() >> 3) % 2) << 5) - 16;
+                    SetHeading(p, p->turn + p->body.direction);
                     action->frame++;
                 } else if (action->frame > 4)
                     ActionState_SetState(action, 0);
@@ -138,7 +137,8 @@ void Hresvelgr_UpdateTurningCharge(struct Hresvelgr *actor)
                     action->frame++;
                 break;
             case 2:
-                actor->finished = 1;
+                p = actor;
+                p->finished = 1;
                 break;
         }
     }

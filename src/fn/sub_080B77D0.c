@@ -2,8 +2,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: neighboring Skeleton controls establish provisional role
-// MATCHING_CONCESSION: register-pinning
-// Keep the map address live through each final signed width load.
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
@@ -82,7 +80,6 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
     u32 cell, height, shape;
     s32 chosen, next, i;
     void **route;
-    struct EngineMap **mapSlot;
 
     do {
         cell = actor->terrainCell;
@@ -93,67 +90,60 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 next = cell + 1;
                 i = 0;
                 route = &actor->group.route;
-                do {
-                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
-                        break;
+                for (; i < steps; i++) {
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape)) {
+                        chosen = next - 1;
+                        goto probed;
+                    }
                     next++;
-                    i++;
-                } while (i < steps);
+                }
                 chosen = next - 1;
                 break;
             case 1:
                 next = cell + MapWidth();
                 i = 0;
                 route = &actor->group.route;
-                do {
-                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
-                        goto finishSouth;
-                    mapSlot = &gTerrainMap;
-                    next += *(s16 *)((*mapSlot)->cells + 4);
-                    i++;
-                } while (i < steps);
-                goto finishSouthLoaded;
+                for (; i < steps; i++) {
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape)) {
+                        chosen = next - MapWidth();
+                        goto probed;
+                    }
+                    next += MapWidth();
+                }
+                chosen = next - MapWidth();
+                break;
             case 2:
                 next = cell - 1;
                 i = 0;
                 route = &actor->group.route;
-                do {
-                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
-                        break;
+                for (; i < steps; i++) {
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape)) {
+                        chosen = next + 1;
+                        goto probed;
+                    }
                     next--;
-                    i++;
-                } while (i < steps);
+                }
                 chosen = next + 1;
                 break;
             case 3:
                 next = cell - MapWidth();
                 i = 0;
                 route = &actor->group.route;
-                do {
-                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
-                        goto finishNorth;
-                    mapSlot = &gTerrainMap;
-                    next -= *(s16 *)((*mapSlot)->cells + 4);
-                    i++;
-                } while (i < steps);
-                goto finishNorthLoaded;
-            finishSouth:
-                mapSlot = &gTerrainMap;
-            finishSouthLoaded:
-                chosen = next - *(s16 *)((*mapSlot)->cells + 4);
-                asm volatile("" : "+r"(mapSlot));
-                break;
-            finishNorth:
-                mapSlot = &gTerrainMap;
-            finishNorthLoaded:
-                chosen = next + *(s16 *)((*mapSlot)->cells + 4);
-                asm volatile("" : "+r"(mapSlot));
+                for (; i < steps; i++) {
+                    if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape)) {
+                        chosen = next + MapWidth();
+                        goto probed;
+                    }
+                    next -= MapWidth();
+                }
+                chosen = next + MapWidth();
                 break;
             default:
                 chosen = actor->terrainCell;
                 route = &actor->group.route;
                 break;
         }
+    probed:
         if (chosen != actor->terrainCell)
             goto selected;
         actor->body.direction += 64;

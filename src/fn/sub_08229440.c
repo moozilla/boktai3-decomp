@@ -1,18 +1,20 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 void Clock_BeginRtcAccess(void);
 u8 Rtc_CheckAndReset(void);
 void Clock_EndRtcAccess(void);
+
+// The probe byte keeps its top-aligned copy for the power-failure test (bit 7), as the SDK's
+// RtcInit does with SIIRTCINFO_POWER; a power failure still reports the clock as usable.
 s32 Clock_CheckRtcStatus(void)
 {
-    register u32 shifted asm("r5");
-    register u32 status asm("r4");
+    u32 probe, status;
     Clock_BeginRtcAccess();
-    shifted = (u32)Rtc_CheckAndReset() << 24;
-    status = shifted >> 24;
+    probe = Rtc_CheckAndReset() << 24;
+    status = probe >> 24;
     Clock_EndRtcAccess();
-    status &= 15;
-    if (status == 1)
+    if ((status & 15) != 1)
+        return -1;
+    if ((s32)probe < 0)
         return 1;
-    return -1;
+    return 1;
 }

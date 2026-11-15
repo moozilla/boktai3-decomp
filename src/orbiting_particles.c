@@ -52,24 +52,22 @@ static inline int scale(int v)
     return -((-v) >> 12);
 }
 
-// MATCHING_CONCESSION: register-pinning
 int OrbitingParticles_Update(struct OrbitingParticles *m)
 {
     int i;
+    struct OrbitingParticle *orb;
     i = 0;
     if (i < m->count) {
         struct SceneVec *position = &m->orbs[0].sprite.position;
-        struct OrbitingParticle *cursor = m->orbs;
-        struct OrbitingParticle *p = cursor;
+        struct OrbitingParticle *p = m->orbs;
         do {
             int angle, radius;
             struct SceneVec *out;
-            struct OrbitingParticle *arg = cursor;
-            asm("" : "+r"(arg));
+            orb = &m->orbs[i];
             if (!p->state)
-                OrbitingParticles_SpawnOrb(m, arg);
+                OrbitingParticles_SpawnOrb(m, orb);
             else
-                OrbitingParticles_Advance(m, arg);
+                OrbitingParticles_Advance(m, orb);
             out = position;
             angle = p->angle;
             radius = p->radius;
@@ -82,25 +80,12 @@ int OrbitingParticles_Update(struct OrbitingParticles *m)
             p->sprite.position.z += m->position.z;
             position = (void *)((u8 *)position + sizeof(struct OrbitingParticle));
             p++;
-            cursor++;
             i++;
         } while (i < m->count);
     }
-    {
-        u32 *flags;
-        i = m->count;
-        if (i <= 7) {
-            /* Keep the byte-offset temporary: direct indexing changes register allocation. */
-            int mask = 1, offset;
-            offset = i * sizeof(struct OrbitingParticle) + (u32) &
-                     ((struct OrbitingParticles *)0)->orbs[0].sprite.flags;
-            flags = (void *)(offset + (u32)m);
-            do {
-                *flags |= mask;
-                flags = (void *)((u8 *)flags + sizeof(struct OrbitingParticle));
-                i++;
-            } while (i <= 7);
-        }
+    for (i = m->count; i < 8; i++) {
+        orb = &m->orbs[i];
+        orb->sprite.flags |= 1;
     }
     m->time++;
     if (m->duration > 0 && m->time >= m->duration && !OrbitingParticles_HasActiveOrb(m))

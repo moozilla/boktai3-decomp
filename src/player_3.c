@@ -614,7 +614,6 @@ s32 SceneActor_SelectEffectDisplayMode(struct Player *p, s32 mode)
     return mode;
 }
 
-// MATCHING_CONCESSION: register-pinning
 
 void Player_EmitQueuedEffects(struct Player *);
 s32 Mod(s32, s32);
@@ -1742,12 +1741,6 @@ static inline void ReverseResistance(struct Player *p, u32 index)
         value = -value;
     p->cueDefenses[index] = value + 4;
 }
-static inline u32 EquipmentSlot(struct SceneValueConsumableDefinition *current)
-{
-    register u32 slot asm("r1") = current->slot;
-    asm("" : "+r"(slot));
-    return slot;
-}
 void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *state,
                                    s32 alternate)
 {
@@ -1765,24 +1758,20 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
             ClearEquipmentFlag(p, bit);
     }
     if (p) {
-        if (p->actionMode == 6 || p->slot)
-            goto finish;
+        if (p->actionMode == 6 || p->slot) {
+            Player_InitVisualResources(p);
+            p->savedSpriteResource = -1;
+            return;
+        }
     }
-    {
-        register s32 choice asm("r1") = alternate;
-        asm("" : "+r"(choice));
-        if (choice < 0) {
-            register struct SceneValueConsumableDefinition *zero asm("r2") = 0;
-            asm("" : "+r"(zero));
-            override = zero;
-        } else
-            override = GameState_GetConsumableDescriptor(alternate);
-    }
+    if (alternate < 0)
+        override = 0;
+    else
+        override = GameState_GetConsumableDescriptor(alternate);
     for (i = 0; i <= 3; i++) {
         struct SceneValueConsumableDefinition *item;
         s32 effect;
-        register struct SceneValueConsumableDefinition *current asm("r0") = override;
-        if (current && i == EquipmentSlot(current))
+        if (override && i == override->slot)
             item = override;
         else {
             struct GameState *save = gGameState;
@@ -2084,7 +2073,6 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
     }
     if (p) {
         Collider_SetContactMode(&p->collider, 64);
-    finish:
         Player_InitVisualResources(p);
         p->savedSpriteResource = -1;
     }

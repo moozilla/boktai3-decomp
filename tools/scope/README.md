@@ -2580,3 +2580,53 @@ which is exactly `10:1`. Not tested.
    the same registers. Existing copies, label-separated copies and copies of a
    different operand are not treated as this evidence. Inspect cse operand order
    and narrowing modes here; a later tie's allocation advice is a false lead.
+226. **A `for` loop's entry test changes what gcse PRE and cse2 do right after the loop.**
+   In Skeleton_TrySelectRetreatCell (080B77D0) a probe loop steps by a width read
+   through a global (`next += MapWidth()`), and the code after the loop reads the
+   width again (`chosen = next - MapWidth()`). Written `do { } while (i < steps)`,
+   the block after the loop has one predecessor, so gcse PRE replaces its
+   literal-pool load with a reaching register it sets at the loop bottom (an
+   extra `adds r0, r1, #0`), and with PRE off cse2 folds the whole second read
+   into the in-loop value. Written `i = 0; for (; i < steps; i++)`, the entry
+   test is an edge into the block after the loop that lasts through gcse and
+   into cse2; neither pass touches the second read, loop hoists its address as
+   its own constant, and reload inherits the register the loop body just
+   loaded (no second pool load; the ROM's branch into the middle of an
+   identical tail is the sign). When the ROM recomputes something right after
+   a loop that the loop body just computed, try the other loop statement
+   before any allocation theory.
+227. **loop.c hoists an invariant only when `threshold * savings * lifetime >= insn_count`; helper types move the count.**
+   In sub_080AA688 the ROM recomputes `&trail->activeCount` on every iteration and
+   every plain draft hoisted it. `AGBCC_LOOP_TRACE=1` prints the numbers per
+   candidate (stderr.txt in the scope work directory): threshold starts at 13 on
+   Thumb in a loop with a call and drops by 3 for each invariant already moved in
+   that pass; the second loop pass starts at 13 again with a smaller count, since
+   the first pass replaced the multiply chains with giv increments. Here the
+   address had savings 1 and lifetime 3 (39) against 37 insns. The count is RTL
+   insns at loop time, including ones combine and flow delete later: byte
+   conversions of a `u8` helper parameter, a `u8` local and a `u8` return, and
+   dead giv increments. The matching form was the flag test as
+   `u8 hasFlag(segment, u8 mask)` behind `isRemoved`, three insns more than the
+   `u32 mask` form and invisible in the output. `AGBCC_NOMOVE=uid` confirms the
+   hoist is the only difference before searching for the form.
+228. **cse decides which of two equal registers survives by where each is last used (make_regs_eqv).**
+   At a copy `p = actor`, cse rewrites later uses in the same extended block to
+   the class head. The older register stays head unless the new one (a) is used
+   past the end of the path cse is walking, or was first used before the path
+   began, and (b) has its last use (by insn order in the function) after the
+   older one's last use; then the new register becomes head and uses of the old
+   one are rewritten to it. Uses in later extended blocks keep the register the
+   C names. Three consequences used so far:
+   * A copy whose uses all sit in the copy's own path is folded away (the
+     "plain local copy is deleted" symptom). To keep it, give it a use past a
+     join, or make its last use the function's last use of either.
+   * Two variables that hold the same pointer are different expressions to gcse
+     PRE. In Hresvelgr_UpdateTurningCharge (0819FC34) each switch case starts
+     with `p = actor` into one function-scope `p`; the second `p->flags |=`
+     is then `(p + 0x9c)`, not the first site's `(actor + 0x9c)`, and PRE leaves
+     both computations in place (the ROM's two `adds r1, r5, #0; adds r1, #0x9c`).
+   * The two share one hard register only when the old one dies at the copy:
+     global-alloc records a conflict when the old one is still live after it.
+     One copy placed ahead of the switch failed for that reason: the path from
+     that copy reaches the new register's last use, cse rewrote those last uses
+     back to the old register, and the two then overlapped (an extra r7).
