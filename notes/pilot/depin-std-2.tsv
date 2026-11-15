@@ -16,3 +16,4 @@ address	name	outcome	minutes	note
 0805F7E0	SceneItemValue_CalculateEquipment	clean	6	Splitting the kind check and the definition lookup into separate statements reloads kind like the ROM, so the volatile cast goes.
 08070070	SceneActorRegistry_SetMovementMode	clean	30	Rewritten from the ROM with the SetState/SetControl/RequestPath idioms of its matched relatives (UpdateRouteRecovery); mode 1 keeps one &flags2D4 pointer and an inline MoveTo shape, dropping all 51 pin/barrier lines.
 0807D2E0	SceneActorReaction_ApplyHitResponse	clean	4	The shared vu32 zero passed into a private clear helper is just ZeroFill8 at each call; with the header excuse no volatile local remains.
+080FE3B0	Axe_UpdateRouteDestinationPhase	clean	3	The vu32 copy into a private CpuSet wrapper is ZeroFill8(context->clearF14); with the header excuse no volatile local remains.
