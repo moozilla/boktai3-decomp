@@ -13,3 +13,4 @@
 08080008	SceneActorReaction_UpdateAnimationGate	clean	35	The group-pointer barrier became the header SceneActorReaction_TakePrepared with a DEBUG_PRINT body (its jumps stop cse folding group+0x40); the field/mask pins became block-local variables per arm, so local alloc gives the load temp r2.
 080837D4	SceneActorControl_ConsumeLiftFlag	holdout	35	Fact 33 constant-first ORs fixed the shape (23/21, shape 4), but cse always merges the ROM s second zero register into the first; no typed-zero spelling kept them apart.
 0809345C	Bee_BuildMovementCurve	clean	1	Its helper concession was Bee_InterpolatePoint reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
+08097798	Ghost_AdvanceMovementCurve	clean	1	Its helper concession was MovementCurve_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
