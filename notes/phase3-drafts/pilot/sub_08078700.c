@@ -1,3 +1,5 @@
+// Holdout draft (no concessions), 18 rows: only the global-alloc order of actor vs position differs.
+// AGBCC_PRI=position:+593 gives MATCH; written with &actor->position at both sites it is AGBCC_NOPRE=1 -> MATCH.
 #include "scene_actor_behavior.h"
 u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
 static inline u8 Test(u32 value, u32 mask)
@@ -25,42 +27,88 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *actor)
     struct ContactCollider *secondary = &actor->secondaryCollider;
     struct ContactCollider *primary = &actor->primaryCollider;
     u16 *control;
+    u16 *field;
     struct ContactPosition *position;
-
-    if (Test(actor->flags2C0, 0x800)) {
+    {
+        u32 mask = 0x800;
+        if (Test(actor->flags2C0, mask)) {
+            primary->flags |= 4;
+            field = &actor->flags2D6;
+            goto clearAndReturn;
+        }
+    }
+    {
+        u32 category = actor->category;
+        if ((u32)(category - 12) <= 1 || category == 23) {
+            u16 *address = &actor->flags2D6;
+            u32 mask = ~0x4000;
+            mask &= *address;
+            *address = mask;
+            return;
+        }
+    }
+    if ((u8)(actor->kind - 21) <= 1)
+        goto disable;
+    {
+        u32 mask = 0x8000;
+        u16 *address;
+        u32 flags;
+        address = &actor->flags2D4;
+        flags = *address & mask;
+        control = address;
+        if (!flags)
+            goto activeTest;
+    }
+disable:
+    primary->flags |= 4;
+    field = &actor->flags2D6;
+clearAndReturn: {
+    u32 mask = ~0x4000;
+    mask &= *field;
+    *field = mask;
+}
+    return;
+activeTest: {
+    u32 mask = 0x4000;
+    u16 *address;
+    u32 flags;
+    address = &actor->flags2D6;
+    flags = *address & mask;
+    field = address;
+    if (!Nonzero(flags)) {
         primary->flags |= 4;
-        actor->flags2D6 &= ~0x4000;
         return;
     }
-    if ((u32)(actor->category - 12) <= 1 || actor->category == 23) {
-        actor->flags2D6 &= ~0x4000;
-        return;
+}
+    {
+        u32 mask = ~4;
+        mask &= primary->flags;
+        primary->flags = mask;
     }
-    control = &actor->flags2D4;
-    if ((u8)(actor->kind - 21) <= 1 || (*control & 0x8000)) {
-        primary->flags |= 4;
-        actor->flags2D6 &= ~0x4000;
-        return;
+    {
+        u32 mask = ~0x4000;
+        mask &= *field;
+        *field = mask;
     }
-    if (!Test(actor->flags2D6, 0x4000)) {
-        primary->flags |= 4;
-        return;
-    }
-    primary->flags &= ~4;
-    actor->flags2D6 &= ~0x4000;
-    if (ReadControl(0x110, control)) {
-        position = &actor->position;
-    } else {
-        u8 near = SceneActorBehavior_IsNearParticipant((void *)actor);
+    if (ReadControl(0x110, control))
+        goto secondaryUpdate;
+    {
+        u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
         position = &actor->position;
         if (!near || ReadControl(6, control))
             goto primaryUpdate;
     }
-    position = &actor->position;
-    if (!(secondary->flags & 4)) {
+secondaryUpdate: {
+    u32 flags = secondary->flags;
+    u32 disabled = 4;
+    disabled &= flags;
+    position = (void *)actor;
+    position = &((struct SceneActorBehaviorView *)position)->position;
+    if (!disabled) {
         Collider_SetPosition(secondary, position, 0);
         Collider_Refresh(secondary);
     }
+}
 primaryUpdate:
     Collider_SetPosition(primary, position, 0);
 }
