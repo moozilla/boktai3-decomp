@@ -11,7 +11,7 @@ address	name	outcome	minutes	note
 080747B8	SceneActorMovement_UpdateAirborne	clean	5	Two hand-rolled vu32 CpuSet fills were ZeroFill8 calls; cse reuses the known-zero bounce register as the ROM does.
 0810E9D4	TimerDisplay_DrawRecord	clean	15	One u16 *cell variable for both map-entry stores: it spans blocks, so global alloc gives it r1 after local alloc puts the stored constant in r0.
 08248778	Eeprom_WriteBlock	clean	5	SDK EEPROM driver (tmc/libgbabackup lineage): its vu16/vu32 polling locals are the original source, excused with concession-ok(volatile) comments like the unit's cflags line.
-08051224	DirectionalForce_Tick	holdout	40	Down to 8 register-only rows: barrier was per-arm angle stores (jump2 merge) and pins were a random-table helper (offset-first form, if/else delay tails), but table vs mask priority (REG_EQUIV doubling of the table pointer) is still swapped.
+08051224	DirectionalForce_Tick	clean	95	Shared ParticleRandom_ReadSample raised the case-1 table above the mask; case 2's first draw leaves its table in the function's table variable (a block-spanning pseudo, so global alloc gives r3 like the ROM), angle barrier became per-arm stores.
 080597E0	ScenePanelRig_RandomizeMovement	holdout	10	Same random-table family: table/index/mask land in r7/r5/r6 instead of r5/r6/r7 because the table constant's REG_EQUIV halves its priority; not solved here.
 0805EB0C	SceneInputPanel_InitWidgets	holdout	2	Triaged only: 43 pins/barriers, 220 differing rows without them; too large for this pass.
 08067018	SceneActorControl_TickJitter	holdout	25	Natural C (flags via (s16) cast gives the ROM's subs #0x19) is 9 register-only rows: the table pointer stays block-local (r5) while the ROM's is global (r6); halves-union table did not help.
