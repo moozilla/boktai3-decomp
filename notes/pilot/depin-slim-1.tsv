@@ -8,3 +8,4 @@ address	name	outcome	minutes	note
 080F421C	sub_080F421C	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
 081B4040	Vanargand_EmitRadialPartEffects	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
 081BF67C	Storage_InitWidgets	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
+080747B8	SceneActorMovement_UpdateAirborne	clean	5	Two hand-rolled vu32 CpuSet fills were ZeroFill8 calls; cse reuses the known-zero bounce register as the ROM does.
