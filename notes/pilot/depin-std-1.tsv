@@ -2,3 +2,4 @@
 08018F38	CircleWindow_GenerateScanlines	holdout	45	The ROM keeps a dead radius-y set (its use vanished after flow, README facts 57/94); identical-arm and loop-biv rewrites got to 7/5 differing but none reproduced it.
 0801A6D0	sub_0801A6D0	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
 08043FB0	ContactSwarm_InitializeSlot	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
+08058BD8	ScenePanel_DrawOverlay	holdout	20	1056-byte spill-heavy function: pin-free draft at 159/159 differing (36 mechanisms in why all), a natural rewrite at 270; deferred as too large for a per-function pilot pass.
