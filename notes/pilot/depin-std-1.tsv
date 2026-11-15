@@ -8,3 +8,4 @@
 08067BA8	sub_08067BA8	clean	5	Replaced the private IsUsed copy (asm clobber) with the header SceneActorControl_IsUsed and wrote the slot fields by name; matched first compile.
 0806C7B0	SceneSteeringActor_CreateTravelActor	clean	1	Cleared by the ZeroFill8 concession-ok(volatile) in include/global.h (its only concession); unit still matches.
 0806DFC8	RouteSpriteActor_Create	clean	6	The pins only forced the 0x2C8 height add; plain actor->elevatedPosition.y += 0x2C8 matches, and the struct copies collapse to direct assignments.
+08077C48	SceneActorPlacement_EmitTimedParticles	holdout	8	1072-byte function with 15 pins/clobbers: 165/177 differing pin-free, the random-step helper the original inlined is unrecovered; deferred as too large for this pass.
