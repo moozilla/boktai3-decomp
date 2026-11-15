@@ -3,7 +3,6 @@
 #include "ram.h"
 #include "display_sequence_inline.h"
 #include "player_cue_sequence.h"
-// MATCHING_CONCESSION: register-pinning
 
 extern u32 gUnk_02000560[];
 
@@ -116,48 +115,19 @@ static inline u8 sameRegion(struct Trigger *p)
     return 0;
 }
 
-s32 Trigger_RunScript(struct Trigger *input, u32 scriptInput, s32 eventInput)
+static inline u32 Trigger_PlayerStatus(s32 index, u32 mask)
 {
-    struct Trigger *p = ({
-        struct Trigger *a = input;
-        a;
-    });
-    u16 script;
-    s32 event;
+    return gUnk_02000560[index] & mask;
+}
+s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
+{
+    u16 script = scriptInput;
     s32 values[10];
     struct TriggerScriptArgs args;
     s32 actor, i;
-    s32 savedActor;
-    u32 *source;
-    s32 *out;
-    struct TriggerScriptArgs *argsPtr;
-    {
-        s32 arg = eventInput;
-        event = arg;
-    }
-    script = scriptInput;
-    if (!script)
-        goto fail;
-    {
-        s32 a = p->actor;
-        if (a == -1)
-            goto fail;
-        asm("" : "+r"(a));
-        actor = a;
-    }
-    {
-        register s32 index asm("r2") = actor;
-        u32 mask = 12;
-        u32 flags;
-        flags = gUnk_02000560[index] & mask;
-        savedActor = index;
-        if (flags)
-            goto fail;
-    }
-    goto active;
-fail:
-    return -1;
-active:
+    u32 busy;
+    if (!script || p->actor == -1 || (busy = Trigger_PlayerStatus(p->actor, 12), actor = p->actor, busy))
+        return -1;
     if (p->type == 1) {
         values[0] = p->position->x;
         values[1] = p->position->y + 64;
@@ -169,25 +139,13 @@ active:
     }
     values[3] = p->id;
     values[4] = p->kind;
-    argsPtr = &args;
-    source = p->arguments;
-    out = values + 5;
-    i = 2;
-    do {
-        *out++ = *source++;
-    } while (--i >= 0);
-    values[8] = savedActor;
+    for (i = 0; i < 3; i++)
+        values[5 + i] = p->arguments[i];
+    values[8] = actor;
     values[9] = event;
-    {
-        u32 mask = 0xffff0000;
-        {
-            u32 word = *(u32 *)&args & mask;
-            word |= 10;
-            *(u32 *)&args = word;
-        }
-    }
-    argsPtr->values = values;
-    return Script_Call(script, argsPtr);
+    args.count = 10;
+    args.values = values;
+    return Script_Call(script, &args);
 }
 
 u32 TriggerManager_InsertTrigger(struct Trigger *p)
