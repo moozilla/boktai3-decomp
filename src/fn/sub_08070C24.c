@@ -1,114 +1,46 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_registry.h"
 #include "player.h"
 #include "ram.h"
-s32 Path_GetPointPositionById(u16 *, u32, u32);
-u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *input,
-                                               const struct ContactPosition *inputBounds)
+s32 Path_GetPointPositionById(void *, u32, u32);
+static inline void Bounds_Subtract(struct ContactPosition *out, const struct SceneVec *a, const struct ContactPosition *b)
 {
-    struct SceneActorRegistryActor *actor = input;
-    register const struct ContactPosition *bounds asm("r8") = inputBounds;
+    out->x = a->x - b->x;
+    out->y = a->y - b->y;
+    out->z = a->z - b->z;
+}
+static inline s32 Bounds_PlanarDistanceSquared(const struct ContactPosition *v)
+{
+    return v->x * v->x + v->z * v->z;
+}
+u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *actor,
+                                               const struct ContactPosition *bounds)
+{
     s32 nearestDistance = 0x7fffffff;
     s32 nearestIndex = -1;
-    /* Only x/y/z participate. The fourth halfword remains unspecified through
-  * aggregate copies and is never read as a scalar. */
     struct ContactPosition origin, difference, bestDifference;
-    if (actor->category == 10) {
+    s32 i;
+    u32 category = actor->category;
+    if (category == 10) {
         u32 mask = 0x4000000;
-        u32 offset = 0x2d0;
-        u32 *field;
-        u32 value;
-        field = (void *)((u8 *)actor + offset);
-        value = *field;
-        value &= mask;
-        if (value)
-            goto success;
-        goto failure;
+        if (actor->flags2D0 & mask)
+            return 1;
+        return 0;
     }
-    {
-        u32 firstOffset = 0x458;
-        register u32 offset asm("r3");
-        u8 *field;
-        u32 first;
-        u8 *controlField = (u8 *)actor + firstOffset;
-        first = *controlField;
-        offset = 0x45a;
-        asm("" : "+r"(offset));
-        controlField = (u8 *)actor + offset;
-        Path_GetPointPositionById((u16 *)&origin, first, *controlField);
-    }
-    {
-        s32 index = 0;
-        s32 initialCount = gPlayerCount;
-        if (index < initialCount) {
-            s32 count;
-            struct ContactPosition *delta = &difference;
-            struct ContactPosition *left = &origin;
-            register struct Player **playerSlot asm("r12");
-            asm("" : "+r"(delta), "+r"(left));
-            count = initialCount;
-            {
-                register struct Player **initial asm("r0") = gPlayers;
-                asm("" : "+r"(initial));
-                playerSlot = initial;
+    Path_GetPointPositionById((u16 *)&origin, actor->pathId, actor->pathPointIndex);
+    for (i = 0; i < gPlayerCount; i++) {
+        struct Player *player = gPlayers[i];
+        if (player) {
+            s32 distance;
+            Bounds_Subtract(&difference, &player->position, &origin);
+            distance = Bounds_PlanarDistanceSquared(&difference);
+            if (nearestDistance > distance) {
+                nearestDistance = distance;
+                nearestIndex = i;
+                bestDifference = difference;
             }
-            do {
-                register struct Player **current asm("r1") = playerSlot;
-                register struct Player *player asm("r0");
-                player = *current;
-                if (player) {
-                    const struct SceneVec *right = &player->position;
-                    s32 x;
-                    s32 z;
-                    s32 xSquare;
-                    s32 zSquare;
-                    s32 distance;
-                    delta->x = (u16)player->position.x - (u16)left->x;
-                    delta->y = (u16)right->y - (u16)left->y;
-                    delta->z = (u16)right->z - (u16)left->z;
-                    x = delta->x;
-                    xSquare = x * x;
-                    z = delta->z;
-                    zSquare = z * z;
-                    {
-                        s32 copy = zSquare;
-                        distance = (s32)((u32)xSquare + (u32)copy);
-                    }
-                    if (nearestDistance > distance) {
-                        nearestDistance = distance;
-                        nearestIndex = index;
-                        bestDifference = difference;
-                    }
-                }
-                playerSlot++;
-                index++;
-            } while (index < count);
         }
-    }
-    if (nearestIndex < 0)
-        goto failure;
-    {
-        const struct ContactPosition *check;
-        s32 component;
-        register s32 limit asm("r0");
-        {
-            u32 wide = (u32)(u16)bestDifference.x << 16;
-            component = (s32)wide >> 16;
-        }
-        check = bounds;
-        limit = check->x;
-        if (component > limit || component < -limit)
-            goto failure;
-        {
-            u32 wide = (u32)(u16)bestDifference.z << 16;
-            component = (s32)wide >> 16;
-        }
-        limit = check->z;
-        if (component > limit || component < -limit)
-            goto failure;
-    }
-success:
-    return 1;
-failure:
+    }    if (nearestIndex >= 0 && bestDifference.x <= bounds->x && bestDifference.x >= -bounds->x
+        && bestDifference.z <= bounds->z && bestDifference.z >= -bounds->z)
+        return 1;
     return 0;
 }
