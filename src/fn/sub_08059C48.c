@@ -1,50 +1,32 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
-static inline s32 randomValue(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
-}
-static inline s32 randomFirst(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
-}
+#include "monster_particle_random.h"
 static inline s32 quarter(s32 value)
 {
     return value >= 0 ? value >> 2 : -((-value) >> 2);
 }
 void ScenePanelRig_TickHoverSelection(struct ScenePanelRig *rig)
 {
-    register u32 observed asm("r4");
     s32 sample;
+    u32 origin;
     rig->colliderHold = 16;
     rig->position.x = quarter(rig->position.x * 3 + rig->origin.x);
-    observed = 0x0403B714;
-    sample = randomFirst();
+    origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
+    sample = ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR);
     {
         u16 *originY = (u16 *)&rig->origin.y;
         sample = (sample & 63) + 128;
         rig->position.y = *originY + sample;
     }
     rig->position.z = quarter(rig->position.z * 3 + rig->origin.z);
-    asm volatile("" ::"r"(observed));
     if (rig->stateFrame < 300)
         rig->stateFrame++;
     if (rig->stateFrame >= 60) {
         if (--rig->selectionTimer == 0) {
-            rig->selectionTimer = Mod(randomValue(), 300) + 300;
-            {
-                s32 subject = ScenePanelRig_SelectActiveSubject(rig);
-                register u32 scratch asm("r1");
-                asm("" : "=r"(scratch));
-                rig->selectedSubject = subject;
-                asm("" ::"r"(scratch));
-            }
+            rig->selectionTimer =
+                Mod(ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR),
+                    300) +
+                300;
+            rig->selectedSubject = ScenePanelRig_SelectActiveSubject(rig);
             if (rig->selectedSubject >= 0) {
                 ScenePanelRig_InitMovement(rig);
                 if (rig->selectedSubject == 0)

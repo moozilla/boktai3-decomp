@@ -12,3 +12,4 @@ address	name	outcome	minutes	note
 08128F98	FeatherEffectPool_SpawnGroundScatter	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
 081B3DB8	Vanargand_ReleaseRadialEffects	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
 080592F4	ScenePanel_InitScheduledAction	clean	5	Plain per-case assignments match: jump.c cross-jumping merges the shared tails the pinned goto version spelled out by hand.
+08059C48	ScenePanelRig_TickHoverSelection	clean	25	The dead ldr of 0x0403B714 is the shared ParticleRandom_ReadRelativeSample origin: using it for both random draws lets combine absorb every use and leave the set, so the pins and barriers go.
