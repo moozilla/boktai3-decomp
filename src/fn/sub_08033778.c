@@ -47,7 +47,6 @@ struct TextWindow *TextWindowManager_FindWindow(struct WindowManager *, int);
 struct TextWindow *TextWindow_Find(int);
 int TextWindowManager_AllocateWindowId(struct WindowManager *);
 const u8 *TextWindow_ResolveString(struct TextWindow *, int);
-// scope: put TextWindow_Destroy begin
 int TextWindow_Destroy(int id)
 {
     struct WindowManager *p = gWindowManager;
@@ -79,4 +78,3 @@ int TextWindow_Destroy(int id)
     Heap_Free(w);
     return id;
 }
-// scope: put TextWindow_Destroy end

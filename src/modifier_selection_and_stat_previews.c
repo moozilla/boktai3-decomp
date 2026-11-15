@@ -311,7 +311,6 @@ void Modifier_LoadFourthSource(struct ModifierSelection *selection)
     }
 }
 
-// scope: put ModifierMenu_SelectPendingSource begin
 void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
 {
     struct ModifierSelection *pending = &menu->pending;
@@ -355,7 +354,6 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             break;
     }
 }
-// scope: put ModifierMenu_SelectPendingSource end
 
 s32 ModifierMenu_CommitFirstSource(struct ModifierMenu *p)
 {
