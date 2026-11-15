@@ -28,3 +28,4 @@ address	name	outcome	minutes	note
 08176F70	sub_08176F70	holdout	90	Concession-free draft is 32/32, shape 2 (from 6 concessions): pinless StepAnimation idiom, header union flag read, CpuFill32, an index helper that fixes the PRE slot order (scope preorder). Left: the ROM keeps the fill/first-call zero apart from the later zero (r5 vs r4).
 081ADEAC	Vanargand_InitBackgroundAttachment	clean	3	Already concession-free after main's CpuFill32 ZeroFill8; dropped an unused alias define.
 081FAE0C	sub_081FAE0C	clean	2	Already concession-free after main's CpuFill32 ZeroFill8 (its only helper concession); check.py MATCH, no source change.
+0816E570	sub_0816E570	holdout	35	Pin-free draft is 26/22: the random-table pointer must land in r6 (then owner r5, kind sb follow); only a union-halves table source (sub_0816E570.union_table.c, 12/12) got r6, at the cost of hoisted 0xFFFF masks.
