@@ -9,3 +9,4 @@ address	name	outcome	minutes	note
 081B4040	Vanargand_EmitRadialPartEffects	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
 081BF67C	Storage_InitWidgets	clean	3	Shared ZeroFill8 (global.h) rewritten as the SDK CpuFill32 macro, whose vu32 tmp is library code; one header change clears all its callers, same bytes.
 080747B8	SceneActorMovement_UpdateAirborne	clean	5	Two hand-rolled vu32 CpuSet fills were ZeroFill8 calls; cse reuses the known-zero bounce register as the ROM does.
+0810E9D4	TimerDisplay_DrawRecord	clean	15	One u16 *cell variable for both map-entry stores: it spans blocks, so global alloc gives it r1 after local alloc puts the stored constant in r0.
