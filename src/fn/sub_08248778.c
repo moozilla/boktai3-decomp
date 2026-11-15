@@ -28,9 +28,13 @@ typedef unsigned long uintptr_t;
 u16 Eeprom_WriteBlock(u16 address, const u16 *data, u8 unk_3)
 {
     u16 buffer[0x52]; // this is one too large?
+    // concession-ok(volatile): the SDK EEPROM driver's own polling locals (tmc, libgbabackup)
     vu16 timeout_flag;
-    vu16 prev_vcount;      // stack + a6
-    vu16 current_vcount;   // stack + a8
+    // concession-ok(volatile): the SDK EEPROM driver's own polling locals (tmc, libgbabackup)
+    vu16 prev_vcount; // stack + a6
+    // concession-ok(volatile): the SDK EEPROM driver's own polling locals (tmc, libgbabackup)
+    vu16 current_vcount; // stack + a8
+    // concession-ok(volatile): the SDK EEPROM driver's own polling locals (tmc, libgbabackup)
     vu32 passed_scanlines; // stack + ac
     u16 ret;
     vu16 *temp2;
