@@ -11,3 +11,4 @@
 081F2208	SpriteTrail_InitializeEntry	clean	3	Its per-file vu32 clear helper was a copy of ZeroFill8; calling the shared (now CpuFill32-based) helper matches.
 0816D394	PauseMenu_ApplyCharacterSelection	clean	10	The ROM reloads gGameState before each store, which struct-field stores never do (in_struct alias rule); storing through a pointer parameter of a small inline setter gives the reload without raw offsets.
 0810AD50	LinkSelection_ExchangeParticipantInput	clean	15	The mask/mode helpers took a shared mask parameter; writing each as its own predicate with the 0x3c00 constant inside and a named mode local let loop.c hoist only the shared mask, as the ROM does.
+080513B8	DirectionalForce_InitializeFromScript	holdout	55	One table/mask swap: the table pseudo's REG_EQUIV doubling (AGBCC_NOEQUIV=table matches); the halves union that removes it in RandomizeMovement stays live from entry here and does not fold.
