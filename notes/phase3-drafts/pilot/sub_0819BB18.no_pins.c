@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "monster_particle_random.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18
@@ -49,48 +50,31 @@ static inline s32 randomValue(const u16 *table)
     offset = NextRandomIndex() * 2;
     return *(const u16 *)(offset + (u32)table);
 }
-/* Keep the shared random source and motion addresses through their inline uses. */
-static inline const u16 *RetainRandomSource(const u16 *raw)
-{
-    const u16 *out;
-    asm("" : "=r"(out) : "0"(raw));
-    return out;
-}
-static inline const u16 *RandomSourceAddress(const u16 *raw)
-{
-    return RetainRandomSource(raw);
-}
-static inline void RetainMotionAddress(struct BurstVector *p)
-{
-}
 void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
 {
     struct BurstVector offset;
     struct BurstVector position;
     struct BurstVector delta;
     s32 i;
+    union ParticleRandomTableSource source;
+    const u16 *table;
     polar(&offset, (actor->direction + 128) & 255, 768);
     {
         struct BurstVector *target = actor->target;
         add(&position, target, &offset);
     }
+    source.halves[0] = 0xB000;
+    source.halves[1] = 0x0203;
+    table = ParticleRandom_GetTable(&source);
     for (i = 0; i < 16; i++) {
-        const u16 *raw = (const u16 *)0x0203B000;
-        const u16 *source;
-        const u16 *storage;
-        const u16 *table;
         s32 type;
         s32 vertical;
         s32 sample;
-        source = RandomSourceAddress(raw);
-        asm("" : "=r"(storage) : "0"(source));
-        asm("" : "=r"(table) : "0"(storage));
         sample = randomValue(table);
         polar(&delta, ((actor->direction + ((sample >> 3) % 64)) - 32) & 255, 128);
         type = randomValue(table) >> 3;
         type %= 4;
         vertical = 32 - ((randomValue(table) >> 3) % 64);
-        RetainMotionAddress(&delta);
         MotionEntry_CreateWithDelta(&actor->position, &delta, type, vertical);
     }
 }
