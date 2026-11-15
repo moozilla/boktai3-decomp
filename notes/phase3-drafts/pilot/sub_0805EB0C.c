@@ -47,7 +47,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     struct SceneInputWidget *widget;
     void *sequenceResource;
     void *graphics;
-    s32 i;
+    s32 i, k;
 
     source = ScriptProc_Start(0xCB05, 0x5D04);
     panel->gridResource = *source;
@@ -127,7 +127,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     position.y = 0;
     Widget_InitLinked(&panel->meterGlyph, &panel->widgetResource, 0x68, 0x30, 0, 0, 60, &position);
     widget = panel->digits;
-    for (i = 7; i >= 0; i--) {
+    for (k = 7; k >= 0; k--) {
         Widget_InitLinked(widget, &panel->widgetResource, 0x50, 0x30, 0, 0, 60, &position);
         widget++;
     }
@@ -135,7 +135,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
                       &position);
     position.x -= 11;
     widget = panel->smallDigits;
-    for (i = 3; i >= 0; i--) {
+    for (k = 3; k >= 0; k--) {
         Widget_InitLinked(widget, &panel->widgetResource, 0xAA, 0x31, 0, 0, 60, &position);
         position.x += 6;
         widget++;
