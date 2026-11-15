@@ -18,7 +18,7 @@ address	name	outcome	minutes	note
 0806BDB8	SceneSteeringActor_EmitRandomParticle	clean	15	The r1 pin on the sine-table pointer goes when both lookups index gUnk_086149C4 directly (the variable was a constant pseudo with halved priority); last draw reads through ParticleRandom_ReadRelativeSample.
 0807F4B8	SceneActorTarget_ResetContactResponse	holdout	2	Triaged only: 8 pins/barriers, 154 differing rows without them.
 08078700	SceneActorBehavior_UpdateColliders	holdout	10	Goto-free rewrite from the ROM is 72 rows off: the mask-first Test/ReadControl shapes and separate early-return tails need more work.
-08082D80	SceneActorControl_ConvergeSavedMotion	holdout	5	Shares RestartPositionCurve's blocker: a u8 zero and a u32 zero set between the flags2D4 load and its OR, which cse merges in ordinary C.
+08082D80	SceneActorControl_ConvergeSavedMotion	clean	85	Field-level rewrite: both arms use SceneActorReaction_EnableMotionFlags (halfword then word zero after the load), and one variable carries the 0 for state->phase and the tracking test result.
 08084044	SceneActorControl_RestartPositionCurve	clean	95	The separate byte zero is cse reusing a halfword zero that the shared s16-bitfield helper SceneActorReaction_EnableMotionFlags creates after the flags2D4 load (found through relatives Golem_ResumeSavedTarget and SceneActorApproach_RunTimedAction).
 080A93F4	TentacleBody_RestartSegmentAnimations	holdout	2	Triaged only: 23 pins/barriers, 75 differing rows without them.
 0810A9D0	LinkSelection_WaitForEmptySlots	clean	45	The display-slot fill is a plain for (i = 0; i < 4; i++) reusing i (loop.c reverses it into the ROM pointer loop); that later use makes i the cse class head over count, so the loop-entry test compares i; no pin.

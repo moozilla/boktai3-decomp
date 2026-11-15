@@ -1,8 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_control_helpers.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
+#include "scene_actor_reaction.h"
 void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
-void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *, struct SceneVec *);
 static inline s32 Quarter(s32 v)
 {
     return v >= 0 ? v >> 2 : -(-v >> 2);
@@ -21,25 +21,36 @@ static inline u8 AtRest(s32 x, s32 z)
         return 1;
     return 0;
 }
-static inline u8 Test(u32 value, u32 mask)
+static inline void AndWordFlags(u32 *flags, u32 mask)
 {
-    if (value & mask)
+    *flags &= mask;
+}
+static inline void OrWordFlags(u32 mask, u32 *flags)
+{
+    *flags |= mask;
+}
+static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
+{
+    u32 mask = bits;
+    mask |= tracking->flags;
+    tracking->flags = mask;
+}
+static inline u8 TrackingHas(struct SceneActorChaseTracking *tracking, u32 mask)
+{
+    if (tracking->flags & mask)
         return 1;
     return 0;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                               u8 behavior)
 {
     actor->state2A8 = state;
     actor->phase2A9 = phase;
     actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
 }
-void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorRegistryResetView *actor = input;
-    struct SceneActorControlState *control = SceneActorControl_GetState(actor);
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     s32 x;
     s32 z;
     s16 *priorX;
@@ -52,26 +63,15 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         {
-            u32 offset = 0x188;
-            struct ContactCollider *collider = (void *)((u8 *)actor + offset);
+            struct ContactCollider *collider = &actor->colliderB;
             collider->flags |= 4;
         }
     }
+    OrWordFlags(0x100000, &actor->flags2D0);
     {
-        u32 mask = 0x100000;
-        u32 offset = 0x2D0;
-        u32 *flags = (void *)((u8 *)actor + offset);
-        *flags |= mask;
-    }
-    {
-        u32 offset = 0x310;
-        s32 current = *(s16 *)((u8 *)actor + offset);
-        u32 priorOffset;
-        s16 *field;
-        s32 difference;
-        priorOffset = 0x318;
-        field = (void *)((u8 *)actor + priorOffset);
-        difference = current - *field;
+        s32 current = actor->reactionStart.x;
+        s16 *field = &actor->reactionEnd.x;
+        s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
@@ -89,86 +89,35 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *i
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
-        u32 ready;
+        u16 *flags;
+        struct SceneActorChaseTracking *tracking;
+        u32 tracked;
+        actor->field2B0 = 1;
+        flags = &actor->flags2D4;
         {
-            u32 offset = 0x2B0;
-            u8 *field = (u8 *)actor + offset;
-            ready = 1;
-            *field = ready;
-        }
-        {
-            u32 flagsOffset = 0x2D4;
-            u16 *flags = (void *)((u8 *)actor + flagsOffset);
-            u32 mask = ready - 34;
-            u32 stateTest;
-            u8 *packet;
-            u32 loaded;
-            loaded = *flags;
-            mask &= loaded;
-            stateTest = 0;
+            u32 mask = ~0x20;
+            mask &= *flags;
+            tracked = 0;
             *flags = mask;
-            {
-                u32 *flags = &actor->flags2CC;
-                u32 mask = ~0x80;
-                *flags &= mask;
-            }
-            *((u8 *)control + 0x3E2) = stateTest;
-            packet = (u8 *)actor + 0xDC;
-            {
-                u32 mask = 8;
-                stateTest = Test(packet[15], mask);
-            }
-            if (stateTest) {
-                register u32 zeroWord asm("r5");
-                u32 mask = 0x100;
-                register u32 loaded asm("r1") = *flags;
-                stateTest = 0;
-                zeroWord = 0;
-                *flags = mask | loaded;
-                SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
-                {
-                    u32 phase = 2;
-                    u8 *first = &actor->state2A8;
-                    *first = stateTest;
-                    actor->phase2A9 = phase;
-                    actor->behavior2AA = stateTest;
-                    actor->counter2AC = zeroWord;
-                    actor->field2B1 = 1;
-                }
-                SceneActorControl_ResetCollisionPhase(actor);
-            } else {
-                register u32 mask asm("r0") = 8;
-                packet[15] = mask | packet[15];
-                mask = 0x100;
-                {
-                    register u32 loaded asm("r1") = *flags;
-                    register u32 zero asm("r2") = 0;
-                    *flags = mask | loaded;
-                    {
-                        u32 behavior = 3;
-                        register u32 offset asm("r3") = 0x2A8;
-                        *((u8 *)actor + offset) = zero;
-                        offset++;
-                        *((u8 *)actor + offset) = zero;
-                        {
-                            u32 behaviorOffset = 0x2AA;
-                            *((u8 *)actor + behaviorOffset) = behavior;
-                        }
-                        offset += 3;
-                        {
-                            register u32 *field asm("r0") = (void *)((u8 *)actor + offset);
-                            *field = stateTest;
-                        }
-                        {
-                            register u32 readyOffset asm("r4") = 0x2B1;
-                            register u8 *field asm("r1") = (u8 *)actor + readyOffset;
-                            asm("" : "+r"(field) : "r"(readyOffset));
-                            *field = 1;
-                        }
-                    }
-                }
-                SceneActorControl_ResetCollisionPhase(actor);
-            }
+        }
+        AndWordFlags(&actor->flags2CC, ~0x80);
+        state->phase = tracked;
+        tracking = &actor->tracking;
+        tracked = TrackingHas(tracking, 8);
+        if (tracked) {
+            SceneActorReaction_EnableMotionFlags(0x100, flags);
+            SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
+            SelectState(actor, 0, 2, 0);
+            actor->counter2AC = 0;
+            actor->field2B1 = 1;
+            SceneActorControl_ResetCollisionPhase(actor);
+        } else {
+            OrTrackingFlags(tracking, 8);
+            SceneActorReaction_EnableMotionFlags(0x100, flags);
+            SelectState(actor, 0, 0, 3);
+            actor->counter2AC = 0;
+            actor->field2B1 = 1;
+            SceneActorControl_ResetCollisionPhase(actor);
         }
     }
 }
