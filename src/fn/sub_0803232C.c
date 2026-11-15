@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct TextVm {
     u8 x, y, left, top, width, height, palette, style, entered, mode, skip, busy, previousMode,
@@ -266,17 +265,16 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
             value = 27;
             goto selected;
         }
-        {
-            register const u8 *alias asm("r6") = name;
-            if (!Text_ComparePrefix(alias, gUnk_0824DDB8, 11)) {
-                value = 30;
-                goto selected;
-            }
-            if (!Text_ComparePrefix(alias, gUnk_0824DDC4, 6)) {
-                value = TextState_GetPairSpeakerLabel();
-                goto selected;
-            }
+        cmp = (int)name;
+        if (!Text_ComparePrefix((const u8 *)cmp, gUnk_0824DDB8, 11)) {
+            value = 30;
+            goto selected;
         }
+        if (!Text_ComparePrefix((const u8 *)cmp, gUnk_0824DDC4, 6)) {
+            value = TextState_GetPairSpeakerLabel();
+            goto selected;
+        }
+        cmp = 0;
         if (!Text_ComparePrefix(name, gUnk_0824DDCC, 6)) {
             value = TextState_GetPlayerSpeakerLabel();
             goto selected;
