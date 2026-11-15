@@ -18,3 +18,4 @@
 080AA240	sub_080AA240	clean	1	Its helper concession was Tentacle_InterpolatePosition reaching ZeroFill8; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 080FC094	sub_080FC094	clean	1	Its two ZeroFill8 calls were its only concession; cleared by the concession-ok(volatile) in include/global.h, unit still matches.
 0810BBD4	LinkSelection_UpdateParticipantScores	holdout	35	Plain rewrite reached 21/19; remaining bonus/positive allocation swap, the inline zero-return paths and a copied 0xFFFF did not yield to the spellings tried.
+081128F8	ActorMarkerPool_UpdateMarkers	clean	20	Replaced the pinned private copy of the display-sequence step with the header PlayerCue_StepSequence and indexed pool->slots[i] in every access (WORKER.md shared-inline tip); a cached slot pointer gave 62 differing.
