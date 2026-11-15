@@ -1,7 +1,5 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-// MATCHING_CONCESSION: register-pinning
-// Remaining differences: the reverse-loop stride uses r0 instead of r1.
 struct TrailSegment {
     u8 unknown0[0x1C];
     struct ContactPosition position;
@@ -18,20 +16,16 @@ struct ActorTrail {
     u8 unknown8DC[0xE];
     u8 activeCount;
 };
-static inline u8 *CountAddress(struct ActorTrail *trail)
+static inline u8 hasFlag(struct TrailSegment *segment, u8 mask)
 {
-    u32 offset = 0x8ea;
-    register u8 *p asm("r1");
-    p = (u8 *)trail + offset;
-    return p;
-}
-static inline u8 isRemoved(struct TrailSegment *segment)
-{
-    u32 mask = 1;
-    u32 value = segment->flags;
+    u8 value = segment->flags;
     if (mask & value)
         return 1;
     return 0;
+}
+static inline u8 isRemoved(struct TrailSegment *segment)
+{
+    return hasFlag(segment, 1);
 }
 #define TentacleActor_RemoveSegmentColliders sub_080AA688
 void TentacleActor_RemoveSegmentColliders(struct SceneActorRegistryResetView *actor)
@@ -45,7 +39,7 @@ void TentacleActor_RemoveSegmentColliders(struct SceneActorRegistryResetView *ac
                 struct TrailSegment *segment = &segments[i];
                 Collider_Remove(segment->collider);
                 segment->flags |= 1;
-                --*CountAddress(trail);
+                trail->activeCount--;
             }
         }
     }
