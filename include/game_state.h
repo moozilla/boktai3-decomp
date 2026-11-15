@@ -100,7 +100,7 @@ struct GameState {
     s32 contactThreshold; /* 0x604: randomized 200..299 after player threshold event (tentative) */
     u32 statHundredths;   /* 0x608: restored by player initialization */
     u32 playerStatusValue; /* 0x60C: synchronized by Player_ClampStatsAndSyncStatus. */
-    u16 unk610;
+    s16 unk610;
     s16 unk612;
     s32 unk614;
     s32 unk618;
