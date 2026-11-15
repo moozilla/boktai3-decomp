@@ -1,32 +1,17 @@
-// MATCHING_CONCESSION: register-pinning
 #include "bouncing_object.h"
 /* BouncingObject_IsActive: Returns true for a nonnull object with a nonnegative slot index and nonzero timer whose state is not 2 */
 #define BouncingObject_IsActive sub_08069788
-#define BouncingObject_IsActive sub_08069788
 u32 BouncingObject_IsActive(struct BouncingObject *input)
 {
-    struct BouncingObject *slot = input;
-    register struct BouncingObject *late asm("r2") = slot;
-    if (slot) {
-        register u32 indexOffset asm("r3") = (u32) & ((struct BouncingObject *)0)->index;
-        register u8 *location asm("r0");
-        u32 index;
-        asm("" : "+r"(indexOffset));
-        location = (void *)((u32)slot + indexOffset);
-        index = *location;
-        index = (s8)index;
-        if ((s32)index >= 0) {
-            u32 offset = (u32) & ((struct BouncingObject *)0)->timer;
-            u16 *timer;
-            timer = (void *)((u32)slot + offset);
-            if (*timer) {
-                u32 stateOffset = (u32) & ((struct BouncingObject *)0)->state;
-                register u8 *state asm("r0");
-                state = (void *)((u32)late + stateOffset);
-                if (*state != 2)
-                    return 1;
-            }
-        }
-    }
-    return 0;
+    struct BouncingObject *object = input;
+
+    if (!input)
+        return 0;
+    if (input->index < 0)
+        return 0;
+    if (!input->timer)
+        return 0;
+    if (object->state == 2)
+        return 0;
+    return 1;
 }
