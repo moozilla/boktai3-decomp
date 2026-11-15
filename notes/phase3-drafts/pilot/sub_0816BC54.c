@@ -1,6 +1,6 @@
+// Holdout draft (no concessions), 120 rows (185 with the pins simply deleted).
+// AGBCC_PRI=<the -1 pseudo>:-100000,currentIndex:+100 -> 74 rows; more allocation decisions remain.
 #include "scene_hud_display.h"
-
-// MATCHING_CONCESSION: register-pinning
 
 // Refresh the four map navigation arrows and record their destination pages.
 #define MapMenu_RefreshNavigationArrows sub_0816BC54
@@ -8,7 +8,6 @@ u32 GameState_GetMapRevealFlag(u32);
 void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
 {
     u32 *first, *second, *third, *fourth;
-    register s32 invalid;
     u8 *destination0;
     u8 *destination1, *destination2, *destination3;
     struct SceneHudNavigationPage *page;
@@ -25,14 +24,11 @@ void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
     destination0 = &menu->navigationDestinations[0];
     *destination0 = -1;
     destination1 = (u8 *)&menu->navigationDestinations[1];
-    invalid = -1;
-    *destination1 = invalid;
+    *(s8 *)destination1 = -1;
     destination2 = (u8 *)&menu->navigationDestinations[2];
-    invalid = -1;
-    *destination2 = invalid;
+    *(s8 *)destination2 = -1;
     destination3 = (u8 *)&menu->navigationDestinations[3];
-    invalid = -1;
-    *destination3 = invalid;
+    *(s8 *)destination3 = -1;
     pages = &menu->navigationPages;
     selectedPage = &menu->navigationPage;
     page = &(*pages)[*selectedPage];
@@ -47,7 +43,7 @@ void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
                 else
                     *first |= 0x200;
             } else if (*selectedPage != menu->currentMapPage) {
-                register u32 currentIndex;
+                u32 currentIndex;
                 if ((*pages)[page->neighbors[0]].map ==
                     (*pages)[currentIndex = menu->currentMapPage].map) {
                     *destination0 = currentIndex;
@@ -74,7 +70,7 @@ void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
                 u8 *selected = &menu->navigationPage;
                 u16 *current = &menu->currentMapPage;
                 if (*selected != *current) {
-                    register u32 currentIndex;
+                    u32 currentIndex;
                     if (menu->navigationPages[page->neighbors[1]].map ==
                         menu->navigationPages[currentIndex = *current].map) {
                         s8 *destination = &menu->navigationDestinations[1];
@@ -105,7 +101,7 @@ void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
                 u8 *selected = &menu->navigationPage;
                 u16 *current = &menu->currentMapPage;
                 if (*selected != *current) {
-                    register u32 currentIndex;
+                    u32 currentIndex;
                     if (menu->navigationPages[page->neighbors[2]].map ==
                         menu->navigationPages[currentIndex = *current].map) {
                         s8 *destination = &menu->navigationDestinations[2];
@@ -136,7 +132,7 @@ void MapMenu_RefreshNavigationArrows(struct SceneHudState *menu)
                 u8 *selected = &menu->navigationPage;
                 u16 *current = &menu->currentMapPage;
                 if (*selected != *current) {
-                    register u32 currentIndex;
+                    u32 currentIndex;
                     if (menu->navigationPages[page->neighbors[3]].map ==
                         menu->navigationPages[currentIndex = *current].map) {
                         s8 *destination = &menu->navigationDestinations[3];
