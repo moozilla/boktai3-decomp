@@ -658,6 +658,12 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     }
 }
 
+static inline int GroupObjects_Random(void)
+{
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
+}
+
 void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
     struct GroupVec delta;
@@ -670,20 +676,14 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
     if (active) {
         p->active = 0;
         p->anchor = p->position;
-        p->direction = randomValue();
+        p->direction = GroupObjects_Random();
         ZeroFill8(offset);
     }
     Vec16_Lerp(&p->anchor, &p->anchor, &p->target, index + 8, 5);
     if (p->speed == 0) {
         const u16 *table;
-        {
-            register u32 d asm("r1");
-            s32 ax;
-            ax = -p->offset.x;
-            asm("" ::"r"(d));
-            p->direction = Math_Atan2(ax, -p->offset.z);
-        }
-        table = gRandomTable;
+        p->direction = Math_Atan2(-p->offset.x, -p->offset.z);
+        table = (const u16 *)RANDOM_TABLE_ADDR;
         p->direction += (randomWith(table) & 15) - 7;
         p->speed = (randomWith(table) & 7) + 8;
     } else
