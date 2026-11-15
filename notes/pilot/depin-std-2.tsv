@@ -11,3 +11,4 @@ address	name	outcome	minutes	note
 080DE6E0	sub_080DE6E0	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
 08128F98	FeatherEffectPool_SpawnGroundScatter	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
 081B3DB8	Vanargand_ReleaseRadialEffects	clean	1	Cleared by the same ZeroFill8 concession-ok(volatile) excuse (its only concession was a call into ZeroFill8).
+080592F4	ScenePanel_InitScheduledAction	clean	5	Plain per-case assignments match: jump.c cross-jumping merges the shared tails the pinned goto version spelled out by hand.
