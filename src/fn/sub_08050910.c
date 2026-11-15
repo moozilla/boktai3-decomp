@@ -1,72 +1,52 @@
 #include "orbit_background.h"
-// MATCHING_CONCESSION: register-pinning
-static inline u32 isSpecial(void)
+static inline s32 LinkSession_Selected(void)
 {
-    u32 value = gPlayerActionPending;
-    u32 result = 0;
-    if (value == 1)
-        result = 1;
-    return result;
+    if (!gLinkSession)
+        return -1;
+    return gLinkSession->selected;
 }
-void OrbitBackground_UpdateVisibility(struct OrbitBackground *input)
+static inline u8 LinkSession_SelectedStatus(void)
 {
-    register struct OrbitBackground *background asm("r5") = input;
+    s32 selected = LinkSession_Selected();
+    if (!gLinkSession || selected < 0)
+        return 0;
+    return gLinkSession->status[selected];
+}
+static inline void Bg_DisableDisplay(s32 mask)
+{
+    gDispCntShadow &= ~mask;
+}
+static inline bool32 isSpecial(void)
+{
+    if (gPlayerActionPending == 1)
+        return TRUE;
+    return FALSE;
+}
+void OrbitBackground_UpdateVisibility(struct OrbitBackground *background)
+{
     if (gEngineFlags & 0x800) {
-        register s32 selected asm("r1");
-        u32 status;
-        if (!gLinkSession)
-            selected = -1;
-        else
-            selected = gLinkSession->selected;
-        if (!gLinkSession || selected < 0)
-            status = 0;
-        else
-            status = gLinkSession->status[selected];
-        asm("" : "+r"(status));
-        if (status)
+        if (LinkSession_SelectedStatus())
             background->enabled = 0;
-        else if (background->enabled)
-            goto enable;
-        else {
+        else if (!background->enabled) {
             OrbitBackground_ResetOrbit(background);
             background->enabled = 1;
         }
         if (background->enabled)
-            goto enable;
-        goto disable;
+            Bg_EnableDisplay(0x200);
+        else
+            Bg_DisableDisplay(0x200);
     } else {
-        u32 special = isSpecial();
-        u8 *saved;
-        if (special) {
-            u8 *mode = &background->specialMode;
-            u32 value = *mode;
-            saved = mode;
-            if (value == 0)
-                *saved = 1;
-        } else {
-            u8 *mode = &background->specialMode;
-            u32 value = *mode;
-            saved = mode;
-            if (value != 0) {
-                *saved = special;
-                if (!background->enabled)
-                    goto disable;
+        if (isSpecial()) {
+            if (!background->specialMode)
+                background->specialMode = 1;
+        } else if (background->specialMode) {
+            background->specialMode = 0;
+            if (background->enabled)
                 OrbitBackground_ResetOrbit(background);
-            }
         }
-        if (!background->enabled)
-            goto disable;
-        if (*saved)
-            goto disable;
+        if (background->enabled && !background->specialMode)
+            Bg_EnableDisplay(0x200);
+        else
+            Bg_DisableDisplay(0x200);
     }
-enable: {
-    u32 mask = 512;
-    gDispCntShadow = mask | gDispCntShadow;
-}
-    return;
-disable: {
-    u16 *control = &gDispCntShadow;
-    u32 mask = ~512;
-    *control = mask & *control;
-}
 }
