@@ -43,4 +43,18 @@ struct ArmorLaunchGroup {
         ++*(count_); \
     } while (0)
 
+/* Set a part's next action and mark it active. */
+static inline void ArmorLaunchState_SetAction(struct ArmorLaunchState *state, u8 active, u8 action)
+{
+    state->active = active;
+    state->action = action;
+    state->flags |= active;
+}
+
+static inline void ArmorLaunchGroup_QueuePart(struct ArmorLaunchGroup *group,
+                                              struct ArmorLaunchState *state, u8 action)
+{
+    ARMOR_QUEUE_PART_ACTION(state, action, 1, 1, &group->activeCount);
+}
+
 #endif

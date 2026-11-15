@@ -1,3 +1,4 @@
 080154D0	AnimatedParticle_PriorityFromFlags	clean	25	regmove will not tie an AND to a parameter copy unless the next insn sets it again: mask and shift the parameter in place (flags &= m; flags >>= 12), then a separate priority = flags - 1.
 08069788	sub_08069788	clean	20	A chain of early returns (if (!p) return 0; ...) with one object = input copy read only by the last test keeps both pointer registers; nested ifs and && chains let cse merge them.
 08019ECC	Presentation_SetItemGraphic	clean	40	The graphic index is narrowed in the call: (u16)(entry->graphic + 0x121); the truncation that combine later proves redundant keeps the constant load and copy apart from the byte.
+0818EA3C	SpriteColliderGroup_ResetActiveParts	clean	70	A plain for loop that indexes a parts base pointer declared in the body (parts[i]) plus an inline SetAction(state, 1, 5) helper gives the hoisted constants and giv order; the hand-rotated pointer walk needed the pin.
