@@ -35,7 +35,7 @@
 #include "player.h"
 
 #include "script_utility.h"
-#include "room_actor.h"
+#include "chase_actor.h"
 
 struct MimicReactionFlags {
     s16 bits : 16;
@@ -59,8 +59,7 @@ struct MimicDeferredResponse {
 /* Complete 0x664 allocation, with the common actor prefix kept flat. */
 
 struct Mimic {
-    struct RoomActor base;
-    struct SceneActorChaseGroup group;
+    struct ChaseActor chase;
     struct MimicNavigationProbe routeProbe;
     struct ContactPosition destination;
     struct ContactPosition origin;
