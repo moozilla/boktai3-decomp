@@ -52,7 +52,10 @@ def dependents(headers, files=None):
 def check(path):
     r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "check.py"), path, "--quiet"],
                        cwd=ROOT, capture_output=True, text=True)
-    return path, r.returncode, (r.stdout + r.stderr).strip().splitlines()[-1:] or [""]
+    lines = (r.stdout + r.stderr).strip().splitlines()
+    # a compile failure: show agbcc's first errors ("stdin:LINE: message", not warnings)
+    errors = [ln for ln in lines if re.match(r"stdin:\d+: (?!warning)", ln) or "error:" in ln]
+    return path, r.returncode, errors[:3] or lines[-1:] or [""]
 
 
 def main():
@@ -78,7 +81,7 @@ def main():
         for path, rc, tail in ex.map(check, deps):
             if rc:
                 bad.append(path)
-                print(f"MISMATCH {path}: {tail[0]}")
+                print(f"MISMATCH {path}: " + "\n    ".join(tail))
     print(f"{len(deps) - len(bad)} of {len(deps)} dependents match")
     sys.exit(1 if bad else 0)
 
