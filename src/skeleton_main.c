@@ -566,11 +566,11 @@ void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
                                             struct SceneActorBehaviorTimer *other)
 {
     switch (s->base.category) {
-        case 6:
+        case MONSTER_CATEGORY_SKELETON_GUARD:
             other->timer = 60;
             break;
-        case 5:
-        case 7:
+        case MONSTER_CATEGORY_SKELETON:
+        case MONSTER_CATEGORY_SKELETON_ARMED:
             other->timer = 120;
             break;
         default:
@@ -886,7 +886,7 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
     switch (((p->base.body.direction + 16) & 255) >> 6) {
         case 0:
         case 2:
-            if (p->base.category == 6) {
+            if (p->base.category == MONSTER_CATEGORY_SKELETON_GUARD) {
                 bounds.packed.x = 180;
                 bounds.packed.z = 84;
             } else {
@@ -896,7 +896,7 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
             break;
         case 1:
         case 3:
-            if (p->base.category == 6) {
+            if (p->base.category == MONSTER_CATEGORY_SKELETON_GUARD) {
                 bounds.packed.x = 84;
                 bounds.packed.z = 180;
             } else {
@@ -919,17 +919,17 @@ void SceneActor_UpdateProfileForCategory(struct ChaseActor *actor)
     actor->base.profileMode = count;
 
     switch (category) {
-        case 5:
-            actor->base.profileId = SceneActorProfiles_FindOrAdd(5, count);
+        case MONSTER_CATEGORY_SKELETON:
+            actor->base.profileId = SceneActorProfiles_FindOrAdd(MONSTER_CATEGORY_SKELETON, count);
             break;
-        case 6:
-            actor->base.profileId = SceneActorProfiles_FindOrAdd(6, count);
+        case MONSTER_CATEGORY_SKELETON_GUARD:
+            actor->base.profileId = SceneActorProfiles_FindOrAdd(MONSTER_CATEGORY_SKELETON_GUARD, count);
             break;
-        case 7:
-            actor->base.profileId = SceneActorProfiles_FindOrAdd(7, count);
+        case MONSTER_CATEGORY_SKELETON_ARMED:
+            actor->base.profileId = SceneActorProfiles_FindOrAdd(MONSTER_CATEGORY_SKELETON_ARMED, count);
             break;
-        case 8:
-            actor->base.profileId = SceneActorProfiles_FindOrAdd(8, count);
+        case MONSTER_CATEGORY_SKELETON_SCRIPTED:
+            actor->base.profileId = SceneActorProfiles_FindOrAdd(MONSTER_CATEGORY_SKELETON_SCRIPTED, count);
             break;
     }
 }
@@ -1190,13 +1190,13 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
             angle = RotationPhase_HeadingDistance(Math_Atan2(delta.x, difference->z),
                                                   s->base.body.direction);
             if (angle < s->base.tracking.heading) {
-                if (s->base.category == 5) {
+                if (s->base.category == MONSTER_CATEGORY_SKELETON) {
                     if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
                         return;
-                } else if (s->base.category == 6) {
+                } else if (s->base.category == MONSTER_CATEGORY_SKELETON_GUARD) {
                     if (Skeleton_TryBeginGuardedAttack(s, context, angle))
                         return;
-                } else if (s->base.category == 7) {
+                } else if (s->base.category == MONSTER_CATEGORY_SKELETON_ARMED) {
                     if (Skeleton_TryBeginArmedAttack(s, context, angle))
                         return;
                 }
@@ -1461,7 +1461,7 @@ u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
         u16 mask = 0x80;
         variant = (u16)(actor->base.motionFlags & mask) != 0;
         SetTileFlag(actor, 0x10000);
-        if (actor->base.category == 7) {
+        if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED) {
             return gUnk_08606078[variant][tile[10] & 7];
         } else {
             return gUnk_08606058[variant][second[10] & 7];
@@ -1604,7 +1604,7 @@ void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor)
     if (!entry)
         return;
     switch (category) {
-        case 5:
+        case MONSTER_CATEGORY_SKELETON:
             SetEntry(0x0, 0x0, entry + 0);
             SetEntry(0x6, 0x0, entry + 1);
             SetEntry(0xC, 0x0, entry + 5);
@@ -1622,7 +1622,7 @@ void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor)
             SetEntry(0x59, 0x0, entry + 18);
             SetEntry(0x5B, 0x0, entry + 13);
             break;
-        case 6:
+        case MONSTER_CATEGORY_SKELETON_GUARD:
             SetEntry(0x2, 0x0, entry + 0);
             SetEntry(0x8, 0x0, entry + 1);
             SetEntry(0xE, 0x0, entry + 5);
@@ -1645,7 +1645,7 @@ void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor)
             SetEntry(0x59, 0x0, entry + 18);
             SetEntry(0x5D, 0x0, entry + 13);
             break;
-        case 7:
+        case MONSTER_CATEGORY_SKELETON_ARMED:
             SetEntry(0x4, 0x0, entry + 0);
             SetEntry(0xA, 0x0, entry + 1);
             SetEntry(0x10, 0x0, entry + 5);
@@ -1687,16 +1687,16 @@ void SceneActorReaction_SetProfileEntries(struct ChaseActor *actor)
     u32 special = mask & flags;
     if (special) {
         switch (category) {
-            case 5:
+            case MONSTER_CATEGORY_SKELETON:
                 SetEntry_SetProfileEntries(0x63, entry);
                 SetEntry_SetProfileEntries(0x27, entry + 1);
                 break;
-            case 6:
+            case MONSTER_CATEGORY_SKELETON_GUARD:
                 SetEntry_SetProfileEntries(0x65, entry);
                 SetEntry_SetProfileEntries(0x29, entry + 1);
                 SetEntry_SetProfileEntries(0x1E, entry + 2);
                 break;
-            case 7:
+            case MONSTER_CATEGORY_SKELETON_ARMED:
                 SetEntry_SetProfileEntries(0x67, entry);
                 SetEntry_SetProfileEntries(0x2B, entry + 1);
                 SetEntry_SetProfileEntries(0x24, entry + 2);
@@ -1704,11 +1704,11 @@ void SceneActorReaction_SetProfileEntries(struct ChaseActor *actor)
         }
     } else {
         switch (category) {
-            case 5:
+            case MONSTER_CATEGORY_SKELETON:
                 SetEntry_SetProfileEntries(0, entry);
                 SetEntry_SetProfileEntries(6, entry + 1);
                 break;
-            case 6:
+            case MONSTER_CATEGORY_SKELETON_GUARD:
                 if (flags & 0x200) {
                     SetEntry_SetProfileEntries(0x65, entry);
                     SetEntry_SetProfileEntries(0x29, entry + 1);
@@ -1719,7 +1719,7 @@ void SceneActorReaction_SetProfileEntries(struct ChaseActor *actor)
                     SetEntry_SetProfileEntries(0x1B, entry + 2);
                 }
                 break;
-            case 7:
+            case MONSTER_CATEGORY_SKELETON_ARMED:
                 if ((u16)(flags & 0x200)) {
                     SetEntry_SetProfileEntries(0x67, entry);
                     SetEntry_SetProfileEntries(0x2B, entry + 1);
@@ -1748,10 +1748,10 @@ u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor)
         case 0:
         case 5:
         case 12:
-            if (actor->base.category == 5) {
+            if (actor->base.category == MONSTER_CATEGORY_SKELETON) {
                 if (context->timer6F0 <= 0)
                     return 1;
-            } else if (actor->base.category == 7) {
+            } else if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED) {
                 if (actor->base.health <
                         ((struct SceneActorReactionHealthTail *)context)->healthThreshold ||
                     ContextHasFlag(context, 0x80)) {
@@ -2728,7 +2728,7 @@ void SceneActorReaction_TickContactAnimation(struct ChaseActor *p)
         Sound_PlaySong(0x3A9);
     if (animation[10] == 3) {
         Collider_Refresh(state + 0x678);
-        if (animation[6] == 0 && *category == 6)
+        if (animation[6] == 0 && *category == MONSTER_CATEGORY_SKELETON_GUARD)
             Sound_PlaySong(0x3AA);
     }
     if (p->base.restart) {
@@ -2923,7 +2923,7 @@ void Skeleton_ShedBones(struct ChaseActor *actor)
         position.y += 0xDC;
         Skeleton_AddPosition(&position, &position, &velocity);
         Skeleton_EmitBone(&position, &velocity, 3);
-        Skeleton_SetCategory(actor, 5);
+        Skeleton_SetCategory(actor, MONSTER_CATEGORY_SKELETON);
         Skeleton_InitializeCategoryProfile(actor);
         Skeleton_InitVariantMotion(actor);
         {

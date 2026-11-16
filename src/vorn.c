@@ -1196,7 +1196,7 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
         actor->base.attachmentTimer = 0;
         actor->base.reactionDirection = (Vorn_DivideDirection(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
-        SceneActorChase_SetControl(actor, group->field5E0, 8);
+        SceneActorChase_SetControl(actor, group->animationEndControl, 8);
         SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
         SceneActorChase_SetState(actor, 3, 1, 0);
@@ -1322,7 +1322,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
         actor->group.turn.turnsRemaining = -1;
         SceneActorChase_SetActorFlags(actor, 16);
         SceneActorChase_SetState(actor, 3, 1, 0);
-        SceneActorChase_SetControl(actor, group->field5E4, 15);
+        SceneActorChase_SetControl(actor, group->routeResumeControl, 15);
     }
     actor->base.field2C2 = 64;
 }

@@ -255,7 +255,7 @@ s32 Mummy_Init(void *object)
 
     MummyInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 1);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_MUMMY);
     Mummy_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
@@ -293,7 +293,7 @@ s32 Mummy_Init(void *object)
     MonsterInit_SetReactionGate(&actor->chase, SceneActor_EnterMotionPhase);
     MonsterInit_SetContactCallback(&actor->chase, Mummy_SelectMovementResponse);
     group->responseCallback = Mummy_OnClearActivityFlag;
-    group->field5EC = Mummy_OnMovementUpdate;
+    group->routeRestoreCallback = Mummy_OnMovementUpdate;
     group->routeChoiceControl = Mummy_UpdateRecoveryWait;
     group->common.fallback = Mummy_TryStimulusRoute;
     actor->chase.base.field2E8 = 1;

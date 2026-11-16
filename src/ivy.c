@@ -2353,7 +2353,7 @@ s32 Ivy_Init(void *object)
 
     IvyInit_ResetCapture(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 24);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_IVY);
     Ivy_InitProfileId(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

@@ -393,7 +393,7 @@ s32 Dog_Init(void *object)
 
     DogInit_Reset(dog);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 0x15);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_DOG);
     SceneActor_RefreshLivingCountAndProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
@@ -448,7 +448,7 @@ s32 Dog_Init(void *object)
     MonsterInit_SetReactionGate(actor, Dog_UpdateTargetGate);
     MonsterInit_SetContactCallback(actor, Dog_ChooseReactionBehavior);
     group->responseCallback = Dog_OnClearActivityFlag;
-    group->field5EC = Dog_RestoreRoute;
+    group->routeRestoreCallback = Dog_RestoreRoute;
     group->turnControl = Dog_UpdateTurnSequence;
     group->common.gate.field41A = 20;
     actor->base.field2E8 = 0;

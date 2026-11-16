@@ -382,7 +382,7 @@ s32 Skeleton_Init(void *object)
     SkeletonInit_ResetFlags(instance);
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
     {
-        MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, 5));
+        MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, MONSTER_CATEGORY_SKELETON));
         if (MonsterInit_GetCategory(actor) == 7)
             SkeletonInit_SetFlagWord(0x40, &instance->actionFlags);
     }
@@ -429,7 +429,7 @@ s32 Skeleton_Init(void *object)
     MonsterInit_SetRouteReset(actor, Skeleton_ResetRouteReaction);
     group->responseCallback = 0;
     MonsterInit_SetReactionGate(actor, SceneActorReaction_UpdateGate);
-    group->field5EC = Skeleton_RestorePursuitRoute;
+    group->routeRestoreCallback = Skeleton_RestorePursuitRoute;
     SkeletonInit_InstallContactDefaults(actor);
     actor->base.field2E8 = 0;
     instance->healthThreshold = (s16)MonsterInit_GetHealth(actor) >> 1;

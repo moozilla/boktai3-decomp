@@ -3254,7 +3254,7 @@ s32 Ghost_Init(void *object)
     arg0->flags = 0;
     SceneActorRegistry_SetObjectContext(a, a, 0, 0);
     {
-        u8 category = 0x17;
+        u8 category = MONSTER_CATEGORY_GHOST;
         a->base.category = category;
     }
     Ghost_InitActorProfile(a);

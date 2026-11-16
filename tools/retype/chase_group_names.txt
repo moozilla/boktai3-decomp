@@ -1,0 +1,15 @@
+# Names for SceneActorChaseGroup's offset-named control slots, from the MonsterInit
+# defaults and the shared readers that install them (see include/scene_actor_group.h):
+#   python3 tools/retype_fields.py --steps tools/retype/chase_group_names.txt --dependents include/scene_actor_group.h
+# Run it after merging the header; it rewrites only accesses that no longer compile.
+[map]
+countdown5C8 contactCooldown
+field5E0 animationEndControl
+field5E4 routeResumeControl
+field5EC routeRestoreCallback
+field5FC fadeControl
+field600 defeatBurstControl
+field604 animateCallback
+field60C contactArrivalControl
+field610 heldControl
+field614 releaseControl

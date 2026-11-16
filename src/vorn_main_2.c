@@ -1484,7 +1484,7 @@ s32 Vorn_Init(void *object)
 
     VornInit_ResetFlags(vorn);
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
-    MonsterInit_SetCategory(actor, 0x19);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_VORN);
     Vorn_InitActorProfile(actor);
     Vorn_ParseField624(actor);
     Vorn_InitScriptCallback(actor);
@@ -1530,10 +1530,10 @@ s32 Vorn_Init(void *object)
     MonsterInit_SetContactCallback(actor, Vorn_SelectHitRecovery);
     VornInit_SetReactionTable(actor, gUnk_08606038);
     group->contactControl = Vorn_UpdateKnockbackRecovery;
-    group->field5E0 = SceneActorReaction_ResumeOrRunScript;
+    group->animationEndControl = SceneActorReaction_ResumeOrRunScript;
     group->responseCallback = Vorn_OnAnimationCleanup;
-    group->field5EC = Vorn_BeginTargetPursuit;
-    group->field614 = Vorn_ResumeReactionRoute;
+    group->routeRestoreCallback = Vorn_BeginTargetPursuit;
+    group->releaseControl = Vorn_ResumeReactionRoute;
     actor->base.field2E8 = 3;
     VornInit_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);

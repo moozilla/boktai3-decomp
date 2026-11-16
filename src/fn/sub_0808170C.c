@@ -170,7 +170,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         actor->base.attachmentTimer = 0;
         actor->base.reactionDirection = (Reaction_ThirtySecond(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
-        SceneActorChase_SetControl(actor, group->field5E0, 8);
+        SceneActorChase_SetControl(actor, group->animationEndControl, 8);
         SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
         SceneActorChase_SetState(actor, 3, 1, 0);

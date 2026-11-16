@@ -17,7 +17,7 @@ typedef char Check_route[(u32) & ((struct ChaseActor *)0)->group.homeRoute == 0x
 typedef char
     Check_contactNode[(u32) & ((struct ChaseActor *)0)->group.contactNode == 0x45C ? 1 : -1];
 typedef char
-    Check_countdown5C8[(u32) & ((struct ChaseActor *)0)->group.countdown5C8 == 0x5C8 ? 1 : -1];
+    Check_contactCooldown[(u32) & ((struct ChaseActor *)0)->group.contactCooldown == 0x5C8 ? 1 : -1];
 typedef char Check_effect5CC[(u32) & ((struct ChaseActor *)0)->group.effect == 0x5CC ? 1 : -1];
 typedef char
     Check_behaviorControl[(u32) & ((struct ChaseActor *)0)->group.contactControl == 0x5DC ? 1 : -1];
@@ -136,8 +136,8 @@ static inline void ActorStatus_TickAttachment(struct ChaseActor *actor)
     } else {
         (*(s16 *)&actor->base.attachmentTimer) = remaining - 1;
     }
-    if (actor->group.countdown5C8)
-        actor->group.countdown5C8--;
+    if (actor->group.contactCooldown)
+        actor->group.contactCooldown--;
 }
 
 static inline u32 ActorStatus_IsUnstable(struct ChaseActor *actor)

@@ -17,6 +17,35 @@ enum RoomActorMotionFlag {
     ROOM_ACTOR_MOTION_HOLDS_CONTACT = 0x1000, /* group.contactNode is held and must be released */
 };
 
+/* RoomActor.category: which monster class an actor is, as each class's init sets it
+ * (MonsterInit_SetCategory); SceneActorRegistry_SendToCategory addresses actors by it.
+ * 0, 0xB, 0xF and 0x10 have no setter found yet. */
+enum MonsterCategory {
+    MONSTER_CATEGORY_MUMMY = 1,
+    MONSTER_CATEGORY_SPIDER = 2,
+    MONSTER_CATEGORY_GOLEM = 3,
+    MONSTER_CATEGORY_GHOUL = 4,
+    /* The Skeleton class takes its category from keyword 'k' (scripts pass 5, 6 or 7). */
+    MONSTER_CATEGORY_SKELETON = 5,          /* the default; Skeleton_ShedBones drops an actor back to it */
+    MONSTER_CATEGORY_SKELETON_GUARD = 6,    /* Skeleton_TryBeginGuardedAttack's variant */
+    MONSTER_CATEGORY_SKELETON_ARMED = 7,    /* Skeleton_TryBeginArmedAttack's variant */
+    MONSTER_CATEGORY_SKELETON_SCRIPTED = 8, /* has a profile; only a script computing 'k' could pick it (low confidence) */
+    MONSTER_CATEGORY_TENTACLE = 9,
+    MONSTER_CATEGORY_MIMIC = 10,
+    MONSTER_CATEGORY_AXE = 12,         /* variant 0 */
+    MONSTER_CATEGORY_AXE_VARIANT = 13, /* any other variant (keyword 't') */
+    MONSTER_CATEGORY_OCTOPUS = 14,
+    MONSTER_CATEGORY_LUN = 0x11,
+    MONSTER_CATEGORY_BAT = 0x12,
+    MONSTER_CATEGORY_CROW = 0x13,
+    MONSTER_CATEGORY_BEE = 0x14,
+    MONSTER_CATEGORY_DOG = 0x15,
+    MONSTER_CATEGORY_SLIME = 0x16,
+    MONSTER_CATEGORY_GHOST = 0x17,
+    MONSTER_CATEGORY_IVY = 0x18,
+    MONSTER_CATEGORY_VORN = 0x19,
+};
+
 /*
  * The object every scene-actor registry entry allocates: the room's enemies (the props,
  * such as crates and floor switches, are pool slots of their own managers). Each class
@@ -31,7 +60,7 @@ struct RoomActor {
     u8 unknown9[0x37];
     u8 movementProbe[0x10];
     struct SceneActorBody body;
-    u8 category;
+    u8 category; /* enum MonsterCategory */
     u8 unknown99;
     u16 hudLabel; /* keyword 'V' (0xFFFF when absent); the HUD's label parameter (low) */
     s16 health;

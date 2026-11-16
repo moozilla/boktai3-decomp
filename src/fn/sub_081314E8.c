@@ -127,7 +127,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         struct ChaseTarget **node = (struct ChaseTarget **)group->contactNode;
         SubtractContactNode(&delta, node, &actor->base.body.position);
         if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
-            BeginControl(actor, group->field60C, 0x19, result);
+            BeginControl(actor, group->contactArrivalControl, 0x19, result);
             {
                 u32 state = 3;
                 u8 *field = &actor->base.state2A8;

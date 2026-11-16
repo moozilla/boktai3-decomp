@@ -4959,9 +4959,9 @@ s32 Axe_Init(void *object)
     variant = AxeInit_BoundedVariant(((struct AxeActorInit *)actor)->variantED7);
     AxeInit_SetVariant(&arg0->base, variant);
     if (variant == 0)
-        MonsterInit_SetCategory(actor, 12);
+        MonsterInit_SetCategory(actor, MONSTER_CATEGORY_AXE);
     else
-        MonsterInit_SetCategory(actor, 13);
+        MonsterInit_SetCategory(actor, MONSTER_CATEGORY_AXE_VARIANT);
     Axe_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
@@ -5014,9 +5014,9 @@ s32 Axe_Init(void *object)
     MonsterInit_InitializeGroup(group, (u8 *)arg0 + 0xED8, (u8 *)arg0 + 0xEFC, 0, 0, 0, 0, 1);
     AxeInit_InstallRoutes(actor);
     group->responseCallback = 0;
-    group->field5EC = 0;
-    group->field614 = Axe_ReleaseAndIdle;
-    group->field610 = Axe_UpdateDamageSpin;
+    group->routeRestoreCallback = 0;
+    group->releaseControl = Axe_ReleaseAndIdle;
+    group->heldControl = Axe_UpdateDamageSpin;
     MonsterInit_SetMotionFlags(actor, 0x60);
     MonsterInit_SetBehaviorFlags(actor, 0x200);
     MonsterInit_SetStatusFlags(actor, 0x02100408);

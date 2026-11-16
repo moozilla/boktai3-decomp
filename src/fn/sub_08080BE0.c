@@ -76,7 +76,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
             if (!active) {
                 second->flags |= 4;
                 first->flags |= 4;
-                Chase_SetCtl(actor, group->field610, 0x1F);
+                Chase_SetCtl(actor, group->heldControl, 0x1F);
                 Chase_SetState(actor, 3, 0, 0);
                 {
                     u32 updated = (*motion | motionMode) | (u16)(active & motionMode);
@@ -166,7 +166,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
             }
             actor->base.secondaryMotion.y = 4;
             Chase_SetState(actor, 3, 0, 0);
-            Chase_SetCtl(actor, group->field614, 0x20);
+            Chase_SetCtl(actor, group->releaseControl, 0x20);
             break;
     }
 

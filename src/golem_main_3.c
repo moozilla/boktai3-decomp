@@ -290,7 +290,7 @@ s32 Golem_Init(void *object)
 
     GolemInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 3);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GOLEM);
     Golem_InitAnimationProfile(actor);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;
@@ -329,7 +329,7 @@ s32 Golem_Init(void *object)
     MonsterInit_SetReactionGate(&actor->chase, SceneActorControl_RefreshMotionRoute);
     MonsterInit_SetContactCallback(&actor->chase, Golem_UpdateHitReaction);
     group->responseCallback = Golem_ClearControlFlag;
-    group->field5EC = Golem_RestoreRoute;
+    group->routeRestoreCallback = Golem_RestoreRoute;
     actor->chase.base.field2E8 = 0;
     GolemInit_EnableInitialFlags(actor);
     MonsterInit_MaskColliderFlags(&actor->chase.base.colliderA, ~1);

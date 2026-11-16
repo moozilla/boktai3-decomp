@@ -55,7 +55,7 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
     if (TakeReady(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         {
-            if (actor->base.category == 7)
+            if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED)
                 SetCategoryControl(actor, SceneActorReaction_TickQueuedContact);
             else
                 SetCategoryControl(actor, SceneActorReaction_TickContactAnimation);

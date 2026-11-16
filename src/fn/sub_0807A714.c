@@ -66,7 +66,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 0x100)) {
-            void *callback = actor->group.field5EC;
+            void *callback = actor->group.routeRestoreCallback;
             if (callback)
                 Callback_InvokeActor(actor, callback);
             ClearBits(flags, 0x180);

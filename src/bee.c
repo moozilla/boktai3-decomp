@@ -1944,7 +1944,7 @@ s32 Bee_Init(void *object)
     s32 r1v;
     bee->flags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 0x14);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_BEE);
     Bee_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

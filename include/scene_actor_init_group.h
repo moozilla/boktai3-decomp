@@ -185,8 +185,8 @@ static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *grou
     group->destination = secondBounds;
     group->routePhaseCallback = downed;
     group->fallback = recover;
-    group->field5FC = SceneActorReaction_BeginFadedState;
-    group->field600 = SceneActorReaction_BeginDefeatBurst;
+    group->fadeControl = SceneActorReaction_BeginFadedState;
+    group->defeatBurstControl = SceneActorReaction_BeginDefeatBurst;
     group->common.field43C = returnToRoute;
     group->common.field440 = 0;
     group->common.control.active = active;
@@ -195,17 +195,17 @@ static inline void MonsterInit_InitializeGroup(struct SceneActorChaseGroup *grou
     group->responseCallback = 0;
     group->field620 = 0;
     group->turnControl = SceneActorReaction_RestoreAfterTurns;
-    group->field60C = sub_0807FCA8;
-    group->field604 = (u32)animate;
-    group->field614 = SceneActorReaction_TurnBackToRoute;
+    group->contactArrivalControl = sub_0807FCA8;
+    group->animateCallback = (u32)animate;
+    group->releaseControl = SceneActorReaction_TurnBackToRoute;
     group->routeChoiceControl = 0;
     group->common.fallback = SceneActorTarget_TryStimulusRoute;
     group->common.gate.control = SceneActorReaction_UpdateAnimationGate;
     group->common.gate.field41A = 0x28;
     group->contactControl = SceneActorReaction_SettleDisplacement;
-    group->field5E0 = SceneActorReaction_ResumeAfterAnimation;
-    group->field5E4 = SceneActorReaction_TryResumeRoute;
-    group->field610 = SceneActorReaction_BeginReactionSound;
+    group->animationEndControl = SceneActorReaction_ResumeAfterAnimation;
+    group->routeResumeControl = SceneActorReaction_TryResumeRoute;
+    group->heldControl = SceneActorReaction_BeginReactionSound;
 }
 
 static inline void MonsterInit_InitializeGroupWithBounds(struct SceneActorChaseGroup *group,

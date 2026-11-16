@@ -2411,7 +2411,7 @@ s32 Spider_Init(void *object)
 
     arg0->flags62C = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 2);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_SPIDER);
     Spider_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
