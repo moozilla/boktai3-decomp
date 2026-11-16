@@ -23,13 +23,6 @@ void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct MummyInitContext {
-    u8 unknown0[0x6CC];
-    u16 field6CC, field6CE;
-    u8 unknown6D0[8];
-    u32 field6D8, field6DC;
-};
-
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -40,7 +33,7 @@ void SceneActorReaction_BeginTargetRecovery(void);
 static inline void MummyInit_ResetFlags(void *object)
 {
     struct Mummy *actor = object;
-    actor->field6F2 = 0;
+    actor->flags6F2 = 0;
 }
 
 void Mummy_InitProfile(void *);
@@ -74,7 +67,7 @@ static inline void MummyInit_EnableInitialFlags(struct Mummy *actor)
     MonsterInit_SetStatusFlags(&actor->chase, 0x8000000);
 }
 
-static inline struct MummyInitContext *MummyInit_Context(struct Mummy *actor)
+static inline struct Mummy *MummyInit_Context(struct Mummy *actor)
 {
     return actor->chase.base.context;
 }
@@ -185,18 +178,18 @@ s32 Mummy_Init(void *object)
 
     arg0->field6E8 = actor->chase.base.tracking.x;
     {
-        struct MummyInitContext *context = MummyInit_Context(actor);
+        struct Mummy *context = MummyInit_Context(actor);
         if (Script_SeekToKeyword(0x42)) {
             context->field6CC = MonsterInit_ReadHalfword(0x14);
-            context->field6CE = MonsterInit_ReadHalfword(0xB4);
+            context->currentTick = MonsterInit_ReadHalfword(0xB4);
         } else {
             context->field6CC = 0x14;
-            context->field6CE = 0xB4;
+            context->currentTick = 0xB4;
         }
     }
     {
-        struct MummyInitContext *context = MummyInit_Context(actor);
-        context->field6D8 = Div(actor->chase.base.tracking.range * 3, 10);
+        struct Mummy *context = MummyInit_Context(actor);
+        context->limit = Div(actor->chase.base.tracking.range * 3, 10);
         context->field6DC = actor->chase.base.tracking.range;
     }
 

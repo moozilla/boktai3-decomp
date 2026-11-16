@@ -1,11 +1,8 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_contacts.h"
 
-struct MummyContactContext {
-    u8 unknown0[0x6F2];
-    u16 flags;
-};
 struct MummyContactTarget {
     struct SceneActorChaseTarget target;
     u8 unknown14[8];
@@ -16,16 +13,16 @@ u8 Mummy_TryDirectPursuit(void *);
 void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
-static inline u8 Mummy_TestContext(struct MummyContactContext *context, u32 mask)
+static inline u8 Mummy_TestContext(struct Mummy *context, u32 mask)
 {
-    if (context->flags & mask)
+    if (context->flags6F2 & mask)
         return 1;
     return 0;
 }
-static inline u8 Mummy_TestContextOwned(struct MummyContactContext *context, u32 mask,
+static inline u8 Mummy_TestContextOwned(struct Mummy *context, u32 mask,
                                         struct SceneActorChaseFlags16 **field)
 {
-    struct SceneActorChaseFlags16 *flags = (void *)&context->flags;
+    struct SceneActorChaseFlags16 *flags = (void *)&context->flags6F2;
     u32 value = flags->value;
     value &= mask;
     *field = flags;
@@ -134,7 +131,7 @@ Mummy_BeginContactTracking(struct SceneActorChaseTracking *tracking, u8 bits)
 
 u8 sub_080D7568(struct ChaseActor *actor)
 {
-    struct MummyContactContext *context = actor->base.context;
+    struct Mummy *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTarget **target;
     struct SceneActorContactNode *contact;

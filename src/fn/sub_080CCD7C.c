@@ -1,5 +1,6 @@
 // confidence=low: existing Golem state interpretation retained.
 #include "global.h"
+#include "golem.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -18,22 +19,6 @@ struct GolemChargeBounds {
     u8 unknown0[0x1C];
     struct ContactPosition home;
 };
-struct GolemBody {
-    u8 unknown0[0x625];
-    u8 flag625;
-    u8 unknown626[2];
-    u32 flags628;
-    u8 unknown62C[0x680 - 0x62C];
-    s16 stamina680, charge682;
-    u8 unknown684[2];
-    u16 counter686;
-    u16 charge688;
-    u8 unknown68A[4];
-    u8 direction68E, unknown68F, direction690, direction691;
-    u8 unknown692[2];
-    struct ContactPosition home694, target69C;
-};
-
 static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
@@ -69,12 +54,12 @@ static inline void Golem_SetBehavior(void *object, u32 behavior)
 
 /* Turned too far off the charge heading: face the new direction and spend 10 stamina; out of
  * stamina, stop the charge (behavior 3), else aim at the route's home and recover (behavior 2). */
-static inline void Golem_TurnAway(struct GolemBody *body)
+static inline void Golem_TurnAway(struct Golem *body)
 {
-    body->direction691 = body->direction690;
-    ((struct ChaseActor *)body)->base.body.direction = body->direction690;
-    body->stamina680 -= 10;
-    if (body->stamina680 <= 0) {
+    body->direction691 = body->savedDirection690;
+    ((struct ChaseActor *)body)->base.body.direction = body->savedDirection690;
+    body->routeDelay -= 10;
+    if (body->routeDelay <= 0) {
         SceneActorChase_SetControl(body, Golem_UpdateChargeStop, 0x27);
         Golem_SetBehavior(body, 3);
         return;
@@ -87,10 +72,10 @@ static inline void Golem_TurnAway(struct GolemBody *body)
     Golem_SetBehavior(body, 2);
 }
 
-static inline void Golem_Recover(struct GolemBody *body)
+static inline void Golem_Recover(struct Golem *body)
 {
-    body->stamina680 -= 30;
-    body->direction691 = body->direction690;
+    body->routeDelay -= 30;
+    body->direction691 = body->savedDirection690;
     SceneActorChase_SetState((struct ChaseActor *)body, 0, 2, 7);
 
     {
@@ -107,7 +92,7 @@ static inline s32 Golem_TurnGap(u8 desired, const u8 *facing)
     return d;
 }
 
-static inline void Golem_Retarget(struct ChaseActor *actor, struct GolemBody *body)
+static inline void Golem_Retarget(struct ChaseActor *actor, struct Golem *body)
 {
     s32 d = Wrap(actor->base.tracking.heading - body->direction68E);
     if ((d < 0 ? -d : d) <= 15 && actor->base.terrainCell != actor->base.previousTerrainCell) {
@@ -137,14 +122,14 @@ static inline s32 Golem_DifferenceHeading(const struct ContactPosition *v)
 void Golem_UpdateChargePursuit(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct GolemBody *body = actor->base.context;
+    struct Golem *body = actor->base.context;
     struct ContactPosition diff;
     void *route;
     if (TakeFlag2B1(actor))
         body->flag625 = 1;
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (body->flag625 == 1 && body->charge682 == 0) {
+    if (body->flag625 == 1 && body->pushSpeed == 0) {
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
         body->flag625 = 0;
     }
@@ -178,7 +163,7 @@ route:
     {
         u16 flag = *(u16 *)route & 4;
         if (flag) {
-            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->charge682, 0)) {
+            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
                 s32 distance;
                 s32 d;
                 body->target69C = body->home694;
@@ -191,7 +176,7 @@ route:
                 }
                 if (d < 0)
                     d = -d;
-                if (d <= 15 && distance <= 0xFFFE && body->charge682 > 199) {
+                if (d <= 15 && distance <= 0xFFFE && body->pushSpeed > 199) {
                     Golem_Recover(body);
                     return;
                 }
@@ -209,14 +194,14 @@ route:
                     } else if ((u32)(a - 0x34) <= 0x18)
                         sub_080C47DC(body);
                 }
-                if (Golem_TurnGap(body->direction690, &body->direction68E) > 31) {
+                if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
                     Golem_TurnAway(body);
                     return;
                 }
                 SceneActorTerrain_Subtract(&diff, &actor->base.tracking.target->position,
                                            &actor->base.body.position);
                 distance = diff.x * diff.x + diff.z * diff.z;
-                if (distance <= 0xFFFE && body->charge682 > 199) {
+                if (distance <= 0xFFFE && body->pushSpeed > 199) {
                     if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
                         struct SceneActorChaseTarget *partner = actor->base.tracking.target;
                         s32 index;
@@ -239,23 +224,23 @@ route:
                 return;
             }
             Golem_Retarget(actor, body);
-            if (Golem_TurnGap(body->direction690, &body->direction68E) > 31) {
+            if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
                 Golem_TurnAway(body);
                 return;
             }
         } else {
-            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->charge682, 0)) {
+            if (Actor_StepTowardTargetAxis(actor, route, 24, 24, body->pushSpeed, 0)) {
                 body->target69C = body->home694;
                 sub_080C47DC(body);
             } else
                 Golem_Retarget(actor, body);
-            if (Golem_TurnGap(body->direction690, &body->direction68E) > 31) {
+            if (Golem_TurnGap(body->savedDirection690, &body->direction68E) > 31) {
                 Golem_TurnAway(body);
                 return;
             }
         }
     }
-    if (body->stamina680 > 0)
+    if (body->routeDelay > 0)
         goto advance;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SelectState(actor, 3, 1, 0);

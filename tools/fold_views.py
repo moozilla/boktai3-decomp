@@ -35,14 +35,38 @@ import retype_fields as rf  # noqa: E402
 import header_dependents as hd  # noqa: E402
 
 PAD = re.compile(r"(unknown|unk|pad)[0-9A-Fa-f]*$")
-# a class name that only records the offset (field6AC, frame69A) gives way to a reader's name
-OFFSET_NAME = re.compile(r"[a-z]+[0-9A-F]{1,3}$")
-WEAK = {"flags", "value", "data", "state", "field", "mode", "timer", "counter", "a", "b", "c", "x", "y", "z"}
+# a member name is a stem plus, often, its offset (stamina680, field6AC, h68a)
+GENERIC = {"field", "unknown", "unk", "word", "half", "byte", "w", "h", "b", "a", "u", "s", "f", "v", "x"}
+WEAK = {"flags", "value", "data", "state", "mode", "timer", "counter", "parameter", "c", "y", "z", "i", "n"}
 
 
-def better(view_name, class_name):
-    return (OFFSET_NAME.match(class_name) and not OFFSET_NAME.match(view_name)
-            and not re.search(r"\d", view_name) and view_name not in WEAK and len(view_name) > 2)
+def split_name(name):
+    """(stem, offset suffix or '')"""
+    m = re.fullmatch(r"([A-Za-z_]+)([0-9][0-9A-Fa-f]{0,2})", name)
+    if m and re.search(r"\d", m.group(2)):
+        return m.group(1), m.group(2)
+    return name, ""
+
+
+def generic(name):
+    stem, _ = split_name(name)
+    return stem in GENERIC or len(stem) <= 1
+
+
+def reader_name(view_name, off):
+    """What a class member read by this view should be called (None: the view says nothing)."""
+    stem, suffix = split_name(view_name)
+    if generic(view_name):
+        return None
+    if stem in WEAK and not suffix:
+        return f"{stem}{off:X}"
+    return view_name
+
+
+def better(view_name, class_name, off=0):
+    """The class takes the view's name when its own only records the offset."""
+    new = reader_name(view_name, off)
+    return new if new and generic(class_name) and new != class_name else None
 
 
 def top(name):
@@ -94,8 +118,9 @@ def probe(header, tag, unit, view):
 def plan(cls, view, view_decls, base_end):
     """(renames {view name: class name}, adopted {class name: view name},
     inserts [(pad member, view member, decl)], problems)."""
-    renames, adopted, inserts, problems = {}, {}, [], []
+    renames, adopted, inserts, problems, retypes = {}, {}, [], [], {}
     cmembers = members(cls["leaves"])
+    class_end = max(c["end"] for c in cmembers)
     for m in members(view["leaves"]):
         if PAD.match(m["name"]):
             continue
@@ -108,12 +133,24 @@ def plan(cls, view, view_decls, base_end):
             # same widths but another signedness or pointer-ness: the byte check decides
             if [(o, k[0], k[3]) for o, k in c["kinds"]] != [(o, k[0], k[3]) for o, k in m["kinds"]]:
                 problems.append(f"{m['name']} at {m['off']:#x}: {c['name']} has another type")
-            elif better(m["name"], c["name"]):
-                adopted[c["name"]] = m["name"]
+                continue
+            if [k for _, k in c["kinds"]] != [k for _, k in m["kinds"]]:
+                # only the signedness differs: try the view's type, and every user must still match
+                t = re.match(r"([su](?:8|16|32))\s+\w+$", view_decls.get(m["name"], ""))
+                if not t:
+                    problems.append(f"{m['name']} at {m['off']:#x}: {c['name']} has another signedness")
+                    continue
+                retypes[c["name"]] = t.group(1)
+            if better(m["name"], c["name"], m["off"]):
+                adopted[c["name"]] = better(m["name"], c["name"], m["off"])
+                if adopted[c["name"]] != m["name"]:
+                    renames[m["name"]] = adopted[c["name"]]
             elif c["name"] != m["name"]:
                 renames[m["name"]] = c["name"]
             continue
         pad = [c for c in cmembers if PAD.match(c["name"]) and c["off"] <= m["off"] and m["end"] <= c["end"]]
+        if not pad and m["off"] >= class_end:
+            pad = [None]  # past the class's last member: appended
         if not pad:
             problems.append(f"{m['name']} at {m['off']:#x}..{m['end']:#x} crosses class members")
             continue
@@ -124,9 +161,9 @@ def plan(cls, view, view_decls, base_end):
         inserts.append((pad[0], m, decl))
     taken = {adopted.get(c["name"], c["name"]) for c in cmembers}
     for i, (p, m, decl) in enumerate(inserts):
-        if m["name"] in WEAK or len(m["name"]) <= 2:
-            # a placeholder name in a draft says less than the offset
-            new = f"field{m['off']:X}"
+        if (reader_name(m["name"], m["off"]) or f"field{m['off']:X}") != m["name"]:
+            # a placeholder name in a draft (h68a, timer) says less than the offset
+            new = reader_name(m["name"], m["off"]) or f"field{m['off']:X}"
             renames[m["name"]] = new
             inserts[i] = (p, m, re.sub(r"\b%s\b" % m["name"], new, decl))
         elif m["name"] in taken:
@@ -135,11 +172,32 @@ def plan(cls, view, view_decls, base_end):
             decl = re.sub(r"\b%s\b" % m["name"], new, decl)
             inserts[i] = (p, m, decl)
         taken.add(renames.get(m["name"], m["name"]))
-    return renames, adopted, inserts, problems
+    return renames, adopted, inserts, problems, retypes
 
 
 def size(n):
     return str(n) if n < 10 else f"0x{n:X}"
+
+
+def pad_decl(indent, off, n):
+    return f"{indent}u8 unknown{off:X};" if n == 1 else f"{indent}u8 unknown{off:X}[{size(n)}];"
+
+
+def retype(text, tag, types):
+    """Give members of struct tag new scalar types, splitting combined declarations."""
+    body = struct_body(text, tag)
+    new_body = body.group(1)
+    for name, t in types.items():
+        line = re.search(r"^([ \t]*)((?:struct )?\w+) ([^;\n]*\b%s\b[^;\n]*);([^\n]*)\n" % re.escape(name), new_body, re.M)
+        if not line:
+            raise ValueError(f"declaration of {name} not found")
+        indent, old_t, names, rest = line.groups()
+        out = []
+        for d in [d.strip() for d in names.split(",")]:
+            out.append(f"{indent}{t if re.fullmatch(re.escape(name), d) else old_t} {d};")
+        out[-1] += rest
+        new_body = new_body[:line.start()] + "\n".join(out) + "\n" + new_body[line.end():]
+    return text[:body.start(1)] + new_body + text[body.end(1):]
 
 
 def adopt(text, tag, adopted):
@@ -151,26 +209,44 @@ def adopt(text, tag, adopted):
     return text[:body.start(1)] + new_body + text[body.end(1):]
 
 
+_class_end = {}
+
+
+def class_end_of(text, tag):
+    return _class_end[tag]
+
+
 def apply_inserts(text, tag, inserts):
     """Split padding arrays of struct tag around the inserted members."""
-    by_pad = {}
+    by_pad, tail = {}, []
     for p, m, decl in inserts:
-        by_pad.setdefault(p["name"], (p, []))[1].append((m, decl))
+        if p is None:
+            tail.append((m, decl))
+        else:
+            by_pad.setdefault(p["name"], (p, []))[1].append((m, decl))
     body = struct_body(text, tag)
     new_body = body.group(1)
+    if tail:
+        indent = re.search(r"^([ \t]*)\S", new_body, re.M).group(1)
+        at = class_end_of(text, tag)
+        for m, decl in sorted(tail, key=lambda x: x[0]["off"]):
+            if m["off"] > at:
+                new_body += pad_decl(indent, at, m["off"] - at) + "\n"
+            new_body += f"{indent}{decl};\n"
+            at = m["end"]
     for name, (p, items) in by_pad.items():
-        line = re.search(r"^([ \t]*)u8 %s\[[^\]]+\];[^\n]*\n" % re.escape(name), new_body, re.M)
+        line = re.search(r"^([ \t]*)u8 %s(?:\[[^\]]+\])?;[^\n]*\n" % re.escape(name), new_body, re.M)
         if not line:
             raise ValueError(f"padding {name} is not on a line of its own")
         indent = line.group(1)
         out, at = [], p["off"]
         for m, decl in sorted(items, key=lambda x: x[0]["off"]):
             if m["off"] > at:
-                out.append(f"{indent}u8 unknown{at:X}[{size(m['off'] - at)}];")
+                out.append(pad_decl(indent, at, m["off"] - at))
             out.append(f"{indent}{decl};")
             at = m["end"]
         if p["end"] > at:
-            out.append(f"{indent}u8 unknown{at:X}[{size(p['end'] - at)}];")
+            out.append(pad_decl(indent, at, p["end"] - at))
         new_body = new_body[:line.start()] + "\n".join(out) + "\n" + new_body[line.end():]
     return text[:body.start(1)] + new_body + text[body.end(1):]
 
@@ -182,14 +258,20 @@ def layout_kept(old, new, adopted=None):
     def renamed(n):
         t = top(n)
         return adopted.get(t, t) + n[len(t):]
-    keep = {(renamed(l["name"]), l["off"], sv.leaf_kind(l)) for l in old["leaves"] if not sv.is_pad(l["name"])}
-    have = {(l["name"], l["off"], sv.leaf_kind(l)) for l in new["leaves"]}
+    def kind(l):  # signedness may change on purpose (retype); the byte checks judge it
+        return l["width"], l["base"], l["bits"]
+    keep = {(renamed(l["name"]), l["off"], kind(l)) for l in old["leaves"] if not sv.is_pad(l["name"])}
+    have = {(l["name"], l["off"], kind(l)) for l in new["leaves"]}
     return keep <= have and new["size"] >= old["size"]
 
 
 def check(unit):
     r = subprocess.run([sys.executable, os.path.join(TOOLS, "check.py"), unit, "--quiet"],
                        cwd=ROOT, capture_output=True, text=True)
+    if r.returncode:
+        lines = (r.stdout + r.stderr).strip().splitlines()
+        errors = [ln for ln in lines if re.match(r"stdin:\d+: (?!warning)", ln) or "MISMATCH" in ln or "differ" in ln]
+        check.last = "; ".join((errors or lines)[-2:])
     return r.returncode == 0
 
 
@@ -217,11 +299,13 @@ def fold(header, tag, unit, view, dry_run=False):
     if not body:
         return f"{unit}: no struct {view}"
     cls, v = probe(header, tag, unit, view)
-    renames, adopted, inserts, problems = plan(cls, v, declarations(body.group(1)), base_end(cls))
+    renames, adopted, inserts, problems, retypes = plan(cls, v, declarations(body.group(1)), base_end(cls))
+    _class_end[tag] = max(c["end"] for c in members(cls["leaves"]))
     if problems:
         return f"{unit}:{view}: left alone: " + "; ".join(problems)
     if dry_run:
-        return f"{unit}:{view}: renames {renames}, class renames {adopted}, adds {[d for _, _, d in inserts]}"
+        return (f"{unit}:{view}: renames {renames}, class renames {adopted}, retypes {retypes}, "
+                f"adds {[d for _, _, d in inserts]}")
     saved = {}
     try:
         if adopted:
@@ -241,12 +325,24 @@ def fold(header, tag, unit, view, dry_run=False):
             htext_cur = htext2
         else:
             htext_cur = htext
+        if retypes:
+            htext_cur = retype(htext_cur, tag, retypes)
+            with open(hpath, "w") as f:
+                f.write(htext_cur)
+            users = [u for u in hd.dependents([header]) if u != unit]
+            for u in users:
+                saved.setdefault(u, open(os.path.join(ROOT, u)).read())
         if inserts:
             with open(hpath, "w") as f:
                 f.write(apply_inserts(htext_cur, tag, inserts))
             new = sv.probe([f"struct {tag}"], [header])[f"struct {tag}"]
             if not layout_kept(cls, new, adopted):
                 raise RuntimeError("the class layout moved")
+            placed = {(top(l["name"]), l["off"]) for l in new["leaves"]}
+            for _, m, decl in inserts:
+                name = re.search(r"(\w+)\s*(\[[^\]]*\])*$", decl).group(1)
+                if not any(n == name and o == m["off"] for n, o in placed):
+                    raise RuntimeError(f"{name} did not land at {m['off']:#x}")
         with open(upath, "w") as f:
             f.write(edit_unit(utext, view, tag, header))
         if renames:
@@ -254,7 +350,11 @@ def fold(header, tag, unit, view, dry_run=False):
             if unsettled or failed:
                 raise RuntimeError(f"rewrite left {list(unsettled.values())[:2] or list(failed.values())[:1]}")
         if not check(unit):
-            raise RuntimeError("tools/check.py: mismatch or compile error")
+            raise RuntimeError(f"tools/check.py: {check.last}")
+        if retypes:
+            bad = [u for u in hd.dependents([header]) if u != unit and not check(u)]
+            if bad:
+                raise RuntimeError(f"retype {retypes}: {bad[:3]} mismatch")
     except (RuntimeError, ValueError) as e:
         with open(hpath, "w") as f:
             f.write(htext)

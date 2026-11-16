@@ -1,3 +1,4 @@
+#include "golem.h"
 #include "scene_actor_behavior.h"
 #include "golem_2.h"
 #include "script_utility.h"
@@ -55,7 +56,6 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 {
     return r->table;
 }
-
 
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
 void Golem_UpdateDefeat(struct ChaseActor *actor)
@@ -127,7 +127,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
             {
                 u8 firstCount = SceneActorEffects_NextSparkCount(table);
                 SceneActorEffects_SpawnDefeatSparks(actor, (const struct ContactPosition *)&rangeB,
-                                                   table, firstCount);
+                                                    table, firstCount);
             }
         }
         category = actor->base.category;
@@ -194,18 +194,7 @@ void SceneActorRoute_CommitReachableDestination(void *);
 /* Fields are established by 080C9C04 and the ordinary ReturnHome/ChargeOrReturnHome
  * relatives. Names for the response count and flags are tentative. */
 
-struct GolemReactionBody {
-    u8 unknown0[0x624];
-    u8 responseCount;
-    u8 unknown625[3];
-    u32 flags628;
-    u8 unknown62C[0x54];
-    s16 routeDelay;
-    u8 unknown682[0x2A];
-    u16 shakeStrength, shakeTimer;
-};
-
-static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u32 flags)
+static inline void GolemReaction_SetBodyFlags(struct Golem *body, u32 flags)
 {
     body->flags628 |= flags;
 }
@@ -246,7 +235,7 @@ static inline void GolemReaction_Settle(struct ChaseActor *actor)
 /* Dispatch the hit-reaction state; return one when entering a state. */
 s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 {
-    struct GolemReactionBody *body = actor->base.context;
+    struct Golem *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     void *object = actor;
 

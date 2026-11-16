@@ -26,11 +26,6 @@ void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct GolemInitContext {
-    u8 unknown0[0x62C];
-    u32 rangeSquared62C;
-};
-
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -41,7 +36,7 @@ void SceneActorReaction_BeginTargetRecovery(void);
 static inline void GolemInit_ResetFlags(void *object)
 {
     struct Golem *actor = object;
-    actor->field628 = 0;
+    actor->flags628 = 0;
 }
 
 static inline void GolemInit_InitializeBody(void *object, u32 *fill)
@@ -160,7 +155,7 @@ static inline void GolemInit_EnableInitialFlags(struct Golem *actor)
     MonsterInit_SetStatusFlags(&actor->chase, 0x8000008);
 }
 
-static inline struct GolemInitContext *GolemInit_Context(struct Golem *actor)
+static inline struct Golem *GolemInit_Context(struct Golem *actor)
 {
     return actor->chase.base.context;
 }
@@ -267,13 +262,13 @@ s32 Golem_Init(void *object)
     {
         struct Golem *instance = arg0;
         instance->field68D = 0;
-        instance->field680 = 0x78;
-        instance->field686 = 0;
+        instance->routeDelay = 0x78;
+        instance->counter686 = 0;
         instance->field684 = 2;
-        instance->field682 = 0;
-        instance->field680 = 0xA0;
+        instance->pushSpeed = 0;
+        instance->routeDelay = 0xA0;
         instance->field68A = 0;
-        instance->field624 = 0;
+        instance->responseCount = 0;
         instance->field693 = 0;
     }
 

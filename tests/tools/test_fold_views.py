@@ -24,7 +24,7 @@ CLASS = {"size": 0x20, "leaves": [
 
 class Plan(unittest.TestCase):
     def plan(self, leaves, decls):
-        return fv.plan(CLASS, {"size": 0x20, "leaves": leaves}, decls, 8)
+        return fv.plan(CLASS, {"size": 0x20, "leaves": leaves}, decls, 8)[:4]
 
     def test_insert_into_padding(self):
         renames, adopted, inserts, problems = self.plan(

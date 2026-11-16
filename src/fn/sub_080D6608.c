@@ -1,12 +1,9 @@
 #include "global.h"
+#include "mummy.h"
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
 #include "scene_actor_chase_direct_arrival.h"
 #include "scene_actor_cardinal_path.h"
 
-struct MummyRouteContext {
-    u8 unknown0[0x6D2];
-    u16 pursuitDelay;
-};
 struct MummyRouteTarget {
     struct SceneActorChaseTarget target;
     u8 unknown14[8];
@@ -25,7 +22,7 @@ static inline u8 FindPath(struct ChaseActor *actor, s32 goal)
 
 u8 Mummy_TryDirectPursuit(struct ChaseActor *actor)
 {
-    struct MummyRouteContext *body = actor->base.context;
+    struct Mummy *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     s32 goal = ((struct MummyRouteTarget *)actor->base.tracking.target)->cell->index;
     if (group->common.control.counter != gTrackedPlayerId[0])

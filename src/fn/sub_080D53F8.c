@@ -1,16 +1,10 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_turn.h"
 
 // Tentative: consumes route probes and selects navigation or a descriptor turn.
-
-struct MummyNavigationContext {
-    u8 unknown0[0x6D2];
-    u16 pursuitDelay;
-    u8 unknown6D4[0x1E];
-    u16 flags;
-};
 
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
@@ -84,11 +78,11 @@ static inline void Mummy_SetBehavior(struct ChaseActor *actor, u32 behavior)
 void Mummy_UpdateProbeNavigation(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyNavigationContext *body = actor->base.context;
+    struct Mummy *body = actor->base.context;
     s32 speed;
     const u16 *randomSamples = gRandomTable;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        u16 *field = &body->flags;
+        u16 *field = &body->flags6F2;
         u32 mask = ~0x1000;
         u32 value = *field;
         mask &= value;

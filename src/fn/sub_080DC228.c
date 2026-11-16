@@ -1,26 +1,22 @@
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_delayed_response.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
 void SceneActor_UpdateDirectionalAnimation(void);
-struct MummyPursuitContext {
-    u8 unknown0[0x6F2];
-    struct SceneActorChaseFlags16 flags;
-};
-
 void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyPursuitContext *body = actor->base.context;
+    struct Mummy *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorChase_SetControl(actor, SceneActor_UpdateDirectionalAnimation, 3);
     }
     if (actor->base.field2B0) {
-        SceneActorChase_ClearFlagComponent(&body->flags, 0x800);
+        SceneActorChase_ClearFlagComponent(&body->flags6F2, 0x800);
         actor->base.tracking.target =
             &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
         if (SceneActorChase_Arrive(actor)) {
