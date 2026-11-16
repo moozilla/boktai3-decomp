@@ -233,7 +233,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
                 SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
             }
         } else {
-            SceneActorChase_SetControl(actor, actor->base.entryTarget224, 2);
+            SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
         }
     }
 }

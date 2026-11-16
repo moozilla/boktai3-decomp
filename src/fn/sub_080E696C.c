@@ -12,7 +12,7 @@ static inline u8 TakeEntry(u8 *flag)
 void SceneActor_UpdateAlternateEntryPhase(struct ChaseActor *actor)
 {
     if (TakeEntry(&actor->base.field2B1)) {
-        void *target = actor->base.entryTarget228;
+        void *target = actor->base.onAlternateEntry;
         u32 one = 1;
         u32 zero;
         u32 *flags;

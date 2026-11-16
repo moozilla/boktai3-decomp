@@ -110,7 +110,7 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
             ClearHit(flags, ~0x49CB);
         }
         {
-            void *control = actor->base.deathControl;
+            void *control = actor->base.onDefeat;
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -230,5 +230,5 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
     done:
         return 1;
     }
-    return (u8)Callback_InvokeActor(actor, actor->base.contactCallback);
+    return (u8)Callback_InvokeActor(actor, actor->base.onContact);
 }

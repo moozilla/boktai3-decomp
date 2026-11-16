@@ -20,7 +20,7 @@ u8 Dog_IsActionTimerExpired(struct ChaseActor *);
 void Dog_UpdateActionPhase(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
-        void *control = p->base.entryTarget224;
+        void *control = p->base.onEntry;
         u32 kind = 2;
         SelectControl(p, control, kind);
     }

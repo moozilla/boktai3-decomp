@@ -58,7 +58,7 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
     }
     actor->base.field2B1 = 1;
     {
-        void *target = actor->base.entryTarget228;
+        void *target = actor->base.onAlternateEntry;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = 0;
         actor->base.field2B5 = 1;

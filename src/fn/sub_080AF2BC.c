@@ -29,7 +29,7 @@ void sub_080AF2BC(struct ChaseActor *actor)
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_Arrive(actor);
     } else if (Vorn_RouteFlags(actor, 0x10)) {
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
@@ -38,7 +38,7 @@ void sub_080AF2BC(struct ChaseActor *actor)
         } else
             group->destination->pad = 1;
     } else {
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 2, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 2, 30);
         actor->base.field2C2 = 64;
     }
     return;

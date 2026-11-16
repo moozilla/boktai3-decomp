@@ -59,13 +59,13 @@ s32 SceneActor_UpdateBehaviorCallbacks(struct ChaseActor *p)
             return 0;
         }
         if (!unavailable(p)) {
-            if (!(u8)Callback_InvokeActor(p, p->base.damageCallback))
+            if (!(u8)Callback_InvokeActor(p, p->base.onDamage))
                 Callback_InvokeActor(p, block->fallback);
         }
         SceneActorBehavior_ActivatePendingControl(p);
         SceneActorBehavior_DispatchPendingFlags(p);
         SceneActor_UpdateStatus(p);
-        dispatch(&p->base.contextCallback, p->base.context);
+        dispatch(&p->base.onUpdate, p->base.context);
         SceneActorBehavior_UpdateTimersAndContacts(p);
         SceneActorMotion_Update(p);
         SceneActorPlacement_ConsumeShakeFlags(p);

@@ -190,7 +190,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = actor->base.deathControl;
+            void *control = actor->base.onDefeat;
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -207,7 +207,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
     } else {
         SetHitFlags(0x20, (void *)&actor->base.flags2D4);
         {
-            void *control = actor->base.reactionTarget230;
+            void *control = actor->base.onReaction;
             Reaction_SetControl(actor, 0x12, control);
         }
         {

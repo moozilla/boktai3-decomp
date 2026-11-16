@@ -29,7 +29,7 @@ void SceneActorRecovery_ResumePursuit(struct ChaseActor *object)
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
         {
             struct SceneActorRegistryControl *control = &group->common.control;
             if (ActorStatus_BehaviorFlags(actor, 0x200000))

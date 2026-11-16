@@ -77,9 +77,9 @@ static inline void MonsterInit_EnableInitialFlags(struct ChaseActor *arg0)
 
 static inline void MonsterInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Spider_OnSecondaryUpdate;
-    arg0->base.destroyCallback = Spider_Destroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Spider_OnSecondaryUpdate;
+    arg0->base.destroy = Spider_Destroy;
 }
 
 static inline void Spider_SetFlags(struct SpiderInstanceState *actor, u32 mask)
@@ -194,7 +194,7 @@ s32 Spider_Init(void *object)
         Spider_SetFlags(arg0, 1);
     } else {
         MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE);
-        Spider_InitializeDeferred((void *)&group->saved, actor->base.entryTarget228, 7, 0x3C);
+        Spider_InitializeDeferred((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);

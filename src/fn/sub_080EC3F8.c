@@ -155,9 +155,9 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
 
 static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Octopus_UpdateInteraction;
-    arg0->base.destroyCallback = Octopus_Destroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Octopus_UpdateInteraction;
+    arg0->base.destroy = Octopus_Destroy;
 }
 
 static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)

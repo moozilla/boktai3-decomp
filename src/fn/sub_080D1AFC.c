@@ -81,7 +81,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
             actor->base.behavior2AA = behavior;
             actor->base.counter2AC = blocked;
             actor->base.field2B1 = 1;
-            target = actor->base.entryTarget228;
+            target = actor->base.onAlternateEntry;
             Bat_SetControl(actor, 1, target);
             *(u16 *)(*(u8 **)((u8 *)actor + 0x5D4) + 6) = blocked;
             actor->base.field2C2 = Div(64, 3);

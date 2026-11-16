@@ -29,7 +29,7 @@ void SceneActorRoute_UpdateTimedPhase(struct ChaseActor *actor)
     }
     if (*(s16 *)(block + 0x1F2) > 0)
         --*(u16 *)(block + 0x1F2);
-    if (!(u8)Callback_InvokeActor(actor, actor->base.update26C) && actor->base.field2B0 &&
+    if (!(u8)Callback_InvokeActor(actor, actor->base.targetQuery) && actor->base.field2B0 &&
         TestFlags(actor, 0x400000))
         SceneActorRoute_AdvanceActorPoint(actor, route);
 }

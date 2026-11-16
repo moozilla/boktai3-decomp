@@ -144,9 +144,9 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
 
 static inline void IvyInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Ivy_UpdateInteraction;
-    arg0->base.destroyCallback = Ivy_Destroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Ivy_UpdateInteraction;
+    arg0->base.destroy = Ivy_Destroy;
 }
 
 static inline void IvyInit_InstallRoutes(struct ChaseActor *actor)
@@ -218,9 +218,9 @@ s32 Ivy_Init(void *object)
     MonsterInit_DrawablePosition(actor);
     MonsterInit_ReadPalette(actor, 0x12A, 0x192);
     SceneActor_InitCollision5005(actor);
-    MonsterInit_InstallOpaqueContactCallbacks(actor, Ivy_Update, 0, 0, 0, 0, 0, 0, Ivy_UpdateDefeat,
-                                              SceneActorReaction_OnEnemyDefault, 0, 0, SceneActorReaction_ResolvePlacementDamage,
-                                              SceneActorControl_BeginSoundTransition);
+    MonsterInit_InstallOpaqueContactCallbacks(
+        actor, Ivy_Update, 0, 0, 0, 0, 0, 0, Ivy_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0,
+        0, SceneActorReaction_ResolvePlacementDamage, SceneActorControl_BeginSoundTransition);
     MonsterInit_InitializeGroup(group, 0, 0, 0, 0, 0, 0, 1);
     IvyInit_InstallRoutes(actor);
     MonsterInit_SetBehaviorFlags(actor, 0x200);

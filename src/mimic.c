@@ -72,12 +72,12 @@ static inline void Mimic_SaveRouteControl(struct ChaseActor *actor, struct Mimic
     u8 outside = SceneActorAttachment_TestPositionWindow((void *)actor, &context->origin, 32, 32);
     if (!outside) {
         ClearSavedFlags(flags, ~0xc0);
-        SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.entryTarget228, 2);
+        SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.onAlternateEntry, 2);
     } else {
         u32 zero;
         ClearSavedFlags(flags, ~0xc0);
         zero = SaveStoppedControl((struct MimicDeferredResponse *)&group->saved,
-                                  actor->base.savedTarget);
+                                  actor->base.onStanding);
         ClearContextFlag(&context->reactionFlags, zero);
     }
     actor->base.field2C2 = 0x40;
@@ -358,7 +358,7 @@ void SceneActor_RestoreSavedTargetOnCompletion(struct ChaseActor *actor)
             struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags &= 0xFFFB;
             zero = 0;
-            saved = actor->base.savedTarget;
+            saved = actor->base.onStanding;
             actor->base.field2B2 = 1;
             actor->base.field2B0 = zero;
             actor->base.field2B5 = zero;
@@ -1166,7 +1166,7 @@ u8 Mimic_StartHitReaction(struct ChaseActor *actor)
     else
         Sound_PlaySong(0x13E);
     if (actor->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+        SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
         ResetState(actor, 3, 0);
         return 1;
     }
@@ -1321,9 +1321,9 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
 
 static inline void MimicInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Mimic_OnUpdate;
-    arg0->base.destroyCallback = Mimic_ReleaseResources;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Mimic_OnUpdate;
+    arg0->base.destroy = Mimic_ReleaseResources;
 }
 
 static inline void MimicInit_SetPaletteBank(struct ChaseActor *actor, u16 palette)

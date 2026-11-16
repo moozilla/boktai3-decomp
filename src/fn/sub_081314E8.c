@@ -99,7 +99,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     u8 result;
     u16 *motionFlags;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        BeginControlZero(actor, actor->base.savedTarget, 0);
+        BeginControlZero(actor, actor->base.onStanding, 0);
         {
             u32 *flags = &actor->base.flags2CC;
             u32 mask = ~0x80;
@@ -162,7 +162,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         u32 destinationOffset;
         struct ContactPosition **destination;
         State(actor, 7);
-        BeginControlZero(actor, actor->base.entryTarget228, 1);
+        BeginControlZero(actor, actor->base.onAlternateEntry, 1);
         destinationOffset = 0x200;
         destination = (void *)((u8 *)group + destinationOffset);
         (*destination)->pad = 1;

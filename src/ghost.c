@@ -345,7 +345,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->base.body.direction = desired;
-            SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+            SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
             actor->base.field2B0 = 1;
             return;
         }
@@ -387,7 +387,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
         u32 variant;
         u32 flags;
         u32 selection;
-        SceneActorChase_SetControl(actor, actor->base.entryTarget224, 2);
+        SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
         if (Ghost_TestActionFlags(actor, 0x10000))
             motion->direction += 32;
         else
@@ -793,7 +793,7 @@ void Ghost_FollowRoute(struct ChaseActor *actor)
     u32 zero[1];
     struct ContactPosition target;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Ghost_FillPosition(&body->motion, zero, 0);
         body->curveDirection = 1;
         actor->base.field2C2 = 64;
@@ -855,7 +855,7 @@ void Ghost_DecelerateMovement(struct ChaseActor *actor)
 {
     struct Ghost *ctx = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        SceneActorChase_SetControl(actor, actor->base.entryTarget224, 2);
+        SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
     actor->base.body.motion.x += ctx->motion.x;
     actor->base.body.motion.z += ctx->motion.z;
     if (Mod(actor->base.counter2AC, 4) == 0) {
@@ -894,7 +894,7 @@ void Ghost_ChooseRouteDestination(struct ChaseActor *actor)
     struct ContactPosition *target, *endpoint;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         state->flightPhase = 0;
     }
     if ((s32)actor->base.counter2AC > 60) {
@@ -1127,7 +1127,7 @@ void Ghost_AdvanceApproachRoute(struct ChaseActor *actor)
     struct ContactPosition target;
     struct ContactPosition delta;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         if (Ghost_TestRouteFlags(route, 4)) {
             u8 reverseBias = 128;
@@ -2555,7 +2555,7 @@ void Ghost_FollowPlayerLoop(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.entryTarget228;
+        void *callback = actor->base.onAlternateEntry;
         u32 one = 1;
         actor->base.field2B2 = one;
         actor->base.field2B0 = 0;
@@ -2633,7 +2633,7 @@ void Ghost_PursuePlayerLoop(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.entryTarget228;
+        void *callback = actor->base.onAlternateEntry;
         u32 one = 1;
         actor->base.field2B2 = one;
         actor->base.field2B0 = 0;
@@ -2804,7 +2804,7 @@ void Ghost_UpdateFacingTrigger(struct ChaseActor *actor)
 {
     struct Ghost *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     {
         u32 mask = 0x800;
         actor->base.flags2C0 = mask | actor->base.flags2C0;
@@ -2839,7 +2839,7 @@ wait:
 void Ghost_UpdateTriggerControl(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     } else {
         {
             u32 mask = 0x800;
@@ -3049,22 +3049,22 @@ static inline void Ghost_InstallPrimaryCallbacks(struct ChaseActor *actor, void 
     u32 zero = 0;
     u32 mask = 0x2000;
     MonsterInit_SetBehaviorFlags(actor, mask);
-    actor->base.contextCallback = cb274;
+    actor->base.onUpdate = cb274;
     MonsterInit_WriteAnimationQuery(&actor->base.animationQuery.word, cb260);
-    actor->base.entryTarget224 = cb224;
-    actor->base.entryTarget228 = cb228;
-    actor->base.savedTarget = cb22C;
-    actor->base.reactionTarget230 = cb230;
-    actor->base.deathControl = cb234;
-    actor->base.field220 = control;
+    actor->base.onEntry = cb224;
+    actor->base.onAlternateEntry = cb228;
+    actor->base.onStanding = cb22C;
+    actor->base.onReaction = cb230;
+    actor->base.onDefeat = cb234;
+    actor->base.onHidden = control;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, 0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
@@ -3133,9 +3133,9 @@ static inline void Ghost_ReadPalette(struct ChaseActor *actor, u32 base, u32 alt
 
 static inline void Ghost_InstallCompletion(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Ghost_OnActorUpdate;
-    actor->base.destroyCallback = Ghost_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = Ghost_OnActorUpdate;
+    actor->base.destroy = Ghost_Destroy;
 }
 
 static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,

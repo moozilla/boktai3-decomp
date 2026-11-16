@@ -176,7 +176,7 @@ static inline void *MonsterInit_GetCurrentControl(struct ChaseActor *actor)
 }
 static inline void *MonsterInit_GetStandingControl(struct ChaseActor *actor)
 {
-    return actor->base.savedTarget;
+    return actor->base.onStanding;
 }
 static inline u8 MonsterInit_GetControlKind(struct ChaseActor *actor)
 {
@@ -367,7 +367,7 @@ static inline void MonsterInit_ReadInitialMode(struct ChaseActor *arg0)
 
 static inline void MonsterInit_SetContactCallback(struct ChaseActor *actor, void *callback)
 {
-    actor->base.contactCallback = callback;
+    actor->base.onContact = callback;
 }
 
 static inline void MonsterInit_SetReactionGate(struct ChaseActor *actor, void *callback)

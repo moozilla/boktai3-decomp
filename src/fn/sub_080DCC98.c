@@ -74,9 +74,9 @@ static inline struct Mummy *MummyInit_Context(struct Mummy *actor)
 
 static inline void MummyInit_InstallCompletionCallbacks(struct Mummy *arg0)
 {
-    arg0->chase.base.messageCallback = SceneActorScript_OnCommand;
-    arg0->chase.base.updateCallback = Mummy_OnInteractionUpdate;
-    arg0->chase.base.destroyCallback = Mummy_OnReleaseResources;
+    arg0->chase.base.onMessage = SceneActorScript_OnCommand;
+    arg0->chase.base.update = Mummy_OnInteractionUpdate;
+    arg0->chase.base.destroy = Mummy_OnReleaseResources;
 }
 
 static inline void MummyInit_InitializePaletteRange(struct Mummy *actor, u32 selected,

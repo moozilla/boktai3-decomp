@@ -51,7 +51,7 @@ void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
         struct AxeFlags16 *flags = (void *)&actor->base.flags2C0;
         u32 mask = ~0x1800;
         flags->bits &= mask;
-        BeginControl(actor, actor->base.savedTarget, 0);
+        BeginControl(actor, actor->base.onStanding, 0);
         SetBehavior(actor, 3);
     } else {
         actor->base.counter2AC++;

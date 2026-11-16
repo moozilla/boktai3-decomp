@@ -81,7 +81,7 @@ void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            target = actor->base.entryTarget228;
+            target = actor->base.onAlternateEntry;
             Bat_SetControl(actor, 1, target);
             {
                 u32 behavior = 7;

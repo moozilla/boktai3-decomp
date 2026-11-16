@@ -12,10 +12,10 @@ static inline void MonsterInit_InitializeCallbackDefaults(struct ChaseActor *act
 {
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
@@ -30,14 +30,14 @@ static inline void MonsterInit_InstallSequenceCallbacks(
     void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    MonsterInit_WriteResultCallback(&actor->base.contextCallback, result);
+    MonsterInit_WriteResultCallback(&actor->base.onUpdate, result);
     MonsterInit_WriteSequenceQuery(&actor->base.animationQuery.sequence, sequence);
-    MonsterInit_WriteActorAction(&actor->base.entryTarget224, entry);
-    MonsterInit_WriteActorAction(&actor->base.entryTarget228, alternateEntry);
-    MonsterInit_WriteActorAction(&actor->base.savedTarget, standing);
-    MonsterInit_WriteActorAction(&actor->base.reactionTarget230, reaction);
-    MonsterInit_WriteActorAction(&actor->base.deathControl, defeat);
-    MonsterInit_WriteActorAction(&actor->base.field220, hidden);
+    MonsterInit_WriteActorAction(&actor->base.onEntry, entry);
+    MonsterInit_WriteActorAction(&actor->base.onAlternateEntry, alternateEntry);
+    MonsterInit_WriteActorAction(&actor->base.onStanding, standing);
+    MonsterInit_WriteActorAction(&actor->base.onReaction, reaction);
+    MonsterInit_WriteActorAction(&actor->base.onDefeat, defeat);
+    MonsterInit_WriteActorAction(&actor->base.onHidden, hidden);
     MonsterInit_WriteDefaultReaction(&actor->base.defaultReaction, defaultReaction);
     MonsterInit_WriteContactPredicate(&actor->base.contactQuery.predicate, contactPredicate);
     MonsterInit_InitializeCallbackDefaults(actor, targetQuery, damage, contact);
@@ -50,14 +50,14 @@ static inline void MonsterInit_InitializeAnimationActions(struct ChaseActor *act
                                                           void *defeat, void *defaultReaction)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = result;
+    actor->base.onUpdate = result;
     MonsterInit_WriteAnimationQuery(&actor->base.animationQuery.word, animation);
-    actor->base.entryTarget224 = entry;
-    actor->base.entryTarget228 = alternateEntry;
-    actor->base.savedTarget = standing;
-    actor->base.reactionTarget230 = reaction;
-    actor->base.deathControl = defeat;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = entry;
+    actor->base.onAlternateEntry = alternateEntry;
+    actor->base.onStanding = standing;
+    actor->base.onReaction = reaction;
+    actor->base.onDefeat = defeat;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
 }
 

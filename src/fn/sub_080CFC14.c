@@ -167,9 +167,9 @@ static inline void GolemInit_InitializeReceiver(struct Golem *actor)
 
 static inline void GolemInit_InstallCompletionCallbacks(struct Golem *arg0)
 {
-    arg0->chase.base.messageCallback = SceneActorScript_OnCommand;
-    arg0->chase.base.updateCallback = Golem_OnSharedActorUpdate;
-    arg0->chase.base.destroyCallback = Golem_OnDestroy;
+    arg0->chase.base.onMessage = SceneActorScript_OnCommand;
+    arg0->chase.base.update = Golem_OnSharedActorUpdate;
+    arg0->chase.base.destroy = Golem_OnDestroy;
 }
 
 static inline void GolemInit_InitializePaletteRange(struct Golem *actor, u32 alternate, u32 current)

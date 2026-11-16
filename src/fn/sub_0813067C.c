@@ -11,7 +11,7 @@ static inline u8 TakeFlag(u8 *flag)
 void SceneActorControl_UpdateSavedControlPhase(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B1)) {
-        void *callback = actor->base.savedTarget;
+        void *callback = actor->base.onStanding;
         u32 zero = 0;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = zero;

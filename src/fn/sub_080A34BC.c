@@ -60,7 +60,7 @@ void sub_080A34BC(struct ChaseActor *a)
     struct SpiderRecoveryContext *ctx = a->base.context;
 
     if (TakeEntry(&a->base.field2B1)) {
-        SetControl(a, a->base.savedTarget, 0);
+        SetControl(a, a->base.onStanding, 0);
         a->base.field2C2 = 0x40;
     }
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque) == 0) {
@@ -86,7 +86,7 @@ void sub_080A34BC(struct ChaseActor *a)
                     ctx->delay = (ParticleRandom_ReadSample(gRandomTable) & 0x7F) + 60;
                 } else {
                     SetState(a, 0, 0, 7);
-                    SetControl(a, a->base.entryTarget228, 1);
+                    SetControl(a, a->base.onAlternateEntry, 1);
                 }
             } else {
                 if ((ParticleRandom_ReadDirectSample(gRandomTable) & 7) == 0) {
@@ -95,7 +95,7 @@ void sub_080A34BC(struct ChaseActor *a)
                     ctx->delay = (ParticleRandom_ReadSample(gRandomTable) & 0x7F) + 60;
                 } else {
                     SetState(a, 0, 0, 7);
-                    SetControl(a, a->base.entryTarget228, 1);
+                    SetControl(a, a->base.onAlternateEntry, 1);
                 }
             }
         } else {

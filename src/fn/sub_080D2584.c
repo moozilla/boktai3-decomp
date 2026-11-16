@@ -136,7 +136,7 @@ void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetBehavior(actor, 7);
     actor->base.field2C2 = Div(64, 3);
 }

@@ -136,30 +136,30 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
                                               void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = cb0;
+    actor->base.onUpdate = cb0;
     MonsterInit_WriteCallback(&actor->base.animationQuery.opaque, cb1);
-    actor->base.entryTarget224 = cb2;
-    actor->base.entryTarget228 = cb3;
-    actor->base.savedTarget = cb4;
-    actor->base.reactionTarget230 = cb5;
-    actor->base.deathControl = cb6;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = cb2;
+    actor->base.onAlternateEntry = cb3;
+    actor->base.onStanding = cb4;
+    actor->base.onReaction = cb5;
+    actor->base.onDefeat = cb6;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = SceneActorControl_BindPrimaryPlayer;
-    actor->base.destroyCallback = Bat_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = SceneActorControl_BindPrimaryPlayer;
+    actor->base.destroy = Bat_Destroy;
 }
 
 static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)

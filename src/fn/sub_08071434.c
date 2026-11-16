@@ -9,7 +9,7 @@ void SceneActorRegistry_DestroyActors(void)
             s32 (*destroy)(void *);
             node = node->next;
             context = actor->base.context;
-            destroy = actor->base.destroyCallback;
+            destroy = actor->base.destroy;
             Callback_InvokeActor(context, destroy);
             Heap_Free(context);
         }

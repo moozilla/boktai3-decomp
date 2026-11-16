@@ -6,9 +6,9 @@
 #include "scene_actor_components.h"
 
 /*
- * The object every actor registry entry allocates: enemies and the room props that
- * share their code. Each class embeds it as its first member, so a class pointer is
- * also a RoomActor pointer. The chase families put a struct SceneActorChaseGroup at
+ * The object every scene-actor registry entry allocates: the room's enemies (the props,
+ * such as crates and floor switches, are pool slots of their own managers). Each class
+ * embeds it as its first member, so a class pointer is also a RoomActor pointer. The chase families put a struct SceneActorChaseGroup at
  * 0x3D4 right after it; the others start their own fields there. Names are provisional
  * (confidence=low) where they still carry an offset.
  */
@@ -53,25 +53,30 @@ struct RoomActor {
     s32 parameters1FC[5];
     u8 unknown210[0xC];
     void *target;
-    void *field220;
-    void *entryTarget224;
-    void *entryTarget228;
-    void *savedTarget;
-    void *reactionTarget230;
-    void *deathControl; /* +0x234: controller installed by defeat dispatch. */
+    /* State handlers (MonsterInit_InstallSequenceCallbacks): the controls the shared code
+     * switches the actor to with MonsterInit_SetControl. */
+    void *onHidden; /* while hidden (Vorn starts in it when field68C is set) */
+    void *onEntry;  /* the two entry controls */
+    void *onAlternateEntry;
+    void *onStanding; /* the resting control, restored after reactions */
+    void *onReaction; /* after a hit or a stimulus */
+    void *onDefeat;   /* +0x234: installed by the defeat dispatch */
     void *field238, *field23C;
     void *field240;
     u8 unknown244[4];
     void *callback248;
-    void *messageCallback;
+    void *onMessage; /* the registry's messages (SceneActorRegistry_SendToCategory, ...) */
     union SceneActorCommandTable commandTable;
     u8 unknown254[4];
-    void *updateCallback, *destroyCallback;
+    void *update;  /* every frame, from SceneActorRegistry_UpdateActors */
+    void *destroy; /* on removal, before the block is freed */
     union SceneActorAnimationQuerySlot animationQuery;
-    void *damageCallback, *contactCallback;
-    void *update26C;
+    void *onDamage;    /* SceneActor_UpdateActiveCallbacks, before onUpdate */
+    void *onContact;   /* the contact test of the shared reaction code */
+    void *targetQuery; /* resolves a pending target object */
     union SceneActorContactQuerySlot contactQuery;
-    void *contextCallback, *defaultReaction;
+    void *onUpdate; /* the class's own step (X_OnUpdate), called with the context */
+    void *defaultReaction;
     void **callbacks27C, **callbacks280, **callbacks284;
     void **alternateBehaviorCallbacks; /* +0x288: indexed by behavior2AA. */
     void **behaviorCallbacks;          /* +0x28C: indexed by behavior2AA. */

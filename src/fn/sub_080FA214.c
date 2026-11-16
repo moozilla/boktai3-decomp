@@ -13,7 +13,7 @@ void SceneActorControl_ApplyDampedMotion(struct ChaseActor *actor)
 {
     struct DampedMotionState *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        RotationPhase_Change(actor, actor->base.entryTarget224, 2);
+        RotationPhase_Change(actor, actor->base.onEntry, 2);
     actor->base.body.motion.x += state->x;
     actor->base.body.motion.z += state->z;
     if (Mod(actor->base.counter2AC, 4) == 0) {

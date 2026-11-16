@@ -62,7 +62,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     void **routeField;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        BeginControlZero(actor, actor->base.entryTarget228, 1);
+        BeginControlZero(actor, actor->base.onAlternateEntry, 1);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((u8)sub_0812F3CC(actor))

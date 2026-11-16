@@ -51,7 +51,7 @@ void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
             }
             Golem_SetRouteFlags(flags, 0x10);
             actor->base.field2C2 = 0x40;
-            SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
             SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
             group->destination->pad = 1;
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,

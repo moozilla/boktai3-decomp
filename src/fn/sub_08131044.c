@@ -116,7 +116,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
         if (event) {
             if (SceneActorBehavior_RequestDescriptorTurn(actor, *descriptor, 32, 32, speed)) {
                 TurnState(actor, 6);
-                Control(actor, actor->base.savedTarget, 0);
+                Control(actor, actor->base.onStanding, 0);
             }
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
                                                                  speed)) {
@@ -155,7 +155,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
             } else {
                 State(actor, 0, 0, 5, 0);
             }
-            Control(actor, actor->base.savedTarget, 0);
+            Control(actor, actor->base.onStanding, 0);
             return;
         }
     }

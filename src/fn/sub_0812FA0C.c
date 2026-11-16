@@ -12,7 +12,7 @@ void SceneActorReaction_UpdateRouteReturn(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x200);
     }

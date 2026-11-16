@@ -71,7 +71,7 @@ void Axe_UpdatePursuit(struct ChaseActor *actor)
     struct PursuitContext *context = actor->base.context;
     s32 angle, step;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = actor->base.entryTarget228;
+        void *callback = actor->base.onAlternateEntry;
         u32 kind = 1;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = 0;

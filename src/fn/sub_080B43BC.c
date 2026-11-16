@@ -178,9 +178,9 @@ static inline void VornInit_EnableInitialFlags(struct ChaseActor *actor)
 
 static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Vorn_OnRender;
-    arg0->base.destroyCallback = Vorn_OnDestroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Vorn_OnRender;
+    arg0->base.destroy = Vorn_OnDestroy;
 }
 
 void Vorn_ParseField624(void *);
@@ -308,14 +308,14 @@ s32 Vorn_Init(void *object)
         }
         ActorShadow_Disable(actor->base.shadow);
         MonsterInit_SetState(actor, 3, 0, 0);
-        MonsterInit_SetControl(actor, actor->base.field220, 0xC);
+        MonsterInit_SetControl(actor, actor->base.onHidden, 0xC);
     } else if ((mode = Script_GetKeywordValue(0x54, 0)) != 0) {
         if (mode == 1)
             vorn->axis = 0;
         else
             vorn->axis = 1;
         VornInit_BeginBehavior(actor, 0x12);
-        MonsterInit_SetControl(actor, actor->base.savedTarget, 0);
+        MonsterInit_SetControl(actor, actor->base.onStanding, 0);
         MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 0x26);
     }
     VornInit_InstallCompletionCallbacks(actor);

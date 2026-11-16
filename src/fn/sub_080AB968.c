@@ -87,7 +87,7 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
     if (s->base.field2B0) {
         TentacleActor_SelectWanderRoute(s);
-        SetControl(s, s->base.entryTarget228, 1);
+        SetControl(s, s->base.onAlternateEntry, 1);
         SetState(s, 2);
     } else {
         s->base.counter2AC++;

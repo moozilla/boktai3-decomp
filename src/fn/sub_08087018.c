@@ -48,7 +48,7 @@ void sub_08087018(struct ChaseActor *actor, s32 frame)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-    SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
+    SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
     actor->base.field2C2 = 64;
     SceneActorChase_SetActorFlags(actor, 0x10);
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);

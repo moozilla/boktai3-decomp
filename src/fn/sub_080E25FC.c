@@ -34,7 +34,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         return 0;
     }
     if (a->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(a, a->base.reactionTarget230, 18);
+        SceneActorChase_SetControl(a, a->base.onReaction, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&a->base.flags2D0, 0x1000000);
         SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
@@ -92,7 +92,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
                 return 0;
             }
         }
-        SceneActorChase_SetControl(a, a->base.entryTarget228, 1);
+        SceneActorChase_SetControl(a, a->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(a, 7);
         a->base.field2C2 = 16;
         return 1;

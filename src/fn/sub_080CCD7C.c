@@ -266,7 +266,7 @@ route:
             actor->base.flags2CC |= mask;
         }
         actor->base.field2C2 = 0x40;
-        SetCommand((void *)&group->saved, actor->base.entryTarget228, 7, 60);
+        SetCommand((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->pad = 1;
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,

@@ -24,7 +24,7 @@ static inline u32 *Route_SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 static inline void Route_RestoreMotion(struct ChaseActor *actor, u32 result, u32 *flags)
 {
     /* Restore the saved target as its stored 32-bit control value. */
-    actor->base.word104 = *(u32 *)&actor->base.entryTarget228;
+    actor->base.word104 = *(u32 *)&actor->base.onAlternateEntry;
     actor->base.word108 = result;
     actor->base.word10C = result;
     actor->base.word110 = 1;

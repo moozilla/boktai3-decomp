@@ -64,7 +64,7 @@ void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
     actor->base.colliderA.responseValue = 0;
     Hide(actor);
     {
-        void *control = actor->base.deathControl;
+        void *control = actor->base.onDefeat;
         Reaction_SetControl(actor, 17, control);
     }
     {

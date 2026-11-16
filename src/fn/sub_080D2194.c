@@ -41,7 +41,7 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 0x28);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x28);
         {
             u32 mask = 0x10;
             actor->base.flags2CC |= mask;

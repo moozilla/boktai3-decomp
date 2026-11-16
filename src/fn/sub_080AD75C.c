@@ -116,7 +116,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 7);
         actor->base.field2C2 = 32;
     }

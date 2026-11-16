@@ -154,7 +154,7 @@ void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
         }
     } else {
         SetState(a, 0, 0, 7);
-        SetControl(a, a->base.entryTarget228, 1);
+        SetControl(a, a->base.onAlternateEntry, 1);
     }
     group->destination->pad = 1;
     if (!Chase(a, group, 0x200))

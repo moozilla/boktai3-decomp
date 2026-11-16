@@ -221,13 +221,13 @@ static inline void GolemReaction_SetChargeHeight(struct ChaseActor *actor, s32 h
 static inline void GolemReaction_EnterCharge(struct ChaseActor *actor, s16 height)
 {
     GolemReaction_SetChargeHeight(actor, height);
-    SceneActorChase_SetTypedControl(actor, actor->base.reactionTarget230, 0x12);
+    SceneActorChase_SetTypedControl(actor, actor->base.onReaction, 0x12);
     SceneActorChase_SetTypedState(actor, 3, 0, 0);
 }
 
 static inline void GolemReaction_Settle(struct ChaseActor *actor)
 {
-    SceneActorChase_SetTypedControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetTypedControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetTypedState(actor, 0, 0, 7);
     actor->base.field2C2 = 0x20;
 }

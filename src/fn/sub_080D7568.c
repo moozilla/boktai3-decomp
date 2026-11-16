@@ -96,7 +96,7 @@ static inline u8 Mummy_Arrive(void *obj, struct SceneActorChaseTracking *trackin
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Mummy_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Mummy_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -139,7 +139,7 @@ u8 sub_080D7568(struct ChaseActor *actor)
     struct SceneActorChaseFlags16 *contextFlags;
     if (Mummy_MotionFlags(actor, 0x10))
         return 0;
-    if ((u8)Callback_InvokeActor(actor, actor->base.update26C))
+    if ((u8)Callback_InvokeActor(actor, actor->base.targetQuery))
         return 1;
     if (Mummy_MotionFlags(actor, 0x100))
         return 0;

@@ -90,7 +90,7 @@ void Spider_BeginPlayerPursuit(struct ChaseActor *a)
     (*point)->pad = ready;
     a->base.tracking.target = (u32)((*(u8 **)gPlayers) + 0x24);
     SetState(a, 0, 0, 7);
-    SetControl(a, a->base.entryTarget228, 1);
+    SetControl(a, a->base.onAlternateEntry, 1);
     terrain = *mesh;
     dest = &a->base.tracking.target->position;
     if (!Nav_IsPositionInMesh(terrain, &a->base.body.position, dest)) {

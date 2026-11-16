@@ -45,7 +45,7 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
     u8 *context = actor->base.context;
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        SetControl(actor, actor->base.savedTarget, 0);
+        SetControl(actor, actor->base.onStanding, 0);
     if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)) && Axe_PickAttack(actor))
         return;
     if (actor->base.health <= *(s32 *)(context + 0xE48)) {

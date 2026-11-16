@@ -31,7 +31,7 @@ void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
 {
     u8 busy;
     if (TakePrepared(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+        void *control = actor->base.onEntry;
         SetControl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);

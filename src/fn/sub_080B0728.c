@@ -20,7 +20,7 @@ u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
-        void *control = p->base.entryTarget224;
+        void *control = p->base.onEntry;
         u32 kind = 2;
         SelectControl(p, control, kind);
     }
@@ -37,7 +37,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
         p->base.behavior2AA = phase;
         p->base.counter2AC = 0;
         p->base.field2B1 = 1;
-        SelectControl(p, p->base.savedTarget, 0);
+        SelectControl(p, p->base.onStanding, 0);
     } else
         ++p->base.counter2AC;
 }

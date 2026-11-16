@@ -7,7 +7,7 @@ void SceneActorRegistry_SendToActorId(u8 a, void *data, u16 c)
             struct ChaseActor *o = n->actor;
             void *callback;
             if (o->base.category == a && o->base.body.id == c) {
-                if ((callback = o->base.messageCallback) != 0) {
+                if ((callback = o->base.onMessage) != 0) {
                     sub_08249240(o, data, callback);
                     return;
                 }

@@ -5,7 +5,7 @@ void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
 {
     u8 *control = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = actor->base.savedTarget;
+        void *callback = actor->base.onStanding;
         u32 zero = 0;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = zero;

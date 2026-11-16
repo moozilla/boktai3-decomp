@@ -46,6 +46,6 @@ void SceneActorPlacement_ResetToPathPoint(struct ChaseActor *object, u32 pathId,
         ActorStatus_SetDrawableFlags(actor, 2);
         ActorStatus_ClearDrawableFlags(actor, 1);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
-        SceneActorTerrain_InstallControl(actor, actor->base.field220, 0xC);
+        SceneActorTerrain_InstallControl(actor, actor->base.onHidden, 0xC);
     }
 }

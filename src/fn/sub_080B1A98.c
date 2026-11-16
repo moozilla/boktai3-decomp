@@ -150,7 +150,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
     actor->chase.base.field2C2 = 32;
     {
         struct SceneActorReactionCommand *command = (void *)(group + 0x8c);
-        void *payload = actor->chase.base.entryTarget228;
+        void *payload = actor->chase.base.onAlternateEntry;
         u32 kind = 7;
         command->duration = 60;
         command->payload = payload;

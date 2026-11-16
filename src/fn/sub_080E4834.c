@@ -44,7 +44,7 @@ void Dog_ResumeRoute(struct ChaseActor *a)
             Chase_SnapToRoute(p, group + 0x74);
             (*(struct ContactPosition **)(group + 0x200))->pad = 0;
             Dog_SetMovementBits(a, 0x10);
-            Chase_SetCtl(a, a->base.entryTarget228, 1);
+            Chase_SetCtl(a, a->base.onAlternateEntry, 1);
             Chase_SetBehavior(a, 7);
             a->base.field2C2 = 0x20;
         }

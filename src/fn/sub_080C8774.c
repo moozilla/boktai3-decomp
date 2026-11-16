@@ -118,7 +118,7 @@ static inline u8 Golem_Arrive(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Golem_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y =
@@ -260,7 +260,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetState(actor, 0, 0, 7);
         actor->base.field2C2 = 0x20;
     }

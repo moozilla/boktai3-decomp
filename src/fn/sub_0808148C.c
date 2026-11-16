@@ -109,7 +109,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
             SetState(actor, 3, 0, 0);
             SetControl(actor, group->contactControl, 7);
         } else {
-            SetControl(actor, actor->base.reactionTarget230, 18);
+            SetControl(actor, actor->base.onReaction, 18);
             SetState(actor, 3, 0, 0);
         }
     }

@@ -8,7 +8,7 @@ void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
 {
     u8 *route = (u8 *)actor + 0x448;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = actor->base.savedTarget;
+        void *control = actor->base.onStanding;
         u32 zero = 0;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = zero;

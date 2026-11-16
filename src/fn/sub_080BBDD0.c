@@ -5,7 +5,7 @@
 #include "scene_actor_reaction.h"
 
 static inline void Skeleton_SnapRecoveryRoute(struct ContactPosition *position,
-                                          struct SceneActorRegistryRoute *route)
+                                              struct SceneActorRegistryRoute *route)
 {
     position->x = route->point->x;
     position->z = route->point->z;
@@ -71,7 +71,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Skeleton_SnapRecoveryRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -170,7 +170,7 @@ static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorCh
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetState(actor, 0, 0, 7);
         actor->base.field2C2 = 0x20;
     }

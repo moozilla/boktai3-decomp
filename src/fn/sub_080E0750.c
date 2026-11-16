@@ -1,4 +1,4 @@
-#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH           1
+#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
@@ -125,7 +125,7 @@ void sub_080E0750(struct ChaseActor *actor)
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetBehavior(actor, 7);
     actor->base.field2C2 = 16;
     return;

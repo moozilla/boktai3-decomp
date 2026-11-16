@@ -34,7 +34,7 @@ s32 SceneActorPlacement_BeginDefaultResponse(struct ChaseActor *p)
         mask |= *flags;
         *flags = mask;
     }
-    SetControl(p, p->base.reactionTarget230, 18);
+    SetControl(p, p->base.onReaction, 18);
     SetState(p, 3, 0, 0);
     {
         u32 *flags = &p->base.flags2D0;

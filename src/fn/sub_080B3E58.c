@@ -39,7 +39,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         return 0;
     }
     if (actor->base.field2DC & 0xC0000) {
-        void *control = actor->base.reactionTarget230;
+        void *control = actor->base.onReaction;
         u32 kind = 0x12;
         u8 zero8;
         actor->base.field2B2 = 1;

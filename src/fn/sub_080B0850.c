@@ -24,7 +24,7 @@ static inline u8 PhaseComplete(struct ChaseActor *p)
 void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
-        void *control = p->base.entryTarget224;
+        void *control = p->base.onEntry;
         u32 kind = 2;
         SelectControl(p, control, kind);
     }
@@ -45,7 +45,7 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
         p->base.counter2AC = zero;
         p->base.field2B1 = one;
         {
-            void *control = p->base.savedTarget;
+            void *control = p->base.onStanding;
             u32 *flags;
             p->base.field2B2 = one;
             *(u8 *)((u32)p + 0x2B0) = zero;

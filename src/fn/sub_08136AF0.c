@@ -52,7 +52,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
             break;
     }
     {
-        const void *control = s->reactionTarget230;
+        const void *control = s->onReaction;
         u8 code = 0x12;
         u32 zero;
         u8 one;

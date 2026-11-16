@@ -97,7 +97,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         *field &= mask;
     }
     SetState(actor, 15);
-    SetControl(actor, actor->chase.base.savedTarget, 0);
+    SetControl(actor, actor->chase.base.onStanding, 0);
     SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;

@@ -51,7 +51,7 @@ void Dog_RestoreRoute(struct ChaseActor *actor)
             actor->base.flags2CC |= mask;
         }
         actor->base.field2C2 = 0x20;
-        SaveDelay(group + 0x8C, actor->base.entryTarget228, 7, 0x3C);
+        SaveDelay(group + 0x8C, actor->base.onAlternateEntry, 7, 0x3C);
     }
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;

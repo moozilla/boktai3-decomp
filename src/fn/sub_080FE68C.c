@@ -81,31 +81,31 @@ static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s3
                                           void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(arg0, 0x2000);
-    arg0->base.contextCallback = cb0;
+    arg0->base.onUpdate = cb0;
     MonsterInit_WriteValueQuery(&arg0->base.animationQuery.value, cb1);
-    arg0->base.entryTarget224 = cb2;
-    arg0->base.entryTarget228 = cb3;
-    arg0->base.savedTarget = cb4;
-    arg0->base.reactionTarget230 = cb5;
-    arg0->base.deathControl = cb6;
-    arg0->base.field220 = hidden;
+    arg0->base.onEntry = cb2;
+    arg0->base.onAlternateEntry = cb3;
+    arg0->base.onStanding = cb4;
+    arg0->base.onReaction = cb5;
+    arg0->base.onDefeat = cb6;
+    arg0->base.onHidden = hidden;
     arg0->base.defaultReaction = defaultReaction;
     MonsterInit_WriteResultCallback(&arg0->base.contactQuery.result, cb270);
     MonsterInit_WriteDataPointer(&arg0->base.commandTable.opaque, gUnk_086108B0);
     arg0->base.callback248 = 0;
-    arg0->base.update26C = targetQuery;
+    arg0->base.targetQuery = targetQuery;
     arg0->base.field238 = SceneActorReaction_SinkAndRemove;
-    arg0->base.damageCallback = damage;
-    arg0->base.contactCallback = contact;
+    arg0->base.onDamage = damage;
+    arg0->base.onContact = contact;
     arg0->base.field240 = 0;
     MonsterInit_ClearMotion(arg0);
 }
 
 static inline void AxeInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Axe_OnRender;
-    arg0->base.destroyCallback = Axe_ReleaseResources;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = Axe_OnRender;
+    arg0->base.destroy = Axe_ReleaseResources;
 }
 
 static inline void AxeInit_InstallRoutes(struct ChaseActor *actor)
@@ -199,7 +199,8 @@ s32 Axe_Init(void *object)
                            Axe_OnAnimationReset, sub_080F93A4, 0, Axe_ConvergeRecoveryMotion,
                            Axe_UpdateDefeat, SceneActorReaction_OnEnemyDefault,
                            SceneActorControl_CanAdvanceHover, SceneActorTarget_ResolvePendingObject,
-                           SceneActorReaction_ResolvePlacementDamage, SceneActorControl_AdvanceReactionCount);
+                           SceneActorReaction_ResolvePlacementDamage,
+                           SceneActorControl_AdvanceReactionCount);
     MonsterInit_InitializeGroup(group, (u8 *)arg0 + 0xED8, (u8 *)arg0 + 0xEFC, 0, 0, 0, 0, 1);
     AxeInit_InstallRoutes(actor);
     group->responseCallback = 0;

@@ -88,7 +88,7 @@ static inline void Skeleton_UpdateArrival(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(

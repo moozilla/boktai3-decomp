@@ -17,7 +17,7 @@ void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
 {
     u8 *context = a->base.context;
     if (Chase_TakeArrived(a))
-        Chase_SetCtl(a, a->base.entryTarget224, 2);
+        Chase_SetCtl(a, a->base.onEntry, 2);
     Callback_InvokeActor(a, a->base.contactQuery.opaque);
     if (a->base.field2B0) {
         Chase_SetBehavior(a, 15);

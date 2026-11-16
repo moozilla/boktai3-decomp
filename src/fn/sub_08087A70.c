@@ -1,6 +1,6 @@
-#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH           1
-#define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR        1
-#define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL     1
+#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH       1
+#define SCENE_ACTOR_CHASE_FRACTION_ACCESSOR    1
+#define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
 #include "scene_actor_displacement.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
@@ -119,7 +119,7 @@ void sub_08087A70(struct ChaseActor *actor, s32 frame)
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetBehavior(actor, 7);
     actor->base.field2C2 = 32;
 }

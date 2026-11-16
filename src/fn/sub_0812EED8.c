@@ -73,7 +73,7 @@ u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetActorFlags(actor, 0x10);
-    SaveDelay(group + 0x8c, actor->base.savedTarget, 9);
+    SaveDelay(group + 0x8c, actor->base.onStanding, 9);
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 1;
     actor->base.field2C2 = 64;

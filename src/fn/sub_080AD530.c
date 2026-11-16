@@ -69,7 +69,7 @@ void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
             Callback_InvokeActor(actor, group->failure);
             return;
         }
-        Chase_SetCtl(actor, actor->base.entryTarget228, 1);
+        Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
         Chase_SetBehavior(actor, 7);
         actor->base.field2C2 = 32;
     }

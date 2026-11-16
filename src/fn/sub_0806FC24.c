@@ -7,7 +7,7 @@ void SceneActorRegistry_SendBroadcast(u8 a, void *data)
             struct ChaseActor *o = n->actor;
             void *callback;
             if (a == 0) {
-                if ((callback = o->base.messageCallback) != 0)
+                if ((callback = o->base.onMessage) != 0)
                     sub_08249240(o, data, callback);
             }
             n = n->next;

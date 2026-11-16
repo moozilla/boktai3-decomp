@@ -212,13 +212,13 @@ next:
         void *context;
         node = node->next;
         context = actor->base.context;
-        Callback_InvokeActor(context, actor->base.destroyCallback);
+        Callback_InvokeActor(context, actor->base.destroy);
         Heap_Free(context);
         actor = node->actor;
         goto next;
     }
     {
-        s32 (**update)(void *) = &actor->base.updateCallback;
+        s32 (**update)(void *) = &actor->base.update;
         void *context = actor->base.context;
         u8 missing, paused;
         Callback_InvokeActor(context, *update);

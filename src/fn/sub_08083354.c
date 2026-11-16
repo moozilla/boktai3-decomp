@@ -25,7 +25,7 @@ void SceneActorControl_TickRandomMotion(struct ChaseActor *input)
     u32 magnitude;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 index;
-        SceneActorTerrain_InstallControl(actor, actor->base.entryTarget228, 1);
+        SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
         ClearMotionVector(&zero, &control->vectors[2]);
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;

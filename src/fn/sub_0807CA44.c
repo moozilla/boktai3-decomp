@@ -165,7 +165,7 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
     if (!MoveToSource(owner, actor, group, group->source)) {
         SetCoordinates(&position, group);
         MoveTo(owner, actor, group, &position);
-        SetControl(actor, actor->base.entryTarget228, 1);
+        SetControl(actor, actor->base.onAlternateEntry, 1);
         SetResponseState(actor, 0, 0, 2);
     } else {
         struct SceneActorReactionCommand *command;
@@ -173,7 +173,7 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
         SetResponseState(actor, 3, 1, 0);
         SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
         command = &group->command;
-        ArmCommand(command, actor->base.entryTarget228, 7, 30);
+        ArmCommand(command, actor->base.onAlternateEntry, 7, 30);
         SetResponseWordFlag(actor, 0x10);
         SetResponseHalfFlag(actor, 0x1000);
         group->destination->pad = 0;

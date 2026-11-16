@@ -30,7 +30,7 @@ void sub_080D49DC(struct ChaseActor *actor)
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
     } else {
         SceneActorChase_SetActorFlags(actor, 0x10);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {

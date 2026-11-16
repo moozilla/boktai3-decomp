@@ -851,7 +851,7 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
     struct Slime *context = actor->base.context;
     s32 speed;
     if (Slime_TakeApproachEntry(&actor->base.field2B1)) {
-        Slime_SetApproachControl(actor, actor->base.entryTarget228, 1);
+        Slime_SetApproachControl(actor, actor->base.onAlternateEntry, 1);
         Slime_SelectWanderTarget(actor, actor->base.body.direction);
         actor->base.field2C2 = 0x40;
         return;
@@ -873,7 +873,7 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
 void Slime_RestoreSavedTarget(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeStateEntry(actor))
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     actor->base.counter2AC++;
 }
@@ -1800,7 +1800,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
     }
     if ((Slime_DamageFlags(&actor->base.field2DC) & 0x40000)) {
         Slime_ClearReactionBits(&actor->base.flags2D6, ~0x980);
-        Slime_SetReactionControl(actor, actor->base.reactionTarget230, 0x12);
+        Slime_SetReactionControl(actor, actor->base.onReaction, 0x12);
         Slime_SetDamageState(actor, 3, 0, 0);
     } else {
         if (Slime_MaskedMotionBits(motionFlags, 0x100))
@@ -1811,7 +1811,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
             Slime_SetDamageState(actor, 0, 0, 2);
             Slime_ClearReactionBits(&actor->base.flags2D6, ~0x980);
         } else if ((*(u32 *)&actor->base.state2A8 & 0xffffff) != 0) {
-            Slime_SetReactionControl(actor, actor->base.savedTarget, 0);
+            Slime_SetReactionControl(actor, actor->base.onStanding, 0);
             Slime_SetDamageState(actor, 0, 0, 0);
         }
     }
@@ -2030,31 +2030,31 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
                                               void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = cb0;
+    actor->base.onUpdate = cb0;
     MonsterInit_WriteCallback(&actor->base.animationQuery.opaque, cb1);
-    actor->base.entryTarget224 = cb2;
-    actor->base.entryTarget228 = cb3;
-    actor->base.savedTarget = cb4;
-    actor->base.reactionTarget230 = cb5;
-    actor->base.deathControl = cb6;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = cb2;
+    actor->base.onAlternateEntry = cb3;
+    actor->base.onStanding = cb4;
+    actor->base.onReaction = cb5;
+    actor->base.onDefeat = cb6;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 
 static inline void Slime_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Slime_OnMessage;
-    actor->base.destroyCallback = Slime_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = Slime_OnMessage;
+    actor->base.destroy = Slime_Destroy;
 }
 
 static inline void Slime_InstallRoutes(struct ChaseActor *actor)

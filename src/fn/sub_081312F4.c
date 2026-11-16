@@ -69,7 +69,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
     u8 *group = (u8 *)&actor->group.common;
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        BeginControlZero(actor, actor->base.entryTarget224, 2);
+        BeginControlZero(actor, actor->base.onEntry, 2);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);
@@ -88,7 +88,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
                     State(actor, 7, flags);
                 else
                     State(actor, 2, bits);
-                BeginControlZero(actor, actor->base.entryTarget228, 1);
+                BeginControlZero(actor, actor->base.onAlternateEntry, 1);
             }
         } else
             actor->base.counter2AC++;

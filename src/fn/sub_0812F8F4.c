@@ -52,7 +52,7 @@ void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
     u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        BeginControlZero(actor, actor->base.entryTarget224, 2);
+        BeginControlZero(actor, actor->base.onEntry, 2);
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         result = sub_0812F3CC(actor);

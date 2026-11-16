@@ -37,7 +37,7 @@ void SceneActorRoute_UpdateDelayedEntry(struct ChaseActor *actor)
 {
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        BeginControlZero(actor, actor->base.savedTarget, 0);
+        BeginControlZero(actor, actor->base.onStanding, 0);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);

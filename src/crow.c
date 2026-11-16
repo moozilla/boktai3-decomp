@@ -494,7 +494,7 @@ void Crow_HopWithinHomeCell(struct ChaseActor *actor)
     s32 cell;
     if (Crow_TakeHopEntry(actor, &arrived)) {
         u32 angle;
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         Crow_GetCellCenter(&local.home, state->homeCell);
         actor->base.body.direction = angle = Crow_NextHopRandom(gRandomTable) & 255;
         Crow_ClearHopVelocity(&local.zero, &state->vectors[2]);
@@ -595,7 +595,7 @@ void Crow_SteerAroundPlayer(struct ChaseActor *actor)
     s16 t2;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         ((struct ActorSprite *)actor->base.drawable)->flags |= 2;
-        SceneActorChase_SetControl(actor, actor->base.entryTarget224, 2);
+        SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
     }
     if (state->approachTime < ((s32)actor->base.counter2AC)) {
         Crow_FindPositionDelta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
@@ -703,7 +703,7 @@ void Crow_UpdateWanderTimer(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor)) {
         u32 mask = 0x7F;
         u32 value;
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         value = Crow_NextWanderRandom();
         context->wanderTicks = (mask & value) + 0x14;
     }
@@ -761,7 +761,7 @@ void Crow_ApproachPlayer(struct ChaseActor *actor)
     s32 limit;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         *(u32 *)actor->base.drawable &= ~2;
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     }
     limit = actor->base.paletteOffset == 1 ? 0x18 : 0x28;
     if ((s32)actor->base.counter2AC > limit) {
@@ -1607,7 +1607,7 @@ void Crow_ReturnToGround(struct ChaseActor *actor)
     s32 delta;
     u16 *height;
     if (Crow_TakeHeightReturnEntry(actor)) {
-        void *fn = actor->base.entryTarget228;
+        void *fn = actor->base.onAlternateEntry;
         u32 one = 1;
         u8 *taken = &actor->base.field2B2;
         u32 zero = 0;
@@ -1843,9 +1843,9 @@ static inline void Crow_ReadPalette(struct ChaseActor *actor, u16 base, u16 alte
 
 static inline void Crow_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Crow_InitPlayerTarget;
-    actor->base.destroyCallback = Crow_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = Crow_InitPlayerTarget;
+    actor->base.destroy = Crow_Destroy;
 }
 
 static inline void Crow_InstallRoutes(struct ChaseActor *actor)

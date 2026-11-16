@@ -73,9 +73,9 @@ static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
 
 static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Dog_OnAuxiliaryUpdate;
-    actor->base.destroyCallback = Dog_ReleaseResources;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = Dog_OnAuxiliaryUpdate;
+    actor->base.destroy = Dog_ReleaseResources;
 }
 
 s32 Dog_Init(void *object)
