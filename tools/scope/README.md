@@ -1308,8 +1308,15 @@ Each was read from the compiler source and confirmed on a live draft.
      computes `row + 1` again. A second-section `row++` with nothing after it moves (the item
      grid as `for (...; row++)`: 43 / 47, against a match with an explicit `nextRow = row + 1`
      that the ROM computes earlier in the block than gcse would).
-   * by the equations, also when x is set in the block before the loop or inside it (not
-     checked on a draft).
+   * x is set inside the inner loop (on any path), or in the block that ends just before its
+     header. Checked on sub_081384A0's bubble sort: the outer `i++` stays after the inner
+     loop with `i = i + index - index;` in the swap branch. cse1 does not fold `(a + b) - b`,
+     so gcse sees a set of i, and combine folds it to nothing. A kill one block earlier (an
+     `if` before the inner loop's top test) only moves the insertion down to that block. A
+     copy kill (`i = pass;` at the top, `pass = i + 1;` at the end) also stops PRE, but
+     leaves two pseudos: global.c ties copies only through hard-register preferences, so
+     the short-lived one takes r0 instead of sharing the counter's r8 (`AGBCC_FORCE=pass:8`
+     matches). `(i + j) - j` with the loop counter j leaves code; the loaded `index` folds.
    `pre` flags each such move ("moved above a loop").
    The same insertion serves two paths when both arms of an if compute an expression:
    EffectGroup_Spawn's kind == 2 arm and its else arm each loop over `group->parts[i].flags`,

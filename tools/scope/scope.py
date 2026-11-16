@@ -6749,7 +6749,9 @@ def cmd_pre(src, func, env):
                 print(f"    moved above a loop: {', '.join(at(r['redundant']) for r in hoisted)} comes after a loop"
                       " that starts after the insertion (the old LCM stops delaying at every loop header, fact"
                       " 50). To keep it after the loop: an increment Thumb cannot encode inline, the same"
-                      " expression again on every later path, or its operand set inside the loop")
+                      " expression again on every later path, or its operand set inside the loop (a no-op"
+                      " `i = i + t - t` with t a loaded value: cse1 keeps it, combine folds it; a copy from"
+                      " another variable leaves two pseudos global.c won't share)")
         for r in group:
             m, counts = scores[r["k"]]
             touched = differing & {r["redundant"], *r["inserted"], *(c for c, _ in r["copies"])}
