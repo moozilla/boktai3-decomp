@@ -393,7 +393,7 @@ s32 Dog_Init(void *object)
 
     DogInit_Reset(dog);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 0x15);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_DOG);
     SceneActor_RefreshLivingCountAndProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

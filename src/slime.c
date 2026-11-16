@@ -2094,7 +2094,7 @@ s32 Slime_Init(void *object)
     s32 j;
     slime->flags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 0x16);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_SLIME);
     Slime_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

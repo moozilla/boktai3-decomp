@@ -1484,7 +1484,7 @@ s32 Vorn_Init(void *object)
 
     VornInit_ResetFlags(vorn);
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
-    MonsterInit_SetCategory(actor, 0x19);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_VORN);
     Vorn_InitActorProfile(actor);
     Vorn_ParseField624(actor);
     Vorn_InitScriptCallback(actor);

@@ -290,7 +290,7 @@ s32 Golem_Init(void *object)
 
     GolemInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 3);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GOLEM);
     Golem_InitAnimationProfile(actor);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;

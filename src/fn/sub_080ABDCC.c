@@ -190,7 +190,7 @@ s32 TentacleActor_Init(void *object)
     u32 flag;
     tentacle->flags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 9);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_TENTACLE);
     TentacleActor_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

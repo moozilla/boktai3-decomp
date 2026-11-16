@@ -255,7 +255,7 @@ s32 Mummy_Init(void *object)
 
     MummyInit_ResetFlags(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 1);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_MUMMY);
     Mummy_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(&actor->chase) == 0) {
         u8 *heap;

@@ -296,7 +296,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
         u32 variant;
         u16 *flags;
         actor->base.body.direction = actor->base.tracking.heading;
-        if (actor->base.category == 5) {
+        if (actor->base.category == MONSTER_CATEGORY_SKELETON) {
             u32 mask = 0x200;
             u32 blocked = actor->base.motionFlags & mask;
             flags = &actor->base.motionFlags;
@@ -307,7 +307,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
             } else
                 Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10,
                                         0);
-        } else if (actor->base.category == 6) {
+        } else if (actor->base.category == MONSTER_CATEGORY_SKELETON_GUARD) {
             u32 mask = 0x200;
             u32 blocked = actor->base.motionFlags & mask;
             flags = &actor->base.motionFlags;
@@ -320,7 +320,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
                                         0);
         } else {
             flags = &actor->base.motionFlags;
-            if (actor->base.category == 7) {
+            if (actor->base.category == MONSTER_CATEGORY_SKELETON_ARMED) {
                 u32 mask = 0x200;
                 u16 blocked = SceneActorChase_FlagComponentBits(
                     (struct SceneActorChaseFlags16 *)&actor->base.motionFlags, mask);

@@ -119,6 +119,42 @@ type, since the registry calls every class the same way. Still `void *`: `onUpda
 `Axe_Init` keeps on the stack; its installer passes them in as `void *`), and
 `defaultReaction`, `routeReset`, `sinkCallback`, `reactionGate`, `field240` and the behavior and phase tables.
 
+### The category
+
+`category` (`enum MonsterCategory`, `include/room_actor.h`) says which kind of monster
+an actor is. Each class's init sets it with `MonsterInit_SetCategory`. The registry
+uses it to address actors (`SceneActorRegistry_SendToCategory`), to count living ones
+(`SceneActorRegistry_CountLivingByCategory`), and as the key of their animation
+profiles (`SceneActorProfiles_FindOrAdd(category, count)`).
+
+| Value | Kind | Set by |
+|---|---|---|
+| 1 | Mummy | Mummy init |
+| 2 | Spider | Spider init |
+| 3 | Golem | Golem init |
+| 4 | Ghoul (Bok) | Ghoul init |
+| 5 | Skeleton | Skeleton init, keyword `-k` (the default); Skeleton_ShedBones drops back to it |
+| 6 | Skeleton, guard variant | `-k 6`: Skeleton_TryBeginGuardedAttack, a 60-frame hop timer |
+| 7 | Skeleton, armed variant | `-k 7`: Skeleton_TryBeginArmedAttack; also set by Skeleton_UpdateDefeat |
+| 8 | Skeleton, further variant | a profile case only. One script computes `-k (local2 & 255)`, so it may pick 8 (low confidence) |
+| 9 | Tentacle | TentacleActor_Init |
+| 10 | Mimic | Mimic init |
+| 12, 13 | Axe: variant 0, and any other variant (keyword `-t`) | Axe init |
+| 14 | Octopus | Octopus init |
+| 0x11 | Lun | Lun init |
+| 0x12 | Bat | Bat init |
+| 0x13 | Crow | Crow init |
+| 0x14 | Bee | Bee init |
+| 0x15 | Dog | Dog init |
+| 0x16 | Slime | Slime init |
+| 0x17 | Ghost | Ghost_Init |
+| 0x18 | Ivy | Ivy init |
+| 0x19 | Vorn | Vorn init |
+
+On the script side only the Skeleton chooses its category. `tools/assets/gcx.py dis`
+shows every spawn of command AD03 (スケルトン): five pass `-k 5`, four `-k 6`, three
+`-k 7`, and one computes the value. No setter has been found for 0, 0xB, 0xF or 0x10.
+
 ### Not members
 
 The props are not registry actors. The wooden crate is one of twelve slots in a

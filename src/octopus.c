@@ -2620,7 +2620,7 @@ s32 Octopus_Init(void *object)
 
     OctopusInit_ResetCapture(arg0);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 14);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_OCTOPUS);
     Octopus_InitProfileId(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

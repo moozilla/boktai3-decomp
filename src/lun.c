@@ -2673,7 +2673,7 @@ s32 Lun_Init(void *object)
     s32 r1v;
     lun->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 0x11);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_LUN);
     Lun_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

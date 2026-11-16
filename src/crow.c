@@ -1867,7 +1867,7 @@ s32 Crow_Init(void *object)
     u32 flag;
     crow->flags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 0x13);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_CROW);
     Crow_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

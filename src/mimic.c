@@ -1356,7 +1356,7 @@ s32 Mimic_Init(void *object)
     s32 lift;
 
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 10);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_MIMIC);
     Mimic_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

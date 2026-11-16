@@ -4959,9 +4959,9 @@ s32 Axe_Init(void *object)
     variant = AxeInit_BoundedVariant(((struct AxeActorInit *)actor)->variantED7);
     AxeInit_SetVariant(&arg0->base, variant);
     if (variant == 0)
-        MonsterInit_SetCategory(actor, 12);
+        MonsterInit_SetCategory(actor, MONSTER_CATEGORY_AXE);
     else
-        MonsterInit_SetCategory(actor, 13);
+        MonsterInit_SetCategory(actor, MONSTER_CATEGORY_AXE_VARIANT);
     Axe_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;

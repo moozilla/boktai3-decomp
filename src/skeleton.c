@@ -382,7 +382,7 @@ s32 Skeleton_Init(void *object)
     SkeletonInit_ResetFlags(instance);
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
     {
-        MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, 5));
+        MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, MONSTER_CATEGORY_SKELETON));
         if (MonsterInit_GetCategory(actor) == 7)
             SkeletonInit_SetFlagWord(0x40, &instance->actionFlags);
     }

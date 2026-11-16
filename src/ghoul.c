@@ -1366,7 +1366,7 @@ s32 Ghoul_Init(void *object)
 
     rootActor->discFlags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    MonsterInit_SetCategory(actor, 4);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GHOUL);
     Ghoul_BindProfile(actor);
     Vorn_ParseField624_0808B320(actor);
 

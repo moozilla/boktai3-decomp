@@ -205,7 +205,7 @@ s32 Bat_Init(void *object)
     u32 flag;
     bat->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
-    MonsterInit_SetCategory(actor, 0x12);
+    MonsterInit_SetCategory(actor, MONSTER_CATEGORY_BAT);
     SceneActorControl_SetDefaultProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
