@@ -616,7 +616,7 @@ void Bestiary_UnlockEntry(void *);
 
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 

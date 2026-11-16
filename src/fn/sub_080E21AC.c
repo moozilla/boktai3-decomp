@@ -9,7 +9,7 @@ void Bestiary_UnlockEntry(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 void SceneActorControl_CompleteBlinkOut(struct ChaseActor *, s32);
 void SceneActorMovement_UpdateAirborne(struct ChaseActor *);
 void SceneActorMovement_UpdateHeight(struct ChaseActor *);

@@ -1,6 +1,6 @@
 #include "scene_actor_effects.h"
-void SceneActorEffects_EmitRandomOffsets(struct SceneActorRegistryActor *actor, s32 count, u32 mode,
-                                         s32 spanX, s32 spanY, u32 value)
+void SceneActorEffects_EmitRandomOffsets(struct ChaseActor *actor, s32 count, u32 mode, s32 spanX,
+                                         s32 spanY, u32 value)
 {
     struct SceneActorEffectsOffset offset;
     s32 i;

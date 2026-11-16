@@ -1,10 +1,10 @@
 #include "scene_actor_registry.h"
-struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32 id)
+struct ChaseActor *SceneActorRegistry_FindById(u32 id)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     while ((actor = node->actor) != NULL) {
-        if (actor->id == id)
+        if (actor->base.body.id == id)
             return actor;
         node = node->next;
     }

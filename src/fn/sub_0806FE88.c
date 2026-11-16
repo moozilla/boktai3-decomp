@@ -5,17 +5,17 @@ struct SceneActorScheduleView {
 };
 s32 SceneActorRegistry_CountAvailable(void);
 s32 Div(s32, s32);
-static inline u8 Inactive(struct SceneActorRegistryActor *actor)
+static inline u8 Inactive(struct ChaseActor *actor)
 {
     {
-        u32 flags = actor->flags2D4;
+        u32 flags = actor->base.flags2D4;
         flags &= 0x40;
         if (flags)
             return 1;
     }
-    if (actor->flags2D0 & 0x20000)
+    if (actor->base.flags2D0 & 0x20000)
         return 1;
-    if (actor->health <= 0)
+    if (actor->base.health <= 0)
         return 1;
     return 0;
 }
@@ -24,7 +24,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
     s32 count = SceneActorRegistry_CountAvailable();
     if (count > 0) {
         struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-        struct SceneActorRegistryActor *actor = node->actor;
+        struct ChaseActor *actor = node->actor;
         s32 selected = 0;
         s32 quota;
         s32 delay;
@@ -63,7 +63,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
                 request = low;
             }
             do {
-                if (Inactive(actor) || actor->flags2CC & blocked) {
+                if (Inactive(actor) || actor->base.flags2CC & blocked) {
                     u8 *ticks = (u8 *)actor + tickOffset;
                     *ticks = zero;
                 } else {
@@ -73,7 +73,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
                     else if (selected < quota) {
                         *ticks = delay;
                         {
-                            u16 *field = &actor->flags2D6;
+                            u16 *field = &actor->base.flags2D6;
                             *field = (u16)request | *field;
                         }
                         selected++;

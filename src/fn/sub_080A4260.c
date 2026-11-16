@@ -2,7 +2,7 @@
 
 // confidence=low: starts the contact route toward the object named by field304.
 void *SceneActorContacts_FindObjectById(u16);
-void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *);
+void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *);
 void sub_080A4798(struct ChaseActor *);
 
 static inline void SetBehavior(struct ChaseActor *actor, u32 b)

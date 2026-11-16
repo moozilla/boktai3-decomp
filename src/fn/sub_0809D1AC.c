@@ -12,14 +12,14 @@ struct RouteActorDestinationState {
     u8 unknown438[12];
     u16 delay;
 };
-static inline u16 TestFlag(struct SceneActorRegistryActor *p, u32 mask)
+static inline u16 TestFlag(struct ChaseActor *p, u32 mask)
 {
-    mask &= p->flags2D4;
+    mask &= p->base.flags2D4;
     return mask;
 }
-void RouteActor_UpdateRandomDestination(struct SceneActorRegistryActor *actor)
+void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)
 {
-    struct RouteActorDestinationState *state = actor->context;
+    struct RouteActorDestinationState *state = actor->base.context;
     if (!TestFlag(actor, 0x100)) {
         state->delay = 0;
     } else if (state->delay) {

@@ -5,12 +5,12 @@ struct AxeColliderBlock {
     struct ContactCollider attack[2];
     struct ContactCollider body[2];
 };
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 void Axe_OnBodyContact(void);
 void Axe_OnAttackColliderContact(void);
-void Axe_InitColliders(struct SceneActorRegistryActor *actor)
+void Axe_InitColliders(struct ChaseActor *actor)
 {
-    struct AxeColliderBlock *blk = actor->context;
+    struct AxeColliderBlock *blk = actor->base.context;
     struct ContactPackedVector bodySize, bodyOff, atkSize, atkOff;
     s32 i;
     u16 f = 0x2401;
@@ -24,11 +24,11 @@ void Axe_InitColliders(struct SceneActorRegistryActor *actor)
     SceneActorCollision_InitBody(actor, &bodySize, &bodyOff, Axe_OnBodyContact, actor);
     for (i = 0; i < 2; i++) {
         struct ContactCollider *c = &blk->body[i];
-        Collider_Init(c, actor->id, 0x4001, 0, 16, &bodySize, &bodyOff);
+        Collider_Init(c, actor->base.body.id, 0x4001, 0, 16, &bodySize, &bodyOff);
         Collider_SetBodyProperties(c, SceneActorCollision_ReadBodyField3C(actor),
                                    SceneActorCollision_ReadBodyReactionFlags(actor),
                                    SceneActorCollision_ReadBodyField34(actor));
-        Collider_SetPosition(c, &actor->position, 0);
+        Collider_SetPosition(c, &actor->base.body.position, 0);
         Collider_SetCallback(c, Axe_OnBodyContact, actor);
         Collider_Refresh(c);
     }
@@ -40,23 +40,23 @@ void Axe_InitColliders(struct SceneActorRegistryActor *actor)
     atkOff.z = 0;
     {
         struct ContactCollider *c = (struct ContactCollider *)((u8 *)actor + 0x188);
-        Collider_Init(c, actor->id, f, 0, 16, &atkSize, &atkOff);
+        Collider_Init(c, actor->base.body.id, f, 0, 16, &atkSize, &atkOff);
         Collider_SetAttackProperties(c, SceneActorCollision_ReadAttackField3C(actor, 0),
                                      SceneActorCollision_ReadAttackField40(actor, 0), 0,
                                      SceneActorCollision_ReadAttackReactionFlags(actor, 0),
                                      SceneActorCollision_ReadAttackField44(actor, 0));
-        Collider_SetPosition(c, &actor->position, 0);
+        Collider_SetPosition(c, &actor->base.body.position, 0);
         Collider_SetCallback(c, Axe_OnAttackColliderContact, actor);
     }
     k = 0x24010000;
     for (i = 0; i < 2; i++) {
         struct ContactCollider *c = &blk->attack[i];
-        Collider_Init(c, actor->id, k >> 16, 0, 16, &atkSize, &atkOff);
+        Collider_Init(c, actor->base.body.id, k >> 16, 0, 16, &atkSize, &atkOff);
         Collider_SetAttackProperties(c, SceneActorCollision_ReadAttackField3C(actor, 0),
                                      SceneActorCollision_ReadAttackField40(actor, 0), 0,
                                      SceneActorCollision_ReadAttackReactionFlags(actor, 0),
                                      SceneActorCollision_ReadAttackField44(actor, 0));
-        Collider_SetPosition(c, &actor->position, 0);
+        Collider_SetPosition(c, &actor->base.body.position, 0);
         Collider_SetCallback(c, Axe_OnAttackColliderContact, actor);
     }
 }

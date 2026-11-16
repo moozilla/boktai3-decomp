@@ -34,8 +34,8 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
             if (flags & mask)
                 control->timer = inactive;
             else {
-                struct SceneActorRegistryActor *base = (void *)actor;
-                u16 *timerPtr = &base->field2B8;
+                struct ChaseActor *base = (void *)actor;
+                u16 *timerPtr = &base->base.field2B8;
                 s16 timer;
                 timer = *timerPtr;
                 if (timer) {

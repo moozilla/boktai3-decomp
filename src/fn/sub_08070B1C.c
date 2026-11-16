@@ -1,9 +1,9 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
-static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
+static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 excluded)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u32 value = *flags;
     u32 mask = 0x40;
     value &= mask;
@@ -11,13 +11,13 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **save
     if (value)
         goto one;
     {
-        u32 value = actor->flags2D0;
+        u32 value = actor->base.flags2D0;
         mask = excluded;
         value &= mask;
         if (value)
             goto one;
     }
-    if (actor->health > 0)
+    if (actor->base.health > 0)
         goto zero;
 one:
     mask = 1;
@@ -30,7 +30,7 @@ zero:
 void SceneActorRegistry_ResetEligibleCategoryState(void)
 {
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     SceneActorRegistry_GetManager();
     node = gSceneActorRegistryNode;
     actor = node->actor;
@@ -46,28 +46,28 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
             {
                 u32 unavailable = IsUnavailable(actor, &flags, excluded);
                 if (!unavailable) {
-                    u32 category = actor->category;
+                    u32 category = actor->base.category;
                     if (category == 4 || category == 1 || category == 3) {
                         u32 selected = *flags & reject;
                         if (!selected) {
-                            actor->field2B2 = one;
-                            actor->field2B0 = selected;
-                            actor->unknown2B5[0] = substate;
-                            actor->control = callback;
-                            actor->field2C8 = selected;
+                            actor->base.field2B2 = one;
+                            actor->base.field2B0 = selected;
+                            actor->base.field2B5 = substate;
+                            actor->base.target = callback;
+                            actor->base.field2C8 = selected;
                             {
-                                u32 *flags = &actor->flags114;
+                                u32 *flags = &actor->base.flags114;
                                 u32 mask = ~1;
                                 u32 value = *flags;
                                 value &= mask;
                                 *flags = value;
                             }
-                            actor->field104 = selected;
-                            actor->state2A8 = zero;
-                            actor->phase2A9 = one;
-                            actor->behavior2AA = zero;
-                            actor->counter2AC = selected;
-                            actor->field2B1 = one;
+                            actor->base.word104 = selected;
+                            actor->base.state2A8 = zero;
+                            actor->base.phase2A9 = one;
+                            actor->base.behavior2AA = zero;
+                            actor->base.counter2AC = selected;
+                            actor->base.field2B1 = one;
                         }
                     }
                 }

@@ -1,8 +1,9 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
+static inline u8 IsUnavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
 {
-    if ((actor->flags2D4 & disabled) || (actor->flags2D0 & excluded) || actor->health <= 0)
+    if ((actor->base.flags2D4 & disabled) || (actor->base.flags2D0 & excluded) ||
+        actor->base.health <= 0)
         return 1;
     return 0;
 }
@@ -12,7 +13,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u32 disabl
 void SceneActorRegistry_ResetCategoryControl(void)
 {
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     SceneActorRegistry_GetManager();
     node = gSceneActorRegistryNode;
     actor = node->actor;
@@ -27,29 +28,29 @@ void SceneActorRegistry_ResetCategoryControl(void)
         do {
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
             if (!unavailable) {
-                u32 category = actor->category;
+                u32 category = actor->base.category;
                 if (category == 4 || category == 1 || category == 3) {
-                    const void *control = actor->control5F4;
-                    actor->field2B2 = one;
-                    actor->field2B0 = zero;
-                    actor->unknown2B5[0] = five;
-                    actor->control = control;
-                    actor->field2C8 = zero;
+                    const void *control = actor->group.routePhaseCallback;
+                    actor->base.field2B2 = one;
+                    actor->base.field2B0 = zero;
+                    actor->base.field2B5 = five;
+                    actor->base.target = control;
+                    actor->base.field2C8 = zero;
                     {
-                        u32 *flags = &actor->flags114;
+                        u32 *flags = &actor->base.flags114;
                         u32 mask = ~1;
                         u32 value;
                         value = *flags;
                         value &= mask;
                         *flags = value;
                     }
-                    actor->field104 = zero;
-                    actor->state2A8 = zero;
-                    actor->phase2A9 = zero;
-                    actor->behavior2AA = three;
-                    actor->counter2AC = zero;
-                    actor->field2B1 = one;
-                    actor->flags2D0 |= status;
+                    actor->base.word104 = zero;
+                    actor->base.state2A8 = zero;
+                    actor->base.phase2A9 = zero;
+                    actor->base.behavior2AA = three;
+                    actor->base.counter2AC = zero;
+                    actor->base.field2B1 = one;
+                    actor->base.flags2D0 |= status;
                 }
             }
             node = node->next;

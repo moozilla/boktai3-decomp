@@ -2,11 +2,11 @@
 #include "scene_actor_registry.h"
 void sub_080ED328(void);
 void Ivy_OnSecondaryContact(void);
-void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryActor *, void *, void *,
-                                           void (*)(void), struct SceneActorRegistryActor *, u32);
-void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *,
-                                    void (*)(void), u32, struct SceneActorRegistryActor *);
-void SceneActor_InitCollision5005(struct SceneActorRegistryActor *actor)
+void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *, void *, void *, void (*)(void),
+                                           struct ChaseActor *, u32);
+void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void (*)(void), u32,
+                                    struct ChaseActor *);
+void SceneActor_InitCollision5005(struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition bodySize, bodyOffset, attackSize, attackOffset;
     bodySize.packed.x = 0x40;

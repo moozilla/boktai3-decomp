@@ -4,15 +4,15 @@ void SceneActorRegistry_SendToCategoryPaletteOffset(u8 category, u8 palette, voi
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     if (node) {
         while (node->next) {
-            struct SceneActorRegistryActor *actor = node->actor;
-            if (actor->category == category) {
-                if (actor->paletteOffset != palette) {
+            struct ChaseActor *actor = node->actor;
+            if (actor->base.category == category) {
+                if (actor->base.paletteOffset != palette) {
                     node = node->next;
                     continue;
                 }
                 {
                     void *callback;
-                    callback = actor->messageCallback;
+                    callback = actor->base.messageCallback;
                     if (callback)
                         sub_08249240(actor, data, callback);
                 }

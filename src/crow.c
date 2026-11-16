@@ -94,31 +94,31 @@ static inline u8 Crow_TestAnimationFlags(struct Crow *state, u32 mask)
     return 0;
 }
 
-void Crow_UpdatePeriodicAnimation(struct SceneActorRegistryActor *actor, s32 tick)
+void Crow_UpdatePeriodicAnimation(struct ChaseActor *actor, s32 tick)
 {
-    struct Crow *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    struct Crow *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     } else if (!Crow_TestAnimationFlags(state, 4)) {
         if (!Mod(tick, 90)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 15);
             state->wanderTicks += 40;
-        } else if (actor->field2B3) {
+        } else if (actor->base.restart) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         }
     }
 }
 
-void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor)
+void Crow_UpdateAnimationSequence(struct ChaseActor *actor)
 {
-    struct Crow *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    struct Crow *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 16);
         state->sequencePhase = 0;
     }
     if (state->sequencePhase)
         Crow_PlayAnimationCue((u8 *)actor);
-    if (actor->field2B3) {
+    if (actor->base.restart) {
         switch (state->sequencePhase) {
             case 0:
             case 1:
@@ -127,7 +127,7 @@ void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor)
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 14);
                 break;
             case 5:
-                actor->field2B0 = 1;
+                actor->base.field2B0 = 1;
                 return;
         }
         state->sequencePhase++;
@@ -326,7 +326,7 @@ void Bestiary_UnlockEntry(void *);
 
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 

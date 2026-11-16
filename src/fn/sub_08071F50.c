@@ -11,7 +11,7 @@ static inline u32 ReadMasked(u32 mask, u32 *field)
 {
     return *field & mask;
 }
-static inline u8 Unavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
+static inline u8 Unavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
 {
     return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
@@ -26,29 +26,29 @@ static inline s32 ReadSignedByte(const s8 *input)
     encoded <<= 24;
     return (s32)encoded >> 24;
 }
-static inline void BindPalette(struct SceneActorRegistryActor *actor,
+static inline void BindPalette(struct ChaseActor *actor,
                                struct SceneActorPaletteTransition *inputTransition)
 {
     register struct SceneActorPaletteTransition *transition asm("r12") = inputTransition;
-    if (actor->drawableKind == 0) {
-        void *drawable = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        void *drawable = actor->base.drawable;
         const u16 *colors;
         colors = transition->colors;
         ((struct SceneActorPaletteSequenceView *)drawable)->palette = colors;
     } else {
-        void *drawable = actor->drawable;
+        void *drawable = actor->base.drawable;
         const u16 *colors;
         colors = transition->colors;
         ((struct SceneActorPaletteTileView *)drawable)->palette = colors;
     }
 }
 u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *inputManager,
-                                      struct SceneActorRegistryActor *inputActor)
+                                      struct ChaseActor *inputActor)
 {
     struct SceneActorPaletteManagerView *manager = inputManager;
     register struct SceneActorPaletteTransition *transition asm("r12");
-    struct SceneActorRegistryActor *actorInput = inputActor;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actorInput = inputActor;
+    struct ChaseActor *actor;
     u32 alreadyAdvanced;
     u32 category;
     register u32 categoryFlags asm("r1");
@@ -73,7 +73,7 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
             goto failure;
     }
     alreadyAdvanced = 0;
-    category = actor->category;
+    category = actor->base.category;
     if (category == 10)
         goto category10;
     if (category != 23)
@@ -88,7 +88,7 @@ selected:
     if (flagSet)
         alreadyAdvanced = 1;
     if (!Remaining(transition)) {
-        if (!ReadMasked(0x02008000, &actor->flags2CC))
+        if (!ReadMasked(0x02008000, &actor->base.flags2CC))
             BindPalette(actor, transition);
         goto success;
     }

@@ -1,5 +1,5 @@
 #include "scene_actor_behavior.h"
-u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
+u8 SceneActorBehavior_IsNearParticipant(struct ChaseActor *);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)

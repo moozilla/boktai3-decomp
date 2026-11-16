@@ -28,7 +28,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         u8 *drawable = actor->base.drawable;
         u32 zero = 0;
         drawable[7] = 2;
-        ((struct SceneActorRegistryActor *)actor)->field178 = zero;
+        ((struct ChaseActor *)actor)->base.colliderA.responseValue = zero;
         showActor(actor);
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
         clearColliderFlag(&actor->base.flags2C0);

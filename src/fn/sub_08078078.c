@@ -5,7 +5,7 @@ struct SceneActorBehaviorContactObject {
     u8 unknown0[12];
     struct ContactPosition position;
 };
-u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
+u8 SceneActorBehavior_IsNearParticipant(struct ChaseActor *actor)
 {
     struct ContactPackedVector difference;
     s32 index = 0;
@@ -22,12 +22,12 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
     do {
         player = *cursor;
         if (player) {
-            difference.x = (u16)actor->position.x - (u16)player->position.x;
+            difference.x = (u16)actor->base.body.position.x - (u16)player->position.x;
             distance = difference.x;
             if (distance < 0)
                 distance = -distance;
             if (distance <= 255) {
-                difference.z = (u16)actor->position.z - (u16)player->position.z;
+                difference.z = (u16)actor->base.body.position.z - (u16)player->position.z;
                 distance = difference.z;
                 if (distance < 0)
                     distance = -distance;
@@ -41,7 +41,7 @@ u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *actor)
 playersDone:
     node = SceneActorContacts_FindNodeByKind(4);
     if (node) {
-        u16 *positionX = (void *)&actor->position.x;
+        u16 *positionX = (void *)&actor->base.body.position.x;
         struct SceneActorBehaviorContactObject *object;
         object = node->object;
         difference.x = *positionX - (u16)object->position.x;
@@ -49,7 +49,7 @@ playersDone:
         if (distance < 0)
             distance = -distance;
         if (distance <= 255) {
-            difference.z = (u16)actor->position.z - (u16)object->position.z;
+            difference.z = (u16)actor->base.body.position.z - (u16)object->position.z;
             distance = difference.z;
             if (distance < 0)
                 distance = -distance;

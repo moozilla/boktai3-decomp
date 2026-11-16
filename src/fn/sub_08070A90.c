@@ -1,9 +1,9 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
-static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 disabled)
+void SceneActorRegistry_SetMovementMode(struct ChaseActor *, s32);
+static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 disabled)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u32 value = *flags;
     u32 mask = disabled;
     value &= mask;
@@ -13,12 +13,12 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **save
     {
         u32 value;
         mask = 0x20000;
-        value = actor->flags2D0;
+        value = actor->base.flags2D0;
         value &= mask;
         if (value)
             goto one;
     }
-    if (actor->health > 0)
+    if (actor->base.health > 0)
         goto zero;
 one:
     return 1;
@@ -28,7 +28,7 @@ zero:
 void SceneActorRegistry_SetMovementModesFromScript(void)
 {
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     s32 mode;
     if (!SceneActorRegistry_GetManager())
         return;

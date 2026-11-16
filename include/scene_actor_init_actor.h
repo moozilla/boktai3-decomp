@@ -5,10 +5,10 @@
 #include "scene_actor_init_primitives.h"
 #include "game_state.h"
 
-struct SceneActorRegistryActor;
+struct ChaseActor;
 void SceneActorControl_OnIdle(u8 *actor);
 s32 Region_FindContaining(void *position);
-void SceneActorRegistry_RegisterCategoryReceiver(struct SceneActorRegistryActor *actor);
+void SceneActorRegistry_RegisterCategoryReceiver(struct ChaseActor *actor);
 
 static inline u32 MonsterInit_GetTerrainCell(struct ChaseActor *actor)
 {

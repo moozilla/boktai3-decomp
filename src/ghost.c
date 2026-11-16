@@ -1403,9 +1403,9 @@ u8 Ghost_SelectRandomRouteEntry(struct SceneActorRouteCursor *cursor)
     return 1;
 }
 
-struct SceneActorRegistryActor;
+struct ChaseActor;
 
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 
@@ -2354,7 +2354,7 @@ finish:
     return 1;
 }
 
-u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
+u8 SceneActorBehavior_IsNearParticipant(struct ChaseActor *);
 
 static inline u32 Ghost_ReadColliderControl(u32 mask, u16 *control)
 {

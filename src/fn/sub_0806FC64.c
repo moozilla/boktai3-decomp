@@ -4,10 +4,10 @@ void SceneActorRegistry_SendToCategory(u8 a, void *data)
     struct SceneActorRegistryNode *n = gSceneActorRegistryNode;
     if (n != 0) {
         while (n->next != 0) {
-            struct SceneActorRegistryActor *o = n->actor;
+            struct ChaseActor *o = n->actor;
             void *callback;
-            if (o->category == a) {
-                if ((callback = o->messageCallback) != 0)
+            if (o->base.category == a) {
+                if ((callback = o->base.messageCallback) != 0)
                     sub_08249240(o, data, callback);
             }
             n = n->next;

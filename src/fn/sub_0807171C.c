@@ -91,7 +91,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     }
 }
 
-void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *argument)
+void SceneActorRegistry_ResetRoute(struct ChaseActor *argument)
 {
     SceneActorRegistry_ResetRouteState((void *)argument);
 }

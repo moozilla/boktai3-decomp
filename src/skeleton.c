@@ -15,7 +15,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
         else
             Sound_PlaySong(0x13E);
     }
-    SceneActorScript_TriggerCallOnCount((struct SceneActorRegistryActor *)actor);
+    SceneActorScript_TriggerCallOnCount((struct ChaseActor *)actor);
     if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x2000)) {
         actor->chase.base.body.direction = actor->chase.base.reactionDirection + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
@@ -237,20 +237,20 @@ static inline u8 sameRegion(u16 *region)
     return 0;
 }
 
-static inline u32 flags16(struct SceneActorRegistryActor *actor, u32 mask)
+static inline u32 flags16(struct ChaseActor *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
-static inline u32 flags32(struct SceneActorRegistryActor *actor, u32 mask)
+static inline u32 flags32(struct ChaseActor *actor, u32 mask)
 {
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
 
-static inline u8 unavailable(struct SceneActorRegistryActor *actor)
+static inline u8 unavailable(struct ChaseActor *actor)
 {
     if (actor) {
-        if (flags16(actor, 0x40) || flags32(actor, 0x20000) || actor->health <= 0)
+        if (flags16(actor, 0x40) || flags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -279,7 +279,7 @@ static inline u8 pending(struct Skeleton *actor)
     return 0;
 }
 
-s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *actor)
+s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
 {
     struct Skeleton *state = (void *)actor;
     struct SceneActorRegistryControlGroup *block = &state->chase.group.common;
@@ -287,25 +287,25 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *actor)
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
-    if (!(test(2, actor->flags2CC))) {
-        if (!sameRegion(&actor->regionId)) {
+    if (!(test(2, actor->base.flags2CC))) {
+        if (!sameRegion(&actor->base.regionId)) {
             SceneActorPlacement_HideActor(actor, 0);
             return 0;
         }
         if (!unavailable(actor) && !pending(state)) {
-            if (!(u8)Callback_InvokeActor(actor, actor->activeCallback264))
+            if (!(u8)Callback_InvokeActor(actor, actor->base.damageCallback))
                 Callback_InvokeActor(actor, block->fallback);
         }
         SceneActorBehavior_DispatchPendingFlags(actor);
         SceneActor_UpdateStatus(actor);
-        dispatch(&actor->contextCallback274, actor->context);
+        dispatch(&actor->base.contextCallback, actor->base.context);
         SceneActorBehavior_UpdateTimersAndContacts(actor);
         SceneActorMotion_Update(actor);
         SceneActorPlacement_ConsumeShakeFlags(actor);
         SceneActorTarget_OnBindingChanged(actor);
         return 1;
     } else {
-        if (!(actor->flags2CC & 1) && sameRegion(&actor->regionId))
+        if (!(actor->base.flags2CC & 1) && sameRegion(&actor->base.regionId))
             SceneActorPlacement_ShowActor(actor, 0);
         SceneActorTarget_OnBindingChanged(actor);
     }
@@ -501,7 +501,7 @@ s32 Skeleton_Init(void *object)
         MonsterInit_SetMotionFlags(actor, 0x800);
 
     SkeletonInit_InstallCompletionCallbacks(actor);
-    if (!SceneActorRegistry_LinkActor((struct SceneActorRegistryActor *)actor))
+    if (!SceneActorRegistry_LinkActor((struct ChaseActor *)actor))
         return -1;
     return 0;
 }

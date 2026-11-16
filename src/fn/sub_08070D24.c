@@ -1,8 +1,7 @@
 #include "scene_actor_registry.h"
-static inline s16 IsUnavailable(struct SceneActorRegistryActor *input, u32 disabledInput,
-                                u32 excludedInput)
+static inline s16 IsUnavailable(struct ChaseActor *input, u32 disabledInput, u32 excludedInput)
 {
-    struct SceneActorRegistryActor *actor = input;
+    struct ChaseActor *actor = input;
     u32 disabled = disabledInput;
     u32 excluded = excludedInput;
     if (actor) {
@@ -26,7 +25,7 @@ static inline s16 IsUnavailable(struct SceneActorRegistryActor *input, u32 disab
             if (value)
                 goto one;
         }
-        if (actor->health > 0)
+        if (actor->base.health > 0)
             goto clear;
     one:
         return 1;
@@ -34,26 +33,25 @@ static inline s16 IsUnavailable(struct SceneActorRegistryActor *input, u32 disab
 clear:
     return 0;
 }
-struct SceneActorRegistryActor *
-SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *input)
+struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *input)
 {
     const struct ContactPosition *position = input;
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-    struct SceneActorRegistryActor *actor = node->actor;
+    struct ChaseActor *actor = node->actor;
     s32 bestDistance = 10000000;
-    struct SceneActorRegistryActor *best = 0;
+    struct ChaseActor *best = 0;
     if (actor) {
         u32 disabled = 0x40;
         u32 excluded = 0x20000;
         struct ContactPosition difference;
         struct ContactPosition *delta = &difference;
         do {
-            u32 category = actor->category;
+            u32 category = actor->base.category;
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
 
             if (!unavailable && (category == 4 || category == 1 || category == 3) &&
-                actor->unknown2B5[0] != 21) {
-                const struct ContactPosition *right = &actor->position;
+                actor->base.field2B5 != 21) {
+                const struct ContactPosition *right = &actor->base.body.position;
                 s32 x;
                 s32 z;
                 s32 xSquare;

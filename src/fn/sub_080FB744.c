@@ -14,7 +14,7 @@ struct AxePaletteContext {
     u8 unk_708[0x744];
     u32 flags;
 };
-void Axe_SetAuxiliarySpriteResource(struct SceneActorRegistryActor *, const u16 *);
+void Axe_SetAuxiliarySpriteResource(struct ChaseActor *, const u16 *);
 
 static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
 {
@@ -30,10 +30,9 @@ static inline s32 Axe_ChannelValue(s32 value)
 {
     return value >= 0 ? value >> 8 : -(-value >> 8);
 }
-static inline void Axe_BindPalette(struct SceneActorRegistryActor *actor,
-                                   struct AxePaletteTransition *p)
+static inline void Axe_BindPalette(struct ChaseActor *actor, struct AxePaletteTransition *p)
 {
-    ((struct SceneActorPaletteSequenceView *)actor->drawable)->palette = p->colors;
+    ((struct SceneActorPaletteSequenceView *)actor->base.drawable)->palette = p->colors;
     Axe_SetAuxiliarySpriteResource(actor, p->colors);
 }
 static inline u32 Axe_ReadBindingFlags(u32 *const *flags, u32 mask)
@@ -47,15 +46,15 @@ static inline s16 *Axe_UpdateRedSlot(s16 *const *values, s16 *const *deltas, s32
     return slot;
 }
 static inline void Axe_GetPaletteUpdateHandles(s16 **deltas, u32 **flags, s16 **values,
-                                               struct SceneActorRegistryActor *actor,
+                                               struct ChaseActor *actor,
                                                struct AxePaletteTransition *transition)
 {
-    *flags = &actor->flags2CC;
+    *flags = &actor->base.flags2CC;
     *values = transition->red;
     *deltas = transition->deltaRed;
 }
 // confidence=low: advances the palette transition and binds its colors when the actor flags allow it.
-u32 Axe_UpdatePaletteTransition(struct SceneActorRegistryActor *actor)
+u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
 {
     struct AxePaletteContext *context;
     struct AxePaletteTransition *p;
@@ -65,12 +64,12 @@ u32 Axe_UpdatePaletteTransition(struct SceneActorRegistryActor *actor)
     u32 *actorFlags;
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return 0;
-    context = actor->context;
+    context = actor->base.context;
     if (!Axe_TestFlags(Axe_ReadMaskedFlags(2, &context->flags), ~0))
         return 0;
     p = &context->transition;
     if (!p->remaining) {
-        if (!Axe_ReadMaskedFlags(0x02008000, &actor->flags2CC))
+        if (!Axe_ReadMaskedFlags(0x02008000, &actor->base.flags2CC))
             Axe_BindPalette(actor, p);
         return 1;
     }

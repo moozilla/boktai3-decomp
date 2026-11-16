@@ -3,17 +3,15 @@
 void Dog_OnBodyCollision(void);
 void Dog_OnSensorContact(void);
 void Dog_OnAttackContact(void);
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
-void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *, void *, u32,
-                                    void *);
-void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *,
-                                            struct ContactCollider *, void *, void *, void *, u32,
-                                            void *);
-void SceneActorCollision_InitGateColliders(struct SceneActorRegistryActor *actor)
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void *, u32, void *);
+void SceneActorCollision_InitExternalAttack(struct ChaseActor *, struct ContactCollider *, void *,
+                                            void *, void *, u32, void *);
+void SceneActorCollision_InitGateColliders(struct ChaseActor *actor)
 {
     struct ContactPackedVector bodySize, bodyOffset, attackSize, attackOffset, externalSize,
         externalOffset;
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     bodySize.x = 0x40;
     bodySize.y = 0x80;
     bodySize.z = 0x40;

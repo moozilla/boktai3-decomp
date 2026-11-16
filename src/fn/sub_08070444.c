@@ -11,7 +11,7 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     s32 category = inputCategory;
     s32 field = inputField;
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     s32 count;
     SceneActorRegistry_GetManager();
     node = gSceneActorRegistryNode;
@@ -20,11 +20,11 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     if (actor) {
         u32 mask = 0x20000;
         do {
-            if (actor->health > 0) {
+            if (actor->base.health > 0) {
                 u32 offset = 0x2d0;
                 u32 *flags;
                 flags = (void *)((u8 *)actor + offset);
-                if (!(*flags & mask) && actor->category == category) {
+                if (!(*flags & mask) && actor->base.category == category) {
                     offset -= 0xea;
                     {
                         u16 *criterion = (void *)(((u8 *)actor) - (-offset));

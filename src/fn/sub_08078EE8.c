@@ -202,7 +202,7 @@ static inline s16 ActorStatus_AttachmentRestart(struct ChaseActor *actor)
 
 static inline void ActorStatus_Wake(struct ChaseActor *actor)
 {
-    const struct SceneActorRegistryActor *identity = (void *)actor;
+    const struct ChaseActor *identity = (void *)actor;
 
     /* wake-up transition when the stun flag is set */
     if (!(ActorStatus_MotionFlags(actor, 0x40)) && !(ActorStatus_StatusFlags(actor, 0x20000)) &&
@@ -221,7 +221,7 @@ static inline void ActorStatus_Wake(struct ChaseActor *actor)
             if (!SceneEnvironment_LinkMode() && !ActorStatus_StatusFlags((void *)identity, 0x800))
                 SceneActorRecord_RecordPair(
                     gScriptEntryProcedure,
-                    (u16)((const struct SceneActorRegistryActor *)identity)->id);
+                    (u16)((const struct ChaseActor *)identity)->base.body.id);
         } else if (ActorStatus_BehaviorFlags(actor, 0x200)) {
             SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
             SceneActorChase_SetState(actor, 3, 0, 0);
@@ -415,9 +415,9 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
         Callback_InvokeActor(object, ((struct ChaseActor *)object)->group.interactionCallback);
 }
 
-s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *actor)
+s32 SceneActor_UpdateStatus(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryActor *arg0 = (void *)actor;
+    struct ChaseActor *arg0 = (void *)actor;
     if (ActorStatus_StatusFlags(arg0, 0x2000))
         ((struct ChaseActor *)arg0)->base.field2C2 = 0x15;
     ActorStatus_TickRouteControl(&((struct ChaseActor *)arg0)->group.common.control);

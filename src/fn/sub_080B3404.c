@@ -9,9 +9,9 @@ struct VornData {
     u16 field6EC;
 };
 
-void Vorn_TickSound(struct SceneActorRegistryActor *actor)
+void Vorn_TickSound(struct ChaseActor *actor)
 {
-    struct VornData *ctx = (struct VornData *)actor->context;
+    struct VornData *ctx = (struct VornData *)actor->base.context;
 
     if (ctx->field6EC == 0) {
         struct SceneVec *vec;
@@ -20,7 +20,7 @@ void Vorn_TickSound(struct SceneActorRegistryActor *actor)
         Sound_PlaySong(0x1CF);
         vec = Player_GetEffectivePosition(0);
         if (vec != 0) {
-            SceneStimulus_AddTagged(vec->x, vec->z, 0, 0, 0x80, (u16)actor->id);
+            SceneStimulus_AddTagged(vec->x, vec->z, 0, 0, 0x80, (u16)actor->base.body.id);
         }
     } else {
         ctx->field6EC--;

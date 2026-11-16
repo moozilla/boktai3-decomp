@@ -17,7 +17,7 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 16);
     }
     if (actor->base.restart) {
-        ((struct SceneActorRegistryActor *)actor)->field178 = 0;
+        ((struct ChaseActor *)actor)->base.colliderA.responseValue = 0;
         actor->base.field2B0 = 1;
         if (!actor->base.drawableKind)
             *(u32 *)actor->base.drawable |= 1;

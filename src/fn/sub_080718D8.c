@@ -16,7 +16,7 @@ static inline u8 SceneActorRegistry_HasNoObject(struct ChaseActor *actor)
         return 1;
     return 0;
 }
-void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *argument)
+void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
 {
     struct ChaseActor *actor = (void *)argument;
     u32 *flags;

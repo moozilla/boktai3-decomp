@@ -1,6 +1,6 @@
 #include "scene_actor_collision.h"
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *actor, void *inputSize,
-                                  void *inputOffset, void *inputCallback, void *owner)
+void SceneActorCollision_InitBody(struct ChaseActor *actor, void *inputSize, void *inputOffset,
+                                  void *inputCallback, void *owner)
 {
     void *size = inputSize;
     void *offset = inputOffset;
@@ -10,11 +10,11 @@ void SceneActorCollision_InitBody(struct SceneActorRegistryActor *actor, void *i
         u32 colliderOffset = 0x134;
         collider = (void *)((u8 *)actor + colliderOffset);
     }
-    Collider_Init(collider, (u16)actor->id, 0x5109, 0, 16, size, offset);
+    Collider_Init(collider, (u16)actor->base.body.id, 0x5109, 0, 16, size, offset);
     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),
                                SceneActorCollision_ReadBodyReactionFlags(actor),
                                SceneActorCollision_ReadBodyField34(actor));
-    Collider_SetPosition(collider, &actor->position, 0);
+    Collider_SetPosition(collider, &actor->base.body.position, 0);
     Collider_SetCallback(collider, callback, owner);
     Collider_Refresh(collider);
 }

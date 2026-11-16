@@ -1,5 +1,5 @@
 #include "scene_actor_placement.h"
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *argument)
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *argument)
 {
     struct RoomActor *actor = (void *)argument;
     u32 mask = 0x400000;

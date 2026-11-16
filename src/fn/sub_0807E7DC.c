@@ -14,12 +14,12 @@ static inline s32 GetCell(struct SceneActorRouteTargetPosition *p)
         return 0;
     return gTerrainMap->rows[z] + x;
 }
-void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *actor)
+void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
 {
     /* This local vector has halfword alignment; aggregate copies are not used. */
     struct SceneActorRouteTargetPosition target;
-    struct SceneActorRegistryActor *owner = actor;
-    struct SceneActorRegistryActor *base = owner;
+    struct ChaseActor *owner = actor;
+    struct ChaseActor *base = owner;
     u8 *control = (u8 *)owner + 0x3D4;
     void *context;
     {
@@ -34,20 +34,20 @@ void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryActor *act
         cell = GetCell(p);
         p->y = SceneActorTerrain_GetHeight(cell, (const struct ContactPosition *)p);
     }
-    target.y = base->position.y;
+    target.y = base->base.body.position.y;
     context = *(void **)(control + 0x1FC);
-    if (!Nav_IsPositionInMesh(context, &base->position, &target))
+    if (!Nav_IsPositionInMesh(context, &base->base.body.position, &target))
         goto failed;
     {
-        u32 result = Terrain_ApplyBlocked(context, &base->position, &target);
+        u32 result = Terrain_ApplyBlocked(context, &base->base.body.position, &target);
         if (!result)
             goto failed;
         if (result != 2)
-            Memory_Clear(&owner->velocity, 8);
+            Memory_Clear(&owner->base.body.motion, 8);
     }
     goto done;
 failed: {
-    u16 *flags = &owner->flags2D4;
+    u16 *flags = &owner->base.flags2D4;
     u32 mask = ~0x200;
     mask &= *flags;
     *flags = mask;

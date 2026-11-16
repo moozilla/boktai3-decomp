@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
-struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
-void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryActor *, s32);
-static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor)
+struct ChaseActor *SceneActorRegistry_FindById(u32);
+void SceneActorRegistry_SetMovementMode(struct ChaseActor *, s32);
+static inline u8 HasMovementFlag(struct ChaseActor *actor)
 {
     u32 mask = 0x100;
     u32 offset = 0x2c0;
@@ -16,7 +16,7 @@ void SceneActorRegistry_SetScriptActorMovementMode(void)
     u32 id = Script_GetKeywordValue('n', 0);
     s32 mode = Script_GetKeywordValue('d', 0);
     if (id) {
-        struct SceneActorRegistryActor *actor = SceneActorRegistry_FindById(id);
+        struct ChaseActor *actor = SceneActorRegistry_FindById(id);
         if (actor) {
             u32 enabled = HasMovementFlag(actor);
             if (enabled)

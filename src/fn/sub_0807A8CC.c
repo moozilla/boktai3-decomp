@@ -5,7 +5,7 @@
 #include "scene_actor_chase_types.h"
 #include "player_cue_sequence.h"
 void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *);
+void SceneActorMovement_UpdateHeight(struct ChaseActor *);
 void Obj_StepPosition(void *);
 struct RepeatedEffectPosition;
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
@@ -94,7 +94,7 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
             &((struct SceneActorMotionSequence *)actor->base.drawable)->sequence);
     return ((struct SceneActorMotionTile *)actor->base.drawable)->elapsed;
 }
-s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
+s32 SceneActorMotion_Update(struct ChaseActor *object)
 {
     struct ChaseActor *actor = (void *)object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;

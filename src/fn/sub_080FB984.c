@@ -29,9 +29,9 @@ struct AnimatedSpriteView {
     u16 priority;
     u8 unknown34[0x2c];
 };
-void SpriteGroup_InitAnimatedSprites(struct SceneActorRegistryActor *owner)
+void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner)
 {
-    struct AnimatedSpriteGroup *group = owner->context;
+    struct AnimatedSpriteGroup *group = owner->base.context;
     u16 zero = 0;
     struct AnimatedSpriteAnimation *animation = &group->sprites[0].animation;
     struct AnimatedSpriteView *sprite = (void *)group->sprites;

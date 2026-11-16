@@ -92,7 +92,7 @@ void Bee_GetDirectionalFrameAndFlip(u16 a, s32 *b, s32 *c);
 void Bee_TickBehaviorCooldown(struct ChaseActor *actor);
 void Bee_BuildMovementCurve(struct ChaseActor *actor, struct ContactPosition *target);
 void *Bee_SubVector(void *unused, struct BeeDisplacement *a, struct BeeDisplacement *b);
-void SceneActorCollision_FireSecondaryAttack(struct SceneActorRegistryActor *actor);
+void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor);
 u32 Bee_OnDetectionCheck(struct ChaseActor *actor);
 void Slime_SetStateFlag(struct ChaseActor *actor);
 u32 Bee_GetMovementVariant(struct ChaseActor *actor);

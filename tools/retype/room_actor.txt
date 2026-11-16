@@ -49,7 +49,6 @@ velocity body.motion
 defense9F field9F
 reactionA0 fieldA0
 gate tracking
-object target
 savedControl104 word104
 allocation108 word108
 allocationArgument10C word10C
@@ -100,8 +99,51 @@ shadow320 shadow
 [types]
 SceneActorRegistryResetView ChaseActor
 
+# SceneActorRegistryActor was a chase actor view (base and group). Base names map to the
+# base's names here; the embedding below adds `base.`.
+[types]
+SceneActorRegistryActor ChaseActor
+[map]
+id body.id
+position body.position
+velocity body.motion
+effectDurationB8 attacks.first[2]
+effectParameterC0 attacks.second[2]
+distanceTarget tracking.target
+field104 word104
+field178 colliderA.responseValue
+control target
+defaultControl savedTarget
+update updateCallback
+destroy destroyCallback
+activeCallback264 damageCallback
+contextCallback274 contextCallback
+field2B3 restart
+livingCountByCategory profileMode
+profileIndex profileId
+flags414 group.common.gate.flags
+field416 group.common.gate.duration
+field418 group.common.gate.counter
+distanceTargetLock group.common.control.field14
+distanceTargetIdentity group.common.control.counter
+fallbackCallback444 group.common.fallback
+field450 group.homeRoute.point
+pathId group.homeRoute.routeId
+pathPointIndex group.homeRoute.pointId
+effectConfig group.effectConfig
+effectOrigin group.effectOrigin
+field570 group.field570
+field574 group.field574
+field5DC group.contactControl
+control5F4 group.routePhaseCallback
+unknown2B5 field2B5
+
 # The monster structs and ChaseActor embed struct RoomActor as `base`.
 [embed RoomActor base]
+
+# RegistryActor's unknown2B5[0] is field2B5 (its unknown3D4 block is &group.common).
+[text]
+base.field2B5[0] base.field2B5
 
 # Last: the chase classes (Skeleton, Vorn, Golem, Mummy, Dog) embed struct ChaseActor
 # as `chase`, and pass `&actor->chase` where chase code takes a ChaseActor.

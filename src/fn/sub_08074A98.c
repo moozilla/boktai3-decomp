@@ -2,9 +2,9 @@
 #include "scene_actor_registry.h"
 #include "player.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-static inline u32 TerrainHeight(struct SceneActorRegistryActor *actor, u32 index)
+static inline u32 TerrainHeight(struct ChaseActor *actor, u32 index)
 {
-    const struct ContactPosition *position = &actor->position;
+    const struct ContactPosition *position = &actor->base.body.position;
     u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
     u32 kind, height;
     if (cell)
@@ -32,15 +32,15 @@ static inline u8 IsPlayerRelativeCategory(u32 c)
         return 1;
     return 0;
 }
-static inline u8 HasSceneFlag(struct SceneActorRegistryActor *actor, u32 mask)
+static inline u8 HasSceneFlag(struct ChaseActor *actor, u32 mask)
 {
     if (((struct ChaseActor *)actor)->base.flags2C0 & mask)
         return 1;
     return 0;
 }
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
+void SceneActorMovement_UpdateHeight(struct ChaseActor *actor)
 {
-    u32 category = actor->category;
+    u32 category = actor->base.category;
     if (category == 0x16) {
         u32 height = TerrainHeight(actor, ((struct ChaseActor *)actor)->base.terrainCell);
         u16 *ground = (void *)((u8 *)actor + 0x2be);
@@ -51,7 +51,7 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
         *ground = height;
     } else {
         u32 mask = 0x4000;
-        if (!(actor->flags2D4 & mask) && IsPlayerRelativeCategory(category)) {
+        if (!(actor->base.flags2D4 & mask) && IsPlayerRelativeCategory(category)) {
             u32 height = (u16)gPlayers[0]->position.y;
             ((struct ChaseActor *)actor)->base.groundHeight = height;
         } else {
@@ -61,11 +61,13 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
     }
     if (!HasSceneFlag(actor, 0x20)) {
         u16 height = ((struct ChaseActor *)actor)->base.groundHeight;
-        actor->position.y = height;
-        actor->position.y = height + ((struct ChaseActor *)actor)->base.field2EA;
+        actor->base.body.position.y = height;
+        actor->base.body.position.y = height + ((struct ChaseActor *)actor)->base.field2EA;
     }
-    if (actor->drawableKind == 0)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;
+    if (actor->base.drawableKind == 0)
+        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->position;
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
 }

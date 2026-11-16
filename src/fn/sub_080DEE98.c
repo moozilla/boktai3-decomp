@@ -18,7 +18,7 @@ void SceneActorControl_CallContextScript(struct RoomActor *actor)
         if (*field & mask)
             return;
     }
-    context = ((struct SceneActorRegistryActor *)actor)->context;
+    context = ((struct ChaseActor *)actor)->base.context;
     if (!actor->script1F4)
         return;
     values[0] = actor->body.position.x;

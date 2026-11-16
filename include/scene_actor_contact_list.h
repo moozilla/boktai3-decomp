@@ -13,7 +13,7 @@ struct SceneActorContactGateView {
     u8 unknown10[0x14];
     u32 enabled;
 };
-void SceneActorContacts_SetDistanceGate(struct SceneActorRegistryActor *,
-                                        struct SceneActorContactGateView *, u32, u32, u32, u32);
+void SceneActorContacts_SetDistanceGate(struct ChaseActor *, struct SceneActorContactGateView *,
+                                        u32, u32, u32, u32);
 void SceneActorContacts_ReleaseNode(struct SceneActorContactNode *);
 #endif

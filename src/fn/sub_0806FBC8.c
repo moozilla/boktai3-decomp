@@ -1,6 +1,6 @@
 #include "scene_actor_registry.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
-void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *actor)
+void SceneActorRegistry_UnlinkActor(struct ChaseActor *actor)
 {
     struct SceneActorRegistryManager *manager = SceneActorRegistry_GetManager();
     if (manager) {

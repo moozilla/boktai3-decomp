@@ -9,9 +9,9 @@ static inline s32 SceneActorScript_GetValue(void)
     return 0;
 }
 
-void SceneActorScript_ReadPParameters(struct SceneActorRegistryActor *actor)
+void SceneActorScript_ReadPParameters(struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
 
     if (Script_SeekToKeyword('P')) {
         s32 i;

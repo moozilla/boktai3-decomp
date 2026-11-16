@@ -73,7 +73,12 @@ struct SceneActorChaseGroup {
     u32 delay46C;
     void *callback470;
     void *attachment;
-    u8 unknown478[0x13E];
+    u8 unknown478[4];
+    u32 effectConfig[2];
+    const struct ContactPosition *effectOrigin;
+    u8 unknown488[0xE8];
+    void *field570, *field574;
+    u8 unknown578[0x3E];
     s16 halfHealth;
     struct ContactPosition motion5B8;
     u16 field5C0, field5C2, field5C4, field5C6;

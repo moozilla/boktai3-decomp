@@ -1,7 +1,7 @@
 #include "scene_actor_availability.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_init_actor.h"
-void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryActor *);
+void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;

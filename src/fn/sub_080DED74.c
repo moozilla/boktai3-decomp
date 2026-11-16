@@ -7,16 +7,16 @@ struct SceneActorActionCooldown {
     u8 unknown67C[0x14];
     u16 remaining, normalDelay, alternateDelay;
 };
-static inline u8 Unavailable(struct SceneActorRegistryActor *actor)
+static inline u8 Unavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if (actor->flags2D4 & mask)
+        if (actor->base.flags2D4 & mask)
             return 1;
         mask = 0x20000;
-        if (actor->flags2D0 & mask)
+        if (actor->base.flags2D0 & mask)
             return 1;
-        if (actor->health <= 0)
+        if (actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -32,42 +32,42 @@ static inline u32 MaskFlags(u32 value, u32 *p)
 {
     return *p & value;
 }
-static inline void QueueAction(struct SceneActorRegistryActor *actor)
+static inline void QueueAction(struct ChaseActor *actor)
 {
     u32 behavior = 15;
     u32 zero;
-    u8 *q = &actor->state2A8;
+    u8 *q = &actor->base.state2A8;
     zero = 0;
     *q = zero;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = zero;
-    actor->field2B1 = 1;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = 1;
     {
         u32 *flags;
         s32 mask;
         struct SceneActorActionCooldown *ctx;
-        ctx = actor->context;
+        ctx = actor->base.context;
         flags = &ctx->flags;
         mask = -2;
         *flags &= mask;
     }
 }
-void SceneActorControl_TickActionCooldown(struct SceneActorRegistryActor *actor)
+void SceneActorControl_TickActionCooldown(struct ChaseActor *actor)
 {
-    struct SceneActorActionCooldown *cooldown = actor->context;
+    struct SceneActorActionCooldown *cooldown = actor->base.context;
     u32 flags;
     if (Unavailable(actor))
         return;
     {
         u32 mask = 0xE33F;
-        flags = actor->flags2D4;
+        flags = actor->base.flags2D4;
         if (mask & flags)
             return;
     }
-    if (MaskFlags(0x10, &actor->flags2CC))
+    if (MaskFlags(0x10, &actor->base.flags2CC))
         return;
-    if (actor->unknown2B5[0] > 1)
+    if (actor->base.field2B5 > 1)
         return;
     if (cooldown->remaining) {
         cooldown->remaining--;
@@ -82,7 +82,7 @@ void SceneActorControl_TickActionCooldown(struct SceneActorRegistryActor *actor)
         u32 *p = &cooldown->flags;
         *p |= one;
     }
-    if (HasPending(&actor->context)) {
+    if (HasPending(&actor->base.context)) {
         QueueAction(actor);
     }
 }

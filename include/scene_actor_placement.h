@@ -9,9 +9,9 @@ struct SceneActorPlacementTileFlags {
     u32 flags;
 };
 /* Reset/placement phase; resetControl220 is observed separately from savedTarget22C. */
-void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
-void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
-void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *);
+void SceneActorRegistry_ResetRouteAndColliders(struct ChaseActor *);
+void SceneActorRegistry_ResetRoute(struct ChaseActor *);
+void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *);
 void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
 static inline u32 SceneActorPlacement_ReadFlags16(struct RoomActor *actor, u32 mask)
 {
@@ -52,5 +52,5 @@ static inline u8 SceneActorPlacement_TestMask(u32 mask, u32 flags)
         return 1;
     return 0;
 }
-void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryResponseSound(struct ChaseActor *);
 #endif

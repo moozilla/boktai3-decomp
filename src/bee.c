@@ -367,7 +367,7 @@ void Bestiary_UnlockEntry(void *);
 
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
@@ -1069,27 +1069,27 @@ void *Bee_SubVector(void *unused, struct BeeDisplacement *a, struct BeeDisplacem
 
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 
-static inline u32 Bee_AttackActorFlags(struct SceneActorRegistryActor *actor, u32 input, u32 offset)
+static inline u32 Bee_AttackActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
+    return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
-static inline u8 Bee_AttackUnavailable(struct SceneActorRegistryActor *actor)
+static inline u8 Bee_AttackUnavailable(struct ChaseActor *actor)
 {
     if (actor && (Bee_AttackActorFlags(actor, 0x40, 0x2D4) ||
-                  Bee_AttackActorFlags(actor, 0x20000, 0x2D0) || actor->health <= 0))
+                  Bee_AttackActorFlags(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
         return 1;
     return 0;
 }
 
-void SceneActorCollision_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
+void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor)
 {
     if (Bee_AttackUnavailable(actor))
         return;
     {
         u16 mask = 0x100;
-        if (mask & actor->flags2D4) {
+        if (mask & actor->base.flags2D4) {
             struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
             u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[1];
             u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[1];
