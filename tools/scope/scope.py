@@ -1053,6 +1053,11 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
               f" (not `f = (f | A) & ~B;`): each field store is an insert `(f & 0) | v`, and cse gives the"
               f" second one's 0 the held zero register, which combine cannot fold across blocks (README"
               f" fact 103)")
+    for i, ln, z in bitfield_zero_hints(rows_json)[:2]:
+        print(f"line {ln}: the ROM sets r{z} to 0 between a field's load and the or/and that is stored back;"
+              f" the draft has no such zero. It is the and-mask of a full-width bitfield store: update the"
+              f" field through a view like `struct {{ u16 bits : 16; }}` (`f->bits = A | f->bits;`), and"
+              f" later zero stores can reuse that register (README fact 25)")
     if untouched_r0_hint(rows_json):
         print("the ROM never writes r0 and calls nothing, the draft does: the caller's r0 (the first argument)"
               " stays live to the end. A non-void function with no return statement does that (its"
@@ -1948,6 +1953,15 @@ def small_sort_note(wd, func, blk):
         p = ln.split()
         if p[0] == "L" and p[1] == func and int(p[2]) == blk:
             qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    say1 = lambda q: f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]} (priority {qtys[q][1]})"
+    if sorted(qtys) == [0, 1] and qtys[1][1] > qtys[0][1]:
+        # Two qtys sort by priority, so qty 1 goes first. A third local value born after them with a
+        # lower priority than qty 1 (say a loaded value kept in its own temp, not a user variable)
+        # makes the hand sort's swaps cancel and allocates the first-born qty 0 first.
+        return (f"    block {blk} has two local quantities, allocated by priority: {say1(1)} before"
+                f" {say1(0)}. With a third local value born after them and a lower priority than the first"
+                f" (for example a loaded value multiplied at the call, so the load is a temp rather than a"
+                f" user variable), block_alloc's hand sort allocates the first-born {qtys[0][0]} first (fact 38)")
     if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
         return None
     used, real = small_sort_order([qtys[q][1] for q in range(3)])
@@ -2266,6 +2280,36 @@ def zero_orr_hints(rows):
         line = next((rows[k].get("line") for k in list(range(i, len(rows))) + list(range(i, -1, -1))
                      if rows[k].get("line")), "?")
         out.append((i, line, z))
+    return out
+
+
+def bitfield_zero_hints(rows):
+    """[(row index, line, zero register)] where the ROM has a `movs rZ, #0` the draft lacks, sitting
+    between a load (ldr/ldrh/ldrb) and the orrs/ands that combines with it, whose result is stored
+    back to the loaded address. That zero is the and-mask of a full-width bitfield store
+    (`f->bits = A | f->bits;` through a `u16 bits : 16` or `u8 bits : 8` view, README fact 25)."""
+    out = []
+    rom = [r["rom"] for r in rows]
+    for i, r in enumerate(rows):
+        if r["tag"] != "-":
+            continue
+        m = re.match(r"movs r(\d+), #0$", rom[i] or "")
+        if not m:
+            continue
+        load = next((k for k in range(i - 1, max(-1, i - 4), -1)
+                     if re.match(r"ldr[bh]? r\d+, \[r\d+", rom[k] or "")), None)
+        op = next((k for k in range(i + 1, min(len(rom), i + 4))
+                   if re.match(r"(orrs|ands) r\d+, r\d+$", rom[k] or "")), None)
+        if load is None or op is None:
+            continue
+        base = re.search(r"\[(r\d+(?:, #0x[0-9a-f]+)?)\]", rom[load]).group(1)
+        dest = re.match(r"(?:orrs|ands) (r\d+)", rom[op]).group(1)
+        if not any(re.match(rf"str[bh]? {dest}, \[{re.escape(base)}\]$", rom[k] or "")
+                   for k in range(op + 1, min(len(rom), op + 3))):
+            continue
+        line = next((rows[k].get("line") for k in list(range(i, len(rows))) + list(range(i, -1, -1))
+                     if rows[k].get("line")), "?")
+        out.append((i, line, int(m.group(1))))
     return out
 
 

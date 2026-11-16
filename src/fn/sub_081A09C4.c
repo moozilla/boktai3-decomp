@@ -1,16 +1,14 @@
 #include "hresvelgr_travel.h"
 
-// MATCHING_CONCESSION: register-pinning
 void ActionState_Reset(u8 *);
 void ActionState_AdvanceState(u8 *);
 void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, u32, u32, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void OffsetActor_StepTowardTarget(struct HresvelgrTravelActor *);
 void Sound_PlaySong(u32);
-void Hresvelgr_PlayDescent(void *p, int tick)
+/* Returns TRUE once the actor has reached the landing height. */
+static inline s32 Hresvelgr_Descend(struct HresvelgrTravelActor *actor)
 {
-    struct HresvelgrTravelActor *actor = p;
-    asm("" : "+r"(actor));
     {
         u32 mask = 0x200000;
         actor->flags |= mask;
@@ -27,9 +25,15 @@ void Hresvelgr_PlayDescent(void *p, int tick)
     if (actor->pulse)
         Sound_PlaySong(0x3d9);
     OffsetActor_StepTowardTarget(actor);
-    if (actor->position.y <= 0x340) {
-        actor->position.y = 0x340;
-        actor->finished = 1;
-    } else if (!(tick & 31))
-        Hresvelgr_RefreshTarget(p);
+    if (actor->position.y > 0x340)
+        return 0;
+    actor->position.y = 0x340;
+    actor->finished = 1;
+    return 1;
+}
+void Hresvelgr_PlayDescent(void *p, int tick)
+{
+    struct HresvelgrTravelActor *actor = p;
+    if (!Hresvelgr_Descend(p) && !(tick & 31))
+        Hresvelgr_RefreshTarget(actor);
 }

@@ -1114,6 +1114,11 @@ Each was read from the compiler source and confirmed on a live draft.
    the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
    and flip through a plain field store left four qtys per branch and the function matched with
    no pin. `why` prints the order used and the order by priority for such a block.
+   The same sort works the other way: in a block with two local qtys where the later-born one
+   outranks the first, adding a third (lower-priority) local value makes the first-born allocate
+   first. SceneActorBehavior_AccelerateTowardDescriptor's sine-table pointer took r0 once the
+   table value was multiplied at the call (`Scale(table[i] * speed)`), leaving the load as its own
+   temp; `why` notes the two-qty case too.
 
 39. **Two natural walls against cross-jumping: a return, and a call that falls into a label.**
    jump2 (jump.c) tries each simple jump against the code that falls into its label first
@@ -2630,3 +2635,64 @@ which is exactly `10:1`. Not tested.
      One copy placed ahead of the switch failed for that reason: the path from
      that copy reaches the new register's last use, cse rewrote those last uses
      back to the old register, and the two then overlapped (an extra r7).
+229. **A parameter copy the ROM keeps in a second register comes from cse rerunning the first block once per path, with last-use data from before the pass.**
+   The symptom is `adds rA, r0, #0; adds rB, rA, #0` at entry with both
+   registers read later, one in the early code and one in a tail
+   (Hresvelgr_PlayDescent 081A09C4, WoodenCrate_ReactToHit 08100144; 457 ROM
+   functions open this way). Four facts decide it.
+   * cse walks every path from a start insn, longest first as it finds them
+     (each conditional jump is TAKEN when its label has one use and follows a
+     barrier, else skipped AROUND when the skipped block has no label, else
+     fallen through), then again with the last followed jump not taken. The
+     `.cse` dump lists them: `;; Processing block from 1 to N`. The first block
+     is rewritten in every run.
+   * REGNO_LAST_UID is from the reg_scan before the pass. A run that rewrites a
+     tail from the copy to the parameter does not move the parameter's last use,
+     so a later, shorter run still sees the copy as "used past the path, and
+     last" and makes it head for the early code. Result: early code in the copy,
+     tail in the parameter, although the C names them the other way round.
+   * When the copy becomes head and the insn before it is the parameter's own
+     `p = rN`, cse swaps the two sets (`copy = rN; p = copy`). That needs the
+     copied parameter to be the last one declared; with another parameter after
+     it (PlayDescent's `tick`) the order stays `p = rN; copy = p`.
+   * gcse copy propagation does not undo it. `compute_cprop_data` passes the
+     transparency bitmap where the altered one belongs, so a copy is available
+     only in blocks all of whose predecessors hold the copy insn itself.
+   So the C is a plain typed copy at the top (`struct T *actor = p;`), the early
+   code written with `p`, the tail with the copy, and control flow whose first
+   path from entry reaches the tail. What changes the paths is the statement
+   form, not the registers: PlayDescent needed its body as an inline ending
+   `if (y > floor) return 0; ...; return 1;` under `if (!Body(p) && ...) Tail(actor)`;
+   WoodenCrate needed its shake as an inline called from two branches
+   (`if (a) Shake(p); else if (!b) Shake(p); else if ...`), which jump2 merges
+   into the one copy the ROM has, where `if (a || !b)` sends the first path into
+   the shake block and the copy swallows the parameter. A copy that only folds
+   at combine (`(u8 *)p + x - x`) reproduces the bytes and is a quick test that
+   this is the cause; it is not the form to land.
+230. **A zero the ROM loads at a join and then stores many times, while a neighbouring zero store loads its own, is a variable assigned 0 in every arm before the join.**
+   WirelessGameItems_UpdateItemMerge 08039CB0 clamps a count, then stores
+   `target->count`, `target->pendingFlag = 0`, and clears five fields of `p`;
+   the ROM has `movs r1, #0` at the clamp's join, `movs r0, #0` for pendingFlag
+   alone, and r1 for all of `p`. Four facts decide it.
+   * A literal 0 stored to a byte member takes cse's newest zero register of a
+     wider mode (HImode first, then SImode: `src_related` in cse_insn), so with
+     everything constant pendingFlag reuses the first zero and the stores after
+     a halfword store move to that store's own HImode zero. Local `u16`
+     variables and inline parameters are SImode pseudos, so types do not change
+     this.
+   * A variable set to 0 in each arm (`if (v > 10) { v = 10; z = 0; } else { if (v < 0) v = 0; z = 0; }`)
+     is not a constant to cse1 or cse2 after the join. Stores written with `z`
+     keep `z`; a literal 0 between them finds no zero register and loads its
+     own. jump2 cross-jumps the arms' loads into one at the join.
+   * The member store before the literal one must not make a zero itself:
+     `p->count = v` reads the old byte and builds a mask zero first (fact 63),
+     which then sits in r0 across `v`. Through a `u8 *` the store is plain.
+   * reload_cse deletes the fall-through arm's `z = 0` when the same hard
+     register already holds an SImode 0 (here the earlier block's zero), and
+     the arm then jumps past the shared load. It forgets everything at a
+     CODE_LABEL. A test combine folds (here `if (count < 0) count = 0;` on a
+     sum of two bytes) is deleted after cse2 but its label stays until jump2,
+     which is enough. `u.i.greg` shows the deleted insn as NOTE_INSN_DELETED.
+   The per-arm zero and the dead test reproduce the bytes with no counted
+   concession; whether the original had them as written or as a clamp helper
+   with a second result is not known.

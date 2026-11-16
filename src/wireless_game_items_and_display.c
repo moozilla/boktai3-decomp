@@ -505,7 +505,6 @@ extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 
 void Vec16_Lerp(void *, void *, void *, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct WirelessGameItem *p,
                                        int indexArg)
 {
@@ -559,25 +558,31 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
             target->entered = one;
             target->timer = zero;
         }
+        /* Never true (count is a sum of two bytes). The compiler folds the test late and the
+         * label it leaves keeps the next block apart, as in the ROM. */
+        if (count < 0)
+            count = 0;
         {
-            register int value asm("r0") = count;
-            if (value > 10)
+            int value = count;
+            int empty;
+            u8 *slot;
+            if (value > 10) {
                 value = 10;
-            else if (value < 0)
-                value = 0;
-            {
-                int zero = 0;
-                asm("" : "+r"(zero));
-                target->count = value;
-                value = 0;
-                target->pendingFlag = value;
-                target->shakeTicks = 8;
-                p->state = zero;
-                p->entered = 1;
-                p->timer = zero;
-                p->count = zero;
-                p->pendingFlag = zero;
+                empty = 0;
+            } else {
+                if (value < 0)
+                    value = 0;
+                empty = 0;
             }
+            slot = &target->count;
+            *slot = value;
+            target->pendingFlag = 0;
+            target->shakeTicks = 8;
+            p->state = empty;
+            p->entered = 1;
+            p->timer = empty;
+            p->count = empty;
+            p->pendingFlag = empty;
         }
     }
     p->timer++;
@@ -1071,7 +1076,6 @@ ok:
     return p;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
 {
     struct WirelessGameItems *owner = gWirelessGameItems;
@@ -1101,29 +1105,37 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
                 current->timer = zero;
             }
             {
-                register int value asm("r0") = count;
+                int value = count;
                 int clear;
+                u8 *slot;
                 if (value > 10)
                     value = 10;
                 else if (value < 0)
                     value = 0;
+                /* What is left for the queued slot: nothing, as the sum is never negative. */
                 clear = 0;
-                current->count = value;
-                value = 0;
-                current->pendingFlag = value;
+                if (count < 0)
+                    clear = count;
+                slot = &current->count;
+                *slot = value;
+                current->pendingFlag = 0;
                 target->count = clear;
             }
         }
-        if (amount > 10)
-            amount = 10;
-        else if (amount < 0)
-            amount = 0;
         {
-            int zero = 0;
-            register int flag asm("r0");
-            target->count = amount;
-            flag = 0;
-            target->pendingFlag = flag;
+            int zero;
+            u8 *slot;
+            if (amount > 10) {
+                amount = 10;
+                zero = 0;
+            } else {
+                if (amount < 0)
+                    amount = 0;
+                zero = 0;
+            }
+            slot = &target->count;
+            *slot = amount;
+            target->pendingFlag = 0;
             target->state = 3;
             target->entered = 1;
             target->timer = zero;
@@ -1161,7 +1173,6 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pendingArg)
 {
     int index = indexArg;
@@ -1187,69 +1198,46 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
         target = (struct WirelessGameItem *)((u8 *)owner + offset);
         if (target->count) {
             struct WirelessGameItem *current;
-            register u8 *first asm("r1");
-            u8 *second;
-            register u8 *dest asm("r5");
-            int total;
             extra = (u32) & ((struct WirelessGameItems *)0)->items[8];
             offset = scaled + extra;
             current = (struct WirelessGameItem *)((u8 *)owner + offset);
             if (target->pendingFlag) {
-                first = owner->pending;
-                {
-                    int slot = index;
-                    dest = first + slot;
-                }
-                total = *dest;
+                int total = owner->pending[index];
                 total += target->count;
-                second = first;
                 if (total > 255)
                     total = 255;
-                *dest = total;
-                first = owner->current;
+                owner->pending[index] = total;
             } else {
-                first = owner->current;
-                {
-                    int slot = index;
-                    dest = first + slot;
-                }
-                total = *dest;
+                int total = owner->current[index];
                 total += target->count;
                 if (total > 255)
                     total = 255;
-                *dest = total;
-                second = owner->pending;
+                owner->current[index] = total;
             }
             {
-                int slot = index;
-                register u8 *address asm("r0");
                 int a;
                 int b;
-                register int one asm("r0");
+                int one;
                 int zero;
-                address = first + slot;
-                a = *address;
-                address = second + slot;
-                b = *address;
+                a = owner->current[index];
+                b = owner->pending[index];
                 one = 1;
                 zero = 0;
-                asm("" : "+r"(a), "+r"(b), "+r"(one), "+r"(zero));
                 current->state = one;
                 current->entered = one;
                 current->timer = zero;
                 {
-                    register int value asm("r0") = a + b;
+                    int value = a + b;
                     int clear;
+                    u8 *itemCount;
                     if (value > 10)
                         value = 10;
+                    /* What is left for the queued slot: nothing, as the sum is never negative. */
                     clear = 0;
-                    asm("" : "+r"(clear));
-                    {
-                        u8 *itemCount = &current->count;
-                        *itemCount = value;
-                    }
-                    value = 0;
-                    current->pendingFlag = value;
+                    if (value < 0)
+                        clear = value;
+                    current->count = value;
+                    current->pendingFlag = 0;
                     target->count = clear;
                 }
             }

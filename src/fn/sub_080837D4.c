@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_control_motion.h"
 #include "player.h"
 static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
@@ -27,6 +26,13 @@ static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
     offset = 0x3D4;
     return Test(*(u32 *)((u8 *)state + offset), mask);
 }
+struct LiftHalfBits {
+    u16 bits : 16;
+};
+struct LiftParameters {
+    u8 unknown0[0xF];
+    u8 flags : 8;
+};
 void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorControlMotionState *state;
@@ -38,32 +44,26 @@ void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor
     if (LiftFlag(state)) {
         u32 *flags = &state->flags3D4;
         u32 clearMask;
-        u8 *parameters;
-        register u32 bit asm("r0");
-        register u32 old asm("r1");
-        u32 wordZero;
-        u16 *actorFlags;
-        u8 byteZero;
-        u8 behavior;
+        struct LiftParameters *parameters;
         clearMask = ~2;
         *flags &= clearMask;
-        parameters = (u8 *)actor + 0xDC;
-        bit = 8;
-        old = parameters[0xF];
-        wordZero = 0;
-        parameters[0xF] = bit | old;
-        bit = 0x100;
-        actorFlags = &actor->flags2D4;
-        old = *actorFlags;
-        byteZero = 0;
-        /* Keep the initialized byte zero distinct from the word counter clear. */
-        asm("" : "+r"(byteZero) : "r"(old));
-        *actorFlags = bit | old;
-        behavior = 3;
-        actor->state2A8 = byteZero;
-        actor->phase2A9 = byteZero;
-        actor->behavior2AA = behavior;
-        actor->counter2AC = wordZero;
-        actor->field2B1 = 1;
+        parameters = (void *)((u8 *)actor + 0xDC);
+        {
+            u8 bit = 8;
+            parameters->flags = bit | parameters->flags;
+        }
+        {
+            u32 bit = 0x100;
+            struct LiftHalfBits *f = (void *)&actor->flags2D4;
+            f->bits = bit | f->bits;
+        }
+        {
+            u8 behavior = 3;
+            actor->state2A8 = 0;
+            actor->phase2A9 = 0;
+            actor->behavior2AA = behavior;
+            actor->counter2AC = 0;
+            actor->field2B1 = 1;
+        }
     }
 }

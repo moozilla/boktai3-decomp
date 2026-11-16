@@ -1,147 +1,78 @@
-// MATCHING_CONCESSION: register-pinning
-#include "scene_actor_update.h"
+#include "scene_actor_availability.h"
+#include "scene_actor_placement.h"
+#include "scene_actor_init_actor.h"
 void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryActor *);
-static inline u8 TestFlag(u16 *flags, u32 mask)
+static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-static inline u8 TestValue(u32 value)
-{
-    if (value)
-        return 1;
-    return 0;
-}
-s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *actor)
-{
-    register u32 mask asm("r0");
-    u32 offset, first;
-    register struct SceneActorRegistryActor *base asm("r5") = actor;
-    register u16 *flags asm("r6");
-    register u8 *phase asm("r4");
-    struct SceneActorRegistryActor *updateActor;
-
+    actor->field2B2 = 1;
+    actor->field2B0 = 0;
+    actor->field2B5 = kind;
+    actor->target = control;
+    actor->field2C8 = 0;
     {
-        u32 inactive;
-        if (!base)
-            goto available;
-        {
-            u32 value = 0x40;
-            if (base->flags2D4 & value)
-                goto inactive;
-        }
-        {
-            u32 value = 0x20000;
-            offset = 0x2D0;
-            asm("" : "+r"(offset));
-            if (*(u32 *)((u8 *)base + offset) & value)
-                goto inactive;
-        }
-        if (base->health > 0)
-            goto available;
-    inactive:
-        inactive = 1;
-        goto checked;
-    available:
-        inactive = 0;
-    checked:
-        asm("" : "+r"(inactive));
-        if (inactive)
-            goto unavailable;
+        u32 *flags = &actor->flags114;
+        u32 mask = ~1;
+        *flags &= mask;
     }
-    if (!base->flags2D6)
-        goto unavailable;
-    updateActor = base;
-    offset = 0x3D4;
-    asm("" : "+r"(offset));
-    phase = (u8 *)base + offset;
-    {
-        u32 bit = 4;
-        register u16 *pointer asm("r1");
-        pointer = &base->flags2D6;
-        first = *pointer & bit;
-        flags = pointer;
-        first = TestValue(first);
+    actor->word104 = 0;
+}
+static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
+                            u8 behavior)
+{
+    actor->state2A8 = state;
+    actor->phase2A9 = phase;
+    actor->behavior2AA = behavior;
+    actor->counter2AC = 0;
+    actor->field2B1 = 1;
+}
+static inline void ClearBits(u16 *field, u32 bits)
+{
+    *field &= ~bits;
+}
+s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryResetView *actor)
+{
+    u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
+    if (!unavailable && actor->flags2D6) {
+        struct SceneActorRegistryResetView *self = actor;
+        struct SceneActorChaseGroup *group = &actor->group;
+        u16 *flags;
+        if (SceneActor_TestPendingFlag((void *)actor, 4, &flags)) {
+            ClearBits(flags, 0x987);
+            return 1;
+        }
+        if (SceneActorPlacement_TestFlags(flags, 2)) {
+            SetState(actor, 3, 0, 0);
+            SetControl(actor, group->contactControl, 7);
+            {
+                s32 value = actor->fieldA8;
+                actor->fieldAA = value;
+            }
+            ClearBits(flags, 0x983);
+            return 1;
+        }
+        if (SceneActorPlacement_TestFlags(flags, 0x800)) {
+            SceneActorAttachment_BeginReturnResponse((void *)self);
+            ClearBits(flags, 0x981);
+            return 1;
+        }
+        if (SceneActorPlacement_TestFlags(flags, 1)) {
+            ClearBits(flags, 0x181);
+            return 1;
+        }
+        if (SceneActorPlacement_TestFlags(flags, 0x80)) {
+            void *callback = actor->field23C;
+            if (callback)
+                Callback_InvokeActor(actor, callback);
+            ClearBits(flags, 0x180);
+            return 1;
+        }
+        if (SceneActorPlacement_TestFlags(flags, 0x100)) {
+            void *callback = actor->group.field5EC;
+            if (callback)
+                Callback_InvokeActor(actor, callback);
+            ClearBits(flags, 0x180);
+            return 1;
+        }
     }
-    if (first)
-        mask = ~0x987;
-    else if (TestFlag(flags, 2)) {
-        register u32 stateOffset asm("r2");
-        u32 controlOffset;
-        u32 zero;
-        {
-            u32 value = 3;
-            u8 *address;
-            stateOffset = 0x2A8;
-            address = (u8 *)base + stateOffset;
-            zero = 0;
-            *address = value;
-        }
-        offset = 0x2A9;
-        *((u8 *)base + offset) = zero;
-        base->behavior2AA = zero;
-        stateOffset += 4;
-        *(u32 *)((u8 *)base + stateOffset) = zero;
-        offset += 8;
-        *((u8 *)base + offset) = 1;
-        stateOffset -= 0xA4;
-        {
-            register void **address asm("r0");
-            address = (void *)(phase + stateOffset);
-            phase = *address;
-        }
-        stateOffset = 7;
-        offset++;
-        *((u8 *)base + offset) = 1;
-        controlOffset = 0x2B0;
-        *((u8 *)base + controlOffset) = zero;
-        offset += 3;
-        *((u8 *)base + offset) = stateOffset;
-        controlOffset -= 0x94;
-        *(const void **)((u8 *)base + controlOffset) = phase;
-        base->field2C8 = zero;
-        offset = 0x114;
-        asm("" : "+r"(offset));
-        {
-            u32 value = ~1;
-            u32 *address = (void *)((u8 *)base + offset);
-            asm("" : "+r"(value));
-            *address &= value;
-        }
-        base->field104 = zero;
-        {
-            register s16 *address asm("r0") =
-                &((struct SceneActorUpdateStatePair *)base)->values[0];
-            s32 value;
-            value = *address;
-            address++;
-            asm("" : "+r"(address));
-            *address = value;
-        }
-        mask = ~0x983;
-    } else if (TestFlag(flags, 0x800)) {
-        SceneActorAttachment_BeginReturnResponse(updateActor);
-        mask = ~0x981;
-    } else if (TestFlag(flags, 1))
-        mask = ~0x181;
-    else {
-        void *callback;
-        if (TestFlag(flags, 0x80)) {
-            offset = 0x23C;
-            asm("" : "+r"(offset));
-            callback = *(void **)((u8 *)base + offset);
-        } else if (TestFlag(flags, 0x100))
-            callback = *(void **)((u8 *)base + 0x5EC);
-        else
-            goto unavailable;
-        if (callback)
-            Callback_InvokeActor(base, callback);
-        mask = ~0x180;
-    }
-    mask &= *flags;
-    *flags = mask;
-    return 1;
-unavailable:
     return 0;
 }
