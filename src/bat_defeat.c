@@ -1,18 +1,73 @@
+#include "scene_actor_chase.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
 #include "scene_actor_part_burst.h"
 
+// confidence=low: reacts to the context probe flag and enters behavior 15 after clearing it.
+
+void Ghoul_SelectRetreatRoutePoint(struct ChaseActor *);
+
+static inline u8 TakeEntry(struct ChaseActor *a)
+{
+    if (a->base.field2B2) {
+        a->base.field2B2 = 0;
+        return 1;
+    }
+    return 0;
+}
+
+struct Bits16 {
+    s16 bits : 16;
+};
+
+static inline u8 Test(u8 *context, u32 mask, struct Bits16 **out)
+{
+    struct Bits16 *p = (void *)(context + 0x628);
+    u32 value = *(u16 *)p & mask;
+    *out = p;
+    if (value)
+        return 1;
+    return 0;
+}
+
+static inline void Clear(struct Bits16 *p, s32 mask)
+{
+    p->bits = mask & p->bits;
+}
+
+void Bat_UpdateProbeReaction(struct ChaseActor *a)
+{
+    u8 *context = a->base.context;
+    struct Bits16 *flags;
+    if (TakeEntry(a))
+        return;
+    if (Test(context, 2, &flags)) {
+        if (a->base.tracking.distance > 0xFFFF)
+            SceneActorAnimation_SelectDirectionalEntry(a, 0);
+        Ghoul_SelectRetreatRoutePoint(a);
+        Clear(flags, ~2);
+        Chase_SetBehavior(a, 15);
+    } else
+        SceneActorAnimation_SelectDirectionalEntry(a, 1);
+}
+
 /* Bat defeat state (tentative; compare SceneActorReaction_BeginHiddenDefeat): on entry it
  * releases attachments, shows the drawable and clears the route; every 12 frames it emits
  * sparks while flag 8 is set, then a six-spark burst, the defeat script, the event flag and
  * the switch to SceneActorControl_OnIdle. */
+
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
+
 void SceneActorEffects_AdvanceSteps(void *, u32);
+
 void *Bestiary_GetEntryForActor(u32, u32);
+
 void Bestiary_UnlockEntry(void *);
+
 void SceneActorBehavior_CallTerrainScript(void *);
+
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
 struct BatDrawableUpdateDefeat {
@@ -25,11 +80,13 @@ struct BatDrawableUpdateDefeat {
     u8 unknown52[4];
     u16 frame;
 };
+
 static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
 }
+
 static inline u32 Random4(void)
 {
     u32 index = (gRandomIndex + 1) & 1023;
@@ -40,6 +97,7 @@ static inline u32 Random4(void)
     v &= 3;
     return v + 1;
 }
+
 union HitSparkTable {
     const u16 *table;
     struct {
@@ -48,6 +106,7 @@ union HitSparkTable {
         u8 region;
     } encoded;
 };
+
 static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 {
     return r->table;
