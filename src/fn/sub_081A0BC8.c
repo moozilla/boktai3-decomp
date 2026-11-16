@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 #include "engine.h"
@@ -186,7 +185,8 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
                 }
                 {
-                    u32 direction = actor->direction4 >> 1;
+                    u32 direction =
+                        (actor->direction4 >> 1) | (normalCollisionMask & (actor->direction4 >> 8));
                     if (direction == 0 && actor->position.x > 0x1400)
                         ActionState_AdvanceState(action);
                     else if (direction == 1 && actor->position.z > 0x1400)
@@ -204,5 +204,4 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             actor->finished = 1;
             break;
     }
-    asm("" ::"r"(normalCollisionMask));
 }
