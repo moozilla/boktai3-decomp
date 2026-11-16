@@ -416,7 +416,7 @@ s32 Skeleton_Init(void *object)
     SceneActorControl_InitBehaviorColliders(actor);
 
     MonsterInit_InstallSequenceCallbacks(
-        actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, sub_080BAE04,
+        actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, Skeleton_TurnTowardRouteFacing,
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
         TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
         Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault,

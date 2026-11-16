@@ -163,7 +163,7 @@ struct SceneActorApproachCaptureContext {
     struct ContactPosition destination;
 };
 
-void sub_080BAAF4(void);
+void Skeleton_BeginHomingBurst(void);
 
 static inline void SetCaptureControl(struct ChaseActor *actor, void *fn)
 {
@@ -186,7 +186,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
     struct SceneActorApproachCaptureContext *context = actor->base.context;
     if (TakeReady(actor)) {
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
-        SetCaptureControl(actor, sub_080BAAF4);
+        SetCaptureControl(actor, Skeleton_BeginHomingBurst);
         context->destination = actor->base.tracking.target->position;
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);

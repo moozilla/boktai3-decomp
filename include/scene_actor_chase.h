@@ -9,7 +9,7 @@
 #include "engine_globals.h"
 #include "player.h"
 
-void Skeleton_UpdateScriptWaitState(void);
+void Skeleton_UpdateScriptWaitState(u8 *p);
 void SceneActorTerrain_RequestRetreatRoute(struct ChaseActor *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
