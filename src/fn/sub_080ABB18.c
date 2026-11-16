@@ -23,22 +23,22 @@ static inline void ClearWord(u32 *p, u32 mask)
 {
     *p = mask & *p;
 }
-static inline u16 *MotionFlags(struct SceneActorRegistryResetView *actor)
+static inline u16 *MotionFlags(struct ChaseActor *actor)
 {
-    return &actor->flags2D4;
+    return &actor->base.flags2D4;
 }
-static inline void ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void ClearMotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->flags2D4 = mask & actor->flags2D4;
+    actor->base.flags2D4 = mask & actor->base.flags2D4;
 }
 // gcse's PRE computes the field addresses of the idle-control stores above the trail loop
 // (its stack slots follow the hash-table order of a 65-bucket table), and cse2 turns the
 // motion-flags address into a copy of the one the head computed through MotionFlags.
-u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
+u32 TentacleActor_RecoverFromSegmentLoss(struct ChaseActor *p)
 {
-    struct Group *g = p->context;
+    struct Group *g = p->base.context;
     s32 count;
-    if (p->reactionSoundVariant == 0)
+    if (p->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x19c);
@@ -50,13 +50,13 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
     }
     g->timer = 240;
     {
-        u16 value = p->colliderA.responseValue + 30;
-        p->colliderA.responseValue = value;
+        u16 value = p->base.colliderA.responseValue + 30;
+        p->base.colliderA.responseValue = value;
     }
     g->flashTimer = 16;
-    ClearWord(&p->flags2D0, ~0x100000);
+    ClearWord(&p->base.flags2D0, ~0x100000);
     ClearHalf(MotionFlags(p), ~1);
-    count = Div(p->health, g->healthStep);
+    count = Div(p->base.health, g->healthStep);
     while (count < g->activeCount) {
         ActorTrail_RemoveLastSegment(p);
         count++;
@@ -64,7 +64,7 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
     ClearMotionFlags(p, ~0x20);
     Chase_SetCtl(p, SceneActorControl_OnIdle, 16);
     Chase_SetBehavior(p, 5);
-    p->body.direction = p->tracking.heading;
-    p->field2C2 = 64;
+    p->base.body.direction = p->base.tracking.heading;
+    p->base.field2C2 = 64;
     return 1;
 }

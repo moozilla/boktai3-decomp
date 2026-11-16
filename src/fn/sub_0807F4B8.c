@@ -34,20 +34,20 @@ static inline void ClearBits(u32 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *p, u32 kind, u32 zero,
+static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
                               u8 byteZero)
 {
-    a->field2B2 = 1;
-    a->field2B0 = byteZero;
-    a->field2B5 = kind;
-    a->target = p;
-    a->field2C8 = zero;
-    ClearBits(&a->flags114, ~1);
-    a->word104 = zero;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = byteZero;
+    a->base.field2B5 = kind;
+    a->base.target = p;
+    a->base.field2C8 = zero;
+    ClearBits(&a->base.flags114, ~1);
+    a->base.word104 = zero;
 }
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputActor)
 {
-    struct SceneActorRegistryResetView *a = (void *)inputActor;
+    struct ChaseActor *a = (void *)inputActor;
     struct SceneActorRegistryControlGroup *group = &a->group.common;
     struct SceneActorBehaviorView *actor;
     u32 slot;
@@ -62,17 +62,17 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
     }
     {
         u32 mask = 0x1000;
-        u32 bits = a->flags2D4;
+        u32 bits = a->base.flags2D4;
         bits &= mask;
         if (bits) {
             SceneActorContacts_ReleaseNode(a->group.contactNode);
-            a->flags2D4 &= ~mask;
+            a->base.flags2D4 &= ~mask;
             a->group.contactNode = (void *)zero;
         }
     }
     {
         struct SceneActorRegistryControl *control = &group->control;
-        ClearBits(&a->flags2CC, 0xFFFEBE3F);
+        ClearBits(&a->base.flags2CC, 0xFFFEBE3F);
         control->counter = zero;
         byteZero = 0;
         control->field14 = zero;
@@ -85,37 +85,37 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
         u32 one;
         u32 clearMask;
         {
-            u8 *field = &a->field2B2;
+            u8 *field = &a->base.field2B2;
             one = 1;
             *field = one;
         }
-        a->field2B0 = byteZero;
-        a->field2B5 = kind;
-        a->target = control;
-        a->field2C8 = zero;
+        a->base.field2B0 = byteZero;
+        a->base.field2B5 = kind;
+        a->base.target = control;
+        a->base.field2C8 = zero;
         {
-            u32 *field = &a->flags114;
+            u32 *field = &a->base.flags114;
             clearMask = ~1;
             *field &= clearMask;
         }
-        a->word104 = zero;
+        a->base.word104 = zero;
         {
             u32 state = 3;
-            u8 *field = &a->state2A8;
+            u8 *field = &a->base.state2A8;
             *field = state;
         }
-        a->phase2A9 = one;
-        a->behavior2AA = byteZero;
-        a->counter2AC = zero;
-        a->field2B1 = one;
+        a->base.phase2A9 = one;
+        a->base.behavior2AA = byteZero;
+        a->base.counter2AC = zero;
+        a->base.field2B1 = one;
         {
             u32 mask = ~0x80;
-            a->flags2CC &= mask;
+            a->base.flags2CC &= mask;
         }
-        a->flags2D4 &= clearMask;
+        a->base.flags2D4 &= clearMask;
         {
             u32 mask = ~0x400;
-            a->flags2D4 &= mask;
+            a->base.flags2D4 &= mask;
         }
     }
     *((u8 *)group + 0x206) = 255;
