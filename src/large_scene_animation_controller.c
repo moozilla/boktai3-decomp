@@ -954,7 +954,7 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
 }
 
 /* Tentative: called once per frame from Nidhoggr_Update. For each of the 26 parts it looks up
- * a callback in gUnk_0824F364 keyed by t->unknown71C2[i] and runs it through sub_08249240
+ * a callback in gUnk_0824F364 keyed by t->partState[i] and runs it through sub_08249240
  * (or resets the row latches when there is none), blinks the row via rowBlink, then
  * repositions each row's offset (rows[i].pos) and collider from t->pos plus constant offset
  * tables. confidence=low. */
@@ -974,7 +974,7 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
     struct SceneVec *p21, *p20;
     struct SceneVec *pa, *pb, *pc, *pd, *pe, *pf;
     for (i = 0; i <= 25; i++) {
-        if (gUnk_0824F364[t->unknown71C2[i]] == 0) {
+        if (gUnk_0824F364[t->partState[i]] == 0) {
             t->rows[i].flags |= 1;
             t->rowInitFlag[i] = 0;
             t->rowCounter[i] = 0;
@@ -989,7 +989,7 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
             } else {
                 t->rows[i].flags &= ~0x600;
             }
-            sub_08249240(t, (void *)i, gUnk_0824F364[t->unknown71C2[i]]);
+            sub_08249240(t, (void *)i, gUnk_0824F364[t->partState[i]]);
             t->rowCounter[i]++;
         }
     }
