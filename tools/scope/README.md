@@ -2851,3 +2851,56 @@ which is exactly `10:1`. Not tested.
    do not reproduce this behavior. The form preserves the ROM base-plus-offset
    operand order without a pin; like the numeric forms in fact 231, its wording
    was chosen for allocation and needs phase 4 review.
+
+
+240. **A late owner identity can prevent PRE from creating array-base spills.**
+   FragmentGroup_SpawnRadial (08014CA4) computes initialized/enabled array bases
+   inside the particle loop. With ordinary unpinned `base->initialized[i]` and
+   `base->enabled[i]`, PRE creates invariant base+32/base+44 values and spills both;
+   the draft differs in 84 ROM instructions. Index through
+   `(struct FragmentGroup *)((u32)base + (base->active >> 8))` at those two sites.
+   CSE/PRE cannot fold the byte-derived zero, while combine does, leaving the ROM's
+   per-iteration addresses and all register decisions. The numeric random table
+   can then use the fact 231 byte-zero form instead of an address-taken halves
+   union. ParticleGroup_SpawnBouncing (08014634) also needs its fact 231 constant
+   inside the inner setup block, where a byte zero avoids the union's extra live
+   span. These identities are allocation-only phase 4 review items.
+
+241. **An impossible signed-negative normalization can preserve two copies until jump2.**
+   FadingParticleGroup_Update (08016118) needs a byte loaded in r0 followed by
+   independent copies to r1 and r2. Plain `compare = raw; time = raw` lets CSE
+   remove the first copy. A known-zero addition preserves it until combine, but
+   regmove's optimize_reg_copy_1 rewrites the later time copy to use compare, then
+   the allocator shares compare with raw. Instead use `raw = *life; compare = raw;
+   if ((s32)raw < 0) raw = 0; time = raw;`. In this function the branch survives CSE;
+   combine replaces its test by an unconditional jump because the current value is
+   a zero-extended byte. The unreachable assignment, branch and join remain through
+   regmove, and the join retains both values in its live set. Jump2 deletes the
+   unreachable arm after allocation. This is not a generic tautology recipe:
+   `raw > 255` leaves a real compare in this compiler. The signed range guard is an
+   allocation-only form. A separate self-assignment of the motion pointer through
+   a byte-derived zero preserves the gravity reload without a memory barrier.
+
+242. **A zero-valued late use can preserve a flow conflict after combine erases the use.**
+   Hresvelgr_UpdateBoundaryBarrage (081A0BC8) has the right instructions but reload
+   reuses sl for the random-index mask; forcing that mask to ip gives an exact
+   diagnostic match. OR the direction with
+   `normalCollisionMask & (actor->direction4 >> 8)`. The byte field makes the term
+   zero, but only combine knows that. Flow first extends the normal mask's live
+   span from 34 to 188 (references 3 to 4); after the term disappears, the retained
+   cross-block live information still conflicts with the random mask. Reload now
+   excludes sl and naturally chooses ip. This is a conflict change, not merely
+   REG_EQUIV priority tuning. Name the allocation-only zero use in the commit.
+
+243. **Equivalent source tails can tune global priorities before late jump sharing.**
+   TentacleActor_AlignSegmentsToTerrain (080AA8C4) needs its y-store induction
+   pointer above the slope helper's position pointer. Two separate failed ascent
+   tests with identical fallback stores raise the y pointer's references from 15
+   to 17. Actual byte-sized attribute/kind locals slightly extend the competitor;
+   jump2 merges the stores back to the exact ROM. NamedObject_RegisterFollowCells
+   (08101B1C) similarly uses five explicit early-release returns: the object gains
+   references 12 to 16, moving above width/index, while a halfword flags snapshot
+   increases its live length enough to keep it below the row pointer. Measure both
+   sides of the tie; increasing priority without checking the next competitor can
+   choose a different wrong register. Repeated equivalent tails and temporary reuse
+   are allocation-only wording to review in phase 4.

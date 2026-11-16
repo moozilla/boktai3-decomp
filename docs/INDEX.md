@@ -236,7 +236,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #depin #matching #round13 | 13 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #compiler #depin #matching #round13 | 14 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -458,6 +458,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round11-c-holdouts.md](../notes/round11-c-holdouts.md) | Round 11-C holdouts |  | 64 |
 | [notes/round11-d-holdouts.md](../notes/round11-d-holdouts.md) | Round 11 package D holdouts |  | 23 |
 | [notes/round13-batch1_2026-11-16.md](../notes/round13-batch1_2026-11-16.md) | Round 13, batch 1: eight concessions removed | #matching #depin #compiler #round13 | 5 |
+| [notes/round13-batch2_2026-11-16.md](../notes/round13-batch2_2026-11-16.md) | Round 13, batch 2: six more concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |

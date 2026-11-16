@@ -106,3 +106,20 @@ combine-formed constant written before the loops scores worse (52).
 * A constant RAM symbol must be formed after CSE: `(u32)symbol & ~(byte >> 8)` or
   `& ~(halfword >> 16)` keeps the symbol and becomes constant only in combine
   (0821B084). These known-zero forms are allocation-only wording for phase 4 review.
+
+* PRE creates extra invariant array bases and spills: add a byte-derived zero to
+  the owner address at each indexed state write, so the base becomes invariant
+  only in combine (08014CA4). The resulting allocation also fixes the table/group
+  ordering; a late table constant then replaces the halves union (also 08014634).
+* Two lifetime copies collapse: place `if ((s32)raw < 0) raw = 0` between the
+  comparison snapshot and the time snapshot (08016118). For an unsigned-byte load,
+  combine makes the branch unconditional; its boundary survives regmove and the
+  dead arm disappears in jump2. A pointer self-identity with a byte-derived zero
+  separately preserves the velocity reload formerly protected by a memory barrier.
+* A high register is wrongly reused during reload: mention its earlier value in
+  a late zero term, e.g. `mask & (actor->direction4 >> 8)` (081A0BC8). Flow records
+  the longer live range; combine erases the term but the conflict still excludes sl.
+* A global near-tie needs more references: expose the naturally identical fallback
+  stores or early-release returns before jump2 (080AA8C4, 08101B1C). Use actual byte
+  or halfword field widths to tune the measured competing live spans; jump2 shares
+  the tails back to the ROM. All these allocation-only forms require phase 4 review.
