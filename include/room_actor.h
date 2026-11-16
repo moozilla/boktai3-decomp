@@ -55,21 +55,22 @@ struct RoomActor {
     void *target;
     /* State handlers (MonsterInit_InstallSequenceCallbacks): the controls the shared code
      * switches the actor to with MonsterInit_SetControl. */
-    void *onHidden; /* while hidden (Vorn starts in it when field68C is set) */
-    void *onEntry;  /* the two entry controls */
-    void *onAlternateEntry;
-    void *onStanding; /* the resting control, restored after reactions */
-    void *onReaction; /* after a hit or a stimulus */
-    void *onDefeat;   /* +0x234: installed by the defeat dispatch */
+    SceneActorAction onHidden; /* while hidden (Vorn starts in it when field68C is set) */
+    SceneActorAction onEntry;  /* the two entry controls */
+    SceneActorAction onAlternateEntry;
+    SceneActorAction onStanding; /* the resting control, restored after reactions */
+    SceneActorAction onReaction; /* after a hit or a stimulus */
+    SceneActorAction onDefeat;   /* +0x234: installed by the defeat dispatch */
     void *field238, *field23C;
     void *field240;
     u8 unknown244[4];
     void *callback248;
-    void *onMessage; /* the registry's messages (SceneActorRegistry_SendToCategory, ...) */
+    SceneActorCommandHandler
+        onMessage; /* the registry's messages (SceneActorRegistry_SendToCategory, ...) */
     union SceneActorCommandTable commandTable;
     u8 unknown254[4];
-    void *update;  /* every frame, from SceneActorRegistry_UpdateActors */
-    void *destroy; /* on removal, before the block is freed */
+    SceneActorResultCallback update;  /* every frame, from SceneActorRegistry_UpdateActors */
+    SceneActorResultCallback destroy; /* on removal, before the block is freed */
     union SceneActorAnimationQuerySlot animationQuery;
     void *onDamage;    /* SceneActor_UpdateActiveCallbacks, before onUpdate */
     void *onContact;   /* the contact test of the shared reaction code */

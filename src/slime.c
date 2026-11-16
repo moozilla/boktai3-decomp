@@ -1932,7 +1932,7 @@ void SceneActorReaction_ResolveDamage(void);
 
 void SceneActorReaction_SinkAndRemove(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void AnimData_SelectPaletteBank(void *, s32);
 
@@ -2053,8 +2053,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Slime_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Slime_OnMessage;
-    actor->base.destroy = Slime_Destroy;
+    actor->base.update = (SceneActorResultCallback)Slime_OnMessage;
+    actor->base.destroy = (SceneActorResultCallback)Slime_Destroy;
 }
 
 static inline void Slime_InstallRoutes(struct ChaseActor *actor)

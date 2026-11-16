@@ -22,7 +22,7 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 void Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 u8 SceneActorRegistry_LinkActor(void *);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
@@ -74,8 +74,8 @@ static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
 static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Dog_OnAuxiliaryUpdate;
-    actor->base.destroy = Dog_ReleaseResources;
+    actor->base.update = (SceneActorResultCallback)Dog_OnAuxiliaryUpdate;
+    actor->base.destroy = (SceneActorResultCallback)Dog_ReleaseResources;
 }
 
 s32 Dog_Init(void *object)

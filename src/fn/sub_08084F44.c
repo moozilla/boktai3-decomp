@@ -23,7 +23,7 @@ void SceneActorReaction_SinkAndRemove(void);
 void SceneActorControl_RestoreMotion(void);
 void SceneActorControl_SetCollisionResponse(void);
 void SceneActorControl_TryActivateProximityResponse(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorControl_BindPrimaryPlayer(void);
 void Bat_Destroy(void);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -158,8 +158,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = SceneActorControl_BindPrimaryPlayer;
-    actor->base.destroy = Bat_Destroy;
+    actor->base.update = (SceneActorResultCallback)SceneActorControl_BindPrimaryPlayer;
+    actor->base.destroy = (SceneActorResultCallback)Bat_Destroy;
 }
 
 static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)

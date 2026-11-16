@@ -66,7 +66,7 @@ void SceneActorEffects_ReleaseResources(u8 *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 void SceneActorBehavior_InitializeShadow(void *);

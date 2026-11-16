@@ -360,8 +360,8 @@ static inline void SkeletonInit_EnableInitialFlags(struct ChaseActor *instance)
 static inline void SkeletonInit_InstallCompletionCallbacks(struct ChaseActor *instance)
 {
     instance->base.onMessage = SceneActorScript_OnCommand;
-    instance->base.update = Skeleton_UpdateBehaviorCallbacks;
-    instance->base.destroy = Skeleton_Destroy;
+    instance->base.update = (SceneActorResultCallback)Skeleton_UpdateBehaviorCallbacks;
+    instance->base.destroy = (SceneActorResultCallback)Skeleton_Destroy;
 }
 
 static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)

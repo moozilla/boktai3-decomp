@@ -1322,8 +1322,8 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
 static inline void MimicInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Mimic_OnUpdate;
-    arg0->base.destroy = Mimic_ReleaseResources;
+    arg0->base.update = (SceneActorResultCallback)Mimic_OnUpdate;
+    arg0->base.destroy = (SceneActorResultCallback)Mimic_ReleaseResources;
 }
 
 static inline void MimicInit_SetPaletteBank(struct ChaseActor *actor, u16 palette)

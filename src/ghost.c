@@ -2958,7 +2958,7 @@ void SceneActorReaction_ResolveDamage(void);
 
 void SceneActorPlacement_PlayResponseAndResetState(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 extern const u8 gUnk_08605E14[];
 
@@ -3134,8 +3134,8 @@ static inline void Ghost_ReadPalette(struct ChaseActor *actor, u32 base, u32 alt
 static inline void Ghost_InstallCompletion(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Ghost_OnActorUpdate;
-    actor->base.destroy = Ghost_Destroy;
+    actor->base.update = (SceneActorResultCallback)Ghost_OnActorUpdate;
+    actor->base.destroy = (SceneActorResultCallback)Ghost_Destroy;
 }
 
 static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,

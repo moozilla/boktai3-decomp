@@ -15,7 +15,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SetMotionMode(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -168,8 +168,8 @@ static inline void GolemInit_InitializeReceiver(struct Golem *actor)
 static inline void GolemInit_InstallCompletionCallbacks(struct Golem *arg0)
 {
     arg0->chase.base.onMessage = SceneActorScript_OnCommand;
-    arg0->chase.base.update = Golem_OnSharedActorUpdate;
-    arg0->chase.base.destroy = Golem_OnDestroy;
+    arg0->chase.base.update = (SceneActorResultCallback)Golem_OnSharedActorUpdate;
+    arg0->chase.base.destroy = (SceneActorResultCallback)Golem_OnDestroy;
 }
 
 static inline void GolemInit_InitializePaletteRange(struct Golem *actor, u32 alternate, u32 current)

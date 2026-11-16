@@ -14,7 +14,7 @@ void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -75,8 +75,8 @@ static inline struct Mummy *MummyInit_Context(struct Mummy *actor)
 static inline void MummyInit_InstallCompletionCallbacks(struct Mummy *arg0)
 {
     arg0->chase.base.onMessage = SceneActorScript_OnCommand;
-    arg0->chase.base.update = Mummy_OnInteractionUpdate;
-    arg0->chase.base.destroy = Mummy_OnReleaseResources;
+    arg0->chase.base.update = (SceneActorResultCallback)Mummy_OnInteractionUpdate;
+    arg0->chase.base.destroy = (SceneActorResultCallback)Mummy_OnReleaseResources;
 }
 
 static inline void MummyInit_InitializePaletteRange(struct Mummy *actor, u32 selected,

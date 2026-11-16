@@ -26,7 +26,7 @@ void SceneActorReaction_SinkAndRemove(void);
 void Lun_ResetMovementState(void);
 void Lun_EnterIdleOrCopyCell(void);
 void Lun_OnTargetCheck(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void Lun_OnPlayerTargetInit(void);
 void Lun_Destroy(void);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -175,8 +175,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Lun_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Lun_OnPlayerTargetInit;
-    actor->base.destroy = Lun_Destroy;
+    actor->base.update = (SceneActorResultCallback)Lun_OnPlayerTargetInit;
+    actor->base.destroy = (SceneActorResultCallback)Lun_Destroy;
 }
 
 static inline void Lun_InstallRoutes(struct ChaseActor *actor)

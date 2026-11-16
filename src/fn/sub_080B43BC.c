@@ -15,7 +15,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SetMotionMode(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -179,8 +179,8 @@ static inline void VornInit_EnableInitialFlags(struct ChaseActor *actor)
 static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Vorn_OnRender;
-    arg0->base.destroy = Vorn_OnDestroy;
+    arg0->base.update = (SceneActorResultCallback)Vorn_OnRender;
+    arg0->base.destroy = (SceneActorResultCallback)Vorn_OnDestroy;
 }
 
 void Vorn_ParseField624(void *);

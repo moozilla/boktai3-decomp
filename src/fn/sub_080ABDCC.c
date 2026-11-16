@@ -13,7 +13,7 @@ void TentacleActor_InitProfile(void *);
 void SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolveDamage(void);
 void SceneActorReaction_SinkAndRemove(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -161,8 +161,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Tentacle_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = TentacleEnemy_InitPlayerReference;
-    actor->base.destroy = TentacleBody_Destroy;
+    actor->base.update = (SceneActorResultCallback)TentacleEnemy_InitPlayerReference;
+    actor->base.destroy = (SceneActorResultCallback)TentacleBody_Destroy;
 }
 
 static inline void Tentacle_InstallRoutes(struct ChaseActor *actor)

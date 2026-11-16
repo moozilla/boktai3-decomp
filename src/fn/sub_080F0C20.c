@@ -24,7 +24,7 @@ extern const u8 gUnk_08606400[];
 void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorReaction_SetMotionMode(void);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
@@ -145,8 +145,8 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
 static inline void IvyInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Ivy_UpdateInteraction;
-    arg0->base.destroy = Ivy_Destroy;
+    arg0->base.update = (SceneActorResultCallback)Ivy_UpdateInteraction;
+    arg0->base.destroy = (SceneActorResultCallback)Ivy_Destroy;
 }
 
 static inline void IvyInit_InstallRoutes(struct ChaseActor *actor)

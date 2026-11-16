@@ -1316,7 +1316,7 @@ void SceneActorReaction_BeginTargetRecovery(void);
 
 void Bat_UpdateAnimationRequest(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void SceneActorBehavior_InitializeShadow(void *);
 
@@ -1341,8 +1341,8 @@ static inline void GhoulInit_InstallRouteDefaults(struct ChaseActor *rootActor)
 static inline void GhoulInit_InstallCompletionCallbacks(struct ChaseActor *rootActor)
 {
     rootActor->base.onMessage = SceneActorScript_OnCommand;
-    rootActor->base.update = Ghoul_OnMessage;
-    rootActor->base.destroy = Ghoul_Destroy;
+    rootActor->base.update = (SceneActorResultCallback)Ghoul_OnMessage;
+    rootActor->base.destroy = (SceneActorResultCallback)Ghoul_Destroy;
 }
 
 static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u32 alternate,

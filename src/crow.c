@@ -1746,7 +1746,7 @@ void SceneActorReaction_ResolveDamage(void);
 
 void SceneActorPlacement_PlayResponseAndResetState(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void SceneActorPlacement_HideActor(void *, s32);
 
@@ -1844,8 +1844,8 @@ static inline void Crow_ReadPalette(struct ChaseActor *actor, u16 base, u16 alte
 static inline void Crow_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Crow_InitPlayerTarget;
-    actor->base.destroy = Crow_Destroy;
+    actor->base.update = (SceneActorResultCallback)Crow_InitPlayerTarget;
+    actor->base.destroy = (SceneActorResultCallback)Crow_Destroy;
 }
 
 static inline void Crow_InstallRoutes(struct ChaseActor *actor)

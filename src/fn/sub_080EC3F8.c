@@ -27,7 +27,7 @@ u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorReaction_SetMotionMode(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
@@ -156,8 +156,8 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
 static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Octopus_UpdateInteraction;
-    arg0->base.destroy = Octopus_Destroy;
+    arg0->base.update = (SceneActorResultCallback)Octopus_UpdateInteraction;
+    arg0->base.destroy = (SceneActorResultCallback)Octopus_Destroy;
 }
 
 static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)

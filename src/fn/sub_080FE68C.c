@@ -44,7 +44,7 @@ void SceneActorReaction_SinkAndRemove(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -104,8 +104,8 @@ static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s3
 static inline void AxeInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Axe_OnRender;
-    arg0->base.destroy = Axe_ReleaseResources;
+    arg0->base.update = (SceneActorResultCallback)Axe_OnRender;
+    arg0->base.destroy = (SceneActorResultCallback)Axe_ReleaseResources;
 }
 
 static inline void AxeInit_InstallRoutes(struct ChaseActor *actor)

@@ -1799,7 +1799,7 @@ void SceneActorPlacement_PlayResponseAndResetState(void);
 
 void SceneActorReaction_SinkAndRemove(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void AnimData_SelectPaletteBank(void *, s32);
 
@@ -1922,8 +1922,8 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
 static inline void Bee_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
-    actor->base.update = Bee_OnPlayerInteraction;
-    actor->base.destroy = Bee_Destroy;
+    actor->base.update = (SceneActorResultCallback)Bee_OnPlayerInteraction;
+    actor->base.destroy = (SceneActorResultCallback)Bee_Destroy;
 }
 
 static inline void Bee_InstallRoutes(struct ChaseActor *actor)

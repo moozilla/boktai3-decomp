@@ -13,7 +13,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 extern SceneActorCommandHandler const gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
@@ -78,8 +78,8 @@ static inline void MonsterInit_EnableInitialFlags(struct ChaseActor *arg0)
 static inline void MonsterInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.onMessage = SceneActorScript_OnCommand;
-    arg0->base.update = Spider_OnSecondaryUpdate;
-    arg0->base.destroy = Spider_Destroy;
+    arg0->base.update = (SceneActorResultCallback)Spider_OnSecondaryUpdate;
+    arg0->base.destroy = (SceneActorResultCallback)Spider_Destroy;
 }
 
 static inline void Spider_SetFlags(struct SpiderInstanceState *actor, u32 mask)

@@ -175,7 +175,7 @@ void SceneActorTarget_ResolvePendingObject(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorReaction_SetMotionMode(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
