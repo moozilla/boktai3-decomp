@@ -505,7 +505,6 @@ extern const u16 gUnk_0824DE7C[], gUnk_0824DE8C[];
 
 void Vec16_Lerp(void *, void *, void *, int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct WirelessGameItem *p,
                                        int indexArg)
 {
@@ -559,25 +558,31 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
             target->entered = one;
             target->timer = zero;
         }
+        /* Never true (count is a sum of two bytes). The compiler folds the test late and the
+         * label it leaves keeps the next block apart, as in the ROM. */
+        if (count < 0)
+            count = 0;
         {
-            register int value asm("r0") = count;
-            if (value > 10)
+            int value = count;
+            int empty;
+            u8 *slot;
+            if (value > 10) {
                 value = 10;
-            else if (value < 0)
-                value = 0;
-            {
-                int zero = 0;
-                asm("" : "+r"(zero));
-                target->count = value;
-                value = 0;
-                target->pendingFlag = value;
-                target->shakeTicks = 8;
-                p->state = zero;
-                p->entered = 1;
-                p->timer = zero;
-                p->count = zero;
-                p->pendingFlag = zero;
+                empty = 0;
+            } else {
+                if (value < 0)
+                    value = 0;
+                empty = 0;
             }
+            slot = &target->count;
+            *slot = value;
+            target->pendingFlag = 0;
+            target->shakeTicks = 8;
+            p->state = empty;
+            p->entered = 1;
+            p->timer = empty;
+            p->count = empty;
+            p->pendingFlag = empty;
         }
     }
     p->timer++;
