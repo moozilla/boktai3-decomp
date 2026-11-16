@@ -1,9 +1,8 @@
-# Object-model cleanup, items 1 to 4 (2026-11-15)
+# Object-model cleanup, items 1 to 5 (2026-11-15/16)
 
 Tags: #cleanup #structs #engine #actors #tooling #object-model
 
-Phase-4 cleanup from the list at the end of `docs/OBJECT_MODEL.md`, items 1 to 4 (item 5,
-the registry-actor base rename, waits). Every change is byte-identical: each unit that
+Phase-4 cleanup from the list at the end of `docs/OBJECT_MODEL.md`, items 1 to 5. Every change is byte-identical: each unit that
 includes a changed header was checked with `tools/check.py` through the new
 `tools/header_dependents.py --check`. No concession was added; one unit
 (`CellGate_ClampPlayerEdge`) lost its `*(u16 *)` casts along the way.
@@ -117,33 +116,49 @@ includes a changed header was checked with `tools/check.py` through the new
 * Item 4: a third Nidhoggr view (`struct BossParts`) existed.
 * Item 5: the `struct SceneActor` in scene_indicator.h was a gPlayers view (removed).
 
-## Item 5: the registry actor base (in progress)
+## Item 5: the registry actor base
 
 Evidence: `notes/room-actor-layout_2026-11-15.md` (from the new `tools/struct_views.py`).
+The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
 
-* `struct RoomActor` (include/room_actor.h) is the base, 0..0x3D4. ResetView and the eight
-  monster structs embed it as `base`.
-* `struct ChaseActor` (include/chase_actor.h) is RoomActor + `struct SceneActorChaseGroup`
-  (0x624 bytes), the type the shared chase code takes. `SceneActorRegistryResetView` is
-  gone: it was ChaseActor plus a tail of family fields, which moved to new struct Vorn,
-  Golem, Mummy and Dog (19 units). ResetView was also the parameter type of base-only code
-  and of the non-chase classes' code (Bee, Crow, ...); that code takes ChaseActor for now
-  and is to be narrowed to RoomActor.
-* `SceneActorAnimationView` folded into RoomActor (restart and nextDirection came from it).
-* Skeleton is `struct Skeleton { struct ChaseActor chase; ... }`. Its two private views are
-  folded in. skeleton.c's functions take a struct Skeleton.
+* `struct RoomActor` (include/room_actor.h, 0..0x3D4) is the base. `struct ChaseActor`
+  (include/chase_actor.h) is RoomActor plus `struct SceneActorChaseGroup`, 0x624 bytes: the
+  type the shared chase code takes. Chase classes embed ChaseActor (Skeleton, Ghoul, Mimic,
+  Vorn, Golem, Mummy, Dog); the others embed RoomActor (Bee, Crow, Ghost, Slime, Tentacle).
+* The views are gone: ResetView (it was ChaseActor plus family fields, which moved to new
+  struct Vorn, Golem, Mummy and Dog), RegistryActor, and the animation, behavior (with the
+  gate view), placement and terrain-collision views.
 * `tools/retype_fields.py` does the rewriting: it compiles each unit and rewrites the
   member accesses agbcc rejects ("no member named"). It handles accesses inside macros,
   member names passed to offsetof-style macros, lines where only a trial compile tells
-  which access is meant, and subclass pointers passed for the base (`--upcast`).
-  `tools/retype/room_actor.txt` holds every step so far; replayed on the pre-item-5
-  sources, it reproduces this tree.
+  which access is meant, subclass pointers passed for the base (`--upcast`) and casts to
+  the base types (`--decast`). `tools/retype/room_actor.txt` holds every step; replayed on
+  the pre-item-5 sources, it reproduces this tree.
+* `tools/fold_views.py` (new, tested) folds a unit's private view of a class into the
+  class: a member the class has is renamed, or the class takes the reader's name when its
+  own only records the offset (field6AC -> pursuitCooldown, every other user follows); a
+  member inside padding is added; past the end, appended; a signedness difference is tried
+  and kept only if every user still matches. Results: Vorn 13 of 14 views, Mummy 10 of 11,
+  Golem 5 of 7, Dog 6 of 8 plus the two attack copies by hand (a Dog's 0x624 is its bite
+  collider, a `struct ContactCollider`), Skeleton 4 of 13.
+* One `struct ChaseRouteProbe` replaced Skeleton's and Mimic's identical probes; Vorn, Golem,
+  Mummy and Dog hold theirs as fields, and the init functions lost their byte offsets.
+* Methods: the slots are named from their callers (update, destroy, onMessage, onUpdate,
+  onDamage, onContact, targetQuery; the state handlers onStanding, onHidden, onEntry,
+  onAlternateEntry, onReaction, onDefeat). update, destroy, onMessage and the state handlers
+  are typed; class handlers with their own pointer type are installed with a cast. The real
+  `SceneActorScript_OnCommand` takes (actor, command); its eighteen `(void)` prototypes were
+  wrong. Typing adds no compiler warning (274 lines before and after, over 791 units).
+* Props: the wooden crate and the floor switch are pool slots of their own managers, not
+  registry actors. None of the eighteen registry classes is a prop.
 * Compiler facts found along the way:
   * Skeleton_Init keeps two pointer variables for the one object. Passing the Skeleton
     pointer where the original passed the chase pointer changes the register allocation,
     so Skeleton_SetMovementControlPreset keeps a ChaseActor parameter.
   * A struct that held ResetView by value had to grow its padding by 0xC8: TentacleActor,
     AxeActor, and two Skeleton views. The byte check caught each one.
-* Still to fold: BehaviorView, PlacementView, TerrainCollisionView, RegistryActor; the
-  Golem view in sub_080CCD7C.c; the Dog unions in sub_080E25FC.c and sub_080E5744.c; and
-  Mummy's raw `(u8 *)arg0 + 0x6F4` offsets.
+  * `counter304` must be s32: as u32 a `> 0` test becomes `!= 0`.
+  * Typing onUpdate, onDamage, onContact and targetQuery as function pointers changes which
+    function-address constant Axe_Init spills (its installer takes them as `void *`), so
+    those four stay `void *`.
+* Still open: see item 5 in `docs/OBJECT_MODEL.md`.

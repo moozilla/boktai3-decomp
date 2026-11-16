@@ -12,10 +12,10 @@ retains its response priorities, sounds, timers, and distinct body fields.
 ## Ownership and verified interfaces
 
 `scene_actor_chase_reaction.h` is the entry header. Its implementation headers
-share route, player, terrain, tracking, flag, and control operations. Actors use
-`SceneActorRegistryResetView` and the canonical body, targeting, and group
-components. Group and tracking accesses now use `&actor->group` and
-`&actor->tracking`, without casting the first member into a different record.
+share route, player, terrain, tracking, flag, and control operations. Actors are
+`struct ChaseActor` (`chase_actor.h`: the `struct RoomActor` base plus the chase group;
+see OBJECT_MODEL.md). Group and tracking accesses use `&actor->group` and
+`&actor->base.tracking`, without casting the first member into a different record.
 
 Two former selectors are removed. Mummy recovery explicitly calls
 `SceneActorChase_QueryMotionFlagComponent` and

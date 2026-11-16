@@ -3,8 +3,8 @@
 Tags: #engine #structs #cleanup #actors
 
 What kinds of object the game has, how each is laid out in memory, and where our source
-still hides that. Read from the matched C on 2026-11-15; nothing here was checked by
-running the game, and names marked *(proposed)* are not in the source yet. The task
+still hides that. Read from the matched C on 2026-11-15 and 2026-11-16; nothing here was
+checked by running the game. The task
 scheduler itself is in [ENGINE.md](ENGINE.md) section 3.
 
 ## The short version
@@ -39,33 +39,92 @@ first 0x18 bytes are that header; its size is the `size` argument to `Task_Creat
 
 ## Family 2: registry actors
 
-Nineteen units build one of these, and they all follow the same recipe. `Skeleton_Create`
-and `Skeleton_Init` in `src/skeleton.c` are a readable example.
+The room's enemies. Eighteen units link one into the scene-actor registry with
+`SceneActorRegistry_LinkActor`, and they all follow one recipe; `Skeleton_Create` and
+`Skeleton_Init` in `src/skeleton.c` are a readable example.
 
-1. `X_Create` allocates the block: `Heap_Alloc(0x74C)` for Skeleton. The size is the
-   subclass (Slime 0x40C, Crow and Bat 0x43C, Lun 0x44C, Bee 0x490, Ghost 0x62C,
-   Octopus 0x63C, Ivy 0x640, Spider 0x65C, Mimic 0x664, Golem 0x6B0, Dog 0x6E0,
-   Vorn and Mummy 0x720, Skeleton 0x74C, Tentacle 0x934, Axe 0xF24; read from each
-   `X_Create(void)`). Ghoul links into the registry too, through a creator of a
-   different shape whose size is not listed here.
-2. `X_Init` fills the **base**: body and position, drawable, two colliders, palette,
-   health, saved control state, script hooks.
-3. It then installs the **virtual methods**, function pointers stored in the base:
-   update, destroy, on-script-message, standing, hidden, reaction, defeat, default
-   reaction, contact predicate, damage, contact, plus tables indexed by behavior and
-   phase. `MonsterInit_InstallSequenceCallbacks` (`include/scene_actor_init_dispatch.h`)
-   writes most of them in one call.
-4. The monster's own fields live after the base (`struct Skeleton` has `actionFlags`,
-   `routeProbe`, `destination`, `healthThreshold`).
-5. `SceneActorRegistry_LinkActor` adds the block to the manager's list; from then on the
-   registry task calls the installed pointers every frame.
+### The class
 
-A script parameter (keyword `k`) selects a **variant** inside one class: Skeleton branches
-on category 7, 8, 0x11 and 0x17.
+```c
+struct RoomActor { ... };                       /* include/room_actor.h, 0x3D4 bytes */
 
-Nineteen source files call `SceneActorRegistry_LinkActor`. Whether props such as the
-wooden crate and floor switch are members has not been checked; Ivy is, which suggests the
-base means "a thing in the room with a body that reacts to being hit" more than "enemy".
+struct ChaseActor {                              /* include/chase_actor.h, 0x624 bytes */
+    struct RoomActor base;
+    struct SceneActorChaseGroup group;           /* route, target placement, pursuit control */
+};
+
+struct Skeleton { struct ChaseActor chase; ... };  /* a chase class */
+struct Bee      { struct RoomActor base;   ... };  /* a class without the chase layer */
+```
+
+* **`struct RoomActor`** is the base: body and position, drawable, the two colliders
+  (`colliderA`, `colliderB`), palette, health, the saved control, the methods, the state,
+  phase and behavior bytes the shared code steps through, the shadow, and `context` (the
+  pointer the methods are called with; `SceneActorRegistry_SetObjectContext(actor, actor, ...)`
+  makes it the actor itself in every class read so far).
+* **`struct ChaseActor`** adds the chase group: the home route, the target placement, the
+  saved pursuit control and the route and turn callbacks the shared chase code drives
+  (`include/scene_actor_group.h`). The shared monster code (`MonsterInit_*`,
+  `SceneActorReaction_*`, `SceneActorMovement_*`, ...) takes a `struct ChaseActor *`.
+* **Classes.** Each class embeds its parent first, so a class pointer is also a parent
+  pointer and code passes `&skeleton->chase` where the shared code wants one. agbcc has
+  no anonymous members, so a class writes `skeleton->chase.base.health`.
+
+| Class | Parent | Header | Size (`X_Create`) |
+|---|---|---|---|
+| Skeleton | ChaseActor | `skeleton.h` | 0x74C |
+| Vorn | ChaseActor | `vorn.h` | 0x720 |
+| Mummy | ChaseActor | `mummy.h` | 0x720 |
+| Dog | ChaseActor | `dog.h` | 0x6E0 |
+| Golem | ChaseActor | `golem.h` | 0x6B0 |
+| Mimic | ChaseActor | `mimic.h` | 0x664 |
+| Ghoul | ChaseActor | `ghoul.h` | (other creator) |
+| Spider, Octopus, Ivy, Axe | ChaseActor | none yet | 0x65C, 0x63C, 0x640, 0xF24 |
+| Ghost | RoomActor | `ghost.h` | 0x62C |
+| Bee | RoomActor | `bee.h` | 0x490 |
+| Crow | RoomActor | `crow.h` | 0x43C |
+| Slime | RoomActor | `slime.h` | 0x40C |
+| Tentacle | RoomActor | `tentacle_body.h` (its segments start at 0x3D4; the init unit's `TentacleActor` still views it as a ChaseActor) | 0x934 |
+| Lun, Bat | RoomActor | none yet | 0x44C, 0x43C |
+
+Vorn and Mummy share their layout past the chase group (flags at 0x6D4, the route probe
+at 0x6F4); shared reaction units read both through one view.
+
+### The methods
+
+`X_Init` fills the base and then installs the methods, function pointers stored in the
+base. `MonsterInit_InstallSequenceCallbacks` (`include/scene_actor_init_dispatch.h`)
+writes most of them in one call. Named from the code that calls them:
+
+| Member | Called by | Example (Vorn) |
+|---|---|---|
+| `update` | `SceneActorRegistry_UpdateActors`, every frame | `Vorn_OnRender` (it runs `SceneActor_UpdateBehaviorCallbacks`) |
+| `destroy` | `SceneActorRegistry_UpdateActors` / `_DestroyActors`, before the block is freed | `Vorn_OnDestroy` |
+| `onMessage` | `SceneActorRegistry_SendToCategory` and the other senders | `SceneActorScript_OnCommand` |
+| `onUpdate` | `SceneActor_UpdateActiveCallbacks`, with `context` | `Vorn_OnUpdate` |
+| `onDamage` | `SceneActor_UpdateActiveCallbacks`, before `onUpdate` | `SceneActorReaction_ResolvePlacementDamage` |
+| `onContact` | the shared contact tests | `SceneActorPlacement_ResetStateThree` |
+| `targetQuery` | the shared pursuit code | `SceneActorTarget_ResolvePendingObject` |
+| `onStanding`, `onHidden`, `onEntry`, `onAlternateEntry`, `onReaction`, `onDefeat` | the state handlers `MonsterInit_SetControl` switches to | `Vorn_BeginIdle`, `Vorn_UpdateHiddenRecovery`, ... |
+| `defaultReaction`, `contactQuery`, `animationQuery` | the shared reaction and animation code | |
+| `behaviorCallbacks`, `alternateBehaviorCallbacks`, `phaseCallbacks` | tables indexed by `behavior2AA` and `phase2A9` | |
+
+The slots are typed with the typedefs in `include/scene_actor_components.h`: `update` and
+`destroy` are `SceneActorResultCallback` (`s32 (*)(void *actor)`), the six state handlers
+`SceneActorAction`, and `onMessage` `SceneActorCommandHandler` (the actor and the script
+command, as `SceneActorScript_OnCommand` takes them). A class whose handler takes its own
+pointer type (`u32 Bee_Destroy(struct ChaseActor *)`) installs it with a cast to the slot's
+type, since the registry calls every class the same way. Still `void *`: `onUpdate`,
+`onDamage`, `onContact` and `targetQuery` (typing those four changes which constant
+`Axe_Init` keeps on the stack; its installer passes them in as `void *`), and
+`defaultReaction`, `callback248`, `field238`..`field240` and the behavior and phase tables.
+
+### Not members
+
+The props are not registry actors. The wooden crate is one of twelve slots in a
+`WoodenCrateManager` (`WoodenCrate_AllocateSlot`), and the floor switch is one of eight
+slots on the scene-object list (`FloorSwitch_AllocateSlot`, `SceneBody_GetRegistry`). Both
+are family 3. Of the eighteen classes that link into the registry, none is a prop.
 
 ## Family 3: pool slots
 
@@ -115,27 +174,26 @@ workers are idle, because it touches most gameplay files.
 4. *(done 2026-11-15)* **Duplicate boss structs.** `struct Nidhoggr` was defined in its
    header and again in `src/fn/sub_08191508.c`, and `src/fn/sub_08190C98.c` had a third
    view (`struct BossParts`). One definition, in the header.
-5. **Name the registry-actor base.** *(proposed)* Today it is eleven overlapping views:
-   `SceneActorRegistryResetView` (used about 2,700 times), `SceneActorRegistryActor`
-   (about 320), and nine narrower ones. An unrelated struct is already called
-   `struct SceneActor` (`include/scene_actor_lifecycle.h`; the one in `scene_indicator.h`
-   was a `gPlayers` view and is gone), so that name is taken. Proposal: `struct RoomActor` for the base, with each subclass
-   embedding it first:
-
-   ```c
-   struct Skeleton {
-       struct RoomActor base;
-       u32 actionFlags;
-       ...
-   };
-   ```
-
-   and the callback slots typed and named as methods (`update`, `destroy`, `onMessage`,
-   `onStanding`, `onHidden`, `onReaction`, `onDefeat`, ...). Merge the views field by
-   field (`tools/layoutmerge.py` does this for globals with several struct types), one
-   field at a time, keeping every
-   dependent unit byte-identical. This is a rename across more than 500 files; do it as
-   a scripted change that can be re-run, not by hand.
+5. *(done 2026-11-16)* **The registry-actor base.** It was eleven overlapping views
+   (`SceneActorRegistryResetView`, about 2,700 uses; `SceneActorRegistryActor`, about 320;
+   the animation, behavior, placement, terrain-collision and gate views; private copies in
+   units). Now it is `struct RoomActor` and `struct ChaseActor` with the classes embedding
+   them (family 2 above), and the method slots are named (most are typed). Every step was
+   byte-identical for every dependent unit. Two scripts redo it on another branch:
+   `tools/retype_fields.py --steps tools/retype/room_actor.txt` rewrites the accesses that
+   no longer compile, and `tools/fold_views.py HEADER CLASS UNIT:VIEW` folds a unit's private
+   view into its class. Still open:
+   * Classes without a header yet: Spider, Octopus, Ivy, Axe, Lun and Bat. Axe is the
+     largest: about 20 private views across 26 units, and 61 conflicting offsets.
+   * Views that do not fold as they are: `VornRetreatContext` and `MummyCheckpointContext`
+     (they read a flags word through a bitfield), `GolemSlideContext` (it reads 0x680
+     unsigned, `GolemBody` signed), `GolemCombatResetContext` (byte arrays over two
+     positions), `DogApproachContext` (reads inside the bite collider), and nine Skeleton
+     views. Five of those are the parameter types of functions that `skeleton.h` declares
+     with `struct ChaseActor`; three read 0x6E0..0x6EC as words.
+   * Code that takes a `struct ChaseActor *` but only reads the base, and the non-chase
+     classes' code (Bee, Crow, ...), should take `struct RoomActor *`.
+   * About 300 casts to `struct ChaseActor *` and 21 to `struct RoomActor *` remain.
 6. **Studio.** Once 1 to 5 land, the actor browser can show the three families and, for
    registry actors, the subclass size, variant list and installed methods.
 

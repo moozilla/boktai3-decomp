@@ -6,7 +6,7 @@ Tags: #matching #scene-actor #compiler #regalloc #08078EE8
 
 ## Recovered source structure
 
-The draft was a starting hypothesis. ROM inspection corrected the unstable-state flag field, effect subtype mask, death-control pointer, death-path state/control ordering, flash-expiry return, signed timers, palette-sum promotion, and actual route/output fields. The implementation uses the canonical `SceneActorRegistryResetView` and shared chase geometry, flag, control, and state operations. Temporary duplicate actor/group/terrain layouts were removed; the migration passed 385 target-compiler layout assertions.
+The draft was a starting hypothesis. ROM inspection corrected the unstable-state flag field, effect subtype mask, death-control pointer, death-path state/control ordering, flash-expiry return, signed timers, palette-sum promotion, and actual route/output fields. The implementation uses the canonical `struct ChaseActor` (then `SceneActorRegistryResetView`) and shared chase geometry, flag, control, and state operations. Temporary duplicate actor/group/terrain layouts were removed; the migration passed 385 target-compiler layout assertions.
 
 The source boundaries that resolved the difficult compiler differences have ordinary purposes:
 

@@ -4,7 +4,7 @@ The contiguous cohort **080800A4–08081290** contains seven complete callbacks:
 
 The existing callback8005C is72 bytes and receives no new credit. The true next entry is800A4, beginning PUSH r4-r7/LR and saves of SL/SB/R8; the old800AC label is the second, interior push. Its complete body restores both saved sets and ends80494. Parent metadata already records the corrected entry and rejected interior label; this worker does not duplicate that bookkeeping commit.
 
-The narrow header `scene_actor_reaction.h` reuses `SceneActorRegistryResetView` and describes the group's collider pointer at3F8, route control at420, and destination pointer5D4. Group414/418 and route control counters retain their observed widths. These are phase views of the shared actor, rather than evidence of a separate allocation.
+The narrow header `scene_actor_reaction.h` reuses `struct ChaseActor` (formerly `SceneActorRegistryResetView`) and describes the group's collider pointer at3F8, route control at420, and destination pointer5D4. Group414/418 and route control counters retain their observed widths. These are phase views of the shared actor, rather than evidence of a separate allocation.
 
 ## Exact work
 
