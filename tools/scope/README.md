@@ -2758,5 +2758,44 @@ which is exactly `10:1`. Not tested.
    concession; whether the original had them as written or as a clamp helper
    with a second result is not known.
 
+231. **A constant pointer whose register loses to a neighbour by a factor of two has had its live length doubled by REG_EQUIV; a pointer built through a union's halves is not doubled.**
+   `update_equiv_regs` (local-alloc.c) turns the REG_EQUAL note cse leaves on a
+   register set once from a constant (`table = gRandomTable`, a hoisted
+   `0x3FF`, an address literal) into REG_EQUIV and doubles `REG_LIVE_LENGTH`,
+   so global-alloc's priority, `floor_log2(refs) * refs / live * 10000`, is
+   halved. Such a register lands in a lower-ranked hard register than the ROM's,
+   or gets none and is rematerialized, and the usual cure was a `+r` barrier
+   or a pin on the table. A register that is also set through a SUBREG is
+   marked `no_equiv`, so it keeps its real length. The halves idiom in
+   `include/monster_particle_random.h` does exactly that and cse still folds
+   it to the one `ldr =0x0203B400`:
+
+   ```c
+   union ParticleRandomTableSource source;
+   const u16 *table;
+   source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+   source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+   table = ParticleRandom_GetTable(&source);
+   ```
+
+   The halves must be the numeric `RANDOM_TABLE_ADDR` (include/global.h);
+   `(u32)gRandomTable` halves are a symbol and compile to real shifts. Declare
+   the union at function scope: inside a loop body the two sets are not hoisted.
+   ParticleGroup_UpdateBouncing 0801404C: with `table = gRandomTable` the table
+   has 7 refs over a doubled 576 and loses sl to the hoisted `-256`; with the
+   union it is 7/288 = 486 against the sprite pointer's 7/287 = 487 and the
+   constant's 9/568 = 475 (itself doubled), which is the ROM's order (sprite
+   sb, table sl, constant in no register). `scope.py A.c vs B.c FUNC` prints
+   refs, live and priority for each register; a `live` twice the distance
+   between first and last use is this doubling. Ref weights to tune the other
+   side of a near tie: a mention outside loops counts 1, inside a loop 2, and
+   inside a `do { } while (0)` macro in a loop 3 (so
+   `ParticleRandom_ReadSample` adds 3 per site and the inline
+   `ParticleRandom_ReadDirectSample` 2). The converse also holds: a register
+   the ROM ranks low or rematerializes wants the plain constant assignment.
+   Related: with `#define gRandomTable ((u16 *)0x0203B400)` cse folds the
+   address into each `(plus reg const)` and loop.c has nothing to hoist; the
+   extern from `ram.h` stays one register that loop.c hoists.
+
 `SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
 `build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.

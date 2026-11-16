@@ -75,3 +75,8 @@ WirelessGameItems_UpdateItemMerge (per-arm zero, dead `count < 0`),
 WirelessGameItems_QueueLocalItem and QueueIncomingItem (`clear = 0; if (x < 0) clear = x`),
 WirelessGameItems_UpdateIncomingItem (`value < 0 ? -1 : 0`), Scene_TryStepDown
 (`if (referenceHeight < 0) return 0;`).
+
+## Recipe: random-table register priority (scope README fact 231)
+
+1. `scope.py A.c vs B.c FUNC`: if the table (or another once-set constant) register shows `live` about twice its real span and lands one register lower than the ROM, it is REG_EQUIV-doubled. Replace `table = gRandomTable` plus its barrier or pin with the function-scope halves union (`source.halves[0] = (u16)RANDOM_TABLE_ADDR; source.halves[1] = RANDOM_TABLE_ADDR >> 16; table = ParticleRandom_GetTable(&source);`).
+2. Then settle the remaining near tie with ref weights only: `ParticleRandom_ReadDirectSample(table)` (2 per site in a loop) against `ParticleRandom_ReadSample` (3 per site), and the extern `gRandomTable` rather than a numeric `#define` when the ROM hoists the address. Proven on sub_0801404C (c34073c60); group: sub_080399F4, ParticleGroup_UpdateFrozen, Vorn_UpdateDefeat, sub_08012B34, FadingParticleGroup_Spawn, FadingParticleGroup_Update, sub_08014CA4, sub_08014634.
