@@ -2,41 +2,43 @@
 
 From `python3 tools/progress.py --list-pinned` on main after pilot batch 18: 36 functions, in ROM order.
 
-| Address | Function | Kinds | Bytes |
-|---|---|---|---|
-| 08012B34 | sub_08012B34 | pin | 468 |
-| 08014330 | ParticleGroup_UpdateFrozen | operand | 360 |
-| 08014634 | sub_08014634 | pin,operand | 664 |
-| 08014CA4 | sub_08014CA4 | pin,operand | 704 |
-| 080154EC | AnimatedParticles_Create | operand | 1176 |
-| 08016118 | FadingParticleGroup_Update | pin,barrier | 540 |
-| 0803198C | sub_0803198C | pin | 948 |
-| 08038448 | WirelessGameMenu_InitEquipmentChoices | pin,operand | 408 |
-| 0803B40C | WirelessResultPanel_Init | pin,operand | 684 |
-| 0804373C | ContactActor_UpdateRetreat | pin,operand | 788 |
-| 0804CB4C | TetherActor_UpdateBounceReturn | pin | 356 |
-| 08051EA8 | ProximityEmitter_InitializeFromScript | pin | 576 |
-| 0805AC3C | ScenePanel_TickRig | pin,operand | 220 |
-| 0805B0F0 | ScenePanel_InitRig | operand | 412 |
-| 0805E1D0 | SceneInput_TickChoice | operand | 160 |
-| 08071F50 | SceneActorPalette_ApplyTransition | pin,operand | 468 |
-| 08072D34 | SceneActorContacts_ReleaseInvalidOwners | pin,operand | 212 |
-| 080A4018 | Spider_UpdateWanderGoal | pin | 584 |
-| 080AA8C4 | TentacleActor_AlignSegmentsToTerrain | operand | 460 |
-| 080AB968 | TentacleActor_UpdateRetraction | operand | 324 |
-| 080AEE08 | Vorn_UpdateDefeat | single-use-macro | 984 |
-| 080BD1F0 | Skeleton_UpdateDefeat | pin | 7924 |
-| 080D1784 | Mummy_ResumeSavedRouteAfterAnimation | pin,operand | 788 |
-| 08101B1C | NamedObject_RegisterFollowCells | pin | 528 |
-| 08108C94 | sub_08108C94 | pin | 456 |
-| 0815F5B4 | TargetRegistry_FindById | pin | 68 |
-| 0817AEC8 | sub_0817AEC8 | pin | 288 |
-| 0819BB18 | sub_0819BB18 | operand | 416 |
-| 0819BCB8 | Hresvelgr_EmitFacingMotion | pin,operand | 368 |
-| 081A0BC8 | Hresvelgr_UpdateBoundaryBarrage | operand | 732 |
-| 081A14FC | sub_081A14FC | pin,operand | 1764 |
-| 081D3620 | sub_081D3620 | pin | 132 |
-| 0820EE34 | OrangeSpine_ApplyHitReaction | pin,operand | 424 |
-| 08217430 | sub_08217430 | pin,operand | 1328 |
-| 0821B084 | GameState_SelectRamBase | pin | 88 |
-| 08234540 | SpiralBurst_InitParticles | pin | 428 |
+For each one, the draft column points to the draft to start from: the latest pilot draft where one exists, otherwise the most recently committed draft in `notes/phase3-drafts/`. Other variants from the same pilot round are named in brackets. The note column gives the most specific note: a note named after the function, else the pilot drafts README when the draft came from the pilot, else the most recent note that mentions it. The log column gives the function's most recent row in a pilot TSV log, with its status. Older drafts from earlier rounds are under `notes/phase3-drafts/*/`, and `notes/pilot/fable-holdouts-causes.md` groups the open functions by cause.
+
+| Address | Function | Kinds | Bytes | Draft | Note | Log |
+|---|---|---|---|---|---|---|
+| 08012B34 | sub_08012B34 | pin | 468 | [phase3-drafts/dp-effects/sub_08012B34.c](../phase3-drafts/dp-effects/sub_08012B34.c) | [pilot/depin-08012B34_2026-11-16.md](../pilot/depin-08012B34_2026-11-16.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08014330 | ParticleGroup_UpdateFrozen | operand | 360 | [phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c](../phase3-drafts/dp-effects/ParticleGroup_UpdateFrozen.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08014634 | sub_08014634 | pin,operand | 664 | [phase3-drafts/pilot/sub_08014634.c](../phase3-drafts/pilot/sub_08014634.c) | [phase3-drafts/pilot/sub_08014634.md](../phase3-drafts/pilot/sub_08014634.md) | [pilot/depin-slim-1.tsv](../pilot/depin-slim-1.tsv) (open) |
+| 08014CA4 | sub_08014CA4 | pin,operand | 704 | [phase3-drafts/pilot/sub_08014CA4.c](../phase3-drafts/pilot/sub_08014CA4.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/depin-slim-1.tsv](../pilot/depin-slim-1.tsv) (open) |
+| 080154EC | AnimatedParticles_Create | operand | 1176 | [phase3-drafts/dp-effects/AnimatedParticles_Create.c](../phase3-drafts/dp-effects/AnimatedParticles_Create.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08016118 | FadingParticleGroup_Update | pin,barrier | 540 | [phase3-drafts/field-effects/FadingParticleGroup_Update.c](../phase3-drafts/field-effects/FadingParticleGroup_Update.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | none |
+| 0803198C | sub_0803198C | pin | 948 | [phase3-drafts/dp-menus/sub_0803198C.c](../phase3-drafts/dp-menus/sub_0803198C.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08038448 | WirelessGameMenu_InitEquipmentChoices | pin,operand | 408 | [phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c](../phase3-drafts/dp-link/WirelessGameMenu_InitEquipmentChoices.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | none |
+| 0803B40C | WirelessResultPanel_Init | pin,operand | 684 | [phase3-drafts/dp-link/WirelessResultPanel_Init.c](../phase3-drafts/dp-link/WirelessResultPanel_Init.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | none |
+| 0804373C | ContactActor_UpdateRetreat | pin,operand | 788 | [phase3-drafts/dp-scene1/ContactActor_UpdateRetreat.c](../phase3-drafts/dp-scene1/ContactActor_UpdateRetreat.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | none |
+| 0804CB4C | TetherActor_UpdateBounceReturn | pin | 356 | [phase3-drafts/dp-field/TetherActor_UpdateBounceReturn.c](../phase3-drafts/dp-field/TetherActor_UpdateBounceReturn.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08051EA8 | ProximityEmitter_InitializeFromScript | pin | 576 | [phase3-drafts/dp-field-b/ProximityEmitter_InitializeFromScript.c](../phase3-drafts/dp-field-b/ProximityEmitter_InitializeFromScript.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 0805AC3C | ScenePanel_TickRig | pin,operand | 220 | [phase3-drafts/dp-menus-b/ScenePanel_TickRig.c](../phase3-drafts/dp-menus-b/ScenePanel_TickRig.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 0805B0F0 | ScenePanel_InitRig | operand | 412 | [phase3-drafts/dp-menus-b/ScenePanel_InitRig.c](../phase3-drafts/dp-menus-b/ScenePanel_InitRig.c) | [phase3-holdouts.md](../phase3-holdouts.md) | [pilot/depin-slim-2.tsv](../pilot/depin-slim-2.tsv) (partial) |
+| 0805E1D0 | SceneInput_TickChoice | operand | 160 | [phase3-drafts/dp-menus-b/SceneInput_TickChoice.c](../phase3-drafts/dp-menus-b/SceneInput_TickChoice.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08071F50 | SceneActorPalette_ApplyTransition | pin,operand | 468 | [phase3-drafts/pilot/SceneActorPalette_ApplyTransition.c](../phase3-drafts/pilot/SceneActorPalette_ApplyTransition.c) | [phase3-drafts/pilot/README.md](../phase3-drafts/pilot/README.md) | [pilot/depin-slim-2.tsv](../pilot/depin-slim-2.tsv) (open) |
+| 08072D34 | SceneActorContacts_ReleaseInvalidOwners | pin,operand | 212 | [phase3-drafts/pilot/SceneActorContacts_ReleaseInvalidOwners.c](../phase3-drafts/pilot/SceneActorContacts_ReleaseInvalidOwners.c) | [phase3-drafts/pilot/README.md](../phase3-drafts/pilot/README.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 080A4018 | Spider_UpdateWanderGoal | pin | 584 | [phase3-drafts/dp-monsters/Spider_UpdateWanderGoal.c](../phase3-drafts/dp-monsters/Spider_UpdateWanderGoal.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 080AA8C4 | TentacleActor_AlignSegmentsToTerrain | operand | 460 | [phase3-drafts/dp-monsters/TentacleActor_AlignSegmentsToTerrain.c](../phase3-drafts/dp-monsters/TentacleActor_AlignSegmentsToTerrain.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 080AB968 | TentacleActor_UpdateRetraction | operand | 324 | [phase3-drafts/dp-monsters/TentacleActor_UpdateRetraction.c](../phase3-drafts/dp-monsters/TentacleActor_UpdateRetraction.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 080AEE08 | Vorn_UpdateDefeat | single-use-macro | 984 | [phase3-drafts/dp-monsters/Vorn_UpdateDefeat.c](../phase3-drafts/dp-monsters/Vorn_UpdateDefeat.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 080BD1F0 | Skeleton_UpdateDefeat | pin | 7924 | [phase3-drafts/dp-monsters/Skeleton_UpdateDefeat.c](../phase3-drafts/dp-monsters/Skeleton_UpdateDefeat.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 080D1784 | Mummy_ResumeSavedRouteAfterAnimation | pin,operand | 788 | [phase3-drafts/dp-monsters/Mummy_ResumeSavedRouteAfterAnimation.c](../phase3-drafts/dp-monsters/Mummy_ResumeSavedRouteAfterAnimation.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08101B1C | NamedObject_RegisterFollowCells | pin | 528 | [phase3-drafts/dp-field-b/NamedObject_RegisterFollowCells.c](../phase3-drafts/dp-field-b/NamedObject_RegisterFollowCells.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08108C94 | sub_08108C94 | pin | 456 | [phase3-drafts/pilot/sub_08108C94.c](../phase3-drafts/pilot/sub_08108C94.c) (also `sub_08108C94_t2.c`) | [phase3-drafts/pilot/README.md](../phase3-drafts/pilot/README.md) | [pilot/depin-slim-2.tsv](../pilot/depin-slim-2.tsv) (open) |
+| 0815F5B4 | TargetRegistry_FindById | pin | 68 | [phase3-drafts/pilot/TargetRegistry_FindById.c](../phase3-drafts/pilot/TargetRegistry_FindById.c) | [phase3-drafts/pilot/TargetRegistry_FindById.md](../phase3-drafts/pilot/TargetRegistry_FindById.md) | [pilot/depin-slim-2.tsv](../pilot/depin-slim-2.tsv) (holdout) |
+| 0817AEC8 | sub_0817AEC8 | pin | 288 | [phase3-drafts/dp-field-b/sub_0817AEC8.c](../phase3-drafts/dp-field-b/sub_0817AEC8.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 0819BB18 | sub_0819BB18 | operand | 416 | [phase3-drafts/pilot/sub_0819BB18.c](../phase3-drafts/pilot/sub_0819BB18.c) (also `sub_0819BB18.no_pins.c`) | [phase3-holdouts.md](../phase3-holdouts.md) | [pilot/depin-slim-1.tsv](../pilot/depin-slim-1.tsv) (holdout) |
+| 0819BCB8 | Hresvelgr_EmitFacingMotion | pin,operand | 368 | [phase3-drafts/dp-bosses/Hresvelgr_EmitFacingMotion.c](../phase3-drafts/dp-bosses/Hresvelgr_EmitFacingMotion.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 081A0BC8 | Hresvelgr_UpdateBoundaryBarrage | operand | 732 | [phase3-drafts/cdp-bosses/Hresvelgr_UpdateBoundaryBarrage.c](../phase3-drafts/cdp-bosses/Hresvelgr_UpdateBoundaryBarrage.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 081A14FC | sub_081A14FC | pin,operand | 1764 | [phase3-drafts/cdp-bosses/sub_081A14FC.c](../phase3-drafts/cdp-bosses/sub_081A14FC.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 081D3620 | sub_081D3620 | pin | 132 | [phase3-drafts/pilot/sub_081D3620.c](../phase3-drafts/pilot/sub_081D3620.c) | [phase3-drafts/pilot/README.md](../phase3-drafts/pilot/README.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 0820EE34 | OrangeSpine_ApplyHitReaction | pin,operand | 424 | [phase3-drafts/cdp-monsters/OrangeSpine_ApplyHitReaction.c](../phase3-drafts/cdp-monsters/OrangeSpine_ApplyHitReaction.c) | [phase3-holdouts.md](../phase3-holdouts.md) | none |
+| 08217430 | sub_08217430 | pin,operand | 1328 | [phase3-drafts/dp-bosses/sub_08217430.c](../phase3-drafts/dp-bosses/sub_08217430.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 0821B084 | GameState_SelectRamBase | pin | 88 | [phase3-drafts/dp-bosses/GameState_SelectRamBase.c](../phase3-drafts/dp-bosses/GameState_SelectRamBase.c) | [pilot/fable-holdouts-causes.md](../pilot/fable-holdouts-causes.md) | [pilot/fable-holdouts.tsv](../pilot/fable-holdouts.tsv) (still-holdout) |
+| 08234540 | SpiralBurst_InitParticles | pin | 428 | [phase3-drafts/pilot/SpiralBurst_InitParticles.c](../phase3-drafts/pilot/SpiralBurst_InitParticles.c) (also `SpiralBurst_InitParticles_aa1.c`, `SpiralBurst_InitParticles_x1.c`) | [phase3-drafts/pilot/README.md](../phase3-drafts/pilot/README.md) | [pilot/depin-slim-2.tsv](../pilot/depin-slim-2.tsv) (open) |

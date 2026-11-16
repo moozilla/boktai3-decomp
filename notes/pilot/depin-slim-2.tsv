@@ -43,3 +43,4 @@
 08072D34	SceneActorContacts_ReleaseInvalidOwners	open	90	notes/phase3-drafts/pilot draft at 8 diffs; AGBCC_FORCE of valid to r1 matches; needs valid allocated after node with the &= form, or a u16 clear form that gcse PRE replaces.
 081D3620	sub_081D3620	open	60	notes/phase3-drafts/pilot draft at 12 diffs; local-alloc ranks the coordinate chain above the sample chain by post-combine refs, so filler does not help; needs a different statement shape.
 08071F50	SceneActorPalette_ApplyTransition	open	60	notes/phase3-drafts/pilot draft at 28 diffs, all stack-slot order (gcse PRE pseudo order).
+08234540	SpiralBurst_InitParticles	open	40	Pin-free draft in notes/phase3-drafts/pilot at 27 diffs (shape 6); the 48-diff version matches under AGBCC_PRI=table:+3600. The loop table copy is constant-equivalent (local-alloc update_equiv_regs doubles its life through cse's REG_EQUAL note), so it ranks below sprite and burst; the ROM needs it allocated before sprite.
