@@ -3,7 +3,7 @@ void Sound_PlaySong(u32);
 s32 LevelAdvanceDisplay_UpdateManager(struct LevelAdvanceManager *manager)
 {
     if (gPlayers[0]) {
-        if (gPlayers[0]->mode == 4) {
+        if (gPlayers[0]->kind == 4) {
             if (manager->active == 1) {
                 s32 i;
                 manager->sprite.flags |= 1;

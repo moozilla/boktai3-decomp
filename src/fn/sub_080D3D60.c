@@ -107,13 +107,13 @@ static inline u8 Arrive(void *obj)
         if (player < 0) {
             goto invoke;
         }
-        cell = gPlayers[player]->cell[3];
+        cell = ((u16 *)gPlayers[player]->followTarget)[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (MotionFlags(actor, 0x400))
         return 0;

@@ -3,6 +3,7 @@
 /* Tentative second sixteen-slot contact pool, beginning at 08043F64. */
 #include "contact_actor.h"
 #include "contact_swarm_sprite.h"
+#include "task.h"
 struct ContactSwarmGraphics {
     u8 unknown0[6];
     u16 paletteIndex;
@@ -34,7 +35,7 @@ struct ContactSwarmSlot {
     u8 shadow[0x40];
 };
 struct ContactSwarm {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask, frame;
     const void *sequenceResource;
     struct ContactSwarmSlot slots[16];

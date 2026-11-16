@@ -1,6 +1,7 @@
 #ifndef GUARD_SPRITE_EFFECT_CONTROLLER_H
 #define GUARD_SPRITE_EFFECT_CONTROLLER_H
 #include "contact_swarm.h"
+#include "task.h"
 /* Tentative independent sprite controller, global 02000178. Drawable layout
  * depends on flags bit 8: sequence sprite position1C, tile sprite position18. */
 struct SpriteEffectDrawablePrefix {
@@ -42,7 +43,7 @@ struct SpriteEffectController {
     u8 enter, colliderDelay;
 };
 struct SpriteEffectControllerPool {
-    u8 task[0x18];
+    struct Task task;
     u32 used;
     struct SpriteEffectController slots[24];
 };

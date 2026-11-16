@@ -91,7 +91,7 @@ byte-exact; `symbolize.py` emits the range from that file instead of
 
 | Format | Ranges | Bytes | Source | Kind |
 |---|---|---:|---|---|
-| `keyed_callbacks` | the actor registry `08603300–08604998` | 5,784 | `data/actor_registry.csv` (committed) | decoded |
+| `keyed_callbacks` | the script command table `08603300–08604998` | 5,784 | `data/actor_registry.csv` (committed) | decoded |
 | `text_bank` | `08D6B1E4–08DD6B96` | 440,754 | `build/text/bank.tsv` (extracted) | decoded |
 | `resource_archive` | 10 archives `08614DCC–08D5A85C` | 7,625,360 | `build/res/LABEL/index.txt` + one `HASH.bin` per entry (extracted) | split |
 
@@ -232,7 +232,7 @@ changing a codec, then regenerate PROGRESS.
 | Codec (`tool`) | Blocks | Editable form |
 |---|---|---|
 | `datafmt/text_bank` | the text bank | `bank.tsv` (strings via `data/charmap.tsv`, blobs) |
-| `datafmt/keyed_callbacks` | the actor registry | `data/actor_registry.csv` (key, callback name) |
+| `datafmt/keyed_callbacks` | the script command table | `data/actor_registry.csv` (key, callback name) |
 | `datafmt/resource_archive` | the 10 archive containers | JSON entry list (name hash, offset) |
 | `palette` | 195 `92B3` palettes, the `9B1B` pool | JSON: colors as `[r, g, b]` (+ the bit-15 flag), header words |
 | `font` | the `A635` font | PNG sheets of the 128 8×16 and 1,537 16×16 glyphs + JSON header |

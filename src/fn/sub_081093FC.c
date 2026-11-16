@@ -16,7 +16,7 @@ static inline u8 *LinkSession_GetData(struct AreaEffectLinkState *p)
         return NULL;
     return flag + 0x8D;
 }
-void LinkSession_CallPositionScript(struct AreaEffectPosition *position, s32 value)
+void LinkSession_CallPositionScript(struct SceneVec *position, s32 value)
 {
     s32 values[6];
     struct LinkScriptArgs args;

@@ -8,6 +8,7 @@
 #include "scene_event_types.h"
 #include "directional_sprite_state.h"
 #include "converging_effect_state.h"
+#include "task.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -161,10 +162,10 @@ struct PlayerAuxiliaryDrawable {
     u8 unknown2C[0x14];
 };
 struct Player {
-    u8 unk0[0x18];
+    struct Task task;
     s32 slot;                  /* 0x18: compared with local link player index */
     u32 kind;                  /* 0x1C: kind one accepts mode-0x1A position reset */
-    u32 statusFlags;           /* 0x186c: busy bits, 0x100000: cannot interact (guess) */
+    u32 statusFlags;           /* 0x20: busy bits, 0x100000: cannot interact (guess) */
     u16 positionalEffectGroup; /* 0x24: forwarded to SceneStimulus_AddTagged (tentative) */
     u8 unk26[6];
     u8 movementRequestBlocked; /* 0x2C: gates saved movement target; also indexes player slot on teardown */
@@ -338,7 +339,9 @@ struct Player {
     u16 positionResetTimer, positionResetCounter; /* 0x4D8 */
     u8 unk4DC[4];
     u8 cueVariant; /* 0x4E0: copied by 0815B404, tentative */
-    u8 unk4E1[5];
+    u8 unk4E1[2];
+    u8 gateCount; /* 0x4E3: cell gates the player is inside (CellGate) */
+    u8 unk4E4[2];
     u16 formCueParameterA;      /* 0x4E6: set to 6 for form two, cleared when its cue exits. */
     u16 terrainRecoveryCounter; /* 0x4E8: vertical scale during scripted cues */
     u16 formCueParameterB;      /* 0x4EA: paired with formCueParameterA. */
@@ -440,7 +443,7 @@ struct Player {
     struct SceneVec movementRequestTarget; /* 0xAE8 */
     u8 unkAF0;
     u8 actionRequestState; /* 0xAF1 */
-    u16 visualSlowdownTimer;
+    u16 visualSlowdownTimer; /* 0xAF2: also lowers the orbiting background (OrbitBackground) */
     u8 effectModes[4], effectCounters[4]; /* 0xAF4: per-channel effect reset state */
     u16 effectLimits[4];
     void *kindTwoAttachment;        /* 0xB04: descriptor-driven attachment, tentative */

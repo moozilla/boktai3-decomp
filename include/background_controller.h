@@ -31,7 +31,7 @@ struct BackgroundCommandQueue {
 
 /* Normal background task (object size 0x140). */
 struct Background {
-    u8 task[0x18]; /* scheduler task header */
+    struct Task task;
     u16 id;
     u8 flags;
     u8 layer;
@@ -64,7 +64,7 @@ struct Background {
 
 /* Scrolling background task (object size 0xF8). */
 struct ScrollingBackground {
-    u8 task[0x18];
+    struct Task task;
     u16 id;
     u8 flags;
     u8 layer;

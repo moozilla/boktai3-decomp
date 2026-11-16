@@ -14,7 +14,7 @@ struct ColorFadeChannel {
 };
 
 struct ColorFadeController {
-    u8 task[0x18]; // task header
+    struct Task task;
     struct ColorFadeChannel channels[2];
     u32 count; // queued commands
     u16 types[8];

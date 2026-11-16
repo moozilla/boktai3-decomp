@@ -2,9 +2,10 @@
 #define GUARD_CONTACT_COLLIDER_MANAGER_H
 
 #include "contact_collider.h"
+#include "task.h"
 
 struct ContactColliderManager {
-    u8 task[0x18];
+    struct Task task;
     struct ContactCollider *source, *pending;
     struct ContactCollider *sourceTail, *pendingTail;
     struct ContactCollider sourceHead, pendingHead;

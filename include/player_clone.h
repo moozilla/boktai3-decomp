@@ -2,6 +2,7 @@
 #define GUARD_PLAYER_CLONE_H
 #include "scene_input.h"
 #include "contact_collider.h"
+#include "task.h"
 
 struct PlayerCloneSlot;
 typedef s32 (*CloneUpdateCallback)(struct PlayerCloneSlot *, s32);
@@ -56,7 +57,7 @@ struct PlayerCloneSlot {
 };
 
 struct PlayerCloneManager {
-    u8 task[0x18];
+    struct Task task;
     u32 activeSlots;
     struct PlayerCloneSlot slots[3];
     u32 count;

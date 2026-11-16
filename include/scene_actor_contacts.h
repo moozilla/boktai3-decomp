@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_CONTACTS_H
 #define GUARD_SCENE_ACTOR_CONTACTS_H
 #include "scene_actor_registry.h"
+#include "task.h"
 /* Tentative contact-candidate list shared with the preceding 08072264 cohort. */
 struct SceneActorContactNode {
     void *object;
@@ -10,7 +11,7 @@ struct SceneActorContactNode {
     struct SceneActorContactNode *next;
 };
 struct SceneActorContactManager {
-    u8 task[0x18];
+    struct Task task;
     u32 field18;
     s32 count;
     u32 frame;

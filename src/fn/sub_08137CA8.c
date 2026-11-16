@@ -26,8 +26,8 @@ s32 SceneActorTarget_FindNearestEligiblePlayer(const struct ContactPosition *pos
     if (session)
         count = session->participantCount;
     for (i = 0; i < count; i++) {
-        struct AreaEffectPlayer *player = gPlayers[i];
-        if (player && !TestSlot(i) && !TestField(&player->flags, 0x20000)) {
+        struct Player *player = gPlayers[i];
+        if (player && !TestSlot(i) && !TestField(&player->statusFlags, 0x20000)) {
             s32 cell = SceneActorTerrain_GetCellIndex((void *)&player->position);
             u8 *data = SceneActorTerrain_GetCell(cell);
             if (!Test(*(u16 *)(data + 2), 0x43)) {

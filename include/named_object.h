@@ -41,7 +41,7 @@ struct NamedObject {
 };
 typedef char NamedObjectSizeCheck[(sizeof(struct NamedObject) == 0x19C) ? 1 : -1];
 struct NamedObjectManager {
-    u8 task[0x18];
+    struct Task task;
     void *sequences;
     struct NamedObject slots[12];
     u32 used, followName, tetherName;

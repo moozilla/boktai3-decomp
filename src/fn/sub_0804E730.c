@@ -1,9 +1,9 @@
 #include "area_effect.h"
 void AreaEffect_UpdateResourceFromPlayerFlags(struct AreaEffectManager *manager)
 {
-    struct AreaEffectPlayer *player = manager->player;
+    struct Player *player = manager->player;
     u32 mask = 32;
-    u32 flags = player->flags;
+    u32 flags = player->statusFlags;
     u32 mode;
     if (flags & mask) {
         mode = 2;

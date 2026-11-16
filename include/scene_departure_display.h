@@ -80,7 +80,7 @@ struct DepartureActor {
     s16 burstX, burstY, burstTimer;
     u16 endingTimer;
     s16 shakeStrength, phaseTimer2;
-    u16 alternateLayer;
+    s16 alternateLayer;
     s16 shakeX, shakeZ, blinkFrame, blinkActive;
     s16 cameraActive;
     u16 healthSeventh, healthTenth;

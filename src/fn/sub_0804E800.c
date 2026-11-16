@@ -12,9 +12,9 @@ void AreaEffect_ShowEnabledSprites(struct AreaEffectManager *manager)
     }
     AreaEffect_UpdateGraphicsId(manager);
     {
-        struct AreaEffectPlayer *player = manager->player;
+        struct Player *player = manager->player;
         u32 mask = 32;
-        u32 flags = player->flags;
+        u32 flags = player->statusFlags;
         s32 mode;
         if (flags & mask)
             mode = 2;

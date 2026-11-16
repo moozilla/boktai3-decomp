@@ -23,11 +23,15 @@ struct NidhoggrAnimRow {
 };
 
 struct NidhoggrCollider {
-    u8 unknown[0x54];
+    u8 unknown0[6];
+    u16 flags; /* 0x06: bit 2 disables the part's collider */
+    u8 unknown8[0x54 - 8];
 };
 
 struct NidhoggrPartExtra {
-    u8 unknown[0x10];
+    u32 unknown0;
+    u32 flags; /* 0x04: bit 0 set when the part is hidden */
+    u8 unknown8[0x10 - 8];
 };
 
 struct NidhoggrTerrainCell {
@@ -69,7 +73,7 @@ struct Nidhoggr {
     u8 attackActive;            /* 0x71BE: timed-attack collider active latch */
     u8 unknown71BF;
     u16 suspendedTimer; /* 0x71C0 */
-    u8 unknown71C2[0x71DC - 0x71C2];
+    u8 partState[26];   /* 0x71C2: per-part state (Nidhoggr_ChangeCompletedPartState) */
     u8 rowInitFlag[26]; /* 0x71DC: per-row "keyframes loaded" latch, indexed like rows[] */
     u8 rowCounter[26];  /* 0x71F6: per-row counter bumped by Nidhoggr_UpdatePartMotion */
     u8 rowDoneFlag[26]; /* 0x7210: per-row "animation finished" latch */

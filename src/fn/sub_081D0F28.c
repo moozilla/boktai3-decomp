@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "player.h"
 #include "ram.h"
 struct Motion {
     u8 pad0[9];
@@ -25,11 +26,6 @@ struct SceneNpc {
     u8 padD4[0x1F8];
     void *update;
 };
-struct Player {
-    u8 pad0[0x30];
-    s16 x, y, z;
-};
-extern struct Player *gPlayers[];
 struct SceneNpc *Actor_FindById(void *manager, s32 name);
 s32 Math_Atan2(s32 dx, s32 dz);
 void sub_081CEE50(void);
@@ -101,7 +97,7 @@ void SceneNpc_CommandFromScript(void)
     if (Script_GetKeywordValue('w', 0) > 0) {
         struct Player *player = gPlayers[0];
         s16 *pos = &npc->motion.x;
-        setAngle(npc, Math_Atan2(player->x - pos[0], player->z - pos[2]));
+        setAngle(npc, Math_Atan2(player->position.x - pos[0], player->position.z - pos[2]));
     }
     if (Script_GetKeywordValue('s', 0) > 0)
         npc->flagsC |= 1;

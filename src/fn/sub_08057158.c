@@ -44,7 +44,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             zero = 0;
             *frame = next;
         }
-        manager->sprite.position = gPlayers[0]->position;
+        manager->sprite.position.world = gPlayers[0]->position;
         timer = *frame;
         if (timer <= 119) {
             {
@@ -91,7 +91,7 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             zero = 0;
             *frame = next;
         }
-        manager->sprite.position = gPlayers[0]->position;
+        manager->sprite.position.world = gPlayers[0]->position;
         timer = *frame;
         if (timer <= 119) {
             manager->sprite.frame = 3;

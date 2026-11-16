@@ -28,9 +28,9 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
                     edge &= pressed;
                 } while (0);
                 if (edge) {
-                    struct InteractionMarkerPlayer *player = gPlayers[0];
+                    struct Player *player = gPlayers[0];
                     u32 blocked = 0x100000;
-                    if (!(player->flags & blocked) && marker->inputCooldown > 9) {
+                    if (!(player->statusFlags & blocked) && marker->inputCooldown > 9) {
                         marker->activationFrame = 8;
                         ScriptUtility_SetControlFlag(1);
                         PlayerCue_WalkTo(gPlayers[0], &marker->position, 0, 4);

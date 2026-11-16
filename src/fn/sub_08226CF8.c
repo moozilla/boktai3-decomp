@@ -2,6 +2,7 @@
 #include "render.h"
 #include "game_state.h"
 #include "engine.h"
+#include "player.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -17,16 +18,11 @@ struct Camera2 {
     u8 unknown68[0xC];
     s16 offsetX, offsetY, offsetZ;
 };
-struct Player {
-    u8 unknown0[0x30];
-    s16 x, y, z;
-};
 struct LinkState {
     u8 unknown0[0x18];
     s16 player;
 };
 extern struct LinkState *gLinkSession;
-extern struct Player *gPlayers[4];
 s32 Div(s32, s32);
 
 // Moves a secondary camera point (pos) by mode: follow the player, hold, pan to `target`,
@@ -35,9 +31,9 @@ void sub_08226CF8(struct Camera2 *camera)
 {
     struct Player *player = gGameState;
     struct PackedVec target;
-    target.x = player->x + camera->offsetX;
-    target.y = player->y + camera->offsetY;
-    target.z = player->z + camera->offsetZ;
+    target.x = player->position.x + camera->offsetX;
+    target.y = player->position.y + camera->offsetY;
+    target.z = player->position.z + camera->offsetZ;
     switch (camera->mode) {
         case 0:
             if (gEngineFlags & 0x800) {
@@ -48,9 +44,9 @@ void sub_08226CF8(struct Camera2 *camera)
                         struct Player **table = gPlayers;
                         struct Player **p = table + index;
                         if (*p) {
-                            camera->pos.x = (*p)->x;
-                            camera->pos.y = (*p)->y + 150;
-                            camera->pos.z = (*p)->z;
+                            camera->pos.x = (*p)->position.x;
+                            camera->pos.y = (*p)->position.y + 150;
+                            camera->pos.z = (*p)->position.z;
                         }
                     }
                 }

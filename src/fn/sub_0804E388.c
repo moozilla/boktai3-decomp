@@ -1,7 +1,7 @@
 #include "area_effect.h"
 #include "engine.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
-void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct AreaEffectPosition *, s32,
+void AreaEffect_InitializeEntry(struct AreaEffectEntry *, s32, struct SceneVec *, s32,
                                 u32);
 struct PackedPosition {
     s32 x : 16;
@@ -71,7 +71,7 @@ void AreaEffect_AddSpriteFromScript(void)
         else
             rotated = 0;
         AreaEffect_InitializeEntry(&manager->entries[manager->count], kind,
-                                   (struct AreaEffectPosition *)&position, rotated,
+                                   (struct SceneVec *)&position, rotated,
                                    manager->graphicsId);
         manager->entries[manager->count].enabled = 1;
         if (!AreaEffect_IsVisible(manager))

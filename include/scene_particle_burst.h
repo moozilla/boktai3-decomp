@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_PARTICLE_BURST_H
 #define GUARD_SCENE_PARTICLE_BURST_H
 #include "scene_particle_pool.h"
+#include "task.h"
 /* Tentative burst-particle pool: independent positions damp velocity by 7/10. */
 struct SceneParticleBurstSlot {
     struct ContactPosition position;
@@ -12,7 +13,7 @@ struct SceneParticleBurstSlot {
     s16 delay;
 };
 struct SceneParticleBurstPool {
-    u8 unknown0[0x18];
+    struct Task task;
     const void *sequenceResource;
     const void *graphicsResource;
     struct SceneParticleEffect effects[32];

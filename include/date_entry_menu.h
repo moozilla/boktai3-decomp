@@ -3,9 +3,10 @@
 
 #include "scene_input_widget.h"
 #include "text_entry_widget.h"
+#include "task.h"
 
 struct DateMenu {
-    u8 task[0x18];
+    struct Task task;
     struct TextEntryWidget widgets[4];
     struct SceneInputWidget digits[12];
     struct SceneInputResource digitResource;

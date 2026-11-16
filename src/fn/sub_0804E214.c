@@ -4,7 +4,7 @@ void Sprite_Init(void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 u32 Region_FindContaining(void *);
 void AreaEffect_InitializeEntry(struct AreaEffectEntry *entry, s32 kind,
-                                struct AreaEffectPosition *position, s32 rotated, u32 graphicsId)
+                                struct SceneVec *position, s32 rotated, u32 graphicsId)
 {
     u32 mirror;
     u8 *kindField;

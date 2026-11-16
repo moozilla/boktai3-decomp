@@ -12,7 +12,7 @@ struct TetherActor;
 
 /* Subject identity remains tentative; fields follow observed consumers. */
 struct ScenePanelSubject {
-    u8 unknown0[0x18];
+    struct Task task;
     struct ContactSwarmSprite drawable;
     u8 graphics[0x1C];
     struct ContactPosition home;

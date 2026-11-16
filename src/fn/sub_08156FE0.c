@@ -63,7 +63,7 @@ s32 Player_SelectActionSequence(struct Player *p)
         p->terrainRecoveryCounter = 0;
         ActorSequence_Begin(p, 0x17, 0);
     }
-    if (p->tetherMode != 4 && p->unk4E1[2])
+    if (p->tetherMode != 4 && p->gateCount)
         Player_BeginDirectionSequence(p, p->coordinateAxis);
     mode = p->tetherMode;
     if (!p->statGaugeFull && (u8)(p->actionMode - 1) <= 1) {

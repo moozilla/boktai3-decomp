@@ -7,7 +7,9 @@ Workers name functions with a file-local alias so they need not touch the
 shared symbols/functions.csv (which renames labels in gen/). At integration
 this tool moves every alias into symbols/functions.csv (confidence=low,
 source=src-alias), rewrites each `sub_XXXXXXXX` reference in src/ and include/
-and symbols/ram.ld to the name, and deletes the alias lines. `make` then regenerates gen/ with the
+and symbols/ram.ld to the name, and deletes the alias lines. It then refreshes
+the informational name column of the keyed_callbacks tables in data/manifest.csv
+(the script command table, data/actor_registry.csv) from symbols/functions.csv. `make` then regenerates gen/ with the
 new labels. Aliases of hidden boundaries without a sub_ label are left
 as they are. Refuses to run if an address has two names or a name two addresses,
 or if an alias disagrees with the name functions.csv already has for its address.
@@ -114,6 +116,25 @@ def main():
         w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
+    refresh_keyed_names({int(r["addr"], 16): r["name"] for r in rows})
+
+
+def refresh_keyed_names(names):
+    """Rewrite the name column of every keyed_callbacks table (data/manifest.csv)."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from datafmt import load_manifest
+    from datafmt.keyed_callbacks import refresh_names
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for e in load_manifest():
+        # Resolve the table under ROOT (the tree being promoted), not this checkout.
+        path = os.path.join(ROOT, os.path.relpath(e.file, repo))
+        if e.format != "keyed_callbacks" or not os.path.exists(path):
+            continue
+        text = open(path, encoding="utf-8").read()
+        out = refresh_names(text, names)
+        if out != text:
+            open(path, "w", encoding="utf-8").write(out)
+            print(f"refreshed names in {os.path.relpath(path, ROOT)}")
 
 
 if __name__ == "__main__":

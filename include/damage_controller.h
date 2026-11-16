@@ -1,6 +1,7 @@
 #ifndef DAMAGE_CONTROLLER_H
 #define DAMAGE_CONTROLLER_H
 #include "global.h"
+#include "task.h"
 
 // An invisible script-placed hit box: accumulates damage from colliders matching a kind/flag mask,
 // runs a script on hit and on death, then frees itself or refills its health.
@@ -26,7 +27,7 @@ struct DamageCollider {
 };
 
 struct DamageController {
-    u8 task[24];
+    struct Task task;
     struct DamageCollider collider;
     u16 id;
     s16 health;

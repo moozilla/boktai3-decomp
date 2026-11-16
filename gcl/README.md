@@ -26,7 +26,7 @@ EUC-JP, against 12 as Shift-JIS, 6 as UTF-8 and 13 expected by chance.
 
 | File | Keys | Used by |
 |---|---|---|
-| `names/chara.csv` | `data/actor_registry.csv` (722) | `chara KEY NAME ...` creates the entry's actor; `command KEY ...` calls its routine and keeps the result |
+| `names/chara.csv` | `data/actor_registry.csv`, the script command table (722) | `chara KEY NAME ...` creates the entry's object; `command KEY ...` calls its routine and keeps the result |
 | `names/command.csv` | native command ids | the block interpreter |
 
 Columns: `key, name, english, confidence, evidence`. `name` is the original

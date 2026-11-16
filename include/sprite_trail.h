@@ -2,6 +2,7 @@
 #define GUARD_SPRITE_TRAIL_H
 
 #include "contact_swarm_sprite.h"
+#include "task.h"
 
 struct TrailVector {
     s32 x, y, z, pad;
@@ -21,7 +22,7 @@ struct SpriteTrail {
 };
 
 struct SpriteTrailPool {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask;
     u8 unknown1C[4];
     struct SpriteTrail entries[4];

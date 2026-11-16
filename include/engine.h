@@ -10,6 +10,7 @@
  */
 
 #include "global.h"
+#include "task.h"
 #include "engine_globals.h"
 #include "game_state.h"
 #include "render.h"
@@ -17,16 +18,6 @@
 #include "ram.h"
 
 /* ---- Globals ---------------------------------------------------------- */
-
-struct Task {
-    struct Task *prev, *next;
-    void (*update)(struct Task *);  /* called every frame while alive */
-    void (*destroy)(struct Task *); /* called once after Task_Kill */
-    u16 id;                         /* unique, never 0 (gNextTaskId counter) */
-    u16 flags;                      /* bit 0: marked for deletion */
-    u8 list;                        /* index into gTaskLists (priority list, 0..13) */
-};
-
 
 #include "engine_map.h"
 

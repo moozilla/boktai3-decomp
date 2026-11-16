@@ -2,8 +2,10 @@
 #define GUARD_INTERACTION_MARKER_H
 #include "contact_swarm.h"
 #include "input.h"
+#include "task.h"
+#include "player.h"
 struct InteractionMarker {
-    u8 task[0x18];
+    struct Task task;
     u16 id;
     u8 nearby, bodyEnabled;
     u8 unknown1C[4], body[0x48];
@@ -16,17 +18,6 @@ struct InteractionMarker {
     u16 stateFrame, unknown112;
     void (*update)(struct InteractionMarker *);
 };
-struct InteractionMarkerPlayer {
-    u8 unknown0[0x20];
-    u32 flags;
-    u8 unknown24[0xC];
-    struct ContactPosition position;
-    u8 unknown38[0x41F];
-    u8 action;
-    u8 unknown458[0xC];
-    u8 busy;
-};
-extern struct InteractionMarkerPlayer *gPlayers[4];
 extern u32 gUnk_02000560;
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *);
 void InteractionMarker_SetState(struct InteractionMarker *, void (*)(struct InteractionMarker *));
@@ -34,7 +25,7 @@ void InteractionMarker_TickIdle(struct InteractionMarker *);
 void InteractionMarker_TickInteraction(struct InteractionMarker *);
 void InteractionMarker_TickDormant(struct InteractionMarker *);
 void ScriptUtility_SetControlFlag(u32);
-void PlayerCue_WalkTo(struct InteractionMarkerPlayer *, struct ContactPosition *, u32, u32);
+void PlayerCue_WalkTo(struct Player *, struct ContactPosition *, u32, u32);
 u32 InteractionMarker_Tick(struct InteractionMarker *);
 u32 InteractionMarker_Destroy(struct InteractionMarker *);
 s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *, u32, u32);

@@ -377,8 +377,10 @@ entrance procedures (`proc_909`, `proc_916`, ...) test it to place the player
 calls use.
 
 The 722-entry table at `08603300` (`data/actor_registry.csv`) has the same
-layout. It is the `chara` table: every object a script can create by name,
-including controllers as well as actors. Its names are not recoverable by
+layout. It is the script command table, which `chara` and `command` both search:
+every native routine a script can run by key, of which actors are only one kind
+(tasks, state setters and system commands make up most of it; see
+[OBJECT_MODEL.md](OBJECT_MODEL.md)). Its names are not recoverable by
 guessing: about 9,400 candidate spellings of character, enemy and object names
 matched 99 keys, which is the 1% chance rate. A few common words do match
 plausible entries (`delay` 082284B4, `varsave` 08225410, `end` 0822548C,

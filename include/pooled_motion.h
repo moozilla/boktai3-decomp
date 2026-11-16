@@ -1,6 +1,7 @@
 #ifndef GUARD_POOLED_MOTION_H
 #define GUARD_POOLED_MOTION_H
 #include "contact_swarm.h"
+#include "task.h"
 struct MotionPoolSlot;
 /* Tentative configurable motion pool, 080454C0–08045A20. */
 struct MotionPoolParams {
@@ -27,7 +28,7 @@ struct MotionPoolSlot {
     u8 unknownFC[0x40];
 };
 struct MotionPool {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask;
     struct MotionPoolSlot slots[16];
 };

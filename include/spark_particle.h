@@ -1,6 +1,7 @@
 #ifndef GUARD_SPARK_PARTICLE_H
 #define GUARD_SPARK_PARTICLE_H
 #include "contact_swarm.h"
+#include "task.h"
 /* Tentative identity: forty-eight independent moving tile-animation particles. */
 struct SparkParticleResource {
     u32 unknown0;
@@ -28,7 +29,7 @@ struct SparkParticle {
     u8 active, unknown41[3];
 };
 struct SparkParticlePool {
-    u8 task[0x18];
+    struct Task task;
     struct SparkParticle particles[48];
     const void *sequenceResource;
     const struct SparkParticleResource *graphics;

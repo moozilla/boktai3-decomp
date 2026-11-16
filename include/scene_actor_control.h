@@ -31,7 +31,7 @@ struct SceneActorControlInput {
     struct ContactPosition position;
 };
 struct SceneActorControlManager {
-    u8 unknown0[0x18];
+    struct Task task;
     u8 graphics[0x1C];
     const void *sequenceResource;
     u32 used;

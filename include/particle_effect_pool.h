@@ -2,6 +2,7 @@
 #define GUARD_PARTICLE_EFFECT_POOL_H
 
 #include "global.h"
+#include "task.h"
 
 struct SceneParticleVector {
     u16 x;
@@ -33,7 +34,7 @@ struct SceneParticle {
 };
 
 struct SceneParticlePool {
-    u8 task[0x18];
+    struct Task task;
     void *resource;
     struct SceneParticle particles[26];
     volatile u32 occupied;

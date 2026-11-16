@@ -1,6 +1,7 @@
 #ifndef POOLED_INTERACTABLE_H
 #define POOLED_INTERACTABLE_H
 #include "scene_object.h"
+#include "task.h"
 
 /*
  * Pooled interactables (tentative): breakable-style props kept in a fixed pool owned by a task
@@ -52,7 +53,7 @@ struct PooledInteractable {
 };
 
 struct PooledInteractableManager {
-    u8 task[24];
+    struct Task task;
     u32 count;
     struct PooledInteractable *slots;
     struct PooledResource resources[3];

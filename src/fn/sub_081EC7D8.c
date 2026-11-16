@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "scene_departure_display.h"
 #include "player_cue_sequence.h"
@@ -6,36 +5,14 @@
 void ActorDisplay_UpdateForegroundSprite(struct DepartureActor *actor)
 {
     struct DepartureDrawable *draw = &actor->foreground;
-    u16 *origin;
-    register u16 *screen;
-    register u32 x asm("r1");
-    u32 y;
-    u32 result;
     draw->ended = 0;
-    screen = (u16 *)&actor->screen.x;
-    origin = (u16 *)&actor->shakeStrength;
-    x = *origin + 42;
-    x += *screen;
-    screen = (u16 *)&actor->shakeX;
-    result = *screen + x;
-    draw->sprite.position.x = result;
-    y = actor->jitter;
-    screen = (u16 *)&actor->displacement;
-    result = *(s32 *)screen + 74;
-    y += result;
-    x = actor->dispersalTimer;
-    x += y;
-    x += *origin;
-    result = (u16)actor->shakeZ + x;
-    draw->sprite.position.y = result;
+    draw->sprite.position.x = actor->screen.x + (s16)(actor->shakeStrength + 42) + actor->shakeX;
+    draw->sprite.position.y = actor->jitter + (actor->displacement + 74) + actor->dispersalTimer
+                              + actor->shakeStrength + actor->shakeZ;
     if (actor->statePhase != 9) {
-        if (actor->motionMode) {
-            screen = &actor->alternateLayer;
-            if (*(s16 *)screen)
-                draw->sprite.flags |= 1;
-            else
-                draw->sprite.flags &= ~1;
-        } else
+        if (actor->motionMode && actor->alternateLayer)
+            draw->sprite.flags |= 1;
+        else
             draw->sprite.flags &= ~1;
     }
     if (draw->mode != 1)

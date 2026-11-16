@@ -2,6 +2,7 @@
 #define GUARD_ACTOR_GLYPH_TRAIL_H
 
 #include "global.h"
+#include "task.h"
 
 struct GlyphPosition {
     u16 x, y, z, pad;
@@ -28,7 +29,7 @@ struct GlyphTrailParticle {
 };
 
 struct ActorGlyphTrail {
-    u8 task[0x18];
+    struct Task task;
     u8 *owner;
     u32 flags;
     u8 spriteBody[0xC];

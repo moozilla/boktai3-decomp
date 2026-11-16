@@ -5,7 +5,7 @@
   gcx.py dis [PROC...]        disassemble procedures (default: all), with
                               recovered names (gcl/names) and English comments
   gcx.py chara                every `chara` command: procedure, key, callback
-                              (from data/actor_registry.csv)
+                              (from the script command table, data/actor_registry.csv)
 
 Layout (loaded by sub_0821AE04): a u32 timestamp, a procedure table of u32
 words ending in 0xFFFFFFFF (index = procedure id; low 24 bits = block offset

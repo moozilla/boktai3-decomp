@@ -29,7 +29,7 @@ struct PoolParticle {
     struct PoolParticleTail tail;
 };
 struct ParticlePool {
-    u8 task[0x18];
+    struct Task task;
     u8 collider[0x58];
     void *resource;
     struct PoolParticle particles[16];

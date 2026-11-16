@@ -17,7 +17,7 @@ const NAV = [
   ['ROM', '/rom', 'The ROM as a treemap'],
   ['Text', '/text', 'Every string, with the fan translation'],
   ['Scripts', '/scripts', 'Script procedures and files (GCL)'],
-  ['Actors', '/actors', 'Objects scripts create'],
+  ['Actors', '/actors', 'The script command table: what scripts create and call'],
   ['Graphics', [['Sprites', '/gfx#sprites'], ['Large sprites', '/gfx#big'], ['Palettes', '/gfx#palettes'], ['Sprite palettes', '/gfx#pool'],
     ['Font', '/gfx#font'], ['Tiles', '/gfx#tiles'], ['Data', '/gfx#data']]],
   ['Maps', [['Maps', '/gfx#maps'], ['World', '/world'], ['Dungeons', '/gfx#dungeon']]],

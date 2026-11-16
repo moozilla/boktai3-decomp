@@ -18,7 +18,7 @@ struct PaletteTransition {
 };
 enum { PALETTE_SET_SOURCE, PALETTE_SET_DESTINATION, PALETTE_SET_VARIANT };
 struct PaletteController {
-    u8 task[0x18];
+    struct Task task;
     u16 flags; // 1 transition, 2 oscillate, 8 blend enabled, 0x10 brightness fade, 0x20 (guess)
     s8 blend, previousBlend;
     u8 dirty, pending; // pending: bit 1 rebuild variants, 2 transition, 4 brightness (guess)

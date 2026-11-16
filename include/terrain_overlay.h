@@ -34,7 +34,7 @@ struct TerrainOverlayEntry {
 };
 
 struct TerrainOverlay {
-    u8 task[0x18]; // task header
+    struct Task task;
     u16 id, resource;
     s32 initialized, actorCount, drawableCount;
     u32 count; // queued commands

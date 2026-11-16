@@ -1,6 +1,7 @@
 #ifndef GUARD_REPEATED_EFFECT_H
 #define GUARD_REPEATED_EFFECT_H
 #include "game_state.h"
+#include "task.h"
 /* Provisional identity: eight script-created effects with repeated state callbacks. */
 struct RepeatedEffectPosition {
     s16 x, y, z, pad;
@@ -38,7 +39,7 @@ struct RepeatedEffect {
     void (*update)(struct RepeatedEffect *);
 };
 struct RepeatedEffectManager {
-    u8 task[0x18];
+    struct Task task;
     u16 count, unknown1A;
     struct RepeatedEffect entries[8];
 };

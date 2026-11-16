@@ -1,6 +1,7 @@
 #ifndef GUARD_TERRAIN_EDGE_MARKER_H
 #define GUARD_TERRAIN_EDGE_MARKER_H
 #include "scene_object.h"
+#include "task.h"
 union TerrainMarkerPosition {
     struct SceneVec world;
     u32 words[2];
@@ -18,7 +19,7 @@ struct TerrainMarkerSprite {
     u8 unknown20[8];
 };
 struct TerrainMarkerManager {
-    u8 task[0x18];
+    struct Task task;
     u16 mode, unknown1A, count, blinkFrame;
     struct TerrainMarkerSprite markers[17];
 };

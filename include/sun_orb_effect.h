@@ -2,6 +2,7 @@
 #define GUARD_SUN_ORB_EFFECT_H
 
 #include "contact_collider.h"
+#include "task.h"
 
 struct OrbitEffect;
 typedef s32 (*OrbitEffectCallback)(struct OrbitEffect *, s32);
@@ -66,7 +67,7 @@ struct OrbitEffectTarget {
     s16 active;
 };
 struct OrbitEffectManager {
-    u8 unk_00[0x18];
+    struct Task task;
     u32 activeSlots;
     u8 unk_1C[0x38 - 0x1C];
     struct OrbitEffect slots[4];

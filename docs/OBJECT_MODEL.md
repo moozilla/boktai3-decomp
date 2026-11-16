@@ -23,13 +23,13 @@ that some task owns.
 
 ## Family 1: tasks
 
-`struct Task` (`include/engine.h`) is the base class of everything the scheduler runs:
+`struct Task` (`include/task.h`, included by `engine.h`) is the base class of everything the scheduler runs:
 `prev`, `next`, `update`, `destroy`, `id`, `flags`, `list`. A subclass is any struct whose
 first 0x18 bytes are that header; its size is the `size` argument to `Task_Create`, and its
 "class" is the pair of callbacks given to `Task_SetCallbacks`.
 
-* **The player** is a task. `struct Player` (`include/player.h`) currently begins with
-  `u8 unk0[0x18]`; that field is the task header.
+* **The player** is a task. `struct Player` (`include/player.h`) begins with
+  `struct Task task;` and is created by `Player_Create` (`Task_Create(6, 0xCAC)`).
 * **Each boss** is its own task class with a very large body. `struct Nidhoggr`
   (`include/large_scene_animation_controller.h`) is `struct Task`, a `SceneEventReceiver`,
   then more than 0x66D8 bytes holding 26 parts with their own visuals and colliders. No
@@ -84,8 +84,8 @@ command a GCL script can call, 722 entries keyed by hash. Reading each entry's f
 * the rest are commands on existing systems: `GameState_*`, `Sound_*`, `Inventory_*`,
   `Camera_*`, `MessageWindow_*`, `SaveData_*`, `Weather_*`.
 
-Its `name` column is also stale: it still shows `sub_XXXXXXXX` for 673 entries, although
-all but 24 of those functions now have real names in `symbols/functions.csv`.
+Its `name` column follows `symbols/functions.csv` (regenerated 2026-11-15; 24 callbacks are
+still `sub_XXXXXXXX`), and `tools/promote_names.py` refreshes it after each naming batch.
 
 ## Where the source hides this (cleanup list)
 
@@ -93,29 +93,33 @@ Each item is a phase-4 cleanup and changes no bytes. Do them in this order; the 
 three are small and independent, the last is large and should wait until the phase-3
 workers are idle, because it touches most gameplay files.
 
-1. **`data/actor_registry.csv` names.** Regenerate the `name` column from
+1. *(done 2026-11-15)* **`data/actor_registry.csv` names.** Regenerate the `name` column from
    `symbols/functions.csv` by callback address, and say in the file's consumers and docs
    that it is the script command table. Keep the file name unless every consumer
    (`tools/`, Studio, `gcl/`) is updated in the same change.
-2. **Task headers spelled as byte arrays.** `struct Player` and about 80 other headers
-   carry an anonymous `u8 x[0x18]` where 111 headers already write `struct Task task;`.
-   Replace each one that really is the first field of a `Task_Create` block. Check each;
-   a 0x18-byte gap elsewhere in a struct is not a task header.
-3. **`gPlayers` has twelve declarations with nine different types** (`struct Player
-   *gPlayers[4]` six times, then `u8 *[]`, `void *`, `struct SceneActor *`, and per-header
-   views such as `AreaEffectPlayer`, `CellGatePlayer`, `InteractionMarkerPlayer`,
-   `OrbitBackgroundPlayer`, `LevelAdvancePlayer`, `ChasePlayer`). It is one array of four
-   `struct Player *`. Move each view's fields into `struct Player` and delete the view.
-   A unit may need the declaration it has today to keep matching (pointer versus array
-   changes how the address is loaded); where that happens, keep the unit's form and note
-   why, do not force it.
-4. **Duplicate boss structs.** `struct Nidhoggr` is defined in its header and again,
-   differently, in `src/fn/sub_08191508.c`. One definition, in the header.
+2. *(done 2026-11-15, 94 of 116)* **Task headers spelled as byte arrays.** 116 structs
+   began with an anonymous 0x18-byte array (`unk0`, `unknown0`, `pad0`, or `u8 task[0x18]`).
+   94 were checked against their creator and now begin with `struct Task task;`. Two are
+   not task headers (`PasswordEntry` is a heap block; `ScriptKeyframeEntry` is an element of
+   the array inside a task) and 20 have no creator that ties the block to their type yet;
+   `notes/object-cleanup_2026-11-15.md` lists them.
+3. *(declarations done 2026-11-15)* **`gPlayers` had nineteen declarations**: eight in
+   headers (`struct Player *[4]`, the views `AreaEffectPlayer`, `CellGatePlayer` (as a plain
+   pointer), `InteractionMarkerPlayer`, `OrbitBackgroundPlayer`, `LevelAdvancePlayer`,
+   `ChasePlayer`, and `struct SceneActor *`) and eleven in units (`u8 *[]` four times,
+   `void *` once, and six `struct Player *[4]` whose units each defined their own small
+   `struct Player`). It is one array of four `struct Player *`, declared once in
+   `player.h`; every unit matches with that form. Still open: about 200 sites read it
+   through a cast (`(*(u8 **)gPlayers)[0x418]`, `(struct SceneActorChasePlayer *)gPlayers[0]`
+   and 21 other view types).
+4. *(done 2026-11-15)* **Duplicate boss structs.** `struct Nidhoggr` was defined in its
+   header and again in `src/fn/sub_08191508.c`, and `src/fn/sub_08190C98.c` had a third
+   view (`struct BossParts`). One definition, in the header.
 5. **Name the registry-actor base.** *(proposed)* Today it is eleven overlapping views:
    `SceneActorRegistryResetView` (used about 2,700 times), `SceneActorRegistryActor`
-   (about 320), and nine narrower ones. Two unrelated structs are already called
-   `struct SceneActor` (`include/scene_actor_lifecycle.h`, `include/scene_indicator.h`),
-   so that name is taken. Proposal: `struct RoomActor` for the base, with each subclass
+   (about 320), and nine narrower ones. An unrelated struct is already called
+   `struct SceneActor` (`include/scene_actor_lifecycle.h`; the one in `scene_indicator.h`
+   was a `gPlayers` view and is gone), so that name is taken. Proposal: `struct RoomActor` for the base, with each subclass
    embedding it first:
 
    ```c

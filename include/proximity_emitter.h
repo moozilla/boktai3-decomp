@@ -1,6 +1,7 @@
 #ifndef GUARD_PROXIMITY_EMITTER_H
 #define GUARD_PROXIMITY_EMITTER_H
 #include "contact_swarm.h"
+#include "task.h"
 struct ProximityEmitterParticle {
     u32 flags;
     u8 unknown4[0x14];
@@ -10,7 +11,7 @@ struct ProximityEmitterParticle {
     u16 unknown2E, active, frame;
 };
 struct ProximityEmitter {
-    u8 task[0x18];
+    struct Task task;
     struct ContactSwarmDrawPacket primary, secondary;
     u16 nearby, stateFrame;
     struct ContactPosition position;

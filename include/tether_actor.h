@@ -43,7 +43,7 @@ struct TetherInteractionProbe {
     u8 unknown2C[0x3C];
 };
 struct TetherActor {
-    u8 unknown0[0x18];
+    struct Task task;
     u16 entry;
     u8 kind, unknown1B;
     u16 kindValue, kindLimit, valueA, valueB;

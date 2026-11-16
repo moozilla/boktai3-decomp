@@ -1,9 +1,10 @@
 #ifndef GUARD_BALLISTIC_SPRITE_EFFECT_H
 #define GUARD_BALLISTIC_SPRITE_EFFECT_H
 #include "particle_emitter.h"
+#include "task.h"
 
 struct BallisticSpriteEffectManager {
-    u8 task[0x18];
+    struct Task task;
     struct ParticleEmitter entries[4];
     void *sequenceResource;
 };

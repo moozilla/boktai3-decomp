@@ -1,6 +1,7 @@
 #ifndef GUARD_TRANSIENT_SPRITE_EFFECTS_H
 #define GUARD_TRANSIENT_SPRITE_EFFECTS_H
 #include "contact_swarm.h"
+#include "task.h"
 /* Sixteen 0x58 transient sprite slots in a 0x598 list-10 singleton. */
 struct TransientEffectSprite {
     u32 flags;
@@ -22,7 +23,7 @@ struct TransientSpriteEffect {
     struct TransientEffectSprite sprite;
 };
 struct TransientSpriteEffects {
-    u8 task[0x18];
+    struct Task task;
     struct TransientSpriteEffect slots[16];
 };
 /* 0x020000A0 */

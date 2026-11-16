@@ -17,8 +17,9 @@ confirm it: katakana names hit 46 keys hashed as EUC-JP, 12 as Shift-JIS and 6
 as UTF-8, against 13 expected by chance). ASCII is the same in all three.
 
 Kinds (one CSV each, columns key, name, english, confidence, evidence):
-  chara    keys of data/actor_registry.csv, used by `chara KEY ...` (create an
-           actor) and `command KEY ...` (call the routine, keep its result)
+  chara    keys of the script command table (data/actor_registry.csv), used by
+           `chara KEY ...` (create the entry's object) and `command KEY ...`
+           (call the routine, keep its result)
   command  native command ids (the tables at 0861418C, 08E8791C, 080F38C8)
 
 gcl/prints.csv translates the scripts' Japanese debug `print` strings (text

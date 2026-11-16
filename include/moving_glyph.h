@@ -2,6 +2,7 @@
 #define GUARD_MOVING_GLYPH_H
 
 #include "global.h"
+#include "task.h"
 
 struct MovingSpritePosition {
     u16 x, unknown2, y, unknown6;
@@ -11,7 +12,7 @@ union MovingSpritePositionValue {
     struct { u32 a, b; } words;
 };
 struct MovingSprite {
-    u8 task[0x18];
+    struct Task task;
     u32 flags;
     u8 spritePrefix[0x18];
     struct MovingSpritePosition displayedPosition;

@@ -225,7 +225,7 @@ function crumbs(path) {
   const parts = path.split('/');
   return `<div class="crumbs">${parts.map((p, i) => `<a href="#node:${esc(parts.slice(0, i + 1).join('/'))}">${esc(p)}</a>`).join(' › ')}</div>`;
 }
-// the original GCL name behind the registry key (gcl/names/chara.csv): the
+// the original GCL name behind the script command key (gcl/names/chara.csv): the
 // best reading, how sure it is and why, and other names with the same hash
 function gclNames(e) {
   const g = e.gcl || [];

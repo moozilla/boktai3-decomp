@@ -381,7 +381,7 @@ if) blocks, `switch` has `c` (case value, block) and `d` (default), and other
 commands take named parameters this way (`p:` position, `e:` event block, ...).
 
 **`chara` usage.** The procedures contain 1,525 `chara` commands naming 151
-distinct registry keys, all present in `data/actor_registry.csv` (for example
+distinct keys, all present in the script command table (`data/actor_registry.csv`) (for example
 `0xB4B4` = `Background_CreateFromScript`). The remaining 571 registry entries
 are not named by any script constant. Only three code sites call the registry
 lookup, and map files show no registry keys above chance, so those entries are
@@ -478,7 +478,7 @@ leads for naming, not facts.
 | `sub_080F0C20` | `1744` (`sub_080F1BD4`) | `D638` | 37 | pale worm | アイビー (Ivy): proc 3278 places "ivy as destroyed remains" with D638 |
 | `sub_080FE68C` | `2D30` (`sub_080FF754`) | `5291` | 4 | living sword | ソード |
 
-Each family is spawned through the script actor registry
+Each family is spawned through the script command table
 (`data/actor_registry.csv`): the key's callback calls the family loader. The
 small-sprite families are `DFDC` (`sub_080B54A8`, black wings) and `AD03`
 (`sub_080C44AC`, skeletons). Registry names are not the sprite names with a

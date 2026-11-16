@@ -31,8 +31,8 @@ static inline s32 FindNearestEligiblePlayer(struct SceneActorRegistryResetView *
     if (session)
         count = session->participantCount;
     for (i = 0; i < count; i++) {
-        struct AreaEffectPlayer *player = gPlayers[i];
-        if (player && !TestSlot(i) && !TestField(&player->flags, 0x20000)) {
+        struct Player *player = gPlayers[i];
+        if (player && !TestSlot(i) && !TestField(&player->statusFlags, 0x20000)) {
             s32 cell = SceneActorTerrain_GetCellIndex((void *)&player->position);
             u8 *data = SceneActorTerrain_GetCell(cell);
             if (!Test(*(u16 *)(data + 2), 0x43)) {
@@ -55,7 +55,7 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
     *flags &= mask;
 }
 static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
-                        struct AreaEffectPlayer **slot)
+                        struct Player **slot)
 {
     void *shape = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->body.position;
@@ -81,7 +81,7 @@ u32 sub_08137AFC(struct SceneActorRegistryResetView *actor)
     if (best < 0)
         return 0;
     {
-        struct AreaEffectPlayer **slots = gPlayers;
+        struct Player **slots = gPlayers;
         MoveTo(actor, group, &slots[best]);
     }
     return 1;

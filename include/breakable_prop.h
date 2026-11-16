@@ -3,9 +3,10 @@
 #include "contact_swarm.h"
 #include "game_state.h"
 #include "engine_globals.h"
+#include "task.h"
 /* Tentative identity: cell-centered object removed by a flagged contact. */
 struct BreakableProp {
-    u8 task[0x18];
+    struct Task task;
     struct ContactSwarmSprite sprite;
     u8 graphics[0x1C];
     struct ContactCollider collider;

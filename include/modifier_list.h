@@ -98,7 +98,7 @@ union ModifierCursorWord {
 /* Observed layout through 0x1088, the size allocated by 08042158.
  * Preview resource/model storage remains opaque within unknown83C. */
 struct ModifierMenu {
-    u8 task[0x18];
+    struct Task task;
     s32 state, mode;
     union ModifierCursorWord choice;
     u32 savedChoices[3];

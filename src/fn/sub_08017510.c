@@ -1,7 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 // confidence=low: scrolls weather tilemap layers and adjusts their randomized drift.
 #define Weather_UpdateTilemapScroll sub_08017510
 struct Weather {
@@ -14,20 +14,9 @@ struct Weather {
     u8 pad54[8];
     u32 frame;
 };
-#define RANDOM_TABLE ((u16 *)0x0203B400)
 s32 SceneTilemap_GetScrollDelta(void);
 s32 Div(s32, s32);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
-#define Random(table, cursor, mask)                                                                \
-    ({                                                                                             \
-        u32 value = (gRandomIndex + 1) & 0x3ff;                                                    \
-        u32 sample;                                                                                \
-        gRandomIndex = value;                                                                      \
-        sample = (table)[value];                                                                   \
-                                                                                                   \
-        sample &= mask;                                                                            \
-        sample;                                                                                    \
-    })
 void Weather_UpdateTilemapScroll(struct Weather *p)
 {
     s32 x;
@@ -37,14 +26,11 @@ void Weather_UpdateTilemapScroll(struct Weather *p)
     x = ((s16 *)gCameraOrigin)[0] + gCamera.offsetX + p->scroll;
     y = ((s16 *)gCameraOrigin)[1] + gCamera.offsetY;
     if (!p->timer) {
-        register u16 *table asm("r3") = RANDOM_TABLE;
-        register u32 *cursor asm("r4") = &gRandomIndex;
-        asm("" : : "r"(table), "r"(cursor));
-        p->timer = Random(table, cursor, 127) + 128;
+        p->timer = (ParticleRandom_ReadDirectSample(gRandomTable) & 127) + 128;
         if (p->alternate)
-            p->target = Random(table, cursor, 3) - 1;
+            p->target = (ParticleRandom_ReadSample(gRandomTable) & 3) - 1;
         else
-            p->target = Random(table, cursor, 7) - 1;
+            p->target = (ParticleRandom_ReadSample(gRandomTable) & 7) - 1;
     } else
         p->timer--;
     if (!(p->frame & 15)) {
@@ -78,8 +64,8 @@ void Weather_UpdateTilemapScroll(struct Weather *p)
             p->y[1] -= p->drift;
         }
     }
-    pixelX = (p->x[p->layer] + x) & 255;
-    pixelY = (p->y[p->layer] + y) & 255;
+    pixelX = (x + p->x[p->layer]) & 255;
+    pixelY = (y + p->y[p->layer]) & 255;
     tileX = Div(x - 128, 8);
     tileY = Div(y - 128, 8) & ~1;
     BgGfx_LoadTilemapSimple(1, tileX, tileY, pixelX, pixelY);

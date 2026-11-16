@@ -9,6 +9,7 @@
 #include "contact_swarm_sprite.h"
 #include "render.h"
 #include "field_hud_widgets.h"
+#include "task.h"
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -56,7 +57,7 @@ struct SceneHudNavigationPage {
 
 /* Scene HUD owner: offsets established by 081651B0, 081658C8 and its initializer 08178FC8. */
 struct SceneHudState {
-    u8 unknown0[0x18];
+    struct Task task;
     u32 panelResource; /* 0x18: passed to panel initialization */
     u8 unknown1C[0x10];
     u32 panelConfig; /* 0x2C: passed to panel initialization */

@@ -7,6 +7,7 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reaction.h"
 #include "engine_globals.h"
+#include "player.h"
 
 void Skeleton_UpdateScriptWaitState(void);
 void SceneActorTerrain_RequestRetreatRoute(void *);
@@ -15,13 +16,6 @@ s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 
-struct ChasePlayer {
-    u8 unknown0[0x20];
-    u32 flags;
-    u8 unknown24[0x1C];
-    u16 *cell;
-};
-extern struct ChasePlayer *gPlayers[];
 
 struct ChaseTarget {
     u8 unknown0[8];
@@ -245,13 +239,13 @@ static inline u8 Chase_Arrive(void *obj)
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
             goto done;
         }
-        cell = gPlayers[player]->cell[3];
+        cell = ((u16 *)gPlayers[player]->followTarget)[3];
     } else {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->flags, 0x20000))
+    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (Chase_MotionFlags(actor, 0x400))
         goto done;

@@ -8,7 +8,7 @@
 // palette, draws the same counter display (sub_0800F4EC mirrors StatusScreen_DrawClock) but has no fades
 // or scanline transition. Its task object is 0x2C bytes.
 struct NumericOverlay {
-    u8 task[24];
+    struct Task task;
     u16 id;
     u8 flags, bg;
     u16 mapId, paletteId;

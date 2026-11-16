@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "sun_orb_effect.h"
 
@@ -20,50 +19,43 @@ static inline void Polar(struct OrbitEffectPosition *p, u32 angle, s32 radius)
 #define OrbitEffect_UpdateHomingTrail sub_081FDCB0
 void OrbitEffect_UpdateHomingTrail(struct OrbitTrailSprite *trail, void *resource)
 {
-    u32 age = trail->age + 1;
-    u32 zero;
-    do {
-        zero = 0;
-    } while (0);
-    trail->age = age;
-    if ((u16)age <= 31) {
-        s32 dx = trail->position.x;
-        struct OrbitEffectPosition *source = trail->target;
+    if ((u16)++trail->age < 32) {
         struct OrbitEffectPosition *target;
-        s32 dz;
-        dx -= source->x;
-        target = source;
-        source = 0;
+        s32 dx, dz;
+        dx = trail->position.x - trail->target->x;
+        target = trail->target;
         if (dx < 0)
             dx = -dx;
         dz = trail->position.z - target->z;
         if (dz < 0)
             dz = -dz;
-        if (dx > 63 || dz > 63) {
-            /* Preserve the observed position reloads before steering. */
-            asm("" : : : "memory");
-            if (!(trail->age & 3)) {
-                struct OrbitEffectPosition velocity;
-                u32 heading =
-                    Math_Atan2(target->x - trail->position.x, target->z - trail->position.z);
-                u32 current = (u16)trail->angle;
-                s32 desired = (s8)heading;
-                s32 delta = (s8)(desired - current);
-                if (delta > 20)
-                    trail->angle = current + 20;
-                else if (delta <= 19)
-                    trail->angle = current - 20;
-                else
-                    trail->angle = desired;
-                Polar(&velocity, trail->angle, trail->radius);
-                trail->velocityX = velocity.x;
-                trail->velocityZ = velocity.z;
-            }
-            trail->position.x += trail->velocityX;
-            trail->position.z += trail->velocityZ;
+        /* Both end paths are written out; jump2 merges them into one tail. */
+        if (dx <= 63 && dz <= 63) {
+            trail->active = 0;
+            trail->flags |= 1;
             return;
         }
+        if (!(trail->age & 3)) {
+            struct OrbitEffectPosition velocity;
+            u32 heading =
+                Math_Atan2(target->x - trail->position.x, target->z - trail->position.z);
+            u32 current = (u16)trail->angle;
+            s32 desired = (s8)heading;
+            s32 delta = (s8)(desired - current);
+            if (delta > 20)
+                trail->angle = current + 20;
+            else if (delta <= 19)
+                trail->angle = current - 20;
+            else
+                trail->angle = desired;
+            Polar(&velocity, trail->angle, trail->radius);
+            trail->velocityX = velocity.x;
+            trail->velocityZ = velocity.z;
+        }
+        trail->position.x += trail->velocityX;
+        trail->position.z += trail->velocityZ;
+        return;
     }
-    trail->active = zero;
+    trail->active = 0;
     trail->flags |= 1;
 }

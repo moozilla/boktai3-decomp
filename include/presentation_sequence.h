@@ -2,9 +2,10 @@
 #define GUARD_PRESENTATION_SEQUENCE_H
 
 #include "scene_input_widget.h"
+#include "task.h"
 
 struct PresentationSequence {
-    u8 task[0x18];
+    struct Task task;
     struct SceneInputResource resource;
     struct SceneInputWidget layers[5];
     u8 unknown218[4];

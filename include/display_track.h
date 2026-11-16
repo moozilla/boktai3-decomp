@@ -2,6 +2,7 @@
 #define GUARD_DISPLAY_TRACK_H
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
+#include "task.h"
 struct DisplayTrackGraphics {
     u8 unknown0[6];
     u16 defaultPalette;
@@ -27,7 +28,7 @@ struct DisplayTrack {
     void *ownedResource;
 };
 struct DisplayTrackManager {
-    u8 task[0x18];
+    struct Task task;
     u8 capacity, count, unknown1A[2];
     struct DisplayTrack entries[1];
 };

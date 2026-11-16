@@ -5,13 +5,13 @@ void LevelAdvanceDisplay_UpdateParticle(struct LevelAdvanceParticle *particle, v
         particle->flags |= 1;
         particle->active = 0;
     } else {
-        struct LevelAdvancePlayer *player;
+        struct Player *player;
 
         particle->offsetY += particle->velocityY;
         player = gPlayers[0];
-        particle->position.world.x = player->position.world.x + particle->offsetX;
-        particle->position.world.y = player->position.world.y + particle->offsetY;
-        particle->position.world.z = player->position.world.z + particle->offsetZ;
+        particle->position.world.x = player->position.x + particle->offsetX;
+        particle->position.world.y = player->position.y + particle->offsetY;
+        particle->position.world.z = player->position.z + particle->offsetZ;
         if ((particle->frame >> 2) & 1)
             SpriteDrawable_SelectTileFrame(particle, resource, 3);
         else

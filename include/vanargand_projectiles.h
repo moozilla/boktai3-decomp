@@ -22,7 +22,7 @@ struct VanargandProjectile {
 };
 
 struct VanargandProjectilePool {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask;
     u16 attack;
     u8 unknown1E[6];
@@ -36,7 +36,7 @@ struct VanargandAfterimage {
 };
 
 struct VanargandAfterimagePool {
-    u8 task[0x18];
+    struct Task task;
     s32 count;
     struct VanargandAfterimage slots[8];
 };

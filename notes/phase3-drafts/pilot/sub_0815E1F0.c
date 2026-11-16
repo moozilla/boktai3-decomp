@@ -1,5 +1,6 @@
+// Holdout draft (no concessions), 13 rows: if/else with identical arms that jump2 should cross-jump.
+// AGBCC_SPILL=15:2 (second arm's 0x4DA reload in r2 like the first) merges them -> 2 rows: the dead power+60 into r3.
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"

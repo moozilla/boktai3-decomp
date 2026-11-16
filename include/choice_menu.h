@@ -24,7 +24,7 @@ struct ChoiceResource {
 };
 
 struct ChoiceMenu {
-    u8 task[24];
+    struct Task task;
     s8 selected, initial;
     u8 delay, count;
     u8 rowStart[8], rowEnd[8], rowCount[8];

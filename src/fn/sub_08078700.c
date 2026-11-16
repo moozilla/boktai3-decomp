@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
 static inline u8 Test(u32 value, u32 mask)
@@ -21,23 +20,23 @@ static inline u32 ReadControl(u32 inputMask, u16 *input)
     value = *field;
     return value & mask;
 }
-void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActor)
+void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *base)
 {
-    struct SceneActorBehaviorView *actor = inputActor;
-    struct ContactCollider *secondary = &actor->secondaryCollider;
-    struct ContactCollider *primary = &actor->primaryCollider;
+    struct ContactCollider *secondary;
+    struct ContactCollider *primary;
     u16 *control;
     u16 *field;
     struct ContactPosition *position;
+    struct SceneActorBehaviorView *self;
+    struct SceneActorBehaviorView *actor = (void *)base;
+    secondary = &actor->secondaryCollider;
+    primary = &actor->primaryCollider;
     {
         u32 mask = 0x800;
-        u32 offset = 0x2C0;
-        if (Test(*(u16 *)((u32)actor + offset), mask)) {
+        if (Test(actor->flags2C0, mask)) {
             primary->flags |= 4;
-            {
-                u32 offset = 0x2D6;
-                field = (void *)((u32)actor + offset);
-            }
+            self = actor;
+            field = &self->flags2D6;
             goto clearAndReturn;
         }
     }
@@ -65,10 +64,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *inputActo
     }
 disable:
     primary->flags |= 4;
-    {
-        u32 offset = 0x2D6;
-        field = (void *)((u32)actor + offset);
-    }
+    field = &actor->flags2D6;
 clearAndReturn: {
     u32 mask = ~0x4000;
     mask &= *field;
@@ -101,18 +97,16 @@ activeTest: {
         goto secondaryUpdate;
     {
         u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
-        position = (void *)actor;
-        position = (void *)((u32)position + 0x5C);
+        position = &actor->position;
         if (!near || ReadControl(6, control))
             goto primaryUpdate;
     }
 secondaryUpdate: {
-    register u32 flags asm("r1") = secondary->flags;
-    u32 disabled;
-    disabled = flags & 4;
-    position = (void *)actor;
-    asm("" : "+r"(position));
-    position = (void *)((u32)position + 0x5C);
+    u32 flags = secondary->flags;
+    u32 disabled = 4;
+    disabled &= flags;
+    self = actor;
+    position = &self->position;
     if (!disabled) {
         Collider_SetPosition(secondary, position, 0);
         Collider_Refresh(secondary);

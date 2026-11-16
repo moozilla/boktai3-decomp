@@ -1,10 +1,10 @@
 #include "cell_gate.h"
 s32 CellGate_TestPassage(struct CellGate *p)
 {
-    struct CellGatePlayer *a = gPlayers;
+    struct Player *a = gPlayers[0];
     u32 r;
-    if (a->transitionMode == 4) {
-        u32 t = a->direction;
+    if (a->tetherMode == 4) {
+        u32 t = a->coordinateAxis;
         if (t == 1) {
             if (p->flags & 0x10)
                 goto yes;
@@ -25,7 +25,7 @@ s32 CellGate_TestPassage(struct CellGate *p)
                 f = 1;
         }
         if (f == 0) {
-            if (gPlayers->actionMode != 4)
+            if (gPlayers[0]->actionMode != 4)
                 goto no;
         }
         if (CellGate_TestPlayerEdge(p, 0x28) == 0)

@@ -1,6 +1,7 @@
 #ifndef GUARD_CONTACT_SEQUENCE_ACTOR_H
 #define GUARD_CONTACT_SEQUENCE_ACTOR_H
 #include "contact_swarm.h"
+#include "task.h"
 /* Tentative family name: eight sequence actors, each with health and resource colliders. */
 struct ContactSequenceActor {
     u8 active, state, enter, variant;
@@ -16,7 +17,7 @@ struct ContactSequenceActor {
     struct DisplaySequenceState sequence;
 };
 struct ContactSequenceOwner {
-    u8 task[0x18];
+    struct Task task;
     s32 initialHealth;
     u32 contactValue;
     s32 resourceValue;

@@ -655,7 +655,6 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     p->timer++;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
                                           struct WirelessGameItem *p, int indexArg)
 {
@@ -718,75 +717,44 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
     }
     if (p->timer > 31) {
         int slot = index & 3;
-        u8 *current;
-        register u8 *pending asm("r12");
         struct WirelessGameItem *target;
-        int count;
+        int first, second;
         if (p->pendingFlag) {
-            u8 *array = owner->pending;
-            u8 *dest = array + slot;
-            register int total asm("r1") = *dest;
-            total += p->count;
-            pending = array;
+            int total = owner->pending[slot] + p->count;
             if (total > 255)
                 total = 255;
-            *dest = total;
-            current = owner->current;
+            owner->pending[slot] = total;
         } else {
-            u8 *dest;
-            int total;
-            current = owner->current;
-            dest = current + slot;
-            total = *dest;
-            total += p->count;
+            int total = owner->current[slot] + p->count;
             if (total > 255)
                 total = 255;
-            *dest = total;
-            {
-                int offset = (u32) & ((struct WirelessGameItems *)0)->pending;
-                u8 *array;
-                array = owner->pending;
-                pending = array;
-            }
+            owner->current[slot] = total;
         }
+        target = &owner->items[index & ~4];
+        first = owner->current[slot];
+        second = owner->pending[slot];
         {
-            /* Keep the byte-offset temporary for the original register lifetime. */
-            int offset = (index & ~4) * sizeof(struct WirelessGameItem) + (u32) &
-                         ((struct WirelessGameItems *)0)->items;
-            int first;
-            int second;
-            register int one asm("r0");
+            int one;
             int zero;
-            target = (struct WirelessGameItem *)((u8 *)owner + offset);
-            {
-                u8 *address = current + slot;
-                first = *address;
-                current = pending;
-                asm("" : "+r"(current));
-                address = current + slot;
-                second = *address;
-            }
             one = 1;
             zero = 0;
-            asm("" : "+r"(one), "+r"(zero));
             target->state = one;
             target->entered = one;
             target->timer = zero;
             {
-                register int value asm("r0") = first + second;
+                int value = first + second;
                 int clear;
                 if (value > 10)
                     value = 10;
-                clear = 0;
-                asm("" : "+r"(clear));
+                else if (value < 0)
+                    value = 0;
                 target->count = value;
-                value = 0;
-                target->pendingFlag = value;
+                target->pendingFlag = value < 0 ? -1 : 0;
                 target->shakeTicks = 8;
-                p->count = clear;
-                p->state = clear;
+                p->count = 0;
+                p->state = 0;
                 p->entered = 1;
-                p->timer = clear;
+                p->timer = 0;
             }
         }
     }

@@ -1,9 +1,9 @@
 #include "cell_gate.h"
 s32 CellGate_TestForcedPassage(struct CellGate *p)
 {
-    struct CellGatePlayer *g = gPlayers;
-    if (g->transitionMode == 4) {
-        u32 v = g->direction;
+    struct Player *g = gPlayers[0];
+    if (g->tetherMode == 4) {
+        u32 v = g->coordinateAxis;
         if (v == 1) {
             if (p->flags & 0x10)
                 goto yes;
@@ -22,7 +22,7 @@ s32 CellGate_TestForcedPassage(struct CellGate *p)
                 x = 1;
         }
         if (x == 0) {
-            u32 t = gPlayers->actionMode;
+            u32 t = gPlayers[0]->actionMode;
             if (t == 3)
                 goto call;
             if (t != 4)

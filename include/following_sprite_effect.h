@@ -3,9 +3,10 @@
 #include "particle_effect_state.h"
 #include "player_cue_sequence.h"
 #include "scene_arc.h"
+#include "task.h"
 
 struct FollowingSpriteManager {
-    u8 task[0x18];
+    struct Task task;
     struct FollowingEffect entries[2];
     u32 frame;
 };
@@ -28,7 +29,7 @@ struct PositionLinkedSprite {
     u32 active;
 };
 struct PositionLinkedSpriteManager {
-    u8 task[0x18];
+    struct Task task;
     struct PositionLinkedSprite entries[2];
     void *sequence;
 };
@@ -60,7 +61,7 @@ struct ScreenMoteState {
     struct ScreenMoteControl control;
 };
 struct ScreenMoteManager {
-    u8 task[0x18];
+    struct Task task;
     void *resource;
     struct ScreenMoteSprite sprites[32];
     struct ScreenMoteState states[32];
