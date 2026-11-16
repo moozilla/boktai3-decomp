@@ -1,6 +1,6 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
+#include "scene_actor_chase.h"
 struct Group {
     u8 pad0[0x8d0];
     u16 flags;
@@ -13,123 +13,58 @@ struct Group {
 };
 void Sound_PlaySong(u32);
 u8 ActorTrail_RemoveLastSegment(void *);
-void SceneActorControl_OnIdle(void);
-static inline void clearHalf(u16 *p, u32 mask)
-{
-    *p = mask & *p;
-}
-static inline void setHalf(u16 *p, u32 mask)
-{
-    *p = mask | *p;
-}
-static inline void clearWord(u32 *p, u32 mask)
-{
-    *p = mask & *p;
-}
 // confidence=low: removes excess segments after damage and restores idle control.
 #define TentacleActor_RecoverFromSegmentLoss sub_080ABB18
-u32 TentacleActor_RecoverFromSegmentLoss(struct ChaseActor *p)
+static inline void ClearHalf(u16 *p, u32 mask)
 {
-    struct Group *g = p->base.context;
-    u16 *flags;
-    u16 *savedFlags;
+    *p = mask & *p;
+}
+static inline void ClearWord(u32 *p, u32 mask)
+{
+    *p = mask & *p;
+}
+static inline u16 *MotionFlags(struct SceneActorRegistryResetView *actor)
+{
+    return &actor->flags2D4;
+}
+static inline void ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+{
+    actor->flags2D4 = mask & actor->flags2D4;
+}
+// gcse's PRE computes the field addresses of the idle-control stores above the trail loop
+// (its stack slots follow the hash-table order of a 65-bucket table), and cse2 turns the
+// motion-flags address into a copy of the one the head computed through MotionFlags.
+u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
+{
+    struct Group *g = p->context;
     s32 count;
-    u8 *initialCount;
-    u32 *motionCounter;
-    void **control;
-    u16 *motionTimer;
-    u8 *direction, *state, *phase, *behavior;
-    u32 *stateCounter;
-    u8 *done, *savedDirection, *queued, *prepared, *kind;
-    register u32 *animationFlags asm("r9");
-    if (p->base.reactionSoundVariant == 0)
+    if (p->reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x19c);
-    flags = &p->base.flags2D4;
-    clearHalf(flags, 0xfffffeff);
+    ClearHalf(MotionFlags(p), ~0x100);
     {
-        u32 bit = 4;
+        u16 bit = 4;
         bit = bit | g->flags;
         g->flags = bit;
     }
     g->timer = 240;
-    p->base.colliderA.responseValue += 30;
-    g->flashTimer = 16;
-    clearWord(&p->base.flags2D0, 0xffefffff);
-    clearHalf(flags, -2);
-    count = Div(p->base.health, g->healthStep);
-    initialCount = &g->activeCount;
-    savedFlags = flags;
-    prepared = &p->base.field2B2;
-    done = &p->base.field2B0;
-    kind = &p->base.field2B5;
-    control = &p->base.target;
-    motionTimer = &p->base.field2C8;
-    animationFlags = &p->base.flags114;
-    motionCounter = &p->base.word104;
-    state = &p->base.state2A8;
-    phase = &p->base.phase2A9;
-    behavior = &p->base.behavior2AA;
-    stateCounter = &p->base.counter2AC;
-    queued = &p->base.field2B1;
-    savedDirection = &p->base.tracking.heading;
-    direction = &p->base.body.direction;
-    if (count < *initialCount)
-        do {
-            ActorTrail_RemoveLastSegment(p);
-            count++;
-        } while (count < g->activeCount);
     {
-        u32 nextFlags;
-        u8 zero8;
-        register u32 zero asm("r3");
-        void *callback;
-        u32 code;
-        u8 one;
-        nextFlags = -33;
-        {
-            u16 *cursor = savedFlags;
-            nextFlags &= *cursor;
-        }
-        zero8 = 0;
-        zero = 0;
-        {
-            u16 *cursor = savedFlags;
-            *cursor = nextFlags;
-        }
-        callback = (void *)SceneActorControl_OnIdle;
-        code = 16;
-        one = 1;
-        *prepared = one;
-        *done = zero8;
-        *kind = code;
-        *control = callback;
-        {
-            register u16 *timer asm("r1") = motionTimer;
-            *timer = zero;
-        }
-        {
-            u32 mask = -2;
-            register u32 *cursor asm("r5");
-            cursor = animationFlags;
-            *cursor = mask & *cursor;
-        }
-        {
-            register u32 *cursor asm("r0") = motionCounter;
-            asm("" : : "r"(cursor));
-            *cursor = zero;
-        }
-        {
-            u32 behaviorCode = 5;
-            *state = zero8;
-            *phase = zero8;
-            *behavior = behaviorCode;
-        }
-        *stateCounter = zero;
-        *queued = one;
-        *direction = *savedDirection;
+        u16 value = p->colliderA.responseValue + 30;
+        p->colliderA.responseValue = value;
     }
-    p->base.field2C2 = 64;
+    g->flashTimer = 16;
+    ClearWord(&p->flags2D0, ~0x100000);
+    ClearHalf(MotionFlags(p), ~1);
+    count = Div(p->health, g->healthStep);
+    while (count < g->activeCount) {
+        ActorTrail_RemoveLastSegment(p);
+        count++;
+    }
+    ClearMotionFlags(p, ~0x20);
+    Chase_SetCtl(p, SceneActorControl_OnIdle, 16);
+    Chase_SetBehavior(p, 5);
+    p->body.direction = p->tracking.heading;
+    p->field2C2 = 64;
     return 1;
 }
