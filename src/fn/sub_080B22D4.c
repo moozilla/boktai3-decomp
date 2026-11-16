@@ -1,16 +1,10 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_registry.h"
-
-struct VornData {
-    u8 unknown0[0x624];
-    u16 field624;
-    u8 field626;
-    u8 field627;
-};
 
 void Vorn_ParseField624(struct ChaseActor *actor)
 {
-    struct VornData *ctx = (struct VornData *)actor->base.context;
+    struct Vorn *ctx = (struct Vorn *)actor->base.context;
 
     if (Script_SeekToKeyword(0x78) != 0) {
         s32 val1, val2;

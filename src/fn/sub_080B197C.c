@@ -17,7 +17,7 @@ static inline u8 ShouldReact(struct Vorn *ctx, u16 value)
 {
     if (HasFlag(value, 1))
         return 1;
-    if (ctx->field67C >= 0)
+    if (ctx->response >= 0)
         return 1;
     return 0;
 }

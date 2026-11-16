@@ -1,10 +1,7 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_registry.h"
 #include "animated_hazard.h"
-
-struct VornData {
-    u8 unknown0[0x678];
-};
 
 struct VornActorExtra {
     u8 unknown0[0xB4];
@@ -16,7 +13,7 @@ struct VornActorExtra {
 
 void Vorn_SpawnHazard(struct ChaseActor *actor, s32 index)
 {
-    struct VornData *ctx = (struct VornData *)actor->base.context;
+    struct Vorn *ctx = (struct Vorn *)actor->base.context;
     struct VornActorExtra *extra = (struct VornActorExtra *)actor;
     u16 b4 = extra->arrB4[index];
     u16 bc = extra->arrBC[index];

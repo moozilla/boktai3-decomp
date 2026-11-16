@@ -311,9 +311,9 @@ s32 Vorn_Init(void *object)
         MonsterInit_SetControl(actor, actor->base.field220, 0xC);
     } else if ((mode = Script_GetKeywordValue(0x54, 0)) != 0) {
         if (mode == 1)
-            vorn->field6B9 = 0;
+            vorn->axis = 0;
         else
-            vorn->field6B9 = 1;
+            vorn->axis = 1;
         VornInit_BeginBehavior(actor, 0x12);
         MonsterInit_SetControl(actor, actor->base.savedTarget, 0);
         MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 0x26);

@@ -1,20 +1,15 @@
 // confidence=low: tentative Vorn behavior inferred from context and neighboring callbacks.
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_terrain.h"
 // confidence=low: tentative Vorn behavior role.
 // confidence=low: target distance controls approach, idle animation, and a delayed action.
 void Vorn_BroadcastPosition(void *);
 void sub_080B1FA8(void *);
-struct VornPursuitContext {
-    u8 unknown0[0x6A8];
-    u16 nearTimer, farTimer;
-    u8 unknown6AC[0x28];
-    s16 flags;
-};
-static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask, u16 **out)
+static inline u8 Vorn_TestNear(struct Vorn *p, u32 mask, u16 **out)
 {
-    u16 *field = (u16 *)&p->flags;
+    u16 *field = (u16 *)&p->flags6D4;
     u32 value = *field & mask;
     *out = field;
     if (value)
@@ -23,7 +18,7 @@ static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask, u16 **out
 }
 void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
 {
-    struct VornPursuitContext *context = actor->base.context;
+    struct Vorn *context = actor->base.context;
     u8 *group = (u8 *)context + 0x3D4;
     struct ContactPosition center;
     u16 *flags;

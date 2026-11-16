@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_reaction.h"
 extern const u8 gUnk_0824E20C[];
 u8 Vorn_HasActiveResponse(void *);
@@ -26,10 +27,6 @@ static inline void Resume_ResetAnimation(struct ChaseActor *actor, u32 state, u3
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-struct SceneActorResumeContext {
-    u8 unknown0[0x6D4];
-    u16 flags;
-};
 void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
@@ -39,8 +36,8 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
         actor->base.field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         if (Vorn_HasActiveResponse(actor->base.context)) {
-            struct SceneActorResumeContext *context = actor->base.context;
-            u16 *flags = &context->flags;
+            struct Vorn *context = actor->base.context;
+            u16 *flags = &context->flags6D4;
             s32 mask = ~3;
             *flags &= mask;
             sub_080B3110(actor, 1, gUnk_0824E20C, 0x367);
