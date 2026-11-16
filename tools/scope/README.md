@@ -2133,6 +2133,42 @@ Each was read from the compiler source and confirmed on a live draft.
    barriers. Keep the complete intervening layout rather than expressing persist through
    a raw offset; the view lives in the unit and needs no shared-header change.
 
+233. **A dead subtract the ROM keeps can be the compare of an if whose only store flow kills.**
+   CircleWindow_GenerateScanlines (08018F38) computes `subs r0, r3, r0` (radius copy minus
+   y) and overwrites r0 at once. `if (savedRadius - p->y > 0) i = 0;` right before loop 1
+   (which sets i = 0 again) matched: cse keeps the store because i has other uses, flow
+   deletes it as dead, and the branch, now to the next insn, keeps its compare and the
+   subtract live through allocation (so the separate `savedRadius` copy also gets its own
+   register). No jump pass runs between flow and reload; jump2 then deletes the branch and
+   its compare and leaves the subtract. Unlike fact 57 the arms need not be identical, and
+   unlike an empty if the first jump pass sees a real store.
+
+234. **A deleted copy of a shared tail can supply the reload choice the ROM made between
+   two branches.** sub_081BB904 (SolarBank transfer input) was a spill-rotation holdout:
+   `AGBCC_SPILL=16:1` matched, one choice short between its two direction branches.
+   Each branch got its own `resetHold: panel->holdFrames = 0; goto blink;` block instead
+   of one shared `reset:` label. jump2 cross-jumps the first copy into the second, and the
+   deleted copy's reload of the 0x702 offset (r0) still advances the rotation (fact 59).
+   When `spill` names a span with no visible extra reload, look for a statement the
+   original could have repeated in that span whose copies jump2 merges.
+
+235. **A 16-bit constant above 255 is loaded through a spill register: `ldr r2, =K; adds
+   r1, r2, #0`.** In LinkSelection_UpdateParticipantScores (0810BBD4) the absent loop
+   `p->points[i] |= -1` on s16 fields narrows the or to HImode, so loop.c hoists an
+   HImode pseudo set to -1 (0xFFFF). `*movhi_insn` accepts only constants 0..255, so
+   reload loads the literal into a spill register and copies it into the allocated one;
+   that reload choice also moves the rotation (the following reload of p took r4).
+   A promoted `u16` local is SImode and loads the literal directly, as do `u32` masks
+   and inline parameters; `|= 0xFFFF` on the s16 field did not narrow the same way.
+   Compare fact 43 (HImode masks and find_equiv_reg).
+
+236. **A copy that gives the losing pseudo a preference moves a higher-priority one off the
+   register.** In ScenePanel_DrawOverlay (08058BD8) `target` (priority 2376) lost r1 to
+   `&currentLevels[slot]` (13333). `s32 mapIndex = target + 1; entry = entries[mapIndex];`
+   in place of `target++` gives target a copy preference for r1; global alloc's first
+   pass skips registers another pseudo prefers, so the address took r2 and target r1.
+   `why` suggests only priority and live-length levers for such a case.
+
 ## Survey: random table as a literal address (2026-10-24)
 
 `SCOPE_TRANSFORM=tools/scope/transforms/random_table_literal.py` over every
