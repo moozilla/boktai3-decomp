@@ -153,7 +153,7 @@ import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, off, rom_data_ranges  # noqa: E402
 
-INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
+INSTR = os.environ.get("SCOPE_AGBCC") or os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh; SCOPE_AGBCC: an experimental build
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
           "lreg", "greg", "jump2", "mach"]
 PASS_NOTE = {"greg": "greg/reload", "mach": "mach (late split/reorg)"}

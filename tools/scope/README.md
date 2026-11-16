@@ -2677,6 +2677,18 @@ which is exactly `10:1`. Not tested.
      One copy placed ahead of the switch failed for that reason: the path from
      that copy reaches the new register's last use, cse rewrote those last uses
      back to the old register, and the two then overlapped (an extra r7).
+   * cse runs twice, and gcse copy propagation sits between the passes, so the head can
+     change and change back. In sub_0810FDDC (0810FDDC) the ROM's flag arms read a copy of
+     `base` (`mov r1, sb` before the compare) while the glyph call reuses the arms'
+     `base << 1` through PRE. cse1 keeps the copy in the arms. gcse cprop rewrites the arms
+     back to `base` (the copy is available at their start), so PRE sees one `(ashift base 1)`
+     and shares it. cse2 then puts the copy back into the arms, but only if the copy's last
+     use (by insn order) comes after `base`'s. A dead modification after the last use of
+     `base` does that: flow deletes it only after cse2. The match reuses the `row` parameter as
+     the copy (`row = base; ... row++;` at the end). The parameter's entry copy from r1
+     gives it the r1 preference that global alloc honors. gcse cprop also does not cross a
+     loop: copies set before a loop reach no use after it (its availability is a minimal
+     fixpoint), so the copy has to be made after the loop.
 229. **A parameter copy the ROM keeps in a second register comes from cse rerunning the first block once per path, with last-use data from before the pass.**
    The symptom is `adds rA, r0, #0; adds rB, rA, #0` at entry with both
    registers read later, one in the early code and one in a tail
@@ -2738,3 +2750,6 @@ which is exactly `10:1`. Not tested.
    The per-arm zero and the dead test reproduce the bytes with no counted
    concession; whether the original had them as written or as a clamp helper
    with a second result is not known.
+
+`SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
+`build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.
