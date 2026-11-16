@@ -3724,9 +3724,11 @@ addr,name,mode,confidence,source,notes
 080D2584,Mummy_UpdateDisplacementRecovery,thumb,low,src-alias,Mummy recoil displacement decay and route/pursuit recovery
 080D3878,Mummy_UpdateDefeat,thumb,low,src-alias,
 080D3D60,Mummy_UpdatePlayerRoute,thumb,low,src-alias,
+080D453C,Mummy_TryStimulusRoute,thumb,low,src-alias,
 080D48C0,Mummy_UpdateBehavior,thumb,low,src-alias,Runs five mummy behavior helpers before the current state callback is dispatched
 080D48E8,Mummy_UpdateSpecialFlags,thumb,low,src-alias,Post-behavior helper clears special flags unless the current action is 0x27
 080D48F4,Mummy_UpdateScriptedAction,thumb,low,src-alias,starts directional entry control and action script once; idle control when done
+080D49DC,Mummy_UpdateDelayedPursuit,thumb,low,src-alias,
 080D5360,Mummy_InitActionHandlers,thumb,low,src-alias,Installs the two-entry action callback table at actor offset 0x288
 080D5370,Mummy_WaitReplaceResponse,thumb,low,src-alias,waits on timer then replaces response slot 0 and restarts behavior 2
 080D53F8,Mummy_UpdateProbeNavigation,thumb,low,src-alias,
@@ -3739,10 +3741,12 @@ addr,name,mode,confidence,source,notes
 080D64E0,Mummy_EnterIdleControl,thumb,low,src-alias,
 080D6608,Mummy_TryDirectPursuit,thumb,low,src-alias,
 080D6DF8,SceneActorPath_FaceAndCheckStraightPath,thumb,low,src-alias,
+080D6FBC,Mummy_IsPlayerFlag8Set,thumb,low,src-alias,
 080D6FDC,Mummy_RequestStraightRoute,thumb,low,src-alias,
 080D7408,Mummy_CanPassMovementThreshold,thumb,low,src-alias,Tentatively permits movement unless the active timer and stored threshold block it
 080D7438,SceneActor_EnterMotionPhase,thumb,low,src-alias,
 080D7548,Mummy_OnMovementUpdate,thumb,low,src-alias,Movement callback that runs movement logic unless flag 0x100 suppresses it
+080D7568,Mummy_TryEngageTarget,thumb,low,src-alias,
 080D7EA0,Mummy_InitCollision,thumb,low,src-alias,Initializes body and attack collision volumes with their respective callbacks
 080D7F34,Mummy_InitProfile,thumb,low,src-alias,Stores the actor profile returned by SceneActorProfiles_FindOrAdd
 080D7F50,Mummy_UpdateAttackCollider,thumb,low,src-alias,
@@ -3756,6 +3760,7 @@ addr,name,mode,confidence,source,notes
 080DA3AC,SceneActor_TryTrackNearbyPlayer,thumb,low,src-alias,
 080DA4E4,SceneGrid_SnapPositionToCellCenter,thumb,low,src-alias,
 080DA598,Mummy_ResetMotionState,thumb,low,src-alias,Advances the active motion sequence and clears state at offsets 0x5B8 through 0x5C2
+080DA5C8,Mummy_ResetResponseState,thumb,low,src-alias,
 080DA678,Mummy_ResetRevivalMotion,thumb,low,src-alias,
 080DA7C4,Mummy_OnClearActivityFlag,thumb,low,src-alias,Callback that clears actor flag 2 with its precise meaning still tentative
 080DA7D8,Mummy_UpdateTemporaryFlagTimer,thumb,low,src-alias,Counts down a timer then clears temporary actor flag 0x01000000
