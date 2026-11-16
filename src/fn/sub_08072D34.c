@@ -1,24 +1,12 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
-static inline u8 Unavailable(struct ChaseActor *inputActor, u16 *inputState, u32 inputDisabled,
-                             u32 inputExcluded)
+static inline u8 Unavailable(struct ChaseActor *actor, u16 **savedState, u32 disabled, u32 excluded)
 {
-    register struct ChaseActor *actor asm("r3") = inputActor;
-    u32 disabled = inputDisabled;
-    u16 *state = inputState;
-    u32 excluded = inputExcluded;
-    u32 flags;
-    flags = *state;
+    u16 *state = &actor->base.motionFlags;
+    u32 flags = *state;
+    *savedState = state;
     if ((flags & disabled) || (actor->base.statusFlags & excluded) || actor->base.health <= 0)
         return 1;
     return 0;
-}
-static inline u32 InvalidFlags(struct ChaseActor *actor)
-{
-    u32 *field = &actor->base.behaviorFlags;
-    u32 value = *field;
-    asm("" : : "r"(actor));
-    return value;
 }
 void SceneActorContacts_ReleaseInvalidOwners(void)
 {
@@ -30,67 +18,40 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
     if (!node)
         return;
     {
-        u32 disabled = 0x40;
-        u32 excluded = 0x20000;
-        u32 required = 0x1000;
-        u32 invalidMask = 3;
-        u32 clearMask = 0xFD;
+        u32 disabled;
+        u32 required;
+        u32 excluded;
+        u32 invalidMask;
+        u32 clearMask;
+        disabled = 0x40;
+        excluded = 0x20000;
+        required = 0x1000;
+        invalidMask = 3;
+        clearMask = 0xFD;
         do {
-            u32 incoming = node->flags;
-            u32 flags;
-            register struct ChaseActor *actor asm("r3");
-            u16 *state;
-            {
-                u32 active = incoming & 1;
-                flags = incoming;
-                if (!active)
-                    goto advance;
-            }
-            if (!(flags & 2))
-                goto advance;
-            actor = node->owner;
-            if (!actor)
-                goto invalid;
-            {
-                u32 offset = 0x2D4;
-                state = (void *)((u32)actor + offset);
-            }
-            if (Unavailable(actor, state, disabled, excluded) ||
-                (InvalidFlags(actor) & invalidMask)) {
-            invalid: {
-                u32 clear = clearMask;
-                register u32 zero asm("r1");
-                clear &= flags;
-                zero = 0;
-                asm("" : "+r"(zero) : "r"(clear));
-                node->flags = clear;
-                node->owner = (void *)zero;
-                {
-                    u32 cooldown = 120;
-                    node->cooldown = cooldown;
+            if ((node->flags & 1) && (node->flags & 2)) {
+                struct ChaseActor *actor = node->owner;
+                u16 *state;
+                if (!actor)
+                    goto invalid;
+                if (Unavailable(actor, &state, disabled, excluded) ||
+                    (actor->base.behaviorFlags & invalidMask)) {
+                invalid:
+                    node->flags &= clearMask;
+                    node->owner = 0;
+                    node->cooldown = 120;
+                    continue;
                 }
-                continue;
-            }
-            }
-            {
-                register u32 value asm("r0") = *state;
-                u32 mask = required;
-                register u32 valid asm("r1");
-                value &= mask;
-                valid = (u16)value;
-                if (!valid) {
-                    u32 clear = clearMask;
-                    asm("" : "+r"(clear));
-                    clear &= flags;
-                    node->flags = clear;
-                    node->owner = (void *)valid;
-                    {
-                        register u32 cooldown asm("r0") = 120;
-                        node->cooldown = cooldown;
+                {
+                    u32 value = *state & required;
+                    if (!(u16)value) {
+                        node->flags &= clearMask;
+                        node->owner = 0;
+                        value = 120;
+                        node->cooldown = value;
                     }
                 }
             }
-        advance:
             node = node->next;
         } while (node);
     }
