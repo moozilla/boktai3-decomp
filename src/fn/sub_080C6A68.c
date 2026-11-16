@@ -13,7 +13,7 @@ void Golem_UpdateChargeRecovery(struct ChaseActor *actor)
     struct SceneActorBody *body = &actor->base.body;
     u8 directionVariant, mirror;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->base.field2B0 = 0;
+        actor->base.stepDone = 0;
         actor->base.restart = 0;
         context->charge.phase = 0;
         {
@@ -96,7 +96,7 @@ void Golem_UpdateChargeRecovery(struct ChaseActor *actor)
             sub_080C47DC(context);
             context->charge.savedDirection = context->charge.routeDirection;
             actor->base.body.direction = context->charge.routeDirection;
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             *counter = zero;
             context->charge.speed = zero;
             return;

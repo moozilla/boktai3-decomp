@@ -14,16 +14,16 @@ s32 Math_Atan2(s32, s32);
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -46,10 +46,10 @@ void Lun_ChooseMovementDestination(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((s16)actor->base.field2EA > 239 && (s32)actor->base.counter2AC > 60) {
+    if ((s16)actor->base.heightOffset > 239 && (s32)actor->base.counter2AC > 60) {
         struct LunRouteEntry *route;
 
-        actor->base.field2EA = 240;
+        actor->base.heightOffset = 240;
         route = (struct LunRouteEntry *)(state + 0x42C);
         Lun_SelectRandomRouteEntry(route);
         target = &destination;

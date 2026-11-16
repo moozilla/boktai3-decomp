@@ -32,7 +32,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(struct RoomActor *actor,
     }
     dz = destination - actorZ;
     mask = 0x1000;
-    if (actor->flags2D4 & mask) {
+    if (actor->motionFlags & mask) {
         if (!(descriptor->flags & 1) && dx * dx + dz * dz <= 0x4000)
             return 1;
     } else if ((u32)Magnitude(descriptor->position.x - actorX) <= rangeX &&

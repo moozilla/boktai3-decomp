@@ -48,11 +48,11 @@ static inline void BeginControl(struct ChaseActor *actor, s32 zero)
         *(void **)((u8 *)actor + phaseOffset) = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
 }
 void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)

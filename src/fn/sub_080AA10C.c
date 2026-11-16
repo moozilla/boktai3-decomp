@@ -60,15 +60,15 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
     {
         void *target = actor->base.onAlternateEntry;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = 1;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = 1;
         actor->base.target = target;
     }
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }

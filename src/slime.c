@@ -29,7 +29,7 @@ void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *
         if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
             actor->base.counter304 = info->collisionId;
             {
-                u32 *field = &actor->base.flags2D0;
+                u32 *field = &actor->base.statusFlags;
                 u32 mask = ~0x1000000;
                 *field &= mask;
             }
@@ -50,10 +50,10 @@ static inline u8 Slime_ContactUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if (actor->base.flags2D4 & mask)
+        if (actor->base.motionFlags & mask)
             return 1;
         mask = 0x20000;
-        if (actor->base.flags2D0 & mask)
+        if (actor->base.statusFlags & mask)
             return 1;
         if (actor->base.health <= 0)
             return 1;
@@ -183,12 +183,12 @@ void Slime_RollMoveFlag(struct ChaseActor *actor)
         roll = *(u8 *)(index * 2 + RANDOM_TABLE_ADDR);
         if (roll <= 7) {
             u32 mask = 0x10;
-            u16 *flags = &actor->base.flags2D6;
+            u16 *flags = &actor->base.reactionFlags;
             mask |= *flags;
             *flags = mask;
         } else if (roll <= 13) {
             u32 mask = 0x20;
-            u16 *flags = &actor->base.flags2D6;
+            u16 *flags = &actor->base.reactionFlags;
             mask |= *flags;
             *flags = mask;
         }
@@ -353,12 +353,12 @@ static inline void Slime_SetNextControl(struct ChaseActor *p, void (*fn)(void *)
     u8 *flag = &p->base.field2B2;
     u32 zero = 0;
     *flag = 1;
-    p->base.field2B0 = zero;
-    p->base.field2B5 = wait;
+    p->base.stepDone = zero;
+    p->base.controlKind = wait;
     p->base.target = fn;
     p->base.field2C8 = zero;
-    Slime_ClearControlFlags(&p->base.flags114, 1);
-    p->base.word104 = zero;
+    Slime_ClearControlFlags(&p->base.pendingControlFlags, 1);
+    p->base.pendingControl = zero;
 }
 
 void Slime_UpdateWalkTransition(struct ChaseActor *p)
@@ -436,7 +436,7 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         actor->base.secondaryMotion.z = Slime_QuarterMotion(actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         {
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
@@ -444,12 +444,12 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x2000;
-        t = &actor->base.flags2CC;
+        t = &actor->base.behaviorFlags;
         *t |= mask;
     }
     {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     {
         s32 current = actor->base.reactionStart.x;
@@ -477,12 +477,12 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         if (!rest)
             sequence->elapsed = rest;
         else if (Slime_IsReactionComplete(actor)) {
-            u8 *field = &actor->base.field2B0;
+            u8 *field = &actor->base.stepDone;
             u32 ready = 1;
 
             *field = ready;
             {
-                u16 *flags = &actor->base.flags2D4;
+                u16 *flags = &actor->base.motionFlags;
                 u32 mask = ready - 34;
                 *flags = mask & *flags;
             }
@@ -494,7 +494,7 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
                 SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
                 SceneActorChase_SetBehavior(actor, 2);
                 {
-                    u16 *flags = &actor->base.flags2D6;
+                    u16 *flags = &actor->base.reactionFlags;
                     u32 mask = ~0x980;
                     *flags = mask & *flags;
                 }
@@ -518,14 +518,14 @@ void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed)
         SceneActorAnimation_SelectProfileEntry(actor, 1);
         {
             u32 bit = 0x100;
-            actor->base.flags2D4 = bit | actor->base.flags2D4;
+            actor->base.motionFlags = bit | actor->base.motionFlags;
         }
     }
     st->index = 0;
     st->elapsed = 5;
     if (Mod(elapsed, 4) == 0) {
         u32 mask = 0x20;
-        u16 *flags = &actor->base.flags2D6;
+        u16 *flags = &actor->base.reactionFlags;
         mask |= *flags;
         *flags = mask;
     }
@@ -580,7 +580,7 @@ void Slime_UpdateLaunch(struct ChaseActor *actor)
             d->scaleY = 0x40;
     }
     mask = 0x10;
-    if (actor->base.flags2D0 & mask) {
+    if (actor->base.statusFlags & mask) {
         SceneActorChase_SetControl(actor, Slime_UpdateStill, 0x2C);
         Slime_EmitScatteredReactionBurst(actor);
         Slime_EmitScatteredReactionBurst(actor);
@@ -596,7 +596,7 @@ void Slime_UpdateStill(struct ChaseActor *actor)
         d->scaleY = 0x40;
         d->flags &= ~2;
         {
-            u16 *f = &actor->base.flags2D4;
+            u16 *f = &actor->base.motionFlags;
             u32 mask = 0xFFFFFEFF;
             *f = mask & *f;
         }
@@ -662,14 +662,14 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         Slime_EmitDeathDebris(actor);
         {
-            u16 *p = &actor->base.flags2D4;
+            u16 *p = &actor->base.motionFlags;
             u32 mask = ~0x38;
             *p = mask & *p;
         }
     }
     {
         u32 mask = 0x8000;
-        u32 *p = &actor->base.flags2CC;
+        u32 *p = &actor->base.behaviorFlags;
         u32 v = *p & mask;
         stateFlags = p;
         if (v)
@@ -677,7 +677,7 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
     }
 
     if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         script = (u16)actor->base.script1F8;
         if (script) {
             values[0] = actor->base.body.position.x;
@@ -686,7 +686,7 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
             values[3] = actor->base.parameters1FC[0];
             values[4] = actor->base.parameters1FC[1];
             values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.field2E0;
+            values[6] = actor->base.hitOwners;
             values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
@@ -694,7 +694,7 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 mask = 0x4000;
-            if (!(actor->base.flags2D4 & mask) && (u32)(actor->base.category - 11) > 2)
+            if (!(actor->base.motionFlags & mask) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         }
@@ -708,16 +708,16 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
             u32 kind;
             kind = 16;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
         Slime_SetReactionState(actor, 1, 0, 2);
     } else {
@@ -747,7 +747,7 @@ void Bat_UpdateActionScript(struct ChaseActor *obj)
         obj->base.body.direction = obj->base.tracking.heading;
         SceneActorBehavior_CallActionScript((u8 *)obj);
     }
-    if (obj->base.field2B0) {
+    if (obj->base.stepDone) {
         u32 flag = 4;
         u16 *h = &context->flags;
         flag |= *h;
@@ -791,16 +791,16 @@ static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 
     u32 zero;
     a->base.field2B2 = 1;
     zero = 0;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
@@ -825,7 +825,7 @@ static inline void Slime_SetMotionScale(struct ChaseActor *actor)
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
@@ -863,9 +863,9 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
         Slime_SelectWanderTarget(actor, actor->base.body.direction);
     {
         u32 m = 0x2000;
-        u32 f = actor->base.flags2CC;
+        u32 f = actor->base.behaviorFlags;
         f |= m;
-        actor->base.flags2CC = f;
+        actor->base.behaviorFlags = f;
     }
     actor->base.counter2AC++;
 }
@@ -962,7 +962,7 @@ s32 Slime_GetAnimationMovePulse(struct ChaseActor *actor)
         result = 0;
     else {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
         result = Mod(sequence->index, 6);
         {
             const u16 *table = gUnk_08605D58;
@@ -1100,7 +1100,7 @@ static inline u8 Slime_TestContext(struct Slime *q)
 static inline void Slime_SetFlags2D6(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = bits;
-    u16 *flags = &actor->base.flags2D6;
+    u16 *flags = &actor->base.reactionFlags;
     mask |= *flags;
     *flags = mask;
 }
@@ -1162,7 +1162,7 @@ void Slime_FollowPlayer(struct ChaseActor *actor)
 
 void Slime_OnInterrupt(struct ChaseActor *actor)
 {
-    u8 kind = actor->base.field2B5;
+    u8 kind = actor->base.controlKind;
     if (kind != 0x26 && kind != 0x22 && kind != 0x23 && kind != 0x24) {
         SceneActorChase_SetControl(actor, Slime_StartRandomWait, 0x26);
         SceneActorChase_SetState(actor, 0, 0, 0xF);
@@ -1239,20 +1239,20 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *p = &actor->base.flags114;
+                u32 *p = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *p &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
         Slime_SetReactionState(actor, 0, 0, 2);
         {
-            u16 *p = &actor->base.flags2D6;
+            u16 *p = &actor->base.reactionFlags;
             u32 mask = ~0x980;
             *p = mask & *p;
         }
@@ -1725,16 +1725,16 @@ static inline void Slime_SetReactionControl(struct ChaseActor *actor, void *cb, 
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void Slime_SetDamageState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
@@ -1754,7 +1754,7 @@ static inline u32 Slime_CollisionDamageFlags(struct ContactCollider *p)
 
 static inline u32 Slime_MaskedDamage(struct ChaseActor *actor, u32 flags, u32 mask)
 {
-    return actor->base.field2DC & flags & mask;
+    return actor->base.hitReactionFlags & flags & mask;
 }
 
 static inline u32 Slime_MaskedMotionBits(u16 *p, u32 mask)
@@ -1781,10 +1781,10 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
         Sound_PlaySong(0x3bf);
     if (actor->base.paletteOffset == 3)
         Slime_EmitTargetedReactionBurst(actor);
-    Slime_ClearMotionBits(&actor->base.flags2D4, ~0x20);
+    Slime_ClearMotionBits(&actor->base.motionFlags, ~0x20);
     context->enrageCount += 80;
     damage = Slime_MaskedDamage(actor, Slime_CollisionDamageFlags(&actor->base.colliderA), 0x7f);
-    motionFlags = &actor->base.flags2D4;
+    motionFlags = &actor->base.motionFlags;
     if (damage == 0 && context->splitScript) {
         if (actor->base.health < context->halfHealth)
             Slime_RunPendingActionScript(actor);
@@ -1798,8 +1798,8 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
             }
         }
     }
-    if ((Slime_DamageFlags(&actor->base.field2DC) & 0x40000)) {
-        Slime_ClearReactionBits(&actor->base.flags2D6, ~0x980);
+    if ((Slime_DamageFlags(&actor->base.hitReactionFlags) & 0x40000)) {
+        Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
         Slime_SetReactionControl(actor, actor->base.onReaction, 0x12);
         Slime_SetDamageState(actor, 3, 0, 0);
     } else {
@@ -1809,7 +1809,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
             (zero = Slime_TestReactionFlag(context, 8))) {
             Slime_SetReactionControl(actor, SceneActorControl_OnIdle, 0x10);
             Slime_SetDamageState(actor, 0, 0, 2);
-            Slime_ClearReactionBits(&actor->base.flags2D6, ~0x980);
+            Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
         } else if ((*(u32 *)&actor->base.state2A8 & 0xffffff) != 0) {
             Slime_SetReactionControl(actor, actor->base.onStanding, 0);
             Slime_SetDamageState(actor, 0, 0, 0);
@@ -1821,9 +1821,9 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
 u32 Slime_ProcessPendingStateChange(struct ChaseActor *actor)
 {
     u32 m = 0x100;
-    if (Slime_TestPendingFlags(&actor->base.flags2D6, m)) {
+    if (Slime_TestPendingFlags(&actor->base.reactionFlags, m)) {
         Slime_OnInterrupt(actor);
-        Slime_ClearPendingFlags(&actor->base.flags2D6, ~0x100);
+        Slime_ClearPendingFlags(&actor->base.reactionFlags, ~0x100);
     }
     return 1;
 }
@@ -1854,7 +1854,7 @@ u32 Slime_Update(struct ChaseActor *actor)
     void **t;
     Slime_ProcessPendingStateChange(actor);
     i = actor->base.state2A8;
-    t = actor->base.callbacks27C;
+    t = actor->base.stateCallbacks;
     Callback_InvokeActor(actor, t[i]);
     SceneActorControl_DispatchControl(actor);
     SceneActorMotion_RefreshGroundHeight(actor);
@@ -1905,7 +1905,7 @@ u32 Slime_Destroy(struct ChaseActor *actor)
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Slime_TestDestroyFlags(&actor->base.flags2C0, m))
+    if (Slime_TestDestroyFlags(&actor->base.placementFlags, m))
         SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
         u8 *r = actor->base.shadow;
@@ -1913,7 +1913,7 @@ u32 Slime_Destroy(struct ChaseActor *actor)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = actor->base.flags2D0 & m;
+    v = actor->base.statusFlags & m;
     q = (void *)&actor->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
@@ -1954,11 +1954,11 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     struct ContactPosition origin;
     s32 mode, firstLimit, secondLimit;
     s32 scriptVariant;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
+    arg0->base.placementFlags = MonsterInit_ReadKeywordHalfword(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -1975,13 +1975,13 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.scriptId = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -1989,14 +1989,14 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
+    arg0->base.hudKind = MonsterInit_ReadKeywordHalfword(0x4B, 2);
     scriptVariant = (s16)MonsterInit_ReadKeywordHalfword(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    arg0->base.field9A = scriptVariant;
+    arg0->base.hudLabel = scriptVariant;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
@@ -2041,9 +2041,9 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;
@@ -2059,8 +2059,8 @@ static inline void Slime_InstallCompletionCallbacks(struct ChaseActor *actor)
 
 static inline void Slime_InstallRoutes(struct ChaseActor *actor)
 {
-    actor->base.callback248 = Slime_ResetIdlePlayback;
-    actor->base.field23C = Slime_FollowPlayer;
+    actor->base.routeReset = Slime_ResetIdlePlayback;
+    actor->base.reactionGate = Slime_FollowPlayer;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Slime_TryEnrage);
     actor->base.field240 = Slime_PlayPendingSound;
 }
@@ -2152,8 +2152,8 @@ s32 Slime_Init(void *object)
     }
     actor->base.colliderA.responseValue = MonsterInit_ReadKeywordHalfword('n', 0);
     slime->launchThreshold = 600;
-    actor->base.field2EA = Script_GetKeywordValue('f', 0);
-    if (actor->base.field2EA)
+    actor->base.heightOffset = Script_GetKeywordValue('f', 0);
+    if (actor->base.heightOffset)
         Slime_SetFlags(slime, 0x10);
     Bat_ReadScriptValuePair(actor);
     Slime_ReadPalette(actor, 0xCC, 0x192);

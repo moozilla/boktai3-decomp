@@ -67,11 +67,11 @@ static inline void SetMotion(struct SceneActorReactionMotion *motion, u32 mask)
 }
 static inline u32 Flag16(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D4 & mask;
+    return p->base.motionFlags & mask;
 }
 static inline u32 Flag32(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D0 & mask;
+    return p->base.statusFlags & mask;
 }
 static inline u8 Unavailable(struct ChaseActor *a)
 {
@@ -84,16 +84,16 @@ static inline u8 Unavailable(struct ChaseActor *a)
 static inline void Control(struct ChaseActor *a, void *callback, u32 kind, u32 zero)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = zero;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         s32 mask = ~1;
         *p &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
 {
@@ -105,7 +105,7 @@ static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
 }
 static inline void SetStatus(struct ChaseActor *a, u32 mask)
 {
-    a->base.flags2D4 = mask | a->base.flags2D4;
+    a->base.motionFlags = mask | a->base.motionFlags;
 }
 static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 counter)
 {
@@ -146,7 +146,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         return;
     if ((!Unavailable(input)) && (contact.collider->kind & 15)) {
         input->base.counter304 = ((struct RecoveryContactIdentity *)contact.collider)->identity;
-        Clear32(&input->base.flags2D0, ~0x1000000);
+        Clear32(&input->base.statusFlags, ~0x1000000);
     }
     Collision_CalculateDamageResponse(source, contact.collider);
     {
@@ -196,7 +196,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
                 s32 param = ((struct RecoveryHealthView *)a)->parameter;
                 SceneHud_SetTimedState(a->base.body.id, hp, max, kind, 0, param);
                 Fill(&zero, buffer);
-                if (a->base.reactionSoundVariant || (!(a->base.field2D8 & 0x20000)))
+                if (a->base.reactionSoundVariant || (!(a->base.hitAttributes & 0x20000)))
                     DamageNumberDisplay_Show(recovery.collider, a->base.reactionSoundVariant, 1,
                                              &a->base.body.position, buffer, 1);
             }

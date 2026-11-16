@@ -34,8 +34,8 @@ static inline void SceneActorEffects_SpawnContactParts(struct ChaseActor *actor)
         EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->base.fieldAA = 0;
-    actor->base.field2B8 = 0;
+    actor->base.attachmentTimer = 0;
+    actor->base.hitLockTimer = 0;
 }
 
 static inline u8 SceneActorEffects_NextSparkCount(const u16 *table)

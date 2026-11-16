@@ -29,7 +29,7 @@ void Dog_UpdateShadowlessApproach(struct ChaseActor *actor)
         actor->base.secondaryMotion.x = 0;
         actor->base.secondaryMotion.z = 0;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u16 *flags;
         u32 active = Dog_TestApproachFlag(context, 1, &flags);
         if (active) {

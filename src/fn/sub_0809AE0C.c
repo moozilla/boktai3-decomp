@@ -12,16 +12,16 @@ extern struct Player *gUnknown_02000580;
 static inline void Lun_SetControl(struct ChaseActor *actor, void *target, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = target;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void Lun_SetState(struct ChaseActor *actor, u32 state, u8 phase, u32 behavior)
@@ -41,12 +41,12 @@ static inline u32 Lun_ReadContextFlags(struct ChaseActor *actor, u8 mask)
 
 static inline u32 Lun_ReadActorMotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline u32 Lun_ReadActorStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 
 static inline u8 Lun_IsUnavailable(struct ChaseActor *actor)
@@ -82,13 +82,13 @@ static inline void Lun_EnableCollider(struct ContactCollider *collider)
 
 static inline void Lun_SetContactFlag(struct ChaseActor *actor, u16 bits)
 {
-    u16 *flags = &actor->base.flags2C0;
+    u16 *flags = &actor->base.placementFlags;
     *flags = bits | *flags;
 }
 
 static inline void Lun_ClearReactionFlags(struct ChaseActor *actor, u32 bits)
 {
-    u16 *flags = &actor->base.flags2D6;
+    u16 *flags = &actor->base.reactionFlags;
     u32 mask = ~bits;
     *flags &= mask;
 }

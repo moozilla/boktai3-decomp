@@ -5,7 +5,7 @@
 
 static inline u32 TestMotionFlag(struct Vorn *p, u32 mask)
 {
-    return (p->chase.base.flags2D4 & mask);
+    return (p->chase.base.motionFlags & mask);
 }
 s32 SceneActor_IsFacingNearbyTarget(struct Vorn *p)
 {

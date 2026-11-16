@@ -180,14 +180,14 @@ void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct Contac
     mesh = actor->group.route;
     pos = &actor->base.body.position;
     if (!Nav_IsPositionInMesh(mesh, pos, target)) {
-        ClearFlags16(&actor->base.flags2D4, ~0x200);
+        ClearFlags16(&actor->base.motionFlags, ~0x200);
     } else {
         r = Terrain_ApplyBlocked(mesh, pos, target);
         if (r != 0) {
             if (r != 2)
                 Memory_Clear(&actor->base.body.motion, 8);
         } else {
-            ClearFlags16(&actor->base.flags2D4, ~0x200);
+            ClearFlags16(&actor->base.motionFlags, ~0x200);
         }
     }
 }

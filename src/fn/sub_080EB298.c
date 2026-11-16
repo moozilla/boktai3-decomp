@@ -7,16 +7,16 @@ s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 static inline void SetControl(struct ChaseActor *a, void *cb, u32 k)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = k;
+    a->base.stepDone = 0;
+    a->base.controlKind = k;
     a->base.target = cb;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void State(struct ChaseActor *a, u32 state)
 {
@@ -41,7 +41,7 @@ void SceneActorReaction_ReacquireAdjacentTarget(struct ChaseActor *a)
         SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);
         a->base.restart = 0;
     }
-    if (a->base.restart || a->base.field2B5 == 34) {
+    if (a->base.restart || a->base.controlKind == 34) {
         if (SceneActorReaction_FindAdjacentTarget(a, 1)) {
             if (!a->base.drawableKind) {
                 u32 *p = a->base.drawable;
@@ -55,7 +55,7 @@ void SceneActorReaction_ReacquireAdjacentTarget(struct ChaseActor *a)
             State(a, 3);
             SetControl(a, (void *)sub_080E9C20, 3);
         }
-        if (a->base.field2B5 == 34 && (s32)a->base.counter2AC > 180) {
+        if (a->base.controlKind == 34 && (s32)a->base.counter2AC > 180) {
             IdleState(a);
             SetControl(a, (void *)SceneActorControl_OnIdle, 16);
             return;

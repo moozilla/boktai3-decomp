@@ -12,7 +12,7 @@ static inline u16 *Bat_PrepareLanding(struct ChaseActor *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
     SceneActorChase_SetReactionFlags(actor, 0x10);
-    reactionFlags = &actor->base.flags2D6;
+    reactionFlags = &actor->base.reactionFlags;
     if (frame <= 17) {
         animation = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
@@ -30,7 +30,7 @@ void sub_08087018(struct ChaseActor *actor, s32 frame)
     reactionFlags = Bat_PrepareLanding(actor, frame);
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 2)) {
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, group->contactControl, 7);

@@ -37,7 +37,7 @@ void SceneActorControl_EnterTimedState(struct ChaseActor *actor)
         DEBUG_PRINT();
     }
     bit = 0x20;
-    masked = actor->base.flags2D4 & bit;
+    masked = actor->base.motionFlags & bit;
     flags = (u16)masked;
     zero = flags;
     if ((bit = zero) == 0)

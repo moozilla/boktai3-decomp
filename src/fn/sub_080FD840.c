@@ -18,11 +18,11 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
     struct SceneActorExtendedControlContext *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         context->fieldED1 = 1;
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u8 zero8;
         u32 zero;
         Axe_SetAuxiliarySpriteRenderState(actor, context->target888, 0x13C);
-        actor->base.flags2D4 = Mask16(&actor->base.flags2D4, ~0x100);
+        actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
         zero8 = 0;
         zero = 0;
         {

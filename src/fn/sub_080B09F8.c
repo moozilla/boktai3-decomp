@@ -9,18 +9,18 @@ void SceneActorPhase_UpdateCooldown(struct ChaseActor *p)
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         {
             s32 mask = 0x100;
-            struct ChaseFlags40 *flags = (void *)&p->base.flags2D4;
+            struct ChaseFlags40 *flags = (void *)&p->base.motionFlags;
             flags->bits |= mask;
         }
         Chase_SetCtl(p, SceneActor_UpdateTargetedAttack, 0x22);
         link->phaseDuration = 120;
         {
             u32 mask = 4;
-            p->base.flags2D0 |= mask;
+            p->base.statusFlags |= mask;
         }
     }
-    if (p->base.field2B0) {
-        u16 *flags = &p->base.flags2D4;
+    if (p->base.stepDone) {
+        u16 *flags = &p->base.motionFlags;
         u32 mask = ~0x100;
         *flags = mask & *flags;
         SceneActorAnimation_SelectDirectionalEntry((void *)p, 0);

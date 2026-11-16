@@ -6,24 +6,24 @@ void SceneActorReaction_RestoreAlternateAfterDelay(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void SceneActorReaction_RestoreAfterControl(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetControl(actor, SceneActor_EndReactionAnimation, 35);
-        actor->base.field2B0 = 0;
+        actor->base.stepDone = 0;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         struct SceneActorReactionCommand *command = (void *)&actor->group.saved.control;
         void *callback = SceneActorControl_OnIdle;
         u32 one = 1;

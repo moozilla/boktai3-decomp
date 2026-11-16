@@ -15,11 +15,11 @@ void SceneActorControl_FinishRotation(struct ChaseActor *actor, s32 elapsed)
         drawable->flags |= 2;
         state[0xEB1] = 40;
         Sound_PlaySong(0x1E3);
-        actor->base.flags2C0 = ClearRotationFlag(&actor->base.flags2C0, ~0x1000);
+        actor->base.placementFlags = ClearRotationFlag(&actor->base.placementFlags, ~0x1000);
     }
     if (Mod(elapsed, 6) == 0) {
         u32 mask = 32;
-        u16 *flags = &actor->base.flags2D6;
+        u16 *flags = &actor->base.reactionFlags;
         mask |= *flags;
         *flags = mask;
     }

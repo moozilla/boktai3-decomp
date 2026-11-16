@@ -5,7 +5,7 @@ void Sound_PlaySong(u32);
 
 static inline void SetFlags(struct RoomActor *s, u16 mask)
 {
-    s->flags2D4 = mask | s->flags2D4;
+    s->motionFlags = mask | s->motionFlags;
 }
 static inline void ClearFlags32(u32 *p, u32 mask)
 {
@@ -22,7 +22,7 @@ s32 sub_08136A9C(struct RoomActor *s)
     SceneActorAttachment_ReplaceResponseSlot(s, 3, 0, s->category);
     tracking = &s->tracking;
     ClearTrackingFlags(tracking, ~8);
-    ClearFlags32(&s->flags2D0, ~0x1000000);
+    ClearFlags32(&s->statusFlags, ~0x1000000);
     Sound_PlaySong(0x13e);
     return 1;
 }

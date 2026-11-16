@@ -36,8 +36,9 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
     s32 height, kind;
     struct BurstExtent extent;
     struct BurstExtent *burst;
-    if (motionSquared(&actor->base.secondaryMotion) == 0 && *(s16 *)&actor->base.field2EA == 0) {
-        u32 *clear = &actor->base.flags2D0;
+    if (motionSquared(&actor->base.secondaryMotion) == 0 &&
+        *(s16 *)&actor->base.heightOffset == 0) {
+        u32 *clear = &actor->base.statusFlags;
         u32 mask = ~0x10;
         *clear &= mask;
         return 1;
@@ -45,18 +46,18 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
     category = actor->base.category;
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     {
         u32 mask = 0x100000;
-        value = actor->base.flags2D0 & mask;
-        flags = &actor->base.flags2D0;
+        value = actor->base.statusFlags & mask;
+        flags = &actor->base.statusFlags;
     }
     if (!value) {
         u16 *y = (u16 *)&actor->base.secondaryMotion.y;
         s32 dy;
         *y = dy = *y - 2;
-        actor->base.field2EA += dy;
+        actor->base.heightOffset += dy;
         actor->base.body.motion.x += actor->base.secondaryMotion.x;
         actor->base.body.motion.z += actor->base.secondaryMotion.z;
         index = actor->base.terrainCell;
@@ -68,7 +69,7 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
             goto haveCell;
         }
     } else {
-        if (Mod(actor->base.field2CA, 4) == 0) {
+        if (Mod(actor->base.frameCounter, 4) == 0) {
             actor->base.secondaryMotion.x = halve(actor->base.secondaryMotion.x);
             actor->base.secondaryMotion.z = halve(actor->base.secondaryMotion.z);
         }
@@ -92,7 +93,7 @@ slopeX:
     height -= *(u8 *)local;
 done:;
     {
-        s16 *elevation = (s16 *)&actor->base.field2EA;
+        s16 *elevation = (s16 *)&actor->base.heightOffset;
         if (*elevation + height <= height) {
             u16 *bouncePtr;
             u16 bounce;
@@ -120,11 +121,12 @@ done:;
                                                    2, 4);
             if (*(void **)((u8 *)actor + 0x240))
                 Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x240));
-            actor->base.field2EA = 0;
+            actor->base.heightOffset = 0;
         }
     }
-    if (motionSquared(&actor->base.secondaryMotion) == 0 && *(s16 *)&actor->base.field2EA == 0) {
-        actor->base.field2EA = 0;
+    if (motionSquared(&actor->base.secondaryMotion) == 0 &&
+        *(s16 *)&actor->base.heightOffset == 0) {
+        actor->base.heightOffset = 0;
         ZeroFill8(&actor->base.secondaryMotion);
         orFlags(flags, 0x10);
         return 1;

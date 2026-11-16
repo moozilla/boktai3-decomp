@@ -5,7 +5,7 @@ void SceneActorAnimation_SelectDirectionalEntry(struct ChaseActor *, u32);
 u8 Vorn_BeginContactAnimation(struct ChaseActor *actor)
 {
     if (actor->group.hitReactionLatch == 0 && (actor->base.field2E6 & 8)) {
-        actor->base.field2B8 = 45;
+        actor->base.hitLockTimer = 45;
         actor->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }

@@ -33,7 +33,7 @@ static inline u8 Mummy_TestContextOwned(struct Mummy *context, u32 mask,
 
 static inline u32 Mummy_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline void Mummy_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 bits)
@@ -42,11 +42,11 @@ static inline void Mummy_SetTrackingFlags(struct SceneActorChaseTracking *tracki
 }
 static inline u32 Mummy_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline u32 Mummy_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 
 static inline void Mummy_SetBehavior(struct ChaseActor *actor, u32 behavior)
@@ -158,7 +158,7 @@ u8 sub_080D7568(struct ChaseActor *actor)
     (*target) = contact->object;
     cell = ((struct MummyContactTarget *)(*target))->cell->index;
     if (*(u32 *)actor->base.unknown100) {
-        if (SceneActorChase_TestField(&actor->base.flags2C0, 2))
+        if (SceneActorChase_TestField(&actor->base.placementFlags, 2))
             (*target) = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
         else if (!((*target)))
             goto threshold;

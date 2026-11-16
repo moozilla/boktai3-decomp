@@ -3,7 +3,7 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorRegistry_SetMovementMode(struct ChaseActor *, s32);
 static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 disabled)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u32 value = *flags;
     u32 mask = disabled;
     value &= mask;
@@ -13,7 +13,7 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 disabl
     {
         u32 value;
         mask = 0x20000;
-        value = actor->base.flags2D0;
+        value = actor->base.statusFlags;
         value &= mask;
         if (value)
             goto one;

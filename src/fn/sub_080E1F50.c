@@ -20,7 +20,7 @@ static inline u8 TestMovement(struct ChaseActor *a)
     struct ContactPosition *position = &a->base.body.position;
     struct ContactPosition *destination = &a->base.tracking.target->position;
     if (!Nav_IsPositionInMesh(collider, position, destination)) {
-        u16 *flags = &a->base.flags2D4;
+        u16 *flags = &a->base.motionFlags;
         u32 mask = ~0x200;
         *flags &= mask;
         return 0;
@@ -31,7 +31,7 @@ static inline u8 TestMovement(struct ChaseActor *a)
                 Memory_Clear(&a->base.body.motion, 8);
             return 1;
         } else {
-            u16 *flags = &a->base.flags2D4;
+            u16 *flags = &a->base.motionFlags;
             u32 mask = ~0x200;
             *flags &= mask;
             return 0;

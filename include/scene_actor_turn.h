@@ -14,7 +14,7 @@ static inline s32 SceneActorTurn_Cardinal(u8 direction)
 
 static inline u32 SceneActorTurn_ActorFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 
 static inline void SceneActorTurn_ApplyDuration(struct ChaseActor *a, u16 *motionFlags)

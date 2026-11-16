@@ -56,7 +56,7 @@ s32 Golem_UpdateEffectsAndContacts(struct Golem *actor)
 {
     struct GolemState *state = actor->chase.base.context;
     u32 m = 0x40;
-    if (!(actor->chase.base.flags2D4 & m)) {
+    if (!(actor->chase.base.motionFlags & m)) {
         u16 *p = &state->shakeTimer6AE;
         if (*p != 0) {
             Camera_RequestShake(state->shakeStrength6AC);

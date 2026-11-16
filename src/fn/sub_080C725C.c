@@ -35,7 +35,7 @@ static inline s32 GolemSlide_Quarter(s16 value)
 
 static inline void GolemSlide_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D4 = mask | actor->base.flags2D4;
+    actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 
 static inline void GolemSlide_ClearColliderFlags(struct ContactCollider *collider, u16 bits)
@@ -46,12 +46,12 @@ static inline void GolemSlide_ClearColliderFlags(struct ContactCollider *collide
 
 static inline void GolemSlide_SetDelay(struct ChaseActor *actor, u16 delay)
 {
-    actor->base.fieldAA = delay;
+    actor->base.attachmentTimer = delay;
 }
 
 static inline void GolemSlide_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D0 |= mask;
+    actor->base.statusFlags |= mask;
 }
 
 void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
@@ -98,7 +98,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
                      &velocity, &spread, 45, 31);
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 5);
         if (context->recovery) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
         } else {
             GolemSlide_SetDelay(actor, 180);
             GolemSlide_SetStatusFlags(actor, 1);

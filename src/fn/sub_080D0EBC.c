@@ -19,7 +19,7 @@ static inline u8 TakeFlag(u8 *flag)
 }
 static inline u32 ReadFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
 {
@@ -31,21 +31,21 @@ void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
         direction[9] = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;
-        actor->base.flags2D4 |= mask;
+        actor->base.motionFlags |= mask;
     }
     if (sequence->frame > 2) {
         if (sequence->frame == 4 && sequence->timer == 0)
             Sound_PlaySong(0x101);
     }
     if (ReadFlags(actor, 0x10)) {
-        u16 *flags = &actor->base.flags2D4;
+        u16 *flags = &actor->base.motionFlags;
         u32 mask = ~0x100;
         mask &= *flags;
         *flags = mask;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     } else {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
 }

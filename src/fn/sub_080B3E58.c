@@ -20,7 +20,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         s32 mask = ~8;
         *flags = *flags & mask;
     }
-    if (!(actor->base.field2D8 & 0x20000)) {
+    if (!(actor->base.hitAttributes & 0x20000)) {
         if (actor->base.reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
         else
@@ -28,32 +28,32 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x8002;
-        blocked = mask & actor->base.flags2D4;
+        blocked = mask & actor->base.motionFlags;
     }
     if (blocked) {
         {
             u32 mask = ~0x20;
-            mask &= actor->base.flags2D4;
-            actor->base.flags2D4 = mask;
+            mask &= actor->base.motionFlags;
+            actor->base.motionFlags = mask;
         }
         return 0;
     }
-    if (actor->base.field2DC & 0xC0000) {
+    if (actor->base.hitReactionFlags & 0xC0000) {
         void *control = actor->base.onReaction;
         u32 kind = 0x12;
         u8 zero8;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = blocked;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = blocked;
+        actor->base.controlKind = kind;
         actor->base.target = control;
         zero8 = 0;
         actor->base.field2C8 = blocked;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->base.word104 = blocked;
+        actor->base.pendingControl = blocked;
         {
             u32 state = 3;
             actor->base.state2A8 = state;
@@ -63,7 +63,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         actor->base.counter2AC = blocked;
         actor->base.field2B1 = 1;
         {
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x1000000;
             *flags &= mask;
         }
@@ -71,16 +71,16 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
     }
     {
         u32 mask = ~0x20;
-        actor->base.flags2D4 &= mask;
+        actor->base.motionFlags &= mask;
     }
-    if (actor->base.flags2D4 & 0x100)
+    if (actor->base.motionFlags & 0x100)
         return 0;
-    if (actor->base.field2B8)
+    if (actor->base.hitLockTimer)
         return 0;
     if (Test(context, 0x1D))
         return Vorn_BeginContactAnimation((void *)context);
     if (actor->group.hitReactionLatch == 0 && (actor->base.field2E6 & 8)) {
-        actor->base.field2B8 = 45;
+        actor->base.hitLockTimer = 45;
         actor->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }

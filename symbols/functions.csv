@@ -3355,11 +3355,14 @@ addr,name,mode,confidence,source,notes
 080A2AEC,Spider_UpdateLandingMotion,thumb,low,src-alias,
 080A2CEC,Spider_UpdateDefeat,thumb,low,src-alias,
 080A2F04,Spider_UpdatePreAction,thumb,low,src-alias,Runs three Spider update helpers and emits timed particles before action dispatch
+080A2F28,Spider_HandleUnusedAction,thumb,low,src-alias,
 080A2F2C,Spider_ApproachRouteProbe,thumb,low,src-alias,
 080A30C0,Spider_UpdateProbeNavigation,thumb,low,src-alias,
 080A32A4,SceneActorControl_UpdateEntryWait,thumb,low,src-alias,
 080A33A4,SceneActorControl_UpdateRouteResponse,thumb,low,src-alias,
+080A34BC,Spider_UpdateIdleWander,thumb,low,src-alias,
 080A37C8,Spider_TickActionUntilComplete,thumb,low,src-alias,Clears the queued flag and increments the action timer while the action callback reports incomplete
+080A3804,Spider_TickActionTimer,thumb,low,src-alias,
 080A382C,Spider_SetBehaviorTables,thumb,low,src-alias,Installs two Spider-specific behavior tables at offsets 0x284 and 0x294
 080A384C,Spider_InitColliders,thumb,low,src-alias,Initializes the spider body and attack colliders with their collision callbacks
 080A38E8,SceneActorRoute_ResetStep,thumb,low,src-alias,
@@ -3374,6 +3377,7 @@ addr,name,mode,confidence,source,notes
 080A4260,SceneActorPlacement_BeginContactRoute,thumb,low,src-alias,
 080A4334,SceneActorPlacement_SelectPlayerApproach,thumb,low,src-alias,
 080A45C8,SceneActorPlacement_BeginNearbyPlayerContact,thumb,low,src-alias,
+080A4798,Spider_SelectRouteEntryAwayFromTarget,thumb,low,src-alias,
 080A48E0,Spider_SelectRandomEntry,thumb,low,src-alias,Selects a different random table entry and resets its playback cursor
 080A4940,Spider_GetAnimationEvent,thumb,low,src-alias,Animation callback that returns a parity-selected event when the animation counter reaches zero
 080A497C,SceneActorPlacement_BeginDefaultResponse,thumb,low,src-alias,

@@ -9,13 +9,13 @@ static inline u8 Unavailable(struct ChaseActor *inputActor, u16 *inputState, u32
     u32 excluded = inputExcluded;
     u32 flags;
     flags = *state;
-    if ((flags & disabled) || (actor->base.flags2D0 & excluded) || actor->base.health <= 0)
+    if ((flags & disabled) || (actor->base.statusFlags & excluded) || actor->base.health <= 0)
         return 1;
     return 0;
 }
 static inline u32 InvalidFlags(struct ChaseActor *actor)
 {
-    u32 *field = &actor->base.flags2CC;
+    u32 *field = &actor->base.behaviorFlags;
     u32 value = *field;
     asm("" : : "r"(actor));
     return value;

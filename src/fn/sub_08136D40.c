@@ -22,21 +22,21 @@ static inline void SetState(struct RoomActor *actor, u32 state, u32 phase, u32 b
 static inline void SetControl(struct RoomActor *actor, u32 kind, const void *control)
 {
     actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
+    actor->stepDone = 0;
+    actor->controlKind = kind;
     actor->target = control;
     actor->field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->pendingControl = 0;
 }
 void SceneActorPlacement_ResumeResetControl(struct RoomActor *actor)
 {
     u32 bit = 1;
-    if (actor->flags2CC & bit) {
+    if (actor->behaviorFlags & bit) {
         SceneActorTerrain_ResumeDrawable(actor);
         if (actor->shadow[0])
             ActorShadow_Enable(actor->shadow);

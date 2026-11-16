@@ -1,7 +1,7 @@
 #include "scene_actor_registry.h"
 static inline u8 IsInactive(struct ChaseActor *actor, u32 mask40, u32 mask20000)
 {
-    if (actor->base.flags2D4 & mask40 || actor->base.flags2D0 & mask20000 ||
+    if (actor->base.motionFlags & mask40 || actor->base.statusFlags & mask20000 ||
         actor->base.health <= 0)
         return 1;
     return 0;
@@ -17,7 +17,7 @@ s32 SceneActorRegistry_CountAvailable(void)
         u32 mask3 = 3;
         do {
             u32 inactive = IsInactive(actor, mask40, mask20000);
-            if (inactive || actor->base.flags2CC & mask3) {
+            if (inactive || actor->base.behaviorFlags & mask3) {
                 node = node->next;
                 actor = node->actor;
             } else {

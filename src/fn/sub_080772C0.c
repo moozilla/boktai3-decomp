@@ -11,16 +11,16 @@ static inline void EnableMotionFlags(u32 mask, u16 *field)
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void ClearFlags(u32 *flags, u32 bits)
 {
@@ -35,7 +35,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
         return 1;
     {
         u32 mask = 0x20000;
-        if (actor->base.flags2D0 & mask)
+        if (actor->base.statusFlags & mask)
             return 1;
     }
     if (actor->base.health <= 0)
@@ -45,7 +45,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
 void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *argument)
 {
     u32 mask = 0x800;
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u16 prior = mask & *flags;
     if (prior)
         return;
@@ -53,10 +53,10 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
     switch (*argument) {
         case 0: {
             u32 bit = 1;
-            if (!(actor->base.flags2CC & bit))
+            if (!(actor->base.behaviorFlags & bit))
                 return;
         }
-            ClearFlags(&actor->base.flags2CC, 3);
+            ClearFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
             SetControl(actor, actor->base.onHidden, 12);
@@ -64,14 +64,14 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
         case 1:
             if (IsDown(actor, flags))
                 return;
-            ClearFlags(&actor->base.flags2CC, 3);
+            ClearFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
             SetControl(actor, actor->base.onHidden, 12);
             break;
         default: {
             u32 bit = 1;
-            if (actor->base.flags2CC & bit) {
+            if (actor->base.behaviorFlags & bit) {
                 SceneActorRegistry_RestoreActorDefaults((void *)actor);
                 actor->base.colliderA.responseValue = 0;
             }

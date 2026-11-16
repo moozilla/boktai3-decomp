@@ -33,7 +33,7 @@ void SceneActorControl_RestoreInactiveDefaults(struct ChaseActor *actor)
     u32 flags;
     if (!blocked2048((void *)actor)) {
         one = 1;
-        flags = actor->base.flags2CC;
+        flags = actor->base.behaviorFlags;
         one &= flags;
         if (!one && (flags & 2)) {
             SceneActorRegistry_RestoreActorDefaults(actor);

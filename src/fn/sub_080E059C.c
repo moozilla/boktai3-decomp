@@ -20,11 +20,11 @@ void Dog_ResumeAfterReaction(struct ChaseActor *a)
         return;
     }
     group = (u8 *)&a->group.common;
-    a->base.field2B0 = 1;
+    a->base.stepDone = 1;
     {
         u32 mask = 0x80;
-        flags = a->base.flags2D4;
-        flags = a->base.flags2D4 & mask;
+        flags = a->base.motionFlags;
+        flags = a->base.motionFlags & mask;
     }
     if (flags) {
         SceneActor_SetPositionXZ((u8 *)a + 0x50, *(s16 *)(*(u8 **)((u8 *)a + 0x5D0) + 0x1C),
@@ -42,6 +42,6 @@ void Dog_ResumeAfterReaction(struct ChaseActor *a)
         SceneActorAnimation_SelectDirectionalEntry(a, 0);
         Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
         Chase_SetBehavior(a, 7);
-        a->base.flags2CC |= 0x10;
+        a->base.behaviorFlags |= 0x10;
     }
 }

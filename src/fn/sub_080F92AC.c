@@ -31,6 +31,6 @@ void SceneActorControl_ResetRotation(struct ChaseActor *actor)
     --*timer;
     if (state[0xEAF] == 0) {
         Axe_SetAuxiliarySpriteRenderState(actor, state + 0x888, 0x13C);
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
     }
 }

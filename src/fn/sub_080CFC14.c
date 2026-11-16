@@ -47,11 +47,11 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
-    arg0->chase.base.flags2CC = 0;
-    arg0->chase.base.flags2D0 = 0;
+    arg0->chase.base.behaviorFlags = 0;
+    arg0->chase.base.statusFlags = 0;
     arg0->chase.base.enabled = 0;
     arg0->chase.base.field2E8 = 8;
-    arg0->chase.base.flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    arg0->chase.base.placementFlags = MonsterInit_ReadKeywordHalfword('M', 0);
     arg0->chase.base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
@@ -73,14 +73,14 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(&arg0->chase, 0x200);
     arg0->chase.base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->chase.base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->chase.base.scriptId = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(&arg0->chase, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(&arg0->chase));
         arg0->chase.base.field9E = MonsterInit_ReadByte(0);
-        arg0->chase.base.field9F = MonsterInit_ReadByte(0);
-        arg0->chase.base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->chase.base.defense = MonsterInit_ReadByte(0);
+        arg0->chase.base.contactReward = MonsterInit_ReadByte(0);
         arg0->chase.base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->chase.base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -89,14 +89,14 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
                                  firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->chase.base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->chase.base.experience = MonsterInit_ReadWord(0);
         arg0->chase.base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->chase.base.fieldB2 = MonsterInit_ReadKeywordHalfword('K', 2);
+    arg0->chase.base.hudKind = MonsterInit_ReadKeywordHalfword('K', 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
     if (identity < 0)
         identity = 0xFFFF;
-    arg0->chase.base.field9A = identity;
+    arg0->chase.base.hudLabel = identity;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(&arg0->chase, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))

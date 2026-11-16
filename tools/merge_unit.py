@@ -76,17 +76,30 @@ def key(item):
     m = re.match(r"typedef\b.*?(\w+)\s*(?:\[[^\]]*\])?\s*;\s*$", first, re.S)
     if m:
         return ("type", m.group(1))
-    if "{" in item and re.match(r"static\b", first):
+    if "{" in item and re.match(r"(?:inline\s+)?static\b", first) and "=" not in item.split("{", 1)[0]:
         m = re.search(r"(\w+)\s*\(", item)
         return ("static", m.group(1))
+    code = _NONCODE.sub(" ", item).strip()
+    m = _PROTOTYPE.match(code)
+    if m:
+        return ("decl", m.group(1))  # a prototype or extern: one type per name in a TU
+    m = _VARIABLE.match(code)
+    if m and not code.startswith("typedef"):
+        return ("var", m.group(1))  # a variable definition: defined once per TU
     return None
+
+
+# `[extern] T name(params);` and `extern T name[...];`, and `[static] T name[...] = ...;`.
+_PROTOTYPE = re.compile(r"(?:extern\s+)?(?!typedef\b)[A-Za-z_][\w \t\n\*]*?[\s\*]([A-Za-z_]\w*)\s*"
+                        r"(?:\((?:[^()]|\([^()]*\))*\)|(?<=\w)(?=\s*[\[;]))[^=;{]*;$", re.S)
+_VARIABLE = re.compile(r"(?!extern\b)[A-Za-z_][\w \t\n\*]*?[\s\*]([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*=", re.S)
 
 
 MARK = "// MATCHING_CONCESSION: register-pinning"
 
 
 def is_function(item):
-    return re.match(r"(?!static\b)[A-Za-z_][\w \*]*\b\w+\s*\([^;{]*\)\s*\{", item.lstrip(), re.S) is not None
+    return re.match(r"(?!(?:inline\s+)?static\b)[A-Za-z_][\w \*]*\b\w+\s*\([^;{]*\)\s*\{", item.lstrip(), re.S) is not None
 
 
 def merge(paths):

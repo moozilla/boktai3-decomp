@@ -20,15 +20,15 @@ void SceneActorReaction_UpdateFacingAttack(struct ChaseActor *actor, s32 frame)
                 (*(struct SceneActorFacingTarget **)gPlayers)->x - actor->base.body.position.x,
                 (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->base.body.position.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        actor->base.field2EA = 80;
+        actor->base.heightOffset = 80;
         Sound_PlaySong(0x1CF);
     }
     {
         u32 mask = 4;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     if (frame == 14) {
-        actor->base.field2EA = 140;
+        actor->base.heightOffset = 140;
         Vorn_RunPendingScript(actor->base.context);
     }
     if (frame > 60)

@@ -10,7 +10,7 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 
 static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 static inline void Vorn_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
@@ -43,7 +43,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
         actor->base.body.direction = (((actor->base.body.direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     }
-    status = &actor->base.flags2D0;
+    status = &actor->base.statusFlags;
     {
         u32 value = *status;
         if (!(value & 16))
@@ -53,7 +53,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
     }
     Vorn_SendMessage(actor);
     SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
-    motion = (struct SceneActorChaseFlags16 *)&actor->base.flags2D4;
+    motion = (struct SceneActorChaseFlags16 *)&actor->base.motionFlags;
     SceneActorChase_ClearFlagComponent(motion, 0x38);
     Vorn_StartRoute(actor, group);
     contextFlags = &context->flags;

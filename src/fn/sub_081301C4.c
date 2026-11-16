@@ -14,16 +14,16 @@ static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = cb;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
 u8 sub_0812F3CC(struct ChaseActor *);
@@ -62,7 +62,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 60) {
         struct ContactPosition target;
         {
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = ~0x100;
             *flags &= mask;
         }
@@ -70,7 +70,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
         SetState(actor, 3, 1, 0);
         SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         {
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = 0x10;
             *flags |= mask;
         }
@@ -83,7 +83,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
                 s32 x = p->x >> 8;
                 s32 z = p->z >> 8;
 
-                savedFlags = &actor->base.flags2CC;
+                savedFlags = &actor->base.behaviorFlags;
                 p->y = SceneActorTerrain_GetHeight(Chase_CellIndex(x, z), p);
             }
         }

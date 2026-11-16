@@ -68,8 +68,8 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
                     s32 initial;
                     u8 flag;
                     SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                    value = (s16 *)(&actor->base.fieldAA);
-                    initial = actor->base.fieldA8;
+                    value = (s16 *)(&actor->base.attachmentTimer);
+                    initial = actor->base.attachmentRestart;
                     flag = SceneActorAttachment_StatusBits(actor, 0x200) != 0;
                     actor->group.attachment = ActorAttachment_CreateValueSpriteSlot(
                         event, &actor->base.body.position, (void *)actor->base.body.id, y, z,
@@ -97,8 +97,8 @@ void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inpu
                     s32 initial;
                     if (!count)
                         count = 3;
-                    value = (s16 *)(&actor->base.fieldAA);
-                    initial = actor->base.fieldA8;
+                    value = (s16 *)(&actor->base.attachmentTimer);
+                    initial = actor->base.attachmentRestart;
                     actor->group.attachment = ActorAttachment_CreatePartsSlotWithCount(
                         7, &actor->base.body.position, (void *)actor->base.body.id, z, category,
                         value, initial, count, follow, (u32)actor);

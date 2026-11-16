@@ -46,7 +46,7 @@ static inline u8 SceneActorReaction_TakePrepared(struct ChaseActor *actor)
 }
 static inline void SceneActorReaction_ClearRoute(struct ChaseActor *actor)
 {
-    actor->base.flags2CC &= ~0x141C0;
+    actor->base.behaviorFlags &= ~0x141C0;
     actor->group.common.control.counter = 0;
     *(u16 *)((u8 *)&actor->group.common.control + 0x14) = 0;
     actor->group.common.control.timer = 0;
@@ -69,12 +69,12 @@ static inline void SceneActorReaction_ResetAnimation(struct ChaseActor *actor, u
 static inline void SceneActorReaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
-    actor->base.flags114 &= ~1;
-    actor->base.word104 = 0;
+    actor->base.pendingControlFlags &= ~1;
+    actor->base.pendingControl = 0;
 }
 static inline u32 SceneActorReaction_TerrainHeight(struct ContactPosition *position)
 {

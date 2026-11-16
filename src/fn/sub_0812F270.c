@@ -15,11 +15,11 @@ static inline u8 sameRegion(u16 *region)
 }
 static inline u32 flags16(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D4 & mask;
+    return p->base.motionFlags & mask;
 }
 static inline u32 flags32(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D0 & mask;
+    return p->base.statusFlags & mask;
 }
 static inline u8 unavailable(struct ChaseActor *p)
 {
@@ -53,7 +53,7 @@ s32 SceneActor_UpdateBehaviorCallbacks(struct ChaseActor *p)
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
-    if (!(test(2, p->base.flags2CC))) {
+    if (!(test(2, p->base.behaviorFlags))) {
         if (!sameRegion(&p->base.regionId)) {
             SceneActorPlacement_HideActor(p, 0);
             return 0;
@@ -72,7 +72,7 @@ s32 SceneActor_UpdateBehaviorCallbacks(struct ChaseActor *p)
         SceneActorTarget_OnBindingChanged(p);
         return 1;
     } else {
-        if (!(p->base.flags2CC & 1) && sameRegion(&p->base.regionId))
+        if (!(p->base.behaviorFlags & 1) && sameRegion(&p->base.regionId))
             SceneActorPlacement_ShowActor(p, 0);
         SceneActorTarget_OnBindingChanged(p);
     }

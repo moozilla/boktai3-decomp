@@ -9,7 +9,7 @@ void Heap_Free(void *);
 static inline u8 RemovalRequested(struct ChaseActor *p)
 {
     u32 mask = 0x1000;
-    if (mask & p->base.flags2D6)
+    if (mask & p->base.reactionFlags)
         return 1;
     return 0;
 }
@@ -80,13 +80,13 @@ static inline void UpdateActors_SpawnContactParts(struct ChaseActor *actor)
         EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->base.fieldAA = 0;
-    actor->base.field2B8 = 0;
+    actor->base.attachmentTimer = 0;
+    actor->base.hitLockTimer = 0;
 }
 
 static inline u32 ReadFlags2CC(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2CC & mask;
+    return p->base.behaviorFlags & mask;
 }
 struct UpdateActorsTile {
     u8 unknown0[8];
@@ -116,11 +116,11 @@ static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 }
 static inline void ClearField2B8(struct ChaseActor *p)
 {
-    p->base.field2B8 = 0;
+    p->base.hitLockTimer = 0;
 }
 static inline void SetFlags2CC(struct ChaseActor *p, u32 bits)
 {
-    p->base.flags2CC |= bits;
+    p->base.behaviorFlags |= bits;
 }
 static inline u8 ActorCategory(struct ChaseActor *p)
 {
@@ -154,7 +154,7 @@ static inline u8 MissingObject(struct ChaseActor *p)
 
 static inline u32 ReadActorStateFlags(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D0 & mask;
+    return p->base.statusFlags & mask;
 }
 static inline u8 ActorUnavailable(struct ChaseActor *p, u16 *flags)
 {
@@ -169,7 +169,7 @@ static inline u8 ActorUnavailable(struct ChaseActor *p, u16 *flags)
 
 static inline u32 *StateAddress(struct ChaseActor *p)
 {
-    return &p->base.flags2D0;
+    return &p->base.statusFlags;
 }
 
 static inline u32 ClearMaskedValue(u32 flags, u32 bits)
@@ -223,11 +223,11 @@ next:
         u8 missing, paused;
         Callback_InvokeActor(context, *update);
         missing = MissingObject(actor);
-        motion = &actor->base.flags2D4;
+        motion = &actor->base.motionFlags;
         if (missing)
             goto palette;
         paused = UpdatesPaused();
-        motion = &actor->base.flags2D4;
+        motion = &actor->base.motionFlags;
         if (paused)
             goto palette;
         flagField = (void *)motion;
@@ -270,7 +270,7 @@ next:
                     if (TransitionComplete(manager)) {
                         u32 bank;
                         manager->flags &= 0xFFFDDFFF;
-                        flagField = (void *)&actor->base.flags2D0;
+                        flagField = (void *)&actor->base.statusFlags;
                         ClearWordFlags(&flagField->word, 0x200000);
                         bank = DefaultPalette(actor);
                         if (actor->base.drawableKind == 0)

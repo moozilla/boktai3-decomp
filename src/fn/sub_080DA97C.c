@@ -14,7 +14,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
     else
         Sound_PlaySong(0xFD);
     {
-        u32 *word = &actor->base.flags2D0;
+        u32 *word = &actor->base.statusFlags;
         s32 mask = ~4;
         *word &= mask;
     }
@@ -48,16 +48,16 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
         SceneActorChase_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (actor->base.field2DC & 0xC0000) {
+    if (actor->base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000000);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(actor, 0x20);
     if (SceneActorChase_QueryMotionFlags(actor, 0x100))
         return 0;
-    if (actor->base.field2B8)
+    if (actor->base.hitLockTimer)
         return 0;
     if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
         SceneActorChase_BeginContactAnimation(actor);

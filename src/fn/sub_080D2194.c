@@ -7,7 +7,7 @@
 
 static inline struct SceneActorChaseFlags16 *Mummy_BeginRecovery(struct ChaseActor *actor, u16 bits)
 {
-    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D6;
+    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.reactionFlags;
     SceneActorChase_SetFlagComponent(flags, bits);
     return flags;
 }
@@ -25,7 +25,7 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
         sequence->elapsed = 0;
     if (actor->base.restart) {
         struct SceneActorChaseGroup *group = &actor->group;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         if (SceneActorChase_QueryMotionFlags(actor, 2)) {
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, actor->group.contactControl, 7);
@@ -44,7 +44,7 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
         SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x28);
         {
             u32 mask = 0x10;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         SceneActorChase_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,

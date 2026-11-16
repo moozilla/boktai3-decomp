@@ -22,26 +22,26 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
-    return off == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
+    return off == 0x2D4 ? actor->base.motionFlags & mask : actor->base.statusFlags & mask;
 }
 
 static inline void ResetMotionControl(struct ChaseActor *actor)
 {
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
                                       u32 prepared)
 {
     actor->base.field2B2 = prepared;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     ResetMotionControl(actor);
 }
@@ -106,7 +106,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
         u32 *field;
         u32 mask;
         u32 zero;
-        field = &actor->base.flags2CC;
+        field = &actor->base.behaviorFlags;
         mask = ~0x141C0;
         *field &= mask;
         zero = 0;
@@ -124,7 +124,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
                 u16 *field = &collider->responseValue;
                 *field = zero;
             }
-            actor->base.fieldAA = zero;
+            actor->base.attachmentTimer = zero;
         }
     }
     {
@@ -181,7 +181,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
         values[3] = actor->base.parameters1FC[0];
         values[4] = actor->base.parameters1FC[1];
         values[5] = actor->base.parameters1FC[2];
-        values[6] = actor->base.field2E0;
+        values[6] = actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;

@@ -17,7 +17,7 @@ void SceneActorRegistry_AdvanceInactiveActors(struct SceneActorRegistryManager *
                 u32 one = 1;
                 do {
                     node = node->next;
-                    if (actor->base.health <= 0 && (actor->base.flags2CC & one) &&
+                    if (actor->base.health <= 0 && (actor->base.behaviorFlags & one) &&
                         !SceneActorRegistry_TestNearestPlayerBounds(actor, gUnk_08605C18))
                         SceneActorRegistry_RestoreActorDefaults(actor);
                     actor = node->actor;

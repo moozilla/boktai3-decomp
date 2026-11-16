@@ -14,16 +14,16 @@ void SceneActorControl_UpdateSavedControlPhase(struct ChaseActor *actor)
         void *callback = actor->base.onStanding;
         u32 zero = 0;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = zero;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = zero;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     } else {
         if (!actor->base.counter2AC)
             Trigger_ConsumePending((u8 *)actor + 0xC, 1);

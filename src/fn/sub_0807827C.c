@@ -2,7 +2,7 @@
 void SceneActorBehavior_PlayReactionSound(struct RoomActor *actor)
 {
     u32 m = 6;
-    if (actor->flags2D4 & m) {
+    if (actor->motionFlags & m) {
         Sound_PlaySong(0x13e);
         return;
     }

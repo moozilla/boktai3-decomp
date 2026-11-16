@@ -10,7 +10,7 @@ struct VornResponseFlags {
 };
 static inline u32 Vorn_ActorFlags(struct Vorn *actor, u32 mask)
 {
-    return actor->chase.base.flags2CC & mask;
+    return actor->chase.base.behaviorFlags & mask;
 }
 static inline u8 Vorn_TestContext(struct Vorn *context, u16 mask, struct VornResponseFlags **field)
 {
@@ -35,11 +35,11 @@ static inline void Vorn_SetResponseFlags(struct VornResponseFlags *flags, u16 bi
 }
 static inline void Vorn_SetTimedMotion(struct Vorn *actor, void *callback, u32 duration)
 {
-    actor->chase.base.word104 = (u32)callback;
-    actor->chase.base.word108 = 0;
-    actor->chase.base.word10C = 0;
-    actor->chase.base.word110 = duration;
-    actor->chase.base.flags114 = 1;
+    actor->chase.base.pendingControl = (u32)callback;
+    actor->chase.base.pendingControlData = 0;
+    actor->chase.base.pendingControlRelease = 0;
+    actor->chase.base.pendingControlKind = duration;
+    actor->chase.base.pendingControlFlags = 1;
 }
 static inline void Vorn_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 bits)
 {
@@ -53,7 +53,7 @@ static inline void Vorn_ResetContext(struct Vorn *a)
     a->chase.base.field2C2 = 64;
     a->chase.group.common.gate.flags = 0;
     a->chase.group.common.gate.counter = 0;
-    flags = &a->chase.base.flags2D4;
+    flags = &a->chase.base.motionFlags;
     {
         s32 mask = ~0x380;
         *flags = mask & (*flags);
@@ -65,7 +65,7 @@ static inline void Vorn_ResetContext(struct Vorn *a)
     }
     control = &a->chase.group.common.control;
     if (Vorn_ActorFlags(a, 0x200000)) {
-        u32 *state = &a->chase.base.flags2D0;
+        u32 *state = &a->chase.base.statusFlags;
         s32 mask = ~0x1000000;
         *state = mask & (*state);
         {
@@ -105,11 +105,11 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
     sub_080B1FA8(a);
     {
         u32 mask = 4;
-        a->chase.base.flags2D0 = mask | a->chase.base.flags2D0;
+        a->chase.base.statusFlags = mask | a->chase.base.statusFlags;
     }
     {
         s8 mask = ~16;
-        a->chase.base.flags2CC = mask & a->chase.base.flags2CC;
+        a->chase.base.behaviorFlags = mask & a->chase.base.behaviorFlags;
     }
     SceneActorChase_SetBehavior(a, 15);
     SceneActorChase_SetControl(a, a->chase.base.onStanding, 0);
@@ -117,6 +117,6 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
     Vorn_SetTrackingFlags(&a->chase.base.tracking, 8);
     {
         u32 mask = 128;
-        a->chase.base.flags2CC = mask | a->chase.base.flags2CC;
+        a->chase.base.behaviorFlags = mask | a->chase.base.behaviorFlags;
     }
 }

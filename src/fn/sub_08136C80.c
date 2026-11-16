@@ -17,10 +17,10 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
 {
     if (!SceneActorPlacement_IsUnavailable(s)) {
         u32 bit = 2;
-        u32 flags = s->flags2CC;
+        u32 flags = s->behaviorFlags;
         if (!(flags & bit)) {
             void *drawable;
-            s->flags2CC = flags | bit;
+            s->behaviorFlags = flags | bit;
             if (s->drawableKind == 0) {
                 u32 *p = s->drawable;
                 ClearWord(p, ~2);

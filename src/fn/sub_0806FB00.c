@@ -35,7 +35,7 @@ u8 SceneActorRegistry_LinkActor(struct ChaseActor *actor)
     SceneActorRegistry_MarkCategoryOne(actor->base.category);
     {
         u32 mask = 0x02000000;
-        if (!(actor->base.flags2D0 & mask))
+        if (!(actor->base.statusFlags & mask))
             TerrainOverlay_QueueAddActor(&actor->base.body.id);
     }
     SceneActorRegistry_EnsureActorSubsystems(manager, actor);

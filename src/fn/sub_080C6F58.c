@@ -23,8 +23,8 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
     Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     {
         u32 mask = 0x20;
-        mask |= actor->base.flags2D6;
-        actor->base.flags2D6 = mask;
+        mask |= actor->base.reactionFlags;
+        actor->base.reactionFlags = mask;
     }
     Golem_SetMotionFlags(actor, 0x100);
     if ((frame & 3) == 0) {

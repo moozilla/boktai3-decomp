@@ -2,7 +2,7 @@
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 static inline u8 IsUnavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
 {
-    if ((actor->base.flags2D4 & disabled) || (actor->base.flags2D0 & excluded) ||
+    if ((actor->base.motionFlags & disabled) || (actor->base.statusFlags & excluded) ||
         actor->base.health <= 0)
         return 1;
     return 0;
@@ -32,25 +32,25 @@ void SceneActorRegistry_ResetCategoryControl(void)
                 if (category == 4 || category == 1 || category == 3) {
                     const void *control = actor->group.routePhaseCallback;
                     actor->base.field2B2 = one;
-                    actor->base.field2B0 = zero;
-                    actor->base.field2B5 = five;
+                    actor->base.stepDone = zero;
+                    actor->base.controlKind = five;
                     actor->base.target = control;
                     actor->base.field2C8 = zero;
                     {
-                        u32 *flags = &actor->base.flags114;
+                        u32 *flags = &actor->base.pendingControlFlags;
                         u32 mask = ~1;
                         u32 value;
                         value = *flags;
                         value &= mask;
                         *flags = value;
                     }
-                    actor->base.word104 = zero;
+                    actor->base.pendingControl = zero;
                     actor->base.state2A8 = zero;
                     actor->base.phase2A9 = zero;
                     actor->base.behavior2AA = three;
                     actor->base.counter2AC = zero;
                     actor->base.field2B1 = one;
-                    actor->base.flags2D0 |= status;
+                    actor->base.statusFlags |= status;
                 }
             }
             node = node->next;

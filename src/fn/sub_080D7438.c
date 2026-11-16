@@ -12,7 +12,7 @@ static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
 }
 void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 {
-    u32 *flags = &actor->base.flags2D0;
+    u32 *flags = &actor->base.statusFlags;
     s32 mask = -5;
     struct Mummy *parent;
     u32 started;
@@ -34,7 +34,7 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
         }
         {
             u32 mask = 0x80;
-            motionFlags = &actor->base.flags2D4;
+            motionFlags = &actor->base.motionFlags;
             {
                 u32 value = *motionFlags;
                 mask |= value;
@@ -60,16 +60,16 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
             void *control = SceneActorControl_OnIdle;
             u32 kind = 0x10;
             actor->base.field2B2 = one;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = control;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 s32 mask = -2;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
     }
     {

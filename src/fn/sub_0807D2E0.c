@@ -26,18 +26,18 @@ static inline void ShowDamage(struct ChaseActor *a)
     u32 buffer[2];
     s32 health = a->base.health;
     u32 max = (u16)a->base.defaultHealth;
-    s32 kind = (s16)a->base.fieldB2;
-    s32 param = (s16)a->base.field9A;
+    s32 kind = (s16)a->base.hudKind;
+    s32 param = (s16)a->base.hudLabel;
     SceneHud_SetTimedState(a->base.body.id, health, max, kind, 0, param);
     ZeroFill8(buffer);
-    if (a->base.reactionSoundVariant || !(a->base.field2D8 & 0x20000))
+    if (a->base.reactionSoundVariant || !(a->base.hitAttributes & 0x20000))
         DamageNumberDisplay_Show(&a->base.colliderA, a->base.reactionSoundVariant, 0,
                                  &a->base.body.position, buffer, 1);
 }
 
 static inline u16 *MotionFlags(struct ChaseActor *a)
 {
-    return &a->base.flags2D4;
+    return &a->base.motionFlags;
 }
 static inline struct ContactCollider *PrimaryCollider(struct ChaseActor *a)
 {
@@ -53,11 +53,11 @@ static inline void MarkHitFlag(s16 bit, struct HitMotionFlags *flags)
 
 static inline u32 *StatusFlags(struct ChaseActor *actor)
 {
-    return &actor->base.flags2D0;
+    return &actor->base.statusFlags;
 }
 static inline u32 ReadStatus(struct ChaseActor *actor, u32 bits)
 {
-    return actor->base.flags2D0 & bits;
+    return actor->base.statusFlags & bits;
 }
 static inline void SelectAnimationState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
@@ -76,7 +76,7 @@ static inline void MaskContactFlags(u32 *dst, u32 mask)
 }
 static inline u32 ReadControlFlag(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 union HitSparkTable {
     const u16 *table;
@@ -114,10 +114,10 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     u32 partFlag;
     struct SceneActorRegistryControl *control;
     category = a->base.category;
-    a->base.field2B8 = 0;
+    a->base.hitLockTimer = 0;
 
     partFlag = 0x2000;
-    if (HitResponse_Test(a->base.flags2D4 & partFlag))
+    if (HitResponse_Test(a->base.motionFlags & partFlag))
         SceneActorEffects_SpawnContactParts((void *)a);
     {
         struct HitMotionFlags *field = (void *)MotionFlags(a);
@@ -129,10 +129,10 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
         case 0:
         case 1: {
             struct ChaseActor *state = victim;
-            if (a->base.field2B5 != 0x15) {
+            if (a->base.controlKind != 0x15) {
                 SceneActorTerrain_EnterState(a, 3, 0, 0);
                 SceneActorTerrain_InstallControl(a, group->field5FC, 0x15);
-                a->base.field2B8 = 0;
+                a->base.hitLockTimer = 0;
                 {
                     u32 mask = 0x20000;
                     *StatusFlags(a) |= mask;
@@ -142,12 +142,12 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 u32 mask = 4;
                 *StatusFlags(a) |= mask;
             }
-            MaskContactFlags(&a->base.flags2CC, ~0x400000);
+            MaskContactFlags(&a->base.behaviorFlags, ~0x400000);
             state->base.field2C2 = 0x40;
             state->group.common.gate.flags = 0;
             state->group.common.gate.counter = 0;
             {
-                u16 *flags = &state->base.flags2D4;
+                u16 *flags = &state->base.motionFlags;
                 u32 mask = ~0x380;
                 *flags = mask & *flags;
             }
@@ -166,7 +166,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 }
                 {
                     u32 mask = ~0x200;
-                    state->base.flags2D4 = mask & state->base.flags2D4;
+                    state->base.motionFlags = mask & state->base.motionFlags;
                 }
 
                 control->mode = 0;
@@ -175,7 +175,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
             }
             {
                 u32 mask = ~0x400;
-                state->base.flags2D4 = mask & state->base.flags2D4;
+                state->base.motionFlags = mask & state->base.motionFlags;
             }
             state->group.turn.turnsRemaining = 0xFF;
             a->base.body.position = *position;
@@ -186,7 +186,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 *(struct ContactPosition *)((u8 *)a->base.drawable + 0x40) = a->base.body.position;
             {
                 u32 mask = 0x2000;
-                a->base.flags2D6 = mask | a->base.flags2D6;
+                a->base.reactionFlags = mask | a->base.reactionFlags;
             }
             break;
         }
@@ -207,7 +207,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 }
             }
             if ((s32)fullDamage > 0) {
-                a->base.field2EA = 0;
+                a->base.heightOffset = 0;
                 {
                     s32 damage = a->base.health;
                     collider->cost = damage;
@@ -217,7 +217,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 MarkHitFlag(8, motion);
                 {
                     u32 mask = 0x400;
-                    a->base.flags2CC = mask | a->base.flags2CC;
+                    a->base.behaviorFlags = mask | a->base.behaviorFlags;
                 }
                 {
                     u32 mask = 0xA0000;

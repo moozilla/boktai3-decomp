@@ -38,7 +38,7 @@ void sub_080B5AA4(struct ChaseActor *input, const u16 *inputRequest)
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         if (!(*flags & mask))
             return;
     }

@@ -37,7 +37,7 @@ void sub_080BAE04(struct ChaseActor *a)
     const u8 *entry;
     struct SkeletonTurnTile *tile;
 
-    motionFlags = &a->base.flags2D4;
+    motionFlags = &a->base.motionFlags;
     if (prepared) {
         a->base.body.direction = (SceneActorTurn_Cardinal(a->base.body.direction) << 6) - 0x40;
         direction = SceneActorTurn_Cardinal(a->base.body.direction);
@@ -49,7 +49,7 @@ void sub_080BAE04(struct ChaseActor *a)
             target = a->base.nextDirection;
         }
         if (direction == (target >> 1)) {
-            a->base.field2B0 = 1;
+            a->base.stepDone = 1;
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorChase_SetState(a, 3, 1, 0);
                 SceneActorChase_SetControl(a, group->turnControl, 0x1B);
@@ -64,7 +64,7 @@ void sub_080BAE04(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, *entry, 0, 4);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 1:
@@ -73,7 +73,7 @@ void sub_080BAE04(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, *entry, 1, 4);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 2:
@@ -82,7 +82,7 @@ void sub_080BAE04(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, *entry, 2, 4);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 3:
@@ -91,7 +91,7 @@ void sub_080BAE04(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, *entry, 1, 1);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
         }
@@ -114,12 +114,12 @@ void sub_080BAE04(struct ChaseActor *a)
         u8 *facing = &a->base.body.direction;
         s32 current = SkeletonTurn_Octant(*facing);
         s32 octantMask = -8;
-        a->base.field2B0 = 1;
+        a->base.stepDone = 1;
         delta = SkeletonTurn_OctantDistance(a->base.nextDirection, current | octantMask);
         if (delta < 0)
             delta = -delta;
         if (delta == 0) {
-            a->base.field2B0 = 1;
+            a->base.stepDone = 1;
             *facing = (a->base.nextDirection + 5) << 5;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {

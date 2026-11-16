@@ -29,13 +29,13 @@ static inline u8 TestSegment(struct TrailSegment *segment, u32 mask)
 }
 static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
-    return mask & p->base.flags2D0;
+    return mask & p->base.statusFlags;
 }
 static inline u8 IsInactive(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if ((actor->base.flags2D4 & mask) || WordFlag(actor, 0x20000) || actor->base.health <= 0)
+        if ((actor->base.motionFlags & mask) || WordFlag(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;

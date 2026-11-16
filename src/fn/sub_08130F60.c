@@ -20,16 +20,16 @@ void sub_08130F60(u8 *s)
         void *target = actor->base.onEntry;
         u32 kind = 2;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = target;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
     }
     if (!(u8)Callback_InvokeActor(s, *(void **)(s + 0x270))) {
         if (!sub_0812F3CC(s)) {

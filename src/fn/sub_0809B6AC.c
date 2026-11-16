@@ -66,5 +66,5 @@ void Lun_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
     if (frame <= 29)
         Flag(actor, 32);
     if (frame > 59)
-        actor->field2B0 = 1;
+        actor->stepDone = 1;
 }

@@ -24,8 +24,8 @@ static inline s32 Angle(s32 angle)
 static inline void SetActorFlags(struct ChaseActor *input, u32 mask)
 {
     u32 value = mask;
-    value |= input->base.flags2D6;
-    input->base.flags2D6 = value;
+    value |= input->base.reactionFlags;
+    input->base.reactionFlags = value;
 }
 
 static inline s32 RelativeAngle(s32 x, s32 z, s32 facing)

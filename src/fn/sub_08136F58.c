@@ -17,16 +17,16 @@ static inline u8 ConsumeEntry(struct ChaseActor *actor)
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
@@ -64,7 +64,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryContr
             return 1;
         }
     }
-    actor->base.flags2D4 &= ~blocked;
+    actor->base.motionFlags &= ~blocked;
     return 0;
 }
 
@@ -74,9 +74,9 @@ void sub_08136F58(struct ChaseActor *actor)
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {
         SetControl(actor, actor->base.onStanding, 0);
-        ClearWordFlags(&actor->base.flags2CC, ~0x80);
-        ClearWordFlags(&actor->base.flags2D0, ~0x1000000);
-        ClearHalfFlags(&actor->base.flags2D4, ~0x200);
+        ClearWordFlags(&actor->base.behaviorFlags, ~0x80);
+        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        ClearHalfFlags(&actor->base.motionFlags, ~0x200);
         actor->base.field2C2 = 0x40;
     }
     if (((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) == 0) {
@@ -100,11 +100,11 @@ void sub_08136F58(struct ChaseActor *actor)
             } else {
                 struct SceneActorRegistryControl *control = &group->control;
                 u32 mask = 0x200000;
-                if (actor->base.flags2CC & mask) {
-                    ClearWordFlags(&actor->base.flags2D0, ~0x1000000);
+                if (actor->base.behaviorFlags & mask) {
+                    ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
                     {
                         u16 k1 = 0x200;
-                        actor->base.flags2D4 &= ~k1;
+                        actor->base.motionFlags &= ~k1;
                     }
                     control->mode = 0;
                     control->counter = 0;

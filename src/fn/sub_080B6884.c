@@ -26,16 +26,16 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
     void *callback = control;
     u32 code = kind;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = code;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = code;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void ClearFlags(u32 *flags, u32 mask)
 {

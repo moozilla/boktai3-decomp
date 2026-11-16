@@ -9,7 +9,7 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
     {
         u16 mask = 0x280;
 
-        u16 v = actor->base.flags2D4 & mask;
+        u16 v = actor->base.motionFlags & mask;
 
         if (v) {
             u8 *q;
@@ -28,7 +28,7 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
     {
         u16 mask = 0x200;
 
-        if (actor->base.flags2D4 & mask)
+        if (actor->base.motionFlags & mask)
             actor->base.field2C2 = 0x20;
     }
 }

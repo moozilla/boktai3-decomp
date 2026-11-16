@@ -5,7 +5,7 @@ u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
 static inline u32 Motion(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline u8 ContextFlags(u8 *context, u32 mask)
 {
@@ -43,24 +43,24 @@ void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
     }
     {
         u32 mask = ReactionFlagMask(16);
-        actor->base.flags2D6 = mask | actor->base.flags2D6;
+        actor->base.reactionFlags = mask | actor->base.reactionFlags;
     }
     if (frame <= 18)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     if (Motion(actor, 2)) {
         u32 mask;
         Chase_SetState(actor, 3, 0, 0);
         Chase_SetCtl(actor, group->control, 7);
         mask = ~0x983;
-        actor->base.flags2D6 = mask & actor->base.flags2D6;
+        actor->base.reactionFlags = mask & actor->base.reactionFlags;
     } else if (ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
         actor->base.tracking.target = (u32)gPlayers[0] + 0x24;
         {
             u32 mask = 16;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         group->destination->pad = 0;
         if (!Skeleton_RerouteToTarget(actor) &&

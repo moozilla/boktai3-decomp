@@ -19,7 +19,7 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
 
     {
         unsigned short mask = 0x100;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         if ((u16)((*flags) & mask)) {
             return;
         }
@@ -46,7 +46,7 @@ void Golem_RestoreRoute(struct ChaseActor *actor)
     } else {
         {
             u32 mask = 0x10;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         actor->base.field2C2 = 0x20;
         SaveDelay(group + 0x8C, actor->base.onAlternateEntry, 7, 0x3C);

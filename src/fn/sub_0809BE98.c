@@ -61,16 +61,16 @@ static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
     u32 zero;
     a->base.field2B2 = 1;
     zero = 0;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 static inline void State(struct ChaseActor *a)
 {
@@ -117,7 +117,7 @@ static inline void Scale(struct ChaseActor *actor)
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;

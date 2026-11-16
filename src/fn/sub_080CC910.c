@@ -26,16 +26,16 @@ static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -80,12 +80,12 @@ void Golem_ReturnHome(struct ChaseActor *actor)
         void *target = Golem_BeginChargeBuildup;
         SetControl(actor, 0x25, target);
         actor->base.body.direction = actor->base.tracking.heading;
-        actor->base.field2B0 = 0;
+        actor->base.stepDone = 0;
         *(u16 *)(body + 0x688) = 0;
     }
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
         struct GolemRouteLink *link = (struct GolemRouteLink *)(group + 0x74);
         dest->x = link->point->x;

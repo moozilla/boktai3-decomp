@@ -28,7 +28,7 @@ static inline u8 SceneActorTerrain_RequestPath(struct ChaseActor *actor, void *r
 
     s32 r;
     if (!Nav_IsPositionInMesh(route, from, pos)) {
-        u16 *flags = &actor->base.flags2D4;
+        u16 *flags = &actor->base.motionFlags;
         s32 mask = ~0x200;
         *flags &= mask;
         return 0;
@@ -40,7 +40,7 @@ static inline u8 SceneActorTerrain_RequestPath(struct ChaseActor *actor, void *r
         return 1;
     }
     {
-        u16 *flags = &actor->base.flags2D4;
+        u16 *flags = &actor->base.motionFlags;
         s32 mask = ~0x200;
         *flags &= mask;
     }

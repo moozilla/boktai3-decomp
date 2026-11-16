@@ -102,7 +102,7 @@ u32 Vorn_SelectRetreatRoute(struct ChaseActor *actor, u32 reset)
     }
     {
         u32 bit = 4;
-        u32 *field = &actor->base.flags2D0;
+        u32 *field = &actor->base.statusFlags;
         u32 value = *field;
         value |= bit;
         *field = value;

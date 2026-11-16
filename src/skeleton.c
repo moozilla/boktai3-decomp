@@ -9,7 +9,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
     struct Skeleton *body = actor->chase.base.context;
     struct SceneActorChaseGroup *group = &actor->chase.group;
 
-    if (!(actor->chase.base.field2D8 & 0x20000)) {
+    if (!(actor->chase.base.hitAttributes & 0x20000)) {
         if (actor->chase.base.reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
         else
@@ -40,16 +40,16 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
         SceneActorChase_ClearMotionFlags(&actor->chase, 0x20);
         return 0;
     }
-    if (actor->chase.base.field2DC & 0xC0000) {
+    if (actor->chase.base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(actor, actor->chase.base.onReaction, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&actor->chase.base.flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&actor->chase.base.statusFlags, 0x1000000);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(&actor->chase, 0x20);
     if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x100))
         return 0;
-    if (actor->chase.base.field2B8)
+    if (actor->chase.base.hitLockTimer)
         return 0;
     if (SceneActorChase_TrackingFlags(&actor->chase.base.tracking, 0x10))
         return 0;
@@ -126,7 +126,7 @@ void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
     actor->chase.base.field2C2 = 0x20;
     {
         u32 mask = 0xA02F;
-        if (actor->chase.base.flags2D4 & mask) {
+        if (actor->chase.base.motionFlags & mask) {
             u16 *p = &actor->chase.base.field2C2;
             *p = 0x40;
             scale = p;
@@ -178,7 +178,7 @@ void Skeleton_UpdateEntryPhase(struct Skeleton *actor)
         if (sub_0812F3CC(&actor->chase))
             return;
     }
-    if (actor->chase.base.field2B0) {
+    if (actor->chase.base.stepDone) {
         Skeleton_ReturnToBehavior(&actor->chase, 15);
         SceneActorChase_SetControl(actor, actor->chase.base.onStanding, 0);
     } else
@@ -197,7 +197,7 @@ void Skeleton_UpdateEntryRecoveryPhase(struct Skeleton *actor)
         if (sub_0812F3CC(&actor->chase))
             return;
     }
-    if (actor->chase.base.field2B0) {
+    if (actor->chase.base.stepDone) {
         {
             u32 state = 3;
             u32 phase = 1;
@@ -222,8 +222,8 @@ s32 Skeleton_Update(struct Skeleton *actor)
     u32 m;
     SceneActorReaction_TickHiddenResponse(actor);
     m = 0x2000;
-    if ((actor->chase.base.flags2D4 & m) || actor->chase.base.field2B8 == 0) {
-        Callback_InvokeActor(actor, actor->chase.base.callbacks27C[actor->chase.base.state2A8]);
+    if ((actor->chase.base.motionFlags & m) || actor->chase.base.hitLockTimer == 0) {
+        Callback_InvokeActor(actor, actor->chase.base.stateCallbacks[actor->chase.base.state2A8]);
         SceneActorControl_DispatchControl(actor);
     }
     Skeleton_UpdateActionFlags(actor);
@@ -239,12 +239,12 @@ static inline u8 sameRegion(u16 *region)
 
 static inline u32 flags16(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline u32 flags32(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 
 static inline u8 unavailable(struct ChaseActor *actor)
@@ -287,7 +287,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
-    if (!(test(2, actor->base.flags2CC))) {
+    if (!(test(2, actor->base.behaviorFlags))) {
         if (!sameRegion(&actor->base.regionId)) {
             SceneActorPlacement_HideActor(actor, 0);
             return 0;
@@ -305,7 +305,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
         SceneActorTarget_OnBindingChanged(actor);
         return 1;
     } else {
-        if (!(actor->base.flags2CC & 1) && sameRegion(&actor->base.regionId))
+        if (!(actor->base.behaviorFlags & 1) && sameRegion(&actor->base.regionId))
             SceneActorPlacement_ShowActor(actor, 0);
         SceneActorTarget_OnBindingChanged(actor);
     }
@@ -346,7 +346,7 @@ static inline void SkeletonInit_InstallContactDefaults(struct ChaseActor *instan
 {
     instance->base.onContact = Skeleton_ReactToContact;
     MonsterInit_WriteDataPointer(&instance->base.commandTable.opaque, gUnk_086060FC);
-    instance->base.field238 = SceneActorReaction_SinkThenDefeat;
+    instance->base.sinkCallback = SceneActorReaction_SinkThenDefeat;
 }
 
 static inline void SkeletonInit_EnableInitialFlags(struct ChaseActor *instance)
@@ -488,7 +488,7 @@ s32 Skeleton_Init(void *object)
                 MonsterInit_CellIndex(MonsterInit_BodyPosition(&actor->base.body));
             actor->base.groundHeight = MonsterInit_TerrainHeight(
                 MonsterInit_GetTerrainCell(actor), MonsterInit_BodyPosition(&actor->base.body));
-            actor->base.field2EA = actor->base.body.position.y - actor->base.groundHeight;
+            actor->base.heightOffset = actor->base.body.position.y - actor->base.groundHeight;
             actor->base.body.position.y = actor->base.groundHeight;
         }
     } else if (SkeletonInit_TestSkeletonFlags(instance, 8)) {

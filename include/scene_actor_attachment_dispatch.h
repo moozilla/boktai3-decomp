@@ -6,13 +6,13 @@
 
 static inline u32 SceneActorAttachment_MotionBits(struct ChaseActor *actor, u32 mask)
 {
-    u16 *p = &actor->base.flags2D4;
+    u16 *p = &actor->base.motionFlags;
     return *p & mask;
 }
 
 static inline u32 SceneActorAttachment_StatusBits(struct ChaseActor *actor, u32 mask)
 {
-    u32 *p = &actor->base.flags2D0;
+    u32 *p = &actor->base.statusFlags;
     return *p & mask;
 }
 

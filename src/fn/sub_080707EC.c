@@ -6,8 +6,8 @@ void SceneActorRegistry_RestoreScriptActorFieldAA(void)
     if (id) {
         struct ChaseActor *actor = SceneActorRegistry_FindById(id);
         if (actor && actor->group.contactControl) {
-            s32 value = actor->base.fieldA8;
-            actor->base.fieldAA = value;
+            s32 value = actor->base.attachmentRestart;
+            actor->base.attachmentTimer = value;
             {
                 u32 mask = 2;
                 u32 offset;

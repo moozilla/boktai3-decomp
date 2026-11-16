@@ -31,16 +31,16 @@ void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
             void *callback = Axe_UpdateTargetLunge;
             u32 phase = 0x36;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = phase;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = phase;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
     } else {
         s32 step, turn;

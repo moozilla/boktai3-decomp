@@ -42,7 +42,7 @@ void Golem_OnUnusedState(void)
 
 static inline u32 Flags32At(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 union HitSparkTable {
     const u16 *table;
@@ -74,7 +74,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         SceneActorEffects_AdvanceSteps(actor, 4);
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
-            u32 *field = &actor->base.flags2CC;
+            u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
@@ -93,7 +93,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorBehavior_CallTerrainScript(actor);
     script = (u16)actor->base.script1F8;
     if (script) {
@@ -103,7 +103,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         values[3] = actor->base.parameters1FC[0];
         values[4] = actor->base.parameters1FC[1];
         values[5] = actor->base.parameters1FC[2];
-        values[6] = (s32)actor->base.field2E0;
+        values[6] = (s32)actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
@@ -144,16 +144,16 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         zero = 0;
         one = 1;
         *ready = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *field = &actor->base.flags114;
+            u32 *field = &actor->base.pendingControlFlags;
             s32 clear = ~1;
             *field &= clear;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         {
             u32 behavior = 2;
             actor->base.state2A8 = one;
@@ -203,19 +203,19 @@ static inline void GolemReaction_LatchHitReact(void *object)
 {
     struct ChaseActor *actor = object;
     if (!actor->group.hitReactionLatch && (actor->base.field2E6 & 8)) {
-        actor->base.field2B8 = 0x2D;
+        actor->base.hitLockTimer = 0x2D;
         actor->group.hitReactionLatch = 0x41;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
 }
 static inline s16 GolemReaction_CurrentHeight(struct ChaseActor *actor)
 {
-    return actor->base.fieldA8;
+    return actor->base.attachmentRestart;
 }
 
 static inline void GolemReaction_SetChargeHeight(struct ChaseActor *actor, s32 height)
 {
-    actor->base.fieldAA = height;
+    actor->base.attachmentTimer = height;
 }
 
 static inline void GolemReaction_EnterCharge(struct ChaseActor *actor, s16 height)
@@ -240,7 +240,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
     void *object = actor;
 
     GolemReaction_SetBodyFlags(body, 0x800);
-    actor->base.flags2D0 &= ~0x1000000;
+    actor->base.statusFlags &= ~0x1000000;
     SceneActorPlacement_PlayVariantEventSound(actor, 1);
 
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
@@ -272,19 +272,19 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         return 1;
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x100)) {
-        if (actor->base.field2D8 & 0x400) {
+        if (actor->base.hitAttributes & 0x400) {
             body->shakeStrength = 30;
             body->shakeTimer = 20;
             GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-            actor->base.field2DC |= 0x80000;
-            SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
-            SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000003);
+            actor->base.hitReactionFlags |= 0x80000;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000003);
             actor->base.field2C2 = 0x40;
             return 1;
         }
-        if (actor->base.field2DC & 0xC0000) {
+        if (actor->base.hitReactionFlags & 0xC0000) {
             GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-            actor->base.flags2D0 &= ~0x1000000;
+            actor->base.statusFlags &= ~0x1000000;
             return 1;
         }
         if (actor->base.tracking.target) {
@@ -294,9 +294,9 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         SceneActorChase_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (actor->base.field2DC & 0xC0000) {
+    if (actor->base.hitReactionFlags & 0xC0000) {
         GolemReaction_EnterCharge(actor, GolemReaction_CurrentHeight(actor));
-        actor->base.flags2D0 &= ~0x1000000;
+        actor->base.statusFlags &= ~0x1000000;
         return 1;
     }
 
@@ -417,7 +417,7 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
         off += 2;
         *((u16 *)(((u8 *)obj) - (-off))) = value;
     }
-    if (obj->base.field2B0) {
+    if (obj->base.stepDone) {
         Golem_ResetIdleControl((u8 *)obj);
     } else {
         ++(*((u32 *)(((u8 *)obj) + 0x2AC)));

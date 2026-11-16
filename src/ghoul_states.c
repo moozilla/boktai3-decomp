@@ -26,7 +26,7 @@ void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactColli
     u32 *flags;
     if ((SceneActor_ActionsBlocked((void *)actor) == 0) && (contact->contactFlags & 0xF)) {
         actor->base.counter304 = contact->collisionId;
-        flags = &actor->base.flags2D0;
+        flags = &actor->base.statusFlags;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }
@@ -111,7 +111,7 @@ void Ghoul_UpdateAimedDiscThrow(struct ChaseActor *actor)
         Sound_PlaySong(0xD6);
     }
     if (actor->base.restart)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }
 
 void Ghoul_UpdateIdleState(struct ChaseActor *actor)
@@ -141,7 +141,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
     u8 prepared = SceneActorReaction_TakePrepared(actor);
     s32 direction, target, delta;
 
-    motionFlags = &actor->base.flags2D4;
+    motionFlags = &actor->base.motionFlags;
     if (prepared) {
         actor->base.body.direction =
             (SceneActorTurn_Cardinal(actor->base.body.direction) << 6) - 0x40;
@@ -154,7 +154,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
             target = actor->base.nextDirection;
         }
         if (direction == (target >> 1)) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
                 SceneActorChase_SetState(actor, 3, 1, 0);
@@ -171,7 +171,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
                     SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(actor, 9, 0, 4);
-                    SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 1:
@@ -180,7 +180,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
                     SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(actor, 9, 1, 4);
-                    SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 2:
@@ -189,7 +189,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
                     SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(actor, 9, 2, 4);
-                    SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 3:
@@ -198,7 +198,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
                     SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(actor, 9, 1, 1);
-                    SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
         }
@@ -224,7 +224,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             actor->base.body.direction =
                 (SceneActorTurn_Cardinal(actor->base.body.direction) << 6) - 0x40;
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -251,7 +251,7 @@ void Ghoul_UpdateDyingState(struct ChaseActor *actor, s32 frame)
         u32 value;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 8);
         test = 2;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         value = *flags;
         test &= value;
         if (test == 0) {
@@ -266,7 +266,7 @@ void Ghoul_UpdateDyingState(struct ChaseActor *actor, s32 frame)
     if ((s16)group->field5C6 <= 0) {
         mask = 0x80;
         mask <<= 5;
-        blockingFlags = actor->base.flags2D0 & mask;
+        blockingFlags = actor->base.statusFlags & mask;
         if (blockingFlags == 0) {
             SceneActorChase_SetControl(actor, Ghoul_UpdateDeathAnimation, 6);
         }
@@ -279,16 +279,16 @@ void Ghoul_UpdateDeathAnimation(struct ChaseActor *actor, s32 frame)
         s32 mask;
         u16 *motionFlags;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
-        motionFlags = &actor->base.flags2D4;
+        motionFlags = &actor->base.motionFlags;
         mask = -2;
         *motionFlags = mask & *motionFlags;
     }
     if (frame == 0x28) {
         u16 flags = 0x10;
-        actor->base.flags2D6 = flags | actor->base.flags2D6;
+        actor->base.reactionFlags = flags | actor->base.reactionFlags;
     }
     if (actor->base.restart && frame > 0x78)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }
 
 void Bat_RestoreSavedState(void);
@@ -319,14 +319,14 @@ void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
         control = Bat_RestoreSavedState;
         code = 0xD;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = queued;
-        actor->base.field2B5 = code;
+        actor->base.stepDone = queued;
+        actor->base.controlKind = code;
         actor->base.target = control;
         actor->base.field2C8 = queued;
-        flags = &actor->base.flags114;
+        flags = &actor->base.pendingControlFlags;
         mask = ~1;
         *flags &= mask;
-        actor->base.word104 = queued;
+        actor->base.pendingControl = queued;
     } else {
         actor->base.restart = queued;
     }

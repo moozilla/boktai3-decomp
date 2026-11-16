@@ -19,13 +19,13 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     mask = 0x10;
-    if (actor->base.flags2D0 & mask) {
+    if (actor->base.statusFlags & mask) {
         struct SceneActorReactionCommand *command;
         void *callback;
         u8 one;
         u32 zero;
         u8 kind;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
         command = (void *)((u8 *)group + 0x8C);
         callback = (void *)SceneActorReaction_PlayAnimationBUntilComplete;
         one = 1;
@@ -38,8 +38,8 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         callback = (void *)SceneActorReaction_RestoreAfterDelay;
         kind = 14;
         actor->base.field2B2 = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         {
             u8 byteZero;
@@ -50,10 +50,10 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
             halfField = &actor->base.field2C8;
             byteZero = 0;
             *halfField = zero;
-            field = &actor->base.flags114;
+            field = &actor->base.pendingControlFlags;
             clearMask = ~1;
             *field &= clearMask;
-            actor->base.word104 = zero;
+            actor->base.pendingControl = zero;
             state = 3;
             actor->base.state2A8 = state;
             actor->base.phase2A9 = one;

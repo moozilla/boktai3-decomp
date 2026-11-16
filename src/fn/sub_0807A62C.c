@@ -2,11 +2,11 @@
 void SceneActorBehavior_UpdateColliders(struct RoomActor *);
 static inline u32 SceneActorBehavior_TestMotionFlags(u32 mask, struct RoomActor *p)
 {
-    return p->flags2D4 & mask;
+    return p->motionFlags & mask;
 }
 static inline u32 SceneActorBehavior_TestStatusFlags(u32 mask, struct RoomActor *p)
 {
-    return p->flags2D0 & mask;
+    return p->statusFlags & mask;
 }
 static inline u8 Inactive(struct RoomActor *actor)
 {
@@ -30,19 +30,19 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
         {
             u32 mask = 0x2000;
             u32 flags;
-            flags = actor->flags2D4;
+            flags = actor->motionFlags;
             if (flags & mask)
                 control->timer = inactive;
             else {
                 struct ChaseActor *base = (void *)actor;
-                u16 *timerPtr = &base->base.field2B8;
+                u16 *timerPtr = &base->base.hitLockTimer;
                 s16 timer;
                 timer = *timerPtr;
                 if (timer) {
                     if (((u16)timer >> 2) & 1) {
                         u32 mask = 0x20;
-                        mask |= actor->flags2D6;
-                        actor->flags2D6 = mask;
+                        mask |= actor->reactionFlags;
+                        actor->reactionFlags = mask;
                     }
                     (*timerPtr)--;
                 }

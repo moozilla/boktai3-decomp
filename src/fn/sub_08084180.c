@@ -11,7 +11,7 @@ void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
     statusMask |= status[0xF];
     status[0xF] = statusMask;
     testMask = 0x100;
-    field = &actor->base.flags2D4;
+    field = &actor->base.motionFlags;
     if (!(*field & testMask)) {
         struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
         u32 mask = 2;
@@ -24,7 +24,7 @@ void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
             u32 old;
             u32 zeroByte;
             u32 zeroWord;
-            flags = &actor->base.flags2D4;
+            flags = &actor->base.motionFlags;
             old = *flags;
             zeroByte = k2;
             zeroWord = 0;

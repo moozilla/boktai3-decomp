@@ -44,16 +44,16 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
@@ -161,7 +161,7 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 bit = 0x800;
-            actor->base.flags2C0 = bit | actor->base.flags2C0;
+            actor->base.placementFlags = bit | actor->base.placementFlags;
         }
         {
             struct ContactPosition *dest = &actor->base.body.position;
@@ -178,11 +178,11 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
         Palette(actor, actor->base.paletteAlternateBank);
         {
             u32 eight = 8;
-            actor->base.field1E8 = eight;
+            actor->base.flashTimer = eight;
         }
         {
             u32 bit = 0x8000;
-            actor->base.flags2CC |= bit;
+            actor->base.behaviorFlags |= bit;
         }
         if (target->kind <= 3) {
             u32 request, option;

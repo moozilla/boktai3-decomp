@@ -6,7 +6,7 @@ void SceneActorControl_OnIdle(u8 *);
 
 static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 excluded)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u32 value = *flags;
     u32 mask = 0x40;
     value &= mask;
@@ -14,7 +14,7 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 exclud
     if (value)
         goto one;
     {
-        u32 value = actor->base.flags2D0;
+        u32 value = actor->base.statusFlags;
         mask = excluded;
         value &= mask;
         if (value)
@@ -32,7 +32,7 @@ zero:
 
 static inline u8 HasMovementFlag(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
@@ -50,18 +50,18 @@ static inline void ResetControl(struct ChaseActor *actor, const void *callback, 
                                 u32 zero)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = substate;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = substate;
     actor->base.target = callback;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         u32 value = *flags;
         value &= mask;
         *flags = value;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 
 // confidence=low: walks the scene actor list and, for available actors with flag 0x100 in flags2C0, resets their script state.
@@ -102,7 +102,7 @@ void sub_08070910(void)
                     }
                     {
                         bits = 8;
-                        actor->base.flags2D0 = actor->base.flags2D0 | bits;
+                        actor->base.statusFlags = actor->base.statusFlags | bits;
                     }
                 }
             }

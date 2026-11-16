@@ -51,15 +51,15 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
 }
 static inline u32 Reaction_Motion(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline void Reaction_ClearMotionBits(struct ChaseActor *actor, s32 mask)
 {
-    actor->base.flags2D4 &= mask;
+    actor->base.motionFlags &= mask;
 }
 static inline void Reaction_SetHalf(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D6 = mask | actor->base.flags2D6;
+    actor->base.reactionFlags = mask | actor->base.reactionFlags;
 }
 static inline void Reaction_SpawnPart(u8 *group)
 {
@@ -100,17 +100,17 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         actor->base.field2C2 = 64;
         reaction = (void *)&actor->base.tracking.target;
         Reaction_ClearMotion(reaction, ~0x18);
-        word = &actor->base.flags2D0;
+        word = &actor->base.statusFlags;
         Reaction_ClearWord(word, ~0x1000000);
         actor->base.field2C2 = 64;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
-        motion = &actor->base.flags2D4;
+        motion = &actor->base.motionFlags;
         Reaction_ClearHalf(motion, ~0x380);
         Reaction_ClearMotion(reaction, ~0x18);
         control = &actor->group.common.control;
         bit = 0x200000;
-        flags = &actor->base.flags2CC;
+        flags = &actor->base.behaviorFlags;
         if (Reaction_HasFlags(*flags & bit)) {
             Reaction_ClearWord(word, ~0x1000000);
             Reaction_ClearHalf(motion, ~0x200);
@@ -134,17 +134,17 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         }
     }
     duration = *(u16 *)(group + 0x1FA);
-    if (duration * 2 == actor->base.field2B8 || duration == actor->base.field2B8) {
+    if (duration * 2 == actor->base.hitLockTimer || duration == actor->base.hitLockTimer) {
         Reaction_SpawnPart(group);
         Reaction_SetHalf(actor, 0x20);
     }
-    if (actor->base.field2B8 <= 10)
+    if (actor->base.hitLockTimer <= 10)
         Reaction_SetHalf(actor, 0x20);
     {
         u32 timer = 65;
-        actor->base.field1EA = timer;
+        actor->base.paletteTimer = timer;
     }
-    if (!actor->base.field2B8) {
+    if (!actor->base.hitLockTimer) {
         struct ContactCollider *collider = &actor->base.colliderA;
         u32 mask = 0x100;
         collider->flags = mask | collider->flags;
@@ -156,6 +156,6 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         actor->base.reactionDirection =
             (Reaction_ThirtySecond((Reaction_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
-        actor->base.field2B8--;
+        actor->base.hitLockTimer--;
     }
 }

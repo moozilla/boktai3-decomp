@@ -28,7 +28,7 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
     saved = *originalScale;
     {
         u32 mask = 0x80;
-        flags = &a->base.flags2D4;
+        flags = &a->base.motionFlags;
         if (Test(flags, mask)) {
             *originalScale = Div(0x40, 3);
         }
@@ -52,6 +52,6 @@ void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
         Anim_SetFrameDurationScale((u8 *)a->base.drawable + 0x20, *scale);
     a->base.field2C2 = saved;
     if (a->base.restart) {
-        a->base.field2B0 = 1;
+        a->base.stepDone = 1;
     }
 }

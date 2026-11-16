@@ -34,8 +34,8 @@ void SceneActorControl_RestartPositionCurve(struct ChaseActor *actor)
     ZeroFill8(&actor->base.secondaryMotion);
     AndWordFlags(&state->flags3D4, ~7);
     OrTrackingFlags(&actor->base.tracking, 8);
-    OrWordFlags(0x100000, &actor->base.flags2D0);
-    SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
+    OrWordFlags(0x100000, &actor->base.statusFlags);
+    SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
     SelectState(actor, 0, 2, 0);
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;

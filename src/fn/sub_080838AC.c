@@ -45,10 +45,10 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
             stateFlags = firstFlags;
         }
         if (Test(firstValue, ~0)) {
-            actor->base.body.position.y = state->baseOffset + actor->base.field2EA;
+            actor->base.body.position.y = state->baseOffset + actor->base.heightOffset;
             return;
         }
-        if ((s16)actor->base.field2EA <= 259) {
+        if ((s16)actor->base.heightOffset <= 259) {
             {
                 u32 mask = 1;
                 if (Test(*stateFlags, mask)) {
@@ -57,7 +57,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
                     return;
                 }
             }
-            actor->base.field2EA += TruncateSine(gUnk_086149C4[state->phase], 9);
+            actor->base.heightOffset += TruncateSine(gUnk_086149C4[state->phase], 9);
             if (state->phase <= 63) {
                 state->phase++;
             }
@@ -71,21 +71,21 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
     absolute = delta >= 0 ? delta : -delta;
     if (absolute > 16) {
         if (delta < 0) {
-            actor->base.field2EA -= 2;
+            actor->base.heightOffset -= 2;
         } else {
-            actor->base.field2EA += 2;
+            actor->base.heightOffset += 2;
         }
     }
     if (((struct SceneActorControlGroundView *)actor)->ground != state->previousGround) {
-        actor->base.field2EA -=
+        actor->base.heightOffset -=
             ((struct SceneActorControlGroundView *)actor)->ground - state->previousGround;
     }
     do {
         {
-            u32 offset = actor->base.field2EA;
+            u32 offset = actor->base.heightOffset;
             {
                 u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
-                actor->base.body.position.y = actor->base.field2EA + ground;
+                actor->base.body.position.y = actor->base.heightOffset + ground;
             }
         }
     } while (0);

@@ -4,7 +4,7 @@ struct ChaseActor *SceneActorRegistry_FindAvailableAfterId(u32);
 static inline u8 IsUnavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
 {
     if (actor) {
-        if ((actor->base.flags2D4 & disabled) || (actor->base.flags2D0 & excluded) ||
+        if ((actor->base.motionFlags & disabled) || (actor->base.statusFlags & excluded) ||
             actor->base.health <= 0)
             return 1;
     }
@@ -27,7 +27,7 @@ initialize: {
     do {
         if (actor->base.category == category) {
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
-            if (!unavailable && (actor->base.flags2CC & flags))
+            if (!unavailable && (actor->base.behaviorFlags & flags))
                 goto success;
         }
         actor = SceneActorRegistry_FindAvailableAfterId(actor->base.body.id);

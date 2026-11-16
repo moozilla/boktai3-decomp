@@ -13,12 +13,12 @@ static inline u8 Inactive(struct Vorn *p)
     if (p) {
         u32 mask = 0x40;
         u32 offset = 0x2D4;
-        if (p->chase.base.flags2D4 & mask)
+        if (p->chase.base.motionFlags & mask)
             goto inactive;
         {
             u32 mask = 0x20000;
             offset -= 4;
-            if (p->chase.base.flags2D0 & mask)
+            if (p->chase.base.statusFlags & mask)
                 goto inactive;
         }
         if (p->chase.base.health > 0)
@@ -60,7 +60,7 @@ void SceneActor_TrySoloAction(struct Vorn *p)
         return;
     {
         u32 mask = 0xE33F;
-        if (p->chase.base.flags2D4 & mask)
+        if (p->chase.base.motionFlags & mask)
             return;
     }
     if (!q->field688)
@@ -94,12 +94,12 @@ void SceneActor_TrySoloAction(struct Vorn *p)
             void *callback = SceneActorReaction_UpdateFacingAttack;
             u32 mode = 0x2A;
             p->chase.base.field2B2 = one;
-            p->chase.base.field2B0 = zero;
-            p->chase.base.field2B5 = mode;
+            p->chase.base.stepDone = zero;
+            p->chase.base.controlKind = mode;
             p->chase.base.target = callback;
         }
         p->chase.base.field2C8 = zero;
-        Clear(&p->chase.base.flags114, 1);
-        p->chase.base.word104 = zero;
+        Clear(&p->chase.base.pendingControlFlags, 1);
+        p->chase.base.pendingControl = zero;
     }
 }

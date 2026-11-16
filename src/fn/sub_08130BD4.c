@@ -5,7 +5,7 @@ u16 SceneActorRoute_GetStepDuration(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
 static inline u32 TestFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 void SceneActorRoute_UpdateTimedPhase(struct ChaseActor *actor)
 {
@@ -15,21 +15,21 @@ void SceneActorRoute_UpdateTimedPhase(struct ChaseActor *actor)
         void *control = *(void **)(block + 0x220);
         u32 kind = 5;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = control;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
         *(s16 *)(block + 0x1F2) = SceneActorRoute_GetStepDuration(route);
     }
     if (*(s16 *)(block + 0x1F2) > 0)
         --*(u16 *)(block + 0x1F2);
-    if (!(u8)Callback_InvokeActor(actor, actor->base.targetQuery) && actor->base.field2B0 &&
+    if (!(u8)Callback_InvokeActor(actor, actor->base.targetQuery) && actor->base.stepDone &&
         TestFlags(actor, 0x400000))
         SceneActorRoute_AdvanceActorPoint(actor, route);
 }

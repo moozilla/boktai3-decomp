@@ -12,15 +12,15 @@ void SceneActor_BeginReaction22(struct ChaseActor *actor)
         void *callback = Ivy_UpdateActiveState;
         u8 reaction = 0x22;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = reaction;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = reaction;
         actor->base.target = callback;
     }
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }

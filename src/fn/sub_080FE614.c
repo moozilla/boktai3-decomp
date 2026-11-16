@@ -12,7 +12,7 @@ s32 Axe_OnUpdate(struct ChaseActor *p)
 
     Axe_PrepareUpdate(p);
     idx = p->base.state2A8;
-    tbl = (u32 *)p->base.callbacks27C;
+    tbl = (u32 *)p->base.stateCallbacks;
     Callback_InvokeActor(p, tbl[idx]);
     SceneActorControl_DispatchControl(p);
     Axe_UpdateEffects(p);

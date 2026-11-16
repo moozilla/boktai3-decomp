@@ -33,7 +33,8 @@ static inline struct SceneActorChaseFlags16 *Skeleton_GateFlags(struct ChaseActo
 
 static inline void Skeleton_EnableMotionFlags(struct ChaseActor *actor, u16 bits)
 {
-    SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&actor->base.flags2D4, bits);
+    SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&actor->base.motionFlags,
+                                     bits);
 }
 
 static inline void Skeleton_SetContextFlags(struct SceneActorTimedBehaviorContext *context,
@@ -44,7 +45,7 @@ static inline void Skeleton_SetContextFlags(struct SceneActorTimedBehaviorContex
 
 static inline u32 Skeleton_MovementFlags(struct ChaseActor *actor, u32 mask)
 {
-    return SceneActorChase_Bits32(&actor->base.flags2D0, mask);
+    return SceneActorChase_Bits32(&actor->base.statusFlags, mask);
 }
 
 static inline void Skeleton_UpdateArrival(void *obj)

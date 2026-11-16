@@ -24,8 +24,8 @@ u32 SceneActorBehavior_TestDefeated(struct RoomActor *actor)
         u8 m;
         SceneActorBehavior_RecordDefeat(actor);
         {
-            s32 v = OrV(0x80, &actor->flags2D6) & ~0x100;
-            *&actor->flags2D6 = v;
+            s32 v = OrV(0x80, &actor->reactionFlags) & ~0x100;
+            *&actor->reactionFlags = v;
         }
         sprite = &actor->tracking;
         m = 0x10;

@@ -24,16 +24,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind
     u32 zero;
     actor->base.field2B2 = 1;
     zero = 0;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -50,11 +50,11 @@ void Golem_BeginSlideState(struct ChaseActor *actor)
     struct Unk080CEB48Body *body = (struct Unk080CEB48Body *)((u8 *)actor + 0x50);
     if (TakeFlag(&actor->base.field2B1)) {
         BeginControl(actor, Golem_UpdateSlideImpact, 0x29);
-        actor->base.field2B0 = 0;
+        actor->base.stepDone = 0;
         body->direction = actor->base.tracking.heading;
         context->pushSpeed = 0x200;
     }
-    if ((s32)actor->base.counter2AC > 0x1E || actor->base.field2B0) {
+    if ((s32)actor->base.counter2AC > 0x1E || actor->base.stepDone) {
         if (context->pendingEvent) {
             actor->base.counter304 = context->pendingEvent;
             Callback_InvokeActor(actor, actor->base.targetQuery);

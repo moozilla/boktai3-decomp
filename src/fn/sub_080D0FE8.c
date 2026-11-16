@@ -23,7 +23,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
 
     group = &a->group;
     prepared = SceneActorReaction_TakePrepared(a);
-    motionFlags = &a->base.flags2D4;
+    motionFlags = &a->base.motionFlags;
     if (prepared) {
         motion->direction = (SceneActorTurn_Cardinal(motion->direction) << 6) - 0x40;
         direction = SceneActorTurn_Cardinal(motion->direction);
@@ -34,7 +34,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
             target = a->base.nextDirection;
         }
         if (direction == (target >> 1)) {
-            a->base.field2B0 = 1;
+            a->base.stepDone = 1;
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
                 SceneActorChase_SetState(a, 3, 1, 0);
@@ -52,7 +52,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, 2, 0, 0);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 1:
@@ -61,7 +61,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, 2, 1, 4);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 2:
@@ -70,7 +70,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, 2, 2, 4);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 3:
@@ -79,7 +79,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
                     SceneActorChase_SetActorFlags(a, 0x10000);
                 } else {
                     SceneActorTurn_SelectAnimation(a, 2, 1, 1);
-                    SceneActorChase_ClearWordFlags(&a->base.flags2CC, 0x10000);
+                    SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x10000);
                 }
                 break;
         }
@@ -104,7 +104,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {
-            a->base.field2B0 = 1;
+            a->base.stepDone = 1;
             a->base.body.direction = (SceneActorTurn_Cardinal(a->base.body.direction) << 6) - 0x40;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {

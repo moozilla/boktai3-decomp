@@ -42,10 +42,10 @@ void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
         return;
     {
         u32 mask = 0x800;
-        if (actor->base.flags2D4 & mask)
+        if (actor->base.motionFlags & mask)
             return;
     }
-    if (actor->base.field2B5 != 0x39)
+    if (actor->base.controlKind != 0x39)
         return;
     {
         u32 offset = 0x130;

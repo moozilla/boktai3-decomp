@@ -37,23 +37,23 @@ static inline void SetCategoryControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 3;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = code;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = code;
     actor->base.target = fn;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCategoryContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         {
             if (actor->base.category == 7)
                 SetCategoryControl(actor, SceneActorReaction_TickQueuedContact);
@@ -63,8 +63,8 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 1);
         context->timer = context->duration;
     }
-    if (actor->base.field2B0) {
-        ClearFlags(&actor->base.flags2D4, ~0x100);
+    if (actor->base.stepDone) {
+        ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -83,29 +83,29 @@ static inline void SetTimedControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x27;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = code;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = code;
     actor->base.target = fn;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachTimedContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SetTimedControl(actor, Skeleton_UpdateAttackWindup);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }
-    if (actor->base.field2B0) {
-        ClearFlags(&actor->base.flags2D4, ~0x100);
+    if (actor->base.stepDone) {
+        ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -124,29 +124,29 @@ static inline void SetAlternateControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x2B;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = code;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = code;
     actor->base.target = fn;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachAlternateContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SetAlternateControl(actor, SceneActorReaction_TickMultiHitAnimation);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 3);
     }
-    if (actor->base.field2B0) {
-        ClearFlags(&actor->base.flags2D4, ~0x100);
+    if (actor->base.stepDone) {
+        ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -169,30 +169,30 @@ static inline void SetCaptureControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x2C;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = code;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = code;
     actor->base.target = fn;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCaptureContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         SetCaptureControl(actor, sub_080BAAF4);
         context->destination = actor->base.tracking.target->position;
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }
-    if (actor->base.field2B0) {
-        ClearFlags(&actor->base.flags2D4, ~0x100);
+    if (actor->base.stepDone) {
+        ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -318,7 +318,7 @@ static inline void Skeleton_UpdateApproachAnimation(struct ChaseActor *actor)
 {
     u32 mask = 0xA02F;
     u16 *scale;
-    if (actor->base.flags2D4 & mask) {
+    if (actor->base.motionFlags & mask) {
         actor->base.field2C2 = 0x40;
         scale = &actor->base.field2C2;
     } else {
@@ -345,12 +345,12 @@ static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
     actor->base.body.motion.z += Skeleton_ScaleApproachMotion(gUnk_086149C4[angle & 0xFF] * speed);
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     if (actor->base.tracking.distance > body->minimumDistance &&
         actor->base.tracking.distance < body->maximumDistance) {
         u16 mask = 0x80;
-        actor->base.flags2D6 = mask | actor->base.flags2D6;
+        actor->base.reactionFlags = mask | actor->base.reactionFlags;
     } else
         actor->base.counter2AC++;
 }

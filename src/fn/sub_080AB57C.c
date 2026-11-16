@@ -22,14 +22,14 @@ void SceneActor_ResetQueuedState(struct ChaseActor *s)
     fn = SceneActorControl_OnIdle;
     code = 0x10;
     s->base.field2B2 = one;
-    s->base.field2B0 = zero;
-    s->base.field2B5 = code;
+    s->base.stepDone = zero;
+    s->base.controlKind = code;
     s->base.target = fn;
     s->base.field2C8 = zero;
-    flags = &s->base.flags114;
+    flags = &s->base.pendingControlFlags;
     {
         u32 mask = -2;
         *flags &= mask;
     }
-    s->base.word104 = zero;
+    s->base.pendingControl = zero;
 }

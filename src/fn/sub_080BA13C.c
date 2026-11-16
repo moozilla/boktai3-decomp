@@ -43,14 +43,14 @@ void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
             s32 m;
             z = 0;
             *a = 1;
-            p->base.field2B0 = z;
-            p->base.field2B5 = k;
+            p->base.stepDone = z;
+            p->base.controlKind = k;
             p->base.target = f;
             p->base.field2C8 = z;
-            w = &p->base.flags114;
+            w = &p->base.pendingControlFlags;
             m = -2;
             *w = m & *w;
-            p->base.word104 = z;
+            p->base.pendingControl = z;
         }
     } else if (p->base.restart) {
         void (*f)(void) = Skeleton_UpdateAttackRecovery;
@@ -61,13 +61,13 @@ void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
         s32 m;
         z = queued;
         *a = 1;
-        p->base.field2B0 = z;
-        p->base.field2B5 = k;
+        p->base.stepDone = z;
+        p->base.controlKind = k;
         p->base.target = f;
         p->base.field2C8 = z;
-        w = &p->base.flags114;
+        w = &p->base.pendingControlFlags;
         m = -2;
         *w = m & *w;
-        p->base.word104 = z;
+        p->base.pendingControl = z;
     }
 }

@@ -37,7 +37,7 @@ s32 Dog_ResolvePendingObject(struct ChaseActor *actor)
         {
             u32 mask = 0x80;
             u16 *flags;
-            flags = &owner->base.flags2D6;
+            flags = &owner->base.reactionFlags;
             mask |= *flags;
             *flags = mask;
         }

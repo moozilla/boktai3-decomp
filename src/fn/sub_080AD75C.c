@@ -30,7 +30,7 @@ static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 
 }
 static inline void Vorn_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D0 = mask | actor->base.flags2D0;
+    actor->base.statusFlags = mask | actor->base.statusFlags;
 }
 
 #define Vorn_UpdateStaggerRecovery sub_080AD75C
@@ -92,10 +92,10 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
         return;
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (actor->base.field2DC & 0x80000) {
+    if (actor->base.hitReactionFlags & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }

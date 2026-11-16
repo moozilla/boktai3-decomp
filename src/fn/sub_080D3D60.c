@@ -16,7 +16,7 @@ static inline u32 ClearWordValue(u32 *field, u32 bits)
 #include "scene_actor_animation.h"
 static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 *field = &actor->base.flags2D4;
+    u16 *field = &actor->base.motionFlags;
     u32 value = *field;
     return value & mask;
 }
@@ -63,7 +63,7 @@ static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
     u8 *group = (u8 *)&actor->group.common;
     {
         u32 mask = 0x400;
-        if (((struct ChaseActor *)ctx)->base.flags2D4 & mask)
+        if (((struct ChaseActor *)ctx)->base.motionFlags & mask)
             return;
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
@@ -73,7 +73,7 @@ static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
         save->target = actor->base.target;
-        save->kind = actor->base.field2B5;
+        save->kind = actor->base.controlKind;
         save->state = actor->base.state2A8;
         save->phase = actor->base.phase2A9;
         save->behavior = actor->base.behavior2AA;
@@ -183,7 +183,7 @@ void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         mask = 4;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     if (BouncingObject_RefreshNearbyHeading(actor))
         Chase_SetBehavior(actor, 16);
@@ -198,7 +198,7 @@ void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
             u32 mask = 4;
             SetHalf((u16 *)(group + 0x40), mask);
         }
-        actor->base.flags2D0 = ClearWordValue(&actor->base.flags2D0, 4);
+        actor->base.statusFlags = ClearWordValue(&actor->base.statusFlags, 4);
         {
             struct ChaseFlags40 *field = (void *)(body + 0x6f2);
             s32 mask = ~0x1400;

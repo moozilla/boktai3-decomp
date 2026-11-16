@@ -13,7 +13,7 @@ static inline u8 Test(u32 value)
 static inline u32 Flag2C0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2C0 & mask;
+    return actor->base.placementFlags & mask;
 }
 static inline u32 Mask(u16 *flags, u32 maskInput)
 {
@@ -25,8 +25,8 @@ static inline void SetControl(struct ChaseActor *actor, u32 zero)
     void *callback = SceneActorReaction_UpdateTimedBurst;
     u32 kind = 29;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     {
         u32 off = 0x2C8;
@@ -36,29 +36,29 @@ static inline void SetControl(struct ChaseActor *actor, u32 zero)
         }
     }
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
 {
     u32 mask = 0x8000000;
-    u32 *flags2D0 = &actor->base.flags2D0;
+    u32 *flags2D0 = &actor->base.statusFlags;
     if (*flags2D0 & mask) {
         u32 blocked = 0x8006;
         u16 *flags2D4;
         u32 flags;
         {
-            u16 *address = &actor->base.flags2D4;
+            u16 *address = &actor->base.motionFlags;
             flags = *address;
             blocked &= flags;
             flags2D4 = address;
         }
-        if (!blocked && (flags & 0x2000) && actor->base.field2B8) {
+        if (!blocked && (flags & 0x2000) && actor->base.hitLockTimer) {
             struct ContactCollider *collider;
-            if (actor->base.field2B5 == 29)
+            if (actor->base.controlKind == 29)
                 return 1;
             SetControl(actor, blocked);
             {
@@ -79,7 +79,7 @@ u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
                 *flags2D0 &= clear;
             }
             {
-                u16 *flags2D6 = &actor->base.flags2D6;
+                u16 *flags2D6 = &actor->base.reactionFlags;
                 u32 clear = ~0x9CB;
                 *flags2D6 = clear & *flags2D6;
             }
@@ -93,7 +93,7 @@ u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
             collider = &actor->base.colliderA;
             if (Test(Flag2C0(actor, 0x40)))
                 collider->flags &= ~0x100;
-            else if ((actor->base.field2DC & 0x84000) || (Mask(flags2D4, 0x2016)))
+            else if ((actor->base.hitReactionFlags & 0x84000) || (Mask(flags2D4, 0x2016)))
                 collider->flags &= ~0x100;
             else
                 collider->flags |= 0x100;

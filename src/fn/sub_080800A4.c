@@ -15,7 +15,7 @@ static inline void Reaction_ClearHalf(struct ChaseFlags40 *field, u32 bits)
 }
 static inline void Reaction_SetActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2CC = mask | actor->base.flags2CC;
+    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
 }
 static inline void Reaction_Show(struct ChaseActor *actor)
 {
@@ -39,12 +39,12 @@ static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
 }
 static inline void SetDeathFlag(struct ChaseActor *actor, u16 bit)
 {
-    actor->base.flags2D4 = bit | actor->base.flags2D4;
+    actor->base.motionFlags = bit | actor->base.motionFlags;
 }
 static inline void ClearActorBits(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
-    actor->base.flags2CC &= mask;
+    actor->base.behaviorFlags &= mask;
 }
 static inline u32 AnyMotion(u32 mask, u32 *flags)
 {
@@ -59,14 +59,14 @@ static inline void ApplyColliderMask(u16 *field, u16 bits)
 }
 static inline u32 *Reaction_ControlFlags(struct ChaseActor *actor)
 {
-    return &actor->base.flags2CC;
+    return &actor->base.behaviorFlags;
 }
 void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *collider = &actor->base.colliderA;
     u8 prepared = SceneActorReaction_TakePrepared(actor);
-    u32 *motion = &actor->base.flags2D0;
+    u32 *motion = &actor->base.statusFlags;
 
     if (prepared) {
         {
@@ -80,13 +80,13 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
         collider->flags |= 4;
         collider->responseValue = 0;
         Reaction_Show(actor);
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         Reaction_SetDrawMode(actor, 2);
         ActorShadow_Enable(actor->base.shadow);
-        Reaction_ClearWord(&actor->base.flags2D0, 0x80000);
-        Reaction_ClearHalf((void *)&actor->base.flags2C0, 0x20);
+        Reaction_ClearWord(&actor->base.statusFlags, 0x80000);
+        Reaction_ClearHalf((void *)&actor->base.placementFlags, 0x20);
         ClearActorBits(actor, 0x400000);
-        motion = &actor->base.flags2D0;
+        motion = &actor->base.statusFlags;
     }
     if (AnyMotion(0x10, motion)) {
         if (actor->base.health <= 1) {

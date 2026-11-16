@@ -82,7 +82,7 @@ static inline u32 SceneActorChase_HeightAt(s32 cell, struct ContactPosition *pos
 #endif
 
 #if SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
-#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->base.flags2D4)
+#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->base.motionFlags)
 #define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->base.body.motion)
 #else
 #define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  SceneActorChase_MotionFlagsOf(a_)

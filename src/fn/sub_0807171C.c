@@ -25,7 +25,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
             actor->base.body.position;
     {
-        u16 *address = &actor->base.field2EA;
+        u16 *address = &actor->base.heightOffset;
         u32 zero;
         zero = 0;
         *address = zero;
@@ -36,10 +36,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
             u32 mask = 0x200000;
             u32 *address;
             u32 selected;
-            address = &actor->base.flags2CC;
+            address = &actor->base.behaviorFlags;
             selected = *address & mask;
             flags = address;
-            renderFlags = &actor->base.flags2D0;
+            renderFlags = &actor->base.statusFlags;
             if (selected) {
                 u32 clearMask = ~0x1000000;
                 u32 value;
@@ -48,7 +48,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
                 value = *renderFlags;
                 value &= clearMask;
                 *renderFlags = value;
-                shortFlags = &actor->base.flags2D4;
+                shortFlags = &actor->base.motionFlags;
                 mask0 = 0xFFFFFDFF;
                 mask0 &= *shortFlags;
                 *shortFlags = mask0;
@@ -80,8 +80,8 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         mask = 0xFFFFBE3F;
         *renderFlags &= mask;
     }
-    actor->base.field1EA = 0;
-    actor->base.field1E8 = 0;
+    actor->base.paletteTimer = 0;
+    actor->base.flashTimer = 0;
     {
         u32 mode = 2;
         if (!actor->base.drawableKind)

@@ -7,7 +7,7 @@ void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
         {
-            u16 *field = &actor->base.flags2C0;
+            u16 *field = &actor->base.placementFlags;
             u32 mask = ~0x800;
             *field = mask & *field;
         }
@@ -34,11 +34,11 @@ void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
             byteZero = 0;
             *(u16 *)((u8 *)actor + offset) = zero;
             {
-                u32 *field = &actor->base.flags114;
+                u32 *field = &actor->base.pendingControlFlags;
                 mask = ~1;
                 *field = *field & mask;
             }
-            actor->base.word104 = zero;
+            actor->base.pendingControl = zero;
             {
                 u32 state = 3;
                 actor->base.state2A8 = byteZero;

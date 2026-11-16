@@ -58,7 +58,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     if ((u32)(actor->category - 18) <= 2 || actor->category == 23) {
         destination->power = source->power;
     } else if (ReadReactionFlags(0x40000, source)) {
-        u8 *defense = &actor->field9F;
+        u8 *defense = &actor->defense;
         s32 power;
         power = source->power;
         power -= *defense;
@@ -67,7 +67,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         destination->power = power;
     }
     SceneActor_SetContactReactionDirection(actor, source, destination);
-    actor->field2E0 = source->kind;
+    actor->hitOwners = source->kind;
     {
         u32 parameter = source->parameter34;
         u32 reaction = source->reactionFlags;
@@ -88,7 +88,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         }
     }
     actor->reactionSoundVariant = destination->remaining;
-    PlayerStats_AddContactHundredths(source, destination, actor->fieldA0);
+    PlayerStats_AddContactHundredths(source, destination, actor->contactReward);
     {
         u32 mask = 0x2000;
         u32 offset = 0x2CC;

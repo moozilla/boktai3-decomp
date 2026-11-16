@@ -19,16 +19,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind
     u32 zero;
     actor->base.field2B2 = 1;
     zero = 0;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -45,8 +45,8 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
         BeginControl(actor, Axe_UpdateFadeOut, 0x22);
         {
             u32 flag = 0x100;
-            flag |= actor->base.flags2D4;
-            actor->base.flags2D4 = flag;
+            flag |= actor->base.motionFlags;
+            actor->base.motionFlags = flag;
         }
         SpriteGroup_SetSharedPosition(actor, &group->position, 0x13C);
         {
@@ -55,7 +55,7 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
         }
     }
     Axe_EmitMotionTrail(actor);
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         BeginControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
         SetPhase(actor, 0, 2, 1);
     } else {

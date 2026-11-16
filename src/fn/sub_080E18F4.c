@@ -31,5 +31,5 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 fr
     if (frame - 13 <= 10)
         Collider_Refresh(&context->collider);
     if (a->base.restart)
-        a->base.field2B0 = 1;
+        a->base.stepDone = 1;
 }

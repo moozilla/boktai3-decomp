@@ -92,9 +92,9 @@ static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s3
     arg0->base.defaultReaction = defaultReaction;
     MonsterInit_WriteResultCallback(&arg0->base.contactQuery.result, cb270);
     MonsterInit_WriteDataPointer(&arg0->base.commandTable.opaque, gUnk_086108B0);
-    arg0->base.callback248 = 0;
+    arg0->base.routeReset = 0;
     arg0->base.targetQuery = targetQuery;
-    arg0->base.field238 = SceneActorReaction_SinkAndRemove;
+    arg0->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     arg0->base.onDamage = damage;
     arg0->base.onContact = contact;
     arg0->base.field240 = 0;
@@ -110,8 +110,8 @@ static inline void AxeInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 
 static inline void AxeInit_InstallRoutes(struct ChaseActor *actor)
 {
-    actor->base.callback248 = SceneActorControl_InitializeHoverState;
-    actor->base.field23C = Axe_OnReaction;
+    actor->base.routeReset = SceneActorControl_InitializeHoverState;
+    actor->base.reactionGate = Axe_OnReaction;
 }
 
 static inline u8 AxeInit_BoundedVariant(s32 variant)

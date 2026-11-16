@@ -33,16 +33,16 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -58,7 +58,7 @@ void Lun_UpdateLaunchedReaction(struct ChaseActor *actor)
     u8 *state = actor->base.context;
     u32 zero;
     u8 entered = SceneActorControl_TakeFlag(&actor->base.field2B1);
-    u32 *flags = &actor->base.flags2D0;
+    u32 *flags = &actor->base.statusFlags;
     if (entered) {
         u8 angle;
         SetControl(actor, Lun_OnSpecialAnimation, 0x24);
@@ -68,11 +68,11 @@ void Lun_UpdateLaunchedReaction(struct ChaseActor *actor)
         actor->base.secondaryMotion.x = Scale12(gUnk_086149C4[angle] * 12);
         actor->base.secondaryMotion.y = 10;
         actor->base.secondaryMotion.z = Scale12(gUnk_086149C4[(angle + 64) & 255] * 12);
-        flags = ClearFlags(&actor->base.flags2D0, ~0x100000);
+        flags = ClearFlags(&actor->base.statusFlags, ~0x100000);
     }
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     {
         u32 mask = 0x10;

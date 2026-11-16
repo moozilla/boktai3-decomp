@@ -25,7 +25,7 @@ void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;
-        actor->base.flags2D4 |= mask;
+        actor->base.motionFlags |= mask;
     }
     if (sequence->frame > 2) {
         if (sequence->frame == 4 && sequence->timer == 0)
@@ -34,6 +34,6 @@ void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
     if (actor->base.restart) {
         state->savedTick = state->currentTick;
         state->targetTick = state->currentTick + 30;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
     }
 }

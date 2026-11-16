@@ -20,7 +20,7 @@ struct ContactRouteFlagOwner {
 static inline u32 ContactRoute_QueryFlags(struct ChaseActor *actor, u32 mask,
                                           struct ContactRouteFlagOwner *owner)
 {
-    u16 *field = &actor->base.flags2D4;
+    u16 *field = &actor->base.motionFlags;
     u32 bits = *field & mask;
     owner->field = field;
     return bits;

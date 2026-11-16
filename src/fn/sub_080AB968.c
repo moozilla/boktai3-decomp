@@ -30,16 +30,16 @@ static inline void SetControl(struct ChaseActor *s, void *control, u32 code)
     u8 *field = &s->base.field2B2;
     zero = 0;
     *field = 1;
-    s->base.field2B0 = zero;
-    s->base.field2B5 = code;
+    s->base.stepDone = zero;
+    s->base.controlKind = code;
     s->base.target = control;
     s->base.field2C8 = zero;
-    flags = &s->base.flags114;
+    flags = &s->base.pendingControlFlags;
     {
         u32 mask = -2;
         *flags &= mask;
     }
-    s->base.word104 = zero;
+    s->base.pendingControl = zero;
 }
 static inline void SetState(struct ChaseActor *p, u32 b)
 {
@@ -85,7 +85,7 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
         Advance(s, ax, az);
     }
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
-    if (s->base.field2B0) {
+    if (s->base.stepDone) {
         TentacleActor_SelectWanderRoute(s);
         SetControl(s, s->base.onAlternateEntry, 1);
         SetState(s, 2);

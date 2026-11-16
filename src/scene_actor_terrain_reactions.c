@@ -25,15 +25,15 @@ void SceneActorRegistry_ApplyTerrainReactions(void)
         cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(
                          actor->base.terrainCell))
                         ->flags;
-        if ((cellFlags & 0x40) &&
-            actor->base.body.position.y + (s16)actor->base.field2EA <= actor->base.groundHeight) {
+        if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.heightOffset <=
+                                      actor->base.groundHeight) {
             void *sink;
             if (SceneActorPlacement_IsUnavailable((void *)actor)) {
                 node = node->next;
                 actor = (void *)node->actor;
                 continue;
             }
-            sink = actor->base.field238;
+            sink = actor->base.sinkCallback;
             if (!sink) {
                 SceneActorTerrain_InstallControl(actor, SceneActorReaction_SinkAndRemove, 0x16);
             } else {
@@ -52,11 +52,11 @@ void SceneActorRegistry_ApplyTerrainReactions(void)
             SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
             SceneActorTerrain_Subtract(&delta, &center, &actor->base.body.position);
             actor->base.reactionDirection = Math_Atan2(delta.x, delta.z) >> 5;
-            actor->base.field2E0 = 0x20;
+            actor->base.hitOwners = 0x20;
             collider->cost = MonsterInit_GetHealth(actor);
             actor->base.reactionSoundVariant = MonsterInit_GetHealth(actor);
             collider->responseParameter = 0x28;
-            actor->base.field2D8 = 0x200;
+            actor->base.hitAttributes = 0x200;
             actor->base.field2E6 = 1;
             MonsterInit_SetBehaviorFlags(actor, 0x2000);
         }

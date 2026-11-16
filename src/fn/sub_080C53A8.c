@@ -71,7 +71,7 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
         }
     active: {
         u32 mask = 0x4000;
-        a->base.flags2D6 = mask | a->base.flags2D6;
+        a->base.reactionFlags = mask | a->base.reactionFlags;
     }
     } else {
         struct ContactCollider *c = (void *)((u8 *)a + 0x188);

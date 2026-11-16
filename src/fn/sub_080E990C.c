@@ -31,7 +31,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         actor->base.colliderA.responseValue = zero;
         showActor(actor);
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
-        clearColliderFlag(&actor->base.flags2C0);
+        clearColliderFlag(&actor->base.placementFlags);
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 15);
         Sound_PlaySong(0x2A0);
     }
@@ -44,13 +44,13 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         s32 mask;
         zero = 0;
         *prepared = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
-        flags = &actor->base.flags114;
+        flags = &actor->base.pendingControlFlags;
         mask = -2;
         *flags = mask & *flags;
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
 }

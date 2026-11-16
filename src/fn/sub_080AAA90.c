@@ -18,13 +18,13 @@ struct TentacleImpulseTrail {
 };
 static inline u32 Tentacle_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline u8 Tentacle_IsInactive(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if ((p->base.flags2D4 & mask) || Tentacle_StatusFlags(p, 0x20000) || p->base.health <= 0)
+        if ((p->base.motionFlags & mask) || Tentacle_StatusFlags(p, 0x20000) || p->base.health <= 0)
             return 1;
     }
     return 0;

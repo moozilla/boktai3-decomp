@@ -114,7 +114,7 @@ static inline u8 Skeleton_Drift(struct ChaseActor *actor)
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
                                          &x);
@@ -140,7 +140,7 @@ static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorCh
 {
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (actor->base.field2DC & 0x80000) {
+    if (actor->base.hitReactionFlags & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -181,7 +181,7 @@ void Skeleton_ConvergeDisplacedPosition(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     if (Skeleton_Drift(actor)) {
         struct Skeleton *context = actor->base.context;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         Skeleton_Settle(actor, group, context);
     }
 }

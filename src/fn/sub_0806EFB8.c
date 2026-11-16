@@ -7,12 +7,12 @@ static inline u8 Inactive(struct ChaseActor *a)
 {
     {
         u32 mask = 0x40;
-        if (a->base.flags2D4 & mask)
+        if (a->base.motionFlags & mask)
             return 1;
     }
     {
         u32 mask = 0x20000;
-        if (a->base.flags2D0 & mask)
+        if (a->base.statusFlags & mask)
             return 1;
     }
     if (a->base.health <= 0)

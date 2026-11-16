@@ -20,16 +20,16 @@ void SceneActor_UpdateAlternateEntryPhase(struct ChaseActor *actor)
         u8 *prepared = &actor->base.field2B2;
         zero = 0;
         *prepared = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = one;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = one;
         actor->base.target = target;
         actor->base.field2C8 = zero;
-        flags = &actor->base.flags114;
+        flags = &actor->base.pendingControlFlags;
         mask = ~1;
         *flags &= mask;
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u32 behavior = 15;
         u32 zero;
         u8 *state = &actor->base.state2A8;

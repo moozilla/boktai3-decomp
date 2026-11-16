@@ -29,5 +29,5 @@ void SceneActorReaction_BeginSideStep(struct ChaseActor *actor, s32 frame)
     }
     SideStep_SetFlags((void *)&actor->base.tracking.target, 32);
     if (frame > context->duration)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }

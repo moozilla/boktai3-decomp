@@ -59,7 +59,7 @@ static inline void Tentacle_ApplyDurationScale(struct ChaseActor *actor)
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;

@@ -14,7 +14,7 @@ void sub_0821DE30(void *);
 
 static inline u32 SceneActorMotion_BehaviorBits(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 {
@@ -22,14 +22,14 @@ static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 }
 static inline u8 SceneActorMotion_HasBodyFlags(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
 static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 value = bits;
-    u16 *field = &actor->base.flags2D4;
+    u16 *field = &actor->base.motionFlags;
     value |= *field;
     *field = value;
 }
@@ -64,7 +64,7 @@ static inline u16 SceneActorMotion_SequenceElapsed(struct DisplaySequenceState *
 static inline u16 *SceneActorMotion_MarkMoving(struct ChaseActor *actor, u32 bits)
 {
     u32 value = bits;
-    u16 *field = &actor->base.flags2D6;
+    u16 *field = &actor->base.reactionFlags;
     value |= *field;
     *field = value;
     return field;
@@ -131,7 +131,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
     SceneActorMovement_UpdateAirborne((void *)actor);
     {
         u32 mask = 0x2000;
-        u32 *field = &actor->base.flags2CC;
+        u32 *field = &actor->base.behaviorFlags;
         u32 moving = *field & mask;
         behavior = field;
         if (moving && !SceneActorMotion_HasBodyFlags(actor, 0x20))
@@ -146,7 +146,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         } else {
             s32 previousX = actor->base.previousPosition.x;
             s32 currentX = actor->base.body.position.x;
-            flags = &actor->base.flags2D6;
+            flags = &actor->base.reactionFlags;
             position = &actor->base.body.position;
             if (previousX == currentX) {
                 s32 previousZ = actor->base.previousPosition.z;
@@ -172,12 +172,12 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         cell = *currentCell;
         cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
         if (*currentCell != actor->base.previousTerrainCell) {
-            if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.field2EA <=
+            if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.heightOffset <=
                                           actor->base.groundHeight) {
                 void *sink;
                 if (SceneActorPlacement_IsUnavailable((void *)actor))
                     goto done;
-                sink = actor->base.field238;
+                sink = actor->base.sinkCallback;
                 if (!sink)
                     SceneActorTerrain_InstallControl(actor, SceneActorReaction_SinkAndRemove, 0x16);
                 else
@@ -192,22 +192,22 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
                 SceneActorTerrain_GetCenter(cell, &center);
                 SceneActorTerrain_Subtract(&delta, &center, position);
                 actor->base.reactionDirection = Math_Atan2(delta.x, delta.z) >> 5;
-                actor->base.field2E0 = 0x20;
+                actor->base.hitOwners = 0x20;
                 collider->cost = MonsterInit_GetHealth(actor);
                 actor->base.reactionSoundVariant = MonsterInit_GetHealth(actor);
                 collider->responseParameter = 0x28;
-                actor->base.field2D8 = 0x200;
+                actor->base.hitAttributes = 0x200;
                 actor->base.field2E6 = 1;
                 SceneActorMotion_SetStatus(behavior, 0x2000);
                 goto done;
             }
         }
-        if (category == 3 && (actor->base.field2CA & 1) &&
+        if (category == 3 && (actor->base.frameCounter & 1) &&
             SceneActorPlacement_ReadFlags16((void *)actor, 0x100))
             MonsterInit_SetStatusFlags(actor, 0x10000);
         if (!SceneActorMotion_Elapsed(actor)) {
             u32 mask = 0x10000;
-            u32 *status = &actor->base.flags2D0;
+            u32 *status = &actor->base.statusFlags;
             if (SceneActorMotion_TestStatus(status, mask)) {
                 RepeatedEffect_RequestNearby((void *)position);
                 SceneActorMotion_ClearStatus(status, 0x10000);
@@ -224,7 +224,7 @@ done: {
             NavMesh_UpdateProbe(contact, position);
     }
 }
-    actor->base.field2CA++;
+    actor->base.frameCounter++;
     sub_0821DE30(group);
     actor->base.previousPosition = actor->base.body.position;
     SceneActorMotion_ClearPending(flags, 0x2000);

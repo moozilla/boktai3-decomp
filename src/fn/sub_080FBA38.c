@@ -58,7 +58,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
     if ((*((u32 *)actor->base.drawable)) & 1)
         return;
     {
-        s32 zero = Mod(actor->base.field2CA, trail->interval);
+        s32 zero = Mod(actor->base.frameCounter, trail->interval);
         if (zero)
             return;
         {

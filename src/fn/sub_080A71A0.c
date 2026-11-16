@@ -31,7 +31,7 @@ static inline s32 Tentacle_ClampStep(s32 value, s16 limit)
 
 static inline void Tentacle_SetReactionFlags(struct ChaseActor *actor, u32 bits)
 {
-    actor->base.flags2D0 |= bits;
+    actor->base.statusFlags |= bits;
 }
 
 static inline u8 Tentacle_ApproachReactionEnd(struct ChaseActor *actor)
@@ -54,7 +54,7 @@ static inline u8 Tentacle_ApproachReactionEnd(struct ChaseActor *actor)
 
 static inline void Tentacle_PrepareRecoil(struct ChaseActor *actor, u16 bits)
 {
-    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D4;
+    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.motionFlags;
     SceneActorChase_SetFlagComponent(flags, bits);
     SceneActorChase_ClearFlagComponent(flags, 1);
 }
@@ -70,7 +70,7 @@ void TentacleBody_ConvergeReactionMotion(struct ChaseActor *actor)
             ActorTrail_RemoveLastSegment(actor);
     }
     if (Tentacle_ApproachReactionEnd(actor)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetState(actor, 0, 0, 5);

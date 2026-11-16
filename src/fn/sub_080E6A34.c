@@ -16,7 +16,7 @@ void SceneActor_StartFlaggedAnimationPhase(struct Dog *actor)
         }
         Chase_SetCtl(&actor->chase, SceneActor_WaitForCategoryAttachment, 0x25);
     }
-    if (actor->chase.base.field2B0) {
+    if (actor->chase.base.stepDone) {
         Chase_SetBehavior(&actor->chase, 2);
     } else {
         Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque);

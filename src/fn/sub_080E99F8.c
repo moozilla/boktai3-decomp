@@ -13,16 +13,16 @@ static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
     void *callback = target;
     u32 type = kind;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = type;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = type;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -42,7 +42,7 @@ static inline void HideCollider(struct ChaseActor *actor)
     collider->flags = m;
     {
         u32 m = 0x800;
-        actor->base.flags2C0 = m | actor->base.flags2C0;
+        actor->base.placementFlags = m | actor->base.placementFlags;
     }
 }
 static inline void ShowCollider(struct ChaseActor *actor)
@@ -50,7 +50,7 @@ static inline void ShowCollider(struct ChaseActor *actor)
     actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
     {
         u32 m = ~0x800;
-        actor->base.flags2C0 = m & actor->base.flags2C0;
+        actor->base.placementFlags = m & actor->base.placementFlags;
     }
 }
 

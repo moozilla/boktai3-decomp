@@ -25,16 +25,16 @@ static inline void SetState(struct ChaseActor *actor, u32 zero)
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
@@ -49,13 +49,13 @@ void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
         }
         {
             u32 mask = 128;
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             u32 value = *flags;
             mask |= value;
             *flags = mask;
         }
         actor->group.common.gate.counter = actor->group.common.gate.duration;
-        if (TestFlags(&actor->base.flags2D4, 256))
+        if (TestFlags(&actor->base.motionFlags, 256))
             return;
         Golem_ResetIdleControl(actor);
     } else {

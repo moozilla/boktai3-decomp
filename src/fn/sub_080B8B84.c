@@ -10,12 +10,12 @@ static inline u8 Blocked(struct ChaseActor *actor)
         goto zero;
     {
         u32 mask = 0x40;
-        if (actor->base.flags2D4 & mask)
+        if (actor->base.motionFlags & mask)
             goto one;
     }
     {
         u32 mask = 0x20000;
-        if (actor->base.flags2D0 & mask)
+        if (actor->base.statusFlags & mask)
             goto one;
     }
     if (actor->base.health > 0)
@@ -30,16 +30,16 @@ static inline void SetControl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state)
 {
@@ -54,8 +54,8 @@ u8 SceneActorReaction_TrySink(struct ChaseActor *actor)
 {
     if (actor && !Blocked(actor) && actor->base.enabled == 1) {
         u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->base.terrainCell) + 2);
-        if (cellFlags & 0x40 &&
-            actor->base.body.position.y + (s16)actor->base.field2EA <= actor->base.groundHeight) {
+        if (cellFlags & 0x40 && actor->base.body.position.y + (s16)actor->base.heightOffset <=
+                                    actor->base.groundHeight) {
             void *sink = *(void **)((u8 *)actor + 0x238);
             if (!sink)
                 SetControl(actor, SceneActorReaction_SinkAndRemove, 0x16);
@@ -64,7 +64,7 @@ u8 SceneActorReaction_TrySink(struct ChaseActor *actor)
             SetState(actor, 3);
             {
                 u32 mask = 0x20000;
-                actor->base.flags2D0 |= mask;
+                actor->base.statusFlags |= mask;
             }
             return 1;
         }

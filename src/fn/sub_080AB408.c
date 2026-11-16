@@ -10,11 +10,11 @@ struct ActorTrail {
 };
 static inline u32 stateFlag(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D4 & mask;
+    return p->base.motionFlags & mask;
 }
 static inline u32 actorFlag(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D0 & mask;
+    return p->base.statusFlags & mask;
 }
 static inline u8 unavailable(struct ChaseActor *p)
 {
@@ -32,7 +32,7 @@ void ActorTrail_UpdateTimedScale(struct ChaseActor *actor)
         if (trail->timer <= 59)
             actor->base.field2C2 = 32;
         else {
-            if (*(s16 *)&actor->base.field2EA == 0 && actor->base.secondaryMotion.y == 0) {
+            if (*(s16 *)&actor->base.heightOffset == 0 && actor->base.secondaryMotion.y == 0) {
                 if (trail->soundDelay)
                     trail->soundDelay--;
                 else if (Mod(trail->timer, 24) == 0)

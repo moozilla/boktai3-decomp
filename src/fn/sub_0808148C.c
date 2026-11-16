@@ -11,7 +11,7 @@ static inline u8 IsControlled(struct ChaseActor *a)
 static inline void ClearRoute(struct ChaseActor *a, u8 *group)
 {
     struct SceneActorRegistryControl *route = (void *)(group + 0x4C);
-    u32 *flags = &a->base.flags2CC;
+    u32 *flags = &a->base.behaviorFlags;
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
@@ -29,16 +29,16 @@ static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = cb;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
 {
@@ -77,7 +77,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
         actor->base.field2B1 = 1;
         actor->base.restart = 0;
         {
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             u32 mask = ~0x20;
             mask &= *flags;
             *flags = mask;
@@ -103,7 +103,7 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
         ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->state2C = 0;
     if (frame > 15) {
         u32 mask = 2;
-        u16 masked = actor->base.flags2D4;
+        u16 masked = actor->base.motionFlags;
         masked &= mask;
         if (masked) {
             SetState(actor, 3, 0, 0);

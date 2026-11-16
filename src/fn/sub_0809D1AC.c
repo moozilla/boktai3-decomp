@@ -14,7 +14,7 @@ struct RouteActorDestinationState {
 };
 static inline u16 TestFlag(struct ChaseActor *p, u32 mask)
 {
-    mask &= p->base.flags2D4;
+    mask &= p->base.motionFlags;
     return mask;
 }
 void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)

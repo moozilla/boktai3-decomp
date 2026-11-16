@@ -15,16 +15,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind
     u32 zero;
     actor->base.field2B2 = 1;
     zero = 0;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 {

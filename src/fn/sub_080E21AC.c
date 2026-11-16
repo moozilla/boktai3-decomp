@@ -70,9 +70,9 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
         return;
     {
         u32 mask = 0x400;
-        u32 instant = actor->base.flags2CC & mask;
+        u32 instant = actor->base.behaviorFlags & mask;
         if (instant) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             SceneActorControl_CallContextScript(actor);
             script = (u16)actor->base.script1F8;
             if (script) {
@@ -82,7 +82,7 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
                 values[3] = actor->base.parameters1FC[0];
                 values[4] = actor->base.parameters1FC[1];
                 values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.field2E0;
+                values[6] = actor->base.hitOwners;
                 values[7] = actor->base.body.id;
                 arguments.count = 8;
                 arguments.values = values;
@@ -90,9 +90,9 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
             }
             {
                 u32 mask = 0x4000;
-                u16 value = actor->base.flags2D4;
+                u16 value = actor->base.motionFlags;
                 u16 test = value & mask;
-                flags = &actor->base.flags2D4;
+                flags = &actor->base.motionFlags;
                 if (!test && (u32)(actor->base.category - 11) > 2)
                     Bestiary_UnlockEntry(
                         Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
@@ -106,16 +106,16 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
                     u32 kind;
                     kind = 16;
                     actor->base.field2B2 = 1;
-                    actor->base.field2B0 = 0;
-                    actor->base.field2B5 = kind;
+                    actor->base.stepDone = 0;
+                    actor->base.controlKind = kind;
                     actor->base.target = callback;
                     actor->base.field2C8 = 0;
                     {
-                        u32 *flags = &actor->base.flags114;
+                        u32 *flags = &actor->base.pendingControlFlags;
                         u32 mask = ~1;
                         *flags &= mask;
                     }
-                    actor->base.word104 = 0;
+                    actor->base.pendingControl = 0;
                     SetAnimation(actor, 1, 0, 2);
                 }
             }
@@ -132,16 +132,16 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
             u32 kind;
             kind = 0x27;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = instant;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = instant;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = instant;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = instant;
+            actor->base.pendingControl = instant;
         }
     }
 }

@@ -57,7 +57,7 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         {
             u16 mask = 0x20;
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             *flags = mask | *flags;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
@@ -66,7 +66,7 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
             collider->flags |= 4;
         }
     }
-    OrWordFlags(0x100000, &actor->base.flags2D0);
+    OrWordFlags(0x100000, &actor->base.statusFlags);
     {
         s32 current = actor->base.reactionStart.x;
         s16 *field = &actor->base.reactionEnd.x;
@@ -91,15 +91,15 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
         u16 *flags;
         struct SceneActorChaseTracking *tracking;
         u32 tracked;
-        actor->base.field2B0 = 1;
-        flags = &actor->base.flags2D4;
+        actor->base.stepDone = 1;
+        flags = &actor->base.motionFlags;
         {
             u32 mask = ~0x20;
             mask &= *flags;
             tracked = 0;
             *flags = mask;
         }
-        AndWordFlags(&actor->base.flags2CC, ~0x80);
+        AndWordFlags(&actor->base.behaviorFlags, ~0x80);
         state->phase = tracked;
         tracking = &actor->base.tracking;
         tracked = TrackingHas(tracking, 8);

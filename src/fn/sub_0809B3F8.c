@@ -20,22 +20,22 @@ static inline u8 Take(u8 *p)
 }
 static inline u32 Bits(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = 0;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 
 #include "scene_actor_animation.h"
@@ -106,19 +106,19 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
         if (current == target) {
             actor->base.body.direction = desired;
             Control(actor, actor->base.onStanding, 0);
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             return;
         }
         target -= 8;
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = &actor->base.flags2CC;
+                u32 *p = &actor->base.behaviorFlags;
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
                 u32 mask = 0x10000;
-                actor->base.flags2CC |= mask;
+                actor->base.behaviorFlags |= mask;
             }
         }
     }
@@ -126,7 +126,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
     {
         u32 mask = 0xA02F;
         u16 *scale;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             actor->base.field2C2 = 64;
             scale = &actor->base.field2C2;
         } else {
@@ -141,7 +141,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
         else
             Anim_SetFrameDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x20, *scale);
     }
-    if (actor->base.field2CA & 4) {
+    if (actor->base.frameCounter & 4) {
         u32 variant;
         u32 flags;
         u32 selection;

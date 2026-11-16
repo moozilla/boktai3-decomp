@@ -15,7 +15,7 @@ s32 Math_Atan2(s32, s32);
 static inline u8 Dog_TracksPlayer(struct ChaseActor *actor)
 {
     u32 mask = 2;
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
@@ -23,8 +23,8 @@ static inline u8 Dog_TracksPlayer(struct ChaseActor *actor)
 static inline void Dog_ClearResponseFlags(void *object)
 {
     struct ChaseActor *actor = object;
-    actor->base.field2D8 = 0;
-    actor->base.field2DC = 0;
+    actor->base.hitAttributes = 0;
+    actor->base.hitReactionFlags = 0;
 }
 
 static inline u32 *Dog_ResponseField(void *object, s16 offset)
@@ -33,8 +33,8 @@ static inline u32 *Dog_ResponseField(void *object, s16 offset)
 }
 static inline void Dog_WriteResponseWords(struct ChaseActor *actor, s32 value)
 {
-    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2D8) = value;
-    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2DC) = value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.hitAttributes) = value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.hitReactionFlags) = value;
 }
 
 static inline void Dog_CopyContactCost(struct ContactCollider *collider, struct ChaseActor *actor)
@@ -59,7 +59,9 @@ void sub_080DF6EC(void *unused, struct ContactCollider *contact, struct ChaseAct
         return;
     if (palette != 0 && palette != 2)
         return;
-    position = *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target.position;
+    position =
+        *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gUnknown_02000580[0])
+             ->target.position;
     position.y += 200;
     if (!InventorySlot_PickRandom(&context->slot, &context->kind, &context->parameter))
         return;
@@ -89,7 +91,7 @@ void sub_080DF6EC(void *unused, struct ContactCollider *contact, struct ChaseAct
     }
     context->slot = -1;
     actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
-    actor->base.field2E0 = 1;
+    actor->base.hitOwners = 1;
     Dog_ClearResponseFlags(actor);
     responseValue = 0;
     Dog_WriteResponseWords(actor, responseValue);

@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "interaction_marker.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneBody_Init(void *, u32, void *, u32, u32, void *);
@@ -27,20 +26,12 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
         u32 cell;
         u32 height, surface;
         u8 *properties;
-        register struct ContactPosition *point asm("r4");
-        register s16 *yAddress asm("r5");
+        struct ContactPosition *point;
         s32 x, z;
-        {
-            u32 value = Script_GetValue();
-            point = &marker->position;
-            point->x = value;
-        }
-        {
-            u32 value = Script_GetValue();
-            yAddress = &marker->position.y;
-            *yAddress = value;
-        }
+        marker->position.x = Script_GetValue();
+        marker->position.y = Script_GetValue();
         marker->position.z = Script_GetValue();
+        point = &marker->position;
         x = point->x >> 8;
         z = point->z >> 8;
         position = point;
@@ -68,7 +59,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
                 height -= (u8)point->x;
                 break;
         }
-        *yAddress = height;
+        marker->position.y = height;
     } else {
         marker->position.x = keyword;
         marker->position.y = keyword;

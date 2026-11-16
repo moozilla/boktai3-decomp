@@ -44,8 +44,8 @@ static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
 static inline void SetFlags(struct ChaseActor *p, u32 mask)
 {
     u32 v = mask;
-    v |= p->base.flags2D4;
-    p->base.flags2D4 = v;
+    v |= p->base.motionFlags;
+    p->base.motionFlags = v;
 }
 void Dog_UpdateTargetGate(struct ChaseActor *p)
 {
@@ -58,7 +58,7 @@ void Dog_UpdateTargetGate(struct ChaseActor *p)
     if (active) {
         Or16(&p->group.common.gate.flags, 4);
         v = 0x80;
-        f = &p->base.flags2D4;
+        f = &p->base.motionFlags;
         v |= *f;
         *f = v;
         p->group.common.gate.counter = p->group.common.gate.duration;
@@ -83,12 +83,12 @@ void Dog_UpdateTargetGate(struct ChaseActor *p)
         callback = SceneActorControl_OnIdle;
         kind = 0x10;
         p->base.field2B2 = one;
-        p->base.field2B0 = active;
-        p->base.field2B5 = kind;
+        p->base.stepDone = active;
+        p->base.controlKind = kind;
         p->base.target = callback;
         p->base.field2C8 = active;
-        And32(&p->base.flags114, ~1);
-        p->base.word104 = active;
+        And32(&p->base.pendingControlFlags, ~1);
+        p->base.pendingControl = active;
     }
     OrMotion((struct SceneActorReactionMotion *)&p->base.tracking.target, 8);
 }

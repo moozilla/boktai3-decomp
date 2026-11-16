@@ -19,7 +19,7 @@ static inline u8 ContextFlag(u8 *context)
 static inline void ClearRoute(struct ChaseActor *a, struct SceneActorRegistryControlGroup *group)
 {
     struct SceneActorRegistryControl *route = &group->control;
-    u32 *flags = &a->base.flags2CC;
+    u32 *flags = &a->base.behaviorFlags;
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
@@ -69,13 +69,13 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
             actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         actor->base.restart = 0;
         actor->base.colliderA.responseValue = 0;
-        actor->base.field2B8 = 0;
+        actor->base.hitLockTimer = 0;
         {
             u32 mask = 0x20000;
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             *flags |= mask;
         }
     }
@@ -96,13 +96,13 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
             }
             {
                 u32 mask = 8;
-                u16 *field = &actor->base.flags2D4;
+                u16 *field = &actor->base.motionFlags;
                 mask |= *field;
                 *field = mask;
             }
             {
                 u32 mask = 0x400;
-                u32 *flags = &actor->base.flags2CC;
+                u32 *flags = &actor->base.behaviorFlags;
                 *flags |= mask;
             }
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
@@ -113,16 +113,16 @@ void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
                 void *control = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;
                 actor->base.field2B2 = 1;
-                actor->base.field2B0 = zeroByte;
-                actor->base.field2B5 = kind;
+                actor->base.stepDone = zeroByte;
+                actor->base.controlKind = kind;
                 actor->base.target = control;
                 actor->base.field2C8 = zeroWord;
                 {
-                    u32 *flags = &actor->base.flags114;
+                    u32 *flags = &actor->base.pendingControlFlags;
                     u32 mask = ~1;
                     *flags &= mask;
                 }
-                actor->base.word104 = zeroWord;
+                actor->base.pendingControl = zeroWord;
             }
         }
     }

@@ -27,16 +27,16 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state)
 {
@@ -54,8 +54,8 @@ static inline void SetState(struct ChaseActor *actor, u32 state)
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = mask;
-    value |= actor->base.flags2D4;
-    actor->base.flags2D4 = value;
+    value |= actor->base.motionFlags;
+    actor->base.motionFlags = value;
 }
 void SceneActorControl_HideOffscreen(struct ChaseActor *actor)
 {

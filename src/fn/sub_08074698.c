@@ -29,7 +29,7 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
     struct SceneActorRouteCursor *embedded = (void *)((u8 *)actor + 0x448);
-    u16 script = (u16)actor->base.field1EC;
+    u16 script = (u16)actor->base.scriptId;
     u32 mode, near;
     if (script) {
         s32 values[3];
@@ -56,7 +56,7 @@ void SceneActorRoute_AdvanceActorPoint(struct ChaseActor *actor,
         actor->base.counter2AC = 0;
         actor->base.field2B1 = 1;
         {
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x20;
             u32 value;
             value = *flags;

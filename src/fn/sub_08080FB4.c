@@ -30,8 +30,8 @@ static inline void SetControl(struct ChaseActor *actor)
     void *callback = (void *)SceneActorControl_OnIdle;
     u8 kind = 16;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     {
         /* Preserve the short-lived halfword-clear address. */
@@ -42,11 +42,11 @@ static inline void SetControl(struct ChaseActor *actor)
         }
     }
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -95,7 +95,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
             *(u32 *)(tile + 8) |= showFlag;
         }
     }
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     script = (u16)actor->base.script1F8;
     if (script) {
         u32 offset = 0;
@@ -118,7 +118,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     }
-    actor->base.fieldAA = 0;
+    actor->base.attachmentTimer = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
     if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {

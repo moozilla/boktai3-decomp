@@ -263,7 +263,7 @@ route:
     } else {
         {
             u32 mask = 0x10;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         actor->base.field2C2 = 0x40;
         SetCommand((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);

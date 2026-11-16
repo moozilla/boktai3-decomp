@@ -68,7 +68,7 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 
 static inline u32 ContactActor_ReadMotionFlags(const struct ChaseActor *actor, u32 mask)
 {
-    return mask & actor->base.flags2D4;
+    return mask & actor->base.motionFlags;
 }
 
 static inline u8 ContactActor_IsControlled(struct ChaseActor *actor)
@@ -107,8 +107,8 @@ static inline void TileContact_EmitThreeParts(struct ChaseActor *actor)
         EffectGroup_SpawnPart((struct EffectGroup *)source, 3, (u32)&position, (u32)&velocity,
                               (u32)&scale, 40, 40);
     }
-    actor->base.fieldAA = 0;
-    actor->base.field2B8 = 0;
+    actor->base.attachmentTimer = 0;
+    actor->base.hitLockTimer = 0;
 }
 
 void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
@@ -145,24 +145,24 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
     while ((actor = (void *)sub_0806F06C((const struct ContactPosition *)&self->position,
                                          (const struct ContactPosition *)&radius, &cursor)) !=
            NULL) {
-        if ((u8)(actor->base.field2B5 - 0x16) <= 1)
+        if ((u8)(actor->base.controlKind - 0x16) <= 1)
             continue;
         {
             u8 kind = 0x16;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *field = &actor->base.flags114;
+                u32 *field = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *field &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
         Chase_SetState(actor, 3, 0, 0);
-        actor->base.field2B8 = 0;
+        actor->base.hitLockTimer = 0;
         if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
             TileContact_EmitThreeParts(actor);
         }

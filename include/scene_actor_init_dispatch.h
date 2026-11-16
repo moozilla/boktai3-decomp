@@ -11,9 +11,9 @@ static inline void MonsterInit_InitializeCallbackDefaults(struct ChaseActor *act
                                                           void *contact)
 {
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_086108B0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;

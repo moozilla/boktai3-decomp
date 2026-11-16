@@ -16,7 +16,6 @@ s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 
-
 struct ChaseTarget {
     u8 unknown0[8];
     u8 index;
@@ -51,16 +50,16 @@ static inline void Chase_SetCtl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void Chase_SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
@@ -81,7 +80,7 @@ static inline void Chase_SetBehavior(struct ChaseActor *actor, u32 b)
 }
 static inline u16 Chase_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline u32 Chase_Bits32(u32 *field, u32 mask)
 {
@@ -133,7 +132,7 @@ static inline void Chase_SnapToRoute(struct ContactPosition *p, u8 *route)
 static inline void Chase_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
-    actor->base.flags2D4 &= mask;
+    actor->base.motionFlags &= mask;
 }
 static inline void Chase_ClearBits(u16 *field, u32 bits)
 {
@@ -144,7 +143,7 @@ static inline u8 Chase_TryRoute(struct ChaseActor *actor, void *route,
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        Chase_ClearBits(&actor->base.flags2D4, 0x200);
+        Chase_ClearBits(&actor->base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
@@ -153,7 +152,7 @@ static inline u8 Chase_TryRoute(struct ChaseActor *actor, void *route,
             Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    Chase_ClearBits(&actor->base.flags2D4, 0x200);
+    Chase_ClearBits(&actor->base.motionFlags, 0x200);
     return 0;
 }
 static inline void Chase_Delta(struct ContactPosition *out, const struct ContactPosition *from,
@@ -180,7 +179,7 @@ static inline void Chase_SavePacket(void *p, struct ChaseActor *actor)
 {
     struct ChasePacket *packet = p;
     packet->control = actor->base.target;
-    packet->kind = actor->base.field2B5;
+    packet->kind = actor->base.controlKind;
     packet->state = actor->base.state2A8;
     packet->phase = actor->base.phase2A9;
     packet->behavior = actor->base.behavior2AA;

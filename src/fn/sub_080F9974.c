@@ -31,7 +31,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 *state = actor->base.context;
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->base.flags2CC;
+        u32 *field = &actor->base.behaviorFlags;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
@@ -50,7 +50,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
             *(u32 *)(tile + 8) &= mask;
         }
         SetState(actor, 3, 0, 0);
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         if (HasAuxiliary(state)) {
             u32 *flags = (void *)(state + 0xA38);
             *flags |= 2;
@@ -70,7 +70,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);
-        OrStatus(0x20, &actor->base.flags2D6);
+        OrStatus(0x20, &actor->base.reactionFlags);
     }
     if (context[0xA3C]) {
         u32 previous = context[0xA34];

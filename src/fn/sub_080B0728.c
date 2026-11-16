@@ -5,16 +5,16 @@ u8 sub_0812F3CC(struct ChaseActor *);
 static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
-    p->base.field2B0 = 0;
-    p->base.field2B5 = kind;
+    p->base.stepDone = 0;
+    p->base.controlKind = kind;
     p->base.target = control;
     p->base.field2C8 = 0;
     {
-        u32 *flags = &p->base.flags114;
+        u32 *flags = &p->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    p->base.word104 = 0;
+    p->base.pendingControl = 0;
 }
 u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
@@ -30,7 +30,7 @@ void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
         if (sub_0812F3CC(p))
             return;
     }
-    if (p->base.field2B0) {
+    if (p->base.stepDone) {
         u32 phase = 0x15;
         p->base.state2A8 = 0;
         p->base.phase2A9 = 0;

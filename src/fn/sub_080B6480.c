@@ -20,17 +20,17 @@ u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
         zero = 0;
         one = 1;
         *taken = one;
-        s->base.field2B0 = zero;
-        s->base.field2B5 = code;
+        s->base.stepDone = zero;
+        s->base.controlKind = code;
         s->base.target = fn;
         zero8 = 0;
         s->base.field2C8 = zero;
-        flags = &s->base.flags114;
+        flags = &s->base.pendingControlFlags;
         {
             u32 mask = -2;
             *flags &= mask;
         }
-        s->base.word104 = zero;
+        s->base.pendingControl = zero;
         two = 2;
         s->base.state2A8 = zero8;
         s->base.phase2A9 = two;

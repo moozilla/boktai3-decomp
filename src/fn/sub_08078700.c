@@ -33,30 +33,30 @@ void SceneActorBehavior_UpdateColliders(struct ChaseActor *base)
     primary = &actor->colliderA;
     {
         u32 mask = 0x800;
-        if (Test(actor->flags2C0, mask)) {
+        if (Test(actor->placementFlags, mask)) {
             primary->flags |= 4;
             self = actor;
-            field = &self->flags2D6;
+            field = &self->reactionFlags;
             goto clearAndReturn;
         }
     }
     {
         u32 category = actor->category;
         if ((u32)(category - 12) <= 1 || category == 23) {
-            u16 *address = &actor->flags2D6;
+            u16 *address = &actor->reactionFlags;
             u32 mask = ~0x4000;
             mask &= *address;
             *address = mask;
             return;
         }
     }
-    if ((u8)(actor->field2B5 - 21) <= 1)
+    if ((u8)(actor->controlKind - 21) <= 1)
         goto disable;
     {
         u32 mask = 0x8000;
         u16 *address;
         u32 flags;
-        address = &actor->flags2D4;
+        address = &actor->motionFlags;
         flags = *address & mask;
         control = address;
         if (!flags)
@@ -64,7 +64,7 @@ void SceneActorBehavior_UpdateColliders(struct ChaseActor *base)
     }
 disable:
     primary->flags |= 4;
-    field = &actor->flags2D6;
+    field = &actor->reactionFlags;
 clearAndReturn: {
     u32 mask = ~0x4000;
     mask &= *field;
@@ -75,7 +75,7 @@ activeTest: {
     u32 mask = 0x4000;
     u16 *address;
     u32 flags;
-    address = &actor->flags2D6;
+    address = &actor->reactionFlags;
     flags = *address & mask;
     field = address;
     if (!Nonzero(flags)) {

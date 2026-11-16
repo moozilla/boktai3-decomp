@@ -95,7 +95,7 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
         u32 *flags;
         s32 mask;
         actor->base.counter304 = *(u16 *)(other + 4);
-        flags = &actor->base.flags2D0;
+        flags = &actor->base.statusFlags;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }

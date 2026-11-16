@@ -8,12 +8,12 @@ s32 Div(s32, s32);
 static inline u8 Inactive(struct ChaseActor *actor)
 {
     {
-        u32 flags = actor->base.flags2D4;
+        u32 flags = actor->base.motionFlags;
         flags &= 0x40;
         if (flags)
             return 1;
     }
-    if (actor->base.flags2D0 & 0x20000)
+    if (actor->base.statusFlags & 0x20000)
         return 1;
     if (actor->base.health <= 0)
         return 1;
@@ -63,7 +63,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
                 request = low;
             }
             do {
-                if (Inactive(actor) || actor->base.flags2CC & blocked) {
+                if (Inactive(actor) || actor->base.behaviorFlags & blocked) {
                     u8 *ticks = (u8 *)actor + tickOffset;
                     *ticks = zero;
                 } else {
@@ -73,7 +73,7 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
                     else if (selected < quota) {
                         *ticks = delay;
                         {
-                            u16 *field = &actor->base.flags2D6;
+                            u16 *field = &actor->base.reactionFlags;
                             *field = (u16)request | *field;
                         }
                         selected++;

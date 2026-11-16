@@ -16,7 +16,7 @@ static inline u32 NextRandomSample(const u16 *table)
 
 static inline u16 TestAnimationFlags(struct ChaseActor *actor, u16 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
@@ -44,7 +44,7 @@ static inline void SetDirectionOffset(struct ContactPosition *position, u32 angl
 static inline void SetStatusFlags(void *object, u32 flags)
 {
     struct ChaseActor *actor = object;
-    actor->base.flags2D0 = flags | actor->base.flags2D0;
+    actor->base.statusFlags = flags | actor->base.statusFlags;
 }
 static inline u32 ReadPaletteOffset(u16 *offset)
 {

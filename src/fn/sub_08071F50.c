@@ -88,7 +88,7 @@ selected:
     if (flagSet)
         alreadyAdvanced = 1;
     if (!Remaining(transition)) {
-        if (!ReadMasked(0x02008000, &actor->base.flags2CC))
+        if (!ReadMasked(0x02008000, &actor->base.behaviorFlags))
             BindPalette(actor, transition);
         goto success;
     }

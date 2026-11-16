@@ -25,10 +25,10 @@ static inline u32 RotationPhase_Mask(u32 *p, u32 mask)
 static inline void RotationPhase_Change(struct ChaseActor *actor, void *callback, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
-    actor->base.flags114 = RotationPhase_Mask(&actor->base.flags114, ~1);
-    actor->base.word104 = 0;
+    actor->base.pendingControlFlags = RotationPhase_Mask(&actor->base.pendingControlFlags, ~1);
+    actor->base.pendingControl = 0;
 }

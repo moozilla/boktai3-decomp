@@ -16,16 +16,16 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
 {
@@ -36,7 +36,7 @@ void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
-        if (actor->base.field2B0) {
+        if (actor->base.stepDone) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             {
                 u32 state = 0x10;

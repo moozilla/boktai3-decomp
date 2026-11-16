@@ -44,7 +44,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     timer = &group->common.control.timer;
     if (!*timer) {
         control = &group->common.control;
-        SceneActorChase_AndWordFlags(&actor->base.flags2CC, ~0x141C0);
+        SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x141C0);
         control->counter = 0;
         control->field14 = 0;
         /* The control record is reset before the overlap timer is armed. */
@@ -84,16 +84,16 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     }
     {
         u32 mask = 0x10;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     {
         u32 mask = 0x200;
-        SceneActorChase_OrHalfFlags(&actor->base.flags2D4, mask);
+        SceneActorChase_OrHalfFlags(&actor->base.motionFlags, mask);
     }
     actor->base.field2C2 = 0x20;
     {
         u32 mask = 0x1000000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     SceneActorAttachment_RetargetNearestPlayer(object, &group->common.control.targetPosition);
     if (started)

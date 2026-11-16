@@ -36,16 +36,16 @@ struct ApproachGroup {
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -97,7 +97,7 @@ static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u3
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
-            actor->base.flags2D4 &= ~bits;
+            actor->base.motionFlags &= ~bits;
         }
         return 0;
     } else {
@@ -108,7 +108,7 @@ static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u3
             return 1;
         } else {
             {
-                actor->base.flags2D4 &= ~bits;
+                actor->base.motionFlags &= ~bits;
             }
             return 0;
         }
@@ -121,7 +121,7 @@ struct SkeletonRouteContext {
 };
 static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 value = actor->base.flags2D4;
+    u16 value = actor->base.motionFlags;
     value &= mask;
     return value;
 }
@@ -155,7 +155,7 @@ void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
         SetControl(actor, SceneActorReaction_RestoreAfterDelay, 0xE);
         {
             u32 mask = 0x10;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         actor->base.field2C2 = 0x20;
         command = (void *)((u8 *)actor + 0x460);

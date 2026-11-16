@@ -47,16 +47,16 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline u32 CellIndex(struct ContactPosition *p)
@@ -185,7 +185,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     timer = &GROUP_FIELD(group, 0x54, u16);
     if (*timer == 0) {
         control = (struct SceneActorRegistryControl *)(group + 0x4C);
-        ClearWordFlags(&actor->base.flags2CC, 0xFFFEBE3F);
+        ClearWordFlags(&actor->base.behaviorFlags, 0xFFFEBE3F);
         control->counter = 0;
         FIELD(control, 0x14, u16) = 0;
         control->timer = 0;
@@ -196,7 +196,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x80;
-        u16 *p = &actor->base.flags2D4;
+        u16 *p = &actor->base.motionFlags;
         u32 t = *p & mask;
         flagsp = p;
         if (t) {
@@ -223,13 +223,13 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     } else {
         {
             u32 mask = 0x10;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         SetHalfFlags(flagsp, 0x200);
         actor->base.field2C2 = 0x20;
         {
             u32 mask = 0x1000000;
-            actor->base.flags2D0 |= mask;
+            actor->base.statusFlags |= mask;
         }
         SceneActorAttachment_RetargetNearestPlayer(
             actor, &GROUP_FIELD(group, 0x58, struct ContactPosition));

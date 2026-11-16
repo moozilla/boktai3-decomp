@@ -10,10 +10,10 @@ static inline u8 Unavailable(struct ChaseActor *actor)
     if (!actor)
         goto no;
     mask = 0x40;
-    if (actor->base.flags2D4 & mask)
+    if (actor->base.motionFlags & mask)
         goto yes;
     mask = 0x20000;
-    if (actor->base.flags2D0 & mask)
+    if (actor->base.statusFlags & mask)
         goto yes;
     if (actor->base.health > 0)
         goto no;
@@ -67,7 +67,7 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
         return;
     {
         u32 mask = 0x8000;
-        flags = actor->base.flags2D4;
+        flags = actor->base.motionFlags;
         if (mask & flags)
             return;
     }

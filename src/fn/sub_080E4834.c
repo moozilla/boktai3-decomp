@@ -3,13 +3,13 @@
 // confidence=low: resumes group chase or the saved route after arrival.
 static inline u32 Dog_SetMotionBits(struct ChaseActor *actor, s32 mask)
 {
-    struct ChaseFlags40 *flags = (void *)&actor->base.flags2D4;
+    struct ChaseFlags40 *flags = (void *)&actor->base.motionFlags;
     flags->bits |= mask;
     return Chase_MotionFlags(actor, 0x80);
 }
 static inline void Dog_SetMovementBits(struct ChaseActor *actor, u32 mask)
 {
-    u32 *flags = &actor->base.flags2CC;
+    u32 *flags = &actor->base.behaviorFlags;
     *flags |= mask;
 }
 void Dog_UpdateArrivalAnimation(void);
@@ -24,7 +24,7 @@ void Dog_ResumeRoute(struct ChaseActor *a)
         return;
     if (sub_0812F3CC(a))
         return;
-    if (a->base.field2B0) {
+    if (a->base.stepDone) {
         if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->base.body.position,
                             (struct ContactPosition *)(context + 0x6D8))) {
             Callback_InvokeActor(a, *(void **)(group + 0x224));

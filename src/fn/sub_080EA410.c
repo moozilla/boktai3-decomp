@@ -76,7 +76,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
         }
         {
             u32 bit = 0x800;
-            actor->base.flags2C0 = bit | actor->base.flags2C0;
+            actor->base.placementFlags = bit | actor->base.placementFlags;
         }
     }
     target = (void *)actor->base.tracking.target;
@@ -98,7 +98,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
         Player_BeginPositionRequest(player, (void *)&position, 0, 3, flip, 0, 0, 0, 0);
     }
     if (actor->base.restart) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
         Hide(actor);
         Sound_PlaySong(0x1E0);

@@ -19,20 +19,20 @@ static inline s32 Vorn_DivideDirection(s32 n)
 }
 static inline u32 Vorn_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 static inline void Vorn_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
-    actor->base.flags2D0 &= mask;
+    actor->base.statusFlags &= mask;
 }
 static inline void Vorn_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D0 = mask | actor->base.flags2D0;
+    actor->base.statusFlags = mask | actor->base.statusFlags;
 }
 static inline void Vorn_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
@@ -54,7 +54,7 @@ static inline void Vorn_AdjustMotionFlags(struct SceneActorChaseFlags16 *field, 
 }
 static inline void Vorn_SetPaletteTimer(struct ChaseActor *actor, u32 value)
 {
-    actor->base.field1EA = value;
+    actor->base.paletteTimer = value;
 }
 static inline void Vorn_ClearRoute(struct ChaseActor *actor,
                                    struct SceneActorRegistryControl *control)
@@ -71,7 +71,7 @@ static inline void Vorn_StartRoute(struct ChaseActor *actor, struct SceneActorCh
 }
 static inline u8 Vorn_ActorCollisionFlags(struct ChaseActor *actor, u32 bits)
 {
-    return SceneActorChase_TestField(&actor->base.flags2C0, bits);
+    return SceneActorChase_TestField(&actor->base.placementFlags, bits);
 }
 static inline void Vorn_ClearContextFlags(u16 *flags, u32 bits)
 {
@@ -94,7 +94,7 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
             Vorn_SetStatusFlags(actor, 2);
             Sound_PlaySong(0x1CC);
         }
-        motion = (struct SceneActorChaseFlags16 *)&actor->base.flags2D4;
+        motion = (struct SceneActorChaseFlags16 *)&actor->base.motionFlags;
         Vorn_AdjustMotionFlags(motion, 2, 0x17A9);
         {
             struct SceneActorRegistryControl *control;
@@ -123,7 +123,7 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
         Vorn_SendMessage(actor);
     }
     Vorn_SetPaletteTimer(actor, 65);
-    timer = (s16)actor->base.fieldAA;
+    timer = (s16)actor->base.attachmentTimer;
     if ((u32)(timer - 30) <= 89) {
         s32 frame = Mod(timer, 30);
         s32 threshold = 15 - Div(timer, 10);
@@ -148,11 +148,11 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
     *z += dz;
     if (Vorn_DisplacementStopped(dx, dz) && timer <= 0) {
         struct ContactCollider *collider;
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         actor->base.reactionDirection = (Vorn_DivideDirection(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->field5E0, 8);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 2);
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
         SceneActorChase_SetState(actor, 3, 1, 0);
         actor->base.body.direction = ((actor->base.body.direction + 32) >> 6) << 6;

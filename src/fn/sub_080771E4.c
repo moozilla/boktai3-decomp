@@ -24,15 +24,15 @@ void SceneActorTerrain_DisableCollision(struct RoomActor *actor)
 {
     struct ContactCollider *collider;
     u32 mask = 3;
-    actor->flags2CC |= mask;
+    actor->behaviorFlags |= mask;
     collider = &actor->colliderA;
     collider->flags |= 4;
     SceneActorPalette_ClearCompletedTransitions();
     {
         u32 queryMask = 0x800;
-        if (ReadMasked(&actor->flags2D0, queryMask) && IsDisposable(actor)) {
+        if (ReadMasked(&actor->statusFlags, queryMask) && IsDisposable(actor)) {
             u32 removalMask = 0x1000;
-            actor->flags2D6 = removalMask | actor->flags2D6;
+            actor->reactionFlags = removalMask | actor->reactionFlags;
         }
     }
 }

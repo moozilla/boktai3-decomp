@@ -14,16 +14,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kin
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -36,16 +36,16 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void State(struct ChaseActor *a, u32 behavior, u32 zero)
 {
@@ -62,7 +62,7 @@ static inline void *SavedControl(u8 *group)
 }
 static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
 {
@@ -76,14 +76,14 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
     if (result)
         return;
     {
-        u8 *finished = &actor->base.field2B0;
+        u8 *finished = &actor->base.stepDone;
         if (*finished) {
             u16 flags = MotionFlags(actor, 0x10);
             if (flags) {
                 State(actor, 8, result);
                 BeginControl(actor, SavedControl(group), 0x13, result);
             } else {
-                u32 bits = actor->base.flags2CC & 0x10;
+                u32 bits = actor->base.behaviorFlags & 0x10;
                 if (bits)
                     State(actor, 7, flags);
                 else

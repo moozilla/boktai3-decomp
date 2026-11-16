@@ -13,11 +13,11 @@ static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if (p->base.flags2D4 & mask)
+        if (p->base.motionFlags & mask)
             return 1;
         {
             u32 mask = 0x20000;
-            if (p->base.flags2D0 & mask)
+            if (p->base.statusFlags & mask)
                 return 1;
         }
         if (p->base.health <= 0)
@@ -35,12 +35,12 @@ static inline u8 active(struct SceneActorRandomReaction *p)
 static inline u32 blocked(struct ChaseActor *p)
 {
     u32 mask = 0xe33f;
-    return p->base.flags2D4 & mask;
+    return p->base.motionFlags & mask;
 }
 void SceneActor_TickRandomReaction(struct ChaseActor *p)
 {
     struct SceneActorRandomReaction *context = p->base.context;
-    if (!unavailable(p) && !blocked(p) && p->base.field2B5 == 0x23 && active(context)) {
+    if (!unavailable(p) && !blocked(p) && p->base.controlKind == 0x23 && active(context)) {
         if (context->timer) {
             context->timer--;
         } else {

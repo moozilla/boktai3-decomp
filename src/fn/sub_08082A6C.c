@@ -37,7 +37,7 @@ void SceneActorControl_UpdateTimedFacing(struct ChaseActor *input)
             }
         }
     }
-    if (!Mod(actor->base.field2CA, control->pulseInterval)) {
+    if (!Mod(actor->base.frameCounter, control->pulseInterval)) {
         struct ContactCollider *collider = &actor->base.colliderB;
         collider->flags &= 0xFFFB;
     }
@@ -50,7 +50,7 @@ void SceneActorControl_UpdateTimedFacing(struct ChaseActor *input)
         u8 limit;
         limit = *limitField;
         if ((u8)elapsed > limit) {
-            u8 *field = &actor->base.field2B0;
+            u8 *field = &actor->base.stepDone;
             *field = 1;
         } else {
             u8 *saved = &control->savedDirection;

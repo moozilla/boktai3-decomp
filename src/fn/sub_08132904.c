@@ -14,21 +14,21 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void Hide(struct ChaseActor *a)
 {
@@ -76,11 +76,11 @@ static inline u32 NextRandomSample(void)
 }
 static inline u32 ActorStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline u32 GetReactionFlags(u32 **out, struct ChaseActor *actor, u32 mask)
 {
-    u32 *p = &actor->base.flags2CC;
+    u32 *p = &actor->base.behaviorFlags;
     u32 result = *p & mask;
     *out = p;
     return result;
@@ -144,7 +144,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         u32 *f;
         u32 result;
         *h -= damage;
-        f = &actor->base.field2D8;
+        f = &actor->base.hitAttributes;
         result = *f & 0x20000;
         health = h;
         flags2D8 = f;
@@ -157,7 +157,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
                     (const u16 *)(gPaletteBankData + bank * 32);
             {
                 u32 eight = 8;
-                actor->base.field1E8 = eight;
+                actor->base.flashTimer = eight;
             }
             {
                 u32 bit = 0x8000;
@@ -168,8 +168,8 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
                 u32 buffer[2];
                 s32 h = *health;
                 u32 max = *maxHealth;
-                s32 kind = (s16)actor->base.fieldB2;
-                s32 param = (s16)actor->base.field9A;
+                s32 kind = (s16)actor->base.hudKind;
+                s32 param = (s16)actor->base.hudLabel;
                 SceneHud_SetTimedState(actor->base.body.id, h, max, kind, 0, param);
                 Fill(&zero, buffer);
                 if (actor->base.reactionSoundVariant || (!((*flags2D8) & 0x20000)))
@@ -179,13 +179,13 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         }
     }
     SceneActorMovement_ProjectProbe(actor, dx, dz);
-    SetHitFlags(8, (void *)&actor->base.flags2D4);
+    SetHitFlags(8, (void *)&actor->base.motionFlags);
     actor->base.body.direction = Math_Atan2(dx, dz);
     *timer = 38;
-    actor->base.field2DC = 0x40000;
-    actor->base.field2D8 = 0;
-    ClearHitFlags((void *)&actor->base.flags2D4, ~0x2000);
-    actor->base.field2B8 = 0;
+    actor->base.hitReactionFlags = 0x40000;
+    actor->base.hitAttributes = 0;
+    ClearHitFlags((void *)&actor->base.motionFlags, ~0x2000);
+    actor->base.hitLockTimer = 0;
     if ((*health) <= 0) {
         collider->responseValue = 0;
         Hide(actor);
@@ -201,11 +201,11 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
             actor->base.counter2AC = 0;
             actor->base.field2B1 = 1;
         }
-        actor->base.field2E0 = 32;
+        actor->base.hitOwners = 32;
         if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
-        SetHitFlags(0x20, (void *)&actor->base.flags2D4);
+        SetHitFlags(0x20, (void *)&actor->base.motionFlags);
         {
             void *control = actor->base.onReaction;
             Reaction_SetControl(actor, 0x12, control);

@@ -36,7 +36,7 @@ s32 SceneActorControl_CanAdvanceHover(struct ChaseActor *actor)
             *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         {
             u32 mask = 0x100;
-            if (!(actor->base.flags2D4 & mask) &&
+            if (!(actor->base.motionFlags & mask) &&
                 actor->base.tracking.distance < actor->base.tracking.limit)
                 goto one;
         }

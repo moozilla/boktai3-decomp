@@ -42,7 +42,7 @@ void SceneActorControl_SettleRotation(struct RoomActor *actor, s32 elapsed)
             magnitude = -magnitude;
         if (magnitude <= 12) {
             drawable->angle = 0;
-            actor->field2B0 = 1;
+            actor->stepDone = 1;
         }
     }
 }

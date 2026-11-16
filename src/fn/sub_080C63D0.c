@@ -54,7 +54,7 @@ static inline s32 WaitTime(struct GolemChargeContext *context, u32 mask, s32 shi
 }
 static inline void Golem_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D4 = mask | actor->base.flags2D4;
+    actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 
 static inline u32 Golem_MirrorFlags(u8 mirror)
@@ -181,7 +181,7 @@ void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
     actor->base.field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
     Golem_ApplyDuration(actor);
     if (frame > *(u16 *)(body + 0x68A)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
     }
 }

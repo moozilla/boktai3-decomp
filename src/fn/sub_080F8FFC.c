@@ -25,15 +25,15 @@ inline static void Axe_BeginRotationControl(struct ChaseActor *a, void *callback
         typeof(a->base.field2B2) *q1 = &a->base.field2B2;
         *q1 = 1;
     }
-    a->base.field2B0 = zero;
-    a->base.field2B5 = phase;
+    a->base.stepDone = zero;
+    a->base.controlKind = phase;
     a->base.target = callback;
     a->base.field2C8 = zero;
     {
         u8 k1 = 1;
-        a->base.flags114 &= ~k1;
+        a->base.pendingControlFlags &= ~k1;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 struct AxeLungePlayer {
@@ -72,7 +72,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
     struct RotatingDrawable *sprite = a->base.drawable;
     u8 entered = SceneActorControl_TakeFlag(&a->base.field2B2);
     s32 angle;
-    u32 *flags = &a->base.flags2D0;
+    u32 *flags = &a->base.statusFlags;
     if (entered) {
         struct ContactPosition delta;
         sprite->flags |= 2;
@@ -89,7 +89,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
         }
         state->delay = 0;
         {
-            u32 *entryFlags = &a->base.flags2D0;
+            u32 *entryFlags = &a->base.statusFlags;
             u32 mask = ~0x100000;
             *entryFlags &= mask;
             Axe_SetAuxiliarySpriteRenderState(a, state->auxiliary, 0x13D);
@@ -97,7 +97,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
             flags = entryFlags;
         }
     }
-    a->base.body.position.y += a->base.field2EA;
+    a->base.body.position.y += a->base.heightOffset;
     if (NormalizeAngle(32 - state->angle) < 0)
         sprite->angle += state->angularSpeed;
     else
