@@ -26,11 +26,11 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
         gRandomIndex = next & mask;
         phase = *(const u8 *)(gRandomIndex * 2 + (u32)top);
     }
+    sprite = burst->particles;
     burst->resource = AnimData_FindEntry(0x1C1E);
     i = 0;
-    table = gRandomTable;
     frame = &burst->particles[0].frame;
-    sprite = burst->particles;
+    table = gRandomTable;
     for (; i < 8; i++) {
         ParticleSprite_Initialize(sprite, burst->resource, 0);
         Effect_SetOrigin(sprite, -4, -4);
