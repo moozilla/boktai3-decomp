@@ -1,7 +1,7 @@
 #include "global.h"
 #include "axe.h"
 #include "scene_actor_control_phase.h"
-void Axe_UpdateTargetWindup(void);
+void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed);
 void ActorPhase_UpdateSpriteCollapse(void);
 static inline void Or16(u32 m, u16 *p)
 {

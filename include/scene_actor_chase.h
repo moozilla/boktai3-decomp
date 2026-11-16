@@ -10,7 +10,7 @@
 #include "player.h"
 
 void Skeleton_UpdateScriptWaitState(void);
-void SceneActorTerrain_RequestRetreatRoute(void *);
+void SceneActorTerrain_RequestRetreatRoute(struct ChaseActor *);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
 void Anim_SetDurationScale(void *, u32);

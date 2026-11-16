@@ -3915,24 +3915,35 @@ addr,name,mode,confidence,source,notes
 080EC364,Octopus_Destroy,thumb,low,src-alias,Destructor callback releases drawable resources and removes collision and registry entries
 080EC3F8,Octopus_Init,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); loader called by Octopus_Create
 080ED2F0,Octopus_Create,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); registry callback
+080ED328,Ivy_OnPrimaryContact,thumb,low,src-alias,
 080ED39C,Ivy_OnSecondaryContact,thumb,low,src-alias,Empty callback installed for the secondary collider during Ivy collision setup
 080ED3A0,Ivy_UpdateActiveState,thumb,low,src-alias,State callback consumes the entry flag and configures collision flags and directional animation 14
 080ED3FC,SceneActorReaction_PlayHiddenCue,thumb,low,src-alias,
+080ED480,Ivy_UpdateInactiveState,thumb,low,src-alias,
+080ED484,Ivy_EnterDisabledState,thumb,low,src-alias,
+080ED4E0,Ivy_UpdateGrabAttack,thumb,low,src-alias,
 080ED838,SceneActorReaction_FinishAnimation17,thumb,low,src-alias,
 080ED914,Ivy_UpdateHold,thumb,low,src-alias,
 080EDEA8,Ivy_BeginRelease,thumb,low,src-alias,
 080EE000,SceneActorControl_UpdateAnimationTransition,thumb,low,src-alias,
+080EE148,Ivy_UpdateRestartFlags,thumb,low,src-alias,
 080EE1B0,Ivy_UpdateDefeat,thumb,low,src-alias,
 080EFC2C,Ivy_SetAuxiliaryColliderFlag,thumb,low,src-alias,Sets bit 4 in the auxiliary collider flags at offset 0x18E
 080EFC40,Ivy_UpdateColliderPosition,thumb,low,src-alias,Synchronizes the main collider with the actor position
 080EFC58,SceneActorControl_WaitForTarget,thumb,low,src-alias,
 080EFD60,SceneActorControl_UpdateTargetApproachPhase,thumb,low,src-alias,
+080EFEA0,Ivy_WaitForHold,thumb,low,src-alias,
 080EFF54,Ivy_ClearAnimationRestartFlag,thumb,low,src-alias,Clears the pending animation restart byte at offset 0x2B1
+080EFF6C,Ivy_WaitThenResetPhase,thumb,low,src-alias,
+080EFFC0,Ivy_WaitThenBeginRelease,thumb,low,src-alias,
+080F0064,Ivy_WaitThenResumeActive,thumb,low,src-alias,
+080F0108,Ivy_WaitLimitThenResetPhase,thumb,low,src-alias,
 080F0164,SceneActorControl_HideAndDisableCollision,thumb,low,src-alias,
 080F01E8,Ivy_UpdateIdle,thumb,low,src-alias,
 080F02F4,Ivy_InitControlPresets,thumb,low,src-alias,Installs three control preset pointers during Ivy initialization
 080F0324,SceneActorControl_BeginSoundTransition,thumb,low,src-alias,
 080F03DC,Ivy_ReleaseCapturedPlayer,thumb,low,src-alias,
+080F05B4,Ivy_NotifyGroup,thumb,low,src-alias,
 080F05CC,Ivy_InitProfileId,thumb,low,src-alias,Finds or adds the default actor profile and stores its identifier
 080F05E8,Ivy_TickDrawable,thumb,low,src-alias,
 080F0738,SceneActor_InitCollision5005,thumb,low,src-alias,
@@ -3953,6 +3964,9 @@ addr,name,mode,confidence,source,notes
 080F1E84,ColorPulse_FadeRed,thumb,low,src-alias,
 080F1F08,ColorPulse_FinishRedFade,thumb,low,src-alias,
 080F1FBC,Ivy_WaitForColorRelease,thumb,low,src-alias,Waits for the color hold flag to clear before restoring the transition callback
+080F1FE8,ColorPulse_UnpackColor,thumb,low,src-alias,
+080F2028,Armor_PlacePrimaryCollider,thumb,low,src-alias,
+080F20AC,Armor_UpdateOrbitingColliders,thumb,low,src-alias,
 080F2260,Armor_UpdatePartColliders_080F2260,thumb,low,src-alias,
 080F231C,Ivy_OnDestroy,thumb,low,src-alias,Empty lifecycle callback installed by the Ivy initializer; destruction role tentative
 080F2320,ColorPulse_ApplyContact,thumb,low,src-alias,
@@ -3960,6 +3974,7 @@ addr,name,mode,confidence,source,notes
 080F2480,Ivy_UpdateBobbing,thumb,low,src-alias,Periodically adjusts vertical velocity and reverses acceleration to produce bobbing
 080F24D8,Ivy_UpdateGroundHeight,thumb,low,src-alias,Refreshes cached terrain height at the object position after its initial frames
 080F2508,Ivy_WaitForRetarget,thumb,low,src-alias,Counts down before switching to the callback that samples the target position
+080F2538,Ivy_UpdateAnchorApproach,thumb,low,src-alias,
 080F26B0,Ivy_WaitForPrimaryActionCompletion,thumb,low,src-alias,Advances after the primary action callback reports completion twice
 080F2700,ColorPulse_PrepareTargetDash,thumb,low,src-alias,
 080F2858,ColorPulse_AlignTargetHeading,thumb,low,src-alias,

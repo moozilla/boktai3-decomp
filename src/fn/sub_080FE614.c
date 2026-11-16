@@ -1,8 +1,8 @@
 #include "scene_actor_state.h"
 
-void Axe_PrepareUpdate(void *);
-void Axe_UpdateEffects(void *);
-void Callback_InvokeActor(void *, u32);
+s32 Axe_PrepareUpdate(void *p);
+s32 Axe_UpdateEffects(void *s);
+s32 Callback_InvokeActor(void *, void *);
 void SceneActorControl_DispatchControl(void *);
 
 s32 Axe_OnUpdate(struct ChaseActor *p)

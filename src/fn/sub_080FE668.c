@@ -1,7 +1,7 @@
 #include "global.h"
 
 void Axe_RemoveSecondaryColliders(void);
-void Axe_RemoveAuxiliarySprites(void *);
+void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s);
 void Axe_ReleaseAuxiliarySprite(void *);
 void SceneActorEffects_ReleaseResources(void *);
 

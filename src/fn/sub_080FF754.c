@@ -1,10 +1,10 @@
 #include "global.h"
 
-void *Heap_Alloc(u32);
-void Memory_Clear(void *, u32);
-s32 Axe_Init(u8 *);
+void *Heap_Alloc(s32 size); /* first-fit allocation from gHeapHead; NULL on failure */
+void Memory_Clear(void *dst, s32 bytes); /* zero fill (bytes, then CpuSet words) */
+s32 Axe_Init(void *object);
 s32 Axe_ReleaseResources(void *p);
-void Heap_Free(u8 *);
+void Heap_Free(void *);
 
 void Axe_Create(void)
 {

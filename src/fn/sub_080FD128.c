@@ -5,8 +5,8 @@ void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s);
 struct SceneActorRegistryActor;
 u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
 void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor);
-void Axe_TickCooldowns(void *);
-void sub_080FCDEC(void *);
+void Axe_TickCooldowns(struct S080FB050 *s);
+void sub_080FCDEC(struct ChaseActor *actor);
 
 s32 Axe_UpdateEffects(void *s)
 {

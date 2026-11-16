@@ -8,36 +8,36 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
 
-void Axe_InitProfile(void *);
-void Axe_InitAttackCooldowns(void *);
-void ActorGroup_ReadScriptOptions(void *);
-void Axe_InitEffectPalettes(void *);
-void Axe_InitColliders(void *);
-void Axe_OnUpdate(void);
+void Axe_InitProfile(struct S080FAC14 *s);
+void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor);
+void ActorGroup_ReadScriptOptions(struct ChaseActor *actor);
+void Axe_InitEffectPalettes(struct AxePaletteActor *s);
+void Axe_InitColliders(struct ChaseActor *actor);
+s32 Axe_OnUpdate(struct ChaseActor *p);
 s32 Axe_GetActorCategory(void);
-void Axe_UpdateTurnAnimation(void);
-void Axe_OnAnimationReset(void);
-void sub_080F93A4(void);
-void Axe_ConvergeRecoveryMotion(void);
-void Axe_UpdateDefeat(void);
-s32 SceneActorControl_CanAdvanceHover(void *);
+void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events);
+void Axe_OnAnimationReset(u8 *p);
+void sub_080F93A4(u8 *p);
+void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor);
+void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame);
+s32 SceneActorControl_CanAdvanceHover(struct ChaseActor *actor);
 void SceneActorTarget_ResolvePendingObject(void);
-void SceneActorControl_AdvanceReactionCount(void);
-void SceneActorControl_InitializeHoverState(void);
+s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor);
+void SceneActorControl_InitializeHoverState(struct ChaseActor *actor);
 void Axe_OnReaction(void);
-void Axe_ReleaseAndIdle(void);
-void Axe_UpdateDamageSpin(void);
+void Axe_ReleaseAndIdle(struct ChaseActor *actor);
+void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame);
 void SceneActorBehavior_InitializeShadow(void *);
-void Axe_InitMotionTable(void *);
-void Axe_InitActionCallbacks(void *);
-void Axe_InitEventCallbacks(void *);
-void SpriteGroup_InitAnimatedSprites(void *);
-void Axe_InitRoutePointHistory(void *);
-void ActorCollision_InitThreeAuxiliaryAttacks(void *);
-void Axe_OnRender(void);
+void Axe_InitMotionTable(struct S080FA744 *s);
+void Axe_InitActionCallbacks(u8 *p);
+void Axe_InitEventCallbacks(struct ChaseActor *p);
+void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner);
+void Axe_InitRoutePointHistory(struct S080FB1DC *s);
+void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor);
+s32 Axe_OnRender(struct S080FE64C *s);
 s32 Axe_ReleaseResources(void *p);
 
-void Memory_Clear(void *, u32);
+void Memory_Clear(void *dst, s32 bytes); /* zero fill (bytes, then CpuSet words) */
 void SceneActorReaction_OnEnemyDefault(void);
 u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorReaction_SinkAndRemove(void);
@@ -47,15 +47,15 @@ void SceneActorReaction_BeginTargetRecovery(void);
 void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorPlacement_HideActor(void *, s32);
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 
-void *Heap_Alloc(u32);
+void *Heap_Alloc(s32 size); /* first-fit allocation from gHeapHead; NULL on failure */
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 extern const u8 gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
-void Anim_Step(void *, void *);
+s32 Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
 struct AxeActorInit {

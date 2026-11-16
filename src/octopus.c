@@ -1681,7 +1681,7 @@ void Octopus_ClearStateChangedFlag(struct SClearStateChangedFlag *s)
 }
 
 /* Count frames; after 60, restart the phase (the count still advances).
-   The empty test of the taken flag is what the sibling sub_080F0108 needs
+   The empty test of the taken flag is what the sibling Ivy_WaitLimitThenResetPhase needs
    too: without it cse carries values across and reload picks other
    registers. */
 
@@ -1807,7 +1807,7 @@ static inline void Ivy_ResetPhaseActive(u8 *p)
 }
 
 /* Count frames until the limit at sub + 0x42, then restart the phase
-   (see sub_080F0108 for the empty test of the taken flag). */
+   (see Ivy_WaitLimitThenResetPhase for the empty test of the taken flag). */
 
 void Octopus_WaitLimitThenResetPhase(u8 *p)
 {

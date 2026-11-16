@@ -11,7 +11,7 @@ struct ActorGroupMotionState {
     u8 unknownEBA[6];
     u16 duration;
 };
-void SceneActorControl_TiltRotation(void);
+void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed);
 void ActorPhase_UpdateSpriteCollapse(void);
 void SpriteGroup_SetSharedPosition(struct ChaseActor *, void *, u32);
 static inline u8 TakePending(struct ChaseActor *actor)

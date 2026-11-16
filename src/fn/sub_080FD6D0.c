@@ -13,7 +13,7 @@ struct ActorGroupMotionStateBeginExtendedMotion {
     u8 unknownEC6[10];
     u8 active;
 };
-void Axe_UpdateTrailFadeIn(void);
+void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame);
 void ActorPhase_UpdateSpriteCollapse(void);
 void SpriteGroup_SetSharedPosition(struct ChaseActor *, void *, u32);
 static inline u8 TakePending(struct ChaseActor *actor)

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
-void Axe_UpdateWaitingAnimation(void);
+void Axe_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 void Axe_BeginMoveToPosition(u8 *s, s16 *v);
 static inline u8 TakeFlag(u8 *flag)
 {

@@ -2,7 +2,7 @@
 #include "global.h"
 #include "axe.h"
 #include "scene_actor_reset.h"
-void Axe_UpdateFadeOut(void);
+void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame);
 void ActorPhase_UpdateSpriteCollapse(void);
 void Axe_EmitMotionTrail(struct ChaseActor *actor);
 void SpriteGroup_SetSharedPosition(struct ChaseActor *, void *, u32);
