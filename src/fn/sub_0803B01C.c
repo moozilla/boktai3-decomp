@@ -1,5 +1,4 @@
 #include "monster_particle_random.h"
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "runtime.h"
 #include "engine_globals.h"
@@ -31,7 +30,6 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
         int icon;
         int count;
         u8 *result;
-        u8 **save;
         p->entered = 0;
         {
             u8 *address = &p->result;
@@ -44,41 +42,24 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
                     icon = 31;
             }
         }
-        {
-            u8 **address = &gSessionState;
-            int maximum;
-            asm("" : "+r"(address));
-            count = *(u16 *)(*address + 0x14) + 1;
-            maximum = 9999;
-            asm("" : "+r"(maximum));
-            save = address;
-            asm("" : "+r"(save));
-            if (count > maximum)
-                count = maximum;
-            *(u16 *)(*save + 0x14) = count;
-        }
-        {
-            int resultValue = *result;
-            if (resultValue == 0) {
-                Sound_PlayTrackedSong(0xB0);
-                {
-                    int old = *(u16 *)(*save + 0x16);
-                    count = old + 1;
-                }
-                {
-                    int maximum = 9999;
-                    if (count > maximum)
-                        count = maximum;
-                }
-                {
-                    u8 **address = &gSessionState;
-                    *(u16 *)(*address + 0x16) = count;
-                }
-            } else if (resultValue == 1) {
-                Sound_PlayTrackedSong(0xB1);
-            } else {
-                Sound_PlayTrackedSong(0xB1);
-            }
+        count = *(u16 *)(gSessionState + 0x14) + 1;
+        if (count > 9999)
+            count = 9999;
+        else if (count < 0)
+            count = 0;
+        *(u16 *)(gSessionState + 0x14) = count;
+        if (*result == 0) {
+            Sound_PlayTrackedSong(0xB0);
+            count = *(u16 *)(gSessionState + 0x16) + 1;
+            if (count > 9999)
+                count = 9999;
+            else if (count < 0)
+                count = 0;
+            *(u16 *)(gSessionState + 0x16) = count;
+        } else if (*result == 1) {
+            Sound_PlayTrackedSong(0xB1);
+        } else {
+            Sound_PlayTrackedSong(0xB1);
         }
         drawing = &p->drawing;
         drawing->flags &= ~1;
