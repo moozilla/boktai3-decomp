@@ -1,6 +1,6 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "render.h"
+#include "display_sequence.h"
 
 void CpuSet(const void *src, void *dst, u32 control);
 s32 Widget_InitLinked(void *, void *, u16, u32, u32, u32, u32, const void *);
@@ -40,105 +40,75 @@ struct HudSprite {
 
 static inline void StepHudAnimation(struct HudAnimation *state, struct HudSprite *sprite)
 {
-    const volatile u16 *command;
-    u32 duration;
+    const u16 *command;
     u32 flags;
     {
         u32 offset = state->index << 1;
-        const volatile u16 *table;
-        table = (const volatile u16 *)state->cmds;
-        command = (const volatile u16 *)((u32)table + offset);
+        const u16 *table = (const u16 *)state->cmds;
+        command = (const u16 *)((u32)table + offset);
     }
     sprite->frame = *command >> 6;
     {
-        u32 input = state->flags;
-        register u32 first asm("r1");
-        register u32 bit asm("r3") = 1;
-        first = bit;
-        first &= input;
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 4;
         else
             sprite->flags &= ~4;
     }
     {
-        u32 input = state->flags;
-        register u32 bit asm("r3");
-        register u32 first asm("r1");
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
         bit = 2;
-        first = bit;
-        first &= input;
-        first = (u8)first;
+        first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
             sprite->flags |= 8;
         else
             sprite->flags &= ~8;
     }
-    {
-        u32 elapsed = state->elapsed + 1;
-        register u32 mask asm("r5");
-        register u32 temp asm("r1");
-        register u32 savedDuration asm("r3");
-        state->elapsed = elapsed;
-        temp = 0xFFFF;
-        asm("" : "+r"(temp));
-        mask = temp;
-        duration = state->duration;
-        elapsed = (u16)elapsed;
-        savedDuration = duration;
-        if (elapsed >= duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                u32 index = state->index;
-                if (index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold) {
-                        state->elapsed = savedDuration;
-                    } else {
-                        state->index = state->count - 1;
-                    }
-                } else {
-                    state->index = index - 1;
-                }
-            } else {
-                u32 index = state->index + 1;
-                u32 frameCount;
-                u32 endFlag;
-                state->index = index;
-                frameCount = state->count;
-                if ((index & mask) >= frameCount) {
-                    endFlag = flags & 8;
-                    asm("" : "+r"(endFlag));
-                    endFlag = (u8)endFlag;
-                    if (endFlag) {
-                        state->elapsed = duration;
-                        {
-                            u32 lastIndex = frameCount - 1;
-                            state->index = lastIndex;
-                        }
-                    } else {
-                        state->index = 0;
-                    }
-                }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        flags = state->flags;
+        if (flags & 4) {
+            if (state->index == 0) {
+                u32 hold = 8;
+                hold &= flags;
+                if (hold)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->count - 1;
+            } else
+                state->index--;
+        } else {
+            if (++state->index >= state->count) {
+                u32 hold = 8;
+                hold &= flags;
+                if ((u8)hold) {
+                    state->elapsed = state->duration;
+                    state->index = state->count - 1;
+                } else
+                    state->index = 0;
             }
-            {
-                u32 offset = state->index << 1;
-                const volatile u16 *table;
-                table = (const volatile u16 *)state->cmds;
-                command = (const volatile u16 *)((u32)table + offset);
-            }
-            state->frameWeight = *command & 15;
-            {
-                register s32 weight asm("r1") = state->frameWeight;
-                s32 speed;
-                speed = state->speed;
-                speed = (speed * weight) >> 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
+        }
+        command = (const u16 *)state->cmds + state->index;
+        {
+            u32 value = *command;
+            u32 mask = 15;
+            mask &= value;
+            state->frameWeight = mask;
+        }
+        {
+            s32 weight = state->frameWeight;
+            s32 speed = state->speed;
+            speed *= weight;
+            speed >>= 6;
+            state->duration = speed;
+            if (!(u8)speed)
+                state->duration = 1;
         }
     }
 }
@@ -176,31 +146,15 @@ struct HudLayout {
     u8 unknown4364[0x50];
     u16 palette[16];
 };
-static inline void FillPosition(const void *source, void *dest)
+static inline s32 HudLayout_InitWidget(struct HudLayout *p, s32 index, void *par, u32 id, u32 type,
+                                       u32 a, u32 b, const void *pos)
 {
-    CpuSet(source, dest, 0x05000002);
+    return Widget_InitLinked(&p->widgets[index], par, id, type, a, b, 60, pos);
 }
 
-static inline void InitializeMainWidgets(struct HudLayout *p, struct HudPosition *position,
-                                         u32 initial, u32 options)
+static inline void ClearPosition(u32 value, struct HudPosition *position)
 {
-    u8 *w;
-    u32 empty = initial;
-    u32 defaults = options;
-    WI(&p->widgets[0], (p->resources[0]), 0x51, 0xB0, empty, empty, position);
-    WI(&p->widgets[1], (p->resources[0]), 0x43, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[2], (p->resources[0]), 0x44, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[8], (p->resources[0]), 0x63, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[9], (p->resources[0]), 0x70, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[3], (p->resources[0]), 0x40, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[4], (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[6], (p->resources[0]), 0x4E, 0xB1, defaults, defaults, position);
-    w = (u8 *)&p->widgets[54];
-    WI(w, (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
-    Anim_LoadKeyframe(w, (p->resources[0]), 0x4D, 1);
-    WI(&p->widgets[5], (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[75], (p->resources[0]), 0x7F, 0xB1, defaults, defaults, position);
-    WI(&p->widgets[76], (p->resources[0]), 0x7F, 0xB1, defaults, defaults, position);
+    CpuFill32(value, position, sizeof(*position));
 }
 
 void sub_08176F70(struct HudLayout *p)
@@ -211,14 +165,28 @@ void sub_08176F70(struct HudLayout *p)
     struct HudAnimation *anim;
 
     {
+        u8 *w;
         u32 initial = 0;
         struct HudPosition *position = &v;
-        register u32 options asm("r4") = 0;
-        vu32 fill;
-        asm("" : "+r"(initial), "+r"(options));
-        fill = initial;
-        FillPosition((void *)&fill, position);
-        InitializeMainWidgets(p, position, initial, options);
+        u32 defaults = 0;
+        ClearPosition(initial, position);
+        WI(&p->widgets[0], (p->resources[0]), 0x51, 0xB0, initial, initial, position);
+        // The original writes `initial` again here without reading it; the
+        // write ends the value's use, so the later zeros come from `defaults`.
+        initial = 1;
+        WI(&p->widgets[1], (p->resources[0]), 0x43, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[2], (p->resources[0]), 0x44, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[8], (p->resources[0]), 0x63, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[9], (p->resources[0]), 0x70, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[3], (p->resources[0]), 0x40, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[4], (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[6], (p->resources[0]), 0x4E, 0xB1, defaults, defaults, position);
+        w = (u8 *)&p->widgets[54];
+        WI(w, (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
+        Anim_LoadKeyframe(w, (p->resources[0]), 0x4D, 1);
+        WI(&p->widgets[5], (p->resources[0]), 0x4D, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[75], (p->resources[0]), 0x7F, 0xB1, defaults, defaults, position);
+        WI(&p->widgets[76], (p->resources[0]), 0x7F, 0xB1, defaults, defaults, position);
     }
     for (i = 0; i <= 0x13; i++) {
         WI((&p->widgets[10 + i]), (p->resources[2]), 0x68, 0xB1, 0, 0, &v);
@@ -269,10 +237,6 @@ void sub_08176F70(struct HudLayout *p)
     Anim_SetSequence(anim, p->script, 0, 0, 0);
     StepHudAnimation(anim, &p->sprite);
 
-    {
-        register u32 scratch asm("r8");
-        asm volatile("" : "=l"(scratch) : : "r0", "r2");
-    }
     p->sprite.x = 0;
     p->sprite.y = 0;
     p->sprite.z = 0;
@@ -298,7 +262,7 @@ void sub_08176F70(struct HudLayout *p)
     v.y = 0;
     for (i = 0; i <= 2; i++) {
         v.z = 0;
-        WI((&p->widgets[85 + i]), (p->resources[0]), 0x79, 0x91, 1, 0, &v);
+        HudLayout_InitWidget(p, 85 + i, (p->resources[0]), 0x79, 0x91, 1, 0, &v);
         p->widgets[85 + i].attribute1A = 3;
         v.z -= 8;
         WI((&p->widgets[88 + i]), (p->resources[0]), 0x7A, 0x91, 1, 0, &v);
