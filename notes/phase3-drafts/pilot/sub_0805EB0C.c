@@ -1,5 +1,5 @@
-// Holdout draft (no concessions), 30 rows: playback struct for first-call zeros (as Storage_InitWidgets), zero vars before digit loops, cursor for loop 2.
-// Left: widget/counter r4/r5 swap in both digit loops; cursor = &position should copy the -=11 address reg (ROM mov r8,r1).
+// Holdout draft (no concessions), 19 rows: i counts every loop and each digit loop has its own widget pointer (k const-doubled lost r4).
+// Left: cursor = &position takes gcse's long-lived &position reaching reg (PRE replaces it), the ROM copies the -=11 address reg (mov r8, r1).
 #include "scene_input_panel.h"
 #include "display_sequence_inline.h"
 
@@ -133,10 +133,12 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     position.y = 0;
     Widget_InitLinked(&panel->meterGlyph, &panel->widgetResource, 0x68, 0x30, 0, 0, 60, &position);
     zero = 0;
-    widget = panel->digits;
-    for (k = 7; k >= 0; k--) {
-        Widget_InitLinked(widget, &panel->widgetResource, 0x50, 0x30, zero, zero, 60, &position);
-        widget++;
+    {
+        struct SceneInputWidget *digit = panel->digits;
+        for (i = 7; i >= 0; i--) {
+            Widget_InitLinked(digit, &panel->widgetResource, 0x50, 0x30, zero, zero, 60, &position);
+            digit++;
+        }
     }
     Widget_InitLinked(&panel->numericLabel, &panel->widgetResource, 0xA9, 0x31, 0, 0, 60,
                       &position);
@@ -146,7 +148,7 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
         u32 none;
         widget = panel->smallDigits;
         none = 0;
-        for (k = 3; k >= 0; k--) {
+        for (i = 3; i >= 0; i--) {
             Widget_InitLinked(widget, &panel->widgetResource, 0xAA, 0x31, none, none, 60, &position);
             cursor->x += 6;
             widget++;
