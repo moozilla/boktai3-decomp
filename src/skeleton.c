@@ -220,7 +220,7 @@ void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
 s32 Skeleton_Update(struct Skeleton *actor)
 {
     u32 m;
-    SceneActorReaction_TickHiddenResponse(actor);
+    SceneActorReaction_TickHiddenResponse(&actor->chase);
     m = 0x2000;
     if ((actor->chase.base.motionFlags & m) || actor->chase.base.hitLockTimer == 0) {
         Callback_InvokeActor(actor, actor->chase.base.stateCallbacks[actor->chase.base.state2A8]);
@@ -416,7 +416,7 @@ s32 Skeleton_Init(void *object)
     SceneActorControl_InitBehaviorColliders(actor);
 
     MonsterInit_InstallSequenceCallbacks(
-        actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, sub_080BAE04,
+        actor, Skeleton_Update, SceneActorReaction_SelectTileParameter, Skeleton_TurnTowardRouteFacing,
         Skeleton_UpdateInactiveState, Skeleton_UpdateIdleState,
         TentacleBody_UpdateReactionTransition, Skeleton_ConvergeDisplacedPosition,
         Skeleton_UpdateDefeat, SceneActorReaction_OnEnemyDefault,

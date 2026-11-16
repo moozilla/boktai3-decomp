@@ -3573,6 +3573,8 @@ addr,name,mode,confidence,source,notes
 080B551C,Skeleton_RerouteToTarget,thumb,low,src-alias,
 080B5724,SceneActorControl_RestartBehavior57,thumb,low,src-alias,
 080B57C0,Skeleton_BeginStationaryPursuit,thumb,low,src-alias,
+080B5AA4,Skeleton_HandleVisibilityRequest,thumb,low,src-alias,a hide request sets the hidden flag and resets the flicker timer
+080B5BEC,Skeleton_UpdateVisibilityFlicker,thumb,low,src-alias,shows and hides the actor faster as the timer runs
 080B5D84,SceneActorControl_BeginTimedBehavior56,thumb,low,src-alias,
 080B5E54,SceneActorControl_CanTurnTowardTarget,thumb,low,src-alias,
 080B5F18,Skeleton_UpdateActionCooldown,thumb,low,src-alias,Decrements the extended-state timer at offset 0x704 without underflow
@@ -3581,6 +3583,7 @@ addr,name,mode,confidence,source,notes
 080B61C4,Vorn_SpawnHazard,thumb,low,src-alias,
 080B6210,Skeleton_UpdateFacingColliders,thumb,low,src-alias,
 080B6430,SceneActor_UpdateProfileForCategory,thumb,low,src-alias,
+080B6480,Skeleton_TryEnterIdleRange,thumb,low,src-alias,
 080B6538,SceneActorControl_TryBeginNearbyBehavior16,thumb,low,src-alias,
 080B6618,Skeleton_TryBeginGuardedAttack,thumb,low,src-alias,
 080B6884,Skeleton_TryBeginArmedAttack,thumb,low,src-alias,
@@ -3594,10 +3597,12 @@ addr,name,mode,confidence,source,notes
 080B7350,Skeleton_InitializeCategoryProfile,thumb,low,src-alias,
 080B7580,SceneActorReaction_SetProfileEntries,thumb,low,src-alias,
 080B7688,SceneActorReaction_IsRangeReady,thumb,low,src-alias,
+080B7768,Skeleton_TickActionCooldowns,thumb,low,src-alias,counts four context timers down to zero
 080B77D0,Skeleton_TrySelectRetreatCell,thumb,low,src-alias,
 080B7A90,SceneActorTarget_ResolvePendingObjectSkeleton,thumb,low,src-alias,
 080B7BB4,SceneActorScript_ReadPParameters,thumb,low,src-alias,
 080B7C10,Skeleton_SelectDistanceReaction,thumb,low,src-alias,
+080B8A58,Skeleton_SelectRandomBehavior,thumb,low,src-alias,
 080B8AB8,SceneActorScript_ReadCallScriptConfig,thumb,low,src-alias,
 080B8B38,SceneActorScript_TriggerCallOnCount,thumb,low,src-alias,
 080B8B84,SceneActorReaction_TrySink,thumb,low,src-alias,
@@ -3610,17 +3615,21 @@ addr,name,mode,confidence,source,notes
 080B9104,Skeleton_UpdateInactiveState,thumb,low,src-alias,Inactive-state callback that consumes the state-entry flag; role tentative
 080B911C,Skeleton_UpdateScriptWaitState,thumb,low,src-alias,Callback installed by a scripted control handler that only consumes the entry flag; role tentative
 080B9134,Skeleton_UpdateIdleState,thumb,low,src-alias,Consumes the entry flag and selects directional animation zero; idle interpretation tentative
+080B9158,Skeleton_UpdateHopToOpenCell,thumb,low,src-alias,"hops to an open neighboring cell, or arrives when none is open"
 080BA010,SceneActorReaction_TickContactAnimation,thumb,low,src-alias,
 080BA0EC,SceneActorReaction_ApplyThreshold,thumb,low,src-alias,
 080BA13C,SceneActorReaction_TickQueuedContact,thumb,low,src-alias,
+080BA268,Skeleton_ShedBones,thumb,low,src-alias,emits two bone fragments and switches to category 5
 080BA578,Skeleton_UpdateAttackRecovery,thumb,low,src-alias,Plays animation 23 then switches to the timed idle callback on restart; attack recovery tentative
 080BA600,Skeleton_UpdateAttackWindup,thumb,low,src-alias,Plays animation 19 then switches to the animation 20 attack callback; windup interpretation tentative
 080BA688,SceneActorReaction_TickForwardBurst,thumb,low,src-alias,
 080BA7E4,Skeleton_TickDecayingLunge,thumb,low,src-alias,
 080BA9A0,Skeleton_UpdateAlternateAttackRecovery,thumb,low,src-alias,Plays animation 22 then returns to the timed idle callback; alternate recovery tentative
 080BAA28,SceneActorReaction_TickMultiHitAnimation,thumb,low,src-alias,
+080BAAF4,Skeleton_BeginHomingBurst,thumb,low,src-alias,after frame 20 installs the homing burst control
 080BAB80,Skeleton_UpdateHomingBurst,thumb,low,src-alias,
 080BAD7C,Skeleton_UpdateHeavyAttackRecovery,thumb,low,src-alias,Plays animation 21 then returns to the timed idle callback; heavy attack interpretation tentative
+080BAE04,Skeleton_TurnTowardRouteFacing,thumb,low,src-alias,turns toward the route octant with the profile's animation
 080BB4DC,Skeleton_UpdateDownedState,thumb,low,src-alias,Plays animation eight and emits periodic feedback before entering recovery when the timer expires; downed interpretation tentative
 080BB5AC,Skeleton_UpdateRevivalState,thumb,low,src-alias,Plays animation seven and changes flags at frame 40 before completing after frame 120; revival interpretation tentative
 080BB61C,Skeleton_BeginKnockedFlight,thumb,low,src-alias,
@@ -3655,6 +3664,8 @@ addr,name,mode,confidence,source,notes
 080C44E4,Actor_StepTowardTargetAxis,thumb,low,src-alias,
 080C4660,SceneActorTerrain_CompareNeighborHeight,thumb,low,src-alias,
 080C4768,Skeleton_StepPosition,thumb,low,src-alias,
+080C47B8,Golem_CenterPositionInCell,thumb,low,src-alias,"sets each axis's low byte to 0x80, the middle of its cell"
+080C47DC,Golem_AlignChargeTarget,thumb,low,src-alias,snaps the target to the cell center on the longer axis and faces it by quadrant
 080C49BC,SceneActorControl_RefreshMotionRoute,thumb,low,src-alias,
 080C4A9C,Golem_RestoreRoute,thumb,low,src-alias,
 080C4CFC,SceneActorRoute_CommitReachableDestination,thumb,low,src-alias,
@@ -3674,6 +3685,7 @@ addr,name,mode,confidence,source,notes
 080C58DC,Golem_OnBodyCollision,thumb,low,src-alias,Body collision callback that forwards to the shared actor collision handler
 080C58E8,Golem_UpdateIdleState,thumb,low,src-alias,Consumes the state-entry flag and selects directional animation one; idle interpretation tentative
 080C590C,Golem_UpdateIdle,thumb,low,src-alias,Idle callback clears the entry flag and selects directional animation zero
+080C5930,Golem_TurnTowardRouteFacing,thumb,low,src-alias,"turns toward the route point's octant, then restores the waiting control"
 080C5F60,Golem_UpdateRevivalReturn,thumb,low,src-alias,
 080C6010,Golem_UpdateRevival,thumb,low,src-alias,Tentative revival callback restores saved actor state and health after reenabling the shadow
 080C61AC,Golem_UpdateDying,thumb,low,src-alias,Tentative dying callback plays animation six and transitions to the death callback
@@ -3689,6 +3701,7 @@ addr,name,mode,confidence,source,notes
 080C75B8,Golem_UpdateRecoil,thumb,low,src-alias,
 080C79A8,SceneActorReaction_SlideBack,thumb,low,src-alias,
 080C7C1C,Golem_ResumeSavedTarget,thumb,low,src-alias,
+080C7E18,Golem_UpdateReactionRecovery,thumb,low,src-alias,"after the reaction animation, arrive or return home after a delay"
 080C8774,Golem_ResumeBehaviorAfterDisplacement,thumb,low,src-alias,
 080C9844,Golem_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Golem_Init
 080C9848,Golem_UpdateDefeat,thumb,low,src-alias,

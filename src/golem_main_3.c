@@ -1,5 +1,5 @@
-#include "scene_body_api.h"
 #include "global.h"
+#include "scene_body_api.h"
 #include "golem.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -9,28 +9,106 @@
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_init_graphics.h"
 
-void *Heap_Alloc(u32);
-void Memory_Clear(void *, u32);
+extern const u8 gUnk_0860613C[];
+
+struct S {
+    u8 filler[652];
+    const u8 *p;
+};
+
+void Golem_InitSpecialActionHandlers(struct S *s)
+{
+    s->p = gUnk_0860613C;
+}
+
+void Golem_TickFacingQuadrant(void *);
+
+s32 Callback_InvokeActor(void *, void *);
+
+void SceneActorControl_DispatchControl(void *);
+
+void Golem_UpdateEffectsAndContacts(void *);
+
+struct SOnUpdate {
+    u8 filler[0x27c];
+    u32 *tbl;
+    u8 filler2[0x2a8 - 0x280];
+    u8 idx;
+    u8 filler3[0x2b8 - 0x2a9];
+    u16 h2b8;
+    u8 filler4[0x2d4 - 0x2ba];
+    u16 flags;
+};
+
+s32 Golem_OnUpdate(struct SOnUpdate *s)
+{
+    u32 m;
+    Golem_TickFacingQuadrant(s);
+    m = 0x2000;
+    if ((s->flags & m) || s->h2b8 == 0) {
+        Callback_InvokeActor(s, s->tbl[s->idx]);
+        SceneActorControl_DispatchControl(s);
+    }
+    Golem_UpdateEffectsAndContacts(s);
+    return 1;
+}
+
+void SceneActor_UpdateBehaviorCallbacks(void);
+
+s32 Golem_OnSharedActorUpdate(void)
+{
+    SceneActor_UpdateBehaviorCallbacks();
+    return 0;
+}
+
+void SceneActorEffects_ReleaseResources(void);
+
+s32 Golem_OnDestroy(u8 *unused)
+{
+    SceneActorEffects_ReleaseResources();
+    return 0;
+}
+
+void *Heap_Alloc(s32 size); /* first-fit allocation from gHeapHead; NULL on failure */
+
+void Memory_Clear(void *dst, s32 bytes); /* zero fill (bytes, then CpuSet words) */
+
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
+
 void SceneActorReaction_SetMotionMode(void);
+
 u32 SceneActorReaction_OnEnemyDefault(void);
+
 void SceneActorReaction_ResolvePlacementDamage(void);
+
 void SceneActorScript_OnCommand(void *actor, const u16 *command);
+
 u32 Route_GetCurrentPointFacing(void *);
+
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
+
 void AnimData_SelectPaletteBank(void *, s32);
+
 void SceneActorPlacement_HideActor(void *, s32);
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void Anim_Step(void *, void *);
+
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
+
+s32 Anim_Step(void *, void *);
+
 void SceneActorBehavior_InstallCallbackTables(void *);
+
 void SceneActorTerrain_ReadScriptParameters(void *);
+
 u8 SceneActorRegistry_LinkActor(void *);
 
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
+
 u8 SceneActorTarget_UpdateTrackedContact(void *);
+
 void SceneActorPlacement_ResetStateThree(void);
+
 void SceneActorReaction_BeginTargetRecovery(void);
 
 static inline void GolemInit_ResetFlags(void *object)
@@ -125,28 +203,50 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
 }
 
 void Golem_InitAnimationProfile(void *);
+
 void Golem_InitColliders(void *);
+
 void Golem_InitActionHandlers(void *);
-void Golem_InitSpecialActionHandlers(void *);
-s32 Golem_OnUpdate(void *);
+
+void Golem_InitSpecialActionHandlers(struct S *s);
+
+s32 Golem_OnUpdate(struct SOnUpdate *s);
+
 u16 Skeleton_LookupAnimationEntry(void *);
-void sub_080C5930(void *);
+
+void Golem_TurnTowardRouteFacing(void *);
+
 void Golem_UpdateIdleState(void *);
+
 void Golem_UpdateIdle(void *);
+
 void Golem_ResumeBehaviorAfterDisplacement(void *);
+
 void Golem_UpdateDefeat(void *);
+
 void Golem_UpdateRevivalReturn(void *);
+
 void SceneActorTarget_ResolvePendingObject(void);
+
 void Golem_UpdateDying(void);
+
 void Golem_ResumeSavedTarget(void);
+
 void Golem_OnUnusedState(void);
+
 void Golem_ResetCombatState(void);
+
 void SceneActorControl_RefreshMotionRoute(void);
+
 u8 Golem_UpdateHitReaction(void *);
+
 void Golem_ClearControlFlag(void);
+
 void Golem_RestoreRoute(void);
-void Golem_OnSharedActorUpdate(void);
-void Golem_OnDestroy(void);
+
+s32 Golem_OnSharedActorUpdate(void);
+
+s32 Golem_OnDestroy(u8 *);
 
 static inline void GolemInit_EnableInitialFlags(struct Golem *actor)
 {
@@ -159,6 +259,7 @@ static inline struct Golem *GolemInit_Context(struct Golem *actor)
 {
     return actor->chase.base.context;
 }
+
 static inline void GolemInit_InitializeReceiver(struct Golem *actor)
 {
     MonsterInit_ClearReceiver(&actor->chase);
@@ -214,7 +315,7 @@ s32 Golem_Init(void *object)
     GolemInit_InitializePaletteRange(actor, 2, 0);
     Golem_InitColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
-        &actor->chase, Golem_OnUpdate, Skeleton_LookupAnimationEntry, sub_080C5930,
+        &actor->chase, Golem_OnUpdate, Skeleton_LookupAnimationEntry, Golem_TurnTowardRouteFacing,
         Golem_UpdateIdleState, Golem_UpdateIdle, Golem_UpdateRevivalReturn,
         Golem_ResumeBehaviorAfterDisplacement, Golem_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
@@ -277,4 +378,20 @@ s32 Golem_Init(void *object)
     if (!SceneActorRegistry_LinkActor(actor))
         return -1;
     return 0;
+}
+
+s32 Golem_Init(void *object);
+
+void Heap_Free(void *);
+
+void Golem_Create(void)
+{
+    u8 *p = Heap_Alloc(0x6b0);
+    if (p != 0) {
+        Memory_Clear(p, 0x6b0);
+        if (Golem_Init(p) < 0) {
+            Golem_OnDestroy(p);
+            Heap_Free(p);
+        }
+    }
 }
