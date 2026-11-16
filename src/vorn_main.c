@@ -1699,13 +1699,13 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E230, 0x29a);
         return;
     }
-    if (MotionFlags(actor, 0x100))
+    if (MotionFlags(&actor->chase, 0x100))
         return;
     group = (u8 *)&actor->chase.group.common;
     if (TestContext_BeginTargetPursuit(actor->chase.base.context, 0x1d)) {
         actor->chase.base.field2C2 = 32;
         if (TestContext_BeginTargetPursuit(actor->chase.base.context, 4) &&
-            MotionFlags(actor, 0x80)) {
+            MotionFlags(&actor->chase, 0x80)) {
             actor->chase.group.common.gate.counter += 300;
             if (actor->chase.group.common.gate.counter > actor->chase.group.common.gate.duration)
                 actor->chase.group.common.gate.counter = actor->chase.group.common.gate.duration;
@@ -1721,7 +1721,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         actor->chase.base.counter2AC = 0;
         actor->chase.base.field2B1 = 1;
     }
-    SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    SetControl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 mask = 16;
         u32 *p = &actor->chase.base.behaviorFlags;
@@ -2112,15 +2112,15 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
     *((u16 *)(((u8 *)context) + 0x6ec)) = 60;
     if (reset == 1)
         StartRoute(&actor->chase.base.body.id, group + 0x74, group);
-    Vorn_SelectRouteAwayFromTarget(actor);
+    Vorn_SelectRouteAwayFromTarget(&actor->chase);
     {
         u32 *field = &actor->chase.base.behaviorFlags;
         s32 mask = ~16;
         *field &= mask;
     }
-    SetState(actor, 15);
-    SetControl(actor, actor->chase.base.onStanding, 0);
-    SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
+    SetState(&actor->chase, 15);
+    SetControl(&actor->chase, actor->chase.base.onStanding, 0);
+    SetMotion(&actor->chase, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;
         u16 *field = &actor->chase.group.common.gate.flags;

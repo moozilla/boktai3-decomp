@@ -404,7 +404,7 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
     if (reset == 1)
         SceneBody_StartRoute(&a->chase.base.body.id, &group->homeRoute,
                              group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0, 0);
-    Vorn_SelectRouteAwayFromTarget(a);
+    Vorn_SelectRouteAwayFromTarget(&a->chase);
     {
         u32 mask = 4;
         a->chase.base.statusFlags = mask | a->chase.base.statusFlags;
@@ -688,12 +688,12 @@ void Vorn_ResumeRouteAfterReaction(void *object)
         Vorn_Resume(actor, group, flags);
         Vorn_ClearRouteBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 6);
         SceneActorChase_ClearWordFlags(flags, 4);
-        Vorn_SendMessage(actor);
+        Vorn_SendMessage(&actor->chase);
     } else if (Vorn_TestBody(body, 16)) {
         Vorn_Resume(actor, group, flags);
         Vorn_ClearRouteBits(&((struct Vorn *)actor->chase.base.context)->flags6D4, 0x70);
         SceneActorChase_ClearWordFlags(flags, 4);
-        Vorn_SendMessage(actor);
+        Vorn_SendMessage(&actor->chase);
     }
 }
 
@@ -765,7 +765,7 @@ u8 SceneActor_DispatchContextAction(struct Vorn *q, u32 reset)
             Vorn_SelectRecoveryAction(p, gUnk_0824E230, 0x61F);
             return 1;
         }
-        Vorn_SelectRetreatRoute(p, reset);
+        Vorn_SelectRetreatRoute(&p->chase, reset);
         return 1;
     }
     return 0;

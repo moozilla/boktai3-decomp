@@ -1275,7 +1275,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
     s32 result;
     u16 *flagsPointer;
     for (; count <= 3; count++) {
-        cell = SceneActor_FindDirectionalCell(actor, direction);
+        cell = SceneActor_FindDirectionalCell(&actor->chase, direction);
         direction = (direction + 1) & 3;
         if (cell != actor->chase.base.terrainCell)
             break;
