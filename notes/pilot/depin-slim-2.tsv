@@ -39,3 +39,7 @@
 08071E00	SceneActorPalette_BeginTransition	clean	45	switch on category, indexed destination, delta-then-base order, and an activeFlag variable set before the loop so the hoisted 0x2000 is rematerialized like the ROM.
 08048E0C	TetherActor_BlendPalette	clean	40	u8 component variables add pre-combine zero_extend insns inside the loop, lengthening every loop-spanning live range so weight (short range) outranks the doubled-life componentMask constant.
 08115674	Collectible_UpdateEntry	clean	20	Reading the hit byte through an inline u8 getter adds a pre-combine extension, so hit is born one insn later and outranks the flags pointer in global-alloc order.
+08108C94	sub_08108C94	open	150	notes/phase3-drafts/pilot/sub_08108C94_t2.c is at 6 diffs and MATCHES with only AGBCC_NOTIE=207; the remaining cause is regmove tying the 0xFFC0 AND to the dying peer load (README lists the regmove conditions that skip it); sub_08108C94.c (n1) is at 4 diffs.
+08072D34	SceneActorContacts_ReleaseInvalidOwners	open	90	notes/phase3-drafts/pilot draft at 8 diffs; AGBCC_FORCE of valid to r1 matches; needs valid allocated after node with the &= form, or a u16 clear form that gcse PRE replaces.
+081D3620	sub_081D3620	open	60	notes/phase3-drafts/pilot draft at 12 diffs; local-alloc ranks the coordinate chain above the sample chain by post-combine refs, so filler does not help; needs a different statement shape.
+08071F50	SceneActorPalette_ApplyTransition	open	60	notes/phase3-drafts/pilot draft at 28 diffs, all stack-slot order (gcse PRE pseudo order).
