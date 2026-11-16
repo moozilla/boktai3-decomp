@@ -2,7 +2,6 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
-// MATCHING_CONCESSION: register-pinning
 // confidence=low: integrates group particles and bounces them against terrain.
 #define ParticleGroup_UpdateBouncing sub_0801404C
 struct Vec {
@@ -82,8 +81,11 @@ void ParticleGroup_UpdateBouncing(struct Manager *m, struct Group *g)
     alive = 0;
     i = 0;
     if (i < g->count) {
-        u16 *table = gRandomTable;
-        asm("" : "+r"(table));
+        union ParticleRandomTableSource source;
+        const u16 *table;
+        source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+        source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+        table = ParticleRandom_GetTable(&source);
         p = g->particles;
         sprite = (u8 *)g + 20;
         do {
