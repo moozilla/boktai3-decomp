@@ -3655,6 +3655,8 @@ addr,name,mode,confidence,source,notes
 080C44E4,Actor_StepTowardTargetAxis,thumb,low,src-alias,
 080C4660,SceneActorTerrain_CompareNeighborHeight,thumb,low,src-alias,
 080C4768,Skeleton_StepPosition,thumb,low,src-alias,
+080C47B8,Golem_CenterPositionInCell,thumb,low,src-alias,"sets each axis's low byte to 0x80, the middle of its cell"
+080C47DC,Golem_AlignChargeTarget,thumb,low,src-alias,snaps the target to the cell center on the longer axis and faces it by quadrant
 080C49BC,SceneActorControl_RefreshMotionRoute,thumb,low,src-alias,
 080C4A9C,Golem_RestoreRoute,thumb,low,src-alias,
 080C4CFC,SceneActorRoute_CommitReachableDestination,thumb,low,src-alias,
@@ -3674,6 +3676,7 @@ addr,name,mode,confidence,source,notes
 080C58DC,Golem_OnBodyCollision,thumb,low,src-alias,Body collision callback that forwards to the shared actor collision handler
 080C58E8,Golem_UpdateIdleState,thumb,low,src-alias,Consumes the state-entry flag and selects directional animation one; idle interpretation tentative
 080C590C,Golem_UpdateIdle,thumb,low,src-alias,Idle callback clears the entry flag and selects directional animation zero
+080C5930,Golem_TurnTowardRouteFacing,thumb,low,src-alias,"turns toward the route point's octant, then restores the waiting control"
 080C5F60,Golem_UpdateRevivalReturn,thumb,low,src-alias,
 080C6010,Golem_UpdateRevival,thumb,low,src-alias,Tentative revival callback restores saved actor state and health after reenabling the shadow
 080C61AC,Golem_UpdateDying,thumb,low,src-alias,Tentative dying callback plays animation six and transitions to the death callback
@@ -3689,6 +3692,7 @@ addr,name,mode,confidence,source,notes
 080C75B8,Golem_UpdateRecoil,thumb,low,src-alias,
 080C79A8,SceneActorReaction_SlideBack,thumb,low,src-alias,
 080C7C1C,Golem_ResumeSavedTarget,thumb,low,src-alias,
+080C7E18,Golem_UpdateReactionRecovery,thumb,low,src-alias,"after the reaction animation, arrive or return home after a delay"
 080C8774,Golem_ResumeBehaviorAfterDisplacement,thumb,low,src-alias,
 080C9844,Golem_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Golem_Init
 080C9848,Golem_UpdateDefeat,thumb,low,src-alias,

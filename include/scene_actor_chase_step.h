@@ -30,12 +30,10 @@ static inline u8 SceneActorChase_CoordinateFraction(s16 coordinate)
         return 0;                                                                                  \
     return SceneActorChase_MapRowStart(SceneActorChase_CurrentMap(), z) + x;
 
-#if SCENE_ACTOR_CHASE_SCALAR_CELLS
 static inline s32 SceneActorChase_CellIndex(s32 x, s32 z)
 {
     SCENE_ACTOR_CHASE_CELL_LOOKUP
 }
-#endif
 
 static inline s32 SceneActorChase_CellAt(struct ContactPosition *position)
 {
