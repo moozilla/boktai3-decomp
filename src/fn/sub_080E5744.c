@@ -61,7 +61,7 @@ static inline void DogInit_Reset(void *object)
 {
     struct Dog *context = object;
     context->flags = 0;
-    context->field6A6 = 0;
+    context->state6A6 = 0;
 }
 
 static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
@@ -125,7 +125,7 @@ s32 Dog_Init(void *object)
     if (!dog->interval)
         dog->interval = 50;
     dog->destinationCell = 0xFFFF;
-    dog->field6A4 = 0;
+    dog->timer6A4 = 0;
 
     MonsterInit_ReadPalette(actor, 0x273, 0x192);
     SceneActorCollision_InitGateColliders(actor);

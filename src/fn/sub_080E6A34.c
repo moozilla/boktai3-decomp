@@ -11,7 +11,7 @@ void SceneActor_StartFlaggedAnimationPhase(struct Dog *actor)
         context = actor->chase.base.context;
         {
             u16 mask = 1;
-            struct ChaseFlags40 *flags = (void *)&context->animationFlags65C;
+            struct ChaseFlags40 *flags = (void *)&context->collider.reactionFlags;
             flags->bits |= mask;
         }
         Chase_SetCtl(&actor->chase, SceneActor_WaitForCategoryAttachment, 0x25);

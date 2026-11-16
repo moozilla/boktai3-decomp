@@ -1,19 +1,11 @@
+#include "dog.h"
 #include "scene_actor_chase.h"
 #include "rotation_phase.h"
 // confidence=low: chooses response 0x75/0x82/0x87 from target range, heading, and action timers.
-struct DogAwareness {
-    u8 unknown0[0x678];
-    u32 flags;
-    u32 nearRange;
-    u32 farRange;
-    u8 unknown684[0x14];
-    u16 nearTimer;
-    u16 farTimer;
-};
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
 void Dog_SelectRetreatOrChase(void *);
-static inline u8 Dog_HasAwarenessFlag(struct DogAwareness *context, u32 mask)
+static inline u8 Dog_HasAwarenessFlag(struct Dog *context, u32 mask)
 {
     u32 value = context->flags;
     if (value & mask)
@@ -32,7 +24,7 @@ static inline void Response(struct ChaseActor *actor, u8 *nav, u32 behavior, u32
 }
 void Dog_SelectTargetAction(struct ChaseActor *actor)
 {
-    struct DogAwareness *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     u8 *nav = (u8 *)&actor->group.common;
     if (ActorFlag(actor, 0x100))
         return;
@@ -51,7 +43,7 @@ void Dog_SelectTargetAction(struct ChaseActor *actor)
         if (angle <= 23) {
             u32 mode = FIELD(actor, 0x1E6, u16);
             if (mode == 0 || mode == 2) {
-                if (actor->base.tracking.distance < context->nearRange && !context->nearTimer) {
+                if (actor->base.tracking.distance < context->speed && !context->nearTimer) {
                     Response(actor, nav, 0, 0x75);
                     return;
                 }
@@ -60,11 +52,11 @@ void Dog_SelectTargetAction(struct ChaseActor *actor)
                     return;
                 goto move;
             } else {
-                if (actor->base.tracking.distance < context->nearRange && !context->nearTimer) {
+                if (actor->base.tracking.distance < context->speed && !context->nearTimer) {
                     Response(actor, nav, 0, 0x82);
                     return;
                 }
-                if (actor->base.tracking.distance < context->farRange && angle <= 5 &&
+                if (actor->base.tracking.distance < context->alternateSpeed && angle <= 5 &&
                     !context->farTimer) {
                     Response(actor, nav, 1, 0x87);
                     return;

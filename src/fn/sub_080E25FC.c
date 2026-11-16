@@ -1,22 +1,16 @@
 #define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
 #include "global.h"
+#include "dog.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
 u8 Dog_IsActionTimerExpired(struct ChaseActor *);
 s32 sub_080DEF78(struct ChaseActor *, u32);
 
-struct DogReactionFields {
-    u8 unknown0[0x678];
-    u32 flags;
-    u8 unknown67C[0x2C];
-    u8 turnDelay;
-};
-
 /* The reaction fields overlap the canonical actor's species storage. */
 union DogReactionContext {
     struct ChaseActor base;
-    struct DogReactionFields reaction;
+    struct Dog reaction;
 };
 
 static inline s32 Dog_HeadingOctant(s32 angle)
