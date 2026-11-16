@@ -37,3 +37,4 @@
 08069FA4	SparkParticle_UpdatePool	clean	35	An indexed for loop over the 48 particles gives the ROM's two strength-reduced pointers, hoisted bit constants and reversed counter, and a separate state pointer keeps gcse from merging the flag reloads; all 11 pins and barriers removed.
 080718D8	SceneActorRegistry_RestoreActorDefaults	clean	60	Plain field assignments; the third ResetResponseState argument is a function-scope local so reload rematerializes it at the call (AGBCC_NOREG on the precomputed pseudo confirmed it).
 08071E00	SceneActorPalette_BeginTransition	clean	45	switch on category, indexed destination, delta-then-base order, and an activeFlag variable set before the loop so the hoisted 0x2000 is rematerialized like the ROM.
+08048E0C	TetherActor_BlendPalette	clean	40	u8 component variables add pre-combine zero_extend insns inside the loop, lengthening every loop-spanning live range so weight (short range) outranks the doubled-life componentMask constant.

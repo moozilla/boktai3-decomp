@@ -1,13 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
 #include "stacked_actor.h"
 #include "engine_globals.h"
+#include "engine_map.h"
 #include "player.h"
-struct ActorMapView {
-    u8 unknown0[4];
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rowOffsets[1];
-};
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
 u8 *TerrainModifiers_FindCellOverride(u32, u32);
@@ -25,70 +19,56 @@ void StackedActor_Appear(struct StackedActor *);
 void StackedActor_WaitForPlayerRelease(struct StackedActor *);
 s32 TetherActor_BeginKindFourStateTen(void);
 void TetherActor_SetPosition(struct StackedActorPosition *);
+static inline void StackedActorSprite_SetFrame(struct StackedActorSprite *sprite, u32 frame)
+{
+    sprite->frame = frame;
+}
 s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
 {
-    struct InitCache {
-        s32 tag;
-        void *graphics;
-        struct StackedActorPosition *world;
-        struct StackedActorSprite *segments;
-        void *receiver;
-        u16 *proximity;
-    } cache;
-    register u16 *baseFrame asm("r10");
-    u32 present;
     u32 mode;
-
-    cache.tag = tag;
-    present = Script_SeekToKeyword('p');
-    if (present) {
+    s32 i;
+    u8 *graphics;
+    if (Script_SeekToKeyword('p')) {
+        u32 cell;
+        u32 height, surface;
+        u8 *properties;
+        struct StackedActorPosition *point;
         s32 x, z;
-        s32 index;
-        register struct StackedActorPosition *world asm("r4");
-        register s16 *worldY asm("r5");
-        u8 *cell;
-        u32 type;
-        s32 y;
-        u32 value = Script_GetValue();
-        world = &actor->world;
-        world->x = value;
-        value = Script_GetValue();
-        worldY = &actor->world.y;
-        *worldY = value;
+        actor->world.x = Script_GetValue();
+        actor->world.y = Script_GetValue();
         actor->world.z = Script_GetValue();
-        x = world->x >> 8;
-        z = world->z >> 8;
-        cache.world = world;
+        point = &actor->world;
+        x = point->x >> 8;
+        z = point->z >> 8;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-            index = 0;
+            cell = 0;
         else {
-            u32 row = ((struct ActorMapView *)gTerrainMap)->rowOffsets[z];
-            index = row + x;
+            u32 row = gTerrainMap->rows[z];
+            cell = row + x;
         }
-        cell = TerrainModifiers_FindCellOverride(index, 1);
-        if (cell)
-            cell += 4;
+        properties = TerrainModifiers_FindCellOverride(cell, 1);
+        if (properties)
+            properties += 4;
         else {
-            struct ActorMapView *map = ((struct ActorMapView *)gTerrainMap);
-            u32 offset = index * 4 + 12;
-            cell = map->cells + offset;
+            struct EngineMap *map = gTerrainMap;
+            u32 offset = cell * 4 + 12;
+            properties = map->cells + offset;
         }
-        type = *cell >> 4;
-        y = (*cell & 15) << 8;
-        switch (type) {
+        surface = *properties >> 4;
+        height = (*properties & 15) << 8;
+        switch (surface) {
             case 1:
-                y -= (u8)world->z;
+                height -= (u8)point->z;
                 break;
             case 2:
-                y -= (u8)world->x;
+                height -= (u8)point->x;
                 break;
         }
-        *worldY = y;
+        actor->world.y = height;
     } else {
-        actor->world.x = present;
-        actor->world.y = present;
-        actor->world.z = present;
-        cache.world = &actor->world;
+        actor->world.x = 0;
+        actor->world.y = 0;
+        actor->world.z = 0;
     }
     if (Script_SeekToKeyword('C'))
         actor->pendingScriptId = Script_GetValue();
@@ -110,7 +90,6 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         actor->baseFrame = Script_GetValue();
     else
         actor->baseFrame = 6;
-    baseFrame = &actor->baseFrame;
     if (Script_SeekToKeyword('a'))
         actor->interactionEnabled = Script_GetValue();
     else
@@ -123,249 +102,96 @@ s32 StackedActor_Initialize(struct StackedActor *actor, s32 tag, s32 unused)
         mode = Script_GetValue();
     else
         mode = 3;
+    actor->paletteBase = (actor->baseFrame >> 1) * 3 + 160;
+    AnimData_Load(actor->graphics, 0xBA8);
     {
-        register u16 *source asm("r1") = baseFrame;
-        actor->paletteBase = (*source >> 1) * 3 + 160;
+        struct StackedActorSprite *sprite = &actor->sprite;
+        Sprite_Init(sprite, actor->graphics, 0);
+        sprite->frame = actor->baseFrame;
     }
+    AnimData_SelectPaletteBank(actor->graphics, actor->paletteBase);
+    actor->sprite.flags |= 0x200;
+    actor->sprite.renderMode = mode;
+    actor->sprite.position = actor->world;
+    AnimData_Load(actor->shadowGraphics, 0xBA8);
     {
-        void *graphics = actor->graphics;
-        u16 *tiles = &actor->paletteBase;
-        struct StackedActorSprite *sprite;
-        void *shadowGraphics;
-        struct StackedActorSprite *shadow;
-        register struct StackedActorPosition *shadowPosition asm("r2");
-        AnimData_Load(graphics, 0xBA8);
-        sprite = &actor->sprite;
-        Sprite_Init(sprite, graphics, 0);
-        {
-            register u16 *source asm("r1") = baseFrame;
-            sprite->frame = *source;
-        }
-        AnimData_SelectPaletteBank(graphics, *tiles);
-        actor->sprite.flags |= 0x200;
-        {
-            u8 *destination = &actor->sprite.renderMode;
-            register u32 renderMode asm("r2") = mode;
-            *destination = renderMode;
-        }
-        {
-            register struct StackedActorPosition *source asm("r3") = cache.world;
-            actor->sprite.position = *source;
-        }
-        shadowGraphics = actor->shadowGraphics;
-        AnimData_Load(shadowGraphics, 0xBA8);
-        shadow = &actor->shadow;
-        Sprite_Init(shadow, shadowGraphics, 0);
-        {
-            register u16 *source asm("r1") = baseFrame;
-            shadow->frame = *source;
-        }
-        AnimData_SelectPaletteBank(shadowGraphics, *tiles);
-        shadow->flags |= 0x400;
-        {
-            u8 *destination = &actor->shadow.renderMode;
-            register u32 renderMode asm("r2") = mode;
-            *destination = renderMode;
-        }
-        shadowPosition = &actor->shadow.position;
-        {
-            register struct StackedActorPosition *source asm("r3") = cache.world;
-            *shadowPosition = *source;
-        }
-        {
-            s32 i = 0;
-            s32 count;
-            register u32 one asm("r5");
-            struct StackedActorSprite *savedShadow;
-            u8 *segmentGraphics;
-            cache.graphics = graphics;
-            savedShadow = shadow;
-            cache.segments = (void *)((u8 *)shadowPosition + 0x2C);
-            {
-                register void *receiver asm("r3") = actor->trigger;
-                u16 *state;
-                cache.receiver = receiver;
-                state = &actor->proximityState;
-                cache.proximity = state;
+        struct StackedActorSprite *shadow = &actor->shadow;
+        Sprite_Init(shadow, actor->shadowGraphics, 0);
+        shadow->frame = actor->baseFrame;
+    }
+    AnimData_SelectPaletteBank(actor->shadowGraphics, actor->paletteBase);
+    actor->shadow.flags |= 0x400;
+    actor->shadow.renderMode = mode;
+    actor->shadow.position = actor->world;
+    i = 0;
+    graphics = actor->graphics;
+    do {
+        AnimData_Load(actor->segmentGraphics[i], 0xBA8);
+        Sprite_Init(&actor->segments[i], actor->segmentGraphics[i], 0);
+        StackedActorSprite_SetFrame(&actor->segments[i], (actor->baseFrame & 1) + 16);
+        AnimData_SelectPaletteBank(actor->segmentGraphics[i], actor->paletteBase + 2);
+        actor->segments[i].flags |= 0x201;
+        actor->segments[i].renderMode = 1;
+        actor->segments[i].position = actor->world;
+    } while (++i < 3);
+    StackedActor_InitParticles(actor);
+    SceneMessages_RegisterReceiver(actor->trigger, tag, 10);
+    if (Script_SeekToKeyword('D')) {
+        actor->proximityState = 0;
+        actor->animationPhase = 0;
+        actor->interactionDelay = 0;
+        actor->lift = 0;
+        StackedActor_SetUpdate(actor, StackedActor_TickDisabled);
+    } else {
+        s32 active = 0;
+        s32 appear;
+        if (Script_SeekToKeyword('f'))
+            active = Script_GetValue();
+        appear = 0;
+        if (Script_SeekToKeyword('s'))
+            appear = Script_GetValue();
+        if (active) {
+            s32 tether;
+            Sound_PlaySong(0x160);
+            actor->unknown380 = 1;
+            ScriptUtility_SetControlFlag(0);
+            Player_SetPositionAndSave(*(u8 **)gPlayers, &actor->world);
+            PlayerCue_Hide(*(u8 **)gPlayers);
+            actor->sprite.flags &= ~1;
+            AnimData_SelectPaletteBank(graphics, actor->paletteBase + 2);
+            actor->shadow.flags |= 1;
+            actor->height = 7;
+            StackedActor_UpdateSegments(actor);
+            actor->animationPhase = 8;
+            actor->proximityState = 1;
+            actor->interactionDelay = 10;
+            actor->lift = 24;
+            actor->removeAfterUse = appear;
+            StackedActor_SetUpdate(actor, StackedActor_WaitForPlayerRelease);
+            tether = 0;
+            if (Script_SeekToKeyword('w'))
+                tether = Script_GetValue();
+            if (tether) {
+                if (!TetherActor_BeginKindFourStateTen())
+                    return 0;
+                TetherActor_SetPosition(&actor->world);
             }
-            {
-                register u32 offset asm("r1") = 0x16C;
-                asm("" : : "r"(offset));
-                segmentGraphics = (void *)((u8 *)actor + offset);
-            }
-            do {
-                register u32 offset asm("r4");
-                struct StackedActorSprite *current;
-                AnimData_Load(segmentGraphics, 0xBA8);
-                {
-                    u32 stride = sizeof(struct StackedActorSprite);
-                    offset = i;
-                    offset *= stride;
-                }
-                {
-                    u32 currentOffset = offset;
-                    currentOffset += 0xE8;
-                    current = (void *)((u8 *)actor + currentOffset);
-                }
-                Sprite_Init(current, segmentGraphics, 0);
-                {
-                    register u16 *source asm("r2") = baseFrame;
-                    u32 frame = *source;
-                    register u32 selected asm("r1");
-                    one = 1;
-                    selected = one;
-                    selected &= frame;
-                    current = (void *)(offset + (u32)actor + 0xE8);
-                    selected += 16;
-                    current->frame = selected;
-                }
-                {
-                    register u32 tileOffset asm("r3") = 0x1C4;
-                    register u16 *tiles asm("r0");
-                    asm("" : : "r"(tileOffset));
-                    tiles = (void *)((u8 *)actor + tileOffset);
-                    AnimData_SelectPaletteBank(segmentGraphics, *tiles + 2);
-                }
-                {
-                    register struct StackedActorSprite *base asm("r0") = cache.segments;
-                    register u32 *flags asm("r2") = (void *)((u8 *)base + offset);
-                    *flags |= 0x201;
-                }
-                {
-                    u8 *relative = (u8 *)actor + offset;
-                    u8 *destination = relative + 0xEF;
-                    register u32 renderMode asm("r2") = 1;
-                    *destination = renderMode;
-                    {
-                        u32 offset = 0x104;
-                        struct StackedActorPosition *destination;
-                        register struct StackedActorPosition *source asm("r3");
-                        destination = (void *)(relative + offset);
-                        source = cache.world;
-                        *destination = *source;
-                    }
-                }
-                segmentGraphics += 0x1C;
-                {
-                    u32 step = 1;
-                    i += step;
-                }
-                count = i;
-            } while (count <= 2);
-            StackedActor_InitParticles(actor);
-            SceneMessages_RegisterReceiver(cache.receiver, cache.tag, 10);
-            if (Script_SeekToKeyword('D')) {
-                register u32 zeroByte asm("r2") = 0;
-                u32 zeroHalf = 0;
-                register u16 *state asm("r3") = cache.proximity;
-                *state = zeroHalf;
-                actor->animationPhase = zeroHalf;
-                actor->interactionDelay = zeroHalf;
-                actor->lift = zeroByte;
-                StackedActor_SetUpdate(actor, StackedActor_TickDisabled);
-            } else {
-                s32 active = 0;
-                s32 appear;
-                if (Script_SeekToKeyword('f'))
-                    active = Script_GetValue();
-                appear = 0;
-                if (Script_SeekToKeyword('s'))
-                    appear = Script_GetValue();
-                if (active) {
-                    s32 tether;
-                    Sound_PlaySong(0x160);
-                    actor->unknown380 = one;
-                    ScriptUtility_SetControlFlag(0);
-                    Player_SetPositionAndSave((*(u8 **)gPlayers), cache.world);
-                    PlayerCue_Hide((*(u8 **)gPlayers));
-                    actor->sprite.flags &= ~1;
-                    {
-                        u32 tile = actor->paletteBase + 2;
-                        AnimData_SelectPaletteBank(cache.graphics, tile);
-                    }
-                    {
-                        struct StackedActorSprite *target = savedShadow;
-                        target->flags |= one;
-                    }
-                    {
-                        u32 offset = 0x1C0;
-                        u16 *destination;
-                        destination = (void *)((u8 *)actor + offset);
-                        *destination = 7;
-                    }
-                    StackedActor_UpdateSegments(actor);
-                    {
-                        u32 offset = 0x1C6;
-                        u16 *destination;
-                        destination = (void *)((u8 *)actor + offset);
-                        *destination = 8;
-                    }
-                    *cache.proximity = one;
-                    {
-                        register u32 offset asm("r2") = 0x36A;
-                        register u16 *destination asm("r1");
-                        asm("" : : "r"(offset));
-                        destination = (void *)((u8 *)actor + offset);
-                        *destination = 10;
-                    }
-                    {
-                        register u32 offset asm("r3") = 0x368;
-                        register u8 *destination asm("r1");
-                        asm("" : : "r"(offset));
-                        destination = (void *)((u8 *)actor + offset);
-                        *destination = 24;
-                    }
-                    actor->removeAfterUse = appear;
-                    StackedActor_SetUpdate(actor, StackedActor_WaitForPlayerRelease);
-                    tether = 0;
-                    if (Script_SeekToKeyword('w'))
-                        tether = Script_GetValue();
-                    if (tether) {
-                        if (!TetherActor_BeginKindFourStateTen())
-                            return 0;
-                        TetherActor_SetPosition(cache.world);
-                    }
-                } else {
-                    {
-                        register u32 zeroByte asm("r0") = 0;
-                        register u16 *state asm("r2") = cache.proximity;
-                        *state = active;
-                        {
-                            register u32 offset asm("r3") = 0x1C6;
-                            register u16 *destination asm("r1");
-                            asm("" : : "r"(offset));
-                            destination = (void *)((u8 *)actor + offset);
-                            *destination = active;
-                        }
-                        {
-                            u32 offset = 0x36A;
-                            u16 *destination;
-                            destination = (void *)((u8 *)actor + offset);
-                            *destination = active;
-                        }
-                        {
-                            u32 offset = 0x368;
-                            u8 *destination;
-                            destination = (void *)((u8 *)actor + offset);
-                            *destination = zeroByte;
-                        }
-                    }
-                    if (appear) {
-                        Sound_PlaySong(0x15E);
-                        actor->sprite.flags |= 2;
-                        {
-                            struct StackedActorSprite *target = savedShadow;
-                            target->flags |= 2;
-                        }
-                        actor->sprite.scaleX = one;
-                        actor->sprite.scaleY = one;
-                        actor->shadow.scaleX = one;
-                        actor->shadow.scaleY = one;
-                        StackedActor_SetUpdate(actor, StackedActor_Appear);
-                    } else
-                        StackedActor_SetUpdate(actor, StackedActor_TickIdle);
-                }
-            }
+        } else {
+            actor->proximityState = 0;
+            actor->animationPhase = 0;
+            actor->interactionDelay = 0;
+            actor->lift = 0;
+            if (appear) {
+                Sound_PlaySong(0x15E);
+                actor->sprite.flags |= 2;
+                actor->shadow.flags |= 2;
+                actor->sprite.scaleX = 1;
+                actor->sprite.scaleY = 1;
+                actor->shadow.scaleX = 1;
+                actor->shadow.scaleY = 1;
+                StackedActor_SetUpdate(actor, StackedActor_Appear);
+            } else
+                StackedActor_SetUpdate(actor, StackedActor_TickIdle);
         }
     }
     gStackedActor = actor;

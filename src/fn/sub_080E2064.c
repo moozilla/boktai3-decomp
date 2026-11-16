@@ -9,7 +9,7 @@ struct SceneActorTargetMotionContext {
     u8 unknown690[0x17];
     u8 phase;
 };
-s32 sub_080DEF78(struct ChaseActor *, u32);
+s32 Dog_SelectRetreatDirection(struct ChaseActor *, u32);
 static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
@@ -58,7 +58,7 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
                 s32 mask = -5;
                 *flags &= mask;
                 if (c->phase <= 3) {
-                    if ((u8)sub_080DEF78(a, a->base.body.direction))
+                    if ((u8)Dog_SelectRetreatDirection(a, a->base.body.direction))
                         SetPhase(a, 17);
                 } else {
                     SetPhase(a, 19);

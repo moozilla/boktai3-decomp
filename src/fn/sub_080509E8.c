@@ -1,6 +1,5 @@
 #include "render.h"
 #include "orbit_background.h"
-// MATCHING_CONCESSION: register-pinning
 static inline s32 scale(s32 value)
 {
     if (value >= 0)
@@ -35,12 +34,10 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
         }
     } else {
         if (gPlayers[background->playerIndex]->cameraOffsetActive) {
-            register u32 angle asm("r0");
             if (gPlayers[background->playerIndex]->tetherMode == 4)
-                angle = ((u16)gGameState->unk85E + 128) & 255;
+                background->angle = (gGameState->unk85E + 128) & 255;
             else
-                angle = (u16)gGameState->unk85E;
-            background->angle = angle;
+                background->angle = gGameState->unk85E;
             if (background->blendFrame <= 6) {
                 s32 weight, denominator;
                 background->blendFrame++;
@@ -62,11 +59,11 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                 finalZ = (u16)gPlayers[background->playerIndex]->cameraTarget.z;
             }
         } else {
-            register struct GameState **gameAddress asm("r2") = &gGameState;
-            s32 source = (*gameAddress)->unk85E;
+            s32 source = gGameState->unk85E;
             s32 angle = background->angle;
-            register s32 difference asm("r1");
+            s32 difference;
             s32 reverse;
+            s32 step;
             {
                 s32 adjusted = angle - 256;
                 difference = (source - adjusted) & 255;
@@ -74,73 +71,59 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
             reverse = 128 - difference;
             if (absolute(reverse) <= 16) {
                 if (difference != 128) {
-                    register s32 next asm("r0");
                     if (difference <= 127) {
-                        register s32 shifted asm("r0") = reverse >> 2;
-                        register s32 step asm("r1");
-                        step = shifted + 1;
-                        next = angle + step;
+                        step = (reverse >> 2) + 1;
+                        background->angle = (angle + step) & 255;
                     } else {
-                        next = difference - 128;
+                        s32 next = difference - 128;
                         next >>= 2;
                         next = angle - next;
                         next += 255;
+                        background->angle = next & 255;
                     }
-                    next &= 255;
-                    background->angle = next;
                 }
                 {
                     s32 radius = (background->radius * 3 - 300) >> 2;
                     background->radius = radius;
                     if ((s16)radius < 0) {
                         background->radius = -radius;
-                        background->angle = (*gameAddress)->unk85E;
+                        background->angle = gGameState->unk85E;
                     }
                 }
             } else {
                 if (difference) {
-                    register s32 next asm("r0");
                     if (difference <= 127) {
-                        register s32 shifted asm("r0") = difference >> 2;
-                        register s32 step asm("r1");
-                        step = shifted + 1;
-                        next = angle + step;
+                        step = (difference >> 2) + 1;
+                        background->angle = (angle + step) & 255;
                     } else {
                         s32 full = 256;
-                        s32 step = full - difference;
+                        s32 next;
+                        step = full - difference;
                         step >>= 2;
                         step += 1;
                         next = angle + full;
                         next -= step;
+                        background->angle = next & 255;
                     }
-                    next &= 255;
-                    background->angle = next;
                 }
                 if (background->radius <= 299)
                     background->radius = (background->radius * 3 + 300) >> 2;
             }
             {
-                u16 loadedFrame = background->blendFrame;
-                u32 frame;
-                asm("" : "+r"(loadedFrame));
-                frame = loadedFrame;
-                if (frame > 1) {
+                if (background->blendFrame > 1) {
                     s32 denominator;
                     background->target.x =
                         (u16)gPlayers[background->playerIndex]->position.x +
                         scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
                     {
                         struct Player *player = gPlayers[background->playerIndex];
-                        background->target.y =
-                            (((128 - player->visualSlowdownTimer) * 150) >> 7) + (u16)player->position.y;
+                        background->target.y = (((128 - player->visualSlowdownTimer) * 150) >> 7) +
+                                               (u16)player->position.y;
                     }
                     background->target.z =
                         (u16)gPlayers[background->playerIndex]->position.z +
                         scale(gUnk_086149C4[background->angle & 255] * background->radius);
-                    {
-                        u32 nextFrame = frame - 1;
-                        background->blendFrame = nextFrame;
-                    }
+                    background->blendFrame--;
                     denominator = background->blendFrame + 1;
                     background->position.x =
                         Div(background->position.x * background->blendFrame + background->target.x,
@@ -159,7 +142,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                     {
                         struct Player *player = gPlayers[background->playerIndex];
                         background->position.y =
-                            (((128 - player->visualSlowdownTimer) * 150) >> 7) + (u16)player->position.y;
+                            (((128 - player->visualSlowdownTimer) * 150) >> 7) +
+                            (u16)player->position.y;
                     }
                     finalZ = (u16)gPlayers[background->playerIndex]->position.z +
                              scale(gUnk_086149C4[background->angle & 255] * background->radius);
