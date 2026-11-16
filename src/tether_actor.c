@@ -2363,10 +2363,6 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-/* Matching adaptation: pinned offset arithmetic and word copies preserve address lifetimes. */
-
 void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
 {
     struct ContactPosition *position;
@@ -2374,7 +2370,6 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
     u32 oldSlope;
     u32 oldHeight;
     u32 oldAttributes;
-    u32 offset;
     if (!actor->statusFlags && actor->state != 5) {
         s32 cell;
         u8 *properties;
@@ -2395,41 +2390,19 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         actor->position.y = height;
     }
     {
-        struct DisplayPosition **slot = &actor->display.animation.position;
-        struct ContactPosition *display = (struct ContactPosition *)*slot;
-        u16 value;
-        u32 coordinate;
+        struct ContactPosition *display =
+            (struct ContactPosition *)actor->display.animation.position;
         position = &actor->position;
-        offset = 0x37E;
-        value = (u16)actor->shakeX;
-        coordinate = (u16)position->x;
-        display->x = value + coordinate;
-        {
-            struct ContactPosition *worldDisplay = (struct ContactPosition *)*slot;
-            {
-                u16 *axis = (u16 *)&actor->position.y;
-                offset += 2;
-                value = (u16)actor->displayOffsetY;
-                coordinate = *axis;
-                worldDisplay->y = value + coordinate;
-            }
-            worldDisplay = (struct ContactPosition *)*slot;
-            {
-                u16 *axis = (u16 *)&actor->position.z;
-                value = (u16)actor->shakeZ;
-                {
-                    u32 z = *axis;
-                    worldDisplay->z = value + z;
-                }
-            }
-        }
-        offset = 0x130;
-        Collider_SetPosition(&actor->chargeCollider, position, 0);
+        display->x = position->x + actor->shakeX;
     }
+    ((struct ContactPosition *)actor->display.animation.position)->y =
+        actor->position.y + actor->displayOffsetY;
+    ((struct ContactPosition *)actor->display.animation.position)->z =
+        actor->position.z + actor->shakeZ;
+    Collider_SetPosition(&actor->chargeCollider, position, 0);
     oldCell = actor->movementProbeStorage.cell;
     oldSlope = actor->movementProbeStorage.slope;
     oldHeight = actor->movementProbeStorage.height;
-    offset -= 2;
     oldAttributes = actor->movementProbeStorage.attributes;
     if (actor->kind == 9) {
         if (!actor->movementProbe) {
@@ -2439,78 +2412,32 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         Obj_StepPosition(&actor->bodyConfig);
     } else {
         u8 *properties;
-        u32 currentCell;
-        u32 index = cellIndex_0804AF80(position->x >> 8, position->z >> 8);
+        u32 cell;
+        actor->movementProbeStorage.cell = cellIndex_0804AF80(position->x >> 8, position->z >> 8);
+        cell = actor->movementProbeStorage.cell;
         {
-            u16 *field = &actor->movementProbeStorage.cell;
-            *field = index;
-            currentCell = *field;
-        }
-        {
-            u8 *raw = TerrainModifiers_FindCellOverride(currentCell, 1);
+            u8 *raw = TerrainModifiers_FindCellOverride(cell, 1);
             if (raw)
                 properties = raw + 4;
             else {
                 struct EngineMap *map = gTerrainMap;
-                u32 offset = currentCell * 4 + 12;
+                u32 offset = cell * 4 + 12;
                 properties = map->cells + offset;
             }
         }
         actor->movementProbeStorage.slope = *properties >> 4;
-        {
-            u32 byte = *properties;
-            u32 height = 15;
-            register u32 heightOffset asm("r4");
-            height &= byte;
-            heightOffset = 0x129;
-            actor->movementProbeStorage.height = height;
-            asm("" : : "r"(heightOffset));
-        }
+        actor->movementProbeStorage.height = *properties & 15;
         actor->movementProbeStorage.attributes = *(u16 *)(properties + 2);
     }
     actor->movementProbeStorage.previousCell = oldCell;
-    {
-        register u32 slopeOffset asm("r3") = 0x12A;
-        u8 *destination = (u8 *)actor + slopeOffset;
-        register u32 sample asm("r4") = oldSlope;
-        *destination = sample;
-        {
-            u32 heightOffset = 0x128;
-            register u32 height asm("r2");
-            destination = &actor->movementProbeStorage.previousHeight;
-            height = oldHeight;
-            *destination = height;
-        }
-        slopeOffset += 2;
-        destination = (u8 *)actor + slopeOffset;
-        sample = oldAttributes;
-        *(u16 *)destination = sample;
-    }
+    actor->movementProbeStorage.previousSlope = oldSlope;
+    actor->movementProbeStorage.previousHeight = oldHeight;
+    actor->movementProbeStorage.previousAttributes = oldAttributes;
     if (actor->kind == 9)
         TetherActor_HandleFlaggedCell(actor);
     TetherActor_UpdateSampledPosition(actor);
-    {
-        register u32 offset asm("r0") = 0x3F0;
-        struct DisplayPosition *target;
-        register u32 first asm("r0");
-        u32 second;
-        asm("" : "+r"(offset));
-        target = (struct DisplayPosition *)((u8 *)actor + offset);
-        first = ((const struct DisplayPosition *)&actor->position)->words[0];
-        second = ((const struct DisplayPosition *)&actor->position)->words[1];
-        target->words[0] = first;
-        target->words[1] = second;
-    }
-    {
-        register u32 headingOffset asm("r1") = 0x260;
-        u32 heading;
-        asm("" : "+r"(headingOffset));
-        {
-            register u8 *headingAddress asm("r0") = (u8 *)actor + headingOffset;
-            heading = *headingAddress;
-        }
-        actor->targetPosition.pad = heading;
-    }
+    actor->targetPosition = actor->position;
+    actor->targetPosition.pad = actor->heading;
 }
 
 u32 TetherActor_TestTerrainTransition(struct TetherActor *actor)
@@ -2711,8 +2638,6 @@ void TetherActor_UpdateIdleState(struct TetherActor *p)
         }
     }
 }
-
-// MATCHING_CONCESSION: register-pinning
 
 void TetherActor_BlockPlayerAcrossTerrain(struct TetherActor *actor)
 {
