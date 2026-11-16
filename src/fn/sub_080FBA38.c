@@ -46,7 +46,7 @@ static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
     u8 scaleY = src->scaleY;
     *(u8 *)(dest + 0x711) = scaleY;
 }
-void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
+void Axe_EmitMotionTrail(struct ChaseActor *actor)
 {
     struct AxeTrailContext *trail = actor->base.context;
     u8 *context = (void *)trail;

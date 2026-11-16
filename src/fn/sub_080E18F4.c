@@ -6,7 +6,7 @@ struct SceneActorTimedAttackContext {
     struct ContactCollider collider;
 };
 void FeatherEffectPool_CreateDirectional(struct ContactPosition *, u32, u32, u32);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -14,8 +14,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryResetView *a,
-                                                    u32 frame)
+void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 frame)
 {
     struct SceneActorTimedAttackContext *context = a->base.context;
     if (TakePrepared(a)) {

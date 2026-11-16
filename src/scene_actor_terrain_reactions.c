@@ -9,7 +9,7 @@
 void SceneActorRegistry_ApplyTerrainReactions(void)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-    struct SceneActorRegistryResetView *actor;
+    struct ChaseActor *actor;
     struct ContactPosition center, delta;
 
     if (!node)

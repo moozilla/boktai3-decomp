@@ -31,7 +31,7 @@ struct RecoveryContextView {
     u8 unknown0[0x3D0];
     u32 controlAddress;
 };
-static inline struct SceneActorControlState *LocalState(struct SceneActorRegistryResetView *a)
+static inline struct SceneActorControlState *LocalState(struct ChaseActor *a)
 {
     return (struct SceneActorControlState *)((struct RecoveryContextView *)a)->controlAddress;
 }
@@ -65,15 +65,15 @@ static inline void SetMotion(struct SceneActorReactionMotion *motion, u32 mask)
     value |= motion->flags;
     motion->flags = value;
 }
-static inline u32 Flag16(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 Flag16(struct ChaseActor *p, u32 mask)
 {
     return p->base.flags2D4 & mask;
 }
-static inline u32 Flag32(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 Flag32(struct ChaseActor *p, u32 mask)
 {
     return p->base.flags2D0 & mask;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a) {
         if (Flag16(a, 0x40) || Flag32(a, 0x20000) || a->base.health <= 0)
@@ -81,8 +81,7 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *callback, u32 kind,
-                           u32 zero)
+static inline void Control(struct ChaseActor *a, void *callback, u32 kind, u32 zero)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = zero;
@@ -96,7 +95,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *callback
     }
     a->base.word104 = zero;
 }
-static inline void PhaseStart(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior)
+static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = phase;
@@ -104,12 +103,11 @@ static inline void PhaseStart(struct SceneActorRegistryResetView *a, u32 phase, 
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-static inline void SetStatus(struct SceneActorRegistryResetView *a, u32 mask)
+static inline void SetStatus(struct ChaseActor *a, u32 mask)
 {
     a->base.flags2D4 = mask | a->base.flags2D4;
 }
-static inline void Phase(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior,
-                         u32 counter)
+static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 counter)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = phase;
@@ -131,13 +129,13 @@ static inline void Fill(u32 *zero, void *dst)
 
 void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView *source,
                                             struct SceneActorBehaviorContactView *inputHit,
-                                            struct SceneActorRegistryResetView *input)
+                                            struct ChaseActor *input)
 {
     union {
         struct SceneActorBehaviorContactView *collider;
         u32 amount;
     } contact;
-    struct SceneActorRegistryResetView *a;
+    struct ChaseActor *a;
     u32 zero;
     struct SceneActorReactionMotion *motion;
     contact.collider = inputHit;

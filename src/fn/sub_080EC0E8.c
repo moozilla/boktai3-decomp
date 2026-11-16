@@ -9,9 +9,8 @@ struct IvyTargetRef {
     struct ContactPosition position;
 };
 
-struct IvyTargetRef *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *);
-struct SceneActorRegistryResetView *
-SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
+struct IvyTargetRef *SceneActorTarget_FindNearbyPlayer(struct ChaseActor *);
+struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
 
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
@@ -23,8 +22,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 /* Row stride of the current terrain map, in cells. */
 #define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
 
-static inline struct IvyTargetRef *Keep(struct SceneActorRegistryResetView *actor,
-                                        struct IvyTargetRef *target)
+static inline struct IvyTargetRef *Keep(struct ChaseActor *actor, struct IvyTargetRef *target)
 {
     actor->base.tracking.target = (u32)target;
     return target;
@@ -41,11 +39,10 @@ static inline u32 CellIndex(const struct ContactPosition *position)
  * category actor on the same level within the distance limit; it must stand on the terrain
  * cell next to the actor (mode 1: any side, turning to face it; otherwise the side it faces).
  * Stores the result at +0xDC. */
-struct IvyTargetRef *
-SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *actor, s32 mode)
+struct IvyTargetRef *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
 {
     s32 best = actor->base.tracking.limit;
-    struct SceneActorRegistryResetView *other;
+    struct ChaseActor *other;
     struct IvyTargetRef *target = SceneActorTarget_FindNearbyPlayer(actor);
     struct ContactPosition delta;
     u32 cell;

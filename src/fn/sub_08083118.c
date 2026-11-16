@@ -1,6 +1,6 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain_reaction.h"
-void SceneActorControl_BeginSavedHeadingPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_BeginSavedHeadingPhase(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeStateEntry(actor))
         actor->base.body.direction = actor->base.tracking.heading;

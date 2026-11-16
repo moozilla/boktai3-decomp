@@ -46,7 +46,7 @@ struct SlimeCollisionVector {
     struct SlimePackedPair xy, zw;
 };
 
-static inline u8 Slime_TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 Slime_TakePrepared(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -56,53 +56,53 @@ static inline u8 Slime_TakePrepared(struct SceneActorRegistryResetView *actor)
 }
 void SceneActorControl_OnIdle(u8 *);
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
-                        struct SceneActorRegistryResetView *actor);
+                        struct ChaseActor *actor);
 void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
-                              struct SceneActorRegistryResetView *actor);
-void Slime_ResetAnimation(struct SceneActorRegistryResetView *actor);
-void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor);
-void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor);
-void Slime_StartRandomWait(struct SceneActorRegistryResetView *actor);
-void Slime_UpdateReturnToIdle(struct SceneActorRegistryResetView *actor);
-void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor);
-void Slime_PlayWaitAnimation(struct SceneActorRegistryResetView *actor);
-void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor);
-void Slime_UpdateWalkTransition(struct SceneActorRegistryResetView *p);
+                              struct ChaseActor *actor);
+void Slime_ResetAnimation(struct ChaseActor *actor);
+void Slime_StartWalkChoice(struct ChaseActor *actor);
+void Slime_RollMoveFlag(struct ChaseActor *actor);
+void Slime_StartRandomWait(struct ChaseActor *actor);
+void Slime_UpdateReturnToIdle(struct ChaseActor *actor);
+void Slime_UpdateRandomWait(struct ChaseActor *actor);
+void Slime_PlayWaitAnimation(struct ChaseActor *actor);
+void Slime_TickWaitTimer(struct ChaseActor *actor);
+void Slime_UpdateWalkTransition(struct ChaseActor *p);
 void Slime_OnUnusedControlEvent(void);
-void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor);
-void Slime_UpdateShake(struct SceneActorRegistryResetView *actor, s32 elapsed);
-void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor);
-void Slime_UpdateStill(struct SceneActorRegistryResetView *actor);
-void Bat_RunDefeatScript(struct SceneActorRegistryResetView *actor, s32 frame);
-void Bat_UpdateActionScript(struct SceneActorRegistryResetView *obj);
-void Slime_SetSecondaryStateTable(struct SceneActorRegistryResetView *actor);
-void Slime_ApproachSavedTarget(struct SceneActorRegistryResetView *actor);
-void Slime_RestoreSavedTarget(struct SceneActorRegistryResetView *actor);
-void Slime_RunUpdateThenWait(struct SceneActorRegistryResetView *actor);
-void Slime_SetPrimaryStateTable(struct SceneActorRegistryResetView *actor);
-void Slime_InitColliders(struct SceneActorRegistryResetView *actor);
-void Slime_ResetIdlePlayback(struct SceneActorRegistryResetView *actor);
+void Slime_ConvergeReactionMotion(struct ChaseActor *actor);
+void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed);
+void Slime_UpdateLaunch(struct ChaseActor *actor);
+void Slime_UpdateStill(struct ChaseActor *actor);
+void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame);
+void Bat_UpdateActionScript(struct ChaseActor *obj);
+void Slime_SetSecondaryStateTable(struct ChaseActor *actor);
+void Slime_ApproachSavedTarget(struct ChaseActor *actor);
+void Slime_RestoreSavedTarget(struct ChaseActor *actor);
+void Slime_RunUpdateThenWait(struct ChaseActor *actor);
+void Slime_SetPrimaryStateTable(struct ChaseActor *actor);
+void Slime_InitColliders(struct ChaseActor *actor);
+void Slime_ResetIdlePlayback(struct ChaseActor *actor);
 void Slime_OnUnusedEvent(void);
-void Slime_InitProfile(struct SceneActorRegistryResetView *actor);
-s32 Slime_GetAnimationMovePulse(struct SceneActorRegistryResetView *actor);
-void Slime_SelectWanderTarget(struct SceneActorRegistryResetView *actor, u32 direction);
-u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor);
-void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor);
-void Slime_OnInterrupt(struct SceneActorRegistryResetView *actor);
-void Bat_ReadScriptValuePair(struct SceneActorRegistryResetView *actor);
-void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor);
-u32 Slime_GetRandomVariantFlags(struct SceneActorRegistryResetView *actor);
-void Slime_EmitDeathDebris(struct SceneActorRegistryResetView *actor);
-void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input);
-void Slime_EmitScatteredReactionBurst(struct SceneActorRegistryResetView *input);
-void Slime_PlayPendingSound(struct SceneActorRegistryResetView *actor);
+void Slime_InitProfile(struct ChaseActor *actor);
+s32 Slime_GetAnimationMovePulse(struct ChaseActor *actor);
+void Slime_SelectWanderTarget(struct ChaseActor *actor, u32 direction);
+u32 Slime_TryEnrage(struct ChaseActor *actor);
+void Slime_FollowPlayer(struct ChaseActor *actor);
+void Slime_OnInterrupt(struct ChaseActor *actor);
+void Bat_ReadScriptValuePair(struct ChaseActor *actor);
+void Slime_RunPendingActionScript(struct ChaseActor *actor);
+u32 Slime_GetRandomVariantFlags(struct ChaseActor *actor);
+void Slime_EmitDeathDebris(struct ChaseActor *actor);
+void Slime_EmitTargetedReactionBurst(struct ChaseActor *input);
+void Slime_EmitScatteredReactionBurst(struct ChaseActor *input);
+void Slime_PlayPendingSound(struct ChaseActor *actor);
 void SceneActorMotion_ArmPrimaryCollider(struct SceneActorMotionView *actor);
-u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor);
-u32 Slime_ProcessPendingStateChange(struct SceneActorRegistryResetView *actor);
+u32 Slime_ResolveDamageReaction(struct ChaseActor *actor);
+u32 Slime_ProcessPendingStateChange(struct ChaseActor *actor);
 s32 SceneActorMotion_RefreshGroundHeight(struct Slime *slime);
-u32 Slime_Update(struct SceneActorRegistryResetView *actor);
-u32 Slime_OnMessage(struct SceneActorRegistryResetView *actor);
-u32 Slime_Destroy(struct SceneActorRegistryResetView *actor);
+u32 Slime_Update(struct ChaseActor *actor);
+u32 Slime_OnMessage(struct ChaseActor *actor);
+u32 Slime_Destroy(struct ChaseActor *actor);
 s32 Slime_Init(void *object);
 void Slime_Create(void);
 

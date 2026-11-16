@@ -117,7 +117,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
                 clearMask = ~1;
                 *field &= clearMask;
             }
-            ((struct SceneActorRegistryResetView *)early)->base.word104 = zero;
+            ((struct ChaseActor *)early)->base.word104 = zero;
             {
                 register u32 state asm("r12") = 3;
                 offset = 0x2A8;

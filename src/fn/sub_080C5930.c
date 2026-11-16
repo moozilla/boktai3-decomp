@@ -19,7 +19,7 @@ static inline s32 GolemTurn_Half(s32 value)
 }
 
 /* Turn toward the route-facing octant, then restore the waiting controller. */
-void sub_080C5930(struct SceneActorRegistryResetView *a)
+void sub_080C5930(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;
     struct SceneActorBody *motion = &a->base.body;

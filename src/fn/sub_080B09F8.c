@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_control_phase.h"
-void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *);
-void Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *, u32);
-void SceneActorPhase_UpdateCooldown(struct SceneActorRegistryResetView *p)
+void SceneActor_UpdateTargetedAttack(struct ChaseActor *);
+void Vorn_SelectRetreatRoute(struct ChaseActor *, u32);
+void SceneActorPhase_UpdateCooldown(struct ChaseActor *p)
 {
     struct SceneActorAnimationLink *link = p->base.context;
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {

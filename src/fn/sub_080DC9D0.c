@@ -13,7 +13,7 @@ struct MummyCheckpointContext {
     s16 flags6F2 : 16;
 };
 
-static inline void Mummy_ClearMotion(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Mummy_ClearMotion(struct ChaseActor *actor, u32 bits)
 {
     struct ChaseFlags40 *field = (void *)&actor->base.flags2D4;
     s32 mask = ~bits;
@@ -24,7 +24,7 @@ static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 ma
     flags->bits &= mask;
 }
 
-void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
+void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     struct MummyCheckpointContext *body = actor->base.context;

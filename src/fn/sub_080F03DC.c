@@ -30,7 +30,7 @@ static inline u8 TestFlags(struct IvyContext *context, u32 maskInput)
     return 0;
 }
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -47,7 +47,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 state = s;
     actor->base.state2A8 = state;
@@ -75,7 +75,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
 /* Ivy release (tentative): once per capture (context flag 1), and when context flag 2 says the
  * player is held, puts the player back on the centre of the actor's terrain cell facing the
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
-void Ivy_ReleaseCapturedPlayer(struct SceneActorRegistryResetView *actor)
+void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
 {
     if (TestFlags(actor->base.context, 1))
         return;

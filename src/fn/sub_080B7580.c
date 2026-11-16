@@ -6,7 +6,7 @@ static inline void SetEntry(u32 value, struct SceneActorProfileEntry *p)
     p->value = value;
     p->flags = value >> 8;
 }
-void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SetProfileEntries(struct ChaseActor *actor)
 {
     s32 category = actor->base.category;
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(

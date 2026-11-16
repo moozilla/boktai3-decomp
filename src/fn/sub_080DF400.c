@@ -1,11 +1,11 @@
 #include "scene_actor_chase.h"
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 extern const u8 gUnk_0824E2A8[];
-u8 sub_080DEF78(struct SceneActorRegistryResetView *, u32);
-u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
+u8 sub_080DEF78(struct ChaseActor *, u32);
+u8 Dog_IsActionTimerExpired(struct ChaseActor *);
+u8 SceneActorTarget_TrySelectNearestParticipant(struct ChaseActor *);
 void SceneActorMotion_TestTargetTransition(void);
-void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *a)
+void Dog_SelectRetreatOrChase(struct ChaseActor *a)
 {
     u8 *context = a->base.context;
     u8 *group = (u8 *)&a->group.common;

@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *);
-s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+void *SceneActorTarget_FindNearbyPlayer(struct ChaseActor *);
+s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 void Ivy_ApplyHeldTargetDamage(void *);
-static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;
     if (*flag) {
@@ -12,8 +12,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                              u32 behavior)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -25,7 +24,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
         *((u8 *)actor + offset) = 1;
     }
 }
-void SceneActorReaction_AwaitTargetControl(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
 {
     void *target;
     TakeReset(actor);

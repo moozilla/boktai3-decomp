@@ -18,12 +18,12 @@ static inline u8 Take(u8 *p)
     }
     return 0;
 }
-static inline u32 Bits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Bits(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -95,7 +95,7 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
 }
 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
-void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
+void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
 {
     u8 *motion = ((u8 *)actor) + 0x50;
     u8 *sequence;

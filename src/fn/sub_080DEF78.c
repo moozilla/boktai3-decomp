@@ -46,8 +46,8 @@ static inline s32 MapWidth(struct EngineMap **terrain)
 {
     return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                          struct ContactPosition *position, struct ContactPosition *destination)
+static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
+                          struct ContactPosition *destination)
 {
     s32 result;
     if (Nav_IsPositionInMesh(route, position, destination)) {
@@ -66,15 +66,13 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     }
     return 0;
 }
-static inline void Dog_CaptureRoutePosition(struct ContactPosition **out,
-                                            struct SceneActorRegistryResetView *actor)
+static inline void Dog_CaptureRoutePosition(struct ContactPosition **out, struct ChaseActor *actor)
 {
     *out = &actor->base.body.position;
 }
 
 /* Scan candidate cells, preserve the interruption map owner, then start the route. */
-static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 priorDirection,
-                                s32 steps)
+static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s32 steps)
 {
     struct DogRetreatContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -185,7 +183,7 @@ selected: {
     return 0;
 }
 
-u32 sub_080DEF78(struct SceneActorRegistryResetView *actor, u32 priorDirection)
+u32 sub_080DEF78(struct ChaseActor *actor, u32 priorDirection)
 {
     return SelectRetreat(actor, priorDirection, 1);
 }

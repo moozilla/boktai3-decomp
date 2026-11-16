@@ -2,20 +2,20 @@
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
-static inline s32 Dog_ReadSecondaryX(const struct SceneActorRegistryResetView *a)
+static inline s32 Dog_ReadSecondaryX(const struct ChaseActor *a)
 {
     return a->base.secondaryMotion.x;
 }
-static inline s32 Dog_ReadSecondaryZ(const struct SceneActorRegistryResetView *a)
+static inline s32 Dog_ReadSecondaryZ(const struct ChaseActor *a)
 {
     return a->base.secondaryMotion.z;
 }
 
-static inline s32 Dog_ReadDesiredX(const struct SceneActorRegistryResetView *a)
+static inline s32 Dog_ReadDesiredX(const struct ChaseActor *a)
 {
     return a->base.reactionStart.x;
 }
-static inline s32 Dog_ReadDesiredZ(const struct SceneActorRegistryResetView *a)
+static inline s32 Dog_ReadDesiredZ(const struct ChaseActor *a)
 {
     return a->base.reactionStart.z;
 }
@@ -53,7 +53,7 @@ static inline s32 Dog_ClampAxis(s32 value, s32 limit)
     return value;
 }
 /* Ease the contact displacement before resuming pursuit or the home route. */
-void sub_080E0750(struct SceneActorRegistryResetView *actor)
+void sub_080E0750(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group;
     s16 *x, *z;

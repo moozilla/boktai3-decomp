@@ -24,7 +24,7 @@ static inline s32 Scale(s32 x)
         result = -(-x >> 12);
     return result;
 }
-static inline void SetAnimation(struct SceneActorRegistryResetView *a, u8 s, u8 p, u8 b)
+static inline void SetAnimation(struct ChaseActor *a, u8 s, u8 p, u8 b)
 {
     a->base.state2A8 = s;
     a->base.phase2A9 = p;
@@ -37,7 +37,7 @@ inline static void CpuSet_2(int a2, struct ContactPosition *a1, u32 *a0)
     CpuSet(a0, a1, a2);
 }
 
-void Axe_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
         u32 zero;

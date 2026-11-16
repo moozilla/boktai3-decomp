@@ -14,14 +14,14 @@ struct SkeletonAttackContext {
     s32 guardHealth;
 };
 void SceneActorControl_OnIdle(void);
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 static inline u8 TestBits(struct SkeletonAttackContext *context, u32 mask)
 {
     if (context->flags & mask)
         return 1;
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     void *callback = control;
     u32 code = kind;
@@ -41,8 +41,7 @@ static inline void ClearFlags(u32 *flags, u32 mask)
 {
     *flags &= mask;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     u32 b = behavior;
     actor->base.state2A8 = state;
@@ -51,10 +50,10 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
 // confidence=low: category-six attack gate selects close, ranged or health-gated guard behavior
-u32 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *actor,
-                                   struct SkeletonAttackContext *context, s32 angle)
+u32 Skeleton_TryBeginGuardedAttack(struct ChaseActor *actor, struct SkeletonAttackContext *context,
+                                   s32 angle)
 {
     if (!SceneActorReaction_IsRangeReady(actor)) {
         if (TestBits(context, 0x200))

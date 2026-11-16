@@ -5,7 +5,7 @@ void sub_08136F48(void *, struct SceneActorRegistryControl *);
 u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 
-static inline u8 ConsumeEntry(struct SceneActorRegistryResetView *actor)
+static inline u8 ConsumeEntry(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -14,7 +14,7 @@ static inline u8 ConsumeEntry(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -29,8 +29,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -51,8 +50,8 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
     *flags &= mask;
 }
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
-                        struct SceneActorRegistryControlGroup *group, u32 blocked)
+static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryControlGroup *group,
+                        u32 blocked)
 {
     void *shape = GROUP_FIELD(group, 0x1fc, void *);
     struct ContactPosition *position = &actor->base.body.position;
@@ -70,7 +69,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor,
 }
 
 // confidence=low: scene actor wait state: on entry clears mode flags; after 60 idle frames walks to the state5D4 destination.
-void sub_08136F58(struct SceneActorRegistryResetView *actor)
+void sub_08136F58(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {

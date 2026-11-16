@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 struct SceneActorTerrainCollisionView;
 void SceneActorTerrain_DisableCollision(struct SceneActorTerrainCollisionView *);
-static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;
     if (*flag) {
@@ -11,7 +11,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state)
+static inline void ResetState(struct ChaseActor *actor, u32 state)
 {
     u8 *field = &actor->base.state2A8;
     u32 zero = 0;
@@ -25,7 +25,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
     *(u32 *)((u8 *)actor + offset) = zero;
     actor->base.field2B1 = 1;
 }
-void SceneActorReaction_BeginHiddenCollisionless(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
         u32 mask = 1;

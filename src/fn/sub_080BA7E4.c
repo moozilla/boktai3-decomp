@@ -37,7 +37,7 @@ static inline s32 Half(s32 value)
     return value >= 0 ? value >> 1 : -((-value) >> 1);
 }
 
-void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_)
+void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
 {
     u8 *context;
     s32 tick = tick_;

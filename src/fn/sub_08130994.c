@@ -3,8 +3,7 @@
 void SceneActorControl_OnIdle(void);
 // confidence=low: starts the actor callback at 0x234 then consumes its trigger.
 #define SceneActorControl_UpdateCallbackTrigger sub_08130994
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                                u32 zero)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;
     {
@@ -24,8 +23,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
@@ -47,13 +45,13 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->base.word104 = zero;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 value = mask;
     value |= actor->base.flags2D6;
     actor->base.flags2D6 = value;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 zero)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 zero)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = 0;
@@ -65,7 +63,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     }
 }
 
-void SceneActorControl_UpdateCallbackTrigger(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
 {
     u32 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {

@@ -3,7 +3,7 @@
 #include "scene_actor_reaction.h"
 extern const u8 gUnk_0824E230[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *, u32);
+u8 Vorn_SelectReachableEscapeCell(struct ChaseActor *, u32);
 u32 SceneActor_DispatchContextAction(void *, u32);
 struct VornRetreatFlags {
     s16 bits : 16;
@@ -32,7 +32,7 @@ static inline u32 Vorn_ScatterDirection(const u8 *heading, u32 sample)
 }
 static inline u8 Vorn_TryTrackedCell(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(object);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     u32 cell;
@@ -52,7 +52,7 @@ static inline u8 Vorn_TryTrackedCell(void *object)
     }
     return 1;
 }
-u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset)
+u32 Vorn_SelectRetreatRoute(struct ChaseActor *actor, u32 reset)
 {
     struct VornRetreatContext *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;

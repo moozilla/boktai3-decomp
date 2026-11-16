@@ -16,7 +16,7 @@ void sub_08130F60(u8 *s)
 
     u8 *p = s + 0x448;
     if (SceneActorControl_TakeFlag(s + 0x2B1)) {
-        struct SceneActorRegistryResetView *actor = (void *)s;
+        struct ChaseActor *actor = (void *)s;
         void *target = actor->base.entryTarget224;
         u32 kind = 2;
         actor->base.field2B2 = 1;

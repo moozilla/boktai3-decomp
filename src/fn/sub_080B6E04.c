@@ -33,7 +33,7 @@ struct ApproachGroup {
     void *failure;
 };
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -47,8 +47,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -89,8 +88,7 @@ slopeX:
 done:
     return height;
 }
-static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
-                       u32 bits)
+static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u32 bits)
 {
     u8 *target = *(u8 **)&actor->base.tracking.target;
     void *route = group->routeObject;
@@ -121,7 +119,7 @@ struct SkeletonRouteContext {
     u8 unknown0[0x6D0];
     u8 active;
 };
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = actor->base.flags2D4;
     value &= mask;
@@ -135,7 +133,7 @@ static inline void OrFlags(u16 *flags, u32 mask)
 }
 
 // confidence=low: category-independent callback restores route target and resumes pursuit
-void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
+void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
 {
     struct SkeletonRouteContext *context = actor->base.context;
     struct ApproachGroup *group = (void *)&actor->group.common;

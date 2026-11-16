@@ -23,7 +23,7 @@ static inline void SubtractPosition(s16 *delta, const struct SceneVec *a,
     delta[1] = a->y - b->y;
     delta[2] = a->z - b->z;
 }
-void *SceneActorTarget_FindNearbyPlayer(struct SceneActorRegistryResetView *actor)
+void *SceneActorTarget_FindNearbyPlayer(struct ChaseActor *actor)
 {
     void *result = 0;
     s32 limit = actor->base.tracking.limit * 2;

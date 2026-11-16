@@ -1,6 +1,6 @@
 #include "scene_actor_reaction.h"
 void SceneActorReaction_PlayAnimationBUntilComplete(void *);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 TakePrepared(struct ChaseActor *actor)
 {
     u8 *field;
     field = &actor->base.field2B2;
@@ -10,7 +10,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void SceneActorReaction_UpdateReturnToRoute(struct SceneActorRegistryResetView *actor,
+static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *actor,
                                                           struct SceneActorReactionGroup *group)
 {
     u32 mask;
@@ -70,7 +70,7 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct SceneActorRegis
     }
 }
 
-void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_TurnBackToRoute(struct ChaseActor *actor)
 {
     SceneActorReaction_UpdateReturnToRoute(actor, (void *)&actor->group.common);
 }

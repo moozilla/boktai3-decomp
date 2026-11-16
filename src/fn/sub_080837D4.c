@@ -1,12 +1,12 @@
 #include "scene_actor_control_motion.h"
 #include "player.h"
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
                            : *(u32 *)((u8 *)actor + offset) & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
     if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
                   actor->base.health <= 0))
@@ -33,7 +33,7 @@ struct LiftParameters {
     u8 unknown0[0xF];
     u8 flags : 8;
 };
-void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
     if (IsUnavailable(actor))

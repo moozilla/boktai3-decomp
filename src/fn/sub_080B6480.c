@@ -3,7 +3,7 @@
 void SceneActorControl_OnIdle(void);
 // confidence=low: distance band uses context bounds at 0x708 and 0x70C.
 #define Skeleton_TryEnterIdleRange sub_080B6480
-u32 Skeleton_TryEnterIdleRange(struct SceneActorRegistryResetView *s)
+u32 Skeleton_TryEnterIdleRange(struct ChaseActor *s)
 {
     u8 *context = s->base.context;
     if (s->base.tracking.distance > *(u32 *)(context + 0x708) &&

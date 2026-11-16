@@ -3,7 +3,7 @@
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
+static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -17,7 +17,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k)
+static inline void State(struct ChaseActor *a, u32 k)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = 0;
@@ -36,17 +36,17 @@ static inline u8 SaveControlFlags(u8 *c, u16 **out, u32 m)
         return 1;
     return 0;
 }
-static inline u16 Actor16(struct SceneActorRegistryResetView *a, u32 m)
+static inline u16 Actor16(struct ChaseActor *a, u32 m)
 {
     u16 value = a->base.flags2D4;
     value &= m;
     return value;
 }
-static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Actor32(struct ChaseActor *a, u32 m)
 {
     return a->base.flags2D0 & m;
 }
-static inline u8 Disabled(struct SceneActorRegistryResetView *a)
+static inline u8 Disabled(struct ChaseActor *a)
 {
     if (a) {
         if (Actor16(a, 64) || Actor32(a, 0x20000) || a->base.health <= 0)
@@ -70,7 +70,7 @@ static inline u8 Slow(void)
     return 0;
 }
 // confidence=low: global flag applies a temporary movement slowdown
-void SceneActorPlacement_UpdateMovementSlowdown(struct SceneActorRegistryResetView *a)
+void SceneActorPlacement_UpdateMovementSlowdown(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
     u16 *flags;

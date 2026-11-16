@@ -12,7 +12,7 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -26,8 +26,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior,
-                            u32 zero)
+static inline void SetState(struct ChaseActor *a, u32 phase, u32 behavior, u32 zero)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = phase;
@@ -35,7 +34,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u3
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-void Lun_DecayRouteMotion(struct SceneActorRegistryResetView *a)
+void Lun_DecayRouteMotion(struct ChaseActor *a)
 {
     u8 *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B1))

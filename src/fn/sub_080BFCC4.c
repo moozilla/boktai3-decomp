@@ -17,7 +17,7 @@ static inline void Skeleton_SnapDelayedRoute(struct ContactPosition *position,
 
 static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -37,7 +37,7 @@ static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *ra
 static inline u8 Skeleton_ArriveAfterDelay(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -101,7 +101,7 @@ success:
     return 1;
 }
 
-void sub_080BFCC4(struct SceneActorRegistryResetView *actor)
+void sub_080BFCC4(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor))

@@ -4,9 +4,8 @@ void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 extern const u8 gUnk_0824E114[];
 
-static inline void SceneActorTarget_UpdateContactRoute(struct SceneActorRegistryResetView *actor,
-                                                       u16 *motionFlags, void *route,
-                                                       struct ContactPosition *source,
+static inline void SceneActorTarget_UpdateContactRoute(struct ChaseActor *actor, u16 *motionFlags,
+                                                       void *route, struct ContactPosition *source,
                                                        struct ContactPosition *target)
 {
     s32 result = Nav_IsPositionInMesh(route, source, target);
@@ -24,7 +23,7 @@ static inline void SceneActorTarget_UpdateContactRoute(struct SceneActorRegistry
 
 // confidence=low: releases a prior contact, checks the route to the target cell,
 // and starts the idle reaction when the target is inactive.
-u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *actor)
+u8 SceneActorTarget_UpdateTrackedContact(struct ChaseActor *actor)
 {
     struct SceneActorContactTracking *motion;
     struct SceneActorContactTracking *tracking;

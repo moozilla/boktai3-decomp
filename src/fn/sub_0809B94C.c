@@ -29,7 +29,7 @@ static inline s32 ClearFlag(struct LunFlagWord *p, u32 mask)
 {
     return p->bits = mask & p->bits;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -43,8 +43,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *a, u32 state, u32 phase, u32 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -70,13 +69,13 @@ static inline s32 Quarter(s32 v)
         v = -((-v) >> 2);
     return v;
 }
-static inline void SetMotionFlags(struct SceneActorRegistryResetView *a, u32 input)
+static inline void SetMotionFlags(struct ChaseActor *a, u32 input)
 {
     u32 mask = input;
     u32 *p = &a->base.flags2D0;
     *p |= mask;
 }
-static inline u8 Move(struct SceneActorRegistryResetView *a)
+static inline u8 Move(struct ChaseActor *a)
 {
     s32 x = Quarter(a->base.reactionStart.x - a->base.reactionEnd.x);
     s32 z = Quarter(a->base.reactionStart.z - a->base.reactionEnd.z);
@@ -97,18 +96,18 @@ static inline u8 Move(struct SceneActorRegistryResetView *a)
     return 0;
 }
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
-static inline u32 TestMotionFlags(u32 mask, struct SceneActorRegistryResetView *a)
+static inline u32 TestMotionFlags(u32 mask, struct ChaseActor *a)
 {
     return a->base.flags2D4 & mask;
 }
 
-inline static u16 SetAnimationFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+inline static u16 SetAnimationFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 *p = &actor->base.flags2C0;
     return *p = mask | (*p);
 }
 
-void Lun_ApproachMovementTarget(struct SceneActorRegistryResetView *a, s32 frame)
+void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
 {
     u8 *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B2)) {

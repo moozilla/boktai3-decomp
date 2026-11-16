@@ -1,7 +1,7 @@
 #include "debug.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_animation.h"
-void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateAnimationGate(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {

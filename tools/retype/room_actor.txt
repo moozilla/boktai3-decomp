@@ -27,5 +27,20 @@ selection animationIndex
 link context
 unknown2B0 field2B0
 
-# Last: the monster structs and ResetView embed struct RoomActor as `base`.
+# SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
+# 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that
+# type by hand (the tool reports them as "no member named" errors). A struct that held a
+# ResetView by value must grow the padding after it by 0xC8 (0x6EC - 0x624); the byte
+# check (tools/header_dependents.py --check) catches one that does not.
+[types]
+SceneActorRegistryResetView ChaseActor
+
+# The monster structs and ChaseActor embed struct RoomActor as `base`.
 [embed RoomActor base]
+
+# Last: the chase classes (Skeleton, Vorn, Golem, Mummy, Dog) embed struct ChaseActor
+# as `chase`, and pass `&actor->chase` where chase code takes a ChaseActor.
+[map]
+base chase.base
+group chase.group
+[upcast chase]

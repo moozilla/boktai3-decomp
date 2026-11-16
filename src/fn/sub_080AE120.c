@@ -9,7 +9,7 @@ static inline void SideStep_SetFlags(struct SceneActorReactionMotion *motion, u8
 {
     motion->flags |= mask;
 }
-void SceneActorReaction_BeginSideStep(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_BeginSideStep(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorSideStepContext *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {

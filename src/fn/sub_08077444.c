@@ -1,7 +1,7 @@
 #include "scene_actor_placement.h"
 #include "scene_actor_status.h"
 #include "scene_actor_terrain_reaction.h"
-static inline void SceneActorPlacement_ResetControl(struct SceneActorRegistryResetView *actor,
+static inline void SceneActorPlacement_ResetControl(struct ChaseActor *actor,
                                                     struct SceneActorRegistryControl *control)
 {
     if (ActorStatus_BehaviorFlags(actor, 0x200000)) {
@@ -18,7 +18,7 @@ static inline void SceneActorPlacement_ClearColliderFlags(struct ContactCollider
 }
 void SceneActorPlacement_ResetToPathPoint(struct SceneActorRegistryActor *object, u32 pathId, u32 pointId, u32 direction)
 {
-    struct SceneActorRegistryResetView *actor = (void *)object;
+    struct ChaseActor *actor = (void *)object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct SceneActorBody *body = &actor->base.body;
     u32 *flags;

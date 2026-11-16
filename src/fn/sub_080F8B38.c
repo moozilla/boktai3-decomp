@@ -17,7 +17,7 @@ static inline s32 Magnitude(s32 a)
         result = -result;
     return result;
 }
-void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed)
 {
     s32 angle_2;
     u8 *state = actor->base.context;

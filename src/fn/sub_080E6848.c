@@ -10,7 +10,7 @@ static inline void clearRouteFlag(u32 *flags)
     u32 mask = ~0x1000000;
     *flags &= mask;
 }
-static inline void resetState(struct SceneActorRegistryResetView *actor, u8 behavior)
+static inline void resetState(struct ChaseActor *actor, u8 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -18,7 +18,7 @@ static inline void resetState(struct SceneActorRegistryResetView *actor, u8 beha
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void setControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -28,11 +28,11 @@ static inline void setControl(struct SceneActorRegistryResetView *actor, void *c
     clearFlag(&actor->base.flags114);
     actor->base.word104 = 0;
 }
-static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
-void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
+void Dog_ResetIdleControl(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
         struct SceneActorReactionMotion *motion;

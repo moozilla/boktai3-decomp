@@ -9,14 +9,14 @@ static inline s32 TruncateShift(s32 value, u32 shift)
     return value >= 0 ? value >> shift : -((-value) >> shift);
 }
 
-static inline void SetHeightFromGround(struct SceneActorRegistryResetView *actor)
+static inline void SetHeightFromGround(struct ChaseActor *actor)
 {
     u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
     actor->base.body.position.y = actor->base.field2EA + ground;
 }
 
 // confidence=low: adds the hover offset to the actor and bobs its drawable.
-void Lun_UpdateHoverHeight(struct SceneActorRegistryResetView *actor)
+void Lun_UpdateHoverHeight(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     s32 delta, magnitude;

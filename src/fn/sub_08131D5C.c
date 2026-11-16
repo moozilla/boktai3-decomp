@@ -11,13 +11,12 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.flags2D0 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -31,7 +30,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->base.word104 = 0;
 }
-static inline void Hide(struct SceneActorRegistryResetView *a)
+static inline void Hide(struct ChaseActor *a)
 {
     if (!a->base.drawableKind) {
         u32 *flags = a->base.drawable;
@@ -70,23 +69,23 @@ static inline u32 NextRandomSample(void)
     gRandomIndex = index;
     return *(const u16 *)((u32)table + index * 2);
 }
-static inline u32 ActorStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 ActorStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u32 GetReactionFlags(u32 **out, struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 GetReactionFlags(u32 **out, struct ChaseActor *actor, u32 mask)
 {
     u32 *p = &actor->base.flags2CC;
     u32 result = *p & mask;
     *out = p;
     return result;
 }
-static inline struct ContactCollider *GetDamageCollider(struct SceneActorRegistryResetView *actor)
+static inline struct ContactCollider *GetDamageCollider(struct ChaseActor *actor)
 {
     return &actor->base.colliderA;
 }
 // Area-effect damage with a random knockback heading.
-u8 SceneActorReaction_ApplyAreaDamage(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_ApplyAreaDamage(struct ChaseActor *actor)
 {
     s32 dx;
     struct ContactPosition *position;

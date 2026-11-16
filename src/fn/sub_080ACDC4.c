@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *);
+void SceneActor_UpdateForwardCollider(struct ChaseActor *);
 struct TargetedAttackContext {
     u8 unknown0[0x628];
     struct ContactCollider collider;
@@ -16,7 +16,7 @@ struct TargetedAttackTarget {
     u8 unknown0[0xC];
     struct ContactPosition position;
 };
-static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
+static inline u8 TakeEntryFlag(struct ChaseActor *s)
 {
     if (s->base.field2B2) {
         s->base.field2B2 = 0;
@@ -24,7 +24,7 @@ static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *s)
+void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
 {
     struct TargetedAttackContext *context = s->base.context;
     struct TargetedAttackSequence *sequence = (void *)((u8 *)s->base.drawable + 0x20);

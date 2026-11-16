@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "debug.h"
 
-static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;
     if (*flag) {
@@ -12,7 +12,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-static inline void Enter(struct SceneActorRegistryResetView *actor, u32 zero)
+static inline void Enter(struct ChaseActor *actor, u32 zero)
 {
     u32 state = 10;
     u8 *field = &actor->base.state2A8;
@@ -27,7 +27,7 @@ static inline void Enter(struct SceneActorRegistryResetView *actor, u32 zero)
     actor->base.field2B1 = 1;
 }
 
-void SceneActorControl_EnterTimedState(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_EnterTimedState(struct ChaseActor *actor)
 {
     u32 masked;
     u16 flags;

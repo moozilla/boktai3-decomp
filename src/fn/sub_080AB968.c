@@ -23,7 +23,7 @@ static inline u8 TakeEntry(u8 *p)
 }
 
 #include "scene_actor_reset.h"
-static inline void SetControl(struct SceneActorRegistryResetView *s, void *control, u32 code)
+static inline void SetControl(struct ChaseActor *s, void *control, u32 code)
 {
     u32 zero;
     u32 *flags;
@@ -41,7 +41,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *s, void *contr
     }
     s->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+static inline void SetState(struct ChaseActor *p, u32 b)
 {
     u32 behavior = b;
     p->base.state2A8 = 0;
@@ -63,9 +63,9 @@ static inline void Advance(void *p, s32 x, s32 z)
     u16 k[] = {0x6400};
     sub_080A9DB0(p, 4, k[0]);
 }
-void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
+void TentacleActor_UpdateRetraction(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *s = input;
+    struct ChaseActor *s = input;
     if (TakeEntry((u8 *)s)) {
         SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
         s->base.field2E8 = 8;

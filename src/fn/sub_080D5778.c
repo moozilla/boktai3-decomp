@@ -17,10 +17,10 @@ struct MummyRouteTarget {
     struct SceneActorChasePlayerCell *cell;
 };
 
-u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
-void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryResetView *);
+u8 Mummy_RequestStraightRoute(struct ChaseActor *);
+void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *);
 
-void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
+void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct MummyRouteContext *body = actor->base.context;

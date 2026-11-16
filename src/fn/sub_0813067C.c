@@ -8,7 +8,7 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-void SceneActorControl_UpdateSavedControlPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateSavedControlPhase(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B1)) {
         void *callback = actor->base.savedTarget;

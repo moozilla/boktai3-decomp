@@ -5,7 +5,7 @@ struct MummyContext {
     u8 unknown0[0x6D8];
     u32 limit;
 };
-void Mummy_EnterIdleControl(struct SceneActorRegistryResetView *actor)
+void Mummy_EnterIdleControl(struct ChaseActor *actor)
 {
     struct MummyContext *context = actor->base.context;
     if (actor->base.tracking.distance < context->limit) {

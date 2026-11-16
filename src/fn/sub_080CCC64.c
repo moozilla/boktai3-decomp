@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 void Golem_UpdateRouteMotion(void);
 void Golem_UpdateChargeBuildup(void);
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -11,7 +11,7 @@ static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -25,7 +25,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
     }
     actor->base.word104 = 0;
 }
-void Golem_UpdateChargeSettle(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateChargeSettle(struct ChaseActor *actor)
 {
     u8 busy;
     if (TakeFlag2B1(actor)) {

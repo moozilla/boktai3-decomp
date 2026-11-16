@@ -64,11 +64,11 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
         return 1;
     return 0;
 }
-static inline u32 ActorWordBits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 ActorWordBits(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
-static inline u16 ActorHalfBits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u16 ActorHalfBits(struct ChaseActor *a, u32 mask)
 {
     u16 value = a->base.flags2D4;
     value &= mask;
@@ -83,7 +83,7 @@ static inline u32 ClearActivity(u32 *flags, u32 mask)
 }
 static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
 {
-    struct SceneActorRegistryResetView *a = (void *)object;
+    struct ChaseActor *a = (void *)object;
     u32 motion;
     motion = ClearActivity(&a->base.flags2D0, 0xFEFFFFFF);
     if (!ActorWordBits(a, 0x200000))
@@ -93,17 +93,17 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
     if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
         Mummy_TestContactFlags((void *)&a->base.tracking.target, 16))
         return 1;
-    if (((struct SceneActorRegistryResetView *)object)->base.field2B8)
+    if (((struct ChaseActor *)object)->base.field2B8)
         return 1;
     {
-        u16 *timer = &((struct SceneActorRegistryResetView *)object)->base.colliderA.responseValue;
+        u16 *timer = &((struct ChaseActor *)object)->base.colliderA.responseValue;
         object = (u8 *)timer;
         if (*timer)
             return 1;
     }
     return 0;
 }
-u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
+u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
 {
     struct MummyStimulusGroup *group;
     struct MummyStimulusContext *body;

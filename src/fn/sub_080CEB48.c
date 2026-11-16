@@ -24,7 +24,7 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return FALSE;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     u32 zero;
     actor->base.field2B2 = 1;
@@ -40,8 +40,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -50,7 +49,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.field2B1 = 1;
 }
 
-void Golem_BeginSlideState(struct SceneActorRegistryResetView *actor)
+void Golem_BeginSlideState(struct ChaseActor *actor)
 {
     struct Unk080CEB48Context *context = actor->base.context;
     struct Unk080CEB48Body *body = (struct Unk080CEB48Body *)((u8 *)actor + 0x50);

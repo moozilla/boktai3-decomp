@@ -10,7 +10,7 @@ struct DogAttackContext {
 };
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 void SceneActorAnimation_EmitDirectionalTrail(void);
-void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *);
+void Dog_SelectRetreatOrChase(struct ChaseActor *);
 static inline void And32(u32 *p, u32 mask)
 {
     *p &= mask;
@@ -27,7 +27,7 @@ static inline void Dog_SetContextFlags(struct DogAttackContext *context, u32 mas
     context->flags |= mask;
 }
 
-void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
+void Dog_UpdateTrailAttack(struct ChaseActor *a)
 {
     struct DogAttackContext *context = a->base.context;
     if (Chase_TakeArrived(a)) {

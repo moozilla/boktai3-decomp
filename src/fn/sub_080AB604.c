@@ -20,7 +20,7 @@ struct ActorReactionContext {
     u8 unknown0[0x8E8];
     u8 request, direction;
 };
-static inline u8 HasReactionFlag(struct SceneActorRegistryResetView *s)
+static inline u8 HasReactionFlag(struct ChaseActor *s)
 {
     struct ActorReactionSensor *sensor = (void *)&s->base.tracking.target;
     u32 mask = 2;
@@ -28,7 +28,7 @@ static inline u8 HasReactionFlag(struct SceneActorRegistryResetView *s)
         return 1;
     return 0;
 }
-s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
+s32 SceneActor_TryRequestFacingReaction(struct ChaseActor *s)
 {
     u32 range;
     struct ActorReactionDelta delta;

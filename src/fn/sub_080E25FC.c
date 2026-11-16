@@ -3,8 +3,8 @@
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
-u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-s32 sub_080DEF78(struct SceneActorRegistryResetView *, u32);
+u8 Dog_IsActionTimerExpired(struct ChaseActor *);
+s32 sub_080DEF78(struct ChaseActor *, u32);
 
 struct DogReactionFields {
     u8 unknown0[0x678];
@@ -15,7 +15,7 @@ struct DogReactionFields {
 
 /* The reaction fields overlap the canonical actor's species storage. */
 union DogReactionContext {
-    struct SceneActorRegistryResetView base;
+    struct ChaseActor base;
     struct DogReactionFields reaction;
 };
 
@@ -27,7 +27,7 @@ static inline s32 Dog_HeadingOctant(s32 angle)
 }
 
 /* React to contact, pursue the target, or select a delayed cardinal turn. */
-s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
+s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
 {
     union DogReactionContext *context = a->base.context;
     struct SceneActorChaseGroup *group = &a->group;

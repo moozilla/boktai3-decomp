@@ -14,7 +14,7 @@ struct SpiderApproachPlayer {
     u8 unknown24[0xC];
     struct ContactPosition position;
 };
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
+static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -28,7 +28,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k)
+static inline void State(struct ChaseActor *a, u32 k)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = 0;
@@ -60,7 +60,7 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *fr
     out->y = to->y - from->y;
     out->z = to->z - from->z;
 }
-static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPosition *delta)
+static inline s32 Facing(struct ChaseActor *a, struct ContactPosition *delta)
 {
     s32 direction = a->base.body.direction;
     s32 difference = Math_Atan2(delta->x, delta->z) - direction;
@@ -70,8 +70,7 @@ static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPo
         difference += 256;
     return difference;
 }
-static inline void BeginContact(struct SceneActorRegistryResetView *a,
-                                struct SceneActorRegistryControlGroup *nav)
+static inline void BeginContact(struct ChaseActor *a, struct SceneActorRegistryControlGroup *nav)
 {
     State(a, 12);
     Control(a, nav->gate.control, 26);
@@ -97,7 +96,7 @@ static inline void BeginContact(struct SceneActorRegistryResetView *a,
     }
 }
 // confidence=low: detects a player in front and selects close or distant contact behavior
-u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *a)
+u8 SceneActorPlacement_SelectPlayerApproach(struct ChaseActor *a)
 {
     u8 *transform = (u8 *)&a->base.body.id;
     u8 *c = (void *)SceneActorControl_GetState(a);

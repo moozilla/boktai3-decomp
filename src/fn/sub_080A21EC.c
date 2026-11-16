@@ -3,7 +3,7 @@
 #include "scene_actor_turn.h"
 #include "display_sequence.h"
 
-static inline u8 Spider_TargetDirection(struct SceneActorRegistryResetView *actor)
+static inline u8 Spider_TargetDirection(struct ChaseActor *actor)
 {
     return ((actor->base.nextDirection + 5) & 7) << 5;
 }
@@ -35,7 +35,7 @@ static inline void Spider_StepDirection(struct SceneActorBody *body, s32 target,
     }
 }
 
-static inline void Spider_ApplyDuration(struct SceneActorRegistryResetView *actor)
+static inline void Spider_ApplyDuration(struct ChaseActor *actor)
 {
     u16 *scale;
     u32 mask = 0xA02F;
@@ -62,7 +62,7 @@ static inline u16 Spider_ReadCardinal(u8 direction)
 {
     return ((direction + 0x60) >> 6) & 3;
 }
-void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
+void Spider_AdvanceTurnAnimation(struct ChaseActor *actor)
 {
     struct SceneActorBody *body = &actor->base.body;
     struct DisplaySequenceState *sequence;

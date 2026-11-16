@@ -3,7 +3,7 @@
 #include "scene_actor_chase_shared.h"
 // confidence=low: selects attack bounds and properties from mummy movement flags.
 void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
-static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Unavailable(struct ChaseActor *actor)
 {
 
     u32 mask;
@@ -29,8 +29,8 @@ struct BoundsBits {
     u32 z : 16;
     u32 pad : 16;
 };
-static inline void ApplyAttack(struct SceneActorRegistryResetView *actor,
-                               struct ContactCollider *collider, u32 alternate, u32 mask)
+static inline void ApplyAttack(struct ChaseActor *actor, struct ContactCollider *collider,
+                               u32 alternate, u32 mask)
 {
 
     u32 damage;
@@ -54,7 +54,7 @@ static inline void ApplyAttack(struct SceneActorRegistryResetView *actor,
     }
     Collider_SetAttackProperties(collider, damage, element, 0, flags, response);
 }
-void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
+void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
 {
     struct BoundsBits bounds;
 

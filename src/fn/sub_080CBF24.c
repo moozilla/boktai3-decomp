@@ -8,7 +8,7 @@
 #include "scene_actor_delayed_response.h"
 
 /* Queue pursuit or a return-home route after the recovery delay. */
-void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
+void Golem_ResumeDelayedRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;

@@ -1,8 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -11,7 +10,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.field2B1 = 1;
 }
 
-void Axe_UpdateRecoverTimer(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateRecoverTimer(struct ChaseActor *actor)
 {
     if (actor->base.field2B1)
         actor->base.field2B1 = 0;

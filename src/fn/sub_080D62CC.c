@@ -26,7 +26,7 @@ static inline s32 Abs(s32 value)
 {
     return value < 0 ? -value : value;
 }
-void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
+void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->base.body.position;

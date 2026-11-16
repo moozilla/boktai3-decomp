@@ -50,7 +50,7 @@ static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 beh
     p->phase = 0;
     p->behavior = behavior;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -64,7 +64,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -72,7 +72,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-void Spider_UpdateHiddenRecovery(struct SceneActorRegistryResetView *a)
+void Spider_UpdateHiddenRecovery(struct ChaseActor *a)
 {
     struct SpiderRecoveryContext *ctx = a->base.context;
     if (TakeEntry(&a->base.field2B2)) {

@@ -7,7 +7,7 @@ static inline s32 Absolute(s32 value)
         result = -result;
     return result;
 }
-static inline u16 Motion(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u16 Motion(struct ChaseActor *a, u32 mask)
 {
     u32 bit = mask;
     u16 *field = &a->base.flags2D4;
@@ -16,13 +16,13 @@ static inline u16 Motion(struct SceneActorRegistryResetView *a, u32 mask)
         return result;
     }
 }
-static inline void SetTurn(struct SceneActorRegistryResetView *a, u32 value)
+static inline void SetTurn(struct ChaseActor *a, u32 value)
 {
     u32 bits = 7;
     bits &= value;
     ((u8 *)a)[0x3CD] = bits;
 }
-u8 Dog_RequestHeadingTurn(struct SceneActorRegistryResetView *a, s32 heading)
+u8 Dog_RequestHeadingTurn(struct ChaseActor *a, s32 heading)
 {
     s32 difference = heading - a->base.body.direction;
     u16 motion;

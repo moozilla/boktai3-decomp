@@ -2,12 +2,12 @@
 #include "scene_actor_control_helpers.h"
 #include "scene_actor_script.h"
 #include "scene_actor_animation.h"
-void sub_080B5BEC(struct SceneActorRegistryResetView *);
-void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *);
-void sub_080B7768(struct SceneActorRegistryResetView *);
-s32 SceneActorReaction_TickHiddenResponse(struct SceneActorRegistryResetView *actor)
+void sub_080B5BEC(struct ChaseActor *);
+void SceneActorReaction_SetProfileEntries(struct ChaseActor *);
+void sub_080B7768(struct ChaseActor *);
+s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *saved = actor;
+    struct ChaseActor *saved = actor;
     u32 mask = 0x4000;
     u32 offset = 0x2D4;
     u16 *field;

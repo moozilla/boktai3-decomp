@@ -37,8 +37,8 @@ static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
     row->trail[0].draw.sprite.paletteVariant = source->paletteVariant;
 }
 
-void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
-                                const struct ContactPosition *position, u32 angle)
+void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
+                                u32 angle)
 {
     struct AxeTrailContext *context = actor->base.context;
     struct ContactSwarmSprite *sprite;

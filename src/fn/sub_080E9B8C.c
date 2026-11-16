@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-void SceneActor_EndReactionAnimation(struct SceneActorRegistryResetView *actor)
+void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         u16 *destination = &actor->base.colliderA.flags;

@@ -3,18 +3,17 @@
 #include "engine.h"
 #include "player.h"
 s32 Math_Atan2(s32, s32);
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
     return 0;
 }
-static inline void RecordContact(struct SceneActorRegistryResetView *a,
-                                 struct ContactCollider *other)
+static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *other)
 {
     if (!Unavailable(a) && (other->contactFlags & 15)) {
         a->base.field304 = other->collisionId;
@@ -70,9 +69,9 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = a->z - b->z;
 }
 void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollider *other,
-                             struct SceneActorRegistryResetView *a)
+                             struct ChaseActor *a)
 {
-    struct SceneActorRegistryResetView *base = a;
+    struct ChaseActor *base = a;
     u8 *state = a->base.context;
     union {
         struct ContactPackedVector packed;

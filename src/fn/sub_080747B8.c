@@ -24,7 +24,7 @@ static inline void orFlags(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
+s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 {
     u8 category;
     u32 *flags;

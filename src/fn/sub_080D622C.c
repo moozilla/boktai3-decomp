@@ -1,9 +1,9 @@
 #include "scene_actor_control_phase.h"
 /* SceneActorControl_UpdatePersistentPhase_080D622C: SceneActorControl_UpdatePersistentPhase variant: control Mummy_UpdatePlayerRoute kind 39, no shadow toggle, update callback via Callback_InvokeActor (provisional name) */
 #include "scene_actor_reaction.h"
-void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *);
+void Mummy_UpdatePlayerRoute(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-void SceneActorControl_UpdatePersistentPhase_080D622C(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdatePersistentPhase_080D622C(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = (void *)Mummy_UpdatePlayerRoute;

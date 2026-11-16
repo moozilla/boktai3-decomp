@@ -1,5 +1,5 @@
 #include "scene_actor_control_helpers.h"
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D4;
@@ -7,7 +7,7 @@ static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D0;
@@ -15,7 +15,7 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
@@ -23,7 +23,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void Hide(struct SceneActorRegistryResetView *actor)
+static inline void Hide(struct ChaseActor *actor)
 {
     u32 one = 1;
     if (actor->base.drawableKind == 0) {
@@ -43,7 +43,7 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *actor)
+static inline void Show(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0) {
         u32 *flags = actor->base.drawable;
@@ -64,7 +64,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
-void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
+void sub_080B5BEC(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
     u32 unavailable = IsUnavailable(actor);

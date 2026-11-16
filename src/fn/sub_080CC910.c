@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* Golem: route back to its home cell; near it, settle (sub_080C47DC), else face the cell centre; then go to state 2 (tentative) */
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 void Golem_BeginChargeBuildup(void);
 void Golem_UpdateRouteMotion(void);
 void sub_080C47B8(struct ContactPosition *);
@@ -15,7 +15,7 @@ struct GolemRouteLink {
     u8 unknown0[8];
     struct GolemRoutePoint *point;
 };
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -23,7 +23,7 @@ static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -70,7 +70,7 @@ slopeX:
 done:
     return height;
 }
-void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
+void Golem_ReturnHome(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u8 *body = actor->base.context;

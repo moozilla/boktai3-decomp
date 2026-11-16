@@ -19,15 +19,14 @@ static inline void OrWordFlags(u32 mask, u32 *flags)
     *flags |= mask;
 }
 
-static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                               u8 behavior)
+static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
     actor->base.behavior2AA = behavior;
 }
 
-void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_RestartPositionCurve(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
 

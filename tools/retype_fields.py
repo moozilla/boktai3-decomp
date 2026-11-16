@@ -332,10 +332,57 @@ def macro_site(line_text, old, new, path, header_defs, load, depth=3):
     return None
 
 
+INCOMPATIBLE = re.compile(r"^(?P<path>[^:\n]+):(?P<line>\d+): warning: passing arg (?P<arg>\d+) of "
+                          r"`(?P<func>\w+)' from incompatible pointer type", re.M)
+
+
+def upcast(files, member, jobs):
+    """Where a subclass pointer is passed for its base (`passing arg N of f from
+    incompatible pointer type`), pass `&arg->member` instead, if that silences the
+    warning. Returns the number of arguments rewritten."""
+    done = 0
+    with concurrent.futures.ThreadPoolExecutor(jobs) as ex:
+        results = dict(zip(files, ex.map(compile_errors, files)))
+    for src in files:
+        stderr = results[src]
+        for m in reversed(list(INCOMPATIBLE.finditer(stderr))):
+            path, line = os.path.normpath(m["path"]), int(m["line"])
+            if path != src:
+                continue
+            with open(os.path.join(ROOT, path)) as f:
+                before = f.read()
+            # the call ends on the reported line; it may start a few lines up
+            lines = before.split("\n")
+            end = sum(len(x) + 1 for x in lines[:line])
+            start = sum(len(x) + 1 for x in lines[:max(0, line - 12)])
+            calls = list(re.finditer(r"\b" + re.escape(m["func"]) + r"\s*\(", before[start:end]))
+            args = calls and call_arguments(before, start + calls[-1].end() - 1)
+            if not args or len(args) < int(m["arg"]):
+                continue
+            a, b = args[int(m["arg"]) - 1]
+            arg = before[a:b].strip()
+            if not re.fullmatch(r"\w+(->\w+|\.\w+)*", arg):
+                continue
+            lead = before[a:b].index(arg)
+            new = before[:a + lead] + f"&{arg}->{member}" + before[a + lead + len(arg):]
+            with open(os.path.join(ROOT, path), "w") as f:
+                f.write(new)
+            after = compile_errors(src)
+            same = [w for w in INCOMPATIBLE.finditer(after)
+                    if os.path.normpath(w["path"]) == path and int(w["line"]) == line and w["arg"] == m["arg"] and w["func"] == m["func"]]
+            if same or ERROR.search("\n".join(ln for ln in after.splitlines() if "warning" not in ln and "In function" not in ln)):
+                with open(os.path.join(ROOT, path), "w") as f:
+                    f.write(before)
+            else:
+                done += 1
+                stderr = after
+    return done
+
+
 def read_steps(path):
-    """[(kind, args)] from a steps file: blocks headed `[embed TYPE MEMBER]`, `[map]`,
-    `[types]` (old and new struct tags) or `[text]` (literal old and new text), each
-    followed by `old new` lines."""
+    """[(kind, args, pairs)] from a steps file: blocks headed `[embed TYPE MEMBER]`,
+    `[map]`, `[types]` (old and new struct tags) or `[text]` (literal old and new text),
+    each followed by `old new` lines, or `[upcast MEMBER]` (see upcast) alone."""
     steps = []
     for raw in open(path):
         ln = raw.split("#", 1)[0].strip()
@@ -391,6 +438,8 @@ def main():
     ap.add_argument("--embed", nargs=2, metavar=("TYPE", "MEMBER"),
                     help='add `f MEMBER.f` for each top-level member of TYPE')
     ap.add_argument("--steps", help="replay a steps file (see read_steps), e.g. tools/retype/room_actor.txt")
+    ap.add_argument("--upcast", metavar="MEMBER",
+                    help="pass `&arg->MEMBER` where a pointer argument draws an incompatible-pointer warning")
     ap.add_argument("--dependents", nargs="+", metavar="HEADER", help="units that include these headers")
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--dry-run", action="store_true", help="report the first round's rewrites, change nothing")
@@ -402,6 +451,9 @@ def main():
     files = sorted(set(files))
     if not files:
         sys.exit("no files")
+    if a.upcast:
+        print(f"{upcast(files, a.upcast, a.j)} arguments now pass &arg->{a.upcast}")
+        return
     if a.steps:
         steps = read_steps(a.steps)
     else:
@@ -414,6 +466,10 @@ def main():
         steps = [("map", [], pairs)]
     unsettled, failed = {}, {}
     for kind, args, pairs in steps:
+        if kind == "upcast":
+            if not a.dry_run:
+                print(f"{upcast(files, args[0], a.j)} arguments now pass &arg->{args[0]}")
+            continue
         if kind in ("types", "text"):
             if not a.dry_run:
                 for path in replace_text(files, pairs, regex=kind == "types"):

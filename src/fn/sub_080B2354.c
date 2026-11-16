@@ -7,7 +7,7 @@ struct VornDeferredScript {
 
 // confidence=low: context script 624 is invoked once the byte-sized delay expires.
 #define Vorn_UpdateDelayedScript sub_080B2354
-void Vorn_UpdateDelayedScript(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateDelayedScript(struct ChaseActor *actor)
 {
     struct VornDeferredScript *context = actor->base.context;
     if (context->script) {

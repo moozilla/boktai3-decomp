@@ -4,7 +4,7 @@
 s32 Mod(s32, s32);
 void SceneActorAnimation_SpawnTrailAtPosition(void *, u32);
 void SceneActorAnimation_RefreshTimedAttackCollider(void);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -12,7 +12,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void SceneActorAnimation_EmitDirectionalTrail(struct SceneActorRegistryResetView *a, s32 frame)
+void SceneActorAnimation_EmitDirectionalTrail(struct ChaseActor *a, s32 frame)
 {
     union SceneActorRegistryPackedPosition p;
     if (TakePrepared(a))

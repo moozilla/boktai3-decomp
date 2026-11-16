@@ -50,7 +50,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
                                              struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorView *);
 
-static inline u8 Bee_ContactUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Bee_ContactUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -66,7 +66,7 @@ static inline u8 Bee_ContactUnavailable(struct SceneActorRegistryResetView *acto
 
 void Bee_ApplyContactReaction(struct SceneActorBehaviorContactView *source,
                               struct SceneActorBehaviorContactView *destination,
-                              struct SceneActorRegistryResetView *actor)
+                              struct ChaseActor *actor)
 {
     u32 index;
     s32 power;
@@ -191,14 +191,14 @@ void Bee_UpdateTurnAnimation(struct RoomActor *actor)
         actor->restart = 0;
 }
 
-void Bee_ResetIdleAnimation(struct SceneActorRegistryResetView *actor)
+void Bee_ResetIdleAnimation(struct ChaseActor *actor)
 {
     if (actor->base.field2B2 != 0)
         actor->base.field2B2 = 0;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 }
 
-void Bee_ResetReactionAnimation(struct SceneActorRegistryResetView *actor)
+void Bee_ResetReactionAnimation(struct ChaseActor *actor)
 {
     if (actor->base.field2B2 != 0)
         actor->base.field2B2 = 0;
@@ -214,7 +214,7 @@ static inline u8 Bee_TakeReadyFlag(u8 *flag)
     return FALSE;
 }
 
-void Bee_UpdateRecoveryAnimation(struct SceneActorRegistryResetView *actor)
+void Bee_UpdateRecoveryAnimation(struct ChaseActor *actor)
 {
     if (Bee_TakeReadyFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
@@ -255,9 +255,9 @@ void Bee_UpdateFacingAnimation(struct RoomActor *actor)
         actor->restart = 0;
 }
 
-void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 
-void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *, struct SceneVec *);
+void SceneActorControl_StartPositionCurve(struct ChaseActor *, struct SceneVec *);
 
 static inline s32 Bee_QuarterMotion(s32 v)
 {
@@ -280,8 +280,7 @@ static inline u8 Bee_IsMotionAtRest(s32 x, s32 z)
     return 0;
 }
 
-static inline void Bee_SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+static inline void Bee_SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -292,7 +291,7 @@ static inline void Bee_SetState(struct SceneActorRegistryResetView *actor, u8 st
 
 // confidence=low: eases saved motion before returning to idle.
 
-void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *actor)
+void Bee_UpdateMovementStop(struct ChaseActor *actor)
 {
     struct Bee *body = actor->base.context;
     s32 x, z;
@@ -372,7 +371,7 @@ void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-void Bee_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -465,7 +464,7 @@ static inline void Bee_ClearReturnMotion(u32 *zero, void *out)
     CpuSet(zero, out, 0x05000002);
 }
 
-static inline void Bee_EnterState(struct SceneActorRegistryResetView *a, u32 phase, u32 behavior)
+static inline void Bee_EnterState(struct ChaseActor *a, u32 phase, u32 behavior)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = phase;
@@ -476,7 +475,7 @@ static inline void Bee_EnterState(struct SceneActorRegistryResetView *a, u32 pha
 
 // confidence=low: initializes a small random movement and returns to the player when it stops.
 
-void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
+void Bee_ReturnToPlayerWhenStopped(struct ChaseActor *actor)
 {
     u32 zero;
     s32 length;
@@ -516,7 +515,7 @@ void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor)
 
 extern void *gUnk_08605D64[];
 
-void Bee_InitActionPreset(struct SceneActorRegistryResetView *actor)
+void Bee_InitActionPreset(struct ChaseActor *actor)
 {
     actor->base.callbacks284 = gUnk_08605D64;
 }
@@ -529,14 +528,13 @@ static inline u32 Bee_AnchorRandom(void)
     return *(const u16 *)((gRandomIndex << 1) + 0x0203B400);
 }
 
-static inline u32 Bee_AnchorActorFlags(struct SceneActorRegistryResetView *actor, u32 input,
-                                       u32 offset)
+static inline u32 Bee_AnchorActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
-static inline u8 Bee_AnchorUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Bee_AnchorUnavailable(struct ChaseActor *actor)
 {
     if (actor && (Bee_AnchorActorFlags(actor, 0x40, 0x2D4) ||
                   Bee_AnchorActorFlags(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
@@ -559,7 +557,7 @@ static inline void Bee_AnchorPolarOffset(struct ContactPosition *out, u16 angle,
     out->z = Bee_TruncateShift(gUnk_086149C4[angle & 255] * radius, 12);
 }
 
-static inline void Bee_SetAnchorControl(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Bee_SetAnchorControl(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     u8 *taken = &a->base.field2B2;
@@ -583,8 +581,7 @@ static inline void Bee_ClearAnchorMotion(u32 *zero, void *out)
     CpuSet(zero, out, 0x05000002);
 }
 
-static inline void Bee_SetAnchorState(struct SceneActorRegistryResetView *a, u32 state, u32 phase,
-                                      u32 behavior)
+static inline void Bee_SetAnchorState(struct ChaseActor *a, u32 state, u32 phase, u32 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -607,7 +604,7 @@ static inline s32 Bee_GetBearing(const struct ContactPosition *delta)
     return Math_Atan2(delta->x, delta->z);
 }
 
-void Bee_StartMoveToBody(struct SceneActorRegistryResetView *actor, u16 *args)
+void Bee_StartMoveToBody(struct ChaseActor *actor, u16 *args)
 {
     struct Bee *body;
     struct {
@@ -660,7 +657,7 @@ static inline void Bee_ClearResetVector(u32 *fillp, u32 value, void *out)
     CpuSet(fillp, out, 0x05000002);
 }
 
-void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
+void Bee_ResetRoute(struct ChaseActor *actor)
 {
     u32 zero4;
     u8 *bytes;
@@ -737,14 +734,13 @@ void Bee_ResetRoute(struct SceneActorRegistryResetView *actor)
     DisplaySequence_Step(actor->base.drawable);
 }
 
-static inline u32 Bee_FlightActorFlags(struct SceneActorRegistryResetView *actor, u32 input,
-                                       u32 offset)
+static inline u32 Bee_FlightActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
-static inline u8 Bee_FlightUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Bee_FlightUnavailable(struct ChaseActor *actor)
 {
     if (actor && (Bee_FlightActorFlags(actor, 0x40, 0x2D4) ||
                   Bee_FlightActorFlags(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
@@ -764,7 +760,7 @@ static inline s32 Bee_ScaleSine(s32 value, u32 shift)
     return value >= 0 ? value >> shift : -((-value) >> shift);
 }
 
-void Bee_UpdateFlightHeight(struct SceneActorRegistryResetView *actor)
+void Bee_UpdateFlightHeight(struct ChaseActor *actor)
 {
     s32 delta, absolute;
     u16 *g;
@@ -866,7 +862,7 @@ static inline u32 Bee_ReadMovementCode(const u32 *t, u32 i)
     return t[i];
 }
 
-u32 Bee_GetMovementAnimationCode(struct SceneActorRegistryResetView *actor)
+u32 Bee_GetMovementAnimationCode(struct ChaseActor *actor)
 {
     struct Bee *state = actor->base.context;
     s32 sample;
@@ -886,8 +882,7 @@ u32 Bee_GetMovementAnimationCode(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Bee_SetMovementEndpoints(struct SceneActorRegistryResetView *actor,
-                              struct ContactPosition *target)
+void Bee_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *target)
 {
     struct Bee *context = actor->base.context;
     context->start = actor->base.body.position;
@@ -895,7 +890,7 @@ void Bee_SetMovementEndpoints(struct SceneActorRegistryResetView *actor,
     context->curveTime = 0;
 }
 
-u8 Bee_AdvanceMovementCurve(struct SceneActorRegistryResetView *actor)
+u8 Bee_AdvanceMovementCurve(struct ChaseActor *actor)
 {
     struct Bee *ctx = actor->base.context;
     struct ContactPosition start, end;
@@ -918,12 +913,12 @@ u8 Bee_AdvanceMovementCurve(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-void Bee_InitProfile(struct SceneActorRegistryResetView *actor)
+void Bee_InitProfile(struct ChaseActor *actor)
 {
     actor->base.profileId = SceneActorProfiles_FindOrAdd(0x14, 0);
 }
 
-void Bee_DisableMovement(struct SceneActorRegistryResetView *actor)
+void Bee_DisableMovement(struct ChaseActor *actor)
 {
     struct Bee *context = actor->base.context;
     u32 m = 0x100000;
@@ -943,8 +938,7 @@ static inline void Bee_FillMotion(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 
-void Bee_BeginMoveToPosition(struct SceneActorRegistryResetView *actor,
-                             struct ContactPosition *target)
+void Bee_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target)
 {
     struct Bee *context = actor->base.context;
     u32 stack[3];
@@ -985,7 +979,7 @@ void Bee_GetDirectionalFrameAndFlip(u16 a, s32 *b, s32 *c)
     }
 }
 
-void Bee_TickBehaviorCooldown(struct SceneActorRegistryResetView *actor)
+void Bee_TickBehaviorCooldown(struct ChaseActor *actor)
 {
     struct Bee *context = actor->base.context;
     u8 v = context->behaviorCooldown;
@@ -1035,8 +1029,7 @@ static inline void Bee_InterpolatePoint(struct ContactPosition *out, struct Cont
     out->z = start->z + Bee_Shift10(value);
 }
 
-void Bee_BuildMovementCurve(struct SceneActorRegistryResetView *actor,
-                            struct ContactPosition *target)
+void Bee_BuildMovementCurve(struct ChaseActor *actor, struct ContactPosition *target)
 {
     struct Bee *route = actor->base.context;
     struct ContactPosition start;
@@ -1097,29 +1090,26 @@ void SceneActorCollision_FireSecondaryAttack(struct SceneActorRegistryActor *act
     {
         u16 mask = 0x100;
         if (mask & actor->flags2D4) {
-            struct ContactCollider *collider =
-                &((struct SceneActorRegistryResetView *)actor)->base.colliderB;
-            u16 field3C = ((struct SceneActorRegistryResetView *)actor)->base.attacks.first[1];
-            u16 field40 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.second[1];
-            u32 reactionFlags =
-                ((struct SceneActorRegistryResetView *)actor)->base.attacks.flags[1];
-            u16 field44 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.parameter[1];
+            struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
+            u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[1];
+            u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[1];
+            u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[1];
+            u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[1];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
     }
     {
-        struct ContactCollider *collider =
-            &((struct SceneActorRegistryResetView *)actor)->base.colliderB;
-        u16 field3C = ((struct SceneActorRegistryResetView *)actor)->base.attacks.first[0];
-        u16 field40 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.second[0];
-        u32 reactionFlags = ((struct SceneActorRegistryResetView *)actor)->base.attacks.flags[0];
-        u16 field44 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.parameter[0];
+        struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
+        u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[0];
+        u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[0];
+        u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[0];
+        u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[0];
         Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
     }
 }
 
-static inline u8 Bee_HasDetection(struct SceneActorRegistryResetView *actor)
+static inline u8 Bee_HasDetection(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *p = &actor->base.tracking;
     u32 mask = 2;
@@ -1128,7 +1118,7 @@ static inline u8 Bee_HasDetection(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-u32 Bee_OnDetectionCheck(struct SceneActorRegistryResetView *actor)
+u32 Bee_OnDetectionCheck(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *p;
     s32 distance;
@@ -1169,14 +1159,14 @@ one: {
     return 1;
 }
 
-void Slime_SetStateFlag(struct SceneActorRegistryResetView *actor)
+void Slime_SetStateFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     u8 m = 8;
     tracking->flags = m | tracking->flags;
 }
 
-u32 Bee_GetMovementVariant(struct SceneActorRegistryResetView *actor)
+u32 Bee_GetMovementVariant(struct ChaseActor *actor)
 {
     u32 r;
     switch (actor->base.paletteOffset) {
@@ -1204,7 +1194,7 @@ void Bee_TickActionCooldown(struct Bee *context)
         *q = v - 1;
 }
 
-u32 Bee_UpdateGroundHeight(struct SceneActorRegistryResetView *actor)
+u32 Bee_UpdateGroundHeight(struct ChaseActor *actor)
 {
     Bee_UpdateFlightHeight(actor);
     return 1;
@@ -1292,7 +1282,7 @@ static inline void Bee_AddPosition(struct ContactPosition *out, const struct Con
     out->z = out->z + from->z;
 }
 
-static inline void Bee_InstallControl(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Bee_InstallControl(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     u8 *taken = &a->base.field2B2;
@@ -1310,14 +1300,14 @@ static inline void Bee_InstallControl(struct SceneActorRegistryResetView *a, voi
     a->base.word104 = zero;
 }
 
-static inline u8 Bee_GetHeading(const struct SceneActorRegistryResetView *actor)
+static inline u8 Bee_GetHeading(const struct ChaseActor *actor)
 {
     return actor->base.tracking.heading;
 }
 
 // confidence=low: follows a randomized route and returns to the Bee behavior selector.
 
-void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
+void Bee_FollowWanderRoute(struct ChaseActor *actor)
 {
     struct ContactPosition dest;
     struct ContactPosition delta;
@@ -1399,7 +1389,7 @@ void Bee_FollowWanderRoute(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_TickPendingTarget(struct ChaseActor *actor)
 {
     struct Bee *context = actor->base.context;
 
@@ -1442,8 +1432,7 @@ void SceneActorControl_TickPendingTarget(struct SceneActorRegistryResetView *act
     }
 }
 
-static inline void Bee_ResetBehavior(struct SceneActorRegistryResetView *actor, u32 phase,
-                                     u32 behavior)
+static inline void Bee_ResetBehavior(struct ChaseActor *actor, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = phase;
@@ -1452,7 +1441,7 @@ static inline void Bee_ResetBehavior(struct SceneActorRegistryResetView *actor, 
     actor->base.field2B1 = 1;
 }
 
-void Bee_UpdateReactionPhase(struct SceneActorRegistryResetView *actor)
+void Bee_UpdateReactionPhase(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         actor->base.body.direction = actor->base.tracking.heading;
@@ -1477,7 +1466,7 @@ void Bee_UpdateReactionPhase(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC++;
 }
 
-static inline void Bee_SetRecoveryControl(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Bee_SetRecoveryControl(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero = 0;
     a->base.field2B2 = 1;
@@ -1495,7 +1484,7 @@ static inline void Bee_SetRecoveryControl(struct SceneActorRegistryResetView *a,
 
 // confidence=low: approaches a saved player position during the recovery animation.
 
-void Bee_ApproachSavedPlayerPosition(struct SceneActorRegistryResetView *actor)
+void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
 {
     struct Bee *body = actor->base.context;
     struct SceneActorBody *motion;
@@ -1555,7 +1544,7 @@ static inline void Bee_PausePolarMotion(struct ContactPosition *m, u32 angle, s3
     m->z = Bee_TruncateShift(gUnk_086149C4[angle] * radius, 12);
 }
 
-void Bee_UpdateWanderPause(struct SceneActorRegistryResetView *actor)
+void Bee_UpdateWanderPause(struct ChaseActor *actor)
 {
     s32 cnt;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
@@ -1642,7 +1631,7 @@ static inline u16 Bee_GetPreviousZ(struct Bee *route, s32 index)
 
 // confidence=low: steps along nine route points toward an anchor, then retargets after the route ends.
 
-void Bee_FollowAnchorRoute(struct SceneActorRegistryResetView *actor)
+void Bee_FollowAnchorRoute(struct ChaseActor *actor)
 {
     struct Bee *route = actor->base.context;
     struct ContactPosition delta, target, step;
@@ -1710,21 +1699,21 @@ void Bee_FollowAnchorRoute(struct SceneActorRegistryResetView *actor)
 
 extern void *gUnk_08605D88[];
 
-void Bee_InitBehaviorHandlers(struct SceneActorRegistryResetView *actor)
+void Bee_InitBehaviorHandlers(struct ChaseActor *actor)
 {
     actor->base.behaviorCallbacks = gUnk_08605D88;
 }
 
 extern void *gUnk_08605D9C[];
 
-void Bee_InitReactionHandlers(struct SceneActorRegistryResetView *actor)
+void Bee_InitReactionHandlers(struct ChaseActor *actor)
 {
     actor->base.callbacks29C = gUnk_08605D9C;
 }
 
 void SceneActorControl_DispatchControl(u8 *);
 
-u32 Bee_OnUpdate(struct SceneActorRegistryResetView *actor)
+u32 Bee_OnUpdate(struct ChaseActor *actor)
 {
     u32 i;
     void **t;
@@ -1739,7 +1728,7 @@ u32 Bee_OnUpdate(struct SceneActorRegistryResetView *actor)
 
 void SceneActor_UpdateActiveCallbacks(u8 *);
 
-u32 Bee_OnPlayerInteraction(struct SceneActorRegistryResetView *actor)
+u32 Bee_OnPlayerInteraction(struct ChaseActor *actor)
 {
     actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     SceneActor_UpdateActiveCallbacks((void *)actor);
@@ -1769,7 +1758,7 @@ static inline u8 Bee_TestDestroyFlags(u16 *a, u32 m)
     return 0;
 }
 
-u32 Bee_Destroy(struct SceneActorRegistryResetView *actor)
+u32 Bee_Destroy(struct ChaseActor *actor)
 {
     u8 *p = actor->base.drawable;
     u8 *q;
@@ -1828,7 +1817,7 @@ extern SceneActorCommandHandler const gUnk_08605DB8[];
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
 
-static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -1885,8 +1874,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
     SceneBody_SetMovementProbe(body, ((struct Bee *)arg0)->base.movementProbe, 0x40, 0x40);
 }
 
-static inline void Bee_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
-                                   u16 alternate)
+static inline void Bee_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 r1v;
     actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
@@ -1905,11 +1893,10 @@ static inline void Bee_ReadPalette(struct SceneActorRegistryResetView *actor, u1
             SceneActorScript_GetManagerField62() - 0x5FFF);
 }
 
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
-                                              void *cb1, void *cb2, void *cb3, void *cb4,
-                                              void *hidden, void *cb5, void *cb6,
-                                              void *defaultReaction, void *targetQuery,
-                                              void *damage, void *contact)
+static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0, void *cb1,
+                                              void *cb2, void *cb3, void *cb4, void *hidden,
+                                              void *cb5, void *cb6, void *defaultReaction,
+                                              void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->base.contextCallback = cb0;
@@ -1932,14 +1919,14 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     MonsterInit_ClearMotion(actor);
 }
 
-static inline void Bee_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void Bee_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = Bee_OnPlayerInteraction;
     actor->base.destroyCallback = Bee_Destroy;
 }
 
-static inline void Bee_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void Bee_InstallRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605DB8);
     actor->base.callback248 = Bee_ResetRoute;
@@ -1950,7 +1937,7 @@ static inline void Bee_InstallRoutes(struct SceneActorRegistryResetView *actor)
 s32 Bee_Init(void *object)
 {
     struct Bee *bee = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

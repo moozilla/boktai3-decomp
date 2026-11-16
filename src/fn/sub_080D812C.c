@@ -75,7 +75,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline u8 Test2(u16 **out, struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     u16 *flags = &actor->base.flags2C0;
@@ -85,13 +85,12 @@ static inline u8 Test2(u16 **out, struct SceneActorRegistryResetView *actor, u32
         return 1;
     return 0;
 }
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.flags2D0 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -105,7 +104,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->base.word104 = 0;
 }
-static inline u8 Blocked(struct SceneActorRegistryResetView *s)
+static inline u8 Blocked(struct ChaseActor *s)
 {
     if (!s)
         goto zero;
@@ -133,7 +132,7 @@ static inline s32 LocalPlayer(void)
         return -1;
     return gLinkSession->localPlayer;
 }
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+static inline u8 ShouldShowDamage(struct ChaseActor *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
         u32 mask = actor->base.field2E0;
@@ -166,7 +165,7 @@ static inline void Fill(u32 *zero, void *dst)
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-static inline s32 CurrentHealth(struct SceneActorRegistryResetView *actor)
+static inline s32 CurrentHealth(struct ChaseActor *actor)
 {
     s16 *health = (void *)&actor->base.health;
     return *health;
@@ -177,7 +176,7 @@ static inline void OrStatus(u16 status, u16 *flags)
 }
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
 #define Mummy_UpdateBurnDamage sub_080D812C
-void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
+void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
 {
     struct BurnState *burn = (void *)&actor->group.common;
     u16 *flags2C0;
@@ -252,11 +251,11 @@ void Mummy_UpdateBurnDamage(struct SceneActorRegistryResetView *actor)
             if (!masked) {
                 u16 bank = actor->base.paletteAlternateBank;
                 {
-                    struct SceneActorRegistryResetView *p = actor;
+                    struct ChaseActor *p = actor;
                     if (p->base.drawableKind == 0)
                         AnimData_SelectPaletteBank((u8 *)p->base.drawable + 0x2C, bank);
                     else {
-                        struct SceneActorRegistryResetView *q = actor;
+                        struct ChaseActor *q = actor;
                         *(u8 **)((u8 *)q->base.drawable + 0x68) = gPaletteBankData + bank * 32;
                     }
                 }

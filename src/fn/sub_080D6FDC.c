@@ -5,7 +5,7 @@
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor)
+static inline void SetControl(struct ChaseActor *actor)
 {
     void *callback = SceneActorControl_OnIdle;
     u8 kind = 0;
@@ -21,8 +21,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
     }
     actor->base.word104 = 0;
 }
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -32,7 +31,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
 }
 
 // confidence=low: scans to the last open cell in the current facing and starts a route.
-u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *actor)
+u8 Mummy_RequestStraightRoute(struct ChaseActor *actor)
 {
     u8 *state = actor->base.context;
     u8 *nav = (u8 *)actor + 0x3D4;

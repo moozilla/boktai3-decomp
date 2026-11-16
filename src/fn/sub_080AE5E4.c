@@ -3,8 +3,7 @@
 extern const u8 gUnk_0824E20C[];
 u8 Vorn_HasActiveResponse(void *);
 void sub_080B3110(void *, u32, const u8 *, u32);
-static inline void Resume_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                     void *control)
+static inline void Resume_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -18,8 +17,8 @@ static inline void Resume_SetControl(struct SceneActorRegistryResetView *actor, 
     }
     actor->base.word104 = 0;
 }
-static inline void Resume_ResetAnimation(struct SceneActorRegistryResetView *actor, u32 state,
-                                         u32 phase, u32 behavior)
+static inline void Resume_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase,
+                                         u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -31,7 +30,7 @@ struct SceneActorResumeContext {
     u8 unknown0[0x6D4];
     u16 flags;
 };
-void SceneActorReaction_ResumeOrRunScript(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor))

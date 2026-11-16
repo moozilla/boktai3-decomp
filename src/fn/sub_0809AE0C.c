@@ -13,7 +13,7 @@ struct LunContactContext {
     u32 flags3D4;
 };
 
-static inline void Lun_SetControl(struct SceneActorRegistryResetView *actor, void *target, u32 kind)
+static inline void Lun_SetControl(struct ChaseActor *actor, void *target, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -28,8 +28,7 @@ static inline void Lun_SetControl(struct SceneActorRegistryResetView *actor, voi
     actor->base.word104 = 0;
 }
 
-static inline void Lun_SetState(struct SceneActorRegistryResetView *actor, u32 state, u8 phase,
-                                u32 behavior)
+static inline void Lun_SetState(struct ChaseActor *actor, u32 state, u8 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -38,23 +37,23 @@ static inline void Lun_SetState(struct SceneActorRegistryResetView *actor, u32 s
     actor->base.field2B1 = 1;
 }
 
-static inline u32 Lun_ReadContextFlags(struct SceneActorRegistryResetView *actor, u8 mask)
+static inline u32 Lun_ReadContextFlags(struct ChaseActor *actor, u8 mask)
 {
     struct LunContactContext *context = actor->base.context;
     return context->flags3D4 & mask ? 1 : 0;
 }
 
-static inline u32 Lun_ReadActorMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Lun_ReadActorMotionFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
 
-static inline u32 Lun_ReadActorStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Lun_ReadActorStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
 
-static inline u8 Lun_IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Lun_IsUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         if (Lun_ReadActorMotionFlags(actor, 0x40) || Lun_ReadActorStatusFlags(actor, 0x20000) ||
@@ -85,13 +84,13 @@ static inline void Lun_EnableCollider(struct ContactCollider *collider)
     collider->flags |= 4;
 }
 
-static inline void Lun_SetContactFlag(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline void Lun_SetContactFlag(struct ChaseActor *actor, u16 bits)
 {
     u16 *flags = &actor->base.flags2C0;
     *flags = bits | *flags;
 }
 
-static inline void Lun_ClearReactionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Lun_ClearReactionFlags(struct ChaseActor *actor, u32 bits)
 {
     u16 *flags = &actor->base.flags2D6;
     u32 mask = ~bits;
@@ -114,7 +113,7 @@ static inline void Lun_ApplyContactFlag(struct LunContactContext *context)
         (result_) = Lun_ReadContextFlags(actor_, mask_);                                           \
     } while (0)
 
-static inline u32 Lun_CapturePalette(struct SceneActorRegistryResetView *actor, u16 **entry)
+static inline u32 Lun_CapturePalette(struct ChaseActor *actor, u16 **entry)
 {
     u16 *current = &actor->base.paletteOffset;
     u32 value = *current;
@@ -125,7 +124,7 @@ static inline u32 Lun_CapturePalette(struct SceneActorRegistryResetView *actor, 
 /* Applies the palette-dependent player effect after a vertical contact check. */
 void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *object)
 {
-    struct SceneActorRegistryResetView *actor;
+    struct ChaseActor *actor;
     u8 phase;
     u16 *palette;
     s32 limit;

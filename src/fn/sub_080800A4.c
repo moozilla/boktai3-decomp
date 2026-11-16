@@ -13,11 +13,11 @@ static inline void Reaction_ClearHalf(struct ChaseFlags40 *field, u32 bits)
     s32 mask = ~bits;
     field->bits &= mask;
 }
-static inline void Reaction_SetActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Reaction_SetActorFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2CC = mask | actor->base.flags2CC;
 }
-static inline void Reaction_Show(struct SceneActorRegistryResetView *actor)
+static inline void Reaction_Show(struct ChaseActor *actor)
 {
     if (!actor->base.drawableKind) {
         u32 *flags = actor->base.drawable;
@@ -30,18 +30,18 @@ static inline void Reaction_Show(struct SceneActorRegistryResetView *actor)
         tile->flags = mask & tile->flags;
     }
 }
-static inline void Reaction_SetDrawMode(struct SceneActorRegistryResetView *actor, u32 mode)
+static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
 {
     if (!actor->base.drawableKind)
         *((u8 *)actor->base.drawable + 7) = mode;
     else
         *((u8 *)actor->base.drawable + 0x3A) = mode;
 }
-static inline void SetDeathFlag(struct SceneActorRegistryResetView *actor, u16 bit)
+static inline void SetDeathFlag(struct ChaseActor *actor, u16 bit)
 {
     actor->base.flags2D4 = bit | actor->base.flags2D4;
 }
-static inline void ClearActorBits(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void ClearActorBits(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
     actor->base.flags2CC &= mask;
@@ -57,11 +57,11 @@ static inline void ApplyColliderMask(u16 *field, u16 bits)
     mask &= old;
     *field = mask;
 }
-static inline u32 *Reaction_ControlFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 *Reaction_ControlFlags(struct ChaseActor *actor)
 {
     return &actor->base.flags2CC;
 }
-void SceneActorReaction_UpdateContactRouteRecovery(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *collider = &actor->base.colliderA;

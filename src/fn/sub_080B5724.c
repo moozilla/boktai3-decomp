@@ -3,8 +3,8 @@
 
 // foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
 #define SceneActorControl_EnterResetMode SceneActorPlacement_ResetActorState
-void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
-static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
+void SceneActorPlacement_ResetActorState(struct ChaseActor *, const u16 *);
+static inline u8 Unavailable(struct ChaseActor *actor)
 {
     if (!actor)
         goto zero;
@@ -35,7 +35,7 @@ one:
 zero:
     return 0;
 }
-void SceneActorControl_RestartBehavior57(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
 {
     u16 mode;
     if (Unavailable(actor))

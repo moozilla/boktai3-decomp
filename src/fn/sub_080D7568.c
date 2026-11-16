@@ -34,7 +34,7 @@ static inline u8 Mummy_TestContextOwned(struct MummyContactContext *context, u32
     return 0;
 }
 
-static inline u32 Mummy_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Mummy_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
@@ -43,16 +43,16 @@ static inline void Mummy_SetTrackingFlags(struct SceneActorChaseTracking *tracki
 {
     tracking->flags |= bits;
 }
-static inline u32 Mummy_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Mummy_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u32 Mummy_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Mummy_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
 
-static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void Mummy_SetBehavior(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -63,7 +63,7 @@ static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, 
 static inline u8 Mummy_Arrive(void *obj, struct SceneActorChaseTracking *tracking)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
@@ -132,7 +132,7 @@ Mummy_BeginContactTracking(struct SceneActorChaseTracking *tracking, u8 bits)
     return &tracking->target;
 }
 
-u8 sub_080D7568(struct SceneActorRegistryResetView *actor)
+u8 sub_080D7568(struct ChaseActor *actor)
 {
     struct MummyContactContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;

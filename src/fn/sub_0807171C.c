@@ -1,6 +1,6 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
-static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct SceneActorRegistryRoute *route = &actor->group.homeRoute;

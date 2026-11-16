@@ -3,8 +3,8 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_script.h"
-u8 SceneActorReaction_TrySink(struct SceneActorRegistryResetView *);
-void SceneActorPlacement_ResetActorState(struct SceneActorRegistryResetView *, const u16 *);
+u8 SceneActorReaction_TrySink(struct ChaseActor *);
+void SceneActorPlacement_ResetActorState(struct ChaseActor *, const u16 *);
 s32 Mod(s32, s32);
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -20,7 +20,7 @@ static inline void SetColliderFlag(struct ContactCollider *collider)
 {
     collider->flags |= 4;
 }
-void SceneActorReaction_TickHiddenTimeout(struct SceneActorRegistryResetView *p, s32 elapsed)
+void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
 {
     struct SceneActorScriptPropertiesView *state = p->base.context;
     u16 mode;

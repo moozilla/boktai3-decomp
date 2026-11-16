@@ -21,7 +21,7 @@ static inline u8 Vorn_TestNear(struct VornPursuitContext *p, u32 mask, u16 **out
         return 1;
     return 0;
 }
-void Vorn_UpdatePursuitDistance(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
 {
     struct VornPursuitContext *context = actor->base.context;
     u8 *group = (u8 *)context + 0x3D4;

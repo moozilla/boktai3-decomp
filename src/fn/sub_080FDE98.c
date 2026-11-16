@@ -9,7 +9,7 @@ struct AxePlayer {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
+void Axe_EmitMotionTrail(struct ChaseActor *);
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 struct AxeRoute {
@@ -64,7 +64,7 @@ static inline u32 Facing(u32 value, u8 *direction)
     return (value & 63) + *direction;
 }
 // confidence=low: follows nine stored route points and retargets around the player; action role tentative.
-void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
+void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
 {
     struct AxeRoute *route = actor->base.context;
     struct ContactPosition delta, target;

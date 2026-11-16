@@ -6,7 +6,7 @@
 
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
-void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *, s32);
+void Vorn_ResumeRouteAfterDelay(struct ChaseActor *, s32);
 
 struct VornAnimationState {
     u8 unknown0[12];
@@ -28,13 +28,13 @@ static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 
         return 1;
     return 0;
 }
-static inline void Vorn_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Vorn_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2D0 = mask | actor->base.flags2D0;
 }
 
 #define Vorn_UpdateStaggerRecovery sub_080AD75C
-void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorAnimationLink *context = actor->base.context;
     struct VornAnimationState *animation =

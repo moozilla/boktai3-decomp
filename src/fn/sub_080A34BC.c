@@ -31,7 +31,7 @@ static inline u8 TestFlags(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -45,7 +45,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -54,7 +54,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->base.field2B1 = 1;
 }
 
-void sub_080A34BC(struct SceneActorRegistryResetView *a)
+void sub_080A34BC(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     struct SpiderRecoveryContext *ctx = a->base.context;

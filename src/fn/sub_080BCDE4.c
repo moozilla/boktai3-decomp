@@ -6,8 +6,8 @@ struct SceneActorApproachContext {
     u8 unknown6E0[0x28];
     u32 minimumDistance, maximumDistance;
 };
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
 static inline void ClearFlags(u32 *p, u32 mask)
 {
@@ -17,7 +17,7 @@ static inline void ClearFlags16(u16 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
+static inline u8 TryMove(struct ChaseActor *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
     struct ContactPosition *position = &actor->base.body.position;
@@ -38,7 +38,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
         }
     }
 }
-void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_UpdateRange(struct ChaseActor *actor)
 {
     struct SceneActorApproachContext *context = actor->base.context;
     u8 *group = (void *)&actor->group.common;

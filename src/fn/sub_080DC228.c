@@ -11,7 +11,7 @@ struct MummyPursuitContext {
     struct SceneActorChaseFlags16 flags;
 };
 
-void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
+void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct MummyPursuitContext *body = actor->base.context;

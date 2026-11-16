@@ -17,9 +17,9 @@ static inline u8 BoolOf(u32 v)
         return 1;
     return 0;
 }
-s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct SceneActorRegistryResetView *actor)
+s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     struct SceneActorTargetLink *state;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     if (*pendingId > 0) {

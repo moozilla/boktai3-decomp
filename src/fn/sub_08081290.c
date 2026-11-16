@@ -1,16 +1,16 @@
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_reaction.h"
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
-static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *);
+static inline u8 IsControlled(struct ChaseActor *a)
 {
     if (a->base.object == (void *)1)
         return 1;
     return 0;
 }
 
-static inline void ClearRoute(struct SceneActorRegistryResetView *a)
+static inline void ClearRoute(struct ChaseActor *a)
 {
     struct SceneActorRegistryControl *route = &a->group.common.control;
     u32 *flags = &a->base.flags2CC;
@@ -21,7 +21,7 @@ static inline void ClearRoute(struct SceneActorRegistryResetView *a)
     route->timer = 0;
 }
 
-static inline void Show(struct SceneActorRegistryResetView *a)
+static inline void Show(struct ChaseActor *a)
 {
     if (!a->base.drawableKind) {
         u32 *flags = a->base.drawable;
@@ -34,7 +34,7 @@ static inline void Show(struct SceneActorRegistryResetView *a)
     }
 }
 
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
 {
     u32 state;
 

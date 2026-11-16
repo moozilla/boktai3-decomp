@@ -7,7 +7,7 @@ void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorRecord_RecordPair(u16, u16);
-static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
+static inline u8 IsPrimary(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
         return 1;
@@ -19,13 +19,13 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
+static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     /* The actor stores flags2D4 as a halfword and flags2D0 as a word. */
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor)
+static inline void SetControl(struct ChaseActor *actor)
 {
     void *callback = (void *)SceneActorControl_OnIdle;
     u8 kind = 16;
@@ -48,8 +48,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
     }
     actor->base.word104 = 0;
 }
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -57,7 +56,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;

@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
-void SceneActorControl_UpdateAnimationTransition(struct SceneActorRegistryResetView *, s32);
-static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u16 zero, u32 offset)
+void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *, s32);
+static inline void BeginTransition(struct ChaseActor *actor, u16 zero, u32 offset)
 {
     u32 state = 3;
     u32 stateOffset = 0x2A8;
@@ -35,7 +35,7 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
         actor->base.word104 = zero;
     }
 }
-s32 SceneActorControl_BeginSoundTransition(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
     u16 *flags;
     u16 suppressed;

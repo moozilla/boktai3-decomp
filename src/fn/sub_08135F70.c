@@ -22,7 +22,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
+static inline u8 HasPendingHit(struct ChaseActor *actor)
 {
     if (actor->base.field2E6 == 0)
         return 0;
@@ -38,7 +38,7 @@ static inline u16 OwnershipFlagBits(u32 value, u32 mask)
 {
     return value & mask;
 }
-static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
+static inline u8 ShouldShowDamage(struct ChaseActor *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->base.field2E0;
@@ -66,7 +66,7 @@ static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
     }
     return 1;
 }
-static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 flags)
+static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
 {
     if (actor) {
         {
@@ -85,8 +85,7 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 flags)
     return 0;
 }
 
-static inline u8 IsDownAtHealth(struct SceneActorRegistryResetView *actor, u16 flags,
-                                const s16 *health)
+static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *health)
 {
     if (actor) {
         {
@@ -105,8 +104,8 @@ static inline u8 IsDownAtHealth(struct SceneActorRegistryResetView *actor, u16 f
     return 0;
 }
 
-static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *actor, u16 *flags2D4,
-                                        u32 *flags2CC, const s16 *health)
+static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4, u32 *flags2CC,
+                                        const s16 *health)
 {
     u32 flags = *flags2D4;
     if (flags) {
@@ -188,7 +187,7 @@ static inline void Fill(u32 *zero, void *dst)
     CpuSet(zero, dst, 0x05000002);
 }
 
-u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
 {
     s16 *savedHealth;
     struct {

@@ -2,8 +2,8 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 extern const s16 gUnk_086149C4[];
-void SceneActorControl_UpdateShadowReturn(struct SceneActorRegistryResetView *);
-void SceneActorControl_RestartPositionCurve(struct SceneActorRegistryResetView *);
+void SceneActorControl_UpdateShadowReturn(struct ChaseActor *);
+void SceneActorControl_RestartPositionCurve(struct ChaseActor *);
 
 static inline s32 ScaleMotionComponent(s32 n)
 {
@@ -19,7 +19,7 @@ static inline void SetPolarMotion(struct ContactPosition *m, u32 angle, s32 radi
     m->z = ScaleMotionComponent(gUnk_086149C4[angle] * radius);
 }
 
-void SceneActorControl_UpdateShadowReturnPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateShadowReturnPhase(struct ChaseActor *actor)
 {
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

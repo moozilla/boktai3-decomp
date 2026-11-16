@@ -12,7 +12,7 @@ struct SpiderResetContext {
 };
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-void SceneActorRoute_ResetStep(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_ResetStep(struct ChaseActor *actor)
 {
     struct SpiderResetContext *context = actor->base.context;
     context->field628 = 0;

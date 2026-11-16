@@ -3,7 +3,7 @@
 #include "scene_actor_straight_route.h"
 #include "scene_actor_attachment.h"
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -11,7 +11,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u8 kind)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -26,7 +26,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 // confidence=low: timed movement recovery restores a route and saves a delayed control.
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 struct DelayedReactionControl {
     u8 state, phase, behavior, unknown3;
@@ -47,7 +47,7 @@ static inline void SaveControl(struct SceneActorChaseSavedControl *record, void 
     saved->next.phase = 0;
     saved->next.behavior = behavior;
 }
-void SceneActorReaction_UpdateRouteRecovery(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u8 result;

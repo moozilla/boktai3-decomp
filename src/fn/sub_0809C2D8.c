@@ -8,10 +8,10 @@ struct LunRouteEntry {
     u16 *point;
 };
 void Lun_SelectRandomRouteEntry(struct LunRouteEntry *);
-void Lun_SetMovementEndpoints(struct SceneActorRegistryResetView *, struct ContactPosition *);
-void sub_0809CCF4(struct SceneActorRegistryResetView *);
+void Lun_SetMovementEndpoints(struct ChaseActor *, struct ContactPosition *);
+void sub_0809CCF4(struct ChaseActor *);
 s32 Math_Atan2(s32, s32);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -25,8 +25,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -35,7 +34,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.field2B1 = 1;
 }
 
-void Lun_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
+void Lun_ChooseMovementDestination(struct ChaseActor *actor)
 {
     u8 *state = actor->base.context;
     struct ContactPosition destination;

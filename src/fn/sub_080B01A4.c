@@ -2,9 +2,9 @@
 // confidence=low: accelerates along the route and chooses side-step or turn transitions.
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -14,7 +14,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -28,8 +28,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                              u32 behavior)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -41,7 +40,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
         *((u8 *)actor + offset) = 1;
     }
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -49,7 +48,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 behav
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb, u32 kind)
+static inline void SetMotion(struct ChaseActor *actor, void *cb, u32 kind)
 {
     actor->base.word104 = (u32)cb;
     actor->base.word108 = 0;
@@ -58,7 +57,7 @@ static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb
     actor->base.flags114 = 1;
 }
 void SceneActorReaction_BeginSideStep(void);
-void Vorn_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 speed;

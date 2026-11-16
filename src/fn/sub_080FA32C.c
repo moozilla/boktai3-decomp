@@ -17,7 +17,7 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 speed)
     v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * speed);
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -31,8 +31,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -41,7 +40,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.field2B1 = 1;
 }
 // confidence=low: speed and phase duration depend on remaining health.
-void Axe_UpdateHealthPacedMotion(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     s32 speed;

@@ -4,9 +4,9 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "player.h"
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
-void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *);
-u8 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *, void *, u32, u32, s32, u32);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
+void SceneActor_AccelerateForTerrain(struct ChaseActor *);
+u8 Actor_StepTowardTargetAxis(struct ChaseActor *, void *, u32, u32, s32, u32);
 s32 Math_Atan2(s32, s32);
 s32 SceneActorTerrain_CompareNeighborHeight(s32, u32, u32);
 void Skeleton_StepPosition(struct ContactPosition *, u32);
@@ -34,7 +34,7 @@ struct GolemBody {
     struct ContactPosition home694, target69C;
 };
 
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -61,7 +61,7 @@ static inline s32 Wrap(s32 d)
 /* Start behavior BEHAVIOR of the current state on the next update. */
 static inline void Golem_SetBehavior(void *object, u32 behavior)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     actor->base.behavior2AA = behavior;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
@@ -72,16 +72,14 @@ static inline void Golem_SetBehavior(void *object, u32 behavior)
 static inline void Golem_TurnAway(struct GolemBody *body)
 {
     body->direction691 = body->direction690;
-    ((struct SceneActorRegistryResetView *)body)->base.body.direction = body->direction690;
+    ((struct ChaseActor *)body)->base.body.direction = body->direction690;
     body->stamina680 -= 10;
     if (body->stamina680 <= 0) {
         SceneActorChase_SetControl(body, Golem_UpdateChargeStop, 0x27);
         Golem_SetBehavior(body, 3);
         return;
     }
-    body->target69C =
-        ((struct GolemChargeBounds *)((struct SceneActorRegistryResetView *)body)->group.route)
-            ->home;
+    body->target69C = ((struct GolemChargeBounds *)((struct ChaseActor *)body)->group.route)->home;
     {
         void *target = Golem_UpdateChargeRecovery;
         SceneActorChase_SetControl(body, target, 0x26);
@@ -93,7 +91,7 @@ static inline void Golem_Recover(struct GolemBody *body)
 {
     body->stamina680 -= 30;
     body->direction691 = body->direction690;
-    SceneActorChase_SetState((struct SceneActorRegistryResetView *)body, 0, 2, 7);
+    SceneActorChase_SetState((struct ChaseActor *)body, 0, 2, 7);
 
     {
         void *target = SceneActorReaction_SlideBack;
@@ -109,7 +107,7 @@ static inline s32 Golem_TurnGap(u8 desired, const u8 *facing)
     return d;
 }
 
-static inline void Golem_Retarget(struct SceneActorRegistryResetView *actor, struct GolemBody *body)
+static inline void Golem_Retarget(struct ChaseActor *actor, struct GolemBody *body)
 {
     s32 d = Wrap(actor->base.tracking.heading - body->direction68E);
     if ((d < 0 ? -d : d) <= 15 && actor->base.terrainCell != actor->base.previousTerrainCell) {
@@ -136,7 +134,7 @@ static inline s32 Golem_DifferenceHeading(const struct ContactPosition *v)
  * charge reaches its end; turning more than 31 off the charge heading costs stamina
  * (Golem_TurnAway); out of stamina, restore control after a delay and chase the player or walk
  * back along the route. */
-void Golem_UpdateChargePursuit(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateChargePursuit(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct GolemBody *body = actor->base.context;

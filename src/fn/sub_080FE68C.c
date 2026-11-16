@@ -59,8 +59,8 @@ void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
 struct AxeActor {
-    struct SceneActorRegistryResetView base;
-    u8 unknown6EC[0x75C];
+    struct ChaseActor base;
+    u8 unknown624[0x824];
     s32 halfHealthE48;
     u32 savedFlagsE4C;
     u8 unknownE50[8];
@@ -75,11 +75,10 @@ struct AxeActor {
 
 extern u8 *gUnknown_02000580;
 
-static inline void AxeInit_InstallPrimary(struct SceneActorRegistryResetView *arg0, void *cb0,
-                                          s32 (*cb1)(void), void *cb2, void *cb3, void *cb4,
-                                          void *hidden, void *cb5, void *cb6, void *defaultReaction,
-                                          s32 (*cb270)(void *), void *targetQuery, void *damage,
-                                          void *contact)
+static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s32 (*cb1)(void),
+                                          void *cb2, void *cb3, void *cb4, void *hidden, void *cb5,
+                                          void *cb6, void *defaultReaction, s32 (*cb270)(void *),
+                                          void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(arg0, 0x2000);
     arg0->base.contextCallback = cb0;
@@ -102,14 +101,14 @@ static inline void AxeInit_InstallPrimary(struct SceneActorRegistryResetView *ar
     MonsterInit_ClearMotion(arg0);
 }
 
-static inline void AxeInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void AxeInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Axe_OnRender;
     arg0->base.destroyCallback = Axe_ReleaseResources;
 }
 
-static inline void AxeInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void AxeInit_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = SceneActorControl_InitializeHoverState;
     actor->base.field23C = Axe_OnReaction;
@@ -122,13 +121,13 @@ static inline u8 AxeInit_BoundedVariant(s32 variant)
     return variant;
 }
 
-static inline void AxeInit_SetVariant(struct SceneActorRegistryResetView *actor, u8 variant)
+static inline void AxeInit_SetVariant(struct ChaseActor *actor, u8 variant)
 {
     ((struct AxeActor *)actor)->variantED7 = variant;
 }
 
-static inline void AxeInit_InitializePaletteRange(struct SceneActorRegistryResetView *actor,
-                                                  u32 alternate, u32 current)
+static inline void AxeInit_InitializePaletteRange(struct ChaseActor *actor, u32 alternate,
+                                                  u32 current)
 {
     actor->base.alternatePalette = MonsterInit_GetPaletteBase(actor) + alternate;
     actor->base.paletteBank = MonsterInit_GetPaletteBase(actor) + current;
@@ -137,7 +136,7 @@ static inline void AxeInit_InitializePaletteRange(struct SceneActorRegistryReset
 s32 Axe_Init(void *object)
 {
     struct AxeActor *arg0 = object;
-    struct SceneActorRegistryResetView *actor = &arg0->base;
+    struct ChaseActor *actor = &arg0->base;
     struct SceneActorChaseGroup *group = &arg0->base.group;
     u32 zero;
     struct ContactPosition tmp;

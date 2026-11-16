@@ -10,7 +10,7 @@ void SceneActorControl_OnIdle(u8 *actor);
 s32 Region_FindContaining(void *position);
 void SceneActorRegistry_RegisterCategoryReceiver(struct SceneActorRegistryActor *actor);
 
-static inline u32 MonsterInit_GetTerrainCell(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetTerrainCell(struct ChaseActor *actor)
 {
     return actor->base.terrainCell;
 }
@@ -92,108 +92,106 @@ static inline void MonsterInit_WriteValueQuery(void *storage, SceneActorValueQue
 
 /* Actor metadata and arithmetic queries. Stored halfword snapshots keep explicit
  * halfword return domains; masks, palette arithmetic and cell IDs use words. */
-static inline u8 MonsterInit_GetDrawableKind(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetDrawableKind(struct ChaseActor *actor)
 {
     return actor->base.drawableKind;
 }
-static inline u8 *MonsterInit_Drawable(struct SceneActorRegistryResetView *actor)
+static inline u8 *MonsterInit_Drawable(struct ChaseActor *actor)
 {
     return actor->base.drawable;
 }
 static inline u8 MonsterInit_GetCategory(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     return actor->base.category;
 }
 static inline void MonsterInit_SetCategory(void *object, u8 category)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     actor->base.category = category;
 }
-static inline s32 MonsterInit_GetHealth(struct SceneActorRegistryResetView *actor)
+static inline s32 MonsterInit_GetHealth(struct ChaseActor *actor)
 {
     return actor->base.health;
 }
-static inline u16 MonsterInit_GetInitialHealth(struct SceneActorRegistryResetView *actor)
+static inline u16 MonsterInit_GetInitialHealth(struct ChaseActor *actor)
 {
     return actor->base.defaultHealth;
 }
-static inline u16 MonsterInit_GetGroundHeight(struct SceneActorRegistryResetView *actor)
+static inline u16 MonsterInit_GetGroundHeight(struct ChaseActor *actor)
 {
     return actor->base.groundHeight2BE;
 }
-static inline u32 MonsterInit_GetPaletteBase(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetPaletteBase(struct ChaseActor *actor)
 {
     return actor->base.basePaletteBank;
 }
-static inline u32 MonsterInit_GetAlternatePalette(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetAlternatePalette(struct ChaseActor *actor)
 {
     return actor->base.paletteAlternateBank;
 }
-static inline u32 MonsterInit_GetAlternatePaletteOffset(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetAlternatePaletteOffset(struct ChaseActor *actor)
 {
     return actor->base.alternateOffset;
 }
-static inline u32 MonsterInit_GetPaletteOffset(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetPaletteOffset(struct ChaseActor *actor)
 {
     return actor->base.paletteOffset;
 }
-static inline void MonsterInit_SetAlternatePaletteOffset(struct SceneActorRegistryResetView *actor,
-                                                         u32 palette)
+static inline void MonsterInit_SetAlternatePaletteOffset(struct ChaseActor *actor, u32 palette)
 {
     actor->base.alternateOffset = palette;
 }
-static inline u32 MonsterInit_GetMotionFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetMotionFlags(struct ChaseActor *actor)
 {
     return actor->base.flags2C0;
 }
-static inline u16 MonsterInit_GetHeightOffset(struct SceneActorRegistryResetView *actor)
+static inline u16 MonsterInit_GetHeightOffset(struct ChaseActor *actor)
 {
     return actor->base.field2EA;
 }
-static inline u32 MonsterInit_GetBehaviorFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetBehaviorFlags(struct ChaseActor *actor)
 {
     return actor->base.flags2CC;
 }
-static inline u32 MonsterInit_GetStatusFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 MonsterInit_GetStatusFlags(struct ChaseActor *actor)
 {
     return actor->base.flags2D0;
 }
-static inline u8 MonsterInit_GetState(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetState(struct ChaseActor *actor)
 {
     return actor->base.state2A8;
 }
-static inline u8 MonsterInit_GetPhase(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetPhase(struct ChaseActor *actor)
 {
     return actor->base.phase2A9;
 }
-static inline u8 MonsterInit_GetBehavior(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetBehavior(struct ChaseActor *actor)
 {
     return actor->base.behavior2AA;
 }
-static inline void *MonsterInit_GetCurrentControl(struct SceneActorRegistryResetView *actor)
+static inline void *MonsterInit_GetCurrentControl(struct ChaseActor *actor)
 {
     return actor->base.target;
 }
-static inline void *MonsterInit_GetStandingControl(struct SceneActorRegistryResetView *actor)
+static inline void *MonsterInit_GetStandingControl(struct ChaseActor *actor)
 {
     return actor->base.savedTarget;
 }
-static inline u8 MonsterInit_GetControlKind(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetControlKind(struct ChaseActor *actor)
 {
     return actor->base.field2B5;
 }
-static inline u8 MonsterInit_GetDirection(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_GetDirection(struct ChaseActor *actor)
 {
     return actor->base.body.direction;
 }
-static inline struct SceneActorDefaultControl *
-MonsterInit_SavedControlOf(struct SceneActorRegistryResetView *actor)
+static inline struct SceneActorDefaultControl *MonsterInit_SavedControlOf(struct ChaseActor *actor)
 {
     return &actor->base.saved;
 }
 static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *saved,
-                                           struct SceneActorRegistryResetView *actor)
+                                           struct ChaseActor *actor)
 {
     saved->motionFlags = MonsterInit_GetMotionFlags(actor);
     saved->heightOffset = MonsterInit_GetHeightOffset(actor);
@@ -206,31 +204,29 @@ static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *save
     saved->control = MonsterInit_GetCurrentControl(actor);
     saved->kind = MonsterInit_GetControlKind(actor);
 }
-static inline void MonsterInit_SetBehaviorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void MonsterInit_SetBehaviorFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2CC |= mask;
 }
-static inline void MonsterInit_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void MonsterInit_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2D0 |= mask;
 }
-static inline void MonsterInit_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void MonsterInit_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2C0 |= mask;
 }
-static inline u8 MonsterInit_TestMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 MonsterInit_TestMotionFlags(struct ChaseActor *actor, u32 mask)
 {
     if (MonsterInit_GetMotionFlags(actor) & mask)
         return 1;
     return 0;
 }
-static inline void MonsterInit_MaskControlFlags(struct SceneActorRegistryResetView *actor,
-                                                u32 keepMask)
+static inline void MonsterInit_MaskControlFlags(struct ChaseActor *actor, u32 keepMask)
 {
     actor->base.flags114 &= keepMask;
 }
-static inline void MonsterInit_SetMotionControl(struct SceneActorRegistryResetView *actor,
-                                                void *callback, u32 kind)
+static inline void MonsterInit_SetMotionControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.word104 = (u32)callback;
     actor->base.word108 = 0;
@@ -240,13 +236,12 @@ static inline void MonsterInit_SetMotionControl(struct SceneActorRegistryResetVi
 }
 static inline void MonsterInit_ClearMotion(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     u32 zero = 0;
     MonsterInit_SetMotionControl(actor, 0, 0);
     actor->base.flags114 = zero;
 }
-static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *actor, void *callback,
-                                          u32 behavior)
+static inline void MonsterInit_SetControl(struct ChaseActor *actor, void *callback, u32 behavior)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -256,8 +251,8 @@ static inline void MonsterInit_SetControl(struct SceneActorRegistryResetView *ac
     MonsterInit_MaskControlFlags(actor, ~1);
     actor->base.word104 = 0;
 }
-static inline void MonsterInit_SetState(struct SceneActorRegistryResetView *actor, u32 state,
-                                        u32 phase, u32 behavior)
+static inline void MonsterInit_SetState(struct ChaseActor *actor, u32 state, u32 phase,
+                                        u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -272,17 +267,16 @@ static inline s32 MonsterInit_ClampHealth(u16 raw)
         health = 0;
     return health;
 }
-static inline void MonsterInit_InstallIdle(struct SceneActorRegistryResetView *actor, void *idle)
+static inline void MonsterInit_InstallIdle(struct ChaseActor *actor, void *idle)
 {
     actor->base.target = idle;
 }
-static inline void MonsterInit_SetInitialHealth(struct SceneActorRegistryResetView *actor,
-                                                u16 health)
+static inline void MonsterInit_SetInitialHealth(struct ChaseActor *actor, u16 health)
 {
     actor->base.defaultHealth = health;
 }
-static inline void MonsterInit_InitializeHealth(struct SceneActorRegistryResetView *actor, u16 raw,
-                                                s32 firstLimit, s32 secondLimit)
+static inline void MonsterInit_InitializeHealth(struct ChaseActor *actor, u16 raw, s32 firstLimit,
+                                                s32 secondLimit)
 {
     actor->base.flags2D4 = 0;
     MonsterInit_InstallIdle(actor, SceneActorControl_OnIdle);
@@ -296,13 +290,11 @@ static inline void MonsterInit_InitializeHealth(struct SceneActorRegistryResetVi
     actor->base.fieldA8 = secondLimit;
     actor->base.regionId = 0;
 }
-static inline void MonsterInit_SetFirstAttack(struct SceneActorRegistryResetView *actor, s32 index,
-                                              s32 value)
+static inline void MonsterInit_SetFirstAttack(struct ChaseActor *actor, s32 index, s32 value)
 {
     actor->base.attacks.first[index] = value;
 }
-static inline struct SceneActorRegistryResetView *
-MonsterInit_ReadAttacks(struct SceneActorRegistryResetView *actor)
+static inline struct ChaseActor *MonsterInit_ReadAttacks(struct ChaseActor *actor)
 {
     s32 i;
     if (Script_SeekToKeyword('a')) {
@@ -320,7 +312,7 @@ MonsterInit_ReadAttacks(struct SceneActorRegistryResetView *actor)
     }
     return actor;
 }
-static inline u8 MonsterInit_IsInCurrentRegion(struct SceneActorRegistryResetView *actor)
+static inline u8 MonsterInit_IsInCurrentRegion(struct ChaseActor *actor)
 {
     if (gGameState->region == actor->base.regionId)
         return 1;
@@ -332,18 +324,18 @@ static inline u8 MonsterInit_TestWorldFlags(u32 mask)
         return 1;
     return 0;
 }
-static inline void MonsterInit_InitializeRegion(struct SceneActorRegistryResetView *actor)
+static inline void MonsterInit_InitializeRegion(struct ChaseActor *actor)
 {
     if (MonsterInit_TestMotionFlags(actor, 2))
         actor->base.regionId = gGameState->region;
     else
         actor->base.regionId = Region_FindContaining(&actor->base.body.position);
 }
-static inline void MonsterInit_ClearReceiver(struct SceneActorRegistryResetView *actor)
+static inline void MonsterInit_ClearReceiver(struct ChaseActor *actor)
 {
     actor->base.field304 = 0;
 }
-static inline void MonsterInit_InitializeReceiver(struct SceneActorRegistryResetView *actor)
+static inline void MonsterInit_InitializeReceiver(struct ChaseActor *actor)
 {
     MonsterInit_ClearReceiver(actor);
     SceneActorRegistry_RegisterCategoryReceiver((void *)actor);
@@ -361,7 +353,7 @@ static inline void MonsterInit_MaskColliderFlags(struct ContactCollider *collide
     collider->flags = keepMask & collider->flags;
 }
 
-static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetView *arg0)
+static inline void MonsterInit_ReadInitialMode(struct ChaseActor *arg0)
 {
     s32 mode;
     mode = Script_GetKeywordValue('u', 0);
@@ -373,20 +365,17 @@ static inline void MonsterInit_ReadInitialMode(struct SceneActorRegistryResetVie
     }
 }
 
-static inline void MonsterInit_SetContactCallback(struct SceneActorRegistryResetView *actor,
-                                                  void *callback)
+static inline void MonsterInit_SetContactCallback(struct ChaseActor *actor, void *callback)
 {
     actor->base.contactCallback = callback;
 }
 
-static inline void MonsterInit_SetReactionGate(struct SceneActorRegistryResetView *actor,
-                                               void *callback)
+static inline void MonsterInit_SetReactionGate(struct ChaseActor *actor, void *callback)
 {
     actor->base.field23C = callback;
 }
 
-static inline void MonsterInit_SetRouteReset(struct SceneActorRegistryResetView *actor,
-                                             void *callback)
+static inline void MonsterInit_SetRouteReset(struct ChaseActor *actor, void *callback)
 {
     actor->base.callback248 = callback;
 }

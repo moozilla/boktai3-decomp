@@ -27,11 +27,11 @@ static inline u8 TestSegment(struct TrailSegment *segment, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 WordFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
     return mask & p->base.flags2D0;
 }
-static inline u8 IsInactive(struct SceneActorRegistryResetView *actor)
+static inline u8 IsInactive(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -71,7 +71,7 @@ static inline s32 NearHeight(s32 x, s32 z, s32 limit)
         return 0;
     return 1;
 }
-void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *actor)
+void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
 {
     struct TentacleTrail *trail;
     s32 i;

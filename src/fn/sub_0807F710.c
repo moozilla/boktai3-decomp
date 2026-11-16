@@ -15,9 +15,9 @@ static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
         return 1;
     return 0;
 }
-s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
+s32 SceneActorTarget_ResolvePendingObject(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     if (*pendingId > 0) {
         struct SceneActorTargetLink *state = (void *)((u8 *)owner + 0xDC);

@@ -8,10 +8,10 @@ struct AdjacentWaitTarget {
     u8 pad[0xC];
     struct ContactPosition position;
 };
-s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 s32 Math_Atan2(s32, s32);
 void sub_080E9C20(void);
-static inline void ResetState(struct SceneActorRegistryResetView *a, u32 zero)
+static inline void ResetState(struct ChaseActor *a, u32 zero)
 {
     a->base.state2A8 = zero;
     a->base.phase2A9 = zero;
@@ -19,7 +19,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *a, u32 zero)
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 zero)
+static inline void BeginControl(struct ChaseActor *actor, s32 zero)
 {
     u32 three = 3;
     u32 stateOffset = 0x2A8;
@@ -55,7 +55,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 z
         actor->base.word104 = zero;
     }
 }
-void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)
 {
     struct AdjacentWaitContext *ctx = a->base.context;
     struct AdjacentWaitTarget *target = (void *)a->base.tracking.target;

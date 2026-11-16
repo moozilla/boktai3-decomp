@@ -2,9 +2,9 @@
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -16,7 +16,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void State(struct ChaseActor *a, u32 behavior)
 {
     u32 off = 0x2A8;
     u32 phase;
@@ -37,7 +37,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
         FIELD(a, b, u8) = 1;
     }
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *target)
+static inline void Control(struct ChaseActor *a, void *target)
 {
     u32 off = 0x2B2;
     FIELD(a, off, u8) = 1;
@@ -55,7 +55,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *target)
     a->base.word104 = 0;
 }
 // confidence=low: advances Spider toward its route probe and resumes route control on arrival
-void Spider_ApproachRouteProbe(struct SceneActorRegistryResetView *actor)
+void Spider_ApproachRouteProbe(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     s32 speed;

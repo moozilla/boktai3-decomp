@@ -30,7 +30,7 @@ struct DogActionContext {
 };
 // confidence=low: clears action gates before resolving the route and stepping its drawable.
 void SceneActorMovement_ResolveRoutePosition(void *);
-void Dog_ResetActionState(struct SceneActorRegistryResetView *actor)
+void Dog_ResetActionState(struct ChaseActor *actor)
 {
     struct DogActionContext *context = actor->base.context;
     context->flags = 0;

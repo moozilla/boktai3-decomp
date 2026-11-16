@@ -6,7 +6,7 @@
 
 extern const s16 gUnk_086149C4[];
 void Lun_OnSpecialAnimation(void);
-void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView *);
+void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *);
 static inline u32 Random(void)
 {
     u32 offset;
@@ -30,7 +30,7 @@ static inline void ClearVector(u32 *zero, struct ContactPosition *v)
     *zero = 0;
     CpuSet(zero, v, 0x05000002);
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -44,8 +44,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -54,7 +53,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.field2B1 = 1;
 }
 // confidence=low: initializes a random launch vector and ends the action on motion flag 0x10.
-void Lun_UpdateLaunchedReaction(struct SceneActorRegistryResetView *actor)
+void Lun_UpdateLaunchedReaction(struct ChaseActor *actor)
 {
     u8 *state = actor->base.context;
     u32 zero;

@@ -20,7 +20,7 @@ static inline u8 Dog_TestApproachFlag(struct DogApproachContext *context, u32 ma
     return 0;
 }
 
-void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
+void Dog_UpdateShadowlessApproach(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     struct DogApproachContext *context = actor->base.context;

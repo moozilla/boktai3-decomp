@@ -52,14 +52,14 @@ struct IvyInstanceState {
     u8 unknown63F;
 };
 
-static inline void IvyInit_ResetState(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void IvyInit_ResetState(struct ChaseActor *actor, u32 behavior)
 {
     MonsterInit_SetState(actor, 0, 0, behavior);
 }
 
 static inline void IvyInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -142,14 +142,14 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->base.body.position;
 }
 
-static inline void IvyInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void IvyInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Ivy_UpdateInteraction;
     arg0->base.destroyCallback = Ivy_Destroy;
 }
 
-static inline void IvyInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void IvyInit_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = Ivy_TickDrawable;
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_08606400);
@@ -157,7 +157,7 @@ static inline void IvyInit_InstallRoutes(struct SceneActorRegistryResetView *act
 
 static inline void IvyInit_ResetCapture(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     ((struct IvyInstanceState *)actor)->captureFlags = 0;
 }
 
@@ -170,15 +170,15 @@ static inline void IvyInit_EnableColliderContact(struct ContactCollider *collide
     collider->flags = mask;
 }
 
-static inline void IvyInit_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void IvyInit_ClearMotionFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2C0 = mask & actor->base.flags2C0;
 }
 
 s32 Ivy_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *arg0 = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     u32 zero;
     struct ContactPosition tmp;

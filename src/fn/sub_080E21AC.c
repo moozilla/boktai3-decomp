@@ -10,12 +10,11 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
-void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *, s32);
-void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
-void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+void SceneActorControl_CompleteBlinkOut(struct ChaseActor *, s32);
+void SceneActorMovement_UpdateAirborne(struct ChaseActor *);
+void SceneActorMovement_UpdateHeight(struct ChaseActor *);
+void SceneActorControl_CallContextScript(struct ChaseActor *);
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -27,7 +26,7 @@ static inline void Hide(u8 *sprite, u32 mask)
 {
     *(u32 *)(sprite + 8) |= mask;
 }
-void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;

@@ -28,7 +28,7 @@ static inline u8 TestFlag(const u32 *flags, u32 mask)
 }
 
 /* Fade the attack palette, then restore the actor palette when the level reaches zero. */
-void sub_080FB30C(struct SceneActorRegistryResetView *actor)
+void sub_080FB30C(struct ChaseActor *actor)
 {
     struct AxeFlashState *state = actor->base.context;
     u32 *flags;

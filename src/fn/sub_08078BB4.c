@@ -1,7 +1,7 @@
 #include "scene_actor_attachment_dispatch.h"
 
-void SceneActorAttachment_ApplySlotCommand(struct SceneActorRegistryResetView *actor, void *attachment, u32 inputMode,
-                  u32 inputEvent, u32 inputCategory)
+void SceneActorAttachment_ApplySlotCommand(struct ChaseActor *actor, void *attachment,
+                                           u32 inputMode, u32 inputEvent, u32 inputCategory)
 {
     s32 mode = (u8)inputMode;
     u8 event = inputEvent;

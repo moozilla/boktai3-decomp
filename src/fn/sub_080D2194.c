@@ -5,15 +5,14 @@
 #include "scene_actor_delayed_response.h"
 #include "display_sequence.h"
 
-static inline struct SceneActorChaseFlags16 *
-Mummy_BeginRecovery(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline struct SceneActorChaseFlags16 *Mummy_BeginRecovery(struct ChaseActor *actor, u16 bits)
 {
     struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D6;
     SceneActorChase_SetFlagComponent(flags, bits);
     return flags;
 }
 
-void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence =
         (void *)((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;

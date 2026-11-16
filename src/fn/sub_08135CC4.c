@@ -7,8 +7,7 @@ void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorTerrain_ClearCollisionTimers(void *);
 void ActorAttachment_ReleasePartsResource(void *, u32, u32);
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     u32 b = behavior;
     actor->base.state2A8 = state;
@@ -18,7 +17,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.field2B1 = 1;
 }
 
-u32 SceneActorReaction_ResetFlaggedState(struct SceneActorRegistryResetView *actor)
+u32 SceneActorReaction_ResetFlaggedState(struct ChaseActor *actor)
 {
     if (actor->base.field2DC & 0x4000) {
         u16 *motionFlags;

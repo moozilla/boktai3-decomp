@@ -36,7 +36,7 @@ static inline void SceneActorReaction_EnableMotionFlags(u32 mask, u16 *field)
     flags->bits |= mask;
 }
 
-static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorReaction_TakePrepared(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -44,22 +44,21 @@ static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetV
     }
     return 0;
 }
-static inline void SceneActorReaction_ClearRoute(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorReaction_ClearRoute(struct ChaseActor *actor)
 {
     actor->base.flags2CC &= ~0x141C0;
     actor->group.common.control.counter = 0;
     *(u16 *)((u8 *)&actor->group.common.control + 0x14) = 0;
     actor->group.common.control.timer = 0;
 }
-static inline void SceneActorReaction_Show(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorReaction_Show(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0)
         *(u32 *)actor->base.drawable &= ~1;
     else
         *(u32 *)((u8 *)actor->base.drawable + 0x28) &= ~1;
 }
-static inline void SceneActorReaction_ResetAnimation(struct SceneActorRegistryResetView *actor,
-                                                     u32 phase)
+static inline void SceneActorReaction_ResetAnimation(struct ChaseActor *actor, u32 phase)
 {
     actor->base.state2A8 = 3;
     actor->base.phase2A9 = phase;
@@ -67,8 +66,7 @@ static inline void SceneActorReaction_ResetAnimation(struct SceneActorRegistryRe
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetView *actor,
-                                                 u32 kind, void *control)
+static inline void SceneActorReaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;

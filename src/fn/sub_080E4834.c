@@ -1,20 +1,20 @@
 // confidence=low: retained provisional behavior name from caller and state-transition evidence.
 #include "scene_actor_chase.h"
 // confidence=low: resumes group chase or the saved route after arrival.
-static inline u32 Dog_SetMotionBits(struct SceneActorRegistryResetView *actor, s32 mask)
+static inline u32 Dog_SetMotionBits(struct ChaseActor *actor, s32 mask)
 {
     struct ChaseFlags40 *flags = (void *)&actor->base.flags2D4;
     flags->bits |= mask;
     return Chase_MotionFlags(actor, 0x80);
 }
-static inline void Dog_SetMovementBits(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Dog_SetMovementBits(struct ChaseActor *actor, u32 mask)
 {
     u32 *flags = &actor->base.flags2CC;
     *flags |= mask;
 }
 void Dog_UpdateArrivalAnimation(void);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-void Dog_ResumeRoute(struct SceneActorRegistryResetView *a)
+u8 sub_0812F3CC(struct ChaseActor *);
+void Dog_ResumeRoute(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     u8 *context = a->base.context;

@@ -10,7 +10,7 @@ struct DogAttackContext {
 };
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 void Dog_UpdateLeapWindup(void);
-void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *);
+void Dog_SelectRetreatOrChase(struct ChaseActor *);
 static inline void And32(u32 *p, u32 mask)
 {
     *p &= mask;
@@ -30,7 +30,7 @@ static inline void Dog_ClearAttackFlags(struct DogAttackContext *ctx, u32 bits)
     Dog_MaskAttackFlags(&ctx->flags, ~bits);
 }
 
-void Dog_UpdateLeapAttack(struct SceneActorRegistryResetView *a)
+void Dog_UpdateLeapAttack(struct ChaseActor *a)
 {
     struct DogAttackContext *context = a->base.context;
     if (Chase_TakeArrived(a)) {

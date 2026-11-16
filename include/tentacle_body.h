@@ -35,36 +35,35 @@ struct TentacleBodyDrawable {
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorView *);
-void TentacleActor_EnterHitReaction(struct SceneActorRegistryResetView *);
+void TentacleActor_EnterHitReaction(struct ChaseActor *);
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
 void TentacleBody_ResetDirectionalAnimations(void *, s32);
 void TentacleBody_RefreshDirectionalAnimations(void *, s32);
 void TentacleActor_AssignSegmentPhases(void *);
-void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *s);
-void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *);
+void ActorTrail_RestoreSavedState(struct ChaseActor *s);
+void ActorTrail_ResetAtSavedPosition(struct ChaseActor *);
 void SceneActorPalette_ClearCompletedTransitions(void);
 void TentacleBody_RestartSegmentAnimations(void *, u32, u32, u32);
-void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor, s32 frame);
-void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, s32 frame);
+void TentacleBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame);
+void TentacleBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame);
 void ActorTrail_ApplyAngularOffsets(void *, s32, s32, s32);
-void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor);
-void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame);
+void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor);
+void TentacleBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame);
 void SceneActor_AimArcAtPlayer(void *);
 void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *obj,
-                                    struct SceneActorRegistryResetView *ctx);
+                                    struct ChaseActor *ctx);
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
-                                struct SceneActorRegistryResetView *actor);
+                                struct ChaseActor *actor);
 void TentacleBody_UpdateAttackWindup(struct RoomActor *actor);
 void TentacleBody_ResetDirectionalPose(struct RoomActor *actor);
 void TentacleBody_OnIdleState(void);
 void TentacleBody_UpdateInactiveState(void);
-void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *p, s32 time);
-void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *s, s32 arg,
-                                         u32 unused);
-void TentacleBody_UpdateAnimationEleven(struct SceneActorRegistryResetView *p);
-void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor);
-void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *actor);
+void TentacleBody_UpdateTimedAction(struct ChaseActor *p, s32 time);
+void TentacleBody_UpdateHiddenTransition(struct ChaseActor *s, s32 arg, u32 unused);
+void TentacleBody_UpdateAnimationEleven(struct ChaseActor *p);
+void TentacleBody_UpdateSpreadWindup(struct ChaseActor *actor);
+void TentacleBody_UpdateSpreadPreparation(struct ChaseActor *actor);
 
 static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
                                                 u32 flags)

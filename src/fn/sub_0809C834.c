@@ -14,7 +14,7 @@ struct LinkedReactionCommand {
     u8 unknown0[10];
     u16 kind;
 };
-static inline u8 Blocked(struct SceneActorRegistryResetView *s)
+static inline u8 Blocked(struct ChaseActor *s)
 {
     if (!s)
         goto zero;
@@ -43,7 +43,7 @@ static inline u8 LinkedFlag(struct LinkedReactionContext *p)
         return 1;
     return 0;
 }
-void SceneActor_BeginLinkedIdleReaction_0809C834(struct SceneActorRegistryResetView *s)
+void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
 {
     if (!Blocked(s) && LinkedFlag(s->base.context)) {
         u32 three = 3;

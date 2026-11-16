@@ -1,8 +1,8 @@
 #include "scene_actor_reset.h"
-void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryResetView *, u32);
-u8 Vorn_BeginContactAnimation(struct SceneActorRegistryResetView *);
-void Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *, u32);
-void Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(struct ChaseActor *, u32);
+u8 Vorn_BeginContactAnimation(struct ChaseActor *);
+void Vorn_BeginPursuitRoute(struct ChaseActor *, u32);
+void Vorn_SelectRetreatRoute(struct ChaseActor *, u32);
 struct VornReactionContext {
     u8 unknown0[0x6AC];
     u16 pursuitCooldown;
@@ -18,7 +18,7 @@ static inline u8 Test(struct VornReactionContext *context, u32 mask)
     return 0;
 }
 // confidence=low: pending hit flags select recovery control or pursuit/retreat behavior.
-u8 Vorn_SelectHitRecovery(struct SceneActorRegistryResetView *actor)
+u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
 {
     struct VornReactionContext *context = actor->base.context;
     u32 blocked;

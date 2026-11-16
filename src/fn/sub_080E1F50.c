@@ -6,10 +6,10 @@ struct SceneActorTargetMotionContext {
     u8 unknown0[0x678];
     u32 flags;
 };
-s32 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
+s32 Dog_IsActionTimerExpired(struct ChaseActor *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -17,7 +17,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
+static inline u8 TestMovement(struct ChaseActor *a)
 {
     void *collider = a->group.route;
     struct ContactPosition *position = &a->base.body.position;
@@ -41,7 +41,7 @@ static inline u8 TestMovement(struct SceneActorRegistryResetView *a)
         }
     }
 }
-void SceneActorMotion_TestTargetTransition(struct SceneActorRegistryResetView *a)
+void SceneActorMotion_TestTargetTransition(struct ChaseActor *a)
 {
     struct SceneActorTargetMotionContext *context = a->base.context;
     if (!TakePrepared(a)) {

@@ -9,8 +9,7 @@ void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -82,7 +81,7 @@ static inline u32 Random4(void)
         return (mask & value) + 1;
     }
 }
-void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     u32 variant, flags;

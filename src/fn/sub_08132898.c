@@ -1,13 +1,13 @@
 #include "global.h"
 #include "scene_actor_reset.h"
-void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *);
-void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *);
-void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *);
-static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *);
+void SceneActorReaction_ApplyCategoryDamage(struct ChaseActor *);
+void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *);
+static inline u32 TestFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
-u32 SceneActorBehavior_DispatchFlaggedCategory(struct SceneActorRegistryResetView *actor)
+u32 SceneActorBehavior_DispatchFlaggedCategory(struct ChaseActor *actor)
 {
     if (actor->base.enabled == 1 && !TestFlags(actor, 2) && (actor->base.field2D8 & 0x100000)) {
         switch ((s32)actor->base.category) {

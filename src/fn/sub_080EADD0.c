@@ -45,15 +45,14 @@ static inline void Octopus_MessageValue(void *object, u16 value)
     message->value = value;
 }
 
-static inline void Octopus_EnableDefeatMotion(struct SceneActorRegistryResetView *actor, u16 bit,
-                                              u16 **component)
+static inline void Octopus_EnableDefeatMotion(struct ChaseActor *actor, u16 bit, u16 **component)
 {
     u16 *field = &actor->base.flags2D4;
     *component = field;
     *field = bit | *field;
 }
 
-void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     u8 *context = actor->base.context;
     u8 *drawable = actor->base.drawable;

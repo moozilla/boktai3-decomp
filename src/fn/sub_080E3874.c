@@ -4,13 +4,13 @@
 #include "scene_actor_delayed_response.h"
 #include "scene_actor_control_phase.h"
 
-static inline u32 Dog_RouteFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Dog_RouteFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
 
 /* Queue pursuit, a home route, or the short waiting response after the delay. */
-void sub_080E3874(struct SceneActorRegistryResetView *actor)
+void sub_080E3874(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group;
     u32 zero;

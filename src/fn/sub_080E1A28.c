@@ -40,7 +40,7 @@ static inline u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void Dog_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
+void Dog_LeapTowardTarget(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     struct ContactPosition velocity;

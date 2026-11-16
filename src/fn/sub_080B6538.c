@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_timed_behavior.h"
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 void SceneActorControl_OnIdle(void);
 static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
 {
@@ -10,7 +10,7 @@ static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
         return 1;
     return 0;
 }
-u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *s,
+u32 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *s,
                                                struct SceneActorTimedBehaviorContext *context,
                                                s32 angle)
 {

@@ -9,7 +9,7 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *,
                                               const struct SceneActorPositionSource *, void *, s32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, const struct ContactPosition *);
 
-static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetView *owner,
+static inline s8 SceneActorTarget_FindStimulus(struct ChaseActor *owner,
                                                struct SceneActorChaseGroup *group)
 {
     struct ContactPosition *position = &owner->base.body.position;
@@ -21,7 +21,7 @@ static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetVie
 // confidence=low: starts a route to the tagged position of an overlapping stimulus.
 u32 SceneActorTarget_TryStimulusRoute(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorRegistryControl *control;
     u16 *timer;
@@ -58,7 +58,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     {
         u32 mask = 0x1000;
         if (SceneActorStimulus_CaptureMotionFlags(object, mask, &motionFlags)) {
-            struct SceneActorRegistryResetView *owner = object;
+            struct ChaseActor *owner = object;
             SceneActorContacts_ReleaseNode(owner->group.contactNode);
             *motionFlags &= ~mask;
             owner->group.contactNode = NULL;

@@ -20,7 +20,7 @@ static inline u32 Test(u32 value, u32 mask)
 {
     return value & mask;
 }
-static inline s32 FindNearestEligiblePlayer(struct SceneActorRegistryResetView *actor)
+static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     s32 bestDistance = 0x7FFFFFFF;
@@ -54,8 +54,7 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
 {
     *flags &= mask;
 }
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
-                        struct Player **slot)
+static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slot)
 {
     void *shape = *(void **)(group + 0x1fc);
     struct ContactPosition *position = &actor->base.body.position;
@@ -73,7 +72,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
 }
 
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
-u32 sub_08137AFC(struct SceneActorRegistryResetView *actor)
+u32 sub_08137AFC(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 best = FindNearestEligiblePlayer(actor);

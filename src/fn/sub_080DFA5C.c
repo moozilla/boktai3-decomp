@@ -60,12 +60,12 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *to
     out->y = to->y - from->y;
     out->z = to->z - from->z;
 }
-void Dog_OnAttackContact(u8 *collider, u8 *other, struct SceneActorRegistryResetView *actor)
+void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition position;
     struct ContactPosition delta;
     s32 direction;
-    struct SceneActorRegistryResetView *facingActor = actor;
+    struct ChaseActor *facingActor = actor;
     if (blockedFirst((u8 *)actor))
         return;
     position.position = *(struct ContactPosition *)(collider + 0x24);

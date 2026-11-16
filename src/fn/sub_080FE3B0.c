@@ -62,8 +62,7 @@ slopeX:
 done:
     return height;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior, u32 counter)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior, u32 counter)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -72,7 +71,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.field2B1 = 1;
 }
 
-void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
 {
     struct AxeContext *context = actor->base.context;
     u32 zero;

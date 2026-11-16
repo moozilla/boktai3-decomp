@@ -21,8 +21,7 @@ static inline void Spider_ClearContextFlags(struct SpiderFlagWord *p, u32 mask)
 {
     p->bits &= mask;
 }
-static inline void Spider_SetControl(struct SceneActorRegistryResetView *a, void *callback,
-                                     u32 kind)
+static inline void Spider_SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -36,8 +35,7 @@ static inline void Spider_SetControl(struct SceneActorRegistryResetView *a, void
     }
     a->base.word104 = 0;
 }
-static inline void Spider_SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase,
-                                   u8 behavior)
+static inline void Spider_SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -66,7 +64,7 @@ static inline s32 Spider_QuarterDisplacement(s32 x)
         x = -((-x) >> 2);
     return x;
 }
-static inline void Spider_AddMotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline void Spider_AddMotionFlags(struct ChaseActor *a, u32 mask)
 {
     u32 value = mask;
     value |= a->base.flags2D4;
@@ -79,13 +77,13 @@ static inline void Spider_AddGroupFlags(struct SceneActorRegistryControlGroup *g
     value |= *flags;
     *flags = value;
 }
-static inline void Spider_ClearMotionFlags(struct SceneActorRegistryResetView *a_, u32 mask)
+static inline void Spider_ClearMotionFlags(struct ChaseActor *a_, u32 mask)
 {
     u16 *p = &a_->base.flags2D4;
     *p &= mask;
 }
 
-static inline u8 Spider_MoveLanding(struct LandingState *s, struct SceneActorRegistryResetView *a)
+static inline u8 Spider_MoveLanding(struct LandingState *s, struct ChaseActor *a)
 {
     s16 *cx;
     s16 *cz;
@@ -125,7 +123,7 @@ static inline u32 Spider_SetLandingReady(struct LandingReady *p)
     return zero;
 }
 
-void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame)
+void Spider_UpdateLandingMotion(struct ChaseActor *a, s32 frame)
 {
     struct LandingSequence *seq = (void *)(((u8 *)a->base.drawable) + 0x48);
     u32 *flags;

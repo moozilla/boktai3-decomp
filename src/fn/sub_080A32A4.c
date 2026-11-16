@@ -2,7 +2,7 @@
 #include "engine.h"
 /* SceneActorControl_UpdateEntryWait: tentative */
 
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
+static inline u8 TakeEntry(struct ChaseActor *s)
 {
     if (s->base.field2B1) {
         s->base.field2B1 = 0;
@@ -15,7 +15,7 @@ static inline void ClearFlag(u32 *flags, u32 mask)
 {
     *flags &= mask;
 }
-static inline void EntryControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void EntryControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -26,7 +26,7 @@ static inline void EntryControl(struct SceneActorRegistryResetView *actor, u32 k
     actor->base.word104 = 0;
 }
 
-void SceneActorControl_UpdateEntryWait(struct SceneActorRegistryResetView *s)
+void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
 {
     if (TakeEntry(s)) {
         void *fn = s->base.entryTarget224;

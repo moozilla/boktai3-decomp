@@ -6,7 +6,7 @@ void Sound_PlaySong(u32);
 void SceneColliderEffect_SpawnAimedSprite(void *, void *, u32, u32, u32);
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
+static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -20,7 +20,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k)
+static inline void State(struct ChaseActor *a, u32 k)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = 0;
@@ -30,7 +30,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 k)
 }
 
 // confidence=low: windup emits a contact cue before entering the pursuit phase.
-void Spider_UpdateContactWindup(struct SceneActorRegistryResetView *a, s32 n)
+void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
 {
     u8 *anim = (u8 *)a->base.drawable + 0x48;
     u8 *nav = (u8 *)a + 0x3D4;

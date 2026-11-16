@@ -36,13 +36,13 @@ static inline void ActorStatus_SetWord(u32 *field, u32 bits)
 
 static inline u32 ActorStatus_BehaviorFlags(void *object, u32 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     return actor->base.flags2CC & mask;
 }
 
 static inline u32 ActorStatus_StatusFlags(void *object, u32 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     return actor->base.flags2D0 & mask;
 }
 
@@ -60,11 +60,11 @@ static inline u32 ActorStatus_HasStatusFlags(void *object, u32 mask)
 
 static inline u16 ActorStatus_MotionFlags(void *object, u16 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     return SceneActorChase_FlagComponentBits((void *)&actor->base.flags2D4, mask);
 }
 
-static inline u8 ActorStatus_BodyFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 ActorStatus_BodyFlags(struct ChaseActor *actor, u32 mask)
 {
     if (actor->base.flags2C0 & mask)
         return 1;
@@ -78,12 +78,12 @@ static inline void ActorStatus_ClearTrackingFlags(struct SceneActorReactionMotio
     tracking->flags &= mask;
 }
 
-static inline s16 ActorStatus_FlashRemaining(struct SceneActorRegistryResetView *actor)
+static inline s16 ActorStatus_FlashRemaining(struct ChaseActor *actor)
 {
     return (*(s16 *)&actor->base.field1E8);
 }
 
-static inline s16 ActorStatus_BlinkRemaining(struct SceneActorRegistryResetView *actor)
+static inline s16 ActorStatus_BlinkRemaining(struct ChaseActor *actor)
 {
     return ((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining;
 }
@@ -93,7 +93,7 @@ static inline void ActorStatus_StoreByte(u8 *field, u8 value)
     *field = value;
 }
 
-static inline void ActorStatus_SetPalette(struct SceneActorRegistryResetView *actor, u32 idx)
+static inline void ActorStatus_SetPalette(struct ChaseActor *actor, u32 idx)
 {
     if (actor->base.drawableKind == 0)
         AnimData_SelectPaletteBank(
@@ -105,7 +105,7 @@ static inline void ActorStatus_SetPalette(struct SceneActorRegistryResetView *ac
 
 static inline u8 ActorStatus_IsDown(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     if (actor == 0)
         return 0;
     if (ActorStatus_MotionFlags((void *)actor, 0x40) ||
@@ -114,7 +114,7 @@ static inline u8 ActorStatus_IsDown(void *object)
     return 0;
 }
 
-static inline void ActorStatus_SetDrawableFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void ActorStatus_SetDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
     if (actor->base.drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= bits;
@@ -130,8 +130,7 @@ static inline void ActorStatus_ClearTileFlags(struct SceneActorAnimationTile *ti
     tile->flags &= keep;
 }
 
-static inline void ActorStatus_ClearDrawableFlags(struct SceneActorRegistryResetView *actor,
-                                                  u32 bits)
+static inline void ActorStatus_ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
     if (actor->base.drawableKind == 0)
         SceneActorChase_ClearWordFlags(
@@ -142,7 +141,7 @@ static inline void ActorStatus_ClearDrawableFlags(struct SceneActorRegistryReset
     }
 }
 
-static inline void ActorStatus_SetBodyBit(struct SceneActorRegistryResetView *actor, u32 on)
+static inline void ActorStatus_SetBodyBit(struct ChaseActor *actor, u32 on)
 {
     if (on)
         ActorStatus_SetDrawableFlags(actor, 1);
@@ -150,12 +149,12 @@ static inline void ActorStatus_SetBodyBit(struct SceneActorRegistryResetView *ac
         ActorStatus_ClearDrawableFlags(actor, 1);
 }
 
-static inline void ActorStatus_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void ActorStatus_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
     actor->base.flags2D4 &= ~bits;
 }
 
-static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_ReleaseContact(struct ChaseActor *actor)
 {
     u32 flag = 0x1000;
     if (actor->base.flags2D4 & flag) {
@@ -165,7 +164,7 @@ static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView
     }
 }
 
-static inline void ActorStatus_ClearInteraction(struct SceneActorRegistryResetView *actor,
+static inline void ActorStatus_ClearInteraction(struct ChaseActor *actor,
                                                 struct SceneActorRegistryControl *control)
 {
     SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
@@ -189,7 +188,7 @@ static inline u32 SceneEnvironment_LinkMode(void)
     return result.linkMode;
 }
 
-static inline u32 ActorStatus_DefaultPalette(struct SceneActorRegistryResetView *actor)
+static inline u32 ActorStatus_DefaultPalette(struct ChaseActor *actor)
 {
     u16 *base = &actor->base.basePaletteBank;
     u16 *offset = &actor->base.paletteOffset;
@@ -236,12 +235,12 @@ static inline u32 ActorStatus_EnvironmentPaletteActive(s32 player)
     return ActorStatus_PassagePaletteActive();
 }
 
-static inline void ActorStatus_SetBlinkTimer(struct SceneActorRegistryResetView *actor, s16 timer)
+static inline void ActorStatus_SetBlinkTimer(struct ChaseActor *actor, s16 timer)
 {
     ((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining = timer;
 }
 
-static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Palette(struct ChaseActor *actor)
 {
     s16 *pTmr;
 
@@ -374,7 +373,7 @@ static inline u16 ActorStatus_TickResponse(struct ContactCollider *response)
     return --response->responseValue;
 }
 
-static inline void ActorStatus_Blink(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Blink(struct ChaseActor *actor)
 {
 
     /* body bit and shadow follow the blink timer at +0x178 */
@@ -407,7 +406,7 @@ static inline void ActorStatus_Blink(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline void ActorStatus_SetPendingBits(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline void ActorStatus_SetPendingBits(struct ChaseActor *actor, u16 bits)
 {
     actor->base.flags2D6 |= bits;
 }
@@ -425,7 +424,7 @@ static inline u8 ActorStatus_ParticleHeading(s8 heading, s32 jitter)
     return heading + jitter;
 }
 
-static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Particles(struct ChaseActor *actor)
 {
     u32 lifetime;
     s32 t;
@@ -455,7 +454,7 @@ static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *act
     }
 }
 
-static inline void ActorStatus_FaceTarget(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_FaceTarget(struct ChaseActor *actor)
 {
     if (ActorStatus_BodyFlags(actor, 2)) {
         actor->base.tracking.target = (u32)(gUnknown_02000580[0] + 0x24);

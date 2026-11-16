@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -15,7 +15,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;
     if (*flag) {
@@ -24,7 +24,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor)
+static inline void ResetState(struct ChaseActor *actor)
 {
     u32 one = 1;
     u8 *field = &actor->base.state2A8;
@@ -39,7 +39,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor)
         *((u8 *)actor + offset) = one;
     }
 }
-void SceneActorReaction_ReturnToIdle(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ReturnToIdle(struct ChaseActor *actor)
 {
     TakeReset(actor);
     if (actor->base.field2B0) {

@@ -11,7 +11,7 @@ static inline u8 Pending(u8 *context, u16 **out)
         return 1;
     return 0;
 }
-static inline void SetBehavior(struct SceneActorRegistryResetView *p, u32 b)
+static inline void SetBehavior(struct ChaseActor *p, u32 b)
 {
     p->base.state2A8 = 0;
     p->base.phase2A9 = 0;
@@ -24,9 +24,9 @@ struct VornWaitTimer {
 };
 // confidence=low: waits for pursuit distance or timeout before restoring behavior 15.
 #define Vorn_UpdatePursuitWait sub_080ADB90
-void Vorn_UpdatePursuitWait(struct SceneActorRegistryResetView *input)
+void Vorn_UpdatePursuitWait(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *a = input;
+    struct ChaseActor *a = input;
     u8 *context = a->base.context;
     u16 *flags;
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {

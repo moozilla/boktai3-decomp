@@ -14,7 +14,7 @@ static inline u32 NextRandomSample(const u16 *table)
     return table[gRandomIndex];
 }
 
-static inline u16 TestAnimationFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline u16 TestAnimationFlags(struct ChaseActor *actor, u16 mask)
 {
     return actor->base.flags2D4 & mask;
 }
@@ -43,7 +43,7 @@ static inline void SetDirectionOffset(struct ContactPosition *position, u32 angl
 
 static inline void SetStatusFlags(void *object, u32 flags)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     actor->base.flags2D0 = flags | actor->base.flags2D0;
 }
 static inline u32 ReadPaletteOffset(u16 *offset)
@@ -51,7 +51,7 @@ static inline u32 ReadPaletteOffset(u16 *offset)
     return *offset;
 }
 
-u16 sub_080DE6E0(struct SceneActorRegistryResetView *actor)
+u16 sub_080DE6E0(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *sequence =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_timed_behavior.h"
 static inline u8 HasTargetFlag(struct SceneActorReactionMotion *s)
 {
@@ -7,18 +8,18 @@ static inline u8 HasTargetFlag(struct SceneActorReactionMotion *s)
         return 1;
     return 0;
 }
-u32 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *s)
+u32 SceneActorControl_CanTurnTowardTarget(struct Vorn *s)
 {
-    struct SceneActorTimedBehaviorContext *context = s->base.context;
+    struct SceneActorTimedBehaviorContext *context = s->chase.base.context;
     s32 x, y, z, angle;
-    if (!s->base.tracking.target)
+    if (!s->chase.base.tracking.target)
         return 0;
     if (context->timer704)
         return 0;
-    if (!HasTargetFlag((void *)&s->base.tracking.target))
+    if (!HasTargetFlag((void *)&s->chase.base.tracking.target))
         return 0;
     {
-        struct ContactPosition *v = &s->base.secondaryMotion;
+        struct ContactPosition *v = &s->chase.base.secondaryMotion;
         s32 sum;
         x = v->x;
         sum = x * x;
@@ -28,10 +29,10 @@ u32 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *s)
         if (sum + x * x != 0)
             return 0;
     }
-    if (s->base.tracking.distance > 0x24000)
+    if (s->chase.base.tracking.distance > 0x24000)
         return 0;
-    angle = ((struct SceneActorFacingTarget *)s->base.tracking.target)->heading -
-            s->base.body.direction;
+    angle = ((struct SceneActorFacingTarget *)s->chase.base.tracking.target)->heading -
+            s->chase.base.body.direction;
     if (angle > 128)
         angle -= 256;
     else if (angle < -128)

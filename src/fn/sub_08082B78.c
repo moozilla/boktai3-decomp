@@ -1,5 +1,5 @@
 #include "scene_actor_control_phase.h"
-void SceneActorControl_UpdateFacingAnimation(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateFacingAnimation(struct ChaseActor *actor)
 {
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     u8 changed = SceneActorControl_TakeFlag(&actor->base.field2B2);

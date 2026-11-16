@@ -1,5 +1,5 @@
 #include "scene_actor_control_motion.h"
-void Lun_UpdateSway(struct SceneActorRegistryResetView *actor)
+void Lun_UpdateSway(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     if (state->sway > 320) {

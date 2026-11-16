@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalFlags(void *, u32);
 void SceneActorControl_OnIdle(void);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -16,7 +16,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-void Octopus_BeginIdleAnimation(struct SceneActorRegistryResetView *actor)
+void Octopus_BeginIdleAnimation(struct ChaseActor *actor)
 {
     u32 flag;
     SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);

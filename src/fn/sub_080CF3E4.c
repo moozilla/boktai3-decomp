@@ -11,7 +11,7 @@ void Skeleton_ClearDirectionalEntryFlag(void);
 static inline u8 Golem_ArriveAndRestoreRoute(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -76,7 +76,7 @@ success:
 }
 
 /* Resume the saved response, then select the arrival or reroute operation. */
-void Golem_ArriveAndRestore(struct SceneActorRegistryResetView *actor)
+void Golem_ArriveAndRestore(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {

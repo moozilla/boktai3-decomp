@@ -25,7 +25,7 @@ static inline u8 isRemoved(struct TrailSegment *segment)
         return 1;
     return 0;
 }
-void ActorTrail_RemoveAllSegments(struct SceneActorRegistryResetView *actor)
+void ActorTrail_RemoveAllSegments(struct ChaseActor *actor)
 {
     struct ActorTrail *trail = actor->base.context;
     struct TrailSegment *segments = trail->segments;

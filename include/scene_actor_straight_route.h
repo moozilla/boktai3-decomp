@@ -21,8 +21,8 @@ static inline u8 SceneActorTerrain_IsLevelOpen(s32 cell, u32 level)
         return 0;
     return 1;
 }
-static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetView *actor,
-                                               void *route, struct ContactPosition *from,
+static inline u8 SceneActorTerrain_RequestPath(struct ChaseActor *actor, void *route,
+                                               struct ContactPosition *from,
                                                struct ContactPosition *pos)
 {
 
@@ -47,7 +47,7 @@ static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetVie
     return 0;
 }
 
-static inline s32 SceneActorTerrain_LastOpenCell(struct SceneActorRegistryResetView *actor, s32 dir)
+static inline s32 SceneActorTerrain_LastOpenCell(struct ChaseActor *actor, s32 dir)
 {
     s32 cell, i, col, total;
     u32 level;

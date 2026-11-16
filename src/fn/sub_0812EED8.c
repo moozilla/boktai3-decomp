@@ -3,7 +3,7 @@
 
 // confidence=low: preserves the existing tentative reaction-state interpretation.
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -11,7 +11,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u8 kind)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -43,7 +43,7 @@ static inline void SaveDelay(u8 *packet, void *control, u8 behavior)
     packet[9] = 0;
     packet[10] = behavior;
 }
-static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -51,7 +51,7 @@ static inline void ClearTargetFlags(struct SceneActorReactionMotion *motion, u32
 {
     motion->flags &= mask;
 }
-static inline void SetActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetActorFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2CC |= mask;
 }
@@ -60,7 +60,7 @@ static inline struct SceneActorReactionMotion *MakeMotionPointer(void *actor)
     u8 *bytes = actor;
     return (void *)(bytes + 0xdc);
 }
-u8 SceneActorReaction_BeginTargetRecovery(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     struct SceneActorReactionMotion *motion;

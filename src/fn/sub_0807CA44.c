@@ -20,7 +20,7 @@ struct ReturnResponseCoordinates {
     s16 *coordinates;
 };
 
-static inline void ClearMotionFlag(struct SceneActorRegistryResetView *actor, u32 flag)
+static inline void ClearMotionFlag(struct ChaseActor *actor, u32 flag)
 {
     u16 *flags = &actor->base.flags2D4;
     u32 mask = ~flag;
@@ -57,7 +57,7 @@ static inline s32 HeightAt(struct ContactPosition *position)
     }
     return height;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -76,8 +76,7 @@ static inline void *ReadNavigationShape(struct ReturnResponseGroup *const *group
     return (*group)->shape;
 }
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *owner,
-                        struct SceneActorRegistryResetView *actor,
+static inline u8 MoveTo(struct ChaseActor *owner, struct ChaseActor *actor,
                         struct ReturnResponseGroup *group, struct ContactPosition *destination)
 {
     void *shape = ReadNavigationShape(&group);
@@ -110,8 +109,7 @@ static inline void ArmCommand(struct SceneActorReactionCommand *command, void *p
     command->second = 0;
     command->kind = kind;
 }
-static inline void SetResponseState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                                    u8 behavior)
+static inline void SetResponseState(struct ChaseActor *actor, u32 state, u32 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -120,8 +118,7 @@ static inline void SetResponseState(struct SceneActorRegistryResetView *actor, u
     actor->base.field2B1 = 1;
 }
 
-static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
-                              struct SceneActorRegistryResetView *actor,
+static inline u8 MoveToSource(struct ChaseActor *owner, struct ChaseActor *actor,
                               struct ReturnResponseGroup *group,
                               struct SceneActorPositionSource **source)
 {
@@ -140,21 +137,21 @@ static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
     return 0;
 }
 
-static inline void SetResponseWordFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetResponseWordFlag(struct ChaseActor *actor, u32 mask)
 {
     u32 *flags = &actor->base.flags2CC;
     *flags = mask | *flags;
 }
 
-static inline void SetResponseHalfFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetResponseHalfFlag(struct ChaseActor *actor, u32 mask)
 {
     u16 *flags = &actor->base.flags2D4;
     *flags = mask | *flags;
 }
 
-void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView *actor)
+void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     struct ReturnResponseGroup *group = (void *)&actor->group.common;
     struct ContactPosition position;
     struct ContactPosition *destination;

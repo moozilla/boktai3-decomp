@@ -22,8 +22,7 @@ static inline u32 RotationPhase_Mask(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline void RotationPhase_Change(struct SceneActorRegistryResetView *actor, void *callback,
-                                        u8 kind)
+static inline void RotationPhase_Change(struct ChaseActor *actor, void *callback, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;

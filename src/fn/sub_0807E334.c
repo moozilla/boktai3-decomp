@@ -2,7 +2,7 @@
 
 void SceneActorTerrain_RequestRetreatRoute(void *obj)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition pos;
     s32 dir, dest, attempts;

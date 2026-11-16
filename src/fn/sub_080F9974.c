@@ -7,7 +7,7 @@ void ActorPhase_EmitTrailSprite(void *, void *, u32);
 void Axe_UpdateTrailColliders(void *);
 void Axe_UpdateAttackColliderPositions(void *);
 void Axe_ReleaseAuxiliarySprite(void *);
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -24,7 +24,7 @@ static inline u8 HasAuxiliary(const u8 *state)
     return state[0xA3C] != 0;
 }
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
-void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u8 *context = actor->base.context;

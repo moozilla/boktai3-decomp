@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 void SceneActor_LeapTowardTarget(void);
-void Dog_UpdateLeapControl(struct SceneActorRegistryResetView *a)
+void Dog_UpdateLeapControl(struct ChaseActor *a)
 {
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, SceneActor_LeapTowardTarget, 0x23);

@@ -1,6 +1,6 @@
 #include "scene_actor_control_phase.h"
 u32 Trigger_ConsumePending(void *, u32);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -14,8 +14,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -24,7 +23,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.field2B1 = 1;
 }
 
-void SceneActorControl_UpdateTriggerPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateTriggerPhase(struct ChaseActor *actor)
 {
     u8 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {

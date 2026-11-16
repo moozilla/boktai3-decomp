@@ -3,11 +3,11 @@
 #include "scene_actor_control_phase.h"
 u16 SceneActorRoute_GetStepDuration(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
-static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 TestFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
-void SceneActorRoute_UpdateTimedPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateTimedPhase(struct ChaseActor *actor)
 {
     u8 *block = (u8 *)actor + 0x3D4;
     void *route = actor->base.body.currentRoute;

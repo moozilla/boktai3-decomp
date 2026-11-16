@@ -19,7 +19,7 @@ inline static u8 TakeFlag(u8 *p)
     return 0;
 }
 
-static inline u32 Flags16(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Flags16(struct ChaseActor *a, u32 m)
 {
     u32 off = 0x2D4;
     return *(u16 *)((u8 *)a + off) & m;
@@ -39,7 +39,7 @@ void Golem_OnUnusedState(void)
 {
 }
 
-static inline u32 Flags32At(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Flags32At(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
@@ -58,7 +58,7 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 
 
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
-void Golem_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     struct ContactPackedVector rangeB;
@@ -212,32 +212,31 @@ static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u3
 
 static inline void GolemReaction_LatchHitReact(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     if (!actor->group.hitReactionLatch && (actor->base.field2E6 & 8)) {
         actor->base.field2B8 = 0x2D;
         actor->group.hitReactionLatch = 0x41;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
 }
-static inline s16 GolemReaction_CurrentHeight(struct SceneActorRegistryResetView *actor)
+static inline s16 GolemReaction_CurrentHeight(struct ChaseActor *actor)
 {
     return actor->base.fieldA8;
 }
 
-static inline void GolemReaction_SetChargeHeight(struct SceneActorRegistryResetView *actor,
-                                                 s32 height)
+static inline void GolemReaction_SetChargeHeight(struct ChaseActor *actor, s32 height)
 {
     actor->base.fieldAA = height;
 }
 
-static inline void GolemReaction_EnterCharge(struct SceneActorRegistryResetView *actor, s16 height)
+static inline void GolemReaction_EnterCharge(struct ChaseActor *actor, s16 height)
 {
     GolemReaction_SetChargeHeight(actor, height);
     SceneActorChase_SetTypedControl(actor, actor->base.reactionTarget230, 0x12);
     SceneActorChase_SetTypedState(actor, 3, 0, 0);
 }
 
-static inline void GolemReaction_Settle(struct SceneActorRegistryResetView *actor)
+static inline void GolemReaction_Settle(struct ChaseActor *actor)
 {
     SceneActorChase_SetTypedControl(actor, actor->base.entryTarget228, 1);
     SceneActorChase_SetTypedState(actor, 0, 0, 7);
@@ -245,7 +244,7 @@ static inline void GolemReaction_Settle(struct SceneActorRegistryResetView *acto
 }
 
 /* Dispatch the hit-reaction state; return one when entering a state. */
-s32 Golem_UpdateHitReaction(struct SceneActorRegistryResetView *actor)
+s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 {
     struct GolemReactionBody *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -375,7 +374,7 @@ s32 Golem_UpdateHitReaction(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
-void Golem_UpdateScriptedAction(struct SceneActorRegistryResetView *obj)
+void Golem_UpdateScriptedAction(struct ChaseActor *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
         void (*fn)(void) = SceneActorReaction_PlayAnimationBUntilComplete;

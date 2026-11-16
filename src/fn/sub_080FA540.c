@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 
 void ActorPhase_UpdateSpriteCollapse(void);
-static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
+static inline u8 TakePending(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -10,7 +10,7 @@ static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     u32 zero;
     actor->base.field2B2 = 1;
@@ -29,7 +29,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
 struct AxeFlags16 {
     u16 bits : 16;
 };
-static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void SetBehavior(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -37,7 +37,7 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 be
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void Axe_UpdateCollapsePhase(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 {
     if (TakePending(actor)) {
         BeginControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);

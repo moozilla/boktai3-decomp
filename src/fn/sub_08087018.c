@@ -5,7 +5,7 @@
 #include "scene_actor_delayed_response.h"
 #include "display_sequence.h"
 
-static inline u16 *Bat_PrepareLanding(struct SceneActorRegistryResetView *actor, s32 frame)
+static inline u16 *Bat_PrepareLanding(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation;
     u16 *reactionFlags;
@@ -23,7 +23,7 @@ static inline u16 *Bat_PrepareLanding(struct SceneActorRegistryResetView *actor,
 }
 
 /* Resume the suspended landing reaction, then queue pursuit or the home route. */
-void sub_08087018(struct SceneActorRegistryResetView *actor, s32 frame)
+void sub_08087018(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *reactionFlags;

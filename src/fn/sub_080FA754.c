@@ -7,7 +7,7 @@ static inline s32 Scale(s32 value)
 {
     return value >= 0 ? value >> 12 : -(-value >> 12);
 }
-void SceneActorControl_UpdateHoverHeight(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     u32 mask = 0x8000;

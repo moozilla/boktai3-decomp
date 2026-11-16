@@ -15,11 +15,11 @@ void SceneActorReaction_TickQueuedContact(void);
 
 void SceneActorReaction_TickContactAnimation(void);
 
-void Vorn_SpawnHazard(struct SceneActorRegistryResetView *, s32);
+void Vorn_SpawnHazard(struct ChaseActor *, s32);
 
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 
-static inline u8 TakeReady(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReady(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -33,7 +33,7 @@ static inline void ClearFlags(u16 *p, u32 mask)
     *p &= mask;
 }
 
-static inline void SetCategoryControl(struct SceneActorRegistryResetView *actor, void *fn)
+static inline void SetCategoryControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 3;
     actor->base.field2B2 = 1;
@@ -49,7 +49,7 @@ static inline void SetCategoryControl(struct SceneActorRegistryResetView *actor,
     actor->base.word104 = 0;
 }
 
-void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCategoryContext *context = actor->base.context;
     if (TakeReady(actor)) {
@@ -79,7 +79,7 @@ struct SceneActorApproachTimedContext {
 
 void Skeleton_UpdateAttackWindup(void);
 
-static inline void SetTimedControl(struct SceneActorRegistryResetView *actor, void *fn)
+static inline void SetTimedControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x27;
     actor->base.field2B2 = 1;
@@ -95,7 +95,7 @@ static inline void SetTimedControl(struct SceneActorRegistryResetView *actor, vo
     actor->base.word104 = 0;
 }
 
-void SceneActorApproach_RunTimedAction(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachTimedContext *context = actor->base.context;
     if (TakeReady(actor)) {
@@ -120,7 +120,7 @@ struct SceneActorApproachAlternateContext {
 
 void SceneActorReaction_TickMultiHitAnimation(void);
 
-static inline void SetAlternateControl(struct SceneActorRegistryResetView *actor, void *fn)
+static inline void SetAlternateControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x2B;
     actor->base.field2B2 = 1;
@@ -136,7 +136,7 @@ static inline void SetAlternateControl(struct SceneActorRegistryResetView *actor
     actor->base.word104 = 0;
 }
 
-void SceneActorApproach_RunAlternateTimedAction(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachAlternateContext *context = actor->base.context;
     if (TakeReady(actor)) {
@@ -165,7 +165,7 @@ struct SceneActorApproachCaptureContext {
 
 void sub_080BAAF4(void);
 
-static inline void SetCaptureControl(struct SceneActorRegistryResetView *actor, void *fn)
+static inline void SetCaptureControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 0x2C;
     actor->base.field2B2 = 1;
@@ -181,7 +181,7 @@ static inline void SetCaptureControl(struct SceneActorRegistryResetView *actor, 
     actor->base.word104 = 0;
 }
 
-void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryResetView *actor)
+void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
 {
     struct SceneActorApproachCaptureContext *context = actor->base.context;
     if (TakeReady(actor)) {
@@ -230,7 +230,7 @@ static inline s32 Skeleton_ScaleApproachMotion(s32 n)
 
 static inline void Skeleton_SetApproachState(void *object, u8 state, u8 phase, u32 behavior)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
     actor->base.behavior2AA = behavior;
@@ -255,7 +255,7 @@ static inline void Skeleton_GetApproachCellCenter(s32 cell, struct ContactPositi
 static inline u8 Skeleton_ApproachTargetCell(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -314,7 +314,7 @@ success:
     return 1;
 }
 
-static inline void Skeleton_UpdateApproachAnimation(struct SceneActorRegistryResetView *actor)
+static inline void Skeleton_UpdateApproachAnimation(struct ChaseActor *actor)
 {
     u32 mask = 0xA02F;
     u16 *scale;
@@ -335,7 +335,7 @@ static inline void Skeleton_UpdateApproachAnimation(struct SceneActorRegistryRes
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
-static inline void Skeleton_ApplyApproachMotion(struct SceneActorRegistryResetView *actor,
+static inline void Skeleton_ApplyApproachMotion(struct ChaseActor *actor,
                                                 struct SkeletonChaseBody *body, u32 angle,
                                                 s32 speed)
 {
@@ -355,7 +355,7 @@ static inline void Skeleton_ApplyApproachMotion(struct SceneActorRegistryResetVi
         actor->base.counter2AC++;
 }
 
-void Skeleton_UpdateTargetApproach(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateTargetApproach(struct ChaseActor *actor)
 {
     struct SkeletonChaseBody *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;

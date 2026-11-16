@@ -10,7 +10,7 @@ static inline u8 TakePending(u8 *flag)
     }
     return 0;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     u32 zero;
     actor->base.field2B2 = 1;
@@ -26,7 +26,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-void Dog_UpdateLeapWindup(struct SceneActorRegistryResetView *actor)
+void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     if (TakePending(&actor->base.field2B2)) {

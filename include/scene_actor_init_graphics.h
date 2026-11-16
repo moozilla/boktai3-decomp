@@ -41,7 +41,7 @@ static inline void MonsterInit_SetWidgetScriptPalette(struct DisplayKeyframeStat
     widget->paletteIndex = scriptPalette - 0x5FFF;
 }
 
-static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
+static inline void MonsterInit_DrawablePosition(struct ChaseActor *actor)
 {
     if (MonsterInit_GetDrawableKind(actor) == 0)
         *(struct ContactPosition *)(actor->base.drawable + 0x1C) = actor->base.body.position;
@@ -49,8 +49,7 @@ static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetVi
         *(struct ContactPosition *)(actor->base.drawable + 0x40) = actor->base.body.position;
 }
 
-static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                           u32 alternate)
+static inline void MonsterInit_ReadPalette(struct ChaseActor *actor, u32 base, u32 alternate)
 {
     s32 palette;
     actor->base.paletteOffset = Script_GetKeywordValue('C', 0);

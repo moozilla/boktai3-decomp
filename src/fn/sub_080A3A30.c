@@ -15,7 +15,7 @@ struct SpiderPursuitGroup {
     void *mesh;
     struct ContactPosition *point;
 };
-static inline u8 Blocked(struct SceneActorRegistryResetView *a)
+static inline u8 Blocked(struct ChaseActor *a)
 {
     if (a) {
         u32 mask = 0x40;
@@ -35,7 +35,7 @@ static inline u8 HasFlag(struct PursuitContext *c, u32 mask)
         return 1;
     return 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -43,7 +43,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -57,11 +57,11 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = 0;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline void SetFlags(struct ChaseActor *a, u32 mask)
 {
     a->base.flags2CC = mask | a->base.flags2CC;
 }
-void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
+void Spider_BeginPlayerPursuit(struct ChaseActor *a)
 {
     struct PursuitContext *ctx;
     u8 *group;

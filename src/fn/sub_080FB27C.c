@@ -28,7 +28,7 @@ zero:
     return 0;
 }
 
-s32 SceneActorControl_CanAdvanceHover(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_CanAdvanceHover(struct ChaseActor *actor)
 {
     if (!Actor_IsInactive((void *)actor)) {
         u8 *context = actor->base.context;

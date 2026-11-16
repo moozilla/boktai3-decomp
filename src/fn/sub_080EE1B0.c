@@ -80,12 +80,12 @@ static inline u8 TestBits(u32 *p, u32 maskInput)
         return 1;
     return 0;
 }
-static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
+static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
 }
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -101,7 +101,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 state = s;
     actor->base.state2A8 = state;
@@ -129,7 +129,7 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         else if (flags &= 0x800)                                                                   \
             INC(0x592);                                                                            \
     }
-static inline void RecordKill(struct SceneActorRegistryResetView *actor, u8 *category)
+static inline void RecordKill(struct ChaseActor *actor, u8 *category)
 {
     struct ContactCollider *collider = &actor->base.colliderA;
     switch (*category) {
@@ -273,7 +273,7 @@ struct DefeatContext {
     u16 script;
 };
 
-void Ivy_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
         u32 zero;

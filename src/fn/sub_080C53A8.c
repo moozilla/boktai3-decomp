@@ -2,17 +2,17 @@
 #include "scene_actor_reset.h"
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 Div(s32, s32);
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
     return 0;
 }
-void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
+void Golem_UpdateAttackProperties(struct ChaseActor *a)
 {
     u8 *state = a->base.context;
     u8 *group = (u8 *)&a->group.common;

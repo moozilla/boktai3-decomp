@@ -3,7 +3,7 @@
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_SelectWanderRoute(void *);
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *p)
+static inline u8 TakeEntry(struct ChaseActor *p)
 {
     if (p->base.field2B1) {
         p->base.field2B1 = 0;
@@ -11,7 +11,7 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *p)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *p, void *control, u32 code)
+static inline void SetControl(struct ChaseActor *p, void *control, u32 code)
 {
     u8 *entry = &p->base.field2B2;
     u32 zero = 0;
@@ -27,7 +27,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *p, void *contr
     }
     p->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+static inline void SetState(struct ChaseActor *p, u32 b)
 {
     u32 behavior = b;
     p->base.state2A8 = 0;
@@ -42,7 +42,7 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-void TentacleActor_UpdateKnockbackSlide(struct SceneActorRegistryResetView *p)
+void TentacleActor_UpdateKnockbackSlide(struct ChaseActor *p)
 {
     if (TakeEntry(p)) {
         struct ContactPosition *velocity;

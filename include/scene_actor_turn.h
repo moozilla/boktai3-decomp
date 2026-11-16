@@ -12,13 +12,12 @@ static inline s32 SceneActorTurn_Cardinal(u8 direction)
     return ((direction + 0x60) >> 6) & 3;
 }
 
-static inline u32 SceneActorTurn_ActorFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 SceneActorTurn_ActorFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
 
-static inline void SceneActorTurn_ApplyDuration(struct SceneActorRegistryResetView *a,
-                                                u16 *motionFlags)
+static inline void SceneActorTurn_ApplyDuration(struct ChaseActor *a, u16 *motionFlags)
 {
     u16 *scale;
     u32 mask = 0xA02F;
@@ -46,14 +45,13 @@ static inline u32 SceneActorTurn_Flags(u16 *field, u32 mask)
     return *field & mask;
 }
 
-static inline void SceneActorTurn_SetAnimationIndex(struct SceneActorRegistryResetView *a,
-                                                    u32 selection)
+static inline void SceneActorTurn_SetAnimationIndex(struct ChaseActor *a, u32 selection)
 {
     a->base.animationIndex = selection;
 }
 
-static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryResetView *a,
-                                                  u32 selection, u32 variant, u32 flags)
+static inline void SceneActorTurn_SelectAnimation(struct ChaseActor *a, u32 selection, u32 variant,
+                                                  u32 flags)
 {
     u32 force;
     if (flags & 0x10) {

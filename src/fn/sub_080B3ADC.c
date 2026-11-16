@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_reset.h"
 
 // confidence=low: dispatches response, pursuit, and retreat actions from context flags.
@@ -14,7 +15,7 @@ static inline u8 Test(u16 *p, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 TestActor(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u8 TestActor(struct Vorn *p, u32 mask)
 {
     if (p->flags6D4 & mask)
         return 1;
@@ -31,9 +32,9 @@ static inline u8 TestValue(u32 value)
     return 0;
 }
 
-u32 SceneActor_DispatchContextAction(struct SceneActorRegistryResetView *q, u32 reset)
+u32 SceneActor_DispatchContextAction(struct Vorn *q, u32 reset)
 {
-    struct SceneActorRegistryResetView *p = q;
+    struct Vorn *p = q;
     u16 *flags;
     u32 first;
     if (TestActor(p, 1)) {

@@ -2,9 +2,9 @@
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -16,7 +16,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void State(struct ChaseActor *a, u32 behavior)
 {
     u32 off = 0x2A8;
     u32 phase;
@@ -37,7 +37,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
         FIELD(a, b, u8) = 1;
     }
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *target)
+static inline void Control(struct ChaseActor *a, void *target)
 {
     u32 off = 0x2B2;
     FIELD(a, off, u8) = 1;
@@ -79,7 +79,7 @@ static inline u32 Flags(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u32 GetFlags(struct SceneActorRegistryResetView *a, u32 mask, u32 **out)
+static inline u32 GetFlags(struct ChaseActor *a, u32 mask, u32 **out)
 {
     u32 *p = &a->base.flags2CC;
     u32 v = *p;
@@ -91,7 +91,7 @@ struct SpiderGroupView {
     u8 pad[0x1FC];
     void *mesh;
 };
-void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
+void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
 {
     struct SpiderProbeContext *ctx = actor->base.context;
     struct SpiderGroupView *group = (void *)&actor->group.common;

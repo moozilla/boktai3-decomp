@@ -12,7 +12,7 @@ s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
 void NavMesh_UpdateProbe(void *, void *);
 void sub_0821DE30(void *);
 
-static inline u32 SceneActorMotion_BehaviorBits(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 SceneActorMotion_BehaviorBits(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -20,13 +20,13 @@ static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 {
     return *flags & bits;
 }
-static inline u8 SceneActorMotion_HasBodyFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 SceneActorMotion_HasBodyFlags(struct ChaseActor *actor, u32 mask)
 {
     if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
-static inline void SceneActorMotion_SetFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 value = bits;
     u16 *field = &actor->base.flags2D4;
@@ -61,7 +61,7 @@ static inline u16 SceneActorMotion_SequenceElapsed(struct DisplaySequenceState *
     return s->elapsed;
 }
 
-static inline u16 *SceneActorMotion_MarkMoving(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline u16 *SceneActorMotion_MarkMoving(struct ChaseActor *actor, u32 bits)
 {
     u32 value = bits;
     u16 *field = &actor->base.flags2D6;
@@ -87,7 +87,7 @@ static inline void SceneActorMotion_SetStatus(u32 *f, u32 bit)
     u32 mask = bit;
     *f |= mask;
 }
-static inline u16 SceneActorMotion_Elapsed(struct SceneActorRegistryResetView *actor)
+static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
 {
     if (!actor->base.drawableKind)
         return SceneActorMotion_SequenceElapsed(
@@ -96,7 +96,7 @@ static inline u16 SceneActorMotion_Elapsed(struct SceneActorRegistryResetView *a
 }
 s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
 {
-    struct SceneActorRegistryResetView *actor = (void *)object;
+    struct ChaseActor *actor = (void *)object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct ContactCollider *collider;
     struct ContactPosition *position;

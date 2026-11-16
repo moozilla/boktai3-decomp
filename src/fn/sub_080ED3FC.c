@@ -3,7 +3,7 @@
 #include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalFlags(void *, s32);
 void Sound_PlaySong(u32);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 TakePrepared(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -11,7 +11,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-void SceneActorReaction_PlayHiddenCue(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
 {
     if (TakePrepared(actor)) {
         u8 *drawable = actor->base.drawable;

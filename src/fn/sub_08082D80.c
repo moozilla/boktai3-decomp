@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 #include "player.h"
 #include "scene_actor_reaction.h"
-void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 static inline s32 Quarter(s32 v)
 {
     return v >= 0 ? v >> 2 : -(-v >> 2);
@@ -41,14 +41,13 @@ static inline u8 TrackingHas(struct SceneActorChaseTracking *tracking, u32 mask)
         return 1;
     return 0;
 }
-static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                               u8 behavior)
+static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
     actor->base.behavior2AA = behavior;
 }
-void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     s32 x;

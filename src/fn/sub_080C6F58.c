@@ -9,7 +9,7 @@ static inline s32 Scale8(s16 n)
 }
 /* Charge windup: reset the pending-hit count, emit dust, and ramp the stored speed. */
 // confidence=low: charge controls 080CDF14 and 080CEDF0 install this preparatory state.
-void Golem_UpdateChargeWindup(struct SceneActorRegistryResetView *actor, u32 frame)
+void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
 {
     struct GolemChargeContext *context = actor->base.context;
     struct SceneActorBody *body = &actor->base.body;

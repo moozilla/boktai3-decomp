@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-void SceneActorControl_UpdatePausePhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
 {
     u8 *control = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

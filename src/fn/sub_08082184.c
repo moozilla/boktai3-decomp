@@ -68,12 +68,12 @@ static inline void ClearBits(u16 *flags, u32 bits)
 {
     *flags &= ~bits;
 }
-static inline void SetActorBits(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void SetActorBits(struct ChaseActor *actor, u32 bits)
 {
     actor->base.flags2CC |= bits;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *context,
-                          struct ContactPosition *source, struct ContactPosition *destination)
+static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct ContactPosition *source,
+                          struct ContactPosition *destination)
 {
     s32 result;
     if (!Nav_IsPositionInMesh(context, source, destination)) {
@@ -89,7 +89,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *conte
     ClearBits(&actor->base.flags2D4, 0x200);
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -103,8 +103,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -121,7 +120,7 @@ static inline void SetResponse(struct RouteResponse *response, void *control, u3
     response->phase = phase;
     response->behavior = behavior;
 }
-void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
 {
     struct RouteResponseGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {

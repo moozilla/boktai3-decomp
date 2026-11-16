@@ -4,7 +4,7 @@
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
+static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -18,7 +18,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k)
+static inline void State(struct ChaseActor *a, u32 k)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = 0;
@@ -49,7 +49,7 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *fr
     out->y = to->y - from->y;
     out->z = to->z - from->z;
 }
-static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPosition *delta)
+static inline s32 Facing(struct ChaseActor *a, struct ContactPosition *delta)
 {
     s32 direction = a->base.body.direction;
     s32 difference = Math_Atan2(delta->x, delta->z) - direction;
@@ -60,7 +60,7 @@ static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPo
     return difference;
 }
 
-static inline u32 SaveFlags(struct SceneActorRegistryResetView *a, u16 **out, u32 m)
+static inline u32 SaveFlags(struct ChaseActor *a, u16 **out, u32 m)
 {
     u16 *p = &a->base.flags2D4;
     u32 r = *p & m;
@@ -68,7 +68,7 @@ static inline u32 SaveFlags(struct SceneActorRegistryResetView *a, u16 **out, u3
     return r;
 }
 // confidence=low: starts close player contact when within the actor's stored distance limit
-u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetView *a)
+u8 SceneActorPlacement_BeginNearbyPlayerContact(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
     u8 *nav = (u8 *)a + 0x3d4;

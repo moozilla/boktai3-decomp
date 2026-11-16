@@ -6,7 +6,7 @@ struct DelayedAnimationContext {
     u16 flags;
     u8 unknown696, delay;
 };
-static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
+static inline u8 TakeEntryFlag(struct ChaseActor *s)
 {
     if (s->base.field2B2) {
         s->base.field2B2 = 0;
@@ -14,7 +14,7 @@ static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void SceneActor_UpdateDelayedAnimation(struct SceneActorRegistryResetView *s)
+void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
 {
     struct DelayedAnimationContext *context = s->base.context;
     if (TakeEntryFlag(s))

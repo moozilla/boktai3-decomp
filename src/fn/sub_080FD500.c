@@ -18,7 +18,7 @@ static inline void Or32(u32 m, u32 *p)
 {
     *p |= m;
 }
-static inline void Restart(struct SceneActorRegistryResetView *actor)
+static inline void Restart(struct ChaseActor *actor)
 {
     void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
     u32 kind = 0x23;
@@ -50,7 +50,7 @@ static inline void Restart(struct SceneActorRegistryResetView *actor)
         actor->base.field2B1 = one;
     }
 }
-void SceneActorControl_UpdateControl35Phase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
 {
     struct SceneActorControl35Context *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

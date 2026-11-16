@@ -9,7 +9,7 @@ struct DampedMotionState {
     u8 unknownF16[2];
     s16 z;
 };
-void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ApplyDampedMotion(struct ChaseActor *actor)
 {
     struct DampedMotionState *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))

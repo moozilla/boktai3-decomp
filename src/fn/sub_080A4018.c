@@ -31,8 +31,7 @@ static inline u8 Test(struct SpiderContext *ctx, u32 mask)
     return 0;
 }
 
-static inline struct ContactPosition *Spider_GetGoal(u32 offset,
-                                                     struct SceneActorRegistryResetView *input)
+static inline struct ContactPosition *Spider_GetGoal(u32 offset, struct ChaseActor *input)
 {
     return (void *)((u8 *)input + offset);
 }
@@ -50,15 +49,14 @@ static inline u8 SelectHeading(u16 random, u8 *direction)
     s32 angle = (random & 127) - 63;
     return angle + *direction;
 }
-static inline s32 ReadCounter(struct SceneActorRegistryResetView *actor)
+static inline s32 ReadCounter(struct ChaseActor *actor)
 {
-    register u32 offset asm("r1") =
-        (u32) & ((struct SceneActorRegistryResetView *)0)->base.counter2AC;
+    register u32 offset asm("r1") = (u32) & ((struct ChaseActor *)0)->base.counter2AC;
     s32 *counter = (void *)((u8 *)actor + offset);
     asm("" : : "r"(offset));
     return *counter;
 }
-void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
+void Spider_UpdateWanderGoal(struct ChaseActor *input)
 {
     struct SpiderContext *ctx = input->base.context;
     struct SpiderGroupView *group = (void *)&input->group.common;

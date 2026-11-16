@@ -4,9 +4,9 @@
 #include "scene_actor_init_actor.h"
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 
-static inline void MonsterInit_InitializeCallbackDefaults(struct SceneActorRegistryResetView *actor,
+static inline void MonsterInit_InitializeCallbackDefaults(struct ChaseActor *actor,
                                                           void *targetQuery, void *damage,
                                                           void *contact)
 {
@@ -23,11 +23,11 @@ static inline void MonsterInit_InitializeCallbackDefaults(struct SceneActorRegis
 /* Install the actor result, sequence selector, action, and contact-predicate
  * callback families used by the pursuit-group initializers. */
 static inline void MonsterInit_InstallSequenceCallbacks(
-    struct SceneActorRegistryResetView *actor, SceneActorResultCallback result,
-    SceneActorSequenceQuery sequence, SceneActorAction entry, SceneActorAction alternateEntry,
-    SceneActorAction standing, SceneActorAction hidden, SceneActorAction reaction,
-    SceneActorAction defeat, SceneActorDefaultReaction defaultReaction,
-    SceneActorContactPredicate contactPredicate, void *targetQuery, void *damage, void *contact)
+    struct ChaseActor *actor, SceneActorResultCallback result, SceneActorSequenceQuery sequence,
+    SceneActorAction entry, SceneActorAction alternateEntry, SceneActorAction standing,
+    SceneActorAction hidden, SceneActorAction reaction, SceneActorAction defeat,
+    SceneActorDefaultReaction defaultReaction, SceneActorContactPredicate contactPredicate,
+    void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     MonsterInit_WriteResultCallback(&actor->base.contextCallback, result);
@@ -43,12 +43,11 @@ static inline void MonsterInit_InstallSequenceCallbacks(
     MonsterInit_InitializeCallbackDefaults(actor, targetQuery, damage, contact);
 }
 
-static inline void MonsterInit_InitializeAnimationActions(struct SceneActorRegistryResetView *actor,
-                                                          void *result, u32 (*animation)(void *),
-                                                          void *entry, void *alternateEntry,
-                                                          void *standing, void *hidden,
-                                                          void *reaction, void *defeat,
-                                                          void *defaultReaction)
+static inline void MonsterInit_InitializeAnimationActions(struct ChaseActor *actor, void *result,
+                                                          u32 (*animation)(void *), void *entry,
+                                                          void *alternateEntry, void *standing,
+                                                          void *hidden, void *reaction,
+                                                          void *defeat, void *defaultReaction)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->base.contextCallback = result;
@@ -63,7 +62,7 @@ static inline void MonsterInit_InitializeAnimationActions(struct SceneActorRegis
 }
 
 static inline void
-MonsterInit_InstallAnimationCallbacks(struct SceneActorRegistryResetView *actor, void *result,
+MonsterInit_InstallAnimationCallbacks(struct ChaseActor *actor, void *result,
                                       u32 (*animation)(void *), void *entry, void *alternateEntry,
                                       void *standing, void *hidden, void *reaction, void *defeat,
                                       void *defaultReaction, u8 (*contactQuery)(void *),
@@ -76,7 +75,7 @@ MonsterInit_InstallAnimationCallbacks(struct SceneActorRegistryResetView *actor,
 }
 
 static inline void MonsterInit_InstallOpaqueContactCallbacks(
-    struct SceneActorRegistryResetView *actor, void *result, u32 (*animation)(void *), void *entry,
+    struct ChaseActor *actor, void *result, u32 (*animation)(void *), void *entry,
     void *alternateEntry, void *standing, void *hidden, void *reaction, void *defeat,
     void *defaultReaction, void *contactQuery, void *targetQuery, void *damage, void *contact)
 {

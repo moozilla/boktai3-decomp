@@ -10,7 +10,7 @@ struct Q {
     u16 b[4];
 };
 
-static inline void Go(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -19,7 +19,7 @@ static inline void Go(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 
     actor->base.field2B1 = 1;
 }
 
-u32 Axe_PickAttack(struct SceneActorRegistryResetView *actor)
+u32 Axe_PickAttack(struct ChaseActor *actor)
 {
     struct Q *q = actor->base.context;
     if (actor->base.health <= q->low && q->b[3] == 0) {

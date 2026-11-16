@@ -23,13 +23,13 @@ static inline u8 AtRest(s32 x, s32 z)
     return 0;
 }
 
-static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 m)
+static inline void SetFlags(struct ChaseActor *a, u32 m)
 {
     u32 v = m;
     v |= a->base.flags2D4;
     a->base.flags2D4 = v;
 }
-static inline void SetForced(struct SceneActorRegistryResetView *a, u32 m)
+static inline void SetForced(struct ChaseActor *a, u32 m)
 {
     a->base.flags2D0 = m | a->base.flags2D0;
 }
@@ -37,11 +37,11 @@ static inline void SetContext(u8 *p, u32 m)
 {
     *(u32 *)(p + 0xE4C) = m | *(u32 *)(p + 0xE4C);
 }
-static inline void RestoreHistory(struct SceneActorRegistryResetView *a, u16 v)
+static inline void RestoreHistory(struct ChaseActor *a, u16 v)
 {
     a->group.common.gate.counter = v;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
 {
     a->base.state2A8 = s;
     a->base.phase2A9 = p;
@@ -49,7 +49,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u8 s, u8 p, u
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
+void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     s32 x, z;

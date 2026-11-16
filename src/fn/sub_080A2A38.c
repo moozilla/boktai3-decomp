@@ -2,7 +2,7 @@
 #include "debug.h"
 /* SceneActorReaction_ResumeEntryTarget: tentative */
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 behavior = b;
     actor->base.state2A8 = s;
@@ -12,7 +12,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->base.field2B1 = 1;
 }
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u32 k)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -27,7 +27,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 
-void SceneActorReaction_ResumeEntryTarget(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ResumeEntryTarget(struct ChaseActor *actor)
 {
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {

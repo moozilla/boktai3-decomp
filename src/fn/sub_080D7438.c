@@ -13,7 +13,7 @@ static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
         return 1;
     return 0;
 }
-void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
+void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 {
     u32 *flags = &actor->base.flags2D0;
     s32 mask = -5;

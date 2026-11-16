@@ -8,13 +8,13 @@ struct SceneActorAttachmentResponseGroup {
     void *attachment;
 };
 
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *actor,
-                                              u32 inputkind, u32 inputevent, u32 inputcategory)
+void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *actor, u32 inputkind,
+                                              u32 inputevent, u32 inputcategory)
 {
     s32 kind = (u8)inputkind;
     u8 event = inputevent;
     u8 category = inputcategory;
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     struct SceneActorAttachmentResponseGroup *group = (void *)&actor->group.common;
     struct ActorAttachmentFollowView *follow = (void *)(&actor->base.body.id);
     s32 y;

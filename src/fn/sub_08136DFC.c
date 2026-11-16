@@ -24,7 +24,7 @@ void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
             *field = flags & ~2;
             if (s->shadow320[0])
                 ActorShadow_Enable(s->shadow320);
-            ClearCollider(&((struct SceneActorRegistryResetView *)s)->base.colliderA);
+            ClearCollider(&((struct ChaseActor *)s)->base.colliderA);
             s->field178 = zero;
             if (s->drawableKind == 0) {
                 u32 *p = s->drawable;

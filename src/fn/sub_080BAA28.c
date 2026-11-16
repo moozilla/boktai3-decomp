@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 void SceneActorReaction_ApplyThreshold(void);
-void SceneActorReaction_TickMultiHitAnimation(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_TickMultiHitAnimation(struct ChaseActor *p)
 {
     u8 *state = p->base.context;
     u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);

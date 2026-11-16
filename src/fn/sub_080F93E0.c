@@ -131,7 +131,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         }
     }
     {
-        struct SceneActorRegistryResetView *state = (void *)actor;
+        struct ChaseActor *state = (void *)actor;
         sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
         {
             u32 mask = 0xA02F;

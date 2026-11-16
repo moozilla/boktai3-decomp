@@ -8,7 +8,7 @@ static inline void EnableMotionFlags(u32 mask, u16 *field)
     struct MotionFlags *flags = (void *)field;
     flags->bits |= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -27,7 +27,7 @@ static inline void ClearFlags(u32 *flags, u32 bits)
     u32 mask = ~bits;
     *flags &= mask;
 }
-static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 *motion)
+static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
 {
     if (!actor)
         return 0;
@@ -42,8 +42,7 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 *motion)
         return 1;
     return 0;
 }
-void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *actor,
-                                         const u16 *argument)
+void SceneActorTarget_ApplyResetCommand(struct ChaseActor *actor, const u16 *argument)
 {
     u32 mask = 0x800;
     u16 *flags = &actor->base.flags2D4;

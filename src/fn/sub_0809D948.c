@@ -16,12 +16,12 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-static inline u16 SetFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 {
     u16 *flags = &actor->base.flags2D4;
     return *flags = mask | *flags;
 }
-void RouteActor_UpdatePlayerDestinationPhase(struct SceneActorRegistryResetView *actor)
+void RouteActor_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B1)) {
         struct RouteActorDestinationState *state = actor->base.context;

@@ -12,7 +12,7 @@ struct SceneActorTrackingParent {
     u8 unknown0[0x6F2];
     u16 flags;
 };
-static inline u8 IsPlayerTracked(struct SceneActorRegistryResetView *actor)
+static inline u8 IsPlayerTracked(struct ChaseActor *actor)
 {
     u32 mask = 2;
     if (actor->base.flags2C0 & mask)
@@ -26,8 +26,8 @@ static inline void SubtractPosition(struct ContactPosition *out, struct ContactP
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 SceneActor_TryTrackNearbyPlayer(struct SceneActorRegistryResetView *actor,
-                                    struct ContactPosition *input, u32 playerId)
+s32 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosition *input,
+                                    u32 playerId)
 {
     u8 *group = (void *)&actor->group.common;
     struct ContactPosition delta;

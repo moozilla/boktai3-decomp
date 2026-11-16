@@ -12,7 +12,7 @@ static inline void clearColliderFlag(u16 *flags)
     mask &= *flags;
     *flags = mask;
 }
-static inline void showActor(struct SceneActorRegistryResetView *actor)
+static inline void showActor(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0)
         clearFlag(actor->base.drawable);
@@ -22,7 +22,7 @@ static inline void showActor(struct SceneActorRegistryResetView *actor)
         *(u32 *)(drawable + 8) &= mask;
     }
 }
-void SceneActor_BeginReactionAnimation(struct SceneActorRegistryResetView *actor)
+void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         u8 *drawable = actor->base.drawable;

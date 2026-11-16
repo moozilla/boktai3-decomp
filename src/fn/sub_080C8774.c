@@ -52,7 +52,7 @@ static inline void Golem_CellCenter(s32 cell, struct ContactPosition *position)
 
 static inline void Golem_SaveControl(struct SceneActorChaseSavedControl *packet, void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     packet->control = actor->base.target;
     packet->kind = actor->base.field2B5;
     packet->state = actor->base.state2A8;
@@ -62,7 +62,7 @@ static inline void Golem_SaveControl(struct SceneActorChaseSavedControl *packet,
 
 static inline void Golem_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -81,7 +81,7 @@ static inline void Golem_BeginTurn(void *obj, u32 saved, const u16 *randomSample
 static inline u8 Golem_Arrive(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -145,11 +145,11 @@ success:
     return 1;
 }
 
-static inline s32 Golem_ReadDesiredX(const struct SceneActorRegistryResetView *a)
+static inline s32 Golem_ReadDesiredX(const struct ChaseActor *a)
 {
     return a->base.reactionStart.x;
 }
-static inline s32 Golem_ReadDesiredZ(const struct SceneActorRegistryResetView *a)
+static inline s32 Golem_ReadDesiredZ(const struct ChaseActor *a)
 {
     return a->base.reactionStart.z;
 }
@@ -188,7 +188,7 @@ static inline s32 Golem_ClampAxis(s32 value, s32 limit)
 }
 
 /* Ease the displacement toward the saved reaction position; true once both axes are still. */
-static inline u8 Golem_Drift(struct SceneActorRegistryResetView *actor)
+static inline u8 Golem_Drift(struct ChaseActor *actor)
 {
     s16 *x, *z;
     s32 dx, dz;
@@ -221,7 +221,7 @@ static inline u8 Golem_Drift(struct SceneActorRegistryResetView *actor)
 
 /* Converge on the saved motion target; once at rest either hand control to the
  * contact callback, or (flag 0x80) chase the player / walk the route (tentative). */
-void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *actor)
+void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (!Golem_Drift(actor))

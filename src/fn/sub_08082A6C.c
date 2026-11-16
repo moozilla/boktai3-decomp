@@ -19,9 +19,9 @@ static inline s32 SceneActorControl_TicksSince(s32 now, s32 start)
     return elapsed;
 }
 
-void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *input)
+void SceneActorControl_UpdateTimedFacing(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     s32 elapsed;
     s32 now;

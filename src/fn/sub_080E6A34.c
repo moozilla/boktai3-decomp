@@ -1,23 +1,24 @@
 #include "global.h"
+#include "dog.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_chase.h"
 void SceneActor_WaitForCategoryAttachment(void);
-void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *actor)
+void SceneActor_StartFlaggedAnimationPhase(struct Dog *actor)
 {
-    if (Chase_TakeArrived(actor)) {
-        struct SceneActorRegistryResetView *context;
-        actor->base.tracking.target = NULL;
-        context = actor->base.context;
+    if (Chase_TakeArrived(&actor->chase)) {
+        struct Dog *context;
+        actor->chase.base.tracking.target = NULL;
+        context = actor->chase.base.context;
         {
             u16 mask = 1;
             struct ChaseFlags40 *flags = (void *)&context->animationFlags65C;
             flags->bits |= mask;
         }
-        Chase_SetCtl(actor, SceneActor_WaitForCategoryAttachment, 0x25);
+        Chase_SetCtl(&actor->chase, SceneActor_WaitForCategoryAttachment, 0x25);
     }
-    if (actor->base.field2B0) {
-        Chase_SetBehavior(actor, 2);
+    if (actor->chase.base.field2B0) {
+        Chase_SetBehavior(&actor->chase, 2);
     } else {
-        Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
+        Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque);
     }
 }

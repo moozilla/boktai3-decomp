@@ -47,7 +47,7 @@ static inline void Tentacle_CellCenter(struct ContactPosition *position, s32 cel
     position->z = ((u32)z << 8) + 128;
 }
 
-void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
+void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
 {
     struct TentacleWanderState *state = actor->base.context;
     struct TentacleWanderTarget *route = &state->target;

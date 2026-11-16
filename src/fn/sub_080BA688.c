@@ -28,10 +28,10 @@ static inline void AddZ(s16 *dst, const struct ContactPosition *src)
 {
     *dst += src->z;
 }
-void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
+void SceneActorReaction_TickForwardBurst(struct ChaseActor *p_)
 {
     u8 *heading;
-    struct SceneActorRegistryResetView *p = p_;
+    struct ChaseActor *p = p_;
     struct {
         u32 zero;
         struct ContactPosition step;

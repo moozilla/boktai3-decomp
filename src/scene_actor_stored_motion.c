@@ -41,7 +41,7 @@ static inline s32 Shift(s32 n, u32 bits)
     return -((-n) >> bits);
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     a->base.field2B2 = 1;
@@ -76,8 +76,8 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-static inline u8 ApproachStoredPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 inSpeed)
+static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct SavedMotion *saved,
+                                     s32 inSpeed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s32 speed = inSpeed;
@@ -95,7 +95,7 @@ static inline u8 ApproachStoredPoint(struct SceneActorRegistryResetView *actor, 
 
 // confidence=low: homes on a stored point, then picks a new point around the player.
 
-void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     u32 zero[1];
@@ -128,11 +128,11 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
     }
 }
 
-void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *);
+void SceneActorControl_UpdateTimedFacing(struct ChaseActor *);
 
-void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 
-static inline void SetMotionPhase(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void SetMotionPhase(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -179,8 +179,8 @@ struct ActorApproachCallbackView {
     void *callback;
 };
 
-static inline u8 ApproachMotionPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 inSpeed)
+static inline u8 ApproachMotionPoint(struct ChaseActor *actor, struct SavedMotion *saved,
+                                     s32 inSpeed)
 {
     struct ActorMotionView *motion = (void *)&actor->base.body.id;
     s32 speed = inSpeed;
@@ -198,7 +198,7 @@ static inline u8 ApproachMotionPoint(struct SceneActorRegistryResetView *actor, 
 
 // confidence=low: waits a timed interval, homes on a stored point, then picks a new point.
 
-void SceneActorControl_UpdateStoredMotion(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
 {
     struct StoredMotionState *body = actor->base.context;
     u32 zero[1];
@@ -273,7 +273,7 @@ void SceneActorControl_SetApproachCallbacks(u8 *p)
     *(u8 **)(p + 0x28c) = gUnk_08605C5C;
 }
 
-static inline void HideForVisibilityTick(struct SceneActorRegistryResetView *actor)
+static inline void HideForVisibilityTick(struct ChaseActor *actor)
 {
     u32 one = 1;
     if (actor->base.drawableKind == 0) {
@@ -293,7 +293,7 @@ static inline void HideForVisibilityTick(struct SceneActorRegistryResetView *act
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *actor)
+static inline void Show(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0) {
         u32 *flags = actor->base.drawable;
@@ -315,7 +315,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_TickVisibility(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
@@ -406,7 +406,7 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_StartStoredCurve(struct ChaseActor *actor)
 {
     struct ContactPosition position;
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -421,7 +421,7 @@ void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *acto
     actor->base.field2B1 = 0;
 }
 
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D4;
@@ -430,7 +430,7 @@ static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inp
     return *flags & mask;
 }
 
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D0;
@@ -439,9 +439,9 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     return *flags & mask;
 }
 
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
+static inline u8 IsUnavailable(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     if (actor) {
         if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
@@ -449,7 +449,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
     return 0;
 }
 
-static inline void HideForVisibilityRequest(struct SceneActorRegistryResetView *actor)
+static inline void HideForVisibilityRequest(struct ChaseActor *actor)
 {
     u32 one = 1;
     if (actor->base.drawableKind == 0) {
@@ -468,10 +468,9 @@ static inline void HideForVisibilityRequest(struct SceneActorRegistryResetView *
 
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
-void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *input,
-                                         const u16 *inputRequest)
+void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     u32 unavailable = IsUnavailable(actor);
@@ -560,7 +559,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
 
 u32 Trigger_ConsumePending(void *, u32);
 
-void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *);
+void SceneActorControl_StartStoredCurve(struct ChaseActor *);
 
 struct WanderActorMotion {
     u32 id;
@@ -575,8 +574,7 @@ struct WanderTriggerView {
     u8 trigger[1];
 };
 
-static inline u8 ApproachWanderPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 ApproachWanderPoint(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     struct WanderActorMotion *motion = (void *)&actor->base.body.id;
     s32 spd = speed;
@@ -607,12 +605,12 @@ struct WanderCallbackView {
     void *callback;
 };
 
-static inline void SetWanderFlags(struct SceneActorRegistryResetView *actor, u32 bit)
+static inline void SetWanderFlags(struct ChaseActor *actor, u32 bit)
 {
     actor->base.flags2C0 = bit | actor->base.flags2C0;
 }
 
-static inline void SetWanderPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 behavior)
+static inline void SetWanderPhase(struct ChaseActor *actor, u32 state, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = 0;
@@ -623,7 +621,7 @@ static inline void SetWanderPhase(struct SceneActorRegistryResetView *actor, u32
 
 // confidence=low: homes on a stored point, then consumes a pending trigger and restarts.
 
-void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
 {
     struct WanderMotionState *body = actor->base.context;
     u32 zero[1];
@@ -650,7 +648,7 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
     }
 }
 
-void SceneActorControl_ConsumePendingEntry(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *fn = actor->base.entryTarget228;
@@ -768,7 +766,7 @@ u32 Bat_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct SceneActorRegistryResetView *)s)->base.flags2D0 & m;
+    v = ((struct ChaseActor *)s)->base.flags2D0 & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

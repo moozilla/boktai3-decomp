@@ -11,8 +11,7 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactSample *, u32,
 u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *,
                                        const struct ContactPosition *);
 u32 TetherActor_CopySampledPosition(struct ContactPosition *);
-s32 sub_08076CDC(struct SceneActorRegistryResetView *, struct ContactPosition *,
-                 struct ContactPosition *);
+s32 sub_08076CDC(struct ChaseActor *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821D4F0(struct ContactPosition *, struct ContactPosition *, s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void *memcpy(void *, const void *, unsigned long);
@@ -53,7 +52,7 @@ static inline s32 Absolute(s32 angle)
 {
     return angle < 0 ? -angle : angle;
 }
-static inline struct SceneActorChaseTracking *TrackingOf(struct SceneActorRegistryResetView *self)
+static inline struct SceneActorChaseTracking *TrackingOf(struct ChaseActor *self)
 {
     return &self->base.tracking;
 }
@@ -73,10 +72,10 @@ static inline s32 PlayerSlot(struct SceneActorContactSample *p)
     return -1;
 }
 
-static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
-                                struct SceneActorContactSample *sample, u32 kind, s32 *bestDistance)
+static inline u8 EvaluateSample(struct ChaseActor *base, struct SceneActorContactSample *sample,
+                                u32 kind, s32 *bestDistance)
 {
-    struct SceneActorRegistryResetView *self = base;
+    struct ChaseActor *self = base;
     struct SceneActorChaseGroup *group = &base->group;
     struct ContactPosition difference;
     struct ContactPosition *delta = &difference;
@@ -183,14 +182,14 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             memcpy(&copy, node->object, sizeof(copy));
             for (tries = 0; tries < 2; tries++) {
                 if (EvaluateSample((void *)base, &copy, node->kind, distance) &&
-                    Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
-                                         &base->position, &copy.position))
+                    Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route, &base->position,
+                                         &copy.position))
                     return 1;
                 TetherActor_CopySampledPosition(&copy.position);
             }
             break;
         case 2:
-            if (!TrackFlags(&((struct SceneActorRegistryResetView *)base)->base.tracking, 2))
+            if (!TrackFlags(&((struct ChaseActor *)base)->base.tracking, 2))
                 break;
             {
                 u32 mode = TestEngineFlags(gEngineFlags, 0x4800);
@@ -211,8 +210,7 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             }
 
             if (EvaluateSample((void *)base, node->object, node->kind, distance) &&
-                Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
-                                     &base->position,
+                Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route, &base->position,
                                      &((struct SceneActorContactSample *)node->object)->position))
                 return 1;
             break;

@@ -25,7 +25,7 @@ struct GolemChargeContext {
     struct GolemChargeState charge;
 };
 
-static inline void Golem_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void Golem_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
@@ -35,8 +35,7 @@ static inline u32 Golem_MirrorFlags(u8 mirror)
     return gUnk_08606130[mirror] | mirror;
 }
 
-static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
-                                             u8 *mirror)
+static inline void Golem_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror)
 {
     s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
@@ -48,8 +47,8 @@ static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView 
     }
 }
 
-static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *actor, u32 selection,
-                                         u32 variant, u32 flags)
+static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,
+                                         u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -99,7 +98,7 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
     *restart = 0;
 }
 
-static inline void Golem_ApplyDuration(struct SceneActorRegistryResetView *actor)
+static inline void Golem_ApplyDuration(struct ChaseActor *actor)
 {
     u16 *scale;
     u32 mask = 0xA02F;

@@ -11,7 +11,7 @@
 #include "ram.h"
 
 void SceneActorRecord_RecordPair(u32, u32);
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(u8 *, s32);
 
 static inline u8 HitResponse_Test(u32 value)
@@ -21,7 +21,7 @@ static inline u8 HitResponse_Test(u32 value)
         matches = 1;
     return matches;
 }
-static inline void ShowDamage(struct SceneActorRegistryResetView *a)
+static inline void ShowDamage(struct ChaseActor *a)
 {
     u32 buffer[2];
     s32 health = a->base.health;
@@ -35,11 +35,11 @@ static inline void ShowDamage(struct SceneActorRegistryResetView *a)
                                  &a->base.body.position, buffer, 1);
 }
 
-static inline u16 *MotionFlags(struct SceneActorRegistryResetView *a)
+static inline u16 *MotionFlags(struct ChaseActor *a)
 {
     return &a->base.flags2D4;
 }
-static inline struct ContactCollider *PrimaryCollider(struct SceneActorRegistryResetView *a)
+static inline struct ContactCollider *PrimaryCollider(struct ChaseActor *a)
 {
     return &a->base.colliderA;
 }
@@ -51,22 +51,21 @@ static inline void MarkHitFlag(s16 bit, struct HitMotionFlags *flags)
     flags->bits = bit | flags->bits;
 }
 
-static inline u32 *StatusFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 *StatusFlags(struct ChaseActor *actor)
 {
     return &actor->base.flags2D0;
 }
-static inline u32 ReadStatus(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline u32 ReadStatus(struct ChaseActor *actor, u32 bits)
 {
     return actor->base.flags2D0 & bits;
 }
-static inline void SelectAnimationState(struct SceneActorRegistryResetView *a, u8 state, u8 phase,
-                                        u8 behavior)
+static inline void SelectAnimationState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
     a->base.behavior2AA = behavior;
 }
-static inline void ResetEntry(struct SceneActorRegistryResetView *a, u32 ready)
+static inline void ResetEntry(struct ChaseActor *a, u32 ready)
 {
     a->base.counter2AC = 0;
     a->base.field2B1 = ready;
@@ -75,7 +74,7 @@ static inline void MaskContactFlags(u32 *dst, u32 mask)
 {
     *dst = mask & *dst;
 }
-static inline u32 ReadControlFlag(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 ReadControlFlag(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
@@ -99,8 +98,7 @@ static inline s32 HitResponse_HalfHealth(s16 health)
     return -((-health) >> 1);
 }
 
-static inline struct SceneActorChaseTracking *
-ContactTracking(struct SceneActorRegistryResetView *actor)
+static inline struct SceneActorChaseTracking *ContactTracking(struct ChaseActor *actor)
 {
     return &actor->base.tracking;
 }
@@ -108,7 +106,7 @@ ContactTracking(struct SceneActorRegistryResetView *actor)
 void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactPosition *position,
                                          u32 heightOffset, u32 fullDamage, u32 unused)
 {
-    struct SceneActorRegistryResetView *a = victim;
+    struct ChaseActor *a = victim;
     struct SceneActorChaseGroup *group = &a->group;
     struct ContactCollider *collider = &a->base.colliderA;
     s32 category;
@@ -130,7 +128,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     switch ((s32)mode) {
         case 0:
         case 1: {
-            struct SceneActorRegistryResetView *state = victim;
+            struct ChaseActor *state = victim;
             if (a->base.field2B5 != 0x15) {
                 SceneActorTerrain_EnterState(a, 3, 0, 0);
                 SceneActorTerrain_InstallControl(a, group->field5FC, 0x15);

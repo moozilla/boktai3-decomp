@@ -1,9 +1,9 @@
 #include "scene_actor_control_helpers.h"
-void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *input)
+void SceneActorControl_SetCollisionResponse(struct ChaseActor *input)
 {
     s16 k2 = 0;
     u8 *field_2;
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     u8 *status = (u8 *)actor + 0xDC;
     u32 statusMask = 8;
     u32 testMask;

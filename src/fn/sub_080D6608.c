@@ -13,8 +13,8 @@ struct MummyRouteTarget {
     struct SceneActorChasePlayerCell *cell;
 };
 
-u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
-static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
+u8 Mummy_RequestStraightRoute(struct ChaseActor *);
+static inline u8 FindPath(struct ChaseActor *actor, s32 goal)
 {
     s32 cell = actor->base.terrainCell;
     s32 y = actor->base.body.position.y;
@@ -23,7 +23,7 @@ static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
     return SceneActorPath_CanReach(cell, goal, y, kind, total);
 }
 
-u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
+u8 Mummy_TryDirectPursuit(struct ChaseActor *actor)
 {
     struct MummyRouteContext *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;

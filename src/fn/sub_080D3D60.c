@@ -14,7 +14,7 @@ static inline u32 ClearWordValue(u32 *field, u32 bits)
     return *field & ~bits;
 }
 #include "scene_actor_animation.h"
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 *field = &actor->base.flags2D4;
     u32 value = *field;
@@ -59,11 +59,11 @@ struct MummySavedControl {
 };
 static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = ctx;
+    struct ChaseActor *actor = ctx;
     u8 *group = (u8 *)&actor->group.common;
     {
         u32 mask = 0x400;
-        if (((struct SceneActorRegistryResetView *)ctx)->base.flags2D4 & mask)
+        if (((struct ChaseActor *)ctx)->base.flags2D4 & mask)
             return;
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
@@ -92,7 +92,7 @@ static inline s32 PlayerSlot(u8 *target)
 static inline u8 Arrive(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
@@ -166,8 +166,8 @@ moved:
 }
 
 // confidence=low: control callback reacquires the player and resumes a route.
-u8 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *);
-static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
+u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *);
+static inline u8 TakeControlEntry(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -175,7 +175,7 @@ static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
+void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     u8 *group = (u8 *)(&actor->group.common);

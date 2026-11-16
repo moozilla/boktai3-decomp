@@ -39,7 +39,7 @@ static inline u32 RecoveryRoute_NewHeading(u32 current, const u16 *randomSamples
 
 static inline void RecoveryRoute_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -58,12 +58,12 @@ static inline void RecoveryRoute_SetGate(struct SceneActorChaseFlags16 *flags, u
     mask |= flags->value;
     flags->value = mask;
 }
-static inline s32 RecoveryRoute_ActorCell(struct SceneActorRegistryResetView *actor)
+static inline s32 RecoveryRoute_ActorCell(struct ChaseActor *actor)
 {
     return actor->base.terrainCell;
 }
 
-static inline s32 RecoveryRoute_SelectDirection(struct SceneActorRegistryResetView *actor)
+static inline s32 RecoveryRoute_SelectDirection(struct ChaseActor *actor)
 {
     s32 cell;
     switch (((actor->base.body.direction + 32) >> 6) & 3) {
@@ -102,7 +102,7 @@ static inline s32 RecoveryRoute_SelectDirection(struct SceneActorRegistryResetVi
 
 u8 SceneActorRoute_TryRecoveryDetour(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 result;

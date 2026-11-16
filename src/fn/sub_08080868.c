@@ -1,5 +1,5 @@
 #include "scene_actor_reaction.h"
-void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
 {
     u32 state;
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;

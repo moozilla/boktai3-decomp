@@ -21,20 +21,20 @@ static inline u8 Reaction_MotionStopped(s32 x, s32 z)
     return 0;
 }
 
-static inline u32 Recovery_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Recovery_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u32 Recovery_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Recovery_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
-static inline void Recovery_ClearStatusFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Recovery_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
     actor->base.flags2D0 &= mask;
 }
-static inline void Recovery_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Recovery_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2D0 = mask | actor->base.flags2D0;
 }
@@ -44,7 +44,7 @@ static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *t
     tracking->flags &= mask;
 }
 
-static inline void Recovery_ClearRoute(struct SceneActorRegistryResetView *actor,
+static inline void Recovery_ClearRoute(struct ChaseActor *actor,
                                        struct SceneActorRegistryControl *control)
 {
     SceneActorChase_ClearActorFlags(actor, 0x141C0);
@@ -53,12 +53,12 @@ static inline void Recovery_ClearRoute(struct SceneActorRegistryResetView *actor
     control->timer = 0;
 }
 
-static inline u8 Recovery_ActorCollisionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline u8 Recovery_ActorCollisionFlags(struct ChaseActor *actor, u32 bits)
 {
     return SceneActorChase_TestField(&actor->base.flags2C0, bits);
 }
 
-void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 counter;

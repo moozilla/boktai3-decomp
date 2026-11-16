@@ -51,8 +51,10 @@ class Steps(unittest.TestCase):
     def test_room_actor_steps_parse(self):
         steps = rf.read_steps(os.path.join(ROOT, "tools", "retype", "room_actor.txt"))
         kinds = [k for k, _, _ in steps]
-        self.assertEqual(kinds[-1], "embed")  # the embedding runs after every rename
-        self.assertEqual(steps[-1][1], ["RoomActor", "base"])
+        embed = kinds.index("embed")
+        self.assertEqual(steps[embed][1], ["RoomActor", "base"])
+        self.assertNotIn("types", kinds[embed:])  # the embedding runs after every rename
+        self.assertEqual(steps[-1][:2], ("upcast", ["chase"]))
         self.assertIn(("types", [], {"SceneActorAnimationView": "RoomActor"}), steps)
 
     def test_type_rename(self):

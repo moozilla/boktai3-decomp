@@ -32,7 +32,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     a->base.field2B2 = 1;
@@ -48,7 +48,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     }
     a->base.word104 = zero;
 }
-static inline void State7(struct SceneActorRegistryResetView *a)
+static inline void State7(struct ChaseActor *a)
 {
     u32 behavior = 7;
     a->base.state2A8 = 0;
@@ -57,7 +57,7 @@ static inline void State7(struct SceneActorRegistryResetView *a)
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-static inline void State1(struct SceneActorRegistryResetView *a)
+static inline void State1(struct ChaseActor *a)
 {
     u32 behavior = 1;
     a->base.state2A8 = 0;
@@ -83,8 +83,7 @@ void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
@@ -98,7 +97,7 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     }
     return 0;
 }
-static inline void Scale(struct SceneActorRegistryResetView *actor)
+static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
@@ -121,7 +120,7 @@ static inline void Scale(struct SceneActorRegistryResetView *actor)
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 }
 // confidence=low: approaches a saved waypoint and requests a turn when the target heading differs.
-void TentacleBody_ApproachWaypoint(struct SceneActorRegistryResetView *actor)
+void TentacleBody_ApproachWaypoint(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     s32 speed;

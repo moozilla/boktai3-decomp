@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
+u8 sub_0812F3CC(struct ChaseActor *);
+static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
     p->base.field2B0 = 0;
@@ -15,13 +15,13 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     }
     p->base.word104 = 0;
 }
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
-void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *);
-static inline u8 PhaseComplete(struct SceneActorRegistryResetView *p)
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
+void Vorn_UpdateApproachRange(struct ChaseActor *);
+static inline u8 PhaseComplete(struct ChaseActor *p)
 {
     return p->base.field2B0;
 }
-void SceneActorPhase_BeginTimedMotion(struct SceneActorRegistryResetView *p)
+void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         void *control = p->base.entryTarget224;

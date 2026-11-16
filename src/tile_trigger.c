@@ -64,15 +64,14 @@ void TetherActor_BeginDetachedState(u32);
 
 s32 EffectGroup_SpawnPart(struct EffectGroup *, u32, u32, u32, u32, u32, u32);
 
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 
-static inline u32 ContactActor_ReadMotionFlags(const struct SceneActorRegistryResetView *actor,
-                                               u32 mask)
+static inline u32 ContactActor_ReadMotionFlags(const struct ChaseActor *actor, u32 mask)
 {
     return mask & actor->base.flags2D4;
 }
 
-static inline u8 ContactActor_IsControlled(struct SceneActorRegistryResetView *actor)
+static inline u8 ContactActor_IsControlled(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
         return 1;
@@ -119,8 +118,8 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
     struct ContactPackedVector radius;
     u32 cursor;
     s32 tetherInRange, actorFound, i;
-    struct SceneActorRegistryResetView *actor;
-    void (*callback)(struct SceneActorRegistryResetView *, s32);
+    struct ChaseActor *actor;
+    void (*callback)(struct ChaseActor *, s32);
 
     callback = SceneActorReaction_SinkAndRemove;
     cursor = 0;

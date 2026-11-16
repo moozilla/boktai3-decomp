@@ -37,7 +37,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     a->base.field2B2 = 1;
@@ -53,7 +53,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     }
     a->base.word104 = zero;
 }
-static inline void State6(struct SceneActorRegistryResetView *a)
+static inline void State6(struct ChaseActor *a)
 {
     u32 behavior = 6;
     a->base.state2A8 = 0;
@@ -79,8 +79,7 @@ void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
@@ -94,7 +93,7 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     }
     return 0;
 }
-static inline void Scale(struct SceneActorRegistryResetView *actor)
+static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
@@ -131,7 +130,7 @@ static inline void Fill(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
-void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
+void TentacleBody_UpdateSpiral(struct ChaseActor *actor)
 {
     u32 zero;
     s32 speed;

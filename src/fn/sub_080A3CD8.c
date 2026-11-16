@@ -3,7 +3,7 @@
 
 #define F(p, o, T) (*(T *)((u8 *)(p) + (o)))
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k, u32 z)
+static inline void Control(struct ChaseActor *a, void *c, u32 k, u32 z)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -17,7 +17,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k
     }
     a->base.word104 = z;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 k, u32 z)
+static inline void State(struct ChaseActor *a, u32 k, u32 z)
 {
     a->base.state2A8 = z;
     a->base.phase2A9 = z;
@@ -26,15 +26,15 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 k, u32 z)
     a->base.field2B1 = 1;
 }
 
-static inline u32 Actor16(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Actor16(struct ChaseActor *a, u32 m)
 {
     return a->base.flags2D4 & m;
 }
-static inline u32 Actor32(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Actor32(struct ChaseActor *a, u32 m)
 {
     return a->base.flags2D0 & m;
 }
-static inline u8 Disabled(struct SceneActorRegistryResetView *a)
+static inline u8 Disabled(struct ChaseActor *a)
 {
     if (a) {
         if (Actor16(a, 64) || Actor32(a, 0x20000) || F(a, 0x9c, s16) <= 0)
@@ -49,7 +49,7 @@ static inline void ClearBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *pos, void *target)
+static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
 {
     s32 r;
     if (!Nav_IsPositionInMesh(nav, pos, target)) {
@@ -65,7 +65,7 @@ static inline u8 Route(struct SceneActorRegistryResetView *a, void *nav, void *p
     ClearBits(&a->base.flags2D4, 0x200);
     return 0;
 }
-s32 SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *a)
+s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)
 {
     u8 *c = (void *)SceneActorControl_GetState(a);
     u8 *nav = (u8 *)a + 0x3d4;

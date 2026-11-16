@@ -12,7 +12,7 @@ static inline u16 MummyTurn_Elapsed(void *sequence)
 }
 
 /* Turn toward the route-facing octant, then restore the waiting controller. */
-void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *a)
+void Mummy_TurnTowardRoute(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group;
     struct SceneActorBody *motion = &a->base.body;

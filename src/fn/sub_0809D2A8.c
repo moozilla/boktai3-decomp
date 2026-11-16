@@ -1,7 +1,7 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 TestFlag(struct ChaseActor *p, u32 mask)
 {
     mask &= p->base.flags2CC;
     return mask;
@@ -24,7 +24,7 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
     }
     return height;
 }
-void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
+void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
 {
     s16 *x_2;
     struct ContactPosition target;

@@ -28,7 +28,7 @@ static inline void clearWord(u32 *p, u32 mask)
 }
 // confidence=low: removes excess segments after damage and restores idle control.
 #define TentacleActor_RecoverFromSegmentLoss sub_080ABB18
-u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
+u32 TentacleActor_RecoverFromSegmentLoss(struct ChaseActor *p)
 {
     struct Group *g = p->base.context;
     u16 *flags;

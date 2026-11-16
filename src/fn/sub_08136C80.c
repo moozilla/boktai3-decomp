@@ -40,7 +40,7 @@ void SceneActorPlacement_HideActor(struct SceneActorPlacementView *s)
                     p->flags |= one;
                 }
             }
-            MarkCollider(&((struct SceneActorRegistryResetView *)s)->base.colliderA);
+            MarkCollider(&((struct ChaseActor *)s)->base.colliderA);
             if (s->shadow320[0])
                 ActorShadow_Disable(s->shadow320);
         }

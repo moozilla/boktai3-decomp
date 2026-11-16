@@ -7,18 +7,18 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 s32 Div(s32, s32);
 s32 Path_GetPointPositionById(u16 *, u32, u32);
 void ProximityVolume_TranslateBounds(void *, struct ContactPosition *);
-void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *);
-void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *);
-void SceneActorRecovery_ResumePursuit(struct SceneActorRegistryResetView *);
-void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *, s32);
-void sub_0807FCA8(struct SceneActorRegistryResetView *, s32);
-void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *);
-s32 SceneActorTarget_TryStimulusRoute(struct SceneActorRegistryResetView *);
-void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *);
-void SceneActorReaction_SettleDisplacement(struct SceneActorRegistryResetView *);
-void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView *, s32);
-void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *, s32);
-void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *);
+void SceneActorReaction_BeginFadedState(struct ChaseActor *);
+void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *);
+void SceneActorRecovery_ResumePursuit(struct ChaseActor *);
+void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *, s32);
+void sub_0807FCA8(struct ChaseActor *, s32);
+void SceneActorReaction_TurnBackToRoute(struct ChaseActor *);
+s32 SceneActorTarget_TryStimulusRoute(struct ChaseActor *);
+void SceneActorReaction_UpdateAnimationGate(struct ChaseActor *);
+void SceneActorReaction_SettleDisplacement(struct ChaseActor *);
+void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *, s32);
+void SceneActorReaction_TryResumeRoute(struct ChaseActor *, s32);
+void SceneActorReaction_BeginReactionSound(struct ChaseActor *);
 
 static inline u32 MonsterInit_GetTargetingFlags(struct SceneActorChaseTracking *target)
 {
@@ -141,8 +141,7 @@ static inline void MonsterInit_BeginRoute(struct SceneActorBody *body,
                          MonsterInit_RoutePointId(route));
 }
 
-static inline u32 MonsterInit_ReadRoute(struct SceneActorRegistryResetView *arg0,
-                                        struct SceneActorChaseGroup *group,
+static inline u32 MonsterInit_ReadRoute(struct ChaseActor *arg0, struct SceneActorChaseGroup *group,
                                         struct SceneActorRegistryRoute *rt)
 {
     struct ContactPosition point;

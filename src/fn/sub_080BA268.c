@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "ram.h"
-void SceneActorReaction_ApplyThreshold(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_ApplyThreshold(struct ChaseActor *, s32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
@@ -50,7 +50,7 @@ static inline void Skeleton_AddPosition(struct ContactPosition *position,
     position->z = delta->z + base->z;
 }
 
-static inline void Skeleton_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
+static inline void Skeleton_SetCategory(struct ChaseActor *actor, u8 category)
 {
     actor->base.category = category;
 }
@@ -62,7 +62,7 @@ static inline void Skeleton_EmitBone(struct ContactPosition *position,
 }
 
 /* Emit two bone fragments and restore the threshold reaction. */
-void sub_080BA268(struct SceneActorRegistryResetView *actor)
+void sub_080BA268(struct ChaseActor *actor)
 {
     struct ContactPosition headingMotion;
     struct ContactPosition velocity;

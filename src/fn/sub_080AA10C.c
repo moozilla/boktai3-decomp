@@ -22,7 +22,7 @@ struct ActorTrail {
 void TentacleActor_ResetRouteHistory(void *);
 void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
 void TentacleActor_SelectWanderRoute(void *);
-void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
+void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
 {
     struct ActorTrail *trail = actor->base.context;
     struct ContactPosition *saved;

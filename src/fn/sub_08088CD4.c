@@ -25,7 +25,7 @@ struct BatDrawable {
     u8 unknown52[4];
     u16 frame;
 };
-static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
+static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
@@ -53,7 +53,7 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
-void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ContactPackedVector rangeA;

@@ -20,7 +20,7 @@ static inline void Fill(void *dest, u32 *zero)
     *zero = 0;
     CpuSet(zero, dest, 0x05000002);
 }
-void SceneActorControl_InitializeHoverState(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_InitializeHoverState(struct ChaseActor *actor)
 {
     struct HoverControlContext *context = actor->base.context;
     u32 zero;

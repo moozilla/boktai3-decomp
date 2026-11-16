@@ -2,12 +2,12 @@
 u16 Route_GetCurrentPointFacing(void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Flags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
 // confidence=low: aligns idle facing with the saved route direction after animation completion.
-void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)actor + 0x50;
     void *route = (u8 *)actor + 0x448;

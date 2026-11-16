@@ -34,7 +34,7 @@ static inline s32 Ghoul_Abs(s32 value)
     return value;
 }
 
-static inline s32 Ghoul_TargetPlayerSlot(struct SceneActorRegistryResetView *actor)
+static inline s32 Ghoul_TargetPlayerSlot(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target = actor->base.tracking.target;
     if (!target)
@@ -42,8 +42,7 @@ static inline s32 Ghoul_TargetPlayerSlot(struct SceneActorRegistryResetView *act
     return SceneActorChase_PlayerSlot(target);
 }
 
-static inline void Ghoul_CaptureTarget(struct SceneActorRegistryResetView *actor,
-                                       struct Ghoul *context, u32 slot)
+static inline void Ghoul_CaptureTarget(struct ChaseActor *actor, struct Ghoul *context, u32 slot)
 {
     if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         s32 player = Ghoul_TargetPlayerSlot(actor);
@@ -60,7 +59,7 @@ static inline s32 Ghoul_MapWidth(struct EngineMap **terrain)
     return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
 }
 
-static inline s32 Ghoul_ForwardCell(struct SceneActorRegistryResetView *actor, s32 steps)
+static inline s32 Ghoul_ForwardCell(struct ChaseActor *actor, s32 steps)
 {
     struct EngineMap **terrain;
     u32 cell = actor->base.terrainCell;

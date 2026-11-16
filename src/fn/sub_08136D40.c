@@ -41,7 +41,7 @@ void SceneActorPlacement_ResumeResetControl(struct SceneActorPlacementView *acto
         SceneActorTerrain_ResumeDrawable(actor);
         if (actor->shadow320[0])
             ActorShadow_Enable(actor->shadow320);
-        ClearCollider(&((struct SceneActorRegistryResetView *)actor)->base.colliderA);
+        ClearCollider(&((struct ChaseActor *)actor)->base.colliderA);
         SceneActorRegistry_ResetRouteAndColliders((void *)actor);
         SetState(actor, 3, 0, 0);
         {

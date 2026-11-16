@@ -20,7 +20,7 @@ extern void *gSceneActorCallbacks298[];
 extern void *gSceneActorCallbacks29C[];
 #define gSceneActorCallbacks2A0 gUnk_086108A8
 extern void *gSceneActorCallbacks2A0[];
-void SceneActorBehavior_InstallCallbackTables(struct SceneActorRegistryResetView *actor)
+void SceneActorBehavior_InstallCallbackTables(struct ChaseActor *actor)
 {
     actor->base.callbacks27C = gSceneActorCallbacks27C;
     actor->base.callbacks280 = gSceneActorCallbacks280;

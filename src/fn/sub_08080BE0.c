@@ -3,18 +3,18 @@
 
 struct ReactionOwner {
     u8 unknown0[0x3C];
-    struct SceneActorRegistryResetView *actor;
+    struct ChaseActor *actor;
 };
 extern const s16 gUnk_086149C4[];
-static inline u32 Reaction_MotionTest(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Reaction_MotionTest(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline u32 Reaction_WordTest(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Reaction_WordTest(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u8 Reaction_IsBlocked(struct SceneActorRegistryResetView *actor)
+static inline u8 Reaction_IsBlocked(struct ChaseActor *actor)
 {
     if (!actor)
         return 0;
@@ -26,7 +26,7 @@ static inline u8 Reaction_IsBlocked(struct SceneActorRegistryResetView *actor)
         return 1;
     return 0;
 }
-static inline u8 Reaction_IsBlockedFlags(struct SceneActorRegistryResetView *actor, u32 flags)
+static inline u8 Reaction_IsBlockedFlags(struct ChaseActor *actor, u32 flags)
 {
     if (!actor)
         return 0;
@@ -54,14 +54,14 @@ static inline s32 Reaction_ScaleMotion(s32 value)
     return -((-value) >> 12);
 }
 
-static inline void Reaction_SetHalf(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void Reaction_SetHalf(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2D6 = mask | actor->base.flags2D6;
 }
 
 u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
 {
-    struct SceneActorRegistryResetView *actor = owner->actor;
+    struct ChaseActor *actor = owner->actor;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactCollider *second = &actor->base.colliderB;
     struct ContactCollider *first = &actor->base.colliderA;

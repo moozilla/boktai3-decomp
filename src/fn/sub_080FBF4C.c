@@ -21,8 +21,8 @@ struct RouteSelectionPosition {
 };
 extern u32 gRandomTableIndex;
 s32 Mod(s32, s32);
-void ActorRoute_RememberPoint(struct SceneActorRegistryResetView *, u32);
-u8 ActorRoute_IsRecentPoint(struct SceneActorRegistryResetView *, s32);
+void ActorRoute_RememberPoint(struct ChaseActor *, u32);
+u8 ActorRoute_IsRecentPoint(struct ChaseActor *, s32);
 u8 *Path_GetPointData(u8 *);
 static inline u32 Random(void)
 {
@@ -43,8 +43,7 @@ inline static u32 Random_SelectDistantWaypoint(void)
     }
 }
 
-void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
-                                      struct ContactPosition *out,
+void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPosition *out,
                                       struct RouteSelectionPosition *origin, s32 limit)
 {
     struct RoutePointSelection route;

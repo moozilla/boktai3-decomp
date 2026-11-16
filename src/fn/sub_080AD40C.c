@@ -11,12 +11,11 @@ struct SceneActorReactionRoutePoint {
     s16 z;
 };
 void SceneActor_SetPositionXZ(void *, s32, s32);
-static inline u32 Reaction_MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Reaction_MaskFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -30,7 +29,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->base.word104 = 0;
 }
-void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorReactionContext *context = actor->base.context;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;

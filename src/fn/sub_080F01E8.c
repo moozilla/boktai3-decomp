@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_actor_chase.h"
 
-void sub_080EE148(struct SceneActorRegistryResetView *);
+void sub_080EE148(struct ChaseActor *);
 void SceneActorControl_OnIdle(void);
 
-void Ivy_UpdateIdle(struct SceneActorRegistryResetView *actor)
+void Ivy_UpdateIdle(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, sub_080EE148, 0x2E);

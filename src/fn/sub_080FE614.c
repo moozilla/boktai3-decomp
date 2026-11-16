@@ -5,7 +5,7 @@ void Axe_UpdateEffects(void *);
 void Callback_InvokeActor(void *, u32);
 void SceneActorControl_DispatchControl(void *);
 
-s32 Axe_OnUpdate(struct SceneActorRegistryResetView *p)
+s32 Axe_OnUpdate(struct ChaseActor *p)
 {
     u8 idx;
     u32 *tbl;

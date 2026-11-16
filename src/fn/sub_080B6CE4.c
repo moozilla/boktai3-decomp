@@ -8,11 +8,11 @@ struct SceneActorReactionContext {
     u8 unknown6D1[0xB];
     u32 flags6DC;
 };
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
-void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
+void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *);
 void SceneActorControl_OnIdle(void);
-static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
+static inline u8 HasReaction(struct ChaseActor *p)
 {
     struct SceneActorReactionMotion *motion = (void *)&p->base.tracking.target;
     u32 mask = 8;
@@ -47,13 +47,13 @@ static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
     v |= p->flags;
     p->flags = v;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
+static inline void SetFlags(struct ChaseActor *p, u32 mask)
 {
     u32 v = mask;
     v |= p->base.flags2D4;
     p->base.flags2D4 = v;
 }
-void SceneActorReaction_UpdateGate(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_UpdateGate(struct ChaseActor *p)
 {
     struct SceneActorReactionContext *context = p->base.context;
     u8 active = HasReaction(p);

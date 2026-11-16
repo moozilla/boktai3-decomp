@@ -11,7 +11,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
         return value >> shift;
     return -(-value >> shift);
 }
-void SceneActor_AimArcAtPlayer(struct SceneActorRegistryResetView *actor)
+void SceneActor_AimArcAtPlayer(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;

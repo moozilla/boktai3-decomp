@@ -9,7 +9,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
+void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
 {
     u8 *state = p->base.context;
     u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);

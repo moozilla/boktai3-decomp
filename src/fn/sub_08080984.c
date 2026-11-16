@@ -1,5 +1,5 @@
 #include "scene_actor_reaction.h"
-void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
 {
     u32 state;
     u32 timerZero;

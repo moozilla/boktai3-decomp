@@ -7,7 +7,7 @@ void sub_080C47B8(struct ContactPosition *);
 s32 sub_080C47DC(void *);
 
 /* Decelerate, approach the current cell center, then restore route motion. */
-void Golem_UpdateChargeRecovery(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateChargeRecovery(struct ChaseActor *actor)
 {
     struct GolemChargeContext *context = actor->base.context;
     struct SceneActorBody *body = &actor->base.body;

@@ -3,7 +3,7 @@ static inline void CpuSet_2(u32 control, void *dest, const void *src)
 {
     CpuSet(src, dest, control);
 }
-void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *actor,
+void SceneActorControl_StartPositionCurve(struct ChaseActor *actor,
                                           const struct ContactPosition *target)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);

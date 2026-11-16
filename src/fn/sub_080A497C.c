@@ -1,6 +1,6 @@
 #include "scene_actor_reset.h"
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u32 k)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -14,7 +14,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -22,7 +22,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-s32 SceneActorPlacement_BeginDefaultResponse(struct SceneActorRegistryResetView *p)
+s32 SceneActorPlacement_BeginDefaultResponse(struct ChaseActor *p)
 {
     if (p->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);

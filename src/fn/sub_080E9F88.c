@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 
 void Ivy_UpdateActiveState_080E98B4(void *);
-void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;

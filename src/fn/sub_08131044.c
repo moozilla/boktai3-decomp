@@ -2,15 +2,14 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
 #include "debug.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
 #define SceneActorRoute_UpdateRouteCompletion sub_08131044
 
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
@@ -33,8 +32,7 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     actor->base.word104 = zero;
 }
 
-static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 phase, u32 behavior,
-                         u32 zero)
+static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -42,7 +40,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void TurnState(struct ChaseActor *a, u32 behavior)
 {
     u8 *field = &a->base.state2A8;
     u32 zero = 0;
@@ -55,18 +53,18 @@ static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior
     }
     a->base.field2B1 = 1;
 }
-static inline u32 FlagsSave(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
+static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {
     u16 *flags = &a->base.flags2D4;
     u32 value = *flags & mask;
     *out = flags;
     return value;
 }
-static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Flags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -81,7 +79,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     a->base.word104 = 0;
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
-void SceneActorRoute_UpdateRouteCompletion(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 speed, event;

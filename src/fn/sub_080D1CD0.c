@@ -2,8 +2,8 @@
 // confidence=low: hidden recovery disables the shadow and waits to enter revival.
 #include "scene_actor_animation.h"
 #include "scene_actor_reaction.h"
-static inline void Mummy_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
-                                             u8 *mirror, u32 zero)
+static inline void Mummy_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror,
+                                             u32 zero)
 {
     s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
@@ -15,8 +15,8 @@ static inline void Mummy_GetDirectionVariant(struct SceneActorRegistryResetView 
     }
 }
 
-static inline void Mummy_SelectAnimation(struct SceneActorRegistryResetView *actor, u32 selection,
-                                         u32 variant, u32 flags)
+static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,
+                                         u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -77,7 +77,7 @@ static inline u8 TakeSaved(u8 *flag, u8 **saved)
     return 0;
 }
 void Mummy_UpdateRevival(void *);
-void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
 {
     u32 queued;
     u8 *prepared;

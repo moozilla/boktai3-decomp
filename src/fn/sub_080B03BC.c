@@ -10,7 +10,7 @@ static inline u8 TakePrepared(u8 *field)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
@@ -26,8 +26,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = zero;
 }
-static inline void SetControlWords(struct SceneActorRegistryResetView *actor, void *control,
-                                   u32 kind)
+static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
@@ -51,7 +50,7 @@ static inline void SetControlWords(struct SceneActorRegistryResetView *actor, vo
 }
 // confidence=low: Ghoul_WaitForRouteResult's twin; on a route result, resets to behavior 0x13
 // and returns control to savedTarget with word104 = entryTarget228.
-void SceneActorControl_WaitForRouteResult(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
 {
     u8 busy;
     u8 zero;

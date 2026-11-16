@@ -6,7 +6,7 @@ struct PlacementTetherState {
 };
 s32 TetherActor_GetParameter(void);
 u32 TetherActor_IsStateOne(void);
-void SceneActorPlacement_TriggerTetherAction(struct SceneActorRegistryResetView *);
+void SceneActorPlacement_TriggerTetherAction(struct ChaseActor *);
 static inline u8 HasPendingAction(struct PlacementTetherState *p)
 {
     u32 mask = 4;
@@ -14,7 +14,7 @@ static inline u8 HasPendingAction(struct PlacementTetherState *p)
         return 1;
     return 0;
 }
-void SceneActorPlacement_UpdateTetherTimer(struct SceneActorRegistryResetView *p)
+void SceneActorPlacement_UpdateTetherTimer(struct ChaseActor *p)
 {
     struct PlacementTetherState *s;
     if (p->base.paletteOffset == 1)

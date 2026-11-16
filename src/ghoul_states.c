@@ -20,7 +20,7 @@
 #include "scene_actor_turn.h"
 
 void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactCollider *contact,
-                             struct SceneActorRegistryResetView *actor)
+                             struct ChaseActor *actor)
 {
     int mask;
     u32 *flags;
@@ -44,7 +44,7 @@ u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
 void SunDiscPool_SpawnDisc(const struct ContactPosition *, const struct ContactPosition *, s32, s32,
                            u32, s32, u32, s32, s32);
 
-void Ghoul_UpdateAimedDiscThrow(struct SceneActorRegistryResetView *actor)
+void Ghoul_UpdateAimedDiscThrow(struct ChaseActor *actor)
 {
     struct Ghoul *context = actor->base.context;
     struct DisplaySequenceState *sequence =
@@ -114,13 +114,13 @@ void Ghoul_UpdateAimedDiscThrow(struct SceneActorRegistryResetView *actor)
         actor->base.field2B0 = 1;
 }
 
-void Ghoul_UpdateIdleState(struct SceneActorRegistryResetView *actor)
+void Ghoul_UpdateIdleState(struct ChaseActor *actor)
 {
     if (actor->base.field2B2 != 0)
         actor->base.field2B2 = 0;
 }
 
-void Ghoul_UpdateStandingState(struct SceneActorRegistryResetView *actor)
+void Ghoul_UpdateStandingState(struct ChaseActor *actor)
 {
     if (actor->base.field2B2 != 0)
         actor->base.field2B2 = 0;
@@ -131,7 +131,7 @@ u32 Route_GetCurrentPointFacing(void *);
 
 /* Turn toward the route-facing octant, then restore the waiting controller. */
 
-void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
+void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
 {
     struct SceneActorBody *motion = &actor->base.body;
     struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
@@ -240,7 +240,7 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, s32, s32, u32);
 
-void Ghoul_UpdateDyingState(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ghoul_UpdateDyingState(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 blockingFlags;
@@ -273,7 +273,7 @@ void Ghoul_UpdateDyingState(struct SceneActorRegistryResetView *actor, s32 frame
     }
 }
 
-void Ghoul_UpdateDeathAnimation(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ghoul_UpdateDeathAnimation(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         s32 mask;
@@ -293,7 +293,7 @@ void Ghoul_UpdateDeathAnimation(struct SceneActorRegistryResetView *actor, s32 f
 
 void Bat_RestoreSavedState(void);
 
-void Ghoul_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 frame, u32 unused)
+void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
 {
     u32 queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {

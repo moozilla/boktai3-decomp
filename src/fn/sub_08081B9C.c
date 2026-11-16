@@ -1,8 +1,7 @@
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_reaction.h"
 
-void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView *actor,
-                                             s32 unusedFrame)
+void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *actor, s32 unusedFrame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {

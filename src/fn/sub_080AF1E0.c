@@ -7,7 +7,7 @@ void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorBehavior_CallActionScript(void *);
 void Vorn_SelectRecoveryAction(void *, const u8 *, u32);
 
-void Vorn_UpdateScriptedAction(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);

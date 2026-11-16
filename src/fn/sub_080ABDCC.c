@@ -25,8 +25,8 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
 struct TentacleActor {
-    struct SceneActorRegistryResetView base;
-    u8 unknown6EC[0x1E4];
+    struct ChaseActor base;
+    u8 unknown624[0x2AC];
     u16 flags;
     u8 unknown8D2[0x14];
     u16 interval8E6;
@@ -59,7 +59,7 @@ void TentacleActor_ResetSegmentPositions(void *, void *);
 void TentacleActor_InitSegmentColliders(void *);
 void TentacleActor_ActivateMarkedSegment(void *);
 
-static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -115,8 +115,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
-static inline void Tentacle_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
-                                        u16 alternate)
+static inline void Tentacle_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 palette;
     actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
@@ -133,7 +132,7 @@ static inline void Tentacle_ReadPalette(struct SceneActorRegistryResetView *acto
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
 
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
+static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0,
                                               u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
                                               void *hidden, void *cb5, void *cb6,
                                               void *defaultReaction, void *targetQuery,
@@ -159,14 +158,14 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
-static inline void Tentacle_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void Tentacle_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = TentacleEnemy_InitPlayerReference;
     actor->base.destroyCallback = TentacleBody_Destroy;
 }
 
-static inline void Tentacle_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void Tentacle_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = ActorTrail_ResetAtSavedPosition;
     actor->base.field23C = SceneActor_ResetQueuedState;
@@ -175,7 +174,7 @@ static inline void Tentacle_InstallRoutes(struct SceneActorRegistryResetView *ac
     actor->base.field240 = sub_080AA744;
 }
 
-static inline void Tentacle_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
+static inline void Tentacle_EnableInitialFlags(struct ChaseActor *actor)
 {
     MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x200);
@@ -185,7 +184,7 @@ static inline void Tentacle_EnableInitialFlags(struct SceneActorRegistryResetVie
 s32 TentacleActor_Init(void *object)
 {
     struct TentacleActor *tentacle = object;
-    struct SceneActorRegistryResetView *actor = &tentacle->base;
+    struct ChaseActor *actor = &tentacle->base;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

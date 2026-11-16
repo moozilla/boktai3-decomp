@@ -11,13 +11,13 @@ u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 void SceneActorReaction_RestoreAfterDelay(void *);
 
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
     if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
                   actor->base.health <= 0))
@@ -39,8 +39,7 @@ static inline u32 TestSlot(s32 i)
     return flags[i] & mask;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -49,7 +48,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.field2B1 = 1;
 }
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -124,9 +123,8 @@ struct ReactionGroup {
     void *failureCallback;
 };
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape,
-                        struct ContactPosition *position, void *destination,
-                        u16 *const *motionFlags, u32 blocked)
+static inline u8 MoveTo(struct ChaseActor *actor, void *shape, struct ContactPosition *position,
+                        void *destination, u16 *const *motionFlags, u32 blocked)
 {
     u16 *flags = *motionFlags;
     s32 result;
@@ -145,13 +143,13 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, void *shape,
     return 0;
 }
 
-static inline u32 ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 bit = mask;
     u32 *flags = &actor->base.flags2CC;
     return *flags & bit;
 }
-static inline void ResetControl(struct SceneActorRegistryResetView *actor, u32 enabled, u16 *flags)
+static inline void ResetControl(struct ChaseActor *actor, u32 enabled, u16 *flags)
 {
     struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
@@ -200,13 +198,13 @@ static inline void SaveControl(void *record, void *callback, u8 behavior)
     saved->phase = 0;
     saved->behavior = behavior;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 bit = mask;
     u32 *flags = &actor->base.flags2CC;
     *flags |= bit;
 }
-u32 sub_0813727C(struct SceneActorRegistryResetView *actor)
+u32 sub_0813727C(struct ChaseActor *actor)
 {
     struct ReactionGroup *group;
     u8 *target;

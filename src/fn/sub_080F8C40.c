@@ -3,8 +3,8 @@
 
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
-void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
-void sub_080FC094(struct SceneActorRegistryResetView *, s32);
+void Axe_EmitMotionTrail(struct ChaseActor *);
+void sub_080FC094(struct ChaseActor *, s32);
 void SceneActorControl_FinishRotation(void);
 struct RotationControlState {
     u8 unknown0[0xE4C];
@@ -24,7 +24,7 @@ static inline s32 FoldRotation(s32 a)
         return a + 256;
     return a;
 }
-void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_RecoverRotation(struct ChaseActor *actor, s32 elapsed)
 {
     struct RotationControlState *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;

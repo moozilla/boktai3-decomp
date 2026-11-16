@@ -18,7 +18,7 @@ s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct Scene
 void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
-u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
+u32 Octopus_GetAnimationStatus(struct ChaseActor *);
 void Octopus_UpdateActiveState(void);
 extern s16 *gLinkSession;
 
@@ -68,7 +68,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -85,7 +85,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     actor->base.word104 = 0;
 }
 
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 s)
+static inline void ResetState(struct ChaseActor *actor, u32 s)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = 0;
@@ -94,7 +94,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 s)
     actor->base.field2B1 = 1;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -103,7 +103,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->base.field2B1 = 1;
 }
 
-static inline void Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant, u8 *flip)
+static inline void Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
 {
     s32 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
@@ -120,7 +120,7 @@ static inline s32 WrapCounter(s32 n)
     return n - 256;
 }
 
-static inline void FacingAngle(struct SceneActorRegistryResetView *actor, u8 *angle)
+static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
 {
     s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
     s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
@@ -148,7 +148,7 @@ static inline s32 HudMode(void)
     return gLinkSession[0xC];
 }
 
-static inline u8 MayCount(struct SceneActorRegistryResetView *victim)
+static inline u8 MayCount(struct ChaseActor *victim)
 {
     if (TestFlags(gEngineFlags, 0x4800)) {
         u32 value = victim->base.field2E0;
@@ -181,7 +181,7 @@ static inline void ClearVector(void *dest)
     CpuFill32(0, dest, 8);
 }
 
-static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
+static inline void ReportDrain(struct ChaseActor *victim)
 {
     struct ContactPackedVector range;
     if (MayCount(victim)) {
@@ -197,7 +197,7 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
     }
 }
 
-void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct OctopusContext *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
@@ -237,7 +237,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
     position.y = actor->base.body.position.y + gUnk_086062B0[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_086062B0[flip][index].z;
     if (target->kind == 4) {
-        struct SceneActorRegistryResetView *victim;
+        struct ChaseActor *victim;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
         victim = target->player;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);

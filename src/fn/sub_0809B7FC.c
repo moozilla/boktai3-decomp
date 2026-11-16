@@ -17,8 +17,7 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind,
-                              u32 zero, u8 zero8)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind, u32 zero, u8 zero8)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = zero8;
@@ -32,7 +31,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *callb
     }
     a->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u32 zero, u8 zero8)
+static inline void SetState(struct ChaseActor *a, u32 phase, u32 zero, u8 zero8)
 {
     u32 one = 1;
     a->base.state2A8 = zero8;
@@ -41,7 +40,7 @@ static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u3
     a->base.counter2AC = zero;
     a->base.field2B1 = one;
 }
-void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 elapsed)
+void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
 {
     s32 frame = elapsed;
     u8 zero8;

@@ -1,11 +1,11 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-static inline u8 Peek(struct SceneActorRegistryResetView *s)
+static inline u8 Peek(struct ChaseActor *s)
 {
     return s->base.field2B0;
 }
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
+static inline u8 TakeEntry(struct ChaseActor *s)
 {
     if (s->base.field2B1) {
         s->base.field2B1 = 0;
@@ -13,7 +13,7 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *s)
     }
     return 0;
 }
-void SceneActorControl_UpdateRouteResponse(struct SceneActorRegistryResetView *s)
+void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
 {
     u8 entered = TakeEntry(s);
     if (entered) {

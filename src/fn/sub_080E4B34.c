@@ -7,7 +7,7 @@
 #include "scene_actor_control_phase.h"
 
 /* Re-arm the saved controller, then resume the delayed pursuit route. */
-void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *actor)
+void Dog_BeginDelayedRouteRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;

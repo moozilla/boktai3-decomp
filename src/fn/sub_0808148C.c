@@ -2,13 +2,13 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
-static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
+static inline u8 IsControlled(struct ChaseActor *a)
 {
     if (a->base.object == (void *)1)
         return 1;
     return 0;
 }
-static inline void ClearRoute(struct SceneActorRegistryResetView *a, u8 *group)
+static inline void ClearRoute(struct ChaseActor *a, u8 *group)
 {
     struct SceneActorRegistryControl *route = (void *)(group + 0x4C);
     u32 *flags = &a->base.flags2CC;
@@ -18,7 +18,7 @@ static inline void ClearRoute(struct SceneActorRegistryResetView *a, u8 *group)
     route->field14 = 0;
     route->timer = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -26,7 +26,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u8 kind)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -40,7 +40,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {

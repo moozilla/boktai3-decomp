@@ -4,7 +4,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_turn.h"
 #include "debug.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
@@ -17,7 +17,7 @@ static inline u32 ContactRoute_FieldBits(u32 mask, u16 *field)
 struct ContactRouteFlagOwner {
     u16 *field;
 };
-static inline u32 ContactRoute_QueryFlags(struct SceneActorRegistryResetView *actor, u32 mask,
+static inline u32 ContactRoute_QueryFlags(struct ChaseActor *actor, u32 mask,
                                           struct ContactRouteFlagOwner *owner)
 {
     u16 *field = &actor->base.flags2D4;
@@ -26,7 +26,7 @@ static inline u32 ContactRoute_QueryFlags(struct SceneActorRegistryResetView *ac
     return bits;
 }
 
-static inline void ContactRoute_ApplyDuration(struct SceneActorRegistryResetView *a, u32 mask,
+static inline void ContactRoute_ApplyDuration(struct ChaseActor *a, u32 mask,
                                               struct ContactRouteFlagOwner *owner)
 {
     u16 *scale;
@@ -94,7 +94,7 @@ static inline u32 ContactRoute_RandomDirectionExcept(u32 current, const u16 *ran
     return current;
 }
 
-static inline u8 ContactRoute_CurrentDirection(const struct SceneActorRegistryResetView *actor)
+static inline u8 ContactRoute_CurrentDirection(const struct ChaseActor *actor)
 {
     return actor->base.body.direction;
 }
@@ -102,8 +102,8 @@ static inline u8 ContactRoute_CurrentDirection(const struct SceneActorRegistryRe
 static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *motionFlags)
 {
     struct SceneActorChaseGroup *group = object;
-    struct SceneActorRegistryResetView *actor = object;
-    group = (void *)((u8 *)group + (u32) & ((struct SceneActorRegistryResetView *)0)->group);
+    struct ChaseActor *actor = object;
+    group = (void *)((u8 *)group + (u32) & ((struct ChaseActor *)0)->group);
     if (!ContactRoute_FieldBits(0x400, motionFlags) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
@@ -117,23 +117,21 @@ static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *mot
 }
 
 // Select the contact-facing route behavior.
-static inline void ContactRoute_SetTurnBehavior(struct SceneActorRegistryResetView *actor,
-                                                u32 behavior)
+static inline void ContactRoute_SetTurnBehavior(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.behavior2AA = behavior;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
 
-static inline void ContactRoute_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior,
-                                            u32 counter)
+static inline void ContactRoute_SetBehavior(struct ChaseActor *actor, u32 behavior, u32 counter)
 {
     actor->base.behavior2AA = behavior;
     actor->base.counter2AC = counter;
     actor->base.field2B1 = 1;
 }
 
-void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;

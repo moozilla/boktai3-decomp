@@ -3,8 +3,8 @@
 #include "scene_actor_init_actor.h"
 
 struct SkeletonSelectionContext {
-    struct SceneActorRegistryResetView base;
-    u8 unknown6EC[0x17];
+    struct ChaseActor base;
+    u8 unknown624[0xDF];
     u8 attempts;
     u8 unknown704[4];
     u32 nearDistance, farDistance;
@@ -12,7 +12,7 @@ struct SkeletonSelectionContext {
 extern const u8 gUnk_0824E250[];
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
-u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *, u32);
+u32 Skeleton_TrySelectRetreatCell(struct ChaseActor *, u32);
 
 static inline void Skeleton_CountDistanceSelection(struct SkeletonSelectionContext *context)
 {
@@ -21,26 +21,25 @@ static inline void Skeleton_CountDistanceSelection(struct SkeletonSelectionConte
     context->attempts = count;
 }
 
-static inline u8 Skeleton_TargetHeading(struct SceneActorRegistryResetView *actor)
+static inline u8 Skeleton_TargetHeading(struct ChaseActor *actor)
 {
     return actor->base.tracking.heading;
 }
 
-static inline u8 Skeleton_FaceAwayFromTarget(struct SceneActorRegistryResetView *actor)
+static inline u8 Skeleton_FaceAwayFromTarget(struct ChaseActor *actor)
 {
     u8 priorDirection = MonsterInit_GetDirection(actor);
     actor->base.body.direction = Skeleton_TargetHeading(actor) + 0x80;
     return priorDirection;
 }
 
-static inline u8 Skeleton_TryRetreatFromTarget(struct SceneActorRegistryResetView *actor)
+static inline u8 Skeleton_TryRetreatFromTarget(struct ChaseActor *actor)
 {
     u8 priorDirection = Skeleton_FaceAwayFromTarget(actor);
     return Skeleton_TrySelectRetreatCell(actor, priorDirection);
 }
 
-static inline struct SkeletonSelectionContext *
-Skeleton_SelectionContext(struct SceneActorRegistryResetView *actor)
+static inline struct SkeletonSelectionContext *Skeleton_SelectionContext(struct ChaseActor *actor)
 {
     return actor->base.context;
 }

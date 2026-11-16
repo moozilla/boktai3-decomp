@@ -2,7 +2,7 @@
 // confidence=low: completed action chooses a pursuit callback from context flag one.
 void sub_080ADB90(void);
 void Vorn_UpdatePursuitDistance(void);
-static inline void SelectPursuit(struct SceneActorRegistryResetView *a, void *cb, u32 mode)
+static inline void SelectPursuit(struct ChaseActor *a, void *cb, u32 mode)
 {
     void *callback = cb;
     u32 zero = 0;
@@ -13,7 +13,7 @@ static inline void SelectPursuit(struct SceneActorRegistryResetView *a, void *cb
     a->base.word110 = kind;
     a->base.flags114 = 1;
 }
-void Vorn_SelectPursuitAfterAction(struct SceneActorRegistryResetView *a)
+void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
 {
     u8 *context = a->base.context;
     if (Chase_TakeArrived(a))

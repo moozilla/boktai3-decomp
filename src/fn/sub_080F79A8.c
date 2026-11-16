@@ -83,7 +83,7 @@ static inline s32 Axe_ContactIndex(s32 index)
     return Axe_ReadContactIndex(&index);
 }
 /* Orbit the actor and its auxiliary sprite around a moving shared center. */
-void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
+void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
 {
     struct AxeContext *data = p->base.context;
     struct ContactPosition delta;

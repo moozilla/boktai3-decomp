@@ -10,9 +10,9 @@ void SceneActorCollision_InitExternalAttackWithField34(struct SceneActorRegistry
                                                        void *, u32, u32, void *);
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *,
                                               struct SceneActorBehaviorContactView *,
-                                              struct SceneActorRegistryResetView *);
+                                              struct ChaseActor *);
 void sub_08082648(struct SceneActorBehaviorContactView *, struct SceneActorBehaviorContactView *,
-                  struct SceneActorRegistryResetView *);
+                  struct ChaseActor *);
 void SceneActorControl_InitContactColliders(u8 *p)
 {
     struct Z s1, s2, s3, s4;

@@ -1,9 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                                u32 zero)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;
     {
@@ -23,8 +22,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
@@ -46,7 +44,7 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->base.word104 = zero;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void State(struct ChaseActor *a, u32 behavior)
 {
     u8 *field = &a->base.state2A8;
     u32 value = 0;
@@ -58,7 +56,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
 }
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
-static inline u32 FlagsSave(struct SceneActorRegistryResetView *a, u32 mask, u16 **out)
+static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {
     u16 *field = &a->base.flags2D4;
     u32 value = *field & mask;
@@ -71,9 +69,8 @@ static inline u16 TestMotion(u16 *field, u32 mask)
     value &= *field;
     return value;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                          struct ContactPosition *position, struct ContactPosition *target,
-                          u16 *flags, u32 mask)
+static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
+                          struct ContactPosition *target, u16 *flags, u32 mask)
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
@@ -96,7 +93,7 @@ static inline void SubtractContactNode(struct ContactPosition *out, struct Chase
     SceneActorTerrain_Subtract(out, &target->position, from);
 }
 // scope shape 5 (differences once low registers are set aside)
-void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u8 result;
@@ -155,7 +152,7 @@ void SceneActorRoute_UpdateContactRecovery(struct SceneActorRegistryResetView *a
         {
             u32 mask = 0x1000;
             if (TestMotion(motionFlags, mask)) {
-                void (*callback)(struct SceneActorRegistryResetView *) = group->interactionCallback;
+                void (*callback)(struct ChaseActor *) = group->interactionCallback;
                 callback(actor);
                 return;
             }

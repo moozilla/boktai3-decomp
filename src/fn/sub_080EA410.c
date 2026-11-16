@@ -29,7 +29,7 @@ struct OctopusOffset {
     u16 x, y, z, pad;
 };
 
-static inline void Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant, u8 *flip)
+static inline void Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
 {
     s32 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
@@ -42,7 +42,7 @@ static inline void Facing(struct SceneActorRegistryResetView *actor, u8 *quadran
 }
 
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
-static inline void Hide(struct SceneActorRegistryResetView *a)
+static inline void Hide(struct ChaseActor *a)
 {
     u32 bit = 1;
     if (a->base.drawableKind == 0)
@@ -55,7 +55,7 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
 
 extern const struct OctopusOffset gUnk_08606300[2][2];
 void *SceneActorRegistry_FindById(u32);
-void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
+void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct OctopusTarget *target;

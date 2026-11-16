@@ -19,7 +19,7 @@ struct IvyPlacement {
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
  * display sequence (the step is ScenePanelRig_TickSprites's, with the same pins). The drawable
  * pointer passes through r0, as in the ROM. */
-void Ivy_TickDrawable(struct SceneActorRegistryResetView *actor)
+void Ivy_TickDrawable(struct ChaseActor *actor)
 {
     {
         struct IvyContext *context = actor->base.context;

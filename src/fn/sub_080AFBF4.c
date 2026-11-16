@@ -13,7 +13,7 @@ static inline u32 RetryDuration(void)
     value &= 31;
     return value + 10;
 }
-void Vorn_UpdateAnimationRetries(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateAnimationRetries(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     if (Chase_TakeArrived(actor)) {

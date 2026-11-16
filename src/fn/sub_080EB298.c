@@ -3,8 +3,8 @@
 void SceneActor_BeginReactionAnimation(void);
 void SceneActorControl_OnIdle(void);
 void sub_080E9C20(void);
-s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u32 k)
+s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
+static inline void SetControl(struct ChaseActor *a, void *cb, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -18,7 +18,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 state)
+static inline void State(struct ChaseActor *a, u32 state)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = 0;
@@ -26,7 +26,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state)
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-static inline void IdleState(struct SceneActorRegistryResetView *a)
+static inline void IdleState(struct ChaseActor *a)
 {
     a->base.state2A8 = 0;
     a->base.phase2A9 = 0;
@@ -35,7 +35,7 @@ static inline void IdleState(struct SceneActorRegistryResetView *a)
     a->base.field2B1 = 1;
 }
 // confidence=low: reacquires an adjacent target after the entry animation, or times out to idle.
-void SceneActorReaction_ReacquireAdjacentTarget(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_ReacquireAdjacentTarget(struct ChaseActor *a)
 {
     if (SceneActorControl_TakeFlag(&a->base.field2B1)) {
         SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);

@@ -32,7 +32,7 @@ struct ChaseContext {
     u32 farDistance;
 };
 
-static inline u8 Chase_TakeArrived(struct SceneActorRegistryResetView *actor)
+static inline u8 Chase_TakeArrived(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -46,7 +46,7 @@ static inline u8 Chase_Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline void Chase_SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void Chase_SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -62,7 +62,7 @@ static inline void Chase_SetCtl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = 0;
 }
-static inline void Chase_SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void Chase_SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 behavior = b;
     actor->base.state2A8 = s;
@@ -71,7 +71,7 @@ static inline void Chase_SetState(struct SceneActorRegistryResetView *actor, u32
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void Chase_SetBehavior(struct SceneActorRegistryResetView *actor, u32 b)
+static inline void Chase_SetBehavior(struct ChaseActor *actor, u32 b)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -79,7 +79,7 @@ static inline void Chase_SetBehavior(struct SceneActorRegistryResetView *actor, 
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline u16 Chase_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 Chase_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
@@ -130,7 +130,7 @@ static inline void Chase_SnapToRoute(struct ContactPosition *p, u8 *route)
     p->z = (*(u16 **)(route + 8))[1];
     p->y = Chase_Height(p);
 }
-static inline void Chase_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Chase_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
     actor->base.flags2D4 &= mask;
@@ -139,7 +139,7 @@ static inline void Chase_ClearBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-static inline u8 Chase_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
+static inline u8 Chase_TryRoute(struct ChaseActor *actor, void *route,
                                 struct ContactPosition *position, struct ContactPosition *target)
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
@@ -176,7 +176,7 @@ struct ChasePacket {
     void *control;
     u8 state, phase, behavior, kind;
 };
-static inline void Chase_SavePacket(void *p, struct SceneActorRegistryResetView *actor)
+static inline void Chase_SavePacket(void *p, struct ChaseActor *actor)
 {
     struct ChasePacket *packet = p;
     packet->control = actor->base.target;
@@ -193,7 +193,7 @@ static inline u32 Chase_RandomBits(u32 mask)
 }
 static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     u8 *group = (u8 *)&actor->group.common;
     if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
         s32 prior = actor->base.body.direction;
@@ -218,7 +218,7 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
 static inline u8 Chase_Arrive(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;

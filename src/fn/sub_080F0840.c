@@ -2,7 +2,7 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 
-void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *actor)
+void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
 {
     void *target = 0;
     s32 limit = actor->base.tracking.limit * 2;

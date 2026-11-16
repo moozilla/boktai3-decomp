@@ -3,7 +3,7 @@
 /* SceneActorControl_ReflectTerrainProbe: Reverses secondary horizontal motion and stops primary horizontal motion when projected terrain exceeds current ground height. */
 #define SceneActorControl_ReflectTerrainProbe sub_08083F5C
 
-void SceneActorControl_ReflectTerrainProbe(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ReflectTerrainProbe(struct ChaseActor *actor)
 {
     s16 *motionZ;
     struct ContactPosition target;

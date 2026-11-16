@@ -29,7 +29,7 @@ void SceneActorRoute_AdvanceActorPoint(struct SceneActorRegistryActor *actor,
                                        struct SceneActorRouteCursor *cursor)
 {
     struct SceneActorRouteCursor *embedded = (void *)((u8 *)actor + 0x448);
-    u16 script = (u16)((struct SceneActorRegistryResetView *)actor)->base.field1EC;
+    u16 script = (u16)((struct ChaseActor *)actor)->base.field1EC;
     u32 mode, near;
     if (script) {
         s32 values[3];

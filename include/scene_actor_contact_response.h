@@ -17,15 +17,14 @@ struct SceneActorContactTracking {
     u32 *actionFlags;
 };
 
-static inline u32 SceneActorContact_ReadActorFlags(struct SceneActorRegistryResetView *actor,
-                                                   u32 mask, u32 **field)
+static inline u32 SceneActorContact_ReadActorFlags(struct ChaseActor *actor, u32 mask, u32 **field)
 {
     u32 *flags = &actor->base.flags2CC;
     u32 value = *flags & mask;
     *field = flags;
     return value;
 }
-static inline u32 SceneActorContact_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 SceneActorContact_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
@@ -40,12 +39,11 @@ static inline void SceneActorContact_SetTrackingFlags(struct SceneActorContactTr
 {
     motion->tracking.flags = bits | motion->tracking.flags;
 }
-static inline u16 SceneActorContact_SavedTargetCell(struct SceneActorRegistryResetView *actor)
+static inline u16 SceneActorContact_SavedTargetCell(struct ChaseActor *actor)
 {
     return actor->base.savedTargetCell;
 }
-static inline void SceneActorContact_SaveTargetCell(struct SceneActorRegistryResetView *actor,
-                                                    u16 cell)
+static inline void SceneActorContact_SaveTargetCell(struct ChaseActor *actor, u16 cell)
 {
     actor->base.savedTargetCell = cell;
 }
@@ -60,8 +58,8 @@ static inline u8 SceneActorContact_TestTrackingOwned(struct SceneActorContactTra
         return 1;
     return 0;
 }
-static inline u32 SceneActorContact_QueryMotionField(struct SceneActorRegistryResetView *actor,
-                                                     u16 mask, void **owner)
+static inline u32 SceneActorContact_QueryMotionField(struct ChaseActor *actor, u16 mask,
+                                                     void **owner)
 {
     u16 *field = &actor->base.flags2D4;
     u32 value;
@@ -70,15 +68,15 @@ static inline u32 SceneActorContact_QueryMotionField(struct SceneActorRegistryRe
     return value;
 }
 
-static inline u16 *SceneActorContact_MotionField(struct SceneActorRegistryResetView *actor)
+static inline u16 *SceneActorContact_MotionField(struct ChaseActor *actor)
 {
     return &actor->base.flags2D4;
 }
 static inline struct SceneActorChaseFlags16 *SceneActorContact_GateFromWork(void *const *work)
 {
-    return &((struct SceneActorRegistryResetView *)*work)->group.common.gate.flags;
+    return &((struct ChaseActor *)*work)->group.common.gate.flags;
 }
-static inline struct SceneActorRegistryResetView *SceneActorContact_ActorFromWork(void *const *work)
+static inline struct ChaseActor *SceneActorContact_ActorFromWork(void *const *work)
 {
     return *work;
 }

@@ -5,7 +5,7 @@
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorControl_ConsumeLiftFlagPenalty(void *);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
 {
     void *callback = target;
     u32 type = kind;
@@ -21,8 +21,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -40,7 +39,7 @@ static inline u8 TakeFlag(u8 *p)
     return 0;
 }
 // confidence=low: Lun defeat callback selects death animation and runs its completion script.
-void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+void Lun_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;

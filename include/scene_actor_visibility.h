@@ -4,7 +4,7 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_state.h"
 
-static inline u8 SceneActorVisibility_IsHidden(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorVisibility_IsHidden(struct ChaseActor *actor)
 {
     u32 mask = 1;
     if (!actor->base.drawableKind) {

@@ -2,8 +2,8 @@
 #include "global.h"
 #include "rotation_phase.h"
 s32 Div(s32, s32);
-void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
-void SceneActorControl_ResetRotation(struct SceneActorRegistryResetView *actor)
+void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *, void *, u32);
+void SceneActorControl_ResetRotation(struct ChaseActor *actor)
 {
     u8 *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;

@@ -1,11 +1,10 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
-static inline void Dog_SetTurnFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void Dog_SetTurnFlags(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
-static inline void Dog_ResetAnimation(struct SceneActorRegistryResetView *actor, u32 state,
-                                      u32 phase)
+static inline void Dog_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -13,8 +12,7 @@ static inline void Dog_ResetAnimation(struct SceneActorRegistryResetView *actor,
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void Dog_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                  void *control)
+static inline void Dog_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     u32 *flags;
     u32 mask;
@@ -28,7 +26,7 @@ static inline void Dog_SetControl(struct SceneActorRegistryResetView *actor, u32
     *flags &= mask;
     actor->base.word104 = 0;
 }
-void Dog_UpdateTurnSequence(struct SceneActorRegistryResetView *actor, s32 frame)
+void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {

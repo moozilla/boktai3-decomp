@@ -35,8 +35,7 @@ static inline void SetHalfFlags(u16 *flags, u32 input)
     *flags |= mask;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -45,7 +44,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.field2B1 = 1;
 }
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -105,8 +104,8 @@ struct RouteLink {
 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
-                        struct ContactPosition *position, u16 *flags, u32 blocked)
+static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct ContactPosition *position,
+                        u16 *flags, u32 blocked)
 {
     void *shape = GROUP_FIELD(group, 0x1fc, void *);
     struct ContactPosition *destination = &GROUP_FIELD(group, 0x58, struct ContactPosition);
@@ -127,7 +126,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
 
 // confidence=low: scene actor picks the closest reachable overlapping stimulus (8 slots), arms its control timer and walks there.
 #define SceneActorTarget_ApproachNearestStimulus sub_081376EC
-u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView *actor)
+u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
 {
     u8 *group;
     struct SceneActorRegistryControl *control;

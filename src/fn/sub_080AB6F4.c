@@ -35,10 +35,10 @@ void Tentacle_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags &= ~mask;
-            field3C = ((struct SceneActorRegistryResetView *)actor)->base.attacks.first[1];
-            field40 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.second[1];
-            reactionFlags = ((struct SceneActorRegistryResetView *)actor)->base.attacks.flags[1];
-            field44 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.parameter[1];
+            field3C = ((struct ChaseActor *)actor)->base.attacks.first[1];
+            field40 = ((struct ChaseActor *)actor)->base.attacks.second[1];
+            reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[1];
+            field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[1];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
@@ -47,10 +47,10 @@ void Tentacle_FireSecondaryAttack(struct SceneActorRegistryActor *actor)
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags |= mask;
-            field3C = ((struct SceneActorRegistryResetView *)actor)->base.attacks.first[0];
-            field40 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.second[0];
-            reactionFlags = ((struct SceneActorRegistryResetView *)actor)->base.attacks.flags[0];
-            field44 = ((struct SceneActorRegistryResetView *)actor)->base.attacks.parameter[0];
+            field3C = ((struct ChaseActor *)actor)->base.attacks.first[0];
+            field40 = ((struct ChaseActor *)actor)->base.attacks.second[0];
+            reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[0];
+            field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[0];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
         }
     }

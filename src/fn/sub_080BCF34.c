@@ -8,8 +8,8 @@ struct SkeletonTargetContext {
     u8 unknown6E0[0x2C];
     u32 timeLimit;
 };
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -23,7 +23,7 @@ static inline u8 IsActive(u32 flags)
         return 1;
     return 0;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *a, u32 phase)
+static inline void SetPhase(struct ChaseActor *a, u32 phase)
 {
     u8 *state = &a->base.state2A8;
     u32 zero = 0;
@@ -33,7 +33,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *a, u32 phase)
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-void Skeleton_UpdateTargetTransition(struct SceneActorRegistryResetView *a)
+void Skeleton_UpdateTargetTransition(struct ChaseActor *a)
 {
     struct SkeletonTargetContext *c = a->base.context;
     if (!TakePrepared(a)) {

@@ -19,13 +19,13 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
+static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
-static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
+static inline void ResetMotionControl(struct ChaseActor *actor)
 {
     actor->base.field2C8 = 0;
     {
@@ -36,8 +36,8 @@ static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
     actor->base.word104 = 0;
 }
 
-static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor, void *callback,
-                                      u32 kind, u32 prepared)
+static inline void InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
+                                      u32 prepared)
 {
     actor->base.field2B2 = prepared;
     actor->base.field2B0 = 0;
@@ -46,15 +46,14 @@ static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor,
     ResetMotionControl(actor);
 }
 
-static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                               u8 behavior)
+static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
     actor->base.behavior2AA = behavior;
 }
 
-static inline void ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
+static inline void ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 {
     actor->base.counter2AC = 0;
     actor->base.field2B1 = prepared;
@@ -65,9 +64,9 @@ static inline u8 NextSparkCount(const u16 *table)
     return (ParticleRandom_ReadSample(table) & 3) + 1;
 }
 
-static inline void SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
-                                     const struct ContactPosition *range, const u16 *table,
-                                     u8 firstCount, s16 height, s16 kind, s16 priority)
+static inline void SpawnDefeatSparks(struct ChaseActor *actor, const struct ContactPosition *range,
+                                     const u16 *table, u8 firstCount, s16 height, s16 kind,
+                                     s16 priority)
 {
     SparkParticle_Spawn(&actor->base.body.position, firstCount, range, 32, 4, height, kind,
                         priority);
@@ -83,7 +82,7 @@ static inline void SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
                         kind, priority);
 }
 
-void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group;
     union {

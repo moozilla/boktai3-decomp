@@ -4,11 +4,11 @@
 #include "scene_actor_reset.h"
 extern const u16 gUnk_08606078[2][8];
 extern const u16 gUnk_08606058[2][8];
-static inline void SetTileFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline void SetTileFlag(struct ChaseActor *p, u32 mask)
 {
     p->base.flags2D0 |= mask;
 }
-u16 SceneActorReaction_SelectTileParameter(struct SceneActorRegistryResetView *actor)
+u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
 {
     struct SceneActorRegistryTileDrawable *drawable = actor->base.drawable;
     u16 *tile = (u16 *)((u8 *)drawable + 0x20);

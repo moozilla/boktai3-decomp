@@ -7,7 +7,7 @@ struct VornPatrolRoute {
     u8 unknown0[8];
     const u16 *points;
 };
-static inline u32 Vorn_TestRestoreFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Vorn_TestRestoreFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2CC & mask;
 }
@@ -20,12 +20,12 @@ static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u3
         return 1;
     return 0;
 }
-static inline void Vorn_SetRestoreFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline void Vorn_SetRestoreFlags(struct ChaseActor *a, u32 mask)
 {
     a->base.flags2CC |= mask;
 }
 
-s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
+s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)(&actor->group.common);
     u8 *context = actor->base.context;

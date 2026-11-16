@@ -23,12 +23,11 @@ struct BatDrawable {
     struct BatAnim anim;
 };
 void SceneActor_SetPositionXZ(void *, s32, s32);
-static inline u32 Bat_MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Bat_MaskFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline void Bat_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                  void *control)
+static inline void Bat_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -42,9 +41,9 @@ static inline void Bat_SetControl(struct SceneActorRegistryResetView *actor, u32
     }
     actor->base.word104 = 0;
 }
-void SceneActorRoute_SetReachableDestination(struct SceneActorRegistryResetView *actor,
+void SceneActorRoute_SetReachableDestination(struct ChaseActor *actor,
                                              struct ContactPosition *destination);
-void Golem_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
+void Golem_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
     u8 *group = (u8 *)&actor->group.common;
     struct BatAnim *anim = &((struct BatDrawable *)actor->base.drawable)->anim;

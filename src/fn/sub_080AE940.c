@@ -8,10 +8,10 @@ struct VornApproachContext {
     u16 flags;
 };
 /* Vorn_UpdateApproachRange: tentative */
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 void Vorn_SelectRetreatRoute(struct RoomActor *, u32);
 s32 Callback_InvokeActor(void *, void *);
-void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateApproachRange(struct ChaseActor *actor)
 {
     struct VornApproachContext *context = actor->base.context;
     u8 *group = (u8 *)&actor->group.common;

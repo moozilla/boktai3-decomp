@@ -17,20 +17,20 @@ static inline s32 Vorn_DivideDirection(s32 n)
 {
     return n >= 0 ? n >> 5 : -((-n) >> 5);
 }
-static inline u32 Vorn_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Vorn_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
-static inline void Vorn_ClearStatusFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Vorn_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
     actor->base.flags2D0 &= mask;
 }
-static inline void Vorn_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Vorn_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2D0 = mask | actor->base.flags2D0;
 }
@@ -52,11 +52,11 @@ static inline void Vorn_AdjustMotionFlags(struct SceneActorChaseFlags16 *field, 
     result &= ~clear;
     field->value = result;
 }
-static inline void Vorn_SetPaletteTimer(struct SceneActorRegistryResetView *actor, u32 value)
+static inline void Vorn_SetPaletteTimer(struct ChaseActor *actor, u32 value)
 {
     actor->base.field1EA = value;
 }
-static inline void Vorn_ClearRoute(struct SceneActorRegistryResetView *actor,
+static inline void Vorn_ClearRoute(struct ChaseActor *actor,
                                    struct SceneActorRegistryControl *control)
 {
     SceneActorChase_ClearActorFlags(actor, 0x141C0);
@@ -64,13 +64,12 @@ static inline void Vorn_ClearRoute(struct SceneActorRegistryResetView *actor,
     control->field14 = 0;
     control->timer = 0;
 }
-static inline void Vorn_StartRoute(struct SceneActorRegistryResetView *actor,
-                                   struct SceneActorChaseGroup *group)
+static inline void Vorn_StartRoute(struct ChaseActor *actor, struct SceneActorChaseGroup *group)
 {
     SceneBody_StartRoute(&actor->base.body.id, &group->homeRoute, group->homeRoute.routeId,
                          group->homeRoute.parameterB, group->homeRoute.pointId);
 }
-static inline u8 Vorn_ActorCollisionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline u8 Vorn_ActorCollisionFlags(struct ChaseActor *actor, u32 bits)
 {
     return SceneActorChase_TestField(&actor->base.flags2C0, bits);
 }
@@ -80,7 +79,7 @@ static inline void Vorn_ClearContextFlags(u16 *flags, u32 bits)
     *flags &= mask;
 }
 
-void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     s32 timer;

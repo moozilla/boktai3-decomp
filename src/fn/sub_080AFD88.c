@@ -3,11 +3,11 @@
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
-static inline u32 TestFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
+void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     u8 *context = a->base.context;
@@ -22,7 +22,7 @@ void Vorn_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
         u16 *rate;
         a->base.field2C2 = 32;
         {
-            struct SceneActorRegistryResetView *held = a;
+            struct ChaseActor *held = a;
             a = held;
         }
         if (TestFlags(a, 0xA02F)) {

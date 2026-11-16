@@ -59,7 +59,7 @@ struct OctopusInstanceState {
 
 extern u8 *gUnknown_02000580;
 
-static inline void OctopusInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
+static inline void OctopusInit_DrawablePosition(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0)
         *(struct ContactPosition *)(actor->base.drawable + 0x1C) = actor->base.body.position;
@@ -69,7 +69,7 @@ static inline void OctopusInit_DrawablePosition(struct SceneActorRegistryResetVi
 
 static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -152,14 +152,14 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->base.body.position;
 }
 
-static inline void OctopusInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Octopus_UpdateInteraction;
     arg0->base.destroyCallback = Octopus_Destroy;
 }
 
-static inline void OctopusInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = SceneActorControl_UpdateMotionPhase_080EBD0C;
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_0860635C);
@@ -167,14 +167,14 @@ static inline void OctopusInit_InstallRoutes(struct SceneActorRegistryResetView 
 
 static inline void OctopusInit_ResetCapture(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     ((struct OctopusInstanceState *)actor)->captureFlags = 0;
 }
 
 s32 Octopus_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *arg0 = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     u32 zero;
     struct ContactPosition tmp;

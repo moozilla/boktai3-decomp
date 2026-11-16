@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 void Ivy_UpdateActiveState(void);
-void SceneActor_BeginReaction22(struct SceneActorRegistryResetView *actor)
+void SceneActor_BeginReaction22(struct ChaseActor *actor)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;

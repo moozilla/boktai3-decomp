@@ -62,7 +62,7 @@ void Lun_InitReactionTable(void *);
 
 #define SV(d) MonsterInit_ReadWord(d)
 
-static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -130,8 +130,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
-static inline void Lun_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
-                                   u16 alternate)
+static inline void Lun_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 r1v;
     actor->base.paletteOffset = Script_GetKeywordValue(0x43, 0);
@@ -147,7 +146,7 @@ static inline void Lun_ReadPalette(struct SceneActorRegistryResetView *actor, u1
         MonsterInit_SetWidgetPalette((void *)(actor->base.drawable + 0x20),
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
+static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0,
                                               u32 (*cb1)(void *), void *cb2, void *cb3, void *cb4,
                                               void *hidden, void *cb5, void *cb6,
                                               void *defaultReaction, void *targetQuery,
@@ -173,14 +172,14 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
-static inline void Lun_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void Lun_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = Lun_OnPlayerTargetInit;
     actor->base.destroyCallback = Lun_Destroy;
 }
 
-static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void Lun_InstallRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605E78);
     actor->base.callback248 = Lun_ResetMovementState;
@@ -188,7 +187,7 @@ static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Lun_OnTargetCheck);
 }
 
-static inline u32 Lun_ReadRoute(struct SceneActorRegistryResetView *actor, struct LunActor *lun,
+static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
                                 struct SceneActorRegistryRoute *route)
 {
     struct ContactPosition point;
@@ -220,7 +219,7 @@ static inline u32 Lun_ReadRoute(struct SceneActorRegistryResetView *actor, struc
     }
     return 0;
 }
-static inline void Lun_ReadPosition(struct SceneActorRegistryResetView *actor, struct LunActor *lun)
+static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *lun)
 {
     if (Script_SeekToKeyword('p')) {
         s32 ground;
@@ -239,7 +238,7 @@ static inline void Lun_ReadPosition(struct SceneActorRegistryResetView *actor, s
 s32 Lun_Init(void *object)
 {
     struct LunActor *lun = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

@@ -3,7 +3,7 @@
 
 void Octopus_ThrowCapturedTarget(void);
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -18,7 +18,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 
-static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;
     if (*flag) {
@@ -28,7 +28,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct ChaseActor *actor)
 {
     u32 two = 2;
     u32 behavior = 2;
@@ -45,7 +45,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Octopus_EnterThrowPhase(struct SceneActorRegistryResetView *actor)
+void Octopus_EnterThrowPhase(struct ChaseActor *actor)
 {
     TakeReset(actor);
     if (actor->base.field2B0) {

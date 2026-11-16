@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 /* Tentative phase-control interpretation; names have low confidence. */
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
+u8 sub_0812F3CC(struct ChaseActor *);
+static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
     p->base.field2B0 = 0;
@@ -16,8 +16,8 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     }
     p->base.word104 = 0;
 }
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
-void SceneActorPhase_UpdateConditionalMotion(struct SceneActorRegistryResetView *p)
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
+void SceneActorPhase_UpdateConditionalMotion(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         void *control = p->base.entryTarget224;

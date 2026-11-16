@@ -60,7 +60,7 @@ static inline void Chase_SnapToRoute_(struct ContactPosition *p, u8 *route)
     p->y = Chase_Height_(p);
 }
 
-void sub_08137E28(struct SceneActorRegistryResetView *actor)
+void sub_08137E28(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)(&actor->group.common);
     struct RouteCursor *route = (struct RouteCursor *)(((u8 *)actor) + 0x448);

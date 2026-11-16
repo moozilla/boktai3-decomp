@@ -4,8 +4,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_delayed_response.h"
 
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
-u8 SceneActorTarget_TrySelectNearestParticipant(struct SceneActorRegistryResetView *);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
+u8 SceneActorTarget_TrySelectNearestParticipant(struct ChaseActor *);
 
 static inline void Golem_SetRouteFlags(u32 *field, u32 bits)
 {
@@ -13,7 +13,7 @@ static inline void Golem_SetRouteFlags(u32 *field, u32 bits)
 }
 
 /* Restore pursuit or a home route when the active control completes. */
-void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
+void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     SceneActorControl_TakeStateEntry(actor);

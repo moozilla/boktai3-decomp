@@ -5,9 +5,8 @@
 #include "player.h"
 extern const s16 gUnk_086149C4[];
 void CpuSet(const void *, void *, u32);
-void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
-void SceneActorControl_StartPositionCurve(struct SceneActorRegistryResetView *,
-                                          const struct ContactPosition *);
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
+void SceneActorControl_StartPositionCurve(struct ChaseActor *, const struct ContactPosition *);
 static inline s32 ScaleMotionSample(s32 v)
 {
     return v >= 0 ? v >> 7 : -(-v >> 7);
@@ -18,9 +17,9 @@ static inline void ClearMotionVector(u32 *zero, struct ContactPosition *out)
     CpuSet(zero, out, 0x05000002);
 }
 
-void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *input)
+void SceneActorControl_TickRandomMotion(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct SceneActorControlMotionState *control = SceneActorControl_GetMotionState(actor);
     u32 zero;
     u32 magnitude;

@@ -3,7 +3,7 @@
 #include "scene_actor_terrain.h"
 #include "player.h"
 /* Golem_ChargeOrReturnHome: builds up charge and cools the charge timer; if the target player is dazzled goes idle (kind 0x27), else charges at the partner when ready (kind 0x28); otherwise walks back to the centre of its home cell, idling there once within reach (tentative) */
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void Golem_UpdateChargeWindup(void);
 void Golem_UpdateRouteMotion(void);
@@ -24,7 +24,7 @@ static inline s32 PlayerSlot(u8 *actor)
         return actor[8];
     return -1;
 }
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -68,7 +68,7 @@ charge: {
     }
 }
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -82,7 +82,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 phase, u32 behavior)
+static inline void SetPhase(struct ChaseActor *actor, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = phase;
@@ -109,7 +109,7 @@ static inline s32 CanCharge(void *ctx)
         return 1;
     return 0;
 }
-void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
+void Golem_ChargeOrReturnHome(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u8 *body = actor->base.context;

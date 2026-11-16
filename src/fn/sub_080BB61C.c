@@ -55,9 +55,9 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-void Skeleton_BeginKnockedFlight(struct SceneActorRegistryResetView *input)
+void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     u8 *context = actor->base.context;
     u32 origin;
     u8 taken = TakeFlag(&actor->base.field2B2);

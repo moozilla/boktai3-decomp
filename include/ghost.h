@@ -120,10 +120,9 @@ static inline s32 Ghost_TerrainCell(s32 x, s32 z)
 void Ghost_NoOp(void);
 
 void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
-                                struct SceneActorRegistryResetView *input);
+                                struct ChaseActor *input);
 
-void SceneActorBehavior_OnContactForward(u16 *source, void *destination,
-                                         struct SceneActorRegistryResetView *actor);
+void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct ChaseActor *actor);
 
 void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor);
 
@@ -131,116 +130,115 @@ void Ghost_UpdateDirectionalPose(struct RoomActor *actor);
 
 void Ghost_UpdateDirectionalPoseB(struct RoomActor *actor);
 
-void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor);
+void Ghost_TurnTowardHeading(struct ChaseActor *actor);
 
 void Ghost_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 
-void Ghost_UpdateRecoilAnimation(struct SceneActorRegistryResetView *actor, s32 tick);
+void Ghost_UpdateRecoilAnimation(struct ChaseActor *actor, s32 tick);
 
-void Ghost_UpdateHitStagger(struct SceneActorRegistryResetView *actor, s32 tick);
+void Ghost_UpdateHitStagger(struct ChaseActor *actor, s32 tick);
 
-void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor);
+void Ghost_UpdateDefeat(struct ChaseActor *actor);
 
-void Ghost_FollowRoute(struct SceneActorRegistryResetView *actor);
+void Ghost_FollowRoute(struct ChaseActor *actor);
 
-void Ghost_DecelerateMovement(struct SceneActorRegistryResetView *a);
+void Ghost_DecelerateMovement(struct ChaseActor *a);
 
-void Ghost_ChooseRouteDestination(struct SceneActorRegistryResetView *actor);
+void Ghost_ChooseRouteDestination(struct ChaseActor *actor);
 
-void Ghost_RecoilTowardEndpoint(struct SceneActorRegistryResetView *actor);
+void Ghost_RecoilTowardEndpoint(struct ChaseActor *actor);
 
-void Ghost_AdvanceApproachRoute(struct SceneActorRegistryResetView *actor);
+void Ghost_AdvanceApproachRoute(struct ChaseActor *actor);
 
-void Ghost_InitMotionPreset(struct SceneActorRegistryResetView *p);
+void Ghost_InitMotionPreset(struct ChaseActor *p);
 
-void SceneActor_BeginLinkedIdleReaction(struct SceneActorRegistryResetView *s);
+void SceneActor_BeginLinkedIdleReaction(struct ChaseActor *s);
 
-void Ghost_RequestVisibility(struct SceneActorRegistryResetView *input, const u16 *inputRequest);
+void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest);
 
-void SceneActor_EasePlayerHeight(struct SceneActorRegistryResetView *actor);
+void SceneActor_EasePlayerHeight(struct ChaseActor *actor);
 
-void Ghost_UpdateCurveSway(struct SceneActorRegistryResetView *p);
+void Ghost_UpdateCurveSway(struct ChaseActor *p);
 
 u8 Ghost_SelectRandomRouteEntry(struct SceneActorRouteCursor *p);
 
-void SceneActor_InitLinkedReactionColliders(struct SceneActorRegistryResetView *actor);
+void SceneActor_InitLinkedReactionColliders(struct ChaseActor *actor);
 
 s32 Ghost_GetBehaviorCode(void);
 
-void Ghost_SetMovementEndpoints(struct SceneActorRegistryResetView *p, struct ContactPosition *q);
+void Ghost_SetMovementEndpoints(struct ChaseActor *p, struct ContactPosition *q);
 
-u8 Ghost_AdvanceMovementCurve(struct SceneActorRegistryResetView *actor);
+u8 Ghost_AdvanceMovementCurve(struct ChaseActor *actor);
 
-void Ghost_InitActorProfile(struct SceneActorRegistryResetView *p);
+void Ghost_InitActorProfile(struct ChaseActor *p);
 
-void Ghost_ResetMovementState(struct SceneActorRegistryResetView *actor);
+void Ghost_ResetMovementState(struct ChaseActor *actor);
 
-void SceneActor_EndLinkedReaction(struct SceneActorRegistryResetView *actor);
+void SceneActor_EndLinkedReaction(struct ChaseActor *actor);
 
 void Ghost_GetDirectionalFrame(u16 heading, s32 *variant, s32 *flags);
 
-void Ghost_StartMovementToPosition(struct SceneActorRegistryResetView *s, s16 *v);
+void Ghost_StartMovementToPosition(struct ChaseActor *s, s16 *v);
 
-void Ghost_ClearActionFlags(struct SceneActorRegistryResetView *s);
+void Ghost_ClearActionFlags(struct ChaseActor *s);
 
-void Ghost_UpdateRandomDestination(struct SceneActorRegistryResetView *actor);
+void Ghost_UpdateRandomDestination(struct ChaseActor *actor);
 
-void Ghost_ReactToPlayerMovement(struct SceneActorRegistryResetView *actor);
+void Ghost_ReactToPlayerMovement(struct ChaseActor *actor);
 
 u32 Ghost_GetControlStatus(void);
 
 void Ghost_OnControlCleanup(void);
 
-void Ghost_SetAfterimagePaletteWord(struct SceneActorRegistryResetView *p, u32 value);
+void Ghost_SetAfterimagePaletteWord(struct ChaseActor *p, u32 value);
 
-void SceneActor_InitLinkedSprites(struct SceneActorRegistryResetView *actor);
+void SceneActor_InitLinkedSprites(struct ChaseActor *actor);
 
-void Ghost_EmitAfterimage(struct SceneActorRegistryResetView *actor);
+void Ghost_EmitAfterimage(struct ChaseActor *actor);
 
-void ActorContact_TickAuxiliaryTimers(struct SceneActorRegistryResetView *actor);
+void ActorContact_TickAuxiliaryTimers(struct ChaseActor *actor);
 
 void Ghost_RemoveAuxiliarySprites(struct Ghost *p);
 
-void Ghost_BuildMovementCurve(struct SceneActorRegistryResetView *actor,
-                              struct ContactPosition *target);
+void Ghost_BuildMovementCurve(struct ChaseActor *actor, struct ContactPosition *target);
 
-void Ghost_TickVisibilityTransition(struct SceneActorRegistryResetView *input);
+void Ghost_TickVisibilityTransition(struct ChaseActor *input);
 
-void ActorVisibility_TickRevealDelay(struct SceneActorRegistryResetView *a);
+void ActorVisibility_TickRevealDelay(struct ChaseActor *a);
 
-void Ghost_EndPlayerSlowdown(struct SceneActorRegistryResetView *s);
+void Ghost_EndPlayerSlowdown(struct ChaseActor *s);
 
-void ActorTick_DecrementCounterAA(struct SceneActorRegistryResetView *actor);
+void ActorTick_DecrementCounterAA(struct ChaseActor *actor);
 
-u32 Ghost_UpdateVisibility(struct SceneActorRegistryResetView *a);
+u32 Ghost_UpdateVisibility(struct ChaseActor *a);
 
 u32 ActorContact_UpdateColliderPositions(struct SceneActorBehaviorView *a);
 
-void Ghost_FollowDrainedPlayer(struct SceneActorRegistryResetView *actor);
+void Ghost_FollowDrainedPlayer(struct ChaseActor *actor);
 
-void Ghost_FollowPlayerLoop(struct SceneActorRegistryResetView *actor);
+void Ghost_FollowPlayerLoop(struct ChaseActor *actor);
 
-void Ghost_PursuePlayerLoop(struct SceneActorRegistryResetView *actor);
+void Ghost_PursuePlayerLoop(struct ChaseActor *actor);
 
-void Ghost_InitActionTable(struct SceneActorRegistryResetView *p);
+void Ghost_InitActionTable(struct ChaseActor *p);
 
-void Ghost_ApproachPlayer(struct SceneActorRegistryResetView *actor);
+void Ghost_ApproachPlayer(struct ChaseActor *actor);
 
-void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor);
+void Ghost_ChooseMovementDestination(struct ChaseActor *actor);
 
-void Ghost_InitReactionTable(struct SceneActorRegistryResetView *p);
+void Ghost_InitReactionTable(struct ChaseActor *p);
 
-void Ghost_UpdateFacingTrigger(struct SceneActorRegistryResetView *actor);
+void Ghost_UpdateFacingTrigger(struct ChaseActor *actor);
 
-void Ghost_UpdateTriggerControl(struct SceneActorRegistryResetView *actor);
+void Ghost_UpdateTriggerControl(struct ChaseActor *actor);
 
-void Ghost_InitEffectTable(struct SceneActorRegistryResetView *p);
+void Ghost_InitEffectTable(struct ChaseActor *p);
 
-u32 Ghost_OnBehaviorUpdate(struct SceneActorRegistryResetView *p);
+u32 Ghost_OnBehaviorUpdate(struct ChaseActor *p);
 
-u32 Ghost_OnActorUpdate(struct SceneActorRegistryResetView *p);
+u32 Ghost_OnActorUpdate(struct ChaseActor *p);
 
-u32 Ghost_Destroy(struct SceneActorRegistryResetView *s);
+u32 Ghost_Destroy(struct ChaseActor *s);
 
 s32 Ghost_Init(void *object);
 

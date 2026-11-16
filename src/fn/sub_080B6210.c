@@ -6,13 +6,13 @@ struct SceneActorForwardCollider {
     u8 unknown0[0x624];
     struct ContactCollider collider;
 };
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
                            : *(u32 *)((u8 *)actor + offset) & mask;
 }
-static inline u8 unavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 unavailable(struct ChaseActor *actor)
 {
     if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
                   actor->base.health <= 0))
@@ -40,7 +40,7 @@ static inline void SetBounds(struct ContactCollider *collider,
 {
     collider->bounds = *(struct ContactPosition *)bounds;
 }
-void Skeleton_UpdateFacingColliders(struct SceneActorRegistryResetView *p)
+void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
 {
     struct SkeletonColliderContext *context = p->base.context;
     union SceneActorRegistryPackedPosition pos, bounds;

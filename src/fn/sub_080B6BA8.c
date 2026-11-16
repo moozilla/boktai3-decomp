@@ -3,13 +3,12 @@
 #include "scene_actor_timed_behavior.h"
 
 s32 Math_Atan2(s32, s32);
-u8 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetView *,
+u8 SceneActorControl_TryBeginNearbyBehavior16(struct ChaseActor *,
                                               struct SceneActorTimedBehaviorContext *, s32);
-u8 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *,
-                                  struct SceneActorTimedBehaviorContext *, s32);
-u8 Skeleton_TryBeginArmedAttack(struct SceneActorRegistryResetView *,
-                                struct SceneActorTimedBehaviorContext *, s32);
-void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
+u8 Skeleton_TryBeginGuardedAttack(struct ChaseActor *, struct SceneActorTimedBehaviorContext *,
+                                  s32);
+u8 Skeleton_TryBeginArmedAttack(struct ChaseActor *, struct SceneActorTimedBehaviorContext *, s32);
+void Skeleton_SelectDistanceReaction(struct ChaseActor *);
 struct SceneActorTargetDelta {
     s16 x, y, z;
 };
@@ -25,7 +24,7 @@ static inline u8 IsFlag512Set(struct SceneActorTimedBehaviorContext *context)
     return 0;
 }
 
-void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryResetView *s)
+void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
 {
     struct SceneActorTimedBehaviorContext *context;
     struct SceneActorTargetDelta delta;

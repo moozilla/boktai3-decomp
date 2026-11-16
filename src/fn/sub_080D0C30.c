@@ -9,7 +9,7 @@ static inline u32 Mummy_Flag(u8 *a, u32 m, u32 off)
 static inline u8 Mummy_IsAttackBlocked(u8 *c)
 {
     if (c && (Mummy_Flag(c, 0x40, 0x2D4) || Mummy_Flag(c, 0x20000, 0x2D0) ||
-              ((struct SceneActorRegistryResetView *)c)->base.health <= 0))
+              ((struct ChaseActor *)c)->base.health <= 0))
         return 1;
     return 0;
 }
@@ -43,8 +43,8 @@ static inline u32 Mummy_ResponseAddress(u32 k_, void *base)
 
 void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
 {
-    struct SceneActorRegistryResetView *base = (void *)input;
-    struct MummyContext *state = ((struct SceneActorRegistryResetView *)input)->base.context;
+    struct ChaseActor *base = (void *)input;
+    struct MummyContext *state = ((struct ChaseActor *)input)->base.context;
     u16 responseCost;
     u16 contactFlags;
     u32 rawKind;
@@ -64,9 +64,9 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             *flags &= mask;
         }
         if ((!Mummy_IsAttackBlocked(input)) && ((obj->contactFlags) & 15)) {
-            ((struct SceneActorRegistryResetView *)input)->base.field304 = obj->collisionId;
+            ((struct ChaseActor *)input)->base.field304 = obj->collisionId;
             {
-                u32 *field = &((struct SceneActorRegistryResetView *)input)->base.flags2D0;
+                u32 *field = &((struct ChaseActor *)input)->base.flags2D0;
                 u32 mask = 0xFEFFFFFF;
                 *field &= mask;
             }
@@ -80,8 +80,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             obj->responseFlags = mask;
         }
         if ((!(*((u16 *)Mummy_ResponseAddress(
-                (u32) & ((struct SceneActorRegistryResetView *)0)->base.colliderA.responseValue,
-                base)))) &&
+                (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
             Mummy_TestOwnerFlag(&((struct MummyContactOwner *)obj->owner)->flags, 0x200)) {
             base->base.field2E0 = 1;
             base->base.field2DC = 4;
@@ -97,9 +96,9 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             base->base.field2E6 = 4;
         }
     } else if ((!Mummy_IsAttackBlocked(input)) && (contactFlags & 15)) {
-        ((struct SceneActorRegistryResetView *)input)->base.field304 = obj->collisionId;
+        ((struct ChaseActor *)input)->base.field304 = obj->collisionId;
         {
-            u32 *field = &((struct SceneActorRegistryResetView *)input)->base.flags2D0;
+            u32 *field = &((struct ChaseActor *)input)->base.flags2D0;
             u32 mask = 0xFEFFFFFF;
             *field &= mask;
         }

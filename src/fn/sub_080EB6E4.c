@@ -2,8 +2,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 void SceneActor_EndReactionAnimation(void *);
-void SceneActorReaction_RestoreAlternateAfterDelay(struct SceneActorRegistryResetView *);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+void SceneActorReaction_RestoreAlternateAfterDelay(struct ChaseActor *);
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -17,7 +17,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-void SceneActorReaction_RestoreAfterControl(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_RestoreAfterControl(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetControl(actor, SceneActor_EndReactionAnimation, 35);

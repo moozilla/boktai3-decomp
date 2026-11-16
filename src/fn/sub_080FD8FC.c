@@ -20,7 +20,7 @@ static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;
 }
-static inline void Restart(struct SceneActorRegistryResetView *actor)
+static inline void Restart(struct ChaseActor *actor)
 {
     u8 zero8;
     u32 zero;
@@ -54,7 +54,7 @@ static inline void Restart(struct SceneActorRegistryResetView *actor)
         }
     }
 }
-void SceneActorControl_UpdateControl2APhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
 {
     struct SceneActorControl2AContext *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

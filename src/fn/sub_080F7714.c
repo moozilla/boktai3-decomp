@@ -9,13 +9,12 @@ struct SceneActorApproachContext {
     u8 unknownC90[0x1B], flagsCAB, unknownCAC[0x195], duration;
     u8 unknownE42[0x6D], remaining, unknownEB0[0x22], stateED2;
 };
-void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
-void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *, struct ContactPosition *,
-                                u32);
-void Axe_UpdateTrailColliders(struct SceneActorRegistryResetView *);
-void ActorPhase_UpdateTimedFlicker(struct SceneActorRegistryResetView *);
+void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *, void *, u32);
+void ActorPhase_EmitTrailSprite(struct ChaseActor *, struct ContactPosition *, u32);
+void Axe_UpdateTrailColliders(struct ChaseActor *);
+void ActorPhase_UpdateTimedFlicker(struct ChaseActor *);
 s32 Div(s32, s32);
-static inline u8 SceneActor_TakeApproachEntry(struct SceneActorRegistryResetView *p)
+static inline u8 SceneActor_TakeApproachEntry(struct ChaseActor *p)
 {
     if (p->base.field2B2) {
         p->base.field2B2 = 0;
@@ -31,8 +30,7 @@ static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *o
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-static inline void SceneActor_SetApproachControl(struct SceneActorRegistryResetView *p,
-                                                 void *control, u32 kind)
+static inline void SceneActor_SetApproachControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
     p->base.field2B0 = 0;
@@ -46,7 +44,7 @@ static inline void SceneActor_SetApproachControl(struct SceneActorRegistryResetV
     }
     p->base.word104 = 0;
 }
-void SceneActor_AdvanceOffsetApproach(struct SceneActorRegistryResetView *p)
+void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
 {
     struct SceneActorApproachContext *context = p->base.context;
     struct ContactPosition difference;

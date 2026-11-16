@@ -14,7 +14,7 @@ struct SceneActorTargetWaitState {
 };
 void Ivy_UpdateActiveState(void);
 void SceneActorReaction_PlayHiddenCue(void);
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void BeginControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -28,7 +28,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = 0;
 }
-static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void ResetPhase(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -36,7 +36,7 @@ static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 beh
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void SceneActorControl_UpdateTargetApproachPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
 {
     struct SceneActorTargetWaitState *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

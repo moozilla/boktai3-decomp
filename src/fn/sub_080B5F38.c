@@ -11,7 +11,7 @@ static inline void clearRouteFlag(u32 *flags)
     u32 mask = ~0x1000000;
     *flags &= mask;
 }
-static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -29,7 +29,7 @@ struct SkeletonResetContext {
     u8 unknown6E0[0x24];
     u16 counter;
 };
-void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
+void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
 {
     struct SkeletonResetContext *context = actor->base.context;
     context->timer = 0;

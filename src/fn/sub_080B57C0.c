@@ -33,7 +33,7 @@ struct ApproachGroup {
     void *failure;
 };
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -47,8 +47,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -56,8 +55,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state,
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
-                       u32 bits)
+static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u32 bits)
 {
     void *route = group->routeObject;
     struct ContactPosition *position = &actor->base.body.position;
@@ -88,7 +86,7 @@ struct SkeletonRouteContext {
     u8 unknown0[0x6D0];
     u8 active;
 };
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = actor->base.flags2D4;
     value &= mask;
@@ -101,11 +99,11 @@ static inline void OrFlags(u16 *flags, u32 mask)
     *flags = value;
 }
 
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
@@ -124,7 +122,7 @@ static inline s32 MotionSquared(struct ContactPosition *p)
     return p->x * p->x + p->y * p->y + p->z * p->z;
 }
 // confidence=low: starts pursuit when stationary, with a six-second cooldown.
-void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
+void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
 {
     u8 *context;
     struct ApproachGroup *group;

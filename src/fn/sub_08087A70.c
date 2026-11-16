@@ -6,7 +6,7 @@
 #include "scene_actor_reaction.h"
 #include "spark_particle.h"
 
-void sub_08087018(struct SceneActorRegistryResetView *, s32);
+void sub_08087018(struct ChaseActor *, s32);
 
 static inline u8 Bat_DisplacementStopped(s32 x, s32 z)
 {
@@ -16,7 +16,7 @@ static inline u8 Bat_DisplacementStopped(s32 x, s32 z)
 }
 
 /* Ease recoil displacement, then select route or pursuit recovery. */
-void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
+void sub_08087A70(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
         (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)

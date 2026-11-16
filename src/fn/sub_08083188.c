@@ -1,7 +1,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
-void SceneActorControl_UpdatePersistentAnimation(struct SceneActorRegistryResetView *);
-void SceneActorControl_UpdatePersistentPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdatePersistentAnimation(struct ChaseActor *);
+void SceneActorControl_UpdatePersistentPhase(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = (void *)SceneActorControl_UpdatePersistentAnimation;
@@ -20,6 +20,6 @@ void SceneActorControl_UpdatePersistentPhase(struct SceneActorRegistryResetView 
         actor->base.word104 = 0;
         ActorShadow_Disable((u8 *)actor + 0x320);
     }
-    if (!((u8(*)(struct SceneActorRegistryResetView *)) * (void **)((u8 *)actor + 0x270))(actor))
+    if (!((u8(*)(struct ChaseActor *)) * (void **)((u8 *)actor + 0x270))(actor))
         ++actor->base.counter2AC;
 }

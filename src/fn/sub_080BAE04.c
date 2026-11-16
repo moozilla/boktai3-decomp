@@ -26,7 +26,7 @@ static inline s32 SkeletonTurn_OctantDistance(s32 target, s32 current)
 }
 
 /* Turn toward the route octant with the profile-selected animation. */
-void sub_080BAE04(struct SceneActorRegistryResetView *a)
+void sub_080BAE04(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group = &a->group;
     struct SceneActorBody *motion = &a->base.body;

@@ -4,7 +4,7 @@
 #include "scene_actor_terrain.h"
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void sub_080C47B8(struct ContactPosition *);
-void SceneActorRoute_SetReachableDestination(struct SceneActorRegistryResetView *actor,
+void SceneActorRoute_SetReachableDestination(struct ChaseActor *actor,
                                              struct ContactPosition *destination)
 {
     struct SceneActorRouteContext *context = actor->base.context;

@@ -1,12 +1,11 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
 #define SceneActorRoute_UpdateReturnEntry sub_081312F4
 
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                                u32 zero)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;
     {
@@ -26,8 +25,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
@@ -49,7 +47,7 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->base.word104 = zero;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior, u32 zero)
+static inline void State(struct ChaseActor *a, u32 behavior, u32 zero)
 {
     a->base.state2A8 = zero;
     a->base.phase2A9 = zero;
@@ -62,11 +60,11 @@ static inline void *SavedControl(u8 *group)
     void **field = (void *)(group + 0x214);
     return *field;
 }
-static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-void SceneActorRoute_UpdateReturnEntry(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u8 result;

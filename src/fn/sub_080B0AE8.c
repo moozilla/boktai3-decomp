@@ -1,10 +1,10 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
-void Vorn_UpdateScriptedAnimation(struct SceneActorRegistryResetView *);
+void Vorn_UpdateScriptedAnimation(struct ChaseActor *);
 static inline u8 IsUnavailable(void *input)
 {
-    struct SceneActorRegistryResetView *p = input;
+    struct ChaseActor *p = input;
     if (p) {
         u32 mask = 0x40;
         if (p->base.flags2D4 & mask)
@@ -23,7 +23,7 @@ static inline u8 HasFlags(u16 *flags, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 MaskedFlags(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 MaskedFlags(struct ChaseActor *p, u32 mask)
 {
     return p->base.flags2D4 & mask;
 }
@@ -36,7 +36,7 @@ static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
         return 1;
     return 0;
 }
-void SceneActorPhase_TryBeginSpecialMotion(struct SceneActorRegistryResetView *p)
+void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
 {
     u8 *base = (u8 *)p;
 

@@ -17,9 +17,9 @@ static inline u8 TestMask(u16 *flags, u32 mask)
     return FALSE;
 }
 
-void SpritePool_ConsumeStateFlag(struct SceneActorRegistryResetView *input)
+void SpritePool_ConsumeStateFlag(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct State080A9 *state = (void *)SceneActorControl_GetState(actor);
     u32 mask = 1;
     if (TestMask(&state->state, mask)) {

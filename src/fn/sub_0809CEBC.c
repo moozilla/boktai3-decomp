@@ -31,7 +31,7 @@ struct LunMovement {
     u8 a, b;
 };
 // confidence=low: resets movement interpolation and starts the directional animation.
-void Lun_ResetMovementState(struct SceneActorRegistryResetView *actor)
+void Lun_ResetMovementState(struct ChaseActor *actor)
 {
     struct LunMovement *context = actor->base.context;
     u32 tmp;

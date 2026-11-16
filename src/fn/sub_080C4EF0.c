@@ -4,7 +4,7 @@
 
 extern const u8 gUnk_0824E274[];
 
-void Golem_ResetIdleControl(struct SceneActorRegistryResetView *actor)
+void Golem_ResetIdleControl(struct ChaseActor *actor)
 {
     SceneActorReaction_ResetResponseState(&actor->group.saved.control, gUnk_0824E274, 0x22F);
     {

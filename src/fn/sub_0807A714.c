@@ -2,7 +2,7 @@
 #include "scene_actor_placement.h"
 #include "scene_actor_init_actor.h"
 void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryActor *);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -16,8 +16,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -29,11 +28,11 @@ static inline void ClearBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryResetView *actor)
+s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
 {
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (!unavailable && actor->base.flags2D6) {
-        struct SceneActorRegistryResetView *self = actor;
+        struct ChaseActor *self = actor;
         struct SceneActorChaseGroup *group = &actor->group;
         u16 *flags;
         if (SceneActor_TestPendingFlag((void *)actor, 4, &flags)) {

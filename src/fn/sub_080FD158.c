@@ -9,9 +9,9 @@ struct ActorGroupMotionState {
 };
 void Axe_UpdateFadeOut(void);
 void ActorPhase_UpdateSpriteCollapse(void);
-void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
-void SpriteGroup_SetSharedPosition(struct SceneActorRegistryResetView *, void *, u32);
-static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
+void Axe_EmitMotionTrail(struct ChaseActor *);
+void SpriteGroup_SetSharedPosition(struct ChaseActor *, void *, u32);
+static inline u8 TakePending(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -19,7 +19,7 @@ static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     u32 zero;
     actor->base.field2B2 = 1;
@@ -35,8 +35,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -44,7 +43,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void Axe_UpdateFadeOutPhase(struct SceneActorRegistryResetView *actor)
+void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
 {
     struct ActorGroupMotionState *group = actor->base.context;
     if (TakePending(actor)) {

@@ -23,7 +23,7 @@ static inline s32 Burst080FC094_Scale(s32 value)
 }
 
 // confidence=low: spawns a particle burst at a point offset from the drawable by its heading.
-void sub_080FC094(struct SceneActorRegistryResetView *actor, s32 count)
+void sub_080FC094(struct ChaseActor *actor, s32 count)
 {
     struct Burst080FC094Drawable *drawable = actor->base.drawable;
     struct ContactPackedVector range;

@@ -16,11 +16,11 @@ struct TentacleImpulseTrail {
     u8 unknown874[0x8DA - 0x874];
     s16 count;
 };
-static inline u32 Tentacle_StatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Tentacle_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D0 & mask;
 }
-static inline u8 Tentacle_IsInactive(struct SceneActorRegistryResetView *p)
+static inline u8 Tentacle_IsInactive(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
@@ -41,7 +41,7 @@ static inline u8 Tentacle_TestSegmentFlags(struct TentacleImpulseSegment *p, u8 
     return 0;
 }
 
-void TentacleActor_UpdateSegmentImpulses(struct SceneActorRegistryResetView *p)
+void TentacleActor_UpdateSegmentImpulses(struct ChaseActor *p)
 {
     struct TentacleImpulseTrail *g;
     s32 i;

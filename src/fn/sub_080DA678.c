@@ -17,7 +17,7 @@ struct MummyMotionCounters {
     u16 counter6F2;
 };
 
-void Mummy_ResetRevivalMotion(struct SceneActorRegistryResetView *actor)
+void Mummy_ResetRevivalMotion(struct ChaseActor *actor)
 {
     struct MummyMotionCounters *body = actor->base.context;
     body->counter6D0 = 0;

@@ -3,7 +3,7 @@
 #include "debug.h"
 // confidence=low: waits for a timer, then replaces response slot 0 and restarts the behavior.
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
-void Mummy_WaitReplaceResponse(struct SceneActorRegistryResetView *actor)
+void Mummy_WaitReplaceResponse(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (Chase_TakeArrived(actor)) {

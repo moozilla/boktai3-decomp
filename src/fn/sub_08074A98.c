@@ -34,7 +34,7 @@ static inline u8 IsPlayerRelativeCategory(u32 c)
 }
 static inline u8 HasSceneFlag(struct SceneActorRegistryActor *actor, u32 mask)
 {
-    if (((struct SceneActorRegistryResetView *)actor)->base.flags2C0 & mask)
+    if (((struct ChaseActor *)actor)->base.flags2C0 & mask)
         return 1;
     return 0;
 }
@@ -42,11 +42,10 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
 {
     u32 category = actor->category;
     if (category == 0x16) {
-        u32 height =
-            TerrainHeight(actor, ((struct SceneActorRegistryResetView *)actor)->base.terrainCell);
+        u32 height = TerrainHeight(actor, ((struct ChaseActor *)actor)->base.terrainCell);
         u16 *ground = (void *)((u8 *)actor + 0x2be);
         if (*ground != height) {
-            u16 *displacement = &((struct SceneActorRegistryResetView *)actor)->base.field2EA;
+            u16 *displacement = &((struct ChaseActor *)actor)->base.field2EA;
             *displacement -= height - *ground;
         }
         *ground = height;
@@ -54,17 +53,16 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && IsPlayerRelativeCategory(category)) {
             u32 height = (u16)gPlayers[0]->position.y;
-            ((struct SceneActorRegistryResetView *)actor)->base.groundHeight2BE = height;
+            ((struct ChaseActor *)actor)->base.groundHeight2BE = height;
         } else {
-            u32 height = TerrainHeight(
-                actor, ((struct SceneActorRegistryResetView *)actor)->base.terrainCell);
-            ((struct SceneActorRegistryResetView *)actor)->base.groundHeight2BE = height;
+            u32 height = TerrainHeight(actor, ((struct ChaseActor *)actor)->base.terrainCell);
+            ((struct ChaseActor *)actor)->base.groundHeight2BE = height;
         }
     }
     if (!HasSceneFlag(actor, 0x20)) {
-        u16 height = ((struct SceneActorRegistryResetView *)actor)->base.groundHeight2BE;
+        u16 height = ((struct ChaseActor *)actor)->base.groundHeight2BE;
         actor->position.y = height;
-        actor->position.y = height + ((struct SceneActorRegistryResetView *)actor)->base.field2EA;
+        actor->position.y = height + ((struct ChaseActor *)actor)->base.field2EA;
     }
     if (actor->drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position = actor->position;

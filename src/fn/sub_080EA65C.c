@@ -39,7 +39,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -56,7 +56,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -110,7 +110,7 @@ void SceneActorBehavior_PlayReactionSound(void *);
 void Camera_RequestShake(u32);
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
-static inline void Hide(struct SceneActorRegistryResetView *a)
+static inline void Hide(struct ChaseActor *a)
 {
     u32 bit = 1;
     if (a->base.drawableKind == 0)
@@ -120,7 +120,7 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
         *(u32 *)(p + 8) |= bit;
     }
 }
-static inline void Show(struct SceneActorRegistryResetView *a)
+static inline void Show(struct ChaseActor *a)
 {
     if (a->base.drawableKind == 0) {
         u32 *d = a->base.drawable;
@@ -132,7 +132,7 @@ static inline void Show(struct SceneActorRegistryResetView *a)
         *(u32 *)(p + 8) &= mask;
     }
 }
-static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
+static inline void Palette(struct ChaseActor *a, u32 bank)
 {
     if (a->base.drawableKind == 0)
         AnimData_SelectPaletteBank((u8 *)a->base.drawable + 0x2C, bank);
@@ -140,7 +140,7 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
         *(u8 **)((u8 *)a->base.drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 
-void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
 {
     u8 *group;
     u8 *drawable = actor->base.drawable;

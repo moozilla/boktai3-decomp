@@ -2,7 +2,7 @@
 
 void SceneActorRecord_RecordPair(u32, u32);
 
-static inline void SceneActorMovement_Wake(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorMovement_Wake(struct ChaseActor *actor)
 {
     /* wake-up transition when the stun flag is set */
     if (!ActorStatus_IsDown(actor) && ActorStatus_BehaviorFlags(actor, 0x1000)) {
@@ -23,7 +23,7 @@ static inline void SceneActorMovement_Wake(struct SceneActorRegistryResetView *a
     }
 }
 
-static inline void SceneActorMovement_ApplyReactionFlags(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorMovement_ApplyReactionFlags(struct ChaseActor *actor)
 {
     /* state-flag dispatch */
     if (actor->base.flags2D4 == 0) {
@@ -49,7 +49,7 @@ static inline void SceneActorMovement_ApplyReactionFlags(struct SceneActorRegist
 
 s32 SceneActorMovement_UpdateStatus(struct SceneActorRegistryActor *object)
 {
-    struct SceneActorRegistryResetView *actor = (void *)object;
+    struct ChaseActor *actor = (void *)object;
     ActorStatus_Palette(actor);
     SceneActorMovement_Wake(actor);
     ActorStatus_Blink(actor);

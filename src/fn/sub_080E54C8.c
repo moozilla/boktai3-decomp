@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 /* Dog_UpdateActionPhase: queues control 2 once, runs the callback while the action timer has expired, else switches phase */
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
+u8 sub_0812F3CC(struct ChaseActor *);
+static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
     p->base.field2B0 = 0;
@@ -16,8 +16,8 @@ static inline void SelectControl(struct SceneActorRegistryResetView *p, void *co
     }
     p->base.word104 = 0;
 }
-u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-void Dog_UpdateActionPhase(struct SceneActorRegistryResetView *p)
+u8 Dog_IsActionTimerExpired(struct ChaseActor *);
+void Dog_UpdateActionPhase(struct ChaseActor *p)
 {
     if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
         void *control = p->base.entryTarget224;

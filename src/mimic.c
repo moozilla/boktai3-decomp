@@ -34,7 +34,7 @@ static inline void clearRouteFlag(u32 *flags)
     *flags &= mask;
 }
 
-static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -44,14 +44,13 @@ static inline void ClearSavedFlags(u32 *flags, s32 mask)
     *flags &= mask;
 }
 
-static inline void *UpdateCallback(struct SceneActorRegistryResetView *actor)
+static inline void *UpdateCallback(struct ChaseActor *actor)
 {
     return actor->base.contactQuery.opaque;
 }
 
-static inline u8 Mimic_FinishRoute(struct SceneActorRegistryResetView *actor, s32 result,
-                                   void *route, struct ContactPosition *position,
-                                   struct ContactPosition *target)
+static inline u8 Mimic_FinishRoute(struct ChaseActor *actor, s32 result, void *route,
+                                   struct ContactPosition *position, struct ContactPosition *target)
 {
     if (!result) {
         MimicChase_ClearBits(&actor->base.flags2D4, 0x200);
@@ -67,9 +66,8 @@ static inline u8 Mimic_FinishRoute(struct SceneActorRegistryResetView *actor, s3
     return 0;
 }
 
-static inline void Mimic_SaveRouteControl(struct SceneActorRegistryResetView *actor,
-                                          struct Mimic *context, struct SceneActorChaseGroup *group,
-                                          u32 *flags)
+static inline void Mimic_SaveRouteControl(struct ChaseActor *actor, struct Mimic *context,
+                                          struct SceneActorChaseGroup *group, u32 *flags)
 {
     u8 outside = SceneActorAttachment_TestPositionWindow((void *)actor, &context->origin, 32, 32);
     if (!outside) {
@@ -87,7 +85,7 @@ static inline void Mimic_SaveRouteControl(struct SceneActorRegistryResetView *ac
 
 // confidence=low: provisional name; recovery after a hit (state 3 -> delayed restore), Mimic-owned.
 
-void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
+void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
 {
     struct Mimic *context = actor->base.context;
     if (MimicChase_TakeArrived(actor)) {
@@ -171,12 +169,12 @@ void Mimic_UpdateHitRecovery(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Mimic_InitBehaviorTable(struct SceneActorRegistryResetView *actor)
+void Mimic_InitBehaviorTable(struct ChaseActor *actor)
 {
     actor->base.callbacks284 = (void **)gUnk_08606264;
 }
 
-s32 Mimic_UpdateReactionState(struct SceneActorRegistryResetView *actor)
+s32 Mimic_UpdateReactionState(struct ChaseActor *actor)
 {
     Mimic_ResetExpiredTarget(actor);
     return 1;
@@ -190,7 +188,7 @@ void SceneActor_EnterFlaggedEntryPhase(struct RoomActor *actor)
         u32 flags = SceneActor_GetDirectionFlags(actor->body.direction);
         struct ContactCollider *collider;
         SceneActorAnimation_SelectEntryFlags(actor, 16, flags);
-        collider = &((struct SceneActorRegistryResetView *)actor)->base.colliderB;
+        collider = &((struct ChaseActor *)actor)->base.colliderB;
         collider->flags &= 0xFFFB;
     }
     if (actor->restart)
@@ -255,7 +253,7 @@ static inline s32 SpeedBase(struct Mimic *context)
 
 // confidence=low: generic scene actor leap; species ownership is not established.
 
-void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
+void SceneActor_LeapTowardTarget(struct ChaseActor *actor)
 {
     struct Mimic *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -337,13 +335,13 @@ void SceneActor_EnterShadowlessPhase(struct RoomActor *actor)
             u32 flags = SceneActor_GetDirectionFlags(actor->body.direction);
             SceneActorAnimation_SelectEntryFlags(actor, 16, flags);
         }
-        ActorShadow_Disable(((struct SceneActorRegistryResetView *)actor)->base.shadow);
+        ActorShadow_Disable(((struct ChaseActor *)actor)->base.shadow);
     }
     if (actor->restart)
         actor->field2B0 = 1;
 }
 
-void SceneActor_RestoreSavedTargetOnCompletion(struct SceneActorRegistryResetView *actor)
+void SceneActor_RestoreSavedTargetOnCompletion(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 flags = SceneActor_GetDirectionFlags(actor->base.body.direction);
@@ -381,7 +379,7 @@ void SceneActor_RestoreSavedTargetOnCompletion(struct SceneActorRegistryResetVie
     }
 }
 
-void Mimic_OnAnimationStateChanged(struct SceneActorRegistryResetView *actor)
+void Mimic_OnAnimationStateChanged(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 r = SceneActor_GetDirectionFlags(actor->base.body.direction);
@@ -392,7 +390,7 @@ void Mimic_OnAnimationStateChanged(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActor_WaitForCategoryAttachment(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 flags = SceneActor_GetDirectionFlags(actor->base.body.direction);
@@ -409,7 +407,7 @@ void SceneActor_WaitForCategoryAttachment(struct SceneActorRegistryResetView *ac
     }
 }
 
-static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
+static inline u8 DrawableVisible(struct ChaseActor *actor)
 {
     u32 mask = 1;
     if (!actor->base.drawableKind) {
@@ -422,8 +420,7 @@ static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -439,7 +436,7 @@ static inline void ResetElapsed(struct DisplaySequenceState *sequence)
 
 // confidence=low: Mimic defeat blink inferred from neighboring behavior callbacks.
 
-void Mimic_UpdateDefeatBlink(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ContactPackedVector range;
@@ -508,7 +505,7 @@ static inline void ClearBits(u16 *field, u32 bits)
     *field &= ~bits;
 }
 
-static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 b)
+static inline void SetBehavior(struct ChaseActor *actor, u32 b)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -517,7 +514,7 @@ static inline void SetBehavior(struct SceneActorRegistryResetView *actor, u32 b)
     actor->base.field2B1 = 1;
 }
 
-void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *actor)
+void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
 {
     s16 *px, *pz;
     s32 x, z;
@@ -596,7 +593,7 @@ static inline u32 Cell(struct ContactPosition *p)
 
 // confidence=low: resets Mimic pursuit state and advances its idle drawable.
 
-void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
+void Mimic_ResetPursuitDrawable(struct ChaseActor *actor)
 {
     struct Mimic *context = actor->base.context;
     context->timer = 0;
@@ -613,8 +610,7 @@ void Mimic_ResetPursuitDrawable(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Mimic_OnAttackContact(u8 *unused, struct ContactCollider *obj,
-                           struct SceneActorRegistryResetView *ctx)
+void Mimic_OnAttackContact(u8 *unused, struct ContactCollider *obj, struct ChaseActor *ctx)
 {
     int mask;
     u32 *flags;
@@ -631,7 +627,7 @@ void Mimic_OnBodyContact(void *a, s32 b)
     SceneActorReaction_HandleColliderContact(a, b);
 }
 
-void Mimic_InitProfile(struct SceneActorRegistryResetView *actor)
+void Mimic_InitProfile(struct ChaseActor *actor)
 {
     actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
@@ -642,14 +638,14 @@ static inline void Mimic_ClearRouteFlag(u32 *flags)
     *flags &= mask;
 }
 
-static inline u32 Mimic_TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Mimic_TestFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
 
 // confidence=low: drops the acquired target when its response cooldown expires.
 
-void Mimic_ResetExpiredTarget(struct SceneActorRegistryResetView *actor)
+void Mimic_ResetExpiredTarget(struct ChaseActor *actor)
 {
     u16 *flags;
     u16 *timer;
@@ -727,7 +723,7 @@ static inline s32 Square(s32 x)
     return x * x;
 }
 
-u8 SceneActor_FindNearbyActivePlayer(struct SceneActorRegistryResetView *p)
+u8 SceneActor_FindNearbyActivePlayer(struct ChaseActor *p)
 {
     s32 i = 0;
     u32 excluded = 8;
@@ -775,8 +771,8 @@ static inline void ClearFlags16(u16 *p, u32 mask)
     *p &= mask;
 }
 
-static inline u8 TryMove(struct SceneActorRegistryResetView *actor,
-                         struct SceneActorChaseGroup *group, struct SceneActorChaseTarget **slot)
+static inline u8 TryMove(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
+                         struct SceneActorChaseTarget **slot)
 {
     void *route = group->route;
     struct ContactPosition *position = &actor->base.body.position;
@@ -798,7 +794,7 @@ static inline u8 TryMove(struct SceneActorRegistryResetView *actor,
     }
 }
 
-u8 Mimic_TryTargetRoute(struct SceneActorRegistryResetView *actor)
+u8 Mimic_TryTargetRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTarget **slot;
@@ -836,7 +832,7 @@ fail:
 
 // confidence=low: retries the saved pursuit goal and selects idle behavior on failure.
 
-u8 Mimic_TryPursuitRoute(struct SceneActorRegistryResetView *actor)
+u8 Mimic_TryPursuitRoute(struct ChaseActor *actor)
 {
     u32 output;
     u32 result = MimicChase_TryRoute(actor, actor->group.route, &actor->base.body.position,
@@ -855,7 +851,7 @@ u8 Mimic_TryPursuitRoute(struct SceneActorRegistryResetView *actor)
     return output;
 }
 
-void Mimic_BeginTargetResponse(struct SceneActorRegistryResetView *actor)
+void Mimic_BeginTargetResponse(struct ChaseActor *actor)
 {
     u16 *h;
     u16 value;
@@ -909,7 +905,7 @@ void Mimic_UpdateIdleState(void)
 {
 }
 
-static inline u8 motionFlag(struct SceneActorRegistryResetView *actor)
+static inline u8 motionFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *motion = &actor->base.tracking;
     u32 mask = 2;
@@ -918,7 +914,7 @@ static inline u8 motionFlag(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-static inline u8 nearFlag(struct SceneActorRegistryResetView *actor)
+static inline u8 nearFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *motion = &actor->base.tracking;
     u32 mask = 8;
@@ -934,7 +930,7 @@ static inline u8 collisionMode(void)
     return 0;
 }
 
-static inline void setTargetFlags(struct SceneActorRegistryResetView *actor)
+static inline void setTargetFlags(struct ChaseActor *actor)
 {
     u32 mask = 0x80;
     u16 *flags = &actor->base.flags2D6;
@@ -949,7 +945,7 @@ static inline void setTargetFlags(struct SceneActorRegistryResetView *actor)
     }
 }
 
-s32 SceneActor_AcquireCollisionTarget(struct SceneActorRegistryResetView *actor)
+s32 SceneActor_AcquireCollisionTarget(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTarget *target;
@@ -995,13 +991,12 @@ zero:
     return 0;
 }
 
-static inline u32 actorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 actorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
 
-static inline u8 reactionStarted(struct SceneActorRegistryResetView *actor,
-                                 struct SceneActorReactionMotion **out)
+static inline u8 reactionStarted(struct ChaseActor *actor, struct SceneActorReactionMotion **out)
 {
     struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
     u32 mask = 8;
@@ -1023,8 +1018,7 @@ static inline void clearFlag(u32 *flags)
     *flags &= mask;
 }
 
-static inline void prepareControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind,
-                                  s32 zero)
+static inline void prepareControl(struct ChaseActor *actor, void *control, u8 kind, s32 zero)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = zero;
@@ -1035,7 +1029,7 @@ static inline void prepareControl(struct SceneActorRegistryResetView *actor, voi
     actor->base.word104 = zero;
 }
 
-void SceneActor_PrepareStationaryReaction(struct SceneActorRegistryResetView *actor)
+void SceneActor_PrepareStationaryReaction(struct ChaseActor *actor)
 {
     struct SceneActorReactionMotion *motion;
     s32 offset;
@@ -1066,7 +1060,7 @@ void SceneActor_PrepareStationaryReaction(struct SceneActorRegistryResetView *ac
 
 // confidence=low: tests whether the collision target is absent or its player is unavailable.
 
-u8 SceneActor_IsCollisionTargetUnavailable(struct SceneActorRegistryResetView *actor)
+u8 SceneActor_IsCollisionTargetUnavailable(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target = actor->base.tracking.target;
     if (target) {
@@ -1092,7 +1086,7 @@ s32 Mimic_OnBehaviorComplete(void)
     return 0;
 }
 
-static inline void resetState(struct SceneActorRegistryResetView *actor, u8 behavior)
+static inline void resetState(struct ChaseActor *actor, u8 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -1101,7 +1095,7 @@ static inline void resetState(struct SceneActorRegistryResetView *actor, u8 beha
     actor->base.field2B1 = 1;
 }
 
-static inline void setControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
+static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -1112,7 +1106,7 @@ static inline void setControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 
-void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor)
+void SceneActor_ResetCollisionReaction(struct ChaseActor *actor)
 {
     struct SceneActorReactionMotion *motion;
     struct SceneActorRegistryControl *control;
@@ -1155,7 +1149,7 @@ void SceneActor_ResetCollisionReaction(struct SceneActorRegistryResetView *actor
     actor->group.turn.turnsRemaining = 0xFF;
 }
 
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -1164,7 +1158,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
     actor->base.field2B1 = 1;
 }
 
-u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
+u8 Mimic_StartHitReaction(struct ChaseActor *actor)
 {
     struct Mimic *ctx = actor->base.context;
     if (actor->base.reactionSoundVariant == 0)
@@ -1199,7 +1193,7 @@ u8 Mimic_StartHitReaction(struct SceneActorRegistryResetView *actor)
 
 // confidence=low: action callback resets response and selects behavior two on entry.
 
-void Mimic_BeginActionResponse(struct SceneActorRegistryResetView *actor)
+void Mimic_BeginActionResponse(struct ChaseActor *actor)
 {
     if (MimicChase_TakeArrived(actor)) {
         Mimic_BeginTargetResponse(actor);
@@ -1215,12 +1209,12 @@ void Mimic_BeginActionResponse(struct SceneActorRegistryResetView *actor)
         actor->base.counter2AC++;
 }
 
-void Mimic_InitActionTable(struct SceneActorRegistryResetView *actor)
+void Mimic_InitActionTable(struct ChaseActor *actor)
 {
     actor->base.alternateBehaviorCallbacks = (void **)gUnk_086062AC;
 }
 
-s32 Mimic_UpdateBehavior(struct SceneActorRegistryResetView *actor)
+s32 Mimic_UpdateBehavior(struct ChaseActor *actor)
 {
     Callback_InvokeActor(actor, actor->base.callbacks27C[actor->base.state2A8]);
     SceneActorControl_DispatchControl(actor);
@@ -1228,13 +1222,13 @@ s32 Mimic_UpdateBehavior(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
-s32 Mimic_OnUpdate(struct SceneActorRegistryResetView *actor)
+s32 Mimic_OnUpdate(struct ChaseActor *actor)
 {
     SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
-s32 Mimic_ReleaseResources(struct SceneActorRegistryResetView *actor)
+s32 Mimic_ReleaseResources(struct ChaseActor *actor)
 {
     SceneActorEffects_ReleaseResources(actor);
     return 0;
@@ -1242,7 +1236,7 @@ s32 Mimic_ReleaseResources(struct SceneActorRegistryResetView *actor)
 
 static inline void MimicInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -1323,26 +1317,25 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->base.body.position;
 }
 
-static inline void MimicInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void MimicInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Mimic_OnUpdate;
     arg0->base.destroyCallback = Mimic_ReleaseResources;
 }
 
-static inline void MimicInit_SetPaletteBank(struct SceneActorRegistryResetView *actor, u16 palette)
+static inline void MimicInit_SetPaletteBank(struct ChaseActor *actor, u16 palette)
 {
     actor->base.paletteBank = palette;
 }
 
-static inline void MimicInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void MimicInit_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = Mimic_ResetPursuitDrawable;
     actor->base.field23C = SceneActor_PrepareStationaryReaction;
 }
 
-static inline void MimicInit_InitializeTerrainCell(struct SceneActorRegistryResetView *actor,
-                                                   s32 cell)
+static inline void MimicInit_InitializeTerrainCell(struct ChaseActor *actor, s32 cell)
 {
     actor->base.terrainCell = cell;
     actor->base.previousTerrainCell = cell;
@@ -1350,8 +1343,8 @@ static inline void MimicInit_InitializeTerrainCell(struct SceneActorRegistryRese
 
 s32 Mimic_Init(void *object)
 {
-    struct SceneActorRegistryResetView *instance = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *instance = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &instance->group;
     struct SceneActorBody *body = &instance->base.body;
     u32 zero;

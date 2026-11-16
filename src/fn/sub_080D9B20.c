@@ -12,7 +12,7 @@ static inline s32 SceneActor_PreviousRowCell(s32 cell)
     return cell - SceneActorTerrain_Width();
 }
 
-s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s32 direction)
+s32 SceneActor_FindDirectionalCell(struct ChaseActor *actor, s32 direction)
 {
     s32 result = actor->base.terrainCell;
     switch (direction) {

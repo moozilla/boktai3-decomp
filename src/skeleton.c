@@ -1,9 +1,10 @@
 #include "skeleton.h"
+#include "golem.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */
 
-u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
+u8 Skeleton_ReactToContact(struct ChaseActor *actor)
 {
     struct Skeleton *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -95,7 +96,7 @@ u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
 
 /* Skeleton_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 
-void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateProbeApproach(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
     struct Skeleton *control = actor->base.context;
@@ -162,7 +163,7 @@ void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC++;
 }
 
-void Skeleton_UpdateEntryPhase(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateEntryPhase(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = actor->base.entryTarget224;
@@ -181,7 +182,7 @@ void Skeleton_UpdateEntryPhase(struct SceneActorRegistryResetView *actor)
         ++actor->base.counter2AC;
 }
 
-void Skeleton_UpdateEntryRecoveryPhase(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateEntryRecoveryPhase(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = actor->base.entryTarget224;
@@ -208,12 +209,12 @@ void Skeleton_UpdateEntryRecoveryPhase(struct SceneActorRegistryResetView *actor
         ++actor->base.counter2AC;
 }
 
-void Skeleton_SetMovementControlPreset(struct SceneActorRegistryResetView *actor)
+void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
 {
     actor->base.callbacks284 = (void **)gUnk_086060B4;
 }
 
-s32 Skeleton_Update(struct SceneActorRegistryResetView *actor)
+s32 Skeleton_Update(struct ChaseActor *actor)
 {
     u32 m;
     SceneActorReaction_TickHiddenResponse(actor);
@@ -278,7 +279,7 @@ static inline u8 pending(struct Skeleton *actor)
 s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *actor)
 {
     struct Skeleton *state = (void *)actor;
-    struct SceneActorRegistryControlGroup *block = &state->group.common;
+    struct SceneActorRegistryControlGroup *block = &state->chase.group.common;
     if (engineFlags(0x400))
         return 0;
     if (test(4, gUnk_02000560))
@@ -315,7 +316,7 @@ u32 Skeleton_Destroy(struct Skeleton *actor)
     return 0;
 }
 
-static inline u8 SkeletonInit_TestSkeletonFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 SkeletonInit_TestSkeletonFlags(struct ChaseActor *actor, u32 mask)
 {
     if (((struct Skeleton *)actor)->actionFlags & mask)
         return 1;
@@ -328,7 +329,7 @@ static inline void SkeletonInit_ResetFlags(void *object)
     actor->actionFlags = 0;
 }
 
-static inline void SkeletonInit_SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SkeletonInit_SetFlags(struct ChaseActor *actor, u32 mask)
 {
     ((struct Skeleton *)actor)->actionFlags |= mask;
 }
@@ -338,14 +339,14 @@ static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframe
     widget->paletteIndex = Script_GetPc() ? Script_GetValue() + 0x12B : 0x12B;
 }
 
-static inline void SkeletonInit_InstallContactDefaults(struct SceneActorRegistryResetView *instance)
+static inline void SkeletonInit_InstallContactDefaults(struct ChaseActor *instance)
 {
     instance->base.contactCallback = Skeleton_ReactToContact;
     MonsterInit_WriteDataPointer(&instance->base.commandTable.opaque, gUnk_086060FC);
     instance->base.field238 = SceneActorReaction_SinkThenDefeat;
 }
 
-static inline void SkeletonInit_EnableInitialFlags(struct SceneActorRegistryResetView *instance)
+static inline void SkeletonInit_EnableInitialFlags(struct ChaseActor *instance)
 {
     MonsterInit_SetTargetingFlags(&instance->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(instance, 0x1600000);
@@ -353,8 +354,7 @@ static inline void SkeletonInit_EnableInitialFlags(struct SceneActorRegistryRese
     MonsterInit_SetMotionFlags(instance, 0x80);
 }
 
-static inline void
-SkeletonInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *instance)
+static inline void SkeletonInit_InstallCompletionCallbacks(struct ChaseActor *instance)
 {
     instance->base.messageCallback = SceneActorScript_OnCommand;
     instance->base.updateCallback = Skeleton_UpdateBehaviorCallbacks;
@@ -368,8 +368,8 @@ static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)
 
 s32 Skeleton_Init(void *object)
 {
-    struct SceneActorRegistryResetView *instance = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *instance = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &instance->group;
     struct SceneActorBody *body = &instance->base.body;
     u32 zero;
@@ -523,10 +523,10 @@ static inline s32 Abs(s32 x)
     return x < 0 ? -x : x;
 }
 
-u32 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *actor,
-                               struct ActorSprite *target, u32 nearX, u32 nearZ, s32 speed)
+u32 Actor_StepTowardTargetAxis(struct ChaseActor *actor, struct ActorSprite *target, u32 nearX,
+                               u32 nearZ, s32 speed)
 {
-    struct SceneActorRegistryResetView *state = actor->base.context;
+    struct Golem *state = actor->base.context;
     s32 dx = target->x - actor->base.body.position.x;
     s32 dz = target->z - actor->base.body.position.z;
     u8 angle;

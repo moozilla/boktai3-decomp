@@ -9,8 +9,8 @@ struct SceneActorTargetMotionContext {
     u8 unknown690[0x17];
     u8 phase;
 };
-s32 sub_080DEF78(struct SceneActorRegistryResetView *, u32);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+s32 sub_080DEF78(struct ChaseActor *, u32);
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -24,7 +24,7 @@ static inline u8 IsActive(u32 flags)
         return 1;
     return 0;
 }
-static inline void SetPhase(struct SceneActorRegistryResetView *a, u32 phase)
+static inline void SetPhase(struct ChaseActor *a, u32 phase)
 {
     u8 *state = &a->base.state2A8;
     u32 zero = 0;
@@ -34,7 +34,7 @@ static inline void SetPhase(struct SceneActorRegistryResetView *a, u32 phase)
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-void SceneActorMotion_UpdateTargetTransition(struct SceneActorRegistryResetView *a)
+void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
 {
     u32 *flags;
     struct SceneActorTargetMotionContext *c = a->base.context;

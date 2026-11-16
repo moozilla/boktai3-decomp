@@ -8,7 +8,7 @@ struct AxeTrailSprite {
 void Axe_EmitMotionTrail(void *);
 void Axe_UpdateReturningTrail(void);
 
-void Axe_UpdateTrailFadeIn(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         struct AxeTrailSprite *sprite = actor->base.drawable;

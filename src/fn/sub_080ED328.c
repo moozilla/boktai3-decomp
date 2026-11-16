@@ -4,14 +4,14 @@
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
                            : *(u32 *)((u8 *)actor + offset) & mask;
 }
 
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
     if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
                   actor->base.health <= 0))
@@ -31,7 +31,7 @@ static inline u32 ContextFlag(struct IvyCaptureState *context, u32 input)
     return context->captureFlags & input;
 }
 
-void sub_080ED328(void *source, void *target, struct SceneActorRegistryResetView *actor)
+void sub_080ED328(void *source, void *target, struct ChaseActor *actor)
 {
     if (IsUnavailable(actor))
         return;

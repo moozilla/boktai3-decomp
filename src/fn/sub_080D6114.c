@@ -11,7 +11,7 @@ static inline u8 TakePrepared(u8 *field)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
@@ -27,7 +27,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = zero;
 }
-void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *actor)
+void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
 {
     u8 busy;
     if (TakePrepared(&actor->base.field2B1)) {

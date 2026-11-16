@@ -4,7 +4,7 @@
 s32 SceneActorRoute_GetStepDuration(void *);
 u8 sub_0812F3CC(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
-void SceneActorRoute_UpdateWaitPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
 {
     u8 *route = (u8 *)actor + 0x448;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {

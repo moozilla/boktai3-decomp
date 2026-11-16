@@ -42,7 +42,7 @@ u8 Vorn_UpdateContactResponse(void *);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
-static inline void VornInit_BeginBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void VornInit_BeginBehavior(struct ChaseActor *actor, u32 behavior)
 {
     MonsterInit_SetState(actor, 0, 0, behavior);
 }
@@ -54,7 +54,7 @@ static inline void VornInit_ResetFlags(void *object)
 
 static inline void VornInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -134,8 +134,7 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     group->common.bodyPosition = &arg0->base.body.position;
 }
 
-static inline void VornInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                        u32 alternate)
+static inline void VornInit_ReadPalette(struct ChaseActor *actor, u32 base, u32 alternate)
 {
     s32 palette;
     actor->base.paletteOffset = Script_GetKeywordValue(0x43, 0);
@@ -173,20 +172,19 @@ void Vorn_BeginTargetPursuit(void);
 void Vorn_OnRender(void);
 void Vorn_OnDestroy(void);
 
-static inline void VornInit_SetReactionTable(struct SceneActorRegistryResetView *actor,
-                                             const void *table)
+static inline void VornInit_SetReactionTable(struct ChaseActor *actor, const void *table)
 {
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, table);
 }
 
-static inline void VornInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
+static inline void VornInit_EnableInitialFlags(struct ChaseActor *actor)
 {
     MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 0x8000000);
 }
 
-static inline void VornInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Vorn_OnRender;
@@ -214,8 +212,8 @@ void Vorn_ResumeReactionRoute(void);
 
 s32 Vorn_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *arg0 = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     u32 zero;

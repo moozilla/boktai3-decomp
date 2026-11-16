@@ -3,7 +3,7 @@
 
 void Ivy_UpdateActiveState(void);
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -18,7 +18,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     actor->base.word104 = 0;
 }
 
-static inline void SetStateB(struct SceneActorRegistryResetView *actor)
+static inline void SetStateB(struct ChaseActor *actor)
 {
     u32 two = 2;
     u8 *field = &actor->base.state2A8;
@@ -30,7 +30,7 @@ static inline void SetStateB(struct SceneActorRegistryResetView *actor)
     actor->base.field2B1 = 1;
 }
 
-void SceneActorReaction_FinishAnimation17(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         u16 *destination = &actor->base.colliderA.flags;

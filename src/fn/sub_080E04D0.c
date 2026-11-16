@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 // confidence=low: animation 11 is the route-arrival reaction selected by Dog_ResumeRoute.
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
+static inline u8 TakeEntry(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -12,7 +12,7 @@ static inline u32 Test(u16 *p, u32 mask)
 {
     return *p & mask;
 }
-void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
+void Dog_UpdateArrivalAnimation(struct ChaseActor *a)
 {
     u16 saved;
     u16 *flags;

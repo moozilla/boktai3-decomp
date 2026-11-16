@@ -36,7 +36,7 @@ static inline void MarkReactionMotion(struct SceneActorReactionMotion *m)
     m->flags = mask | m->flags;
 }
 
-void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
+void Vorn_SelectReactionControl(struct ChaseActor *a)
 {
     u8 *ctx = a->base.context;
     u16 *flags = (void *)(ctx + 0x6D4);

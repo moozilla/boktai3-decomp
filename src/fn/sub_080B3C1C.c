@@ -5,7 +5,7 @@ void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 extern const u8 gUnk_0824E230[];
 
-u8 Vorn_UpdateContactResponse(struct SceneActorRegistryResetView *actor)
+u8 Vorn_UpdateContactResponse(struct ChaseActor *actor)
 {
     struct SceneActorContactTracking *motion;
     u16 zero;

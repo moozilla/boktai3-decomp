@@ -71,12 +71,12 @@ struct DogInitContext {
 
 struct DogActor {
     union {
-        struct SceneActorRegistryResetView base;
+        struct ChaseActor base;
         struct DogInitContext context;
     } state;
 };
 
-static inline struct DogInitContext *DogInit_Context(struct SceneActorRegistryResetView *actor)
+static inline struct DogInitContext *DogInit_Context(struct ChaseActor *actor)
 {
     return actor->base.context;
 }
@@ -88,14 +88,14 @@ static inline void DogInit_Reset(void *object)
     context->field6A6 = 0;
 }
 
-static inline void DogInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
+static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
 {
     MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 8);
 }
 
-static inline void DogInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = Dog_OnAuxiliaryUpdate;
@@ -105,7 +105,7 @@ static inline void DogInit_InstallCompletionCallbacks(struct SceneActorRegistryR
 s32 Dog_Init(void *object)
 {
     struct DogActor *dog = object;
-    struct SceneActorRegistryResetView *actor = &dog->state.base;
+    struct ChaseActor *actor = &dog->state.base;
     struct SceneActorChaseGroup *group = &dog->state.base.group;
     u32 zero;
     struct ContactPosition tmp;

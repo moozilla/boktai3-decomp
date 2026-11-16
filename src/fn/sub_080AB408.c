@@ -8,21 +8,21 @@ struct ActorTrail {
     u8 unknown8D8[0x1C];
     u16 soundDelay;
 };
-static inline u32 stateFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 stateFlag(struct ChaseActor *p, u32 mask)
 {
     return p->base.flags2D4 & mask;
 }
-static inline u32 actorFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 actorFlag(struct ChaseActor *p, u32 mask)
 {
     return p->base.flags2D0 & mask;
 }
-static inline u8 unavailable(struct SceneActorRegistryResetView *p)
+static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p && (stateFlag(p, 0x40) || actorFlag(p, 0x20000) || p->base.health <= 0))
         return 1;
     return 0;
 }
-void ActorTrail_UpdateTimedScale(struct SceneActorRegistryResetView *actor)
+void ActorTrail_UpdateTimedScale(struct ChaseActor *actor)
 {
     struct ActorTrail *trail;
     if (unavailable(actor))

@@ -101,7 +101,7 @@ static inline u16 Axe_SequenceSelection(struct DisplaySequenceState *source)
     return source->unknownA;
 }
 
-void Axe_InitAttackTrail(struct SceneActorRegistryResetView *s)
+void Axe_InitAttackTrail(struct ChaseActor *s)
 {
     struct ContactPackedVector bodySize;
     struct ContactPackedVector bodyOffset;

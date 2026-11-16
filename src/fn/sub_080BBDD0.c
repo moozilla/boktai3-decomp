@@ -4,8 +4,8 @@
 #include "scene_actor_reaction.h"
 
 struct SkeletonRecoveryContext {
-    struct SceneActorRegistryResetView base;
-    u8 unknown6EC[4];
+    struct ChaseActor base;
+    u8 unknown624[0xCC];
     u16 timer;
 };
 
@@ -19,7 +19,7 @@ static inline void Skeleton_SnapRecoveryRoute(struct ContactPosition *position,
 
 static inline void Skeleton_BeginRecoveryTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -39,7 +39,7 @@ static inline void Skeleton_BeginRecoveryTurn(void *obj, u32 saved, const u16 *r
 static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -110,7 +110,7 @@ static inline u8 Skeleton_DisplacementStopped(s32 dx, s32 dz)
     return 0;
 }
 
-static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
+static inline u8 Skeleton_Drift(struct ChaseActor *actor)
 {
     s32 dx, dz;
     s16 *x, *z;
@@ -140,9 +140,8 @@ static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
     return Skeleton_DisplacementStopped(dx, dz);
 }
 
-static inline void Skeleton_Settle(struct SceneActorRegistryResetView *actor,
-                                    struct SceneActorChaseGroup *group,
-                                    struct SkeletonRecoveryContext *context)
+static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
+                                   struct SkeletonRecoveryContext *context)
 {
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
@@ -182,7 +181,7 @@ static inline void Skeleton_Settle(struct SceneActorRegistryResetView *actor,
     }
 }
 
-void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *actor)
+void Skeleton_ConvergeDisplacedPosition(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (Skeleton_Drift(actor)) {

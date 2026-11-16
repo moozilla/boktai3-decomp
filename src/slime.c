@@ -22,7 +22,7 @@
 #include "scene_actor_init_graphics.h"
 
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
-                        struct SceneActorRegistryResetView *actor)
+                        struct ChaseActor *actor)
 {
     s32 k2 = 1;
     if ((!SceneActor_ActionsBlocked((void *)actor)) && (info->contactFlags == k2)) {
@@ -46,7 +46,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
                                              struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorView *);
 
-static inline u8 Slime_ContactUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Slime_ContactUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -88,12 +88,12 @@ static inline u32 Slime_ContactFlags(struct ContactCollider *contact, u32 mask)
 }
 
 void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
-                              struct SceneActorRegistryResetView *actor)
+                              struct ChaseActor *actor)
 {
     struct ContactPosition next, displacement, center, fromContact, adjusted;
     s32 angle;
     u32 contactFlags;
-    struct SceneActorRegistryResetView *checkActor = actor;
+    struct ChaseActor *checkActor = actor;
     if (Slime_ContactUnavailable(checkActor))
         return;
     contactFlags = Slime_ContactFlags(contact, 0x800);
@@ -140,14 +140,14 @@ void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
         SceneActorBehavior_ApplyContactReaction((void *)contact, other, (void *)checkActor);
 }
 
-void Slime_ResetAnimation(struct SceneActorRegistryResetView *actor)
+void Slime_ResetAnimation(struct ChaseActor *actor)
 {
     if (actor->base.field2B2 != 0)
         actor->base.field2B2 = 0;
     SceneActorAnimation_SelectProfileEntry((void *)actor, 1);
 }
 
-void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
+void Slime_StartWalkChoice(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 1);
@@ -166,7 +166,7 @@ void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
+void Slime_RollMoveFlag(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor)) {
         u16 *scale = &actor->base.field2C2;
@@ -195,7 +195,7 @@ void Slime_RollMoveFlag(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Slime_StartRandomWait(struct SceneActorRegistryResetView *actor)
+void Slime_StartRandomWait(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x11);
@@ -206,7 +206,7 @@ void Slime_StartRandomWait(struct SceneActorRegistryResetView *actor)
         SceneActorChase_SetControl(actor, Slime_UpdateRandomWait, 0x22);
 }
 
-void Slime_UpdateReturnToIdle(struct SceneActorRegistryResetView *actor)
+void Slime_UpdateReturnToIdle(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x12);
@@ -287,7 +287,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
     *restart = 0;
 }
 
-void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor)
+void Slime_UpdateRandomWait(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor)) {
         u32 index;
@@ -307,7 +307,7 @@ void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor)
         SceneActorChase_SetControl(actor, Slime_PlayWaitAnimation, 0x23);
 }
 
-void Slime_PlayWaitAnimation(struct SceneActorRegistryResetView *actor)
+void Slime_PlayWaitAnimation(struct ChaseActor *actor)
 {
     if (Slime_TakePrepared(actor))
         SceneActorTurn_SelectProfileAnimation((void *)actor, 15, 1, 0);
@@ -315,7 +315,7 @@ void Slime_PlayWaitAnimation(struct SceneActorRegistryResetView *actor)
         SceneActorChase_SetControl(actor, Slime_TickWaitTimer, 0x24);
 }
 
-void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor)
+void Slime_TickWaitTimer(struct ChaseActor *actor)
 {
     struct Slime *q = actor->base.context;
     if (Slime_TakePrepared(actor)) {
@@ -333,7 +333,7 @@ void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor)
 
 void Anim_SetDurationScale(void *, u32);
 
-static inline u8 Slime_TakeEntryFlag(struct SceneActorRegistryResetView *p)
+static inline u8 Slime_TakeEntryFlag(struct ChaseActor *p)
 {
     if (p->base.field2B2) {
         p->base.field2B2 = 0;
@@ -348,8 +348,7 @@ static inline void Slime_ClearControlFlags(u32 *flags, u32 mask)
     *flags &= m;
 }
 
-static inline void Slime_SetNextControl(struct SceneActorRegistryResetView *p, void (*fn)(void *),
-                                        u32 wait)
+static inline void Slime_SetNextControl(struct ChaseActor *p, void (*fn)(void *), u32 wait)
 {
     u8 *flag = &p->base.field2B2;
     u32 zero = 0;
@@ -362,7 +361,7 @@ static inline void Slime_SetNextControl(struct SceneActorRegistryResetView *p, v
     p->base.word104 = zero;
 }
 
-void Slime_UpdateWalkTransition(struct SceneActorRegistryResetView *p)
+void Slime_UpdateWalkTransition(struct ChaseActor *p)
 {
     if (Slime_TakeEntryFlag(p)) {
         SceneActorAnimation_SelectProfileEntry((void *)p, 0xe);
@@ -415,13 +414,13 @@ static inline u8 Slime_HasContextFlag(struct Slime *p, u32 mask)
     return 0;
 }
 
-static inline u32 Slime_IsReactionComplete(struct SceneActorRegistryResetView *actor)
+static inline u32 Slime_IsReactionComplete(struct ChaseActor *actor)
 {
     u32 complete = actor->base.restart;
     return complete;
 }
 
-void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
+void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     struct DisplaySequenceState *sequence =
@@ -507,7 +506,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Slime_UpdateShake(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed)
 {
     struct Slime *q = actor->base.context;
     struct DisplaySequenceState *st =
@@ -543,7 +542,7 @@ static inline s32 Shift12(s32 x)
     return -((-x) >> 12);
 }
 
-void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
+void Slime_UpdateLaunch(struct ChaseActor *actor)
 {
     struct SlimeDrawable *d = actor->base.drawable;
     u32 mask;
@@ -589,7 +588,7 @@ void Slime_UpdateLaunch(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Slime_UpdateStill(struct SceneActorRegistryResetView *actor)
+void Slime_UpdateStill(struct ChaseActor *actor)
 {
     struct SlimeDrawable *d = actor->base.drawable;
     if (Slime_TakePrepared(actor)) {
@@ -621,8 +620,7 @@ void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-static inline void Slime_SetReactionState(struct SceneActorRegistryResetView *actor, u8 state,
-                                          u8 phase, u8 behavior)
+static inline void Slime_SetReactionState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -633,7 +631,7 @@ static inline void Slime_SetReactionState(struct SceneActorRegistryResetView *ac
 
 /* Explicit branches retain the original shared true/false exit blocks. */
 
-static inline u8 Slime_IsHidden(struct SceneActorRegistryResetView *a)
+static inline u8 Slime_IsHidden(struct ChaseActor *a)
 {
     u32 mask = 1;
     if (!a->base.drawableKind) {
@@ -653,7 +651,7 @@ no:
     return 0;
 }
 
-void Bat_RunDefeatScript(struct SceneActorRegistryResetView *actor, s32 frame)
+void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -741,7 +739,7 @@ inline static u8 Slime_TakeActionEntry(u8 *p)
     return 0;
 }
 
-void Bat_UpdateActionScript(struct SceneActorRegistryResetView *obj)
+void Bat_UpdateActionScript(struct ChaseActor *obj)
 {
     struct Slime *context = obj->base.context;
 
@@ -761,7 +759,7 @@ void Bat_UpdateActionScript(struct SceneActorRegistryResetView *obj)
 
 extern void *gUnk_08605D14[];
 
-void Slime_SetSecondaryStateTable(struct SceneActorRegistryResetView *actor)
+void Slime_SetSecondaryStateTable(struct ChaseActor *actor)
 {
     actor->base.alternateBehaviorCallbacks = gUnk_08605D14;
 }
@@ -788,8 +786,7 @@ static inline s32 Slime_ShiftTowardZero(s32 n, u32 bits)
     return -((-n) >> bits);
 }
 
-static inline void Slime_SetApproachControl(struct SceneActorRegistryResetView *a, void *cb,
-                                            u32 kind)
+static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     a->base.field2B2 = 1;
@@ -806,7 +803,7 @@ static inline void Slime_SetApproachControl(struct SceneActorRegistryResetView *
     a->base.word104 = zero;
 }
 
-static inline u8 Slime_ApproachWanderTarget(struct SceneActorRegistryResetView *actor,
+static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
                                             struct SceneActorMotionSubject *target, s32 speed)
 {
     struct SceneActorBody *motion = &actor->base.body;
@@ -823,7 +820,7 @@ static inline u8 Slime_ApproachWanderTarget(struct SceneActorRegistryResetView *
     return 0;
 }
 
-static inline void Slime_SetMotionScale(struct SceneActorRegistryResetView *actor)
+static inline void Slime_SetMotionScale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
@@ -849,7 +846,7 @@ static inline void Slime_SetMotionScale(struct SceneActorRegistryResetView *acto
 
 // confidence=low: moves toward a saved waypoint, then re-selects the route.
 
-void Slime_ApproachSavedTarget(struct SceneActorRegistryResetView *actor)
+void Slime_ApproachSavedTarget(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     s32 speed;
@@ -873,7 +870,7 @@ void Slime_ApproachSavedTarget(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC++;
 }
 
-void Slime_RestoreSavedTarget(struct SceneActorRegistryResetView *actor)
+void Slime_RestoreSavedTarget(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeStateEntry(actor))
         SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
@@ -881,7 +878,7 @@ void Slime_RestoreSavedTarget(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC++;
 }
 
-void Slime_RunUpdateThenWait(struct SceneActorRegistryResetView *actor)
+void Slime_RunUpdateThenWait(struct ChaseActor *actor)
 {
     u8 result;
     if (actor->base.field2B1)
@@ -896,7 +893,7 @@ void Slime_RunUpdateThenWait(struct SceneActorRegistryResetView *actor)
 
 extern void *gUnk_08605D18[];
 
-void Slime_SetPrimaryStateTable(struct SceneActorRegistryResetView *actor)
+void Slime_SetPrimaryStateTable(struct ChaseActor *actor)
 {
     actor->base.callbacks284 = gUnk_08605D18;
 }
@@ -907,7 +904,7 @@ void SceneActorCollision_InitBody(u8 *, struct SlimeCollisionVector *,
 void SceneActorCollision_InitAttack(u8 *, struct SlimeCollisionVector *,
                                     struct SlimeCollisionVector *, void *, u32, u8 *);
 
-void Slime_InitColliders(struct SceneActorRegistryResetView *actor)
+void Slime_InitColliders(struct ChaseActor *actor)
 {
     struct SlimeCollisionVector s1, s2;
     s1.xy.first = 0x40;
@@ -927,7 +924,7 @@ void Slime_InitColliders(struct SceneActorRegistryResetView *actor)
 
 // confidence=low: clears context timers, selects idle animation, and advances its first frame.
 
-void Slime_ResetIdlePlayback(struct SceneActorRegistryResetView *actor)
+void Slime_ResetIdlePlayback(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     context->flags = 0;
@@ -945,7 +942,7 @@ void Slime_OnUnusedEvent(void)
 {
 }
 
-void Slime_InitProfile(struct SceneActorRegistryResetView *actor)
+void Slime_InitProfile(struct ChaseActor *actor)
 {
     actor->base.profileId = SceneActorProfiles_FindOrAdd(0x16, 0);
 }
@@ -956,7 +953,7 @@ extern const u16 gUnk_08605D58[];
 
 // confidence=low: emits the profile's six-frame movement pulse at animation frame boundaries.
 
-s32 Slime_GetAnimationMovePulse(struct SceneActorRegistryResetView *actor)
+s32 Slime_GetAnimationMovePulse(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *sequence =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
@@ -997,7 +994,7 @@ static inline s32 Slime_MapWidth(struct EngineMap **terrain)
     return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
 }
 
-static inline s32 Slime_ForwardCell(struct SceneActorRegistryResetView *actor, s32 steps)
+static inline s32 Slime_ForwardCell(struct ChaseActor *actor, s32 steps)
 {
     s32 cell = actor->base.terrainCell;
     struct ContactPosition *position = &actor->base.body.position;
@@ -1062,7 +1059,7 @@ home:
     return actor->base.terrainCell;
 }
 
-void Slime_SelectWanderTarget(struct SceneActorRegistryResetView *actor, u32 direction)
+void Slime_SelectWanderTarget(struct ChaseActor *actor, u32 direction)
 {
     struct ContactPosition center;
     struct Slime *context = actor->base.context;
@@ -1083,7 +1080,7 @@ selected:
     context->wanderTarget.position = center;
 }
 
-static inline u8 Slime_TestFlag(struct SceneActorRegistryResetView *actor)
+static inline u8 Slime_TestFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *p = &actor->base.tracking;
     u32 mask = 2;
@@ -1100,7 +1097,7 @@ static inline u8 Slime_TestContext(struct Slime *q)
     return 0;
 }
 
-static inline void Slime_SetFlags2D6(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Slime_SetFlags2D6(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = bits;
     u16 *flags = &actor->base.flags2D6;
@@ -1108,7 +1105,7 @@ static inline void Slime_SetFlags2D6(struct SceneActorRegistryResetView *actor, 
     *flags = mask;
 }
 
-u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor)
+u32 Slime_TryEnrage(struct ChaseActor *actor)
 {
     struct Slime *q = actor->base.context;
     s32 dy;
@@ -1139,7 +1136,7 @@ u32 Slime_TryEnrage(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
-void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
+void Slime_FollowPlayer(struct ChaseActor *actor)
 {
     struct Slime *q = actor->base.context;
     struct SceneActorChasePlayer *p;
@@ -1163,7 +1160,7 @@ void Slime_FollowPlayer(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Slime_OnInterrupt(struct SceneActorRegistryResetView *actor)
+void Slime_OnInterrupt(struct ChaseActor *actor)
 {
     u8 kind = actor->base.field2B5;
     if (kind != 0x26 && kind != 0x22 && kind != 0x23 && kind != 0x24) {
@@ -1172,7 +1169,7 @@ void Slime_OnInterrupt(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void Bat_ReadScriptValuePair(struct SceneActorRegistryResetView *actor)
+void Bat_ReadScriptValuePair(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     s32 a = Script_SeekToKeyword('s');
@@ -1210,7 +1207,7 @@ static inline void Slime_ScriptPolarMotion(struct ContactPosition *out, u32 angl
 
 // confidence=low: invokes a pending Slime script with motion and variant arguments, then resets control.
 
-void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
+void Slime_RunPendingActionScript(struct ChaseActor *actor)
 {
     s32 values[10];
     struct ContactPosition vector;
@@ -1262,7 +1259,7 @@ void Slime_RunPendingActionScript(struct SceneActorRegistryResetView *actor)
     }
 }
 
-u32 Slime_GetRandomVariantFlags(struct SceneActorRegistryResetView *actor)
+u32 Slime_GetRandomVariantFlags(struct ChaseActor *actor)
 {
     s32 v;
     u32 r;
@@ -1314,14 +1311,13 @@ static inline void Slime_DebrisPolarMotion(s32 angle, struct ContactPosition *v,
         Slime_DebrisPolarMotion(angle, &v, (Slime_DebrisRandom() & 15) + 6, mask);                 \
     }
 
-static inline void Slime_DebrisPalette(struct SceneActorRegistryResetView *actor, u16 **bank,
-                                       u16 **offset)
+static inline void Slime_DebrisPalette(struct ChaseActor *actor, u16 **bank, u16 **offset)
 {
     *bank = &actor->base.basePaletteBank;
     *offset = &actor->base.paletteOffset;
 }
 
-void Slime_EmitDeathDebris(struct SceneActorRegistryResetView *actor)
+void Slime_EmitDeathDebris(struct ChaseActor *actor)
 {
     /* The actor, then (from the first emission on) the actor's position at 0x5C. */
     void *base = actor;
@@ -1335,7 +1331,7 @@ void Slime_EmitDeathDebris(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 sum = *a + *b;
-        base = &((struct SceneActorRegistryResetView *)base)->base.body.position;
+        base = &((struct ChaseActor *)base)->base.body.position;
         sub_08127590(base, &v, 0xB96C, 0xA929, 6, 0x18, 0x200, 0, sum, 0, 0, 0, 0, 0, 0);
     }
     BURST(v)
@@ -1381,36 +1377,36 @@ static inline void Slime_TargetBurstDelta(struct ContactPosition *v, struct Cont
     v->z = to->z - from->z;
 }
 
-static inline u16 *Slime_TargetBurstPalette(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_TargetBurstPalette(struct ChaseActor *actor)
 {
     return &actor->base.basePaletteBank;
 }
 
-static inline u16 *Slime_TargetBurstOffset(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_TargetBurstOffset(struct ChaseActor *actor)
 {
     return &actor->base.paletteOffset;
 }
 
-static inline u16 *Slime_TargetBurstPower(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_TargetBurstPower(struct ChaseActor *actor)
 {
     return &actor->base.attacks.first[1];
 }
 
-static inline u16 *Slime_TargetBurstParameter(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_TargetBurstParameter(struct ChaseActor *actor)
 {
     return &actor->base.attacks.second[1];
 }
 
-static inline u32 *Slime_TargetBurstFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 *Slime_TargetBurstFlags(struct ChaseActor *actor)
 {
     return &actor->base.attacks.flags[1];
 }
 
 // confidence=low: launches three randomized reaction projectiles toward the current target.
 
-void Slime_EmitTargetedReactionBurst(struct SceneActorRegistryResetView *input)
+void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct ContactPosition velocity;
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
@@ -1528,46 +1524,46 @@ static inline void Slime_SubtractPositions(struct ContactPosition *v, struct Con
     v->z = to->z - from->z;
 }
 
-static inline u16 *Slime_PaletteBase(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_PaletteBase(struct ChaseActor *actor)
 {
     return &actor->base.basePaletteBank;
 }
 
-static inline u16 *Slime_PaletteOffset(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_PaletteOffset(struct ChaseActor *actor)
 {
     return &actor->base.paletteOffset;
 }
 
-static inline u16 *Slime_AttackPower(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_AttackPower(struct ChaseActor *actor)
 {
     return &actor->base.attacks.first[1];
 }
 
-static inline u16 *Slime_AttackResponse(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_AttackResponse(struct ChaseActor *actor)
 {
     return &actor->base.attacks.second[1];
 }
 
-static inline u32 *Slime_AttackFlags(struct SceneActorRegistryResetView *actor)
+static inline u32 *Slime_AttackFlags(struct ChaseActor *actor)
 {
     return &actor->base.attacks.flags[1];
 }
 
-static inline u16 *Slime_AttackParameter(struct SceneActorRegistryResetView *actor)
+static inline u16 *Slime_AttackParameter(struct ChaseActor *actor)
 {
     return &actor->base.attacks.parameter[1];
 }
 
-static inline struct ContactPosition *Slime_Position(struct SceneActorRegistryResetView *actor)
+static inline struct ContactPosition *Slime_Position(struct ChaseActor *actor)
 {
     return &actor->base.body.position;
 }
 
 /* Emit three reaction projectiles with independent random headings. */
 
-void Slime_EmitScatteredReactionBurst(struct SceneActorRegistryResetView *input)
+void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct ContactPosition velocity;
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
@@ -1673,7 +1669,7 @@ static inline u8 Slime_TestPendingFlags(u16 *m, u32 b)
     return FALSE;
 }
 
-void Slime_PlayPendingSound(struct SceneActorRegistryResetView *actor)
+void Slime_PlayPendingSound(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     u32 m = 0x10;
@@ -1724,8 +1720,7 @@ static inline u8 Slime_TestReactionFlag(struct Slime *s, u32 mask)
     return 0;
 }
 
-static inline void Slime_SetReactionControl(struct SceneActorRegistryResetView *actor, void *cb,
-                                            u32 k)
+static inline void Slime_SetReactionControl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -1742,8 +1737,7 @@ static inline void Slime_SetReactionControl(struct SceneActorRegistryResetView *
     actor->base.word104 = 0;
 }
 
-static inline void Slime_SetDamageState(struct SceneActorRegistryResetView *actor, u32 s, u32 p,
-                                        u32 b)
+static inline void Slime_SetDamageState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 behavior = b;
     actor->base.state2A8 = s;
@@ -1758,7 +1752,7 @@ static inline u32 Slime_CollisionDamageFlags(struct ContactCollider *p)
     return p->statRewardFlags;
 }
 
-static inline u32 Slime_MaskedDamage(struct SceneActorRegistryResetView *actor, u32 flags, u32 mask)
+static inline u32 Slime_MaskedDamage(struct ChaseActor *actor, u32 flags, u32 mask)
 {
     return actor->base.field2DC & flags & mask;
 }
@@ -1775,7 +1769,7 @@ static inline u32 Slime_DamageFlags(u32 *flags)
 
 // confidence=low: reaction callback chooses split/idle/recovery states after damage.
 
-u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
+u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     u16 *motionFlags;
@@ -1824,7 +1818,7 @@ u32 Slime_ResolveDamageReaction(struct SceneActorRegistryResetView *actor)
     return 1;
 }
 
-u32 Slime_ProcessPendingStateChange(struct SceneActorRegistryResetView *actor)
+u32 Slime_ProcessPendingStateChange(struct ChaseActor *actor)
 {
     u32 m = 0x100;
     if (Slime_TestPendingFlags(&actor->base.flags2D6, m)) {
@@ -1854,7 +1848,7 @@ s32 SceneActorMotion_RefreshGroundHeight(struct Slime *slime)
 
 void SceneActorControl_DispatchControl(u8 *);
 
-u32 Slime_Update(struct SceneActorRegistryResetView *actor)
+u32 Slime_Update(struct ChaseActor *actor)
 {
     u32 i;
     void **t;
@@ -1869,7 +1863,7 @@ u32 Slime_Update(struct SceneActorRegistryResetView *actor)
 
 void SceneActor_UpdateActiveCallbacks(u8 *);
 
-u32 Slime_OnMessage(struct SceneActorRegistryResetView *actor)
+u32 Slime_OnMessage(struct ChaseActor *actor)
 {
     actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     SceneActor_UpdateActiveCallbacks((void *)actor);
@@ -1899,7 +1893,7 @@ static inline u8 Slime_TestDestroyFlags(u16 *a, u32 m)
     return 0;
 }
 
-u32 Slime_Destroy(struct SceneActorRegistryResetView *actor)
+u32 Slime_Destroy(struct ChaseActor *actor)
 {
     u8 *p = actor->base.drawable;
     u8 *q;
@@ -1954,7 +1948,7 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
 
-static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -2011,8 +2005,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
     SceneBody_SetMovementProbe(body, ((struct Slime *)arg0)->base.movementProbe, 0x40, 0x40);
 }
 
-static inline void Slime_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
-                                     u16 alternate)
+static inline void Slime_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 r1v;
     actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
@@ -2031,11 +2024,10 @@ static inline void Slime_ReadPalette(struct SceneActorRegistryResetView *actor, 
             SceneActorScript_GetManagerField62() - 0x5FFF);
 }
 
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
-                                              void *cb1, void *cb2, void *cb3, void *cb4,
-                                              void *hidden, void *cb5, void *cb6,
-                                              void *defaultReaction, void *targetQuery,
-                                              void *damage, void *contact)
+static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0, void *cb1,
+                                              void *cb2, void *cb3, void *cb4, void *hidden,
+                                              void *cb5, void *cb6, void *defaultReaction,
+                                              void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->base.contextCallback = cb0;
@@ -2058,14 +2050,14 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     MonsterInit_ClearMotion(actor);
 }
 
-static inline void Slime_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void Slime_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = Slime_OnMessage;
     actor->base.destroyCallback = Slime_Destroy;
 }
 
-static inline void Slime_InstallRoutes(struct SceneActorRegistryResetView *actor)
+static inline void Slime_InstallRoutes(struct ChaseActor *actor)
 {
     actor->base.callback248 = Slime_ResetIdlePlayback;
     actor->base.field23C = Slime_FollowPlayer;
@@ -2085,7 +2077,7 @@ static inline void Slime_SetFlags(struct Slime *slime, u16 mask)
     slime->flags |= mask;
 }
 
-static inline s32 MonsterInit_UpdateTerrainCell(struct SceneActorRegistryResetView *actor)
+static inline s32 MonsterInit_UpdateTerrainCell(struct ChaseActor *actor)
 {
     struct ContactPosition *position = &actor->base.body.position;
     actor->base.terrainCell = MonsterInit_CellId(position);
@@ -2095,7 +2087,7 @@ static inline s32 MonsterInit_UpdateTerrainCell(struct SceneActorRegistryResetVi
 s32 Slime_Init(void *object)
 {
     struct Slime *slime = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

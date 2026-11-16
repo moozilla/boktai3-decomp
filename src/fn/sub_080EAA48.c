@@ -18,7 +18,7 @@ s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct Scene
 void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 void SceneHud_SetTimedState(u32, s32, u32, u32, u32, u32);
 void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
-u32 Octopus_GetAnimationStatus(struct SceneActorRegistryResetView *);
+u32 Octopus_GetAnimationStatus(struct ChaseActor *);
 void Octopus_UpdateActiveState(void);
 extern s16 *gLinkSession;
 
@@ -46,7 +46,7 @@ struct OctopusOffset {
 };
 extern const struct OctopusOffset gUnk_086062B0[2][5];
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -63,7 +63,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -117,7 +117,7 @@ void SceneActorBehavior_PlayReactionSound(void *);
 void Camera_RequestShake(u32);
 void SpriteParticle_SpawnBatch(void *, u32, u32, u32, u32);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
-static inline void Hide(struct SceneActorRegistryResetView *a)
+static inline void Hide(struct ChaseActor *a)
 {
     u32 bit = 1;
     if (a->base.drawableKind == 0)
@@ -128,7 +128,7 @@ static inline void Hide(struct SceneActorRegistryResetView *a)
     }
 }
 
-static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
+static inline void Palette(struct ChaseActor *a, u32 bank)
 {
     if (a->base.drawableKind == 0)
         AnimData_SelectPaletteBank((u8 *)a->base.drawable + 0x2C, bank);
@@ -137,7 +137,7 @@ static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
 }
 
 void SceneActorTerrain_DisableCollision(void *);
-void Octopus_ReturnToRoutePoint(struct SceneActorRegistryResetView *actor)
+void Octopus_ReturnToRoutePoint(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         u8 *group = (u8 *)actor + 0x3D4;

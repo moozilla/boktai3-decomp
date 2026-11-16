@@ -51,8 +51,8 @@ static inline s32 MapWidth(void)
 {
     return *(s16 *)(gTerrainMap->cells + 4);
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                          struct ContactPosition *position, struct ContactPosition *destination)
+static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
+                          struct ContactPosition *destination)
 {
     s32 result;
     if (Nav_IsPositionInMesh(route, position, destination)) {
@@ -72,8 +72,7 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
     return 0;
 }
 // confidence=low: probes neighboring cells in facing order and routes toward a retreat cell
-static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 priorDirection,
-                                s32 steps)
+static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s32 steps)
 {
     struct ContactPosition center;
     s32 tries = 0;
@@ -153,7 +152,7 @@ selected:
     actor->base.body.direction = priorDirection;
     SceneActorTerrain_GetCenter(chosen, &center);
     {
-        s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group.common;
+        s16 groupOffset = (u32) & ((struct ChaseActor *)0)->group.common;
         u8 *group = (u8 *)actor + groupOffset;
         if (TryRoute(actor, *route, &actor->base.body.position, &center))
             return 1;
@@ -162,7 +161,7 @@ selected:
     return 0;
 }
 
-u32 Skeleton_TrySelectRetreatCell(struct SceneActorRegistryResetView *actor, u32 priorDirection)
+u32 Skeleton_TrySelectRetreatCell(struct ChaseActor *actor, u32 priorDirection)
 {
     return SelectRetreat(actor, priorDirection, 1);
 }

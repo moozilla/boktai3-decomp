@@ -6,7 +6,7 @@
 static inline u8 SceneActorChase_ArriveWithDirectFallback(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;

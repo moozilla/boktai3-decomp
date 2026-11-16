@@ -7,7 +7,7 @@ struct ActorMotion {
 };
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *actor)
+void SceneActor_AccelerateForTerrain(struct ChaseActor *actor)
 {
     struct ActorMotion *motion = actor->base.context;
     u16 type = actor->base.terrainCell;

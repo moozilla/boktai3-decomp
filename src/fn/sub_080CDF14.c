@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "player.h"
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void Golem_UpdateChargeWindup(void);
 void Golem_UpdateRouteMotion(void);
@@ -19,7 +19,7 @@ static inline s32 PlayerSlot(u8 *actor)
         return actor[8];
     return -1;
 }
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
         actor->base.field2B1 = 0;
@@ -63,7 +63,7 @@ charge: {
     }
 }
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -96,7 +96,7 @@ static inline s32 CanCharge(void *ctx)
         return 1;
     return 0;
 }
-void Golem_ChargeOrApproach(struct SceneActorRegistryResetView *actor)
+void Golem_ChargeOrApproach(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     if (TakeFlag2B1(actor))

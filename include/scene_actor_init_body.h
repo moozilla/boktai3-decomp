@@ -12,7 +12,7 @@ s32 TargetRegistry_RegisterActor(void *, void *, void *);
 /* Shared script-driven body, health, pursuit route and movement-probe setup. */
 static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;

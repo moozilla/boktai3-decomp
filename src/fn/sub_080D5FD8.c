@@ -4,11 +4,11 @@
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
-static inline u32 TestFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-void Mummy_UpdateDescriptorPursuit(struct SceneActorRegistryResetView *a)
+void Mummy_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     s32 motion;

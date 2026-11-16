@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 void Golem_UpdateChargeBuildup(void);
 
-void Golem_BeginChargeBuildup(struct SceneActorRegistryResetView *actor)
+void Golem_BeginChargeBuildup(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xE);

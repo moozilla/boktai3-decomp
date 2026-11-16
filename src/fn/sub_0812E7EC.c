@@ -46,7 +46,7 @@ void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
 void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
-void SceneActorAttachment_ApplySlotCommand(struct SceneActorRegistryResetView *, void *, u32, u32, u32);
+void SceneActorAttachment_ApplySlotCommand(struct ChaseActor *, void *, u32, u32, u32);
 void SceneActorAttachment_SelectOffsets(u8, u8, s32 *, s32 *);
 void *ActorAttachment_CreateValueSpriteSlot(u32, void *, u32, s32, s32, u32, void *, s32, u32,
                                             void *, void *);
@@ -60,20 +60,19 @@ static inline void Command_SetMotionFlag(u32 bits, struct SceneActorChaseFlags16
     field->value = bits | field->value;
 }
 
-static inline u8 HasFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 HasFlag(struct ChaseActor *actor, u32 mask)
 {
     if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
-static inline u8 HasGroup(struct SceneActorRegistryResetView *actor)
+static inline u8 HasGroup(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
         return 1;
     return 0;
 }
-static inline void SetBehaviorAndIdle(struct SceneActorRegistryResetView *actor, u32 state,
-                                      u32 behavior)
+static inline void SetBehaviorAndIdle(struct ChaseActor *actor, u32 state, u32 behavior)
 {
     u8 *field = &actor->base.state2A8;
     u32 zero = 0;
@@ -106,9 +105,9 @@ union CommandWorkspace {
     } offset;
 };
 // confidence=low: dispatches pending receiver commands and attachment requests.
-s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetView *input)
+s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct CommandReceiver *receiver = NULL;
     struct SceneActorChaseGroup *group;
     void *attachment;

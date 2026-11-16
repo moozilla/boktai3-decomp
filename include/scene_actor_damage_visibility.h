@@ -25,7 +25,7 @@ static inline u16 SceneActorDamage_OwnershipBits(u32 value, u32 mask)
     return value & mask;
 }
 
-static inline u8 SceneActorDamage_ShouldShow(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorDamage_ShouldShow(struct ChaseActor *actor)
 {
     if (SceneActorDamage_TestFlags(gEngineFlags, 0x4800)) {
         u32 *owner = &actor->base.field2E0;

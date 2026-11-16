@@ -44,7 +44,7 @@ static inline void Tentacle_SubtractPositions(struct ContactPosition *out,
     out->z = to->z - from->z;
 }
 
-static inline void Tentacle_BeginForwardState(struct SceneActorRegistryResetView *a)
+static inline void Tentacle_BeginForwardState(struct ChaseActor *a)
 {
     u32 behavior = 2;
     a->base.state2A8 = 0;
@@ -54,7 +54,7 @@ static inline void Tentacle_BeginForwardState(struct SceneActorRegistryResetView
     a->base.field2B1 = 1;
 }
 
-static inline void Tentacle_ApplyDurationScale(struct SceneActorRegistryResetView *actor)
+static inline void Tentacle_ApplyDurationScale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
@@ -98,7 +98,7 @@ static inline s32 Tentacle_HeadingDifference(u8 desired, u8 current)
     return difference;
 }
 
-void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
+void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
 {
     struct TentacleReturnContext *body = actor->base.context;
     s32 speed;

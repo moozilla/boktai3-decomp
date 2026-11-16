@@ -7,9 +7,9 @@ static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
 {
     return PlayerCue_StepSequenceEnded(owner, &owner->sequence);
 }
-void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
+void SceneActorControl_RestoreMotion(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
     u32 height;

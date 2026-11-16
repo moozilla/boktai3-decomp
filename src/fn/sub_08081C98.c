@@ -15,11 +15,11 @@ static inline u8 Reaction_HasFlags(u32 bits)
 }
 
 /* Direction is stored in turns of 1/256 of a circle. */
-static inline u8 Reaction_GetDirection(struct SceneActorRegistryResetView *actor)
+static inline u8 Reaction_GetDirection(struct ChaseActor *actor)
 {
     return actor->base.body.direction;
 }
-static inline void Reaction_Palette(struct SceneActorRegistryResetView *actor, u32 bank)
+static inline void Reaction_Palette(struct ChaseActor *actor, u32 bank)
 {
     if (!actor->base.drawableKind)
         AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
@@ -49,15 +49,15 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
     control->field14 = 0;
     control->timer = 0;
 }
-static inline u32 Reaction_Motion(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Reaction_Motion(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline void Reaction_ClearMotionBits(struct SceneActorRegistryResetView *actor, s32 mask)
+static inline void Reaction_ClearMotionBits(struct ChaseActor *actor, s32 mask)
 {
     actor->base.flags2D4 &= mask;
 }
-static inline void Reaction_SetHalf(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void Reaction_SetHalf(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2D6 = mask | actor->base.flags2D6;
 }
@@ -84,7 +84,7 @@ static inline s32 Reaction_ThirtySecond(s32 value)
         return value >> 5;
     return -((-value) >> 5);
 }
-void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u32 duration;

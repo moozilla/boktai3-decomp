@@ -18,12 +18,12 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorRoute_TryRecoveryDetour(void *);
 u8 Mummy_RequestStraightRoute(void *);
 
-static inline u32 Mummy_MotionBits(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Mummy_MotionBits(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
 
-static inline void Mummy_ApplyDuration(struct SceneActorRegistryResetView *a)
+static inline void Mummy_ApplyDuration(struct ChaseActor *a)
 {
     u16 *scale;
     u32 mask = 0xA02F;
@@ -51,14 +51,14 @@ struct MummyProbeGroup {
 };
 static inline struct MummyProbeGroup Mummy_ProbeGroup(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct MummyProbeGroup owner;
     owner.group = SceneActorChase_GroupOf(actor);
     return owner;
 }
 static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct MummyProbeGroup owner = Mummy_ProbeGroup(object);
     struct SceneActorChaseGroup *group = owner.group;
     if (!Mummy_MotionBits(actor, 0x400) &&
@@ -73,7 +73,7 @@ static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *rand
     }
 }
 
-static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void Mummy_SetBehavior(struct ChaseActor *actor, u32 behavior)
 {
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
@@ -81,7 +81,7 @@ static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, 
     SceneActorChase_ResetStateEntry(actor);
 }
 
-void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
+void Mummy_UpdateProbeNavigation(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     struct MummyNavigationContext *body = actor->base.context;

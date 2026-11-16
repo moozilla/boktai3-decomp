@@ -3,7 +3,7 @@
 void Vorn_ClearRouteResumeFlag(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 u8 sub_0812F3CC(void *);
-static inline u32 *Route_SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline u32 *Route_SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -21,8 +21,7 @@ static inline u32 *Route_SetCtl(struct SceneActorRegistryResetView *actor, void 
     actor->base.word104 = 0;
     return field;
 }
-static inline void Route_RestoreMotion(struct SceneActorRegistryResetView *actor, u32 result,
-                                       u32 *flags)
+static inline void Route_RestoreMotion(struct ChaseActor *actor, u32 result, u32 *flags)
 {
     /* Restore the saved target as its stored 32-bit control value. */
     actor->base.word104 = *(u32 *)&actor->base.entryTarget228;
@@ -33,7 +32,7 @@ static inline void Route_RestoreMotion(struct SceneActorRegistryResetView *actor
 }
 // confidence=low: restores route control and movement after an action completes.
 #define Vorn_RestoreRouteMovement sub_080B0038
-void Vorn_RestoreRouteMovement(struct SceneActorRegistryResetView *a)
+void Vorn_RestoreRouteMovement(struct ChaseActor *a)
 {
     u8 *context = a->base.context;
     u8 *group = context + 0x3D4;

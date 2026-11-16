@@ -8,7 +8,7 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -22,7 +22,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor)
+static inline void ResetState(struct ChaseActor *actor)
 {
     u32 state = 2;
     actor->base.state2A8 = state;
@@ -31,7 +31,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void SceneActorControl_UpdateTriggerApproach(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 speed;

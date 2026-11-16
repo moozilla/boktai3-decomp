@@ -6,7 +6,7 @@
 
 void SceneActor_EndReactionAnimation(void);
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
@@ -23,7 +23,7 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
     actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -32,7 +32,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u3
     actor->base.field2B1 = 1;
 }
 
-void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     if (SceneActorReaction_TakePrepared(actor)) {

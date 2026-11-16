@@ -21,7 +21,7 @@ static inline s32 Angle(s32 angle)
         angle += 256;
     return angle;
 }
-static inline void SetActorFlags(struct SceneActorRegistryResetView *input, u32 mask)
+static inline void SetActorFlags(struct ChaseActor *input, u32 mask)
 {
     u32 value = mask;
     value |= input->base.flags2D6;
@@ -33,7 +33,7 @@ static inline s32 RelativeAngle(s32 x, s32 z, s32 facing)
     return Angle(Math_Atan2(x, z) - facing);
 }
 
-void SceneActorControl_UpdateContactRelease(struct SceneActorRegistryResetView *input, s32 frame)
+void SceneActorControl_UpdateContactRelease(struct ChaseActor *input, s32 frame)
 {
     u8 *group = ((u8 *)input) + 0x3D4;
     void **node;

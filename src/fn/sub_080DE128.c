@@ -20,18 +20,17 @@ static inline u8 Dog_HasAwarenessFlag(struct DogAwareness *context, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline void Response(struct SceneActorRegistryResetView *actor, u8 *nav, u32 behavior,
-                            u32 response)
+static inline void Response(struct ChaseActor *actor, u8 *nav, u32 behavior, u32 response)
 {
     Chase_SetState(actor, 0, 2, behavior);
     Chase_SetCtl(actor, (void *)SceneActorControl_OnIdle, 0x10);
     SceneActorReaction_ResetResponseState(nav + 0x8C, gUnk_0824E2A8, response);
 }
-void Dog_SelectTargetAction(struct SceneActorRegistryResetView *actor)
+void Dog_SelectTargetAction(struct ChaseActor *actor)
 {
     struct DogAwareness *context = actor->base.context;
     u8 *nav = (u8 *)&actor->group.common;

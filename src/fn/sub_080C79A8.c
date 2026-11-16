@@ -23,7 +23,7 @@ static inline s32 Scale16(s32 n)
     return n >= 0 ? n >> 16 : -((-n) >> 16);
 }
 
-void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SlideBack(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     struct Unk080C79A8Motion *motion = (struct Unk080C79A8Motion *)((u8 *)actor + 0x50);

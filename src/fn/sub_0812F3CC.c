@@ -2,8 +2,7 @@
 #include "scene_actor_reset.h"
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);
-static inline u32 SceneActorReaction_ReadFlags(struct SceneActorRegistryResetView *a, u32 mask,
-                                               u32 **out)
+static inline u32 SceneActorReaction_ReadFlags(struct ChaseActor *a, u32 mask, u32 **out)
 {
     u32 *f = &a->base.flags2CC;
     u32 bits = *f & mask;
@@ -24,8 +23,8 @@ static inline u8 SceneActorReaction_HasContact(struct SceneActorReactionMotion *
         return 1;
     return 0;
 }
-static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetView *a, void *p,
-                                                 u32 kind, u32 zero, u8 byteZero)
+static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
+                                                 u8 byteZero)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = byteZero;
@@ -37,7 +36,7 @@ static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetV
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
-u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a)
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     void *contact;

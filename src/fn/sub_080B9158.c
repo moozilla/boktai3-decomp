@@ -3,7 +3,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_timed_behavior.h"
 
-s32 SceneActorTerrain_FindOpenNeighborDirection(struct SceneActorRegistryResetView *, s32);
+s32 SceneActorTerrain_FindOpenNeighborDirection(struct ChaseActor *, s32);
 
 static inline u32 Skeleton_RandomSample(const u16 *samples)
 {
@@ -26,14 +26,12 @@ static inline void Skeleton_SetPolarMotion(struct ContactPosition *motion, s32 a
     motion->z = Skeleton_ScaleMotion(gUnk_086149C4[angle & 255] * speed);
 }
 
-
-static inline struct SceneActorChaseFlags16 *
-Skeleton_GateFlags(struct SceneActorRegistryResetView *actor)
+static inline struct SceneActorChaseFlags16 *Skeleton_GateFlags(struct ChaseActor *actor)
 {
     return (struct SceneActorChaseFlags16 *)&actor->group.common.gate.flags;
 }
 
-static inline void Skeleton_EnableMotionFlags(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline void Skeleton_EnableMotionFlags(struct ChaseActor *actor, u16 bits)
 {
     SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&actor->base.flags2D4, bits);
 }
@@ -44,7 +42,7 @@ static inline void Skeleton_SetContextFlags(struct SceneActorTimedBehaviorContex
     context->flags6DC |= bits;
 }
 
-static inline u32 Skeleton_MovementFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Skeleton_MovementFlags(struct ChaseActor *actor, u32 mask)
 {
     return SceneActorChase_Bits32(&actor->base.flags2D0, mask);
 }
@@ -52,7 +50,7 @@ static inline u32 Skeleton_MovementFlags(struct SceneActorRegistryResetView *act
 static inline void Skeleton_UpdateArrival(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -116,8 +114,7 @@ success:
     return;
 }
 
-static inline void Skeleton_StartHop(struct SceneActorRegistryResetView *actor,
-                                     s32 direction, s32 speed)
+static inline void Skeleton_StartHop(struct ChaseActor *actor, s32 direction, s32 speed)
 {
     Skeleton_SetPolarMotion(&actor->base.secondaryMotion, direction << 6, speed);
     actor->base.body.direction = ((direction + 2) & 3) << 6;
@@ -126,12 +123,12 @@ static inline void Skeleton_StartHop(struct SceneActorRegistryResetView *actor,
     SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 14);
 }
 
-static inline void Skeleton_RestartGate(struct SceneActorRegistryResetView *actor)
+static inline void Skeleton_RestartGate(struct ChaseActor *actor)
 {
     actor->group.common.gate.counter = actor->group.common.gate.duration;
 }
 
-void sub_080B9158(struct SceneActorRegistryResetView *actor)
+void sub_080B9158(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {

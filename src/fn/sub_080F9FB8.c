@@ -44,8 +44,7 @@ static inline s32 Eighth(s32 x)
         result = -(-x >> 3);
     return result;
 }
-static inline void FromPlayer(u8 **player, struct ContactPosition *out,
-                              struct SceneActorRegistryResetView *owner)
+static inline void FromPlayer(u8 **player, struct ContactPosition *out, struct ChaseActor *owner)
 {
     const struct ContactPosition *target = (void *)(*player + 0x30);
     const struct ContactPosition *actor = &owner->base.body.position;
@@ -65,7 +64,7 @@ struct PursuitContext {
     u8 unknown0[0xE56];
     u16 distance;
 };
-void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
+void Axe_UpdatePursuit(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     struct ContactPosition velocity;

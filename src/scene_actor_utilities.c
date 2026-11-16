@@ -161,8 +161,7 @@ static inline void ClearFlags16(u16 *f, u32 mask)
     *f &= mask;
 }
 
-void SceneActorRoute_ClampTargetToAnchor(struct SceneActorRegistryResetView *actor,
-                                         struct ContactPosition *target)
+void SceneActorRoute_ClampTargetToAnchor(struct ChaseActor *actor, struct ContactPosition *target)
 {
     struct SceneActorBody *body = &actor->base.body;
     s32 dx = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->x - body->position.x;
@@ -374,7 +373,7 @@ static inline s32 ActorParticles_NextRandom(void)
     return table[gRandomIndex];
 }
 
-void ActorParticles_SpawnDirectionalBurst(struct SceneActorRegistryResetView *actor, s32 amount)
+void ActorParticles_SpawnDirectionalBurst(struct ChaseActor *actor, s32 amount)
 {
     struct SceneExtent velocity, spread;
     u32 count;
@@ -407,7 +406,7 @@ static inline s32 ActorParticles_Half(s16 n)
     return (s16) - ((-n) >> 1);
 }
 
-void ActorParticles_SpawnBurst(struct SceneActorRegistryResetView *actor)
+void ActorParticles_SpawnBurst(struct ChaseActor *actor)
 {
     struct SceneExtent velocity, spread;
     u32 count;
@@ -424,7 +423,7 @@ void ActorParticles_SpawnBurst(struct SceneActorRegistryResetView *actor)
                  (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
 }
 
-u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *actor)
+u32 ActorMode_SelectOddStateVariant(struct ChaseActor *actor)
 {
     u32 result;
     switch (actor->base.paletteOffset) {
@@ -441,7 +440,7 @@ u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *actor)
     return result;
 }
 
-void ActorParticles_SpawnWideBurst(struct SceneActorRegistryResetView *actor)
+void ActorParticles_SpawnWideBurst(struct ChaseActor *actor)
 {
     struct SceneExtent velocity, spread;
     u32 count;

@@ -10,18 +10,18 @@ void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorBehavior_CallActionScript(void *);
 
-static inline u32 Skeleton_ProfileId(const struct SceneActorRegistryResetView *a)
+static inline u32 Skeleton_ProfileId(const struct ChaseActor *a)
 {
     return a->base.profileId;
 }
 
-static inline u32 Skeleton_ProfileMode(const struct SceneActorRegistryResetView *a)
+static inline u32 Skeleton_ProfileMode(const struct ChaseActor *a)
 {
     return a->base.profileMode;
 }
 
 static inline struct SceneActorAnimationSequenceDrawable *
-Skeleton_SequenceDrawable(struct SceneActorRegistryResetView *a)
+Skeleton_SequenceDrawable(struct ChaseActor *a)
 {
     return a->base.drawable;
 }
@@ -31,7 +31,7 @@ static inline void *Skeleton_Sequence(struct SceneActorAnimationSequenceDrawable
     return d->sequence;
 }
 
-static inline struct SceneActorAnimationTile *Skeleton_TileOf(struct SceneActorRegistryResetView *a)
+static inline struct SceneActorAnimationTile *Skeleton_TileOf(struct ChaseActor *a)
 {
     return &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
 }
@@ -41,7 +41,7 @@ static inline u32 Skeleton_TileMirror(struct SceneActorAnimationTile *tile)
     return tile->flags & 4;
 }
 
-static inline struct RoomActor *Skeleton_Playback(struct SceneActorRegistryResetView *a)
+static inline struct RoomActor *Skeleton_Playback(struct ChaseActor *a)
 {
     return (void *)a;
 }
@@ -65,7 +65,7 @@ static inline void Skeleton_ResolvePlayback(u8 mirrorFlags, u8 entryFlags, u32 *
 static inline void Skeleton_LaunchSequence(void *object, u32 selection, u8 variant, u8 flags,
                                            u8 **restartOut)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorAnimationSequenceDrawable *drawable;
     actor->base.animationIndex = selection;
     drawable = Skeleton_SequenceDrawable(actor);
@@ -77,7 +77,7 @@ static inline void Skeleton_LaunchSequence(void *object, u32 selection, u8 varia
 static inline void Skeleton_CommitTile(void *obj, struct SceneActorAnimationTile *tile,
                                        u8 *savedSelection, u32 selection, u32 flags)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     *savedSelection = selection;
     {
         const u32 mask = 4;
@@ -166,8 +166,8 @@ static inline void Skeleton_EnableFlags(u16 *p, u32 maskInput)
     *p = mask;
 }
 
-static inline void Skeleton_SetRiseControl(struct SceneActorRegistryResetView *actor, void *cb,
-                                           u32 controlKind, u8 ready)
+static inline void Skeleton_SetRiseControl(struct ChaseActor *actor, void *cb, u32 controlKind,
+                                           u8 ready)
 {
     void *callback = cb;
     u32 kind = controlKind;
@@ -194,7 +194,7 @@ static inline void Skeleton_SnapDelayedRoute(struct ContactPosition *position,
 
 static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -220,7 +220,7 @@ static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *ra
 static inline void Skeleton_ArriveAfterDelay(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -281,7 +281,7 @@ invoke:
 }
 
 /* Recover from the directional rise, then resume or redirect the route. */
-void Skeleton_UpdateRiseRecovery(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {

@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 // confidence=low: animation completion resumes group movement or idle.
 void SceneActorControl_OnIdle(void);
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
+static inline u8 TakeEntry(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -9,7 +9,7 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
+void Dog_ResumeAfterReaction(struct ChaseActor *a)
 {
     u8 *group;
     u16 flags;

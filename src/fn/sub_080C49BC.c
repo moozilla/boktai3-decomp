@@ -13,7 +13,7 @@ static inline u8 MotionActive(struct SceneActorReactionMotion *motion)
         return 1;
     return 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 zero)
+static inline void SetState(struct ChaseActor *actor, u32 zero)
 {
     u32 phase = 1;
     actor->base.state2A8 = zero;
@@ -22,8 +22,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 zero)
     actor->base.counter2AC = zero;
     actor->base.field2B1 = phase;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                              u32 zero)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = zero;
@@ -37,7 +36,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = zero;
 }
-void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
     u32 active = MotionActive((void *)&actor->base.tracking.target);
     if (active) {

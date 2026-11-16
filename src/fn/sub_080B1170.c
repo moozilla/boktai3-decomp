@@ -9,7 +9,7 @@ struct SceneActorRandomReaction {
     u8 unknown694[0x6d4 - 0x694];
     u16 flags;
 };
-static inline u8 unavailable(struct SceneActorRegistryResetView *p)
+static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
@@ -32,12 +32,12 @@ static inline u8 active(struct SceneActorRandomReaction *p)
         return 1;
     return 0;
 }
-static inline u32 blocked(struct SceneActorRegistryResetView *p)
+static inline u32 blocked(struct ChaseActor *p)
 {
     u32 mask = 0xe33f;
     return p->base.flags2D4 & mask;
 }
-void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
+void SceneActor_TickRandomReaction(struct ChaseActor *p)
 {
     struct SceneActorRandomReaction *context = p->base.context;
     if (!unavailable(p) && !blocked(p) && p->base.field2B5 == 0x23 && active(context)) {

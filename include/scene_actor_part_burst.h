@@ -43,7 +43,7 @@ static inline u8 SceneActorEffects_NextSparkCount(const u16 *table)
     return (SceneActorEffects_NextSample(table) & 3) + 1;
 }
 
-static inline void SceneActorEffects_SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
+static inline void SceneActorEffects_SpawnDefeatSparks(struct ChaseActor *actor,
                                                        const struct ContactPosition *range,
                                                        const u16 *table, u8 firstCount)
 {

@@ -9,11 +9,10 @@
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
-void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+void SceneActorMovement_UpdateAirborne(struct ChaseActor *);
+void SceneActorMovement_UpdateHeight(struct ChaseActor *);
+void SceneActorControl_CallContextScript(struct ChaseActor *);
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -25,7 +24,7 @@ static inline void Hide(u8 *sprite, u32 mask)
 {
     *(u32 *)(sprite + 8) |= mask;
 }
-static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
+static inline u8 DrawableVisible(struct ChaseActor *actor)
 {
     u32 mask = 1;
     if (!actor->base.drawableKind) {
@@ -39,7 +38,7 @@ static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
 hidden:
     return 0;
 }
-void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorControl_CompleteBlinkOut(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;

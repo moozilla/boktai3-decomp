@@ -7,7 +7,7 @@ static inline u16 ClearRotationFlag(u16 *flags, u32 mask)
 {
     return mask & *flags;
 }
-void SceneActorControl_FinishRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_FinishRotation(struct ChaseActor *actor, s32 elapsed)
 {
     u8 *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;

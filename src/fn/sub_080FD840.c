@@ -8,12 +8,12 @@ struct SceneActorExtendedControlContext {
     u8 unknownE50[0x81];
     u8 fieldED1;
 };
-void Axe_SetAuxiliarySpriteRenderState(struct SceneActorRegistryResetView *, void *, u32);
+void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *, void *, u32);
 static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;
 }
-void SceneActorControl_EndExtendedPhase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
 {
     struct SceneActorExtendedControlContext *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))

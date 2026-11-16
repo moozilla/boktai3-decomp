@@ -52,7 +52,7 @@ static inline void Tentacle_InterpolatePosition(struct ContactPosition *out,
     value = scaled + value + sway + final;
     out->z = start->z + Tentacle_TruncateFixed10(value);
 }
-void sub_080A9BD8(struct SceneActorRegistryResetView *actor, struct ContactPosition *from,
+void sub_080A9BD8(struct ChaseActor *actor, struct ContactPosition *from,
                   struct ContactPosition *to, s32 first, s32 last)
 {
     struct TentacleCurveTrail *trail = actor->base.context;

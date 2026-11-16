@@ -18,8 +18,7 @@ static inline u32 Axe_TestFlags(u32 k_, u32 *flags)
     return (*flags) & k_;
 }
 
-inline static void Axe_BeginRotationControl(struct SceneActorRegistryResetView *a, void *callback,
-                                            u8 phase)
+inline static void Axe_BeginRotationControl(struct ChaseActor *a, void *callback, u8 phase)
 {
     u32 zero = 0;
     {
@@ -67,7 +66,7 @@ struct AxeLungeState {
     u8 angle;
 };
 
-void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
+void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
 {
     struct AxeLungeState *state = a->base.context;
     struct RotatingDrawable *sprite = a->base.drawable;

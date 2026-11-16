@@ -4,7 +4,7 @@
 #include "area_effect_link.h"
 #include "render.h"
 void SceneActor_ClearReactionFlags(void *);
-u32 SceneActorBehavior_DispatchFlaggedCategory(struct SceneActorRegistryResetView *);
+u32 SceneActorBehavior_DispatchFlaggedCategory(struct ChaseActor *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
 void SceneActorBehavior_PlayReactionSound(void *);
 void SceneActorTerrain_ClearCollisionTimers(void *);
@@ -15,7 +15,7 @@ s32 DamageNumberDisplay_Show(struct DamageNumberSource *, u32, u32, const struct
                              const struct ContactPosition *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 
-static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 flags)
+static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
 {
     if (actor) {
         {
@@ -40,8 +40,7 @@ union PlacementHitFlags {
     } half;
 };
 
-static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *actor, u16 *flags2D4,
-                                        u32 *flags2CC)
+static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4, u32 *flags2CC)
 {
     union PlacementHitFlags *pair = (void *)flags2D4;
     u32 flags = pair->packed & 0xFFFF;
@@ -148,7 +147,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(void *);
 u8 SceneActorReaction_TryBeginControl29(void *);
 void SceneActorPlacement_BeginDestinationJump(void *);
 u8 SceneActorReaction_ApplyEscalatingHit(void *);
-u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *);
+u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *);
 void SceneActorContacts_ReleaseNode(void *);
 
 struct PlacementStatusOwner {
@@ -157,8 +156,8 @@ struct PlacementStatusOwner {
 struct PlacementMotionOwner {
     u16 *field;
 };
-static inline u32 PlacementDamage_QueryMotionSaveStatus(struct SceneActorRegistryResetView *actor,
-                                                        u32 mask, u32 *status,
+static inline u32 PlacementDamage_QueryMotionSaveStatus(struct ChaseActor *actor, u32 mask,
+                                                        u32 *status,
                                                         struct PlacementStatusOwner *owner,
                                                         struct PlacementMotionOwner *motionOwner)
 {
@@ -180,11 +179,11 @@ static inline u32 WordBits(u32 *field, u32 mask)
 {
     return *field & mask;
 }
-static inline u32 HitFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 HitFlag(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
-static inline u8 HasPendingHitSave(struct SceneActorRegistryResetView *actor, u16 **out)
+static inline u8 HasPendingHitSave(struct ChaseActor *actor, u16 **out)
 {
     u16 *address = &actor->base.field2E6;
     u32 value = *address;
@@ -199,9 +198,9 @@ static inline u32 PlacementDamage_MotionBits(u32 mask, u16 *flags2D4)
     return (*flags2D4) & mask;
 }
 
-static inline void PlacementDamage_ReportHud(struct SceneActorRegistryResetView *actor, u32 id,
-                                             s32 health, u32 maximum, u32 kind, u32 mode,
-                                             u32 parameter, u32 *damageFlags, s32 priority,
+static inline void PlacementDamage_ReportHud(struct ChaseActor *actor, u32 id, s32 health,
+                                             u32 maximum, u32 kind, u32 mode, u32 parameter,
+                                             u32 *damageFlags, s32 priority,
                                              struct ContactCollider **captured)
 {
     u32 zero;
@@ -217,8 +216,7 @@ static inline void PlacementDamage_ReportHud(struct SceneActorRegistryResetView 
 }
 
 static inline void PlacementDamage_UpdateCollider(struct ContactCollider *collider,
-                                                  struct SceneActorRegistryResetView *actor,
-                                                  u16 *flags2D4)
+                                                  struct ChaseActor *actor, u16 *flags2D4)
 {
     if (PlacementDamage_TestField(0x40, &actor->base.flags2C0))
         collider->flags &= ~0x100;
@@ -228,7 +226,7 @@ static inline void PlacementDamage_UpdateCollider(struct ContactCollider *collid
         collider->flags |= 0x100;
 }
 
-u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *pending;

@@ -1,7 +1,7 @@
 #include "scene_actor_chase.h"
 // confidence=low: reacts to the context probe flag and enters behavior 15 after clearing it.
-void Ghoul_SelectRetreatRoutePoint(struct SceneActorRegistryResetView *);
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
+void Ghoul_SelectRetreatRoutePoint(struct ChaseActor *);
+static inline u8 TakeEntry(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -25,7 +25,7 @@ static inline void Clear(struct Bits16 *p, s32 mask)
 {
     p->bits = mask & p->bits;
 }
-void Bat_UpdateProbeReaction(struct SceneActorRegistryResetView *a)
+void Bat_UpdateProbeReaction(struct ChaseActor *a)
 {
     u8 *context = a->base.context;
     struct Bits16 *flags;

@@ -8,7 +8,7 @@ struct DamageTarget {
 };
 void SpriteParticle_SpawnBatch(void *, s32, s32, s32, s32);
 void SpriteEffect_SpawnTowardObject(void *, void *, u32, u32, u32, u32);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
 {
     void *callback = target;
     u32 type = kind;
@@ -24,8 +24,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
     }
     actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -33,7 +32,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void HideCollider(struct SceneActorRegistryResetView *actor)
+static inline void HideCollider(struct ChaseActor *actor)
 {
     struct ContactCollider *collider = &actor->base.colliderA;
     u32 f = collider->flags;
@@ -46,7 +45,7 @@ static inline void HideCollider(struct SceneActorRegistryResetView *actor)
         actor->base.flags2C0 = m | actor->base.flags2C0;
     }
 }
-static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
+static inline void ShowCollider(struct ChaseActor *actor)
 {
     actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
     {
@@ -56,7 +55,7 @@ static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
 }
 
 // confidence=low: applies a contact effect to the held player and waits before release.
-void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         struct DamageTarget *target = (void *)actor->base.tracking.target;

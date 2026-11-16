@@ -2,19 +2,19 @@
 #include "scene_actor_chase.h"
 void Mummy_ResetMotionState(void *);
 void Mummy_ResumeSavedRouteAfterAnimation(void *);
-static inline void StoreHalf(struct SceneActorRegistryResetView *a, u32 v)
+static inline void StoreHalf(struct ChaseActor *a, u32 v)
 {
     u32 value = v;
     a->base.field1EA = value;
 }
-static inline void SetHalf(struct SceneActorRegistryResetView *a, u16 mask)
+static inline void SetHalf(struct ChaseActor *a, u16 mask)
 {
     a->base.flags2D4 = mask | a->base.flags2D4;
 }
 
 // confidence=low: waits for the recovery timer before restoring route animation.
 #define Mummy_UpdateRecoveryWait sub_080D1644
-void Mummy_UpdateRecoveryWait(struct SceneActorRegistryResetView *a)
+void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     u16 *speed;

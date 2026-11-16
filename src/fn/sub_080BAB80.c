@@ -37,7 +37,7 @@ static inline s32 Quarter(s32 value)
     return value >= 0 ? value >> 6 : -((-value) >> 6);
 }
 
-void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
+void Skeleton_UpdateHomingBurst(struct ChaseActor *p, s32 tick)
 {
     u8 *context = p->base.context;
     if (SceneActorReaction_TakePrepared(p)) {

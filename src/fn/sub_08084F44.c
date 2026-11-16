@@ -58,7 +58,7 @@ struct BatActor {
     struct ContactPosition initialPosition;
 };
 
-static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -114,8 +114,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
-static inline void MonsterInit_ReadBatPalette(struct SceneActorRegistryResetView *actor, u16 base,
-                                              u16 alternate)
+static inline void MonsterInit_ReadBatPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 r1v;
     actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
@@ -131,11 +130,10 @@ static inline void MonsterInit_ReadBatPalette(struct SceneActorRegistryResetView
         MonsterInit_SetWidgetPalette((void *)(actor->base.drawable + 0x20),
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
-static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
-                                              void *cb1, void *cb2, void *cb3, void *cb4,
-                                              void *hidden, void *cb5, void *cb6,
-                                              void *defaultReaction, void *targetQuery,
-                                              void *damage, void *contact)
+static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0, void *cb1,
+                                              void *cb2, void *cb3, void *cb4, void *hidden,
+                                              void *cb5, void *cb6, void *defaultReaction,
+                                              void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
     actor->base.contextCallback = cb0;
@@ -157,14 +155,14 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
-static inline void Bat_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.messageCallback = SceneActorScript_OnCommand;
     actor->base.updateCallback = SceneActorControl_BindPrimaryPlayer;
     actor->base.destroyCallback = Bat_Destroy;
 }
 
-static inline void MonsterInit_InstallBatRoutes(struct SceneActorRegistryResetView *actor)
+static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605C74);
     actor->base.callback248 = SceneActorControl_RestoreMotion;
@@ -176,7 +174,7 @@ static inline void MonsterInit_InstallBatRoutes(struct SceneActorRegistryResetVi
 s32 Bat_Init(void *object)
 {
     struct BatActor *bat = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

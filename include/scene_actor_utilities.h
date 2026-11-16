@@ -30,7 +30,7 @@ s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPositio
 u8 *Path_GetPointData(void *);
 s32 Inventory_GetItemId(u32);
 s32 Inventory_GetItemPackedState(u32);
-u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *);
+u32 ActorMode_SelectOddStateVariant(struct ChaseActor *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 #endif

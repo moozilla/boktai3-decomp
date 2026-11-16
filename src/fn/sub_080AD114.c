@@ -12,7 +12,7 @@ s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
 void Vorn_BeginPursuitRoute(void *, u32);
 void Vorn_RunPendingScript(void *);
-void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_UpdateFacingAttack(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         if ((*(struct SceneActorFacingTarget **)gPlayers))

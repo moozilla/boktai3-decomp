@@ -8,11 +8,11 @@ struct DogGateContext {
     u16 timer690;
     u16 timer692;
 };
-u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-void Dog_SelectRetreatOrChase(struct SceneActorRegistryResetView *);
-void Dog_SelectTargetAction(struct SceneActorRegistryResetView *);
+u8 Dog_IsActionTimerExpired(struct ChaseActor *);
+void Dog_SelectRetreatOrChase(struct ChaseActor *);
+void Dog_SelectTargetAction(struct ChaseActor *);
 void SceneActorControl_OnIdle(void);
-static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
+static inline u8 HasReaction(struct ChaseActor *p)
 {
     struct SceneActorReactionMotion *motion = (void *)&p->base.tracking.target;
     u32 mask = 8;
@@ -47,13 +47,13 @@ static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
     v |= p->flags;
     p->flags = v;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
+static inline void SetFlags(struct ChaseActor *p, u32 mask)
 {
     u32 v = mask;
     v |= p->base.flags2D4;
     p->base.flags2D4 = v;
 }
-void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
+void Dog_UpdateTargetGate(struct ChaseActor *p)
 {
     struct DogGateContext *context = p->base.context;
     u8 active;

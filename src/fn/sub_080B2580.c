@@ -13,7 +13,7 @@ static inline s32 Vorn_MapSlotWidth(struct EngineMap **slot)
 {
     return ((struct SceneActorChaseTerrainGrid *)(*slot)->cells)->width;
 }
-static inline s32 Vorn_SweepEscapeCells(struct SceneActorRegistryResetView *actor, s32 range)
+static inline s32 Vorn_SweepEscapeCells(struct ChaseActor *actor, s32 range)
 {
     struct EngineMap **cachedMapSlot = &gTerrainMap;
     s32 cell = actor->base.terrainCell;
@@ -108,7 +108,7 @@ static inline void Vorn_CellCenter(s32 cell, struct ContactPosition *position)
     position->z = centeredZ;
 }
 
-u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32 savedDirection)
+u8 Vorn_SelectReachableEscapeCell(struct ChaseActor *actor, u32 savedDirection)
 {
     struct ContactPosition target;
     struct SceneActorChaseGroup *group;

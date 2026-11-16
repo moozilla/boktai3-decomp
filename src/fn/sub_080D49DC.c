@@ -4,7 +4,7 @@
 #include "scene_actor_delayed_response.h"
 #include "scene_actor_control_phase.h"
 
-void sub_080D49DC(struct SceneActorRegistryResetView *actor)
+void sub_080D49DC(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;

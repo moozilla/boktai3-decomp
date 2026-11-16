@@ -39,7 +39,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
-void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
+void Ivy_BeginRelease(struct ChaseActor *actor)
 {
     struct IvyContext *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {

@@ -12,7 +12,7 @@ s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
 s32 Math_Atan2(s32, s32);
 
-static inline u8 Dog_TracksPlayer(struct SceneActorRegistryResetView *actor)
+static inline u8 Dog_TracksPlayer(struct ChaseActor *actor)
 {
     u32 mask = 2;
     if (actor->base.flags2C0 & mask)
@@ -22,7 +22,7 @@ static inline u8 Dog_TracksPlayer(struct SceneActorRegistryResetView *actor)
 
 static inline void Dog_ClearResponseFlags(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     actor->base.field2D8 = 0;
     actor->base.field2DC = 0;
 }
@@ -31,22 +31,18 @@ static inline u32 *Dog_ResponseField(void *object, s16 offset)
 {
     return (u32 *)((u8 *)object + offset);
 }
-static inline void Dog_WriteResponseWords(struct SceneActorRegistryResetView *actor, s32 value)
+static inline void Dog_WriteResponseWords(struct ChaseActor *actor, s32 value)
 {
-    *Dog_ResponseField(actor, (u32) & ((struct SceneActorRegistryResetView *)0)->base.field2D8) =
-        value;
-    *Dog_ResponseField(actor, (u32) & ((struct SceneActorRegistryResetView *)0)->base.field2DC) =
-        value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2D8) = value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2DC) = value;
 }
 
-static inline void Dog_CopyContactCost(struct ContactCollider *collider,
-                                  struct SceneActorRegistryResetView *actor)
+static inline void Dog_CopyContactCost(struct ContactCollider *collider, struct ChaseActor *actor)
 {
     collider->cost = actor->base.reactionSoundVariant;
 }
 
-void sub_080DF6EC(void *unused, struct ContactCollider *contact,
-                  struct SceneActorRegistryResetView *actor)
+void sub_080DF6EC(void *unused, struct ContactCollider *contact, struct ChaseActor *actor)
 {
     struct DogItemContext *context;
     u32 palette;

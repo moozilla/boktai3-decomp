@@ -14,7 +14,7 @@ static inline void Golem_SnapDelayedRoute(struct ContactPosition *position,
 
 static inline void Golem_BeginDelayedTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
@@ -34,7 +34,7 @@ static inline void Golem_BeginDelayedTurn(void *obj, u32 saved, const u16 *rando
 static inline u8 Golem_ArriveAfterDelay(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
@@ -98,7 +98,7 @@ success:
     return 1;
 }
 
-void sub_080C7E18(struct SceneActorRegistryResetView *actor, s32 frame)
+void sub_080C7E18(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;

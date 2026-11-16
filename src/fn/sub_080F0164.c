@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 void SceneActorTerrain_DisableCollision(void *);
-static inline void Hide(struct SceneActorRegistryResetView *actor)
+static inline void Hide(struct ChaseActor *actor)
 {
     u32 mask = 1;
     if (!actor->base.drawableKind) {
@@ -12,7 +12,7 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
         tile->flags |= mask;
     }
 }
-void SceneActorControl_HideAndDisableCollision(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_HideAndDisableCollision(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         Hide(actor);

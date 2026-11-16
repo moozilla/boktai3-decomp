@@ -2,14 +2,14 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_straight_route.h"
 #include "scene_actor_attachment.h"
-u8 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryResetView *,
-                                           const struct ContactPosition *, u32, u32);
+u8 SceneActorAttachment_TestPositionWindow(struct ChaseActor *, const struct ContactPosition *, u32,
+                                           u32);
 /* The local player's position, as gPlayers[0] holds it. */
 struct MovementModePlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
 };
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -17,7 +17,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u8 kind)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -31,7 +31,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *actor, s32 mode)
+void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *motionFlags;

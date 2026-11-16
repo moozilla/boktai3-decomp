@@ -75,84 +75,83 @@ struct CrowSignedFlags {
 
 void SceneActorControl_OnIdle(u8 *);
 
-void Crow_OnAttackContact(u8 *unused, struct ContactCollider *obj,
-                          struct SceneActorRegistryResetView *ctx);
+void Crow_OnAttackContact(u8 *unused, struct ContactCollider *obj, struct ChaseActor *ctx);
 
 void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
                         struct SceneActorBehaviorContactView *destination,
-                        struct SceneActorRegistryResetView *actor);
+                        struct ChaseActor *actor);
 
-void Crow_OnIdleAnimation(struct SceneActorRegistryResetView *p);
+void Crow_OnIdleAnimation(struct ChaseActor *p);
 
 void Crow_UpdatePeriodicAnimation(struct SceneActorRegistryActor *actor, s32 tick);
 
 void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor);
 
-void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor);
+void Crow_PlayEntry2(struct ChaseActor *actor);
 
 void Crow_UpdateDirectionalPose(struct RoomActor *actor);
 
-void Crow_OnSpecialAnimation(struct SceneActorRegistryResetView *p);
+void Crow_OnSpecialAnimation(struct ChaseActor *p);
 
-void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32 elapsed);
+void Crow_RecoverFromDisplacement(struct ChaseActor *actor, s32 elapsed);
 
-void Crow_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame);
+void Crow_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
-void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor);
+void Crow_HopWithinHomeCell(struct ChaseActor *actor);
 
-void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor);
+void Crow_SteerAroundPlayer(struct ChaseActor *actor);
 
-void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor);
+void Crow_UpdateWanderTimer(struct ChaseActor *actor);
 
-void Crow_UpdateReturnAnimation(struct SceneActorRegistryResetView *s);
+void Crow_UpdateReturnAnimation(struct ChaseActor *s);
 
-void Crow_ApproachPlayer(struct SceneActorRegistryResetView *actor);
+void Crow_ApproachPlayer(struct ChaseActor *actor);
 
-void Crow_InitActionTable(struct SceneActorRegistryResetView *p);
+void Crow_InitActionTable(struct ChaseActor *p);
 
-void Crow_BeginScriptedAction(struct SceneActorRegistryResetView *s);
+void Crow_BeginScriptedAction(struct ChaseActor *s);
 
-void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor);
+void Crow_ResetGroundState(struct ChaseActor *actor);
 
-void Crow_UpdateGroundHeight(struct SceneActorRegistryResetView *actor);
+void Crow_UpdateGroundHeight(struct ChaseActor *actor);
 
 void Crow_InitColliders(u8 *p);
 
-u32 Crow_GetTimedAction(struct SceneActorRegistryResetView *p);
+u32 Crow_GetTimedAction(struct ChaseActor *p);
 
-void Crow_InitProfile(struct SceneActorRegistryResetView *p);
+void Crow_InitProfile(struct ChaseActor *p);
 
-void Crow_DisableAttackCollision(struct SceneActorRegistryResetView *s);
+void Crow_DisableAttackCollision(struct ChaseActor *s);
 
 void Crow_GetDirectionalFrameAndFlip(u16 a, s32 *b, s32 *c);
 
-void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor);
+void Crow_StopAtRaisedTerrain(struct ChaseActor *actor);
 
-void Crow_PlayAnimationCue(struct SceneActorRegistryResetView *p);
+void Crow_PlayAnimationCue(struct ChaseActor *p);
 
-s32 Crow_TryActivatePlayerProximityResponse(struct SceneActorRegistryResetView *s);
+s32 Crow_TryActivatePlayerProximityResponse(struct ChaseActor *s);
 
-void Crow_BeginReaction(struct SceneActorRegistryResetView *s);
+void Crow_BeginReaction(struct ChaseActor *s);
 
 void Crow_ReadSpawnScript(void *input);
 
-u32 Crow_UpdatePreAction(struct SceneActorRegistryResetView *actor);
+u32 Crow_UpdatePreAction(struct ChaseActor *actor);
 
-u32 Crow_UpdatePostAction(struct SceneActorRegistryResetView *actor);
+u32 Crow_UpdatePostAction(struct ChaseActor *actor);
 
-void Crow_UpdateKnockback(struct SceneActorRegistryResetView *actor);
+void Crow_UpdateKnockback(struct ChaseActor *actor);
 
-void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor);
+void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor);
 
-void Crow_ReturnToGround(struct SceneActorRegistryResetView *s);
+void Crow_ReturnToGround(struct ChaseActor *s);
 
-void Crow_SetBehaviorTable(struct SceneActorRegistryResetView *p);
+void Crow_SetBehaviorTable(struct ChaseActor *p);
 
-u32 Crow_Update(struct SceneActorRegistryResetView *p);
+u32 Crow_Update(struct ChaseActor *p);
 
-u32 Crow_InitPlayerTarget(struct SceneActorRegistryResetView *p);
+u32 Crow_InitPlayerTarget(struct ChaseActor *p);
 
-u32 Crow_Destroy(struct SceneActorRegistryResetView *s);
+u32 Crow_Destroy(struct ChaseActor *s);
 
 s32 Crow_Init(void *object);
 

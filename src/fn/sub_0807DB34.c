@@ -7,9 +7,9 @@ static inline void SceneActorRecovery_ClearGate(struct SceneActorControlGate *ga
     u32 mask = ~bits;
     gate->flags &= mask;
 }
-void SceneActorRecovery_ResumePursuit(struct SceneActorRegistryResetView *object)
+void SceneActorRecovery_ResumePursuit(struct ChaseActor *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
 
     ActorStatus_ReleaseContact(actor);

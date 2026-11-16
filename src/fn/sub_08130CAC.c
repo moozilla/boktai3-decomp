@@ -1,14 +1,13 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: chooses idle or turn behavior after advancing a route descriptor.
 #define SceneActorRoute_UpdateAdvancePhase sub_08130CAC
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
@@ -31,8 +30,7 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     actor->base.word104 = zero;
 }
 
-static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 phase, u32 behavior,
-                         u32 zero)
+static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -40,7 +38,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 p
     a->base.counter2AC = zero;
     a->base.field2B1 = 1;
 }
-static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void TurnState(struct ChaseActor *a, u32 behavior)
 {
     u8 *field = &a->base.state2A8;
     u32 zero = 0;
@@ -53,11 +51,11 @@ static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior
     }
     a->base.field2B1 = 1;
 }
-static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Flags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *actor)
+void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;

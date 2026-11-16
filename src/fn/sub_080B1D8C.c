@@ -8,7 +8,7 @@ void SceneActorCollision_InitExternalAttack(void *, void *, void *, void *, void
 void Vorn_OnCollisionResponse(void);
 void Vorn_OnContactEvent(void);
 void Vorn_OnScriptActionRequest(void);
-void SceneActor_InitContextColliders(struct SceneActorRegistryResetView *p)
+void SceneActor_InitContextColliders(struct ChaseActor *p)
 {
     struct ContactPackedVector size, offset;
     u8 *q = p->base.context;

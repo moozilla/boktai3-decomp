@@ -10,7 +10,7 @@
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
@@ -68,14 +68,14 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline void MonsterInit_EnableInitialFlags(struct SceneActorRegistryResetView *arg0)
+static inline void MonsterInit_EnableInitialFlags(struct ChaseActor *arg0)
 {
     MonsterInit_SetTargetingFlags(&arg0->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(arg0, 0x400000);
     MonsterInit_SetStatusFlags(arg0, 8);
 }
 
-static inline void MonsterInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void MonsterInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
     arg0->base.messageCallback = SceneActorScript_OnCommand;
     arg0->base.updateCallback = Spider_OnSecondaryUpdate;
@@ -96,7 +96,7 @@ static inline void Spider_InitializeDeferred(struct SpiderDeferredControl *contr
     control->mode = mode;
 }
 
-static inline void Spider_InstallContact(struct SceneActorRegistryResetView *actor,
+static inline void Spider_InstallContact(struct ChaseActor *actor,
                                          struct SceneActorChaseGroup *group)
 {
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_08605F34);
@@ -111,8 +111,8 @@ static inline void Spider_InstallContact(struct SceneActorRegistryResetView *act
 s32 Spider_Init(void *object)
 {
     struct SpiderInstanceState *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = &((struct SceneActorRegistryResetView *)arg0)->group;
+    struct ChaseActor *actor = object;
+    struct SceneActorChaseGroup *group = &((struct ChaseActor *)arg0)->group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;

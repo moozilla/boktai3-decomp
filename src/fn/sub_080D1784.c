@@ -19,7 +19,7 @@ static inline void ClearFlags(u16 *field, u32 mask)
 {
     *field = *field & ~mask;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
+static inline u8 TryRoute(struct ChaseActor *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
     struct ContactPosition *position = &actor->base.body.position;
@@ -46,7 +46,7 @@ struct RecoveryCounter {
 };
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 // confidence=low: restarts the saved route after a timed animation and waits before restoring control.
-void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
 {
     void *body;
     u8 *group = (u8 *)&actor->group.common;

@@ -7,7 +7,7 @@ static inline u8 ContextHasFlag(struct SceneActorScriptPropertiesView *p, u32 ma
         return 1;
     return 0;
 }
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor)
 {
     struct SceneActorScriptPropertiesView *context = actor->base.context;
     switch (actor->base.paletteOffset) {

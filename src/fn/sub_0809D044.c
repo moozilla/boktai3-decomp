@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_control_helpers.h"
 
-void SceneActorControl_ResetCollisionFlags(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     u32 *state = (void *)SceneActorControl_GetMotionState(actor);
     u32 mask = 0x100000;
     u32 *flags = &actor->base.flags2D0;

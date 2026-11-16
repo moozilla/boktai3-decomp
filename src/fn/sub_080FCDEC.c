@@ -41,7 +41,7 @@ static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelectio
     } while (0)
 
 // confidence=low: fires the axe's attack on the actor collider and both attack colliders, with attack parameters chosen by the context's flags.
-void sub_080FCDEC(struct SceneActorRegistryResetView *actor)
+void sub_080FCDEC(struct ChaseActor *actor)
 {
     struct AxeAttackContext *context = actor->base.context;
     struct AxeAttackSelection selection;

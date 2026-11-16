@@ -29,7 +29,7 @@ import layoutmerge  # noqa: E402  (re-execs into build/venv for pycparser)
 
 def defining_header(spell):
     tag = spell.split()[-1]
-    out = subprocess.run(["git", "grep", "-l", "-P", rf"^{spell.split()[0]} {tag}\s*\{{", "--", "include", "src"],
+    out = subprocess.run(["git", "grep", "--untracked", "-l", "-P", rf"^{spell.split()[0]} {tag}\s*\{{", "--", "include", "src"],
                          cwd=ROOT, capture_output=True, text=True).stdout.split()
     if not out:
         sys.exit(f"no definition of {spell}")

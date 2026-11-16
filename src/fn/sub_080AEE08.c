@@ -17,16 +17,16 @@ struct VornDefeatScript {
     u16 id, unused;
     s32 parameters[3];
 };
-static inline u16 Vorn_GetDefeatScript(struct SceneActorRegistryResetView *actor)
+static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
 {
     struct VornDefeatScript *script = (void *)&actor->base.unknown1F4[4];
     return script->id;
 }
-static inline s32 Vorn_GetScriptParameter(struct SceneActorRegistryResetView *actor, u32 index)
+static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
 {
     return ((struct SceneActorBehaviorView *)actor)->parameters1FC[index];
 }
-static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -71,7 +71,7 @@ static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
         SceneActorChase_SelectState((actor_), (state_), 0, 2);                                     \
         Vorn_ResetStateEntry((actor_), 1);                                                         \
     } while (0)
-static inline void Vorn_ClearRoute(struct SceneActorRegistryResetView *actor,
+static inline void Vorn_ClearRoute(struct ChaseActor *actor,
                                    struct SceneActorRegistryControl *control, u32 cleared)
 {
     SceneActorChase_ClearActorFlags(actor, 0x141C0);
@@ -88,15 +88,15 @@ static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 b
         (actor_)->base.field2B2 = (prepared_);                                                     \
         (actor_)->base.field2B0 = 0;                                                               \
     } while (0)
-static inline void Vorn_InstallIdleControl(struct SceneActorRegistryResetView *actor,
-                                           void *callback, u32 kind, u32 prepared)
+static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
+                                           u32 prepared)
 {
     VORN_PREPARE_ENTRY_BYTE(actor, prepared);
     actor->base.field2B5 = kind;
     actor->base.target = callback;
     SceneActorChase_ResetMotionControl(actor);
 }
-static inline void Vorn_ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
+static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 {
     VORN_RESET_ENTRY_FIELDS(actor, prepared);
 }
@@ -119,7 +119,7 @@ union VornSpreadVector {
     u32 words[2];
 };
 /* Completes the defeat sequence, dispatches its script, and enters idle control. */
-void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     union VornSpreadVector range;

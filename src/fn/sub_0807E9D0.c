@@ -18,13 +18,13 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 TestControl(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 TestControl(struct ChaseActor *actor, u32 mask)
 {
     if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
-static inline void MarkContact(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void MarkContact(struct ChaseActor *actor, u32 mask)
 {
     actor->base.flags2CC = mask | actor->base.flags2CC;
 }
@@ -37,7 +37,7 @@ static inline u32 TestMotion(u16 *flags, u32 mask)
 {
     return *flags & mask;
 }
-static inline void AimAtContactTarget(struct SceneActorRegistryResetView *actor)
+static inline void AimAtContactTarget(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target;
     if (TestControl(actor, 2))
@@ -54,7 +54,7 @@ static inline void AimAtContactTarget(struct SceneActorRegistryResetView *actor)
 }
 static inline void SelectContactTarget(struct SceneActorBehaviorContactView *source, void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     s32 flagged = 0;
     u16 owners = source->kind;
     if (owners & 1) {
@@ -85,19 +85,19 @@ static inline void SelectContactTarget(struct SceneActorBehaviorContactView *sou
     if (flagged)
         AimAtContactTarget(actor);
 }
-static inline void ExtendContactTimer(struct SceneActorRegistryResetView *actor)
+static inline void ExtendContactTimer(struct ChaseActor *actor)
 {
     actor->group.common.gate.counter += 0x12C;
     if (actor->group.common.gate.counter > actor->group.common.gate.duration)
         actor->group.common.gate.counter = actor->group.common.gate.duration;
 }
-static inline u8 IsPrimary(struct SceneActorRegistryResetView *actor)
+static inline u8 IsPrimary(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
         return 1;
     return 0;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor, u16 **motion)
+static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **motion)
 {
     u16 *flags;
     u32 mask;
@@ -141,13 +141,13 @@ static inline void SpawnContactParts(struct SceneActorRegistryActor *actor)
     actor->field2B8 = 0;
 }
 
-static inline void SetContactResult(struct SceneActorRegistryResetView *actor, u16 value)
+static inline void SetContactResult(struct ChaseActor *actor, u16 value)
 {
     actor->base.reactionSoundVariant = value;
 }
 void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
-                                              struct SceneActorRegistryResetView *actor)
+                                              struct ChaseActor *actor)
 {
     struct ContactCollider *primary;
     u16 *motion;

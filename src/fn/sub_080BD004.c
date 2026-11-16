@@ -2,8 +2,8 @@
 /* Sinks the actor into the ground after frame 6, then starts the hidden defeat. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
-static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *);
+static inline u8 IsControlled(struct ChaseActor *a)
 {
     if (a->base.object == (void *)1)
         return 1;
@@ -16,8 +16,7 @@ static inline u8 ContextFlag(u8 *context)
         return 1;
     return 0;
 }
-static inline void ClearRoute(struct SceneActorRegistryResetView *a,
-                              struct SceneActorRegistryControlGroup *group)
+static inline void ClearRoute(struct ChaseActor *a, struct SceneActorRegistryControlGroup *group)
 {
     struct SceneActorRegistryControl *route = &group->control;
     u32 *flags = &a->base.flags2CC;
@@ -27,7 +26,7 @@ static inline void ClearRoute(struct SceneActorRegistryResetView *a,
     route->field14 = 0;
     route->timer = 0;
 }
-static inline void Show(struct SceneActorRegistryResetView *a)
+static inline void Show(struct ChaseActor *a)
 {
     if (!a->base.drawableKind) {
         u32 *flags = a->base.drawable;
@@ -40,7 +39,7 @@ static inline void Show(struct SceneActorRegistryResetView *a)
     }
 }
 
-void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
 {
     u32 state;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;

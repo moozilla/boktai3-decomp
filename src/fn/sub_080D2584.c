@@ -10,7 +10,7 @@
 #include "spark_particle.h"
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *, s32);
+void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *, s32);
 
 static inline u8 Mummy_DisplacementStopped(s32 x, s32 z)
 {
@@ -20,7 +20,7 @@ static inline u8 Mummy_DisplacementStopped(s32 x, s32 z)
 }
 
 /* Ease recoil displacement, then select route or pursuit recovery. */
-void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
         (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)

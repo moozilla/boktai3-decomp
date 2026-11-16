@@ -30,7 +30,7 @@ static inline void Fill(u32 *zero, void *dst)
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     if (actor->base.category == 1 && (actor->base.field2DC & 4)) {

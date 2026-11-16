@@ -6,8 +6,8 @@ u8 SceneActor_DispatchContextAction(void *, u32);
 u8 Skeleton_RerouteToTarget(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
-    struct SceneActorRegistryResetView *alt = obj;
+    struct ChaseActor *actor = obj;
+    struct ChaseActor *alt = obj;
     u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;

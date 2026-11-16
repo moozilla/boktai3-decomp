@@ -17,7 +17,7 @@ static inline s32 WrapCounter(s32 n)
 {
     return n - 256;
 }
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
     if (a->base.field2B2) {
         a->base.field2B2 = 0;
@@ -25,7 +25,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
     }
     return 0;
 }
-void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a)
+void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
 {
     struct ActorParticipantProgress *s = a->base.context;
     s32 delta;

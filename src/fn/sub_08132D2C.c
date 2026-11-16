@@ -61,7 +61,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline u8 Test2(u16 **out, struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     u16 *flags = &actor->base.flags2C0;
@@ -71,13 +71,12 @@ static inline u8 Test2(u16 **out, struct SceneActorRegistryResetView *actor, u32
         return 1;
     return 0;
 }
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.flags2D0 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -91,7 +90,7 @@ static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor
     }
     actor->base.word104 = 0;
 }
-u32 SceneActorReaction_DefeatRecordStats(struct SceneActorRegistryResetView *actor)
+u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u16 *flags2C0;

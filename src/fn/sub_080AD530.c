@@ -3,7 +3,7 @@
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
 // confidence=low: after the action delay, restores a reaction or reroutes toward the player.
-static inline u32 Motion(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Motion(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2D4 & mask;
 }
@@ -26,7 +26,7 @@ struct VornRouteGroup {
     u8 pad20C[0x18];
     void *failure;
 };
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 TakePrepared(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -34,7 +34,7 @@ static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
     }
     return 0;
 }
-void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *actor, s32 frame)
+void Vorn_ResumeRouteAfterDelay(struct ChaseActor *actor, s32 frame)
 {
     struct VornRouteGroup *group = (void *)&actor->group.common;
     u8 *context = actor->base.context;

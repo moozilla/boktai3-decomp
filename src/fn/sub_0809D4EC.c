@@ -16,9 +16,9 @@ static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
     return Test(*(u32 *)((u8 *)state + offset), mask);
 }
 
-void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
         return;
     if (actor->base.paletteOffset == 0) {

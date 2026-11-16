@@ -4,7 +4,7 @@
 #include "scene_actor_reset.h"
 extern const s16 gUnk_086149C4[];
 void Collider_SetPosition(void *, void *, u32);
-static inline u8 SuppressCollision(struct SceneActorRegistryResetView *a)
+static inline u8 SuppressCollision(struct ChaseActor *a)
 {
     if (a) {
         u32 mask = 0x40;
@@ -42,7 +42,7 @@ static inline s32 Direction(s32 value)
 {
     return value >= 0 ? value >> 6 : -(-value >> 6);
 }
-void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
+void Dog_UpdateCollisionBounds(struct ChaseActor *a)
 {
     union SceneActorRegistryPackedPosition position;
     union SceneActorRegistryPackedPosition wide;

@@ -1,7 +1,7 @@
 #include "tentacle_body.h"
 
 void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider,
-                                    struct SceneActorRegistryResetView *actor)
+                                    struct ChaseActor *actor)
 {
     int mask;
     u32 *flags;
@@ -13,14 +13,14 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
     }
 }
 
-static inline u8 TentacleBody_IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 TentacleBody_IsUnavailable(struct ChaseActor *actor)
 {
     return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
 }
 
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
-                                struct SceneActorRegistryResetView *actor)
+                                struct ChaseActor *actor)
 {
     if (TentacleBody_IsUnavailable(actor))
         return;
@@ -36,15 +36,12 @@ void TentacleBody_UpdateAttackWindup(struct RoomActor *actor)
     if (TentacleSpread_Take(&actor->field2B2)) {
         TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
-        TentacleBody_RefreshDirectionalAnimations(
-            ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
-        TentacleActor_AssignSegmentPhases(
-            ((struct SceneActorRegistryResetView *)actor)->base.context);
+        TentacleBody_RefreshDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 15);
+        TentacleActor_AssignSegmentPhases(((struct ChaseActor *)actor)->base.context);
     } else {
         TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
-        TentacleBody_RefreshDirectionalAnimations(
-            ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
+        TentacleBody_RefreshDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 15);
     }
 }
 
@@ -57,8 +54,7 @@ void TentacleBody_ResetDirectionalPose(struct RoomActor *actor)
         actor->field2B2 = 0;
     TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
     TentacleBody_SelectAnimation(actor, entry[17].value, variant, flags);
-    TentacleBody_ResetDirectionalAnimations(
-        ((struct SceneActorRegistryResetView *)actor)->base.context, 18);
+    TentacleBody_ResetDirectionalAnimations(((struct ChaseActor *)actor)->base.context, 18);
 }
 
 void TentacleBody_OnIdleState(void)
@@ -83,7 +79,7 @@ static inline void TentacleBody_SetActionFlags(u16 m, u16 *f)
     *f |= m;
 }
 
-void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *actor, s32 frame)
+void TentacleBody_UpdateTimedAction(struct ChaseActor *actor, s32 frame)
 {
     if (TentacleSpread_Take(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 7);
@@ -95,8 +91,7 @@ void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *actor, s
         actor->base.field2B0 = 1;
 }
 
-void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *actor, s32 frame,
-                                         u32 unused)
+void TentacleBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u32 unused)
 {
     u32 queued = TentacleSpread_Take(&actor->base.field2B2);
     if (queued) {
@@ -114,7 +109,7 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
         }
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
-        void (*nextState)(struct SceneActorRegistryResetView *);
+        void (*nextState)(struct ChaseActor *);
         u32 stateKind;
         u32 *flags;
         u32 mask;
@@ -139,12 +134,12 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
 
 /* The accessor preserves the saved-state reset code generation with agbcc. */
 
-static inline u8 TentacleBody_IsAnimationReady(struct SceneActorRegistryResetView *actor)
+static inline u8 TentacleBody_IsAnimationReady(struct ChaseActor *actor)
 {
     return actor->base.restart;
 }
 
-void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
+void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
 {
     s32 health;
     if (TentacleSpread_Take(&actor->base.field2B2)) {
@@ -210,7 +205,7 @@ void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
 
 /* TentacleBody_UpdateAnimationEleven: Starts directional animation 11 on state entry and completes when the ready flag is set */
 
-void TentacleBody_UpdateAnimationEleven(struct SceneActorRegistryResetView *actor)
+void TentacleBody_UpdateAnimationEleven(struct ChaseActor *actor)
 {
     if (TentacleSpread_Take(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(actor, 11);
@@ -234,7 +229,7 @@ static inline void TentacleBody_FillMotion(void *dst, u32 *tmp, u32 v)
 
 // confidence=low: winds up a segment-spread attack while backing away from the target.
 
-void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
+void TentacleBody_UpdateSpreadWindup(struct ChaseActor *actor)
 {
     struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex, threshold, speed;
@@ -328,7 +323,7 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
 
 // confidence=low: spreads the body's segments out from the actor's position, then releases.
 
-void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor, s32 frame)
+void TentacleBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
 {
     struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex;
@@ -409,7 +404,7 @@ static inline void TentacleBody_ClearMotion(const u32 *source, void *destination
     CpuSet(source, destination, 0x05000002);
 }
 
-void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *actor)
+void TentacleBody_UpdateSpreadPreparation(struct ChaseActor *actor)
 {
     u32 zero;
     struct ContactPosition *dst;
@@ -456,7 +451,7 @@ void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *ac
 
 // confidence=low: spreads the body's segments out from the actor's position, then attacks.
 
-void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, s32 frame)
+void TentacleBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
 {
     struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex;
@@ -517,7 +512,7 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
         SceneActorChase_SetControl(actor, (void *)TentacleBody_BeginDirectedAttack, 36);
 }
 
-void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
+void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
@@ -582,7 +577,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void TentacleBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);

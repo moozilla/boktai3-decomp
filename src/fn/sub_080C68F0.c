@@ -16,8 +16,7 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
-                                             u8 *mirror)
+static inline void Golem_GetDirectionVariant(struct ChaseActor *actor, u8 *variant, u8 *mirror)
 {
     s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
@@ -29,8 +28,8 @@ static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView 
     }
 }
 
-static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *actor, u32 selection,
-                                         u32 variant, u32 flags)
+static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection, u32 variant,
+                                         u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -81,7 +80,7 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
 }
 
 // confidence=low: charge and slide behaviors install this completion control.
-void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
+void Golem_UpdateChargeStop(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B2)) {
         u8 directionVariant, mirror;

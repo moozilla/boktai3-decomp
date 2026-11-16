@@ -6,7 +6,7 @@
 void SceneActorMovement_ResolveRoutePosition(void *);
 
 /* Choose a route, react to contact, or resume pursuit in motion-flag priority order. */
-u8 Mummy_SelectMovementResponse(struct SceneActorRegistryResetView *actor)
+u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (!actor->base.reactionSoundVariant)

@@ -14,7 +14,7 @@ struct WindupContext {
 };
 void Sound_PlaySong(u32);
 void Axe_UpdateTargetLunge(void);
-void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
 {
     struct WindupContext *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;

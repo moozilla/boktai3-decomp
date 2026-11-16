@@ -1,11 +1,11 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-static inline u32 WordFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
     return mask & p->base.flags2D0;
 }
-static inline u8 IsInactive(struct SceneActorRegistryResetView *actor)
+static inline u8 IsInactive(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -49,7 +49,7 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = b->y + a->y;
     out->z = b->z + a->z;
 }
-void TentacleActor_ResolveBlockedMovement(struct SceneActorRegistryResetView *actor)
+void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
 {
     u8 *trail;
     struct ContactPosition target;

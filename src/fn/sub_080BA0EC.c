@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_script.h"
 
-void SceneActorReaction_ApplyThreshold(struct SceneActorRegistryResetView *actor, s32 value)
+void SceneActorReaction_ApplyThreshold(struct ChaseActor *actor, s32 value)
 {
     struct SceneActorScriptPropertiesView *context = actor->base.context;
 

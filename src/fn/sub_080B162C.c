@@ -2,11 +2,11 @@
 
 void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
 u8 Vorn_SelectUphillTurn(void *, void *);
-static inline u32 MotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D4 & mask;
 }
-static inline u32 StatusFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 StatusFlags(struct ChaseActor *a, u32 mask)
 {
     return a->base.flags2D0 & mask;
 }
@@ -19,14 +19,14 @@ static inline u8 ContextFlags(u8 *p, u32 mask, u16 **out)
         return 1;
     return 0;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a && (MotionFlags(a, 64) || StatusFlags(a, 0x20000) || a->base.health <= 0))
         return 1;
     return 0;
 }
 // confidence=low: periodically probes uphill destinations and queues a delayed route action.
-static inline void Chase_SetState_1(struct SceneActorRegistryResetView *actor, u32 s, u32 p)
+static inline void Chase_SetState_1(struct ChaseActor *actor, u32 s, u32 p)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
@@ -42,7 +42,7 @@ static inline u8 Chase_Test_(const u16 *value, u32 mask)
     return 0;
 }
 
-inline static u32 Chase_Bits32_1(struct SceneActorRegistryResetView *actor_, u32 mask)
+inline static u32 Chase_Bits32_1(struct ChaseActor *actor_, u32 mask)
 {
     u32 *field = &actor_->base.flags2CC;
     return (*field) & mask;
@@ -55,7 +55,7 @@ static inline u32 Vorn_GetRandomBits(u32 mask)
     return ((const u16 *)0x0203B400)[index] & mask;
 }
 
-void Vorn_TryUphillRoute(struct SceneActorRegistryResetView *actor)
+void Vorn_TryUphillRoute(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     u8 *group = context + 0x3D4;

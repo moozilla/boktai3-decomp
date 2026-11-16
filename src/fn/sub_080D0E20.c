@@ -13,7 +13,7 @@ struct SceneActorCheckpointSequence {
     u8 unknownA[4];
     u16 timer;
 };
-void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *);
+void Mummy_FireAcceleratingVolley(struct ChaseActor *);
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -22,7 +22,7 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-void SceneActor_UpdateAnimationCheckpoint(struct SceneActorRegistryResetView *actor)
+void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
 {
     struct SceneActorCheckpointState *state = actor->base.context;
     struct SceneActorCheckpointSequence *sequence = (void *)((u8 *)actor->base.drawable + 0x48);

@@ -8,7 +8,7 @@ void sub_080B3110(void *, u32, const u8 *, u32);
 void Vorn_SendMessage(void *);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 
-static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.flags2CC & mask;
 }
@@ -21,8 +21,7 @@ static inline void Vorn_SetTrackingFlags(struct SceneActorChaseTracking *trackin
 {
     tracking->flags = bits | tracking->flags;
 }
-static inline void Vorn_StartRoute(struct SceneActorRegistryResetView *actor,
-                                   struct SceneActorChaseGroup *group)
+static inline void Vorn_StartRoute(struct ChaseActor *actor, struct SceneActorChaseGroup *group)
 {
     SceneBody_StartRoute(&actor->base.body.id, &group->homeRoute, group->homeRoute.routeId,
                          group->homeRoute.parameterB, group->homeRoute.pointId);
@@ -33,7 +32,7 @@ static inline void Vorn_ClearContextFlags(u16 *flags, u32 bits)
     *flags &= mask;
 }
 
-void Vorn_ResumeReactionRoute(struct SceneActorRegistryResetView *actor)
+void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     struct SceneActorAnimationLink *context = actor->base.context;

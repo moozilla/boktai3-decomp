@@ -2,9 +2,9 @@
 #include "global.h"
 /* SceneActorControl_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 #include "scene_actor_control_phase.h"
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorMotion_UpdateTargetTransition(void);
 u8 Dog_IsActionTimerExpired(void *);
 void Anim_SetDurationScale(void *, u32);
@@ -15,7 +15,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -29,8 +29,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                              u32 behavior)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -42,7 +41,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
         *((u8 *)actor + offset) = 1;
     }
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct ChaseActor *actor)
 {
     u32 behavior = 18;
     actor->base.state2A8 = 0;
@@ -52,7 +51,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     actor->base.field2B1 = 1;
 }
 // confidence=low: approaches the navigation probe and selects the next dog state.
-void Dog_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
+void Dog_UpdateProbeApproach(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     u8 *control = (u8 *)SceneActorControl_GetState(actor);

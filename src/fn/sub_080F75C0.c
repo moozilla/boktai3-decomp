@@ -35,7 +35,7 @@ static inline s32 Axe_ContactIndex(s32 index)
 void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
                        struct SceneActorBehaviorContactView *destination, void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct AxeContactContext *context = actor->base.context;
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return;

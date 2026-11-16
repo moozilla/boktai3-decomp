@@ -9,8 +9,7 @@ static inline u8 SceneActorTerrain_ExcludesCategory(u32 category)
         return 1;
     return 0;
 }
-static inline void SceneActorTerrain_InstallControl(struct SceneActorRegistryResetView *actor,
-                                                    void *sink, u8 kind)
+static inline void SceneActorTerrain_InstallControl(struct ChaseActor *actor, void *sink, u8 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -24,8 +23,8 @@ static inline void SceneActorTerrain_InstallControl(struct SceneActorRegistryRes
     }
     actor->base.word104 = 0;
 }
-static inline void SceneActorTerrain_EnterState(struct SceneActorRegistryResetView *actor, u8 state,
-                                                u8 phase, u8 behavior)
+static inline void SceneActorTerrain_EnterState(struct ChaseActor *actor, u8 state, u8 phase,
+                                                u8 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;

@@ -1,7 +1,7 @@
 #include "scene_actor_terrain_reaction.h"
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_reset.h"
-#define ACTOR_OFFSET(member) ((u32) & ((struct SceneActorRegistryResetView *)0)->member)
+#define ACTOR_OFFSET(member) ((u32) & ((struct ChaseActor *)0)->member)
 /* Offset temporaries preserve pointer lifetimes required by the original allocator. */
 void SceneActorControl_OnIdle(u8 *);
 void SceneActorPalette_ClearCompletedTransitions(void);
@@ -10,7 +10,7 @@ void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void *ActorAttachment_ReleaseResource(void *, u32, u32);
 void *ActorAttachment_ReleasePartsResource(void *, u32, u32);
 extern const u8 gUnk_0824E0D8[];
-static inline u8 SceneActorRegistry_HasNoObject(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorRegistry_HasNoObject(struct ChaseActor *actor)
 {
     if (!actor->base.object)
         return 1;
@@ -18,7 +18,7 @@ static inline u8 SceneActorRegistry_HasNoObject(struct SceneActorRegistryResetVi
 }
 void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *argument)
 {
-    struct SceneActorRegistryResetView *actor = (void *)argument;
+    struct ChaseActor *actor = (void *)argument;
     u32 *flags;
     u32 noObject;
     SceneActorRegistry_ResetRouteAndColliders((void *)actor);

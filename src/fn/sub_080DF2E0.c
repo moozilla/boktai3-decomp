@@ -14,9 +14,9 @@ static inline u8 BoolOf(u32 v)
         return 1;
     return 0;
 }
-s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
+s32 Dog_ResolvePendingObject(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     struct SceneActorTargetLink *state;
     if (*pendingId > 0) {

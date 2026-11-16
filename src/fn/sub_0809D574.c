@@ -56,7 +56,7 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = out->y + from->y;
     out->z = from->z + out->z;
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
     a->base.field2B2 = 1;
@@ -72,7 +72,7 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 
     }
     a->base.word104 = zero;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -97,8 +97,7 @@ void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
@@ -112,7 +111,7 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     }
     return 0;
 }
-static inline void Scale(struct SceneActorRegistryResetView *actor)
+static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
@@ -155,7 +154,7 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
 }
 // confidence=low: follows the current route segment and renews its endpoint at the player.
 void Lun_SetMovementEndpoints(void *, void *);
-void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
+void Lun_RenewPlayerRoute(struct ChaseActor *actor)
 {
     u8 *body = actor->base.context;
     s32 speed;

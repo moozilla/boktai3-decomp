@@ -1,10 +1,10 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
-static inline void Turn_SetFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void Turn_SetFlags(struct ChaseActor *actor, u16 mask)
 {
     actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
-static inline void Turn_ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase)
+static inline void Turn_ResetState(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -12,8 +12,7 @@ static inline void Turn_ResetState(struct SceneActorRegistryResetView *actor, u3
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void Turn_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                   void *control)
+static inline void Turn_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     u32 *flags;
     u32 mask;
@@ -27,7 +26,7 @@ static inline void Turn_SetControl(struct SceneActorRegistryResetView *actor, u3
     *flags &= mask;
     actor->base.word104 = 0;
 }
-void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {

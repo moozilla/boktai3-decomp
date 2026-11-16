@@ -10,9 +10,8 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
     }
     return 0;
 }
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                                u32 zero)
+u8 sub_0812F3CC(struct ChaseActor *);
+static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     {
         u8 *field = &actor->base.field2B2;
@@ -29,8 +28,7 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
     }
     actor->base.word104 = zero;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 zero;
     {
@@ -49,7 +47,7 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     }
     actor->base.word104 = zero;
 }
-void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
 {
     u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;

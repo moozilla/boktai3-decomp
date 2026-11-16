@@ -10,7 +10,7 @@ static inline u8 Test(u32 value)
         return 1;
     return 0;
 }
-static inline u32 Flag2C0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2C0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.flags2C0 & mask;
@@ -20,7 +20,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 zero)
+static inline void SetControl(struct ChaseActor *actor, u32 zero)
 {
     void *callback = SceneActorReaction_UpdateTimedBurst;
     u32 kind = 29;
@@ -42,7 +42,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 zer
     }
     actor->base.word104 = zero;
 }
-u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *actor)
+u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
 {
     u32 mask = 0x8000000;
     u32 *flags2D0 = &actor->base.flags2D0;

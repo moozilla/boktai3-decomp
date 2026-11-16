@@ -1,5 +1,5 @@
 #include "scene_actor_control_motion.h"
-void SceneActorControl_TickSway(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_TickSway(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     if (state->sway > 320) {

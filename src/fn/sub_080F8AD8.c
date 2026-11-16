@@ -6,7 +6,7 @@ struct AxeFadeSprite {
     u8 pad4[2];
     u8 field6;
 };
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeEntry(struct ChaseActor *actor)
 {
     if (actor->base.field2B2) {
         actor->base.field2B2 = 0;
@@ -15,7 +15,7 @@ static inline u8 TakeEntry(struct SceneActorRegistryResetView *actor)
     return 0;
 }
 
-void Axe_UpdateFadeOut(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame)
 {
     u8 entered = TakeEntry(actor);
     struct AxeFadeSprite *sprite = actor->base.drawable;

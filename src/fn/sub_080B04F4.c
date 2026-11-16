@@ -2,9 +2,9 @@
 /* SceneActorControl_UpdateProbeApproach_080B04F4: SceneActorControl_UpdateProbeApproach (SceneActorControl_UpdateProbeApproach) with control SceneActorPhase_SelectLinkedAnimation and halfword flags at +0x6D4 (provisional name) */
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -14,7 +14,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
     actor->base.field2B0 = 0;
@@ -28,8 +28,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
     }
     actor->base.word104 = 0;
 }
-static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                              u32 behavior)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -41,7 +40,7 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
         *((u8 *)actor + offset) = 1;
     }
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct ChaseActor *actor)
 {
     u32 behavior = 22;
     actor->base.state2A8 = 0;
@@ -50,7 +49,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-void SceneActorControl_UpdateProbeApproach_080B04F4(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     u8 *control = (u8 *)SceneActorControl_GetState(actor);

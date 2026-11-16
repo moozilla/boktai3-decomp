@@ -5,9 +5,9 @@
 #include "scene_actor_chase_shared.h"
 #include "engine.h"
 #include "ram.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -15,7 +15,7 @@ u32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetState(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct ChaseActor *actor)
 {
     u32 behavior = 6;
     actor->base.state2A8 = 0;
@@ -24,8 +24,7 @@ static inline void SetState(struct SceneActorRegistryResetView *actor)
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor,
-                                       struct SceneActorChaseGroup *nav)
+static inline void BeginRouteSelection(struct ChaseActor *actor, struct SceneActorChaseGroup *nav)
 {
     void *control;
     u32 kind;
@@ -57,7 +56,7 @@ static inline u8 InLinkMode(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
     s32 speed;

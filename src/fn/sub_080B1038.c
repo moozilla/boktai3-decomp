@@ -6,7 +6,7 @@ struct SceneActorForwardCollider {
     u8 unknown0[0x628];
     struct ContactCollider collider;
 };
-static inline u8 unavailable(struct SceneActorRegistryResetView *p)
+static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
@@ -28,7 +28,7 @@ static inline s32 scaled(s32 x)
         return x >> 12;
     return -(-x >> 12);
 }
-void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *p)
+void SceneActor_UpdateForwardCollider(struct ChaseActor *p)
 {
     struct SceneActorForwardCollider *context = p->base.context;
     union SceneActorRegistryPackedPosition pos;

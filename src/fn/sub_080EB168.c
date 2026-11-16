@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 void SceneActor_BeginReactionAnimation(void);
-s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u32 k)
+s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
+static inline void SetControl(struct ChaseActor *a, void *cb, u32 k)
 {
     a->base.field2B2 = 1;
     a->base.field2B0 = 0;
@@ -16,7 +16,7 @@ static inline void SetControl(struct SceneActorRegistryResetView *a, void *cb, u
     }
     a->base.word104 = 0;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
@@ -31,7 +31,7 @@ static inline void Or(u16 m, u16 *f)
 // confidence=low: hides the actor and waits for an adjacent target; one starts the reaction
 // animation, otherwise after 60 frames it moves on to phase 2, behavior 5.
 #define SceneActorReaction_WaitHiddenForAdjacentTarget sub_080EB168
-void SceneActorReaction_WaitHiddenForAdjacentTarget(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
 {
     if (SceneActorControl_TakeFlag(&a->base.field2B1)) {
         u32 flag;

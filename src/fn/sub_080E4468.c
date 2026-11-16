@@ -4,7 +4,7 @@
 #include "scene_actor_chase.h"
 
 void Dog_UpdateAnimationFourteenReaction(void);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 struct DogAnim {
@@ -15,7 +15,7 @@ struct DogAnim {
     u16 timer;
 };
 
-static inline u16 LoadMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 LoadMotionFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = actor->base.flags2D4;
     return value & mask;
@@ -28,7 +28,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
+void Dog_ChasePlayer(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     u8 *group = (u8 *)&actor->group.common;
