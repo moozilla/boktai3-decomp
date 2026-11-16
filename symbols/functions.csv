@@ -3872,8 +3872,10 @@ addr,name,mode,confidence,source,notes
 080E98B0,Octopus_OnAttackContact,thumb,low,src-alias,Attack collider callback with an empty implementation
 080E98B4,Ivy_UpdateActiveState_080E98B4,thumb,low,src-alias,
 080E990C,SceneActor_BeginReactionAnimation,thumb,low,src-alias,
+080E99F4,Octopus_UpdateIdleState,thumb,low,src-alias,
 080E99F8,Ivy_ApplyHeldTargetDamage,thumb,low,src-alias,
 080E9B8C,SceneActor_EndReactionAnimation,thumb,low,src-alias,
+080E9C20,Octopus_UpdateCaptureAttack,thumb,low,src-alias,
 080E9F88,SceneActorReaction_PlayEntry17,thumb,low,src-alias,
 080EA064,Octopus_UpdateHold,thumb,low,src-alias,
 080EA410,Octopus_ThrowCapturedTarget,thumb,low,src-alias,
@@ -3883,15 +3885,18 @@ addr,name,mode,confidence,source,notes
 080EADD0,Octopus_UpdateDefeat,thumb,low,src-alias,
 080EB13C,Octopus_SetAnimationRefreshFlag,thumb,low,src-alias,Sets bit 4 in the animation component flags before behavior dispatch
 080EB150,Octopus_UpdateBodyColliderPosition,thumb,low,src-alias,Positions the body collider from the actor position
+080EB168,SceneActorReaction_WaitHiddenForAdjacentTarget,thumb,low,src-alias,
 080EB298,SceneActorReaction_ReacquireAdjacentTarget,thumb,low,src-alias,
 080EB450,SceneActorReaction_AwaitTargetControl,thumb,low,src-alias,
 080EB58C,SceneActorReaction_WaitForAdjacentTarget,thumb,low,src-alias,
 080EB6E4,SceneActorReaction_RestoreAfterControl,thumb,low,src-alias,
 080EB800,Octopus_StartHoldControl,thumb,low,src-alias,
 080EB8B4,Octopus_ClearStateChangedFlag,thumb,low,src-alias,Clears the state change byte at offset 0x2B1 when set
+080EB8CC,Octopus_WaitThenResetPhase,thumb,low,src-alias,
 080EB920,Octopus_EnterThrowPhase,thumb,low,src-alias,
 080EB9C4,Octopus_EnterReleasePhase,thumb,low,src-alias,
 080EBA6C,Octopus_ClearAnimationRestartFlag,thumb,low,src-alias,Clears the pending animation restart byte at offset 0x2B1
+080EBA84,Octopus_WaitLimitThenResetPhase,thumb,low,src-alias,
 080EBAE4,SceneActorReaction_ReturnToIdle,thumb,low,src-alias,
 080EBB84,SceneActorReaction_BeginHiddenCollisionless,thumb,low,src-alias,
 080EBC08,Octopus_InitControlPresets,thumb,low,src-alias,Installs three control preset pointers during Octopus initialization
@@ -3899,6 +3904,7 @@ addr,name,mode,confidence,source,notes
 080EBCF0,Octopus_InitProfileId,thumb,low,src-alias,Finds or adds the default actor profile and stores its identifier
 080EBD0C,SceneActorControl_UpdateMotionPhase_080EBD0C,thumb,low,src-alias,
 080EBE5C,SceneActorCollision_InitCompactBody,thumb,low,src-alias,
+080EBEE0,Octopus_BeginReturnToRoutePoint,thumb,low,src-alias,
 080EBF8C,Octopus_BeginIdleAnimation,thumb,low,src-alias,
 080EC024,SceneActorTarget_FindNearbyPlayer,thumb,low,src-alias,
 080EC0E8,SceneActorReaction_FindAdjacentTarget,thumb,low,src-alias,

@@ -192,7 +192,7 @@ Golem,080C47B8,080D0C30,,,auto: 50 of 63 functions named Golem_*
 Mummy,080D0C30,080DDD28,,,auto: 50 of 71 functions named Mummy_*
 Dog,080DDD28,080E6E08,,,auto: 50 of 73 functions named Dog_*
 Mimic,080E6E08,080E98A4,,,auto: 24 of 36 functions named Mimic_*
-Octopus,080E98A4,080ED328,,,auto: 24 of 46 functions named Octopus_*
+Octopus,080E98A4,080ED328,,,auto: 29 of 46 functions named Octopus_*
 Ivy,080ED328,080F2700,,,auto: 29 of 61 functions named Ivy_*
 Phase object,080F2700,080F33BC,,,auto: 7 of 15 functions named PhaseObject_*; also ColorPulse_*
 Child group,080F33BC,080F421C,,,auto: 14 of 17 functions named ChildGroup_*
