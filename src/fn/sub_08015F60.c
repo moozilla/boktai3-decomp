@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine_globals.h"
 #include "ram.h"
@@ -57,6 +56,7 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
     s32 i, j;
     u32 *rng;
     const u16 *table;
+    const s16 *sine;
     if ((*(struct Manager **)&gFadingParticleManager) == NULL &&
         FadingParticleManager_Create(0, 0) == NULL)
         return -1;
@@ -84,9 +84,9 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
                 anim = &g->particles[0].motion.anim;
                 sprite = &g->particles[0].motion.sprite;
                 p = &g->particles[0];
+                sine = gUnk_086149C4;
                 do {
                     s32 a;
-                    register const s16 *sine asm("r2");
                     p->active = 1;
                     if (lifeRange == 0)
                         p->lifetime = life;
