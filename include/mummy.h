@@ -10,6 +10,10 @@ struct Mummy {
     u16 flags6D4;
     u8 unknown6D6[0x12];
     u16 field6E8;
+    u8 unknown6EA[8];
+    u16 field6F2;
+    struct ChaseRouteProbe routeProbe;
+    struct ContactPosition destination;
 };
 
 #endif // GUARD_MUMMY_H

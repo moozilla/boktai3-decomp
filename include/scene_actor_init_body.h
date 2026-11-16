@@ -81,12 +81,13 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
+        TargetRegistry_RegisterActor(&group->common.placement, body,
+                                     SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;

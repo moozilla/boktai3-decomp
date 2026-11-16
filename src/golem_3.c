@@ -46,7 +46,7 @@ s32 Golem_TickFacingQuadrant(struct Golem *a)
         u32 quadrant = (base[9] + 0x60) >> 6;
         u32 mask = 3;
         mask &= quadrant;
-        a->unknown68C = mask;
+        a->field68C = mask;
     }
     a->savedDirection690 = a->direction68E;
     return 1;

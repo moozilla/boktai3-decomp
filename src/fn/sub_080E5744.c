@@ -1,4 +1,5 @@
 #include "global.h"
+#include "dog.h"
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
@@ -51,39 +52,14 @@ void Dog_SetSecondaryBehaviorPreset(void *);
 void Dog_OnAuxiliaryUpdate(void);
 void Dog_ReleaseResources(void);
 
-struct DogInitContext {
-    u8 unknown0[0x678];
-    u32 flags;
-    u32 speed;
-    u32 alternateSpeed;
-    u32 rangeSquared;
-    u32 lastCell;
-    u32 currentSpeed;
-    u16 field690;
-    u16 limitX, limitZ;
-    u8 unknown696[6];
-    u16 nearDistance, farDistance;
-    u16 destinationCell;
-    u16 field6A2;
-    u16 field6A4;
-    u8 field6A6, field6A7, field6A8, interval;
-};
-
-struct DogActor {
-    union {
-        struct ChaseActor base;
-        struct DogInitContext context;
-    } state;
-};
-
-static inline struct DogInitContext *DogInit_Context(struct ChaseActor *actor)
+static inline struct Dog *DogInit_Context(struct ChaseActor *actor)
 {
     return actor->base.context;
 }
 
 static inline void DogInit_Reset(void *object)
 {
-    struct DogInitContext *context = object;
+    struct Dog *context = object;
     context->flags = 0;
     context->field6A6 = 0;
 }
@@ -104,14 +80,14 @@ static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 
 s32 Dog_Init(void *object)
 {
-    struct DogActor *dog = object;
-    struct ChaseActor *actor = &dog->state.base;
-    struct SceneActorChaseGroup *group = &dog->state.base.group;
+    struct Dog *dog = object;
+    struct ChaseActor *actor = &dog->chase;
+    struct SceneActorChaseGroup *group = &dog->chase.group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
 
-    DogInit_Reset(&dog->state.context);
+    DogInit_Reset(dog);
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, 0x15);
     SceneActor_RefreshLivingCountAndProfile(actor);
@@ -133,33 +109,33 @@ s32 Dog_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xD635, &tmp);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(&dog->state.base, &zero);
+    MonsterInit_InitializePursuitBody(&dog->chase, &zero);
 
     if (Script_SeekToKeyword('P')) {
-        dog->state.context.nearDistance = (Script_GetPc() ? Script_GetValue() : 200);
-        dog->state.context.farDistance = (Script_GetPc() ? Script_GetValue() : 320);
+        dog->nearDistance = (Script_GetPc() ? Script_GetValue() : 200);
+        dog->farDistance = (Script_GetPc() ? Script_GetValue() : 320);
     }
     if (Script_SeekToKeyword('Y')) {
-        MonsterInit_ReadScriptWord(&dog->state.context.rangeSquared, 0);
-        dog->state.context.rangeSquared *= dog->state.context.rangeSquared;
-        dog->state.context.limitX = (Script_GetPc() ? Script_GetValue() : 640);
-        dog->state.context.limitZ = (Script_GetPc() ? Script_GetValue() : 640);
+        MonsterInit_ReadScriptWord(&dog->rangeSquared, 0);
+        dog->rangeSquared *= dog->rangeSquared;
+        dog->limitX = (Script_GetPc() ? Script_GetValue() : 640);
+        dog->limitZ = (Script_GetPc() ? Script_GetValue() : 640);
     }
-    dog->state.context.interval = Script_GetKeywordValue('d', 50);
-    if (!dog->state.context.interval)
-        dog->state.context.interval = 50;
-    dog->state.context.destinationCell = 0xFFFF;
-    dog->state.context.field6A4 = 0;
+    dog->interval = Script_GetKeywordValue('d', 50);
+    if (!dog->interval)
+        dog->interval = 50;
+    dog->destinationCell = 0xFFFF;
+    dog->field6A4 = 0;
 
     MonsterInit_ReadPalette(actor, 0x273, 0x192);
     SceneActorCollision_InitGateColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
         actor, Dog_Update, sub_080DE6E0, sub_080DFC34, Dog_SelectAnimationOne,
         Dog_SelectAnimationZero, Dog_OnReactionCleanup, sub_080E0750,
-        SceneActorControl_BeginHiddenDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
-        Dog_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
-        SceneActorPlacement_ResetStateThree);
-    MonsterInit_InitializeGroupWithBounds(group, (u8 *)dog + 0x6AC, (u8 *)dog + 0x6D0,
+        SceneActorControl_BeginHiddenDefeat, SceneActorReaction_OnEnemyDefault,
+        SceneActorTarget_UpdateTrackedContact, Dog_ResolvePendingObject,
+        SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
+    MonsterInit_InitializeGroupWithBounds(group, &dog->routeProbe, &dog->destination,
                                           Dog_UpdateDefeatDelay, Dog_ResumeAfterReaction,
                                           SceneActorReaction_BeginTargetRecovery,
                                           Dog_OnSecondaryReactionCleanup, 1, &actor->base.body);
@@ -175,7 +151,7 @@ s32 Dog_Init(void *object)
     DogInit_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
-    MonsterInit_ReadInitialMode(&dog->state.base);
+    MonsterInit_ReadInitialMode(&dog->chase);
     flag = 0;
     if (MonsterInit_TestMotionFlags(actor, 4)) {
         MonsterInit_SetStatusFlags(actor, 0x2000);
@@ -198,7 +174,7 @@ s32 Dog_Init(void *object)
     MonsterInit_ClearReceiver(actor);
 
     {
-        struct DogInitContext *context = DogInit_Context(actor);
+        struct Dog *context = DogInit_Context(actor);
         u32 *speed;
         if (MonsterInit_GetPaletteOffset(actor) == 0 || MonsterInit_GetPaletteOffset(actor) == 2) {
             speed = &context->speed;

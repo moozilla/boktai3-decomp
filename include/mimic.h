@@ -41,12 +41,6 @@ struct MimicReactionFlags {
     s16 bits : 16;
 };
 
-struct MimicNavigationProbe {
-    u16 flags, unknown2, region, polygon;
-    u32 unknown8;
-    struct ContactPosition origin, previous, destination;
-};
-
 /* Deferred-response packet begins at the pursuit group's saved-control slot. */
 
 struct MimicDeferredResponse {
@@ -60,7 +54,7 @@ struct MimicDeferredResponse {
 
 struct Mimic {
     struct ChaseActor chase;
-    struct MimicNavigationProbe routeProbe;
+    struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
     struct ContactPosition origin;
     u16 originCell, timer;
