@@ -124,14 +124,17 @@ def refresh_keyed_names(names):
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from datafmt import load_manifest
     from datafmt.keyed_callbacks import refresh_names
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     for e in load_manifest():
-        if e.format != "keyed_callbacks" or not os.path.exists(e.file):
+        # Resolve the table under ROOT (the tree being promoted), not this checkout.
+        path = os.path.join(ROOT, os.path.relpath(e.file, repo))
+        if e.format != "keyed_callbacks" or not os.path.exists(path):
             continue
-        text = open(e.file, encoding="utf-8").read()
+        text = open(path, encoding="utf-8").read()
         out = refresh_names(text, names)
         if out != text:
-            open(e.file, "w", encoding="utf-8").write(out)
-            print(f"refreshed names in {os.path.relpath(e.file, ROOT)}")
+            open(path, "w", encoding="utf-8").write(out)
+            print(f"refreshed names in {os.path.relpath(path, ROOT)}")
 
 
 if __name__ == "__main__":
