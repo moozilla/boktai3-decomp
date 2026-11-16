@@ -1114,6 +1114,11 @@ Each was read from the compiler source and confirmed on a live draft.
    the chain does nothing, AGBCC_FORCE matches. Storing facing through a block-local pointer
    and flip through a plain field store left four qtys per branch and the function matched with
    no pin. `why` prints the order used and the order by priority for such a block.
+   The same sort works the other way: in a block with two local qtys where the later-born one
+   outranks the first, adding a third (lower-priority) local value makes the first-born allocate
+   first. SceneActorBehavior_AccelerateTowardDescriptor's sine-table pointer took r0 once the
+   table value was multiplied at the call (`Scale(table[i] * speed)`), leaving the load as its own
+   temp; `why` notes the two-qty case too.
 
 39. **Two natural walls against cross-jumping: a return, and a call that falls into a label.**
    jump2 (jump.c) tries each simple jump against the code that falls into its label first

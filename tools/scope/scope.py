@@ -1948,6 +1948,15 @@ def small_sort_note(wd, func, blk):
         p = ln.split()
         if p[0] == "L" and p[1] == func and int(p[2]) == blk:
             qtys.setdefault(int(p[4]), (int(p[3]), int(p[5]), p[11] if len(p) > 11 else "-"))
+    say1 = lambda q: f"{qtys[q][0]}{'' if qtys[q][2] == '-' else ' ' + qtys[q][2]} (priority {qtys[q][1]})"
+    if sorted(qtys) == [0, 1] and qtys[1][1] > qtys[0][1]:
+        # Two qtys sort by priority, so qty 1 goes first. A third local value born after them with a
+        # lower priority than qty 1 (say a loaded value kept in its own temp, not a user variable)
+        # makes the hand sort's swaps cancel and allocates the first-born qty 0 first.
+        return (f"    block {blk} has two local quantities, allocated by priority: {say1(1)} before"
+                f" {say1(0)}. With a third local value born after them and a lower priority than the first"
+                f" (for example a loaded value multiplied at the call, so the load is a temp rather than a"
+                f" user variable), block_alloc's hand sort allocates the first-born {qtys[0][0]} first (fact 38)")
     if len(qtys) != 3 or sorted(qtys) != [0, 1, 2]:
         return None
     used, real = small_sort_order([qtys[q][1] for q in range(3)])
