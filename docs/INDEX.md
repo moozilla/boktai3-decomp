@@ -236,7 +236,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 |  | 9 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 |  | 11 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -605,6 +605,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
 | [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
+| [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 6 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |
 | [notes/w1.md](../notes/w1.md) | w1 notes (range 0803CC90-0806FC64) |  | 2 |
