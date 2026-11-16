@@ -1,3 +1,4 @@
+#include "skeleton.h"
 #include "scene_actor_chase_shared.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
@@ -36,11 +37,6 @@ static inline void Skeleton_SetPolarMotion(struct ContactPosition *v, s32 direct
     v->z = Skeleton_TruncateFixed12(gUnk_086149C4[direction & 255] * radius);
 }
 
-struct SkeletonAttackContext {
-    u8 unknown0[0x678];
-    struct ContactCollider attack;
-};
-
 static inline void Skeleton_AddPosition(struct ContactPosition *position,
                                         const struct ContactPosition *base,
                                         const struct ContactPosition *delta)
@@ -68,7 +64,7 @@ void sub_080BA268(struct ChaseActor *actor)
     struct ContactPosition velocity;
     struct ContactPosition position;
     s32 direction;
-    struct SkeletonAttackContext *context = actor->base.context;
+    struct Skeleton *context = actor->base.context;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x16);
@@ -97,7 +93,8 @@ void sub_080BA268(struct ChaseActor *actor)
             u16 second = actor->base.attacks.second[3];
             u32 flags = actor->base.attacks.flags[3];
             u16 parameter = actor->base.attacks.parameter[3];
-            Collider_SetAttackProperties(&context->attack, first, second, 0, flags, parameter);
+            Collider_SetAttackProperties(&context->attackCollider, first, second, 0, flags,
+                                         parameter);
         }
     }
     if (actor->base.restart)

@@ -1,11 +1,8 @@
 #define gSineTable gUnk_086149C4
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
+#include "skeleton.h"
 #include "scene_actor_reset.h"
-struct SceneActorForwardCollider {
-    u8 unknown0[0x624];
-    struct ContactCollider collider;
-};
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
@@ -27,14 +24,6 @@ static inline s32 scaled(s32 x)
 }
 
 // confidence=low: updates Skeleton body and facing attack bounds while its control is active
-struct SkeletonColliderContext {
-    u8 unknown0[0x624];
-    struct ContactCollider body;
-    u8 unknown678[0x678 - 0x624 - sizeof(struct ContactCollider)];
-    struct ContactCollider attack;
-    u8 unknown6CC[0x6D0 - 0x678 - sizeof(struct ContactCollider)];
-    u8 timer;
-};
 static inline void SetBounds(struct ContactCollider *collider,
                              union SceneActorRegistryPackedPosition *bounds)
 {
@@ -42,7 +31,7 @@ static inline void SetBounds(struct ContactCollider *collider,
 }
 void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
 {
-    struct SkeletonColliderContext *context = p->base.context;
+    struct Skeleton *context = p->base.context;
     union SceneActorRegistryPackedPosition pos, bounds;
     u32 mask;
     if (unavailable(p))
@@ -54,16 +43,16 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
         return;
     if (p->base.field2B5 == 0x3D)
         return;
-    if (context->timer) {
+    if (context->collisionDelay) {
         p->base.colliderA.flags |= 4;
-        context->body.flags |= 4;
-        context->timer--;
+        context->bodyCollider.flags |= 4;
+        context->collisionDelay--;
     } else {
         p->base.colliderA.flags &= ~4;
-        context->body.flags &= ~4;
+        context->bodyCollider.flags &= ~4;
     }
     pos.position = p->base.body.position;
-    Collider_SetPosition(&context->body, &pos, 0);
+    Collider_SetPosition(&context->bodyCollider, &pos, 0);
     pos.packed.x += scaled(gUnk_086149C4[(p->base.body.direction + 64) & 255] * 128);
     pos.packed.z += scaled(gUnk_086149C4[p->base.body.direction] * 128);
     switch (((p->base.body.direction + 16) & 255) >> 6) {
@@ -89,7 +78,7 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
             break;
     }
     bounds.packed.y = 100;
-    SetBounds(&context->attack, &bounds);
-    Collider_SetPosition(&context->attack, &pos, 0);
-    Collider_SetPosition(&context->body, &pos, 0);
+    SetBounds(&context->attackCollider, &bounds);
+    Collider_SetPosition(&context->attackCollider, &pos, 0);
+    Collider_SetPosition(&context->bodyCollider, &pos, 0);
 }
