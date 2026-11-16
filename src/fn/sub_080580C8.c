@@ -4,7 +4,7 @@ void ScenePanel_UpdatePaletteState(struct ScenePanel *input)
     struct ScenePanelEffectsView *panel = (void *)input;
     if (panel->state)
         panel->state(input);
-    ScenePanel_UpdateTimePalette(input);
+    ScenePanel_UpdateTimePalette(panel);
     if (panel->channelsDirty) {
         s32 i;
         for (i = 0; i < 3; i++)

@@ -1,40 +1,27 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_effects.h"
-/* Persistent loop state; empty barriers preserve the reviewed stack layout. */
-struct ScenePanelPaletteScratch {
-    s32 column;
-    const u16 *previous;
-    s32 remaining, nextRow;
-    u32 rowOffset;
-    u16 *paletteBase;
-};
-void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
+
+// Blends the panel palette (16 rows) and the sprite palette from the previous time-of-day
+// palette toward the target one over 64 frames. Each channel is read through the u16 pointer
+// (README fact 37), which keeps the 31 masks spilled as in the ROM. In the sprite loop the target
+// and destination are indexed, so loop.c creates their pointers after the hoisted masks and both
+// outrank them.
+void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *panel)
 {
-    register struct ScenePanelEffectsView *panel asm("r8") = (void *)input;
-    struct ScenePanelPaletteScratch cache;
-    u32 phase;
-    u8 *phaseField;
-    phase = SunClock_GetPhase();
-    phaseField = &panel->timePhase;
-    if (*phaseField != phase) {
-        *phaseField = phase;
-        ScenePanel_SelectTimePalette((struct ScenePanel *)panel, *phaseField);
+    u32 phase = SunClock_GetPhase();
+    if (panel->timePhase != phase) {
+        panel->timePhase = phase;
+        ScenePanel_SelectTimePalette((struct ScenePanel *)panel, panel->timePhase);
     }
     if (panel->paletteBlendActive) {
-        u16 *blendFrame;
-        u32 nextFrame;
         panel->channelsDirty = 1;
-        blendFrame = &panel->paletteBlendFrame;
-        nextFrame = *blendFrame + 1;
-        *blendFrame = nextFrame;
-        if ((u16)nextFrame > 63) {
-            const u16 *source;
-            u32 paletteOffset = panel->targetPalette * 4;
-            const u16 **sources = panel->paletteSources;
+        if (++panel->paletteBlendFrame > 63) {
             u16 *destination;
+            const u16 *source;
+            u32 offset = panel->targetPalette * 4;
+            const u16 **sources = panel->paletteSources;
             s32 i;
-            sources = (void *)((u8 *)sources + paletteOffset);
-            destination = &panel->paletteColors[0][0];
+            sources = (const u16 **)((u8 *)sources + offset);
+            destination = panel->paletteColors[0];
             source = *sources;
             for (i = 15; i >= 0; i--) {
                 CpuSet(source, destination, 0x04000008);
@@ -45,213 +32,94 @@ void ScenePanel_UpdateTimePalette(struct ScenePanel *input)
             {
                 struct ScenePanelMainSprite *sprite = &panel->mainSprite;
                 if (ScenePanel_IsSpriteVisible(sprite)) {
-                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
-                    u16 *framePointer = &panel->mainSprite.paletteFrame;
-                    *framePointer = frame;
+                    sprite->paletteFrame = ScenePanel_AdvancePaletteFrame(sprite);
                     {
-                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
+                        struct ScenePanelGraphics *graphics = &sprite->graphics;
                         u32 bank;
-                        u32 frameValue;
+                        u32 paletteFrame;
                         bank = panel->targetPalette * 4;
-                        frameValue = *framePointer;
-                        frameValue += 0x203;
-                        bank += frameValue;
+                        paletteFrame = sprite->paletteFrame;
+                        paletteFrame += 0x203;
+                        bank += paletteFrame;
                         AnimData_SelectPaletteBank(graphics, bank);
                     }
                 }
             }
         } else {
-            s32 newWeight;
-            s32 oldWeight;
-            register const u16 *previous asm("r12");
-            const u16 *target;
-            u32 paletteOffset;
-            const u16 **sources;
-            register s32 row asm("r0");
-            {
-                s32 sample = *blendFrame;
-                s32 inverse = 64 - sample;
-                oldWeight = inverse;
-                newWeight = sample;
-            }
-            paletteOffset = panel->previousPalette * 4;
-            sources = panel->paletteSources;
-            previous = *(const u16 **)((u8 *)sources + paletteOffset);
-            paletteOffset = panel->targetPalette * 4;
-            sources = (void *)((u8 *)sources + paletteOffset);
-            target = *sources;
-            row = 0;
-            {
-                register u16 *base asm("r5") = &panel->paletteColors[0][0];
-                cache.paletteBase = base;
-            }
-            do {
-                cache.column = 0;
-                {
-                    register u32 rowOffset asm("r2") = row * 32;
-                    cache.rowOffset = rowOffset;
+            s32 fromWeight = 64 - panel->paletteBlendFrame;
+            s32 toWeight = panel->paletteBlendFrame;
+            const u16 *from = panel->paletteSources[panel->previousPalette];
+            const u16 *to = panel->paletteSources[panel->targetPalette];
+            s32 row, column;
+            for (row = 0; row <= 15; row++) {
+                for (column = 0; column <= 15; column++) {
+                    s32 redFrom = *from & 31;
+                    s32 greenFrom = (*from >> 5) & 31;
+                    s32 blueFrom = (*from >> 10) & 31;
+                    s32 redTo = *to & 31;
+                    s32 greenTo = (*to >> 5) & 31;
+                    s32 blueTo = (*to >> 10) & 31;
+                    s32 red, green, blue;
+                    red = (fromWeight * redFrom + toWeight * redTo) >> 6;
+                    green = (fromWeight * greenFrom + toWeight * greenTo) >> 6;
+                    blue = (fromWeight * blueFrom + toWeight * blueTo) >> 6;
+                    panel->paletteColors[row][column] = (blue << 10) | (green << 5) | red;
+                    from++;
+                    to++;
                 }
-                cache.nextRow = row + 1;
-                do {
-                    register const u16 *previousView asm("r5") = previous;
-                    u32 startColor = *previousView;
-                    s32 redStart = 31;
-                    s32 greenStart;
-                    s32 redEnd;
-                    u32 endColor;
-                    s32 greenEnd;
-                    register s32 channelMask asm("r5");
-                    register s32 red, green asm("r2"), blue asm("r0");
-                    redStart &= startColor;
-                    startColor <<= 16;
-                    greenStart = startColor >> 21;
-                    redEnd = 31;
-                    greenStart &= redEnd;
-                    startColor >>= 26;
-                    startColor &= redEnd;
-                    endColor = *target;
-                    redEnd &= endColor;
-                    endColor <<= 16;
-                    greenEnd = endColor >> 21;
-                    channelMask = 31;
-                    greenEnd &= channelMask;
-                    endColor >>= 26;
-                    endColor &= channelMask;
-                    red = (oldWeight * redStart + newWeight * redEnd) >> 6;
-                    green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
-                    blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
-
-                    asm("" : "+m"(cache.column), "+m"(cache.rowOffset), "+m"(cache.paletteBase));
-                    {
-                        s32 column = cache.column;
-                        register u32 offset asm("r1") = column * 2;
-                        register u16 *destination asm("r1");
-                        asm("" : : "r"(column));
-                        offset += cache.rowOffset;
-                        destination = (u16 *)((u8 *)cache.paletteBase + offset);
-                        blue <<= 10;
-                        green <<= 5;
-                        blue |= green;
-                        blue |= red;
-                        *destination = blue;
-                    }
-                    {
-                        register u32 step asm("r5") = 2;
-                        asm("" : "+r"(step));
-                        previous = (u16 *)((u8 *)previous + step);
-                    }
-                    target++;
-                    asm("" : "+m"(cache.column));
-                    cache.column++;
-                } while (cache.column <= 15);
-                row = cache.nextRow;
-            } while (row <= 15);
-            {
-                struct ScenePanelMainSprite *sprite = &panel->mainSprite;
-                if (ScenePanel_IsSpriteVisible(sprite)) {
-                    s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
-                    u8 **ram = &gPaletteBankData;
-                    u32 offset;
-                    u8 *ramBase;
-                    register const u16 *target asm("r12");
-                    u16 *destination;
-                    offset = panel->previousPalette * 4;
-                    frame += 0x203;
-                    offset += frame;
-                    offset <<= 5;
-                    ramBase = *ram;
-                    cache.previous = (u16 *)(ramBase + offset);
-                    offset = panel->targetPalette * 4 + frame;
-                    offset <<= 5;
-                    target = (u16 *)(ramBase + offset);
-                    destination = panel->mainSprite.paletteColors;
-                    {
-                        register s32 remaining asm("r5") = 15;
-                        cache.remaining = remaining;
-                    }
-                    do {
-                        register const u16 *previousView asm("r0") = cache.previous;
-                        u32 startColor = *previousView;
-                        s32 redStart = 31;
-                        s32 greenStart;
-                        register s32 startMask asm("r1");
-                        s32 redEnd;
-                        u32 endColor;
-                        s32 greenEnd;
-                        register s32 channelMask asm("r5");
-                        s32 red, green, blue;
-                        redStart &= startColor;
-                        startColor <<= 16;
-                        greenStart = startColor >> 21;
-                        startMask = 31;
-                        greenStart &= startMask;
-                        startColor >>= 26;
-                        startColor &= startMask;
-                        {
-                            register const u16 *targetView asm("r5") = target;
-                            endColor = *targetView;
-                        }
-                        redEnd = 31;
-                        redEnd &= endColor;
-                        endColor <<= 16;
-                        greenEnd = endColor >> 21;
-                        channelMask = 31;
-                        greenEnd &= channelMask;
-                        endColor >>= 26;
-                        endColor &= channelMask;
-                        red = (oldWeight * redStart + newWeight * redEnd) >> 6;
-                        green = (oldWeight * greenStart + newWeight * greenEnd) >> 6;
-                        blue = (oldWeight * (s32)startColor + newWeight * (s32)endColor) >> 6;
-
-                        blue <<= 10;
-                        green <<= 5;
-                        blue |= green;
-                        blue |= red;
-                        *destination = blue;
-                        {
-                            register const u16 *next asm("r5") = cache.previous + 1;
-                            cache.previous = next;
-                        }
-                        {
-                            u32 step = 2;
-                            target = (u16 *)((u8 *)target + step);
-                        }
-                        destination++;
-                        {
-                            register s32 remaining asm("r1") = cache.remaining - 1;
-                            cache.remaining = remaining;
-                            if (remaining < 0)
-                                break;
-                        }
-                    } while (1);
-                    panel->mainSprite.graphics.paletteOverride = panel->mainSprite.paletteColors;
+            }
+            if (ScenePanel_IsSpriteVisible(&panel->mainSprite)) {
+                s32 frame = ScenePanel_AdvancePaletteFrame(&panel->mainSprite);
+                u32 offset;
+                const u16 *previous, *target;
+                u8 **banks = &gPaletteBankData;
+                u8 *bankBase;
+                u16 *destination;
+                s32 i;
+                offset = panel->previousPalette * 4;
+                frame += 0x203;
+                offset += frame;
+                offset <<= 5;
+                bankBase = *banks;
+                previous = (const u16 *)(bankBase + offset);
+                offset = panel->targetPalette * 4;
+                offset += frame;
+                offset <<= 5;
+                target = (const u16 *)(bankBase + offset);
+                destination = panel->mainSprite.paletteColors;
+                for (i = 0; i <= 15; i++) {
+                    u16 *out = &destination[i];
+                    s32 redFrom = *previous & 31;
+                    s32 greenFrom = (*previous >> 5) & 31;
+                    s32 blueFrom = (*previous >> 10) & 31;
+                    s32 redTo = target[i] & 31;
+                    s32 greenTo = (target[i] >> 5) & 31;
+                    s32 blueTo = (target[i] >> 10) & 31;
+                    s32 red, green, blue;
+                    red = (fromWeight * redFrom + toWeight * redTo) >> 6;
+                    green = (fromWeight * greenFrom + toWeight * greenTo) >> 6;
+                    blue = (fromWeight * blueFrom + toWeight * blueTo) >> 6;
+                    *out = (blue << 10) | (green << 5) | red;
+                    previous++;
                 }
+                panel->mainSprite.graphics.paletteOverride = panel->mainSprite.paletteColors;
             }
         }
     } else {
         struct ScenePanelMainSprite *sprite = &panel->mainSprite;
         if (ScenePanel_IsSpriteVisible(sprite)) {
             s32 frame = ScenePanel_AdvancePaletteFrame(sprite);
-            u16 *framePointer = &panel->mainSprite.paletteFrame;
-            {
-                register u32 oldFrame asm("r3") = *framePointer;
-                asm("" : : "r"(oldFrame));
-                if (frame != oldFrame) {
-                    *framePointer = frame;
-                    {
-                        struct ScenePanelGraphics *graphics = &panel->mainSprite.graphics;
-                        u32 bank;
-                        u32 frameValue;
-                        bank = panel->targetPalette * 4;
-                        frameValue = *framePointer;
-                        {
-                            register u32 paletteBase asm("r5") = 0x203;
-                            asm("" : "+r"(paletteBase));
-                            frameValue += paletteBase;
-                        }
-                        bank += frameValue;
-                        AnimData_SelectPaletteBank(graphics, bank);
-                    }
+            if (frame != sprite->paletteFrame) {
+                sprite->paletteFrame = frame;
+                {
+                    struct ScenePanelGraphics *graphics = &sprite->graphics;
+                    u32 bank;
+                    u32 paletteFrame;
+                    bank = panel->targetPalette * 4;
+                    paletteFrame = sprite->paletteFrame;
+                    paletteFrame += 0x203;
+                    bank += paletteFrame;
+                    AnimData_SelectPaletteBank(graphics, bank);
                 }
             }
         }
