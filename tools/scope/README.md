@@ -2092,6 +2092,12 @@ Each was read from the compiler source and confirmed on a live draft.
    `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
    leaves a comparison in the final output. The nonempty do/while/for forms all
    match; placing the timer store and return inside the loop changes the tail.
+   ScenePanelRig_TickRise (08059AC4) uses the same boundary for an if/else: the last
+   arm before the else label, written `do { ...; return; } while (0);`, stops cse
+   following into the else arm, which then reloads the field it stored. Keep earlier
+   arms that exit (`if (c) { call(); return; }`) outside the loop: loop.c's
+   find_and_verify_loops moves a block that a conditional jump skips and that ends in
+   a jump out of the loop to after the loop.
 230. **One local shared across disjoint phases combines their register conflicts.**
    HomingProjectile_UpdateDefaultState (081FF454) had three copies of a facing inline,
    each preserving the second flip-byte address. The first two naturally used r7 because
