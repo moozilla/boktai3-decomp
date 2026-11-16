@@ -1173,7 +1173,6 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
     return 0;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pendingArg)
 {
     int index = indexArg;
@@ -1199,69 +1198,46 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
         target = (struct WirelessGameItem *)((u8 *)owner + offset);
         if (target->count) {
             struct WirelessGameItem *current;
-            register u8 *first asm("r1");
-            u8 *second;
-            register u8 *dest asm("r5");
-            int total;
             extra = (u32) & ((struct WirelessGameItems *)0)->items[8];
             offset = scaled + extra;
             current = (struct WirelessGameItem *)((u8 *)owner + offset);
             if (target->pendingFlag) {
-                first = owner->pending;
-                {
-                    int slot = index;
-                    dest = first + slot;
-                }
-                total = *dest;
+                int total = owner->pending[index];
                 total += target->count;
-                second = first;
                 if (total > 255)
                     total = 255;
-                *dest = total;
-                first = owner->current;
+                owner->pending[index] = total;
             } else {
-                first = owner->current;
-                {
-                    int slot = index;
-                    dest = first + slot;
-                }
-                total = *dest;
+                int total = owner->current[index];
                 total += target->count;
                 if (total > 255)
                     total = 255;
-                *dest = total;
-                second = owner->pending;
+                owner->current[index] = total;
             }
             {
-                int slot = index;
-                register u8 *address asm("r0");
                 int a;
                 int b;
-                register int one asm("r0");
+                int one;
                 int zero;
-                address = first + slot;
-                a = *address;
-                address = second + slot;
-                b = *address;
+                a = owner->current[index];
+                b = owner->pending[index];
                 one = 1;
                 zero = 0;
-                asm("" : "+r"(a), "+r"(b), "+r"(one), "+r"(zero));
                 current->state = one;
                 current->entered = one;
                 current->timer = zero;
                 {
-                    register int value asm("r0") = a + b;
+                    int value = a + b;
                     int clear;
+                    u8 *itemCount;
                     if (value > 10)
                         value = 10;
+                    /* What is left for the queued slot: nothing, as the sum is never negative. */
                     clear = 0;
-                    asm("" : "+r"(clear));
-                    {
-                        u8 *itemCount = &current->count;
-                        *itemCount = value;
-                    }
-                    value = 0;
-                    current->pendingFlag = value;
+                    if (value < 0)
+                        clear = value;
+                    current->count = value;
+                    current->pendingFlag = 0;
                     target->count = clear;
                 }
             }
