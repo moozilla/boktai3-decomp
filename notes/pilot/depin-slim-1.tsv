@@ -29,3 +29,4 @@ address	name	outcome	minutes	note
 08015F60	FadingParticleGroup_Spawn	clean	15	sine pin dropped: 'sine = gUnk_086149C4' set once before the inner loop and again in the body makes it may_not_optimize, so loop.c keeps the per-iteration load (ROM ldr r2 inside the loop) and the angle keeps r3
 0804AF80	TetherActor_UpdateWorldPosition	clean	25	rewritten from ROM: display pointer re-read per store, position+shake operand order, cell stored then re-read, explicit override/raw lookup in the else branch, plain struct copy for targetPosition
 08053AEC	InteractionMarker_InitializeFromScript	clean	5	dropped r4/r5 pins: plain marker->position stores, point = &marker->position after the three reads
+08054028	SavedPositionMarker_InitializeFromScript	clean	10	natural rewrite from InteractionMarker sibling: plain member pointers, per-arm tile locals, boundary local for the clear loop
