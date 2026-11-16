@@ -13,7 +13,7 @@ static inline u8 SceneActorRegistry_HasNoObject(struct ChaseActor *actor)
         return 1;
     return 0;
 }
-void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *argument)
+void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
 {
     struct ChaseActor *actor = (void *)argument;
     u32 *flags;
@@ -23,73 +23,73 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
     SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 16);
     if (SceneActorRegistry_HasNoObject(actor)) {
         s32 health;
-        actor->base.flags2CC = actor->base.saved.behaviorFlags;
-        actor->base.flags2D0 = actor->base.saved.statusFlags;
+        actor->base.behaviorFlags = actor->base.saved.behaviorFlags;
+        actor->base.statusFlags = actor->base.saved.statusFlags;
         actor->base.body.direction = actor->base.saved.direction;
         actor->base.state2A8 = actor->base.saved.state;
         actor->base.phase2A9 = actor->base.saved.phase;
         actor->base.behavior2AA = actor->base.saved.behavior;
         actor->base.target = (void *)actor->base.saved.control;
-        actor->base.field2B5 = actor->base.saved.kind;
-        actor->base.flags2C0 = actor->base.saved.motionFlags;
-        actor->base.field2EA = actor->base.saved.heightOffset;
+        actor->base.controlKind = actor->base.saved.kind;
+        actor->base.placementFlags = actor->base.saved.motionFlags;
+        actor->base.heightOffset = actor->base.saved.heightOffset;
         health = actor->base.defaultHealth;
-        flags = &actor->base.flags2CC;
+        flags = &actor->base.behaviorFlags;
         if (health <= 0)
             health = 0;
         actor->base.health = health;
-        actor->base.flags2D6 = 0;
-        actor->base.flags2D4 = 0;
-        actor->base.field2B0 = 0;
+        actor->base.reactionFlags = 0;
+        actor->base.motionFlags = 0;
+        actor->base.stepDone = 0;
         actor->base.field2B1 = 1;
         actor->base.field2B2 = 1;
         actor->base.restart = 0;
-        actor->base.field304 = 0;
-        actor->base.field2B6 = 0;
+        actor->base.counter304 = 0;
+        actor->base.reactionDirection = 0;
         actor->base.field2C2 = 64;
-        actor->base.field2D8 = 0;
-        actor->base.field2DC = 0;
-        actor->base.field2E0 = 0;
+        actor->base.hitAttributes = 0;
+        actor->base.hitReactionFlags = 0;
+        actor->base.hitOwners = 0;
         actor->base.field2E6 = 0;
         actor->base.field3CC = 0;
         actor->base.tracking.target = 0;
         SceneActorPalette_ClearCompletedTransitions();
     } else {
         s32 health;
-        actor->base.flags2CC = actor->base.saved.behaviorFlags;
-        actor->base.flags2D0 = actor->base.saved.statusFlags;
+        actor->base.behaviorFlags = actor->base.saved.behaviorFlags;
+        actor->base.statusFlags = actor->base.saved.statusFlags;
         actor->base.body.direction = actor->base.saved.direction;
         actor->base.state2A8 = actor->base.saved.state;
         actor->base.phase2A9 = actor->base.saved.phase;
         actor->base.behavior2AA = actor->base.saved.behavior;
         actor->base.target = (void *)actor->base.saved.control;
-        actor->base.field2B5 = actor->base.saved.kind;
-        actor->base.flags2C0 = actor->base.saved.motionFlags;
-        actor->base.field2EA = actor->base.saved.heightOffset;
+        actor->base.controlKind = actor->base.saved.kind;
+        actor->base.placementFlags = actor->base.saved.motionFlags;
+        actor->base.heightOffset = actor->base.saved.heightOffset;
         health = actor->base.defaultHealth;
-        flags = &actor->base.flags2CC;
+        flags = &actor->base.behaviorFlags;
         if (health <= 0)
             health = 0;
         actor->base.health = health;
-        actor->base.flags2D6 = 0;
-        actor->base.flags2D4 = 0;
-        actor->base.field2B0 = 0;
+        actor->base.reactionFlags = 0;
+        actor->base.motionFlags = 0;
+        actor->base.stepDone = 0;
         actor->base.field2B1 = 1;
         actor->base.field2B2 = 1;
         actor->base.restart = 0;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
-        actor->base.fieldAA = 0;
-        actor->base.field304 = 0;
-        actor->base.field2B6 = 0;
+        actor->base.attachmentTimer = 0;
+        actor->base.counter304 = 0;
+        actor->base.reactionDirection = 0;
         actor->base.field2C2 = 64;
-        actor->base.field2D8 = 0;
-        actor->base.field2DC = 0;
-        actor->base.field2E0 = 0;
+        actor->base.hitAttributes = 0;
+        actor->base.hitReactionFlags = 0;
+        actor->base.hitOwners = 0;
         actor->base.field2E6 = 0;
         actor->base.field3CC = 0;
         actor->base.tracking.target = 0;
-        actor->base.field2B8 = 0;
+        actor->base.hitLockTimer = 0;
         actor->group.hitReactionLatch = 0;
         actor->group.field5C6 = 0;
         actor->group.common.control.mode = 0;
@@ -120,7 +120,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
         struct ContactCollider *collider = &actor->base.colliderA;
         collider->flags |= 4;
     }
-    if (actor->base.callback248)
-        Callback_InvokeActor(actor, actor->base.callback248);
+    if (actor->base.routeReset)
+        Callback_InvokeActor(actor, actor->base.routeReset);
     SceneActorPalette_ClearCompletedTransitions();
 }

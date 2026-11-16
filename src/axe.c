@@ -3969,7 +3969,7 @@ void Axe_UpdateScreenShake(struct S080FC3F8 *s);
 
 void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s);
 
-struct SceneActorRegistryActor;
+struct ChaseActor;
 
 u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
 
