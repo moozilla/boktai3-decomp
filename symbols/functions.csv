@@ -3834,6 +3834,7 @@ addr,name,mode,confidence,source,notes
 080E0460,Dog_UpdateDefeatFinish,thumb,low,src-alias,Plays animation 7 and sets timed completion flags before ending the reaction; defeat interpretation is tentative
 080E04D0,Dog_UpdateArrivalAnimation,thumb,low,src-alias,
 080E059C,Dog_ResumeAfterReaction,thumb,low,src-alias,
+080E0750,Dog_UpdateContactRecovery,thumb,low,src-alias,"eases the contact displacement, then resumes pursuit or the home route"
 080E17D8,SceneActorAnimation_EmitDirectionalTrail,thumb,low,src-alias,
 080E18F4,SceneActorAnimation_RefreshTimedAttackCollider,thumb,low,src-alias,
 080E1984,Dog_UpdateLeapWindup,thumb,low,src-alias,
