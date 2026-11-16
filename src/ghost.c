@@ -638,16 +638,16 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
-    script = ((struct RoomActor *)actor)->script1F8;
+    script = actor->base.script1F8;
     if (script) {
         s32 values[8];
         struct ScriptUtilityArguments arguments;
         Ghost_SetScriptValue(actor->base.body.position.x, &values[0]);
         Ghost_SetScriptValue(actor->base.body.position.y, &values[1]);
         Ghost_SetScriptValue(actor->base.body.position.z, &values[2]);
-        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[0], &values[3]);
-        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[1], &values[4]);
-        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[2], &values[5]);
+        Ghost_SetScriptValue(actor->base.parameters1FC[0], &values[3]);
+        Ghost_SetScriptValue(actor->base.parameters1FC[1], &values[4]);
+        Ghost_SetScriptValue(actor->base.parameters1FC[2], &values[5]);
         Ghost_SetScriptValue(actor->base.field2E0, &values[6]);
         Ghost_SetScriptValue(actor->base.body.id, &values[7]);
         arguments.count = 8;

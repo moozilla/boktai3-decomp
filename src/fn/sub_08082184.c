@@ -125,7 +125,7 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
     struct RouteResponseGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.body.direction = (((actor->base.reactionDirection + 3) & 7) << 5) - 64;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         actor->base.restart = 0;
     }
     if (frame > 60 && actor->base.restart) {

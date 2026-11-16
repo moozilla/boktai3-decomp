@@ -14,11 +14,11 @@ static inline u8 TakeFlag(u8 *flag)
 void SceneActorAnimation_UpdateDirectionalEntry(u8 *p, s32 arg1)
 {
     if (TakeFlag(p + 0x2B2)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0);
+        SceneActorAnimation_SelectDirectionalEntry(p, 0);
         *(u8 *)(p + 0x2B3) = 0;
     }
     if (arg1 > 0x10 && *(u8 *)(p + 0x2B3) && *(u8 *)(p + 0x2B0) != 1) {
         *(u8 *)(p + 0x2B0) = 1;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0);
+        SceneActorAnimation_SelectDirectionalEntry(p, 0);
     }
 }

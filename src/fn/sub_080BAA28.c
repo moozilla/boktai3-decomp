@@ -8,7 +8,7 @@ void SceneActorReaction_TickMultiHitAnimation(struct ChaseActor *p)
     u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
     u32 frame;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x17);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x17);
     frame = animation[10];
     if ((u16)(frame - 3) <= 2 || (u16)(frame - 7) <= 2)
         Collider_Refresh(state + 0x678);

@@ -18,7 +18,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
     SceneActorScript_TriggerCallOnCount((struct ChaseActor *)actor);
     if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x2000)) {
         actor->chase.base.body.direction = actor->chase.base.reactionDirection + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->chase.base, 0);
         SceneActorChase_ClearMotionFlags(&actor->chase, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;

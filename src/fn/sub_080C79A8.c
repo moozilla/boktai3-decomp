@@ -31,7 +31,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
     s16 *speed;
 
     if (TakeFlag(&actor->base.field2B2)) {
-        u8 *direction = &((struct RoomActor *)actor)->body.direction;
+        u8 *direction = &actor->base.body.direction;
         u8 saved = *direction;
         u8 directionVariant, mirror;
         u8 *mirrorPointer;
@@ -55,7 +55,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
                 *variantPointer = quadrant;
             }
         }
-        *(&((struct RoomActor *)actor)->body.direction) = saved;
+        *(&actor->base.body.direction) = saved;
         variantReload = &directionVariant;
         {
             u32 mirrorValue = *mirrorPointer;
@@ -70,22 +70,21 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
         } else {
             force = 0;
         }
-        if (!((struct RoomActor *)actor)->drawableKind) {
+        if (!actor->base.drawableKind) {
             struct SceneActorAnimationSequenceDrawable *drawable;
-            ((struct RoomActor *)actor)->animationIndex = selection;
-            drawable = ((struct RoomActor *)actor)->drawable;
+            actor->base.animationIndex = selection;
+            drawable = actor->base.drawable;
             Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                              (u8)variant, (u8)flags);
-            restart = &((struct RoomActor *)actor)->restart;
+            restart = &actor->base.restart;
         } else {
             struct SceneActorAnimationTile *tile =
-                &((struct SceneActorAnimationTileDrawable *)((struct RoomActor *)actor)->drawable)
-                     ->tile;
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u8 *savedSelection;
 
             selection += variant;
-            savedSelection = &((struct RoomActor *)actor)->animationIndex;
-            restart = &((struct RoomActor *)actor)->restart;
+            savedSelection = &actor->base.animationIndex;
+            restart = &actor->base.restart;
             if (!force && *savedSelection == selection && !*restart) {
                 if ((flags == 1) && (tile->flags & 4)) {
                     goto done;
@@ -104,10 +103,8 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
                     mode = 4;
                 }
                 Anim_SetKeyframes(
-                    &((struct SceneActorAnimationTileDrawable *)((struct RoomActor *)actor)
-                          ->drawable)
-                         ->tile,
-                    ((struct RoomActor *)actor)->drawable, (u16)selection, 2, (u16)mode);
+                    &((struct SceneActorAnimationTileDrawable *)(&actor->base)->drawable)->tile,
+                    actor->base.drawable, (u16)selection, 2, (u16)mode);
                 flags &= 1;
                 if (flags) {
                     tile->flags |= mask;
@@ -118,7 +115,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
         }
         *restart = 0;
     done:
-        ((struct RoomActor *)actor)->restart = 0;
+        actor->base.restart = 0;
         body[0x68F] = 0;
     }
     {

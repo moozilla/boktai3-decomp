@@ -419,8 +419,8 @@ s32 SceneActor_UpdateStatus(struct ChaseActor *actor)
 {
     struct ChaseActor *arg0 = (void *)actor;
     if (ActorStatus_StatusFlags(arg0, 0x2000))
-        ((struct ChaseActor *)arg0)->base.field2C2 = 0x15;
-    ActorStatus_TickRouteControl(&((struct ChaseActor *)arg0)->group.common.control);
+        arg0->base.field2C2 = 0x15;
+    ActorStatus_TickRouteControl(&arg0->group.common.control);
     if (!ActorStatus_IsDown(arg0))
         ActorStatus_TickAttachment((void *)actor);
     ActorStatus_CollisionGate(actor);
@@ -434,9 +434,7 @@ s32 SceneActor_UpdateStatus(struct ChaseActor *actor)
         ActorStatus_RecoverAndRelease(actor);
         ActorStatus_FaceTarget((void *)arg0);
     }
-    ActorStatus_StoreByte(&((struct ChaseActor *)arg0)->base.colliderB.direction,
-                          ((struct ChaseActor *)arg0)->base.body.direction);
-    ActorStatus_StoreByte(&((struct ChaseActor *)arg0)->base.colliderA.direction,
-                          ((struct ChaseActor *)arg0)->base.body.direction);
+    ActorStatus_StoreByte(&arg0->base.colliderB.direction, arg0->base.body.direction);
+    ActorStatus_StoreByte(&arg0->base.colliderA.direction, arg0->base.body.direction);
     return 1;
 }

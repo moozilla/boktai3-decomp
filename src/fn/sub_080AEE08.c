@@ -125,7 +125,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     u32 *cursor = &gRandomIndex;
     completedState = 1;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 10);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 10);
         {
             u8 *entry = &actor->base.restart;
             workValue = 0;

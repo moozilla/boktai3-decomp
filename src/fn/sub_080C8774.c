@@ -195,7 +195,7 @@ static inline u8 Golem_Drift(struct ChaseActor *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         u16 *flags;
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         if (actor->base.field2D8 & 0x400)
             Sound_PlaySong(0x18B);
         mask = 0x20;

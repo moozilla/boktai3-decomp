@@ -28,7 +28,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
         actor->base.body.direction = actor->base.reactionDirection + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;

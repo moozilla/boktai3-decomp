@@ -19,7 +19,7 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct ChaseActor *a, u32 fr
     struct SceneActorTimedAttackContext *context = a->base.context;
     if (TakePrepared(a)) {
         u32 variant, palette;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 17);
+        SceneActorAnimation_SelectDirectionalEntry(&a->base, 17);
         palette = a->base.paletteOffset;
         variant = 0;
         if (palette == 1)

@@ -392,14 +392,14 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
     actor->base.field2B0 = 1;
-    script = (u16)((struct RoomActor *)actor)->script1F8;
+    script = (u16)actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
         values[6] = actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -1090,21 +1090,21 @@ void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor)
     {
         u16 mask = 0x100;
         if (mask & actor->base.flags2D4) {
-            struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
-            u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[1];
-            u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[1];
-            u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[1];
-            u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[1];
+            struct ContactCollider *collider = &actor->base.colliderB;
+            u16 field3C = actor->base.attacks.first[1];
+            u16 field40 = actor->base.attacks.second[1];
+            u32 reactionFlags = actor->base.attacks.flags[1];
+            u16 field44 = actor->base.attacks.parameter[1];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
     }
     {
-        struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
-        u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[0];
-        u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[0];
-        u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[0];
-        u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[0];
+        struct ContactCollider *collider = &actor->base.colliderB;
+        u16 field3C = actor->base.attacks.first[0];
+        u16 field40 = actor->base.attacks.second[0];
+        u32 reactionFlags = actor->base.attacks.flags[0];
+        u16 field44 = actor->base.attacks.parameter[0];
         Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
     }
 }

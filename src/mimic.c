@@ -462,14 +462,14 @@ void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
         ((struct ActorSprite *)actor->base.drawable)->flags |= 1;
         ActorShadow_Disable(actor->base.shadow);
         SceneActorBehavior_CallTerrainScript(actor);
-        script = (u16)((struct RoomActor *)actor)->script1F8;
+        script = (u16)actor->base.script1F8;
         if (script) {
             values[0] = actor->base.body.position.x;
             values[1] = actor->base.body.position.y;
             values[2] = actor->base.body.position.z;
-            values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-            values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-            values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+            values[3] = actor->base.parameters1FC[0];
+            values[4] = actor->base.parameters1FC[1];
+            values[5] = actor->base.parameters1FC[2];
             values[6] = actor->base.field2E0;
             values[7] = actor->base.body.id;
             arguments.count = 8;
@@ -1343,10 +1343,10 @@ static inline void MimicInit_InitializeTerrainCell(struct ChaseActor *actor, s32
 
 s32 Mimic_Init(void *object)
 {
-    struct ChaseActor *instance = object;
+    struct Mimic *instance = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &instance->group;
-    struct SceneActorBody *body = &instance->base.body;
+    struct SceneActorChaseGroup *group = &instance->chase.group;
+    struct SceneActorBody *body = &instance->chase.base.body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -1376,9 +1376,9 @@ s32 Mimic_Init(void *object)
         actor->base.animationIndex = 0xFF;
     }
     MimicInit_InitializeBody(instance, &zero);
-    ((struct Mimic *)instance)->healthThreshold = MonsterInit_GetHealth(actor) >> 1;
+    instance->healthThreshold = MonsterInit_GetHealth(actor) >> 1;
     actor->base.body.direction = Script_GetKeywordValue('d', 0);
-    ((struct Mimic *)instance)->leapSpeed = Script_GetKeywordValue('s', 10);
+    instance->leapSpeed = Script_GetKeywordValue('s', 10);
     if (Script_SeekToKeyword('p')) {
         s32 cell;
         actor->base.body.position.x = MonsterInit_ReadHalfword(0);
@@ -1391,8 +1391,8 @@ s32 Mimic_Init(void *object)
         actor->base.body.position.y = actor->base.groundHeight;
         MonsterInit_DrawablePosition(actor);
     }
-    ((struct Mimic *)instance)->origin = actor->base.body.position;
-    ((struct Mimic *)instance)->originCell = actor->base.terrainCell;
+    instance->origin = actor->base.body.position;
+    instance->originCell = actor->base.terrainCell;
     MonsterInit_ReadPalette(actor, 0x304, 0x192);
     MimicInit_SetPaletteBank(actor, 0x306);
     SceneActor_InitializeReactionColliders(actor);
@@ -1402,9 +1402,8 @@ s32 Mimic_Init(void *object)
         SceneActorReaction_OnEnemyDefault, SceneActor_AcquireCollisionTarget,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         Mimic_StartHitReaction);
-    MonsterInit_InitializeGroupWithBounds(group, &((struct Mimic *)instance)->routeProbe,
-                                          &((struct Mimic *)instance)->destination, 0, 0,
-                                          Mimic_OnBehaviorComplete, 0, 1, body);
+    MonsterInit_InitializeGroupWithBounds(group, &instance->routeProbe, &instance->destination, 0,
+                                          0, Mimic_OnBehaviorComplete, 0, 1, body);
     MimicInit_InstallRoutes(actor);
     MonsterInit_SetBehaviorFlags(actor, 0x400200);
     MonsterInit_SetStatusFlags(actor, 8);

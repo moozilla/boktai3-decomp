@@ -69,7 +69,7 @@ void sub_080E0750(struct ChaseActor *actor)
             s32 value = Dog_ReadSecondaryZ(actor);
             actor->base.secondaryMotion.z = Dog_QuarterDisplacement(&value);
         }
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         mask = 0x20;
         flags = &actor->base.flags2D4;
         mask |= *flags;

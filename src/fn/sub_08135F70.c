@@ -396,6 +396,6 @@ done: {
 
     SceneActorReaction_RecordDefeat(actor);
     UpdateHitFlagsShared(actor, flags2D4, flags2CC, savedHealth);
-    SceneActorTerrain_ClearCollisionTimers((struct RoomActor *)actor);
+    SceneActorTerrain_ClearCollisionTimers(&actor->base);
     return 1;
 }

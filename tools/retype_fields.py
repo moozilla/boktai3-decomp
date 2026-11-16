@@ -382,6 +382,49 @@ def upcast(files, member, jobs):
     return done
 
 
+DECAST_FORMS = {
+    # cast target -> member paths that reach it from a pointer of a class type, tried in order
+    "RoomActor": ["", "base.", "chase.base."],
+    "ChaseActor": ["", "chase."],
+}
+
+
+def diagnostics(stderr):
+    return sorted(ln for ln in stderr.splitlines() if re.match(r"[^:\n]+:\d+: ", ln))
+
+
+def decast_unit(src):
+    """Replace `((struct T *)v)->` with `v->PATH` and a `(struct T *)v` argument with
+    `&v->PATH` (or `v`), for T in DECAST_FORMS, where the unit then compiles with exactly
+    the diagnostics it had. Returns the number of casts removed."""
+    path = os.path.join(ROOT, src)
+    with open(path) as f:
+        text = f.read()
+    before_diag = [re.sub(r":\d+:", ":", d) for d in diagnostics(compile_errors(src))]
+    done = 0
+    pairs = sorted(set(re.findall(r"\(\(struct (\w+) \*\)(\w+)\)->", text)) |
+                   set(re.findall(r"\(struct (\w+) \*\)(\w+)(?=[,)])", text)))
+    for tag, var in pairs:
+        if tag not in DECAST_FORMS:
+            continue
+        for form in DECAST_FORMS[tag]:
+            new = re.sub(r"\(\(struct " + tag + r" \*\)" + var + r"\)->", var + "->" + form, text)
+            arg = var if not form else f"&{var}->{form[:-1]}"
+            new = re.sub(r"(?<![\w)])\(struct " + tag + r" \*\)" + var + r"(?=[,)])", arg, new)
+            if new == text:
+                break
+            with open(path, "w") as f:
+                f.write(new)
+            after = [re.sub(r":\d+:", ":", d) for d in diagnostics(compile_errors(src))]
+            if after == before_diag:
+                done += text.count(f"(struct {tag} *){var}")
+                text = new
+                break
+            with open(path, "w") as f:
+                f.write(text)
+    return done
+
+
 def read_steps(path):
     """[(kind, args, pairs)] from a steps file: blocks headed `[embed TYPE MEMBER]`,
     `[map]`, `[types]` (old and new struct tags) or `[text]` (literal old and new text),
@@ -443,6 +486,8 @@ def main():
     ap.add_argument("--steps", help="replay a steps file (see read_steps), e.g. tools/retype/room_actor.txt")
     ap.add_argument("--upcast", metavar="MEMBER",
                     help="pass `&arg->MEMBER` where a pointer argument draws an incompatible-pointer warning")
+    ap.add_argument("--decast", action="store_true",
+                    help="remove casts to RoomActor/ChaseActor that a member path can replace")
     ap.add_argument("--dependents", nargs="+", metavar="HEADER", help="units that include these headers")
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--dry-run", action="store_true", help="report the first round's rewrites, change nothing")
@@ -454,6 +499,10 @@ def main():
     files = sorted(set(files))
     if not files:
         sys.exit("no files")
+    if a.decast:
+        with concurrent.futures.ThreadPoolExecutor(a.j) as ex:
+            print(f"{sum(ex.map(decast_unit, files))} casts removed")
+        return
     if a.upcast:
         print(f"{upcast(files, a.upcast, a.j)} arguments now pass &arg->{a.upcast}")
         return

@@ -31,7 +31,7 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
         SetColliderFlag(&p->base.colliderA);
         ((struct ContactCollider *)((u8 *)state + 0x624))->flags |= mask;
         ((struct ContactCollider *)((u8 *)state + 0x678))->flags |= mask;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x11);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x11);
         ActorShadow_Disable((u8 *)p + 0x320);
     } else {
         if (Mod(elapsed, 10) == 0 && SceneActorReaction_TrySink(p))

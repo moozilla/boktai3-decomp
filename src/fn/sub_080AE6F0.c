@@ -41,7 +41,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
     u16 *contextFlags;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.body.direction = (((actor->base.body.direction + 128) & 255) >> 6) << 6;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     }
     status = &actor->base.flags2D0;
     {
@@ -52,7 +52,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
         *status = value;
     }
     Vorn_SendMessage(actor);
-    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
     motion = (struct SceneActorChaseFlags16 *)&actor->base.flags2D4;
     SceneActorChase_ClearFlagComponent(motion, 0x38);
     Vorn_StartRoute(actor, group);

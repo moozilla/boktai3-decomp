@@ -8,7 +8,7 @@ void SceneActor_SetContactReactionDirection(struct RoomActor *,
 void PlayerStats_AddContactHundredths(struct SceneActorBehaviorContactView *, void *, u32);
 static inline u32 Unavailable(struct RoomActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
+    return SceneActorPlacement_IsUnavailable(actor);
 }
 static inline u8 Test(u32 value, u32 mask)
 {

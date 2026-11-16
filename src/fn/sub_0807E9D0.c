@@ -162,7 +162,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     if (unavailable)
         return;
     primary = &actor->base.colliderA;
-    if (((struct ChaseActor *)actor)->base.colliderA.responseValue) {
+    if (actor->base.colliderA.responseValue) {
         if (actor->base.field2E6) {
             destination->remaining = unavailable;
             destination->mode = 0;
@@ -189,7 +189,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             if (actor->group.countdown5C8)
                 return;
             actor->group.countdown5C8 = 0x3C;
-            attack = SceneActorPlacement_ReadFlags32((struct RoomActor *)actor, 0x8000000);
+            attack = SceneActorPlacement_ReadFlags32(&actor->base, 0x8000000);
             if (attack) {
                 u32 mask = 0x100;
                 if ((destination->flags & mask) && (sourceFlags & mask)) {
