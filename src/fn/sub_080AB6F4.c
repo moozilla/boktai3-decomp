@@ -2,7 +2,7 @@
 #include "global.h"
 #include "scene_actor_collision.h"
 
-void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {

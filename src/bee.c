@@ -1067,7 +1067,7 @@ void *Bee_SubVector(void *unused, struct BeeDisplacement *a, struct BeeDisplacem
     return unused;
 }
 
-void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 
 static inline u32 Bee_AttackActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
