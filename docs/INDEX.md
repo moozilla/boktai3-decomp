@@ -135,7 +135,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
 | [docs/MUMMY_DISPLACEMENT_RECOVERY.md](../docs/MUMMY_DISPLACEMENT_RECOVERY.md) | Mummy displacement recovery: 080D2584 | #matching #mummy #scene-actor #regalloc #080D2584 | 3 |
 | [docs/MUMMY_MOVEMENT_RESPONSE.md](../docs/MUMMY_MOVEMENT_RESPONSE.md) | Mummy movement response: 080DA97C | #matching #mummy #scene-actor #regalloc #080DA97C | 3 |
-| [docs/OBJECT_MODEL.md](../docs/OBJECT_MODEL.md) | The object model: how the game builds its things | #engine #structs #cleanup #actors | 13 |
+| [docs/OBJECT_MODEL.md](../docs/OBJECT_MODEL.md) | The object model: how the game builds its things | #engine #structs #cleanup #actors | 15 |
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
