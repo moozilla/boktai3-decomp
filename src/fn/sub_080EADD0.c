@@ -45,46 +45,45 @@ static inline void Octopus_MessageValue(void *object, u16 value)
     message->value = value;
 }
 
-static inline void Octopus_EnableDefeatMotion(struct SceneActorRegistryResetView *actor, u16 bit,
-                                              u16 **component)
+static inline void Octopus_EnableDefeatMotion(struct ChaseActor *actor, u16 bit, u16 **component)
 {
-    u16 *field = &actor->flags2D4;
+    u16 *field = &actor->base.flags2D4;
     *component = field;
     *field = bit | *field;
 }
 
-void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
-    u8 *context = actor->context;
-    u8 *drawable = actor->drawable;
+    u8 *context = actor->base.context;
+    u8 *drawable = actor->base.drawable;
     s32 values[8];
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 3);
         {
-            struct ContactCollider *collider = &actor->colliderA;
+            struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags |= 4;
             collider->flags &= 0xFFF7;
         }
         {
             u32 bit = 0x800;
-            actor->flags2C0 = bit | actor->flags2C0;
+            actor->base.flags2C0 = bit | actor->base.flags2C0;
         }
         {
             u16 bit = 0x40;
-            actor->flags2D4 &= ~bit;
+            actor->base.flags2D4 &= ~bit;
         }
         {
             u8 k1 = 1;
-            actor->health = k1;
+            actor->base.health = k1;
         }
-        actor->field2EA = 0;
+        actor->base.field2EA = 0;
         Memory_Clear(context + 0x624, 8);
         {
             s32 abs;
-            actor->secondaryMotion.y = Octopus_RandomSpeed();
+            actor->base.secondaryMotion.y = Octopus_RandomSpeed();
             *((s16 *)(((u8 *)context) + 0x62A)) =
                 Octopus_SpinSpeed(Octopus_RandomSample(gRandomTable));
-            actor->field2E8 = 0;
+            actor->base.field2E8 = 0;
             abs = *((s16 *)(((u8 *)context) + 0x62A));
             if (abs < 0)
                 abs = -abs;
@@ -93,10 +92,10 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         {
             u32 bit = 2;
-            if (actor->drawableKind == 0)
-                *((u32 *)actor->drawable) |= bit;
+            if (actor->base.drawableKind == 0)
+                *((u32 *)actor->base.drawable) |= bit;
             else {
-                u8 *p = ((u8 *)actor->drawable) + 0x20;
+                u8 *p = ((u8 *)actor->base.drawable) + 0x20;
                 *((u32 *)(p + 8)) |= bit;
             }
         }
@@ -110,28 +109,28 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     {
         u8 k2 = 0x10;
-        if (actor->flags2D0 & k2) {
+        if (actor->base.flags2D0 & k2) {
             u16 *flags;
             struct ContactPosition *pos;
             Octopus_EnableDefeatMotion(actor, 0x40, &flags);
-            actor->health = 0;
-            pos = &actor->body.position;
+            actor->base.health = 0;
+            pos = &actor->base.body.position;
             SpriteParticle_SpawnBatch(pos, 1, 2, 0, 0x154);
             Sound_PlaySong(0x1D8);
             {
                 u8 *d;
                 u32 bit = 1;
-                if (actor->drawableKind == 0) {
-                    u32 *sequence = actor->drawable;
+                if (actor->base.drawableKind == 0) {
+                    u32 *sequence = actor->base.drawable;
                     *sequence |= bit;
                     d = (void *)sequence;
                 } else {
                     u8 *p;
-                    d = actor->drawable;
+                    d = actor->base.drawable;
                     p = d + 0x20;
                     *((u32 *)(p + 8)) |= bit;
                 }
-                if (actor->drawableKind == 0) {
+                if (actor->base.drawableKind == 0) {
                     u32 mask = ~2;
                     *((u32 *)d) &= mask;
                 } else {
@@ -147,25 +146,25 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                 if (script) {
                     struct ScriptUtilityArguments arguments;
                     values[0] = pos->x;
-                    values[1] = actor->body.position.y;
-                    values[2] = actor->body.position.z;
+                    values[1] = actor->base.body.position.y;
+                    values[2] = actor->base.body.position.z;
                     values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
                     values[4] = *((u32 *)(((u8 *)actor) + 0x200));
                     values[5] = *((u32 *)(((u8 *)actor) + 0x204));
-                    values[6] = actor->field2E0;
-                    values[7] = actor->body.id;
+                    values[6] = actor->base.field2E0;
+                    values[7] = actor->base.body.id;
                     arguments.count = 8;
                     arguments.values = values;
                     Script_Call(script, &arguments);
                 }
             }
-            if ((!Octopus_MotionBits(0x4000, flags)) && (((u32)(actor->category - 11)) > 2))
+            if ((!Octopus_MotionBits(0x4000, flags)) && (((u32)(actor->base.category - 11)) > 2))
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             SceneActorChase_SetTypedControl(actor, (void *)SceneActorControl_OnIdle, 0x10);
             SceneActorChase_SetTypedState(actor, 1, 0, 2);
             {
-                u8 *linked = actor->context;
+                u8 *linked = actor->base.context;
                 struct OctopusDefeatMessage *message = (void *)values;
                 u32 id;
                 message->kind = 8;
@@ -175,6 +174,6 @@ void Octopus_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
                     SceneActorRegistry_SendToActorId(15, values, id);
             }
         } else if (Mod(frame, 4) == 0)
-            actor->secondaryMotion.y -= 8;
+            actor->base.secondaryMotion.y -= 8;
     }
 }

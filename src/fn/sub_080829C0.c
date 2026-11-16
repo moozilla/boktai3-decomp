@@ -6,7 +6,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
 
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
-                                              struct SceneActorRegistryResetView *actor)
+                                              struct ChaseActor *actor)
 {
     s32 power;
     u32 sample;

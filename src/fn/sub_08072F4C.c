@@ -11,8 +11,7 @@ u8 SceneActorContacts_TestPlayerCondition(struct SceneActorContactSample *, u32,
 u32 SceneActorTerrain_IsFacingPosition(struct SceneActorTerrainView *,
                                        const struct ContactPosition *);
 u32 TetherActor_CopySampledPosition(struct ContactPosition *);
-s32 sub_08076CDC(struct SceneActorRegistryResetView *, struct ContactPosition *,
-                 struct ContactPosition *);
+s32 sub_08076CDC(struct ChaseActor *, struct ContactPosition *, struct ContactPosition *);
 s32 sub_0821D4F0(struct ContactPosition *, struct ContactPosition *, s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void *memcpy(void *, const void *, unsigned long);
@@ -53,9 +52,9 @@ static inline s32 Absolute(s32 angle)
 {
     return angle < 0 ? -angle : angle;
 }
-static inline struct SceneActorChaseTracking *TrackingOf(struct SceneActorRegistryResetView *self)
+static inline struct SceneActorChaseTracking *TrackingOf(struct ChaseActor *self)
 {
-    return &self->tracking;
+    return &self->base.tracking;
 }
 static inline s32 AngleSeparation(s32 angle)
 {
@@ -73,14 +72,14 @@ static inline s32 PlayerSlot(struct SceneActorContactSample *p)
     return -1;
 }
 
-static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
-                                struct SceneActorContactSample *sample, u32 kind, s32 *bestDistance)
+static inline u8 EvaluateSample(struct ChaseActor *base, struct SceneActorContactSample *sample,
+                                u32 kind, s32 *bestDistance)
 {
-    struct SceneActorRegistryResetView *self = base;
+    struct ChaseActor *self = base;
     struct SceneActorChaseGroup *group = &base->group;
     struct ContactPosition difference;
     struct ContactPosition *delta = &difference;
-    struct ContactPosition *own = &base->body.position;
+    struct ContactPosition *own = &base->base.body.position;
     struct ContactPosition *position = &sample->position;
     s32 dist, angle, limit, threshold, transition, cell;
     u32 facing;
@@ -91,19 +90,20 @@ static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
 
     if ((u8)SceneActorTerrain_IsFacingPosition((void *)base, position)) {
         *bestDistance = dist;
-        SceneActorContacts_SetDistanceGate((void *)base, (void *)&base->tracking, dist, 0, 0, kind);
+        SceneActorContacts_SetDistanceGate((void *)base, (void *)&base->base.tracking, dist, 0, 0,
+                                           kind);
         return 1;
     }
-    facing = self->body.direction;
+    facing = self->base.body.direction;
     angle = AngleSeparation(Math_Atan2(delta->x, delta->z) - facing);
-    if (angle > self->tracking.fieldEA)
+    if (angle > self->base.tracking.fieldEA)
         return 0;
 
     if (kind == 2) {
         if (TestEngineFlags(gEngineFlags, 0x4800)) {
             if (!SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000))
                 goto plain;
-            limit = HalfDistance((s32)self->tracking.limit);
+            limit = HalfDistance((s32)self->base.tracking.limit);
             if (TrackFlags(TrackingOf(self), 4))
                 threshold = limit;
             else
@@ -111,7 +111,7 @@ static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
         } else {
             if (SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000) ||
                 !(MonsterInit_TestWorldFlags(0x20))) {
-                limit = HalfDistance((s32)self->tracking.limit);
+                limit = HalfDistance((s32)self->base.tracking.limit);
                 if (TrackFlags(TrackingOf(self), 4))
                     threshold = limit;
                 else
@@ -124,7 +124,7 @@ static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
         if (TestEngineFlags(gEngineFlags, 0x4800))
             return 0;
         if (!MonsterInit_TestWorldFlags(0x20)) {
-            limit = HalfDistance((s32)self->tracking.limit);
+            limit = HalfDistance((s32)self->base.tracking.limit);
             if (TrackFlags(TrackingOf(self), 4))
                 threshold = limit;
             else
@@ -135,35 +135,36 @@ static inline u8 EvaluateSample(struct SceneActorRegistryResetView *base,
     }
     goto gate;
 plain:
-    limit = (s32)self->tracking.limit;
-    threshold = (s32)self->tracking.range;
+    limit = (s32)self->base.tracking.limit;
+    threshold = (s32)self->base.tracking.range;
 gate:
     if (dist > limit)
         return 0;
-    transition = sub_08076CDC(self, &self->body.position, &sample->position);
+    transition = sub_08076CDC(self, &self->base.body.position, &sample->position);
     if (transition < 0)
         return 0;
     cell = SceneActorTerrain_GetCellIndex(&sample->position);
     if (SceneActor_IsAdjacentCellOpen(self, cell)) {
         if (!TrackFlags(TrackingOf(self), 4)) {
-            if (!Nav_IsPositionInMesh(group->route, &self->body.position, &sample->position))
+            if (!Nav_IsPositionInMesh(group->route, &self->base.body.position, &sample->position))
                 return 0;
         }
         *bestDistance = dist;
-        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->tracking, dist, 0, 0, kind);
+        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->base.tracking, dist, 0, 0,
+                                           kind);
         return 1;
     }
     if (transition != 2) {
         if (TrackFlags(TrackingOf(self), 0x20)) {
-            if (!(u8)sub_0821D4F0(&self->tracking.destination, &sample->position, 10, 0x100))
+            if (!(u8)sub_0821D4F0(&self->base.tracking.destination, &sample->position, 10, 0x100))
                 return 0;
-        } else if (!(u8)sub_0821D4F0(&self->body.position, &sample->position, 10, 0x100))
+        } else if (!(u8)sub_0821D4F0(&self->base.body.position, &sample->position, 10, 0x100))
             return 0;
     }
     if (dist < *bestDistance) {
         *bestDistance = dist;
-        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->tracking, dist, threshold,
-                                           transition, kind);
+        SceneActorContacts_SetDistanceGate((void *)self, (void *)&self->base.tracking, dist,
+                                           threshold, transition, kind);
         return 1;
     }
     return 0;
@@ -181,14 +182,14 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             memcpy(&copy, node->object, sizeof(copy));
             for (tries = 0; tries < 2; tries++) {
                 if (EvaluateSample((void *)base, &copy, node->kind, distance) &&
-                    Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
-                                         &base->position, &copy.position))
+                    Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route, &base->position,
+                                         &copy.position))
                     return 1;
                 TetherActor_CopySampledPosition(&copy.position);
             }
             break;
         case 2:
-            if (!TrackFlags(&((struct SceneActorRegistryResetView *)base)->tracking, 2))
+            if (!TrackFlags(&((struct ChaseActor *)base)->base.tracking, 2))
                 break;
             {
                 u32 mode = TestEngineFlags(gEngineFlags, 0x4800);
@@ -209,8 +210,7 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             }
 
             if (EvaluateSample((void *)base, node->object, node->kind, distance) &&
-                Nav_IsPositionInMesh(((struct SceneActorRegistryResetView *)base)->group.route,
-                                     &base->position,
+                Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route, &base->position,
                                      &((struct SceneActorContactSample *)node->object)->position))
                 return 1;
             break;

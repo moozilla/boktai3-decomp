@@ -1,3 +1,4 @@
+#include "golem.h"
 #include "golem_2.h"
 #include "engine.h"
 
@@ -7,36 +8,36 @@ void Skeleton_TryTriggerAction(void *);
 void Skeleton_ClearPendingFlag(void *);
 void Golem_UpdateAttackProperties(void *);
 
-static inline u32 Flags16(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Flags16(struct Golem *a, u32 m)
 {
     u32 off = 0x2D4;
     return *(u16 *)((u8 *)a + off) & m;
 }
 
-static inline u32 Flags32(struct SceneActorRegistryResetView *a, u32 m)
+static inline u32 Flags32(struct Golem *a, u32 m)
 {
     u32 off = 0x2D0;
     return *(u32 *)((u8 *)a + off) & m;
 }
 
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct Golem *a)
 {
     if (a) {
-        if (Flags16(a, 0x40) || Flags32(a, 0x20000) || a->health <= 0)
+        if (Flags16(a, 0x40) || Flags32(a, 0x20000) || a->chase.base.health <= 0)
             return 1;
     }
     return 0;
 }
 
-void Golem_InitActionHandlers(struct SceneActorRegistryResetView *actor)
+void Golem_InitActionHandlers(struct Golem *actor)
 {
-    actor->alternateBehaviorCallbacks = (void **)gUnk_08606134;
+    actor->chase.base.alternateBehaviorCallbacks = (void **)gUnk_08606134;
 }
 
-s32 Golem_TickFacingQuadrant(struct SceneActorRegistryResetView *a)
+s32 Golem_TickFacingQuadrant(struct Golem *a)
 {
-    u8 *base = (u8 *)&a->body.id;
-    struct GolemState *s = a->context;
+    u8 *base = (u8 *)&a->chase.base.body.id;
+    struct GolemState *s = a->chase.base.context;
     if (!Unavailable(a)) {
         if (s->countdown626)
             s->countdown626--;
@@ -51,11 +52,11 @@ s32 Golem_TickFacingQuadrant(struct SceneActorRegistryResetView *a)
     return 1;
 }
 
-s32 Golem_UpdateEffectsAndContacts(struct SceneActorRegistryResetView *actor)
+s32 Golem_UpdateEffectsAndContacts(struct Golem *actor)
 {
-    struct GolemState *state = actor->context;
+    struct GolemState *state = actor->chase.base.context;
     u32 m = 0x40;
-    if (!(actor->flags2D4 & m)) {
+    if (!(actor->chase.base.flags2D4 & m)) {
         u16 *p = &state->shakeTimer6AE;
         if (*p != 0) {
             Camera_RequestShake(state->shakeStrength6AC);

@@ -8,18 +8,18 @@ struct AdjacentWaitTarget {
     u8 pad[0xC];
     struct ContactPosition position;
 };
-s32 SceneActorReaction_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 s32 Math_Atan2(s32, s32);
 void sub_080E9C20(void);
-static inline void ResetState(struct SceneActorRegistryResetView *a, u32 zero)
+static inline void ResetState(struct ChaseActor *a, u32 zero)
 {
-    a->state2A8 = zero;
-    a->phase2A9 = zero;
-    a->behavior2AA = zero;
-    a->counter2AC = zero;
-    a->field2B1 = 1;
+    a->base.state2A8 = zero;
+    a->base.phase2A9 = zero;
+    a->base.behavior2AA = zero;
+    a->base.counter2AC = zero;
+    a->base.field2B1 = 1;
 }
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 zero)
+static inline void BeginControl(struct ChaseActor *actor, s32 zero)
 {
     u32 three = 3;
     u32 stateOffset = 0x2A8;
@@ -46,22 +46,22 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, s32 z
         *((u8 *)actor + stateOffset) = three;
         phaseOffset -= 0x94;
         *(void **)((u8 *)actor + phaseOffset) = callback;
-        actor->field2C8 = zero;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     }
 }
-void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)
 {
-    struct AdjacentWaitContext *ctx = a->context;
-    struct AdjacentWaitTarget *target = (void *)a->tracking.target;
+    struct AdjacentWaitContext *ctx = a->base.context;
+    struct AdjacentWaitTarget *target = (void *)a->base.tracking.target;
     s32 found;
     s32 zero;
-    if (SceneActorControl_TakeFlag(&a->field2B1))
+    if (SceneActorControl_TakeFlag(&a->base.field2B1))
         ctx->missed = 0;
     found = SceneActorReaction_FindAdjacentTarget(a, 1);
     if (!found) {
@@ -71,11 +71,11 @@ void SceneActorReaction_WaitForAdjacentTarget(struct SceneActorRegistryResetView
             ctx->missed++;
     } else
         ctx->missed = 0;
-    if ((s32)a->counter2AC > 30 && (zero = ctx->missed) == 0) {
-        struct ContactPosition *position = &a->body.position;
-        a->body.direction =
+    if ((s32)a->base.counter2AC > 30 && (zero = ctx->missed) == 0) {
+        struct ContactPosition *position = &a->base.body.position;
+        a->base.body.direction =
             Math_Atan2(target->position.x - position->x, target->position.z - position->z);
         BeginControl(a, zero);
     }
-    a->counter2AC++;
+    a->base.counter2AC++;
 }

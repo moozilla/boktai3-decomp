@@ -19,26 +19,26 @@ static inline s32 SceneActorControl_TicksSince(s32 now, s32 start)
     return elapsed;
 }
 
-void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *input)
+void SceneActorControl_UpdateTimedFacing(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct SceneActorControlState *control = SceneActorControl_GetState(actor);
     s32 elapsed;
     s32 now;
     s32 start;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         control->startTick = Tick();
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
         {
-            u32 direction = actor->body.direction;
+            u32 direction = actor->base.body.direction;
             {
                 u8 *field = &control->savedDirection;
                 *field = direction;
             }
         }
     }
-    if (!Mod(actor->field2CA, control->pulseInterval)) {
-        struct ContactCollider *collider = &actor->colliderB;
+    if (!Mod(actor->base.field2CA, control->pulseInterval)) {
+        struct ContactCollider *collider = &actor->base.colliderB;
         collider->flags &= 0xFFFB;
     }
     start = control->startTick;
@@ -50,12 +50,12 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
         u8 limit;
         limit = *limitField;
         if ((u8)elapsed > limit) {
-            u8 *field = &actor->field2B0;
+            u8 *field = &actor->base.field2B0;
             *field = 1;
         } else {
             u8 *saved = &control->savedDirection;
             u8 *direction;
-            direction = &actor->body.direction;
+            direction = &actor->base.body.direction;
             {
                 u32 prior = *saved;
                 u32 current;
@@ -65,7 +65,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
                     *saved = *direction;
                 } else {
 
-                    u8 *field = &actor->field2B3;
+                    u8 *field = &actor->base.restart;
                     *field = 0;
                 }
             }

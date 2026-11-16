@@ -3,79 +3,77 @@
 void SceneActorControl_OnIdle(void);
 // confidence=low: starts the actor callback at 0x234 then consumes its trigger.
 #define SceneActorControl_UpdateCallbackTrigger sub_08130994
-static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                                u32 zero)
+static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         *field = 1;
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->field2B5 = kind;
+    actor->base.field2B5 = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
-    actor->field2C8 = zero;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         zero = 0;
         *field = 1;
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->field2B5 = kind;
+    actor->base.field2B5 = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
-    actor->field2C8 = zero;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 value = mask;
-    value |= actor->flags2D6;
-    actor->flags2D6 = value;
+    value |= actor->base.flags2D6;
+    actor->base.flags2D6 = value;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 zero)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 zero)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = 0;
-    actor->counter2AC = zero;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = 0;
+    actor->base.counter2AC = zero;
     {
-        typeof(actor->field2B1) *q1 = &actor->field2B1;
+        typeof(actor->base.field2B1) *q1 = &actor->base.field2B1;
         *q1 = 1;
     }
 }
 
-void SceneActorControl_UpdateCallbackTrigger(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
 {
-    u32 taken = SceneActorControl_TakeFlag(&actor->field2B1);
+    u32 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {
-        BeginControlZero(actor, actor->deathControl, 0x11);
-    } else if (actor->field2B0) {
+        BeginControlZero(actor, actor->base.deathControl, 0x11);
+    } else if (actor->base.field2B0) {
         Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
         BeginControl(actor, SceneActorControl_OnIdle, 0x10, taken);
         SetState(actor, 3, taken);
         SetFlags(actor, 0x1000);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

@@ -10,68 +10,68 @@ static inline u8 TakePrepared(u8 *field)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
-    u8 *prepared = &actor->field2B2;
+    u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-static inline void SetControlWords(struct SceneActorRegistryResetView *actor, void *control,
-                                   u32 kind)
+static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
-    u8 *prepared = &actor->field2B2;
+    u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
-        actor->word104 = zero;
-        actor->word104 = *(u32 *)&actor->entryTarget228; /* a u32 read keeps the store above */
-        actor->word108 = 0;
-        actor->word10C = 0;
-        actor->word110 = 1;
+        actor->base.word104 = zero;
+        actor->base.word104 =
+            *(u32 *)&actor->base.entryTarget228; /* a u32 read keeps the store above */
+        actor->base.word108 = 0;
+        actor->base.word10C = 0;
+        actor->base.word110 = 1;
         *flags = 1;
     }
 }
 // confidence=low: Ghoul_WaitForRouteResult's twin; on a route result, resets to behavior 0x13
 // and returns control to savedTarget with word104 = entryTarget228.
-void SceneActorControl_WaitForRouteResult(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
 {
     u8 busy;
     u8 zero;
-    if (TakePrepared(&actor->field2B1)) {
-        void *control = actor->entryTarget224;
+    if (TakePrepared(&actor->base.field2B1)) {
+        void *control = actor->base.entryTarget224;
         SetControl(actor, control, 2);
     }
-    busy = Callback_InvokeActor(actor, actor->contactQuery.opaque);
+    busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
         zero = sub_0812F3CC(actor);
         if (!zero) {
-            if (actor->field2B0) {
+            if (actor->base.field2B0) {
                 u32 state = 0x13;
-                actor->state2A8 = zero;
-                actor->phase2A9 = zero;
-                actor->behavior2AA = state;
-                actor->counter2AC = zero;
-                actor->field2B1 = 1;
-                SetControlWords(actor, actor->savedTarget, 0);
+                actor->base.state2A8 = zero;
+                actor->base.phase2A9 = zero;
+                actor->base.behavior2AA = state;
+                actor->base.counter2AC = zero;
+                actor->base.field2B1 = 1;
+                SetControlWords(actor, actor->base.savedTarget, 0);
             } else
-                actor->counter2AC++;
+                actor->base.counter2AC++;
         }
     }
 }

@@ -6,28 +6,28 @@ struct AxeFadeSprite {
     u8 pad4[2];
     u8 field6;
 };
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeEntry(struct ChaseActor *actor)
 {
-    if (actor->field2B2) {
-        actor->field2B2 = 0;
+    if (actor->base.field2B2) {
+        actor->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
 
-void Axe_UpdateFadeOut(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame)
 {
     u8 entered = TakeEntry(actor);
-    struct AxeFadeSprite *sprite = actor->drawable;
+    struct AxeFadeSprite *sprite = actor->base.drawable;
     s32 previous;
     if (entered)
         sprite->flags |= 2;
     previous = sprite->field6;
     sprite->field6 = previous - 6;
-    if (previous < ((struct AxeFadeSprite *)actor->drawable)->field6)
+    if (previous < ((struct AxeFadeSprite *)actor->base.drawable)->field6)
         Sound_PlaySong(0x169);
     if (frame > 0x2B) {
-        ((struct AxeFadeSprite *)actor->drawable)->field6 = 0;
-        actor->field2B0 = 1;
+        ((struct AxeFadeSprite *)actor->base.drawable)->field6 = 0;
+        actor->base.field2B0 = 1;
     }
 }

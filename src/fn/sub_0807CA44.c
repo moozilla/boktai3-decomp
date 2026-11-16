@@ -20,9 +20,9 @@ struct ReturnResponseCoordinates {
     s16 *coordinates;
 };
 
-static inline void ClearMotionFlag(struct SceneActorRegistryResetView *actor, u32 flag)
+static inline void ClearMotionFlag(struct ChaseActor *actor, u32 flag)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u32 mask = ~flag;
     *flags &= mask;
 }
@@ -57,36 +57,35 @@ static inline s32 HeightAt(struct ContactPosition *position)
     }
     return height;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void *ReadNavigationShape(struct ReturnResponseGroup *const *group)
 {
     return (*group)->shape;
 }
 
-static inline u8 MoveTo(struct SceneActorRegistryResetView *owner,
-                        struct SceneActorRegistryResetView *actor,
+static inline u8 MoveTo(struct ChaseActor *owner, struct ChaseActor *actor,
                         struct ReturnResponseGroup *group, struct ContactPosition *destination)
 {
     void *shape = ReadNavigationShape(&group);
-    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *position = &actor->base.body.position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->body.motion, 8);
+                Memory_Clear(&owner->base.body.motion, 8);
             return 1;
         }
     }
@@ -110,29 +109,27 @@ static inline void ArmCommand(struct SceneActorReactionCommand *command, void *p
     command->second = 0;
     command->kind = kind;
 }
-static inline void SetResponseState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                                    u8 behavior)
+static inline void SetResponseState(struct ChaseActor *actor, u32 state, u32 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
-static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
-                              struct SceneActorRegistryResetView *actor,
+static inline u8 MoveToSource(struct ChaseActor *owner, struct ChaseActor *actor,
                               struct ReturnResponseGroup *group,
                               struct SceneActorPositionSource **source)
 {
     void *shape = group->shape;
-    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *position = &actor->base.body.position;
     struct ContactPosition *destination = &(*source)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&owner->body.motion, 8);
+                Memory_Clear(&owner->base.body.motion, 8);
             return 1;
         }
     }
@@ -140,21 +137,21 @@ static inline u8 MoveToSource(struct SceneActorRegistryResetView *owner,
     return 0;
 }
 
-static inline void SetResponseWordFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetResponseWordFlag(struct ChaseActor *actor, u32 mask)
 {
-    u32 *flags = &actor->flags2CC;
+    u32 *flags = &actor->base.flags2CC;
     *flags = mask | *flags;
 }
 
-static inline void SetResponseHalfFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetResponseHalfFlag(struct ChaseActor *actor, u32 mask)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     *flags = mask | *flags;
 }
 
-void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView *actor)
+void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     struct ReturnResponseGroup *group = (void *)&actor->group.common;
     struct ContactPosition position;
     struct ContactPosition *destination;
@@ -168,15 +165,15 @@ void SceneActorAttachment_BeginReturnResponse(struct SceneActorRegistryResetView
     if (!MoveToSource(owner, actor, group, group->source)) {
         SetCoordinates(&position, group);
         MoveTo(owner, actor, group, &position);
-        SetControl(actor, actor->entryTarget228, 1);
+        SetControl(actor, actor->base.entryTarget228, 1);
         SetResponseState(actor, 0, 0, 2);
     } else {
         struct SceneActorReactionCommand *command;
-        SceneActorAttachment_ReplaceResponseSlot(owner, 0, 1, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(owner, 0, 1, actor->base.category);
         SetResponseState(actor, 3, 1, 0);
         SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
         command = &group->command;
-        ArmCommand(command, actor->entryTarget228, 7, 30);
+        ArmCommand(command, actor->base.entryTarget228, 7, 30);
         SetResponseWordFlag(actor, 0x10);
         SetResponseHalfFlag(actor, 0x1000);
         group->destination->pad = 0;

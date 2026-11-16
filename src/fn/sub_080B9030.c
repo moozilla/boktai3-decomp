@@ -2,19 +2,19 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_script.h"
-void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *,
+void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *,
                                             struct SceneActorScriptPropertiesView *);
-u8 SceneActorControl_CanTurnTowardTarget(struct SceneActorRegistryResetView *);
-static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input, u32 offset)
+u8 SceneActorControl_CanTurnTowardTarget(struct ChaseActor *);
+static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
     return offset == 0x2D4 ? *(u16 *)((u8 *)actor + offset) & mask
                            : *(u32 *)((u8 *)actor + offset) & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -36,10 +36,9 @@ static inline u32 WordFlag(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
-                                        struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *state = actor->context;
+    struct SceneActorScriptPropertiesView *state = actor->base.context;
     if (IsUnavailable(actor))
         return;
     if (HalfFlag(&contact[3], 4))
@@ -56,5 +55,5 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
         return;
     SceneActorControl_BeginTimedBehavior56(actor, state);
     *((u8 *)state + 0x6D0) = 20;
-    actor->field2B6 = actor->tracking.heading + 0x80;
+    actor->base.field2B6 = actor->base.tracking.heading + 0x80;
 }

@@ -1,5 +1,6 @@
 /* Descriptive aliases and object roles are tentative (confidence: low). */
 #include "global.h"
+#include "vorn.h"
 #include "directional_interaction.h"
 struct SceneActorPositionScript {
     u8 unknown0[0x5c];

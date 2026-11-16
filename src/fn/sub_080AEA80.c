@@ -2,11 +2,11 @@
 #include "scene_actor_animation.h"
 #include "engine.h"
 
-void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
-static inline u8 ConsumeFlag(struct SceneActorAnimationView *p)
+void Vorn_SelectRetreatRoute(struct RoomActor *, u32);
+static inline u8 ConsumeFlag(struct RoomActor *p)
 {
-    if (p->directionalEntryFlag) {
-        p->directionalEntryFlag = 0;
+    if (p->field2B2) {
+        p->field2B2 = 0;
         return 1;
     }
     return 0;
@@ -34,19 +34,19 @@ static inline s32 RandomByte(void)
     offset = *index * 2;
     return *(const u8 *)(offset + RANDOM_TABLE_ADDR);
 }
-void SceneActorPhase_SelectLinkedAnimation(struct SceneActorAnimationView *p)
+void SceneActorPhase_SelectLinkedAnimation(struct RoomActor *p)
 {
-    struct SceneActorAnimationLink *link = p->link;
+    struct SceneActorAnimationLink *link = p->context;
     if (!ConsumeFlag(p)) {
         if (LinkActive(link)) {
-            if (p->phaseTimer > link->phaseTimer) {
+            if (p->tracking.distance > link->phaseTimer) {
                 u32 state = 0x17;
-                p->phase = 0;
-                p->subphase = 0;
-                p->nextPhase = state;
-                p->phaseCounter = 0;
-                p->phaseReady = 1;
-                p->nextDirection = (AngleIndex(p->facingAngle) + 3) & 7;
+                p->state2A8 = 0;
+                p->phase2A9 = 0;
+                p->behavior2AA = state;
+                p->counter2AC = 0;
+                p->field2B1 = 1;
+                p->nextDirection = (AngleIndex(p->tracking.heading) + 3) & 7;
             } else {
                 if (RandomByte() <= 0x1f)
                     Vorn_SelectRetreatRoute(p, 1);

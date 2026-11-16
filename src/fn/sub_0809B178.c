@@ -2,8 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_animation.h"
 void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -14,7 +13,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -24,7 +23,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -51,13 +50,13 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
     *restart = 0;
 }
 
-void Lun_UpdateDirectionalPoseNoSelect(struct SceneActorAnimationView *actor)
+void Lun_UpdateDirectionalPoseNoSelect(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
     u32 variant, flags;
-    if (actor->directionalEntryFlag)
-        actor->directionalEntryFlag = 0;
-    Lun_GetDirectionalFrame(actor->direction, &variant, &flags);
+    if (actor->field2B2)
+        actor->field2B2 = 0;
+    Lun_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     Select(actor, entry->value, variant, flags);
 }

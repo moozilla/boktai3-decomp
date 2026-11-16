@@ -1,7 +1,7 @@
 #include "scene_actor_control_helpers.h"
 #include "movement_curve.h"
 
-s32 SceneActorControl_AdvancePositionCurve(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_AdvancePositionCurve(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *ctx = SceneActorControl_GetMotionState(actor);
     struct ContactPosition start, end;

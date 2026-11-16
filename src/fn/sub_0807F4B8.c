@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 #include "scene_actor_reset.h"
 void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
@@ -26,124 +25,101 @@ static inline void IncrementFirst(u16 *input)
 {
     u16 *counter = input;
     u32 value = *counter;
-    u32 result;
-    if (*(s16 *)counter <= 9998)
-        result = value + 1;
-    else {
-        u32 limit = 9999;
-        asm("" : : "r"(limit));
-        result = limit;
-    }
-    *counter = result;
+    if (*(s16 *)counter <= 9998) {
+        *counter = value + 1;
+    } else
+        *counter = 9999;
+}
+static inline void ClearBits(u32 *p, u32 mask)
+{
+    *p &= mask;
+}
+static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
+                              u8 byteZero)
+{
+    a->base.field2B2 = 1;
+    a->base.field2B0 = byteZero;
+    a->base.field2B5 = kind;
+    a->base.target = p;
+    a->base.field2C8 = zero;
+    ClearBits(&a->base.flags114, ~1);
+    a->base.word104 = zero;
 }
 void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputActor)
 {
-    struct SceneActorBehaviorView *early = inputActor;
-    struct SceneActorRegistryControlGroup *group;
+    struct ChaseActor *a = (void *)inputActor;
+    struct SceneActorRegistryControlGroup *group = &a->group.common;
     struct SceneActorBehaviorView *actor;
     u32 slot;
     u32 zero;
+    u8 byteZero;
     {
-        u32 offset = 0x3D4;
-        group = (void *)((u8 *)early + offset);
-    }
-    {
-        struct SceneActorBehaviorGateView *gate = &early->gate;
+        struct SceneActorBehaviorGateView *gate = &((struct SceneActorBehaviorView *)a)->gate;
         u32 mask = 8;
         zero = Test(gate->flags, mask);
         if (zero)
             return;
     }
     {
-        u16 *flags;
-        u32 ownership;
-        u32 inputMask = 0x1000;
-        u32 *actorFlags;
-        u32 byteZero;
-        ownership = inputMask;
-        {
-            u32 flagOffset = 0x2D4;
-            flags = (void *)((u8 *)early + flagOffset);
+        u32 mask = 0x1000;
+        u32 bits = a->base.flags2D4;
+        bits &= mask;
+        if (bits) {
+            SceneActorContacts_ReleaseNode(a->group.contactNode);
+            a->base.flags2D4 &= ~mask;
+            a->group.contactNode = (void *)zero;
         }
-        if (*flags & inputMask) {
-            u32 nodeOffset = 0x45C;
-            void **node;
-            node = (void *)((u8 *)early + nodeOffset);
-            SceneActorContacts_ReleaseNode(*node);
-            {
-                u32 old = *flags;
-                u32 mask;
-                mask = ownership;
-                *flags = old & ~mask;
-            }
-            *node = (void *)zero;
-        }
-        {
-            struct SceneActorRegistryControl *route = &group->control;
-            u32 mask;
-            actorFlags = &early->flags2CC;
-            mask = ~0x141C0;
-            *actorFlags &= mask;
-            route->counter = zero;
-            byteZero = 0;
-            route->field14 = zero;
-            route->timer = zero;
-        }
-        SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
-        {
-            register void *control asm("r12") = (void *)SceneActorControl_OnIdle;
-            u32 kind = 16;
-            u32 offset = 0x2B2;
-            u32 one;
-            u32 clearMask;
-            u8 *byteField;
-            byteField = (u8 *)early + offset;
-            one = 1;
-            *byteField = one;
-            offset -= 2;
-            byteField = (u8 *)early + offset;
-            *byteField = byteZero;
-            offset = 0x2B5;
-            *((u8 *)early + offset) = kind;
-            kind = 0x21C;
-            *(void **)((u8 *)early + kind) = control;
-            kind += 0xAC;
-            {
-                u16 *half = (void *)((u8 *)early + kind);
-                *half = zero;
-            }
-            {
-                register u32 *field asm("r2") = &early->flags114;
-                clearMask = ~1;
-                *field &= clearMask;
-            }
-            ((struct SceneActorRegistryResetView *)early)->word104 = zero;
-            {
-                register u32 state asm("r12") = 3;
-                offset = 0x2A8;
-                *((u8 *)early + offset) = state;
-            }
-            offset = 0x2A9;
-            *((u8 *)early + offset) = one;
-            offset++;
-            byteField = (u8 *)early + offset;
-            *byteField = byteZero;
-            offset = 0x2AC;
-            *(u32 *)((u8 *)early + offset) = zero;
-            offset += 5;
-            byteField = (u8 *)early + offset;
-            *byteField = one;
-            {
-                register u32 mask asm("r2") = ~0x80;
-                *actorFlags &= mask;
-            }
-            clearMask &= *flags;
-            clearMask &= ~0x400;
-            *flags = clearMask;
-        }
-        *((u8 *)group + 0x206) = 255;
     }
-    actor = early;
+    {
+        struct SceneActorRegistryControl *control = &group->control;
+        ClearBits(&a->base.flags2CC, 0xFFFEBE3F);
+        control->counter = zero;
+        byteZero = 0;
+        control->field14 = zero;
+        control->timer = zero;
+    }
+    SceneActorReaction_ResetResponseState((u8 *)group + 0x8C, gUnk_0824E114, 0x60D);
+    {
+        void *control = SceneActorControl_OnIdle;
+        u32 kind = 16;
+        u32 one;
+        u32 clearMask;
+        {
+            u8 *field = &a->base.field2B2;
+            one = 1;
+            *field = one;
+        }
+        a->base.field2B0 = byteZero;
+        a->base.field2B5 = kind;
+        a->base.target = control;
+        a->base.field2C8 = zero;
+        {
+            u32 *field = &a->base.flags114;
+            clearMask = ~1;
+            *field &= clearMask;
+        }
+        a->base.word104 = zero;
+        {
+            u32 state = 3;
+            u8 *field = &a->base.state2A8;
+            *field = state;
+        }
+        a->base.phase2A9 = one;
+        a->base.behavior2AA = byteZero;
+        a->base.counter2AC = zero;
+        a->base.field2B1 = one;
+        {
+            u32 mask = ~0x80;
+            a->base.flags2CC &= mask;
+        }
+        a->base.flags2D4 &= clearMask;
+        {
+            u32 mask = ~0x400;
+            a->base.flags2D4 &= mask;
+        }
+    }
+    *((u8 *)group + 0x206) = 255;
+    actor = (void *)a;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
     if (Test(gEngineFlags, 0x4800))
         return;
@@ -160,7 +136,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
     {
         u16 *counter;
         u32 value;
-        register u32 result asm("r0");
+        u32 result;
         if (slot == 0) {
             IncrementFirst(CounterAddress(0x884));
             counter = CounterAddress(0x530);
@@ -196,11 +172,7 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             return;
         }
         return;
-    capped: {
-        register u32 limit asm("r1") = 9999;
-        asm("" : : "r"(limit));
-        result = limit;
-    }
-        *counter = result;
+    capped:
+        *counter = 9999;
     }
 }

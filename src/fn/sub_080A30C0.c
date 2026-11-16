@@ -2,9 +2,9 @@
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -16,7 +16,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void State(struct ChaseActor *a, u32 behavior)
 {
     u32 off = 0x2A8;
     u32 phase;
@@ -37,7 +37,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
         FIELD(a, b, u8) = 1;
     }
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *target)
+static inline void Control(struct ChaseActor *a, void *target)
 {
     u32 off = 0x2B2;
     FIELD(a, off, u8) = 1;
@@ -45,14 +45,14 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *target)
     FIELD(a, off, u8) = 0;
     off += 5;
     FIELD(a, off, u8) = 1;
-    a->target = target;
-    a->field2C8 = 0;
+    a->base.target = target;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         s32 m = ~1;
         *p &= m;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 // confidence=low: updates probe navigation and switches between turn, approach, and idle behaviors.
 void Spider_UpdateWanderGoal(void *);
@@ -79,9 +79,9 @@ static inline u32 Flags(u32 *p, u32 mask)
 {
     return *p & mask;
 }
-static inline u32 GetFlags(struct SceneActorRegistryResetView *a, u32 mask, u32 **out)
+static inline u32 GetFlags(struct ChaseActor *a, u32 mask, u32 **out)
 {
-    u32 *p = &a->flags2CC;
+    u32 *p = &a->base.flags2CC;
     u32 v = *p;
     v &= mask;
     *out = p;
@@ -91,38 +91,38 @@ struct SpiderGroupView {
     u8 pad[0x1FC];
     void *mesh;
 };
-void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
+void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
 {
-    struct SpiderProbeContext *ctx = actor->context;
+    struct SpiderProbeContext *ctx = actor->base.context;
     struct SpiderGroupView *group = (void *)&actor->group.common;
     s32 speed;
     u32 *flags;
     u16 *scale;
     u32 probe;
-    if (actor->field2B1)
-        actor->field2B1 = 0;
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
     if ((u8)Callback_InvokeActor(actor, FIELD(actor, 0x270, void *)))
         return;
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *p = &actor->field2C2;
+            u16 *p = &actor->base.field2C2;
             u32 v = *p;
             scale = p;
             if (!v)
                 *p = 64;
         }
     }
-    if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+    if (!actor->base.drawableKind)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
-    if (!GetFlags(actor, 0x4000, &flags) && !HasFlag(actor->context, 4))
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+    if (!GetFlags(actor, 0x4000, &flags) && !HasFlag(actor->base.context, 4))
         Spider_UpdateWanderGoal(actor);
     probe = NavMesh_ConsumeProbeEvent(group->mesh);
     if (!probe) {
@@ -133,7 +133,7 @@ void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
                 u32 mask = ~0x4000;
                 *flags &= mask;
             }
-            ClearFlag(&((struct SpiderProbeContext *)actor->context)->flags, ~2);
+            ClearFlag(&((struct SpiderProbeContext *)actor->base.context)->flags, ~2);
             return;
         }
     } else {
@@ -145,5 +145,5 @@ void Spider_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         u32 mask = 0x2000;
         *flags |= mask;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

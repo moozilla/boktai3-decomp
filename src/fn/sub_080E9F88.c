@@ -2,12 +2,12 @@
 #include "scene_actor_reaction.h"
 
 void Ivy_UpdateActiveState_080E98B4(void *);
-void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->colliderA.flags = (actor->colliderA.flags & 0xFFFB) | 8;
+        actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
         {
-            u16 *field = &actor->flags2C0;
+            u16 *field = &actor->base.flags2C0;
             u32 mask = ~0x800;
             *field = mask & *field;
         }
@@ -18,7 +18,7 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
         if (*((u8 *)actor + controlOffset)) {
             void *callback = Ivy_UpdateActiveState_080E98B4;
             u8 kind = 34;
-            u8 *prepared = &actor->field2B2;
+            u8 *prepared = &actor->base.field2B2;
             u32 zero = 0;
             u8 one = 1;
             u32 offset;
@@ -29,28 +29,28 @@ void SceneActorReaction_PlayEntry17(struct SceneActorRegistryResetView *actor)
             *(((u8 *)actor) - (-controlOffset)) = zero;
             controlOffset += 5;
             *((u8 *)actor + controlOffset) = kind;
-            actor->target = callback;
+            actor->base.target = callback;
             offset = 0x2C8;
             byteZero = 0;
             *(u16 *)((u8 *)actor + offset) = zero;
             {
-                u32 *field = &actor->flags114;
+                u32 *field = &actor->base.flags114;
                 mask = ~1;
                 *field = *field & mask;
             }
-            actor->word104 = zero;
+            actor->base.word104 = zero;
             {
                 u32 state = 3;
-                actor->state2A8 = byteZero;
-                actor->phase2A9 = byteZero;
+                actor->base.state2A8 = byteZero;
+                actor->base.phase2A9 = byteZero;
                 {
                     u32 behOff = 0x2AA;
                     u8 *bq;
                     bq = (u8 *)actor + behOff;
                     *bq = state;
                 }
-                actor->counter2AC = zero;
-                actor->field2B1 = one;
+                actor->base.counter2AC = zero;
+                actor->base.field2B1 = one;
             }
         }
     }

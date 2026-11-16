@@ -14,21 +14,21 @@ struct LinkedReactionCommand {
     u8 unknown0[10];
     u16 kind;
 };
-static inline u8 Blocked(struct SceneActorRegistryResetView *s)
+static inline u8 Blocked(struct ChaseActor *s)
 {
     if (!s)
         goto zero;
     {
         u32 mask = 0x40;
-        if (s->flags2D4 & mask)
+        if (s->base.flags2D4 & mask)
             goto one;
     }
     {
         u32 mask = 0x20000;
-        if (s->flags2D0 & mask)
+        if (s->base.flags2D0 & mask)
             goto one;
     }
-    if (s->health > 0)
+    if (s->base.health > 0)
         goto zero;
 one:
     return 1;
@@ -43,36 +43,36 @@ static inline u8 LinkedFlag(struct LinkedReactionContext *p)
         return 1;
     return 0;
 }
-void SceneActor_BeginLinkedIdleReaction_0809C834(struct SceneActorRegistryResetView *s)
+void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
 {
-    if (!Blocked(s) && LinkedFlag(s->context)) {
+    if (!Blocked(s) && LinkedFlag(s->base.context)) {
         u32 three = 3;
-        u8 *state = &s->state2A8;
+        u8 *state = &s->base.state2A8;
         u8 zero = 0;
         u8 one;
         void (*fn)(void);
         u8 code;
         *state = zero;
-        s->phase2A9 = zero;
-        s->behavior2AA = three;
-        s->counter2AC = zero;
+        s->base.phase2A9 = zero;
+        s->base.behavior2AA = three;
+        s->base.counter2AC = zero;
         {
-            u8 *queued = &s->field2B1;
+            u8 *queued = &s->base.field2B1;
             one = 1;
             *queued = one;
         }
         fn = SceneActorControl_OnIdle;
         code = 0x10;
-        s->field2B2 = one;
-        s->field2B0 = zero;
-        s->field2B5 = code;
-        s->target = fn;
-        s->field2C8 = zero;
+        s->base.field2B2 = one;
+        s->base.field2B0 = zero;
+        s->base.field2B5 = code;
+        s->base.target = fn;
+        s->base.field2C8 = zero;
         {
-            u32 *flags = &s->flags114;
+            u32 *flags = &s->base.flags114;
             u32 mask = -2;
             *flags &= mask;
         }
-        s->word104 = zero;
+        s->base.word104 = zero;
     }
 }

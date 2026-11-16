@@ -17,10 +17,10 @@ static inline u8 SceneActor_IsCellOpen(s32 cell, s32 level)
         return 0;
     return 1;
 }
-static inline u8 SceneActor_IsAdjacentCellOpen(struct SceneActorRegistryResetView *actor, s32 goal)
+static inline u8 SceneActor_IsAdjacentCellOpen(struct ChaseActor *actor, s32 goal)
 {
-    s32 cell = actor->terrainCell;
-    s32 level = actor->body.position.y >> 8;
+    s32 cell = actor->base.terrainCell;
+    s32 level = actor->base.body.position.y >> 8;
     s32 i, width;
     if ((goal - 1) == cell) {
         i = cell + 1;

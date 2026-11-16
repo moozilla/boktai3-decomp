@@ -10,24 +10,24 @@ static inline u8 Test(u32 value)
         return 1;
     return 0;
 }
-static inline u32 Flag2C0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2C0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2C0 & mask;
+    return actor->base.flags2C0 & mask;
 }
 static inline u32 Mask(u16 *flags, u32 maskInput)
 {
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 zero)
+static inline void SetControl(struct ChaseActor *actor, u32 zero)
 {
     void *callback = SceneActorReaction_UpdateTimedBurst;
     u32 kind = 29;
-    actor->field2B2 = 1;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = callback;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
     {
         u32 off = 0x2C8;
         {
@@ -36,38 +36,38 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 zer
         }
     }
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *actor)
+u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
 {
     u32 mask = 0x8000000;
-    u32 *flags2D0 = &actor->flags2D0;
+    u32 *flags2D0 = &actor->base.flags2D0;
     if (*flags2D0 & mask) {
         u32 blocked = 0x8006;
         u16 *flags2D4;
         u32 flags;
         {
-            u16 *address = &actor->flags2D4;
+            u16 *address = &actor->base.flags2D4;
             flags = *address;
             blocked &= flags;
             flags2D4 = address;
         }
-        if (!blocked && (flags & 0x2000) && actor->field2B8) {
+        if (!blocked && (flags & 0x2000) && actor->base.field2B8) {
             struct ContactCollider *collider;
-            if (actor->field2B5 == 29)
+            if (actor->base.field2B5 == 29)
                 return 1;
             SetControl(actor, blocked);
             {
                 u32 state = 3;
-                actor->state2A8 = state;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = 0;
-                actor->counter2AC = blocked;
-                actor->field2B1 = 1;
+                actor->base.state2A8 = state;
+                actor->base.phase2A9 = 0;
+                actor->base.behavior2AA = 0;
+                actor->base.counter2AC = blocked;
+                actor->base.field2B1 = 1;
             }
             SceneActorTerrain_ClearCollisionTimers((void *)actor);
             {
@@ -79,7 +79,7 @@ u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *act
                 *flags2D0 &= clear;
             }
             {
-                u16 *flags2D6 = &actor->flags2D6;
+                u16 *flags2D6 = &actor->base.flags2D6;
                 u32 clear = ~0x9CB;
                 *flags2D6 = clear & *flags2D6;
             }
@@ -90,10 +90,10 @@ u32 SceneActorReaction_TryBeginControl29(struct SceneActorRegistryResetView *act
             actor->group.field5C4 = blocked;
             actor->group.field5C0 = blocked;
             actor->group.field5C2 = blocked;
-            collider = &actor->colliderA;
+            collider = &actor->base.colliderA;
             if (Test(Flag2C0(actor, 0x40)))
                 collider->flags &= ~0x100;
-            else if ((actor->field2DC & 0x84000) || (Mask(flags2D4, 0x2016)))
+            else if ((actor->base.field2DC & 0x84000) || (Mask(flags2D4, 0x2016)))
                 collider->flags &= ~0x100;
             else
                 collider->flags |= 0x100;

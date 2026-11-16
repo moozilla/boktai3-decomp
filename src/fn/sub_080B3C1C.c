@@ -5,7 +5,7 @@ void SceneActorTarget_ResetContactResponse(void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 extern const u8 gUnk_0824E230[];
 
-u8 Vorn_UpdateContactResponse(struct SceneActorRegistryResetView *actor)
+u8 Vorn_UpdateContactResponse(struct ChaseActor *actor)
 {
     struct SceneActorContactTracking *motion;
     u16 zero;
@@ -20,9 +20,9 @@ u8 Vorn_UpdateContactResponse(struct SceneActorRegistryResetView *actor)
     work = actor;
     if (SceneActorContact_MotionFlags(SceneActorContact_ActorFromWork(&work), 0x10))
         return 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update26C))
+    if ((u8)Callback_InvokeActor(actor, actor->base.update26C))
         return 1;
-    if (!SceneActorContact_TestTrackingOwned((void *)&actor->tracking, 1, &motion))
+    if (!SceneActorContact_TestTrackingOwned((void *)&actor->base.tracking, 1, &motion))
         return 0;
     motionFlags = SceneActorContact_MotionField(actor);
     {
@@ -33,7 +33,7 @@ u8 Vorn_UpdateContactResponse(struct SceneActorRegistryResetView *actor)
     if (zero)
         return 0;
     nodeSlot = &actor->group.contactNode;
-    if (!actor->tracking.limit)
+    if (!actor->base.tracking.limit)
         return 0;
     SCENE_ACTOR_CONTACT_FIND_CONTACT(contact, actor);
     if (!contact)
@@ -70,7 +70,7 @@ u8 Vorn_UpdateContactResponse(struct SceneActorRegistryResetView *actor)
     actor->group.turn.turnsRemaining = -1;
     SceneActorAnimation_SelectDirectionalEntry(SceneActorContact_ActorFromWork(&work), 0);
     actor->group.common.control.timer = 0xB4;
-    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
     SceneActorChase_SetReactionFlags(actor, 0x100);
     return 1;
 }

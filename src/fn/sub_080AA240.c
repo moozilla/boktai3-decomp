@@ -79,15 +79,15 @@ static inline void Tentacle_InterpolatePosition(struct ContactPosition *out,
     value = scaled + value + sway + final;
     out->z = start->z + Tentacle_TruncateFixed10(value);
 }
-void sub_080AA240(struct SceneActorRegistryResetView *actor)
+void sub_080AA240(struct ChaseActor *actor)
 {
-    struct TentacleWaveTrail *trail = actor->context;
+    struct TentacleWaveTrail *trail = actor->base.context;
     struct ContactPosition output, previous;
     struct TentacleWaveDrawable *xHost, *zHost;
     s32 sign, i;
-    xHost = actor->drawable;
+    xHost = actor->base.drawable;
     xHost->position.x += Tentacle_TruncateFixed12(gUnk_086149C4[(trail->phase + 64) & 255] * 2);
-    zHost = actor->drawable;
+    zHost = actor->base.drawable;
     zHost->position.z += Tentacle_TruncateFixed12(gUnk_086149C4[trail->phase] * 16);
     trail->phase += 8;
     sign = 1;
@@ -97,7 +97,7 @@ void sub_080AA240(struct SceneActorRegistryResetView *actor)
         trail->segments[i].phase += 8;
         sign = -sign;
     }
-    previous = ((struct TentacleWaveDrawable *)actor->drawable)->position;
+    previous = ((struct TentacleWaveDrawable *)actor->base.drawable)->position;
     for (i = 0; i < trail->count - 1; i += 2) {
         Tentacle_InterpolatePosition(&output, &previous, &trail->segments[i + 1].position, 1, 512,
                                      0, 0);
@@ -106,9 +106,9 @@ void sub_080AA240(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void sub_080AA4B8(struct SceneActorRegistryResetView *actor)
+void sub_080AA4B8(struct ChaseActor *actor)
 {
-    struct TentacleWaveTrail *trail = actor->context;
+    struct TentacleWaveTrail *trail = actor->base.context;
     s32 live = 0;
     s32 i;
     for (i = 0; i < trail->count; i++) {

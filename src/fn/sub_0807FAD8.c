@@ -8,26 +8,26 @@ static inline void EnableMotionFlags(u32 mask, u16 *field)
     struct MotionFlags *flags = (void *)field;
     flags->bits |= mask;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void ClearFlags(u32 *flags, u32 bits)
 {
     u32 mask = ~bits;
     *flags &= mask;
 }
-static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 *motion)
+static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
 {
     if (!actor)
         return 0;
@@ -35,18 +35,17 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 *motion)
         return 1;
     {
         u32 mask = 0x20000;
-        if (actor->flags2D0 & mask)
+        if (actor->base.flags2D0 & mask)
             return 1;
     }
-    if (actor->health <= 0)
+    if (actor->base.health <= 0)
         return 1;
     return 0;
 }
-void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *actor,
-                                         const u16 *argument)
+void SceneActorTarget_ApplyResetCommand(struct ChaseActor *actor, const u16 *argument)
 {
     u32 mask = 0x800;
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u16 prior = mask & *flags;
     if (prior)
         return;
@@ -55,28 +54,28 @@ void SceneActorTarget_ApplyResetCommand(struct SceneActorRegistryResetView *acto
         case 0:
             {
                 u32 bit = 1;
-                if (!(actor->flags2CC & bit))
+                if (!(actor->base.flags2CC & bit))
                     return;
             }
-            ClearFlags(&actor->flags2CC, 3);
-            SceneActorRegistry_ResetRouteAndColliders((void *)actor);
-            MonsterInit_SetState(actor, 3, 0, 0);
-            SetControl(actor, actor->field220, 12);
-            break;
+                ClearFlags(&actor->base.flags2CC, 3);
+                SceneActorRegistry_ResetRouteAndColliders((void *)actor);
+                MonsterInit_SetState(actor, 3, 0, 0);
+                SetControl(actor, actor->base.field220, 12);
+                break;
         case 1:
             if (IsDown(actor, flags))
                 return;
-            ClearFlags(&actor->flags2CC, 3);
+            ClearFlags(&actor->base.flags2CC, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
-            SetControl(actor, actor->field220, 12);
+            SetControl(actor, actor->base.field220, 12);
             break;
         default:
             {
                 u32 bit = 1;
-                if (actor->flags2CC & bit) {
+                if (actor->base.flags2CC & bit) {
                     SceneActorRegistry_RestoreActorDefaults((void *)actor);
-                    actor->colliderA.responseValue = 0;
+                    actor->base.colliderA.responseValue = 0;
                 }
             }
             break;

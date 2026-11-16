@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: route role inferred from callers and terrain/path tests.
@@ -41,38 +42,38 @@ static inline void ClearRouteBits(u16 *field, u32 bits)
 {
     *field &= ~bits;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route,
-                          struct ContactPosition *position, struct ContactPosition *target)
+static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPosition *position,
+                          struct ContactPosition *target)
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        ClearRouteBits(&actor->flags2D4, 0x200);
+        ClearRouteBits(&actor->chase.base.flags2D4, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->chase.base.body.motion, 8);
         return 1;
     }
-    ClearRouteBits(&actor->flags2D4, 0x200);
+    ClearRouteBits(&actor->chase.base.flags2D4, 0x200);
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetControl(struct Vorn *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->chase.base.field2B2 = 1;
+    actor->chase.base.field2B0 = 0;
+    actor->chase.base.field2B5 = kind;
+    actor->chase.base.target = callback;
+    actor->chase.base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->chase.base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->chase.base.word104 = 0;
 }
 
 static inline u8 Test(u16 *p, u32 mask)
@@ -87,23 +88,23 @@ extern const u8 gUnk_0824E230[];
 
 u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
-static inline u32 MotionFlags(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 MotionFlags(struct Vorn *p, u32 mask)
 {
-    return p->flags2D4 & mask;
+    return p->chase.base.flags2D4 & mask;
 }
-static inline u8 TestContext(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u8 TestContext(struct Vorn *p, u32 mask)
 {
     if (p->flags6D4 & mask)
         return 1;
     return 0;
 }
-static inline u8 NeedsResponse(struct SceneActorRegistryResetView *p)
+static inline u8 NeedsResponse(struct Vorn *p)
 {
     if (TestContext(p, 1) || p->field67C >= 0)
         return 1;
     return 0;
 }
-void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
+void Vorn_BeginTargetPursuit(struct Vorn *actor)
 {
     u8 *group;
     struct ContactPosition *dest;
@@ -112,44 +113,44 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
         u16 *point;
     };
     struct RouteLink *point;
-    ClearRouteBits((void *)((u8 *)actor->context + 0x6d4), 8);
-    if (NeedsResponse(actor->context)) {
+    ClearRouteBits((void *)((u8 *)actor->chase.base.context + 0x6d4), 8);
+    if (NeedsResponse(actor->chase.base.context)) {
         sub_080B3110(actor, 1, gUnk_0824E230, 0x29a);
         return;
     }
     if (MotionFlags(actor, 0x100))
         return;
-    group = (u8 *)&actor->group.common;
-    if (TestContext(actor->context, 0x1d)) {
-        actor->field2C2 = 32;
-        if (TestContext(actor->context, 4) && MotionFlags(actor, 0x80)) {
-            actor->group.common.gate.counter += 300;
-            if (actor->group.common.gate.counter > actor->group.common.gate.duration)
-                actor->group.common.gate.counter = actor->group.common.gate.duration;
+    group = (u8 *)&actor->chase.group.common;
+    if (TestContext(actor->chase.base.context, 0x1d)) {
+        actor->chase.base.field2C2 = 32;
+        if (TestContext(actor->chase.base.context, 4) && MotionFlags(actor, 0x80)) {
+            actor->chase.group.common.gate.counter += 300;
+            if (actor->chase.group.common.gate.counter > actor->chase.group.common.gate.duration)
+                actor->chase.group.common.gate.counter = actor->chase.group.common.gate.duration;
         }
-        if (SceneActor_DispatchContextAction(actor->context, 1))
+        if (SceneActor_DispatchContextAction(actor->chase.base.context, 1))
             return;
     }
     {
         u32 state = 3, phase = 1;
-        actor->state2A8 = state;
-        actor->phase2A9 = phase;
-        actor->behavior2AA = 0;
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        actor->chase.base.state2A8 = state;
+        actor->chase.base.phase2A9 = phase;
+        actor->chase.base.behavior2AA = 0;
+        actor->chase.base.counter2AC = 0;
+        actor->chase.base.field2B1 = 1;
     }
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 mask = 16;
-        u32 *p = &actor->flags2CC;
+        u32 *p = &actor->chase.base.flags2CC;
         u32 value = *p;
         value |= mask;
         *p = value;
     }
-    actor->field2C2 = 32;
+    actor->chase.base.field2C2 = 32;
     {
         struct SceneActorReactionCommand *command = (void *)(group + 0x8c);
-        void *payload = actor->entryTarget228;
+        void *payload = actor->chase.base.entryTarget228;
         u32 kind = 7;
         command->duration = 60;
         command->payload = payload;
@@ -163,7 +164,7 @@ void Vorn_BeginTargetPursuit(struct SceneActorRegistryResetView *actor)
     dest->z = point->point[1];
     dest->y = CellHeight(dest, CellIndex(dest));
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->body.position,
-                  &actor->tracking.target->position))
+    if (!TryRoute(actor, *(void **)(group + 0x1fc), &actor->chase.base.body.position,
+                  &actor->chase.base.tracking.target->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

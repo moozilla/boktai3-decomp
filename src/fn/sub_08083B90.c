@@ -11,7 +11,7 @@ static inline u32 SceneActorControl_ReadTravelProfile(const u32 *table, u32 inde
 {
     return table[index];
 }
-u32 SceneActorControl_GetTravelProfile(struct SceneActorRegistryResetView *actor)
+u32 SceneActorControl_GetTravelProfile(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     s32 sample;

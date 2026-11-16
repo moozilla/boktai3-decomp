@@ -14,9 +14,9 @@ static inline u32 NextRandomSample(const u16 *table)
     return table[gRandomIndex];
 }
 
-static inline u16 TestAnimationFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline u16 TestAnimationFlags(struct ChaseActor *actor, u16 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
 static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
@@ -43,18 +43,18 @@ static inline void SetDirectionOffset(struct ContactPosition *position, u32 angl
 
 static inline void SetStatusFlags(void *object, u32 flags)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    actor->flags2D0 = flags | actor->flags2D0;
+    struct ChaseActor *actor = object;
+    actor->base.flags2D0 = flags | actor->base.flags2D0;
 }
 static inline u32 ReadPaletteOffset(u16 *offset)
 {
     return *offset;
 }
 
-u16 sub_080DE6E0(struct SceneActorRegistryResetView *actor)
+u16 sub_080DE6E0(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *sequence =
-        &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     u32 alternate;
     u16 *paletteOffset;
     u32 palette;
@@ -65,16 +65,16 @@ u16 sub_080DE6E0(struct SceneActorRegistryResetView *actor)
     if (sequence->elapsed == 0) {
         alternate = TestAnimationFlags(actor, 0x80) != 0;
         SetStatusFlags(actor, 0x10000);
-        palette = ReadPaletteOffset(&actor->paletteOffset);
-        paletteOffset = &actor->paletteOffset;
+        palette = ReadPaletteOffset(&actor->base.paletteOffset);
+        paletteOffset = &actor->base.paletteOffset;
         if (palette == 3 || palette == 1) {
             if (sequence->index == 7 || sequence->index == 5 || sequence->index == 1) {
                 position.packed.x = (NextRandomSample(gRandomTable) & 63) - 48;
                 position.packed.z = (NextRandomSample(gRandomTable) & 63) - 48;
-                AddPosition(&position.position, &position.position, &actor->body.position);
-                SetDirectionOffset(&offset, (actor->body.direction + 0x80) & 0xFF, 0x50);
+                AddPosition(&position.position, &position.position, &actor->base.body.position);
+                SetDirectionOffset(&offset, (actor->base.body.direction + 0x80) & 0xFF, 0x50);
                 AddPosition(&position.position, &position.position, &offset);
-                position.position.y = actor->body.position.y;
+                position.position.y = actor->base.body.position.y;
                 ZeroFill8(&velocity);
                 if (*paletteOffset == 3) {
                     s32 lifetime = (NextRandomSample((const u16 *)RANDOM_TABLE_ADDR) & 63) + 20;

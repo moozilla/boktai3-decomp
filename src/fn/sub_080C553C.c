@@ -3,23 +3,22 @@
 #include "engine.h"
 #include "player.h"
 s32 Math_Atan2(s32, s32);
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
-    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->health <= 0))
+    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
     return 0;
 }
-static inline void RecordContact(struct SceneActorRegistryResetView *a,
-                                 struct ContactCollider *other)
+static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *other)
 {
     if (!Unavailable(a) && (other->contactFlags & 15)) {
-        a->field304 = other->collisionId;
+        a->base.field304 = other->collisionId;
         {
-            u32 *p = &a->flags2D0;
+            u32 *p = &a->base.flags2D0;
             s32 mask = 0xFEFFFFFF;
             *p &= mask;
         }
@@ -70,10 +69,10 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = a->z - b->z;
 }
 void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollider *other,
-                             struct SceneActorRegistryResetView *a)
+                             struct ChaseActor *a)
 {
-    struct SceneActorRegistryResetView *base = a;
-    u8 *state = a->context;
+    struct ChaseActor *base = a;
+    u8 *state = a->base.context;
     union {
         struct ContactPackedVector packed;
         struct ContactPosition pos;
@@ -82,7 +81,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     if (Unavailable(a))
         return;
     origin.pos = *(struct ContactPosition *)&self->x;
-    switch ((s32)((base->body.direction + 0x20) & 255) >> 6) {
+    switch ((s32)((base->base.body.direction + 0x20) & 255) >> 6) {
         case 0:
             origin.packed.x -= 256;
             break;
@@ -100,7 +99,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     self->direction = Math_Atan2(delta.x, delta.z);
     if (other->contactFlags & 15) {
         if (Flag(base, 0x100, 0x2D4)) {
-            if (base->field2B5 == 0x29 || IsFrontal(base->body.direction, other)) {
+            if (base->base.field2B5 == 0x29 || IsFrontal(base->base.body.direction, other)) {
                 RecordContact(a, other);
                 AddImpact(state);
                 {

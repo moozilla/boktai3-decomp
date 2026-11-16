@@ -4,21 +4,21 @@
 #include "scene_actor_reset.h"
 extern const u16 gUnk_08606078[2][8];
 extern const u16 gUnk_08606058[2][8];
-static inline void SetTileFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline void SetTileFlag(struct ChaseActor *p, u32 mask)
 {
-    p->flags2D0 |= mask;
+    p->base.flags2D0 |= mask;
 }
-u16 SceneActorReaction_SelectTileParameter(struct SceneActorRegistryResetView *actor)
+u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryTileDrawable *drawable = actor->drawable;
+    struct SceneActorRegistryTileDrawable *drawable = actor->base.drawable;
     u16 *tile = (u16 *)((u8 *)drawable + 0x20);
     u16 *second = tile;
     u32 variant;
     if (tile[6] == 0) {
         u16 mask = 0x80;
-        variant = (u16)(actor->flags2D4 & mask) != 0;
+        variant = (u16)(actor->base.flags2D4 & mask) != 0;
         SetTileFlag(actor, 0x10000);
-        if (actor->category == 7) {
+        if (actor->base.category == 7) {
             return gUnk_08606078[variant][tile[10] & 7];
         } else {
             return gUnk_08606058[variant][second[10] & 7];

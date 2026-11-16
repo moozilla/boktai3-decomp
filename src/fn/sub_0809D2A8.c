@@ -1,9 +1,9 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-static inline u32 TestFlag(struct SceneActorRegistryResetView *p, u32 mask)
+static inline u32 TestFlag(struct ChaseActor *p, u32 mask)
 {
-    mask &= p->flags2CC;
+    mask &= p->base.flags2CC;
     return mask;
 }
 static inline s32 Height(s32 cell, struct ContactPosition *p)
@@ -24,21 +24,21 @@ static inline s32 Height(s32 cell, struct ContactPosition *p)
     }
     return height;
 }
-void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
+void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
 {
     s16 *x_2;
     struct ContactPosition target;
     if (TestFlag(actor, 0x2000)) {
         struct ContactPosition *p = &target;
-        struct ContactPosition *position = &actor->body.position;
-        struct ContactPosition *offset = &actor->secondaryMotion;
+        struct ContactPosition *position = &actor->base.body.position;
+        struct ContactPosition *offset = &actor->base.secondaryMotion;
         s32 cell, height;
         p->x = offset->x + position->x;
         p->y = offset->y + position->y;
         p->z = offset->z + position->z;
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
-        if (actor->groundHeight2BE < height) {
+        if (actor->base.groundHeight2BE < height) {
             s32 zero;
             s32 off = 0x2EC;
             s16 *x = (s16 *)((u8 *)actor + off);
@@ -49,8 +49,8 @@ void RouteActor_ReflectAtRaisedTerrain(struct SceneActorRegistryResetView *actor
             x_2 = (s16 *)(((u8 *)actor) + off);
             value = -(*x_2);
             *x_2 = value;
-            actor->body.motion.x = zero;
-            actor->body.motion.z = zero;
+            actor->base.body.motion.x = zero;
+            actor->base.body.motion.z = zero;
         }
     }
 }

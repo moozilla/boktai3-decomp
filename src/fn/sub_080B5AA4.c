@@ -1,6 +1,6 @@
 #include "scene_actor_visibility.h"
 #include "scene_actor_control_helpers.h"
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D4;
@@ -8,7 +8,7 @@ static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D0;
@@ -16,20 +16,20 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
+static inline u8 IsUnavailable(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
 }
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
-void sub_080B5AA4(struct SceneActorRegistryResetView *input, const u16 *inputRequest)
+void sub_080B5AA4(struct ChaseActor *input, const u16 *inputRequest)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     u32 unavailable = IsUnavailable(actor);
@@ -38,7 +38,7 @@ void sub_080B5AA4(struct SceneActorRegistryResetView *input, const u16 *inputReq
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         if (!(*flags & mask))
             return;
     }

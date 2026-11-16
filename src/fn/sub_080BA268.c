@@ -2,7 +2,7 @@
 #include "scene_actor_control_phase.h"
 #include "engine.h"
 #include "ram.h"
-void SceneActorReaction_ApplyThreshold(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_ApplyThreshold(struct ChaseActor *, s32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
@@ -50,9 +50,9 @@ static inline void Skeleton_AddPosition(struct ContactPosition *position,
     position->z = delta->z + base->z;
 }
 
-static inline void Skeleton_SetCategory(struct SceneActorRegistryResetView *actor, u8 category)
+static inline void Skeleton_SetCategory(struct ChaseActor *actor, u8 category)
 {
-    actor->category = category;
+    actor->base.category = category;
 }
 
 static inline void Skeleton_EmitBone(struct ContactPosition *position,
@@ -62,23 +62,23 @@ static inline void Skeleton_EmitBone(struct ContactPosition *position,
 }
 
 /* Emit two bone fragments and restore the threshold reaction. */
-void sub_080BA268(struct SceneActorRegistryResetView *actor)
+void sub_080BA268(struct ChaseActor *actor)
 {
     struct ContactPosition headingMotion;
     struct ContactPosition velocity;
     struct ContactPosition position;
     s32 direction;
-    struct SkeletonAttackContext *context = actor->context;
+    struct SkeletonAttackContext *context = actor->base.context;
 
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x16);
-        direction = Skeleton_TruncateFixed6((s32)((actor->body.direction + 0x10) & 0xFF)) << 6;
+        direction = Skeleton_TruncateFixed6((s32)((actor->base.body.direction + 0x10) & 0xFF)) << 6;
         Skeleton_SetPolarMotion(&headingMotion, direction, 20);
         direction = Skeleton_RandomSample();
         direction &= 255;
         Skeleton_SetPolarMotion(&velocity, direction, 10);
         velocity.y = 30;
-        position = actor->body.position;
+        position = actor->base.body.position;
         position.y += 0x104;
         Skeleton_AddPosition(&position, &position, &velocity);
         Skeleton_EmitBone(&position, &velocity, 2);
@@ -93,13 +93,13 @@ void sub_080BA268(struct SceneActorRegistryResetView *actor)
         Skeleton_InitializeCategoryProfile(actor);
         Skeleton_InitVariantMotion(actor);
         {
-            u16 first = actor->attacks.first[3];
-            u16 second = actor->attacks.second[3];
-            u32 flags = actor->attacks.flags[3];
-            u16 parameter = actor->attacks.parameter[3];
+            u16 first = actor->base.attacks.first[3];
+            u16 second = actor->base.attacks.second[3];
+            u32 flags = actor->base.attacks.flags[3];
+            u16 parameter = actor->base.attacks.parameter[3];
             Collider_SetAttackProperties(&context->attack, first, second, 0, flags, parameter);
         }
     }
-    if (actor->field2B3)
+    if (actor->base.restart)
         SceneActorChase_SetControl(actor, SceneActorReaction_ApplyThreshold, 0x3E);
 }

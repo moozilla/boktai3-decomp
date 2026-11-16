@@ -79,35 +79,35 @@ static inline u8 TestBits(u32 *p, u32 maskInput)
         return 1;
     return 0;
 }
-static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
+static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
 }
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
     u32 state = s;
-    actor->state2A8 = state;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
 {
@@ -129,9 +129,9 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     do {                                                                                           \
         struct ContactPosition vec;                                                                \
         struct ContactPosition pos;                                                                \
-        u32 angle = (actor->body.direction + 0x80) & 0xFF;                                         \
+        u32 angle = (actor->base.body.direction + 0x80) & 0xFF;                                    \
         Polar(&vec, angle, 10);                                                                    \
-        pos = actor->body.position;                                                                \
+        pos = actor->base.body.position;                                                           \
         pos.y += 200;                                                                              \
         vec.y = 54;                                                                                \
         sub_08127590(&pos, &vec, 0xD45E, 0x1DC3, kind, 0x1A, 2, 0, 0x13C, 0, 0, 0, 0, 0, 0);       \
@@ -149,9 +149,9 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
         else if (flags &= 0x800)                                                                   \
             INC(0x592);                                                                            \
     }
-static inline void RecordKill(struct SceneActorRegistryResetView *actor, u8 *category)
+static inline void RecordKill(struct ChaseActor *actor, u8 *category)
 {
-    struct ContactCollider *collider = &actor->colliderA;
+    struct ContactCollider *collider = &actor->base.colliderA;
     switch (*category) {
         case 4: {
             u32 flags = collider->reactionFlags;
@@ -267,10 +267,10 @@ static inline void RecordKill(struct SceneActorRegistryResetView *actor, u8 *cat
     }
 }
 
-void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
-    struct SkeletonContext *context = actor->context;
+    struct SkeletonContext *context = actor->base.context;
     u8 *group = (u8 *)&actor->group.common;
     u32 mask;
     u32 wrap = 1023;
@@ -284,7 +284,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     u8 *categoryp;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
@@ -292,33 +292,33 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
-            u32 *field = &actor->flags2CC;
+            u32 *field = &actor->base.flags2CC;
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
             control->field14 = 0;
             control->timer = 0;
         }
-        actor->colliderA.flags |= 4;
-        if (actor->category == 6)
+        actor->base.colliderA.flags |= 4;
+        if (actor->base.category == 6)
             BURST(0);
-        else if (actor->category == 7)
+        else if (actor->base.category == 7)
             BURST(4);
         {
             u32 m = 0x1800;
-            actor->flags2C0 = m | actor->flags2C0;
+            actor->base.flags2C0 = m | actor->base.flags2C0;
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    if (!actor->field2B3)
+    if (!actor->base.restart)
         return;
-    actor->field2B0 = 1;
-    actor->fieldAA = 0;
-    actor->colliderA.responseValue = 0;
+    actor->base.field2B0 = 1;
+    actor->base.fieldAA = 0;
+    actor->base.colliderA.responseValue = 0;
     mask = 0x4000;
     {
-        u32 test = actor->flags2D4 & mask;
-        flags2D4 = &actor->flags2D4;
+        u32 test = actor->base.flags2D4 & mask;
+        flags2D4 = &actor->base.flags2D4;
         if (!test)
             goto notHidden;
     }
@@ -326,24 +326,24 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
             struct ScriptUtilityArguments arguments;
-            values[0] = actor->body.position.x;
-            values[1] = actor->body.position.y;
-            values[2] = actor->body.position.z;
+            values[0] = actor->base.body.position.x;
+            values[1] = actor->base.body.position.y;
+            values[2] = actor->base.body.position.z;
             values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
             values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
             values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-            values[6] = actor->field2E0;
-            values[7] = actor->body.id;
+            values[6] = actor->base.field2E0;
+            values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);
         }
         {
             u32 t = *flags2D4 & mask;
-            categoryp = &actor->category;
+            categoryp = &actor->base.category;
             if (!t && (u32)(*categoryp - 11) > 2)
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(*categoryp, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
         }
         {
             struct ContactPackedVector range;
@@ -354,18 +354,18 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             range.y = 60;
             range.z = 60;
             table = gRandomTable;
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
-                                count, life, size, one = 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
-                                count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x20, count, life, size, one = 1);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x40, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x5E, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x80, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0xC4, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0xF0, count, life, size, one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
                 category == 0x18 || category == 0x19)
@@ -375,15 +375,15 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         SetState(actor, 3, 0, 0);
         {
             u32 m = 0x1000;
-            actor->flags2D6 = m | actor->flags2D6;
+            actor->base.flags2D6 = m | actor->base.flags2D6;
         }
         ActorShadow_Disable((u8 *)actor + 0x320);
         Trigger_ConsumePending((u8 *)actor + 0xC, 1);
         return;
     }
 notHidden:
-    if (actor->field2DC & 0x7F) {
-        u32 hit = actor->field2D8 & 0x100017;
+    if (actor->base.field2DC & 0x7F) {
+        u32 hit = actor->base.field2D8 & 0x100017;
         ctxFlags = &context->flags;
         if (hit)
             goto defeated;
@@ -399,33 +399,33 @@ notHidden:
         {
             void *callback = (void *)SceneActorReaction_TickHiddenTimeout;
             u32 kind = 0x39;
-            actor->field2B2 = 1;
-            actor->field2B0 = blocked;
-            actor->field2B5 = kind;
-            actor->target = callback;
-            actor->field2C8 = blocked;
+            actor->base.field2B2 = 1;
+            actor->base.field2B0 = blocked;
+            actor->base.field2B5 = kind;
+            actor->base.target = callback;
+            actor->base.field2C8 = blocked;
             {
-                u32 *field = &actor->flags114;
+                u32 *field = &actor->base.flags114;
                 s32 clear = ~1;
                 *field &= clear;
             }
-            actor->word104 = blocked;
+            actor->base.word104 = blocked;
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
+            actor->base.state2A8 = state;
         }
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0;
-        actor->counter2AC = blocked;
-        actor->field2B1 = 1;
-        actor->health = 1;
+        actor->base.phase2A9 = 0;
+        actor->base.behavior2AA = 0;
+        actor->base.counter2AC = blocked;
+        actor->base.field2B1 = 1;
+        actor->base.health = 1;
         {
             u32 bit = 0x40;
             *flags2D4 &= ~bit;
             if (Test(*ctxFlags, bit)) {
                 u32 c = 7;
-                actor->category = c;
+                actor->base.category = c;
                 Skeleton_InitializeCategoryProfile(actor);
                 Skeleton_InitVariantMotion(actor);
             }
@@ -434,23 +434,23 @@ notHidden:
             u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
-                values[0] = actor->body.position.x;
-                values[1] = actor->body.position.y;
-                values[2] = actor->body.position.z;
+                values[0] = actor->base.body.position.x;
+                values[1] = actor->base.body.position.y;
+                values[2] = actor->base.body.position.z;
                 values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
                 values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
                 values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-                values[6] = actor->field2E0;
-                values[7] = actor->body.id;
+                values[6] = actor->base.field2E0;
+                values[7] = actor->base.body.id;
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(script, &arguments);
             }
-            if (!Masked16(flags2D4, 0x4000) && (u32)(actor->category - 11) > 2)
+            if (!Masked16(flags2D4, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             sub_08159164(context->rewardHigh);
-            Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
+            Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
         } else {
             sub_08159164(context->rewardLow);
         }
@@ -465,7 +465,7 @@ notHidden:
         SetState(actor, 1, 0, 2);
         {
             u8 b = TestBits(ctxFlags, 0x40);
-            categoryp = &actor->category;
+            categoryp = &actor->base.category;
             if (b)
                 *categoryp = 7;
         }
@@ -474,24 +474,23 @@ notHidden:
             u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
-                values[0] = actor->body.position.x;
-                values[1] = actor->body.position.y;
-                values[2] = actor->body.position.z;
+                values[0] = actor->base.body.position.x;
+                values[1] = actor->base.body.position.y;
+                values[2] = actor->base.body.position.z;
                 values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
                 values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
                 values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-                values[6] = actor->field2E0;
-                values[7] = actor->body.id;
+                values[6] = actor->base.field2E0;
+                values[7] = actor->base.body.id;
                 arguments.count = 8;
                 arguments.values = values;
                 Script_Call(script, &arguments);
             }
         }
         if (!Masked16(flags2D4, 0x4000) && (u32)(*categoryp - 11) > 2)
-            Bestiary_UnlockEntry(
-                Bestiary_GetEntryForActor(*categoryp, actor->paletteOffset));
+            Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
         sub_08159164(context->rewardHigh);
-        Player_RefreshLifeState(actor->field2D8, *((u8 *)actor + 0xA1));
+        Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
         COUNT(0x87C);
         COUNT(0x538);
         RecordKill(actor, categoryp);
@@ -504,25 +503,25 @@ notHidden:
             range.y = 60;
             range.z = 60;
             table = gRandomTable;
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x20,
-                                count, life, size, one = 1);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x40,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x5E,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0x80,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xC4,
-                                count, life, size, one);
-            SparkParticle_Spawn(&actor->body.position, RandomFrom(table, wrap, bits), &range, 0xF0,
-                                count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x20, count, life, size, one = 1);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x40, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x5E, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0x80, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0xC4, count, life, size, one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+                                0xF0, count, life, size, one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
                 category == 0x18 || category == 0x19)
                 Sound_PlaySong(0xE5);
         }
         if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);
 }

@@ -37,17 +37,17 @@ static inline s32 Quarter(s32 value)
     return value >= 0 ? value >> 6 : -((-value) >> 6);
 }
 
-void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
+void Skeleton_UpdateHomingBurst(struct ChaseActor *p, s32 tick)
 {
-    u8 *context = p->context;
+    u8 *context = p->base.context;
     if (SceneActorReaction_TakePrepared(p)) {
-        struct ContactPackedVector spawn = *(struct ContactPackedVector *)&p->body.position;
+        struct ContactPackedVector spawn = *(struct ContactPackedVector *)&p->base.body.position;
         struct ContactPosition delta;
         struct ContactPosition step;
-        u32 base = (u8)(Quarter((p->body.direction + 0x20) & 0xFF) << 6);
+        u32 base = (u8)(Quarter((p->base.body.direction + 0x20) & 0xFF) << 6);
         s32 angle, diff;
         struct ContactPosition *dp = &delta;
-        struct ContactPosition *pos = &p->body.position;
+        struct ContactPosition *pos = &p->base.body.position;
         struct ContactPosition *target;
         target = (struct ContactPosition *)(context + 0x710);
         Difference(dp, target, pos);
@@ -66,31 +66,31 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
         {
             struct ContactPackedVector *sp = &spawn;
             u32 b8, c0, d4, c8;
-            b8 = p->attacks.first[2];
-            c0 = p->attacks.second[2];
-            d4 = p->attacks.flags[2];
-            c8 = p->attacks.parameter[2];
+            b8 = p->base.attacks.first[2];
+            c0 = p->base.attacks.second[2];
+            d4 = p->base.attacks.flags[2];
+            c8 = p->base.attacks.parameter[2];
             MovingSprite_Create(sp, base, b8, c0, d4, c8, 0x2A);
         }
         Sound_PlaySong(0x3A8);
     }
-    SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
+    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x14);
     if (tick > 0x18) {
         void (*f)(void) = Skeleton_UpdateHeavyAttackRecovery;
         u32 k = 0x2E;
         u32 z;
-        u8 *a = &p->field2B2;
+        u8 *a = &p->base.field2B2;
         u32 *w;
         s32 m;
         z = 0;
         *a = 1;
-        p->field2B0 = z;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = z;
-        w = &p->flags114;
+        p->base.field2B0 = z;
+        p->base.field2B5 = k;
+        p->base.target = f;
+        p->base.field2C8 = z;
+        w = &p->base.flags114;
         m = -2;
         *w = m & *w;
-        p->word104 = z;
+        p->base.word104 = z;
     }
 }

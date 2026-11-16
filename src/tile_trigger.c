@@ -64,17 +64,16 @@ void TetherActor_BeginDetachedState(u32);
 
 s32 EffectGroup_SpawnPart(struct EffectGroup *, u32, u32, u32, u32, u32, u32);
 
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 
-static inline u32 ContactActor_ReadMotionFlags(const struct SceneActorRegistryResetView *actor,
-                                               u32 mask)
+static inline u32 ContactActor_ReadMotionFlags(const struct ChaseActor *actor, u32 mask)
 {
-    return mask & actor->flags2D4;
+    return mask & actor->base.flags2D4;
 }
 
-static inline u8 ContactActor_IsControlled(struct SceneActorRegistryResetView *actor)
+static inline u8 ContactActor_IsControlled(struct ChaseActor *actor)
 {
-    if (actor->object == (void *)1)
+    if (actor->base.object == (void *)1)
         return 1;
     return 0;
 }
@@ -119,8 +118,8 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
     struct ContactPackedVector radius;
     u32 cursor;
     s32 tetherInRange, actorFound, i;
-    struct SceneActorRegistryResetView *actor;
-    void (*callback)(struct SceneActorRegistryResetView *, s32);
+    struct ChaseActor *actor;
+    void (*callback)(struct ChaseActor *, s32);
 
     callback = SceneActorReaction_SinkAndRemove;
     cursor = 0;
@@ -146,24 +145,24 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
     while ((actor = (void *)sub_0806F06C((const struct ContactPosition *)&self->position,
                                          (const struct ContactPosition *)&radius, &cursor)) !=
            NULL) {
-        if ((u8)(actor->field2B5 - 0x16) <= 1)
+        if ((u8)(actor->base.field2B5 - 0x16) <= 1)
             continue;
         {
             u8 kind = 0x16;
-            actor->field2B2 = 1;
-            actor->field2B0 = 0;
-            actor->field2B5 = kind;
-            actor->target = callback;
-            actor->field2C8 = 0;
+            actor->base.field2B2 = 1;
+            actor->base.field2B0 = 0;
+            actor->base.field2B5 = kind;
+            actor->base.target = callback;
+            actor->base.field2C8 = 0;
             {
-                u32 *field = &actor->flags114;
+                u32 *field = &actor->base.flags114;
                 u32 mask = ~1;
                 *field &= mask;
             }
-            actor->word104 = 0;
+            actor->base.word104 = 0;
         }
         Chase_SetState(actor, 3, 0, 0);
-        actor->field2B8 = 0;
+        actor->base.field2B8 = 0;
         if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
             TileContact_EmitThreeParts((struct SceneActorRegistryActor *)actor);
         }

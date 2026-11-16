@@ -5,7 +5,7 @@ struct SceneActorTargetWaitState {
     u8 unknown0[0x634];
     s16 targetMissFrames;
 };
-s32 Ivy_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+s32 Ivy_FindAdjacentTarget(struct ChaseActor *, s32);
 void sub_080ED4E0(void);
 static inline void ClearFlags(u16 *p, u32 mask)
 {
@@ -18,7 +18,7 @@ static inline void SetCollider(struct ContactCollider *collider)
     flags |= 8;
     collider->flags = flags;
 }
-static inline void BeginTargetControl(struct SceneActorRegistryResetView *actor, s32 zero)
+static inline void BeginTargetControl(struct ChaseActor *actor, s32 zero)
 {
     u32 three = 3;
     u32 stateOffset = 0x2A8;
@@ -48,27 +48,27 @@ static inline void BeginTargetControl(struct SceneActorRegistryResetView *actor,
         stateOffset += 0x13;
         *(u16 *)((u8 *)actor + stateOffset) = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     }
 }
-void SceneActorControl_WaitForTarget(struct SceneActorRegistryResetView *input)
+void SceneActorControl_WaitForTarget(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     s32 zero;
-    struct SceneActorTargetWaitState *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetCollider(&actor->colliderA);
-        ClearFlags(&actor->flags2C0, ~0x800);
+    struct SceneActorTargetWaitState *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        SetCollider(&actor->base.colliderA);
+        ClearFlags(&actor->base.flags2C0, ~0x800);
     }
     if (!Ivy_FindAdjacentTarget(actor, 1))
         state->targetMissFrames++;
     else
         state->targetMissFrames = 0;
-    if ((s32)actor->counter2AC > 30 && (zero = state->targetMissFrames) == 0) {
+    if ((s32)actor->base.counter2AC > 30 && (zero = state->targetMissFrames) == 0) {
         BeginTargetControl(actor, zero);
     }
     {

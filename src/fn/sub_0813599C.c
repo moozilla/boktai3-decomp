@@ -30,12 +30,12 @@ static inline void Fill(u32 *zero, void *dst)
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
-    if (actor->category == 1 && (actor->field2DC & 4)) {
+    if (actor->base.category == 1 && (actor->base.field2DC & 4)) {
         u32 test = 0x2000;
-        u16 *flags2D4 = &actor->flags2D4;
+        u16 *flags2D4 = &actor->base.flags2D4;
         u32 value = *flags2D4;
         if (!(test & value)) {
             u32 *flags2D0;
@@ -45,13 +45,13 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 v &= ~0xA007;
                 *flags2D4 = v;
             }
-            flags2D0 = &actor->flags2D0;
+            flags2D0 = &actor->base.flags2D0;
             {
                 u32 mask = ~2;
                 *flags2D0 &= mask;
             }
             {
-                struct SceneActorChaseFlags16 *flags = (void *)&actor->flags2D6;
+                struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D6;
                 s32 mask = ~0x9CB;
                 flags->value &= mask;
             }
@@ -76,25 +76,26 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
                 actor->group.field5C2 |= 1 << *count;
                 (*count)++;
             }
-            actor->reactionSoundVariant = 1 << *hits;
+            actor->base.reactionSoundVariant = 1 << *hits;
             {
-                u32 d = actor->reactionSoundVariant;
-                actor->health -= d;
+                u32 d = actor->base.reactionSoundVariant;
+                actor->base.health -= d;
             }
             if (SceneActorDamage_ShouldShow(actor)) {
                 u32 zero;
                 u32 buffer[2];
                 {
-                    s32 h = actor->health;
+                    s32 h = actor->base.health;
                     s32 maxh = FIELD(actor, 0xB0, u16);
                     s32 kind = FIELD(actor, 0xB2, s16);
                     s32 param = FIELD(actor, 0x9A, s16);
                     SceneHud_SetTimedState(FIELD(actor, 0x50, u32), h, maxh, kind, 1, param);
                 }
                 Fill(&zero, buffer);
-                if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
-                    DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                             &actor->body.position, buffer, 1);
+                if (actor->base.reactionSoundVariant || !(actor->base.field2D8 & 0x20000))
+                    DamageNumberDisplay_Show(&actor->base.colliderA,
+                                             actor->base.reactionSoundVariant, 0,
+                                             &actor->base.body.position, buffer, 1);
             }
             SceneBody_StartRoute(
                 (u8 *)actor + 0x50, nav + 0x74,
@@ -106,18 +107,18 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct SceneActorRegistryResetView *act
             }
             {
                 u16 bank = FIELD(actor, 0x1E4, u16);
-                if (actor->drawableKind == 0)
-                    AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+                if (actor->base.drawableKind == 0)
+                    AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
                 else
-                    FIELD(actor->drawable, 0x68, u8 *) = gPaletteBankData + bank * 32;
+                    FIELD(actor->base.drawable, 0x68, u8 *) = gPaletteBankData + bank * 32;
             }
             {
                 u32 bit = 0x2000000;
-                actor->flags2CC |= bit;
+                actor->base.flags2CC |= bit;
             }
             {
                 u16 timer = 6000;
-                actor->field1EA = timer;
+                actor->base.field1EA = timer;
             }
             Sound_PlaySong(0x121);
             return 1;

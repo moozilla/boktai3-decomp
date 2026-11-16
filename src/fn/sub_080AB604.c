@@ -20,15 +20,15 @@ struct ActorReactionContext {
     u8 unknown0[0x8E8];
     u8 request, direction;
 };
-static inline u8 HasReactionFlag(struct SceneActorRegistryResetView *s)
+static inline u8 HasReactionFlag(struct ChaseActor *s)
 {
-    struct ActorReactionSensor *sensor = (void *)&s->tracking.target;
+    struct ActorReactionSensor *sensor = (void *)&s->base.tracking.target;
     u32 mask = 2;
     if (sensor->flags & mask)
         return 1;
     return 0;
 }
-s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
+s32 SceneActor_TryRequestFacingReaction(struct ChaseActor *s)
 {
     u32 range;
     struct ActorReactionDelta delta;
@@ -39,27 +39,27 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
     struct ActorReactionContext *context;
     if (!HasReactionFlag(s))
         return 0;
-    sensor = (void *)&s->tracking.target;
+    sensor = (void *)&s->base.tracking.target;
     {
         u32 mask = -3;
         sensor->flags &= mask;
     }
     {
-        u32 kind = s->field2B5;
+        u32 kind = s->base.field2B5;
         sensor2 = sensor;
         if (kind == 0x27)
-            range = s->tracking.range * 2;
+            range = s->base.tracking.range * 2;
         else
-            range = s->tracking.range;
+            range = s->base.tracking.range;
     }
-    if (s->tracking.distance > range)
+    if (s->base.tracking.distance > range)
         return 0;
     {
         const s16 *own;
         const s16 *other;
         struct ActorReactionTarget *t;
         out = &delta;
-        own = (const s16 *)&s->body.position;
+        own = (const s16 *)&s->base.body.position;
         t = sensor2->target;
         other = (const s16 *)&t->position;
         delta.x = t->position.x - own[0];
@@ -67,15 +67,15 @@ s32 SceneActor_TryRequestFacingReaction(struct SceneActorRegistryResetView *s)
         out->z = other[2] - own[2];
     }
     angle = ((Math_Atan2(delta.x, out->z) + 0x10) & 0xFF) >> 6;
-    if (angle != (((s->body.direction + 0x10) & 0xFF) >> 6))
+    if (angle != (((s->base.body.direction + 0x10) & 0xFF) >> 6))
         return 0;
     height = out->y;
     if (height < 0)
         height = -height;
     if (height > 0x1FF)
         return 0;
-    context = s->context;
-    context->direction = ((s->tracking.heading + 0x80) & 0xFF) >> 6;
+    context = s->base.context;
+    context->direction = ((s->base.tracking.heading + 0x80) & 0xFF) >> 6;
     context->request = 0xE;
     return 1;
 }

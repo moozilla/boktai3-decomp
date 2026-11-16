@@ -116,3 +116,34 @@ includes a changed header was checked with `tools/check.py` through the new
   not twelve with nine types; plus ~200 cast sites the doc did not count.
 * Item 4: a third Nidhoggr view (`struct BossParts`) existed.
 * Item 5: the `struct SceneActor` in scene_indicator.h was a gPlayers view (removed).
+
+## Item 5: the registry actor base (in progress)
+
+Evidence: `notes/room-actor-layout_2026-11-15.md` (from the new `tools/struct_views.py`).
+
+* `struct RoomActor` (include/room_actor.h) is the base, 0..0x3D4. ResetView and the eight
+  monster structs embed it as `base`.
+* `struct ChaseActor` (include/chase_actor.h) is RoomActor + `struct SceneActorChaseGroup`
+  (0x624 bytes), the type the shared chase code takes. `SceneActorRegistryResetView` is
+  gone: it was ChaseActor plus a tail of family fields, which moved to new struct Vorn,
+  Golem, Mummy and Dog (19 units). ResetView was also the parameter type of base-only code
+  and of the non-chase classes' code (Bee, Crow, ...); that code takes ChaseActor for now
+  and is to be narrowed to RoomActor.
+* `SceneActorAnimationView` folded into RoomActor (restart and nextDirection came from it).
+* Skeleton is `struct Skeleton { struct ChaseActor chase; ... }`. Its two private views are
+  folded in. skeleton.c's functions take a struct Skeleton.
+* `tools/retype_fields.py` does the rewriting: it compiles each unit and rewrites the
+  member accesses agbcc rejects ("no member named"). It handles accesses inside macros,
+  member names passed to offsetof-style macros, lines where only a trial compile tells
+  which access is meant, and subclass pointers passed for the base (`--upcast`).
+  `tools/retype/room_actor.txt` holds every step so far; replayed on the pre-item-5
+  sources, it reproduces this tree.
+* Compiler facts found along the way:
+  * Skeleton_Init keeps two pointer variables for the one object. Passing the Skeleton
+    pointer where the original passed the chase pointer changes the register allocation,
+    so Skeleton_SetMovementControlPreset keeps a ChaseActor parameter.
+  * A struct that held ResetView by value had to grow its padding by 0xC8: TentacleActor,
+    AxeActor, and two Skeleton views. The byte check caught each one.
+* Still to fold: BehaviorView, PlacementView, TerrainCollisionView, RegistryActor; the
+  Golem view in sub_080CCD7C.c; the Dog unions in sub_080E25FC.c and sub_080E5744.c; and
+  Mummy's raw `(u8 *)arg0 + 0x6F4` offsets.

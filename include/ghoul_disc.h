@@ -34,16 +34,15 @@ static inline s32 Ghoul_Abs(s32 value)
     return value;
 }
 
-static inline s32 Ghoul_TargetPlayerSlot(struct SceneActorRegistryResetView *actor)
+static inline s32 Ghoul_TargetPlayerSlot(struct ChaseActor *actor)
 {
-    struct SceneActorChaseTarget *target = actor->tracking.target;
+    struct SceneActorChaseTarget *target = actor->base.tracking.target;
     if (!target)
         return -1;
     return SceneActorChase_PlayerSlot(target);
 }
 
-static inline void Ghoul_CaptureTarget(struct SceneActorRegistryResetView *actor,
-                                       struct Ghoul *context, u32 slot)
+static inline void Ghoul_CaptureTarget(struct ChaseActor *actor, struct Ghoul *context, u32 slot)
 {
     if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         s32 player = Ghoul_TargetPlayerSlot(actor);
@@ -51,7 +50,7 @@ static inline void Ghoul_CaptureTarget(struct SceneActorRegistryResetView *actor
             context->discTargets[slot] =
                 ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->target.position;
     } else {
-        context->discTargets[slot] = actor->tracking.target->position;
+        context->discTargets[slot] = actor->base.tracking.target->position;
     }
 }
 
@@ -60,14 +59,14 @@ static inline s32 Ghoul_MapWidth(struct EngineMap **terrain)
     return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
 }
 
-static inline s32 Ghoul_ForwardCell(struct SceneActorRegistryResetView *actor, s32 steps)
+static inline s32 Ghoul_ForwardCell(struct ChaseActor *actor, s32 steps)
 {
     struct EngineMap **terrain;
-    u32 cell = actor->terrainCell;
-    u32 height = SceneActorChase_HeightAt(cell, &actor->body.position);
+    u32 cell = actor->base.terrainCell;
+    u32 height = SceneActorChase_HeightAt(cell, &actor->base.body.position);
     u32 shape = SceneActorChase_CellProperties(cell)->attributes >> 4;
     s32 next, i, chosen, stride;
-    switch (Ghoul_QuarterDirection(actor->body.direction + 32) & 3) {
+    switch (Ghoul_QuarterDirection(actor->base.body.direction + 32) & 3) {
         case 0:
             next = cell + 1;
             i = 0;
@@ -121,7 +120,7 @@ static inline s32 Ghoul_ForwardCell(struct SceneActorRegistryResetView *actor, s
             chosen = next + Ghoul_MapWidth(terrain);
             break;
         default:
-            chosen = actor->terrainCell;
+            chosen = actor->base.terrainCell;
             break;
     }
     return chosen;

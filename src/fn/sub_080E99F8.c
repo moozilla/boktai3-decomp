@@ -8,34 +8,33 @@ struct DamageTarget {
 };
 void SpriteParticle_SpawnBatch(void *, s32, s32, s32, s32);
 void SpriteEffect_SpawnTowardObject(void *, void *, u32, u32, u32, u32);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *target)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
 {
     void *callback = target;
     u32 type = kind;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = type;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = type;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
-static inline void HideCollider(struct SceneActorRegistryResetView *actor)
+static inline void HideCollider(struct ChaseActor *actor)
 {
-    struct ContactCollider *collider = &actor->colliderA;
+    struct ContactCollider *collider = &actor->base.colliderA;
     u32 f = collider->flags;
     u32 m = 4;
     m |= f;
@@ -43,23 +42,23 @@ static inline void HideCollider(struct SceneActorRegistryResetView *actor)
     collider->flags = m;
     {
         u32 m = 0x800;
-        actor->flags2C0 = m | actor->flags2C0;
+        actor->base.flags2C0 = m | actor->base.flags2C0;
     }
 }
-static inline void ShowCollider(struct SceneActorRegistryResetView *actor)
+static inline void ShowCollider(struct ChaseActor *actor)
 {
-    actor->colliderA.flags = (actor->colliderA.flags & 0xFFFB) | 8;
+    actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
     {
         u32 m = ~0x800;
-        actor->flags2C0 = m & actor->flags2C0;
+        actor->base.flags2C0 = m & actor->base.flags2C0;
     }
 }
 
 // confidence=low: applies a contact effect to the held player and waits before release.
-void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 frame)
+void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        struct DamageTarget *target = (void *)actor->tracking.target;
+        struct DamageTarget *target = (void *)actor->base.tracking.target;
         if (target->kind == 4) {
             SetControl(actor, 16, SceneActorControl_OnIdle);
             SetState(actor, 0, 0, 1);
@@ -68,11 +67,11 @@ void Ivy_ApplyHeldTargetDamage(struct SceneActorRegistryResetView *actor, s32 fr
         if (target->kind <= 3) {
             u8 *player = target->owner;
             u32 a3, a4, a5, a6;
-            SpriteParticle_SpawnBatch(&actor->body.position, 1, 2, 0, 0x154);
-            a3 = actor->attacks.first[0];
-            a4 = actor->attacks.second[0];
-            a5 = actor->attacks.flags[0];
-            a6 = actor->attacks.parameter[0];
+            SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 2, 0, 0x154);
+            a3 = actor->base.attacks.first[0];
+            a4 = actor->base.attacks.second[0];
+            a5 = actor->base.attacks.flags[0];
+            a6 = actor->base.attacks.parameter[0];
             SpriteEffect_SpawnTowardObject((u8 *)actor + 0x50, player + 0x24, a3, a4, a5, a6);
             Sound_PlaySong(0x1E0);
         }

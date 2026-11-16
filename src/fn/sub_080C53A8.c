@@ -2,19 +2,19 @@
 #include "scene_actor_reset.h"
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 s32 Div(s32, s32);
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
-    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->health <= 0))
+    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
     return 0;
 }
-void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
+void Golem_UpdateAttackProperties(struct ChaseActor *a)
 {
-    u8 *state = a->context;
+    u8 *state = a->base.context;
     u8 *group = (u8 *)&a->group.common;
     if (Unavailable(a))
         return;
@@ -25,10 +25,10 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
         c->contactFlags = 0x20;
         c->flags = 0x2001;
         {
-            u16 power = a->attacks.first[2];
-            u16 response = a->attacks.second[2];
-            u32 reaction = a->attacks.flags[2] | 0x200004;
-            u16 value = a->attacks.parameter[2];
+            u16 power = a->base.attacks.first[2];
+            u16 response = a->base.attacks.second[2];
+            u32 reaction = a->base.attacks.flags[2] | 0x200004;
+            u16 value = a->base.attacks.parameter[2];
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
         goto active;
@@ -46,8 +46,8 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
             scale = 20;
         else if (scale < 10)
             scale = 10;
-        power = Div(a->attacks.first[1] * scale, 10);
-        response = Div(a->attacks.second[1] * (scale >> 1), 10);
+        power = Div(a->base.attacks.first[1] * scale, 10);
+        response = Div(a->base.attacks.second[1] * (scale >> 1), 10);
         c = (void *)((u8 *)a + 0x188);
         {
             u32 flags = 0x2301;
@@ -55,8 +55,8 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
             c->contactFlags = 0;
         }
         {
-            u32 reaction = a->attacks.flags[1] | 0x40000;
-            u16 value = a->attacks.parameter[1];
+            u32 reaction = a->base.attacks.flags[1] | 0x40000;
+            u16 value = a->base.attacks.parameter[1];
             Collider_SetAttackProperties(c, power, response, 0x400, reaction, value);
         }
         {
@@ -71,17 +71,17 @@ void Golem_UpdateAttackProperties(struct SceneActorRegistryResetView *a)
         }
     active: {
         u32 mask = 0x4000;
-        a->flags2D6 = mask | a->flags2D6;
+        a->base.flags2D6 = mask | a->base.flags2D6;
     }
     } else {
         struct ContactCollider *c = (void *)((u8 *)a + 0x188);
         c->flags = 0x2001;
         c->contactFlags = 0x10;
         {
-            u16 power = a->attacks.first[0];
-            u16 response = a->attacks.second[0];
-            u32 reaction = a->attacks.flags[0];
-            u16 value = a->attacks.parameter[0];
+            u16 power = a->base.attacks.first[0];
+            u16 response = a->base.attacks.second[0];
+            u32 reaction = a->base.attacks.flags[0];
+            u16 value = a->base.attacks.parameter[0];
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
         return;

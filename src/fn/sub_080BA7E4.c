@@ -37,7 +37,7 @@ static inline s32 Half(s32 value)
     return value >= 0 ? value >> 1 : -((-value) >> 1);
 }
 
-void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_)
+void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
 {
     u8 *context;
     s32 tick = tick_;
@@ -50,19 +50,19 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_
     struct ContactPosition *np;
     context = *(u8 **)((u8 *)p + 0x3D0);
     if (SceneActorReaction_TakePrepared(p)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x15);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x15);
         context[0x6D1] = 0x48;
     }
-    HeadingStep(&p->body.direction, context + 0x6D1, &scratch.step);
+    HeadingStep(&p->base.body.direction, context + 0x6D1, &scratch.step);
     {
         struct ContactPosition *v = &scratch.step;
-        AddHalf(&p->body.motion.x, &v->x);
-        v = &p->body.motion;
+        AddHalf(&p->base.body.motion.x, &v->x);
+        v = &p->base.body.motion;
         AddZ(&v->z, &scratch.step);
     }
     {
         u32 mask = 0x2000;
-        u32 *fl = &p->flags2CC;
+        u32 *fl = &p->base.flags2CC;
         *fl |= mask;
     }
     if (Mod(tick, 4) == 0) {
@@ -77,22 +77,22 @@ void Skeleton_TickDecayingLunge(struct SceneActorRegistryResetView *p, s32 tick_
         np = &empty;
         scratch.zero = z;
         Clear(&scratch.zero, np, 0x05000002);
-        SceneParticleBurst_CreateWithPause(&p->body.position, np, &jitter, 1, 2, 4);
+        SceneParticleBurst_CreateWithPause(&p->base.body.position, np, &jitter, 1, 2, 4);
     }
     Collider_Refresh(context + 0x678);
-    if (p->field2B3 && context[0x6D1] == 0) {
+    if (p->base.restart && context[0x6D1] == 0) {
         void (*f)(void) = Skeleton_UpdateAlternateAttackRecovery;
         u32 k = 0x2A;
         u32 *w;
         s32 m;
-        p->field2B2 = 1;
-        p->field2B0 = 0;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = 0;
-        w = &p->flags114;
+        p->base.field2B2 = 1;
+        p->base.field2B0 = 0;
+        p->base.field2B5 = k;
+        p->base.target = f;
+        p->base.field2C8 = 0;
+        w = &p->base.flags114;
         m = -2;
         *w = m & *w;
-        p->word104 = 0;
+        p->base.word104 = 0;
     }
 }

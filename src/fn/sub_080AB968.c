@@ -23,32 +23,32 @@ static inline u8 TakeEntry(u8 *p)
 }
 
 #include "scene_actor_reset.h"
-static inline void SetControl(struct SceneActorRegistryResetView *s, void *control, u32 code)
+static inline void SetControl(struct ChaseActor *s, void *control, u32 code)
 {
     u32 zero;
     u32 *flags;
-    u8 *field = &s->field2B2;
+    u8 *field = &s->base.field2B2;
     zero = 0;
     *field = 1;
-    s->field2B0 = zero;
-    s->field2B5 = code;
-    s->target = control;
-    s->field2C8 = zero;
-    flags = &s->flags114;
+    s->base.field2B0 = zero;
+    s->base.field2B5 = code;
+    s->base.target = control;
+    s->base.field2C8 = zero;
+    flags = &s->base.flags114;
     {
         u32 mask = -2;
         *flags &= mask;
     }
-    s->word104 = zero;
+    s->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+static inline void SetState(struct ChaseActor *p, u32 b)
 {
     u32 behavior = b;
-    p->state2A8 = 0;
-    p->phase2A9 = 0;
-    p->behavior2AA = behavior;
-    p->counter2AC = 0;
-    p->field2B1 = 1;
+    p->base.state2A8 = 0;
+    p->base.phase2A9 = 0;
+    p->base.behavior2AA = behavior;
+    p->base.counter2AC = 0;
+    p->base.field2B1 = 1;
 }
 static inline s32 Abs(s32 x)
 {
@@ -63,21 +63,21 @@ static inline void Advance(void *p, s32 x, s32 z)
     u16 k[] = {0x6400};
     sub_080A9DB0(p, 4, k[0]);
 }
-void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
+void TentacleActor_UpdateRetraction(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *s = input;
+    struct ChaseActor *s = input;
     if (TakeEntry((u8 *)s)) {
         SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
-        s->field2E8 = 8;
+        s->base.field2E8 = 8;
     }
     {
-        s32 x = s->secondaryMotion.x;
+        s32 x = s->base.secondaryMotion.x;
         s32 ax = x;
         s32 z;
         s32 az;
         if (x < 0)
             ax = -x;
-        z = s->secondaryMotion.z;
+        z = s->base.secondaryMotion.z;
         az = z;
         if (z < 0)
             az = -z;
@@ -85,11 +85,11 @@ void TentacleActor_UpdateRetraction(struct SceneActorRegistryResetView *input)
         Advance(s, ax, az);
     }
     TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
-    if (s->field2B0) {
+    if (s->base.field2B0) {
         TentacleActor_SelectWanderRoute(s);
-        SetControl(s, s->entryTarget228, 1);
+        SetControl(s, s->base.entryTarget228, 1);
         SetState(s, 2);
     } else {
-        s->counter2AC++;
+        s->base.counter2AC++;
     }
 }

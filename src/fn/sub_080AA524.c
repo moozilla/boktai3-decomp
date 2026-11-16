@@ -29,9 +29,9 @@ static inline void setFlag(struct TrailSegment *segment, u8 mask)
 {
     segment->flags |= mask;
 }
-s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *actor)
+s32 ActorTrail_RemoveLastSegment(struct ChaseActor *actor)
 {
-    struct ActorTrail *trail = actor->context;
+    struct ActorTrail *trail = actor->base.context;
     struct TrailSegment *segments = trail->segments;
     s32 i;
     if (trail->activeCount > 2)

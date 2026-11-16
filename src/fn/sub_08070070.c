@@ -2,45 +2,45 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_straight_route.h"
 #include "scene_actor_attachment.h"
-u8 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryResetView *,
-                                           const struct ContactPosition *, u32, u32);
+u8 SceneActorAttachment_TestPositionWindow(struct ChaseActor *, const struct ContactPosition *, u32,
+                                           u32);
 /* The local player's position, as gPlayers[0] holds it. */
 struct MovementModePlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
 };
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *cb, u8 kind)
+static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = cb;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = cb;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *actor, s32 mode)
+void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *motionFlags;
     {
-        u32 *flags = &actor->flags2D0;
+        u32 *flags = &actor->base.flags2D0;
         u32 mask = ~4;
         *flags &= mask;
     }
-    motionFlags = &actor->flags2D4;
+    motionFlags = &actor->base.flags2D4;
     {
         u32 mask = ~0x4000;
         *motionFlags &= mask;
@@ -51,7 +51,7 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *acto
             u32 *savedFlags;
             {
                 u32 mask = 0x10;
-                u32 *flags = &actor->flags2CC;
+                u32 *flags = &actor->base.flags2CC;
                 *flags |= mask;
             }
             {
@@ -64,12 +64,12 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *acto
                     s32 x = p->x >> 8;
                     s32 z = p->z >> 8;
 
-                    savedFlags = &actor->flags2CC;
+                    savedFlags = &actor->base.flags2CC;
                     p->y = SceneActorTerrain_GetHeight(Chase_CellIndex(x, z), p);
                 }
             }
-            target.y = actor->body.position.y;
-            SceneActorTerrain_RequestPath(actor, group->route, &actor->body.position, &target);
+            target.y = actor->base.body.position.y;
+            SceneActorTerrain_RequestPath(actor, group->route, &actor->base.body.position, &target);
             group->destination->pad = 1;
             if (!SceneActorAttachment_TestPositionWindow(actor, &target, 32, 32)) {
                 {
@@ -78,7 +78,7 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *acto
                     *flags &= mask;
                 }
                 SetState(actor, 0, 0, 7);
-                SetControl(actor, actor->entryTarget228, 1);
+                SetControl(actor, actor->base.entryTarget228, 1);
             } else {
                 {
                     u32 *flags = savedFlags;
@@ -86,9 +86,9 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *acto
                     *flags &= mask;
                 }
                 SetState(actor, 0, 0, 0);
-                SetControl(actor, actor->savedTarget, 0);
+                SetControl(actor, actor->base.savedTarget, 0);
             }
-            actor->field2C2 = 64;
+            actor->base.field2C2 = 64;
             break;
         }
         case 1: {
@@ -112,12 +112,12 @@ void SceneActorRegistry_SetMovementMode(struct SceneActorRegistryResetView *acto
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             players = (struct MovementModePlayer **)gPlayers;
             route = group->route;
-            position = &actor->body.position;
+            position = &actor->base.body.position;
             target = &players[0]->position;
             if (Nav_IsPositionInMesh(route, position, target) &&
                 (result = Terrain_ApplyBlocked(route, position, target))) {
                 if (result != 2)
-                    Memory_Clear(&actor->body.motion, 8);
+                    Memory_Clear(&actor->base.body.motion, 8);
             } else {
                 u32 mask = ~0x200;
                 mask &= *motionFlags;

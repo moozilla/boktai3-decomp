@@ -46,7 +46,7 @@ void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
 void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
-void SceneActorAttachment_ApplySlotCommand(struct SceneActorRegistryResetView *, void *, u32, u32, u32);
+void SceneActorAttachment_ApplySlotCommand(struct ChaseActor *, void *, u32, u32, u32);
 void SceneActorAttachment_SelectOffsets(u8, u8, s32 *, s32 *);
 void *ActorAttachment_CreateValueSpriteSlot(u32, void *, u32, s32, s32, u32, void *, s32, u32,
                                             void *, void *);
@@ -60,42 +60,41 @@ static inline void Command_SetMotionFlag(u32 bits, struct SceneActorChaseFlags16
     field->value = bits | field->value;
 }
 
-static inline u8 HasFlag(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 HasFlag(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->flags2C0 & mask)
+    if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
-static inline u8 HasGroup(struct SceneActorRegistryResetView *actor)
+static inline u8 HasGroup(struct ChaseActor *actor)
 {
-    if (actor->object == (void *)1)
+    if (actor->base.object == (void *)1)
         return 1;
     return 0;
 }
-static inline void SetBehaviorAndIdle(struct SceneActorRegistryResetView *actor, u32 state,
-                                      u32 behavior)
+static inline void SetBehaviorAndIdle(struct ChaseActor *actor, u32 state, u32 behavior)
 {
-    u8 *field = &actor->state2A8;
+    u8 *field = &actor->base.state2A8;
     u32 zero = 0;
     *field = state;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = zero;
-    actor->field2B1 = 1;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = 1;
     {
         void *control = SceneActorControl_OnIdle;
         u32 kind = 0x10;
-        actor->field2B2 = 1;
-        actor->field2B0 = zero;
-        actor->field2B5 = kind;
-        actor->target = control;
-        actor->field2C8 = zero;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = kind;
+        actor->base.target = control;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     }
 }
 /* Command payloads and attachment offsets reuse this local workspace. */
@@ -106,9 +105,9 @@ union CommandWorkspace {
     } offset;
 };
 // confidence=low: dispatches pending receiver commands and attachment requests.
-s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetView *input)
+s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     struct CommandReceiver *receiver = NULL;
     struct SceneActorChaseGroup *group;
     void *attachment;
@@ -123,7 +122,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
         group = 0;
     attachment = 0;
     receiver = &CommandFields(actor)->receiver;
-    category = actor->category;
+    category = actor->base.category;
     i = 0;
     if (i < receiver->counts[gSceneEventDispatchState->bank]) {
         do {
@@ -145,17 +144,17 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                             command->data.args[2];
                         if (command->data.args[3])
                             Command_SetMotionFlag(
-                                0x200, (struct SceneActorChaseFlags16 *)&actor->flags2D4);
+                                0x200, (struct SceneActorChaseFlags16 *)&actor->base.flags2D4);
                         else
                             SceneActorChase_ClearFlagComponent(
-                                (struct SceneActorChaseFlags16 *)&actor->flags2D4, 0x200);
+                                (struct SceneActorChaseFlags16 *)&actor->base.flags2D4, 0x200);
                         ((struct CommandRoute *)group->route)->current =
                             ((struct CommandRoute *)group->route)->destination;
                         SetBehaviorAndIdle(actor, 2, 3);
                     }
                     break;
                 case 1: {
-                    s32 direction = actor->body.direction;
+                    s32 direction = actor->base.body.direction;
                     s32 delta;
                     if (direction >= 0)
                         direction >>= 5;
@@ -180,22 +179,22 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     break;
                 }
                 case 2:
-                    actor->body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
+                    actor->base.body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
                     SetBehaviorAndIdle(actor, 2, 2);
                     break;
                 case 4:
                     SetBehaviorAndIdle(actor, 2, 5);
                     break;
                 case 8:
-                    actor->body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
+                    actor->base.body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
                     SetBehaviorAndIdle(actor, 2, 6);
                     break;
                 case 9:
-                    actor->body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
+                    actor->base.body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
                     SetBehaviorAndIdle(actor, 2, 7);
                     break;
                 case 10:
-                    actor->body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
+                    actor->base.body.direction = ((u8)command->data.args[0] + 5 & 7) << 5;
                     SetBehaviorAndIdle(actor, 2, 8);
                     break;
                 case 11:
@@ -203,13 +202,15 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     break;
                 case 5:
                     workspace.packet[0] = 6;
-                    SceneActorRegistry_SendToActorId(category, workspace.packet, actor->body.id);
+                    SceneActorRegistry_SendToActorId(category, workspace.packet,
+                                                     actor->base.body.id);
                     break;
                 case 6:
                     workspace.packet[0] = 6;
                     workspace.packet[1] = command->data.args[0];
                     workspace.packet[2] = command->data.args[1];
-                    SceneActorRegistry_SendToActorId(category, workspace.packet, actor->body.id);
+                    SceneActorRegistry_SendToActorId(category, workspace.packet,
+                                                     actor->base.body.id);
                     break;
                 case 7:
                     if (category == 23 || category == 18)
@@ -217,7 +218,8 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                     else
                         workspace.packet[0] = 8;
                     workspace.packet[1] = command->data.args[0];
-                    SceneActorRegistry_SendToActorId(category, workspace.packet, actor->body.id);
+                    SceneActorRegistry_SendToActorId(category, workspace.packet,
+                                                     actor->base.body.id);
                     break;
                 case 3:
                     switch ((u32)command->data.args[0]) {
@@ -237,17 +239,17 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                             s32 initialValue;
                             CommandFields(actor)->attachmentValues.value =
                                 command->data.attachment.value;
-                            value = (s16 *)&actor->fieldAA;
+                            value = (s16 *)&actor->base.fieldAA;
                             CommandFields(actor)->attachmentValues.initial =
                                 command->data.attachment.initial;
-                            initial = &actor->fieldA8;
+                            initial = &actor->base.fieldA8;
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
                                                                &workspace.offset.z);
                             initialValue = *initial;
                             attachment = ActorAttachment_CreateValueSpriteSlot(
-                                0, &actor->body.position, actor->body.id, workspace.offset.y,
-                                workspace.offset.z, category, value, initialValue, 0, actor,
-                                &actor->body.id);
+                                0, &actor->base.body.position, actor->base.body.id,
+                                workspace.offset.y, workspace.offset.z, category, value,
+                                initialValue, 0, actor, &actor->base.body.id);
                             break;
                         }
                         case 5: {
@@ -257,41 +259,43 @@ s32 SceneActorReaction_DispatchPendingCommands(struct SceneActorRegistryResetVie
                             s32 count;
                             CommandFields(actor)->attachmentValues.value =
                                 command->data.attachment.value;
-                            value = (s16 *)&actor->fieldAA;
+                            value = (s16 *)&actor->base.fieldAA;
                             CommandFields(actor)->attachmentValues.initial =
                                 command->data.attachment.initial;
-                            initial = &actor->fieldA8;
+                            initial = &actor->base.fieldA8;
                             count = command->data.attachment.count;
                             SceneActorAttachment_SelectOffsets(category, 3, &workspace.offset.y,
                                                                &workspace.offset.z);
                             initialValue = *initial;
                             attachment = ActorAttachment_CreatePartsSlotWithCount(
-                                7, &actor->body.position, actor->body.id, workspace.offset.z, 0,
-                                value, initialValue, count, &actor->body.id, actor);
+                                7, &actor->base.body.position, actor->base.body.id,
+                                workspace.offset.z, 0, value, initialValue, count,
+                                &actor->base.body.id, actor);
                             break;
                         }
                         case 6:
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
                                                                &workspace.offset.z);
                             attachment = ActorAttachment_UpdateFromDescriptor(
-                                attachment, &actor->body.id, 5, 0, 0, 0, workspace.offset.z,
+                                attachment, &actor->base.body.id, 5, 0, 0, 0, workspace.offset.z,
                                 workspace.offset.y);
                             break;
                         case 7:
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
                                                                &workspace.offset.z);
                             attachment = ActorAttachment_UpdateFromDescriptor(
-                                attachment, &actor->body.id, 4, 0, 0, 0, workspace.offset.z,
+                                attachment, &actor->base.body.id, 4, 0, 0, 0, workspace.offset.z,
                                 workspace.offset.y);
                             break;
                         case 8: {
                             void **slot = &group->attachment;
-                            *slot = ActorAttachment_ReleaseResource(*slot, 0, actor->body.id);
-                            *slot = ActorAttachment_ReleaseResource(*slot, 1, actor->body.id);
-                            *slot = ActorAttachment_ReleaseResource(*slot, 2, actor->body.id);
-                            *slot = ActorAttachment_ReleaseResource(*slot, 4, actor->body.id);
-                            *slot = ActorAttachment_ReleaseResource(*slot, 5, actor->body.id);
-                            *slot = ActorAttachment_ReleasePartsResource(*slot, 3, actor->body.id);
+                            *slot = ActorAttachment_ReleaseResource(*slot, 0, actor->base.body.id);
+                            *slot = ActorAttachment_ReleaseResource(*slot, 1, actor->base.body.id);
+                            *slot = ActorAttachment_ReleaseResource(*slot, 2, actor->base.body.id);
+                            *slot = ActorAttachment_ReleaseResource(*slot, 4, actor->base.body.id);
+                            *slot = ActorAttachment_ReleaseResource(*slot, 5, actor->base.body.id);
+                            *slot =
+                                ActorAttachment_ReleasePartsResource(*slot, 3, actor->base.body.id);
                             break;
                         }
                     }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
 
@@ -8,12 +9,12 @@ s32 Mod(s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 s32 SceneActor_FindDirectionalCell(void *, s32);
-s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
+s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *parent = actor->context;
-    u8 *group = (void *)&actor->group.common;
-    s32 direction = (((actor->body.direction + 0x20) >> 6) + 2) & 3;
+    struct Mummy *parent = actor->chase.base.context;
+    u8 *group = (void *)&actor->chase.group.common;
+    s32 direction = (((actor->chase.base.body.direction + 0x20) >> 6) + 2) & 3;
     s32 cell = 0;
     s32 count = 0;
     struct ContactPosition *targetPointer;
@@ -26,7 +27,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
     for (; count <= 3; count++) {
         cell = SceneActor_FindDirectionalCell(actor, direction);
         direction = (direction + 1) & 3;
-        if (cell != actor->terrainCell)
+        if (cell != actor->chase.base.terrainCell)
             break;
     }
     targetPointer = &target;
@@ -40,12 +41,12 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
         terrain = gCurrentTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*terrain & 15) << 8;
     targetPointer->z = (cellZ << 8) + 0x80;
-    target.y = actor->body.position.y;
+    target.y = actor->chase.base.body.position.y;
     route = *(void **)(group + 0x1FC);
-    position = &actor->body.position;
+    position = &actor->chase.base.body.position;
     result = Nav_IsPositionInMesh(route, position, &target);
     if (!result) {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->chase.base.flags2D4;
         u32 mask = 0xFFFFFDFF;
         u32 value = *flags;
         mask &= value;
@@ -54,9 +55,9 @@ s32 SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *actor)
         result = Terrain_ApplyBlocked(route, position, &target);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->chase.base.body.motion, 8);
         } else {
-            u16 *flags = &actor->flags2D4;
+            u16 *flags = &actor->chase.base.flags2D4;
             u32 mask = 0xFFFFFDFF;
             u32 value = *flags;
             mask &= value;

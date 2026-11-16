@@ -5,13 +5,13 @@ union SceneActorCollisionVector {
     struct ContactPackedVector vector;
     u32 words[2];
 };
-void SceneActorCollision_InitBodyWithFlags(struct SceneActorRegistryResetView *, void *, void *,
-                                           void (*)(void), void *, u32);
-void SceneActorCollision_InitAttack(struct SceneActorRegistryResetView *, void *, void *,
-                                    void (*)(void), u32, void *);
+void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *, void *, void *, void (*)(void),
+                                           void *, u32);
+void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void (*)(void), u32,
+                                    void *);
 void Octopus_OnBodyContact(void);
 void Octopus_OnAttackContact(void);
-void SceneActorCollision_InitCompactBody(struct SceneActorRegistryResetView *actor)
+void SceneActorCollision_InitCompactBody(struct ChaseActor *actor)
 {
     union SceneActorCollisionVector bounds, offset, attackBounds, attackOffset;
     bounds.vector.x = 64;

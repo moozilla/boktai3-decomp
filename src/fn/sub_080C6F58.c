@@ -9,22 +9,22 @@ static inline s32 Scale8(s16 n)
 }
 /* Charge windup: reset the pending-hit count, emit dust, and ramp the stored speed. */
 // confidence=low: charge controls 080CDF14 and 080CEDF0 install this preparatory state.
-void Golem_UpdateChargeWindup(struct SceneActorRegistryResetView *actor, u32 frame)
+void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
 {
-    struct GolemChargeContext *context = actor->context;
-    struct SceneActorBody *body = &actor->body;
+    struct GolemChargeContext *context = actor->base.context;
+    struct SceneActorBody *body = &actor->base.body;
     u8 directionVariant, mirror;
     s16 *speed;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
         context->pendingHits = 0;
     }
     Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
     Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     {
         u32 mask = 0x20;
-        mask |= actor->flags2D6;
-        actor->flags2D6 = mask;
+        mask |= actor->base.flags2D6;
+        actor->base.flags2D6 = mask;
     }
     Golem_SetMotionFlags(actor, 0x100);
     if ((frame & 3) == 0) {
@@ -48,6 +48,6 @@ void Golem_UpdateChargeWindup(struct SceneActorRegistryResetView *actor, u32 fra
     speed = &context->charge.speed;
     if (*speed <= 383)
         *speed += 16;
-    actor->field2C2 = 0x40 >> (*speed >> 7);
+    actor->base.field2C2 = 0x40 >> (*speed >> 7);
     Golem_ApplyDuration(actor);
 }

@@ -3,19 +3,19 @@
 #include "scene_actor_chase_shared.h"
 // confidence=low: selects attack bounds and properties from mummy movement flags.
 void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
-static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 Unavailable(struct ChaseActor *actor)
 {
 
     u32 mask;
     if (!actor)
         goto no;
     mask = 0x40;
-    if (actor->flags2D4 & mask)
+    if (actor->base.flags2D4 & mask)
         goto yes;
     mask = 0x20000;
-    if (actor->flags2D0 & mask)
+    if (actor->base.flags2D0 & mask)
         goto yes;
-    if (actor->health > 0)
+    if (actor->base.health > 0)
         goto no;
 yes:
     return 1;
@@ -29,8 +29,8 @@ struct BoundsBits {
     u32 z : 16;
     u32 pad : 16;
 };
-static inline void ApplyAttack(struct SceneActorRegistryResetView *actor,
-                               struct ContactCollider *collider, u32 alternate, u32 mask)
+static inline void ApplyAttack(struct ChaseActor *actor, struct ContactCollider *collider,
+                               u32 alternate, u32 mask)
 {
 
     u32 damage;
@@ -38,23 +38,23 @@ static inline void ApplyAttack(struct SceneActorRegistryResetView *actor,
     u32 response;
     u32 flags;
     if (alternate) {
-        damage = actor->attacks.first[1];
-        element = actor->attacks.second[1];
-        flags = actor->attacks.flags[1];
+        damage = actor->base.attacks.first[1];
+        element = actor->base.attacks.second[1];
+        flags = actor->base.attacks.flags[1];
         {
             u32 extra = mask;
             flags |= extra;
         }
-        response = actor->attacks.parameter[1];
+        response = actor->base.attacks.parameter[1];
     } else {
-        damage = actor->attacks.first[0];
-        element = actor->attacks.second[0];
-        flags = actor->attacks.flags[0];
-        response = actor->attacks.parameter[0];
+        damage = actor->base.attacks.first[0];
+        element = actor->base.attacks.second[0];
+        flags = actor->base.attacks.flags[0];
+        response = actor->base.attacks.parameter[0];
     }
     Collider_SetAttackProperties(collider, damage, element, 0, flags, response);
 }
-void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
+void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
 {
     struct BoundsBits bounds;
 
@@ -63,11 +63,11 @@ void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
 
     if (Unavailable(actor))
         return;
-    if (actor->colliderA.responseValue)
+    if (actor->base.colliderA.responseValue)
         return;
     {
         u32 mask = 0x8000;
-        flags = actor->flags2D4;
+        flags = actor->base.flags2D4;
         if (mask & flags)
             return;
     }
@@ -78,7 +78,7 @@ void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
         bounds.x = 64;
         bounds.y = 100;
         bounds.z = 64;
-        collider = &actor->colliderB;
+        collider = &actor->base.colliderB;
         collider->bounds = *(struct ContactPosition *)&bounds;
         collider->contactFlags = 32;
         collider->flags = 0x2201;
@@ -89,7 +89,7 @@ void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
         ((struct ContactPosition *)&bounds)->x = 32;
         ((struct ContactPosition *)&bounds)->y = 100;
         ((struct ContactPosition *)&bounds)->z = 32;
-        collider = &actor->colliderB;
+        collider = &actor->base.colliderB;
         collider->bounds = *(struct ContactPosition *)&bounds;
         collider->contactFlags = attackBit;
         collider->flags = 0x2201;
@@ -99,7 +99,7 @@ void Mummy_UpdateAttackCollider(struct SceneActorRegistryResetView *actor)
         ((struct ContactPosition *)&bounds)->x = 32;
         ((struct ContactPosition *)&bounds)->y = 100;
         ((struct ContactPosition *)&bounds)->z = 32;
-        collider = &actor->colliderB;
+        collider = &actor->base.colliderB;
         collider->bounds = *(struct ContactPosition *)&bounds;
         collider->contactFlags = attackBit;
         collider->flags = 0x2201;

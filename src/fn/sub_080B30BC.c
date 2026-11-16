@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_registry.h"
 
 struct VornData {

@@ -4,7 +4,7 @@
 #include "scene_actor_chase.h"
 
 void Dog_UpdateAnimationFourteenReaction(void);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 struct DogAnim {
@@ -15,9 +15,9 @@ struct DogAnim {
     u16 timer;
 };
 
-static inline u16 LoadMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 LoadMotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 value = actor->flags2D4;
+    u16 value = actor->base.flags2D4;
     return value & mask;
 }
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
@@ -28,33 +28,34 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
+void Dog_ChasePlayer(struct ChaseActor *actor)
 {
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     u8 *group = (u8 *)&actor->group.common;
     struct ContactPosition target;
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, Dog_UpdateAnimationFourteenReaction, 0x28);
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;
     {
         struct DogAnim *anim;
         s32 distance;
-        Delta(&target, &actor->body.position, (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
+        Delta(&target, &actor->base.body.position,
+              (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
         distance = target.x * target.x + target.z * target.z;
-        anim = (struct DogAnim *)((u8 *)actor->drawable + 0x48);
+        anim = (struct DogAnim *)((u8 *)actor->base.drawable + 0x48);
         if ((anim->frame == 6 || anim->frame == 0xC || anim->frame == 0x13 ||
              anim->frame == 0x19) &&
             anim->timer == anim->rate - 1 && (u32)distance < *(u32 *)(context + 0x684)) {
-            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
             Chase_SetBehavior(actor, 0x10);
             *(struct ContactPosition *)(context + 0x6D8) =
                 *(struct ContactPosition *)((u8 *)gPlayers[0] + 0x30);
             {
                 u32 chasing = 0x80;
-                if (actor->flags2D4 & chasing) {
+                if (actor->base.flags2D4 & chasing) {
                     u16 *time = &actor->group.common.gate.counter;
                     *time += 0x12C;
                     if (*time > actor->group.common.gate.duration)
@@ -64,7 +65,7 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
             return;
         }
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         if (LoadMotionFlags(actor, 0x80)) {
             Chase_SetBehavior(actor, 0xC);
             Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
@@ -77,10 +78,10 @@ void Dog_ChasePlayer(struct SceneActorRegistryResetView *actor)
             return;
         }
         Chase_SnapToRoute(&target, group + 0x74);
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
+        Chase_SetCtl(actor, actor->base.entryTarget228, 1);
         Chase_SetBehavior(actor, 2);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &target))
+        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position, &target))
             Callback_InvokeActor(actor, *(void **)(group + 0x224));
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

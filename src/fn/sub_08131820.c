@@ -5,9 +5,9 @@
 #include "scene_actor_chase_shared.h"
 #include "engine.h"
 #include "ram.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -15,40 +15,39 @@ u32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetState(struct SceneActorRegistryResetView *actor)
+static inline void SetState(struct ChaseActor *actor)
 {
     u32 behavior = 6;
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
-static inline void BeginRouteSelection(struct SceneActorRegistryResetView *actor,
-                                       struct SceneActorChaseGroup *nav)
+static inline void BeginRouteSelection(struct ChaseActor *actor, struct SceneActorChaseGroup *nav)
 {
     void *control;
     u32 kind;
     u32 behavior = 8;
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
     /* The route callback is installed after the reset fields. */
     control = nav->routeChoiceControl;
     kind = 0x13;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline u8 InLinkMode(u32 value, u32 mask)
@@ -57,36 +56,36 @@ static inline u8 InLinkMode(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
     s32 speed;
     u32 event;
     u16 *scale;
-    if (actor->field2B1)
-        actor->field2B1 = 0;
-    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     {
         u32 mask = 0xA02F;
-        u16 *flagAddress = &actor->flags2D4;
+        u16 *flagAddress = &actor->base.flags2D4;
         if (*flagAddress & mask) {
-            u16 *p = &actor->field2C2;
+            u16 *p = &actor->base.field2C2;
             *p = 0x40;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0)
                 *scale = 0x40;
         }
     }
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
@@ -101,5 +100,5 @@ void SceneActorControl_UpdateRouteApproach(struct SceneActorRegistryResetView *a
         }
         return;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

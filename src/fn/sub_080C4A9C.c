@@ -11,7 +11,7 @@ static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
     saved[10] = behavior;
 }
 
-void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
+void Golem_RestoreRoute(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u16 *flags;
@@ -19,7 +19,7 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
 
     {
         unsigned short mask = 0x100;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         if ((u16)((*flags) & mask)) {
             return;
         }
@@ -28,7 +28,7 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
     chasing = 0x80;
     if (*flags & chasing) {
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
         {
             u16 *field = (u16 *)((u8 *)actor + 0x414);
             u32 mask = 4;
@@ -46,14 +46,14 @@ void Golem_RestoreRoute(struct SceneActorRegistryResetView *actor)
     } else {
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
-        actor->field2C2 = 0x20;
-        SaveDelay(group + 0x8C, actor->entryTarget228, 7, 0x3C);
+        actor->base.field2C2 = 0x20;
+        SaveDelay(group + 0x8C, actor->base.entryTarget228, 7, 0x3C);
     }
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
-                        &((struct ChaseTarget *)actor->tracking.target)->position))
+    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position,
+                        &((struct ChaseTarget *)actor->base.tracking.target)->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

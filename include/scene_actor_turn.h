@@ -12,33 +12,32 @@ static inline s32 SceneActorTurn_Cardinal(u8 direction)
     return ((direction + 0x60) >> 6) & 3;
 }
 
-static inline u32 SceneActorTurn_ActorFlags(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 SceneActorTurn_ActorFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->flags2CC & mask;
+    return a->base.flags2CC & mask;
 }
 
-static inline void SceneActorTurn_ApplyDuration(struct SceneActorRegistryResetView *a,
-                                                u16 *motionFlags)
+static inline void SceneActorTurn_ApplyDuration(struct ChaseActor *a, u16 *motionFlags)
 {
     u16 *scale;
     u32 mask = 0xA02F;
     if (*motionFlags & mask) {
-        u16 *p = &a->field2C2;
+        u16 *p = &a->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *q = &a->field2C2;
+        u16 *q = &a->base.field2C2;
         u16 value = *q;
         scale = q;
         if (!value)
             *scale = 64;
     }
-    if (!a->drawableKind)
-        Anim_SetDurationScale(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
-                              *scale);
+    if (!a->base.drawableKind)
+        Anim_SetDurationScale(
+            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                                   *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
 }
 
 static inline u32 SceneActorTurn_Flags(u16 *field, u32 mask)
@@ -46,14 +45,13 @@ static inline u32 SceneActorTurn_Flags(u16 *field, u32 mask)
     return *field & mask;
 }
 
-static inline void SceneActorTurn_SetAnimationIndex(struct SceneActorRegistryResetView *a,
-                                                    u32 selection)
+static inline void SceneActorTurn_SetAnimationIndex(struct ChaseActor *a, u32 selection)
 {
-    a->animationIndex = selection;
+    a->base.animationIndex = selection;
 }
 
-static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryResetView *a,
-                                                  u32 selection, u32 variant, u32 flags)
+static inline void SceneActorTurn_SelectAnimation(struct ChaseActor *a, u32 selection, u32 variant,
+                                                  u32 flags)
 {
     u32 force;
     if (flags & 0x10) {
@@ -61,20 +59,20 @@ static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryReset
         flags &= ~0x10;
     } else
         force = 0;
-    if (!a->drawableKind) {
+    if (!a->base.drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        a->animationIndex = selection;
-        drawable = a->drawable;
+        a->base.animationIndex = selection;
+        drawable = a->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
         struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)a->drawable)->tile;
+            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
         selection += variant;
         {
-            u8 *selectionAddress = &a->animationIndex;
+            u8 *selectionAddress = &a->base.animationIndex;
             u32 previous = *selectionAddress;
-            if (!force && previous == selection && !a->field2B3) {
+            if (!force && previous == selection && !a->base.restart) {
                 if (flags == 1 && (tile->flags & 4))
                     return;
                 if (flags == 0 && !(tile->flags & 4))
@@ -89,19 +87,19 @@ static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryReset
                 mode = 6;
             else
                 mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                              a->drawable, (u16)selection, 2, (u16)mode);
+            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile,
+                              a->base.drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
                 tile->flags |= mask;
             else
                 tile->flags &= ~4;
         }
     }
-    a->field2B3 = 0;
+    a->base.restart = 0;
 }
 
-static inline void SceneActorTurn_SelectProfileAnimation(struct SceneActorAnimationView *actor,
-                                                         s32 index, u32 variant, u32 flags)
+static inline void SceneActorTurn_SelectProfileAnimation(struct RoomActor *actor, s32 index,
+                                                         u32 variant, u32 flags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);

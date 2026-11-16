@@ -7,11 +7,11 @@ static inline void SetEntry(u32 value, u32 flags, struct SceneActorProfileEntry 
     entry->flags = flags;
 }
 // confidence=low: writes the animation/action profile shared by the three Skeleton categories
-void Skeleton_InitializeCategoryProfile(struct SceneActorRegistryResetView *actor)
+void Skeleton_InitializeCategoryProfile(struct ChaseActor *actor)
 {
-    s32 category = actor->category;
-    struct SceneActorProfileEntry *entry =
-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);
+    s32 category = actor->base.category;
+    struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
+        actor->base.profileId, actor->base.profileMode, 0);
     if (!entry)
         return;
     switch (category) {

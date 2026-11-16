@@ -64,13 +64,13 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
         return 1;
     return 0;
 }
-static inline u32 ActorWordBits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 ActorWordBits(struct ChaseActor *a, u32 mask)
 {
-    return a->flags2CC & mask;
+    return a->base.flags2CC & mask;
 }
-static inline u16 ActorHalfBits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u16 ActorHalfBits(struct ChaseActor *a, u32 mask)
 {
-    u16 value = a->flags2D4;
+    u16 value = a->base.flags2D4;
     value &= mask;
     return value;
 }
@@ -83,27 +83,27 @@ static inline u32 ClearActivity(u32 *flags, u32 mask)
 }
 static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
 {
-    struct SceneActorRegistryResetView *a = (void *)object;
+    struct ChaseActor *a = (void *)object;
     u32 motion;
-    motion = ClearActivity(&a->flags2D0, 0xFEFFFFFF);
+    motion = ClearActivity(&a->base.flags2D0, 0xFEFFFFFF);
     if (!ActorWordBits(a, 0x200000))
         return 1;
     if (motion & 4)
         return 1;
     if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
-        Mummy_TestContactFlags((void *)&a->tracking.target, 16))
+        Mummy_TestContactFlags((void *)&a->base.tracking.target, 16))
         return 1;
-    if (((struct SceneActorRegistryResetView *)object)->field2B8)
+    if (((struct ChaseActor *)object)->base.field2B8)
         return 1;
     {
-        u16 *timer = &((struct SceneActorRegistryResetView *)object)->colliderA.responseValue;
+        u16 *timer = &((struct ChaseActor *)object)->base.colliderA.responseValue;
         object = (u8 *)timer;
         if (*timer)
             return 1;
     }
     return 0;
 }
-u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
+u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
 {
     struct MummyStimulusGroup *group;
     struct MummyStimulusContext *body;
@@ -115,10 +115,11 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
     group = (void *)&a->group.common;
     ((struct MummyStimulusGroup *)&a->group.common)->stimulus.phase[0] = 0;
     started = 0;
-    body = a->context;
+    body = a->base.context;
     tag = SceneStimulus_FindOverlap(
-        a->body.position.x, a->body.position.z, ((struct MummyStimulusGroup *)&a->group.common)->stimulus.radius,
-        ((struct MummyStimulusGroup *)&a->group.common)->stimulus.kind, (u16)a->body.id);
+        a->base.body.position.x, a->base.body.position.z,
+        ((struct MummyStimulusGroup *)&a->group.common)->stimulus.radius,
+        ((struct MummyStimulusGroup *)&a->group.common)->stimulus.kind, (u16)a->base.body.id);
     if (tag < 0)
         goto failed;
     if (!((struct MummyStimulusGroup *)&a->group.common)->stimulus.timer) {
@@ -134,26 +135,26 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
     if (SceneActorStimulus_CaptureMotionFlags(a, 0x80, &motionFlags)) {
         SceneActorStimulus_ExtendGate(a);
     }
-    SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->body.id, group->route, tag);
+    SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->base.body.id, group->route, tag);
     if (SceneActor_TryTrackNearbyPlayer(a, &group->target, group->cell))
         goto success;
     Chase_SnapToRoute(group->destination, (u8 *)&group->link);
-    (group->destination)->y = a->body.position.y;
+    (group->destination)->y = a->base.body.position.y;
     (group->destination)->pad = 0;
     SceneGrid_SnapPositionToCellCenter(&group->target, group->cell);
-    if (!Mummy_TryRoute(motionFlags, 0x200, group->route, &a->body.position, &group->target)) {
+    if (!Mummy_TryRoute(motionFlags, 0x200, group->route, &a->base.body.position, &group->target)) {
         Callback_InvokeActor(a, group->fallback);
     success:
         return 1;
     }
     {
         u32 mask = 16;
-        a->flags2CC |= mask;
+        a->base.flags2CC |= mask;
     }
-    a->field2C2 = Div(64, 3);
+    a->base.field2C2 = Div(64, 3);
     {
         u32 mask = 0xFF7FFFFF;
-        a->flags2CC = mask & a->flags2CC;
+        a->base.flags2CC = mask & a->base.flags2CC;
     }
     body->phase[0] = 4;
     {
@@ -162,7 +163,7 @@ u32 Mummy_TryStimulusRoute(struct SceneActorRegistryResetView *a)
     }
     {
         u32 mask = 0x1000000;
-        a->flags2D0 |= mask;
+        a->base.flags2D0 |= mask;
     }
     SceneActorAttachment_RetargetNearestPlayer(a, &group->target);
     if (started)

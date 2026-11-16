@@ -1,5 +1,5 @@
 #include "scene_actor_control_helpers.h"
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D4;
@@ -7,7 +7,7 @@ static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D0;
@@ -15,26 +15,26 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     flags = (void *)((u8 *)actor + offset);
     return *flags & mask;
 }
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
+static inline u8 IsUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
 }
-static inline void Hide(struct SceneActorRegistryResetView *actor)
+static inline void Hide(struct ChaseActor *actor)
 {
     u32 one = 1;
-    if (actor->drawableKind == 0) {
-        u32 *flags = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        u32 *flags = actor->base.drawable;
         *flags |= one;
     } else {
         struct Tile {
             u8 unknown0[8];
             u32 flags;
         };
-        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= one;
     }
     {
@@ -43,10 +43,10 @@ static inline void Hide(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *actor)
+static inline void Show(struct ChaseActor *actor)
 {
-    if (actor->drawableKind == 0) {
-        u32 *flags = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        u32 *flags = actor->base.drawable;
         u32 mask;
         mask = ~1;
         *flags &= mask;
@@ -55,7 +55,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
             u8 unknown0[8];
             u32 flags;
         };
-        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -64,7 +64,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
         ActorShadow_Enable((void *)((u8 *)actor + offset));
     }
 }
-void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
+void sub_080B5BEC(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
     u32 unavailable = IsUnavailable(actor);
@@ -111,8 +111,8 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {
-                if (actor->drawableKind == 0) {
-                    u32 *field = actor->drawable;
+                if (actor->base.drawableKind == 0) {
+                    u32 *field = actor->base.drawable;
                     u32 mask = ~1;
                     *field &= mask;
                 } else {
@@ -120,7 +120,7 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
                         u8 unknown0[8];
                         u32 flags;
                     };
-                    struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+                    struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
                     {
                         u32 mask = ~1;
                         tile->flags &= mask;
@@ -133,15 +133,15 @@ void sub_080B5BEC(struct SceneActorRegistryResetView *actor)
                 ActorShadow_Enable((void *)((u8 *)actor + 0x320));
             } else {
                 u32 one = 1;
-                if (actor->drawableKind == 0) {
-                    u32 *field = actor->drawable;
+                if (actor->base.drawableKind == 0) {
+                    u32 *field = actor->base.drawable;
                     *field |= one;
                 } else {
                     struct Tile {
                         u8 unknown0[8];
                         u32 flags;
                     };
-                    struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+                    struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
                     tile->flags |= one;
                 }
                 {

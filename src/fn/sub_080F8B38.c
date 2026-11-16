@@ -17,16 +17,16 @@ static inline s32 Magnitude(s32 a)
         result = -result;
     return result;
 }
-void SceneActorControl_TiltRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
+void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed)
 {
     s32 angle_2;
-    u8 *state = actor->context;
-    struct RotatingDrawable *drawable = actor->drawable;
+    u8 *state = actor->base.context;
+    struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle, magnitude;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 saved;
         drawable->flags |= 2;
-        saved = actor->tracking.heading;
+        saved = actor->base.tracking.heading;
         state[0xED3] = saved;
     }
     angle = FoldAngle(drawable->angle);

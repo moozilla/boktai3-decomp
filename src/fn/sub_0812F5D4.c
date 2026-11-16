@@ -4,7 +4,7 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_turn.h"
 #include "debug.h"
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
@@ -17,36 +17,36 @@ static inline u32 ContactRoute_FieldBits(u32 mask, u16 *field)
 struct ContactRouteFlagOwner {
     u16 *field;
 };
-static inline u32 ContactRoute_QueryFlags(struct SceneActorRegistryResetView *actor, u32 mask,
+static inline u32 ContactRoute_QueryFlags(struct ChaseActor *actor, u32 mask,
                                           struct ContactRouteFlagOwner *owner)
 {
-    u16 *field = &actor->flags2D4;
+    u16 *field = &actor->base.flags2D4;
     u32 bits = *field & mask;
     owner->field = field;
     return bits;
 }
 
-static inline void ContactRoute_ApplyDuration(struct SceneActorRegistryResetView *a, u32 mask,
+static inline void ContactRoute_ApplyDuration(struct ChaseActor *a, u32 mask,
                                               struct ContactRouteFlagOwner *owner)
 {
     u16 *scale;
     if (ContactRoute_QueryFlags(a, mask, owner)) {
-        u16 *p = &a->field2C2;
+        u16 *p = &a->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *q = &a->field2C2;
+        u16 *q = &a->base.field2C2;
         u16 value = *q;
         scale = q;
         if (!value)
             *scale = 64;
     }
-    if (!a->drawableKind)
-        Anim_SetDurationScale(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
-                              *scale);
+    if (!a->base.drawableKind)
+        Anim_SetDurationScale(
+            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                                   *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
 }
 
 static inline u16 ContactRoute_AdvanceRandomCursor(u32 *cursor, u16 wrap)
@@ -94,16 +94,16 @@ static inline u32 ContactRoute_RandomDirectionExcept(u32 current, const u16 *ran
     return current;
 }
 
-static inline u8 ContactRoute_CurrentDirection(const struct SceneActorRegistryResetView *actor)
+static inline u8 ContactRoute_CurrentDirection(const struct ChaseActor *actor)
 {
-    return actor->body.direction;
+    return actor->base.body.direction;
 }
 
 static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *motionFlags)
 {
     struct SceneActorChaseGroup *group = object;
-    struct SceneActorRegistryResetView *actor = object;
-    group = (void *)((u8 *)group + (u32) & ((struct SceneActorRegistryResetView *)0)->group);
+    struct ChaseActor *actor = object;
+    group = (void *)((u8 *)group + (u32) & ((struct ChaseActor *)0)->group);
     if (!ContactRoute_FieldBits(0x400, motionFlags) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
@@ -117,23 +117,21 @@ static inline void ContactRoute_BeginProbeTurn(void *object, u32 saved, u16 *mot
 }
 
 // Select the contact-facing route behavior.
-static inline void ContactRoute_SetTurnBehavior(struct SceneActorRegistryResetView *actor,
-                                                u32 behavior)
+static inline void ContactRoute_SetTurnBehavior(struct ChaseActor *actor, u32 behavior)
 {
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
-static inline void ContactRoute_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior,
-                                            u32 counter)
+static inline void ContactRoute_SetBehavior(struct ChaseActor *actor, u32 behavior, u32 counter)
 {
-    actor->behavior2AA = behavior;
-    actor->counter2AC = counter;
-    actor->field2B1 = 1;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = counter;
+    actor->base.field2B1 = 1;
 }
 
-void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateContactRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     s32 speed, event;
@@ -142,11 +140,11 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
     if (SceneActorControl_TakeStateEntry(actor)) {
         DEBUG_PRINT();
     }
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if (sub_0812F3CC(actor))
         return;
-    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     durationMask = 0xA02F;
     ContactRoute_ApplyDuration(actor, durationMask, &motionFlags);
     event = NavMesh_ConsumeProbeEvent(group->route);
@@ -156,7 +154,7 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
                 if (SceneActorRoute_TryRecoveryDetour(actor))
                     return;
                 if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
-                    u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;
+                    u32 saved = ((actor->base.nextDirection + 5) & 7) << 5;
                     ContactRoute_BeginProbeTurn(actor, saved, motionFlags.field);
                     return;
                 }
@@ -167,5 +165,5 @@ void SceneActorReaction_UpdateContactRoute(struct SceneActorRegistryResetView *a
         ContactRoute_SetBehavior(actor, 14, event);
         return;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

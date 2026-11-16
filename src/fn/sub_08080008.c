@@ -1,13 +1,13 @@
 #include "debug.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_animation.h"
-void SceneActorReaction_UpdateAnimationGate(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_UpdateAnimationGate(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         DEBUG_PRINT();
     }
-    if (actor->tracking.distance <= 0xFFFFF) {
+    if (actor->base.tracking.distance <= 0xFFFFF) {
         u16 *field = &group->gate.flags;
         u32 mask = 1;
         mask |= *field;

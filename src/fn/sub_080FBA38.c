@@ -46,23 +46,23 @@ static inline void CopyScaleY(struct TrailSprite *src, u8 *dest)
     u8 scaleY = src->scaleY;
     *(u8 *)(dest + 0x711) = scaleY;
 }
-void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
+void Axe_EmitMotionTrail(struct ChaseActor *actor)
 {
-    struct AxeTrailContext *trail = actor->context;
+    struct AxeTrailContext *trail = actor->base.context;
     u8 *context = (void *)trail;
     struct TrailSprite *sprite;
     void *sourceDrawable;
     u8 *slotBase;
     void *scaleDrawable;
     u8 *scaleSlotBase;
-    if ((*((u32 *)actor->drawable)) & 1)
+    if ((*((u32 *)actor->base.drawable)) & 1)
         return;
     {
-        s32 zero = Mod(actor->field2CA, trail->interval);
+        s32 zero = Mod(actor->base.field2CA, trail->interval);
         if (zero)
             return;
         {
-            struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+            struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->unknownA;
             {
@@ -83,7 +83,7 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
     {
         u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
         u8 *slot = context + offset;
-        *((struct ContactPosition *)(slot + 0x724)) = actor->body.position;
+        *((struct ContactPosition *)(slot + 0x724)) = actor->base.body.position;
     }
     {
         u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
@@ -97,15 +97,15 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *actor)
         u8 *slot = context + offset;
         *((u16 *)(slot + 0x764)) = 8;
     }
-    sourceDrawable = actor->drawable;
+    sourceDrawable = actor->base.drawable;
     slotBase =
         context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
     CopyAngle(sourceDrawable, slotBase);
-    scaleDrawable = actor->drawable;
+    scaleDrawable = actor->base.drawable;
     scaleSlotBase =
         context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
     CopyScaleX(scaleDrawable, scaleSlotBase);
-    sourceDrawable = actor->drawable;
+    sourceDrawable = actor->base.drawable;
     slotBase =
         context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
     CopyScaleY(sourceDrawable, slotBase);

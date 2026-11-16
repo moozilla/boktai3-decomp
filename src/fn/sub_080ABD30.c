@@ -49,7 +49,7 @@ u32 TentacleBody_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct SceneActorRegistryResetView *)s)->flags2D0 & m;
+    v = ((struct ChaseActor *)s)->base.flags2D0 & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

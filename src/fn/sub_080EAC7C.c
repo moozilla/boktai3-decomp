@@ -6,40 +6,40 @@
 
 void SceneActor_EndReactionAnimation(void);
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
+static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
-void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
+void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
 {
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
+    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 3);
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
         {
-            u16 *d = &actor->colliderA.flags;
+            u16 *d = &actor->base.colliderA.flags;
             u32 flags = *d;
             u32 mask = 4;
             mask |= flags;
@@ -48,16 +48,16 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         {
             u32 bit = 0x800;
-            actor->flags2C0 = bit | actor->flags2C0;
+            actor->base.flags2C0 = bit | actor->base.flags2C0;
         }
         {
             u32 bit = 0x20;
-            actor->flags2D4 = *(&bit) | actor->flags2D4;
+            actor->base.flags2D4 = *(&bit) | actor->base.flags2D4;
         }
     }
     {
         u32 bit = 0x10;
-        actor->flags2D6 = *(&bit) | actor->flags2D6;
+        actor->base.flags2D6 = *(&bit) | actor->base.flags2D6;
     }
     if (frame <= 17 && sequence->index == 0) {
         u16 elapsed = sequence->elapsed;
@@ -65,19 +65,19 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
         if (elapsed == (duration != 0) && duration != 1)
             sequence->elapsed = 0;
     }
-    if (actor->field2B3) {
-        actor->field2B0 = 0;
+    if (actor->base.restart) {
+        actor->base.field2B0 = 0;
         {
             u16 bit = 0x20;
-            actor->flags2D4 &= ~bit;
+            actor->base.flags2D4 &= ~bit;
         }
         {
-            u32 *field = &actor->flags2CC;
+            u32 *field = &actor->base.flags2CC;
             u32 mask = ~0x80;
             *field &= mask;
         }
         SetCtl(actor, SceneActor_EndReactionAnimation, 0x23);
         SetState(actor, 1, 0, 3);
-        actor->body.direction = actor->tracking.heading;
+        actor->base.body.direction = actor->base.tracking.heading;
     }
 }

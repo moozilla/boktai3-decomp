@@ -34,13 +34,13 @@ struct SceneActorControlGroundView {
     u16 ground;
 };
 static inline struct SceneActorControlMotionState *
-SceneActorControl_GetMotionState(struct SceneActorRegistryResetView *actor)
+SceneActorControl_GetMotionState(struct ChaseActor *actor)
 {
     return (void *)SceneActorControl_GetState(actor);
 }
-void SceneActorControl_SetDefaultPreset(struct SceneActorRegistryResetView *);
+void SceneActorControl_SetDefaultPreset(struct ChaseActor *);
 /* Phase-dispatch callers supply an actor with an initialized control context. */
-void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *);
-void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *);
-void SceneActorControl_TickSway(struct SceneActorRegistryResetView *);
+void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *);
+void SceneActorControl_TickGroundBob(struct ChaseActor *);
+void SceneActorControl_TickSway(struct ChaseActor *);
 #endif

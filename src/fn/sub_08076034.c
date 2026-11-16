@@ -1,7 +1,7 @@
 #include "scene_actor_animation.h"
-static inline void Dir(struct SceneActorAnimationView *actor, u8 *variant, u8 *mirror)
+static inline void Dir(struct RoomActor *actor, u8 *variant, u8 *mirror)
 {
-    s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+    s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
@@ -10,7 +10,7 @@ static inline void Dir(struct SceneActorAnimationView *actor, u8 *variant, u8 *m
         *variant = quadrant;
     }
 }
-static inline void Sel(struct SceneActorAnimationView *actor, u32 selection, u32 variant, u32 flags)
+static inline void Sel(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -21,7 +21,7 @@ static inline void Sel(struct SceneActorAnimationView *actor, u32 selection, u32
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, flags);
@@ -31,7 +31,7 @@ static inline void Sel(struct SceneActorAnimationView *actor, u32 selection, u32
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -58,7 +58,7 @@ static inline void Sel(struct SceneActorAnimationView *actor, u32 selection, u32
     }
     *restart = 0;
 }
-void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *actor, s32 index)
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);

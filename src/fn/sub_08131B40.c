@@ -13,20 +13,20 @@ static inline u32 HasOverride(void)
     return gUnk_02000560 & mask;
 }
 #define SceneActorBehavior_DispatchTable284OrEnterState2 sub_08131B40
-void SceneActorBehavior_DispatchTable284OrEnterState2(struct SceneActorRegistryResetView *actor)
+void SceneActorBehavior_DispatchTable284OrEnterState2(struct ChaseActor *actor)
 {
     if (IsSuspended() || HasOverride()) {
         u32 state = 2;
         u32 one = 1;
         u32 zero;
-        u8 *p = &actor->state2A8;
+        u8 *p = &actor->base.state2A8;
         zero = 0;
         *p = state;
-        actor->phase2A9 = zero;
-        actor->behavior2AA = one;
-        actor->counter2AC = zero;
-        actor->field2B1 = one;
+        actor->base.phase2A9 = zero;
+        actor->base.behavior2AA = one;
+        actor->base.counter2AC = zero;
+        actor->base.field2B1 = one;
     } else {
-        Callback_InvokeActor(actor, actor->callbacks284[actor->behavior2AA]);
+        Callback_InvokeActor(actor, actor->base.callbacks284[actor->base.behavior2AA]);
     }
 }

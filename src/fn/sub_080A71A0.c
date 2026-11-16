@@ -8,7 +8,7 @@ struct TentacleTrailState {
     u8 segmentCount;
     u8 healthPerSegment;
 };
-s32 ActorTrail_RemoveLastSegment(struct SceneActorRegistryResetView *);
+s32 ActorTrail_RemoveLastSegment(struct ChaseActor *);
 
 static inline s32 Tentacle_Shift(s32 value, u32 bits)
 {
@@ -29,52 +29,52 @@ static inline s32 Tentacle_ClampStep(s32 value, s16 limit)
     return value;
 }
 
-static inline void Tentacle_SetReactionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Tentacle_SetReactionFlags(struct ChaseActor *actor, u32 bits)
 {
-    actor->flags2D0 |= bits;
+    actor->base.flags2D0 |= bits;
 }
 
-static inline u8 Tentacle_ApproachReactionEnd(struct SceneActorRegistryResetView *actor)
+static inline u8 Tentacle_ApproachReactionEnd(struct ChaseActor *actor)
 {
     s32 x, z;
     SceneActorChase_SetActorFlags(actor, 0x2000);
     Tentacle_SetReactionFlags(actor, 0x10000);
-    x = Tentacle_Shift(actor->reactionStart.x - actor->reactionEnd.x, 2);
-    z = Tentacle_Shift(actor->reactionStart.z - actor->reactionEnd.z, 2);
+    x = Tentacle_Shift(actor->base.reactionStart.x - actor->base.reactionEnd.x, 2);
+    z = Tentacle_Shift(actor->base.reactionStart.z - actor->base.reactionEnd.z, 2);
     x = Tentacle_ClampStep(x, 200);
     z = Tentacle_ClampStep(z, 200);
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
-    actor->reactionEnd.x += x;
-    actor->reactionEnd.z += z;
+    actor->base.body.motion.x += x;
+    actor->base.body.motion.z += z;
+    actor->base.reactionEnd.x += x;
+    actor->base.reactionEnd.z += z;
     if (x == 0 && z == 0)
         return 1;
     return 0;
 }
 
-static inline void Tentacle_PrepareRecoil(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline void Tentacle_PrepareRecoil(struct ChaseActor *actor, u16 bits)
 {
-    struct SceneActorChaseFlags16 *flags = (void *)&actor->flags2D4;
+    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D4;
     SceneActorChase_SetFlagComponent(flags, bits);
     SceneActorChase_ClearFlagComponent(flags, 1);
 }
 
-void TentacleBody_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
+void TentacleBody_ConvergeReactionMotion(struct ChaseActor *actor)
 {
-    struct TentacleTrailState *trail = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    struct TentacleTrailState *trail = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 segments;
         Tentacle_PrepareRecoil(actor, 0x20);
-        segments = Div(actor->health, trail->healthPerSegment);
+        segments = Div(actor->base.health, trail->healthPerSegment);
         for (; segments < trail->segmentCount; segments++)
             ActorTrail_RemoveLastSegment(actor);
     }
     if (Tentacle_ApproachReactionEnd(actor)) {
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetState(actor, 0, 0, 5);
-        actor->body.direction = actor->tracking.heading;
-        actor->field2C2 = 64;
+        actor->base.body.direction = actor->base.tracking.heading;
+        actor->base.field2C2 = 64;
     }
 }

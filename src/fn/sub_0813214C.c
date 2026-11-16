@@ -13,34 +13,33 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void Hide(struct SceneActorRegistryResetView *a)
+static inline void Hide(struct ChaseActor *a)
 {
-    if (!a->drawableKind) {
-        u32 *flags = a->drawable;
+    if (!a->base.drawableKind) {
+        u32 *flags = a->base.drawable;
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -69,89 +68,89 @@ static inline void Fill(u32 *zero, void *dst)
     *zero = 0;
     CpuSet(zero, dst, 0x05000002);
 }
-void SceneActorReaction_ApplyStaggerDamage(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
 {
-    struct ContactCollider *collider = &actor->colliderA;
+    struct ContactCollider *collider = &actor->base.colliderA;
     {
-        u32 damage = actor->reactionSoundVariant;
-        actor->health -= damage;
+        u32 damage = actor->base.reactionSoundVariant;
+        actor->base.health -= damage;
     }
-    if (!(actor->field2D8 & 0x20000)) {
-        u16 bank = actor->paletteAlternateBank;
-        if (actor->drawableKind == 0)
-            AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+    if (!(actor->base.field2D8 & 0x20000)) {
+        u16 bank = actor->base.paletteAlternateBank;
+        if (actor->base.drawableKind == 0)
+            AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
         else
-            ((struct SceneActorPaletteTileView *)actor->drawable)->palette =
+            ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
                 (const u16 *)(gPaletteBankData + bank * 32);
         {
             u32 eight = 8;
-            actor->field1E8 = eight;
+            actor->base.field1E8 = eight;
         }
         {
             u32 bit = 0x8000;
-            actor->flags2CC |= bit;
+            actor->base.flags2CC |= bit;
         }
         if (SceneActorDamage_ShouldShow(actor)) {
             u32 zero;
             u32 buffer[2];
-            s32 health = actor->health;
-            u32 max = (u16)actor->defaultHealth;
-            s32 kind = (s16)actor->fieldB2;
-            s32 param = (s16)actor->field9A;
-            SceneHud_SetTimedState(actor->body.id, health, max, kind, 0, param);
+            s32 health = actor->base.health;
+            u32 max = (u16)actor->base.defaultHealth;
+            s32 kind = (s16)actor->base.fieldB2;
+            s32 param = (s16)actor->base.field9A;
+            SceneHud_SetTimedState(actor->base.body.id, health, max, kind, 0, param);
             Fill(&zero, buffer);
-            if (actor->reactionSoundVariant || !(actor->field2D8 & 0x20000))
-                DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                         &actor->body.position, buffer, 1);
+            if (actor->base.reactionSoundVariant || !(actor->base.field2D8 & 0x20000))
+                DamageNumberDisplay_Show(&actor->base.colliderA, actor->base.reactionSoundVariant,
+                                         0, &actor->base.body.position, buffer, 1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, 0, 0);
     {
-        struct FlagHalfword *flags = (void *)&actor->flags2D4;
+        struct FlagHalfword *flags = (void *)&actor->base.flags2D4;
         ClearHit(flags, ~0x2000);
-        actor->field2B8 = 0;
+        actor->base.field2B8 = 0;
     }
     SceneActorTerrain_ClearCollisionTimers(actor);
     {
-        u16 *flags = &actor->flags2D6;
+        u16 *flags = &actor->base.flags2D6;
         u32 mask = ~0x980;
         *flags = mask & *flags;
     }
-    if (actor->health <= 0) {
+    if (actor->base.health <= 0) {
         collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = actor->deathControl;
+            void *control = actor->base.deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
-        actor->field2E0 = 32;
+        actor->base.field2E0 = 32;
         if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
-        SetHit(0x20, (void *)&actor->flags2D4);
+        SetHit(0x20, (void *)&actor->base.flags2D4);
         {
             void *control = SceneActorReaction_PlayStaggerBurst;
             Reaction_SetControl(actor, 0x21, control);
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
     }
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
 }

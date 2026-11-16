@@ -7,18 +7,18 @@ static inline u8 ContextHasFlag(struct SceneActorScriptPropertiesView *p, u32 ma
         return 1;
     return 0;
 }
-u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *actor)
+u8 SceneActorReaction_IsRangeReady(struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
-    switch (actor->paletteOffset) {
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
+    switch (actor->base.paletteOffset) {
         case 0:
         case 5:
         case 12:
-            if (actor->category == 5) {
+            if (actor->base.category == 5) {
                 if (context->timer6F0 <= 0)
                     return 1;
-            } else if (actor->category == 7) {
-                if (actor->health <
+            } else if (actor->base.category == 7) {
+                if (actor->base.health <
                         ((struct SceneActorReactionHealthTail *)context)->healthThreshold ||
                     ContextHasFlag(context, 0x80)) {
                     if (context->timer6F0 <= 0)
@@ -28,11 +28,14 @@ u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *actor)
                         return 1;
                 }
             } else {
-                if (actor->tracking.distance < context->distanceThreshold6E0 && context->timer6F0 <= 0)
+                if (actor->base.tracking.distance < context->distanceThreshold6E0 &&
+                    context->timer6F0 <= 0)
                     return 1;
-                if (actor->tracking.distance < context->distanceThreshold6E4 && context->timer6F2 <= 0)
+                if (actor->base.tracking.distance < context->distanceThreshold6E4 &&
+                    context->timer6F2 <= 0)
                     return 1;
-                if (actor->tracking.distance < context->distanceThreshold6E8 && context->timer6F4 <= 0)
+                if (actor->base.tracking.distance < context->distanceThreshold6E8 &&
+                    context->timer6F4 <= 0)
                     return 1;
             }
             break;

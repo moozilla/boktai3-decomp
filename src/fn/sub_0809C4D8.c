@@ -3,35 +3,34 @@
 #include "scene_actor_control_phase.h"
 
 s32 Mod(s32, s32);
-void SceneActorControl_ResetCollisionFlags(struct SceneActorRegistryResetView *);
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+void SceneActorControl_ResetCollisionFlags(struct ChaseActor *);
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
-static inline void Blink(struct SceneActorRegistryResetView *actor)
+static inline void Blink(struct ChaseActor *actor)
 {
     u32 mask = 0x20;
-    mask |= actor->flags2D6;
-    actor->flags2D6 = mask;
+    mask |= actor->base.flags2D6;
+    actor->base.flags2D6 = mask;
 }
 static inline void DisableCollider(struct ContactCollider *collider)
 {
@@ -39,31 +38,31 @@ static inline void DisableCollider(struct ContactCollider *collider)
     collider->flags &= mask;
 }
 // confidence=low: flashes at increasing frequency, then resets collision and movement state.
-void Lun_UpdateTimedRecovery(struct SceneActorRegistryResetView *actor)
+void Lun_UpdateTimedRecovery(struct ChaseActor *actor)
 {
-    u8 *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    u8 *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetControl(actor, SceneActorControl_OnIdle, 16);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 16);
         *(u32 *)(state + 0x3D4) |= 1;
-        DisableCollider(&actor->colliderB);
-        DisableCollider(&actor->colliderA);
+        DisableCollider(&actor->base.colliderB);
+        DisableCollider(&actor->base.colliderA);
         {
-            u16 *flags = &actor->flags2C0;
+            u16 *flags = &actor->base.flags2C0;
             u32 mask = ~0x800;
             mask &= *flags;
             *flags = mask;
         }
     }
-    if ((s32)actor->counter2AC < 40) {
-        if (Mod(actor->counter2AC, 8) == 0)
+    if ((s32)actor->base.counter2AC < 40) {
+        if (Mod(actor->base.counter2AC, 8) == 0)
             Blink(actor);
-    } else if (Mod(actor->counter2AC, 3) == 0)
+    } else if (Mod(actor->base.counter2AC, 3) == 0)
         Blink(actor);
-    if ((s32)actor->counter2AC > 60) {
-        actor->field2EA += actor->body.position.y - actor->groundHeight2BE;
+    if ((s32)actor->base.counter2AC > 60) {
+        actor->base.field2EA += actor->base.body.position.y - actor->base.groundHeight2BE;
         SceneActorControl_ResetCollisionFlags(actor);
         SetState(actor, 0, 0, 0);
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -10,7 +10,7 @@
 void *Heap_Alloc(u32);
 void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
-void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *, s32);
+void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void);
@@ -68,18 +68,18 @@ void Spider_OnSecondaryUpdate(void);
 void Spider_Destroy(void);
 extern const u8 gUnk_08605F34[];
 
-static inline void MonsterInit_EnableInitialFlags(struct SceneActorRegistryResetView *arg0)
+static inline void MonsterInit_EnableInitialFlags(struct ChaseActor *arg0)
 {
-    MonsterInit_SetTargetingFlags(&arg0->tracking, 1);
+    MonsterInit_SetTargetingFlags(&arg0->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(arg0, 0x400000);
     MonsterInit_SetStatusFlags(arg0, 8);
 }
 
-static inline void MonsterInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void MonsterInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->messageCallback = SceneActorScript_OnCommand;
-    arg0->updateCallback = Spider_OnSecondaryUpdate;
-    arg0->destroyCallback = Spider_Destroy;
+    arg0->base.messageCallback = SceneActorScript_OnCommand;
+    arg0->base.updateCallback = Spider_OnSecondaryUpdate;
+    arg0->base.destroyCallback = Spider_Destroy;
 }
 
 static inline void Spider_SetFlags(struct SpiderInstanceState *actor, u32 mask)
@@ -96,23 +96,23 @@ static inline void Spider_InitializeDeferred(struct SpiderDeferredControl *contr
     control->mode = mode;
 }
 
-static inline void Spider_InstallContact(struct SceneActorRegistryResetView *actor,
+static inline void Spider_InstallContact(struct ChaseActor *actor,
                                          struct SceneActorChaseGroup *group)
 {
-    MonsterInit_WriteDataPointer(&actor->commandTable.opaque, gUnk_08605F34);
+    MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_08605F34);
     group->common.gate.control = SceneActorReaction_ResumeEntryTarget;
     if (MonsterInit_GetPaletteOffset(actor) == 0)
-        MonsterInit_WriteContactPredicate(&actor->contactQuery.predicate,
+        MonsterInit_WriteContactPredicate(&actor->base.contactQuery.predicate,
                                           SceneActorPlacement_BeginNearbyPlayerContact);
     else
-        MonsterInit_WriteContactPredicate(&actor->contactQuery.predicate,
+        MonsterInit_WriteContactPredicate(&actor->base.contactQuery.predicate,
                                           SceneActorPlacement_SelectPlayerApproach);
 }
 s32 Spider_Init(void *object)
 {
     struct SpiderInstanceState *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
-    struct SceneActorChaseGroup *group = &((struct SceneActorRegistryResetView *)arg0)->group;
+    struct ChaseActor *actor = object;
+    struct SceneActorChaseGroup *group = &((struct ChaseActor *)arg0)->group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -124,21 +124,21 @@ s32 Spider_Init(void *object)
     Spider_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0x528F, 0xB6EE);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x528F, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializePursuitBody(actor, &zero);
     MonsterInit_ReadPalette(actor, 0xC8, 0x192);
@@ -154,7 +154,7 @@ s32 Spider_Init(void *object)
         SceneActorPlacement_BeginDefaultResponse);
     MonsterInit_InitializeGroupWithBounds(
         group, arg0->bounds630, arg0->bounds654, Spider_OnSecondaryColliderContact, 0,
-        SceneActorReaction_BeginTargetRecovery, 0, 1, &actor->body);
+        SceneActorReaction_BeginTargetRecovery, 0, 1, &actor->base.body);
     SceneActorMovement_ResolveRoutePosition(actor);
     MonsterInit_SetRouteReset(actor, SceneActorRoute_ResetStep);
     MonsterInit_SetReactionGate(actor, 0);
@@ -173,28 +173,28 @@ s32 Spider_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Spider_SetBehaviorTables(actor);
     if (extra != 0) {
-        actor->field2EA = extra;
-        actor->field2E8 = 2;
+        actor->base.field2EA = extra;
+        actor->base.field2E8 = 2;
         MonsterInit_SetControl(actor, Spider_UpdateHiddenRecovery, 0x23);
         MonsterInit_SetState(actor, 3, 0, 0);
-        ScaledShadow_Initialize((u8 *)actor + 0x360, &actor->body.position, 0x40, 0x10, 0x60, 0x64,
-                                0xA00, 1, 5, 1, 0);
+        ScaledShadow_Initialize((u8 *)actor + 0x360, &actor->base.body.position, 0x40, 0x10, 0x60,
+                                0x64, 0xA00, 1, 5, 1, 0);
         Spider_SetFlags(arg0, 1);
     } else {
         MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE);
-        Spider_InitializeDeferred((void *)&group->saved, actor->entryTarget228, 7, 0x3C);
+        Spider_InitializeDeferred((void *)&group->saved, actor->base.entryTarget228, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);

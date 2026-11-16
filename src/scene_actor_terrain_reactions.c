@@ -9,7 +9,7 @@
 void SceneActorRegistry_ApplyTerrainReactions(void)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-    struct SceneActorRegistryResetView *actor;
+    struct ChaseActor *actor;
     struct ContactPosition center, delta;
 
     if (!node)
@@ -17,23 +17,23 @@ void SceneActorRegistry_ApplyTerrainReactions(void)
     actor = (void *)node->actor;
     while (actor) {
         u16 cellFlags;
-        if (actor->enabled != 1 || SceneActorTerrain_ExcludesCategory(actor->category)) {
+        if (actor->base.enabled != 1 || SceneActorTerrain_ExcludesCategory(actor->base.category)) {
             node = node->next;
             actor = (void *)node->actor;
             continue;
         }
-        cellFlags =
-            ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(actor->terrainCell))
-                ->flags;
-        if ((cellFlags & 0x40) &&
-            actor->body.position.y + (s16)actor->field2EA <= actor->groundHeight2BE) {
+        cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(
+                         actor->base.terrainCell))
+                        ->flags;
+        if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.field2EA <=
+                                      actor->base.groundHeight2BE) {
             void *sink;
             if (SceneActorPlacement_IsUnavailable((void *)actor)) {
                 node = node->next;
                 actor = (void *)node->actor;
                 continue;
             }
-            sink = actor->field238;
+            sink = actor->base.field238;
             if (!sink) {
                 SceneActorTerrain_InstallControl(actor, SceneActorReaction_SinkAndRemove, 0x16);
             } else {
@@ -43,21 +43,21 @@ void SceneActorRegistry_ApplyTerrainReactions(void)
             SceneActorTerrain_EnterState(actor, 3, 0, 0);
             MonsterInit_SetStatusFlags(actor, 0x20000);
         } else if ((cellFlags & 0x80) && MonsterInit_TestWorldFlags(0x10)) {
-            struct ContactCollider *collider = &actor->colliderA;
-            if (actor->colliderA.responseValue) {
+            struct ContactCollider *collider = &actor->base.colliderA;
+            if (actor->base.colliderA.responseValue) {
                 node = node->next;
                 actor = (void *)node->actor;
                 continue;
             }
-            SceneActorTerrain_GetCenter(actor->terrainCell, &center);
-            SceneActorTerrain_Subtract(&delta, &center, &actor->body.position);
-            actor->field2B6 = Math_Atan2(delta.x, delta.z) >> 5;
-            actor->field2E0 = 0x20;
+            SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
+            SceneActorTerrain_Subtract(&delta, &center, &actor->base.body.position);
+            actor->base.field2B6 = Math_Atan2(delta.x, delta.z) >> 5;
+            actor->base.field2E0 = 0x20;
             collider->cost = MonsterInit_GetHealth(actor);
-            actor->reactionSoundVariant = MonsterInit_GetHealth(actor);
+            actor->base.reactionSoundVariant = MonsterInit_GetHealth(actor);
             collider->responseParameter = 0x28;
-            actor->field2D8 = 0x200;
-            actor->field2E6 = 1;
+            actor->base.field2D8 = 0x200;
+            actor->base.field2E6 = 1;
             MonsterInit_SetBehaviorFlags(actor, 0x2000);
         }
         node = node->next;

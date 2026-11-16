@@ -9,37 +9,36 @@
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-void SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *);
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryResetView *);
-void SceneActorControl_CallContextScript(struct SceneActorRegistryResetView *);
-static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                                u8 behavior)
+void SceneActorMovement_UpdateAirborne(struct ChaseActor *);
+void SceneActorMovement_UpdateHeight(struct ChaseActor *);
+void SceneActorControl_CallContextScript(struct ChaseActor *);
+static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void Hide(u8 *sprite, u32 mask)
 {
     *(u32 *)(sprite + 8) |= mask;
 }
-static inline u8 DrawableVisible(struct SceneActorRegistryResetView *actor)
+static inline u8 DrawableVisible(struct ChaseActor *actor)
 {
     u32 mask = 1;
-    if (!actor->drawableKind) {
-        if (*(u32 *)actor->drawable & mask)
+    if (!actor->base.drawableKind) {
+        if (*(u32 *)actor->base.drawable & mask)
             goto visible;
         goto hidden;
     }
-    if (((struct SceneActorRegistryTileDrawable *)actor->drawable)->flags & mask)
+    if (((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->flags & mask)
     visible:
         return 1;
 hidden:
     return 0;
 }
-void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorControl_CompleteBlinkOut(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -48,31 +47,31 @@ void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *acto
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
-    if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
-        actor->field2B0 = 1;
+    if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
+        actor->base.field2B0 = 1;
         SceneActorControl_CallContextScript(actor);
         script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
-            values[0] = actor->body.position.x;
-            values[1] = actor->body.position.y;
-            values[2] = actor->body.position.z;
+            values[0] = actor->base.body.position.x;
+            values[1] = actor->base.body.position.y;
+            values[2] = actor->base.body.position.z;
             values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
             values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
             values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-            values[6] = actor->field2E0;
-            values[7] = actor->body.id;
+            values[6] = actor->base.field2E0;
+            values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);
         }
         {
             u32 mask = 0x4000;
-            u16 value = actor->flags2D4;
+            u16 value = actor->base.flags2D4;
             u16 test = value & mask;
-            flags = &actor->flags2D4;
-            if (!test && (u32)(actor->category - 11) > 2)
+            flags = &actor->base.flags2D4;
+            if (!test && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         }
         {
             u32 mask = 0x4000;
@@ -82,27 +81,27 @@ void SceneActorControl_CompleteBlinkOut(struct SceneActorRegistryResetView *acto
                 void *callback = (void *)SceneActorControl_OnIdle;
                 u32 kind;
                 kind = 16;
-                actor->field2B2 = 1;
-                actor->field2B0 = 0;
-                actor->field2B5 = kind;
-                actor->target = callback;
-                actor->field2C8 = 0;
+                actor->base.field2B2 = 1;
+                actor->base.field2B0 = 0;
+                actor->base.field2B5 = kind;
+                actor->base.target = callback;
+                actor->base.field2C8 = 0;
                 {
-                    u32 *flags = &actor->flags114;
+                    u32 *flags = &actor->base.flags114;
                     u32 mask = ~1;
                     *flags &= mask;
                 }
-                actor->word104 = 0;
+                actor->base.word104 = 0;
                 SetAnimation(actor, 1, 0, 2);
             }
         }
         ActorShadow_Disable((u8 *)actor + 0x320);
         {
             u32 mask = 1;
-            if (!actor->drawableKind)
-                *(u32 *)actor->drawable |= mask;
+            if (!actor->base.drawableKind)
+                *(u32 *)actor->base.drawable |= mask;
             else
-                Hide((u8 *)actor->drawable + 0x20, mask);
+                Hide((u8 *)actor->base.drawable + 0x20, mask);
         }
     } else if (DrawableVisible(actor))
         ActorShadow_Disable((u8 *)actor + 0x320);

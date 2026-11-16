@@ -3,9 +3,9 @@
 #include "scene_actor_turn.h"
 #include "display_sequence.h"
 
-static inline u8 Spider_TargetDirection(struct SceneActorRegistryResetView *actor)
+static inline u8 Spider_TargetDirection(struct ChaseActor *actor)
 {
-    return ((actor->unknown3CD[0] + 5) & 7) << 5;
+    return ((actor->base.nextDirection + 5) & 7) << 5;
 }
 
 static inline void Spider_StepDirection(struct SceneActorBody *body, s32 target, s32 step)
@@ -35,42 +35,42 @@ static inline void Spider_StepDirection(struct SceneActorBody *body, s32 target,
     }
 }
 
-static inline void Spider_ApplyDuration(struct SceneActorRegistryResetView *actor)
+static inline void Spider_ApplyDuration(struct ChaseActor *actor)
 {
     u16 *scale;
     u32 mask = 0xA02F;
-    if (actor->flags2D4 & mask) {
-        u16 *p = &actor->field2C2;
+    if (actor->base.flags2D4 & mask) {
+        u16 *p = &actor->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *q = &actor->field2C2;
+        u16 *q = &actor->base.field2C2;
         u16 value = *q;
         scale = q;
         if (!value)
             *scale = 64;
     }
-    if (!actor->drawableKind)
+    if (!actor->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 static inline u16 Spider_ReadCardinal(u8 direction)
 {
     return ((direction + 0x60) >> 6) & 3;
 }
-void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
+void Spider_AdvanceTurnAnimation(struct ChaseActor *actor)
 {
-    struct SceneActorBody *body = &actor->body;
+    struct SceneActorBody *body = &actor->base.body;
     struct DisplaySequenceState *sequence;
     s32 direction, facing, difference;
     if (SceneActorReaction_TakePrepared(actor)) {
         body->direction = (SceneActorTurn_Cardinal(body->direction) << 6) - 64;
         direction = ((body->direction + 0x60) >> 6) & 3;
-        facing = actor->unknown3CD[0];
+        facing = actor->base.nextDirection;
         facing >>= 1;
         if (direction != facing) {
             difference = facing - direction;
@@ -79,7 +79,7 @@ void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
             if (difference == 2)
                 goto turn;
         }
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         return;
     turn:
@@ -98,15 +98,15 @@ void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
                 break;
         }
     }
-    sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+    sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (sequence->elapsed == 0) {
         s32 target = Spider_TargetDirection(actor);
         Spider_StepDirection(body, target, 64);
     }
     Spider_ApplyDuration(actor);
-    if (actor->field2B3) {
-        actor->field2B0 = 1;
-        actor->body.direction = (Spider_ReadCardinal(actor->body.direction) << 6) - 64;
+    if (actor->base.restart) {
+        actor->base.field2B0 = 1;
+        actor->base.body.direction = (Spider_ReadCardinal(actor->base.body.direction) << 6) - 64;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
 }

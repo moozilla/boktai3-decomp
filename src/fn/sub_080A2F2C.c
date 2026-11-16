@@ -2,9 +2,9 @@
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
 #include "scene_actor_control_phase.h"
-u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
+u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 s32 Callback_InvokeActor(void *, void *);
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
+u8 sub_0812F3CC(struct ChaseActor *);
 void SceneActorPhase_SelectLinkedAnimation(void);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
@@ -16,7 +16,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 void sub_080A4798(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
+static inline void State(struct ChaseActor *a, u32 behavior)
 {
     u32 off = 0x2A8;
     u32 phase;
@@ -37,7 +37,7 @@ static inline void State(struct SceneActorRegistryResetView *a, u32 behavior)
         FIELD(a, b, u8) = 1;
     }
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *target)
+static inline void Control(struct ChaseActor *a, void *target)
 {
     u32 off = 0x2B2;
     FIELD(a, off, u8) = 1;
@@ -45,42 +45,42 @@ static inline void Control(struct SceneActorRegistryResetView *a, void *target)
     FIELD(a, off, u8) = 0;
     off += 5;
     FIELD(a, off, u8) = 1;
-    a->target = target;
-    a->field2C8 = 0;
+    a->base.target = target;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         s32 m = ~1;
         *p &= m;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 // confidence=low: advances Spider toward its route probe and resumes route control on arrival
-void Spider_ApproachRouteProbe(struct SceneActorRegistryResetView *actor)
+void Spider_ApproachRouteProbe(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
     s32 speed;
     u16 *scale;
-    if (actor->field2B1)
-        actor->field2B1 = 0;
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *p = &actor->field2C2;
+            u16 *p = &actor->base.field2C2;
             u32 v = *p;
             scale = p;
             if (!v)
                 *p = 64;
         }
     }
-    if (!actor->drawableKind)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+    if (!actor->base.drawableKind)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     if (NavMesh_ConsumeProbeEvent(FIELD(nav, 0x1FC, void *))) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 32, 32,
                                                      speed)) {
@@ -95,10 +95,10 @@ void Spider_ApproachRouteProbe(struct SceneActorRegistryResetView *actor)
         sub_080A4798(actor);
         SceneActorMovement_ResolveRoutePosition(actor);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
         {
             u32 mask = 0x2000;
-            u32 *p = &actor->flags2CC;
+            u32 *p = &actor->base.flags2CC;
             *p |= mask;
         }
     }

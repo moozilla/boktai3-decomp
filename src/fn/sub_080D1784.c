@@ -19,26 +19,26 @@ static inline void ClearFlags(u16 *field, u32 mask)
 {
     *field = *field & ~mask;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, u8 *group)
+static inline u8 TryRoute(struct ChaseActor *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *position = &actor->base.body.position;
     register u32 mask asm("r8") = 0x200;
     struct ContactPosition *target;
     s32 result;
     target = *(struct ContactPosition **)(group + mask);
     result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        ClearFlags(&actor->flags2D4, mask);
+        ClearFlags(&actor->base.flags2D4, mask);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    ClearFlags(&actor->flags2D4, mask);
+    ClearFlags(&actor->base.flags2D4, mask);
     return 0;
 }
 struct RecoveryCounter {
@@ -46,17 +46,17 @@ struct RecoveryCounter {
 };
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 // confidence=low: restarts the saved route after a timed animation and waits before restoring control.
-void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *actor, s32 frame)
+void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
 {
     void *body;
     u8 *group = (u8 *)&actor->group.common;
     struct RecoverySequence *sequence;
     body = (u8 *)actor + 0x50;
-    sequence = (void *)((u8 *)actor->drawable + 0x48);
+    sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     if (SceneActorReaction_TakePrepared(actor)) {
         register u8 *reaction asm("r2") = group + 0x4C;
         {
-            register u32 *flags asm("r3") = &actor->flags2CC;
+            register u32 *flags asm("r3") = &actor->base.flags2CC;
             u32 mask = ~0x141C0;
             asm("" : "+r"(mask) : "r"(flags), "r"(reaction));
             *flags &= mask;
@@ -65,15 +65,15 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *ac
         *(u16 *)(reaction + 0x14) = 0;
         *(u16 *)(reaction + 8) = 0;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
     }
     if (frame <= 0x3B) {
         sequence->frame = 0;
         sequence->timer = 0;
     }
-    if (actor->field2B3) {
+    if (actor->base.restart) {
         ((struct RecoveryCounter *)((u8 *)actor + 0xAA))->value &= 0;
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
         Chase_SetState(actor, 3, 1, 0);
@@ -89,9 +89,9 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *ac
             (*(struct ContactPosition **)(group + 0x200))->pad = 1;
             {
                 u32 mask = 0x10;
-                actor->flags2CC |= mask;
+                actor->base.flags2CC |= mask;
             }
-            SaveDelay(group + 0x8C, actor->entryTarget228, 7, 0x3C);
+            SaveDelay(group + 0x8C, actor->base.entryTarget228, 7, 0x3C);
         }
     }
 }

@@ -68,49 +68,48 @@ static inline void ClearBits(u16 *flags, u32 bits)
 {
     *flags &= ~bits;
 }
-static inline void SetActorBits(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void SetActorBits(struct ChaseActor *actor, u32 bits)
 {
-    actor->flags2CC |= bits;
+    actor->base.flags2CC |= bits;
 }
-static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *context,
-                          struct ContactPosition *source, struct ContactPosition *destination)
+static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct ContactPosition *source,
+                          struct ContactPosition *destination)
 {
     s32 result;
     if (!Nav_IsPositionInMesh(context, source, destination)) {
-        ClearBits(&actor->flags2D4, 0x200);
+        ClearBits(&actor->base.flags2D4, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(context, source, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    ClearBits(&actor->flags2D4, 0x200);
+    ClearBits(&actor->base.flags2D4, 0x200);
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
-                            u32 behavior)
+static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void SetResponse(struct RouteResponse *response, void *control, u32 state, u32 phase,
                                u32 behavior, s32 threshold)
@@ -121,19 +120,19 @@ static inline void SetResponse(struct RouteResponse *response, void *control, u3
     response->phase = phase;
     response->behavior = behavior;
 }
-void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
 {
     struct RouteResponseGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->body.direction = (((actor->field2B6 + 3) & 7) << 5) - 64;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
-        actor->field2B3 = 0;
+        actor->base.body.direction = (((actor->base.field2B6 + 3) & 7) << 5) - 64;
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        actor->base.restart = 0;
     }
-    if (frame > 60 && actor->field2B3) {
-        actor->field2B0 = 1;
-        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
+    if (frame > 60 && actor->base.restart) {
+        actor->base.field2B0 = 1;
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
         SnapToRoute(group->destination, &group->route);
-        if (!TryRoute(actor, group->context, &actor->body.position, group->destination)) {
+        if (!TryRoute(actor, group->context, &actor->base.body.position, group->destination)) {
             SetControl(actor, SceneActorControl_OnIdle, 0);
             SetState(actor, 3, 0, 0);
         } else {
@@ -141,8 +140,8 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor
             SetState(actor, 3, 1, 0);
             SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             SetActorBits(actor, 0x10);
-            actor->field2C2 = 64;
-            SetResponse(&group->response, actor->entryTarget228, 0, 0, 7, 60);
+            actor->base.field2C2 = 64;
+            SetResponse(&group->response, actor->base.entryTarget228, 0, 0, 7, 60);
         }
     }
 }

@@ -15,9 +15,9 @@ static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
         return 1;
     return 0;
 }
-s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
+s32 SceneActorTarget_ResolvePendingObject(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *owner = actor;
+    struct ChaseActor *owner = actor;
     s32 *pendingId = (void *)((u8 *)owner + 0x304);
     if (*pendingId > 0) {
         struct SceneActorTargetLink *state = (void *)((u8 *)owner + 0xDC);
@@ -38,7 +38,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
         {
             u32 mask = 0x80;
             u16 *flags;
-            flags = &owner->flags2D6;
+            flags = &owner->base.flags2D6;
             mask |= *flags;
             mask &= ~0x100;
             *flags = mask;
@@ -61,7 +61,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
         SceneActorContact_SaveTargetCell(owner, cell);
         {
             struct Delta *out = &delta;
-            struct ContactPosition *source = &owner->body.position;
+            struct ContactPosition *source = &owner->base.body.position;
             target = (void *)(state->target + 0xC);
             {
                 u32 xDelta = (u16)target->x;
@@ -77,7 +77,7 @@ s32 SceneActorTarget_ResolvePendingObject(struct SceneActorRegistryResetView *ac
                 u32 direction;
                 u8 *field;
                 direction = Math_Atan2(first->x, out->z);
-                field = &owner->body.direction;
+                field = &owner->base.body.direction;
                 *field = direction;
             }
         }

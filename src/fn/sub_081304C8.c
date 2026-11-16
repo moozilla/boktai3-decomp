@@ -8,75 +8,74 @@ struct DrawablePart {
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 // confidence=low: hides the drawable and moves the actor above the active field.
 #define SceneActorControl_HideOffscreen sub_081304C8
-static inline u8 TakeReset(struct SceneActorRegistryResetView *a)
+static inline u8 TakeReset(struct ChaseActor *a)
 {
-    if (a->field2B1) {
-        a->field2B1 = 0;
+    if (a->base.field2B1) {
+        a->base.field2B1 = 0;
         return 1;
     }
     return 0;
 }
-static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
-                                    u32 kind)
+static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
     u32 zero;
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         zero = 0;
         *field = 1;
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->field2B5 = kind;
+    actor->base.field2B5 = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
-    actor->field2C8 = zero;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state)
+static inline void SetState(struct ChaseActor *actor, u32 state)
 {
-    u8 *field = &actor->state2A8;
+    u8 *field = &actor->base.state2A8;
     u32 zero = 0;
     *field = state;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = zero;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = zero;
     {
-        u32 *counter = &actor->counter2AC;
+        u32 *counter = &actor->base.counter2AC;
         *counter = zero;
     }
-    actor->field2B1 = 1;
+    actor->base.field2B1 = 1;
 }
-static inline void SetFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = mask;
-    value |= actor->flags2D4;
-    actor->flags2D4 = value;
+    value |= actor->base.flags2D4;
+    actor->base.flags2D4 = value;
 }
-void SceneActorControl_HideOffscreen(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_HideOffscreen(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
         struct ContactPosition *position;
-        if (actor->drawableKind == 0)
-            position = (void *)((u8 *)actor->drawable + 0x1C);
+        if (actor->base.drawableKind == 0)
+            position = (void *)((u8 *)actor->base.drawable + 0x1C);
         else
-            position = (void *)((u8 *)actor->drawable + 0x40);
+            position = (void *)((u8 *)actor->base.drawable + 0x40);
         position->y = 30000;
     }
-    actor->body.position.x = 0;
-    actor->body.position.y = 30000;
-    actor->body.position.z = 0;
+    actor->base.body.position.x = 0;
+    actor->base.body.position.y = 30000;
+    actor->base.body.position.z = 0;
     {
         u32 mask = 1;
-        if (actor->drawableKind == 0)
-            FIELD(actor->drawable, 0, u32) |= mask;
+        if (actor->base.drawableKind == 0)
+            FIELD(actor->base.drawable, 0, u32) |= mask;
         else {
-            struct DrawablePart *part = (void *)((u8 *)actor->drawable + 0x20);
+            struct DrawablePart *part = (void *)((u8 *)actor->base.drawable + 0x20);
             part->flags |= mask;
         }
     }
@@ -87,5 +86,5 @@ void SceneActorControl_HideOffscreen(struct SceneActorRegistryResetView *actor)
         u32 mask = 0x40;
         SetFlags(actor, mask);
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

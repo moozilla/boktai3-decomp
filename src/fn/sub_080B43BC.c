@@ -42,7 +42,7 @@ u8 Vorn_UpdateContactResponse(void *);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
-static inline void VornInit_BeginBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void VornInit_BeginBehavior(struct ChaseActor *actor, u32 behavior)
 {
     MonsterInit_SetState(actor, 0, 0, behavior);
 }
@@ -54,18 +54,18 @@ static inline void VornInit_ResetFlags(void *object)
 
 static inline void VornInit_InitializeBody(void *object, u32 *fill)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
+    struct ChaseActor *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
-    arg0->field2C2 = 0x40;
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -82,33 +82,33 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     }
     MonsterInit_InitializeGate(&group->common.gate, gateDuration);
     MonsterInit_ReadRange(&group->common.control);
-    MonsterInit_ReadTargeting(&arg0->tracking);
+    MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
+    arg0->base.fieldB2 = Script_GetKeywordValue(0x4B, 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
     if (identity < 0)
         identity = 0xFFFF;
-    arg0->field9A = identity;
+    arg0->base.field9A = identity;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
@@ -117,38 +117,37 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
-        MonsterInit_SnapToRoute(&arg0->body.position, rt);
+        MonsterInit_SnapToRoute(&arg0->base.body.position, rt);
         MonsterInit_DrawablePosition(arg0);
-        arg0->body.direction = Route_GetCurrentPointFacing(rt);
+        arg0->base.body.direction = Route_GetCurrentPointFacing(rt);
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
         TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->common.bodyId = arg0->body.id;
-    group->common.bodyPosition = &arg0->body.position;
+    group->common.bodyId = arg0->base.body.id;
+    group->common.bodyPosition = &arg0->base.body.position;
 }
 
-static inline void VornInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
-                                        u32 alternate)
+static inline void VornInit_ReadPalette(struct ChaseActor *actor, u32 base, u32 alternate)
 {
     s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base + 1;
+    actor->base.paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->base.basePaletteBank = base;
+    actor->base.paletteAlternateBank = alternate;
+    actor->base.alternateOffset = MonsterInit_GetPaletteOffset(actor) + base + 1;
     palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
+        AnimData_SelectPaletteBank(actor->base.drawable + 0x2C, palette);
     else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
+        *(u8 **)(actor->base.drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->base.drawable + 0x20),
                                            SceneActorScript_GetManagerField62());
 }
 
@@ -173,24 +172,23 @@ void Vorn_BeginTargetPursuit(void);
 void Vorn_OnRender(void);
 void Vorn_OnDestroy(void);
 
-static inline void VornInit_SetReactionTable(struct SceneActorRegistryResetView *actor,
-                                             const void *table)
+static inline void VornInit_SetReactionTable(struct ChaseActor *actor, const void *table)
 {
-    MonsterInit_WriteDataPointer(&actor->commandTable.opaque, table);
+    MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, table);
 }
 
-static inline void VornInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
+static inline void VornInit_EnableInitialFlags(struct ChaseActor *actor)
 {
-    MonsterInit_SetTargetingFlags(&actor->tracking, 1);
+    MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 0x8000000);
 }
 
-static inline void VornInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
+static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->messageCallback = SceneActorScript_OnCommand;
-    arg0->updateCallback = Vorn_OnRender;
-    arg0->destroyCallback = Vorn_OnDestroy;
+    arg0->base.messageCallback = SceneActorScript_OnCommand;
+    arg0->base.updateCallback = Vorn_OnRender;
+    arg0->base.destroyCallback = Vorn_OnDestroy;
 }
 
 void Vorn_ParseField624(void *);
@@ -214,10 +212,10 @@ void Vorn_ResumeReactionRoute(void);
 
 s32 Vorn_Init(void *object)
 {
-    struct SceneActorRegistryResetView *arg0 = object;
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *arg0 = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -237,21 +235,21 @@ s32 Vorn_Init(void *object)
     Vorn_ParseField688(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0x3DB6, 0);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x3DB6, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     VornInit_InitializeBody(arg0, &zero);
     VornInit_ReadPalette(actor, 0x31B, 0x192);
@@ -274,7 +272,7 @@ s32 Vorn_Init(void *object)
     group->responseCallback = Vorn_OnAnimationCleanup;
     group->field5EC = Vorn_BeginTargetPursuit;
     group->field614 = Vorn_ResumeReactionRoute;
-    actor->field2E8 = 3;
+    actor->base.field2E8 = 3;
     VornInit_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
@@ -290,14 +288,14 @@ s32 Vorn_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     SceneActorRegistry_RegisterCategoryReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
@@ -310,21 +308,21 @@ s32 Vorn_Init(void *object)
     flag = ((struct VornInstanceState *)arg0)->field68C;
     if (flag == 1) {
         if (MonsterInit_GetDrawableKind(actor) == 0)
-            *(u32 *)actor->drawable |= flag;
+            *(u32 *)actor->base.drawable |= flag;
         else {
-            u8 *widget = actor->drawable + 0x20;
+            u8 *widget = actor->base.drawable + 0x20;
             *(u32 *)(widget + 8) |= flag;
         }
         ActorShadow_Disable((u8 *)actor + 0x320);
         MonsterInit_SetState(actor, 3, 0, 0);
-        MonsterInit_SetControl(actor, actor->field220, 0xC);
+        MonsterInit_SetControl(actor, actor->base.field220, 0xC);
     } else if ((mode = Script_GetKeywordValue(0x54, 0)) != 0) {
         if (mode == 1)
             ((struct VornInstanceState *)arg0)->field6B9 = 0;
         else
             ((struct VornInstanceState *)arg0)->field6B9 = 1;
         VornInit_BeginBehavior(actor, 0x12);
-        MonsterInit_SetControl(actor, actor->savedTarget, 0);
+        MonsterInit_SetControl(actor, actor->base.savedTarget, 0);
         MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 0x26);
     }
     VornInit_InstallCompletionCallbacks(actor);

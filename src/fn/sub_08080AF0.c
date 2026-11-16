@@ -1,31 +1,31 @@
 #include "scene_actor_reaction.h"
 void SceneActorReaction_PlayAnimationBUntilComplete(void *);
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *actor)
+static inline u8 TakePrepared(struct ChaseActor *actor)
 {
     u8 *field;
-    field = &actor->field2B2;
+    field = &actor->base.field2B2;
     if (*field) {
         *field = 0;
         return 1;
     }
     return 0;
 }
-static inline void SceneActorReaction_UpdateReturnToRoute(struct SceneActorRegistryResetView *actor,
+static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *actor,
                                                           struct SceneActorReactionGroup *group)
 {
     u32 mask;
     if (TakePrepared(actor)) {
-        actor->body.direction = (((actor->body.direction + 128) & 255) >> 6) << 6;
+        actor->base.body.direction = (((actor->base.body.direction + 128) & 255) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     }
     mask = 0x10;
-    if (actor->flags2D0 & mask) {
+    if (actor->base.flags2D0 & mask) {
         struct SceneActorReactionCommand *command;
         void *callback;
         u8 one;
         u32 zero;
         u8 kind;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
         command = (void *)((u8 *)group + 0x8C);
         callback = (void *)SceneActorReaction_PlayAnimationBUntilComplete;
         one = 1;
@@ -37,40 +37,40 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct SceneActorRegis
         command->kind = one;
         callback = (void *)SceneActorReaction_RestoreAfterDelay;
         kind = 14;
-        actor->field2B2 = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = kind;
-        actor->target = callback;
+        actor->base.field2B2 = one;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = kind;
+        actor->base.target = callback;
         {
             u8 byteZero;
             u16 *halfField;
             u32 *field;
             u32 clearMask;
             u32 state;
-            halfField = &actor->field2C8;
+            halfField = &actor->base.field2C8;
             byteZero = 0;
             *halfField = zero;
-            field = &actor->flags114;
+            field = &actor->base.flags114;
             clearMask = ~1;
             *field &= clearMask;
-            actor->word104 = zero;
+            actor->base.word104 = zero;
             state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = one;
-            actor->behavior2AA = byteZero;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = one;
+            actor->base.behavior2AA = byteZero;
             {
-                actor->counter2AC = zero;
+                actor->base.counter2AC = zero;
             }
-            actor->field2B1 = one;
+            actor->base.field2B1 = one;
             {
-                u16 *cooldown = &actor->field2C2;
+                u16 *cooldown = &actor->base.field2C2;
                 *cooldown = 64;
             }
         }
     }
 }
 
-void SceneActorReaction_TurnBackToRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_TurnBackToRoute(struct ChaseActor *actor)
 {
     SceneActorReaction_UpdateReturnToRoute(actor, (void *)&actor->group.common);
 }

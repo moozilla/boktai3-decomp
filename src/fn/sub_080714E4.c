@@ -1,9 +1,9 @@
 #include "scene_actor_reset.h"
-static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     struct SceneActorRegistryRoute *route = &actor->group.homeRoute;
-    struct ContactCollider *collider = &actor->colliderA;
+    struct ContactCollider *collider = &actor->base.colliderA;
     struct ContactPosition *cachedPosition;
     struct ContactPosition *position;
     struct SceneActorRegistryControl *control;
@@ -14,16 +14,16 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
     s32 computedCell;
     u8 *data;
     route->currentPoint = route->pointId;
-    category = actor->category;
+    category = actor->base.category;
     if (category - 18 > 1 && category != 9 && category != 22) {
-        struct ContactPosition *earlyPosition = &actor->body.position;
+        struct ContactPosition *earlyPosition = &actor->base.body.position;
         Path_GetPointPositionById((u16 *)earlyPosition, route->routeId, route->pointId);
         Route_Start(route, route->routeId, route->parameterB, route->pointId);
         ProximityVolume_TranslateBounds(actor->group.route, earlyPosition);
-        actor->body.currentRoute = route;
+        actor->base.body.currentRoute = route;
     }
     {
-        struct ContactPosition *lowPosition = &actor->body.position;
+        struct ContactPosition *lowPosition = &actor->base.body.position;
         x = lowPosition->x >> 8;
         z = lowPosition->z >> 8;
         cachedPosition = lowPosition;
@@ -58,37 +58,38 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
             height -= (u8)position->x;
             break;
     }
-    actor->body.position.y = height;
-    if (!actor->drawableKind)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position =
-            actor->body.position;
+    actor->base.body.position.y = height;
+    if (!actor->base.drawableKind)
+        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
     {
         u16 *address;
         u32 zero;
         {
-            u32 direction = actor->saved.direction;
-            u8 *destination = &actor->body.direction;
+            u32 direction = actor->base.saved.direction;
+            u8 *destination = &actor->base.body.direction;
             zero = 0;
             *destination = direction;
         }
-        address = &actor->field2EA;
+        address = &actor->base.field2EA;
         *address = zero;
         {
             u32 offset = 0x2EC;
             Memory_Clear((u8 *)actor + offset, 8);
         }
-        Memory_Clear(&actor->body.motion, 8);
+        Memory_Clear(&actor->base.body.motion, 8);
         control = &group->control;
         {
             u32 mask = 0x200000;
             u32 *address;
             u32 selected;
-            address = &actor->flags2CC;
+            address = &actor->base.flags2CC;
             selected = *address & mask;
             flags = address;
-            renderFlags = &actor->flags2D0;
+            renderFlags = &actor->base.flags2D0;
             if (selected) {
                 u32 clearMask = ~0x1000000;
                 u32 value;
@@ -99,7 +100,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
                 value &= clearMask;
                 *renderFlags = value;
                 offset = 0x2D4;
-                shortFlags = &actor->flags2D4;
+                shortFlags = &actor->base.flags2D4;
                 mask0 = 0xFFFFFDFF;
                 mask0 &= *shortFlags;
                 *shortFlags = mask0;
@@ -115,14 +116,15 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
         const u16 *offset;
         u32 bank;
         base = (const u16 *)((u8 *)actor + fieldOffset);
-        offset = &actor->paletteOffset;
+        offset = &actor->base.paletteOffset;
         bank = *base;
         bank += *offset;
-        if (!actor->drawableKind)
+        if (!actor->base.drawableKind)
             AnimData_SelectPaletteBank(
-                ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->animation, bank);
+                ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->animation,
+                bank);
         else
-            ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
+            ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
                 gPaletteBankData + (bank << 5);
     }
     {
@@ -133,7 +135,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
     }
     {
         u32 offset = 0x188;
-        Collider_SetPosition(&actor->colliderB, cachedPosition, 0);
+        Collider_SetPosition(&actor->base.colliderB, cachedPosition, 0);
     }
     Collider_SetPosition(collider, cachedPosition, 0);
     {
@@ -148,18 +150,18 @@ static inline void SceneActorRegistry_ResetRouteState(struct SceneActorRegistryR
         zero = 0;
         collider->flags = value;
         offset = 0x1EA;
-        address = &actor->field1EA;
+        address = &actor->base.field1EA;
         *address = zero;
         offset -= 2;
-        address = &actor->field1E8;
+        address = &actor->base.field1E8;
         *address = zero;
     }
     {
         u32 mode = 2;
-        if (!actor->drawableKind)
-            ((u8 *)actor->drawable)[7] = mode;
+        if (!actor->base.drawableKind)
+            ((u8 *)actor->base.drawable)[7] = mode;
         else
-            ((u8 *)actor->drawable)[0x3A] = mode;
+            ((u8 *)actor->base.drawable)[0x3A] = mode;
     }
     collider->responseValue = 0;
 }

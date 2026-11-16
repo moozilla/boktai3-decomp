@@ -1,9 +1,9 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-void SceneActor_EndReactionAnimation(struct SceneActorRegistryResetView *actor)
+void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        u16 *destination = &actor->colliderA.flags;
+        u16 *destination = &actor->base.colliderA.flags;
         u32 flags = *destination;
         u32 mask = 4;
         mask |= flags;
@@ -11,18 +11,18 @@ void SceneActor_EndReactionAnimation(struct SceneActorRegistryResetView *actor)
         *destination = mask;
         {
             u32 mask = 0x800;
-            mask |= actor->flags2C0;
-            actor->flags2C0 = mask;
+            mask |= actor->base.flags2C0;
+            actor->base.flags2C0 = mask;
         }
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 16);
     }
-    if (actor->field2B3) {
+    if (actor->base.restart) {
         ((struct SceneActorRegistryActor *)actor)->field178 = 0;
-        actor->field2B0 = 1;
-        if (!actor->drawableKind)
-            *(u32 *)actor->drawable |= 1;
+        actor->base.field2B0 = 1;
+        if (!actor->base.drawableKind)
+            *(u32 *)actor->base.drawable |= 1;
         else {
-            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             tile->flags |= 1;
         }
     }

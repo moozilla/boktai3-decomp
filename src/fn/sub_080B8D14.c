@@ -2,12 +2,12 @@
 #include "scene_actor_control_helpers.h"
 #include "scene_actor_script.h"
 #include "scene_actor_animation.h"
-void sub_080B5BEC(struct SceneActorRegistryResetView *);
-void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *);
-void sub_080B7768(struct SceneActorRegistryResetView *);
-s32 SceneActorReaction_TickHiddenResponse(struct SceneActorRegistryResetView *actor)
+void sub_080B5BEC(struct ChaseActor *);
+void SceneActorReaction_SetProfileEntries(struct ChaseActor *);
+void sub_080B7768(struct ChaseActor *);
+s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryResetView *saved = actor;
+    struct ChaseActor *saved = actor;
     u32 mask = 0x4000;
     u32 offset = 0x2D4;
     u16 *field;
@@ -23,11 +23,11 @@ s32 SceneActorReaction_TickHiddenResponse(struct SceneActorRegistryResetView *ac
         flags = (void *)actor;
         if (SceneActorControl_TestFlags(enabled, ~0)) {
             u32 one = 1;
-            if (saved->drawableKind == 0) {
-                u32 *field = saved->drawable;
+            if (saved->base.drawableKind == 0) {
+                u32 *field = saved->base.drawable;
                 *field |= one;
             } else {
-                struct SceneActorAnimationTile *tile = (void *)((u8 *)saved->drawable + 0x20);
+                struct SceneActorAnimationTile *tile = (void *)((u8 *)saved->base.drawable + 0x20);
                 tile->flags |= one;
             }
             {

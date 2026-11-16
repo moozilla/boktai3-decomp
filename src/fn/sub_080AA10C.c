@@ -22,9 +22,9 @@ struct ActorTrail {
 void TentacleActor_ResetRouteHistory(void *);
 void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
 void TentacleActor_SelectWanderRoute(void *);
-void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
+void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
 {
-    struct ActorTrail *trail = actor->context;
+    struct ActorTrail *trail = actor->base.context;
     struct ContactPosition *saved;
     trail->flags8D0 &= 0xFFFD;
     trail->field879 = 0;
@@ -41,34 +41,34 @@ void ActorTrail_ResetAtSavedPosition(struct SceneActorRegistryResetView *actor)
     trail->field875 = 0;
     trail->field8F4 = 0;
     saved = &trail->savedPosition;
-    if (!actor->drawableKind)
-        *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = *saved;
+    if (!actor->base.drawableKind)
+        *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) = *saved;
     else
-        *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = *saved;
-    actor->body.position = trail->savedPosition;
+        *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = *saved;
+    actor->base.body.position = trail->savedPosition;
     TentacleActor_ResetRouteHistory(actor);
-    TentacleActor_ResetSegmentPositions(trail, &actor->body.position);
+    TentacleActor_ResetSegmentPositions(trail, &actor->base.body.position);
     TentacleActor_SelectWanderRoute(actor);
     {
         u32 state = 2;
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = state;
-        actor->counter2AC = 0;
+        actor->base.state2A8 = 0;
+        actor->base.phase2A9 = 0;
+        actor->base.behavior2AA = state;
+        actor->base.counter2AC = 0;
     }
-    actor->field2B1 = 1;
+    actor->base.field2B1 = 1;
     {
-        void *target = actor->entryTarget228;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = 1;
-        actor->target = target;
+        void *target = actor->base.entryTarget228;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = 1;
+        actor->base.target = target;
     }
-    actor->field2C8 = 0;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }

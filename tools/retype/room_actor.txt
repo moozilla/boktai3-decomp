@@ -1,0 +1,51 @@
+# The registry actor base (item 5 of docs/OBJECT_MODEL.md), as replayable steps:
+#   python3 tools/retype_fields.py --steps tools/retype/room_actor.txt --dependents include/room_actor.h
+# Run it on a branch after merging the header changes: it rewrites the accesses in your
+# units that no longer compile. Steps run in order; each is safe to repeat. Renames come
+# first and the embedding last, so old code gets both (`x->field2B3` -> `x->base.restart`).
+
+# Names the base took from the views.
+[text]
+unknown3CD[0] nextDirection
+[map]
+field2B3 restart
+
+# SceneActorAnimationView was a view of the base alone.
+[types]
+SceneActorAnimationView RoomActor
+[map]
+direction body.direction
+facingAngle tracking.heading
+phaseTimer tracking.distance
+phase state2A8
+subphase phase2A9
+nextPhase behavior2AA
+phaseCounter counter2AC
+phaseReady field2B1
+directionalEntryFlag field2B2
+selection animationIndex
+link context
+unknown2B0 field2B0
+
+# SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
+# 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that
+# type by hand (the tool reports them as "no member named" errors). A struct that held a
+# ResetView by value must grow the padding after it by 0xC8 (0x6EC - 0x624); the byte
+# check (tools/header_dependents.py --check) catches one that does not.
+[types]
+SceneActorRegistryResetView ChaseActor
+
+# The monster structs and ChaseActor embed struct RoomActor as `base`.
+[embed RoomActor base]
+
+# Last: the chase classes (Skeleton, Vorn, Golem, Mummy, Dog) embed struct ChaseActor
+# as `chase`, and pass `&actor->chase` where chase code takes a ChaseActor.
+[map]
+base chase.base
+group chase.group
+[upcast chase]
+
+# Skeleton's private views (SkeletonSelectionContext in sub_080B7C10.c,
+# SkeletonRecoveryContext in sub_080BBDD0.c) are struct Skeleton now; nothing to replay
+# unless a branch edited those two units (their fields: attempts, nearDistance,
+# farDistance, and pursuitTimer for the recovery timer).

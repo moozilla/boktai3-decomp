@@ -1,15 +1,15 @@
 #include "scene_actor_chase.h"
 void Golem_UpdateChargeBuildup(void);
 
-void Golem_BeginChargeBuildup(struct SceneActorRegistryResetView *actor)
+void Golem_BeginChargeBuildup(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xE);
         {
             u32 mask = 0x100;
-            actor->flags2D4 = mask | actor->flags2D4;
+            actor->base.flags2D4 = mask | actor->base.flags2D4;
         }
     }
-    if (actor->field2B3)
+    if (actor->base.restart)
         Chase_SetCtl(actor, Golem_UpdateChargeBuildup, 0x22);
 }

@@ -4,8 +4,7 @@
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
 void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -16,7 +15,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -26,7 +25,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -64,11 +63,11 @@ static inline u8 Take(u8 *p)
     }
     return 0;
 }
-static inline void Control(struct SceneActorAnimationView *a, void *callback, u32 phase)
+static inline void Control(struct RoomActor *a, void *callback, u32 phase)
 {
     u32 zero = 0;
-    a->directionalEntryFlag = 1;
-    a->unknown2B0 = zero;
+    a->field2B2 = 1;
+    a->field2B0 = zero;
     FIELD(a, 0x2B5, u8) = phase;
     FIELD(a, 0x21C, void *) = callback;
     FIELD(a, 0x2C8, u16) = zero;
@@ -80,21 +79,20 @@ static inline void Control(struct SceneActorAnimationView *a, void *callback, u3
     FIELD(a, 0x104, u32) = zero;
 }
 // confidence=low: turns one octant toward the requested direction on animation ticks.
-static inline u32 Arg1(u32 k_, struct SceneActorAnimationView *actor)
+static inline u32 Arg1(u32 k_, struct RoomActor *actor)
 {
     return (*((u16 *)(((u8 *)actor) + 0x2D4))) & k_;
 }
 
-static inline u32 Arg2(u32 k_, struct SceneActorAnimationView *actor)
+static inline u32 Arg2(u32 k_, struct RoomActor *actor)
 {
     return (*((u32 *)(((u8 *)actor) + 0x2CC))) & k_;
 }
 
-inline static void Control_UpdateTurnAnimation(struct SceneActorAnimationView *a, void *callback,
-                                               u32 phase)
+inline static void Control_UpdateTurnAnimation(struct RoomActor *a, void *callback, u32 phase)
 {
-    a->directionalEntryFlag = 1;
-    a->unknown2B0 = 0;
+    a->field2B2 = 1;
+    a->field2B0 = 0;
     *((u8 *)(((u8 *)a) + 0x2B5)) = phase;
     *((void **)(((u8 *)a) + 0x21C)) = callback;
     *((u16 *)(((u8 *)a) + 0x2C8)) = 0;
@@ -106,17 +104,17 @@ inline static void Control_UpdateTurnAnimation(struct SceneActorAnimationView *a
     *((u32 *)(((u8 *)a) + 0x104)) = 0;
 }
 
-void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
+void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
     u8 *sequence;
-    if (Take(&actor->directionalEntryFlag)) {
-        s32 current = ((actor->direction + 0x70) >> 5) & 7;
+    if (Take(&actor->field2B2)) {
+        s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
-            actor->direction = actor->nextDirection;
+            actor->body.direction = actor->nextDirection;
             Control_UpdateTurnAnimation(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
-            actor->unknown2B0 = 1;
+            actor->field2B0 = 1;
             return;
         }
         target -= 8;
@@ -133,16 +131,16 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         }
     }
     {
-        struct SceneActorRegistryResetView *state = (void *)actor;
+        struct ChaseActor *state = (void *)actor;
         sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
         {
             u32 mask = 0xA02F;
             u16 *scale;
-            if (state->flags2D4 & mask) {
-                state->field2C2 = 64;
-                scale = &state->field2C2;
+            if (state->base.flags2D4 & mask) {
+                state->base.field2C2 = 64;
+                scale = &state->base.field2C2;
             } else {
-                u16 *p = &state->field2C2;
+                u16 *p = &state->base.field2C2;
                 u16 value = *p;
                 scale = p;
                 if (!value)

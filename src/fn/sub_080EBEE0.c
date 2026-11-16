@@ -3,34 +3,34 @@
 
 void Octopus_ReturnToRoutePoint(void);
 void SceneActorReaction_RestoreAlternateAfterDelay(void);
-void SceneActorTerrain_ResumeDrawable(struct SceneActorRegistryResetView *);
+void SceneActorTerrain_ResumeDrawable(struct ChaseActor *);
 
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s)
+static inline void SetState(struct ChaseActor *actor, u32 s)
 {
-    u8 *state = &actor->state2A8;
+    u8 *state = &actor->base.state2A8;
     u32 zero = 0;
     *state = s;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = zero;
-    actor->counter2AC = zero;
-    actor->field2B1 = 1;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = zero;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = 1;
 }
 
-static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u32 k)
+static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 struct Delay {
@@ -42,7 +42,7 @@ struct Delay {
 
 /* Octopus: settle into state 3, return to the route point after 60 ticks,
    restore the alternate pose after 14, and raise the drawable flag. */
-void sub_080EBEE0(struct SceneActorRegistryResetView *actor)
+void sub_080EBEE0(struct ChaseActor *actor)
 {
     SetState(actor, 3);
     {

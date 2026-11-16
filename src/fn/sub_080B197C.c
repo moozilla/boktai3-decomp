@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
+#include "vorn.h"
 
 extern const u8 gUnk_0824E230[];
 void sub_080B3110(void *, u32, const void *, u32);
@@ -11,13 +11,17 @@ static inline u8 HasFlag(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 ShouldReact(u8 *ctx, u32 value)
+// The u16 parameter here and the u8 mask of MotionFlag lengthen the actor pointer's life by a
+// few insns before combine, enough that `active` (8 refs) outranks it for r4.
+static inline u8 ShouldReact(struct Vorn *ctx, u16 value)
 {
-    if (HasFlag(value, 1) || *(s16 *)(ctx + 0x67C) >= 0)
+    if (HasFlag(value, 1))
+        return 1;
+    if (ctx->field67C >= 0)
         return 1;
     return 0;
 }
-static inline u8 MotionFlag(struct SceneActorReactionMotion *m, u32 mask)
+static inline u8 MotionFlag(struct SceneActorReactionMotion *m, u8 mask)
 {
     if (m->flags & mask)
         return 1;
@@ -36,31 +40,28 @@ static inline void MarkReactionMotion(struct SceneActorReactionMotion *m)
     m->flags = mask | m->flags;
 }
 
-void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
+void Vorn_SelectReactionControl(struct ChaseActor *a)
 {
-    u8 *ctx = a->context;
-    u16 *flags = (void *)(ctx + 0x6D4);
+    struct Vorn *ctx = a->base.context;
+    u16 *flags = &ctx->flags6D4;
     u32 value = ~8;
     value &= *flags;
     *flags = value;
     if (ShouldReact(ctx, value)) {
         sub_080B3110(a, 1, gUnk_0824E230, 0x279);
-        MarkReactionMotion((void *)&a->tracking.target);
+        MarkReactionMotion((void *)&a->base.tracking.target);
         {
             u32 mask = 0x80;
-            a->flags2CC = mask | a->flags2CC;
+            a->base.flags2CC = mask | a->base.flags2CC;
         }
     } else {
-        u32 active = MotionFlag((void *)&a->tracking.target, 8);
-        /* Phase 3: without this, a (18 refs / 94) outranks active (8 / 33); active needs one more
-         * ref or two fewer insns of life (AGBCC_PRI=active:+400). */
-        asm("" : : "r"(active));
+        u32 active = MotionFlag((void *)&a->base.tracking.target, 8);
         if (active)
             SceneActor_DispatchContextAction(ctx, 0);
         else {
             Chase_SetState(a, active, 1, active);
             Chase_SetCtl(a, SceneActorControl_OnIdle, 16);
         }
-        SetMotion((void *)&a->tracking.target, 8);
+        SetMotion((void *)&a->base.tracking.target, 8);
     }
 }

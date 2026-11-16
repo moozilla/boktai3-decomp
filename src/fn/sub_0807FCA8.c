@@ -21,11 +21,11 @@ static inline s32 Angle(s32 angle)
         angle += 256;
     return angle;
 }
-static inline void SetActorFlags(struct SceneActorRegistryResetView *input, u32 mask)
+static inline void SetActorFlags(struct ChaseActor *input, u32 mask)
 {
     u32 value = mask;
-    value |= input->flags2D6;
-    input->flags2D6 = value;
+    value |= input->base.flags2D6;
+    input->base.flags2D6 = value;
 }
 
 static inline s32 RelativeAngle(s32 x, s32 z, s32 facing)
@@ -33,38 +33,39 @@ static inline s32 RelativeAngle(s32 x, s32 z, s32 facing)
     return Angle(Math_Atan2(x, z) - facing);
 }
 
-void SceneActorControl_UpdateContactRelease(struct SceneActorRegistryResetView *input, s32 frame)
+void SceneActorControl_UpdateContactRelease(struct ChaseActor *input, s32 frame)
 {
     u8 *group = ((u8 *)input) + 0x3D4;
     void **node;
     struct ContactPosition delta;
-    if (SceneActorControl_TakeFlag(&input->field2B2))
+    if (SceneActorControl_TakeFlag(&input->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(input, 0);
     node = (void **)(group + 0x88);
-    Delta(&delta, &input->body.position, (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
-    RelativeAngle(delta.x, delta.z, input->body.direction);
+    Delta(&delta, &input->base.body.position,
+          (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
+    RelativeAngle(delta.x, delta.z, input->base.body.direction);
     if (frame > 59) {
         if (frame <= 119) {
             SceneActorAnimation_SelectDirectionalEntry(input, 3);
             if (frame == 60)
-                SceneActorEffect_PlayCategorySound(0, input->category, ((u8 *)input)[0x1E6]);
+                SceneActorEffect_PlayCategorySound(0, input->base.category, ((u8 *)input)[0x1E6]);
             if (frame == 100) {
                 TetherActor_StartInteractionEffect();
                 SceneActorContacts_ReleaseNode(*((void **)(group + 0x88)));
             }
             if ((frame >> 2) & 1)
                 SetActorFlags(input, 0x20);
-            if (!input->drawableKind) {
+            if (!input->base.drawableKind) {
                 struct Sequence {
                     u8 pad[14];
                     u16 elapsed;
                 };
-                struct Sequence *s = (void *)(((u8 *)input->drawable) + 0x48);
+                struct Sequence *s = (void *)(((u8 *)input->base.drawable) + 0x48);
                 s->elapsed = 0;
             } else
-                *((u16 *)(((u8 *)input->drawable) + 0x2C)) = 0;
+                *((u16 *)(((u8 *)input->base.drawable) + 0x2C)) = 0;
         }
-        if (input->field2B3) {
+        if (input->base.restart) {
             Callback_InvokeActor(input, *((void **)(group + 0x244)));
             *((void **)(group + 0x88)) = 0;
         }

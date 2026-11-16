@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *);
+void SceneActor_UpdateForwardCollider(struct ChaseActor *);
 struct TargetedAttackContext {
     u8 unknown0[0x628];
     struct ContactCollider collider;
@@ -16,28 +16,28 @@ struct TargetedAttackTarget {
     u8 unknown0[0xC];
     struct ContactPosition position;
 };
-static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
+static inline u8 TakeEntryFlag(struct ChaseActor *s)
 {
-    if (s->field2B2) {
-        s->field2B2 = 0;
+    if (s->base.field2B2) {
+        s->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
-void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *s)
+void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
 {
-    struct TargetedAttackContext *context = s->context;
-    struct TargetedAttackSequence *sequence = (void *)((u8 *)s->drawable + 0x20);
+    struct TargetedAttackContext *context = s->base.context;
+    struct TargetedAttackSequence *sequence = (void *)((u8 *)s->base.drawable + 0x20);
     if (TakeEntryFlag(s)) {
-        s->body.direction = (((s->tracking.heading + 0x20) & 0xFF) >> 6) << 6;
+        s->base.body.direction = (((s->base.tracking.heading + 0x20) & 0xFF) >> 6) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 5);
-        context->target = ((struct TargetedAttackTarget *)s->tracking.target)->position;
+        context->target = ((struct TargetedAttackTarget *)s->base.tracking.target)->position;
         Sound_PlaySong(0x1D0);
     }
     if ((u16)(sequence->frame - 3) <= 1) {
         SceneActor_UpdateForwardCollider(s);
         Collider_Refresh(&context->collider);
     }
-    if (s->field2B3)
-        s->field2B0 = 1;
+    if (s->base.restart)
+        s->base.field2B0 = 1;
 }

@@ -1,8 +1,8 @@
 #include "scene_actor_animation.h"
 /* SceneActorAnimation_SelectDirectionalExtraFlags: Selects a profile animation with variant zero and combines direction-derived mirroring with entry flags and caller-supplied playback flags */
 #define SceneActorAnimation_SelectDirectionalExtraFlags sub_080762A8
-void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationView *actor,
-                                                     s32 index, u32 extraFlags)
+void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s32 index,
+                                                     u32 extraFlags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
@@ -18,7 +18,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
     u8 *restart;
     {
         u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+        s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
             *mirrorPointer = 1;
@@ -41,7 +41,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         {
             void *sequence = drawable->sequence;
@@ -55,7 +55,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct SceneActorAnimationV
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))

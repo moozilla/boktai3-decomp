@@ -43,24 +43,24 @@ static inline u8 SceneActorEffects_NextSparkCount(const u16 *table)
     return (SceneActorEffects_NextSample(table) & 3) + 1;
 }
 
-static inline void SceneActorEffects_SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
+static inline void SceneActorEffects_SpawnDefeatSparks(struct ChaseActor *actor,
                                                        const struct ContactPosition *range,
                                                        const u16 *table, u8 firstCount)
 {
     s32 verticalRange, kind;
     u32 priority;
-    SparkParticle_Spawn(&actor->body.position, firstCount, range, 32, 4, verticalRange = 20,
+    SparkParticle_Spawn(&actor->base.body.position, firstCount, range, 32, 4, verticalRange = 20,
                         kind = 2, priority = 1);
-    SparkParticle_Spawn(&actor->body.position, SceneActorEffects_NextSparkCount(table), range, 64,
-                        4, verticalRange, kind, priority);
-    SparkParticle_Spawn(&actor->body.position, SceneActorEffects_NextSparkCount(table), range, 94,
-                        4, verticalRange, kind, priority);
-    SparkParticle_Spawn(&actor->body.position, SceneActorEffects_NextSparkCount(table), range, 128,
-                        4, verticalRange, kind, priority);
-    SparkParticle_Spawn(&actor->body.position, SceneActorEffects_NextSparkCount(table), range, 196,
-                        4, verticalRange, kind, priority);
-    SparkParticle_Spawn(&actor->body.position, SceneActorEffects_NextSparkCount(table), range, 240,
-                        4, verticalRange, kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, SceneActorEffects_NextSparkCount(table), range,
+                        64, 4, verticalRange, kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, SceneActorEffects_NextSparkCount(table), range,
+                        94, 4, verticalRange, kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, SceneActorEffects_NextSparkCount(table), range,
+                        128, 4, verticalRange, kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, SceneActorEffects_NextSparkCount(table), range,
+                        196, 4, verticalRange, kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, SceneActorEffects_NextSparkCount(table), range,
+                        240, 4, verticalRange, kind, priority);
 }
 
 #endif

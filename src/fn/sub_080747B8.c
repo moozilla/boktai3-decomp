@@ -24,7 +24,7 @@ static inline void orFlags(u32 *flags, u32 mask)
 {
     *flags |= mask;
 }
-s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
+s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
 {
     u8 category;
     u32 *flags;
@@ -36,31 +36,31 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
     s32 height, kind;
     struct BurstExtent extent;
     struct BurstExtent *burst;
-    if (motionSquared(&actor->secondaryMotion) == 0 && *(s16 *)&actor->field2EA == 0) {
-        u32 *clear = &actor->flags2D0;
+    if (motionSquared(&actor->base.secondaryMotion) == 0 && *(s16 *)&actor->base.field2EA == 0) {
+        u32 *clear = &actor->base.flags2D0;
         u32 mask = ~0x10;
         *clear &= mask;
         return 1;
     }
-    category = actor->category;
+    category = actor->base.category;
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
     {
         u32 mask = 0x100000;
-        value = actor->flags2D0 & mask;
-        flags = &actor->flags2D0;
+        value = actor->base.flags2D0 & mask;
+        flags = &actor->base.flags2D0;
     }
     if (!value) {
-        u16 *y = (u16 *)&actor->secondaryMotion.y;
+        u16 *y = (u16 *)&actor->base.secondaryMotion.y;
         s32 dy;
         *y = dy = *y - 2;
-        actor->field2EA += dy;
-        actor->body.motion.x += actor->secondaryMotion.x;
-        actor->body.motion.z += actor->secondaryMotion.z;
-        index = actor->terrainCell;
-        local = &actor->body.position;
+        actor->base.field2EA += dy;
+        actor->base.body.motion.x += actor->base.secondaryMotion.x;
+        actor->base.body.motion.z += actor->base.secondaryMotion.z;
+        index = actor->base.terrainCell;
+        local = &actor->base.body.position;
         cell = TerrainModifiers_FindCellOverride(index, 1);
         position = (void *)local;
         if (cell) {
@@ -68,12 +68,12 @@ s32 SceneActorMovement_UpdateAirborne(struct SceneActorRegistryResetView *actor)
             goto haveCell;
         }
     } else {
-        if (Mod(actor->field2CA, 4) == 0) {
-            actor->secondaryMotion.x = halve(actor->secondaryMotion.x);
-            actor->secondaryMotion.z = halve(actor->secondaryMotion.z);
+        if (Mod(actor->base.field2CA, 4) == 0) {
+            actor->base.secondaryMotion.x = halve(actor->base.secondaryMotion.x);
+            actor->base.secondaryMotion.z = halve(actor->base.secondaryMotion.z);
         }
-        actor->body.motion.x += actor->secondaryMotion.x;
-        actor->body.motion.z += actor->secondaryMotion.z;
+        actor->base.body.motion.x += actor->base.secondaryMotion.x;
+        actor->base.body.motion.z += actor->base.secondaryMotion.z;
         return 0;
     }
     cell = gTerrainMap->cells + (index * 4 + 12);
@@ -92,7 +92,7 @@ slopeX:
     height -= *(u8 *)local;
 done:;
     {
-        s16 *elevation = (s16 *)&actor->field2EA;
+        s16 *elevation = (s16 *)&actor->base.field2EA;
         if (*elevation + height <= height) {
             u16 *bouncePtr;
             u16 bounce;
@@ -103,29 +103,29 @@ done:;
             bounce = *bouncePtr;
             burst = &extent;
             if (bounce == 0) {
-                ZeroFill8(&actor->secondaryMotion);
+                ZeroFill8(&actor->base.secondaryMotion);
                 *elevation = bounce;
             } else {
                 s32 y;
-                actor->secondaryMotion.x = Div(actor->secondaryMotion.x * 5, 10);
-                y = actor->secondaryMotion.y;
+                actor->base.secondaryMotion.x = Div(actor->base.secondaryMotion.x * 5, 10);
+                y = actor->base.secondaryMotion.y;
                 if (y < 0)
                     y = -y;
-                actor->secondaryMotion.y = Div(*bouncePtr * y, 10);
-                actor->secondaryMotion.z = Div(actor->secondaryMotion.z * 5, 10);
+                actor->base.secondaryMotion.y = Div(*bouncePtr * y, 10);
+                actor->base.secondaryMotion.z = Div(actor->base.secondaryMotion.z * 5, 10);
             }
             if (category != 0x11 && category != 0x17 && category != 0x13 && category != 0x12 &&
                 category != 0xe && category != 0xc)
-                SceneParticleBurst_CreateWithPause(position, &actor->secondaryMotion, burst, 6, 2,
-                                                   4);
+                SceneParticleBurst_CreateWithPause(position, &actor->base.secondaryMotion, burst, 6,
+                                                   2, 4);
             if (*(void **)((u8 *)actor + 0x240))
                 Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x240));
-            actor->field2EA = 0;
+            actor->base.field2EA = 0;
         }
     }
-    if (motionSquared(&actor->secondaryMotion) == 0 && *(s16 *)&actor->field2EA == 0) {
-        actor->field2EA = 0;
-        ZeroFill8(&actor->secondaryMotion);
+    if (motionSquared(&actor->base.secondaryMotion) == 0 && *(s16 *)&actor->base.field2EA == 0) {
+        actor->base.field2EA = 0;
+        ZeroFill8(&actor->base.secondaryMotion);
         orFlags(flags, 0x10);
         return 1;
     }

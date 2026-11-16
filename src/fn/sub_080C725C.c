@@ -6,7 +6,7 @@
 
 struct SceneActorPlacementView;
 void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *, u32);
-u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *);
+u32 ActorMode_SelectOddStateVariant(struct ChaseActor *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);
 
@@ -33,9 +33,9 @@ static inline s32 GolemSlide_Quarter(s16 value)
     return -((-value) >> 2);
 }
 
-static inline void GolemSlide_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
+static inline void GolemSlide_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->flags2D4 = mask | actor->flags2D4;
+    actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
 
 static inline void GolemSlide_ClearColliderFlags(struct ContactCollider *collider, u16 bits)
@@ -44,29 +44,30 @@ static inline void GolemSlide_ClearColliderFlags(struct ContactCollider *collide
     collider->flags = mask & collider->flags;
 }
 
-static inline void GolemSlide_SetDelay(struct SceneActorRegistryResetView *actor, u16 delay)
+static inline void GolemSlide_SetDelay(struct ChaseActor *actor, u16 delay)
 {
-    actor->fieldAA = delay;
+    actor->base.fieldAA = delay;
 }
 
-static inline void GolemSlide_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void GolemSlide_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->flags2D0 |= mask;
+    actor->base.flags2D0 |= mask;
 }
 
-void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 frame)
+void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
 {
-    struct GolemSlideContext *context = actor->context;
+    struct GolemSlideContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
-    struct SceneActorBody *body = &actor->body;
+    struct SceneActorBody *body = &actor->base.body;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 4);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 15);
     SceneActorChase_SetReactionFlags(actor, 0x20);
     GolemSlide_SetMotionFlags(actor, 0x100);
     SceneActorChase_SetActorFlags(actor, 0x2000);
-    actor->body.motion.x += (context->speed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
-    actor->body.motion.z += (context->speed * gUnk_086149C4[body->direction]) >> 16;
+    actor->base.body.motion.x +=
+        (context->speed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
+    actor->base.body.motion.z += (context->speed * gUnk_086149C4[body->direction]) >> 16;
     if ((frame & 3) == 0) {
         struct SceneExtent velocity, spread;
         velocity.x = -body->motion.x;
@@ -78,7 +79,7 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
         SceneParticleBurst_CreateWithPause((void *)&body->position, (s32)&velocity, &spread, 1, 3,
                                            4);
     }
-    if (actor->unknown9[0x40 - 9] & 1) {
+    if (actor->base.unknown9[0x40 - 9] & 1) {
         struct SceneExtent velocity, spread;
         u32 count;
         u32 randomOrigin;
@@ -97,13 +98,13 @@ void Golem_UpdateSlideImpact(struct SceneActorRegistryResetView *actor, u32 fram
                      &velocity, &spread, 45, 31);
         SceneActorPlacement_PlayVariantEventSound((void *)actor, 5);
         if (context->recovery) {
-            actor->field2B0 = 1;
+            actor->base.field2B0 = 1;
         } else {
             GolemSlide_SetDelay(actor, 180);
             GolemSlide_SetStatusFlags(actor, 1);
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, group->contactControl, 7);
-            GolemSlide_ClearColliderFlags(&actor->colliderA, 0x100);
+            GolemSlide_ClearColliderFlags(&actor->base.colliderA, 0x100);
         }
     }
 }

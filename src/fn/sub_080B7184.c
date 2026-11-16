@@ -11,9 +11,9 @@ static inline void SetContextFlags(struct SceneActorScriptPropertiesView *p, u32
 {
     p->flags6DC |= mask;
 }
-void SceneActorReaction_ParseOptions(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_ParseOptions(struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
     s32 mode;
     s32 value;
     if (Script_SeekToKeyword('E')) {

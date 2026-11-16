@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 /* Golem: route back to its home cell; near it, settle (sub_080C47DC), else face the cell centre; then go to state 2 (tentative) */
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 void Golem_BeginChargeBuildup(void);
 void Golem_UpdateRouteMotion(void);
 void sub_080C47B8(struct ContactPosition *);
@@ -15,27 +15,27 @@ struct GolemRouteLink {
     u8 unknown0[8];
     struct GolemRoutePoint *point;
 };
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -70,22 +70,22 @@ slopeX:
 done:
     return height;
 }
-void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
+void Golem_ReturnHome(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     struct ContactPosition center;
     struct ContactPosition diff;
     if (TakeFlag2B1(actor)) {
         void *target = Golem_BeginChargeBuildup;
         SetControl(actor, 0x25, target);
-        actor->body.direction = actor->tracking.heading;
-        actor->field2B0 = 0;
+        actor->base.body.direction = actor->base.tracking.heading;
+        actor->base.field2B0 = 0;
         *(u16 *)(body + 0x688) = 0;
     }
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
         struct GolemRouteLink *link = (struct GolemRouteLink *)(group + 0x74);
         dest->x = link->point->x;
@@ -98,17 +98,17 @@ void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
         *(u16 *)(body + 0x684) = 2;
         *(u16 *)(body + 0x682) = 0;
         *(struct ContactPosition *)(body + 0x69C) = *(struct ContactPosition *)(body + 0x694);
-        SceneActorTerrain_GetCenter(actor->terrainCell, &center);
+        SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
         sub_080C47B8(&center);
-        SceneActorTerrain_Subtract(&diff, &actor->body.position, &center);
+        SceneActorTerrain_Subtract(&diff, &actor->base.body.position, &center);
         if (diff.x * diff.x + diff.z * diff.z < 0x400)
             sub_080C47DC(body);
         else {
             u8 angle;
             *(struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C) = center;
-            SceneActorTerrain_Subtract(&diff, &center, &actor->body.position);
+            SceneActorTerrain_Subtract(&diff, &center, &actor->base.body.position);
             angle = ((Math_Atan2(diff.x, diff.z) + 0x20) & 0xFF) >> 6 << 6;
-            actor->body.direction = angle;
+            actor->base.body.direction = angle;
             body[0x68E] = angle;
         }
         {
@@ -117,12 +117,12 @@ void Golem_ReturnHome(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 phase = 2;
-            actor->state2A8 = 0;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = 1;
+            actor->base.state2A8 = 0;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = 1;
         }
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        actor->base.counter2AC = 0;
+        actor->base.field2B1 = 1;
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

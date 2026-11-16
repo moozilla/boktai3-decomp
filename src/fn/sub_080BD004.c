@@ -2,10 +2,10 @@
 /* Sinks the actor into the ground after frame 6, then starts the hidden defeat. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActorReaction_BeginHiddenDefeat(struct SceneActorRegistryResetView *);
-static inline u8 IsControlled(struct SceneActorRegistryResetView *a)
+void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *);
+static inline u8 IsControlled(struct ChaseActor *a)
 {
-    if (a->object == (void *)1)
+    if (a->base.object == (void *)1)
         return 1;
     return 0;
 }
@@ -16,42 +16,41 @@ static inline u8 ContextFlag(u8 *context)
         return 1;
     return 0;
 }
-static inline void ClearRoute(struct SceneActorRegistryResetView *a,
-                              struct SceneActorRegistryControlGroup *group)
+static inline void ClearRoute(struct ChaseActor *a, struct SceneActorRegistryControlGroup *group)
 {
     struct SceneActorRegistryControl *route = &group->control;
-    u32 *flags = &a->flags2CC;
+    u32 *flags = &a->base.flags2CC;
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
     route->field14 = 0;
     route->timer = 0;
 }
-static inline void Show(struct SceneActorRegistryResetView *a)
+static inline void Show(struct ChaseActor *a)
 {
-    if (!a->drawableKind) {
-        u32 *flags = a->drawable;
+    if (!a->base.drawableKind) {
+        u32 *flags = a->base.drawable;
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
 }
 
-void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_SinkThenDefeat(struct ChaseActor *actor, s32 frame)
 {
     u32 state;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         ClearRoute(actor, group);
-        if (!ContextFlag(actor->context)) {
+        if (!ContextFlag(actor->base.context)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
-            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
         }
         {
-            u16 *destination = &actor->colliderA.flags;
+            u16 *destination = &actor->base.colliderA.flags;
             u32 flags = *destination;
             u32 mask = 4;
             mask |= flags;
@@ -62,46 +61,48 @@ void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor
             u32 zero;
             u8 *first;
             state = 3;
-            first = &actor->state2A8;
+            first = &actor->base.state2A8;
             zero = 0;
             *first = state;
-            actor->phase2A9 = zero;
-            actor->behavior2AA = zero;
-            actor->counter2AC = zero;
-            actor->field2B1 = 1;
+            actor->base.phase2A9 = zero;
+            actor->base.behavior2AA = zero;
+            actor->base.counter2AC = zero;
+            actor->base.field2B1 = 1;
         }
-        actor->fieldAA = 0;
-        actor->field2B3 = 0;
-        actor->colliderA.responseValue = 0;
-        actor->field2B8 = 0;
+        actor->base.fieldAA = 0;
+        actor->base.restart = 0;
+        actor->base.colliderA.responseValue = 0;
+        actor->base.field2B8 = 0;
         {
             u32 mask = 0x20000;
-            u32 *flags = &actor->flags2D0;
+            u32 *flags = &actor->base.flags2D0;
             *flags |= mask;
         }
     }
     if (frame > 6) {
-        actor->body.position.y -= (u32)(frame - 6) * 30;
-        if (!actor->drawableKind)
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x1C) = actor->body.position;
+        actor->base.body.position.y -= (u32)(frame - 6) * 30;
+        if (!actor->base.drawableKind)
+            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) =
+                actor->base.body.position;
         else
-            *(struct ContactPosition *)((u8 *)actor->drawable + 0x40) = actor->body.position;
+            *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) =
+                actor->base.body.position;
         if (frame > 8) {
             u32 zeroWord = 0;
             u8 zeroByte = 0;
             {
                 s16 health = zeroWord;
-                actor->health = health;
+                actor->base.health = health;
             }
             {
                 u32 mask = 8;
-                u16 *field = &actor->flags2D4;
+                u16 *field = &actor->base.flags2D4;
                 mask |= *field;
                 *field = mask;
             }
             {
                 u32 mask = 0x400;
-                u32 *flags = &actor->flags2CC;
+                u32 *flags = &actor->base.flags2CC;
                 *flags |= mask;
             }
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
@@ -111,17 +112,17 @@ void SceneActorReaction_SinkThenDefeat(struct SceneActorRegistryResetView *actor
             {
                 void *control = SceneActorReaction_BeginHiddenDefeat;
                 u32 kind = 23;
-                actor->field2B2 = 1;
-                actor->field2B0 = zeroByte;
-                actor->field2B5 = kind;
-                actor->target = control;
-                actor->field2C8 = zeroWord;
+                actor->base.field2B2 = 1;
+                actor->base.field2B0 = zeroByte;
+                actor->base.field2B5 = kind;
+                actor->base.target = control;
+                actor->base.field2C8 = zeroWord;
                 {
-                    u32 *flags = &actor->flags114;
+                    u32 *flags = &actor->base.flags114;
                     u32 mask = ~1;
                     *flags &= mask;
                 }
-                actor->word104 = zeroWord;
+                actor->base.word104 = zeroWord;
             }
         }
     }

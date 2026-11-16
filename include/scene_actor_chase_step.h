@@ -8,10 +8,10 @@ static inline void SceneActorChase_SelectState(void *object, u32 state, u32 phas
 static inline void SceneActorChase_SelectState(void *object, u8 state, u8 phase, u8 behavior)
 #endif
 {
-    struct SceneActorRegistryResetView *actor = object;
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
+    struct ChaseActor *actor = object;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
 }
 
 #if SCENE_ACTOR_CHASE_FRACTION_ACCESSOR
@@ -82,14 +82,14 @@ static inline u32 SceneActorChase_HeightAt(s32 cell, struct ContactPosition *pos
 #endif
 
 #if SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
-#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->flags2D4)
-#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->body.motion)
+#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->base.flags2D4)
+#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->base.body.motion)
 #else
 #define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  SceneActorChase_MotionFlagsOf(a_)
 #define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) SceneActorChase_MotionOf(a_)
 #endif
 
-static inline u8 SceneActorChase_TryRoute(struct SceneActorRegistryResetView *actor, void *route,
+static inline u8 SceneActorChase_TryRoute(struct ChaseActor *actor, void *route,
                                           struct ContactPosition *position,
                                           struct ContactPosition *target)
 {
@@ -133,21 +133,21 @@ static inline u8 SceneActorChase_TryRoute(struct SceneActorRegistryResetView *ac
 
 static inline void SceneActorChase_SetState(void *object, u32 state, u32 phase, u32 behavior)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     SceneActorChase_SelectState(actor, state, phase, behavior);
     SceneActorChase_ResetStateEntry(actor);
 }
 
 static inline void SceneActorChase_SetPhase(void *object, u32 phase, u32 behavior)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     SceneActorChase_SelectState(actor, 0, phase, behavior);
     SceneActorChase_ResetStateEntry(actor);
 }
 
 static inline void SceneActorChase_SetBehavior(void *object, u32 behavior)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     SceneActorChase_SetPhase(actor, 0, behavior);
 }
 
@@ -166,12 +166,12 @@ static inline void SceneActorChase_SnapToRoute(struct ContactPosition *position,
 
 static inline void SceneActorChase_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
 {
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -186,9 +186,9 @@ static inline void SceneActorChase_BeginTurn(void *obj, u32 saved, const u16 *ra
 static inline u8 SceneActorChase_Arrive(void *obj)
 {
     struct ContactPosition target;
-    struct SceneActorRegistryResetView *actor = obj;
+    struct ChaseActor *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -209,7 +209,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         cell = SCENE_ACTOR_CHASE_TARGET_CELL(t);
         player = 0;
     }
-    if (cell != actor->terrainCell &&
+    if (cell != actor->base.terrainCell &&
         !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
                                 0x20000))
         goto reroute;
@@ -223,7 +223,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -231,15 +231,15 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         SceneActorChase_BeginTurn(obj, saved, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 reroute: {
     SceneActorChase_CellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto success;
 }
     callback = &group->fallback;
@@ -250,8 +250,8 @@ success:
     return 1;
 }
 
-static inline void SceneActorChase_SetTypedState(struct SceneActorRegistryResetView *actor,
-                                                 u32 state, u32 phase, u32 behavior)
+static inline void SceneActorChase_SetTypedState(struct ChaseActor *actor, u32 state, u32 phase,
+                                                 u32 behavior)
 {
     SceneActorChase_SelectState(actor, state, phase, behavior);
     SceneActorChase_ResetStateEntry(actor);

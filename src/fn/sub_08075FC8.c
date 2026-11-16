@@ -7,7 +7,7 @@ s32 SceneActorMovement_RequestAvailableAction(struct SceneActorRegistryActor *ac
 {
     u32 unavailable;
     /* The unconditional first store requires a valid actor. */
-    ((struct SceneActorRegistryResetView *)actor)->field304 = 0;
+    ((struct ChaseActor *)actor)->base.field304 = 0;
     unavailable = SceneActor_ActionsBlocked(actor);
     {
         u32 result;

@@ -12,24 +12,24 @@ s32 Math_Atan2(s32, s32);
 void Sound_PlaySong(u32);
 void Vorn_BeginPursuitRoute(void *, u32);
 void Vorn_RunPendingScript(void *);
-void SceneActorReaction_UpdateFacingAttack(struct SceneActorRegistryResetView *actor, s32 frame)
+void SceneActorReaction_UpdateFacingAttack(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         if ((*(struct SceneActorFacingTarget **)gPlayers))
-            actor->body.direction =
-                Math_Atan2((*(struct SceneActorFacingTarget **)gPlayers)->x - actor->body.position.x,
-                           (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->body.position.z);
+            actor->base.body.direction = Math_Atan2(
+                (*(struct SceneActorFacingTarget **)gPlayers)->x - actor->base.body.position.x,
+                (*(struct SceneActorFacingTarget **)gPlayers)->z - actor->base.body.position.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        actor->field2EA = 80;
+        actor->base.field2EA = 80;
         Sound_PlaySong(0x1CF);
     }
     {
         u32 mask = 4;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     if (frame == 14) {
-        actor->field2EA = 140;
-        Vorn_RunPendingScript(actor->context);
+        actor->base.field2EA = 140;
+        Vorn_RunPendingScript(actor->base.context);
     }
     if (frame > 60)
         Vorn_BeginPursuitRoute(actor, 1);

@@ -28,8 +28,7 @@ struct SceneActorControlPhaseView {
     u8 unknown0[0x3D0];
     struct SceneActorControlState *control;
 };
-static inline struct SceneActorControlState *
-SceneActorControl_GetState(struct SceneActorRegistryResetView *actor)
+static inline struct SceneActorControlState *SceneActorControl_GetState(struct ChaseActor *actor)
 {
     return ((struct SceneActorControlPhaseView *)actor)->control;
 }
@@ -41,9 +40,9 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
     }
     return 0;
 }
-static inline u8 SceneActorControl_TakeStateEntry(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorControl_TakeStateEntry(struct ChaseActor *actor)
 {
-    return SceneActorControl_TakeFlag(&actor->field2B1);
+    return SceneActorControl_TakeFlag(&actor->base.field2B1);
 }
 
 #endif

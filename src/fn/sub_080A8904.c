@@ -47,12 +47,12 @@ static inline void Tentacle_CellCenter(struct ContactPosition *position, s32 cel
     position->z = ((u32)z << 8) + 128;
 }
 
-void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
+void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
 {
-    struct TentacleWanderState *state = actor->context;
+    struct TentacleWanderState *state = actor->base.context;
     struct TentacleWanderTarget *route = &state->target;
     s32 cells[4];
-    s32 facing = Tentacle_Cardinal(actor->body.direction);
+    s32 facing = Tentacle_Cardinal(actor->base.body.direction);
     s32 count;
     s32 forward;
     s32 dir;
@@ -70,7 +70,7 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
     }
     count = 0;
     forward = -1;
-    surface = (*SceneActorTerrain_GetCell(actor->terrainCell)) >> 4;
+    surface = (*SceneActorTerrain_GetCell(actor->base.terrainCell)) >> 4;
     if ((surface - 1) > 1) {
         if (state->attempts == 2)
             dir = (facing + 1) & 3;
@@ -81,7 +81,7 @@ void TentacleActor_SelectWanderRoute(struct SceneActorRegistryResetView *actor)
     } else
         dir = facing;
     if (state->attempts > 16) {
-        state->preferred = ((actor->tracking.heading + 32) & 255) >> 6;
+        state->preferred = ((actor->base.tracking.heading + 32) & 255) >> 6;
         state->attempts = 0;
     }
     for (i = 0; i < 4; i++) {

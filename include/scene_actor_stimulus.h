@@ -13,16 +13,17 @@ static inline u8 SceneActorStimulus_TestMotion(struct SceneActorReactionMotion *
 
 static inline u8 SceneActorStimulus_HasLock(u8 *raw)
 {
-    if (((struct SceneActorRegistryResetView *)raw)->field2B8 || ((struct SceneActorRegistryResetView *)raw)->colliderA.responseValue)
+    if (((struct ChaseActor *)raw)->base.field2B8 ||
+        ((struct ChaseActor *)raw)->base.colliderA.responseValue)
         return 1;
     return 0;
 }
 
-static inline u8 SceneActorStimulus_CheckBusy(struct SceneActorRegistryResetView *actor)
+static inline u8 SceneActorStimulus_CheckBusy(struct ChaseActor *actor)
 {
     u8 *raw = (u8 *)actor;
     u32 flags2D0, flags2CC;
-    u32 *p = &actor->flags2D0;
+    u32 *p = &actor->base.flags2D0;
     {
         u32 mask = ~0x1000000;
         flags2D0 = *p & mask;
@@ -30,7 +31,7 @@ static inline u8 SceneActorStimulus_CheckBusy(struct SceneActorRegistryResetView
     }
     {
         u32 mask = 0x200000;
-        flags2CC = actor->flags2CC;
+        flags2CC = actor->base.flags2CC;
         if (!(mask & flags2CC))
             return 1;
     }
@@ -40,25 +41,26 @@ static inline u8 SceneActorStimulus_CheckBusy(struct SceneActorRegistryResetView
         return 1;
     {
         u32 mask = 0xE13F;
-        if (actor->flags2D4 & mask)
+        if (actor->base.flags2D4 & mask)
             return 1;
     }
-    if (SceneActorStimulus_TestMotion((struct SceneActorReactionMotion *)&actor->tracking.target, 0x10))
+    if (SceneActorStimulus_TestMotion(
+            (struct SceneActorReactionMotion *)&actor->base.tracking.target, 0x10))
         return 1;
     return SceneActorStimulus_HasLock(raw);
 }
 
-static inline u16 SceneActorStimulus_CaptureMotionFlags(struct SceneActorRegistryResetView *actor,
-                                                        u32 mask, u16 **field)
+static inline u16 SceneActorStimulus_CaptureMotionFlags(struct ChaseActor *actor, u32 mask,
+                                                        u16 **field)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u16 value = *flags;
     value &= mask;
     *field = flags;
     return value;
 }
 
-static inline void SceneActorStimulus_ExtendGate(struct SceneActorRegistryResetView *actor)
+static inline void SceneActorStimulus_ExtendGate(struct ChaseActor *actor)
 {
     u16 *counter = &actor->group.common.gate.counter;
     *counter += 300;

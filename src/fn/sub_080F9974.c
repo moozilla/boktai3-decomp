@@ -7,13 +7,13 @@ void ActorPhase_EmitTrailSprite(void *, void *, u32);
 void Axe_UpdateTrailColliders(void *);
 void Axe_UpdateAttackColliderPositions(void *);
 void Axe_ReleaseAuxiliarySprite(void *);
-static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 static inline void OrStatus(u16 status, u16 *flags)
 {
@@ -24,14 +24,14 @@ static inline u8 HasAuxiliary(const u8 *state)
     return state[0xA3C] != 0;
 }
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
-void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
+void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    u8 *context = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
-        u8 *state = actor->context;
+    u8 *context = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
+        u8 *state = actor->base.context;
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->flags2CC;
+        u32 *field = &actor->base.flags2CC;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
@@ -39,18 +39,18 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
         control->timer = 0;
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         Sound_PlaySong(318);
-        actor->colliderA.responseValue = 0;
-        if (actor->drawableKind == 0) {
-            u32 *flags = actor->drawable;
+        actor->base.colliderA.responseValue = 0;
+        if (actor->base.drawableKind == 0) {
+            u32 *flags = actor->base.drawable;
             u32 mask = ~1;
             *flags &= mask;
         } else {
-            u8 *tile = (u8 *)actor->drawable + 0x20;
+            u8 *tile = (u8 *)actor->base.drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(tile + 8) &= mask;
         }
         SetState(actor, 3, 0, 0);
-        actor->fieldAA = 0;
+        actor->base.fieldAA = 0;
         if (HasAuxiliary(state)) {
             u32 *flags = (void *)(state + 0xA38);
             *flags |= 2;
@@ -70,7 +70,7 @@ void Axe_UpdateDamageSpin(struct SceneActorRegistryResetView *actor, s32 frame)
     }
     if (*(u16 *)(context + 0xED4)) {
         --*(u16 *)(context + 0xED4);
-        OrStatus(0x20, &actor->flags2D6);
+        OrStatus(0x20, &actor->base.flags2D6);
     }
     if (context[0xA3C]) {
         u32 previous = context[0xA34];

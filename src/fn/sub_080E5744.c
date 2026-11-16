@@ -71,14 +71,14 @@ struct DogInitContext {
 
 struct DogActor {
     union {
-        struct SceneActorRegistryResetView base;
+        struct ChaseActor base;
         struct DogInitContext context;
     } state;
 };
 
-static inline struct DogInitContext *DogInit_Context(struct SceneActorRegistryResetView *actor)
+static inline struct DogInitContext *DogInit_Context(struct ChaseActor *actor)
 {
-    return actor->context;
+    return actor->base.context;
 }
 
 static inline void DogInit_Reset(void *object)
@@ -88,24 +88,24 @@ static inline void DogInit_Reset(void *object)
     context->field6A6 = 0;
 }
 
-static inline void DogInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
+static inline void DogInit_EnableInitialFlags(struct ChaseActor *actor)
 {
-    MonsterInit_SetTargetingFlags(&actor->tracking, 1);
+    MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 8);
 }
 
-static inline void DogInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
+static inline void DogInit_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->messageCallback = SceneActorScript_OnCommand;
-    actor->updateCallback = Dog_OnAuxiliaryUpdate;
-    actor->destroyCallback = Dog_ReleaseResources;
+    actor->base.messageCallback = SceneActorScript_OnCommand;
+    actor->base.updateCallback = Dog_OnAuxiliaryUpdate;
+    actor->base.destroyCallback = Dog_ReleaseResources;
 }
 
 s32 Dog_Init(void *object)
 {
     struct DogActor *dog = object;
-    struct SceneActorRegistryResetView *actor = &dog->state.base;
+    struct ChaseActor *actor = &dog->state.base;
     struct SceneActorChaseGroup *group = &dog->state.base.group;
     u32 zero;
     struct ContactPosition tmp;
@@ -117,21 +117,21 @@ s32 Dog_Init(void *object)
     SceneActor_RefreshLivingCountAndProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD635, 0xF6E7);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xD635, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializePursuitBody(&dog->state.base, &zero);
 
@@ -159,9 +159,10 @@ s32 Dog_Init(void *object)
         SceneActorControl_BeginHiddenDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         Dog_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
-    MonsterInit_InitializeGroupWithBounds(
-        group, (u8 *)dog + 0x6AC, (u8 *)dog + 0x6D0, Dog_UpdateDefeatDelay, Dog_ResumeAfterReaction,
-        SceneActorReaction_BeginTargetRecovery, Dog_OnSecondaryReactionCleanup, 1, &actor->body);
+    MonsterInit_InitializeGroupWithBounds(group, (u8 *)dog + 0x6AC, (u8 *)dog + 0x6D0,
+                                          Dog_UpdateDefeatDelay, Dog_ResumeAfterReaction,
+                                          SceneActorReaction_BeginTargetRecovery,
+                                          Dog_OnSecondaryReactionCleanup, 1, &actor->base.body);
     SceneActorMovement_ResolveRoutePosition(dog);
     MonsterInit_SetRouteReset(actor, Dog_ResetActionState);
     MonsterInit_SetReactionGate(actor, Dog_UpdateTargetGate);
@@ -170,7 +171,7 @@ s32 Dog_Init(void *object)
     group->field5EC = Dog_RestoreRoute;
     group->turnControl = Dog_UpdateTurnSequence;
     group->common.gate.field41A = 20;
-    actor->field2E8 = 0;
+    actor->base.field2E8 = 0;
     DogInit_EnableInitialFlags(actor);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
@@ -186,14 +187,14 @@ s32 Dog_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
 
     {

@@ -55,46 +55,46 @@ static inline u8 Test(u32 value, u32 mask)
     return 0;
 }
 
-void Skeleton_BeginKnockedFlight(struct SceneActorRegistryResetView *input)
+void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
-    u8 *context = actor->context;
+    struct ChaseActor *actor = input;
+    u8 *context = actor->base.context;
     u32 origin;
-    u8 taken = TakeFlag(&actor->field2B2);
+    u8 taken = TakeFlag(&actor->base.field2B2);
     if (taken) {
         u32 mask = 4;
         SetColliderFlags((struct ContactCollider *)(context + 0x624), mask);
         SetColliderFlags((struct ContactCollider *)(context + 0x678), mask);
-        SetColliderFlags(&actor->colliderA, mask);
-        ClearColliderFlags(&actor->colliderB, mask);
+        SetColliderFlags(&actor->base.colliderA, mask);
+        ClearColliderFlags(&actor->base.colliderB, mask);
         {
-            u8 direction = actor->body.direction;
+            u8 direction = actor->base.body.direction;
             s32 random;
             PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
             random = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR);
             random &= 0xF;
             {
                 u32 angle = direction;
-                Polar(&actor->secondaryMotion, angle, random + 0x1C);
+                Polar(&actor->base.secondaryMotion, angle, random + 0x1C);
             }
         }
-        actor->secondaryMotion.y =
+        actor->base.secondaryMotion.y =
             (ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR) & 0x1F) +
             0x18;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x11);
         ActorShadow_Enable((u8 *)actor + 0x320);
     } else {
         if (**(u8 **)((u8 *)actor + 0x6C) & 1) {
-            actor->secondaryMotion.x = taken;
-            actor->secondaryMotion.z = taken;
+            actor->base.secondaryMotion.x = taken;
+            actor->base.secondaryMotion.z = taken;
         }
         {
             u32 mask = 0x10;
-            if (actor->flags2D0 & mask) {
+            if (actor->base.flags2D0 & mask) {
                 u16 argument;
                 if (TestField(0x800, (u32 *)(context + 0x6DC)))
                     Sound_PlaySong(0x3AD);
-                SetColliderFlags(&actor->colliderB, 4);
+                SetColliderFlags(&actor->base.colliderB, 4);
                 argument = 1;
                 SceneActorPlacement_ResetActorState(actor, &argument);
             }

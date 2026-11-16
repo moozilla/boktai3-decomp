@@ -21,14 +21,14 @@ static inline u8 SceneActorTerrain_IsLevelOpen(s32 cell, u32 level)
         return 0;
     return 1;
 }
-static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetView *actor,
-                                               void *route, struct ContactPosition *from,
+static inline u8 SceneActorTerrain_RequestPath(struct ChaseActor *actor, void *route,
+                                               struct ContactPosition *from,
                                                struct ContactPosition *pos)
 {
 
     s32 r;
     if (!Nav_IsPositionInMesh(route, from, pos)) {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         s32 mask = ~0x200;
         *flags &= mask;
         return 0;
@@ -36,22 +36,22 @@ static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetVie
     r = Terrain_ApplyBlocked(route, from, pos);
     if (r) {
         if (r != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
     {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         s32 mask = ~0x200;
         *flags &= mask;
     }
     return 0;
 }
 
-static inline s32 SceneActorTerrain_LastOpenCell(struct SceneActorRegistryResetView *actor, s32 dir)
+static inline s32 SceneActorTerrain_LastOpenCell(struct ChaseActor *actor, s32 dir)
 {
     s32 cell, i, col, total;
     u32 level;
-    cell = actor->terrainCell;
+    cell = actor->base.terrainCell;
     level = *SceneActorTerrain_GetCell(cell) & 15;
     total = SceneActorTerrain_Width() * SceneActorTerrain_Height();
     switch (dir) {

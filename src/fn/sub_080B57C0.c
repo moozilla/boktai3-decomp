@@ -33,51 +33,49 @@ struct ApproachGroup {
     void *failure;
 };
 
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
-                            u8 behavior)
+static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
-static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
-                       u32 bits)
+static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u32 bits)
 {
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->body.position;
-    u8 *target = *(u8 **)&actor->tracking.target;
+    struct ContactPosition *position = &actor->base.body.position;
+    u8 *target = *(u8 **)&actor->base.tracking.target;
     struct ContactPosition *destination = (void *)(target + 12);
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
-            actor->flags2D4 &= ~bits;
+            actor->base.flags2D4 &= ~bits;
         }
         return 0;
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         } else {
             {
-                actor->flags2D4 &= ~bits;
+                actor->base.flags2D4 &= ~bits;
             }
             return 0;
         }
@@ -88,9 +86,9 @@ struct SkeletonRouteContext {
     u8 unknown0[0x6D0];
     u8 active;
 };
-static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 value = actor->flags2D4;
+    u16 value = actor->base.flags2D4;
     value &= mask;
     return value;
 }
@@ -101,13 +99,13 @@ static inline void OrFlags(u16 *flags, u32 mask)
     *flags = value;
 }
 
-static inline u32 Flag(struct SceneActorRegistryResetView *a, u32 m, u32 off)
+static inline u32 Flag(struct ChaseActor *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)((u8 *)a + off) & m : *(u32 *)((u8 *)a + off) & m;
 }
-static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
+static inline u8 Unavailable(struct ChaseActor *a)
 {
-    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->health <= 0))
+    if (a && (Flag(a, 0x40, 0x2D4) || Flag(a, 0x20000, 0x2D0) || a->base.health <= 0))
         return 1;
     return 0;
 }
@@ -124,13 +122,13 @@ static inline s32 MotionSquared(struct ContactPosition *p)
     return p->x * p->x + p->y * p->y + p->z * p->z;
 }
 // confidence=low: starts pursuit when stationary, with a six-second cooldown.
-void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
+void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
 {
     u8 *context;
     struct ApproachGroup *group;
     if (Unavailable(a))
         return;
-    context = a->context;
+    context = a->base.context;
     group = (void *)&a->group.common;
     if (Pending(context))
         return;
@@ -138,15 +136,15 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
         return;
     if (Flag(a, 0x100, 0x2D4))
         return;
-    if (MotionSquared(&a->secondaryMotion))
+    if (MotionSquared(&a->base.secondaryMotion))
         return;
     if (context[0x6D0])
         return;
     if (*(u16 *)(context + 0x6D8))
         return;
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-    a->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
-    a->field2C2 = Div(64, 3);
+    a->base.tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
+    a->base.field2C2 = Div(64, 3);
     if (MotionFlags(a, 0x80))
         OrFlags(&group->flags414, 4);
     if (MotionFlags(a, 0x80)) {
@@ -159,7 +157,7 @@ void Skeleton_BeginStationaryPursuit(struct SceneActorRegistryResetView *a)
         }
     } else {
         SetState(a, 0, 0, 7);
-        SetControl(a, a->entryTarget228, 1);
+        SetControl(a, a->base.entryTarget228, 1);
     }
     group->destination->pad = 1;
     if (!Chase(a, group, 0x200))

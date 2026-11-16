@@ -68,80 +68,79 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline u8 Test2(u16 **out, struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    u16 *flags = &actor->flags2C0;
+    u16 *flags = &actor->base.flags2C0;
     u32 value = *flags & mask;
     *out = flags;
     if (value)
         return 1;
     return 0;
 }
-static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
+static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
-static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
-                                       void *control)
+static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
-u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
+u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
 {
     u16 *flags2C0;
     u8 *category;
     u8 *collider;
     u8 *hit;
     u32 kind;
-    if (actor->health <= 0) {
+    if (actor->base.health <= 0) {
         {
-            struct FlagHalfword *flags = (void *)&actor->flags2D6;
+            struct FlagHalfword *flags = (void *)&actor->base.flags2D6;
             ClearHit(flags, ~0x49CB);
         }
         {
-            void *control = actor->deathControl;
+            void *control = actor->base.deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
         if (Test(gEngineFlags, 0x4800)) {
-            Player_NotifyFirstSelectedSlot(actor->field2E0, actor->field2D8);
+            Player_NotifyFirstSelectedSlot(actor->base.field2E0, actor->base.field2D8);
             goto done;
         }
         {
-            u8 *address = &actor->category;
+            u8 *address = &actor->base.category;
             u32 owner;
             kind = *address;
-            owner = actor->field2E0 & 1;
+            owner = actor->base.field2E0 & 1;
             category = address;
-            flags2C0 = &actor->flags2C0;
-            collider = (u8 *)&actor->colliderA;
+            flags2C0 = &actor->base.flags2C0;
+            collider = (u8 *)&actor->base.colliderA;
             if (!owner)
                 goto record;
         }
         {
             u8 blocked;
-            flags2C0 = &actor->flags2C0;
+            flags2C0 = &actor->base.flags2C0;
             blocked = Test(Mask(flags2C0, 0x80), ~0);
-            collider = (u8 *)&actor->colliderA;
+            collider = (u8 *)&actor->base.colliderA;
             if (blocked)
                 goto record;
         }
@@ -220,16 +219,16 @@ u32 SceneActorReaction_RecordDefeat(struct SceneActorRegistryResetView *actor)
                     }
                 }
             }
-            sub_08159164(actor->fieldAC);
-            Player_RefreshLifeState(actor->field2D8, actor->fieldA1);
+            sub_08159164(actor->base.fieldAC);
+            Player_RefreshLifeState(actor->base.field2D8, actor->base.fieldA1);
         }
     record:
         if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
             !Flag2D0(actor, 0x800))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:
         return 1;
     }
-    return (u8)Callback_InvokeActor(actor, actor->contactCallback);
+    return (u8)Callback_InvokeActor(actor, actor->base.contactCallback);
 }

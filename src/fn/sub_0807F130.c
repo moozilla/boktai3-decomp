@@ -9,19 +9,19 @@ void SceneActorPosition_ResolveTaggedPosition(struct SceneActorTaggedPosition *,
                                               const struct SceneActorPositionSource *, void *, s32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, const struct ContactPosition *);
 
-static inline s8 SceneActorTarget_FindStimulus(struct SceneActorRegistryResetView *owner,
+static inline s8 SceneActorTarget_FindStimulus(struct ChaseActor *owner,
                                                struct SceneActorChaseGroup *group)
 {
-    struct ContactPosition *position = &owner->body.position;
-    return SceneStimulus_FindOverlap(position->x, owner->body.position.z,
+    struct ContactPosition *position = &owner->base.body.position;
+    return SceneStimulus_FindOverlap(position->x, owner->base.body.position.z,
                                      group->common.control.radius, group->common.control.active,
-                                     (u16)owner->body.id);
+                                     (u16)owner->base.body.id);
 }
 
 // confidence=low: starts a route to the tagged position of an overlapping stimulus.
 u32 SceneActorTarget_TryStimulusRoute(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorRegistryControl *control;
     u16 *timer;
@@ -38,19 +38,19 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     started = 0;
     found = SceneActorTarget_FindStimulus(actor, group);
     tag = found;
-    position = &actor->body.position;
+    position = &actor->base.body.position;
     if (found < 0)
         goto failed;
     timer = &group->common.control.timer;
     if (!*timer) {
         control = &group->common.control;
-        SceneActorChase_AndWordFlags(&actor->flags2CC, ~0x141C0);
+        SceneActorChase_AndWordFlags(&actor->base.flags2CC, ~0x141C0);
         control->counter = 0;
         control->field14 = 0;
         /* The control record is reset before the overlap timer is armed. */
         control->timer = 0;
         *timer = 180;
-        SceneActorAttachment_ReplaceResponseSlot(object, 0, 1, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(object, 0, 1, actor->base.category);
         SceneActorChase_SetControl(actor, group->common.field43C, 9);
         SceneActorChase_SetBehavior(actor, 11);
         started = 1;
@@ -58,14 +58,14 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     {
         u32 mask = 0x1000;
         if (SceneActorStimulus_CaptureMotionFlags(object, mask, &motionFlags)) {
-            struct SceneActorRegistryResetView *owner = object;
+            struct ChaseActor *owner = object;
             SceneActorContacts_ReleaseNode(owner->group.contactNode);
             *motionFlags &= ~mask;
             owner->group.contactNode = NULL;
         }
     }
     SceneActorPosition_ResolveTaggedPosition((void *)&group->common.control,
-                                             (void *)&actor->body.id, group->route, (s8)tag);
+                                             (void *)&actor->base.body.id, group->route, (s8)tag);
     {
         u32 mask = 0x80;
         if (*motionFlags & mask)
@@ -74,7 +74,7 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     destination = group->destination;
     SceneActorChase_SnapToRoute(destination, &group->homeRoute);
     /* Fetch the active destination again after reading the terrain. */
-    group->destination->y = actor->body.position.y;
+    group->destination->y = actor->base.body.position.y;
     group->destination->pad = 0;
 
     if (!SceneActorChase_TryRoute(object, group->route, position,
@@ -84,16 +84,16 @@ u32 SceneActorTarget_TryStimulusRoute(void *object)
     }
     {
         u32 mask = 0x10;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
     {
         u32 mask = 0x200;
-        SceneActorChase_OrHalfFlags(&actor->flags2D4, mask);
+        SceneActorChase_OrHalfFlags(&actor->base.flags2D4, mask);
     }
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     {
         u32 mask = 0x1000000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     SceneActorAttachment_RetargetNearestPlayer(object, &group->common.control.targetPosition);
     if (started)

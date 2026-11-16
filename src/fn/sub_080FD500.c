@@ -18,63 +18,63 @@ static inline void Or32(u32 m, u32 *p)
 {
     *p |= m;
 }
-static inline void Restart(struct SceneActorRegistryResetView *actor)
+static inline void Restart(struct ChaseActor *actor)
 {
     void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
     u32 kind = 0x23;
     u8 zero8;
     u8 one;
     u32 zero;
-    u8 *taken = &actor->field2B2;
+    u8 *taken = &actor->base.field2B2;
     zero = 0;
     one = 1;
     *taken = one;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = callback;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
     zero8 = 0;
-    actor->field2C8 = zero;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
     {
         u32 phase = 2;
         u32 behavior = 5;
-        actor->state2A8 = zero8;
-        actor->phase2A9 = phase;
-        actor->behavior2AA = behavior;
-        actor->counter2AC = zero;
-        actor->field2B1 = one;
+        actor->base.state2A8 = zero8;
+        actor->base.phase2A9 = phase;
+        actor->base.behavior2AA = behavior;
+        actor->base.counter2AC = zero;
+        actor->base.field2B1 = one;
     }
 }
-void SceneActorControl_UpdateControl35Phase(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
 {
-    struct SceneActorControl35Context *context = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    struct SceneActorControl35Context *context = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = (void *)Axe_UpdateTargetWindup;
         u32 kind = 0x35;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = kind;
+        actor->base.target = callback;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
-        Or16(0x100, &actor->flags2D4);
+        actor->base.word104 = 0;
+        Or16(0x100, &actor->base.flags2D4);
         Or32(0x800, &context->flagsE4C);
         context->fieldEBA = context->fieldEC2;
-        Or16(0x1000, &actor->flags2C0);
+        Or16(0x1000, &actor->base.flags2C0);
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         Restart(actor);
     } else {
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
     }
 }

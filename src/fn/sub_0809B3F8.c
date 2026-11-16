@@ -18,24 +18,24 @@ static inline u8 Take(u8 *p)
     }
     return 0;
 }
-static inline u32 Bits(struct SceneActorRegistryResetView *a, u32 mask)
+static inline u32 Bits(struct ChaseActor *a, u32 mask)
 {
-    return a->flags2CC & mask;
+    return a->base.flags2CC & mask;
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = kind;
-    a->target = cb;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = kind;
+    a->base.target = cb;
+    a->base.field2C8 = 0;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 
 #include "scene_actor_animation.h"
@@ -46,8 +46,7 @@ void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);
 void sub_0813D834(void *, u32, u32);
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -58,7 +57,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -68,7 +67,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -96,30 +95,30 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
 }
 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
-void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
+void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
 {
     u8 *motion = ((u8 *)actor) + 0x50;
     u8 *sequence;
-    if (Take(&actor->field2B2)) {
-        s32 current = ((((s32)actor->body.direction) + 0x70) >> 5) & 7;
+    if (Take(&actor->base.field2B2)) {
+        s32 current = ((((s32)actor->base.body.direction) + 0x70) >> 5) & 7;
         u8 desired = *(((u8 *)actor) + 0x3CD);
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
-            actor->body.direction = desired;
-            Control(actor, actor->savedTarget, 0);
-            actor->field2B0 = 1;
+            actor->base.body.direction = desired;
+            Control(actor, actor->base.savedTarget, 0);
+            actor->base.field2B0 = 1;
             return;
         }
         target -= 8;
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = &actor->flags2CC;
+                u32 *p = &actor->base.flags2CC;
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
                 u32 mask = 0x10000;
-                actor->flags2CC |= mask;
+                actor->base.flags2CC |= mask;
             }
         }
     }
@@ -127,11 +126,11 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
     {
         u32 mask = 0xA02F;
         u16 *scale;
-        if (actor->flags2D4 & mask) {
-            actor->field2C2 = 64;
-            scale = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            actor->base.field2C2 = 64;
+            scale = &actor->base.field2C2;
         } else {
-            u16 *p = &actor->field2C2;
+            u16 *p = &actor->base.field2C2;
             u16 value = *p;
             scale = p;
             if (!value)
@@ -142,13 +141,13 @@ void Lun_TurnTowardSavedDirection(struct SceneActorRegistryResetView *actor)
         else
             Anim_SetFrameDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x20, *scale);
     }
-    if (actor->field2CA & 4) {
+    if (actor->base.field2CA & 4) {
         u32 variant;
         u32 flags;
         u32 selection;
-        struct SceneActorProfileEntry *entry =
-            (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
-        Control(actor, actor->entryTarget224, 2);
+        struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
+            actor->base.profileId, actor->base.profileMode, 1);
+        Control(actor, actor->base.entryTarget224, 2);
         if (Bits(actor, 0x10000))
             motion[9] += 32;
         else

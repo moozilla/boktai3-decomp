@@ -1,31 +1,30 @@
 #include "scene_actor_chase.h"
 // confidence=low: animation completion resumes group movement or idle.
-void SceneActorControl_OnIdle(void);
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
+static inline u8 TakeEntry(struct ChaseActor *a)
 {
-    if (a->field2B2) {
-        a->field2B2 = 0;
+    if (a->base.field2B2) {
+        a->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
-void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
+void Dog_ResumeAfterReaction(struct ChaseActor *a)
 {
     u8 *group;
     u16 flags;
     if (TakeEntry(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
-        a->field2B3 = 0;
+        a->base.restart = 0;
     }
-    if (!a->field2B3) {
+    if (!a->base.restart) {
         return;
     }
     group = (u8 *)&a->group.common;
-    a->field2B0 = 1;
+    a->base.field2B0 = 1;
     {
         u32 mask = 0x80;
-        flags = a->flags2D4;
-        flags = a->flags2D4 & mask;
+        flags = a->base.flags2D4;
+        flags = a->base.flags2D4 & mask;
     }
     if (flags) {
         SceneActor_SetPositionXZ((u8 *)a + 0x50, *(s16 *)(*(u8 **)((u8 *)a + 0x5D0) + 0x1C),
@@ -38,11 +37,11 @@ void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
             u32 mask = 4;
             *field = (*(&mask)) | (*field);
         }
-        a->field2C2 = 0x20;
+        a->base.field2C2 = 0x20;
     } else {
         SceneActorAnimation_SelectDirectionalEntry(a, 0);
         Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
         Chase_SetBehavior(a, 7);
-        a->flags2CC |= 0x10;
+        a->base.flags2CC |= 0x10;
     }
 }

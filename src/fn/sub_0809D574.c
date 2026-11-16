@@ -56,29 +56,29 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = out->y + from->y;
     out->z = from->z + out->z;
 }
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
-    a->field2B2 = 1;
+    a->base.field2B2 = 1;
     zero = 0;
-    a->field2B0 = zero;
-    a->field2B5 = kind;
-    a->target = cb;
-    a->field2C8 = zero;
+    a->base.field2B0 = zero;
+    a->base.field2B5 = kind;
+    a->base.target = cb;
+    a->base.field2C8 = zero;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = zero;
+    a->base.word104 = zero;
 }
-static inline void State(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
+static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 struct SavedPair {
@@ -97,8 +97,7 @@ void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
@@ -112,27 +111,27 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     }
     return 0;
 }
-static inline void Scale(struct SceneActorRegistryResetView *actor)
+static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0)
                 *scale = 64;
         }
     }
-    if (actor->drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+    if (actor->base.drawableKind == 0)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 }
 
 void Lun_UpdateSway(void *);
@@ -155,14 +154,14 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
 }
 // confidence=low: follows the current route segment and renews its endpoint at the player.
 void Lun_SetMovementEndpoints(void *, void *);
-void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
+void Lun_RenewPlayerRoute(struct ChaseActor *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     s32 speed;
     u32 zero[1];
     struct ContactPosition delta;
-    if (Take(&actor->field2B1)) {
-        Control(actor, actor->entryTarget228, 1);
+    if (Take(&actor->base.field2B1)) {
+        Control(actor, actor->base.entryTarget228, 1);
         Fill(body + 0x424, zero, 0);
         body[0x3E3] = 1;
     }
@@ -174,8 +173,8 @@ void Lun_RenewPlayerRoute(struct SceneActorRegistryResetView *actor)
         Lun_SetMovementEndpoints(actor, ((u8 **)gPlayers)[0] + 0x30);
         sub_0809CCF4(actor);
         State(actor, 0, 0, 1);
-        Delta(&delta, &actor->body.position, (void *)(((u8 **)gPlayers)[0] + 0x30));
+        Delta(&delta, &actor->base.body.position, (void *)(((u8 **)gPlayers)[0] + 0x30));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -7,11 +7,11 @@ struct SceneActorTargetLink {
     u8 flags;
 };
 
-void SceneActorControl_ResetTargetFlags(struct SceneActorRegistryResetView *input)
+void SceneActorControl_ResetTargetFlags(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *s = input;
-    struct SceneActorPendingTargetState *q = s->context;
-    u16 *hp = &s->flags2D4;
+    struct ChaseActor *s = input;
+    struct SceneActorPendingTargetState *q = s->base.context;
+    u16 *hp = &s->base.flags2D4;
     u32 hm = 0xFFFFFEFF;
     struct SceneActorTargetLink *t;
     u32 bm;

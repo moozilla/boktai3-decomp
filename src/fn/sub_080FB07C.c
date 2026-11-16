@@ -10,24 +10,24 @@ struct Q {
     u16 b[4];
 };
 
-static inline void Go(struct SceneActorRegistryResetView *actor, u8 s, u8 p, u8 b)
+static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
-u32 Axe_PickAttack(struct SceneActorRegistryResetView *actor)
+u32 Axe_PickAttack(struct ChaseActor *actor)
 {
-    struct Q *q = actor->context;
-    if (actor->health <= q->low && q->b[3] == 0) {
+    struct Q *q = actor->base.context;
+    if (actor->base.health <= q->low && q->b[3] == 0) {
         Go(actor, 0, 2, 8);
         return 1;
     }
-    if (q->b[0] == 0 && actor->tracking.distance <= 0xFFFE) {
-        s32 a = actor->tracking.heading;
+    if (q->b[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
+        s32 a = actor->base.tracking.heading;
         s32 d = a - 0xa0;
         s32 e;
         if (d > 0x80)
@@ -43,7 +43,7 @@ u32 Axe_PickAttack(struct SceneActorRegistryResetView *actor)
             Go(actor, 0, 2, 2);
         return 1;
     }
-    if (q->mid >= actor->health) {
+    if (q->mid >= actor->base.health) {
         if (q->b[1] == 0) {
             Go(actor, 0, 2, 4);
             return 1;

@@ -691,17 +691,13 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
 
 #undef DUST_SAMPLE_ADDRESS
 
-// MATCHING_CONCESSION: register-pinning
-s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
+s32 Scene_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
 {
-    struct SceneObject *actor = input;
-    register s32 index asm("r4") = idx;
-    s32 direction = dir;
     struct SceneCell *reference = &actor->cellRef.cell;
-    s32 savedIndex;
     s32 delta = 0, dx = 0, dz = 0, speed, step;
     struct SceneCell *cell;
     u8 *dynamic;
+    s32 type, saved;
     if (({
             u8 active = 0;
             if (gPlayerPassageState && gPlayerInteractionMode == 2)
@@ -733,47 +729,33 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
             delta = -1;
             break;
     }
-    index += delta;
-    dynamic = TerrainModifiers_FindCellOverride(index, 1);
-    savedIndex = index;
+    dynamic = TerrainModifiers_FindCellOverride(index + delta, 1);
+    saved = index + delta;
     if (dynamic)
         cell = (struct SceneCell *)(dynamic + 4);
     else
-        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + savedIndex * 4);
+        cell = (struct SceneCell *)(gTerrainMap->cells + 12 + saved * 4);
     if (cell) {
-        u32 heightByte = cell->height;
-        u32 mask = 0xF0;
-        s32 type;
-        asm("" : "+r"(mask));
-        type = heightByte >> 4;
+        u32 height = cell->height;
+        type = (height & 0xF0) >> 4;
         switch (type) {
             case 0: {
                 u32 lowMask = 15;
-                u32 referenceHeight;
-                s32 next;
-                s32 current;
-                referenceHeight = ({
-                    struct SceneCell *p = reference;
-                    p->height;
-                });
-                asm("" : : "r"(referenceHeight));
-                next = heightByte & lowMask;
+                s32 referenceHeight = reference->height;
+                s32 next, current;
+                if (referenceHeight < 0)
+                    return 0;
+                next = height & lowMask;
                 current = referenceHeight & lowMask;
                 if ((u32)next >= (u32)current)
                     break;
                 if (cell->flags & 8)
                     break;
                 if (current - next > 1) {
-                    actor->targetY = ({
-                        u32 y = next << 8;
-                        y;
-                    });
-                    actor->direction = ({
-                        u32 d = direction;
-                        d;
-                    });
+                    actor->targetY = next << 8;
+                    actor->direction = direction;
                     {
-                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
+                        void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;
@@ -781,37 +763,20 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                     actor->dx = dx;
                     actor->dz = dz;
                     actor->kind = 2;
-                    actor->cellRef.index = savedIndex;
+                    actor->cellRef.index = saved;
                     actor->duration = speed;
                     return 3;
                 } else {
-                    u32 referenceHeight;
-                    actor->targetY = ({
-                        u32 y = next << 8;
-                        y;
-                    });
-                    referenceHeight = ({
-                        struct SceneCell *p = reference;
-                        p->height;
-                    });
+                    s32 remaining;
+                    actor->targetY = next << 8;
+                    remaining = reference->height & 15;
+                    if (remaining > 0)
+                        remaining--;
+                    reference->height = (reference->height & 0xF0) | remaining;
+                    reference->tile = cell->tile;
+                    actor->direction = direction;
                     {
-                        register s32 remaining asm("r0") = referenceHeight & lowMask;
-                        if (remaining > 0)
-                            remaining--;
-                        mask &= referenceHeight;
-                        mask |= remaining;
-                        reference->height = mask;
-                    }
-                    {
-                        u32 tile = cell->tile;
-                        reference->tile = tile;
-                    }
-                    actor->direction = ({
-                        u32 d = direction;
-                        d;
-                    });
-                    {
-                        register void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
+                        void (*callback)(struct SceneObject *) = Scene_UpdateObjectStep;
                         actor->update = callback;
                     }
                     actor->timer = 0;
@@ -819,7 +784,7 @@ s32 Scene_TryStepDown(struct SceneObject *input, s32 idx, s32 dir)
                     actor->dx = dx;
                     actor->dz = dz;
                     actor->kind = 1;
-                    actor->cellRef.index = savedIndex;
+                    actor->cellRef.index = saved;
                     actor->duration = speed;
                     return 1;
                 }

@@ -13,33 +13,32 @@ static inline u8 MotionActive(struct SceneActorReactionMotion *motion)
         return 1;
     return 0;
 }
-static inline void SetState(struct SceneActorRegistryResetView *actor, u32 zero)
+static inline void SetState(struct ChaseActor *actor, u32 zero)
 {
     u32 phase = 1;
-    actor->state2A8 = zero;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = zero;
-    actor->counter2AC = zero;
-    actor->field2B1 = phase;
+    actor->base.state2A8 = zero;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = zero;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = phase;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind,
-                              u32 zero)
+static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
-void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
-    u32 active = MotionActive((void *)&actor->tracking.target);
+    u32 active = MotionActive((void *)&actor->base.tracking.target);
     if (active) {
         {
             u16 *flags = &actor->group.common.gate.flags;
@@ -50,13 +49,13 @@ void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *ac
         }
         {
             u32 mask = 128;
-            u16 *flags = &actor->flags2D4;
+            u16 *flags = &actor->base.flags2D4;
             u32 value = *flags;
             mask |= value;
             *flags = mask;
         }
         actor->group.common.gate.counter = actor->group.common.gate.duration;
-        if (TestFlags(&actor->flags2D4, 256))
+        if (TestFlags(&actor->base.flags2D4, 256))
             return;
         Golem_ResetIdleControl(actor);
     } else {
@@ -64,7 +63,7 @@ void SceneActorControl_RefreshMotionRoute(struct SceneActorRegistryResetView *ac
         SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
+        struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
         u32 mask = 8;
         u32 value = motion->flags;
         mask |= value;

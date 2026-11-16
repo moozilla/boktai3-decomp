@@ -2,7 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "player.h"
 /* Golem: build up charge while the target player is not dazzled; charge at the partner when ready and in reach (kind 0x28), else approach (kind 0x23) (tentative) */
-u8 Golem_InvokeEnabledBehavior(struct SceneActorRegistryResetView *actor);
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor);
 u8 sub_0821D4F0(void *, void *, u32, u32);
 void Golem_UpdateChargeWindup(void);
 void Golem_UpdateRouteMotion(void);
@@ -19,10 +19,10 @@ static inline s32 PlayerSlot(u8 *actor)
         return actor[8];
     return -1;
 }
-static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
+static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -63,19 +63,19 @@ charge: {
     }
 }
 }
-static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kind, void *control)
+static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 /* Can the body charge at its partner: enough stored charge, closer than its range, in reach? */
 static inline s32 CanCharge(void *ctx)
@@ -96,25 +96,25 @@ static inline s32 CanCharge(void *ctx)
         return 1;
     return 0;
 }
-void Golem_ChargeOrApproach(struct SceneActorRegistryResetView *actor)
+void Golem_ChargeOrApproach(struct ChaseActor *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     if (TakeFlag2B1(actor))
-        actor->field2B0 = 0;
+        actor->base.field2B0 = 0;
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         Golem_Charge(body);
         if (CanCharge(body)) {
             void *target = Golem_UpdateChargeWindup;
             SetControl(actor, 0x28, target);
             {
                 u32 phase = 2, behavior = 4;
-                actor->state2A8 = 0;
-                actor->phase2A9 = phase;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
+                actor->base.state2A8 = 0;
+                actor->base.phase2A9 = phase;
+                actor->base.behavior2AA = behavior;
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = 1;
             }
             return;
         }
@@ -124,12 +124,12 @@ void Golem_ChargeOrApproach(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 phase = 2;
-            actor->state2A8 = 0;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = 1;
+            actor->base.state2A8 = 0;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = 1;
         }
-        actor->counter2AC = 0;
-        actor->field2B1 = 1;
+        actor->base.counter2AC = 0;
+        actor->base.field2B1 = 1;
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

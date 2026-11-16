@@ -23,15 +23,15 @@ static inline s32 Scale16(s32 n)
     return n >= 0 ? n >> 16 : -((-n) >> 16);
 }
 
-void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_SlideBack(struct ChaseActor *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     struct Unk080C79A8Motion *motion = (struct Unk080C79A8Motion *)((u8 *)actor + 0x50);
     s32 dx, dz;
     s16 *speed;
 
-    if (TakeFlag(&actor->field2B2)) {
-        u8 *direction = &((struct SceneActorAnimationView *)actor)->direction;
+    if (TakeFlag(&actor->base.field2B2)) {
+        u8 *direction = &((struct RoomActor *)actor)->body.direction;
         u8 saved = *direction;
         u8 directionVariant, mirror;
         u8 *mirrorPointer;
@@ -55,7 +55,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
                 *variantPointer = quadrant;
             }
         }
-        *(&((struct SceneActorAnimationView *)actor)->direction) = saved;
+        *(&((struct RoomActor *)actor)->body.direction) = saved;
         variantReload = &directionVariant;
         {
             u32 mirrorValue = *mirrorPointer;
@@ -70,24 +70,22 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
         } else {
             force = 0;
         }
-        if (!((struct SceneActorAnimationView *)actor)->drawableKind) {
+        if (!((struct RoomActor *)actor)->drawableKind) {
             struct SceneActorAnimationSequenceDrawable *drawable;
-            ((struct SceneActorAnimationView *)actor)->selection = selection;
-            drawable = ((struct SceneActorAnimationView *)actor)->drawable;
+            ((struct RoomActor *)actor)->animationIndex = selection;
+            drawable = ((struct RoomActor *)actor)->drawable;
             Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                              (u8)variant, (u8)flags);
-            restart = &((struct SceneActorAnimationView *)actor)->restart;
+            restart = &((struct RoomActor *)actor)->restart;
         } else {
             struct SceneActorAnimationTile *tile =
-                &((struct SceneActorAnimationTileDrawable *)((struct SceneActorAnimationView *)
-                                                                 actor)
-                      ->drawable)
+                &((struct SceneActorAnimationTileDrawable *)((struct RoomActor *)actor)->drawable)
                      ->tile;
             u8 *savedSelection;
 
             selection += variant;
-            savedSelection = &((struct SceneActorAnimationView *)actor)->selection;
-            restart = &((struct SceneActorAnimationView *)actor)->restart;
+            savedSelection = &((struct RoomActor *)actor)->animationIndex;
+            restart = &((struct RoomActor *)actor)->restart;
             if (!force && *savedSelection == selection && !*restart) {
                 if ((flags == 1) && (tile->flags & 4)) {
                     goto done;
@@ -106,12 +104,10 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
                     mode = 4;
                 }
                 Anim_SetKeyframes(
-                    &((struct SceneActorAnimationTileDrawable *)((struct SceneActorAnimationView *)
-                                                                     actor)
+                    &((struct SceneActorAnimationTileDrawable *)((struct RoomActor *)actor)
                           ->drawable)
                          ->tile,
-                    ((struct SceneActorAnimationView *)actor)->drawable, (u16)selection, 2,
-                    (u16)mode);
+                    ((struct RoomActor *)actor)->drawable, (u16)selection, 2, (u16)mode);
                 flags &= 1;
                 if (flags) {
                     tile->flags |= mask;
@@ -122,16 +118,16 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
         }
         *restart = 0;
     done:
-        ((struct SceneActorAnimationView *)actor)->restart = 0;
+        ((struct RoomActor *)actor)->restart = 0;
         body[0x68F] = 0;
     }
     {
         u32 mask = 0x100;
-        actor->flags2D4 |= mask;
+        actor->base.flags2D4 |= mask;
     }
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
     dx = Scale16(gUnk_086149C4[(body[0x691] + 0x40) & 0xFF] * *(s16 *)(body + 0x682));
     dz = Scale16(gUnk_086149C4[body[0x691]] * *(s16 *)(body + 0x682));
@@ -145,7 +141,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
         s16 zero = 0;
         *speed = zero;
         if (++body[0x68F] > 11) {
-            actor->field2B0 = 1;
+            actor->base.field2B0 = 1;
             *speed = zero;
         }
     } else {

@@ -5,10 +5,10 @@ struct SceneActorBehaviorTimer {
     u16 timer;
 };
 void sub_080B9158(void);
-void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *s,
+void SceneActorControl_BeginTimedBehavior56(struct ChaseActor *s,
                                             struct SceneActorBehaviorTimer *other)
 {
-    switch (s->category) {
+    switch (s->base.category) {
         case 6:
             other->timer = 60;
             break;
@@ -28,29 +28,29 @@ void SceneActorControl_BeginTimedBehavior56(struct SceneActorRegistryResetView *
         u32 *flags;
         u8 *taken;
         u32 three;
-        taken = &s->field2B2;
+        taken = &s->base.field2B2;
         zero = 0;
         one = 1;
         *taken = one;
-        s->field2B0 = zero;
-        s->field2B5 = code;
-        s->target = fn;
+        s->base.field2B0 = zero;
+        s->base.field2B5 = code;
+        s->base.target = fn;
         zero8 = 0;
-        s->field2C8 = zero;
-        flags = &s->flags114;
+        s->base.field2C8 = zero;
+        flags = &s->base.flags114;
         {
             u32 mask = -2;
             *flags &= mask;
         }
-        s->word104 = zero;
+        s->base.word104 = zero;
         three = 3;
-        s->state2A8 = three;
-        s->phase2A9 = zero8;
-        s->behavior2AA = zero8;
-        s->counter2AC = zero;
-        s->field2B1 = one;
+        s->base.state2A8 = three;
+        s->base.phase2A9 = zero8;
+        s->base.behavior2AA = zero8;
+        s->base.counter2AC = zero;
+        s->base.field2B1 = one;
         {
-            u16 *flags = &s->flags2D6;
+            u16 *flags = &s->base.flags2D6;
             u32 mask = 0xFFFFF636;
             *flags &= mask;
         }

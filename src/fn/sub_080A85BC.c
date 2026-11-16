@@ -3,38 +3,38 @@
 extern const s16 gUnk_086149C4[];
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_SelectWanderRoute(void *);
-static inline u8 TakeEntry(struct SceneActorRegistryResetView *p)
+static inline u8 TakeEntry(struct ChaseActor *p)
 {
-    if (p->field2B1) {
-        p->field2B1 = 0;
+    if (p->base.field2B1) {
+        p->base.field2B1 = 0;
         return 1;
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *p, void *control, u32 code)
+static inline void SetControl(struct ChaseActor *p, void *control, u32 code)
 {
-    u8 *entry = &p->field2B2;
+    u8 *entry = &p->base.field2B2;
     u32 zero = 0;
     *entry = 1;
-    p->field2B0 = zero;
-    p->field2B5 = code;
-    p->target = control;
-    p->field2C8 = zero;
+    p->base.field2B0 = zero;
+    p->base.field2B5 = code;
+    p->base.target = control;
+    p->base.field2C8 = zero;
     {
-        u32 *flags = &p->flags114;
+        u32 *flags = &p->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    p->word104 = zero;
+    p->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *p, u32 b)
+static inline void SetState(struct ChaseActor *p, u32 b)
 {
     u32 behavior = b;
-    p->state2A8 = 0;
-    p->phase2A9 = 0;
-    p->behavior2AA = behavior;
-    p->counter2AC = 0;
-    p->field2B1 = 1;
+    p->base.state2A8 = 0;
+    p->base.phase2A9 = 0;
+    p->base.behavior2AA = behavior;
+    p->base.counter2AC = 0;
+    p->base.field2B1 = 1;
 }
 static inline s32 Scale(s32 x)
 {
@@ -42,7 +42,7 @@ static inline s32 Scale(s32 x)
         return x >> 12;
     return -((-x) >> 12);
 }
-void TentacleActor_UpdateKnockbackSlide(struct SceneActorRegistryResetView *p)
+void TentacleActor_UpdateKnockbackSlide(struct ChaseActor *p)
 {
     if (TakeEntry(p)) {
         struct ContactPosition *velocity;
@@ -64,13 +64,13 @@ void TentacleActor_UpdateKnockbackSlide(struct SceneActorRegistryResetView *p)
     sub_080A9DB0(p, 6, 0x1000);
     {
         u32 mask = 16;
-        if (p->flags2D0 & mask) {
+        if (p->base.flags2D0 & mask) {
             TentacleActor_SelectWanderRoute(p);
-            SetControl(p, p->entryTarget228, 1);
+            SetControl(p, p->base.entryTarget228, 1);
             SetState(p, 2);
             Sound_PlaySong(983);
         } else {
-            p->counter2AC++;
+            p->base.counter2AC++;
         }
     }
 }

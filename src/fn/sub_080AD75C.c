@@ -6,7 +6,7 @@
 
 u8 Skeleton_RerouteToTarget(void *);
 u8 SceneActor_DispatchContextAction(void *, u32);
-void Vorn_ResumeRouteAfterDelay(struct SceneActorRegistryResetView *, s32);
+void Vorn_ResumeRouteAfterDelay(struct ChaseActor *, s32);
 
 struct VornAnimationState {
     u8 unknown0[12];
@@ -28,28 +28,29 @@ static inline u8 Vorn_ContextFlags(struct SceneActorAnimationLink *context, u32 
         return 1;
     return 0;
 }
-static inline void Vorn_SetStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline void Vorn_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->flags2D0 = mask | actor->flags2D0;
+    actor->base.flags2D0 = mask | actor->base.flags2D0;
 }
 
 #define Vorn_UpdateStaggerRecovery sub_080AD75C
-void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
+void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorAnimationLink *context = actor->context;
-    struct VornAnimationState *animation = &((struct VornDrawable *)actor->drawable)->animation;
+    struct SceneActorAnimationLink *context = actor->base.context;
+    struct VornAnimationState *animation =
+        &((struct VornDrawable *)actor->base.drawable)->animation;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
     struct ContactPackedVector range;
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x1CB);
             Sound_PlaySong(0x12A);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     Vorn_SetStatusFlags(actor, 0x10000);
@@ -67,11 +68,14 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
         sample = *(const u16 *)(RANDOM_TABLE_ADDR + index);
         sample &= 3;
         count = sample + 1;
-        SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
-                            actor->body.direction + 128, 10, 6, 2, 2);
+        SparkParticle_Spawn(&actor->base.body.position, count,
+                            (const struct ContactPosition *)&range,
+                            actor->base.body.direction + 128, 10, 6, 2, 2);
     }
-    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
+                                         &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.z, &actor->base.reactionEnd.z,
+                                         &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
@@ -80,18 +84,18 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (!Vorn_DisplacementStopped(dx, dz))
         return;
-    if (!actor->field2B3)
+    if (!actor->base.restart)
         return;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -99,7 +103,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, Vorn_ResumeRouteAfterDelay, 20);
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
-        actor->field2C2 = 64;
+        actor->base.field2C2 = 64;
     } else if (Vorn_ContextFlags(context, 0x1D))
         SceneActor_DispatchContextAction(context, 1);
     else {
@@ -107,13 +111,13 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
         SceneActorChase_SetActorFlags(actor, 16);
         group->destination->pad = 0;
         if (!Skeleton_RerouteToTarget(actor) &&
-            !SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                      &actor->tracking.target->position)) {
+            !SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      &actor->base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 7);
-        actor->field2C2 = 32;
+        actor->base.field2C2 = 32;
     }
 }

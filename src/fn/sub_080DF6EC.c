@@ -12,39 +12,37 @@ s32 FloatingItemEffect_Spawn(s32, s32, s32, s32, void *, void *, s32, void *);
 void Inventory_ClearItemSlot(u32);
 s32 Math_Atan2(s32, s32);
 
-static inline u8 Dog_TracksPlayer(struct SceneActorRegistryResetView *actor)
+static inline u8 Dog_TracksPlayer(struct ChaseActor *actor)
 {
     u32 mask = 2;
-    if (actor->flags2C0 & mask)
+    if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
 
 static inline void Dog_ClearResponseFlags(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    actor->field2D8 = 0;
-    actor->field2DC = 0;
+    struct ChaseActor *actor = object;
+    actor->base.field2D8 = 0;
+    actor->base.field2DC = 0;
 }
 
 static inline u32 *Dog_ResponseField(void *object, s16 offset)
 {
     return (u32 *)((u8 *)object + offset);
 }
-static inline void Dog_WriteResponseWords(struct SceneActorRegistryResetView *actor, s32 value)
+static inline void Dog_WriteResponseWords(struct ChaseActor *actor, s32 value)
 {
-    *Dog_ResponseField(actor, (u32)&((struct SceneActorRegistryResetView *)0)->field2D8) = value;
-    *Dog_ResponseField(actor, (u32)&((struct SceneActorRegistryResetView *)0)->field2DC) = value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2D8) = value;
+    *Dog_ResponseField(actor, (u32) & ((struct ChaseActor *)0)->base.field2DC) = value;
 }
 
-static inline void Dog_CopyContactCost(struct ContactCollider *collider,
-                                  struct SceneActorRegistryResetView *actor)
+static inline void Dog_CopyContactCost(struct ContactCollider *collider, struct ChaseActor *actor)
 {
-    collider->cost = actor->reactionSoundVariant;
+    collider->cost = actor->base.reactionSoundVariant;
 }
 
-void sub_080DF6EC(void *unused, struct ContactCollider *contact,
-                  struct SceneActorRegistryResetView *actor)
+void sub_080DF6EC(void *unused, struct ContactCollider *contact, struct ChaseActor *actor)
 {
     struct DogItemContext *context;
     u32 palette;
@@ -55,8 +53,8 @@ void sub_080DF6EC(void *unused, struct ContactCollider *contact,
         return;
     if (contact->contactFlags != 1)
         return;
-    context = actor->context;
-    palette = actor->paletteOffset;
+    context = actor->base.context;
+    palette = actor->base.paletteOffset;
     if (context->slot >= 0)
         return;
     if (palette != 0 && palette != 2)
@@ -65,8 +63,9 @@ void sub_080DF6EC(void *unused, struct ContactCollider *contact,
     position.y += 200;
     if (!InventorySlot_PickRandom(&context->slot, &context->kind, &context->parameter))
         return;
-    spawned = FloatingItemEffect_Spawn(0, context->kind, 3, 0, &position, &actor->body.position, 24, actor);
-    actorPosition = &actor->body.position;
+    spawned = FloatingItemEffect_Spawn(0, context->kind, 3, 0, &position,
+                                       &actor->base.body.position, 24, actor);
+    actorPosition = &actor->base.body.position;
     if (spawned < 0) {
         SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&context->slot, 0xFFFF);
         return;
@@ -80,33 +79,34 @@ void sub_080DF6EC(void *unused, struct ContactCollider *contact,
         default:
             return;
     }
-    responseValue = Div((u16)actor->defaultHealth * context->healthPercent, 100);
+    responseValue = Div((u16)actor->base.defaultHealth * context->healthPercent, 100);
     {
-        health = actor->health;
+        health = actor->base.health;
         if (health - responseValue <= 0)
-            actor->reactionSoundVariant = health;
+            actor->base.reactionSoundVariant = health;
         else
-            actor->reactionSoundVariant = responseValue;
+            actor->base.reactionSoundVariant = responseValue;
     }
     context->slot = -1;
-    actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
-    actor->field2E0 = 1;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->base.field2E0 = 1;
     Dog_ClearResponseFlags(actor);
     responseValue = 0;
     Dog_WriteResponseWords(actor, responseValue);
-    Dog_CopyContactCost(&actor->colliderA, actor);
-    actor->colliderA.responseParameter = 1;
-    actor->colliderA.responseValue = 30;
-    actor->field2E6 = 1;
+    Dog_CopyContactCost(&actor->base.colliderA, actor);
+    actor->base.colliderA.responseParameter = 1;
+    actor->base.colliderA.responseValue = 30;
+    actor->base.field2E6 = 1;
     if (Dog_TracksPlayer(actor))
-        actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
-    else if (!actor->tracking.target)
+        actor->base.tracking.target =
+            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    else if (!actor->base.tracking.target)
         return;
     {
-        struct SceneActorChaseTarget *target = actor->tracking.target;
+        struct SceneActorChaseTarget *target = actor->base.tracking.target;
         s32 dx = target->position.x - actorPosition->x;
-        s32 dz = target->position.z - actor->body.position.z;
-        actor->tracking.heading = Math_Atan2(dx, dz);
-        actor->tracking.distance = dx * dx + dz * dz;
+        s32 dz = target->position.z - actor->base.body.position.z;
+        actor->base.tracking.heading = Math_Atan2(dx, dz);
+        actor->base.tracking.distance = dx * dx + dz * dz;
     }
 }

@@ -17,9 +17,9 @@ struct MummyMotionCounters {
     u16 counter6F2;
 };
 
-void Mummy_ResetRevivalMotion(struct SceneActorRegistryResetView *actor)
+void Mummy_ResetRevivalMotion(struct ChaseActor *actor)
 {
-    struct MummyMotionCounters *body = actor->context;
+    struct MummyMotionCounters *body = actor->base.context;
     body->counter6D0 = 0;
     body->counter6D2 = 0;
     body->counter6D4 = 0;
@@ -31,7 +31,7 @@ void Mummy_ResetRevivalMotion(struct SceneActorRegistryResetView *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorMovement_ResolveRoutePosition(actor);
     {
-        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
         DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

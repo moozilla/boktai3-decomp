@@ -1,6 +1,6 @@
 #include "scene_actor_animation.h"
-void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationView *actor,
-                                                     s32 index, u32 extraFlags)
+void SceneActorAnimation_SelectDirectionalEntryFlags(struct RoomActor *actor, s32 index,
+                                                     u32 extraFlags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
@@ -15,7 +15,7 @@ void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationV
     u8 *restart;
     {
         u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+        s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
             *mirrorPointer = 1;
@@ -38,7 +38,7 @@ void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationV
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -49,7 +49,7 @@ void SceneActorAnimation_SelectDirectionalEntryFlags(struct SceneActorAnimationV
         u8 *savedSelection;
 
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))

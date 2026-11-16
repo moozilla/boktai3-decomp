@@ -53,9 +53,9 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     value = scaled + value + sway + final;
     out->z = start->z + Shift10(value);
 }
-u8 sub_080FAA5C(struct SceneActorRegistryResetView *actor)
+u8 sub_080FAA5C(struct ChaseActor *actor)
 {
-    struct AxeCurveContext *ctx = actor->context;
+    struct AxeCurveContext *ctx = actor->base.context;
     struct ContactPosition start, end;
     start = ctx->start;
     {

@@ -26,8 +26,7 @@ inline static void CpuSet_2(int control, struct ContactPosition *dest, u32 *sour
     CpuSet(source, dest, control);
 }
 
-void sub_080FC1F8(struct SceneActorRegistryResetView *actor, struct ContactPosition *origin,
-                  s32 angle, s32 frame)
+void sub_080FC1F8(struct ChaseActor *actor, struct ContactPosition *origin, s32 angle, s32 frame)
 {
     struct {
         u32 zero;
@@ -39,7 +38,7 @@ void sub_080FC1F8(struct SceneActorRegistryResetView *actor, struct ContactPosit
         struct ContactPosition p;
         struct ContactPackedVector v;
     } position;
-    struct AxeSparkContext *context = actor->context;
+    struct AxeSparkContext *context = actor->base.context;
     if (Mod(frame, 2) == 0) {
         s32 x, z, x2;
         range.x = 60;

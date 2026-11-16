@@ -41,21 +41,21 @@ static inline s32 Shift(s32 n, u32 bits)
     return -((-n) >> bits);
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
-    a->field2B2 = 1;
+    a->base.field2B2 = 1;
     zero = 0;
-    a->field2B0 = zero;
-    a->field2B5 = kind;
-    a->target = cb;
-    a->field2C8 = zero;
+    a->base.field2B0 = zero;
+    a->base.field2B5 = kind;
+    a->base.target = cb;
+    a->base.field2C8 = zero;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = zero;
+    a->base.word104 = zero;
 }
 
 static inline u32 WanderRand(void)
@@ -76,8 +76,8 @@ struct SavedMotion {
     struct ContactPosition position;
 };
 
-static inline u8 ApproachStoredPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 inSpeed)
+static inline u8 ApproachStoredPoint(struct ChaseActor *actor, struct SavedMotion *saved,
+                                     s32 inSpeed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s32 speed = inSpeed;
@@ -95,13 +95,13 @@ static inline u8 ApproachStoredPoint(struct SceneActorRegistryResetView *actor, 
 
 // confidence=low: homes on a stored point, then picks a new point around the player.
 
-void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     u32 zero[1];
-    if (Take(&actor->field2B1)) {
-        u8 *context = actor->context;
-        Control(actor, actor->entryTarget228, 1);
+    if (Take(&actor->base.field2B1)) {
+        u8 *context = actor->base.context;
+        Control(actor, actor->base.entryTarget228, 1);
         Fill(context + 0x42C, zero, 0);
         context[0x3E3] = 1;
     }
@@ -117,27 +117,28 @@ void SceneActorControl_WanderAroundPlayer(struct SceneActorRegistryResetView *ac
             target.z += Shift(gUnk_086149C4[(angle + 64) & 255], 4);
             SceneActorControl_StartPositionCurve(actor, &target);
             {
-                u32 *flags = &((struct SceneActorControlMotionState *)actor->context)->flags3D4;
+                u32 *flags =
+                    &((struct SceneActorControlMotionState *)actor->base.context)->flags3D4;
                 u32 mask = ~8;
                 *flags &= mask;
             }
         }
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }
 
-void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *);
+void SceneActorControl_UpdateTimedFacing(struct ChaseActor *);
 
-void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *);
+void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 
-static inline void SetMotionPhase(struct SceneActorRegistryResetView *actor, u32 behavior)
+static inline void SetMotionPhase(struct ChaseActor *actor, u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline u32 MotionRand(void)
@@ -178,10 +179,10 @@ struct ActorApproachCallbackView {
     void *callback;
 };
 
-static inline u8 ApproachMotionPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 inSpeed)
+static inline u8 ApproachMotionPoint(struct ChaseActor *actor, struct SavedMotion *saved,
+                                     s32 inSpeed)
 {
-    struct ActorMotionView *motion = (void *)&actor->body.id;
+    struct ActorMotionView *motion = (void *)&actor->base.body.id;
     s32 speed = inSpeed;
     s16 dx = saved->position.x - (u16)motion->position.x;
     s16 dz = saved->position.z - (u16)motion->position.z;
@@ -197,11 +198,11 @@ static inline u8 ApproachMotionPoint(struct SceneActorRegistryResetView *actor, 
 
 // confidence=low: waits a timed interval, homes on a stored point, then picks a new point.
 
-void SceneActorControl_UpdateStoredMotion(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
 {
-    struct StoredMotionState *body = actor->context;
+    struct StoredMotionState *body = actor->base.context;
     u32 zero[1];
-    if (Take(&actor->field2B1)) {
+    if (Take(&actor->base.field2B1)) {
         Control(actor, (void *)SceneActorControl_UpdateTimedFacing, 0x24);
         Fill(&body->scratch, zero, 0);
         body->mode = 1;
@@ -251,17 +252,17 @@ void SceneActorControl_UpdateStoredMotion(struct SceneActorRegistryResetView *ac
                 SceneActorControl_AdvancePositionCurve(actor);
             }
         }
-        if (actor->tracking.distance > 0xFDE8) {
+        if (actor->base.tracking.distance > 0xFDE8) {
             SceneActorControl_ResetCollisionPhase(actor);
-            actor->body.direction = actor->tracking.heading;
+            actor->base.body.direction = actor->base.tracking.heading;
             body->timer = 0x1E;
             return;
         }
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         SetMotionPhase(actor, 4);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }
 
@@ -272,18 +273,18 @@ void SceneActorControl_SetApproachCallbacks(u8 *p)
     *(u8 **)(p + 0x28c) = gUnk_08605C5C;
 }
 
-static inline void HideForVisibilityTick(struct SceneActorRegistryResetView *actor)
+static inline void HideForVisibilityTick(struct ChaseActor *actor)
 {
     u32 one = 1;
-    if (actor->drawableKind == 0) {
-        u32 *flags = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        u32 *flags = actor->base.drawable;
         *flags |= one;
     } else {
         struct Tile {
             u8 unknown0[8];
             u32 flags;
         };
-        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= one;
     }
     {
@@ -292,10 +293,10 @@ static inline void HideForVisibilityTick(struct SceneActorRegistryResetView *act
     }
 }
 
-static inline void Show(struct SceneActorRegistryResetView *actor)
+static inline void Show(struct ChaseActor *actor)
 {
-    if (actor->drawableKind == 0) {
-        u32 *flags = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        u32 *flags = actor->base.drawable;
         u32 mask;
         mask = ~1;
         *flags &= mask;
@@ -304,7 +305,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
             u8 unknown0[8];
             u32 flags;
         };
-        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -314,7 +315,7 @@ static inline void Show(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_TickVisibility(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionState *state;
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
@@ -358,8 +359,8 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
             flags = inputFlags;
             active = SceneActorControl_TestFlags(active, ~0);
             if (active) {
-                if (actor->drawableKind == 0) {
-                    u32 *field = actor->drawable;
+                if (actor->base.drawableKind == 0) {
+                    u32 *field = actor->base.drawable;
                     u32 mask = ~1;
                     *field &= mask;
                 } else {
@@ -367,7 +368,7 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
                         u8 unknown0[8];
                         u32 flags;
                     };
-                    struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+                    struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
                     {
                         u32 mask = ~1;
                         tile->flags &= mask;
@@ -380,15 +381,15 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
                 ActorShadow_Enable((void *)((u8 *)actor + 0x320));
             } else {
                 u32 one = 1;
-                if (actor->drawableKind == 0) {
-                    u32 *field = actor->drawable;
+                if (actor->base.drawableKind == 0) {
+                    u32 *field = actor->base.drawable;
                     *field |= one;
                 } else {
                     struct Tile {
                         u8 unknown0[8];
                         u32 flags;
                     };
-                    struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+                    struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
                     tile->flags |= one;
                 }
                 {
@@ -405,11 +406,11 @@ void SceneActorControl_TickVisibility(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_StartStoredCurve(struct ChaseActor *actor)
 {
     struct ContactPosition position;
     gRandomIndex = (gRandomIndex + 1) & 1023;
-    position = actor->previousPosition;
+    position = actor->base.previousPosition;
     SceneActorControl_StartPositionCurve(actor, &position);
     SceneActorTerrain_EnterState(actor, 2, 0, 3);
     {
@@ -417,10 +418,10 @@ void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *acto
         u32 mask = ~8;
         *flags &= mask;
     }
-    actor->field2B1 = 0;
+    actor->base.field2B1 = 0;
 }
 
-static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D4;
@@ -429,7 +430,7 @@ static inline u32 ReadFlags16(struct SceneActorRegistryResetView *actor, u32 inp
     return *flags & mask;
 }
 
-static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inputMask)
+static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 offset = 0x2D0;
@@ -438,28 +439,28 @@ static inline u32 ReadFlags32(struct SceneActorRegistryResetView *actor, u32 inp
     return *flags & mask;
 }
 
-static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
+static inline u8 IsUnavailable(struct ChaseActor *input)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
 }
 
-static inline void HideForVisibilityRequest(struct SceneActorRegistryResetView *actor)
+static inline void HideForVisibilityRequest(struct ChaseActor *actor)
 {
     u32 one = 1;
-    if (actor->drawableKind == 0) {
-        u32 *flags = actor->drawable;
+    if (actor->base.drawableKind == 0) {
+        u32 *flags = actor->base.drawable;
         *flags |= one;
     } else {
         struct Tile {
             u8 unknown0[8];
             u32 flags;
         };
-        struct Tile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct Tile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= one;
     }
     ActorShadow_Disable((void *)((u8 *)actor + 0x320));
@@ -467,10 +468,9 @@ static inline void HideForVisibilityRequest(struct SceneActorRegistryResetView *
 
 /* actor must be nonnull: its control context is loaded before the availability gate. */
 
-void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *input,
-                                         const u16 *inputRequest)
+void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
 {
-    struct SceneActorRegistryResetView *actor = input;
+    struct ChaseActor *actor = input;
     const u16 *request = inputRequest;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     u32 unavailable = IsUnavailable(actor);
@@ -479,14 +479,14 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         if (!(*flags & mask))
             return;
     }
     {
         u32 mask = 0x800;
         u16 *flags;
-        flags = &actor->flags2C0;
+        flags = &actor->base.flags2C0;
         mask |= *flags;
         *flags = mask;
     }
@@ -559,7 +559,7 @@ void SceneActorControl_RequestVisibility(struct SceneActorRegistryResetView *inp
 
 u32 Trigger_ConsumePending(void *, u32);
 
-void SceneActorControl_StartStoredCurve(struct SceneActorRegistryResetView *);
+void SceneActorControl_StartStoredCurve(struct ChaseActor *);
 
 struct WanderActorMotion {
     u32 id;
@@ -574,10 +574,9 @@ struct WanderTriggerView {
     u8 trigger[1];
 };
 
-static inline u8 ApproachWanderPoint(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 ApproachWanderPoint(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
-    struct WanderActorMotion *motion = (void *)&actor->body.id;
+    struct WanderActorMotion *motion = (void *)&actor->base.body.id;
     s32 spd = speed;
     s16 dx = saved->position.x - (u16)motion->position.x;
     s16 dz = saved->position.z - (u16)motion->position.z;
@@ -606,32 +605,32 @@ struct WanderCallbackView {
     void *callback;
 };
 
-static inline void SetWanderFlags(struct SceneActorRegistryResetView *actor, u32 bit)
+static inline void SetWanderFlags(struct ChaseActor *actor, u32 bit)
 {
-    actor->flags2C0 = bit | actor->flags2C0;
+    actor->base.flags2C0 = bit | actor->base.flags2C0;
 }
 
-static inline void SetWanderPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 behavior)
+static inline void SetWanderPhase(struct ChaseActor *actor, u32 state, u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 // confidence=low: homes on a stored point, then consumes a pending trigger and restarts.
 
-void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
 {
-    struct WanderMotionState *body = actor->context;
+    struct WanderMotionState *body = actor->base.context;
     u32 zero[1];
-    if (Take(&actor->field2B1)) {
-        struct WanderMotionState *context = actor->context;
+    if (Take(&actor->base.field2B1)) {
+        struct WanderMotionState *context = actor->base.context;
         context->timer = 0;
         context->mode = 1;
         SceneActorControl_StartStoredCurve(actor);
-        Control(actor, actor->entryTarget228, 1);
+        Control(actor, actor->base.entryTarget228, 1);
         Fill(&context->scratch, zero, 0);
         SetWanderFlags(actor, 0x800);
     }
@@ -644,40 +643,40 @@ void SceneActorControl_UpdateWanderTarget(struct SceneActorRegistryResetView *ac
                 SetWanderPhase(actor, 2, 2);
             }
         } else {
-            actor->counter2AC++;
+            actor->base.counter2AC++;
         }
     }
 }
 
-void SceneActorControl_ConsumePendingEntry(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *fn = actor->entryTarget228;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        void *fn = actor->base.entryTarget228;
         u32 one = 1;
-        u8 *taken = &actor->field2B2;
+        u8 *taken = &actor->base.field2B2;
         u32 zero = 0;
         *taken = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = one;
-        actor->target = fn;
-        actor->field2C8 = zero;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = one;
+        actor->base.target = fn;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
         Trigger_ConsumePending((void *)((u8 *)actor + 0xC), 1);
         {
             u32 mask = 0x800;
             u16 *flags;
-            flags = &actor->flags2C0;
+            flags = &actor->base.flags2C0;
             mask |= *flags;
             *flags = mask;
         }
     }
     {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }
 
@@ -767,7 +766,7 @@ u32 Bat_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct SceneActorRegistryResetView *)s)->flags2D0 & m;
+    v = ((struct ChaseActor *)s)->base.flags2D0 & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

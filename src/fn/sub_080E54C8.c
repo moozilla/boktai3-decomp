@@ -1,42 +1,42 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 /* Dog_UpdateActionPhase: queues control 2 once, runs the callback while the action timer has expired, else switches phase */
-u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
-static inline void SelectControl(struct SceneActorRegistryResetView *p, void *control, u32 kind)
+u8 sub_0812F3CC(struct ChaseActor *);
+static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
-    p->field2B2 = 1;
-    p->field2B0 = 0;
-    p->field2B5 = kind;
-    p->target = control;
-    p->field2C8 = 0;
+    p->base.field2B2 = 1;
+    p->base.field2B0 = 0;
+    p->base.field2B5 = kind;
+    p->base.target = control;
+    p->base.field2C8 = 0;
     {
-        u32 *flags = &p->flags114;
+        u32 *flags = &p->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    p->word104 = 0;
+    p->base.word104 = 0;
 }
-u8 Dog_IsActionTimerExpired(struct SceneActorRegistryResetView *);
-void Dog_UpdateActionPhase(struct SceneActorRegistryResetView *p)
+u8 Dog_IsActionTimerExpired(struct ChaseActor *);
+void Dog_UpdateActionPhase(struct ChaseActor *p)
 {
-    if (SceneActorControl_TakeFlag(&p->field2B1)) {
-        void *control = p->entryTarget224;
+    if (SceneActorControl_TakeFlag(&p->base.field2B1)) {
+        void *control = p->base.entryTarget224;
         u32 kind = 2;
         SelectControl(p, control, kind);
     }
     if (Dog_IsActionTimerExpired(p)) {
-        if ((u8)Callback_InvokeActor(p, p->contactQuery.opaque))
+        if ((u8)Callback_InvokeActor(p, p->base.contactQuery.opaque))
             return;
         if (sub_0812F3CC(p))
             return;
     }
-    if (p->field2B0) {
+    if (p->base.field2B0) {
         u32 phase = 0x11;
-        p->state2A8 = 0;
-        p->phase2A9 = 0;
-        p->behavior2AA = phase;
-        p->counter2AC = 0;
-        p->field2B1 = 1;
+        p->base.state2A8 = 0;
+        p->base.phase2A9 = 0;
+        p->base.behavior2AA = phase;
+        p->base.counter2AC = 0;
+        p->base.field2B1 = 1;
     } else
-        ++p->counter2AC;
+        ++p->base.counter2AC;
 }

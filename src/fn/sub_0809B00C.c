@@ -17,17 +17,17 @@ static inline s32 WrapCounter(s32 n)
 {
     return n - 256;
 }
-static inline u8 TakePrepared(struct SceneActorRegistryResetView *a)
+static inline u8 TakePrepared(struct ChaseActor *a)
 {
-    if (a->field2B2) {
-        a->field2B2 = 0;
+    if (a->base.field2B2) {
+        a->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
-void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a)
+void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
 {
-    struct ActorParticipantProgress *s = a->context;
+    struct ActorParticipantProgress *s = a->base.context;
     s32 delta;
     u8 *elapsed;
     if (TakePrepared(a)) {
@@ -35,17 +35,17 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
         s->accumulated = 0;
     }
     SceneActorAnimation_SelectProfileEntry(a, 14);
-    if (Mod(a->field2CA, s->interval) == 0) {
-        u16 *mode = &a->paletteOffset;
+    if (Mod(a->base.field2CA, s->interval) == 0) {
+        u16 *mode = &a->base.paletteOffset;
         u32 value = *mode;
         if (!value) {
-            u32 first = a->attacks.first[0];
-            u32 second = a->attacks.second[0];
-            u32 last = a->attacks.flags[0];
+            u32 first = a->base.attacks.first[0];
+            u32 second = a->base.attacks.second[0];
+            u32 last = a->base.attacks.flags[0];
             PlayerContact_ApplySyntheticContact((*(u8 **)gPlayers), first, second, 0, value, last);
         } else {
             {
-                u32 increment = a->attacks.first[0];
+                u32 increment = a->base.attacks.first[0];
                 u16 *counter = &s->accumulated;
                 *counter = *counter + increment;
             }
@@ -71,12 +71,12 @@ void ActorBehavior_TickParticipantProgress(struct SceneActorRegistryResetView *a
     if (*elapsed != delta) {
         if (Mod(*elapsed, 4) == 0) {
             u32 mask = 0x20;
-            u16 *flags = &a->flags2D6;
+            u16 *flags = &a->base.flags2D6;
             mask |= *flags;
             *flags = mask;
         }
         *elapsed = delta;
     }
     if (s->elapsed > s->limit)
-        a->field2B0 = 1;
+        a->base.field2B0 = 1;
 }

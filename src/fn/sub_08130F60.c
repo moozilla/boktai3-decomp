@@ -16,20 +16,20 @@ void sub_08130F60(u8 *s)
 
     u8 *p = s + 0x448;
     if (SceneActorControl_TakeFlag(s + 0x2B1)) {
-        struct SceneActorRegistryResetView *actor = (void *)s;
-        void *target = actor->entryTarget224;
+        struct ChaseActor *actor = (void *)s;
+        void *target = actor->base.entryTarget224;
         u32 kind = 2;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = target;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = kind;
+        actor->base.target = target;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
+        actor->base.word104 = 0;
     }
     if (!(u8)Callback_InvokeActor(s, *(void **)(s + 0x270))) {
         if (!sub_0812F3CC(s)) {

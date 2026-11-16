@@ -21,8 +21,8 @@ struct RouteSelectionPosition {
 };
 extern u32 gRandomTableIndex;
 s32 Mod(s32, s32);
-void ActorRoute_RememberPoint(struct SceneActorRegistryResetView *, u32);
-u8 ActorRoute_IsRecentPoint(struct SceneActorRegistryResetView *, s32);
+void ActorRoute_RememberPoint(struct ChaseActor *, u32);
+u8 ActorRoute_IsRecentPoint(struct ChaseActor *, s32);
 u8 *Path_GetPointData(u8 *);
 static inline u32 Random(void)
 {
@@ -43,8 +43,7 @@ inline static u32 Random_SelectDistantWaypoint(void)
     }
 }
 
-void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
-                                      struct ContactPosition *out,
+void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPosition *out,
                                       struct RouteSelectionPosition *origin, s32 limit)
 {
     struct RoutePointSelection route;
@@ -59,7 +58,7 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
         s32 value;
         u8 bytes[4];
     } bestIndex;
-    Route_Start((void *)(&route), *((s16 *)(((u8 *)actor->context) + 0xeb6)), 0, 0);
+    Route_Start((void *)(&route), *((s16 *)(((u8 *)actor->base.context) + 0xeb6)), 0, 0);
     bestDistance = 0;
     bestIndex.value = -1;
     for (i = 0; i < (*route.data); i++) {
@@ -92,7 +91,7 @@ void ActorPhase_SelectDistantWaypoint(struct SceneActorRegistryResetView *actor,
     route.entry = (u16 *)(((u8 *)route.entry) + (route.index * 8));
     wide = route.entry[0];
     out->x = wide;
-    out->y = actor->groundHeight2BE;
+    out->y = actor->base.groundHeight2BE;
     entry = route.entry;
     out->z = entry[1];
 }

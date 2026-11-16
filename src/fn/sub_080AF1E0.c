@@ -7,14 +7,14 @@ void SceneActorReaction_PlayAnimationBUntilComplete(void);
 void SceneActorBehavior_CallActionScript(void *);
 void Vorn_SelectRecoveryAction(void *, const u8 *, u32);
 
-void Vorn_UpdateScriptedAction(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
-        actor->body.direction = actor->tracking.heading;
+        actor->base.body.direction = actor->base.tracking.heading;
         SceneActorBehavior_CallActionScript(actor);
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         u8 *group = (u8 *)actor;
         {
             u16 *h = (u16 *)(group + 0x414);
@@ -24,7 +24,7 @@ void Vorn_UpdateScriptedAction(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 flag = 0x80;
-            u16 *flags = &actor->flags2D4;
+            u16 *flags = &actor->base.flags2D4;
             flag |= *flags;
             *flags = flag;
         }
@@ -34,6 +34,6 @@ void Vorn_UpdateScriptedAction(struct SceneActorRegistryResetView *actor)
         }
         Vorn_SelectRecoveryAction(actor, gUnk_0824E218, 0x27);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

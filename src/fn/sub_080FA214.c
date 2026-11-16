@@ -9,18 +9,18 @@ struct DampedMotionState {
     u8 unknownF16[2];
     s16 z;
 };
-void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *actor)
+void SceneActorControl_ApplyDampedMotion(struct ChaseActor *actor)
 {
-    struct DampedMotionState *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1))
-        RotationPhase_Change(actor, actor->entryTarget224, 2);
-    actor->body.motion.x += state->x;
-    actor->body.motion.z += state->z;
-    if (Mod(actor->counter2AC, 4) == 0) {
+    struct DampedMotionState *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1))
+        RotationPhase_Change(actor, actor->base.entryTarget224, 2);
+    actor->base.body.motion.x += state->x;
+    actor->base.body.motion.z += state->z;
+    if (Mod(actor->base.counter2AC, 4) == 0) {
         state->x >>= 1;
         state->z >>= 1;
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         u32 offset = 0x2A8;
         u8 *field = ((u8 *)actor) + offset;
         *field = 0;
@@ -33,6 +33,6 @@ void SceneActorControl_ApplyDampedMotion(struct SceneActorRegistryResetView *act
         offset = 0x2B1;
         *(((u8 *)actor) + offset) = 1;
     } else {
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
     }
 }

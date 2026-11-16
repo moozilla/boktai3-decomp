@@ -1,18 +1,18 @@
 #include "scene_actor_reaction.h"
-void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *actor)
+void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
 {
     u32 state;
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->flags2CC;
+        u32 *field = &actor->base.flags2CC;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
         control->field14 = 0;
         control->timer = 0;
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 3, 1);
-        switch (actor->category) {
+        switch (actor->base.category) {
             case 4:
                 Sound_PlaySong(212);
                 break;
@@ -24,7 +24,7 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
                 break;
         }
         {
-            struct ContactCollider *collider = &actor->colliderA;
+            struct ContactCollider *collider = &actor->base.colliderA;
             u32 old;
             u32 flag;
             u32 zero;
@@ -32,14 +32,14 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
             flag = 4;
             collider->flags = flag | collider->flags;
             zero = 0;
-            actor->colliderA.responseValue = zero;
+            actor->base.colliderA.responseValue = zero;
         }
-        if (actor->drawableKind == 0) {
-            u32 *sequence = actor->drawable;
+        if (actor->base.drawableKind == 0) {
+            u32 *sequence = actor->base.drawable;
             u32 mask = ~1;
             *sequence &= mask;
         } else {
-            u8 *tile = (u8 *)actor->drawable + 0x20;
+            u8 *tile = (u8 *)actor->base.drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(tile + 8) &= mask;
         }
@@ -52,18 +52,18 @@ void SceneActorReaction_BeginFadedState(struct SceneActorRegistryResetView *acto
             *first = state;
             *((u8 *)actor + 0x2A9) = zero;
             *((u8 *)actor + 0x2AA) = zero;
-            actor->counter2AC = zero;
-            actor->field2B1 = 1;
+            actor->base.counter2AC = zero;
+            actor->base.field2B1 = 1;
         }
-        actor->fieldAA = 0;
-        if (actor->drawableKind == 0)
-            *((u8 *)actor->drawable + 7) = state;
+        actor->base.fieldAA = 0;
+        if (actor->base.drawableKind == 0)
+            *((u8 *)actor->base.drawable + 7) = state;
         else
-            *((u8 *)actor->drawable + 0x3A) = state;
+            *((u8 *)actor->base.drawable + 0x3A) = state;
         {
             u32 mask = 0x80000;
             u32 *field;
-            field = &actor->flags2D0;
+            field = &actor->base.flags2D0;
             *field |= mask;
         }
         ActorShadow_Disable((u8 *)actor + 0x320);

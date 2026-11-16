@@ -20,7 +20,7 @@ static inline u32 Test(u32 value, u32 mask)
 {
     return value & mask;
 }
-static inline s32 FindNearestEligiblePlayer(struct SceneActorRegistryResetView *actor)
+static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     s32 bestDistance = 0x7FFFFFFF;
@@ -38,7 +38,7 @@ static inline s32 FindNearestEligiblePlayer(struct SceneActorRegistryResetView *
             if (!Test(*(u16 *)(data + 2), 0x43)) {
                 s32 distance;
                 SceneActorTerrain_Subtract(&delta, (void *)&gPlayers[i]->position,
-                                           &actor->body.position);
+                                           &actor->base.body.position);
                 distance = delta.x * delta.x + delta.z * delta.z;
                 if (distance < bestDistance) {
                     bestDistance = distance;
@@ -54,26 +54,25 @@ static inline void ClearHalfFlags(u16 *flags, u32 mask)
 {
     *flags &= mask;
 }
-static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
-                        struct Player **slot)
+static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slot)
 {
     void *shape = *(void **)(group + 0x1fc);
-    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *position = &actor->base.body.position;
     void *destination = &(*slot)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
         s32 result = Terrain_ApplyBlocked(shape, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         }
     }
-    ClearHalfFlags(&actor->flags2D4, ~0x200);
+    ClearHalfFlags(&actor->base.flags2D4, ~0x200);
     return 0;
 }
 
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
-u32 sub_08137AFC(struct SceneActorRegistryResetView *actor)
+u32 sub_08137AFC(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 best = FindNearestEligiblePlayer(actor);

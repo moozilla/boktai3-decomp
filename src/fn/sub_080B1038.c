@@ -6,18 +6,18 @@ struct SceneActorForwardCollider {
     u8 unknown0[0x628];
     struct ContactCollider collider;
 };
-static inline u8 unavailable(struct SceneActorRegistryResetView *p)
+static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if (p->flags2D4 & mask)
+        if (p->base.flags2D4 & mask)
             return 1;
         {
             u32 mask = 0x20000;
-            if (p->flags2D0 & mask)
+            if (p->base.flags2D0 & mask)
                 return 1;
         }
-        if (p->health <= 0)
+        if (p->base.health <= 0)
             return 1;
     }
     return 0;
@@ -28,15 +28,15 @@ static inline s32 scaled(s32 x)
         return x >> 12;
     return -(-x >> 12);
 }
-void SceneActor_UpdateForwardCollider(struct SceneActorRegistryResetView *p)
+void SceneActor_UpdateForwardCollider(struct ChaseActor *p)
 {
-    struct SceneActorForwardCollider *context = p->context;
+    struct SceneActorForwardCollider *context = p->base.context;
     union SceneActorRegistryPackedPosition pos;
     union SceneActorRegistryPackedPosition bounds;
-    if (!unavailable(p) && p->field2B5 == 0x22) {
-        pos.position = p->body.position;
-        pos.packed.x += scaled(180 * gUnk_086149C4[(p->body.direction + 64) & 255]);
-        pos.packed.z += scaled(180 * gUnk_086149C4[p->body.direction]);
+    if (!unavailable(p) && p->base.field2B5 == 0x22) {
+        pos.position = p->base.body.position;
+        pos.packed.x += scaled(180 * gUnk_086149C4[(p->base.body.direction + 64) & 255]);
+        pos.packed.z += scaled(180 * gUnk_086149C4[p->base.body.direction]);
         bounds.packed.x = 64;
         bounds.packed.z = 64;
         bounds.packed.y = 100;

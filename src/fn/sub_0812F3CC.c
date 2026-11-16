@@ -2,10 +2,9 @@
 #include "scene_actor_reset.h"
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);
-static inline u32 SceneActorReaction_ReadFlags(struct SceneActorRegistryResetView *a, u32 mask,
-                                               u32 **out)
+static inline u32 SceneActorReaction_ReadFlags(struct ChaseActor *a, u32 mask, u32 **out)
 {
-    u32 *f = &a->flags2CC;
+    u32 *f = &a->base.flags2CC;
     u32 bits = *f & mask;
     *out = f;
     return bits;
@@ -24,20 +23,20 @@ static inline u8 SceneActorReaction_HasContact(struct SceneActorReactionMotion *
         return 1;
     return 0;
 }
-static inline void SceneActorReaction_SetControl(struct SceneActorRegistryResetView *a, void *p,
-                                                 u32 kind, u32 zero, u8 byteZero)
+static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
+                                                 u8 byteZero)
 {
-    a->field2B2 = 1;
-    a->field2B0 = byteZero;
-    a->field2B5 = kind;
-    a->target = p;
-    a->field2C8 = zero;
-    SceneActorReaction_ClearBits(&a->flags114, ~1);
-    a->word104 = zero;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = byteZero;
+    a->base.field2B5 = kind;
+    a->base.target = p;
+    a->base.field2C8 = zero;
+    SceneActorReaction_ClearBits(&a->base.flags114, ~1);
+    a->base.word104 = zero;
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
-u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a)
+u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
 {
     u8 *group = (u8 *)&a->group.common;
     void *contact;
@@ -48,12 +47,13 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
     s32 reactionMask;
     {
         u32 mask = 0x1010;
-        if (a->flags2D4 & mask)
+        if (a->base.flags2D4 & mask)
             goto fail;
     }
     if (!SceneActorReaction_ReadFlags(a, 0x1000000, &flags))
         goto fail;
-    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->tracking.target, 1))
+    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->base.tracking.target,
+                                       1))
         goto fail;
     {
         u32 mask = 0x80;
@@ -72,7 +72,7 @@ u8 SceneActorReaction_BeginContactResponse(struct SceneActorRegistryResetView *a
                 goto fail;
         }
     }
-    if (!a->tracking.limit)
+    if (!a->base.tracking.limit)
         goto fail;
     result = (u32)SceneActorContacts_SelectForActor(a, 1);
     contact = (void *)result;
@@ -97,15 +97,15 @@ success: {
     SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, zero, byteZero);
     {
         u32 state = 3;
-        u8 *field = &a->state2A8;
+        u8 *field = &a->base.state2A8;
         *field = state;
     }
-    a->phase2A9 = 1;
-    a->behavior2AA = byteZero;
-    a->counter2AC = zero;
-    a->field2B1 = 1;
+    a->base.phase2A9 = 1;
+    a->base.behavior2AA = byteZero;
+    a->base.counter2AC = zero;
+    a->base.field2B1 = 1;
     SceneActorReaction_ClearBits(flags, ~0x10);
     reactionMask = 0x800;
-    SceneActorReaction_SetBits(&a->flags2D6, reactionMask);
+    SceneActorReaction_SetBits(&a->base.flags2D6, reactionMask);
     return 1;
 }

@@ -13,28 +13,28 @@ struct MummyRouteTarget {
     struct SceneActorChasePlayerCell *cell;
 };
 
-u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *);
-static inline u8 FindPath(struct SceneActorRegistryResetView *actor, s32 goal)
+u8 Mummy_RequestStraightRoute(struct ChaseActor *);
+static inline u8 FindPath(struct ChaseActor *actor, s32 goal)
 {
-    s32 cell = actor->terrainCell;
-    s32 y = actor->body.position.y;
+    s32 cell = actor->base.terrainCell;
+    s32 y = actor->base.body.position.y;
     u32 kind = *SceneActorTerrain_GetCell(cell) >> 4;
     s32 total = SceneActorPath_Width() * SceneActorPath_Height();
     return SceneActorPath_CanReach(cell, goal, y, kind, total);
 }
 
-u8 Mummy_TryDirectPursuit(struct SceneActorRegistryResetView *actor)
+u8 Mummy_TryDirectPursuit(struct ChaseActor *actor)
 {
-    struct MummyRouteContext *body = actor->context;
+    struct MummyRouteContext *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
-    s32 goal = ((struct MummyRouteTarget *)actor->tracking.target)->cell->index;
+    s32 goal = ((struct MummyRouteTarget *)actor->base.tracking.target)->cell->index;
     if (group->common.control.counter != gTrackedPlayerId[0])
         return 0;
-    if (goal == actor->terrainCell)
+    if (goal == actor->base.terrainCell)
         return 1;
     if (FindPath(actor, goal))
         return 1;
-    if ((!body->pursuitDelay) && (actor->terrainCell == goal)) {
+    if ((!body->pursuitDelay) && (actor->base.terrainCell == goal)) {
         Mummy_RequestStraightRoute(actor);
         return 0;
     }

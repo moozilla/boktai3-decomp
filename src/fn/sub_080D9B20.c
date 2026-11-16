@@ -12,28 +12,28 @@ static inline s32 SceneActor_PreviousRowCell(s32 cell)
     return cell - SceneActorTerrain_Width();
 }
 
-s32 SceneActor_FindDirectionalCell(struct SceneActorRegistryResetView *actor, s32 direction)
+s32 SceneActor_FindDirectionalCell(struct ChaseActor *actor, s32 direction)
 {
-    s32 result = actor->terrainCell;
+    s32 result = actor->base.terrainCell;
     switch (direction) {
         case 0:
             if (SceneActor_IsAdjacentCellOpen(actor, result + 1))
-                result = actor->terrainCell + 1;
+                result = actor->base.terrainCell + 1;
             break;
 
         case 1:
             if (SceneActor_IsAdjacentCellOpen(actor, result + SceneActorTerrain_Width()))
-                result = SceneActor_NextRowCell(&actor->terrainCell);
+                result = SceneActor_NextRowCell(&actor->base.terrainCell);
             break;
 
         case 2:
             if (SceneActor_IsAdjacentCellOpen(actor, result - 1))
-                result = actor->terrainCell - 1;
+                result = actor->base.terrainCell - 1;
             break;
 
         case 3:
             if (SceneActor_IsAdjacentCellOpen(actor, result - SceneActorTerrain_Width()))
-                result = SceneActor_PreviousRowCell(actor->terrainCell);
+                result = SceneActor_PreviousRowCell(actor->base.terrainCell);
             break;
     }
 

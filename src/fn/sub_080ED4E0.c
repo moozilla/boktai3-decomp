@@ -10,7 +10,7 @@ struct IvyTarget {
     u8 unk0[8];
     u8 kind;
     u8 unk9[0x3C - 9];
-    struct SceneActorRegistryResetView *actor;
+    struct ChaseActor *actor;
 };
 struct IvyContext {
     u8 unknown0[0x62C];
@@ -20,17 +20,17 @@ struct Player;
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
                                 s32, s32, s32, u32);
 void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
-s32 Ivy_FindAdjacentTarget(struct SceneActorRegistryResetView *, s32);
+s32 Ivy_FindAdjacentTarget(struct ChaseActor *, s32);
 void Ivy_UpdateHold(void);
-void SceneActorReaction_FinishAnimation17(struct SceneActorRegistryResetView *);
+void SceneActorReaction_FinishAnimation17(struct ChaseActor *);
 struct IvyOffset {
     u16 x, y, z, pad;
 };
 extern const struct IvyOffset gUnk_08606384[2][5];
 
-static inline void Ivy_Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant, u8 *flip)
+static inline void Ivy_Facing(struct ChaseActor *actor, u8 *quadrant, u8 *flip)
 {
-    s16 side = ((actor->body.direction + 0x60) >> 6) & 3;
+    s16 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -45,9 +45,9 @@ static inline void Ivy_EnableCollider(struct ContactCollider *collider)
     collider->flags |= 4;
     collider->flags &= 0xFFF7;
 }
-static inline void Ivy_SetContactFlag(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void Ivy_SetContactFlag(struct ChaseActor *actor, u32 bits)
 {
-    actor->flags2C0 = bits | actor->flags2C0;
+    actor->base.flags2C0 = bits | actor->base.flags2C0;
 }
 static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
 {
@@ -58,10 +58,10 @@ static inline void Ivy_DisableCollider(struct ContactCollider *collider)
     collider->flags &= 0xFFFB;
     collider->flags |= 8;
 }
-static inline void Ivy_DisableContact(struct SceneActorRegistryResetView *actor)
+static inline void Ivy_DisableContact(struct ChaseActor *actor)
 {
-    Ivy_DisableCollider(&actor->colliderA);
-    SceneActorChase_ClearFlagComponent((void *)&actor->flags2C0, 0x800);
+    Ivy_DisableCollider(&actor->base.colliderA);
+    SceneActorChase_ClearFlagComponent((void *)&actor->base.flags2C0, 0x800);
 }
 
 struct IvyFrameIndex {
@@ -74,7 +74,7 @@ static inline struct IvyFrameIndex Ivy_ReadFrame(struct DisplaySequenceState *se
     return value;
 }
 
-void sub_080ED4E0(struct SceneActorRegistryResetView *actor)
+void sub_080ED4E0(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *anim;
     struct IvyTarget *target;
@@ -82,7 +82,7 @@ void sub_080ED4E0(struct SceneActorRegistryResetView *actor)
     u8 quadrant, flip;
     u32 started;
 
-    anim = &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
+    anim = &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     started = SceneActorReaction_TakePrepared(actor);
     if (started)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
@@ -90,30 +90,30 @@ void sub_080ED4E0(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(0x1DD);
 
     if (Ivy_ReadFrame(anim).index == 3 && Ivy_GetElapsed(anim) > 6) {
-        actor->colliderA.flags |= 4;
-        actor->colliderA.flags &= 0xFFF7;
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= 0xFFF7;
         Ivy_SetContactFlag(actor, 0x800);
         if (Ivy_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Ivy_UpdateHold, 0x25);
             SceneActorChase_SetState(actor, 0, 2, 1);
 
             Ivy_Facing(actor, &quadrant, &flip);
-            pos.x = actor->body.position.x + gUnk_08606384[flip][anim->index].x;
-            pos.y = actor->body.position.y + gUnk_08606384[flip][anim->index].y;
-            pos.z = actor->body.position.z + gUnk_08606384[flip][anim->index].z;
-            target = (void *)actor->tracking.target;
+            pos.x = actor->base.body.position.x + gUnk_08606384[flip][anim->index].x;
+            pos.y = actor->base.body.position.y + gUnk_08606384[flip][anim->index].y;
+            pos.z = actor->base.body.position.z + gUnk_08606384[flip][anim->index].z;
+            target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
                 Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,
                                             0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
-                struct SceneActorRegistryResetView *t = target->actor;
-                t->colliderA.responseValue = 0;
+                struct ChaseActor *t = target->actor;
+                t->base.colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
                 SceneActorReaction_ApplyHitResponse(t, 0, (void *)&pos, 0, flip, 0);
             }
             {
-                struct IvyContext *context = actor->context;
+                struct IvyContext *context = actor->base.context;
                 u32 mask = 2;
                 context->flags |= mask;
             }
@@ -122,11 +122,11 @@ void sub_080ED4E0(struct SceneActorRegistryResetView *actor)
     } else if (Ivy_ReadFrame(anim).index <= 1) {
         Ivy_DisableContact(actor);
     } else {
-        Ivy_EnableCollider(&actor->colliderA);
+        Ivy_EnableCollider(&actor->base.colliderA);
         Ivy_SetContactFlag(actor, 0x800);
     }
 
-    if (actor->field2B3) {
+    if (actor->base.restart) {
         Ivy_DisableContact(actor);
         SceneActorChase_SetControl(actor, SceneActorReaction_FinishAnimation17, 0x27);
         SceneActorChase_SetState(actor, 0, 2, 3);

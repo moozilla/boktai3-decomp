@@ -17,18 +17,18 @@ struct VornDefeatScript {
     u16 id, unused;
     s32 parameters[3];
 };
-static inline u16 Vorn_GetDefeatScript(struct SceneActorRegistryResetView *actor)
+static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
 {
-    struct VornDefeatScript *script = (void *)&actor->unknown1F4[4];
+    struct VornDefeatScript *script = (void *)&actor->base.unknown1F4[4];
     return script->id;
 }
-static inline s32 Vorn_GetScriptParameter(struct SceneActorRegistryResetView *actor, u32 index)
+static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
 {
     return ((struct SceneActorBehaviorView *)actor)->parameters1FC[index];
 }
-static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->flags2CC & mask;
+    return actor->base.flags2CC & mask;
 }
 #define VORN_READ_RANDOM_SAMPLE(out_, samples_, offset_)                                           \
     do {                                                                                           \
@@ -52,7 +52,7 @@ static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
     } while (0)
 #define VORN_CAPTURE_SPARK_ORIGIN(out_, actor_)                                                    \
     do {                                                                                           \
-        (out_) = (const struct ContactPosition *)&(actor_)->body.position;                         \
+        (out_) = (const struct ContactPosition *)&(actor_)->base.body.position;                    \
     } while (0)
 #define VORN_SPARK_ORIGIN(actor_)                                                                  \
     ({                                                                                             \
@@ -62,8 +62,8 @@ static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
     })
 #define VORN_RESET_ENTRY_FIELDS(actor_, prepared_)                                                 \
     do {                                                                                           \
-        (actor_)->counter2AC = 0;                                                                  \
-        (actor_)->field2B1 = (prepared_);                                                          \
+        (actor_)->base.counter2AC = 0;                                                             \
+        (actor_)->base.field2B1 = (prepared_);                                                     \
     } while (0)
 #define VORN_COMPLETE_DEFEAT(actor_, state_)                                                       \
     do {                                                                                           \
@@ -71,7 +71,7 @@ static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
         SceneActorChase_SelectState((actor_), (state_), 0, 2);                                     \
         Vorn_ResetStateEntry((actor_), 1);                                                         \
     } while (0)
-static inline void Vorn_ClearRoute(struct SceneActorRegistryResetView *actor,
+static inline void Vorn_ClearRoute(struct ChaseActor *actor,
                                    struct SceneActorRegistryControl *control, u32 cleared)
 {
     SceneActorChase_ClearActorFlags(actor, 0x141C0);
@@ -85,18 +85,18 @@ static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 b
 
 #define VORN_PREPARE_ENTRY_BYTE(actor_, prepared_)                                                 \
     do {                                                                                           \
-        (actor_)->field2B2 = (prepared_);                                                          \
-        (actor_)->field2B0 = 0;                                                                    \
+        (actor_)->base.field2B2 = (prepared_);                                                     \
+        (actor_)->base.field2B0 = 0;                                                               \
     } while (0)
-static inline void Vorn_InstallIdleControl(struct SceneActorRegistryResetView *actor,
-                                           void *callback, u32 kind, u32 prepared)
+static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
+                                           u32 prepared)
 {
     VORN_PREPARE_ENTRY_BYTE(actor, prepared);
-    actor->field2B5 = kind;
-    actor->target = callback;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
     SceneActorChase_ResetMotionControl(actor);
 }
-static inline void Vorn_ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
+static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 {
     VORN_RESET_ENTRY_FIELDS(actor, prepared);
 }
@@ -119,7 +119,7 @@ union VornSpreadVector {
     u32 words[2];
 };
 /* Completes the defeat sequence, dispatches its script, and enters idle control. */
-void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
+void Vorn_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
     union VornSpreadVector range;
@@ -130,9 +130,9 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     u32 *cursor = &gRandomIndex;
     completedState = 1;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 10);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 10);
         {
-            u8 *entry = &actor->field2B3;
+            u8 *entry = &actor->base.restart;
             workValue = 0;
             *entry = workValue;
         }
@@ -145,15 +145,15 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             Sound_PlaySong(0x12A);
         Vorn_ClearRoute(actor, &actor->group.common.control, workValue);
         {
-            struct ContactCollider *collider = &actor->colliderA;
+            struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags |= 4;
         }
         Vorn_SendMessage(actor);
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    if (!actor->field2B3)
+    if (!actor->base.restart)
         return;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     if (!Vorn_ActorFlags(actor, 0x400)) {
         u8 category;
         SceneActor_CallContextScriptB(actor);
@@ -184,37 +184,38 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
                 VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
                 (const struct ContactPosition *)spread, 0xF0, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
         }
-        category = actor->category;
+        category = actor->base.category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
     script = Vorn_GetDefeatScript(actor);
     if (script) {
-        values[0] = actor->body.position.x;
-        values[1] = actor->body.position.y;
-        values[2] = actor->body.position.z;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
         values[3] = Vorn_GetScriptParameter(actor, 0);
         values[4] = Vorn_GetScriptParameter(actor, 1);
         values[5] = Vorn_GetScriptParameter(actor, 2);
-        values[6] = actor->field2E0;
-        values[7] = actor->body.id;
+        values[6] = actor->base.field2E0;
+        values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) && (u32)(actor->category - 11) > 2)
+    if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+        (u32)(actor->base.category - 11) > 2)
         Bestiary_UnlockEntry(
-            Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
-    actor->fieldAA = 0;
+            Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+    actor->base.fieldAA = 0;
     {
         u32 mask = 1;
-        if (!actor->drawableKind)
-            *((u32 *)actor->drawable) |= mask;
+        if (!actor->base.drawableKind)
+            *((u32 *)actor->base.drawable) |= mask;
         else
-            Vorn_SetTileFlags(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                              mask);
+            Vorn_SetTileFlags(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, mask);
     }
     VORN_COMPLETE_DEFEAT(actor, completedState);
-    ActorShadow_Disable(actor->shadow);
+    ActorShadow_Disable(actor->base.shadow);
 }

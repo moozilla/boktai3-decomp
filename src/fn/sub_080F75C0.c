@@ -35,15 +35,15 @@ static inline s32 Axe_ContactIndex(s32 index)
 void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
                        struct SceneActorBehaviorContactView *destination, void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    struct AxeContactContext *context = actor->context;
+    struct ChaseActor *actor = object;
+    struct AxeContactContext *context = actor->base.context;
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
-    if (actor->colliderA.responseValue == 0) {
-        actor->colliderA.cost = destination->remaining;
-        actor->field2E6 = destination->mode;
-        actor->colliderA.responseValue = Axe_ContactResponse(destination);
+    if (actor->base.colliderA.responseValue == 0) {
+        actor->base.colliderA.cost = destination->remaining;
+        actor->base.field2E6 = destination->mode;
+        actor->base.colliderA.responseValue = Axe_ContactResponse(destination);
     }
     if ((context->flags & 2) && context->timer > 2) {
         s32 i;

@@ -1,5 +1,5 @@
 #include "scene_actor_animation.h"
-void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *actor, s32 index)
+void SceneActorAnimation_SelectProfileEntry(struct RoomActor *actor, s32 index)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
@@ -15,7 +15,7 @@ void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *acto
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -25,7 +25,7 @@ void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *acto
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))

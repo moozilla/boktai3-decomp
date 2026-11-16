@@ -44,11 +44,10 @@ static inline s32 Eighth(s32 x)
         result = -(-x >> 3);
     return result;
 }
-static inline void FromPlayer(u8 **player, struct ContactPosition *out,
-                              struct SceneActorRegistryResetView *owner)
+static inline void FromPlayer(u8 **player, struct ContactPosition *out, struct ChaseActor *owner)
 {
     const struct ContactPosition *target = (void *)(*player + 0x30);
-    const struct ContactPosition *actor = &owner->body.position;
+    const struct ContactPosition *actor = &owner->base.body.position;
     out->x = actor->x - target->x;
     out->y = actor->y - target->y;
     out->z = actor->z - target->z;
@@ -65,35 +64,35 @@ struct PursuitContext {
     u8 unknown0[0xE56];
     u16 distance;
 };
-void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
+void Axe_UpdatePursuit(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     struct ContactPosition velocity;
-    struct PursuitContext *context = actor->context;
+    struct PursuitContext *context = actor->base.context;
     s32 angle, step;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *callback = actor->entryTarget228;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        void *callback = actor->base.entryTarget228;
         u32 kind = 1;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = kind;
+        actor->base.target = callback;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
-        *(u32 *)actor->drawable |= 2;
+        actor->base.word104 = 0;
+        *(u32 *)actor->base.drawable |= 2;
         context->distance = 512;
     }
     Axe_EmitMotionTrail(actor);
-    if (context->distance > actor->tracking.distance) {
+    if (context->distance > actor->base.tracking.distance) {
         s32 difference;
         FromPlayer(&gPlayers, &delta, actor);
         angle = Math_Atan2(delta.x, delta.z);
-        difference = Normalize(((angle + 64) & 255) - actor->body.direction);
+        difference = Normalize(((angle + 64) & 255) - actor->base.body.direction);
         if (difference < 0)
             difference = -difference;
         if (difference <= 63)
@@ -106,9 +105,9 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             step = 2;
     } else {
         s32 difference, magnitude;
-        ToPlayer(&gPlayers, &delta, &actor->body.position);
+        ToPlayer(&gPlayers, &delta, &actor->base.body.position);
         angle = Math_Atan2(delta.x, delta.z);
-        difference = Normalize(angle - actor->body.direction);
+        difference = Normalize(angle - actor->base.body.direction);
         magnitude = Abs(difference);
         {
             s32 result = Eighth(magnitude);
@@ -118,12 +117,12 @@ void Axe_UpdatePursuit(struct SceneActorRegistryResetView *actor)
             step = result;
         }
     }
-    if (Normalize(angle - actor->body.direction) > 0)
-        actor->body.direction += step;
+    if (Normalize(angle - actor->base.body.direction) > 0)
+        actor->base.body.direction += step;
     else
-        actor->body.direction -= step;
-    Polar(&velocity, actor->body.direction, 32);
-    *((u8 *)actor->drawable + 6) = 159 - actor->body.direction;
-    actor->body.motion = velocity;
-    actor->counter2AC++;
+        actor->base.body.direction -= step;
+    Polar(&velocity, actor->base.body.direction, 32);
+    *((u8 *)actor->base.drawable + 6) = 159 - actor->base.body.direction;
+    actor->base.body.motion = velocity;
+    actor->base.counter2AC++;
 }

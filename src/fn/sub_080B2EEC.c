@@ -1,4 +1,5 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
 
@@ -7,20 +8,20 @@
 s32 SceneActorRegistry_CountLiving(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32);
 void SceneActorReaction_UpdateFacingAttack(void);
-static inline u8 Inactive(struct SceneActorRegistryResetView *p)
+static inline u8 Inactive(struct Vorn *p)
 {
     if (p) {
         u32 mask = 0x40;
         u32 offset = 0x2D4;
-        if (p->flags2D4 & mask)
+        if (p->chase.base.flags2D4 & mask)
             goto inactive;
         {
             u32 mask = 0x20000;
             offset -= 4;
-            if (p->flags2D0 & mask)
+            if (p->chase.base.flags2D0 & mask)
                 goto inactive;
         }
-        if (p->health > 0)
+        if (p->chase.base.health > 0)
             goto active;
     inactive:
         return 1;
@@ -49,9 +50,9 @@ inline static s32 RandomByte_TrySoloAction(void)
     return (u8)((const u16 *)0x0203B400)[gRandomIndex];
 }
 
-void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
+void SceneActor_TrySoloAction(struct Vorn *p)
 {
-    struct SceneActorRegistryResetView *q = p;
+    struct Vorn *q = p;
     u8 zero;
     s32 t1;
     u32 timer;
@@ -59,7 +60,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         return;
     {
         u32 mask = 0xE33F;
-        if (p->flags2D4 & mask)
+        if (p->chase.base.flags2D4 & mask)
             return;
     }
     if (!q->field688)
@@ -82,23 +83,23 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
             return;
         {
             u32 state = 3;
-            p->state2A8 = state;
+            p->chase.base.state2A8 = state;
         }
-        p->phase2A9 = zero;
-        p->behavior2AA = zero;
-        p->counter2AC = zero;
-        p->field2B1 = 1;
+        p->chase.base.phase2A9 = zero;
+        p->chase.base.behavior2AA = zero;
+        p->chase.base.counter2AC = zero;
+        p->chase.base.field2B1 = 1;
         {
             u32 one = 1;
             void *callback = SceneActorReaction_UpdateFacingAttack;
             u32 mode = 0x2A;
-            p->field2B2 = one;
-            p->field2B0 = zero;
-            p->field2B5 = mode;
-            p->target = callback;
+            p->chase.base.field2B2 = one;
+            p->chase.base.field2B0 = zero;
+            p->chase.base.field2B5 = mode;
+            p->chase.base.target = callback;
         }
-        p->field2C8 = zero;
-        Clear(&p->flags114, 1);
-        p->word104 = zero;
+        p->chase.base.field2C8 = zero;
+        Clear(&p->chase.base.flags114, 1);
+        p->chase.base.word104 = zero;
     }
 }

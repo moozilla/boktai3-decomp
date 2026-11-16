@@ -1,8 +1,8 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "engine.h"
-void SceneActorControl_UpdateAnimationTransition(struct SceneActorRegistryResetView *, s32);
-static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u16 zero, u32 offset)
+void SceneActorControl_UpdateAnimationTransition(struct ChaseActor *, s32);
+static inline void BeginTransition(struct ChaseActor *actor, u16 zero, u32 offset)
 {
     u32 state = 3;
     u32 stateOffset = 0x2A8;
@@ -10,7 +10,7 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
     *field = state;
     offset -= 0x2B;
     *((u8 *)actor + offset) = zero;
-    actor->behavior2AA = zero;
+    actor->base.behavior2AA = zero;
     stateOffset += 4;
     *(u32 *)((u8 *)actor + stateOffset) = zero;
     offset += 8;
@@ -26,23 +26,23 @@ static inline void BeginTransition(struct SceneActorRegistryResetView *actor, u1
         *((u8 *)actor + offset) = kind;
         stateOffset -= 0x94;
         *(void **)((u8 *)actor + stateOffset) = callback;
-        actor->field2C8 = zero;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     }
 }
-s32 SceneActorControl_BeginSoundTransition(struct SceneActorRegistryResetView *actor)
+s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
     u16 *flags;
     u16 suppressed;
     u32 offset;
     u32 value;
     s32 result;
-    if (actor->reactionSoundVariant == 0)
+    if (actor->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);

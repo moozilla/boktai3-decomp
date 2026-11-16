@@ -2,11 +2,11 @@
 // confidence=low: refreshes the nearby route heading after the context cooldown expires.
 
 s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *);
-void SceneActor_StartAdjacentCellRoute(struct SceneActorRegistryResetView *);
+void SceneActor_StartAdjacentCellRoute(struct ChaseActor *);
 
-s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
+s32 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
 {
-    struct SceneActorRegistryResetView *actor = arg;
+    struct ChaseActor *actor = arg;
     struct SceneActorControlState **slot = &((struct SceneActorControlPhaseView *)actor)->control;
     u8 *context = (u8 *)*slot;
     u16 *counter;
@@ -19,7 +19,7 @@ s32 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *arg)
         *counter = v - 1;
         return 0;
     }
-    if (BouncingObject_GetNearbyHeading(&actor->body.position) < 0) {
+    if (BouncingObject_GetNearbyHeading(&actor->base.body.position) < 0) {
         u16 *flags = (u16 *)((u8 *)*slot + 0x6F2);
         u32 mask = ~0x400;
         *flags &= mask;

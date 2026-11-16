@@ -39,12 +39,12 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
-void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
+void Ivy_BeginRelease(struct ChaseActor *actor)
 {
-    struct IvyContext *context = actor->context;
+    struct IvyContext *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {
         {
-            u16 *destination = &actor->colliderA.flags;
+            u16 *destination = &actor->base.colliderA.flags;
             u32 flags = *destination;
             u32 mask = 4;
             mask |= flags;
@@ -53,30 +53,30 @@ void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 mask = 0x800;
-            mask |= actor->flags2C0;
-            actor->flags2C0 = mask;
+            mask |= actor->base.flags2C0;
+            actor->base.flags2C0 = mask;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
-            struct IvyTarget *target = (void *)actor->tracking.target;
+            struct IvyTarget *target = (void *)actor->base.tracking.target;
             struct SceneVec position;
             u8 angle;
-            CellCenter(&position, actor->terrainCell);
+            CellCenter(&position, actor->base.terrainCell);
             {
-                s32 turn = (actor->body.direction + 0x20) & 0xFF;
+                s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
                 s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
                 angle = quadrant << 6;
             }
             if (target->kind <= 3)
                 Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
         }
-        ((u8 *)actor->drawable)[7] = 2;
+        ((u8 *)actor->base.drawable)[7] = 2;
         {
             u32 *flags = &context->flags;
             u32 mask = ~2;
             *flags &= mask;
         }
     }
-    if (actor->field2B3)
-        actor->field2B0 = 1;
+    if (actor->base.restart)
+        actor->base.field2B0 = 1;
 }

@@ -9,18 +9,18 @@ struct SceneActorRandomReaction {
     u8 unknown694[0x6d4 - 0x694];
     u16 flags;
 };
-static inline u8 unavailable(struct SceneActorRegistryResetView *p)
+static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if (p->flags2D4 & mask)
+        if (p->base.flags2D4 & mask)
             return 1;
         {
             u32 mask = 0x20000;
-            if (p->flags2D0 & mask)
+            if (p->base.flags2D0 & mask)
                 return 1;
         }
-        if (p->health <= 0)
+        if (p->base.health <= 0)
             return 1;
     }
     return 0;
@@ -32,15 +32,15 @@ static inline u8 active(struct SceneActorRandomReaction *p)
         return 1;
     return 0;
 }
-static inline u32 blocked(struct SceneActorRegistryResetView *p)
+static inline u32 blocked(struct ChaseActor *p)
 {
     u32 mask = 0xe33f;
-    return p->flags2D4 & mask;
+    return p->base.flags2D4 & mask;
 }
-void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
+void SceneActor_TickRandomReaction(struct ChaseActor *p)
 {
-    struct SceneActorRandomReaction *context = p->context;
-    if (!unavailable(p) && !blocked(p) && p->field2B5 == 0x23 && active(context)) {
+    struct SceneActorRandomReaction *context = p->base.context;
+    if (!unavailable(p) && !blocked(p) && p->base.field2B5 == 0x23 && active(context)) {
         if (context->timer) {
             context->timer--;
         } else {
@@ -50,11 +50,11 @@ void SceneActor_TickRandomReaction(struct SceneActorRegistryResetView *p)
                 s32 random = *(u8 *)&gRandomTable[gRandomIndex];
                 if (random > 0xbd) {
                     u32 behavior = 0x11;
-                    p->state2A8 = 0;
-                    p->phase2A9 = 0;
-                    p->behavior2AA = behavior;
-                    p->counter2AC = 0;
-                    p->field2B1 = 1;
+                    p->base.state2A8 = 0;
+                    p->base.phase2A9 = 0;
+                    p->base.behavior2AA = behavior;
+                    p->base.counter2AC = 0;
+                    p->base.field2B1 = 1;
                 }
             }
         }

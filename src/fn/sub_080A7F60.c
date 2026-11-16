@@ -37,30 +37,30 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-static inline void Control(struct SceneActorRegistryResetView *a, void *cb, u32 kind)
+static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     u32 zero;
-    a->field2B2 = 1;
+    a->base.field2B2 = 1;
     zero = 0;
-    a->field2B0 = zero;
-    a->field2B5 = kind;
-    a->target = cb;
-    a->field2C8 = zero;
+    a->base.field2B0 = zero;
+    a->base.field2B5 = kind;
+    a->base.target = cb;
+    a->base.field2C8 = zero;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = zero;
+    a->base.word104 = zero;
 }
-static inline void State6(struct SceneActorRegistryResetView *a)
+static inline void State6(struct ChaseActor *a)
 {
     u32 behavior = 6;
-    a->state2A8 = 0;
-    a->phase2A9 = 0;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 struct SavedPair {
@@ -79,8 +79,7 @@ void TentacleActor_SelectWanderRoute(void *);
 void TentacleActor_AdvanceMotionPhase(void *, s32);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct SavedMotion *saved,
-                          s32 speed)
+static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s32 speed)
 {
     u8 *motion = (u8 *)actor + 0x50;
     s16 dx = saved->position.x - *(u16 *)(motion + 12);
@@ -94,27 +93,27 @@ static inline u8 Approach(struct SceneActorRegistryResetView *actor, struct Save
     }
     return 0;
 }
-static inline void Scale(struct SceneActorRegistryResetView *actor)
+static inline void Scale(struct ChaseActor *actor)
 {
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0)
                 *scale = 64;
         }
     }
-    if (actor->drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+    if (actor->base.drawableKind == 0)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 }
 
 s32 Mod(s32, s32);
@@ -131,44 +130,44 @@ static inline void Fill(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
-void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
+void TentacleBody_UpdateSpiral(struct ChaseActor *actor)
 {
     u32 zero;
     s32 speed;
     s32 amplitude, turn, rate;
     s32 dx, dz;
-    if (Take(&actor->field2B1)) {
+    if (Take(&actor->base.field2B1)) {
         Control(actor, *(void **)((u8 *)actor + 0x228), 1);
         {
             u32 m = 0x100000;
-            actor->flags2D0 |= m;
+            actor->base.flags2D0 |= m;
         }
     }
-    if (Mod(actor->counter2AC, 48) == 0)
+    if (Mod(actor->base.counter2AC, 48) == 0)
         Sound_PlaySong(0x3D7);
     {
         u8 *dst = (u8 *)actor + 0x2EC;
         zero = 0;
         Fill(dst, &zero, zero);
     }
-    if ((s32)actor->counter2AC > 115) {
-        s32 angle = *((u8 *)actor + 0xE9) - actor->body.direction;
+    if ((s32)actor->base.counter2AC > 115) {
+        s32 angle = *((u8 *)actor + 0xE9) - actor->base.body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)
             angle += 256;
         if (Turned(angle)) {
-            actor->body.direction = *((u8 *)actor + 0xE9);
+            actor->base.body.direction = *((u8 *)actor + 0xE9);
             State6(actor);
             return;
         }
     }
-    if ((s32)actor->counter2AC <= 63) {
+    if ((s32)actor->base.counter2AC <= 63) {
         speed = 20;
         amplitude = 8;
         turn = 4;
         rate = 0x1860;
-    } else if ((s32)actor->counter2AC <= 115) {
+    } else if ((s32)actor->base.counter2AC <= 115) {
         speed = 14;
         amplitude = 8;
         turn = 8;
@@ -179,11 +178,11 @@ void TentacleBody_UpdateSpiral(struct SceneActorRegistryResetView *actor)
         turn = 6;
         rate = 0x4D8;
     }
-    dx = Shift(gUnk_086149C4[(actor->body.direction + 64) & 255] * speed, 12);
-    dz = Shift(gUnk_086149C4[actor->body.direction] * speed, 12);
-    actor->body.direction += turn;
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    dx = Shift(gUnk_086149C4[(actor->base.body.direction + 64) & 255] * speed, 12);
+    dz = Shift(gUnk_086149C4[actor->base.body.direction] * speed, 12);
+    actor->base.body.direction += turn;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     sub_080A9DB0(actor, amplitude, rate);
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -36,14 +36,14 @@ static inline void ActorStatus_SetWord(u32 *field, u32 bits)
 
 static inline u32 ActorStatus_BehaviorFlags(void *object, u32 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    return actor->flags2CC & mask;
+    struct ChaseActor *actor = object;
+    return actor->base.flags2CC & mask;
 }
 
 static inline u32 ActorStatus_StatusFlags(void *object, u32 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    return actor->flags2D0 & mask;
+    struct ChaseActor *actor = object;
+    return actor->base.flags2D0 & mask;
 }
 
 static inline u32 ActorStatus_BitsPresent(u32 bits)
@@ -60,13 +60,13 @@ static inline u32 ActorStatus_HasStatusFlags(void *object, u32 mask)
 
 static inline u16 ActorStatus_MotionFlags(void *object, u16 mask)
 {
-    struct SceneActorRegistryResetView *actor = object;
-    return SceneActorChase_FlagComponentBits((void *)&actor->flags2D4, mask);
+    struct ChaseActor *actor = object;
+    return SceneActorChase_FlagComponentBits((void *)&actor->base.flags2D4, mask);
 }
 
-static inline u8 ActorStatus_BodyFlags(struct SceneActorRegistryResetView *actor, u32 mask)
+static inline u8 ActorStatus_BodyFlags(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->flags2C0 & mask)
+    if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
@@ -78,14 +78,14 @@ static inline void ActorStatus_ClearTrackingFlags(struct SceneActorReactionMotio
     tracking->flags &= mask;
 }
 
-static inline s16 ActorStatus_FlashRemaining(struct SceneActorRegistryResetView *actor)
+static inline s16 ActorStatus_FlashRemaining(struct ChaseActor *actor)
 {
-    return (*(s16 *)&actor->field1E8);
+    return (*(s16 *)&actor->base.field1E8);
 }
 
-static inline s16 ActorStatus_BlinkRemaining(struct SceneActorRegistryResetView *actor)
+static inline s16 ActorStatus_BlinkRemaining(struct ChaseActor *actor)
 {
-    return ((struct SceneActorPaletteTimer *)&actor->field1EA)->remaining;
+    return ((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining;
 }
 
 static inline void ActorStatus_StoreByte(u8 *field, u8 value)
@@ -93,31 +93,33 @@ static inline void ActorStatus_StoreByte(u8 *field, u8 value)
     *field = value;
 }
 
-static inline void ActorStatus_SetPalette(struct SceneActorRegistryResetView *actor, u32 idx)
+static inline void ActorStatus_SetPalette(struct ChaseActor *actor, u32 idx)
 {
-    if (actor->drawableKind == 0)
-        AnimData_SelectPaletteBank(((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->animation, idx);
+    if (actor->base.drawableKind == 0)
+        AnimData_SelectPaletteBank(
+            ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->animation, idx);
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette = gPaletteBankData + (idx << 5);
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
+            gPaletteBankData + (idx << 5);
 }
 
 static inline u8 ActorStatus_IsDown(void *object)
 {
-    struct SceneActorRegistryResetView *actor = object;
+    struct ChaseActor *actor = object;
     if (actor == 0)
         return 0;
     if (ActorStatus_MotionFlags((void *)actor, 0x40) ||
-        ActorStatus_HasStatusFlags(actor, 0x20000) || actor->health <= 0)
+        ActorStatus_HasStatusFlags(actor, 0x20000) || actor->base.health <= 0)
         return 1;
     return 0;
 }
 
-static inline void ActorStatus_SetDrawableFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void ActorStatus_SetDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
-    if (actor->drawableKind == 0)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->flags |= bits;
+    if (actor->base.drawableKind == 0)
+        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= bits;
     else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= bits;
     }
 }
@@ -128,19 +130,18 @@ static inline void ActorStatus_ClearTileFlags(struct SceneActorAnimationTile *ti
     tile->flags &= keep;
 }
 
-static inline void ActorStatus_ClearDrawableFlags(struct SceneActorRegistryResetView *actor,
-                                                  u32 bits)
+static inline void ActorStatus_ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         SceneActorChase_ClearWordFlags(
-            &((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->flags, bits);
+            &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
     else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         ActorStatus_ClearTileFlags(tile, bits);
     }
 }
 
-static inline void ActorStatus_SetBodyBit(struct SceneActorRegistryResetView *actor, u32 on)
+static inline void ActorStatus_SetBodyBit(struct ChaseActor *actor, u32 on)
 {
     if (on)
         ActorStatus_SetDrawableFlags(actor, 1);
@@ -148,25 +149,25 @@ static inline void ActorStatus_SetBodyBit(struct SceneActorRegistryResetView *ac
         ActorStatus_ClearDrawableFlags(actor, 1);
 }
 
-static inline void ActorStatus_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
+static inline void ActorStatus_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
-    actor->flags2D4 &= ~bits;
+    actor->base.flags2D4 &= ~bits;
 }
 
-static inline void ActorStatus_ReleaseContact(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_ReleaseContact(struct ChaseActor *actor)
 {
     u32 flag = 0x1000;
-    if (actor->flags2D4 & flag) {
+    if (actor->base.flags2D4 & flag) {
         SceneActorContacts_ReleaseNode(actor->group.contactNode);
-        actor->flags2D4 &= ~flag;
+        actor->base.flags2D4 &= ~flag;
         actor->group.contactNode = 0;
     }
 }
 
-static inline void ActorStatus_ClearInteraction(struct SceneActorRegistryResetView *actor,
+static inline void ActorStatus_ClearInteraction(struct ChaseActor *actor,
                                                 struct SceneActorRegistryControl *control)
 {
-    SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x1000000);
+    SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
     ActorStatus_ClearMotionFlags(actor, 0x200);
     control->mode = 0;
     control->counter = 0;
@@ -187,10 +188,10 @@ static inline u32 SceneEnvironment_LinkMode(void)
     return result.linkMode;
 }
 
-static inline u32 ActorStatus_DefaultPalette(struct SceneActorRegistryResetView *actor)
+static inline u32 ActorStatus_DefaultPalette(struct ChaseActor *actor)
 {
-    u16 *base = &actor->basePaletteBank;
-    u16 *offset = &actor->paletteOffset;
+    u16 *base = &actor->base.basePaletteBank;
+    u16 *offset = &actor->base.paletteOffset;
     return *base + *offset;
 }
 
@@ -234,12 +235,12 @@ static inline u32 ActorStatus_EnvironmentPaletteActive(s32 player)
     return ActorStatus_PassagePaletteActive();
 }
 
-static inline void ActorStatus_SetBlinkTimer(struct SceneActorRegistryResetView *actor, s16 timer)
+static inline void ActorStatus_SetBlinkTimer(struct ChaseActor *actor, s16 timer)
 {
-    ((struct SceneActorPaletteTimer *)&actor->field1EA)->remaining = timer;
+    ((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining = timer;
 }
 
-static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Palette(struct ChaseActor *actor)
 {
     s16 *pTmr;
 
@@ -251,14 +252,15 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
         if (ActorStatus_BehaviorFlags(actor, 0x2000000)) {
             s32 blinkRemaining = ActorStatus_BlinkRemaining(actor);
             if (blinkRemaining > 0) {
-                ((struct SceneActorPaletteTimer *)&actor->field1EA)->remaining = blinkRemaining - 1;
+                ((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining =
+                    blinkRemaining - 1;
             } else {
                 ActorStatus_SetBlinkTimer(actor, 0);
-                SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x2000000);
+                SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x2000000);
             }
         }
         flashRemaining = ActorStatus_FlashRemaining(actor);
-        flashTimer = &(*(s16 *)&actor->field1E8);
+        flashTimer = &(*(s16 *)&actor->base.field1E8);
         if (flashRemaining > 0) {
             *flashTimer = flashRemaining - 1;
             return;
@@ -266,20 +268,20 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
         if ((ActorStatus_BehaviorFlags(actor, 0x2000000)) ||
             (ActorStatus_HasStatusFlags(actor, 0x40))) {
             if (ActorStatus_HasStatusFlags(actor, 0x4000))
-                ActorStatus_SetPalette(actor, actor->alternatePalette);
+                ActorStatus_SetPalette(actor, actor->base.alternatePalette);
             else
-                ActorStatus_SetPalette(actor, actor->alternateOffset);
+                ActorStatus_SetPalette(actor, actor->base.alternateOffset);
         } else {
             ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
         }
         *flashTimer = 0;
-        SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x8000);
+        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x8000);
         return;
     } else if (ActorStatus_BehaviorFlags(actor, 0x2000000)) {
         s32 blinkRemaining;
         s32 phase;
         blinkRemaining = ActorStatus_BlinkRemaining(actor);
-        pTmr = &((struct SceneActorPaletteTimer *)&actor->field1EA)->remaining;
+        pTmr = &((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining;
         if (blinkRemaining > 0) {
             if (blinkRemaining <= 0x40) {
                 if (blinkRemaining >= 0)
@@ -289,29 +291,29 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
                 if (phase & 1) {
                     ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
                 } else if (ActorStatus_HasStatusFlags(actor, 0x4000)) {
-                    ActorStatus_SetPalette(actor, actor->alternatePalette);
+                    ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                 } else {
-                    ActorStatus_SetPalette(actor, actor->alternateOffset);
+                    ActorStatus_SetPalette(actor, actor->base.alternateOffset);
                 }
             } else {
                 if (ActorStatus_HasStatusFlags(actor, 0x4000))
-                    ActorStatus_SetPalette(actor, actor->alternatePalette);
+                    ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                 else
-                    ActorStatus_SetPalette(actor, actor->alternateOffset);
+                    ActorStatus_SetPalette(actor, actor->base.alternateOffset);
             }
             *pTmr = *pTmr - 1;
         } else {
             ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
             *pTmr = 0;
-            SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x2000000);
-            SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x4000);
+            SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x2000000);
+            SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x4000);
         }
     } else if (ActorStatus_HasStatusFlags(actor, 0xC0)) {
         if (ActorStatus_HasStatusFlags(actor, 0x100)) {
-            SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x4140);
+            SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x4140);
             if (ActorStatus_HasStatusFlags(actor, 0x80)) {
-                ActorStatus_SetWord(&actor->flags2CC, 0x2000000);
-                SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x80);
+                ActorStatus_SetWord(&actor->base.flags2CC, 0x2000000);
+                SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x80);
                 ActorStatus_SetBlinkTimer(actor, 0x40);
                 return;
             }
@@ -321,7 +323,7 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
             s32 recoveryRemaining;
             s32 phase;
             recoveryRemaining = ActorStatus_BlinkRemaining(actor);
-            pTmr = &((struct SceneActorPaletteTimer *)&actor->field1EA)->remaining;
+            pTmr = &((struct SceneActorPaletteTimer *)&actor->base.field1EA)->remaining;
             if (recoveryRemaining >= 0) {
                 if (recoveryRemaining <= 0x40) {
                     if (recoveryRemaining >= 0)
@@ -331,9 +333,9 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
                     if (phase & 1) {
                         ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
                     } else if (ActorStatus_HasStatusFlags(actor, 0x4000)) {
-                        ActorStatus_SetPalette(actor, actor->alternatePalette);
+                        ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                     } else {
-                        ActorStatus_SetPalette(actor, actor->alternateOffset);
+                        ActorStatus_SetPalette(actor, actor->base.alternateOffset);
                     }
                     *pTmr = *pTmr + 1;
                 }
@@ -354,15 +356,15 @@ static inline void ActorStatus_Palette(struct SceneActorRegistryResetView *actor
 valid_player:
     if (ActorStatus_EnvironmentPaletteActive(res)) {
         if (!(ActorStatus_BehaviorFlags(actor, 0x20000))) {
-            u32 current = actor->paletteBank;
+            u32 current = actor->base.paletteBank;
             u32 restored = ActorStatus_DefaultPalette(actor);
-            SceneActorPalette_BeginTransition(current, restored, 0, actor->category, 0);
-            ActorStatus_SetWord(&actor->flags2CC, 0x20000);
+            SceneActorPalette_BeginTransition(current, restored, 0, actor->base.category, 0);
+            ActorStatus_SetWord(&actor->base.flags2CC, 0x20000);
         }
     } else if (ActorStatus_BehaviorFlags(actor, 0x20000)) {
-        SceneActorPalette_BeginTransition((ActorStatus_DefaultPalette(actor)), actor->paletteBank,
-                                          0, actor->category, 1);
-        SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x20000);
+        SceneActorPalette_BeginTransition((ActorStatus_DefaultPalette(actor)),
+                                          actor->base.paletteBank, 0, actor->base.category, 1);
+        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x20000);
     }
 }
 
@@ -371,41 +373,42 @@ static inline u16 ActorStatus_TickResponse(struct ContactCollider *response)
     return --response->responseValue;
 }
 
-static inline void ActorStatus_Blink(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Blink(struct ChaseActor *actor)
 {
 
     /* body bit and shadow follow the blink timer at +0x178 */
     if (!(ActorStatus_MotionFlags(actor, 0x40)) && !(ActorStatus_StatusFlags(actor, 0x20000))) {
-        struct ContactCollider *response = &actor->colliderA;
-        if (actor->health <= 0) {
-            if (actor->colliderA.responseValue != 0) {
-                actor->colliderA.responseValue = 0;
+        struct ContactCollider *response = &actor->base.colliderA;
+        if (actor->base.health <= 0) {
+            if (actor->base.colliderA.responseValue != 0) {
+                actor->base.colliderA.responseValue = 0;
                 ActorStatus_SetBodyBit(actor, 0);
-                if (actor->shadow[0] != 0)
+                if (actor->base.shadow[0] != 0)
                     ActorShadow_Enable((u8 *)actor + 0x320);
             }
-        } else if (actor->colliderA.responseValue != 0 && !(ActorStatus_MotionFlags(actor, 0x20))) {
-            if ((actor->colliderA.responseValue >> 2) & 1) {
+        } else if (actor->base.colliderA.responseValue != 0 &&
+                   !(ActorStatus_MotionFlags(actor, 0x20))) {
+            if ((actor->base.colliderA.responseValue >> 2) & 1) {
                 ActorStatus_SetBodyBit(actor, 0);
-                if (actor->shadow[0] != 0)
+                if (actor->base.shadow[0] != 0)
                     ActorShadow_Enable((u8 *)actor + 0x320);
             } else {
                 ActorStatus_SetBodyBit(actor, 1);
-                if (actor->shadow[0] != 0)
+                if (actor->base.shadow[0] != 0)
                     ActorShadow_Disable((u8 *)actor + 0x320);
             }
             if (ActorStatus_TickResponse(response) == 0) {
                 ActorStatus_SetBodyBit(actor, 0);
-                if (actor->shadow[0] != 0)
+                if (actor->base.shadow[0] != 0)
                     ActorShadow_Enable((u8 *)actor + 0x320);
             }
         }
     }
 }
 
-static inline void ActorStatus_SetPendingBits(struct SceneActorRegistryResetView *actor, u16 bits)
+static inline void ActorStatus_SetPendingBits(struct ChaseActor *actor, u16 bits)
 {
-    actor->flags2D6 |= bits;
+    actor->base.flags2D6 |= bits;
 }
 
 static inline u32 ActorStatus_RandomSample(const u16 *samples)
@@ -421,7 +424,7 @@ static inline u8 ActorStatus_ParticleHeading(s8 heading, s32 jitter)
     return heading + jitter;
 }
 
-static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_Particles(struct ChaseActor *actor)
 {
     u32 lifetime;
     s32 t;
@@ -431,13 +434,13 @@ static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *act
         struct ContactPackedVector packed;
     } sparkPos;
     /* flicker spark while the hit timer runs */
-    if ((*(u16 *)&actor->field30C) != 0) {
-        (*(u16 *)&actor->field30C)--;
-        if (actor->body.position.y >= 0 && Mod((*(u16 *)&actor->field30C), 4) == 0) {
-            u8 baseAngle = actor->field2B6;
+    if ((*(u16 *)&actor->base.field30C) != 0) {
+        (*(u16 *)&actor->base.field30C)--;
+        if (actor->base.body.position.y >= 0 && Mod((*(u16 *)&actor->base.field30C), 4) == 0) {
+            u8 baseAngle = actor->base.field2B6;
             u32 rb;
 
-            sparkPos.position = actor->body.position;
+            sparkPos.position = actor->base.body.position;
             sparkPos.packed.y += (ActorStatus_RandomSample(gRandomTable) & 255);
             rb = ActorStatus_ParticleHeading(
                 baseAngle, (s32)(ActorStatus_RandomSample(gRandomTable) & 31) - 16);
@@ -451,20 +454,20 @@ static inline void ActorStatus_Particles(struct SceneActorRegistryResetView *act
     }
 }
 
-static inline void ActorStatus_FaceTarget(struct SceneActorRegistryResetView *actor)
+static inline void ActorStatus_FaceTarget(struct ChaseActor *actor)
 {
     if (ActorStatus_BodyFlags(actor, 2)) {
-        actor->tracking.target = (u32)(gUnknown_02000580[0] + 0x24);
-    } else if (actor->tracking.target == 0) {
+        actor->base.tracking.target = (u32)(gUnknown_02000580[0] + 0x24);
+    } else if (actor->base.tracking.target == 0) {
         return;
     }
     {
-        u8 *tg = (void *)actor->tracking.target;
-        s32 dx = *(s16 *)(tg + 0xC) - actor->body.position.x;
-        s32 dy = *(s16 *)(tg + 0x10) - actor->body.position.z;
+        u8 *tg = (void *)actor->base.tracking.target;
+        s32 dx = *(s16 *)(tg + 0xC) - actor->base.body.position.x;
+        s32 dy = *(s16 *)(tg + 0x10) - actor->base.body.position.z;
 
-        actor->tracking.heading = Math_Atan2(dx, dy);
-        actor->tracking.distance = dx * dx + dy * dy;
+        actor->base.tracking.heading = Math_Atan2(dx, dy);
+        actor->base.tracking.distance = dx * dx + dy * dy;
     }
 }
 #endif

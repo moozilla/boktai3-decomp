@@ -17,39 +17,38 @@ static inline u8 TakeFlag(u8 *p)
     }
     return 0;
 }
-static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind,
-                              u32 zero, u8 zero8)
+static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind, u32 zero, u8 zero8)
 {
-    a->field2B2 = 1;
-    a->field2B0 = zero8;
-    a->field2B5 = kind;
-    a->target = callback;
-    a->field2C8 = zero;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = zero8;
+    a->base.field2B5 = kind;
+    a->base.target = callback;
+    a->base.field2C8 = zero;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = zero;
+    a->base.word104 = zero;
 }
-static inline void SetState(struct SceneActorRegistryResetView *a, u32 phase, u32 zero, u8 zero8)
+static inline void SetState(struct ChaseActor *a, u32 phase, u32 zero, u8 zero8)
 {
     u32 one = 1;
-    a->state2A8 = zero8;
-    a->phase2A9 = phase;
-    a->behavior2AA = one;
-    a->counter2AC = zero;
-    a->field2B1 = one;
+    a->base.state2A8 = zero8;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = one;
+    a->base.counter2AC = zero;
+    a->base.field2B1 = one;
 }
-void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 elapsed)
+void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
 {
     s32 frame = elapsed;
     u8 zero8;
-    if (TakeFlag(&input->field2B2))
+    if (TakeFlag(&input->base.field2B2))
         SceneActorControl_ConsumeLiftFlagPenalty(input);
     {
         u32 flags = 0x10;
-        u16 *p = &input->flags2D6;
+        u16 *p = &input->base.flags2D6;
         u32 value = *p;
         u16 initialState[1] = {0};
         zero8 = initialState[0];
@@ -58,17 +57,17 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
     }
     {
         u32 mask = 0x100000;
-        u32 *p = &input->flags2D0;
+        u32 *p = &input->base.flags2D0;
         *p |= mask;
     }
     if (frame > 30) {
-        u8 *ctx = input->context;
+        u8 *ctx = input->base.context;
         u16 delay;
         SceneActorControl_ResetCollisionFlags(input);
         delay = *((u16 *)(ctx + 0x444));
         if (delay) {
             u32 flags = 0x100;
-            u16 *p = &input->flags2D4;
+            u16 *p = &input->base.flags2D4;
             flags = flags | (*p);
             *p = flags;
             *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
@@ -78,8 +77,8 @@ void Lun_ResumeAfterLiftPenalty(struct SceneActorRegistryResetView *input, s32 e
             u32 zero = delay;
             SetControl(input, Lun_UpdateWaitingAnimation, 10, zero, zero8);
             SetState(input, 1, zero, zero8);
-            input->body.direction = input->tracking.heading;
-            input->field2C2 = 64;
+            input->base.body.direction = input->base.tracking.heading;
+            input->base.field2C2 = 64;
         }
     }
 }

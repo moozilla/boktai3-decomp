@@ -37,22 +37,22 @@ static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
     row->trail[0].draw.sprite.paletteVariant = source->paletteVariant;
 }
 
-void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
-                                const struct ContactPosition *position, u32 angle)
+void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
+                                u32 angle)
 {
-    struct AxeTrailContext *context = actor->context;
+    struct AxeTrailContext *context = actor->base.context;
     struct ContactSwarmSprite *sprite;
     struct DisplaySequenceState *state;
     u32 spriteOffset;
-    if (((struct DisplaySequenceSprite *)actor->drawable)->flags & 1)
+    if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->field2CA, context->spacing);
+        s32 zero = Mod(actor->base.field2CA, context->spacing);
         if (zero)
             return;
         {
             struct DisplaySequenceState *source =
-                &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
+                &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
             u16 selection = source->unknownA;
             u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlot);
             struct AxeTrailSlot *slot;
@@ -79,13 +79,13 @@ void ActorPhase_EmitTrailSprite(struct SceneActorRegistryResetView *actor,
     context->trail[context->nextTrail].lifetime = 8;
     context->trail[context->nextTrail].draw.sprite.attribute = angle;
     {
-        struct DisplaySequenceSprite *source = actor->drawable;
+        struct DisplaySequenceSprite *source = actor->base.drawable;
         struct AxeTrailContext *row =
             (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleX(source, row);
     }
     {
-        struct DisplaySequenceSprite *source = actor->drawable;
+        struct DisplaySequenceSprite *source = actor->base.drawable;
         struct AxeTrailContext *row =
             (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleY(source, row);
