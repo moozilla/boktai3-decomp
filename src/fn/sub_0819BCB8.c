@@ -1,8 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "monster_particle_random.h"
 #include "ram.h"
+#include "heap.h"
+#include "resource_registry.h"
 
 /* Tentative: emit a motion entry from a randomized point ahead or behind the actor. */
 
@@ -30,10 +31,14 @@ static inline s32 Scale(s32 value)
 }
 static inline void Polar(struct BurstVector *out, s32 inputAngle, s32 radius)
 {
-    register s32 angle asm("r3") = inputAngle;
+    s32 angle = inputAngle;
     out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     out->y = 0;
-    out->z = Scale(gUnk_086149C4[angle & 255] * radius);
+    {
+        u32 mask = 255;
+        mask &= angle;
+        out->z = Scale(gUnk_086149C4[mask] * radius);
+    }
 }
 static inline void Add(struct BurstVector *out, struct BurstVector *a, struct BurstVector *b)
 {
@@ -81,7 +86,7 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
     struct BurstVector position;
     struct BurstVector velocity;
     /* The inlined RNG retains this setup address across its first two samples. */
-    u32 origin = PARTICLE_RANDOM_SAMPLE_ORIGIN;
+    u32 origin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
     u32 savedOrigin;
     u32 sideSample;
     s32 side;
@@ -93,14 +98,17 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
     facing = actor->side;
     radius = RandomValue() >> 3;
     {
-        register s32 quotient asm("r1");
+        s32 quotient;
 
         struct BurstVector *out;
         s32 angle;
+        u32 index;
         quotient = radius;
-        asm("" : : "r"(quotient));
         savedOrigin = origin;
-        quotient = quotient / 1024 * 1024;
+        if (quotient < 0)
+            quotient += 1023;
+        quotient >>= 10;
+        quotient <<= 10;
         out = &position;
         side <<= 7;
         direction = facing << 6;
@@ -110,12 +118,11 @@ void Hresvelgr_EmitFacingMotion(struct ActorReaction *input)
         out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
         out->y = 0;
         angle &= 255;
-        direction = angle << 1;
-        out->z = Scale(*(const s16 *)((u32)gUnk_086149C4 + direction) * radius);
+        index = angle << 1;
+        out->z = Scale(*(const s16 *)((u32)gUnk_086149C4 + index) * radius);
     }
     Add(&position, &saved->position, &position);
-    direction = actor->side;
-    Polar(&velocity, direction << 6, 128);
+    Polar(&velocity, actor->side << 6, 128);
 
     MotionEntry_CreateWithDelta(
         &position, &velocity,
