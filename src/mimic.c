@@ -1315,9 +1315,9 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
                                      SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, ((struct Mimic *)arg0)->movementProbe, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, ((struct Mimic *)arg0)->base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, ((struct Mimic *)arg0)->movementProbe, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, ((struct Mimic *)arg0)->base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;
