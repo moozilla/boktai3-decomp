@@ -2876,7 +2876,7 @@ struct ColorPulseApplyContact {
     u16 damage, effect;
 };
 
-void sub_080F421C(void);
+void Ivy_UpdateDefeatBurst(void);
 
 void Sword_UpdateBodyPaletteRestore(void);
 
@@ -2887,7 +2887,7 @@ void PlayerStats_AddContactHundredths(void *, void *, s32);
 void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
                              struct ColorPulseApplyContact *p)
 {
-    if (p->callback == sub_080F421C)
+    if (p->callback == Ivy_UpdateDefeatBurst)
         return;
     if (p->disabled) {
         if (p->effect) {

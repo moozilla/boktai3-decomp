@@ -4005,11 +4005,15 @@ addr,name,mode,confidence,source,notes
 080F3CC4,ChildGroup_UpdateOrbitingMembers,thumb,low,src-alias,
 080F3F48,ChildGroup_UpdateLandingState,thumb,low,src-alias,
 080F40C8,ChildGroup_UpdateAlternatingCallbacks,thumb,low,src-alias,
+080F421C,Ivy_UpdateDefeatBurst,thumb,low,src-alias,
+080F469C,Ivy_OnUpdateIdle,thumb,low,src-alias,
 080F46A0,Ivy_UpdateActions,thumb,low,src-alias,Dispatches the primary and optional secondary action callbacks then refreshes ground height
 080F46D8,Ivy_DispatchState,thumb,low,src-alias,Invokes the state-indexed callback unless flag 0x10 suppresses dispatch
 080F4704,Ivy_OnChildDestroy,thumb,low,src-alias,Empty lifecycle callback installed during Ivy setup; child destruction role tentative
+080F4708,Ivy_OnChildContact,thumb,low,src-alias,
 080F49BC,Ivy_UpdateChildBobbing,thumb,low,src-alias,Applies alternating vertical acceleration to the smaller child object layout
 080F4A0C,Ivy_BeginChildPulse,thumb,low,src-alias,Initializes two changing visual parameters and their rates then installs the pulse callback and plays a sound
+080F4A4C,Ivy_ApproachChildBlend,thumb,low,src-alias,
 080F4AB4,ActorPhase_ApproachNeutral,thumb,low,src-alias,
 080F4B54,Ivy_BeginChildRandomDelay,thumb,low,src-alias,Selects a delay of 30 or 94 from the random table and installs the next child callback
 080F4B94,ActorPhase_OrbitParent,thumb,low,src-alias,

@@ -7,43 +7,79 @@
 #include "display_sequence_inline.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
+
 void *Heap_Alloc(u32);
+
 void Memory_Clear(void *, u32);
+
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
+
 void SceneActorControl_SetDefaultProfile(void *);
+
 void Bat_OnUpdate(void);
+
 void SceneActorControl_GetTravelProfile(void);
+
 void SceneActorControl_UpdateFacingAnimation(void);
+
 void SceneActorControl_ResetDirectionalAnimation(void);
+
 void SceneActorControl_ConvergeSavedMotion(void);
+
 void SceneActorControl_CompleteScriptedResponse(void);
+
 void SceneActorReaction_OnEnemyDefault(void);
+
 void SceneActorReaction_ResolveDamage(void);
+
 void SceneActorPlacement_PlayResponseAndResetState(void);
+
 void SceneActorReaction_SinkAndRemove(void);
+
 void SceneActorControl_RestoreMotion(void);
+
 void SceneActorControl_SetCollisionResponse(void);
+
 void SceneActorControl_TryActivateProximityResponse(void);
+
 void SceneActorScript_OnCommand(void *actor, const u16 *command);
+
 void SceneActorControl_BindPrimaryPlayer(void);
-void Bat_Destroy(void);
+
+void Bat_Destroy(void *);
+
 void AnimData_SelectPaletteBank(void *, s32);
+
 void SceneActorControl_InitContactColliders(void *);
+
 void SceneActorPlacement_HideActor(void *, s32);
+
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
+
 void Anim_Step(void *, void *);
+
 void SceneActorBehavior_InstallCallbackTables(void *);
+
 void SceneActorControl_SetDefaultPreset(void *);
+
 void SceneActorControl_SetApproachCallbacks(void *);
+
 void SceneActorControl_SetStoredMotionCallbacks(void *);
+
 void SceneActorControl_RestartPositionCurve(void *);
+
 void ActorShadow_Disable(void *);
+
 void SceneActorBehavior_InitializeShadow(void *);
+
 void SceneActorTerrain_ReadScriptParameters(void *);
+
 u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_08605C74[];
+
 extern SceneActorCommandHandler const gUnk_086108B0[];
+
 static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
@@ -100,6 +136,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
+
 static inline void MonsterInit_ReadBatPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {
     s32 r1v;
@@ -116,6 +153,7 @@ static inline void MonsterInit_ReadBatPalette(struct ChaseActor *actor, u16 base
         MonsterInit_SetWidgetPalette((void *)(actor->base.drawable + 0x20),
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
+
 static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb0, void *cb1,
                                               void *cb2, void *cb3, void *cb4, void *hidden,
                                               void *cb5, void *cb6, void *defaultReaction,
@@ -141,6 +179,7 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
+
 static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
     actor->base.onMessage = SceneActorScript_OnCommand;
@@ -279,4 +318,20 @@ s32 Bat_Init(void *object)
     if (!SceneActorRegistry_LinkActor(actor))
         return -1;
     return 0;
+}
+
+void Heap_Free(void *);
+
+s32 Bat_Init(void *);
+
+void Bat_Create(void)
+{
+    void *m = Heap_Alloc(0x43c);
+    if (m != 0) {
+        Memory_Clear(m, 0x43c);
+        if (Bat_Init(m) < 0) {
+            Bat_Destroy(m);
+            Heap_Free(m);
+        }
+    }
 }

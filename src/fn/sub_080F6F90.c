@@ -49,7 +49,7 @@ struct SwordComponent {
 };
 // confidence=low: the four children are the active sword components updated at 080F63C4.
 void Ivy_OnChildDestroy(void);
-void sub_080F4708(void);
+void Ivy_OnChildContact(void);
 static inline void Sword_SetFrame(struct DisplaySequenceSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
@@ -233,7 +233,7 @@ void Sword_InitAttackComponents(struct SwordAttackSetup *p)
         collider = &child->body;
         Collider_Init(collider, 0, 0x5009, 0, 16, &size, &offset);
         Collider_SetBodyProperties(collider, p->bodyD16, p->bodyD1C, p->bodyD1E);
-        Collider_SetCallback(collider, sub_080F4708, child);
+        Collider_SetCallback(collider, Ivy_OnChildContact, child);
         Collider_Refresh(collider);
         child->body.flags |= 4;
     }
