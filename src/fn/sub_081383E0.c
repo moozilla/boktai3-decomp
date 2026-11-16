@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 
 /* Result-counter meanings are tentative; the score formula is established. */
@@ -60,8 +59,6 @@ void Registry1745_UpdateRankingAwards(struct SessionScores *session)
         values[i] = -1;
     }
     for (i = 0; i <= 2; i++) {
-        /* Keep the pass counter separate from the inner scan. */
-        asm("" : "+r"(i));
         for (j = 3; j > i; j--) {
             if (values[j - 1] < values[j]) {
                 s32 value = values[j - 1];
@@ -72,6 +69,9 @@ void Registry1745_UpdateRankingAwards(struct SessionScores *session)
                 index = order[j];
                 order[j] = order[j - 1];
                 order[j - 1] = index;
+                /* A no-op rewrite of i (combine folds it away). Setting i inside the
+                   inner loop keeps gcse from computing the next pass's i + 1 above it. */
+                i = i + index - index;
             }
         }
     }
