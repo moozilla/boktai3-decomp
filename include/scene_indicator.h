@@ -2,6 +2,7 @@
 #define GUARD_SCENE_INDICATOR_H
 
 #include "engine.h"
+#include "player.h"
 
 struct Vec {
     s16 x, y, z, pad;
@@ -51,16 +52,9 @@ struct SceneIndicators {
     int tile; /* terrain cell index under the player */
 };
 
-struct SceneActor {
-    u8 pad0[0x30];
-    s16 x;
-    u8 pad32[2];
-    s16 y;
-};
 
 /* 0x0200004C */
 extern struct SceneIndicators *gSceneIndicators;
-extern struct SceneActor *gPlayers;
 
 struct SceneIndicators *SceneIndicators_GetInstance(void);
 void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p);

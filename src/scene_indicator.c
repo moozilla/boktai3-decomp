@@ -100,7 +100,7 @@ int SceneIndicators_Update(struct SceneIndicators *m)
         if (p->active)
             SceneIndicator_Update(m, p);
     {
-        int x = gPlayers->x >> 8, y = gPlayers->y >> 8, tile;
+        int x = gPlayers[0]->position.x >> 8, y = gPlayers[0]->position.z >> 8, tile;
         if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else
@@ -164,8 +164,8 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
         for (i = 15; i >= 0; i--, p++)
             SceneIndicator_Initialize(m, p);
     }
-    if (gPlayers) {
-        int x = gPlayers->x >> 8, y = gPlayers->y >> 8, tile;
+    if (gPlayers[0]) {
+        int x = gPlayers[0]->position.x >> 8, y = gPlayers[0]->position.z >> 8, tile;
         if (x < 0 || y < 0 || x >= gTerrainWidth || y >= gTerrainHeight)
             tile = 0;
         else

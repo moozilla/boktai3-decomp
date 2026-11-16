@@ -14,11 +14,11 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
         result = CellGate_TestPlayerCell(gate);
         if (result) {
             if (!gate->playerInside) {
-                gPlayers->gateCount++;
+                gPlayers[0]->gateCount++;
                 if (gate->flags & 8)
-                    gPlayers->direction = 7;
+                    gPlayers[0]->coordinateAxis = 7;
                 else
-                    gPlayers->direction = 1;
+                    gPlayers[0]->coordinateAxis = 1;
                 gate->playerInside = 1;
             }
             if (gate->registered) {
@@ -26,8 +26,8 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
                 gate->registered = 0;
             }
             CellGate_ClampPlayerEdge(gate, 40);
-            if (gPlayers->transitionMode != 4 && !specialMode()) {
-                struct CellGatePlayer *player = gPlayers;
+            if (gPlayers[0]->tetherMode != 4 && !specialMode()) {
+                struct Player *player = gPlayers[0];
                 u32 action = player->actionMode;
                 if (action == 3)
                     goto done;
@@ -42,7 +42,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
             }
         } else {
             if (gate->playerInside) {
-                gPlayers->gateCount--;
+                gPlayers[0]->gateCount--;
                 gate->playerInside = result;
             }
             if (!CellGate_TestForcedPassage(gate)) {
@@ -56,7 +56,7 @@ void CellGate_UpdateForcedDirection(struct CellGate *gate)
         }
     } else {
         if (gate->playerInside) {
-            gPlayers->gateCount--;
+            gPlayers[0]->gateCount--;
             gate->playerInside = result;
         }
     remove:

@@ -1,6 +1,6 @@
 #include "area_effect.h"
 void AreaEffect_SetBounds(struct AreaEffectEntry *entry, s32 kind,
-                          struct AreaEffectPosition *position, s32 rotated)
+                          struct SceneVec *position, s32 rotated)
 {
     s32 xRadius, zRadius;
     u32 x;

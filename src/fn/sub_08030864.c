@@ -1,12 +1,6 @@
 #include "global.h"
 #include "ram.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Player {
-    u8 pad[0x30];
-    struct Vec pos;
-};
+#include "player.h"
 struct Actor {
     u8 pad[0x2e0];
     void (*destroy)(void *, struct Actor *);
@@ -22,10 +16,9 @@ struct Manager {
     u8 event, pad25[3];
     u32 buffer, count[2];
     u8 pad34[0x400];
-    struct Vec *target;
+    struct SceneVec *target;
     struct Player *player;
 };
-extern struct Player *gPlayers[4];
 int Weather_GetType(void);
 int SunClock_GetBaseHour(void);
 int SunClock_GetBaseMinute(void);

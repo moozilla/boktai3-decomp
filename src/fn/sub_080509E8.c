@@ -34,9 +34,9 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
             finalZ = (u16)gCamera.position.z;
         }
     } else {
-        if (gPlayers[background->playerIndex]->targetActive) {
+        if (gPlayers[background->playerIndex]->cameraOffsetActive) {
             register u32 angle asm("r0");
-            if (gPlayers[background->playerIndex]->transition == 4)
+            if (gPlayers[background->playerIndex]->tetherMode == 4)
                 angle = ((u16)gGameState->unk85E + 128) & 255;
             else
                 angle = (u16)gGameState->unk85E;
@@ -47,19 +47,19 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                 weight = 8 - background->blendFrame;
                 denominator = weight + 1;
                 background->position.x = Div(background->position.x * weight +
-                                                 gPlayers[background->playerIndex]->target.x,
+                                                 gPlayers[background->playerIndex]->cameraTarget.x,
                                              denominator);
                 background->position.y = Div(background->position.y * weight +
-                                                 gPlayers[background->playerIndex]->target.y,
+                                                 gPlayers[background->playerIndex]->cameraTarget.y,
                                              denominator);
                 finalZ = Div(background->position.z * weight +
-                                 gPlayers[background->playerIndex]->target.z,
+                                 gPlayers[background->playerIndex]->cameraTarget.z,
                              denominator);
             } else {
                 background->blendFrame = 8;
-                background->position.x = gPlayers[background->playerIndex]->target.x;
-                background->position.y = gPlayers[background->playerIndex]->target.y;
-                finalZ = (u16)gPlayers[background->playerIndex]->target.z;
+                background->position.x = gPlayers[background->playerIndex]->cameraTarget.x;
+                background->position.y = gPlayers[background->playerIndex]->cameraTarget.y;
+                finalZ = (u16)gPlayers[background->playerIndex]->cameraTarget.z;
             }
         } else {
             register struct GameState **gameAddress asm("r2") = &gGameState;
@@ -130,9 +130,9 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                         (u16)gPlayers[background->playerIndex]->position.x +
                         scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
                     {
-                        struct OrbitBackgroundPlayer *player = gPlayers[background->playerIndex];
+                        struct Player *player = gPlayers[background->playerIndex];
                         background->target.y =
-                            (((128 - player->heightScale) * 150) >> 7) + (u16)player->position.y;
+                            (((128 - player->visualSlowdownTimer) * 150) >> 7) + (u16)player->position.y;
                     }
                     background->target.z =
                         (u16)gPlayers[background->playerIndex]->position.z +
@@ -157,9 +157,9 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                         (u16)gPlayers[background->playerIndex]->position.x +
                         scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
                     {
-                        struct OrbitBackgroundPlayer *player = gPlayers[background->playerIndex];
+                        struct Player *player = gPlayers[background->playerIndex];
                         background->position.y =
-                            (((128 - player->heightScale) * 150) >> 7) + (u16)player->position.y;
+                            (((128 - player->visualSlowdownTimer) * 150) >> 7) + (u16)player->position.y;
                     }
                     finalZ = (u16)gPlayers[background->playerIndex]->position.z +
                              scale(gUnk_086149C4[background->angle & 255] * background->radius);

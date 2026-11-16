@@ -16,7 +16,7 @@ void CellGate_UpdateConditionalBarrier(struct CellGate *gate)
                 } else {
                     TerrainModifiers_UnregisterCell(gate->registration);
                     gate->registered = retained;
-                    Player_BeginTerrainInteraction(gPlayers);
+                    Player_BeginTerrainInteraction(gPlayers[0]);
                 }
                 if (gate->scriptId)
                     Script_Call(gate->scriptId, 0);

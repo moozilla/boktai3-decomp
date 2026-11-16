@@ -1,6 +1,6 @@
 #include "area_effect.h"
 #include "input.h"
-void Player_AddEnergy(struct AreaEffectPlayer *, s32);
+void Player_AddEnergy(struct Player *, s32);
 static inline u32 test(u32 *value, u32 mask)
 {
     return *value & mask;
@@ -17,7 +17,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
 {
     struct AreaEffectManager *object = manager;
     s32 activeMode = mode;
-    struct AreaEffectPlayer *player;
+    struct Player *player;
     if (gEngineFlags & 0x100) {
         object->idleFrame = 0;
     } else if ((*(u16 *)gPadState)) {
@@ -29,7 +29,7 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
         return;
     }
     {
-        struct AreaEffectPlayer *candidate = object->player;
+        struct Player *candidate = object->player;
         u32 kind = candidate->actionMode;
         player = candidate;
         if (kind == 6) {

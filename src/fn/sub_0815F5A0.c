@@ -1,7 +1,7 @@
 #include "global.h"
-extern u8 *gPlayers[4];
+#include "player.h"
 
 u8 sub_0815F5A0(s32 i)
 {
-    return gPlayers[i][0x2d];
+    return gPlayers[i]->unk2D;
 }

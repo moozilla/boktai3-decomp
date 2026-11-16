@@ -38,9 +38,9 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         z = (value >> 3 & rangeMask) - 63;
     }
     particle->offsetZ = z;
-    particle->position.world.x = gPlayers[0]->position.world.x + x;
-    particle->position.world.y = gPlayers[0]->position.world.y + y;
-    particle->position.world.z = gPlayers[0]->position.world.z + z;
+    particle->position.world.x = gPlayers[0]->position.x + x;
+    particle->position.world.y = gPlayers[0]->position.y + y;
+    particle->position.world.z = gPlayers[0]->position.z + z;
     {
         u32 value = zero;
         particle->velocityX = value;

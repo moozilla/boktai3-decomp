@@ -2,12 +2,12 @@
 u32 InteractionMarker_IsPlayerNearby(struct InteractionMarker *marker)
 {
     u16 state = (u16)gGameState->form - 3;
-    struct InteractionMarkerPlayer *player;
+    struct Player *player;
     s32 x, z;
     if (state <= 2)
         return 0;
     player = gPlayers[0];
-    if (player->busy)
+    if (player->actionLatch464)
         return 0;
     x = player->position.x - marker->position.x;
     if (x < 0)

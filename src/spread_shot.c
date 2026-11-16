@@ -250,7 +250,7 @@ u8 SpreadShot_ResolveTerrain(struct SpreadShot *shot, s32 angle, u32 next)
             s32 direction = (quadrant >> 6) & 3;
             s32 preferred;
             s32 target;
-            struct AreaEffectPlayer *player = gPlayers[0];
+            struct Player *player = gPlayers[0];
             if (!player)
                 preferred = 0;
             else {

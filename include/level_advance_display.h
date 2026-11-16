@@ -2,6 +2,7 @@
 #define GUARD_LEVEL_ADVANCE_DISPLAY_H
 #include "engine.h"
 #include "scene_vec.h"
+#include "player.h"
 union LevelAdvancePosition {
     struct SceneVec world;
     u32 words[2];
@@ -45,15 +46,6 @@ struct LevelAdvanceProgress {
     u16 levelBonus;            /* tentative: incremented by two per advancement */
     u32 unknown44, experience; /* experience interpretation tentative */
 };
-struct LevelAdvancePlayer {
-    u8 unknown0[0x1C];
-    u32 mode;
-    u8 unknown20[0x10];
-    union LevelAdvancePosition position;
-};
-#ifndef GUARD_PLAYER_H
-extern struct LevelAdvancePlayer *gPlayers[4];
-#endif
 /* 0x02000120 */
 extern struct LevelAdvanceManager *gLevelAdvanceManager;
 #define LEVEL_ADVANCE_PROGRESS ((struct LevelAdvanceProgress *)gGameState)

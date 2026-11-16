@@ -1,5 +1,5 @@
 #include "area_effect.h"
-s32 AreaEffect_FindContainingEntry(struct AreaEffectPosition *);
+s32 AreaEffect_FindContainingEntry(struct SceneVec *);
 void AreaEffect_UpdateGraphicsId(struct AreaEffectManager *);
 void EffectManager_SpawnParticles(u32, u32, u32, void *, void *, u32, u32);
 struct PackedHalfword {
@@ -32,7 +32,7 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
         }
     }
     active = 0;
-    if (manager->player->stateTag == 1) {
+    if (manager->player->kind == 1) {
         if (gGameState->flags868 & 2) {
             goto action;
         }
@@ -42,21 +42,21 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     }
     if (active) {
     action: {
-        struct AreaEffectPlayer *player = manager->player;
-        if (player->action == 7 && player->actionPhase <= 3) {
-            if ((u8)(player->actionPhase - 2) <= 1 && manager->actionFrame <= 62) {
+        struct Player *player = manager->player;
+        if (player->tetherMode == 7 && player->tetherPhase <= 3) {
+            if ((u8)(player->tetherPhase - 2) <= 1 && manager->actionFrame <= 62) {
                 if ((manager->actionFrame & 7) == 0) {
                     struct PackedPosition position, size;
-                    *(struct AreaEffectPosition *)&position = player->position;
+                    *(struct SceneVec *)&position = player->position;
                     {
-                        u32 x = (u16)(((struct AreaEffectPosition *)&position)->x - 100);
+                        u32 x = (u16)(((struct SceneVec *)&position)->x - 100);
                         u32 highMask = 0xFFFF0000;
                         u32 xy = *(u32 *)&position.xy;
                         xy &= highMask;
                         xy |= x;
                         *(u32 *)&position.xy = xy;
                         {
-                            u32 z = (u16)(((struct AreaEffectPosition *)&position)->z - 100);
+                            u32 z = (u16)(((struct SceneVec *)&position)->z - 100);
                             *(u32 *)&position.zpad = (*(u32 *)&position.zpad & highMask) | z;
                         }
                         {
@@ -89,9 +89,9 @@ void AreaEffect_UpdateActionParticles(struct AreaEffectManager *manager)
     }
     AreaEffect_UpdateGraphicsId(manager);
     {
-        struct AreaEffectPlayer *player = manager->player;
+        struct Player *player = manager->player;
         u32 mask = 32;
-        u32 flags = player->flags;
+        u32 flags = player->statusFlags;
         u32 mode;
         if (flags & mask) {
             mode = 2;

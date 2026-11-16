@@ -2,6 +2,7 @@
 #include "global.h"
 
 #include "engine.h"
+#include "player.h"
 
 // confidence=low: moves a requested player position and eventually restores player control.
 struct Vec {
@@ -10,10 +11,6 @@ struct Vec {
 struct Action {
     u8 state, pad[3];
     u32 frame;
-};
-struct Player {
-    u8 pad[0x20];
-    u32 flags;
 };
 struct Hresvelgr {
     u8 pad0[0x51];
@@ -37,7 +34,6 @@ struct Hresvelgr {
     u8 pad372[0x2a];
     struct Vec target, step, savedPosition;
 };
-extern void *gPlayers;
 void ActionState_Reset(void *);
 void ActionState_AdvanceState(void *);
 void ActionState_SetState(void *, u32);
@@ -51,7 +47,7 @@ void Camera_RequestShake(u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 {
-    u32 flags = p->flags & mask;
+    u32 flags = p->statusFlags & mask;
     u8 result = 0;
     if (!flags)
         result = 1;
@@ -59,7 +55,7 @@ static inline u8 PlayerCanMove(struct Player *p, u32 mask)
 }
 static inline u32 PlayerHasFlag(struct Player *p, u32 mask)
 {
-    return p->flags & mask;
+    return p->statusFlags & mask;
 }
 static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
 {
@@ -262,7 +258,7 @@ void Hresvelgr_UpdatePlayerRelease(struct Hresvelgr *actor, u32 tick)
         case 5:
             if (!action->frame) {
                 Hresvelgr_SetAnimation(saved, saved->animation, saved->animationData, 12, 2, 0);
-                Player_ApplyPositionRequest(gPlayers, &actor->position, 1, actor->heading, 50, 0,
+                Player_ApplyPositionRequest(gPlayers[0], &actor->position, 1, actor->heading, 50, 0,
                                             saved->releaseHeight, 0);
                 action->frame = 1;
             }

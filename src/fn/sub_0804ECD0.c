@@ -1,9 +1,9 @@
 #include "area_effect_link.h"
-void Player_AddEnergy(struct AreaEffectPlayer *, s32);
-static inline u32 AreaEffect_GetPlayerMode(struct AreaEffectPlayer *player)
+void Player_AddEnergy(struct Player *, s32);
+static inline u32 AreaEffect_GetPlayerMode(struct Player *player)
 {
     u32 mask = 32;
-    u32 flags = player->flags;
+    u32 flags = player->statusFlags;
     u32 mode;
     if (flags & mask)
         mode = 2;
@@ -24,8 +24,8 @@ void AreaEffect_UpdateLinkPlayerResources(struct AreaEffectManager *manager)
 {
     s32 i;
     for (i = 0; i < 4; i++) {
-        struct AreaEffectPlayer *player = gPlayers[i];
-        if (player && player->stateTag == 1) {
+        struct Player *player = gPlayers[i];
+        if (player && player->kind == 1) {
             u32 mode = AreaEffect_GetPlayerMode(player);
             s32 amount;
             if (player->actionMode == 6) {

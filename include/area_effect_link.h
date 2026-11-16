@@ -4,6 +4,4 @@
 #include "area_effect.h"
 #include "link_session_state.h"
 
-extern struct AreaEffectPlayer *gPlayers[4];
-
 #endif
