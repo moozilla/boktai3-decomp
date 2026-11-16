@@ -84,8 +84,8 @@ command a GCL script can call, 722 entries keyed by hash. Reading each entry's f
 * the rest are commands on existing systems: `GameState_*`, `Sound_*`, `Inventory_*`,
   `Camera_*`, `MessageWindow_*`, `SaveData_*`, `Weather_*`.
 
-Its `name` column is also stale: it still shows `sub_XXXXXXXX` for 673 entries, although
-all but 24 of those functions now have real names in `symbols/functions.csv`.
+Its `name` column follows `symbols/functions.csv` (regenerated 2026-11-15; 24 callbacks are
+still `sub_XXXXXXXX`), and `tools/promote_names.py` refreshes it after each naming batch.
 
 ## Where the source hides this (cleanup list)
 

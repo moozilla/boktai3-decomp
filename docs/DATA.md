@@ -55,7 +55,7 @@ the bank, were encoded with it.
 
 | Format | Range | File | Notes |
 |---|---|---|---|
-| `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` command binary-searches it (`08225844`) and calls the callback. |
+| `keyed_callbacks` | `08603300`–`08604998` | `data/actor_registry.csv` | The script command table: 722 sorted `(key, callback)` records and a zero sentinel. The script `chara` and `command` commands binary-search it (`08225844`) and call the callback. The `name` column is informational; `tools/promote_names.py` refreshes it from `symbols/functions.csv`. |
 | `callback_array` | Eleven ranges listed in `data/manifest.csv` | `data/actor_commands/*.csv` | Ordered Thumb callback pointers for the common actor commands and ten monster extensions. The command packet's first halfword selects an entry; every non-null pointer remains a linker relocation. |
 | `actor_marker_table` | `0824E6D4`–`0824E6F8`, `0824E818`–`0824E8A8` | `data/actor_marker/*.csv` | 180 bytes: fragment frame/animation indices and facing-dependent XYZ offsets, with fixed group/fragment order and no pointers. |
 | `resource_archive` | 10 ranges `08614DCC`–`08D5A85C` | `build/res/LABEL/index.txt` + `HASH.bin` (extracted) | The archives found by `ScriptProc_Start` (anm, map, ptn, fnt, sprites...). Header, sorted hash table and offsets are regenerated; entries are emitted as `.incbin` of their files and may change size. Their contents are position-independent: about 7,300 pointer-like words inside them (tile and map data) are no longer relocated. Verified in-game: growing the first `anm` entry by 37 bytes shifts every archive and leaves all menu and field screenshots identical. |

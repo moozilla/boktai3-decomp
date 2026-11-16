@@ -174,7 +174,7 @@ menu as alternatives. The pool itself is browsable at `/gfx#pool`.
 ## Actors, scripts and code (http://localhost:8642/actors, /scripts, /code)
 
 Cross-referenced by `tools/assets/actors.py` (also a command line:
-`actors.py actors`, `procs`, `code ADDR`), from `data/actor_registry.csv`,
+`actors.py actors`, `procs`, `code ADDR`), from the script command table (`data/actor_registry.csv`),
 the generated disassembly (`gen/code.s`), the script image and the text bank.
 
 * **Actors**: the 722 entries of the script actor registry, which scripts

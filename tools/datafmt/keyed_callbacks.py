@@ -1,11 +1,18 @@
 """Sorted (u32 key, Thumb callback) records ending in an all-zero sentinel.
 
+This is the format of the script command table (data/actor_registry.csv): every
+native routine a GCL script can call by key, through `chara KEY NAME ...`
+(create the entry's object) or `command KEY ...` (call it and keep the result).
+Most entries are not actors: about a quarter create a task, many only read
+script arguments, the rest drive existing systems (docs/OBJECT_MODEL.md).
 The script `chara` command looks keys up by binary search (08225844), so rows
 must stay sorted by key. Keys are 16-bit string hashes (sub_08219BD8:
 h = rotl16(h, 5) + c), the scheme MGS's GCL uses for its `chara` names.
 
 CSV columns: key (hex), callback (hex address, Thumb bit set), name (the
-callback's current function name; informational, ignored by encode).
+callback's current function name from symbols/functions.csv; informational,
+ignored by encode). refresh_names() rewrites that column without the ROM;
+tools/promote_names.py runs it after each naming batch.
 """
 import csv
 import io
@@ -26,6 +33,21 @@ def decode(rom, start, end, names):
         o += 8
     if rom[o:o + 8] != bytes(8):
         raise ValueError("keyed_callbacks: no zero sentinel at the end of the range")
+    return out.getvalue()
+
+
+def refresh_names(text, names):
+    """The CSV text with each row's name set from names (address -> name),
+    looked up by callback address with the Thumb bit masked."""
+    rows = list(csv.reader(io.StringIO(text)))
+    out = io.StringIO()
+    w = csv.writer(out, lineterminator="\n")
+    w.writerow(rows[0])
+    col = rows[0].index("name")
+    for r in rows[1:]:
+        cb = int(r[1], 16) & ~1
+        r[col] = names.get(cb, f"sub_{cb:08X}")
+        w.writerow(r)
     return out.getvalue()
 
 

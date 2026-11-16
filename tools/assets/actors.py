@@ -6,8 +6,10 @@
   actors.py code ADDR           a function's disassembly and, if matched, its C
 
 Sources (all ROM-derived or in the repository):
-  * data/actor_registry.csv: the 722 `chara` keys (16-bit hashes of the
-    original names, docs/DATA.md) and their callbacks.
+  * data/actor_registry.csv, the script command table: the 722 `chara` keys
+    (16-bit hashes of the original names, docs/DATA.md) and their callbacks.
+    Only some entries build actors; the rest create tasks, set state or call
+    existing systems (docs/OBJECT_MODEL.md).
   * data/actor_commands/*.csv: reviewed, ordered script-handler tables
     declared in data/manifest.csv. Tables named as literals in the callback
     or loader; initialization may install another table later.

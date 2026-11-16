@@ -3,7 +3,7 @@
 
   script_targets.py [--markdown FILE]
 
-Script entry points are the registry routines (data/actor_registry.csv, run by
+Script entry points are the script command table routines (data/actor_registry.csv, run by
 `chara` and `command`) and the native command handlers. From them this walks
 the call graph of gen/code.s (`bl` targets and Thumb function pointers loaded
 from literal pools, such as the callbacks a routine installs) and joins it

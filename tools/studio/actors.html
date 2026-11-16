@@ -82,8 +82,10 @@ body.embed main { grid-template-columns: 1fr; }
 </main>
 <script src="/static/common.js"></script>
 <script>
-// The script actor registry (data/actor_registry.csv): every object a script
-// can create by key with `chara KEY NAME` or call with `command KEY`. Recovered
+// The script command table (data/actor_registry.csv): every native routine a
+// script can run by key, creating an object with `chara KEY NAME` or calling it
+// with `command KEY`. Actors are one kind of entry; others create tasks, set
+// state or drive existing systems (docs/OBJECT_MODEL.md). Recovered
 // GCL names come from gcl/names/chara.csv; cross-references from
 // tools/assets/actors.py.
 studioHeader();
@@ -112,7 +114,7 @@ function renderList() {
   const q = $('q').value.trim().toUpperCase(), fs = $('fspr').checked, fu = $('fused').checked, fg = $('fgcl').checked;
   const hits = A.filter(a => (!fs || a.sprites.length) && (!fu || a.procs.length) && (!fg || a.gcl.length) &&
     (!q || [a.key, label(a), a.callback_name, a.loader_name, ...a.sprites.map(s => s.hash), ...a.names.map(n => n.jp + ' ' + (en[n.id] || '')), ...a.gcl.map(g => g.name + ' ' + g.english), browseTitles[a.key], ...placesOf(a)].some(x => (x || '').toUpperCase().includes(q))));
-  $('count').textContent = `${hits.length} of ${A.length} registry entries`;
+  $('count').textContent = `${hits.length} of ${A.length} script commands`;
   const special = (key, text) => {
     const d = document.createElement('div');
     d.className = 'row special' + (sel?.split(':')[0] === key ? ' on' : ''); d.dataset.key = key;
@@ -147,7 +149,7 @@ async function show(key) {
   if (navKey === 'tables') return showNumericTables(...key.split(':').slice(1));
   const a = byKey[key], v = $('view');
   pageTitle(a ? browseTitle(a) || title(a) : key, 'Actors');
-  if (!a) { v.innerHTML = `<div class="empty">No registry entry ${esc(key)}.</div>`; return; }
+  if (!a) { v.innerHTML = `<div class="empty">No script command ${esc(key)}.</div>`; return; }
   // one page per object, Browse's (tools/studio/atlas.html), shown here beside the registry list
   v.classList.add('frame');
   const f = v.querySelector('iframe.obj');
@@ -171,7 +173,7 @@ function showCommandTables(addr) {
         <table class="commands"><thead><tr><th>Index</th><th>Handler</th><th>Thumb pointer</th></tr></thead><tbody>
           ${t.entries.map(e => `<tr><td>${e.index}</td><td>${e.addr ? codeLink(e.addr, e.name) : '<span class="empty">Empty slot</span>'}</td><td class="mono">${e.callback}</td></tr>`).join('')}
         </tbody></table>
-        <div class="meta">${users.length ? 'Referenced by registry entries: ' + users.map(a => `<a href="#${a.key}" title="${esc(a.callback_name)}">${a.key}</a>`).join(', ') : 'No direct reference found in the registry callbacks or their loaders.'}</div>
+        <div class="meta">${users.length ? 'Referenced by script commands: ' + users.map(a => `<a href="#${a.key}" title="${esc(a.callback_name)}">${a.key}</a>`).join(', ') : 'No direct reference found in the script command callbacks or their loaders.'}</div>
       </section>`;
     }).join('')}
     <p class="meta">Rows keep the dispatch order. Handler names follow the current code symbols; pointer values retain the Thumb bit.</p>`;
@@ -230,7 +232,7 @@ function showNames() {
     <div class="meta">Text-bank strings (click an ID to open it in the text editor). English in grey is the fan translation, for reading only.</div>
     <h3>Monsters (strings ${enemies[0]?.id}–${enemies.at(-1)?.id})</h3>
     <p class="meta">The game shows these as base + index somewhere (a bestiary-like set: descriptions follow at 2509, elements at 9927, classes at 9936), but the code or script that adds 9838 to an enemy kind is not found yet: code reaches strings as a script-supplied base plus an offset, no script operand supplies a base near 9838, and the late-game save's pause menus never look one up. Links below go through the family's sprite (visual identification), so they are candidates.</p>
-    <table><tr><th>String</th><th>Name</th><th></th><th>Registry entries</th></tr>${enemies.map(row).join('')}</table>
+    <table><tr><th>String</th><th>Name</th><th></th><th>Script commands</th></tr>${enemies.map(row).join('')}</table>
     <h3>Characters (strings ${characters[0]?.id}–${characters.at(-1)?.id})</h3>
     <table><tr><th>String</th><th>Name</th><th></th><th></th></tr>${characters.map(row).join('')}</table>`;
 }
