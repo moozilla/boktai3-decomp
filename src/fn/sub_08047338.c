@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "transient_sprite_effects.h"
 static inline s32 effectScale(s32 value)
 {
@@ -10,12 +9,15 @@ s32 TransientSpriteEffects_Update(struct TransientSpriteEffects *pool)
 {
     s32 index = 0;
     do {
-        register u32 offset asm("r0") = index * sizeof(pool->slots[0]);
-        register struct TransientSpriteEffects *view asm("r1");
-        view = (struct TransientSpriteEffects *)((u32)pool + offset);
+        struct TransientSpriteEffects *view =
+            (struct TransientSpriteEffects *)((u8 *)pool + index * sizeof(pool->slots[0]));
         if (view->slots[0].active) {
-            struct TransientSpriteEffect *slot = &view->slots[0];
-            struct TransientEffectSprite *sprite = &slot->sprite;
+            struct TransientSpriteEffect *slot;
+            struct TransientEffectSprite *sprite;
+            // Two steps: the slot is the view advanced past the task header.
+            slot = (void *)view;
+            slot = (void *)((u8 *)slot + sizeof(view->task));
+            sprite = &slot->sprite;
             if (slot->age >= slot->dragDelay) {
                 s32 drag;
                 s32 x = slot->velocity.x;
