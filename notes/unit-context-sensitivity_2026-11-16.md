@@ -80,3 +80,11 @@ never does.
   neighbors.
 * `tools/merge_unit.py` should refuse, or warn on, a `#define` that comes before an
   `#include` in an input, because hoisting the include reorders the two.
+
+## Status (2026-11-16, later)
+
+* 6d08b413b removed all ten chase selectors (`tools/unselect.py`; the files keep class copies).
+* 080ACBE0 now names `gUnk_086149C4` directly instead of an alias `#define`.
+* Not done yet: rerunning the consolidation over these fifteen functions so they join their
+  neighbors' units (`unitize` over each class range); merge_resolve should then fold the
+  identical class copies into one per unit.

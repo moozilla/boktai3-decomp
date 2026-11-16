@@ -1,8 +1,7 @@
-#define gSineTable gUnk_086149C4
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "player.h"
-extern const s16 gSineTable[];
+extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 static inline s32 TruncateShift(s32 value, u32 shift)
@@ -24,8 +23,8 @@ void SceneActor_AimArcAtPlayer(struct ChaseActor *actor)
     out->y = player->y - own->y;
     out->z = player->z - own->z;
     angle = Math_Atan2(delta.x, out->z);
-    actor->base.secondaryMotion.x = TruncateShift(gSineTable[(angle + 64) & 255] * 32, 12);
-    actor->base.secondaryMotion.z = TruncateShift(gSineTable[angle & 255] * 32, 12);
+    actor->base.secondaryMotion.x = TruncateShift(gUnk_086149C4[(angle + 64) & 255] * 32, 12);
+    actor->base.secondaryMotion.z = TruncateShift(gUnk_086149C4[angle & 255] * 32, 12);
     if (actor->base.secondaryMotion.x != 0)
         time = Div(delta.x, actor->base.secondaryMotion.x);
     else if (actor->base.secondaryMotion.z != 0)
