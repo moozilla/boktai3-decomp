@@ -11,7 +11,7 @@ void TargetRegistry_RegisterSceneActor(void *, void *, void *);
 void Ivy_OnDestroy(void);
 void ColorPulse_ApplyContact(void);
 void ChildGroup_ProcessEvent(void);
-void sub_080F20AC(void);
+void Armor_UpdateOrbitingColliders(void);
 void ChildGroup_WaitForTrailingMembers(void);
 void Ivy_InitColorTransition(void);
 
@@ -388,7 +388,7 @@ void Sword_InitTask(struct SwordTask *p)
     Collider_SetBodyProperties(&p->body, p->body80, p->body8A, p->body88);
     Collider_SetCallback(&p->body, ColorPulse_ApplyContact, p);
     Collider_Refresh(&p->body);
-    p->onContact = sub_080F20AC;
+    p->onContact = Armor_UpdateOrbitingColliders;
 
     {
         u32 childContactFlags = 0x10;

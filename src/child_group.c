@@ -415,7 +415,7 @@ struct ChildGroupOscillationState {
     u32 timer;
 };
 
-void sub_080F1FE8();
+void ColorPulse_UnpackColor();
 
 void Ivy_UpdateBobbing();
 
@@ -450,7 +450,7 @@ void ChildGroup_UpdateTimedOscillation(struct ChildGroupOscillationState *p)
 {
     if (EnterState_3848(p)) {
         p->timer = 150;
-        p->callbackCF0 = sub_080F1FE8;
+        p->callbackCF0 = ColorPulse_UnpackColor;
     }
     Ivy_UpdateBobbing(p);
     if (--p->timer == 0) {
@@ -631,7 +631,7 @@ void ChildGroup_BeginInactiveState(struct ChildGroupInactiveState *p)
     if (EnterState_3ABC(p)) {
         p->timer = 100;
         p->callbackCD4 = Ivy_WaitForRetarget;
-        p->callbackCF0 = sub_080F1FE8;
+        p->callbackCF0 = ColorPulse_UnpackColor;
     }
     Ivy_UpdateBobbing(p);
     if (p->callbackCD4)

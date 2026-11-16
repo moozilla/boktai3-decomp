@@ -3,7 +3,7 @@
 extern u8 *gGameState;
 void Sword_UpdateBodyPaletteRestore(void *);
 void ChildGroup_ShowDamageNumber(void *, u32, u32);
-void sub_080F421C(void);
+void Ivy_UpdateDefeatBurst(void);
 #define H(p, n) (*(s16 *)((p) + (n)))
 #define U(p, n) (*(u16 *)((p) + (n)))
 #define W(p, n) (*(u32 *)((p) + (n)))
@@ -55,7 +55,7 @@ void Sword_UpdateDamage(u8 *p)
         if ((*((s16 *)(p + 0x7e))) <= 0) {
             do {
                 setState((void *)p, 1, 6);
-                *(void (**)(void))(p + 0xcc8) = sub_080F421C;
+                *(void (**)(void))(p + 0xcc8) = Ivy_UpdateDefeatBurst;
                 H(gGameState, 0x87C) =
                     H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
                 {

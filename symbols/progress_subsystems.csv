@@ -181,7 +181,7 @@ Ghoul,08089168,0808E208,,,auto: 32 of 37 functions named Ghoul_*
 Slime,0808E208,08091E54,,,auto: 43 of 48 functions named Slime_*
 Bee,08091E54,08095574,,,auto: 42 of 45 functions named Bee_*
 Ghost,08095574,0809AE0C,,,auto: 53 of 63 functions named Ghost_*
-Lun,0809AE0C,0809ED00,,,auto: 40 of 50 functions named Lun_*
+Lun,0809AE0C,0809ED00,,,auto: 41 of 50 functions named Lun_*
 Crow,0809ED00,080A2048,,,auto: 40 of 40 functions named Crow_*
 Spider,080A2048,080A5B8C,,,auto: 32 of 45 functions named Spider_*
 Tentacle body,080A5B8C,080A7700,,,auto: 17 of 19 functions named TentacleBody_*
@@ -192,15 +192,15 @@ Golem,080C47B8,080D0C30,,,auto: 50 of 63 functions named Golem_*
 Mummy,080D0C30,080DDD28,,,auto: 50 of 71 functions named Mummy_*
 Dog,080DDD28,080E6E08,,,auto: 50 of 73 functions named Dog_*
 Mimic,080E6E08,080E98A4,,,auto: 24 of 36 functions named Mimic_*
-Octopus,080E98A4,080ED328,,,auto: 24 of 46 functions named Octopus_*
-Ivy,080ED328,080F2700,,,auto: 29 of 61 functions named Ivy_*
+Octopus,080E98A4,080ED328,,,auto: 29 of 46 functions named Octopus_*
+Ivy,080ED328,080F2700,,,auto: 41 of 61 functions named Ivy_*
 Phase object,080F2700,080F33BC,,,auto: 7 of 15 functions named PhaseObject_*; also ColorPulse_*
 Child group,080F33BC,080F421C,,,auto: 14 of 17 functions named ChildGroup_*
-Ivy,080F421C,080F4B94,,,auto: 6 of 11 functions named Ivy_*
+Ivy,080F421C,080F4B94,,,auto: 10 of 11 functions named Ivy_*
 Sword,080F4B94,080F757C,,,auto: 31 of 39 functions named Sword_*
 Axe,080F757C,080F8010,,,auto: 5 of 7 functions named Axe_*
 Actor phase,080F8010,080F85B0,,,auto: 6 of 6 functions named ActorPhase_*
-Axe,080F85B0,080FF78C,,,auto: 65 of 97 functions named Axe_*
+Axe,080F85B0,080FF78C,,,auto: 73 of 97 functions named Axe_*
 Wooden crate,080FF78C,0810033C,,,auto: 22 of 25 functions named WoodenCrate_*
 Floor switch,0810033C,08100A64,,,auto: 11 of 13 functions named FloorSwitch_*
 Named object,08100A64,08103ADC,,,auto: 37 of 47 functions named NamedObject_*

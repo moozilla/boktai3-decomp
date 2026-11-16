@@ -3276,6 +3276,7 @@ addr,name,mode,confidence,source,notes
 0809CBB8,ActorContact_InitializeBodyAndSecondary,thumb,low,src-alias,
 0809CC8C,Lun_GetRouteProgressRate,thumb,low,src-alias,
 0809CCB8,Lun_SetMovementEndpoints,thumb,low,src-alias,Copies current and destination positions into movement state and resets its counter
+0809CCF4,Lun_StepCurveMotion,thumb,low,src-alias,
 0809CEA0,Lun_InitProfile,thumb,low,src-alias,Assigns the shared actor profile for Lun type 0x11
 0809CEBC,Lun_ResetMovementState,thumb,low,src-alias,
 0809D044,SceneActorControl_ResetCollisionFlags,thumb,low,src-alias,
@@ -3872,8 +3873,10 @@ addr,name,mode,confidence,source,notes
 080E98B0,Octopus_OnAttackContact,thumb,low,src-alias,Attack collider callback with an empty implementation
 080E98B4,Ivy_UpdateActiveState_080E98B4,thumb,low,src-alias,
 080E990C,SceneActor_BeginReactionAnimation,thumb,low,src-alias,
+080E99F4,Octopus_UpdateIdleState,thumb,low,src-alias,
 080E99F8,Ivy_ApplyHeldTargetDamage,thumb,low,src-alias,
 080E9B8C,SceneActor_EndReactionAnimation,thumb,low,src-alias,
+080E9C20,Octopus_UpdateCaptureAttack,thumb,low,src-alias,
 080E9F88,SceneActorReaction_PlayEntry17,thumb,low,src-alias,
 080EA064,Octopus_UpdateHold,thumb,low,src-alias,
 080EA410,Octopus_ThrowCapturedTarget,thumb,low,src-alias,
@@ -3883,15 +3886,18 @@ addr,name,mode,confidence,source,notes
 080EADD0,Octopus_UpdateDefeat,thumb,low,src-alias,
 080EB13C,Octopus_SetAnimationRefreshFlag,thumb,low,src-alias,Sets bit 4 in the animation component flags before behavior dispatch
 080EB150,Octopus_UpdateBodyColliderPosition,thumb,low,src-alias,Positions the body collider from the actor position
+080EB168,SceneActorReaction_WaitHiddenForAdjacentTarget,thumb,low,src-alias,
 080EB298,SceneActorReaction_ReacquireAdjacentTarget,thumb,low,src-alias,
 080EB450,SceneActorReaction_AwaitTargetControl,thumb,low,src-alias,
 080EB58C,SceneActorReaction_WaitForAdjacentTarget,thumb,low,src-alias,
 080EB6E4,SceneActorReaction_RestoreAfterControl,thumb,low,src-alias,
 080EB800,Octopus_StartHoldControl,thumb,low,src-alias,
 080EB8B4,Octopus_ClearStateChangedFlag,thumb,low,src-alias,Clears the state change byte at offset 0x2B1 when set
+080EB8CC,Octopus_WaitThenResetPhase,thumb,low,src-alias,
 080EB920,Octopus_EnterThrowPhase,thumb,low,src-alias,
 080EB9C4,Octopus_EnterReleasePhase,thumb,low,src-alias,
 080EBA6C,Octopus_ClearAnimationRestartFlag,thumb,low,src-alias,Clears the pending animation restart byte at offset 0x2B1
+080EBA84,Octopus_WaitLimitThenResetPhase,thumb,low,src-alias,
 080EBAE4,SceneActorReaction_ReturnToIdle,thumb,low,src-alias,
 080EBB84,SceneActorReaction_BeginHiddenCollisionless,thumb,low,src-alias,
 080EBC08,Octopus_InitControlPresets,thumb,low,src-alias,Installs three control preset pointers during Octopus initialization
@@ -3899,6 +3905,7 @@ addr,name,mode,confidence,source,notes
 080EBCF0,Octopus_InitProfileId,thumb,low,src-alias,Finds or adds the default actor profile and stores its identifier
 080EBD0C,SceneActorControl_UpdateMotionPhase_080EBD0C,thumb,low,src-alias,
 080EBE5C,SceneActorCollision_InitCompactBody,thumb,low,src-alias,
+080EBEE0,Octopus_BeginReturnToRoutePoint,thumb,low,src-alias,
 080EBF8C,Octopus_BeginIdleAnimation,thumb,low,src-alias,
 080EC024,SceneActorTarget_FindNearbyPlayer,thumb,low,src-alias,
 080EC0E8,SceneActorReaction_FindAdjacentTarget,thumb,low,src-alias,
@@ -3908,24 +3915,35 @@ addr,name,mode,confidence,source,notes
 080EC364,Octopus_Destroy,thumb,low,src-alias,Destructor callback releases drawable resources and removes collision and registry entries
 080EC3F8,Octopus_Init,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); loader called by Octopus_Create
 080ED2F0,Octopus_Create,thumb,medium,gcl-name,name from GCL key 3F99 オクトパス (Octopus); registry callback
+080ED328,Ivy_OnPrimaryContact,thumb,low,src-alias,
 080ED39C,Ivy_OnSecondaryContact,thumb,low,src-alias,Empty callback installed for the secondary collider during Ivy collision setup
 080ED3A0,Ivy_UpdateActiveState,thumb,low,src-alias,State callback consumes the entry flag and configures collision flags and directional animation 14
 080ED3FC,SceneActorReaction_PlayHiddenCue,thumb,low,src-alias,
+080ED480,Ivy_UpdateInactiveState,thumb,low,src-alias,
+080ED484,Ivy_EnterDisabledState,thumb,low,src-alias,
+080ED4E0,Ivy_UpdateGrabAttack,thumb,low,src-alias,
 080ED838,SceneActorReaction_FinishAnimation17,thumb,low,src-alias,
 080ED914,Ivy_UpdateHold,thumb,low,src-alias,
 080EDEA8,Ivy_BeginRelease,thumb,low,src-alias,
 080EE000,SceneActorControl_UpdateAnimationTransition,thumb,low,src-alias,
+080EE148,Ivy_UpdateRestartFlags,thumb,low,src-alias,
 080EE1B0,Ivy_UpdateDefeat,thumb,low,src-alias,
 080EFC2C,Ivy_SetAuxiliaryColliderFlag,thumb,low,src-alias,Sets bit 4 in the auxiliary collider flags at offset 0x18E
 080EFC40,Ivy_UpdateColliderPosition,thumb,low,src-alias,Synchronizes the main collider with the actor position
 080EFC58,SceneActorControl_WaitForTarget,thumb,low,src-alias,
 080EFD60,SceneActorControl_UpdateTargetApproachPhase,thumb,low,src-alias,
+080EFEA0,Ivy_WaitForHold,thumb,low,src-alias,
 080EFF54,Ivy_ClearAnimationRestartFlag,thumb,low,src-alias,Clears the pending animation restart byte at offset 0x2B1
+080EFF6C,Ivy_WaitThenResetPhase,thumb,low,src-alias,
+080EFFC0,Ivy_WaitThenBeginRelease,thumb,low,src-alias,
+080F0064,Ivy_WaitThenResumeActive,thumb,low,src-alias,
+080F0108,Ivy_WaitLimitThenResetPhase,thumb,low,src-alias,
 080F0164,SceneActorControl_HideAndDisableCollision,thumb,low,src-alias,
 080F01E8,Ivy_UpdateIdle,thumb,low,src-alias,
 080F02F4,Ivy_InitControlPresets,thumb,low,src-alias,Installs three control preset pointers during Ivy initialization
 080F0324,SceneActorControl_BeginSoundTransition,thumb,low,src-alias,
 080F03DC,Ivy_ReleaseCapturedPlayer,thumb,low,src-alias,
+080F05B4,Ivy_NotifyGroup,thumb,low,src-alias,
 080F05CC,Ivy_InitProfileId,thumb,low,src-alias,Finds or adds the default actor profile and stores its identifier
 080F05E8,Ivy_TickDrawable,thumb,low,src-alias,
 080F0738,SceneActor_InitCollision5005,thumb,low,src-alias,
@@ -3946,6 +3964,9 @@ addr,name,mode,confidence,source,notes
 080F1E84,ColorPulse_FadeRed,thumb,low,src-alias,
 080F1F08,ColorPulse_FinishRedFade,thumb,low,src-alias,
 080F1FBC,Ivy_WaitForColorRelease,thumb,low,src-alias,Waits for the color hold flag to clear before restoring the transition callback
+080F1FE8,ColorPulse_UnpackColor,thumb,low,src-alias,
+080F2028,Armor_PlacePrimaryCollider,thumb,low,src-alias,
+080F20AC,Armor_UpdateOrbitingColliders,thumb,low,src-alias,
 080F2260,Armor_UpdatePartColliders_080F2260,thumb,low,src-alias,
 080F231C,Ivy_OnDestroy,thumb,low,src-alias,Empty lifecycle callback installed by the Ivy initializer; destruction role tentative
 080F2320,ColorPulse_ApplyContact,thumb,low,src-alias,
@@ -3953,6 +3974,7 @@ addr,name,mode,confidence,source,notes
 080F2480,Ivy_UpdateBobbing,thumb,low,src-alias,Periodically adjusts vertical velocity and reverses acceleration to produce bobbing
 080F24D8,Ivy_UpdateGroundHeight,thumb,low,src-alias,Refreshes cached terrain height at the object position after its initial frames
 080F2508,Ivy_WaitForRetarget,thumb,low,src-alias,Counts down before switching to the callback that samples the target position
+080F2538,Ivy_UpdateAnchorApproach,thumb,low,src-alias,
 080F26B0,Ivy_WaitForPrimaryActionCompletion,thumb,low,src-alias,Advances after the primary action callback reports completion twice
 080F2700,ColorPulse_PrepareTargetDash,thumb,low,src-alias,
 080F2858,ColorPulse_AlignTargetHeading,thumb,low,src-alias,
@@ -3983,11 +4005,15 @@ addr,name,mode,confidence,source,notes
 080F3CC4,ChildGroup_UpdateOrbitingMembers,thumb,low,src-alias,
 080F3F48,ChildGroup_UpdateLandingState,thumb,low,src-alias,
 080F40C8,ChildGroup_UpdateAlternatingCallbacks,thumb,low,src-alias,
+080F421C,Ivy_UpdateDefeatBurst,thumb,low,src-alias,
+080F469C,Ivy_OnUpdateIdle,thumb,low,src-alias,
 080F46A0,Ivy_UpdateActions,thumb,low,src-alias,Dispatches the primary and optional secondary action callbacks then refreshes ground height
 080F46D8,Ivy_DispatchState,thumb,low,src-alias,Invokes the state-indexed callback unless flag 0x10 suppresses dispatch
 080F4704,Ivy_OnChildDestroy,thumb,low,src-alias,Empty lifecycle callback installed during Ivy setup; child destruction role tentative
+080F4708,Ivy_OnChildContact,thumb,low,src-alias,
 080F49BC,Ivy_UpdateChildBobbing,thumb,low,src-alias,Applies alternating vertical acceleration to the smaller child object layout
 080F4A0C,Ivy_BeginChildPulse,thumb,low,src-alias,Initializes two changing visual parameters and their rates then installs the pulse callback and plays a sound
+080F4A4C,Ivy_ApproachChildBlend,thumb,low,src-alias,
 080F4AB4,ActorPhase_ApproachNeutral,thumb,low,src-alias,
 080F4B54,Ivy_BeginChildRandomDelay,thumb,low,src-alias,Selects a delay of 30 or 94 from the random table and installs the next child callback
 080F4B94,ActorPhase_OrbitParent,thumb,low,src-alias,
@@ -4052,6 +4078,7 @@ addr,name,mode,confidence,source,notes
 080F8FFC,Axe_UpdateTargetLunge,thumb,low,src-alias,
 080F92AC,SceneActorControl_ResetRotation,thumb,low,src-alias,
 080F9374,Axe_OnAnimationReset,thumb,low,src-alias,Callback consumes the pending flag at offset 0x2B2 and selects animation profile entry 1
+080F93A4,Axe_BeginProfileEntry,thumb,low,src-alias,
 080F93E0,Axe_UpdateTurnAnimation,thumb,low,src-alias,
 080F9694,Axe_UpdateWaitingAnimation,thumb,low,src-alias,
 080F97E4,Axe_ConvergeRecoveryMotion,thumb,low,src-alias,
@@ -4069,6 +4096,7 @@ addr,name,mode,confidence,source,notes
 080FA830,Axe_InitColliders,thumb,low,src-alias,
 080FAA1C,Axe_GetActorCategory,thumb,low,src-alias,Actor callback returning constant category four; category meaning is tentative
 080FAA20,Axe_SetMovementEndpoints,thumb,low,src-alias,Copies current and target positions into movement state and clears its timer
+080FAA5C,Axe_StepCurveMotion,thumb,low,src-alias,
 080FAC14,Axe_InitProfile,thumb,low,src-alias,Finds or adds profile zero for the actor type and stores its handle
 080FAC30,SceneActorControl_InitializeHoverState,thumb,low,src-alias,
 080FACFC,Axe_ResetMovementFlags,thumb,low,src-alias,Sets an actor control flag and clears movement-related flags; interpretation is tentative
@@ -4084,6 +4112,9 @@ addr,name,mode,confidence,source,notes
 080FB248,Axe_IsRoutePointRecent,thumb,low,src-alias,Tests whether a route point index appears in the three-entry history
 080FB27C,SceneActorControl_CanAdvanceHover,thumb,low,src-alias,
 080FB308,Axe_OnReaction,thumb,low,src-alias,Empty actor reaction callback; precise event interpretation is tentative
+080FB30C,Axe_UpdateAttackFlashFade,thumb,low,src-alias,
+080FB4EC,Axe_UpdatePaletteFade,thumb,low,src-alias,
+080FB620,Axe_BeginPaletteTransition,thumb,low,src-alias,
 080FB744,Axe_UpdatePaletteTransition,thumb,low,src-alias,Advances palette interpolation and binds the current palette when permitted by actor flags.
 080FB8E8,Axe_InitEffectPalettes,thumb,low,src-alias,
 080FB938,Axe_SetAuxiliarySpriteResource,thumb,low,src-alias,Assigns the same resource pointer to all four auxiliary sprites
@@ -4094,6 +4125,8 @@ addr,name,mode,confidence,source,notes
 080FBEDC,Axe_TickAuxiliarySpriteTimers,thumb,low,src-alias,Counts down each auxiliary sprite timer and sets bit 0 of its flags when it expires
 080FBF20,Axe_RemoveAuxiliarySprites,thumb,low,src-alias,Removes each active sprite in the four-entry auxiliary sprite array
 080FBF4C,ActorPhase_SelectDistantWaypoint,thumb,low,src-alias,
+080FC094,Axe_SpawnHeadingBurst,thumb,low,src-alias,
+080FC1F8,Axe_SpawnSparks,thumb,low,src-alias,
 080FC3F8,Axe_UpdateScreenShake,thumb,low,src-alias,Requests a screen effect while its countdown remains active; shake interpretation is tentative
 080FC43C,ActorPhase_UpdateReverseFlickerTimer,thumb,low,src-alias,
 080FC498,ActorPhase_UpdateFlicker,thumb,low,src-alias,
@@ -4106,6 +4139,7 @@ addr,name,mode,confidence,source,notes
 080FC998,Axe_UpdateTrailColliders,thumb,low,src-alias,
 080FCB3C,Axe_RemoveSecondaryColliders,thumb,low,src-alias,Removes two colliders from the axe auxiliary data
 080FCB64,Axe_UpdateBodyColliders,thumb,low,src-alias,Gate three body/attack collider pairs and rotate their positions along the Axe actor.
+080FCDEC,Axe_FireAttack,thumb,low,src-alias,
 080FD04C,ActorGroup_ReadScriptOptions,thumb,low,src-alias,
 080FD10C,Axe_PrepareUpdate,thumb,low,src-alias,Runs three preparation helpers before the axe state callback
 080FD128,Axe_UpdateEffects,thumb,low,src-alias,Runs six effect and timer helpers after the axe state callback; grouping is provisional

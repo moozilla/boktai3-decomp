@@ -10,8 +10,11 @@ in the later file: if the later file still matches (tools/check.py), the copy is
 and the merge keeps one helper. Otherwise the later file's helper is renamed after the
 function that uses it (`SetControl` in Spider_SelectRecoveryRoute becomes
 `SetControl_SelectRecoveryRoute`), so the two can sit in one unit; a later cleanup can
-still unify them. It repeats until merge_unit.py reports no conflicts, and prints what it
-did for the log.
+still unify them. A prototype that disagrees with the definition takes the header's or the
+definition's signature (with forward declarations of the definition's struct tags), or a
+variant; failing those, the definition takes the callers' signature and keeps its own
+parameter types in locals. Each choice must leave every input matching and, with --out, the
+merged unit compiling. It prints what it did for the log; UNSETTLED lines need a hand edit.
 """
 import argparse
 import csv
@@ -63,6 +66,8 @@ def rename(text, k, new):
     if kind == "type" and " " in name:  # struct/union/enum tag
         tag = name.split()[1]
         return re.sub(r"\b(struct|union|enum)(\s+)%s\b" % re.escape(tag), r"\1\2" + new, text)
+    if kind == "static":  # a function: its definition and calls, not a member of that name
+        return re.sub(r"(?<![\w.>])%s(?=\s*\()" % re.escape(name), new, text)
     return re.sub(r"(?<![\w.>])%s\b" % re.escape(name), new, text)
 
 
@@ -97,7 +102,12 @@ def settle_declaration(paths, k, dry_run, out=None):
                 if item not in variants:
                     variants.append(item)
     own = signature(paths, k[1])
-    candidates = header_declarations(k[1]) + ([own] if own else []) + variants
+    forward = None
+    if own and re.search(r"\b(struct|union)\s+\w+", own):
+        # the definition's own types, declared ahead so a prototype earlier in the unit agrees
+        tags = dict.fromkeys(re.findall(r"\b((?:struct|union)\s+\w+)", own))
+        forward = "".join(f"{tag};\n" for tag in tags) + own
+    candidates = header_declarations(k[1]) + ([own] if own else []) + ([forward] if forward else []) + variants
     candidates = list(dict.fromkeys(candidates))
     if dry_run:
         return f"{k[1]}: {len(variants)} declarations in {len(users)} files"
@@ -111,7 +121,70 @@ def settle_declaration(paths, k, dry_run, out=None):
             return f"{k[1]}: one declaration in {len(users)} files: {' '.join(cand.split())}"
     for p, text in saved.items():
         open(os.path.join(ROOT, p), "w").write(text)
+    for v in variants:
+        line = adapt_definition(paths, k[1], v, users, saved, out)
+        if line:
+            return line
     return f"{k[1]}: UNSETTLED declaration ({len(variants)} variants, none matches in every file)"
+
+
+def split_params(params):
+    out, depth, cur = [], 0, ""
+    for ch in params:
+        depth += ch in "(["
+        depth -= ch in ")]"
+        if ch == "," and depth == 0:
+            out.append(cur.strip())
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        out.append(cur.strip())
+    return out
+
+
+def adapt_definition(paths, name, variant, users, saved, out):
+    """Give the definition the callers' signature: its parameters keep their names inside the
+    body through a local of the old type. Kept only if the definition and every caller match."""
+    m = re.match(r"\s*(.*?)\b%s\s*\((.*)\)\s*;\s*$" % re.escape(name), mu._NONCODE.sub(" ", variant), re.S)
+    if not m:
+        return None
+    vret, vparams = m.group(1).strip(), split_params(m.group(2))
+    for path in paths:
+        text = open(os.path.join(ROOT, path)).read()
+        dm = re.search(r"^([A-Za-z_][^;{}()]*?)\b%s\s*\(([^)]*)\)\s*\{\n" % re.escape(name), text, re.M)
+        if not dm or dm.group(1).lstrip().startswith("static"):
+            continue
+        dparams = split_params(dm.group(2))
+        if len(dparams) != len(vparams) or dparams == ["void"]:
+            return None
+        header, locals_ = [], []
+        for dp, vp in zip(dparams, vparams):
+            dn = re.search(r"(\w+)\s*$", dp).group(1)
+            vtype = re.sub(r"\b\w+\s*$", "", vp).strip() if re.search(r"[\w\*]\s+\w+\s*$|\*\s*\w+\s*$", vp) else vp
+            dtype = dp[: dp.rfind(dn)].strip()
+            if " ".join(vtype.split()) == " ".join(dtype.split()):
+                header.append(dp)
+                continue
+            header.append(f"{vtype}{'' if vtype.endswith('*') else ' '}{dn}In")
+            locals_.append(f"    {dtype}{'' if dtype.endswith('*') else ' '}{dn} = ({dtype}){dn}In;\n")
+        new_head = f"{vret} {name}({', '.join(header)})\n{{\n" + "".join(locals_)
+        adapted = text[: dm.start()] + new_head + text[dm.end():]
+        for p, s in saved.items():
+            for v in set(users[p]):
+                s = s.replace(v, variant)
+            open(os.path.join(ROOT, p), "w").write(s)
+        own_text = open(os.path.join(ROOT, path)).read() if path in saved else text
+        open(os.path.join(ROOT, path), "w").write(own_text[: own_text.find(dm.group(0))] + new_head
+                                                   + own_text[own_text.find(dm.group(0)) + len(dm.group(0)):])
+        files = set(users) | {path}
+        if all(matches(p) for p in files) and (out is None or name not in probe(paths, out)[0]):
+            return f"{name}: definition takes the callers' signature: {' '.join(variant.split())}"
+        for p, s in saved.items():
+            open(os.path.join(ROOT, p), "w").write(s)
+        open(os.path.join(ROOT, path), "w").write(text)
+        return None
+    return None
 
 
 def resolve(paths, dry_run=False):

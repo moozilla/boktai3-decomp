@@ -27,7 +27,7 @@ static inline u32 SceneActorCollision_ReadBodyField34(struct ChaseActor *actor)
     const u16 *field = (void *)((u8 *)actor + 0xa4);
     return *field;
 }
-void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 /* GNU trailing-storage views avoid imposing a four-entry index bound. The
  * selected entries must lie in initialized storage in the actual actor object. */
 static inline u16 SceneActorCollision_ReadAttackField3C(struct ChaseActor *actor, u32 index)
