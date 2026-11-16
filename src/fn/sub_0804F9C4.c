@@ -1,82 +1,49 @@
-// MATCHING_CONCESSION: register-pinning
 #include "repeated_effect.h"
 #include "engine_globals.h"
 void Sound_PlaySong(s32);
 void AnimatedParticles_EmitChargeSparkle(u32, u32, u32, u32, struct RepeatedEffectPosition *);
+static inline u32 RepeatedEffect_OffsetCoordinate(u16 value, const u8 *sample)
+{
+    s32 base = value - 127;
+    return base + *sample;
+}
+/* Adds two consecutive random-table bytes, centered on zero, to position.x and position.z. */
+#define REPEATED_EFFECT_SCATTER_POSITION(position)                    \
+    {                                                                  \
+        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;             \
+        u32 index = gRandomIndex;                                      \
+        const u8 *sampleX;                                             \
+        const u8 *sampleZ;                                             \
+        index++;                                                       \
+        index &= 1023;                                                 \
+        sampleX = (const u8 *)&table[index];                           \
+        (position).x = RepeatedEffect_OffsetCoordinate((position).x, sampleX); \
+        index++;                                                       \
+        index &= 1023;                                                 \
+        gRandomIndex = index;                                          \
+        sampleZ = (const u8 *)&table[index];                           \
+        (position).z = RepeatedEffect_OffsetCoordinate((position).z, sampleZ); \
+    }
 void RepeatedEffect_TickUpperTransition(struct RepeatedEffect *effect)
 {
-    u16 *frame = &effect->stateFrame;
-    register u32 value asm("r0");
-    if (!*frame)
+    if (!effect->stateFrame)
         Sound_PlaySong(0x15C);
-    value = *frame + 1;
-    *frame = value;
-
-    value = (u16)value;
-    if (value <= 7) {
+    effect->stateFrame++;
+    if (effect->stateFrame <= 7) {
         struct RepeatedEffectPosition position;
         effect->sprite.frame = 6;
-        if (!(*frame & 3)) {
+        if (!(effect->stateFrame & 3)) {
             position = effect->sprite.position;
-            {
-                u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-                u32 *rng = &gRandomIndex;
-                register u32 index asm("r2") = *rng + 1;
-                u32 mask = 1023;
-                u8 *sample;
-                register u32 x asm("r1");
-                register u32 z asm("r0");
-                index &= mask;
-                sample = (u8 *)(index * 2 + (u32)random);
-                x = (u16)position.x;
-                x -= 127;
-                x += *sample;
-                position.x = x;
-                index = (index + 1) & mask;
-                *rng = index;
-                {
-                    u8 *sampleZ = (u8 *)(index * 2 + (u32)random);
-                    z = (u16)position.z;
-                    z -= 127;
-                    z += *sampleZ;
-                    position.z = z;
-                }
-            }
+            REPEATED_EFFECT_SCATTER_POSITION(position);
             AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
-    } else if (value <= 15) {
+    } else if (effect->stateFrame <= 15) {
         struct RepeatedEffectPosition position;
         effect->sprite.frame = 7;
-        value = *frame + 1;
-        *frame = value;
-
-        value &= 3;
-        if (!value) {
+        effect->stateFrame++;
+        if (!(effect->stateFrame & 3)) {
             position = effect->sprite.position;
-            {
-                u16 *random = (u16 *)RANDOM_TABLE_ADDR;
-                u32 *rng = &gRandomIndex;
-                register u32 index asm("r2") = *rng + 1;
-                u32 mask = 1023;
-                u8 *sample;
-                register u32 x asm("r1");
-                register u32 z asm("r0");
-                index &= mask;
-                sample = (u8 *)(index * 2 + (u32)random);
-                x = (u16)position.x;
-                x -= 127;
-                x += *sample;
-                position.x = x;
-                index = (index + 1) & mask;
-                *rng = index;
-                {
-                    u8 *sampleZ = (u8 *)(index * 2 + (u32)random);
-                    z = (u16)position.z;
-                    z -= 127;
-                    z += *sampleZ;
-                    position.z = z;
-                }
-            }
+            REPEATED_EFFECT_SCATTER_POSITION(position);
             AnimatedParticles_EmitChargeSparkle(1, 0, 1, 64, &position);
         }
     } else {
