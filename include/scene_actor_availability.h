@@ -14,7 +14,8 @@ static inline u8 SceneActor_ActionsBlocked(const struct ChaseActor *actor)
     if (!actor)
         return 0;
     if (SceneActor_MaskedHalfword(0x40, &actor->base.motionFlags) ||
-        SceneActor_MaskedWord(0x20000, &actor->base.statusFlags) || actor->base.health <= 0)
+        SceneActor_MaskedWord(ROOM_ACTOR_STATUS_INACTIVE, &actor->base.statusFlags) ||
+        actor->base.health <= 0)
         return 1;
     return 0;
 }

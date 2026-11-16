@@ -156,7 +156,7 @@ static inline void ActorStatus_ClearMotionFlags(struct ChaseActor *actor, u32 bi
 
 static inline void ActorStatus_ReleaseContact(struct ChaseActor *actor)
 {
-    u32 flag = 0x1000;
+    u32 flag = ROOM_ACTOR_MOTION_HOLDS_CONTACT;
     if (actor->base.motionFlags & flag) {
         SceneActorContacts_ReleaseNode(actor->group.contactNode);
         actor->base.motionFlags &= ~flag;
@@ -167,7 +167,7 @@ static inline void ActorStatus_ReleaseContact(struct ChaseActor *actor)
 static inline void ActorStatus_ClearInteraction(struct ChaseActor *actor,
                                                 struct SceneActorRegistryControl *control)
 {
-    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000000);
+    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, ROOM_ACTOR_STATUS_INTERACTING);
     ActorStatus_ClearMotionFlags(actor, 0x200);
     control->mode = 0;
     control->counter = 0;
@@ -267,7 +267,7 @@ static inline void ActorStatus_Palette(struct ChaseActor *actor)
         }
         if ((ActorStatus_BehaviorFlags(actor, 0x2000000)) ||
             (ActorStatus_HasStatusFlags(actor, 0x40))) {
-            if (ActorStatus_HasStatusFlags(actor, 0x4000))
+            if (ActorStatus_HasStatusFlags(actor, ROOM_ACTOR_STATUS_ALTERNATE_PALETTE))
                 ActorStatus_SetPalette(actor, actor->base.alternatePalette);
             else
                 ActorStatus_SetPalette(actor, actor->base.alternateOffset);
@@ -290,13 +290,13 @@ static inline void ActorStatus_Palette(struct ChaseActor *actor)
                     phase = -((-blinkRemaining) >> 2);
                 if (phase & 1) {
                     ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
-                } else if (ActorStatus_HasStatusFlags(actor, 0x4000)) {
+                } else if (ActorStatus_HasStatusFlags(actor, ROOM_ACTOR_STATUS_ALTERNATE_PALETTE)) {
                     ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                 } else {
                     ActorStatus_SetPalette(actor, actor->base.alternateOffset);
                 }
             } else {
-                if (ActorStatus_HasStatusFlags(actor, 0x4000))
+                if (ActorStatus_HasStatusFlags(actor, ROOM_ACTOR_STATUS_ALTERNATE_PALETTE))
                     ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                 else
                     ActorStatus_SetPalette(actor, actor->base.alternateOffset);
@@ -306,7 +306,8 @@ static inline void ActorStatus_Palette(struct ChaseActor *actor)
             ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
             *pTmr = 0;
             SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000000);
-            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x4000);
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags,
+                                           ROOM_ACTOR_STATUS_ALTERNATE_PALETTE);
         }
     } else if (ActorStatus_HasStatusFlags(actor, 0xC0)) {
         if (ActorStatus_HasStatusFlags(actor, 0x100)) {
@@ -332,7 +333,8 @@ static inline void ActorStatus_Palette(struct ChaseActor *actor)
                         phase = -((-recoveryRemaining) >> 2);
                     if (phase & 1) {
                         ActorStatus_SetPalette(actor, ActorStatus_DefaultPalette(actor));
-                    } else if (ActorStatus_HasStatusFlags(actor, 0x4000)) {
+                    } else if (ActorStatus_HasStatusFlags(actor,
+                                                          ROOM_ACTOR_STATUS_ALTERNATE_PALETTE)) {
                         ActorStatus_SetPalette(actor, actor->base.alternatePalette);
                     } else {
                         ActorStatus_SetPalette(actor, actor->base.alternateOffset);

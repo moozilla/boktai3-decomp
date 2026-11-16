@@ -5,6 +5,18 @@
 #include "contact_collider.h"
 #include "scene_actor_components.h"
 
+/* Bits of RoomActor.statusFlags whose meaning reads the same in every class. */
+enum RoomActorStatusFlag {
+    ROOM_ACTOR_STATUS_ALTERNATE_PALETTE = 0x4000, /* draw with alternatePalette */
+    ROOM_ACTOR_STATUS_INACTIVE = 0x20000,         /* takes no actions (SceneActor_ActionsBlocked) */
+    ROOM_ACTOR_STATUS_INTERACTING = 0x1000000,    /* in an interaction with the player */
+};
+
+/* Bits of RoomActor.motionFlags. */
+enum RoomActorMotionFlag {
+    ROOM_ACTOR_MOTION_HOLDS_CONTACT = 0x1000, /* group.contactNode is held and must be released */
+};
+
 /*
  * The object every scene-actor registry entry allocates: the room's enemies (the props,
  * such as crates and floor switches, are pool slots of their own managers). Each class
