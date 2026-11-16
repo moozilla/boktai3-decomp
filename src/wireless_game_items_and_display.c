@@ -1076,7 +1076,6 @@ ok:
     return p;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
 {
     struct WirelessGameItems *owner = gWirelessGameItems;
@@ -1106,29 +1105,37 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
                 current->timer = zero;
             }
             {
-                register int value asm("r0") = count;
+                int value = count;
                 int clear;
+                u8 *slot;
                 if (value > 10)
                     value = 10;
                 else if (value < 0)
                     value = 0;
+                /* What is left for the queued slot: nothing, as the sum is never negative. */
                 clear = 0;
-                current->count = value;
-                value = 0;
-                current->pendingFlag = value;
+                if (count < 0)
+                    clear = count;
+                slot = &current->count;
+                *slot = value;
+                current->pendingFlag = 0;
                 target->count = clear;
             }
         }
-        if (amount > 10)
-            amount = 10;
-        else if (amount < 0)
-            amount = 0;
         {
-            int zero = 0;
-            register int flag asm("r0");
-            target->count = amount;
-            flag = 0;
-            target->pendingFlag = flag;
+            int zero;
+            u8 *slot;
+            if (amount > 10) {
+                amount = 10;
+                zero = 0;
+            } else {
+                if (amount < 0)
+                    amount = 0;
+                zero = 0;
+            }
+            slot = &target->count;
+            *slot = amount;
+            target->pendingFlag = 0;
             target->state = 3;
             target->entered = 1;
             target->timer = zero;
