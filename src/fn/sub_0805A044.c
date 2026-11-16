@@ -1,16 +1,22 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_panel_rig.h"
+
 static inline s32 scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
+
 static inline s32 scale24(s32 value)
 {
     return value >= 0 ? value >> 24 : -((-value) >> 24);
 }
+
+// Turns the rig toward the selected subject's angle and eases its distance,
+// then places it on that circle with a small sway; arriving plays a sound and
+// moves on to state 5.
 void ScenePanelRig_TickApproachSubject(struct ScenePanelRig *rig)
 {
     s32 targetAngle;
+    // The target distance and then the sine table share one register.
     union {
         s32 distance;
         const s16 *table;
@@ -18,9 +24,10 @@ void ScenePanelRig_TickApproachSubject(struct ScenePanelRig *rig)
     s32 difference;
     s32 distanceDifference;
     u32 angle;
-    s32 value, wave;
-    register s32 x;
-    s32 z;
+    s32 value, wave, sway;
+    void *address;
+    s32 x, z;
+
     if (rig->selectedSubject == 0) {
         targetAngle = 1920;
         work.distance = 480;
@@ -71,32 +78,32 @@ void ScenePanelRig_TickApproachSubject(struct ScenePanelRig *rig)
     x = scale12(value);
     wave = work.table[(rig->motionFlag + 64) & 255];
     value = (work.table[(angle + 64) & 255] << 5) * wave;
+    if (value >= 0)
+        wave = value >> 24;
+    else
+        wave = -((-value) >> 24);
     {
-        register s32 modulation asm("r2") = scale24(value);
         u32 position;
-        asm("" : "+r"(modulation));
         position = (u16)rig->origin.x + x;
-        position += modulation;
+        position += wave;
         rig->position.x = position;
     }
     {
         u32 radius;
-        u16 *address;
         address = &rig->distance;
-        radius = *address;
+        radius = *(u16 *)address;
         value = work.table[angle & 255] * radius;
     }
     z = scale12(value);
-    wave = work.table[(rig->motionFlag + 64) & 255];
+    sway = work.table[(rig->motionFlag + 64) & 255];
     angle &= 255;
+    // `address` is reused here; sharing it with the distance read keeps the
+    // table's register preference away from the sway result.
+    address = (void *)(angle * 2 + (u32)work.table);
+    value = (*(s16 *)address << 5) * sway;
     {
-        const s16 *address = (void *)(angle * 2 + (u32)work.table);
-        value = (*address << 5) * wave;
-    }
-    {
-        register s32 modulation asm("r1") = scale24(value);
+        s32 modulation = scale24(value);
         u32 position;
-        asm("" : "+r"(modulation));
         position = (u16)rig->origin.z + z;
         position += modulation;
         rig->position.z = position;
