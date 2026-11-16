@@ -88,7 +88,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = (u16)Script_GetKeywordValue(0x46, 0);
+    arg0->base.script1F0 = (u16)Script_GetKeywordValue(0x46, 0);
     arg0->base.field1EC = (u16)Script_GetKeywordValue(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
@@ -205,7 +205,7 @@ static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
         Path_GetPointPositionById(&point, MonsterInit_RouteId(route),
                                   MonsterInit_RoutePointId(route));
         actor->base.terrainCell = MonsterInit_CellIndex(&point);
-        point.y = actor->base.groundHeight2BE =
+        point.y = actor->base.groundHeight =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &point);
         MonsterInit_BeginRoute(&actor->base.body, route);
         return 1;
@@ -229,7 +229,7 @@ static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *l
         actor->base.terrainCell = MonsterInit_CellIndex(&actor->base.body.position);
         ground = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
                                            &actor->base.body.position);
-        actor->base.groundHeight2BE = ground;
+        actor->base.groundHeight = ground;
         lun->ground3DC = ground;
         MonsterInit_DrawablePosition(actor);
     }

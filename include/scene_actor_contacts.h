@@ -7,7 +7,7 @@ struct SceneActorContactNode {
     void *object;
     u8 flags, kind;
     u16 cooldown;
-    struct SceneActorRegistryActor *owner;
+    struct ChaseActor *owner;
     struct SceneActorContactNode *next;
 };
 struct SceneActorContactManager {
@@ -24,9 +24,8 @@ void SceneActorScript_DispatchKindPayload(void *);
 void SceneActorContacts_ResetList(void);
 u8 SceneActorContacts_CanSelectNode(struct SceneActorContactNode *);
 void SceneActorContacts_ReleaseInvalidOwners(void);
-u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *, struct SceneActorRegistryActor *, s32 *);
-struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *,
-                                                                u32);
+u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *, struct ChaseActor *, s32 *);
+struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActor *, u32);
 void SceneActorContacts_TickCooldowns(void);
 u32 SceneActorContacts_Update(struct SceneActorContactManager *);
 struct SceneActorContactManager *SceneActorContacts_Destroy(struct SceneActorContactManager *);

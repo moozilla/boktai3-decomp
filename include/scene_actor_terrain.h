@@ -2,6 +2,7 @@
 #define GUARD_SCENE_ACTOR_TERRAIN_H
 #include "engine.h"
 #include "contact_actor.h"
+#include "room_actor.h"
 /* Narrow terrain/query phase of the registered actor. */
 struct SceneActorTerrainView {
     u8 unknown0[0x59];
@@ -69,18 +70,5 @@ static inline void SceneActorTerrain_Subtract(struct ContactPosition *out,
     out->z = a->z - b->z;
 }
 /* Collision-control prefix used by the adjacent reset/disable helpers. */
-struct SceneActorTerrainCollisionView {
-    void *object, *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x8F];
-    u8 category;
-    u8 unknown99[0x9B];
-    struct ContactCollider collider;
-    u8 unknown188[0x144];
-    u32 flags2CC, flags2D0;
-    u16 flags2D4, flags2D6;
-    u8 unknown2D8[0xC];
-    u16 field2E4, field2E6;
-};
-void SceneActorTerrain_ClearCollisionTimers(struct SceneActorTerrainCollisionView *);
+void SceneActorTerrain_ClearCollisionTimers(struct RoomActor *);
 #endif

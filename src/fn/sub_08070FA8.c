@@ -6,10 +6,10 @@
 #include "game_state.h"
 void Heap_Free(void *);
 
-static inline u8 RemovalRequested(struct SceneActorRegistryActor *p)
+static inline u8 RemovalRequested(struct ChaseActor *p)
 {
     u32 mask = 0x1000;
-    if (mask & p->flags2D6)
+    if (mask & p->base.flags2D6)
         return 1;
     return 0;
 }
@@ -28,9 +28,9 @@ static inline struct GameState *RegistryCurrentGame(void)
     return game;
 }
 
-static inline u8 CurrentRegion(struct SceneActorRegistryActor *p)
+static inline u8 CurrentRegion(struct ChaseActor *p)
 {
-    u16 region = p->regionId;
+    u16 region = p->base.regionId;
     if (RegistryCurrentGame()->region == region)
         return 1;
     return 0;
@@ -57,7 +57,7 @@ static inline u32 NextParticleSample(const u16 *table)
     gRandomIndex = index;
     return table[index];
 }
-static inline void UpdateActors_SpawnContactParts(struct SceneActorRegistryActor *actor)
+static inline void UpdateActors_SpawnContactParts(struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
     u32 horizontalMask = 15;
@@ -74,19 +74,19 @@ static inline void UpdateActors_SpawnContactParts(struct SceneActorRegistryActor
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
-        position.packed.x = actor->effectOrigin->x;
-        position.packed.y = actor->effectOrigin->y + 128;
-        position.packed.z = actor->effectOrigin->z;
-        EffectGroup_SpawnPart((void *)actor->effectConfig, 3, &position.position,
+        position.packed.x = actor->group.effectOrigin->x;
+        position.packed.y = actor->group.effectOrigin->y + 128;
+        position.packed.z = actor->group.effectOrigin->z;
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->fieldAA = 0;
-    actor->field2B8 = 0;
+    actor->base.fieldAA = 0;
+    actor->base.field2B8 = 0;
 }
 
-static inline u32 ReadFlags2CC(struct SceneActorRegistryActor *p, u32 mask)
+static inline u32 ReadFlags2CC(struct ChaseActor *p, u32 mask)
 {
-    return p->flags2CC & mask;
+    return p->base.flags2CC & mask;
 }
 struct UpdateActorsTile {
     u8 unknown0[8];
@@ -104,33 +104,33 @@ static inline void ClearTileFlags(struct UpdateActorsTile *tile, u32 bits)
     u32 keep = ~bits;
     tile->flags &= keep;
 }
-static inline void ClearDrawableFlags(struct SceneActorRegistryActor *actor, u32 bits)
+static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
-    if (actor->drawableKind == 0)
-        ClearWordFlags(&((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->flags,
+    if (actor->base.drawableKind == 0)
+        ClearWordFlags(&((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags,
                        bits);
     else {
-        struct UpdateActorsTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct UpdateActorsTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         ClearTileFlags(tile, bits);
     }
 }
-static inline void ClearField2B8(struct SceneActorRegistryActor *p)
+static inline void ClearField2B8(struct ChaseActor *p)
 {
-    p->field2B8 = 0;
+    p->base.field2B8 = 0;
 }
-static inline void SetFlags2CC(struct SceneActorRegistryActor *p, u32 bits)
+static inline void SetFlags2CC(struct ChaseActor *p, u32 bits)
 {
-    p->flags2CC |= bits;
+    p->base.flags2CC |= bits;
 }
-static inline u8 ActorCategory(struct SceneActorRegistryActor *p)
+static inline u8 ActorCategory(struct ChaseActor *p)
 {
-    return p->category;
+    return p->base.category;
 }
 
-static inline u32 DefaultPalette(struct SceneActorRegistryActor *actor)
+static inline u32 DefaultPalette(struct ChaseActor *actor)
 {
-    u16 *base = &actor->basePaletteBank;
-    u16 *offset = &actor->paletteOffset;
+    u16 *base = &actor->base.basePaletteBank;
+    u16 *offset = &actor->base.paletteOffset;
     return *base + *offset;
 }
 
@@ -145,31 +145,31 @@ static inline u8 MotionFlagSet(const u16 *flags, u32 mask)
         found = 1;
     return found;
 }
-static inline u8 MissingObject(struct SceneActorRegistryActor *p)
+static inline u8 MissingObject(struct ChaseActor *p)
 {
-    if (!p->object)
+    if (!p->base.object)
         return 1;
     return 0;
 }
 
-static inline u32 ReadActorStateFlags(struct SceneActorRegistryActor *p, u32 mask)
+static inline u32 ReadActorStateFlags(struct ChaseActor *p, u32 mask)
 {
-    return p->flags2D0 & mask;
+    return p->base.flags2D0 & mask;
 }
-static inline u8 ActorUnavailable(struct SceneActorRegistryActor *p, u16 *flags)
+static inline u8 ActorUnavailable(struct ChaseActor *p, u16 *flags)
 {
     u32 mask = 0x40;
     if (p) {
         if ((mask & *flags) || SceneActorPlacement_ReadFlags32((void *)p, 0x20000) ||
-            p->health <= 0)
+            p->base.health <= 0)
             return 1;
     }
     return 0;
 }
 
-static inline u32 *StateAddress(struct SceneActorRegistryActor *p)
+static inline u32 *StateAddress(struct ChaseActor *p)
 {
-    return &p->flags2D0;
+    return &p->base.flags2D0;
 }
 
 static inline u32 ClearMaskedValue(u32 flags, u32 bits)
@@ -196,7 +196,7 @@ union RegistryFlagField {
 void SceneActorRegistry_UpdateActors(struct SceneActorRegistryManager *manager)
 {
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     void *draw;
     u32 category;
     u32 partMask = 0x2000;
@@ -211,36 +211,37 @@ next:
     if (RemovalRequested(actor)) {
         void *context;
         node = node->next;
-        context = actor->context;
-        Callback_InvokeActor(context, actor->destroy);
+        context = actor->base.context;
+        Callback_InvokeActor(context, actor->base.destroyCallback);
         Heap_Free(context);
         actor = node->actor;
         goto next;
     }
     {
-        s32 (**update)(void *) = &actor->update;
-        void *context = actor->context;
+        s32 (**update)(void *) = &actor->base.updateCallback;
+        void *context = actor->base.context;
         u8 missing, paused;
         Callback_InvokeActor(context, *update);
         missing = MissingObject(actor);
-        motion = &actor->flags2D4;
+        motion = &actor->base.flags2D4;
         if (missing)
             goto palette;
         paused = UpdatesPaused();
-        motion = &actor->flags2D4;
+        motion = &actor->base.flags2D4;
         if (paused)
             goto palette;
         flagField = (void *)motion;
         if (!MotionFlagSet(&flagField->halfword, 0x4000) && !ReadActorStateFlags(actor, 8) &&
-            actor->enabled && !ReadFlags2CC(actor, 2) && (RegistryCurrentGame()->flags868 & 2) &&
-            CurrentRegion(actor) && !ActorUnavailable(actor, motion) &&
-            RegistryCurrentGame()->unk876 > 0 && !PlayerActionPending()) {
-            actor->field178 = 0;
+            actor->base.enabled && !ReadFlags2CC(actor, 2) &&
+            (RegistryCurrentGame()->flags868 & 2) && CurrentRegion(actor) &&
+            !ActorUnavailable(actor, motion) && RegistryCurrentGame()->unk876 > 0 &&
+            !PlayerActionPending()) {
+            actor->base.colliderA.responseValue = 0;
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
             {
                 s16 zero = 0;
-                actor->health = zero;
+                actor->base.health = zero;
             }
             if (ReadMotionFlags(motion, partMask))
                 UpdateActors_SpawnContactParts(actor);
@@ -254,42 +255,42 @@ next:
             category = ActorCategory(actor);
             if (category == 10 || category == 23) {
                 if (!ReadFlags2CC(actor, 0x02008000)) {
-                    if (actor->drawableKind == 0) {
-                        draw = actor->drawable;
+                    if (actor->base.drawableKind == 0) {
+                        draw = actor->base.drawable;
                         ((struct SceneActorPaletteSequenceView *)draw)->paletteOffset =
-                            actor->paletteBank;
+                            actor->base.paletteBank;
                     } else {
                         struct UpdateActorsTile *tile;
-                        draw = actor->drawable;
+                        draw = actor->base.drawable;
                         tile = (void *)((u8 *)draw + 0x20);
-                        tile->paletteOffset = actor->paletteOffset;
+                        tile->paletteOffset = actor->base.paletteOffset;
                     }
                 }
                 if ((u8)SceneActorPalette_ApplyTransition((void *)manager, actor)) {
                     if (TransitionComplete(manager)) {
                         u32 bank;
                         manager->flags &= 0xFFFDDFFF;
-                        flagField = (void *)&actor->flags2D0;
+                        flagField = (void *)&actor->base.flags2D0;
                         ClearWordFlags(&flagField->word, 0x200000);
                         bank = DefaultPalette(actor);
-                        if (actor->drawableKind == 0)
-                            AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+                        if (actor->base.drawableKind == 0)
+                            AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
                         else
-                            ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
-                                gPaletteBankData + (bank << 5);
+                            ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)
+                                ->palette = gPaletteBankData + (bank << 5);
                     } else {
                         u32 tested, bit;
                         bit = 0x200000;
                         tested = SceneActorPlacement_ReadFlags32((void *)actor, bit);
                         flagField = (void *)StateAddress(actor);
                         if (tested) {
-                            u16 bank = actor->paletteBank;
+                            u16 bank = actor->base.paletteBank;
                             SceneActorPalette_BeginTransition(bank, DefaultPalette(actor), 0,
                                                               category, 0);
                             ClearWordFlags(&flagField->word, 0x200000);
                         } else {
-                            SceneActorPalette_BeginTransition(DefaultPalette(actor),
-                                                              actor->paletteBank, 0, category, 0);
+                            SceneActorPalette_BeginTransition(
+                                DefaultPalette(actor), actor->base.paletteBank, 0, category, 0);
                             flagField->word |= bit;
                         }
                     }

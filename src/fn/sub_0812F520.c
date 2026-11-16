@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_behavior.h"
 s32 Math_Atan2(s32, s32);
-void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *actor,
+void SceneActor_SetContactReactionDirection(struct RoomActor *actor,
                                             struct SceneActorBehaviorContactView *source,
                                             struct SceneActorBehaviorContactView *destination)
 {

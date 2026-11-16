@@ -1,15 +1,15 @@
 #include "global.h"
 #include "scene_actor_profile.h"
 
-void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *actor)
+void SceneActor_ConfigureSecondaryProfileEntry(struct ChaseActor *actor)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
-        actor->profileIndex, actor->livingCountByCategory, 0);
+        actor->base.profileId, actor->base.profileMode, 0);
 
     {
         u16 mask = 0x280;
 
-        u16 v = actor->flags2D4 & mask;
+        u16 v = actor->base.flags2D4 & mask;
 
         if (v) {
             u8 *q;
@@ -28,7 +28,7 @@ void SceneActor_ConfigureSecondaryProfileEntry(struct SceneActorRegistryActor *a
     {
         u16 mask = 0x200;
 
-        if (actor->flags2D4 & mask)
-            actor->field2C2 = 0x20;
+        if (actor->base.flags2D4 & mask)
+            actor->base.field2C2 = 0x20;
     }
 }

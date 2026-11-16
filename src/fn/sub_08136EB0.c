@@ -27,17 +27,17 @@ zero:
     return 0;
 }
 
-void SceneActorControl_RestoreInactiveDefaults(struct SceneActorRegistryActor *actor)
+void SceneActorControl_RestoreInactiveDefaults(struct ChaseActor *actor)
 {
     u32 one;
     u32 flags;
     if (!blocked2048((void *)actor)) {
         one = 1;
-        flags = actor->flags2CC;
+        flags = actor->base.flags2CC;
         one &= flags;
         if (!one && (flags & 2)) {
             SceneActorRegistry_RestoreActorDefaults(actor);
-            actor->field178 = one;
+            actor->base.colliderA.responseValue = one;
         }
     }
 }

@@ -16,7 +16,7 @@ static inline u8 Unavailable(struct ChaseActor *a)
 static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *other)
 {
     if (!Unavailable(a) && (other->contactFlags & 15)) {
-        a->base.field304 = other->collisionId;
+        a->base.counter304 = other->collisionId;
         {
             u32 *p = &a->base.flags2D0;
             s32 mask = 0xFEFFFFFF;

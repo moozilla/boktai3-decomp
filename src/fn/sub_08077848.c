@@ -1,5 +1,5 @@
 #include "scene_actor_placement.h"
-void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *actor, u32 event)
+void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *actor, u32 event)
 {
     s32 variant = actor->paletteOffset;
     switch (event) {
@@ -24,10 +24,10 @@ void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *a
             }
             break;
         case 1:
-            if (!actor->field2E4) {
+            if (!actor->reactionSoundVariant) {
                 Sound_PlaySong(529);
             } else {
-                unsigned long long soundFlags = actor->flags2E6;
+                unsigned long long soundFlags = actor->field2E6;
                 u32 soundMask = 4;
                 if (!SceneActorPlacement_TestMask(soundMask, soundFlags)) {
                     switch ((s32)actor->paletteOffset) {

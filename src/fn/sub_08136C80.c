@@ -13,7 +13,7 @@ static inline void MarkCollider(struct ContactCollider *p)
 {
     p->flags = 4 | p->flags;
 }
-void SceneActorPlacement_HideActor(struct SceneActorPlacementView *s)
+void SceneActorPlacement_HideActor(struct RoomActor *s)
 {
     if (!SceneActorPlacement_IsUnavailable(s)) {
         u32 bit = 2;
@@ -41,8 +41,8 @@ void SceneActorPlacement_HideActor(struct SceneActorPlacementView *s)
                 }
             }
             MarkCollider(&((struct ChaseActor *)s)->base.colliderA);
-            if (s->shadow320[0])
-                ActorShadow_Disable(s->shadow320);
+            if (s->shadow[0])
+                ActorShadow_Disable(s->shadow);
         }
     }
 }

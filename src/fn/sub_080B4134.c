@@ -8,15 +8,15 @@ struct VornData {
     u8 field6C1;
 };
 
-void Vorn_SendMessage(struct SceneActorRegistryActor *actor)
+void Vorn_SendMessage(struct ChaseActor *actor)
 {
-    struct VornData *ctx = (struct VornData *)actor->context;
+    struct VornData *ctx = (struct VornData *)actor->base.context;
 
     if (ctx->field6C1 != 0) {
         s16 message[2];
 
         message[0] = 7;
-        message[1] = actor->id;
+        message[1] = actor->base.body.id;
         SceneActorRegistry_SendToCategory(0x19, message);
         ctx->field6C1 = 0;
     }

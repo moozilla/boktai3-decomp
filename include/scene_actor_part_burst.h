@@ -14,7 +14,7 @@ static inline u32 SceneActorEffects_NextSample(const u16 *table)
     return table[index];
 }
 
-static inline void SceneActorEffects_SpawnContactParts(struct SceneActorRegistryActor *actor)
+static inline void SceneActorEffects_SpawnContactParts(struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
     s32 i;
@@ -27,15 +27,15 @@ static inline void SceneActorEffects_SpawnContactParts(struct SceneActorRegistry
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
-        origin = actor->effectOrigin;
+        origin = actor->group.effectOrigin;
         position.packed.x = origin->x;
         position.packed.y = origin->y + 128;
         position.packed.z = origin->z;
-        EffectGroup_SpawnPart((void *)actor->effectConfig, 3, &position.position,
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->fieldAA = 0;
-    actor->field2B8 = 0;
+    actor->base.fieldAA = 0;
+    actor->base.field2B8 = 0;
 }
 
 static inline u8 SceneActorEffects_NextSparkCount(const u16 *table)

@@ -83,9 +83,9 @@ void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
 
 void Crow_OnIdleAnimation(struct ChaseActor *p);
 
-void Crow_UpdatePeriodicAnimation(struct SceneActorRegistryActor *actor, s32 tick);
+void Crow_UpdatePeriodicAnimation(struct ChaseActor *actor, s32 tick);
 
-void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor);
+void Crow_UpdateAnimationSequence(struct ChaseActor *actor);
 
 void Crow_PlayEntry2(struct ChaseActor *actor);
 

@@ -3,7 +3,7 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 s32 SceneActorRegistry_CountLivingByCategory(s32 state)
 {
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     s32 count;
     SceneActorRegistry_GetManager();
     /* The allocated terminal node carries a NULL actor; an absent list head
@@ -12,11 +12,11 @@ s32 SceneActorRegistry_CountLivingByCategory(s32 state)
     actor = node->actor;
     count = 0;
     while (actor) {
-        if (actor->health > 0) {
+        if (actor->base.health > 0) {
             u32 offset = 0x2d0;
             u32 *field;
             field = (void *)(((u8 *)actor) - (-offset));
-            if ((!((*field) & 0x20000)) && (actor->category == state)) {
+            if ((!((*field) & 0x20000)) && (actor->base.category == state)) {
                 count++;
             }
         }

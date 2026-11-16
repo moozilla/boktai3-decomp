@@ -3,9 +3,9 @@
 #define SceneActorBehavior_UpdateDefeatState sub_08078B48
 #define SceneActorBehavior_TestDefeated      sub_08078B48
 
-void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *);
+void SceneActorBehavior_RecordDefeat(struct RoomActor *);
 
-static inline u8 TestMask(struct SceneActorBehaviorGateView *s, u32 mask)
+static inline u8 TestMask(struct SceneActorChaseTracking *s, u32 mask)
 {
     if (s->flags & mask)
         return TRUE;
@@ -17,9 +17,9 @@ static inline u32 OrV(u16 m, u16 *f)
     return m | *f;
 }
 
-u32 SceneActorBehavior_TestDefeated(struct SceneActorBehaviorView *actor)
+u32 SceneActorBehavior_TestDefeated(struct RoomActor *actor)
 {
-    struct SceneActorBehaviorGateView *sprite;
+    struct SceneActorChaseTracking *sprite;
     if (actor->counter304 > 0) {
         u8 m;
         SceneActorBehavior_RecordDefeat(actor);
@@ -27,12 +27,12 @@ u32 SceneActorBehavior_TestDefeated(struct SceneActorBehaviorView *actor)
             s32 v = OrV(0x80, &actor->flags2D6) & ~0x100;
             *&actor->flags2D6 = v;
         }
-        sprite = &actor->gate;
+        sprite = &actor->tracking;
         m = 0x10;
         sprite->flags |= m;
         return 1;
     }
-    sprite = &actor->gate;
+    sprite = &actor->tracking;
     if (TestMask(sprite, 2)) {
         s32 m = ~0x10;
         sprite->flags &= m;

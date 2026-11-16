@@ -9,6 +9,10 @@
 unknown3CD[0] nextDirection
 [map]
 field2B3 restart
+field2B6 reactionDirection
+groundHeight2BE groundHeight
+field1F0 script1F0
+field304 counter304
 
 # SceneActorAnimationView was a view of the base alone.
 [types]
@@ -27,6 +31,66 @@ selection animationIndex
 link context
 unknown2B0 field2B0
 
+# SceneActorTerrainCollisionView was a view of the base alone.
+[types]
+SceneActorTerrainCollisionView RoomActor
+[map]
+collider colliderA
+field2E4 reactionSoundVariant
+
+# SceneActorBehaviorView was a view of the base alone; its gate is the tracking block.
+[types]
+SceneActorBehaviorView RoomActor
+SceneActorBehaviorGateView SceneActorChaseTracking
+[map]
+heading body.direction
+position body.position
+velocity body.motion
+defense9F field9F
+reactionA0 fieldA0
+gate tracking
+savedControl104 word104
+allocation108 word108
+allocationArgument10C word10C
+savedKind110 word110
+primaryCollider colliderA
+secondaryCollider colliderB
+control target
+substate field2B0
+resetRequested field2B1
+prepared field2B2
+kind field2B5
+parameter2D8 field2D8
+reaction2DC field2DC
+payload2E0 field2E0
+result2E4 reactionSoundVariant
+mode2E6 field2E6
+biasX310 reactionStart.x
+biasZ314 reactionStart.z
+requestedDirection nextDirection
+
+# SceneActorPlacementView: its code reads the base only.
+[types]
+SceneActorPlacementView RoomActor
+[map]
+direction body.direction
+position body.position
+field104 word104
+field178 colliderA.responseValue
+control target
+resetControl220 field220
+savedControl230 reactionTarget230
+callback23C field23C
+field2B6 reactionDirection
+selection animationIndex
+flags2D8 field2D8
+flags2DC field2DC
+field2E4 reactionSoundVariant
+flags2E6 field2E6
+velocity secondaryMotion
+destination reactionStart
+shadow320 shadow
+
 # SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
 # 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that
 # type by hand (the tool reports them as "no member named" errors). A struct that held a
@@ -35,8 +99,51 @@ unknown2B0 field2B0
 [types]
 SceneActorRegistryResetView ChaseActor
 
+# SceneActorRegistryActor was a chase actor view (base and group). Base names map to the
+# base's names here; the embedding below adds `base.`.
+[types]
+SceneActorRegistryActor ChaseActor
+[map]
+id body.id
+position body.position
+velocity body.motion
+effectDurationB8 attacks.first[2]
+effectParameterC0 attacks.second[2]
+distanceTarget tracking.target
+field104 word104
+field178 colliderA.responseValue
+control target
+defaultControl savedTarget
+update updateCallback
+destroy destroyCallback
+activeCallback264 damageCallback
+contextCallback274 contextCallback
+field2B3 restart
+livingCountByCategory profileMode
+profileIndex profileId
+flags414 group.common.gate.flags
+field416 group.common.gate.duration
+field418 group.common.gate.counter
+distanceTargetLock group.common.control.field14
+distanceTargetIdentity group.common.control.counter
+fallbackCallback444 group.common.fallback
+field450 group.homeRoute.point
+pathId group.homeRoute.routeId
+pathPointIndex group.homeRoute.pointId
+effectConfig group.effectConfig
+effectOrigin group.effectOrigin
+field570 group.field570
+field574 group.field574
+field5DC group.contactControl
+control5F4 group.routePhaseCallback
+unknown2B5 field2B5
+
 # The monster structs and ChaseActor embed struct RoomActor as `base`.
 [embed RoomActor base]
+
+# RegistryActor's unknown2B5[0] is field2B5 (its unknown3D4 block is &group.common).
+[text]
+base.field2B5[0] base.field2B5
 
 # Last: the chase classes (Skeleton, Vorn, Golem, Mummy, Dog) embed struct ChaseActor
 # as `chase`, and pass `&actor->chase` where chase code takes a ChaseActor.

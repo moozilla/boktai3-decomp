@@ -1,7 +1,7 @@
 #include "scene_actor_placement.h"
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *argument)
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *argument)
 {
-    struct SceneActorPlacementView *actor = (void *)argument;
+    struct RoomActor *actor = (void *)argument;
     u32 mask = 0x400000;
     u32 *flags = &actor->flags2D0;
     if (mask & *flags) {

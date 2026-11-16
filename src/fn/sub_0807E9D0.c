@@ -117,7 +117,7 @@ unavailable:
 available:
     return 0;
 }
-static inline void SpawnContactParts(struct SceneActorRegistryActor *actor)
+static inline void SpawnContactParts(struct ChaseActor *actor)
 {
     union SceneActorRegistryPackedPosition velocity, bounds, position;
     s32 i;
@@ -130,15 +130,15 @@ static inline void SpawnContactParts(struct SceneActorRegistryActor *actor)
         bounds.packed.x = 5;
         bounds.packed.y = 10;
         bounds.packed.z = 5;
-        origin = actor->effectOrigin;
+        origin = actor->group.effectOrigin;
         position.packed.x = origin->x;
         position.packed.y = origin->y + 128;
         position.packed.z = origin->z;
-        EffectGroup_SpawnPart((void *)actor->effectConfig, 3, &position.position,
+        EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->fieldAA = 0;
-    actor->field2B8 = 0;
+    actor->base.fieldAA = 0;
+    actor->base.field2B8 = 0;
 }
 
 static inline void SetContactResult(struct ChaseActor *actor, u16 value)
@@ -162,7 +162,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     if (unavailable)
         return;
     primary = &actor->base.colliderA;
-    if (((struct SceneActorRegistryActor *)actor)->field178) {
+    if (((struct ChaseActor *)actor)->base.colliderA.responseValue) {
         if (actor->base.field2E6) {
             destination->remaining = unavailable;
             destination->mode = 0;
@@ -189,8 +189,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             if (actor->group.countdown5C8)
                 return;
             actor->group.countdown5C8 = 0x3C;
-            attack =
-                SceneActorPlacement_ReadFlags32((struct SceneActorPlacementView *)actor, 0x8000000);
+            attack = SceneActorPlacement_ReadFlags32((struct RoomActor *)actor, 0x8000000);
             if (attack) {
                 u32 mask = 0x100;
                 if ((destination->flags & mask) && (sourceFlags & mask)) {

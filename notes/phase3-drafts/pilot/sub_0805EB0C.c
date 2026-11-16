@@ -1,3 +1,5 @@
+// Holdout draft (no concessions), 30 rows: playback struct for first-call zeros (as Storage_InitWidgets), zero vars before digit loops, cursor for loop 2.
+// Left: widget/counter r4/r5 swap in both digit loops; cursor = &position should copy the -=11 address reg (ROM mov r8,r1).
 #include "scene_input_panel.h"
 #include "display_sequence_inline.h"
 
@@ -48,6 +50,10 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     void *sequenceResource;
     void *graphics;
     s32 i, k;
+    u32 zero;
+    struct SceneInputPackedPosition *cursor;
+    struct SceneWidgetPlayback playback;
+    u8 priority;
 
     source = ScriptProc_Start(0xCB05, 0x5D04);
     panel->gridResource = *source;
@@ -55,13 +61,13 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     source = ScriptProc_Start(0xCB05, 0x530D);
     panel->widgetResource = *source;
     ResourceHeader_Relocate(&panel->widgetResource, source);
-    {
-        struct SceneInputPackedPosition *initialPosition;
-        position.z = position.y = position.x = 0;
-        initialPosition = &position;
-        Widget_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30, 0,
-                          0, 60, initialPosition);
-    }
+    playback.priority = 0;
+    playback.mode = 0;
+    position.x = 0;
+    position.y = 0;
+    position.z = 0;
+    priority = playback.priority;
+    Widget_InitLinked(&panel->indicator, &panel->widgetResource, gUnk_0824DEEA[mode], 0x30, priority, priority, 60, &position);
 
     sequenceResource = ScriptProc_Start(0x922E, 0x4BBF);
     graphics = panel->drawable.graphics;
@@ -126,19 +132,25 @@ void SceneInputPanel_InitWidgets(struct SceneInputPanel *owner, s32 mode)
     position.x = 56;
     position.y = 0;
     Widget_InitLinked(&panel->meterGlyph, &panel->widgetResource, 0x68, 0x30, 0, 0, 60, &position);
+    zero = 0;
     widget = panel->digits;
     for (k = 7; k >= 0; k--) {
-        Widget_InitLinked(widget, &panel->widgetResource, 0x50, 0x30, 0, 0, 60, &position);
+        Widget_InitLinked(widget, &panel->widgetResource, 0x50, 0x30, zero, zero, 60, &position);
         widget++;
     }
     Widget_InitLinked(&panel->numericLabel, &panel->widgetResource, 0xA9, 0x31, 0, 0, 60,
                       &position);
     position.x -= 11;
-    widget = panel->smallDigits;
-    for (k = 3; k >= 0; k--) {
-        Widget_InitLinked(widget, &panel->widgetResource, 0xAA, 0x31, 0, 0, 60, &position);
-        position.x += 6;
-        widget++;
+    cursor = &position;
+    {
+        u32 none;
+        widget = panel->smallDigits;
+        none = 0;
+        for (k = 3; k >= 0; k--) {
+            Widget_InitLinked(widget, &panel->widgetResource, 0xAA, 0x31, none, none, 60, &position);
+            cursor->x += 6;
+            widget++;
+        }
     }
     position.x = 0;
     position.y = 0;

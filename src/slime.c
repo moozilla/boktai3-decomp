@@ -27,7 +27,7 @@ void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *
     s32 k2 = 1;
     if ((!SceneActor_ActionsBlocked((void *)actor)) && (info->contactFlags == k2)) {
         if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
-            actor->base.field304 = info->collisionId;
+            actor->base.counter304 = info->collisionId;
             {
                 u32 *field = &actor->base.flags2D0;
                 u32 mask = ~0x1000000;
@@ -44,7 +44,7 @@ void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *
 
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorView *);
+                                             struct RoomActor *);
 
 static inline u8 Slime_ContactUnavailable(struct ChaseActor *actor)
 {
@@ -125,7 +125,7 @@ void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
         Slime_AddPositions(&adjusted, &actor->base.body.position, &displacement);
         {
             s32 cell = SceneActorChase_CellAt(&adjusted);
-            u32 ground = actor->base.groundHeight2BE;
+            u32 ground = actor->base.groundHeight;
             u8 *data = SceneActorTerrain_GetCell(cell);
             if (ground != (*data & 15) << 8)
                 SceneActorMotion_ArmPrimaryCollider(actor);
@@ -614,9 +614,9 @@ void *Bestiary_GetEntryForActor(u32, u32);
 
 void Bestiary_UnlockEntry(void *);
 
-void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
+void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
@@ -678,14 +678,14 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 
     if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
         actor->base.field2B0 = 1;
-        script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+        script = (u16)((struct RoomActor *)actor)->script1F8;
         if (script) {
             values[0] = actor->base.body.position.x;
             values[1] = actor->base.body.position.y;
             values[2] = actor->base.body.position.z;
-            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+            values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+            values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+            values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
             values[6] = actor->base.field2E0;
             values[7] = actor->base.body.id;
             arguments.count = 8;
@@ -1218,7 +1218,7 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
         values[3] = actor->base.health;
-        Slime_ScriptPolarMotion(&vector, actor->base.field2B6, 12);
+        Slime_ScriptPolarMotion(&vector, actor->base.reactionDirection, 12);
         values[4] = vector.x;
         values[5] = 24;
         values[6] = vector.z;
@@ -1832,7 +1832,7 @@ s32 SceneActorMotion_RefreshGroundHeight(struct Slime *slime)
 {
     struct SceneActorMotionView *actor = (void *)slime;
 
-    if ((s32)slime->base.groundHeight2BE - slime->previousGround > 0x1FF) {
+    if ((s32)slime->base.groundHeight - slime->previousGround > 0x1FF) {
         s32 cell = SceneActorTerrain_GetCellIndex(&slime->base.body.position);
         if (TerrainModifiers_FindCellOverride(cell, 1)) {
             SceneActorMotion_ArmPrimaryCollider(actor);
@@ -1974,7 +1974,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
@@ -2127,7 +2127,7 @@ s32 Slime_Init(void *object)
         actor->base.body.position.y = MonsterInit_ReadHalfword(0);
         actor->base.body.position.z = MonsterInit_ReadHalfword(0);
         ground = MonsterInit_UpdateTerrainCell(actor);
-        actor->base.groundHeight2BE = ground;
+        actor->base.groundHeight = ground;
         slime->previousGround = ground;
         if (MonsterInit_GetDrawableKind(actor) == 0)
             ((struct SlimeDrawable *)actor->base.drawable)->position = actor->base.body.position;

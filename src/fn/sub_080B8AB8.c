@@ -2,9 +2,9 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-void SceneActorScript_ReadCallScriptConfig(struct SceneActorRegistryActor *actor)
+void SceneActorScript_ReadCallScriptConfig(struct ChaseActor *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
     s32 found = Script_SeekToKeyword('x');
     s32 a;
     s32 b;

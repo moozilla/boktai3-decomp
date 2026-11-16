@@ -47,7 +47,7 @@ static inline void SceneActorMovement_ApplyReactionFlags(struct ChaseActor *acto
     }
 }
 
-s32 SceneActorMovement_UpdateStatus(struct SceneActorRegistryActor *object)
+s32 SceneActorMovement_UpdateStatus(struct ChaseActor *object)
 {
     struct ChaseActor *actor = (void *)object;
     ActorStatus_Palette(actor);

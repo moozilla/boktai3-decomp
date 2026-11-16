@@ -2,10 +2,10 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_script.h"
 
-void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *actor)
+void SceneActorScript_TriggerCallOnCount(struct ChaseActor *actor)
 {
     s32 zero = 0;
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
     u16 *script = &context->scriptId6CC;
     u8 *count;
     u8 *limit;

@@ -13,12 +13,12 @@ static inline s32 ScaleProduct(s32 product)
         product = -((s32)(0u - (u32)product) >> 16);
     return product;
 }
-u8 SceneActorBehavior_AccelerateTowardDescriptor(struct SceneActorBehaviorView *actor,
+u8 SceneActorBehavior_AccelerateTowardDescriptor(struct RoomActor *actor,
                                                  struct SceneActorBehaviorDestination *descriptor,
                                                  u32 rangeX, u32 rangeZ, s32 speed)
 {
     s32 destination = descriptor->destination.x;
-    struct ContactPosition *position = &actor->position;
+    struct ContactPosition *position = &actor->body.position;
     s32 actorX = position->x;
     s32 dx = destination - actorX;
     s32 actorZ;
@@ -39,18 +39,18 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(struct SceneActorBehaviorView *
                (u32)Magnitude(descriptor->position.z - actorZ) <= rangeZ)
         return 1;
     if (dx || dz) {
-        actor->heading = Math_Atan2(dx, dz);
-        x = ScaleProduct(gUnk_086149C4[(actor->heading + 64) & 255] * speed);
-        z = ScaleProduct(gUnk_086149C4[actor->heading] * speed);
+        actor->body.direction = Math_Atan2(dx, dz);
+        x = ScaleProduct(gUnk_086149C4[(actor->body.direction + 64) & 255] * speed);
+        z = ScaleProduct(gUnk_086149C4[actor->body.direction] * speed);
         {
-            s16 *field = &actor->velocity.x;
+            s16 *field = &actor->body.motion.x;
             s32 old = *field;
             if (Magnitude(x) > 10)
                 old += x;
             *field = old;
         }
         {
-            s16 *field = &actor->velocity.z;
+            s16 *field = &actor->body.motion.z;
             s32 old = *field;
             if (Magnitude(z) > 10)
                 old += z;

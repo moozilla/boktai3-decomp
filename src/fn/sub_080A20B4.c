@@ -2,9 +2,9 @@
 #include "scene_actor_behavior.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorView *);
+                                             struct RoomActor *);
 void sub_08249244(void *, void *, s32, void *);
-static inline u8 Unavailable(struct SceneActorBehaviorView *actor)
+static inline u8 Unavailable(struct RoomActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -24,7 +24,7 @@ static inline u32 TestFlag(struct SceneActorBehaviorContactView *s, u32 mask)
 }
 void SceneActorContact_ApplyWithinBounds(struct SceneActorBehaviorContactView *source,
                                          struct SceneActorBehaviorContactView *destination,
-                                         struct SceneActorBehaviorView *actor)
+                                         struct RoomActor *actor)
 {
     struct ContactPosition point;
     s32 difference;

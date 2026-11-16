@@ -16,7 +16,8 @@ static inline void SceneActorPlacement_ClearColliderFlags(struct ContactCollider
     mask &= value;
     collider->flags = mask;
 }
-void SceneActorPlacement_ResetToPathPoint(struct SceneActorRegistryActor *object, u32 pathId, u32 pointId, u32 direction)
+void SceneActorPlacement_ResetToPathPoint(struct ChaseActor *object, u32 pathId, u32 pointId,
+                                          u32 direction)
 {
     struct ChaseActor *actor = (void *)object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;

@@ -8,20 +8,20 @@ static inline void Subtract(struct ContactPosition *out, const struct ContactPos
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-s32 SceneActorTarget_CanReplaceByDistance(struct SceneActorRegistryActor *actor,
+s32 SceneActorTarget_CanReplaceByDistance(struct ChaseActor *actor,
                                           const struct ContactPosition *position, void *identity)
 {
     struct ContactPosition delta;
     s32 distance;
     if (((struct SceneActorTargetIdentityView *)((u8 *)actor + 0x3D4))->identity == identity)
         return 1;
-    if (actor->distanceTargetLock)
+    if (actor->group.common.control.field14)
         return 0;
-    Subtract(&delta, position, &actor->position);
+    Subtract(&delta, position, &actor->base.body.position);
     distance = delta.x * delta.x + delta.z * delta.z;
-    if (!actor->distanceTarget)
+    if (!actor->base.tracking.target)
         return 1;
-    Subtract(&delta, &actor->distanceTarget->position, &actor->position);
+    Subtract(&delta, &actor->base.tracking.target->position, &actor->base.body.position);
     if (delta.x * delta.x + delta.z * delta.z < distance)
         return 0;
     return 1;

@@ -26,8 +26,8 @@ static inline u32 EmitRandom(const u16 *table)
     return table[gRandomIndex];
 }
 /* Three particle bursts around the actor, raised by offset->y. */
-static inline void EmitBurst(struct SceneActorPlacementView *actor,
-                             const struct EmitPosition *offset, s32 kind, u32 angle)
+static inline void EmitBurst(struct RoomActor *actor, const struct EmitPosition *offset, s32 kind,
+                             u32 angle)
 {
     union EmitTableSource source = {0};
     const u16 *table;
@@ -41,7 +41,7 @@ static inline void EmitBurst(struct SceneActorPlacementView *actor,
     /* confidence=low: a jitter that is drawn but never applied. */
     jitter.y = EmitRandom(table);
     jitter.z = EmitRandom(table);
-    position = *(struct EmitPosition *)&actor->position;
+    position = *(struct EmitPosition *)&actor->body.position;
     position.y += offset->y;
     {
         s32 count = (EmitRandom(table) & 3) + 2;
@@ -60,7 +60,7 @@ static inline void EmitBurst(struct SceneActorPlacementView *actor,
         sub_080148CC(count, kind, &position, direction, 8, duration, 2, 6, 3, 5, 10);
     }
 }
-void SceneActorPlacement_EmitTimedParticles(struct SceneActorPlacementView *actor)
+void SceneActorPlacement_EmitTimedParticles(struct RoomActor *actor)
 {
     struct SceneActorEmissionPhase *phase = (void *)actor;
     u32 angle;

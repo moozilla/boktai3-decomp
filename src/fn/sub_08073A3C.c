@@ -6,12 +6,12 @@ static inline u8 SceneActorContacts_AreDisabled(void)
         return 1;
     return 0;
 }
-struct SceneActorContactNode *
-SceneActorContacts_SelectForActor(struct SceneActorRegistryActor *argument, u32 kindMaskArgument)
+struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActor *argument,
+                                                                u32 kindMaskArgument)
 {
-    struct SceneActorRegistryActor *actor = argument;
+    struct ChaseActor *actor = argument;
     u32 kindMask = kindMaskArgument;
-    struct SceneActorRegistryActor *owner = actor;
+    struct ChaseActor *owner = actor;
     struct SceneActorContactManager *manager;
 
     struct SceneActorContactNode *node, *best;

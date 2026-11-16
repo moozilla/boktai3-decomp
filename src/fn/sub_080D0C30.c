@@ -64,7 +64,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             *flags &= mask;
         }
         if ((!Mummy_IsAttackBlocked(input)) && ((obj->contactFlags) & 15)) {
-            ((struct ChaseActor *)input)->base.field304 = obj->collisionId;
+            ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
             {
                 u32 *field = &((struct ChaseActor *)input)->base.flags2D0;
                 u32 mask = 0xFEFFFFFF;
@@ -72,7 +72,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             }
         }
         base->base.tracking.target =
-            SceneActorContacts_FindObjectById(*(u16 *)&base->base.field304);
+            SceneActorContacts_FindObjectById(*(u16 *)&base->base.counter304);
         {
             u32 value = obj->responseFlags;
             u32 mask = 1;
@@ -96,7 +96,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
             base->base.field2E6 = 4;
         }
     } else if ((!Mummy_IsAttackBlocked(input)) && (contactFlags & 15)) {
-        ((struct ChaseActor *)input)->base.field304 = obj->collisionId;
+        ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
         {
             u32 *field = &((struct ChaseActor *)input)->base.flags2D0;
             u32 mask = 0xFEFFFFFF;

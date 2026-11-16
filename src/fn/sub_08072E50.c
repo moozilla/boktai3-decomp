@@ -5,7 +5,7 @@ static inline u8 TestGate(struct SceneActorContactGateView *gate, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorContacts_SetDistanceGate(struct SceneActorRegistryActor *actor,
+void SceneActorContacts_SetDistanceGate(struct ChaseActor *actor,
                                         struct SceneActorContactGateView *gate, u32 metric,
                                         u32 threshold, u32 mode, u32 flags)
 {

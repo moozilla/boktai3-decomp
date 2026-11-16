@@ -4,8 +4,8 @@
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
-struct SceneActorPlacementView;
-void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *, u32);
+struct RoomActor;
+void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
 u32 ActorMode_SelectOddStateVariant(struct ChaseActor *);
 void sub_08014634(u32, u32, struct SceneExtent *, struct SceneExtent *, struct SceneExtent *, u32,
                   u32);

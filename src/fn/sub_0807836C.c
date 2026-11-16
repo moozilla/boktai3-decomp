@@ -9,9 +9,9 @@ static inline u8 TestNonzero(u32 value)
         return 1;
     return 0;
 }
-u8 SceneActorBehavior_TickDrawableBlink(struct SceneActorRegistryActor *inputActor, s32 inputAge)
+u8 SceneActorBehavior_TickDrawableBlink(struct ChaseActor *inputActor, s32 inputAge)
 {
-    struct SceneActorRegistryActor *actor = inputActor;
+    struct ChaseActor *actor = inputActor;
     s32 age = inputAge;
     s32 cadence = 0;
     if (age <= 30) {
@@ -25,15 +25,15 @@ u8 SceneActorBehavior_TickDrawableBlink(struct SceneActorRegistryActor *inputAct
         u32 hidden;
         {
             u32 mask = 1;
-            kind = actor->drawableKind;
+            kind = actor->base.drawableKind;
             if (kind == 0) {
-                void *base = actor->drawable;
+                void *base = actor->base.drawable;
                 u32 flags = ((struct SceneActorRegistrySequenceDrawable *)base)->flags;
                 flags &= mask;
                 drawable = base;
                 hidden = TestNonzero(flags);
             } else {
-                void *base = actor->drawable;
+                void *base = actor->base.drawable;
                 u32 flags = ((struct SceneActorRegistryTileDrawable *)base)->flags;
                 flags &= mask;
                 drawable = base;
@@ -62,12 +62,12 @@ u8 SceneActorBehavior_TickDrawableBlink(struct SceneActorRegistryActor *inputAct
         }
     }
     if (age > 60) {
-        if (!actor->drawableKind) {
-            void *base = actor->drawable;
+        if (!actor->base.drawableKind) {
+            void *base = actor->base.drawable;
             u32 mask = ~1;
             ((struct SceneActorRegistrySequenceDrawable *)base)->flags &= mask;
         } else {
-            u8 *base = (u8 *)actor->drawable + 0x20;
+            u8 *base = (u8 *)actor->base.drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(base + 8) &= mask;
         }

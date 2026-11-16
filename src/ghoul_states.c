@@ -25,7 +25,7 @@ void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactColli
     int mask;
     u32 *flags;
     if ((SceneActor_ActionsBlocked((void *)actor) == 0) && (contact->contactFlags & 0xF)) {
-        actor->base.field304 = contact->collisionId;
+        actor->base.counter304 = contact->collisionId;
         flags = &actor->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;

@@ -2758,5 +2758,64 @@ which is exactly `10:1`. Not tested.
    concession; whether the original had them as written or as a clamp helper
    with a second result is not known.
 
+231. **A constant pointer whose register loses to a neighbour by a factor of two has had its live length doubled by REG_EQUIV; a constant that combine forms, not cse, is not doubled.**
+   `update_equiv_regs` (local-alloc.c) turns a REG_EQUAL note on a register
+   set once from a constant (`table = gRandomTable`, a hoisted `0x3FF`, an
+   address literal) into REG_EQUIV and doubles `REG_LIVE_LENGTH`, so
+   global-alloc's priority, `floor_log2(refs) * refs / live * 10000`, is
+   halved. Such a register lands in a lower-ranked hard register than the
+   ROM's, is evicted by find_reg, or gets none and is rematerialized; the usual
+   cure was a `+r` barrier or a pin on the table. The note comes from expand
+   and from cse (cse_insn adds one whenever it folds a source to a constant).
+   combine adds none. So an address that cse1/cse2 cannot fold and combine can
+   becomes a plain `(set (reg) (const_int))` with no note, keeps its real
+   length, and still assembles to the one `ldr =0x0203B400`. combine folds two
+   things cse does not: nonzero-bits algebra and mask chains on an unknown
+   value. Two forms that match:
+
+   ```c
+   /* sub_080399F4 (Item_Place): an always-zero term; no stack slot */
+   const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (p->shakeTicks >> 8));
+
+   /* sub_0801404C: include/monster_particle_random.h; one 4-byte stack slot */
+   union ParticleRandomTableSource source;
+   const u16 *table;
+   source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+   source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+   table = ParticleRandom_GetTable(&source);
+   ```
+
+   The first is a `u8` member shifted right by 8 (`|` works as well as `+`);
+   the byte load dies in combine. In the second the address-taken union makes
+   each half store a read-mask-or on fresh temporaries of an uninitialized
+   word, which only combine reduces. It leaves the union's slot in the frame,
+   one per inlined copy: right for 0801404C, whose ROM frame has it, and 8
+   bytes too many in 080399F4. Variants that fail, and why: zero-initializing
+   the union first, `u32 base = 0x02030000; base + 0xB400`, and an inline
+   `(const u16 *)(0x02000000 + offset)` all fold in cse (note, doubled);
+   `table = source.table` without the address keeps one user register through
+   four sets and never folds (`.word 0x02030000` in the pool); the union
+   inside a helper inlined below another inline also stays unfolded;
+   `(u32)gRandomTable` halves are a symbol and compile to real shifts;
+   `gRandomTable + (byte >> 8)` folds early. Build the table outside the loop
+   and once per scope (in 080399F4 in Item_Place, passed to both
+   Item_NextRandom calls, which is where the ROM loads it).
+   Check in `u.i.lreg`: the table's set must have `(nil)` notes, not
+   `REG_EQUIV`. `scope.py A.c vs B.c FUNC` prints refs, live and priority; a
+   `live` twice the span between first and last use is the doubling.
+   ParticleGroup_UpdateBouncing 0801404C: doubled, the table has 7 refs over
+   576 and loses sl to the hoisted `-256`; undoubled it is 7/288 = 486 against
+   the sprite pointer's 7/287 = 487 and the constant's 9/568 = 475 (itself
+   doubled), the ROM's order. Ref weights to tune the other side of a near
+   tie: a mention outside loops counts 1, inside a loop 2, inside a
+   `do { } while (0)` macro in a loop 3 (`ParticleRandom_ReadSample` 3 per
+   site, the inline `ParticleRandom_ReadDirectSample` 2). The converse holds:
+   a register the ROM ranks low or rematerializes wants the plain constant.
+   Related: with `#define gRandomTable ((u16 *)0x0203B400)` cse folds the
+   address into each `(plus reg const)` and loop.c has nothing to hoist; the
+   extern from `ram.h` stays one register that loop.c hoists.
+   Both forms are free of counted concessions but are chosen for their
+   effect; what the authors wrote to get a note-free constant is not known.
+
 `SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
 `build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.

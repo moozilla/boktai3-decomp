@@ -61,7 +61,7 @@ void Golem_BeginSlideState(struct ChaseActor *actor)
     }
     if ((s32)actor->base.counter2AC > 0x1E || actor->base.field2B0) {
         if (context->pendingEvent) {
-            actor->base.field304 = context->pendingEvent;
+            actor->base.counter304 = context->pendingEvent;
             Callback_InvokeActor(actor, actor->base.update26C);
         }
         BeginControl(actor, Golem_UpdateChargeStop, 0x27);

@@ -13,9 +13,9 @@ static inline s32 ReadOption(s32 defaultValue)
         value = defaultValue;
     return value;
 }
-void ActorGroup_ReadScriptOptions(struct SceneActorRegistryActor *actor)
+void ActorGroup_ReadScriptOptions(struct ChaseActor *actor)
 {
-    struct ActorGroupOptions *group = actor->context;
+    struct ActorGroupOptions *group = actor->base.context;
     if (Script_SeekToKeyword('O')) {
         group->option0 = ReadOption(6);
         group->option1 = ReadOption(12);

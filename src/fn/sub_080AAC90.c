@@ -4,15 +4,15 @@ void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
 void TentacleActor_EnterHitReaction(void *);
 s32 Math_Atan2(s32, s32);
-static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
+static inline u32 Unavailable(struct RoomActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 struct TentacleContactSegment {
     u8 unknown0[0x108];
     u8 reactionDirection;
     u8 unknown109[0x124 - 0x109];
-    struct SceneActorBehaviorView *target;
+    struct RoomActor *target;
 };
 struct TentacleContactTarget {
     u8 unknown0[0x8EC];

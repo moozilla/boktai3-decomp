@@ -1,13 +1,13 @@
 #include "scene_actor_registry.h"
-struct SceneActorRegistryActor *SceneActorRegistry_FindById(u32);
+struct ChaseActor *SceneActorRegistry_FindById(u32);
 void SceneActorRegistry_RestoreScriptActorFieldAA(void)
 {
     u32 id = Script_GetKeywordValue('n', 0);
     if (id) {
-        struct SceneActorRegistryActor *actor = SceneActorRegistry_FindById(id);
-        if (actor && actor->field5DC) {
-            s32 value = actor->fieldA8;
-            actor->fieldAA = value;
+        struct ChaseActor *actor = SceneActorRegistry_FindById(id);
+        if (actor && actor->group.contactControl) {
+            s32 value = actor->base.fieldA8;
+            actor->base.fieldAA = value;
             {
                 u32 mask = 2;
                 u32 offset;

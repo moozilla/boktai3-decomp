@@ -4,9 +4,9 @@
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 
-static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **saved, u32 excluded)
+static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 excluded)
 {
-    u16 *flags = &actor->flags2D4;
+    u16 *flags = &actor->base.flags2D4;
     u32 value = *flags;
     u32 mask = 0x40;
     value &= mask;
@@ -14,13 +14,13 @@ static inline u8 IsUnavailable(struct SceneActorRegistryActor *actor, u16 **save
     if (value)
         goto one;
     {
-        u32 value = actor->flags2D0;
+        u32 value = actor->base.flags2D0;
         mask = excluded;
         value &= mask;
         if (value)
             goto one;
     }
-    if (actor->health > 0)
+    if (actor->base.health > 0)
         goto zero;
 one:
     mask = 1;
@@ -30,45 +30,45 @@ zero:
     return mask;
 }
 
-static inline u8 HasMovementFlag(struct SceneActorRegistryActor *actor, u32 mask)
+static inline u8 HasMovementFlag(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->flags2C0 & mask)
+    if (actor->base.flags2C0 & mask)
         return 1;
     return 0;
 }
 
-static inline void ResetState(struct SceneActorRegistryActor *actor, u32 state, u32 zero)
+static inline void ResetState(struct ChaseActor *actor, u32 state, u32 zero)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = zero;
-    actor->counter2AC = zero;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = zero;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = 1;
 }
 
-static inline void ResetControl(struct SceneActorRegistryActor *actor, const void *callback,
-                                u32 substate, u32 zero)
+static inline void ResetControl(struct ChaseActor *actor, const void *callback, u32 substate,
+                                u32 zero)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = zero;
-    actor->unknown2B5[0] = substate;
-    actor->control = callback;
-    actor->field2C8 = zero;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = substate;
+    actor->base.target = callback;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         u32 value = *flags;
         value &= mask;
         *flags = value;
     }
-    actor->field104 = zero;
+    actor->base.word104 = zero;
 }
 
 // confidence=low: walks the scene actor list and, for available actors with flag 0x100 in flags2C0, resets their script state.
 void sub_08070910(void)
 {
     struct SceneActorRegistryNode *node;
-    struct SceneActorRegistryActor *actor;
+    struct ChaseActor *actor;
     s32 keyword;
 
     if (!SceneActorRegistry_GetManager())
@@ -102,7 +102,7 @@ void sub_08070910(void)
                     }
                     {
                         bits = 8;
-                        actor->flags2D0 = actor->flags2D0 | bits;
+                        actor->base.flags2D0 = actor->base.flags2D0 | bits;
                     }
                 }
             }

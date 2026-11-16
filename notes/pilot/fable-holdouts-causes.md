@@ -74,4 +74,20 @@ what the authors wrote: TextState_ProcessTag (`cmp = 0` dead store),
 WirelessGameItems_UpdateItemMerge (per-arm zero, dead `count < 0`),
 WirelessGameItems_QueueLocalItem and QueueIncomingItem (`clear = 0; if (x < 0) clear = x`),
 WirelessGameItems_UpdateIncomingItem (`value < 0 ? -1 : 0`), Scene_TryStepDown
-(`if (referenceHeight < 0) return 0;`).
+(`if (referenceHeight < 0) return 0;`), sub_080399F4
+(`RANDOM_TABLE_ADDR + (p->shakeTicks >> 8)`, an always-zero term), sub_0801404C (table built
+through the halves union).
+
+## Recipe: random-table register priority (scope README fact 231)
+
+1. In `u.i.lreg`, if the table's (or another once-set constant's) set carries `REG_EQUIV` and `scope.py A.c vs B.c FUNC` shows its `live` at twice the real span, it is doubled and ranks one register too low. Drop the pin or barrier and make combine, not cse, form the constant: `table = (const u16 *)(RANDOM_TABLE_ADDR + (p->someU8Field >> 8));` (no stack slot; sub_080399F4, 8a3ff6351), or the address-taken halves union from include/monster_particle_random.h when the ROM frame has a spare 4-byte slot (sub_0801404C, c34073c60). Build it once, outside the loop, where the ROM's `ldr =0x203B400` sits.
+2. Then settle any remaining near tie with ref weights only: `ParticleRandom_ReadDirectSample(table)` (2 per site in a loop) against `ParticleRandom_ReadSample` (3), and the extern `gRandomTable` rather than a numeric `#define` when the ROM hoists the address. Group still open: ParticleGroup_UpdateFrozen, Vorn_UpdateDefeat, sub_08012B34, FadingParticleGroup_Spawn, FadingParticleGroup_Update, sub_08014CA4, sub_08014634 (table must outrank velocity: 17/165 undoubled).
+
+Both forms are guessed wording (an always-zero term; a pointer built in halves) and belong on the review list below with sub_080399F4 and sub_0801404C.
+
+sub_08014634 update: best draft is seven scalar parameters, the extern `gRandomTable`
+(no numeric `#define`), `rng = &gRandomIndex` before the outer `for`, `u32 mask = 0x3ff`
+in the inner body, plain flags: 46 ROM / 44 draft. Left: the table must outrank velocity
+(17/165 undoubled), the 0x3FF hoist must land after the giv inits, one reload choice.
+The fact 231 forms do not apply directly: the ROM's table load is a loop.c hoist, and a
+combine-formed constant written before the loops scores worse (52).

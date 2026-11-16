@@ -8,9 +8,9 @@ struct VornData {
     u8 field627;
 };
 
-void Vorn_ParseField624(struct SceneActorRegistryActor *actor)
+void Vorn_ParseField624(struct ChaseActor *actor)
 {
-    struct VornData *ctx = (struct VornData *)actor->context;
+    struct VornData *ctx = (struct VornData *)actor->base.context;
 
     if (Script_SeekToKeyword(0x78) != 0) {
         s32 val1, val2;

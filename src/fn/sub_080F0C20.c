@@ -92,7 +92,7 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     scriptParameter = (u16)Script_GetKeywordValue(0x46, 0);
-    arg0->base.field1F0 = scriptParameter;
+    arg0->base.script1F0 = scriptParameter;
     scriptParameter = (u16)Script_GetKeywordValue(0x52, 0);
     arg0->base.field1EC = scriptParameter;
 

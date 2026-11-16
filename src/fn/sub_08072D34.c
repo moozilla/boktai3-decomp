@@ -1,21 +1,21 @@
 // MATCHING_CONCESSION: register-pinning
 #include "scene_actor_contact_list.h"
-static inline u8 Unavailable(struct SceneActorRegistryActor *inputActor, u16 *inputState,
-                             u32 inputDisabled, u32 inputExcluded)
+static inline u8 Unavailable(struct ChaseActor *inputActor, u16 *inputState, u32 inputDisabled,
+                             u32 inputExcluded)
 {
-    register struct SceneActorRegistryActor *actor asm("r3") = inputActor;
+    register struct ChaseActor *actor asm("r3") = inputActor;
     u32 disabled = inputDisabled;
     u16 *state = inputState;
     u32 excluded = inputExcluded;
     u32 flags;
     flags = *state;
-    if ((flags & disabled) || (actor->flags2D0 & excluded) || actor->health <= 0)
+    if ((flags & disabled) || (actor->base.flags2D0 & excluded) || actor->base.health <= 0)
         return 1;
     return 0;
 }
-static inline u32 InvalidFlags(struct SceneActorRegistryActor *actor)
+static inline u32 InvalidFlags(struct ChaseActor *actor)
 {
-    u32 *field = &actor->flags2CC;
+    u32 *field = &actor->base.flags2CC;
     u32 value = *field;
     asm("" : : "r"(actor));
     return value;
@@ -38,7 +38,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
         do {
             u32 incoming = node->flags;
             u32 flags;
-            register struct SceneActorRegistryActor *actor asm("r3");
+            register struct ChaseActor *actor asm("r3");
             u16 *state;
             {
                 u32 active = incoming & 1;

@@ -12,17 +12,17 @@ struct SceneActorCollisionParameters {
     u32 reactionFlags[4];
 };
 void Collider_SetBodyProperties(void *, u16, u32, u32);
-static inline u16 SceneActorCollision_ReadBodyField3C(struct SceneActorRegistryActor *actor)
+static inline u16 SceneActorCollision_ReadBodyField3C(struct ChaseActor *actor)
 {
     const u8 *field = (u8 *)actor + 0x9e;
     return *field;
 }
-static inline u32 SceneActorCollision_ReadBodyReactionFlags(struct SceneActorRegistryActor *actor)
+static inline u32 SceneActorCollision_ReadBodyReactionFlags(struct ChaseActor *actor)
 {
     const u16 *field = (void *)((u8 *)actor + 0xa2);
     return *field;
 }
-static inline u32 SceneActorCollision_ReadBodyField34(struct SceneActorRegistryActor *actor)
+static inline u32 SceneActorCollision_ReadBodyField34(struct ChaseActor *actor)
 {
     const u16 *field = (void *)((u8 *)actor + 0xa4);
     return *field;
@@ -30,8 +30,7 @@ static inline u32 SceneActorCollision_ReadBodyField34(struct SceneActorRegistryA
 void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 /* GNU trailing-storage views avoid imposing a four-entry index bound. The
  * selected entries must lie in initialized storage in the actual actor object. */
-static inline u16 SceneActorCollision_ReadAttackField3C(struct SceneActorRegistryActor *actor,
-                                                        u32 index)
+static inline u16 SceneActorCollision_ReadAttackField3C(struct ChaseActor *actor, u32 index)
 {
     const struct {
         u8 unknown0[0xb4];
@@ -39,8 +38,7 @@ static inline u16 SceneActorCollision_ReadAttackField3C(struct SceneActorRegistr
     } *view = (const void *)actor;
     return view->entries[index];
 }
-static inline u16 SceneActorCollision_ReadAttackField40(struct SceneActorRegistryActor *actor,
-                                                        u32 index)
+static inline u16 SceneActorCollision_ReadAttackField40(struct ChaseActor *actor, u32 index)
 {
     const struct {
         u8 unknown0[0xbc];
@@ -48,8 +46,7 @@ static inline u16 SceneActorCollision_ReadAttackField40(struct SceneActorRegistr
     } *view = (const void *)actor;
     return view->entries[index];
 }
-static inline u32 SceneActorCollision_ReadAttackReactionFlags(struct SceneActorRegistryActor *actor,
-                                                              u32 index)
+static inline u32 SceneActorCollision_ReadAttackReactionFlags(struct ChaseActor *actor, u32 index)
 {
     const struct {
         u8 unknown0[0xcc];
@@ -57,8 +54,7 @@ static inline u32 SceneActorCollision_ReadAttackReactionFlags(struct SceneActorR
     } *view = (const void *)actor;
     return view->entries[index];
 }
-static inline u16 SceneActorCollision_ReadAttackField44(struct SceneActorRegistryActor *actor,
-                                                        u32 index)
+static inline u16 SceneActorCollision_ReadAttackField44(struct ChaseActor *actor, u32 index)
 {
     const struct {
         u8 unknown0[0xc4];

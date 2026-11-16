@@ -5,7 +5,7 @@ void SceneActorEffects_DestroyGroup(void *);
 void TerrainOverlay_QueueRemoveActor(void *);
 void SceneLink_RemoveNode(void *);
 void SceneBody_Unregister(void *);
-void SceneActorRegistry_UnlinkActor(struct SceneActorRegistryActor *);
+void SceneActorRegistry_UnlinkActor(struct ChaseActor *);
 static inline u8 TestFlag(u16 *flags, u32 mask)
 {
     if (*flags & mask)

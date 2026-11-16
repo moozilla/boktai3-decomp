@@ -1,9 +1,9 @@
 #include "scene_actor_availability.h"
 #include "scene_actor_placement.h"
 
-u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argument)
+u32 SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *argument)
 {
-    struct SceneActorPlacementView *actor = (void *)argument;
+    struct RoomActor *actor = (void *)argument;
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (!unavailable && actor->flags2D6) {
         u8 small;

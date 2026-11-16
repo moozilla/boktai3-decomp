@@ -1,41 +1,41 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_components.h"
-struct SceneActorRegistryActor *SceneActorRegistry_FindAvailableAfterId(u32);
-static inline u8 Inactive(struct SceneActorRegistryActor *a)
+struct ChaseActor *SceneActorRegistry_FindAvailableAfterId(u32);
+static inline u8 Inactive(struct ChaseActor *a)
 {
     {
         u32 mask = 0x40;
-        if (a->flags2D4 & mask)
+        if (a->base.flags2D4 & mask)
             return 1;
     }
     {
         u32 mask = 0x20000;
-        if (a->flags2D0 & mask)
+        if (a->base.flags2D0 & mask)
             return 1;
     }
-    if (a->health <= 0)
+    if (a->base.health <= 0)
         return 1;
     return 0;
 }
-struct SceneActorRegistryActor *sub_0806F06C(const struct ContactPosition *center,
-                                             const struct ContactPosition *radius, u32 *cursor)
+struct ChaseActor *sub_0806F06C(const struct ContactPosition *center,
+                                const struct ContactPosition *radius, u32 *cursor)
 {
     s32 i = 0;
     do {
     repeat: {
-        struct SceneActorRegistryActor *a = SceneActorRegistry_FindAvailableAfterId(*cursor);
+        struct ChaseActor *a = SceneActorRegistry_FindAvailableAfterId(*cursor);
         if (!a) {
             return 0;
         }
         {
             u32 mask = 0x400;
-            if (a->flags2D0 & mask) {
+            if (a->base.flags2D0 & mask) {
                 continue;
             }
         }
-        *cursor = a->id;
+        *cursor = a->base.body.id;
         {
-            struct SceneActorBody *body = (struct SceneActorBody *)&a->id;
+            struct SceneActorBody *body = (struct SceneActorBody *)&a->base.body.id;
             if (Inactive(a)) {
                 continue;
             }

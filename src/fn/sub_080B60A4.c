@@ -1,21 +1,18 @@
 #include "global.h"
 #include "scene_actor_registry.h"
-void SceneActorCollision_InitExternalBody(struct SceneActorRegistryActor *,
-                                          struct ContactCollider *, void *, void *, void *, void *,
-                                          u32);
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
-void SceneActorCollision_InitAttack(struct SceneActorRegistryActor *, void *, void *, void *, u32,
-                                    void *);
-void SceneActorCollision_InitExternalAttack(struct SceneActorRegistryActor *,
-                                            struct ContactCollider *, void *, void *, void *, u32,
-                                            void *);
+void SceneActorCollision_InitExternalBody(struct ChaseActor *, struct ContactCollider *, void *,
+                                          void *, void *, void *, u32);
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitAttack(struct ChaseActor *, void *, void *, void *, u32, void *);
+void SceneActorCollision_InitExternalAttack(struct ChaseActor *, struct ContactCollider *, void *,
+                                            void *, void *, u32, void *);
 void SceneActorReaction_TryStartContact(void);
 void SceneActor_TryForward(void);
 void Skeleton_OnAttackCollision(void);
 void Skeleton_OnContactEvent(void);
-void SceneActorControl_InitBehaviorColliders(struct SceneActorRegistryActor *actor)
+void SceneActorControl_InitBehaviorColliders(struct ChaseActor *actor)
 {
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     union SceneActorRegistryPackedPosition bodySize, bodyOffset;
     union SceneActorRegistryPackedPosition innerSize, innerOffset;
     union SceneActorRegistryPackedPosition attackSize, attackOffset;

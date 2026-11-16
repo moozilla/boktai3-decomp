@@ -62,7 +62,7 @@ void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
     index = SceneActorTerrain_GetCellIndex(&target);
     attributes = ((u16 *)SceneActorTerrain_GetCell(index))[1];
     height = Height(index, &target);
-    if (actor->base.groundHeight2BE < height || (attributes & 0x43)) {
+    if (actor->base.groundHeight < height || (attributes & 0x43)) {
         actor->base.secondaryMotion.x = 0;
         actor->base.secondaryMotion.z = 0;
     }

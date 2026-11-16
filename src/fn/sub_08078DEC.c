@@ -1,5 +1,5 @@
 #include "scene_actor_behavior.h"
-static inline u8 Unavailable(struct SceneActorBehaviorView *actor)
+static inline u8 Unavailable(struct RoomActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
@@ -22,7 +22,7 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *actor)
+void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
 {
     u32 *flags;
     u32 clear;
@@ -46,26 +46,26 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
         value = Test(value, value);
         active = value;
         if (!active) {
-            actor->savedControl104 = (void *)active;
-            actor->allocation108 = (void *)active;
+            actor->word104 = (void *)active;
+            actor->word108 = (void *)active;
             return;
         }
     }
     clear = ~1;
     *flags &= clear;
     {
-        const void **field = &actor->savedControl104;
+        const void **field = &actor->word104;
         control = *field;
     }
-    kind = actor->savedKind110;
+    kind = actor->word110;
     {
-        u8 *field = &actor->prepared;
+        u8 *field = &actor->field2B2;
         zero = 0;
         *field = 1;
     }
-    actor->substate = zero;
-    actor->kind = kind;
-    actor->control = control;
+    actor->field2B0 = zero;
+    actor->field2B5 = kind;
+    actor->target = control;
     actor->field2C8 = zero;
     *flags &= clear;
     {
@@ -74,10 +74,10 @@ void SceneActorBehavior_ActivatePendingControl(struct SceneActorBehaviorView *ac
         *(const void **)((u32)actor + offset) = (void *)zero;
     }
     {
-        void **allocation = &actor->allocation108;
+        void **allocation = &actor->word108;
         void *value = *allocation;
         if (value) {
-            Callback_InvokeActor(actor->allocationArgument10C, value);
+            Callback_InvokeActor(actor->word10C, value);
             *allocation = (void *)zero;
         }
     }

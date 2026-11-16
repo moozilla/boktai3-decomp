@@ -38,7 +38,7 @@ void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
         p->z = offset->z + position->z;
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Height(cell, &target);
-        if (actor->base.groundHeight2BE < height) {
+        if (actor->base.groundHeight < height) {
             s32 zero;
             s32 off = 0x2EC;
             s16 *x = (s16 *)((u8 *)actor + off);

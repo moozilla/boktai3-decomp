@@ -312,7 +312,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         SceneActorPlacement_PlayCategoryEventSound(actor);
         ClearPos(&vec, &buf.zero);
-        Polar(&vec, actor->base.field2B6, Rand() & 0x1F);
+        Polar(&vec, actor->base.reactionDirection, Rand() & 0x1F);
         vec.y = (Rand() & 0x1F) + 0x30;
         sub_08127590(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0,
                      0, 0, 0, 0);
@@ -396,15 +396,15 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     *drawable |= 1;
     SceneActorBehavior_CallTerrainScript(actor);
     {
-        u16 script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+        u16 script = (u16)((struct RoomActor *)actor)->script1F8;
         if (script) {
             struct ScriptUtilityArguments arguments;
             buf.values[0] = actor->base.body.position.x;
             buf.values[1] = actor->base.body.position.y;
             buf.values[2] = actor->base.body.position.z;
-            buf.values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-            buf.values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-            buf.values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+            buf.values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+            buf.values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+            buf.values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
             buf.values[6] = actor->base.field2E0;
             buf.values[7] = actor->base.body.id;
             arguments.count = 8;

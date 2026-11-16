@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 
@@ -9,16 +8,16 @@ struct PackedVec {
 };
 u8 *BouncingObject_Spawn(struct PackedVec *, struct PackedVec *, struct PackedVec *, s32, s32, s32,
                          s32);
+// The plain conditional expression keeps each of the six expansions short before combine,
+// which keeps &pos ahead of b in global allocation (r8 and sb, as in the ROM).
 static inline s32 optionalValue(void)
 {
-    s32 value;
-    value = (Script_GetPc()) ? (Script_GetValue()) : (0);
-    return value;
+    return Script_GetPc() ? Script_GetValue() : 0;
 }
 
-static inline void BouncingObject_ClearVector(void *destination, const void *source)
+static inline void BouncingObject_ClearVector(struct PackedVec *vector)
 {
-    CpuSet(source, destination, 0x05000002);
+    CpuFill32(0, vector, sizeof(*vector));
 }
 // confidence=low: spawns a bouncing object from script keywords p (position), a (shot,
 // category), v (velocity), l and n, and sets flag 1 at 0x134.
@@ -31,8 +30,7 @@ void BouncingObject_SpawnFromScript(void)
     s32 a;
     s32 l;
     s32 n;
-    register s32 b asm("r9");
-    struct PackedVec *out;
+    s32 b;
     u8 *object;
     b = 0;
     a = 0;
@@ -45,11 +43,8 @@ void BouncingObject_SpawnFromScript(void)
         a = optionalValue();
         if (Script_GetPc())
             b = Script_GetValue();
-        else {
-            register u32 value asm("r1") = 0;
-            asm("" : "+r"(value));
-            b = value;
-        }
+        else
+            b = 0;
     }
     if (Script_SeekToKeyword('v')) {
         vel.x = optionalValue();
@@ -62,17 +57,8 @@ void BouncingObject_SpawnFromScript(void)
     }
     l = Script_GetKeywordValue('l', 0);
     n = Script_GetKeywordValue('n', 0);
-    {
-        vu32 fill;
-        out = &zero;
-        fill = 0;
-        {
-            const void *source = (const void *)(&fill);
-            void *dest = out;
-            BouncingObject_ClearVector(dest, source);
-        }
-    }
-    object = BouncingObject_Spawn(&pos, &vel, out, a, b, l, n);
+    BouncingObject_ClearVector(&zero);
+    object = BouncingObject_Spawn(&pos, &vel, &zero, a, b, l, n);
     if (object) {
         u16 *flags = (u16 *)(object + 0x134);
         u32 value = *flags;

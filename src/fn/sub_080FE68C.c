@@ -182,10 +182,10 @@ s32 Axe_Init(void *object)
         actor->base.terrainCell = MonsterInit_CellIndex(&actor->base.body.position);
         height = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
                                            &actor->base.body.position);
-        actor->base.groundHeight2BE = height;
+        actor->base.groundHeight = height;
         arg0->groundHeightE58 = height;
     } else {
-        arg0->groundHeightE58 = actor->base.groundHeight2BE;
+        arg0->groundHeightE58 = actor->base.groundHeight;
     }
     arg0->fieldEB6 = Script_GetKeywordValue('w', -1);
     ActorGroup_ReadScriptOptions(actor);

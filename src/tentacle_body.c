@@ -6,7 +6,7 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
     int mask;
     u32 *flags;
     if ((SceneActor_ActionsBlocked(actor) == 0) && (collider->contactFlags & 0xF)) {
-        actor->base.field304 = collider->collisionId;
+        actor->base.counter304 = collider->collisionId;
         flags = &actor->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;
@@ -15,7 +15,7 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
 
 static inline u8 TentacleBody_IsUnavailable(struct ChaseActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
@@ -190,8 +190,8 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
         actor->base.field2B1 = 1;
         actor->base.field2B2 = 1;
         actor->base.restart = 0;
-        actor->base.field304 = 0;
-        actor->base.field2B6 = 0;
+        actor->base.counter304 = 0;
+        actor->base.reactionDirection = 0;
         actor->base.field2C2 = 64;
         actor->base.field2D8 = 0;
         actor->base.field2DC = 0;

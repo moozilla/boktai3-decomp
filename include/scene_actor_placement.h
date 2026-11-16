@@ -2,74 +2,26 @@
 #define GUARD_SCENE_ACTOR_PLACEMENT_H
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
+#include "room_actor.h"
 /* Tile drawable flags relative to its embedded block at drawable +0x20. */
 struct SceneActorPlacementTileFlags {
     u8 unknown0[8];
     u32 flags;
 };
 /* Reset/placement phase; resetControl220 is observed separately from savedTarget22C. */
-struct SceneActorPlacementView {
-    void *object, *drawable;
-    u8 drawableKind, unknown9[0x50];
-    u8 direction, unknown5A[2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-    u8 category, unknown99[3];
-    s16 health;
-    u8 unknown9E[0x66];
-    u32 field104;
-    u8 unknown108[0xC];
-    u32 flags114;
-    u8 unknown118[0x60];
-    u16 field178;
-    u8 unknown17A[0x6C];
-    u16 paletteOffset;
-    u8 unknown1E8[0x34];
-    const void *control, *resetControl220;
-    u8 unknown224[0xC];
-    const void *savedControl230;
-    u8 unknown234[8];
-    void *callback23C;
-    u8 unknown240[0x68];
-    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
-    u32 counter2AC;
-    u8 field2B0, field2B1, field2B2, restart;
-    u8 enabled, field2B5, field2B6, selection;
-    u16 field2B8;
-    u8 unknown2BA[6];
-    u16 flags2C0, field2C2;
-    u32 profileMode;
-    u16 field2C8;
-    u8 unknown2CA[2];
-    u32 flags2CC, flags2D0;
-    u16 flags2D4, flags2D6;
-    u32 flags2D8;
-    u32 flags2DC;
-    u8 unknown2E0[4];
-    u16 field2E4, flags2E6;
-    u8 unknown2E8[4];
-    struct ContactPosition velocity;
-    u16 terrainCell;
-    u8 unknown2F6[0x1A];
-    struct ContactPosition destination;
-    u8 unknown318[8];
-    u8 shadow320[0xB4];
-    struct SceneActorRegistryControlGroup group;
-    struct SceneActorRegistryRoute route;
-};
-void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *);
-void SceneActorRegistry_ResetRoute(struct SceneActorRegistryActor *);
-void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *);
-void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *, u32);
-static inline u32 SceneActorPlacement_ReadFlags16(struct SceneActorPlacementView *actor, u32 mask)
+void SceneActorRegistry_ResetRouteAndColliders(struct ChaseActor *);
+void SceneActorRegistry_ResetRoute(struct ChaseActor *);
+void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *);
+void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
+static inline u32 SceneActorPlacement_ReadFlags16(struct RoomActor *actor, u32 mask)
 {
     return actor->flags2D4 & mask;
 }
-static inline u32 SceneActorPlacement_ReadFlags32(struct SceneActorPlacementView *actor, u32 mask)
+static inline u32 SceneActorPlacement_ReadFlags32(struct RoomActor *actor, u32 mask)
 {
     return actor->flags2D0 & mask;
 }
-static inline u8 SceneActorPlacement_IsUnavailable(struct SceneActorPlacementView *actor)
+static inline u8 SceneActorPlacement_IsUnavailable(struct RoomActor *actor)
 {
     if (actor) {
         if (SceneActorPlacement_ReadFlags16(actor, 0x40) ||
@@ -100,5 +52,5 @@ static inline u8 SceneActorPlacement_TestMask(u32 mask, u32 flags)
         return 1;
     return 0;
 }
-void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *);
+void SceneActorPlacement_PlayCategoryResponseSound(struct ChaseActor *);
 #endif

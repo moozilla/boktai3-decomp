@@ -98,7 +98,7 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
     Vorn_SetResponseFlags(flags, 1);
     flags->bits &= ~2;
     ctx->field698 = ctx->frame69A;
-    a->chase.base.body.direction = a->chase.base.field2B6;
+    a->chase.base.body.direction = a->chase.base.reactionDirection;
     if (reset == 1)
         SceneBody_StartRoute(&a->chase.base.body.id, &group->homeRoute,
                              group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0, 0);

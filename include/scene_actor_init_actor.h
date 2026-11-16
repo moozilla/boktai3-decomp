@@ -5,10 +5,10 @@
 #include "scene_actor_init_primitives.h"
 #include "game_state.h"
 
-struct SceneActorRegistryActor;
+struct ChaseActor;
 void SceneActorControl_OnIdle(u8 *actor);
 s32 Region_FindContaining(void *position);
-void SceneActorRegistry_RegisterCategoryReceiver(struct SceneActorRegistryActor *actor);
+void SceneActorRegistry_RegisterCategoryReceiver(struct ChaseActor *actor);
 
 static inline u32 MonsterInit_GetTerrainCell(struct ChaseActor *actor)
 {
@@ -120,7 +120,7 @@ static inline u16 MonsterInit_GetInitialHealth(struct ChaseActor *actor)
 }
 static inline u16 MonsterInit_GetGroundHeight(struct ChaseActor *actor)
 {
-    return actor->base.groundHeight2BE;
+    return actor->base.groundHeight;
 }
 static inline u32 MonsterInit_GetPaletteBase(struct ChaseActor *actor)
 {
@@ -333,7 +333,7 @@ static inline void MonsterInit_InitializeRegion(struct ChaseActor *actor)
 }
 static inline void MonsterInit_ClearReceiver(struct ChaseActor *actor)
 {
-    actor->base.field304 = 0;
+    actor->base.counter304 = 0;
 }
 static inline void MonsterInit_InitializeReceiver(struct ChaseActor *actor)
 {

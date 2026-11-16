@@ -26,13 +26,12 @@ struct SceneActorPaletteTileView {
     u8 unknown5C[0xC];
     const u16 *palette;
 };
-struct SceneActorRegistryActor *SceneActorRegistry_FindLiving(u32);
+struct ChaseActor *SceneActorRegistry_FindLiving(u32);
 s32 SceneActorRegistry_CountLivingByCategory(s32);
 u32 SceneActorRegistry_TestCategoryFlags(s32, u32);
 void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);
-u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *,
-                                      struct SceneActorRegistryActor *);
+u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *, struct ChaseActor *);
 u32 sub_08072124(void);
 void SceneActorPalette_ClearCompletedTransitions(void);
-void sub_08072204(struct SceneActorRegistryActor *);
+void sub_08072204(struct ChaseActor *);
 #endif

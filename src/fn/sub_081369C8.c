@@ -1,6 +1,6 @@
 #include "global.h"
 #include "scene_actor_placement.h"
-static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
+static inline void SetFlags(struct RoomActor *s, u16 mask)
 {
     s->flags2D4 = mask | s->flags2D4;
 }
@@ -8,13 +8,13 @@ static inline void ClearFlags32(u32 *p, u32 mask)
 {
     *p &= mask;
 }
-s32 SceneActorPlacement_ResetStateThree(struct SceneActorPlacementView *s)
+s32 SceneActorPlacement_ResetStateThree(struct RoomActor *s)
 {
-    if (s->flags2DC & 0x40000) {
+    if (s->field2DC & 0x40000) {
         SetFlags(s, 0x20);
     }
     {
-        const void *control = s->savedControl230;
+        const void *control = s->reactionTarget230;
         u8 code = 0x12;
         u32 zero;
         u8 one;
@@ -28,7 +28,7 @@ s32 SceneActorPlacement_ResetStateThree(struct SceneActorPlacementView *s)
         *taken = one;
         s->field2B0 = zero;
         s->field2B5 = code;
-        s->control = control;
+        s->target = control;
         zero8 = 0;
         s->field2C8 = zero;
         flags = &s->flags114;
@@ -36,7 +36,7 @@ s32 SceneActorPlacement_ResetStateThree(struct SceneActorPlacementView *s)
             u32 mask = -2;
             *flags &= mask;
         }
-        s->field104 = zero;
+        s->word104 = zero;
         three = 3;
         s->state2A8 = three;
         s->phase2A9 = zero8;

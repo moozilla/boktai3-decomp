@@ -393,9 +393,8 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
     p->drawing.flags &= ~1;
 }
 
-static inline u32 Item_NextRandom(void)
+static inline u32 Item_NextRandom(const u16 *t)
 {
-    register const u16 *t asm("r6") = gRandomTable;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return t[gRandomIndex];
 }
@@ -411,12 +410,14 @@ static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSpr
     pos->y = y;
     pos->z = 0;
     if (p->shakeTicks) {
-        u32 r = Item_NextRandom();
+        u32 r;
+        const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (p->shakeTicks >> 8));
+        r = Item_NextRandom(table);
         {
             s32 v = drawing->position.coords.x - 1;
             drawing->position.coords.x = v + (r & 3);
         }
-        r = Item_NextRandom();
+        r = Item_NextRandom(table);
         {
             s32 v = drawing->position.coords.y - 1;
             drawing->position.coords.y = v + (r & 3);

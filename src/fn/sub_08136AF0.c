@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_placement.h"
 
-static inline void SetFlags(struct SceneActorPlacementView *s, u16 mask)
+static inline void SetFlags(struct RoomActor *s, u16 mask)
 {
     s->flags2D4 = mask | s->flags2D4;
 }
@@ -19,28 +19,28 @@ static inline u16 TestFlags(u32 value, u32 mask)
 {
     return mask & value;
 }
-s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView *s)
+s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
 {
     u8 new_var;
     u32 flags = MaskFlags(&s->flags2D4, 0xFFFFFEFF);
     switch (s->category) {
         case 0x12:
-            if (!s->field2E4)
+            if (!s->reactionSoundVariant)
                 goto fallback;
             Sound_PlaySong(0x108);
             break;
         case 0x13:
-            if (!s->field2E4)
+            if (!s->reactionSoundVariant)
                 goto fallback;
             Sound_PlaySong(0x109);
             break;
         case 0x14:
-            if (!s->field2E4)
+            if (!s->reactionSoundVariant)
                 goto fallback;
             Sound_PlaySong(0x13E);
             break;
         case 0x17:
-            if (!s->field2E4) {
+            if (!s->reactionSoundVariant) {
             fallback:
                 Sound_PlaySong(0x211);
             } else if ((new_var = TestFlags(flags, 8))) {
@@ -52,7 +52,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView
             break;
     }
     {
-        const void *control = s->savedControl230;
+        const void *control = s->reactionTarget230;
         u8 code = 0x12;
         u32 zero;
         u8 one;
@@ -66,7 +66,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView
         *taken = one;
         s->field2B0 = zero;
         s->field2B5 = code;
-        s->control = control;
+        s->target = control;
         zero8 = 0;
         s->field2C8 = zero;
         flags = &s->flags114;
@@ -74,7 +74,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct SceneActorPlacementView
             u32 mask = -2;
             *flags &= mask;
         }
-        s->field104 = zero;
+        s->word104 = zero;
         three = 3;
         s->state2A8 = three;
         s->phase2A9 = zero8;

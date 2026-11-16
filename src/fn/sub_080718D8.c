@@ -16,7 +16,7 @@ static inline u8 SceneActorRegistry_HasNoObject(struct ChaseActor *actor)
         return 1;
     return 0;
 }
-void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *argument)
+void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
 {
     struct ChaseActor *actor = (void *)argument;
     u32 *flags;
@@ -150,7 +150,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             parameterOffset += 3;
             address = (u8 *)actor + parameterOffset;
             *address = byteZero;
-            actor->base.field304 = wordZero;
+            actor->base.counter304 = wordZero;
             offset2 += 4;
             address = (u8 *)actor + offset2;
             *address = byteZero;
@@ -310,9 +310,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
                 *address = wordZero;
             }
             offset2 += 0x52;
-            actor->base.field304 = wordZero;
+            actor->base.counter304 = wordZero;
             fieldOffset += 3;
-            actor->base.field2B6 = byteZero;
+            actor->base.reactionDirection = byteZero;
             parameterOffset = ACTOR_OFFSET(base.field2C2);
             actor->base.field2C2 = 64;
             offset1 = ACTOR_OFFSET(base.field2D8);

@@ -94,7 +94,7 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct ChaseActor *actor)
     if (!blocked2048((u8 *)actor) && (*(u16 *)(other + 0xA) & 0xF)) {
         u32 *flags;
         s32 mask;
-        actor->base.field304 = *(u16 *)(other + 4);
+        actor->base.counter304 = *(u16 *)(other + 4);
         flags = &actor->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;

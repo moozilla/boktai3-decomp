@@ -237,15 +237,18 @@ def run(files, pairs, jobs, dry_run=False, rounds=8, trials=16):
         for path, line, old, count, spans, src in ambiguous:
             text = load(path)
             before = text[line - 1]
+            # judge a choice by the errors naming old alone: the new name may need a later step
             base_errs = sum(1 for m in NO_MEMBER.finditer(results[src])
-                            if os.path.normpath(m["path"]) == path and int(m["line"]) == line)
+                            if os.path.normpath(m["path"]) == path and int(m["line"]) == line
+                            and m["member"] == old)
             chosen = None
             for combo in list(itertools.combinations(spans, count))[:trials]:
                 text[line - 1] = apply_spans(before, combo, pairs[old])
                 save(path)
                 after = compile_errors(src)
                 left = sum(1 for m in NO_MEMBER.finditer(after)
-                           if os.path.normpath(m["path"]) == path and int(m["line"]) == line)
+                           if os.path.normpath(m["path"]) == path and int(m["line"]) == line
+                           and m["member"] == old)
                 if left <= base_errs - count:
                     chosen = text[line - 1]
                     break
@@ -472,13 +475,16 @@ def main():
             continue
         if kind in ("types", "text"):
             if not a.dry_run:
-                for path in replace_text(files, pairs, regex=kind == "types"):
+                headers = sorted(os.path.join("include", n) for n in os.listdir(os.path.join(ROOT, "include"))
+                                 if n.endswith(".h")) if kind == "types" else []
+                for path in replace_text(files + headers, pairs, regex=kind == "types"):
                     print(f"rewrote {path} ({kind})")
             continue
         if kind == "embed":
             pairs = {**embed_pairs(*args), **pairs}
-        changed, unsettled, failed = run(files, pairs, a.j, a.dry_run)
-        report(changed, unsettled, {} if a.steps else failed, a.dry_run)
+        changed, step_unsettled, failed = run(files, pairs, a.j, a.dry_run)
+        unsettled.update(step_unsettled)
+        report(changed, step_unsettled, {} if a.steps else failed, a.dry_run)
     if a.steps and failed:
         report([], {}, failed, a.dry_run)
     print(f"{len(files)} units; {len(unsettled)} lines to edit by hand; {len(failed)} with other errors")

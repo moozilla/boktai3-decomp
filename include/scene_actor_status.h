@@ -437,7 +437,7 @@ static inline void ActorStatus_Particles(struct ChaseActor *actor)
     if ((*(u16 *)&actor->base.field30C) != 0) {
         (*(u16 *)&actor->base.field30C)--;
         if (actor->base.body.position.y >= 0 && Mod((*(u16 *)&actor->base.field30C), 4) == 0) {
-            u8 baseAngle = actor->base.field2B6;
+            u8 baseAngle = actor->base.reactionDirection;
             u32 rb;
 
             sparkPos.position = actor->base.body.position;

@@ -2,13 +2,13 @@
 /* SceneActorReaction_RestoreAndClearRestart: Clears the tentative restart flag and restores saved actor state and control once the delay threshold is reached */
 #define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
 #define SceneActorReaction_RestoreAndClearRestart sub_0807FE80
-void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *actor, s32 frame)
+void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 frame)
 {
-    struct SceneActorRegistryActor *owner = actor;
+    struct ChaseActor *owner = actor;
 
     u32 zero;
     {
-        u8 *restart = &owner->field2B3;
+        u8 *restart = &owner->base.restart;
         zero = 0;
         *restart = zero;
     }
@@ -17,15 +17,15 @@ void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *a
         u32 kind = 14;
         u32 one;
         {
-            u8 *field = &owner->field2B2;
+            u8 *field = &owner->base.field2B2;
 
             one = 1;
             *field = one;
         }
-        owner->field2B0 = zero;
+        owner->base.field2B0 = zero;
         *((u8 *)owner + 0x2B5) = kind;
-        owner->control = control;
-        owner->field2C8 = zero;
+        owner->base.target = control;
+        owner->base.field2C8 = zero;
         {
             u32 offset = 0x114;
             u32 *field;
@@ -34,7 +34,7 @@ void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *a
             mask = ~1;
             *field &= mask;
             {
-                u32 *clear = &owner->field104;
+                u32 *clear = &owner->base.word104;
                 *clear = zero;
             }
         }
@@ -42,12 +42,12 @@ void SceneActorReaction_RestoreAndClearRestart(struct SceneActorRegistryActor *a
             u32 state = ((struct SceneActorRestorationState *)owner)->state,
                 phase = ((struct SceneActorRestorationState *)owner)->phase,
                 behavior = ((struct SceneActorRestorationState *)owner)->behavior;
-            owner->state2A8 = state;
-            owner->phase2A9 = phase;
-            owner->behavior2AA = behavior;
+            owner->base.state2A8 = state;
+            owner->base.phase2A9 = phase;
+            owner->base.behavior2AA = behavior;
         }
-        owner->counter2AC = zero;
-        owner->field2B1 = one;
+        owner->base.counter2AC = zero;
+        owner->base.field2B1 = one;
         SceneActorReaction_ResetResponseState((u8 *)owner + 0x460, gUnk_0824E128, 0x8B);
     }
 }

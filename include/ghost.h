@@ -212,7 +212,7 @@ void ActorTick_DecrementCounterAA(struct ChaseActor *actor);
 
 u32 Ghost_UpdateVisibility(struct ChaseActor *a);
 
-u32 ActorContact_UpdateColliderPositions(struct SceneActorBehaviorView *a);
+u32 ActorContact_UpdateColliderPositions(struct RoomActor *a);
 
 void Ghost_FollowDrainedPlayer(struct ChaseActor *actor);
 

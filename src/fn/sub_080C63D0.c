@@ -14,8 +14,8 @@ static inline u8 TakeFlag(u8 *flag)
     }
     return 0;
 }
-struct SceneActorPlacementView;
-void SceneActorPlacement_PlayVariantEventSound(struct SceneActorPlacementView *, u32);
+struct RoomActor;
+void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)

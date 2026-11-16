@@ -14,9 +14,9 @@ static inline u8 HasFlag(struct SceneActorRegistryManager *manager, u32 mask)
     return 0;
 }
 void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *manager,
-                                              struct SceneActorRegistryActor *actor)
+                                              struct ChaseActor *actor)
 {
-    u32 category = actor->category;
+    u32 category = actor->base.category;
     if (category == 2) {
         if (!HasFlag(manager, 8)) {
             struct Task *task = (void *)SceneActorControl_EnsureSingleton();
@@ -32,7 +32,7 @@ void SceneActorRegistry_EnsureActorSubsystems(struct SceneActorRegistryManager *
             }
             manager->controlTaskId = task->id;
         }
-        if (actor->paletteOffset == 1 && !HasFlag(manager, 0x10)) {
+        if (actor->base.paletteOffset == 1 && !HasFlag(manager, 0x10)) {
             struct Task *task = SceneColliderEffect_EnsurePool();
             manager->variantTask = task;
             if (!task)

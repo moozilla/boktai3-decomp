@@ -4,7 +4,7 @@
 #include "scene_actor_chase_types.h"
 #include "player_cue_sequence.h"
 void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
-void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *);
+void SceneActorMovement_UpdateHeight(struct ChaseActor *);
 void Obj_StepPosition(void *);
 struct RepeatedEffectPosition;
 s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
@@ -86,7 +86,7 @@ static inline u16 SceneActorMotion_Elapsed(struct ChaseActor *actor)
             &((struct SceneActorMotionSequence *)actor->base.drawable)->sequence);
     return ((struct SceneActorMotionTile *)actor->base.drawable)->elapsed;
 }
-s32 SceneActorMovement_UpdateAnimationAndTerrain(struct SceneActorRegistryActor *object)
+s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
 {
     struct ChaseActor *actor = (void *)object;
     struct ContactCollider *collider;
@@ -159,7 +159,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct SceneActorRegistryActor 
         cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
         if (*currentCell != actor->base.previousTerrainCell) {
             if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.field2EA <=
-                                          actor->base.groundHeight2BE) {
+                                          actor->base.groundHeight) {
                 void *sink;
                 if (SceneActorPlacement_IsUnavailable((void *)actor))
                     goto done;
@@ -177,7 +177,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct SceneActorRegistryActor 
                 cell = *currentCell;
                 SceneActorTerrain_GetCenter(cell, &center);
                 SceneActorTerrain_Subtract(&delta, &center, position);
-                actor->base.field2B6 = Math_Atan2(delta.x, delta.z) >> 5;
+                actor->base.reactionDirection = Math_Atan2(delta.x, delta.z) >> 5;
                 actor->base.field2E0 = 0x20;
                 collider->cost = MonsterInit_GetHealth(actor);
                 actor->base.reactionSoundVariant = MonsterInit_GetHealth(actor);

@@ -1,14 +1,14 @@
 #include "scene_actor_update.h"
-void SceneActorBehavior_UpdateColliders(struct SceneActorBehaviorView *);
-static inline u32 SceneActorBehavior_TestMotionFlags(u32 mask, struct SceneActorBehaviorView *p)
+void SceneActorBehavior_UpdateColliders(struct RoomActor *);
+static inline u32 SceneActorBehavior_TestMotionFlags(u32 mask, struct RoomActor *p)
 {
     return p->flags2D4 & mask;
 }
-static inline u32 SceneActorBehavior_TestStatusFlags(u32 mask, struct SceneActorBehaviorView *p)
+static inline u32 SceneActorBehavior_TestStatusFlags(u32 mask, struct RoomActor *p)
 {
     return p->flags2D0 & mask;
 }
-static inline u8 Inactive(struct SceneActorBehaviorView *actor)
+static inline u8 Inactive(struct RoomActor *actor)
 {
     if (!actor)
         return 0;
@@ -17,9 +17,9 @@ static inline u8 Inactive(struct SceneActorBehaviorView *actor)
         return 1;
     return 0;
 }
-s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *actor)
+s32 SceneActorBehavior_UpdateTimersAndContacts(struct RoomActor *actor)
 {
-    struct SceneActorBehaviorView *updateActor = actor;
+    struct RoomActor *updateActor = actor;
     u32 inactive;
     actor->counter304 = 0;
     inactive = Inactive(actor);
@@ -34,8 +34,8 @@ s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorBehaviorView *ac
             if (flags & mask)
                 control->timer = inactive;
             else {
-                struct SceneActorRegistryActor *base = (void *)actor;
-                u16 *timerPtr = &base->field2B8;
+                struct ChaseActor *base = (void *)actor;
+                u16 *timerPtr = &base->base.field2B8;
                 s16 timer;
                 timer = *timerPtr;
                 if (timer) {

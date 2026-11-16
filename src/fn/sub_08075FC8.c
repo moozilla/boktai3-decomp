@@ -1,13 +1,13 @@
 #include "scene_actor_availability.h"
 #include "scene_actor_state.h"
 #include "scene_actor_registry.h"
-void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *);
+void SceneActorBehavior_UpdateColliders(struct ChaseActor *);
 
-s32 SceneActorMovement_RequestAvailableAction(struct SceneActorRegistryActor *actor)
+s32 SceneActorMovement_RequestAvailableAction(struct ChaseActor *actor)
 {
     u32 unavailable;
     /* The unconditional first store requires a valid actor. */
-    ((struct ChaseActor *)actor)->base.field304 = 0;
+    ((struct ChaseActor *)actor)->base.counter304 = 0;
     unavailable = SceneActor_ActionsBlocked(actor);
     {
         u32 result;

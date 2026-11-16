@@ -6,8 +6,8 @@
 #include "script_utility.h"
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
-void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 void Axe_ReleaseAuxiliarySprite(void *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 s32 Mod(s32, s32);
@@ -122,14 +122,14 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript((void *)actor);
-    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = (u16)((struct RoomActor *)actor)->script1F8;
     if (script) {
         buf.values[0] = actor->base.body.position.x;
         buf.values[1] = actor->base.body.position.y;
         buf.values[2] = actor->base.body.position.z;
-        buf.values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-        buf.values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-        buf.values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        buf.values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+        buf.values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+        buf.values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
         buf.values[6] = actor->base.field2E0;
         buf.values[7] = actor->base.body.id;
         arguments.count = 8;

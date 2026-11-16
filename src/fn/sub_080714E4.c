@@ -166,7 +166,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     collider->responseValue = 0;
 }
 
-void SceneActorRegistry_ResetRouteAndColliders(struct SceneActorRegistryActor *argument)
+void SceneActorRegistry_ResetRouteAndColliders(struct ChaseActor *argument)
 {
     SceneActorRegistry_ResetRouteState((void *)argument);
 }

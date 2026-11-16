@@ -46,7 +46,7 @@ struct Skeleton {
     u8 unknown748[4];
 };
 
-void SceneActorScript_TriggerCallOnCount(struct SceneActorRegistryActor *);
+void SceneActorScript_TriggerCallOnCount(struct ChaseActor *);
 u8 SceneActorReaction_IsRangeReady(struct ChaseActor *);
 u8 sub_0812F3CC(struct ChaseActor *);
 void Skeleton_UpdateTargetTransition(void);
@@ -61,13 +61,13 @@ void SceneActorReaction_TickHiddenResponse(void *);
 void SceneActorControl_DispatchControl(void *);
 void Skeleton_UpdateActionFlags(void *);
 extern u32 gUnk_02000560;
-void SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *);
-void SceneActorTarget_OnBindingChanged(struct SceneActorRegistryActor *);
-void SceneActorBehavior_ActivatePendingControl(struct SceneActorRegistryActor *);
-s32 SceneActorBehavior_DispatchPendingFlags(struct SceneActorRegistryActor *);
-s32 SceneActorBehavior_UpdateTimersAndContacts(struct SceneActorRegistryActor *);
-void SceneActorMotion_Update(struct SceneActorRegistryActor *);
-s32 SceneActor_UpdateStatus(struct SceneActorRegistryActor *);
+void SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *);
+void SceneActorTarget_OnBindingChanged(struct ChaseActor *);
+void SceneActorBehavior_ActivatePendingControl(struct ChaseActor *);
+s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *);
+s32 SceneActorBehavior_UpdateTimersAndContacts(struct ChaseActor *);
+void SceneActorMotion_Update(struct ChaseActor *);
+s32 SceneActor_UpdateStatus(struct ChaseActor *);
 void SceneActorEffects_ReleaseResources(u8 *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
@@ -107,7 +107,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor);
 void SceneActorReaction_SinkThenDefeat(void);
 void Skeleton_BeginKnockedFlight(void);
 void SceneActorReaction_TickHiddenTimeout(void);
-s32 Skeleton_UpdateBehaviorCallbacks(struct SceneActorRegistryActor *p);
+s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *p);
 u32 Skeleton_Destroy(struct Skeleton *actor);
 extern const u8 gUnk_086060FC[];
 s32 Skeleton_Init(void *object);
@@ -120,9 +120,9 @@ u32 Actor_StepTowardTargetAxis(struct ChaseActor *obj, struct ActorSprite *targe
                                u32 nearZ, s32 speed);
 s32 SceneActorTerrain_CompareNeighborHeight(s32 cell, s32 height, s32 direction);
 void Skeleton_StepPosition(struct ContactPosition *position, s32 n);
-u8 SceneActorRegistry_LinkActor(struct SceneActorRegistryActor *);
-void SceneActorPlacement_HideActor(struct SceneActorRegistryActor *, s32);
-void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
+u8 SceneActorRegistry_LinkActor(struct ChaseActor *);
+void SceneActorPlacement_HideActor(struct ChaseActor *, s32);
+void SceneActorPlacement_ShowActor(struct ChaseActor *, s32);
 static inline void Skeleton_SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;

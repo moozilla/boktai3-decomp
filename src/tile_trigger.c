@@ -55,8 +55,8 @@ struct TileTrigger;
 struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *, const struct SceneVec *,
                                                   s32);
 
-struct SceneActorRegistryActor *sub_0806F06C(const struct ContactPosition *,
-                                             const struct ContactPosition *, u32 *);
+struct ChaseActor *sub_0806F06C(const struct ContactPosition *, const struct ContactPosition *,
+                                u32 *);
 
 s32 Player_BeginDirectionalCue(struct Player *, s32);
 
@@ -85,7 +85,7 @@ static inline u32 TileContact_NextParticleSample(u32 *cursor, const u16 *table)
     return table[index];
 }
 
-static inline void TileContact_EmitThreeParts(struct SceneActorRegistryActor *actor)
+static inline void TileContact_EmitThreeParts(struct ChaseActor *actor)
 {
     s32 i;
     u16 sample;
@@ -100,15 +100,15 @@ static inline void TileContact_EmitThreeParts(struct SceneActorRegistryActor *ac
         scale.x = 5;
         scale.y = 10;
         scale.z = 5;
-        position.x = actor->effectOrigin->x;
-        position.y = actor->effectOrigin->y + 128;
-        position.z = actor->effectOrigin->z;
-        source = actor->effectConfig;
+        position.x = actor->group.effectOrigin->x;
+        position.y = actor->group.effectOrigin->y + 128;
+        position.z = actor->group.effectOrigin->z;
+        source = actor->group.effectConfig;
         EffectGroup_SpawnPart((struct EffectGroup *)source, 3, (u32)&position, (u32)&velocity,
                               (u32)&scale, 40, 40);
     }
-    actor->fieldAA = 0;
-    actor->field2B8 = 0;
+    actor->base.fieldAA = 0;
+    actor->base.field2B8 = 0;
 }
 
 void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
@@ -164,7 +164,7 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
         Chase_SetState(actor, 3, 0, 0);
         actor->base.field2B8 = 0;
         if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
-            TileContact_EmitThreeParts((struct SceneActorRegistryActor *)actor);
+            TileContact_EmitThreeParts((struct ChaseActor *)actor);
         }
         actorFound = 1;
     }

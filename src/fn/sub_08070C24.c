@@ -12,21 +12,22 @@ static inline s32 Bounds_PlanarDistanceSquared(const struct ContactPosition *v)
 {
     return v->x * v->x + v->z * v->z;
 }
-u32 SceneActorRegistry_TestNearestPlayerBounds(struct SceneActorRegistryActor *actor,
+u32 SceneActorRegistry_TestNearestPlayerBounds(struct ChaseActor *actor,
                                                const struct ContactPosition *bounds)
 {
     s32 nearestDistance = 0x7fffffff;
     s32 nearestIndex = -1;
     struct ContactPosition origin, difference, bestDifference;
     s32 i;
-    u32 category = actor->category;
+    u32 category = actor->base.category;
     if (category == 10) {
         u32 mask = 0x4000000;
-        if (actor->flags2D0 & mask)
+        if (actor->base.flags2D0 & mask)
             return 1;
         return 0;
     }
-    Path_GetPointPositionById((u16 *)&origin, actor->pathId, actor->pathPointIndex);
+    Path_GetPointPositionById((u16 *)&origin, actor->group.homeRoute.routeId,
+                              actor->group.homeRoute.pointId);
     for (i = 0; i < gPlayerCount; i++) {
         struct Player *player = gPlayers[i];
         if (player) {

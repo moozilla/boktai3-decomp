@@ -13,18 +13,13 @@ void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
-struct VornDefeatScript {
-    u16 id, unused;
-    s32 parameters[3];
-};
 static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
 {
-    struct VornDefeatScript *script = (void *)&actor->base.unknown1F4[4];
-    return script->id;
+    return actor->base.script1F8;
 }
 static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
 {
-    return ((struct SceneActorBehaviorView *)actor)->parameters1FC[index];
+    return actor->base.parameters1FC[index];
 }
 static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {

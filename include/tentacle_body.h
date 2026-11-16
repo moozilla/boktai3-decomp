@@ -34,7 +34,7 @@ struct TentacleBodyDrawable {
 
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorView *);
+                                             struct RoomActor *);
 void TentacleActor_EnterHitReaction(struct ChaseActor *);
 void TentacleBody_GetDirectionFrame(u8, u32 *, u32 *);
 void TentacleBody_ResetDirectionalAnimations(void *, s32);

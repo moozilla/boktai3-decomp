@@ -14,9 +14,9 @@ struct VornActorExtra {
     u32 arrCC[4];
 };
 
-void Vorn_SpawnHazard(struct SceneActorRegistryActor *actor, s32 index)
+void Vorn_SpawnHazard(struct ChaseActor *actor, s32 index)
 {
-    struct VornData *ctx = (struct VornData *)actor->context;
+    struct VornData *ctx = (struct VornData *)actor->base.context;
     struct VornActorExtra *extra = (struct VornActorExtra *)actor;
     u16 b4 = extra->arrB4[index];
     u16 bc = extra->arrBC[index];

@@ -1,10 +1,10 @@
 #include "scene_actor_registry.h"
-u32 SceneActorAttachment_TestPositionWindow(struct SceneActorRegistryActor *actor,
+u32 SceneActorAttachment_TestPositionWindow(struct ChaseActor *actor,
                                             const struct ContactPosition *position, u32 xWindow,
                                             u32 zWindow)
 {
-    s16 x = (u16)position->x - (u16)actor->position.x;
-    s16 z = (u16)position->z - (u16)actor->position.z;
+    s16 x = (u16)position->x - (u16)actor->base.body.position.x;
+    s16 z = (u16)position->z - (u16)actor->base.body.position.z;
     s32 dx = x;
     s32 dz;
     if (dx < 0)

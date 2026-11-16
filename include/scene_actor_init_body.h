@@ -43,7 +43,7 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
     MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
 
     if (Script_SeekToKeyword('A')) {

@@ -2,13 +2,13 @@
 #include "scene_actor_placement.h"
 void Collision_CalculateDamageResponse(struct SceneActorBehaviorContactView *,
                                        struct SceneActorBehaviorContactView *);
-void SceneActor_SetContactReactionDirection(struct SceneActorBehaviorView *,
+void SceneActor_SetContactReactionDirection(struct RoomActor *,
                                             struct SceneActorBehaviorContactView *,
                                             struct SceneActorBehaviorContactView *);
 void PlayerStats_AddContactHundredths(struct SceneActorBehaviorContactView *, void *, u32);
-static inline u32 Unavailable(struct SceneActorBehaviorView *actor)
+static inline u32 Unavailable(struct RoomActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 static inline u8 Test(u32 value, u32 mask)
 {
@@ -23,15 +23,15 @@ static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorCont
 }
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *source,
                                              struct SceneActorBehaviorContactView *destination,
-                                             struct SceneActorBehaviorView *actor)
+                                             struct RoomActor *actor)
 {
     struct SceneActorBehaviorContactView *primary;
     u32 unavailable = Unavailable(actor);
     if (unavailable)
         return;
-    primary = (void *)&actor->primaryCollider;
-    if (actor->primaryCollider.responseValue) {
-        if (actor->mode2E6) {
+    primary = (void *)&actor->colliderA;
+    if (actor->colliderA.responseValue) {
+        if (actor->field2E6) {
             destination->remaining = unavailable;
             destination->mode = 0;
         }
@@ -58,7 +58,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     if ((u32)(actor->category - 18) <= 2 || actor->category == 23) {
         destination->power = source->power;
     } else if (ReadReactionFlags(0x40000, source)) {
-        u8 *defense = &actor->defense9F;
+        u8 *defense = &actor->field9F;
         s32 power;
         power = source->power;
         power -= *defense;
@@ -67,7 +67,7 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         destination->power = power;
     }
     SceneActor_SetContactReactionDirection(actor, source, destination);
-    actor->payload2E0 = source->kind;
+    actor->field2E0 = source->kind;
     {
         u32 parameter = source->parameter34;
         u32 reaction = source->reactionFlags;
@@ -83,12 +83,12 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
         if (Test(gGameState->flags868, mask) || (ReadReactionFlags(0x40, source))) {
             destination->remaining = 0;
             destination->power = 0;
-            actor->result2E4 = 0;
-            actor->mode2E6 = 1;
+            actor->reactionSoundVariant = 0;
+            actor->field2E6 = 1;
         }
     }
-    actor->result2E4 = destination->remaining;
-    PlayerStats_AddContactHundredths(source, destination, actor->reactionA0);
+    actor->reactionSoundVariant = destination->remaining;
+    PlayerStats_AddContactHundredths(source, destination, actor->fieldA0);
     {
         u32 mask = 0x2000;
         u32 offset = 0x2CC;

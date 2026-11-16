@@ -6,8 +6,8 @@
 #include "ram.h"
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
-void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
-void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
+void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
+void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -119,14 +119,14 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         if (!(actor->base.flags2CC & mask))
             SceneActorBehavior_CallTerrainScript((void *)actor);
     }
-    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = (u16)((struct RoomActor *)actor)->script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
         values[6] = actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;

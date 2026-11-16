@@ -6,9 +6,9 @@ struct AuxiliaryAttackGroup {
     struct ContactCollider colliders[3];
 };
 void ActorCollision_IgnoreContact(void);
-void ActorCollision_InitThreeAuxiliaryAttacks(struct SceneActorRegistryActor *actor)
+void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
 {
-    struct AuxiliaryAttackGroup *group = actor->context;
+    struct AuxiliaryAttackGroup *group = actor->base.context;
     struct ContactPackedVector size, offset;
     s32 i;
     size.x = 24;
@@ -19,12 +19,12 @@ void ActorCollision_InitThreeAuxiliaryAttacks(struct SceneActorRegistryActor *ac
     offset.z = 0;
     for (i = 0; i < 3; i++) {
         struct ContactCollider *collider = &group->colliders[i];
-        Collider_Init(collider, actor->id, 0x2401, 0, 16, &size, &offset);
+        Collider_Init(collider, actor->base.body.id, 0x2401, 0, 16, &size, &offset);
         Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, 3),
                                      SceneActorCollision_ReadAttackField40(actor, 3), 0,
                                      SceneActorCollision_ReadAttackReactionFlags(actor, 3),
                                      SceneActorCollision_ReadAttackField44(actor, 3));
-        Collider_SetPosition(collider, &actor->position, 0);
+        Collider_SetPosition(collider, &actor->base.body.position, 0);
         Collider_SetCallback(collider, ActorCollision_IgnoreContact, actor);
     }
 }

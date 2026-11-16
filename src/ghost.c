@@ -638,19 +638,16 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
-    script = ((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = ((struct RoomActor *)actor)->script1F8;
     if (script) {
         s32 values[8];
         struct ScriptUtilityArguments arguments;
         Ghost_SetScriptValue(actor->base.body.position.x, &values[0]);
         Ghost_SetScriptValue(actor->base.body.position.y, &values[1]);
         Ghost_SetScriptValue(actor->base.body.position.z, &values[2]);
-        Ghost_SetScriptValue(((struct SceneActorBehaviorView *)actor)->parameters1FC[0],
-                             &values[3]);
-        Ghost_SetScriptValue(((struct SceneActorBehaviorView *)actor)->parameters1FC[1],
-                             &values[4]);
-        Ghost_SetScriptValue(((struct SceneActorBehaviorView *)actor)->parameters1FC[2],
-                             &values[5]);
+        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[0], &values[3]);
+        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[1], &values[4]);
+        Ghost_SetScriptValue(((struct RoomActor *)actor)->parameters1FC[2], &values[5]);
         Ghost_SetScriptValue(actor->base.field2E0, &values[6]);
         Ghost_SetScriptValue(actor->base.body.id, &values[7]);
         arguments.count = 8;
@@ -1406,9 +1403,9 @@ u8 Ghost_SelectRandomRouteEntry(struct SceneActorRouteCursor *cursor)
     return 1;
 }
 
-struct SceneActorRegistryActor;
+struct ChaseActor;
 
-void SceneActorCollision_InitBody(struct SceneActorRegistryActor *, void *, void *, void *, void *);
+void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 
@@ -2357,14 +2354,14 @@ finish:
     return 1;
 }
 
-u8 SceneActorBehavior_IsNearParticipant(struct SceneActorRegistryActor *);
+u8 SceneActorBehavior_IsNearParticipant(struct ChaseActor *);
 
 static inline u32 Ghost_ReadColliderControl(u32 mask, u16 *control)
 {
     return *control & mask;
 }
 
-u32 ActorContact_UpdateColliderPositions(struct SceneActorBehaviorView *actor)
+u32 ActorContact_UpdateColliderPositions(struct RoomActor *actor)
 {
     u16 *control;
     struct ContactPosition *position;
@@ -2381,24 +2378,24 @@ u32 ActorContact_UpdateColliderPositions(struct SceneActorBehaviorView *actor)
     {
         u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
         position = (void *)actor;
-        position = &((struct SceneActorBehaviorView *)position)->position;
+        position = &((struct RoomActor *)position)->body.position;
         if (!near || Ghost_ReadColliderControl(6, control))
             goto primary;
     }
 secondary: {
-    struct ContactCollider *collider = &actor->secondaryCollider;
+    struct ContactCollider *collider = &actor->colliderB;
     u32 flags = collider->flags;
     u32 disabled = 4;
     disabled &= flags;
     position = (void *)actor;
-    position = &((struct SceneActorBehaviorView *)position)->position;
+    position = &((struct RoomActor *)position)->body.position;
     if (!disabled) {
         Collider_SetPosition(collider, position, 0);
         Collider_Refresh(collider);
     }
 }
 primary:
-    Collider_SetPosition(&actor->primaryCollider, position, 0);
+    Collider_SetPosition(&actor->colliderA, position, 0);
 done:
     return 1;
 }
@@ -3016,7 +3013,7 @@ static inline void Ghost_InitializeScriptFields(struct ChaseActor *actor, u32 *f
     }
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(actor, 0x200);
-    actor->base.field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
+    actor->base.script1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
     actor->base.field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
     if (Script_SeekToKeyword('A')) {
         MonsterInit_SetInitialHealth(actor, MonsterInit_ReadHalfword(0));
@@ -3231,7 +3228,7 @@ static inline u32 Ghost_ReadRoute(struct ChaseActor *actor, struct SceneActorReg
             Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(route);
         Path_GetPointPositionById((u16 *)&point, route->routeId, route->pointId);
         actor->base.terrainCell = MonsterInit_CellIndex(&point);
-        point.y = actor->base.groundHeight2BE =
+        point.y = actor->base.groundHeight =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &point);
         MonsterInit_BeginRoute(&actor->base.body, route);
         return 1;
@@ -3280,12 +3277,12 @@ s32 Ghost_Init(void *object)
         a->base.body.position.y = MonsterInit_ReadHalfword(0);
         a->base.body.position.z = MonsterInit_ReadHalfword(0);
         a->base.terrainCell = MonsterInit_CellIndex(&a->base.body.position);
-        a->base.groundHeight2BE =
+        a->base.groundHeight =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(a), &a->base.body.position);
-        arg0->baseHeight = a->base.groundHeight2BE;
+        arg0->baseHeight = a->base.groundHeight;
         MonsterInit_DrawablePosition(a);
     } else
-        arg0->baseHeight = a->base.groundHeight2BE;
+        arg0->baseHeight = a->base.groundHeight;
     arg0->delayDuration = MonsterInit_ReadKeywordHalfword('l', 0);
     arg0->previousPlayer = *(struct ContactPosition *)&gPlayers[0]->position;
     if (Script_SeekToKeyword('P')) {
