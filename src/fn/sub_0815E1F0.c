@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
@@ -55,6 +54,16 @@ static inline u32 contactFlag(struct ContactCollider *c, u32 mask)
     u32 *flags = &c->reactionFlags;
     return *flags & mask;
 }
+// The capped duration is computed and then unused: the reset always gets power + 60.
+static inline u32 resetDuration(u32 power)
+{
+    u32 duration = power + 60;
+    if (gEngineFlags & 0x1000) {
+        if (duration > 255)
+            duration = 255;
+    }
+    return power + 60;
+}
 s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source,
                                 struct ContactCollider *target)
 {
@@ -92,13 +101,7 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             p->secondaryDrawFlags &= ~0x400;
         }
         if ((contactFlag(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
-            register u32 power asm("r2") = source->unknown3C;
-            u32 duration = power + 60;
-            u32 flags;
-            flags = gEngineFlags & 0x1000;
-            // Preserve the original evaluated values without changing the callee's ABI.
-            asm volatile("" : "+r"(flags) : "r"(power), "r"(duration));
-            Player_RequestTimedReset(p, power + 60);
+            Player_RequestTimedReset(p, resetDuration(source->unknown3C));
             p->positionResetCounter = 1;
         }
         if (!p->positionResetRequested && p->positionResetTimer)
