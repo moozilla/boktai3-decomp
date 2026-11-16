@@ -235,7 +235,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-31.md](../docs/history/2026-10-31.md) | 2026-10-31: finish-subsystem sessions | #bosses #cleanup #compiler #data #effects #hresvelgr #matching #player #presentation #process #ratatosk #register-pinning #scene-actors #structs #studio #tooling #vanargand | 7 |
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
-| [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 9 |
+| [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -398,7 +398,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
 | [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
-| [notes/object-cleanup_2026-11-15.md](../notes/object-cleanup_2026-11-15.md) | Object-model cleanup, items 1 to 4 (2026-11-15) | #cleanup #structs #engine #actors #tooling #object-model | 8 |
+| [notes/object-cleanup_2026-11-15.md](../notes/object-cleanup_2026-11-15.md) | Object-model cleanup, items 1 to 4 (2026-11-15) | #cleanup #structs #engine #actors #tooling #object-model | 10 |
 | [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
 | [notes/opus-armor-part-damage_2026-11-01.md](../notes/opus-armor-part-damage_2026-11-01.md) | Armor_OnPartDamageCollision (0818C6F8): matched in ordinary C | #matching #armor #twin #random-table #cross-jump | 2 |
 | [notes/opus-charged-burst-spark_2026-10-31.md](../notes/opus-charged-burst-spark_2026-10-31.md) | ChargedBurst_EmitSpark (082335F0): matched (2026-11-01) | #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #global-alloc | 13 |
@@ -447,6 +447,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/repeated-effect_2026-10-14.md](../notes/repeated-effect_2026-10-14.md) | Contiguous repeated effect cohort (Sol, 2026-10-14) |  | 5 |
 | [notes/research-handoff-2026-10-23.md](../notes/research-handoff-2026-10-23.md) | Research handoff: making matching cheaper (2026-10-23) | *#matching #process* | 7 |
 | [notes/resource-station_2026-10-14.md](../notes/resource-station_2026-10-14.md) | Stored-resource station (Sol, 2026-10-14) | *#assets #tooling* | 3 |
+| [notes/room-actor-layout_2026-11-15.md](../notes/room-actor-layout_2026-11-15.md) | The registry actor base: merged layout (2026-11-15) | #object-model #structs #actors #registry #enemies | 10 |
 | [notes/root-batch6.md](../notes/root-batch6.md) | Main-thread batch 6 evidence | *#scene #hardware #tooling* | 2 |
 | [notes/round1-luna-a.md](../notes/round1-luna-a.md) | Luna A production round |  | 2 |
 | [notes/round1-luna-b.md](../notes/round1-luna-b.md) | Production matching round 1 — Luna B | *#matching* | 1 |
