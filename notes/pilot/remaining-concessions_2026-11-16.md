@@ -1,6 +1,6 @@
-# Functions still carrying a concession after pilot batch 17 (2026-11-16)
+# Functions still carrying a concession at the end of the phase-3 pilot run (2026-11-16)
 
-From `python3 tools/progress.py --list-pinned` on main after batch 17: 36 functions, in ROM order.
+From `python3 tools/progress.py --list-pinned` on main after pilot batch 18: 36 functions, in ROM order.
 
 | Address | Function | Kinds | Bytes |
 |---|---|---|---|

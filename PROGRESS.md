@@ -16,7 +16,7 @@ Without concessions: **98.870%**. With concessions (register pins, asm barriers 
 | `volatile` | 14 (+17 excused) |
 | `cflags` | 0 (+50 excused) |
 | `raw-offset` | 8 |
-| `goto` (tracked, not scored) | 2,147 |
+| `goto` (tracked, not scored) | 2,143 |
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 

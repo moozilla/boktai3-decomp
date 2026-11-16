@@ -31,7 +31,7 @@ stronger model), comes only after the extreme effort [WORKER.md](WORKER.md) "Sta
 until it matches" describes. Measure progress by exact matches and removed concessions,
 not by fuzzy scores. Blind spelling sweeps don't count.
 
-## Where things stand (2026-10-31)
+## Where things stand (2026-11-16)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -41,25 +41,27 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 |---|---|
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
-| Phase 2 | the last guarded drafts (PROGRESS.md "Nonmatching drafts"): GPT-6 Pro's round 9 queue (scene actors 1, 2 and 4, misc) and 17 round 8 holdouts, which an Opus worker is retrying |
-| Phase 3 | the With concessions share in PROGRESS.md (tools/concessions.py; decomp.dev counts only concession-free code as matched); `scope.py FILE.c pins` and `tools/depin.py` remove them |
-| Phase 4 | names, shared types, a real source tree and subsystem units ([ROADMAP.md](ROADMAP.md)); the [EWRAM shared declarations](../notes/ewram-layout_2026-10-27.md), naming as functions match, and the cleanup units from the Codex run, integrated in batches (notes: [menus/link](../notes/menus-link-cleanup_2026-11-12.md), [engine/player](../notes/cx-cl-bosses_cleanup_2026-11-13.md)) |
+| Phase 2 | complete: every function matches; no `#ifdef NONMATCHING` drafts are left |
+| Phase 3 | 98.870% of code is concession-free; 36 functions still carry a pin, operand, barrier or single-use macro, listed in [notes/pilot/remaining-concessions_2026-11-16.md](../notes/pilot/remaining-concessions_2026-11-16.md) with drafts in `notes/phase3-drafts/pilot/` and per-worker logs in `notes/pilot/*.tsv`. No new concessions: stay on a function until it matches without one; a holdout (best draft, note, matchsearch store) only after the extreme effort [WORKER.md](WORKER.md) describes |
+| Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/room_actor.h`) or `struct ChaseActor` (`include/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
-* **2026-10-31**: the finish-subsystem Codex sessions (scene actors 3, bosses, player,
-  effects) and GPT-6 Pro round 8 are integrated. Round 8 left 18 holdouts with notes and
-  matchsearch stores; an Opus worker matched `Ratatosk_UpdateDefeatSequence` (`081F4CF8`) from them and is continuing. scope's `why`
-  now explains stack-slot reloads ([batch history](history/2026-10-31.md)).
-* **2026-10-30**: rounds 6 and 7 (monster initializers and recovery) and the player cue
-  batch; many command and animation tables are editable and browsable in Studio.
+* **2026-11-15 to 16, the phase-3 pilot run** (PRs 1021 to 1039): pilot workers removed the
+  concessions from most remaining functions (concession-free 95.042% to 98.870%; functions
+  with a concession 219 to 36), and the object-model cleanup landed in the same batches
+  ([history](history/2026-11-16.md)).
+* **Cleanup tools**: `tools/retype_fields.py` rewrites member accesses after a struct's
+  members move or get names, replayed from steps files in `tools/retype/` (`room_actor.txt`,
+  `room_actor_names.txt`, `chase_group_names.txt`, in that order, on a branch that predates
+  them). `tools/unselect.py` replaces selector macros with a file's own copies of the
+  inlines. `tools/fold_views.py`, `tools/struct_views.py`, `tools/merge_resolve.py` and
+  `tools/header_dependents.py --since REV --check` support class folds and unit merges.
 * **ARM code**: `sub_08000430` (IWRAM, `src/iwram_code.c`) matched without pinning
   through an instrumented ARM compiler (`agbcc_arm`; [notes/arm-08000430.md](../notes/arm-08000430.md)).
   scope compiles Thumb only.
-* **Yu-Gi-Oh! EDS wiki vendored**: [external/eds/](external/eds/README.md), a catalog of
-  GCC 2.95 matching tricks from another agent-driven decomp.
 
 ## The tools that matter now
 
