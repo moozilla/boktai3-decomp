@@ -1,43 +1,6 @@
-#include "global.h"
+#include "fading_particle_group.h"
 #include "ram.h"
 #include "display_sequence_inline.h"
-// MATCHING_CONCESSION: register-pinning
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[4];
-    u16 tile;
-    u8 width, height;
-    u8 padc[12];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Motion {
-    struct Vec velocity;
-    struct Sprite sprite;
-    struct Anim anim;
-};
-struct Particle {
-    u8 active, lifetime;
-    s16 speed;
-    struct Motion motion;
-};
-struct Group {
-    u8 active, count, pad[2];
-    struct Particle particles[8];
-};
-struct Manager {
-    u8 pad[28];
-    u8 *resource;
-    void *animations;
-};
 void Anim_SetDurationScale(void *, int);
 void Effect_Remove(void *);
 static inline int scale(int a, int b)
@@ -51,33 +14,33 @@ static inline u32 frame_factor(u16 v)
 {
     return DisplaySequence_MaskCommand(v, 15);
 }
-int FadingParticleGroup_Update(struct Group *g)
+int FadingParticleGroup_Update(struct FadingParticleGroup *g)
 {
     int alive = 0, i = 0;
     if (i < g->count) {
         u8 *life = &g->particles[0].lifetime;
-        struct Anim *anim = &g->particles[0].motion.anim;
+        struct DisplaySequenceState *anim = &g->particles[0].motion.anim;
         s16 *speed = &g->particles[0].speed;
-        struct Motion *p = &g->particles[0].motion;
+        struct FadingParticleMotion *p = &g->particles[0].motion;
         do {
             if (*life) {
-                struct Anim *a;
+                struct DisplaySequenceState *a;
                 const u16 *entry;
-                u8 *resource;
+                const struct SpriteEffectTileResource *resource;
                 u32 frame;
                 alive++;
                 p->sprite.position.x += scale(p->velocity.x, *speed);
                 p->sprite.position.y += p->velocity.y;
                 p->sprite.position.z += scale(p->velocity.z, *speed);
-                asm("" : : : "memory");
+                p = (struct FadingParticleMotion *)((u32)p + (p->anim.flags >> 8));
                 p->velocity.y -= 2;
                 Anim_SetDurationScale(anim, 16);
-                resource = ((struct Manager *)gFadingParticleManager)->resource;
+                resource = ((struct FadingParticleManager *)gFadingParticleManager)->graphics;
                 a = anim;
-                entry = p->anim.data + p->anim.frame;
+                entry = p->anim.commands + p->anim.index;
                 frame = *entry >> 6;
-                p->sprite.tile = *(u16 *)(resource + 4) +
-                                 (p->sprite.width >> 3) * (p->sprite.height >> 3) * frame;
+                p->sprite.tile =
+                    resource->tileBase + (p->sprite.width >> 3) * (p->sprite.height >> 3) * frame;
                 {
                     union DisplaySequenceControl control;
                     u32 bit, first;
@@ -100,42 +63,44 @@ int FadingParticleGroup_Update(struct Group *g)
                     else
                         p->sprite.flags &= ~8;
                 }
-                if (++a->timer >= a->rate) {
-                    a->timer = 0;
+                if (++a->elapsed >= a->duration) {
+                    a->elapsed = 0;
                     if (a->flags & 4) {
-                        if (a->frame == 0) {
+                        if (a->index == 0) {
                             if (a->flags & 8) {
-                                a->timer = a->rate;
+                                a->elapsed = a->duration;
                             } else {
-                                a->frame = a->count - 1;
+                                a->index = a->frameCount - 1;
                             }
                         } else {
-                            a->frame--;
+                            a->index--;
                         }
                     } else {
-                        if (++a->frame >= a->count) {
+                        if (++a->index >= a->frameCount) {
                             if ((u8)(a->flags & 8)) {
-                                a->timer = a->rate;
-                                a->frame = a->count - 1;
+                                a->elapsed = a->duration;
+                                a->index = a->frameCount - 1;
                             } else {
-                                a->frame = 0;
+                                a->index = 0;
                             }
                         }
                     }
-                    entry = a->data + a->frame;
-                    a->rate = ((int)frame_factor(*entry) * a->scale) >> 6;
+                    entry = a->commands + a->index;
+                    a->duration = ((int)frame_factor(*entry) * a->speed) >> 6;
                 }
                 {
-                    register u32 raw asm("r0") = *life;
+                    u32 raw = *life;
                     u32 compare;
                     u32 time;
                     compare = raw;
+                    if ((s32)raw < 0)
+                        raw = 0;
                     time = raw;
                     if (compare > 8) {
-                        if (p->anim.frame == 5)
-                            p->anim.frame = 0;
+                        if (p->anim.index == 5)
+                            p->anim.index = 0;
                     } else if (compare == 8)
-                        p->anim.frame = 0;
+                        p->anim.index = 0;
                     raw = time - 1;
                     *life = raw;
                     if ((u8)raw == 255)
