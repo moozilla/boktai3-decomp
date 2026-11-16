@@ -1354,16 +1354,16 @@ static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u3
 
 s32 Ghoul_Init(void *object)
 {
-    struct ChaseActor *rootActor = object;
+    struct Ghoul *rootActor = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &rootActor->group;
-    struct SceneActorBody *body = &rootActor->base.body;
+    struct SceneActorChaseGroup *group = &rootActor->chase.group;
+    struct SceneActorBody *body = &rootActor->chase.base.body;
     u32 zero;
     struct ContactPosition origin;
     u32 flag;
     s32 mode;
 
-    ((struct Ghoul *)rootActor)->discFlags = 0;
+    rootActor->discFlags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, 4);
     Ghoul_BindProfile(actor);
@@ -1389,12 +1389,12 @@ s32 Ghoul_Init(void *object)
     }
     MonsterInit_InitializePursuitBody(rootActor, &zero);
     if (Script_SeekToKeyword('P')) {
-        ((struct Ghoul *)rootActor)->discKind = MonsterInit_ReadByte(0x78);
-        ((struct Ghoul *)rootActor)->recoveryDelay = MonsterInit_ReadHalfword(0x78);
-        ((struct Ghoul *)rootActor)->throwCount = MonsterInit_ReadHalfword(0x78);
+        rootActor->discKind = MonsterInit_ReadByte(0x78);
+        rootActor->recoveryDelay = MonsterInit_ReadHalfword(0x78);
+        rootActor->throwCount = MonsterInit_ReadHalfword(0x78);
     } else {
-        ((struct Ghoul *)rootActor)->discKind = 0x78;
-        ((struct Ghoul *)rootActor)->recoveryDelay = 0x78;
+        rootActor->discKind = 0x78;
+        rootActor->recoveryDelay = 0x78;
     }
     MonsterInit_ReadPalette(actor, 0x192, 0x192);
     GhoulInit_InitializePaletteRange(actor, 4, 0);
@@ -1406,8 +1406,8 @@ s32 Ghoul_Init(void *object)
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
-        group, ((struct Ghoul *)rootActor)->routeBounds,
-        &((struct Ghoul *)rootActor)->routePosition, Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
+        group, rootActor->routeBounds,
+        &rootActor->routePosition, Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Bat_UpdateAnimationRequest, 1, body);
     SceneActorMovement_ResolveRoutePosition(rootActor);
     GhoulInit_InstallRouteDefaults(actor);
