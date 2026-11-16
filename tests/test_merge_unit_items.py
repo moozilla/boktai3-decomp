@@ -84,3 +84,16 @@ class MergeWrites(unittest.TestCase):
             with self.assertRaises(OSError):
                 write_merge(Path(directory) / "missing" / "merged.c", [source], "merged")
             self.assertEqual(source.read_text(), "original source")
+
+
+class DeclarationKeys(unittest.TestCase):
+    """Prototypes, externs and variables must agree across the merged inputs."""
+
+    def test_keys(self):
+        from merge_unit import key
+        self.assertEqual(key("void f(void *a);"), ("decl", "f"))
+        self.assertEqual(key("extern u8 gX[];"), ("decl", "gX"))
+        self.assertEqual(key("u32 Foo(struct B *b, void (*cb)(int));"), ("decl", "Foo"))
+        self.assertEqual(key("static const u16 sT[3] = {1, 2, 3};"), ("var", "sT"))
+        self.assertEqual(key("inline static u8 f(u8 *c)\n{\n    return *c;\n}"), ("static", "f"))
+        self.assertIsNone(key("typedef void (*F)(int);"))
