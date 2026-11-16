@@ -5,7 +5,7 @@
 #include "scene_actor_reaction.h"
 
 u8 Dog_IsActionTimerExpired(struct ChaseActor *);
-s32 sub_080DEF78(struct ChaseActor *, u32);
+s32 Dog_SelectRetreatDirection(struct ChaseActor *, u32);
 
 /* The reaction fields overlap the canonical actor's species storage. */
 union DogReactionContext {
@@ -74,7 +74,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
             s32 direction = a->base.body.direction;
             a->base.body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
             context->reaction.turnDelay = 90;
-            if ((u8)sub_080DEF78(a, direction))
+            if ((u8)Dog_SelectRetreatDirection(a, direction))
                 return 1;
             return 0;
         }

@@ -3624,6 +3624,7 @@ addr,name,mode,confidence,source,notes
 080BD004,SceneActorReaction_SinkThenDefeat,thumb,low,src-alias,
 080BD1F0,Skeleton_UpdateDefeat,thumb,low,src-alias,
 080BF0E4,Skeleton_UpdateRiseRecovery,thumb,low,src-alias,Tentative: plays a category-specific directional rise animation; then resumes or redirects the skeleton route.
+080BFCC4,Skeleton_UpdateDelayedArrival,thumb,low,src-alias,
 080C0658,Skeleton_SetAttackControlTable,thumb,low,src-alias,Installs the table at actor offset 0x288 during initialization; attack role tentative
 080C0668,SceneActorApproach_RunCategoryAction,thumb,low,src-alias,
 080C0750,SceneActorApproach_RunTimedAction,thumb,low,src-alias,
@@ -3703,6 +3704,7 @@ addr,name,mode,confidence,source,notes
 080CFC08,Golem_OnDestroy,thumb,low,src-alias,Cleanup callback releases scene actor effect resources
 080CFC14,Golem_Init,thumb,high,gcl-name,name from GCL key 98EC ゴーレム (Golem); loader called by Golem_Create
 080D0BFC,Golem_Create,thumb,high,gcl-name,name from GCL key 98EC ゴーレム (Golem); registry callback
+080D0C30,Mummy_OnAttackCollision,thumb,low,src-alias,
 080D0E14,Mummy_OnBodyCollision,thumb,low,src-alias,Body collision callback forwards collision arguments to the shared response handler
 080D0E20,SceneActor_UpdateAnimationCheckpoint,thumb,low,src-alias,
 080D0EB8,Mummy_OnUnusedState,thumb,low,src-alias,Empty state callback registered by Mummy_Init
@@ -3710,6 +3712,7 @@ addr,name,mode,confidence,source,notes
 080D0F88,Mummy_UpdateWalking,thumb,low,src-alias,Tentative walking callback selects animation one and initializes movement parameters on entry
 080D0FC4,Mummy_UpdateIdle,thumb,low,src-alias,Idle callback clears the entry flag and selects directional animation zero
 080D0FE8,Mummy_TurnTowardRoute,thumb,low,src-alias,
+080D1644,Mummy_UpdateRecoveryWait,thumb,low,src-alias,
 080D1784,Mummy_ResumeSavedRouteAfterAnimation,thumb,low,src-alias,
 080D1A98,SceneActorAnimation_UpdateDirectionalEntry,thumb,low,src-alias,
 080D1AFC,Mummy_ResumeSavedTarget,thumb,low,src-alias,
@@ -3771,9 +3774,11 @@ addr,name,mode,confidence,source,notes
 080DDD90,Dog_UpdateTargetGate,thumb,low,src-alias,
 080DDEC8,Dog_RestoreRoute,thumb,low,src-alias,
 080DE128,Dog_SelectTargetAction,thumb,low,src-alias,
+080DE42C,Dog_RequestHeadingTurn,thumb,low,src-alias,
 080DE550,SceneActor_RefreshLivingCountAndProfile,thumb,low,src-alias,
 080DE57C,Dog_ResetActionState,thumb,low,src-alias,
 080DE6CC,Dog_OnClearActivityFlag,thumb,low,src-alias,Dog initialization registers this callback to clear actor flag 2
+080DE6E0,Dog_UpdateItemDrop,thumb,low,src-alias,
 080DE92C,SceneActor_ConfigureSecondaryProfileEntry,thumb,low,src-alias,
 080DE990,SceneActorCollision_InitGateColliders,thumb,low,src-alias,
 080DEA7C,Dog_UpdateCollisionBounds,thumb,low,src-alias,
@@ -3781,16 +3786,19 @@ addr,name,mode,confidence,source,notes
 080DED54,Dog_UpdateActionCooldown,thumb,low,src-alias,Decrements the separate dog cooldown at state offset 0x696
 080DED74,SceneActorControl_TickActionCooldown,thumb,low,src-alias,
 080DEE98,SceneActorControl_CallContextScript,thumb,low,src-alias,
+080DEF78,Dog_SelectRetreatDirection,thumb,low,src-alias,
 080DF298,Dog_IsActionTimerExpired,thumb,low,src-alias,Tests timer expiration using actor state to select the applicable paired timer
 080DF2E0,Dog_ResolvePendingObject,thumb,low,src-alias,
 080DF400,Dog_SelectRetreatOrChase,thumb,low,src-alias,
 080DF6D4,Dog_TickCooldown,thumb,low,src-alias,Decrements the byte at 0x6A8 while nonzero; cooldown purpose is tentative
+080DF6EC,Dog_OnItemContact,thumb,low,src-alias,
 080DF908,SceneActorAnimation_SpawnTrailAtPosition,thumb,low,src-alias,
 080DF9F0,Dog_OnSensorContact,thumb,low,src-alias,Contact callback records the contacting object's identifier and clears flag 0x01000000 unless blocked
 080DFA5C,Dog_OnAttackContact,thumb,low,src-alias,
 080DFBCC,Dog_OnBodyCollision,thumb,low,src-alias,Body collision callback forwards collision handling unless object flag 0x800 disables it
 080DFBEC,Dog_SelectAnimationOne,thumb,low,src-alias,Resets the animation entry flag and selects directional animation 1
 080DFC10,Dog_SelectAnimationZero,thumb,low,src-alias,Resets the animation entry flag and selects directional animation 0
+080DFC34,Dog_UpdateCardinalTurn,thumb,low,src-alias,
 080E038C,Dog_OnReactionCleanup,thumb,low,src-alias,Empty reaction callback installed during initialization; cleanup role is tentative
 080E0390,Dog_UpdateDefeatDelay,thumb,low,src-alias,Plays animation 6 and periodically emits an effect before entering the final defeat phase; interpretation is tentative
 080E0460,Dog_UpdateDefeatFinish,thumb,low,src-alias,Plays animation 7 and sets timed completion flags before ending the reaction; defeat interpretation is tentative
@@ -3810,6 +3818,7 @@ addr,name,mode,confidence,source,notes
 080E2428,SceneActorControl_CompleteBlinkOut,thumb,low,src-alias,
 080E25FC,Dog_ChooseReactionBehavior,thumb,low,src-alias,
 080E3790,Dog_UpdateScriptedAction,thumb,low,src-alias,Starts action callback 10 and calls the action script before advancing or finishing the behavior
+080E3874,Dog_UpdateDelayedPursuit,thumb,low,src-alias,
 080E41AC,Dog_SetPrimaryBehaviorPreset,thumb,low,src-alias,Assigns the fixed table at 0x08606204 to field 0x288; preset role is tentative
 080E41BC,Dog_PrepareFrame,thumb,low,src-alias,Runs two shared preparation helpers before state dispatch in the update callback
 080E41D4,Dog_FinishFrame,thumb,low,src-alias,Runs shared update helpers and decrements timers after state dispatch

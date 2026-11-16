@@ -9,16 +9,16 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
 
-void *Heap_Alloc(u32);
-void Memory_Clear(void *, u32);
+void *Heap_Alloc(s32 size); /* first-fit allocation from gHeapHead; NULL on failure */
+void Memory_Clear(void *dst, s32 bytes); /* zero fill (bytes, then CpuSet words) */
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void Anim_Step(void *, void *);
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
+s32 Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
@@ -26,7 +26,7 @@ u8 SceneActorRegistry_LinkActor(void *);
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-u8 sub_080D7568(void *);
+u8 sub_080D7568(struct ChaseActor *actor);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
 
@@ -36,29 +36,29 @@ static inline void MummyInit_ResetFlags(void *object)
     actor->flags6F2 = 0;
 }
 
-void Mummy_InitProfile(void *);
-void Mummy_InitCollision(void *);
-void Mummy_InitActionHandlers(void *);
-void Mummy_SetBehaviorTable(void *);
-s32 Mummy_OnUpdate(void *);
-u16 Mummy_GetAnimationStepOffset(void *);
+void Mummy_InitProfile(struct SInitProfile *s);
+void Mummy_InitCollision(u8 *p);
+void Mummy_InitActionHandlers(struct SInitActionHandlers *s);
+void Mummy_SetBehaviorTable(struct SSetBehaviorTable *s);
+s32 Mummy_OnUpdate(struct SOnUpdate *s);
+s32 Mummy_GetAnimationStepOffset(struct R *s);
 void Mummy_TurnTowardRoute(void *);
 void Mummy_UpdateWalking(void *);
 void Mummy_UpdateIdle(void *);
-void Mummy_UpdateDisplacementRecovery(void *);
-void Mummy_UpdateDefeat(void *);
-void Mummy_UpdateHiddenRecovery(void *);
+void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame);
+void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame);
+void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame);
 void SceneActorTarget_ResolvePendingObject(void);
-void Mummy_UpdateDying(void);
-void Mummy_ResumeSavedTarget(void);
+void Mummy_UpdateDying(u8 *s, s32 arg);
+void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame);
 void Mummy_OnUnusedState(void);
-void Mummy_ResetRevivalMotion(void);
-void SceneActor_EnterMotionPhase(void);
-u8 Mummy_SelectMovementResponse(void *);
-void Mummy_OnClearActivityFlag(void);
-void Mummy_OnMovementUpdate(void);
-void Mummy_OnInteractionUpdate(void);
-void Mummy_OnReleaseResources(void);
+void Mummy_ResetRevivalMotion(struct ChaseActor *actor);
+void SceneActor_EnterMotionPhase(struct ChaseActor *actor);
+u8 Mummy_SelectMovementResponse(struct ChaseActor *actor);
+void Mummy_OnClearActivityFlag(struct SOnClearActivityFlag *s);
+void Mummy_OnMovementUpdate(struct SOnMovementUpdate *s);
+s32 Mummy_OnInteractionUpdate(void);
+void Mummy_OnReleaseResources(u8 *);
 
 static inline void MummyInit_EnableInitialFlags(struct Mummy *actor)
 {
@@ -87,9 +87,9 @@ static inline void MummyInit_InitializePaletteRange(struct Mummy *actor, u32 sel
     actor->chase.base.paletteBank = MonsterInit_GetPaletteBase(&actor->chase) + current;
 }
 
-void Mummy_SetControlPreset(void *);
+void Mummy_SetControlPreset(struct SSetControlPreset *s);
 void SceneActorEffects_InitAtActorPosition(void *);
-void sub_080D1644(void);
+void Mummy_UpdateRecoveryWait(void);
 void sub_080D453C(void);
 
 s32 Mummy_Init(void *object)
@@ -142,7 +142,7 @@ s32 Mummy_Init(void *object)
     MonsterInit_SetContactCallback(&actor->chase, Mummy_SelectMovementResponse);
     group->responseCallback = Mummy_OnClearActivityFlag;
     group->field5EC = Mummy_OnMovementUpdate;
-    group->routeChoiceControl = sub_080D1644;
+    group->routeChoiceControl = Mummy_UpdateRecoveryWait;
     group->common.fallback = sub_080D453C;
     actor->chase.base.field2E8 = 1;
     MummyInit_EnableInitialFlags(actor);

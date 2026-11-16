@@ -9,7 +9,7 @@ struct Z {
 void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), u8 *);
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 void Mummy_OnBodyCollision(void);
-void sub_080D0C30(void);
+void Mummy_OnAttackCollision(void);
 void Mummy_InitCollision(u8 *p)
 {
     struct Z s1, s2, s3, s4;
@@ -24,5 +24,5 @@ void Mummy_InitCollision(u8 *p)
     s3.b.lo = 0x20;
     *(u32 *)&s4.a = 0x800000;
     *(u32 *)&s4.b &= 0xFFFF0000;
-    SceneActorCollision_InitAttack(p, &s3, &s4, sub_080D0C30, 0, p);
+    SceneActorCollision_InitAttack(p, &s3, &s4, Mummy_OnAttackCollision, 0, p);
 }
