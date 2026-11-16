@@ -472,7 +472,9 @@ def main():
             continue
         if kind in ("types", "text"):
             if not a.dry_run:
-                for path in replace_text(files, pairs, regex=kind == "types"):
+                headers = sorted(os.path.join("include", n) for n in os.listdir(os.path.join(ROOT, "include"))
+                                 if n.endswith(".h")) if kind == "types" else []
+                for path in replace_text(files + headers, pairs, regex=kind == "types"):
                     print(f"rewrote {path} ({kind})")
             continue
         if kind == "embed":

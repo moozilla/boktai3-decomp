@@ -27,6 +27,13 @@ selection animationIndex
 link context
 unknown2B0 field2B0
 
+# SceneActorTerrainCollisionView was a view of the base alone.
+[types]
+SceneActorTerrainCollisionView RoomActor
+[map]
+collider colliderA
+field2E4 reactionSoundVariant
+
 # SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
 # 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that
 # type by hand (the tool reports them as "no member named" errors). A struct that held a

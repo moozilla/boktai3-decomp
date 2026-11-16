@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
-struct SceneActorTerrainCollisionView;
-void SceneActorTerrain_DisableCollision(struct SceneActorTerrainCollisionView *);
+struct RoomActor;
+void SceneActorTerrain_DisableCollision(struct RoomActor *);
 static inline u8 TakeReset(struct ChaseActor *actor)
 {
     u8 *flag = &actor->base.field2B1;

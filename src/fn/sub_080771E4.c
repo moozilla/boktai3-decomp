@@ -10,7 +10,7 @@ static inline u8 TestFlags(u32 flags, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 IsDisposable(struct SceneActorTerrainCollisionView *actor)
+static inline u8 IsDisposable(struct RoomActor *actor)
 {
     if (!TestFlags(gEngineFlags, 0x4800)) {
         u32 category = actor->category;
@@ -20,12 +20,12 @@ static inline u8 IsDisposable(struct SceneActorTerrainCollisionView *actor)
     }
     return 0;
 }
-void SceneActorTerrain_DisableCollision(struct SceneActorTerrainCollisionView *actor)
+void SceneActorTerrain_DisableCollision(struct RoomActor *actor)
 {
     struct ContactCollider *collider;
     u32 mask = 3;
     actor->flags2CC |= mask;
-    collider = &actor->collider;
+    collider = &actor->colliderA;
     collider->flags |= 4;
     SceneActorPalette_ClearCompletedTransitions();
     {
