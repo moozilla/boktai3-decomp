@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "render.h"
 #include "scene_panel_overlay.h"
 
@@ -23,8 +22,26 @@ static inline void projectSceneOverlay(struct ContactPosition *out,
     out->y = sum - y;
     out->z = sum + y;
 }
-#define truncate5(value) ((value) >= 0 ? (value) >> 5 : -((-(value)) >> 5))
-#define truncate1(value) ((value) >= 0 ? (value) >> 1 : -((-(value)) >> 1))
+#define truncate5(v)                                                                               \
+    ({                                                                                             \
+        s32 value = (v);                                                                           \
+        s32 result;                                                                                \
+        if (value >= 0)                                                                            \
+            result = value >> 5;                                                                   \
+        else                                                                                       \
+            result = -((-value) >> 5);                                                             \
+        result;                                                                                    \
+    })
+#define truncate1(v)                                                                               \
+    ({                                                                                             \
+        s32 value = (v);                                                                           \
+        s32 result;                                                                                \
+        if (value >= 0)                                                                            \
+            result = value >> 1;                                                                   \
+        else                                                                                       \
+            result = -((-value) >> 1);                                                             \
+        result;                                                                                    \
+    })
 void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                             s32 screenY)
 {
@@ -32,37 +49,23 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     struct SceneOverlayMapEntry entry;
     struct ContactPosition projected;
     struct SceneOverlayMapEntry *entries;
+    struct BackgroundLayer *bg = &gBgRecords[3];
+    u16 *output;
     s32 width, height;
     u16 *blocks;
-    s32 blockStride, centerX, centerY, playSound = 0;
-    struct SceneOverlayMapEntry *entryPointer;
-    s32 next;
-    register u16 *output asm("r9");
-    s32 slot;
+    s32 blockStride, centerX, centerY;
+    s32 playSound = 0;
+    s32 slot, x, y, minX, minY, maxX, maxY, target;
+    s32 dx, dy;
+
     ScenePanel_CycleOverlayPalette(panel);
-    {
-        struct BackgroundLayer *layer;
-        register u16 tx asm("r2");
-        u16 ty;
-        u16 *buffer;
-        register u32 reloadScratch asm("r3");
-        tx = tileX;
-        layer = &gBgRecords[3];
-        layer->scaleX = tx;
-        ty = tileY;
-        layer->scaleY = ty;
-        layer->x = screenX;
-        layer->y = screenY;
-        buffer = layer->map;
-        asm("" : : "r"(buffer));
-        output = buffer;
-        asm("" : : "r"(output));
-        /* Defined opaque scratch keeps the signed-load reloads in their original registers. */
-        asm("" : "=r"(reloadScratch));
-        width = layer->width * 2;
-        asm("" : : "r"(width), "r"(tx), "r"(reloadScratch), "r"(buffer));
-        height = layer->height * 2;
-    }
+    bg->scaleX = tileX;
+    bg->scaleY = tileY;
+    bg->x = screenX;
+    bg->y = screenY;
+    output = bg->map;
+    width = bg->width * 2;
+    height = bg->height * 2;
     projectSceneOverlay(&projected, &panel->origin);
     centerX = projected.x + gCamera.offsetX;
     centerY = projected.y + gCamera.offsetY;
@@ -70,275 +73,119 @@ void ScenePanel_DrawOverlay(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 
     centerY = truncate3(centerY) & ~1;
     centerX -= tileX;
     centerY -= tileY;
-    {
-        struct SceneOverlayResource *mapBase = panel->overlayMap;
-        resource = *mapBase;
-        resource.maps = (void *)((u32)resource.maps + (u32)mapBase);
-        entries = resource.maps;
-    }
+    resource = *(struct SceneOverlayResource *)panel->overlayMap;
+    resource.maps = (void *)((u32)resource.maps + (u32)panel->overlayMap);
+    entries = resource.maps;
     panel->overlayChanged = 0;
-    slot = 0;
-    if (slot < panel->subjectCount) {
-        entryPointer = &entry;
-        do {
-            s32 old;
-            s32 y, x;
-            s32 target;
-            register u8 *current asm("r2");
-            register u8 *base asm("r0");
-            s32 maxX, maxY;
-            s32 minX;
-            s32 minY;
-            if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
-                target = 5;
-            else {
-                u32 state = panel->subjects[slot]->state;
-                target = 5;
-                if (state == 4)
-                    target = 0;
+    for (slot = 0; slot < panel->subjectCount; slot++) {
+        if (panel->paletteMode == 0 || (panel->effectState != 10 && panel->effectState != 14))
+            target = 5;
+        else if (panel->subjects[slot]->state == 4)
+            target = 0;
+        else
+            target = 5;
+        panel->targetLevels[slot] = target;
+        if (panel->currentLevels[slot] == target)
+            continue;
+        if (target == 0)
+            playSound = 1;
+        panel->currentLevels[slot] = target;
+        switch (slot) {
+            case 0:
+                maxX = centerX;
+                maxY = centerY;
+                minX = maxX - 7;
+                if (minX < 0)
+                    minX = 0;
+                minY = maxY - 6;
+                if (minY < 0)
+                    minY = 0;
+                break;
+            case 2:
+                maxX = centerX + 7;
+                maxY = centerY;
+                minX = centerX;
+                if (minX < 0)
+                    minX = 0;
+                minY = maxY - 6;
+                if (minY < 0)
+                    minY = 0;
+                break;
+            case 3:
+                maxX = centerX;
+                maxY = centerY + 4;
+                minX = maxX - 7;
+                if (minX < 0)
+                    minX = 0;
+                minY = centerY;
+                if (minY < 0)
+                    minY = 0;
+                break;
+            case 1:
+                maxX = centerX + 7;
+                maxY = centerY + 4;
+                minX = centerX;
+                if (minX < 0)
+                    minX = 0;
+                minY = centerY;
+                if (minY < 0)
+                    minY = 0;
+                break;
+            default:
+                maxX = maxY = minY = minX = -1;
+                break;
+        }
+        if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
+            continue;
+        blockStride = bg->width >> 4;
+        if (target == 5) {
+            for (y = minY; y < maxY; y += 2) {
+                for (x = minX; x < maxX; x++) {
+                    s32 dx = tileX + x;
+                    s32 dy = tileY + y;
+                    dx &= 31;
+                    dy &= 31;
+                    output[dx + (dy << 5)] = 0;
+                    output[dx + ((dy + 1) << 5)] = 0;
+                }
             }
-            panel->targetLevels[slot] = target;
-            base = panel->currentLevels;
-            current = base + slot;
-            old = *current;
-            next = slot + 1;
-            if (old == target)
-                goto nextSlot;
-            if (target == 0)
-                playSound = 1;
-            *current = target;
-            switch (slot) {
-                case 0:
-                    maxX = centerX;
-                    maxY = centerY;
-                    minX = maxX - 7;
-                    if (minX < 0)
-                        minX = 0;
-                    minY = maxY - 6;
-                    if (minY < 0)
-                        minY = 0;
-                    break;
-                case 2:
-                    maxX = centerX + 7;
-                    maxY = centerY;
-                    minX = centerX;
-                    if (minX < 0)
-                        minX = 0;
-                    minY = maxY - 6;
-                    if (minY < 0)
-                        minY = 0;
-                    break;
-                case 3:
-                    maxX = centerX;
-                    maxY = centerY + 4;
-                    minX = maxX - 7;
-                    if (minX < 0)
-                        minX = 0;
-                    minY = centerY;
-                    if (minY < 0)
-                        minY = 0;
-                    break;
-                case 1:
-                    maxX = centerX + 7;
-                    maxY = centerY + 4;
-                    minX = centerX;
-                    if (minX < 0)
-                        minX = 0;
-                    minY = centerY;
-                    if (minY < 0)
-                        minY = 0;
-                    break;
-                default:
-                    minX = -1;
-                    minY = minX;
-                    maxY = minX;
-                    maxX = maxY;
-                    break;
-            }
-            {
-                s32 *cursor = &slot;
-                next = ++*cursor;
-            }
-            if (maxX < 0 || maxY < 0 || minX > 31 || minY > 31)
-                goto nextSlot;
-            {
-                struct BackgroundLayer *strideLayer = &gBgRecords[3];
-                blockStride = strideLayer->width >> 4;
-            }
-            if (target == 5) {
-                for (y = minY; y < maxY; y += 2) {
-                    for (x = minX; x < maxX; x++) {
-                        register s32 dx = tileX + x, dy = tileY + y;
+        } else {
+            s32 mapIndex = target + 1;
+            entry = entries[mapIndex];
+            entry.blocks = (u16 *)((u32)entry.blocks + (u32)panel->overlayMap);
+            bg->mapData = entry.blocks;
+            blocks = entry.blocks;
+            for (y = minY; y < maxY; y += 2) {
+                for (x = minX; x < maxX; x++) {
+                    dx = tileX + x;
+                    dy = tileY + y;
+                    if (dx < 0 || dy < 0 || dx >= width || dy >= height) {
                         dx &= 31;
                         dy &= 31;
-                        {
-                            s32 row = dy * 32;
-                            s32 index;
-
-                            index = dx + row;
-                            output[index] = 0;
-                        }
-                        dy++;
-                        dy *= 32;
-                        dx += dy;
-                        output[dx] = 0;
-                    }
-                }
-            } else {
-                u32 ringMask;
-                target++;
-                {
-                    u32 offset = target * sizeof(entry);
-                    struct SceneOverlayMapEntry *destination, *mapEntries;
-                    destination = entryPointer;
-                    mapEntries = entries;
-                    offset += (u32)mapEntries;
-                    *destination = *(struct SceneOverlayMapEntry *)offset;
-                }
-                {
-                    void **mapSlot;
-                    struct ScenePanel *mapPanel = panel;
-                    struct SceneOverlayMapEntry *copied;
-                    u32 relative;
-                    mapSlot = (void *)&mapPanel->overlayMap;
-                    copied = entryPointer;
-                    relative = (u32)copied->blocks;
-                    {
-                        u32 mapBase = (u32)*mapSlot;
-                        relative += mapBase;
-                        copied->blocks = (void *)relative;
-                        gBgRecords[3].mapData = (void *)relative;
-                        blocks = (void *)relative;
-                    }
-                }
-                for (y = minY; y < maxY; y += 2) {
-                    for (x = minX; x < maxX; x++) {
-                        s32 dx, dy;
-                        u16 *secondOutput;
-                        u32 secondValue;
-                        ringMask = 31;
-                        dx = tileX + x;
-                        dy = tileY + y;
-                        if (dx < 0 || dy < 0 || dx >= width || dy >= height) {
-                            {
-                                u32 mask = ringMask;
-                                dx &= mask;
-                                dy &= mask;
-                            }
-                            {
-                                s32 row = dy * 32;
-                                s32 index;
-
-                                index = dx + row;
-                                index = (u32)(output + index);
-                                secondValue = 0;
-                                *(u16 *)index = secondValue;
-                            }
-                            {
-                                s32 row = dy + 1;
-                                s32 index;
-                                row *= 32;
-
-                                index = dx + row;
-                                secondOutput = output + index;
-                            }
+                        output[dx + (dy << 5)] = 0;
+                        output[dx + ((dy + 1) << 5)] = 0;
+                    } else {
+                        u32 tile;
+                        s32 blockX = truncate5(dx);
+                        s32 blockY = truncate5(dy);
+                        s32 block = (blockX + blockY * blockStride) << 8;
+                        s32 halfX, halfY;
+                        dx &= 31;
+                        dy &= 31;
+                        halfX = truncate1(dx);
+                        halfY = truncate1(dy);
+                        tile = blocks[block + halfX + (halfY << 4)];
+                        if ((dx & 1) == 0) {
+                            output[dx + (dy << 5)] = bg->extraData[tile * 4];
+                            output[dx + ((dy + 1) << 5)] = bg->extraData[tile * 4 + 2];
                         } else {
-                            register s32 blockX, block, halfX, halfY asm("r0");
-                            u32 tile;
-                            {
-                                s32 scaled = truncate5(dx);
-                                blockX = scaled;
-                            }
-                            {
-                                s32 scaled = truncate5(dy);
-                                scaled *= blockStride;
-                                {
-                                    s32 sum = blockX + scaled;
-                                    block = sum << 8;
-                                }
-                            }
-                            dx &= ringMask;
-                            dy &= ringMask;
-                            {
-                                s32 scaled = truncate1(dx);
-                                halfX = scaled;
-                            }
-                            halfY = truncate1(dy);
-                            halfY <<= 4;
-                            {
-                                s32 index = block + halfX + halfY;
-                                tile = blocks[index];
-                            }
-                            {
-                                u32 parity = dx & 1;
-                                if (parity == 0) {
-                                    u16 *firstOutput;
-                                    u16 *tileBuffer, *pair;
-                                    {
-                                        register s32 index asm("r1") = dy * 32;
-                                        index = dx + index;
-                                        firstOutput = output + index;
-                                    }
-                                    /* Preserve the original destination spill while loading the tile table. */
-                                    asm(""
-                                        :
-                                        : "m"(((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                                  ->extraData),
-                                          "r"(parity));
-                                    tileBuffer =
-                                        ((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                            ->extraData;
-                                    tile <<= 3;
-                                    tile += (u32)tileBuffer;
-                                    pair = (void *)tile;
-                                    {
-                                        u32 value = *pair;
-                                        *firstOutput = value;
-                                    }
-                                    {
-                                        s32 row = dy + 1;
-                                        s32 index;
-                                        row *= 32;
-                                        index = dx + row;
-                                        secondOutput = output + index;
-                                    }
-                                    secondValue = pair[2];
-                                } else {
-                                    u16 *firstOutput;
-                                    u16 *tileBuffer, *pair;
-                                    {
-                                        register s32 index asm("r1") = dy * 32;
-                                        index = dx + index;
-                                        firstOutput = output + index;
-                                    }
-                                    tileBuffer =
-                                        ((struct BackgroundLayer *)SCENE_OVERLAY_LAYER_ADDR)
-                                            ->extraData;
-                                    tile <<= 3;
-                                    tile += (u32)tileBuffer;
-                                    pair = (void *)tile;
-                                    {
-                                        u32 value = pair[1];
-                                        *firstOutput = value;
-                                    }
-                                    {
-                                        s32 row = dy + 1;
-                                        s32 index;
-                                        row *= 32;
-                                        index = dx + row;
-                                        secondOutput = output + index;
-                                    }
-                                    secondValue = pair[3];
-                                }
-                            }
+                            output[dx + (dy << 5)] = bg->extraData[tile * 4 + 1];
+                            output[dx + ((dy + 1) << 5)] = bg->extraData[tile * 4 + 3];
                         }
-                        *secondOutput = secondValue;
                     }
                 }
             }
-        nextSlot:
-            slot = next;
-        } while (slot < panel->subjectCount);
+        }
     }
     if (playSound)
         Sound_PlaySong(245);
