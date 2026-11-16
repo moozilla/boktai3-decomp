@@ -659,7 +659,7 @@ void Golem_UpdateHoldTimer(struct Golem *actor)
     struct Golem *context = actor->chase.base.context;
     struct Golem080CEAC4Body *body = (struct Golem080CEAC4Body *)((u8 *)actor + 0x50);
     TakeFlag(&actor->chase.base.field2B1);
-    if (Golem_InvokeEnabledBehavior(actor))
+    if (Golem_InvokeEnabledBehavior(&actor->chase))
         return;
     body->direction = actor->chase.base.tracking.heading;
     if ((s32)actor->chase.base.counter2AC > 0x77) {

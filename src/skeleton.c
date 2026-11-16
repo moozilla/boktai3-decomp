@@ -220,7 +220,7 @@ void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
 s32 Skeleton_Update(struct Skeleton *actor)
 {
     u32 m;
-    SceneActorReaction_TickHiddenResponse(actor);
+    SceneActorReaction_TickHiddenResponse(&actor->chase);
     m = 0x2000;
     if ((actor->chase.base.motionFlags & m) || actor->chase.base.hitLockTimer == 0) {
         Callback_InvokeActor(actor, actor->chase.base.stateCallbacks[actor->chase.base.state2A8]);
