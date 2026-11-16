@@ -1,7 +1,7 @@
 #include "scene_actor_placement.h"
 void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActor *argument)
 {
-    struct SceneActorPlacementView *actor = (void *)argument;
+    struct RoomActor *actor = (void *)argument;
     u32 mask = 0x400000;
     u32 *flags = &actor->flags2D0;
     if (mask & *flags) {
@@ -9,7 +9,7 @@ void SceneActorPlacement_PlayCategoryResponseSound(struct SceneActorRegistryActo
         return;
     }
     {
-        unsigned long long soundFlags = actor->flags2E6;
+        unsigned long long soundFlags = actor->field2E6;
         u32 soundMask = 4;
         if (SceneActorPlacement_TestMask(soundMask, soundFlags)) {
             return;

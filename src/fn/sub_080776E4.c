@@ -3,7 +3,7 @@
 
 u32 SceneActorPlacement_ConsumeShakeFlags(struct SceneActorRegistryActor *argument)
 {
-    struct SceneActorPlacementView *actor = (void *)argument;
+    struct RoomActor *actor = (void *)argument;
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
     if (!unavailable && actor->flags2D6) {
         u8 small;

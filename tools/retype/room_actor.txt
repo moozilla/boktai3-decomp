@@ -70,6 +70,28 @@ biasX310 reactionStart.x
 biasZ314 reactionStart.z
 requestedDirection nextDirection
 
+# SceneActorPlacementView: its code reads the base only.
+[types]
+SceneActorPlacementView RoomActor
+[map]
+direction body.direction
+position body.position
+field104 word104
+field178 colliderA.responseValue
+control target
+resetControl220 field220
+savedControl230 reactionTarget230
+callback23C field23C
+field2B6 reactionDirection
+selection animationIndex
+flags2D8 field2D8
+flags2DC field2DC
+field2E4 reactionSoundVariant
+flags2E6 field2E6
+velocity secondaryMotion
+destination reactionStart
+shadow320 shadow
+
 # SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
 # 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that
 # type by hand (the tool reports them as "no member named" errors). A struct that held a

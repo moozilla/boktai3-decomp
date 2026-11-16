@@ -13,7 +13,7 @@ static inline u32 ReadMasked(u32 mask, u32 *field)
 }
 static inline u8 Unavailable(struct SceneActorRegistryActor *actor, u32 disabled, u32 excluded)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 static inline u16 Remaining(struct SceneActorPaletteTransition *transition)
 {

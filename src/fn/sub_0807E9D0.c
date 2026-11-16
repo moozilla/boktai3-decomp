@@ -189,8 +189,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             if (actor->group.countdown5C8)
                 return;
             actor->group.countdown5C8 = 0x3C;
-            attack =
-                SceneActorPlacement_ReadFlags32((struct SceneActorPlacementView *)actor, 0x8000000);
+            attack = SceneActorPlacement_ReadFlags32((struct RoomActor *)actor, 0x8000000);
             if (attack) {
                 u32 mask = 0x100;
                 if ((destination->flags & mask) && (sourceFlags & mask)) {

@@ -15,7 +15,7 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
 
 static inline u8 TentacleBody_IsUnavailable(struct ChaseActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,

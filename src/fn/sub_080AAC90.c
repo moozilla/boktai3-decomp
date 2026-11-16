@@ -6,7 +6,7 @@ void TentacleActor_EnterHitReaction(void *);
 s32 Math_Atan2(s32, s32);
 static inline u32 Unavailable(struct RoomActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct SceneActorPlacementView *)actor);
+    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
 }
 struct TentacleContactSegment {
     u8 unknown0[0x108];

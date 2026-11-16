@@ -13,7 +13,7 @@ static inline void ClearCollider(struct ContactCollider *p)
     p->flags = 0xFFFB & p->flags;
 }
 void ActorShadow_Enable(void *);
-void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
+void SceneActorPlacement_ShowActor(struct RoomActor *s)
 {
     if (!SceneActorPlacement_IsUnavailable(s)) {
         u32 zero = 1;
@@ -22,10 +22,10 @@ void SceneActorPlacement_ShowActor(struct SceneActorPlacementView *s)
         zero &= flags;
         if (!zero && (flags & 2)) {
             *field = flags & ~2;
-            if (s->shadow320[0])
-                ActorShadow_Enable(s->shadow320);
+            if (s->shadow[0])
+                ActorShadow_Enable(s->shadow);
             ClearCollider(&((struct ChaseActor *)s)->base.colliderA);
-            s->field178 = zero;
+            s->colliderA.responseValue = zero;
             if (s->drawableKind == 0) {
                 u32 *p = s->drawable;
                 ClearWord(p, ~1);
