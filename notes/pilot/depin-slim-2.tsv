@@ -38,3 +38,4 @@
 080718D8	SceneActorRegistry_RestoreActorDefaults	clean	60	Plain field assignments; the third ResetResponseState argument is a function-scope local so reload rematerializes it at the call (AGBCC_NOREG on the precomputed pseudo confirmed it).
 08071E00	SceneActorPalette_BeginTransition	clean	45	switch on category, indexed destination, delta-then-base order, and an activeFlag variable set before the loop so the hoisted 0x2000 is rematerialized like the ROM.
 08048E0C	TetherActor_BlendPalette	clean	40	u8 component variables add pre-combine zero_extend insns inside the loop, lengthening every loop-spanning live range so weight (short range) outranks the doubled-life componentMask constant.
+08115674	Collectible_UpdateEntry	clean	20	Reading the hit byte through an inline u8 getter adds a pre-combine extension, so hit is born one insn later and outranks the flags pointer in global-alloc order.
