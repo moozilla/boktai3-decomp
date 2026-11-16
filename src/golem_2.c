@@ -5,10 +5,19 @@
 #include "engine.h"
 #include "player.h"
 #include "ram.h"
+#include "scene_actor_part_burst.h"
+#include "scene_actor_chase_reaction.h"
+#include "global.h"
+#include "scene_actor_control_phase.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_delayed_response.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
+
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, u32, u32, u32);
+
 void SceneActorBehavior_CallActionScript(u8 *);
+
 void Golem_ResetIdleControl(u8 *);
 
 inline static u8 TakeFlag(u8 *p)
@@ -27,15 +36,23 @@ static inline u32 Flags16(struct ChaseActor *a, u32 m)
 }
 
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void SceneActorTerrain_ClearCollisionTimers(void *);
+
+void SceneActorTerrain_ClearCollisionTimers(struct RoomActor *);
+
 void SceneActorBehavior_CallTerrainScript(void *);
+
 void SceneActorPlacement_PlayCategoryEventSound(void *);
+
 void *Bestiary_GetEntryForActor(u32, u32);
+
 void Bestiary_UnlockEntry(void *);
-#include "scene_actor_part_burst.h"
+
 void ActorShadow_Disable(void *);
+
 void ActorParticles_SpawnWideBurst(void *);
-void SceneActorControl_OnIdle(void);
+
+void SceneActorControl_OnIdle(u8 *);
+
 void Golem_OnUnusedState(void)
 {
 }
@@ -44,6 +61,7 @@ static inline u32 Flags32At(struct ChaseActor *a, u32 mask)
 {
     return a->base.behaviorFlags & mask;
 }
+
 union HitSparkTable {
     const u16 *table;
     struct {
@@ -52,12 +70,14 @@ union HitSparkTable {
         u8 region;
     } encoded;
 };
+
 static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
 {
     return r->table;
 }
 
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
+
 void Golem_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
@@ -185,9 +205,8 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
 
 void SceneActorRoute_CommitReachableDestination(void *);
 
-#include "scene_actor_chase_reaction.h"
-
 /* This class's own copies of the shared chase inlines it compiles differently. */
+
 static inline void Golem_SelectState(void *object, u32 state, u32 phase, u32 behavior)
 {
     struct ChaseActor *actor = object;
@@ -383,6 +402,7 @@ static inline void GolemReaction_LatchHitReact(void *object)
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }
 }
+
 static inline s16 GolemReaction_CurrentHeight(struct ChaseActor *actor)
 {
     return actor->base.attachmentRestart;
@@ -408,6 +428,7 @@ static inline void GolemReaction_Settle(struct ChaseActor *actor)
 }
 
 /* Dispatch the hit-reaction state; return one when entering a state. */
+
 s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 {
     struct Golem *body = actor->base.context;
@@ -597,4 +618,214 @@ void Golem_UpdateScriptedAction(struct ChaseActor *obj)
     } else {
         ++(*((u32 *)(((u8 *)obj) + 0x2AC)));
     }
+}
+
+/* This class's own copies of the shared chase inlines it compiles differently. */
+
+static inline void Golem_SaveControl(struct SceneActorChaseSavedControl *packet, void *object)
+{
+    struct ChaseActor *actor = object;
+    packet->control = actor->base.target;
+    packet->kind = actor->base.controlKind;
+    packet->state = actor->base.state2A8;
+    packet->phase = actor->base.phase2A9;
+    packet->behavior = actor->base.behavior2AA;
+}
+
+static inline u32 Golem_Height_ResumeDelayedRoute(struct ContactPosition *position)
+{
+    return SceneActorChase_HeightAt(Golem_CellAt(position), position);
+}
+
+static inline void Golem_SnapToRoute_ResumeDelayedRoute(struct ContactPosition *position,
+                                                        struct SceneActorRegistryRoute *route)
+{
+    position->x = route->point->x;
+    position->z = route->point->z;
+    position->y = Golem_Height_ResumeDelayedRoute(position);
+}
+
+static inline void Golem_BeginTurn_ResumeDelayedRoute(void *obj, u32 saved,
+                                                      const u16 *randomSamples)
+{
+    struct ChaseActor *actor = obj;
+    struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
+    if (!SceneActorChase_MotionFlags(actor, 0x400) &&
+        !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
+        group->turn.direction =
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
+        Golem_SaveControl(&group->saved, actor);
+        group->turn.savedDirection = saved;
+        SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
+        Golem_SetState(actor, 3, 1, 0);
+        group->turn.turnsRemaining = 6;
+    }
+}
+
+static inline u8 Golem_Arrive_ResumeDelayedRoute(void *obj)
+{
+    struct ContactPosition target;
+    struct ChaseActor *actor = obj;
+    struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
+    s32 cell, player;
+    const u16 *randomSamples = gRandomTable;
+    void **callback;
+    Golem_SnapToRoute_ResumeDelayedRoute(group->destination, &group->homeRoute);
+    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
+        struct SceneActorChaseTarget *t = tracking->target;
+        if (!t)
+            goto invalid_target;
+        player = SceneActorChase_PlayerSlot(t);
+        if (player < 0) {
+        invalid_target:
+            callback = &group->fallback;
+            goto invoke;
+        }
+        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+    } else {
+        struct SceneActorChaseTarget *t = tracking->target;
+        cell = SceneActorChase_CellIndex((t)->position.x >> 8, (t)->position.z >> 8);
+        player = 0;
+    }
+    if (cell != actor->base.terrainCell &&
+        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+                                0x20000))
+        goto reroute;
+    if (SceneActorChase_MotionFlags(actor, 0x400))
+        return 0;
+    {
+        u32 bits = 4;
+        group->common.gate.flags &= ~bits;
+    }
+    if (SceneActorChase_MotionFlags(actor, 0x80)) {
+        SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
+        Golem_SetBehavior(actor, 12);
+    } else {
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
+        Golem_SetBehavior(actor, 5);
+        Golem_SnapToRoute_ResumeDelayedRoute(group->destination, &group->homeRoute);
+        (group->destination)->y =
+            SceneActorChase_HeightAt(Golem_CellAt(group->destination), group->destination);
+        (group->destination)->pad = 0;
+    }
+    {
+        u8 saved = actor->base.body.direction;
+        Golem_BeginTurn_ResumeDelayedRoute(obj, saved, randomSamples);
+    }
+    SceneActorTerrain_RequestRetreatRoute(obj);
+    actor->base.field2C2 = 0x20;
+    return 0;
+reroute: {
+    SceneActorChase_CellCenter(cell, &target);
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
+        goto success;
+}
+    callback = &group->fallback;
+invoke:
+    Callback_InvokeActor(actor, *callback);
+    return 0;
+success:
+    return 1;
+}
+
+/* Queue pursuit or a return-home route after the recovery delay. */
+
+void Golem_ResumeDelayedRoute(struct ChaseActor *actor)
+{
+    struct SceneActorChaseGroup *group = &actor->group;
+    u32 zero;
+    SceneActorControl_TakeStateEntry(actor);
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
+        return;
+    zero = (u8)sub_0812F3CC(actor);
+    if (zero)
+        return;
+    if ((s32)actor->base.counter2AC <= 60)
+        goto waiting;
+    SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
+    Golem_SetState(actor, 3, 1, zero);
+    SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    if (SceneActorChase_MotionFlags(actor, 0x80)) {
+        SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
+        Golem_Arrive_ResumeDelayedRoute(actor);
+    } else {
+        SceneActorChase_SetActorFlags(actor, 0x10);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
+        Golem_SnapToRoute_ResumeDelayedRoute(group->destination, &group->homeRoute);
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      group->destination)) {
+            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
+            Golem_SetState(actor, 3, 0, 0);
+        } else
+            group->destination->pad = 1;
+    }
+    return;
+waiting:
+    actor->base.counter2AC++;
+}
+
+extern const u8 gUnk_08606134[];
+
+void Camera_RequestShake(u32);
+
+void Skeleton_TryTriggerAction(void *);
+
+void Skeleton_ClearPendingFlag(void *);
+
+void Golem_UpdateAttackProperties(void *);
+
+static inline u32 Flags32(struct Golem *a, u32 m)
+{
+    u32 off = 0x2D0;
+    return *(u32 *)((u8 *)a + off) & m;
+}
+
+static inline u8 Unavailable(struct Golem *a)
+{
+    if (a) {
+        if (Flags16(a, 0x40) || Flags32(a, 0x20000) || a->chase.base.health <= 0)
+            return 1;
+    }
+    return 0;
+}
+
+void Golem_InitActionHandlers(struct Golem *actor)
+{
+    actor->chase.base.alternateBehaviorCallbacks = (void **)gUnk_08606134;
+}
+
+s32 Golem_TickFacingQuadrant(struct Golem *a)
+{
+    u8 *base = (u8 *)&a->chase.base.body.id;
+    struct GolemState *s = a->chase.base.context;
+    if (!Unavailable(a)) {
+        if (s->countdown626)
+            s->countdown626--;
+    }
+    {
+        u32 quadrant = (base[9] + 0x60) >> 6;
+        u32 mask = 3;
+        mask &= quadrant;
+        a->field68C = mask;
+    }
+    a->savedDirection690 = a->direction68E;
+    return 1;
+}
+
+s32 Golem_UpdateEffectsAndContacts(struct Golem *actor)
+{
+    struct GolemState *state = actor->chase.base.context;
+    u32 m = 0x40;
+    if (!(actor->chase.base.motionFlags & m)) {
+        u16 *p = &state->shakeTimer6AE;
+        if (*p != 0) {
+            Camera_RequestShake(state->shakeStrength6AC);
+            *p = *p - 1;
+        }
+    }
+    Skeleton_TryTriggerAction(actor);
+    Skeleton_ClearPendingFlag(actor);
+    Golem_UpdateAttackProperties(actor);
+    return 1;
 }

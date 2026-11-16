@@ -88,3 +88,18 @@ never does.
 * Not done yet: rerunning the consolidation over these fifteen functions so they join their
   neighbors' units (`unitize` over each class range); merge_resolve should then fold the
   identical class copies into one per unit.
+
+## Consolidation rerun (branch claude/units-after-selectors, from main after PR 1038)
+
+With the selectors gone, 16 of the 17 held-out functions joined units, as predicted:
+
+* Bat: 08087018, 08087A70 and bat_defeat.c into `src/bat_restore.c`.
+* Vorn: 080B2580 joins vorn_main.c and vorn_main_2.c.
+* Golem: 080CBF24 into golem_2.c (with golem_3.c); 080CF3E4 into golem_main_2.c (with
+  golem_main_3.c).
+* Mummy: all six, and 080D1A98 onward is one unit, `src/mummy_entry.c`.
+* Dog: all five, and the whole class is one unit, `src/dog.c`.
+
+The one left out, 080ACBE0, is a different case: its neighbor 080ACCD4 is compiled with
+old_agbcc (`// COMPILER: old_agbcc`), so neither can share a unit with vorn.c. Joining
+golem_main.c, golem_2.c and golem_main_2.c stops on `sub_08014634`, declared two ways.

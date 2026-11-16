@@ -176,7 +176,7 @@ Scene actor control phases,08082648,08084280,,symbols/proposed/report-subsystems
 Scene actor visibility and stored motion,08084280,08084F44,,,docs/SCENE_ACTOR_VISIBILITY.md; reviewed control-context visibility oscillation stored-position and entry callbacks
 Bat,08084F44,08085D58,,,auto: 2 of 2 functions named Bat_*
 Ghoul,08085D58,08086C1C,,,auto: 9 of 9 functions named Ghoul_*
-Bat,08086C1C,08089168,,,auto: 5 of 7 functions named Bat_*
+Bat,08086C1C,08089168,,,auto: 7 of 7 functions named Bat_*
 Ghoul,08089168,0808E208,,,auto: 32 of 37 functions named Ghoul_*
 Slime,0808E208,08091E54,,,auto: 43 of 48 functions named Slime_*
 Bee,08091E54,08095574,,,auto: 42 of 45 functions named Bee_*
@@ -190,7 +190,7 @@ Vorn,080ACBE0,080B551C,,,auto: 77 of 105 functions named Vorn_*
 Skeleton,080B551C,080C47B8,,,auto: 55 of 94 functions named Skeleton_*; also SceneActorApproach_*
 Golem,080C47B8,080D0C30,,,auto: 54 of 63 functions named Golem_*
 Mummy,080D0C30,080DDD28,,,auto: 57 of 71 functions named Mummy_*
-Dog,080DDD28,080E6E08,,,auto: 56 of 73 functions named Dog_*
+Dog,080DDD28,080E6E08,,,auto: 57 of 73 functions named Dog_*
 Mimic,080E6E08,080E98A4,,,auto: 24 of 36 functions named Mimic_*
 Octopus,080E98A4,080ED328,,,auto: 29 of 46 functions named Octopus_*
 Ivy,080ED328,080F2700,,,auto: 41 of 61 functions named Ivy_*
