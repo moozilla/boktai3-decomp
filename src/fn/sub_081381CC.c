@@ -1,25 +1,17 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "area_effect_link.h"
 
-// foundry draft (worker best 96.7%); what differs is mostly register allocation and instruction order
 #define PlayerValue_GetBand Solar_GetLevelForIntensity
 s32 PlayerValue_GetBand(s32);
 s32 Div(s32, s32);
-static inline u32 GetSelection(s32 player)
+static inline u16 GetSelection(s32 player)
 {
     struct AreaEffectLinkState *session = gLinkSession;
-    u32 base;
-    u32 index;
     if (!session)
         return 0;
-    index = session->previousSelectionPage;
-    index <<= 2;
     {
-        u32 sum = player + index;
-        asm("" : "+r"(sum));
-        base = (u32)session + 0x54;
-        return *(u8 *)(base + sum);
+        s32 index = player + session->previousSelectionPage * 4;
+        return session->selectionBits[index];
     }
 }
 
