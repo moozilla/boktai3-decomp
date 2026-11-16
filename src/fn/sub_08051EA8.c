@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "proximity_emitter.h"
 s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
                                           u32 unused2)
@@ -13,20 +12,12 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         u32 cell;
         u32 height, surface;
         u8 *properties;
-        register struct ContactPosition *point asm("r4");
-        register s16 *yAddress asm("r5");
+        struct ContactPosition *point;
         s32 x, z;
-        {
-            u32 value = Script_GetValue();
-            point = &emitter->position;
-            point->x = value;
-        }
-        {
-            u32 value = Script_GetValue();
-            yAddress = &emitter->position.y;
-            *yAddress = value;
-        }
+        emitter->position.x = Script_GetValue();
+        emitter->position.y = Script_GetValue();
         emitter->position.z = Script_GetValue();
+        point = &emitter->position;
         x = point->x >> 8;
         z = point->z >> 8;
         position = point;
@@ -54,7 +45,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
                 height -= (u8)point->x;
                 break;
         }
-        *yAddress = height;
+        emitter->position.y = height;
     } else {
         emitter->position.x = 0;
         emitter->position.y = 0;
