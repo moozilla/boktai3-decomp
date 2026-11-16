@@ -1297,7 +1297,7 @@ u32 Ghoul_Destroy(struct ChaseActor *actor)
     return 0;
 }
 
-void sub_08087A70(void);
+void Bat_UpdateRecoilRecovery(void);
 
 void Bat_UpdateDefeat(void);
 
@@ -1402,7 +1402,7 @@ s32 Ghoul_Init(void *object)
     Ghoul_InitCollision(actor);
     MonsterInit_InstallAnimationCallbacks(
         actor, Ghoul_Update, Bat_LookupAnimationEntry, Ghoul_TurnTowardRoute, Ghoul_UpdateIdleState,
-        Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, sub_08087A70, Bat_UpdateDefeat,
+        Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, Bat_UpdateRecoilRecovery, Bat_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);

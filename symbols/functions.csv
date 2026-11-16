@@ -3057,6 +3057,8 @@ addr,name,mode,confidence,source,notes
 08086C1C,Bat_RestoreSavedState,thumb,low,src-alias,
 08086DD0,Bat_UpdateAnimationRequest,thumb,low,src-alias,
 08086E2C,Bat_ResumeSavedTarget,thumb,low,src-alias,
+08087018,Bat_UpdateLandingRecovery,thumb,low,src-alias,"resumes the suspended landing reaction, then queues pursuit or the home route"
+08087A70,Bat_UpdateRecoilRecovery,thumb,low,src-alias,"eases the recoil displacement, then picks route or pursuit recovery"
 08088C24,Bat_UpdateProbeReaction,thumb,low,src-alias,
 08088CD4,Bat_UpdateDefeat,thumb,low,src-alias,
 08089168,Ghoul_UpdateDisplacementRecovery,thumb,low,src-alias,
