@@ -1838,8 +1838,8 @@ s32 SceneActorMotion_RefreshGroundHeight(struct Slime *slime)
 {
     struct SceneActorMotionView *actor = (void *)slime;
 
-    if ((s32)slime->groundHeight2BE - slime->previousGround > 0x1FF) {
-        s32 cell = SceneActorTerrain_GetCellIndex(&slime->body.position);
+    if ((s32)slime->base.groundHeight2BE - slime->previousGround > 0x1FF) {
+        s32 cell = SceneActorTerrain_GetCellIndex(&slime->base.body.position);
         if (TerrainModifiers_FindCellOverride(cell, 1)) {
             SceneActorMotion_ArmPrimaryCollider(actor);
             actor->groundHeight = slime->previousGround;
@@ -2008,7 +2008,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, ((struct Slime *)arg0)->movementProbe, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, ((struct Slime *)arg0)->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void Slime_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
