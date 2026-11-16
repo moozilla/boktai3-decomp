@@ -1,4 +1,5 @@
 #include "global.h"
+#include "axe.h"
 #include "rotation_phase.h"
 
 void Sound_PlaySong(u32);
@@ -6,16 +7,6 @@ s32 Mod(s32, s32);
 void Axe_EmitMotionTrail(struct ChaseActor *);
 void sub_080FC094(struct ChaseActor *, s32);
 void SceneActorControl_FinishRotation(void);
-struct RotationControlState {
-    u8 unknown0[0xE4C];
-    u32 flags;
-    u8 unknownE50[0x5E];
-    u8 acceleration;
-    u8 unknownEAF[3];
-    u8 parameter;
-    u8 unknownEB3[0x20];
-    u8 savedAngle;
-};
 static inline s32 FoldRotation(s32 a)
 {
     if (a > 128)
@@ -26,7 +17,7 @@ static inline s32 FoldRotation(s32 a)
 }
 void SceneActorControl_RecoverRotation(struct ChaseActor *actor, s32 elapsed)
 {
-    struct RotationControlState *state = actor->base.context;
+    struct Axe *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
@@ -54,8 +45,8 @@ void SceneActorControl_RecoverRotation(struct ChaseActor *actor, s32 elapsed)
             magnitude = -magnitude;
         if (magnitude > 96) {
             RotationPhase_Change(actor, SceneActorControl_FinishRotation, 51);
-            state->flags = RotationPhase_Mask(&state->flags, ~0x200);
-            state->parameter = 32;
+            state->flagsE4C = RotationPhase_Mask(&state->flagsE4C, ~0x200);
+            state->parameterEB2 = 32;
             sub_080FC094(actor, 8);
         }
     }

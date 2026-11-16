@@ -1,13 +1,10 @@
 #include "global.h"
+#include "spider.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
 
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-struct SpiderApproachContext {
-    u8 unknown0[0x62C];
-    u16 flags;
-};
 struct SpiderApproachPlayer {
     u8 unknown0[0x20];
     u32 flags;
@@ -38,7 +35,7 @@ static inline void State(struct ChaseActor *a, u32 k)
 }
 static inline u8 HasFlag(u8 *c, u32 m)
 {
-    if (((struct SpiderApproachContext *)c)->flags & m)
+    if (((struct Spider *)c)->flags62C & m)
         return 1;
     return 0;
 }

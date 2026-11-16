@@ -73,16 +73,24 @@ def top(name):
     return re.split(r"[.\[]", name, maxsplit=1)[0]
 
 
-def members(leaves):
-    """Top-level members in offset order: {name, off, end, kinds}."""
-    out = {}
+def members(leaves, size=None):
+    """Top-level members in offset order: {name, off, end, kinds}. The probe lists only the
+    first element of an array of structs, so such a member ends where the next one starts."""
+    out, struct_arrays = {}, set()
     for l in leaves:
         t = top(l["name"])
+        if l["name"][len(t):].startswith("[") and "." in l["name"]:
+            struct_arrays.add(t)
         m = out.setdefault(t, {"name": t, "off": l["off"], "end": l["off"] + l["size"], "kinds": []})
         m["off"] = min(m["off"], l["off"])
         m["end"] = max(m["end"], l["off"] + l["size"])
         m["kinds"].append((l["off"], sv.leaf_kind(l)))
-    return sorted(out.values(), key=lambda m: m["off"])
+    ordered = sorted(out.values(), key=lambda m: m["off"])
+    for i, m in enumerate(ordered):
+        if m["name"] in struct_arrays:
+            m["end"] = ordered[i + 1]["off"] if i + 1 < len(ordered) else (size or m["end"])
+            m["kinds"] = [(o, k) for o, k in m["kinds"]]  # element 0 only; compared as such
+    return ordered
 
 
 def struct_body(text, tag):
@@ -119,9 +127,9 @@ def plan(cls, view, view_decls, base_end):
     """(renames {view name: class name}, adopted {class name: view name},
     inserts [(pad member, view member, decl)], problems)."""
     renames, adopted, inserts, problems, retypes = {}, {}, [], [], {}
-    cmembers = members(cls["leaves"])
+    cmembers = members(cls["leaves"], cls["size"])
     class_end = max(c["end"] for c in cmembers)
-    for m in members(view["leaves"]):
+    for m in members(view["leaves"], view["size"]):
         if PAD.match(m["name"]):
             continue
         if m["off"] < base_end:

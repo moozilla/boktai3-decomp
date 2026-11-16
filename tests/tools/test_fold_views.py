@@ -50,6 +50,14 @@ class Plan(unittest.TestCase):
         self.assertEqual(len(problems), 2)  # inside the base; across field8 and the padding
 
 
+class Members(unittest.TestCase):
+    def test_array_of_structs_ends_at_next_member(self):
+        # the probe lists only element 0 of `struct C colliders[3]` (0x54 bytes each)
+        ms = fv.members([leaf("colliders[0].next", 0x10, 4), leaf("colliders[0].owner", 0x60, 4),
+                         leaf("after", 0x10 + 3 * 0x54, 2)], 0x200)
+        self.assertEqual((ms[0]["name"], ms[0]["end"]), ("colliders", 0x10 + 3 * 0x54))
+
+
 class Text(unittest.TestCase):
     def test_split_padding(self):
         text = "struct C {\n    u8 chase[8];\n    u16 field8;\n    u8 unknownA[0xE];\n    u16 flags18;\n};\n"

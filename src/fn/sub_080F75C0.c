@@ -1,18 +1,9 @@
 #include "global.h"
+#include "axe.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_chase_shared.h"
-
-struct AxeContactContext {
-    u8 unknown0[0xA90];
-    struct ContactCollider attack[3];
-    struct ContactCollider body[3];
-    u8 unknownC88[0xCAB - 0xC88];
-    u8 flags;
-    u8 unknownCAC[0xEB0 - 0xCAC];
-    u8 timer;
-};
 
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *, void *);
@@ -36,7 +27,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
                        struct SceneActorBehaviorContactView *destination, void *object)
 {
     struct ChaseActor *actor = object;
-    struct AxeContactContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return;
     SceneActorBehavior_ApplyContactReaction(source, destination, actor);
@@ -45,7 +36,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
         actor->base.field2E6 = destination->mode;
         actor->base.colliderA.responseValue = Axe_ContactResponse(destination);
     }
-    if ((context->flags & 2) && context->timer > 2) {
+    if ((context->flagsCAB & 2) && context->timerEB0 > 2) {
         s32 i;
         u32 stride = sizeof(struct ContactCollider);
         i = 0;
@@ -62,6 +53,6 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
             ++i;
         } while (Axe_ContactIndex(i) <= 2);
         SceneActorChase_SetControl(actor, (void *)ActorPhase_UpdateReverseFlicker, 0x2F);
-        context->timer = 0;
+        context->timerEB0 = 0;
     }
 }

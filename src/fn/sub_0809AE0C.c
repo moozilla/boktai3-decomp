@@ -1,3 +1,4 @@
+#include "lun.h"
 #include "scene_actor_reset.h"
 #include "player.h"
 #include "ram.h"
@@ -7,11 +8,6 @@ void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);
 void Player_QueueStatusEffect(struct Player *player, s32 effect);
 void Sound_PlaySong(u32 song);
 extern struct Player *gUnknown_02000580;
-
-struct LunContactContext {
-    u8 unknown0[0x3D4];
-    u32 flags3D4;
-};
 
 static inline void Lun_SetControl(struct ChaseActor *actor, void *target, u32 kind)
 {
@@ -39,7 +35,7 @@ static inline void Lun_SetState(struct ChaseActor *actor, u32 state, u8 phase, u
 
 static inline u32 Lun_ReadContextFlags(struct ChaseActor *actor, u8 mask)
 {
-    struct LunContactContext *context = actor->base.context;
+    struct Lun *context = actor->base.context;
     return context->flags3D4 & mask ? 1 : 0;
 }
 
@@ -97,12 +93,12 @@ static inline void Lun_ClearReactionFlags(struct ChaseActor *actor, u32 bits)
     *flags &= mask;
 }
 
-static inline void Lun_SetContextFlags(struct LunContactContext *context, const u32 *mask)
+static inline void Lun_SetContextFlags(struct Lun *context, const u32 *mask)
 {
     context->flags3D4 |= *mask;
 }
 
-static inline void Lun_ApplyContactFlag(struct LunContactContext *context)
+static inline void Lun_ApplyContactFlag(struct Lun *context)
 {
     u32 mask = 2;
     Lun_SetContextFlags(context, &mask);

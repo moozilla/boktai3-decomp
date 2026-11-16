@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "bat.h"
 #include "scene_actor_state.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -43,21 +44,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_08605C74[];
 extern SceneActorCommandHandler const gUnk_086108B0[];
-struct BatActor {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    s16 height;
-    u8 parameter3DA;
-    u8 unknown3DB;
-    u8 parameter3DC;
-    u8 unknown3DD;
-    s16 field3DE;
-    u8 unknown3E0[10];
-    s16 field3EA;
-    u8 unknown3EC[0x48];
-    struct ContactPosition initialPosition;
-};
-
 static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
@@ -173,12 +159,12 @@ static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)
 
 s32 Bat_Init(void *object)
 {
-    struct BatActor *bat = object;
+    struct Bat *bat = object;
     struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
-    bat->flags = 0;
+    bat->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
     MonsterInit_SetCategory(actor, 0x12);
     SceneActorControl_SetDefaultProfile(actor);
@@ -285,7 +271,7 @@ s32 Bat_Init(void *object)
     if (Script_GetKeywordValue(0x54, 0) == 0) {
         SceneActorControl_RestartPositionCurve(actor);
     } else {
-        bat->flags |= 2;
+        bat->flags3D4 |= 2;
         ActorShadow_Disable((u8 *)actor + 0x320);
     }
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);

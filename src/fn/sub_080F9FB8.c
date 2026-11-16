@@ -1,3 +1,4 @@
+#include "axe.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
 s32 Math_Atan2(s32, s32);
@@ -60,15 +61,11 @@ static inline void ToPlayer(u8 **player, struct ContactPosition *out,
     out->y = target->y - actor->y;
     out->z = target->z - actor->z;
 }
-struct PursuitContext {
-    u8 unknown0[0xE56];
-    u16 distance;
-};
 void Axe_UpdatePursuit(struct ChaseActor *actor)
 {
     struct ContactPosition delta;
     struct ContactPosition velocity;
-    struct PursuitContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     s32 angle, step;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = actor->base.onAlternateEntry;

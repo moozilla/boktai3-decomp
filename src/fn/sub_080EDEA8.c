@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -8,11 +9,6 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
-
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-};
 
 struct IvyTarget {
     u8 unknown0[8];
@@ -41,7 +37,7 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
  * clears context flag 2. */
 void Ivy_BeginRelease(struct ChaseActor *actor)
 {
-    struct IvyContext *context = actor->base.context;
+    struct Ivy *context = actor->base.context;
     if (SceneActorReaction_TakePrepared(actor)) {
         {
             u16 *destination = &actor->base.colliderA.flags;
@@ -72,7 +68,7 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
         ((u8 *)actor->base.drawable)[7] = 2;
         {
-            u32 *flags = &context->flags;
+            u32 *flags = &context->captureFlags;
             u32 mask = ~2;
             *flags &= mask;
         }

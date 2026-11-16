@@ -1,27 +1,18 @@
 #include "global.h"
+#include "axe.h"
 #include "rotation_phase.h"
 #include "player.h"
 // confidence=low: saves the player position and turns the axe before the attack callback.
-struct WindupContext {
-    u8 unknown0[0xE3E];
-    u8 delay, turnStep;
-    u8 unknownE40[8];
-    s32 healthThreshold;
-    u8 unknownE4C[0x84];
-    u8 active, unknownED1[2], direction;
-    u8 unknownED4[0x48];
-    struct ContactPosition target;
-};
 void Sound_PlaySong(u32);
 void Axe_UpdateTargetLunge(void);
 void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
 {
-    struct WindupContext *state = actor->base.context;
+    struct Axe *state = actor->base.context;
     struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle, magnitude;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         drawable->flags |= 2;
-        state->direction = actor->base.tracking.heading;
+        state->savedAngle = actor->base.tracking.heading;
         state->target = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         state->active = 1;
         Sound_PlaySong(0x16F);
@@ -59,7 +50,7 @@ void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
             step = state->turnStep >> 1;
         if (step <= 0)
             step = 1;
-        turn = NormalizeAngle(32 - state->direction);
+        turn = NormalizeAngle(32 - state->savedAngle);
         if (turn < 0)
             drawable->angle -= step;
         else

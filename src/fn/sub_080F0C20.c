@@ -1,6 +1,7 @@
 #include "scene_body_api.h"
 #include "scene_actor_init_dispatch.h"
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_init_group.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -38,19 +39,6 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
-
-struct IvyInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[8];
-    u32 captureFlags;
-    u8 unknown630[6];
-    u16 field636;
-    u32 field638;
-    u8 unknown63C;
-    u8 field63D;
-    u8 field63E;
-    u8 unknown63F;
-};
 
 static inline void IvyInit_ResetState(struct ChaseActor *actor, u32 behavior)
 {
@@ -158,7 +146,7 @@ static inline void IvyInit_InstallRoutes(struct ChaseActor *actor)
 static inline void IvyInit_ResetCapture(void *object)
 {
     struct ChaseActor *actor = object;
-    ((struct IvyInstanceState *)actor)->captureFlags = 0;
+    ((struct Ivy *)actor)->captureFlags = 0;
 }
 
 static inline void IvyInit_EnableColliderContact(struct ContactCollider *collider)
@@ -208,11 +196,11 @@ s32 Ivy_Init(void *object)
     }
     IvyInit_InitializeBody(actor, &zero);
     if (Script_SeekToKeyword('P')) {
-        ((struct IvyInstanceState *)arg0)->field636 = MonsterInit_ReadHalfword(0);
-        ((struct IvyInstanceState *)arg0)->field63E = MonsterInit_ReadByte(0);
-        ((struct IvyInstanceState *)arg0)->field63D = MonsterInit_ReadByte(0);
+        ((struct Ivy *)arg0)->field636 = MonsterInit_ReadHalfword(0);
+        ((struct Ivy *)arg0)->interval = MonsterInit_ReadByte(0);
+        ((struct Ivy *)arg0)->holdTicks = MonsterInit_ReadByte(0);
     }
-    ((struct IvyInstanceState *)arg0)->field638 = Script_GetKeywordValue('d', 0);
+    ((struct Ivy *)arg0)->field638 = Script_GetKeywordValue('d', 0);
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;
     MonsterInit_DrawablePosition(actor);

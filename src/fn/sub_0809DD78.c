@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "lun.h"
 #include "scene_actor_state.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -46,17 +47,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern MonsterInitCommandHandler const gUnk_08605E78[];
 extern MonsterInitCommandHandler const gUnk_086108B0[];
-struct LunActor {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    u8 parameter3D8, parameter3D9;
-    u8 unknown3DA[2];
-    u16 ground3DC;
-    u8 unknown3DE[0x4E];
-    struct SceneActorRegistryRoute route;
-    u8 unknown440[2];
-    u16 field442;
-};
 u32 Route_GetCurrentPointFacing(void *);
 void Lun_InitReactionTable(void *);
 
@@ -187,7 +177,7 @@ static inline void Lun_InstallRoutes(struct ChaseActor *actor)
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Lun_OnTargetCheck);
 }
 
-static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
+static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct Lun *lun,
                                 struct SceneActorRegistryRoute *route)
 {
     struct ContactPosition point;
@@ -219,7 +209,7 @@ static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
     }
     return 0;
 }
-static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *lun)
+static inline void Lun_ReadPosition(struct ChaseActor *actor, struct Lun *lun)
 {
     if (Script_SeekToKeyword('p')) {
         s32 ground;
@@ -237,13 +227,13 @@ static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *l
 
 s32 Lun_Init(void *object)
 {
-    struct LunActor *lun = object;
+    struct Lun *lun = object;
     struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 r1v;
-    lun->flags = 0;
+    lun->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
     MonsterInit_SetCategory(actor, 0x11);
     Lun_InitProfile(actor);

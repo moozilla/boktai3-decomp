@@ -1,10 +1,7 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
-struct SceneActorTargetWaitState {
-    u8 unknown0[0x634];
-    s16 targetMissFrames;
-};
 s32 Ivy_FindAdjacentTarget(struct ChaseActor *, s32);
 void sub_080ED4E0(void);
 static inline void ClearFlags(u16 *p, u32 mask)
@@ -59,7 +56,7 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
     s32 zero;
-    struct SceneActorTargetWaitState *state = actor->base.context;
+    struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetCollider(&actor->base.colliderA);
         ClearFlags(&actor->base.flags2C0, ~0x800);

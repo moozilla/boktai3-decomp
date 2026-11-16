@@ -1,4 +1,5 @@
 #include "global.h"
+#include "axe.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
@@ -25,11 +26,6 @@ struct AxeLink {
     u8 unknown0[8];
     struct AxeRoutePoint *point;
 };
-struct AxeContext {
-    u8 unknown0[0xF14];
-    u32 clearF14[2];
-};
-
 static inline u32 CellIndex(s32 x, s32 z)
 {
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
@@ -73,7 +69,7 @@ static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 beh
 
 void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
 {
-    struct AxeContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     u32 zero;
     struct AxeVec targetStorage;
     struct AxeVec *target;

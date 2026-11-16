@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_control_phase.h"
 /* The collider's flags as a 16-bit bitfield: the read-modify-write leaves the zeros that the
  * SetControl and ResetPhase stores reuse. */
@@ -8,10 +9,6 @@ struct IvyColliderBits {
 };
 
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
-struct SceneActorTargetWaitState {
-    u8 unknown0[0x634];
-    s16 targetMissFrames;
-};
 void Ivy_UpdateActiveState(void);
 void SceneActorReaction_PlayHiddenCue(void);
 static inline void BeginControl(struct ChaseActor *actor, void *callback, u32 kind)
@@ -38,7 +35,7 @@ static inline void ResetPhase(struct ChaseActor *actor, u32 behavior)
 }
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
 {
-    struct SceneActorTargetWaitState *state = actor->base.context;
+    struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = SceneActorReaction_PlayHiddenCue;
         u32 kind = 0x2A;
