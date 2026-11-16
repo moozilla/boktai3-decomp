@@ -17,14 +17,14 @@ static inline u8 Reaction_HasFlags(u32 bits)
 /* Direction is stored in turns of 1/256 of a circle. */
 static inline u8 Reaction_GetDirection(struct SceneActorRegistryResetView *actor)
 {
-    return actor->body.direction;
+    return actor->base.body.direction;
 }
 static inline void Reaction_Palette(struct SceneActorRegistryResetView *actor, u32 bank)
 {
-    if (!actor->drawableKind)
-        AnimData_SelectPaletteBank((u8 *)actor->drawable + 0x2C, bank);
+    if (!actor->base.drawableKind)
+        AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)actor->drawable + 0x68) = gPaletteBankData + bank * 32;
+        *(u8 **)((u8 *)actor->base.drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 static inline void Reaction_SetWord(u32 *flags, u32 mask)
 {
@@ -51,15 +51,15 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
 }
 static inline u32 Reaction_Motion(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 static inline void Reaction_ClearMotionBits(struct SceneActorRegistryResetView *actor, s32 mask)
 {
-    actor->flags2D4 &= mask;
+    actor->base.flags2D4 &= mask;
 }
 static inline void Reaction_SetHalf(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    actor->flags2D6 = mask | actor->flags2D6;
+    actor->base.flags2D6 = mask | actor->base.flags2D6;
 }
 static inline void Reaction_SpawnPart(u8 *group)
 {
@@ -95,22 +95,22 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         u32 *word;
         u16 *motion;
         u32 bit;
-        actor->body.direction = (((Reaction_GetDirection(actor) + 32) >> 6) & 3) << 6;
+        actor->base.body.direction = (((Reaction_GetDirection(actor) + 32) >> 6) & 3) << 6;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
-        actor->field2C2 = 64;
-        reaction = (void *)&actor->tracking.target;
+        actor->base.field2C2 = 64;
+        reaction = (void *)&actor->base.tracking.target;
         Reaction_ClearMotion(reaction, ~0x18);
-        word = &actor->flags2D0;
+        word = &actor->base.flags2D0;
         Reaction_ClearWord(word, ~0x1000000);
-        actor->field2C2 = 64;
+        actor->base.field2C2 = 64;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
-        motion = &actor->flags2D4;
+        motion = &actor->base.flags2D4;
         Reaction_ClearHalf(motion, ~0x380);
         Reaction_ClearMotion(reaction, ~0x18);
         control = &actor->group.common.control;
         bit = 0x200000;
-        flags = &actor->flags2CC;
+        flags = &actor->base.flags2CC;
         if (Reaction_HasFlags(*flags & bit)) {
             Reaction_ClearWord(word, ~0x1000000);
             Reaction_ClearHalf(motion, ~0x200);
@@ -128,24 +128,24 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
             u32 shown = 0x4000;
             *word = (shown | *word) & ~0x140;
             if (Reaction_HasFlags(*word & shown))
-                Reaction_Palette(actor, actor->alternatePalette);
+                Reaction_Palette(actor, actor->base.alternatePalette);
             else
-                Reaction_Palette(actor, actor->alternateOffset);
+                Reaction_Palette(actor, actor->base.alternateOffset);
         }
     }
     duration = *(u16 *)(group + 0x1FA);
-    if (duration * 2 == actor->field2B8 || duration == actor->field2B8) {
+    if (duration * 2 == actor->base.field2B8 || duration == actor->base.field2B8) {
         Reaction_SpawnPart(group);
         Reaction_SetHalf(actor, 0x20);
     }
-    if (actor->field2B8 <= 10)
+    if (actor->base.field2B8 <= 10)
         Reaction_SetHalf(actor, 0x20);
     {
         u32 timer = 65;
-        actor->field1EA = timer;
+        actor->base.field1EA = timer;
     }
-    if (!actor->field2B8) {
-        struct ContactCollider *collider = &actor->colliderA;
+    if (!actor->base.field2B8) {
+        struct ContactCollider *collider = &actor->base.colliderA;
         u32 mask = 0x100;
         collider->flags = mask | collider->flags;
         if (Reaction_HasFlags(Reaction_Motion(actor, 0x2000)))
@@ -153,9 +153,9 @@ void SceneActorReaction_UpdateTimedBurst(struct SceneActorRegistryResetView *act
         Reaction_ClearMotionBits(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
-        actor->field2B6 =
+        actor->base.field2B6 =
             (Reaction_ThirtySecond((Reaction_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
-        actor->field2B8--;
+        actor->base.field2B8--;
     }
 }

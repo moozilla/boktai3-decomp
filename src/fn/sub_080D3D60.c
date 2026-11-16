@@ -16,7 +16,7 @@ static inline u32 ClearWordValue(u32 *field, u32 bits)
 #include "scene_actor_animation.h"
 static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u16 *field = &actor->flags2D4;
+    u16 *field = &actor->base.flags2D4;
     u32 value = *field;
     return value & mask;
 }
@@ -63,20 +63,20 @@ static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
     u8 *group = (u8 *)&actor->group.common;
     {
         u32 mask = 0x400;
-        if (((struct SceneActorRegistryResetView *)ctx)->flags2D4 & mask)
+        if (((struct SceneActorRegistryResetView *)ctx)->base.flags2D4 & mask)
             return;
     }
     if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
         return;
     ((struct MummyTurnBytes *)(group + 0x204))->direction =
-        PickTurn(actor->body.direction, randomSamples);
+        PickTurn(actor->base.body.direction, randomSamples);
     {
         struct MummySavedControl *save = (struct MummySavedControl *)(group + 0x8C);
-        save->target = actor->target;
-        save->kind = actor->field2B5;
-        save->state = actor->state2A8;
-        save->phase = actor->phase2A9;
-        save->behavior = actor->behavior2AA;
+        save->target = actor->base.target;
+        save->kind = actor->base.field2B5;
+        save->state = actor->base.state2A8;
+        save->phase = actor->base.phase2A9;
+        save->behavior = actor->base.behavior2AA;
     }
     group[0x205] = saved;
     Chase_SetCtl(actor, *(void **)(group + 0x21C), 0x1B);
@@ -113,7 +113,7 @@ static inline u8 Arrive(void *obj)
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell && !Chase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
+    if (cell != actor->base.terrainCell && !Chase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (MotionFlags(actor, 0x400))
         return 0;
@@ -126,7 +126,7 @@ static inline u8 Arrive(void *obj)
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
     } else {
-        Chase_SetCtl(actor, actor->entryTarget228, 1);
+        Chase_SetCtl(actor, actor->base.entryTarget228, 1);
         Chase_SetBehavior(actor, 5);
         Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
         (*(struct ContactPosition **)(group + 0x200))->y =
@@ -135,11 +135,11 @@ static inline u8 Arrive(void *obj)
         (*(struct ContactPosition **)(group + 0x200))->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         Turn(saved, obj, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 reroute: {
     struct ContactPosition *targetPointer = &target;
@@ -154,7 +154,7 @@ reroute: {
         data = gTerrainMap->cells + (cell * 4 + 12);
     targetPointer->y = (*data & 15) << 8;
     targetPointer->z = (z << 8) + 0x80;
-    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->body.position, &target))
+    if (Chase_TryRoute(obj, *(void **)(group + 0x1FC), &actor->base.body.position, &target))
         goto moved;
     goto invoke;
 }
@@ -169,36 +169,36 @@ moved:
 u8 BouncingObject_RefreshNearbyHeading(struct SceneActorRegistryResetView *);
 static inline u8 TakeControlEntry(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B2) {
-        actor->field2B2 = 0;
+    if (actor->base.field2B2) {
+        actor->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
 void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     u8 *group = (u8 *)(&actor->group.common);
     if (TakeControlEntry(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         mask = 4;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     if (BouncingObject_RefreshNearbyHeading(actor))
         Chase_SetBehavior(actor, 16);
-    if (actor->behavior2AA == 16)
+    if (actor->base.behavior2AA == 16)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
-    else if (actor->behavior2AA == 18)
+    else if (actor->base.behavior2AA == 18)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    actor->field2C2 = 32;
+    actor->base.field2C2 = 32;
     if (!(*((u16 *)(body + 0x6d6)))) {
-        actor->tracking.target = ((u32)gPlayers[0]) + 0x24;
+        actor->base.tracking.target = ((u32)gPlayers[0]) + 0x24;
         {
             u32 mask = 4;
             SetHalf((u16 *)(group + 0x40), mask);
         }
-        actor->flags2D0 = ClearWordValue(&actor->flags2D0, 4);
+        actor->base.flags2D0 = ClearWordValue(&actor->base.flags2D0, 4);
         {
             struct ChaseFlags40 *field = (void *)(body + 0x6f2);
             s32 mask = ~0x1400;
@@ -209,5 +209,5 @@ void Mummy_UpdatePlayerRoute(struct SceneActorRegistryResetView *actor)
             Chase_SetBehavior(actor, 12);
         }
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

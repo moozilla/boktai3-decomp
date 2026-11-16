@@ -14,31 +14,31 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag2D0(struct SceneActorRegistryResetView *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
 static inline void Reaction_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
                                        void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void Hide(struct SceneActorRegistryResetView *a)
 {
-    if (!a->drawableKind) {
-        u32 *flags = a->drawable;
+    if (!a->base.drawableKind) {
+        u32 *flags = a->base.drawable;
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }
@@ -77,18 +77,18 @@ static inline u32 NextRandomSample(void)
 }
 static inline u32 ActorStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
 static inline u32 GetReactionFlags(u32 **out, struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u32 *p = &actor->flags2CC;
+    u32 *p = &actor->base.flags2CC;
     u32 result = *p & mask;
     *out = p;
     return result;
 }
 static inline struct ContactCollider *GetDamageCollider(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->colliderA;
+    return &actor->base.colliderA;
 }
 // Area-effect damage with a random knockback heading.
 u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *actor)
@@ -104,12 +104,12 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     struct ContactCollider *collider;
     u32 *flags2D8;
     s32 gain;
-    if ((ActorStatusFlags(actor, 8) || (actor->enabled != 1)) ||
+    if ((ActorStatusFlags(actor, 8) || (actor->base.enabled != 1)) ||
         GetReactionFlags(&flags2CC, actor, 2))
         goto fail;
     collider = GetDamageCollider(actor);
     {
-        u16 *p = &actor->colliderA.responseValue;
+        u16 *p = &actor->base.colliderA.responseValue;
         u32 value = *p;
         displayCollider = collider;
         timer = p;
@@ -120,14 +120,14 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
         struct ContactPosition *pos;
         u16 *max;
         if (Test(gEngineFlags, 0x4800)) {
-            pos = &actor->body.position;
-            max = (u16 *)&actor->defaultHealth;
+            pos = &actor->base.body.position;
+            max = (u16 *)&actor->base.defaultHealth;
             gain = AreaEffect_ScaleLinkGainAtPosition(pos, *max);
             position = pos;
             maxHealth = max;
         } else {
-            pos = &actor->body.position;
-            max = (u16 *)&actor->defaultHealth;
+            pos = &actor->base.body.position;
+            max = (u16 *)&actor->base.defaultHealth;
             gain = AreaEffect_ScaleGainAtPosition(pos, *max);
             position = pos;
             maxHealth = max;
@@ -138,27 +138,27 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
     dx = (NextRandomSample() & 0x3F) - 16;
     dz = (NextRandomSample() & 0x3F) - 16;
     collider->cost = gain;
-    actor->reactionSoundVariant = gain;
+    actor->base.reactionSoundVariant = gain;
     {
         u32 damage = collider->cost;
-        s16 *h = &actor->health;
+        s16 *h = &actor->base.health;
         u32 *f;
         u32 result;
         *h -= damage;
-        f = &actor->field2D8;
+        f = &actor->base.field2D8;
         result = *f & 0x20000;
         health = h;
         flags2D8 = f;
         if (!result) {
-            u16 bank = actor->paletteAlternateBank;
-            if (actor->drawableKind == 0)
-                AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
+            u16 bank = actor->base.paletteAlternateBank;
+            if (actor->base.drawableKind == 0)
+                AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
             else
-                ((struct SceneActorPaletteTileView *)actor->drawable)->palette =
+                ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
                     (const u16 *)(gPaletteBankData + bank * 32);
             {
                 u32 eight = 8;
-                actor->field1E8 = eight;
+                actor->base.field1E8 = eight;
             }
             {
                 u32 bit = 0x8000;
@@ -169,55 +169,55 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct SceneActorRegistryResetView *
                 u32 buffer[2];
                 s32 h = *health;
                 u32 max = *maxHealth;
-                s32 kind = (s16)actor->fieldB2;
-                s32 param = (s16)actor->field9A;
-                SceneHud_SetTimedState(actor->body.id, h, max, kind, 0, param);
+                s32 kind = (s16)actor->base.fieldB2;
+                s32 param = (s16)actor->base.field9A;
+                SceneHud_SetTimedState(actor->base.body.id, h, max, kind, 0, param);
                 Fill(&zero, buffer);
-                if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
-                    DamageNumberDisplay_Show(displayCollider, actor->reactionSoundVariant, 0,
+                if (actor->base.reactionSoundVariant || (!((*flags2D8) & 0x20000)))
+                    DamageNumberDisplay_Show(displayCollider, actor->base.reactionSoundVariant, 0,
                                              position, buffer, 1);
             }
         }
     }
     SceneActorMovement_ProjectProbe(actor, dx, dz);
-    SetHitFlags(8, (void *)&actor->flags2D4);
-    actor->body.direction = Math_Atan2(dx, dz);
+    SetHitFlags(8, (void *)&actor->base.flags2D4);
+    actor->base.body.direction = Math_Atan2(dx, dz);
     *timer = 38;
-    actor->field2DC = 0x40000;
-    actor->field2D8 = 0;
-    ClearHitFlags((void *)&actor->flags2D4, ~0x2000);
-    actor->field2B8 = 0;
+    actor->base.field2DC = 0x40000;
+    actor->base.field2D8 = 0;
+    ClearHitFlags((void *)&actor->base.flags2D4, ~0x2000);
+    actor->base.field2B8 = 0;
     if ((*health) <= 0) {
         collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = actor->deathControl;
+            void *control = actor->base.deathControl;
             Reaction_SetControl(actor, 17, control);
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
-        actor->field2E0 = 32;
+        actor->base.field2E0 = 32;
         if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
-            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->body.id);
+            SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
-        SetHitFlags(0x20, (void *)&actor->flags2D4);
+        SetHitFlags(0x20, (void *)&actor->base.flags2D4);
         {
-            void *control = actor->reactionTarget230;
+            void *control = actor->base.reactionTarget230;
             Reaction_SetControl(actor, 0x12, control);
         }
         {
             u32 state = 3;
-            actor->state2A8 = state;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
     }
     {

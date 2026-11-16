@@ -22,13 +22,13 @@ static inline void SetColliderFlag(struct ContactCollider *collider)
 }
 void SceneActorReaction_TickHiddenTimeout(struct SceneActorRegistryResetView *p, s32 elapsed)
 {
-    struct SceneActorScriptPropertiesView *state = p->context;
+    struct SceneActorScriptPropertiesView *state = p->base.context;
     u16 mode;
     if (SceneActorReaction_TakePrepared(p)) {
         u32 mask;
-        SetColliderFlag(&p->colliderB);
+        SetColliderFlag(&p->base.colliderB);
         mask = 4;
-        SetColliderFlag(&p->colliderA);
+        SetColliderFlag(&p->base.colliderA);
         ((struct ContactCollider *)((u8 *)state + 0x624))->flags |= mask;
         ((struct ContactCollider *)((u8 *)state + 0x678))->flags |= mask;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x11);

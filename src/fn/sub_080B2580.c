@@ -16,10 +16,10 @@ static inline s32 Vorn_MapSlotWidth(struct EngineMap **slot)
 static inline s32 Vorn_SweepEscapeCells(struct SceneActorRegistryResetView *actor, s32 range)
 {
     struct EngineMap **cachedMapSlot = &gTerrainMap;
-    s32 cell = actor->terrainCell;
-    u32 height = SceneActorChase_HeightAt(cell, &actor->body.position);
+    s32 cell = actor->base.terrainCell;
+    u32 height = SceneActorChase_HeightAt(cell, &actor->base.body.position);
     u32 shape = SceneActorChase_CellProperties(cell)->attributes >> 4;
-    s32 direction = Vorn_RoundDirection(actor->body.direction + 32) & 3;
+    s32 direction = Vorn_RoundDirection(actor->base.body.direction + 32) & 3;
     s32 next;
     s32 i;
     struct EngineMap **completionMapSlot;
@@ -79,7 +79,7 @@ west:
 north:
     return next + Vorn_MapSlotWidth(cachedMapSlot);
 home:
-    return actor->terrainCell;
+    return actor->base.terrainCell;
 }
 
 static inline u32 Vorn_HeightFromAttributes(u32 value)
@@ -120,16 +120,16 @@ u8 Vorn_SelectReachableEscapeCell(struct SceneActorRegistryResetView *actor, u32
         tries = 0;
         do {
             dest = Vorn_SweepEscapeCells(actor, range);
-            if (dest != actor->terrainCell) {
+            if (dest != actor->base.terrainCell) {
                 found = 1;
                 goto nextRange;
             }
-            actor->body.direction += 64;
+            actor->base.body.direction += 64;
         } while ((++tries) <= 3);
     nextRange:
         range--;
 
-        actor->body.direction = savedDirection;
+        actor->base.body.direction = savedDirection;
         if (found || (range <= 0))
             goto done;
     } while (1);
@@ -137,7 +137,7 @@ done:
     Vorn_CellCenter(dest, &target);
 
     group = &actor->group;
-    if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position, &target)) {
+    if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position, &target)) {
         Callback_InvokeActor(actor, group->fallback);
         return 0;
     }

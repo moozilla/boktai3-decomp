@@ -27,47 +27,47 @@ static inline u8 TakeFlag(u8 *flag)
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
 {
     u32 zero;
-    actor->field2B2 = 1;
+    actor->base.field2B2 = 1;
     zero = 0;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                             u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Golem_BeginSlideState(struct SceneActorRegistryResetView *actor)
 {
-    struct Unk080CEB48Context *context = actor->context;
+    struct Unk080CEB48Context *context = actor->base.context;
     struct Unk080CEB48Body *body = (struct Unk080CEB48Body *)((u8 *)actor + 0x50);
-    if (TakeFlag(&actor->field2B1)) {
+    if (TakeFlag(&actor->base.field2B1)) {
         BeginControl(actor, Golem_UpdateSlideImpact, 0x29);
-        actor->field2B0 = 0;
-        body->direction = actor->tracking.heading;
+        actor->base.field2B0 = 0;
+        body->direction = actor->base.tracking.heading;
         context->pushSpeed = 0x200;
     }
-    if ((s32)actor->counter2AC > 0x1E || actor->field2B0) {
+    if ((s32)actor->base.counter2AC > 0x1E || actor->base.field2B0) {
         if (context->pendingEvent) {
-            actor->field304 = context->pendingEvent;
-            Callback_InvokeActor(actor, actor->update26C);
+            actor->base.field304 = context->pendingEvent;
+            Callback_InvokeActor(actor, actor->base.update26C);
         }
         BeginControl(actor, Golem_UpdateChargeStop, 0x27);
         SetPhase(actor, 0, 2, 3);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

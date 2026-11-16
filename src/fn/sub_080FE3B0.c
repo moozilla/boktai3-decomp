@@ -65,16 +65,16 @@ done:
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                             u8 behavior, u32 counter)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = counter;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = counter;
+    actor->base.field2B1 = 1;
 }
 
 void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeContext *context = actor->context;
+    struct AxeContext *context = actor->base.context;
     u32 zero;
     struct AxeVec targetStorage;
     struct AxeVec *target;
@@ -83,11 +83,11 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
     struct AxeLink *link;
     s16 deltaX;
     s16 deltaZ;
-    if (actor->field2B1)
-        actor->field2B1 = 0;
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if (((s32)actor->counter2AC) > 60) {
+    if (((s32)actor->base.counter2AC) > 60) {
         Axe_SelectRandomRoutePoint(actor);
         target = &targetStorage;
         link = (struct AxeLink *)(((u8 *)actor) + 0x448);
@@ -104,7 +104,7 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         sub_080FAA5C(actor);
         SetState(actor, 0, 0, 1, zero);
         {
-            struct AxeVec *position = (struct AxeVec *)(&actor->body.position);
+            struct AxeVec *position = (struct AxeVec *)(&actor->base.body.position);
             target = &targetStorage;
             target->x -= position->x;
             copy->y -= position->y;
@@ -115,5 +115,5 @@ void Axe_UpdateRouteDestinationPhase(struct SceneActorRegistryResetView *actor)
         *(((u8 *)actor) + 0x3cd) = Math_Atan2(deltaX, deltaZ);
         ZeroFill8(context->clearF14);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

@@ -57,25 +57,25 @@ static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 beh
 }
 static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = kind;
-    a->target = callback;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = kind;
+    a->base.target = callback;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 s32 SceneActorControl_CreateFromPosition(void *);
@@ -91,27 +91,27 @@ static inline s32 Random(void)
 }
 void Spider_SelectRecoveryRoute(struct SceneActorRegistryResetView *a, s32 frame)
 {
-    struct SpiderRecoveryContext *ctx = a->context;
+    struct SpiderRecoveryContext *ctx = a->base.context;
     u8 *actor = (u8 *)a + 0x50;
     u8 *group;
-    TakeEntry(&a->field2B2);
+    TakeEntry(&a->base.field2B2);
     SceneActorAnimation_SelectDirectionalEntry(a, 14);
     if (frame <= ctx->delay)
         return;
     group = (u8 *)&a->group.common;
     ClearContext(&ctx->flags, ~4);
-    if (a->paletteOffset == 0 && SceneActorControl_CreateFromPosition(actor) >= 0) {
-        SaveRecovery((void *)&a->group.saved.control, a->entryTarget228, 7, 60);
+    if (a->base.paletteOffset == 0 && SceneActorControl_CreateFromPosition(actor) >= 0) {
+        SaveRecovery((void *)&a->group.saved.control, a->base.entryTarget228, 7, 60);
         SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(a, 3, 1, 0);
     } else {
         u32 choice = (Random() >> 3) & 3;
         if (choice == 0) {
-            SaveRecovery((void *)(group + 0x8C), a->entryTarget228, 7, 60);
+            SaveRecovery((void *)(group + 0x8C), a->base.entryTarget228, 7, 60);
             SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             SetState(a, 3, 1, 0);
         } else {
-            SaveRecovery((void *)(group + 0x8C), a->savedTarget, 5, 60);
+            SaveRecovery((void *)(group + 0x8C), a->base.savedTarget, 5, 60);
             SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             SetState(a, 3, 1, 0);
         }

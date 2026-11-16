@@ -2,30 +2,30 @@
 #include "engine.h"
 static inline void Turn_SetFlags(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    actor->flags2D4 = mask | actor->flags2D4;
+    actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
 static inline void Turn_ResetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = 0;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = 0;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void Turn_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
                                    void *control)
 {
     u32 *flags;
     u32 mask;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
-    flags = &actor->flags114;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
+    flags = &actor->base.flags114;
     mask = ~1;
     *flags &= mask;
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *actor, s32 frame)
 {
@@ -33,7 +33,7 @@ void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *ac
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Turn_SetFlags(actor, 0x400);
-        actor->field2C2 = 32;
+        actor->base.field2C2 = 32;
     }
     if (group->turn.turnsRemaining > 0) {
         if (frame > 60) {
@@ -41,13 +41,13 @@ void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *ac
             const void *data;
             u32 encoded;
             Turn_ResetState(actor, 3, 1);
-            data = actor->entryTarget224;
+            data = actor->base.entryTarget224;
             Turn_SetControl(actor, 2, (void *)data);
             if (group->turn.turnsRemaining == 1) {
                 encoded = ((group->turn.savedDirection >> 5) + 3) & 7;
-                actor->unknown3CD[0] = encoded;
+                actor->base.unknown3CD[0] = encoded;
             } else {
-                s32 prior = actor->body.direction;
+                s32 prior = actor->base.body.direction;
                 s32 tries = 0;
                 u32 *randomIndex;
                 u32 wrap, mask;
@@ -71,7 +71,7 @@ void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *ac
                     }
                 }
                 encoded = ((choice >> 5) + 3) & 7;
-                actor->unknown3CD[0] = encoded;
+                actor->base.unknown3CD[0] = encoded;
             }
             group->turn.turnsRemaining--;
         }
@@ -86,13 +86,13 @@ void SceneActorReaction_RestoreAfterTurns(struct SceneActorRegistryResetView *ac
             state = saved->state;
             phase = saved->phase;
             behavior = saved->behavior;
-            actor->state2A8 = state;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = behavior;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
             {
-                u16 *flags = &actor->flags2D4;
+                u16 *flags = &actor->base.flags2D4;
                 u32 mask = ~0x400;
                 *flags = mask & *flags;
             }

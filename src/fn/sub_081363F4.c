@@ -25,10 +25,10 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 flags)
         }
         {
             u32 mask = 0x20000;
-            if (actor->flags2D0 & mask)
+            if (actor->base.flags2D0 & mask)
                 return 1;
         }
-        if (actor->health <= 0)
+        if (actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -50,9 +50,9 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
         if (down) {
             u32 zero = 0;
             *flags2D4 = 0x40;
-            actor->field2E6 = zero;
+            actor->base.field2E6 = zero;
             {
-                u16 *flags2D6 = &actor->flags2D6;
+                u16 *flags2D6 = &actor->base.flags2D6;
                 s32 mask = ~0x980;
                 *flags2D6 &= mask;
             }
@@ -84,7 +84,7 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
                 *flags2CC &= mask;
             }
             {
-                struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
+                struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
                 s32 mask = ~0x10;
                 motion->flags &= mask;
             }
@@ -96,15 +96,15 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
                 }
             }
             {
-                u32 *flags2D0 = &actor->flags2D0;
+                u32 *flags2D0 = &actor->base.flags2D0;
                 u32 mask = 0xFFEFFFFB;
                 *flags2D0 &= mask;
             }
             {
                 u32 bit = 0x400;
-                actor->flags2D6 |= bit;
+                actor->base.flags2D6 |= bit;
             }
-            actor->field2E6 = down;
+            actor->base.field2E6 = down;
             {
                 u32 bit = 0x2000;
                 *flags2CC |= bit;
@@ -162,7 +162,7 @@ static inline u32 PlacementDamage_QueryMotionSaveStatus(struct SceneActorRegistr
                                                         struct PlacementStatusOwner *owner,
                                                         struct PlacementMotionOwner *motionOwner)
 {
-    u16 *motion = &actor->flags2D4;
+    u16 *motion = &actor->base.flags2D4;
     u32 bits = *motion & mask;
     motionOwner->field = motion;
     owner->field = status;
@@ -182,11 +182,11 @@ static inline u32 WordBits(u32 *field, u32 mask)
 }
 static inline u32 HitFlag(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 static inline u8 HasPendingHitSave(struct SceneActorRegistryResetView *actor, u16 **out)
 {
-    u16 *address = &actor->field2E6;
+    u16 *address = &actor->base.field2E6;
     u32 value = *address;
     *out = address;
     if (!value)
@@ -208,10 +208,10 @@ static inline void PlacementDamage_ReportHud(struct SceneActorRegistryResetView 
     struct ContactPosition offset;
     SceneHud_SetTimedState(id, health, maximum, kind, mode >> 2, parameter);
     Fill(&zero, &offset);
-    if (actor->reactionSoundVariant || !(*damageFlags & 0x20000)) {
-        struct ContactCollider *displayCollider = &actor->colliderA;
-        DamageNumberDisplay_Show((void *)displayCollider, actor->reactionSoundVariant, 0,
-                                 &actor->body.position, &offset, priority);
+    if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000)) {
+        struct ContactCollider *displayCollider = &actor->base.colliderA;
+        DamageNumberDisplay_Show((void *)displayCollider, actor->base.reactionSoundVariant, 0,
+                                 &actor->base.body.position, &offset, priority);
         *captured = displayCollider;
     }
 }
@@ -220,9 +220,9 @@ static inline void PlacementDamage_UpdateCollider(struct ContactCollider *collid
                                                   struct SceneActorRegistryResetView *actor,
                                                   u16 *flags2D4)
 {
-    if (PlacementDamage_TestField(0x40, &actor->flags2C0))
+    if (PlacementDamage_TestField(0x40, &actor->base.flags2C0))
         collider->flags &= ~0x100;
-    else if ((actor->field2DC & 0x84000) || PlacementDamage_FieldBits(0x2016, flags2D4))
+    else if ((actor->base.field2DC & 0x84000) || PlacementDamage_FieldBits(0x2016, flags2D4))
         collider->flags &= ~0x100;
     else
         collider->flags |= 0x100;
@@ -248,7 +248,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
             struct PlacementStatusOwner saved;
             struct PlacementMotionOwner savedMotion;
             struct SceneActorRegistryControl *control = &group->common.control;
-            u32 *flags = &actor->flags2CC;
+            u32 *flags = &actor->base.flags2CC;
             u32 mask = 0xFFFEBE3F;
             *flags &= mask;
             ResetMotion(control);
@@ -276,60 +276,60 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
     if (SceneActorReaction_TryBeginControl29(actor))
         return 1;
     SceneActor_ClearReactionFlags(actor);
-    SceneActorMovement_ProjectProbe(actor, actor->colliderA.responseParameter,
-                                    actor->colliderA.responseParameter);
+    SceneActorMovement_ProjectProbe(actor, actor->base.colliderA.responseParameter,
+                                    actor->base.colliderA.responseParameter);
     SceneActorPlacement_BeginDestinationJump(actor);
     {
-        u32 damage = actor->reactionSoundVariant;
-        s16 *health = &actor->health;
+        u32 damage = actor->base.reactionSoundVariant;
+        s16 *health = &actor->base.health;
         *health -= damage;
     }
     {
         u32 applied = SceneActorReaction_ApplyEscalatingHit(actor);
-        flags2D4 = &actor->flags2D4;
-        if ((!applied) && (!(actor->field2D8 & 0x20000))) {
+        flags2D4 = &actor->base.flags2D4;
+        if ((!applied) && (!(actor->base.field2D8 & 0x20000))) {
             PlacementDamage_SetHitFlags(0x20, (void *)flags2D4);
         }
     }
     {
-        u32 bits = actor->field2E6 & 4;
+        u32 bits = actor->base.field2E6 & 4;
         mode = 1;
         if (bits)
             mode = 4;
     }
     {
-        u32 *damageFlags = &actor->field2D8;
+        u32 *damageFlags = &actor->base.field2D8;
         u32 blocked = *damageFlags & 0x20000;
-        flags2CC = &actor->flags2CC;
+        flags2CC = &actor->base.flags2CC;
         flags2D8 = damageFlags;
-        collider = &actor->colliderA;
+        collider = &actor->base.colliderA;
         if (!blocked) {
             if ((mode & 4) && (!PlacementDamage_MotionBits(4, flags2D4))) {
                 SceneActorBehavior_PlayReactionSound(actor);
-                *(u16 *)&actor->field30C = 12;
+                *(u16 *)&actor->base.field30C = 12;
             }
-            flags2CC = &actor->flags2CC;
-            collider = &actor->colliderA;
+            flags2CC = &actor->base.flags2CC;
+            collider = &actor->base.colliderA;
             if (mode) {
-                u16 bank = actor->paletteAlternateBank;
-                if (actor->drawableKind == 0)
-                    AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
+                u16 bank = actor->base.paletteAlternateBank;
+                if (actor->base.drawableKind == 0)
+                    AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
                 else
-                    ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
+                    ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
                         gPaletteBankData + (bank * 32);
                 {
                     u32 eight = 8;
-                    actor->field1E8 = eight;
+                    actor->base.field1E8 = eight;
                 }
                 {
                     u32 strong = mode & 4;
-                    flags2CC = &actor->flags2CC;
-                    if (strong && (actor->category == 0x19)) {
+                    flags2CC = &actor->base.flags2CC;
+                    if (strong && (actor->base.category == 0x19)) {
                         u32 bit = 0x2000000;
                         *flags2CC |= bit;
                         {
                             u32 duration = 0x41;
-                            actor->field1EA = duration;
+                            actor->base.field1EA = duration;
                         }
                     }
                 }
@@ -345,13 +345,13 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
                         u32 raw;
                     } decision;
                     decision.raw = SceneActorDamage_ShouldShow(actor);
-                    collider = &actor->colliderA;
+                    collider = &actor->base.colliderA;
                     if (decision.part.value) {
-                        s32 h = actor->health;
-                        s32 maxh = (u16)actor->defaultHealth;
-                        s32 kind = (s16)actor->fieldB2;
-                        s32 param = (s16)actor->field9A;
-                        u32 id = actor->body.id;
+                        s32 h = actor->base.health;
+                        s32 maxh = (u16)actor->base.defaultHealth;
+                        s32 kind = (s16)actor->base.fieldB2;
+                        s32 param = (s16)actor->base.field9A;
+                        u32 id = actor->base.body.id;
                         s32 priority;
                         decision.part.value = 1;
                         priority = decision.part.value;
@@ -366,14 +366,14 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct SceneActorRegistryResetView 
         u32 test = 0x10;
         u32 flags = *flags2D4;
         if ((test & flags) || WordBits(flags2CC, 0x200))
-            actor->fieldAA = 0;
+            actor->base.fieldAA = 0;
         else if (flags & 6) {
-            s16 *currentField = (s16 *)&actor->fieldAA;
-            s16 *initialField = (s16 *)&actor->fieldA8;
+            s16 *currentField = (s16 *)&actor->base.fieldAA;
+            s16 *initialField = (s16 *)&actor->base.fieldA8;
             s32 current = *currentField;
             s32 initial = *initialField;
             if (current >= initial)
-                actor->fieldAA = initial;
+                actor->base.fieldAA = initial;
         }
     }
     {

@@ -26,10 +26,10 @@ void ActorContact_InitializeBodyAndSecondary(struct SceneActorRegistryResetView 
     secondaryOffset.z = 0;
     {
         u32 flags = 0x2003;
-        collider = &a->colliderB;
-        Collider_Init(collider, a->body.id, flags, 0, 0x10, &secondarySize, &secondaryOffset);
+        collider = &a->base.colliderB;
+        Collider_Init(collider, a->base.body.id, flags, 0, 0x10, &secondarySize, &secondaryOffset);
     }
     Collider_SetAttackProperties(collider, 0, 0, 0, 0, 0);
-    Collider_SetPosition(collider, &a->body.position, 0);
+    Collider_SetPosition(collider, &a->base.body.position, 0);
     Collider_SetCallback(collider, Lun_HandlePlayerContact, a);
 }

@@ -8,7 +8,7 @@
 static inline struct SceneActorChaseFlags16 *
 Mummy_BeginRecovery(struct SceneActorRegistryResetView *actor, u16 bits)
 {
-    struct SceneActorChaseFlags16 *flags = (void *)&actor->flags2D6;
+    struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D6;
     SceneActorChase_SetFlagComponent(flags, bits);
     return flags;
 }
@@ -16,7 +16,7 @@ Mummy_BeginRecovery(struct SceneActorRegistryResetView *actor, u16 bits)
 void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence =
-        (void *)((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+        (void *)((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     struct SceneActorChaseFlags16 *reactionFlags;
     SceneActorReaction_TakePrepared(actor);
     reactionFlags = Mummy_BeginRecovery(actor, 0x10);
@@ -24,9 +24,9 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
          (sequence->elapsed == (sequence->duration != 0))) &&
         (sequence->duration != 1))
         sequence->elapsed = 0;
-    if (actor->field2B3) {
+    if (actor->base.field2B3) {
         struct SceneActorChaseGroup *group = &actor->group;
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         if (SceneActorChase_QueryMotionFlags(actor, 2)) {
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, actor->group.contactControl, 7);
@@ -42,13 +42,13 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 0x28);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 0x28);
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
         SceneActorChase_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
             SceneActorChase_SetControl(actor, (void *)SceneActorControl_OnIdle, 0);
             SceneActorChase_SetState(actor, 3, 0, 0);

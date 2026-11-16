@@ -33,21 +33,21 @@ static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelectio
 }
 #define Axe_ApplyAttack(collider, actor, index)                                                    \
     do {                                                                                           \
-        u16 power = (actor)->attacks.first[index];                                                 \
-        u16 force = (actor)->attacks.second[index];                                                \
-        u32 flags = (actor)->attacks.flags[index];                                                 \
-        u16 duration = (actor)->attacks.parameter[index];                                          \
+        u16 power = (actor)->base.attacks.first[index];                                            \
+        u16 force = (actor)->base.attacks.second[index];                                           \
+        u32 flags = (actor)->base.attacks.flags[index];                                            \
+        u16 duration = (actor)->base.attacks.parameter[index];                                     \
         Collider_SetAttackProperties(collider, power, force, 0, flags, duration);                  \
     } while (0)
 
 // confidence=low: fires the axe's attack on the actor collider and both attack colliders, with attack parameters chosen by the context's flags.
 void sub_080FCDEC(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeAttackContext *context = actor->context;
+    struct AxeAttackContext *context = actor->base.context;
     struct AxeAttackSelection selection;
 
     if (Axe_TestFlag(0x200, &context->flags)) {
-        Axe_ApplyAttack(&actor->colliderB, actor, 2);
+        Axe_ApplyAttack(&actor->base.colliderB, actor, 2);
         Axe_ApplyAttack(&context->attackColliders[0], actor, 2);
         Axe_ApplyAttack(&context->attackColliders[1], actor, 2);
     } else {
@@ -55,36 +55,36 @@ void sub_080FCDEC(struct SceneActorRegistryResetView *actor)
         u32 value = Axe_ReadMaskedFlags(mask, &context->flags);
         selection.flags = &context->flags;
         if (Axe_TestMaskedFlags(value)) {
-            s32 power = actor->attacks.first[2] * 2;
-            s32 force = actor->attacks.second[2] * 2;
+            s32 power = actor->base.attacks.first[2] * 2;
+            s32 force = actor->base.attacks.second[2] * 2;
             {
-                u32 reactionFlags = actor->attacks.flags[2];
-                u16 duration = actor->attacks.parameter[2];
-                Collider_SetAttackProperties(&actor->colliderB, power, force, 0, reactionFlags,
+                u32 reactionFlags = actor->base.attacks.flags[2];
+                u16 duration = actor->base.attacks.parameter[2];
+                Collider_SetAttackProperties(&actor->base.colliderB, power, force, 0, reactionFlags,
                                              duration);
             }
             {
-                u32 reactionFlags = actor->attacks.flags[2];
-                u16 duration = actor->attacks.parameter[2];
+                u32 reactionFlags = actor->base.attacks.flags[2];
+                u16 duration = actor->base.attacks.parameter[2];
                 Collider_SetAttackProperties(&context->attackColliders[0], power, force, 0,
                                              reactionFlags, duration);
             }
             {
-                u32 reactionFlags = actor->attacks.flags[2];
-                u16 duration = actor->attacks.parameter[2];
+                u32 reactionFlags = actor->base.attacks.flags[2];
+                u16 duration = actor->base.attacks.parameter[2];
                 Collider_SetAttackProperties(&context->attackColliders[1], power, force, 0,
                                              reactionFlags, duration);
             }
         } else if (Axe_TestSelectionFlags(0x400, &selection)) {
-            Axe_ApplyAttack(&actor->colliderB, actor, 1);
+            Axe_ApplyAttack(&actor->base.colliderB, actor, 1);
             Axe_ApplyAttack(&context->attackColliders[0], actor, 1);
             Axe_ApplyAttack(&context->attackColliders[1], actor, 1);
         } else if (Axe_TestSelectionFlags(0x1000, &selection)) {
-            Axe_ApplyAttack(&actor->colliderB, actor, 0);
+            Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
             Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
             Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
         } else {
-            Axe_ApplyAttack(&actor->colliderB, actor, 0);
+            Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
             Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
             Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
         }

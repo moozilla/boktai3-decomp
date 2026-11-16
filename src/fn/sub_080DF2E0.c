@@ -37,7 +37,7 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         {
             u32 mask = 0x80;
             u16 *flags;
-            flags = &owner->flags2D6;
+            flags = &owner->base.flags2D6;
             mask |= *flags;
             *flags = mask;
         }
@@ -60,7 +60,7 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
         SceneActorContact_SaveTargetCell(owner, cell);
         {
             struct Delta *out = &delta;
-            struct ContactPosition *source = &owner->body.position;
+            struct ContactPosition *source = &owner->base.body.position;
             target = (void *)(state->target + 0xC);
             {
                 u32 xDelta = (u16)target->x;
@@ -76,7 +76,7 @@ s32 Dog_ResolvePendingObject(struct SceneActorRegistryResetView *actor)
                 u32 direction;
                 u8 *field;
                 direction = Math_Atan2(first->x, out->z);
-                field = &owner->body.direction;
+                field = &owner->base.body.direction;
                 *field = direction;
             }
         }

@@ -35,26 +35,26 @@ struct ApproachGroup {
 
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                             u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline u32 CellIndex(struct ContactPosition *p)
 {
@@ -92,25 +92,25 @@ done:
 static inline u8 Chase(struct SceneActorRegistryResetView *actor, struct ApproachGroup *group,
                        u32 bits)
 {
-    u8 *target = *(u8 **)&actor->tracking.target;
+    u8 *target = *(u8 **)&actor->base.tracking.target;
     void *route = group->routeObject;
-    struct ContactPosition *position = &actor->body.position;
+    struct ContactPosition *position = &actor->base.body.position;
     struct ContactPosition *destination = (void *)(target + 12);
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
         {
-            actor->flags2D4 &= ~bits;
+            actor->base.flags2D4 &= ~bits;
         }
         return 0;
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         } else {
             {
-                actor->flags2D4 &= ~bits;
+                actor->base.flags2D4 &= ~bits;
             }
             return 0;
         }
@@ -123,7 +123,7 @@ struct SkeletonRouteContext {
 };
 static inline u16 MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    u16 value = actor->flags2D4;
+    u16 value = actor->base.flags2D4;
     value &= mask;
     return value;
 }
@@ -137,7 +137,7 @@ static inline void OrFlags(u16 *flags, u32 mask)
 // confidence=low: category-independent callback restores route target and resumes pursuit
 void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct SkeletonRouteContext *context = actor->context;
+    struct SkeletonRouteContext *context = actor->base.context;
     struct ApproachGroup *group = (void *)&actor->group.common;
     struct ContactPosition *destination;
     if (MotionFlags(actor, 0x100) || context->active)
@@ -157,12 +157,12 @@ void Skeleton_RestorePursuitRoute(struct SceneActorRegistryResetView *actor)
         SetControl(actor, SceneActorReaction_RestoreAfterDelay, 0xE);
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
         command = (void *)((u8 *)actor + 0x460);
         {
-            void *payload = actor->entryTarget228;
+            void *payload = actor->base.entryTarget228;
             u32 kind = 7;
             command->duration = 60;
             command->payload = payload;

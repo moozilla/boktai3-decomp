@@ -13,7 +13,7 @@ static inline void clearRouteFlag(u32 *flags)
 }
 static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2CC & mask;
+    return actor->base.flags2CC & mask;
 }
 static inline void clearBits16(u16 *field, u32 bits)
 {
@@ -31,41 +31,41 @@ struct SkeletonResetContext {
 };
 void Skeleton_ResetRouteReaction(struct SceneActorRegistryResetView *actor)
 {
-    struct SkeletonResetContext *context = actor->context;
+    struct SkeletonResetContext *context = actor->base.context;
     context->timer = 0;
     context->counter = 0;
-    context->savedFlags = actor->saved.privateFlags;
+    context->savedFlags = actor->base.saved.privateFlags;
     Memory_Clear(actor->group.destination, 8);
     SceneActorReaction_ResetResponseState(&actor->group.saved.control, gUnk_0824E250, 0x120);
-    actor->field2C2 = 64;
+    actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
     {
         struct SceneActorRegistryControl *control;
-        clearBits16(&actor->flags2D4, 0x380);
+        clearBits16(&actor->base.flags2D4, 0x380);
         {
-            u8 *motion = (u8 *)&actor->tracking.target;
+            u8 *motion = (u8 *)&actor->base.tracking.target;
             s32 mask = ~0x18;
             mask &= motion[15];
             motion[15] = mask;
         }
         control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
-            clearRouteFlag(&actor->flags2D0);
-            clearBits16(&actor->flags2D4, 0x200);
+            clearRouteFlag(&actor->base.flags2D0);
+            clearBits16(&actor->base.flags2D4, 0x200);
             control->mode = 0;
             control->counter = 0;
             control->timer = 0;
         }
-        clearBits16(&actor->flags2D4, 0x400);
+        clearBits16(&actor->base.flags2D4, 0x400);
     }
     actor->group.turn.turnsRemaining = 255;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-    if (SceneActorRoute_IsOutsidePointBounds(&actor->group.homeRoute, &actor->body.position, 32,
-                                             32))
+    if (SceneActorRoute_IsOutsidePointBounds(&actor->group.homeRoute, &actor->base.body.position,
+                                             32, 32))
         Chase_SetBehavior(actor, 2);
     else
         Chase_SetBehavior(actor, 0);
-    Anim_Step((u8 *)actor->drawable + 32, actor->drawable);
+    Anim_Step((u8 *)actor->base.drawable + 32, actor->base.drawable);
 }

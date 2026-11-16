@@ -20,29 +20,31 @@ void SceneActorPlacement_ResetToPathPoint(struct SceneActorRegistryActor *object
 {
     struct SceneActorRegistryResetView *actor = (void *)object;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    struct SceneActorBody *body = &actor->body;
+    struct SceneActorBody *body = &actor->base.body;
     u32 *flags;
     u32 enabled = 1;
-    flags = &actor->flags2CC;
+    flags = &actor->base.flags2CC;
     if (*flags & enabled) {
         struct ContactPosition *position;
         SceneActorChase_ClearWordFlags(flags, 3);
         actor->group.homeRoute.currentPoint = actor->group.homeRoute.pointId;
-        position = &actor->body.position;
+        position = &actor->base.body.position;
         Path_GetPointPositionById((u16 *)position, pathId, pointId);
-        actor->terrainCell = SceneActorTerrain_GetCellIndex(position);
-        body->position.y = SceneActorTerrain_GetHeight(actor->terrainCell, &actor->body.position);
-        if (!actor->drawableKind)
-            ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position =
+        actor->base.terrainCell = SceneActorTerrain_GetCellIndex(position);
+        body->position.y =
+            SceneActorTerrain_GetHeight(actor->base.terrainCell, &actor->base.body.position);
+        if (!actor->base.drawableKind)
+            ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
                 body->position;
         else
-            ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = body->position;
+            ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
+                body->position;
         body->direction = direction;
         SceneActorPlacement_ResetControl(actor, &group->control);
-        SceneActorPlacement_ClearColliderFlags(&actor->colliderA, 4);
+        SceneActorPlacement_ClearColliderFlags(&actor->base.colliderA, 4);
         ActorStatus_SetDrawableFlags(actor, 2);
         ActorStatus_ClearDrawableFlags(actor, 1);
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
-        SceneActorTerrain_InstallControl(actor, actor->field220, 0xC);
+        SceneActorTerrain_InstallControl(actor, actor->base.field220, 0xC);
     }
 }

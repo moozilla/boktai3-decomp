@@ -20,14 +20,14 @@ struct SceneActorContactTracking {
 static inline u32 SceneActorContact_ReadActorFlags(struct SceneActorRegistryResetView *actor,
                                                    u32 mask, u32 **field)
 {
-    u32 *flags = &actor->flags2CC;
+    u32 *flags = &actor->base.flags2CC;
     u32 value = *flags & mask;
     *field = flags;
     return value;
 }
 static inline u32 SceneActorContact_MotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 static inline u8 SceneActorContact_TestTracking(struct SceneActorContactTracking *motion, u32 mask)
 {
@@ -42,12 +42,12 @@ static inline void SceneActorContact_SetTrackingFlags(struct SceneActorContactTr
 }
 static inline u16 SceneActorContact_SavedTargetCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->savedTargetCell;
+    return actor->base.savedTargetCell;
 }
 static inline void SceneActorContact_SaveTargetCell(struct SceneActorRegistryResetView *actor,
                                                     u16 cell)
 {
-    actor->savedTargetCell = cell;
+    actor->base.savedTargetCell = cell;
 }
 
 static inline u8 SceneActorContact_TestTrackingOwned(struct SceneActorContactTracking *current,
@@ -63,7 +63,7 @@ static inline u8 SceneActorContact_TestTrackingOwned(struct SceneActorContactTra
 static inline u32 SceneActorContact_QueryMotionField(struct SceneActorRegistryResetView *actor,
                                                      u16 mask, void **owner)
 {
-    u16 *field = &actor->flags2D4;
+    u16 *field = &actor->base.flags2D4;
     u32 value;
     *owner = field;
     value = *field & mask;
@@ -72,7 +72,7 @@ static inline u32 SceneActorContact_QueryMotionField(struct SceneActorRegistryRe
 
 static inline u16 *SceneActorContact_MotionField(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->flags2D4;
+    return &actor->base.flags2D4;
 }
 static inline struct SceneActorChaseFlags16 *SceneActorContact_GateFromWork(void *const *work)
 {

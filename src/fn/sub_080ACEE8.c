@@ -8,15 +8,15 @@ struct DelayedAnimationContext {
 };
 static inline u8 TakeEntryFlag(struct SceneActorRegistryResetView *s)
 {
-    if (s->field2B2) {
-        s->field2B2 = 0;
+    if (s->base.field2B2) {
+        s->base.field2B2 = 0;
         return 1;
     }
     return 0;
 }
 void SceneActor_UpdateDelayedAnimation(struct SceneActorRegistryResetView *s)
 {
-    struct DelayedAnimationContext *context = s->context;
+    struct DelayedAnimationContext *context = s->base.context;
     if (TakeEntryFlag(s))
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
     if (context->delay) {
@@ -26,8 +26,8 @@ void SceneActor_UpdateDelayedAnimation(struct SceneActorRegistryResetView *s)
             else
                 SceneActorAnimation_SelectDirectionalEntryFlags((void *)s, 14, 4);
         }
-    } else if (s->field2B3) {
+    } else if (s->base.field2B3) {
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
-        s->field2B0 = 1;
+        s->base.field2B0 = 1;
     }
 }

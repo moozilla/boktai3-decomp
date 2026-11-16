@@ -8,7 +8,7 @@ void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
 s32 Anim_Step(void *, void *);
 void SceneActor_ResetContextAnimation(struct SceneActorRegistryResetView *p)
 {
-    struct SceneActorRegistryResetView *q = p->context;
+    struct SceneActorRegistryResetView *q = p->base.context;
     q->field6D6 = 0;
     q->flags6D4 = 0;
     q->field6E8 = 0;
@@ -19,5 +19,5 @@ void SceneActor_ResetContextAnimation(struct SceneActorRegistryResetView *p)
     SceneActorReaction_ResetResponseState(&p->group.saved.control, gUnk_0824E230, 0x2F8);
     SceneActorMovement_ResolveRoutePosition(p);
     SceneActorAnimation_SelectDirectionalEntry(p, 0);
-    Anim_Step((u8 *)p->drawable + 0x20, p->drawable);
+    Anim_Step((u8 *)p->base.drawable + 0x20, p->base.drawable);
 }

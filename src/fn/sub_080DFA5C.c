@@ -69,7 +69,7 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct SceneActorRegistryReset
     if (blockedFirst((u8 *)actor))
         return;
     position.position = *(struct ContactPosition *)(collider + 0x24);
-    direction = ((facingActor->body.direction + 0x20) & 0xFF) >> 6;
+    direction = ((facingActor->base.body.direction + 0x20) & 0xFF) >> 6;
     switch (direction) {
         case 0:
             position.packed.x -= 0x100;
@@ -94,8 +94,8 @@ void Dog_OnAttackContact(u8 *collider, u8 *other, struct SceneActorRegistryReset
     if (!blocked2048((u8 *)actor) && (*(u16 *)(other + 0xA) & 0xF)) {
         u32 *flags;
         s32 mask;
-        actor->field304 = *(u16 *)(other + 4);
-        flags = &actor->flags2D0;
+        actor->base.field304 = *(u16 *)(other + 4);
+        flags = &actor->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }

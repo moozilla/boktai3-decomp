@@ -17,9 +17,9 @@ static inline u8 HasPendingAction(struct PlacementTetherState *p)
 void SceneActorPlacement_UpdateTetherTimer(struct SceneActorRegistryResetView *p)
 {
     struct PlacementTetherState *s;
-    if (p->paletteOffset == 1)
+    if (p->base.paletteOffset == 1)
         return;
-    s = p->context;
+    s = p->base.context;
     if (TetherActor_GetParameter() != -1 || !TetherActor_IsStateOne()) {
         s->timer = 300;
         {

@@ -43,26 +43,26 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 struct GolemRoutePoint {
@@ -113,37 +113,37 @@ void SceneActorReaction_RestoreAlternateAfterDelay(void);
 static inline void Hide(struct SceneActorRegistryResetView *a)
 {
     u32 bit = 1;
-    if (a->drawableKind == 0)
-        *(u32 *)a->drawable |= bit;
+    if (a->base.drawableKind == 0)
+        *(u32 *)a->base.drawable |= bit;
     else {
-        u8 *p = (u8 *)a->drawable + 0x20;
+        u8 *p = (u8 *)a->base.drawable + 0x20;
         *(u32 *)(p + 8) |= bit;
     }
 }
 static inline void Show(struct SceneActorRegistryResetView *a)
 {
-    if (a->drawableKind == 0) {
-        u32 *d = a->drawable;
+    if (a->base.drawableKind == 0) {
+        u32 *d = a->base.drawable;
         u32 mask = ~1;
         *d &= mask;
     } else {
-        u8 *p = (u8 *)a->drawable + 0x20;
+        u8 *p = (u8 *)a->base.drawable + 0x20;
         u32 mask = ~1;
         *(u32 *)(p + 8) &= mask;
     }
 }
 static inline void Palette(struct SceneActorRegistryResetView *a, u32 bank)
 {
-    if (a->drawableKind == 0)
-        AnimData_SelectPaletteBank((u8 *)a->drawable + 0x2C, bank);
+    if (a->base.drawableKind == 0)
+        AnimData_SelectPaletteBank((u8 *)a->base.drawable + 0x2C, bank);
     else
-        *(u8 **)((u8 *)a->drawable + 0x68) = gPaletteBankData + bank * 32;
+        *(u8 **)((u8 *)a->base.drawable + 0x68) = gPaletteBankData + bank * 32;
 }
 
 void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 *group;
-    u8 *drawable = actor->drawable;
+    u8 *drawable = actor->base.drawable;
     struct OctopusTarget *target;
     struct ContactPosition position;
     struct Player *player;
@@ -152,7 +152,7 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
         {
-            struct ContactCollider *collider = &actor->colliderA;
+            struct ContactCollider *collider = &actor->base.colliderA;
             u32 flags = collider->flags;
             u32 mask = 4;
             mask |= flags;
@@ -161,35 +161,35 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         }
         {
             u32 bit = 0x800;
-            actor->flags2C0 = bit | actor->flags2C0;
+            actor->base.flags2C0 = bit | actor->base.flags2C0;
         }
         {
-            struct ContactPosition *dest = &actor->body.position;
+            struct ContactPosition *dest = &actor->base.body.position;
             struct GolemRouteLink *link = (void *)(group + 0x74);
             dest->x = link->point->x;
             dest->z = link->point->z;
             dest->y = CellHeight(dest, CellIndex(dest));
         }
-        *(struct ContactPosition *)(drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(drawable + 0x1C) = actor->base.body.position;
     }
-    target = (void *)actor->tracking.target;
+    target = (void *)actor->base.tracking.target;
     if (frame == 60 || frame == 90) {
         Show(actor);
-        Palette(actor, actor->paletteAlternateBank);
+        Palette(actor, actor->base.paletteAlternateBank);
         {
             u32 eight = 8;
-            actor->field1E8 = eight;
+            actor->base.field1E8 = eight;
         }
         {
             u32 bit = 0x8000;
-            actor->flags2CC |= bit;
+            actor->base.flags2CC |= bit;
         }
         if (target->kind <= 3) {
             u32 request, option;
             player = target->player;
-            request = actor->attacks.first[2];
-            option = actor->attacks.flags[2];
-            Player_BeginPositionRequest(player, (void *)&actor->body.position, 0, 0, 0, 0, 1,
+            request = actor->base.attacks.first[2];
+            option = actor->base.attacks.flags[2];
+            Player_BeginPositionRequest(player, (void *)&actor->base.body.position, 0, 0, 0, 0, 1,
                                         request, option);
             Sound_PlaySong(0xE6);
         } else if (target->kind & 4) {
@@ -211,11 +211,11 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         } else if (target->kind <= 3) {
             s32 turn, angle;
             player = target->player;
-            turn = (actor->body.direction + 0x20) & 0xFF;
+            turn = (actor->base.body.direction + 0x20) & 0xFF;
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
-            CellCenter((void *)&position, actor->terrainCell);
+            CellCenter((void *)&position, actor->base.terrainCell);
             Player_ApplyPositionRequest(player, (void *)&position, 0x80, angle, 60, 0, 0, 0);
-            SpriteParticle_SpawnBatch(&actor->body.position, 1, 1, 1, 0x154);
+            SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 1, 1, 0x154);
             Sound_PlaySong(0x1DF);
         }
         SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
@@ -237,8 +237,8 @@ void Octopus_ReleaseCapturedTarget(struct SceneActorRegistryResetView *actor, s3
         }
         SetCtl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(actor, 3, 0, 0);
-        actor->body.position.x += 32;
-        actor->body.position.z += 32;
-        *(struct ContactPosition *)(drawable + 0x1C) = actor->body.position;
+        actor->base.body.position.x += 32;
+        actor->base.body.position.z += 32;
+        *(struct ContactPosition *)(drawable + 0x1C) = actor->base.body.position;
     }
 }

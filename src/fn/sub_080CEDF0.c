@@ -26,8 +26,8 @@ static inline s32 PlayerSlot(u8 *actor)
 }
 static inline u8 TakeFlag2B1(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -70,25 +70,25 @@ charge: {
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 phase, u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 /* Can the body charge at its partner: enough stored charge, closer than its range, in reach? */
 static inline s32 CanCharge(void *ctx)
@@ -112,18 +112,18 @@ static inline s32 CanCharge(void *ctx)
 void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     u8 coop;
     if (TakeFlag2B1(actor))
-        actor->field2B0 = 0;
+        actor->base.field2B0 = 0;
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         Golem_Charge(body);
         *(u16 *)(body + 0x680) -= 0x1E;
         coop = Test(gEngineFlags, 0x4800);
         if (coop) {
-            u8 *partner = (u8 *)actor->tracking.target;
+            u8 *partner = (u8 *)actor->base.tracking.target;
             s32 index;
             if (!partner)
                 goto check;
@@ -162,16 +162,16 @@ void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
         return;
     approach: {
         struct ContactPosition center, delta;
-        SceneActorTerrain_GetCenter(actor->terrainCell, &center);
+        SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
         sub_080C47B8(&center);
-        SceneActorTerrain_Subtract(&delta, &actor->body.position, &center);
+        SceneActorTerrain_Subtract(&delta, &actor->base.body.position, &center);
         if (delta.x * delta.x + delta.z * delta.z <= 0xFFF) {
             sub_080C47DC(body);
             SetPhase(actor, 2, 6);
             return;
         }
         *(struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C) = center;
-        SceneActorTerrain_Subtract(&delta, &center, &actor->body.position);
+        SceneActorTerrain_Subtract(&delta, &center, &actor->base.body.position);
         {
             u8 direction = ((Math_Atan2(delta.x, delta.z) + 0x20) & 0xFF) >> 6 << 6;
             ((u8 *)actor)[0x59] = direction;
@@ -181,5 +181,5 @@ void Golem_ChargeOrReturnHome(struct SceneActorRegistryResetView *actor)
         SetPhase(actor, 2, 1);
     }
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

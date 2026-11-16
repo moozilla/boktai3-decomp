@@ -8,10 +8,10 @@ static inline u8 SuppressCollision(struct SceneActorRegistryResetView *a)
 {
     if (a) {
         u32 mask = 0x40;
-        if (!(a->flags2D4 & mask)) {
+        if (!(a->base.flags2D4 & mask)) {
             u32 mask = 0x20000;
-            if (!(a->flags2D0 & mask)) {
-                if (a->health > 0)
+            if (!(a->base.flags2D0 & mask)) {
+                if (a->base.health > 0)
                     return 0;
             }
         }
@@ -47,13 +47,13 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     union SceneActorRegistryPackedPosition position;
     union SceneActorRegistryPackedPosition wide;
     union SceneActorRegistryPackedPosition narrow;
-    u8 *context = a->context;
+    u8 *context = a->base.context;
     s32 heading;
     u32 *flags;
     if (SuppressCollision(a))
         return;
-    position.position = a->body.position;
-    heading = Direction((a->body.direction + 32) & 255) << 6;
+    position.position = a->base.body.position;
+    heading = Direction((a->base.body.direction + 32) & 255) << 6;
     {
         if (TestContext(context, 2, &flags)) {
             position.packed.x += Scale(gUnk_086149C4[(heading + 64) & 255] << 9);
@@ -65,7 +65,7 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     }
     Collider_SetPosition(context + 0x624, &position, 0);
     context[0x666] = heading;
-    position.position = a->body.position;
+    position.position = a->base.body.position;
     switch (Direction(heading)) {
         case 0:
         case 2:
@@ -88,12 +88,12 @@ void Dog_UpdateCollisionBounds(struct SceneActorRegistryResetView *a)
     }
     narrow.packed.y = 100;
     {
-        struct ContactCollider *c = &a->colliderB;
+        struct ContactCollider *c = &a->base.colliderB;
         c->bounds = *(struct ContactPosition *)&narrow;
         Collider_SetPosition(c, &position, 0);
     }
     {
-        struct ContactCollider *c = &a->colliderA;
+        struct ContactCollider *c = &a->base.colliderA;
         c->bounds = *(struct ContactPosition *)&narrow;
         Collider_SetPosition(c, &position, 0);
     }

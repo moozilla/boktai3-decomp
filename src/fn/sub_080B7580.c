@@ -8,11 +8,11 @@ static inline void SetEntry(u32 value, struct SceneActorProfileEntry *p)
 }
 void SceneActorReaction_SetProfileEntries(struct SceneActorRegistryResetView *actor)
 {
-    s32 category = actor->category;
-    struct SceneActorProfileEntry *entry =
-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);
+    s32 category = actor->base.category;
+    struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
+        actor->base.profileId, actor->base.profileMode, 0);
     u32 mask = 0x280;
-    u16 flags = actor->flags2D4;
+    u16 flags = actor->base.flags2D4;
     u32 special = mask & flags;
     if (special) {
         switch (category) {

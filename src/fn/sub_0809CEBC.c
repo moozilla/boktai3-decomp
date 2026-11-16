@@ -33,7 +33,7 @@ struct LunMovement {
 // confidence=low: resets movement interpolation and starts the directional animation.
 void Lun_ResetMovementState(struct SceneActorRegistryResetView *actor)
 {
-    struct LunMovement *context = actor->context;
+    struct LunMovement *context = actor->base.context;
     u32 tmp;
     u32 one;
     context->time = 0;
@@ -52,7 +52,7 @@ void Lun_ResetMovementState(struct SceneActorRegistryResetView *actor)
     Fill((u8 *)context + 0x424, &tmp, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
-        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
         DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

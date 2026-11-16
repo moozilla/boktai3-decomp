@@ -9,8 +9,8 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *actor)
 {
-    struct ActorMotion *motion = actor->context;
-    u16 type = actor->terrainCell;
+    struct ActorMotion *motion = actor->base.context;
+    u16 type = actor->base.terrainCell;
     u8 *entry = TerrainModifiers_FindCellOverride(type, 1);
     s32 maximum, acceleration;
     if (entry)
@@ -18,7 +18,7 @@ void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *actor)
     else
         entry = (type * 4 + 12) + gTerrainMap->cells;
     if (*entry >> 4) {
-        switch (actor->paletteOffset) {
+        switch (actor->base.paletteOffset) {
             case 1:
             case 3:
             case 5:
@@ -35,7 +35,7 @@ void SceneActor_AccelerateForTerrain(struct SceneActorRegistryResetView *actor)
                 break;
         }
     } else {
-        switch (actor->paletteOffset) {
+        switch (actor->base.paletteOffset) {
             case 1:
             case 3:
             case 5:

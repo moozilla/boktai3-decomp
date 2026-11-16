@@ -25,50 +25,51 @@ struct BatDrawable {
 void SceneActor_SetPositionXZ(void *, s32, s32);
 static inline u32 Bat_MaskFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 static inline void Bat_SetControl(struct SceneActorRegistryResetView *actor, u32 kind,
                                   void *control)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
-        actor->field2B3 = 0;
+        actor->base.field2B3 = 0;
     }
     if (frame > 60) {
         u16 blocked;
-        if (!actor->field2B3)
+        if (!actor->base.field2B3)
             return;
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         blocked = Bat_MaskFlags(actor, 128);
         if (blocked) {
             void *target;
-            SceneActor_SetPositionXZ(&actor->body.id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
+            SceneActor_SetPositionXZ(&actor->base.body.id,
+                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = *(void **)(group + 0x48);
             Bat_SetControl(actor, 0x1A, target);
             {
                 u32 behavior = 12;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
+                actor->base.state2A8 = 0;
+                actor->base.phase2A9 = 0;
+                actor->base.behavior2AA = behavior;
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = 1;
             }
             {
                 u16 *flags = (u16 *)(group + 0x40);
@@ -77,26 +78,27 @@ void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
             }
         } else {
             void *target;
-            SceneActor_SetPositionXZ(&actor->body.id, (*(struct BatRoutePoint **)(group + 0x1FC))->x,
+            SceneActor_SetPositionXZ(&actor->base.body.id,
+                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                      (*(struct BatRoutePoint **)(group + 0x1FC))->z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            target = actor->entryTarget228;
+            target = actor->base.entryTarget228;
             Bat_SetControl(actor, 1, target);
             {
                 u32 behavior = 7;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
+                actor->base.state2A8 = 0;
+                actor->base.phase2A9 = 0;
+                actor->base.behavior2AA = behavior;
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = 1;
             }
             {
                 u32 mask = 16;
-                actor->flags2CC |= mask;
+                actor->base.flags2CC |= mask;
             }
         }
     } else {
-        struct BatAnim *anim = &((struct BatDrawable *)actor->drawable)->anim;
+        struct BatAnim *anim = &((struct BatDrawable *)actor->base.drawable)->anim;
         if (anim->mode == 2) {
             u16 f = anim->frame;
             u8 loop = anim->loop;

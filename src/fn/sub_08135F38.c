@@ -7,8 +7,8 @@ static inline short ClearReaction(u16 *flags, u32 mask)
 }
 void SceneActor_ClearReactionFlags(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2DC & 0xC4000) {
-        actor->flags2D6 = ClearReaction(&actor->flags2D6, ~0x9C9);
-        actor->field2B8 = 0;
+    if (actor->base.field2DC & 0xC4000) {
+        actor->base.flags2D6 = ClearReaction(&actor->base.flags2D6, ~0x9C9);
+        actor->base.field2B8 = 0;
     }
 }

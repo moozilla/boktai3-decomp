@@ -28,7 +28,7 @@ static inline u16 SceneActorDamage_OwnershipBits(u32 value, u32 mask)
 static inline u8 SceneActorDamage_ShouldShow(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorDamage_TestFlags(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
+        u32 *owner = &actor->base.field2E0;
         u32 mask = *owner;
         if (!SceneActorDamage_OwnershipBits(mask, 0x20) && mask) {
             switch (SceneActorDamage_LocalPlayer()) {

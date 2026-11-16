@@ -14,16 +14,16 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
 {
     struct SceneActorRegistryResetView *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = Script_GetKeywordValue('M', 0);
-    arg0->field2C2 = 0x40;
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = Script_GetKeywordValue('M', 0);
+    arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue('N', 0);
 
@@ -40,33 +40,33 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
     }
     MonsterInit_InitializeGate(&group->common.gate, gateDuration);
     MonsterInit_ReadRange(&group->common.control);
-    MonsterInit_ReadTargeting(&arg0->tracking);
+    MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
+    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
+    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
 
     if (Script_SeekToKeyword('A')) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword('X')) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = Script_GetKeywordValue('K', 2);
+    arg0->base.fieldB2 = Script_GetKeywordValue('K', 2);
     identity = (s16)Script_GetKeywordValue('V', -1);
     if (identity < 0)
         identity = 0xFFFF;
-    arg0->field9A = identity;
+    arg0->base.field9A = identity;
     if (Script_GetKeywordValue('H', 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue('L', 0))
@@ -75,21 +75,21 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
-        MonsterInit_SnapToRoute(&arg0->body.position, rt);
+        MonsterInit_SnapToRoute(&arg0->base.body.position, rt);
         MonsterInit_DrawablePosition(arg0);
-        arg0->body.direction = Route_GetCurrentPointFacing(rt);
+        arg0->base.body.direction = Route_GetCurrentPointFacing(rt);
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
         TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->common.bodyId = arg0->body.id;
-    group->common.bodyPosition = &arg0->body.position;
+    group->common.bodyId = arg0->base.body.id;
+    group->common.bodyPosition = &arg0->base.body.position;
 }
 
 #endif

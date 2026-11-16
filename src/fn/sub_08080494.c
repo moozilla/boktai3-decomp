@@ -22,42 +22,42 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag(struct SceneActorRegistryResetView *actor, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
-    return off == 0x2D4 ? actor->flags2D4 & mask : actor->flags2D0 & mask;
+    return off == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
 }
 
 static inline void ResetMotionControl(struct SceneActorRegistryResetView *actor)
 {
-    actor->field2C8 = 0;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void InstallIdleControl(struct SceneActorRegistryResetView *actor, void *callback,
                                       u32 kind, u32 prepared)
 {
-    actor->field2B2 = prepared;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
+    actor->base.field2B2 = prepared;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
     ResetMotionControl(actor);
 }
 
 static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
 }
 
 static inline void ResetStateEntry(struct SceneActorRegistryResetView *actor, u32 prepared)
 {
-    actor->counter2AC = 0;
-    actor->field2B1 = prepared;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = prepared;
 }
 
 static inline u8 NextSparkCount(const u16 *table)
@@ -69,17 +69,18 @@ static inline void SpawnDefeatSparks(struct SceneActorRegistryResetView *actor,
                                      const struct ContactPosition *range, const u16 *table,
                                      u8 firstCount, s16 height, s16 kind, s16 priority)
 {
-    SparkParticle_Spawn(&actor->body.position, firstCount, range, 32, 4, height, kind, priority);
-    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 64, 4, height, kind,
+    SparkParticle_Spawn(&actor->base.body.position, firstCount, range, 32, 4, height, kind,
                         priority);
-    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 94, 4, height, kind,
-                        priority);
-    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 128, 4, height, kind,
-                        priority);
-    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 196, 4, height, kind,
-                        priority);
-    SparkParticle_Spawn(&actor->body.position, NextSparkCount(table), range, 240, 4, height, kind,
-                        priority);
+    SparkParticle_Spawn(&actor->base.body.position, NextSparkCount(table), range, 64, 4, height,
+                        kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, NextSparkCount(table), range, 94, 4, height,
+                        kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, NextSparkCount(table), range, 128, 4, height,
+                        kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, NextSparkCount(table), range, 196, 4, height,
+                        kind, priority);
+    SparkParticle_Spawn(&actor->base.body.position, NextSparkCount(table), range, 240, 4, height,
+                        kind, priority);
 }
 
 void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *actor)
@@ -106,7 +107,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
         u32 *field;
         u32 mask;
         u32 zero;
-        field = &actor->flags2CC;
+        field = &actor->base.flags2CC;
         mask = ~0x141C0;
         *field &= mask;
         zero = 0;
@@ -117,24 +118,24 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
             struct ContactCollider *collider;
 
             u32 bit;
-            collider = &actor->colliderA;
+            collider = &actor->base.colliderA;
             bit = 4;
             collider->flags = bit | collider->flags;
             {
                 u16 *field = &collider->responseValue;
                 *field = zero;
             }
-            actor->fieldAA = zero;
+            actor->base.fieldAA = zero;
         }
     }
     {
         u32 showFlag = 1;
-        if (actor->drawableKind == 0) {
-            u32 *p = actor->drawable;
+        if (actor->base.drawableKind == 0) {
+            u32 *p = actor->base.drawable;
             *p |= showFlag;
             drawable = p;
         } else {
-            u8 *p = actor->drawable;
+            u8 *p = actor->base.drawable;
             u8 *tile = p + 0x20;
             *(u32 *)(tile + 8) |= showFlag;
             drawable = p;
@@ -143,7 +144,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     sparkHeight = 20;
     sparkKind = 2;
     sparkPriority = 1;
-    if (actor->drawableKind == 0) {
+    if (actor->base.drawableKind == 0) {
         u32 mask = ~2;
         *(u32 *)drawable &= mask;
     } else {
@@ -153,7 +154,7 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     }
     {
         u32 blend = 2;
-        if (actor->drawableKind == 0)
+        if (actor->base.drawableKind == 0)
             *((u8 *)drawable + 7) = blend;
         else {
             u8 *field = (u8 *)drawable + 0x3A;
@@ -166,35 +167,35 @@ void SceneActorReaction_BeginDefeatBurst(struct SceneActorRegistryResetView *act
     source.samples = gRandomTable;
     SpawnDefeatSparks(actor, &range, source.samples, NextSparkCount(source.samples), sparkHeight,
                       sparkKind, sparkPriority);
-    if (actor->category == 4 || actor->category == 1 || actor->category == 5 ||
-        actor->category == 7 || actor->category == 6 || actor->category == 24 ||
-        actor->category == 25)
+    if (actor->base.category == 4 || actor->base.category == 1 || actor->base.category == 5 ||
+        actor->base.category == 7 || actor->base.category == 6 || actor->base.category == 24 ||
+        actor->base.category == 25)
         Sound_PlaySong(229);
     SceneActorPlacement_PlayCategoryEventSound(actor);
-    if (actor->category == 3)
+    if (actor->base.category == 3)
         ActorParticles_SpawnWideBurst(actor);
     script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
-        values[0] = actor->body.position.x;
-        values[1] = actor->body.position.y;
-        values[2] = actor->body.position.z;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
         values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
         values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
         values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-        values[6] = actor->field2E0;
-        values[7] = actor->body.id;
+        values[6] = actor->base.field2E0;
+        values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    source.category = &actor->category;
+    source.category = &actor->base.category;
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*source.category - 11) > 2)
         Bestiary_UnlockEntry(
-            Bestiary_GetEntryForActor(*source.category, actor->paletteOffset));
+            Bestiary_GetEntryForActor(*source.category, actor->base.paletteOffset));
     InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SelectState(actor, completedState, 0, 2);
     ResetStateEntry(actor, completedState);
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
-        SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->body.id);
-    ActorShadow_Disable(actor->shadow);
+        SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
+    ActorShadow_Disable(actor->base.shadow);
 }

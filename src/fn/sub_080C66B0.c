@@ -21,7 +21,7 @@ static inline u8 TakeFlag(u8 *flag)
 }
 static inline void Golem_SetMotionFlags(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    actor->flags2D4 = mask | actor->flags2D4;
+    actor->base.flags2D4 = mask | actor->base.flags2D4;
 }
 
 static inline u32 Golem_MirrorFlags(u8 mirror)
@@ -32,7 +32,7 @@ static inline u32 Golem_MirrorFlags(u8 mirror)
 static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
                                              u8 *mirror)
 {
-    s32 quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
+    s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
@@ -52,20 +52,20 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
         flags &= ~0x10;
     } else
         force = 0;
-    if (!actor->drawableKind) {
+    if (!actor->base.drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->animationIndex = selection;
-        drawable = actor->drawable;
+        actor->base.animationIndex = selection;
+        drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->field2B3;
+        restart = &actor->base.field2B3;
     } else {
         struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->animationIndex;
-        restart = &actor->field2B3;
+        savedSelection = &actor->base.animationIndex;
+        restart = &actor->base.field2B3;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
@@ -80,8 +80,9 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
                 mode = 6;
             else
                 mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                              actor->drawable, (u16)selection, 2, (u16)mode);
+            Anim_SetKeyframes(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
+                actor->base.drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
                 tile->flags |= mask;
@@ -97,38 +98,38 @@ static inline void Golem_ApplyDuration(struct SceneActorRegistryResetView *actor
     u16 *scale;
     u32 mask = 0xA02F;
     if (SceneActorChase_QueryMotionFlags(actor, mask)) {
-        u16 *p = &actor->field2C2;
+        u16 *p = &actor->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *q = &actor->field2C2;
+        u16 *q = &actor->base.field2C2;
         u16 value = *q;
         scale = q;
         if (!value)
             *scale = 64;
     }
-    if (!actor->drawableKind)
+    if (!actor->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 // confidence=low: return-home behaviors use this control while moving to a cell center.
 void Golem_UpdateRouteMotion(struct SceneActorRegistryResetView *actor, u32 frame)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     struct GolemRouteMotion *motion = (void *)((u8 *)actor + 0x50);
-    if (TakeFlag(&actor->field2B2))
-        actor->field2B3 = 0;
+    if (TakeFlag(&actor->base.field2B2))
+        actor->base.field2B3 = 0;
     Golem_SetMotionFlags(actor, 0x100);
     {
         u8 directionVariant, mirror;
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     }
-    actor->field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
+    actor->base.field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
     Golem_ApplyDuration(actor);
     if (!(frame & 3)) {
         struct SceneExtent velocity, size;

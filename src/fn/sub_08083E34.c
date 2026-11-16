@@ -4,7 +4,7 @@ void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *i
     struct SceneActorRegistryResetView *actor = input;
     u32 *state = (void *)SceneActorControl_GetMotionState(actor);
     u32 mask = 0x100000;
-    u32 *flags = &actor->flags2D0;
+    u32 *flags = &actor->base.flags2D0;
     *flags |= mask;
     {
         u32 offset = 0x3D4;
@@ -14,7 +14,7 @@ void SceneActorControl_ResetCollisionPhase(struct SceneActorRegistryResetView *i
         *state &= mask;
     }
     {
-        struct ContactCollider *collider = &actor->colliderB;
+        struct ContactCollider *collider = &actor->base.colliderB;
         u32 mask;
         mask = ~4;
         mask &= collider->flags;

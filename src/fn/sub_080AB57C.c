@@ -10,26 +10,26 @@ void SceneActor_ResetQueuedState(struct SceneActorRegistryResetView *s)
     u8 code;
     u8 *field;
     u32 *flags;
-    field = &s->state2A8;
+    field = &s->base.state2A8;
     zero = 0;
     *field = zero;
-    s->phase2A9 = two;
-    s->behavior2AA = zero;
-    s->counter2AC = zero;
-    field = &s->field2B1;
+    s->base.phase2A9 = two;
+    s->base.behavior2AA = zero;
+    s->base.counter2AC = zero;
+    field = &s->base.field2B1;
     one = 1;
     *field = one;
     fn = SceneActorControl_OnIdle;
     code = 0x10;
-    s->field2B2 = one;
-    s->field2B0 = zero;
-    s->field2B5 = code;
-    s->target = fn;
-    s->field2C8 = zero;
-    flags = &s->flags114;
+    s->base.field2B2 = one;
+    s->base.field2B0 = zero;
+    s->base.field2B5 = code;
+    s->base.target = fn;
+    s->base.field2C8 = zero;
+    flags = &s->base.flags114;
     {
         u32 mask = -2;
         *flags &= mask;
     }
-    s->word104 = zero;
+    s->base.word104 = zero;
 }

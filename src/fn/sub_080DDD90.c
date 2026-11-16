@@ -14,7 +14,7 @@ void Dog_SelectTargetAction(struct SceneActorRegistryResetView *);
 void SceneActorControl_OnIdle(void);
 static inline u8 HasReaction(struct SceneActorRegistryResetView *p)
 {
-    struct SceneActorReactionMotion *motion = (void *)&p->tracking.target;
+    struct SceneActorReactionMotion *motion = (void *)&p->base.tracking.target;
     u32 mask = 8;
     if (mask & motion->flags)
         return 1;
@@ -50,12 +50,12 @@ static inline void OrMotion(struct SceneActorReactionMotion *p, u32 mask)
 static inline void SetFlags(struct SceneActorRegistryResetView *p, u32 mask)
 {
     u32 v = mask;
-    v |= p->flags2D4;
-    p->flags2D4 = v;
+    v |= p->base.flags2D4;
+    p->base.flags2D4 = v;
 }
 void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
 {
-    struct DogGateContext *context = p->context;
+    struct DogGateContext *context = p->base.context;
     u8 active;
     u32 v;
     u16 *f;
@@ -64,7 +64,7 @@ void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
     if (active) {
         Or16(&p->group.common.gate.flags, 4);
         v = 0x80;
-        f = &p->flags2D4;
+        f = &p->base.flags2D4;
         v |= *f;
         *f = v;
         p->group.common.gate.counter = p->group.common.gate.duration;
@@ -81,20 +81,20 @@ void Dog_UpdateTargetGate(struct SceneActorRegistryResetView *p)
         u32 kind;
         And32(&context->flags, ~12);
         one = 1;
-        p->state2A8 = active;
-        p->phase2A9 = one;
-        p->behavior2AA = active;
-        p->counter2AC = active;
-        p->field2B1 = one;
+        p->base.state2A8 = active;
+        p->base.phase2A9 = one;
+        p->base.behavior2AA = active;
+        p->base.counter2AC = active;
+        p->base.field2B1 = one;
         callback = SceneActorControl_OnIdle;
         kind = 0x10;
-        p->field2B2 = one;
-        p->field2B0 = active;
-        p->field2B5 = kind;
-        p->target = callback;
-        p->field2C8 = active;
-        And32(&p->flags114, ~1);
-        p->word104 = active;
+        p->base.field2B2 = one;
+        p->base.field2B0 = active;
+        p->base.field2B5 = kind;
+        p->base.target = callback;
+        p->base.field2C8 = active;
+        And32(&p->base.flags114, ~1);
+        p->base.word104 = active;
     }
-    OrMotion((struct SceneActorReactionMotion *)&p->tracking.target, 8);
+    OrMotion((struct SceneActorReactionMotion *)&p->base.tracking.target, 8);
 }

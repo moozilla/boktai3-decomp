@@ -32,7 +32,7 @@ struct DogActionContext {
 void SceneActorMovement_ResolveRoutePosition(void *);
 void Dog_ResetActionState(struct SceneActorRegistryResetView *actor)
 {
-    struct DogActionContext *context = actor->context;
+    struct DogActionContext *context = actor->base.context;
     context->flags = 0;
     context->timer690 = 0;
     context->selection = 0xFFFF;
@@ -43,7 +43,7 @@ void Dog_ResetActionState(struct SceneActorRegistryResetView *actor)
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
         DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

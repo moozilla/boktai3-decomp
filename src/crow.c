@@ -35,8 +35,8 @@ void Crow_OnAttackContact(u8 *unused, struct ContactCollider *obj,
     if (obj->contactFlags != 1)
         return;
     if ((SceneActor_ActionsBlocked(ctx) == 0) && (obj->contactFlags & 0xF)) {
-        ctx->field304 = obj->collisionId;
-        flags = &ctx->flags2D0;
+        ctx->base.field304 = obj->collisionId;
+        flags = &ctx->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }
@@ -81,8 +81,8 @@ void Crow_OnBodyContact(struct SceneActorBehaviorContactView *source,
 
 void Crow_OnIdleAnimation(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B2 != 0)
-        actor->field2B2 = 0;
+    if (actor->base.field2B2 != 0)
+        actor->base.field2B2 = 0;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     Crow_PlayAnimationCue(actor);
 }
@@ -140,7 +140,7 @@ void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor)
 
 void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->field2B2))
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         SceneActorTurn_SelectProfileAnimation((void *)actor, 2, 0, 0);
 }
 
@@ -199,9 +199,9 @@ void Crow_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
     struct SceneActorBody *body;
     s32 variant, flags;
     u32 selection;
-    if (!SceneActorControl_TakeFlag(&((struct SceneActorRegistryResetView *)actor)->field2B2))
+    if (!SceneActorControl_TakeFlag(&((struct SceneActorRegistryResetView *)actor)->base.field2B2))
         return;
-    body = &((struct SceneActorRegistryResetView *)actor)->body;
+    body = &((struct SceneActorRegistryResetView *)actor)->base.body;
     entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 2);
     Crow_GetDirectionalFrameAndFlip(body->direction, &variant, &flags);
     selection = entry->value;
@@ -210,8 +210,8 @@ void Crow_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
 
 void Crow_OnSpecialAnimation(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B2 != 0)
-        actor->field2B2 = 0;
+    if (actor->base.field2B2 != 0)
+        actor->base.field2B2 = 0;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0xe);
 }
 
@@ -226,8 +226,8 @@ static inline s32 Crow_QuarterMotion(s32 n)
 
 static inline u8 Crow_EaseReactionMotion(struct SceneActorRegistryResetView *actor)
 {
-    s32 x = Crow_QuarterMotion(actor->reactionStart.x - actor->reactionEnd.x);
-    s32 z = Crow_QuarterMotion(actor->reactionStart.z - actor->reactionEnd.z);
+    s32 x = Crow_QuarterMotion(actor->base.reactionStart.x - actor->base.reactionEnd.x);
+    s32 z = Crow_QuarterMotion(actor->base.reactionStart.z - actor->base.reactionEnd.z);
     if (x > 200)
         x = 200;
     else if (x < -200)
@@ -236,10 +236,10 @@ static inline u8 Crow_EaseReactionMotion(struct SceneActorRegistryResetView *act
         z = 200;
     else if (z < -200)
         z = -200;
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
-    actor->reactionEnd.x += x;
-    actor->reactionEnd.z += z;
+    actor->base.body.motion.x += x;
+    actor->base.body.motion.z += z;
+    actor->base.reactionEnd.x += x;
+    actor->base.reactionEnd.z += z;
     if (x == 0 && z == 0)
         return 1;
     return 0;
@@ -248,75 +248,75 @@ static inline u8 Crow_EaseReactionMotion(struct SceneActorRegistryResetView *act
 static inline void Crow_SetRecoveryState(struct SceneActorRegistryResetView *actor, u32 state,
                                          u32 phase, u8 behavior, u32 zw)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = zw;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = zw;
+    actor->base.field2B1 = 1;
 }
 
 static inline void Crow_SetRecoveryControl(struct SceneActorRegistryResetView *actor,
                                            void *callback, u32 kind, u32 zb, u32 zw)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = zb;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = zw;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = zb;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = zw;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zw;
+    actor->base.word104 = zw;
 }
 
 // confidence=low: eases the stored reaction displacement to its target before restoring idle.
 
 void Crow_RecoverFromDisplacement(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
-    struct Crow *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    struct Crow *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 m = 0x20;
-        m |= actor->flags2D4;
-        actor->flags2D4 = m;
+        m |= actor->base.flags2D4;
+        actor->base.flags2D4 = m;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
     }
     {
         u32 mask = 0x100000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     if (elapsed < 20) {
         u32 m = 0x20;
-        m |= actor->flags2D6;
-        actor->flags2D6 = m;
+        m |= actor->base.flags2D6;
+        actor->base.flags2D6 = m;
     }
     if (Crow_EaseReactionMotion(actor) && elapsed > 30) {
         u32 clearedWord;
-        u16 v = actor->colliderA.responseValue + 10;
+        u16 v = actor->base.colliderA.responseValue + 10;
         u16 initialState[] = {0};
         clearedWord = 0;
 
-        actor->colliderA.responseValue = v;
-        actor->field2B0 = 1;
+        actor->base.colliderA.responseValue = v;
+        actor->base.field2B0 = 1;
         {
-            u16 *field = &actor->flags2D4;
+            u16 *field = &actor->base.flags2D4;
             u32 mask;
             mask = ~0x20;
             ((struct CrowSignedFlags *)field)->bits &= mask;
         }
         {
-            u32 *flags = &actor->flags2CC;
+            u32 *flags = &actor->base.flags2CC;
             u32 mask = ~0x80;
             *flags &= mask;
         }
         state->bobPhase = initialState[0];
         Crow_DisableAttackCollision(actor);
-        actor->body.direction = actor->tracking.heading;
+        actor->base.body.direction = actor->base.tracking.heading;
         Crow_SetRecoveryControl(actor, SceneActorControl_OnIdle, 16, initialState[0], clearedWord);
         Crow_SetRecoveryState(actor, initialState[0], initialState[0], 1, clearedWord);
-        actor->body.direction = actor->tracking.heading;
-        actor->field2C2 = 64;
+        actor->base.body.direction = actor->base.tracking.heading;
+        actor->base.field2C2 = 64;
     }
 }
 
@@ -335,11 +335,11 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void Crow_SetDefeatState(struct SceneActorRegistryResetView *actor, u8 state,
                                        u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Crow_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
@@ -347,12 +347,12 @@ void Crow_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     s32 values[8];
     struct ScriptUtilityArguments arguments;
     u16 script;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
             u32 offset = 0x13A;
-            u16 *flags = &actor->colliderA.flags;
+            u16 *flags = &actor->base.colliderA.flags;
             {
                 u32 v = *flags;
                 u32 m = 4;
@@ -361,53 +361,53 @@ void Crow_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             }
         }
     }
-    if (!Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30))
+    if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
     if (script) {
-        values[0] = actor->body.position.x;
-        values[1] = actor->body.position.y;
-        values[2] = actor->body.position.z;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
         values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
         values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
         values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-        values[6] = actor->field2E0;
-        values[7] = actor->body.id;
+        values[6] = actor->base.field2E0;
+        values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
     {
         u32 mask = 0x4000;
-        if (!(actor->flags2D4 & mask) && (u32)(actor->category - 11) > 2)
+        if (!(actor->base.flags2D4 & mask) && (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
-                Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     }
     {
         u32 mask = 0x400;
-        if (!(actor->flags2CC & mask))
+        if (!(actor->base.flags2CC & mask))
             SceneActorBehavior_CallTerrainScript((void *)actor);
     }
-    actor->fieldAA = 0;
+    actor->base.fieldAA = 0;
     {
         void *callback = (void *)SceneActorControl_OnIdle;
         u32 kind;
         kind = 16;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = kind;
+        actor->base.target = callback;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
+        actor->base.word104 = 0;
     }
     Crow_SetDefeatState(actor, 1, 0, 2);
-    ActorShadow_Disable(actor->shadow);
+    ActorShadow_Disable(actor->base.shadow);
 }
 
 // confidence=low: hops within the stored home terrain cell.
@@ -473,7 +473,7 @@ static inline void Crow_GetCellCenter(struct ContactPosition *p, s32 cell)
 
 static inline u8 Crow_TakeHopEntry(struct SceneActorRegistryResetView *actor, u8 **saved)
 {
-    u8 *field = &actor->field2B1;
+    u8 *field = &actor->base.field2B1;
     u32 value = *field;
     *saved = field;
     if (value) {
@@ -487,46 +487,46 @@ static inline u8 Crow_TakeHopEntry(struct SceneActorRegistryResetView *actor, u8
 
 void Crow_HopWithinHomeCell(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *state = actor->context;
+    struct Crow *state = actor->base.context;
     struct {
         u32 zero;
         struct ContactPosition home, next;
     } local;
-    s32 ground = SceneActorChase_HeightAt(actor->terrainCell, &actor->body.position);
+    s32 ground = SceneActorChase_HeightAt(actor->base.terrainCell, &actor->base.body.position);
     u8 *arrived;
     s32 cell;
     if (Crow_TakeHopEntry(actor, &arrived)) {
         u32 angle;
-        SceneActorChase_SetControl(actor, actor->savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
         Crow_GetCellCenter(&local.home, state->homeCell);
-        actor->body.direction = angle = Crow_NextHopRandom(gRandomTable) & 255;
+        actor->base.body.direction = angle = Crow_NextHopRandom(gRandomTable) & 255;
         Crow_ClearHopVelocity(&local.zero, &state->vectors[2]);
         Crow_MakeHopVelocity(&state->vectors[2], angle, (Crow_NextHopRandom(gRandomTable) & 7) + 1);
         state->vectors[2].y = 14;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    Crow_AddHopPosition(&local.next, &actor->body.position, &state->vectors[2]);
+    Crow_AddHopPosition(&local.next, &actor->base.body.position, &state->vectors[2]);
     cell = SceneActorChase_CellAt(&local.next);
     if (state->homeCell != cell) {
         state->vectors[2].x = 0;
         state->vectors[2].z = 0;
     }
-    actor->body.motion.x += state->vectors[2].x;
-    actor->body.motion.z += state->vectors[2].z;
-    actor->field2EA += state->vectors[2].y;
+    actor->base.body.motion.x += state->vectors[2].x;
+    actor->base.body.motion.z += state->vectors[2].z;
+    actor->base.field2EA += state->vectors[2].y;
     state->vectors[2].y -= 2;
-    if (ground >= (s16)actor->field2EA) {
-        actor->body.position.y = ground;
-        actor->field2EA = ground;
+    if (ground >= (s16)actor->base.field2EA) {
+        actor->base.body.position.y = ground;
+        actor->base.field2EA = ground;
         Crow_ClearHopVelocity(&local.zero, &state->vectors[2]);
-        actor->state2A8 = 0;
-        actor->phase2A9 = 0;
-        actor->behavior2AA = 0;
-        actor->counter2AC = 0;
+        actor->base.state2A8 = 0;
+        actor->base.phase2A9 = 0;
+        actor->base.behavior2AA = 0;
+        actor->base.counter2AC = 0;
         *arrived = 1;
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 static inline s32 Crow_NormalizeHeading(s32 n)
@@ -578,18 +578,18 @@ static inline s32 Crow_ClampTurnSpeed(s32 n, s32 min, s32 *out)
 static inline void Crow_SetFlightState(struct SceneActorRegistryResetView *actor, u8 state,
                                        u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 // confidence=low: distance and angle gates suggest approach and orbit flight steering.
 
 void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *state = actor->context;
+    struct Crow *state = actor->base.context;
     struct ContactPosition delta;
     struct ContactPosition velocity;
     s32 angle;
@@ -597,21 +597,21 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
     s32 step;
     s16 t1;
     s16 t2;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        ((struct ActorSprite *)actor->drawable)->flags |= 2;
-        SceneActorChase_SetControl(actor, actor->entryTarget224, 2);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        ((struct ActorSprite *)actor->base.drawable)->flags |= 2;
+        SceneActorChase_SetControl(actor, actor->base.entryTarget224, 2);
     }
-    if (state->approachTime < ((s32)actor->counter2AC)) {
-        Crow_FindPositionDelta(&delta, &actor->body.position, (void *)&gPlayers[0]->position);
+    if (state->approachTime < ((s32)actor->base.counter2AC)) {
+        Crow_FindPositionDelta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
         t1 = delta.x;
         t2 = delta.z;
         angle = Math_Atan2(t1, t2);
-        turn = Crow_NormalizeHeading(angle - actor->body.direction);
+        turn = Crow_NormalizeHeading(angle - actor->base.body.direction);
         if (turn < 0)
             turn = -turn;
         if (turn <= 11) {
             state->approachTurns = 0;
-            ((struct ActorSprite *)actor->drawable)->flags &= ~2;
+            ((struct ActorSprite *)actor->base.drawable)->flags &= ~2;
             Crow_SetFlightState(actor, 0, 2, 0);
             return;
         }
@@ -627,14 +627,14 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             state->approachTurns++;
             state->turnDelay = 0;
         }
-    } else if (actor->tracking.distance <= 0x7CFF) {
+    } else if (actor->base.tracking.distance <= 0x7CFF) {
         Crow_SetFlightState(actor, 0, 0, 4);
         return;
-    } else if (state->orbitRange > actor->tracking.distance) {
-        Crow_FindPositionDelta(&delta, (void *)&gPlayers[0]->position, &actor->body.position);
+    } else if (state->orbitRange > actor->base.tracking.distance) {
+        Crow_FindPositionDelta(&delta, (void *)&gPlayers[0]->position, &actor->base.body.position);
         angle = Math_Atan2(delta.x, delta.z);
         turn = Crow_HeadingMagnitude(
-            Crow_NormalizeHeading(((angle + 64) & 255) - actor->body.direction));
+            Crow_NormalizeHeading(((angle + 64) & 255) - actor->base.body.direction));
         if (turn <= 63)
             angle += 64;
         else
@@ -645,9 +645,9 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
             step = 2;
         goto clamp;
     } else {
-        Crow_FindPositionDelta(&delta, &actor->body.position, (void *)&gPlayers[0]->position);
+        Crow_FindPositionDelta(&delta, &actor->base.body.position, (void *)&gPlayers[0]->position);
         angle = Math_Atan2(delta.x, delta.z);
-        turn = Crow_NormalizeHeading(angle - actor->body.direction);
+        turn = Crow_NormalizeHeading(angle - actor->base.body.direction);
         if (turn < 0)
             turn = -turn;
         if (turn <= 31) {
@@ -662,24 +662,24 @@ void Crow_SteerAroundPlayer(struct SceneActorRegistryResetView *actor)
     {
         u8 *speed = &state->speed;
         struct ContactPosition *out = &velocity;
-        Crow_MakeSteeringVelocity(out, actor->body.direction, *speed);
+        Crow_MakeSteeringVelocity(out, actor->base.body.direction, *speed);
     }
-    actor->body.motion = velocity;
+    actor->base.body.motion = velocity;
     if (!state->turnDelay) {
-        s32 difference = Crow_NormalizeHeading(angle - actor->body.direction);
+        s32 difference = Crow_NormalizeHeading(angle - actor->base.body.direction);
         if (difference > 0)
-            actor->body.direction += step;
+            actor->base.body.direction += step;
         else
-            actor->body.direction -= step;
-        ((struct ActorSprite *)actor->drawable)->unk04[2] = 0x9F - actor->body.direction;
-        if (actor->paletteOffset == 0)
+            actor->base.body.direction -= step;
+        ((struct ActorSprite *)actor->base.drawable)->unk04[2] = 0x9F - actor->base.body.direction;
+        if (actor->base.paletteOffset == 0)
             state->turnDelay = 4;
         else
             state->turnDelay = 2;
     }
     if (state->turnDelay)
         state->turnDelay--;
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }
 
 static inline u32 Crow_NextWanderRandom(void)
@@ -703,23 +703,23 @@ static inline u8 Crow_TestFlags(u32 mask, u32 flags)
 
 void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *context = actor->context;
+    struct Crow *context = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         u32 mask = 0x7F;
         u32 value;
-        SceneActorChase_SetControl(actor, actor->savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
         value = Crow_NextWanderRandom();
         context->wanderTicks = (mask & value) + 0x14;
     }
     {
         u32 four = 4;
         if (!Crow_TestFlags(four, context->flags)) {
-            u8 result = Callback_InvokeActor(actor, actor->contactQuery.opaque);
+            u8 result = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
             if (!result) {
-                if ((s32)actor->counter2AC > context->wanderTicks && actor->field2B3) {
+                if ((s32)actor->base.counter2AC > context->wanderTicks && actor->base.field2B3) {
                     SceneActorChase_SetBehavior(actor, 2);
                 } else {
-                    actor->counter2AC++;
+                    actor->base.counter2AC++;
                 }
             }
         }
@@ -728,8 +728,8 @@ void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
 
 static inline u8 Crow_TakeReturnEntry(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -738,11 +738,11 @@ static inline u8 Crow_TakeReturnEntry(struct SceneActorRegistryResetView *actor)
 static inline void Crow_SetReturnState(struct SceneActorRegistryResetView *actor, u32 phase,
                                        u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Crow_UpdateReturnAnimation(struct SceneActorRegistryResetView *actor)
@@ -750,56 +750,56 @@ void Crow_UpdateReturnAnimation(struct SceneActorRegistryResetView *actor)
     if (Crow_TakeReturnEntry(actor)) {
         SceneActorChase_SetControl(actor, Crow_UpdateAnimationSequence, 0x23);
     }
-    Callback_InvokeActor(actor, actor->contactQuery.opaque);
-    if (actor->field2B0) {
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
+    if (actor->base.field2B0) {
         Crow_SetReturnState(actor, 2, 1);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }
 
 void Crow_ApproachPlayer(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *state = actor->context;
+    struct Crow *state = actor->base.context;
     struct ContactPosition delta, velocity;
     u8 **pp;
     s32 limit;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        *(u32 *)actor->drawable &= ~2;
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        *(u32 *)actor->base.drawable &= ~2;
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
     }
-    limit = actor->paletteOffset == 1 ? 0x18 : 0x28;
-    if ((s32)actor->counter2AC > limit) {
-        if (state->orbitRange > actor->tracking.distance) {
+    limit = actor->base.paletteOffset == 1 ? 0x18 : 0x28;
+    if ((s32)actor->base.counter2AC > limit) {
+        if (state->orbitRange > actor->base.tracking.distance) {
             Crow_SetFlightState(actor, 0, 0, 1);
             return;
         }
         pp = &gPlayers;
-        Crow_FindPositionDelta(&delta, &actor->body.position,
+        Crow_FindPositionDelta(&delta, &actor->base.body.position,
                                &((struct SceneActorChasePlayer *)*pp)->target.position);
         if (Crow_HeadingMagnitude(Crow_NormalizeHeading(Math_Atan2(delta.x, delta.z) -
-                                                        actor->body.direction)) > 0x40) {
+                                                        actor->base.body.direction)) > 0x40) {
             Crow_SetFlightState(actor, 0, 0, 1);
             return;
         }
     }
-    Crow_MakeSteeringVelocity(&velocity, actor->body.direction, state->speed);
-    actor->body.motion = velocity;
-    actor->counter2AC++;
+    Crow_MakeSteeringVelocity(&velocity, actor->base.body.direction, state->speed);
+    actor->base.body.motion = velocity;
+    actor->base.counter2AC++;
 }
 
 extern u8 gUnk_08605E94[];
 
 void Crow_InitActionTable(struct SceneActorRegistryResetView *actor)
 {
-    actor->callbacks284 = gUnk_08605E94;
+    actor->base.callbacks284 = gUnk_08605E94;
 }
 
 void Crow_BeginScriptedAction(struct SceneActorRegistryResetView *actor)
 {
     u32 zero = SceneActor_ActionsBlocked(actor);
     if (zero == 0 && (*(u8 **)gPlayers)) {
-        struct Crow *p = actor->context;
+        struct Crow *p = actor->base.context;
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u8 one;
@@ -807,40 +807,40 @@ void Crow_BeginScriptedAction(struct SceneActorRegistryResetView *actor)
         u32 *flags;
         u8 *taken;
         u32 three;
-        taken = &actor->field2B2;
+        taken = &actor->base.field2B2;
         one = 1;
         *taken = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = code;
-        actor->target = fn;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = code;
+        actor->base.target = fn;
         zero8 = 0;
-        actor->field2C8 = zero;
-        flags = &actor->flags114;
+        actor->base.field2C8 = zero;
+        flags = &actor->base.flags114;
         {
             u32 mask = -2;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
         three = 3;
-        actor->state2A8 = zero8;
-        actor->phase2A9 = zero8;
-        actor->behavior2AA = three;
-        actor->counter2AC = zero;
-        actor->field2B1 = one;
+        actor->base.state2A8 = zero8;
+        actor->base.phase2A9 = zero8;
+        actor->base.behavior2AA = three;
+        actor->base.counter2AC = zero;
+        actor->base.field2B1 = one;
         {
             u32 *otherflags = &p->flags;
             u32 mask = -5;
             *otherflags &= mask;
         }
         {
-            struct SceneActorChaseTracking *extra = &actor->tracking;
+            struct SceneActorChaseTracking *extra = &actor->base.tracking;
             u32 mask = 8;
             mask |= extra->flags;
             extra->flags = mask;
         }
         {
             u32 mask = 0x100000;
-            actor->flags2D0 |= mask;
+            actor->base.flags2D0 |= mask;
         }
     }
 }
@@ -856,7 +856,7 @@ static inline void Crow_FillResetPosition(void *dst, u32 *tmp, u32 v)
 
 void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *context = actor->context;
+    struct Crow *context = actor->base.context;
     u32 zero;
     context->sequencePhase = 0;
     context->field3EE = 0;
@@ -864,80 +864,80 @@ void Crow_ResetGroundState(struct SceneActorRegistryResetView *actor)
     context->turnDelay = 0;
     context->approachTurns = 0;
     context->flags = 0;
-    *(struct CrowPackedPosition *)&actor->body.position =
+    *(struct CrowPackedPosition *)&actor->base.body.position =
         *(struct CrowPackedPosition *)&context->storedPosition;
-    actor->terrainCell = context->homeCell;
-    actor->groundHeight2BE =
-        SceneActorTerrain_GetHeight(actor->terrainCell, &context->storedPosition);
-    actor->field2EA = actor->body.position.y;
-    actor->body.position.y = actor->groundHeight2BE;
-    if (!actor->drawableKind)
+    actor->base.terrainCell = context->homeCell;
+    actor->base.groundHeight2BE =
+        SceneActorTerrain_GetHeight(actor->base.terrainCell, &context->storedPosition);
+    actor->base.field2EA = actor->base.body.position.y;
+    actor->base.body.position.y = actor->base.groundHeight2BE;
+    if (!actor->base.drawableKind)
         *(struct CrowPackedPosition
-              *)(&((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position) =
-            *(struct CrowPackedPosition *)&actor->body.position;
+              *)(&((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position) =
+            *(struct CrowPackedPosition *)&actor->base.body.position;
     else
-        *(struct CrowPackedPosition *)(&((struct SceneActorRegistryTileDrawable *)actor->drawable)
-                                            ->position) =
-            *(struct CrowPackedPosition *)&actor->body.position;
+        *(struct CrowPackedPosition
+              *)(&((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position) =
+            *(struct CrowPackedPosition *)&actor->base.body.position;
     Crow_FillResetPosition(&context->vectors[0], &zero, 0);
     Crow_FillResetPosition(&context->vectors[1], &zero, 0);
     Crow_FillResetPosition(&context->vectors[2], &zero, 0);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    DisplaySequence_Step(actor->drawable);
+    DisplaySequence_Step(actor->base.drawable);
 }
 
 void Crow_UpdateGroundHeight(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *state = actor->context;
+    struct Crow *state = actor->base.context;
     u32 kind;
     if (SceneActor_ActionsBlocked(actor))
         return;
-    kind = actor->field2B5;
+    kind = actor->base.field2B5;
     if (kind == 0 || kind == 0x25 || kind == 0x26) {
-        actor->body.position.y = actor->field2EA;
+        actor->base.body.position.y = actor->base.field2EA;
         return;
     }
     {
         u32 mask = 0x100000;
-        if (actor->flags2D0 & mask) {
+        if (actor->base.flags2D0 & mask) {
             if (kind != 0x23)
                 goto adjust;
             {
-                s32 cell = SceneActorTerrain_GetCellIndex(&actor->body.position);
+                s32 cell = SceneActorTerrain_GetCellIndex(&actor->base.body.position);
                 s32 height = (*SceneActorTerrain_GetCell(cell) & 15) << 8;
-                if ((s16)actor->field2EA < height + 0x118) {
-                    actor->field2EA += Crow_ScaleFixed12(gUnk_086149C4[state->bobPhase] * 8);
+                if ((s16)actor->base.field2EA < height + 0x118) {
+                    actor->base.field2EA += Crow_ScaleFixed12(gUnk_086149C4[state->bobPhase] * 8);
                     if (state->bobPhase <= 0x3F)
                         state->bobPhase++;
                 }
             }
         }
     }
-    actor->body.position.y = actor->field2EA;
+    actor->base.body.position.y = actor->base.field2EA;
     return;
 adjust: {
     s32 diff;
     s32 magnitude;
     u32 ground;
     s32 bias;
-    ground = actor->groundHeight2BE;
+    ground = actor->base.groundHeight2BE;
     bias = -0x118;
-    diff = ground - (actor->body.position.y + bias);
+    diff = ground - (actor->base.body.position.y + bias);
     magnitude = diff;
     if (magnitude < 0)
         magnitude = -magnitude;
     if (magnitude > 0x10) {
         if (diff < 0)
-            actor->field2EA -= 2;
+            actor->base.field2EA -= 2;
         else
-            actor->field2EA += 2;
+            actor->base.field2EA += 2;
     }
 }
-    actor->body.position.y = actor->field2EA;
-    if ((u8)(actor->field2B5 - 1) <= 1) {
+    actor->base.body.position.y = actor->base.field2EA;
+    if ((u8)(actor->base.field2B5 - 1) <= 1) {
         struct DisplaySequenceState *seq;
         struct CrowDrawable *drawable;
-        drawable = actor->drawable;
+        drawable = actor->base.drawable;
         seq = &drawable->sequence;
         switch (seq->index) {
             case 0:
@@ -995,7 +995,7 @@ extern u32 gUnk_08605EA8[];
 
 u32 Crow_GetTimedAction(struct SceneActorRegistryResetView *actor)
 {
-    s32 v = (s32)actor->counter2AC;
+    s32 v = (s32)actor->base.counter2AC;
     s32 i = 0;
     if (v > 0x1d) {
         i = 1;
@@ -1010,21 +1010,21 @@ u32 Crow_GetTimedAction(struct SceneActorRegistryResetView *actor)
 
 void Crow_InitProfile(struct SceneActorRegistryResetView *actor)
 {
-    actor->profileId = SceneActorProfiles_FindOrAdd(0x13, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(0x13, 0);
 }
 
 void Crow_DisableAttackCollision(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *q = actor->context;
+    struct Crow *q = actor->base.context;
     u32 m = 0x100000;
-    u32 *p = &actor->flags2D0;
+    u32 *p = &actor->base.flags2D0;
     u32 *p2;
     u32 m2;
     *p = *p | m;
     p2 = &q->flags;
     m2 = ~1;
     *p2 = *p2 & m2;
-    actor->colliderB.flags &= ~4;
+    actor->base.colliderB.flags &= ~4;
 }
 
 void Crow_GetDirectionalFrameAndFlip(u16 heading, s32 *variant, s32 *flags)
@@ -1077,37 +1077,37 @@ static inline void Crow_SetFlags(struct Crow *p, u32 m)
 
 void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *context = actor->context;
+    struct Crow *context = actor->base.context;
     struct ContactPosition target;
     Crow_ClearFlags(context, 2);
-    if (actor->field2B5 == 0x25) {
+    if (actor->base.field2B5 == 0x25) {
         struct ContactPosition *p = &target;
-        struct ContactPosition *position = &actor->body.position;
-        struct ContactPosition *offset = &actor->secondaryMotion;
+        struct ContactPosition *position = &actor->base.body.position;
+        struct ContactPosition *offset = &actor->base.secondaryMotion;
 
         s32 cell, height;
 
         p->x = offset->x + position->x;
         p->y = offset->y + position->y;
         p->z = offset->z + position->z;
-        Crow_AddMotion(p, &actor->body.motion);
+        Crow_AddMotion(p, &actor->base.body.motion);
         cell = SceneActorTerrain_GetCellIndex(&target);
         height = Crow_GetCollisionHeight(cell, &target);
-        if (actor->groundHeight2BE + (s16)actor->field2EA < height) {
-            actor->secondaryMotion.x = 0;
-            actor->secondaryMotion.y = 0;
-            actor->secondaryMotion.z = 0;
+        if (actor->base.groundHeight2BE + (s16)actor->base.field2EA < height) {
+            actor->base.secondaryMotion.x = 0;
+            actor->base.secondaryMotion.y = 0;
+            actor->base.secondaryMotion.z = 0;
             context->vectors[2].x = 0;
             context->vectors[2].y = 0;
             context->vectors[2].z = 0;
-            actor->body.motion.x = 0;
-            actor->body.motion.z = 0;
-            actor->body.motion.y = 0;
+            actor->base.body.motion.x = 0;
+            actor->base.body.motion.z = 0;
+            actor->base.body.motion.y = 0;
             Crow_SetFlags(context, 2);
         }
         if (target.y < height) {
-            actor->secondaryMotion.y = 0;
-            actor->body.motion.y = 0;
+            actor->base.secondaryMotion.y = 0;
+            actor->base.body.motion.y = 0;
             context->vectors[2].y = 0;
         }
     }
@@ -1115,14 +1115,14 @@ void Crow_StopAtRaisedTerrain(struct SceneActorRegistryResetView *actor)
 
 void Crow_PlayAnimationCue(struct SceneActorRegistryResetView *actor)
 {
-    struct DisplaySequenceState *q = &((struct CrowDrawable *)actor->drawable)->sequence;
+    struct DisplaySequenceState *q = &((struct CrowDrawable *)actor->base.drawable)->sequence;
     if (q->index == 5 && q->elapsed == 0)
         Sound_PlaySong(0xf6);
 }
 
 static inline u8 Crow_HasPlayerDetection(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorChaseTracking *q = &actor->tracking;
+    struct SceneActorChaseTracking *q = &actor->base.tracking;
     u32 mask = 2;
     if (q->flags & mask)
         return 1;
@@ -1135,22 +1135,22 @@ s32 Crow_TryActivatePlayerProximityResponse(struct SceneActorRegistryResetView *
     struct SceneActorChaseTracking *p;
     if (!Crow_HasPlayerDetection(actor))
         goto zero;
-    d = actor->body.position.y - gPlayers[0]->position.y;
+    d = actor->base.body.position.y - gPlayers[0]->position.y;
     if (d < 0)
         d = -d;
     if (d > 0x200)
         goto zero;
-    if (actor->tracking.distance < actor->tracking.limit)
+    if (actor->base.tracking.distance < actor->base.tracking.limit)
         goto yes;
 zero:
     return 0;
 yes: {
     u32 mask = 0x80;
-    u16 *flags = &actor->flags2D6;
+    u16 *flags = &actor->base.flags2D6;
     mask |= *flags;
     *flags = mask;
 }
-    p = &actor->tracking;
+    p = &actor->base.tracking;
     {
         u32 mask = 0x10;
         mask |= p->flags;
@@ -1162,7 +1162,7 @@ yes: {
 static inline u8 Crow_GetReactionTracking(struct SceneActorRegistryResetView *actor,
                                           struct SceneActorChaseTracking **out)
 {
-    struct SceneActorChaseTracking *p = &actor->tracking;
+    struct SceneActorChaseTracking *p = &actor->base.tracking;
     u32 mask = 8;
     u32 value = p->flags & mask;
     *out = p;
@@ -1176,7 +1176,7 @@ void Crow_BeginReaction(struct SceneActorRegistryResetView *actor)
     u32 mask = 0x100;
     struct SceneActorChaseTracking *extra;
     u32 zero;
-    if (actor->flags2D4 & mask)
+    if (actor->base.flags2D4 & mask)
         return;
     zero = Crow_GetReactionTracking(actor, &extra);
     if (zero == 0) {
@@ -1187,26 +1187,26 @@ void Crow_BeginReaction(struct SceneActorRegistryResetView *actor)
         u32 *flags;
         u8 *taken;
         u32 three;
-        taken = &actor->field2B2;
+        taken = &actor->base.field2B2;
         one = 1;
         *taken = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = code;
-        actor->target = fn;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = code;
+        actor->base.target = fn;
         zero8 = 0;
-        actor->field2C8 = zero;
-        flags = &actor->flags114;
+        actor->base.field2C8 = zero;
+        flags = &actor->base.flags114;
         {
             u32 clear = -2;
             *flags &= clear;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
         three = 3;
-        actor->state2A8 = zero8;
-        actor->phase2A9 = zero8;
-        actor->behavior2AA = three;
-        actor->counter2AC = zero;
-        actor->field2B1 = one;
+        actor->base.state2A8 = zero8;
+        actor->base.phase2A9 = zero8;
+        actor->base.behavior2AA = three;
+        actor->base.counter2AC = zero;
+        actor->base.field2B1 = one;
         {
             u32 bit = 8;
             bit |= extra->flags;
@@ -1214,7 +1214,7 @@ void Crow_BeginReaction(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 bit = 0x100000;
-            actor->flags2D0 |= bit;
+            actor->base.flags2D0 |= bit;
         }
     }
 }
@@ -1365,8 +1365,8 @@ u32 Crow_UpdatePostAction(struct SceneActorRegistryResetView *actor)
 
 static inline u8 Crow_TakeKnockbackEntry(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -1375,49 +1375,49 @@ static inline u8 Crow_TakeKnockbackEntry(struct SceneActorRegistryResetView *act
 static inline void Crow_SetKnockbackState(struct SceneActorRegistryResetView *actor, u8 state,
                                           u8 phase, u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Crow_UpdateKnockback(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *state = actor->context;
+    struct Crow *state = actor->base.context;
     u32 mask = 0x42;
     if (Crow_TakeKnockbackEntry(actor)) {
         SceneActorChase_SetControl(actor, Crow_OnSpecialAnimation, 0x26);
         state->vectors[2].y = 30;
     }
-    if (((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(actor->terrainCell))
+    if (((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(actor->base.terrainCell))
             ->flags &
         mask) {
-        if ((s32)actor->counter2AC > 20) {
+        if ((s32)actor->base.counter2AC > 20) {
             Crow_SetKnockbackState(actor, 0, 0, 4);
             return;
         }
     } else {
         u32 mask2 = 0xA02F;
         u16 *speed;
-        if (actor->flags2D4 & mask2) {
-            u16 *t = &actor->field2C2;
+        if (actor->base.flags2D4 & mask2) {
+            u16 *t = &actor->base.field2C2;
             *t = 0x40;
             speed = t;
         } else {
-            u16 *t = &actor->field2C2;
+            u16 *t = &actor->base.field2C2;
             u32 v = *t;
             speed = t;
             if (v == 0)
                 *speed = 0x40;
         }
-        if (actor->drawableKind == 0)
-            Anim_SetDurationScale(&((struct CrowDrawable *)actor->drawable)->sequence, *speed);
+        if (actor->base.drawableKind == 0)
+            Anim_SetDurationScale(&((struct CrowDrawable *)actor->base.drawable)->sequence, *speed);
         else
             Anim_SetFrameDurationScale(
-                &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *speed);
-        actor->field2EA += state->vectors[2].y;
-        if (Mod(actor->counter2AC, 4) == 0) {
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *speed);
+        actor->base.field2EA += state->vectors[2].y;
+        if (Mod(actor->base.counter2AC, 4) == 0) {
             s32 v = state->vectors[2].y;
             s32 h;
             if (v >= 0)
@@ -1431,7 +1431,7 @@ void Crow_UpdateKnockback(struct SceneActorRegistryResetView *actor)
             return;
         }
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }
 
 s32 Div(s32, s32);
@@ -1468,23 +1468,23 @@ static inline void Crow_SetAnimationSpeed(struct SceneActorRegistryResetView *ac
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0)
                 *scale = 64;
         }
     }
-    if (actor->drawableKind == 0)
-        Anim_SetDurationScale(&((struct CrowDrawable *)actor->drawable)->sequence, *scale);
+    if (actor->base.drawableKind == 0)
+        Anim_SetDurationScale(&((struct CrowDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 static inline void Crow_FillResponseMotion(void *dst, u32 *tmp, u32 value)
@@ -1496,11 +1496,11 @@ static inline void Crow_FillResponseMotion(void *dst, u32 *tmp, u32 value)
 static inline void Crow_SetResponseState(struct SceneActorRegistryResetView *actor, u32 state,
                                          u32 phase, u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline u8 Crow_TestResponseFlags(struct Crow *body, u32 mask)
@@ -1529,22 +1529,23 @@ static inline u8 Crow_ApproachSavedPosition(struct SceneActorRegistryResetView *
 
 void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
 {
-    struct Crow *body = actor->context;
+    struct Crow *body = actor->base.context;
     u32 zero[1];
     struct ContactPosition delta;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         struct ContactPosition *saved;
         SceneActorChase_SetControl(actor, Crow_UpdateDirectionalPose, 0x25);
         saved = (void *)(&body->curveSubject.position);
         *((struct CrowPackedPosition *)saved) =
             *(struct CrowPackedPosition *)&gPlayers[0]->position;
         Crow_FillResponseMotion(&body->vectors[2], zero, 0);
-        Crow_FindPositionDelta(&delta, &actor->body.position, saved);
-        actor->body.direction = Math_Atan2(delta.x, delta.z);
+        Crow_FindPositionDelta(&delta, &actor->base.body.position, saved);
+        actor->base.body.direction = Math_Atan2(delta.x, delta.z);
         body->vectors[2].x = Crow_ShiftMotion(
-            gUnk_086149C4[(actor->body.direction + 64) & 255] * body->distance, 12);
+            gUnk_086149C4[(actor->base.body.direction + 64) & 255] * body->distance, 12);
         {
-            s32 depth = Crow_ShiftMotion(gUnk_086149C4[actor->body.direction] * body->distance, 12);
+            s32 depth =
+                Crow_ShiftMotion(gUnk_086149C4[actor->base.body.direction] * body->distance, 12);
             {
                 typeof(body->vectors[2].z) *q1 = &(body->vectors[2].z);
                 u32 z1 = 0;
@@ -1564,26 +1565,27 @@ void Crow_ApproachPlayerThenRecoil(struct SceneActorRegistryResetView *actor)
         Sound_PlaySong(247);
         body->bobPhase = 0;
     } else {
-        Callback_InvokeActor(actor, actor->contactQuery.opaque);
+        Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
         Crow_SetAnimationSpeed(actor);
-        *(s16 *)&actor->field2EA += body->vectors[2].y;
-        if (!Mod(actor->counter2AC, 6))
+        *(s16 *)&actor->base.field2EA += body->vectors[2].y;
+        if (!Mod(actor->base.counter2AC, 6))
             body->vectors[2].y = Crow_ShiftMotion(body->vectors[2].y, 1);
-        if (Crow_ApproachSavedPosition(actor, &body->curveSubject, &actor->body, body->distance) ||
+        if (Crow_ApproachSavedPosition(actor, &body->curveSubject, &actor->base.body,
+                                       body->distance) ||
             Crow_TestResponseFlags(body, 2)) {
-            Crow_MakeRecoilVelocity(&actor->secondaryMotion, actor->body.direction,
+            Crow_MakeRecoilVelocity(&actor->base.secondaryMotion, actor->base.body.direction,
                                     body->distance * 2);
             Crow_SetResponseState(actor, 0, 2, 2);
         } else {
-            actor->counter2AC++;
+            actor->base.counter2AC++;
         }
     }
 }
 
 static inline u8 Crow_TakeHeightReturnEntry(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -1591,19 +1593,19 @@ static inline u8 Crow_TakeHeightReturnEntry(struct SceneActorRegistryResetView *
 
 static inline u32 Crow_ReadHeightReturnFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
 static inline void Crow_ResetReturnState(struct SceneActorRegistryResetView *actor)
 {
     u32 one = 1;
-    u8 *state = &actor->state2A8;
+    u8 *state = &actor->base.state2A8;
     u32 zero = 0;
     *state = zero;
-    actor->phase2A9 = zero;
-    actor->behavior2AA = one;
-    actor->counter2AC = zero;
-    actor->field2B1 = one;
+    actor->base.phase2A9 = zero;
+    actor->base.behavior2AA = one;
+    actor->base.counter2AC = zero;
+    actor->base.field2B1 = one;
 }
 
 void Crow_ReturnToGround(struct SceneActorRegistryResetView *actor)
@@ -1611,53 +1613,53 @@ void Crow_ReturnToGround(struct SceneActorRegistryResetView *actor)
     s32 delta;
     u16 *height;
     if (Crow_TakeHeightReturnEntry(actor)) {
-        void *fn = actor->entryTarget228;
+        void *fn = actor->base.entryTarget228;
         u32 one = 1;
-        u8 *taken = &actor->field2B2;
+        u8 *taken = &actor->base.field2B2;
         u32 zero = 0;
         *taken = one;
-        actor->field2B0 = zero;
-        actor->field2B5 = one;
-        actor->target = fn;
-        actor->field2C8 = zero;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = one;
+        actor->base.target = fn;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->word104 = zero;
-        actor->body.direction += 0x80;
+        actor->base.word104 = zero;
+        actor->base.body.direction += 0x80;
     }
-    Callback_InvokeActor(actor, actor->contactQuery.opaque);
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (Crow_ReadHeightReturnFlags(actor, 0xA02F)) {
-        actor->field2C2 = 0x40;
-        height = &actor->field2C2;
+        actor->base.field2C2 = 0x40;
+        height = &actor->base.field2C2;
     } else {
-        u16 value = actor->field2C2;
-        height = &actor->field2C2;
+        u16 value = actor->base.field2C2;
+        height = &actor->base.field2C2;
         if (!value)
             *height = 0x40;
     }
-    if (!actor->drawableKind)
-        Anim_SetDurationScale(&((struct CrowDrawable *)actor->drawable)->sequence, *height);
+    if (!actor->base.drawableKind)
+        Anim_SetDurationScale(&((struct CrowDrawable *)actor->base.drawable)->sequence, *height);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *height);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *height);
     {
         s32 y;
         s32 offset;
-        delta = actor->groundHeight2BE;
-        y = actor->body.position.y;
+        delta = actor->base.groundHeight2BE;
+        y = actor->base.body.position.y;
         offset = -280;
         y += offset;
         delta -= y;
     }
     if (delta < 0)
         delta = -delta;
-    if ((delta <= 16) && (((s32)actor->counter2AC) > 80)) {
+    if ((delta <= 16) && (((s32)actor->base.counter2AC) > 80)) {
         Crow_ResetReturnState(actor);
     } else {
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
     }
 }
 
@@ -1665,7 +1667,7 @@ extern u8 gUnk_08605EB8[];
 
 void Crow_SetBehaviorTable(struct SceneActorRegistryResetView *actor)
 {
-    actor->behaviorCallbacks = gUnk_08605EB8;
+    actor->base.behaviorCallbacks = gUnk_08605EB8;
 }
 
 void SceneActorControl_DispatchControl(u8 *);
@@ -1675,8 +1677,8 @@ u32 Crow_Update(struct SceneActorRegistryResetView *actor)
     u32 i;
     void **t;
     Crow_UpdatePreAction(actor);
-    i = actor->state2A8;
-    t = actor->callbacks27C;
+    i = actor->base.state2A8;
+    t = actor->base.callbacks27C;
     Callback_InvokeActor(actor, t[i]);
     SceneActorControl_DispatchControl(actor);
     Crow_UpdatePostAction(actor);
@@ -1687,7 +1689,7 @@ void SceneActor_UpdateActiveCallbacks(u8 *);
 
 u32 Crow_InitPlayerTarget(struct SceneActorRegistryResetView *actor)
 {
-    actor->tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     SceneActor_UpdateActiveCallbacks(actor);
     return 0;
 }
@@ -1713,31 +1715,31 @@ static inline u8 Crow_TestDestroyFlags(u16 *a, u32 m)
 
 u32 Crow_Destroy(struct SceneActorRegistryResetView *actor)
 {
-    u8 *p = actor->drawable;
+    u8 *p = actor->base.drawable;
     u8 *q;
     u32 m;
     u32 v;
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Sprite_Remove(p);
     else
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Crow_TestDestroyFlags(&actor->flags2C0, m))
-        SceneMessages_UnregisterReceiver(&actor->unknown9[3]);
+    if (Crow_TestDestroyFlags(&actor->base.flags2C0, m))
+        SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
-        u8 *r = actor->shadow;
+        u8 *r = actor->base.shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct SceneActorRegistryResetView *)actor)->flags2D0 & m;
-    q = (void *)&actor->body;
+    v = ((struct SceneActorRegistryResetView *)actor)->base.flags2D0 & m;
+    q = (void *)&actor->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove(&actor->colliderA);
+    Collider_Remove(&actor->base.colliderA);
     SceneActorRegistry_UnlinkActor(actor);
     return 0;
 }
@@ -1768,19 +1770,19 @@ extern SceneActorCommandHandler const gUnk_086108B0[];
 
 static inline void Crow_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, firstLimit, secondLimit;
     s32 scriptVariant;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
-    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->tracking);
+    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->base.tracking);
 
     if (Script_SeekToKeyword(0x6C)) {
         firstLimit = MonsterInit_ReadWord(0x12C);
@@ -1792,34 +1794,34 @@ static inline void Crow_InitializeBody(struct SceneActorRegistryResetView *arg0,
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
+    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
     scriptVariant = (s16)MonsterInit_ReadKeywordHalfword(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    arg0->field9A = scriptVariant;
+    arg0->base.field9A = scriptVariant;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) ? 0 : arg0->drawable);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, ((struct Crow *)arg0)->movementProbe, 0x40, 0x40);
 }
 
@@ -1828,37 +1830,38 @@ static inline void Crow_ReadPalette(struct SceneActorRegistryResetView *actor, u
 {
     s32 r1v;
     u32 currentPalette;
-    actor->paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
+    actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
+    actor->base.basePaletteBank = base;
+    actor->base.paletteAlternateBank = alternate;
     currentPalette = MonsterInit_GetPaletteOffset(actor);
     currentPalette += 0x1CE;
     MonsterInit_SetAlternatePaletteOffset(actor, (u16)currentPalette);
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(((struct CrowDrawable *)actor->drawable)->animation, r1v);
+        AnimData_SelectPaletteBank(((struct CrowDrawable *)actor->base.drawable)->animation, r1v);
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->palette =
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
             gPaletteBankData + (r1v << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
         MonsterInit_SetWidgetScriptPalette(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
             SceneActorScript_GetManagerField62());
 }
 
 static inline void Crow_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
 {
-    actor->messageCallback = SceneActorScript_OnCommand;
-    actor->updateCallback = Crow_InitPlayerTarget;
-    actor->destroyCallback = Crow_Destroy;
+    actor->base.messageCallback = SceneActorScript_OnCommand;
+    actor->base.updateCallback = Crow_InitPlayerTarget;
+    actor->base.destroyCallback = Crow_Destroy;
 }
 
 static inline void Crow_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_08605EC4);
-    actor->callback248 = Crow_ResetGroundState;
-    actor->field23C = Crow_BeginReaction;
-    MonsterInit_WriteCallback(&actor->contactQuery.opaque, Crow_TryActivatePlayerProximityResponse);
+    MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605EC4);
+    actor->base.callback248 = Crow_ResetGroundState;
+    actor->base.field23C = Crow_BeginReaction;
+    MonsterInit_WriteCallback(&actor->base.contactQuery.opaque,
+                              Crow_TryActivatePlayerProximityResponse);
 }
 
 s32 Crow_Init(void *object)
@@ -1874,21 +1877,21 @@ s32 Crow_Init(void *object)
     Crow_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0x5A6E, 0x7B03);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             ((struct ActorSprite *)heap)->priority = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x5A6E, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     Crow_InitializeBody(actor, &zero);
     Crow_ReadSpawnScript(crow);
@@ -1917,20 +1920,20 @@ s32 Crow_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                  actor->drawable);
+        Anim_Step(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
+                  actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Crow_InitActionTable(actor);
     Crow_SetBehaviorTable(actor);
-    actor->field2E8 = 2;
+    actor->base.field2E8 = 2;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
     Crow_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))

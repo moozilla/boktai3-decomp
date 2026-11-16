@@ -24,9 +24,9 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
     struct SceneActorControlMotionState *control = SceneActorControl_GetMotionState(actor);
     u32 zero;
     u32 magnitude;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 index;
-        SceneActorTerrain_InstallControl(actor, actor->entryTarget228, 1);
+        SceneActorTerrain_InstallControl(actor, actor->base.entryTarget228, 1);
         ClearMotionVector(&zero, &control->vectors[2]);
         index = (gRandomIndex + 1) & 1023;
         gRandomIndex = index;
@@ -37,7 +37,7 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             {
                 u8 *angle = &control->randomMotionAngle;
                 *angle = value;
-                actor->secondaryMotion.x = ScaleMotionSample(gUnk_086149C4[*angle]);
+                actor->base.secondaryMotion.x = ScaleMotionSample(gUnk_086149C4[*angle]);
             }
         }
         {
@@ -48,10 +48,10 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             s32 sample;
             angle &= mask;
             sample = sine[angle];
-            actor->secondaryMotion.z = ScaleMotionSample(sample);
+            actor->base.secondaryMotion.z = ScaleMotionSample(sample);
         }
     }
-    if ((s32)actor->counter2AC <= 5) {
+    if ((s32)actor->base.counter2AC <= 5) {
         const s16 *first = gUnk_086149C4;
         u8 *field;
         const s16 *table;
@@ -60,14 +60,14 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
         field = &control->randomMotionAngle;
         value = first[*field];
         table = first;
-        actor->secondaryMotion.x = ScaleMotionSample(value);
+        actor->base.secondaryMotion.x = ScaleMotionSample(value);
 
         field = &control->randomMotionAngle;
         value = table[(*field + 64) & 255];
-        actor->secondaryMotion.z = ScaleMotionSample(value);
+        actor->base.secondaryMotion.z = ScaleMotionSample(value);
     }
     {
-        struct ContactPosition *motion = &actor->secondaryMotion;
+        struct ContactPosition *motion = &actor->base.secondaryMotion;
         s32 x = motion->x;
         u32 squareX = (u32)x * x;
         {
@@ -86,5 +86,5 @@ void SceneActorControl_TickRandomMotion(struct SceneActorRegistryResetView *inpu
             SceneActorTerrain_EnterState(actor, 0, 2, 0);
         }
     }
-    ++actor->counter2AC;
+    ++actor->base.counter2AC;
 }

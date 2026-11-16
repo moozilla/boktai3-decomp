@@ -20,14 +20,14 @@ static inline u32 MaskFlags(u16 *p, u32 mask)
 }
 s32 SceneActorControl_AdvanceReactionCount(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorReactionCountContext *context = actor->context;
+    struct SceneActorReactionCountContext *context = actor->base.context;
     u16 *flags;
     u32 mask;
-    if (actor->reactionSoundVariant == 0)
+    if (actor->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);
-    flags = &actor->flags2D4;
+    flags = &actor->base.flags2D4;
     mask = ~0x20;
     *flags = mask & *flags;
     if (*flags & 0x8000)
@@ -39,11 +39,11 @@ s32 SceneActorControl_AdvanceReactionCount(struct SceneActorRegistryResetView *a
         if (!blocked && context->reactionCount > 2) {
             u32 phase = 2;
             u32 behavior = 6;
-            actor->state2A8 = blocked;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = blocked;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = blocked;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = behavior;
+            actor->base.counter2AC = blocked;
+            actor->base.field2B1 = 1;
             context->reactionCount = blocked;
             return 1;
         }

@@ -5,7 +5,7 @@
 void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *actor)
 {
     void *target = 0;
-    s32 limit = actor->tracking.limit * 2;
+    s32 limit = actor->base.tracking.limit * 2;
     struct ContactPosition difference;
     struct Player **slot;
     s32 i;
@@ -19,13 +19,13 @@ void *SceneActor_FindNearbyPlayerTarget(struct SceneActorRegistryResetView *acto
             limit = 0x24000;
         }
     }
-    if ((actor->field2B5 == 3) && (flags & 0x40000)) {
+    if ((actor->base.field2B5 == 3) && (flags & 0x40000)) {
         return 0;
     }
     {
         u32 blocked = 0x1000;
         struct ContactPosition *delta = &difference;
-        const struct ContactPosition *origin = &actor->body.position;
+        const struct ContactPosition *origin = &actor->base.body.position;
         {
             u32 address = (u32)gPlayers;
             slot = (struct Player **)address;

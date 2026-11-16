@@ -4,8 +4,8 @@ void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorRegistryResetVi
 // confidence=low: enters directional animation three when the contact-ready flag is set.
 u8 Vorn_BeginContactAnimation(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->group.hitReactionLatch == 0 && (actor->field2E6 & 8)) {
-        actor->field2B8 = 45;
+    if (actor->group.hitReactionLatch == 0 && (actor->base.field2E6 & 8)) {
+        actor->base.field2B8 = 45;
         actor->group.hitReactionLatch = 65;
         SceneActorAnimation_SelectDirectionalEntry(actor, 3);
     }

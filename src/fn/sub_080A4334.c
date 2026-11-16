@@ -16,25 +16,25 @@ struct SpiderApproachPlayer {
 };
 static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = k;
-    a->target = c;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = k;
+    a->base.target = c;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         u32 m = ~1;
         *p &= m;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 static inline void State(struct SceneActorRegistryResetView *a, u32 k)
 {
-    a->state2A8 = 0;
-    a->phase2A9 = 0;
-    a->behavior2AA = k;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = k;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 static inline u8 HasFlag(u8 *c, u32 m)
 {
@@ -62,7 +62,7 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *fr
 }
 static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPosition *delta)
 {
-    s32 direction = a->body.direction;
+    s32 direction = a->base.body.direction;
     s32 difference = Math_Atan2(delta->x, delta->z) - direction;
     if (difference > 128)
         difference -= 256;
@@ -86,7 +86,7 @@ static inline void BeginContact(struct SceneActorRegistryResetView *a,
     }
     {
         u32 m = 128;
-        u16 *p = &a->flags2D4;
+        u16 *p = &a->base.flags2D4;
         u32 v = *p;
         m |= v;
         *p = m;
@@ -99,7 +99,7 @@ static inline void BeginContact(struct SceneActorRegistryResetView *a,
 // confidence=low: detects a player in front and selects close or distant contact behavior
 u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *a)
 {
-    u8 *transform = (u8 *)&a->body.id;
+    u8 *transform = (u8 *)&a->base.body.id;
     u8 *c = (void *)SceneActorControl_GetState(a);
     struct ContactPosition delta;
     u8 *player;
@@ -118,7 +118,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
     if (!candidate)
         return 0;
     player = candidate;
-    Delta(&delta, &a->body.position, &((struct SpiderApproachPlayer *)player)->position);
+    Delta(&delta, &a->base.body.position, &((struct SpiderApproachPlayer *)player)->position);
     height = delta.y;
     if (height < 0)
         height = -height;
@@ -126,9 +126,9 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         return 0;
     distance = (delta.x * delta.x) + (delta.z * delta.z);
     Math_Atan2(delta.x, delta.z);
-    if (distance >= (a->tracking.limit * 2))
+    if (distance >= (a->base.tracking.limit * 2))
         return 0;
-    Delta(&delta, &a->body.position, &((struct SpiderApproachPlayer *)player)->position);
+    Delta(&delta, &a->base.body.position, &((struct SpiderApproachPlayer *)player)->position);
     angle = Facing(a, &delta);
     if (angle < 0)
         angle = -angle;
@@ -136,7 +136,7 @@ u8 SceneActorPlacement_SelectPlayerApproach(struct SceneActorRegistryResetView *
         return 0;
     if (!sub_0821D4F0(transform + 12, &((struct SpiderApproachPlayer *)player)->position, 5, 256))
         return 0;
-    a->tracking.target = (u32)((struct SpiderApproachPlayer *)player)->unknown24;
+    a->base.tracking.target = (u32)((struct SpiderApproachPlayer *)player)->unknown24;
     if (((s32)distance) <= 0x3fff)
         BeginContact(a, &a->group.common);
     else {

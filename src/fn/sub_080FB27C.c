@@ -31,12 +31,13 @@ zero:
 s32 SceneActorControl_CanAdvanceHover(struct SceneActorRegistryResetView *actor)
 {
     if (!Actor_IsInactive((void *)actor)) {
-        u8 *context = actor->context;
+        u8 *context = actor->base.context;
         *(struct ContactPosition *)(context + 0xF1C) =
             *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         {
             u32 mask = 0x100;
-            if (!(actor->flags2D4 & mask) && actor->tracking.distance < actor->tracking.limit)
+            if (!(actor->base.flags2D4 & mask) &&
+                actor->base.tracking.distance < actor->base.tracking.limit)
                 goto one;
         }
     }

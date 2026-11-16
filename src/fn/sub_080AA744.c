@@ -65,8 +65,8 @@ static inline void Tentacle_MaskTrailFlags(struct TentacleImpulseTrail *trail, u
 
 void sub_080AA744(struct SceneActorRegistryResetView *actor)
 {
-    struct TentacleImpulseTrail *trail = actor->context;
-    s32 mask = Tentacle_LengthSquared(&actor->secondaryMotion);
+    struct TentacleImpulseTrail *trail = actor->base.context;
+    s32 mask = Tentacle_LengthSquared(&actor->base.secondaryMotion);
     s32 i;
     u32 activeMask = 2;
     u32 hiddenMask = 1;

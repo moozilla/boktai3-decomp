@@ -47,11 +47,11 @@ static inline void Tentacle_SubtractPositions(struct ContactPosition *out,
 static inline void Tentacle_BeginForwardState(struct SceneActorRegistryResetView *a)
 {
     u32 behavior = 2;
-    a->state2A8 = 0;
-    a->phase2A9 = 0;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 static inline void Tentacle_ApplyDurationScale(struct SceneActorRegistryResetView *actor)
@@ -59,24 +59,24 @@ static inline void Tentacle_ApplyDurationScale(struct SceneActorRegistryResetVie
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0)
                 *scale = 64;
         }
     }
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 static inline void Tentacle_AddPositions(struct ContactPosition *out,
@@ -100,47 +100,47 @@ static inline s32 Tentacle_HeadingDifference(u8 desired, u8 current)
 
 void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
 {
-    struct TentacleReturnContext *body = actor->context;
+    struct TentacleReturnContext *body = actor->base.context;
     s32 speed;
     s32 difference;
     s32 index;
     struct ContactPosition target;
-    if (Tentacle_TakeEntry(&actor->field2B1)) {
+    if (Tentacle_TakeEntry(&actor->base.field2B1)) {
         {
-            u32 cell = actor->terrainCell;
+            u32 cell = actor->base.terrainCell;
             body->startCell = cell;
         }
         SceneActorTerrain_GetCenter(body->startCell, &body->center);
     }
-    Callback_InvokeActor(actor, actor->contactQuery.opaque);
-    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Tentacle_ApplyDurationScale(actor);
-    difference = Tentacle_HeadingDifference(actor->unknown3CD[0], actor->body.direction);
+    difference = Tentacle_HeadingDifference(actor->base.unknown3CD[0], actor->base.body.direction);
     {
         s32 magnitude = (difference < 0) ? (-difference) : (difference);
         if (magnitude > 8) {
             s32 x = Tentacle_ShiftTowardZero(
-                speed * gUnk_086149C4[(actor->body.direction + 64) & 255], 12);
-            s32 z = Tentacle_ShiftTowardZero(speed * gUnk_086149C4[actor->body.direction], 12);
-            actor->body.motion.x += x;
-            actor->body.motion.z += z;
+                speed * gUnk_086149C4[(actor->base.body.direction + 64) & 255], 12);
+            s32 z = Tentacle_ShiftTowardZero(speed * gUnk_086149C4[actor->base.body.direction], 12);
+            actor->base.body.motion.x += x;
+            actor->base.body.motion.z += z;
         }
     }
-    Tentacle_AddPositions(&target, &actor->body.motion, &actor->body.position);
+    Tentacle_AddPositions(&target, &actor->base.body.motion, &actor->base.body.position);
     index = SceneActorTerrain_GetCellIndex(&target);
     if ((body->startCell) != index) {
         Tentacle_SubtractPositions(&target, &target, &body->center);
-        actor->body.motion.x += Div(target.x, 10);
-        actor->body.motion.z += Div(target.z, 10);
+        actor->base.body.motion.x += Div(target.x, 10);
+        actor->base.body.motion.z += Div(target.z, 10);
     }
     sub_080A9DB0(actor, 12, 0xA410);
     if (((difference < 0) ? (-difference) : (difference)) <= 7) {
         if ((body->startCell) == index)
             Tentacle_BeginForwardState(actor);
     } else if (difference > 0) {
-        actor->body.direction += (((64 - actor->field2C2) >> 4) << 1) + 1;
+        actor->base.body.direction += (((64 - actor->base.field2C2) >> 4) << 1) + 1;
     } else {
-        actor->body.direction -= (((64 - actor->field2C2) >> 4) << 1) + 1;
+        actor->base.body.direction -= (((64 - actor->base.field2C2) >> 4) << 1) + 1;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

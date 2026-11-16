@@ -13,49 +13,49 @@ static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, v
     u32 offset;
     u32 zero;
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         zero = 0;
         *field = 1;
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->field2B5 = kind;
+    actor->base.field2B5 = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
-    actor->field2C8 = zero;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 
 static inline void State(struct SceneActorRegistryResetView *a, u32 state, u32 phase, u32 behavior,
                          u32 zero)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = zero;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = zero;
+    a->base.field2B1 = 1;
 }
 static inline void TurnState(struct SceneActorRegistryResetView *a, u32 behavior)
 {
-    u8 *field = &a->state2A8;
+    u8 *field = &a->base.state2A8;
     u32 zero = 0;
     *field = zero;
-    a->phase2A9 = zero;
-    a->behavior2AA = behavior;
+    a->base.phase2A9 = zero;
+    a->base.behavior2AA = behavior;
     {
-        u32 *counter = &a->counter2AC;
+        u32 *counter = &a->base.counter2AC;
         *counter = zero;
     }
-    a->field2B1 = 1;
+    a->base.field2B1 = 1;
 }
 static inline u32 Flags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    return a->flags2D4 & mask;
+    return a->base.flags2D4 & mask;
 }
 void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *actor)
 {
@@ -63,29 +63,29 @@ void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *acto
     s32 speed, event;
     void **routeField;
     u16 *scale;
-    if (SceneActorControl_TakeFlag(&actor->field2B1))
-        BeginControlZero(actor, actor->entryTarget228, 1);
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1))
+        BeginControlZero(actor, actor->base.entryTarget228, 1);
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((u8)sub_0812F3CC(actor))
         return;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
     speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
     if (Flags(actor, 0xA02F)) {
-        u16 *p = &actor->field2C2;
+        u16 *p = &actor->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *p = &actor->field2C2;
+        u16 *p = &actor->base.field2C2;
         u16 value = *p;
         scale = p;
         if (!value)
             *p = 64;
     }
-    if (actor->drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->drawable + 0x48, *scale);
+    if (actor->base.drawableKind == 0)
+        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
 
     routeField = &group->route;
     event = NavMesh_ConsumeProbeEvent(*routeField);
@@ -100,5 +100,5 @@ void SceneActorRoute_UpdateAdvancePhase(struct SceneActorRegistryResetView *acto
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
             TurnState(actor, 6);
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -85,13 +85,13 @@ static inline s32 Axe_ContactIndex(s32 index)
 /* Orbit the actor and its auxiliary sprite around a moving shared center. */
 void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
 {
-    struct AxeContext *data = p->context;
+    struct AxeContext *data = p->base.context;
     struct ContactPosition delta;
     struct ContactPosition *position;
     u8 entered;
     s32 difference, absolute;
-    entered = Axe_TakeEntry(&p->field2B2);
-    position = &p->body.position;
+    entered = Axe_TakeEntry(&p->base.field2B2);
+    position = &p->base.body.position;
     if (entered) {
         data->flags |= 2;
         data->angle = 0;
@@ -106,7 +106,7 @@ void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
     }
     position->x = data->center.x +
                   Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
-    p->body.position.z =
+    p->base.body.position.z =
         data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
     data->spriteX = data->center.x +
                     Axe_ScaleTowardZero(
@@ -161,14 +161,14 @@ void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
         data->center.x += Axe_ScaleTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
         data->center.z += Axe_ScaleTowardZero(gUnk_086149C4[data->heading] * 2, 12);
         if (data->flags & 4) {
-            struct DisplaySequenceSprite *sprite = p->drawable;
+            struct DisplaySequenceSprite *sprite = p->base.drawable;
             u32 previous;
             sprite->flags |= 2;
             data->spriteFlags |= 2;
             previous = sprite->attribute;
             sprite->attribute = previous - 6;
             data->spriteAngle += 6;
-            if ((s32)previous < ((struct DisplaySequenceSprite *)p->drawable)->attribute)
+            if ((s32)previous < ((struct DisplaySequenceSprite *)p->base.drawable)->attribute)
                 Sound_PlaySong(0x169);
             if (data->flags & 4) {
                 if (frame < 480)
@@ -192,11 +192,11 @@ void Axe_UpdateOrbitAttack(struct SceneActorRegistryResetView *p, s32 frame)
         s32 i;
         u32 stride = sizeof(struct ContactCollider);
         {
-            struct ContactCollider *c = &p->colliderB;
+            struct ContactCollider *c = &p->base.colliderB;
             c->flags |= 4;
         }
         {
-            struct ContactCollider *c = &p->colliderA;
+            struct ContactCollider *c = &p->base.colliderA;
             c->flags |= 4;
         }
         i = 0;

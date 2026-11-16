@@ -16,12 +16,12 @@ void Sound_PlaySong(u32);
 void Axe_UpdateTargetLunge(void);
 void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
-    struct WindupContext *state = actor->context;
-    struct RotatingDrawable *drawable = actor->drawable;
+    struct WindupContext *state = actor->base.context;
+    struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle, magnitude;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         drawable->flags |= 2;
-        state->direction = actor->tracking.heading;
+        state->direction = actor->base.tracking.heading;
         state->target = *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
         state->active = 1;
         Sound_PlaySong(0x16F);
@@ -32,28 +32,28 @@ void Axe_UpdateTargetWindup(struct SceneActorRegistryResetView *actor, s32 elaps
         magnitude = -magnitude;
     if (magnitude > 48) {
         s32 delay;
-        if (actor->health <= state->healthThreshold)
+        if (actor->base.health <= state->healthThreshold)
             delay = state->delay >> 1;
         else
             delay = state->delay;
         if (elapsed > delay) {
             void *callback = Axe_UpdateTargetLunge;
             u32 phase = 0x36;
-            actor->field2B2 = 1;
-            actor->field2B0 = 0;
-            actor->field2B5 = phase;
-            actor->target = callback;
-            actor->field2C8 = 0;
+            actor->base.field2B2 = 1;
+            actor->base.field2B0 = 0;
+            actor->base.field2B5 = phase;
+            actor->base.target = callback;
+            actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->flags114;
+                u32 *flags = &actor->base.flags114;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->word104 = 0;
+            actor->base.word104 = 0;
         }
     } else {
         s32 step, turn;
-        if (actor->health <= state->healthThreshold)
+        if (actor->base.health <= state->healthThreshold)
             step = state->turnStep;
         else
             step = state->turnStep >> 1;

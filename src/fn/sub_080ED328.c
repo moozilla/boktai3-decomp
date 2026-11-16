@@ -13,8 +13,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -35,7 +35,7 @@ void sub_080ED328(void *source, void *target, struct SceneActorRegistryResetView
 {
     if (IsUnavailable(actor))
         return;
-    if (Test(ContextFlag(actor->context, 1), ~0))
+    if (Test(ContextFlag(actor->base.context, 1), ~0))
         return;
     SceneActorBehavior_ApplyContactReaction(source, target, actor);
 }

@@ -13,8 +13,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -39,7 +39,7 @@ static inline u32 WordFlag(u32 *p, u32 mask)
 void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
                                         struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorScriptPropertiesView *state = actor->context;
+    struct SceneActorScriptPropertiesView *state = actor->base.context;
     if (IsUnavailable(actor))
         return;
     if (HalfFlag(&contact[3], 4))
@@ -56,5 +56,5 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact,
         return;
     SceneActorControl_BeginTimedBehavior56(actor, state);
     *((u8 *)state + 0x6D0) = 20;
-    actor->field2B6 = actor->tracking.heading + 0x80;
+    actor->base.field2B6 = actor->base.tracking.heading + 0x80;
 }

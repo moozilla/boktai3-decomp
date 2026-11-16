@@ -52,16 +52,17 @@ static inline u8 SelectHeading(u16 random, u8 *direction)
 }
 static inline s32 ReadCounter(struct SceneActorRegistryResetView *actor)
 {
-    register u32 offset asm("r1") = (u32) & ((struct SceneActorRegistryResetView *)0)->counter2AC;
+    register u32 offset asm("r1") =
+        (u32) & ((struct SceneActorRegistryResetView *)0)->base.counter2AC;
     s32 *counter = (void *)((u8 *)actor + offset);
     asm("" : : "r"(offset));
     return *counter;
 }
 void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
 {
-    struct SpiderContext *ctx = input->context;
+    struct SpiderContext *ctx = input->base.context;
     struct SpiderGroupView *group = (void *)&input->group.common;
-    register struct Transform *transform asm("r5") = (void *)&input->body.id;
+    register struct Transform *transform asm("r5") = (void *)&input->base.body.id;
     struct ContactPackedVector target;
     register const u16 *table asm("r6") = gRandomTable;
     register u32 *indexAddress asm("sl") = &gRandomIndex;
@@ -78,7 +79,7 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
     *(u32 *)field = index;
     {
         u16 sample = table[index];
-        field = &input->body.direction;
+        field = &input->base.body.direction;
         heading = SelectHeading(sample, field);
     }
     if (Mod(ReadCounter(input), 30) == 0) {
@@ -87,17 +88,18 @@ void Spider_UpdateWanderGoal(struct SceneActorRegistryResetView *input)
         target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
         target.y = transform->position.y;
         target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
-        if (!Nav_IsPositionInMesh(input->group.route, &input->body.position, (void *)(&target))) {
+        if (!Nav_IsPositionInMesh(input->group.route, &input->base.body.position,
+                                  (void *)(&target))) {
             if (!Test(ctx, 16))
-                input->field2C2 = 64;
+                input->base.field2C2 = 64;
             SceneActorMovement_ResolveRoutePosition(input);
             ctx->timer = 0;
         } else {
             ((struct SpiderMovementView *)input)->goal = *((struct ContactPosition *)(&target));
             if (!(RandomChoice(indexAddress, table, mask)))
-                input->field2C2 = 16;
+                input->base.field2C2 = 16;
             else
-                input->field2C2 = 64;
+                input->base.field2C2 = 64;
             {
                 void *mesh = group->mesh;
                 struct ContactPosition *to;

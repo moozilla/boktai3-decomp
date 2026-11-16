@@ -30,7 +30,7 @@ static inline u8 TestFlag(const u32 *flags, u32 mask)
 /* Fade the attack palette, then restore the actor palette when the level reaches zero. */
 void sub_080FB30C(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeFlashState *state = actor->context;
+    struct AxeFlashState *state = actor->base.context;
     u32 *flags;
     if (state->start) {
         state->level = 0;
@@ -75,8 +75,8 @@ void sub_080FB30C(struct SceneActorRegistryResetView *actor)
     {
         u32 mask = 0x180;
         if (TestFlag(flags, mask)) {
-            ((struct AxeFlashDrawable *)actor->drawable)->graphics.defaultPalette = 0x13F;
-            ((struct AxeFlashDrawable *)actor->drawable)->graphics.palette = state->palette;
+            ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.defaultPalette = 0x13F;
+            ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.palette = state->palette;
             switch (state->level) {
                 case 0:
                     state->palette[1] = 0;
@@ -94,9 +94,10 @@ void sub_080FB30C(struct SceneActorRegistryResetView *actor)
             if (++state->timer > 9) {
                 if (!TestFlag(flags, 0x80)) {
                     if (--state->level <= 0) {
-                        void *drawable = &((struct AxeFlashDrawable *)actor->drawable)->graphics;
-                        u16 *palette = &actor->basePaletteBank;
-                        u16 *offset = &actor->paletteOffset;
+                        void *drawable =
+                            &((struct AxeFlashDrawable *)actor->base.drawable)->graphics;
+                        u16 *palette = &actor->base.basePaletteBank;
+                        u16 *offset = &actor->base.paletteOffset;
                         AnimData_SelectPaletteBank(drawable, *palette + *offset);
                         {
                             u32 clr = ~0x100;

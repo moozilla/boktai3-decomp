@@ -20,32 +20,32 @@ static inline void ClearFlags16(u16 *p, u32 mask)
 static inline u8 TryMove(struct SceneActorRegistryResetView *actor, u8 *group)
 {
     void *route = *(void **)(group + 0x1FC);
-    struct ContactPosition *position = &actor->body.position;
-    struct ContactPosition *destination = &actor->tracking.target->position;
+    struct ContactPosition *position = &actor->base.body.position;
+    struct ContactPosition *destination = &actor->base.tracking.target->position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
-        ClearFlags16(&actor->flags2D4, ~0x200);
+        ClearFlags16(&actor->base.flags2D4, ~0x200);
         return 0;
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         } else {
-            ClearFlags16(&actor->flags2D4, ~0x200);
+            ClearFlags16(&actor->base.flags2D4, ~0x200);
             return 0;
         }
     }
 }
 void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorApproachContext *context = actor->context;
+    struct SceneActorApproachContext *context = actor->base.context;
     u8 *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    else if (actor->tracking.distance > context->maximumDistance ||
-             actor->tracking.distance < context->minimumDistance) {
+    else if (actor->base.tracking.distance > context->maximumDistance ||
+             actor->base.tracking.distance < context->minimumDistance) {
         ClearFlags(&context->flags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else if (SceneActorReaction_IsRangeReady(actor)) {
@@ -56,11 +56,11 @@ void SceneActorApproach_UpdateRange(struct SceneActorRegistryResetView *actor)
             u32 next;
             ClearFlags(&context->flags, ~0x100);
             next = 15;
-            actor->state2A8 = 0;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = next;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = 0;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = next;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
     }
 }

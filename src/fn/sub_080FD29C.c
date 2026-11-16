@@ -9,25 +9,25 @@ struct ActorGroupPhaseState {
 static inline void ResetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                               u32 behavior, u32 counter)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = counter;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = counter;
+    actor->base.field2B1 = 1;
 }
 void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
 {
-    struct ActorGroupPhaseState *group = actor->context;
-    if (actor->field2B1)
-        actor->field2B1 = 0;
-    if (actor->field2B0) {
+    struct ActorGroupPhaseState *group = actor->base.context;
+    if (actor->base.field2B1)
+        actor->base.field2B1 = 0;
+    if (actor->base.field2B0) {
         u32 z3, z4;
         {
             u32 m;
             int c = 0x100;
-            u16 *f = &actor->flags2D4;
+            u16 *f = &actor->base.flags2D4;
             m = ~c;
-            actor->flags2D4 = m & *f;
+            actor->base.flags2D4 = m & *f;
             z3 = 0;
             z4 = 0;
         }
@@ -38,6 +38,6 @@ void ActorGroup_ResetActivePhase(struct SceneActorRegistryResetView *actor)
         }
         ResetPhase(actor, z3, z3, 3, z4);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

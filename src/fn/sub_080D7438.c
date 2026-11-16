@@ -15,18 +15,18 @@ static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
 }
 void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
 {
-    u32 *flags = &actor->flags2D0;
+    u32 *flags = &actor->base.flags2D0;
     s32 mask = -5;
     struct SceneActorMotionParent *parent;
     u32 started;
     *flags &= mask;
-    parent = actor->context;
+    parent = actor->base.context;
     {
         u16 *p = &parent->flags;
         u32 mask = 0xFFFFEBFF;
         *p = mask & *p;
     }
-    started = MotionStarted((void *)&actor->tracking.target);
+    started = MotionStarted((void *)&actor->base.tracking.target);
     if (started) {
         u16 *motionFlags = &actor->group.common.gate.flags;
         {
@@ -37,7 +37,7 @@ void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
         }
         {
             u32 mask = 0x80;
-            motionFlags = &actor->flags2D4;
+            motionFlags = &actor->base.flags2D4;
             {
                 u32 value = *motionFlags;
                 mask |= value;
@@ -54,29 +54,29 @@ void SceneActor_EnterMotionPhase(struct SceneActorRegistryResetView *actor)
         Mummy_EnterIdleControl(actor);
     } else {
         u32 one = 1;
-        actor->state2A8 = 0;
-        actor->phase2A9 = one;
-        actor->behavior2AA = 0;
-        actor->counter2AC = 0;
-        actor->field2B1 = one;
+        actor->base.state2A8 = 0;
+        actor->base.phase2A9 = one;
+        actor->base.behavior2AA = 0;
+        actor->base.counter2AC = 0;
+        actor->base.field2B1 = one;
         {
             void *control = SceneActorControl_OnIdle;
             u32 kind = 0x10;
-            actor->field2B2 = one;
-            actor->field2B0 = 0;
-            actor->field2B5 = kind;
-            actor->target = control;
-            actor->field2C8 = 0;
+            actor->base.field2B2 = one;
+            actor->base.field2B0 = 0;
+            actor->base.field2B5 = kind;
+            actor->base.target = control;
+            actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->flags114;
+                u32 *flags = &actor->base.flags114;
                 s32 mask = -2;
                 *flags &= mask;
             }
-            actor->word104 = 0;
+            actor->base.word104 = 0;
         }
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
+        struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
         u32 mask = 8;
         {
             u32 value = motion->flags;

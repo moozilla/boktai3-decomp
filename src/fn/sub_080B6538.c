@@ -20,7 +20,7 @@ u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetVie
         Skeleton_SelectDistanceReaction(s);
         return 1;
     }
-    if (angle <= 24 && s->tracking.distance < context->nearRange6E0) {
+    if (angle <= 24 && s->base.tracking.distance < context->nearRange6E0) {
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u32 zero;
@@ -29,27 +29,27 @@ u32 SceneActorControl_TryBeginNearbyBehavior16(struct SceneActorRegistryResetVie
         u32 *flags;
         u8 *taken;
         u32 two;
-        taken = &s->field2B2;
+        taken = &s->base.field2B2;
         zero = 0;
         one = 1;
         *taken = one;
-        s->field2B0 = zero;
-        s->field2B5 = code;
-        s->target = fn;
+        s->base.field2B0 = zero;
+        s->base.field2B5 = code;
+        s->base.target = fn;
         zero8 = 0;
-        s->field2C8 = zero;
-        flags = &s->flags114;
+        s->base.field2C8 = zero;
+        flags = &s->base.flags114;
         {
             u32 mask = -2;
             *flags &= mask;
         }
-        s->word104 = zero;
+        s->base.word104 = zero;
         two = 2;
-        s->state2A8 = zero8;
-        s->phase2A9 = two;
-        s->behavior2AA = zero8;
-        s->counter2AC = zero;
-        s->field2B1 = one;
+        s->base.state2A8 = zero8;
+        s->base.phase2A9 = two;
+        s->base.behavior2AA = zero8;
+        s->base.counter2AC = zero;
+        s->base.field2B1 = one;
         context->attempts703 = zero8;
         return 1;
     }

@@ -4,20 +4,20 @@
 
 static inline s32 Dog_ReadSecondaryX(const struct SceneActorRegistryResetView *a)
 {
-    return a->secondaryMotion.x;
+    return a->base.secondaryMotion.x;
 }
 static inline s32 Dog_ReadSecondaryZ(const struct SceneActorRegistryResetView *a)
 {
-    return a->secondaryMotion.z;
+    return a->base.secondaryMotion.z;
 }
 
 static inline s32 Dog_ReadDesiredX(const struct SceneActorRegistryResetView *a)
 {
-    return a->reactionStart.x;
+    return a->base.reactionStart.x;
 }
 static inline s32 Dog_ReadDesiredZ(const struct SceneActorRegistryResetView *a)
 {
-    return a->reactionStart.z;
+    return a->base.reactionStart.z;
 }
 static inline s32 Dog_ScaleMagnitude(s32 value, u32 shift)
 {
@@ -63,39 +63,39 @@ void sub_080E0750(struct SceneActorRegistryResetView *actor)
         u32 mask;
         {
             s32 value = Dog_ReadSecondaryX(actor);
-            actor->secondaryMotion.x = Dog_QuarterDisplacement(&value);
+            actor->base.secondaryMotion.x = Dog_QuarterDisplacement(&value);
         }
         {
             s32 value = Dog_ReadSecondaryZ(actor);
-            actor->secondaryMotion.z = Dog_QuarterDisplacement(&value);
+            actor->base.secondaryMotion.z = Dog_QuarterDisplacement(&value);
         }
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         mask = 0x20;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         mask |= *flags;
         mask &= ~0x100;
         *flags = mask;
     }
     {
         u32 mask = 0x10000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
-    dx = Dog_ReadDisplacementAxis(Dog_ReadDesiredX(actor), &actor->reactionEnd.x, &x);
-    dz = Dog_ReadDisplacementAxis(Dog_ReadDesiredZ(actor), &actor->reactionEnd.z, &z);
+    dx = Dog_ReadDisplacementAxis(Dog_ReadDesiredX(actor), &actor->base.reactionEnd.x, &x);
+    dz = Dog_ReadDisplacementAxis(Dog_ReadDesiredZ(actor), &actor->base.reactionEnd.z, &z);
     dx = Dog_ClampAxis(dx, 200);
     dz = Dog_ClampAxis(dz, 200);
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (!Dog_DisplacementStopped(dx, dz))
         goto moving;
-    if (!actor->field2B3)
+    if (!actor->base.field2B3)
         goto moving;
     group = &actor->group;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -103,8 +103,8 @@ void sub_080E0750(struct SceneActorRegistryResetView *actor)
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -119,15 +119,15 @@ void sub_080E0750(struct SceneActorRegistryResetView *actor)
     SceneActorChase_SetActorFlags(actor, 0x10);
     group->destination->pad = 0;
     if (!SceneActorChase_Arrive(actor)) {
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                      &actor->tracking.target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      &actor->base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
     SceneActorChase_SetBehavior(actor, 7);
-    actor->field2C2 = 16;
+    actor->base.field2C2 = 16;
     return;
 moving:
     SceneActorChase_SetActorFlags(actor, 0x2000);

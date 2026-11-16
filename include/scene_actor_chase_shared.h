@@ -19,7 +19,7 @@ s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPositio
 static inline void SceneActorChase_SetActorFlags(void *object, u32 bits)
 {
     struct SceneActorRegistryResetView *view = object;
-    view->flags2CC |= bits;
+    view->base.flags2CC |= bits;
 }
 
 #if SCENE_ACTOR_CHASE_TYPED_GROUP
@@ -69,7 +69,7 @@ static inline u8 SceneActorChase_TestField(u16 *field, u32 mask)
 static inline u16 SceneActorChase_ReadMotionFlags(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    return actor->flags2D4;
+    return actor->base.flags2D4;
 }
 
 static inline u16 SceneActorChase_MotionFlags(void *object, u32 mask)
@@ -87,22 +87,22 @@ static inline u32 SceneActorChase_Bits32(u32 *field, u32 mask)
 static inline void SceneActorChase_InstallControl(void *object, void *callback, u32 kind)
 {
     struct SceneActorRegistryResetView *actor = object;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
 }
 
 static inline void SceneActorChase_ResetMotionControl(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    actor->field2C8 = 0;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void SceneActorChase_SetControl(void *object, void *callback, u32 kind)
@@ -115,8 +115,8 @@ static inline void SceneActorChase_SetControl(void *object, void *callback, u32 
 static inline void SceneActorChase_ResetStateEntry(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline struct EngineMap *SceneActorChase_CurrentMap(void)
@@ -151,39 +151,39 @@ static inline void SceneActorChase_ClearBits(u16 *field, u32 bits)
 
 static inline u16 *SceneActorChase_MotionFlagsOf(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->flags2D4;
+    return &actor->base.flags2D4;
 }
 
 static inline struct ContactPosition *
 SceneActorChase_MotionOf(struct SceneActorRegistryResetView *actor)
 {
-    return &actor->body.motion;
+    return &actor->base.body.motion;
 }
 
 static inline void *SceneActorChase_CurrentControl(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    return actor->target;
+    return actor->base.target;
 }
 
 static inline u8 SceneActorChase_ControlKind(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2B5;
+    return actor->base.field2B5;
 }
 
 static inline u8 SceneActorChase_CurrentState(struct SceneActorRegistryResetView *actor)
 {
-    return actor->state2A8;
+    return actor->base.state2A8;
 }
 
 static inline u8 SceneActorChase_CurrentPhase(struct SceneActorRegistryResetView *actor)
 {
-    return actor->phase2A9;
+    return actor->base.phase2A9;
 }
 
 static inline u8 SceneActorChase_CurrentBehavior(struct SceneActorRegistryResetView *actor)
 {
-    return actor->behavior2AA;
+    return actor->base.behavior2AA;
 }
 
 #if SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL
@@ -195,11 +195,11 @@ static inline void SceneActorChase_SaveControl(void *p, void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
 #if SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL
-    packet->control = actor->target;
-    packet->kind = actor->field2B5;
-    packet->state = actor->state2A8;
-    packet->phase = actor->phase2A9;
-    packet->behavior = actor->behavior2AA;
+    packet->control = actor->base.target;
+    packet->kind = actor->base.field2B5;
+    packet->state = actor->base.state2A8;
+    packet->phase = actor->base.phase2A9;
+    packet->behavior = actor->base.behavior2AA;
 #else
     struct SceneActorChaseSavedControl *packet = p;
     packet->control = SceneActorChase_CurrentControl(actor);
@@ -301,7 +301,7 @@ static inline s32 SceneActorChase_PlayerSlot(struct SceneActorChaseTarget *targe
 static inline u16 SceneActorChase_QueryMotionFlags(struct SceneActorRegistryResetView *actor,
                                                    u16 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
 /* Query the separately owned halfword component; used by recovery and status
@@ -309,7 +309,7 @@ static inline u16 SceneActorChase_QueryMotionFlags(struct SceneActorRegistryRese
 static inline u16
 SceneActorChase_QueryMotionFlagComponent(struct SceneActorRegistryResetView *actor, u16 mask)
 {
-    return SceneActorChase_FlagComponentBits((struct SceneActorChaseFlags16 *)&actor->flags2D4,
+    return SceneActorChase_FlagComponentBits((struct SceneActorChaseFlags16 *)&actor->base.flags2D4,
                                              mask);
 }
 
@@ -317,13 +317,14 @@ static inline void SceneActorChase_ClearMotionFlags(struct SceneActorRegistryRes
                                                     u32 bits)
 {
     u32 mask = ~bits;
-    actor->flags2D4 &= mask;
+    actor->base.flags2D4 &= mask;
 }
 
 static inline void
 SceneActorChase_ClearMotionFlagComponent(struct SceneActorRegistryResetView *actor, u32 bits)
 {
-    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&actor->flags2D4, bits);
+    SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&actor->base.flags2D4,
+                                       bits);
 }
 
 static inline u8 SceneActorChase_TrackingFlags(struct SceneActorChaseTracking *tracking, u32 mask)
@@ -375,8 +376,8 @@ static inline void SceneActorChase_SetTypedControl(struct SceneActorRegistryRese
 /* Contact animation and target selection shared by the ground-monster reactions. */
 static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistryResetView *actor)
 {
-    if (!actor->group.hitReactionLatch && (actor->field2E6 & 8)) {
-        actor->field2B8 = 0x2D;
+    if (!actor->group.hitReactionLatch && (actor->base.field2E6 & 8)) {
+        actor->base.field2B8 = 0x2D;
         actor->group.hitReactionLatch = 0x41;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         return 1;
@@ -386,19 +387,19 @@ static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistry
 
 static inline void SceneActorChase_TrackPlayer(struct SceneActorRegistryResetView *actor)
 {
-    actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
 }
 
 static inline void SceneActorChase_ClearActorFlags(void *object, u32 bits)
 {
     struct SceneActorRegistryResetView *view = object;
-    view->flags2CC &= ~bits;
+    view->base.flags2CC &= ~bits;
 }
 
 static inline void SceneActorChase_SetReactionFlags(void *object, u32 bits)
 {
     struct SceneActorRegistryResetView *actor = object;
-    SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&actor->flags2D6, bits);
+    SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)&actor->base.flags2D6, bits);
 }
 
 /* Randomly select another stored route when the current route is chosen again. */
@@ -414,7 +415,7 @@ static inline u8 SceneActorChase_RouteCount(struct SceneActorChaseRouteSelection
 
 static inline void SceneActorChase_ChooseRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorChaseRouteSelection *route = actor->body.currentRoute;
+    struct SceneActorChaseRouteSelection *route = actor->base.body.currentRoute;
     u8 choice;
     {
         u32 index = (gRandomIndex + 1) & 1023;

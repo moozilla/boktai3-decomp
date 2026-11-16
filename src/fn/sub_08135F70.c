@@ -24,7 +24,7 @@ static inline u8 Test(u32 value, u32 mask)
 }
 static inline u8 HasPendingHit(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2E6 == 0)
+    if (actor->base.field2E6 == 0)
         return 0;
     return 1;
 }
@@ -41,7 +41,7 @@ static inline u16 OwnershipFlagBits(u32 value, u32 mask)
 static inline u8 ShouldShowDamage(struct SceneActorRegistryResetView *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->field2E0;
+        u32 *owner = &actor->base.field2E0;
         u32 mask = *owner;
         if (!OwnershipFlagBits(mask, 0x20) && mask) {
             switch (LocalPlayer()) {
@@ -76,10 +76,10 @@ static inline u8 IsDown(struct SceneActorRegistryResetView *actor, u16 flags)
         }
         {
             u32 mask = 0x20000;
-            if (actor->flags2D0 & mask)
+            if (actor->base.flags2D0 & mask)
                 return 1;
         }
-        if (actor->health <= 0)
+        if (actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -96,7 +96,7 @@ static inline u8 IsDownAtHealth(struct SceneActorRegistryResetView *actor, u16 f
         }
         {
             u32 mask = 0x20000;
-            if (actor->flags2D0 & mask)
+            if (actor->base.flags2D0 & mask)
                 return 1;
         }
         if (*health <= 0)
@@ -114,9 +114,9 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
         if (down) {
             u32 zero = 0;
             *flags2D4 = 0x40;
-            actor->field2E6 = zero;
+            actor->base.field2E6 = zero;
             {
-                u16 *flags2D6 = &actor->flags2D6;
+                u16 *flags2D6 = &actor->base.flags2D6;
                 s32 mask = ~0x980;
                 *flags2D6 &= mask;
             }
@@ -148,7 +148,7 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
                 *flags2CC &= mask;
             }
             {
-                struct SceneActorReactionMotion *motion = (void *)&actor->tracking.target;
+                struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
                 s32 mask = ~0x10;
                 motion->flags &= mask;
             }
@@ -160,15 +160,15 @@ static inline void UpdateHitFlagsShared(struct SceneActorRegistryResetView *acto
                 }
             }
             {
-                u32 *flags2D0 = &actor->flags2D0;
+                u32 *flags2D0 = &actor->base.flags2D0;
                 u32 mask = 0xFFEFFFFB;
                 *flags2D0 &= mask;
             }
             {
                 u32 bit = 0x400;
-                actor->flags2D6 |= bit;
+                actor->base.flags2D6 |= bit;
             }
-            actor->field2E6 = down;
+            actor->base.field2E6 = down;
             {
                 u32 bit = 0x2000;
                 *flags2CC |= bit;
@@ -202,14 +202,14 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     u32 strong;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
-            u16 *borrowed = &actor->flags2D4;
+            u16 *borrowed = &actor->base.flags2D4;
             u32 flags = *borrowed;
             flags2D4 = borrowed;
             // The clear is written in both places it applies. jump2 cross-jumps the
             // two copies into one, but reload has already loaded the 0x2CC offset for
             // each, which advances its spill rotation before IsDown.
             if (!flags) {
-                u32 *flags2CC = &actor->flags2CC;
+                u32 *flags2CC = &actor->base.flags2CC;
                 u32 mask = ~0x2000;
                 *flags2CC &= mask;
             } else {
@@ -217,9 +217,9 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                 if (down) {
                     u32 zero = 0;
                     *flags2D4 = 0x40;
-                    actor->field2E6 = zero;
+                    actor->base.field2E6 = zero;
                     {
-                        u16 *flags2D6 = &actor->flags2D6;
+                        u16 *flags2D6 = &actor->base.flags2D6;
                         s32 mask = ~0x980;
                         *flags2D6 &= mask;
                     }
@@ -242,14 +242,14 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                             value = mask.field.bits & flags;
                             *flags2D4 = value;
                         }
-                        flags2CC = &actor->flags2CC;
+                        flags2CC = &actor->base.flags2CC;
                         {
                             u32 mask = ~0x4000;
                             *flags2CC &= mask;
                         }
                         {
                             struct SceneActorReactionMotion *motion =
-                                (void *)&actor->tracking.target;
+                                (void *)&actor->base.tracking.target;
                             s32 mask = ~0x10;
                             motion->flags &= mask;
                         }
@@ -261,21 +261,21 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                             }
                         }
                         {
-                            u32 *flags2D0 = &actor->flags2D0;
+                            u32 *flags2D0 = &actor->base.flags2D0;
                             u32 mask = 0xFFEFFFFB;
                             *flags2D0 &= mask;
                         }
                         {
                             u32 bit = 0x400;
-                            actor->flags2D6 |= bit;
+                            actor->base.flags2D6 |= bit;
                         }
-                        actor->field2E6 = down;
+                        actor->base.field2E6 = down;
                         {
                             u32 bit = 0x2000;
                             *flags2CC |= bit;
                         }
                     } else {
-                        u32 *flags2CC = &actor->flags2CC;
+                        u32 *flags2CC = &actor->base.flags2CC;
                         u32 mask = ~0x2000;
                         *flags2CC &= mask;
                     }
@@ -289,11 +289,11 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     if (SceneActorBehavior_DispatchFlaggedCategory(actor))
         return 1;
     SceneActor_ClearReactionFlags(actor);
-    SceneActorMovement_ProjectProbe(actor, actor->colliderA.responseParameter,
-                                    actor->colliderA.responseParameter);
+    SceneActorMovement_ProjectProbe(actor, actor->base.colliderA.responseParameter,
+                                    actor->base.colliderA.responseParameter);
     {
-        u32 d = actor->reactionSoundVariant;
-        s16 *health = &actor->health;
+        u32 d = actor->base.reactionSoundVariant;
+        s16 *health = &actor->base.health;
         *health -= d;
         healthOwner.field = health;
     }
@@ -308,7 +308,7 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
         updated = marked;
 
         {
-            u32 responseFlags = actor->field2E6 & 4u;
+            u32 responseFlags = actor->base.field2E6 & 4u;
             mode = 1;
             flags2D4 = motion;
             savedHealth = healthOwner.field;
@@ -317,9 +317,9 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
         }
     }
     {
-        u32 *damageFlags = &actor->field2D8;
+        u32 *damageFlags = &actor->base.field2D8;
         u32 blocked = *damageFlags & 0x20000;
-        flags2CC = &actor->flags2CC;
+        flags2CC = &actor->base.flags2CC;
         flags2D8 = damageFlags;
         if (blocked)
             goto done;
@@ -327,32 +327,32 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
     {
         if ((mode & 4) && (!(updated & 4))) {
             SceneActorBehavior_PlayReactionSound(actor);
-            *(u16 *)&actor->field30C = 12;
+            *(u16 *)&actor->base.field30C = 12;
         }
-        flags2CC = &actor->flags2CC;
+        flags2CC = &actor->base.flags2CC;
         if (mode) {
             {
-                u16 bank = actor->paletteAlternateBank;
-                if (actor->drawableKind == 0)
-                    AnimData_SelectPaletteBank(((u8 *)actor->drawable) + 0x2C, bank);
+                u16 bank = actor->base.paletteAlternateBank;
+                if (actor->base.drawableKind == 0)
+                    AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
                 else
-                    ((struct SceneActorPaletteTileView *)actor->drawable)->palette =
+                    ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
                         (const u16 *)(gPaletteBankData + bank * 32);
             }
             {
                 u32 eight = 8;
-                actor->field1E8 = eight;
+                actor->base.field1E8 = eight;
             }
             strong = mode & 4;
-            flags2CC = &actor->flags2CC;
-            if (strong && (actor->category == 0x19)) {
+            flags2CC = &actor->base.flags2CC;
+            if (strong && (actor->base.category == 0x19)) {
                 {
                     u32 bit = 0x2000000;
                     *flags2CC |= bit;
                 }
                 {
                     u32 v = 0x41;
-                    actor->field1EA = v;
+                    actor->base.field1EA = v;
                 }
             }
             {
@@ -371,18 +371,19 @@ u8 SceneActorReaction_ResolveDamage(struct SceneActorRegistryResetView *actor)
                     u32 zero;
                     u32 buffer[2];
                     s32 h = *savedHealth;
-                    s32 maxh = (u16)actor->defaultHealth;
-                    s32 kind = (s16)actor->fieldB2;
-                    s32 param = (s16)actor->field9A;
-                    u32 id = actor->body.id;
+                    s32 maxh = (u16)actor->base.defaultHealth;
+                    s32 kind = (s16)actor->base.fieldB2;
+                    s32 param = (s16)actor->base.field9A;
+                    u32 id = actor->base.body.id;
                     s32 priority;
                     decision.part.value = 1;
                     priority = decision.part.value;
                     SceneHud_SetTimedState(id, h, maxh, kind, mode >> 2, param);
                     Fill(&zero, buffer);
-                    if (actor->reactionSoundVariant || (!((*flags2D8) & 0x20000)))
-                        DamageNumberDisplay_Show(&actor->colliderA, actor->reactionSoundVariant, 0,
-                                                 &actor->body.position, buffer, priority);
+                    if (actor->base.reactionSoundVariant || (!((*flags2D8) & 0x20000)))
+                        DamageNumberDisplay_Show(&actor->base.colliderA,
+                                                 actor->base.reactionSoundVariant, 0,
+                                                 &actor->base.body.position, buffer, priority);
                 }
             }
         }

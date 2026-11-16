@@ -54,12 +54,12 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         }
     }
     {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         u32 mask = ~0x200;
         mask &= *flags;
         *flags = mask;
@@ -69,14 +69,14 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
 static inline void Dog_CaptureRoutePosition(struct ContactPosition **out,
                                             struct SceneActorRegistryResetView *actor)
 {
-    *out = &actor->body.position;
+    *out = &actor->base.body.position;
 }
 
 /* Scan candidate cells, preserve the interruption map owner, then start the route. */
 static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 priorDirection,
                                 s32 steps)
 {
-    struct DogRetreatContext *context = actor->context;
+    struct DogRetreatContext *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition center;
     struct ContactPosition *routePosition;
@@ -89,13 +89,13 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
             s32 next, i;
             struct ContactPosition *position;
             struct EngineMap **terrain, **completion;
-            cell = actor->terrainCell;
-            position = &actor->body.position;
+            cell = actor->base.terrainCell;
+            position = &actor->base.body.position;
             Dog_CaptureRoutePosition(&routePosition, actor);
             terrain = &gTerrainMap;
             height = SceneActorChase_HeightAt(cell, position);
             shape = CellShape(terrain, cell);
-            switch (FacingQuarter(actor->body.direction + 32) & 3) {
+            switch (FacingQuarter(actor->base.body.direction + 32) & 3) {
                 case 0:
                     next = cell + 1;
                     i = 0;
@@ -149,18 +149,18 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                     chosen = next + MapWidth(terrain);
                     goto scanDone;
                 default:
-                    chosen = actor->terrainCell;
+                    chosen = actor->base.terrainCell;
                     goto scanDone;
             }
 
         scanDone:;
         }
-        if (chosen != actor->terrainCell)
+        if (chosen != actor->base.terrainCell)
             goto selected;
         if (TurnClockwise(context))
-            actor->body.direction += 64;
+            actor->base.body.direction += 64;
         else
-            actor->body.direction -= 64;
+            actor->base.body.direction -= 64;
         tries++;
     } while (tries <= 3);
 selected: {
@@ -173,7 +173,7 @@ selected: {
     else
         SetTurnClockwise(context, 0);
 }
-    actor->body.direction = priorDirection;
+    actor->base.body.direction = priorDirection;
     SceneActorChase_CellCenter(chosen, &center);
     {
         if (TryRoute(actor, GroupRoute(group), routePosition, &center)) {

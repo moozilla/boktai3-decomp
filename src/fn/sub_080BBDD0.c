@@ -24,7 +24,7 @@ static inline void Skeleton_BeginRecoveryTurn(void *obj, u32 saved, const u16 *r
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -41,7 +41,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = &actor->group;
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -62,7 +62,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
-    if (cell != actor->terrainCell &&
+    if (cell != actor->base.terrainCell &&
         !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
                                 0x20000))
         goto reroute;
@@ -76,7 +76,7 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Skeleton_SnapRecoveryRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -84,15 +84,15 @@ static inline u8 Skeleton_ArriveAfterRecovery(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         Skeleton_BeginRecoveryTurn(obj, saved, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 reroute: {
     SceneActorChase_CellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto success;
 }
     callback = &group->fallback;
@@ -119,10 +119,12 @@ static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
-    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
+                                         &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.z, &actor->base.reactionEnd.z,
+                                         &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
@@ -131,8 +133,8 @@ static inline u8 Skeleton_Drift(struct SceneActorRegistryResetView *actor)
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     return Skeleton_DisplacementStopped(dx, dz);
@@ -144,7 +146,7 @@ static inline void Skeleton_Settle(struct SceneActorRegistryResetView *actor,
 {
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -154,8 +156,8 @@ static inline void Skeleton_Settle(struct SceneActorRegistryResetView *actor,
                                          4);
         SceneActorChase_TrackPlayer(actor);
         if (!Skeleton_ArriveAfterRecovery(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -168,15 +170,15 @@ static inline void Skeleton_Settle(struct SceneActorRegistryResetView *actor,
         group->destination->pad = 0;
         if (!Skeleton_ArriveAfterRecovery(actor)) {
             context->timer = 0;
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetState(actor, 0, 0, 7);
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
     }
 }
 
@@ -184,8 +186,8 @@ void Skeleton_ConvergeDisplacedPosition(struct SceneActorRegistryResetView *acto
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (Skeleton_Drift(actor)) {
-        struct SkeletonRecoveryContext *context = actor->context;
-        actor->field2B0 = 1;
+        struct SkeletonRecoveryContext *context = actor->base.context;
+        actor->base.field2B0 = 1;
         Skeleton_Settle(actor, group, context);
     }
 }

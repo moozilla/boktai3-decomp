@@ -25,12 +25,12 @@ static inline s32 Scale16(s32 n)
 
 void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
 {
-    u8 *body = actor->context;
+    u8 *body = actor->base.context;
     struct Unk080C79A8Motion *motion = (struct Unk080C79A8Motion *)((u8 *)actor + 0x50);
     s32 dx, dz;
     s16 *speed;
 
-    if (TakeFlag(&actor->field2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         u8 *direction = &((struct SceneActorAnimationView *)actor)->direction;
         u8 saved = *direction;
         u8 directionVariant, mirror;
@@ -127,11 +127,11 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
     }
     {
         u32 mask = 0x100;
-        actor->flags2D4 |= mask;
+        actor->base.flags2D4 |= mask;
     }
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
     dx = Scale16(gUnk_086149C4[(body[0x691] + 0x40) & 0xFF] * *(s16 *)(body + 0x682));
     dz = Scale16(gUnk_086149C4[body[0x691]] * *(s16 *)(body + 0x682));
@@ -145,7 +145,7 @@ void SceneActorReaction_SlideBack(struct SceneActorRegistryResetView *actor)
         s16 zero = 0;
         *speed = zero;
         if (++body[0x68F] > 11) {
-            actor->field2B0 = 1;
+            actor->base.field2B0 = 1;
             *speed = zero;
         }
     } else {

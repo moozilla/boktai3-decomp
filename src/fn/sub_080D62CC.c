@@ -28,8 +28,8 @@ static inline s32 Abs(s32 value)
 }
 void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
 {
-    u8 *body = actor->context;
-    struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->body.position;
+    u8 *body = actor->base.context;
+    struct ContactPackedVector source = *(struct ContactPackedVector *)&actor->base.body.position;
     struct ContactPosition delta;
     struct ContactPosition *velocity;
     s32 divisor, facing, difference;
@@ -39,7 +39,7 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     s32 direction;
     s32 strength;
     source.y += 200;
-    heightDifference = source.y - actor->tracking.target->position.y;
+    heightDifference = source.y - actor->base.tracking.target->position.y;
     if (heightDifference <= 255)
         divisor = 15;
     else if (heightDifference <= 511)
@@ -50,7 +50,7 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         divisor = 27;
     else
         divisor = 34;
-    Subtract(&delta, &actor->body.position, &actor->tracking.target->position);
+    Subtract(&delta, &actor->base.body.position, &actor->base.tracking.target->position);
     {
         s32 x = delta.x, z;
         s32 ax = Abs(x), az;
@@ -66,7 +66,7 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         speed = 10;
     if (speed > *(u16 *)(body + 0x6cc))
         speed = *(u16 *)(body + 0x6cc);
-    switch (actor->paletteOffset) {
+    switch (actor->base.paletteOffset) {
         case 0:
             count = 1;
             break;
@@ -77,8 +77,8 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
             count = 3;
             break;
     }
-    facing = ((actor->body.direction + 32) & 255) >> 6 << 6;
-    difference = actor->tracking.heading - facing;
+    facing = ((actor->base.body.direction + 32) & 255) >> 6 << 6;
+    difference = actor->base.tracking.heading - facing;
     if (difference > 128)
         difference -= 256;
     else if (difference < -128)
@@ -87,7 +87,7 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
     if (Abs(direction) > 28)
         direction = facing;
     else
-        direction = actor->tracking.heading;
+        direction = actor->base.tracking.heading;
     i = count;
     strength = *(u16 *)(body + 0x6ce);
     for (; i != 0; i--) {
@@ -96,10 +96,11 @@ void Mummy_FireAcceleratingVolley(struct SceneActorRegistryResetView *actor)
         velocity->y = 0;
         velocity->z = Scale(gUnk_086149C4[direction & 255] * speed);
         {
-            u32 shot = actor->attacks.first[2];
-            u32 category = actor->attacks.second[2];
-            void *target = &actor->tracking.target->position;
-            BouncingObject_Spawn(&source, &delta, target, shot, category, strength, actor->body.id);
+            u32 shot = actor->base.attacks.first[2];
+            u32 category = actor->base.attacks.second[2];
+            void *target = &actor->base.tracking.target->position;
+            BouncingObject_Spawn(&source, &delta, target, shot, category, strength,
+                                 actor->base.body.id);
         }
         strength = Div(strength << 3, 10);
         speed += Div(speed << 2, 10);

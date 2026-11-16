@@ -9,7 +9,7 @@ struct VornPatrolRoute {
 };
 static inline u32 Vorn_TestRestoreFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    return a->flags2CC & mask;
+    return a->base.flags2CC & mask;
 }
 static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u32 mask,
                                           struct SceneActorReactionMotion **saved)
@@ -22,27 +22,27 @@ static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u3
 }
 static inline void Vorn_SetRestoreFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    a->flags2CC |= mask;
+    a->base.flags2CC |= mask;
 }
 
 s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)(&actor->group.common);
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     struct SceneActorReactionMotion *savedMotion;
     struct ContactPosition *destination;
     if (((!Vorn_TestRestoreFlags(actor, 0x400000)) || (!Vorn_TestRestoreFlags(actor, 0x200000))) ||
-        (!Vorn_GetRestorableMotion((void *)(&actor->tracking.target), 1, &savedMotion)))
+        (!Vorn_GetRestorableMotion((void *)(&actor->base.tracking.target), 1, &savedMotion)))
         return 0;
     Vorn_SetRestoreFlags(actor, 0x100);
-    actor->field2C2 = 64;
+    actor->base.field2C2 = 64;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     Chase_SetState(actor, 3, 1, 0);
     Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     Vorn_SetRestoreFlags(actor, 16);
     {
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-        void *payload = actor->savedTarget;
+        void *payload = actor->base.savedTarget;
         u32 kind = 9;
         command->duration = 30;
         command->payload = payload;
@@ -58,10 +58,10 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     }
     destination->y = Chase_Height(destination);
     (*((struct ContactPosition **)(group + 0x200)))->pad = 1;
-    actor->field2C2 = 64;
+    actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
-    Chase_ClearBits(&actor->flags2D4, 0x380);
+    Chase_ClearBits(&actor->base.flags2D4, 0x380);
     {
         struct SceneActorReactionMotion *m = savedMotion;
         s32 mask = ~0x18;
@@ -70,20 +70,20 @@ s32 Vorn_TryRestorePatrolRoute(struct SceneActorRegistryResetView *actor)
     {
         struct SceneActorRegistryControl *control = &actor->group.common.control;
         u32 restoreBits = Vorn_TestRestoreFlags(actor, 0x200000);
-        u32 *flags = &actor->flags2D0;
+        u32 *flags = &actor->base.flags2D0;
         if (restoreBits) {
             {
                 u32 k2 = 0x1000000;
                 *flags &= ~k2;
             }
-            Chase_ClearBits(&actor->flags2D4, 0x200);
+            Chase_ClearBits(&actor->base.flags2D4, 0x200);
             control->mode = 0;
             control->counter = 0;
             control->timer = 0;
         }
-        Chase_ClearBits(&actor->flags2D4, 0x400);
+        Chase_ClearBits(&actor->base.flags2D4, 0x400);
         actor->group.turn.turnsRemaining = 0xFF;
-        Chase_ClearBits(&actor->flags2D4, 0x1000);
+        Chase_ClearBits(&actor->base.flags2D4, 0x1000);
         *((u16 *)(context + 0x6D4)) = 0;
         *((u16 *)(context + 0x69E)) = 0;
         *((u16 *)(context + 0x6AC)) = 0;

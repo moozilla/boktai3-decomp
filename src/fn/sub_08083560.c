@@ -11,7 +11,7 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
-    struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
     u32 height;
     state->field3DB = 0;
     state->field3E0 = 0;
@@ -21,17 +21,18 @@ void SceneActorControl_RestoreMotion(struct SceneActorRegistryResetView *input)
     state->elapsed = 0;
     state->startTick = 0;
     state->flags3D4 = 0;
-    actor->body.position = state->storedPosition;
-    actor->terrainCell = SceneActorTerrain_GetCellIndex(&state->storedPosition);
-    height = SceneActorTerrain_GetHeight(actor->terrainCell, &state->storedPosition);
-    actor->groundHeight2BE = height;
-    actor->field2EA = actor->body.position.y - height;
-    actor->body.position.y = actor->groundHeight2BE;
-    if (actor->drawableKind == 0)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->position =
-            actor->body.position;
+    actor->base.body.position = state->storedPosition;
+    actor->base.terrainCell = SceneActorTerrain_GetCellIndex(&state->storedPosition);
+    height = SceneActorTerrain_GetHeight(actor->base.terrainCell, &state->storedPosition);
+    actor->base.groundHeight2BE = height;
+    actor->base.field2EA = actor->base.body.position.y - height;
+    actor->base.body.position.y = actor->base.groundHeight2BE;
+    if (actor->base.drawableKind == 0)
+        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        ((struct SceneActorRegistryTileDrawable *)actor->drawable)->position = actor->body.position;
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
+            actor->base.body.position;
     ZeroFill8(&state->vectors[0]);
     ZeroFill8(&state->vectors[1]);
     ZeroFill8(&state->vectors[2]);

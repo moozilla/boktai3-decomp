@@ -145,8 +145,8 @@ struct SlimeCollisionVector {
 
 static inline u8 Slime_TakePrepared(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B2) {
-        actor->field2B2 = 0;
+    if (actor->base.field2B2) {
+        actor->base.field2B2 = 0;
         return 1;
     }
     return 0;

@@ -22,24 +22,24 @@ static inline u8 TakeFlag(u8 *flag)
 static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                             u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Golem_UpdateHoldTimer(struct SceneActorRegistryResetView *actor)
 {
-    struct Golem080CEAC4Context *context = actor->context;
+    struct Golem080CEAC4Context *context = actor->base.context;
     struct Golem080CEAC4Body *body = (struct Golem080CEAC4Body *)((u8 *)actor + 0x50);
-    TakeFlag(&actor->field2B1);
+    TakeFlag(&actor->base.field2B1);
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    body->direction = actor->tracking.heading;
-    if ((s32)actor->counter2AC > 0x77) {
+    body->direction = actor->base.tracking.heading;
+    if ((s32)actor->base.counter2AC > 0x77) {
         SetPhase(actor, 0, 2, 5);
         context->field688 = 0;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

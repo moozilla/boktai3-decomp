@@ -11,8 +11,8 @@ s32 Axe_OnUpdate(struct SceneActorRegistryResetView *p)
     u32 *tbl;
 
     Axe_PrepareUpdate(p);
-    idx = p->state2A8;
-    tbl = (u32 *)p->callbacks27C;
+    idx = p->base.state2A8;
+    tbl = (u32 *)p->base.callbacks27C;
     Callback_InvokeActor(p, tbl[idx]);
     SceneActorControl_DispatchControl(p);
     Axe_UpdateEffects(p);

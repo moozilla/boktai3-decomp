@@ -75,14 +75,15 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
     u8 *cursor;
     void *nav;
     t = *((struct ChaseTarget **)(((u8 *)actor) + 0xDC));
-    angle = Math_Atan2(t->position.x - actor->body.position.x, t->position.z - actor->body.position.z);
+    angle = Math_Atan2(t->position.x - actor->base.body.position.x,
+                       t->position.z - actor->base.body.position.z);
     dir.x = (gUnk_086149C4[(angle + 64) & 255] * 10) >> 12;
     dir.z = (gUnk_086149C4[angle] * 10) >> 12;
     entry = (u16 *)Path_GetPointData(route->data);
     found = 0;
     for (i = 0; i < (*route->data); i++) {
-        delta.x = entry[0] - actor->body.position.x;
-        delta.z = entry[1] - actor->body.position.z;
+        delta.x = entry[0] - actor->base.body.position.x;
+        delta.z = entry[1] - actor->base.body.position.z;
         if (Dot(&dir, &delta) < 0) {
             u32 w = *((u32 *)entry);
             if (w == (*(*((u32 **)(group + 0x7C)))))
@@ -105,7 +106,7 @@ void sub_08137E28(struct SceneActorRegistryResetView *actor)
     }
     Chase_SnapToRoute_(*((struct ContactPosition **)(group + 0x200)), cursor);
     nav = *((void **)(group + 0x1FC));
-    if (!Chase_TryRoute(actor, nav, &actor->body.position,
+    if (!Chase_TryRoute(actor, nav, &actor->base.body.position,
                         *((struct ContactPosition **)(group + 0x200)))) {
         Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
         Chase_SetState(actor, 3, 0, 0);

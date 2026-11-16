@@ -20,7 +20,7 @@ static inline u8 IsUnavailable(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     if (actor) {
-        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->health <= 0)
+        if (ReadFlags16(actor, 0x40) || ReadFlags32(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -38,7 +38,7 @@ void sub_080B5AA4(struct SceneActorRegistryResetView *input, const u16 *inputReq
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         if (!(*flags & mask))
             return;
     }

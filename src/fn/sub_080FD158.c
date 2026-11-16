@@ -13,8 +13,8 @@ void Axe_EmitMotionTrail(struct SceneActorRegistryResetView *);
 void SpriteGroup_SetSharedPosition(struct SceneActorRegistryResetView *, void *, u32);
 static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -22,37 +22,37 @@ static inline u8 TakePending(struct SceneActorRegistryResetView *actor)
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
 {
     u32 zero;
-    actor->field2B2 = 1;
+    actor->base.field2B2 = 1;
     zero = 0;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 static inline void SetPhase(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                             u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 void Axe_UpdateFadeOutPhase(struct SceneActorRegistryResetView *actor)
 {
-    struct ActorGroupMotionState *group = actor->context;
+    struct ActorGroupMotionState *group = actor->base.context;
     if (TakePending(actor)) {
         BeginControl(actor, Axe_UpdateFadeOut, 0x22);
         {
             u32 flag = 0x100;
-            flag |= actor->flags2D4;
-            actor->flags2D4 = flag;
+            flag |= actor->base.flags2D4;
+            actor->base.flags2D4 = flag;
         }
         SpriteGroup_SetSharedPosition(actor, &group->position, 0x13C);
         {
@@ -61,10 +61,10 @@ void Axe_UpdateFadeOutPhase(struct SceneActorRegistryResetView *actor)
         }
     }
     Axe_EmitMotionTrail(actor);
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         BeginControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
         SetPhase(actor, 0, 2, 1);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

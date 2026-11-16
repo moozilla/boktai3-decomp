@@ -22,14 +22,14 @@ extern void *gSceneActorCallbacks29C[];
 extern void *gSceneActorCallbacks2A0[];
 void SceneActorBehavior_InstallCallbackTables(struct SceneActorRegistryResetView *actor)
 {
-    actor->callbacks27C = gSceneActorCallbacks27C;
-    actor->callbacks280 = gSceneActorCallbacks280;
-    actor->callbacks284 = gSceneActorCallbacks284;
-    actor->alternateBehaviorCallbacks = gSceneActorCallbacks288;
-    actor->behaviorCallbacks = gSceneActorCallbacks28C;
-    actor->callbacks290 = gSceneActorCallbacks290;
-    actor->callbacks294 = gSceneActorCallbacks294;
-    actor->phaseCallbacks = gSceneActorCallbacks298;
-    actor->callbacks29C = gSceneActorCallbacks29C;
-    actor->callbacks2A0 = gSceneActorCallbacks2A0;
+    actor->base.callbacks27C = gSceneActorCallbacks27C;
+    actor->base.callbacks280 = gSceneActorCallbacks280;
+    actor->base.callbacks284 = gSceneActorCallbacks284;
+    actor->base.alternateBehaviorCallbacks = gSceneActorCallbacks288;
+    actor->base.behaviorCallbacks = gSceneActorCallbacks28C;
+    actor->base.callbacks290 = gSceneActorCallbacks290;
+    actor->base.callbacks294 = gSceneActorCallbacks294;
+    actor->base.phaseCallbacks = gSceneActorCallbacks298;
+    actor->base.callbacks29C = gSceneActorCallbacks29C;
+    actor->base.callbacks2A0 = gSceneActorCallbacks2A0;
 }

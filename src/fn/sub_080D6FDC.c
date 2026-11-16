@@ -9,32 +9,32 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor)
 {
     void *callback = SceneActorControl_OnIdle;
     u8 kind = 0;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                 u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 // confidence=low: scans to the last open cell in the current facing and starts a route.
 u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *actor)
 {
-    u8 *state = actor->context;
+    u8 *state = actor->base.context;
     u8 *nav = (u8 *)actor + 0x3D4;
     s32 dest;
     s32 dir;
@@ -43,13 +43,14 @@ u8 Mummy_RequestStraightRoute(struct SceneActorRegistryResetView *actor)
 
     if (FIELD(state, 0x6D2, u16))
         return 0;
-    dir = ((actor->body.direction + 0x20) >> 6) & 3;
+    dir = ((actor->base.body.direction + 0x20) >> 6) & 3;
     dest = SceneActorTerrain_LastOpenCell(actor, dir);
-    if (dest == actor->terrainCell)
+    if (dest == actor->base.terrainCell)
         return 0;
     SceneActorTerrain_GetCenter(dest, &pos);
-    pos.y = actor->body.position.y;
-    result = SceneActorTerrain_RequestPath(actor, FIELD(nav, 0x1FC, void *), &actor->body.position, &pos);
+    pos.y = actor->base.body.position.y;
+    result = SceneActorTerrain_RequestPath(actor, FIELD(nav, 0x1FC, void *),
+                                           &actor->base.body.position, &pos);
     if (!result) {
         SetControl(actor);
         SetAnimation(actor, 3, 0, 0);

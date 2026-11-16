@@ -5,12 +5,12 @@ void SceneActorReaction_ApplyCategoryDamage(struct SceneActorRegistryResetView *
 void SceneActorReaction_EndHitCheckDefeat(struct SceneActorRegistryResetView *);
 static inline u32 TestFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2CC & mask;
+    return actor->base.flags2CC & mask;
 }
 u32 SceneActorBehavior_DispatchFlaggedCategory(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->enabled == 1 && !TestFlags(actor, 2) && (actor->field2D8 & 0x100000)) {
-        switch ((s32)actor->category) {
+    if (actor->base.enabled == 1 && !TestFlags(actor, 2) && (actor->base.field2D8 & 0x100000)) {
+        switch ((s32)actor->base.category) {
             case 11:
             case 12:
             case 13:

@@ -29,30 +29,30 @@ static inline void Dog_SetContextFlags(struct DogAttackContext *context, u32 mas
 
 void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
 {
-    struct DogAttackContext *context = a->context;
+    struct DogAttackContext *context = a->base.context;
     if (Chase_TakeArrived(a)) {
         And32(&context->flags, ~8);
-        SceneActorReaction_EnableMotionFlags(0x100, &a->flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &a->base.flags2D4);
         {
             void *callback = SceneActorAnimation_EmitDirectionalTrail;
             u32 kind = 37;
-            a->field2B2 = 1;
-            a->field2B0 = 0;
-            a->field2B5 = kind;
-            a->target = callback;
-            a->field2C8 = 0;
+            a->base.field2B2 = 1;
+            a->base.field2B0 = 0;
+            a->base.field2B5 = kind;
+            a->base.target = callback;
+            a->base.field2C8 = 0;
             {
-                u32 *flags = &a->flags114;
+                u32 *flags = &a->base.flags114;
                 s32 mask = -2;
                 *flags &= mask;
             }
-            a->word104 = 0;
+            a->base.word104 = 0;
         }
-        Dog_SetContextFlags(a->context, 2);
+        Dog_SetContextFlags(a->base.context, 2);
         {
             void *collider = context->collider;
-            u32 damage = a->attacks.first[2];
-            u32 response = a->attacks.second[2];
+            u32 damage = a->base.attacks.first[2];
+            u32 response = a->base.attacks.second[2];
             u8 *p = (u8 *)a + 0xD4;
             u32 power = *(u32 *)p;
             u32 extra;
@@ -62,14 +62,14 @@ void Dog_UpdateTrailAttack(struct SceneActorRegistryResetView *a)
         }
         context->emitted = 0;
     }
-    if (a->field2B0) {
+    if (a->base.field2B0) {
         context->timer69A = context->timer69E;
         {
-            u16 *flags = &a->flags2D4;
+            u16 *flags = &a->base.flags2D4;
             u32 mask = ~0x100;
             *flags = mask & *flags;
         }
         Dog_SelectRetreatOrChase(a);
     } else
-        a->counter2AC++;
+        a->base.counter2AC++;
 }

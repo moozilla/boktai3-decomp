@@ -29,13 +29,13 @@ static inline u8 TestSegment(struct TrailSegment *segment, u32 mask)
 }
 static inline u32 WordFlag(struct SceneActorRegistryResetView *p, u32 mask)
 {
-    return mask & p->flags2D0;
+    return mask & p->base.flags2D0;
 }
 static inline u8 IsInactive(struct SceneActorRegistryResetView *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if ((actor->flags2D4 & mask) || WordFlag(actor, 0x20000) || actor->health <= 0)
+        if ((actor->base.flags2D4 & mask) || WordFlag(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -79,7 +79,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
     if (IsInactive(actor))
         return;
     do {
-        trail = actor->context;
+        trail = actor->base.context;
     } while (0);
     if (WordFlag(actor, 0x100000))
         return;
@@ -97,7 +97,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
                     s32 delta = height - y;
                     if (!NearHeight(delta, delta, 255))
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
-                                  positionY)) = actor->body.position.y;
+                                  positionY)) = actor->base.body.position.y;
                     else
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) = height;
@@ -105,7 +105,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct SceneActorRegistryResetView *ac
                     s32 delta = rawHeight - y;
                     if (Abs(delta) > 256)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
-                                  positionY)) = actor->body.position.y;
+                                  positionY)) = actor->base.body.position.y;
                     else
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) += Div(delta, 10);

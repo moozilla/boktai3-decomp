@@ -4,7 +4,7 @@ struct SceneActorTerrainCollisionView;
 void SceneActorTerrain_DisableCollision(struct SceneActorTerrainCollisionView *);
 static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
 {
-    u8 *flag = &actor->field2B1;
+    u8 *flag = &actor->base.field2B1;
     if (*flag) {
         *flag = 0;
         return 1;
@@ -13,7 +13,7 @@ static inline u8 TakeReset(struct SceneActorRegistryResetView *actor)
 }
 static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 state)
 {
-    u8 *field = &actor->state2A8;
+    u8 *field = &actor->base.state2A8;
     u32 zero = 0;
     u32 offset;
     *field = state;
@@ -23,20 +23,20 @@ static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 sta
     *((u8 *)actor + offset) = zero;
     offset += 2;
     *(u32 *)((u8 *)actor + offset) = zero;
-    actor->field2B1 = 1;
+    actor->base.field2B1 = 1;
 }
 void SceneActorReaction_BeginHiddenCollisionless(struct SceneActorRegistryResetView *actor)
 {
     if (TakeReset(actor)) {
         u32 mask = 1;
-        if (!actor->drawableKind)
-            *(u32 *)actor->drawable |= mask;
+        if (!actor->base.drawableKind)
+            *(u32 *)actor->base.drawable |= mask;
         else {
-            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             tile->flags |= mask;
         }
         ResetState(actor, 3);
         SceneActorTerrain_DisableCollision((void *)actor);
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

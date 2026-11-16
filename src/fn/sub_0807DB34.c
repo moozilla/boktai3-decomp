@@ -13,7 +13,7 @@ void SceneActorRecovery_ResumePursuit(struct SceneActorRegistryResetView *object
     struct SceneActorChaseGroup *group = &actor->group;
 
     ActorStatus_ReleaseContact(actor);
-    actor->field2C2 = 64;
+    actor->base.field2C2 = 64;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SceneActorChase_SetState(actor, 3, 1, 0);
@@ -24,12 +24,12 @@ void SceneActorRecovery_ResumePursuit(struct SceneActorRegistryResetView *object
         }
     } else {
         group->destination->pad = 1;
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 60);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
         {
             struct SceneActorRegistryControl *control = &group->common.control;
             if (ActorStatus_BehaviorFlags(actor, 0x200000))

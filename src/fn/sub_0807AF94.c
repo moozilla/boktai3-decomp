@@ -43,7 +43,7 @@ static inline void RecoveryRoute_BeginTurn(void *obj, u32 saved, const u16 *rand
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
-        group->turn.direction = RecoveryRoute_NewHeading(actor->body.direction, randomSamples);
+        group->turn.direction = RecoveryRoute_NewHeading(actor->base.body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -60,34 +60,36 @@ static inline void RecoveryRoute_SetGate(struct SceneActorChaseFlags16 *flags, u
 }
 static inline s32 RecoveryRoute_ActorCell(struct SceneActorRegistryResetView *actor)
 {
-    return actor->terrainCell;
+    return actor->base.terrainCell;
 }
 
 static inline s32 RecoveryRoute_SelectDirection(struct SceneActorRegistryResetView *actor)
 {
     s32 cell;
-    switch (((actor->body.direction + 32) >> 6) & 3) {
+    switch (((actor->base.body.direction + 32) >> 6) & 3) {
         case 0:
         case 2:
             cell = RecoveryRoute_ActorCell(actor) - SceneActorPath_Width();
             if (RecoveryRoute_CanReach(RecoveryRoute_ActorCell(actor), cell,
-                                       actor->body.position.y)) {
+                                       actor->base.body.position.y)) {
                 return 3;
             }
             cell = RecoveryRoute_ActorCell(actor) + SceneActorPath_Width();
             if (RecoveryRoute_CanReach(RecoveryRoute_ActorCell(actor), cell,
-                                       actor->body.position.y)) {
+                                       actor->base.body.position.y)) {
                 return 1;
             }
             break;
         case 1:
         case 3:
-            cell = actor->terrainCell + 1;
-            if (RecoveryRoute_CanReach(actor->terrainCell, cell, actor->body.position.y)) {
+            cell = actor->base.terrainCell + 1;
+            if (RecoveryRoute_CanReach(actor->base.terrainCell, cell,
+                                       actor->base.body.position.y)) {
                 return 0;
             }
-            cell = actor->terrainCell - 1;
-            if (RecoveryRoute_CanReach(actor->terrainCell, cell, actor->body.position.y)) {
+            cell = actor->base.terrainCell - 1;
+            if (RecoveryRoute_CanReach(actor->base.terrainCell, cell,
+                                       actor->base.body.position.y)) {
                 return 2;
             }
             break;
@@ -102,7 +104,7 @@ u8 SceneActorRoute_TryRecoveryDetour(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorChaseGroup *group = &actor->group;
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 result;
     s16 *actorHeight;
     struct SceneActorChaseTarget *subject;
@@ -115,7 +117,7 @@ u8 SceneActorRoute_TryRecoveryDetour(void *object)
         return 0;
     if (!SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1))
         return 0;
-    actorHeight = &actor->body.position.y;
+    actorHeight = &actor->base.body.position.y;
     subject = tracking->target;
     if (*actorHeight != subject->position.y) {
         SceneActorChase_ArriveWithDirectFallback(object);
@@ -127,7 +129,7 @@ u8 SceneActorRoute_TryRecoveryDetour(void *object)
     if (direction < 0)
         return 0;
     routeValue = SceneActorTerrain_LastOpenCell(actor, direction);
-    if (!routeValue || routeValue == actor->terrainCell)
+    if (!routeValue || routeValue == actor->base.terrainCell)
         return 0;
     RecoveryRoute_BeginTurn(object, direction, randomSamples);
     point = &center;
@@ -138,8 +140,8 @@ u8 SceneActorRoute_TryRecoveryDetour(void *object)
         point->y = (*SceneActorTerrain_GetCell(routeValue) & 15) << 8;
         point->z = ((u32)result << 8) + 128;
     }
-    center.y = actor->body.position.y;
-    result = SceneActorChase_TryRoute(object, group->route, &actor->body.position, &center);
+    center.y = actor->base.body.position.y;
+    result = SceneActorChase_TryRoute(object, group->route, &actor->base.body.position, &center);
     if (result)
         goto routed;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);

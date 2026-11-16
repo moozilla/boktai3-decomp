@@ -16,7 +16,7 @@ static inline void SceneActorTarget_UpdateContactRoute(struct SceneActorRegistry
         result = Terrain_ApplyBlocked(route, source, target);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
         } else
             SceneActorChase_ClearBits(motionFlags, 0x200);
     }
@@ -42,9 +42,9 @@ u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *act
     work = actor;
     if (SceneActorContact_MotionFlags(SceneActorContact_ActorFromWork(&work), 0x10))
         return 0;
-    if ((u8)Callback_InvokeActor(actor, actor->update26C))
+    if ((u8)Callback_InvokeActor(actor, actor->base.update26C))
         return 1;
-    if (!SceneActorContact_TestTrackingOwned((void *)&actor->tracking, 1, &motion))
+    if (!SceneActorContact_TestTrackingOwned((void *)&actor->base.tracking, 1, &motion))
         return 0;
     motionFlags = SceneActorContact_MotionField(actor);
     {
@@ -58,7 +58,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *act
     group = &actor->group;
     tracking = motion;
     nodeSlot = &actor->group.contactNode;
-    if (!actor->tracking.limit)
+    if (!actor->base.tracking.limit)
         return 0;
     SCENE_ACTOR_CONTACT_FIND_CONTACT(contact, actor);
     if (!contact)
@@ -77,9 +77,9 @@ u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *act
         if (SceneActorContact_TestTracking(motion, 8)) {
             if (SceneActorContact_SavedTargetCell(actor) != cell) {
                 SceneActorTarget_UpdateContactRoute(actor, savedFlags, group->route,
-                                                    &actor->body.position,
+                                                    &actor->base.body.position,
                                                     &tracking->tracking.target->position);
-                actor->savedTargetCell = cell;
+                actor->base.savedTargetCell = cell;
             }
         } else
             SceneActorTarget_ResetContactResponse(actor);
@@ -99,7 +99,7 @@ u8 SceneActorTarget_UpdateTrackedContact(struct SceneActorRegistryResetView *act
     actor->group.turn.turnsRemaining = -1;
     SceneActorAnimation_SelectDirectionalEntry((void *)SceneActorContact_ActorFromWork(&work), 0);
     actor->group.common.control.timer = 0xB4;
-    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+    SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
     SceneActorChase_SetReactionFlags(actor, 0x100);
     return 1;
 }

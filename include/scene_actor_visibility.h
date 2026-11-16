@@ -7,12 +7,12 @@
 static inline u8 SceneActorVisibility_IsHidden(struct SceneActorRegistryResetView *actor)
 {
     u32 mask = 1;
-    if (!actor->drawableKind) {
-        if (((struct SceneActorRegistrySequenceDrawable *)actor->drawable)->flags & mask)
+    if (!actor->base.drawableKind) {
+        if (((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags & mask)
             goto hidden;
         goto visible;
     }
-    if (!(((struct SceneActorRegistryTileDrawable *)actor->drawable)->flags & mask))
+    if (!(((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->flags & mask))
         goto visible;
 hidden:
     return 1;

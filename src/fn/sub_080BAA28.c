@@ -4,8 +4,8 @@
 void SceneActorReaction_ApplyThreshold(void);
 void SceneActorReaction_TickMultiHitAnimation(struct SceneActorRegistryResetView *p)
 {
-    u8 *state = p->context;
-    u16 *animation = (u16 *)((u8 *)p->drawable + 0x20);
+    u8 *state = p->base.context;
+    u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
     u32 frame;
     if (SceneActorReaction_TakePrepared(p))
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x17);
@@ -14,22 +14,22 @@ void SceneActorReaction_TickMultiHitAnimation(struct SceneActorRegistryResetView
         Collider_Refresh(state + 0x678);
     if ((animation[10] == 4 || animation[10] == 7) && animation[6] == 0)
         Sound_PlaySong(0x3AA);
-    if (p->field2B3) {
+    if (p->base.field2B3) {
         void (*f)(void) = SceneActorReaction_ApplyThreshold;
         u32 k = 0x3e;
         u32 z;
-        u8 *a = &p->field2B2;
+        u8 *a = &p->base.field2B2;
         u32 *w;
         s32 m;
         z = 0;
         *a = 1;
-        p->field2B0 = z;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = z;
-        w = &p->flags114;
+        p->base.field2B0 = z;
+        p->base.field2B5 = k;
+        p->base.target = f;
+        p->base.field2C8 = z;
+        w = &p->base.flags114;
         m = -2;
         *w = m & *w;
-        p->word104 = z;
+        p->base.word104 = z;
     }
 }

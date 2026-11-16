@@ -26,12 +26,12 @@ static inline u8 AtRest(s32 x, s32 z)
 static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 m)
 {
     u32 v = m;
-    v |= a->flags2D4;
-    a->flags2D4 = v;
+    v |= a->base.flags2D4;
+    a->base.flags2D4 = v;
 }
 static inline void SetForced(struct SceneActorRegistryResetView *a, u32 m)
 {
-    a->flags2D0 = m | a->flags2D0;
+    a->base.flags2D0 = m | a->base.flags2D0;
 }
 static inline void SetContext(u8 *p, u32 m)
 {
@@ -43,32 +43,32 @@ static inline void RestoreHistory(struct SceneActorRegistryResetView *a, u16 v)
 }
 static inline void SetState(struct SceneActorRegistryResetView *a, u8 s, u8 p, u8 b)
 {
-    a->state2A8 = s;
-    a->phase2A9 = p;
-    a->behavior2AA = b;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = s;
+    a->base.phase2A9 = p;
+    a->base.behavior2AA = b;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     s32 x, z;
     s16 *priorX, *priorZ;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SetFlags(actor, 0x20);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         Axe_ClearForcedMovement(actor);
         Axe_ResetMovementFlags(actor);
     }
     {
-        s32 current = actor->reactionStart.x;
+        s32 current = actor->base.reactionStart.x;
         s16 *field = (void *)((u8 *)actor + 0x318);
         s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
-        s32 current = actor->reactionStart.z;
+        s32 current = actor->base.reactionStart.z;
         s16 *field = (void *)((u8 *)actor + 0x31C);
         s32 difference = current - *field;
         priorZ = field;
@@ -76,23 +76,23 @@ void Axe_ConvergeRecoveryMotion(struct SceneActorRegistryResetView *actor)
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
+    actor->base.body.motion.x += x;
+    actor->base.body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         {
             struct SignedFlag {
                 s32 bits : 16;
             };
-            struct SignedFlag *f = (void *)&actor->flags2D4;
+            struct SignedFlag *f = (void *)&actor->base.flags2D4;
             s32 m = ~0x20;
             m &= (u16)f->bits;
             f->bits = m;
         }
         {
-            u32 *f = &actor->flags2CC;
+            u32 *f = &actor->base.flags2CC;
             s32 m = ~0x80;
             *f &= m;
         }

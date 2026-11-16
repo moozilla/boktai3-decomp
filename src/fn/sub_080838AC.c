@@ -7,8 +7,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -45,18 +45,19 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
             stateFlags = firstFlags;
         }
         if (Test(firstValue, ~0)) {
-            actor->body.position.y = state->baseOffset + actor->field2EA;
+            actor->base.body.position.y = state->baseOffset + actor->base.field2EA;
             return;
         }
-        if ((s16)actor->field2EA <= 259) {
+        if ((s16)actor->base.field2EA <= 259) {
             {
                 u32 mask = 1;
                 if (Test(*stateFlags, mask)) {
-                    actor->body.position.y = ((struct SceneActorControlGroundView *)actor)->ground;
+                    actor->base.body.position.y =
+                        ((struct SceneActorControlGroundView *)actor)->ground;
                     return;
                 }
             }
-            actor->field2EA += TruncateSine(gUnk_086149C4[state->phase], 9);
+            actor->base.field2EA += TruncateSine(gUnk_086149C4[state->phase], 9);
             if (state->phase <= 63) {
                 state->phase++;
             }
@@ -64,32 +65,32 @@ void SceneActorControl_TickGroundBob(struct SceneActorRegistryResetView *actor)
     }
     {
         s32 currentGround = ((struct SceneActorControlGroundView *)actor)->ground;
-        s32 raisedY = actor->body.position.y - 260;
+        s32 raisedY = actor->base.body.position.y - 260;
         delta = currentGround - raisedY;
     }
     absolute = delta >= 0 ? delta : -delta;
     if (absolute > 16) {
         if (delta < 0) {
-            actor->field2EA -= 2;
+            actor->base.field2EA -= 2;
         } else {
-            actor->field2EA += 2;
+            actor->base.field2EA += 2;
         }
     }
     if (((struct SceneActorControlGroundView *)actor)->ground != state->previousGround) {
-        actor->field2EA -=
+        actor->base.field2EA -=
             ((struct SceneActorControlGroundView *)actor)->ground - state->previousGround;
     }
     do {
         {
-            u32 offset = actor->field2EA;
+            u32 offset = actor->base.field2EA;
             {
                 u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
-                actor->body.position.y = actor->field2EA + ground;
+                actor->base.body.position.y = actor->base.field2EA + ground;
             }
         }
     } while (0);
     {
-        struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
+        struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
         drawable->position.y -= TruncateSine(gUnk_086149C4[state->phase], 5);
     }
     if (state->phase > 64) {

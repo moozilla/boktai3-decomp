@@ -34,27 +34,27 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
 {
     u32 state = s;
-    actor->state2A8 = state;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
@@ -77,39 +77,39 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
 void Ivy_ReleaseCapturedPlayer(struct SceneActorRegistryResetView *actor)
 {
-    if (TestFlags(actor->context, 1))
+    if (TestFlags(actor->base.context, 1))
         return;
-    if (TestFlags(actor->context, 2)) {
+    if (TestFlags(actor->base.context, 2)) {
         struct SceneVec position;
         s32 angle;
-        CellCenter(&position, actor->terrainCell);
+        CellCenter(&position, actor->base.terrainCell);
         {
-            s32 turn = (actor->body.direction + 0x20) & 0xFF;
+            s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
         }
         {
-            struct IvyTarget *target = (void *)actor->tracking.target;
+            struct IvyTarget *target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
                 Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
                 Sound_PlaySong(0xE6);
             }
         }
-        ((u8 *)actor->drawable)[7] = 2;
+        ((u8 *)actor->base.drawable)[7] = 2;
     }
     SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
     SetState(actor, 0, 0, 3);
     {
-        struct ContactCollider *collider = &actor->colliderA;
+        struct ContactCollider *collider = &actor->base.colliderA;
         collider->flags |= 4;
     }
     {
-        struct ContactCollider *collider = &actor->colliderB;
+        struct ContactCollider *collider = &actor->base.colliderB;
         collider->flags |= 4;
     }
     {
         u32 m = 0x800;
-        actor->flags2C0 = m | actor->flags2C0;
+        actor->base.flags2C0 = m | actor->base.flags2C0;
     }
-    ((struct IvyContext *)actor->context)->flags |= 1;
-    actor->health = 0;
+    ((struct IvyContext *)actor->base.context)->flags |= 1;
+    actor->base.health = 0;
 }

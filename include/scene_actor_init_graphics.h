@@ -44,26 +44,26 @@ static inline void MonsterInit_SetWidgetScriptPalette(struct DisplayKeyframeStat
 static inline void MonsterInit_DrawablePosition(struct SceneActorRegistryResetView *actor)
 {
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
+        *(struct ContactPosition *)(actor->base.drawable + 0x1C) = actor->base.body.position;
     else
-        *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
+        *(struct ContactPosition *)(actor->base.drawable + 0x40) = actor->base.body.position;
 }
 
 static inline void MonsterInit_ReadPalette(struct SceneActorRegistryResetView *actor, u32 base,
                                            u32 alternate)
 {
     s32 palette;
-    actor->paletteOffset = Script_GetKeywordValue('C', 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
-    actor->alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
+    actor->base.paletteOffset = Script_GetKeywordValue('C', 0);
+    actor->base.basePaletteBank = base;
+    actor->base.paletteAlternateBank = alternate;
+    actor->base.alternateOffset = MonsterInit_GetPaletteOffset(actor) + base;
     palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
+        AnimData_SelectPaletteBank(actor->base.drawable + 0x2C, palette);
     else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
+        *(u8 **)(actor->base.drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetScriptPalette((void *)(actor->drawable + 0x20),
+        MonsterInit_SetWidgetScriptPalette((void *)(actor->base.drawable + 0x20),
                                            SceneActorScript_GetManagerField62());
 }
 

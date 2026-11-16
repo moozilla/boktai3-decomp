@@ -24,27 +24,29 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
 {
     struct DisplaySequenceState *animation =
         (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)
-                                            actor->drawable)
+                                            actor->base.drawable)
             ->sequence;
     struct ContactPackedVector range;
     struct SceneActorChaseGroup *group;
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->secondaryMotion.x = SceneActorDisplacement_Quarter(actor->secondaryMotion.x);
-        actor->secondaryMotion.z = SceneActorDisplacement_Quarter(actor->secondaryMotion.z);
+        actor->base.secondaryMotion.x =
+            SceneActorDisplacement_Quarter(actor->base.secondaryMotion.x);
+        actor->base.secondaryMotion.z =
+            SceneActorDisplacement_Quarter(actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x12A);
             Sound_PlaySong(0xFD);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->field2B3 = 0;
+        actor->base.field2B3 = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
         animation->duration != 1)
@@ -61,11 +63,14 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         sample = *(const u16 *)(RANDOM_TABLE_ADDR + index);
         sample &= 3;
         count = sample + 1;
-        SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
-                            actor->body.direction + 128, 10, 6, 2, 2);
+        SparkParticle_Spawn(&actor->base.body.position, count,
+                            (const struct ContactPosition *)&range,
+                            actor->base.body.direction + 128, 10, 6, 2, 2);
     }
-    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
+                                         &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.z, &actor->base.reactionEnd.z,
+                                         &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
@@ -74,16 +79,16 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (!Mummy_DisplacementStopped(dx, dz))
         return;
-    if (!actor->field2B3)
+    if (!actor->base.field2B3)
         return;
     group = &actor->group;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x10)) {
@@ -94,7 +99,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
         return;
     }
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -102,15 +107,15 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, Mummy_ResumeRouteAfterRecovery, 0x14);
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
-        actor->field2C2 = 64;
+        actor->base.field2C2 = 64;
         return;
     }
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x80)) {
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -125,13 +130,13 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     group->destination->pad = 0;
     SceneActorChase_TrackPlayer(actor);
     if (!SceneActorChase_Arrive(actor)) {
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                      &actor->tracking.target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      &actor->base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
     SceneActorChase_SetBehavior(actor, 7);
-    actor->field2C2 = Div(64, 3);
+    actor->base.field2C2 = Div(64, 3);
 }

@@ -24,21 +24,21 @@ static inline u8 TakeFlag(u8 *flag)
 }
 void SceneActor_UpdateAnimationCheckpoint(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorCheckpointState *state = actor->context;
-    struct SceneActorCheckpointSequence *sequence = (void *)((u8 *)actor->drawable + 0x48);
-    if (TakeFlag(&actor->field2B2)) {
+    struct SceneActorCheckpointState *state = actor->base.context;
+    struct SceneActorCheckpointSequence *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    if (TakeFlag(&actor->base.field2B2)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         mask = 0x100;
-        actor->flags2D4 |= mask;
+        actor->base.flags2D4 |= mask;
     }
     if (sequence->frame > 2) {
         if (sequence->frame == 4 && sequence->timer == 0)
             Mummy_FireAcceleratingVolley(actor);
     }
-    if (actor->field2B3) {
+    if (actor->base.field2B3) {
         state->savedTick = state->currentTick;
         state->targetTick = state->currentTick + 30;
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
     }
 }

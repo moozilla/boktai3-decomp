@@ -15,7 +15,7 @@ struct MummyCheckpointContext {
 
 static inline void Mummy_ClearMotion(struct SceneActorRegistryResetView *actor, u32 bits)
 {
-    struct ChaseFlags40 *field = (void *)&actor->flags2D4;
+    struct ChaseFlags40 *field = (void *)&actor->base.flags2D4;
     s32 mask = ~bits;
     field->bits &= mask;
 }
@@ -27,12 +27,12 @@ static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 ma
 void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
-    struct MummyCheckpointContext *body = actor->context;
+    struct MummyCheckpointContext *body = actor->base.context;
     if (Chase_TakeArrived(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Chase_SetCtl(actor, SceneActor_UpdateAnimationCheckpoint, 0x26);
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         s32 contextBits = 0x800;
         Mummy_ClearMotion(actor, 0x100);
         body->flags6F2 &= ~contextBits;
@@ -44,7 +44,8 @@ void Mummy_ResumeRouteAfterCheckpoint(struct SceneActorRegistryResetView *actor)
         }
         Chase_SetCtl(actor, Mummy_UpdatePlayerRoute, 0x27);
         Chase_SetBehavior(actor, 0x10);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position, &actor->body.position)) {
+        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position,
+                            &actor->base.body.position)) {
             Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
             Chase_SetState(actor, 3, 0, 0);
         }

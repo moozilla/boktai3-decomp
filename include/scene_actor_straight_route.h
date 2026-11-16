@@ -28,7 +28,7 @@ static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetVie
 
     s32 r;
     if (!Nav_IsPositionInMesh(route, from, pos)) {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         s32 mask = ~0x200;
         *flags &= mask;
         return 0;
@@ -36,11 +36,11 @@ static inline u8 SceneActorTerrain_RequestPath(struct SceneActorRegistryResetVie
     r = Terrain_ApplyBlocked(route, from, pos);
     if (r) {
         if (r != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
     {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         s32 mask = ~0x200;
         *flags &= mask;
     }
@@ -51,7 +51,7 @@ static inline s32 SceneActorTerrain_LastOpenCell(struct SceneActorRegistryResetV
 {
     s32 cell, i, col, total;
     u32 level;
-    cell = actor->terrainCell;
+    cell = actor->base.terrainCell;
     level = *SceneActorTerrain_GetCell(cell) & 15;
     total = SceneActorTerrain_Width() * SceneActorTerrain_Height();
     switch (dir) {

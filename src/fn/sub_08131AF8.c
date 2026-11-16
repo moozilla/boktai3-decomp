@@ -5,9 +5,9 @@ u8 sub_0812F3CC(struct SceneActorRegistryResetView *);
 #define SceneActorControl_UpdateContactWait sub_08131AF8
 void SceneActorControl_UpdateContactWait(struct SceneActorRegistryResetView *actor)
 {
-    SceneActorControl_TakeFlag(&actor->field2B1);
-    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
+    SceneActorControl_TakeFlag(&actor->base.field2B1);
+    if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         if (!sub_0812F3CC(actor))
-            actor->counter2AC++;
+            actor->base.counter2AC++;
     }
 }

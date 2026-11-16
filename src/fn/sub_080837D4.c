@@ -8,8 +8,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -54,16 +54,16 @@ void SceneActorControl_ConsumeLiftFlag(struct SceneActorRegistryResetView *actor
         }
         {
             u32 bit = 0x100;
-            struct LiftHalfBits *f = (void *)&actor->flags2D4;
+            struct LiftHalfBits *f = (void *)&actor->base.flags2D4;
             f->bits = bit | f->bits;
         }
         {
             u8 behavior = 3;
-            actor->state2A8 = 0;
-            actor->phase2A9 = 0;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = 0;
+            actor->base.phase2A9 = 0;
+            actor->base.behavior2AA = behavior;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
     }
 }

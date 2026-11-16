@@ -6,8 +6,8 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
     int mask;
     u32 *flags;
     if ((SceneActor_ActionsBlocked(actor) == 0) && (collider->contactFlags & 0xF)) {
-        actor->field304 = collider->collisionId;
-        flags = &actor->flags2D0;
+        actor->base.field304 = collider->collisionId;
+        flags = &actor->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;
     }
@@ -37,13 +37,14 @@ void TentacleBody_UpdateAttackWindup(struct SceneActorAnimationView *actor)
         TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
         TentacleBody_RefreshDirectionalAnimations(
-            ((struct SceneActorRegistryResetView *)actor)->context, 15);
-        TentacleActor_AssignSegmentPhases(((struct SceneActorRegistryResetView *)actor)->context);
+            ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
+        TentacleActor_AssignSegmentPhases(
+            ((struct SceneActorRegistryResetView *)actor)->base.context);
     } else {
         TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
         TentacleBody_RefreshDirectionalAnimations(
-            ((struct SceneActorRegistryResetView *)actor)->context, 15);
+            ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
     }
 }
 
@@ -56,8 +57,8 @@ void TentacleBody_ResetDirectionalPose(struct SceneActorAnimationView *actor)
         actor->directionalEntryFlag = 0;
     TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
     TentacleBody_SelectAnimation(actor, entry[17].value, variant, flags);
-    TentacleBody_ResetDirectionalAnimations(((struct SceneActorRegistryResetView *)actor)->context,
-                                            18);
+    TentacleBody_ResetDirectionalAnimations(
+        ((struct SceneActorRegistryResetView *)actor)->base.context, 18);
 }
 
 void TentacleBody_OnIdleState(void)
@@ -84,34 +85,34 @@ static inline void TentacleBody_SetActionFlags(u16 m, u16 *f)
 
 void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    if (TentacleSpread_Take(&actor->field2B2)) {
+    if (TentacleSpread_Take(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 7);
-        TentacleBody_ClearActionFlags(&actor->flags2D4, ~1);
+        TentacleBody_ClearActionFlags(&actor->base.flags2D4, ~1);
     }
     if (frame == 40)
-        TentacleBody_SetActionFlags(16, &actor->flags2D6);
-    if (actor->field2B3 && frame > 120)
-        actor->field2B0 = 1;
+        TentacleBody_SetActionFlags(16, &actor->base.flags2D6);
+    if (actor->base.field2B3 && frame > 120)
+        actor->base.field2B0 = 1;
 }
 
 void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *actor, s32 frame,
                                          u32 unused)
 {
-    u32 queued = TentacleSpread_Take(&actor->field2B2);
+    u32 queued = TentacleSpread_Take(&actor->base.field2B2);
     if (queued) {
         u32 mask = 1;
-        if (actor->drawableKind == 0) {
-            struct ActorSprite *drawable = actor->drawable;
+        if (actor->base.drawableKind == 0) {
+            struct ActorSprite *drawable = actor->base.drawable;
             u32 value = drawable->flags;
             drawable->flags = value | mask;
         } else {
-            struct ActorSprite *drawable = actor->drawable;
+            struct ActorSprite *drawable = actor->base.drawable;
             struct SceneActorAnimationTile *tile =
                 &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
             u32 value = tile->flags;
             tile->flags = value | mask;
         }
-        ActorShadow_Disable(actor->shadow);
+        ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
         void (*nextState)(struct SceneActorRegistryResetView *);
         u32 stateKind;
@@ -120,17 +121,17 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
         SceneActorAnimation_SelectDirectionalEntry(actor, 9);
         nextState = ActorTrail_RestoreSavedState;
         stateKind = 0xD;
-        actor->field2B2 = 1;
-        actor->field2B0 = queued;
-        actor->field2B5 = stateKind;
-        actor->target = nextState;
-        actor->field2C8 = queued;
-        flags = &actor->flags114;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = queued;
+        actor->base.field2B5 = stateKind;
+        actor->base.target = nextState;
+        actor->base.field2C8 = queued;
+        flags = &actor->base.flags114;
         mask = ~1;
         *flags &= mask;
-        actor->word104 = queued;
+        actor->base.word104 = queued;
     } else {
-        actor->field2B3 = queued;
+        actor->base.field2B3 = queued;
     }
 }
 
@@ -140,33 +141,33 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
 
 static inline u8 TentacleBody_IsAnimationReady(struct SceneActorRegistryResetView *actor)
 {
-    return actor->field2B3;
+    return actor->base.field2B3;
 }
 
 void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
 {
     s32 health;
-    if (TentacleSpread_Take(&actor->field2B2)) {
-        ActorShadow_Enable(actor->shadow);
-        if (!actor->drawableKind) {
-            u32 *q = &((struct ActorSprite *)actor->drawable)->flags;
+    if (TentacleSpread_Take(&actor->base.field2B2)) {
+        ActorShadow_Enable(actor->base.shadow);
+        if (!actor->base.drawableKind) {
+            u32 *q = &((struct ActorSprite *)actor->base.drawable)->flags;
             u32 mask = ~1;
             *q = mask & *q;
         } else {
             struct SceneActorAnimationTile *q =
-                &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u32 mask = ~1;
             q->flags = mask & q->flags;
         }
         {
             u16 one = 1;
-            actor->health = one;
+            actor->base.health = one;
         }
-        actor->colliderA.responseValue = 60;
+        actor->base.colliderA.responseValue = 60;
     }
     {
         struct DisplaySequenceState *sequence =
-            &((struct TentacleBodyDrawable *)actor->drawable)->sequence;
+            &((struct TentacleBodyDrawable *)actor->base.drawable)->sequence;
         if (sequence->index == 3 && sequence->elapsed == 4)
             Sound_PlaySong(0xEE);
     }
@@ -174,35 +175,35 @@ void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
         return;
     {
         ActorTrail_ResetAtSavedPosition(actor);
-        actor->flags2CC = actor->saved.behaviorFlags;
-        actor->flags2D0 = actor->saved.statusFlags;
-        actor->body.direction = actor->saved.direction;
-        actor->state2A8 = actor->saved.state;
-        actor->phase2A9 = actor->saved.phase;
-        actor->behavior2AA = actor->saved.behavior;
-        actor->target = actor->saved.control;
-        actor->field2B5 = actor->saved.kind;
-        actor->flags2C0 = actor->saved.motionFlags;
-        actor->field2EA = actor->saved.heightOffset;
-        health = actor->defaultHealth;
+        actor->base.flags2CC = actor->base.saved.behaviorFlags;
+        actor->base.flags2D0 = actor->base.saved.statusFlags;
+        actor->base.body.direction = actor->base.saved.direction;
+        actor->base.state2A8 = actor->base.saved.state;
+        actor->base.phase2A9 = actor->base.saved.phase;
+        actor->base.behavior2AA = actor->base.saved.behavior;
+        actor->base.target = actor->base.saved.control;
+        actor->base.field2B5 = actor->base.saved.kind;
+        actor->base.flags2C0 = actor->base.saved.motionFlags;
+        actor->base.field2EA = actor->base.saved.heightOffset;
+        health = actor->base.defaultHealth;
         if (health <= 0)
             health = 0;
-        actor->health = health;
-        actor->flags2D6 = 0;
-        actor->flags2D4 = 0;
-        actor->field2B0 = 0;
-        actor->field2B1 = 1;
-        actor->field2B2 = 1;
-        actor->field2B3 = 0;
-        actor->field304 = 0;
-        actor->field2B6 = 0;
-        actor->field2C2 = 64;
-        actor->field2D8 = 0;
-        actor->field2DC = 0;
-        actor->field2E0 = 0;
-        actor->field2E6 = 0;
-        actor->field3CC = 0;
-        actor->tracking.target = 0;
+        actor->base.health = health;
+        actor->base.flags2D6 = 0;
+        actor->base.flags2D4 = 0;
+        actor->base.field2B0 = 0;
+        actor->base.field2B1 = 1;
+        actor->base.field2B2 = 1;
+        actor->base.field2B3 = 0;
+        actor->base.field304 = 0;
+        actor->base.field2B6 = 0;
+        actor->base.field2C2 = 64;
+        actor->base.field2D8 = 0;
+        actor->base.field2DC = 0;
+        actor->base.field2E0 = 0;
+        actor->base.field2E6 = 0;
+        actor->base.field3CC = 0;
+        actor->base.tracking.target = 0;
         SceneActorPalette_ClearCompletedTransitions();
     }
 }
@@ -211,10 +212,10 @@ void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
 
 void TentacleBody_UpdateAnimationEleven(struct SceneActorRegistryResetView *actor)
 {
-    if (TentacleSpread_Take(&actor->field2B2))
+    if (TentacleSpread_Take(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(actor, 11);
-    if (actor->field2B3)
-        actor->field2B0 = 1;
+    if (actor->base.field2B3)
+        actor->base.field2B0 = 1;
 }
 
 static inline void TentacleBody_SetAttackFlag(struct TentacleBody *body, u32 input)
@@ -235,23 +236,23 @@ static inline void TentacleBody_FillMotion(void *dst, u32 *tmp, u32 v)
 
 void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
 {
-    struct TentacleBody *body = actor->context;
+    struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex, threshold, speed;
     u32 zero;
     struct {
         u32 zero, variant, flags;
     } params;
-    if (TentacleSpread_Take(&actor->field2B2)) {
+    if (TentacleSpread_Take(&actor->base.field2B2)) {
         {
             u32 mask = 0x100000;
-            actor->flags2D0 |= mask;
+            actor->base.flags2D0 |= mask;
         }
-        TentacleBody_GetDirectionFrame(actor->body.direction, &params.variant, &params.flags);
+        TentacleBody_GetDirectionFrame(actor->base.body.direction, &params.variant, &params.flags);
         TentacleBody_RestartSegmentAnimations(body, 18, params.variant, params.flags);
         TentacleBody_SetAttackFlag(body, 2);
     }
     {
-        struct ContactPosition *destination = &actor->secondaryMotion;
+        struct ContactPosition *destination = &actor->base.secondaryMotion;
         zero = 0;
         TentacleBody_FillMotion(destination, &params.zero, zero);
     }
@@ -261,32 +262,33 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
         if (count > 3)
             threshold = 300;
     }
-    if ((s16)actor->field2EA >= threshold) {
+    if ((s16)actor->base.field2EA >= threshold) {
         void *target = TentacleBody_UpdateSpreadRelease;
         u32 kind = 39;
-        actor->field2B2 = 1;
-        actor->field2B0 = zero;
-        actor->field2B5 = kind;
-        actor->target = target;
-        actor->field2C8 = zero;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = kind;
+        actor->base.target = target;
+        actor->base.field2C8 = zero;
         {
-            u32 *f = &actor->flags114;
+            u32 *f = &actor->base.flags114;
             s32 mask = -2;
             *f &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     } else {
         u32 angle;
-        if ((s32)actor->counter2AC <= 29) {
+        if ((s32)actor->base.counter2AC <= 29) {
             speed = 1;
-            actor->field2EA += 10;
+            actor->base.field2EA += 10;
         } else {
             speed = 2;
-            actor->field2EA += 40;
+            actor->base.field2EA += 40;
         }
-        angle = (actor->body.direction + 128) & 255;
-        actor->body.motion.x += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-        actor->body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * speed, 12);
+        angle = (actor->base.body.direction + 128) & 255;
+        actor->base.body.motion.x +=
+            TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+        actor->base.body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * speed, 12);
         sub_080A9DB0(actor, 14, 12000);
         activeSegment = 0;
         for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
@@ -295,25 +297,27 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
                 switch (activeSegment) {
                     case 0:
                         body->segments[segmentIndex].position.x =
-                            (u16)actor->body.position.x -
+                            (u16)actor->base.body.position.x -
                             TentacleSpread_Shift(
-                                gUnk_086149C4[(actor->body.direction + 64) & 255] * 54, 12);
+                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 54, 12);
                         body->segments[segmentIndex].position.z =
-                            (u16)actor->body.position.z -
-                            TentacleSpread_Shift(gUnk_086149C4[actor->body.direction] * 54, 12);
+                            (u16)actor->base.body.position.z -
+                            TentacleSpread_Shift(gUnk_086149C4[actor->base.body.direction] * 54,
+                                                 12);
                         break;
                     case 1:
                         body->segments[segmentIndex].position.x =
-                            (u16)actor->body.position.x -
+                            (u16)actor->base.body.position.x -
                             TentacleSpread_Shift(
-                                gUnk_086149C4[(actor->body.direction + 64) & 255] * 20, 12);
+                                gUnk_086149C4[(actor->base.body.direction + 64) & 255] * 20, 12);
                         body->segments[segmentIndex].position.z =
-                            (u16)actor->body.position.z -
-                            TentacleSpread_Shift(gUnk_086149C4[actor->body.direction] * 20, 12);
+                            (u16)actor->base.body.position.z -
+                            TentacleSpread_Shift(gUnk_086149C4[actor->base.body.direction] * 20,
+                                                 12);
                         break;
                     default:
-                        body->segments[segmentIndex].position.x = (u16)actor->body.position.x;
-                        body->segments[segmentIndex].position.z = (u16)actor->body.position.z;
+                        body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
+                        body->segments[segmentIndex].position.z = (u16)actor->base.body.position.z;
                         break;
                 }
                 activeSegment++;
@@ -326,63 +330,64 @@ void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor)
 
 void TentacleBody_UpdateSpreadRelease(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct TentacleBody *body = actor->context;
+    struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex;
     u32 angle, scale;
     u8 *direction;
-    if (TentacleSpread_Take(&actor->field2B2))
+    if (TentacleSpread_Take(&actor->base.field2B2))
         body->spin = 0;
     {
         u16 raw = body->spin;
         u8 *field;
         if ((s8)body->spin >= 0) {
-            field = &actor->body.direction;
+            field = &actor->base.body.direction;
             angle = *field;
         } else {
-            field = &actor->body.direction;
+            field = &actor->base.body.direction;
             angle = (*field + 128) & 255;
         }
         scale = TentacleSpread_Scale(raw);
         direction = field;
     }
-    actor->body.motion.x += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
-    actor->body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
+    actor->base.body.motion.x +=
+        TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
+    actor->base.body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
         if (TentacleSpread_Test(&body->segments[segmentIndex], 2) &&
             !TentacleSpread_Test(&body->segments[segmentIndex], 5)) {
-            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->body.motion,
+            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
                                        segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
                     body->segments[segmentIndex].position.x =
-                        (u16)actor->body.position.x -
+                        (u16)actor->base.body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
                     body->segments[segmentIndex].position.z =
-                        (u16)actor->body.position.z -
+                        (u16)actor->base.body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
                     break;
                 case 1:
                     body->segments[segmentIndex].position.x =
-                        (u16)actor->body.position.x -
+                        (u16)actor->base.body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
                     body->segments[segmentIndex].position.z =
-                        (u16)actor->body.position.z -
+                        (u16)actor->base.body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
                     break;
                 default:
-                    body->segments[segmentIndex].position.x = (u16)actor->body.position.x;
-                    body->segments[segmentIndex].position.z = (u16)actor->body.position.z;
+                    body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
+                    body->segments[segmentIndex].position.z = (u16)actor->base.body.position.z;
                     break;
             }
             activeSegment++;
         }
     }
     if (frame > body->releaseFrame) {
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
         {
-            u16 *p = &actor->field2E8;
+            u16 *p = &actor->base.field2E8;
             u32 two = 2;
             *p = two;
             {
@@ -411,39 +416,40 @@ void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *ac
     s32 speed;
     s32 angle;
 
-    if (TentacleSpread_Take(&actor->field2B2)) {
+    if (TentacleSpread_Take(&actor->base.field2B2)) {
         u32 mask = 0x100000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
-    dst = &actor->secondaryMotion;
+    dst = &actor->base.secondaryMotion;
     zero = 0;
     TentacleBody_ClearMotion(&zero, dst);
-    if ((s16)actor->field2EA > 255) {
+    if ((s16)actor->base.field2EA > 255) {
         void *target = (void *)TentacleBody_UpdateChargeSpread;
         u32 kind = 0x23;
-        actor->field2B2 = 1;
-        actor->field2B0 = 0;
-        actor->field2B5 = kind;
-        actor->target = target;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = kind;
+        actor->base.target = target;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
+        actor->base.word104 = 0;
         return;
     }
-    if ((s32)actor->counter2AC <= 29) {
+    if ((s32)actor->base.counter2AC <= 29) {
         speed = 1;
-        actor->field2EA += 10;
+        actor->base.field2EA += 10;
     } else {
         speed = 2;
-        actor->field2EA += 40;
+        actor->base.field2EA += 40;
     }
-    angle = (actor->body.direction + 128) & 255;
-    actor->body.motion.x += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
-    actor->body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * speed, 12);
+    angle = (actor->base.body.direction + 128) & 255;
+    actor->base.body.motion.x +=
+        TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    actor->base.body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * speed, 12);
     sub_080A9DB0(actor, 10, 0x1000);
     ActorTrail_ApplyAngularOffsets(actor, 20, 24, 0);
 }
@@ -452,54 +458,55 @@ void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *ac
 
 void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct TentacleBody *body = actor->context;
+    struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex;
     u32 angle, scale;
     u8 *direction;
-    if (TentacleSpread_Take(&actor->field2B2))
+    if (TentacleSpread_Take(&actor->base.field2B2))
         body->spin = 0;
     {
         u8 raw = body->spin;
         u8 *field;
         if ((s8)body->spin >= 0) {
-            field = &actor->body.direction;
+            field = &actor->base.body.direction;
             angle = *field;
         } else {
-            field = &actor->body.direction;
+            field = &actor->base.body.direction;
             angle = (*field + 128) & 255;
         }
         scale = TentacleSpread_Scale(raw);
         direction = field;
     }
-    actor->body.motion.x += TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
-    actor->body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
+    actor->base.body.motion.x +=
+        TentacleSpread_Shift(gUnk_086149C4[(angle + 64) & 255] * scale, 12);
+    actor->base.body.motion.z += TentacleSpread_Shift(gUnk_086149C4[angle] * scale, 12);
     body->spin += 12;
     activeSegment = 0;
     for (segmentIndex = 0; segmentIndex < body->segmentCount; segmentIndex++) {
         if (TentacleSpread_Test(&body->segments[segmentIndex], 2) &&
             !TentacleSpread_Test(&body->segments[segmentIndex], 5)) {
-            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->body.motion,
+            TENTACLE_SPREAD_SET_OFFSET(body->segments[segmentIndex].offset, actor->base.body.motion,
                                        segmentIndex + 1);
             switch (activeSegment) {
                 case 0:
                     body->segments[segmentIndex].position.x =
-                        (u16)actor->body.position.x -
+                        (u16)actor->base.body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 54, 12);
                     body->segments[segmentIndex].position.z =
-                        (u16)actor->body.position.z -
+                        (u16)actor->base.body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 54, 12);
                     break;
                 case 1:
                     body->segments[segmentIndex].position.x =
-                        (u16)actor->body.position.x -
+                        (u16)actor->base.body.position.x -
                         TentacleSpread_Shift(gUnk_086149C4[(*direction + 64) & 255] * 20, 12);
                     body->segments[segmentIndex].position.z =
-                        (u16)actor->body.position.z -
+                        (u16)actor->base.body.position.z -
                         TentacleSpread_Shift(gUnk_086149C4[*direction] * 20, 12);
                     break;
                 default:
-                    body->segments[segmentIndex].position.x = (u16)actor->body.position.x;
-                    body->segments[segmentIndex].position.z = (u16)actor->body.position.z;
+                    body->segments[segmentIndex].position.x = (u16)actor->base.body.position.x;
+                    body->segments[segmentIndex].position.z = (u16)actor->base.body.position.z;
                     break;
             }
             activeSegment++;
@@ -515,18 +522,18 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
         ((struct SceneActorAnimationView *)actor)->profileId,
         ((struct SceneActorAnimationView *)actor)->profileMode, 0);
-    struct TentacleBody *body = actor->context;
+    struct TentacleBody *body = actor->base.context;
     u32 variant;
     u32 flags;
-    u32 entered = TentacleSpread_Take(&actor->field2B2);
-    u8 *direction = &actor->body.direction;
-    u32 *attackFlags = &actor->flags2D0;
+    u32 entered = TentacleSpread_Take(&actor->base.field2B2);
+    u8 *direction = &actor->base.body.direction;
+    u32 *attackFlags = &actor->base.flags2D0;
     if (entered) {
         SceneActor_AimArcAtPlayer(actor);
-        *direction = Math_Atan2(actor->secondaryMotion.x, actor->secondaryMotion.z);
+        *direction = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
         {
             u32 mask = 256;
-            actor->flags2D4 |= mask;
+            actor->base.flags2D4 |= mask;
         }
         {
             u32 mask = ~0x100000;
@@ -545,33 +552,33 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
     TentacleBody_GetDirectionFrame(*direction, &variant, &flags);
     TentacleBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
     ActorTrail_ApplyAngularOffsets(actor, 18, 6, 0);
-    TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
+    TentacleBody_RefreshDirectionalAnimations(actor->base.context, 15);
     {
         u32 mask = 16;
         if ((*attackFlags) & mask) {
             {
-                u16 *field = &actor->flags2D4;
+                u16 *field = &actor->base.flags2D4;
                 s32 mask = ~256;
-                actor->flags2D4 = *field & mask;
+                actor->base.flags2D4 = *field & mask;
             }
             {
                 void *callback = (void *)TentacleBody_UpdateAttackRecovery;
                 u32 kind = 37;
-                actor->field2B2 = 1;
-                actor->field2B0 = 0;
-                actor->field2B5 = kind;
-                actor->target = callback;
-                actor->field2C8 = 0;
+                actor->base.field2B2 = 1;
+                actor->base.field2B0 = 0;
+                actor->base.field2B5 = kind;
+                actor->base.target = callback;
+                actor->base.field2C8 = 0;
                 {
-                    u32 *flags = &actor->flags114;
+                    u32 *flags = &actor->base.flags114;
                     u32 mask = ~1;
                     *flags &= mask;
                 }
-                actor->word104 = 0;
+                actor->base.word104 = 0;
             }
         } else {
             u32 mask = 8192;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
     }
 }
@@ -582,16 +589,16 @@ void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor
         ((struct SceneActorAnimationView *)actor)->profileId,
         ((struct SceneActorAnimationView *)actor)->profileMode, 0);
     u32 variant, flags;
-    if (actor->field2B2)
-        actor->field2B2 = 0;
-    TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
+    if (actor->base.field2B2)
+        actor->base.field2B2 = 0;
+    TentacleBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
     TentacleBody_SelectAnimation((void *)actor, entry[17].value, variant, flags);
-    TentacleBody_ResetDirectionalAnimations(actor->context, 18);
+    TentacleBody_ResetDirectionalAnimations(actor->base.context, 18);
     sub_080A9DB0(actor, 20, 25600);
     if (frame > 40) {
-        TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
+        TentacleBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
         TentacleBody_SelectAnimation((void *)actor, entry[14].value, variant, flags);
-        TentacleBody_RefreshDirectionalAnimations(actor->context, 15);
-        actor->field2B0 = 1;
+        TentacleBody_RefreshDirectionalAnimations(actor->base.context, 15);
+        actor->base.field2B0 = 1;
     }
 }

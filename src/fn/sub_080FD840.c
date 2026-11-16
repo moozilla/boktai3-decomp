@@ -15,14 +15,14 @@ static inline u16 Mask16(u16 *p, u32 m)
 }
 void SceneActorControl_EndExtendedPhase(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorExtendedControlContext *context = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1))
+    struct SceneActorExtendedControlContext *context = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         context->fieldED1 = 1;
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         u8 zero8;
         u32 zero;
         Axe_SetAuxiliarySpriteRenderState(actor, context->target888, 0x13C);
-        actor->flags2D4 = Mask16(&actor->flags2D4, ~0x100);
+        actor->base.flags2D4 = Mask16(&actor->base.flags2D4, ~0x100);
         zero8 = 0;
         zero = 0;
         {
@@ -32,13 +32,13 @@ void SceneActorControl_EndExtendedPhase(struct SceneActorRegistryResetView *acto
         }
         {
             u32 behavior = 3;
-            actor->state2A8 = zero8;
-            actor->phase2A9 = zero8;
-            actor->behavior2AA = behavior;
-            actor->counter2AC = zero;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = zero8;
+            actor->base.phase2A9 = zero8;
+            actor->base.behavior2AA = behavior;
+            actor->base.counter2AC = zero;
+            actor->base.field2B1 = 1;
         }
     } else {
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
     }
 }

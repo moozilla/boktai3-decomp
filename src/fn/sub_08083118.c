@@ -3,7 +3,7 @@
 void SceneActorControl_BeginSavedHeadingPhase(struct SceneActorRegistryResetView *actor)
 {
     if (SceneActorControl_TakeStateEntry(actor))
-        actor->body.direction = actor->tracking.heading;
+        actor->base.body.direction = actor->base.tracking.heading;
     SceneActorTerrain_EnterState(actor, 0, 2, 0);
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

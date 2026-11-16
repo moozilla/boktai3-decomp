@@ -25,17 +25,17 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, void *c
 {
     void *callback = control;
     u32 code = kind;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = code;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = code;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void ClearFlags(u32 *flags, u32 mask)
 {
@@ -45,11 +45,11 @@ static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state
                             u32 behavior)
 {
     u32 b = behavior;
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 u8 SceneActorReaction_IsRangeReady(struct SceneActorRegistryResetView *);
 // confidence=low: category-six attack gate selects close, ranged or health-gated guard behavior
@@ -62,8 +62,8 @@ u32 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *actor,
         Skeleton_SelectDistanceReaction(actor);
         return 1;
     }
-    if (actor->tracking.distance < context->guardRange && context->guardTimer <= 0) {
-        if (angle <= 12 && actor->health <= context->guardHealth) {
+    if (actor->base.tracking.distance < context->guardRange && context->guardTimer <= 0) {
+        if (angle <= 12 && actor->base.health <= context->guardHealth) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 2);
             context->attempts = 0;
@@ -76,13 +76,15 @@ u32 Skeleton_TryBeginGuardedAttack(struct SceneActorRegistryResetView *actor,
             return 1;
         }
     } else {
-        if (angle <= 24 && actor->tracking.distance < context->nearRange && context->nearTimer <= 0) {
+        if (angle <= 24 && actor->base.tracking.distance < context->nearRange &&
+            context->nearTimer <= 0) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 0);
             context->attempts = 0;
             return 1;
         }
-        if (angle <= 12 && actor->tracking.distance < context->rangedRange && context->rangedTimer <= 0) {
+        if (angle <= 12 && actor->base.tracking.distance < context->rangedRange &&
+            context->rangedTimer <= 0) {
             SetControl(actor, SceneActorControl_OnIdle, 0x10);
             SetState(actor, 0, 2, 1);
             context->attempts = 0;

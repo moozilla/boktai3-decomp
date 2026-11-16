@@ -23,11 +23,11 @@ s32 SceneActorReaction_TickHiddenResponse(struct SceneActorRegistryResetView *ac
         flags = (void *)actor;
         if (SceneActorControl_TestFlags(enabled, ~0)) {
             u32 one = 1;
-            if (saved->drawableKind == 0) {
-                u32 *field = saved->drawable;
+            if (saved->base.drawableKind == 0) {
+                u32 *field = saved->base.drawable;
                 *field |= one;
             } else {
-                struct SceneActorAnimationTile *tile = (void *)((u8 *)saved->drawable + 0x20);
+                struct SceneActorAnimationTile *tile = (void *)((u8 *)saved->base.drawable + 0x20);
                 tile->flags |= one;
             }
             {

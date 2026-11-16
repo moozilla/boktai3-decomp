@@ -4,11 +4,11 @@
 
 void SceneActorReaction_ApplyThreshold(struct SceneActorRegistryResetView *actor, s32 value)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
 
-    if (SceneActorControl_TakeFlag(&actor->field2B2))
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 
     if (value > context->parameter706)
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
 }

@@ -32,26 +32,26 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct SceneActorRegistryRese
     s32 angle;
     u32 m = 0x100;
 
-    if (!(s->flags2D4 & m)) {
-        context = s->context;
-        if (s->tracking.distance < s->tracking.range) {
+    if (!(s->base.flags2D4 & m)) {
+        context = s->base.context;
+        if (s->base.tracking.distance < s->base.tracking.range) {
             struct SceneActorTargetDelta *difference = &delta;
-            struct ContactPosition *from = &s->body.position;
+            struct ContactPosition *from = &s->base.body.position;
             struct ContactPosition *to =
-                &((struct SceneActorTargetPosition *)s->tracking.target)->position;
+                &((struct SceneActorTargetPosition *)s->base.tracking.target)->position;
             difference->x = to->x - from->x;
             difference->y = to->y - from->y;
             difference->z = to->z - from->z;
             angle = RotationPhase_HeadingDistance(Math_Atan2(delta.x, difference->z),
-                                                  s->body.direction);
-            if (angle < s->tracking.heading) {
-                if (s->category == 5) {
+                                                  s->base.body.direction);
+            if (angle < s->base.tracking.heading) {
+                if (s->base.category == 5) {
                     if (SceneActorControl_TryBeginNearbyBehavior16(s, context, angle))
                         return;
-                } else if (s->category == 6) {
+                } else if (s->base.category == 6) {
                     if (Skeleton_TryBeginGuardedAttack(s, context, angle))
                         return;
-                } else if (s->category == 7) {
+                } else if (s->base.category == 7) {
                     if (Skeleton_TryBeginArmedAttack(s, context, angle))
                         return;
                 }

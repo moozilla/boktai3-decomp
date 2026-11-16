@@ -6,25 +6,25 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 
 static inline void Control(struct SceneActorRegistryResetView *a, void *c, u32 k)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = k;
-    a->target = c;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = k;
+    a->base.target = c;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         u32 m = ~1;
         *p &= m;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 static inline void State(struct SceneActorRegistryResetView *a, u32 k)
 {
-    a->state2A8 = 0;
-    a->phase2A9 = 0;
-    a->behavior2AA = k;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = 0;
+    a->base.phase2A9 = 0;
+    a->base.behavior2AA = k;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 static inline u8 HasFlag(u8 *c, u32 m)
 {
@@ -51,7 +51,7 @@ static inline void Delta(struct ContactPosition *out, struct ContactPosition *fr
 }
 static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPosition *delta)
 {
-    s32 direction = a->body.direction;
+    s32 direction = a->base.body.direction;
     s32 difference = Math_Atan2(delta->x, delta->z) - direction;
     if (difference > 128)
         difference -= 256;
@@ -62,7 +62,7 @@ static inline s32 Facing(struct SceneActorRegistryResetView *a, struct ContactPo
 
 static inline u32 SaveFlags(struct SceneActorRegistryResetView *a, u16 **out, u32 m)
 {
-    u16 *p = &a->flags2D4;
+    u16 *p = &a->base.flags2D4;
     u32 r = *p & m;
     *out = p;
     return r;
@@ -86,9 +86,9 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         return 0;
     if (SaveFlags(a, &flags, 128))
         return 0;
-    if (a->tracking.distance > a->tracking.limit)
+    if (a->base.tracking.distance > a->base.tracking.limit)
         return 0;
-    Delta(&delta, &a->body.position, (void *)(player + 0x30));
+    Delta(&delta, &a->base.body.position, (void *)(player + 0x30));
     angle = Facing(a, &delta);
     if (angle < 0)
         angle = -angle;
@@ -96,7 +96,7 @@ u8 SceneActorPlacement_BeginNearbyPlayerContact(struct SceneActorRegistryResetVi
         return 0;
     if (!sub_0821D4F0(transform + 12, ((u8 **)gPlayers)[0] + 0x30, 5, 256))
         return 0;
-    a->tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
+    a->base.tracking.target = (u32)(((u8 **)gPlayers)[0] + 0x24);
     State(a, 12);
     Control(a, F(nav, 0x48, void *), 26);
     sub_080A4798(a);

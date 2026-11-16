@@ -59,12 +59,12 @@ static inline u8 TryRoute(struct SceneActorRegistryResetView *actor, void *route
         result = Terrain_ApplyBlocked(route, position, destination);
         if (result) {
             if (result != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         }
     }
     {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         u32 mask = ~0x200;
         mask &= *flags;
         *flags = mask;
@@ -82,10 +82,10 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
     void **route;
 
     do {
-        cell = actor->terrainCell;
-        height = CellHeight(&actor->body.position, cell);
+        cell = actor->base.terrainCell;
+        height = CellHeight(&actor->base.body.position, cell);
         shape = CellShape(cell);
-        switch (FacingQuarter(actor->body.direction + 32) & 3) {
+        switch (FacingQuarter(actor->base.body.direction + 32) & 3) {
             case 0:
                 next = cell + 1;
                 i = 0;
@@ -139,23 +139,23 @@ static inline u32 SelectRetreat(struct SceneActorRegistryResetView *actor, u32 p
                 chosen = next + MapWidth();
                 break;
             default:
-                chosen = actor->terrainCell;
+                chosen = actor->base.terrainCell;
                 route = &actor->group.route;
                 break;
         }
     probed:
-        if (chosen != actor->terrainCell)
+        if (chosen != actor->base.terrainCell)
             goto selected;
-        actor->body.direction += 64;
+        actor->base.body.direction += 64;
         tries++;
     } while (tries <= 3);
 selected:
-    actor->body.direction = priorDirection;
+    actor->base.body.direction = priorDirection;
     SceneActorTerrain_GetCenter(chosen, &center);
     {
         s16 groupOffset = (u32) & ((struct SceneActorRegistryResetView *)0)->group.common;
         u8 *group = (u8 *)actor + groupOffset;
-        if (TryRoute(actor, *route, &actor->body.position, &center))
+        if (TryRoute(actor, *route, &actor->base.body.position, &center))
             return 1;
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
     }

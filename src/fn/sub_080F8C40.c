@@ -26,10 +26,10 @@ static inline s32 FoldRotation(s32 a)
 }
 void SceneActorControl_RecoverRotation(struct SceneActorRegistryResetView *actor, s32 elapsed)
 {
-    struct RotationControlState *state = actor->context;
-    struct RotatingDrawable *drawable = actor->drawable;
+    struct RotationControlState *state = actor->base.context;
+    struct RotatingDrawable *drawable = actor->base.drawable;
     s32 angle;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         drawable->flags |= 2;
         state->acceleration = 4;
         Sound_PlaySong(0x1E5);

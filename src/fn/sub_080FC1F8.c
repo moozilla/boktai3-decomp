@@ -39,7 +39,7 @@ void sub_080FC1F8(struct SceneActorRegistryResetView *actor, struct ContactPosit
         struct ContactPosition p;
         struct ContactPackedVector v;
     } position;
-    struct AxeSparkContext *context = actor->context;
+    struct AxeSparkContext *context = actor->base.context;
     if (Mod(frame, 2) == 0) {
         s32 x, z, x2;
         range.x = 60;

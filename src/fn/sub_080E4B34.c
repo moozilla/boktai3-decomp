@@ -12,16 +12,16 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorChase_SetControl(actor, actor->savedTarget, 0);
-        SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x80);
+        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x200);
     }
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     zero = (u8)sub_0812F3CC(actor);
     if (zero)
         return;
-    if ((s32)actor->counter2AC <= 20)
+    if ((s32)actor->base.counter2AC <= 20)
         goto waiting;
     SceneActorChase_ClearFlagComponent((struct SceneActorChaseFlags16 *)&group->common.gate.flags,
                                         6);
@@ -32,5 +32,5 @@ void Dog_BeginDelayedRouteRecovery(struct SceneActorRegistryResetView *actor)
     SceneActorChase_Arrive(actor);
     return;
 waiting:
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -61,19 +61,19 @@ void TentacleActor_ActivateMarkedSegment(void *);
 
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit;
     s32 scriptVariant;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
-    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->tracking);
+    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->base.tracking);
 
     if (Script_SeekToKeyword(0x6C)) {
         firstLimit = MonsterInit_ReadWord(0x12C);
@@ -85,51 +85,51 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
+    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
     scriptVariant = (s16)Script_GetKeywordValue(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    arg0->field9A = scriptVariant;
+    arg0->base.field9A = scriptVariant;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    SceneBody_SetSprite(body, arg0->drawableKind ? 0 : arg0->drawable);
+    SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
 static inline void Tentacle_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
                                         u16 alternate)
 {
     s32 palette;
-    actor->paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
+    actor->base.paletteOffset = MonsterInit_ReadKeywordHalfword(0x43, 0);
+    actor->base.basePaletteBank = base;
+    actor->base.paletteAlternateBank = alternate;
     MonsterInit_SetAlternatePaletteOffset(actor, MonsterInit_GetPaletteOffset(actor) + base);
     palette = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, palette);
+        AnimData_SelectPaletteBank(actor->base.drawable + 0x2C, palette);
     else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (palette << 5);
+        *(u8 **)(actor->base.drawable + 0x68) = gPaletteBankData + (palette << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetPalette((void *)(actor->drawable + 0x20),
+        MonsterInit_SetWidgetPalette((void *)(actor->base.drawable + 0x20),
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
 
@@ -140,43 +140,44 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
                                               void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->contextCallback = cb0;
-    MonsterInit_WriteAnimationQuery(&actor->animationQuery.word, cb1);
-    actor->entryTarget224 = cb2;
-    actor->entryTarget228 = cb3;
-    actor->savedTarget = cb4;
-    actor->reactionTarget230 = cb5;
-    actor->deathControl = cb6;
-    actor->field220 = hidden;
-    actor->defaultReaction = defaultReaction;
-    MonsterInit_WriteCallback(&actor->contactQuery.opaque, 0);
-    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_086108B0);
-    actor->callback248 = 0;
-    actor->update26C = targetQuery;
-    actor->field238 = SceneActorReaction_SinkAndRemove;
-    actor->damageCallback = damage;
-    actor->contactCallback = contact;
-    actor->field240 = 0;
+    actor->base.contextCallback = cb0;
+    MonsterInit_WriteAnimationQuery(&actor->base.animationQuery.word, cb1);
+    actor->base.entryTarget224 = cb2;
+    actor->base.entryTarget228 = cb3;
+    actor->base.savedTarget = cb4;
+    actor->base.reactionTarget230 = cb5;
+    actor->base.deathControl = cb6;
+    actor->base.field220 = hidden;
+    actor->base.defaultReaction = defaultReaction;
+    MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
+    MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
+    actor->base.callback248 = 0;
+    actor->base.update26C = targetQuery;
+    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.damageCallback = damage;
+    actor->base.contactCallback = contact;
+    actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 static inline void Tentacle_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
 {
-    actor->messageCallback = SceneActorScript_OnCommand;
-    actor->updateCallback = TentacleEnemy_InitPlayerReference;
-    actor->destroyCallback = TentacleBody_Destroy;
+    actor->base.messageCallback = SceneActorScript_OnCommand;
+    actor->base.updateCallback = TentacleEnemy_InitPlayerReference;
+    actor->base.destroyCallback = TentacleBody_Destroy;
 }
 
 static inline void Tentacle_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    actor->callback248 = ActorTrail_ResetAtSavedPosition;
-    actor->field23C = SceneActor_ResetQueuedState;
-    MonsterInit_WriteCallback(&actor->contactQuery.opaque, SceneActor_TryRequestFacingReaction);
-    actor->field240 = sub_080AA744;
+    actor->base.callback248 = ActorTrail_ResetAtSavedPosition;
+    actor->base.field23C = SceneActor_ResetQueuedState;
+    MonsterInit_WriteCallback(&actor->base.contactQuery.opaque,
+                              SceneActor_TryRequestFacingReaction);
+    actor->base.field240 = sub_080AA744;
 }
 
 static inline void Tentacle_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
 {
-    MonsterInit_SetTargetingFlags(&actor->tracking, 1);
+    MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x200);
     MonsterInit_SetStatusFlags(actor, 8);
     MonsterInit_SetMotionFlags(actor, 0x40);
@@ -194,46 +195,46 @@ s32 TentacleActor_Init(void *object)
     TentacleActor_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD636, 0xC102);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
         void *res;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         res = ScriptProc_Start(0xCB05, 0xD636);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor, &zero);
 
     if (Script_SeekToKeyword(0x70)) {
         s32 height;
         u16 *ground;
-        actor->body.position.x = MonsterInit_ReadHalfword(0);
-        actor->body.position.y = MonsterInit_ReadHalfword(0);
-        actor->body.position.z = MonsterInit_ReadHalfword(0);
-        actor->terrainCell = MonsterInit_CellId(&actor->body.position);
-        height =
-            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &actor->body.position);
-        ground = &actor->groundHeight2BE;
+        actor->base.body.position.x = MonsterInit_ReadHalfword(0);
+        actor->base.body.position.y = MonsterInit_ReadHalfword(0);
+        actor->base.body.position.z = MonsterInit_ReadHalfword(0);
+        actor->base.terrainCell = MonsterInit_CellId(&actor->base.body.position);
+        height = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
+                                           &actor->base.body.position);
+        ground = &actor->base.groundHeight2BE;
         *ground = height;
-        actor->field2EA = (u16)actor->body.position.y - height;
-        actor->body.position.y = *ground;
+        actor->base.field2EA = (u16)actor->base.body.position.y - height;
+        actor->base.body.position.y = *ground;
         if (MonsterInit_GetDrawableKind(actor) == 0)
-            *(struct ContactPosition *)(actor->drawable + 0x1C) = actor->body.position;
+            *(struct ContactPosition *)(actor->base.drawable + 0x1C) = actor->base.body.position;
         else
-            *(struct ContactPosition *)(actor->drawable + 0x40) = actor->body.position;
-        tentacle->savedPosition = actor->body.position;
+            *(struct ContactPosition *)(actor->base.drawable + 0x40) = actor->base.body.position;
+        tentacle->savedPosition = actor->base.body.position;
     }
 
     if (Script_SeekToKeyword(0x50))
@@ -263,23 +264,23 @@ s32 TentacleActor_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     TentacleActor_SelectWanderRoute(actor);
     MonsterInit_SetState(actor, 0, 0, 2);
-    MonsterInit_SetControl(actor, actor->entryTarget228, 1);
+    MonsterInit_SetControl(actor, actor->base.entryTarget228, 1);
     SceneActorBehavior_InstallCallbackTables(actor);
     TentacleBody_InitBehaviorTable(actor);
     TentacleActor_InitStateHandlers(actor);
     TentacleBody_InitSegmentAnimations(actor, 0xD636, 0xC102, MonsterInit_GetDirection(actor));
-    TentacleActor_ResetSegmentPositions(tentacle, &actor->body.position);
+    TentacleActor_ResetSegmentPositions(tentacle, &actor->base.body.position);
     TentacleActor_InitSegmentColliders(actor);
     TentacleActor_SelectWanderRoute(actor);
     TentacleActor_ActivateMarkedSegment(actor);

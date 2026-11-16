@@ -9,17 +9,17 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
         SceneActorTerrain_ClearCollisionTimers((void *)actor);
         {
-            u16 *flags = &actor->flags2D4;
+            u16 *flags = &actor->base.flags2D4;
             s32 mask = ~2;
             *flags &= mask;
         }
     }
-    if (actor->field2B3) {
-        actor->fieldAA = 0;
-        actor->field2B0 = 1;
+    if (actor->base.field2B3) {
+        actor->base.fieldAA = 0;
+        actor->base.field2B0 = 1;
         {
             u32 mask = 16;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorTerrain_EnterState(actor, 3, 1, 0);

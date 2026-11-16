@@ -5,7 +5,7 @@
 static inline void Mummy_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
                                              u8 *mirror, u32 zero)
 {
-    s32 quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
+    s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
@@ -25,20 +25,20 @@ static inline void Mummy_SelectAnimation(struct SceneActorRegistryResetView *act
         flags &= ~0x10;
     } else
         force = 0;
-    if (!actor->drawableKind) {
+    if (!actor->base.drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->animationIndex = selection;
-        drawable = actor->drawable;
+        actor->base.animationIndex = selection;
+        drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->field2B3;
+        restart = &actor->base.field2B3;
     } else {
         struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->animationIndex;
-        restart = &actor->field2B3;
+        savedSelection = &actor->base.animationIndex;
+        restart = &actor->base.field2B3;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
@@ -53,8 +53,9 @@ static inline void Mummy_SelectAnimation(struct SceneActorRegistryResetView *act
                 mode = 6;
             else
                 mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                              actor->drawable, (u16)selection, 2, (u16)mode);
+            Anim_SetKeyframes(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
+                actor->base.drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
                 tile->flags |= mask;
@@ -81,14 +82,14 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
     u32 queued;
     u8 *prepared;
     u32 mask = 1;
-    if (!actor->drawableKind) {
-        u32 *flags = actor->drawable;
+    if (!actor->base.drawableKind) {
+        u32 *flags = actor->base.drawable;
         *flags |= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->drawable + 0x20);
+        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= mask;
     }
-    queued = TakeSaved(&actor->field2B2, &prepared);
+    queued = TakeSaved(&actor->base.field2B2, &prepared);
     if (queued) {
         ActorShadow_Disable((u8 *)actor + 0x320);
     } else if (frame > 0x1A) {
@@ -103,16 +104,16 @@ void Mummy_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         kind = 13;
         zero = 0;
         *prepared = 1;
-        actor->field2B0 = zero;
-        actor->field2B5 = kind;
-        actor->target = callback;
-        actor->field2C8 = zero;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = kind;
+        actor->base.target = callback;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     } else
-        actor->field2B3 = queued;
+        actor->base.field2B3 = queued;
 }

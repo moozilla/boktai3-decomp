@@ -22,7 +22,7 @@ static inline u32 Flags32(struct SceneActorRegistryResetView *a, u32 m)
 static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
 {
     if (a) {
-        if (Flags16(a, 0x40) || Flags32(a, 0x20000) || a->health <= 0)
+        if (Flags16(a, 0x40) || Flags32(a, 0x20000) || a->base.health <= 0)
             return 1;
     }
     return 0;
@@ -30,13 +30,13 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *a)
 
 void Golem_InitActionHandlers(struct SceneActorRegistryResetView *actor)
 {
-    actor->alternateBehaviorCallbacks = (void **)gUnk_08606134;
+    actor->base.alternateBehaviorCallbacks = (void **)gUnk_08606134;
 }
 
 s32 Golem_TickFacingQuadrant(struct SceneActorRegistryResetView *a)
 {
-    u8 *base = (u8 *)&a->body.id;
-    struct GolemState *s = a->context;
+    u8 *base = (u8 *)&a->base.body.id;
+    struct GolemState *s = a->base.context;
     if (!Unavailable(a)) {
         if (s->countdown626)
             s->countdown626--;
@@ -53,9 +53,9 @@ s32 Golem_TickFacingQuadrant(struct SceneActorRegistryResetView *a)
 
 s32 Golem_UpdateEffectsAndContacts(struct SceneActorRegistryResetView *actor)
 {
-    struct GolemState *state = actor->context;
+    struct GolemState *state = actor->base.context;
     u32 m = 0x40;
-    if (!(actor->flags2D4 & m)) {
+    if (!(actor->base.flags2D4 & m)) {
         u16 *p = &state->shakeTimer6AE;
         if (*p != 0) {
             Camera_RequestShake(state->shakeStrength6AC);

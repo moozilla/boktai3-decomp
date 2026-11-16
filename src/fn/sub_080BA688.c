@@ -42,18 +42,18 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
-    heading = &p->body.direction;
+    heading = &p->base.body.direction;
     HeadingStep(&scratch.step, heading, 32);
     {
         struct ContactPosition *v = &scratch.step;
-        AddHalf(&p->body.motion.x, &v->x);
-        v = &p->body.motion;
+        AddHalf(&p->base.body.motion.x, &v->x);
+        v = &p->base.body.motion;
         AddZ(&v->z, &scratch.step);
     }
     step = &scratch.step;
     {
         u32 mask = 0x2000;
-        u32 *fl = &p->flags2CC;
+        u32 *fl = &p->base.flags2CC;
         *fl |= mask;
     }
     scratch.zero = 0;
@@ -61,20 +61,20 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     jitter.x = 0x52;
     jitter.y = 0;
     jitter.z = 0x52;
-    SceneParticleBurst_CreateWithPause(&p->body.position, step, &jitter, 1, 2, 4);
-    if (p->field2B3) {
+    SceneParticleBurst_CreateWithPause(&p->base.body.position, step, &jitter, 1, 2, 4);
+    if (p->base.field2B3) {
         void (*f)(void) = Skeleton_TickDecayingLunge;
         u32 k = 0x29;
         u32 *w;
         s32 m;
-        p->field2B2 = 1;
-        p->field2B0 = 0;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = 0;
-        w = &p->flags114;
+        p->base.field2B2 = 1;
+        p->base.field2B0 = 0;
+        p->base.field2B5 = k;
+        p->base.target = f;
+        p->base.field2C8 = 0;
+        w = &p->base.flags114;
         m = -2;
         *w = m & *w;
-        p->word104 = 0;
+        p->base.word104 = 0;
     }
 }

@@ -2,38 +2,38 @@
 u32 Trigger_ConsumePending(void *, u32);
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                             u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void SceneActorControl_UpdateTriggerPhase(struct SceneActorRegistryResetView *actor)
 {
-    u8 taken = SceneActorControl_TakeFlag(&actor->field2B1);
+    u8 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {
-        SetControl(actor, actor->entryTarget224, 1);
-    } else if (actor->field2B0) {
+        SetControl(actor, actor->base.entryTarget224, 1);
+    } else if (actor->base.field2B0) {
         Trigger_ConsumePending((u8 *)actor + 0xc, 1);
-        SetControl(actor, actor->savedTarget, taken);
+        SetControl(actor, actor->base.savedTarget, taken);
         SetState(actor, 2, 0, 2);
     } else {
-        actor->counter2AC++;
+        actor->base.counter2AC++;
     }
 }

@@ -14,7 +14,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
 void SceneActor_AimArcAtPlayer(struct SceneActorRegistryResetView *actor)
 {
     struct ContactPosition delta;
-    struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
+    struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
     struct Player **slots = gPlayers;
     struct ContactPosition *out = &delta;
     const struct ContactPosition *own = &drawable->position;
@@ -24,13 +24,13 @@ void SceneActor_AimArcAtPlayer(struct SceneActorRegistryResetView *actor)
     out->y = player->y - own->y;
     out->z = player->z - own->z;
     angle = Math_Atan2(delta.x, out->z);
-    actor->secondaryMotion.x = TruncateShift(gSineTable[(angle + 64) & 255] * 32, 12);
-    actor->secondaryMotion.z = TruncateShift(gSineTable[angle & 255] * 32, 12);
-    if (actor->secondaryMotion.x != 0)
-        time = Div(delta.x, actor->secondaryMotion.x);
-    else if (actor->secondaryMotion.z != 0)
-        time = Div(delta.z, actor->secondaryMotion.z);
+    actor->base.secondaryMotion.x = TruncateShift(gSineTable[(angle + 64) & 255] * 32, 12);
+    actor->base.secondaryMotion.z = TruncateShift(gSineTable[angle & 255] * 32, 12);
+    if (actor->base.secondaryMotion.x != 0)
+        time = Div(delta.x, actor->base.secondaryMotion.x);
+    else if (actor->base.secondaryMotion.z != 0)
+        time = Div(delta.z, actor->base.secondaryMotion.z);
     else
         time = 0;
-    actor->secondaryMotion.y = TruncateShift(time, 1);
+    actor->base.secondaryMotion.y = TruncateShift(time, 1);
 }

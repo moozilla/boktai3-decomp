@@ -48,27 +48,27 @@ static inline void BeginTargetControl(struct SceneActorRegistryResetView *actor,
         stateOffset += 0x13;
         *(u16 *)((u8 *)actor + stateOffset) = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     }
 }
 void SceneActorControl_WaitForTarget(struct SceneActorRegistryResetView *input)
 {
     struct SceneActorRegistryResetView *actor = input;
     s32 zero;
-    struct SceneActorTargetWaitState *state = actor->context;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        SetCollider(&actor->colliderA);
-        ClearFlags(&actor->flags2C0, ~0x800);
+    struct SceneActorTargetWaitState *state = actor->base.context;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        SetCollider(&actor->base.colliderA);
+        ClearFlags(&actor->base.flags2C0, ~0x800);
     }
     if (!Ivy_FindAdjacentTarget(actor, 1))
         state->targetMissFrames++;
     else
         state->targetMissFrames = 0;
-    if ((s32)actor->counter2AC > 30 && (zero = state->targetMissFrames) == 0) {
+    if ((s32)actor->base.counter2AC > 30 && (zero = state->targetMissFrames) == 0) {
         BeginTargetControl(actor, zero);
     }
     {

@@ -9,7 +9,7 @@ struct VornResponseFlags {
 };
 static inline u32 Vorn_ActorFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2CC & mask;
+    return actor->base.flags2CC & mask;
 }
 static inline u8 Vorn_TestContext(struct SceneActorRegistryResetView *context, u16 mask,
                                   struct VornResponseFlags **field)
@@ -36,11 +36,11 @@ static inline void Vorn_SetResponseFlags(struct VornResponseFlags *flags, u16 bi
 static inline void Vorn_SetTimedMotion(struct SceneActorRegistryResetView *actor, void *callback,
                                        u32 duration)
 {
-    actor->word104 = (u32)callback;
-    actor->word108 = 0;
-    actor->word10C = 0;
-    actor->word110 = duration;
-    actor->flags114 = 1;
+    actor->base.word104 = (u32)callback;
+    actor->base.word108 = 0;
+    actor->base.word10C = 0;
+    actor->base.word110 = duration;
+    actor->base.flags114 = 1;
 }
 static inline void Vorn_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 bits)
 {
@@ -51,22 +51,22 @@ static inline void Vorn_ResetContext(struct SceneActorRegistryResetView *a)
     struct SceneActorChaseTracking *motion;
     struct SceneActorRegistryControl *control;
     u16 *flags;
-    a->field2C2 = 64;
+    a->base.field2C2 = 64;
     a->group.common.gate.flags = 0;
     a->group.common.gate.counter = 0;
-    flags = &a->flags2D4;
+    flags = &a->base.flags2D4;
     {
         s32 mask = ~0x380;
         *flags = mask & (*flags);
     }
-    motion = &a->tracking;
+    motion = &a->base.tracking;
     {
         s32 mask = ~0x18;
         motion->flags = mask & motion->flags;
     }
     control = &a->group.common.control;
     if (Vorn_ActorFlags(a, 0x200000)) {
-        u32 *state = &a->flags2D0;
+        u32 *state = &a->base.flags2D0;
         s32 mask = ~0x1000000;
         *state = mask & (*state);
         {
@@ -87,7 +87,7 @@ static inline void Vorn_ResetContext(struct SceneActorRegistryResetView *a)
 void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset, const void *unused,
                                u32 unused2)
 {
-    struct SceneActorRegistryResetView *ctx = (void *)a->context;
+    struct SceneActorRegistryResetView *ctx = (void *)a->base.context;
     struct SceneActorChaseGroup *group = &ctx->group;
     struct VornResponseFlags *flags;
 
@@ -100,25 +100,25 @@ void Vorn_BeginResponsePursuit(struct SceneActorRegistryResetView *a, u32 reset,
     Vorn_SetResponseFlags(flags, 1);
     flags->bits &= ~2;
     ctx->field698 = ctx->frame69A;
-    a->body.direction = a->field2B6;
+    a->base.body.direction = a->base.field2B6;
     if (reset == 1)
-        SceneBody_StartRoute(&a->body.id, &group->homeRoute,
+        SceneBody_StartRoute(&a->base.body.id, &group->homeRoute,
                              group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0, 0);
     sub_080B1FA8(a);
     {
         u32 mask = 4;
-        a->flags2D0 = mask | a->flags2D0;
+        a->base.flags2D0 = mask | a->base.flags2D0;
     }
     {
         s8 mask = ~16;
-        a->flags2CC = mask & a->flags2CC;
+        a->base.flags2CC = mask & a->base.flags2CC;
     }
     SceneActorChase_SetBehavior(a, 15);
-    SceneActorChase_SetControl(a, a->savedTarget, 0);
+    SceneActorChase_SetControl(a, a->base.savedTarget, 0);
     Vorn_SetTimedMotion(a, sub_080ADB90, 35);
-    Vorn_SetTrackingFlags(&a->tracking, 8);
+    Vorn_SetTrackingFlags(&a->base.tracking, 8);
     {
         u32 mask = 128;
-        a->flags2CC = mask | a->flags2CC;
+        a->base.flags2CC = mask | a->base.flags2CC;
     }
 }

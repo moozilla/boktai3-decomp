@@ -11,8 +11,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 }
 static inline u8 IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -28,12 +28,12 @@ static inline u32 StateFlag(struct SceneActorScriptPropertiesView *p, u32 mask)
 }
 void SceneActor_TryForward(void *a, void *b, struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorScriptPropertiesView *state = actor->context;
+    struct SceneActorScriptPropertiesView *state = actor->base.context;
     if (IsUnavailable(actor))
         return;
     if (Test(StateFlag(state, 0x10), ~0)) {
-        actor->context++;
-        actor->context--;
+        actor->base.context++;
+        actor->base.context--;
         return;
     }
     if (*((u8 *)state + 0x6D0))

@@ -20,7 +20,7 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
         (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)
-                                            actor->drawable)
+                                            actor->base.drawable)
             ->sequence;
     struct ContactPackedVector range;
     struct SceneActorChaseGroup *group = &actor->group;
@@ -33,12 +33,12 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
             Sound_PlaySong(0x12A);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->field2B3 = 0;
+        actor->base.field2B3 = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
     if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
         animation->duration != 1)
@@ -55,11 +55,14 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
         sample = *(const u16 *)(RANDOM_TABLE_ADDR + index);
         sample &= 3;
         count = sample + 1;
-        SparkParticle_Spawn(&actor->body.position, count, (const struct ContactPosition *)&range,
-                            actor->body.direction + 128, 10, 6, 2, 2);
+        SparkParticle_Spawn(&actor->base.body.position, count,
+                            (const struct ContactPosition *)&range,
+                            actor->base.body.direction + 128, 10, 6, 2, 2);
     }
-    dx = SceneActorDisplacement_ReadAxis(actor->reactionStart.x, &actor->reactionEnd.x, &x);
-    dz = SceneActorDisplacement_ReadAxis(actor->reactionStart.z, &actor->reactionEnd.z, &z);
+    dx = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
+                                         &x);
+    dz = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.z, &actor->base.reactionEnd.z,
+                                         &z);
     if (dx > 200)
         dx = 200;
     else if (dx < -200)
@@ -68,18 +71,18 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
         dz = 200;
     else if (dz < -200)
         dz = -200;
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     if (!Bat_DisplacementStopped(dx, dz))
         return;
-    if (!actor->field2B3)
+    if (!actor->base.field2B3)
         return;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }
@@ -87,7 +90,7 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, sub_08087018, 0x14);
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
-        actor->field2C2 = 64;
+        actor->base.field2C2 = 64;
         return;
     }
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x80)) {
@@ -96,8 +99,8 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
                                          4);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -110,13 +113,13 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
     SceneActorChase_SetActorFlags(actor, 0x10);
     group->destination->pad = 0;
     if (!SceneActorChase_Arrive(actor)) {
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                      &actor->tracking.target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      &actor->base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
     SceneActorChase_SetBehavior(actor, 7);
-    actor->field2C2 = 32;
+    actor->base.field2C2 = 32;
 }

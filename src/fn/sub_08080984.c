@@ -6,14 +6,14 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->flags2CC;
+        u32 *field = &actor->base.flags2CC;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
         control->field14 = 0;
         control->timer = 0;
         {
-            switch (actor->category) {
+            switch (actor->base.category) {
                 case 4:
                     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
                     Sound_PlaySong(212);
@@ -43,12 +43,12 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
         }
         while (0)
             ;
-        if (actor->drawableKind == 0) {
-            u32 *sequence = actor->drawable;
+        if (actor->base.drawableKind == 0) {
+            u32 *sequence = actor->base.drawable;
             u32 mask = timerZero - 2;
             *sequence &= mask;
         } else {
-            u8 *tile = (u8 *)actor->drawable + 0x20;
+            u8 *tile = (u8 *)actor->base.drawable + 0x20;
             u32 mask = ~1;
             *(u32 *)(tile + 8) &= mask;
         }
@@ -61,9 +61,9 @@ void SceneActorReaction_BeginReactionSound(struct SceneActorRegistryResetView *a
             *first = state;
             *((u8 *)actor + 0x2A9) = zero;
             *((u8 *)actor + 0x2AA) = zero;
-            actor->counter2AC = zero;
-            actor->field2B1 = 1;
+            actor->base.counter2AC = zero;
+            actor->base.field2B1 = 1;
         }
-        actor->fieldAA = 0;
+        actor->base.fieldAA = 0;
     }
 }

@@ -29,9 +29,9 @@ static inline s32 Dog_HeadingOctant(s32 angle)
 /* React to contact, pursue the target, or select a delayed cardinal turn. */
 s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
 {
-    union DogReactionContext *context = a->context;
+    union DogReactionContext *context = a->base.context;
     struct SceneActorChaseGroup *group = &a->group;
-    if (a->reactionSoundVariant == 0)
+    if (a->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);
@@ -39,27 +39,27 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         SceneActorChase_ClearMotionFlags(a, 0x20);
         return 0;
     }
-    if (a->field2DC & 0xC0000) {
-        SceneActorChase_SetControl(a, a->reactionTarget230, 18);
+    if (a->base.field2DC & 0xC0000) {
+        SceneActorChase_SetControl(a, a->base.reactionTarget230, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&a->flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&a->base.flags2D0, 0x1000000);
         SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(a, 0x20);
-    if (SceneActorChase_QueryMotionFlags(a, 0x100) || a->field2B8)
+    if (SceneActorChase_QueryMotionFlags(a, 0x100) || a->base.field2B8)
         return 0;
     if (SceneActorChase_QueryMotionFlags(a, 0x80)) {
         SceneActorChase_BeginContactAnimation(a);
-        if (!a->tracking.target)
+        if (!a->base.tracking.target)
             return 0;
         SceneActorChase_SetActorFlags(a, 0x80);
         SceneActorChase_SetFlagComponent((void *)&group->common.gate.flags, 4);
         SceneActorChase_TrackPlayer(a);
         if (Dog_IsActionTimerExpired(a)) {
             if (!SceneActorChase_Arrive(a)) {
-                if (!SceneActorChase_TryRoute(a, group->route, &a->body.position,
-                                              &a->tracking.target->position)) {
+                if (!SceneActorChase_TryRoute(a, group->route, &a->base.body.position,
+                                              &a->base.tracking.target->position)) {
                     Callback_InvokeActor(a, group->fallback);
                     return 0;
                 }
@@ -73,12 +73,12 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         SceneActorChase_SetControl(a, SceneActorControl_OnIdle, 16);
         SceneActorChase_SetBehavior(a, 18);
         {
-            s32 angle = Dog_HeadingOctant((a->tracking.heading + 0xA0) & 255);
+            s32 angle = Dog_HeadingOctant((a->base.tracking.heading + 0xA0) & 255);
             ((struct SceneActorAnimationView *)a)->nextDirection = (angle + 3) & 7;
         }
         {
-            s32 direction = a->body.direction;
-            a->body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
+            s32 direction = a->base.body.direction;
+            a->base.body.direction = (((direction + 0xA0) & 255) >> 6) << 6;
             context->reaction.turnDelay = 90;
             if ((u8)sub_080DEF78(a, direction))
                 return 1;
@@ -86,21 +86,21 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         }
     } else {
         SceneActorChase_BeginContactAnimation(a);
-        if (!a->tracking.target)
+        if (!a->base.tracking.target)
             return 0;
         SceneActorChase_TrackPlayer(a);
         SceneActorChase_SetActorFlags(a, 16);
         group->destination->pad = 0;
         if (!SceneActorChase_Arrive(a)) {
-            if (!SceneActorChase_TryRoute(a, group->route, &a->body.position,
-                                          &a->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(a, group->route, &a->base.body.position,
+                                          &a->base.tracking.target->position)) {
                 Callback_InvokeActor(a, group->fallback);
                 return 0;
             }
         }
-        SceneActorChase_SetControl(a, a->entryTarget228, 1);
+        SceneActorChase_SetControl(a, a->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(a, 7);
-        a->field2C2 = 16;
+        a->base.field2C2 = 16;
         return 1;
     }
 }

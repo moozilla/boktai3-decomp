@@ -23,26 +23,26 @@ static inline u8 Dog_TestApproachFlag(struct DogApproachContext *context, u32 ma
 void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
-    struct DogApproachContext *context = actor->context;
+    struct DogApproachContext *context = actor->base.context;
     if (Chase_TakeArrived(actor))
         Chase_SetCtl(actor, SceneActor_EnterShadowlessPhase, 0x24);
     if (SceneActorBehavior_RequestDescriptorTurn(actor, *(void **)(group + 0x1FC), 32, 32, 0)) {
-        actor->secondaryMotion.x = 0;
-        actor->secondaryMotion.z = 0;
+        actor->base.secondaryMotion.x = 0;
+        actor->base.secondaryMotion.z = 0;
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         u16 *flags;
         u32 active = Dog_TestApproachFlag(context, 1, &flags);
         if (active) {
-            if (context->terrainCell == actor->terrainCell) {
+            if (context->terrainCell == actor->base.terrainCell) {
                 u32 bit = 1;
 
                 ((struct ChaseFlags40 *)flags)->bits &= ~bit;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = 0;
-                actor->counter2AC = 0;
-                actor->field2B1 = bit;
+                actor->base.state2A8 = 0;
+                actor->base.phase2A9 = 0;
+                actor->base.behavior2AA = 0;
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = bit;
             } else
                 Chase_SetBehavior(actor, 15);
         } else if (SceneActor_IsCollisionTargetUnavailable(actor)) {
@@ -52,5 +52,5 @@ void Dog_UpdateShadowlessApproach(struct SceneActorRegistryResetView *actor)
         } else
             Chase_SetBehavior(actor, 15);
     } else
-        Callback_InvokeActor(actor, actor->contactQuery.opaque);
+        Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
 }

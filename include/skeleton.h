@@ -124,19 +124,19 @@ void SceneActorPlacement_ShowActor(struct SceneActorRegistryActor *, s32);
 static inline void Skeleton_SetState(struct SceneActorRegistryResetView *actor, u32 state,
                                      u32 phase, u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void Skeleton_ReturnToBehavior(struct SceneActorRegistryResetView *actor,
                                              u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 #endif

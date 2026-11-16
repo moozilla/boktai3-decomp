@@ -14,14 +14,15 @@ struct MummyPursuitContext {
 void Mummy_ResumePlayerPursuit(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyPursuitContext *body = actor->context;
+    struct MummyPursuitContext *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorChase_SetControl(actor, SceneActor_UpdateDirectionalAnimation, 3);
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         SceneActorChase_ClearFlagComponent(&body->flags, 0x800);
-        actor->tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+        actor->base.tracking.target =
+            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
         if (SceneActorChase_Arrive(actor)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);

@@ -10,23 +10,23 @@ static inline u8 TakeFlag(u8 *flag)
 }
 void SceneActorControl_UpdateSavedControlPhase(struct SceneActorRegistryResetView *actor)
 {
-    if (TakeFlag(&actor->field2B1)) {
-        void *callback = actor->savedTarget;
+    if (TakeFlag(&actor->base.field2B1)) {
+        void *callback = actor->base.savedTarget;
         u32 zero = 0;
-        actor->field2B2 = 1;
-        actor->field2B0 = zero;
-        actor->field2B5 = zero;
-        actor->target = callback;
-        actor->field2C8 = zero;
+        actor->base.field2B2 = 1;
+        actor->base.field2B0 = zero;
+        actor->base.field2B5 = zero;
+        actor->base.target = callback;
+        actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->word104 = zero;
+        actor->base.word104 = zero;
     } else {
-        if (!actor->counter2AC)
+        if (!actor->base.counter2AC)
             Trigger_ConsumePending((u8 *)actor + 0xC, 1);
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
     }
 }

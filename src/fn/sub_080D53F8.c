@@ -20,30 +20,30 @@ u8 Mummy_RequestStraightRoute(void *);
 
 static inline u32 Mummy_MotionBits(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
 static inline void Mummy_ApplyDuration(struct SceneActorRegistryResetView *a)
 {
     u16 *scale;
     u32 mask = 0xA02F;
-    if (a->flags2D4 & mask) {
-        u16 *p = &a->field2C2;
+    if (a->base.flags2D4 & mask) {
+        u16 *p = &a->base.field2C2;
         *p = 64;
         scale = p;
     } else {
-        u16 *q = &a->field2C2;
+        u16 *q = &a->base.field2C2;
         u16 value = *q;
         scale = q;
         if (!value)
             *scale = 64;
     }
-    if (!a->drawableKind)
-        Anim_SetDurationScale(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
-                              *scale);
+    if (!a->base.drawableKind)
+        Anim_SetDurationScale(
+            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                                   *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
 }
 
 struct MummyProbeGroup {
@@ -64,7 +64,7 @@ static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *rand
     if (!Mummy_MotionBits(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
         SceneActorChase_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -75,16 +75,16 @@ static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *rand
 
 static inline void Mummy_SetBehavior(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
     SceneActorChase_ResetStateEntry(actor);
 }
 
 void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyNavigationContext *body = actor->context;
+    struct MummyNavigationContext *body = actor->base.context;
     s32 speed;
     const u16 *randomSamples = gRandomTable;
     if (SceneActorControl_TakeStateEntry(actor)) {
@@ -94,9 +94,9 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         mask &= value;
         *field = mask;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Mummy_ApplyDuration(actor);
     if (NavMesh_ConsumeProbeEvent(group->route)) {
         if (!SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 32, 32, speed))
@@ -105,7 +105,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
             if (SceneActorRoute_TryRecoveryDetour(actor))
                 return;
             if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
-                u32 saved = ((actor->unknown3CD[0] + 5) & 7) << 5;
+                u32 saved = ((actor->base.unknown3CD[0] + 5) & 7) << 5;
                 Mummy_BeginProbeTurn(actor, saved, randomSamples);
                 return;
             }
@@ -122,5 +122,5 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
         return;
     }
 increment:
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

@@ -23,18 +23,18 @@ inline static void Axe_BeginRotationControl(struct SceneActorRegistryResetView *
 {
     u32 zero = 0;
     {
-        typeof(a->field2B2) *q1 = &a->field2B2;
+        typeof(a->base.field2B2) *q1 = &a->base.field2B2;
         *q1 = 1;
     }
-    a->field2B0 = zero;
-    a->field2B5 = phase;
-    a->target = callback;
-    a->field2C8 = zero;
+    a->base.field2B0 = zero;
+    a->base.field2B5 = phase;
+    a->base.target = callback;
+    a->base.field2C8 = zero;
     {
         u8 k1 = 1;
-        a->flags114 &= ~k1;
+        a->base.flags114 &= ~k1;
     }
-    a->word104 = zero;
+    a->base.word104 = zero;
 }
 
 struct AxeLungePlayer {
@@ -69,28 +69,28 @@ struct AxeLungeState {
 
 void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
 {
-    struct AxeLungeState *state = a->context;
-    struct RotatingDrawable *sprite = a->drawable;
-    u8 entered = SceneActorControl_TakeFlag(&a->field2B2);
+    struct AxeLungeState *state = a->base.context;
+    struct RotatingDrawable *sprite = a->base.drawable;
+    u8 entered = SceneActorControl_TakeFlag(&a->base.field2B2);
     s32 angle;
-    u32 *flags = &a->flags2D0;
+    u32 *flags = &a->base.flags2D0;
     if (entered) {
         struct ContactPosition delta;
         sprite->flags |= 2;
         state->angularSpeed = 2;
-        Axe_DeltaFromPlayer(&gPlayers, &delta, &a->body.position);
-        if (a->health <= (state->healthThreshold)) {
-            a->secondaryMotion.x = Div(delta.x, 44);
-            a->secondaryMotion.y = 44;
-            a->secondaryMotion.z = Div(delta.z, 44);
+        Axe_DeltaFromPlayer(&gPlayers, &delta, &a->base.body.position);
+        if (a->base.health <= (state->healthThreshold)) {
+            a->base.secondaryMotion.x = Div(delta.x, 44);
+            a->base.secondaryMotion.y = 44;
+            a->base.secondaryMotion.z = Div(delta.z, 44);
         } else {
-            a->secondaryMotion.x = Axe_ShiftSigned(delta.x);
-            a->secondaryMotion.y = 64;
-            a->secondaryMotion.z = Axe_ShiftSigned(delta.z);
+            a->base.secondaryMotion.x = Axe_ShiftSigned(delta.x);
+            a->base.secondaryMotion.y = 64;
+            a->base.secondaryMotion.z = Axe_ShiftSigned(delta.z);
         }
         state->delay = 0;
         {
-            u32 *entryFlags = &a->flags2D0;
+            u32 *entryFlags = &a->base.flags2D0;
             u32 mask = ~0x100000;
             *entryFlags &= mask;
             Axe_SetAuxiliarySpriteRenderState(a, state->auxiliary, 0x13D);
@@ -98,7 +98,7 @@ void Axe_UpdateTargetLunge(struct SceneActorRegistryResetView *a, s32 frame)
             flags = entryFlags;
         }
     }
-    a->body.position.y += a->field2EA;
+    a->base.body.position.y += a->base.field2EA;
     if (NormalizeAngle(32 - state->angle) < 0)
         sprite->angle += state->angularSpeed;
     else

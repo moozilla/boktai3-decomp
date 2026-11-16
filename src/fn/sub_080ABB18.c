@@ -30,7 +30,7 @@ static inline void clearWord(u32 *p, u32 mask)
 #define TentacleActor_RecoverFromSegmentLoss sub_080ABB18
 u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
 {
-    struct Group *g = p->context;
+    struct Group *g = p->base.context;
     u16 *flags;
     u16 *savedFlags;
     s32 count;
@@ -42,11 +42,11 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
     u32 *stateCounter;
     u8 *done, *savedDirection, *queued, *prepared, *kind;
     register u32 *animationFlags asm("r9");
-    if (p->reactionSoundVariant == 0)
+    if (p->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x19c);
-    flags = &p->flags2D4;
+    flags = &p->base.flags2D4;
     clearHalf(flags, 0xfffffeff);
     {
         u32 bit = 4;
@@ -54,27 +54,27 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
         g->flags = bit;
     }
     g->timer = 240;
-    p->colliderA.responseValue += 30;
+    p->base.colliderA.responseValue += 30;
     g->flashTimer = 16;
-    clearWord(&p->flags2D0, 0xffefffff);
+    clearWord(&p->base.flags2D0, 0xffefffff);
     clearHalf(flags, -2);
-    count = Div(p->health, g->healthStep);
+    count = Div(p->base.health, g->healthStep);
     initialCount = &g->activeCount;
     savedFlags = flags;
-    prepared = &p->field2B2;
-    done = &p->field2B0;
-    kind = &p->field2B5;
-    control = &p->target;
-    motionTimer = &p->field2C8;
-    animationFlags = &p->flags114;
-    motionCounter = &p->word104;
-    state = &p->state2A8;
-    phase = &p->phase2A9;
-    behavior = &p->behavior2AA;
-    stateCounter = &p->counter2AC;
-    queued = &p->field2B1;
-    savedDirection = &p->tracking.heading;
-    direction = &p->body.direction;
+    prepared = &p->base.field2B2;
+    done = &p->base.field2B0;
+    kind = &p->base.field2B5;
+    control = &p->base.target;
+    motionTimer = &p->base.field2C8;
+    animationFlags = &p->base.flags114;
+    motionCounter = &p->base.word104;
+    state = &p->base.state2A8;
+    phase = &p->base.phase2A9;
+    behavior = &p->base.behavior2AA;
+    stateCounter = &p->base.counter2AC;
+    queued = &p->base.field2B1;
+    savedDirection = &p->base.tracking.heading;
+    direction = &p->base.body.direction;
     if (count < *initialCount)
         do {
             ActorTrail_RemoveLastSegment(p);
@@ -130,6 +130,6 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct SceneActorRegistryResetView *p)
         *queued = one;
         *direction = *savedDirection;
     }
-    p->field2C2 = 64;
+    p->base.field2C2 = 64;
     return 1;
 }

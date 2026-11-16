@@ -164,7 +164,7 @@ static inline void ClearFlags16(u16 *f, u32 mask)
 void SceneActorRoute_ClampTargetToAnchor(struct SceneActorRegistryResetView *actor,
                                          struct ContactPosition *target)
 {
-    struct SceneActorBody *body = &actor->body;
+    struct SceneActorBody *body = &actor->base.body;
     s32 dx = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->x - body->position.x;
     s32 dz = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->z - body->position.z;
     s32 len = (s16)Math_GetVectorLength((s16)dx, (s16)dz);
@@ -179,16 +179,16 @@ void SceneActorRoute_ClampTargetToAnchor(struct SceneActorRegistryResetView *act
         target->z = (u16)((struct SceneActorRouteCursor *)body->currentRoute)->point->z;
     }
     mesh = actor->group.route;
-    pos = &actor->body.position;
+    pos = &actor->base.body.position;
     if (!Nav_IsPositionInMesh(mesh, pos, target)) {
-        ClearFlags16(&actor->flags2D4, ~0x200);
+        ClearFlags16(&actor->base.flags2D4, ~0x200);
     } else {
         r = Terrain_ApplyBlocked(mesh, pos, target);
         if (r != 0) {
             if (r != 2)
-                Memory_Clear(&actor->body.motion, 8);
+                Memory_Clear(&actor->base.body.motion, 8);
         } else {
-            ClearFlags16(&actor->flags2D4, ~0x200);
+            ClearFlags16(&actor->base.flags2D4, ~0x200);
         }
     }
 }
@@ -380,7 +380,7 @@ void ActorParticles_SpawnDirectionalBurst(struct SceneActorRegistryResetView *ac
     u32 count;
     u32 angle;
     if (amount > 0) {
-        angle = (actor->field2B6 + 128) & 255;
+        angle = (actor->base.field2B6 + 128) & 255;
         velocity.x = gUnk_086149C4[(angle + 64) & 255] >> 10;
         velocity.y = ActorParticles_NextRandom() & 7;
         velocity.z = gUnk_086149C4[angle & 255] >> 10;
@@ -389,7 +389,7 @@ void ActorParticles_SpawnDirectionalBurst(struct SceneActorRegistryResetView *ac
         spread.z = (ActorParticles_NextRandom() & 7) + 3;
         count = (ActorParticles_NextRandom() & 1) + 2;
         sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                     (struct SceneExtent *)&actor->body.position, &velocity, &spread, 45, 31);
+                     (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
     }
 }
 
@@ -412,22 +412,22 @@ void ActorParticles_SpawnBurst(struct SceneActorRegistryResetView *actor)
     struct SceneExtent velocity, spread;
     u32 count;
     u32 sampleOrigin;
-    velocity.x = ActorParticles_Half(actor->body.motion.x);
+    velocity.x = ActorParticles_Half(actor->base.body.motion.x);
     PARTICLE_RANDOM_CAPTURE_ORIGIN(sampleOrigin);
     velocity.y = ActorParticles_FirstRandom() & 7;
-    velocity.z = ActorParticles_Half(actor->body.motion.z);
+    velocity.z = ActorParticles_Half(actor->base.body.motion.z);
     spread.x = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 15;
     spread.y = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 7) + 15;
     spread.z = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 15;
     count = (ParticleRandom_ReadRelativeSample(sampleOrigin, gRandomTable) & 3) + 4;
     sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->body.position, &velocity, &spread, 45, 31);
+                 (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 45, 31);
 }
 
 u32 ActorMode_SelectOddStateVariant(struct SceneActorRegistryResetView *actor)
 {
     u32 result;
-    switch (actor->paletteOffset) {
+    switch (actor->base.paletteOffset) {
         case 1:
         case 3:
         case 5:
@@ -453,5 +453,5 @@ void ActorParticles_SpawnWideBurst(struct SceneActorRegistryResetView *actor)
     spread.z = 24;
     count = (ActorParticles_NextRandom() & 3) + 4;
     sub_08014634(count, ActorMode_SelectOddStateVariant(actor),
-                 (struct SceneExtent *)&actor->body.position, &velocity, &spread, 60, 63);
+                 (struct SceneExtent *)&actor->base.body.position, &velocity, &spread, 60, 63);
 }

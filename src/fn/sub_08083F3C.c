@@ -6,7 +6,7 @@ void SceneActorControl_ClearCollisionLatch(struct SceneActorRegistryResetView *a
 {
     u8 *status;
     {
-        u16 *flags = &actor->flags2D4;
+        u16 *flags = &actor->base.flags2D4;
         u32 m = ~0x100;
         m &= *flags;
         *flags = m;

@@ -23,13 +23,13 @@ static inline void Skeleton_CountDistanceSelection(struct SkeletonSelectionConte
 
 static inline u8 Skeleton_TargetHeading(struct SceneActorRegistryResetView *actor)
 {
-    return actor->tracking.heading;
+    return actor->base.tracking.heading;
 }
 
 static inline u8 Skeleton_FaceAwayFromTarget(struct SceneActorRegistryResetView *actor)
 {
     u8 priorDirection = MonsterInit_GetDirection(actor);
-    actor->body.direction = Skeleton_TargetHeading(actor) + 0x80;
+    actor->base.body.direction = Skeleton_TargetHeading(actor) + 0x80;
     return priorDirection;
 }
 
@@ -42,7 +42,7 @@ static inline u8 Skeleton_TryRetreatFromTarget(struct SceneActorRegistryResetVie
 static inline struct SkeletonSelectionContext *
 Skeleton_SelectionContext(struct SceneActorRegistryResetView *actor)
 {
-    return actor->context;
+    return actor->base.context;
 }
 
 void Skeleton_SelectDistanceReaction(struct SkeletonSelectionContext *actor)
@@ -51,20 +51,20 @@ void Skeleton_SelectDistanceReaction(struct SkeletonSelectionContext *actor)
     struct SceneActorChaseGroup *group = &actor->base.group;
     SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E250, 0x4F5);
     Skeleton_CountDistanceSelection(context);
-    if (actor->base.tracking.distance < context->nearDistance) {
+    if (actor->base.base.tracking.distance < context->nearDistance) {
         if (!Skeleton_TryRetreatFromTarget(&actor->base))
             return;
         SceneActorChase_SetTypedControl(&actor->base, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetPhase(&actor->base, 0, 15);
-    } else if (actor->base.tracking.distance > context->farDistance) {
-        if (!actor->base.tracking.target)
+    } else if (actor->base.base.tracking.distance > context->farDistance) {
+        if (!actor->base.base.tracking.target)
             SceneActorChase_TrackPlayer(&actor->base);
         if (SceneActorChase_Arrive(&actor->base)) {
             SceneActorChase_SetTypedControl(&actor->base, group->common.gate.control, 0x1A);
             SceneActorChase_SetPhase(&actor->base, 0, 12);
         }
     } else {
-        if (!actor->base.tracking.target)
+        if (!actor->base.base.tracking.target)
             SceneActorChase_TrackPlayer(&actor->base);
         if (SceneActorChase_Arrive(&actor->base)) {
             SceneActorChase_SetTypedControl(&actor->base, group->common.gate.control, 0x1A);

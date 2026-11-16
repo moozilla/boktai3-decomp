@@ -62,16 +62,16 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
 {
     struct SceneActorRegistryResetView *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
-    arg0->field2C2 = 0x40;
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -88,33 +88,33 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     }
     MonsterInit_InitializeGate(&group->common.gate, gateDuration);
     MonsterInit_ReadRange(&group->common.control);
-    MonsterInit_ReadTargeting(&arg0->tracking);
+    MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = MonsterInit_ReadKeywordHalfword('K', 2);
+    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword('K', 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
     if (identity < 0)
         identity = 0xFFFF;
-    arg0->field9A = identity;
+    arg0->base.field9A = identity;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
@@ -123,21 +123,21 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
-        MonsterInit_SnapToRoute(&arg0->body.position, rt);
+        MonsterInit_SnapToRoute(&arg0->base.body.position, rt);
         MonsterInit_DrawablePosition(arg0);
-        arg0->body.direction = Route_GetCurrentPointFacing(rt);
+        arg0->base.body.direction = Route_GetCurrentPointFacing(rt);
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
         TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->common.bodyId = arg0->body.id;
-    group->common.bodyPosition = &arg0->body.position;
+    group->common.bodyId = arg0->base.body.id;
+    group->common.bodyPosition = &arg0->base.body.position;
 }
 
 void Golem_InitAnimationProfile(void *);
@@ -166,33 +166,33 @@ void Golem_OnDestroy(void);
 
 static inline void GolemInit_EnableInitialFlags(struct SceneActorRegistryResetView *actor)
 {
-    MonsterInit_SetTargetingFlags(&actor->tracking, 1);
+    MonsterInit_SetTargetingFlags(&actor->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(actor, 0x1600000);
     MonsterInit_SetStatusFlags(actor, 0x8000008);
 }
 
 static inline struct GolemInitContext *GolemInit_Context(struct SceneActorRegistryResetView *actor)
 {
-    return actor->context;
+    return actor->base.context;
 }
 static inline void GolemInit_InitializeReceiver(struct SceneActorRegistryResetView *actor)
 {
     MonsterInit_ClearReceiver(actor);
-    GolemInit_Context(actor)->rangeSquared62C = actor->tracking.range;
+    GolemInit_Context(actor)->rangeSquared62C = actor->base.tracking.range;
 }
 
 static inline void GolemInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
-    arg0->messageCallback = SceneActorScript_OnCommand;
-    arg0->updateCallback = Golem_OnSharedActorUpdate;
-    arg0->destroyCallback = Golem_OnDestroy;
+    arg0->base.messageCallback = SceneActorScript_OnCommand;
+    arg0->base.updateCallback = Golem_OnSharedActorUpdate;
+    arg0->base.destroyCallback = Golem_OnDestroy;
 }
 
 static inline void GolemInit_InitializePaletteRange(struct SceneActorRegistryResetView *actor,
                                                     u32 alternate, u32 current)
 {
-    actor->alternatePalette = MonsterInit_GetPaletteBase(actor) + alternate;
-    actor->paletteBank = MonsterInit_GetPaletteBase(actor) + current;
+    actor->base.alternatePalette = MonsterInit_GetPaletteBase(actor) + alternate;
+    actor->base.paletteBank = MonsterInit_GetPaletteBase(actor) + current;
 }
 
 s32 Golem_Init(void *object)
@@ -210,21 +210,21 @@ s32 Golem_Init(void *object)
     Golem_InitAnimationProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0x5290, 0x1E38);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x5290, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     GolemInit_InitializeBody(arg0, &zero);
     MonsterInit_ReadPalette(actor, 0x27D, 0x192);
@@ -237,16 +237,16 @@ s32 Golem_Init(void *object)
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
         group, (u8 *)arg0 + 0x638, (u8 *)arg0 + 0x65C, Golem_UpdateDying, Golem_ResumeSavedTarget,
-        SceneActorReaction_BeginTargetRecovery, Golem_OnUnusedState, 1, &actor->body);
+        SceneActorReaction_BeginTargetRecovery, Golem_OnUnusedState, 1, &actor->base.body);
     SceneActorMovement_ResolveRoutePosition(actor);
     MonsterInit_SetRouteReset(actor, Golem_ResetCombatState);
     MonsterInit_SetReactionGate(actor, SceneActorControl_RefreshMotionRoute);
     MonsterInit_SetContactCallback(actor, Golem_UpdateHitReaction);
     group->responseCallback = Golem_ClearControlFlag;
     group->field5EC = Golem_RestoreRoute;
-    actor->field2E8 = 0;
+    actor->base.field2E8 = 0;
     GolemInit_EnableInitialFlags(actor);
-    MonsterInit_MaskColliderFlags(&actor->colliderA, ~1);
+    MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
     MonsterInit_ReadInitialMode(actor);
@@ -261,14 +261,14 @@ s32 Golem_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     GolemInit_InitializeReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Golem_InitActionHandlers(actor);

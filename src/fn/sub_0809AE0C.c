@@ -15,50 +15,50 @@ struct LunContactContext {
 
 static inline void Lun_SetControl(struct SceneActorRegistryResetView *actor, void *target, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = target;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = target;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void Lun_SetState(struct SceneActorRegistryResetView *actor, u32 state, u8 phase,
                                 u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline u32 Lun_ReadContextFlags(struct SceneActorRegistryResetView *actor, u8 mask)
 {
-    struct LunContactContext *context = actor->context;
+    struct LunContactContext *context = actor->base.context;
     return context->flags3D4 & mask ? 1 : 0;
 }
 
 static inline u32 Lun_ReadActorMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->base.flags2D4 & mask;
 }
 
 static inline u32 Lun_ReadActorStatusFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2D0 & mask;
+    return actor->base.flags2D0 & mask;
 }
 
 static inline u8 Lun_IsUnavailable(struct SceneActorRegistryResetView *actor)
 {
     if (actor) {
         if (Lun_ReadActorMotionFlags(actor, 0x40) || Lun_ReadActorStatusFlags(actor, 0x20000) ||
-            actor->health <= 0)
+            actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -87,13 +87,13 @@ static inline void Lun_EnableCollider(struct ContactCollider *collider)
 
 static inline void Lun_SetContactFlag(struct SceneActorRegistryResetView *actor, u16 bits)
 {
-    u16 *flags = &actor->flags2C0;
+    u16 *flags = &actor->base.flags2C0;
     *flags = bits | *flags;
 }
 
 static inline void Lun_ClearReactionFlags(struct SceneActorRegistryResetView *actor, u32 bits)
 {
-    u16 *flags = &actor->flags2D6;
+    u16 *flags = &actor->base.flags2D6;
     u32 mask = ~bits;
     *flags &= mask;
 }
@@ -116,7 +116,7 @@ static inline void Lun_ApplyContactFlag(struct LunContactContext *context)
 
 static inline u32 Lun_CapturePalette(struct SceneActorRegistryResetView *actor, u16 **entry)
 {
-    u16 *current = &actor->paletteOffset;
+    u16 *current = &actor->base.paletteOffset;
     u32 value = *current;
     *entry = current;
     return value;
@@ -137,7 +137,7 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     actor = object;
     if (Lun_IsUnavailable(actor))
         return;
-    distance = actor->body.position.y - gUnknown_02000580->position.y;
+    distance = actor->base.body.position.y - gUnknown_02000580->position.y;
     {
         s32 fast = Lun_IsPlayerFast();
         if (fast || gUnknown_02000580->actionMode == 4) {
@@ -153,19 +153,19 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     Lun_SetControl(actor, SceneActorControl_OnIdle, 16);
     phase = 2;
     Lun_SetState(actor, 0, phase, 0);
-    Lun_EnableCollider(&actor->colliderB);
-    Lun_EnableCollider(&actor->colliderA);
+    Lun_EnableCollider(&actor->base.colliderB);
+    Lun_EnableCollider(&actor->base.colliderA);
     Lun_SetContactFlag(actor, 0x800);
     Lun_ClearReactionFlags(actor, 0x180);
     while (Lun_CapturePalette(actor, &palette) == 0) {
         LUN_READ_CONTACT_FLAG(phase, actor, phase);
         Player_IncrementActionSpeedBonus(gUnknown_02000580, 0);
-        Lun_ApplyContactFlag(actor->context);
+        Lun_ApplyContactFlag(actor->base.context);
         Sound_PlaySong(0x2AD);
         return;
     }
     LUN_READ_CONTACT_FLAG(phase, actor, phase);
-    Lun_ApplyContactFlag(actor->context);
+    Lun_ApplyContactFlag(actor->base.context);
     if (*palette == 1) {
         Player_QueueStatusEffect(gUnknown_02000580, 1);
     } else {

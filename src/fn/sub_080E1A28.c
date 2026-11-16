@@ -42,14 +42,14 @@ static inline u8 TakeFlag(u8 *flag)
 
 void Dog_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     struct ContactPosition velocity;
-    if (TakeFlag(&actor->field2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         s32 angle, facing, turn;
-        context = actor->context;
-        Delta(&velocity, &actor->body.position, (struct ContactPosition *)(context + 0x6D8));
+        context = actor->base.context;
+        Delta(&velocity, &actor->base.body.position, (struct ContactPosition *)(context + 0x6D8));
         angle = Math_Atan2(velocity.x, velocity.z);
-        facing = ((actor->body.direction + 0x20) & 0xFF) >> 6 << 6;
+        facing = ((actor->base.body.direction + 0x20) & 0xFF) >> 6 << 6;
         turn = angle - facing;
         if (turn > 0x80)
             turn -= 0x100;
@@ -61,37 +61,37 @@ void Dog_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
             Polar(&velocity, (facing + 0x10) & 0xFF, 24);
         else
             Polar(&velocity, (facing + 0xEF) & 0xFF, 24);
-        actor->secondaryMotion.x = velocity.x;
-        actor->secondaryMotion.y = 0x20;
-        actor->secondaryMotion.z = velocity.z;
+        actor->base.secondaryMotion.x = velocity.x;
+        actor->base.secondaryMotion.y = 0x20;
+        actor->base.secondaryMotion.z = velocity.z;
         Sound_PlaySong(0x3A4);
     }
     Collider_Refresh(context + 0x624);
     if (**(u8 **)((u8 *)actor + 0x6C) & 1) {
-        actor->secondaryMotion.x = Half(actor->secondaryMotion.x);
-        actor->secondaryMotion.z = Half(actor->secondaryMotion.z);
+        actor->base.secondaryMotion.x = Half(actor->base.secondaryMotion.x);
+        actor->base.secondaryMotion.z = Half(actor->base.secondaryMotion.z);
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
     {
         u32 mask = 0x10;
-        if (actor->flags2D0 & mask) {
+        if (actor->base.flags2D0 & mask) {
             void *callback = (void *)Dog_UpdateAnimationSixteenReaction;
             u32 kind = 0x24;
-            actor->field2B2 = 1;
-            actor->field2B0 = 0;
-            actor->field2B5 = kind;
-            actor->target = callback;
-            actor->field2C8 = 0;
+            actor->base.field2B2 = 1;
+            actor->base.field2B0 = 0;
+            actor->base.field2B5 = kind;
+            actor->base.target = callback;
+            actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->flags114;
+                u32 *flags = &actor->base.flags114;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->word104 = 0;
+            actor->base.word104 = 0;
         }
     }
 }

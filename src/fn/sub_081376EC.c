@@ -38,26 +38,26 @@ static inline void SetHalfFlags(u16 *flags, u32 input)
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                             u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *callback, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline u32 CellIndex(struct ContactPosition *p)
@@ -118,7 +118,7 @@ static inline u8 MoveTo(struct SceneActorRegistryResetView *actor, u8 *group,
     result = Terrain_ApplyBlocked(shape, position, destination);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
     *flags &= ~blocked;
@@ -156,22 +156,22 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
     best = 0x7FFFFFFF;
     bestTag = 0;
     i = 0;
-    position = &actor->body.position;
+    position = &actor->base.body.position;
     for (; i <= 7; i++) {
         u32 tag;
         s32 next;
         next = SceneStimulus_FindOverlapFromIndex(
-            actor->body.position.x, actor->body.position.z, GROUP_FIELD(group, 0x4E, u16),
-            GROUP_FIELD(group, 0x57, u8), actor->body.id, (s8)i);
+            actor->base.body.position.x, actor->base.body.position.z, GROUP_FIELD(group, 0x4E, u16),
+            GROUP_FIELD(group, 0x57, u8), actor->base.body.id, (s8)i);
         i = next;
         if (next < 0)
             break;
         tag = sub_081376B4(actor, &candidate, (s8)i);
         if (SceneActorTarget_CanReplaceByDistance(actor, &candidate, tag) &&
-            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->body.position,
+            Nav_IsPositionInMesh(GROUP_FIELD(group, 0x1fc, void *), &actor->base.body.position,
                                  &candidate)) {
             s32 distance;
-            SceneActorTerrain_Subtract(&delta, &candidate, &actor->body.position);
+            SceneActorTerrain_Subtract(&delta, &candidate, &actor->base.body.position);
             distance = delta.x * delta.x + delta.z * delta.z;
             if (best > distance) {
                 best = distance;
@@ -186,18 +186,18 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
     timer = &GROUP_FIELD(group, 0x54, u16);
     if (*timer == 0) {
         control = (struct SceneActorRegistryControl *)(group + 0x4C);
-        ClearWordFlags(&actor->flags2CC, 0xFFFEBE3F);
+        ClearWordFlags(&actor->base.flags2CC, 0xFFFEBE3F);
         control->counter = 0;
         FIELD(control, 0x14, u16) = 0;
         control->timer = 0;
         *timer = 180;
-        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
         SetControl(actor, GROUP_FIELD(group, 0x68, void *), 9);
         SetState(actor, 0, 0, 11);
     }
     {
         u32 mask = 0x80;
-        u16 *p = &actor->flags2D4;
+        u16 *p = &actor->base.flags2D4;
         u32 t = *p & mask;
         flagsp = p;
         if (t) {
@@ -217,20 +217,20 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct SceneActorRegistryResetView 
         dest->y = CellHeight(CellIndex(dest), dest);
     }
     bit = 0x200;
-    GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->body.position.y;
+    GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->base.body.position.y;
     GROUP_FIELD(group, bit, struct ContactPosition *)->pad = 0;
     if (!MoveTo(actor, group, position, flagsp, bit)) {
         Callback_InvokeActor(actor, GROUP_FIELD(group, 0x224, void *));
     } else {
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
         SetHalfFlags(flagsp, 0x200);
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
         {
             u32 mask = 0x1000000;
-            actor->flags2D0 |= mask;
+            actor->base.flags2D0 |= mask;
         }
         SceneActorAttachment_RetargetNearestPlayer(
             actor, &GROUP_FIELD(group, 0x58, struct ContactPosition));

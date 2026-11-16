@@ -15,15 +15,15 @@ static inline u32 RetryDuration(void)
 }
 void Vorn_UpdateAnimationRetries(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context = actor->context;
+    u8 *context = actor->base.context;
     if (Chase_TakeArrived(actor)) {
         Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);
         context[0x696] = 0;
         context[0x697] = RetryDuration();
         *(u16 *)(context + 0x694) = 0;
     }
-    Callback_InvokeActor(actor, actor->contactQuery.opaque);
-    if (actor->field2B0) {
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
+    if (actor->base.field2B0) {
         u8 *retries = context + 0x696;
         if (*retries) {
             Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);
@@ -31,11 +31,11 @@ void Vorn_UpdateAnimationRetries(struct SceneActorRegistryResetView *actor)
             context[0x697] = RetryDuration();
             ++*(u16 *)(context + 0x694);
         } else {
-            u16 *flags = (void *)((u8 *)actor->context + 0x6D4);
+            u16 *flags = (void *)((u8 *)actor->base.context + 0x6D4);
             s32 mask = ~3;
             *flags &= mask;
             sub_080B3110(actor, 1, gUnk_0824E224, 0x41);
         }
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

@@ -12,25 +12,25 @@ static inline void clearRouteFlag(u32 *flags)
 }
 static inline void resetState(struct SceneActorRegistryResetView *actor, u8 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void setControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
-    clearFlag(&actor->flags114);
-    actor->word104 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
+    clearFlag(&actor->base.flags114);
+    actor->base.word104 = 0;
 }
 static inline u32 testFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    return actor->flags2CC & mask;
+    return actor->base.flags2CC & mask;
 }
 void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
 {
@@ -38,16 +38,16 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
         struct SceneActorReactionMotion *motion;
         struct SceneActorRegistryControl *control;
         u16 *flags;
-        actor->field2C2 = 0x40;
+        actor->base.field2C2 = 0x40;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         {
             u32 mask = ~0x380;
             mask &= *flags;
             *flags = mask;
         }
-        motion = (void *)&actor->tracking.target;
+        motion = (void *)&actor->base.tracking.target;
         {
             s32 mask = ~0x18;
             mask &= motion->flags;
@@ -55,7 +55,7 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
         }
         control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
-            clearRouteFlag(&actor->flags2D0);
+            clearRouteFlag(&actor->base.flags2D0);
             {
                 u32 mask = ~0x200;
                 mask &= *flags;
@@ -73,7 +73,7 @@ void Dog_ResetIdleControl(struct SceneActorRegistryResetView *actor)
         actor->group.turn.turnsRemaining = 0xFF;
 
         motion->fieldDC = 0;
-        setControl(actor, actor->savedTarget, 0);
+        setControl(actor, actor->base.savedTarget, 0);
     }
-    Callback_InvokeActor(actor, actor->contactQuery.opaque);
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
 }

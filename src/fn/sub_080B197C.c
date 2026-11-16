@@ -38,20 +38,20 @@ static inline void MarkReactionMotion(struct SceneActorReactionMotion *m)
 
 void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
 {
-    u8 *ctx = a->context;
+    u8 *ctx = a->base.context;
     u16 *flags = (void *)(ctx + 0x6D4);
     u32 value = ~8;
     value &= *flags;
     *flags = value;
     if (ShouldReact(ctx, value)) {
         sub_080B3110(a, 1, gUnk_0824E230, 0x279);
-        MarkReactionMotion((void *)&a->tracking.target);
+        MarkReactionMotion((void *)&a->base.tracking.target);
         {
             u32 mask = 0x80;
-            a->flags2CC = mask | a->flags2CC;
+            a->base.flags2CC = mask | a->base.flags2CC;
         }
     } else {
-        u32 active = MotionFlag((void *)&a->tracking.target, 8);
+        u32 active = MotionFlag((void *)&a->base.tracking.target, 8);
         /* Phase 3: without this, a (18 refs / 94) outranks active (8 / 33); active needs one more
          * ref or two fewer insns of life (AGBCC_PRI=active:+400). */
         asm("" : : "r"(active));
@@ -61,6 +61,6 @@ void Vorn_SelectReactionControl(struct SceneActorRegistryResetView *a)
             Chase_SetState(a, active, 1, active);
             Chase_SetCtl(a, SceneActorControl_OnIdle, 16);
         }
-        SetMotion((void *)&a->tracking.target, 8);
+        SetMotion((void *)&a->base.tracking.target, 8);
     }
 }

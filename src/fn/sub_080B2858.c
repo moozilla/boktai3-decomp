@@ -34,19 +34,19 @@ static inline u8 Vorn_TryTrackedCell(void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(object);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     u32 cell;
     struct ContactPosition target;
     SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
     cell = SceneActorChase_CellAt(&tracking->target->position);
-    if (cell == actor->terrainCell ||
+    if (cell == actor->base.terrainCell ||
         SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,
                                0x20000)) {
-        SceneActor_DispatchContextAction(actor->context, 0);
+        SceneActor_DispatchContextAction(actor->base.context, 0);
         return 0;
     }
     SceneActorChase_CellCenter(cell, &target);
-    if (!SceneActorChase_TryRoute(object, group->route, &actor->body.position, &target)) {
+    if (!SceneActorChase_TryRoute(object, group->route, &actor->base.body.position, &target)) {
         Callback_InvokeActor(actor, group->fallback);
         return 0;
     }
@@ -54,7 +54,7 @@ static inline u8 Vorn_TryTrackedCell(void *object)
 }
 u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
-    struct VornRetreatContext *body = actor->context;
+    struct VornRetreatContext *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     u8 old;
     if ((!reset) && body->timer)
@@ -64,34 +64,36 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     Vorn_AdjustContextFlags(body, 0x10, 0x40);
     SceneActorReaction_ResetResponseState(&group->saved, gUnk_0824E230, 0x486);
     body->requests++;
-    if (actor->tracking.distance < body->nearDistance) {
-        old = actor->body.direction;
-        actor->body.direction = actor->tracking.heading + 0x80;
+    if (actor->base.tracking.distance < body->nearDistance) {
+        old = actor->base.body.direction;
+        actor->base.body.direction = actor->base.tracking.heading + 0x80;
         if (!Vorn_SelectReachableEscapeCell(actor, old))
             return 0;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetBehavior(actor, 0x15);
-    } else if (actor->tracking.distance > body->farDistance) {
-        old = actor->body.direction;
+    } else if (actor->base.tracking.distance > body->farDistance) {
+        old = actor->base.body.direction;
         {
             u32 random = Vorn_RandomSample();
-            actor->body.direction = Vorn_ScatterDirection(&actor->tracking.heading, random);
+            actor->base.body.direction =
+                Vorn_ScatterDirection(&actor->base.tracking.heading, random);
         }
-        if (!actor->tracking.target)
-            actor->tracking.target =
+        if (!actor->base.tracking.target)
+            actor->base.tracking.target =
                 &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
         if ((!Vorn_TryTrackedCell(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetBehavior(actor, 0x15);
     } else {
-        old = actor->body.direction;
+        old = actor->base.body.direction;
         {
             u32 random = Vorn_RandomSample();
-            actor->body.direction = Vorn_ScatterDirection(&actor->tracking.heading, random);
+            actor->base.body.direction =
+                Vorn_ScatterDirection(&actor->base.tracking.heading, random);
         }
-        if (!actor->tracking.target)
-            actor->tracking.target =
+        if (!actor->base.tracking.target)
+            actor->base.tracking.target =
                 &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
         if ((!Vorn_TryTrackedCell(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
@@ -100,7 +102,7 @@ u32 Vorn_SelectRetreatRoute(struct SceneActorRegistryResetView *actor, u32 reset
     }
     {
         u32 bit = 4;
-        u32 *field = &actor->flags2D0;
+        u32 *field = &actor->base.flags2D0;
         u32 value = *field;
         value |= bit;
         *field = value;

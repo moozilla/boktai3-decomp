@@ -37,33 +37,33 @@ static inline void SetFlags(u16 bit, u16 *field)
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 behavior)
 {
-    actor->state2A8 = 0;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = 0;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetMotion(struct SceneActorRegistryResetView *actor, void *cb, u32 kind)
 {
-    actor->word104 = (u32)cb;
-    actor->word108 = 0;
-    actor->word10C = 0;
-    actor->word110 = kind;
-    actor->flags114 = 1;
+    actor->base.word104 = (u32)cb;
+    actor->base.word108 = 0;
+    actor->base.word10C = 0;
+    actor->base.word110 = kind;
+    actor->base.flags114 = 1;
 }
 static inline void StartRoute(void *body, void *path, u8 *group)
 {
@@ -73,7 +73,7 @@ static inline void StartRoute(void *body, void *path, u8 *group)
 }
 u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
 {
-    struct SceneActorRegistryResetView *context = actor->context;
+    struct SceneActorRegistryResetView *context = actor->base.context;
     u8 *group = (void *)&context->group.common;
     struct VornResponseFlags *flags;
     if (context->field6AC)
@@ -88,15 +88,15 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
     }
     *((u16 *)(((u8 *)context) + 0x6ec)) = 60;
     if (reset == 1)
-        StartRoute(&actor->body.id, group + 0x74, group);
+        StartRoute(&actor->base.body.id, group + 0x74, group);
     sub_080B1FA8(actor);
     {
-        u32 *field = &actor->flags2CC;
+        u32 *field = &actor->base.flags2CC;
         s32 mask = ~16;
         *field &= mask;
     }
     SetState(actor, 15);
-    SetControl(actor, actor->savedTarget, 0);
+    SetControl(actor, actor->base.savedTarget, 0);
     SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;
@@ -104,7 +104,7 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
         bit |= *field;
         *field = bit;
     }
-    SetFlags(0x80, &actor->flags2D4);
+    SetFlags(0x80, &actor->base.flags2D4);
     {
         u32 timer = actor->group.common.gate.duration;
         actor->group.common.gate.counter = timer;
@@ -115,6 +115,6 @@ u8 Vorn_BeginPursuitRoute(struct SceneActorRegistryResetView *actor, u32 reset)
         bit |= field[15];
         field[15] = bit;
     }
-    actor->flags2CC |= 0x80;
+    actor->base.flags2CC |= 0x80;
     return 1;
 }

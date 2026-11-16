@@ -11,8 +11,8 @@ static inline u8 Test(u32 value, u32 mask)
 }
 void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
 {
-    u8 *state = p->context;
-    u16 *animation = (u16 *)((u8 *)p->drawable + 0x20);
+    u8 *state = p->base.context;
+    u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
     u32 *flags;
     u32 queued;
     if (SceneActorReaction_TakePrepared(p))
@@ -38,36 +38,36 @@ void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
             void (*f)(void) = sub_080BA268;
             u32 k = 0x25;
             u32 z;
-            u8 *a = &p->field2B2;
+            u8 *a = &p->base.field2B2;
             u32 *w;
             s32 m;
             z = 0;
             *a = 1;
-            p->field2B0 = z;
-            p->field2B5 = k;
-            p->target = f;
-            p->field2C8 = z;
-            w = &p->flags114;
+            p->base.field2B0 = z;
+            p->base.field2B5 = k;
+            p->base.target = f;
+            p->base.field2C8 = z;
+            w = &p->base.flags114;
             m = -2;
             *w = m & *w;
-            p->word104 = z;
+            p->base.word104 = z;
         }
-    } else if (p->field2B3) {
+    } else if (p->base.field2B3) {
         void (*f)(void) = Skeleton_UpdateAttackRecovery;
         u32 k = 0x24;
         u32 z;
-        u8 *a = &p->field2B2;
+        u8 *a = &p->base.field2B2;
         u32 *w;
         s32 m;
         z = queued;
         *a = 1;
-        p->field2B0 = z;
-        p->field2B5 = k;
-        p->target = f;
-        p->field2C8 = z;
-        w = &p->flags114;
+        p->base.field2B0 = z;
+        p->base.field2B5 = k;
+        p->base.target = f;
+        p->base.field2C8 = z;
+        w = &p->base.flags114;
         m = -2;
         *w = m & *w;
-        p->word104 = z;
+        p->base.word104 = z;
     }
 }

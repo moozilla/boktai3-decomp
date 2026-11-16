@@ -11,7 +11,7 @@ void Vorn_OnScriptActionRequest(void);
 void SceneActor_InitContextColliders(struct SceneActorRegistryResetView *p)
 {
     struct ContactPackedVector size, offset;
-    u8 *q = p->context;
+    u8 *q = p->base.context;
     size.x = 0x40;
     size.y = 0x80;
     size.z = 0x40;

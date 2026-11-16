@@ -43,7 +43,7 @@ static inline u8 SceneActorControl_TakeFlag(u8 *flag)
 }
 static inline u8 SceneActorControl_TakeStateEntry(struct SceneActorRegistryResetView *actor)
 {
-    return SceneActorControl_TakeFlag(&actor->field2B1);
+    return SceneActorControl_TakeFlag(&actor->base.field2B1);
 }
 
 #endif

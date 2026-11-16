@@ -13,41 +13,41 @@ static inline u8 TakePrepared(u8 *field)
 }
 static inline void SetControl(struct SceneActorRegistryResetView *actor, void *control, u32 kind)
 {
-    u8 *prepared = &actor->field2B2;
+    u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 void SceneActor_WaitForControlCompletion(struct SceneActorRegistryResetView *actor)
 {
     u8 busy;
-    if (TakePrepared(&actor->field2B1)) {
-        void *control = actor->entryTarget224;
+    if (TakePrepared(&actor->base.field2B1)) {
+        void *control = actor->base.entryTarget224;
         SetControl(actor, control, 2);
     }
-    busy = Callback_InvokeActor(actor, actor->contactQuery.opaque);
+    busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
-        if (actor->field2B0) {
+        if (actor->base.field2B0) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             {
                 u32 state = 0x10;
-                actor->state2A8 = 0;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = state;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
+                actor->base.state2A8 = 0;
+                actor->base.phase2A9 = 0;
+                actor->base.behavior2AA = state;
+                actor->base.counter2AC = 0;
+                actor->base.field2B1 = 1;
             }
             SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         } else
-            actor->counter2AC++;
+            actor->base.counter2AC++;
     }
 }

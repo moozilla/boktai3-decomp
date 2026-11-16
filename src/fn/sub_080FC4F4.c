@@ -107,7 +107,7 @@ void Axe_InitAttackTrail(struct SceneActorRegistryResetView *s)
     struct ContactPackedVector bodyOffset;
     struct ContactPackedVector attackSize;
     struct ContactPackedVector attackOffset;
-    struct AxeAttackTrailContext *d = s->context;
+    struct AxeAttackTrailContext *d = s->base.context;
     void *resource = &d->graphics;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *frames;
@@ -119,14 +119,14 @@ void Axe_InitAttackTrail(struct SceneActorRegistryResetView *s)
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
         struct DisplaySequenceState *drawable =
-            &((struct SceneActorControlMotionDrawable *)s->drawable)->sequence;
+            &((struct SceneActorControlMotionDrawable *)s->base.drawable)->sequence;
         u32 index = Axe_SequenceSelection(drawable);
         frames = &d->sequence;
         Anim_SetSequence(frames, sequence, index, d->variant, 0);
     }
     Axe_StepSequence(sprite, frames);
     d->draw.sprite.flags |= 1;
-    d->draw.spatial.position = s->body.position;
+    d->draw.spatial.position = s->base.body.position;
     d->draw.sprite.priority = 1;
     bodySize.x = 24;
     bodySize.y = 70;
@@ -153,10 +153,10 @@ void Axe_InitAttackTrail(struct SceneActorRegistryResetView *s)
         void *c = &d->attack[i];
         Collider_Init(c, 0, 0x2401, 0, 16, &attackSize, &attackOffset);
         {
-            u16 first = s->attacks.first[0];
-            u16 second = s->attacks.second[0];
-            u32 flags = s->attacks.flags[0];
-            u16 parameter = s->attacks.parameter[0];
+            u16 first = s->base.attacks.first[0];
+            u16 second = s->base.attacks.second[0];
+            u32 flags = s->base.attacks.flags[0];
+            u16 parameter = s->base.attacks.parameter[0];
             Collider_SetAttackProperties(c, first, second, 0, flags, parameter);
         }
         Collider_SetPosition(c, &d->origin, 0);

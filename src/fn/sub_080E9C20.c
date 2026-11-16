@@ -27,7 +27,7 @@ extern const struct OctopusOffset gUnk_086062B0[2][5];
 static inline void Octopus_GetCaptureFacing(struct SceneActorRegistryResetView *actor, u8 *quadrant,
                                             u8 *flip)
 {
-    s16 side = ((actor->body.direction + 0x60) >> 6) & 3;
+    s16 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -44,13 +44,13 @@ static inline void Octopus_EnableCollider(struct ContactCollider *collider)
 }
 static inline void Octopus_SetContactFlag(struct SceneActorRegistryResetView *actor, u32 bits)
 {
-    actor->flags2C0 = bits | actor->flags2C0;
+    actor->base.flags2C0 = bits | actor->base.flags2C0;
 }
 static inline void Octopus_DisableContact(struct SceneActorRegistryResetView *actor)
 {
-    actor->colliderA.flags &= 0xFFFB;
-    actor->colliderA.flags |= 8;
-    SceneActorChase_ClearFlagComponent((void *)&actor->flags2C0, 0x800);
+    actor->base.colliderA.flags &= 0xFFFB;
+    actor->base.colliderA.flags |= 8;
+    SceneActorChase_ClearFlagComponent((void *)&actor->base.flags2C0, 0x800);
 }
 
 struct OctopusFrameIndex {
@@ -73,9 +73,9 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
     s32 limit;
     u16 *palette;
 
-    anim = &((struct SceneActorControlMotionDrawable *)actor->drawable)->sequence;
+    anim = &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     started = SceneActorReaction_TakePrepared(actor);
-    palette = &actor->paletteOffset;
+    palette = &actor->base.paletteOffset;
     if (started) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
         if (*palette == 1)
@@ -90,7 +90,7 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
         limit = 6;
 
     if (Octopus_ReadFrame(anim).index == 3 && anim->elapsed > limit) {
-        Octopus_EnableCollider(&actor->colliderA);
+        Octopus_EnableCollider(&actor->base.colliderA);
         Octopus_SetContactFlag(actor, 0x800);
         if (SceneActorReaction_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Octopus_UpdateHold, 0x25);
@@ -98,16 +98,16 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
             SceneActorAnimation_SelectDirectionalFlags((void *)actor, 0x12);
 
             Octopus_GetCaptureFacing(actor, &quadrant, &flip);
-            pos.x = actor->body.position.x + gUnk_086062B0[flip][anim->index].x;
-            pos.y = actor->body.position.y + gUnk_086062B0[flip][anim->index].y;
-            pos.z = actor->body.position.z + gUnk_086062B0[flip][anim->index].z;
-            target = (void *)actor->tracking.target;
+            pos.x = actor->base.body.position.x + gUnk_086062B0[flip][anim->index].x;
+            pos.y = actor->base.body.position.y + gUnk_086062B0[flip][anim->index].y;
+            pos.z = actor->base.body.position.z + gUnk_086062B0[flip][anim->index].z;
+            target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
                 Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,
                                             0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct SceneActorRegistryResetView *t = target->actor;
-                t->colliderA.responseValue = 0;
+                t->base.colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
                 SceneActorReaction_ApplyHitResponse(t, 0, (void *)&pos, 0, flip, 0);
@@ -117,12 +117,12 @@ void sub_080E9C20(struct SceneActorRegistryResetView *actor)
     } else if (Octopus_ReadFrame(anim).index <= 1) {
         Octopus_DisableContact(actor);
     } else {
-        actor->colliderA.flags |= 4;
-        actor->colliderA.flags &= 0xFFF7;
+        actor->base.colliderA.flags |= 4;
+        actor->base.colliderA.flags &= 0xFFF7;
         Octopus_SetContactFlag(actor, 0x800);
     }
 
-    if (actor->field2B3) {
+    if (actor->base.field2B3) {
         Octopus_DisableContact(actor);
         SceneActorChase_SetControl(actor, SceneActorReaction_PlayEntry17, 0x27);
         SceneActorChase_SetState(actor, 0, 2, 3);

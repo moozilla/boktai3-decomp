@@ -23,23 +23,23 @@ void SceneActorMovement_ResolveRoutePosition(struct SceneActorRegistryResetView 
 void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyRouteContext *body = actor->context;
+    struct MummyRouteContext *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorChase_SetControl(actor, actor->savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x200);
-        SceneActorChase_ClearWordFlags(&actor->flags2CC, 0x80);
+        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
         group->common.control.timer = 0;
     }
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    if ((s32)actor->counter2AC > 60) {
+    if ((s32)actor->base.counter2AC > 60) {
         SceneActorChase_ClearFlagComponent(&group->common.gate.flags, 6);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_SetState(actor, 3, 1, 0);
         if (body->pursuitDelay &&
-            actor->terrainCell ==
-                ((struct MummyRouteTarget *)actor->tracking.target)->cell->index) {
+            actor->base.terrainCell ==
+                ((struct MummyRouteTarget *)actor->base.tracking.target)->cell->index) {
             if (Mummy_RequestStraightRoute(actor))
                 return;
             SceneActorChase_ChooseRoute(actor);
@@ -48,5 +48,5 @@ void Mummy_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
         } else
             SceneActorChase_Arrive(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

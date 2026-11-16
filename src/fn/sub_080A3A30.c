@@ -19,12 +19,12 @@ static inline u8 Blocked(struct SceneActorRegistryResetView *a)
 {
     if (a) {
         u32 mask = 0x40;
-        if (a->flags2D4 & mask)
+        if (a->base.flags2D4 & mask)
             return 1;
         mask = 0x20000;
-        if (a->flags2D0 & mask)
+        if (a->base.flags2D0 & mask)
             return 1;
-        if (a->health <= 0)
+        if (a->base.health <= 0)
             return 1;
     }
     return 0;
@@ -37,29 +37,29 @@ static inline u8 HasFlag(struct PursuitContext *c, u32 mask)
 }
 static inline void SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase, u8 behavior)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 static inline void SetControl(struct SceneActorRegistryResetView *a, void *callback, u32 kind)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = kind;
-    a->target = callback;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = kind;
+    a->base.target = callback;
+    a->base.field2C8 = 0;
     {
-        u32 *flags = &a->flags114;
+        u32 *flags = &a->base.flags114;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 static inline void SetFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
-    a->flags2CC = mask | a->flags2CC;
+    a->base.flags2CC = mask | a->base.flags2CC;
 }
 void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
 {
@@ -76,36 +76,36 @@ void Spider_BeginPlayerPursuit(struct SceneActorRegistryResetView *a)
         return;
     if (!(*(u8 **)gPlayers))
         return;
-    ctx = a->context;
+    ctx = a->base.context;
     group = (u8 *)(&a->group.common);
     ready = HasFlag(ctx, 1);
     if (ready)
         return;
     mesh = &((struct SpiderPursuitGroup *)group)->mesh;
-    if (!Nav_IsPositionInMesh(*mesh, &a->body.position, (*(u8 **)gPlayers) + 0x30))
+    if (!Nav_IsPositionInMesh(*mesh, &a->base.body.position, (*(u8 **)gPlayers) + 0x30))
         return;
     motionMask = 0x200;
     point = &((struct SpiderPursuitGroup *)group)->point;
-    *(*point) = a->body.position;
+    *(*point) = a->base.body.position;
     (*point)->pad = ready;
-    a->tracking.target = (u32)((*(u8 **)gPlayers) + 0x24);
+    a->base.tracking.target = (u32)((*(u8 **)gPlayers) + 0x24);
     SetState(a, 0, 0, 7);
-    SetControl(a, a->entryTarget228, 1);
+    SetControl(a, a->base.entryTarget228, 1);
     terrain = *mesh;
-    dest = &a->tracking.target->position;
-    if (!Nav_IsPositionInMesh(terrain, &a->body.position, dest)) {
-        a->flags2D4 &= ~motionMask;
+    dest = &a->base.tracking.target->position;
+    if (!Nav_IsPositionInMesh(terrain, &a->base.body.position, dest)) {
+        a->base.flags2D4 &= ~motionMask;
     } else {
-        result = Terrain_ApplyBlocked(terrain, &a->body.position, dest);
+        result = Terrain_ApplyBlocked(terrain, &a->base.body.position, dest);
         if (result) {
             if (result != 2)
-                Memory_Clear(&a->body.motion, 8);
+                Memory_Clear(&a->base.body.motion, 8);
         } else {
-            a->flags2D4 &= ~motionMask;
+            a->base.flags2D4 &= ~motionMask;
         }
     }
     SetFlags(a, 0x4010);
-    a->field2C2 = Div(64, 3);
+    a->base.field2C2 = Div(64, 3);
     ctx->flags |= 2;
     ctx->timer = 0;
 }

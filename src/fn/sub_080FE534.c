@@ -3,5 +3,5 @@ extern void *gUnk_08606494[];
 
 void Axe_InitEventCallbacks(struct SceneActorRegistryResetView *p)
 {
-    p->alternateBehaviorCallbacks = gUnk_08606494;
+    p->base.alternateBehaviorCallbacks = gUnk_08606494;
 }

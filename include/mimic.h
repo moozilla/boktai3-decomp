@@ -169,8 +169,8 @@ struct Mimic {
 
 static inline u8 MimicChase_TakeArrived(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -180,11 +180,11 @@ static inline void MimicChase_SetState(struct SceneActorRegistryResetView *actor
                                        u32 b)
 {
     u32 behavior = b;
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void MimicChase_ClearBits(u16 *field, u32 bits)
@@ -198,16 +198,16 @@ static inline u8 MimicChase_TryRoute(struct SceneActorRegistryResetView *actor, 
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        MimicChase_ClearBits(&actor->flags2D4, 0x200);
+        MimicChase_ClearBits(&actor->base.flags2D4, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
-            Memory_Clear(&actor->body.motion, 8);
+            Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    MimicChase_ClearBits(&actor->flags2D4, 0x200);
+    MimicChase_ClearBits(&actor->base.flags2D4, 0x200);
     return 0;
 }
 
@@ -217,8 +217,8 @@ s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPositio
 
 static inline u8 SceneActorReaction_TakePrepared(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B2) {
-        actor->field2B2 = 0;
+    if (actor->base.field2B2) {
+        actor->base.field2B2 = 0;
         return 1;
     }
     return 0;

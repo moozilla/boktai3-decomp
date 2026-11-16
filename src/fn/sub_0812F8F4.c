@@ -15,62 +15,62 @@ static inline void BeginControl(struct SceneActorRegistryResetView *actor, void 
                                 u32 zero)
 {
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         *field = 1;
     }
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 static inline void BeginControlZero(struct SceneActorRegistryResetView *actor, void *control,
                                     u32 kind)
 {
     u32 zero;
     {
-        u8 *field = &actor->field2B2;
+        u8 *field = &actor->base.field2B2;
         zero = 0;
         *field = 1;
     }
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 void SceneActorControl_UpdateEntryTransition(struct SceneActorRegistryResetView *actor)
 {
     u8 result;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        BeginControlZero(actor, actor->entryTarget224, 2);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        BeginControlZero(actor, actor->base.entryTarget224, 2);
     }
-    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
+    if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         result = sub_0812F3CC(actor);
         if (!result) {
-            if (actor->field2B0) {
+            if (actor->base.field2B0) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);
                 {
                     u32 behavior = 12;
-                    u8 *field = &actor->behavior2AA;
+                    u8 *field = &actor->base.behavior2AA;
                     *field = behavior;
                 }
-                actor->counter2AC = result;
-                actor->field2B1 = 1;
+                actor->base.counter2AC = result;
+                actor->base.field2B1 = 1;
                 BeginControl(actor, group->gate.control, 26, result);
             } else {
-                ++actor->counter2AC;
+                ++actor->base.counter2AC;
             }
         }
     }

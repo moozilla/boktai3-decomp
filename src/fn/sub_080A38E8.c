@@ -14,14 +14,14 @@ struct SpiderResetContext {
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_ResetStep(struct SceneActorRegistryResetView *actor)
 {
-    struct SpiderResetContext *context = actor->context;
+    struct SpiderResetContext *context = actor->base.context;
     context->field628 = 0;
     context->field62A = 0;
     context->field62C = 0;
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
-        struct SceneActorControlMotionDrawable *drawable = actor->drawable;
+        struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
         DisplaySequence_StepState(drawable, &drawable->sequence);
     }
 }

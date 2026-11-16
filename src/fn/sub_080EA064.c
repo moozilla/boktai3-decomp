@@ -72,40 +72,40 @@ static inline void SetCtl(struct SceneActorRegistryResetView *actor, void *cb, u
 {
     void *callback = cb;
     u32 kind = k;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void ResetState(struct SceneActorRegistryResetView *actor, u32 s)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = 0;
-    actor->behavior2AA = 0;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = 0;
+    actor->base.behavior2AA = 0;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 s, u32 p, u32 b)
 {
-    actor->state2A8 = s;
-    actor->phase2A9 = p;
-    actor->behavior2AA = b;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = s;
+    actor->base.phase2A9 = p;
+    actor->base.behavior2AA = b;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void Facing(struct SceneActorRegistryResetView *actor, u8 *quadrant, u8 *flip)
 {
-    s32 side = ((actor->body.direction + 0x60) >> 6) & 3;
+    s32 side = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (side > 1) {
         *flip = 1;
         *quadrant = 3 - side;
@@ -122,7 +122,7 @@ static inline s32 WrapCounter(s32 n)
 
 static inline void FacingAngle(struct SceneActorRegistryResetView *actor, u8 *angle)
 {
-    s32 turn = (actor->body.direction + 0x20) & 0xFF;
+    s32 turn = (actor->base.body.direction + 0x20) & 0xFF;
     s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
     *angle = quadrant << 6;
 }
@@ -151,23 +151,23 @@ static inline s32 HudMode(void)
 static inline u8 MayCount(struct SceneActorRegistryResetView *victim)
 {
     if (TestFlags(gEngineFlags, 0x4800)) {
-        u32 value = victim->field2E0;
+        u32 value = victim->base.field2E0;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {
                 case 0:
-                    if (victim->field2E0 != 1)
+                    if (victim->base.field2E0 != 1)
                         return 0;
                     break;
                 case 1:
-                    if (victim->field2E0 != 2)
+                    if (victim->base.field2E0 != 2)
                         return 0;
                     break;
                 case 2:
-                    if (victim->field2E0 != 4)
+                    if (victim->base.field2E0 != 4)
                         return 0;
                     break;
                 case 3:
-                    if (victim->field2E0 != 8)
+                    if (victim->base.field2E0 != 8)
                         return 0;
                     break;
             }
@@ -185,23 +185,23 @@ static inline void ReportDrain(struct SceneActorRegistryResetView *victim)
 {
     struct ContactPackedVector range;
     if (MayCount(victim)) {
-        s32 health = victim->health;
+        s32 health = victim->base.health;
         u32 max = *(u16 *)((u8 *)victim + 0xB0);
         s32 kind = *(s16 *)((u8 *)victim + 0xB2);
         s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
-        SceneHud_SetTimedState(victim->body.id, health, max, kind, 0, parameter);
+        SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
-        if (victim->reactionSoundVariant || !(victim->field2D8 & 0x20000))
-            DamageNumberDisplay_Show(&victim->colliderA, victim->reactionSoundVariant, 0,
-                                     &victim->body.position, &range, 1);
+        if (victim->base.reactionSoundVariant || !(victim->base.field2D8 & 0x20000))
+            DamageNumberDisplay_Show(&victim->base.colliderA, victim->base.reactionSoundVariant, 0,
+                                     &victim->base.body.position, &range, 1);
     }
 }
 
 void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
 {
-    struct OctopusContext *context = actor->context;
+    struct OctopusContext *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->drawable + 0x48);
+    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct OctopusTarget *target;
     u8 quadrant, flip;
     struct ContactPosition position;
@@ -209,7 +209,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor)) {
         context->startTick = (*(u8 **)gPlayers)[0x4F4];
         {
-            u16 *destination = &actor->colliderA.flags;
+            u16 *destination = &actor->base.colliderA.flags;
             u32 flags = *destination;
             u32 mask = 4;
             mask |= flags;
@@ -218,11 +218,11 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
         }
         {
             u32 mask = 0x800;
-            mask |= actor->flags2C0;
-            actor->flags2C0 = mask;
+            mask |= actor->base.flags2C0;
+            actor->base.flags2C0 = mask;
         }
     }
-    target = (void *)actor->tracking.target;
+    target = (void *)actor->base.tracking.target;
     Facing(actor, &quadrant, &flip);
     if (target->kind <= 3) {
         if (sequence->elapsed + 1 >= sequence->duration) {
@@ -233,12 +233,12 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             index = sequence->index;
     } else
         index = sequence->index;
-    position.x = actor->body.position.x + gUnk_086062B0[flip][index].x;
-    position.y = actor->body.position.y + gUnk_086062B0[flip][index].y;
-    position.z = actor->body.position.z + gUnk_086062B0[flip][index].z;
+    position.x = actor->base.body.position.x + gUnk_086062B0[flip][index].x;
+    position.y = actor->base.body.position.y + gUnk_086062B0[flip][index].y;
+    position.z = actor->base.body.position.z + gUnk_086062B0[flip][index].z;
     if (target->kind == 4) {
         struct SceneActorRegistryResetView *victim;
-        ((struct OctopusDrawable *)actor->drawable)->mode = 2;
+        ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
         victim = target->player;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
         goto animate;
@@ -247,7 +247,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
         goto animate;
     {
         struct Player *player;
-        ((struct OctopusDrawable *)actor->drawable)->mode = 1;
+        ((struct OctopusDrawable *)actor->base.drawable)->mode = 1;
         player = target->player;
         if (Mod(frame, context->interval) == 0) {
             s32 start, cur, elapsed;
@@ -263,7 +263,7 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             if (elapsed > context->holdTicks) {
             release:
                 FacingAngle(actor, &quadrant);
-                CellCenter((struct SceneVec *)&position, actor->terrainCell);
+                CellCenter((struct SceneVec *)&position, actor->base.terrainCell);
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
                 SetState(actor, 0, 0, 0);
@@ -272,8 +272,8 @@ void Octopus_UpdateHold(struct SceneActorRegistryResetView *actor, s32 frame)
             }
             {
                 u32 status = Octopus_GetAnimationStatus(actor);
-                u32 request = actor->attacks.first[1];
-                u32 option = actor->attacks.flags[1];
+                u32 request = actor->base.attacks.first[1];
+                u32 option = actor->base.attacks.flags[1];
                 Player_BeginPositionRequest(player, (struct SceneVec *)&position, 0, status, flip,
                                             0, 0, request, option);
             }
@@ -287,7 +287,7 @@ animate:
     if (sequence->index == 0 && sequence->elapsed == 0)
         Sound_PlaySong(0x1DE);
     if (frame > 0xB4) {
-        actor->field2B0 = 1;
-        ((struct OctopusDrawable *)actor->drawable)->mode = 1;
+        actor->base.field2B0 = 1;
+        ((struct OctopusDrawable *)actor->base.drawable)->mode = 1;
     }
 }

@@ -13,14 +13,14 @@ void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     u32 zero;
     SceneActorControl_TakeStateEntry(actor);
-    if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     zero = (u8)sub_0812F3CC(actor);
     if (zero)
         return;
-    if ((s32)actor->counter2AC <= 60)
+    if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
-    SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->category);
+    SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
     SceneActorChase_SetState(actor, 3, 1, zero);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
@@ -28,9 +28,9 @@ void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
         SceneActorChase_Arrive(actor);
     } else {
         SceneActorChase_SetActorFlags(actor, 0x10);
-        SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
             SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
             SceneActorChase_SetState(actor, 3, 0, 0);
@@ -39,5 +39,5 @@ void Golem_ResumeDelayedRoute(struct SceneActorRegistryResetView *actor)
     }
     return;
 waiting:
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }

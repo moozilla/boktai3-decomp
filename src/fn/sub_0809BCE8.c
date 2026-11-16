@@ -9,26 +9,26 @@ static inline void SetControl(struct SceneActorRegistryResetView *actor, u32 kin
 {
     void *callback = target;
     u32 type = kind;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = type;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = type;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 static inline void SetState(struct SceneActorRegistryResetView *actor, u32 state, u32 phase,
                             u32 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline u8 TakeFlag(u8 *p)
@@ -45,50 +45,50 @@ void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     s32 values[8];
     struct ScriptUtilityArguments arguments;
     u16 script;
-    if (TakeFlag(&actor->field2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
-            u32 *p = &actor->flags2D0;
+            u32 *p = &actor->base.flags2D0;
             u32 m = ~0x100000;
             *p &= m;
         }
         {
-            struct ContactCollider *c = &actor->colliderB;
+            struct ContactCollider *c = &actor->base.colliderB;
             c->flags |= 4;
         }
         {
-            struct ContactCollider *c = &actor->colliderA;
+            struct ContactCollider *c = &actor->base.colliderA;
             c->flags |= 4;
         }
         {
             u32 m = 0x800;
-            actor->flags2C0 = m | actor->flags2C0;
+            actor->base.flags2C0 = m | actor->base.flags2C0;
         }
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
     }
-    if (actor->field2B3) {
-        actor->field2B0 = 1;
+    if (actor->base.field2B3) {
+        actor->base.field2B0 = 1;
         SceneActorBehavior_CallTerrainScript(actor);
         script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
         if (script) {
-            values[0] = actor->body.position.x;
-            values[1] = actor->body.position.y;
-            values[2] = actor->body.position.z;
+            values[0] = actor->base.body.position.x;
+            values[1] = actor->base.body.position.y;
+            values[2] = actor->base.body.position.z;
             values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
             values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
             values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-            values[6] = actor->field2E0;
-            values[7] = actor->body.id;
+            values[6] = actor->base.field2E0;
+            values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);
         }
         {
             u32 m = 0x4000;
-            if (!(actor->flags2D4 & m) && (u32)(actor->category - 11) > 2)
+            if (!(actor->base.flags2D4 & m) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         }
         SetControl(actor, 16, SceneActorControl_OnIdle);
         SetState(actor, 1, 0, 2);

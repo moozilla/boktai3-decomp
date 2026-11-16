@@ -14,8 +14,8 @@ static inline u32 ActorFlag(struct SceneActorRegistryResetView *actor, u32 input
 }
 static inline u8 unavailable(struct SceneActorRegistryResetView *actor)
 {
-    if (actor &&
-        (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor && (ActorFlag(actor, 0x40, 0x2D4) || ActorFlag(actor, 0x20000, 0x2D0) ||
+                  actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -42,34 +42,34 @@ static inline void SetBounds(struct ContactCollider *collider,
 }
 void Skeleton_UpdateFacingColliders(struct SceneActorRegistryResetView *p)
 {
-    struct SkeletonColliderContext *context = p->context;
+    struct SkeletonColliderContext *context = p->base.context;
     union SceneActorRegistryPackedPosition pos, bounds;
     u32 mask;
     if (unavailable(p))
         return;
     mask = 0x800;
-    if (p->flags2D4 & mask)
+    if (p->base.flags2D4 & mask)
         return;
-    if (p->field2B5 == 0x39)
+    if (p->base.field2B5 == 0x39)
         return;
-    if (p->field2B5 == 0x3D)
+    if (p->base.field2B5 == 0x3D)
         return;
     if (context->timer) {
-        p->colliderA.flags |= 4;
+        p->base.colliderA.flags |= 4;
         context->body.flags |= 4;
         context->timer--;
     } else {
-        p->colliderA.flags &= ~4;
+        p->base.colliderA.flags &= ~4;
         context->body.flags &= ~4;
     }
-    pos.position = p->body.position;
+    pos.position = p->base.body.position;
     Collider_SetPosition(&context->body, &pos, 0);
-    pos.packed.x += scaled(gUnk_086149C4[(p->body.direction + 64) & 255] * 128);
-    pos.packed.z += scaled(gUnk_086149C4[p->body.direction] * 128);
-    switch (((p->body.direction + 16) & 255) >> 6) {
+    pos.packed.x += scaled(gUnk_086149C4[(p->base.body.direction + 64) & 255] * 128);
+    pos.packed.z += scaled(gUnk_086149C4[p->base.body.direction] * 128);
+    switch (((p->base.body.direction + 16) & 255) >> 6) {
         case 0:
         case 2:
-            if (p->category == 6) {
+            if (p->base.category == 6) {
                 bounds.packed.x = 180;
                 bounds.packed.z = 84;
             } else {
@@ -79,7 +79,7 @@ void Skeleton_UpdateFacingColliders(struct SceneActorRegistryResetView *p)
             break;
         case 1:
         case 3:
-            if (p->category == 6) {
+            if (p->base.category == 6) {
                 bounds.packed.x = 84;
                 bounds.packed.z = 180;
             } else {

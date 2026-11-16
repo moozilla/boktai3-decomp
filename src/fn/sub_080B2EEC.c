@@ -12,15 +12,15 @@ static inline u8 Inactive(struct SceneActorRegistryResetView *p)
     if (p) {
         u32 mask = 0x40;
         u32 offset = 0x2D4;
-        if (p->flags2D4 & mask)
+        if (p->base.flags2D4 & mask)
             goto inactive;
         {
             u32 mask = 0x20000;
             offset -= 4;
-            if (p->flags2D0 & mask)
+            if (p->base.flags2D0 & mask)
                 goto inactive;
         }
-        if (p->health > 0)
+        if (p->base.health > 0)
             goto active;
     inactive:
         return 1;
@@ -59,7 +59,7 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
         return;
     {
         u32 mask = 0xE33F;
-        if (p->flags2D4 & mask)
+        if (p->base.flags2D4 & mask)
             return;
     }
     if (!q->field688)
@@ -82,23 +82,23 @@ void SceneActor_TrySoloAction(struct SceneActorRegistryResetView *p)
             return;
         {
             u32 state = 3;
-            p->state2A8 = state;
+            p->base.state2A8 = state;
         }
-        p->phase2A9 = zero;
-        p->behavior2AA = zero;
-        p->counter2AC = zero;
-        p->field2B1 = 1;
+        p->base.phase2A9 = zero;
+        p->base.behavior2AA = zero;
+        p->base.counter2AC = zero;
+        p->base.field2B1 = 1;
         {
             u32 one = 1;
             void *callback = SceneActorReaction_UpdateFacingAttack;
             u32 mode = 0x2A;
-            p->field2B2 = one;
-            p->field2B0 = zero;
-            p->field2B5 = mode;
-            p->target = callback;
+            p->base.field2B2 = one;
+            p->base.field2B0 = zero;
+            p->base.field2B5 = mode;
+            p->base.target = callback;
         }
-        p->field2C8 = zero;
-        Clear(&p->flags114, 1);
-        p->word104 = zero;
+        p->base.field2C8 = zero;
+        Clear(&p->base.flags114, 1);
+        p->base.word104 = zero;
     }
 }

@@ -160,10 +160,10 @@ static inline u32 MonsterInit_ReadRoute(struct SceneActorRegistryResetView *arg0
             Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(rt);
         Path_GetPointPositionById((u16 *)&point, MonsterInit_RouteId(rt),
                                   MonsterInit_RoutePointId(rt));
-        arg0->terrainCell = MonsterInit_CellIndex(&point);
-        point.y = arg0->groundHeight2BE =
+        arg0->base.terrainCell = MonsterInit_CellIndex(&point);
+        point.y = arg0->base.groundHeight2BE =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(arg0), &point);
-        MonsterInit_BeginRoute(&arg0->body, rt);
+        MonsterInit_BeginRoute(&arg0->base.body, rt);
         return 1;
     } else {
         rt->routeId = 0;

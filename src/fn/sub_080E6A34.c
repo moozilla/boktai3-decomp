@@ -6,8 +6,8 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
 {
     if (Chase_TakeArrived(actor)) {
         struct SceneActorRegistryResetView *context;
-        actor->tracking.target = NULL;
-        context = actor->context;
+        actor->base.tracking.target = NULL;
+        context = actor->base.context;
         {
             u16 mask = 1;
             struct ChaseFlags40 *flags = (void *)&context->animationFlags65C;
@@ -15,9 +15,9 @@ void SceneActor_StartFlaggedAnimationPhase(struct SceneActorRegistryResetView *a
         }
         Chase_SetCtl(actor, SceneActor_WaitForCategoryAttachment, 0x25);
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         Chase_SetBehavior(actor, 2);
     } else {
-        Callback_InvokeActor(actor, actor->contactQuery.opaque);
+        Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     }
 }

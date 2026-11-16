@@ -44,9 +44,9 @@ static inline u8 TrackingHas(struct SceneActorChaseTracking *tracking, u32 mask)
 static inline void SelectState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
 }
 void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *actor)
 {
@@ -55,68 +55,68 @@ void SceneActorControl_ConvergeSavedMotion(struct SceneActorRegistryResetView *a
     s32 z;
     s16 *priorX;
     s16 *priorZ;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         {
             u16 mask = 0x20;
-            u16 *flags = &actor->flags2D4;
+            u16 *flags = &actor->base.flags2D4;
             *flags = mask | *flags;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         {
-            struct ContactCollider *collider = &actor->colliderB;
+            struct ContactCollider *collider = &actor->base.colliderB;
             collider->flags |= 4;
         }
     }
-    OrWordFlags(0x100000, &actor->flags2D0);
+    OrWordFlags(0x100000, &actor->base.flags2D0);
     {
-        s32 current = actor->reactionStart.x;
-        s16 *field = &actor->reactionEnd.x;
+        s32 current = actor->base.reactionStart.x;
+        s16 *field = &actor->base.reactionEnd.x;
         s32 difference = current - *field;
         priorX = field;
         x = Quarter(difference);
     }
     {
-        s32 current = actor->reactionStart.z;
-        s16 *field = &actor->reactionEnd.z;
+        s32 current = actor->base.reactionStart.z;
+        s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
         z = Quarter(difference);
     }
     x = Clamp(x);
     z = Clamp(z);
-    actor->body.motion.x += x;
-    actor->body.motion.z += z;
+    actor->base.body.motion.x += x;
+    actor->base.body.motion.z += z;
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
         u16 *flags;
         struct SceneActorChaseTracking *tracking;
         u32 tracked;
-        actor->field2B0 = 1;
-        flags = &actor->flags2D4;
+        actor->base.field2B0 = 1;
+        flags = &actor->base.flags2D4;
         {
             u32 mask = ~0x20;
             mask &= *flags;
             tracked = 0;
             *flags = mask;
         }
-        AndWordFlags(&actor->flags2CC, ~0x80);
+        AndWordFlags(&actor->base.flags2CC, ~0x80);
         state->phase = tracked;
-        tracking = &actor->tracking;
+        tracking = &actor->base.tracking;
         tracked = TrackingHas(tracking, 8);
         if (tracked) {
             SceneActorReaction_EnableMotionFlags(0x100, flags);
             SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);
             SelectState(actor, 0, 2, 0);
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
             SceneActorControl_ResetCollisionPhase(actor);
         } else {
             OrTrackingFlags(tracking, 8);
             SceneActorReaction_EnableMotionFlags(0x100, flags);
             SelectState(actor, 0, 0, 3);
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
             SceneActorControl_ResetCollisionPhase(actor);
         }
     }

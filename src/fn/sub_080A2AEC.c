@@ -24,26 +24,26 @@ static inline void Spider_ClearContextFlags(struct SpiderFlagWord *p, u32 mask)
 static inline void Spider_SetControl(struct SceneActorRegistryResetView *a, void *callback,
                                      u32 kind)
 {
-    a->field2B2 = 1;
-    a->field2B0 = 0;
-    a->field2B5 = kind;
-    a->target = callback;
-    a->field2C8 = 0;
+    a->base.field2B2 = 1;
+    a->base.field2B0 = 0;
+    a->base.field2B5 = kind;
+    a->base.target = callback;
+    a->base.field2C8 = 0;
     {
-        u32 *p = &a->flags114;
+        u32 *p = &a->base.flags114;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->word104 = 0;
+    a->base.word104 = 0;
 }
 static inline void Spider_SetState(struct SceneActorRegistryResetView *a, u8 state, u8 phase,
                                    u8 behavior)
 {
-    a->state2A8 = state;
-    a->phase2A9 = phase;
-    a->behavior2AA = behavior;
-    a->counter2AC = 0;
-    a->field2B1 = 1;
+    a->base.state2A8 = state;
+    a->base.phase2A9 = phase;
+    a->base.behavior2AA = behavior;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 void sub_080A4798(void *);
@@ -69,8 +69,8 @@ static inline s32 Spider_QuarterDisplacement(s32 x)
 static inline void Spider_AddMotionFlags(struct SceneActorRegistryResetView *a, u32 mask)
 {
     u32 value = mask;
-    value |= a->flags2D4;
-    a->flags2D4 = value;
+    value |= a->base.flags2D4;
+    a->base.flags2D4 = value;
 }
 static inline void Spider_AddGroupFlags(struct SceneActorRegistryControlGroup *g, u32 mask)
 {
@@ -81,7 +81,7 @@ static inline void Spider_AddGroupFlags(struct SceneActorRegistryControlGroup *g
 }
 static inline void Spider_ClearMotionFlags(struct SceneActorRegistryResetView *a_, u32 mask)
 {
-    u16 *p = &a_->flags2D4;
+    u16 *p = &a_->base.flags2D4;
     *p &= mask;
 }
 
@@ -106,8 +106,8 @@ static inline u8 Spider_MoveLanding(struct LandingState *s, struct SceneActorReg
         z = 200;
     else if (z < -200)
         z = -200;
-    a->body.motion.x += x;
-    a->body.motion.z += z;
+    a->base.body.motion.x += x;
+    a->base.body.motion.z += z;
     *cx += x;
     *cz += z;
     if (!x && !z)
@@ -127,21 +127,21 @@ static inline u32 Spider_SetLandingReady(struct LandingReady *p)
 
 void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame)
 {
-    struct LandingSequence *seq = (void *)(((u8 *)a->drawable) + 0x48);
+    struct LandingSequence *seq = (void *)(((u8 *)a->base.drawable) + 0x48);
     u32 *flags;
-    if (Spider_TakeEntry(&a->field2B2)) {
-        Spider_ClearContextFlags(&((struct SpiderRecoveryContext *)a->context)->flags, ~6);
+    if (Spider_TakeEntry(&a->base.field2B2)) {
+        Spider_ClearContextFlags(&((struct SpiderRecoveryContext *)a->base.context)->flags, ~6);
         SceneActorAnimation_SelectDirectionalEntry(a, 3);
         Spider_AddMotionFlags(a, 0x20);
     }
     {
         u32 mask = 0x10000;
-        u32 *p = &a->flags2D0;
+        u32 *p = &a->base.flags2D0;
         *p |= mask;
     }
     {
         u32 mask = 0x2000;
-        u32 *p = &a->flags2CC;
+        u32 *p = &a->base.flags2CC;
         *p |= mask;
         flags = p;
     }
@@ -149,7 +149,7 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
         seq->elapsed = 0;
     if (Spider_MoveLanding((void *)a, a)) {
         struct SceneActorRegistryControlGroup *group = &a->group.common;
-        u32 zero = Spider_SetLandingReady((void *)&a->field2B0);
+        u32 zero = Spider_SetLandingReady((void *)&a->base.field2B0);
         Spider_SetState(a, zero, zero, 12);
         Spider_SetControl(a, group->gate.control, 26);
         sub_080A4798(a);
@@ -158,7 +158,7 @@ void Spider_UpdateLandingMotion(struct SceneActorRegistryResetView *a, s32 frame
         Spider_AddMotionFlags(a, 0x80);
         a->group.common.gate.counter = a->group.common.gate.duration;
         Spider_ClearMotionFlags(a, ~0x20);
-        a->body.direction = a->tracking.heading;
+        a->base.body.direction = a->base.tracking.heading;
         {
             u32 mask = 0x10;
             *flags |= mask;

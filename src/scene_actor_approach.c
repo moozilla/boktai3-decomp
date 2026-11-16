@@ -21,8 +21,8 @@ void Skeleton_SelectDistanceReaction(struct SceneActorRegistryResetView *);
 
 static inline u8 TakeReady(struct SceneActorRegistryResetView *actor)
 {
-    if (actor->field2B1) {
-        actor->field2B1 = 0;
+    if (actor->base.field2B1) {
+        actor->base.field2B1 = 0;
         return 1;
     }
     return 0;
@@ -36,26 +36,26 @@ static inline void ClearFlags(u16 *p, u32 mask)
 static inline void SetCategoryControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 3;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = code;
-    actor->target = fn;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = code;
+    actor->base.target = fn;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorApproachCategoryContext *context = actor->context;
+    struct SceneActorApproachCategoryContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
         {
-            if (actor->category == 7)
+            if (actor->base.category == 7)
                 SetCategoryControl(actor, SceneActorReaction_TickQueuedContact);
             else
                 SetCategoryControl(actor, SceneActorReaction_TickContactAnimation);
@@ -63,11 +63,11 @@ void SceneActorApproach_RunCategoryAction(struct SceneActorRegistryResetView *ac
         Vorn_SpawnHazard(actor, 1);
         context->timer = context->duration;
     }
-    if (actor->field2B0) {
-        ClearFlags(&actor->flags2D4, ~0x100);
+    if (actor->base.field2B0) {
+        ClearFlags(&actor->base.flags2D4, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 struct SceneActorApproachTimedContext {
@@ -82,33 +82,33 @@ void Skeleton_UpdateAttackWindup(void);
 static inline void SetTimedControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 0x27;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = code;
-    actor->target = fn;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = code;
+    actor->base.target = fn;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 void SceneActorApproach_RunTimedAction(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorApproachTimedContext *context = actor->context;
+    struct SceneActorApproachTimedContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
         SetTimedControl(actor, Skeleton_UpdateAttackWindup);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }
-    if (actor->field2B0) {
-        ClearFlags(&actor->flags2D4, ~0x100);
+    if (actor->base.field2B0) {
+        ClearFlags(&actor->base.flags2D4, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 struct SceneActorApproachAlternateContext {
@@ -123,33 +123,33 @@ void SceneActorReaction_TickMultiHitAnimation(void);
 static inline void SetAlternateControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 0x2B;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = code;
-    actor->target = fn;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = code;
+    actor->base.target = fn;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 void SceneActorApproach_RunAlternateTimedAction(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorApproachAlternateContext *context = actor->context;
+    struct SceneActorApproachAlternateContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
         SetAlternateControl(actor, SceneActorReaction_TickMultiHitAnimation);
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 3);
     }
-    if (actor->field2B0) {
-        ClearFlags(&actor->flags2D4, ~0x100);
+    if (actor->base.field2B0) {
+        ClearFlags(&actor->base.flags2D4, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 // foundry draft (worker best 94.9%); what differs is mostly register allocation and instruction order
@@ -168,34 +168,34 @@ void sub_080BAAF4(void);
 static inline void SetCaptureControl(struct SceneActorRegistryResetView *actor, void *fn)
 {
     u8 code = 0x2C;
-    actor->field2B2 = 1;
-    actor->field2B0 = 0;
-    actor->field2B5 = code;
-    actor->target = fn;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = 0;
+    actor->base.field2B5 = code;
+    actor->base.target = fn;
+    actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 void SceneActorApproach_CaptureTargetAndRunAction(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorApproachCaptureContext *context = actor->context;
+    struct SceneActorApproachCaptureContext *context = actor->base.context;
     if (TakeReady(actor)) {
-        SceneActorReaction_EnableMotionFlags(0x100, &actor->flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.flags2D4);
         SetCaptureControl(actor, sub_080BAAF4);
-        context->destination = actor->tracking.target->position;
+        context->destination = actor->base.tracking.target->position;
         context->timer = context->duration;
         Vorn_SpawnHazard(actor, 2);
     }
-    if (actor->field2B0) {
-        ClearFlags(&actor->flags2D4, ~0x100);
+    if (actor->base.field2B0) {
+        ClearFlags(&actor->base.flags2D4, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 #define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
@@ -231,11 +231,11 @@ static inline s32 Skeleton_ScaleApproachMotion(s32 n)
 static inline void Skeleton_SetApproachState(void *object, u8 state, u8 phase, u32 behavior)
 {
     struct SceneActorRegistryResetView *actor = object;
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 static inline void Skeleton_GetApproachCellCenter(s32 cell, struct ContactPosition *position)
@@ -257,7 +257,7 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -274,7 +274,7 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
-    if (cell != actor->terrainCell &&
+    if (cell != actor->base.terrainCell &&
         !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
                                 0x20000))
         goto reroute;
@@ -288,7 +288,7 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -296,15 +296,15 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         SceneActorChase_BeginTurn(obj, saved, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 reroute: {
     Skeleton_GetApproachCellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto success;
 }
     callback = &group->fallback;
@@ -318,21 +318,21 @@ static inline void Skeleton_UpdateApproachAnimation(struct SceneActorRegistryRes
 {
     u32 mask = 0xA02F;
     u16 *scale;
-    if (actor->flags2D4 & mask) {
-        actor->field2C2 = 0x40;
-        scale = &actor->field2C2;
+    if (actor->base.flags2D4 & mask) {
+        actor->base.field2C2 = 0x40;
+        scale = &actor->base.field2C2;
     } else {
-        u16 t = actor->field2C2;
-        scale = &actor->field2C2;
+        u16 t = actor->base.field2C2;
+        scale = &actor->base.field2C2;
         if (t == 0)
             *scale = 0x40;
     }
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 static inline void Skeleton_ApplyApproachMotion(struct SceneActorRegistryResetView *actor,
@@ -340,35 +340,35 @@ static inline void Skeleton_ApplyApproachMotion(struct SceneActorRegistryResetVi
                                                 s32 speed)
 {
     Skeleton_UpdateApproachAnimation(actor);
-    actor->body.motion.x +=
+    actor->base.body.motion.x +=
         Skeleton_ScaleApproachMotion(gUnk_086149C4[(angle + 0x40) & 0xFF] * speed);
-    actor->body.motion.z += Skeleton_ScaleApproachMotion(gUnk_086149C4[angle & 0xFF] * speed);
+    actor->base.body.motion.z += Skeleton_ScaleApproachMotion(gUnk_086149C4[angle & 0xFF] * speed);
     {
         u32 mask = 0x2000;
-        actor->flags2CC |= mask;
+        actor->base.flags2CC |= mask;
     }
-    if (actor->tracking.distance > body->minimumDistance &&
-        actor->tracking.distance < body->maximumDistance) {
+    if (actor->base.tracking.distance > body->minimumDistance &&
+        actor->base.tracking.distance < body->maximumDistance) {
         u16 mask = 0x80;
-        actor->flags2D6 = mask | actor->flags2D6;
+        actor->base.flags2D6 = mask | actor->base.flags2D6;
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }
 
 void Skeleton_UpdateTargetApproach(struct SceneActorRegistryResetView *actor)
 {
-    struct SkeletonChaseBody *body = actor->context;
+    struct SkeletonChaseBody *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {
         void *target = Skeleton_UpdateScriptWaitState;
         SceneActorChase_SetControl(actor, target, 0x26);
     }
-    if (((struct SkeletonApproachProbe *)actor->body.movementProbe)->flags & 1) {
+    if (((struct SkeletonApproachProbe *)actor->base.body.movementProbe)->flags & 1) {
         Skeleton_SetApproachState(actor, 0, 0, 12);
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Skeleton_ApproachTargetCell(actor);
         {
-            struct SkeletonChaseBody *b = actor->context;
+            struct SkeletonChaseBody *b = actor->base.context;
             u32 mask = 0x80;
             b->flags |= mask;
         }
@@ -378,20 +378,20 @@ void Skeleton_UpdateTargetApproach(struct SceneActorRegistryResetView *actor)
         s32 speed;
         {
             struct ContactPosition *out = &diff;
-            struct ContactPosition *from = &actor->body.position;
-            struct ContactPosition *to = &actor->tracking.target->position;
+            struct ContactPosition *from = &actor->base.body.position;
+            struct ContactPosition *to = &actor->base.tracking.target->position;
             SceneActorTerrain_Subtract(out, to, from);
         }
         angle = Math_Atan2(diff.x, diff.z);
-        if (actor->tracking.distance < body->minimumDistance) {
+        if (actor->base.tracking.distance < body->minimumDistance) {
             angle = (angle + 0x80) & 0xFF;
-            actor->field2C2 = 0x20;
-        } else if (actor->tracking.distance > body->maximumDistance) {
-            actor->field2C2 = 0x20;
-            actor->body.direction = angle;
+            actor->base.field2C2 = 0x20;
+        } else if (actor->base.tracking.distance > body->maximumDistance) {
+            actor->base.field2C2 = 0x20;
+            actor->base.body.direction = angle;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
-        speed = Callback_InvokeActor(actor, actor->animationQuery.opaque);
+        speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
         Skeleton_ApplyApproachMotion(actor, body, angle, speed);
     }
 }

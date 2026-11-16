@@ -64,7 +64,8 @@ static inline u32 Flag(void *base, u32 maskInput, u32 off)
 }
 static inline u8 IsDown(struct SceneActorRegistryResetView *actor)
 {
-    if (actor && (Flag(actor, 0x40, 0x2D4) || Flag(actor, 0x20000, 0x2D0) || actor->health <= 0))
+    if (actor &&
+        (Flag(actor, 0x40, 0x2D4) || Flag(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
         return 1;
     return 0;
 }
@@ -77,16 +78,16 @@ static inline u8 HasMark(struct AxeContext *context)
 static inline void SetState(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                             u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 
 void Axe_UpdateRouteWander(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeContext *context = actor->context;
+    struct AxeContext *context = actor->base.context;
     struct AxeGroup *group = (void *)&actor->group.common;
     struct AxeVec targetStorage;
     struct AxeVec *target;

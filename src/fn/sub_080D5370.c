@@ -9,12 +9,12 @@ void Mummy_WaitReplaceResponse(struct SceneActorRegistryResetView *actor)
     if (Chase_TakeArrived(actor)) {
         DEBUG_PRINT();
     }
-    if (!(u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
-        if ((s32)actor->counter2AC >= group->gate.counter) {
-            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
+    if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
+        if ((s32)actor->base.counter2AC >= group->gate.counter) {
+            SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
             Chase_SetBehavior(actor, 2);
         } else {
-            actor->counter2AC++;
+            actor->base.counter2AC++;
         }
     }
 }

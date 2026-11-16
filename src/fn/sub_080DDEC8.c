@@ -21,7 +21,7 @@ void Dog_RestoreRoute(struct SceneActorRegistryResetView *actor)
 
     {
         unsigned short mask = 0x100;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         if ((u16)((*flags) & mask)) {
             return;
         }
@@ -30,7 +30,7 @@ void Dog_RestoreRoute(struct SceneActorRegistryResetView *actor)
     Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
     chasing = 0x80;
     if (*flags & chasing) {
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
         SaveDelay(group + 0x8C, *(void **)(group + 0x48), 0xC, 0x14);
         if (*flags & chasing) {
             u16 *time = (u16 *)((u8 *)actor + 0x418);
@@ -48,14 +48,14 @@ void Dog_RestoreRoute(struct SceneActorRegistryResetView *actor)
     } else {
         {
             u32 mask = 0x10;
-            actor->flags2CC |= mask;
+            actor->base.flags2CC |= mask;
         }
-        actor->field2C2 = 0x20;
-        SaveDelay(group + 0x8C, actor->entryTarget228, 7, 0x3C);
+        actor->base.field2C2 = 0x20;
+        SaveDelay(group + 0x8C, actor->base.entryTarget228, 7, 0x3C);
     }
     Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
     (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->body.position,
-                        &((struct ChaseTarget *)actor->tracking.target)->position))
+    if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position,
+                        &((struct ChaseTarget *)actor->base.tracking.target)->position))
         Callback_InvokeActor(actor, *(void **)(group + 0x224));
 }

@@ -12,18 +12,18 @@ void SceneActorBehavior_CallActionScript(void *);
 
 static inline u32 Skeleton_ProfileId(const struct SceneActorRegistryResetView *a)
 {
-    return a->profileId;
+    return a->base.profileId;
 }
 
 static inline u32 Skeleton_ProfileMode(const struct SceneActorRegistryResetView *a)
 {
-    return a->profileMode;
+    return a->base.profileMode;
 }
 
 static inline struct SceneActorAnimationSequenceDrawable *
 Skeleton_SequenceDrawable(struct SceneActorRegistryResetView *a)
 {
-    return a->drawable;
+    return a->base.drawable;
 }
 
 static inline void *Skeleton_Sequence(struct SceneActorAnimationSequenceDrawable *d)
@@ -33,7 +33,7 @@ static inline void *Skeleton_Sequence(struct SceneActorAnimationSequenceDrawable
 
 static inline struct SceneActorAnimationTile *Skeleton_TileOf(struct SceneActorRegistryResetView *a)
 {
-    return &((struct SceneActorAnimationTileDrawable *)a->drawable)->tile;
+    return &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
 }
 
 static inline u32 Skeleton_TileMirror(struct SceneActorAnimationTile *tile)
@@ -68,7 +68,7 @@ static inline void Skeleton_LaunchSequence(void *object, u32 selection, u8 varia
 {
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorAnimationSequenceDrawable *drawable;
-    actor->animationIndex = selection;
+    actor->base.animationIndex = selection;
     drawable = Skeleton_SequenceDrawable(actor);
     Anim_SetSequence(Skeleton_Sequence(drawable), (void *)drawable->resource, (u16)selection,
                      (u8)variant, (u8)flags);
@@ -87,7 +87,8 @@ static inline void Skeleton_CommitTile(void *obj, struct SceneActorAnimationTile
             mode = 6;
         else
             mode = 4;
-        Anim_SetKeyframes(Skeleton_TileOf(actor), actor->drawable, (u16)selection, 2, (u16)mode);
+        Anim_SetKeyframes(Skeleton_TileOf(actor), actor->base.drawable, (u16)selection, 2,
+                          (u16)mode);
         flags &= 1;
         if (flags)
             *Skeleton_SpriteBits(tile) |= mask;
@@ -117,7 +118,7 @@ static inline u32 Skeleton_ReadFrame(u32 value, u32 *selectedFrame, u8 *variantR
         {                                                                                          \
             u8 *variantAddress = &directionVariant;                                                \
             u8 *mirrorAddress = &mirror;                                                           \
-            quadrant = SceneActorTurn_Cardinal(actor->body.direction);                             \
+            quadrant = SceneActorTurn_Cardinal(actor->base.body.direction);                        \
             mirrorPointer = mirrorAddress;                                                         \
             if (quadrant > 1) {                                                                    \
                 *mirrorPointer = 1;                                                                \
@@ -136,7 +137,7 @@ static inline u32 Skeleton_ReadFrame(u32 value, u32 *selectedFrame, u8 *variantR
             variant = Skeleton_ReadFrame(value, &selection, variantReload);                        \
         } while (0);                                                                               \
         Skeleton_ResolvePlayback(mirrorValue, entryFlags, &flags, &force);                         \
-        if (!actor->drawableKind) {                                                                \
+        if (!actor->base.drawableKind) {                                                           \
                                                                                                    \
             Skeleton_LaunchSequence(actor, selection, variant, flags, &restart);                   \
                                                                                                    \
@@ -145,7 +146,7 @@ static inline u32 Skeleton_ReadFrame(u32 value, u32 *selectedFrame, u8 *variantR
             struct SceneActorAnimationTile *tile = Skeleton_TileOf(actor);                         \
                                                                                                    \
             selection = selection + variant;                                                       \
-            savedSelection = &actor->animationIndex;                                               \
+            savedSelection = &actor->base.animationIndex;                                          \
             restart = &Skeleton_Playback(actor)->restart;                                          \
             if (!force && *savedSelection == selection && !*restart) {                             \
                 if (flags == 1 && Skeleton_TileMirror(tile))                                       \
@@ -171,17 +172,17 @@ static inline void Skeleton_SetRiseControl(struct SceneActorRegistryResetView *a
 {
     void *callback = cb;
     u32 kind = controlKind;
-    actor->field2B2 = 1;
-    actor->field2B0 = ready;
-    actor->field2B5 = kind;
-    actor->target = callback;
-    actor->field2C8 = 0;
+    actor->base.field2B2 = 1;
+    actor->base.field2B0 = ready;
+    actor->base.field2B5 = kind;
+    actor->base.target = callback;
+    actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->base.flags114;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->word104 = 0;
+    actor->base.word104 = 0;
 }
 
 static inline void Skeleton_SnapDelayedRoute(struct ContactPosition *position,
@@ -199,14 +200,14 @@ static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *ra
     if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
         {
             struct SceneActorChaseSavedControl *savedControl = &group->saved;
-            savedControl->control = actor->target;
-            savedControl->kind = actor->field2B5;
-            savedControl->state = actor->state2A8;
-            savedControl->phase = actor->phase2A9;
-            savedControl->behavior = actor->behavior2AA;
+            savedControl->control = actor->base.target;
+            savedControl->kind = actor->base.field2B5;
+            savedControl->state = actor->base.state2A8;
+            savedControl->phase = actor->base.phase2A9;
+            savedControl->behavior = actor->base.behavior2AA;
         }
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -222,7 +223,7 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(actor);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -243,7 +244,7 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
-    if (cell != actor->terrainCell &&
+    if (cell != actor->base.terrainCell &&
         !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
                                 0x20000))
         goto reroute;
@@ -257,7 +258,7 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetTypedState(actor, 0, 0, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetTypedState(actor, 0, 0, 5);
         Skeleton_SnapDelayedRoute(group->destination, &group->homeRoute);
         (group->destination)->y = MonsterInit_TerrainHeight(
@@ -265,15 +266,15 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         Skeleton_BeginDelayedTurn(obj, saved, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return;
 reroute:
     SceneActorTerrain_GetCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         return;
     callback = &group->fallback;
 invoke:
@@ -290,57 +291,57 @@ void Skeleton_UpdateRiseRecovery(struct SceneActorRegistryResetView *actor)
         u8 *restart;
         u32 variant;
         u16 *flags;
-        actor->body.direction = actor->tracking.heading;
-        if (actor->category == 5) {
+        actor->base.body.direction = actor->base.tracking.heading;
+        if (actor->base.category == 5) {
             u32 mask = 0x200;
-            u32 blocked = actor->flags2D4 & mask;
-            flags = &actor->flags2D4;
-            if (blocked || actor->animationIndex == 0x63) {
+            u32 blocked = actor->base.flags2D4 & mask;
+            flags = &actor->base.flags2D4;
+            if (blocked || actor->base.animationIndex == 0x63) {
                 SKELETON_PLAY_RISE(0x63, done5, quadrant);
             done5:
-                actor->field2B0 = 1;
+                actor->base.field2B0 = 1;
             } else
                 Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10,
                                         0);
-        } else if (actor->category == 6) {
+        } else if (actor->base.category == 6) {
             u32 mask = 0x200;
-            u32 blocked = actor->flags2D4 & mask;
-            flags = &actor->flags2D4;
-            if (blocked || actor->animationIndex == 0x65) {
+            u32 blocked = actor->base.flags2D4 & mask;
+            flags = &actor->base.flags2D4;
+            if (blocked || actor->base.animationIndex == 0x65) {
                 SKELETON_PLAY_RISE(0x65, done6, quadrant);
             done6:
-                actor->field2B0 = 1;
+                actor->base.field2B0 = 1;
             } else
                 Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10,
                                         0);
         } else {
-            flags = &actor->flags2D4;
-            if (actor->category == 7) {
+            flags = &actor->base.flags2D4;
+            if (actor->base.category == 7) {
                 u32 mask = 0x200;
                 u16 blocked = SceneActorChase_FlagComponentBits(
-                    (struct SceneActorChaseFlags16 *)&actor->flags2D4, mask);
-                if (blocked || actor->animationIndex == 0x67) {
+                    (struct SceneActorChaseFlags16 *)&actor->base.flags2D4, mask);
+                if (blocked || actor->base.animationIndex == 0x67) {
                     s32 finalQuadrant;
                     SKELETON_PLAY_RISE(0x67, done7, finalQuadrant);
                 done7:
-                    actor->field2B0 = 1;
+                    actor->base.field2B0 = 1;
                 } else
                     Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete,
                                             10, 0);
             }
         }
-        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->category);
+        SceneActorAttachment_ReplaceResponseSlot(actor, 0, 0, actor->base.category);
         SceneActorBehavior_CallActionScript(actor);
         Skeleton_EnableFlags(&SceneActorChase_GroupOf(actor)->common.gate.flags, 4);
         SceneActorChase_SetFlagComponent((struct SceneActorChaseFlags16 *)flags, 0x80);
         SceneActorChase_GroupOf(actor)->common.gate.counter =
             SceneActorChase_GroupOf(actor)->common.gate.duration;
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         SceneActorChase_SelectState(actor, 0, 0, 12);
         SceneActorChase_ResetStateEntry(actor);
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Skeleton_ArriveAfterDelay(actor);
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

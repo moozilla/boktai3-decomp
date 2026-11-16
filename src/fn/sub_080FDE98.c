@@ -66,24 +66,24 @@ static inline u32 Facing(u32 value, u8 *direction)
 // confidence=low: follows nine stored route points and retargets around the player; action role tentative.
 void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
 {
-    struct AxeRoute *route = actor->context;
+    struct AxeRoute *route = actor->base.context;
     struct ContactPosition delta, target;
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->entryTarget228;
+        void *callback = actor->base.entryTarget228;
         u32 one = 1;
-        actor->field2B2 = one;
-        actor->field2B0 = 0;
-        actor->field2B5 = 1;
-        actor->target = callback;
-        actor->field2C8 = 0;
+        actor->base.field2B2 = one;
+        actor->base.field2B0 = 0;
+        actor->base.field2B5 = 1;
+        actor->base.target = callback;
+        actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->flags114;
+            u32 *flags = &actor->base.flags114;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->word104 = 0;
+        actor->base.word104 = 0;
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -91,37 +91,38 @@ void Axe_FollowAcceleratingRoute(struct SceneActorRegistryResetView *actor)
         SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->body.position, &target);
+        Delta(&delta, &actor->base.body.position, &target);
         Polar(&route->motion,
               Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
-                     &actor->tracking.heading) &
+                     &actor->base.tracking.heading) &
                   255,
               32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->body.position, &route->points[route->index]);
+    Delta(&delta, &actor->base.body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
-        actor->body.direction = Math_Atan2(route->points[route->index].x - actor->body.position.x,
-                                           route->points[route->index].z - actor->body.position.z);
-        Polar(&delta, actor->body.direction, route->speed);
-        actor->body.motion.x += delta.x;
-        actor->body.motion.z += delta.z;
-        route->motion = actor->body.motion;
+        actor->base.body.direction =
+            Math_Atan2(route->points[route->index].x - actor->base.body.position.x,
+                       route->points[route->index].z - actor->base.body.position.z);
+        Polar(&delta, actor->base.body.direction, route->speed);
+        actor->base.body.motion.x += delta.x;
+        actor->base.body.motion.z += delta.z;
+        route->motion = actor->base.body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->body.position, &route->points[8]);
+        Delta(&route->motion, &actor->base.body.position, &route->points[8]);
         route->motion.y = 0;
-        actor->body.position.x = route->points[8].x;
-        actor->body.position.z = route->points[8].z;
+        actor->base.body.position.x = route->points[8].x;
+        actor->base.body.position.z = route->points[8].z;
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
-        Polar(&delta, Facing(Random(), &actor->tracking.heading) & 255, 256);
+        Polar(&delta, Facing(Random(), &actor->base.tracking.heading) & 255, 256);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->body.position, &target);
+        Delta(&delta, &actor->base.body.position, &target);
         return;
     }
-    if (Mod(actor->counter2AC, 16) == 0 && route->speed <= 17)
+    if (Mod(actor->base.counter2AC, 16) == 0 && route->speed <= 17)
         ++route->speed;
-    ++actor->counter2AC;
+    ++actor->base.counter2AC;
 }

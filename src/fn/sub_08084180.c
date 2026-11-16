@@ -11,7 +11,7 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
     statusMask |= status[0xF];
     status[0xF] = statusMask;
     testMask = 0x100;
-    field = &actor->flags2D4;
+    field = &actor->base.flags2D4;
     if (!(*field & testMask)) {
         struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
         u32 mask = 2;
@@ -24,7 +24,7 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
             u32 old;
             u32 zeroByte;
             u32 zeroWord;
-            flags = &actor->flags2D4;
+            flags = &actor->base.flags2D4;
             old = *flags;
             zeroByte = k2;
             zeroWord = 0;
@@ -47,7 +47,7 @@ void SceneActorControl_SetCollisionResponse(struct SceneActorRegistryResetView *
                 *(u32 *)field = zeroWord;
             }
             {
-                u8 *field = &actor->field2B1;
+                u8 *field = &actor->base.field2B1;
                 *field = 1;
             }
         }

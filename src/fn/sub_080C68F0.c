@@ -19,7 +19,7 @@ static inline u8 TakeFlag(u8 *flag)
 static inline void Golem_GetDirectionVariant(struct SceneActorRegistryResetView *actor, u8 *variant,
                                              u8 *mirror)
 {
-    s32 quadrant = ((actor->body.direction + 0x60) >> 6) & 3;
+    s32 quadrant = ((actor->base.body.direction + 0x60) >> 6) & 3;
     if (quadrant > 1) {
         *mirror = 1;
         *variant = 3 - quadrant;
@@ -39,20 +39,20 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
         flags &= ~0x10;
     } else
         force = 0;
-    if (!actor->drawableKind) {
+    if (!actor->base.drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->animationIndex = selection;
-        drawable = actor->drawable;
+        actor->base.animationIndex = selection;
+        drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->field2B3;
+        restart = &actor->base.field2B3;
     } else {
         struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->animationIndex;
-        restart = &actor->field2B3;
+        savedSelection = &actor->base.animationIndex;
+        restart = &actor->base.field2B3;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
@@ -67,8 +67,9 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
                 mode = 6;
             else
                 mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                              actor->drawable, (u16)selection, 2, (u16)mode);
+            Anim_SetKeyframes(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
+                actor->base.drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
                 tile->flags |= mask;
@@ -82,20 +83,20 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
 // confidence=low: charge and slide behaviors install this completion control.
 void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
 {
-    if (TakeFlag(&actor->field2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         u8 directionVariant, mirror;
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 7, directionVariant, mirror | 4);
-        actor->field2B3 = 0;
+        actor->base.field2B3 = 0;
     }
-    if (actor->field2B3) {
+    if (actor->base.field2B3) {
         {
-            u16 *field = &actor->flags2D4;
+            u16 *field = &actor->base.flags2D4;
             u32 mask = ~0x100;
             u32 value = *field;
             mask &= value;
             *field = mask;
         }
-        actor->field2B0 = 1;
+        actor->base.field2B0 = 1;
     }
 }

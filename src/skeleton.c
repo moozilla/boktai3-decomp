@@ -5,91 +5,91 @@
 
 u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
 {
-    struct Skeleton *body = actor->context;
+    struct Skeleton *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
 
-    if (!(actor->field2D8 & 0x20000)) {
-        if (actor->reactionSoundVariant == 0)
+    if (!(actor->base.field2D8 & 0x20000)) {
+        if (actor->base.reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
         else
             Sound_PlaySong(0x13E);
     }
     SceneActorScript_TriggerCallOnCount((struct SceneActorRegistryActor *)actor);
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
-        actor->body.direction = actor->field2B6 + 0x80;
+        actor->base.body.direction = actor->base.field2B6 + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 7);
-        actor->field2C2 = Div(0x40, 3);
+        actor->base.field2C2 = Div(0x40, 3);
         return 1;
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x8002)) {
         SceneActorChase_ClearMotionFlags(actor, 0x20);
         return 0;
     }
-    if (actor->field2DC & 0xC0000) {
-        SceneActorChase_SetControl(actor, actor->reactionTarget230, 0x12);
+    if (actor->base.field2DC & 0xC0000) {
+        SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(actor, 0x20);
     if (SceneActorChase_QueryMotionFlags(actor, 0x100))
         return 0;
-    if (actor->field2B8)
+    if (actor->base.field2B8)
         return 0;
-    if (SceneActorChase_TrackingFlags(&actor->tracking, 0x10))
+    if (SceneActorChase_TrackingFlags(&actor->base.tracking, 0x10))
         return 0;
     if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
         if (SceneActorChase_BeginContactAnimation(actor))
             Sound_PlaySong(0x3A7);
-        if (!actor->tracking.target)
+        if (!actor->base.tracking.target)
             return 0;
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         SceneActorChase_TrackPlayer(actor);
         if (!SceneActorChase_Arrive(actor)) {
             body->pursuitTimer = 0;
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
         return 1;
     }
     if (SceneActorChase_BeginContactAnimation(actor))
         Sound_PlaySong(0x3A7);
-    if (!actor->tracking.target)
+    if (!actor->base.tracking.target)
         return 0;
     SceneActorChase_TrackPlayer(actor);
     SceneActorChase_SetActorFlags(actor, 0x10);
     group->destination->pad = 0;
     if (!SceneActorChase_Arrive(actor)) {
         body->pursuitTimer = 0;
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                      &actor->tracking.target->position)) {
+        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                      &actor->base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
     }
-    SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
     SceneActorChase_SetBehavior(actor, 7);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 }
 
@@ -98,12 +98,12 @@ u8 Skeleton_ReactToContact(struct SceneActorRegistryResetView *actor)
 void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
-    struct Skeleton *control = actor->context;
+    struct Skeleton *control = actor->base.context;
     s32 speed;
     u32 event;
     u16 *scale;
 
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, Skeleton_UpdateTargetTransition, 0x3B);
         {
             u32 bit = 0x200;
@@ -112,23 +112,23 @@ void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         }
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque)) {
+        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
             return;
         }
         if (sub_0812F3CC(actor)) {
             return;
         }
     }
-    speed = Callback_InvokeActor(*(&actor), actor->animationQuery.opaque);
-    actor->field2C2 = 0x20;
+    speed = Callback_InvokeActor(*(&actor), actor->base.animationQuery.opaque);
+    actor->base.field2C2 = 0x20;
     {
         u32 mask = 0xA02F;
-        if (actor->flags2D4 & mask) {
-            u16 *p = &actor->field2C2;
+        if (actor->base.flags2D4 & mask) {
+            u16 *p = &actor->base.field2C2;
             *p = 0x40;
             scale = p;
         } else {
-            u16 *q = &actor->field2C2;
+            u16 *q = &actor->base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0) {
@@ -136,17 +136,17 @@ void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
             }
         }
     }
-    if (actor->drawableKind == 0)
+    if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
             Skeleton_ReturnToBehavior(actor, 16);
-            SceneActorChase_SetControl(actor, actor->savedTarget, 0);
+            SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
             return;
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
@@ -159,58 +159,58 @@ void Skeleton_UpdateProbeApproach(struct SceneActorRegistryResetView *actor)
         }
         return;
     }
-    actor->counter2AC++;
+    actor->base.counter2AC++;
 }
 
 void Skeleton_UpdateEntryPhase(struct SceneActorRegistryResetView *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *control = actor->entryTarget224;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        void *control = actor->base.entryTarget224;
         SceneActorChase_SetControl(actor, control, 2);
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
             return;
         if (sub_0812F3CC(actor))
             return;
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         Skeleton_ReturnToBehavior(actor, 15);
-        SceneActorChase_SetControl(actor, actor->savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
     } else
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
 }
 
 void Skeleton_UpdateEntryRecoveryPhase(struct SceneActorRegistryResetView *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->field2B1)) {
-        void *control = actor->entryTarget224;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        void *control = actor->base.entryTarget224;
         SceneActorChase_SetControl(actor, control, 2);
     }
     if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->contactQuery.opaque))
+        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
             return;
         if (sub_0812F3CC(actor))
             return;
     }
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         {
             u32 state = 3;
             u32 phase = 1;
-            actor->state2A8 = state;
-            actor->phase2A9 = phase;
-            actor->behavior2AA = 0;
-            actor->counter2AC = 0;
-            actor->field2B1 = 1;
+            actor->base.state2A8 = state;
+            actor->base.phase2A9 = phase;
+            actor->base.behavior2AA = 0;
+            actor->base.counter2AC = 0;
+            actor->base.field2B1 = 1;
         }
         SceneActorChase_SetControl(actor, (void *)SceneActorApproach_UpdateRange, 60);
     } else
-        ++actor->counter2AC;
+        ++actor->base.counter2AC;
 }
 
 void Skeleton_SetMovementControlPreset(struct SceneActorRegistryResetView *actor)
 {
-    actor->callbacks284 = (void **)gUnk_086060B4;
+    actor->base.callbacks284 = (void **)gUnk_086060B4;
 }
 
 s32 Skeleton_Update(struct SceneActorRegistryResetView *actor)
@@ -218,8 +218,8 @@ s32 Skeleton_Update(struct SceneActorRegistryResetView *actor)
     u32 m;
     SceneActorReaction_TickHiddenResponse(actor);
     m = 0x2000;
-    if ((actor->flags2D4 & m) || actor->field2B8 == 0) {
-        Callback_InvokeActor(actor, actor->callbacks27C[actor->state2A8]);
+    if ((actor->base.flags2D4 & m) || actor->base.field2B8 == 0) {
+        Callback_InvokeActor(actor, actor->base.callbacks27C[actor->base.state2A8]);
         SceneActorControl_DispatchControl(actor);
     }
     Skeleton_UpdateActionFlags(actor);
@@ -340,14 +340,14 @@ static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframe
 
 static inline void SkeletonInit_InstallContactDefaults(struct SceneActorRegistryResetView *instance)
 {
-    instance->contactCallback = Skeleton_ReactToContact;
-    MonsterInit_WriteDataPointer(&instance->commandTable.opaque, gUnk_086060FC);
-    instance->field238 = SceneActorReaction_SinkThenDefeat;
+    instance->base.contactCallback = Skeleton_ReactToContact;
+    MonsterInit_WriteDataPointer(&instance->base.commandTable.opaque, gUnk_086060FC);
+    instance->base.field238 = SceneActorReaction_SinkThenDefeat;
 }
 
 static inline void SkeletonInit_EnableInitialFlags(struct SceneActorRegistryResetView *instance)
 {
-    MonsterInit_SetTargetingFlags(&instance->tracking, 1);
+    MonsterInit_SetTargetingFlags(&instance->base.tracking, 1);
     MonsterInit_SetBehaviorFlags(instance, 0x1600000);
     MonsterInit_SetStatusFlags(instance, 0x8000008);
     MonsterInit_SetMotionFlags(instance, 0x80);
@@ -356,9 +356,9 @@ static inline void SkeletonInit_EnableInitialFlags(struct SceneActorRegistryRese
 static inline void
 SkeletonInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *instance)
 {
-    instance->messageCallback = SceneActorScript_OnCommand;
-    instance->updateCallback = Skeleton_UpdateBehaviorCallbacks;
-    instance->destroyCallback = Skeleton_Destroy;
+    instance->base.messageCallback = SceneActorScript_OnCommand;
+    instance->base.updateCallback = Skeleton_UpdateBehaviorCallbacks;
+    instance->base.destroyCallback = Skeleton_Destroy;
 }
 
 static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)
@@ -371,7 +371,7 @@ s32 Skeleton_Init(void *object)
     struct SceneActorRegistryResetView *instance = object;
     struct SceneActorRegistryResetView *actor = object;
     struct SceneActorChaseGroup *group = &instance->group;
-    struct SceneActorBody *body = &instance->body;
+    struct SceneActorBody *body = &instance->base.body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -387,21 +387,21 @@ s32 Skeleton_Init(void *object)
 
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xAE52, 0);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             ((struct ActorSprite *)heap)->priority = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xAE52, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
 
     MonsterInit_InitializePursuitBody(instance, &zero);
@@ -429,10 +429,10 @@ s32 Skeleton_Init(void *object)
     MonsterInit_SetReactionGate(actor, SceneActorReaction_UpdateGate);
     group->field5EC = Skeleton_RestorePursuitRoute;
     SkeletonInit_InstallContactDefaults(actor);
-    actor->field2E8 = 0;
+    actor->base.field2E8 = 0;
     ((struct Skeleton *)instance)->healthThreshold = (s16)MonsterInit_GetHealth(actor) >> 1;
     SkeletonInit_EnableInitialFlags(actor);
-    MonsterInit_MaskColliderFlags(&actor->colliderA, ~1);
+    MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorTerrain_ReadScriptParameters(actor);
     MonsterInit_ReadInitialMode(actor);
@@ -449,16 +449,16 @@ s32 Skeleton_Init(void *object)
 
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
 
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
-                  actor->drawable);
+        Anim_Step(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
+                  actor->base.drawable);
 
     MonsterInit_InitializeReceiver(actor);
     Skeleton_InitVariantMotion(actor);
@@ -468,7 +468,7 @@ s32 Skeleton_Init(void *object)
     Skeleton_SetReactionControlTable(actor);
 
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
-    actor->saved.privateFlags = ((struct Skeleton *)instance)->actionFlags;
+    actor->base.saved.privateFlags = ((struct Skeleton *)instance)->actionFlags;
 
     if (SkeletonInit_TestSkeletonFlags(instance, 0x800)) {
         MonsterInit_SetControl(actor, Skeleton_BeginKnockedFlight, 0x3D);
@@ -476,17 +476,18 @@ s32 Skeleton_Init(void *object)
         SkeletonInit_SetFlags(instance, 0x10);
         MonsterInit_SetMotionFlags(actor, 0x1800);
         if (Script_SeekToKeyword(0x70)) {
-            actor->body.position.x = MonsterInit_ReadHalfword(0);
-            actor->body.position.y = MonsterInit_ReadHalfword(0);
-            actor->body.position.z = MonsterInit_ReadHalfword(0);
-            actor->body.direction = MonsterInit_ReadByte(0);
+            actor->base.body.position.x = MonsterInit_ReadHalfword(0);
+            actor->base.body.position.y = MonsterInit_ReadHalfword(0);
+            actor->base.body.position.z = MonsterInit_ReadHalfword(0);
+            actor->base.body.direction = MonsterInit_ReadByte(0);
             SkeletonInit_ReadWidgetRelativePalette(
-                (void *)(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile));
-            actor->terrainCell = MonsterInit_CellIndex(MonsterInit_BodyPosition(&actor->body));
-            actor->groundHeight2BE = MonsterInit_TerrainHeight(
-                MonsterInit_GetTerrainCell(actor), MonsterInit_BodyPosition(&actor->body));
-            actor->field2EA = actor->body.position.y - actor->groundHeight2BE;
-            actor->body.position.y = actor->groundHeight2BE;
+                (void *)(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile));
+            actor->base.terrainCell =
+                MonsterInit_CellIndex(MonsterInit_BodyPosition(&actor->base.body));
+            actor->base.groundHeight2BE = MonsterInit_TerrainHeight(
+                MonsterInit_GetTerrainCell(actor), MonsterInit_BodyPosition(&actor->base.body));
+            actor->base.field2EA = actor->base.body.position.y - actor->base.groundHeight2BE;
+            actor->base.body.position.y = actor->base.groundHeight2BE;
         }
     } else if (SkeletonInit_TestSkeletonFlags(instance, 8)) {
         MonsterInit_SetControl(actor, SceneActorReaction_TickHiddenTimeout, 0x39);
@@ -525,9 +526,9 @@ static inline s32 Abs(s32 x)
 u32 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *actor,
                                struct ActorSprite *target, u32 nearX, u32 nearZ, s32 speed)
 {
-    struct SceneActorRegistryResetView *state = actor->context;
-    s32 dx = target->x - actor->body.position.x;
-    s32 dz = target->z - actor->body.position.z;
+    struct SceneActorRegistryResetView *state = actor->base.context;
+    s32 dx = target->x - actor->base.body.position.x;
+    s32 dz = target->z - actor->base.body.position.z;
     u8 angle;
 
     if ((u32)Abs(dx) <= nearX && (u32)Abs(dz) <= nearZ) {
@@ -536,8 +537,9 @@ u32 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *actor,
         else
             dx = 0;
         state->direction68E = Math_Atan2(dx, dz);
-        actor->body.motion.x += (gUnk_086149C4[(state->direction68E + 0x40) & 0xFF] * speed) >> 16;
-        actor->body.motion.z += (gUnk_086149C4[state->direction68E] * speed) >> 16;
+        actor->base.body.motion.x +=
+            (gUnk_086149C4[(state->direction68E + 0x40) & 0xFF] * speed) >> 16;
+        actor->base.body.motion.z += (gUnk_086149C4[state->direction68E] * speed) >> 16;
         return 1;
     }
     if (dx || dz) {
@@ -557,13 +559,13 @@ u32 Actor_StepTowardTargetAxis(struct SceneActorRegistryResetView *actor,
             }
         angle = Math_Atan2(dx, dz);
         if (angle != state->direction68E) {
-            actor->body.direction = angle;
+            actor->base.body.direction = angle;
             state->direction68E = angle;
             return 1;
         }
-        actor->body.motion.x += (gUnk_086149C4[(angle + 0x40) & 0xFF] * speed) >> 16;
-        actor->body.motion.z += (gUnk_086149C4[angle] * speed) >> 16;
-        actor->body.direction = angle;
+        actor->base.body.motion.x += (gUnk_086149C4[(angle + 0x40) & 0xFF] * speed) >> 16;
+        actor->base.body.motion.z += (gUnk_086149C4[angle] * speed) >> 16;
+        actor->base.body.direction = angle;
         state->direction68E = angle;
     }
     return 0;

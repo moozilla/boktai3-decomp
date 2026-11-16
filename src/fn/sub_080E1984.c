@@ -13,27 +13,27 @@ static inline u8 TakePending(u8 *flag)
 static inline void BeginControl(struct SceneActorRegistryResetView *actor, void *control, u8 kind)
 {
     u32 zero;
-    actor->field2B2 = 1;
+    actor->base.field2B2 = 1;
     zero = 0;
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
-    actor->target = control;
-    actor->field2C8 = zero;
+    actor->base.field2B0 = zero;
+    actor->base.field2B5 = kind;
+    actor->base.target = control;
+    actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->flags114;
+        u32 *flags = &actor->base.flags114;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->word104 = zero;
+    actor->base.word104 = zero;
 }
 void Dog_UpdateLeapWindup(struct SceneActorRegistryResetView *actor)
 {
-    u8 *context = actor->context;
-    if (TakePending(&actor->field2B2)) {
+    u8 *context = actor->base.context;
+    if (TakePending(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xF);
         *(struct ContactPosition *)(context + 0x6D8) =
             *(struct ContactPosition *)(*(u8 **)((u8 *)actor + 0xDC) + 0xC);
     }
-    if (actor->field2B3)
+    if (actor->base.field2B3)
         BeginControl(actor, Dog_LeapTowardTarget, 0x23);
 }

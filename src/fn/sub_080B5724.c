@@ -28,7 +28,7 @@ static inline u8 Unavailable(struct SceneActorRegistryResetView *actor)
         if (value)
             goto one;
     }
-    if (actor->health > 0)
+    if (actor->base.health > 0)
         goto zero;
 one:
     return 1;
@@ -42,10 +42,10 @@ void SceneActorControl_RestartBehavior57(struct SceneActorRegistryResetView *act
         return;
     {
         u32 mask = 0x800;
-        if (actor->flags2D4 & mask)
+        if (actor->base.flags2D4 & mask)
             return;
     }
-    if (actor->field2B5 != 0x39)
+    if (actor->base.field2B5 != 0x39)
         return;
     {
         u32 offset = 0x130;

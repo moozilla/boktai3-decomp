@@ -138,11 +138,11 @@ void Axe_UpdateTurnAnimation(struct SceneActorAnimationView *actor, u32 events)
         {
             u32 mask = 0xA02F;
             u16 *scale;
-            if (state->flags2D4 & mask) {
-                state->field2C2 = 64;
-                scale = &state->field2C2;
+            if (state->base.flags2D4 & mask) {
+                state->base.field2C2 = 64;
+                scale = &state->base.field2C2;
             } else {
-                u16 *p = &state->field2C2;
+                u16 *p = &state->base.field2C2;
                 u16 value = *p;
                 scale = p;
                 if (!value)

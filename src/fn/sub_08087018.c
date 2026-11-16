@@ -12,9 +12,9 @@ static inline u16 *Bat_PrepareLanding(struct SceneActorRegistryResetView *actor,
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
     SceneActorChase_SetReactionFlags(actor, 0x10);
-    reactionFlags = &actor->flags2D6;
+    reactionFlags = &actor->base.flags2D6;
     if (frame <= 17) {
-        animation = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+        animation = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
             animation->duration != 1)
             animation->elapsed = 0;
@@ -28,9 +28,9 @@ void sub_08087018(struct SceneActorRegistryResetView *actor, s32 frame)
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *reactionFlags;
     reactionFlags = Bat_PrepareLanding(actor, frame);
-    if (!actor->field2B3)
+    if (!actor->base.field2B3)
         return;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 2)) {
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_SetControl(actor, group->contactControl, 7);
@@ -48,12 +48,13 @@ void sub_08087018(struct SceneActorRegistryResetView *actor, s32 frame)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-    SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 60);
-    actor->field2C2 = 64;
+    SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
+    actor->base.field2C2 = 64;
     SceneActorChase_SetActorFlags(actor, 0x10);
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
     SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-    if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position, group->destination)) {
+    if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                  group->destination)) {
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
         SceneActorChase_SetState(actor, 3, 0, 0);
         return;

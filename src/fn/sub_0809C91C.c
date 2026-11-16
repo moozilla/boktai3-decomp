@@ -12,7 +12,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
 static inline void SetHeightFromGround(struct SceneActorRegistryResetView *actor)
 {
     u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
-    actor->body.position.y = actor->field2EA + ground;
+    actor->base.body.position.y = actor->base.field2EA + ground;
 }
 
 // confidence=low: adds the hover offset to the actor and bobs its drawable.
@@ -29,7 +29,7 @@ void Lun_UpdateHoverHeight(struct SceneActorRegistryResetView *actor)
         if (SceneActorPlacement_TestValue(state->flags3D4, mask))
             return;
     }
-    if ((u8)(actor->field2B5 - 0x23) <= 1) {
+    if ((u8)(actor->base.field2B5 - 0x23) <= 1) {
         SetHeightFromGround(actor);
         return;
     }
@@ -48,24 +48,25 @@ void Lun_UpdateHoverHeight(struct SceneActorRegistryResetView *actor)
         else
             cap = 0x104;
     }
-    if ((s16)actor->field2EA < cap) {
-        actor->field2EA += TruncateShift(gUnk_086149C4[state->phase], 9);
+    if ((s16)actor->base.field2EA < cap) {
+        actor->base.field2EA += TruncateShift(gUnk_086149C4[state->phase], 9);
         if (state->phase <= 0x3f)
             state->phase++;
-        actor->body.position.y =
-            ((struct SceneActorControlGroundView *)actor)->ground + actor->field2EA;
+        actor->base.body.position.y =
+            ((struct SceneActorControlGroundView *)actor)->ground + actor->base.field2EA;
     }
-    delta = ((struct SceneActorControlGroundView *)actor)->ground + cap - actor->body.position.y;
+    delta =
+        ((struct SceneActorControlGroundView *)actor)->ground + cap - actor->base.body.position.y;
     magnitude = delta >= 0 ? delta : -delta;
     if (magnitude > 0x10) {
         if (delta < 0)
-            actor->field2EA -= 2;
+            actor->base.field2EA -= 2;
         else
-            actor->field2EA += 2;
+            actor->base.field2EA += 2;
     }
     SetHeightFromGround(actor);
     {
-        struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
+        struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
         drawable->position.y += TruncateShift(gUnk_086149C4[state->phase] * 32, 12);
     }
     state->phase += 2;

@@ -13,22 +13,22 @@ u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 state, u8 phase,
                                 u8 behavior)
 {
-    actor->state2A8 = state;
-    actor->phase2A9 = phase;
-    actor->behavior2AA = behavior;
-    actor->counter2AC = 0;
-    actor->field2B1 = 1;
+    actor->base.state2A8 = state;
+    actor->base.phase2A9 = phase;
+    actor->base.behavior2AA = behavior;
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = 1;
 }
 static inline u8 Hidden(struct SceneActorRegistryResetView *a)
 {
     u32 mask = 1;
-    if (!a->drawableKind) {
-        if (*(u32 *)a->drawable & mask)
+    if (!a->base.drawableKind) {
+        if (*(u32 *)a->base.drawable & mask)
             goto yes;
         else
             goto no;
     } else {
-        if (((struct SceneActorRegistryTileDrawable *)a->drawable)->flags & mask)
+        if (((struct SceneActorRegistryTileDrawable *)a->base.drawable)->flags & mask)
             goto yes;
         else
             goto no;
@@ -44,10 +44,10 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     struct ScriptUtilityArguments arguments;
     u16 script;
     u32 *stateFlags;
-    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 3);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
-        actor->defeatTimer = 60;
+        actor->base.defeatTimer = 60;
         {
             u32 index = (gRandomIndex + 1) & 1023;
             u32 value;
@@ -87,7 +87,7 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         }
     }
 
-    if (Sprite_BlinkUntilExpired(actor->drawable, frame, 10, 30)) {
+    if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
         {
             u32 off = 0x2B0;
             u8 *q;
@@ -101,23 +101,23 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             script = *q;
         }
         if (script) {
-            values[0] = actor->body.position.x;
-            values[1] = actor->body.position.y;
-            values[2] = actor->body.position.z;
+            values[0] = actor->base.body.position.x;
+            values[1] = actor->base.body.position.y;
+            values[2] = actor->base.body.position.z;
             values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
             values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
             values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
-            values[6] = actor->field2E0;
-            values[7] = actor->body.id;
+            values[6] = actor->base.field2E0;
+            values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
             Script_Call(script, &arguments);
         }
         {
             u32 mask = 0x4000;
-            if ((!(actor->flags2D4 & mask)) && (((u32)(actor->category - 11)) > 2)) {
+            if ((!(actor->base.flags2D4 & mask)) && (((u32)(actor->base.category - 11)) > 2)) {
                 Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
+                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             }
         }
         {
@@ -130,17 +130,17 @@ void Spider_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind;
             kind = 16;
-            actor->field2B2 = 1;
-            actor->field2B0 = 0;
-            actor->field2B5 = kind;
-            actor->target = callback;
-            actor->field2C8 = 0;
+            actor->base.field2B2 = 1;
+            actor->base.field2B0 = 0;
+            actor->base.field2B5 = kind;
+            actor->base.target = callback;
+            actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->flags114;
+                u32 *flags = &actor->base.flags114;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->word104 = 0;
+            actor->base.word104 = 0;
         }
         SetAnimation(actor, 1, 0, 2);
     } else if (Hidden(actor)) {

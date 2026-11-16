@@ -19,11 +19,11 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
     SceneActorControl_TakeStateEntry(actor);
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->field2B0) {
+    if (actor->base.field2B0) {
         u16 blocked;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-        ProximityVolume_TranslateBounds(group->route, &actor->body.position);
+        ProximityVolume_TranslateBounds(group->route, &actor->base.body.position);
         blocked = SceneActorChase_MotionFlags(actor, 0x80);
         if (blocked) {
             SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
@@ -33,31 +33,31 @@ void Golem_ResumeRouteAfterControl(struct SceneActorRegistryResetView *actor)
             } else
                 SceneActorChase_TrackPlayer(actor);
             if (SceneActorChase_Arrive(actor))
-                actor->field2C2 = 0x20;
+                actor->base.field2C2 = 0x20;
         } else {
             u32 bit = 0x200;
             u16 returning = SceneActorChase_MotionFlags(actor, bit);
-            u32 *flags = &actor->flags2CC;
+            u32 *flags = &actor->base.flags2CC;
             if (returning) {
                 struct SceneActorRegistryControl *control = &group->common.control;
                 if (SceneActorChase_Bits32(flags, 0x200000)) {
-                    SceneActorChase_ClearWordFlags(&actor->flags2D0, 0x1000000);
+                    SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
                     SceneActorChase_ClearMotionFlagComponent(actor, bit);
                     control->mode = 0;
                     control->counter = 0;
                     control->timer = 0;
                 }
-                SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->category);
+                SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
             }
             Golem_SetRouteFlags(flags, 0x10);
-            actor->field2C2 = 0x40;
-            SceneActorDelay_Prepare((void *)&group->saved, actor->entryTarget228, 7, 60);
+            actor->base.field2C2 = 0x40;
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 60);
             SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
             group->destination->pad = 1;
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                           group->destination))
                 Callback_InvokeActor(actor, group->fallback);
         }
     } else
-        actor->counter2AC++;
+        actor->base.counter2AC++;
 }

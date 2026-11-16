@@ -3,8 +3,8 @@
 void Ghoul_SelectRetreatRoutePoint(struct SceneActorRegistryResetView *);
 static inline u8 TakeEntry(struct SceneActorRegistryResetView *a)
 {
-    if (a->field2B2) {
-        a->field2B2 = 0;
+    if (a->base.field2B2) {
+        a->base.field2B2 = 0;
         return 1;
     }
     return 0;
@@ -27,12 +27,12 @@ static inline void Clear(struct Bits16 *p, s32 mask)
 }
 void Bat_UpdateProbeReaction(struct SceneActorRegistryResetView *a)
 {
-    u8 *context = a->context;
+    u8 *context = a->base.context;
     struct Bits16 *flags;
     if (TakeEntry(a))
         return;
     if (Test(context, 2, &flags)) {
-        if (a->tracking.distance > 0xFFFF)
+        if (a->base.tracking.distance > 0xFFFF)
             SceneActorAnimation_SelectDirectionalEntry(a, 0);
         Ghoul_SelectRetreatRoutePoint(a);
         Clear(flags, ~2);

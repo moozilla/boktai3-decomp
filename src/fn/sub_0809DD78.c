@@ -64,19 +64,19 @@ void Lun_InitReactionTable(void *);
 
 static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView *arg0, u32 *fill)
 {
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, r4v, r6v, r3v;
     s32 initialHealth, scriptVariant;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = Script_GetKeywordValue(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
-    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->tracking);
+    MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->base.tracking);
 
     if (Script_SeekToKeyword(0x6C)) {
         r6v = MonsterInit_ReadWord(0x12C);
@@ -88,63 +88,63 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->field1F0 = (u16)Script_GetKeywordValue(0x46, 0);
-    arg0->field1EC = (u16)Script_GetKeywordValue(0x52, 0);
+    arg0->base.field1F0 = (u16)Script_GetKeywordValue(0x46, 0);
+    arg0->base.field1EC = (u16)Script_GetKeywordValue(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
-        arg0->defaultHealth = MonsterInit_ReadHalfword(0);
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.defaultHealth = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     initialHealth = MonsterInit_GetInitialHealth(arg0);
     r3v = r4v;
-    arg0->flags2D4 = 0;
-    arg0->target = SceneActorControl_OnIdle;
-    arg0->field2B2 = 1;
-    arg0->field2B0 = 0;
-    arg0->health = MonsterInit_ClampHealth(initialHealth);
-    arg0->fieldAA = 0;
+    arg0->base.flags2D4 = 0;
+    arg0->base.target = SceneActorControl_OnIdle;
+    arg0->base.field2B2 = 1;
+    arg0->base.field2B0 = 0;
+    arg0->base.health = MonsterInit_ClampHealth(initialHealth);
+    arg0->base.fieldAA = 0;
     if (r3v <= 0)
         r3v = r6v;
-    arg0->attachmentLimit = r6v;
-    arg0->fieldA8 = r3v;
-    arg0->regionId = 0;
+    arg0->base.attachmentLimit = r6v;
+    arg0->base.fieldA8 = r3v;
+    arg0->base.regionId = 0;
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    MonsterInit_WriteHalfword(&arg0->fieldB2, Script_GetKeywordValue(0x4B, 2));
+    MonsterInit_WriteHalfword(&arg0->base.fieldB2, Script_GetKeywordValue(0x4B, 2));
     scriptVariant = (s16)Script_GetKeywordValue(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    MonsterInit_WriteHalfword(&arg0->field9A, scriptVariant);
+    MonsterInit_WriteHalfword(&arg0->base.field9A, scriptVariant);
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
-    SceneBody_SetSprite(body, arg0->drawableKind ? 0 : arg0->drawable);
+    SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
     SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 }
 static inline void Lun_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
                                    u16 alternate)
 {
     s32 r1v;
-    actor->paletteOffset = Script_GetKeywordValue(0x43, 0);
-    actor->basePaletteBank = base;
-    actor->paletteAlternateBank = alternate;
+    actor->base.paletteOffset = Script_GetKeywordValue(0x43, 0);
+    actor->base.basePaletteBank = base;
+    actor->base.paletteAlternateBank = alternate;
     MonsterInit_SetAlternatePaletteOffset(actor, MonsterInit_GetPaletteOffset(actor) + 0x91);
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(actor->drawable + 0x2C, r1v);
+        AnimData_SelectPaletteBank(actor->base.drawable + 0x2C, r1v);
     else
-        *(u8 **)(actor->drawable + 0x68) = gPaletteBankData + (r1v << 5);
+        *(u8 **)(actor->base.drawable + 0x68) = gPaletteBankData + (r1v << 5);
     if (MonsterInit_GetDrawableKind(actor) == 1)
-        MonsterInit_SetWidgetPalette((void *)(actor->drawable + 0x20),
+        MonsterInit_SetWidgetPalette((void *)(actor->base.drawable + 0x20),
                                      SceneActorScript_GetManagerField62() - 0x5FFF);
 }
 static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView *actor, void *cb0,
@@ -154,38 +154,38 @@ static inline void MonsterInit_InstallPrimary(struct SceneActorRegistryResetView
                                               void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->contextCallback = cb0;
-    MonsterInit_WriteAnimationQuery(&actor->animationQuery.word, cb1);
-    actor->entryTarget224 = cb2;
-    actor->entryTarget228 = cb3;
-    actor->savedTarget = cb4;
-    actor->reactionTarget230 = cb5;
-    actor->deathControl = cb6;
-    actor->field220 = hidden;
-    actor->defaultReaction = defaultReaction;
-    MonsterInit_WriteCallback(&actor->contactQuery.opaque, 0);
-    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_086108B0);
-    actor->callback248 = 0;
-    actor->update26C = targetQuery;
-    actor->field238 = SceneActorReaction_SinkAndRemove;
-    actor->damageCallback = damage;
-    actor->contactCallback = contact;
-    actor->field240 = 0;
+    actor->base.contextCallback = cb0;
+    MonsterInit_WriteAnimationQuery(&actor->base.animationQuery.word, cb1);
+    actor->base.entryTarget224 = cb2;
+    actor->base.entryTarget228 = cb3;
+    actor->base.savedTarget = cb4;
+    actor->base.reactionTarget230 = cb5;
+    actor->base.deathControl = cb6;
+    actor->base.field220 = hidden;
+    actor->base.defaultReaction = defaultReaction;
+    MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
+    MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
+    actor->base.callback248 = 0;
+    actor->base.update26C = targetQuery;
+    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.damageCallback = damage;
+    actor->base.contactCallback = contact;
+    actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 static inline void Lun_InstallCompletionCallbacks(struct SceneActorRegistryResetView *actor)
 {
-    actor->messageCallback = SceneActorScript_OnCommand;
-    actor->updateCallback = Lun_OnPlayerTargetInit;
-    actor->destroyCallback = Lun_Destroy;
+    actor->base.messageCallback = SceneActorScript_OnCommand;
+    actor->base.updateCallback = Lun_OnPlayerTargetInit;
+    actor->base.destroyCallback = Lun_Destroy;
 }
 
 static inline void Lun_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    MonsterInit_WriteCommandTable(&actor->commandTable.handlers, gUnk_08605E78);
-    actor->callback248 = Lun_ResetMovementState;
-    actor->field23C = Lun_EnterIdleOrCopyCell;
-    MonsterInit_WriteCallback(&actor->contactQuery.opaque, Lun_OnTargetCheck);
+    MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605E78);
+    actor->base.callback248 = Lun_ResetMovementState;
+    actor->base.field23C = Lun_EnterIdleOrCopyCell;
+    MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Lun_OnTargetCheck);
 }
 
 static inline u32 Lun_ReadRoute(struct SceneActorRegistryResetView *actor, struct LunActor *lun,
@@ -205,10 +205,10 @@ static inline u32 Lun_ReadRoute(struct SceneActorRegistryResetView *actor, struc
             Script_GetPc() ? Script_GetValue() : MonsterInit_RouteId(route);
         Path_GetPointPositionById(&point, MonsterInit_RouteId(route),
                                   MonsterInit_RoutePointId(route));
-        actor->terrainCell = MonsterInit_CellIndex(&point);
-        point.y = actor->groundHeight2BE =
+        actor->base.terrainCell = MonsterInit_CellIndex(&point);
+        point.y = actor->base.groundHeight2BE =
             MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &point);
-        MonsterInit_BeginRoute(&actor->body, route);
+        MonsterInit_BeginRoute(&actor->base.body, route);
         return 1;
     } else {
         route->routeId = 0;
@@ -224,13 +224,13 @@ static inline void Lun_ReadPosition(struct SceneActorRegistryResetView *actor, s
 {
     if (Script_SeekToKeyword('p')) {
         s32 ground;
-        actor->body.position.x = MonsterInit_ReadHalfword(0);
-        actor->body.position.y = MonsterInit_ReadHalfword(0);
-        actor->body.position.z = MonsterInit_ReadHalfword(0);
-        actor->terrainCell = MonsterInit_CellIndex(&actor->body.position);
-        ground =
-            MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor), &actor->body.position);
-        actor->groundHeight2BE = ground;
+        actor->base.body.position.x = MonsterInit_ReadHalfword(0);
+        actor->base.body.position.y = MonsterInit_ReadHalfword(0);
+        actor->base.body.position.z = MonsterInit_ReadHalfword(0);
+        actor->base.terrainCell = MonsterInit_CellIndex(&actor->base.body.position);
+        ground = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
+                                           &actor->base.body.position);
+        actor->base.groundHeight2BE = ground;
         lun->ground3DC = ground;
         MonsterInit_DrawablePosition(actor);
     }
@@ -250,33 +250,33 @@ s32 Lun_Init(void *object)
     Lun_InitProfile(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD28E, 0x9607);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
         void *res;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         res = ScriptProc_Start(0xCB05, 0xD28E);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     MonsterInit_InitializeBody(actor, &zero);
     {
         struct SceneActorRegistryRoute *route = &lun->route;
         if (Lun_ReadRoute(actor, lun, route)) {
-            MonsterInit_SnapToRoute(&actor->body.position, route);
+            MonsterInit_SnapToRoute(&actor->base.body.position, route);
             MonsterInit_DrawablePosition(actor);
-            actor->body.direction = Route_GetCurrentPointFacing(route);
+            actor->base.body.direction = Route_GetCurrentPointFacing(route);
         }
     }
     Lun_ReadPosition(actor, lun);
@@ -312,20 +312,20 @@ s32 Lun_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue(0x53, 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Lun_InitMotionPreset(actor);
     Lun_InitSecondaryActionTable(actor);
     Lun_InitReactionTable(actor);
-    actor->field2E8 = 2;
+    actor->base.field2E8 = 2;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
     Lun_InstallCompletionCallbacks(actor);
     if (!SceneActorRegistry_LinkActor(actor))

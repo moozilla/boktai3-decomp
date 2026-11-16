@@ -21,7 +21,7 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct SceneActorRegistryResetView
     struct SceneActorRegistryResetView *actor = input;
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
         return;
-    if (actor->paletteOffset == 0) {
+    if (actor->base.paletteOffset == 0) {
         u8 *p = (*(u8 **)gPlayers) + 0x4F6;
         *p = *p - 1;
     }

@@ -9,7 +9,7 @@ struct VornDeferredScript {
 #define Vorn_UpdateDelayedScript sub_080B2354
 void Vorn_UpdateDelayedScript(struct SceneActorRegistryResetView *actor)
 {
-    struct VornDeferredScript *context = actor->context;
+    struct VornDeferredScript *context = actor->base.context;
     if (context->script) {
         context->elapsed++;
         if (context->elapsed >= context->duration) {

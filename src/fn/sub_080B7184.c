@@ -13,7 +13,7 @@ static inline void SetContextFlags(struct SceneActorScriptPropertiesView *p, u32
 }
 void SceneActorReaction_ParseOptions(struct SceneActorRegistryResetView *actor)
 {
-    struct SceneActorScriptPropertiesView *context = actor->context;
+    struct SceneActorScriptPropertiesView *context = actor->base.context;
     s32 mode;
     s32 value;
     if (Script_SeekToKeyword('E')) {

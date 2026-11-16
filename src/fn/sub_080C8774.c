@@ -53,11 +53,11 @@ static inline void Golem_CellCenter(s32 cell, struct ContactPosition *position)
 static inline void Golem_SaveControl(struct SceneActorChaseSavedControl *packet, void *object)
 {
     struct SceneActorRegistryResetView *actor = object;
-    packet->control = actor->target;
-    packet->kind = actor->field2B5;
-    packet->state = actor->state2A8;
-    packet->phase = actor->phase2A9;
-    packet->behavior = actor->behavior2AA;
+    packet->control = actor->base.target;
+    packet->kind = actor->base.field2B5;
+    packet->state = actor->base.state2A8;
+    packet->phase = actor->base.phase2A9;
+    packet->behavior = actor->base.behavior2AA;
 }
 
 static inline void Golem_BeginTurn(void *obj, u32 saved, const u16 *randomSamples)
@@ -67,7 +67,7 @@ static inline void Golem_BeginTurn(void *obj, u32 saved, const u16 *randomSample
     if (!SceneActorChase_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&group->common.gate.flags, 4)) {
         group->turn.direction =
-            SceneActorChase_RandomDirectionExcept(actor->body.direction, randomSamples);
+            SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
         Golem_SaveControl(&group->saved, actor);
         group->turn.savedDirection = saved;
         SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
@@ -83,7 +83,7 @@ static inline u8 Golem_Arrive(void *obj)
     struct ContactPosition target;
     struct SceneActorRegistryResetView *actor = obj;
     struct SceneActorChaseGroup *group = SceneActorChase_GroupOf(obj);
-    struct SceneActorChaseTracking *tracking = &actor->tracking;
+    struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
@@ -104,7 +104,7 @@ static inline u8 Golem_Arrive(void *obj)
         cell = Golem_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
-    if (cell != actor->terrainCell &&
+    if (cell != actor->base.terrainCell &&
         !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
                                 0x20000))
         goto reroute;
@@ -118,7 +118,7 @@ static inline u8 Golem_Arrive(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Golem_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y =
@@ -126,15 +126,15 @@ static inline u8 Golem_Arrive(void *obj)
         (group->destination)->pad = 0;
     }
     {
-        u8 saved = actor->body.direction;
+        u8 saved = actor->base.body.direction;
         Golem_BeginTurn(obj, saved, randomSamples);
     }
     SceneActorTerrain_RequestRetreatRoute(obj);
-    actor->field2C2 = 0x20;
+    actor->base.field2C2 = 0x20;
     return 0;
 reroute: {
     Golem_CellCenter(cell, &target);
-    if (SceneActorChase_TryRoute(obj, group->route, &actor->body.position, &target))
+    if (SceneActorChase_TryRoute(obj, group->route, &actor->base.body.position, &target))
         goto success;
 }
     callback = &group->fallback;
@@ -147,11 +147,11 @@ success:
 
 static inline s32 Golem_ReadDesiredX(const struct SceneActorRegistryResetView *a)
 {
-    return a->reactionStart.x;
+    return a->base.reactionStart.x;
 }
 static inline s32 Golem_ReadDesiredZ(const struct SceneActorRegistryResetView *a)
 {
-    return a->reactionStart.z;
+    return a->base.reactionStart.z;
 }
 static inline s32 Golem_ScaleMagnitude(s32 value, u32 shift)
 {
@@ -196,24 +196,24 @@ static inline u8 Golem_Drift(struct SceneActorRegistryResetView *actor)
         u16 *flags;
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
-        if (actor->field2D8 & 0x400)
+        if (actor->base.field2D8 & 0x400)
             Sound_PlaySong(0x18B);
         mask = 0x20;
-        flags = &actor->flags2D4;
+        flags = &actor->base.flags2D4;
         mask |= *flags;
         mask &= ~0x100;
         *flags = mask;
     }
     {
         u32 mask = 0x10000;
-        actor->flags2D0 |= mask;
+        actor->base.flags2D0 |= mask;
     }
-    dx = Golem_ReadDisplacementAxis(Golem_ReadDesiredX(actor), &actor->reactionEnd.x, &x);
-    dz = Golem_ReadDisplacementAxis(Golem_ReadDesiredZ(actor), &actor->reactionEnd.z, &z);
+    dx = Golem_ReadDisplacementAxis(Golem_ReadDesiredX(actor), &actor->base.reactionEnd.x, &x);
+    dz = Golem_ReadDisplacementAxis(Golem_ReadDesiredZ(actor), &actor->base.reactionEnd.z, &z);
     dx = Golem_ClampAxis(dx, 200);
     dz = Golem_ClampAxis(dz, 200);
-    actor->body.motion.x += dx;
-    actor->body.motion.z += dz;
+    actor->base.body.motion.x += dx;
+    actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
     return Golem_DisplacementStopped(dx, dz);
@@ -226,11 +226,11 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
     struct SceneActorChaseGroup *group = &actor->group;
     if (!Golem_Drift(actor))
         goto moving;
-    if (!actor->field2B3)
+    if (!actor->base.field2B3)
         goto moving;
-    actor->field2B0 = 1;
+    actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
-    if (actor->field2DC & 0x80000) {
+    if (actor->base.field2DC & 0x80000) {
         SceneActorChase_SetControl(actor, group->contactControl, 7);
         SceneActorChase_SetState(actor, 3, 0, 0);
         return;
@@ -241,8 +241,8 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
                                          4);
         SceneActorChase_TrackPlayer(actor);
         if (!Golem_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
@@ -254,15 +254,15 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
         SceneActorChase_SetActorFlags(actor, 0x90);
         group->destination->pad = 0;
         if (!Golem_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->body.position,
-                                          &actor->tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                          &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, actor->entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
         SceneActorChase_SetState(actor, 0, 0, 7);
-        actor->field2C2 = 0x20;
+        actor->base.field2C2 = 0x20;
     }
     return;
 moving:

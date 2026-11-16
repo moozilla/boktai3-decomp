@@ -16,29 +16,29 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
     u8 category = inputcategory;
     struct SceneActorRegistryResetView *owner = actor;
     struct SceneActorAttachmentResponseGroup *group = (void *)&actor->group.common;
-    struct ActorAttachmentFollowView *follow = (void *)(&actor->body.id);
+    struct ActorAttachmentFollowView *follow = (void *)(&actor->base.body.id);
     s32 y;
     s32 z;
     if (event == 127) {
         switch (kind) {
             case 0:
-                actor->group.attachment =
-                    ActorAttachment_ReleaseResource(actor->group.attachment, 0, (void *)actor->body.id);
+                actor->group.attachment = ActorAttachment_ReleaseResource(
+                    actor->group.attachment, 0, (void *)actor->base.body.id);
                 break;
 
             case 1:
-                actor->group.attachment =
-                    ActorAttachment_ReleaseResource(actor->group.attachment, 1, (void *)actor->body.id);
+                actor->group.attachment = ActorAttachment_ReleaseResource(
+                    actor->group.attachment, 1, (void *)actor->base.body.id);
                 break;
 
             case 3:
-                actor->group.attachment =
-                    ActorAttachment_ReleasePartsResource(actor->group.attachment, 3, (void *)actor->body.id);
+                actor->group.attachment = ActorAttachment_ReleasePartsResource(
+                    actor->group.attachment, 3, (void *)actor->base.body.id);
                 break;
 
             case 2:
-                actor->group.attachment =
-                    ActorAttachment_ReleaseResource(actor->group.attachment, 2, (void *)actor->body.id);
+                actor->group.attachment = ActorAttachment_ReleaseResource(
+                    actor->group.attachment, 2, (void *)actor->base.body.id);
                 break;
         }
 
@@ -53,7 +53,7 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                                                                      (void *)follow->identity, y, z,
                                                                      category, actor, follow);
                 SceneActorEffect_PlayCategorySoundIfEnabled(kind, event, category,
-                                                            *(u8 *)&owner->paletteOffset);
+                                                            *(u8 *)&owner->base.paletteOffset);
                 if ((event == 0) || (event == 3))
                     SceneStimulus_AddTagged(follow->anchor.x, follow->anchor.z,
                                             group->stimulusHeight, 0, 1, (u16)follow->identity);
@@ -68,27 +68,28 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                     s32 initial;
                     u8 flag;
                     SceneActorAttachment_SelectOffsets(category, 1, &y, &z);
-                    value = (s16 *)(&actor->fieldAA);
-                    initial = actor->fieldA8;
+                    value = (s16 *)(&actor->base.fieldAA);
+                    initial = actor->base.fieldA8;
                     flag = SceneActorAttachment_StatusBits(actor, 0x200) != 0;
                     actor->group.attachment = ActorAttachment_CreateValueSpriteSlot(
-                        event, &actor->body.position, (void *)actor->body.id, y, z, category, value, initial,
-                        flag, actor, follow);
+                        event, &actor->base.body.position, (void *)actor->base.body.id, y, z,
+                        category, value, initial, flag, actor, follow);
                     SceneActorEffect_PlayCategorySoundIfEnabled(1, event, category,
-                                                                *(u8 *)&actor->paletteOffset);
+                                                                *(u8 *)&actor->base.paletteOffset);
                 }
                 break;
 
             case 2:
                 SceneActorAttachment_SelectOffsets(category, 2, &y, &z);
                 actor->group.attachment = ActorAttachment_CreateSinglePartSlot(
-                    1, &actor->body.position, (void *)actor->body.id, z, category, follow);
+                    1, &actor->base.body.position, (void *)actor->base.body.id, z, category,
+                    follow);
                 break;
 
             case 3:
                 SceneActorAttachment_ReleaseSpriteSlots(actor, &actor->group.attachment);
-                actor->group.attachment =
-                    ActorAttachment_ReleasePartsResource(actor->group.attachment, 3, (void *)actor->body.id);
+                actor->group.attachment = ActorAttachment_ReleasePartsResource(
+                    actor->group.attachment, 3, (void *)actor->base.body.id);
                 SceneActorAttachment_SelectOffsets(category, 3, &y, &z);
                 {
                     u32 count = event;
@@ -96,11 +97,11 @@ void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorRegistryResetView
                     s32 initial;
                     if (!count)
                         count = 3;
-                    value = (s16 *)(&actor->fieldAA);
-                    initial = actor->fieldA8;
+                    value = (s16 *)(&actor->base.fieldAA);
+                    initial = actor->base.fieldA8;
                     actor->group.attachment = ActorAttachment_CreatePartsSlotWithCount(
-                        7, &actor->body.position, (void *)actor->body.id, z, category, value, initial, count, follow,
-                        (u32)actor);
+                        7, &actor->base.body.position, (void *)actor->base.body.id, z, category,
+                        value, initial, count, follow, (u32)actor);
                 }
                 break;
         }

@@ -61,17 +61,17 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
 {
     struct SceneActorRegistryResetView *arg0 = object;
     struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->body;
+    struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
     s32 mode, firstLimit, secondLimit, gateDuration, statValue;
     u16 scriptParameter;
     struct SceneActorRegistryRoute *rt;
-    arg0->flags2CC = 0;
-    arg0->flags2D0 = 0;
-    arg0->enabled = 0;
-    arg0->field2E8 = 8;
-    arg0->flags2C0 = Script_GetKeywordValue(0x4D, 0);
-    arg0->field2C2 = 0x40;
+    arg0->base.flags2CC = 0;
+    arg0->base.flags2D0 = 0;
+    arg0->base.enabled = 0;
+    arg0->base.field2E8 = 8;
+    arg0->base.flags2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -88,35 +88,35 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     }
     MonsterInit_InitializeGate(&group->common.gate, gateDuration);
     MonsterInit_ReadRange(&group->common.control);
-    MonsterInit_ReadTargeting(&arg0->tracking);
+    MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     scriptParameter = (u16)Script_GetKeywordValue(0x46, 0);
-    arg0->field1F0 = scriptParameter;
+    arg0->base.field1F0 = scriptParameter;
     scriptParameter = (u16)Script_GetKeywordValue(0x52, 0);
-    arg0->field1EC = scriptParameter;
+    arg0->base.field1EC = scriptParameter;
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
-        arg0->field9E = MonsterInit_ReadByte(0);
-        arg0->field9F = MonsterInit_ReadByte(0);
-        arg0->fieldA0 = MonsterInit_ReadByte(0);
-        arg0->fieldA2 = MonsterInit_ReadHalfword(0);
-        arg0->fieldA4 = MonsterInit_ReadHalfword(0);
+        arg0->base.field9E = MonsterInit_ReadByte(0);
+        arg0->base.field9F = MonsterInit_ReadByte(0);
+        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
+        arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->fieldAC = MonsterInit_ReadWord(0);
-        arg0->fieldA1 = MonsterInit_ReadByte(0);
+        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->fieldB2 = Script_GetKeywordValue(0x4B, 2);
+    arg0->base.fieldB2 = Script_GetKeywordValue(0x4B, 2);
     statValue = (s16)Script_GetKeywordValue(0x56, -1);
     if (statValue < 0)
         statValue = 0xFFFF;
-    arg0->field9A = statValue;
+    arg0->base.field9A = statValue;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))
@@ -125,34 +125,34 @@ static inline void IvyInit_InitializeBody(void *object, u32 *fill)
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
-        MonsterInit_SnapToRoute(&arg0->body.position, rt);
+        MonsterInit_SnapToRoute(&arg0->base.body.position, rt);
         MonsterInit_DrawablePosition(arg0);
-        arg0->body.direction = Route_GetCurrentPointFacing(rt);
+        arg0->base.body.direction = Route_GetCurrentPointFacing(rt);
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
         TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
-    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->drawable : 0);
+    SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
     else
         SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
 
-    group->common.bodyId = arg0->body.id;
-    group->common.bodyPosition = &arg0->body.position;
+    group->common.bodyId = arg0->base.body.id;
+    group->common.bodyPosition = &arg0->base.body.position;
 }
 
 static inline void IvyInit_InstallCompletionCallbacks(struct SceneActorRegistryResetView *arg0)
 {
-    arg0->messageCallback = SceneActorScript_OnCommand;
-    arg0->updateCallback = Ivy_UpdateInteraction;
-    arg0->destroyCallback = Ivy_Destroy;
+    arg0->base.messageCallback = SceneActorScript_OnCommand;
+    arg0->base.updateCallback = Ivy_UpdateInteraction;
+    arg0->base.destroyCallback = Ivy_Destroy;
 }
 
 static inline void IvyInit_InstallRoutes(struct SceneActorRegistryResetView *actor)
 {
-    actor->callback248 = Ivy_TickDrawable;
-    MonsterInit_WriteDataPointer(&actor->commandTable.opaque, gUnk_08606400);
+    actor->base.callback248 = Ivy_TickDrawable;
+    MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_08606400);
 }
 
 static inline void IvyInit_ResetCapture(void *object)
@@ -172,7 +172,7 @@ static inline void IvyInit_EnableColliderContact(struct ContactCollider *collide
 
 static inline void IvyInit_ClearMotionFlags(struct SceneActorRegistryResetView *actor, u32 mask)
 {
-    actor->flags2C0 = mask & actor->flags2C0;
+    actor->base.flags2C0 = mask & actor->base.flags2C0;
 }
 
 s32 Ivy_Init(void *object)
@@ -190,21 +190,21 @@ s32 Ivy_Init(void *object)
     Ivy_InitProfileId(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->drawable, 0x5C);
+        actor->base.drawable = Heap_Alloc(0x5C);
+        Memory_Clear(actor->base.drawable, 0x5C);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_InitializeSprite(heap, 0xD638, 0x99DD);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
-        actor->body.direction = 0;
+        actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->drawable, 0x80);
+        actor->base.drawable = Heap_Alloc(0x80);
+        Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
         MonsterInit_ClearPosition(&zero, &tmp);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0xD638, &tmp);
-        actor->animationIndex = 0xFF;
+        actor->base.animationIndex = 0xFF;
     }
     IvyInit_InitializeBody(actor, &zero);
     if (Script_SeekToKeyword('P')) {
@@ -213,8 +213,8 @@ s32 Ivy_Init(void *object)
         ((struct IvyInstanceState *)arg0)->field63D = MonsterInit_ReadByte(0);
     }
     ((struct IvyInstanceState *)arg0)->field638 = Script_GetKeywordValue('d', 0);
-    actor->body.position.x += 0x20;
-    actor->body.position.z += 0x20;
+    actor->base.body.position.x += 0x20;
+    actor->base.body.position.z += 0x20;
     MonsterInit_DrawablePosition(actor);
     MonsterInit_ReadPalette(actor, 0x12A, 0x192);
     SceneActor_InitCollision5005(actor);
@@ -240,14 +240,14 @@ s32 Ivy_Init(void *object)
     }
     MonsterInit_InitializeRegion(actor);
     if (MonsterInit_TestMotionFlags(actor, 0x40))
-        MonsterInit_MaskColliderFlags(&actor->colliderA, ~0x100);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~0x100);
     if (Script_GetKeywordValue('S', 0) != 0 || !MonsterInit_IsInCurrentRegion(actor))
         SceneActorPlacement_HideActor(actor, 0);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        DisplaySequence_Step(actor->drawable);
+        DisplaySequence_Step(actor->base.drawable);
     else
-        Anim_Step(actor->drawable + 0x20, actor->drawable);
+        Anim_Step(actor->base.drawable + 0x20, actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     SceneActorBehavior_InstallCallbackTables(actor);
     Ivy_InitControlPresets(actor);
@@ -255,7 +255,7 @@ s32 Ivy_Init(void *object)
     if (MonsterInit_TestWorldFlags(0x400)) {
         IvyInit_ResetState(actor, 1);
         MonsterInit_SetControl(actor, SceneActorReaction_PlayHiddenCue, 0x2A);
-        IvyInit_EnableColliderContact(&actor->colliderA);
+        IvyInit_EnableColliderContact(&actor->base.colliderA);
         IvyInit_ClearMotionFlags(actor, ~0x800);
     }
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
