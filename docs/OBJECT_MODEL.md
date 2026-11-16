@@ -79,13 +79,13 @@ struct Bee      { struct RoomActor base;   ... };  /* a class without the chase 
 | Golem | ChaseActor | `golem.h` | 0x6B0 |
 | Mimic | ChaseActor | `mimic.h` | 0x664 |
 | Ghoul | ChaseActor | `ghoul.h` | (other creator) |
-| Spider, Octopus, Ivy, Axe | ChaseActor | none yet | 0x65C, 0x63C, 0x640, 0xF24 |
+| Spider, Octopus, Ivy, Axe | ChaseActor | `spider.h`, `octopus.h`, `ivy.h`, `axe.h` | 0x65C, 0x63C, 0x640, 0xF24 |
 | Ghost | RoomActor | `ghost.h` | 0x62C |
 | Bee | RoomActor | `bee.h` | 0x490 |
 | Crow | RoomActor | `crow.h` | 0x43C |
 | Slime | RoomActor | `slime.h` | 0x40C |
 | Tentacle | RoomActor | `tentacle_body.h` (its segments start at 0x3D4; the init unit's `TentacleActor` still views it as a ChaseActor) | 0x934 |
-| Lun, Bat | RoomActor | none yet | 0x44C, 0x43C |
+| Lun, Bat | RoomActor | `lun.h`, `bat.h` | 0x44C, 0x43C |
 
 Vorn and Mummy share their layout past the chase group (flags at 0x6D4, the route probe
 at 0x6F4); shared reaction units read both through one view.
@@ -183,8 +183,9 @@ workers are idle, because it touches most gameplay files.
    `tools/retype_fields.py --steps tools/retype/room_actor.txt` rewrites the accesses that
    no longer compile, and `tools/fold_views.py HEADER CLASS UNIT:VIEW` folds a unit's private
    view into its class. Still open:
-   * Classes without a header yet: Spider, Octopus, Ivy, Axe, Lun and Bat. Axe is the
-     largest: about 20 private views across 26 units, and 61 conflicting offsets.
+   * Every class has a header now, but some views remain. Axe has six: AxeColliderBlock
+     declares the colliders as arrays of two, and the trail views need types that only their
+     units define. Ivy has two, and Bat and Crow share two in `scene_actor_stored_motion.c`.
    * Views that do not fold as they are: `VornRetreatContext` and `MummyCheckpointContext`
      (they read a flags word through a bitfield), `GolemSlideContext` (it reads 0x680
      unsigned, `GolemBody` signed), `GolemCombatResetContext` (byte arrays over two
