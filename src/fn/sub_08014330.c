@@ -1,36 +1,21 @@
 #include "global.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
-struct PGroup {
-    u8 active, count, type, priority;
-    u8 particles[448];
-};
-struct PManager {
-    u8 pad[24];
-    u32 timer;
-    u8 *small, *large;
-    struct PGroup groups[6];
-};
-struct PCell {
-    u8 b0, b1;
-    u16 flags;
-};
-struct PMap {
-    u32 pad0;
-    u8 *cells;
-    u8 pad1[28];
-    u16 rows[1];
-};
-struct PEntry {
-    u16 a, b;
-    u16 c, d;
-};
+#include "particle_group.h"
+#include "terrain_collision.h"
 extern u32 gUnk_08604B90[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
-void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
+static inline s32 FrozenGroup_LoadType(struct ParticleGroup *g)
 {
-    u8 *p;
+    s32 type = g->type;
+    if (type < 0)
+        type = -1;
+    return type;
+}
+
+void ParticleGroup_UpdateFrozen(struct ParticleGroupManager *m, struct ParticleGroup *g)
+{
+    struct ParticleGroupParticle *p;
     u32 base;
     s32 n;
     u32 type;
@@ -41,22 +26,18 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
     p = g->particles;
     n = 7;
     do {
-        struct PEntry *e;
+        struct ParticleGroupGraphics *e;
         u32 cell, v;
         u8 *q;
         u32 fl;
-        type = ({
-            u8 z = g->type;
-            asm("" : "+r"(z));
-            z;
-        });
+        type = FrozenGroup_LoadType(g);
         if (type <= 0x14)
-            e = (struct PEntry *)m->small;
+            e = (struct ParticleGroupGraphics *)m->small;
         else
-            e = (struct PEntry *)m->large;
-        if (!(*(u32 *)(p + 0x10) & 1)) {
-            s32 x = (s16) * (u16 *)(p + 0x28) >> 8;
-            s32 y = (s16) * (u16 *)(p + 0x2c) >> 8;
+            e = (struct ParticleGroupGraphics *)m->large;
+        if (!(p->flags & 1)) {
+            s32 x = (s16)(u16)p->position.x >> 8;
+            s32 y = (s16)(u16)p->position.z >> 8;
             u32 t;
             if (x < 0 || y < 0 || (u32)x >= gTerrainWidth || (u32)y >= gTerrainHeight)
                 t = 0xFFFF;
@@ -66,32 +47,32 @@ void ParticleGroup_UpdateFrozen(struct PManager *m, struct PGroup *g)
             if (cell != 0xFFFF) {
                 q = TerrainModifiers_FindCellOverride(cell, 1);
                 if (q)
-                    q += 4;
+                    q = (u8 *)&((struct TerrainCellOverride *)q)->cell;
                 else
-                    q = gTerrainMap->cells + 0xc + cell * 4;
-                if ((fl = *(u16 *)(q + 2)) & 0x20) {
+                    q = (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
+                if ((fl = ((struct TerrainCell *)q)->flags) & 0x20) {
                     v = 0xFFFF;
                     type = g->type;
                 } else {
                     q = TerrainModifiers_FindCellOverride(cell, 1);
                     if (q)
-                        q += 4;
+                        q = (u8 *)&((struct TerrainCellOverride *)q)->cell;
                     else
-                        q = gTerrainMap->cells + 0xc + cell * 4;
-                    v = (q[0] & 0xf) << 8;
+                        q = (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
+                    v = (((struct TerrainCell *)q)->shapeAndHeight & 0xf) << 8;
                     type = g->type;
                 }
             } else
                 v = cell;
-            if (({ (u8) type; }) <= 8 && (m->timer & 1) && v != 0xFFFF) {
-                *(u16 *)(p + 0x2a) = v;
-                *(u16 *)(p + 0x18) = e->c + base;
+            if ((u8)type <= 8 && (m->timer & 1) && v != 0xFFFF) {
+                p->position.y = v;
+                p->tile = e->tileBase + base;
             } else {
-                *(u16 *)(p + 0x2a) = *(u16 *)(p + 6);
-                *(u16 *)(p + 0x18) = e->c + *(u32 *)((g->type << 2) + (u32)gUnk_08604B90);
+                p->position.y = (u16)p->height;
+                p->tile = e->tileBase + *(u32 *)((g->type << 2) + (u32)gUnk_08604B90);
             }
         }
-        p += 0x38;
+        p++;
         n--;
     } while (n >= 0);
 }
