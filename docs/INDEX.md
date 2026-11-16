@@ -135,7 +135,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/MOTION_0818.md](../docs/MOTION_0818.md) | Motion callback family at 0818D754 | *#tooling* | 7 |
 | [docs/MUMMY_DISPLACEMENT_RECOVERY.md](../docs/MUMMY_DISPLACEMENT_RECOVERY.md) | Mummy displacement recovery: 080D2584 | #matching #mummy #scene-actor #regalloc #080D2584 | 3 |
 | [docs/MUMMY_MOVEMENT_RESPONSE.md](../docs/MUMMY_MOVEMENT_RESPONSE.md) | Mummy movement response: 080DA97C | #matching #mummy #scene-actor #regalloc #080DA97C | 3 |
-| [docs/OBJECT_MODEL.md](../docs/OBJECT_MODEL.md) | The object model: how the game builds its things | #engine #structs #cleanup #actors | 9 |
+| [docs/OBJECT_MODEL.md](../docs/OBJECT_MODEL.md) | The object model: how the game builds its things | #engine #structs #cleanup #actors | 13 |
 | [docs/PERMUTER.md](../docs/PERMUTER.md) | Solving register allocation in the compiler, then in C | #matching #tooling | 22 |
 | [docs/PERMUTER_HANDOFF_2026-10-15.md](../docs/PERMUTER_HANDOFF_2026-10-15.md) | October 15 matching residue and frozen searches | *#matching* | 5 |
 | [docs/PROCESS_REVIEW.md](../docs/PROCESS_REVIEW.md) | External research review and next experiments | *#scripts #process* | 13 |
@@ -236,7 +236,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 |  | 2 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 |  | 3 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -399,7 +399,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/nav-mesh-route-round9.md](../notes/nav-mesh-route-round9.md) | NavMesh_FindRoute |  | 1 |
 | [notes/nidhoggr-init-parts-match.md](../notes/nidhoggr-init-parts-match.md) | Nidhoggr_InitParts (081940F8) | #matching #nidhoggr #cse #reload | 1 |
 | [notes/nidhoggr-restored-collider-ranges.md](../notes/nidhoggr-restored-collider-ranges.md) | Nidhoggr restored collider ranges | #matching #nidhoggr #register-allocation | 1 |
-| [notes/object-cleanup_2026-11-15.md](../notes/object-cleanup_2026-11-15.md) | Object-model cleanup, items 1 to 4 (2026-11-15) | #cleanup #structs #engine #actors #tooling #object-model | 10 |
+| [notes/object-cleanup_2026-11-15.md](../notes/object-cleanup_2026-11-15.md) | Object-model cleanup, items 1 to 5 (2026-11-15/16) | #cleanup #structs #engine #actors #tooling #object-model | 11 |
 | [notes/opus-actor-marker-fragments_2026-10-31.md](../notes/opus-actor-marker-fragments_2026-10-31.md) | ActorMarker_LaunchFragments (08181514): holdout | #matching #actor-marker #compiler #reload #local-alloc #combine #scope-gap | 8 |
 | [notes/opus-armor-part-damage_2026-11-01.md](../notes/opus-armor-part-damage_2026-11-01.md) | Armor_OnPartDamageCollision (0818C6F8): matched in ordinary C | #matching #armor #twin #random-table #cross-jump | 2 |
 | [notes/opus-charged-burst-spark_2026-10-31.md](../notes/opus-charged-burst-spark_2026-10-31.md) | ChargedBurst_EmitSpark (082335F0): matched (2026-11-01) | #matching #charged-burst #random-table #compiler #local-alloc #reload #combine #global-alloc | 13 |
