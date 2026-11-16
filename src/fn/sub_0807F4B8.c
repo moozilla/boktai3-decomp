@@ -1,6 +1,6 @@
 #include "scene_actor_behavior.h"
 #include "scene_actor_reset.h"
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32);
 extern const u8 gUnk_0824E114[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorControl_OnIdle(u8 *);
@@ -45,16 +45,16 @@ static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
     ClearBits(&a->base.flags114, ~1);
     a->base.word104 = zero;
 }
-void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputActor)
+void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
 {
     struct ChaseActor *a = (void *)inputActor;
     struct SceneActorRegistryControlGroup *group = &a->group.common;
-    struct SceneActorBehaviorView *actor;
+    struct RoomActor *actor;
     u32 slot;
     u32 zero;
     u8 byteZero;
     {
-        struct SceneActorBehaviorGateView *gate = &((struct SceneActorBehaviorView *)a)->gate;
+        struct SceneActorChaseTracking *gate = &((struct RoomActor *)a)->tracking;
         u32 mask = 8;
         zero = Test(gate->flags, mask);
         if (zero)
@@ -130,8 +130,8 @@ void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *inputA
             return;
     }
     {
-        struct SceneActorBehaviorGateView *gate = &actor->gate;
-        slot = ((struct SceneActorBehaviorPlayerSlot *)gate->object)->slot;
+        struct SceneActorChaseTracking *gate = &actor->tracking;
+        slot = ((struct SceneActorBehaviorPlayerSlot *)gate->target)->slot;
     }
     {
         u16 *counter;

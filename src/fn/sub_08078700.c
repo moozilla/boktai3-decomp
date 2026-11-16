@@ -20,17 +20,17 @@ static inline u32 ReadControl(u32 inputMask, u16 *input)
     value = *field;
     return value & mask;
 }
-void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *base)
+void SceneActorBehavior_UpdateColliders(struct ChaseActor *base)
 {
     struct ContactCollider *secondary;
     struct ContactCollider *primary;
     u16 *control;
     u16 *field;
     struct ContactPosition *position;
-    struct SceneActorBehaviorView *self;
-    struct SceneActorBehaviorView *actor = (void *)base;
-    secondary = &actor->secondaryCollider;
-    primary = &actor->primaryCollider;
+    struct RoomActor *self;
+    struct RoomActor *actor = (void *)base;
+    secondary = &actor->colliderB;
+    primary = &actor->colliderA;
     {
         u32 mask = 0x800;
         if (Test(actor->flags2C0, mask)) {
@@ -50,7 +50,7 @@ void SceneActorBehavior_UpdateColliders(struct SceneActorRegistryActor *base)
             return;
         }
     }
-    if ((u8)(actor->kind - 21) <= 1)
+    if ((u8)(actor->field2B5 - 21) <= 1)
         goto disable;
     {
         u32 mask = 0x8000;
@@ -97,7 +97,7 @@ activeTest: {
         goto secondaryUpdate;
     {
         u32 near = (u32)SceneActorBehavior_IsNearParticipant((void *)actor) << 24;
-        position = &actor->position;
+        position = &actor->body.position;
         if (!near || ReadControl(6, control))
             goto primaryUpdate;
     }
@@ -106,7 +106,7 @@ secondaryUpdate: {
     u32 disabled = 4;
     disabled &= flags;
     self = actor;
-    position = &self->position;
+    position = &self->body.position;
     if (!disabled) {
         Collider_SetPosition(secondary, position, 0);
         Collider_Refresh(secondary);
