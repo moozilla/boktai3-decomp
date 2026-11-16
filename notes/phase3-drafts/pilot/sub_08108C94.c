@@ -37,6 +37,10 @@ static inline u16 SlotMonitor_Peer(u16 *base, s32 i)
 {
     return base[i];
 }
+static inline u16 SlotMonitor_Flags(struct SlotMonitor *obj)
+{
+    return obj->flags;
+}
 void sub_08108C94(struct SlotMonitor *obj)
 {
     s32 i;
@@ -47,7 +51,7 @@ void sub_08108C94(struct SlotMonitor *obj)
     s32 stop;
 
     obj->result = Serial_ReceivePacket(obj->peers);
-    obj->field44 = SerialLink_QueueSendWord(obj->flags);
+    obj->field44 = SerialLink_QueueSendWord(SlotMonitor_Flags(obj));
     if (obj->finished == 0 && obj->selection == 0)
         SerialLink_StartTransferIfIdle();
     stop = (u8)SlotMonitor_CheckTimeout(obj);
@@ -60,9 +64,10 @@ void sub_08108C94(struct SlotMonitor *obj)
     if (obj->result >= 0) {
         u16 *base;
         u16 *p;
-        s32 none = 0xFFFF;
+        s32 none;
         obj->ticks++;
         base = obj->peers;
+        none = 0xFFFF;
         for (i = 0; i < 4; i++) {
             u16 v = SlotMonitor_Peer(base, i);
             if (v != none) {
