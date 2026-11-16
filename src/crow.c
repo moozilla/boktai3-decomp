@@ -1309,7 +1309,7 @@ void Crow_ReadSpawnScript(void *input)
             *radius = (*radius) * (*radius);
         }
     }
-    ((struct Crow *)actor)->body.direction = Script_GetKeywordValue(0x64, 0);
+    ((struct Crow *)actor)->base.body.direction = Script_GetKeywordValue(0x64, 0);
     if (Script_SeekToKeyword(0x70)) {
         u16 *height;
         struct CrowPackedPosition *copy;
@@ -1822,7 +1822,7 @@ static inline void Crow_InitializeBody(struct SceneActorRegistryResetView *arg0,
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, ((struct Crow *)arg0)->movementProbe, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, ((struct Crow *)arg0)->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void Crow_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
