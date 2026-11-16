@@ -162,3 +162,127 @@ The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
     function-address constant Axe_Init spills (its installer takes them as `void *`), so
     those four stay `void *`.
 * Still open: see item 5 in `docs/OBJECT_MODEL.md`.
+
+## Names and units (2026-11-16)
+
+### A. Names for the base
+
+* 33 RoomActor members named from their readers and writers. The steps are in
+  `tools/retype/room_actor_names.txt`. All 792 dependents match. The evidence:
+  * `defense` (9F): subtracted from a hit's power.
+  * `contactReward` (A0): passed to `PlayerStats_AddContactHundredths`.
+  * `experience` (AC): keyword 'X'; awarded on defeat.
+  * `attachmentRestart` / `attachmentTimer` (A8/AA): keyword 'l'; the restart value
+    is copied into the timer.
+  * `hudKind` / `hudLabel` (B2/9A): keywords 'K' and 'V', the HUD's type and parameter
+    (low confidence).
+  * `pendingControl*` (104..114): what `MonsterInit_SetMotionControl` queues and
+    `SceneActorBehavior_ActivatePendingControl` installs: the control, its data, the
+    release callback, the kind, and a pending bit.
+  * `flashTimer`, `paletteTimer`, `particleTimer`: the base's existing offset checks
+    and readers.
+  * `scriptId` (1EC): keyword 'R'.
+  * `sinkCallback` and `reactionGate` (238/23C), `routeReset` (248): set by the
+    MonsterInit setters of the same names.
+  * `stateCallbacks` (27C): indexed by state2A8.
+  * `stepDone` (2B0) and `controlKind` (2B5): written together with `target` when a
+    control is installed.
+  * `hitLockTimer` (2B8): set to 0x2D on contact.
+  * `placementFlags` (2C0): keyword 'M'.
+  * `frameCounter` (2CA): incremented every frame and taken modulo intervals.
+  * `behaviorFlags`, `statusFlags`, `motionFlags`, `reactionFlags` (2CC..2D6): the
+    names of the shared helpers' getters and setters.
+  * `hitAttributes`, `hitReactionFlags`, `hitOwners` (2D8..2E0): what
+    `SceneActorReaction_HandleColliderContact` copies from the hit.
+  * `heightOffset` (2EA): the height above groundHeight (Bee's flight, and the saved
+    control).
+* Left offset-named, each with a note:
+  * field9E, fieldA1, fieldA2, fieldA4: only the keyword reads.
+  * field2C2: readers call it speed, height or scale.
+  * field2C8, field240, callbacks280..2A0, field2E6, field2E8, field3CC.
+  * The SceneActorChaseGroup offset names are not done.
+* Flags: four bits have one meaning in every class: status 0x4000 (alternate
+  palette), 0x20000 (inactive), 0x1000000 (interacting), and motion 0x1000 (holds a
+  contact node). They are enums in room_actor.h, used in the shared status and
+  availability helpers. The other bits are passed as raw masks through many helpers,
+  and no single meaning has held for them yet.
+* `category` stays a number. MonsterInit sets it from an argument that each creator
+  passes in (the categories SceneActorRegistry_SendToCategory addresses). Naming it
+  means mapping every class's value first.
+
+### B. Monster classes as units
+
+* `tools/merge_resolve.py` settles merge_unit's conflicts while keeping every input
+  byte-identical:
+  * A helper copy gives way to the first file's copy when the file still matches.
+    Otherwise it is renamed after its function.
+  * Prototypes, externs and variables now count as conflicts, and the resolver
+    settles them: the header's signature first, then the definition's, then each
+    variant. A candidate is kept only if every file that declares it still matches
+    and the merged unit compiles (`--out`).
+* Hand fixes (merge_resolve reports these as UNSETTLED):
+  * A definition whose return type disagreed with its callers'
+    (SceneActorPlacement_BeginContactRoute now returns u8).
+  * A definition taking a private view (Octopus_GetAnimationStatus now takes the
+    ChaseActor).
+  * Prototypes naming a struct that is defined later in the unit (they get a
+    forward declaration).
+* Units so far (each whole unit MATCH):
+  * `src/spider.c`: 45 functions, 15172 bytes.
+  * `src/octopus.c`: 46 functions, 14980 bytes.
+  * `src/lun.c`: 50 functions, 16116 bytes.
+  * `src/ivy.c`: 61 functions, 21464 bytes.
+  * `src/ivy_child.c`: 11 functions, 2424 bytes.
+  * `src/bat.c`: Bat_Init and Bat_Create.
+  * `src/bat_restore.c` and `src/bat_defeat.c`.
+  * `src/axe_contact.c`: 7 functions, 2708 bytes.
+  * `src/axe.c`: 96 functions, 29148 bytes.
+* More hand fixes, each keeping every file byte-identical:
+  * Function-name aliases (`#define OldName Axe_Name`) hid conflicting prototypes.
+    They give way to the real name.
+  * Local copies of a header's struct or inline (RotatingDrawable, NormalizeAngle)
+    give way to the header.
+  * Two headers declared one function two ways. Both are unified, and every
+    dependent still matches:
+    * `SceneActorTerrain_RequestRetreatRoute` takes a ChaseActor.
+    * `Collider_SetAttackProperties` takes u32 arguments.
+* More units (each whole unit MATCH):
+  * Dog: `src/dog.c` (10356 bytes), `src/dog_scripted.c` (5028), `src/dog_approach.c` (6940).
+  * Mummy: `src/mummy.c` (2900), `src/mummy_entry.c` (1788), `src/mummy_defeat.c` (7936),
+    `src/mummy_pursuit.c` (1584), `src/mummy_path.c` (15236), `src/mummy_init.c` (4952).
+  * `src/skeleton_rise.c` (5508).
+  * Vorn: `src/vorn.c` (8472), `src/vorn_main.c` (13216), `src/vorn_main_2.c` (11460).
+  * Golem: `src/golem_main.c` (20620), `src/golem_main_2.c` (10964), `src/golem_main_3.c` (4248).
+  * Skeleton: `src/skeleton_main.c` (71 functions, 31956 bytes).
+  * `src/dog_reaction.c` (3152).
+* Header prototypes that disagreed with the definitions now state the definitions'
+  own signatures. Every dependent matches:
+  * `skeleton.h`: 28 prototypes, most of them `void`/`void *` where the function
+    takes the ChaseActor.
+  * `scene_actor_chase.h`: Skeleton_UpdateScriptWaitState.
+  * `scene_actor_chase_step.h`: SceneActorChase_CellIndex is now defined whatever
+    SCENE_ACTOR_CHASE_SCALAR_CELLS says. That is one branch less of a selector
+    macro; the rest of the selector set (`scene_actor_chase_reaction.h`) still
+    needs taking apart.
+* Declarations brought into line with their definitions, each file still matching:
+  * A definition that ignores trailing arguments its callers pass takes them as
+    unused parameters (Vorn_SelectRecoveryAction, Vorn_OnDestroy, Golem_OnDestroy).
+  * A definition returning a flag returns u8 like its callers expect
+    (SceneActor_IsFacingNearbyTarget, SceneActor_DispatchContextAction).
+  * Local `Heap_Alloc`/`Memory_Clear`/`Script_Call` prototypes give way to engine.h.
+  * Golem files that copied `golem_charge.h` now include it; the copies are dropped
+    by a scratch script that removes items identical to the header's.
+* Compiler fact: some functions match alone but not inside a unit. They are left in
+  `src/fn` for a matcher:
+  * Bat 08087018 and 08087A70.
+  * Dog 080E059C, 080E25FC and 080E4B34.
+  * Mummy 080D2194, 080D2584, 080D5778, 080D6608, 080DA97C and 080DC228.
+  * Vorn 080ACBE0 and 080B2580. 080ACCD4, a lone file between them, also stays.
+  * Golem 080CF3E4 (it also still uses the scalar-cells selector) and Dog 080E0750.
+  * Even when nothing but declarations comes before such a function, it can change.
+    `sub_08087A70` loses its match when given an identical redundant
+    `s32 Mod(s32, s32);` (a spill moves from sp+0x70 to sp+0x60). `sub_08087018` changes
+    after another function's body (r3 becomes r4). So agbcc's output depends on what
+    came before in the file, not on what the declarations mean. Their current C is
+    probably not the original form; the original unit compiled them in place.
+  * Units split at these functions, so a class can take two or three units.
