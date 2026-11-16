@@ -11,7 +11,6 @@ void SolarBank_BeginClosing(struct SolarBankPanel *);
 void SolarBank_BeginSelection(struct SolarBankPanel *);
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *);
 
-// MATCHING_CONCESSION: register-pinning
 #define SolarBank_UpdateTransferInput sub_081BB904
 void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
 {
@@ -40,10 +39,10 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
         u16 *timer;
         u16 h;
         if (*bal > 9998)
-            goto reset;
+            goto resetHold0;
         xfer = (u32 *)&panel->transferAmount;
         if (*xfer == 0)
-            goto reset;
+            goto resetHold0;
         if (panel->holdFrames == 0)
             panel->repeatSpeed = 0;
         hold = &panel->holdFrames;
@@ -94,24 +93,24 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
                 SolarBank_RefreshAmountDigits(panel);
             }
         }
+        goto blink;
+    // Each direction resets its own hold; jump2 merges this copy into the second one, and
+    // its reload choice still moves the spill rotation (README fact 59).
+    resetHold0:
+        panel->holdFrames = 0;
+        goto blink;
     } else if ((t = gPadState[0] & 0x10) != 0) {
-        register u32 balOffset asm("r1") = 0x6F8;
         u32 *bal;
         u32 *xfer;
         u16 *hold;
         u16 *timer;
         u16 h;
-        asm("" : : "r"(balOffset));
-        bal = (u32 *)((u8 *)panel + balOffset);
+        bal = (u32 *)&panel->balance;
         if (*bal == 0)
-            goto reset;
-        {
-            register u32 offset asm("r3") = 0x6F4;
-            asm("" : : "r"(offset));
-            xfer = (u32 *)((u8 *)panel + offset);
-        }
+            goto resetHold1;
+        xfer = (u32 *)&panel->transferAmount;
         if (*xfer > 9998)
-            goto reset;
+            goto resetHold1;
         if (panel->holdFrames == 0)
             panel->repeatSpeed = 0;
         hold = &panel->holdFrames;
@@ -162,12 +161,13 @@ void SolarBank_UpdateTransferInput(struct SolarBankPanel *panel)
                 SolarBank_RefreshAmountDigits(panel);
             }
         }
+        goto blink;
+    resetHold1:
+        panel->holdFrames = 0;
+        goto blink;
     } else {
         goto zero;
     }
-    goto blink;
-reset:
-    panel->holdFrames = 0;
     goto blink;
 zero:
     panel->holdFrames = t;
