@@ -9,6 +9,10 @@
 unknown3CD[0] nextDirection
 [map]
 field2B3 restart
+field2B6 reactionDirection
+groundHeight2BE groundHeight
+field1F0 script1F0
+field304 counter304
 
 # SceneActorAnimationView was a view of the base alone.
 [types]
@@ -33,6 +37,38 @@ SceneActorTerrainCollisionView RoomActor
 [map]
 collider colliderA
 field2E4 reactionSoundVariant
+
+# SceneActorBehaviorView was a view of the base alone; its gate is the tracking block.
+[types]
+SceneActorBehaviorView RoomActor
+SceneActorBehaviorGateView SceneActorChaseTracking
+[map]
+heading body.direction
+position body.position
+velocity body.motion
+defense9F field9F
+reactionA0 fieldA0
+gate tracking
+object target
+savedControl104 word104
+allocation108 word108
+allocationArgument10C word10C
+savedKind110 word110
+primaryCollider colliderA
+secondaryCollider colliderB
+control target
+substate field2B0
+resetRequested field2B1
+prepared field2B2
+kind field2B5
+parameter2D8 field2D8
+reaction2DC field2DC
+payload2E0 field2E0
+result2E4 reactionSoundVariant
+mode2E6 field2E6
+biasX310 reactionStart.x
+biasZ314 reactionStart.z
+requestedDirection nextDirection
 
 # SceneActorRegistryResetView is struct ChaseActor (base + chase group). Its fields past
 # 0x624 moved to struct Vorn, Golem, Mummy and Dog: a unit that reads them needs that

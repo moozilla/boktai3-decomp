@@ -145,7 +145,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     if (Unavailable(a))
         return;
     if ((!Unavailable(input)) && (contact.collider->kind & 15)) {
-        input->base.field304 = ((struct RecoveryContactIdentity *)contact.collider)->identity;
+        input->base.counter304 = ((struct RecoveryContactIdentity *)contact.collider)->identity;
         Clear32(&input->base.flags2D0, ~0x1000000);
     }
     Collision_CalculateDamageResponse(source, contact.collider);

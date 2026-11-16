@@ -6,7 +6,7 @@ struct SceneActorScriptContext {
     u8 unknown0[0x67C];
     s16 mode, firstParameter, secondParameter;
 };
-void SceneActor_CallContextScriptB(struct SceneActorBehaviorView *actor)
+void SceneActor_CallContextScriptB(struct RoomActor *actor)
 {
     s32 values[12];
     struct ScriptUtilityArguments arguments;
@@ -21,9 +21,9 @@ void SceneActor_CallContextScriptB(struct SceneActorBehaviorView *actor)
     context = ((struct SceneActorRegistryActor *)actor)->context;
     if (!(u16)actor->script1F4)
         return;
-    values[0] = actor->position.x;
-    values[1] = actor->position.y;
-    values[2] = actor->position.z;
+    values[0] = actor->body.position.x;
+    values[1] = actor->body.position.y;
+    values[2] = actor->body.position.z;
     values[3] = actor->parameters1FC[0];
     values[4] = actor->parameters1FC[1];
     values[5] = actor->parameters1FC[2];
@@ -36,7 +36,7 @@ void SceneActor_CallContextScriptB(struct SceneActorBehaviorView *actor)
     }
     values[8] = actor->category;
     values[9] = actor->paletteOffset;
-    values[10] = actor->parameter2D8;
+    values[10] = actor->field2D8;
     values[11] = -1;
     arguments.count = 12;
     arguments.values = values;

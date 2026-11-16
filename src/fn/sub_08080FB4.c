@@ -96,7 +96,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
         }
     }
     actor->base.field2B0 = 1;
-    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = (u16)((struct RoomActor *)actor)->script1F8;
     if (script) {
         u32 offset = 0;
         values[0] = *(s16 *)((u8 *)&actor->base.body.position + offset);
@@ -104,8 +104,8 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
         values[2] = actor->base.body.position.z;
         offset = 0x1FC;
         values[3] = *((s32 *)(((u8 *)actor) - (-offset)));
-        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
         offset += 0xE4;
         values[6] = *(s32 *)((u8 *)actor + offset);
         values[7] = actor->base.body.id;

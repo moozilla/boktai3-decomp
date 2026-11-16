@@ -91,7 +91,7 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     route.entry = (u16 *)(((u8 *)route.entry) + (route.index * 8));
     wide = route.entry[0];
     out->x = wide;
-    out->y = actor->base.groundHeight2BE;
+    out->y = actor->base.groundHeight;
     entry = route.entry;
     out->z = entry[1];
 }

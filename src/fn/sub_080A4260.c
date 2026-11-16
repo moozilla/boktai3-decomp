@@ -39,11 +39,11 @@ s32 SceneActorPlacement_BeginContactRoute(struct ChaseActor *p)
 {
     struct SceneActorRegistryControlGroup *group;
     s32 result;
-    if ((s32)p->base.field304 <= 0) {
+    if ((s32)p->base.counter304 <= 0) {
         result = 0;
     } else {
         group = &p->group.common;
-        p->base.tracking.target = (u32)SceneActorContacts_FindObjectById(p->base.field304);
+        p->base.tracking.target = (u32)SceneActorContacts_FindObjectById(p->base.counter304);
         SetBehavior(p, 12);
         SetControl(p, group->gate.control, 26);
         sub_080A4798(p);

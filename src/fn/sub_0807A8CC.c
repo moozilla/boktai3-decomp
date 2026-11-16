@@ -173,7 +173,7 @@ s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
         cellFlags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
         if (*currentCell != actor->base.previousTerrainCell) {
             if ((cellFlags & 0x40) && actor->base.body.position.y + (s16)actor->base.field2EA <=
-                                          actor->base.groundHeight2BE) {
+                                          actor->base.groundHeight) {
                 void *sink;
                 if (SceneActorPlacement_IsUnavailable((void *)actor))
                     goto done;
@@ -191,7 +191,7 @@ s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
                 cell = *currentCell;
                 SceneActorTerrain_GetCenter(cell, &center);
                 SceneActorTerrain_Subtract(&delta, &center, position);
-                actor->base.field2B6 = Math_Atan2(delta.x, delta.z) >> 5;
+                actor->base.reactionDirection = Math_Atan2(delta.x, delta.z) >> 5;
                 actor->base.field2E0 = 0x20;
                 collider->cost = MonsterInit_GetHealth(actor);
                 actor->base.reactionSoundVariant = MonsterInit_GetHealth(actor);

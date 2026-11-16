@@ -1,5 +1,5 @@
 #include "scene_actor_behavior.h"
-void SceneActorAttachment_ReplaceResponseSlot(struct SceneActorBehaviorView *, u32, u32, u32);
+void SceneActorAttachment_ReplaceResponseSlot(struct RoomActor *, u32, u32, u32);
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
     u8 slot;
@@ -25,13 +25,13 @@ static inline void IncrementFirst(u16 *input)
     } else
         *counter = 9999;
 }
-void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
+void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
 {
-    struct SceneActorBehaviorView *early = inputActor;
-    struct SceneActorBehaviorView *actor;
+    struct RoomActor *early = inputActor;
+    struct RoomActor *actor;
     u32 slot;
     {
-        struct SceneActorBehaviorGateView *gate = &inputActor->gate;
+        struct SceneActorChaseTracking *gate = &inputActor->tracking;
         u32 mask = 8;
         if (Test(gate->flags, mask))
             return;
@@ -60,7 +60,7 @@ void SceneActorBehavior_RecordDefeat(struct SceneActorBehaviorView *inputActor)
         if (*(u32 *)((u32)actor + offset) & mask)
             return;
     }
-    slot = ((struct SceneActorBehaviorPlayerSlot *)actor->gate.object)->slot;
+    slot = ((struct SceneActorBehaviorPlayerSlot *)actor->tracking.target)->slot;
     {
         u16 *counter;
         u32 value;

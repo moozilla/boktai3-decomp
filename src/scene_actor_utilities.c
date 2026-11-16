@@ -379,7 +379,7 @@ void ActorParticles_SpawnDirectionalBurst(struct ChaseActor *actor, s32 amount)
     u32 count;
     u32 angle;
     if (amount > 0) {
-        angle = (actor->base.field2B6 + 128) & 255;
+        angle = (actor->base.reactionDirection + 128) & 255;
         velocity.x = gUnk_086149C4[(angle + 64) & 255] >> 10;
         velocity.y = ActorParticles_NextRandom() & 7;
         velocity.z = gUnk_086149C4[angle & 255] >> 10;

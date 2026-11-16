@@ -17,7 +17,7 @@ u8 Skeleton_ReactToContact(struct Skeleton *actor)
     }
     SceneActorScript_TriggerCallOnCount((struct SceneActorRegistryActor *)actor);
     if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x2000)) {
-        actor->chase.base.body.direction = actor->chase.base.field2B6 + 0x80;
+        actor->chase.base.body.direction = actor->chase.base.reactionDirection + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
         SceneActorChase_ClearMotionFlags(&actor->chase, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
@@ -486,10 +486,10 @@ s32 Skeleton_Init(void *object)
                 (void *)(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile));
             actor->base.terrainCell =
                 MonsterInit_CellIndex(MonsterInit_BodyPosition(&actor->base.body));
-            actor->base.groundHeight2BE = MonsterInit_TerrainHeight(
+            actor->base.groundHeight = MonsterInit_TerrainHeight(
                 MonsterInit_GetTerrainCell(actor), MonsterInit_BodyPosition(&actor->base.body));
-            actor->base.field2EA = actor->base.body.position.y - actor->base.groundHeight2BE;
-            actor->base.body.position.y = actor->base.groundHeight2BE;
+            actor->base.field2EA = actor->base.body.position.y - actor->base.groundHeight;
+            actor->base.body.position.y = actor->base.groundHeight;
         }
     } else if (SkeletonInit_TestSkeletonFlags(instance, 8)) {
         MonsterInit_SetControl(actor, SceneActorReaction_TickHiddenTimeout, 0x39);

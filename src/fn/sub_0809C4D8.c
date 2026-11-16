@@ -60,7 +60,7 @@ void Lun_UpdateTimedRecovery(struct ChaseActor *actor)
     } else if (Mod(actor->base.counter2AC, 3) == 0)
         Blink(actor);
     if ((s32)actor->base.counter2AC > 60) {
-        actor->base.field2EA += actor->base.body.position.y - actor->base.groundHeight2BE;
+        actor->base.field2EA += actor->base.body.position.y - actor->base.groundHeight;
         SceneActorControl_ResetCollisionFlags(actor);
         SetState(actor, 0, 0, 0);
     }

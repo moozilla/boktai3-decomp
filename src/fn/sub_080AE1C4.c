@@ -149,7 +149,7 @@ void Vorn_UpdateKnockbackRecovery(struct ChaseActor *actor)
     if (Vorn_DisplacementStopped(dx, dz) && timer <= 0) {
         struct ContactCollider *collider;
         actor->base.fieldAA = 0;
-        actor->base.field2B6 = (Vorn_DivideDirection(actor->base.body.direction) + 7) & 7;
+        actor->base.reactionDirection = (Vorn_DivideDirection(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->field5E0, 8);
         SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 2);

@@ -133,7 +133,8 @@ void sub_080B9158(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 speed = (Skeleton_RandomSample((const u16 *)RANDOM_TABLE_ADDR) & 3) + 10;
-        s32 direction = SceneActorTerrain_FindOpenNeighborDirection(actor, actor->base.field2B6);
+        s32 direction =
+            SceneActorTerrain_FindOpenNeighborDirection(actor, actor->base.reactionDirection);
         if (direction < 0) {
             struct SceneActorTimedBehaviorContext *context;
             SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 15);

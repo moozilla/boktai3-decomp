@@ -48,8 +48,10 @@ struct RoomActor {
     u16 paletteOffset;
     u16 field1E8;
     u16 field1EA;
-    u32 field1EC, field1F0;
-    u8 unknown1F4[0x28];
+    u32 field1EC;
+    u32 script1F0, script1F4, script1F8; /* script parameter words */
+    s32 parameters1FC[5];
+    u8 unknown210[0xC];
     void *target;
     void *field220;
     void *entryTarget224;
@@ -83,11 +85,12 @@ struct RoomActor {
     u8 field2B1; /* set when the next phase may start; BehaviorView read it as a reset request */
     u8 field2B2; /* directional entry flag; BehaviorView read it as "prepared" */
     u8 restart;
-    u8 enabled, field2B5, field2B6, animationIndex;
+    u8 enabled, field2B5, reactionDirection,
+        animationIndex; /* reactionDirection: source direction or contact-to-contact angle (0812F520) */
     u16 field2B8;
     u8 unknown2BA[2];
     u16 defeatTimer; /* 0x2BC: set to 60 on entry to Spider_UpdateDefeat. */
-    u16 groundHeight2BE;
+    u16 groundHeight;
     u16 flags2C0, field2C2;
     u32 profileMode;
     u16 field2C8;
@@ -107,7 +110,7 @@ struct RoomActor {
     u16 savedTargetCell;
     u16 regionId;
     struct ContactPosition previousPosition;
-    u32 field304;
+    s32 counter304; /* SceneActorBehavior_TestDefeated records a defeat while it is positive */
     u32 profileId;
     u32 field30C;
     struct ContactPosition reactionStart,

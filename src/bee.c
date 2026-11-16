@@ -48,7 +48,7 @@ void Bee_OnAttackCollision(void)
 
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorView *);
+                                             struct RoomActor *);
 
 static inline u8 Bee_ContactUnavailable(struct ChaseActor *actor)
 {
@@ -365,7 +365,7 @@ void *Bestiary_GetEntryForActor(u32, u32);
 
 void Bestiary_UnlockEntry(void *);
 
-void SceneActorBehavior_CallTerrainScript(struct SceneActorBehaviorView *);
+void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 
 void SceneActorPlacement_PlayCategoryEventSound(struct SceneActorRegistryActor *);
 
@@ -392,14 +392,14 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
     actor->base.field2B0 = 1;
-    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = (u16)((struct RoomActor *)actor)->script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
         values[6] = actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -706,9 +706,9 @@ void Bee_ResetRoute(struct ChaseActor *actor)
                 break;
         }
     }
-    actor->base.groundHeight2BE = height;
+    actor->base.groundHeight = height;
     actor->base.field2EA = actor->base.body.position.y - height;
-    actor->base.body.position.y = actor->base.groundHeight2BE;
+    actor->base.body.position.y = actor->base.groundHeight;
     if (!actor->base.drawableKind) {
         *(struct BeePackedPosition *)&((struct BeeDrawable *)actor->base.drawable)->position =
             *(struct BeePackedPosition *)&actor->base.body.position;
@@ -772,7 +772,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
 
     if (Bee_FlightUnavailable(actor))
         return;
-    g = &actor->base.groundHeight2BE;
+    g = &actor->base.groundHeight;
     {
         u32 diff = *g - state->previousGround;
         actor->base.field2EA -= diff;
@@ -786,17 +786,17 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
         {
             u32 mask = 1;
             if (Bee_TestFlightFlags(state->flags, mask)) {
-                actor->base.body.position.y = actor->base.groundHeight2BE;
+                actor->base.body.position.y = actor->base.groundHeight;
                 return;
             }
         }
         actor->base.field2EA += Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 9);
         if (state->flightPhase <= 63)
             state->flightPhase++;
-        actor->base.body.position.y = actor->base.groundHeight2BE + actor->base.field2EA;
+        actor->base.body.position.y = actor->base.groundHeight + actor->base.field2EA;
     }
     {
-        s32 currentGround = actor->base.groundHeight2BE;
+        s32 currentGround = actor->base.groundHeight;
         s32 raisedY = actor->base.body.position.y - 260;
         delta = currentGround - raisedY;
     }
@@ -807,7 +807,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
         else
             actor->base.field2EA += 8;
     }
-    actor->base.body.position.y = actor->base.groundHeight2BE + actor->base.field2EA;
+    actor->base.body.position.y = actor->base.groundHeight + actor->base.field2EA;
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
         drawable->position.y -= Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 5);
@@ -1843,7 +1843,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
@@ -1991,7 +1991,7 @@ s32 Bee_Init(void *object)
             s32 groundHeight =
                 MonsterInit_TerrainHeight(actor->base.terrainCell, &bee->initialPosition);
             s32 offset;
-            u16 *ground = &actor->base.groundHeight2BE;
+            u16 *ground = &actor->base.groundHeight;
             *ground = groundHeight;
             offset = (u16)actor->base.body.position.y - groundHeight;
             actor->base.field2EA = offset;

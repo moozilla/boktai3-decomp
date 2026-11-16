@@ -1,5 +1,5 @@
 #include "scene_actor_behavior.h"
-void SceneActorBehavior_PlayReactionSound(struct SceneActorBehaviorView *actor)
+void SceneActorBehavior_PlayReactionSound(struct RoomActor *actor)
 {
     u32 m = 6;
     if (actor->flags2D4 & m) {

@@ -85,7 +85,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
@@ -225,7 +225,7 @@ s32 TentacleActor_Init(void *object)
         actor->base.terrainCell = MonsterInit_CellId(&actor->base.body.position);
         height = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
                                            &actor->base.body.position);
-        ground = &actor->base.groundHeight2BE;
+        ground = &actor->base.groundHeight;
         *ground = height;
         actor->base.field2EA = (u16)actor->base.body.position.y - height;
         actor->base.body.position.y = *ground;

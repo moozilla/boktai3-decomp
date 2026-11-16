@@ -15,24 +15,24 @@ static inline s32 ScaledComponent(s32 component, s32 speed)
         return product >> 16;
     return -((s32)(0u - (u32)product) >> 16);
 }
-u8 SceneActorBehavior_AddDescriptorAcceleration(struct SceneActorBehaviorView *actor,
+u8 SceneActorBehavior_AddDescriptorAcceleration(struct RoomActor *actor,
                                                 struct SceneActorBehaviorDestination *descriptor,
                                                 u32 rangeX, u32 rangeZ, s32 speed)
 {
-    s16 dx = (u16)descriptor->destination.x - (u16)actor->position.x;
-    s16 dz = (u16)descriptor->destination.z - (u16)actor->position.z;
+    s16 dx = (u16)descriptor->destination.x - (u16)actor->body.position.x;
+    s16 dz = (u16)descriptor->destination.z - (u16)actor->body.position.z;
     s32 step;
     u8 heading;
-    if ((u32)Magnitude(descriptor->position.x - actor->position.x) <= rangeX &&
-        (u32)Magnitude(descriptor->position.z - actor->position.z) <= rangeZ)
+    if ((u32)Magnitude(descriptor->position.x - actor->body.position.x) <= rangeX &&
+        (u32)Magnitude(descriptor->position.z - actor->body.position.z) <= rangeZ)
         return 1;
     if (dx || dz) {
         heading = Math_Atan2(dx, dz);
         step = ScaledComponent(gUnk_086149C4[(heading + 64) & 255], speed);
-        actor->velocity.x = (u16)actor->velocity.x + (u16)(actor->biasX310 + step);
+        actor->body.motion.x = (u16)actor->body.motion.x + (u16)(actor->reactionStart.x + step);
         step = ScaledComponent(gUnk_086149C4[heading], speed);
-        actor->velocity.z = (u16)actor->velocity.z + (u16)(actor->biasZ314 + step);
-        actor->heading = heading;
+        actor->body.motion.z = (u16)actor->body.motion.z + (u16)(actor->reactionStart.z + step);
+        actor->body.direction = heading;
     }
     return 0;
 }

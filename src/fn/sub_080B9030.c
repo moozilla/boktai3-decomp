@@ -55,5 +55,5 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseAc
         return;
     SceneActorControl_BeginTimedBehavior56(actor, state);
     *((u8 *)state + 0x6D0) = 20;
-    actor->base.field2B6 = actor->base.tracking.heading + 0x80;
+    actor->base.reactionDirection = actor->base.tracking.heading + 0x80;
 }

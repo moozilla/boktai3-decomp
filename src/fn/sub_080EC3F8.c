@@ -102,7 +102,7 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     scriptParameter = (u16)Script_GetKeywordValue('F', 0);
-    arg0->base.field1F0 = scriptParameter;
+    arg0->base.script1F0 = scriptParameter;
     scriptParameter = (u16)Script_GetKeywordValue('R', 0);
     arg0->base.field1EC = scriptParameter;
 

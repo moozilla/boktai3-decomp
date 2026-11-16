@@ -84,7 +84,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
@@ -232,7 +232,7 @@ s32 Bat_Init(void *object)
             s32 groundHeight =
                 MonsterInit_TerrainHeight(actor->base.terrainCell, &bat->initialPosition);
             s32 offset;
-            u16 *ground = &actor->base.groundHeight2BE;
+            u16 *ground = &actor->base.groundHeight;
             *ground = groundHeight;
             offset = (u16)actor->base.body.position.y - groundHeight;
             actor->base.field2EA = offset;

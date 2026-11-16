@@ -130,14 +130,14 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+    script = (u16)((struct RoomActor *)actor)->script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-        values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-        values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
         values[6] = (s32)actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;

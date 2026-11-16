@@ -153,7 +153,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         Reaction_ClearMotionBits(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
-        actor->base.field2B6 =
+        actor->base.reactionDirection =
             (Reaction_ThirtySecond((Reaction_GetDirection(actor) + 128) & 255) + 7) & 7;
     } else {
         actor->base.field2B8--;

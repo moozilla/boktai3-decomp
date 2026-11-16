@@ -462,14 +462,14 @@ void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
         ((struct ActorSprite *)actor->base.drawable)->flags |= 1;
         ActorShadow_Disable(actor->base.shadow);
         SceneActorBehavior_CallTerrainScript(actor);
-        script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;
+        script = (u16)((struct RoomActor *)actor)->script1F8;
         if (script) {
             values[0] = actor->base.body.position.x;
             values[1] = actor->base.body.position.y;
             values[2] = actor->base.body.position.z;
-            values[3] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[0];
-            values[4] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[1];
-            values[5] = ((struct SceneActorBehaviorView *)actor)->parameters1FC[2];
+            values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
+            values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
+            values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
             values[6] = actor->base.field2E0;
             values[7] = actor->base.body.id;
             arguments.count = 8;
@@ -615,7 +615,7 @@ void Mimic_OnAttackContact(u8 *unused, struct ContactCollider *obj, struct Chase
     int mask;
     u32 *flags;
     if ((SceneActor_ActionsBlocked(ctx) == 0) && (obj->contactFlags & 0xF)) {
-        ctx->base.field304 = obj->collisionId;
+        ctx->base.counter304 = obj->collisionId;
         flags = &ctx->base.flags2D0;
         mask = 0xFEFFFFFF;
         *flags &= mask;
@@ -952,10 +952,10 @@ s32 SceneActor_AcquireCollisionTarget(struct ChaseActor *actor)
     s32 d;
     if (!motionFlag(actor))
         goto zero;
-    if ((s32)actor->base.field304 > 0) {
+    if ((s32)actor->base.counter304 > 0) {
         setTargetFlags(actor);
         actor->base.tracking.target =
-            (u32)SceneActorContacts_FindObjectById((u16)actor->base.field304);
+            (u32)SceneActorContacts_FindObjectById((u16)actor->base.counter304);
         return 1;
     }
     if (collisionMode()) {
@@ -1267,7 +1267,7 @@ static inline void MimicInit_InitializeBody(void *object, u32 *fill)
     MonsterInit_ReadTargeting(&arg0->base.tracking);
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
-    arg0->base.field1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
+    arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
     arg0->base.field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
 
     if (Script_SeekToKeyword('A')) {
@@ -1385,10 +1385,10 @@ s32 Mimic_Init(void *object)
         actor->base.body.position.y = MonsterInit_ReadHalfword(0);
         actor->base.body.position.z = MonsterInit_ReadHalfword(0);
         MimicInit_InitializeTerrainCell(actor, MonsterInit_CellIndex(&actor->base.body.position));
-        actor->base.groundHeight2BE = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
-                                                                &actor->base.body.position);
+        actor->base.groundHeight = MonsterInit_TerrainHeight(MonsterInit_GetTerrainCell(actor),
+                                                             &actor->base.body.position);
         actor->base.field2EA = 0;
-        actor->base.body.position.y = actor->base.groundHeight2BE;
+        actor->base.body.position.y = actor->base.groundHeight;
         MonsterInit_DrawablePosition(actor);
     }
     ((struct Mimic *)instance)->origin = actor->base.body.position;

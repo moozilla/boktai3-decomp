@@ -54,8 +54,8 @@ u8 SceneActorReaction_TrySink(struct ChaseActor *actor)
 {
     if (actor && !Blocked(actor) && actor->base.enabled == 1) {
         u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->base.terrainCell) + 2);
-        if (cellFlags & 0x40 && actor->base.body.position.y + (s16)actor->base.field2EA <=
-                                    actor->base.groundHeight2BE) {
+        if (cellFlags & 0x40 &&
+            actor->base.body.position.y + (s16)actor->base.field2EA <= actor->base.groundHeight) {
             void *sink = *(void **)((u8 *)actor + 0x238);
             if (!sink)
                 SetControl(actor, SceneActorReaction_SinkAndRemove, 0x16);

@@ -7,7 +7,7 @@ struct SceneActorTargetLink {
     u8 unknownE0[0xB];
     u8 flags;
 };
-void SceneActorTarget_ResetContactResponse(struct SceneActorBehaviorView *);
+void SceneActorTarget_ResetContactResponse(struct RoomActor *);
 static inline u8 TargetHasFlag(struct SceneActorTargetLink *state)
 {
     u32 mask = 2;

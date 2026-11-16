@@ -120,7 +120,7 @@ static inline u16 MonsterInit_GetInitialHealth(struct ChaseActor *actor)
 }
 static inline u16 MonsterInit_GetGroundHeight(struct ChaseActor *actor)
 {
-    return actor->base.groundHeight2BE;
+    return actor->base.groundHeight;
 }
 static inline u32 MonsterInit_GetPaletteBase(struct ChaseActor *actor)
 {
@@ -333,7 +333,7 @@ static inline void MonsterInit_InitializeRegion(struct ChaseActor *actor)
 }
 static inline void MonsterInit_ClearReceiver(struct ChaseActor *actor)
 {
-    actor->base.field304 = 0;
+    actor->base.counter304 = 0;
 }
 static inline void MonsterInit_InitializeReceiver(struct ChaseActor *actor)
 {

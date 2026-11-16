@@ -53,14 +53,14 @@ void SceneActorMovement_UpdateHeight(struct SceneActorRegistryActor *actor)
         u32 mask = 0x4000;
         if (!(actor->flags2D4 & mask) && IsPlayerRelativeCategory(category)) {
             u32 height = (u16)gPlayers[0]->position.y;
-            ((struct ChaseActor *)actor)->base.groundHeight2BE = height;
+            ((struct ChaseActor *)actor)->base.groundHeight = height;
         } else {
             u32 height = TerrainHeight(actor, ((struct ChaseActor *)actor)->base.terrainCell);
-            ((struct ChaseActor *)actor)->base.groundHeight2BE = height;
+            ((struct ChaseActor *)actor)->base.groundHeight = height;
         }
     }
     if (!HasSceneFlag(actor, 0x20)) {
-        u16 height = ((struct ChaseActor *)actor)->base.groundHeight2BE;
+        u16 height = ((struct ChaseActor *)actor)->base.groundHeight;
         actor->position.y = height;
         actor->position.y = height + ((struct ChaseActor *)actor)->base.field2EA;
     }

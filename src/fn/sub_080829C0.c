@@ -2,7 +2,7 @@
 #include "scene_actor_control_motion.h"
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
-                                             struct SceneActorBehaviorView *);
+                                             struct RoomActor *);
 
 void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactView *source,
                                               struct SceneActorBehaviorContactView *destination,
