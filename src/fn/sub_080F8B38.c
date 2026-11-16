@@ -1,7 +1,7 @@
 #include "global.h"
 #include "rotation_phase.h"
 
-void SceneActorControl_RecoverRotation(void);
+void SceneActorControl_RecoverRotation(struct ChaseActor *actor, s32 elapsed);
 static inline s32 FoldAngle(s32 a)
 {
     if (a > 128)

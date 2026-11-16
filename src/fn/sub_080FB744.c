@@ -3,15 +3,14 @@
 
 struct AxePaletteTransition {
     u16 colors[16];
-    u16 remaining;
-    u16 unk_22;
+    u16 remaining, destinationBank;
     s16 red[16], green[16], blue[16];
     s16 deltaRed[16], deltaGreen[16], deltaBlue[16];
 };
 struct AxePaletteContext {
-    u8 unk_0[0x624];
+    u8 unk_00[0x624];
     struct AxePaletteTransition transition;
-    u8 unk_708[0x744];
+    u8 unk_708[0xE4C - 0x708];
     u32 flags;
 };
 void Axe_SetAuxiliarySpriteResource(struct ChaseActor *, const u16 *);
@@ -20,7 +19,7 @@ static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
 {
     return *field & mask;
 }
-static inline u8 Axe_TestFlags(u32 value, u32 mask)
+static inline u8 Axe_TestFlags_UpdatePaletteTransition(u32 value, u32 mask)
 {
     if (value & mask)
         return 1;
@@ -65,7 +64,7 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return 0;
     context = actor->base.context;
-    if (!Axe_TestFlags(Axe_ReadMaskedFlags(2, &context->flags), ~0))
+    if (!Axe_TestFlags_UpdatePaletteTransition(Axe_ReadMaskedFlags(2, &context->flags), ~0))
         return 0;
     p = &context->transition;
     if (!p->remaining) {

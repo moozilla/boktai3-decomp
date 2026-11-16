@@ -3,15 +3,15 @@
 #include "scene_actor_control_phase.h"
 void Sound_PlaySong(u32);
 void ActorShadow_Disable(void *);
-void ActorPhase_EmitTrailSprite(void *, void *, u32);
-void Axe_UpdateTrailColliders(void *);
+void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position, u32 angle);
+void Axe_UpdateTrailColliders(u8 *actor);
 void Axe_UpdateAttackColliderPositions(void *);
 void Axe_ReleaseAuxiliarySprite(void *);
-static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
 {
-    a->base.state2A8 = state;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
+    a->base.state2A8 = s;
+    a->base.phase2A9 = p;
+    a->base.behavior2AA = b;
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }

@@ -20,7 +20,7 @@ struct AxeAttackTrailContext {
     u8 variant;
 };
 void Collider_SetBodyProperties(void *, u16, u32, u32);
-void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
 void Axe_LatchColliderContact(void);
 void Axe_OnSecondaryColliderContact(void);
 u32 Shadow_Initialize(void *, void *, s32);

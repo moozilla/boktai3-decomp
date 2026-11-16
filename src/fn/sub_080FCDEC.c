@@ -20,9 +20,9 @@ static inline u8 Axe_TestMaskedFlags(u32 value)
         return 1;
     return 0;
 }
-static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *flags)
+static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
 {
-    return *flags & mask;
+    return *field & mask;
 }
 struct AxeAttackSelection {
     u32 *flags;

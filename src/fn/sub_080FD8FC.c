@@ -20,7 +20,7 @@ static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;
 }
-static inline void Restart(struct ChaseActor *actor)
+static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 {
     u8 zero8;
     u32 zero;
@@ -75,7 +75,7 @@ void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
         context->fieldEBE = context->fieldEC6;
     }
     if (actor->base.stepDone) {
-        Restart(actor);
+        Restart_UpdateControl2APhase(actor);
     } else {
         ++actor->base.counter2AC;
     }

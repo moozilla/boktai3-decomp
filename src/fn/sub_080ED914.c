@@ -21,7 +21,7 @@ u32 Ivy_GetAnimationStatus(struct ChaseActor *);
 void Ivy_UpdateActiveState(void);
 extern s16 *gLinkSession;
 
-struct IvyTarget {
+struct IvyTargetUpdateHold {
     u8 unknown0[8];
     u8 kind;
     u8 unknown9[0x33];
@@ -203,7 +203,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     struct Ivy *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
-    struct IvyTarget *target;
+    struct IvyTargetUpdateHold *target;
     u8 quadrant, flip;
     struct ContactPosition position;
     s32 index;

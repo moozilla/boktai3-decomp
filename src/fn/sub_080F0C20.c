@@ -19,7 +19,7 @@ void SceneActor_InitCollision5005(void *);
 void Ivy_InitControlPresets(void *);
 void SceneActor_BeginReaction22(void *);
 void Ivy_UpdateInteraction(void);
-void Ivy_Destroy(void);
+u32 Ivy_Destroy(struct SDestroy *s);
 extern const u8 gUnk_08606400[];
 
 void Memory_Clear(void *, u32);

@@ -4,9 +4,9 @@ struct S080FC844 {
     u8 filler[0x3d0];
     u8 *q;
 };
-void Collider_Remove(u8 *);
+void Collider_Remove(void *);
 void Shadow_Destroy(u8 *);
-void Sprite_Remove(u8 *);
+void Sprite_Remove(void *);
 
 void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
 {

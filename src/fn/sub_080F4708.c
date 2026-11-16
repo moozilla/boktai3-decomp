@@ -23,7 +23,7 @@ struct SwordContactOwner {
     u8 unknownD1C[0x3C];
     u16 palette;
 };
-struct SwordComponent {
+struct SwordComponent080F4708 {
     u8 pad0[0xc];
     u8 *animation;
     u8 pad10[0x52 - 0x10];
@@ -79,7 +79,7 @@ static inline u32 Sword_ContactFlags(struct SwordContact *contact, u32 mask)
 {
     return contact->contactFlags & mask;
 }
-static inline void Sword_SetChildState(struct SwordComponent *child, u8 active, u8 phase)
+static inline void Sword_SetChildState(struct SwordComponent080F4708 *child, u8 active, u8 phase)
 {
     child->active = active;
     child->phase = phase;
@@ -92,13 +92,13 @@ static inline void Sword_ContactDisplacement(struct SceneVec *out, const struct 
     out->y = source->y - target->y;
     out->z = source->z - target->z;
 }
-static inline u32 Sword_GetPhase(struct SwordComponent *child, u8 **field)
+static inline u32 Sword_GetPhase(struct SwordComponent080F4708 *child, u8 **field)
 {
     u32 value = child->phase;
     *field = &child->phase;
     return value;
 }
-static inline void Sword_BeginContactReturn(struct SwordComponent *child, u8 *phaseField)
+static inline void Sword_BeginContactReturn(struct SwordComponent080F4708 *child, u8 *phaseField)
 {
     u32 phase = *phaseField;
     if (phase == 2) {
@@ -113,7 +113,7 @@ static inline void Sword_BeginContactReturn(struct SwordComponent *child, u8 *ph
     }
 }
 void sub_080F4708(struct SwordContact *source, struct SwordContact *target,
-                  struct SwordComponent *child)
+                  struct SwordComponent080F4708 *child)
 {
     struct SceneVec displacement;
     s16 *health;

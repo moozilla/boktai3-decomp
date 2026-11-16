@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct S {
+struct SInitBobbing {
     u8 filler[0x64];
     u16 h64;
     u16 h66;
@@ -13,7 +13,7 @@ struct S {
     u32 cnt;
 };
 
-void Ivy_InitBobbing(struct S *s)
+void Ivy_InitBobbing(struct SInitBobbing *s)
 {
     s->h64 = 0;
     s->h66 = 0;

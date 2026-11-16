@@ -5,9 +5,9 @@
 
 // confidence=low: after the wait, selects a route point and starts the stored movement spline.
 
-void Axe_SelectRandomRoutePoint(void *);
-void Axe_SetMovementEndpoints(void *, void *);
-void sub_080FAA5C(void *);
+void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s);
+void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d);
+u8 sub_080FAA5C(struct ChaseActor *actor);
 
 struct AxeVec {
     s16 x, y, z;
@@ -20,13 +20,12 @@ struct AxeGroup {
     u16 field44;
     u8 unknown46[0x36];
     struct AxeRoutePoint *point;
-    u32 has;
 };
 struct AxeLink {
     u8 unknown0[8];
     struct AxeRoutePoint *point;
 };
-static inline u32 CellIndex(s32 x, s32 z)
+static inline u32 CellIndex_UpdateRouteDestinationPhase(s32 x, s32 z)
 {
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0;
@@ -58,7 +57,7 @@ slopeX:
 done:
     return height;
 }
-static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior, u32 counter)
+static inline void SetState_UpdateRouteDestinationPhase(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior, u32 counter)
 {
     actor->base.state2A8 = state;
     actor->base.phase2A9 = phase;
@@ -92,12 +91,12 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
         {
             s32 cellX = target->x >> 8, cellZ = target->z >> 8;
             copy = target;
-            target->y = CellHeight(target, CellIndex(cellX, cellZ));
+            target->y = CellHeight(target, CellIndex_UpdateRouteDestinationPhase(cellX, cellZ));
         }
         zero = 0;
         Axe_SetMovementEndpoints(actor, copy);
         sub_080FAA5C(actor);
-        SetState(actor, 0, 0, 1, zero);
+        SetState_UpdateRouteDestinationPhase(actor, 0, 0, 1, zero);
         {
             struct AxeVec *position = (struct AxeVec *)(&actor->base.body.position);
             target = &targetStorage;

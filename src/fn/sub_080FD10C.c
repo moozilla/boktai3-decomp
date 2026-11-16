@@ -1,8 +1,8 @@
 #include "global.h"
 
-void SceneActorControl_UpdateHoverHeight(void *);
-void Axe_UpdateRouteWander(void *);
-void sub_080FB30C(void *);
+void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor);
+void Axe_UpdateRouteWander(struct ChaseActor *actor);
+void sub_080FB30C(struct ChaseActor *actor);
 
 s32 Axe_PrepareUpdate(void *p)
 {

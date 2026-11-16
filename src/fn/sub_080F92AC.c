@@ -2,7 +2,7 @@
 #include "global.h"
 #include "rotation_phase.h"
 s32 Div(s32, s32);
-void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *, void *, u32);
+void Axe_SetAuxiliarySpriteRenderState(struct S080FB958 *s, u32 x, u32 y);
 void SceneActorControl_ResetRotation(struct ChaseActor *actor)
 {
     u8 *state = actor->base.context;

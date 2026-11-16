@@ -1,9 +1,9 @@
 #include "global.h"
 
-u32 Callback_InvokeActor(void *, u32);
+s32 Callback_InvokeActor(void *, void *);
 void ColorPulse_PrepareTargetDash(void);
 
-struct S {
+struct SWaitForPrimaryActionCompletion {
     u8 filler[0xcd8];
     void (*fp)(void);
     u8 f2[0xcf0 - 0xcdc];
@@ -12,7 +12,7 @@ struct S {
     s8 b;
 };
 
-void Ivy_WaitForPrimaryActionCompletion(struct S *s)
+void Ivy_WaitForPrimaryActionCompletion(struct SWaitForPrimaryActionCompletion *s)
 {
     u32 v = s->v;
     if (v != 0) {

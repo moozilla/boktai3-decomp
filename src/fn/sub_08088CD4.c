@@ -15,7 +15,7 @@ void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
-struct BatDrawable {
+struct BatDrawableUpdateDefeat {
     u32 flags;
     u8 unknown4[4];
     u8 alpha8, alpha9;
@@ -59,7 +59,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     struct ContactPackedVector rangeA;
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
-    struct BatDrawable *drawable = actor->base.drawable;
+    struct BatDrawableUpdateDefeat *drawable = actor->base.drawable;
     u8 *anim = drawable->anim;
     u16 script;
     if (SceneActorReaction_TakePrepared(actor)) {

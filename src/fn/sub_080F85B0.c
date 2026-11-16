@@ -5,7 +5,7 @@ struct AxeTrailSprite {
     u8 pad4[2];
     u8 field6;
 };
-void Axe_EmitMotionTrail(void *);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
 void Axe_UpdateReturningTrail(void);
 
 void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame)

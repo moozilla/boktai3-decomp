@@ -8,12 +8,12 @@ struct P {
     const u8 *a;
     u32 pad;
 };
-struct S {
+struct SInitControlPresets {
     u8 filler[0x284];
     struct P p[3];
 };
 
-void Ivy_InitControlPresets(struct S *s)
+void Ivy_InitControlPresets(struct SInitControlPresets *s)
 {
     s->p[0].a = gUnk_086063E4;
     s->p[1].a = gUnk_086063D4;

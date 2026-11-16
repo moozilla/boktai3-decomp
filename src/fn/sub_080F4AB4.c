@@ -18,7 +18,7 @@ struct PhaseActor {
     u8 unknown18B[4];
     u8 phaseStep;
 };
-void Ivy_BeginChildPulse(void);
+void Ivy_BeginChildPulse(struct A *p);
 void IvyChild_UpdateAfterBob(void);
 void ActorPhase_ApproachNeutral(struct PhaseActor *p)
 {

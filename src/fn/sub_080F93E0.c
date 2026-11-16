@@ -3,7 +3,7 @@
 
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
-void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
+void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b);
 static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
@@ -53,8 +53,8 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
 }
 
 #define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
-void Anim_SetDurationScale(void *, u16);
-void Anim_SetFrameDurationScale(void *, u16);
+void Anim_SetDurationScale(void *, u32);
+void Anim_SetFrameDurationScale(void *, u32);
 static inline u8 Take(u8 *p)
 {
     if (*p) {

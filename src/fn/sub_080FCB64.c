@@ -49,7 +49,7 @@ static inline void ClearCollider(struct ContactCollider *collider, u32 mask)
 {
     collider->flags &= ~mask;
 }
-static inline s32 Scale(s32 value)
+static inline s32 Scale_UpdateBodyColliders(s32 value)
 {
     s32 result;
     if (value >= 0)
@@ -112,11 +112,11 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale(offset.x * gUnk_086149C4[(drawable->angle + 64) & 255]);
-        z = Scale(offset.z * gUnk_086149C4[drawable->angle]);
+        x = Scale_UpdateBodyColliders(offset.x * gUnk_086149C4[(drawable->angle + 64) & 255]);
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[drawable->angle]);
         position.v.x = x + z + position.p.x;
-        x = Scale(-(offset.x * gUnk_086149C4[drawable->angle]));
-        z = Scale(offset.z * gUnk_086149C4[(drawable->angle + 64) & 255]);
+        x = Scale_UpdateBodyColliders(-(offset.x * gUnk_086149C4[drawable->angle]));
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[(drawable->angle + 64) & 255]);
         position.v.z = x + z + position.p.z;
         if (index == 0) {
             Collider_SetPosition(&actor->body, &position, 0);

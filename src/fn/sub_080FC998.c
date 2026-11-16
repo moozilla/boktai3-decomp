@@ -2,7 +2,7 @@
 #include "contact_actor.h"
 void CpuSet(const void *, void *, u32);
 extern const s16 gUnk_086149C4[];
-static inline s32 Scale(s32 x)
+static inline s32 Scale_UpdateTrailColliders(s32 x)
 {
     s32 result;
     if (x >= 0)
@@ -55,11 +55,11 @@ void Axe_UpdateTrailColliders(u8 *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale(offset.x * gUnk_086149C4[(entry[6] + 64) & 255]);
-        z = Scale(offset.z * gUnk_086149C4[entry[6]]);
+        x = Scale_UpdateTrailColliders(offset.x * gUnk_086149C4[(entry[6] + 64) & 255]);
+        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[entry[6]]);
         position.v.x = x + z + position.p.x;
-        x = Scale(-(offset.x * gUnk_086149C4[entry[6]]));
-        z = Scale(offset.z * gUnk_086149C4[(entry[6] + 64) & 255]);
+        x = Scale_UpdateTrailColliders(-(offset.x * gUnk_086149C4[entry[6]]));
+        z = Scale_UpdateTrailColliders(offset.z * gUnk_086149C4[(entry[6] + 64) & 255]);
         position.v.z = x + z + position.p.z;
         Collider_SetPosition(ctx + 0x928 + i * 0x54, &position, 0);
         Collider_Refresh(ctx + 0x928 + i * 0x54);

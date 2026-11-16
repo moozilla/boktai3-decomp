@@ -10,14 +10,14 @@ s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 
-struct IvyTarget {
+struct IvyTargetReleaseCapturedPlayer {
     u8 unknown0[8];
     u8 kind;
     u8 unknown9[0x33];
     struct Player *player;
 };
 
-static inline u8 TestFlags(struct Ivy *context, u32 maskInput)
+static inline u8 TestFlags_ReleaseCapturedPlayer(struct Ivy *context, u32 maskInput)
 {
     u32 mask = maskInput;
     if (context->captureFlags & mask)
@@ -44,8 +44,7 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 
 static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
-    u32 state = s;
-    actor->base.state2A8 = state;
+    actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
     actor->base.behavior2AA = b;
     actor->base.counter2AC = 0;
@@ -72,9 +71,9 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
  * actor's quadrant (cue 0xE6); then returns the actor to idle with both colliders disabled. */
 void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
 {
-    if (TestFlags(actor->base.context, 1))
+    if (TestFlags_ReleaseCapturedPlayer(actor->base.context, 1))
         return;
-    if (TestFlags(actor->base.context, 2)) {
+    if (TestFlags_ReleaseCapturedPlayer(actor->base.context, 2)) {
         struct SceneVec position;
         s32 angle;
         CellCenter(&position, actor->base.terrainCell);
@@ -83,7 +82,7 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
         }
         {
-            struct IvyTarget *target = (void *)actor->base.tracking.target;
+            struct IvyTargetReleaseCapturedPlayer *target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
                 Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
                 Sound_PlaySong(0xE6);

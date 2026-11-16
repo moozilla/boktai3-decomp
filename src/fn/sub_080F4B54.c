@@ -2,7 +2,7 @@
 #include "engine_globals.h"
 #include "ram.h"
 
-struct P {
+struct PBeginChildRandomDelay {
     u8 f[0x170];
     void (*cb)(void);
     u8 g[0x184 - 0x174];
@@ -10,7 +10,7 @@ struct P {
 };
 void ActorPhase_OrbitParent(void);
 
-void Ivy_BeginChildRandomDelay(struct P *p)
+void Ivy_BeginChildRandomDelay(struct PBeginChildRandomDelay *p)
 {
     u32 v;
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;

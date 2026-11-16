@@ -1,6 +1,6 @@
 #include "global.h"
 
-void SceneActorAnimation_SelectProfileEntry(void *, u32);
+void SceneActorAnimation_SelectProfileEntry(struct RoomActor *, s32);
 
 // A bool8 (u8) result from an inline helper keeps the materialised 0/1 and
 // the second test; an int result gets jump-threaded away.

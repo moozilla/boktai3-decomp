@@ -5,10 +5,10 @@
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
-void Axe_EmitMotionTrail(void *);
-void sub_080FC094(void *, s32);
-void Axe_SetAuxiliarySpriteRenderState(void *, void *, u32);
-void SceneActorControl_FinishRotation(void);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
+void sub_080FC094(struct ChaseActor *actor, s32 count);
+void Axe_SetAuxiliarySpriteRenderState(struct S080FB958 *s, u32 x, u32 y);
+void SceneActorControl_FinishRotation(struct ChaseActor *actor, s32 elapsed);
 static inline s32 Axe_ShiftSigned(s32 v)
 {
     return v >= 0 ? v >> 6 : -(-v >> 6);

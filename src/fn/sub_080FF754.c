@@ -1,9 +1,9 @@
 #include "global.h"
 
-u8 *Heap_Alloc(u32);
-void Memory_Clear(u8 *, u32);
+void *Heap_Alloc(u32);
+void Memory_Clear(void *, u32);
 s32 Axe_Init(u8 *);
-void Axe_ReleaseResources(u8 *);
+s32 Axe_ReleaseResources(void *p);
 void Heap_Free(u8 *);
 
 void Axe_Create(void)

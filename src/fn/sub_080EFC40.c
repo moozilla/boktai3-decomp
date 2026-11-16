@@ -1,6 +1,6 @@
 #include "global.h"
 
-void Collider_SetPosition(void *, void *, s32);
+void Collider_SetPosition(void *, void *, u32);
 
 s32 Ivy_UpdateColliderPosition(u8 *s)
 {

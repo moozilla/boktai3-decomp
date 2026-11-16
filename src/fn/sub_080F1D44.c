@@ -17,7 +17,7 @@ static inline u16 color(struct Obj *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
-void SceneActor_LowerColorRedPeak(struct Obj *);
+s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor);
 void Ivy_WaitForColorRelease(struct Obj *);
 s32 Ivy_UpdateRedBrightening(struct Obj *p)
 {

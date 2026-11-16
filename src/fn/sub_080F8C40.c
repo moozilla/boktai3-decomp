@@ -4,9 +4,9 @@
 
 void Sound_PlaySong(u32);
 s32 Mod(s32, s32);
-void Axe_EmitMotionTrail(struct ChaseActor *);
-void sub_080FC094(struct ChaseActor *, s32);
-void SceneActorControl_FinishRotation(void);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
+void sub_080FC094(struct ChaseActor *actor, s32 count);
+void SceneActorControl_FinishRotation(struct ChaseActor *actor, s32 elapsed);
 static inline s32 FoldRotation(s32 a)
 {
     if (a > 128)

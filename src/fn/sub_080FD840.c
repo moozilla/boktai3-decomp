@@ -8,7 +8,7 @@ struct SceneActorExtendedControlContext {
     u8 unknownE50[0x81];
     u8 fieldED1;
 };
-void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *, void *, u32);
+void Axe_SetAuxiliarySpriteRenderState(struct S080FB958 *s, u32 x, u32 y);
 static inline u16 Mask16(u16 *p, u32 m)
 {
     return *p & m;

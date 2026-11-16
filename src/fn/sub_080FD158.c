@@ -4,7 +4,7 @@
 #include "scene_actor_reset.h"
 void Axe_UpdateFadeOut(void);
 void ActorPhase_UpdateSpriteCollapse(void);
-void Axe_EmitMotionTrail(struct ChaseActor *);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
 void SpriteGroup_SetSharedPosition(struct ChaseActor *, void *, u32);
 static inline u8 TakePending(struct ChaseActor *actor)
 {

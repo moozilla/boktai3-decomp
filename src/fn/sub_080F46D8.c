@@ -1,7 +1,7 @@
 #include "global.h"
 
 extern void (*gUnk_08606434[])(void);
-void Callback_InvokeActor(u8 *, void *);
+s32 Callback_InvokeActor(void *, void *);
 
 void Ivy_DispatchState(u8 *p)
 {

@@ -6,7 +6,7 @@ struct P {
     u8 g[0xcd0 - 0xccc];
     void *b;
 };
-void Callback_InvokeActor(void *, void *);
+s32 Callback_InvokeActor(void *, void *);
 void Ivy_UpdateGroundHeight(void *);
 
 void Ivy_UpdateActions(struct P *p)

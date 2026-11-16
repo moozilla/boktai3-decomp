@@ -16,14 +16,14 @@ static inline u8 tst(u16 *a, u32 m)
         return 1;
     return 0;
 }
-struct S {
+struct SDestroy {
     u8 f0[4];
     u8 *p4;
     u8 b8;
     u8 f1[0x2b7];
     u16 h2c0;
 };
-u32 Ivy_Destroy(struct S *s)
+u32 Ivy_Destroy(struct SDestroy *s)
 {
     u8 *p = s->p4;
     u8 *q;

@@ -1,5 +1,5 @@
 #include "scene_actor_animation.h"
-void Axe_GetDirectionalFrame(u8, u32 *, u32 *);
+void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b);
 static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;

@@ -9,7 +9,7 @@ struct AxePlayer {
     u8 pad[0x30];
     struct ContactPosition position;
 };
-void Axe_EmitMotionTrail(struct ChaseActor *);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
 s32 Math_Atan2(s32, s32);
 s32 Mod(s32, s32);
 struct AxeRoute {
@@ -20,17 +20,17 @@ struct AxeRoute {
     u8 padEA5[0xF14 - 0xEA5];
     struct ContactPosition motion;
 };
-static inline s32 Scale(s32 n)
+static inline s32 Scale(s32 value)
 {
-    if (n >= 0)
-        return n >> 12;
-    return -((-n) >> 12);
+    if (value >= 0)
+        return value >> 12;
+    return -(-value >> 12);
 }
-static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
+static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
-    out->x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-    out->y = 0;
-    out->z = Scale(gUnk_086149C4[angle & 255] * speed);
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+    v->y = 0;
+    v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
                          const struct ContactPosition *to)
@@ -47,7 +47,7 @@ static inline u32 RandomFirst(u32 bits)
     value = *(const u16 *)(index + RANDOM_TABLE_ADDR);
     return value & bits;
 }
-static inline u16 Random(void)
+static inline u16 Random_FollowAcceleratingRoute(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(const u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
@@ -116,7 +116,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
         actor->base.body.position.z = route->points[8].z;
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
-        Polar(&delta, Facing(Random(), &actor->base.tracking.heading) & 255, 256);
+        Polar(&delta, Facing(Random_FollowAcceleratingRoute(), &actor->base.tracking.heading) & 255, 256);
         target.x += delta.x;
         target.z += delta.z;
         Delta(&delta, &actor->base.body.position, &target);

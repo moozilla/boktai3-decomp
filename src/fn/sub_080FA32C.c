@@ -2,20 +2,17 @@
 u8 Axe_PickAttack(void *);
 void ActorPhase_UpdateSpriteCollapse(void);
 extern const s16 gUnk_086149C4[];
-static inline s32 Scale(s32 x)
+static inline s32 Scale(s32 value)
 {
-    s32 r;
-    if (x >= 0)
-        r = x >> 12;
-    else
-        r = -(-x >> 12);
-    return r;
+    if (value >= 0)
+        return value >> 12;
+    return -(-value >> 12);
 }
-static inline void Polar(struct ContactPosition *v, s32 angle, s32 speed)
+static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
-    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+    v->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
-    v->z = Scale(gUnk_086149C4[angle & 255] * speed);
+    v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
@@ -31,13 +28,13 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     }
     actor->base.pendingControl = 0;
 }
-static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
 {
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
+    a->base.state2A8 = s;
+    a->base.phase2A9 = p;
+    a->base.behavior2AA = b;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 // confidence=low: speed and phase duration depend on remaining health.
 void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)

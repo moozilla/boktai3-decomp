@@ -2,7 +2,7 @@
 
 u32 Terrain_GetHeightAt(void *);
 
-struct S {
+struct SUpdateGroundHeight {
     u8 filler[0xb84];
     u8 a[0xd00 - 0xb84];
     u32 v;
@@ -10,7 +10,7 @@ struct S {
     s32 n;
 };
 
-void Ivy_UpdateGroundHeight(struct S *s)
+void Ivy_UpdateGroundHeight(struct SUpdateGroundHeight *s)
 {
     if (s->n > 7)
         s->v = (u16)Terrain_GetHeightAt(s->a);

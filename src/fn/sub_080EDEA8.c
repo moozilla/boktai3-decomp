@@ -10,7 +10,7 @@ s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 
-struct IvyTarget {
+struct IvyTargetBeginRelease {
     u8 unknown0[8];
     u8 kind;
     u8 unknown9[0x33];
@@ -54,7 +54,7 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
-            struct IvyTarget *target = (void *)actor->base.tracking.target;
+            struct IvyTargetBeginRelease *target = (void *)actor->base.tracking.target;
             struct SceneVec position;
             u8 angle;
             CellCenter(&position, actor->base.terrainCell);

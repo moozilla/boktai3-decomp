@@ -28,7 +28,7 @@ static inline u8 TakeReset(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void SetStateB(struct ChaseActor *actor)
+static inline void SetStateB_080F0064(struct ChaseActor *actor)
 {
     u32 two = 2;
     u8 *field = &actor->base.state2A8;
@@ -49,6 +49,6 @@ void sub_080F0064(struct ChaseActor *actor)
     TakeReset(actor);
     if (actor->base.stepDone) {
         SetControl(actor, Ivy_UpdateActiveState, 0x22);
-        SetStateB(actor);
+        SetStateB_080F0064(actor);
     }
 }

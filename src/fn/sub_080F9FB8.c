@@ -3,7 +3,7 @@
 #include "player.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void Axe_EmitMotionTrail(void *);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
 extern const s16 gUnk_086149C4[];
 static inline s32 Normalize(s32 a)
 {
@@ -14,14 +14,11 @@ static inline s32 Normalize(s32 a)
         r += 256;
     return r;
 }
-static inline s32 Scale(s32 x)
+static inline s32 Scale(s32 value)
 {
-    s32 r;
-    if (x >= 0)
-        r = x >> 12;
-    else
-        r = -(-x >> 12);
-    return r;
+    if (value >= 0)
+        return value >> 12;
+    return -(-value >> 12);
 }
 static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
 {

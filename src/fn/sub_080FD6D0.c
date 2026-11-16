@@ -1,7 +1,7 @@
 #define SpriteGroup_SetSharedPosition Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
 #include "scene_actor_reset.h"
-struct ActorGroupMotionState {
+struct ActorGroupMotionStateBeginExtendedMotion {
     u8 unknown0[0x8A8];
     struct ContactPosition position;
     u8 unknown890[0x59c];
@@ -50,7 +50,7 @@ static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 
 }
 void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionState *group = actor->base.context;
+    struct ActorGroupMotionStateBeginExtendedMotion *group = actor->base.context;
     if (TakePending(actor)) {
         BeginControl(actor, Axe_UpdateTrailFadeIn, 0x27);
         {

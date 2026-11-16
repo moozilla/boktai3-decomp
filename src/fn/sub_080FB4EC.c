@@ -25,7 +25,7 @@ struct S080FB4EC_Actor {
     u8 unk1E8[0x3D0 - 0x1E8];
     struct S080FB4EC_Ctx *context;
 };
-void AnimData_SelectPaletteBank(void *, u32 animation);
+void AnimData_SelectPaletteBank(void *, s32);
 
 // scope shape 2 (differences once low registers are set aside)
 // confidence=low: steps the Axe palette-fade state machine in the context and selects a palette bank when one is queued.

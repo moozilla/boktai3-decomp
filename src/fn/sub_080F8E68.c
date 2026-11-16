@@ -4,7 +4,7 @@
 #include "player.h"
 // confidence=low: saves the player position and turns the axe before the attack callback.
 void Sound_PlaySong(u32);
-void Axe_UpdateTargetLunge(void);
+void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame);
 void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
 {
     struct Axe *state = actor->base.context;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void SceneActorAnimation_SelectDirectionalEntry(void *, u32);
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
 struct Seq {
     u8 pad0[7];

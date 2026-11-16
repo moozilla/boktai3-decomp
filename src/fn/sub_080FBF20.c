@@ -4,7 +4,7 @@ struct S080FBF20 {
     u8 filler[0x3d0];
     u8 *q;
 };
-void Sprite_Remove(u8 *);
+void Sprite_Remove(void *);
 
 void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s)
 {

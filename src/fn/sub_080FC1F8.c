@@ -11,7 +11,7 @@ s32 Mod(s32, s32);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 extern const s16 gUnk_086149C4[];
 
-static inline s32 Scale(s32 x)
+static inline s32 Scale_080FC1F8(s32 x)
 {
     s32 result;
     if (x >= 0)
@@ -21,9 +21,9 @@ static inline s32 Scale(s32 x)
     return result;
 }
 
-inline static void CpuSet_2(int control, struct ContactPosition *dest, u32 *source)
+inline static void CpuSet_2(int a2, struct ContactPosition *a1, u32 *a0)
 {
-    CpuSet(source, dest, control);
+    CpuSet(a0, a1, a2);
 }
 
 void sub_080FC1F8(struct ChaseActor *actor, struct ContactPosition *origin, s32 angle, s32 frame)
@@ -77,10 +77,10 @@ void sub_080FC1F8(struct ChaseActor *actor, struct ContactPosition *origin, s32 
                 context->sparkStep = 0;
                 break;
         }
-        x = Scale(offset.x * gUnk_086149C4[(angle + 64) & 255]);
-        z = Scale(offset.z * gUnk_086149C4[angle & 255]);
+        x = Scale_080FC1F8(offset.x * gUnk_086149C4[(angle + 64) & 255]);
+        z = Scale_080FC1F8(offset.z * gUnk_086149C4[angle & 255]);
         position.v.x = x + z + position.p.x;
-        x2 = Scale(-(offset.x * gUnk_086149C4[angle & 255]));
+        x2 = Scale_080FC1F8(-(offset.x * gUnk_086149C4[angle & 255]));
         z = offset.z * gUnk_086149C4[(angle + 64) & 255];
         if (z >= 0)
             z >>= 12;

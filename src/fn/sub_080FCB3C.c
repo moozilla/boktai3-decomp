@@ -4,7 +4,7 @@ struct S080FCB3C {
     u8 filler[0x3d0];
     u8 *q;
 };
-void Collider_Remove(u8 *);
+void Collider_Remove(void *);
 
 void Axe_RemoveSecondaryColliders(struct S080FCB3C *s)
 {

@@ -17,10 +17,10 @@ struct ArmorPart {
     u8 collider9C[0xC4];
     struct {
         u8 pad[0x60];
-        struct ArmorScene *scene;
+        struct ArmorSceneUpdatePartColliders_080F2260 *scene;
     } *owner;
 };
-struct ArmorScene {
+struct ArmorSceneUpdatePartColliders_080F2260 {
     u8 pad0[0x32];
     s16 height;
 };

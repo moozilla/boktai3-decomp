@@ -8,7 +8,7 @@ struct SceneActorReactionCountContext {
     u8 unknownEB1[0x23];
     u16 fieldED4;
 };
-static inline u8 TestFlag(u32 mask, u32 *flags)
+static inline u8 TestFlag_AdvanceReactionCount(u32 mask, u32 *flags)
 {
     if (*flags & mask)
         return 1;
@@ -35,7 +35,7 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
     if (context->reactionCount <= 2)
         ++context->reactionCount;
     if (!MaskFlags(flags, 0x8100)) {
-        u32 blocked = TestFlag(4, &context->flagsE4C);
+        u32 blocked = TestFlag_AdvanceReactionCount(4, &context->flagsE4C);
         if (!blocked && context->reactionCount > 2) {
             u32 phase = 2;
             u32 behavior = 6;

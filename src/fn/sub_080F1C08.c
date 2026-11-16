@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct P {
+struct PInitColorTransition {
     u8 f[0xcc5];
     u8 a;
     u8 b;
@@ -10,7 +10,7 @@ struct P {
     u16 v;
 };
 void SceneActor_RampColorRed(void);
-s32 Ivy_InitColorTransition(struct P *p)
+s32 Ivy_InitColorTransition(struct PInitColorTransition *p)
 {
     u16 *s = &p->v;
     p->a = (*s >> 5) & 0x1f;

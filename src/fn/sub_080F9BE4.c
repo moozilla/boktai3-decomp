@@ -15,7 +15,7 @@ void CpuSet(const void *, void *, u32);
 void Sound_PlaySong(u32);
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 extern const s16 gUnk_086149C4[];
-static inline s32 Scale(s32 x)
+static inline s32 Scale_UpdateDefeat(s32 x)
 {
     s32 result;
     if (x >= 0)
@@ -110,11 +110,11 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                 context[0xED2] = 0;
                 break;
         }
-        x = Scale(offset.x * gUnk_086149C4[(drawable[6] + 64) & 255]);
-        z = Scale(offset.z * gUnk_086149C4[drawable[6]]);
+        x = Scale_UpdateDefeat(offset.x * gUnk_086149C4[(drawable[6] + 64) & 255]);
+        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[drawable[6]]);
         position.v.x = x + z + position.p.x;
-        x2 = Scale(-(offset.x * gUnk_086149C4[drawable[6]]));
-        z = Scale(offset.z * gUnk_086149C4[(drawable[6] + 64) & 255]);
+        x2 = Scale_UpdateDefeat(-(offset.x * gUnk_086149C4[drawable[6]]));
+        z = Scale_UpdateDefeat(offset.z * gUnk_086149C4[(drawable[6] + 64) & 255]);
         position.v.z = x2 + z + position.p.z;
         SparkParticle_Spawn(&position, 2, &range, 0, 0, 22, 2, 1);
     }

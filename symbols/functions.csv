@@ -3276,6 +3276,7 @@ addr,name,mode,confidence,source,notes
 0809CBB8,ActorContact_InitializeBodyAndSecondary,thumb,low,src-alias,
 0809CC8C,Lun_GetRouteProgressRate,thumb,low,src-alias,
 0809CCB8,Lun_SetMovementEndpoints,thumb,low,src-alias,Copies current and destination positions into movement state and resets its counter
+0809CCF4,Lun_StepCurveMotion,thumb,low,src-alias,
 0809CEA0,Lun_InitProfile,thumb,low,src-alias,Assigns the shared actor profile for Lun type 0x11
 0809CEBC,Lun_ResetMovementState,thumb,low,src-alias,
 0809D044,SceneActorControl_ResetCollisionFlags,thumb,low,src-alias,

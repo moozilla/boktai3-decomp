@@ -3,8 +3,8 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
 
-void Axe_SelectRandomRoutePoint(void *);
-void Axe_BeginMoveToPosition(void *, void *);
+void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s);
+void Axe_BeginMoveToPosition(u8 *s, s16 *v);
 void Axe_ClearForcedMovement(void *);
 void Axe_ResetMovementFlags(void *);
 
@@ -53,7 +53,7 @@ slopeX:
 done:
     return height;
 }
-static inline u32 Flag(void *base, u32 maskInput, u32 off)
+static inline u32 Flag_UpdateRouteWander(void *base, u32 maskInput, u32 off)
 {
     u32 mask = maskInput;
     return off == 0x2D4 ? *(u16 *)((u8 *)base + off) & mask : *(u32 *)((u8 *)base + off) & mask;
@@ -61,23 +61,23 @@ static inline u32 Flag(void *base, u32 maskInput, u32 off)
 static inline u8 IsDown(struct ChaseActor *actor)
 {
     if (actor &&
-        (Flag(actor, 0x40, 0x2D4) || Flag(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
+        (Flag_UpdateRouteWander(actor, 0x40, 0x2D4) || Flag_UpdateRouteWander(actor, 0x20000, 0x2D0) || actor->base.health <= 0))
         return 1;
     return 0;
 }
 static inline u8 HasMark(struct Axe *context)
 {
-    if (Flag(context, 0x10, 0xE4C))
+    if (Flag_UpdateRouteWander(context, 0x10, 0xE4C))
         return 1;
     return 0;
 }
-static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
+static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
 {
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
+    a->base.state2A8 = s;
+    a->base.phase2A9 = p;
+    a->base.behavior2AA = b;
+    a->base.counter2AC = 0;
+    a->base.field2B1 = 1;
 }
 
 void Axe_UpdateRouteWander(struct ChaseActor *actor)
@@ -89,7 +89,7 @@ void Axe_UpdateRouteWander(struct ChaseActor *actor)
     struct AxeRoutePoint *point;
     if (IsDown(actor))
         return;
-    if (Flag(actor, 0x100, 0x2D4))
+    if (Flag_UpdateRouteWander(actor, 0x100, 0x2D4))
         return;
     if (!HasMark(context)) {
         group->field44 = 0;

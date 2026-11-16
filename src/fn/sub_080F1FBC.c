@@ -1,15 +1,15 @@
 #include "global.h"
 
-void SceneActor_LowerColorRedPeak(void);
+s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor);
 
-struct S {
+struct SWaitForColorRelease {
     u8 filler[0xcf0];
     void (*fp)(void);
     u8 f2[0xd54 - 0xcf4];
     u8 b;
 };
 
-s32 Ivy_WaitForColorRelease(struct S *s)
+s32 Ivy_WaitForColorRelease(struct SWaitForColorRelease *s)
 {
     s32 r;
     if (s->b != 0)

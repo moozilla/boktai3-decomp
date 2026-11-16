@@ -4,8 +4,8 @@ struct S080FC7F4 {
     u8 filler[0x3d0];
     u8 *q;
 };
-void Collider_SetPosition(u8 *, u8 *, u32);
-s32 Collider_Refresh(u8 *);
+void Collider_SetPosition(void *, void *, u32);
+s32 Collider_Refresh(void *);
 
 void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s)
 {

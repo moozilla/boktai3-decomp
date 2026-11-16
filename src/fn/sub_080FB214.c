@@ -1,18 +1,18 @@
 #include "global.h"
 
-struct Q {
+struct QRecordRoutePoint {
     u8 filler[0xec8];
     u8 v[3];
     u8 idx;
 };
 struct S080FB214 {
     u8 filler[0x3d0];
-    struct Q *q;
+    struct QRecordRoutePoint *q;
 };
 
 void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x)
 {
-    struct Q *q = s->q;
+    struct QRecordRoutePoint *q = s->q;
     q->v[q->idx] = x;
     q->idx++;
     if (q->idx > 2)

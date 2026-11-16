@@ -35,7 +35,7 @@ void SpriteGroup_InitAnimatedSprites(void *);
 void Axe_InitRoutePointHistory(void *);
 void ActorCollision_InitThreeAuxiliaryAttacks(void *);
 void Axe_OnRender(void);
-void Axe_ReleaseResources(void);
+s32 Axe_ReleaseResources(void *p);
 
 void Memory_Clear(void *, u32);
 void SceneActorReaction_OnEnemyDefault(void);
@@ -58,7 +58,7 @@ void AnimData_SelectPaletteBank(void *, s32);
 void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct AxeActor {
+struct AxeActorInit {
     struct ChaseActor base;
     u8 unknown624[0x824];
     s32 halfHealthE48;
@@ -123,7 +123,7 @@ static inline u8 AxeInit_BoundedVariant(s32 variant)
 
 static inline void AxeInit_SetVariant(struct ChaseActor *actor, u8 variant)
 {
-    ((struct AxeActor *)actor)->variantED7 = variant;
+    ((struct AxeActorInit *)actor)->variantED7 = variant;
 }
 
 static inline void AxeInit_InitializePaletteRange(struct ChaseActor *actor, u32 alternate,
@@ -135,7 +135,7 @@ static inline void AxeInit_InitializePaletteRange(struct ChaseActor *actor, u32 
 
 s32 Axe_Init(void *object)
 {
-    struct AxeActor *arg0 = object;
+    struct AxeActorInit *arg0 = object;
     struct ChaseActor *actor = &arg0->base;
     struct SceneActorChaseGroup *group = &arg0->base.group;
     u32 zero;
@@ -145,8 +145,8 @@ s32 Axe_Init(void *object)
 
     arg0->savedFlagsE4C = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
-    ((struct AxeActor *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
-    variant = AxeInit_BoundedVariant(((struct AxeActor *)actor)->variantED7);
+    ((struct AxeActorInit *)actor)->variantED7 = Script_GetKeywordValue('t', 0);
+    variant = AxeInit_BoundedVariant(((struct AxeActorInit *)actor)->variantED7);
     AxeInit_SetVariant(&arg0->base, variant);
     if (variant == 0)
         MonsterInit_SetCategory(actor, 12);

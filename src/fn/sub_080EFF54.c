@@ -1,11 +1,11 @@
 #include "global.h"
 
-struct S {
+struct SClearAnimationRestartFlag {
     u8 filler[0x000002B1];
     u8 f;
 };
 
-void Ivy_ClearAnimationRestartFlag(struct S *s)
+void Ivy_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
 {
     if (s->f != 0)
         s->f = 0;

@@ -1,6 +1,6 @@
 #include "global.h"
 
-void Ivy_UpdateHold();
+void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame);
 
 /* Arm the vine's hold: Ivy_UpdateHold takes over with state 0x25. The
    arguments, the early address and the local constants give the ROM's

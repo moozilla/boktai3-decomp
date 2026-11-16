@@ -4,12 +4,12 @@ struct R {
     u8 f[8];
     u16 v;
 };
-struct P {
+struct PGetAnimationStatus {
     u8 f[4];
     u8 *q;
 };
 
-u16 Ivy_GetAnimationStatus(struct P *p)
+u16 Ivy_GetAnimationStatus(struct PGetAnimationStatus *p)
 {
     struct R *r = (struct R *)(p->q + 0x48);
     if (r->v == 3)

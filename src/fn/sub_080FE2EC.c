@@ -2,14 +2,14 @@
 #include "scene_actor_reset.h"
 #include "player.h"
 void Axe_UpdateWaitingAnimation(void);
-void Axe_BeginMoveToPosition(void *, void *);
-static inline u8 TakeFlag(u8 *p)
+void Axe_BeginMoveToPosition(u8 *s, s16 *v);
+static inline u8 TakeFlag(u8 *flag)
 {
-    if (*p) {
-        *p = 0;
-        return 1;
+    if (*flag) {
+        *flag = 0;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 {

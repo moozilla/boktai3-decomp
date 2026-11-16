@@ -1,7 +1,7 @@
 /* Tentative name based on the observed state transition or initialization. */
 #include "global.h"
 #include "scene_actor_reset.h"
-void SceneActorAnimation_SelectDirectionalFlags(void *, s32);
+void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 void Sound_PlaySong(u32);
 static inline u8 TakePrepared(struct ChaseActor *actor)
 {

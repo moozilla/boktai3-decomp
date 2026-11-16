@@ -1,6 +1,6 @@
 #include "global.h"
 
-void SceneActorAnimation_SelectDirectionalFlags(void *, u32);
+void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
 static inline u8 TakeFlag(u8 *flag)
 {

@@ -18,7 +18,7 @@ s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct Scene
                                 s32, s32, s32, u32);
 void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 s32 Ivy_FindAdjacentTarget(struct ChaseActor *, s32);
-void Ivy_UpdateHold(void);
+void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame);
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *);
 struct IvyOffset {
     u16 x, y, z, pad;

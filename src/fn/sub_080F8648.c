@@ -32,12 +32,12 @@ struct AxeActor {
     u8 unknown2CA[0x106];
     struct AxeTrail *trail;
 };
-extern s16 gUnk_086149C4[];
-void Axe_UpdateTrailColliders(void *);
-void ActorPhase_EmitTrailSprite(void *, struct ContactPosition *, u32);
+extern const s16 gUnk_086149C4[];
+void Axe_UpdateTrailColliders(u8 *actor);
+void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position, u32 angle);
 void Sound_PlaySong(u32);
 s32 Math_Atan2(s32, s32);
-void SceneActorControl_SettleRotation(void);
+void SceneActorControl_SettleRotation(struct RoomActor *actor, s32 elapsed);
 static inline u8 Take(u8 *p)
 {
     if (*p) {

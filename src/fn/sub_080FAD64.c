@@ -1,9 +1,9 @@
 #include "global.h"
-void Axe_SetMovementEndpoints(u8 *, s16 *);
-void sub_080FAA5C(u8 *);
-u32 Math_Atan2(s32, s32);
+void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d);
+u8 sub_080FAA5C(struct ChaseActor *actor);
+s32 Math_Atan2(s32, s32);
 void CpuSet(const void *, void *, u32);
-static inline void Fill(void *dst, u32 *tmp, u32 v)
+static inline void Fill_BeginMoveToPosition(void *dst, u32 *tmp, u32 v)
 {
     *tmp = v;
     CpuSet(tmp, dst, 0x05000002);
@@ -35,6 +35,6 @@ void Axe_BeginMoveToPosition(u8 *s, s16 *v)
         b[1] = v[1] - a[1];
         b[2] = v[2] - a[2];
         s[0x3cd] = Math_Atan2(b[0], b[2]);
-        Fill(p + 0xf14, stack, zero);
+        Fill_BeginMoveToPosition(p + 0xf14, stack, zero);
     }
 }

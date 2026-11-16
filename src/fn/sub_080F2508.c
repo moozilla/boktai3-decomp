@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct P {
+struct PWaitForRetarget {
     u8 f[0xcd4];
     void (*cb)(void);
     u8 g[0x1c];
@@ -8,7 +8,7 @@ struct P {
 };
 void sub_080F2538(void);
 
-void Ivy_WaitForRetarget(struct P *p)
+void Ivy_WaitForRetarget(struct PWaitForRetarget *p)
 {
     if (--p->n == 0) {
         p->n = 300;

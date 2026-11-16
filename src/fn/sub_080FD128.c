@@ -1,10 +1,10 @@
 #include "global.h"
 
-void Axe_UpdateScreenShake(void *);
-void Axe_TickAuxiliarySpriteTimers(void *);
+void Axe_UpdateScreenShake(struct S080FC3F8 *s);
+void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s);
 struct SceneActorRegistryActor;
-u32 Axe_UpdatePaletteTransition(struct SceneActorRegistryActor *);
-void Axe_UpdateBodyColliders(void *);
+u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
+void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor);
 void Axe_TickCooldowns(void *);
 void sub_080FCDEC(void *);
 

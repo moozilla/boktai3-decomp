@@ -11,7 +11,7 @@ struct ColorPulseContact {
     u8 effect;
     u16 value;
 };
-struct ColorPulse {
+struct ColorPulseApplyContact {
     u8 pad0[0x64];
     u16 velocityX;
     u8 pad66[2];
@@ -45,10 +45,10 @@ void sub_080F421C(void);
 void Sword_UpdateBodyPaletteRestore(void);
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
-void AnimData_SelectPaletteBank(void *, u32);
+void AnimData_SelectPaletteBank(void *, s32);
 void Sound_PlaySong(u32);
 void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
-                             struct ColorPulse *p)
+                             struct ColorPulseApplyContact *p)
 {
     if (p->callback == sub_080F421C)
         return;

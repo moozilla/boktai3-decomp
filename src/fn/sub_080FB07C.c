@@ -1,7 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 
-struct Q {
+struct QPickAttack {
     u8 filler[0xe48];
     s32 low;
     u8 filler2[0xeb4 - 0xe4c];
@@ -21,7 +21,7 @@ static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 
 u32 Axe_PickAttack(struct ChaseActor *actor)
 {
-    struct Q *q = actor->base.context;
+    struct QPickAttack *q = actor->base.context;
     if (actor->base.health <= q->low && q->b[3] == 0) {
         Go(actor, 0, 2, 8);
         return 1;

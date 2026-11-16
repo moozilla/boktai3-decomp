@@ -24,7 +24,7 @@ void ActorShadow_Enable(void *);
 void Sound_PlaySong(u32);
 u8 ActorPhase_UpdateFlicker(u32 *, s32, s32, s32);
 void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
-void Axe_UpdateOrbitAttack(void);
+void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame);
 static inline u8 consumeEntry(struct PhaseActor *s)
 {
     if (s->entered) {

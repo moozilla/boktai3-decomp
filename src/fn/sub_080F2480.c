@@ -1,6 +1,6 @@
 #include "global.h"
 
-struct S {
+struct SUpdateBobbing {
     u8 filler[0x66];
     u16 h66;
     u8 f2[0x6e - 0x68];
@@ -11,7 +11,7 @@ struct S {
     u32 cnt;
 };
 
-void Ivy_UpdateBobbing(struct S *s)
+void Ivy_UpdateBobbing(struct SUpdateBobbing *s)
 {
     u32 *c = &s->cnt;
     if ((*c & 3) == 0)

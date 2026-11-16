@@ -1,10 +1,10 @@
 #include "global.h"
 
-u8 *Heap_Alloc(u32);
-void Memory_Clear(u8 *, u32);
+void *Heap_Alloc(u32);
+void Memory_Clear(void *, u32);
 s32 Ivy_Init(u8 *);
-void Ivy_Destroy(u8 *);
-void Heap_Free(u8 *);
+u32 Ivy_Destroy(struct SDestroy *s);
+void Heap_Free(void *);
 
 void Ivy_Create(void)
 {

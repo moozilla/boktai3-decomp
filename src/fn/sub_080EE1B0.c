@@ -103,8 +103,7 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 }
 static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
-    u32 state = s;
-    actor->base.state2A8 = state;
+    actor->base.state2A8 = s;
     actor->base.phase2A9 = p;
     actor->base.behavior2AA = b;
     actor->base.counter2AC = 0;

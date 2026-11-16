@@ -7,7 +7,7 @@ struct A {
     u8 p170[0x18e - 0x170];
     u8 b18e, b18f;
 };
-void Sound_PlaySong(s32);
+void Sound_PlaySong(u32 song); /* m4aSongNumStart, remembering the song per track unless muted */
 void sub_080F4A4C(void);
 void Ivy_BeginChildPulse(struct A *p)
 {

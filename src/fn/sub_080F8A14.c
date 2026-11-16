@@ -6,7 +6,7 @@ struct RotatingDrawable {
     u8 unknown4[2];
     u8 angle;
 };
-void Axe_EmitMotionTrail(struct RoomActor *);
+void Axe_EmitMotionTrail(struct ChaseActor *actor);
 void Sound_PlaySong(u32);
 
 static inline s32 NormalizeAngle(s32 angle)

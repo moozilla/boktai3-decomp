@@ -5,7 +5,9 @@
 extern const s16 gUnk_086149C4[];
 static inline s32 Scale(s32 value)
 {
-    return value >= 0 ? value >> 12 : -(-value >> 12);
+    if (value >= 0)
+        return value >> 12;
+    return -(-value >> 12);
 }
 void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
