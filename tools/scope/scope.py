@@ -153,7 +153,7 @@ import build  # noqa: E402
 import check  # noqa: E402
 from romlib import ROOT, load_rom, off, rom_data_ranges  # noqa: E402
 
-INSTR = os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh
+INSTR = os.environ.get("SCOPE_AGBCC") or os.path.join(ROOT, "build", "scope", "agbcc", "gcc", "agbcc")  # tools/scope/build_agbcc.sh; SCOPE_AGBCC: an experimental build
 PASSES = ["rtl", "jump", "cse", "addressof", "gcse", "loop", "cse2", "flow", "combine", "regmove",
           "lreg", "greg", "jump2", "mach"]
 PASS_NOTE = {"greg": "greg/reload", "mach": "mach (late split/reorg)"}
@@ -3948,7 +3948,9 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
           " removes them")
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
-          " each copy's reload choices still count (README fact 59)")
+          " each copy's reload choices still count (README facts 59, 234)")
+    print("      a constant above 255 stored to a halfword goes through a spill register (*movhi_insn takes"
+          " only 0..255), which shifts the rotation like any reload (README fact 235)")
     rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
     if rnd:
         print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
@@ -6747,7 +6749,9 @@ def cmd_pre(src, func, env):
                 print(f"    moved above a loop: {', '.join(at(r['redundant']) for r in hoisted)} comes after a loop"
                       " that starts after the insertion (the old LCM stops delaying at every loop header, fact"
                       " 50). To keep it after the loop: an increment Thumb cannot encode inline, the same"
-                      " expression again on every later path, or its operand set inside the loop")
+                      " expression again on every later path, or its operand set inside the loop (a no-op"
+                      " `i = i + t - t` with t a loaded value: cse1 keeps it, combine folds it; a copy from"
+                      " another variable leaves two pseudos global.c won't share)")
         for r in group:
             m, counts = scores[r["k"]]
             touched = differing & {r["redundant"], *r["inserted"], *(c for c, _ in r["copies"])}

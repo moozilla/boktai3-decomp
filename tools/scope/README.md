@@ -1308,8 +1308,15 @@ Each was read from the compiler source and confirmed on a live draft.
      computes `row + 1` again. A second-section `row++` with nothing after it moves (the item
      grid as `for (...; row++)`: 43 / 47, against a match with an explicit `nextRow = row + 1`
      that the ROM computes earlier in the block than gcse would).
-   * by the equations, also when x is set in the block before the loop or inside it (not
-     checked on a draft).
+   * x is set inside the inner loop (on any path), or in the block that ends just before its
+     header. Checked on sub_081384A0's bubble sort: the outer `i++` stays after the inner
+     loop with `i = i + index - index;` in the swap branch. cse1 does not fold `(a + b) - b`,
+     so gcse sees a set of i, and combine folds it to nothing. A kill one block earlier (an
+     `if` before the inner loop's top test) only moves the insertion down to that block. A
+     copy kill (`i = pass;` at the top, `pass = i + 1;` at the end) also stops PRE, but
+     leaves two pseudos: global.c ties copies only through hard-register preferences, so
+     the short-lived one takes r0 instead of sharing the counter's r8 (`AGBCC_FORCE=pass:8`
+     matches). `(i + j) - j` with the loop counter j leaves code; the loaded `index` folds.
    `pre` flags each such move ("moved above a loop").
    The same insertion serves two paths when both arms of an if compute an expression:
    EffectGroup_Spawn's kind == 2 arm and its else arm each loop over `group->parts[i].flags`,
@@ -2092,6 +2099,12 @@ Each was read from the compiler source and confirmed on a live draft.
    `CSE_NOFOLLOW=2` confirms the decision. A second entry edge also blocks it but
    leaves a comparison in the final output. The nonempty do/while/for forms all
    match; placing the timer store and return inside the loop changes the tail.
+   ScenePanelRig_TickRise (08059AC4) uses the same boundary for an if/else: the last
+   arm before the else label, written `do { ...; return; } while (0);`, stops cse
+   following into the else arm, which then reloads the field it stored. Keep earlier
+   arms that exit (`if (c) { call(); return; }`) outside the loop: loop.c's
+   find_and_verify_loops moves a block that a conditional jump skips and that ends in
+   a jump out of the loop to after the loop.
 230. **One local shared across disjoint phases combines their register conflicts.**
    HomingProjectile_UpdateDefaultState (081FF454) had three copies of a facing inline,
    each preserving the second flip-byte address. The first two naturally used r7 because
@@ -2126,6 +2139,42 @@ Each was read from the compiler source and confirmed on a live draft.
    share their actual field base. Together the changes match all 796 bytes and remove both
    barriers. Keep the complete intervening layout rather than expressing persist through
    a raw offset; the view lives in the unit and needs no shared-header change.
+
+233. **A dead subtract the ROM keeps can be the compare of an if whose only store flow kills.**
+   CircleWindow_GenerateScanlines (08018F38) computes `subs r0, r3, r0` (radius copy minus
+   y) and overwrites r0 at once. `if (savedRadius - p->y > 0) i = 0;` right before loop 1
+   (which sets i = 0 again) matched: cse keeps the store because i has other uses, flow
+   deletes it as dead, and the branch, now to the next insn, keeps its compare and the
+   subtract live through allocation (so the separate `savedRadius` copy also gets its own
+   register). No jump pass runs between flow and reload; jump2 then deletes the branch and
+   its compare and leaves the subtract. Unlike fact 57 the arms need not be identical, and
+   unlike an empty if the first jump pass sees a real store.
+
+234. **A deleted copy of a shared tail can supply the reload choice the ROM made between
+   two branches.** sub_081BB904 (SolarBank transfer input) was a spill-rotation holdout:
+   `AGBCC_SPILL=16:1` matched, one choice short between its two direction branches.
+   Each branch got its own `resetHold: panel->holdFrames = 0; goto blink;` block instead
+   of one shared `reset:` label. jump2 cross-jumps the first copy into the second, and the
+   deleted copy's reload of the 0x702 offset (r0) still advances the rotation (fact 59).
+   When `spill` names a span with no visible extra reload, look for a statement the
+   original could have repeated in that span whose copies jump2 merges.
+
+235. **A 16-bit constant above 255 is loaded through a spill register: `ldr r2, =K; adds
+   r1, r2, #0`.** In LinkSelection_UpdateParticipantScores (0810BBD4) the absent loop
+   `p->points[i] |= -1` on s16 fields narrows the or to HImode, so loop.c hoists an
+   HImode pseudo set to -1 (0xFFFF). `*movhi_insn` accepts only constants 0..255, so
+   reload loads the literal into a spill register and copies it into the allocated one;
+   that reload choice also moves the rotation (the following reload of p took r4).
+   A promoted `u16` local is SImode and loads the literal directly, as do `u32` masks
+   and inline parameters; `|= 0xFFFF` on the s16 field did not narrow the same way.
+   Compare fact 43 (HImode masks and find_equiv_reg).
+
+236. **A copy that gives the losing pseudo a preference moves a higher-priority one off the
+   register.** In ScenePanel_DrawOverlay (08058BD8) `target` (priority 2376) lost r1 to
+   `&currentLevels[slot]` (13333). `s32 mapIndex = target + 1; entry = entries[mapIndex];`
+   in place of `target++` gives target a copy preference for r1; global alloc's first
+   pass skips registers another pseudo prefers, so the address took r2 and target r1.
+   `why` suggests only priority and live-length levers for such a case.
 
 ## Survey: random table as a literal address (2026-10-24)
 
@@ -2635,6 +2684,18 @@ which is exactly `10:1`. Not tested.
      One copy placed ahead of the switch failed for that reason: the path from
      that copy reaches the new register's last use, cse rewrote those last uses
      back to the old register, and the two then overlapped (an extra r7).
+   * cse runs twice, and gcse copy propagation sits between the passes, so the head can
+     change and change back. In sub_0810FDDC (0810FDDC) the ROM's flag arms read a copy of
+     `base` (`mov r1, sb` before the compare) while the glyph call reuses the arms'
+     `base << 1` through PRE. cse1 keeps the copy in the arms. gcse cprop rewrites the arms
+     back to `base` (the copy is available at their start), so PRE sees one `(ashift base 1)`
+     and shares it. cse2 then puts the copy back into the arms, but only if the copy's last
+     use (by insn order) comes after `base`'s. A dead modification after the last use of
+     `base` does that: flow deletes it only after cse2. The match reuses the `row` parameter as
+     the copy (`row = base; ... row++;` at the end). The parameter's entry copy from r1
+     gives it the r1 preference that global alloc honors. gcse cprop also does not cross a
+     loop: copies set before a loop reach no use after it (its availability is a minimal
+     fixpoint), so the copy has to be made after the loop.
 229. **A parameter copy the ROM keeps in a second register comes from cse rerunning the first block once per path, with last-use data from before the pass.**
    The symptom is `adds rA, r0, #0; adds rB, rA, #0` at entry with both
    registers read later, one in the early code and one in a tail
@@ -2696,3 +2757,6 @@ which is exactly `10:1`. Not tested.
    The per-arm zero and the dead test reproduce the bytes with no counted
    concession; whether the original had them as written or as a clamp helper
    with a second result is not known.
+
+`SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
+`build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.

@@ -1,37 +1,43 @@
 #include "directional_force.h"
-// MATCHING_CONCESSION: register-pinning
+#include "monster_particle_random.h"
 s32 Script_SeekToKeyword(s32);
 s32 Script_GetValue(void);
-static inline s32 readRanges(struct DirectionalForce *force)
+
+static inline u16 NextRandom(void)
 {
-    u32 magnitude;
-    u32 delay;
-    register s32 status asm("r0");
-    if (Script_SeekToKeyword('p')) {
-        force->baseMagnitude = Script_GetValue();
-        magnitude = Script_GetValue();
-    } else {
-        magnitude = 3;
-        force->baseMagnitude = magnitude;
-    }
-    force->magnitudeRange = magnitude;
-    delay = Script_SeekToKeyword('t');
-    status = delay;
-    if (delay) {
-        force->baseDelay = Script_GetValue();
-        delay = Script_GetValue();
-        status = delay;
-    } else {
-        delay = 120;
-        force->baseDelay = delay;
-    }
-    force->delayRange = delay;
-    return status;
+    gRandomIndex = (gRandomIndex + 1) & 1023;
+    return *(const u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
+
+static inline void ReadRanges(struct DirectionalForce *force)
+{
+    u32 value;
+    {
+        u32 magnitude;
+        if (Script_SeekToKeyword('p')) {
+            force->baseMagnitude = Script_GetValue();
+            magnitude = Script_GetValue();
+        } else {
+            magnitude = 3;
+            force->baseMagnitude = magnitude;
+        }
+        force->magnitudeRange = magnitude;
+    }
+    value = Script_SeekToKeyword('t');
+    if (value) {
+        force->baseDelay = Script_GetValue();
+        value = Script_GetValue();
+    } else {
+        value = 120;
+        force->baseDelay = value;
+    }
+    force->delayRange = value;
+}
+
+// No return statement: the caller tests whatever the last call left in r0, as in the ROM.
 s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id)
 {
     u32 value;
-    register s32 status asm("r0");
     force->id = id;
     {
         u32 mode;
@@ -42,93 +48,66 @@ s32 DirectionalForce_InitializeFromScript(struct DirectionalForce *force, u32 id
         force->mode = mode;
     }
     {
-        u32 found;
-        status = Script_SeekToKeyword('H');
-        found = status;
-        if (found) {
-            u16 *destination = &gPlayerDirectionLatch;
-            status = Script_GetValue();
-            {
-                u32 value = status;
-                asm("" : : "r"(value));
-                *destination = value;
-            }
-        } else {
-            u16 *destination = &gPlayerDirectionLatch;
-            *destination = found;
-        }
+        u32 found = Script_SeekToKeyword('H');
+        if (found)
+            gPlayerDirectionLatch = Script_GetValue();
+        else
+            gPlayerDirectionLatch = found;
     }
-    switch ((s32)force->mode) {
+    switch (force->mode) {
         case 0:
             force->targetAngle = 0;
             force->targetMagnitude = 0;
             break;
         case 1:
-            status = readRanges(force);
+            ReadRanges(force);
             {
-                register const u16 *random asm("r4") = (const u16 *)RANDOM_TABLE_ADDR;
-                u32 *indexAddress = &gRandomIndex;
-                u32 oldIndex = *indexAddress;
-                u32 index;
-                u32 mask;
-                index = oldIndex + 1;
-                mask = 1023;
-                index &= mask;
-                *indexAddress = index;
+                const u16 *random = gRandomTable;
+                u32 index = (gRandomIndex + 1) & 1023;
+                gRandomIndex = index;
                 force->targetAngle = ((const u8 *)random)[index * 2];
                 if (!force->magnitudeRange)
                     value = force->baseMagnitude;
                 else {
-                    u32 next = (index + 1) & mask;
-                    s32 sample;
-                    *indexAddress = next;
-                    status = Mod(random[next], force->magnitudeRange);
-                    sample = status;
-                    asm("" : : "r"(sample));
-                    value = force->baseMagnitude + sample;
+                    u32 next = (index + 1) & 1023;
+                    u32 sample;
+                    gRandomIndex = next;
+                    /* The shared macro's loop notes count random's refs twice in flow,
+                       so global alloc gives it r4 before the 1023 mask. */
+                    PARTICLE_RANDOM_READ_SAMPLE(sample, random, next);
+                    value = force->baseMagnitude + Mod(sample, force->magnitudeRange);
                 }
             }
             force->targetMagnitude = value << 4;
             force->magnitude = force->baseMagnitude << 4;
-            if (!force->delayRange) {
-                value = force->baseDelay;
-                asm("" : "+r"(value));
-                goto storeDelay;
+            /* Stored directly (a HImode copy), so jump2 does not cross-jump this arm into
+               case 2's; the random arm is shared with case 2's. */
+            if (!force->delayRange)
+                force->delay = force->baseDelay;
+            else {
+                value = force->baseDelay + Mod(NextRandom(), force->delayRange);
+                force->delay = value;
             }
-            goto randomDelay;
-        case 2: {
-            u32 direction = Script_SeekToKeyword('d');
-            if (direction)
-                direction = Script_GetValue();
-            force->targetAngle = direction;
-        }
-            status = readRanges(force);
+            break;
+        case 2:
+            {
+                u32 direction = Script_SeekToKeyword('d');
+                if (direction)
+                    direction = Script_GetValue();
+                force->targetAngle = direction;
+            }
+            ReadRanges(force);
             if (!force->magnitudeRange)
                 value = force->baseMagnitude;
-            else {
-                s32 random;
-                gRandomIndex = (gRandomIndex + 1) & 1023;
-                status = Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], force->magnitudeRange);
-                random = status;
-                asm("" : : "r"(random));
-                value = force->baseMagnitude + random;
-            }
+            else
+                value = force->baseMagnitude + Mod(NextRandom(), force->magnitudeRange);
             force->targetMagnitude = value << 4;
             if (!force->delayRange)
                 value = force->baseDelay;
-            else {
-                s32 random;
-            randomDelay:
-                gRandomIndex = (gRandomIndex + 1) & 1023;
-                status = Mod(((u16 *)RANDOM_TABLE_ADDR)[gRandomIndex], force->delayRange);
-                random = status;
-                asm("" : : "r"(random));
-                value = force->baseDelay + random;
-            }
-        storeDelay:
+            else
+                value = force->baseDelay + Mod(NextRandom(), force->delayRange);
             force->delay = value;
             break;
     }
     gDirectionalForce = force;
-    return status;
 }

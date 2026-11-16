@@ -1,5 +1,4 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
 struct Circle {
     u8 pad[24];
     s16 radius;
@@ -24,10 +23,9 @@ void CircleWindow_GenerateScanlines(struct Circle *p, int bank)
     bottom = p->y + radius;
     if (bottom > 160)
         bottom = 160;
-    {
-        int relativeTop = savedRadius - p->y;
-        asm("" : : "r"(relativeTop));
-    }
+    // flow deletes the dead store, jump2 then the branch: the ROM keeps only the subtract.
+    if (savedRadius - p->y > 0)
+        i = 0;
     out = p->rows[bank];
     for (i = 0; i < top; i++, out++)
         *out = 0;
