@@ -186,7 +186,7 @@ Crow,0809ED00,080A2048,,,auto: 40 of 40 functions named Crow_*
 Spider,080A2048,080A5B8C,,,auto: 32 of 45 functions named Spider_*
 Tentacle body,080A5B8C,080A7700,,,auto: 17 of 19 functions named TentacleBody_*
 Tentacle actor,080A7700,080ACBE0,,,auto: 34 of 70 functions named TentacleActor_*
-Vorn,080ACBE0,080B551C,,,auto: 67 of 105 functions named Vorn_*
+Vorn,080ACBE0,080B551C,,,auto: 70 of 105 functions named Vorn_*
 Skeleton,080B551C,080C47B8,,,auto: 46 of 94 functions named Skeleton_*; also SceneActorApproach_*
 Golem,080C47B8,080D0C30,,,auto: 50 of 63 functions named Golem_*
 Mummy,080D0C30,080DDD28,,,auto: 57 of 71 functions named Mummy_*

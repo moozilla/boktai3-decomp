@@ -1,6 +1,6 @@
 #include "scene_actor_chase.h"
 // confidence=low: completed action chooses a pursuit callback from context flag one.
-void sub_080ADB90(void);
+void Vorn_UpdatePursuitWait(void);
 void Vorn_UpdatePursuitDistance(void);
 static inline void SelectPursuit(struct ChaseActor *a, void *cb, u32 mode)
 {
@@ -22,7 +22,7 @@ void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
     if (a->base.stepDone) {
         Chase_SetBehavior(a, 15);
         if (Chase_Test(*(u16 *)(context + 0x6D4), 1))
-            SelectPursuit(a, sub_080ADB90, 0x23);
+            SelectPursuit(a, Vorn_UpdatePursuitWait, 0x23);
         else
             SelectPursuit(a, Vorn_UpdatePursuitDistance, 0x25);
     } else

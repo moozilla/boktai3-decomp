@@ -20,8 +20,8 @@ u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
-void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
-void Anim_Step(void *, void *);
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
+s32 Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
@@ -29,7 +29,7 @@ u8 SceneActorRegistry_LinkActor(void *);
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
-u8 Vorn_UpdateContactResponse(void *);
+u8 Vorn_UpdateContactResponse(struct ChaseActor *actor);
 void SceneActorPlacement_ResetStateThree(void);
 extern const u8 gUnk_08606038[];
 
@@ -143,26 +143,26 @@ static inline void VornInit_ReadPalette(struct ChaseActor *actor, u32 base, u32 
                                            SceneActorScript_GetManagerField62());
 }
 
-void Vorn_InitActorProfile(void *);
-void SceneActor_InitContextColliders(void *);
-s32 Vorn_OnUpdate(void *);
-u16 Vorn_GetAnimationEvent(void *);
+void Vorn_InitActorProfile(struct PInitActorProfile *p);
+void SceneActor_InitContextColliders(struct ChaseActor *p);
+s32 Vorn_OnUpdate(struct SOnUpdate *s);
+u16 Vorn_GetAnimationEvent(u8 *p);
 void Vorn_UpdateIdleFacing(void *);
 void Vorn_ResetStateEntry(void *);
 void Vorn_BeginIdle(void *);
-void sub_080AD75C(void *);
+void Vorn_UpdateStaggerRecovery(void *);
 void Vorn_UpdateDefeat(void *);
 void Vorn_UpdateHiddenRecovery(void *);
 void SceneActorTarget_ResolvePendingObject(void);
 void Vorn_OnReactionNoOp(void);
 void SceneActorReaction_ResumeSavedTarget(void);
-void SceneActor_ResetContextAnimation(void);
+void SceneActor_ResetContextAnimation(struct Vorn *p);
 void sub_080B197C(void);
-u8 Vorn_SelectHitRecovery(void *);
+u8 Vorn_SelectHitRecovery(struct ChaseActor *actor);
 void Vorn_OnAnimationCleanup(void);
-void Vorn_BeginTargetPursuit(void);
-void Vorn_OnRender(void);
-void Vorn_OnDestroy(void);
+void Vorn_BeginTargetPursuit(struct Vorn *actor);
+u32 Vorn_OnRender(void);
+void Vorn_OnDestroy(u8 *);
 
 static inline void VornInit_SetReactionTable(struct ChaseActor *actor, const void *table)
 {
@@ -183,18 +183,18 @@ static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
     arg0->base.destroy = (SceneActorResultCallback)Vorn_OnDestroy;
 }
 
-void Vorn_ParseField624(void *);
-void Vorn_InitScriptCallback(void *);
-void Vorn_InitActionCooldown(void *);
-void Vorn_InitTimedAction(void *);
-void Vorn_ParseField69A(void *);
-void Vorn_ResetRecoveryMode(void *);
-void Vorn_InitMotionLimits(void *);
-void Vorn_ParseField688(void *);
-void Vorn_InitAttackActionTable(void *);
-void Vorn_InitSpecialActionTable(void *);
-void Vorn_InitReactionActionTable(void *);
-void Vorn_InitActionTable(void *);
+void Vorn_ParseField624(struct ChaseActor *actor);
+void Vorn_InitScriptCallback(struct Vorn *p);
+void Vorn_InitActionCooldown(u8 *p);
+void Vorn_InitTimedAction(struct P *p);
+void Vorn_ParseField69A(struct Vorn *ctx);
+void Vorn_ResetRecoveryMode(u8 *p);
+void Vorn_InitMotionLimits(struct PInitMotionLimits *p);
+void Vorn_ParseField688(struct Vorn *ctx);
+void Vorn_InitAttackActionTable(u8 *p);
+void Vorn_InitSpecialActionTable(u8 *p);
+void Vorn_InitReactionActionTable(u8 *p);
+void Vorn_InitActionTable(u8 *p);
 void ActorShadow_Disable(void *);
 void SceneActorReaction_BeginSideStep(void);
 s32 Vorn_TryRestorePatrolRoute(void *);
@@ -248,7 +248,7 @@ s32 Vorn_Init(void *object)
     SceneActor_InitContextColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
         actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
-        Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, sub_080AD75C, Vorn_UpdateDefeat,
+        Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, Vorn_UpdateStaggerRecovery, Vorn_UpdateDefeat,
         SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);

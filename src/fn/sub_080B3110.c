@@ -1,8 +1,8 @@
 #include "vorn.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
-void sub_080B1FA8(void *);
-void sub_080ADB90(void);
+void sub_080B1FA8(struct ChaseActor *actor);
+void Vorn_UpdatePursuitWait(void);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 #define Vorn_BeginResponsePursuit sub_080B3110
 struct VornResponseFlags {
@@ -113,7 +113,7 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
     }
     SceneActorChase_SetBehavior(a, 15);
     SceneActorChase_SetControl(a, a->chase.base.onStanding, 0);
-    Vorn_SetTimedMotion(a, sub_080ADB90, 35);
+    Vorn_SetTimedMotion(a, Vorn_UpdatePursuitWait, 35);
     Vorn_SetTrackingFlags(&a->chase.base.tracking, 8);
     {
         u32 mask = 128;
