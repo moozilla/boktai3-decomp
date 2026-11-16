@@ -279,10 +279,8 @@ The result is described in `docs/OBJECT_MODEL.md` family 2; this is the log.
   * Mummy 080D2194, 080D2584, 080D5778, 080D6608, 080DA97C and 080DC228.
   * Vorn 080ACBE0 and 080B2580. 080ACCD4, a lone file between them, also stays.
   * Golem 080CF3E4 (it also still uses the scalar-cells selector) and Dog 080E0750.
-  * Even when nothing but declarations comes before such a function, it can change.
-    `sub_08087A70` loses its match when given an identical redundant
-    `s32 Mod(s32, s32);` (a spill moves from sp+0x70 to sp+0x60). `sub_08087018` changes
-    after another function's body (r3 becomes r4). So agbcc's output depends on what
-    came before in the file, not on what the declarations mean. Their current C is
-    probably not the original form; the original unit compiled them in place.
+  * Correction (2026-11-16): this is not agbcc state. merge_unit hoists the includes
+    above a file's chase selector `#define`s (or an earlier file has already included
+    the header), so the selector no longer applies. 080E059C was misattributed. See
+    `notes/unit-context-sensitivity_2026-11-16.md`.
   * Units split at these functions, so a class can take two or three units.

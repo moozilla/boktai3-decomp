@@ -1,5 +1,26 @@
-#define SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES 1
 #include "scene_actor_chase_reaction.h"
+
+/* This class's own copies of the shared chase inlines it compiles differently. */
+static inline u8 Vorn_TryRoute(struct ChaseActor *actor, void *route,
+                               struct ContactPosition *position, struct ContactPosition *target)
+{
+    s32 result = ({
+        void *route_owner_ = (route);
+        struct ContactPosition *route_position_ = (position);
+        struct ContactPosition *route_target_ = (target);
+        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);
+        if (route_status_)
+            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);
+        route_status_;
+    });
+    if (result) {
+        if (result != 2)
+            Memory_Clear(SceneActorChase_MotionOf(actor), 8);
+        return 1;
+    }
+    SceneActorChase_ClearBits(SceneActorChase_MotionFlagsOf(actor), 0x200);
+    return 0;
+}
 
 // Tentative: searches progressively shorter cardinal routes around the actor.
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);
@@ -137,7 +158,7 @@ done:
     Vorn_CellCenter(dest, &target);
 
     group = &actor->group;
-    if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position, &target)) {
+    if (!Vorn_TryRoute(actor, group->route, &actor->base.body.position, &target)) {
         Callback_InvokeActor(actor, group->fallback);
         return 0;
     }

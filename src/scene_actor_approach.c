@@ -198,10 +198,6 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
-
-#define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
-
 void Skeleton_UpdateScriptWaitState(void);
 
 s32 Callback_InvokeActor(void *, void *);

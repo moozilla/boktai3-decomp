@@ -22,15 +22,9 @@ static inline void SceneActorChase_SetActorFlags(void *object, u32 bits)
     view->base.behaviorFlags |= bits;
 }
 
-#if SCENE_ACTOR_CHASE_TYPED_GROUP
-static inline struct SceneActorChaseGroup *SceneActorChase_GroupOf(struct ChaseActor *actor)
-#else
 static inline struct SceneActorChaseGroup *SceneActorChase_GroupOf(void *object)
-#endif
 {
-#if !SCENE_ACTOR_CHASE_TYPED_GROUP
     struct ChaseActor *actor = object;
-#endif
     return &actor->group;
 }
 
@@ -184,28 +178,15 @@ static inline u8 SceneActorChase_CurrentBehavior(struct ChaseActor *actor)
     return actor->base.behavior2AA;
 }
 
-#if SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL
-static inline void SceneActorChase_SaveControl(struct SceneActorChaseSavedControl *packet,
-                                               void *object)
-#else
 static inline void SceneActorChase_SaveControl(void *p, void *object)
-#endif
 {
     struct ChaseActor *actor = object;
-#if SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL
-    packet->control = actor->base.target;
-    packet->kind = actor->base.controlKind;
-    packet->state = actor->base.state2A8;
-    packet->phase = actor->base.phase2A9;
-    packet->behavior = actor->base.behavior2AA;
-#else
     struct SceneActorChaseSavedControl *packet = p;
     packet->control = SceneActorChase_CurrentControl(actor);
     packet->kind = SceneActorChase_ControlKind(actor);
     packet->state = SceneActorChase_CurrentState(actor);
     packet->phase = SceneActorChase_CurrentPhase(actor);
     packet->behavior = SceneActorChase_CurrentBehavior(actor);
-#endif
 }
 
 #define SceneActorChase_NextSample(table_, seed_, wrap_, bits_)                                    \
@@ -235,11 +216,7 @@ static inline u32 SceneActorChase_RandomDirectionExcept(u32 current, const u16 *
     return current;
 }
 
-#if SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH
-static inline s32 SceneActorChase_MapWidth(struct EngineMap *map)
-#else
 static inline s16 SceneActorChase_MapWidth(struct EngineMap *map)
-#endif
 {
     return ((struct SceneActorChaseTerrainGrid *)map->cells)->width;
 }
@@ -249,44 +226,24 @@ static inline s16 SceneActorChase_TerrainLevelHeight(u32 level)
     return level << 8;
 }
 
-#if SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT
-static inline s32 SceneActorChase_CellCenterCoordinate(s32 coordinate)
-{
-    return ((u32)coordinate << 8) + 0x80;
-}
-
-static inline void SceneActorChase_StoreCoordinate(s16 *field, s32 coordinate)
-{
-    *field = coordinate;
-}
-#else
 #define SceneActorChase_CellCenterCoordinate(coordinate_)                                          \
     ({                                                                                             \
         s32 grid_coordinate_ = (coordinate_);                                                      \
         (s16)(((u32)grid_coordinate_ << 8) + 0x80);                                                \
     })
-#endif
 
 static inline void SceneActorChase_CellCenter(s32 cell, struct ContactPosition *position)
 {
     s32 x = Mod(cell, SceneActorChase_MapWidth(SceneActorChase_CurrentMap()));
     s32 z = Div(cell, SceneActorChase_MapWidth(SceneActorChase_CurrentMap()));
-#if SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT
-    SceneActorChase_StoreCoordinate(&position->x, SceneActorChase_CellCenterCoordinate(x));
-#else
     position->x = SceneActorChase_CellCenterCoordinate(x);
-#endif
     {
         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
         u32 height = 15;
         height &= attributes;
         position->y = SceneActorChase_TerrainLevelHeight(height);
     }
-#if SCENE_ACTOR_CHASE_SCALAR_COORDINATE_OUTPUT
-    SceneActorChase_StoreCoordinate(&position->z, SceneActorChase_CellCenterCoordinate(z));
-#else
     position->z = SceneActorChase_CellCenterCoordinate(z);
-#endif
 }
 
 static inline s32 SceneActorChase_PlayerSlot(struct SceneActorChaseTarget *target)
@@ -398,15 +355,6 @@ static inline void SceneActorChase_SetReactionFlags(void *object, u32 bits)
 }
 
 /* Randomly select another stored route when the current route is chosen again. */
-#if SCENE_ACTOR_CHASE_ROUTE_COUNT_ACCESSOR
-static inline u8 SceneActorChase_RouteCount(struct SceneActorChaseRouteSelection *route)
-{
-    return route->points->count;
-}
-#define SCENE_ACTOR_CHASE_ROUTE_COUNT(route_) SceneActorChase_RouteCount(route_)
-#else
-#define SCENE_ACTOR_CHASE_ROUTE_COUNT(route_) ((route_)->points->count)
-#endif
 
 static inline void SceneActorChase_ChooseRoute(struct ChaseActor *actor)
 {
@@ -419,10 +367,10 @@ static inline void SceneActorChase_ChooseRoute(struct ChaseActor *actor)
         index *= 2;
         value = *(const u16 *)(RANDOM_TABLE_ADDR + index);
         value >>= 3;
-        choice = Mod(value, SCENE_ACTOR_CHASE_ROUTE_COUNT(route));
+        choice = Mod(value, route->points->count);
     }
     if (choice == route->index)
-        choice = Mod(choice + 1, SCENE_ACTOR_CHASE_ROUTE_COUNT(route));
+        choice = Mod(choice + 1, route->points->count);
     route->index = choice;
     route->phase = 0;
     {
@@ -431,6 +379,5 @@ static inline void SceneActorChase_ChooseRoute(struct ChaseActor *actor)
         route->current = base + route->index * 8;
     }
 }
-#undef SCENE_ACTOR_CHASE_ROUTE_COUNT
 
 #endif

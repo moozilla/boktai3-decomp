@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "display_sequence_sprite.h"
 #include "background_controller.h"
 struct Camera {
@@ -39,6 +38,10 @@ u8 Collectible_IsNearPlayer(void *);
 void Collectible_StartDeath(void);
 void Sound_PlaySong(u32);
 void AnimData_SelectPaletteBank(void *, s32);
+static inline u8 Collectible_ReadHit(u8 *hp)
+{
+    return *hp;
+}
 void Collectible_UpdateEntry(struct Col *p)
 {
     struct Render *render;
@@ -94,9 +97,9 @@ void Collectible_UpdateEntry(struct Col *p)
     }
     {
         u8 *hp;
-        register u32 hit asm("r5");
+        u32 hit;
         hp = &p->hitFlag;
-        hit = *hp;
+        hit = Collectible_ReadHit(hp);
         ep = &p->flagEF;
         if (hit == 1) {
             p->hp -= p->hit;

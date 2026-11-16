@@ -1,9 +1,27 @@
 #include "global.h"
-#define SCENE_ACTOR_CHASE_SCALAR_CELLS 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_delayed_response.h"
 #include "display_sequence.h"
+
+/* This class's own copies of the shared chase inlines it compiles differently. */
+static inline s32 Mummy_CellAt(struct ContactPosition *position)
+{
+    return SceneActorChase_CellIndex(position->x >> 8, position->z >> 8);
+}
+
+static inline u32 Mummy_Height(struct ContactPosition *position)
+{
+    return SceneActorChase_HeightAt(Mummy_CellAt(position), position);
+}
+
+static inline void Mummy_SnapToRoute(struct ContactPosition *position,
+                                     struct SceneActorRegistryRoute *route)
+{
+    position->x = route->point->x;
+    position->z = route->point->z;
+    position->y = Mummy_Height(position);
+}
 
 static inline struct SceneActorChaseFlags16 *Mummy_BeginRecovery(struct ChaseActor *actor, u16 bits)
 {
@@ -46,7 +64,7 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
             u32 mask = 0x10;
             actor->base.behaviorFlags |= mask;
         }
-        SceneActorChase_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
+        Mummy_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
             SceneActorChase_SetControl(actor, (void *)SceneActorControl_OnIdle, 0);
