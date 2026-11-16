@@ -8,7 +8,6 @@ s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
-void SceneActorControl_OnIdle(void);
 
 struct IvyContext {
     u8 unknown0[0x62C];

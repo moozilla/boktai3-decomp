@@ -4,107 +4,109 @@
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */
 
-u8 Skeleton_ReactToContact(struct ChaseActor *actor)
+u8 Skeleton_ReactToContact(struct Skeleton *actor)
 {
-    struct Skeleton *body = actor->base.context;
-    struct SceneActorChaseGroup *group = &actor->group;
+    struct Skeleton *body = actor->chase.base.context;
+    struct SceneActorChaseGroup *group = &actor->chase.group;
 
-    if (!(actor->base.field2D8 & 0x20000)) {
-        if (actor->base.reactionSoundVariant == 0)
+    if (!(actor->chase.base.field2D8 & 0x20000)) {
+        if (actor->chase.base.reactionSoundVariant == 0)
             Sound_PlaySong(0x211);
         else
             Sound_PlaySong(0x13E);
     }
     SceneActorScript_TriggerCallOnCount((struct SceneActorRegistryActor *)actor);
-    if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
-        actor->base.body.direction = actor->base.field2B6 + 0x80;
+    if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x2000)) {
+        actor->chase.base.body.direction = actor->chase.base.field2B6 + 0x80;
         SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
-        SceneActorChase_ClearMotionFlags(actor, 0x2020);
+        SceneActorChase_ClearMotionFlags(&actor->chase, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
-        SceneActorChase_TrackPlayer(actor);
+        SceneActorChase_TrackPlayer(&actor->chase);
         if (!SceneActorChase_Arrive(actor)) {
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                          &actor->base.tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(&actor->chase, group->route,
+                                          &actor->chase.base.body.position,
+                                          &actor->chase.base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->chase.base.entryTarget228, 1);
         SceneActorChase_SetBehavior(actor, 7);
-        actor->base.field2C2 = Div(0x40, 3);
+        actor->chase.base.field2C2 = Div(0x40, 3);
         return 1;
     }
-    if (SceneActorChase_QueryMotionFlags(actor, 0x8002)) {
-        SceneActorChase_ClearMotionFlags(actor, 0x20);
+    if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x8002)) {
+        SceneActorChase_ClearMotionFlags(&actor->chase, 0x20);
         return 0;
     }
-    if (actor->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+    if (actor->chase.base.field2DC & 0xC0000) {
+        SceneActorChase_SetControl(actor, actor->chase.base.reactionTarget230, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&actor->chase.base.flags2D0, 0x1000000);
         return 1;
     }
-    SceneActorChase_ClearMotionFlags(actor, 0x20);
-    if (SceneActorChase_QueryMotionFlags(actor, 0x100))
+    SceneActorChase_ClearMotionFlags(&actor->chase, 0x20);
+    if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x100))
         return 0;
-    if (actor->base.field2B8)
+    if (actor->chase.base.field2B8)
         return 0;
-    if (SceneActorChase_TrackingFlags(&actor->base.tracking, 0x10))
+    if (SceneActorChase_TrackingFlags(&actor->chase.base.tracking, 0x10))
         return 0;
-    if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
-        if (SceneActorChase_BeginContactAnimation(actor))
+    if (SceneActorChase_QueryMotionFlags(&actor->chase, 0x80)) {
+        if (SceneActorChase_BeginContactAnimation(&actor->chase))
             Sound_PlaySong(0x3A7);
-        if (!actor->base.tracking.target)
+        if (!actor->chase.base.tracking.target)
             return 0;
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
-        SceneActorChase_TrackPlayer(actor);
+        SceneActorChase_TrackPlayer(&actor->chase);
         if (!SceneActorChase_Arrive(actor)) {
             body->pursuitTimer = 0;
-            if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                          &actor->base.tracking.target->position)) {
+            if (!SceneActorChase_TryRoute(&actor->chase, group->route,
+                                          &actor->chase.base.body.position,
+                                          &actor->chase.base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
                 return 0;
             }
         }
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
-        actor->base.field2C2 = 0x20;
+        actor->chase.base.field2C2 = 0x20;
         return 1;
     }
-    if (SceneActorChase_BeginContactAnimation(actor))
+    if (SceneActorChase_BeginContactAnimation(&actor->chase))
         Sound_PlaySong(0x3A7);
-    if (!actor->base.tracking.target)
+    if (!actor->chase.base.tracking.target)
         return 0;
-    SceneActorChase_TrackPlayer(actor);
+    SceneActorChase_TrackPlayer(&actor->chase);
     SceneActorChase_SetActorFlags(actor, 0x10);
     group->destination->pad = 0;
     if (!SceneActorChase_Arrive(actor)) {
         body->pursuitTimer = 0;
-        if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
-                                      &actor->base.tracking.target->position)) {
+        if (!SceneActorChase_TryRoute(&actor->chase, group->route, &actor->chase.base.body.position,
+                                      &actor->chase.base.tracking.target->position)) {
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->chase.base.entryTarget228, 1);
     SceneActorChase_SetBehavior(actor, 7);
-    actor->base.field2C2 = 0x20;
+    actor->chase.base.field2C2 = 0x20;
     return 0;
 }
 
 /* Skeleton_UpdateProbeApproach: control phase that moves the actor toward its nav probe descriptor (+0x5D0): turns on a probe event, otherwise accelerates; changes state on arrival */
 
-void Skeleton_UpdateProbeApproach(struct ChaseActor *actor)
+void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
 {
-    struct SceneActorChaseGroup *nav = &actor->group;
-    struct Skeleton *control = actor->base.context;
+    struct SceneActorChaseGroup *nav = &actor->chase.group;
+    struct Skeleton *control = actor->chase.base.context;
     s32 speed;
     u32 event;
     u16 *scale;
 
-    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->chase.base.field2B1)) {
         SceneActorChase_SetControl(actor, Skeleton_UpdateTargetTransition, 0x3B);
         {
             u32 bit = 0x200;
@@ -112,24 +114,24 @@ void Skeleton_UpdateProbeApproach(struct ChaseActor *actor)
             *flags |= bit;
         }
     }
-    if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
+    if (SceneActorReaction_IsRangeReady(&actor->chase)) {
+        if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque)) {
             return;
         }
-        if (sub_0812F3CC(actor)) {
+        if (sub_0812F3CC(&actor->chase)) {
             return;
         }
     }
-    speed = Callback_InvokeActor(*(&actor), actor->base.animationQuery.opaque);
-    actor->base.field2C2 = 0x20;
+    speed = Callback_InvokeActor(*(&actor), actor->chase.base.animationQuery.opaque);
+    actor->chase.base.field2C2 = 0x20;
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
-            u16 *p = &actor->base.field2C2;
+        if (actor->chase.base.flags2D4 & mask) {
+            u16 *p = &actor->chase.base.field2C2;
             *p = 0x40;
             scale = p;
         } else {
-            u16 *q = &actor->base.field2C2;
+            u16 *q = &actor->chase.base.field2C2;
             u16 v = *q;
             scale = q;
             if (v == 0) {
@@ -137,22 +139,23 @@ void Skeleton_UpdateProbeApproach(struct ChaseActor *actor)
             }
         }
     }
-    if (actor->base.drawableKind == 0)
+    if (actor->chase.base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            ((struct SceneActorAnimationSequenceDrawable *)actor->chase.base.drawable)->sequence,
+            *scale);
     else
         Anim_SetFrameDurationScale(
-            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
+            &((struct SceneActorAnimationTileDrawable *)actor->chase.base.drawable)->tile, *scale);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
-            Skeleton_ReturnToBehavior(actor, 16);
-            SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+            Skeleton_ReturnToBehavior(&actor->chase, 16);
+            SceneActorChase_SetControl(actor, actor->chase.base.savedTarget, 0);
             return;
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
                                                              speed)) {
-        Skeleton_SetState(actor, 3, 1, 0);
+        Skeleton_SetState(&actor->chase, 3, 1, 0);
         {
             u32 bit = 0x100;
             u32 *flags = &control->actionFlags;
@@ -160,53 +163,53 @@ void Skeleton_UpdateProbeApproach(struct ChaseActor *actor)
         }
         return;
     }
-    actor->base.counter2AC++;
+    actor->chase.base.counter2AC++;
 }
 
-void Skeleton_UpdateEntryPhase(struct ChaseActor *actor)
+void Skeleton_UpdateEntryPhase(struct Skeleton *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+    if (SceneActorControl_TakeFlag(&actor->chase.base.field2B1)) {
+        void *control = actor->chase.base.entryTarget224;
         SceneActorChase_SetControl(actor, control, 2);
     }
-    if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
+    if (SceneActorReaction_IsRangeReady(&actor->chase)) {
+        if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(actor))
+        if (sub_0812F3CC(&actor->chase))
             return;
     }
-    if (actor->base.field2B0) {
-        Skeleton_ReturnToBehavior(actor, 15);
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+    if (actor->chase.base.field2B0) {
+        Skeleton_ReturnToBehavior(&actor->chase, 15);
+        SceneActorChase_SetControl(actor, actor->chase.base.savedTarget, 0);
     } else
-        ++actor->base.counter2AC;
+        ++actor->chase.base.counter2AC;
 }
 
-void Skeleton_UpdateEntryRecoveryPhase(struct ChaseActor *actor)
+void Skeleton_UpdateEntryRecoveryPhase(struct Skeleton *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+    if (SceneActorControl_TakeFlag(&actor->chase.base.field2B1)) {
+        void *control = actor->chase.base.entryTarget224;
         SceneActorChase_SetControl(actor, control, 2);
     }
-    if (SceneActorReaction_IsRangeReady(actor)) {
-        if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
+    if (SceneActorReaction_IsRangeReady(&actor->chase)) {
+        if ((u8)Callback_InvokeActor(actor, actor->chase.base.contactQuery.opaque))
             return;
-        if (sub_0812F3CC(actor))
+        if (sub_0812F3CC(&actor->chase))
             return;
     }
-    if (actor->base.field2B0) {
+    if (actor->chase.base.field2B0) {
         {
             u32 state = 3;
             u32 phase = 1;
-            actor->base.state2A8 = state;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
+            actor->chase.base.state2A8 = state;
+            actor->chase.base.phase2A9 = phase;
+            actor->chase.base.behavior2AA = 0;
+            actor->chase.base.counter2AC = 0;
+            actor->chase.base.field2B1 = 1;
         }
         SceneActorChase_SetControl(actor, (void *)SceneActorApproach_UpdateRange, 60);
     } else
-        ++actor->base.counter2AC;
+        ++actor->chase.base.counter2AC;
 }
 
 void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
@@ -214,13 +217,13 @@ void Skeleton_SetMovementControlPreset(struct ChaseActor *actor)
     actor->base.callbacks284 = (void **)gUnk_086060B4;
 }
 
-s32 Skeleton_Update(struct ChaseActor *actor)
+s32 Skeleton_Update(struct Skeleton *actor)
 {
     u32 m;
     SceneActorReaction_TickHiddenResponse(actor);
     m = 0x2000;
-    if ((actor->base.flags2D4 & m) || actor->base.field2B8 == 0) {
-        Callback_InvokeActor(actor, actor->base.callbacks27C[actor->base.state2A8]);
+    if ((actor->chase.base.flags2D4 & m) || actor->chase.base.field2B8 == 0) {
+        Callback_InvokeActor(actor, actor->chase.base.callbacks27C[actor->chase.base.state2A8]);
         SceneActorControl_DispatchControl(actor);
     }
     Skeleton_UpdateActionFlags(actor);
@@ -316,9 +319,9 @@ u32 Skeleton_Destroy(struct Skeleton *actor)
     return 0;
 }
 
-static inline u8 SkeletonInit_TestSkeletonFlags(struct ChaseActor *actor, u32 mask)
+static inline u8 SkeletonInit_TestSkeletonFlags(struct Skeleton *actor, u32 mask)
 {
-    if (((struct Skeleton *)actor)->actionFlags & mask)
+    if (actor->actionFlags & mask)
         return 1;
     return 0;
 }
@@ -329,9 +332,9 @@ static inline void SkeletonInit_ResetFlags(void *object)
     actor->actionFlags = 0;
 }
 
-static inline void SkeletonInit_SetFlags(struct ChaseActor *actor, u32 mask)
+static inline void SkeletonInit_SetFlags(struct Skeleton *actor, u32 mask)
 {
-    ((struct Skeleton *)actor)->actionFlags |= mask;
+    actor->actionFlags |= mask;
 }
 
 static inline void SkeletonInit_ReadWidgetRelativePalette(struct DisplayKeyframeState *widget)
@@ -368,10 +371,10 @@ static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)
 
 s32 Skeleton_Init(void *object)
 {
-    struct ChaseActor *instance = object;
+    struct Skeleton *instance = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &instance->group;
-    struct SceneActorBody *body = &instance->base.body;
+    struct SceneActorChaseGroup *group = &instance->chase.group;
+    struct SceneActorBody *body = &instance->chase.base.body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -381,7 +384,7 @@ s32 Skeleton_Init(void *object)
     {
         MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, 5));
         if (MonsterInit_GetCategory(actor) == 7)
-            SkeletonInit_SetFlagWord(0x40, &((struct Skeleton *)instance)->actionFlags);
+            SkeletonInit_SetFlagWord(0x40, &instance->actionFlags);
     }
     SceneActor_UpdateProfileForCategory(actor);
 
@@ -420,8 +423,7 @@ s32 Skeleton_Init(void *object)
         SceneActorTarget_UpdateTrackedContact, SceneActorTarget_ResolvePendingObjectSkeleton,
         SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
-        group, &((struct Skeleton *)instance)->routeProbe,
-        &((struct Skeleton *)instance)->destination, Skeleton_UpdateDownedState,
+        group, &instance->routeProbe, &instance->destination, Skeleton_UpdateDownedState,
         SceneActorReaction_ReturnToRouteEntry, SceneActorReaction_BeginTargetRecovery, 0, 1, body);
     SceneActorMovement_ResolveRoutePosition(instance);
     MonsterInit_SetRouteReset(actor, Skeleton_ResetRouteReaction);
@@ -430,7 +432,7 @@ s32 Skeleton_Init(void *object)
     group->field5EC = Skeleton_RestorePursuitRoute;
     SkeletonInit_InstallContactDefaults(actor);
     actor->base.field2E8 = 0;
-    ((struct Skeleton *)instance)->healthThreshold = (s16)MonsterInit_GetHealth(actor) >> 1;
+    instance->healthThreshold = (s16)MonsterInit_GetHealth(actor) >> 1;
     SkeletonInit_EnableInitialFlags(actor);
     MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~1);
     SceneActorBehavior_InitializeShadow(actor);
@@ -468,7 +470,7 @@ s32 Skeleton_Init(void *object)
     Skeleton_SetReactionControlTable(actor);
 
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
-    actor->base.saved.privateFlags = ((struct Skeleton *)instance)->actionFlags;
+    actor->base.saved.privateFlags = instance->actionFlags;
 
     if (SkeletonInit_TestSkeletonFlags(instance, 0x800)) {
         MonsterInit_SetControl(actor, Skeleton_BeginKnockedFlight, 0x3D);
@@ -506,9 +508,9 @@ s32 Skeleton_Init(void *object)
 
 void Skeleton_Create(void)
 {
-    void *m = Heap_Alloc(0x74c);
+    void *m = Heap_Alloc(sizeof(struct Skeleton));
     if (m != 0) {
-        Memory_Clear(m, 0x74c);
+        Memory_Clear(m, sizeof(struct Skeleton));
         if (Skeleton_Init(m) < 0) {
             Skeleton_Destroy(m);
             Heap_Free(m);

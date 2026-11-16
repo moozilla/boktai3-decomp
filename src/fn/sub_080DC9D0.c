@@ -6,7 +6,6 @@
 
 void SceneActor_UpdateAnimationCheckpoint(void);
 void Mummy_UpdatePlayerRoute(void);
-void SceneActorControl_OnIdle(void);
 
 struct MummyCheckpointContext {
     u8 unknown0[0x6F2];

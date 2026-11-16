@@ -1,6 +1,5 @@
 #include "scene_actor_chase.h"
 // confidence=low: animation completion resumes group movement or idle.
-void SceneActorControl_OnIdle(void);
 static inline u8 TakeEntry(struct ChaseActor *a)
 {
     if (a->base.field2B2) {

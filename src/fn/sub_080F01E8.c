@@ -2,7 +2,6 @@
 #include "scene_actor_chase.h"
 
 void sub_080EE148(struct ChaseActor *);
-void SceneActorControl_OnIdle(void);
 
 void Ivy_UpdateIdle(struct ChaseActor *actor)
 {

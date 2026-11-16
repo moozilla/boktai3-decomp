@@ -1,7 +1,6 @@
 #include "scene_actor_chase.h"
 // confidence=low: resolves the shadowless approach against the saved context position.
 void SceneActor_EnterShadowlessPhase(void);
-void SceneActorControl_OnIdle(void);
 u8 SceneActor_IsCollisionTargetUnavailable(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 struct DogApproachContext {

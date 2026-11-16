@@ -1,13 +1,8 @@
 #include "scene_actor_displacement.h"
 #include "global.h"
+#include "skeleton.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
-
-struct SkeletonRecoveryContext {
-    struct ChaseActor base;
-    u8 unknown624[0xCC];
-    u16 timer;
-};
 
 static inline void Skeleton_SnapRecoveryRoute(struct ContactPosition *position,
                                           struct SceneActorRegistryRoute *route)
@@ -141,7 +136,7 @@ static inline u8 Skeleton_Drift(struct ChaseActor *actor)
 }
 
 static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
-                                   struct SkeletonRecoveryContext *context)
+                                   struct Skeleton *context)
 {
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
@@ -168,7 +163,7 @@ static inline void Skeleton_Settle(struct ChaseActor *actor, struct SceneActorCh
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
         if (!Skeleton_ArriveAfterRecovery(actor)) {
-            context->timer = 0;
+            context->pursuitTimer = 0;
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                           &actor->base.tracking.target->position)) {
                 Callback_InvokeActor(actor, group->fallback);
@@ -185,7 +180,7 @@ void Skeleton_ConvergeDisplacedPosition(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     if (Skeleton_Drift(actor)) {
-        struct SkeletonRecoveryContext *context = actor->base.context;
+        struct Skeleton *context = actor->base.context;
         actor->base.field2B0 = 1;
         Skeleton_Settle(actor, group, context);
     }

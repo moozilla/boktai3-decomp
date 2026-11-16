@@ -1,8 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 
-void SceneActorControl_OnIdle(void);
-
 static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {

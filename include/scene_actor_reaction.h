@@ -24,7 +24,7 @@ struct SceneActorReactionTail {
     u8 unknown0[0x5D4];
     struct ContactPosition *destination;
 };
-void SceneActorControl_OnIdle(void);
+void SceneActorControl_OnIdle(u8 *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
 struct SceneActorReactionMotionFlags {

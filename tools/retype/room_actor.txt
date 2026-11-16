@@ -44,3 +44,8 @@ SceneActorRegistryResetView ChaseActor
 base chase.base
 group chase.group
 [upcast chase]
+
+# Skeleton's private views (SkeletonSelectionContext in sub_080B7C10.c,
+# SkeletonRecoveryContext in sub_080BBDD0.c) are struct Skeleton now; nothing to replay
+# unless a branch edited those two units (their fields: attempts, nearDistance,
+# farDistance, and pursuitTimer for the recovery timer).

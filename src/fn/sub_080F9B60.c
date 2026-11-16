@@ -1,7 +1,6 @@
 #include "scene_actor_chase.h"
 
 void Axe_ReleaseAuxiliarySprite(void *);
-void SceneActorControl_OnIdle(void);
 
 void Axe_ReleaseAndIdle(struct ChaseActor *actor)
 {
