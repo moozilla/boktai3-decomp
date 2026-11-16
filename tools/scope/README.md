@@ -2819,3 +2819,35 @@ which is exactly `10:1`. Not tested.
 
 `SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
 `build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.
+
+
+237. **Branch-local symbolic constants can give a joined value the preference that priority cannot.**
+   In sub_08012B34 (08012B34), the shared dead RNG origin has three references over
+   a long span and cannot naturally outrank angle. Each direction arm instead uses
+   `u32 origin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;`, draws its angle,
+   then sets `sampleOrigin = origin`. The distinct sources are local to their arms
+   and occupy r3. The copies survive CSE, so global.c's set_preference and
+   prune_preferences reserve r3 for the joined origin and give angle/speed r4/r5.
+   Numeric 0x0403B714 folds the copies and loses the preference. No artificial late
+   uses or initializers are needed. Keep only the first later sample relative to
+   the origin; direct subsequent draws avoid extending it across calls.
+
+238. **A normalized inline result can retain both a byte snapshot copy and its later extension.**
+   ParticleGroup_UpdateFrozen (08014330) needs `ldrb r0; adds r3,r0` at the loop top
+   and a zero extension of r3 at the later test. Plain field reads get the snapshot
+   from PRE but combine removes the extension (`AGBCC_COMBKEEP=104` diagnoses it).
+   `s32 type = g->type; if (type < 0) type = -1; return type;` in an inline, assigned
+   to the caller's cache, matches. The impossible negative arm contributes unknown
+   bits when combine first computes reg_nonzero_bits; its branch then disappears.
+   Copying before normalization loses the initial r0-to-r3 copy, whereas copying
+   the normalized result afterward keeps it. The redundant range guard is an
+   allocation-only form to review during phase 4.
+
+239. **Bit-clearing a known-zero mask can defer a symbolic constant until combine.**
+   GameState_SelectRamBase (0821B084) uses
+   `(u8 *)((u32)gGameStateStorage & ~(timer >> 16))`, with timer loaded from a u16
+   hardware register. It keeps the RAM symbol while making its value unavailable
+   to CSE; combine folds the known-zero mask. Symbol-plus-zero and symbol-or-zero
+   do not reproduce this behavior. The form preserves the ROM base-plus-offset
+   operand order without a pin; like the numeric forms in fact 231, its wording
+   was chosen for allocation and needs phase 4 review.

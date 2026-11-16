@@ -91,3 +91,18 @@ in the inner body, plain flags: 46 ROM / 44 draft. Left: the table must outrank 
 (17/165 undoubled), the 0x3FF hoist must land after the giv inits, one reload choice.
 The fact 231 forms do not apply directly: the ROM's table load is a loop.c hoist, and a
 combine-formed constant written before the loops scores worse (52).
+
+
+## Round 13 recipes (2026-11-16)
+
+* An early dead origin loses every priority race but needs r3: use a distinct
+  branch-local symbolic origin, then copy it after the angle draw. Local allocation
+  gives the sources r3, and their surviving copies reserve r3 for the joined value
+  (08012B34; a numeric literal folds the copies).
+* A cached byte loses a repeated zero extension: normalize the source in a signed
+  inline (`if (type < 0) type = -1`) before returning it to the cache. The sentinel
+  contributes unknown bits before combine deletes the impossible branch, while the
+  final return copy preserves the separate input register (08014330).
+* A constant RAM symbol must be formed after CSE: `(u32)symbol & ~(byte >> 8)` or
+  `& ~(halfword >> 16)` keeps the symbol and becomes constant only in combine
+  (0821B084). These known-zero forms are allocation-only wording for phase 4 review.
