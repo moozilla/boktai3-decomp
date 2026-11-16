@@ -1,41 +1,7 @@
-// MATCHING_CONCESSION: register-pinning
-#include "global.h"
-#include "monster_particle_random.h"
-#include "ram.h"
-#include "engine_globals.h"
+#include "fragment_group.h"
 // confidence=low: allocates a fragment group with randomized direction and lifetime.
 #define FragmentGroup_SpawnRadial sub_08014CA4
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[12];
-    u16 tile;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Group {
-    u8 active, count, type, pad3;
-    u8 animation[28];
-    u8 initialized[6], lifetime[6], enabled[6];
-    u16 speed[6];
-    u8 pad3e[2];
-    struct Vec velocity[6];
-    struct Sprite sprites[6];
-};
-struct Manager {
-    u8 pad[32];
-    struct Group groups[4];
-};
 extern u16 gUnk_08604C42[], gUnk_08604C30[];
-extern s16 gUnk_086149C4[];
-#define RANDOM_TABLE ((u16 *)0x0203B400)
-void *FragmentManager_Create(void *, u32);
-s32 AnimData_Load(void *, s32);
-void AnimData_SelectPaletteBank(void *, s32);
-void Sprite_Init(struct Sprite *, void *, s32);
 s32 Mod(s32, s32);
 static inline s32 Random(const u16 *table, u32 *rng)
 {
@@ -56,21 +22,22 @@ static inline s32 Scale(s32 a, s32 b)
         return v >> 12;
     return -(-v >> 12);
 }
-s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 radius, s32 lifetime,
-                              s32 lifetimeRange, s32 speed, s32 speedRange, s32 angle,
-                              s32 angleRange, s32 vertical, s32 verticalRange)
+s32 FragmentGroup_SpawnRadial(s32 count, s32 type, const struct ContactPosition *position,
+                              s32 radius, s32 lifetime, s32 lifetimeRange, s32 speed,
+                              s32 speedRange, s32 angle, s32 angleRange, s32 vertical,
+                              s32 verticalRange)
 {
-    struct Manager *m;
-    struct Group *g;
-    register struct Group *base asm("r8");
+    struct FragmentManager *m;
+    struct FragmentGroup *g;
+    struct FragmentGroup *base;
     u16 *speeds;
     u32 *rng;
     s32 i;
-    u8 *animation;
+    struct SceneAnimation *animation;
     u8 *cursor;
     u8 *lifetimes;
     s32 j;
-    u8 *animData;
+    struct SceneAnimation *animData;
     if ((!gFragmentManager) && (!FragmentManager_Create(0, 0)))
         return -1;
     m = gFragmentManager;
@@ -81,10 +48,11 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
     g = m->groups;
     speeds = m->groups[0].speed;
     lifetimes = m->groups[0].lifetime;
-    animData = m->groups[0].animation;
+    animData = &m->groups[0].animation;
     base = g;
-    for (; j < 4; g++, speeds = (void *)(((u8 *)speeds) + sizeof(struct Group)),
-                       lifetimes += sizeof(struct Group), animData += sizeof(struct Group), base++,
+    for (; j < 4; g++, speeds = (void *)(((u8 *)speeds) + sizeof(struct FragmentGroup)),
+                       lifetimes += sizeof(struct FragmentGroup),
+                       animData = (void *)((u8 *)animData + sizeof(struct FragmentGroup)), base++,
                        j++) {
         if (!g->active) {
             s32 loaded;
@@ -95,35 +63,28 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
             if (!loaded)
                 return -1;
             if ((g->type == 4) || (g->type == 8))
-                AnimData_SelectPaletteBank(animation, (*((u16 *)(g->animation + 6))) + 1);
+                AnimData_SelectPaletteBank(animation, g->animation.paletteIndex + 1);
             {
-                union SpawnInput {
-                    s32 count;
-                    union ParticleRandomTableSource random;
-                } input;
                 i = 0;
-                input.count = count;
-                if (i < input.count) {
+                if (i < count) {
                     const u16 *table;
-                    struct Vec *velocity;
+                    struct SceneVec *velocity;
                     u16 *speedOut;
-                    register u8 *life asm("sl");
-                    input.random.halves[0] = 0xB400;
-                    input.random.halves[1] = 0x0203;
-                    table = ParticleRandom_GetTable(&input.random);
+                    u8 *life;
+                    table = (const u16 *)(0x0203B400 + (g->type >> 8));
                     cursor = (u8 *)base;
                     velocity = base->velocity;
                     speedOut = speeds;
                     life = lifetimes;
                     do {
-                        struct Sprite *p;
+                        struct DisplaySequenceSprite *p;
                         s32 direction;
                         u8 *out;
                         p = &base->sprites[i];
-                        base->initialized[i] = 1;
+                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))
+                            ->initialized[i] = 1;
                         if (!lifetimeRange) {
-                            register u8 value asm("r2") = lifetime;
-                            asm("" : "+r"(value));
+                            u8 value = lifetime;
                             out = life;
                             *out = value;
                         } else {
@@ -138,8 +99,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                             *out = value;
                         }
                         {
-                            register s32 spread asm("r2") = speedRange;
-                            asm("" : "+r"(spread));
+                            s32 spread = speedRange;
                             if (!spread) {
                                 u32 value = (u16)speed;
                                 *speedOut = value;
@@ -161,19 +121,19 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, struct Vec *position, s32 rad
                         else {
                             s32 random = Random(table, rng);
                             s32 value = vertical + Mod(random, verticalRange);
-                            ((struct Group *)cursor)->velocity[0].y = value;
+                            ((struct FragmentGroup *)cursor)->velocity[0].y = value;
                         }
                         p->flags &= ~1;
                         p->position = *position;
                         p->position.x += Scale(velocity->x, radius);
                         p->position.z += Scale(velocity->z, radius);
                         Sprite_Init(p, animation, 0x200);
-                        p->tile = gUnk_08604C30[g->type];
+                        p->frame = gUnk_08604C30[g->type];
                         if (RandomByte(table, rng) <= 128)
                             p->flags |= 4;
                         else
                             p->flags &= ~4;
-                        base->enabled[i] = 1;
+                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))->enabled[i] = 1;
                         cursor += 8;
                         velocity++;
                         speedOut++;
