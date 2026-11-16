@@ -27,21 +27,21 @@ void Dog_UpdateLeapAttack(struct ChaseActor *a)
     struct Dog *context = a->base.context;
     if (Chase_TakeArrived(a)) {
         And32(&context->flags, ~8);
-        SceneActorReaction_EnableMotionFlags(0x100, &a->base.flags2D4);
+        SceneActorReaction_EnableMotionFlags(0x100, &a->base.motionFlags);
         {
             void *callback = Dog_UpdateLeapWindup;
             u32 kind = 34;
             a->base.field2B2 = 1;
-            a->base.field2B0 = 0;
-            a->base.field2B5 = kind;
+            a->base.stepDone = 0;
+            a->base.controlKind = kind;
             a->base.target = callback;
             a->base.field2C8 = 0;
             {
-                u32 *flags = &a->base.flags114;
+                u32 *flags = &a->base.pendingControlFlags;
                 s32 mask = -2;
                 *flags &= mask;
             }
-            a->base.word104 = 0;
+            a->base.pendingControl = 0;
         }
         Dog_ClearAttackFlags(a->base.context, 2);
         {
@@ -55,10 +55,10 @@ void Dog_UpdateLeapAttack(struct ChaseActor *a)
         context->emitted = 0;
         context->nearTimer = context->nearDistance;
     }
-    if (a->base.field2B0) {
+    if (a->base.stepDone) {
         context->nearTimer = context->nearDistance;
         {
-            u16 *flags = &a->base.flags2D4;
+            u16 *flags = &a->base.motionFlags;
             u32 mask = ~0x100;
             *flags = mask & *flags;
         }

@@ -70,14 +70,14 @@ static inline void ClearBits(u16 *flags, u32 bits)
 }
 static inline void SetActorBits(struct ChaseActor *actor, u32 bits)
 {
-    actor->base.flags2CC |= bits;
+    actor->base.behaviorFlags |= bits;
 }
 static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct ContactPosition *source,
                           struct ContactPosition *destination)
 {
     s32 result;
     if (!Nav_IsPositionInMesh(context, source, destination)) {
-        ClearBits(&actor->base.flags2D4, 0x200);
+        ClearBits(&actor->base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(context, source, destination);
@@ -86,22 +86,22 @@ static inline u8 TryRoute(struct ChaseActor *actor, void *context, struct Contac
             Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    ClearBits(&actor->base.flags2D4, 0x200);
+    ClearBits(&actor->base.motionFlags, 0x200);
     return 0;
 }
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -129,7 +129,7 @@ void SceneActorReaction_TryResumeRoute(struct ChaseActor *actor, s32 frame)
         actor->base.restart = 0;
     }
     if (frame > 60 && actor->base.restart) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
         SnapToRoute(group->destination, &group->route);
         if (!TryRoute(actor, group->context, &actor->base.body.position, group->destination)) {

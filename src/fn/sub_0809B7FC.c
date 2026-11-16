@@ -20,16 +20,16 @@ static inline u8 TakeFlag(u8 *p)
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind, u32 zero, u8 zero8)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = zero8;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero8;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 static inline void SetState(struct ChaseActor *a, u32 phase, u32 zero, u8 zero8)
 {
@@ -48,7 +48,7 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
         SceneActorControl_ConsumeLiftFlagPenalty(input);
     {
         u32 flags = 0x10;
-        u16 *p = &input->base.flags2D6;
+        u16 *p = &input->base.reactionFlags;
         u32 value = *p;
         u16 initialState[1] = {0};
         zero8 = initialState[0];
@@ -57,7 +57,7 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
     }
     {
         u32 mask = 0x100000;
-        u32 *p = &input->base.flags2D0;
+        u32 *p = &input->base.statusFlags;
         *p |= mask;
     }
     if (frame > 30) {
@@ -67,7 +67,7 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
         delay = *((u16 *)(ctx + 0x444));
         if (delay) {
             u32 flags = 0x100;
-            u16 *p = &input->base.flags2D4;
+            u16 *p = &input->base.motionFlags;
             flags = flags | (*p);
             *p = flags;
             *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));

@@ -38,16 +38,16 @@ static inline void BeginRouteSelection(struct ChaseActor *actor, struct SceneAct
     control = nav->routeChoiceControl;
     kind = 0x13;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
 static inline u8 InLinkMode(u32 value, u32 mask)
@@ -67,7 +67,7 @@ void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     {
         u32 mask = 0xA02F;
-        u16 *flagAddress = &actor->base.flags2D4;
+        u16 *flagAddress = &actor->base.motionFlags;
         if (*flagAddress & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 0x40;

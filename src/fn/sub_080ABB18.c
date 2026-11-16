@@ -25,11 +25,11 @@ static inline void ClearWord(u32 *p, u32 mask)
 }
 static inline u16 *MotionFlags(struct ChaseActor *actor)
 {
-    return &actor->base.flags2D4;
+    return &actor->base.motionFlags;
 }
 static inline void ClearMotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D4 = mask & actor->base.flags2D4;
+    actor->base.motionFlags = mask & actor->base.motionFlags;
 }
 // gcse's PRE computes the field addresses of the idle-control stores above the trail loop
 // (its stack slots follow the hash-table order of a 65-bucket table), and cse2 turns the
@@ -54,7 +54,7 @@ u32 TentacleActor_RecoverFromSegmentLoss(struct ChaseActor *p)
         p->base.colliderA.responseValue = value;
     }
     g->flashTimer = 16;
-    ClearWord(&p->base.flags2D0, ~0x100000);
+    ClearWord(&p->base.statusFlags, ~0x100000);
     ClearHalf(MotionFlags(p), ~1);
     count = Div(p->base.health, g->healthStep);
     while (count < g->activeCount) {

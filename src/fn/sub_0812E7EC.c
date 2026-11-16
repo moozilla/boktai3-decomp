@@ -62,7 +62,7 @@ static inline void Command_SetMotionFlag(u32 bits, struct SceneActorChaseFlags16
 
 static inline u8 HasFlag(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
@@ -85,16 +85,16 @@ static inline void SetBehaviorAndIdle(struct ChaseActor *actor, u32 state, u32 b
         void *control = SceneActorControl_OnIdle;
         u32 kind = 0x10;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = control;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
 }
 /* Command payloads and attachment offsets reuse this local workspace. */
@@ -144,10 +144,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             command->data.args[2];
                         if (command->data.args[3])
                             Command_SetMotionFlag(
-                                0x200, (struct SceneActorChaseFlags16 *)&actor->base.flags2D4);
+                                0x200, (struct SceneActorChaseFlags16 *)&actor->base.motionFlags);
                         else
                             SceneActorChase_ClearFlagComponent(
-                                (struct SceneActorChaseFlags16 *)&actor->base.flags2D4, 0x200);
+                                (struct SceneActorChaseFlags16 *)&actor->base.motionFlags, 0x200);
                         ((struct CommandRoute *)group->route)->current =
                             ((struct CommandRoute *)group->route)->destination;
                         SetBehaviorAndIdle(actor, 2, 3);
@@ -225,13 +225,16 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                     switch ((u32)command->data.args[0]) {
                         case 1:
                         case 2:
-                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 0, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 0,
+                                                                  category);
                             break;
                         case 0:
-                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 1, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 1,
+                                                                  category);
                             break;
                         case 3:
-                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 2, category);
+                            SceneActorAttachment_ApplySlotCommand(actor, attachment, 0, 2,
+                                                                  category);
                             break;
                         case 4: {
                             s16 *value;
@@ -239,10 +242,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s32 initialValue;
                             CommandFields(actor)->attachmentValues.value =
                                 command->data.attachment.value;
-                            value = (s16 *)&actor->base.fieldAA;
+                            value = (s16 *)&actor->base.attachmentTimer;
                             CommandFields(actor)->attachmentValues.initial =
                                 command->data.attachment.initial;
-                            initial = &actor->base.fieldA8;
+                            initial = &actor->base.attachmentRestart;
                             SceneActorAttachment_SelectOffsets(category, 1, &workspace.offset.y,
                                                                &workspace.offset.z);
                             initialValue = *initial;
@@ -259,10 +262,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                             s32 count;
                             CommandFields(actor)->attachmentValues.value =
                                 command->data.attachment.value;
-                            value = (s16 *)&actor->base.fieldAA;
+                            value = (s16 *)&actor->base.attachmentTimer;
                             CommandFields(actor)->attachmentValues.initial =
                                 command->data.attachment.initial;
-                            initial = &actor->base.fieldA8;
+                            initial = &actor->base.attachmentRestart;
                             count = command->data.attachment.count;
                             SceneActorAttachment_SelectOffsets(category, 3, &workspace.offset.y,
                                                                &workspace.offset.z);

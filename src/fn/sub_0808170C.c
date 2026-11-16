@@ -23,20 +23,20 @@ static inline u8 Reaction_MotionStopped(s32 x, s32 z)
 
 static inline u32 Recovery_StatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline u32 Recovery_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 static inline void Recovery_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
-    actor->base.flags2D0 &= mask;
+    actor->base.statusFlags &= mask;
 }
 static inline void Recovery_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D0 = mask | actor->base.flags2D0;
+    actor->base.statusFlags = mask | actor->base.statusFlags;
 }
 static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
@@ -55,7 +55,7 @@ static inline void Recovery_ClearRoute(struct ChaseActor *actor,
 
 static inline u8 Recovery_ActorCollisionFlags(struct ChaseActor *actor, u32 bits)
 {
-    return SceneActorChase_TestField(&actor->base.flags2C0, bits);
+    return SceneActorChase_TestField(&actor->base.placementFlags, bits);
 }
 
 void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
@@ -107,7 +107,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         }
         {
             u16 bits = 2;
-            motion = (void *)&actor->base.flags2D4;
+            motion = (void *)&actor->base.motionFlags;
             SceneActorChase_SetFlagComponent(motion, bits);
             SceneActorChase_ClearFlagComponent(motion, 0x17A9);
         }
@@ -141,7 +141,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
             (status->duration != 1))
             status->elapsed = 0;
     }
-    counter = (s16)actor->base.fieldAA;
+    counter = (s16)actor->base.attachmentTimer;
     if (((u32)(counter - 30)) <= 89) {
         s32 remainder = Mod(counter, 30);
         s32 limit = 15 - Div(counter, 10);
@@ -167,11 +167,11 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
     *priorZ += z;
     if (Reaction_MotionStopped(x, z) && (counter <= 0)) {
         struct ContactCollider *collider;
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         actor->base.reactionDirection = (Reaction_ThirtySecond(actor->base.body.direction) + 7) & 7;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, group->field5E0, 8);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 2);
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x3A);
         SceneActorChase_SetState(actor, 3, 1, 0);
         actor->base.body.direction = ((actor->base.body.direction + 32) >> 6) << 6;

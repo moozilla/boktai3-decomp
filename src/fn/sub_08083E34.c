@@ -4,7 +4,7 @@ void SceneActorControl_ResetCollisionPhase(struct ChaseActor *input)
     struct ChaseActor *actor = input;
     u32 *state = (void *)SceneActorControl_GetMotionState(actor);
     u32 mask = 0x100000;
-    u32 *flags = &actor->base.flags2D0;
+    u32 *flags = &actor->base.statusFlags;
     *flags |= mask;
     {
         u32 offset = 0x3D4;

@@ -15,7 +15,7 @@ struct SceneActorTrackingParent {
 static inline u8 IsPlayerTracked(struct ChaseActor *actor)
 {
     u32 mask = 2;
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
@@ -55,7 +55,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosi
     if (!(u8)SceneActorPath_FaceAndCheckStraightPath(actor))
         goto fail;
     {
-        u32 *flags = &actor->base.flags2CC;
+        u32 *flags = &actor->base.behaviorFlags;
         s32 mask = -0x81;
         *flags &= mask;
     }
@@ -82,7 +82,7 @@ s32 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosi
     }
 ready: {
     u32 mask = 0x80;
-    u16 *flags = &actor->base.flags2D6;
+    u16 *flags = &actor->base.reactionFlags;
     u32 value = *flags;
     mask |= value;
     *flags = mask;

@@ -64,7 +64,7 @@ static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactP
         }
     }
     {
-        u16 *flags = &actor->base.flags2D4;
+        u16 *flags = &actor->base.motionFlags;
         u32 mask = ~0x200;
         mask &= *flags;
         *flags = mask;

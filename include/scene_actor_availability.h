@@ -13,15 +13,15 @@ static inline u8 SceneActor_ActionsBlocked(const struct ChaseActor *actor)
 {
     if (!actor)
         return 0;
-    if (SceneActor_MaskedHalfword(0x40, &actor->base.flags2D4) ||
-        SceneActor_MaskedWord(0x20000, &actor->base.flags2D0) || actor->base.health <= 0)
+    if (SceneActor_MaskedHalfword(0x40, &actor->base.motionFlags) ||
+        SceneActor_MaskedWord(0x20000, &actor->base.statusFlags) || actor->base.health <= 0)
         return 1;
     return 0;
 }
 static inline u8 SceneActor_TestPendingFlag(struct ChaseActor *actor, u32 mask, u16 **saved)
 {
-    u32 bits = actor->base.flags2D6 & mask;
-    *saved = &actor->base.flags2D6;
+    u32 bits = actor->base.reactionFlags & mask;
+    *saved = &actor->base.reactionFlags;
     if (bits)
         return 1;
     return 0;

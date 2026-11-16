@@ -20,16 +20,16 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 
 static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
@@ -55,28 +55,28 @@ static inline void TurnState(struct ChaseActor *a, u32 behavior)
 }
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {
-    u16 *flags = &a->base.flags2D4;
+    u16 *flags = &a->base.motionFlags;
     u32 value = *flags & mask;
     *out = flags;
     return value;
 }
 static inline u32 Flags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = 0;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
@@ -133,9 +133,9 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
                 control = group + 0x4C;
                 {
                     u32 mask = 0x200000;
-                    if (actor->base.flags2CC & mask) {
+                    if (actor->base.behaviorFlags & mask) {
                         {
-                            u32 *flags = &actor->base.flags2D0;
+                            u32 *flags = &actor->base.statusFlags;
                             u32 mask = ~0x1000000;
                             *flags &= mask;
                         }
@@ -146,7 +146,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
                     }
                 }
                 {
-                    u32 *flags = &actor->base.flags2CC;
+                    u32 *flags = &actor->base.behaviorFlags;
                     u32 mask = ~0x90;
                     *flags &= mask;
                 }

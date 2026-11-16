@@ -2,7 +2,8 @@
 #include "player.h"
 #include "ram.h"
 s32 Path_GetPointPositionById(void *, u32, u32);
-static inline void Bounds_Subtract(struct ContactPosition *out, const struct SceneVec *a, const struct ContactPosition *b)
+static inline void Bounds_Subtract(struct ContactPosition *out, const struct SceneVec *a,
+                                   const struct ContactPosition *b)
 {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
@@ -22,7 +23,7 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct ChaseActor *actor,
     u32 category = actor->base.category;
     if (category == 10) {
         u32 mask = 0x4000000;
-        if (actor->base.flags2D0 & mask)
+        if (actor->base.statusFlags & mask)
             return 1;
         return 0;
     }
@@ -40,8 +41,9 @@ u32 SceneActorRegistry_TestNearestPlayerBounds(struct ChaseActor *actor,
                 bestDifference = difference;
             }
         }
-    }    if (nearestIndex >= 0 && bestDifference.x <= bounds->x && bestDifference.x >= -bounds->x
-        && bestDifference.z <= bounds->z && bestDifference.z >= -bounds->z)
+    }
+    if (nearestIndex >= 0 && bestDifference.x <= bounds->x && bestDifference.x >= -bounds->x &&
+        bestDifference.z <= bounds->z && bestDifference.z >= -bounds->z)
         return 1;
     return 0;
 }

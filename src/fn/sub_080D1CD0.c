@@ -104,16 +104,16 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
         kind = 13;
         zero = 0;
         *prepared = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     } else
         actor->base.restart = queued;
 }

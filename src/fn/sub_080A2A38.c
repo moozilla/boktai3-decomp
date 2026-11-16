@@ -15,16 +15,16 @@ static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 static inline void SetControl(struct ChaseActor *actor, void *cb, u32 k)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = k;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = k;
     actor->base.target = cb;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorReaction_ResumeEntryTarget(struct ChaseActor *actor)
@@ -37,7 +37,7 @@ void SceneActorReaction_ResumeEntryTarget(struct ChaseActor *actor)
     if (group->timer418 == 0) {
         {
             u32 mask = 0x80;
-            actor->base.flags2D4 &= ~mask;
+            actor->base.motionFlags &= ~mask;
         }
         SetState(actor, 0, 0, 7);
         SetControl(actor, actor->base.onAlternateEntry, 1);

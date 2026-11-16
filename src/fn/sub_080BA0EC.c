@@ -10,5 +10,5 @@ void SceneActorReaction_ApplyThreshold(struct ChaseActor *actor, s32 value)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 
     if (value > context->parameter706)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }

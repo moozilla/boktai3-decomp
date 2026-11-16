@@ -49,7 +49,7 @@ static inline void Axe_GetPaletteUpdateHandles(s16 **deltas, u32 **flags, s16 **
                                                struct ChaseActor *actor,
                                                struct AxePaletteTransition *transition)
 {
-    *flags = &actor->base.flags2CC;
+    *flags = &actor->base.behaviorFlags;
     *values = transition->red;
     *deltas = transition->deltaRed;
 }
@@ -69,7 +69,7 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
         return 0;
     p = &context->transition;
     if (!p->remaining) {
-        if (!Axe_ReadMaskedFlags(0x02008000, &actor->base.flags2CC))
+        if (!Axe_ReadMaskedFlags(0x02008000, &actor->base.behaviorFlags))
             Axe_BindPalette(actor, p);
         return 1;
     }

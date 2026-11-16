@@ -1,0 +1,38 @@
+# Names for the registry actor base's offset-named members, from their readers and
+# writers across the monster classes (see include/room_actor.h for what each means):
+#   python3 tools/retype_fields.py --steps tools/retype/room_actor_names.txt --dependents include/room_actor.h
+# Run it after merging the header; it rewrites only accesses that no longer compile.
+[map]
+field9A hudLabel
+field9F defense
+fieldA0 contactReward
+fieldA8 attachmentRestart
+fieldAA attachmentTimer
+fieldAC experience
+fieldB2 hudKind
+word104 pendingControl
+word108 pendingControlData
+word10C pendingControlRelease
+word110 pendingControlKind
+flags114 pendingControlFlags
+field1E8 flashTimer
+field1EA paletteTimer
+field1EC scriptId
+field238 sinkCallback
+field23C reactionGate
+callback248 routeReset
+callbacks27C stateCallbacks
+field2B0 stepDone
+field2B5 controlKind
+field2B8 hitLockTimer
+flags2C0 placementFlags
+field2CA frameCounter
+flags2CC behaviorFlags
+flags2D0 statusFlags
+flags2D4 motionFlags
+flags2D6 reactionFlags
+field2D8 hitAttributes
+field2DC hitReactionFlags
+field2E0 hitOwners
+field2EA heightOffset
+field30C particleTimer

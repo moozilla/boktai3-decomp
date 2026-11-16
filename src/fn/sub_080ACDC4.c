@@ -39,5 +39,5 @@ void SceneActor_UpdateTargetedAttack(struct ChaseActor *s)
         Collider_Refresh(&context->collider);
     }
     if (s->base.restart)
-        s->base.field2B0 = 1;
+        s->base.stepDone = 1;
 }

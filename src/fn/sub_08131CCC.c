@@ -22,7 +22,7 @@ extern void *gSceneActorCallbacks29C[];
 extern void *gSceneActorCallbacks2A0[];
 void SceneActorBehavior_InstallCallbackTables(struct ChaseActor *actor)
 {
-    actor->base.callbacks27C = gSceneActorCallbacks27C;
+    actor->base.stateCallbacks = gSceneActorCallbacks27C;
     actor->base.callbacks280 = gSceneActorCallbacks280;
     actor->base.callbacks284 = gSceneActorCallbacks284;
     actor->base.alternateBehaviorCallbacks = gSceneActorCallbacks288;

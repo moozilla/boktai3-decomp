@@ -43,13 +43,13 @@ static inline void Octopus_EnableCollider(struct ContactCollider *collider)
 }
 static inline void Octopus_SetContactFlag(struct ChaseActor *actor, u32 bits)
 {
-    actor->base.flags2C0 = bits | actor->base.flags2C0;
+    actor->base.placementFlags = bits | actor->base.placementFlags;
 }
 static inline void Octopus_DisableContact(struct ChaseActor *actor)
 {
     actor->base.colliderA.flags &= 0xFFFB;
     actor->base.colliderA.flags |= 8;
-    SceneActorChase_ClearFlagComponent((void *)&actor->base.flags2C0, 0x800);
+    SceneActorChase_ClearFlagComponent((void *)&actor->base.placementFlags, 0x800);
 }
 
 struct OctopusFrameIndex {

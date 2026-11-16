@@ -71,14 +71,14 @@ void sub_080E0750(struct ChaseActor *actor)
         }
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         mask = 0x20;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         mask |= *flags;
         mask &= ~0x100;
         *flags = mask;
     }
     {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     dx = Dog_ReadDisplacementAxis(Dog_ReadDesiredX(actor), &actor->base.reactionEnd.x, &x);
     dz = Dog_ReadDisplacementAxis(Dog_ReadDesiredZ(actor), &actor->base.reactionEnd.z, &z);
@@ -93,9 +93,9 @@ void sub_080E0750(struct ChaseActor *actor)
     if (!actor->base.restart)
         goto moving;
     group = &actor->group;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
-    if (actor->base.field2DC & 0x80000) {
+    if (actor->base.hitReactionFlags & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }

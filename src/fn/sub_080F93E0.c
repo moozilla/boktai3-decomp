@@ -67,7 +67,7 @@ static inline void Control(struct RoomActor *a, void *callback, u32 phase)
 {
     u32 zero = 0;
     a->field2B2 = 1;
-    a->field2B0 = zero;
+    a->stepDone = zero;
     FIELD(a, 0x2B5, u8) = phase;
     FIELD(a, 0x21C, void *) = callback;
     FIELD(a, 0x2C8, u16) = zero;
@@ -92,7 +92,7 @@ static inline u32 Arg2(u32 k_, struct RoomActor *actor)
 inline static void Control_UpdateTurnAnimation(struct RoomActor *a, void *callback, u32 phase)
 {
     a->field2B2 = 1;
-    a->field2B0 = 0;
+    a->stepDone = 0;
     *((u8 *)(((u8 *)a) + 0x2B5)) = phase;
     *((void **)(((u8 *)a) + 0x21C)) = callback;
     *((u16 *)(((u8 *)a) + 0x2C8)) = 0;
@@ -114,7 +114,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         if (current == target) {
             actor->body.direction = actor->nextDirection;
             Control_UpdateTurnAnimation(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
-            actor->field2B0 = 1;
+            actor->stepDone = 1;
             return;
         }
         target -= 8;
@@ -136,7 +136,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         {
             u32 mask = 0xA02F;
             u16 *scale;
-            if (state->base.flags2D4 & mask) {
+            if (state->base.motionFlags & mask) {
                 state->base.field2C2 = 64;
                 scale = &state->base.field2C2;
             } else {

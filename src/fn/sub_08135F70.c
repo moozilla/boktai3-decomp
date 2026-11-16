@@ -41,7 +41,7 @@ static inline u16 OwnershipFlagBits(u32 value, u32 mask)
 static inline u8 ShouldShowDamage(struct ChaseActor *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->base.field2E0;
+        u32 *owner = &actor->base.hitOwners;
         u32 mask = *owner;
         if (!OwnershipFlagBits(mask, 0x20) && mask) {
             switch (LocalPlayer()) {
@@ -76,7 +76,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
         }
         {
             u32 mask = 0x20000;
-            if (actor->base.flags2D0 & mask)
+            if (actor->base.statusFlags & mask)
                 return 1;
         }
         if (actor->base.health <= 0)
@@ -95,7 +95,7 @@ static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *
         }
         {
             u32 mask = 0x20000;
-            if (actor->base.flags2D0 & mask)
+            if (actor->base.statusFlags & mask)
                 return 1;
         }
         if (*health <= 0)
@@ -115,7 +115,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
             *flags2D4 = 0x40;
             actor->base.field2E6 = zero;
             {
-                u16 *flags2D6 = &actor->base.flags2D6;
+                u16 *flags2D6 = &actor->base.reactionFlags;
                 s32 mask = ~0x980;
                 *flags2D6 &= mask;
             }
@@ -159,13 +159,13 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
                 }
             }
             {
-                u32 *flags2D0 = &actor->base.flags2D0;
+                u32 *flags2D0 = &actor->base.statusFlags;
                 u32 mask = 0xFFEFFFFB;
                 *flags2D0 &= mask;
             }
             {
                 u32 bit = 0x400;
-                actor->base.flags2D6 |= bit;
+                actor->base.reactionFlags |= bit;
             }
             actor->base.field2E6 = down;
             {
@@ -201,14 +201,14 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
     u32 strong;
     if (!HasPendingHit(actor)) {
         if (SceneActorReaction_ApplyAreaDamage(actor)) {
-            u16 *borrowed = &actor->base.flags2D4;
+            u16 *borrowed = &actor->base.motionFlags;
             u32 flags = *borrowed;
             flags2D4 = borrowed;
             // The clear is written in both places it applies. jump2 cross-jumps the
             // two copies into one, but reload has already loaded the 0x2CC offset for
             // each, which advances its spill rotation before IsDown.
             if (!flags) {
-                u32 *flags2CC = &actor->base.flags2CC;
+                u32 *flags2CC = &actor->base.behaviorFlags;
                 u32 mask = ~0x2000;
                 *flags2CC &= mask;
             } else {
@@ -218,7 +218,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                     *flags2D4 = 0x40;
                     actor->base.field2E6 = zero;
                     {
-                        u16 *flags2D6 = &actor->base.flags2D6;
+                        u16 *flags2D6 = &actor->base.reactionFlags;
                         s32 mask = ~0x980;
                         *flags2D6 &= mask;
                     }
@@ -241,7 +241,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                             value = mask.field.bits & flags;
                             *flags2D4 = value;
                         }
-                        flags2CC = &actor->base.flags2CC;
+                        flags2CC = &actor->base.behaviorFlags;
                         {
                             u32 mask = ~0x4000;
                             *flags2CC &= mask;
@@ -260,13 +260,13 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                             }
                         }
                         {
-                            u32 *flags2D0 = &actor->base.flags2D0;
+                            u32 *flags2D0 = &actor->base.statusFlags;
                             u32 mask = 0xFFEFFFFB;
                             *flags2D0 &= mask;
                         }
                         {
                             u32 bit = 0x400;
-                            actor->base.flags2D6 |= bit;
+                            actor->base.reactionFlags |= bit;
                         }
                         actor->base.field2E6 = down;
                         {
@@ -274,7 +274,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                             *flags2CC |= bit;
                         }
                     } else {
-                        u32 *flags2CC = &actor->base.flags2CC;
+                        u32 *flags2CC = &actor->base.behaviorFlags;
                         u32 mask = ~0x2000;
                         *flags2CC &= mask;
                     }
@@ -316,9 +316,9 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
         }
     }
     {
-        u32 *damageFlags = &actor->base.field2D8;
+        u32 *damageFlags = &actor->base.hitAttributes;
         u32 blocked = *damageFlags & 0x20000;
-        flags2CC = &actor->base.flags2CC;
+        flags2CC = &actor->base.behaviorFlags;
         flags2D8 = damageFlags;
         if (blocked)
             goto done;
@@ -326,9 +326,9 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
     {
         if ((mode & 4) && (!(updated & 4))) {
             SceneActorBehavior_PlayReactionSound(actor);
-            *(u16 *)&actor->base.field30C = 12;
+            *(u16 *)&actor->base.particleTimer = 12;
         }
-        flags2CC = &actor->base.flags2CC;
+        flags2CC = &actor->base.behaviorFlags;
         if (mode) {
             {
                 u16 bank = actor->base.paletteAlternateBank;
@@ -340,10 +340,10 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
             }
             {
                 u32 eight = 8;
-                actor->base.field1E8 = eight;
+                actor->base.flashTimer = eight;
             }
             strong = mode & 4;
-            flags2CC = &actor->base.flags2CC;
+            flags2CC = &actor->base.behaviorFlags;
             if (strong && (actor->base.category == 0x19)) {
                 {
                     u32 bit = 0x2000000;
@@ -351,7 +351,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                 }
                 {
                     u32 v = 0x41;
-                    actor->base.field1EA = v;
+                    actor->base.paletteTimer = v;
                 }
             }
             {
@@ -371,8 +371,8 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                     u32 buffer[2];
                     s32 h = *savedHealth;
                     s32 maxh = (u16)actor->base.defaultHealth;
-                    s32 kind = (s16)actor->base.fieldB2;
-                    s32 param = (s16)actor->base.field9A;
+                    s32 kind = (s16)actor->base.hudKind;
+                    s32 param = (s16)actor->base.hudLabel;
                     u32 id = actor->base.body.id;
                     s32 priority;
                     decision.part.value = 1;

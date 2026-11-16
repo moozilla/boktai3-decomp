@@ -46,7 +46,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
     position = &actor->chase.base.body.position;
     result = Nav_IsPositionInMesh(route, position, &target);
     if (!result) {
-        u16 *flags = &actor->chase.base.flags2D4;
+        u16 *flags = &actor->chase.base.motionFlags;
         u32 mask = 0xFFFFFDFF;
         u32 value = *flags;
         mask &= value;
@@ -57,7 +57,7 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor)
             if (result != 2)
                 Memory_Clear(&actor->chase.base.body.motion, 8);
         } else {
-            u16 *flags = &actor->chase.base.flags2D4;
+            u16 *flags = &actor->chase.base.motionFlags;
             u32 mask = 0xFFFFFDFF;
             u32 value = *flags;
             mask &= value;

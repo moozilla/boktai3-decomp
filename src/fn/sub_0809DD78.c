@@ -58,11 +58,11 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     struct ContactPosition origin;
     s32 mode, r4v, r6v, r3v;
     s32 initialHealth, scriptVariant;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = Script_GetKeywordValue(0x4D, 0);
+    arg0->base.placementFlags = Script_GetKeywordValue(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -79,40 +79,40 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->base.script1F0 = (u16)Script_GetKeywordValue(0x46, 0);
-    arg0->base.field1EC = (u16)Script_GetKeywordValue(0x52, 0);
+    arg0->base.scriptId = (u16)Script_GetKeywordValue(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         arg0->base.defaultHealth = MonsterInit_ReadHalfword(0);
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
 
     initialHealth = MonsterInit_GetInitialHealth(arg0);
     r3v = r4v;
-    arg0->base.flags2D4 = 0;
+    arg0->base.motionFlags = 0;
     arg0->base.target = SceneActorControl_OnIdle;
     arg0->base.field2B2 = 1;
-    arg0->base.field2B0 = 0;
+    arg0->base.stepDone = 0;
     arg0->base.health = MonsterInit_ClampHealth(initialHealth);
-    arg0->base.fieldAA = 0;
+    arg0->base.attachmentTimer = 0;
     if (r3v <= 0)
         r3v = r6v;
     arg0->base.attachmentLimit = r6v;
-    arg0->base.fieldA8 = r3v;
+    arg0->base.attachmentRestart = r3v;
     arg0->base.regionId = 0;
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    MonsterInit_WriteHalfword(&arg0->base.fieldB2, Script_GetKeywordValue(0x4B, 2));
+    MonsterInit_WriteHalfword(&arg0->base.hudKind, Script_GetKeywordValue(0x4B, 2));
     scriptVariant = (s16)Script_GetKeywordValue(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    MonsterInit_WriteHalfword(&arg0->base.field9A, scriptVariant);
+    MonsterInit_WriteHalfword(&arg0->base.hudLabel, scriptVariant);
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
@@ -154,9 +154,9 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;
@@ -172,8 +172,8 @@ static inline void Lun_InstallCompletionCallbacks(struct ChaseActor *actor)
 static inline void Lun_InstallRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605E78);
-    actor->base.callback248 = Lun_ResetMovementState;
-    actor->base.field23C = Lun_EnterIdleOrCopyCell;
+    actor->base.routeReset = Lun_ResetMovementState;
+    actor->base.reactionGate = Lun_EnterIdleOrCopyCell;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Lun_OnTargetCheck);
 }
 

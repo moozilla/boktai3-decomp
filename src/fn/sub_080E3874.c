@@ -6,7 +6,7 @@
 
 static inline u32 Dog_RouteFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 
 /* Queue pursuit, a home route, or the short waiting response after the delay. */

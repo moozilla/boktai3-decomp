@@ -12,7 +12,7 @@ static inline s32 TruncateShift(s32 value, u32 shift)
 static inline void SetHeightFromGround(struct ChaseActor *actor)
 {
     u32 ground = ((struct SceneActorControlGroundView *)actor)->ground;
-    actor->base.body.position.y = actor->base.field2EA + ground;
+    actor->base.body.position.y = actor->base.heightOffset + ground;
 }
 
 // confidence=low: adds the hover offset to the actor and bobs its drawable.
@@ -29,7 +29,7 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
         if (SceneActorPlacement_TestValue(state->flags3D4, mask))
             return;
     }
-    if ((u8)(actor->base.field2B5 - 0x23) <= 1) {
+    if ((u8)(actor->base.controlKind - 0x23) <= 1) {
         SetHeightFromGround(actor);
         return;
     }
@@ -48,21 +48,21 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
         else
             cap = 0x104;
     }
-    if ((s16)actor->base.field2EA < cap) {
-        actor->base.field2EA += TruncateShift(gUnk_086149C4[state->phase], 9);
+    if ((s16)actor->base.heightOffset < cap) {
+        actor->base.heightOffset += TruncateShift(gUnk_086149C4[state->phase], 9);
         if (state->phase <= 0x3f)
             state->phase++;
         actor->base.body.position.y =
-            ((struct SceneActorControlGroundView *)actor)->ground + actor->base.field2EA;
+            ((struct SceneActorControlGroundView *)actor)->ground + actor->base.heightOffset;
     }
     delta =
         ((struct SceneActorControlGroundView *)actor)->ground + cap - actor->base.body.position.y;
     magnitude = delta >= 0 ? delta : -delta;
     if (magnitude > 0x10) {
         if (delta < 0)
-            actor->base.field2EA -= 2;
+            actor->base.heightOffset -= 2;
         else
-            actor->base.field2EA += 2;
+            actor->base.heightOffset += 2;
     }
     SetHeightFromGround(actor);
     {

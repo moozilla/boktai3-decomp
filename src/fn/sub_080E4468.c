@@ -17,7 +17,7 @@ struct DogAnim {
 
 static inline u16 LoadMotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 value = actor->base.flags2D4;
+    u16 value = actor->base.motionFlags;
     return value & mask;
 }
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
@@ -55,7 +55,7 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
                 *(struct ContactPosition *)((u8 *)gPlayers[0] + 0x30);
             {
                 u32 chasing = 0x80;
-                if (actor->base.flags2D4 & chasing) {
+                if (actor->base.motionFlags & chasing) {
                     u16 *time = &actor->group.common.gate.counter;
                     *time += 0x12C;
                     if (*time > actor->group.common.gate.duration)
@@ -65,7 +65,7 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
             return;
         }
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         if (LoadMotionFlags(actor, 0x80)) {
             Chase_SetBehavior(actor, 0xC);
             Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);

@@ -25,7 +25,7 @@ void Dog_SelectRetreatOrChase(struct ChaseActor *a)
         }
         if (a->base.tracking.distance > FIELD(context, 0x68C, u32)) {
             struct ChaseTarget *target;
-            if (a->base.field2B5 == 0x1A)
+            if (a->base.controlKind == 0x1A)
                 return;
             if ((*(u32 *)&a->base.state2A8 & 0xFFFFFF) == 0xC0000)
                 return;

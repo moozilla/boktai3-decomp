@@ -2,7 +2,7 @@
 #include "scene_actor_animation.h"
 void SceneActorTerrain_ResumeDrawable(struct RoomActor *actor)
 {
-    u32 *flags = &actor->flags2CC;
+    u32 *flags = &actor->behaviorFlags;
     u32 mask = -4;
     *flags &= mask;
     if (!actor->drawableKind) {

@@ -144,19 +144,19 @@ static inline void MonsterInit_SetAlternatePaletteOffset(struct ChaseActor *acto
 }
 static inline u32 MonsterInit_GetMotionFlags(struct ChaseActor *actor)
 {
-    return actor->base.flags2C0;
+    return actor->base.placementFlags;
 }
 static inline u16 MonsterInit_GetHeightOffset(struct ChaseActor *actor)
 {
-    return actor->base.field2EA;
+    return actor->base.heightOffset;
 }
 static inline u32 MonsterInit_GetBehaviorFlags(struct ChaseActor *actor)
 {
-    return actor->base.flags2CC;
+    return actor->base.behaviorFlags;
 }
 static inline u32 MonsterInit_GetStatusFlags(struct ChaseActor *actor)
 {
-    return actor->base.flags2D0;
+    return actor->base.statusFlags;
 }
 static inline u8 MonsterInit_GetState(struct ChaseActor *actor)
 {
@@ -180,7 +180,7 @@ static inline void *MonsterInit_GetStandingControl(struct ChaseActor *actor)
 }
 static inline u8 MonsterInit_GetControlKind(struct ChaseActor *actor)
 {
-    return actor->base.field2B5;
+    return actor->base.controlKind;
 }
 static inline u8 MonsterInit_GetDirection(struct ChaseActor *actor)
 {
@@ -206,15 +206,15 @@ static inline void MonsterInit_SaveControl(struct SceneActorDefaultControl *save
 }
 static inline void MonsterInit_SetBehaviorFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2CC |= mask;
+    actor->base.behaviorFlags |= mask;
 }
 static inline void MonsterInit_SetStatusFlags(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2D0 |= mask;
+    actor->base.statusFlags |= mask;
 }
 static inline void MonsterInit_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2C0 |= mask;
+    actor->base.placementFlags |= mask;
 }
 static inline u8 MonsterInit_TestMotionFlags(struct ChaseActor *actor, u32 mask)
 {
@@ -224,32 +224,32 @@ static inline u8 MonsterInit_TestMotionFlags(struct ChaseActor *actor, u32 mask)
 }
 static inline void MonsterInit_MaskControlFlags(struct ChaseActor *actor, u32 keepMask)
 {
-    actor->base.flags114 &= keepMask;
+    actor->base.pendingControlFlags &= keepMask;
 }
 static inline void MonsterInit_SetMotionControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
-    actor->base.word104 = (u32)callback;
-    actor->base.word108 = 0;
-    actor->base.word10C = 0;
-    actor->base.word110 = kind;
-    actor->base.flags114 = 1;
+    actor->base.pendingControl = (u32)callback;
+    actor->base.pendingControlData = 0;
+    actor->base.pendingControlRelease = 0;
+    actor->base.pendingControlKind = kind;
+    actor->base.pendingControlFlags = 1;
 }
 static inline void MonsterInit_ClearMotion(void *object)
 {
     struct ChaseActor *actor = object;
     u32 zero = 0;
     MonsterInit_SetMotionControl(actor, 0, 0);
-    actor->base.flags114 = zero;
+    actor->base.pendingControlFlags = zero;
 }
 static inline void MonsterInit_SetControl(struct ChaseActor *actor, void *callback, u32 behavior)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = behavior;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = behavior;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     MonsterInit_MaskControlFlags(actor, ~1);
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void MonsterInit_SetState(struct ChaseActor *actor, u32 state, u32 phase,
                                         u32 behavior)
@@ -278,16 +278,16 @@ static inline void MonsterInit_SetInitialHealth(struct ChaseActor *actor, u16 he
 static inline void MonsterInit_InitializeHealth(struct ChaseActor *actor, u16 raw, s32 firstLimit,
                                                 s32 secondLimit)
 {
-    actor->base.flags2D4 = 0;
+    actor->base.motionFlags = 0;
     MonsterInit_InstallIdle(actor, SceneActorControl_OnIdle);
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
+    actor->base.stepDone = 0;
     actor->base.health = MonsterInit_ClampHealth(raw);
-    actor->base.fieldAA = 0;
+    actor->base.attachmentTimer = 0;
     if (secondLimit <= 0)
         secondLimit = firstLimit;
     actor->base.attachmentLimit = firstLimit;
-    actor->base.fieldA8 = secondLimit;
+    actor->base.attachmentRestart = secondLimit;
     actor->base.regionId = 0;
 }
 static inline void MonsterInit_SetFirstAttack(struct ChaseActor *actor, s32 index, s32 value)
@@ -372,12 +372,12 @@ static inline void MonsterInit_SetContactCallback(struct ChaseActor *actor, void
 
 static inline void MonsterInit_SetReactionGate(struct ChaseActor *actor, void *callback)
 {
-    actor->base.field23C = callback;
+    actor->base.reactionGate = callback;
 }
 
 static inline void MonsterInit_SetRouteReset(struct ChaseActor *actor, void *callback)
 {
-    actor->base.callback248 = callback;
+    actor->base.routeReset = callback;
 }
 
 #endif

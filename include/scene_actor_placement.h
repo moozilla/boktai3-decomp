@@ -15,11 +15,11 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *);
 void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *, u32);
 static inline u32 SceneActorPlacement_ReadFlags16(struct RoomActor *actor, u32 mask)
 {
-    return actor->flags2D4 & mask;
+    return actor->motionFlags & mask;
 }
 static inline u32 SceneActorPlacement_ReadFlags32(struct RoomActor *actor, u32 mask)
 {
-    return actor->flags2D0 & mask;
+    return actor->statusFlags & mask;
 }
 static inline u8 SceneActorPlacement_IsUnavailable(struct RoomActor *actor)
 {

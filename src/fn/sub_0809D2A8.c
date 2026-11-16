@@ -3,7 +3,7 @@
 
 static inline u32 TestFlag(struct ChaseActor *p, u32 mask)
 {
-    mask &= p->base.flags2CC;
+    mask &= p->base.behaviorFlags;
     return mask;
 }
 static inline s32 Height(s32 cell, struct ContactPosition *p)

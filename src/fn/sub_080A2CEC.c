@@ -106,7 +106,7 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             values[3] = actor->base.parameters1FC[0];
             values[4] = actor->base.parameters1FC[1];
             values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.field2E0;
+            values[6] = actor->base.hitOwners;
             values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
@@ -114,7 +114,7 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 mask = 0x4000;
-            if ((!(actor->base.flags2D4 & mask)) && (((u32)(actor->base.category - 11)) > 2)) {
+            if ((!(actor->base.motionFlags & mask)) && (((u32)(actor->base.category - 11)) > 2)) {
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             }
@@ -130,16 +130,16 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             u32 kind;
             kind = 16;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
         SetAnimation(actor, 1, 0, 2);
     } else if (Hidden(actor)) {

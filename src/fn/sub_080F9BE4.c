@@ -66,7 +66,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 mask = 0x800;
-            actor->base.flags2C0 = mask | actor->base.flags2C0;
+            actor->base.placementFlags = mask | actor->base.placementFlags;
         }
         context[0xED2] = 0;
         Axe_ReleaseAuxiliarySprite(actor);
@@ -120,7 +120,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorBehavior_CallTerrainScript((void *)actor);
     script = (u16)actor->base.script1F8;
     if (script) {
@@ -130,7 +130,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         buf.values[3] = actor->base.parameters1FC[0];
         buf.values[4] = actor->base.parameters1FC[1];
         buf.values[5] = actor->base.parameters1FC[2];
-        buf.values[6] = actor->base.field2E0;
+        buf.values[6] = actor->base.hitOwners;
         buf.values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = buf.values;
@@ -138,27 +138,27 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     {
         u32 mask = 0x4000;
-        if (!(actor->base.flags2D4 & mask) && (u32)(actor->base.category - 11) > 2)
+        if (!(actor->base.motionFlags & mask) && (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     }
     Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->base.category, context[0xED7]));
-    actor->base.fieldAA = 0;
+    actor->base.attachmentTimer = 0;
     {
         void *callback = (void *)SceneActorControl_OnIdle;
         u32 kind;
         kind = 16;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
     }
     SetAnimation(actor, 1, 0, 2);
 }

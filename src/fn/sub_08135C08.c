@@ -13,7 +13,7 @@ s32 SceneActorPlacement_BeginDestinationJump(struct RoomActor *actor)
 {
     struct ContactPosition delta;
     if (actor->category == 3 && SceneActorPlacement_ReadFlags16(actor, 0x100) &&
-        (actor->field2D8 & 0x400)) {
+        (actor->hitAttributes & 0x400)) {
         Difference(&delta, &actor->body.position, &actor->reactionStart);
         actor->secondaryMotion.x = Div(delta.x, 36);
         actor->secondaryMotion.y = 20;

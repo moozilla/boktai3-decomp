@@ -5,7 +5,7 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->base.flags2CC;
+        u32 *field = &actor->base.behaviorFlags;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
@@ -55,7 +55,7 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
             actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         if (actor->base.drawableKind == 0)
             *((u8 *)actor->base.drawable + 7) = state;
         else
@@ -63,7 +63,7 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
         {
             u32 mask = 0x80000;
             u32 *field;
-            field = &actor->base.flags2D0;
+            field = &actor->base.statusFlags;
             *field |= mask;
         }
         ActorShadow_Disable((u8 *)actor + 0x320);

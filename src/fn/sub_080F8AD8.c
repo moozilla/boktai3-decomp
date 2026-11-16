@@ -28,6 +28,6 @@ void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame)
         Sound_PlaySong(0x169);
     if (frame > 0x2B) {
         ((struct AxeFadeSprite *)actor->base.drawable)->field6 = 0;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
     }
 }

@@ -14,7 +14,7 @@ void SceneActorReaction_RestoreAlternateAfterDelay(struct ChaseActor *actor, s32
             one = 1;
             *field = one;
         }
-        owner->base.field2B0 = zero;
+        owner->base.stepDone = zero;
         *((u8 *)owner + 0x2B5) = kind;
         owner->base.target = control;
         owner->base.field2C8 = zero;
@@ -26,7 +26,7 @@ void SceneActorReaction_RestoreAlternateAfterDelay(struct ChaseActor *actor, s32
             mask = ~1;
             *field &= mask;
             {
-                u32 *clear = &owner->base.word104;
+                u32 *clear = &owner->base.pendingControl;
                 *clear = zero;
             }
         }

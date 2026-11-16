@@ -11,10 +11,10 @@ static inline u8 Unavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if (actor->base.flags2D4 & mask)
+        if (actor->base.motionFlags & mask)
             return 1;
         mask = 0x20000;
-        if (actor->base.flags2D0 & mask)
+        if (actor->base.statusFlags & mask)
             return 1;
         if (actor->base.health <= 0)
             return 1;
@@ -61,13 +61,13 @@ void SceneActorControl_TickActionCooldown(struct ChaseActor *actor)
         return;
     {
         u32 mask = 0xE33F;
-        flags = actor->base.flags2D4;
+        flags = actor->base.motionFlags;
         if (mask & flags)
             return;
     }
-    if (MaskFlags(0x10, &actor->base.flags2CC))
+    if (MaskFlags(0x10, &actor->base.behaviorFlags))
         return;
-    if (actor->base.field2B5 > 1)
+    if (actor->base.controlKind > 1)
         return;
     if (cooldown->remaining) {
         cooldown->remaining--;

@@ -14,7 +14,7 @@ struct MummyCheckpointContext {
 
 static inline void Mummy_ClearMotion(struct ChaseActor *actor, u32 bits)
 {
-    struct ChaseFlags40 *field = (void *)&actor->base.flags2D4;
+    struct ChaseFlags40 *field = (void *)&actor->base.motionFlags;
     s32 mask = ~bits;
     field->bits &= mask;
 }
@@ -31,7 +31,7 @@ void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Chase_SetCtl(actor, SceneActor_UpdateAnimationCheckpoint, 0x26);
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         s32 contextBits = 0x800;
         Mummy_ClearMotion(actor, 0x100);
         body->flags6F2 &= ~contextBits;

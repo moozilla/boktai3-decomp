@@ -14,7 +14,7 @@ void SceneActorReaction_RestoreAfterDelay(void *);
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
+    return offset == 0x2D4 ? actor->base.motionFlags & mask : actor->base.statusFlags & mask;
 }
 
 static inline u8 IsUnavailable(struct ChaseActor *actor)
@@ -51,16 +51,16 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline u32 CellIndex(struct ContactPosition *p)
@@ -146,14 +146,14 @@ static inline u8 MoveTo(struct ChaseActor *actor, void *shape, struct ContactPos
 static inline u32 ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 bit = mask;
-    u32 *flags = &actor->base.flags2CC;
+    u32 *flags = &actor->base.behaviorFlags;
     return *flags & bit;
 }
 static inline void ResetControl(struct ChaseActor *actor, u32 enabled, u16 *flags)
 {
     struct SceneActorRegistryControl *control = &actor->group.common.control;
     if (enabled) {
-        ClearWordFlags(&actor->base.flags2D0, ~0x1000000);
+        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
         ClearHalfFlags(flags, ~0x200);
         control->mode = 0;
         control->counter = 0;
@@ -201,7 +201,7 @@ static inline void SaveControl(void *record, void *callback, u8 behavior)
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 bit = mask;
-    u32 *flags = &actor->base.flags2CC;
+    u32 *flags = &actor->base.behaviorFlags;
     *flags |= bit;
 }
 u32 sub_0813727C(struct ChaseActor *actor)
@@ -225,7 +225,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
         return 0;
     {
         u32 busy = 0xA027;
-        u16 *p = &actor->base.flags2D4;
+        u16 *p = &actor->base.motionFlags;
         u32 t;
         flags = *p;
         t = busy & flags;

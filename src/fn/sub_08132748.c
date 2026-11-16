@@ -12,21 +12,21 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void Hide(struct ChaseActor *a)
 {
@@ -46,15 +46,15 @@ void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
         u16 *timer = &actor->base.colliderA.responseParameter;
         u32 zero = 0;
         *timer = zero;
-        actor->base.field2B8 = zero;
+        actor->base.hitLockTimer = zero;
     }
     {
-        u16 *flags = &actor->base.flags2D4;
+        u16 *flags = &actor->base.motionFlags;
         u32 mask = ~0x2000;
         *flags = mask & *flags;
     }
     {
-        u16 *flags = &actor->base.flags2D6;
+        u16 *flags = &actor->base.reactionFlags;
         u32 mask = ~0x980;
         *flags = mask & *flags;
     }
@@ -75,11 +75,11 @@ void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
         actor->base.counter2AC = 0;
         actor->base.field2B1 = 1;
     }
-    actor->base.field2E0 = 32;
+    actor->base.hitOwners = 32;
     if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
 }

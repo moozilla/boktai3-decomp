@@ -2,7 +2,7 @@
 #include "engine.h"
 static inline void Turn_SetFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D4 = mask | actor->base.flags2D4;
+    actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 static inline void Turn_ResetState(struct ChaseActor *actor, u32 state, u32 phase)
 {
@@ -17,14 +17,14 @@ static inline void Turn_SetControl(struct ChaseActor *actor, u32 kind, void *con
     u32 *flags;
     u32 mask;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
-    flags = &actor->base.flags114;
+    flags = &actor->base.pendingControlFlags;
     mask = ~1;
     *flags &= mask;
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
 {
@@ -91,7 +91,7 @@ void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
             actor->base.counter2AC = 0;
             actor->base.field2B1 = 1;
             {
-                u16 *flags = &actor->base.flags2D4;
+                u16 *flags = &actor->base.motionFlags;
                 u32 mask = ~0x400;
                 *flags = mask & *flags;
             }

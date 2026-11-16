@@ -15,7 +15,7 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorChase_SetControl(actor, SceneActor_UpdateDirectionalAnimation, 3);
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         SceneActorChase_ClearFlagComponent(&body->flags6F2, 0x800);
         actor->base.tracking.target =
             &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;

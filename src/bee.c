@@ -54,9 +54,9 @@ static inline u8 Bee_ContactUnavailable(struct ChaseActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if (!(actor->base.flags2D4 & mask)) {
+        if (!(actor->base.motionFlags & mask)) {
             u32 mask = 0x20000;
-            if (!(actor->base.flags2D0 & mask) && actor->base.health > 0)
+            if (!(actor->base.statusFlags & mask) && actor->base.health > 0)
                 return 0;
         }
         return 1;
@@ -219,7 +219,7 @@ void Bee_UpdateRecoveryAnimation(struct ChaseActor *actor)
     if (Bee_TakeReadyFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
     if (actor->base.restart)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }
 
 // confidence=low: preserves sequence timing when the Bee changes facing without entering a state.
@@ -300,7 +300,7 @@ void Bee_UpdateMovementStop(struct ChaseActor *actor)
         u16 *flags;
         {
             u32 value = 0x20;
-            flags = &actor->base.flags2D4;
+            flags = &actor->base.motionFlags;
             value |= *flags;
             *flags = value;
         }
@@ -312,7 +312,7 @@ void Bee_UpdateMovementStop(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x100000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     {
         s32 current = actor->base.reactionStart.x;
@@ -335,16 +335,16 @@ void Bee_UpdateMovementStop(struct ChaseActor *actor)
     *priorX += x;
     *priorZ += z;
     if (Bee_IsMotionAtRest(x, z)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         {
 
-            struct BeeSignedFlag *f = (void *)&actor->base.flags2D4;
+            struct BeeSignedFlag *f = (void *)&actor->base.motionFlags;
             s32 m = ~0x20;
             m &= (u16)f->bits;
             f->bits = m;
         }
         {
-            u32 *f = &actor->base.flags2CC;
+            u32 *f = &actor->base.behaviorFlags;
             s32 m = ~0x80;
             *f &= m;
         }
@@ -391,7 +391,7 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     script = (u16)actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
@@ -400,7 +400,7 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         values[3] = actor->base.parameters1FC[0];
         values[4] = actor->base.parameters1FC[1];
         values[5] = actor->base.parameters1FC[2];
-        values[6] = actor->base.field2E0;
+        values[6] = actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
@@ -408,13 +408,13 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     {
         u32 mask = 0x4000;
-        if (!(actor->base.flags2D4 & mask) && (u32)(actor->base.category - 11) > 2)
+        if (!(actor->base.motionFlags & mask) && (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     }
     {
         u32 mask = 0x400;
-        if (!(actor->base.flags2CC & mask))
+        if (!(actor->base.behaviorFlags & mask))
             SceneActorBehavior_CallTerrainScript((void *)actor);
     }
     {
@@ -422,16 +422,16 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         u32 kind;
         kind = 16;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
     }
     Bee_SetState(actor, 1, 0, 2);
     ActorShadow_Disable(actor->base.shadow);
@@ -531,7 +531,7 @@ static inline u32 Bee_AnchorRandom(void)
 static inline u32 Bee_AnchorActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
+    return offset == 0x2D4 ? actor->base.motionFlags & mask : actor->base.statusFlags & mask;
 }
 
 static inline u8 Bee_AnchorUnavailable(struct ChaseActor *actor)
@@ -563,16 +563,16 @@ static inline void Bee_SetAnchorControl(struct ChaseActor *a, void *cb, u32 kind
     u8 *taken = &a->base.field2B2;
     zero = 0;
     *taken = 1;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 static inline void Bee_ClearAnchorMotion(u32 *zero, void *out)
@@ -707,7 +707,7 @@ void Bee_ResetRoute(struct ChaseActor *actor)
         }
     }
     actor->base.groundHeight = height;
-    actor->base.field2EA = actor->base.body.position.y - height;
+    actor->base.heightOffset = actor->base.body.position.y - height;
     actor->base.body.position.y = actor->base.groundHeight;
     if (!actor->base.drawableKind) {
         *(struct BeePackedPosition *)&((struct BeeDrawable *)actor->base.drawable)->position =
@@ -737,7 +737,7 @@ void Bee_ResetRoute(struct ChaseActor *actor)
 static inline u32 Bee_FlightActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
+    return offset == 0x2D4 ? actor->base.motionFlags & mask : actor->base.statusFlags & mask;
 }
 
 static inline u8 Bee_FlightUnavailable(struct ChaseActor *actor)
@@ -775,14 +775,14 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
     g = &actor->base.groundHeight;
     {
         u32 diff = *g - state->previousGround;
-        actor->base.field2EA -= diff;
+        actor->base.heightOffset -= diff;
         state->previousGround = *g;
     }
     if (!Bee_FlightActorFlags(actor, 0x100000, 0x2D0)) {
-        actor->base.body.position.y = *g + actor->base.field2EA;
+        actor->base.body.position.y = *g + actor->base.heightOffset;
         return;
     }
-    if ((s16)actor->base.field2EA <= 259) {
+    if ((s16)actor->base.heightOffset <= 259) {
         {
             u32 mask = 1;
             if (Bee_TestFlightFlags(state->flags, mask)) {
@@ -790,10 +790,10 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
                 return;
             }
         }
-        actor->base.field2EA += Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 9);
+        actor->base.heightOffset += Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 9);
         if (state->flightPhase <= 63)
             state->flightPhase++;
-        actor->base.body.position.y = actor->base.groundHeight + actor->base.field2EA;
+        actor->base.body.position.y = actor->base.groundHeight + actor->base.heightOffset;
     }
     {
         s32 currentGround = actor->base.groundHeight;
@@ -803,11 +803,11 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
     absolute = delta >= 0 ? delta : -delta;
     if (absolute > 16) {
         if (delta < 0)
-            actor->base.field2EA -= 8;
+            actor->base.heightOffset -= 8;
         else
-            actor->base.field2EA += 8;
+            actor->base.heightOffset += 8;
     }
-    actor->base.body.position.y = actor->base.groundHeight + actor->base.field2EA;
+    actor->base.body.position.y = actor->base.groundHeight + actor->base.heightOffset;
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
         drawable->position.y -= Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 5);
@@ -922,7 +922,7 @@ void Bee_DisableMovement(struct ChaseActor *actor)
 {
     struct Bee *context = actor->base.context;
     u32 m = 0x100000;
-    u32 *p = &actor->base.flags2D0;
+    u32 *p = &actor->base.statusFlags;
     u32 *p2;
     u32 m2;
     *p = *p | m;
@@ -1072,7 +1072,7 @@ void Collider_SetAttackProperties(void *, u16, u16, u32, u32, u16);
 static inline u32 Bee_AttackActorFlags(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
-    return offset == 0x2D4 ? actor->base.flags2D4 & mask : actor->base.flags2D0 & mask;
+    return offset == 0x2D4 ? actor->base.motionFlags & mask : actor->base.statusFlags & mask;
 }
 
 static inline u8 Bee_AttackUnavailable(struct ChaseActor *actor)
@@ -1089,7 +1089,7 @@ void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor)
         return;
     {
         u16 mask = 0x100;
-        if (mask & actor->base.flags2D4) {
+        if (mask & actor->base.motionFlags) {
             struct ContactCollider *collider = &actor->base.colliderB;
             u16 field3C = actor->base.attacks.first[1];
             u16 field40 = actor->base.attacks.second[1];
@@ -1147,7 +1147,7 @@ zero:
     return 0;
 one: {
     u32 mask = 0x80;
-    u16 *flags = &actor->base.flags2D6;
+    u16 *flags = &actor->base.reactionFlags;
     mask |= *flags;
     *flags = mask;
 }
@@ -1288,16 +1288,16 @@ static inline void Bee_InstallControl(struct ChaseActor *a, void *cb, u32 kind)
     u8 *taken = &a->base.field2B2;
     zero = 0;
     *taken = 1;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 static inline u8 Bee_GetHeading(const struct ChaseActor *actor)
@@ -1399,16 +1399,16 @@ void SceneActorControl_TickPendingTarget(struct ChaseActor *actor)
             void *target = actor->base.onAlternateEntry;
             u32 one = 1;
             actor->base.field2B2 = one;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = one;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = one;
             actor->base.target = target;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
     }
     {
@@ -1449,16 +1449,16 @@ void Bee_UpdateReactionPhase(struct ChaseActor *actor)
             void *callback = (void *)Bee_ResetReactionAnimation;
             u32 kind = 0x25;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
     }
     if ((s32)actor->base.counter2AC > 0x28 && actor->base.restart)
@@ -1470,16 +1470,16 @@ static inline void Bee_SetRecoveryControl(struct ChaseActor *a, void *cb, u32 ki
 {
     u32 zero = 0;
     a->base.field2B2 = 1;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 // confidence=low: approaches a saved player position during the recovery animation.
@@ -1503,7 +1503,7 @@ void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
         }
         {
             u32 mask = 0x100;
-            actor->base.flags2D4 = mask | actor->base.flags2D4;
+            actor->base.motionFlags = mask | actor->base.motionFlags;
         }
         Sound_PlaySong(0x3C8);
     }
@@ -1520,7 +1520,7 @@ void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
             motion->motion.z += Bee_TruncateShift(gUnk_086149C4[motion->direction] * speed, 12);
         }
     }
-    if (actor->base.field2B0)
+    if (actor->base.stepDone)
         Bee_EnterState(actor, 2, 4);
     else
         actor->base.counter2AC++;
@@ -1557,16 +1557,16 @@ void Bee_UpdateWanderPause(struct ChaseActor *actor)
         u8 *taken = &actor->base.field2B2;
         zero = 0;
         *taken = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         r = Bee_PauseRandom();
         fp = &actor->base.tracking.heading;
         angle = (r & 0x1F) + 0x71;
@@ -1575,7 +1575,7 @@ void Bee_UpdateWanderPause(struct ChaseActor *actor)
     }
     cnt = actor->base.counter2AC;
     if (cnt > 0x1E) {
-        actor->base.flags2D4 = Bee_MaskFlags(&actor->base.flags2D4, ~0x100);
+        actor->base.motionFlags = Bee_MaskFlags(&actor->base.motionFlags, ~0x100);
         Bee_SetState(actor, 0, 2, 0);
     } else {
         actor->base.counter2AC = cnt + 1;
@@ -1719,7 +1719,7 @@ u32 Bee_OnUpdate(struct ChaseActor *actor)
     void **t;
     Bee_UpdateGroundHeight(actor);
     i = actor->base.state2A8;
-    t = actor->base.callbacks27C;
+    t = actor->base.stateCallbacks;
     Callback_InvokeActor(actor, t[i]);
     SceneActorControl_DispatchControl(actor);
     Bee_UpdateTimersAndContacts(actor);
@@ -1770,7 +1770,7 @@ u32 Bee_Destroy(struct ChaseActor *actor)
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Bee_TestDestroyFlags(&actor->base.flags2C0, m))
+    if (Bee_TestDestroyFlags(&actor->base.placementFlags, m))
         SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
         u8 *r = actor->base.shadow;
@@ -1778,7 +1778,7 @@ u32 Bee_Destroy(struct ChaseActor *actor)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = actor->base.flags2D0 & m;
+    v = actor->base.statusFlags & m;
     q = (void *)&actor->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
@@ -1823,11 +1823,11 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     struct ContactPosition origin;
     s32 mode, firstLimit, secondLimit;
     s32 scriptVariant;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
+    arg0->base.placementFlags = MonsterInit_ReadKeywordHalfword(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -1844,13 +1844,13 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.scriptId = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -1858,14 +1858,14 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
+    arg0->base.hudKind = MonsterInit_ReadKeywordHalfword(0x4B, 2);
     scriptVariant = (s16)MonsterInit_ReadKeywordHalfword(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    arg0->base.field9A = scriptVariant;
+    arg0->base.hudLabel = scriptVariant;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
@@ -1910,9 +1910,9 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;
@@ -1929,8 +1929,8 @@ static inline void Bee_InstallCompletionCallbacks(struct ChaseActor *actor)
 static inline void Bee_InstallRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605DB8);
-    actor->base.callback248 = Bee_ResetRoute;
-    actor->base.field23C = Slime_SetStateFlag;
+    actor->base.routeReset = Bee_ResetRoute;
+    actor->base.reactionGate = Slime_SetStateFlag;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Bee_OnDetectionCheck);
 }
 
@@ -1994,7 +1994,7 @@ s32 Bee_Init(void *object)
             u16 *ground = &actor->base.groundHeight;
             *ground = groundHeight;
             offset = (u16)actor->base.body.position.y - groundHeight;
-            actor->base.field2EA = offset;
+            actor->base.heightOffset = offset;
             bee->initialHeight = offset;
             actor->base.body.position.y = *ground;
             bee->previousGround = *ground;

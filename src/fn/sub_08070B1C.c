@@ -3,7 +3,7 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 void SceneActorControl_OnIdle(u8 *);
 static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 excluded)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u32 value = *flags;
     u32 mask = 0x40;
     value &= mask;
@@ -11,7 +11,7 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **saved, u32 exclud
     if (value)
         goto one;
     {
-        u32 value = actor->base.flags2D0;
+        u32 value = actor->base.statusFlags;
         mask = excluded;
         value &= mask;
         if (value)
@@ -51,18 +51,18 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                         u32 selected = *flags & reject;
                         if (!selected) {
                             actor->base.field2B2 = one;
-                            actor->base.field2B0 = selected;
-                            actor->base.field2B5 = substate;
+                            actor->base.stepDone = selected;
+                            actor->base.controlKind = substate;
                             actor->base.target = callback;
                             actor->base.field2C8 = selected;
                             {
-                                u32 *flags = &actor->base.flags114;
+                                u32 *flags = &actor->base.pendingControlFlags;
                                 u32 mask = ~1;
                                 u32 value = *flags;
                                 value &= mask;
                                 *flags = value;
                             }
-                            actor->base.word104 = selected;
+                            actor->base.pendingControl = selected;
                             actor->base.state2A8 = zero;
                             actor->base.phase2A9 = one;
                             actor->base.behavior2AA = zero;

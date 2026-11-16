@@ -3,7 +3,7 @@ void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *argument)
 {
     struct RoomActor *actor = (void *)argument;
     u32 mask = 0x400000;
-    u32 *flags = &actor->flags2D0;
+    u32 *flags = &actor->statusFlags;
     if (mask & *flags) {
         *flags &= ~0x400000;
         return;

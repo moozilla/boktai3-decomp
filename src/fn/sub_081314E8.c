@@ -11,16 +11,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kin
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -33,16 +33,16 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void State(struct ChaseActor *a, u32 behavior)
 {
@@ -58,7 +58,7 @@ static inline void State(struct ChaseActor *a, u32 behavior)
 #include "scene_actor_attachment.h"
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
 {
-    u16 *field = &a->base.flags2D4;
+    u16 *field = &a->base.motionFlags;
     u32 value = *field & mask;
     *out = field;
     return value;
@@ -101,17 +101,17 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         BeginControlZero(actor, actor->base.onStanding, 0);
         {
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = ~0x80;
             *flags &= mask;
         }
         {
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x1000000;
             *flags &= mask;
         }
         {
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             u32 mask = ~0x200;
             *flags &= mask;
         }
@@ -174,9 +174,9 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         {
             struct SceneActorRegistryControl *control = &group->common.control;
             u32 mask = 0x200000;
-            if (actor->base.flags2CC & mask) {
+            if (actor->base.behaviorFlags & mask) {
                 {
-                    u32 *flags = &actor->base.flags2D0;
+                    u32 *flags = &actor->base.statusFlags;
                     u32 mask = ~0x1000000;
                     *flags &= mask;
                 }

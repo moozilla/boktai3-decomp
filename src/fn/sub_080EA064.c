@@ -67,16 +67,16 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void ResetState(struct ChaseActor *actor, u32 s)
@@ -145,23 +145,23 @@ static inline s32 HudMode(void)
 static inline u8 MayCount(struct ChaseActor *victim)
 {
     if (TestFlags(gEngineFlags, 0x4800)) {
-        u32 value = victim->base.field2E0;
+        u32 value = victim->base.hitOwners;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {
                 case 0:
-                    if (victim->base.field2E0 != 1)
+                    if (victim->base.hitOwners != 1)
                         return 0;
                     break;
                 case 1:
-                    if (victim->base.field2E0 != 2)
+                    if (victim->base.hitOwners != 2)
                         return 0;
                     break;
                 case 2:
-                    if (victim->base.field2E0 != 4)
+                    if (victim->base.hitOwners != 4)
                         return 0;
                     break;
                 case 3:
-                    if (victim->base.field2E0 != 8)
+                    if (victim->base.hitOwners != 8)
                         return 0;
                     break;
             }
@@ -185,7 +185,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
         s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
         SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
-        if (victim->base.reactionSoundVariant || !(victim->base.field2D8 & 0x20000))
+        if (victim->base.reactionSoundVariant || !(victim->base.hitAttributes & 0x20000))
             DamageNumberDisplay_Show(&victim->base.colliderA, victim->base.reactionSoundVariant, 0,
                                      &victim->base.body.position, &range, 1);
     }
@@ -212,8 +212,8 @@ void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 mask = 0x800;
-            mask |= actor->base.flags2C0;
-            actor->base.flags2C0 = mask;
+            mask |= actor->base.placementFlags;
+            actor->base.placementFlags = mask;
         }
     }
     target = (void *)actor->base.tracking.target;
@@ -281,7 +281,7 @@ animate:
     if (sequence->index == 0 && sequence->elapsed == 0)
         Sound_PlaySong(0x1DE);
     if (frame > 0xB4) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 1;
     }
 }

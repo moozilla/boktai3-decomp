@@ -10,7 +10,7 @@ static inline s32 Absolute(s32 value)
 static inline u16 Motion(struct ChaseActor *a, u32 mask)
 {
     u32 bit = mask;
-    u16 *field = &a->base.flags2D4;
+    u16 *field = &a->base.motionFlags;
     {
         u32 result = *field & bit;
         return result;
@@ -30,7 +30,7 @@ u8 Dog_RequestHeadingTurn(struct ChaseActor *a, s32 heading)
         difference -= 256;
     else if (difference < -128)
         difference += 256;
-    if (Absolute(difference) < a->base.tracking.fieldEA || a->base.field2B5 == 2)
+    if (Absolute(difference) < a->base.tracking.fieldEA || a->base.controlKind == 2)
         return 0;
     Chase_SetCtl(a, SceneActorControl_OnIdle, 0x10);
     motion = Motion(a, 0x80);

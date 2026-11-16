@@ -37,7 +37,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
             return;
     }
     {
-        u32 *field = &early->flags2CC;
+        u32 *field = &early->behaviorFlags;
         u32 mask = ~0x80;
         *field &= mask;
     }

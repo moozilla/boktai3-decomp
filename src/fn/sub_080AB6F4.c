@@ -25,7 +25,7 @@ void Tentacle_FireSecondaryAttack(struct ChaseActor *actor)
         return;
     {
         u32 busy = 0xA027;
-        u32 flags = actor->base.flags2D4;
+        u32 flags = actor->base.motionFlags;
         u16 mask;
         if (busy & flags)
             return;

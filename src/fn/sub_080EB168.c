@@ -5,16 +5,16 @@ s32 SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 static inline void SetControl(struct ChaseActor *a, void *cb, u32 k)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = k;
+    a->base.stepDone = 0;
+    a->base.controlKind = k;
     a->base.target = cb;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
@@ -40,7 +40,7 @@ void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
             u16 v = 4 | c->flags;
             c->flags = v & 0xfff7;
         }
-        Or(0x800, &a->base.flags2C0);
+        Or(0x800, &a->base.placementFlags);
         flag = 1;
         if (a->base.drawableKind == 0) {
             u32 *flags = a->base.drawable;

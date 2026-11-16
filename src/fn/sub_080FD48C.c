@@ -14,9 +14,9 @@ void Axe_UpdateRecoverTimer(struct ChaseActor *actor)
 {
     if (actor->base.field2B1)
         actor->base.field2B1 = 0;
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u32 mask = 0x100;
-        actor->base.flags2D4 = actor->base.flags2D4 & ~mask;
+        actor->base.motionFlags = actor->base.motionFlags & ~mask;
         SetPhase(actor, 0, 0, 3);
     } else
         actor->base.counter2AC++;

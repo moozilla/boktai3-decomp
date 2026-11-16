@@ -5,16 +5,16 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -31,7 +31,7 @@ static inline void ClearBits(u16 *field, u32 bits)
 s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
 {
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
-    if (!unavailable && actor->base.flags2D6) {
+    if (!unavailable && actor->base.reactionFlags) {
         struct ChaseActor *self = actor;
         struct SceneActorChaseGroup *group = &actor->group;
         u16 *flags;
@@ -43,8 +43,8 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
             SetState(actor, 3, 0, 0);
             SetControl(actor, group->contactControl, 7);
             {
-                s32 value = actor->base.fieldA8;
-                actor->base.fieldAA = value;
+                s32 value = actor->base.attachmentRestart;
+                actor->base.attachmentTimer = value;
             }
             ClearBits(flags, 0x983);
             return 1;
@@ -59,7 +59,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 0x80)) {
-            void *callback = actor->base.field23C;
+            void *callback = actor->base.reactionGate;
             if (callback)
                 Callback_InvokeActor(actor, callback);
             ClearBits(flags, 0x180);

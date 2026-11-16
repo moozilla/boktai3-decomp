@@ -8,10 +8,10 @@ static inline u8 Unavailable(struct RoomActor *actor)
 {
     if (actor) {
         u32 mask = 0x40;
-        if (actor->flags2D4 & mask)
+        if (actor->motionFlags & mask)
             return 1;
         mask = 0x20000;
-        if (actor->flags2D0 & mask)
+        if (actor->statusFlags & mask)
             return 1;
         if (actor->health <= 0)
             return 1;

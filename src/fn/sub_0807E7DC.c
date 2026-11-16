@@ -47,7 +47,7 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *actor)
     }
     goto done;
 failed: {
-    u16 *flags = &owner->base.flags2D4;
+    u16 *flags = &owner->base.motionFlags;
     u32 mask = ~0x200;
     mask &= *flags;
     *flags = mask;

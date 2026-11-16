@@ -35,7 +35,7 @@ void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
         s->accumulated = 0;
     }
     SceneActorAnimation_SelectProfileEntry(a, 14);
-    if (Mod(a->base.field2CA, s->interval) == 0) {
+    if (Mod(a->base.frameCounter, s->interval) == 0) {
         u16 *mode = &a->base.paletteOffset;
         u32 value = *mode;
         if (!value) {
@@ -71,12 +71,12 @@ void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
     if (*elapsed != delta) {
         if (Mod(*elapsed, 4) == 0) {
             u32 mask = 0x20;
-            u16 *flags = &a->base.flags2D6;
+            u16 *flags = &a->base.reactionFlags;
             mask |= *flags;
             *flags = mask;
         }
         *elapsed = delta;
     }
     if (s->elapsed > s->limit)
-        a->base.field2B0 = 1;
+        a->base.stepDone = 1;
 }

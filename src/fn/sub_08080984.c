@@ -6,7 +6,7 @@ void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
     struct SceneActorReactionGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *control = &group->control;
-        u32 *field = &actor->base.flags2CC;
+        u32 *field = &actor->base.behaviorFlags;
         u32 mask = ~0x141C0;
         *field &= mask;
         control->counter = 0;
@@ -64,6 +64,6 @@ void SceneActorReaction_BeginReactionSound(struct ChaseActor *actor)
             actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
     }
 }

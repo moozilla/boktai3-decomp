@@ -33,9 +33,9 @@ static inline void Fill(u32 *zero, void *dst)
 u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
-    if (actor->base.category == 1 && (actor->base.field2DC & 4)) {
+    if (actor->base.category == 1 && (actor->base.hitReactionFlags & 4)) {
         u32 test = 0x2000;
-        u16 *flags2D4 = &actor->base.flags2D4;
+        u16 *flags2D4 = &actor->base.motionFlags;
         u32 value = *flags2D4;
         if (!(test & value)) {
             u32 *flags2D0;
@@ -45,13 +45,13 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                 v &= ~0xA007;
                 *flags2D4 = v;
             }
-            flags2D0 = &actor->base.flags2D0;
+            flags2D0 = &actor->base.statusFlags;
             {
                 u32 mask = ~2;
                 *flags2D0 &= mask;
             }
             {
-                struct SceneActorChaseFlags16 *flags = (void *)&actor->base.flags2D6;
+                struct SceneActorChaseFlags16 *flags = (void *)&actor->base.reactionFlags;
                 s32 mask = ~0x9CB;
                 flags->value &= mask;
             }
@@ -92,7 +92,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                     SceneHud_SetTimedState(FIELD(actor, 0x50, u32), h, maxh, kind, 1, param);
                 }
                 Fill(&zero, buffer);
-                if (actor->base.reactionSoundVariant || !(actor->base.field2D8 & 0x20000))
+                if (actor->base.reactionSoundVariant || !(actor->base.hitAttributes & 0x20000))
                     DamageNumberDisplay_Show(&actor->base.colliderA,
                                              actor->base.reactionSoundVariant, 0,
                                              &actor->base.body.position, buffer, 1);
@@ -114,11 +114,11 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
             }
             {
                 u32 bit = 0x2000000;
-                actor->base.flags2CC |= bit;
+                actor->base.behaviorFlags |= bit;
             }
             {
                 u16 timer = 6000;
-                actor->base.field1EA = timer;
+                actor->base.paletteTimer = timer;
             }
             Sound_PlaySong(0x121);
             return 1;

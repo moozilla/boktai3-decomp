@@ -120,11 +120,11 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x100;
-        actor->base.flags2D4 |= mask;
+        actor->base.motionFlags |= mask;
     }
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     dx = Scale16(gUnk_086149C4[(body[0x691] + 0x40) & 0xFF] * *(s16 *)(body + 0x682));
     dz = Scale16(gUnk_086149C4[body[0x691]] * *(s16 *)(body + 0x682));
@@ -138,7 +138,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
         s16 zero = 0;
         *speed = zero;
         if (++body[0x68F] > 11) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             *speed = zero;
         }
     } else {

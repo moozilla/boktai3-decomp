@@ -50,7 +50,7 @@ struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct Cont
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
 
             if (!unavailable && (category == 4 || category == 1 || category == 3) &&
-                actor->base.field2B5 != 21) {
+                actor->base.controlKind != 21) {
                 const struct ContactPosition *right = &actor->base.body.position;
                 s32 x;
                 s32 z;

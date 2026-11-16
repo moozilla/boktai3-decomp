@@ -23,7 +23,7 @@ static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
 }
 static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 #define VORN_READ_RANDOM_SAMPLE(out_, samples_, offset_)                                           \
     do {                                                                                           \
@@ -81,13 +81,13 @@ static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 b
 #define VORN_PREPARE_ENTRY_BYTE(actor_, prepared_)                                                 \
     do {                                                                                           \
         (actor_)->base.field2B2 = (prepared_);                                                     \
-        (actor_)->base.field2B0 = 0;                                                               \
+        (actor_)->base.stepDone = 0;                                                               \
     } while (0)
 static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
                                            u32 prepared)
 {
     VORN_PREPARE_ENTRY_BYTE(actor, prepared);
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     SceneActorChase_ResetMotionControl(actor);
 }
@@ -148,7 +148,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     if (!Vorn_ActorFlags(actor, 0x400)) {
         u8 category;
         SceneActor_CallContextScriptB(actor);
@@ -192,7 +192,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
         values[3] = Vorn_GetScriptParameter(actor, 0);
         values[4] = Vorn_GetScriptParameter(actor, 1);
         values[5] = Vorn_GetScriptParameter(actor, 2);
-        values[6] = actor->base.field2E0;
+        values[6] = actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
@@ -202,7 +202,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
         (u32)(actor->base.category - 11) > 2)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-    actor->base.fieldAA = 0;
+    actor->base.attachmentTimer = 0;
     {
         u32 mask = 1;
         if (!actor->base.drawableKind)

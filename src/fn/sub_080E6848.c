@@ -21,16 +21,16 @@ static inline void resetState(struct ChaseActor *actor, u8 behavior)
 static inline void setControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
-    clearFlag(&actor->base.flags114);
-    actor->base.word104 = 0;
+    clearFlag(&actor->base.pendingControlFlags);
+    actor->base.pendingControl = 0;
 }
 static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 void Dog_ResetIdleControl(struct ChaseActor *actor)
 {
@@ -41,7 +41,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         actor->base.field2C2 = 0x40;
         actor->group.common.gate.flags = 0;
         actor->group.common.gate.counter = 0;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         {
             u32 mask = ~0x380;
             mask &= *flags;
@@ -55,7 +55,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         }
         control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
-            clearRouteFlag(&actor->base.flags2D0);
+            clearRouteFlag(&actor->base.statusFlags);
             {
                 u32 mask = ~0x200;
                 mask &= *flags;

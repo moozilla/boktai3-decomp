@@ -8,17 +8,17 @@ void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *actor, s32 unuse
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
         SceneActorTerrain_ClearCollisionTimers((void *)actor);
         {
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             s32 mask = ~2;
             *flags &= mask;
         }
     }
     if (actor->base.restart) {
-        actor->base.fieldAA = 0;
-        actor->base.field2B0 = 1;
+        actor->base.attachmentTimer = 0;
+        actor->base.stepDone = 1;
         {
             u32 mask = 16;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorTerrain_EnterState(actor, 3, 1, 0);

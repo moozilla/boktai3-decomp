@@ -20,12 +20,12 @@ static inline u8 Blocked(struct ChaseActor *s)
         goto zero;
     {
         u32 mask = 0x40;
-        if (s->base.flags2D4 & mask)
+        if (s->base.motionFlags & mask)
             goto one;
     }
     {
         u32 mask = 0x20000;
-        if (s->base.flags2D0 & mask)
+        if (s->base.statusFlags & mask)
             goto one;
     }
     if (s->base.health > 0)
@@ -64,15 +64,15 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
         fn = SceneActorControl_OnIdle;
         code = 0x10;
         s->base.field2B2 = one;
-        s->base.field2B0 = zero;
-        s->base.field2B5 = code;
+        s->base.stepDone = zero;
+        s->base.controlKind = code;
         s->base.target = fn;
         s->base.field2C8 = zero;
         {
-            u32 *flags = &s->base.flags114;
+            u32 *flags = &s->base.pendingControlFlags;
             u32 mask = -2;
             *flags &= mask;
         }
-        s->base.word104 = zero;
+        s->base.pendingControl = zero;
     }
 }

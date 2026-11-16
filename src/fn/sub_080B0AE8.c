@@ -7,10 +7,10 @@ static inline u8 IsUnavailable(void *input)
     struct ChaseActor *p = input;
     if (p) {
         u32 mask = 0x40;
-        if (p->base.flags2D4 & mask)
+        if (p->base.motionFlags & mask)
             return 1;
         mask = 0x20000;
-        if (p->base.flags2D0 & mask)
+        if (p->base.statusFlags & mask)
             return 1;
         if (p->base.health <= 0)
             return 1;
@@ -25,7 +25,7 @@ static inline u8 HasFlags(u16 *flags, u32 mask)
 }
 static inline u32 MaskedFlags(struct ChaseActor *p, u32 mask)
 {
-    return p->base.flags2D4 & mask;
+    return p->base.motionFlags & mask;
 }
 static inline u8 TestContext(u8 *base, u32 mask, u16 **out)
 {
@@ -40,7 +40,7 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
 {
     u8 *base = (u8 *)p;
 
-    if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->base.field2B5 != 0x29 &&
+    if (!IsUnavailable(base) && *(s16 *)(base + 0x682) == 1 && p->base.controlKind != 0x29 &&
         !MaskedFlags(p, 0xE3BF)) {
         u16 *flags;
         if (!TestContext(base, 0xC, &flags) && HasFlags(flags, 2)) {
@@ -59,24 +59,24 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
                 *ready = one;
                 control = p->base.onStanding;
                 p->base.field2B2 = one;
-                p->base.field2B0 = zero;
-                p->base.field2B5 = zero;
+                p->base.stepDone = zero;
+                p->base.controlKind = zero;
                 p->base.target = control;
                 p->base.field2C8 = zero;
-                motionFlags = &p->base.flags114;
+                motionFlags = &p->base.pendingControlFlags;
                 {
                     s32 mask = -2;
                     *motionFlags &= mask;
                 }
                 {
                     u32 duration;
-                    u32 *slot = &p->base.word104;
+                    u32 *slot = &p->base.pendingControl;
                     u32 callback = (u32)Vorn_UpdateScriptedAnimation;
                     duration = 0x29;
                     *slot = callback;
-                    p->base.word108 = zero;
-                    p->base.word10C = zero;
-                    p->base.word110 = duration;
+                    p->base.pendingControlData = zero;
+                    p->base.pendingControlRelease = zero;
+                    p->base.pendingControlKind = duration;
                     *motionFlags = one;
                 }
             }

@@ -24,7 +24,7 @@ static inline u8 TryMove(struct ChaseActor *actor, u8 *group)
     struct ContactPosition *destination = &actor->base.tracking.target->position;
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, destination)) {
-        ClearFlags16(&actor->base.flags2D4, ~0x200);
+        ClearFlags16(&actor->base.motionFlags, ~0x200);
         return 0;
     } else {
         result = Terrain_ApplyBlocked(route, position, destination);
@@ -33,7 +33,7 @@ static inline u8 TryMove(struct ChaseActor *actor, u8 *group)
                 Memory_Clear(&actor->base.body.motion, 8);
             return 1;
         } else {
-            ClearFlags16(&actor->base.flags2D4, ~0x200);
+            ClearFlags16(&actor->base.motionFlags, ~0x200);
             return 0;
         }
     }

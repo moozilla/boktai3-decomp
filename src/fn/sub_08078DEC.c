@@ -30,7 +30,7 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
     const void *control;
     u32 kind;
     if (Unavailable(actor)) {
-        u32 *field = &actor->flags114;
+        u32 *field = &actor->pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
         return;
@@ -40,31 +40,31 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
         u32 *field;
         u32 value;
         u32 active;
-        field = &actor->flags114;
+        field = &actor->pendingControlFlags;
         value = *field & mask;
         flags = field;
         value = Test(value, value);
         active = value;
         if (!active) {
-            actor->word104 = (void *)active;
-            actor->word108 = (void *)active;
+            actor->pendingControl = (void *)active;
+            actor->pendingControlData = (void *)active;
             return;
         }
     }
     clear = ~1;
     *flags &= clear;
     {
-        const void **field = &actor->word104;
+        const void **field = &actor->pendingControl;
         control = *field;
     }
-    kind = actor->word110;
+    kind = actor->pendingControlKind;
     {
         u8 *field = &actor->field2B2;
         zero = 0;
         *field = 1;
     }
-    actor->field2B0 = zero;
-    actor->field2B5 = kind;
+    actor->stepDone = zero;
+    actor->controlKind = kind;
     actor->target = control;
     actor->field2C8 = zero;
     *flags &= clear;
@@ -74,10 +74,10 @@ void SceneActorBehavior_ActivatePendingControl(struct RoomActor *actor)
         *(const void **)((u32)actor + offset) = (void *)zero;
     }
     {
-        void **allocation = &actor->word108;
+        void **allocation = &actor->pendingControlData;
         void *value = *allocation;
         if (value) {
-            Callback_InvokeActor(actor->word10C, value);
+            Callback_InvokeActor(actor->pendingControlRelease, value);
             *allocation = (void *)zero;
         }
     }

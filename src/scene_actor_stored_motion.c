@@ -44,16 +44,16 @@ static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
     u32 zero;
     a->base.field2B2 = 1;
     zero = 0;
-    a->base.field2B0 = zero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = zero;
+    a->base.controlKind = kind;
     a->base.target = cb;
     a->base.field2C8 = zero;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = zero;
+    a->base.pendingControl = zero;
 }
 
 static inline u32 WanderRand(void)
@@ -258,7 +258,7 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
             return;
         }
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         SetMotionPhase(actor, 4);
     } else {
         actor->base.counter2AC++;
@@ -478,14 +478,14 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         if (!(*flags & mask))
             return;
     }
     {
         u32 mask = 0x800;
         u16 *flags;
-        flags = &actor->base.flags2C0;
+        flags = &actor->base.placementFlags;
         mask |= *flags;
         *flags = mask;
     }
@@ -606,7 +606,7 @@ struct WanderCallbackView {
 
 static inline void SetWanderFlags(struct ChaseActor *actor, u32 bit)
 {
-    actor->base.flags2C0 = bit | actor->base.flags2C0;
+    actor->base.placementFlags = bit | actor->base.placementFlags;
 }
 
 static inline void SetWanderPhase(struct ChaseActor *actor, u32 state, u32 behavior)
@@ -655,21 +655,21 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
         u8 *taken = &actor->base.field2B2;
         u32 zero = 0;
         *taken = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = one;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = one;
         actor->base.target = fn;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         Trigger_ConsumePending((void *)((u8 *)actor + 0xC), 1);
         {
             u32 mask = 0x800;
             u16 *flags;
-            flags = &actor->base.flags2C0;
+            flags = &actor->base.placementFlags;
             mask |= *flags;
             *flags = mask;
         }
@@ -764,7 +764,7 @@ u32 Bat_Destroy(struct S *s)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.flags2D0 & m;
+    v = ((struct ChaseActor *)s)->base.statusFlags & m;
     q = (u8 *)s + 0x50;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);

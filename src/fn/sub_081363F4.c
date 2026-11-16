@@ -25,7 +25,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
         }
         {
             u32 mask = 0x20000;
-            if (actor->base.flags2D0 & mask)
+            if (actor->base.statusFlags & mask)
                 return 1;
         }
         if (actor->base.health <= 0)
@@ -51,7 +51,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
             *flags2D4 = 0x40;
             actor->base.field2E6 = zero;
             {
-                u16 *flags2D6 = &actor->base.flags2D6;
+                u16 *flags2D6 = &actor->base.reactionFlags;
                 s32 mask = ~0x980;
                 *flags2D6 &= mask;
             }
@@ -95,13 +95,13 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
                 }
             }
             {
-                u32 *flags2D0 = &actor->base.flags2D0;
+                u32 *flags2D0 = &actor->base.statusFlags;
                 u32 mask = 0xFFEFFFFB;
                 *flags2D0 &= mask;
             }
             {
                 u32 bit = 0x400;
-                actor->base.flags2D6 |= bit;
+                actor->base.reactionFlags |= bit;
             }
             actor->base.field2E6 = down;
             {
@@ -161,7 +161,7 @@ static inline u32 PlacementDamage_QueryMotionSaveStatus(struct ChaseActor *actor
                                                         struct PlacementStatusOwner *owner,
                                                         struct PlacementMotionOwner *motionOwner)
 {
-    u16 *motion = &actor->base.flags2D4;
+    u16 *motion = &actor->base.motionFlags;
     u32 bits = *motion & mask;
     motionOwner->field = motion;
     owner->field = status;
@@ -181,7 +181,7 @@ static inline u32 WordBits(u32 *field, u32 mask)
 }
 static inline u32 HitFlag(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline u8 HasPendingHitSave(struct ChaseActor *actor, u16 **out)
 {
@@ -218,9 +218,10 @@ static inline void PlacementDamage_ReportHud(struct ChaseActor *actor, u32 id, s
 static inline void PlacementDamage_UpdateCollider(struct ContactCollider *collider,
                                                   struct ChaseActor *actor, u16 *flags2D4)
 {
-    if (PlacementDamage_TestField(0x40, &actor->base.flags2C0))
+    if (PlacementDamage_TestField(0x40, &actor->base.placementFlags))
         collider->flags &= ~0x100;
-    else if ((actor->base.field2DC & 0x84000) || PlacementDamage_FieldBits(0x2016, flags2D4))
+    else if ((actor->base.hitReactionFlags & 0x84000) ||
+             PlacementDamage_FieldBits(0x2016, flags2D4))
         collider->flags &= ~0x100;
     else
         collider->flags |= 0x100;
@@ -246,7 +247,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
             struct PlacementStatusOwner saved;
             struct PlacementMotionOwner savedMotion;
             struct SceneActorRegistryControl *control = &group->common.control;
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = 0xFFFEBE3F;
             *flags &= mask;
             ResetMotion(control);
@@ -284,8 +285,8 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
     }
     {
         u32 applied = SceneActorReaction_ApplyEscalatingHit(actor);
-        flags2D4 = &actor->base.flags2D4;
-        if ((!applied) && (!(actor->base.field2D8 & 0x20000))) {
+        flags2D4 = &actor->base.motionFlags;
+        if ((!applied) && (!(actor->base.hitAttributes & 0x20000))) {
             PlacementDamage_SetHitFlags(0x20, (void *)flags2D4);
         }
     }
@@ -296,17 +297,17 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
             mode = 4;
     }
     {
-        u32 *damageFlags = &actor->base.field2D8;
+        u32 *damageFlags = &actor->base.hitAttributes;
         u32 blocked = *damageFlags & 0x20000;
-        flags2CC = &actor->base.flags2CC;
+        flags2CC = &actor->base.behaviorFlags;
         flags2D8 = damageFlags;
         collider = &actor->base.colliderA;
         if (!blocked) {
             if ((mode & 4) && (!PlacementDamage_MotionBits(4, flags2D4))) {
                 SceneActorBehavior_PlayReactionSound(actor);
-                *(u16 *)&actor->base.field30C = 12;
+                *(u16 *)&actor->base.particleTimer = 12;
             }
-            flags2CC = &actor->base.flags2CC;
+            flags2CC = &actor->base.behaviorFlags;
             collider = &actor->base.colliderA;
             if (mode) {
                 u16 bank = actor->base.paletteAlternateBank;
@@ -317,17 +318,17 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
                         gPaletteBankData + (bank * 32);
                 {
                     u32 eight = 8;
-                    actor->base.field1E8 = eight;
+                    actor->base.flashTimer = eight;
                 }
                 {
                     u32 strong = mode & 4;
-                    flags2CC = &actor->base.flags2CC;
+                    flags2CC = &actor->base.behaviorFlags;
                     if (strong && (actor->base.category == 0x19)) {
                         u32 bit = 0x2000000;
                         *flags2CC |= bit;
                         {
                             u32 duration = 0x41;
-                            actor->base.field1EA = duration;
+                            actor->base.paletteTimer = duration;
                         }
                     }
                 }
@@ -347,8 +348,8 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
                     if (decision.part.value) {
                         s32 h = actor->base.health;
                         s32 maxh = (u16)actor->base.defaultHealth;
-                        s32 kind = (s16)actor->base.fieldB2;
-                        s32 param = (s16)actor->base.field9A;
+                        s32 kind = (s16)actor->base.hudKind;
+                        s32 param = (s16)actor->base.hudLabel;
                         u32 id = actor->base.body.id;
                         s32 priority;
                         decision.part.value = 1;
@@ -364,14 +365,14 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
         u32 test = 0x10;
         u32 flags = *flags2D4;
         if ((test & flags) || WordBits(flags2CC, 0x200))
-            actor->base.fieldAA = 0;
+            actor->base.attachmentTimer = 0;
         else if (flags & 6) {
-            s16 *currentField = (s16 *)&actor->base.fieldAA;
-            s16 *initialField = (s16 *)&actor->base.fieldA8;
+            s16 *currentField = (s16 *)&actor->base.attachmentTimer;
+            s16 *initialField = (s16 *)&actor->base.attachmentRestart;
             s32 current = *currentField;
             s32 initial = *initialField;
             if (current >= initial)
-                actor->base.fieldAA = initial;
+                actor->base.attachmentTimer = initial;
         }
     }
     {

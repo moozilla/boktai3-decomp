@@ -53,16 +53,16 @@ static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 beh
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
@@ -80,18 +80,18 @@ void Spider_UpdateHiddenRecovery(struct ChaseActor *a)
         ScaledShadow_Enable((u8 *)a + 0x360);
         {
             u32 mask = 0x800;
-            a->base.flags2C0 = mask | a->base.flags2C0;
+            a->base.placementFlags = mask | a->base.placementFlags;
         }
         SetCollider(&a->base.colliderB);
         SetCollider(&a->base.colliderA);
     }
     {
         u32 mask = 0x10;
-        if (a->base.flags2D0 & mask) {
+        if (a->base.statusFlags & mask) {
             u32 zero;
             if (*((u8 *)a + 0x360))
                 ScaledShadow_Destroy((u8 *)a + 0x360);
-            ClearHidden((void *)&a->base.flags2C0, ~0x800);
+            ClearHidden((void *)&a->base.placementFlags, ~0x800);
             ClearCollider(&a->base.colliderB);
             ClearCollider(&a->base.colliderA);
             SaveRecovery((void *)&a->group.saved.control, a->base.onStanding, 5, 20);

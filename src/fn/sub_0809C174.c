@@ -15,16 +15,16 @@ static inline u8 TakeFlag(u8 *p)
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = 0;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *a, u32 phase, u32 behavior, u32 zero)
 {
@@ -45,9 +45,9 @@ void Lun_DecayRouteMotion(struct ChaseActor *a)
         *(s16 *)(ctx + 0x424) >>= 1;
         *(s16 *)(ctx + 0x428) >>= 1;
     }
-    if (a->base.field2B0) {
+    if (a->base.stepDone) {
         u32 mask = 0x100;
-        u16 *p = &a->base.flags2D4;
+        u16 *p = &a->base.motionFlags;
         u16 flags;
         {
             u32 raw = *p & mask;

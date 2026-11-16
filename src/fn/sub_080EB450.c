@@ -44,8 +44,8 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
         zero = 0;
         one = 1;
         *prepared = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         {
             u16 *field = &actor->base.field2C8;
@@ -53,11 +53,11 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
             *field = zero;
         }
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         ResetState(actor, 3, 0, 0);
     } else {
         if ((s32)actor->base.counter2AC > 300 || SceneActorReaction_FindAdjacentTarget(actor, 1)) {
@@ -69,16 +69,16 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
             callback = SceneActorControl_OnIdle;
             kind = 16;
             actor->base.field2B2 = one;
-            actor->base.field2B0 = zero;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = zero;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = zero;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = zero;
+            actor->base.pendingControl = zero;
         }
         actor->base.counter2AC++;
     }

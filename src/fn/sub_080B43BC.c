@@ -51,11 +51,11 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     struct ContactPosition origin;
     s32 mode, secondLimit, firstLimit, gateDuration, identity;
     struct SceneActorRegistryRoute *rt;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    arg0->base.placementFlags = MonsterInit_ReadKeywordHalfword('M', 0);
     arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
@@ -77,14 +77,14 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.scriptId = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -92,14 +92,14 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->base.fieldB2 = Script_GetKeywordValue(0x4B, 2);
+    arg0->base.hudKind = Script_GetKeywordValue(0x4B, 2);
     identity = (s16)Script_GetKeywordValue(0x56, -1);
     if (identity < 0)
         identity = 0xFFFF;
-    arg0->base.field9A = identity;
+    arg0->base.hudLabel = identity;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue(0x4C, 0))

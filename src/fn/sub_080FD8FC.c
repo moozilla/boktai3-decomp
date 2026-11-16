@@ -24,7 +24,7 @@ static inline void Restart(struct ChaseActor *actor)
 {
     u8 zero8;
     u32 zero;
-    actor->base.flags2D4 = Mask16(&actor->base.flags2D4, ~0x100);
+    actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
     zero8 = 0;
     zero = 0;
     {
@@ -34,16 +34,16 @@ static inline void Restart(struct ChaseActor *actor)
         u8 *taken = &actor->base.field2B2;
         one = 1;
         *taken = one;
-        actor->base.field2B0 = zero8;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = zero8;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         {
             u32 behavior = 4;
             actor->base.state2A8 = zero8;
@@ -61,20 +61,20 @@ void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
         void *callback = (void *)SceneActor_AdvanceOffsetApproach;
         u32 kind = 0x2A;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
-        Or16(0x100, &actor->base.flags2D4);
+        actor->base.pendingControl = 0;
+        Or16(0x100, &actor->base.motionFlags);
         context->fieldEBE = context->fieldEC6;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         Restart(actor);
     } else {
         ++actor->base.counter2AC;

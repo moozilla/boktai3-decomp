@@ -93,7 +93,7 @@ static inline u8 MimicChase_TryRoute(struct ChaseActor *actor, void *route,
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        MimicChase_ClearBits(&actor->base.flags2D4, 0x200);
+        MimicChase_ClearBits(&actor->base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
@@ -102,7 +102,7 @@ static inline u8 MimicChase_TryRoute(struct ChaseActor *actor, void *route,
             Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    MimicChase_ClearBits(&actor->base.flags2D4, 0x200);
+    MimicChase_ClearBits(&actor->base.motionFlags, 0x200);
     return 0;
 }
 

@@ -5,7 +5,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, s32, s32, s32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, s32, s32, s32);
 static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 void Vorn_UpdateDescriptorPursuit(struct ChaseActor *a)
 {

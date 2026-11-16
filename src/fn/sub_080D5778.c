@@ -24,7 +24,7 @@ void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x200);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         group->common.control.timer = 0;
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))

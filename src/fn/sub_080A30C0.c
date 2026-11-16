@@ -48,11 +48,11 @@ static inline void Control(struct ChaseActor *a, void *target)
     a->base.target = target;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         s32 m = ~1;
         *p &= m;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 // confidence=low: updates probe navigation and switches between turn, approach, and idle behaviors.
 void Spider_UpdateWanderGoal(void *);
@@ -81,7 +81,7 @@ static inline u32 Flags(u32 *p, u32 mask)
 }
 static inline u32 GetFlags(struct ChaseActor *a, u32 mask, u32 **out)
 {
-    u32 *p = &a->base.flags2CC;
+    u32 *p = &a->base.behaviorFlags;
     u32 v = *p;
     v &= mask;
     *out = p;
@@ -106,7 +106,7 @@ void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;

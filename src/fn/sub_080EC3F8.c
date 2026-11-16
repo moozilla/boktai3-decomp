@@ -65,11 +65,11 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     s32 mode, secondLimit, firstLimit, gateDuration, variant;
     u16 scriptParameter;
     struct SceneActorRegistryRoute *rt;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = Script_GetKeywordValue('M', 0);
+    arg0->base.placementFlags = Script_GetKeywordValue('M', 0);
     arg0->base.field2C2 = 0x40;
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue('N', 0);
@@ -93,14 +93,14 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     scriptParameter = (u16)Script_GetKeywordValue('F', 0);
     arg0->base.script1F0 = scriptParameter;
     scriptParameter = (u16)Script_GetKeywordValue('R', 0);
-    arg0->base.field1EC = scriptParameter;
+    arg0->base.scriptId = scriptParameter;
 
     if (Script_SeekToKeyword('A')) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         group->halfHealth = MonsterInit_Half(MonsterInit_GetInitialHealth(arg0));
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -108,14 +108,14 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword('X')) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->base.fieldB2 = Script_GetKeywordValue('K', 2);
+    arg0->base.hudKind = Script_GetKeywordValue('K', 2);
     variant = (s16)Script_GetKeywordValue('V', -1);
     if (variant < 0)
         variant = 0xFFFF;
-    arg0->base.field9A = variant;
+    arg0->base.hudLabel = variant;
     if (Script_GetKeywordValue('H', 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
     if (Script_GetKeywordValue('L', 0))
@@ -151,7 +151,7 @@ static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg
 
 static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)
 {
-    actor->base.callback248 = SceneActorControl_UpdateMotionPhase_080EBD0C;
+    actor->base.routeReset = SceneActorControl_UpdateMotionPhase_080EBD0C;
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_0860635C);
 }
 

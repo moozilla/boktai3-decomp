@@ -10,16 +10,16 @@ static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
     void *callback = target;
     u32 type = kind;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = type;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = type;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -48,7 +48,7 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
         SceneActorAnimation_SelectProfileEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
-            u32 *p = &actor->base.flags2D0;
+            u32 *p = &actor->base.statusFlags;
             u32 m = ~0x100000;
             *p &= m;
         }
@@ -62,12 +62,12 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
         }
         {
             u32 m = 0x800;
-            actor->base.flags2C0 = m | actor->base.flags2C0;
+            actor->base.placementFlags = m | actor->base.placementFlags;
         }
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
     }
     if (actor->base.restart) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorBehavior_CallTerrainScript(actor);
         script = (u16)actor->base.script1F8;
         if (script) {
@@ -77,7 +77,7 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
             values[3] = actor->base.parameters1FC[0];
             values[4] = actor->base.parameters1FC[1];
             values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.field2E0;
+            values[6] = actor->base.hitOwners;
             values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
@@ -85,7 +85,7 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
         }
         {
             u32 m = 0x4000;
-            if (!(actor->base.flags2D4 & m) && (u32)(actor->base.category - 11) > 2)
+            if (!(actor->base.motionFlags & m) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         }

@@ -13,7 +13,7 @@ static inline void clearRouteFlag(u32 *flags)
 }
 static inline u32 testFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 static inline void clearBits16(u16 *field, u32 bits)
 {
@@ -42,7 +42,7 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
     actor->group.common.gate.counter = 0;
     {
         struct SceneActorRegistryControl *control;
-        clearBits16(&actor->base.flags2D4, 0x380);
+        clearBits16(&actor->base.motionFlags, 0x380);
         {
             u8 *motion = (u8 *)&actor->base.tracking.target;
             s32 mask = ~0x18;
@@ -51,13 +51,13 @@ void Skeleton_ResetRouteReaction(struct ChaseActor *actor)
         }
         control = &actor->group.common.control;
         if (testFlags(actor, 0x200000)) {
-            clearRouteFlag(&actor->base.flags2D0);
-            clearBits16(&actor->base.flags2D4, 0x200);
+            clearRouteFlag(&actor->base.statusFlags);
+            clearBits16(&actor->base.motionFlags, 0x200);
             control->mode = 0;
             control->counter = 0;
             control->timer = 0;
         }
-        clearBits16(&actor->base.flags2D4, 0x400);
+        clearBits16(&actor->base.motionFlags, 0x400);
     }
     actor->group.turn.turnsRemaining = 255;
     SceneActorMovement_ResolveRoutePosition(actor);

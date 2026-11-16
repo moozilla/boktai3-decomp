@@ -33,16 +33,16 @@ static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *o
 static inline void SceneActor_SetApproachControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
-    p->base.field2B0 = 0;
-    p->base.field2B5 = kind;
+    p->base.stepDone = 0;
+    p->base.controlKind = kind;
     p->base.target = control;
     p->base.field2C8 = 0;
     {
-        u32 *flags = &p->base.flags114;
+        u32 *flags = &p->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    p->base.word104 = 0;
+    p->base.pendingControl = 0;
 }
 void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
 {

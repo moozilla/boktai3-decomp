@@ -46,7 +46,7 @@ void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
         animation->duration != 1)
@@ -88,7 +88,7 @@ void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
     if (!actor->base.restart)
         return;
     group = &actor->group;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);
     SceneActorChase_ClearActorFlags(actor, 0x80);
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x10)) {
@@ -99,7 +99,7 @@ void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
         SceneActorChase_ClearMotionFlagComponent(actor, 8);
         return;
     }
-    if (actor->base.field2DC & 0x80000) {
+    if (actor->base.hitReactionFlags & 0x80000) {
         SceneActorChase_SetReactionFlags(actor, 2);
         return;
     }

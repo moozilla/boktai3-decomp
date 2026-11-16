@@ -18,7 +18,7 @@ static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *o
     if (!Unavailable(a) && (other->contactFlags & 15)) {
         a->base.counter304 = other->collisionId;
         {
-            u32 *p = &a->base.flags2D0;
+            u32 *p = &a->base.statusFlags;
             s32 mask = 0xFEFFFFFF;
             *p &= mask;
         }
@@ -99,7 +99,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
     self->direction = Math_Atan2(delta.x, delta.z);
     if (other->contactFlags & 15) {
         if (Flag(base, 0x100, 0x2D4)) {
-            if (base->base.field2B5 == 0x29 || IsFrontal(base->base.body.direction, other)) {
+            if (base->base.controlKind == 0x29 || IsFrontal(base->base.body.direction, other)) {
                 RecordContact(a, other);
                 AddImpact(state);
                 {

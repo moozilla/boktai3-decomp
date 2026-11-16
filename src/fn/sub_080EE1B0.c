@@ -90,16 +90,16 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
@@ -294,7 +294,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         u32 hidden;
         {
             u16 m = 0x40;
-            actor->base.flags2D4 = m | actor->base.flags2D4;
+            actor->base.motionFlags = m | actor->base.motionFlags;
         }
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 10, 1);
         {
@@ -308,7 +308,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 m = 0x800;
-            actor->base.flags2C0 = m | actor->base.flags2C0;
+            actor->base.placementFlags = m | actor->base.placementFlags;
         }
         SceneActorPlacement_PlayCategoryEventSound(actor);
         ClearPos(&vec, &buf.zero);
@@ -316,7 +316,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         vec.y = (Rand() & 0x1F) + 0x30;
         sub_08127590(&actor->base.body.position, &vec, 0xD638, 0x99DD, 10, 0x1E, 2, 0, 0x12A, 0, 0,
                      0, 0, 0, 0);
-        hidden = actor->base.field2DC & 0x10;
+        hidden = actor->base.hitReactionFlags & 0x10;
         if (hidden)
             Sound_PlaySong(0xE5);
         else {
@@ -333,7 +333,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     if (frame <= 0x14)
         return;
     {
-        u32 hidden = actor->base.field2DC & 0x10;
+        u32 hidden = actor->base.hitReactionFlags & 0x10;
         if (!hidden) {
             s32 h = actor->base.defaultHealth;
             if (h <= 0)
@@ -341,7 +341,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             actor->base.health = h;
             {
                 u32 bit = 0x40;
-                actor->base.flags2D4 &= ~bit;
+                actor->base.motionFlags &= ~bit;
             }
             SetState(actor, 0, 0, 1);
             SetCtl(actor, (void *)SceneActorReaction_PlayHiddenCue, 0x2A);
@@ -354,7 +354,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             }
             {
                 u32 bit = 0x800;
-                actor->base.flags2C0 &= ~bit;
+                actor->base.placementFlags &= ~bit;
             }
             return;
         }
@@ -367,7 +367,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         Sound_PlaySong(0xE5);
         {
             u32 m = 0x1000;
-            actor->base.flags2D6 = m | actor->base.flags2D6;
+            actor->base.reactionFlags = m | actor->base.reactionFlags;
         }
         categoryp = &actor->base.category;
     } else {
@@ -405,7 +405,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             buf.values[3] = actor->base.parameters1FC[0];
             buf.values[4] = actor->base.parameters1FC[1];
             buf.values[5] = actor->base.parameters1FC[2];
-            buf.values[6] = actor->base.field2E0;
+            buf.values[6] = actor->base.hitOwners;
             buf.values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = buf.values;
@@ -419,8 +419,8 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
-    sub_08159164(actor->base.fieldAC);
-    Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
+    sub_08159164(actor->base.experience);
+    Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
     if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
 }

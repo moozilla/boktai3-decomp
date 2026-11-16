@@ -90,7 +90,7 @@ void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
         }
         {
             u32 mask = 0x10;
-            if (actor->base.flags2D0 & mask) {
+            if (actor->base.statusFlags & mask) {
                 u16 argument;
                 if (TestField(0x800, (u32 *)(context + 0x6DC)))
                     Sound_PlaySong(0x3AD);

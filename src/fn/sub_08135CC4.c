@@ -19,20 +19,20 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 
 u32 SceneActorReaction_ResetFlaggedState(struct ChaseActor *actor)
 {
-    if (actor->base.field2DC & 0x4000) {
+    if (actor->base.hitReactionFlags & 0x4000) {
         u16 *motionFlags;
         u32 bit;
-        s32 initial = actor->base.fieldA8;
-        actor->base.fieldAA = initial;
+        s32 initial = actor->base.attachmentRestart;
+        actor->base.attachmentTimer = initial;
         SceneActorMovement_ProjectProbe(actor, 0, 0);
         SceneActorTerrain_ClearCollisionTimers(actor);
         {
-            u16 *flags = &actor->base.flags2D6;
+            u16 *flags = &actor->base.reactionFlags;
             u32 mask = ~0x9CB;
             *flags = mask & *flags;
         }
         bit = 2;
-        motionFlags = &actor->base.flags2D4;
+        motionFlags = &actor->base.motionFlags;
         {
             u16 mask = bit;
             *motionFlags |= mask;

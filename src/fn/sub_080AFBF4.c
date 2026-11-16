@@ -23,7 +23,7 @@ void Vorn_UpdateAnimationRetries(struct ChaseActor *actor)
         *(u16 *)(context + 0x694) = 0;
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u8 *retries = context + 0x696;
         if (*retries) {
             Chase_SetCtl(actor, SceneActor_UpdateDelayedAnimation, 0x24);

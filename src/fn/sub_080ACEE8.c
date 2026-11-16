@@ -28,6 +28,6 @@ void SceneActor_UpdateDelayedAnimation(struct ChaseActor *s)
         }
     } else if (s->base.restart) {
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
-        s->base.field2B0 = 1;
+        s->base.stepDone = 1;
     }
 }

@@ -22,7 +22,7 @@ struct ReturnResponseCoordinates {
 
 static inline void ClearMotionFlag(struct ChaseActor *actor, u32 flag)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u32 mask = ~flag;
     *flags &= mask;
 }
@@ -60,16 +60,16 @@ static inline s32 HeightAt(struct ContactPosition *position)
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void *ReadNavigationShape(struct ReturnResponseGroup *const *group)
 {
@@ -139,13 +139,13 @@ static inline u8 MoveToSource(struct ChaseActor *owner, struct ChaseActor *actor
 
 static inline void SetResponseWordFlag(struct ChaseActor *actor, u32 mask)
 {
-    u32 *flags = &actor->base.flags2CC;
+    u32 *flags = &actor->base.behaviorFlags;
     *flags = mask | *flags;
 }
 
 static inline void SetResponseHalfFlag(struct ChaseActor *actor, u32 mask)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     *flags = mask | *flags;
 }
 

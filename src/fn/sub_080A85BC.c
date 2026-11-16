@@ -16,16 +16,16 @@ static inline void SetControl(struct ChaseActor *p, void *control, u32 code)
     u8 *entry = &p->base.field2B2;
     u32 zero = 0;
     *entry = 1;
-    p->base.field2B0 = zero;
-    p->base.field2B5 = code;
+    p->base.stepDone = zero;
+    p->base.controlKind = code;
     p->base.target = control;
     p->base.field2C8 = zero;
     {
-        u32 *flags = &p->base.flags114;
+        u32 *flags = &p->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    p->base.word104 = zero;
+    p->base.pendingControl = zero;
 }
 static inline void SetState(struct ChaseActor *p, u32 b)
 {
@@ -64,7 +64,7 @@ void TentacleActor_UpdateKnockbackSlide(struct ChaseActor *p)
     sub_080A9DB0(p, 6, 0x1000);
     {
         u32 mask = 16;
-        if (p->base.flags2D0 & mask) {
+        if (p->base.statusFlags & mask) {
             TentacleActor_SelectWanderRoute(p);
             SetControl(p, p->base.onAlternateEntry, 1);
             SetState(p, 2);

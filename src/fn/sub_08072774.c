@@ -17,8 +17,8 @@ void SceneActorScript_SetFlagFromScript(void)
     if (!actor)
         return;
     if (!Script_GetKeywordValue('f', 0)) {
-        u32 *flags = &actor->base.flags2D0;
+        u32 *flags = &actor->base.statusFlags;
         KeepFlags(~0x04000000, flags);
     } else
-        SetFlags(0x04000000, &actor->base.flags2D0);
+        SetFlags(0x04000000, &actor->base.statusFlags);
 }

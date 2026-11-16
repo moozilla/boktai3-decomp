@@ -18,12 +18,12 @@ static inline void ClearFlag(u32 *flags, u32 mask)
 static inline void EntryControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
-    ClearFlag(&actor->base.flags114, ~1);
-    actor->base.word104 = 0;
+    ClearFlag(&actor->base.pendingControlFlags, ~1);
+    actor->base.pendingControl = 0;
 }
 
 void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
@@ -34,16 +34,16 @@ void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
         u8 *ready = &s->base.field2B2;
         u32 zero = 0;
         *ready = 1;
-        s->base.field2B0 = zero;
-        s->base.field2B5 = two;
+        s->base.stepDone = zero;
+        s->base.controlKind = two;
         s->base.target = fn;
         s->base.field2C8 = zero;
-        ClearFlag(&s->base.flags114, ~1);
-        s->base.word104 = zero;
+        ClearFlag(&s->base.pendingControlFlags, ~1);
+        s->base.pendingControl = zero;
     } else {
         u8 result = Callback_InvokeActor(s, s->base.contactQuery.opaque);
         if (result == 0) {
-            if (s->base.field2B0) {
+            if (s->base.stepDone) {
                 u32 seven = 7;
                 s->base.state2A8 = result;
                 s->base.phase2A9 = result;

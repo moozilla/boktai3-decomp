@@ -17,16 +17,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kin
         u8 *field = &actor->base.field2B2;
         *field = 1;
     }
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -36,16 +36,16 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
         zero = 0;
         *field = 1;
     }
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
 {
@@ -57,7 +57,7 @@ void SceneActorControl_UpdateEntryTransition(struct ChaseActor *actor)
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         result = sub_0812F3CC(actor);
         if (!result) {
-            if (actor->base.field2B0) {
+            if (actor->base.stepDone) {
                 SceneActorAnimation_SelectDirectionalEntry(actor, 0);
                 {
                     u32 behavior = 12;

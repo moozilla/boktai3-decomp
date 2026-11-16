@@ -172,16 +172,16 @@ static inline void Skeleton_SetRiseControl(struct ChaseActor *actor, void *cb, u
     void *callback = cb;
     u32 kind = controlKind;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = ready;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = ready;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline void Skeleton_SnapDelayedRoute(struct ContactPosition *position,
@@ -203,7 +203,7 @@ static inline void Skeleton_BeginDelayedTurn(void *obj, u32 saved, const u16 *ra
         {
             struct SceneActorChaseSavedControl *savedControl = &group->saved;
             savedControl->control = actor->base.target;
-            savedControl->kind = actor->base.field2B5;
+            savedControl->kind = actor->base.controlKind;
             savedControl->state = actor->base.state2A8;
             savedControl->phase = actor->base.phase2A9;
             savedControl->behavior = actor->base.behavior2AA;
@@ -293,37 +293,37 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
         actor->base.body.direction = actor->base.tracking.heading;
         if (actor->base.category == 5) {
             u32 mask = 0x200;
-            u32 blocked = actor->base.flags2D4 & mask;
-            flags = &actor->base.flags2D4;
+            u32 blocked = actor->base.motionFlags & mask;
+            flags = &actor->base.motionFlags;
             if (blocked || actor->base.animationIndex == 0x63) {
                 SKELETON_PLAY_RISE(0x63, done5, quadrant);
             done5:
-                actor->base.field2B0 = 1;
+                actor->base.stepDone = 1;
             } else
                 Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10,
                                         0);
         } else if (actor->base.category == 6) {
             u32 mask = 0x200;
-            u32 blocked = actor->base.flags2D4 & mask;
-            flags = &actor->base.flags2D4;
+            u32 blocked = actor->base.motionFlags & mask;
+            flags = &actor->base.motionFlags;
             if (blocked || actor->base.animationIndex == 0x65) {
                 SKELETON_PLAY_RISE(0x65, done6, quadrant);
             done6:
-                actor->base.field2B0 = 1;
+                actor->base.stepDone = 1;
             } else
                 Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10,
                                         0);
         } else {
-            flags = &actor->base.flags2D4;
+            flags = &actor->base.motionFlags;
             if (actor->base.category == 7) {
                 u32 mask = 0x200;
                 u16 blocked = SceneActorChase_FlagComponentBits(
-                    (struct SceneActorChaseFlags16 *)&actor->base.flags2D4, mask);
+                    (struct SceneActorChaseFlags16 *)&actor->base.motionFlags, mask);
                 if (blocked || actor->base.animationIndex == 0x67) {
                     s32 finalQuadrant;
                     SKELETON_PLAY_RISE(0x67, done7, finalQuadrant);
                 done7:
-                    actor->base.field2B0 = 1;
+                    actor->base.stepDone = 1;
                 } else
                     Skeleton_SetRiseControl(actor, SceneActorReaction_PlayAnimationBUntilComplete,
                                             10, 0);
@@ -336,7 +336,7 @@ void Skeleton_UpdateRiseRecovery(struct ChaseActor *actor)
         SceneActorChase_GroupOf(actor)->common.gate.counter =
             SceneActorChase_GroupOf(actor)->common.gate.duration;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         SceneActorChase_SelectState(actor, 0, 0, 12);
         SceneActorChase_ResetStateEntry(actor);
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);

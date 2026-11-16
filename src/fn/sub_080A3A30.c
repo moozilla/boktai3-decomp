@@ -19,10 +19,10 @@ static inline u8 Blocked(struct ChaseActor *a)
 {
     if (a) {
         u32 mask = 0x40;
-        if (a->base.flags2D4 & mask)
+        if (a->base.motionFlags & mask)
             return 1;
         mask = 0x20000;
-        if (a->base.flags2D0 & mask)
+        if (a->base.statusFlags & mask)
             return 1;
         if (a->base.health <= 0)
             return 1;
@@ -46,20 +46,20 @@ static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavio
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = 0;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void SetFlags(struct ChaseActor *a, u32 mask)
 {
-    a->base.flags2CC = mask | a->base.flags2CC;
+    a->base.behaviorFlags = mask | a->base.behaviorFlags;
 }
 void Spider_BeginPlayerPursuit(struct ChaseActor *a)
 {
@@ -94,14 +94,14 @@ void Spider_BeginPlayerPursuit(struct ChaseActor *a)
     terrain = *mesh;
     dest = &a->base.tracking.target->position;
     if (!Nav_IsPositionInMesh(terrain, &a->base.body.position, dest)) {
-        a->base.flags2D4 &= ~motionMask;
+        a->base.motionFlags &= ~motionMask;
     } else {
         result = Terrain_ApplyBlocked(terrain, &a->base.body.position, dest);
         if (result) {
             if (result != 2)
                 Memory_Clear(&a->base.body.motion, 8);
         } else {
-            a->base.flags2D4 &= ~motionMask;
+            a->base.motionFlags &= ~motionMask;
         }
     }
     SetFlags(a, 0x4010);

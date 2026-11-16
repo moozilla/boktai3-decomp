@@ -19,14 +19,14 @@ struct SceneActorContactTracking {
 
 static inline u32 SceneActorContact_ReadActorFlags(struct ChaseActor *actor, u32 mask, u32 **field)
 {
-    u32 *flags = &actor->base.flags2CC;
+    u32 *flags = &actor->base.behaviorFlags;
     u32 value = *flags & mask;
     *field = flags;
     return value;
 }
 static inline u32 SceneActorContact_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline u8 SceneActorContact_TestTracking(struct SceneActorContactTracking *motion, u32 mask)
 {
@@ -61,7 +61,7 @@ static inline u8 SceneActorContact_TestTrackingOwned(struct SceneActorContactTra
 static inline u32 SceneActorContact_QueryMotionField(struct ChaseActor *actor, u16 mask,
                                                      void **owner)
 {
-    u16 *field = &actor->base.flags2D4;
+    u16 *field = &actor->base.motionFlags;
     u32 value;
     *owner = field;
     value = *field & mask;
@@ -70,7 +70,7 @@ static inline u32 SceneActorContact_QueryMotionField(struct ChaseActor *actor, u
 
 static inline u16 *SceneActorContact_MotionField(struct ChaseActor *actor)
 {
-    return &actor->base.flags2D4;
+    return &actor->base.motionFlags;
 }
 static inline struct SceneActorChaseFlags16 *SceneActorContact_GateFromWork(void *const *work)
 {

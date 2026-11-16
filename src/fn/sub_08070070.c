@@ -20,27 +20,27 @@ static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = cb;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *motionFlags;
     {
-        u32 *flags = &actor->base.flags2D0;
+        u32 *flags = &actor->base.statusFlags;
         u32 mask = ~4;
         *flags &= mask;
     }
-    motionFlags = &actor->base.flags2D4;
+    motionFlags = &actor->base.motionFlags;
     {
         u32 mask = ~0x4000;
         *motionFlags &= mask;
@@ -51,7 +51,7 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
             u32 *savedFlags;
             {
                 u32 mask = 0x10;
-                u32 *flags = &actor->base.flags2CC;
+                u32 *flags = &actor->base.behaviorFlags;
                 *flags |= mask;
             }
             {
@@ -64,7 +64,7 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
                     s32 x = p->x >> 8;
                     s32 z = p->z >> 8;
 
-                    savedFlags = &actor->base.flags2CC;
+                    savedFlags = &actor->base.behaviorFlags;
                     p->y = SceneActorTerrain_GetHeight(Chase_CellIndex(x, z), p);
                 }
             }

@@ -5,7 +5,7 @@ u32 SceneActorPlacement_ConsumeShakeFlags(struct ChaseActor *argument)
 {
     struct RoomActor *actor = (void *)argument;
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
-    if (!unavailable && actor->flags2D6) {
+    if (!unavailable && actor->reactionFlags) {
         u8 small;
         u16 *flags;
         small = SceneActor_TestPendingFlag((void *)actor, 0x10, &flags);

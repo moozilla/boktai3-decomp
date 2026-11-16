@@ -62,7 +62,7 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
     }
     {
         u32 mask = 0x2000;
-        u32 *fl = &p->base.flags2CC;
+        u32 *fl = &p->base.behaviorFlags;
         *fl |= mask;
     }
     if (Mod(tick, 4) == 0) {
@@ -86,13 +86,13 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
         u32 *w;
         s32 m;
         p->base.field2B2 = 1;
-        p->base.field2B0 = 0;
-        p->base.field2B5 = k;
+        p->base.stepDone = 0;
+        p->base.controlKind = k;
         p->base.target = f;
         p->base.field2C8 = 0;
-        w = &p->base.flags114;
+        w = &p->base.pendingControlFlags;
         m = -2;
         *w = m & *w;
-        p->base.word104 = 0;
+        p->base.pendingControl = 0;
     }
 }

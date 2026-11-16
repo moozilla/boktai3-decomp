@@ -11,7 +11,7 @@ void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
     u8 *context = actor->base.context;
     u32 mask = 0x8000;
-    if (!(actor->base.flags2D4 & mask)) {
+    if (!(actor->base.motionFlags & mask)) {
         s32 height = Scale(gHoverSineTable[context[0xEAA]] << 5);
         u8 *scene = (*(u8 **)gPlayers);
         u32 y = height + 220;

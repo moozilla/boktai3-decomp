@@ -47,7 +47,7 @@ static inline void Octopus_MessageValue(void *object, u16 value)
 
 static inline void Octopus_EnableDefeatMotion(struct ChaseActor *actor, u16 bit, u16 **component)
 {
-    u16 *field = &actor->base.flags2D4;
+    u16 *field = &actor->base.motionFlags;
     *component = field;
     *field = bit | *field;
 }
@@ -66,17 +66,17 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         {
             u32 bit = 0x800;
-            actor->base.flags2C0 = bit | actor->base.flags2C0;
+            actor->base.placementFlags = bit | actor->base.placementFlags;
         }
         {
             u16 bit = 0x40;
-            actor->base.flags2D4 &= ~bit;
+            actor->base.motionFlags &= ~bit;
         }
         {
             u8 k1 = 1;
             actor->base.health = k1;
         }
-        actor->base.field2EA = 0;
+        actor->base.heightOffset = 0;
         Memory_Clear(context + 0x624, 8);
         {
             s32 abs;
@@ -109,7 +109,7 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     {
         u8 k2 = 0x10;
-        if (actor->base.flags2D0 & k2) {
+        if (actor->base.statusFlags & k2) {
             u16 *flags;
             struct ContactPosition *pos;
             Octopus_EnableDefeatMotion(actor, 0x40, &flags);
@@ -151,7 +151,7 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                     values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
                     values[4] = *((u32 *)(((u8 *)actor) + 0x200));
                     values[5] = *((u32 *)(((u8 *)actor) + 0x204));
-                    values[6] = actor->base.field2E0;
+                    values[6] = actor->base.hitOwners;
                     values[7] = actor->base.body.id;
                     arguments.count = 8;
                     arguments.values = values;

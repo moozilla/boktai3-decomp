@@ -35,19 +35,19 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
             offset += 0x13;
             *(u16 *)(offset + (u32)p) = zero;
         } while (0);
-        flags = &p->base.flags114;
+        flags = &p->base.pendingControlFlags;
         mask = -2;
         *flags &= mask;
-        p->base.word104 = zero;
+        p->base.pendingControl = zero;
         {
             u32 mask = 0x100000;
-            u32 *flags = &p->base.flags2D0;
+            u32 *flags = &p->base.statusFlags;
             *flags |= mask;
         }
         Sound_PlaySong(0x19B);
     }
     savedOffset = 39;
-    if (p->base.field2B5 == savedOffset &&
+    if (p->base.controlKind == savedOffset &&
         (u8)Callback_InvokeActor(p, p->base.contactQuery.opaque)) {
         u32 two = 2;
         u8 *field = &p->base.state2A8;
@@ -57,7 +57,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
         p->base.behavior2AA = zero;
         p->base.counter2AC = zero;
         p->base.field2B1 = 1;
-    } else if (p->base.field2B0) {
+    } else if (p->base.stepDone) {
         u32 two;
         u32 zero;
         u8 *field;
@@ -71,7 +71,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
         p->base.counter2AC = zero;
         p->base.field2B1 = 1;
         {
-            u32 *flags = &p->base.flags2D0;
+            u32 *flags = &p->base.statusFlags;
             u32 mask = ~0x100000;
             *flags &= mask;
         }

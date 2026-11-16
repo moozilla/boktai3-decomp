@@ -12,16 +12,16 @@ static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kin
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -34,22 +34,22 @@ static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32
     }
     offset = 0x2B0;
     *((u8 *)actor + offset) = zero;
-    actor->base.field2B5 = kind;
+    actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u32 value = mask;
-    value |= actor->base.flags2D6;
-    actor->base.flags2D6 = value;
+    value |= actor->base.reactionFlags;
+    actor->base.reactionFlags = value;
 }
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 zero)
 {
@@ -68,7 +68,7 @@ void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
     u32 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {
         BeginControlZero(actor, actor->base.onDefeat, 0x11);
-    } else if (actor->base.field2B0) {
+    } else if (actor->base.stepDone) {
         Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
         BeginControl(actor, SceneActorControl_OnIdle, 0x10, taken);
         SetState(actor, 3, taken);

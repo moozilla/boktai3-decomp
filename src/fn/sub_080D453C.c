@@ -66,11 +66,11 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
 }
 static inline u32 ActorWordBits(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 static inline u16 ActorHalfBits(struct ChaseActor *a, u32 mask)
 {
-    u16 value = a->base.flags2D4;
+    u16 value = a->base.motionFlags;
     value &= mask;
     return value;
 }
@@ -85,7 +85,7 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
 {
     struct ChaseActor *a = (void *)object;
     u32 motion;
-    motion = ClearActivity(&a->base.flags2D0, 0xFEFFFFFF);
+    motion = ClearActivity(&a->base.statusFlags, 0xFEFFFFFF);
     if (!ActorWordBits(a, 0x200000))
         return 1;
     if (motion & 4)
@@ -93,7 +93,7 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
     if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
         Mummy_TestContactFlags((void *)&a->base.tracking.target, 16))
         return 1;
-    if (((struct ChaseActor *)object)->base.field2B8)
+    if (((struct ChaseActor *)object)->base.hitLockTimer)
         return 1;
     {
         u16 *timer = &((struct ChaseActor *)object)->base.colliderA.responseValue;
@@ -149,12 +149,12 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     }
     {
         u32 mask = 16;
-        a->base.flags2CC |= mask;
+        a->base.behaviorFlags |= mask;
     }
     a->base.field2C2 = Div(64, 3);
     {
         u32 mask = 0xFF7FFFFF;
-        a->base.flags2CC = mask & a->base.flags2CC;
+        a->base.behaviorFlags = mask & a->base.behaviorFlags;
     }
     body->phase[0] = 4;
     {
@@ -163,7 +163,7 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     }
     {
         u32 mask = 0x1000000;
-        a->base.flags2D0 |= mask;
+        a->base.statusFlags |= mask;
     }
     SceneActorAttachment_RetargetNearestPlayer(a, &group->target);
     if (started)

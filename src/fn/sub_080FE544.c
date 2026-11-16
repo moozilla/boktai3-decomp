@@ -27,7 +27,7 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
         Sound_PlaySong(0x211);
     else
         Sound_PlaySong(0x13E);
-    flags = &actor->base.flags2D4;
+    flags = &actor->base.motionFlags;
     mask = ~0x20;
     *flags = mask & *flags;
     if (*flags & 0x8000)

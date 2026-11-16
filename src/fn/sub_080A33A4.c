@@ -3,7 +3,7 @@
 
 static inline u8 Peek(struct ChaseActor *s)
 {
-    return s->base.field2B0;
+    return s->base.stepDone;
 }
 static inline u8 TakeEntry(struct ChaseActor *s)
 {
@@ -22,16 +22,16 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
         u8 *ready = &s->base.field2B2;
         u32 zero = 0;
         *ready = 1;
-        s->base.field2B0 = zero;
-        s->base.field2B5 = two;
+        s->base.stepDone = zero;
+        s->base.controlKind = two;
         s->base.target = fn;
         s->base.field2C8 = zero;
         {
-            u32 *flags = &s->base.flags114;
+            u32 *flags = &s->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        s->base.word104 = zero;
+        s->base.pendingControl = zero;
     } else if (Peek(s)) {
         u8 *group = (u8 *)s + 0x3D4;
         u32 twelve = 12;
@@ -45,16 +45,16 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
         fn = *(void **)(group + 0x48);
         kind = 26;
         s->base.field2B2 = 1;
-        s->base.field2B0 = entered;
-        s->base.field2B5 = kind;
+        s->base.stepDone = entered;
+        s->base.controlKind = kind;
         s->base.target = fn;
         s->base.field2C8 = entered;
         {
-            u32 *flags = &s->base.flags114;
+            u32 *flags = &s->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        s->base.word104 = entered;
+        s->base.pendingControl = entered;
     } else {
         ++s->base.counter2AC;
     }

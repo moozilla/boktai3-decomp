@@ -54,7 +54,7 @@ static inline void Golem_SaveControl(struct SceneActorChaseSavedControl *packet,
 {
     struct ChaseActor *actor = object;
     packet->control = actor->base.target;
-    packet->kind = actor->base.field2B5;
+    packet->kind = actor->base.controlKind;
     packet->state = actor->base.state2A8;
     packet->phase = actor->base.phase2A9;
     packet->behavior = actor->base.behavior2AA;
@@ -196,17 +196,17 @@ static inline u8 Golem_Drift(struct ChaseActor *actor)
         u16 *flags;
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
-        if (actor->base.field2D8 & 0x400)
+        if (actor->base.hitAttributes & 0x400)
             Sound_PlaySong(0x18B);
         mask = 0x20;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         mask |= *flags;
         mask &= ~0x100;
         *flags = mask;
     }
     {
         u32 mask = 0x10000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     dx = Golem_ReadDisplacementAxis(Golem_ReadDesiredX(actor), &actor->base.reactionEnd.x, &x);
     dz = Golem_ReadDisplacementAxis(Golem_ReadDesiredZ(actor), &actor->base.reactionEnd.z, &z);
@@ -228,9 +228,9 @@ void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
         goto moving;
     if (!actor->base.restart)
         goto moving;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
-    if (actor->base.field2DC & 0x80000) {
+    if (actor->base.hitReactionFlags & 0x80000) {
         SceneActorChase_SetControl(actor, group->contactControl, 7);
         SceneActorChase_SetState(actor, 3, 0, 0);
         return;

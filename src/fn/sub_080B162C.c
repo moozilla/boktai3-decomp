@@ -4,11 +4,11 @@ void SceneActor_SelectDistantRoutePoint(void *, void *, void *, u32);
 u8 Vorn_SelectUphillTurn(void *, void *);
 static inline u32 MotionFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 static inline u32 StatusFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D0 & mask;
+    return a->base.statusFlags & mask;
 }
 static inline u8 ContextFlags(u8 *p, u32 mask, u16 **out)
 {
@@ -44,7 +44,7 @@ static inline u8 Chase_Test_(const u16 *value, u32 mask)
 
 inline static u32 Chase_Bits32_1(struct ChaseActor *actor_, u32 mask)
 {
-    u32 *field = &actor_->base.flags2CC;
+    u32 *field = &actor_->base.behaviorFlags;
     return (*field) & mask;
 }
 
@@ -67,7 +67,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
         return;
     if (Chase_Bits32_1(actor, 16))
         return;
-    if (actor->base.field2B5 != 1)
+    if (actor->base.controlKind != 1)
         return;
     if (ContextFlags(context, 0x1D, &flags))
         return;

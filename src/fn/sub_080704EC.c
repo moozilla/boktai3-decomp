@@ -15,12 +15,12 @@ static inline u8 IsUnavailable(struct ChaseActor *input)
         u32 *field;
         u32 value;
         mask = 0x40;
-        value = actor->base.flags2D4;
+        value = actor->base.motionFlags;
         value &= mask;
         if (value)
             goto one;
         mask = 0x20000;
-        field = &actor->base.flags2D0;
+        field = &actor->base.statusFlags;
         value = *field;
         value &= mask;
         if (value)
@@ -44,7 +44,7 @@ static inline u32 ReadSuppressionFlag(struct ChaseActor *actor)
     u32 mask = 0x800;
     u32 *field;
     u32 value;
-    field = &actor->base.flags2D0;
+    field = &actor->base.statusFlags;
     value = *field;
     value &= mask;
     return value;
@@ -72,7 +72,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 u32 mask = 2;
                 u32 *field;
                 u32 value;
-                field = &actor->base.flags2CC;
+                field = &actor->base.behaviorFlags;
                 value = *field;
                 value &= mask;
                 flags = field;
@@ -87,7 +87,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 if (category && category != actor->base.category)
                     goto next;
                 *health = zero;
-                actor->base.fieldAA = zero;
+                actor->base.attachmentTimer = zero;
                 actor->base.body.position.x = zero;
                 actor->base.body.position.y = 30000;
                 actor->base.body.position.z = zero;
@@ -110,18 +110,18 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                 {
                     u32 code = 16;
                     actor->base.field2B2 = one;
-                    actor->base.field2B0 = zero;
-                    actor->base.field2B5 = code;
+                    actor->base.stepDone = zero;
+                    actor->base.controlKind = code;
                     actor->base.target = defaultControl;
                     actor->base.field2C8 = zero;
                     {
-                        u32 *flags114 = &actor->base.flags114;
+                        u32 *flags114 = &actor->base.pendingControlFlags;
                         u32 mask = ~1;
                         u32 value = *flags114;
                         value &= mask;
                         *flags114 = value;
                     }
-                    actor->base.word104 = zero;
+                    actor->base.pendingControl = zero;
                     {
                         u32 state = 3;
                         u8 *field = &actor->base.state2A8;
@@ -141,7 +141,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
             u32 unavailable = IsUnavailable(actor);
             if (!unavailable && (!category || category == actor->base.category)) {
                 actor->base.health = zero;
-                actor->base.fieldAA = zero;
+                actor->base.attachmentTimer = zero;
                 {
                     u32 mask = 0x1000;
                     u32 value;
@@ -155,7 +155,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         u32 *field;
                         u32 value;
                         specialCopy = 0x400000;
-                        field = &actor->base.flags2D0;
+                        field = &actor->base.statusFlags;
                         value = *field;
                         value |= specialCopy;
                         *field = value;

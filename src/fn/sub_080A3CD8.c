@@ -6,16 +6,16 @@
 static inline void Control(struct ChaseActor *a, void *c, u32 k, u32 z)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = k;
+    a->base.stepDone = 0;
+    a->base.controlKind = k;
     a->base.target = c;
     a->base.field2C8 = z;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 m = ~1;
         *p &= m;
     }
-    a->base.word104 = z;
+    a->base.pendingControl = z;
 }
 static inline void State(struct ChaseActor *a, u32 k, u32 z)
 {
@@ -28,11 +28,11 @@ static inline void State(struct ChaseActor *a, u32 k, u32 z)
 
 static inline u32 Actor16(struct ChaseActor *a, u32 m)
 {
-    return a->base.flags2D4 & m;
+    return a->base.motionFlags & m;
 }
 static inline u32 Actor32(struct ChaseActor *a, u32 m)
 {
-    return a->base.flags2D0 & m;
+    return a->base.statusFlags & m;
 }
 static inline u8 Disabled(struct ChaseActor *a)
 {
@@ -53,7 +53,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
 {
     s32 r;
     if (!Nav_IsPositionInMesh(nav, pos, target)) {
-        ClearBits(&a->base.flags2D4, 0x200);
+        ClearBits(&a->base.motionFlags, 0x200);
         return 0;
     }
     r = Terrain_ApplyBlocked(nav, pos, target);
@@ -62,7 +62,7 @@ static inline u8 Route(struct ChaseActor *a, void *nav, void *pos, void *target)
             Memory_Clear((u8 *)a + 0x64, 8);
         return 1;
     }
-    ClearBits(&a->base.flags2D4, 0x200);
+    ClearBits(&a->base.motionFlags, 0x200);
     return 0;
 }
 s32 SceneActorPlacement_TriggerTetherAction(struct ChaseActor *a)

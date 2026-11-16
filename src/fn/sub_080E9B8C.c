@@ -11,14 +11,14 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
         *destination = mask;
         {
             u32 mask = 0x800;
-            mask |= actor->base.flags2C0;
-            actor->base.flags2C0 = mask;
+            mask |= actor->base.placementFlags;
+            actor->base.placementFlags = mask;
         }
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 16);
     }
     if (actor->base.restart) {
         actor->base.colliderA.responseValue = 0;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         if (!actor->base.drawableKind)
             *(u32 *)actor->base.drawable |= 1;
         else {

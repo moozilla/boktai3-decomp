@@ -10,11 +10,11 @@ static inline u8 unavailable(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if (p->base.flags2D4 & mask)
+        if (p->base.motionFlags & mask)
             return 1;
         {
             u32 mask = 0x20000;
-            if (p->base.flags2D0 & mask)
+            if (p->base.statusFlags & mask)
                 return 1;
         }
         if (p->base.health <= 0)
@@ -33,7 +33,7 @@ void SceneActor_UpdateForwardCollider(struct ChaseActor *p)
     struct SceneActorForwardCollider *context = p->base.context;
     union SceneActorRegistryPackedPosition pos;
     union SceneActorRegistryPackedPosition bounds;
-    if (!unavailable(p) && p->base.field2B5 == 0x22) {
+    if (!unavailable(p) && p->base.controlKind == 0x22) {
         pos.position = p->base.body.position;
         pos.packed.x += scaled(180 * gUnk_086149C4[(p->base.body.direction + 64) & 255]);
         pos.packed.z += scaled(180 * gUnk_086149C4[p->base.body.direction]);

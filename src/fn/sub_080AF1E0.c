@@ -14,7 +14,7 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
         actor->base.body.direction = actor->base.tracking.heading;
         SceneActorBehavior_CallActionScript(actor);
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u8 *group = (u8 *)actor;
         {
             u16 *h = (u16 *)(group + 0x414);
@@ -24,7 +24,7 @@ void Vorn_UpdateScriptedAction(struct ChaseActor *actor)
         }
         {
             u32 flag = 0x80;
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             flag |= *flags;
             *flags = flag;
         }

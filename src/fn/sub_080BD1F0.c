@@ -89,16 +89,16 @@ static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *field = &actor->base.flags114;
+        u32 *field = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
 {
@@ -292,7 +292,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
             struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
-            u32 *field = &actor->base.flags2CC;
+            u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
@@ -306,19 +306,19 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             BURST(4);
         {
             u32 m = 0x1800;
-            actor->base.flags2C0 = m | actor->base.flags2C0;
+            actor->base.placementFlags = m | actor->base.placementFlags;
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
-    actor->base.fieldAA = 0;
+    actor->base.stepDone = 1;
+    actor->base.attachmentTimer = 0;
     actor->base.colliderA.responseValue = 0;
     mask = 0x4000;
     {
-        u32 test = actor->base.flags2D4 & mask;
-        flags2D4 = &actor->base.flags2D4;
+        u32 test = actor->base.motionFlags & mask;
+        flags2D4 = &actor->base.motionFlags;
         if (!test)
             goto notHidden;
     }
@@ -332,7 +332,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             values[3] = actor->base.parameters1FC[0];
             values[4] = actor->base.parameters1FC[1];
             values[5] = actor->base.parameters1FC[2];
-            values[6] = actor->base.field2E0;
+            values[6] = actor->base.hitOwners;
             values[7] = actor->base.body.id;
             arguments.count = 8;
             arguments.values = values;
@@ -375,15 +375,15 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         SetState(actor, 3, 0, 0);
         {
             u32 m = 0x1000;
-            actor->base.flags2D6 = m | actor->base.flags2D6;
+            actor->base.reactionFlags = m | actor->base.reactionFlags;
         }
         ActorShadow_Disable((u8 *)actor + 0x320);
         Trigger_ConsumePending((u8 *)actor + 0xC, 1);
         return;
     }
 notHidden:
-    if (actor->base.field2DC & 0x7F) {
-        u32 hit = actor->base.field2D8 & 0x100017;
+    if (actor->base.hitReactionFlags & 0x7F) {
+        u32 hit = actor->base.hitAttributes & 0x100017;
         ctxFlags = &context->flags;
         if (hit)
             goto defeated;
@@ -400,16 +400,16 @@ notHidden:
             void *callback = (void *)SceneActorReaction_TickHiddenTimeout;
             u32 kind = 0x39;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = blocked;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = blocked;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = blocked;
             {
-                u32 *field = &actor->base.flags114;
+                u32 *field = &actor->base.pendingControlFlags;
                 s32 clear = ~1;
                 *field &= clear;
             }
-            actor->base.word104 = blocked;
+            actor->base.pendingControl = blocked;
         }
         {
             u32 state = 3;
@@ -440,7 +440,7 @@ notHidden:
                 values[3] = actor->base.parameters1FC[0];
                 values[4] = actor->base.parameters1FC[1];
                 values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.field2E0;
+                values[6] = actor->base.hitOwners;
                 values[7] = actor->base.body.id;
                 arguments.count = 8;
                 arguments.values = values;
@@ -450,7 +450,7 @@ notHidden:
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
             sub_08159164(context->rewardHigh);
-            Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
+            Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
         } else {
             sub_08159164(context->rewardLow);
         }
@@ -480,7 +480,7 @@ notHidden:
                 values[3] = actor->base.parameters1FC[0];
                 values[4] = actor->base.parameters1FC[1];
                 values[5] = actor->base.parameters1FC[2];
-                values[6] = actor->base.field2E0;
+                values[6] = actor->base.hitOwners;
                 values[7] = actor->base.body.id;
                 arguments.count = 8;
                 arguments.values = values;
@@ -490,7 +490,7 @@ notHidden:
         if (!Masked16(flags2D4, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
         sub_08159164(context->rewardHigh);
-        Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
+        Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
         COUNT(0x87C);
         COUNT(0x538);
         RecordKill(actor, categoryp);

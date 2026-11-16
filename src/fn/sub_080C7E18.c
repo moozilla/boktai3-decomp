@@ -111,7 +111,7 @@ void sub_080C7E18(struct ChaseActor *actor, s32 frame)
         sequence->elapsed = 0;
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);

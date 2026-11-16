@@ -33,7 +33,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
         register u32 byteZero asm("r4");
         register u32 parameterOffset asm("r6");
         register u32 fieldOffset asm("r4");
-        u32 *branchFlags = &actor->base.flags2CC;
+        u32 *branchFlags = &actor->base.behaviorFlags;
         {
             u32 sourceOffset = ACTOR_OFFSET(base.saved.behaviorFlags);
             u32 value;
@@ -41,10 +41,10 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
                 u32 *source = (u32 *)((u8 *)actor + sourceOffset);
                 value = *source;
             }
-            actor->base.flags2CC = value;
+            actor->base.behaviorFlags = value;
         }
         {
-            register u32 destinationOffset asm("r3") = ACTOR_OFFSET(base.flags2D0);
+            register u32 destinationOffset asm("r3") = ACTOR_OFFSET(base.statusFlags);
             register u32 *address asm("r1");
             register u32 sourceOffset asm("r4");
             u32 value;
@@ -103,9 +103,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             u32 value;
             address = (u8 *)actor + parameterOffset;
             value = *address;
-            fieldOffset = ACTOR_OFFSET(base.field2B5);
+            fieldOffset = ACTOR_OFFSET(base.controlKind);
             address = (u8 *)actor + fieldOffset;
-            actor->base.field2B5 = value;
+            actor->base.controlKind = value;
         }
         parameterOffset += 6;
         {
@@ -120,9 +120,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             parameterOffset -= 2;
             address = (u16 *)((u8 *)actor + parameterOffset);
             value = *address;
-            parameterOffset = ACTOR_OFFSET(base.field2EA);
+            parameterOffset = ACTOR_OFFSET(base.heightOffset);
             address = (u16 *)((u8 *)actor + parameterOffset);
-            actor->base.field2EA = value;
+            actor->base.heightOffset = value;
         }
         {
             s32 health = actor->base.defaultHealth;
@@ -132,15 +132,15 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             actor->base.health = health;
         }
         {
-            u32 offset1 = ACTOR_OFFSET(base.flags2D6);
+            u32 offset1 = ACTOR_OFFSET(base.reactionFlags);
             u32 offset2;
             u8 *address;
             register u32 one asm("r1");
-            actor->base.flags2D6 = wordZero;
-            offset2 = ACTOR_OFFSET(base.flags2D4);
-            actor->base.flags2D4 = wordZero;
-            parameterOffset = ACTOR_OFFSET(base.field2B0);
-            actor->base.field2B0 = byteZero;
+            actor->base.reactionFlags = wordZero;
+            offset2 = ACTOR_OFFSET(base.motionFlags);
+            actor->base.motionFlags = wordZero;
+            parameterOffset = ACTOR_OFFSET(base.stepDone);
+            actor->base.stepDone = byteZero;
             offset1 -= 0x25;
             address = (u8 *)actor + offset1;
             one = 1;
@@ -159,10 +159,10 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
                 u16 *timerAddress = (u16 *)((u8 *)actor + parameterOffset);
                 *timerAddress = 64;
             }
-            offset1 = ACTOR_OFFSET(base.field2D8);
-            actor->base.field2D8 = wordZero;
+            offset1 = ACTOR_OFFSET(base.hitAttributes);
+            actor->base.hitAttributes = wordZero;
             offset2 += 0x26;
-            actor->base.field2DC = wordZero;
+            actor->base.hitReactionFlags = wordZero;
             parameterOffset += 0x1E;
             address = (u8 *)actor + parameterOffset;
             *(u32 *)address = wordZero;
@@ -181,7 +181,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
         u32 fieldOffset;
         u32 *branchFlags;
         {
-            register u32 offset asm("r3") = ACTOR_OFFSET(base.flags2CC);
+            register u32 offset asm("r3") = ACTOR_OFFSET(base.behaviorFlags);
             asm("" : "+r"(offset));
             branchFlags = (u32 *)((u8 *)actor + offset);
         }
@@ -195,7 +195,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             *branchFlags = value;
         }
         {
-            u32 offset = ACTOR_OFFSET(base.flags2D0);
+            u32 offset = ACTOR_OFFSET(base.statusFlags);
             u32 *address;
             register u32 sourceOffset asm("r3");
             u32 value;
@@ -252,9 +252,9 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             register u32 value asm("r1");
             address = (u8 *)actor + parameterOffset;
             value = *address;
-            fieldOffset = ACTOR_OFFSET(base.field2B5);
+            fieldOffset = ACTOR_OFFSET(base.controlKind);
             address = (u8 *)actor + fieldOffset;
-            actor->base.field2B5 = value;
+            actor->base.controlKind = value;
         }
         parameterOffset += 6;
         {
@@ -265,13 +265,13 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             fieldOffset += 0xB;
             address = (u16 *)((u8 *)actor + fieldOffset);
             byteZero = 0;
-            actor->base.flags2C0 = value;
+            actor->base.placementFlags = value;
             parameterOffset -= 2;
             address = (u16 *)((u8 *)actor + parameterOffset);
             value = *address;
             fieldOffset += 0x2A;
             address = (u16 *)((u8 *)actor + fieldOffset);
-            actor->base.field2EA = value;
+            actor->base.heightOffset = value;
         }
         {
             s32 health = actor->base.defaultHealth;
@@ -287,11 +287,11 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             u32 offset2;
             u8 *address;
             u32 one;
-            actor->base.flags2D6 = wordZero;
-            offset2 = ACTOR_OFFSET(base.flags2D4);
-            actor->base.flags2D4 = wordZero;
-            fieldOffset = ACTOR_OFFSET(base.field2B0);
-            actor->base.field2B0 = byteZero;
+            actor->base.reactionFlags = wordZero;
+            offset2 = ACTOR_OFFSET(base.motionFlags);
+            actor->base.motionFlags = wordZero;
+            fieldOffset = ACTOR_OFFSET(base.stepDone);
+            actor->base.stepDone = byteZero;
             parameterOffset = 0x2B1;
             address = (u8 *)actor + parameterOffset;
             one = 1;
@@ -315,12 +315,12 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             actor->base.reactionDirection = byteZero;
             parameterOffset = ACTOR_OFFSET(base.field2C2);
             actor->base.field2C2 = 64;
-            offset1 = ACTOR_OFFSET(base.field2D8);
-            actor->base.field2D8 = wordZero;
+            offset1 = ACTOR_OFFSET(base.hitAttributes);
+            actor->base.hitAttributes = wordZero;
             offset2 -= 0x28;
-            actor->base.field2DC = wordZero;
+            actor->base.hitReactionFlags = wordZero;
             fieldOffset += 0x2A;
-            actor->base.field2E0 = wordZero;
+            actor->base.hitOwners = wordZero;
             parameterOffset += 0x24;
             actor->base.field2E6 = wordZero;
             offset1 += 0xF4;
@@ -328,7 +328,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
             actor->base.tracking.target = wordZero;
             offset2 -= 0x24;
             address = (u8 *)actor + offset2;
-            actor->base.field2B8 = wordZero;
+            actor->base.hitLockTimer = wordZero;
             fieldOffset = ACTOR_OFFSET(group.hitReactionLatch);
             asm("" : "+r"(fieldOffset));
             address = (u8 *)actor + fieldOffset;
@@ -445,7 +445,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct ChaseActor *argument)
         collider->flags = value;
     }
     {
-        u32 offset = ACTOR_OFFSET(base.callback248);
+        u32 offset = ACTOR_OFFSET(base.routeReset);
         void *callback;
         void **address;
         address = (void **)((u8 *)actor + offset);

@@ -6,7 +6,7 @@ void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input)
     struct ChaseActor *actor = input;
     u32 *state = (void *)SceneActorControl_GetMotionState(actor);
     u32 mask = 0x100000;
-    u32 *flags = &actor->base.flags2D0;
+    u32 *flags = &actor->base.statusFlags;
     *flags |= mask;
     {
         u32 offset = 0x3D4;
@@ -27,7 +27,7 @@ void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input)
         }
     }
     {
-        u16 *p = &actor->base.flags2C0;
+        u16 *p = &actor->base.placementFlags;
         u32 mask;
         mask = 0xFFFFF7FF;
         *p &= mask;

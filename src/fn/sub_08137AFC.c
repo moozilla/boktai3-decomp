@@ -67,7 +67,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slo
             return 1;
         }
     }
-    ClearHalfFlags(&actor->base.flags2D4, ~0x200);
+    ClearHalfFlags(&actor->base.motionFlags, ~0x200);
     return 0;
 }
 

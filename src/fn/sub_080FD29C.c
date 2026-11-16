@@ -20,14 +20,14 @@ void ActorGroup_ResetActivePhase(struct ChaseActor *actor)
     struct ActorGroupPhaseState *group = actor->base.context;
     if (actor->base.field2B1)
         actor->base.field2B1 = 0;
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u32 z3, z4;
         {
             u32 m;
             int c = 0x100;
-            u16 *f = &actor->base.flags2D4;
+            u16 *f = &actor->base.motionFlags;
             m = ~c;
-            actor->base.flags2D4 = m & *f;
+            actor->base.motionFlags = m & *f;
             z3 = 0;
             z4 = 0;
         }

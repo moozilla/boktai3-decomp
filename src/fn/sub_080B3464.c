@@ -48,16 +48,16 @@ static inline void Vorn_SetControl(struct Vorn *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->chase.base.field2B2 = 1;
-    actor->chase.base.field2B0 = 0;
-    actor->chase.base.field2B5 = kind;
+    actor->chase.base.stepDone = 0;
+    actor->chase.base.controlKind = kind;
     actor->chase.base.target = callback;
     actor->chase.base.field2C8 = 0;
     {
-        u32 *field = &actor->chase.base.flags114;
+        u32 *field = &actor->chase.base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->chase.base.word104 = 0;
+    actor->chase.base.pendingControl = 0;
 }
 /* Restores the saved route after a context response; interpretation is tentative. */
 void Vorn_TickSound(void *);
@@ -66,11 +66,11 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 static inline u32 Vorn_Mask16(struct Vorn *p, u32 mask)
 {
-    return p->chase.base.flags2D4 & mask;
+    return p->chase.base.motionFlags & mask;
 }
 static inline u32 Vorn_Mask32(struct Vorn *p, u32 mask)
 {
-    return p->chase.base.flags2D0 & mask;
+    return p->chase.base.statusFlags & mask;
 }
 static inline u8 Vorn_IsInactive(struct Vorn *p)
 {
@@ -86,7 +86,7 @@ static inline u8 Vorn_TestBody(void *p, u32 mask)
 }
 static inline u32 Vorn_MaskLow(struct Vorn *p, u32 mask)
 {
-    return p->chase.base.flags2CC & mask;
+    return p->chase.base.behaviorFlags & mask;
 }
 static inline void Vorn_SnapTarget(struct ContactPosition *out,
                                    struct SceneActorChaseRoutePoint *point)
@@ -103,7 +103,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     actor->chase.base.field2C2 = 64;
     actor->chase.group.common.gate.flags = 0;
     actor->chase.group.common.gate.counter = 0;
-    Vorn_ClearRouteBits(&actor->chase.base.flags2D4, 0x380);
+    Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x380);
     {
         struct SceneActorChaseTracking *motion = &actor->chase.base.tracking;
         u32 mask = ~0x18;
@@ -113,7 +113,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
         struct SceneActorRegistryControl *control = &actor->chase.group.common.control;
         if (Vorn_MaskLow(actor, 0x200000)) {
             SceneActorChase_ClearWordFlags(flags, 0x1000000);
-            Vorn_ClearRouteBits(&actor->chase.base.flags2D4, 0x200);
+            Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
             {
                 control->mode = 0;
                 control->counter = 0;
@@ -121,7 +121,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
             }
         }
     }
-    Vorn_ClearRouteBits(&actor->chase.base.flags2D4, 0x400);
+    Vorn_ClearRouteBits(&actor->chase.base.motionFlags, 0x400);
     actor->chase.group.turn.turnsRemaining = 255;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -146,12 +146,12 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     }
     {
         u32 mask = 16;
-        u32 *field = &actor->chase.base.flags2CC;
+        u32 *field = &actor->chase.base.behaviorFlags;
         u32 value = *field;
         value |= mask;
         *field = value;
     }
-    Vorn_ClearRouteBits(&actor->chase.base.flags2D6, 0x9c9);
+    Vorn_ClearRouteBits(&actor->chase.base.reactionFlags, 0x9c9);
     SceneBody_StartRoute(&actor->chase.base.body.id, &group->homeRoute, group->homeRoute.routeId,
                          group->homeRoute.parameterB, group->homeRoute.pointId);
     point = &group->homeRoute;
@@ -177,16 +177,16 @@ void Vorn_ResumeRouteAfterReaction(void *object)
         return;
     {
         u32 mask = 4;
-        u32 *field = &actor->chase.base.flags2D0;
+        u32 *field = &actor->chase.base.statusFlags;
         u32 value = *field;
         value |= mask;
         *field = value;
     }
     body = actor->chase.base.context;
     gateCounter = group->common.gate.counter;
-    flags = &actor->chase.base.flags2D0;
+    flags = &actor->chase.base.statusFlags;
     if (gateCounter) {
-        if ((actor->chase.base.field2B5 == 0x25) && Vorn_TestBody(body, 4))
+        if ((actor->chase.base.controlKind == 0x25) && Vorn_TestBody(body, 4))
             Vorn_TickSound(object);
         return;
     }

@@ -14,14 +14,14 @@ u8 Mummy_RequestStraightRoute(void *);
 
 static inline u32 Mummy_MotionBits(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline void Mummy_ApplyDuration(struct ChaseActor *a)
 {
     u16 *scale;
     u32 mask = 0xA02F;
-    if (a->base.flags2D4 & mask) {
+    if (a->base.motionFlags & mask) {
         u16 *p = &a->base.field2C2;
         *p = 64;
         scale = p;

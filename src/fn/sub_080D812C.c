@@ -78,7 +78,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
 static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    u16 *flags = &actor->base.flags2C0;
+    u16 *flags = &actor->base.placementFlags;
     u32 value = *flags & mask;
     *out = flags;
     if (value)
@@ -88,21 +88,21 @@ static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline u8 Blocked(struct ChaseActor *s)
 {
@@ -110,12 +110,12 @@ static inline u8 Blocked(struct ChaseActor *s)
         goto zero;
     {
         u32 mask = 0x40;
-        if (s->base.flags2D4 & mask)
+        if (s->base.motionFlags & mask)
             goto one;
     }
     {
         u32 mask = 0x20000;
-        if (s->base.flags2D0 & mask)
+        if (s->base.statusFlags & mask)
             goto one;
     }
     if (s->base.health > 0)
@@ -135,23 +135,23 @@ static inline s32 LocalPlayer(void)
 static inline u8 ShouldShowDamage(struct ChaseActor *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
-        u32 mask = actor->base.field2E0;
+        u32 mask = actor->base.hitOwners;
         if (!(mask & 0x20) && mask) {
             switch (LocalPlayer()) {
                 case 0:
-                    if (actor->base.field2E0 != 1)
+                    if (actor->base.hitOwners != 1)
                         return 0;
                     break;
                 case 1:
-                    if (actor->base.field2E0 != 2)
+                    if (actor->base.hitOwners != 2)
                         return 0;
                     break;
                 case 2:
-                    if (actor->base.field2E0 != 4)
+                    if (actor->base.hitOwners != 4)
                         return 0;
                     break;
                 case 3:
-                    if (actor->base.field2E0 != 8)
+                    if (actor->base.hitOwners != 8)
                         return 0;
                     break;
             }
@@ -190,11 +190,11 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         return;
     if (!burn->timer)
         return;
-    if (actor->base.field2B5 == 0x15) {
+    if (actor->base.controlKind == 0x15) {
         {
             u32 n = 0x20;
-            actor->base.field1EA = n;
-            actor->base.flags2D4 &= n - 0x31;
+            actor->base.paletteTimer = n;
+            actor->base.motionFlags &= n - 0x31;
         }
         actor->base.field2C2 = 0x40;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
@@ -207,12 +207,12 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     if (burn->intensity > 2) {
         if (Mod(burn->timer, 16) == 0) {
             Sound_PlaySong(0x121);
-            OrStatus(0x10, &actor->base.flags2D6);
+            OrStatus(0x10, &actor->base.reactionFlags);
         }
     } else {
         if (Mod(burn->timer, 48) == 0) {
             Sound_PlaySong(0x121);
-            OrStatus(0x20, &actor->base.flags2D6);
+            OrStatus(0x20, &actor->base.reactionFlags);
         }
     }
     if (burn->count) {
@@ -244,7 +244,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                 health = (void *)&actor->base.health;
                 *health -= amount;
             }
-            flags = &actor->base.field2D8;
+            flags = &actor->base.hitAttributes;
             masked = *flags & 0x20000;
             collider = (u8 *)initial;
             damageFlags = flags;
@@ -261,19 +261,19 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                 }
                 {
                     u32 n = 8;
-                    actor->base.field1E8 = n;
+                    actor->base.flashTimer = n;
                 }
                 {
                     u32 bit = 0x8000;
-                    actor->base.flags2CC |= bit;
+                    actor->base.behaviorFlags |= bit;
                 }
                 if (ShouldShowDamage(actor)) {
                     u32 zero;
                     u32 buffer[2];
                     s32 health = CurrentHealth(actor);
                     u32 max = (u16)actor->base.defaultHealth;
-                    s32 type = (s16)actor->base.fieldB2;
-                    s32 param = (s16)actor->base.field9A;
+                    s32 type = (s16)actor->base.hudKind;
+                    s32 param = (s16)actor->base.hudLabel;
                     SceneHud_SetTimedState(actor->base.body.id, health, max, type, 0, param);
                     Fill(&zero, buffer);
                     if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000))
@@ -299,17 +299,17 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         Reaction_SetControl(actor, 17, control);
     }
     if (Test(gEngineFlags, 0x4800)) {
-        Player_NotifyFirstSelectedSlot(actor->base.field2E0, actor->base.field2D8);
+        Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
         goto done;
     }
     {
         u8 *address = &actor->base.category;
         u32 owner;
         kind = *address;
-        owner = actor->base.field2E0 & 1;
+        owner = actor->base.hitOwners & 1;
         collider = (u8 *)&actor->base.colliderA;
         category = address;
-        flags2C0 = &actor->base.flags2C0;
+        flags2C0 = &actor->base.placementFlags;
         if (!owner)
             goto record;
     }
@@ -393,8 +393,8 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                 }
             }
         }
-        sub_08159164(actor->base.fieldAC);
-        Player_RefreshLifeState(actor->base.field2D8, *((u8 *)actor + 0xA1));
+        sub_08159164(actor->base.experience);
+        Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
     }
 
 record:
@@ -403,5 +403,5 @@ record:
     ((struct ContactCollider *)collider)->flags |= 4;
 done:
     burn->timer = 0;
-    actor->base.field2B8 = 0;
+    actor->base.hitLockTimer = 0;
 }

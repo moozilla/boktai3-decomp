@@ -27,7 +27,7 @@ struct GolemChargeContext {
 
 static inline void Golem_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D4 = mask | actor->base.flags2D4;
+    actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 
 static inline u32 Golem_MirrorFlags(u8 mirror)

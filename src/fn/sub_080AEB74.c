@@ -9,7 +9,7 @@ struct VornPatrolRoute {
 };
 static inline u32 Vorn_TestRestoreFlags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2CC & mask;
+    return a->base.behaviorFlags & mask;
 }
 static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u32 mask,
                                           struct SceneActorReactionMotion **saved)
@@ -22,7 +22,7 @@ static inline u8 Vorn_GetRestorableMotion(struct SceneActorReactionMotion *m, u3
 }
 static inline void Vorn_SetRestoreFlags(struct ChaseActor *a, u32 mask)
 {
-    a->base.flags2CC |= mask;
+    a->base.behaviorFlags |= mask;
 }
 
 s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
@@ -61,7 +61,7 @@ s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
     actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
-    Chase_ClearBits(&actor->base.flags2D4, 0x380);
+    Chase_ClearBits(&actor->base.motionFlags, 0x380);
     {
         struct SceneActorReactionMotion *m = savedMotion;
         s32 mask = ~0x18;
@@ -70,20 +70,20 @@ s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
     {
         struct SceneActorRegistryControl *control = &actor->group.common.control;
         u32 restoreBits = Vorn_TestRestoreFlags(actor, 0x200000);
-        u32 *flags = &actor->base.flags2D0;
+        u32 *flags = &actor->base.statusFlags;
         if (restoreBits) {
             {
                 u32 k2 = 0x1000000;
                 *flags &= ~k2;
             }
-            Chase_ClearBits(&actor->base.flags2D4, 0x200);
+            Chase_ClearBits(&actor->base.motionFlags, 0x200);
             control->mode = 0;
             control->counter = 0;
             control->timer = 0;
         }
-        Chase_ClearBits(&actor->base.flags2D4, 0x400);
+        Chase_ClearBits(&actor->base.motionFlags, 0x400);
         actor->group.turn.turnsRemaining = 0xFF;
-        Chase_ClearBits(&actor->base.flags2D4, 0x1000);
+        Chase_ClearBits(&actor->base.motionFlags, 0x1000);
         *((u16 *)(context + 0x6D4)) = 0;
         *((u16 *)(context + 0x69E)) = 0;
         *((u16 *)(context + 0x6AC)) = 0;

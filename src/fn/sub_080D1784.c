@@ -29,7 +29,7 @@ static inline u8 TryRoute(struct ChaseActor *actor, u8 *group)
     target = *(struct ContactPosition **)(group + mask);
     result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        ClearFlags(&actor->base.flags2D4, mask);
+        ClearFlags(&actor->base.motionFlags, mask);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
@@ -38,7 +38,7 @@ static inline u8 TryRoute(struct ChaseActor *actor, u8 *group)
             Memory_Clear(&actor->base.body.motion, 8);
         return 1;
     }
-    ClearFlags(&actor->base.flags2D4, mask);
+    ClearFlags(&actor->base.motionFlags, mask);
     return 0;
 }
 struct RecoveryCounter {
@@ -56,7 +56,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor)) {
         register u8 *reaction asm("r2") = group + 0x4C;
         {
-            register u32 *flags asm("r3") = &actor->base.flags2CC;
+            register u32 *flags asm("r3") = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             asm("" : "+r"(mask) : "r"(flags), "r"(reaction));
             *flags &= mask;
@@ -73,7 +73,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
     }
     if (actor->base.restart) {
         ((struct RecoveryCounter *)((u8 *)actor + 0xAA))->value &= 0;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
         Chase_SetState(actor, 3, 1, 0);
@@ -89,7 +89,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
             (*(struct ContactPosition **)(group + 0x200))->pad = 1;
             {
                 u32 mask = 0x10;
-                actor->base.flags2CC |= mask;
+                actor->base.behaviorFlags |= mask;
             }
             SaveDelay(group + 0x8C, actor->base.onAlternateEntry, 7, 0x3C);
         }

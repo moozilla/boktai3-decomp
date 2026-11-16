@@ -178,7 +178,7 @@ s32 Spider_Init(void *object)
     SceneActorBehavior_InstallCallbackTables(actor);
     Spider_SetBehaviorTables(actor);
     if (extra != 0) {
-        actor->base.field2EA = extra;
+        actor->base.heightOffset = extra;
         actor->base.field2E8 = 2;
         MonsterInit_SetControl(actor, Spider_UpdateHiddenRecovery, 0x23);
         MonsterInit_SetState(actor, 3, 0, 0);

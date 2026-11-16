@@ -43,7 +43,7 @@ void *SceneActorTarget_FindNearbyPlayer(struct ChaseActor *actor)
             limit = 0x24000;
         }
     }
-    if ((actor->base.field2B5 == 3) && (flags & 0x40000)) {
+    if ((actor->base.controlKind == 3) && (flags & 0x40000)) {
         return 0;
     }
     excluded = 0x1000;

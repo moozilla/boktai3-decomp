@@ -6,16 +6,16 @@ void Octopus_ThrowCapturedTarget(void);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 
 static inline u8 TakeReset(struct ChaseActor *actor)
@@ -48,7 +48,7 @@ static inline void SetState(struct ChaseActor *actor)
 void Octopus_EnterThrowPhase(struct ChaseActor *actor)
 {
     TakeReset(actor);
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         SetControl(actor, Octopus_ThrowCapturedTarget, 0x26);
         SetState(actor);
     }

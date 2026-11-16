@@ -36,7 +36,7 @@ void SceneActor_CallContextScriptB(struct RoomActor *actor)
     }
     values[8] = actor->category;
     values[9] = actor->paletteOffset;
-    values[10] = actor->field2D8;
+    values[10] = actor->hitAttributes;
     values[11] = -1;
     arguments.count = 12;
     arguments.values = values;

@@ -20,13 +20,13 @@ static inline u8 Test(u32 value, u32 mask)
 }
 static inline u8 TestControl(struct ChaseActor *actor, u32 mask)
 {
-    if (actor->base.flags2C0 & mask)
+    if (actor->base.placementFlags & mask)
         return 1;
     return 0;
 }
 static inline void MarkContact(struct ChaseActor *actor, u32 mask)
 {
-    actor->base.flags2CC = mask | actor->base.flags2CC;
+    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
 }
 static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
 {
@@ -75,12 +75,12 @@ static inline void SelectContactTarget(struct SceneActorBehaviorContactView *sou
     } else if (owners & 0x20) {
         flagged = 1;
     }
-    actor->base.field2E0 = owners;
+    actor->base.hitOwners = owners;
     {
         u32 parameter = source->parameter34;
         u32 reaction = source->reactionFlags;
-        actor->base.field2D8 = parameter;
-        actor->base.field2DC = reaction;
+        actor->base.hitAttributes = parameter;
+        actor->base.hitReactionFlags = reaction;
     }
     if (flagged)
         AimAtContactTarget(actor);
@@ -103,7 +103,7 @@ static inline u8 IsUnavailable(struct ChaseActor *actor, u16 **motion)
     u32 mask;
     u32 disabled;
     mask = 0x40;
-    flags = &actor->base.flags2D4;
+    flags = &actor->base.motionFlags;
     disabled = *flags & mask;
     *motion = flags;
     if (disabled)
@@ -137,8 +137,8 @@ static inline void SpawnContactParts(struct ChaseActor *actor)
         EffectGroup_SpawnPart((void *)actor->group.effectConfig, 3, &position.position,
                               &velocity.position, &bounds.position, 40, 40);
     }
-    actor->base.fieldAA = 0;
-    actor->base.field2B8 = 0;
+    actor->base.attachmentTimer = 0;
+    actor->base.hitLockTimer = 0;
 }
 
 static inline void SetContactResult(struct ChaseActor *actor, u16 value)
@@ -197,9 +197,9 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
                     if (d < 0)
                         d = -d;
                     if (d <= 0x20) {
-                        actor->base.field2B8 = source->unknown3C;
+                        actor->base.hitLockTimer = source->unknown3C;
                         actor->base.field2E6 = 1;
-                        *(u16 *)actor->group.unknown5CE = Div(actor->base.field2B8, 3);
+                        *(u16 *)actor->group.unknown5CE = Div(actor->base.hitLockTimer, 3);
                         {
                             u32 bit = 0x2000;
                             *motion = bit | *motion;
@@ -232,7 +232,7 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     destination->parameter44 = source->parameter44;
     actor->base.field2E6 = destination->mode;
     if (ReadReactionFlags(0x40000, source)) {
-        u8 *defense = &actor->base.field9F;
+        u8 *defense = &actor->base.defense;
         power = source->power;
         power -= *defense;
         if (power < 0)
@@ -262,6 +262,6 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
     if (TestMotion(motion, 0x2000))
         SpawnContactParts((void *)actor);
     actor->base.reactionSoundVariant = destination->remaining;
-    PlayerStats_AddContactHundredths(source, destination, actor->base.fieldA0);
+    PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
     MarkContact(actor, 0x2000);
 }

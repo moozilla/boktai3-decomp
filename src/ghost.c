@@ -92,7 +92,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
     if (!SceneActor_ActionsBlocked(s)) {
         u32 mask = 0x4000;
         u16 zero;
-        zero = s->base.flags2D4;
+        zero = s->base.motionFlags;
         zero &= mask;
         if (!zero && contact->contactFlags == 1) {
             struct Ghost *p = s->base.context;
@@ -105,17 +105,17 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
             u8 linked;
 
             s->base.field2B2 = one;
-            s->base.field2B0 = zero;
-            s->base.field2B5 = code;
+            s->base.stepDone = zero;
+            s->base.controlKind = code;
             s->base.target = fn;
             zero8 = 0;
             s->base.field2C8 = zero;
-            flags = &s->base.flags114;
+            flags = &s->base.pendingControlFlags;
             {
                 u32 mask = -2;
                 *flags &= mask;
             }
-            s->base.word104 = zero;
+            s->base.pendingControl = zero;
             two = 2;
             s->base.state2A8 = zero8;
             s->base.phase2A9 = two;
@@ -125,7 +125,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
             Ghost_EnableCollider(&s->base.colliderB);
             Ghost_EnableCollider(&s->base.colliderA);
             {
-                u16 *f = &s->base.flags2D6;
+                u16 *f = &s->base.reactionFlags;
                 u32 mask = ~0x180;
                 *f &= mask;
             }
@@ -157,7 +157,7 @@ void SceneActorBehavior_OnContactForward(u16 *source, void *destination, struct 
         return;
     {
         u32 mask = 0x4000;
-        u16 *f = &actor->base.flags2D4;
+        u16 *f = &actor->base.motionFlags;
         if (*f & mask)
             return;
     }
@@ -238,7 +238,7 @@ static inline void Ghost_SelectDirectionalAnimation(struct RoomActor *actor, u32
 
 static inline u16 Ghost_SetEffectFlags(struct RoomActor *a, u16 mask)
 {
-    u16 *p = &((struct ChaseActor *)a)->base.flags2D6;
+    u16 *p = &((struct ChaseActor *)a)->base.reactionFlags;
     return *p = mask | *p;
 }
 
@@ -271,11 +271,11 @@ void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor)
     selection = entry->value;
     Ghost_SelectDirectionalAnimation(actor, selection, variant, flags);
     if (((struct ChaseActor *)actor)->base.paletteOffset == 0) {
-        if (Mod(((struct ChaseActor *)actor)->base.field2CA, body->drainInterval) == 0)
+        if (Mod(((struct ChaseActor *)actor)->base.frameCounter, body->drainInterval) == 0)
             Player_SubtractEnergy(((u8 **)gPlayers)[0],
                                   ((struct ChaseActor *)actor)->base.attacks.first[0]);
     } else if (((struct ChaseActor *)actor)->base.paletteOffset == 1) {
-        if (Mod(((struct ChaseActor *)actor)->base.field2CA, body->drainInterval) == 0)
+        if (Mod(((struct ChaseActor *)actor)->base.frameCounter, body->drainInterval) == 0)
             Player_SubtractEnergy(((u8 **)gPlayers)[0],
                                   ((struct ChaseActor *)actor)->base.attacks.first[0]);
         if (((u8 **)gPlayers)[0])
@@ -296,7 +296,7 @@ void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor)
         *elapsed = delta;
     }
     if (body->drainElapsed > body->drainDuration)
-        actor->field2B0 = 1;
+        actor->stepDone = 1;
 }
 
 void Ghost_UpdateDirectionalPose(struct RoomActor *actor)
@@ -330,7 +330,7 @@ void Ghost_UpdateDirectionalPoseB(struct RoomActor *actor)
 
 static inline u32 Ghost_TestActionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 
 // confidence=low: turns one octant at animation events until reaching the requested heading.
@@ -346,19 +346,19 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
         if (current == target) {
             actor->base.body.direction = desired;
             SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             return;
         }
         target -= 8;
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = &actor->base.flags2CC;
+                u32 *p = &actor->base.behaviorFlags;
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
                 u32 mask = 0x10000;
-                actor->base.flags2CC |= mask;
+                actor->base.behaviorFlags |= mask;
             }
         }
     }
@@ -366,7 +366,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
     {
         u32 mask = 0xA02F;
         u16 *scale;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             actor->base.field2C2 = 64;
             scale = &actor->base.field2C2;
         } else {
@@ -383,7 +383,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
             Anim_SetFrameDurationScale(
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     }
-    if (actor->base.field2CA & 4) {
+    if (actor->base.frameCounter & 4) {
         u32 variant;
         u32 flags;
         u32 selection;
@@ -402,7 +402,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
 
 static inline u16 Ghost_SetAnimationFlags(struct RoomActor *actor, u16 mask)
 {
-    u16 *p = &((struct ChaseActor *)actor)->base.flags2D6;
+    u16 *p = &((struct ChaseActor *)actor)->base.reactionFlags;
     return *p = mask | *p;
 }
 
@@ -421,7 +421,7 @@ void Ghost_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
     if (frame <= 29)
         Ghost_SetAnimationFlags(actor, 32);
     if (frame > 59)
-        actor->field2B0 = 1;
+        actor->stepDone = 1;
 }
 
 // confidence=low: recoil callback selects animation 15 and completes after sixty ticks.
@@ -435,7 +435,7 @@ void Ghost_UpdateRecoilAnimation(struct ChaseActor *actor, s32 tick)
         SceneActorChase_SetReactionFlags(actor, 32);
     }
     if (tick > 59) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
     }
 }
 
@@ -499,7 +499,7 @@ void Ghost_UpdateHitStagger(struct ChaseActor *actor, s32 tick)
     u16 *f;
     u8 taken;
     taken = SceneActorControl_TakeFlag(&actor->base.field2B2);
-    f = &actor->base.flags2D4;
+    f = &actor->base.motionFlags;
     if (taken) {
         {
             u32 value = 0x20;
@@ -542,7 +542,7 @@ void Ghost_UpdateHitStagger(struct ChaseActor *actor, s32 tick)
     *priorX += x;
     *priorZ += z;
     if (Ghost_IsMotionAtRest(x, z)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         Ghost_EndPlayerSlowdown(actor);
         {
             struct GhostSignedFlags16 *flags = (void *)f;
@@ -551,13 +551,13 @@ void Ghost_UpdateHitStagger(struct ChaseActor *actor, s32 tick)
             flags->bits = m;
         }
         {
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             s32 mask = ~0x80;
             *flags &= mask;
         }
         {
             u32 mask = 0x100000;
-            actor->base.flags2D0 |= mask;
+            actor->base.statusFlags |= mask;
         }
         SceneActor_EndLinkedReaction(actor);
         {
@@ -586,7 +586,7 @@ void EffectManager_SpawnParticlesAt(u32, u32, u32, void *, void *, u32, u32);
 static inline u32 Ghost_ReadDefeatFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline void Ghost_SetScriptValue(s32 value, s32 *entry)
@@ -636,7 +636,7 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
     }
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     SceneActorBehavior_CallTerrainScript(actor);
     script = actor->base.script1F8;
     if (script) {
@@ -648,7 +648,7 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         Ghost_SetScriptValue(actor->base.parameters1FC[0], &values[3]);
         Ghost_SetScriptValue(actor->base.parameters1FC[1], &values[4]);
         Ghost_SetScriptValue(actor->base.parameters1FC[2], &values[5]);
-        Ghost_SetScriptValue(actor->base.field2E0, &values[6]);
+        Ghost_SetScriptValue(actor->base.hitOwners, &values[6]);
         Ghost_SetScriptValue(actor->base.body.id, &values[7]);
         arguments.count = 8;
         arguments.values = values;
@@ -660,8 +660,8 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         u32 zero;
         u32 one;
         u16 masked;
-        u32 test = actor->base.flags2D4 & mask;
-        flags = &actor->base.flags2D4;
+        u32 test = actor->base.motionFlags & mask;
+        flags = &actor->base.motionFlags;
         if ((!test) && (((u32)(actor->base.category - 11)) > 2))
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
@@ -675,16 +675,16 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
             u32 kind = 16;
             one = (actor->base.field2B2 = 1);
             zero = 0;
-            actor->base.field2B0 = masked;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = masked;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = masked;
             {
-                u32 *field = &actor->base.flags114;
+                u32 *field = &actor->base.pendingControlFlags;
                 s32 clear = ~1;
                 *field &= clear;
             }
-            actor->base.word104 = masked;
+            actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
                 actor->base.state2A8 = one;
@@ -748,7 +748,7 @@ static inline void Ghost_UpdateAnimationSpeed(struct ChaseActor *actor)
     u16 *scale;
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
@@ -862,9 +862,9 @@ void Ghost_DecelerateMovement(struct ChaseActor *actor)
         ctx->motion.x >>= 1;
         ctx->motion.z >>= 1;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u32 mask = 0x100;
-        u16 *p = &actor->base.flags2D4;
+        u16 *p = &actor->base.motionFlags;
         u16 flags;
         {
             u32 raw = *p & mask;
@@ -984,7 +984,7 @@ void Ghost_RecoilTowardEndpoint(struct ChaseActor *actor)
         actor->base.body.direction =
             Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z) - 128;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         Ghost_ClearActionFlags(actor);
         Ghost_ClearPosition(&actor->base.secondaryMotion, &zero);
         Ghost_SetRecoilState(actor, 0, 0, 2);
@@ -1082,7 +1082,7 @@ static inline u8 Ghost_TestRouteFlags(struct Ghost *route, u32 mask)
 
 static inline void Ghost_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     u32 mask = ~bits;
     *flags &= mask;
 }
@@ -1147,7 +1147,7 @@ void Ghost_AdvanceApproachRoute(struct ChaseActor *actor)
         route->routeSpeed = 1;
         {
             u32 mask = 0x100;
-            actor->base.flags2D4 = mask | actor->base.flags2D4;
+            actor->base.motionFlags = mask | actor->base.motionFlags;
         }
         actor->base.field2C2 = 32;
     }
@@ -1213,16 +1213,16 @@ void SceneActor_BeginLinkedIdleReaction(struct ChaseActor *actor)
         fn = SceneActorControl_OnIdle;
         code = 0x10;
         actor->base.field2B2 = one;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = code;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = code;
         actor->base.target = fn;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = -2;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
         actor->base.colliderA.flags &= 0xFFFB;
     }
 }
@@ -1240,7 +1240,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
     {
         u32 mask = 0x4000;
         u16 *flags;
-        flags = &actor->base.flags2D4;
+        flags = &actor->base.motionFlags;
         if (!(*flags & mask))
             return;
     }
@@ -1276,7 +1276,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
                     {
                         u32 mask = 0x800;
                         u16 *flags;
-                        flags = &actor->base.flags2C0;
+                        flags = &actor->base.placementFlags;
                         mask |= *flags;
                         *flags = mask;
                     }
@@ -1314,7 +1314,7 @@ void Ghost_RequestVisibility(struct ChaseActor *input, const u16 *inputRequest)
                     {
                         u32 mask = 0x800;
                         u16 *flags;
-                        flags = &actor->base.flags2C0;
+                        flags = &actor->base.placementFlags;
                         mask |= *flags;
                         *flags = mask;
                     }
@@ -1351,7 +1351,7 @@ void SceneActor_EasePlayerHeight(struct ChaseActor *actor)
         offset = 100;
     else
         offset = 220;
-    if (actor->base.field2B5 == 0x23) {
+    if (actor->base.controlKind == 0x23) {
         target = gPlayers[0]->position.y + offset;
         Ghost_EaseHeight(target, &actor->base.body.position.y);
     } else {
@@ -1522,7 +1522,7 @@ void SceneActor_EndLinkedReaction(struct ChaseActor *actor)
     struct Ghost *state = actor->base.context;
     {
         u32 mask = 0x100000;
-        actor->base.flags2D0 |= mask;
+        actor->base.statusFlags |= mask;
     }
     {
         u32 *flags = &state->flags;
@@ -1591,7 +1591,7 @@ void Ghost_StartMovementToPosition(struct ChaseActor *actor, s16 *destination)
 void Ghost_ClearActionFlags(struct ChaseActor *actor)
 {
     struct Ghost *context = actor->base.context;
-    u16 *motionFlags = &actor->base.flags2D4;
+    u16 *motionFlags = &actor->base.motionFlags;
     u32 motionMask = 0xFFFFFEFF;
     u32 *actionFlags;
     u32 actionMask;
@@ -1615,7 +1615,7 @@ void Ghost_ClearActionFlags(struct ChaseActor *actor)
 
 static inline u16 Ghost_TestDestinationFlags(struct ChaseActor *actor, u32 mask)
 {
-    mask &= actor->base.flags2D4;
+    mask &= actor->base.motionFlags;
     return mask;
 }
 
@@ -1685,7 +1685,7 @@ void Ghost_UpdateRandomDestination(struct ChaseActor *actor)
 
 static inline u32 Ghost_ReadReactionFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
 static inline u8 Ghost_TestReactionFlags(struct SceneActorReactionMotion *reaction, u32 mask)
@@ -1916,7 +1916,7 @@ void Ghost_EmitAfterimage(struct ChaseActor *actor)
     struct Ghost *ctx = actor->base.context;
     u32 variant;
     u32 flags;
-    if (Mod(actor->base.field2CA, ctx->visualInterval) == 0) {
+    if (Mod(actor->base.frameCounter, ctx->visualInterval) == 0) {
         Ghost_GetDirectionalFrame(actor->base.body.direction, &variant, &flags);
         {
             struct ActorAnim *source = &((struct GhostVisual *)actor->base.drawable)->sequence.anim;
@@ -2209,7 +2209,7 @@ void Ghost_EndPlayerSlowdown(struct ChaseActor *actor)
 void ActorTick_DecrementCounterAA(struct ChaseActor *actor)
 {
     if (!SceneActor_ActionsBlocked(actor)) {
-        s16 *p = (s16 *)&actor->base.fieldAA;
+        s16 *p = (s16 *)&actor->base.attachmentTimer;
         s32 v = *p;
         if (v > 0)
             *p = v - 1;
@@ -2226,7 +2226,7 @@ static inline u8 Ghost_TestVisibilityFlags(struct Ghost *p, u32 mask)
 static inline u32 Ghost_ReadMotionFlags(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     return *flags & mask;
 }
 
@@ -2369,7 +2369,7 @@ u32 ActorContact_UpdateColliderPositions(struct RoomActor *actor)
     {
         u32 mask = 0x20;
 
-        control = &actor->flags2D4;
+        control = &actor->motionFlags;
         if (*control & mask)
             goto done;
     }
@@ -2474,17 +2474,17 @@ static inline u16 *Ghost_BeginPlayerFollow(struct ChaseActor *actor, struct Ghos
         SceneActorChase_SetControl(actor, Ghost_UpdateEnergyDrainAnimation, 0x23);
         Ghost_SavePlayerPosition(&context->start, gPlayers);
         {
-            u16 *flags = &actor->base.flags2D4;
+            u16 *flags = &actor->base.motionFlags;
             u32 mask = 0x100;
             *flags = mask | (*flags);
         }
         {
             u32 mask = 0x2000000;
-            actor->base.flags2CC |= mask;
+            actor->base.behaviorFlags |= mask;
         }
         actor->base.body.direction = actor->base.tracking.heading;
     }
-    return &actor->base.flags2D4;
+    return &actor->base.motionFlags;
 }
 
 void Ghost_FollowDrainedPlayer(struct ChaseActor *actor)
@@ -2494,7 +2494,7 @@ void Ghost_FollowDrainedPlayer(struct ChaseActor *actor)
     u16 *flags = Ghost_BeginPlayerFollow(actor, context);
     {
         u32 scale = 64;
-        actor->base.field1EA = scale;
+        actor->base.paletteTimer = scale;
         Ghost_SubtractPositions(&delta, &context->start,
                                 (struct ContactPosition *)&gPlayers[0]->position);
         actor->base.body.motion.x += delta.x;
@@ -2502,7 +2502,7 @@ void Ghost_FollowDrainedPlayer(struct ChaseActor *actor)
         context->start = *((struct ContactPosition *)&gPlayers[0]->position);
         Ghost_UpdateAnimationScale(actor, flags);
     }
-    if (actor->base.field2B0 || (gPlayers[0]->currentStatB == 0)) {
+    if (actor->base.stepDone || (gPlayers[0]->currentStatB == 0)) {
         Sound_PlaySong(0x3CC);
         Ghost_SetBehavior(actor, 3);
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
@@ -2558,16 +2558,16 @@ void Ghost_FollowPlayerLoop(struct ChaseActor *actor)
         void *callback = actor->base.onAlternateEntry;
         u32 one = 1;
         actor->base.field2B2 = one;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = 1;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = 1;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
         route->index = 0;
         target = (*(struct SceneActorChasePlayer **)gPlayers)->target.position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -2636,16 +2636,16 @@ void Ghost_PursuePlayerLoop(struct ChaseActor *actor)
         void *callback = actor->base.onAlternateEntry;
         u32 one = 1;
         actor->base.field2B2 = one;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = 1;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = 1;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
         route->index = 0;
         target = (*(struct SceneActorChasePlayer **)gPlayers)->target.position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -2705,7 +2705,7 @@ void Ghost_InitActionTable(struct ChaseActor *actor)
 
 static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     return *flags = mask | *flags;
 }
 
@@ -2716,20 +2716,20 @@ void Ghost_ApproachPlayer(struct ChaseActor *actor)
         void *callback = Ghost_UpdateWaitingAnimation;
         u32 kind = 10;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
         SetFlag(actor, 0x100);
         state->delay = state->delayDuration;
     }
-    if (actor->base.field2B0)
+    if (actor->base.stepDone)
         Ghost_StartMovementToPosition(actor, &gPlayers[0]->position);
     else
         actor->base.counter2AC++;
@@ -2807,7 +2807,7 @@ void Ghost_UpdateFacingTrigger(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     {
         u32 mask = 0x800;
-        actor->base.flags2C0 = mask | actor->base.flags2C0;
+        actor->base.placementFlags = mask | actor->base.placementFlags;
     }
     actor->base.body.direction = actor->base.tracking.heading;
     if (!(gPadState[1] & A_BUTTON))
@@ -2843,7 +2843,7 @@ void Ghost_UpdateTriggerControl(struct ChaseActor *actor)
     } else {
         {
             u32 mask = 0x800;
-            actor->base.flags2C0 |= mask;
+            actor->base.placementFlags |= mask;
         }
         if (actor->base.counter2AC == 0)
             Trigger_ConsumePending(&actor->base.unknown9[3], 1);
@@ -2866,7 +2866,7 @@ u32 Ghost_OnBehaviorUpdate(struct ChaseActor *actor)
     void **t;
     Ghost_UpdateVisibility(actor);
     i = actor->base.state2A8;
-    t = actor->base.callbacks27C;
+    t = actor->base.stateCallbacks;
     Callback_InvokeActor(actor, t[i]);
     SceneActorControl_DispatchControl(actor);
     ActorContact_UpdateColliderPositions(actor);
@@ -2917,7 +2917,7 @@ u32 Ghost_Destroy(struct ChaseActor *actor)
         Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (Ghost_TestDestroyFlags(&actor->base.flags2C0, m))
+    if (Ghost_TestDestroyFlags(&actor->base.placementFlags, m))
         SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
     {
         u8 *r = actor->base.shadow;
@@ -2925,7 +2925,7 @@ u32 Ghost_Destroy(struct ChaseActor *actor)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)actor)->base.flags2D0 & m;
+    v = ((struct ChaseActor *)actor)->base.statusFlags & m;
     q = (void *)&actor->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
@@ -2996,11 +2996,11 @@ static inline void Ghost_InitializeScriptFields(struct ChaseActor *actor, u32 *f
     struct ContactPosition origin;
     s32 first, second;
     s32 variant;
-    actor->base.flags2CC = 0;
-    actor->base.flags2D0 = 0;
+    actor->base.behaviorFlags = 0;
+    actor->base.statusFlags = 0;
     actor->base.enabled = 0;
     actor->base.field2E8 = 8;
-    actor->base.flags2C0 = MonsterInit_ReadKeywordHalfword('M', 0);
+    actor->base.placementFlags = MonsterInit_ReadKeywordHalfword('M', 0);
     MonsterInit_ClearPosition(fill, &origin);
     id = Script_GetKeywordValue('N', 0);
     MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(actor)->base.tracking);
@@ -3014,25 +3014,25 @@ static inline void Ghost_InitializeScriptFields(struct ChaseActor *actor, u32 *f
     if (Script_GetKeywordValue('b', 0))
         MonsterInit_SetStatusFlags(actor, 0x200);
     actor->base.script1F0 = MonsterInit_ReadKeywordHalfword('F', 0);
-    actor->base.field1EC = MonsterInit_ReadKeywordHalfword('R', 0);
+    actor->base.scriptId = MonsterInit_ReadKeywordHalfword('R', 0);
     if (Script_SeekToKeyword('A')) {
         MonsterInit_SetInitialHealth(actor, MonsterInit_ReadHalfword(0));
         actor->base.field9E = MonsterInit_ReadByte(0);
-        actor->base.field9F = MonsterInit_ReadByte(0);
-        actor->base.fieldA0 = MonsterInit_ReadByte(0);
+        actor->base.defense = MonsterInit_ReadByte(0);
+        actor->base.contactReward = MonsterInit_ReadByte(0);
         actor->base.fieldA2 = MonsterInit_ReadHalfword(0);
         actor->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
     MonsterInit_InitializeHealth(actor, MonsterInit_GetInitialHealth(actor), first, second);
     if (Script_SeekToKeyword('X')) {
-        actor->base.fieldAC = MonsterInit_ReadWord(0);
+        actor->base.experience = MonsterInit_ReadWord(0);
         actor->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    MonsterInit_WriteHalfword(&actor->base.fieldB2, MonsterInit_ReadKeywordHalfword('K', 2));
+    MonsterInit_WriteHalfword(&actor->base.hudKind, MonsterInit_ReadKeywordHalfword('K', 2));
     variant = (s16)Script_GetKeywordValue('V', -1);
     if (variant < 0)
         variant = 0xFFFF;
-    MonsterInit_WriteHalfword(&actor->base.field9A, variant);
+    MonsterInit_WriteHalfword(&actor->base.hudLabel, variant);
     if (Script_GetKeywordValue('H', 0))
         MonsterInit_SetStatusFlags(actor, 0x800);
     SceneBody_Init(body, id, &origin, 0, 4, actor);
@@ -3060,9 +3060,9 @@ static inline void Ghost_InstallPrimaryCallbacks(struct ChaseActor *actor, void 
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, 0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;
@@ -3077,8 +3077,8 @@ static inline void Ghost_InitializeCallbacks(struct ChaseActor *actor)
         Ghost_UpdateDirectionalPose, Ghost_UpdateDirectionalPoseB, 0, Ghost_UpdateHitStagger,
         Ghost_UpdateDefeat, SceneActorReaction_OnEnemyDefault, 0, SceneActorReaction_ResolveDamage,
         SceneActorPlacement_PlayResponseAndResetState);
-    actor->base.callback248 = Ghost_ResetMovementState;
-    actor->base.field23C = Ghost_OnControlCleanup;
+    actor->base.routeReset = Ghost_ResetMovementState;
+    actor->base.reactionGate = Ghost_OnControlCleanup;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Ghost_GetControlStatus);
     MonsterInit_WriteDataPointer(&actor->base.commandTable.opaque, gUnk_08605E14);
     MonsterInit_SetMotionFlags(actor, 0x20);
@@ -3128,7 +3128,7 @@ static inline void Ghost_ReadPalette(struct ChaseActor *actor, u32 base, u32 alt
             SceneActorScript_GetManagerField62());
     actor->base.alternatePalette = MonsterInit_GetPaletteBase(actor);
     actor->base.paletteBank = MonsterInit_GetPaletteBase(actor) + 2;
-    actor->base.field1EA = 0x1EE;
+    actor->base.paletteTimer = 0x1EE;
 }
 
 static inline void Ghost_InstallCompletion(struct ChaseActor *actor)

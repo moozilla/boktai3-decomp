@@ -52,7 +52,7 @@ void Vorn_SelectReactionControl(struct ChaseActor *a)
         MarkReactionMotion((void *)&a->base.tracking.target);
         {
             u32 mask = 0x80;
-            a->base.flags2CC = mask | a->base.flags2CC;
+            a->base.behaviorFlags = mask | a->base.behaviorFlags;
         }
     } else {
         u32 active = MotionFlag((void *)&a->base.tracking.target, 8);

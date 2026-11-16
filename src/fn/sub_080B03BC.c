@@ -15,36 +15,36 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.word104 = zero;
+    actor->base.pendingControl = zero;
 }
 static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
     u32 zero = 0;
     *prepared = 1;
-    actor->base.field2B0 = zero;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = zero;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = zero;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
-        actor->base.word104 = zero;
-        actor->base.word104 =
+        actor->base.pendingControl = zero;
+        actor->base.pendingControl =
             *(u32 *)&actor->base.onAlternateEntry; /* a u32 read keeps the store above */
-        actor->base.word108 = 0;
-        actor->base.word10C = 0;
-        actor->base.word110 = 1;
+        actor->base.pendingControlData = 0;
+        actor->base.pendingControlRelease = 0;
+        actor->base.pendingControlKind = 1;
         *flags = 1;
     }
 }
@@ -62,7 +62,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
     if (!busy) {
         zero = sub_0812F3CC(actor);
         if (!zero) {
-            if (actor->base.field2B0) {
+            if (actor->base.stepDone) {
                 u32 state = 0x13;
                 actor->base.state2A8 = zero;
                 actor->base.phase2A9 = zero;

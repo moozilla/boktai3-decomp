@@ -31,5 +31,5 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
         Sound_PlaySong(475);
     }
     if (actor->base.restart)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }

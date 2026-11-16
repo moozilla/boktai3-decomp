@@ -16,21 +16,21 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void Hide(struct ChaseActor *a)
 {
@@ -75,7 +75,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
         u32 damage = actor->base.reactionSoundVariant;
         actor->base.health -= damage;
     }
-    if (!(actor->base.field2D8 & 0x20000)) {
+    if (!(actor->base.hitAttributes & 0x20000)) {
         u16 bank = actor->base.paletteAlternateBank;
         if (actor->base.drawableKind == 0)
             AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
@@ -84,35 +84,35 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
                 (const u16 *)(gPaletteBankData + bank * 32);
         {
             u32 eight = 8;
-            actor->base.field1E8 = eight;
+            actor->base.flashTimer = eight;
         }
         {
             u32 bit = 0x8000;
-            actor->base.flags2CC |= bit;
+            actor->base.behaviorFlags |= bit;
         }
         if (SceneActorDamage_ShouldShow(actor)) {
             u32 zero;
             u32 buffer[2];
             s32 health = actor->base.health;
             u32 max = (u16)actor->base.defaultHealth;
-            s32 kind = (s16)actor->base.fieldB2;
-            s32 param = (s16)actor->base.field9A;
+            s32 kind = (s16)actor->base.hudKind;
+            s32 param = (s16)actor->base.hudLabel;
             SceneHud_SetTimedState(actor->base.body.id, health, max, kind, 0, param);
             Fill(&zero, buffer);
-            if (actor->base.reactionSoundVariant || !(actor->base.field2D8 & 0x20000))
+            if (actor->base.reactionSoundVariant || !(actor->base.hitAttributes & 0x20000))
                 DamageNumberDisplay_Show(&actor->base.colliderA, actor->base.reactionSoundVariant,
                                          0, &actor->base.body.position, buffer, 1);
         }
     }
     SceneActorMovement_ProjectProbe(actor, 0, 0);
     {
-        struct FlagHalfword *flags = (void *)&actor->base.flags2D4;
+        struct FlagHalfword *flags = (void *)&actor->base.motionFlags;
         ClearHit(flags, ~0x2000);
-        actor->base.field2B8 = 0;
+        actor->base.hitLockTimer = 0;
     }
     SceneActorTerrain_ClearCollisionTimers(actor);
     {
-        u16 *flags = &actor->base.flags2D6;
+        u16 *flags = &actor->base.reactionFlags;
         u32 mask = ~0x980;
         *flags = mask & *flags;
     }
@@ -131,11 +131,11 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
             actor->base.counter2AC = 0;
             actor->base.field2B1 = 1;
         }
-        actor->base.field2E0 = 32;
+        actor->base.hitOwners = 32;
         if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
-        SetHit(0x20, (void *)&actor->base.flags2D4);
+        SetHit(0x20, (void *)&actor->base.motionFlags);
         {
             void *control = SceneActorReaction_PlayStaggerBurst;
             Reaction_SetControl(actor, 0x21, control);
@@ -151,6 +151,6 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
     }
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
 }

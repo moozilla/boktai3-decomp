@@ -33,15 +33,15 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         SceneActorChase_ClearMotionFlags(a, 0x20);
         return 0;
     }
-    if (a->base.field2DC & 0xC0000) {
+    if (a->base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(a, a->base.onReaction, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
-        SceneActorChase_ClearWordFlags(&a->base.flags2D0, 0x1000000);
+        SceneActorChase_ClearWordFlags(&a->base.statusFlags, 0x1000000);
         SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
         return 1;
     }
     SceneActorChase_ClearMotionFlags(a, 0x20);
-    if (SceneActorChase_QueryMotionFlags(a, 0x100) || a->base.field2B8)
+    if (SceneActorChase_QueryMotionFlags(a, 0x100) || a->base.hitLockTimer)
         return 0;
     if (SceneActorChase_QueryMotionFlags(a, 0x80)) {
         SceneActorChase_BeginContactAnimation(a);

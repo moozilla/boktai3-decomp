@@ -45,11 +45,11 @@ static inline void BeginTargetControl(struct ChaseActor *actor, s32 zero)
         stateOffset += 0x13;
         *(u16 *)((u8 *)actor + stateOffset) = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
 }
 void SceneActorControl_WaitForTarget(struct ChaseActor *input)
@@ -59,7 +59,7 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
     struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetCollider(&actor->base.colliderA);
-        ClearFlags(&actor->base.flags2C0, ~0x800);
+        ClearFlags(&actor->base.placementFlags, ~0x800);
     }
     if (!Ivy_FindAdjacentTarget(actor, 1))
         state->targetMissFrames++;

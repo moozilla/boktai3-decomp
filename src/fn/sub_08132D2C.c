@@ -64,7 +64,7 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
 static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    u16 *flags = &actor->base.flags2C0;
+    u16 *flags = &actor->base.placementFlags;
     u32 value = *flags & mask;
     *out = flags;
     if (value)
@@ -74,21 +74,21 @@ static inline u8 Test2(u16 **out, struct ChaseActor *actor, u32 maskInput)
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->base.flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
 {
@@ -100,7 +100,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
     u32 kind;
     {
         u32 mask = 0x1000;
-        u16 *flags2D4 = &actor->base.flags2D4;
+        u16 *flags2D4 = &actor->base.motionFlags;
         if (*flags2D4 & mask) {
             void **node = (void **)((u8 *)actor + 0x45C);
             SceneActorContacts_ReleaseNode(*node);
@@ -114,12 +114,12 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
     }
     if (actor->base.health <= 0) {
         {
-            u16 *flags2D6 = &actor->base.flags2D6;
+            u16 *flags2D6 = &actor->base.reactionFlags;
             u32 clear = ~0x49CB;
             u16 value = clear & *flags2D6;
             u32 zero = 0;
             *flags2D6 = value;
-            actor->base.field2B8 = zero;
+            actor->base.hitLockTimer = zero;
         }
         if (Test2(&flags2C0, actor, 0x200)) {
             struct GroupLink *link = (void *)(group + 0x30);
@@ -139,14 +139,14 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             actor->base.field2B1 = 1;
         }
         if (Test(gEngineFlags, 0x4800)) {
-            Player_NotifyFirstSelectedSlot(actor->base.field2E0, actor->base.field2D8);
+            Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
             goto done;
         }
         {
             u8 *address = &actor->base.category;
             u32 owner;
             kind = *address;
-            owner = actor->base.field2E0 & 1;
+            owner = actor->base.hitOwners & 1;
             category = address;
             collider = (u8 *)&actor->base.colliderA;
             if (!owner)
@@ -233,8 +233,8 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
                     }
                 }
             }
-            sub_08159164(actor->base.fieldAC);
-            Player_RefreshLifeState(actor->base.field2D8, actor->base.fieldA1);
+            sub_08159164(actor->base.experience);
+            Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         }
     record:
         if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&

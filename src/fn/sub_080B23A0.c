@@ -47,24 +47,24 @@ static inline void SetState(struct Vorn *actor, u32 behavior)
 static inline void SetControl(struct Vorn *actor, void *control, u32 kind)
 {
     actor->chase.base.field2B2 = 1;
-    actor->chase.base.field2B0 = 0;
-    actor->chase.base.field2B5 = kind;
+    actor->chase.base.stepDone = 0;
+    actor->chase.base.controlKind = kind;
     actor->chase.base.target = control;
     actor->chase.base.field2C8 = 0;
     {
-        u32 *flags = &actor->chase.base.flags114;
+        u32 *flags = &actor->chase.base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->chase.base.word104 = 0;
+    actor->chase.base.pendingControl = 0;
 }
 static inline void SetMotion(struct Vorn *actor, void *cb, u32 kind)
 {
-    actor->chase.base.word104 = (u32)cb;
-    actor->chase.base.word108 = 0;
-    actor->chase.base.word10C = 0;
-    actor->chase.base.word110 = kind;
-    actor->chase.base.flags114 = 1;
+    actor->chase.base.pendingControl = (u32)cb;
+    actor->chase.base.pendingControlData = 0;
+    actor->chase.base.pendingControlRelease = 0;
+    actor->chase.base.pendingControlKind = kind;
+    actor->chase.base.pendingControlFlags = 1;
 }
 static inline void StartRoute(void *body, void *path, u8 *group)
 {
@@ -92,7 +92,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         StartRoute(&actor->chase.base.body.id, group + 0x74, group);
     sub_080B1FA8(actor);
     {
-        u32 *field = &actor->chase.base.flags2CC;
+        u32 *field = &actor->chase.base.behaviorFlags;
         s32 mask = ~16;
         *field &= mask;
     }
@@ -105,7 +105,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         bit |= *field;
         *field = bit;
     }
-    SetFlags(0x80, &actor->chase.base.flags2D4);
+    SetFlags(0x80, &actor->chase.base.motionFlags);
     {
         u32 timer = actor->chase.group.common.gate.duration;
         actor->chase.group.common.gate.counter = timer;
@@ -116,6 +116,6 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         bit |= field[15];
         field[15] = bit;
     }
-    actor->chase.base.flags2CC |= 0x80;
+    actor->chase.base.behaviorFlags |= 0x80;
     return 1;
 }

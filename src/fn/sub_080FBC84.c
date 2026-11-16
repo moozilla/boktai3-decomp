@@ -47,7 +47,7 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->base.field2CA, context->spacing);
+        s32 zero = Mod(actor->base.frameCounter, context->spacing);
         if (zero)
             return;
         {

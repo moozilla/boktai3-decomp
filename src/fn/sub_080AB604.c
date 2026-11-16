@@ -45,7 +45,7 @@ s32 SceneActor_TryRequestFacingReaction(struct ChaseActor *s)
         sensor->flags &= mask;
     }
     {
-        u32 kind = s->base.field2B5;
+        u32 kind = s->base.controlKind;
         sensor2 = sensor;
         if (kind == 0x27)
             range = s->base.tracking.range * 2;

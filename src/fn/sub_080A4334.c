@@ -14,16 +14,16 @@ struct SpiderApproachPlayer {
 static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = k;
+    a->base.stepDone = 0;
+    a->base.controlKind = k;
     a->base.target = c;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 m = ~1;
         *p &= m;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void State(struct ChaseActor *a, u32 k)
 {
@@ -82,7 +82,7 @@ static inline void BeginContact(struct ChaseActor *a, struct SceneActorRegistryC
     }
     {
         u32 m = 128;
-        u16 *p = &a->base.flags2D4;
+        u16 *p = &a->base.motionFlags;
         u32 v = *p;
         m |= v;
         *p = m;

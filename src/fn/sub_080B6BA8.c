@@ -31,7 +31,7 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
     s32 angle;
     u32 m = 0x100;
 
-    if (!(s->base.flags2D4 & m)) {
+    if (!(s->base.motionFlags & m)) {
         context = s->base.context;
         if (s->base.tracking.distance < s->base.tracking.range) {
             struct SceneActorTargetDelta *difference = &delta;

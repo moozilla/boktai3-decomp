@@ -7,11 +7,11 @@ static inline void SelectPursuit(struct ChaseActor *a, void *cb, u32 mode)
     void *callback = cb;
     u32 zero = 0;
     u32 kind = mode;
-    a->base.word104 = (u32)callback;
-    a->base.word108 = zero;
-    a->base.word10C = zero;
-    a->base.word110 = kind;
-    a->base.flags114 = 1;
+    a->base.pendingControl = (u32)callback;
+    a->base.pendingControlData = zero;
+    a->base.pendingControlRelease = zero;
+    a->base.pendingControlKind = kind;
+    a->base.pendingControlFlags = 1;
 }
 void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
 {
@@ -19,7 +19,7 @@ void Vorn_SelectPursuitAfterAction(struct ChaseActor *a)
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, a->base.onEntry, 2);
     Callback_InvokeActor(a, a->base.contactQuery.opaque);
-    if (a->base.field2B0) {
+    if (a->base.stepDone) {
         Chase_SetBehavior(a, 15);
         if (Chase_Test(*(u16 *)(context + 0x6D4), 1))
             SelectPursuit(a, sub_080ADB90, 0x23);

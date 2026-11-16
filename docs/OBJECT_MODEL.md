@@ -117,7 +117,7 @@ pointer type (`u32 Bee_Destroy(struct ChaseActor *)`) installs it with a cast to
 type, since the registry calls every class the same way. Still `void *`: `onUpdate`,
 `onDamage`, `onContact` and `targetQuery` (typing those four changes which constant
 `Axe_Init` keeps on the stack; its installer passes them in as `void *`), and
-`defaultReaction`, `callback248`, `field238`..`field240` and the behavior and phase tables.
+`defaultReaction`, `routeReset`, `sinkCallback`, `reactionGate`, `field240` and the behavior and phase tables.
 
 ### Not members
 

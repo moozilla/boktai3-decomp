@@ -37,11 +37,11 @@ void Skeleton_UpdateFacingColliders(struct ChaseActor *p)
     if (unavailable(p))
         return;
     mask = 0x800;
-    if (p->base.flags2D4 & mask)
+    if (p->base.motionFlags & mask)
         return;
-    if (p->base.field2B5 == 0x39)
+    if (p->base.controlKind == 0x39)
         return;
-    if (p->base.field2B5 == 0x3D)
+    if (p->base.controlKind == 0x3D)
         return;
     if (context->collisionDelay) {
         p->base.colliderA.flags |= 4;

@@ -13,7 +13,7 @@ static inline u8 IsControlled(struct ChaseActor *a)
 static inline void ClearRoute(struct ChaseActor *a)
 {
     struct SceneActorRegistryControl *route = &a->group.common.control;
-    u32 *flags = &a->base.flags2CC;
+    u32 *flags = &a->base.behaviorFlags;
     u32 mask = ~0x141C0;
     *flags &= mask;
     route->counter = 0;
@@ -67,13 +67,13 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
             actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         actor->base.restart = 0;
         collider->responseValue = 0;
-        actor->base.field2B8 = 0;
+        actor->base.hitLockTimer = 0;
         {
             u32 mask = 0x20000;
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             *flags |= mask;
         }
     }
@@ -94,13 +94,13 @@ void SceneActorReaction_SinkAndRemove(struct ChaseActor *actor, s32 frame)
             }
             {
                 u32 mask = 8;
-                u16 *field = &actor->base.flags2D4;
+                u16 *field = &actor->base.motionFlags;
                 mask |= *field;
                 *field = mask;
             }
             {
                 u32 mask = 0x400;
-                u32 *flags = &actor->base.flags2CC;
+                u32 *flags = &actor->base.behaviorFlags;
                 *flags |= mask;
             }
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);

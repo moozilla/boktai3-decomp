@@ -58,16 +58,16 @@ static inline void SaveRecovery(struct RecoveryPacket *p, void *callback, u8 beh
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *p &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {

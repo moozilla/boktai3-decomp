@@ -11,16 +11,16 @@ void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
         void *control = actor->base.onStanding;
         u32 zero = 0;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = zero;
-        actor->base.field2B5 = zero;
+        actor->base.stepDone = zero;
+        actor->base.controlKind = zero;
         actor->base.target = control;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
     if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) {
         u32 zero = sub_0812F3CC(actor);
@@ -33,7 +33,7 @@ void SceneActorRoute_UpdateWaitPhase(struct ChaseActor *actor)
                 actor->base.counter2AC = zero;
                 actor->base.field2B1 = kind;
                 {
-                    u32 *flags = &actor->base.flags2D0;
+                    u32 *flags = &actor->base.statusFlags;
                     s32 mask = ~0x20;
                     *flags &= mask;
                 }

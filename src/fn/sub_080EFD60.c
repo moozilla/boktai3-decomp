@@ -14,16 +14,16 @@ void SceneActorReaction_PlayHiddenCue(void);
 static inline void BeginControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = callback;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void ResetPhase(struct ChaseActor *actor, u32 behavior)
 {
@@ -42,13 +42,13 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
         BeginControl(actor, callback, kind);
         state->targetMissFrames = 0;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         struct IvyColliderBits *collider = (void *)&actor->base.colliderA;
         u32 mask = ~4;
         collider->flags &= mask;
         collider->flags |= 8;
         {
-            u16 *flags = &actor->base.flags2C0;
+            u16 *flags = &actor->base.placementFlags;
             u32 mask = ~0x800;
             *flags = mask & *flags;
         }

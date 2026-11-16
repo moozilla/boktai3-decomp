@@ -25,7 +25,7 @@ void SceneActorControl_RestoreMotion(struct ChaseActor *input)
     actor->base.terrainCell = SceneActorTerrain_GetCellIndex(&state->storedPosition);
     height = SceneActorTerrain_GetHeight(actor->base.terrainCell, &state->storedPosition);
     actor->base.groundHeight = height;
-    actor->base.field2EA = actor->base.body.position.y - height;
+    actor->base.heightOffset = actor->base.body.position.y - height;
     actor->base.body.position.y = actor->base.groundHeight;
     if (actor->base.drawableKind == 0)
         ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position =

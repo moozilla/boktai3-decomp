@@ -50,11 +50,11 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     struct ContactPosition origin;
     s32 mode, firstLimit, secondLimit;
     s32 scriptVariant;
-    arg0->base.flags2CC = 0;
-    arg0->base.flags2D0 = 0;
+    arg0->base.behaviorFlags = 0;
+    arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
-    arg0->base.flags2C0 = MonsterInit_ReadKeywordHalfword(0x4D, 0);
+    arg0->base.placementFlags = MonsterInit_ReadKeywordHalfword(0x4D, 0);
     MonsterInit_ClearPosition(fill, &origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
@@ -71,13 +71,13 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     if (Script_GetKeywordValue(0x62, 0))
         MonsterInit_SetStatusFlags(arg0, 0x200);
     arg0->base.script1F0 = MonsterInit_ReadKeywordHalfword(0x46, 0);
-    arg0->base.field1EC = MonsterInit_ReadKeywordHalfword(0x52, 0);
+    arg0->base.scriptId = MonsterInit_ReadKeywordHalfword(0x52, 0);
 
     if (Script_SeekToKeyword(0x41)) {
         MonsterInit_SetInitialHealth(arg0, MonsterInit_ReadHalfword(0));
         arg0->base.field9E = MonsterInit_ReadByte(0);
-        arg0->base.field9F = MonsterInit_ReadByte(0);
-        arg0->base.fieldA0 = MonsterInit_ReadByte(0);
+        arg0->base.defense = MonsterInit_ReadByte(0);
+        arg0->base.contactReward = MonsterInit_ReadByte(0);
         arg0->base.fieldA2 = MonsterInit_ReadHalfword(0);
         arg0->base.fieldA4 = MonsterInit_ReadHalfword(0);
     }
@@ -85,14 +85,14 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     MonsterInit_InitializeHealth(arg0, MonsterInit_GetInitialHealth(arg0), firstLimit, secondLimit);
 
     if (Script_SeekToKeyword(0x58)) {
-        arg0->base.fieldAC = MonsterInit_ReadWord(0);
+        arg0->base.experience = MonsterInit_ReadWord(0);
         arg0->base.fieldA1 = MonsterInit_ReadByte(0);
     }
-    arg0->base.fieldB2 = MonsterInit_ReadKeywordHalfword(0x4B, 2);
+    arg0->base.hudKind = MonsterInit_ReadKeywordHalfword(0x4B, 2);
     scriptVariant = (s16)MonsterInit_ReadKeywordHalfword(0x56, -1);
     if ((s16)scriptVariant < 0)
         scriptVariant = 0xFFFF;
-    arg0->base.field9A = scriptVariant;
+    arg0->base.hudLabel = scriptVariant;
     if (Script_GetKeywordValue(0x48, 0))
         MonsterInit_SetStatusFlags(arg0, 0x800);
 
@@ -133,9 +133,9 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
-    actor->base.callback248 = 0;
+    actor->base.routeReset = 0;
     actor->base.targetQuery = targetQuery;
-    actor->base.field238 = SceneActorReaction_SinkAndRemove;
+    actor->base.sinkCallback = SceneActorReaction_SinkAndRemove;
     actor->base.onDamage = damage;
     actor->base.onContact = contact;
     actor->base.field240 = 0;
@@ -151,8 +151,8 @@ static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605C74);
-    actor->base.callback248 = SceneActorControl_RestoreMotion;
-    actor->base.field23C = SceneActorControl_SetCollisionResponse;
+    actor->base.routeReset = SceneActorControl_RestoreMotion;
+    actor->base.reactionGate = SceneActorControl_SetCollisionResponse;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque,
                               SceneActorControl_TryActivateProximityResponse);
 }
@@ -221,7 +221,7 @@ s32 Bat_Init(void *object)
             u16 *ground = &actor->base.groundHeight;
             *ground = groundHeight;
             offset = (u16)actor->base.body.position.y - groundHeight;
-            actor->base.field2EA = offset;
+            actor->base.heightOffset = offset;
             bat->height = offset;
             actor->base.body.position.y = *ground;
             bat->field3DE = *ground;

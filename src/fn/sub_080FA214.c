@@ -20,7 +20,7 @@ void SceneActorControl_ApplyDampedMotion(struct ChaseActor *actor)
         state->x >>= 1;
         state->z >>= 1;
     }
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u32 offset = 0x2A8;
         u8 *field = ((u8 *)actor) + offset;
         *field = 0;

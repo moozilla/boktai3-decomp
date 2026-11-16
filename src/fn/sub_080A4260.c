@@ -17,16 +17,16 @@ static inline void SetBehavior(struct ChaseActor *actor, u32 b)
 static inline void SetControl(struct ChaseActor *actor, void *cb, u32 k)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = k;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = k;
     actor->base.target = cb;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void OrFlags(u16 *flags, u32 mask)
 {
@@ -51,7 +51,7 @@ s32 SceneActorPlacement_BeginContactRoute(struct ChaseActor *p)
         OrFlags((u16 *)&group->gate.flags, 4);
         {
             u32 mask = 128;
-            u16 *flags = &p->base.flags2D4;
+            u16 *flags = &p->base.motionFlags;
             u32 value = *flags;
             mask |= value;
             *flags = mask;

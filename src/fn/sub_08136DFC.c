@@ -17,7 +17,7 @@ void SceneActorPlacement_ShowActor(struct RoomActor *s)
 {
     if (!SceneActorPlacement_IsUnavailable(s)) {
         u32 zero = 1;
-        u32 *field = &s->flags2CC;
+        u32 *field = &s->behaviorFlags;
         u32 flags = *field;
         zero &= flags;
         if (!zero && (flags & 2)) {

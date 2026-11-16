@@ -49,8 +49,8 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
         {
             u32 mask = 0x800;
-            mask |= actor->base.flags2C0;
-            actor->base.flags2C0 = mask;
+            mask |= actor->base.placementFlags;
+            actor->base.placementFlags = mask;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
@@ -74,5 +74,5 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
     }
     if (actor->base.restart)
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
 }

@@ -4,22 +4,22 @@ u8 sub_0812F3CC(struct ChaseActor *);
 static inline void SelectControl(struct ChaseActor *p, void *control, u32 kind)
 {
     p->base.field2B2 = 1;
-    p->base.field2B0 = 0;
-    p->base.field2B5 = kind;
+    p->base.stepDone = 0;
+    p->base.controlKind = kind;
     p->base.target = control;
     p->base.field2C8 = 0;
     {
-        u32 *flags = &p->base.flags114;
+        u32 *flags = &p->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    p->base.word104 = 0;
+    p->base.pendingControl = 0;
 }
 u8 SceneActor_IsFacingNearbyTarget(struct ChaseActor *);
 void Vorn_UpdateApproachRange(struct ChaseActor *);
 static inline u8 PhaseComplete(struct ChaseActor *p)
 {
-    return p->base.field2B0;
+    return p->base.stepDone;
 }
 void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
 {
@@ -52,20 +52,20 @@ void SceneActorPhase_BeginTimedMotion(struct ChaseActor *p)
             *(u8 *)((u32)p + 0x2B5) = zero;
             p->base.target = control;
             p->base.field2C8 = zero;
-            flags = &p->base.flags114;
+            flags = &p->base.pendingControlFlags;
             {
                 s32 mask = -2;
                 *flags &= mask;
             }
             {
                 u16 duration;
-                u32 *word104 = &p->base.word104;
+                u32 *word104 = &p->base.pendingControl;
                 u32 handler = (u32)Vorn_UpdateApproachRange;
                 duration = 40;
                 *word104 = handler;
-                p->base.word108 = zero;
-                p->base.word10C = zero;
-                p->base.word110 = duration;
+                p->base.pendingControlData = zero;
+                p->base.pendingControlRelease = zero;
+                p->base.pendingControlKind = duration;
                 *flags = one;
             }
         }

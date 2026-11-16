@@ -7,7 +7,7 @@ void Golem_BeginChargeBuildup(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xE);
         {
             u32 mask = 0x100;
-            actor->base.flags2D4 = mask | actor->base.flags2D4;
+            actor->base.motionFlags = mask | actor->base.motionFlags;
         }
     }
     if (actor->base.restart)

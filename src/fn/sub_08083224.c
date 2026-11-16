@@ -25,14 +25,14 @@ void SceneActorControl_UpdateShadowReturnPhase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorTerrain_InstallControl(actor, (void *)SceneActorControl_UpdateShadowReturn, 35);
         {
-            u32 *flags = &actor->base.flags2D0;
+            u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x100000;
             *flags &= mask;
         }
         SetPolarMotion(&actor->base.secondaryMotion, actor->base.body.direction, 4);
         actor->base.secondaryMotion.y = 10;
     }
-    if (actor->base.field2B0 && (s16)actor->base.field2EA < control->returnHeight - 20)
+    if (actor->base.stepDone && (s16)actor->base.heightOffset < control->returnHeight - 20)
         SceneActorControl_RestartPositionCurve(actor);
     else
         ++actor->base.counter2AC;

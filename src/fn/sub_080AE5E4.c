@@ -7,16 +7,16 @@ void sub_080B3110(void *, u32, const u8 *, u32);
 static inline void Resume_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void Resume_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase,
                                          u32 behavior)
@@ -33,7 +33,7 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
     if (actor->base.restart) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         if (Vorn_HasActiveResponse(actor->base.context)) {
             struct Vorn *context = actor->base.context;
@@ -44,7 +44,7 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
         } else {
             {
                 u32 mask = 16;
-                actor->base.flags2CC |= mask;
+                actor->base.behaviorFlags |= mask;
             }
             Resume_ResetAnimation(actor, 3, 1, 0);
             {

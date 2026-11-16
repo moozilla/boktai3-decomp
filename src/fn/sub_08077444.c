@@ -24,7 +24,7 @@ void SceneActorPlacement_ResetToPathPoint(struct ChaseActor *object, u32 pathId,
     struct SceneActorBody *body = &actor->base.body;
     u32 *flags;
     u32 enabled = 1;
-    flags = &actor->base.flags2CC;
+    flags = &actor->base.behaviorFlags;
     if (*flags & enabled) {
         struct ContactPosition *position;
         SceneActorChase_ClearWordFlags(flags, 3);

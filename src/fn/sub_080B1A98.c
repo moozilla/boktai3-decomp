@@ -47,7 +47,7 @@ static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPositio
 {
     s32 result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
-        ClearRouteBits(&actor->chase.base.flags2D4, 0x200);
+        ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
         return 0;
     }
     result = Terrain_ApplyBlocked(route, position, target);
@@ -56,7 +56,7 @@ static inline u8 TryRoute(struct Vorn *actor, void *route, struct ContactPositio
             Memory_Clear(&actor->chase.base.body.motion, 8);
         return 1;
     }
-    ClearRouteBits(&actor->chase.base.flags2D4, 0x200);
+    ClearRouteBits(&actor->chase.base.motionFlags, 0x200);
     return 0;
 }
 static inline void SetControl(struct Vorn *actor, void *cb, u32 k)
@@ -64,16 +64,16 @@ static inline void SetControl(struct Vorn *actor, void *cb, u32 k)
     void *callback = cb;
     u32 kind = k;
     actor->chase.base.field2B2 = 1;
-    actor->chase.base.field2B0 = 0;
-    actor->chase.base.field2B5 = kind;
+    actor->chase.base.stepDone = 0;
+    actor->chase.base.controlKind = kind;
     actor->chase.base.target = callback;
     actor->chase.base.field2C8 = 0;
     {
-        u32 *field = &actor->chase.base.flags114;
+        u32 *field = &actor->chase.base.pendingControlFlags;
         u32 mask = ~1;
         *field &= mask;
     }
-    actor->chase.base.word104 = 0;
+    actor->chase.base.pendingControl = 0;
 }
 
 static inline u8 Test(u16 *p, u32 mask)
@@ -90,7 +90,7 @@ u8 SceneActor_DispatchContextAction(void *, u32);
 void sub_080B3110(void *, u32, const void *, u32);
 static inline u32 MotionFlags(struct Vorn *p, u32 mask)
 {
-    return p->chase.base.flags2D4 & mask;
+    return p->chase.base.motionFlags & mask;
 }
 static inline u8 TestContext(struct Vorn *p, u32 mask)
 {
@@ -142,7 +142,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 mask = 16;
-        u32 *p = &actor->chase.base.flags2CC;
+        u32 *p = &actor->chase.base.behaviorFlags;
         u32 value = *p;
         value |= mask;
         *p = value;

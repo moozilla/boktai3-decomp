@@ -4,7 +4,7 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 static inline u32 Flags(struct ChaseActor *a, u32 mask)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 // confidence=low: aligns idle facing with the saved route direction after animation completion.
 void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
@@ -24,7 +24,7 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
         } else
             facing = *((u8 *)actor + 0x3CD);
         if (direction == (facing >> 1)) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             SceneActorAnimation_SelectDirectionalEntry(actor, 0);
             return;
         }
@@ -48,7 +48,7 @@ void Vorn_UpdateIdleFacing(struct ChaseActor *actor)
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
     if (actor->base.restart) {
         group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         {
             u32 facing = (actor->base.body.direction + 0x60) >> 6;
             u32 quadrant = 3;

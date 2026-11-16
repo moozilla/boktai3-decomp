@@ -54,7 +54,7 @@ void SceneActorControl_ConsumeLiftFlag(struct ChaseActor *actor)
         }
         {
             u32 bit = 0x100;
-            struct LiftHalfBits *f = (void *)&actor->base.flags2D4;
+            struct LiftHalfBits *f = (void *)&actor->base.motionFlags;
             f->bits = bit | f->bits;
         }
         {

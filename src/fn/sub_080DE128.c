@@ -14,7 +14,7 @@ static inline u8 Dog_HasAwarenessFlag(struct Dog *context, u32 mask)
 }
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline void Response(struct ChaseActor *actor, u8 *nav, u32 behavior, u32 response)
 {

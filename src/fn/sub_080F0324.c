@@ -28,11 +28,11 @@ static inline void BeginTransition(struct ChaseActor *actor, u16 zero, u32 offse
         *(void **)((u8 *)actor + stateOffset) = callback;
         actor->base.field2C8 = zero;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = zero;
+        actor->base.pendingControl = zero;
     }
 }
 s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)

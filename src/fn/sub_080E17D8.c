@@ -48,15 +48,15 @@ void SceneActorAnimation_EmitDirectionalTrail(struct ChaseActor *a, s32 frame)
         u8 *prepared = &a->base.field2B2;
         u32 zero = 0;
         *prepared = 1;
-        a->base.field2B0 = zero;
-        a->base.field2B5 = kind;
+        a->base.stepDone = zero;
+        a->base.controlKind = kind;
         a->base.target = callback;
         a->base.field2C8 = zero;
         {
-            u32 *flags = &a->base.flags114;
+            u32 *flags = &a->base.pendingControlFlags;
             s32 mask = -2;
             *flags &= mask;
         }
-        a->base.word104 = zero;
+        a->base.pendingControl = zero;
     }
 }

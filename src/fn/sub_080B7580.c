@@ -12,7 +12,7 @@ void SceneActorReaction_SetProfileEntries(struct ChaseActor *actor)
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
         actor->base.profileId, actor->base.profileMode, 0);
     u32 mask = 0x280;
-    u16 flags = actor->base.flags2D4;
+    u16 flags = actor->base.motionFlags;
     u32 special = mask & flags;
     if (special) {
         switch (category) {

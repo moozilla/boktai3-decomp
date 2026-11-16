@@ -19,7 +19,7 @@ void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
     SceneActorControl_TakeStateEntry(actor);
     if (Golem_InvokeEnabledBehavior(actor))
         return;
-    if (actor->base.field2B0) {
+    if (actor->base.stepDone) {
         u16 blocked;
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
@@ -37,11 +37,11 @@ void Golem_ResumeRouteAfterControl(struct ChaseActor *actor)
         } else {
             u32 bit = 0x200;
             u16 returning = SceneActorChase_MotionFlags(actor, bit);
-            u32 *flags = &actor->base.flags2CC;
+            u32 *flags = &actor->base.behaviorFlags;
             if (returning) {
                 struct SceneActorRegistryControl *control = &group->common.control;
                 if (SceneActorChase_Bits32(flags, 0x200000)) {
-                    SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
+                    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x1000000);
                     SceneActorChase_ClearMotionFlagComponent(actor, bit);
                     control->mode = 0;
                     control->counter = 0;

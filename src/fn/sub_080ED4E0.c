@@ -44,7 +44,7 @@ static inline void Ivy_EnableCollider(struct ContactCollider *collider)
 }
 static inline void Ivy_SetContactFlag(struct ChaseActor *actor, u32 bits)
 {
-    actor->base.flags2C0 = bits | actor->base.flags2C0;
+    actor->base.placementFlags = bits | actor->base.placementFlags;
 }
 static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
 {
@@ -58,7 +58,7 @@ static inline void Ivy_DisableCollider(struct ContactCollider *collider)
 static inline void Ivy_DisableContact(struct ChaseActor *actor)
 {
     Ivy_DisableCollider(&actor->base.colliderA);
-    SceneActorChase_ClearFlagComponent((void *)&actor->base.flags2C0, 0x800);
+    SceneActorChase_ClearFlagComponent((void *)&actor->base.placementFlags, 0x800);
 }
 
 struct IvyFrameIndex {

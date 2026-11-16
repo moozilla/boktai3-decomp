@@ -74,7 +74,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
             zero = 0;
             *destination = direction;
         }
-        address = &actor->base.field2EA;
+        address = &actor->base.heightOffset;
         *address = zero;
         {
             u32 offset = 0x2EC;
@@ -86,10 +86,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
             u32 mask = 0x200000;
             u32 *address;
             u32 selected;
-            address = &actor->base.flags2CC;
+            address = &actor->base.behaviorFlags;
             selected = *address & mask;
             flags = address;
-            renderFlags = &actor->base.flags2D0;
+            renderFlags = &actor->base.statusFlags;
             if (selected) {
                 u32 clearMask = ~0x1000000;
                 u32 value;
@@ -100,7 +100,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
                 value &= clearMask;
                 *renderFlags = value;
                 offset = 0x2D4;
-                shortFlags = &actor->base.flags2D4;
+                shortFlags = &actor->base.motionFlags;
                 mask0 = 0xFFFFFDFF;
                 mask0 &= *shortFlags;
                 *shortFlags = mask0;
@@ -150,10 +150,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         zero = 0;
         collider->flags = value;
         offset = 0x1EA;
-        address = &actor->base.field1EA;
+        address = &actor->base.paletteTimer;
         *address = zero;
         offset -= 2;
-        address = &actor->base.field1E8;
+        address = &actor->base.flashTimer;
         *address = zero;
     }
     {

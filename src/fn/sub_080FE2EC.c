@@ -13,7 +13,7 @@ static inline u8 TakeFlag(u8 *p)
 }
 static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 {
-    u16 *flags = &actor->base.flags2D4;
+    u16 *flags = &actor->base.motionFlags;
     return *flags = mask | *flags;
 }
 void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
@@ -23,20 +23,20 @@ void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
         void *callback = Axe_UpdateWaitingAnimation;
         u32 kind = 10;
         actor->base.field2B2 = 1;
-        actor->base.field2B0 = 0;
-        actor->base.field2B5 = kind;
+        actor->base.stepDone = 0;
+        actor->base.controlKind = kind;
         actor->base.target = callback;
         actor->base.field2C8 = 0;
         {
-            u32 *flags = &actor->base.flags114;
+            u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.word104 = 0;
+        actor->base.pendingControl = 0;
         SetFlag(actor, 0x100);
         group->gate.counter = group->gate.duration;
     }
-    if (actor->base.field2B0)
+    if (actor->base.stepDone)
         Axe_BeginMoveToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);
     else
         actor->base.counter2AC++;

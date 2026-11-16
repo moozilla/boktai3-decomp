@@ -32,16 +32,16 @@ static inline s32 ClearFlag(struct LunFlagWord *p, u32 mask)
 static inline void SetControl(struct ChaseActor *a, void *callback, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = kind;
+    a->base.stepDone = 0;
+    a->base.controlKind = kind;
     a->base.target = callback;
     a->base.field2C8 = 0;
     {
-        u32 *flags = &a->base.flags114;
+        u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void SetState(struct ChaseActor *a, u32 state, u32 phase, u32 behavior)
 {
@@ -72,7 +72,7 @@ static inline s32 Quarter(s32 v)
 static inline void SetMotionFlags(struct ChaseActor *a, u32 input)
 {
     u32 mask = input;
-    u32 *p = &a->base.flags2D0;
+    u32 *p = &a->base.statusFlags;
     *p |= mask;
 }
 static inline u8 Move(struct ChaseActor *a)
@@ -98,12 +98,12 @@ static inline u8 Move(struct ChaseActor *a)
 // confidence=low: eases Lun to its movement target, then selects the next waiting or pursuit state.
 static inline u32 TestMotionFlags(u32 mask, struct ChaseActor *a)
 {
-    return a->base.flags2D4 & mask;
+    return a->base.motionFlags & mask;
 }
 
 inline static u16 SetAnimationFlags(struct ChaseActor *actor, u32 mask)
 {
-    u16 *p = &actor->base.flags2C0;
+    u16 *p = &actor->base.placementFlags;
     return *p = mask | (*p);
 }
 
@@ -111,8 +111,8 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
 {
     u8 *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B2)) {
-        SetFlag(32, (struct LunFlagWord *)&a->base.flags2D4);
-        if (a->base.flags2D4 & 8)
+        SetFlag(32, (struct LunFlagWord *)&a->base.motionFlags);
+        if (a->base.motionFlags & 8)
             Sound_PlaySong(0x12A);
         {
             struct ContactCollider *c = &a->base.colliderB;
@@ -134,10 +134,10 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
     }
     SetMotionFlags(a, 0x100000);
     if (Move(a)) {
-        a->base.field2B0 = 1;
-        ClearFlag((struct LunFlagWord *)&a->base.flags2D4, ~0x120);
+        a->base.stepDone = 1;
+        ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~0x120);
         {
-            u32 *p = &a->base.flags2CC;
+            u32 *p = &a->base.behaviorFlags;
             u32 mask = ~0x80;
             *p &= mask;
         }
@@ -145,13 +145,13 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
         ctx[0x3E2] = 0;
         {
             u16 liftFlag = 8;
-            if (a->base.flags2D4 & liftFlag) {
+            if (a->base.motionFlags & liftFlag) {
                 SetState(a, 3, 0, 0);
                 SetControl(a, Lun_ResumeAfterLiftPenalty, 20);
-                ClearFlag((struct LunFlagWord *)&a->base.flags2D4, ~8);
+                ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~8);
                 a->base.field2C2 = 64;
             } else if (*((u16 *)(ctx + 0x444))) {
-                SetFlag(0x100, (struct LunFlagWord *)&a->base.flags2D4);
+                SetFlag(0x100, (struct LunFlagWord *)&a->base.motionFlags);
                 *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
                 Lun_BeginMoveToPosition(a, ((u8 **)gPlayers)[0] + 0x30);
                 SetState(a, 0, 2, 1);

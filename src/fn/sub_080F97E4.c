@@ -26,12 +26,12 @@ static inline u8 AtRest(s32 x, s32 z)
 static inline void SetFlags(struct ChaseActor *a, u32 m)
 {
     u32 v = m;
-    v |= a->base.flags2D4;
-    a->base.flags2D4 = v;
+    v |= a->base.motionFlags;
+    a->base.motionFlags = v;
 }
 static inline void SetForced(struct ChaseActor *a, u32 m)
 {
-    a->base.flags2D0 = m | a->base.flags2D0;
+    a->base.statusFlags = m | a->base.statusFlags;
 }
 static inline void SetContext(u8 *p, u32 m)
 {
@@ -81,18 +81,18 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
     *priorX += x;
     *priorZ += z;
     if (AtRest(x, z)) {
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         {
             struct SignedFlag {
                 s32 bits : 16;
             };
-            struct SignedFlag *f = (void *)&actor->base.flags2D4;
+            struct SignedFlag *f = (void *)&actor->base.motionFlags;
             s32 m = ~0x20;
             m &= (u16)f->bits;
             f->bits = m;
         }
         {
-            u32 *f = &actor->base.flags2CC;
+            u32 *f = &actor->base.behaviorFlags;
             s32 m = ~0x80;
             *f &= m;
         }

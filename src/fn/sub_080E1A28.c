@@ -74,24 +74,24 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     {
         u32 mask = 0x10;
-        if (actor->base.flags2D0 & mask) {
+        if (actor->base.statusFlags & mask) {
             void *callback = (void *)Dog_UpdateAnimationSixteenReaction;
             u32 kind = 0x24;
             actor->base.field2B2 = 1;
-            actor->base.field2B0 = 0;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = 0;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = 0;
             {
-                u32 *flags = &actor->base.flags114;
+                u32 *flags = &actor->base.pendingControlFlags;
                 u32 mask = ~1;
                 *flags &= mask;
             }
-            actor->base.word104 = 0;
+            actor->base.pendingControl = 0;
         }
     }
 }

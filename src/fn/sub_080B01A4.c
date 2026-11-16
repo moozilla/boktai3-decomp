@@ -17,16 +17,16 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -50,11 +50,11 @@ static inline void SetState(struct ChaseActor *actor, u32 behavior)
 }
 static inline void SetMotion(struct ChaseActor *actor, void *cb, u32 kind)
 {
-    actor->base.word104 = (u32)cb;
-    actor->base.word108 = 0;
-    actor->base.word10C = 0;
-    actor->base.word110 = kind;
-    actor->base.flags114 = 1;
+    actor->base.pendingControl = (u32)cb;
+    actor->base.pendingControlData = 0;
+    actor->base.pendingControlRelease = 0;
+    actor->base.pendingControlKind = kind;
+    actor->base.pendingControlFlags = 1;
 }
 void SceneActorReaction_BeginSideStep(void);
 void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
@@ -73,7 +73,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xa02f;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;

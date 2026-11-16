@@ -9,16 +9,16 @@ void SceneActorMovement_ResolveRoutePosition(void *);
 static inline void Control(struct ChaseActor *a, void *c, u32 k)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = 0;
-    a->base.field2B5 = k;
+    a->base.stepDone = 0;
+    a->base.controlKind = k;
     a->base.target = c;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         u32 m = ~1;
         *p &= m;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 static inline void State(struct ChaseActor *a, u32 k)
 {
@@ -39,11 +39,11 @@ void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
     if (SceneActorControl_TakeFlag(&a->base.field2B2)) {
         {
             u32 m = 0x100;
-            a->base.flags2D4 = m | a->base.flags2D4;
+            a->base.motionFlags = m | a->base.motionFlags;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)a, 5);
         {
-            u32 *p = &a->base.flags2CC;
+            u32 *p = &a->base.behaviorFlags;
             u32 m = ~0x4000;
             *p &= m;
         }
@@ -60,7 +60,7 @@ void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
     }
     if (a->base.restart && n > 60) {
         {
-            struct ChaseFlags40 *p = (void *)&a->base.flags2D4;
+            struct ChaseFlags40 *p = (void *)&a->base.motionFlags;
             u32 mask = ~0x100;
             p->bits &= mask;
         }
@@ -75,8 +75,8 @@ void Spider_UpdateContactWindup(struct ChaseActor *a, s32 n)
         }
         {
             u32 mask = 128;
-            mask |= a->base.flags2D4;
-            a->base.flags2D4 = mask;
+            mask |= a->base.motionFlags;
+            a->base.motionFlags = mask;
         }
         a->group.common.gate.counter = a->group.common.gate.duration;
     }

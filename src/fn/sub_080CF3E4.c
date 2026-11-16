@@ -81,9 +81,9 @@ void Golem_ArriveAndRestore(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorChase_SetControl(actor, Skeleton_ClearDirectionalEntryFlag, 0x2C);
-        actor->base.field2B0 = 0;
+        actor->base.stepDone = 0;
     }
-    if (!actor->base.field2B0)
+    if (!actor->base.stepDone)
         return;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);

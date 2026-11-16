@@ -21,21 +21,21 @@ struct BatDrawable {
 void SceneActor_SetPositionXZ(void *, s32, s32);
 static inline u32 Bat_MaskFlags(struct ChaseActor *actor, u32 mask)
 {
-    return actor->base.flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 static inline void Bat_SetControl(struct ChaseActor *actor, u32 kind, void *control)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
@@ -50,7 +50,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         if (!actor->base.restart) {
             return;
         }
-        actor->base.field2B0 = 1;
+        actor->base.stepDone = 1;
         SceneActor_SetPositionXZ(&actor->base.body.id,
                                  (*(struct BatRoutePoint **)(group + 0x1FC))->x,
                                  (*(struct BatRoutePoint **)(group + 0x1FC))->z);
@@ -87,7 +87,7 @@ void Mummy_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
             actor->base.field2C2 = Div(64, 3);
             {
                 u32 mask = 16;
-                u32 *flags = &actor->base.flags2CC;
+                u32 *flags = &actor->base.behaviorFlags;
                 *flags |= mask;
             }
         }

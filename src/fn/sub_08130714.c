@@ -11,16 +11,16 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.field2B0 = 0;
-    actor->base.field2B5 = kind;
+    actor->base.stepDone = 0;
+    actor->base.controlKind = kind;
     actor->base.target = control;
     actor->base.field2C8 = 0;
     {
-        u32 *flags = &actor->base.flags114;
+        u32 *flags = &actor->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.word104 = 0;
+    actor->base.pendingControl = 0;
 }
 static inline void ResetState(struct ChaseActor *actor)
 {
@@ -43,7 +43,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
         speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
         {
             u32 mask = 0xa02f;
-            if (actor->base.flags2D4 & mask) {
+            if (actor->base.motionFlags & mask) {
                 u16 *p = &actor->base.field2C2;
                 *p = 64;
                 scale = p;

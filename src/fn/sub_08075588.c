@@ -6,7 +6,7 @@ static inline void SceneActorMovement_Wake(struct ChaseActor *actor)
 {
     /* wake-up transition when the stun flag is set */
     if (!ActorStatus_IsDown(actor) && ActorStatus_BehaviorFlags(actor, 0x1000)) {
-        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x1000);
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x1000);
         actor->base.reactionStart.x = actor->base.body.position.x;
         actor->base.reactionStart.z = actor->base.body.position.z;
         actor->base.reactionEnd.x = actor->base.body.position.x;
@@ -26,24 +26,24 @@ static inline void SceneActorMovement_Wake(struct ChaseActor *actor)
 static inline void SceneActorMovement_ApplyReactionFlags(struct ChaseActor *actor)
 {
     /* state-flag dispatch */
-    if (actor->base.flags2D4 == 0) {
-        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x2000);
+    if (actor->base.motionFlags == 0) {
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000);
     } else if (ActorStatus_IsDown(actor)) {
-        actor->base.flags2D4 = 0x40;
+        actor->base.motionFlags = 0x40;
         actor->base.field2E6 = 0;
-        SceneActorChase_ClearBits(&actor->base.flags2D6, 0x980);
+        SceneActorChase_ClearBits(&actor->base.reactionFlags, 0x980);
     } else if (ActorStatus_MotionFlags(actor, 0x803E)) {
         ActorStatus_ClearMotionFlags(actor, 0x201);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x4000);
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
         ActorStatus_ClearTrackingFlags((void *)&actor->base.tracking.target, 0x10);
         if (!(ActorStatus_MotionFlags(actor, 0x20)))
-            SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
-        SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x100004);
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100004);
         ActorStatus_SetPendingBits(actor, 0x400);
         actor->base.field2E6 = 0;
-        ActorStatus_SetWord(&actor->base.flags2CC, 0x2000);
+        ActorStatus_SetWord(&actor->base.behaviorFlags, 0x2000);
     } else {
-        SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x2000);
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000);
     }
 }
 

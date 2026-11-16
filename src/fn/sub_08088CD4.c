@@ -75,7 +75,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             Sound_PlaySong(0x12A);
         {
             struct SceneActorRegistryControl *control = &actor->group.common.control;
-            u32 *field = &actor->base.flags2CC;
+            u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
@@ -106,7 +106,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     if (!actor->base.restart)
         return;
-    actor->base.field2B0 = 1;
+    actor->base.stepDone = 1;
     if (!Flag(actor, 0x400, 0x2CC)) {
         u8 category;
         SceneActorBehavior_CallTerrainScript(actor);
@@ -138,7 +138,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         values[3] = actor->base.parameters1FC[0];
         values[4] = actor->base.parameters1FC[1];
         values[5] = actor->base.parameters1FC[2];
-        values[6] = (s32)actor->base.field2E0;
+        values[6] = (s32)actor->base.hitOwners;
         values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
@@ -150,12 +150,12 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         u32 zero;
         u32 one;
         u16 masked;
-        u32 test = actor->base.flags2D4 & mask;
-        flags = &actor->base.flags2D4;
+        u32 test = actor->base.motionFlags & mask;
+        flags = &actor->base.motionFlags;
         if (!test && (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-        actor->base.fieldAA = 0;
+        actor->base.attachmentTimer = 0;
         zero = 0;
         drawable->alpha8 = 0x40;
         drawable->alpha9 = 0x40;
@@ -170,16 +170,16 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
             actor->base.field2B2 = one;
-            actor->base.field2B0 = zero;
-            actor->base.field2B5 = kind;
+            actor->base.stepDone = zero;
+            actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = masked;
             {
-                u32 *field = &actor->base.flags114;
+                u32 *field = &actor->base.pendingControlFlags;
                 s32 clear = ~1;
                 *field &= clear;
             }
-            actor->base.word104 = masked;
+            actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
                 actor->base.state2A8 = one;

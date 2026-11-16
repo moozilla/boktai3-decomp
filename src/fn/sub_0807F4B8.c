@@ -34,16 +34,15 @@ static inline void ClearBits(u32 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
-                              u8 byteZero)
+static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero, u8 byteZero)
 {
     a->base.field2B2 = 1;
-    a->base.field2B0 = byteZero;
-    a->base.field2B5 = kind;
+    a->base.stepDone = byteZero;
+    a->base.controlKind = kind;
     a->base.target = p;
     a->base.field2C8 = zero;
-    ClearBits(&a->base.flags114, ~1);
-    a->base.word104 = zero;
+    ClearBits(&a->base.pendingControlFlags, ~1);
+    a->base.pendingControl = zero;
 }
 void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
 {
@@ -62,17 +61,17 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     }
     {
         u32 mask = 0x1000;
-        u32 bits = a->base.flags2D4;
+        u32 bits = a->base.motionFlags;
         bits &= mask;
         if (bits) {
             SceneActorContacts_ReleaseNode(a->group.contactNode);
-            a->base.flags2D4 &= ~mask;
+            a->base.motionFlags &= ~mask;
             a->group.contactNode = (void *)zero;
         }
     }
     {
         struct SceneActorRegistryControl *control = &group->control;
-        ClearBits(&a->base.flags2CC, 0xFFFEBE3F);
+        ClearBits(&a->base.behaviorFlags, 0xFFFEBE3F);
         control->counter = zero;
         byteZero = 0;
         control->field14 = zero;
@@ -89,16 +88,16 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
             one = 1;
             *field = one;
         }
-        a->base.field2B0 = byteZero;
-        a->base.field2B5 = kind;
+        a->base.stepDone = byteZero;
+        a->base.controlKind = kind;
         a->base.target = control;
         a->base.field2C8 = zero;
         {
-            u32 *field = &a->base.flags114;
+            u32 *field = &a->base.pendingControlFlags;
             clearMask = ~1;
             *field &= clearMask;
         }
-        a->base.word104 = zero;
+        a->base.pendingControl = zero;
         {
             u32 state = 3;
             u8 *field = &a->base.state2A8;
@@ -110,12 +109,12 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
         a->base.field2B1 = one;
         {
             u32 mask = ~0x80;
-            a->base.flags2CC &= mask;
+            a->base.behaviorFlags &= mask;
         }
-        a->base.flags2D4 &= clearMask;
+        a->base.motionFlags &= clearMask;
         {
             u32 mask = ~0x400;
-            a->base.flags2D4 &= mask;
+            a->base.motionFlags &= mask;
         }
     }
     *((u8 *)group + 0x206) = 255;

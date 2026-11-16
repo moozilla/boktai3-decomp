@@ -48,11 +48,11 @@ static inline void Control(struct ChaseActor *a, void *target)
     a->base.target = target;
     a->base.field2C8 = 0;
     {
-        u32 *p = &a->base.flags114;
+        u32 *p = &a->base.pendingControlFlags;
         s32 m = ~1;
         *p &= m;
     }
-    a->base.word104 = 0;
+    a->base.pendingControl = 0;
 }
 // confidence=low: advances Spider toward its route probe and resumes route control on arrival
 void Spider_ApproachRouteProbe(struct ChaseActor *actor)
@@ -65,7 +65,7 @@ void Spider_ApproachRouteProbe(struct ChaseActor *actor)
     speed = Callback_InvokeActor(actor, FIELD(actor, 0x260, void *));
     {
         u32 mask = 0xA02F;
-        if (actor->base.flags2D4 & mask) {
+        if (actor->base.motionFlags & mask) {
             u16 *p = &actor->base.field2C2;
             *p = 64;
             scale = p;
@@ -98,7 +98,7 @@ void Spider_ApproachRouteProbe(struct ChaseActor *actor)
         actor->base.counter2AC++;
         {
             u32 mask = 0x2000;
-            u32 *p = &actor->base.flags2CC;
+            u32 *p = &actor->base.behaviorFlags;
             *p |= mask;
         }
     }

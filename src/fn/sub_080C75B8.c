@@ -36,7 +36,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 
 static inline void Golem_SetMotionFlags(struct ChaseActor *actor, u16 mask)
 {
-    actor->base.flags2D4 = mask | actor->base.flags2D4;
+    actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 
 static inline u32 Golem_MirrorFlags(u8 mirror)
@@ -151,7 +151,7 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
     Golem_SetMotionFlags(actor, 0x100);
     {
         u32 mask = 0x2000;
-        actor->base.flags2CC |= mask;
+        actor->base.behaviorFlags |= mask;
     }
     {
         u8 directionVariant, mirror;
@@ -218,7 +218,7 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
         u32 zero = 0;
         *counter = value;
         if ((u8)value > 7) {
-            actor->base.field2B0 = 1;
+            actor->base.stepDone = 1;
             *counter = zero;
             *(u16 *)(body + 0x682) = zero;
             return;

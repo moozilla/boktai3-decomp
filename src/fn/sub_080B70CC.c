@@ -6,7 +6,7 @@ extern const u16 gUnk_08606078[2][8];
 extern const u16 gUnk_08606058[2][8];
 static inline void SetTileFlag(struct ChaseActor *p, u32 mask)
 {
-    p->base.flags2D0 |= mask;
+    p->base.statusFlags |= mask;
 }
 u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
 {
@@ -16,7 +16,7 @@ u16 SceneActorReaction_SelectTileParameter(struct ChaseActor *actor)
     u32 variant;
     if (tile[6] == 0) {
         u16 mask = 0x80;
-        variant = (u16)(actor->base.flags2D4 & mask) != 0;
+        variant = (u16)(actor->base.motionFlags & mask) != 0;
         SetTileFlag(actor, 0x10000);
         if (actor->base.category == 7) {
             return gUnk_08606078[variant][tile[10] & 7];
