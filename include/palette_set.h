@@ -17,7 +17,7 @@ struct PaletteSetEntry {
 };
 
 struct PaletteSet {
-    u8 task[24];
+    struct Task task;
     u16 id, count, from, to; // from/to: variant indices blended by `blend`
     u8 blend, overlay;       // blend amounts (64 is full)
     u16 previous, current, pad;

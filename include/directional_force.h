@@ -4,7 +4,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 struct DirectionalForce {
-    u8 unknown0[0x18];
+    struct Task task;
     u16 id, mode;
     u16 baseMagnitude, magnitudeRange, baseDelay, delayRange;
     u16 magnitude, targetMagnitude, angle, targetAngle, delay, unknown2E;

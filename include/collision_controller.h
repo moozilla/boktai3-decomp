@@ -4,6 +4,7 @@
 #include "scene_object.h"
 #include "player.h"
 #include "ram.h"
+#include "task.h"
 
 // Tentative: a pool of 16 small hit-detecting props (idle sprite, hit animation, then spawns an
 // effect burst) owned by a task, created from script. Each slot embeds a collider
@@ -53,7 +54,7 @@ struct CollisionGraphics {
 };
 
 struct CollisionManager {
-    u8 task[24];
+    struct Task task;
     u8 paused;
     u8 pad19[3];
     struct CollisionGraphics *graphics;          // hit sprite graphics

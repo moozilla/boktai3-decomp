@@ -3,6 +3,7 @@
 
 #include "display_animation.h"
 #include "contact_collider.h"
+#include "task.h"
 
 struct ProjectileSlot;
 typedef s32 (*ProjectileSlotUpdate)(struct ProjectileSlot *slot, s32 index);
@@ -41,7 +42,7 @@ struct ProjectileSlot {
 };
 
 struct TimedProjectilePool {
-    u8 task[0x18];
+    struct Task task;
     u32 mask;
     struct ProjectileSlot slots[16];
 };

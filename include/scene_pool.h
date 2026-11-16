@@ -112,7 +112,7 @@ struct ScenePoolActor {
     struct ScenePoolVec32 savedPosition;
 };
 struct ScenePoolManager {
-    u8 task[0x18];
+    struct Task task;
     u32 capacity, activeCount;
     struct ScenePoolEntry *entries;
     u32 seenIds[8];

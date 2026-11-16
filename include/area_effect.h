@@ -2,6 +2,7 @@
 #define GUARD_AREA_EFFECT_H
 #include "game_state.h"
 #include "engine_globals.h"
+#include "task.h"
 /* Tentative identity: scripted rectangular areas with optional display sprites. */
 struct AreaEffectPosition {
     s16 x, y, z, pad;
@@ -34,7 +35,7 @@ struct AreaEffectPlayer {
     u8 action, actionPhase;
 };
 struct AreaEffectManager {
-    u8 unknown0[0x18];
+    struct Task task;
     struct AreaEffectPlayer *player;
     u16 unknown1C, resourceFraction, idleFrame, actionFrame, graphicsId;
     u8 count, mode, visible, override, unknown2A[2];

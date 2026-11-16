@@ -2,6 +2,7 @@
 #define EFFECT_EMITTER_H
 #include "global.h"
 #include "scene_object.h"
+#include "task.h"
 
 // Tentative: a hovering, bobbing prop with a shadow that can be hit; when its health runs out it
 // bursts into an effect (EffectManager_SpawnParticlesAt), see homing_effect.h.
@@ -27,7 +28,7 @@ struct EmitterAttack {
 };
 
 struct EffectEmitter {
-    u8 task[24];
+    struct Task task;
     u16 id, pad1A;
     u8 pad1C[4];
     void *scene; // the scene (owner) this emitter belongs to; hidden when not current

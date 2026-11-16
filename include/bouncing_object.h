@@ -3,6 +3,7 @@
 #include "display_sequence_inline.h"
 #include "contact_swarm.h"
 #include "ram.h"
+#include "task.h"
 /* Separate twelve-slot family; not the preceding anchored-particle pool. */
 struct BouncingObject {
     struct ContactSwarmSprite sprite;
@@ -20,7 +21,7 @@ struct BouncingObject {
     u16 initialTimer, stateFrame;
 };
 struct BouncingPool {
-    u8 task[0x18];
+    struct Task task;
     u8 graphics[0x1C];
     void *sequenceResource;
     struct BouncingObject slots[12];

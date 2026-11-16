@@ -4,9 +4,10 @@
 #include "game_state.h"
 #include "render.h"
 #include "ram.h"
+#include "task.h"
 /* Tentative identity: BG1 image positioned from an orbit around the selected player. */
 struct OrbitBackground {
-    u8 unknown0[0x18];
+    struct Task task;
     void *resource;
     u16 id;
     u8 playerIndex, enabled;

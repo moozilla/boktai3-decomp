@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_STEERING_ACTOR_H
 #define GUARD_SCENE_STEERING_ACTOR_H
 #include "contact_actor.h"
+#include "task.h"
 /* Tentative eight-slot steering actor pool, global02000188. The prefix is a
  * sequence sprite, followed by a shadow and the actor's own contact collider. */
 struct SceneSteeringActor {
@@ -31,7 +32,7 @@ struct SceneSteeringActor {
     u8 enter, steeringDelay;
 };
 struct SceneSteeringActorPool {
-    u8 task[0x18];
+    struct Task task;
     u8 graphics[0x1c];
     const void *sequenceResource;
     u32 used;

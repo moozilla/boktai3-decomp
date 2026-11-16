@@ -3,8 +3,9 @@
 #include "display_animation.h"
 #include "contact_collider.h"
 #include "player_cue_sequence.h"
+#include "task.h"
 struct PinkSpineState {
-    u8 unknown0[24];
+    struct Task task;
     u32 age;
     struct ContactPosition initialPosition;
     struct DisplaySequenceSprite sprite;

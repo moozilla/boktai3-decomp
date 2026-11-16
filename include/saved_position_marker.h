@@ -1,8 +1,9 @@
 #ifndef GUARD_SAVED_POSITION_MARKER_H
 #define GUARD_SAVED_POSITION_MARKER_H
 #include "interaction_marker.h"
+#include "task.h"
 struct SavedPositionMarker {
-    u8 task[0x18];
+    struct Task task;
     u16 nearby;
     u8 variant, unknown1B;
     struct ContactSwarmDrawPacket primary;

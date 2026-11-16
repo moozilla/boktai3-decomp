@@ -3,9 +3,10 @@
 #include "particle_effect_state.h"
 #include "player_cue_sequence.h"
 #include "scene_arc.h"
+#include "task.h"
 
 struct ParticleBurstManager {
-    u8 task[0x18];
+    struct Task task;
     struct BurstEntry entries[6];
     u32 frame;
 };

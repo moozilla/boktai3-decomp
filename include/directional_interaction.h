@@ -5,6 +5,7 @@
 #include "game_state.h"
 #include "player.h"
 #include "input.h"
+#include "task.h"
 
 /*
  * Directional interaction controllers (tentative): invisible trigger zones kept in a small pool
@@ -44,7 +45,7 @@ struct DirectionalController {
 };
 
 struct DirectionalManager {
-    u8 task[24];
+    struct Task task;
     u32 count : 8;
     s32 selected : 8; /* controller whose script is running, or -1 */
     s32 pending : 8;  /* 0: run start script, 1: run end script, -1: none */

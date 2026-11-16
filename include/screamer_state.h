@@ -2,6 +2,7 @@
 #define GUARD_SCREAMER_STATE_H
 
 #include "display_animation.h"
+#include "task.h"
 struct ActorPosition {
     s16 x, y, z, pad;
 };
@@ -15,7 +16,7 @@ struct ScreamerSprite {
 };
 /* Private state begins before the end of the canonical actor record. */
 struct ScreamerState {
-    u8 unknown0[24];
+    struct Task task;
     u32 age;
     struct ActorPosition initialPosition;
     struct ScreamerSprite sprite;

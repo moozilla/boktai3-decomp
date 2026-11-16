@@ -1,6 +1,8 @@
 #ifndef GUARD_ACTOR_ANIMATION_CONTROLLER_H
 #define GUARD_ACTOR_ANIMATION_CONTROLLER_H
 
+#include "task.h"
+
 /* Tentative shared layout for the actor animation controller (081E34D0-081EAB64).
  * Offsets are cross-checked across many matched functions in this unit; field
  * names are provisional descriptions, not an identified character or a claim
@@ -54,7 +56,7 @@ struct ActorAnim {
 struct Player;
 
 struct ActorAnimController {
-    u8 unk00[0x18];
+    struct Task task;
     struct Player *owner; /* 0x18: player linked to this controller */
     struct ActorChildSlot children[16]; /* 0x1C, stride 0xDC */
     struct ActorSprite obj;             /* 0xDDC; agbcc tail-pads this to 0x24 bytes */

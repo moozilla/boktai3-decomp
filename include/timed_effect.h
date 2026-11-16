@@ -2,6 +2,7 @@
 #define GUARD_TIMED_EFFECT_H
 
 #include "contact_swarm.h"
+#include "task.h"
 
 struct TimedEffectConfig {
     u16 flags, strength, tracking;
@@ -45,7 +46,7 @@ struct TimedEffectManagerSprite {
     u8 data[0x30];
 };
 struct TimedEffectManager {
-    u8 task[0x18];
+    struct Task task;
     u32 activeMask;
     s32 categoryCounts[4], totalCounts[4];
     s32 capacity;

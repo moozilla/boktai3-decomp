@@ -11,7 +11,7 @@ struct MenuResource {
 
 /* Full-screen message menu task (0x4D8 bytes, priority list 11). */
 struct MessageMenu {
-    u8 task[24];
+    struct Task task;
     u32 timer; /* frames since creation */
     u8 pad1C[6];
     u16 script;                           /* script run once when the menu is dismissed */

@@ -3,9 +3,10 @@
 #include "contact_swarm.h"
 #include "game_state.h"
 #include "ram.h"
+#include "task.h"
 /* Tentative cell-local traversal gate; flags select behavior and constrained axis. */
 struct CellGate {
-    u8 unknown0[0x18];
+    struct Task task;
     u16 id, unknown1A;
     u8 flags, registered;
     u16 cell, height, playerInside;

@@ -1,5 +1,7 @@
 #ifndef FOUNDRY_RECORD_MENU_H
 #define FOUNDRY_RECORD_MENU_H
+
+#include "task.h"
 struct RecordMenuSprite {
     u8 unknown[0x20];
     u16 x, y;
@@ -10,7 +12,7 @@ struct RecordMenuSprite {
     u8 pad4c[0x14];
 };
 struct RecordMenu {
-    u8 task[0x18];
+    struct Task task;
     void *backgroundMap;
     void *otherMap;
     void *paletteResource;

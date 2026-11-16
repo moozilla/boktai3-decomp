@@ -4,9 +4,10 @@
 #include "display_animation.h"
 #include "scene_vec.h"
 #include "player_cue_sequence.h"
+#include "task.h"
 /* Layout observed in initialization, state callbacks and collision consumers. */
 struct VulcanCannon {
-    u8 pad0[0x18];
+    struct Task task;
     s32 timer;
     u8 body[0x48];
     struct SceneVec initialPosition;

@@ -1,9 +1,10 @@
 #ifndef GUARD_BACKGROUND_FLASH_H
 #define GUARD_BACKGROUND_FLASH_H
 #include "background_controller.h"
+#include "task.h"
 /* Tentative gameplay identity: BG1 flashing and dual-page scroll task, size 0x48. */
 struct BackgroundFlashController {
-    u8 task[0x18];
+    struct Task task;
     u32 frame;
     u8 state, enter, page, unknown1F;
     void *effectSourceA, *effectSourceB;

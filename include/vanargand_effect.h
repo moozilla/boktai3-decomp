@@ -2,6 +2,7 @@
 #define GUARD_VANARGAND_EFFECT_H
 
 #include "motion_track.h"
+#include "task.h"
 
 struct VanargandEffectSprite {
     u32 flags;
@@ -14,7 +15,7 @@ struct VanargandEffectSprite {
 };
 
 struct VanargandEffect {
-    u8 task[0x18];
+    struct Task task;
     struct VanargandEffectSprite sprite;
     u8 graphics[0x1C];
     struct MotionTrack motion;

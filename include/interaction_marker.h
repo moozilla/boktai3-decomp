@@ -2,8 +2,9 @@
 #define GUARD_INTERACTION_MARKER_H
 #include "contact_swarm.h"
 #include "input.h"
+#include "task.h"
 struct InteractionMarker {
-    u8 task[0x18];
+    struct Task task;
     u16 id;
     u8 nearby, bodyEnabled;
     u8 unknown1C[4], body[0x48];

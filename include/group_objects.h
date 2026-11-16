@@ -73,7 +73,7 @@ struct GroupActor {
 };
 
 struct GroupObjects {
-    u8 task[24];
+    struct Task task;
     u32 active, timer;
     void *animation;
     struct GroupPiece pieces[16]; // 0x24

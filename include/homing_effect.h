@@ -4,6 +4,7 @@
 #include "player.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "task.h"
 
 // Tentative: a pool of six particle effects (each four sprites) that drift around, home in on the
 // player actor and apply an effect to it when they arrive. Owned by a task (struct EffectManager).
@@ -54,7 +55,7 @@ struct EffectGraphics {
 };
 
 struct EffectManager {
-    u8 task[24];
+    struct Task task;
     u32 mode, counter;
     struct EffectGraphics *graphics;
     void *animation;

@@ -1,6 +1,7 @@
 #ifndef GUARD_ROUTE_SPRITE_ACTOR_H
 #define GUARD_ROUTE_SPRITE_ACTOR_H
 #include "contact_swarm.h"
+#include "task.h"
 /* Tentative four-slot route-driven actor pool; visual/story identity is unknown. */
 struct RouteSpriteRouteResource {
     u8 pointCount, unknown1;
@@ -42,7 +43,7 @@ struct RouteSpriteActor {
     void *context;
 };
 struct RouteSpritePool {
-    u8 task[0x18];
+    struct Task task;
     void *sequenceResource;
     u32 occupiedMask;
     struct RouteSpriteActor slots[4];

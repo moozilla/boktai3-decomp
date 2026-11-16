@@ -28,7 +28,7 @@ struct LevelAdvanceParticle {
     u16 active, frame;
 };
 struct LevelAdvanceManager {
-    u8 task[0x18];
+    struct Task task;
     struct LevelAdvanceSprite sprite;
     u8 graphics[0x1C];
     u16 kind, active, frame;

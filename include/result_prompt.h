@@ -9,7 +9,7 @@
 // for a result (1 selects the first text, otherwise the second), then closes after A is pressed
 // (from frame 120) or at frame 300 and calls the script from keyword 'e' with the result.
 struct ResultPrompt {
-    u8 task[24];
+    struct Task task;
     s32 window;        // text window id, or -1
     u32 script;        // script to call when done (keyword 'e'), cleared once called
     s32 timer;         // frames since creation

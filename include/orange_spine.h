@@ -4,6 +4,7 @@
 #include "display_animation.h"
 #include "contact_collider.h"
 #include "scene_vec.h"
+#include "task.h"
 
 union OrangeSpineSprite {
     struct DisplaySequenceSprite display;
@@ -14,7 +15,7 @@ union OrangeSpineSprite {
     } coordinates;
 };
 struct OrangeSpineActor {
-    u8 unknown0[0x18];
+    struct Task task;
     u32 age;
     struct SceneVec initialPosition;
     union OrangeSpineSprite sprite;

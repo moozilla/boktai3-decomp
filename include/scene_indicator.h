@@ -44,7 +44,7 @@ struct IndicatorAnimation {
 
 /* Scene indicator controller task (0xBD0 bytes, priority list 8). */
 struct SceneIndicators {
-    u8 task[24];
+    struct Task task;
     int count;
     struct IndicatorAnimation animations[4];
     struct SceneIndicator indicators[16];

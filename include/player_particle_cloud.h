@@ -2,6 +2,7 @@
 #define GUARD_PLAYER_PARTICLE_CLOUD_H
 
 #include "global.h"
+#include "task.h"
 
 struct CloudPosition {
     s16 x, y, z, pad;
@@ -25,7 +26,7 @@ struct CloudPlayer {
     struct CloudPosition position;
 };
 struct CloudTask {
-    u8 pad0[0x18];
+    struct Task task;
     u32 ticks;
     u16 mode;
     u8 duration, stop;

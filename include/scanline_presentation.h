@@ -21,7 +21,7 @@ struct ScanlinePresentation;
 typedef void (*ScanlineCallback)(struct ScanlinePresentation *);
 
 struct ScanlinePresentation {
-    u8 task[0x18];
+    struct Task task;
     struct ScanlineResourceHeader header; // copy of the script resource's header
     u16 state, timer;                     // state: 0 delay, 1 fading in, 2 hold, 3 fading out
     u32 ticks, script;

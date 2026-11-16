@@ -2,9 +2,10 @@
 #define GUARD_NAME_ENTRY_H
 
 #include "text_entry_widget.h"
+#include "task.h"
 
 struct NameEntryTask {
-    u8 task[0x18];
+    struct Task task;
     struct TextEntryWidget widgets[6];
     s32 characterPage; /* 0x348: active keyboard character page */
     s32 selection; /* 0x34C: keyboard key; 0x55 page toggle, 0x56 End */

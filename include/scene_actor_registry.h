@@ -133,7 +133,7 @@ struct SceneActorRegistryMessage {
     u8 *data;
 };
 struct SceneActorRegistryManager {
-    u8 task[0x18];
+    struct Task task;
     struct SceneActorRegistryMessage *messages;
     struct SceneActorRegistryNode *sentinel, *cursor;
     u32 resourceId;

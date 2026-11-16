@@ -18,7 +18,7 @@ struct TerrainModifier {
 };
 
 struct TerrainModifierManager {
-    u8 pad[24];
+    struct Task task;
     struct TerrainModifier *head;
 };
 

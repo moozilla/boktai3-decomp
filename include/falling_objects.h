@@ -38,7 +38,7 @@ struct FallingObject {
 };
 
 struct FallingObjectManager {
-    u8 task[24];
+    struct Task task;
     void *animation;
     struct FallingObject *head;
 };

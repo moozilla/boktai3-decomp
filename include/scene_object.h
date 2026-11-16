@@ -110,7 +110,7 @@ struct SceneObject {
 };
 
 struct SceneObjectManager {
-    u8 task[24];
+    struct Task task;
     u16 count; /* capacity of objects[] */
     u8 frame, descending;
     s16 fade;

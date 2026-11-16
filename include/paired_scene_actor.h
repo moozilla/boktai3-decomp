@@ -6,6 +6,7 @@
 #include "display_sequence.h"
 #include "motion_track.h"
 #include "scene_input_widget.h"
+#include "task.h"
 
 struct PairedHalfGraphics {
     u8 unknown0[6];
@@ -48,7 +49,7 @@ struct PairedSceneHalf {
     struct PairedHalfTarget target;
 };
 struct VanargandAttackPair {
-    u8 task[0x18];
+    struct Task task;
     struct SceneInputWidget widget;
     struct SceneInputResource resource;
     struct PairedSceneHalf halves[2];

@@ -20,7 +20,7 @@ struct StatusScreen;
 typedef void (*StatusScreenFn)(struct StatusScreen *);
 
 struct StatusScreen {
-    u8 task[24];
+    struct Task task;
     u16 id;
     u8 flags, bg;
     u16 mapId, paletteId;

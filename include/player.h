@@ -8,6 +8,7 @@
 #include "scene_event_types.h"
 #include "directional_sprite_state.h"
 #include "converging_effect_state.h"
+#include "task.h"
 
 /* Body colliders use a fixed defense in both setup and hit resolution. */
 #define PLAYER_BODY_DEFENSE 0
@@ -161,7 +162,7 @@ struct PlayerAuxiliaryDrawable {
     u8 unknown2C[0x14];
 };
 struct Player {
-    u8 unk0[0x18];
+    struct Task task;
     s32 slot;                  /* 0x18: compared with local link player index */
     u32 kind;                  /* 0x1C: kind one accepts mode-0x1A position reset */
     u32 statusFlags;           /* 0x186c: busy bits, 0x100000: cannot interact (guess) */

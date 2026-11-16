@@ -2,9 +2,10 @@
 #define GUARD_SCENE_ACTOR_SEQUENCE_H
 
 #include "global.h"
+#include "task.h"
 
 struct SceneActorSequence {
-    u8 task[0x18];
+    struct Task task;
     u8 *background;
     u8 *palette;
     s16 layer3X;

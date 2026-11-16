@@ -4,6 +4,7 @@
 #include "scene_object.h"
 #include "player.h"
 #include "display_sequence.h"
+#include "task.h"
 
 /*
  * "Triggers": dropped items (type 0) and treasure containers (type 1) that live in a linked list
@@ -83,7 +84,7 @@ struct Trigger {
 };
 
 struct TriggerManager {
-    u8 task[24];
+    struct Task task;
     struct TriggerGraphics *graphics;
     void *resource;
     u16 kind;

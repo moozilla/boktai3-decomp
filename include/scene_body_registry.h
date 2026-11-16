@@ -2,9 +2,10 @@
 #define GUARD_SCENE_BODY_REGISTRY_H
 
 #include "global.h"
+#include "task.h"
 
 struct SceneBodyRegistry {
-    u8 unk00[0x18];
+    struct Task task;
     void *first, *last;
 };
 

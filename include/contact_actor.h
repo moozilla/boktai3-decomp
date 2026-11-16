@@ -4,6 +4,7 @@
 #include "display_animation.h"
 #include "contact_position.h"
 #include "contact_collider.h"
+#include "task.h"
 struct ContactPackedVector {
     s32 x : 16;
     s32 y : 16;
@@ -29,7 +30,7 @@ struct ContactActor {
 };
 /* Task allocation is 0x1720 bytes; the final 32 bytes hold the blend buffer. */
 struct ContactActorPool {
-    u8 task[0x18];
+    struct Task task;
     u32 state;
     u8 unknown1C, hideRequested;
     u8 clearRequested, mode;

@@ -2,6 +2,7 @@
 #define GUARD_TRANSIENT_SPRITE_POOL_H
 
 #include "display_animation.h"
+#include "task.h"
 
 struct TransientSpriteGraphics {
     u8 unknown0[6];
@@ -19,7 +20,7 @@ struct TemporarySpriteSlot {
 };
 
 struct TemporarySpritePool {
-    u8 task[0x18];
+    struct Task task;
     struct TemporarySpriteSlot slots[16];
 };
 

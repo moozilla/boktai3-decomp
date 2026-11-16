@@ -1,9 +1,10 @@
 #ifndef GUARD_STAGE_ICON_DISPLAY_H
 #define GUARD_STAGE_ICON_DISPLAY_H
 #include "projected_display.h"
+#include "task.h"
 /* Tentative identity: a keyframe icon with three staged indicator animations. */
 struct StageIconDisplay {
-    u8 task[0x18];
+    struct Task task;
     struct ProjectedDisplayResource resource;
     struct ProjectedDisplayEntry icon, indicators[3];
     u8 scriptCompletion, option;

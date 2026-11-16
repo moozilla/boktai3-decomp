@@ -3,6 +3,7 @@
 
 #include "global.h"
 #include "scene_vec.h"
+#include "task.h"
 
 struct SceneStatusIndicator {
     u32 flags;
@@ -26,7 +27,7 @@ struct SceneStatusIndicatorPosition {
 };
 
 struct SceneStatusIndicatorManager {
-    u8 task[0x18];
+    struct Task task;
     void *resource;
     struct SceneStatusIndicator entries[12];
     u32 allocated;

@@ -2,6 +2,7 @@
 #define GUARD_BURST_EMITTER_H
 #include "contact_swarm.h"
 #include "engine_globals.h"
+#include "task.h"
 /* Tentative five-slot burst family; kind/ownership identities are unconfirmed. */
 struct BurstEmitter {
     struct ContactCollider collider;
@@ -13,7 +14,7 @@ struct BurstEmitter {
     u32 context;
 };
 struct BurstEmitterPool {
-    u8 task[0x18];
+    struct Task task;
     u32 used;
     struct BurstEmitter slots[5];
 };

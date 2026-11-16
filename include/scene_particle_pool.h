@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_PARTICLE_POOL_H
 #define GUARD_SCENE_PARTICLE_POOL_H
 #include "contact_actor.h"
+#include "task.h"
 /* Provisional eight-slot anchored particle pool at 080682D0; its renderer uses
  * the common 0x28-byte effect record, distinct from the preceding 32-slot pool. */
 struct SceneParticleEffect {
@@ -24,7 +25,7 @@ struct SceneParticleSlot {
     s16 delay;
 };
 struct SceneParticlePool {
-    u8 unknown0[0x18];
+    struct Task task;
     const void *sequenceResource;
     const void *graphicsResource;
     struct SceneParticleEffect effects[8];
