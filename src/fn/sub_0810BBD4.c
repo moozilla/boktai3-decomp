@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 struct LinkScores {
     u8 pad0[0x1a];
@@ -26,12 +25,6 @@ no:
     return 0;
 yes:
     return 1;
-}
-static inline void MarkAbsent(u16 *p, u32 mask)
-{
-    u32 value = *p;
-    value |= mask;
-    *p = value;
 }
 static inline s32 Time(struct LinkResults *p, s32 i)
 {
@@ -63,85 +56,38 @@ void LinkSelection_UpdateParticipantScores(struct LinkScores *p)
     s32 i;
     times[0] = Time(results, 0);
     times[1] = Time(results, 1);
-    i = 0;
-    {
-        register struct LinkScores *first asm("r2") = p;
-        s32 count;
-        asm("" : "+r"(first));
-        count = first->count;
-        if (i < count)
-            do {
-                s32 bonus, score;
-                register s32 positive asm("r12");
-                s32 negative;
-                if (times[i] < times[1 - i])
-                    bonus = Div(times[1 - i] - times[i], 120) + 40;
-                else {
-                    bonus = -10;
-                    bonus -= Div(times[i] - times[1 - i], 120);
-                }
-                {
-                    struct LinkResults *check = results;
-                    u32 result;
-                    if (!check)
-                        result = 0;
-                    else if (!Valid(i)) {
-                        {
-                            register u32 zero asm("r1") = 0;
-                            asm("" : "+r"(zero));
-                            positive = zero;
-                        }
-                        goto negative;
-                    } else
-                        result = results->positive[i];
-                    positive = result;
-                }
-            negative: {
-                register struct LinkResults *check asm("r2") = results;
-                asm("" : "+r"(check));
-                if (!check || !Valid(i))
-                    negative = 0;
-                else
-                    negative = results->negative[i];
-            }
-                p->points[i] = (positive * 7 - (negative * 13 - 50)) + bonus;
-                score = p->points[i];
-                if (score > 100)
-                    score = 100;
-                else if (score < 0)
-                    score = 0;
-                p->points[i] = score;
-                {
-                    s32 total = p->totals[i] + p->points[i];
-                    if (total > 9999)
-                        total = 9999;
-                    else if (total < 0)
-                        total = 0;
-                    p->totals[i] = total;
-                }
-            } while (++i < p->count);
-    }
-    if (i <= 3) {
-        register u32 initialMask asm("r2") = 0xffff;
-        u32 absentMask;
-        asm("" : "+r"(initialMask));
-        absentMask = initialMask;
-        asm("" : "+r"(absentMask));
-        {
-            register u32 offset asm("r0") = i * 2 + 0x84;
-            register u8 *base asm("r4");
-            register u16 *initialEntry asm("r3");
-            u16 *entry;
-            base = (u8 *)p;
-            asm("" : "+r"(base));
-            initialEntry = (u16 *)(offset + (u32)base);
-            asm("" : "+r"(initialEntry));
-            entry = initialEntry;
-            do {
-                MarkAbsent(entry, absentMask);
-                MarkAbsent(entry + 4, absentMask);
-                entry++;
-            } while (++i <= 3);
+    for (i = 0; i < p->count; i++) {
+        s32 bonus, score, total;
+        s32 positive, negative;
+        if (times[i] < times[1 - i])
+            bonus = Div(times[1 - i] - times[i], 120) + 40;
+        else {
+            bonus = -10;
+            bonus -= Div(times[i] - times[1 - i], 120);
         }
+        if (!results)
+            positive = 0;
+        else if (!Valid(i))
+            positive = 0;
+        else
+            positive = results->positive[i];
+        negative = Negative(results, i);
+        p->points[i] = positive * 7 - (negative * 13 - 50) + bonus;
+        score = p->points[i];
+        if (score > 100)
+            score = 100;
+        else if (score < 0)
+            score = 0;
+        p->points[i] = score;
+        total = p->totals[i] + p->points[i];
+        if (total > 9999)
+            total = 9999;
+        else if (total < 0)
+            total = 0;
+        p->totals[i] = total;
+    }
+    for (; i <= 3; i++) {
+        p->points[i] |= -1;
+        p->totals[i] |= -1;
     }
 }
