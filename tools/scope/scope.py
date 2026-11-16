@@ -3948,7 +3948,9 @@ def rotation_hints(src, wd, func, rel, k, d, regs, order):
           " removes them")
     print("      a tail that several branches jump to may be one the C writes in each branch (an inline"
           " helper: fact 55 keeps its field addresses apart); jump2 merges the copies after reload, and"
-          " each copy's reload choices still count (README fact 59)")
+          " each copy's reload choices still count (README facts 59, 234)")
+    print("      a constant above 255 stored to a halfword goes through a spill register (*movhi_insn takes"
+          " only 0..255), which shifts the rotation like any reload (README fact 235)")
     rnd = [n for n in cl if 0 < n <= len(text) and re.search(r"gRandomTable|gUnk_0203B400", text[n - 1])]
     if rnd:
         print(f"      the random table is read here (line {', '.join(map(str, rnd))}): reading it through"
