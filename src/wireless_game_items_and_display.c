@@ -1340,47 +1340,27 @@ int Div(int, int);
 
 int Mod(int, int);
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameDisplay_UpdateRoundAnnouncement(struct WirelessGameDisplay *p)
 {
     struct WirelessGameDrawing *q;
-    void *volatile resource;
-    u16 *volatile table;
-    register int mask asm("r8");
     if (p->entered) {
-        register int count asm("r4");
+        int count;
         p->entered = 0;
         count = WirelessGame_GetRoundCount();
         if (count == 1)
             Sound_PlaySong(706);
         q = p->drawings;
-        resource = &p->resource;
-        Anim_LoadKeyframe(q, resource, 11, 0);
-        {
-            u32 flags = q->flags;
-            int value = ~1;
-            mask = value;
-            q->flags = flags & value;
-        }
+        Anim_LoadKeyframe(q, &p->resource, 11, 0);
+        q->flags &= ~1;
         q++;
-        Anim_LoadKeyframe(q, resource, (u16)(Div(count, 10) + 12), 0);
-        {
-            u32 flags = q->flags;
-            register int value asm("r3");
-            value = mask;
-            asm("" : "+r"(value));
-            q->flags = flags & value;
-        }
+        Anim_LoadKeyframe(q, &p->resource, (u16)(Div(count, 10) + 12), 0);
+        q->flags &= ~1;
         q = &p->drawings[2];
-        Anim_LoadKeyframe(q, resource, (u16)(Mod(count, 10) + 12), 0);
-        q->flags &= mask;
+        Anim_LoadKeyframe(q, &p->resource, (u16)(Mod(count, 10) + 12), 0);
+        q->flags &= ~1;
         q->position.coords.x = 16;
-        {
-            register int offset asm("r3") = (u32) & ((struct WirelessGameDisplay *)0)->drawings[3];
-            asm("" : "+r"(offset));
-            q = (struct WirelessGameDrawing *)((u8 *)p + offset);
-        }
-        Anim_LoadKeyframe(q, resource, 29, 0);
+        q = &p->drawings[3];
+        Anim_LoadKeyframe(q, &p->resource, 29, 0);
         q->flags |= 1;
     }
     if (p->timer == 90) {
@@ -1391,39 +1371,19 @@ void WirelessGameDisplay_UpdateRoundAnnouncement(struct WirelessGameDisplay *p)
         q->flags |= 1;
         q = &p->drawings[2];
         q->flags |= 1;
-        {
-            register int offset asm("r3") = (u32) & ((struct WirelessGameDisplay *)0)->drawings[3];
-            asm("" : "+r"(offset));
-            q = (struct WirelessGameDrawing *)((u8 *)p + offset);
-        }
+        q = &p->drawings[3];
         q->flags |= 1;
         Sound_PlaySong(1452);
     }
     if (p->timer - 90 <= 7) {
-        register u32 *state asm("r2");
-        register u32 limit asm("r5");
-        register u32 index asm("r0");
-        int value;
-        int bits;
+        union ParticleRandomTableSource source = {gRandomTable};
+        const u16 *table;
         q = p->drawings;
-        table = gRandomTable;
-        state = &gRandomIndex;
-        index = *state + 1;
-        limit = 1023;
-        index &= limit;
-        *state = index;
-        value = index * 2;
-        value = *(u16 *)(value + (u32)table);
-        bits = 3;
-        value &= bits;
-        value -= 2;
-        q->position.coords.x = value;
-        index = (index + 1) & limit;
-        *state = index;
-        index *= 2;
-        index = *(u16 *)(index + (u32)table) & bits;
-        index -= 2;
-        q->position.coords.y = index;
+        source.halves[0] = (u16)RANDOM_TABLE_ADDR;
+        source.halves[1] = RANDOM_TABLE_ADDR >> 16;
+        table = ParticleRandom_GetTable(&source);
+        q->position.coords.x = (ParticleRandom_ReadDirectSample(table) & 3) - 2;
+        q->position.coords.y = (ParticleRandom_ReadDirectSample(table) & 3) - 2;
     }
     if (p->timer == 98) {
         q = p->drawings;
