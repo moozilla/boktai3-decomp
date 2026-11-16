@@ -186,9 +186,9 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
             }
             if (TestMotion(motion, 0xA007))
                 return;
-            if (actor->group.countdown5C8)
+            if (actor->group.contactCooldown)
                 return;
-            actor->group.countdown5C8 = 0x3C;
+            actor->group.contactCooldown = 0x3C;
             attack = SceneActorPlacement_ReadFlags32(&actor->base, 0x8000000);
             if (attack) {
                 u32 mask = 0x100;

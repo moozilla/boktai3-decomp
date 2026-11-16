@@ -429,7 +429,7 @@ s32 Skeleton_Init(void *object)
     MonsterInit_SetRouteReset(actor, Skeleton_ResetRouteReaction);
     group->responseCallback = 0;
     MonsterInit_SetReactionGate(actor, SceneActorReaction_UpdateGate);
-    group->field5EC = Skeleton_RestorePursuitRoute;
+    group->routeRestoreCallback = Skeleton_RestorePursuitRoute;
     SkeletonInit_InstallContactDefaults(actor);
     actor->base.field2E8 = 0;
     instance->healthThreshold = (s16)MonsterInit_GetHealth(actor) >> 1;

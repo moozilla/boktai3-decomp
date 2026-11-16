@@ -80,9 +80,12 @@ struct SceneActorChaseGroup {
     void *field570, *field574;
     u8 unknown578[0x3E];
     s16 halfHealth;
+    /* 5B8..5C6: class-specific. The escalating hit keeps u16 slots at 5B8 with
+     * field5C0 as their count and field5C2 as a bitmask of filled slots; Mummy clears
+     * field5C4 on reset and Ghoul's states read field5C6 as a timer. */
     struct ContactPosition motion5B8;
     u16 field5C0, field5C2, field5C4, field5C6;
-    u16 countdown5C8;
+    u16 contactCooldown; /* set to 60 frames on a collider contact, counted down each frame */
     u8 hitReactionLatch, unknown5CB;
     u16 effect;
     u8 unknown5CE[2];
@@ -90,17 +93,24 @@ struct SceneActorChaseGroup {
     struct ContactPosition *destination;
     struct SceneActorChaseTurnState turn;
     void *contactControl;
-    void *field5E0, *field5E4;
+    void *animationEndControl; /* state 8, after a reaction's animation (default ResumeAfterAnimation) */
+    void *routeResumeControl;  /* state 15, back onto the route (default TryResumeRoute) */
     void *routeChoiceControl;
-    void *field5EC;
+    void *routeRestoreCallback; /* run on pending flag 0x100: each class's route or pursuit restart */
     void *turnControl;
     void *routePhaseCallback;
     void *fallback;
-    void *field5FC, *field600;
-    u32 field604, field608;
-    void *field60C, *field610, *field614;
+    void *fadeControl;        /* state 0x15 (default BeginFadedState) */
+    void *defeatBurstControl; /* default BeginDefeatBurst */
+    u32 animateCallback;      /* MonsterInit's `animate` argument */
+    u32 field608;             /* only ever cleared */
+    void *contactArrivalControl; /* state 0x19, on reaching the contact node in contact recovery */
+    /* SceneActorReaction_SetMotionMode: mode 0 turns the colliders off and installs heldControl
+     * (state 0x1F); mode 1 restores them, pushes the actor back and installs releaseControl
+     * (state 0x20). Names are low confidence. */
+    void *heldControl, *releaseControl;
     void *interactionCallback, *responseCallback;
-    u32 field620;
+    u32 field620; /* only ever cleared */
 };
 
 #endif

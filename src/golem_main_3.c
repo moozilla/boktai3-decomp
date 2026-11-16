@@ -329,7 +329,7 @@ s32 Golem_Init(void *object)
     MonsterInit_SetReactionGate(&actor->chase, SceneActorControl_RefreshMotionRoute);
     MonsterInit_SetContactCallback(&actor->chase, Golem_UpdateHitReaction);
     group->responseCallback = Golem_ClearControlFlag;
-    group->field5EC = Golem_RestoreRoute;
+    group->routeRestoreCallback = Golem_RestoreRoute;
     actor->chase.base.field2E8 = 0;
     GolemInit_EnableInitialFlags(actor);
     MonsterInit_MaskColliderFlags(&actor->chase.base.colliderA, ~1);

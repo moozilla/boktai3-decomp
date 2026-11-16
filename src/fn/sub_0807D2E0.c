@@ -131,7 +131,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
             struct ChaseActor *state = victim;
             if (a->base.controlKind != 0x15) {
                 SceneActorTerrain_EnterState(a, 3, 0, 0);
-                SceneActorTerrain_InstallControl(a, group->field5FC, 0x15);
+                SceneActorTerrain_InstallControl(a, group->fadeControl, 0x15);
                 a->base.hitLockTimer = 0;
                 {
                     u32 mask = 0x20000;
