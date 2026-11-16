@@ -30,3 +30,4 @@ address	name	outcome	minutes	note
 0804AF80	TetherActor_UpdateWorldPosition	clean	25	rewritten from ROM: display pointer re-read per store, position+shake operand order, cell stored then re-read, explicit override/raw lookup in the else branch, plain struct copy for targetPosition
 08053AEC	InteractionMarker_InitializeFromScript	clean	5	dropped r4/r5 pins: plain marker->position stores, point = &marker->position after the three reads
 08054028	SavedPositionMarker_InitializeFromScript	clean	10	natural rewrite from InteractionMarker sibling: plain member pointers, per-arm tile locals, boundary local for the clear loop
+08057158	LevelAdvanceDisplay_UpdateAnimation	clean	25	natural rewrite: shake inline with gRandomTable + one index per step (local-alloc order), kind copy after the load, frame pointer before particles, zero set inside the frame++ block; jump2 cross-jumps kind 1 into kind 2's tail

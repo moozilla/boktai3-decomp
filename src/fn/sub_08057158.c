@@ -1,82 +1,76 @@
-// MATCHING_CONCESSION: register-pinning
 #include "level_advance_display.h"
+static inline void LevelAdvanceDisplay_Shake(struct LevelAdvanceManager *manager)
+{
+    const u16 *table = gRandomTable;
+    u32 *randomIndex = &gRandomIndex;
+    u32 first = (*randomIndex + 1) & 1023;
+    u32 second, third;
+    {
+        s32 value = table[first];
+        u32 coordinate = (u16)manager->sprite.position.world.x - 15;
+        manager->sprite.position.world.x = coordinate + (value & 31);
+    }
+    second = (first + 1) & 1023;
+    {
+        s32 value = table[second];
+        u32 coordinate = (u16)manager->sprite.position.world.y - 15;
+        manager->sprite.position.world.y = coordinate + (value & 31);
+    }
+    third = (second + 1) & 1023;
+    *randomIndex = third;
+    {
+        s32 value = table[third];
+        u32 coordinate = (u16)manager->sprite.position.world.z - 15;
+        manager->sprite.position.world.z = coordinate + (value & 31);
+    }
+}
 void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
 {
     u16 *active = &manager->active;
     u16 *kind;
     u16 *kindCache;
     u32 kindValue;
-    u32 timer;
-    register u32 left asm("r0"), right;
     if (!*active)
         return;
     kind = &manager->kind;
     kindValue = *kind;
     kindCache = kind;
-    asm("" : : "r"(kindCache), "r"(kindValue));
     if (kindValue == 1) {
-        register u16 *frame asm("r6") = &manager->frame;
-        struct LevelAdvanceParticle *particle = manager->particles;
+        struct LevelAdvanceParticle *particle;
         s32 i;
         u32 zero;
-        i = 7;
-        do {
+        u16 *frame = &manager->frame;
+        particle = manager->particles;
+        for (i = 7; i >= 0; i--) {
             if (particle->active)
                 LevelAdvanceDisplay_UpdateParticle(particle, manager->particleResource);
             particle++;
-        } while (--i >= 0);
-        {
-            u32 sample = *frame;
-            u32 shifted;
-            shifted = sample << 16;
-            if ((shifted >> 16) <= 63) {
-                u32 low = 3;
-                low &= sample;
-                if (!low) {
-                    shifted >>= 18;
-                    shifted &= 7;
-                    LevelAdvanceDisplay_StartParticle(&manager->particles[shifted]);
-                }
-            }
         }
+        if (*frame < 64 && !(*frame & 3))
+            LevelAdvanceDisplay_StartParticle(&manager->particles[(*frame >> 2) & 7]);
         {
             u32 next = *frame + 1;
             zero = 0;
             *frame = next;
         }
         manager->sprite.position.world = gPlayers[0]->position;
-        timer = *frame;
-        if (timer <= 119) {
+        if (*frame < 120) {
             {
                 struct LevelAdvanceSprite *sprite = &manager->sprite;
                 sprite->frame = zero;
             }
-            timer = *frame;
-            if (timer <= 4) {
-                left = (u16)manager->sprite.position.world.y + 250;
-                right = *frame * 30;
-                asm("" : "+r"(right));
-                goto add_height;
+            if (*frame < 5) {
+                manager->sprite.position.world.y += 250 + *frame * 30;
+            } else {
+                if (*frame < 20)
+                    LevelAdvanceDisplay_Shake(manager);
+                manager->sprite.position.world.y += 400;
             }
-            goto rise;
-        }
-        if (timer <= 122) {
-            {
-                u32 amount = 400;
-                left = amount;
-                asm("" : "+r"(left) : "r"(amount));
-                right = (u16)manager->sprite.position.world.y;
-                manager->sprite.position.world.y = left + right;
-            }
+        } else if (*frame < 123) {
+            manager->sprite.position.world.y += 400;
             manager->sprite.frame = 1;
-        } else if (timer <= 125) {
-            {
-                u32 amount = 400;
-                left = amount;
-                asm("" : "+r"(left) : "r"(amount));
-                right = (u16)manager->sprite.position.world.y;
-                manager->sprite.position.world.y = left + right;
-            }
+        } else if (*frame < 126) {
+            manager->sprite.position.world.y += 400;
             manager->sprite.frame = 2;
         } else {
             manager->sprite.flags |= 1;
@@ -84,99 +78,31 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
             *kindCache = zero;
         }
     } else if (kindValue == 2) {
-        register u16 *frame asm("r2") = &manager->frame;
-        u32 zero;
-        {
-            u32 next = *frame + 1;
-            zero = 0;
-            *frame = next;
-        }
+        manager->frame++;
         manager->sprite.position.world = gPlayers[0]->position;
-        timer = *frame;
-        if (timer <= 119) {
+        if (manager->frame < 120) {
             manager->sprite.frame = 3;
-            timer = *frame;
-            if (timer <= 4) {
-                left = (u16)manager->sprite.position.world.y + 250;
-                right = *frame * 30;
-                goto add_height;
+            if (manager->frame < 5) {
+                manager->sprite.position.world.y += 250 + manager->frame * 30;
+            } else {
+                if (manager->frame < 20)
+                    LevelAdvanceDisplay_Shake(manager);
+                manager->sprite.position.world.y += 400;
             }
-            goto rise;
-        /* Both notification kinds share the same rise and shake phase. */
-        rise:
-            if (timer <= 19) {
-                const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
-                u32 *randomIndex = &gRandomIndex;
-                u32 index = *randomIndex + 1;
-                u32 mask = 1023;
-                u32 rangeMask;
-                u32 *cursor;
-                s32 value;
-                index &= mask;
-                cursor = &index;
-                value = table[*cursor];
-                {
-                    u32 coordinate = (u16)manager->sprite.position.world.x;
-                    coordinate -= 15;
-                    rangeMask = 31;
-                    value &= rangeMask;
-                    manager->sprite.position.world.x = coordinate + value;
-                }
-                index = (index + 1) & mask;
-                {
-                    s32 verticalSample = table[index];
-                    u32 coordinate = (u16)manager->sprite.position.world.y;
-                    coordinate -= 15;
-                    verticalSample &= rangeMask;
-                    manager->sprite.position.world.y = coordinate + verticalSample;
-                }
-                index = (index + 1) & mask;
-                *randomIndex = index;
-                {
-                    s32 lastValue = table[index];
-                    u32 coordinate = (u16)manager->sprite.position.world.z;
-                    coordinate -= 15;
-                    lastValue &= rangeMask;
-                    manager->sprite.position.world.z = coordinate + lastValue;
-                }
-            }
-            {
-                u32 amount = 400;
-                left = amount;
-                asm("" : "+r"(left) : "r"(amount));
-            }
-            right = (u16)manager->sprite.position.world.y;
-        add_height:
-            manager->sprite.position.world.y = left + right;
-            return;
-        }
-        if (timer <= 122) {
-            {
-                u32 amount = 400;
-                left = amount;
-                asm("" : "+r"(left) : "r"(amount));
-                right = (u16)manager->sprite.position.world.y;
-                manager->sprite.position.world.y = left + right;
-            }
+        } else if (manager->frame < 123) {
+            manager->sprite.position.world.y += 400;
             manager->sprite.frame = 4;
-        } else if (timer <= 125) {
-            {
-                u32 amount = 400;
-                left = amount;
-                asm("" : "+r"(left) : "r"(amount));
-                right = (u16)manager->sprite.position.world.y;
-                manager->sprite.position.world.y = left + right;
-            }
-            manager->sprite.frame = kindValue;
+        } else if (manager->frame < 126) {
+            manager->sprite.position.world.y += 400;
+            manager->sprite.frame = 2;
         } else {
             manager->sprite.flags |= 1;
-            *active = zero;
-            *kind = zero;
+            *active = 0;
+            *kind = 0;
         }
     } else {
         manager->sprite.flags |= 1;
         *active = 0;
         *kind = 0;
     }
-    return;
 }
