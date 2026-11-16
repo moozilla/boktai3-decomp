@@ -3051,7 +3051,7 @@ static inline void Ghost_InitializeScriptFields(struct SceneActorRegistryResetVi
         MonsterInit_SetStatusFlags(actor, 0x800);
     SceneBody_Init(body, id, &origin, 0, 4, actor);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(actor) ? 0 : actor->base.drawable);
-    SceneBody_SetMovementProbe(body, ((struct Ghost *)actor)->movementProbe, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, ((struct Ghost *)actor)->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void Ghost_InstallPrimaryCallbacks(struct SceneActorRegistryResetView *actor,
