@@ -96,14 +96,14 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
                 u32 mask = ~0xc0;
                 *flags &= mask;
             }
-            SaveControl(&group->saved, actor->base.entryTarget228, 7);
+            SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
         } else {
             {
                 u32 *flags = savedFlags;
                 u32 mask = ~0xd0;
                 *flags &= mask;
             }
-            SaveControl(&group->saved, actor->base.savedTarget, 0);
+            SaveControl(&group->saved, actor->base.onStanding, 0);
         }
         actor->base.field2C2 = 64;
     }

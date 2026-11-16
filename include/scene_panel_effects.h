@@ -71,7 +71,7 @@ void ScenePanel_SelectTimePalette(struct ScenePanel *, s32);
 s32 ScenePanel_IsSpriteVisible(struct ScenePanelMainSprite *);
 s32 ScenePanel_AdvancePaletteFrame(struct ScenePanelMainSprite *);
 void ScenePanel_InitTimePalette(struct ScenePanel *);
-void ScenePanel_UpdateTimePalette(struct ScenePanel *);
+void ScenePanel_UpdateTimePalette(struct ScenePanelEffectsView *);
 void ParticleSprite_Initialize(struct ScenePanelParticle *, void *, u32);
 void SpriteDrawable_SelectTileFrame(struct ScenePanelParticle *, void *, u32);
 void Effect_SetOrigin(struct ScenePanelParticle *, s32, s32);

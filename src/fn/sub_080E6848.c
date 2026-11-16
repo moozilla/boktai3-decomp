@@ -73,7 +73,7 @@ void Dog_ResetIdleControl(struct ChaseActor *actor)
         actor->group.turn.turnsRemaining = 0xFF;
 
         motion->fieldDC = 0;
-        setControl(actor, actor->base.savedTarget, 0);
+        setControl(actor, actor->base.onStanding, 0);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
 }

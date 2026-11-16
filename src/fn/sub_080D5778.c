@@ -2,15 +2,12 @@
 #define SCENE_ACTOR_CHASE_ROUTE_COUNT_ACCESSOR 1
 #define SCENE_ACTOR_CHASE_DIRECT_SAVED_CONTROL 1
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_delayed_response.h"
 
-struct MummyRouteContext {
-    u8 unknown0[0x6D2];
-    u16 pursuitDelay;
-};
 struct MummyRouteTarget {
     struct SceneActorChaseTarget target;
     u8 unknown14[8];
@@ -23,9 +20,9 @@ void SceneActorMovement_ResolveRoutePosition(struct ChaseActor *);
 void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    struct MummyRouteContext *body = actor->base.context;
+    struct Mummy *body = actor->base.context;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_ClearMotionFlagComponent(actor, 0x200);
         SceneActorChase_ClearWordFlags(&actor->base.flags2CC, 0x80);
         group->common.control.timer = 0;

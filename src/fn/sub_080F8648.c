@@ -5,12 +5,9 @@
 
 // Two instructions differ: the global address load is scheduled after the stack-vector address.
 // confidence=low: sends the axe trail toward the player, then returns it to the actor.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct AxeTrail {
     u8 unknown0[0xA24];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 angle, heading, spinRate;
     u8 unknownA37[0x405];
     u8 angleDecay, speed;
@@ -19,7 +16,7 @@ struct AxeActor {
     u8 unknown0[4];
     u8 *sprite;
     u8 unknown8[0x54];
-    struct Vec position;
+    struct ContactPosition position;
     u8 unknown64[0x85];
     u8 facing;
     u8 unknownEA[0x1A];
@@ -37,7 +34,7 @@ struct AxeActor {
 };
 extern s16 gUnk_086149C4[];
 void Axe_UpdateTrailColliders(void *);
-void ActorPhase_EmitTrailSprite(void *, struct Vec *, u32);
+void ActorPhase_EmitTrailSprite(void *, struct ContactPosition *, u32);
 void Sound_PlaySong(u32);
 s32 Math_Atan2(s32, s32);
 void SceneActorControl_SettleRotation(void);
@@ -55,19 +52,20 @@ static inline s32 Scale(s32 value)
         return value >> 12;
     return -(-value >> 12);
 }
-static inline void Velocity(struct Vec *out, u8 angle, s32 speed)
+static inline void Velocity(struct ContactPosition *out, u8 angle, s32 speed)
 {
     out->x = Scale(speed * gUnk_086149C4[(angle + 64) & 255]);
     out->y = 0;
     out->z = Scale(speed * gUnk_086149C4[angle]);
 }
-static inline void Difference(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
+                              struct ContactPosition *b)
 {
     out->x = a->x - b->x;
     out->y = a->y - b->y;
     out->z = a->z - b->z;
 }
-static inline void Advance(struct Vec *a, struct Vec *b)
+static inline void Advance(struct ContactPosition *a, struct ContactPosition *b)
 {
     a->x = b->x + a->x;
     a->y = b->y + a->y;
@@ -82,7 +80,7 @@ static inline s32 AngleDifference(s32 a, s32 b)
         delta += 256;
     return delta;
 }
-static inline s32 LengthSquared(struct Vec *v)
+static inline s32 LengthSquared(struct ContactPosition *v)
 {
     return v->x * v->x + v->z * v->z;
 }
@@ -116,14 +114,14 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
     if ((s32)previous < p->sprite[6])
         Sound_PlaySong(0x169);
     if (frame <= 119) {
-        struct Vec delta;
+        struct ContactPosition delta;
         s32 difference;
         ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
         Advance(&trail->position, &trail->velocity);
         trail->angle -= trail->angleDecay;
         {
             u8 **gp = &gPlayers;
-            struct Vec *d;
+            struct ContactPosition *d;
             d = &delta;
             Difference(d, (void *)(*gp + 0x30), &trail->position);
         }
@@ -132,7 +130,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
             trail->heading += 4;
         Velocity(&trail->velocity, trail->heading, trail->speed);
     } else {
-        struct Vec delta;
+        struct ContactPosition delta;
         s32 difference;
         ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
         Advance(&trail->position, &trail->velocity);

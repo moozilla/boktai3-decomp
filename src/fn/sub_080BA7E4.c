@@ -50,7 +50,7 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
     struct ContactPosition *np;
     context = *(u8 **)((u8 *)p + 0x3D0);
     if (SceneActorReaction_TakePrepared(p)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x15);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x15);
         context[0x6D1] = 0x48;
     }
     HeadingStep(&p->base.body.direction, context + 0x6D1, &scratch.step);

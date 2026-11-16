@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "bat.h"
 #include "scene_actor_state.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -23,7 +24,7 @@ void SceneActorReaction_SinkAndRemove(void);
 void SceneActorControl_RestoreMotion(void);
 void SceneActorControl_SetCollisionResponse(void);
 void SceneActorControl_TryActivateProximityResponse(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorControl_BindPrimaryPlayer(void);
 void Bat_Destroy(void);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -43,21 +44,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern SceneActorCommandHandler const gUnk_08605C74[];
 extern SceneActorCommandHandler const gUnk_086108B0[];
-struct BatActor {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    s16 height;
-    u8 parameter3DA;
-    u8 unknown3DB;
-    u8 parameter3DC;
-    u8 unknown3DD;
-    s16 field3DE;
-    u8 unknown3E0[10];
-    s16 field3EA;
-    u8 unknown3EC[0x48];
-    struct ContactPosition initialPosition;
-};
-
 static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
 {
     struct SceneActorBody *body = &arg0->base.body;
@@ -136,30 +122,30 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
                                               void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = cb0;
+    actor->base.onUpdate = cb0;
     MonsterInit_WriteCallback(&actor->base.animationQuery.opaque, cb1);
-    actor->base.entryTarget224 = cb2;
-    actor->base.entryTarget228 = cb3;
-    actor->base.savedTarget = cb4;
-    actor->base.reactionTarget230 = cb5;
-    actor->base.deathControl = cb6;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = cb2;
+    actor->base.onAlternateEntry = cb3;
+    actor->base.onStanding = cb4;
+    actor->base.onReaction = cb5;
+    actor->base.onDefeat = cb6;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 static inline void Bat_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = SceneActorControl_BindPrimaryPlayer;
-    actor->base.destroyCallback = Bat_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = (SceneActorResultCallback)SceneActorControl_BindPrimaryPlayer;
+    actor->base.destroy = (SceneActorResultCallback)Bat_Destroy;
 }
 
 static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)
@@ -173,12 +159,12 @@ static inline void MonsterInit_InstallBatRoutes(struct ChaseActor *actor)
 
 s32 Bat_Init(void *object)
 {
-    struct BatActor *bat = object;
+    struct Bat *bat = object;
     struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
-    bat->flags = 0;
+    bat->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
     MonsterInit_SetCategory(actor, 0x12);
     SceneActorControl_SetDefaultProfile(actor);
@@ -285,7 +271,7 @@ s32 Bat_Init(void *object)
     if (Script_GetKeywordValue(0x54, 0) == 0) {
         SceneActorControl_RestartPositionCurve(actor);
     } else {
-        bat->flags |= 2;
+        bat->flags3D4 |= 2;
         ActorShadow_Disable((u8 *)actor + 0x320);
     }
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);

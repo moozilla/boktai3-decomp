@@ -1,13 +1,10 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_reset.h"
 void SceneActorControl_OnIdle(void);
-struct MummyContext {
-    u8 unknown0[0x6D8];
-    u32 limit;
-};
 void Mummy_EnterIdleControl(struct ChaseActor *actor)
 {
-    struct MummyContext *context = actor->base.context;
+    struct Mummy *context = actor->base.context;
     if (actor->base.tracking.distance < context->limit) {
         void *fn = SceneActorControl_OnIdle;
         u8 code = 0x10;

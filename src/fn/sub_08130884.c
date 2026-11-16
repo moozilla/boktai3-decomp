@@ -27,10 +27,10 @@ void SceneActorControl_UpdateTriggerPhase(struct ChaseActor *actor)
 {
     u8 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {
-        SetControl(actor, actor->base.entryTarget224, 1);
+        SetControl(actor, actor->base.onEntry, 1);
     } else if (actor->base.field2B0) {
         Trigger_ConsumePending((u8 *)actor + 0xc, 1);
-        SetControl(actor, actor->base.savedTarget, taken);
+        SetControl(actor, actor->base.onStanding, taken);
         SetState(actor, 2, 0, 2);
     } else {
         actor->base.counter2AC++;

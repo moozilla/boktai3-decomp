@@ -1,4 +1,5 @@
 #include "global.h"
+#include "octopus.h"
 
 // Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
 #include "scene_actor_reaction.h"
@@ -21,13 +22,6 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Octopus_GetAnimationStatus(struct ChaseActor *);
 void Octopus_UpdateActiveState(void);
 extern s16 *gLinkSession;
-
-struct OctopusContext {
-    u8 unknown0[0x628];
-    u32 flags;
-    u8 unknown630[0xC];
-    u8 startTick, holdTicks, interval;
-};
 
 struct OctopusTarget {
     u8 unknown0[8];

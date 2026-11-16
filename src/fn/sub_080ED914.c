@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -19,13 +20,6 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Ivy_GetAnimationStatus(struct ChaseActor *);
 void Ivy_UpdateActiveState(void);
 extern s16 *gLinkSession;
-
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[0xC];
-    u8 startTick, holdTicks, interval;
-};
 
 struct IvyTarget {
     u8 unknown0[8];
@@ -125,9 +119,9 @@ static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
     *angle = quadrant << 6;
 }
 
-static inline void ClearHeld(struct IvyContext *context)
+static inline void ClearHeld(struct Ivy *context)
 {
-    u32 *flags = &context->flags;
+    u32 *flags = &context->captureFlags;
     u32 mask = ~2;
     *flags &= mask;
 }
@@ -206,7 +200,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
  * so combine does not refold it. */
 void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
-    struct IvyContext *context = actor->base.context;
+    struct Ivy *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct IvyTarget *target;

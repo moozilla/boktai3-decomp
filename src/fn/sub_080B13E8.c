@@ -1,10 +1,5 @@
+#include "vorn.h"
 #include "scene_actor_terrain.h"
-struct VornTerrainChoice {
-    u8 unknown0[0x6B0];
-    u16 turnX, unknown6B2, turnZ;
-    u8 unknown6B6[3];
-    u8 axis;
-};
 struct VornProbe {
     s32 x : 16;
     s32 y : 16;
@@ -32,7 +27,7 @@ done:
     return height;
 }
 // confidence=low: biases turn weights toward a neighboring cell with higher terrain.
-s32 Vorn_SelectUphillTurn(struct VornTerrainChoice *context, struct ContactPosition *position)
+s32 Vorn_SelectUphillTurn(struct Vorn *context, struct ContactPosition *position)
 {
     struct VornProbe probe;
     s32 height, heightX, heightZ;

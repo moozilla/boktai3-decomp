@@ -100,7 +100,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
         if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 0x20, 0x20,
                                                      speed)) {
             SetState(actor);
-            SetControl(actor, actor->base.savedTarget, 0);
+            SetControl(actor, actor->base.onStanding, 0);
             return;
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,

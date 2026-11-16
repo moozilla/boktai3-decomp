@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -9,11 +10,6 @@ s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Player_ApplyPositionRequest(struct Player *, struct SceneVec *, s32, u32, s32, s32, s32, u32);
 
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-};
-
 struct IvyTarget {
     u8 unknown0[8];
     u8 kind;
@@ -21,10 +17,10 @@ struct IvyTarget {
     struct Player *player;
 };
 
-static inline u8 TestFlags(struct IvyContext *context, u32 maskInput)
+static inline u8 TestFlags(struct Ivy *context, u32 maskInput)
 {
     u32 mask = maskInput;
-    if (context->flags & mask)
+    if (context->captureFlags & mask)
         return 1;
     return 0;
 }
@@ -109,6 +105,6 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
         u32 m = 0x800;
         actor->base.flags2C0 = m | actor->base.flags2C0;
     }
-    ((struct IvyContext *)actor->base.context)->flags |= 1;
+    ((struct Ivy *)actor->base.context)->captureFlags |= 1;
     actor->base.health = 0;
 }

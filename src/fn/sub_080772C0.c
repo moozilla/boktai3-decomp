@@ -51,33 +51,30 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
         return;
     EnableMotionFlags(mask, flags);
     switch (*argument) {
-        case 0:
-            {
-                u32 bit = 1;
-                if (!(actor->base.flags2CC & bit))
-                    return;
-            }
-                ClearFlags(&actor->base.flags2CC, 3);
-                SceneActorRegistry_ResetRouteAndColliders((void *)actor);
-                MonsterInit_SetState(actor, 3, 0, 0);
-                SetControl(actor, actor->base.field220, 12);
-                break;
+        case 0: {
+            u32 bit = 1;
+            if (!(actor->base.flags2CC & bit))
+                return;
+        }
+            ClearFlags(&actor->base.flags2CC, 3);
+            SceneActorRegistry_ResetRouteAndColliders((void *)actor);
+            MonsterInit_SetState(actor, 3, 0, 0);
+            SetControl(actor, actor->base.onHidden, 12);
+            break;
         case 1:
             if (IsDown(actor, flags))
                 return;
             ClearFlags(&actor->base.flags2CC, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
-            SetControl(actor, actor->base.field220, 12);
+            SetControl(actor, actor->base.onHidden, 12);
             break;
-        default:
-            {
-                u32 bit = 1;
-                if (actor->base.flags2CC & bit) {
-                    SceneActorRegistry_RestoreActorDefaults((void *)actor);
-                    actor->base.colliderA.responseValue = 0;
-                }
+        default: {
+            u32 bit = 1;
+            if (actor->base.flags2CC & bit) {
+                SceneActorRegistry_RestoreActorDefaults((void *)actor);
+                actor->base.colliderA.responseValue = 0;
             }
-            break;
+        } break;
     }
 }

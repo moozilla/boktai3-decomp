@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "octopus.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_dispatch.h"
 #include "render.h"
@@ -27,7 +28,7 @@ u8 SceneActorTarget_UpdateTrackedContact(void *);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorReaction_SetMotionMode(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);
@@ -44,18 +45,6 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 void Anim_Step(void *, void *);
 u8 SceneActorRegistry_LinkActor(void *);
-
-struct OctopusInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[8];
-    u32 captureFlags;
-    u8 unknown630[6];
-    u16 field636;
-    u8 unknown638;
-    u8 field639;
-    u8 field63A;
-    u8 unknown63B;
-};
 
 extern u8 *gUnknown_02000580;
 
@@ -141,12 +130,13 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
+        TargetRegistry_RegisterActor(&group->common.placement, body,
+                                     SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;
@@ -154,9 +144,9 @@ static inline void OctopusInit_InitializeBody(void *object, u32 *fill)
 
 static inline void OctopusInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Octopus_UpdateInteraction;
-    arg0->base.destroyCallback = Octopus_Destroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = (SceneActorResultCallback)Octopus_UpdateInteraction;
+    arg0->base.destroy = (SceneActorResultCallback)Octopus_Destroy;
 }
 
 static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)
@@ -168,7 +158,7 @@ static inline void OctopusInit_InstallRoutes(struct ChaseActor *actor)
 static inline void OctopusInit_ResetCapture(void *object)
 {
     struct ChaseActor *actor = object;
-    ((struct OctopusInstanceState *)actor)->captureFlags = 0;
+    ((struct Octopus *)actor)->captureFlags = 0;
 }
 
 s32 Octopus_Init(void *object)
@@ -204,9 +194,9 @@ s32 Octopus_Init(void *object)
     }
     OctopusInit_InitializeBody(actor, &zero);
     if (Script_SeekToKeyword('P')) {
-        ((struct OctopusInstanceState *)arg0)->field636 = MonsterInit_ReadHalfword(0);
-        ((struct OctopusInstanceState *)arg0)->field63A = MonsterInit_ReadByte(0);
-        ((struct OctopusInstanceState *)arg0)->field639 = MonsterInit_ReadByte(0);
+        ((struct Octopus *)arg0)->field636 = MonsterInit_ReadHalfword(0);
+        ((struct Octopus *)arg0)->interval = MonsterInit_ReadByte(0);
+        ((struct Octopus *)arg0)->holdTicks = MonsterInit_ReadByte(0);
     }
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;

@@ -15,5 +15,5 @@ void Golem_ResetIdleControl(struct ChaseActor *actor)
         actor->base.counter2AC = 0;
         actor->base.field2B1 = 1;
     }
-    Chase_SetCtl(actor, actor->base.entryTarget228, 1);
+    Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
 }

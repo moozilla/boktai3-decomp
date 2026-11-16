@@ -7,7 +7,7 @@ void SceneActorRegistry_SendToCategory(u8 a, void *data)
             struct ChaseActor *o = n->actor;
             void *callback;
             if (o->base.category == a) {
-                if ((callback = o->base.messageCallback) != 0)
+                if ((callback = o->base.onMessage) != 0)
                     sub_08249240(o, data, callback);
             }
             n = n->next;

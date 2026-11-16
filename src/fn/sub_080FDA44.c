@@ -71,7 +71,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.entryTarget228;
+        void *callback = actor->base.onAlternateEntry;
         u32 one = 1;
         actor->base.field2B2 = one;
         actor->base.field2B0 = 0;

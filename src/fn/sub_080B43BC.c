@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "vorn.h"
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
@@ -14,7 +15,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SetMotionMode(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -24,16 +25,6 @@ void Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
-
-struct VornInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[0x68];
-    u8 field68C;
-    u8 unknown68D[0x2C];
-    u8 field6B9;
-    u8 unknown6BA[0x1A];
-    u16 field6D4;
-};
 
 void SceneActorBehavior_InitializeShadow(void *);
 
@@ -48,8 +39,8 @@ static inline void VornInit_BeginBehavior(struct ChaseActor *actor, u32 behavior
 }
 static inline void VornInit_ResetFlags(void *object)
 {
-    struct VornInstanceState *actor = object;
-    actor->field6D4 = 0;
+    struct Vorn *actor = object;
+    actor->flags6D4 = 0;
 }
 
 static inline void VornInit_InitializeBody(void *object, u32 *fill)
@@ -123,12 +114,13 @@ static inline void VornInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(arg0, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
+        TargetRegistry_RegisterActor(&group->common.placement, body,
+                                     SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(body, MonsterInit_GetDrawableKind(arg0) == 0 ? arg0->base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;
@@ -186,9 +178,9 @@ static inline void VornInit_EnableInitialFlags(struct ChaseActor *actor)
 
 static inline void VornInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Vorn_OnRender;
-    arg0->base.destroyCallback = Vorn_OnDestroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = (SceneActorResultCallback)Vorn_OnRender;
+    arg0->base.destroy = (SceneActorResultCallback)Vorn_OnDestroy;
 }
 
 void Vorn_ParseField624(void *);
@@ -212,16 +204,16 @@ void Vorn_ResumeReactionRoute(void);
 
 s32 Vorn_Init(void *object)
 {
-    struct ChaseActor *arg0 = object;
+    struct Vorn *vorn = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->base.body;
+    struct SceneActorChaseGroup *group = &vorn->chase.group;
+    struct SceneActorBody *body = &vorn->chase.base.body;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 mode;
 
-    VornInit_ResetFlags(arg0);
+    VornInit_ResetFlags(vorn);
     SceneActorRegistry_SetObjectContext(actor, actor, 1, 1);
     MonsterInit_SetCategory(actor, 0x19);
     Vorn_InitActorProfile(actor);
@@ -251,18 +243,19 @@ s32 Vorn_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x3DB6, &tmp);
         actor->base.animationIndex = 0xFF;
     }
-    VornInit_InitializeBody(arg0, &zero);
+    VornInit_InitializeBody(vorn, &zero);
     VornInit_ReadPalette(actor, 0x31B, 0x192);
     SceneActor_InitContextColliders(actor);
     MonsterInit_InstallSequenceCallbacks(
         actor, Vorn_OnUpdate, Vorn_GetAnimationEvent, Vorn_UpdateIdleFacing, Vorn_ResetStateEntry,
         Vorn_BeginIdle, Vorn_UpdateHiddenRecovery, sub_080AD75C, Vorn_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse, SceneActorTarget_ResolvePendingObject,
-        SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
-    MonsterInit_InitializeGroupWithBounds(group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718,
+        SceneActorReaction_OnEnemyDefault, Vorn_UpdateContactResponse,
+        SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
+        SceneActorPlacement_ResetStateThree);
+    MonsterInit_InitializeGroupWithBounds(group, &vorn->routeProbe, &vorn->destination,
                                           Vorn_OnReactionNoOp, SceneActorReaction_ResumeSavedTarget,
                                           Vorn_TryRestorePatrolRoute, 0, 1, body);
-    SceneActorMovement_ResolveRoutePosition(arg0);
+    SceneActorMovement_ResolveRoutePosition(vorn);
     MonsterInit_SetRouteReset(actor, SceneActor_ResetContextAnimation);
     MonsterInit_SetReactionGate(actor, sub_080B197C);
     MonsterInit_SetContactCallback(actor, Vorn_SelectHitRecovery);
@@ -305,7 +298,7 @@ s32 Vorn_Init(void *object)
     Vorn_InitActionTable(actor);
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
 
-    flag = ((struct VornInstanceState *)arg0)->field68C;
+    flag = vorn->field68C;
     if (flag == 1) {
         if (MonsterInit_GetDrawableKind(actor) == 0)
             *(u32 *)actor->base.drawable |= flag;
@@ -313,16 +306,16 @@ s32 Vorn_Init(void *object)
             u8 *widget = actor->base.drawable + 0x20;
             *(u32 *)(widget + 8) |= flag;
         }
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
         MonsterInit_SetState(actor, 3, 0, 0);
-        MonsterInit_SetControl(actor, actor->base.field220, 0xC);
+        MonsterInit_SetControl(actor, actor->base.onHidden, 0xC);
     } else if ((mode = Script_GetKeywordValue(0x54, 0)) != 0) {
         if (mode == 1)
-            ((struct VornInstanceState *)arg0)->field6B9 = 0;
+            vorn->axis = 0;
         else
-            ((struct VornInstanceState *)arg0)->field6B9 = 1;
+            vorn->axis = 1;
         VornInit_BeginBehavior(actor, 0x12);
-        MonsterInit_SetControl(actor, actor->base.savedTarget, 0);
+        MonsterInit_SetControl(actor, actor->base.onStanding, 0);
         MonsterInit_SetMotionControl(actor, SceneActorReaction_BeginSideStep, 0x26);
     }
     VornInit_InstallCompletionCallbacks(actor);

@@ -136,7 +136,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     actor->chase.base.field2B1 = 1;
     {
         struct SceneActorDelayedResponse *command = (void *)&group->saved;
-        u32 target = (u32)actor->chase.base.entryTarget228;
+        u32 target = (u32)actor->chase.base.onAlternateEntry;
         u32 kind = 7;
         command->delay = 60;
         command->control = (void *)target;

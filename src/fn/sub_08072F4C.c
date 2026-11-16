@@ -182,14 +182,14 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             memcpy(&copy, node->object, sizeof(copy));
             for (tries = 0; tries < 2; tries++) {
                 if (EvaluateSample((void *)base, &copy, node->kind, distance) &&
-                    Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route,
-                                         &base->base.body.position, &copy.position))
+                    Nav_IsPositionInMesh(base->group.route, &base->base.body.position,
+                                         &copy.position))
                     return 1;
                 TetherActor_CopySampledPosition(&copy.position);
             }
             break;
         case 2:
-            if (!TrackFlags(&((struct ChaseActor *)base)->base.tracking, 2))
+            if (!TrackFlags(&base->base.tracking, 2))
                 break;
             {
                 u32 mode = TestEngineFlags(gEngineFlags, 0x4800);
@@ -210,8 +210,7 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             }
 
             if (EvaluateSample((void *)base, node->object, node->kind, distance) &&
-                Nav_IsPositionInMesh(((struct ChaseActor *)base)->group.route,
-                                     &base->base.body.position,
+                Nav_IsPositionInMesh(base->group.route, &base->base.body.position,
                                      &((struct SceneActorContactSample *)node->object)->position))
                 return 1;
             break;

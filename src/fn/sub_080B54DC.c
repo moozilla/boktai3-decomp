@@ -9,7 +9,7 @@ static inline u8 Test(struct Vorn *actor, u32 mask)
 // confidence=low: reports whether a response flag or nonnegative response distance is present.
 u8 Vorn_HasActiveResponse(struct Vorn *context)
 {
-    if (!Test(context, 1) && context->field67C < 0)
+    if (!Test(context, 1) && context->response < 0)
         return 0;
     return 1;
 }

@@ -17,7 +17,7 @@ void sub_08130F60(u8 *s)
     u8 *p = s + 0x448;
     if (SceneActorControl_TakeFlag(s + 0x2B1)) {
         struct ChaseActor *actor = (void *)s;
-        void *target = actor->base.entryTarget224;
+        void *target = actor->base.onEntry;
         u32 kind = 2;
         actor->base.field2B2 = 1;
         actor->base.field2B0 = 0;

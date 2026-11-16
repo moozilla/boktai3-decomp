@@ -48,7 +48,7 @@ static inline u8 Golem_ArriveAndRestoreRoute(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -90,7 +90,7 @@ void Golem_ArriveAndRestore(struct ChaseActor *actor)
     if (SceneActorChase_MotionFlags(actor, 0x80))
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 120);
     else
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 120);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 120);
     SceneActorChase_SetActorFlags(actor, 0x10);
     actor->base.field2C2 = 0x20;
     SceneActorChase_SetState(actor, 3, 1, 0);

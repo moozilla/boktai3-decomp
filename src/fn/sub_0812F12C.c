@@ -57,10 +57,10 @@ s32 SceneActor_UpdateActiveCallbacks(struct ChaseActor *p)
             return 0;
         }
         if (!unavailable(p))
-            Callback_InvokeActor(p, p->base.damageCallback);
+            Callback_InvokeActor(p, p->base.onDamage);
         SceneActorPlacement_ConsumeCallbackFlag(p);
         SceneActorMovement_UpdateStatus(p);
-        dispatch(&p->base.contextCallback, p->base.context);
+        dispatch(&p->base.onUpdate, p->base.context);
         SceneActorMovement_RequestAvailableAction(p);
         SceneActorMovement_UpdateAnimationAndTerrain(p);
         SceneActorPlacement_ConsumeShakeFlags(p);

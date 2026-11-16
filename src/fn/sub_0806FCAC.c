@@ -12,7 +12,7 @@ void SceneActorRegistry_SendToCategoryPaletteOffset(u8 category, u8 palette, voi
                 }
                 {
                     void *callback;
-                    callback = actor->base.messageCallback;
+                    callback = actor->base.onMessage;
                     if (callback)
                         sub_08249240(actor, data, callback);
                 }

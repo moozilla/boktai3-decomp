@@ -88,7 +88,7 @@ static inline void Skeleton_UpdateArrival(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -120,7 +120,7 @@ static inline void Skeleton_StartHop(struct ChaseActor *actor, s32 direction, s3
     actor->base.body.direction = ((direction + 2) & 3) << 6;
     actor->base.secondaryMotion.y =
         (Skeleton_RandomSample((const u16 *)RANDOM_TABLE_ADDR) & 15) + 12;
-    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 14);
+    SceneActorAnimation_SelectDirectionalEntry(&actor->base, 14);
 }
 
 static inline void Skeleton_RestartGate(struct ChaseActor *actor)
@@ -137,7 +137,7 @@ void sub_080B9158(struct ChaseActor *actor)
             SceneActorTerrain_FindOpenNeighborDirection(actor, actor->base.reactionDirection);
         if (direction < 0) {
             struct SceneActorTimedBehaviorContext *context;
-            SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 15);
+            SceneActorAnimation_SelectDirectionalEntry(&actor->base, 15);
             SceneActorChase_SetFlagComponent(Skeleton_GateFlags(actor), 4);
             Skeleton_EnableMotionFlags(actor, 0x80);
             Skeleton_RestartGate(actor);
@@ -152,7 +152,7 @@ void sub_080B9158(struct ChaseActor *actor)
         Skeleton_StartHop(actor, direction, speed);
     }
     if (Skeleton_MovementFlags(actor, 0x10)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 15);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 15);
         SceneActorChase_SelectState(actor, 0, 0, 12);
         SceneActorChase_ResetStateEntry(actor);
         SceneActorChase_SetTypedControl(actor, group->common.gate.control, 0x1A);

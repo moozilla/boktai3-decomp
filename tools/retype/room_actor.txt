@@ -13,6 +13,20 @@ field2B6 reactionDirection
 groundHeight2BE groundHeight
 field1F0 script1F0
 field304 counter304
+# The method slots (named from the registry code that calls them).
+messageCallback onMessage
+updateCallback update
+destroyCallback destroy
+contextCallback onUpdate
+damageCallback onDamage
+contactCallback onContact
+update26C targetQuery
+field220 onHidden
+entryTarget224 onEntry
+entryTarget228 onAlternateEntry
+savedTarget onStanding
+reactionTarget230 onReaction
+deathControl onDefeat
 
 # SceneActorAnimationView was a view of the base alone.
 [types]

@@ -1,20 +1,12 @@
 #include "global.h"
+#include "vorn.h"
 
 s32 Script_GetKeywordValue(s32, s32);
 
-struct S080B0C38 {
-    u8 pad0[0x67c];
-    u16 a;
-    s16 b;
-    s16 c;
-    u8 pad682[2];
-    s32 value;
-};
-
-void Vorn_InitScriptCallback(struct S080B0C38 *p)
+void Vorn_InitScriptCallback(struct Vorn *p)
 {
-    p->a = 0xffff;
-    p->b = -1;
-    p->c = -1;
-    p->value = Script_GetKeywordValue(100, 0);
+    p->response = 0xffff;
+    p->field67E = -1;
+    p->field680 = -1;
+    p->field684 = Script_GetKeywordValue(100, 0);
 }

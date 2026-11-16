@@ -1,4 +1,5 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
@@ -8,23 +9,14 @@
 void Mummy_ResetMotionState(void *);
 void SceneActorMovement_ResolveRoutePosition(void *);
 
-struct MummyMotionCounters {
-    u8 unknown0[0x6D0];
-    u16 counter6D0, counter6D2, counter6D4, counter6D6;
-    u8 unknown6D8[0x6EE - 0x6D8];
-    u16 counter6EE;
-    u8 unknown6F0[2];
-    u16 counter6F2;
-};
-
 void Mummy_ResetRevivalMotion(struct ChaseActor *actor)
 {
-    struct MummyMotionCounters *body = actor->base.context;
-    body->counter6D0 = 0;
-    body->counter6D2 = 0;
-    body->counter6D4 = 0;
-    body->counter6D6 = 0;
-    body->counter6F2 = 0;
+    struct Mummy *body = actor->base.context;
+    body->targetTick = 0;
+    body->pursuitDelay = 0;
+    body->flags6D4 = 0;
+    body->savedTick = 0;
+    body->flags6F2 = 0;
     actor->group.field5C4 = 0;
     body->counter6EE = 0;
     Mummy_ResetMotionState(actor);

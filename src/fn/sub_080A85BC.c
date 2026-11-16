@@ -66,7 +66,7 @@ void TentacleActor_UpdateKnockbackSlide(struct ChaseActor *p)
         u32 mask = 16;
         if (p->base.flags2D0 & mask) {
             TentacleActor_SelectWanderRoute(p);
-            SetControl(p, p->base.entryTarget228, 1);
+            SetControl(p, p->base.onAlternateEntry, 1);
             SetState(p, 2);
             Sound_PlaySong(983);
         } else {

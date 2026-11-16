@@ -32,7 +32,7 @@ static inline void SetState(struct ChaseActor *actor)
 void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+        void *control = actor->base.onEntry;
         SetControl(actor, control, 2);
     }
     if (Dog_IsActionTimerExpired(actor)) {

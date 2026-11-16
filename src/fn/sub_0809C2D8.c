@@ -41,7 +41,7 @@ void Lun_ChooseMovementDestination(struct ChaseActor *actor)
     struct ContactPosition *target, *endpoint;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetControl(actor, actor->base.savedTarget, 0);
+        SetControl(actor, actor->base.onStanding, 0);
         state[0x3E2] = 0;
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))

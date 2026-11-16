@@ -161,7 +161,7 @@ void Lun_FollowRoute(struct ChaseActor *actor)
     u32 zero[1];
     struct ContactPosition target;
     if (Take(&actor->base.field2B1)) {
-        Control(actor, actor->base.entryTarget228, 1);
+        Control(actor, actor->base.onAlternateEntry, 1);
         Fill(body + 0x424, zero, 0);
         body[0x3E3] = 1;
     }

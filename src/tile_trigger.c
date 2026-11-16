@@ -164,7 +164,7 @@ void TileTrigger_ApplyContactEffects(struct TileTrigger *self)
         Chase_SetState(actor, 3, 0, 0);
         actor->base.field2B8 = 0;
         if (ContactActor_IsControlled(actor) && ContactActor_ReadMotionFlags(actor, 0x2000)) {
-            TileContact_EmitThreeParts((struct ChaseActor *)actor);
+            TileContact_EmitThreeParts(actor);
         }
         actorFound = 1;
     }

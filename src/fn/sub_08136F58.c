@@ -73,7 +73,7 @@ void sub_08136F58(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {
-        SetControl(actor, actor->base.savedTarget, 0);
+        SetControl(actor, actor->base.onStanding, 0);
         ClearWordFlags(&actor->base.flags2CC, ~0x80);
         ClearWordFlags(&actor->base.flags2D0, ~0x1000000);
         ClearHalfFlags(&actor->base.flags2D4, ~0x200);
@@ -88,7 +88,7 @@ void sub_08136F58(struct ChaseActor *actor)
         if (((s32)(*counter)) > 60) {
             u32 bit;
             SetState(actor, 0, 0, 7);
-            SetControl(actor, actor->base.entryTarget228, 1);
+            SetControl(actor, actor->base.onAlternateEntry, 1);
             // The loop around this assignment doubles bit's use weight in
             // global allocation, which gives it r8 ahead of group (rasolve).
             do {

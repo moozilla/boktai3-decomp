@@ -15,7 +15,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SetMotionMode(void);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -26,26 +26,6 @@ void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
 
-struct GolemInitContext {
-    u8 unknown0[0x62C];
-    u32 rangeSquared62C;
-};
-
-struct GolemInstanceState {
-    u8 unknown0[0x624];
-    u8 field624;
-    u8 unknown625[3];
-    u32 field628;
-    u8 unknown62C[0x54];
-    u16 field680, field682, field684, field686;
-    u16 unknown688;
-    u16 field68A;
-    u8 unknown68C;
-    u8 field68D;
-    u8 unknown68E[5];
-    u8 field693;
-};
-
 void SceneActorBehavior_InitializeShadow(void *);
 
 void SceneActorMovement_ResolveRoutePosition(void *);
@@ -55,8 +35,8 @@ void SceneActorReaction_BeginTargetRecovery(void);
 
 static inline void GolemInit_ResetFlags(void *object)
 {
-    struct GolemInstanceState *actor = object;
-    actor->field628 = 0;
+    struct Golem *actor = object;
+    actor->flags628 = 0;
 }
 
 static inline void GolemInit_InitializeBody(void *object, u32 *fill)
@@ -131,13 +111,14 @@ static inline void GolemInit_InitializeBody(void *object, u32 *fill)
     }
 
     if (MonsterInit_TestMotionFlags(&arg0->chase, 0x200))
-        TargetRegistry_RegisterActor((u8 *)group + 0x30, body, SceneActorReaction_SetMotionMode);
+        TargetRegistry_RegisterActor(&group->common.placement, body,
+                                     SceneActorReaction_SetMotionMode);
     SceneBody_SetSprite(
         body, MonsterInit_GetDrawableKind(&arg0->chase) == 0 ? arg0->chase.base.drawable : 0);
     if (MonsterInit_GetCategory(arg0) == 0x15)
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x3C, 0x3C);
+        SceneBody_SetMovementProbe(body, arg0->chase.base.movementProbe, 0x3C, 0x3C);
     else
-        SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+        SceneBody_SetMovementProbe(body, arg0->chase.base.movementProbe, 0x40, 0x40);
 
     group->common.bodyId = arg0->chase.base.body.id;
     group->common.bodyPosition = &arg0->chase.base.body.position;
@@ -174,7 +155,7 @@ static inline void GolemInit_EnableInitialFlags(struct Golem *actor)
     MonsterInit_SetStatusFlags(&actor->chase, 0x8000008);
 }
 
-static inline struct GolemInitContext *GolemInit_Context(struct Golem *actor)
+static inline struct Golem *GolemInit_Context(struct Golem *actor)
 {
     return actor->chase.base.context;
 }
@@ -186,9 +167,9 @@ static inline void GolemInit_InitializeReceiver(struct Golem *actor)
 
 static inline void GolemInit_InstallCompletionCallbacks(struct Golem *arg0)
 {
-    arg0->chase.base.messageCallback = SceneActorScript_OnCommand;
-    arg0->chase.base.updateCallback = Golem_OnSharedActorUpdate;
-    arg0->chase.base.destroyCallback = Golem_OnDestroy;
+    arg0->chase.base.onMessage = SceneActorScript_OnCommand;
+    arg0->chase.base.update = (SceneActorResultCallback)Golem_OnSharedActorUpdate;
+    arg0->chase.base.destroy = (SceneActorResultCallback)Golem_OnDestroy;
 }
 
 static inline void GolemInit_InitializePaletteRange(struct Golem *actor, u32 alternate, u32 current)
@@ -240,7 +221,7 @@ s32 Golem_Init(void *object)
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
-        group, (u8 *)arg0 + 0x638, (u8 *)arg0 + 0x65C, Golem_UpdateDying, Golem_ResumeSavedTarget,
+        group, &arg0->routeProbe, &arg0->destination, Golem_UpdateDying, Golem_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Golem_OnUnusedState, 1, &actor->chase.base.body);
     SceneActorMovement_ResolveRoutePosition(actor);
     MonsterInit_SetRouteReset(&actor->chase, Golem_ResetCombatState);
@@ -279,15 +260,15 @@ s32 Golem_Init(void *object)
     Golem_InitSpecialActionHandlers(actor);
 
     {
-        struct GolemInstanceState *instance = (void *)arg0;
+        struct Golem *instance = arg0;
         instance->field68D = 0;
-        instance->field680 = 0x78;
-        instance->field686 = 0;
+        instance->routeDelay = 0x78;
+        instance->counter686 = 0;
         instance->field684 = 2;
-        instance->field682 = 0;
-        instance->field680 = 0xA0;
+        instance->pushSpeed = 0;
+        instance->routeDelay = 0xA0;
         instance->field68A = 0;
-        instance->field624 = 0;
+        instance->responseCount = 0;
         instance->field693 = 0;
     }
 

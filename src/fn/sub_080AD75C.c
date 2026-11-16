@@ -44,7 +44,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x1CB);
             Sound_PlaySong(0x12A);
@@ -116,7 +116,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
             Callback_InvokeActor(actor, group->fallback);
             return;
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 7);
         actor->base.field2C2 = 32;
     }

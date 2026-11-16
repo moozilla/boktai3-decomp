@@ -37,7 +37,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
     s32 speed;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetControl(actor, actor->base.entryTarget228, 1);
+        SetControl(actor, actor->base.onAlternateEntry, 1);
     } else {
         SceneActorAnimation_SelectDirectionalEntry(actor, 1);
         speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
@@ -63,7 +63,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
                                                           speed)) {
             Trigger_ConsumePending((u8 *)actor + 0xc, 1);
             ResetState(actor);
-            SetControl(actor, actor->base.savedTarget, 0);
+            SetControl(actor, actor->base.onStanding, 0);
         } else {
             actor->base.counter2AC++;
         }

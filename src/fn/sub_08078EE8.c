@@ -7,8 +7,7 @@ typedef char Check_alternatePalette[(u32) & ((struct ChaseActor *)0)->base.alter
                                         ? 1
                                         : -1];
 typedef char Check_flashTimer[(u32) & ((struct ChaseActor *)0)->base.field1E8 == 0x1E8 ? 1 : -1];
-typedef char
-    Check_deathControl[(u32) & ((struct ChaseActor *)0)->base.deathControl == 0x234 ? 1 : -1];
+typedef char Check_deathControl[(u32) & ((struct ChaseActor *)0)->base.onDefeat == 0x234 ? 1 : -1];
 typedef char
     Check_secondaryMotion[(u32) & ((struct ChaseActor *)0)->base.secondaryMotion == 0x2EC ? 1 : -1];
 typedef char Check_particleTimer[(u32) & ((struct ChaseActor *)0)->base.field30C == 0x30C ? 1 : -1];
@@ -165,7 +164,6 @@ static inline void ActorStatus_CollisionGate(void *object)
     }
 }
 
-
 static inline s32 SceneEnvironment_SolarLevel(void)
 {
     struct SceneEnvironmentSnapshot result = SceneEnvironment_Read();
@@ -217,13 +215,13 @@ static inline void ActorStatus_Wake(struct ChaseActor *actor)
             (*(s16 *)&actor->base.fieldAA) = ActorStatus_AttachmentRestart(actor);
         if (actor->base.health <= 0) {
             SceneActorChase_SetState(actor, 3, 0, 0);
-            SceneActorChase_SetControl(actor, actor->base.deathControl, 0x11);
+            SceneActorChase_SetControl(actor, actor->base.onDefeat, 0x11);
             if (!SceneEnvironment_LinkMode() && !ActorStatus_StatusFlags((void *)identity, 0x800))
                 SceneActorRecord_RecordPair(
                     gScriptEntryProcedure,
                     (u16)((const struct ChaseActor *)identity)->base.body.id);
         } else if (ActorStatus_BehaviorFlags(actor, 0x200)) {
-            SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+            SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
             SceneActorChase_SetState(actor, 3, 0, 0);
         } else {
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0x7F, actor->base.category);
@@ -395,7 +393,7 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
             SceneActorChase_SetState(object, 3, 1, 0);
             ActorStatus_StoreRestoration(
                 (void *)&((struct ChaseActor *)object)->group.saved.control,
-                ((struct ChaseActor *)object)->base.entryTarget228, 0, 0, 7, 60);
+                ((struct ChaseActor *)object)->base.onAlternateEntry, 0, 0, 7, 60);
             ActorStatus_SetWord(&((struct ChaseActor *)object)->base.flags2CC, 0x10);
             ActorStatus_MaskHalfword(&((struct ChaseActor *)object)->base.flags2D6,
                                      (u32)(s16)0xF636);
@@ -419,8 +417,8 @@ s32 SceneActor_UpdateStatus(struct ChaseActor *actor)
 {
     struct ChaseActor *arg0 = (void *)actor;
     if (ActorStatus_StatusFlags(arg0, 0x2000))
-        ((struct ChaseActor *)arg0)->base.field2C2 = 0x15;
-    ActorStatus_TickRouteControl(&((struct ChaseActor *)arg0)->group.common.control);
+        arg0->base.field2C2 = 0x15;
+    ActorStatus_TickRouteControl(&arg0->group.common.control);
     if (!ActorStatus_IsDown(arg0))
         ActorStatus_TickAttachment((void *)actor);
     ActorStatus_CollisionGate(actor);
@@ -434,9 +432,7 @@ s32 SceneActor_UpdateStatus(struct ChaseActor *actor)
         ActorStatus_RecoverAndRelease(actor);
         ActorStatus_FaceTarget((void *)arg0);
     }
-    ActorStatus_StoreByte(&((struct ChaseActor *)arg0)->base.colliderB.direction,
-                          ((struct ChaseActor *)arg0)->base.body.direction);
-    ActorStatus_StoreByte(&((struct ChaseActor *)arg0)->base.colliderA.direction,
-                          ((struct ChaseActor *)arg0)->base.body.direction);
+    ActorStatus_StoreByte(&arg0->base.colliderB.direction, arg0->base.body.direction);
+    ActorStatus_StoreByte(&arg0->base.colliderA.direction, arg0->base.body.direction);
     return 1;
 }

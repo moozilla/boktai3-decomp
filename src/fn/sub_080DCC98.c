@@ -14,7 +14,7 @@ void Memory_Clear(void *, u32);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
 void SceneActorAnimation_SelectDirectionalEntry(void *, s32);
@@ -22,19 +22,6 @@ void Anim_Step(void *, void *);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 u8 SceneActorRegistry_LinkActor(void *);
-
-struct MummyInitContext {
-    u8 unknown0[0x6CC];
-    u16 field6CC, field6CE;
-    u8 unknown6D0[8];
-    u32 field6D8, field6DC;
-};
-
-struct MummyActor {
-    struct Mummy base;
-    u8 unknown6EC[6];
-    u16 field6F2;
-};
 
 void SceneActorBehavior_InitializeShadow(void *);
 
@@ -45,8 +32,8 @@ void SceneActorReaction_BeginTargetRecovery(void);
 
 static inline void MummyInit_ResetFlags(void *object)
 {
-    struct MummyActor *actor = object;
-    actor->field6F2 = 0;
+    struct Mummy *actor = object;
+    actor->flags6F2 = 0;
 }
 
 void Mummy_InitProfile(void *);
@@ -80,16 +67,16 @@ static inline void MummyInit_EnableInitialFlags(struct Mummy *actor)
     MonsterInit_SetStatusFlags(&actor->chase, 0x8000000);
 }
 
-static inline struct MummyInitContext *MummyInit_Context(struct Mummy *actor)
+static inline struct Mummy *MummyInit_Context(struct Mummy *actor)
 {
     return actor->chase.base.context;
 }
 
 static inline void MummyInit_InstallCompletionCallbacks(struct Mummy *arg0)
 {
-    arg0->chase.base.messageCallback = SceneActorScript_OnCommand;
-    arg0->chase.base.updateCallback = Mummy_OnInteractionUpdate;
-    arg0->chase.base.destroyCallback = Mummy_OnReleaseResources;
+    arg0->chase.base.onMessage = SceneActorScript_OnCommand;
+    arg0->chase.base.update = (SceneActorResultCallback)Mummy_OnInteractionUpdate;
+    arg0->chase.base.destroy = (SceneActorResultCallback)Mummy_OnReleaseResources;
 }
 
 static inline void MummyInit_InitializePaletteRange(struct Mummy *actor, u32 selected,
@@ -107,9 +94,9 @@ void sub_080D453C(void);
 
 s32 Mummy_Init(void *object)
 {
-    struct MummyActor *arg0 = object;
-    struct Mummy *actor = &arg0->base;
-    struct SceneActorChaseGroup *group = &arg0->base.chase.group;
+    struct Mummy *arg0 = object;
+    struct Mummy *actor = object;
+    struct SceneActorChaseGroup *group = &arg0->chase.group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -136,7 +123,7 @@ s32 Mummy_Init(void *object)
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x48DE, &tmp);
         actor->chase.base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(&arg0->base, &zero);
+    MonsterInit_InitializePursuitBody(arg0, &zero);
     MonsterInit_ReadPalette(&actor->chase, 0x23, 0x192);
     MummyInit_InitializePaletteRange(actor, MonsterInit_GetPaletteBase(&actor->chase) + 3, 4, 0);
     Mummy_InitCollision(actor);
@@ -147,7 +134,7 @@ s32 Mummy_Init(void *object)
         sub_080D7568, SceneActorTarget_ResolvePendingObject,
         SceneActorReaction_ResolvePlacementDamage, SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(
-        group, (u8 *)arg0 + 0x6F4, (u8 *)arg0 + 0x718, Mummy_UpdateDying, Mummy_ResumeSavedTarget,
+        group, &arg0->routeProbe, &arg0->destination, Mummy_UpdateDying, Mummy_ResumeSavedTarget,
         SceneActorReaction_BeginTargetRecovery, Mummy_OnUnusedState, 3, &actor->chase.base.body);
     SceneActorMovement_ResolveRoutePosition(arg0);
     MonsterInit_SetRouteReset(&actor->chase, Mummy_ResetRevivalMotion);
@@ -163,7 +150,7 @@ s32 Mummy_Init(void *object)
     SceneActorBehavior_InitializeShadow(actor);
     SceneActorEffects_InitAtActorPosition(arg0);
     SceneActorTerrain_ReadScriptParameters(actor);
-    MonsterInit_ReadInitialMode(&arg0->base);
+    MonsterInit_ReadInitialMode(&arg0->chase);
     flag = 0;
     if (MonsterInit_TestMotionFlags(&actor->chase, 4)) {
         MonsterInit_SetStatusFlags(&actor->chase, 0x2000);
@@ -189,20 +176,20 @@ s32 Mummy_Init(void *object)
     Mummy_InitActionHandlers(actor);
     Mummy_SetBehaviorTable(actor);
 
-    arg0->base.field6E8 = actor->chase.base.tracking.x;
+    arg0->field6E8 = actor->chase.base.tracking.x;
     {
-        struct MummyInitContext *context = MummyInit_Context(actor);
+        struct Mummy *context = MummyInit_Context(actor);
         if (Script_SeekToKeyword(0x42)) {
             context->field6CC = MonsterInit_ReadHalfword(0x14);
-            context->field6CE = MonsterInit_ReadHalfword(0xB4);
+            context->currentTick = MonsterInit_ReadHalfword(0xB4);
         } else {
             context->field6CC = 0x14;
-            context->field6CE = 0xB4;
+            context->currentTick = 0xB4;
         }
     }
     {
-        struct MummyInitContext *context = MummyInit_Context(actor);
-        context->field6D8 = Div(actor->chase.base.tracking.range * 3, 10);
+        struct Mummy *context = MummyInit_Context(actor);
+        context->limit = Div(actor->chase.base.tracking.range * 3, 10);
         context->field6DC = actor->chase.base.tracking.range;
     }
 

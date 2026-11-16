@@ -15,7 +15,7 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider
 
 static inline u8 TentacleBody_IsUnavailable(struct ChaseActor *actor)
 {
-    return SceneActorPlacement_IsUnavailable((struct RoomActor *)actor);
+    return SceneActorPlacement_IsUnavailable(&actor->base);
 }
 
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
@@ -515,7 +515,7 @@ void TentacleBody_UpdateChargeSpread(struct ChaseActor *actor, s32 frame)
 void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
-        ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
+        actor->base.profileId, actor->base.profileMode, 0);
     struct TentacleBody *body = actor->base.context;
     u32 variant;
     u32 flags;
@@ -580,7 +580,7 @@ void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor)
 void TentacleBody_UpdateAttackRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
-        ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
+        actor->base.profileId, actor->base.profileMode, 0);
     u32 variant, flags;
     if (actor->base.field2B2)
         actor->base.field2B2 = 0;

@@ -262,7 +262,7 @@ void Ghoul_ResumeDelayedChase(struct ChaseActor *actor)
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_Arrive(actor);
     } else if (Ghoul_RouteFlags(actor, 0x10)) {
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
@@ -271,7 +271,7 @@ void Ghoul_ResumeDelayedChase(struct ChaseActor *actor)
         } else
             group->destination->pad = 1;
     } else {
-        SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 2, 30);
+        SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 2, 30);
         actor->base.field2C2 = 64;
     }
     return;
@@ -403,7 +403,7 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
 {
     struct Ghoul *control = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *target = actor->base.entryTarget224;
+        void *target = actor->base.onEntry;
         SceneActorChase_SetControl(actor, target, 2);
     }
     if (!control->discCooldown) {
@@ -436,7 +436,7 @@ void Ghoul_WaitForRouteResult(struct ChaseActor *actor)
     u8 busy;
     u8 zero;
     if (Ghoul_TakeStateEntry(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+        void *control = actor->base.onEntry;
         SceneActorChase_SetControl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
@@ -450,7 +450,7 @@ void Ghoul_WaitForRouteResult(struct ChaseActor *actor)
                 actor->base.behavior2AA = state;
                 actor->base.counter2AC = zero;
                 actor->base.field2B1 = 1;
-                SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+                SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
             } else
                 actor->base.counter2AC++;
         }
@@ -609,7 +609,7 @@ static inline void Ghoul_PrepareSavedReturnAction(struct ChaseActor *actor, u32 
     void *target;
     u32 behavior;
     u32 duration;
-    target = actor->base.entryTarget228;
+    target = actor->base.onAlternateEntry;
     behavior = kind;
     duration = time;
     action->delay = duration;
@@ -1038,7 +1038,7 @@ u8 Ghoul_ReactToContact(struct ChaseActor *actor)
     Bat_TickDelayedScript(actor);
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
         actor->base.body.direction = actor->base.reactionDirection + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
@@ -1050,7 +1050,7 @@ u8 Ghoul_ReactToContact(struct ChaseActor *actor)
                 return 0;
             }
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 7);
         actor->base.field2C2 = 32;
         return 1;
@@ -1060,7 +1060,7 @@ u8 Ghoul_ReactToContact(struct ChaseActor *actor)
         return 0;
     }
     if (actor->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+        SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
         return 1;
@@ -1102,7 +1102,7 @@ u8 Ghoul_ReactToContact(struct ChaseActor *actor)
             return 0;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetBehavior(actor, 7);
     actor->base.field2C2 = Div(64, 3);
     return 1;
@@ -1225,7 +1225,7 @@ void Ghoul_UpdateSpecialActionControl(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, Ghoul_UpdateDiscThrow, 35);
     if (actor->base.field2B0) {
         Trigger_ConsumePending(&actor->base.unknown9[3], 1);
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {
         ++actor->base.counter2AC;
@@ -1238,7 +1238,7 @@ void Ghoul_UpdateAnimationElevenControl(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorReaction_PlayAnimationBUntilComplete, 10);
     if (actor->base.field2B0) {
         Trigger_ConsumePending(&actor->base.unknown9[3], 1);
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {
         ++actor->base.counter2AC;
@@ -1251,7 +1251,7 @@ void Ghoul_UpdateAttackControl(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, Ghoul_UpdateDisplacementRecovery, 18);
     if (actor->base.field2B0) {
         Trigger_ConsumePending(&actor->base.unknown9[3], 1);
-        SceneActorChase_SetControl(actor, actor->base.savedTarget, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_SetState(actor, 2, 0, 2);
     } else {
         ++actor->base.counter2AC;
@@ -1316,7 +1316,7 @@ void SceneActorReaction_BeginTargetRecovery(void);
 
 void Bat_UpdateAnimationRequest(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void SceneActorBehavior_InitializeShadow(void *);
 
@@ -1340,9 +1340,9 @@ static inline void GhoulInit_InstallRouteDefaults(struct ChaseActor *rootActor)
 
 static inline void GhoulInit_InstallCompletionCallbacks(struct ChaseActor *rootActor)
 {
-    rootActor->base.messageCallback = SceneActorScript_OnCommand;
-    rootActor->base.updateCallback = Ghoul_OnMessage;
-    rootActor->base.destroyCallback = Ghoul_Destroy;
+    rootActor->base.onMessage = SceneActorScript_OnCommand;
+    rootActor->base.update = (SceneActorResultCallback)Ghoul_OnMessage;
+    rootActor->base.destroy = (SceneActorResultCallback)Ghoul_Destroy;
 }
 
 static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u32 alternate,
@@ -1354,16 +1354,16 @@ static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u3
 
 s32 Ghoul_Init(void *object)
 {
-    struct ChaseActor *rootActor = object;
+    struct Ghoul *rootActor = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &rootActor->group;
-    struct SceneActorBody *body = &rootActor->base.body;
+    struct SceneActorChaseGroup *group = &rootActor->chase.group;
+    struct SceneActorBody *body = &rootActor->chase.base.body;
     u32 zero;
     struct ContactPosition origin;
     u32 flag;
     s32 mode;
 
-    ((struct Ghoul *)rootActor)->discFlags = 0;
+    rootActor->discFlags = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, 4);
     Ghoul_BindProfile(actor);
@@ -1389,12 +1389,12 @@ s32 Ghoul_Init(void *object)
     }
     MonsterInit_InitializePursuitBody(rootActor, &zero);
     if (Script_SeekToKeyword('P')) {
-        ((struct Ghoul *)rootActor)->discKind = MonsterInit_ReadByte(0x78);
-        ((struct Ghoul *)rootActor)->recoveryDelay = MonsterInit_ReadHalfword(0x78);
-        ((struct Ghoul *)rootActor)->throwCount = MonsterInit_ReadHalfword(0x78);
+        rootActor->discKind = MonsterInit_ReadByte(0x78);
+        rootActor->recoveryDelay = MonsterInit_ReadHalfword(0x78);
+        rootActor->throwCount = MonsterInit_ReadHalfword(0x78);
     } else {
-        ((struct Ghoul *)rootActor)->discKind = 0x78;
-        ((struct Ghoul *)rootActor)->recoveryDelay = 0x78;
+        rootActor->discKind = 0x78;
+        rootActor->recoveryDelay = 0x78;
     }
     MonsterInit_ReadPalette(actor, 0x192, 0x192);
     GhoulInit_InitializePaletteRange(actor, 4, 0);
@@ -1405,10 +1405,10 @@ s32 Ghoul_Init(void *object)
         SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
-    MonsterInit_InitializeGroupWithBounds(
-        group, ((struct Ghoul *)rootActor)->routeBounds,
-        &((struct Ghoul *)rootActor)->routePosition, Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
-        SceneActorReaction_BeginTargetRecovery, Bat_UpdateAnimationRequest, 1, body);
+    MonsterInit_InitializeGroupWithBounds(group, rootActor->routeBounds, &rootActor->routePosition,
+                                          Ghoul_UpdateDyingState, Bat_ResumeSavedTarget,
+                                          SceneActorReaction_BeginTargetRecovery,
+                                          Bat_UpdateAnimationRequest, 1, body);
     SceneActorMovement_ResolveRoutePosition(rootActor);
     GhoulInit_InstallRouteDefaults(actor);
     MonsterInit_SetContactCallback(actor, Ghoul_ReactToContact);

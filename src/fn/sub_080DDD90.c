@@ -1,13 +1,7 @@
 #include "global.h"
+#include "dog.h"
 #include "scene_actor_reset.h"
 
-struct DogGateContext {
-    u8 unknown0[0x678];
-    u32 flags;
-    u8 unknown67C[0x14];
-    u16 timer690;
-    u16 timer692;
-};
 u8 Dog_IsActionTimerExpired(struct ChaseActor *);
 void Dog_SelectRetreatOrChase(struct ChaseActor *);
 void Dog_SelectTargetAction(struct ChaseActor *);
@@ -20,7 +14,7 @@ static inline u8 HasReaction(struct ChaseActor *p)
         return 1;
     return 0;
 }
-static inline u8 ContextBlocked(struct DogGateContext *p)
+static inline u8 ContextBlocked(struct Dog *p)
 {
     u32 mask = 8;
     if (p->flags & mask)
@@ -55,11 +49,11 @@ static inline void SetFlags(struct ChaseActor *p, u32 mask)
 }
 void Dog_UpdateTargetGate(struct ChaseActor *p)
 {
-    struct DogGateContext *context = p->base.context;
+    struct Dog *context = p->base.context;
     u8 active;
     u32 v;
     u16 *f;
-    context->timer690 = context->timer692;
+    context->timer690 = context->limitX;
     active = HasReaction(p);
     if (active) {
         Or16(&p->group.common.gate.flags, 4);

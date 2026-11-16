@@ -67,7 +67,7 @@ void SceneActorControl_UpdateCallbackTrigger(struct ChaseActor *actor)
 {
     u32 taken = SceneActorControl_TakeFlag(&actor->base.field2B1);
     if (taken) {
-        BeginControlZero(actor, actor->base.deathControl, 0x11);
+        BeginControlZero(actor, actor->base.onDefeat, 0x11);
     } else if (actor->base.field2B0) {
         Trigger_ConsumePending(((u8 *)actor) + 0xC, 1);
         BeginControl(actor, SceneActorControl_OnIdle, 0x10, taken);

@@ -42,7 +42,7 @@ s32 Vorn_TryRestorePatrolRoute(struct ChaseActor *actor)
     Vorn_SetRestoreFlags(actor, 16);
     {
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-        void *payload = actor->base.savedTarget;
+        void *payload = actor->base.onStanding;
         u32 kind = 9;
         command->duration = 30;
         command->payload = payload;

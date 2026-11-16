@@ -249,7 +249,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetFlags(actor, 0x10);
-    SaveControl(&group->saved, actor->base.entryTarget228, 7);
+    SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);
     ProximityVolume_TranslateBounds(actor->group.route, &actor->base.body.position);
     dest = actor->group.destination;

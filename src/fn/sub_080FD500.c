@@ -1,15 +1,8 @@
 #include "global.h"
+#include "axe.h"
 #include "scene_actor_control_phase.h"
 void Axe_UpdateTargetWindup(void);
 void ActorPhase_UpdateSpriteCollapse(void);
-struct SceneActorControl35Context {
-    u8 unknown0[0xE4C];
-    u32 flagsE4C;
-    u8 unknownE50[0x6A];
-    u16 fieldEBA;
-    u8 unknownEBC[6];
-    u16 fieldEC2;
-};
 static inline void Or16(u32 m, u16 *p)
 {
     *p = m | *p;
@@ -52,7 +45,7 @@ static inline void Restart(struct ChaseActor *actor)
 }
 void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
 {
-    struct SceneActorControl35Context *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = (void *)Axe_UpdateTargetWindup;
         u32 kind = 0x35;

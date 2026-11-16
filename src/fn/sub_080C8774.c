@@ -118,7 +118,7 @@ static inline u8 Golem_Arrive(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Golem_SnapToRoute(group->destination, &group->homeRoute);
         (group->destination)->y =
@@ -195,7 +195,7 @@ static inline u8 Golem_Drift(struct ChaseActor *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         u16 *flags;
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         if (actor->base.field2D8 & 0x400)
             Sound_PlaySong(0x18B);
         mask = 0x20;
@@ -260,7 +260,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct ChaseActor *actor)
                 return;
             }
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetState(actor, 0, 0, 7);
         actor->base.field2C2 = 0x20;
     }

@@ -1,13 +1,8 @@
 #include "global.h"
+#include "golem.h"
 /* Golem_BeginSlideState: on entry hands control to the slide state (Golem_UpdateSlideImpact, kind 0x29), faces the stored heading and sets the context push speed to 0x200; after 30 frames or once the control finishes, reports the pending context event and returns to the idle control (Golem_UpdateChargeStop, kind 0x27) in phase 2/3 (provisional name) */
 #include "scene_actor_reset.h"
 
-struct Unk080CEB48Context {
-    u8 unknown0[0x634];
-    u16 pendingEvent;
-    u8 unknown636[0x682 - 0x636];
-    u16 pushSpeed;
-};
 struct Unk080CEB48Body {
     u8 unknown0[9];
     u8 direction;
@@ -51,7 +46,7 @@ static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 
 
 void Golem_BeginSlideState(struct ChaseActor *actor)
 {
-    struct Unk080CEB48Context *context = actor->base.context;
+    struct Golem *context = actor->base.context;
     struct Unk080CEB48Body *body = (struct Unk080CEB48Body *)((u8 *)actor + 0x50);
     if (TakeFlag(&actor->base.field2B1)) {
         BeginControl(actor, Golem_UpdateSlideImpact, 0x29);
@@ -62,7 +57,7 @@ void Golem_BeginSlideState(struct ChaseActor *actor)
     if ((s32)actor->base.counter2AC > 0x1E || actor->base.field2B0) {
         if (context->pendingEvent) {
             actor->base.counter304 = context->pendingEvent;
-            Callback_InvokeActor(actor, actor->base.update26C);
+            Callback_InvokeActor(actor, actor->base.targetQuery);
         }
         BeginControl(actor, Golem_UpdateChargeStop, 0x27);
         SetPhase(actor, 0, 2, 3);

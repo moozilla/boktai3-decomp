@@ -1,17 +1,13 @@
 #include "global.h"
+#include "vorn.h"
 #include "scene_actor_registry.h"
 #include "animated_hazard.h"
 
 void SceneStimulus_AddTagged(s16 a, s16 b, s16 c, s16 d, u8 e, u16 f);
 
-struct VornData {
-    u8 unknown0[0x6EC];
-    u16 field6EC;
-};
-
 void Vorn_TickSound(struct ChaseActor *actor)
 {
-    struct VornData *ctx = (struct VornData *)actor->base.context;
+    struct Vorn *ctx = (struct Vorn *)actor->base.context;
 
     if (ctx->field6EC == 0) {
         struct SceneVec *vec;

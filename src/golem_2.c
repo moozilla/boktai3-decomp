@@ -1,3 +1,4 @@
+#include "golem.h"
 #include "scene_actor_behavior.h"
 #include "golem_2.h"
 #include "script_utility.h"
@@ -56,7 +57,6 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
-
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
 void Golem_UpdateDefeat(struct ChaseActor *actor)
 {
@@ -95,14 +95,14 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
-    script = (u16)((struct RoomActor *)actor)->script1F8;
+    script = (u16)actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
         values[6] = (s32)actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -127,7 +127,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
             {
                 u8 firstCount = SceneActorEffects_NextSparkCount(table);
                 SceneActorEffects_SpawnDefeatSparks(actor, (const struct ContactPosition *)&rangeB,
-                                                   table, firstCount);
+                                                    table, firstCount);
             }
         }
         category = actor->base.category;
@@ -194,18 +194,7 @@ void SceneActorRoute_CommitReachableDestination(void *);
 /* Fields are established by 080C9C04 and the ordinary ReturnHome/ChargeOrReturnHome
  * relatives. Names for the response count and flags are tentative. */
 
-struct GolemReactionBody {
-    u8 unknown0[0x624];
-    u8 responseCount;
-    u8 unknown625[3];
-    u32 flags628;
-    u8 unknown62C[0x54];
-    s16 routeDelay;
-    u8 unknown682[0x2A];
-    u16 shakeStrength, shakeTimer;
-};
-
-static inline void GolemReaction_SetBodyFlags(struct GolemReactionBody *body, u32 flags)
+static inline void GolemReaction_SetBodyFlags(struct Golem *body, u32 flags)
 {
     body->flags628 |= flags;
 }
@@ -232,13 +221,13 @@ static inline void GolemReaction_SetChargeHeight(struct ChaseActor *actor, s32 h
 static inline void GolemReaction_EnterCharge(struct ChaseActor *actor, s16 height)
 {
     GolemReaction_SetChargeHeight(actor, height);
-    SceneActorChase_SetTypedControl(actor, actor->base.reactionTarget230, 0x12);
+    SceneActorChase_SetTypedControl(actor, actor->base.onReaction, 0x12);
     SceneActorChase_SetTypedState(actor, 3, 0, 0);
 }
 
 static inline void GolemReaction_Settle(struct ChaseActor *actor)
 {
-    SceneActorChase_SetTypedControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetTypedControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetTypedState(actor, 0, 0, 7);
     actor->base.field2C2 = 0x20;
 }
@@ -246,7 +235,7 @@ static inline void GolemReaction_Settle(struct ChaseActor *actor)
 /* Dispatch the hit-reaction state; return one when entering a state. */
 s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 {
-    struct GolemReactionBody *body = actor->base.context;
+    struct Golem *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     void *object = actor;
 

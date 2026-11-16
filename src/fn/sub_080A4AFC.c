@@ -1,5 +1,6 @@
 #include "scene_actor_init_dispatch.h"
 #include "global.h"
+#include "spider.h"
 #include "render.h"
 #include "engine_globals.h"
 #include "display_sequence_inline.h"
@@ -13,7 +14,7 @@ void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 void SceneActorReaction_SinkAndRemove(struct ChaseActor *, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 extern SceneActorCommandHandler const gUnk_086108B0[];
 void AnimData_SelectPaletteBank(void *, s32);
 void SceneActorPlacement_HideActor(void *, s32);
@@ -28,14 +29,6 @@ struct SpiderDeferredControl {
     u8 state, phase, mode, unknownB;
     u32 counter;
     void *callback;
-};
-struct SpiderInstanceState {
-    u8 unknown0[0x624];
-    u8 unknown624[8];
-    u16 flags62C;
-    u16 timer62E;
-    u8 bounds630[0x24];
-    u8 bounds654[0x24];
 };
 
 void Spider_InitProfile(void *);
@@ -77,12 +70,12 @@ static inline void MonsterInit_EnableInitialFlags(struct ChaseActor *arg0)
 
 static inline void MonsterInit_InstallCompletionCallbacks(struct ChaseActor *arg0)
 {
-    arg0->base.messageCallback = SceneActorScript_OnCommand;
-    arg0->base.updateCallback = Spider_OnSecondaryUpdate;
-    arg0->base.destroyCallback = Spider_Destroy;
+    arg0->base.onMessage = SceneActorScript_OnCommand;
+    arg0->base.update = (SceneActorResultCallback)Spider_OnSecondaryUpdate;
+    arg0->base.destroy = (SceneActorResultCallback)Spider_Destroy;
 }
 
-static inline void Spider_SetFlags(struct SpiderInstanceState *actor, u32 mask)
+static inline void Spider_SetFlags(struct Spider *actor, u32 mask)
 {
     actor->flags62C |= mask;
 }
@@ -110,9 +103,9 @@ static inline void Spider_InstallContact(struct ChaseActor *actor,
 }
 s32 Spider_Init(void *object)
 {
-    struct SpiderInstanceState *arg0 = object;
+    struct Spider *arg0 = object;
     struct ChaseActor *actor = object;
-    struct SceneActorChaseGroup *group = &((struct ChaseActor *)arg0)->group;
+    struct SceneActorChaseGroup *group = &arg0->chase.group;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -153,7 +146,7 @@ s32 Spider_Init(void *object)
         SceneActorPlacement_BeginContactRoute, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_BeginDefaultResponse);
     MonsterInit_InitializeGroupWithBounds(
-        group, arg0->bounds630, arg0->bounds654, Spider_OnSecondaryColliderContact, 0,
+        group, &arg0->routeProbe, &arg0->destination, Spider_OnSecondaryColliderContact, 0,
         SceneActorReaction_BeginTargetRecovery, 0, 1, &actor->base.body);
     SceneActorMovement_ResolveRoutePosition(actor);
     MonsterInit_SetRouteReset(actor, SceneActorRoute_ResetStep);
@@ -194,7 +187,7 @@ s32 Spider_Init(void *object)
         Spider_SetFlags(arg0, 1);
     } else {
         MonsterInit_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 0xE);
-        Spider_InitializeDeferred((void *)&group->saved, actor->base.entryTarget228, 7, 0x3C);
+        Spider_InitializeDeferred((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x3C);
     }
     arg0->timer62E = 0x12C;
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);

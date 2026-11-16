@@ -1,11 +1,8 @@
 #define SceneActorMotion_IsVariantTimerReady Dog_IsActionTimerExpired
 #include "global.h"
+#include "dog.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-struct SceneActorTargetMotionContext {
-    u8 unknown0[0x678];
-    u32 flags;
-};
 s32 Dog_IsActionTimerExpired(struct ChaseActor *);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, struct ContactPosition *);
@@ -43,12 +40,12 @@ static inline u8 TestMovement(struct ChaseActor *a)
 }
 void SceneActorMotion_TestTargetTransition(struct ChaseActor *a)
 {
-    struct SceneActorTargetMotionContext *context = a->base.context;
+    struct Dog *context = a->base.context;
     if (!TakePrepared(a)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 11);
+        SceneActorAnimation_SelectDirectionalEntry(&a->base, 11);
         if ((u8)Dog_IsActionTimerExpired(a)) {
             u8 *tail = (u8 *)a + 0x3D4;
-            SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 0);
+            SceneActorAnimation_SelectDirectionalEntry(&a->base, 0);
             if (!TestMovement(a))
                 Callback_InvokeActor(a, *(void **)(tail + 0x224));
             else {

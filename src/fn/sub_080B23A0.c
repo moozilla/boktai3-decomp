@@ -77,12 +77,12 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
     struct Vorn *context = actor->chase.base.context;
     u8 *group = (void *)&context->chase.group.common;
     struct VornResponseFlags *flags;
-    if (context->field6AC)
+    if (context->pursuitCooldown)
         return 0;
     flags = (struct VornResponseFlags *)&context->flags6D4;
     if (reset != 1 && Vorn_HasPursuitFlag(&flags, 4) && !Vorn_TestResponseFlags(flags, 2))
         return 0;
-    context->field6AC = 60;
+    context->pursuitCooldown = 60;
     {
         Vorn_SetResponseFlags(flags, 4);
         flags->bits &= ~2;
@@ -97,7 +97,7 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         *field &= mask;
     }
     SetState(actor, 15);
-    SetControl(actor, actor->chase.base.savedTarget, 0);
+    SetControl(actor, actor->chase.base.onStanding, 0);
     SetMotion(actor, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;

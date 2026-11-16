@@ -28,7 +28,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
         actor->base.body.direction = actor->base.reactionDirection + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
@@ -39,7 +39,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 7);
         actor->base.field2C2 = Div(64, 3);
         return 1;
@@ -49,7 +49,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
         return 0;
     }
     if (actor->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+        SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
         SceneActorChase_SetState(actor, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&actor->base.flags2D0, 0x1000000);
         return 1;
@@ -89,7 +89,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 7);
         actor->base.field2C2 = Div(64, 3);
         return 1;

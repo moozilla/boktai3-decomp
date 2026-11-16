@@ -40,7 +40,7 @@ void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
             const void *data;
             u32 encoded;
             Dog_ResetAnimation(actor, 3, 1);
-            data = actor->base.entryTarget224;
+            data = actor->base.onEntry;
             Dog_SetControl(actor, 2, (void *)data);
             if (group->turn.turnsRemaining == 1) {
                 encoded = ((group->turn.savedDirection >> 5) + 3) & 7;

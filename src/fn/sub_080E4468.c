@@ -78,7 +78,7 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
             return;
         }
         Chase_SnapToRoute(&target, group + 0x74);
-        Chase_SetCtl(actor, actor->base.entryTarget228, 1);
+        Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
         Chase_SetBehavior(actor, 2);
         if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position, &target))
             Callback_InvokeActor(actor, *(void **)(group + 0x224));

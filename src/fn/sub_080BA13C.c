@@ -16,7 +16,7 @@ void SceneActorReaction_TickQueuedContact(struct ChaseActor *p)
     u32 *flags;
     u32 queued;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 5);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 5);
     if (animation[10] == 2 && animation[6] == 0)
         Sound_PlaySong(0x3A9);
     if (animation[10] == 3) {

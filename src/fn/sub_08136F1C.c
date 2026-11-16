@@ -1,10 +1,11 @@
 #include "global.h"
-void sub_08249240(u8 *, u16 *, u32);
-void SceneActorScript_OnCommand(u8 *p, u16 *q)
+#include "room_actor.h"
+void sub_08249240(void *, const u16 *, SceneActorCommandHandler);
+/* The shared onMessage: a script command's first halfword picks the handler in the actor's
+ * command table. */
+void SceneActorScript_OnCommand(void *object, const u16 *command)
 {
-    if (q != 0) {
-        u32 i = q[0];
-        u32 *t = (u32 *)*(u32 *)(p + 0x250);
-        sub_08249240(p, q, t[i]);
-    }
+    struct RoomActor *actor = object;
+    if (command != 0)
+        sub_08249240(actor, command, actor->commandTable.handlers[command[0]]);
 }

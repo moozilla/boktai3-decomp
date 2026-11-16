@@ -120,7 +120,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
         collider->responseValue = 0;
         Hide(actor);
         {
-            void *control = actor->base.deathControl;
+            void *control = actor->base.onDefeat;
             Reaction_SetControl(actor, 17, control);
         }
         {

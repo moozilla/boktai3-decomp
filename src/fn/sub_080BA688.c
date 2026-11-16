@@ -39,7 +39,7 @@ void SceneActorReaction_TickForwardBurst(struct ChaseActor *p_)
     struct ContactPackedVector jitter;
     struct ContactPosition *step;
     if (SceneActorReaction_TakePrepared(p)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x14);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x14);
         Sound_PlaySong(0x3AB);
     }
     heading = &p->base.body.direction;

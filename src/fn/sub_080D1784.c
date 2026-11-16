@@ -91,7 +91,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
                 u32 mask = 0x10;
                 actor->base.flags2CC |= mask;
             }
-            SaveDelay(group + 0x8C, actor->base.entryTarget228, 7, 0x3C);
+            SaveDelay(group + 0x8C, actor->base.onAlternateEntry, 7, 0x3C);
         }
     }
 }

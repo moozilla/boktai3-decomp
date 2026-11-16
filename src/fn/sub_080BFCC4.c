@@ -74,7 +74,7 @@ static inline u8 Skeleton_ArriveAfterDelay(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
         Skeleton_SnapDelayedRoute(group->destination, &group->homeRoute);
         (group->destination)->y = SceneActorChase_HeightAt(
@@ -119,7 +119,7 @@ void sub_080BFCC4(struct ChaseActor *actor)
             SceneActorChase_SetState(actor, 3, 1, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-            SceneActorDelay_Prepare((void *)&group->saved, actor->base.entryTarget228, 7, 30);
+            SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
             Skeleton_SnapDelayedRoute(group->destination, &group->homeRoute);
             if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                           group->destination)) {

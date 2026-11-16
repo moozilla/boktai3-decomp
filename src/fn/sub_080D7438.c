@@ -1,9 +1,6 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_reset.h"
-struct SceneActorMotionParent {
-    u8 unknown0[0x6F2];
-    u16 flags;
-};
 void Mummy_EnterIdleControl(void *);
 void SceneActorControl_OnIdle(void);
 static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
@@ -17,12 +14,12 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 {
     u32 *flags = &actor->base.flags2D0;
     s32 mask = -5;
-    struct SceneActorMotionParent *parent;
+    struct Mummy *parent;
     u32 started;
     *flags &= mask;
     parent = actor->base.context;
     {
-        u16 *p = &parent->flags;
+        u16 *p = &parent->flags6F2;
         u32 mask = 0xFFFFEBFF;
         *p = mask & *p;
     }

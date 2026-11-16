@@ -12,12 +12,6 @@
 #include "display_sequence_inline.h"
 #include "chase_actor.h"
 
-/* Navigation descriptor initialized by ProximityVolume_TranslateBounds. */
-struct SkeletonNavigationProbe {
-    u16 flags, unknown2, region, polygon;
-    u32 unknown8;
-    struct ContactPosition origin, previous, destination;
-};
 /* Full 0x74C Skeleton allocation; unresolved script roles remain provisional. */
 struct Skeleton {
     struct ChaseActor chase;
@@ -41,7 +35,7 @@ struct Skeleton {
     u32 nearDistance, farDistance; /* target distance bands for the reaction choice */
     u8 unknown710[8];
     s32 healthThreshold;
-    struct SkeletonNavigationProbe routeProbe;
+    struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
     u8 unknown748[4];
 };
@@ -72,7 +66,7 @@ void SceneActorEffects_ReleaseResources(u8 *);
 void SceneActorRegistry_SetObjectContext(void *, void *, s32, s32);
 u32 SceneActorReaction_OnEnemyDefault(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorBehavior_InstallCallbackTables(void *);
 void SceneActorTerrain_ReadScriptParameters(void *);
 void SceneActorBehavior_InitializeShadow(void *);

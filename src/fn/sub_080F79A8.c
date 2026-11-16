@@ -1,37 +1,11 @@
 #include "global.h"
+#include "axe.h"
 #include "engine.h"
 #include "ram.h"
 #include "scene_actor_chase_shared.h"
 #include "scene_actor_control_phase.h"
 #include "player.h"
 #include "contact_swarm.h"
-struct AxeContext {
-    u8 pad0[0xA38];
-    u32 spriteFlags;
-    u8 padA3C[0x2];
-    u8 spriteAngle;
-    u8 padA3F[0x15];
-    u16 spriteX;
-    u8 padA56[0x2];
-    u16 spriteZ;
-    u8 padA5A[0x36];
-    struct ContactCollider attack[3];
-    struct ContactCollider body[3];
-    struct ContactPosition origin;
-    u8 padC90[0x8];
-    struct ContactPosition center;
-    s16 radius;
-    u8 padCA2[0x2];
-    u8 speed;
-    s8 direction;
-    u8 heading;
-    u8 padCA7[0x2];
-    u8 angle;
-    u8 padCAA[0x1];
-    u8 flags;
-    u8 padCAC[0x204];
-    u8 timer;
-};
 extern const s16 gUnk_086149C4[];
 s32 Mod(s32, s32);
 s32 Math_Atan2(s32, s32);
@@ -85,7 +59,7 @@ static inline s32 Axe_ContactIndex(s32 index)
 /* Orbit the actor and its auxiliary sprite around a moving shared center. */
 void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
 {
-    struct AxeContext *data = p->base.context;
+    struct Axe *data = p->base.context;
     struct ContactPosition delta;
     struct ContactPosition *position;
     u8 entered;
@@ -93,7 +67,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
     entered = Axe_TakeEntry(&p->base.field2B2);
     position = &p->base.body.position;
     if (entered) {
-        data->flags |= 2;
+        data->flagsCAB |= 2;
         data->angle = 0;
         data->radius = 128;
         data->speed = 4;
@@ -116,7 +90,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
         data->speed += 2;
-        data->timer = 0;
+        data->timerEB0 = 0;
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
             if (Axe_RandomByte() <= 19) {
@@ -129,9 +103,9 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         }
         Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
         data->heading = Math_Atan2(delta.x, delta.z);
-        data->timer = 0;
+        data->timerEB0 = 0;
     } else {
-        if (!(data->flags & 4)) {
+        if (!(data->flagsCAB & 4)) {
             if (data->radius < 512) {
                 data->radius += 8;
                 data->speed -= 4;
@@ -140,7 +114,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             } else {
                 data->radius = 512;
                 data->speed = 16;
-                data->flags |= 4;
+                data->flagsCAB |= 4;
             }
         }
         Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
@@ -160,7 +134,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         }
         data->center.x += Axe_ScaleTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
         data->center.z += Axe_ScaleTowardZero(gUnk_086149C4[data->heading] * 2, 12);
-        if (data->flags & 4) {
+        if (data->flagsCAB & 4) {
             struct DisplaySequenceSprite *sprite = p->base.drawable;
             u32 previous;
             sprite->flags |= 2;
@@ -170,7 +144,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             data->spriteAngle += 6;
             if ((s32)previous < ((struct DisplaySequenceSprite *)p->base.drawable)->attribute)
                 Sound_PlaySong(0x169);
-            if (data->flags & 4) {
+            if (data->flagsCAB & 4) {
                 if (frame < 480)
                     data->radius--;
                 else if (frame < 580)
@@ -186,7 +160,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
     }
     data->angle += Axe_ScaleTowardZero(data->speed * (s8)data->direction, 4);
     Axe_UpdateAttackColliderPositions(p);
-    if (data->flags & 1) {
+    if (data->flagsCAB & 1) {
         SceneActorChase_SetControl(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);
     } else if (frame > 1000) {
         s32 i;

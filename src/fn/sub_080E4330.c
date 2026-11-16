@@ -1,13 +1,5 @@
+#include "dog.h"
 #include "scene_actor_chase.h"
-struct DogAttackContext {
-    u8 unknown0[0x624];
-    u8 collider[0x54];
-    u32 flags;
-    u8 unknown67C[0x1C];
-    u16 timer698, timer69A, timer69C, timer69E;
-    u8 unknown6A0[7];
-    u8 emitted;
-};
 #define FIELD(p, n, T) (*(T *)((u8 *)(p) + (n)))
 void SceneActorAnimation_EmitDirectionalTrail(void);
 void Dog_SelectRetreatOrChase(struct ChaseActor *);
@@ -22,14 +14,14 @@ static inline void Or16(u16 *p, u32 mask)
     *p = value;
 }
 
-static inline void Dog_SetContextFlags(struct DogAttackContext *context, u32 mask)
+static inline void Dog_SetContextFlags(struct Dog *context, u32 mask)
 {
     context->flags |= mask;
 }
 
 void Dog_UpdateTrailAttack(struct ChaseActor *a)
 {
-    struct DogAttackContext *context = a->base.context;
+    struct Dog *context = a->base.context;
     if (Chase_TakeArrived(a)) {
         And32(&context->flags, ~8);
         SceneActorReaction_EnableMotionFlags(0x100, &a->base.flags2D4);
@@ -50,7 +42,7 @@ void Dog_UpdateTrailAttack(struct ChaseActor *a)
         }
         Dog_SetContextFlags(a->base.context, 2);
         {
-            void *collider = context->collider;
+            void *collider = &context->collider;
             u32 damage = a->base.attacks.first[2];
             u32 response = a->base.attacks.second[2];
             u8 *p = (u8 *)a + 0xD4;
@@ -63,7 +55,7 @@ void Dog_UpdateTrailAttack(struct ChaseActor *a)
         context->emitted = 0;
     }
     if (a->base.field2B0) {
-        context->timer69A = context->timer69E;
+        context->farTimer = context->farDistance;
         {
             u16 *flags = &a->base.flags2D4;
             u32 mask = ~0x100;

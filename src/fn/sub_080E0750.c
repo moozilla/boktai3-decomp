@@ -1,4 +1,4 @@
-#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH           1
+#define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
@@ -69,7 +69,7 @@ void sub_080E0750(struct ChaseActor *actor)
             s32 value = Dog_ReadSecondaryZ(actor);
             actor->base.secondaryMotion.z = Dog_QuarterDisplacement(&value);
         }
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 3);
         mask = 0x20;
         flags = &actor->base.flags2D4;
         mask |= *flags;
@@ -125,7 +125,7 @@ void sub_080E0750(struct ChaseActor *actor)
             return;
         }
     }
-    SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorChase_SetBehavior(actor, 7);
     actor->base.field2C2 = 16;
     return;

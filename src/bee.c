@@ -392,14 +392,14 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     if (!Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30))
         return;
     actor->base.field2B0 = 1;
-    script = (u16)((struct RoomActor *)actor)->script1F8;
+    script = (u16)actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
         values[1] = actor->base.body.position.y;
         values[2] = actor->base.body.position.z;
-        values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-        values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-        values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
         values[6] = actor->base.field2E0;
         values[7] = actor->base.body.id;
         arguments.count = 8;
@@ -483,7 +483,7 @@ void Bee_ReturnToPlayerWhenStopped(struct ChaseActor *actor)
     if (Bee_TakeControlEntry(&actor->base.field2B1)) {
         struct Bee *body = actor->base.context;
         u32 angle;
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         Bee_ClearReturnMotion(&zero, &body->motion);
         angle = (u8)Bee_ReturnRandom();
         {
@@ -638,7 +638,7 @@ void Bee_StartMoveToBody(struct ChaseActor *actor, u16 *args)
     Bee_SubVector(actor, &actor->base.body.position, &offset);
     Bee_ClearAnchorMotion(&work.fill, &body->motion);
     Bee_SetAnchorState(actor, 2, 0, 10);
-    Bee_SetAnchorControl(actor, actor->base.entryTarget228, 1);
+    Bee_SetAnchorControl(actor, actor->base.onAlternateEntry, 1);
 }
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -1090,21 +1090,21 @@ void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor)
     {
         u16 mask = 0x100;
         if (mask & actor->base.flags2D4) {
-            struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
-            u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[1];
-            u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[1];
-            u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[1];
-            u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[1];
+            struct ContactCollider *collider = &actor->base.colliderB;
+            u16 field3C = actor->base.attacks.first[1];
+            u16 field40 = actor->base.attacks.second[1];
+            u32 reactionFlags = actor->base.attacks.flags[1];
+            u16 field44 = actor->base.attacks.parameter[1];
             Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
             return;
         }
     }
     {
-        struct ContactCollider *collider = &((struct ChaseActor *)actor)->base.colliderB;
-        u16 field3C = ((struct ChaseActor *)actor)->base.attacks.first[0];
-        u16 field40 = ((struct ChaseActor *)actor)->base.attacks.second[0];
-        u32 reactionFlags = ((struct ChaseActor *)actor)->base.attacks.flags[0];
-        u16 field44 = ((struct ChaseActor *)actor)->base.attacks.parameter[0];
+        struct ContactCollider *collider = &actor->base.colliderB;
+        u16 field3C = actor->base.attacks.first[0];
+        u16 field40 = actor->base.attacks.second[0];
+        u32 reactionFlags = actor->base.attacks.flags[0];
+        u16 field44 = actor->base.attacks.parameter[0];
         Collider_SetAttackProperties(collider, field3C, field40, 0, reactionFlags, field44);
     }
 }
@@ -1313,7 +1313,7 @@ void Bee_FollowWanderRoute(struct ChaseActor *actor)
     struct ContactPosition delta;
     struct Bee *body = actor->base.context;
     if (Bee_TakeEntryFlag(&actor->base.field2B1)) {
-        Bee_InstallControl(actor, actor->base.entryTarget228, 1);
+        Bee_InstallControl(actor, actor->base.onAlternateEntry, 1);
         body->index = 0;
         if (Bee_TestRouteFlags(body, 8)) {
             {
@@ -1396,7 +1396,7 @@ void SceneActorControl_TickPendingTarget(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         actor->base.body.direction = actor->base.tracking.heading;
         {
-            void *target = actor->base.entryTarget228;
+            void *target = actor->base.onAlternateEntry;
             u32 one = 1;
             actor->base.field2B2 = one;
             actor->base.field2B0 = 0;
@@ -1638,7 +1638,7 @@ void Bee_FollowAnchorRoute(struct ChaseActor *actor)
     s32 n;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        Bee_InstallControl(actor, actor->base.entryTarget228, 1);
+        Bee_InstallControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         Bee_SubtractPositions(&delta, &actor->base.body.position, &route->anchor->position);
         actor->base.tracking.heading = Math_Atan2(delta.x, delta.z);
@@ -1799,7 +1799,7 @@ void SceneActorPlacement_PlayResponseAndResetState(void);
 
 void SceneActorReaction_SinkAndRemove(void);
 
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 void AnimData_SelectPaletteBank(void *, s32);
 
@@ -1899,31 +1899,31 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
                                               void *targetQuery, void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = cb0;
+    actor->base.onUpdate = cb0;
     MonsterInit_WriteCallback(&actor->base.animationQuery.opaque, cb1);
-    actor->base.entryTarget224 = cb2;
-    actor->base.entryTarget228 = cb3;
-    actor->base.savedTarget = cb4;
-    actor->base.reactionTarget230 = cb5;
-    actor->base.deathControl = cb6;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = cb2;
+    actor->base.onAlternateEntry = cb3;
+    actor->base.onStanding = cb4;
+    actor->base.onReaction = cb5;
+    actor->base.onDefeat = cb6;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 
 static inline void Bee_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Bee_OnPlayerInteraction;
-    actor->base.destroyCallback = Bee_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = (SceneActorResultCallback)Bee_OnPlayerInteraction;
+    actor->base.destroy = (SceneActorResultCallback)Bee_Destroy;
 }
 
 static inline void Bee_InstallRoutes(struct ChaseActor *actor)
@@ -2037,7 +2037,7 @@ s32 Bee_Init(void *object)
                   actor->base.drawable);
     MonsterInit_ClearReceiver(actor);
     MonsterInit_SetState(actor, 0, 2, 0);
-    MonsterInit_SetControl(actor, actor->base.entryTarget228, 1);
+    MonsterInit_SetControl(actor, actor->base.onAlternateEntry, 1);
     SceneActorBehavior_InstallCallbackTables(actor);
     Bee_InitActionPreset(actor);
     Bee_InitBehaviorHandlers(actor);

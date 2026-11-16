@@ -1,5 +1,6 @@
 #include "scene_body_api.h"
 #include "global.h"
+#include "lun.h"
 #include "scene_actor_state.h"
 #include "render.h"
 #include "engine_globals.h"
@@ -26,7 +27,7 @@ void SceneActorReaction_SinkAndRemove(void);
 void Lun_ResetMovementState(void);
 void Lun_EnterIdleOrCopyCell(void);
 void Lun_OnTargetCheck(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void Lun_OnPlayerTargetInit(void);
 void Lun_Destroy(void);
 void AnimData_SelectPaletteBank(void *, s32);
@@ -46,17 +47,6 @@ u8 SceneActorRegistry_LinkActor(void *);
 
 extern MonsterInitCommandHandler const gUnk_08605E78[];
 extern MonsterInitCommandHandler const gUnk_086108B0[];
-struct LunActor {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    u8 parameter3D8, parameter3D9;
-    u8 unknown3DA[2];
-    u16 ground3DC;
-    u8 unknown3DE[0x4E];
-    struct SceneActorRegistryRoute route;
-    u8 unknown440[2];
-    u16 field442;
-};
 u32 Route_GetCurrentPointFacing(void *);
 void Lun_InitReactionTable(void *);
 
@@ -153,30 +143,30 @@ static inline void MonsterInit_InstallPrimary(struct ChaseActor *actor, void *cb
                                               void *damage, void *contact)
 {
     MonsterInit_SetBehaviorFlags(actor, 0x2000);
-    actor->base.contextCallback = cb0;
+    actor->base.onUpdate = cb0;
     MonsterInit_WriteAnimationQuery(&actor->base.animationQuery.word, cb1);
-    actor->base.entryTarget224 = cb2;
-    actor->base.entryTarget228 = cb3;
-    actor->base.savedTarget = cb4;
-    actor->base.reactionTarget230 = cb5;
-    actor->base.deathControl = cb6;
-    actor->base.field220 = hidden;
+    actor->base.onEntry = cb2;
+    actor->base.onAlternateEntry = cb3;
+    actor->base.onStanding = cb4;
+    actor->base.onReaction = cb5;
+    actor->base.onDefeat = cb6;
+    actor->base.onHidden = hidden;
     actor->base.defaultReaction = defaultReaction;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, 0);
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_086108B0);
     actor->base.callback248 = 0;
-    actor->base.update26C = targetQuery;
+    actor->base.targetQuery = targetQuery;
     actor->base.field238 = SceneActorReaction_SinkAndRemove;
-    actor->base.damageCallback = damage;
-    actor->base.contactCallback = contact;
+    actor->base.onDamage = damage;
+    actor->base.onContact = contact;
     actor->base.field240 = 0;
     MonsterInit_ClearMotion(actor);
 }
 static inline void Lun_InstallCompletionCallbacks(struct ChaseActor *actor)
 {
-    actor->base.messageCallback = SceneActorScript_OnCommand;
-    actor->base.updateCallback = Lun_OnPlayerTargetInit;
-    actor->base.destroyCallback = Lun_Destroy;
+    actor->base.onMessage = SceneActorScript_OnCommand;
+    actor->base.update = (SceneActorResultCallback)Lun_OnPlayerTargetInit;
+    actor->base.destroy = (SceneActorResultCallback)Lun_Destroy;
 }
 
 static inline void Lun_InstallRoutes(struct ChaseActor *actor)
@@ -187,7 +177,7 @@ static inline void Lun_InstallRoutes(struct ChaseActor *actor)
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Lun_OnTargetCheck);
 }
 
-static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
+static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct Lun *lun,
                                 struct SceneActorRegistryRoute *route)
 {
     struct ContactPosition point;
@@ -219,7 +209,7 @@ static inline u32 Lun_ReadRoute(struct ChaseActor *actor, struct LunActor *lun,
     }
     return 0;
 }
-static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *lun)
+static inline void Lun_ReadPosition(struct ChaseActor *actor, struct Lun *lun)
 {
     if (Script_SeekToKeyword('p')) {
         s32 ground;
@@ -237,13 +227,13 @@ static inline void Lun_ReadPosition(struct ChaseActor *actor, struct LunActor *l
 
 s32 Lun_Init(void *object)
 {
-    struct LunActor *lun = object;
+    struct Lun *lun = object;
     struct ChaseActor *actor = object;
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 r1v;
-    lun->flags = 0;
+    lun->flags3D4 = 0;
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 0);
     MonsterInit_SetCategory(actor, 0x11);
     Lun_InitProfile(actor);

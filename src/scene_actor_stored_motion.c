@@ -8,9 +8,7 @@
 #include "scene_actor_visibility.h"
 #include "scene_actor_state.h"
 
-
 /* SceneActorControl_ReturnSuccess: Returns constant 1; provisional success stub with no known callers */
-
 
 s32 SceneActorControl_ReturnSuccess(void)
 {
@@ -101,13 +99,13 @@ void SceneActorControl_WanderAroundPlayer(struct ChaseActor *actor)
     u32 zero[1];
     if (Take(&actor->base.field2B1)) {
         u8 *context = actor->base.context;
-        Control(actor, actor->base.entryTarget228, 1);
+        Control(actor, actor->base.onAlternateEntry, 1);
         Fill(context + 0x42C, zero, 0);
         context[0x3E3] = 1;
     }
     SceneActorControl_TickSway(actor);
     if (ApproachStoredPoint(actor, (void *)(body + 0x3F0),
-                 Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260)))) {
+                            Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260)))) {
         if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
             struct ContactPosition target;
             u32 angle;
@@ -238,9 +236,10 @@ void SceneActorControl_UpdateStoredMotion(struct ChaseActor *actor)
         }
     } else {
         SceneActorControl_TickSway(actor);
-        if (ApproachMotionPoint(actor, &body->saved,
-                     Callback_InvokeActor(actor,
-                                          ((struct ActorApproachCallbackView *)actor)->callback))) {
+        if (ApproachMotionPoint(
+                actor, &body->saved,
+                Callback_InvokeActor(actor,
+                                     ((struct ActorApproachCallbackView *)actor)->callback))) {
             if ((u8)SceneActorControl_AdvancePositionCurve(actor)) {
                 struct ContactPosition target;
                 u32 angle;
@@ -630,7 +629,7 @@ void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
         context->timer = 0;
         context->mode = 1;
         SceneActorControl_StartStoredCurve(actor);
-        Control(actor, actor->base.entryTarget228, 1);
+        Control(actor, actor->base.onAlternateEntry, 1);
         Fill(&context->scratch, zero, 0);
         SetWanderFlags(actor, 0x800);
     }
@@ -651,7 +650,7 @@ void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
 void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *fn = actor->base.entryTarget228;
+        void *fn = actor->base.onAlternateEntry;
         u32 one = 1;
         u8 *taken = &actor->base.field2B2;
         u32 zero = 0;
@@ -688,7 +687,6 @@ void SceneActorControl_SetStoredMotionCallbacks(u8 *p)
 }
 
 void SceneActorControl_TickHiddenResponse(u8 *);
-
 
 void SceneActorControl_DispatchControl(u8 *);
 

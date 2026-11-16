@@ -78,7 +78,7 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
                     *flags &= mask;
                 }
                 SetState(actor, 0, 0, 7);
-                SetControl(actor, actor->base.entryTarget228, 1);
+                SetControl(actor, actor->base.onAlternateEntry, 1);
             } else {
                 {
                     u32 *flags = savedFlags;
@@ -86,7 +86,7 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
                     *flags &= mask;
                 }
                 SetState(actor, 0, 0, 0);
-                SetControl(actor, actor->base.savedTarget, 0);
+                SetControl(actor, actor->base.onStanding, 0);
             }
             actor->base.field2C2 = 64;
             break;

@@ -101,17 +101,17 @@ void Spider_SelectRecoveryRoute(struct ChaseActor *a, s32 frame)
     group = (u8 *)&a->group.common;
     ClearContext(&ctx->flags, ~4);
     if (a->base.paletteOffset == 0 && SceneActorControl_CreateFromPosition(actor) >= 0) {
-        SaveRecovery((void *)&a->group.saved.control, a->base.entryTarget228, 7, 60);
+        SaveRecovery((void *)&a->group.saved.control, a->base.onAlternateEntry, 7, 60);
         SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SetState(a, 3, 1, 0);
     } else {
         u32 choice = (Random() >> 3) & 3;
         if (choice == 0) {
-            SaveRecovery((void *)(group + 0x8C), a->base.entryTarget228, 7, 60);
+            SaveRecovery((void *)(group + 0x8C), a->base.onAlternateEntry, 7, 60);
             SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             SetState(a, 3, 1, 0);
         } else {
-            SaveRecovery((void *)(group + 0x8C), a->base.savedTarget, 5, 60);
+            SaveRecovery((void *)(group + 0x8C), a->base.onStanding, 5, 60);
             SetControl(a, SceneActorReaction_RestoreAlternateAfterDelay, 14);
             SetState(a, 3, 1, 0);
         }

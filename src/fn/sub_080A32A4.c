@@ -29,7 +29,7 @@ static inline void EntryControl(struct ChaseActor *actor, u32 kind, void *contro
 void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
 {
     if (TakeEntry(s)) {
-        void *fn = s->base.entryTarget224;
+        void *fn = s->base.onEntry;
         u32 two = 2;
         u8 *ready = &s->base.field2B2;
         u32 zero = 0;
@@ -50,7 +50,7 @@ void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
                 s->base.behavior2AA = seven;
                 s->base.counter2AC = result;
                 s->base.field2B1 = 1;
-                EntryControl(s, 1, s->base.entryTarget228);
+                EntryControl(s, 1, s->base.onAlternateEntry);
             } else {
                 s->base.counter2AC++;
             }

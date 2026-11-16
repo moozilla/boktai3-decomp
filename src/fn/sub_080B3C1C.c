@@ -20,7 +20,7 @@ u8 Vorn_UpdateContactResponse(struct ChaseActor *actor)
     work = actor;
     if (SceneActorContact_MotionFlags(SceneActorContact_ActorFromWork(&work), 0x10))
         return 0;
-    if ((u8)Callback_InvokeActor(actor, actor->base.update26C))
+    if ((u8)Callback_InvokeActor(actor, actor->base.targetQuery))
         return 1;
     if (!SceneActorContact_TestTrackingOwned((void *)&actor->base.tracking, 1, &motion))
         return 0;

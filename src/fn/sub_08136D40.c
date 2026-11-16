@@ -44,7 +44,7 @@ void SceneActorPlacement_ResumeResetControl(struct RoomActor *actor)
         SceneActorRegistry_ResetRouteAndColliders((void *)actor);
         SetState(actor, 3, 0, 0);
         {
-            const void *control = actor->field220;
+            const void *control = actor->onHidden;
             SetControl(actor, 12, control);
         }
     }

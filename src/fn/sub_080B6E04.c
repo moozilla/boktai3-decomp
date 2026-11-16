@@ -160,7 +160,7 @@ void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
         actor->base.field2C2 = 0x20;
         command = (void *)((u8 *)actor + 0x460);
         {
-            void *payload = actor->base.entryTarget228;
+            void *payload = actor->base.onAlternateEntry;
             u32 kind = 7;
             command->duration = 60;
             command->payload = payload;

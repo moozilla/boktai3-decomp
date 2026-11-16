@@ -1,12 +1,7 @@
 #define SpriteGroup_SetSharedPosition Axe_SetAuxiliarySpriteRenderState
 #include "global.h"
+#include "axe.h"
 #include "scene_actor_reset.h"
-struct ActorGroupMotionState {
-    u8 unknown0[0x888];
-    struct ContactPosition position;
-    u8 unknown890[0x5BC];
-    u32 flags;
-};
 void Axe_UpdateFadeOut(void);
 void ActorPhase_UpdateSpriteCollapse(void);
 void Axe_EmitMotionTrail(struct ChaseActor *);
@@ -45,7 +40,7 @@ static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 
 }
 void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionState *group = actor->base.context;
+    struct Axe *group = actor->base.context;
     if (TakePending(actor)) {
         BeginControl(actor, Axe_UpdateFadeOut, 0x22);
         {
@@ -56,7 +51,7 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
         SpriteGroup_SetSharedPosition(actor, &group->position, 0x13C);
         {
             u32 flag = 0x400;
-            group->flags |= flag;
+            group->flagsE4C |= flag;
         }
     }
     Axe_EmitMotionTrail(actor);

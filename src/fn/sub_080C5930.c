@@ -116,7 +116,7 @@ void sub_080C5930(struct ChaseActor *a)
                 SceneActorChase_SetControl(a, group->turnControl, 0x1B);
             }
         } else {
-            SceneActorChase_SetControl(a, a->base.entryTarget224, 2);
+            SceneActorChase_SetControl(a, a->base.onEntry, 2);
         }
     }
 }

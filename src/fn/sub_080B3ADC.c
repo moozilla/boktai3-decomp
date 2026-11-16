@@ -54,7 +54,7 @@ u32 SceneActor_DispatchContextAction(struct Vorn *q, u32 reset)
     }
     if (first) {
         if (reset == 1)
-            q->field6AC = 0;
+            q->pursuitCooldown = 0;
         Vorn_BeginPursuitRoute(p, reset);
         return 1;
     }

@@ -18,7 +18,7 @@ s32 Lun_PlayResponseAndResetState(struct RoomActor *s)
     if (s->field2DC & 0x40000)
         SetFlags(s, 0x20);
     {
-        const void *control = s->reactionTarget230;
+        const void *control = s->onReaction;
         u8 code = 0x12;
         u32 zero;
         u8 one;

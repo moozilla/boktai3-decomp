@@ -122,14 +122,14 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript((void *)actor);
-    script = (u16)((struct RoomActor *)actor)->script1F8;
+    script = (u16)actor->base.script1F8;
     if (script) {
         buf.values[0] = actor->base.body.position.x;
         buf.values[1] = actor->base.body.position.y;
         buf.values[2] = actor->base.body.position.z;
-        buf.values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-        buf.values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-        buf.values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+        buf.values[3] = actor->base.parameters1FC[0];
+        buf.values[4] = actor->base.parameters1FC[1];
+        buf.values[5] = actor->base.parameters1FC[2];
         buf.values[6] = actor->base.field2E0;
         buf.values[7] = actor->base.body.id;
         arguments.count = 8;

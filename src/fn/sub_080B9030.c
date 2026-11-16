@@ -43,7 +43,7 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseAc
         return;
     if (HalfFlag(&contact[3], 4))
         return;
-    if (((struct ChaseActor *)actor)->base.colliderA.responseValue)
+    if (actor->base.colliderA.responseValue)
         return;
     if (Test(StateFlag(state, 0x10), ~0))
         return;

@@ -35,16 +35,10 @@
 #include "player.h"
 
 #include "script_utility.h"
-#include "room_actor.h"
+#include "chase_actor.h"
 
 struct MimicReactionFlags {
     s16 bits : 16;
-};
-
-struct MimicNavigationProbe {
-    u16 flags, unknown2, region, polygon;
-    u32 unknown8;
-    struct ContactPosition origin, previous, destination;
 };
 
 /* Deferred-response packet begins at the pursuit group's saved-control slot. */
@@ -59,9 +53,8 @@ struct MimicDeferredResponse {
 /* Complete 0x664 allocation, with the common actor prefix kept flat. */
 
 struct Mimic {
-    struct RoomActor base;
-    struct SceneActorChaseGroup group;
-    struct MimicNavigationProbe routeProbe;
+    struct ChaseActor chase;
+    struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
     struct ContactPosition origin;
     u16 originCell, timer;
@@ -182,7 +175,7 @@ void SceneActorTarget_ResolvePendingObject(void);
 void SceneActorReaction_ResolvePlacementDamage(void);
 void SceneActorPlacement_ResetStateThree(void);
 void SceneActorReaction_BeginTargetRecovery(void);
-void SceneActorScript_OnCommand(void);
+void SceneActorScript_OnCommand(void *actor, const u16 *command);
 void SceneActorReaction_SetMotionMode(void);
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorBehavior_InitializeShadow(void *);

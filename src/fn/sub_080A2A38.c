@@ -40,6 +40,6 @@ void SceneActorReaction_ResumeEntryTarget(struct ChaseActor *actor)
             actor->base.flags2D4 &= ~mask;
         }
         SetState(actor, 0, 0, 7);
-        SetControl(actor, actor->base.entryTarget228, 1);
+        SetControl(actor, actor->base.onAlternateEntry, 1);
     }
 }

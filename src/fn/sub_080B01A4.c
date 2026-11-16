@@ -94,7 +94,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(group, 0x1fc, void *), 32,
                                                           32, speed)) {
             SetState(actor, 18);
-            SetControl(actor, actor->base.savedTarget, 0);
+            SetControl(actor, actor->base.onStanding, 0);
             SetMotion(actor, SceneActorReaction_BeginSideStep, 38);
             actor->base.field2C2 = 64;
             *(u16 *)(group + 0x54) = 0;
@@ -103,7 +103,7 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     } else if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(group, 0x1fc, void *), 32, 32,
                                                         speed)) {
         SetState(actor, 20);
-        SetControl(actor, actor->base.savedTarget, 0);
+        SetControl(actor, actor->base.onStanding, 0);
     }
     actor->base.counter2AC++;
 }

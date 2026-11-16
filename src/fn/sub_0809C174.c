@@ -38,7 +38,7 @@ void Lun_DecayRouteMotion(struct ChaseActor *a)
 {
     u8 *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B1))
-        SetControl(a, a->base.entryTarget224, 2);
+        SetControl(a, a->base.onEntry, 2);
     a->base.body.motion.x += *(s16 *)(ctx + 0x424);
     a->base.body.motion.z += *(s16 *)(ctx + 0x428);
     if (Mod(a->base.counter2AC, 4) == 0) {

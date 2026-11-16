@@ -54,7 +54,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     u32 zero;
     u8 byteZero;
     {
-        struct SceneActorChaseTracking *gate = &((struct RoomActor *)a)->tracking;
+        struct SceneActorChaseTracking *gate = &a->base.tracking;
         u32 mask = 8;
         zero = Test(gate->flags, mask);
         if (zero)

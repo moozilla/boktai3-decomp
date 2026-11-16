@@ -112,7 +112,7 @@ void Vorn_BeginResponsePursuit(struct Vorn *a, u32 reset, const void *unused, u3
         a->chase.base.flags2CC = mask & a->chase.base.flags2CC;
     }
     SceneActorChase_SetBehavior(a, 15);
-    SceneActorChase_SetControl(a, a->chase.base.savedTarget, 0);
+    SceneActorChase_SetControl(a, a->chase.base.onStanding, 0);
     Vorn_SetTimedMotion(a, sub_080ADB90, 35);
     Vorn_SetTrackingFlags(&a->chase.base.tracking, 8);
     {

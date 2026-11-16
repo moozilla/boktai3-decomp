@@ -1,22 +1,16 @@
 #define SCENE_ACTOR_CHASE_WIDE_MAP_WIDTH 1
 #include "global.h"
+#include "dog.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 
 u8 Dog_IsActionTimerExpired(struct ChaseActor *);
 s32 sub_080DEF78(struct ChaseActor *, u32);
 
-struct DogReactionFields {
-    u8 unknown0[0x678];
-    u32 flags;
-    u8 unknown67C[0x2C];
-    u8 turnDelay;
-};
-
 /* The reaction fields overlap the canonical actor's species storage. */
 union DogReactionContext {
     struct ChaseActor base;
-    struct DogReactionFields reaction;
+    struct Dog reaction;
 };
 
 static inline s32 Dog_HeadingOctant(s32 angle)
@@ -40,7 +34,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         return 0;
     }
     if (a->base.field2DC & 0xC0000) {
-        SceneActorChase_SetControl(a, a->base.reactionTarget230, 18);
+        SceneActorChase_SetControl(a, a->base.onReaction, 18);
         SceneActorChase_SetState(a, 3, 0, 0);
         SceneActorChase_ClearWordFlags(&a->base.flags2D0, 0x1000000);
         SceneActorChase_ClearWordFlags(&context->reaction.flags, 8);
@@ -74,7 +68,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
         SceneActorChase_SetBehavior(a, 18);
         {
             s32 angle = Dog_HeadingOctant((a->base.tracking.heading + 0xA0) & 255);
-            ((struct RoomActor *)a)->nextDirection = (angle + 3) & 7;
+            a->base.nextDirection = (angle + 3) & 7;
         }
         {
             s32 direction = a->base.body.direction;
@@ -98,7 +92,7 @@ s32 Dog_ChooseReactionBehavior(struct ChaseActor *a)
                 return 0;
             }
         }
-        SceneActorChase_SetControl(a, a->base.entryTarget228, 1);
+        SceneActorChase_SetControl(a, a->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(a, 7);
         a->base.field2C2 = 16;
         return 1;

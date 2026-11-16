@@ -323,15 +323,15 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             goto notHidden;
     }
     {
-        u16 script = (u16)((struct RoomActor *)actor)->script1F8;
+        u16 script = (u16)actor->base.script1F8;
         if (script) {
             struct ScriptUtilityArguments arguments;
             values[0] = actor->base.body.position.x;
             values[1] = actor->base.body.position.y;
             values[2] = actor->base.body.position.z;
-            values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-            values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-            values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+            values[3] = actor->base.parameters1FC[0];
+            values[4] = actor->base.parameters1FC[1];
+            values[5] = actor->base.parameters1FC[2];
             values[6] = actor->base.field2E0;
             values[7] = actor->base.body.id;
             arguments.count = 8;
@@ -431,15 +431,15 @@ notHidden:
             }
         }
         if (context->rank > 19999) {
-            u16 script = (u16)((struct RoomActor *)actor)->script1F8;
+            u16 script = (u16)actor->base.script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
                 values[0] = actor->base.body.position.x;
                 values[1] = actor->base.body.position.y;
                 values[2] = actor->base.body.position.z;
-                values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-                values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-                values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+                values[3] = actor->base.parameters1FC[0];
+                values[4] = actor->base.parameters1FC[1];
+                values[5] = actor->base.parameters1FC[2];
                 values[6] = actor->base.field2E0;
                 values[7] = actor->base.body.id;
                 arguments.count = 8;
@@ -471,15 +471,15 @@ notHidden:
         }
         SceneActorBehavior_CallTerrainScript(actor);
         {
-            u16 script = (u16)((struct RoomActor *)actor)->script1F8;
+            u16 script = (u16)actor->base.script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
                 values[0] = actor->base.body.position.x;
                 values[1] = actor->base.body.position.y;
                 values[2] = actor->base.body.position.z;
-                values[3] = ((struct RoomActor *)actor)->parameters1FC[0];
-                values[4] = ((struct RoomActor *)actor)->parameters1FC[1];
-                values[5] = ((struct RoomActor *)actor)->parameters1FC[2];
+                values[3] = actor->base.parameters1FC[0];
+                values[4] = actor->base.parameters1FC[1];
+                values[5] = actor->base.parameters1FC[2];
                 values[6] = actor->base.field2E0;
                 values[7] = actor->base.body.id;
                 arguments.count = 8;

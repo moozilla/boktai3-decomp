@@ -94,7 +94,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     {
         u32 duration = (((u16)Vorn_GetRandomBits(0xFFFF)) & 15) + 30;
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
-        void *payload = actor->base.entryTarget228;
+        void *payload = actor->base.onAlternateEntry;
         u32 kind = 19;
         command->duration = duration;
         command->payload = payload;

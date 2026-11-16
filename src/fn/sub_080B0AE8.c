@@ -57,7 +57,7 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
                 void *control;
                 u32 *motionFlags;
                 *ready = one;
-                control = p->base.savedTarget;
+                control = p->base.onStanding;
                 p->base.field2B2 = one;
                 p->base.field2B0 = zero;
                 p->base.field2B5 = zero;

@@ -9,7 +9,7 @@ void SceneActorReaction_TickContactAnimation(struct ChaseActor *p)
     u8 *category;
     u32 kind;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 5);
+        SceneActorAnimation_SelectDirectionalEntry(&p->base, 5);
     kind = p->base.category;
     category = &p->base.category;
     if (kind == 5 && animation[10] == 2 && animation[6] == 0)

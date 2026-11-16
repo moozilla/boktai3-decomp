@@ -1,29 +1,22 @@
+#include "vorn.h"
 #include "scene_actor_reset.h"
 void SceneActorAnimation_SelectDirectionalEntry(struct ChaseActor *, u32);
 u8 Vorn_BeginContactAnimation(struct ChaseActor *);
 void Vorn_BeginPursuitRoute(struct ChaseActor *, u32);
 void Vorn_SelectRetreatRoute(struct ChaseActor *, u32);
-struct VornReactionContext {
-    u8 unknown0[0x6AC];
-    u16 pursuitCooldown;
-    u8 unknown6AE[0x12];
-    u8 foreignPosition;
-    u8 unknown6C1[0x13];
-    u16 flags;
-};
-static inline u8 Test(struct VornReactionContext *context, u32 mask)
+static inline u8 Test(struct Vorn *context, u32 mask)
 {
-    if (context->flags & mask)
+    if (context->flags6D4 & mask)
         return 1;
     return 0;
 }
 // confidence=low: pending hit flags select recovery control or pursuit/retreat behavior.
 u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
 {
-    struct VornReactionContext *context = actor->base.context;
+    struct Vorn *context = actor->base.context;
     u32 blocked;
     {
-        u16 *flags = &context->flags;
+        u16 *flags = &context->flags6D4;
         s32 mask = ~8;
         *flags = *flags & mask;
     }
@@ -46,7 +39,7 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         return 0;
     }
     if (actor->base.field2DC & 0xC0000) {
-        void *control = actor->base.reactionTarget230;
+        void *control = actor->base.onReaction;
         u32 kind = 0x12;
         u8 zero8;
         actor->base.field2B2 = 1;

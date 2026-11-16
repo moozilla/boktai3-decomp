@@ -126,7 +126,7 @@ static inline u8 Arrive(void *obj)
         Chase_SetCtl(actor, *(void **)(group + 0x48), 0x1A);
         Chase_SetBehavior(actor, 12);
     } else {
-        Chase_SetCtl(actor, actor->base.entryTarget228, 1);
+        Chase_SetCtl(actor, actor->base.onAlternateEntry, 1);
         Chase_SetBehavior(actor, 5);
         Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
         (*(struct ContactPosition **)(group + 0x200))->y =

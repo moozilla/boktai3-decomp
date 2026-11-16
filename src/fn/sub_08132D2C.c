@@ -127,7 +127,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             link->flags |= one;
         }
         {
-            void *control = actor->base.deathControl;
+            void *control = actor->base.onDefeat;
             Reaction_SetControl(actor, 17, control);
         }
         {
@@ -244,5 +244,5 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
     done:
         return 1;
     }
-    return (u8)Callback_InvokeActor(actor, actor->base.contactCallback);
+    return (u8)Callback_InvokeActor(actor, actor->base.onContact);
 }

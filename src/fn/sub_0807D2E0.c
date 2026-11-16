@@ -227,7 +227,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 SceneActorAttachment_ReplaceResponseSlot(victim, 1, 0x7F, 0);
                 SceneActorAttachment_ReplaceResponseSlot(victim, 3, 0x7F, 0);
                 SceneActorEffects_AdvanceSteps((u8 *)victim, 4);
-                SceneActorTerrain_InstallControl(a, a->base.deathControl, 0x11);
+                SceneActorTerrain_InstallControl(a, a->base.onDefeat, 0x11);
                 SelectAnimationState(a, 3, 0, 0);
                 ResetEntry(a, 1);
                 if (SceneActorDamage_ShouldShow(a))

@@ -41,7 +41,7 @@ static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 
         *flags &= mask;
         actor->base.word104 = zero;
         actor->base.word104 =
-            *(u32 *)&actor->base.entryTarget228; /* a u32 read keeps the store above */
+            *(u32 *)&actor->base.onAlternateEntry; /* a u32 read keeps the store above */
         actor->base.word108 = 0;
         actor->base.word10C = 0;
         actor->base.word110 = 1;
@@ -55,7 +55,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
     u8 busy;
     u8 zero;
     if (TakePrepared(&actor->base.field2B1)) {
-        void *control = actor->base.entryTarget224;
+        void *control = actor->base.onEntry;
         SetControl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
@@ -69,7 +69,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
                 actor->base.behavior2AA = state;
                 actor->base.counter2AC = zero;
                 actor->base.field2B1 = 1;
-                SetControlWords(actor, actor->base.savedTarget, 0);
+                SetControlWords(actor, actor->base.onStanding, 0);
             } else
                 actor->base.counter2AC++;
         }

@@ -257,7 +257,7 @@ static inline void Skeleton_ArriveAfterDelay(void *obj)
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetTypedState(actor, 0, 0, 12);
     } else {
-        SceneActorChase_SetControl(actor, actor->base.entryTarget228, 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetTypedState(actor, 0, 0, 5);
         Skeleton_SnapDelayedRoute(group->destination, &group->homeRoute);
         (group->destination)->y = MonsterInit_TerrainHeight(

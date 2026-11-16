@@ -1,9 +1,6 @@
 #include "global.h"
+#include "vorn.h"
 void Trigger_ConsumePending(u8 *, u32);
-struct Context {
-    u8 unknown0[0x67C];
-    u16 response;
-};
 struct S {
     u8 pad[0x9C];
     s16 z;
@@ -59,7 +56,7 @@ void Vorn_RestoreControlAfterItemLaunch(struct S *s)
         u32 *flags;
         u32 two;
         SceneActor_TryLaunchItem13(context);
-        ((struct Context *)context)->response = 0xFFFF;
+        ((struct Vorn *)context)->response = 0xFFFF;
         Trigger_ConsumePending(((u8 *)s) + 0xC, 1);
         fn = s->next;
         zero = 0;

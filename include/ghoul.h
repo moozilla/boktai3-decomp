@@ -4,13 +4,12 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
 #include "display_sequence.h"
-#include "room_actor.h"
+#include "chase_actor.h"
 
 /* Ghoul's allocation shares the actor prefix through the pursuit group.
  * The species parameters and flag meanings are tentative. */
 struct Ghoul {
-    struct RoomActor base;
-    struct SceneActorChaseGroup group;
+    struct ChaseActor chase;
     u16 delayedScript;
     u8 scriptDelay, scriptElapsed;
     u16 discFlags;

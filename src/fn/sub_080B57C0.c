@@ -1,4 +1,5 @@
 #include "global.h"
+#include "skeleton.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 #include "player.h"
@@ -82,10 +83,6 @@ static inline u8 Chase(struct ChaseActor *actor, struct ApproachGroup *group, u3
     }
 }
 
-struct SkeletonRouteContext {
-    u8 unknown0[0x6D0];
-    u8 active;
-};
 static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = actor->base.flags2D4;
@@ -157,7 +154,7 @@ void Skeleton_BeginStationaryPursuit(struct ChaseActor *a)
         }
     } else {
         SetState(a, 0, 0, 7);
-        SetControl(a, a->base.entryTarget228, 1);
+        SetControl(a, a->base.onAlternateEntry, 1);
     }
     group->destination->pad = 1;
     if (!Chase(a, group, 0x200))

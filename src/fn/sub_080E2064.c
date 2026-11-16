@@ -52,7 +52,7 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
                         angle >>= 5;
                     else
                         angle = -(-angle >> 5);
-                    ((struct RoomActor *)a)->nextDirection = (angle + 3) & 7;
+                    a->base.nextDirection = (angle + 3) & 7;
                 }
             } else {
                 s32 mask = -5;
@@ -68,11 +68,11 @@ void SceneActorMotion_UpdateTargetTransition(struct ChaseActor *a)
                             angle >>= 5;
                         else
                             angle = -(-angle >> 5);
-                        ((struct RoomActor *)a)->nextDirection = (angle + 3) & 7;
+                        a->base.nextDirection = (angle + 3) & 7;
                     }
                 }
             }
         } else
-            SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 1);
+            SceneActorAnimation_SelectDirectionalEntry(&a->base, 1);
     }
 }

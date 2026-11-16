@@ -105,7 +105,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->base.body.direction = desired;
-            Control(actor, actor->base.savedTarget, 0);
+            Control(actor, actor->base.onStanding, 0);
             actor->base.field2B0 = 1;
             return;
         }
@@ -147,7 +147,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
         u32 selection;
         struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
             actor->base.profileId, actor->base.profileMode, 1);
-        Control(actor, actor->base.entryTarget224, 2);
+        Control(actor, actor->base.onEntry, 2);
         if (Bits(actor, 0x10000))
             motion[9] += 32;
         else

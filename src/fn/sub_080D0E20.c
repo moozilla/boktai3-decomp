@@ -1,12 +1,7 @@
 #include "global.h"
+#include "mummy.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_animation.h"
-struct SceneActorCheckpointState {
-    u8 unknown0[0x6ce];
-    u16 currentTick, targetTick;
-    u8 unknown6d2[4];
-    u16 savedTick;
-};
 struct SceneActorCheckpointSequence {
     u8 unknown0[8];
     u16 frame;
@@ -24,7 +19,7 @@ static inline u8 TakeFlag(u8 *flag)
 }
 void SceneActor_UpdateAnimationCheckpoint(struct ChaseActor *actor)
 {
-    struct SceneActorCheckpointState *state = actor->base.context;
+    struct Mummy *state = actor->base.context;
     struct SceneActorCheckpointSequence *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     if (TakeFlag(&actor->base.field2B2)) {
         u32 mask;

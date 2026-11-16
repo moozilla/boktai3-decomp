@@ -13,11 +13,11 @@ static inline void SceneActorMovement_Wake(struct ChaseActor *actor)
         actor->base.reactionEnd.z = actor->base.body.position.z;
         if (actor->base.health <= 0) {
             SceneActorChase_SetState(actor, 3, 0, 0);
-            SceneActorChase_SetControl(actor, actor->base.deathControl, 0x11);
+            SceneActorChase_SetControl(actor, actor->base.onDefeat, 0x11);
             if (!SceneEnvironment_LinkMode() && !ActorStatus_StatusFlags(actor, 0x800))
                 SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
         } else {
-            SceneActorChase_SetControl(actor, actor->base.reactionTarget230, 0x12);
+            SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
             SceneActorChase_SetState(actor, 3, 0, 0);
         }
     }

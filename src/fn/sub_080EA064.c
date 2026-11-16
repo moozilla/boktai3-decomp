@@ -1,6 +1,7 @@
 // MATCHING_CONCESSION: register-pinning
 #include "player.h"
 #include "global.h"
+#include "octopus.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -21,13 +22,6 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Octopus_GetAnimationStatus(struct ChaseActor *);
 void Octopus_UpdateActiveState(void);
 extern s16 *gLinkSession;
-
-struct OctopusContext {
-    u8 unknown0[0x628];
-    u32 flags;
-    u8 unknown630[0xC];
-    u8 startTick, holdTicks, interval;
-};
 
 struct OctopusTarget {
     u8 unknown0[8];
@@ -127,9 +121,9 @@ static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
     *angle = quadrant << 6;
 }
 
-static inline void ClearHeld(struct OctopusContext *context)
+static inline void ClearHeld(struct Octopus *context)
 {
-    u32 *flags = &context->flags;
+    u32 *flags = &context->flags628;
     u32 mask = ~2;
     *flags &= mask;
 }
@@ -199,7 +193,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
 
 void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
-    struct OctopusContext *context = actor->base.context;
+    struct Octopus *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct OctopusTarget *target;

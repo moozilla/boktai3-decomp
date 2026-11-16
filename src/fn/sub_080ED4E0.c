@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ivy.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -11,10 +12,6 @@ struct IvyTarget {
     u8 kind;
     u8 unk9[0x3C - 9];
     struct ChaseActor *actor;
-};
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
 };
 struct Player;
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
@@ -113,9 +110,9 @@ void sub_080ED4E0(struct ChaseActor *actor)
                 SceneActorReaction_ApplyHitResponse(t, 0, (void *)&pos, 0, flip, 0);
             }
             {
-                struct IvyContext *context = actor->base.context;
+                struct Ivy *context = actor->base.context;
                 u32 mask = 2;
-                context->flags |= mask;
+                context->captureFlags |= mask;
             }
             return;
         }

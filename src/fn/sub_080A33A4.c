@@ -17,7 +17,7 @@ void SceneActorControl_UpdateRouteResponse(struct ChaseActor *s)
 {
     u8 entered = TakeEntry(s);
     if (entered) {
-        void *fn = s->base.entryTarget224;
+        void *fn = s->base.onEntry;
         u32 two = 2;
         u8 *ready = &s->base.field2B2;
         u32 zero = 0;
