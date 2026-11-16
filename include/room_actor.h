@@ -79,7 +79,10 @@ struct RoomActor {
     u8 unknown2A4[4];
     u8 state2A8, phase2A9, behavior2AA, unknown2AB;
     u32 counter2AC;
-    u8 field2B0, field2B1, field2B2, field2B3;
+    u8 field2B0;
+    u8 field2B1; /* set when the next phase may start; BehaviorView read it as a reset request */
+    u8 field2B2; /* directional entry flag; BehaviorView read it as "prepared" */
+    u8 restart;
     u8 enabled, field2B5, field2B6, animationIndex;
     u16 field2B8;
     u8 unknown2BA[2];
@@ -110,7 +113,9 @@ struct RoomActor {
     struct ContactPosition reactionStart,
         reactionEnd; /* +0x310/+0x318: reaction position snapshots. */
     u8 shadow[0xAC]; /* +0x320: first byte gates the shadow enable/disable API. */
-    u8 field3CC, unknown3CD[3];
+    u8 field3CC;
+    u8 nextDirection; /* direction index (0..7) the next phase turns to */
+    u8 unknown3CE[2];
     void *context;
 };
 

@@ -47,11 +47,11 @@ void Bat_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 frame)
     u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     if (frame > 60) {
         u16 blocked;
-        if (!actor->base.field2B3)
+        if (!actor->base.restart)
             return;
         actor->base.field2B0 = 1;
         blocked = Bat_MaskFlags(actor, 128);

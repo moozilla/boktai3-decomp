@@ -74,7 +74,7 @@ s32 Dog_ChooseReactionBehavior(struct SceneActorRegistryResetView *a)
         SceneActorChase_SetBehavior(a, 18);
         {
             s32 angle = Dog_HeadingOctant((a->base.tracking.heading + 0xA0) & 255);
-            ((struct SceneActorAnimationView *)a)->nextDirection = (angle + 3) & 7;
+            ((struct RoomActor *)a)->nextDirection = (angle + 3) & 7;
         }
         {
             s32 direction = a->base.body.direction;

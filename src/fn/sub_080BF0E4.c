@@ -41,8 +41,7 @@ static inline u32 Skeleton_TileMirror(struct SceneActorAnimationTile *tile)
     return tile->flags & 4;
 }
 
-static inline struct SceneActorAnimationView *
-Skeleton_Playback(struct SceneActorRegistryResetView *a)
+static inline struct RoomActor *Skeleton_Playback(struct SceneActorRegistryResetView *a)
 {
     return (void *)a;
 }

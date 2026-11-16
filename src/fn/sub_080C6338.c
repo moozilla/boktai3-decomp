@@ -10,6 +10,6 @@ void Golem_BeginChargeBuildup(struct SceneActorRegistryResetView *actor)
             actor->base.flags2D4 = mask | actor->base.flags2D4;
         }
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         Chase_SetCtl(actor, Golem_UpdateChargeBuildup, 0x22);
 }

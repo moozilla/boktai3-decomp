@@ -67,7 +67,7 @@ void Lun_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         }
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2B0 = 1;
         SceneActorBehavior_CallTerrainScript(actor);
         script = (u16)((struct SceneActorBehaviorView *)actor)->script1F8;

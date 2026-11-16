@@ -46,7 +46,7 @@ void SceneActorReaction_FinishAnimation17(struct SceneActorRegistryResetView *ac
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         SetControl(actor, Ivy_UpdateActiveState, 0x22);
         SetStateB(actor);
     }

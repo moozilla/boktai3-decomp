@@ -65,7 +65,7 @@ void SceneActorControl_UpdateTimedFacing(struct SceneActorRegistryResetView *inp
                     *saved = *direction;
                 } else {
 
-                    u8 *field = &actor->base.field2B3;
+                    u8 *field = &actor->base.restart;
                     *field = 0;
                 }
             }

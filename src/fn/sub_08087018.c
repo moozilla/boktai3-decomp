@@ -28,7 +28,7 @@ void sub_08087018(struct SceneActorRegistryResetView *actor, s32 frame)
     struct SceneActorChaseGroup *group = &actor->group;
     u16 *reactionFlags;
     reactionFlags = Bat_PrepareLanding(actor, frame);
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 2)) {

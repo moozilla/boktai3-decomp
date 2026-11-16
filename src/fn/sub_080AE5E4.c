@@ -36,7 +36,7 @@ void SceneActorReaction_ResumeOrRunScript(struct SceneActorRegistryResetView *ac
     u8 *group = (u8 *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         if (Vorn_HasActiveResponse(actor->base.context)) {

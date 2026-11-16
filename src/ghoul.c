@@ -76,7 +76,7 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
         Sound_PlaySong(0xD4);
         if (Ghoul_MotionFlag(actor, 8))
             Sound_PlaySong(0x12A);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     {
         u32 mask = 0x2000;
@@ -118,7 +118,7 @@ void Ghoul_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     actor->base.body.motion.z += dz;
     *x += dx;
     *z += dz;
-    if (Ghoul_DisplacementStopped(dx, dz) && actor->base.field2B3)
+    if (Ghoul_DisplacementStopped(dx, dz) && actor->base.restart)
         actor->base.field2B0 = 1;
 }
 
@@ -185,7 +185,7 @@ void Ghoul_UpdateDiscThrow(struct SceneActorRegistryResetView *actor)
         }
         Sound_PlaySong(0xD6);
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         actor->base.field2B0 = 1;
 }
 
@@ -1039,7 +1039,7 @@ u8 Ghoul_ReactToContact(struct SceneActorRegistryResetView *actor)
     Bat_TickDelayedScript(actor);
     if (SceneActorChase_QueryMotionFlags(actor, 0x2000)) {
         actor->base.body.direction = actor->base.field2B6 + 0x80;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;

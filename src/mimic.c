@@ -184,17 +184,17 @@ s32 Mimic_UpdateReactionState(struct SceneActorRegistryResetView *actor)
 
 /* SceneActor_EnterFlaggedEntryPhase: plays directional entry 16 once, clears the 0x4 bit, and forwards the restart flag */
 
-void SceneActor_EnterFlaggedEntryPhase(struct SceneActorAnimationView *actor)
+void SceneActor_EnterFlaggedEntryPhase(struct RoomActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->directionalEntryFlag)) {
-        u32 flags = SceneActor_GetDirectionFlags(actor->direction);
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
+        u32 flags = SceneActor_GetDirectionFlags(actor->body.direction);
         struct ContactCollider *collider;
         SceneActorAnimation_SelectEntryFlags(actor, 16, flags);
         collider = &((struct SceneActorRegistryResetView *)actor)->base.colliderB;
         collider->flags &= 0xFFFB;
     }
     if (actor->restart)
-        actor->unknown2B0 = 1;
+        actor->field2B0 = 1;
 }
 
 static inline void CellCenter(struct ContactPosition *out, u32 cell)
@@ -327,20 +327,20 @@ void SceneActor_LeapTowardTarget(struct SceneActorRegistryResetView *actor)
     }
 }
 
-void SceneActor_EnterShadowlessPhase(struct SceneActorAnimationView *actor)
+void SceneActor_EnterShadowlessPhase(struct RoomActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&actor->directionalEntryFlag)) {
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         if (SceneActor_IsCollisionTargetUnavailable(actor)) {
-            u32 flags = SceneActor_GetDirectionFlags(actor->direction);
+            u32 flags = SceneActor_GetDirectionFlags(actor->body.direction);
             SceneActorAnimation_SelectEntryFlags(actor, 15, flags);
         } else {
-            u32 flags = SceneActor_GetDirectionFlags(actor->direction);
+            u32 flags = SceneActor_GetDirectionFlags(actor->body.direction);
             SceneActorAnimation_SelectEntryFlags(actor, 16, flags);
         }
         ActorShadow_Disable(((struct SceneActorRegistryResetView *)actor)->base.shadow);
     }
     if (actor->restart)
-        actor->unknown2B0 = 1;
+        actor->field2B0 = 1;
 }
 
 void SceneActor_RestoreSavedTargetOnCompletion(struct SceneActorRegistryResetView *actor)
@@ -546,7 +546,7 @@ void Mimic_ConvergeAndTurn(struct SceneActorRegistryResetView *actor)
     actor->base.body.motion.z += z;
     *px += x;
     *pz += z;
-    if (AtRest(x, z) && actor->base.field2B3) {
+    if (AtRest(x, z) && actor->base.restart) {
         u16 *motion = &actor->base.flags2D4;
         u16 *flags;
         u32 hit;

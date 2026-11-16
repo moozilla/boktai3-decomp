@@ -35,7 +35,7 @@ void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *ac
     struct SceneActorReactionContext *context = actor->base.context;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->base.field2B3 = 1;
+        actor->base.restart = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
         {
             u16 *flags = &context->flags;
@@ -43,7 +43,7 @@ void SceneActorReaction_ResumeSavedTarget(struct SceneActorRegistryResetView *ac
             *flags &= mask;
         }
     }
-    if (frame > 60 && actor->base.field2B3) {
+    if (frame > 60 && actor->base.restart) {
         u16 blocked;
         actor->base.field2B0 = 1;
         blocked = Reaction_MaskFlags(actor, 128);

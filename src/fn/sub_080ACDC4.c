@@ -38,6 +38,6 @@ void SceneActor_UpdateTargetedAttack(struct SceneActorRegistryResetView *s)
         SceneActor_UpdateForwardCollider(s);
         Collider_Refresh(&context->collider);
     }
-    if (s->base.field2B3)
+    if (s->base.restart)
         s->base.field2B0 = 1;
 }

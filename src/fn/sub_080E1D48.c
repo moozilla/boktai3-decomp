@@ -46,7 +46,7 @@ void Dog_UpdateTurnSequence(struct SceneActorRegistryResetView *actor, s32 frame
             Dog_SetControl(actor, 2, (void *)data);
             if (group->turn.turnsRemaining == 1) {
                 encoded = ((group->turn.savedDirection >> 5) + 3) & 7;
-                actor->base.unknown3CD[0] = encoded;
+                actor->base.nextDirection = encoded;
             } else {
                 s32 prior = actor->base.body.direction;
                 s32 tries = 0;
@@ -72,7 +72,7 @@ void Dog_UpdateTurnSequence(struct SceneActorRegistryResetView *actor, s32 frame
                     }
                 }
                 encoded = ((choice >> 5) + 3) & 7;
-                actor->base.unknown3CD[0] = encoded;
+                actor->base.nextDirection = encoded;
             }
             group->turn.turnsRemaining--;
         }

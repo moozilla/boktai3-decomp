@@ -14,7 +14,7 @@ void SceneActorReaction_ResumeAfterAnimation(struct SceneActorRegistryResetView 
             *flags &= mask;
         }
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.fieldAA = 0;
         actor->base.field2B0 = 1;
         {

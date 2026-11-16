@@ -97,7 +97,7 @@ void Octopus_ThrowCapturedTarget(struct SceneActorRegistryResetView *actor)
         player = target->player;
         Player_BeginPositionRequest(player, (void *)&position, 0, 3, flip, 0, 0, 0, 0);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2B0 = 1;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
         Hide(actor);

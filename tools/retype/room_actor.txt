@@ -1,0 +1,31 @@
+# The registry actor base (item 5 of docs/OBJECT_MODEL.md), as replayable steps:
+#   python3 tools/retype_fields.py --steps tools/retype/room_actor.txt --dependents include/room_actor.h
+# Run it on a branch after merging the header changes: it rewrites the accesses in your
+# units that no longer compile. Steps run in order; each is safe to repeat. Renames come
+# first and the embedding last, so old code gets both (`x->field2B3` -> `x->base.restart`).
+
+# Names the base took from the views.
+[text]
+unknown3CD[0] nextDirection
+[map]
+field2B3 restart
+
+# SceneActorAnimationView was a view of the base alone.
+[types]
+SceneActorAnimationView RoomActor
+[map]
+direction body.direction
+facingAngle tracking.heading
+phaseTimer tracking.distance
+phase state2A8
+subphase phase2A9
+nextPhase behavior2AA
+phaseCounter counter2AC
+phaseReady field2B1
+directionalEntryFlag field2B2
+selection animationIndex
+link context
+unknown2B0 field2B0
+
+# Last: the monster structs and ResetView embed struct RoomActor as `base`.
+[embed RoomActor base]

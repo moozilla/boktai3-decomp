@@ -69,11 +69,11 @@ void Bee_OnAttackCollision(void);
 void Bee_ApplyContactReaction(struct SceneActorBehaviorContactView *source,
                               struct SceneActorBehaviorContactView *destination,
                               struct SceneActorRegistryResetView *actor);
-void Bee_UpdateTurnAnimation(struct SceneActorAnimationView *actor);
+void Bee_UpdateTurnAnimation(struct RoomActor *actor);
 void Bee_ResetIdleAnimation(struct SceneActorRegistryResetView *actor);
 void Bee_ResetReactionAnimation(struct SceneActorRegistryResetView *actor);
 void Bee_UpdateRecoveryAnimation(struct SceneActorRegistryResetView *actor);
-void Bee_UpdateFacingAnimation(struct SceneActorAnimationView *actor);
+void Bee_UpdateFacingAnimation(struct RoomActor *actor);
 void Bee_UpdateMovementStop(struct SceneActorRegistryResetView *actor);
 void Bee_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame);
 void Bee_ReturnToPlayerWhenStopped(struct SceneActorRegistryResetView *actor);

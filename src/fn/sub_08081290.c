@@ -68,7 +68,7 @@ void SceneActorReaction_SinkAndRemove(struct SceneActorRegistryResetView *actor,
             actor->base.field2B1 = 1;
         }
         actor->base.fieldAA = 0;
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         collider->responseValue = 0;
         actor->base.field2B8 = 0;
         {

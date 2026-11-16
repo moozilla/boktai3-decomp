@@ -284,7 +284,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     u8 *categoryp;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
@@ -310,7 +310,7 @@ void Skeleton_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     actor->base.fieldAA = 0;

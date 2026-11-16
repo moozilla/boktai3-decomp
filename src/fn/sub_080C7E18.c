@@ -109,7 +109,7 @@ void sub_080C7E18(struct SceneActorRegistryResetView *actor, s32 frame)
     if (frame <= 19 && !DisplaySequence_GetIndex(sequence) &&
         sequence->elapsed == (sequence->duration != 0) && sequence->duration != 1)
         sequence->elapsed = 0;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

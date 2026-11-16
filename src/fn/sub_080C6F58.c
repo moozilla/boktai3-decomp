@@ -16,7 +16,7 @@ void Golem_UpdateChargeWindup(struct SceneActorRegistryResetView *actor, u32 fra
     u8 directionVariant, mirror;
     s16 *speed;
     if (SceneActorReaction_TakePrepared(actor)) {
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         context->pendingHits = 0;
     }
     Golem_GetDirectionVariant(actor, &directionVariant, &mirror);

@@ -17,11 +17,11 @@ static inline u8 TakeFlag(u8 *flag)
     return FALSE;
 }
 
-void Skeleton_ClearDirectionalEntryFlag(struct SceneActorAnimationView *s)
+void Skeleton_ClearDirectionalEntryFlag(struct RoomActor *s)
 {
     struct Seq *seq = (struct Seq *)((u8 *)s->drawable + 0x48);
 
-    if (TakeFlag(&s->directionalEntryFlag)) {
+    if (TakeFlag(&s->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(s, 0xE);
         s->restart = 0;
     }

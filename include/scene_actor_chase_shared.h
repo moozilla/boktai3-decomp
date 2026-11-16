@@ -379,7 +379,7 @@ static inline u8 SceneActorChase_BeginContactAnimation(struct SceneActorRegistry
     if (!actor->group.hitReactionLatch && (actor->base.field2E6 & 8)) {
         actor->base.field2B8 = 0x2D;
         actor->group.hitReactionLatch = 0x41;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         return 1;
     }
     return 0;

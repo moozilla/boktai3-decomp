@@ -75,7 +75,7 @@ void SceneActorReaction_PlayStaggerBurst(struct SceneActorRegistryResetView *act
         actor->base.behavior2AA = 0;
         actor->base.counter2AC = 0;
         actor->base.field2B1 = 1;
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         {
             u16 *flags = &actor->base.flags2D4;
             u32 mask = ~0x20;

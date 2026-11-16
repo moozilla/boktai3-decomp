@@ -24,7 +24,7 @@ void Mummy_ResumeRouteAfterRecovery(struct SceneActorRegistryResetView *actor, s
          (sequence->elapsed == (sequence->duration != 0))) &&
         (sequence->duration != 1))
         sequence->elapsed = 0;
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         struct SceneActorChaseGroup *group = &actor->group;
         actor->base.field2B0 = 1;
         if (SceneActorChase_QueryMotionFlags(actor, 2)) {

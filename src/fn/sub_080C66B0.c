@@ -58,14 +58,14 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
         drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
         savedSelection = &actor->base.animationIndex;
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
@@ -122,7 +122,7 @@ void Golem_UpdateRouteMotion(struct SceneActorRegistryResetView *actor, u32 fram
     u8 *body = actor->base.context;
     struct GolemRouteMotion *motion = (void *)((u8 *)actor + 0x50);
     if (TakeFlag(&actor->base.field2B2))
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     Golem_SetMotionFlags(actor, 0x100);
     {
         u8 directionVariant, mirror;

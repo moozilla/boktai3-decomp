@@ -46,8 +46,7 @@ void Lun_GetDirectionalFrame(u8, u32 *, u32 *);
 s32 Mod(s32, s32);
 void Player_SubtractEnergy(void *, u32);
 void sub_0813D834(void *, u32, u32);
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -58,7 +57,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -68,7 +67,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))

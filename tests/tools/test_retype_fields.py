@@ -47,6 +47,27 @@ class Lines(unittest.TestCase):
         self.assertEqual([s[a:b] for a, b in rf.call_arguments(s, 1)], ["a(b, c)", " d[1]", " e"])
 
 
+class Steps(unittest.TestCase):
+    def test_room_actor_steps_parse(self):
+        steps = rf.read_steps(os.path.join(ROOT, "tools", "retype", "room_actor.txt"))
+        kinds = [k for k, _, _ in steps]
+        self.assertEqual(kinds[-1], "embed")  # the embedding runs after every rename
+        self.assertEqual(steps[-1][1], ["RoomActor", "base"])
+        self.assertIn(("types", [], {"SceneActorAnimationView": "RoomActor"}), steps)
+
+    def test_type_rename(self):
+        d = tempfile.mkdtemp(dir=os.path.join(ROOT, "build"))
+        try:
+            path = os.path.join(d, "t.c")
+            with open(path, "w") as f:
+                f.write("struct OldView *a; struct OldViewer *b;\n")
+            rf.replace_text([os.path.relpath(path, ROOT)], {"OldView": "RoomActor"}, regex=True)
+            with open(path) as f:
+                self.assertEqual(f.read(), "struct RoomActor *a; struct OldViewer *b;\n")
+        finally:
+            shutil.rmtree(d)
+
+
 @unittest.skipUnless(os.path.exists(os.path.join(ROOT, "build", "tools", "agbcc", "agbcc")), "needs agbcc")
 class EndToEnd(unittest.TestCase):
     """A unit and a header in a scratch copy of include/: macros, offsetof-style

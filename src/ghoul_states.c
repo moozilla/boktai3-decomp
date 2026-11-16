@@ -110,7 +110,7 @@ void Ghoul_UpdateAimedDiscThrow(struct SceneActorRegistryResetView *actor)
         }
         Sound_PlaySong(0xD6);
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         actor->base.field2B0 = 1;
 }
 
@@ -149,9 +149,9 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
         if (actor->base.behavior2AA != 6 && actor->base.behavior2AA != 17 &&
             !SceneActorTurn_Flags(motionFlags, 0x4480)) {
             target = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
-            actor->base.unknown3CD[0] = target;
+            actor->base.nextDirection = target;
         } else {
-            target = actor->base.unknown3CD[0];
+            target = actor->base.nextDirection;
         }
         if (direction == (target >> 1)) {
             actor->base.field2B0 = 1;
@@ -202,11 +202,11 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
                 }
                 break;
         }
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (sequence->elapsed == 0 && (sequence->index == 1 || sequence->index == 3)) {
-        s32 targetDirection = SceneActorTurn_OctantDirection(actor->base.unknown3CD[0]);
+        s32 targetDirection = SceneActorTurn_OctantDirection(actor->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
             difference = -difference;
@@ -218,9 +218,9 @@ void Ghoul_TurnTowardRoute(struct SceneActorRegistryResetView *actor)
             motion->direction -= 0x20;
     }
     SceneActorTurn_ApplyDuration(actor, motionFlags);
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         s32 current = ((actor->base.body.direction + 0x70) >> 5) & 7;
-        delta = actor->base.unknown3CD[0] - current;
+        delta = actor->base.nextDirection - current;
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {
@@ -287,7 +287,7 @@ void Ghoul_UpdateDeathAnimation(struct SceneActorRegistryResetView *actor, s32 f
         u16 flags = 0x10;
         actor->base.flags2D6 = flags | actor->base.flags2D6;
     }
-    if (actor->base.field2B3 && frame > 0x78)
+    if (actor->base.restart && frame > 0x78)
         actor->base.field2B0 = 1;
 }
 
@@ -328,6 +328,6 @@ void Ghoul_UpdateHiddenRecovery(struct SceneActorRegistryResetView *actor, s32 f
         *flags &= mask;
         actor->base.word104 = queued;
     } else {
-        actor->base.field2B3 = queued;
+        actor->base.restart = queued;
     }
 }

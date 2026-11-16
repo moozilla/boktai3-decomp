@@ -35,7 +35,7 @@ void SceneActor_BeginReactionAnimation(struct SceneActorRegistryResetView *actor
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 15);
         Sound_PlaySong(0x2A0);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         void (*callback)(void) = Ivy_UpdateActiveState_080E98B4;
         u32 kind = 0x22;
         u32 zero;

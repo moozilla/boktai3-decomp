@@ -123,7 +123,7 @@ static inline void Skeleton_StartHop(struct SceneActorRegistryResetView *actor,
     actor->base.body.direction = ((direction + 2) & 3) << 6;
     actor->base.secondaryMotion.y =
         (Skeleton_RandomSample((const u16 *)RANDOM_TABLE_ADDR) & 15) + 12;
-    SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 14);
+    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 14);
 }
 
 static inline void Skeleton_RestartGate(struct SceneActorRegistryResetView *actor)
@@ -139,7 +139,7 @@ void sub_080B9158(struct SceneActorRegistryResetView *actor)
         s32 direction = SceneActorTerrain_FindOpenNeighborDirection(actor, actor->base.field2B6);
         if (direction < 0) {
             struct SceneActorTimedBehaviorContext *context;
-            SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 15);
+            SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 15);
             SceneActorChase_SetFlagComponent(Skeleton_GateFlags(actor), 4);
             Skeleton_EnableMotionFlags(actor, 0x80);
             Skeleton_RestartGate(actor);
@@ -154,7 +154,7 @@ void sub_080B9158(struct SceneActorRegistryResetView *actor)
         Skeleton_StartHop(actor, direction, speed);
     }
     if (Skeleton_MovementFlags(actor, 0x10)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 15);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 15);
         SceneActorChase_SelectState(actor, 0, 0, 12);
         SceneActorChase_ResetStateEntry(actor);
         SceneActorChase_SetTypedControl(actor, group->common.gate.control, 0x1A);

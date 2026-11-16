@@ -77,6 +77,6 @@ void Ivy_BeginRelease(struct SceneActorRegistryResetView *actor)
             *flags &= mask;
         }
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         actor->base.field2B0 = 1;
 }

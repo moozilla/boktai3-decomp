@@ -55,8 +55,8 @@ void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *obj,
 void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
                                 struct SceneActorBehaviorContactView *destination,
                                 struct SceneActorRegistryResetView *actor);
-void TentacleBody_UpdateAttackWindup(struct SceneActorAnimationView *actor);
-void TentacleBody_ResetDirectionalPose(struct SceneActorAnimationView *actor);
+void TentacleBody_UpdateAttackWindup(struct RoomActor *actor);
+void TentacleBody_ResetDirectionalPose(struct RoomActor *actor);
 void TentacleBody_OnIdleState(void);
 void TentacleBody_UpdateInactiveState(void);
 void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *p, s32 time);
@@ -66,8 +66,8 @@ void TentacleBody_UpdateAnimationEleven(struct SceneActorRegistryResetView *p);
 void TentacleBody_UpdateSpreadWindup(struct SceneActorRegistryResetView *actor);
 void TentacleBody_UpdateSpreadPreparation(struct SceneActorRegistryResetView *actor);
 
-static inline void TentacleBody_SelectAnimation(struct SceneActorAnimationView *actor,
-                                                u32 selection, u32 variant, u32 flags)
+static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
+                                                u32 flags)
 {
     u32 force;
     if (flags & 0x10) {
@@ -77,7 +77,7 @@ static inline void TentacleBody_SelectAnimation(struct SceneActorAnimationView *
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -85,13 +85,13 @@ static inline void TentacleBody_SelectAnimation(struct SceneActorAnimationView *
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         selection += variant;
-        if (!force && actor->selection == selection && !actor->restart) {
+        if (!force && actor->animationIndex == selection && !actor->restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
             if (flags == 0 && !(tile->flags & 4))
                 return;
         }
-        actor->selection = selection;
+        actor->animationIndex = selection;
         {
             u32 mask = 4;
             u32 mode;

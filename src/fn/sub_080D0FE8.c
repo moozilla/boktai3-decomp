@@ -29,9 +29,9 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *a)
         direction = SceneActorTurn_Cardinal(motion->direction);
         if (a->base.behavior2AA != 6 && !(SceneActorTurn_Flags(motionFlags, 0x480))) {
             target = (((u16)Route_GetCurrentPointFacing(motion->currentRoute) + 0x70) >> 5) & 7;
-            a->base.unknown3CD[0] = target;
+            a->base.nextDirection = target;
         } else {
-            target = a->base.unknown3CD[0];
+            target = a->base.nextDirection;
         }
         if (direction == (target >> 1)) {
             a->base.field2B0 = 1;
@@ -44,7 +44,7 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *a)
             }
             return;
         }
-        a->base.unknown3CD[0] = target;
+        a->base.nextDirection = target;
         switch (direction) {
             case 0:
                 if ((u32)(target - 2) <= 3) {
@@ -83,10 +83,10 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *a)
                 }
                 break;
         }
-        a->base.field2B3 = 0;
+        a->base.restart = 0;
     }
     if (MummyTurn_Elapsed(sequence) == 0) {
-        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.unknown3CD[0]);
+        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
             difference = -difference;
@@ -98,9 +98,9 @@ void Mummy_TurnTowardRoute(struct SceneActorRegistryResetView *a)
             motion->direction -= 0x15;
     }
     SceneActorTurn_ApplyDuration(a, motionFlags);
-    if (a->base.field2B3) {
+    if (a->base.restart) {
         s32 current = ((motion->direction + 0x70) >> 5) & 7;
-        delta = a->base.unknown3CD[0] - current;
+        delta = a->base.nextDirection - current;
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {

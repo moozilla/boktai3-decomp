@@ -69,7 +69,7 @@ void sub_080E0750(struct SceneActorRegistryResetView *actor)
             s32 value = Dog_ReadSecondaryZ(actor);
             actor->base.secondaryMotion.z = Dog_QuarterDisplacement(&value);
         }
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         mask = 0x20;
         flags = &actor->base.flags2D4;
         mask |= *flags;
@@ -90,7 +90,7 @@ void sub_080E0750(struct SceneActorRegistryResetView *actor)
     *z += dz;
     if (!Dog_DisplacementStopped(dx, dz))
         goto moving;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         goto moving;
     group = &actor->group;
     actor->base.field2B0 = 1;

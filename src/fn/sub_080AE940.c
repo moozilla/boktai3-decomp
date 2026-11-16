@@ -9,7 +9,7 @@ struct VornApproachContext {
 };
 /* Vorn_UpdateApproachRange: tentative */
 u8 SceneActor_IsFacingNearbyTarget(struct SceneActorRegistryResetView *);
-void Vorn_SelectRetreatRoute(struct SceneActorAnimationView *, u32);
+void Vorn_SelectRetreatRoute(struct RoomActor *, u32);
 s32 Callback_InvokeActor(void *, void *);
 void Vorn_UpdateApproachRange(struct SceneActorRegistryResetView *actor)
 {

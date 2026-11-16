@@ -299,7 +299,7 @@ void SceneActorRegistry_RestoreActorDefaults(struct SceneActorRegistryActor *arg
             offset2 -= 0x22;
             actor->base.field2B2 = one;
             fieldOffset += 3;
-            actor->base.field2B3 = byteZero;
+            actor->base.restart = byteZero;
             parameterOffset = ACTOR_OFFSET(group.common.gate.flags);
             asm("" : "+r"(parameterOffset));
             address = (u8 *)actor + parameterOffset;

@@ -21,7 +21,7 @@ void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
     unsigned long long originalOffset;
     if (TakeEntry(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
-        a->base.field2B3 = 0;
+        a->base.restart = 0;
     }
     originalOffset = 0x2C2;
     originalScale = (u16 *)((u8 *)a + originalOffset);
@@ -51,7 +51,7 @@ void Dog_UpdateArrivalAnimation(struct SceneActorRegistryResetView *a)
     else
         Anim_SetFrameDurationScale((u8 *)a->base.drawable + 0x20, *scale);
     a->base.field2C2 = saved;
-    if (a->base.field2B3) {
+    if (a->base.restart) {
         a->base.field2B0 = 1;
     }
 }

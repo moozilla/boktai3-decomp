@@ -130,9 +130,9 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
     u32 *cursor = &gRandomIndex;
     completedState = 1;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 10);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 10);
         {
-            u8 *entry = &actor->base.field2B3;
+            u8 *entry = &actor->base.restart;
             workValue = 0;
             *entry = workValue;
         }
@@ -151,7 +151,7 @@ void Vorn_UpdateDefeat(struct SceneActorRegistryResetView *actor)
         Vorn_SendMessage(actor);
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     if (!Vorn_ActorFlags(actor, 0x400)) {

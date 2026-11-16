@@ -27,13 +27,13 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0xD4);
             Sound_PlaySong(0x12A);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
@@ -77,7 +77,7 @@ void sub_08087A70(struct SceneActorRegistryResetView *actor, s32 frame)
     *z += dz;
     if (!Bat_DisplacementStopped(dx, dz))
         return;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);

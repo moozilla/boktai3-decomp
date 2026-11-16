@@ -15,9 +15,9 @@ void Dog_ResumeAfterReaction(struct SceneActorRegistryResetView *a)
     u16 flags;
     if (TakeEntry(a)) {
         SceneActorAnimation_SelectDirectionalEntry(a, 11);
-        a->base.field2B3 = 0;
+        a->base.restart = 0;
     }
-    if (!a->base.field2B3) {
+    if (!a->base.restart) {
         return;
     }
     group = (u8 *)&a->group.common;

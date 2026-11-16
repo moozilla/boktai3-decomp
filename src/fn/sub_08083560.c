@@ -2,7 +2,7 @@
 #include "scene_actor_control_motion.h"
 #include "player_cue_sequence.h"
 #include "scene_actor_terrain.h"
-void SceneActorAnimation_SelectDirectionalEntry(struct SceneActorAnimationView *, s32);
+void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 static inline u32 StepDrawable(struct SceneActorControlMotionDrawable *owner)
 {
     return PlayerCue_StepSequenceEnded(owner, &owner->sequence);

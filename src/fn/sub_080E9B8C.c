@@ -16,7 +16,7 @@ void SceneActor_EndReactionAnimation(struct SceneActorRegistryResetView *actor)
         }
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 16);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         ((struct SceneActorRegistryActor *)actor)->field178 = 0;
         actor->base.field2B0 = 1;
         if (!actor->base.drawableKind)

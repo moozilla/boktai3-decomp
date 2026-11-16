@@ -144,8 +144,8 @@ void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor)
         SceneActorTurn_SelectProfileAnimation((void *)actor, 2, 0, 0);
 }
 
-static inline void Crow_SelectAnimation(struct SceneActorAnimationView *actor, u32 selection,
-                                        u32 variant, u32 flags)
+static inline void Crow_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
+                                        u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -156,7 +156,7 @@ static inline void Crow_SelectAnimation(struct SceneActorAnimationView *actor, u
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -166,7 +166,7 @@ static inline void Crow_SelectAnimation(struct SceneActorAnimationView *actor, u
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -193,7 +193,7 @@ static inline void Crow_SelectAnimation(struct SceneActorAnimationView *actor, u
     *restart = 0;
 }
 
-void Crow_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
+void Crow_UpdateDirectionalPose(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry;
     struct SceneActorBody *body;
@@ -716,7 +716,7 @@ void Crow_UpdateWanderTimer(struct SceneActorRegistryResetView *actor)
         if (!Crow_TestFlags(four, context->flags)) {
             u8 result = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
             if (!result) {
-                if ((s32)actor->base.counter2AC > context->wanderTicks && actor->base.field2B3) {
+                if ((s32)actor->base.counter2AC > context->wanderTicks && actor->base.restart) {
                     SceneActorChase_SetBehavior(actor, 2);
                 } else {
                     actor->base.counter2AC++;

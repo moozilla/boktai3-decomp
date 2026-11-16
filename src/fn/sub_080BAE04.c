@@ -44,9 +44,9 @@ void sub_080BAE04(struct SceneActorRegistryResetView *a)
         if (a->base.behavior2AA != 6 && a->base.behavior2AA != 0x14 &&
             !SceneActorTurn_Flags(motionFlags, 0x4480)) {
             target = (((u16)Route_GetCurrentPointFacing(route) + 0x70) >> 5) & 7;
-            a->base.unknown3CD[0] = target;
+            a->base.nextDirection = target;
         } else {
-            target = a->base.unknown3CD[0];
+            target = a->base.nextDirection;
         }
         if (direction == (target >> 1)) {
             a->base.field2B0 = 1;
@@ -98,7 +98,7 @@ void sub_080BAE04(struct SceneActorRegistryResetView *a)
     }
     tile = (void *)&((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
     if (tile->elapsed == 0 && (u16)(tile->frame - 1) <= 1) {
-        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.unknown3CD[0]);
+        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
             difference = -difference;
@@ -110,17 +110,17 @@ void sub_080BAE04(struct SceneActorRegistryResetView *a)
             motion->direction -= 0x20;
     }
     SceneActorTurn_ApplyDuration(a, motionFlags);
-    if (a->base.field2B3) {
+    if (a->base.restart) {
         u8 *facing = &a->base.body.direction;
         s32 current = SkeletonTurn_Octant(*facing);
         s32 octantMask = -8;
         a->base.field2B0 = 1;
-        delta = SkeletonTurn_OctantDistance(a->base.unknown3CD[0], current | octantMask);
+        delta = SkeletonTurn_OctantDistance(a->base.nextDirection, current | octantMask);
         if (delta < 0)
             delta = -delta;
         if (delta == 0) {
             a->base.field2B0 = 1;
-            *facing = (a->base.unknown3CD[0] + 5) << 5;
+            *facing = (a->base.nextDirection + 5) << 5;
             SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
             if (SceneActorTurn_Flags(motionFlags, 0x400)) {
                 SceneActorChase_SetState(a, 3, 1, 0);

@@ -126,10 +126,10 @@ void SceneActorReaction_TryResumeRoute(struct SceneActorRegistryResetView *actor
     struct RouteResponseGroup *group = (void *)&actor->group.common;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.body.direction = (((actor->base.field2B6 + 3) & 7) << 5) - 64;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 0);
-        actor->base.field2B3 = 0;
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 0);
+        actor->base.restart = 0;
     }
-    if (frame > 60 && actor->base.field2B3) {
+    if (frame > 60 && actor->base.restart) {
         actor->base.field2B0 = 1;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
         SnapToRoute(group->destination, &group->route);

@@ -1,6 +1,6 @@
 #include "scene_actor_animation.h"
-void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationView *actor,
-                                                     s32 index, u32 variantArgument)
+void SceneActorAnimation_SelectDirectionFlagsVariant(struct RoomActor *actor, s32 index,
+                                                     u32 variantArgument)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
@@ -16,7 +16,7 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
     u8 *restart;
     {
         u8 *mirrorAddress = &mirror;
-        s32 quadrant = (((s32)actor->direction + 0x60) >> 6) & 3;
+        s32 quadrant = (((s32)actor->body.direction + 0x60) >> 6) & 3;
         mirrorPointer = mirrorAddress;
         if (quadrant > 1) {
             *mirrorPointer = 1;
@@ -41,7 +41,7 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
     }
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         {
             void *sequence = drawable->sequence;
@@ -58,7 +58,7 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct SceneActorAnimationV
         u8 *savedSelection;
 
         selection += variantArgument;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if ((flags == 1) && (tile->flags & 4)) {

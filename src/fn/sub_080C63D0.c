@@ -91,14 +91,14 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
         drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
         savedSelection = &actor->base.animationIndex;
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;

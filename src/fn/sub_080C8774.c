@@ -195,7 +195,7 @@ static inline u8 Golem_Drift(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         u16 *flags;
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         if (actor->base.field2D8 & 0x400)
             Sound_PlaySong(0x18B);
         mask = 0x20;
@@ -226,7 +226,7 @@ void Golem_ResumeBehaviorAfterDisplacement(struct SceneActorRegistryResetView *a
     struct SceneActorChaseGroup *group = &actor->group;
     if (!Golem_Drift(actor))
         goto moving;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         goto moving;
     actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x20);

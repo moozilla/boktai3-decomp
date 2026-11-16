@@ -3,5 +3,5 @@ void SceneActorControl_UpdatePersistentAnimation(struct SceneActorRegistryResetV
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 15, 0);
-    actor->base.field2B3 = 0;
+    actor->base.restart = 0;
 }

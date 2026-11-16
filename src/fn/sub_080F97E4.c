@@ -1,7 +1,7 @@
 #include "scene_actor_control_phase.h"
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
-void SceneActorAnimation_SelectProfileEntry(struct SceneActorAnimationView *, s32);
+void SceneActorAnimation_SelectProfileEntry(struct RoomActor *, s32);
 void Axe_ClearForcedMovement(void *);
 void Axe_ResetMovementFlags(void *);
 static inline s32 Quarter(s32 v)

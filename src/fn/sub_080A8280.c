@@ -115,7 +115,7 @@ void TentacleBody_ReturnToCellCenter(struct SceneActorRegistryResetView *actor)
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Tentacle_ApplyDurationScale(actor);
-    difference = Tentacle_HeadingDifference(actor->base.unknown3CD[0], actor->base.body.direction);
+    difference = Tentacle_HeadingDifference(actor->base.nextDirection, actor->base.body.direction);
     {
         s32 magnitude = (difference < 0) ? (-difference) : (difference);
         if (magnitude > 8) {

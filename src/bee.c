@@ -107,8 +107,8 @@ static inline u8 Bee_TakeControlEntry(u8 *p)
     return 0;
 }
 
-static inline void Bee_SelectAnimation(struct SceneActorAnimationView *actor, u32 selection,
-                                       u32 variant, u32 flags)
+static inline void Bee_SelectAnimation(struct RoomActor *actor, u32 selection, u32 variant,
+                                       u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -119,7 +119,7 @@ static inline void Bee_SelectAnimation(struct SceneActorAnimationView *actor, u3
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -129,7 +129,7 @@ static inline void Bee_SelectAnimation(struct SceneActorAnimationView *actor, u3
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -156,14 +156,14 @@ static inline void Bee_SelectAnimation(struct SceneActorAnimationView *actor, u3
     *restart = 0;
 }
 
-void Bee_UpdateTurnAnimation(struct SceneActorAnimationView *actor)
+void Bee_UpdateTurnAnimation(struct RoomActor *actor)
 {
-    struct Bee *body = (void *)actor->link;
+    struct Bee *body = (void *)actor->context;
     u32 variant, flags;
-    if (Bee_TakeControlEntry(&actor->directionalEntryFlag)) {
+    if (Bee_TakeControlEntry(&actor->field2B2)) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
-        Bee_GetDirectionalFrameAndFlip(actor->direction, &variant, &flags);
+        Bee_GetDirectionalFrameAndFlip(actor->body.direction, &variant, &flags);
         {
             struct DisplaySequenceState *sequence =
                 &((struct BeeDrawable *)actor->drawable)->sequence;
@@ -171,20 +171,20 @@ void Bee_UpdateTurnAnimation(struct SceneActorAnimationView *actor)
         }
         Bee_SelectAnimation(actor, entry->value, variant, flags);
         {
-            u32 direction = actor->direction;
+            u32 direction = actor->body.direction;
             body->savedFacing = direction;
         }
-    } else if (body->savedFacing != actor->direction) {
+    } else if (body->savedFacing != actor->body.direction) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
         struct DisplaySequenceState *sequence = &((struct BeeDrawable *)actor->drawable)->sequence;
         u32 frame = sequence->index, time = sequence->elapsed;
-        Bee_GetDirectionalFrameAndFlip(actor->direction, &variant, &flags);
+        Bee_GetDirectionalFrameAndFlip(actor->body.direction, &variant, &flags);
         Bee_SelectAnimation(actor, entry->value, variant, flags);
         sequence->index = frame;
         sequence->elapsed = time;
         {
-            u32 direction = actor->direction;
+            u32 direction = actor->body.direction;
             body->savedFacing = direction;
         }
     } else
@@ -218,37 +218,37 @@ void Bee_UpdateRecoveryAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (Bee_TakeReadyFlag(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 5);
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         actor->base.field2B0 = 1;
 }
 
 // confidence=low: preserves sequence timing when the Bee changes facing without entering a state.
 
-void Bee_UpdateFacingAnimation(struct SceneActorAnimationView *actor)
+void Bee_UpdateFacingAnimation(struct RoomActor *actor)
 {
-    struct Bee *body = (void *)actor->link;
+    struct Bee *body = (void *)actor->context;
     u32 variant, flags;
-    if (Bee_TakeControlEntry(&actor->directionalEntryFlag)) {
+    if (Bee_TakeControlEntry(&actor->field2B2)) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
-        Bee_GetDirectionalFrameAndFlip(actor->facingAngle, &variant, &flags);
+        Bee_GetDirectionalFrameAndFlip(actor->tracking.heading, &variant, &flags);
         Bee_SelectAnimation(actor, entry->value, variant, flags);
         SceneActorAnimation_SelectDirectionalEntry(actor, 1);
         {
-            u32 direction = actor->facingAngle;
+            u32 direction = actor->tracking.heading;
             body->savedFacing = direction;
         }
-    } else if (body->savedFacing != actor->facingAngle) {
+    } else if (body->savedFacing != actor->tracking.heading) {
         struct SceneActorProfileEntry *entry =
             (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
         struct DisplaySequenceState *sequence = &((struct BeeDrawable *)actor->drawable)->sequence;
         u32 frame = sequence->index, time = sequence->elapsed;
-        Bee_GetDirectionalFrameAndFlip(actor->facingAngle, &variant, &flags);
+        Bee_GetDirectionalFrameAndFlip(actor->tracking.heading, &variant, &flags);
         Bee_SelectAnimation(actor, entry->value, variant, flags);
         sequence->index = frame;
         sequence->elapsed = time;
         {
-            u32 direction = actor->facingAngle;
+            u32 direction = actor->tracking.heading;
             body->savedFacing = direction;
         }
     } else
@@ -968,7 +968,7 @@ void Bee_BeginMoveToPosition(struct SceneActorRegistryResetView *actor,
         b[0] = target->x - a[0];
         b[1] = target->y - a[1];
         b[2] = target->z - a[2];
-        actor->base.unknown3CD[0] = Math_Atan2(b[0], b[2]);
+        actor->base.nextDirection = Math_Atan2(b[0], b[2]);
         Bee_FillMotion(&context->motion, stack, zero);
     }
 }
@@ -1472,7 +1472,7 @@ void Bee_UpdateReactionPhase(struct SceneActorRegistryResetView *actor)
             actor->base.word104 = 0;
         }
     }
-    if ((s32)actor->base.counter2AC > 0x28 && actor->base.field2B3)
+    if ((s32)actor->base.counter2AC > 0x28 && actor->base.restart)
         Bee_ResetBehavior(actor, 2, 3);
     actor->base.counter2AC++;
 }

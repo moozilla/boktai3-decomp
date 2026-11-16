@@ -44,13 +44,13 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
     s16 *x, *z;
     s32 dx, dz;
     if (SceneActorReaction_TakePrepared(actor)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x1CB);
             Sound_PlaySong(0x12A);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     Vorn_SetStatusFlags(actor, 0x10000);
@@ -90,7 +90,7 @@ void Vorn_UpdateStaggerRecovery(struct SceneActorRegistryResetView *actor, s32 f
     *z += dz;
     if (!Vorn_DisplacementStopped(dx, dz))
         return;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     SceneActorChase_ClearMotionFlagComponent(actor, 0x120);

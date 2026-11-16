@@ -39,7 +39,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     struct ContactPackedVector jitter;
     struct ContactPosition *step;
     if (SceneActorReaction_TakePrepared(p)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x14);
         Sound_PlaySong(0x3AB);
     }
     heading = &p->base.body.direction;
@@ -62,7 +62,7 @@ void SceneActorReaction_TickForwardBurst(struct SceneActorRegistryResetView *p_)
     jitter.y = 0;
     jitter.z = 0x52;
     SceneParticleBurst_CreateWithPause(&p->base.body.position, step, &jitter, 1, 2, 4);
-    if (p->base.field2B3) {
+    if (p->base.restart) {
         void (*f)(void) = Skeleton_TickDecayingLunge;
         u32 k = 0x29;
         u32 *w;

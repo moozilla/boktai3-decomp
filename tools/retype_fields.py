@@ -332,36 +332,99 @@ def macro_site(line_text, old, new, path, header_defs, load, depth=3):
     return None
 
 
+def read_steps(path):
+    """[(kind, args)] from a steps file: blocks headed `[embed TYPE MEMBER]`, `[map]`,
+    `[types]` (old and new struct tags) or `[text]` (literal old and new text), each
+    followed by `old new` lines."""
+    steps = []
+    for raw in open(path):
+        ln = raw.split("#", 1)[0].strip()
+        if not ln:
+            continue
+        if ln.startswith("["):
+            head = ln.strip("[]").split()
+            steps.append((head[0], head[1:], {}))
+            continue
+        old, new = ln.split()
+        steps[-1][2].setdefault(old, new)
+    return steps
+
+
+def replace_text(files, pairs, regex=False):
+    """Literal (or `struct OLD` -> `struct NEW` with regex) replacement in the files."""
+    changed = []
+    for path in files:
+        full = os.path.join(ROOT, path)
+        with open(full) as f:
+            text = f.read()
+        new = text
+        for old, rep in pairs.items():
+            if regex:
+                new = re.sub(r"\bstruct " + re.escape(old) + r"\b", "struct " + rep, new)
+            else:
+                new = new.replace(old, rep)
+        if new != text:
+            with open(full, "w") as f:
+                f.write(new)
+            changed.append(path)
+    return changed
+
+
+def embed_pairs(spell, member):
+    spell = spell if spell.startswith(("struct ", "union ")) else "struct " + spell
+    return {name: f"{member}.{name}" for name in top_members(spell)}
+
+
+def report(changed, unsettled, failed, dry_run):
+    for path in changed:
+        print(("would rewrite " if dry_run else "rewrote ") + path)
+    for msg in unsettled.values():
+        print(f"UNSETTLED {msg}")
+    for src, lines in failed.items():
+        print(f"ERROR {src}: " + "\n    ".join(lines))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("files", nargs="*")
     ap.add_argument("--map", help="file of `old new` pairs")
     ap.add_argument("--embed", nargs=2, metavar=("TYPE", "MEMBER"),
                     help='add `f MEMBER.f` for each top-level member of TYPE')
+    ap.add_argument("--steps", help="replay a steps file (see read_steps), e.g. tools/retype/room_actor.txt")
     ap.add_argument("--dependents", nargs="+", metavar="HEADER", help="units that include these headers")
     ap.add_argument("-j", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--dry-run", action="store_true", help="report the first round's rewrites, change nothing")
     a = ap.parse_args()
-    pairs = read_map(a.map) if a.map else {}
-    if a.embed:
-        spell = a.embed[0] if a.embed[0].startswith(("struct ", "union ")) else "struct " + a.embed[0]
-        for name in top_members(spell):
-            pairs.setdefault(name, f"{a.embed[1]}.{name}")
-    if not pairs:
-        sys.exit("nothing to rewrite: give --map and/or --embed")
     files = list(a.files)
     if a.dependents:
         import header_dependents
         files += header_dependents.dependents(a.dependents)
+    files = sorted(set(files))
     if not files:
         sys.exit("no files")
-    changed, unsettled, failed = run(sorted(set(files)), pairs, a.j, a.dry_run)
-    for path in changed:
-        print(("would rewrite " if a.dry_run else "rewrote ") + path)
-    for msg in unsettled.values():
-        print(f"UNSETTLED {msg}")
-    for src, lines in failed.items():
-        print(f"ERROR {src}: " + "\n    ".join(lines))
+    if a.steps:
+        steps = read_steps(a.steps)
+    else:
+        pairs = read_map(a.map) if a.map else {}
+        if a.embed:
+            for k, v in embed_pairs(*a.embed).items():
+                pairs.setdefault(k, v)
+        if not pairs:
+            sys.exit("nothing to rewrite: give --map, --embed or --steps")
+        steps = [("map", [], pairs)]
+    unsettled, failed = {}, {}
+    for kind, args, pairs in steps:
+        if kind in ("types", "text"):
+            if not a.dry_run:
+                for path in replace_text(files, pairs, regex=kind == "types"):
+                    print(f"rewrote {path} ({kind})")
+            continue
+        if kind == "embed":
+            pairs = {**embed_pairs(*args), **pairs}
+        changed, unsettled, failed = run(files, pairs, a.j, a.dry_run)
+        report(changed, unsettled, {} if a.steps else failed, a.dry_run)
+    if a.steps and failed:
+        report([], {}, failed, a.dry_run)
     print(f"{len(files)} units; {len(unsettled)} lines to edit by hand; {len(failed)} with other errors")
     sys.exit(1 if unsettled or failed else 0)
 

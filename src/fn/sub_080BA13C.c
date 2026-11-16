@@ -16,7 +16,7 @@ void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
     u32 *flags;
     u32 queued;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 5);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 5);
     if (animation[10] == 2 && animation[6] == 0)
         Sound_PlaySong(0x3A9);
     if (animation[10] == 3) {
@@ -52,7 +52,7 @@ void SceneActorReaction_TickQueuedContact(struct SceneActorRegistryResetView *p)
             *w = m & *w;
             p->base.word104 = z;
         }
-    } else if (p->base.field2B3) {
+    } else if (p->base.restart) {
         void (*f)(void) = Skeleton_UpdateAttackRecovery;
         u32 k = 0x24;
         u32 z;

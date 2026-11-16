@@ -65,13 +65,13 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct SceneActorRegistryResetView *ac
         *(u16 *)(reaction + 0x14) = 0;
         *(u16 *)(reaction + 8) = 0;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     if (frame <= 0x3B) {
         sequence->frame = 0;
         sequence->timer = 0;
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         ((struct RecoveryCounter *)((u8 *)actor + 0xAA))->value &= 0;
         actor->base.field2B0 = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

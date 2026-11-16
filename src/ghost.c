@@ -188,8 +188,8 @@ void Player_SubtractEnergy(void *, u32);
 
 void sub_0813D834(void *, u32, u32);
 
-static inline void Ghost_SelectDirectionalAnimation(struct SceneActorAnimationView *actor,
-                                                    u32 selection, u32 variant, u32 flags)
+static inline void Ghost_SelectDirectionalAnimation(struct RoomActor *actor, u32 selection,
+                                                    u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -200,7 +200,7 @@ static inline void Ghost_SelectDirectionalAnimation(struct SceneActorAnimationVi
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -210,7 +210,7 @@ static inline void Ghost_SelectDirectionalAnimation(struct SceneActorAnimationVi
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -237,7 +237,7 @@ static inline void Ghost_SelectDirectionalAnimation(struct SceneActorAnimationVi
     *restart = 0;
 }
 
-static inline u16 Ghost_SetEffectFlags(struct SceneActorAnimationView *a, u16 mask)
+static inline u16 Ghost_SetEffectFlags(struct RoomActor *a, u16 mask)
 {
     u16 *p = &((struct SceneActorRegistryResetView *)a)->base.flags2D6;
     return *p = mask | *p;
@@ -250,15 +250,15 @@ static inline s32 Ghost_UnwrapProgressCounter(s32 n)
 
 // confidence=low: drains player energy while tracking the player's wrapping progress counter.
 
-void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
+void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor)
 {
-    struct Ghost *body = actor->link;
+    struct Ghost *body = actor->context;
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
     u32 variant, flags, selection;
     s32 delta;
     u8 *elapsed;
-    if (SceneActorControl_TakeFlag(&actor->directionalEntryFlag)) {
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         {
             u32 value = gPlayers[0]->facingChangeEffects;
             u8 *p = &body->drainStart;
@@ -268,7 +268,7 @@ void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
         }
         ((struct SceneActorRegistryResetView *)actor)->base.field2C2 = 16;
     }
-    Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
+    Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     selection = entry->value;
     Ghost_SelectDirectionalAnimation(actor, selection, variant, flags);
     if (((struct SceneActorRegistryResetView *)actor)->base.paletteOffset == 0) {
@@ -301,29 +301,29 @@ void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor)
         *elapsed = delta;
     }
     if (body->drainElapsed > body->drainDuration)
-        actor->unknown2B0 = 1;
+        actor->field2B0 = 1;
 }
 
-void Ghost_UpdateDirectionalPose(struct SceneActorAnimationView *actor)
+void Ghost_UpdateDirectionalPose(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry;
     u32 variant, flags, selection;
-    if (actor->directionalEntryFlag)
-        actor->directionalEntryFlag = 0;
+    if (actor->field2B2)
+        actor->field2B2 = 0;
     entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
-    Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
+    Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     selection = entry->value;
     Ghost_SelectDirectionalAnimation(actor, selection, variant, flags);
 }
 
-void Ghost_UpdateDirectionalPoseB(struct SceneActorAnimationView *actor)
+void Ghost_UpdateDirectionalPoseB(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry;
     u32 variant, flags, selection;
-    if (SceneActorControl_TakeFlag(&actor->directionalEntryFlag))
+    if (SceneActorControl_TakeFlag(&actor->field2B2))
         ((struct SceneActorRegistryResetView *)actor)->base.field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 1);
-    Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
+    Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 1);
     selection = entry->value;
     Ghost_SelectDirectionalAnimation(actor, selection, variant, flags);
@@ -346,7 +346,7 @@ void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor)
     struct ActorAnim *sequence;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 current = ((((s32)actor->base.body.direction) + 0x70) >> 5) & 7;
-        u8 desired = actor->base.unknown3CD[0];
+        u8 desired = actor->base.nextDirection;
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->base.body.direction = desired;
@@ -405,7 +405,7 @@ void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor)
     }
 }
 
-static inline u16 Ghost_SetAnimationFlags(struct SceneActorAnimationView *actor, u16 mask)
+static inline u16 Ghost_SetAnimationFlags(struct RoomActor *actor, u16 mask)
 {
     u16 *p = &((struct SceneActorRegistryResetView *)actor)->base.flags2D6;
     return *p = mask | *p;
@@ -413,20 +413,20 @@ static inline u16 Ghost_SetAnimationFlags(struct SceneActorAnimationView *actor,
 
 // confidence=low: selects Ghost's waiting animation and marks the wait complete after 60 ticks.
 
-void Ghost_UpdateWaitingAnimation(struct SceneActorAnimationView *actor, s32 frame)
+void Ghost_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
 {
     struct SceneActorProfileEntry *entry;
     u32 variant, flags, selection;
-    if (actor->directionalEntryFlag)
-        actor->directionalEntryFlag = 0;
-    Ghost_GetDirectionalFrame(actor->direction, &variant, &flags);
+    if (actor->field2B2)
+        actor->field2B2 = 0;
+    Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     entry = (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 11);
     selection = entry->value;
     Ghost_SelectDirectionalAnimation(actor, selection, variant, flags);
     if (frame <= 29)
         Ghost_SetAnimationFlags(actor, 32);
     if (frame > 59)
-        actor->unknown2B0 = 1;
+        actor->field2B0 = 1;
 }
 
 // confidence=low: recoil callback selects animation 15 and completes after sixty ticks.
@@ -640,7 +640,7 @@ void Ghost_UpdateDefeat(struct SceneActorRegistryResetView *actor)
             EffectManager_SpawnParticlesAt(count, 0, ctx->particleStyle, pos, pieces, 300, 120);
         }
     }
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     SceneActorBehavior_CallTerrainScript(actor);
@@ -932,7 +932,7 @@ void Ghost_ChooseRouteDestination(struct SceneActorRegistryResetView *actor)
             endpoint->z -= position->z;
         }
 
-        actor->base.unknown3CD[0] = Math_Atan2(target->x, endpoint->z);
+        actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
         ZeroFill8(&state->motion);
     }
     actor->base.counter2AC++;
@@ -1594,7 +1594,7 @@ void Ghost_StartMovementToPosition(struct SceneActorRegistryResetView *actor, s1
         delta[0] = destination[0] - position[0];
         delta[1] = destination[1] - position[1];
         delta[2] = destination[2] - position[2];
-        actor->base.unknown3CD[0] = Math_Atan2(delta[0], delta[2]);
+        actor->base.nextDirection = Math_Atan2(delta[0], delta[2]);
         Ghost_FillMovementPosition(&context->motion, workspace, zero);
     }
 }
@@ -2792,7 +2792,7 @@ void Ghost_ChooseMovementDestination(struct SceneActorRegistryResetView *actor)
             endpoint->z -= position->z;
         }
 
-        actor->base.unknown3CD[0] = Math_Atan2(target->x, endpoint->z);
+        actor->base.nextDirection = Math_Atan2(target->x, endpoint->z);
         ZeroFill8(&state->motion);
         return;
     }
@@ -2999,7 +2999,7 @@ static inline void Ghost_SetAnimationIndex(struct SceneActorRegistryResetView *a
 
 static inline u8 Ghost_GetAnimationRestart(struct SceneActorRegistryResetView *actor)
 {
-    return actor->base.field2B3;
+    return actor->base.restart;
 }
 
 static inline void Ghost_InitializeScriptFields(struct SceneActorRegistryResetView *actor,
@@ -3196,7 +3196,7 @@ static inline void Ghost_SelectAnimation(struct SceneActorRegistryResetView *act
                 tile->flags &= ~4;
         }
     }
-    actor->base.field2B3 = 0;
+    actor->base.restart = 0;
 }
 
 static inline void Ghost_InitializeDrawable(struct SceneActorRegistryResetView *actor, u32 *fill)

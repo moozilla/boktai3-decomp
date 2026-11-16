@@ -26,7 +26,7 @@ void SceneActor_UpdateDelayedAnimation(struct SceneActorRegistryResetView *s)
             else
                 SceneActorAnimation_SelectDirectionalEntryFlags((void *)s, 14, 4);
         }
-    } else if (s->base.field2B3) {
+    } else if (s->base.restart) {
         SceneActorAnimation_SelectDirectionalEntry((void *)s, 0);
         s->base.field2B0 = 1;
     }

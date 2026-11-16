@@ -74,7 +74,7 @@ void Skeleton_UpdateHomingBurst(struct SceneActorRegistryResetView *p, s32 tick)
         }
         Sound_PlaySong(0x3A8);
     }
-    SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x14);
+    SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x14);
     if (tick > 0x18) {
         void (*f)(void) = Skeleton_UpdateHeavyAttackRecovery;
         u32 k = 0x2E;

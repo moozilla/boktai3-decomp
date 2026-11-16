@@ -14,7 +14,7 @@ void Golem_UpdateChargeRecovery(struct SceneActorRegistryResetView *actor)
     u8 directionVariant, mirror;
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.field2B0 = 0;
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         context->charge.phase = 0;
         {
             u32 angle = (context->charge.savedDirection + 0x60) >> 6;

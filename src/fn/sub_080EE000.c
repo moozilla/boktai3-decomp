@@ -111,7 +111,7 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 {
     struct IvyTransitionAnimation *animation = (void *)((*((u8 **)(p + 4))) + 0x48);
     if (SceneActorControl_TakeFlag(&((struct IvyTransitionActor *)p)->prepared)) {
-        SceneActorAnimation_SelectDirectionalFlags((struct SceneActorAnimationView *)p, 3);
+        SceneActorAnimation_SelectDirectionalFlags((struct RoomActor *)p, 3);
         ((struct IvyTransitionActor *)p)->complete = 0;
         Ivy_SetBlend(p);
         Ivy_SetHalf(p, 0x2C0, 0x800);

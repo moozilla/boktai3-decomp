@@ -64,7 +64,7 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
     u16 script;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
@@ -104,7 +104,7 @@ void Bat_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 frame)
         drawable->alpha8 = 0x40;
         drawable->alpha9 = 0x40;
     }
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     actor->base.field2B0 = 1;
     if (!Flag(actor, 0x400, 0x2CC)) {

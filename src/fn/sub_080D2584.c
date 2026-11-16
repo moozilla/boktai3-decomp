@@ -35,13 +35,13 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
             SceneActorDisplacement_Quarter(actor->base.secondaryMotion.x);
         actor->base.secondaryMotion.z =
             SceneActorDisplacement_Quarter(actor->base.secondaryMotion.z);
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 3);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 3);
         if (SceneActorChase_QueryMotionFlagComponent(actor, 8)) {
             Sound_PlaySong(0x12A);
             Sound_PlaySong(0xFD);
         }
         SceneActorChase_ClearMotionFlagComponent(actor, 1);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
     {
@@ -85,7 +85,7 @@ void Mummy_UpdateDisplacementRecovery(struct SceneActorRegistryResetView *actor,
     *z += dz;
     if (!Mummy_DisplacementStopped(dx, dz))
         return;
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     group = &actor->group;
     actor->base.field2B0 = 1;

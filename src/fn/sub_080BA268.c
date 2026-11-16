@@ -100,6 +100,6 @@ void sub_080BA268(struct SceneActorRegistryResetView *actor)
             Collider_SetAttackProperties(&context->attack, first, second, 0, flags, parameter);
         }
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         SceneActorChase_SetControl(actor, SceneActorReaction_ApplyThreshold, 0x3E);
 }

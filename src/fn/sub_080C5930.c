@@ -33,9 +33,9 @@ void sub_080C5930(struct SceneActorRegistryResetView *a)
         direction = SceneActorTurn_Cardinal(a->base.body.direction);
         if (a->base.behavior2AA != 6 && !(SceneActorTurn_Flags(motionFlags, 0x480))) {
             target = (((u16)Route_GetCurrentPointFacing(motion->currentRoute) + 0x70) >> 5) & 7;
-            a->base.unknown3CD[0] = target;
+            a->base.nextDirection = target;
         } else {
-            target = a->base.unknown3CD[0];
+            target = a->base.nextDirection;
         }
         if (direction == GolemTurn_Half(target)) {
             a->base.field2B0 = 1;
@@ -86,11 +86,11 @@ void sub_080C5930(struct SceneActorRegistryResetView *a)
                 }
                 break;
         }
-        a->base.field2B3 = 0;
+        a->base.restart = 0;
     }
     if (GolemTurn_Elapsed(
             ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence) == 0) {
-        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.unknown3CD[0]);
+        s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
             difference = -difference;
@@ -102,9 +102,9 @@ void sub_080C5930(struct SceneActorRegistryResetView *a)
             motion->direction -= 0x16;
     }
     SceneActorTurn_ApplyDuration(a, motionFlags);
-    if (a->base.field2B3) {
+    if (a->base.restart) {
         s32 current = ((a->base.body.direction + 0x70) >> 5) & 7;
-        delta = a->base.unknown3CD[0] - current;
+        delta = a->base.nextDirection - current;
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {

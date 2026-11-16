@@ -36,7 +36,7 @@ void SceneActor_UpdateAnimationCheckpoint(struct SceneActorRegistryResetView *ac
         if (sequence->frame == 4 && sequence->timer == 0)
             Mummy_FireAcceleratingVolley(actor);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         state->savedTick = state->currentTick;
         state->targetTick = state->currentTick + 30;
         actor->base.field2B0 = 1;

@@ -37,7 +37,7 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 3);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         {
             u16 *d = &actor->base.colliderA.flags;
             u32 flags = *d;
@@ -65,7 +65,7 @@ void Octopus_UpdateStagger(struct SceneActorRegistryResetView *actor, s32 frame)
         if (elapsed == (duration != 0) && duration != 1)
             sequence->elapsed = 0;
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2B0 = 0;
         {
             u16 bit = 0x20;

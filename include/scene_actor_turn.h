@@ -74,7 +74,7 @@ static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryReset
         {
             u8 *selectionAddress = &a->base.animationIndex;
             u32 previous = *selectionAddress;
-            if (!force && previous == selection && !a->base.field2B3) {
+            if (!force && previous == selection && !a->base.restart) {
                 if (flags == 1 && (tile->flags & 4))
                     return;
                 if (flags == 0 && !(tile->flags & 4))
@@ -97,11 +97,11 @@ static inline void SceneActorTurn_SelectAnimation(struct SceneActorRegistryReset
                 tile->flags &= ~4;
         }
     }
-    a->base.field2B3 = 0;
+    a->base.restart = 0;
 }
 
-static inline void SceneActorTurn_SelectProfileAnimation(struct SceneActorAnimationView *actor,
-                                                         s32 index, u32 variant, u32 flags)
+static inline void SceneActorTurn_SelectProfileAnimation(struct RoomActor *actor, s32 index,
+                                                         u32 variant, u32 flags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);

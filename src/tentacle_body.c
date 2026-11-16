@@ -28,34 +28,34 @@ void TentacleBody_OnBodyContact(struct SceneActorBehaviorContactView *source,
     TentacleActor_EnterHitReaction(actor);
 }
 
-void TentacleBody_UpdateAttackWindup(struct SceneActorAnimationView *actor)
+void TentacleBody_UpdateAttackWindup(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);
     u32 variant, flags;
-    if (TentacleSpread_Take(&actor->directionalEntryFlag)) {
-        TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+    if (TentacleSpread_Take(&actor->field2B2)) {
+        TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
         TentacleBody_RefreshDirectionalAnimations(
             ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
         TentacleActor_AssignSegmentPhases(
             ((struct SceneActorRegistryResetView *)actor)->base.context);
     } else {
-        TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+        TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
         TentacleBody_SelectAnimation(actor, entry[14].value, variant, flags);
         TentacleBody_RefreshDirectionalAnimations(
             ((struct SceneActorRegistryResetView *)actor)->base.context, 15);
     }
 }
 
-void TentacleBody_ResetDirectionalPose(struct SceneActorAnimationView *actor)
+void TentacleBody_ResetDirectionalPose(struct RoomActor *actor)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, 0);
     u32 variant, flags;
-    if (actor->directionalEntryFlag)
-        actor->directionalEntryFlag = 0;
-    TentacleBody_GetDirectionFrame(actor->direction, &variant, &flags);
+    if (actor->field2B2)
+        actor->field2B2 = 0;
+    TentacleBody_GetDirectionFrame(actor->body.direction, &variant, &flags);
     TentacleBody_SelectAnimation(actor, entry[17].value, variant, flags);
     TentacleBody_ResetDirectionalAnimations(
         ((struct SceneActorRegistryResetView *)actor)->base.context, 18);
@@ -91,7 +91,7 @@ void TentacleBody_UpdateTimedAction(struct SceneActorRegistryResetView *actor, s
     }
     if (frame == 40)
         TentacleBody_SetActionFlags(16, &actor->base.flags2D6);
-    if (actor->base.field2B3 && frame > 120)
+    if (actor->base.restart && frame > 120)
         actor->base.field2B0 = 1;
 }
 
@@ -131,7 +131,7 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
         *flags &= mask;
         actor->base.word104 = queued;
     } else {
-        actor->base.field2B3 = queued;
+        actor->base.restart = queued;
     }
 }
 
@@ -141,7 +141,7 @@ void TentacleBody_UpdateHiddenTransition(struct SceneActorRegistryResetView *act
 
 static inline u8 TentacleBody_IsAnimationReady(struct SceneActorRegistryResetView *actor)
 {
-    return actor->base.field2B3;
+    return actor->base.restart;
 }
 
 void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
@@ -194,7 +194,7 @@ void ActorTrail_RestoreSavedState(struct SceneActorRegistryResetView *actor)
         actor->base.field2B0 = 0;
         actor->base.field2B1 = 1;
         actor->base.field2B2 = 1;
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         actor->base.field304 = 0;
         actor->base.field2B6 = 0;
         actor->base.field2C2 = 64;
@@ -214,7 +214,7 @@ void TentacleBody_UpdateAnimationEleven(struct SceneActorRegistryResetView *acto
 {
     if (TentacleSpread_Take(&actor->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(actor, 11);
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         actor->base.field2B0 = 1;
 }
 
@@ -520,8 +520,7 @@ void TentacleBody_UpdateChargeSpread(struct SceneActorRegistryResetView *actor, 
 void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
-        ((struct SceneActorAnimationView *)actor)->profileId,
-        ((struct SceneActorAnimationView *)actor)->profileMode, 0);
+        ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
     struct TentacleBody *body = actor->base.context;
     u32 variant;
     u32 flags;
@@ -586,8 +585,7 @@ void TentacleBody_BeginDirectedAttack(struct SceneActorRegistryResetView *actor)
 void TentacleBody_UpdateAttackRecovery(struct SceneActorRegistryResetView *actor, s32 frame)
 {
     struct SceneActorProfileEntry *entry = (void *)SceneActorProfiles_GetEntryAddress(
-        ((struct SceneActorAnimationView *)actor)->profileId,
-        ((struct SceneActorAnimationView *)actor)->profileMode, 0);
+        ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
     u32 variant, flags;
     if (actor->base.field2B2)
         actor->base.field2B2 = 0;

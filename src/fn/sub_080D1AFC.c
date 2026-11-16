@@ -43,12 +43,12 @@ void Mummy_ResumeSavedTarget(struct SceneActorRegistryResetView *actor, s32 fram
     struct BatAnim *anim = &((struct BatDrawable *)actor->base.drawable)->anim;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     if (frame > 42) {
         u8 *group = (u8 *)&actor->group.common;
         u16 blocked;
-        if (!actor->base.field2B3) {
+        if (!actor->base.restart) {
             return;
         }
         actor->base.field2B0 = 1;

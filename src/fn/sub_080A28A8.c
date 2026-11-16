@@ -58,7 +58,7 @@ void Spider_UpdateContactWindup(struct SceneActorRegistryResetView *a, s32 n)
                                                  a->base.attacks.second[1],
                                                  a->base.attacks.parameter[1]);
     }
-    if (a->base.field2B3 && n > 60) {
+    if (a->base.restart && n > 60) {
         {
             struct ChaseFlags40 *p = (void *)&a->base.flags2D4;
             u32 mask = ~0x100;

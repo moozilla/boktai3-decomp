@@ -16,7 +16,7 @@ void SceneActorAnimation_EmitDirectionalTrail(struct SceneActorRegistryResetView
 {
     union SceneActorRegistryPackedPosition p;
     if (TakePrepared(a))
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 17);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 17);
     {
         struct DisplaySequenceState *sequence = (void *)((u8 *)a->base.drawable + 0x48);
         sequence->index = 0;

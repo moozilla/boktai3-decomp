@@ -18,8 +18,7 @@ static inline void SetAnimation(struct SceneActorRegistryResetView *actor, u8 st
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void Select(struct SceneActorAnimationView *actor, u32 selection, u32 variant,
-                          u32 flags)
+static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -30,7 +29,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
@@ -40,7 +39,7 @@ static inline void Select(struct SceneActorAnimationView *actor, u32 selection, 
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
-        savedSelection = &actor->selection;
+        savedSelection = &actor->animationIndex;
         restart = &actor->restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
@@ -92,12 +91,11 @@ void TentacleBody_UpdateDefeat(struct SceneActorRegistryResetView *actor, s32 fr
     u16 script;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 *entry = (void *)SceneActorProfiles_GetEntryAddress(
-            ((struct SceneActorAnimationView *)actor)->profileId,
-            ((struct SceneActorAnimationView *)actor)->profileMode, 0);
+            ((struct RoomActor *)actor)->profileId, ((struct RoomActor *)actor)->profileMode, 0);
         TentacleBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
         Select((void *)actor, entry[0x44], variant, flags);
         TentacleBody_ResetDirectionalAnimations(actor->base.context, 18);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
             struct ContactCollider *c = (void *)((u8 *)actor + 0x134);

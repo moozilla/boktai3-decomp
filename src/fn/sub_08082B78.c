@@ -12,5 +12,5 @@ void SceneActorControl_UpdateFacingAnimation(struct SceneActorRegistryResetView 
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 1);
         control->savedDirection = actor->base.body.direction;
     } else
-        actor->base.field2B3 = changed;
+        actor->base.restart = changed;
 }

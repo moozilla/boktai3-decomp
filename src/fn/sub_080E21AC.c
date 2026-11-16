@@ -35,7 +35,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
     u16 *flags;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
@@ -67,7 +67,7 @@ void SceneActorControl_BeginHiddenDefeat(struct SceneActorRegistryResetView *act
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
     SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
-    if (!actor->base.field2B3)
+    if (!actor->base.restart)
         return;
     {
         u32 mask = 0x400;

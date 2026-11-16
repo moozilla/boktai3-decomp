@@ -112,10 +112,10 @@ s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
     }
     if (SceneActorMotion_BehaviorBits(actor, 1))
         SceneActorMotion_SetFlags(actor, 0x40);
-    if (actor->base.field2B3 != 1) {
+    if (actor->base.restart != 1) {
         if (!actor->base.drawableKind) {
             struct SceneActorMotionSequence *drawable = actor->base.drawable;
-            actor->base.field2B3 =
+            actor->base.restart =
                 SceneActorMotion_StepSequence(drawable, &drawable->sequence, enabledBit);
         } else {
             void *drawable = actor->base.drawable;
@@ -123,7 +123,7 @@ s32 SceneActorMotion_Update(struct SceneActorRegistryActor *object)
             s32 ended = Anim_Step(state, drawable);
             u8 bits = (enabledBit & state->status);
             if (bits || ended)
-                actor->base.field2B3 = enabledBit;
+                actor->base.restart = enabledBit;
         }
     }
     if (SceneActorPlacement_IsUnavailable((void *)actor))

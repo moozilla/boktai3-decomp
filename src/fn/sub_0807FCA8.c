@@ -65,7 +65,7 @@ void SceneActorControl_UpdateContactRelease(struct SceneActorRegistryResetView *
             } else
                 *((u16 *)(((u8 *)input->base.drawable) + 0x2C)) = 0;
         }
-        if (input->base.field2B3) {
+        if (input->base.restart) {
             Callback_InvokeActor(input, *((void **)(group + 0x244)));
             *((void **)(group + 0x88)) = 0;
         }

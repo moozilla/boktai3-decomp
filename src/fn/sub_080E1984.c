@@ -34,6 +34,6 @@ void Dog_UpdateLeapWindup(struct SceneActorRegistryResetView *actor)
         *(struct ContactPosition *)(context + 0x6D8) =
             *(struct ContactPosition *)(*(u8 **)((u8 *)actor + 0xDC) + 0xC);
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         BeginControl(actor, Dog_LeapTowardTarget, 0x23);
 }

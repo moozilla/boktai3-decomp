@@ -20,7 +20,7 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryRes
     struct SceneActorTimedAttackContext *context = a->base.context;
     if (TakePrepared(a)) {
         u32 variant, palette;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 17);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 17);
         palette = a->base.paletteOffset;
         variant = 0;
         if (palette == 1)
@@ -31,6 +31,6 @@ void SceneActorAnimation_RefreshTimedAttackCollider(struct SceneActorRegistryRes
     }
     if (frame - 13 <= 10)
         Collider_Refresh(&context->collider);
-    if (a->base.field2B3)
+    if (a->base.restart)
         a->base.field2B0 = 1;
 }

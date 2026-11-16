@@ -9,7 +9,7 @@ void SceneActorReaction_TickContactAnimation(struct SceneActorRegistryResetView 
     u8 *category;
     u32 kind;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 5);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 5);
     kind = p->base.category;
     category = &p->base.category;
     if (kind == 5 && animation[10] == 2 && animation[6] == 0)
@@ -19,7 +19,7 @@ void SceneActorReaction_TickContactAnimation(struct SceneActorRegistryResetView 
         if (animation[6] == 0 && *category == 6)
             Sound_PlaySong(0x3AA);
     }
-    if (p->base.field2B3) {
+    if (p->base.restart) {
         void (*f)(void) = SceneActorReaction_ApplyThreshold;
         u32 k = 0x3e;
         u32 z;

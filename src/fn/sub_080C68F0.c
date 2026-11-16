@@ -7,7 +7,7 @@
 extern const u16 gUnk_08606130[];
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
-#define A(a) ((struct SceneActorAnimationView *)(a))
+#define A(a) ((struct RoomActor *)(a))
 static inline u8 TakeFlag(u8 *flag)
 {
     if (*flag) {
@@ -45,14 +45,14 @@ static inline void Golem_SelectAnimation(struct SceneActorRegistryResetView *act
         drawable = actor->base.drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
     } else {
         struct SceneActorAnimationTile *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
         savedSelection = &actor->base.animationIndex;
-        restart = &actor->base.field2B3;
+        restart = &actor->base.restart;
         if (!force && *savedSelection == selection && !*restart) {
             if (flags == 1 && (tile->flags & 4))
                 return;
@@ -87,9 +87,9 @@ void Golem_UpdateChargeStop(struct SceneActorRegistryResetView *actor)
         u8 directionVariant, mirror;
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 7, directionVariant, mirror | 4);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         {
             u16 *field = &actor->base.flags2D4;
             u32 mask = ~0x100;

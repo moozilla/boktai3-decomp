@@ -105,7 +105,7 @@ void Mummy_UpdateProbeNavigation(struct SceneActorRegistryResetView *actor)
             if (SceneActorRoute_TryRecoveryDetour(actor))
                 return;
             if (SceneActorChase_TestField((u16 *)&group->common.gate.flags, 1)) {
-                u32 saved = ((actor->base.unknown3CD[0] + 5) & 7) << 5;
+                u32 saved = ((actor->base.nextDirection + 5) & 7) << 5;
                 Mummy_BeginProbeTurn(actor, saved, randomSamples);
                 return;
             }

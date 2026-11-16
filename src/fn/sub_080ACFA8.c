@@ -29,7 +29,7 @@ void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
             return;
         }
         SceneActorAnimation_SelectDirectionalEntry(actor, 0);
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     if (Flags(actor, 0xA02F)) {
         u16 *p = &actor->base.field2C2;
@@ -46,7 +46,7 @@ void Vorn_UpdateIdleFacing(struct SceneActorRegistryResetView *actor)
         Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
         Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         group[9] = (*((u8 *)actor + 0x3CD) + 5) << 5;
         actor->base.field2B0 = 1;
         {

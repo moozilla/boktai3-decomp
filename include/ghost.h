@@ -125,15 +125,15 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
 void SceneActorBehavior_OnContactForward(u16 *source, void *destination,
                                          struct SceneActorRegistryResetView *actor);
 
-void Ghost_UpdateEnergyDrainAnimation(struct SceneActorAnimationView *actor);
+void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor);
 
-void Ghost_UpdateDirectionalPose(struct SceneActorAnimationView *actor);
+void Ghost_UpdateDirectionalPose(struct RoomActor *actor);
 
-void Ghost_UpdateDirectionalPoseB(struct SceneActorAnimationView *actor);
+void Ghost_UpdateDirectionalPoseB(struct RoomActor *actor);
 
 void Ghost_TurnTowardHeading(struct SceneActorRegistryResetView *actor);
 
-void Ghost_UpdateWaitingAnimation(struct SceneActorAnimationView *actor, s32 frame);
+void Ghost_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 
 void Ghost_UpdateRecoilAnimation(struct SceneActorRegistryResetView *actor, s32 tick);
 

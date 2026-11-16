@@ -5,7 +5,7 @@
 
 static inline u8 Spider_TargetDirection(struct SceneActorRegistryResetView *actor)
 {
-    return ((actor->base.unknown3CD[0] + 5) & 7) << 5;
+    return ((actor->base.nextDirection + 5) & 7) << 5;
 }
 
 static inline void Spider_StepDirection(struct SceneActorBody *body, s32 target, s32 step)
@@ -70,7 +70,7 @@ void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         body->direction = (SceneActorTurn_Cardinal(body->direction) << 6) - 64;
         direction = ((body->direction + 0x60) >> 6) & 3;
-        facing = actor->base.unknown3CD[0];
+        facing = actor->base.nextDirection;
         facing >>= 1;
         if (direction != facing) {
             difference = facing - direction;
@@ -104,7 +104,7 @@ void Spider_AdvanceTurnAnimation(struct SceneActorRegistryResetView *actor)
         Spider_StepDirection(body, target, 64);
     }
     Spider_ApplyDuration(actor);
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2B0 = 1;
         actor->base.body.direction = (Spider_ReadCardinal(actor->base.body.direction) << 6) - 64;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);

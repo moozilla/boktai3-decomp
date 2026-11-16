@@ -90,7 +90,7 @@ void Crow_UpdateAnimationSequence(struct SceneActorRegistryActor *actor);
 
 void Crow_PlayEntry2(struct SceneActorRegistryResetView *actor);
 
-void Crow_UpdateDirectionalPose(struct SceneActorAnimationView *actor);
+void Crow_UpdateDirectionalPose(struct RoomActor *actor);
 
 void Crow_OnSpecialAnimation(struct SceneActorRegistryResetView *p);
 

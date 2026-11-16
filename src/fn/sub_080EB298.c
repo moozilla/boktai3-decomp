@@ -39,9 +39,9 @@ void SceneActorReaction_ReacquireAdjacentTarget(struct SceneActorRegistryResetVi
 {
     if (SceneActorControl_TakeFlag(&a->base.field2B1)) {
         SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);
-        a->base.field2B3 = 0;
+        a->base.restart = 0;
     }
-    if (a->base.field2B3 || a->base.field2B5 == 34) {
+    if (a->base.restart || a->base.field2B5 == 34) {
         if (SceneActorReaction_FindAdjacentTarget(a, 1)) {
             if (!a->base.drawableKind) {
                 u32 *p = a->base.drawable;

@@ -8,13 +8,13 @@ void SceneActorReaction_TickMultiHitAnimation(struct SceneActorRegistryResetView
     u16 *animation = (u16 *)((u8 *)p->base.drawable + 0x20);
     u32 frame;
     if (SceneActorReaction_TakePrepared(p))
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)p, 0x17);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)p, 0x17);
     frame = animation[10];
     if ((u16)(frame - 3) <= 2 || (u16)(frame - 7) <= 2)
         Collider_Refresh(state + 0x678);
     if ((animation[10] == 4 || animation[10] == 7) && animation[6] == 0)
         Sound_PlaySong(0x3AA);
-    if (p->base.field2B3) {
+    if (p->base.restart) {
         void (*f)(void) = SceneActorReaction_ApplyThreshold;
         u32 k = 0x3e;
         u32 z;

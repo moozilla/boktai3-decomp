@@ -126,7 +126,7 @@ void sub_080ED4E0(struct SceneActorRegistryResetView *actor)
         Ivy_SetContactFlag(actor, 0x800);
     }
 
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         Ivy_DisableContact(actor);
         SceneActorChase_SetControl(actor, SceneActorReaction_FinishAnimation17, 0x27);
         SceneActorChase_SetState(actor, 0, 2, 3);

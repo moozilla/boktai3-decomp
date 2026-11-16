@@ -89,7 +89,7 @@ void Vorn_UpdateKnockbackRecovery(struct SceneActorRegistryResetView *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorChaseFlags16 *motion;
         actor->base.body.direction = (((actor->base.body.direction + 32) >> 6) & 3) << 6;
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)actor, 6);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)actor, 6);
         if (!Vorn_StatusFlags(actor, 2)) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0, 25);
             Vorn_SetStatusFlags(actor, 2);

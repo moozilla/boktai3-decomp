@@ -45,10 +45,10 @@ void SceneActorMotion_TestTargetTransition(struct SceneActorRegistryResetView *a
 {
     struct SceneActorTargetMotionContext *context = a->base.context;
     if (!TakePrepared(a)) {
-        SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 11);
+        SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 11);
         if ((u8)Dog_IsActionTimerExpired(a)) {
             u8 *tail = (u8 *)a + 0x3D4;
-            SceneActorAnimation_SelectDirectionalEntry((struct SceneActorAnimationView *)a, 0);
+            SceneActorAnimation_SelectDirectionalEntry((struct RoomActor *)a, 0);
             if (!TestMovement(a))
                 Callback_InvokeActor(a, *(void **)(tail + 0x224));
             else {

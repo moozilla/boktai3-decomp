@@ -154,7 +154,7 @@ void Slime_StartWalkChoice(struct SceneActorRegistryResetView *actor)
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         s32 r;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         r = *(u16 *)(gRandomIndex * 2 + (u32)gRandomTable);
@@ -202,7 +202,7 @@ void Slime_StartRandomWait(struct SceneActorRegistryResetView *actor)
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_UpdateRandomWait, 0x22);
 }
 
@@ -213,7 +213,7 @@ void Slime_UpdateReturnToIdle(struct SceneActorRegistryResetView *actor)
         actor->base.field2C2 = 0x40;
         Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         u8 *q = &actor->base.state2A8;
         u32 z;
         z = 0;
@@ -228,8 +228,8 @@ void Slime_UpdateReturnToIdle(struct SceneActorRegistryResetView *actor)
 
 // confidence=low: plays profile animation 15 with a random duration, then enters the next Slime control.
 
-static inline void Slime_SelectWaitAnimation(struct SceneActorAnimationView *actor, s32 index,
-                                             u32 variant, u32 inputFlags)
+static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index, u32 variant,
+                                             u32 inputFlags)
 {
     struct SceneActorProfileEntry *entry =
         (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
@@ -244,7 +244,7 @@ static inline void Slime_SelectWaitAnimation(struct SceneActorAnimationView *act
         force = 0;
     if (!actor->drawableKind) {
         struct SceneActorAnimationSequenceDrawable *drawable;
-        actor->selection = selection;
+        actor->animationIndex = selection;
         drawable = actor->drawable;
         Anim_SetSequence(drawable->sequence, (void *)drawable->resource, selection, variant, flags);
         restart = &actor->restart;
@@ -255,7 +255,7 @@ static inline void Slime_SelectWaitAnimation(struct SceneActorAnimationView *act
         u32 previous;
         u8 *savedSelection;
         selection += variant;
-        selectionAddress = &actor->selection;
+        selectionAddress = &actor->animationIndex;
         previous = *selectionAddress;
         savedSelection = selectionAddress;
         restart = &actor->restart;
@@ -303,7 +303,7 @@ void Slime_UpdateRandomWait(struct SceneActorRegistryResetView *actor)
         Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence,
                               actor->base.field2C2);
     }
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_PlayWaitAnimation, 0x23);
 }
 
@@ -311,7 +311,7 @@ void Slime_PlayWaitAnimation(struct SceneActorRegistryResetView *actor)
 {
     if (Slime_TakePrepared(actor))
         SceneActorTurn_SelectProfileAnimation((void *)actor, 15, 1, 0);
-    if (actor->base.field2B3)
+    if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_TickWaitTimer, 0x24);
 }
 
@@ -327,7 +327,7 @@ void Slime_TickWaitTimer(struct SceneActorRegistryResetView *actor)
     }
     if (q->waitTimer)
         q->waitTimer--;
-    else if (actor->base.field2B3)
+    else if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_UpdateRandomWait, 0x22);
 }
 
@@ -368,7 +368,7 @@ void Slime_UpdateWalkTransition(struct SceneActorRegistryResetView *p)
         SceneActorAnimation_SelectProfileEntry((void *)p, 0xe);
         Anim_SetDurationScale(&((struct SlimeDrawable *)p->base.drawable)->sequence, 0x40);
     }
-    if (p->base.field2B3 != 0) {
+    if (p->base.restart != 0) {
         u32 index = (gRandomIndex + 1) & 1023;
         s32 r;
         gRandomIndex = index;
@@ -417,7 +417,7 @@ static inline u8 Slime_HasContextFlag(struct Slime *p, u32 mask)
 
 static inline u32 Slime_IsReactionComplete(struct SceneActorRegistryResetView *actor)
 {
-    u32 complete = actor->base.field2B3;
+    u32 complete = actor->base.restart;
     return complete;
 }
 
@@ -441,7 +441,7 @@ void Slime_ConvergeReactionMotion(struct SceneActorRegistryResetView *actor)
             u32 mask = ~1;
             *flags = mask & *flags;
         }
-        actor->base.field2B3 = 0;
+        actor->base.restart = 0;
     }
     {
         u32 mask = 0x2000;
@@ -602,7 +602,7 @@ void Slime_UpdateStill(struct SceneActorRegistryResetView *actor)
             *f = mask & *f;
         }
     }
-    if (actor->base.field2B3) {
+    if (actor->base.restart) {
         actor->base.field2C2 = 0x40;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetState(actor, 0, 0, 2);
