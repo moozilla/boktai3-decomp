@@ -3495,10 +3495,12 @@ addr,name,mode,confidence,source,notes
 080AEB74,Vorn_TryRestorePatrolRoute,thumb,low,src-alias,
 080AEE08,Vorn_UpdateDefeat,thumb,low,src-alias,ordinary C: complete 984-byte match
 080AF1E0,Vorn_UpdateScriptedAction,thumb,low,src-alias,
+080AF2BC,Vorn_QueueDelayedResponse,thumb,low,src-alias,"after the wait, queue pursuit, the home route or a short wait"
 080AFBE4,Vorn_InitSpecialActionTable,thumb,low,src-alias,Installs the action table at actor offset 0x288; special action role is tentative
 080AFBF4,Vorn_UpdateAnimationRetries,thumb,low,src-alias,
 080AFD88,Vorn_UpdateDescriptorPursuit,thumb,low,src-alias,
 080AFEF0,Vorn_SelectPursuitAfterAction,thumb,low,src-alias,
+080B0038,Vorn_RestoreRouteMovement,thumb,low,src-alias,
 080B01A4,Vorn_UpdateRouteApproach,thumb,low,src-alias,
 080B03BC,SceneActorControl_WaitForRouteResult,thumb,low,src-alias,
 080B04F4,SceneActorControl_UpdateProbeApproach_080B04F4,thumb,low,src-alias,
@@ -3525,13 +3527,17 @@ addr,name,mode,confidence,source,notes
 080B162C,Vorn_TryUphillRoute,thumb,low,src-alias,
 080B18AC,Vorn_BeginAction16,thumb,low,src-alias,Queues action 16 and resets its callback and animation counters; specific action meaning is tentative
 080B1938,Vorn_SelectRecoveryAction,thumb,low,src-alias,Selects one of three actions using the recovery mode and eligibility test; recovery interpretation is tentative
+080B197C,Vorn_SelectReactionControl,thumb,low,src-alias,
 080B1A98,Vorn_BeginTargetPursuit,thumb,low,src-alias,
 080B1D8C,SceneActor_InitContextColliders,thumb,low,src-alias,
 080B1E60,SceneActor_ResetContextAnimation,thumb,low,src-alias,
 080B1EE8,Vorn_OnAnimationCleanup,thumb,low,src-alias,Empty callback installed by Vorn_Init; animation cleanup role is tentative
 080B1EEC,Vorn_InitActorProfile,thumb,low,src-alias,Clears profile state and finds or creates the category 25 actor profile
 080B1F10,Vorn_GetAnimationEvent,thumb,low,src-alias,Returns a table value for the current animation frame when its countdown expires and marks an event flag
+080B1F48,Vorn_SelectRandomBehavior,thumb,low,src-alias,
+080B1FA8,Vorn_SelectRouteAwayFromTarget,thumb,low,src-alias,"first route point on the far side from the target, else a random one"
 080B22D4,Vorn_ParseField624,thumb,low,src-alias,
+080B2354,Vorn_UpdateDelayedScript,thumb,low,src-alias,
 080B23A0,Vorn_BeginPursuitRoute,thumb,low,src-alias,
 080B2558,Vorn_InitMotionLimits,thumb,low,src-alias,Initializes three extended fields to zero and fixed-point limits; motion interpretation is tentative
 080B2580,Vorn_SelectReachableEscapeCell,thumb,low,src-alias,
@@ -3540,6 +3546,7 @@ addr,name,mode,confidence,source,notes
 080B303C,Vorn_ParseField688,thumb,low,src-alias,
 080B309C,Vorn_RunPendingScript,thumb,low,src-alias,Calls the stored script procedure once and clears its identifier
 080B30BC,Vorn_ParseField69A,thumb,low,src-alias,
+080B3110,Vorn_BeginResponsePursuit,thumb,low,src-alias,
 080B335C,SceneActor_IsFacingNearbyTarget,thumb,low,src-alias,
 080B33D8,Vorn_UpdateRecoveryCooldown,thumb,low,src-alias,Decrements the extended-state cooldown without underflow; recovery interpretation follows its action eligibility use
 080B33F8,Vorn_ResetRecoveryMode,thumb,low,src-alias,Clears the mode byte used to choose recovery actions; mode meaning is tentative

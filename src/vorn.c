@@ -56,7 +56,7 @@ extern const u8 gUnk_0824E20C[];
 
 s32 SceneActor_TryLaunchSelectedItem(u8 *);
 
-void sub_080B3110(u8 *, u32, const u8 *, u32);
+void Vorn_BeginResponsePursuit(u8 *, u32, const u8 *, u32);
 
 void Vorn_OnScriptActionRequest(u32 a, u32 b, u8 *p)
 {
@@ -65,7 +65,7 @@ void Vorn_OnScriptActionRequest(u32 a, u32 b, u8 *p)
         case 0:
             *(u16 *)(q + 0x682) = 1;
         case 1:
-            sub_080B3110(p, 1, gUnk_0824E20C, 0x4a);
+            Vorn_BeginResponsePursuit(p, 1, gUnk_0824E20C, 0x4a);
             break;
     }
 }
@@ -815,7 +815,7 @@ void Vorn_UpdateStaggerRecovery(struct ChaseActor *actor, s32 frame)
     }
 }
 
-void sub_080B1FA8(void *);
+void Vorn_SelectRouteAwayFromTarget(void *);
 
 static inline u8 Pending(u8 *context, u16 **out)
 {
@@ -853,7 +853,7 @@ void Vorn_UpdatePursuitWait(struct ChaseActor *input)
         *(u16 *)(context + 0x69C) = 0;
     } else if (Pending(context, &flags)) {
         if (a->base.tracking.distance <= 0x18FFF) {
-            sub_080B1FA8(a);
+            Vorn_SelectRouteAwayFromTarget(a);
             {
                 s32 mask = ~2;
                 ((struct ChaseFlags40 *)flags)->bits &= mask;
@@ -866,7 +866,7 @@ void Vorn_UpdatePursuitWait(struct ChaseActor *input)
             timer = (void *)(context + 0x69C);
             ++timer->value;
             if (timer->value > 120) {
-                sub_080B1FA8(a);
+                Vorn_SelectRouteAwayFromTarget(a);
                 {
                     s32 mask = ~2;
                     ((struct ChaseFlags40 *)flags)->bits &= mask;
@@ -911,7 +911,7 @@ void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
         near = Vorn_TestNear(context, 2, &flags);
         if (near) {
             if (context->nearTimer > 40) {
-                sub_080B1FA8(actor);
+                Vorn_SelectRouteAwayFromTarget(actor);
                 Chase_SetBehavior(actor, 15);
                 {
                     s32 mask = ~2;
@@ -928,7 +928,7 @@ void Vorn_UpdatePursuitDistance(struct ChaseActor *actor)
         } else {
             if (actor->base.tracking.distance < 0x19000) {
                 if (context->nearTimer > 30) {
-                    sub_080B1FA8(actor);
+                    Vorn_SelectRouteAwayFromTarget(actor);
                     Chase_SetBehavior(actor, 15);
                     {
                         s32 mask = ~2;
@@ -1256,7 +1256,7 @@ void SceneActorReaction_ResumeOrRunScript(struct ChaseActor *actor)
             u16 *flags = &context->flags6D4;
             s32 mask = ~3;
             *flags &= mask;
-            sub_080B3110(actor, 1, gUnk_0824E20C, 0x367);
+            Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E20C, 0x367);
         } else {
             {
                 u32 mask = 16;
@@ -1301,7 +1301,7 @@ void Vorn_ResumeReactionRoute(struct ChaseActor *actor)
         Vorn_SetTrackingFlags(&actor->base.tracking, 8);
         SceneActorChase_SetActorFlags(actor, 0x80);
         Vorn_ClearContextFlags(&((struct SceneActorAnimationLink *)actor->base.context)->flags, 3);
-        sub_080B3110(actor, 1, gUnk_0824E20C, 0x39F);
+        Vorn_BeginResponsePursuit(actor, 1, gUnk_0824E20C, 0x39F);
     } else if (!SceneActor_DispatchContextAction(context, 1)) {
         struct SceneActorRegistryControl *control;
         Vorn_ClearContextFlags(contextFlags, 0x1E);
