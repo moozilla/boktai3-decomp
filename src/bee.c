@@ -1882,7 +1882,7 @@ static inline void MonsterInit_InitializeBody(struct SceneActorRegistryResetView
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, ((struct Bee *)arg0)->movementProbe, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, ((struct Bee *)arg0)->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void Bee_ReadPalette(struct SceneActorRegistryResetView *actor, u16 base,
