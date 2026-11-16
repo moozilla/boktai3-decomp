@@ -1,10 +1,28 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
-#define SCENE_ACTOR_CHASE_SCALAR_CELLS 1
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_delayed_response.h"
 #include "scene_actor_terrain.h"
+
+/* This class's own copies of the shared chase inlines it compiles differently. */
+static inline s32 Golem_CellAt(struct ContactPosition *position)
+{
+    return SceneActorChase_CellIndex(position->x >> 8, position->z >> 8);
+}
+
+static inline u32 Golem_Height(struct ContactPosition *position)
+{
+    return SceneActorChase_HeightAt(Golem_CellAt(position), position);
+}
+
+static inline void Golem_SnapToRoute(struct ContactPosition *position,
+                                     struct SceneActorRegistryRoute *route)
+{
+    position->x = route->point->x;
+    position->z = route->point->z;
+    position->y = Golem_Height(position);
+}
 
 void Skeleton_ClearDirectionalEntryFlag(void);
 
@@ -17,7 +35,7 @@ static inline u8 Golem_ArriveAndRestoreRoute(void *obj)
     s32 cell, player;
     const u16 *randomSamples = gRandomTable;
     void **callback;
-    SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
+    Golem_SnapToRoute(group->destination, &group->homeRoute);
     if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         struct SceneActorChaseTarget *t = tracking->target;
         if (!t)
@@ -50,9 +68,9 @@ static inline u8 Golem_ArriveAndRestoreRoute(void *obj)
     } else {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         SceneActorChase_SetBehavior(actor, 5);
-        SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
-        (group->destination)->y = SceneActorChase_HeightAt(
-            SceneActorChase_CellAt(group->destination), group->destination);
+        Golem_SnapToRoute(group->destination, &group->homeRoute);
+        (group->destination)->y =
+            SceneActorChase_HeightAt(Golem_CellAt(group->destination), group->destination);
         (group->destination)->pad = 0;
     }
     {

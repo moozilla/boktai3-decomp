@@ -2,11 +2,7 @@
 #define GUARD_SCENE_ACTOR_CHASE_STEP_H
 
 /* Stored selectors and arithmetic selectors feed the same actor state fields. */
-#if SCENE_ACTOR_CHASE_WIDE_STATE
-static inline void SceneActorChase_SelectState(void *object, u32 state, u32 phase, u32 behavior)
-#else
 static inline void SceneActorChase_SelectState(void *object, u8 state, u8 phase, u8 behavior)
-#endif
 {
     struct ChaseActor *actor = object;
     actor->base.state2A8 = state;
@@ -14,38 +10,22 @@ static inline void SceneActorChase_SelectState(void *object, u8 state, u8 phase,
     actor->base.behavior2AA = behavior;
 }
 
-#if SCENE_ACTOR_CHASE_FRACTION_ACCESSOR
-static inline u8 SceneActorChase_CoordinateFraction(s16 coordinate)
-{
-    return coordinate;
-}
-#define SCENE_ACTOR_CHASE_FRACTION(v_) SceneActorChase_CoordinateFraction(v_)
-#else
-#define SCENE_ACTOR_CHASE_FRACTION(v_) ((u8)(v_))
-#endif
-
-/* The query may own a stored position or receive its already promoted axes. */
-#define SCENE_ACTOR_CHASE_CELL_LOOKUP                                                              \
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)                     \
-        return 0;                                                                                  \
-    return SceneActorChase_MapRowStart(SceneActorChase_CurrentMap(), z) + x;
-
+/* The cell index of map coordinates, or 0 off the map. CellAt takes a position in 1/256 cells. */
 static inline s32 SceneActorChase_CellIndex(s32 x, s32 z)
 {
-    SCENE_ACTOR_CHASE_CELL_LOOKUP
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return SceneActorChase_MapRowStart(SceneActorChase_CurrentMap(), z) + x;
 }
 
 static inline s32 SceneActorChase_CellAt(struct ContactPosition *position)
 {
-#if SCENE_ACTOR_CHASE_SCALAR_CELLS
-    return SceneActorChase_CellIndex(position->x >> 8, position->z >> 8);
-#else
     s32 x = position->x >> 8;
     s32 z = position->z >> 8;
-    SCENE_ACTOR_CHASE_CELL_LOOKUP
-#endif
+    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+        return 0;
+    return SceneActorChase_MapRowStart(SceneActorChase_CurrentMap(), z) + x;
 }
-#undef SCENE_ACTOR_CHASE_CELL_LOOKUP
 
 static inline u32 SceneActorChase_HeightAt(s32 cell, struct ContactPosition *position)
 {
@@ -55,79 +35,35 @@ static inline u32 SceneActorChase_HeightAt(s32 cell, struct ContactPosition *pos
     height = (data->attributes & 15) << 8;
     switch (kind) {
         case 1:
-            height -= SCENE_ACTOR_CHASE_FRACTION(position->z);
+            height -= (u8)position->z;
             break;
         case 2:
-            height -= SCENE_ACTOR_CHASE_FRACTION(position->x);
+            height -= (u8)position->x;
             break;
     }
     return height;
 }
-#undef SCENE_ACTOR_CHASE_FRACTION
-
-#if SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
-#define SceneActorChase_RouteStatus(route_, position_, target_)                                    \
-    ({                                                                                             \
-        void *route_owner_ = (route_);                                                             \
-        struct ContactPosition *route_position_ = (position_);                                     \
-        struct ContactPosition *route_target_ = (target_);                                         \
-        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);    \
-        if (route_status_)                                                                         \
-            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);    \
-        route_status_;                                                                             \
-    })
-
-#endif
-
-#if SCENE_ACTOR_CHASE_DIRECT_ROUTE_FIELDS
-#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  (&(a_)->base.motionFlags)
-#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) (&(a_)->base.body.motion)
-#else
-#define SCENE_ACTOR_CHASE_ROUTE_FLAGS(a_)  SceneActorChase_MotionFlagsOf(a_)
-#define SCENE_ACTOR_CHASE_ROUTE_MOTION(a_) SceneActorChase_MotionOf(a_)
-#endif
 
 static inline u8 SceneActorChase_TryRoute(struct ChaseActor *actor, void *route,
                                           struct ContactPosition *position,
                                           struct ContactPosition *target)
 {
-#if SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
-    s32 result = SceneActorChase_RouteStatus(route, position, target);
-#else
     s32 result;
     if (!Nav_IsPositionInMesh(route, position, target)) {
-        SceneActorChase_ClearBits(SCENE_ACTOR_CHASE_ROUTE_FLAGS(actor), 0x200);
+        SceneActorChase_ClearBits(SceneActorChase_MotionFlagsOf(actor), 0x200);
         return 0;
     } else {
         result = Terrain_ApplyBlocked(route, position, target);
-#endif
-    if (result) {
-        if (result != 2)
-            Memory_Clear(SCENE_ACTOR_CHASE_ROUTE_MOTION(actor), 8);
-        return 1;
-    }
-#if !SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
-    else {
-#endif
-        SceneActorChase_ClearBits(SCENE_ACTOR_CHASE_ROUTE_FLAGS(actor), 0x200);
-        return 0;
-#if !SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
+        if (result) {
+            if (result != 2)
+                Memory_Clear(SceneActorChase_MotionOf(actor), 8);
+            return 1;
+        } else {
+            SceneActorChase_ClearBits(SceneActorChase_MotionFlagsOf(actor), 0x200);
+            return 0;
+        }
     }
 }
-#endif
-}
-#undef SCENE_ACTOR_CHASE_ROUTE_FLAGS
-#undef SCENE_ACTOR_CHASE_ROUTE_MOTION
-#if SCENE_ACTOR_CHASE_JOIN_ROUTE_FAILURES
-#undef SceneActorChase_RouteStatus
-#endif
-
-#if SCENE_ACTOR_CHASE_SCALAR_CELLS
-#define SCENE_ACTOR_CHASE_TARGET_CELL(t_)                                                          \
-    SceneActorChase_CellIndex((t_)->position.x >> 8, (t_)->position.z >> 8)
-#else
-#define SCENE_ACTOR_CHASE_TARGET_CELL(t_) SceneActorChase_CellAt(&(t_)->position)
-#endif
 
 static inline void SceneActorChase_SetState(void *object, u32 state, u32 phase, u32 behavior)
 {
@@ -204,7 +140,7 @@ static inline u8 SceneActorChase_Arrive(void *obj)
         cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
-        cell = SCENE_ACTOR_CHASE_TARGET_CELL(t);
+        cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
@@ -254,7 +190,5 @@ static inline void SceneActorChase_SetTypedState(struct ChaseActor *actor, u32 s
     SceneActorChase_SelectState(actor, state, phase, behavior);
     SceneActorChase_ResetStateEntry(actor);
 }
-
-#undef SCENE_ACTOR_CHASE_TARGET_CELL
 
 #endif
