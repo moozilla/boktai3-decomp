@@ -69,7 +69,6 @@ void SceneActors_UpdateKnockbackReaction(ActorAnimation *base, int time)
     int tick = time;
     ActorAnimation *p = base;
     u8 *position = (u8 *)p + 0x48;
-    u32 zero;
     if (p->changed) {
         int sequence;
         p->changed = 0;
@@ -82,9 +81,8 @@ void SceneActors_UpdateKnockbackReaction(ActorAnimation *base, int time)
     }
     {
         u32 *dst = (u32 *)((u8 *)p + 0x33c);
-        zero = 0;
-        *dst = zero;
-        *((u8 *)p + 0x340) = zero;
+        *dst = 0u;
+        *((u8 *)p + 0x340) = 0u;
     }
     {
         u32 mask = 12;
@@ -93,7 +91,7 @@ void SceneActors_UpdateKnockbackReaction(ActorAnimation *base, int time)
     if (p->minScale > 23)
         p->minScale -= 24;
     else
-        p->minScale = zero;
+        p->minScale = 0u;
     decay(&p->maxScale);
     if (!base->reset(base)) {
         if (tick <= 9) {
