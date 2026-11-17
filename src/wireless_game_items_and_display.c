@@ -492,11 +492,10 @@ void WirelessGameItems_UpdateBlinkingItem(struct WirelessGameItems *p, struct Wi
     }
     if (q->timer > 9) {
         int one = 1;
-        int zero = 0;
         q->state = one;
         q->entered = one;
         one = 0;
-        q->timer = zero;
+        q->timer = 0;
         q->count = one;
     }
     q->timer++;
@@ -554,10 +553,9 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
             count += target->count;
         {
             int one = 1;
-            int zero = 0;
             target->state = one;
             target->entered = one;
-            target->timer = zero;
+            target->timer = 0;
         }
         /* Never true (count is a sum of two bytes). The compiler folds the test late and the
          * label it leaves keeps the next block apart, as in the ROM. */
@@ -736,12 +734,10 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
         second = owner->pending[slot];
         {
             int one;
-            int zero;
             one = 1;
-            zero = 0;
             target->state = one;
             target->entered = one;
-            target->timer = zero;
+            target->timer = 0;
             {
                 int value = first + second;
                 int clear;
@@ -846,10 +842,9 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
     }
     *(struct WirelessGamePair *)&sprite->x = *(struct WirelessGamePair *)&drawing->position.words.x;
     if (p->timer > 43) {
-        int zero = 0;
-        p->state = zero;
+        p->state = 0;
         p->entered = 1;
-        p->timer = zero;
+        p->timer = 0;
     }
     p->timer++;
 }
@@ -894,21 +889,19 @@ void WirelessGameItems_InitItem(struct WirelessGameItems *owner, struct Wireless
 {
     int state;
     int choice;
-    int zero;
     struct WirelessGameSprite *sprite;
     if ((u32)index <= 3 || (u32)(index - 8) <= 3)
         state = 1;
     else
         state = 0;
-    zero = 0;
-    p->count = zero;
-    p->pendingFlag = zero;
+    p->count = 0;
+    p->pendingFlag = 0;
     sprite = &p->sprite;
     Sprite_Init(sprite, owner->sprite, 0x10011);
     {
         int clear = 0;
         u8 *visible;
-        sprite->value = zero;
+        sprite->value = 0;
         visible = &p->sprite.visible;
         *visible = clear;
     }
