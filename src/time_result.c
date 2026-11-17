@@ -336,9 +336,8 @@ void Actor_UpdateStateThree(u32 context, struct StateActor *actor)
     }
     if (actor->done != 0) {
         u32 ready = 1;
-        u32 zero = 0;
         actor->state = ready;
-        actor->timer = zero;
+        actor->timer = 0u;
         actor->enterCommand = ready;
         Trigger_ConsumePending(actor->receiver, 1);
     }
@@ -353,9 +352,8 @@ void Actor_UpdateStateFour(u32 context, struct StateActor *actor)
     }
     if (actor->done != 0) {
         u32 ready = 1;
-        u32 zero = 0;
         actor->state = ready;
-        actor->timer = zero;
+        actor->timer = 0u;
         actor->enterCommand = ready;
         Trigger_ConsumePending(actor->receiver, 1);
     }
