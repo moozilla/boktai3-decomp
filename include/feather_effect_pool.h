@@ -2,20 +2,13 @@
 #define GUARD_FEATHER_EFFECT_POOL_H
 
 #include "task.h"
-#include "contact_position.h"
+#include "contact_swarm_sprite.h"
 #include "display_sequence.h"
 
 /* Tentative feather identity. The allocator and destructor traverse twenty
  * 0xA0-byte entries; the complete task allocation is 0xCBC bytes. */
 struct Feather {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[4];
-    void *graphics;
-    u16 frame;
-    u8 unknown12[10];
-    struct ContactPosition position;
-    u8 unknown24[8];
+    struct ContactSwarmSprite sprite;
     struct DisplaySequenceState sequence;
     u8 unknown3C[0x54];
     u16 age;
@@ -35,9 +28,14 @@ struct FeatherPool {
 };
 
 typedef void (*FeatherStateCallback)(struct FeatherPool *, struct Feather *);
-extern FeatherStateCallback const gUnk_086107A0[];
+extern FeatherStateCallback const gUnk_086107A0[4];
 extern struct FeatherPool *gFadingSpritePool;
 
+void sub_08128B48(struct FeatherPool *, struct Feather *);
+void FeatherEffectPool_UpdateOpeningAnimation(struct FeatherPool *, struct Feather *);
+void FeatherEffectPool_UpdateScatterAnimation(struct FeatherPool *, struct Feather *);
+void FadingSprite_UpdateExpiry(struct FeatherPool *, struct Feather *);
 u32 FeatherEffectPool_UpdateTask(struct FeatherPool *);
+struct FeatherPool *FeatherEffectPool_GetOrCreate(void);
 
 #endif
