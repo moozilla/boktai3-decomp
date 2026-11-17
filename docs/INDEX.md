@@ -236,8 +236,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #compiler #depin #matching #round13 | 14 |
-| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 1 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #compiler #concessions #depin #matching #object-model #round13 #round14 | 15 |
+| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -461,8 +461,9 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round13-batch1_2026-11-16.md](../notes/round13-batch1_2026-11-16.md) | Round 13, batch 1: eight concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch2_2026-11-16.md](../notes/round13-batch2_2026-11-16.md) | Round 13, batch 2: six more concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch3_2026-11-17.md](../notes/round13-batch3_2026-11-17.md) | Round 13, batch 3: eight more concessions removed | #matching #depin #compiler #round13 | 6 |
-| [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 4 |
-| [notes/round13-batch5_2026-11-17.md](../notes/round13-batch5_2026-11-17.md) | Round 13 complete: all 36 concessions removed | #matching #depin #compiler #round13 | 2 |
+| [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 5 |
+| [notes/round13-batch5_2026-11-17.md](../notes/round13-batch5_2026-11-17.md) | Round 13 complete: all 36 concessions removed | #matching #depin #compiler #round13 | 7 |
+| [notes/round14-batch1_2026-11-16.md](../notes/round14-batch1_2026-11-16.md) | Round 14 batch 1: ordinary fields and task state | #round14 #matching #compiler #concessions #object-model | 7 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
@@ -611,6 +612,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
 | [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
+| [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |

@@ -42,13 +42,17 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
 | Phase 2 | complete: every function matches; no `#ifdef NONMATCHING` drafts are left |
-| Phase 3 | 98.870% of code is concession-free; 36 functions still carry a pin, operand, barrier or single-use macro, listed in [notes/pilot/remaining-concessions_2026-11-16.md](../notes/pilot/remaining-concessions_2026-11-16.md) with drafts in `notes/phase3-drafts/pilot/` and per-worker logs in `notes/pilot/*.tsv`. No new concessions: stay on a function until it matches without one; a holdout (best draft, note, matchsearch store) only after the extreme effort [WORKER.md](WORKER.md) describes |
+| Phase 3 | Round 13 cleared the old per-function scan, but left allocation-only C. Round 14 treats those forms as open source debt: drive file-level errors down, then compiler-reported unreachable and proved-zero operations, then the other warnings. The first checkpoint removes stale declarations and uses shared fields; remaining work and evidence are in [round14-batch1](../notes/round14-batch1_2026-11-16.md). A clean old score is not evidence of plausible original source. |
 | Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/room_actor.h`) or `struct ChaseActor` (`include/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
+* **2026-11-16, round 14 batch 1**: ordinary fields, shared manager layouts,
+  particle allocation, and directional input preserve the exact ROM while
+  removing file-level errors and warning sites. Remaining volatile declarations
+  and all compiler-warning work stay explicit in the [checkpoint notes](../notes/round14-batch1_2026-11-16.md).
 * **2026-11-15 to 16, the phase-3 pilot run** (PRs 1021 to 1039): pilot workers removed the
   concessions from most remaining functions (concession-free 95.042% to 98.870%; functions
   with a concession 219 to 36), and the object-model cleanup landed in the same batches
