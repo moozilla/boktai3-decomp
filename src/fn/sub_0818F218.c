@@ -12,11 +12,10 @@ struct EffectPoolSlot *EffectPool_AllocateSlot(struct EffectPool *pool)
 {
     struct EffectPoolSlot *slot = pool->slots;
     u32 bit = 1;
-    volatile u32 *occupied = &pool->occupied;
     while (bit <= 0xFFFFFF) {
-        u32 flags = *occupied;
+        u32 flags = pool->occupied;
         if (!(flags & bit)) {
-            *occupied = flags | bit;
+            pool->occupied = flags | bit;
             return slot;
         }
         slot++;
