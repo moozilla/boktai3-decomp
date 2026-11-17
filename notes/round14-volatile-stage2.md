@@ -1,5 +1,7 @@
 # Round 14: volatile cleanup and remaining compiler-dead sites
 
+Tags: #round14 #concessions #matching
+
 ## Completed volatile assignment
 
 The seven affected files started with six volatile errors and five warnings.
@@ -43,7 +45,7 @@ added. These are counts for the six assigned units, not the entire repository.
 
 ### ScenePanel_TickRig: fixed
 
-Commit `fa59f49a3` removes the two fabricated negative-value arms, two volatile
+Commit `ba319f43c` removes the two fabricated negative-value arms, two volatile
 views, and the interval temporary reused for a different sample. Direct
 comparisons of the shared schedule's frame and interval fields preserve the
 original four timer reads. Stock agbcc produces the exact 220-byte function.
@@ -54,7 +56,7 @@ identities are needed. This removes two dead-code and two volatile-view sites.
 
 ### Dog_UpdateCardinalTurn: shared helper restored
 
-Commit `9cf8675b5` removes the private `DogTurn_SelectAnimation` duplicate and
+Commit `34a3cdc12` removes the private `DogTurn_SelectAnimation` duplicate and
 uses `SceneActorTurn_SelectAnimation`, already used by the Golem, Ghoul, Mummy,
 and Skeleton turn routines. The 1,880-byte function and entire 37,088-byte Dog
 unit match with stock agbcc.

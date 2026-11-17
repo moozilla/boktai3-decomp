@@ -1,6 +1,8 @@
 # Round 14: object, trigger and palette wrapper cleanup
 
-Date: 2026-11-17. Trial baseline: `49df76412` on `codex/round14-fields`.
+Tags: #round14 #concessions #matching
+
+Date: 2026-11-16. Trial baseline: `348240c2f` on `codex/round14-fields`.
 
 The bounded five-unit pass removes **23 reported warnings** with ordinary C:
 16 statement expressions, 3 one-shot loops, 2 address/dereference expressions
@@ -10,11 +12,11 @@ ranges, totaling **26,348 bytes**.
 
 | Source | Removed warnings | Exact bytes | Commit |
 | --- | ---: | ---: | --- |
-| `script_record.c` | 5 | 2,752 | `7a22388ab` |
-| `group_objects.c` | 1 | 6,184 | `d58285b0d` |
-| `scene_object.c` | 8 | 7,236 | `88a589097` |
-| `item_container.c` | 8 | 7,024 | `784bc4c23` |
-| `palette_controller.c` | 1 | 3,152 | `55cf7ed0a` |
+| `script_record.c` | 5 | 2,752 | `f5837dc4c` |
+| `group_objects.c` | 1 | 6,184 | `e125ab3e6` |
+| `scene_object.c` | 8 | 7,236 | `0b2d04e3a` |
+| `item_container.c` | 8 | 7,024 | `e364128ca` |
+| `palette_controller.c` | 1 | 3,152 | `49b8fe188` |
 
 The final five-unit scan reports 0 errors and 19 warnings: 10 once-loop,
 3 const-local and 6 local-union. It reports no compiler warnings. This is a

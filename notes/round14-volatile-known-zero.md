@@ -1,5 +1,7 @@
 # Round 14: four further known-zero functions remain open
 
+Tags: #round14 #concessions #matching
+
 This follows `round14-volatile-stage2.md`. The assigned follow-up was
 `TetherActor_UpdateBounceReturn`, `Spider_UpdateWanderGoal`,
 `TargetRegistry_FindById`, and `GameState_SelectRamBase`, examined in ROM order.

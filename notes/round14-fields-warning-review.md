@@ -1,6 +1,8 @@
 # Round 14: field-worker compiler-warning review
 
-Date: 2026-11-17. Source baseline for these trials: `0ff9046b8` on
+Tags: #round14 #concessions #matching
+
+Date: 2026-11-16. Source baseline for these trials: `0ff9046b8` on
 `codex/round14-fields` (the seven preceding commits remove the nine assigned
 raw-field/volatile errors). **None of the stage 2 drafts below is a stock match;
 no stage 2 production source or lint suppression was changed.**

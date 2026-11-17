@@ -1,6 +1,8 @@
 # Round 14: bounded animation constant-local pass
 
-Date: 2026-11-17. Trial baseline: `18fc805d7` on `codex/round14-fields`.
+Tags: #round14 #concessions #matching
+
+Date: 2026-11-16. Trial baseline: `2554f000d` on `codex/round14-fields`.
 
 **59 constant-local warnings were removed in six assigned source units. Every
 combined unit was independently byte-exact with stock agbcc.** A later audit of
@@ -12,12 +14,12 @@ settings changed. The parent integration task owns the full-ROM build gate.
 
 | Unit | Const-local before → after | Stock bytes | Commit |
 | --- | ---: | ---: | --- |
-| `src/scene_actor_animation.c` | 41 → 13 | 11,544 | `69933f745` |
-| `src/actor_animation_controller.c` | 36 → 31 | 30,356 | `db82dd31c` |
-| `src/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `6063bb3ea` |
-| `src/actor_controller_transitions.c` | 13 → 6 | 3,404 | `ed9a887f7` |
-| `src/scene_event_actor.c` | 14 → 2 | 4,024 | `082e3ab67` |
-| `src/scene_actor_stored_motion.c` | 6 → 5 | 3,268 | `f1dcfcd13` |
+| `src/scene_actor_animation.c` | 41 → 13 | 11,544 | `0c162ae12` |
+| `src/actor_animation_controller.c` | 36 → 31 | 30,356 | `7474978c5` |
+| `src/actor_graphics_and_basic_states.c` | 16 → 10 | 12,420 | `0f429931e` |
+| `src/actor_controller_transitions.c` | 13 → 6 | 3,404 | `88e29c2bf` |
+| `src/scene_event_actor.c` | 14 → 2 | 4,024 | `0bb3db59d` |
+| `src/scene_actor_stored_motion.c` | 6 → 5 | 3,268 | `9e798c993` |
 
 All six combined units total **65,016 exact bytes**. Their final concession scan
 has 0 errors and 70 warnings: 67 const-local, 2 once-loop and 1 local-union. It
@@ -69,7 +71,7 @@ also do not match.
 
 Both sites are solved by merging the existing mask with the actual field value
 before storing that result. This removes the artificial address/dereference
-without a new local or a new warning. Commit `ff4f82dcd` contains the change;
+without a new local or a new warning. Commit `ff28ffb91` contains the change;
 all **14,980 stock bytes** in `src/octopus.c` match. The unit has 0 errors and 22
 remaining const-local warnings, with no compiler or addr-deref diagnostics.
 

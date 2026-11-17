@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 11 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -236,7 +236,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #compiler #concessions #depin #matching #object-model #round13 #round14 | 15 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 15 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -463,7 +463,20 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round13-batch3_2026-11-17.md](../notes/round13-batch3_2026-11-17.md) | Round 13, batch 3: eight more concessions removed | #matching #depin #compiler #round13 | 6 |
 | [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch5_2026-11-17.md](../notes/round13-batch5_2026-11-17.md) | Round 13 complete: all 36 concessions removed | #matching #depin #compiler #round13 | 7 |
+| [notes/round14-accepted-zero-diagnostics.md](../notes/round14-accepted-zero-diagnostics.md) | Round 14: discard zero proofs from rejected combine attempts |  | 3 |
+| [notes/round14-address-expressions_2026-11-16.md](../notes/round14-address-expressions_2026-11-16.md) | Round 14: address-expression cleanup checkpoint | #round14 #concessions #matching | 7 |
+| [notes/round14-animation-constant-review.md](../notes/round14-animation-constant-review.md) | Round 14: bounded animation constant-local pass | #round14 #concessions #matching | 4 |
 | [notes/round14-batch1_2026-11-16.md](../notes/round14-batch1_2026-11-16.md) | Round 14 batch 1: ordinary fields and task state | #round14 #matching #compiler #concessions #object-model | 7 |
+| [notes/round14-batch2_2026-11-16.md](../notes/round14-batch2_2026-11-16.md) | Boktai 3 round 14 — checkpoint 2 | #round14 #matching #concessions #tooling #cleanup | 9 |
+| [notes/round14-constant-declaration-diagnostics.md](../notes/round14-constant-declaration-diagnostics.md) | Round 14: distinguish declarations from jumps and returns |  | 2 |
+| [notes/round14-enemy-constant-locals.md](../notes/round14-enemy-constant-locals.md) | Round 14: bounded enemy constant-local pass | #round14 #concessions #matching | 9 |
+| [notes/round14-fields-warning-review.md](../notes/round14-fields-warning-review.md) | Round 14: field-worker compiler-warning review | #round14 #concessions #matching | 10 |
+| [notes/round14-input-camera-warning-audit_2026-11-16.md](../notes/round14-input-camera-warning-audit_2026-11-16.md) | Round 14: input, camera, and compiler-warning audit | #matching #round14 #concessions #input #camera #compiler | 8 |
+| [notes/round14-mechanical-constant-review.md](../notes/round14-mechanical-constant-review.md) | Round 14: direct constant values across the remaining source units |  | 3 |
+| [notes/round14-union-review.md](../notes/round14-union-review.md) | Round 14: separate unrelated values from two local unions | #round14 #concessions #local-union | 3 |
+| [notes/round14-volatile-known-zero.md](../notes/round14-volatile-known-zero.md) | Round 14: four further known-zero functions remain open | #round14 #concessions #matching | 7 |
+| [notes/round14-volatile-stage2.md](../notes/round14-volatile-stage2.md) | Round 14: volatile cleanup and remaining compiler-dead sites | #round14 #concessions #matching | 8 |
+| [notes/round14-wrapper-cleanup.md](../notes/round14-wrapper-cleanup.md) | Round 14: object, trigger and palette wrapper cleanup | #round14 #concessions #matching | 5 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |

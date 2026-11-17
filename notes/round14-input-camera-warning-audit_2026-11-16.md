@@ -11,10 +11,10 @@ source annotation, or acceptance result.
 
 | Address | Change | Worker commit | Stock result |
 | --- | --- | --- | --- |
-| 0816B3D4 | Use the shared input-grid state and direct pressed/held key tests; remove the local volatile pad declaration. | `22fdd1025` | 72 bytes exact; all 87 shared-header dependents exact. |
-| 0804E8D8 | Assign the actual `SceneVec` particle position and size fields instead of masking artificial packed halfword views. | `e60b2b0c0` | 352 bytes exact; the unit has zero errors and warnings. |
-| 0817AEC8 | Assign the vertical offset zero directly instead of using a constant-only local. | `6e514b224` | 288 bytes exact; the existing sine-pointer report remains. |
-| 081AE0C0 | Reset state fields with direct zero values. | `74f28329e` | 5,064 bytes exact; the existing palette-specialization report remains. |
+| 0816B3D4 | Use the shared input-grid state and direct pressed/held key tests; remove the local volatile pad declaration. | `e4a2d2ac0` | 72 bytes exact; all 87 shared-header dependents exact. |
+| 0804E8D8 | Assign the actual `SceneVec` particle position and size fields instead of masking artificial packed halfword views. | `f10b8f9eb` | 352 bytes exact; the unit has zero errors and warnings. |
+| 0817AEC8 | Assign the vertical offset zero directly instead of using a constant-only local. | `d449e6e75` | 288 bytes exact; the existing sine-pointer report remains. |
+| 081AE0C0 | Reset state fields with direct zero values. | `b5ae75fbb` | 5,064 bytes exact; the existing palette-specialization report remains. |
 
 The input change adds `repeatTimer` to the existing `SceneInputGridView` at its
 observed byte offset. It does not attempt to reconcile every historical pad-state

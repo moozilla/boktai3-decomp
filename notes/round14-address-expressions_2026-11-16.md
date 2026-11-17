@@ -1,7 +1,9 @@
 # Round 14: address-expression cleanup checkpoint
 
+Tags: #round14 #concessions #matching
+
 This checkpoint covers the address-expression worker's source commits through
-`640ef64cb`, based on `9b40f4fdd`. It removes **21 `addr-deref` warning sites and
+`768cfbb85`, based on `9b40f4fdd`. It removes **21 `addr-deref` warning sites and
 two allocator `const-local` sites in 18 translation units**. The integration
 branch incorporated these changes by `a21e52f43`, where the coordinator reports
 a passing complete stock build. Work after this checkpoint is counted separately.
@@ -31,29 +33,29 @@ including adjacent functions and literal pools.
 
 | Source unit | Ordinary operation recovered | Address sites removed | Exact extent | Worker commit |
 |---|---|---:|---:|---|
-| `fn/sub_081ACAC4.c` | Directly clear the pending-action field | 1 | 156 bytes | `7b81cab1a` |
-| `fn/sub_0820F078.c` | Direct position copy | 1 | 296 bytes | `e18d99cfe` |
-| `fn/sub_0807F710.c` | Merge the existing flags into the pending-object flag value, then store it | 1 | 268 bytes | `45e1e7ec3` |
-| `slime.c` | Merge the existing flags into the action-script flag value, then store it | 1 | 15,436 bytes | `342b4be70` |
-| `scene_actor_lifecycle.c` | Use the byte-sized shadow kind after storing the incoming argument | 1 | 1,092 bytes | `e62339b60` |
-| `fn/sub_0805CBD4.c` | Apply random offsets directly to the two position components | 1 | 112 bytes | `393eddaee` |
-| `fn/sub_08060660.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `afc0bb6e3` |
-| `fn/sub_08060708.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `8cf1ce015` |
-| `fn/sub_08060D0C.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `14d5fb88c` |
-| `fn/sub_08060EA4.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `84cc01fd7` |
-| `fn/sub_08066B28.c` | Destroy attachments through their indexed part array | 1 | 144 bytes | `c861990d5` |
-| `fn/sub_08199C20.c` | Represent the slot position with the existing shared `ContactPosition` type | 1 | 84 bytes | `5c986bf8c` |
-| `fn/sub_080506CC.c` | Store the selected callback in the corresponding flag branch | 1 | 272 bytes | `10a246b7e` |
-| `fn/sub_0804194C.c` | Read the actor's signed halfword identifier through a nullable accessor | 1 | 212 bytes | `755ccc551` |
-| `staged_effect.c` | Keep halfword random-table samples as `u16` in three shake paths | 3 | 1,992 bytes | `8fc793d79` |
-| `roaming_object.c` | Keep halfword random-table samples as `u16` in two wander paths | 2 | 3,352 bytes | `8a24f7f7e` |
-| `fn/sub_0812A24C.c` | Allocate and clear the selected entry through the typed slot array | 1 | 96 bytes | `1ddaac88c` |
-| `fn/sub_0812B084.c` | Allocate and clear the selected entry through the typed slot array | 1 | 100 bytes | `640ef64cb` |
+| `fn/sub_081ACAC4.c` | Directly clear the pending-action field | 1 | 156 bytes | `e09d202e6` |
+| `fn/sub_0820F078.c` | Direct position copy | 1 | 296 bytes | `3e113455a` |
+| `fn/sub_0807F710.c` | Merge the existing flags into the pending-object flag value, then store it | 1 | 268 bytes | `75164e190` |
+| `slime.c` | Merge the existing flags into the action-script flag value, then store it | 1 | 15,436 bytes | `15e4b81f0` |
+| `scene_actor_lifecycle.c` | Use the byte-sized shadow kind after storing the incoming argument | 1 | 1,092 bytes | `27677fc10` |
+| `fn/sub_0805CBD4.c` | Apply random offsets directly to the two position components | 1 | 112 bytes | `f37290d20` |
+| `fn/sub_08060660.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `36f9cdb41` |
+| `fn/sub_08060708.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `41bc9ae65` |
+| `fn/sub_08060D0C.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `476d7ae2c` |
+| `fn/sub_08060EA4.c` | Initialize the actual second position's vector fields | 1 | 168 bytes | `ba3ab6d06` |
+| `fn/sub_08066B28.c` | Destroy attachments through their indexed part array | 1 | 144 bytes | `f8331b0eb` |
+| `fn/sub_08199C20.c` | Represent the slot position with the existing shared `ContactPosition` type | 1 | 84 bytes | `1092af5ca` |
+| `fn/sub_080506CC.c` | Store the selected callback in the corresponding flag branch | 1 | 272 bytes | `bc134e28e` |
+| `fn/sub_0804194C.c` | Read the actor's signed halfword identifier through a nullable accessor | 1 | 212 bytes | `0439c2d92` |
+| `staged_effect.c` | Keep halfword random-table samples as `u16` in three shake paths | 3 | 1,992 bytes | `0f7beb07f` |
+| `roaming_object.c` | Keep halfword random-table samples as `u16` in two wander paths | 2 | 3,352 bytes | `0ed48799a` |
+| `fn/sub_0812A24C.c` | Allocate and clear the selected entry through the typed slot array | 1 | 96 bytes | `21346b595` |
+| `fn/sub_0812B084.c` | Allocate and clear the selected entry through the typed slot array | 1 | 100 bytes | `768cfbb85` |
 
 The final two rows also remove one constant-`one` local each. The slot selection,
 occupancy test, clear size, and stored slot index now follow the existing pool
 types. No shared header changes were needed. The integration commit corresponding
-to worker `7b81cab1a` is `e09d202e6`.
+to worker `e09d202e6` is `e09d202e6`.
 
 The source rationale matters independently of matching. For example, the flag
 changes express a real read/merge/store; they do not add a zero expression to
@@ -100,6 +102,6 @@ The ignored evidence directory in the address-expression worktree is
   before/after diagnostic comparison before committing a source unit.
 
 For this checkpoint, restrict `family-matches.json` to commits through
-`640ef64cb`; later entries belong to the next batch. The initial two direct
+`768cfbb85`; later entries belong to the next batch. The initial two direct
 matches are recorded in `results.json` and their individual source commits.
 The accepted forms and rationale are durable in the commits listed above.
