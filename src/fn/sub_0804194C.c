@@ -7,6 +7,12 @@ void CharacterPreview_PositionParts(u8 *, u8 *, struct ModifierPreviewOrigin *, 
 void CharacterModel_SetAnimationFlags(u8 *, s32);
 void CharacterModel_SetComponentRenderMode(u8 *, s32);
 void CharacterModel_InitPalettes(u8 *, s32);
+static inline s16 ModifierMenu_GetPreviewActorId(struct ModifierMenuActor *actor)
+{
+    if (!actor)
+        return -1;
+    return actor->id;
+}
 void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
 {
     struct ModifierPreviewOrigin origin;
@@ -20,14 +26,7 @@ void ModifierMenu_InitializePreview(struct ModifierMenu *menu)
     mask = 0x800;
     flags = (gEngineFlags | gScenePauseFlags) & mask;
     if (flags) {
-        s32 id;
-        struct ModifierMenuActor *actor = gLinkSession;
-        if (!actor) {
-            id = -1;
-        } else {
-            *(&id) = actor->id;
-        }
-        menu->previewActorId = id;
+        menu->previewActorId = ModifierMenu_GetPreviewActorId(gLinkSession);
     } else {
         menu->previewActorId = flags;
     }
