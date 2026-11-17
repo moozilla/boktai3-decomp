@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "before_commit": "720eb4fadaebcf3d8adb8c9303a680ea6e99aafb",
+  "integrated_source_commit": "a97420c5fb2487cdc3fcf36e9515f2accee81ef1",
+  "worker_source_commit": "4458ea877472f15e12fb1b1a18548b6c946da74e",
+  "commit_counterparts": [
+    {
+      "worker": "5f56e235a788f838b70d2ed0d6906fccc4765eed",
+      "integrated": "567ac15a95897209950790ced201daf6fdb56eb8"
+    },
+    {
+      "worker": "2cd6bfa8a3ff0cd3eed0cbf65912dec63dcc604b",
+      "integrated": "31f447575e9d5de6543ebe084940f43502f980d5"
+    },
+    {
+      "worker": "37ba1d4f25c36260a378a78425400b10d3530f7c",
+      "integrated": "8af9631678760876d659fdf4e9fe9a57ed5cb2d4"
+    },
+    {
+      "worker": "26745087515e8b94cc42f24406c484b22d6bebec",
+      "integrated": "93511eb852728b40dbeac949f2eaaa559bbcb345"
+    },
+    {
+      "worker": "93ddbf82386248acf3097d16add03c41e6f18439",
+      "integrated": "d1c16754fc88e464bfe6408f2914b62c069a5672"
+    },
+    {
+      "worker": "4458ea877472f15e12fb1b1a18548b6c946da74e",
+      "integrated": "a97420c5fb2487cdc3fcf36e9515f2accee81ef1"
+    }
+  ],
+  "compiler": {
+    "stock_revision": "da598c1d918402c42c0c0d7128ba14567f3175e9",
+    "binary_sha256": "e9cb8508fd608de54ab0009e7a4c9989964e810e78f298c83bdea0c70e31ef43",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "rom_sha1": "2651c5e6875ac60abff734510d152166d211c87c"
+  },
+  "owner_header": "include/feather_effect_pool.h",
+  "owner_header_dependents": [
+    "src/fn/sub_08128B48.c",
+    "src/fn/sub_08128B9C.c",
+    "src/fn/sub_081292D4.c",
+    "src/fn/sub_08129444.c",
+    "src/fn/sub_081296D0.c",
+    "src/fn/sub_081297DC.c"
+  ],
+  "complete_unit_checks": [
+    {
+      "source": "src/fn/sub_08128B48.c",
+      "target_size": 4,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "f8cbc35471e1a774feb8c8f1d13e8ee898bf3c1802b7c340385fe9f565f04ec6"
+    },
+    {
+      "source": "src/fn/sub_08128B9C.c",
+      "target_size": 392,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "b66ac4f28d49faf271d8ddb43b6e5770588a7b9e4a6af8a88b4e841e74450bed"
+    },
+    {
+      "source": "src/fn/sub_081292D4.c",
+      "target_size": 368,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "cdf414dd722b2db4d336167032bae6d101e02d370a630a722115bbc0d7223868"
+    },
+    {
+      "source": "src/fn/sub_08129444.c",
+      "target_size": 112,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "a885a14605c4157aeb0aeea32378eae94926a603da7b1f4c0c4ceb5cefc3483b"
+    },
+    {
+      "source": "src/fn/sub_081296D0.c",
+      "target_size": 140,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "0f09e19b4965dccfe979a596f6dcb1c66a034095b62e5f52edda80e324ace12f"
+    },
+    {
+      "source": "src/fn/sub_081297DC.c",
+      "target_size": 76,
+      "match": true,
+      "diagnostics": [
+        "stdin: In function `FeatherEffectPool_GetOrCreate':",
+        "stdin:420: warning: passing arg 2 of `Task_SetCallbacks' from incompatible pointer type"
+      ],
+      "sha256": "202c715d9d3acbaf512ebda8c608c355d179a314485073c9689b637cd2dcd036"
+    },
+    {
+      "source": "src/fn/sub_081294B4.c",
+      "target_size": 540,
+      "match": true,
+      "diagnostics": [],
+      "sha256": "c4234c7aa17c70008db037a83f599fe35680188d728ef3d09e5f44b604131b90"
+    }
+  ],
+  "header_dependents_bytes": 1092,
+  "additional_caller": "src/fn/sub_081294B4.c",
+  "total_checked_bytes": 1632,
+  "baseline_diagnostics": [
+    {
+      "source": "src/fn/sub_08128B48.c",
+      "returncode": 0,
+      "diagnostics": []
+    },
+    {
+      "source": "src/fn/sub_08128B9C.c",
+      "returncode": 0,
+      "diagnostics": []
+    },
+    {
+      "source": "src/fn/sub_081292D4.c",
+      "returncode": 0,
+      "diagnostics": [
+        "stdin: In function `Step':",
+        "stdin:1357: warning: passing arg 1 of `PlayerCue_StepSequenceEnded' from incompatible pointer type",
+        "stdin:1357: warning: passing arg 2 of `PlayerCue_StepSequenceEnded' from incompatible pointer type"
+      ]
+    },
+    {
+      "source": "src/fn/sub_08129444.c",
+      "returncode": 0,
+      "diagnostics": [
+        "stdin: In function `FadingSprite_UpdateExpiry':",
+        "stdin:359: warning: initialization from incompatible pointer type"
+      ]
+    },
+    {
+      "source": "src/fn/sub_081296D0.c",
+      "returncode": 0,
+      "diagnostics": []
+    },
+    {
+      "source": "src/fn/sub_081297DC.c",
+      "returncode": 0,
+      "diagnostics": [
+        "stdin: In function `FeatherEffectPool_GetOrCreate':",
+        "stdin:348: warning: return from incompatible pointer type"
+      ]
+    },
+    {
+      "source": "src/fn/sub_081294B4.c",
+      "returncode": 0,
+      "diagnostics": []
+    }
+  ],
+  "layout_and_callback_type_probe": {
+    "layout": {
+      "sprite_size": 44,
+      "feather_size": 160,
+      "pool_size": 3260,
+      "task_size": 24,
+      "sprite_offset": 0,
+      "sequence_offset": 44,
+      "age_offset": 144,
+      "state_offset": 146,
+      "slot_offset": 147,
+      "blink_age_offset": 148,
+      "entry_flag_offset": 150,
+      "pool_used_offset": 56,
+      "pool_slots_offset": 60,
+      "slot_count": 20,
+      "callback_count": 4,
+      "callback_size": 4
+    },
+    "rom_callback_order": [
+      "sub_08128B48",
+      "FeatherEffectPool_UpdateOpeningAnimation",
+      "FeatherEffectPool_UpdateScatterAnimation",
+      "FadingSprite_UpdateExpiry"
+    ],
+    "callback_type_diagnostics": "",
+    "probe_source": "#include \"feather_effect_pool.h\"\nconst FeatherStateCallback callbackTypeCheck[4] = {\n    sub_08128B48,\n    FeatherEffectPool_UpdateOpeningAnimation,\n    FeatherEffectPool_UpdateScatterAnimation,\n    FadingSprite_UpdateExpiry,\n};\nconst u32 featherInterfaceLayout[] = {\n    sizeof(struct ContactSwarmSprite),\n    sizeof(struct Feather),\n    sizeof(struct FeatherPool),\n    sizeof(struct Task),\n    (u32)&((struct Feather *)0)->sprite,\n    (u32)&((struct Feather *)0)->sequence,\n    (u32)&((struct Feather *)0)->age,\n    (u32)&((struct Feather *)0)->state,\n    (u32)&((struct Feather *)0)->slot,\n    (u32)&((struct Feather *)0)->blinkAge,\n    (u32)&((struct Feather *)0)->enter,\n    (u32)&((struct FeatherPool *)0)->used,\n    (u32)&((struct FeatherPool *)0)->slots,\n    sizeof(((struct FeatherPool *)0)->slots) / sizeof(struct Feather),\n    sizeof(gUnk_086107A0) / sizeof(FeatherStateCallback),\n    sizeof(FeatherStateCallback),\n};\n"
+  },
+  "sprite_member_probe": {
+    "offsets": {
+      "sprite.flags": 0,
+      "sprite.priority": 7,
+      "sprite.frame": 16,
+      "sprite.position": 28
+    },
+    "probe_source": "#include \"feather_effect_pool.h\"\nconst u32 spriteMemberOffsets[] = {\n    (u32)&((struct Feather *)0)->sprite.flags,\n    (u32)&((struct Feather *)0)->sprite.priority,\n    (u32)&((struct Feather *)0)->sprite.frame,\n    (u32)&((struct Feather *)0)->sprite.position,\n};\n"
+  },
+  "retained_helper_debt": "The existing Step(owner, state, base) retains its duplicate owner/base and unused state parameter. Only the real component types changed; no helper-cleanup credit is claimed.",
+  "creator_boundary": "The return tag and address meaning are corrected. The sole caller still has private Feather/FeatherPool definitions, so the creator/caller family is not fully canonical.",
+  "scheduler_boundary": {
+    "exposed_warning": "passing arg 2 of `Task_SetCallbacks' from incompatible pointer type",
+    "private_registration": "void Task_SetCallbacks(u8 *, void (*)(void), void (*)(void));",
+    "actual_implementation": "src/task_scheduler.c: RuntimeTask callbacks",
+    "public_contract": "include/engine.h: void * task and void(void *) callbacks",
+    "unchanged_false_destructor_declaration": "void FeatherEffectPool_DestroyTask(void);",
+    "new_cast_or_shim": false
+  },
+  "remaining_private_family_views": [
+    "src/fn/sub_08128B4C.c",
+    "src/fn/sub_08128D24.c",
+    "src/fn/sub_08128F98.c",
+    "src/fn/sub_081294B4.c",
+    "src/fn/sub_0812975C.c",
+    "src/fn/sub_081297A4.c"
+  ],
+  "rejected_candidate": {
+    "source": "src/fn/sub_081292D4.c",
+    "function": "FeatherEffectPool_UpdateScatterAnimation",
+    "hypothesis": "Replace the existing duplicate-argument Step helper with the direct canonical PlayerCue_StepSequenceEnded operation.",
+    "patch_base_commit": "a97420c5fb2487cdc3fcf36e9515f2accee81ef1",
+    "source_sha256": "3294a3295fc3cb4705f4bf725b7c8fe4ee636e631754d8b6886bc23ec72dbc65",
+    "patch": "--- a/src/fn/sub_081292D4.c\n+++ b/src/fn/sub_081292D4.c\n@@ -13,24 +13,17 @@\n         *row = quadrant;\n     }\n }\n-static inline u32 Step(struct ContactSwarmSprite *owner, struct DisplaySequenceState *state,\n-                       struct Feather *base)\n-{\n-    return PlayerCue_StepSequenceEnded(owner, &base->sequence);\n-}\n-\n void FeatherEffectPool_SpawnGroundScatter(struct Feather *, s32);\n // confidence=low: emits ground scatter on frame three, then releases the completed feather effect.\n void FeatherEffectPool_UpdateScatterAnimation(struct FeatherPool *unused, struct Feather *p)\n {\n-    struct ContactSwarmSprite *sprite = &p->sprite;\n     if (p->enter) {\n         p->sprite.flags &= ~1;\n         p->enter = 0;\n     }\n     if (p->sequence.index == 3 && !p->sequence.elapsed)\n         FeatherEffectPool_SpawnGroundScatter(p, 4);\n-    if (Step(sprite, &p->sequence, p)) {\n+    if (PlayerCue_StepSequenceEnded(&p->sprite, &p->sequence)) {\n         struct FeatherPool *pool = gFadingSpritePool;\n         pool->used &= ~(1 << p->slot);\n         p->state = 0;\n",
+    "patch_replayed": true,
+    "stock_complete_unit": {
+      "match": false,
+      "target_size": 368,
+      "actual_size": 364,
+      "differing_bytes": 346,
+      "fuzzy_percent": 82.9,
+      "aligned_differing_instructions": 31,
+      "aligned_ignoring_registers": 2
+    }
+  },
+  "generated_assembly_or_rtl_tracked": false
+}
