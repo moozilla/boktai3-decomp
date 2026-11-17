@@ -16,12 +16,23 @@ function, write it the way it will finally be.
    Register pins and empty `asm("")` barriers were allowed in this phase as a stopgap, and about
    16% of code still has them (the Register-pinned category in PROGRESS.md). A new pin is a
    last resort (`land --allow-pins`).
-3. **No concessions** (current). Every match is ordinary C: no register pins, no barriers, no
-   compiler overrides, no `*(u16 *)((u8 *)p + 0x172)` access where a struct field fits.
-   `progress.py --list-pinned` is the queue; `scope.py FILE.c pins FUNC` gives the cost of removing
-   each pin, alone and grouped, and writes the pin-free draft a rematch starts from (the free removals
-   `tools/depin.py` made are used up).
-4. **Cleanup** (where it comes naturally; the main push comes after phase 3). Source that reads
+3. **No concessions**, in two steps:
+   * **3a. Nothing addressed to the compiler** (done, 2026-11-16, bar three file-level
+     `volatile` declarations). No register pins, no barriers, no compiler overrides, no
+     `*(u16 *)((u8 *)p + 0x172)` access where a struct field fits. These are the linter's
+     **errors** (`python3 tools/concessions.py`). They were tied to this compiler and this
+     machine: a pin names an ARM register. With them gone the source is portable C.
+   * **3b. No steering** (current). C that is valid anywhere but that nobody would write:
+     arms that can never run, terms that are always zero, single-pass loops, constants parked
+     in locals, unions of unrelated values. It exists only to nudge this compiler's choices.
+     These are the linter's **warnings**, and two kinds are found from what the compiler does,
+     not from spelling (`tools/deadcode.py`). Each warning is either rewritten as the C the
+     authors plausibly wrote, or kept with a `concession-ok(kind): reason` whose reason is a
+     claim about the original source (an SDK macro, a matched sibling), never about the
+     compiler. The linter is incomplete, so a clean run is necessary, not sufficient: a new
+     steering form found is a new linter kind.
+4. **Cleanup** (runs alongside 3b, because the natural C is easier to find in a unit with
+   real types and names; the main push comes after). Source that reads
    like the original and builds the same ROM:
    * **Names.** No `sub_XXXXXXXX` functions or `gUnk_XXXXXXXX` RAM objects left: every function,
      RAM object and ROM table has a real name (`Prefix_Action` for functions, see

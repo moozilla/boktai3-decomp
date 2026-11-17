@@ -12,15 +12,16 @@ list) is [history/HANDOFF_2026-10-23.md](history/HANDOFF_2026-10-23.md); older r
 
 ## The goal: four phases, aiming at the last one
 
-[ROADMAP.md](ROADMAP.md) has the plan: (1) draft, done; (2) match, nearly done;
-(3) no concessions, current; (4) cleanup, where it comes naturally; plus the side
+[ROADMAP.md](ROADMAP.md) has the plan: (1) draft, done; (2) match, done;
+(3) no concessions: 3a, nothing addressed to the compiler, done; 3b, no steering, current;
+(4) cleanup, alongside 3b; plus the side
 threads (RAM and data annotation, Studio, translation, tooling).
 
 **Always aim for the final form.** When you touch a function, write C that matches
 with no register pins, barriers or compiler overrides and reads like the original
-authors wrote it. Pins are heavily discouraged now that phase 3 is removing them: the
-landing tools refuse new ones without `--allow-pins`, which is for the hardest
-functions after real attempts without.
+authors wrote it. Pins and barriers are gone (phase 3a) and none comes back. The work now
+(phase 3b) is the linter's warnings, `python3 tools/concessions.py`: errors stay at zero,
+warnings go down, and a change adds none (`scope.py land` prints the ones it adds).
 
 **Work systematically, and stay until it matches.** Go through a subsystem in ROM order.
 Don't sort for likely wins, and don't skip or defer the hard functions. Proving the
@@ -35,7 +36,7 @@ not by fuzzy scores. Blind spelling sweeps don't count.
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
-`progress.py --list-pinned` for the phase-3 list.
+`python3 tools/concessions.py --summary` for the phase-3 list.
 
 | | |
 |---|---|

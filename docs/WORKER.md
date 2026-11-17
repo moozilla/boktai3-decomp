@@ -10,8 +10,9 @@ The previous playbook (wip/ files, explain.py, family rounds) is kept in
 
 ## Aim for the final form
 
-The project is in phase 3 (ROADMAP.md): phase 2 is nearly done, and the work now is
-matching the last drafts and removing the register pins from existing matches. **Aim for
+The project is in phase 3b (ROADMAP.md): every function matches, the register pins and
+barriers are gone, and the work now is the steering C the linter reports as warnings
+(`python3 tools/concessions.py`; "Linter warnings" below has the ignore rule). **Aim for
 ordinary C**: no register pins (`register T x asm("rN")`), no `asm("")` barriers, never a
 compiler override, with struct fields, real types and names, written the way the original
 authors would have. Pins are heavily discouraged: each one is phase 3 work someone has to
@@ -209,6 +210,34 @@ that is a scope gap: record it (below) so the tool gets better.
 * Names: `Prefix_Action`, one prefix per object (`scope.py rename`, `land --name`).
   Provisional names are welcome; mark guesses `confidence=low`.
 * Comments in C stand alone: say what the code does, never what you tried.
+
+## Linter warnings
+
+`python3 tools/concessions.py [FILE...]` reports errors (pins, barriers and the other scored
+kinds) and warnings (C a person plausibly would not write; the kinds are in its docstring).
+Errors stay at zero. Warnings go down, and a change adds none: `scope.py land` prints the
+ones a match adds.
+
+A warning is a question: would the original authors have written this? Usually the answer is
+no, and the fix is rarely local, because the steering form compensates for a draft whose
+structure differs from the original somewhere else. A single-pass loop or a statement
+expression is usually a macro to name in the header that owns the concept; a `zero` local is
+usually a missing type or a struct assignment; read the matched siblings.
+
+When the answer is yes, silence it like a linter warning:
+
+```c
+union { s32 word; s16 half[2]; } pos;  // concession-ok(local-union): 16.16 fixed point, read as a word and as its integer half
+```
+
+The reason is a claim about the original source, with the evidence (an SDK macro, a sibling
+that does the same without steering, the libgcc source). A reason about the compiler
+(registers, allocation, "to match") is an admission and the linter rejects it. If that is the
+only reason there is, the warning stays.
+
+If you find a steering form the linter does not report, add a kind (its own commit, a test
+with the legitimate look-alike, counts before and after). Prefer detection from what the
+compiler does (`tools/deadcode.py`) over a regex.
 
 ## Recording what you learned
 
