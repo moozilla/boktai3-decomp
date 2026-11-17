@@ -12,23 +12,23 @@ void sub_08220E6C(struct SceneInputWidget *anim, struct SceneInputResource *data
     struct AnimationKeyframeSequence *entry = (struct AnimationKeyframeSequence *)((sequence * 8) + (u32)table);
     struct AnimationKeyframe *frames = (struct AnimationKeyframe *)(data->frameData + entry->offset);
     struct AnimationKeyframe *frame;
-    anim->frameTimer = index;
+    anim->frameIndex = index;
     if (index >= entry->frameCount)
-        anim->frameTimer = entry->frameCount - 1;
-    frame = &frames[anim->frameTimer];
-    Anim_LoadKeyframe(anim, data, frame->key, anim->attribute1B);
-    anim->frameDuration = entry->frameCount;
-    anim->attributeE = Scale6(frame->duration * anim->scale);
-    if (anim->attributeE == 0)
-        anim->attributeE = 1;
-    anim->fieldC = 0;
+        anim->frameIndex = entry->frameCount - 1;
+    frame = &frames[anim->frameIndex];
+    Anim_LoadKeyframe(anim, data, frame->key, anim->mode);
+    anim->frameCount = entry->frameCount;
+    anim->duration = Scale6(frame->duration * anim->durationScale);
+    if (anim->duration == 0)
+        anim->duration = 1;
+    anim->elapsed = 0;
     anim->value6 = 0;
     anim->status = 0;
-    if (anim->fieldC + 1 >= anim->attributeE) {
-        if (anim->value18 & 2) {
-            if (anim->frameTimer != 0)
+    if (anim->elapsed + 1 >= anim->duration) {
+        if (anim->playbackFlags & 2) {
+            if (anim->frameIndex != 0)
                 return;
-        } else if (anim->frameTimer + 1 < anim->frameDuration)
+        } else if (anim->frameIndex + 1 < anim->frameCount)
             return;
         anim->status = 1;
     }

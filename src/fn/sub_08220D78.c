@@ -30,28 +30,28 @@ void Anim_SetKeyframes(struct SceneInputWidget *anim, struct SceneInputResource 
                 goto have_frame;
             }
         } else
-            off = anim->frameTimer * 4;
+            off = anim->frameIndex * 4;
         frame = (struct AnimationKeyframe *)((u8 *)frames + off);
     }
 have_frame:
-    if (anim->frame != sequence || (flags & 4))
+    if (anim->sequenceId != sequence || (flags & 4))
         Anim_LoadKeyframe(anim, data, frame->key, (u8)mode);
-    anim->frame = sequence;
-    anim->frameDuration = seqs[sequence].frameCount;
-    anim->attributeE = Scale6(frame->duration * anim->scale);
-    if (anim->attributeE == 0)
-        anim->attributeE = 1;
-    anim->value18 = flags;
+    anim->sequenceId = sequence;
+    anim->frameCount = seqs[sequence].frameCount;
+    anim->duration = Scale6(frame->duration * anim->durationScale);
+    if (anim->duration == 0)
+        anim->duration = 1;
+    anim->playbackFlags = flags;
     anim->frames = frames;
-    anim->attribute1B = mode;
+    anim->mode = mode;
     if (flags & 1)
         return;
     if (flags & 2)
-        anim->frameTimer = anim->frameDuration - 1;
+        anim->frameIndex = anim->frameCount - 1;
     else
-        anim->frameTimer = 0;
+        anim->frameIndex = 0;
     anim->value6 = 0;
-    anim->fieldC = 0;
+    anim->elapsed = 0;
     anim->status = 0;
-    anim->scale = 0x40;
+    anim->durationScale = 0x40;
 }

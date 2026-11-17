@@ -32,9 +32,9 @@ struct SceneInputWidget {
     u8 active, unknown5; /* active: linked to an animation list */
     u16 value6;
     u32 flags;
-    u16 fieldC, attributeE, scale; /* elapsed ticks, frame duration, Q6 speed */
-    u16 frame, frameTimer, frameDuration, value18; /* sequence ID, frame index/count, playback flags */
-    u8 attribute1A, attribute1B;
+    u16 elapsed, duration, durationScale; /* durationScale has six fractional bits (0x40 = 1x). */
+    u16 sequenceId, frameIndex, frameCount, playbackFlags;
+    u8 attribute1A, mode;
     u8 list, status;
     u16 unknown1E;
     struct ContactPosition position;

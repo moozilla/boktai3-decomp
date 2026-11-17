@@ -116,36 +116,36 @@ s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct SceneInputRes
 }
 
 s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
-                              u8 attributeA, u8 attributeB, u8 attributeC,
+                              u8 attributeA, u8 mode, u8 duration,
                               const struct ContactPosition *position)
 {
     if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
         return -1;
     widget->stamp = gDefaultAnimFlags;
     widget->flags |= flags;
-    widget->fieldC = 0;
-    widget->scale = 0x40;
-    widget->attributeE = attributeC;
+    widget->elapsed = 0;
+    widget->durationScale = 0x40;
+    widget->duration = duration;
     widget->attribute1A = attributeA;
-    widget->attribute1B = attributeB;
+    widget->mode = mode;
     widget->position = *position;
     return 0;
 }
 
 s32 Anim_LoadKeyframe(struct SceneInputWidget *widget, struct SceneInputResource *resource,
-                      u16 glyph, u8 attribute)
+                      u16 glyph, u8 mode)
 {
     if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
         return -1;
     widget->stamp = gDefaultAnimFlags;
-    widget->attribute1B = attribute;
+    widget->mode = mode;
     return 0;
 }
 
 void Anim_LinkToList(void *, u32);
 
 s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
-                      u8 attributeA, u8 attributeB, u8 attributeC,
+                      u8 attributeA, u8 mode, u8 duration,
                       const struct ContactPosition *position)
 {
     struct ContactPosition initialPosition;
@@ -161,10 +161,10 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
     if (zero == 0) {
         widget->glyphKind = zero;
         widget->value6 = zero;
-        widget->frame = zero;
-        widget->frameTimer = zero;
-        widget->frameDuration = zero;
-        widget->value18 = zero;
+        widget->sequenceId = zero;
+        widget->frameIndex = zero;
+        widget->frameCount = zero;
+        widget->playbackFlags = zero;
         widget->status = 0;
         widget->width = zero;
         widget->height = zero;
@@ -180,8 +180,8 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, attributeB,
-                                  attributeC, &initialPosition);
+        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+                                  duration, &initialPosition);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
             gDefaultAnimFlags = zero;
@@ -196,7 +196,7 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
 }
 
 s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyph, u32 flags,
-                       u8 attributeA, u8 attributeB, u8 attributeC, void *position)
+                       u8 attributeA, u8 mode, u8 duration, void *position)
 {
     u32 zero = widget->active;
     if (zero != 0)
@@ -204,10 +204,10 @@ s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyp
     else {
         widget->glyphKind = zero;
         widget->value6 = zero;
-        widget->frame = zero;
-        widget->frameTimer = zero;
-        widget->frameDuration = zero;
-        widget->value18 = zero;
+        widget->sequenceId = zero;
+        widget->frameIndex = zero;
+        widget->frameCount = zero;
+        widget->playbackFlags = zero;
         widget->status = 0;
         widget->width = zero;
         widget->height = zero;
@@ -223,8 +223,8 @@ s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyp
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
-        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, attributeB,
-                                  attributeC, position);
+        Anim_InitPositionedWidget(widget, resource, glyph, flags, attributeA, mode,
+                                  duration, position);
         gDefaultAnimFlags++;
         if (gDefaultAnimFlags == 0xFFFF)
             gDefaultAnimFlags = zero;
@@ -245,18 +245,18 @@ void Widget_CopyMasked(struct SceneInputWidget *dst, struct SceneInputWidget *sr
     dst->glyphKind = src->glyphKind;
     if (mask & 1)
         dst->flags = src->flags;
-    dst->fieldC = src->fieldC;
-    dst->attributeE = src->attributeE;
-    dst->scale = src->scale;
-    dst->frame = src->frame;
+    dst->elapsed = src->elapsed;
+    dst->duration = src->duration;
+    dst->durationScale = src->durationScale;
+    dst->sequenceId = src->sequenceId;
     dst->value6 = src->value6;
-    dst->frameTimer = src->frameTimer;
-    dst->frameDuration = src->frameDuration;
-    dst->value18 = src->value18;
+    dst->frameIndex = src->frameIndex;
+    dst->frameCount = src->frameCount;
+    dst->playbackFlags = src->playbackFlags;
     if (mask & 2)
         dst->attribute1A = src->attribute1A;
     if (mask & 4)
-        dst->attribute1B = src->attribute1B;
+        dst->mode = src->mode;
     dst->status = src->status;
     if (mask & 8) {
         dst->position = src->position;

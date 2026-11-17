@@ -310,7 +310,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                     Anim_LoadKeyframe(animation, resource, 0x54, 2);
                     Anim_SetKeyframes(animation, resource,
                                       (u16)(clone->animationIndex + clone->foldedFacing), 2, 4);
-                    clone->animation.attributeE = z;
+                    clone->animation.duration = z;
                     pool = (void *)gDirectionalSpritePool;
                     if (!pool) {
                         /* Animation setup cannot finish without the drawable pool. */

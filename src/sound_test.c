@@ -226,7 +226,7 @@ void SoundTest_UpdatePlaybackIndicators(struct SoundTest *p)
             s->flags &= ~1;
             Anim_Step(s, &p->digitsResource);
         } else if (!(s->flags & 1)) {
-            s->attribute1B = 2;
+            s->mode = 2;
             if (Anim_Step(s, &p->digitsResource))
                 s->flags |= 1;
         }
