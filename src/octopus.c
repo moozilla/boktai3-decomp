@@ -345,7 +345,7 @@ void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
             pos.z = actor->base.body.position.z + gUnk_086062B0[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,
+                Player_BeginPositionRequest(gPlayers[target->kind], (void *)&pos,
                                             0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct ChaseActor *t = target->actor;
