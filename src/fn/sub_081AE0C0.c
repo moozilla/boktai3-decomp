@@ -197,13 +197,12 @@ static inline void ChangeState(struct Vanargand *p, s32 state, VanargandStateCal
         Vanargand_StopActionSequence((void *)&self->actionSequence);
     }
     {
-        u32 zero = 0;
         p->state = state;
         p->callback = callback;
-        p->actionTimer = zero;
+        p->actionTimer = 0;
         p->pendingAnimation = 1;
-        p->phase = zero;
-        p->timer = zero;
+        p->phase = 0;
+        p->timer = 0;
     }
 }
 
