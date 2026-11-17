@@ -1,0 +1,64 @@
+--- a/src/fn/sub_0819FC34.c
++++ b/src/fn/sub_0819FC34.c
+@@ -4,6 +4,7 @@
+ #include "player.h"
+ #include "engine.h"
+ #include "ram.h"
++#include "monster_particle_random.h"
+ // confidence=low: charges along the facing axis, turning by a random signed offset on contact.
+ struct Action {
+     u8 state, pad[3];
+@@ -66,13 +67,6 @@
+         result = 1;
+     return result;
+ }
+-static inline s32 RandomValue(void)
+-{
+-    u32 offset;
+-    gRandomIndex = (gRandomIndex + 1) & 1023;
+-    offset = gRandomIndex * 2;
+-    return *(const u16 *)(offset + RANDOM_TABLE_ADDR);
+-}
+ static inline void SetFlags(struct Hresvelgr *p, u32 mask)
+ {
+     p->flags |= mask;
+@@ -128,7 +122,7 @@
+                 p = actor;
+                 if (!action->frame) {
+                     if (!p->turn)
+-                        p->turn = (((RandomValue() >> 3) % 2) << 5) - 16;
++                        p->turn = (((ParticleRandom_ReadDirectSample(gRandomTable) >> 3) % 2) << 5) - 16;
+                     SetHeading(p, p->turn + p->body.direction);
+                     action->frame++;
+                 } else if (action->frame > 4)
+--- a/src/fn/sub_081A9DDC.c
++++ b/src/fn/sub_081A9DDC.c
+@@ -1,6 +1,7 @@
+ #include "global.h"
+ #include "engine_globals.h"
+ #include "ram.h"
++#include "monster_particle_random.h"
+ // confidence=low: paired commands 7 and 8 appear to prepare and alternate attacks.
+ struct Vanargand {
+     u8 pad0[0x9C];
+@@ -27,11 +28,6 @@
+ void Vanargand_SetPairedMotionParameter(void *, u16);
+ void PairedSceneActor_ApplyToSelectedHalves(void *, s32, s32);
+ s32 PairedSceneActor_AreSelectedHalvesFinished(void *);
+-static inline s32 RandomValue(void)
+-{
+-    gRandomIndex = (gRandomIndex + 1) & 0x3FF;
+-    return *(u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
+-}
+ void Vanargand_UpdateAlternatingPairAttack(struct Vanargand *p)
+ {
+     struct Vanargand *self = p;
+@@ -44,7 +40,7 @@
+         p->pending = 0;
+         p->phase = 0;
+         p->timer = 0;
+-        p->selected = (RandomValue() >> 3) % 2;
++        p->selected = (ParticleRandom_ReadDirectSample(gRandomTable) >> 3) % 2;
+         Vanargand_SetPairedMotionParameter(p->pair, p->parameter);
+     }
+     if (Callback_InvokeActor(p, p->callback))

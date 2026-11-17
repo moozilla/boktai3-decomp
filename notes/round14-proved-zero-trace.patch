@@ -1,0 +1,64 @@
+--- a/combine.c
++++ b/combine.c
+@@ -118,11 +118,12 @@
+ {
+   rtx insn;
+   enum rtx_code code;
++  rtx proof, before;
+ };
+ static struct agbcc_zero_event *agbcc_zero_events;
+ static int agbcc_zero_count, agbcc_zero_capacity;
+ static void
+-agbcc_zero_record (rtx insn, enum rtx_code code)
++agbcc_zero_record (rtx insn, enum rtx_code code, rtx proof)
+ {
+   int i;
+ 
+@@ -136,6 +137,8 @@
+         (agbcc_zero_events, agbcc_zero_capacity * sizeof (*agbcc_zero_events));
+     }
+   agbcc_zero_events[agbcc_zero_count].insn = insn;
++  agbcc_zero_events[agbcc_zero_count].proof = getenv ("AGBCC_ZERO_TRACE") ? copy_rtx (proof) : 0;
++  agbcc_zero_events[agbcc_zero_count].before = getenv ("AGBCC_ZERO_TRACE") ? copy_rtx (PATTERN (insn)) : 0;
+   agbcc_zero_events[agbcc_zero_count++].code = code;
+ }
+ static void
+@@ -145,8 +148,27 @@
+   int i;
+ 
+   for (i = 0; i < agbcc_zero_count; i++)
+-    agbcc_dead_report (agbcc_zero_events[i].insn, "zero",
+-                       GET_RTX_NAME (agbcc_zero_events[i].code));
++    {
++      if (getenv ("AGBCC_ZERO_TRACE"))
++        {
++          extern char *current_function_name;
++          rtx insn = agbcc_zero_events[i].insn;
++          fprintf (stderr, "AGBCC_ZERO_TRACE\t%s\tuid=%d\t%s\n",
++                   current_function_name, INSN_UID (insn),
++                   GET_RTX_NAME (agbcc_zero_events[i].code));
++          fprintf (stderr, "proof:\n");
++          debug_rtx (agbcc_zero_events[i].proof);
++          fprintf (stderr, "before:\n");
++          debug_rtx (agbcc_zero_events[i].before);
++          fprintf (stderr, "accepted:\n");
++          if (GET_RTX_CLASS (GET_CODE (insn)) == 'i')
++            debug_rtx (PATTERN (insn));
++          else
++            debug_rtx (insn);
++        }
++      agbcc_dead_report (agbcc_zero_events[i].insn, "zero",
++                         GET_RTX_NAME (agbcc_zero_events[i].code));
++    }
+   agbcc_zero_count = 0;
+ }
+ 
+@@ -3398,7 +3420,7 @@
+ 	&& GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
+ 	&& (GET_RTX_CLASS (code) == '2' || GET_RTX_CLASS (code) == 'c' || GET_RTX_CLASS (code) == '1')
+ 	&& nonzero_bits (x, mode) == 0)
+-      agbcc_zero_record (subst_insn, code);
++      agbcc_zero_record (subst_insn, code, x);
+   }
+ 
+   /* If this is a commutative operation, put a constant last and a complex

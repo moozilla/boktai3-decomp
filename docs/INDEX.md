@@ -473,19 +473,24 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-batch3_2026-11-16.md](../notes/round14-batch3_2026-11-16.md) | Boktai 3 round 14 — checkpoint 3 | #round14 #matching #concessions #object-model #cleanup | 11 |
 | [notes/round14-constant-declaration-diagnostics.md](../notes/round14-constant-declaration-diagnostics.md) | Round 14: distinguish declarations from jumps and returns |  | 2 |
 | [notes/round14-decimal-rendering_2026-11-16.md](../notes/round14-decimal-rendering_2026-11-16.md) | Round 14: decimal-rendering once-loop investigation | *#hud* | 5 |
+| [notes/round14-downed-control_2026-11-16.md](../notes/round14-downed-control_2026-11-16.md) | Round 14: typed downed-state control transitions | #round14 #matching #once-loop #shared-types #checkpoint4 | 4 |
 | [notes/round14-enemy-constant-locals.md](../notes/round14-enemy-constant-locals.md) | Round 14: bounded enemy constant-local pass | #round14 #concessions #matching | 9 |
 | [notes/round14-fields-warning-review.md](../notes/round14-fields-warning-review.md) | Round 14: field-worker compiler-warning review | #round14 #concessions #matching | 10 |
 | [notes/round14-flash-marker_2026-11-16.md](../notes/round14-flash-marker_2026-11-16.md) | Round 14: flash and interaction-marker once-loops |  | 6 |
 | [notes/round14-input-camera-warning-audit_2026-11-16.md](../notes/round14-input-camera-warning-audit_2026-11-16.md) | Round 14: input, camera, and compiler-warning audit | #matching #round14 #concessions #input #camera #compiler | 8 |
 | [notes/round14-libgcc-multiply-source.md](../notes/round14-libgcc-multiply-source.md) | Libgcc integer multiplication: source evidence | #matching #cleanup #round14 #libraries | 2 |
 | [notes/round14-mechanical-constant-review.md](../notes/round14-mechanical-constant-review.md) | Round 14: direct constant values across the remaining source units |  | 3 |
+| [notes/round14-numeric-traversal_2026-11-16.md](../notes/round14-numeric-traversal_2026-11-16.md) | Round 14: numeric traversal holdouts | #round14 #matching #once-loop #source-evidence #checkpoint4 | 4 |
 | [notes/round14-once-loop-review_2026-11-16.md](../notes/round14-once-loop-review_2026-11-16.md) | Round 14: once-loop inventory and checkpoint-three source recovery | #round14 #matching #once-loop #source-recovery #cleanup | 11 |
 | [notes/round14-palette-traversal_2026-11-16.md](../notes/round14-palette-traversal_2026-11-16.md) | Round 14: indexed palette-bank traversal | *#assets* | 4 |
 | [notes/round14-placeholder-audit.md](../notes/round14-placeholder-audit.md) | Round 14: placeholder-name audit | #matching #actors #animation #tooling | 12 |
+| [notes/round14-pool-cursor_2026-11-16.md](../notes/round14-pool-cursor_2026-11-16.md) | Round 14 checkpoint 4: indexed pool callbacks |  | 6 |
+| [notes/round14-proved-zero-expansion-audit.md](../notes/round14-proved-zero-expansion-audit.md) | Round 14: proved-zero reports from compiler expansion intermediates | #matching #tooling #compiler #concessions | 9 |
 | [notes/round14-random-draw-operation.md](../notes/round14-random-draw-operation.md) | Round 14: shared random-table draw operation | #round14 #matching #once-loop #random-table | 4 |
 | [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 3 |
 | [notes/round14-state-union-review_2026-11-16.md](../notes/round14-state-union-review_2026-11-16.md) | Round 14: shared state operations and ordinary union alternatives | #round14 #matching #concessions #object-model #cleanup | 4 |
 | [notes/round14-statement-expression-review.md](../notes/round14-statement-expression-review.md) | Round 14: remaining statement expressions | #matching #cleanup #round14 #compiler | 8 |
+| [notes/round14-sword-action_2026-11-16.md](../notes/round14-sword-action_2026-11-16.md) | Round 14: sword component action recovery | #round14 #matching #once-loop #shared-operation #checkpoint4 | 3 |
 | [notes/round14-union-review.md](../notes/round14-union-review.md) | Round 14: separate unrelated values from two local unions | #round14 #concessions #local-union | 3 |
 | [notes/round14-volatile-followon-audit.md](../notes/round14-volatile-followon-audit.md) | Round 14: remaining sequence views and background queue | #matching #animation #backgrounds #tooling | 9 |
 | [notes/round14-volatile-known-zero.md](../notes/round14-volatile-known-zero.md) | Round 14: four further known-zero functions remain open | #round14 #concessions #matching | 7 |
