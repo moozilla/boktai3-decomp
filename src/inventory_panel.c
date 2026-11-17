@@ -4,7 +4,6 @@
 #include "player.h"
 #include "inventory_panel.h"
 #include "scene_hud_display.h"
-#include "level_advance_display.h"
 #include "monster_particle_random.h"
 #include "engine.h"
 #include "ram.h"
@@ -300,28 +299,18 @@ void InventoryPanel_ShowStatusIcons(struct SceneHudState *p)
         p->statusIcons[n].flags |= 1;
 }
 
-struct MenuParticle {
-    u32 flags;
-    u8 unknown4[0x14];
-    u16 x, y;
-    u8 unknown1C[0x14];
-    u16 velocityX, velocityY;
-    u8 unknown34[4];
-    u8 active, age;
-};
-
-u32 MenuParticle_UpdateMotion(struct MenuParticle *particle)
+u32 MenuParticle_UpdateMotion(struct InventoryPanelCallback *particle, void *context)
 {
-    if (++particle->age > 19) {
-        particle->flags |= 1;
-        particle->active = 0;
+    if (++particle->state.age > 19) {
+        particle->sprite.flags |= 1;
+        particle->state.active = 0;
     } else {
-        particle->x += particle->velocityX;
-        particle->y += particle->velocityY;
-        if (!(particle->age & 3))
+        particle->sprite.position.x += particle->velocityX;
+        particle->sprite.position.y += particle->velocityY;
+        if (!(particle->state.age & 3))
             particle->velocityY++;
     }
-    return particle->active;
+    return particle->state.active;
 }
 
 /* Tentative inventory display family, inferred from slot and item consumers. */
@@ -330,25 +319,22 @@ void InventoryPanel_UpdateCallbackGroups(struct InventoryPanel *panel)
 {
     s32 i = 0;
     do {
-        s32 offset = ((i << 6) + i) << 3;
         struct InventoryPanelCallbackGroup *group;
         s32 enabled;
         s32 next;
-        offset += 0x4450;
-        group = (struct InventoryPanelCallbackGroup *)((u32)panel + offset);
+        group = &panel->groups[i];
         enabled = group->active;
         next = i + 1;
         if (enabled) {
             s32 active = 0;
-            struct InventoryPanelCallbackMetadata *metadata =
-                group->callbacks.metadataView.metadata;
-            struct InventoryPanelCallback *entry = group->callbacks.entries;
+            struct InventoryPanelCallbackState *state = &group->entries[0].state;
+            struct InventoryPanelCallback *entry = group->entries;
             s32 j = 7;
             do {
-                if (metadata->active &&
-                    sub_08249240(&entry->particle, group->context, metadata->callback))
+                if (state->active &&
+                    sub_08249240(entry, group->context, state->callback))
                     active = 1;
-                metadata++;
+                state = (struct InventoryPanelCallbackState *)((u8 *)state + sizeof(*entry));
                 entry++;
             } while (--j >= 0);
             group->active = active;
@@ -357,15 +343,11 @@ void InventoryPanel_UpdateCallbackGroups(struct InventoryPanel *panel)
     } while (i <= 1);
 }
 
-// Open: temporary choices only (constant 1 and rand address regs); pointer roles match.
-
 /* Tentative inventory display family, inferred from slot and item consumers. */
 
 extern const s16 gUnk_086149C4[];
 
 void *AnimData_FindEntry(s32);
-
-u32 MenuParticle_UpdateMotion(struct MenuParticle *);
 
 static inline s32 Scale(s32 value)
 {
@@ -381,85 +363,64 @@ static inline u32 Arg1(u32 k_, s32 angle)
 
 void InventoryPanel_StartCallbackBurst(struct InventoryPanel *panel, s32 index, s32 x, s32 y)
 {
-    s32 offset = ((index << 6) + index) << 3;
-    struct InventoryPanelCallbackGroup *group =
-        (struct InventoryPanelCallbackGroup *)((u8 *)panel + 0x4450 + offset);
-    struct InventoryPanelCallbackMetadata *metadata;
+    struct InventoryPanelCallbackGroup *group = &panel->groups[index];
+    struct InventoryPanelCallbackState *state;
     struct InventoryPanelCallback *entry;
-    struct LevelAdvanceParticle *particle;
+    struct SpriteDrawable *sprite;
     s32 i;
     group->context = AnimData_FindEntry(0x1C1C);
     group->active = 1;
     i = 0;
     {
         const u16 *table = gRandomTable;
-        metadata = group->callbacks.metadataView.metadata;
-        particle = &group->callbacks.entries[0].particle;
-        entry = (struct InventoryPanelCallback *)particle;
+        state = &group->entries[0].state;
+        entry = group->entries;
+        sprite = &entry->sprite;
         for (; i < 8; i++) {
             s32 angle;
             s32 scale;
-            u32 flags = entry->particle.flags & (~1);
-            entry->particle.flags = flags;
+            u32 flags = entry->sprite.flags & (~1);
+            entry->sprite.flags = flags;
             if ((u8)ParticleRandom_ReadSample(table) & 1)
                 flags |= 4;
             else
                 flags &= ~4;
-            entry->particle.flags = flags;
-            SpriteDrawable_SelectTileFrame(particle, group->context, 0x15);
-            Effect_SetPalette(particle, 0);
+            entry->sprite.flags = flags;
+            SpriteDrawable_SelectTileFrame(sprite, group->context, 0x15);
+            Effect_SetPalette(sprite, 0);
             angle = ((i * 32) + (((s32)ParticleRandom_ReadSample(table) >> 3) & 0xf)) - 8;
             scale = (((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 1) + 3;
-            entry->particle.velocityX = Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
-            entry->particle.velocityY = Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
-            entry->particle.position.world.x = entry->particle.velocityX + x;
-            entry->particle.position.world.y = entry->particle.velocityY + y;
-            metadata->active = 1;
-            metadata->age = 0;
-            entry->callback = MenuParticle_UpdateMotion;
-            metadata++;
+            entry->velocityX = Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
+            entry->velocityY = Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
+            entry->sprite.position.x = entry->velocityX + x;
+            entry->sprite.position.y = entry->velocityY + y;
+            state->active = 1;
+            state->age = 0;
+            entry->state.callback = MenuParticle_UpdateMotion;
+            state = (struct InventoryPanelCallbackState *)((u8 *)state + sizeof(*entry));
             entry++;
-            particle = (struct LevelAdvanceParticle *)(((u8 *)particle) + 0x40);
+            sprite = (struct SpriteDrawable *)((u8 *)sprite + sizeof(*entry));
         }
     }
 }
 
-struct PanelParticle {
-    u8 unknown[0x40];
-};
-
-struct PanelParticleGroup {
-    struct PanelParticle particles[8];
-    u8 unknown200[8];
-};
-
-struct PanelEffect {
-    u8 unknown[0x28];
-};
-
-struct PlayerPanel {
-    u8 unknown0[0x4458];
-    struct PanelParticleGroup groups[2];
-    u8 unknown4868[0x478];
-    struct PanelEffect effects[4];
-};
-
-void PlayerPanel_RemoveEffects(struct PlayerPanel *panel)
+void PlayerPanel_RemoveEffects(struct InventoryPanel *panel)
 {
     s32 group = 0;
     u32 offset = 0;
     s32 i;
     do {
-        struct PanelParticle *particle = (struct PanelParticle *)((u8 *)panel + (offset + 0x4458));
+        struct InventoryPanelCallback *particle =
+            (struct InventoryPanelCallback *)((u8 *)panel + (offset + 0x4458));
         for (i = 7; i >= 0; i--) {
-            Effect_Remove(particle);
+            Effect_Remove(&particle->sprite);
             particle++;
         }
-        offset += 0x208;
+        offset += sizeof(struct InventoryPanelCallbackGroup);
         (*(&group))++;
     } while (group < 2);
     {
-        struct PanelEffect *effect = panel->effects;
+        struct SpriteDrawable *effect = panel->numberDigits;
         for (group = 3; group >= 0; group--) {
             Effect_Remove(effect);
             effect++;
@@ -473,17 +434,15 @@ void InventoryPanel_InitCallbackGroups(struct InventoryPanel *panel)
 {
     s32 i = 0;
     do {
-        s32 offset = ((i << 6) + i) << 3;
         struct InventoryPanelCallbackGroup *group;
         s32 frame;
         s32 negative;
         u32 zero;
         s32 next;
-        struct InventoryPanelCallbackMetadata *metadata;
+        struct InventoryPanelCallbackState *state;
         struct InventoryPanelCallback *entry;
         s32 j;
-        offset += 0x4450;
-        group = (struct InventoryPanelCallbackGroup *)((u32)panel + offset);
+        group = &panel->groups[i];
         frame = 0x91;
         if (i == 0)
             frame = 0x11;
@@ -493,15 +452,15 @@ void InventoryPanel_InitCallbackGroups(struct InventoryPanel *panel)
         next = i + 1;
         negative = -4;
         zero = 0;
-        metadata = group->callbacks.metadataView.metadata;
-        entry = group->callbacks.entries;
+        state = &group->entries[0].state;
+        entry = group->entries;
         j = 7;
         do {
-            ParticleSprite_Initialize(&entry->particle, group->context, frame);
-            Effect_SetOrigin(&entry->particle, negative, negative);
-            entry->particle.mode = zero;
-            metadata->active = zero;
-            metadata++;
+            ParticleSprite_Initialize(&entry->sprite, group->context, frame);
+            Effect_SetOrigin(&entry->sprite, negative, negative);
+            entry->sprite.priority = zero;
+            state->active = zero;
+            state = (struct InventoryPanelCallbackState *)((u8 *)state + sizeof(*entry));
             entry++;
         } while (--j >= 0);
         i = next;
