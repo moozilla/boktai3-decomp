@@ -1195,8 +1195,6 @@ void SceneActor_BeginLinkedIdleReaction(struct ChaseActor *actor)
         u8 *state = &actor->base.state2A8;
         u8 zero = 0;
         u8 one;
-        void (*fn)(void);
-        u8 code;
         *state = zero;
         actor->base.phase2A9 = zero;
         actor->base.behavior2AA = three;
@@ -1206,19 +1204,7 @@ void SceneActor_BeginLinkedIdleReaction(struct ChaseActor *actor)
             one = 1;
             *queued = one;
         }
-        fn = SceneActorControl_OnIdle;
-        code = 0x10;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = code;
-        actor->base.target = fn;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         actor->base.colliderA.flags &= 0xFFFB;
     }
 }
