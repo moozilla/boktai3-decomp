@@ -73,9 +73,8 @@ static inline s32 trunc12(s32 v)
 static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * radius);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
 struct AnimatedParticleParams {
