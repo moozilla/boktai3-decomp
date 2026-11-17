@@ -1,4 +1,5 @@
 #include "timed_effect.h"
+#include "player.h"
 #include "engine.h"
 #include "scene_actor_terrain.h"
 
@@ -200,11 +201,6 @@ s32 TimedEffect_UpdateTerrainTurn(void *ctx, struct TimedEffectTerrainView *e, s
 
 /* sub_081DA3D8.c */
 
-struct EffectPlayer {
-    u8 unknown00[0x20];
-    u32 flags;
-};
-extern struct EffectPlayer *gUnknown_02000580;
 extern const s16 gUnk_086149C4[];
 void TimedEffect_RemoveFromManager(struct TimedEffectManager *, struct TimedEffect *, s32);
 s32 TimedEffect_UpdateTerrainTurn(void *, struct TimedEffectTerrainView *, s32);
@@ -303,9 +299,9 @@ s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)
                         }
                     }
                     {
-                        struct EffectPlayer *player = gUnknown_02000580;
+                        struct Player *player = gPlayers[0];
                         u32 flag = 0x80000;
-                        player->flags |= flag;
+                        player->statusFlags |= flag;
                     }
                 }
                 cursor->frame++;
