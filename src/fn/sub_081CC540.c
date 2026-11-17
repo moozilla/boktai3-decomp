@@ -10,12 +10,10 @@ void SceneCharacter_UpdateSlowingBlink(u8 *a, u8 *b)
     u32 t;
     u8 phase;
     if (b[9]) {
-        u32 one;
         b[9] = 0;
         b[7] = 0;
-        one = 1;
-        *(u32 *)(b + 0x14) = one;
-        b[0x18] = one;
+        *(u32 *)(b + 0x14) = 1u;
+        b[0x18] = 1u;
     }
     t = *(u32 *)(b + 0x14);
     if (t > 15) {
