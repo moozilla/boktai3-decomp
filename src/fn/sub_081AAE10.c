@@ -106,9 +106,8 @@ void Vanargand_UpdateLeapTrack(struct Vanargand *p)
                 PairedSceneActor_ApplyToSelectedHalves(p->attachment, 3, 0x19);
                 {
                     u8 next = 2;
-                    u32 zero = 0;
                     p->phase = next;
-                    p->timer = zero;
+                    p->timer = 0u;
                 }
             }
             break;
