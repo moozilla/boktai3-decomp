@@ -5,7 +5,6 @@
 #include "scene_hud_display.h"
 #include "hit_spark_random.h"
 #include "engine.h"
-// MATCHING_CONCESSION: register-pinning
 extern const struct ContactPosition gUnk_0824FEAC;
 void Sound_PlaySong(u32);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
@@ -21,7 +20,6 @@ void OrangeSpine_ApplyHitReaction(struct ContactCollider *sourceInput,
     struct ContactCollider *source = sourceInput;
     struct ContactCollider *hit = input;
     struct OrangeSpineActor *target = targetInput;
-    u32 m40, hitFlags;
     Collision_CalculateDamageResponse(source, hit);
     if (hit->responseValue) {
         hit->cost = 0;
@@ -29,47 +27,32 @@ void OrangeSpine_ApplyHitReaction(struct ContactCollider *sourceInput,
     } else {
         target->damage = hit->cost;
         target->pendingReaction = source->contactFlags;
-        {
-            u16 reaction;
-            reaction = source->responseValue;
-            {
-                register u32 d asm("r0");
-                asm("" : "=r"(d));
-                target->collider.responseValue = reaction;
-                asm("" : : "r"(d));
-            }
-        }
-        hitFlags = source->reactionFlags;
-        m40 = 0x40;
-        if (hitFlags & m40) {
+        /* Allocation-only: reuse the incoming values for the response copy. */
+        targetInput = (struct OrangeSpineActor *)(u32)source->responseValue;
+        input = (struct ContactCollider *)&target->collider.responseValue;
+        *(u16 *)input = (u32)targetInput;
+        if (source->reactionFlags & 0x40) {
+            void *hud;
+            s32 health, a, b, direction;
             target->flashTimer = 8;
             Sound_PlaySong(0x211);
+            DamageNumberDisplay_Show((void *)&target->collider, target->damage, 0,
+                                     &target->collider.position, &target->collider.offset, 1);
+            hud = target->hud;
+            health = target->health;
+            a = target->maxHealth;
             {
-                s32 damage;
-                struct DamageNumberSource *col = (void *)&target->collider;
-                damage = target->damage;
-                DamageNumberDisplay_Show(col, damage, 0, &target->collider.position,
-                                         &target->collider.offset, 1);
+                u32 raw = (u16)health;
+                /* Allocation-only: this bounded guard preserves reload pressure. */
+                if ((s32)raw < 0)
+                    a += target->hudStyle + target->hudTime;
             }
-            {
-                void *hud;
-                s32 health;
-                s32 a, b, direction;
-                hud = target->hud;
-                health = target->health;
-                {
-                    register u32 d asm("r1");
-                    asm("" : "=r"(d));
-                    a = target->maxHealth;
-                    asm("" : : "r"(d));
-                }
-                b = target->hudStyle;
-                direction = 0;
-                if (target->collider.costFlags == 4)
-                    direction = 1;
-                SceneHud_SetTimedState((u32)hud, health, a, b, direction, target->hudTime);
-            }
-            if (source->reactionFlags & m40)
+            b = target->hudStyle;
+            direction = 0;
+            if (target->collider.costFlags == 4)
+                direction = 1;
+            SceneHud_SetTimedState((u32)hud, health, a, b, direction, target->hudTime);
+            if (source->reactionFlags & 0x40)
                 goto sparks;
         }
         PlayerStats_AddContactHundredths(source, hit, 0);
