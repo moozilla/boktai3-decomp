@@ -16,8 +16,8 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 
 | Warnings (`python3 tools/concessions.py`; not scored) | |
 |---|---:|
-| `dead-arm` | 27 |
-| `known-zero` | 16 |
+| `dead-code` | 19 |
+| `proved-zero` | 45 |
 | `once-loop` | 154 |
 | `stmt-expr` | 40 |
 | `const-local` | 1,521 |
@@ -25,7 +25,9 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | `placeholder-name` | 24 |
 | `volatile-view` | 55 |
 | `local-union` | 133 |
-| total | 2,045 |
+| total | 2,066 |
+
+Source files with no warning: **5,087** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 

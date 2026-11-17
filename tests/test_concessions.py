@@ -169,21 +169,6 @@ def warns(text, path=None):
 
 
 class Warnings(unittest.TestCase):
-    def test_dead_arm_needs_an_unsigned_declaration(self):
-        self.assertEqual(warns("void f(u8 *p) {\n    u32 raw = *p;\n    if ((s32)raw < 0) {\n        g();\n    }\n}\n"), ["dead-arm"])
-        self.assertEqual(warns("void f(s32 *p) {\n    s32 raw = *p;\n    if (raw < 0) {\n        g();\n    }\n}\n"), [])
-        self.assertEqual(warns("void f(void) {\n    u32 width = w();\n    if (left + (s32)width < 0)\n        g();\n}\n"), [])
-
-    def test_types_are_read_per_function(self):
-        text = "void a(void) {\n    u16 x = g();\n    h(x);\n}\nvoid b(void) {\n    s32 x = g();\n    if (x < 0)\n        h(x);\n}\n"
-        self.assertEqual(warns(text), [])
-
-    def test_known_zero(self):
-        self.assertEqual(warns("void f(u32 i) {\n    u32 o = (i + ((u16)i >> 16)) * 2;\n}\n"), ["known-zero"])
-        self.assertEqual(warns("void f(u32 b) {\n    t = t | ((b & 31) >> 5);\n}\n"), ["known-zero"])
-        self.assertEqual(warns("void f(u32 b) {\n    t = (b & 0xFF00) >> 8;\n}\n"), [])
-        self.assertEqual(warns("void f(void) {\n    u8 phase = g();\n    t = phase >> 8;\n}\n"), ["known-zero"])
-
     def test_once_loop_with_a_body_but_not_in_a_macro(self):
         self.assertEqual(warns("void f(void) {\n    do {\n        zero = 0;\n    } while (0);\n}\n"), ["once-loop"])
         self.assertEqual(warns("#define SET(x) do { x = 0; } while (0)\nvoid f(void) {\n    SET(a);\n}\n"), [])
@@ -212,6 +197,37 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns(good), [])
         self.assertEqual(c.lint(good), [])
         self.assertTrue(any("admission" in p for p in c.lint(bad)))
+
+
+class Compiler(unittest.TestCase):
+    """dead-code and proved-zero, from scope's instrumented compiler (skipped when it isn't built)."""
+
+    def kinds_of(self, body):
+        import deadcode
+        if not deadcode.available():
+            self.skipTest("scope's compiler is not built")
+        os.makedirs(deadcode.CACHE, exist_ok=True)
+        path = os.path.join(deadcode.CACHE, f"_test_{os.getpid()}.c")
+        with open(path, "w") as f:
+            f.write("typedef unsigned char u8; typedef unsigned short u16; typedef unsigned int u32; typedef int s32;\n"
+                    "void g(u32); extern u8 gByte; extern u16 gHalf; extern u32 gWord; extern const u16 gTable[];\n" + body)
+        try:
+            return sorted({s[0] for s in deadcode.compile_unit(os.path.relpath(path, deadcode.ROOT))})
+        finally:
+            os.remove(path)
+
+    def test_unreachable_arm_on_a_narrow_value(self):
+        self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gHalf;\n    if ((s32)raw < 0) {\n        g(raw);\n        return;\n    }\n    g(1);\n}\n"), ["dead-code"])
+
+    def test_respelling_the_guard_does_not_hide_it(self):
+        self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gByte;\n    if (raw & 0x100) {\n        gWord = raw;\n    }\n    g(1);\n}\n"), ["dead-code", "proved-zero"])
+
+    def test_live_code_and_syntactic_dead_code_are_quiet(self):
+        self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gHalf;\n    if (raw > 300) {\n        g(raw);\n    }\n    if (0) {\n        g(2);\n    }\n}\n"), [])
+
+    def test_proved_zero(self):
+        self.assertEqual(self.kinds_of("void f(u32 i) {\n    const u16 *t = (const u16 *)((u32)gTable + ((u16)i >> 16));\n    g(t[i & 3]);\n}\n"), ["proved-zero"])
+        self.assertEqual(self.kinds_of("void f(u32 i) {\n    g((i & 0xFF00) >> 8);\n}\n"), [])
 
 
 if __name__ == "__main__":

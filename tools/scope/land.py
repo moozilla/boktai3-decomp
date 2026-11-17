@@ -252,6 +252,21 @@ def added_warnings(before, after, path=None):
             out[s.kind] = out.get(s.kind, 0) + 1
         return out
     old, new = count(before), count(after)
+    import deadcode
+    if rel and rel.endswith(".c") and deadcode.available():  # the two kinds only a compile finds
+        os.makedirs(deadcode.CACHE, exist_ok=True)
+        for text, into in ((without_drafts(before), old), (without_drafts(after), new)):
+            if not text.strip():
+                continue
+            tmp = os.path.join(deadcode.CACHE, f"_land_{os.getpid()}.c")
+            open(tmp, "w").write(text)
+            try:
+                for kind in {(s[0], s[2]) for s in deadcode.compile_unit(os.path.relpath(tmp, deadcode.ROOT))}:
+                    into[kind[0]] = into.get(kind[0], 0) + 1
+            except RuntimeError:
+                pass  # a unit that doesn't compile is reported by the land itself
+            finally:
+                os.remove(tmp)
     return {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}
 
 
