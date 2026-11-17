@@ -194,7 +194,7 @@ static inline void Chase_BeginTurn(void *obj, u8 saved)
 {
     struct ChaseActor *actor = obj;
     u8 *group = (u8 *)&actor->group.common;
-    if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test(*(u16 *)((u8 *)actor + 0x414), 4)) {
+    if (!Chase_MotionFlags(actor, 0x400) && !Chase_Test((u16)actor->group.common.gate.flags, 4)) {
         s32 prior = actor->base.body.direction;
         s32 tries = 0;
         s32 choice;
