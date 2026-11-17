@@ -30,11 +30,10 @@ void SceneActorState_WaitForFlagClear(struct SceneActorFlagWait *p)
     } else {
         u32 one = 1;
         if (!(p->flags & one)) {
-            u32 zero = 0;
-            p->phase0 = zero;
-            p->phase1 = zero;
-            p->phase2 = zero;
-            p->timer = zero;
+            p->phase0 = 0u;
+            p->phase1 = 0u;
+            p->phase2 = 0u;
+            p->timer = 0u;
             p->pending = one;
             p->state = one;
         }
