@@ -68,9 +68,8 @@ static inline s32 Fixed_Truncate12(s32 v)
 static inline void Vec_SetPolar(struct Vec *v, s32 angle, s32 radius)
 {
     s32 x = Fixed_Truncate12(gUnk_086149C4[(angle + 64) & 255] * radius);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = Fixed_Truncate12(gUnk_086149C4[angle & 255] * radius);
 }
 static inline void Vec_Add(struct Vec *d, struct Vec *a, struct Vec *b)
@@ -102,11 +101,10 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
     struct Vec spawn;
     struct Actor *p2 = p;
     if (p->changed) {
-        u32 zero = 0;
-        p->changed = zero;
+        p->changed = 0u;
         Ratatosk_SetFacing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 17, 1, 4, 4);
-        p->phase = zero;
+        p->phase = 0u;
     }
     switch (p->phase) {
         case 0:
