@@ -46,12 +46,11 @@ int Wireless_UpdateConnectionSession(struct Engine *argument)
 {
     struct Engine *p = argument;
     if (p->pad18) {
-        volatile u8 *busy = &gWirelessSessionState;
-        int initial = *busy;
+        int initial = gWirelessSessionState;
         u8 *lost = &p->flag35;
         if (initial == 1) {
             do {
-            } while (*busy == 1);
+            } while (gWirelessSessionState == 1);
         }
         sub_08223BC0(0);
         if (*lost) {
