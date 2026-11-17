@@ -332,11 +332,10 @@ static inline void SetStateB(struct ChaseActor *actor)
 {
     u32 two = 2;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
-    actor->base.phase2A9 = zero;
+    *field = 0;
+    actor->base.phase2A9 = 0;
     actor->base.behavior2AA = two;
-    actor->base.counter2AC = zero;
+    actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
 
@@ -747,11 +746,10 @@ struct IvyTransitionActor {
 static inline void ResetPhase(u8 *p)
 {
     u8 *state = &((struct IvyTransitionActor *)p)->phase;
-    u32 zero = 0;
-    *state = zero;
-    ((struct IvyTransitionActor *)p)->subphase = zero;
-    ((struct IvyTransitionActor *)p)->phaseFlags = zero;
-    *(u32 *)(p + 0x2AC) = zero;
+    *state = 0;
+    ((struct IvyTransitionActor *)p)->subphase = 0;
+    ((struct IvyTransitionActor *)p)->phaseFlags = 0;
+    *(u32 *)(p + 0x2AC) = 0;
     ((struct IvyTransitionActor *)p)->restart = 1;
 }
 
@@ -791,19 +789,18 @@ static inline void Ivy_SetBlend(u8 *p)
 static inline void Ivy_EnterActive(u8 *p, void (*callback)(void), u32 kind)
 {
     u8 *prepared = &((struct IvyTransitionActor *)p)->prepared;
-    u32 zero = 0;
     u32 one = 1;
     *prepared = one;
-    ((struct IvyTransitionActor *)p)->active = zero;
+    ((struct IvyTransitionActor *)p)->active = 0;
     ((struct IvyTransitionActor *)p)->kind = kind;
     *(void (**)(void))(p + 0x21C) = callback;
-    *(u16 *)(p + 0x2C8) = zero;
+    *(u16 *)(p + 0x2C8) = 0;
     {
         u32 *flags = (u32 *)(p + 0x114);
         u32 mask = ~1;
         *flags &= mask;
     }
-    *(u32 *)(p + 0x104) = zero;
+    *(u32 *)(p + 0x104) = 0;
     ResetPhase(p);
 }
 
@@ -1439,8 +1436,7 @@ static inline void Ivy_BeginHold(u8 *p, void (*update)(), u8 state)
 {
     u8 *active = &p[0x2B2];
     u32 zero = 0;
-    u32 one = 1;
-    *active = one;
+    *active = 1;
     p[0x2B0] = zero;
     p[0x2B5] = state;
     *(void (**)())(p + 0x21C) = update;
@@ -1456,9 +1452,9 @@ static inline void Ivy_BeginHold(u8 *p, void (*update)(), u8 state)
         p[0x2A8] = 0;
         p[0x2A9] = two;
     }
-    p[0x2AA] = one;
+    p[0x2AA] = 1;
     *(u32 *)(p + 0x2AC) = zero;
-    p[0x2B1] = one;
+    p[0x2B1] = 1;
 }
 
 void Ivy_WaitForHold(u8 *p)
@@ -1513,11 +1509,10 @@ static inline void SetState_WaitThenBeginRelease(struct ChaseActor *actor)
 {
     u32 two = 2;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
+    *field = 0;
     actor->base.phase2A9 = two;
     actor->base.behavior2AA = two;
-    actor->base.counter2AC = zero;
+    actor->base.counter2AC = 0;
     {
         u16 offset = 0x2A9;
         offset += 8;
@@ -1538,11 +1533,10 @@ static inline void SetStateB_WaitThenResumeActive(struct ChaseActor *actor)
 {
     u32 two = 2;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
-    actor->base.phase2A9 = zero;
+    *field = 0;
+    actor->base.phase2A9 = 0;
     actor->base.behavior2AA = two;
-    actor->base.counter2AC = zero;
+    actor->base.counter2AC = 0;
     {
         u16 offset = 0x2A9;
         offset += 8;
