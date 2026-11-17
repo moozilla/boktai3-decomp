@@ -21,7 +21,6 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
     struct SceneSteeringPlayerView **location;
     struct ContactPosition *target;
     s32 angle;
-    u32 zero;
     origin.packed.x = 0x980;
     origin.packed.y = 0x2DC;
     origin.packed.z = 0x880;
@@ -34,7 +33,6 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
             u32 x = (u16)player->position.x;
             struct ContactPosition *left = &origin.position;
             x -= (u16)left->x;
-            zero = 0;
             delta->x = x;
         }
         delta->y = target->y - origin.position.y;
@@ -42,5 +40,5 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
     }
     angle = Math_Atan2(delta->x, delta->z);
     SceneSteeringActor_CreateTravelActor(&origin.position, &(*location)->position, 20, angle, 60, 4,
-                                         12, 4, 24, zero, zero, zero, zero);
+                                         12, 4, 24, 0u, 0u, 0u, 0u);
 }
