@@ -23,14 +23,13 @@ void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
     u32 bits;
     u32 flags;
     if (p->entered) {
-        u32 zero = 0;
-        p->entered = zero;
+        p->entered = 0u;
         PaletteLevels_Reset();
-        data = zero;
+        data = 0u;
         WirelessExchange_SendPacket(p, 1, &data, 1);
         set(4);
         WirelessGameMenu_SetStatusPanelState(p, 1);
-        p->flag = zero;
+        p->flag = 0u;
         WirelessGameItems_StartOutgoingItems();
     }
     bits = 128;
