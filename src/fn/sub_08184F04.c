@@ -35,14 +35,12 @@ void ActorController_UpdateAnimation(u8 *p)
     if (Anim_Step(anim, p + 0x94))
         *finished = 1;
     {
-        u32 one;
         u8 *q = p + 0xD1;
         u32 r = *(volatile u8 *)q;
-        one = 1;
-        if (one & r)
-            *finished = one;
+        if (1u & r)
+            *finished = 1u;
         if (*(u16 *)(p + 0xB32) & 0x800)
-            anim->flags |= one;
+            anim->flags |= 1u;
         else
             anim->flags &= ~1;
     }
