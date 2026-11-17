@@ -1231,9 +1231,10 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
         Slime_EmitDeathDebris(actor);
         context->splitScript = 0;
         {
-            u32 mask = 8;
+            u32 flags = 8;
             u16 *p = &context->flags;
-            *p = (*(&mask)) | (*p);
+            flags |= *p;
+            *p = flags;
         }
         {
             void *callback = (void *)SceneActorControl_OnIdle;
