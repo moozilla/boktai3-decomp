@@ -4,22 +4,6 @@ extern u32 gUnk_0824EED0[];
 
 u32 ActorController_SetAnimation(struct SceneCombatActor *, const void *, u32);
 
-static inline s32 ActorController_TruncateMotion(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -((-x) >> 12);
-}
-
-static inline void ActorController_SetMotion(struct ActorControllerVelocity *velocity, s32 angle, s32 speed)
-{
-    s32 x = ActorController_TruncateMotion(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
-    velocity->x = x;
-    velocity->y = zero;
-    velocity->z = ActorController_TruncateMotion(gUnk_086149C4[angle] * speed);
-}
-
 void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
 {
     u8 *phase = &actor->actionPhase;
