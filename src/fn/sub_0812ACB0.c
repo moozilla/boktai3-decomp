@@ -18,15 +18,10 @@ struct Sprite {
     struct Vec position;
     u8 pad24[0x24];
 };
-struct Anim {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 
 struct Effect {
     struct Sprite sprite;
-    struct Anim anim;
+    struct DisplaySequenceState anim;
     u8 pad58[0xA8];
     struct Vec *target;
     u8 pad104[0x68];
@@ -89,7 +84,7 @@ void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
 {
     struct Pool *pool = poolArg;
     struct Sprite *sprite = &p->sprite;
-    struct Anim *sequence = &p->anim;
+    struct DisplaySequenceState *sequence = &p->anim;
     if (p->entered) {
         p->sprite.flags &= ~1;
         p->riseTimer = 60;
@@ -143,7 +138,7 @@ void LinkedEffect_FollowTarget(struct Pool *poolArg, struct Effect *p)
     }
     sprite->position.z += p->velocity.z;
     p->ended = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)sprite,
-                                           (struct DisplaySequenceState *)sequence);
+                                           sequence);
     LinkedEffect_UpdateColliders(p);
     p->frame++;
     if (p->lifetime)
