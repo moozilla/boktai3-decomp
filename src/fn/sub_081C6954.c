@@ -120,7 +120,6 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
     Actor_LinkToManager(manager, npc);
     switch (Script_GetKeywordValue('i', 0)) {
         case 0: {
-            u8 one;
             u32 ten;
             void (*fn)(void);
             npc->parameter21C = 0x400;
@@ -130,13 +129,12 @@ s32 StateActor_CreateFromScriptEntry(void *manager, void *name)
             npc->field3 = 0;
             npc->state = ten;
             npc->timer = 0;
-            one = 1;
-            npc->enterCommand = one;
+            npc->enterCommand = 1;
             fn = Actor_UpdateTargetFacing;
             npc->prevState = ten;
             npc->update = fn;
             npc->stateFrame = 0;
-            npc->enter = one;
+            npc->enter = 1;
             npc->phase = 0;
         } break;
         case 1: {
