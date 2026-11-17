@@ -467,6 +467,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-address-expressions_2026-11-16.md](../notes/round14-address-expressions_2026-11-16.md) | Round 14: address-expression cleanup checkpoint | #round14 #concessions #matching | 7 |
 | [notes/round14-address-followup_2026-11-16.md](../notes/round14-address-followup_2026-11-16.md) | Round 14: address-expression follow-up and open families | #round14 #matching #concessions #cleanup | 10 |
 | [notes/round14-animation-constant-review.md](../notes/round14-animation-constant-review.md) | Round 14: bounded animation constant-local pass | #round14 #concessions #matching | 4 |
+| [notes/round14-animation-status-paths.md](../notes/round14-animation-status-paths.md) | Round 14: actor animation fields and the sequence-command holdout | #matching #animation #concessions #input | 8 |
 | [notes/round14-batch1_2026-11-16.md](../notes/round14-batch1_2026-11-16.md) | Round 14 batch 1: ordinary fields and task state | #round14 #matching #compiler #concessions #object-model | 7 |
 | [notes/round14-batch2_2026-11-16.md](../notes/round14-batch2_2026-11-16.md) | Boktai 3 round 14 — checkpoint 2 | #round14 #matching #concessions #tooling #cleanup | 9 |
 | [notes/round14-batch3_2026-11-16.md](../notes/round14-batch3_2026-11-16.md) | Boktai 3 round 14 — checkpoint 3 | #round14 #matching #concessions #object-model #cleanup | 11 |
