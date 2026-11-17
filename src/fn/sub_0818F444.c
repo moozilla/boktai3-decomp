@@ -1,11 +1,7 @@
 /* The current build ELF still exports these two original address names. */
 #include "global.h"
+#include "display_sequence.h"
 
-struct NidhoggrPoolSequence {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 struct NidhoggrEffectMotion {
     u16 x, y, z, unknown6;
 };
@@ -22,7 +18,7 @@ struct NidhoggrAnimatedSlot {
     void (*onComplete)(struct NidhoggrAnimatedSlot *);
     u8 animationData[0x1c];
     struct NidhoggrPoolSprite sprite;
-    struct NidhoggrPoolSequence sequence;
+    struct DisplaySequenceState sequence;
     struct NidhoggrEffectMotion motion;
     u8 lifetime;
     u8 unknown69[3];
@@ -40,7 +36,7 @@ void Nidhoggr_DestroySpriteEffect(struct NidhoggrAnimatedSlot *);
 s32 AnimData_Load(void *, u32);
 void AnimData_SelectPaletteBank(void *, u32);
 void Sprite_Init(void *, void *, u32);
-void Anim_RestartSequence(struct NidhoggrPoolSequence *, void *, u32, u32, u32);
+void Anim_RestartSequence(struct DisplaySequenceState *, void *, u32, u32, u32);
 void ExplosionEffect_Create(void *, u32, u32, u32, u32);
 extern const u8 gUnk_08611D1C[];
 extern const struct NidhoggrEffectMotion gUnk_0824F214[];
