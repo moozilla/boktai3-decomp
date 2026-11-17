@@ -65,11 +65,9 @@ done:
 
 success: {
     int operation = 8;
-    int one;
     p->flag = status;
     p->operation = operation;
     p->ticks = status;
-    one = 1;
-    p->pending = one;
+    p->pending = 1;
 }
 }
