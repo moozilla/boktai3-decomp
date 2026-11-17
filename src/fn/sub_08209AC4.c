@@ -5,11 +5,6 @@
 struct FanVec {
     s16 x, y, z, pad;
 };
-struct FanSeq {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
-};
 struct FanCollider {
     u8 pad[6];
     u16 flags;
@@ -31,7 +26,7 @@ struct FanCannon {
     u16 blink;
     u8 p9e[0xf4 - 0x9e];
     void (*update)(void);
-    struct FanSeq sequence;
+    struct DisplaySequenceState sequence;
     s32 range;
     s16 maximumWind, health, damage, reaction;
     s16 f114, dead, flash;
@@ -270,7 +265,7 @@ tail:
     {
         u32 *sprite = &p->flags;
         PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite,
-                               (struct DisplaySequenceState *)&p->sequence);
+                               &p->sequence);
     }
     p->age++;
 }
