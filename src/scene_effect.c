@@ -51,11 +51,10 @@ void SceneEffect_UpdateFinishAnimation(struct SceneEffectActor *actor)
         ScaledShadow_Disable(actor->shadow);
         (*entered)++;
     } else if (actor->animationEnded != 0) {
-        u32 zero = 0;
-        actor->update = zero;
+        actor->update = 0u;
         if (actor->destroy != 0) {
             Callback_InvokeActor(actor, actor->destroy);
-            actor->destroy = zero;
+            actor->destroy = 0u;
         }
     }
 }
