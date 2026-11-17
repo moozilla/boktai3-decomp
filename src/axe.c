@@ -2933,11 +2933,82 @@ static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
     row->trail[0].sprite.paletteVariant = source->paletteVariant;
 }
 
+static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
+                                   struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
+}
+
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
                                 u32 angle)
 {
     struct AxeTrailContextEmitTrailSprite *context = actor->base.context;
-    struct ContactSwarmSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *state;
     u32 spriteOffset;
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
@@ -2962,17 +3033,17 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
             Anim_SetSequence(destination, resource, selection, context->variant, zero);
         }
     }
-    sprite = (struct ContactSwarmSprite *)(context->nextTrail *
+    sprite = (struct DisplaySequenceSprite *)(context->nextTrail *
                                                sizeof(struct AxeTrailSlotEmitTrailSprite) +
                                            (u32)context);
-    sprite = (struct ContactSwarmSprite *)((u8 *)sprite + spriteOffset);
+    sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
     state = (struct DisplaySequenceState *)(context->nextTrail *
                                                 sizeof(struct AxeTrailSlotEmitTrailSprite) +
                                             (u32)context);
     state = (struct DisplaySequenceState
                  *)((u8 *)state + (u32) &
                     ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0].sequence);
-    PlayerCue_StepSequenceEnded(sprite, state);
+    Axe_StepSequence(sprite, state);
     context->trail[context->nextTrail].sprite.position = *position;
     context->trail[context->nextTrail].sprite.flags &= ~1;
     context->trail[context->nextTrail].sprite.flags |= 2;
@@ -3345,77 +3416,6 @@ void Axe_LatchColliderContact(void);
 void Axe_OnSecondaryColliderContact(void);
 
 u32 Shadow_Initialize(void *, void *, s32);
-
-static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
-                                   struct DisplaySequenceState *state)
-{
-    const u16 *command;
-    u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    owner->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index--;
-                ended = 0;
-            }
-        } else {
-            if (++state->index >= state->frameCount) {
-                if (state->flags & 8) {
-                    state->elapsed = state->duration;
-                    state->index = state->frameCount - 1;
-                } else {
-                    state->index = 0;
-                }
-                ended = 1;
-            } else {
-                ended = 0;
-            }
-        }
-        command = state->commands + state->index;
-        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
-        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-        if (state->duration == 0)
-            state->duration = 1;
-    } else {
-        ended = 0;
-    }
-    return ended;
-}
 
 static inline u16 Axe_SequenceSelection(struct DisplaySequenceState *source)
 {
