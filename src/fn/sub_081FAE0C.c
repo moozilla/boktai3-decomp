@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 #include "scene_actor_init_actor.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -29,7 +30,6 @@ void *SunOrb_GetOrCreateManager(void);
 void *Ratatosk_CreateAnimatedParticlePool(void);
 void *Ratatosk_CreateParticlePool(void);
 s32 Mod(s32, s32);
-extern void *gUnknown_02000580;
 s32 sub_081F6428(void *);
 void Ratatosk_InitRequestedState(void *);
 void Ratatosk_ApplyDamageReaction(void);
@@ -421,7 +421,7 @@ s32 Ratatosk_InitializeFromScript(struct RatatoskInit *actor, u32 id)
     } else {
         actor->parameterF0C = 0;
     }
-    RatatoskInit_SetTarget(self, gUnknown_02000580);
+    RatatoskInit_SetTarget(self, gPlayers[0]);
     SceneActors_Initialize(self, id, 4, &sizes, facing);
     self->savedFacing = facing;
     actor->displayResource = 0xFB81;
