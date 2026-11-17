@@ -1,18 +1,15 @@
 #include "global.h"
-#include "level_advance_display.h"
+#include "sprite_drawable_api.h"
 struct BriefSpriteEffect {
     u8 unknown0[0x744];
-    void *resource;
-    u32 flags;
-    u8 unknown74C[0x14];
-    union LevelAdvancePosition position;
-    u8 unknown768[8];
+    const struct SpriteEffectTileResource *resource;
+    struct SpriteDrawable sprite;
     u8 active, tick, firstFrame;
 };
 void SpriteEffect_StartBriefAnimation(struct BriefSpriteEffect *p,
-                                      union LevelAdvancePosition *position, s32 alternate)
+                                      const struct ContactPosition *position, s32 alternate)
 {
-    struct LevelAdvanceParticle *sprite = (struct LevelAdvanceParticle *)&p->flags;
+    struct SpriteDrawable *sprite = &p->sprite;
     if (alternate)
         p->firstFrame = 0x48;
     else
