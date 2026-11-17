@@ -1,5 +1,5 @@
-// MATCHING_CONCESSION: register-pinning
 #include "contact_actor.h"
+#include "monster_particle_random.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)
@@ -26,6 +26,15 @@ static inline u32 nextRandom(const u16 *table)
 {
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
+    return table[index];
+}
+static inline u32 nextRandomFrom(const u16 *table, u32 *cursor)
+{
+    u32 index;
+    do {
+        index = (*cursor + 1) & 1023;
+        *cursor = index;
+    } while (0);
     return table[index];
 }
 static inline s32 terrainHeight(struct ContactPosition *position, s32 index)
@@ -60,12 +69,15 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
     if (slot->enter) {
         struct ContactPosition *center;
         struct ContactPosition *entryDestination;
-        register u32 rngSetup asm("r8");
+        u32 origin;
         const u16 *table;
         const u16 *earlyTable;
         u32 angle;
-        register u32 angleMask asm("r6");
-        register u32 radiusBits asm("r1");
+        union {
+            u32 mask;
+            u32 *cursor;
+        } random;
+        u32 radiusBits;
         u32 radius;
         s32 jitter;
         struct ContactPosition *write;
@@ -76,27 +88,35 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         }
         center = &pool->retreatCenter;
         pool->retreatCenter.y = terrainHeight(center, cellIndex(center));
-        rngSetup = 0x0403B714;
-        asm volatile("" : : "r"(rngSetup));
+        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         earlyTable = (const u16 *)0x0203B400;
         angle = nextRandom(earlyTable);
-        angleMask = 255;
-        angle &= angleMask;
-        radiusBits = nextRandom(earlyTable) & 127;
+        do {
+            random.mask = 255;
+        } while (0);
+        angle &= random.mask;
+        radiusBits = nextRandom(earlyTable);
+        do {
+            radiusBits &= 127;
+        } while (0);
         write = &delta;
         radius = radiusBits + 16;
-        write->x = truncateShift12(gUnk_086149C4[(angle + 64) & angleMask] * radius);
+        {
+            s32 product = gUnk_086149C4[(angle + 64) & random.mask] * radius;
+            random.cursor = &gRandomIndex;
+            write->x = truncateShift12(product) | (origin & 3);
+        }
         write->y = 0;
         write->z = truncateShift12(gUnk_086149C4[angle] * radius);
         entryDestination = &slot->destination;
         addPosition(entryDestination, &delta, &pool->retreatCenter);
         table = gRandomTable;
-        slot->targetHeight = (nextRandom(table) & 511) + slot->desiredHeight;
+        slot->targetHeight = (nextRandomFrom(table, random.cursor) & 511) + slot->desiredHeight;
         slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
                                      entryDestination->z - slot->position.z);
-        jitter = (nextRandom(table) & 15) - 8;
+        jitter = (nextRandomFrom(table, random.cursor) & 15) - 8;
         slot->direction += jitter;
-        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+        slot->steeringTimer = (nextRandomFrom(table, random.cursor) & 7) + 8;
         slot->speed = 16;
     }
     if (!slot->steeringTimer) {
