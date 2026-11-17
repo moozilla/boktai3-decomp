@@ -1,6 +1,8 @@
 # Round 14: shared random-table draw operation
 
-Date: 2026-11-17. Source baseline: `6277b368b` on `codex/round14-fields`.
+Tags: #round14 #matching #once-loop #random-table
+
+Date: 2026-11-16. Source baseline: `6277b368b` on `codex/round14-fields`.
 
 The recovered operation advances a cursor through the 1,024-entry random table
 and captures the selected halfword. `PARTICLE_RANDOM_DRAW` contains those two
