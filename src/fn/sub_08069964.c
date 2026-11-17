@@ -15,13 +15,11 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             break;
         case 1: {
             struct ContactPosition *position;
-            u32 one;
             index = 0;
             position = &emitter->position;
-            one = 1;
             for (; index <= 3; index++) {
-                BurstSpark_Create(position, 1, 8, index << 6, 34, one, emitter->context);
-                BurstSpark_Create(position, 1, 14, index << 6, 64, one, emitter->context);
+                BurstSpark_Create(position, 1, 8, index << 6, 34, 1u, emitter->context);
+                BurstSpark_Create(position, 1, 14, index << 6, 64, 1u, emitter->context);
             }
             break;
         }
