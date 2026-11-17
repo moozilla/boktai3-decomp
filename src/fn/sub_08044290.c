@@ -69,13 +69,11 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             mask = 15;
             jitter &= mask;
             {
-                u32 zero;
                 u32 newDirection = direction + jitter - 8;
-                zero = 0;
                 slot->direction = newDirection;
                 slot->state = 3;
                 slot->enter = 1;
-                slot->stateFrame = zero;
+                slot->stateFrame = 0u;
             }
         } else
             slot->stateFrame = frame + 1;
