@@ -5,14 +5,12 @@ void sub_081A1D18(void *);
 void sub_081A14FC(void *);
 static inline void SetState(struct GridAttackActor *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->stateReset = zero;
-    p->pending = zero;
+    p->stateReset = 0;
+    p->pending = 0;
 }
 int Hresvelgr_BeginDamageReaction(struct GridAttackActor *p, int kind, int damage)
 {
