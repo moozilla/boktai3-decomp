@@ -1,0 +1,33 @@
+95543a223	Remove palette transition register and operand constraints
+6cabee396	Match ContactActor_UpdateRetreat without register pins
+d780e0f33	Remove object palette bank copy register constraints
+cb9bd6370	Remove cloud scatter sample register pin
+ddc6bdbe0	Remove panel rig initializer table barrier
+59d3a1774	Remove panel rig tick register and operand constraints
+aaf893a85	Remove WirelessResultPanel initialization allocation concessions
+385252aa8	Remove all Skeleton defeat register pins
+a978a7888	Remove Mummy route-recovery register constraints
+230ab2ac3	Remove Hresvelgr finale spray register constraints
+a0b86b029	Remove WirelessGameMenu equipment-choice allocation concessions
+dd59d2993	Remove Spider wander goal register concessions
+8a6b86039	Remove Spiral Burst particle initializer register pins
+285858951	Remove Orange Spine hit-reaction register constraints
+3c80830eb	Match sub_0803198C without the completion callback pin
+072c34191	Remove scatter emitter sine register pin
+c0dfd00a2	Remove defeat-state statement-macro concessions
+db6be2d3a	Remove target registry ID register pin
+bb5f8abbf	Match TentacleActor_UpdateRetraction without an operand barrier
+92173a644	Match AnimatedParticles_Create without operand barriers
+26ad07ea2	Remove motion-burst operand barriers with staged invariant values
+66361917e	Remove boundary barrage mask operand concession
+556da172a	Remove fading particle update pin and memory barrier
+ab4133c01	Remove follow-cell object register pin
+5ffdcedc8	Remove terrain alignment register concessions
+c0e906b29	Remove fragment radial spawn pins with local state indexing
+017c3be62	Remove bouncing particle spawn concessions with a late table constant
+a49798198	Remove RAM-selection pin with a combine-formed symbolic base
+c3de4ffcb	Remove slot-monitor pins with a halfword peer snapshot
+ee4a46f75	Remove frozen particle type operand barrier
+1e2eb5d1f	Remove choice-input operand barrier with preserved input preference
+41f641c01	Remove contact owner cleanup concessions
+bce1d1dd4	Remove bounce-return concessions with ordinary field updates
