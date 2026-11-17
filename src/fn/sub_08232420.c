@@ -105,18 +105,16 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
     } else
         p->collider = 0;
     if (p->flags & 1) {
-        u32 zero;
         p->attack = Heap_Alloc(84);
         if (!p->attack)
             return -1;
         Memory_Clear(p->attack, 84);
-        zero = 0;
         ((struct HazardVec *)&size)->x = 100;
         ((struct HazardVec *)&size)->y = 120;
         ((struct HazardVec *)&size)->z = 100;
-        ((struct HazardVec *)&offset)->x = zero;
-        ((struct HazardVec *)&offset)->y = zero;
-        ((struct HazardVec *)&offset)->z = zero;
+        ((struct HazardVec *)&offset)->x = 0u;
+        ((struct HazardVec *)&offset)->y = 0u;
+        ((struct HazardVec *)&offset)->z = 0u;
         Collider_Init(p->attack, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(p->attack, TimedHazard_OnAttackContact, p);
         Collider_SetAttackPowerAndForce(p->attack, 50, 20);
