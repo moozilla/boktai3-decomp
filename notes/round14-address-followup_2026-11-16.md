@@ -1,7 +1,9 @@
 # Round 14: address-expression follow-up and open families
 
-Worker source checkpoint: `cc6a8f492`, following the earlier checkpoint at
-`640ef64cb` documented in
+Tags: #round14 #matching #concessions #cleanup
+
+Worker source checkpoint: `2c804e8ef`, following the earlier checkpoint at
+`768cfbb85` documented in
 [round14-address-expressions_2026-11-16.md](round14-address-expressions_2026-11-16.md).
 
 The assigned 59-site queue now has **29 address sites removed and 30 remaining**.
@@ -22,13 +24,13 @@ These seven source units remove eight more sites after the 21-site checkpoint.
 
 | Unit | Ordinary source change | Sites | Complete exact extent | Worker commit |
 |---|---|---:|---:|---|
-| `scene_status_indicator.c` | Allocate through the typed entry array and the existing occupancy predicate | 1 | 1,768 bytes | `461b993c2` |
-| `fn/sub_08069D0C.c` | Pass the literal bit value to the existing burst occupancy predicate | 1 | 68 bytes | `bdffaf8fd` |
-| `fn/sub_0810AFB0.c` | Pass the actual packet-mode mask directly to its three predicates | 1 | 368 bytes | `d3c8c34af` |
-| `fn/sub_08062414.c` | Form each catalog index from the selection and page, including the post-call page reload | 2 | 460 bytes | `85f155917` |
-| `choice_menu.c` | Read the four optional script operands through an indexed argument array | 1 | 2,944 bytes | `960bac51b` |
-| `fn/sub_08041128.c` | Fill unused modifier windows by row index, then refresh the capacity | 1 | 344 bytes | `8c553dd08` |
-| `collision_controller.c` | Keep the two boolean predicates and their selected result in the byte domain used by `paused` | 1 | 2,512 bytes | `cc6a8f492` |
+| `scene_status_indicator.c` | Allocate through the typed entry array and the existing occupancy predicate | 1 | 1,768 bytes | `eaf495531` |
+| `fn/sub_08069D0C.c` | Pass the literal bit value to the existing burst occupancy predicate | 1 | 68 bytes | `98cc1fabe` |
+| `fn/sub_0810AFB0.c` | Pass the actual packet-mode mask directly to its three predicates | 1 | 368 bytes | `f3676ad19` |
+| `fn/sub_08062414.c` | Form each catalog index from the selection and page, including the post-call page reload | 2 | 460 bytes | `e9593faab` |
+| `choice_menu.c` | Read the four optional script operands through an indexed argument array | 1 | 2,944 bytes | `f848b108a` |
+| `fn/sub_08041128.c` | Fill unused modifier windows by row index, then refresh the capacity | 1 | 344 bytes | `a391465ab` |
+| `collision_controller.c` | Keep the two boolean predicates and their selected result in the byte domain used by `paused` | 1 | 2,512 bytes | `2c804e8ef` |
 
 The first two rows also remove one constant-`one` local each. The status-indicator
 change removes a local `volatile u32 *` declaration, but the existing shared
@@ -53,14 +55,14 @@ and two additional occupancy fixes bring this worker's total to 20 removals.
 
 | Unit | Additional locals removed | Complete exact extent | Worker commit |
 |---|---:|---:|---|
-| `fn/sub_08036230.c` | 1 | 176 bytes | `10ad357f3` |
-| `fn/sub_08056F88.c` | 1 | 196 bytes | `af07286b3` |
-| `player_clone.c` | 2 | 4,452 bytes | `1d990b3de` |
-| `slime.c` | 1 | 15,436 bytes | `fed6614e2` |
-| `status_screen_fade.c` | 1 | 2,232 bytes | `cf8e4844f` |
-| `timed_effect.c` | 3 | 1,992 bytes | `716818b94` |
-| `vanargand_projectiles.c` | 2 | 3,368 bytes | `9099e2f67` |
-| `wireless_game_items_and_display.c` | 5 | 5,832 bytes | `f5e35035c` |
+| `fn/sub_08036230.c` | 1 | 176 bytes | `1a433b88c` |
+| `fn/sub_08056F88.c` | 1 | 196 bytes | `4666c9ee1` |
+| `player_clone.c` | 2 | 4,452 bytes | `177cc7682` |
+| `slime.c` | 1 | 15,436 bytes | `597ce660b` |
+| `status_screen_fade.c` | 1 | 2,232 bytes | `3a837a7e1` |
+| `timed_effect.c` | 3 | 1,992 bytes | `5a180a2a3` |
+| `vanargand_projectiles.c` | 2 | 3,368 bytes | `3cdec3f6d` |
+| `wireless_game_items_and_display.c` | 5 | 5,832 bytes | `c889ca7bc` |
 
 The generator preserves signedness with unsigned literals for `u32`, excludes
 address-taken fill storage, and does not rewrite mixed assignments or duplicate

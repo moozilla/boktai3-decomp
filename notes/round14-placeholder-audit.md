@@ -43,18 +43,18 @@ pointer were independent removals.
 
 | Unit | Source change | Placeholder sites | Whole-unit bytes | Worker commit |
 | --- | --- | ---: | ---: | --- |
-| `src/fn/sub_08115F74.c` | Advance the actual callback pointer without assigning an unused second array-base alias. | 1 to 0 | 56 | `ab4aa648d` |
-| `src/fn/sub_08149A14.c` | Remove the unused `dummy` declaration. | 1 to 0 | 988 | `f1c2ee966` |
-| `src/fn/sub_081A117C.c` | Store the motion zero directly and use the existing actor view. The pointer-to-pointer alias remains open. | 3 to 1 | 200 | `e8354916d`, `9bafe2435` |
-| `src/fn/sub_081ACAC4.c` | Write the two declared delay fields directly, retaining their existing common halfword delay value. | 1 to 0 | 156 | `09fac439d` |
-| `src/fn/sub_081D46B4.c` | Recover origin and direction fields from matched relatives; remove the cached direction and destination pointer. | 1 to 0 | 152 | `bd5cff4de` |
-| `src/fn/sub_081D76F4.c` | Use `ContactPosition` and the actual entry fields; remove the position alias and the literal shared between random range and address arithmetic. | 3 to 1 | 384 | `c21d92185` |
-| `src/fn/sub_081F9E20.c` | Use the shared projectile parameter/position contracts, actual position pointers, and direct aggregate copies. | 3 to 0 | 240 | `178a801d7` |
-| `src/fn/sub_0822D080.c` | Use the existing slot parameter in the packed-state exchange. | 1 to 0 | 72 | `a40983591` |
-| `src/fn/sub_08241BC4.c` | Remove the unused `dummy` declaration. | 1 to 0 | 756 | `c26294e18` |
-| `src/fn/sub_08242EA4.c` | Store the computed flags without the assignment-only field pointer. | 1 to 0 | 216 | `2c99e9a2e` |
-| `src/lun.c` | Read the typed participant position directly; remove both the placeholder alias and the separate unused `players` local. | 1 to 0 | 16,116 | `d3d5cf9d8` |
-| `src/nav_mesh.c` | Reuse the existing `GetMesh` accessor and remove assignment-result base aliases from both the caller and accessor. | 1 to 0 | 3,180 | `04e10cba8` |
+| `src/fn/sub_08115F74.c` | Advance the actual callback pointer without assigning an unused second array-base alias. | 1 to 0 | 56 | `428cee113` |
+| `src/fn/sub_08149A14.c` | Remove the unused `dummy` declaration. | 1 to 0 | 988 | `64bd7f0ee` |
+| `src/fn/sub_081A117C.c` | Store the motion zero directly and use the existing actor view. The pointer-to-pointer alias remains open. | 3 to 1 | 200 | `a21e52f43`, `a083a0423` |
+| `src/fn/sub_081ACAC4.c` | Write the two declared delay fields directly, retaining their existing common halfword delay value. | 1 to 0 | 156 | `6dc3d96d1` |
+| `src/fn/sub_081D46B4.c` | Recover origin and direction fields from matched relatives; remove the cached direction and destination pointer. | 1 to 0 | 152 | `a747f40c3` |
+| `src/fn/sub_081D76F4.c` | Use `ContactPosition` and the actual entry fields; remove the position alias and the literal shared between random range and address arithmetic. | 3 to 1 | 384 | `11bfe1fe4` |
+| `src/fn/sub_081F9E20.c` | Use the shared projectile parameter/position contracts, actual position pointers, and direct aggregate copies. | 3 to 0 | 240 | `77aa80ad3` |
+| `src/fn/sub_0822D080.c` | Use the existing slot parameter in the packed-state exchange. | 1 to 0 | 72 | `60def4a42` |
+| `src/fn/sub_08241BC4.c` | Remove the unused `dummy` declaration. | 1 to 0 | 756 | `b67684658` |
+| `src/fn/sub_08242EA4.c` | Store the computed flags without the assignment-only field pointer. | 1 to 0 | 216 | `1b631516e` |
+| `src/lun.c` | Read the typed participant position directly; remove both the placeholder alias and the separate unused `players` local. | 1 to 0 | 16,116 | `5a30e5054` |
+| `src/nav_mesh.c` | Reuse the existing `GetMesh` accessor and remove assignment-result base aliases from both the caller and accessor. | 1 to 0 | 3,180 | `63d034219` |
 
 ### Evidence behind the type and dataflow changes
 
@@ -171,7 +171,7 @@ the candidate was accepted. The accepted changes are the commits above.
 
 `notes/round14-placeholder-natural-candidates.patch` retains one natural
 nonmatching candidate for each of the eight open functions, against the
-accepted source at `9bafe2435`. Each file patch is an independent investigation
+accepted source at `a083a0423`. Each file patch is an independent investigation
 candidate. The scratch logs and compiler-warning summaries are under
 `build/round14-placeholder/`.
 

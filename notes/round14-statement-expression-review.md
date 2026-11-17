@@ -15,18 +15,18 @@ bytes match. No header or compiler configuration changed.
 
 | Commit | Unit | Statement expressions removed | Exact bytes |
 |---|---|---:|---:|
-| `627d3bcdb` | `background_controller.c` | 1 | 5,372 |
-| `a922b7c5e` | `scene_catalog.c` | 1 | 2,664 |
-| `5d794faf7` | `vorn_main.c` | 1 | 25,404 |
-| `83b7d9b55` | `bat_restore.c` | 2 | 9,548 |
-| `ae7f10920` | `fn/sub_0801EC4C.c` | 1 | 732 |
-| `2a93015d7` | `fn/sub_0801F5EC.c` | 1 | 840 |
-| `4a0dd20f9` | `fn/sub_08038AD4.c` | 3 | 520 |
-| `762ec8e08` | `fn/sub_0810D688.c` | 1 | 216 |
-| `68c452ea6` | `fn/sub_0812A2BC.c` | 2 | 348 |
-| `52c63fa4b` | `fn/sub_0820C4D4.c` | 3 | 1,200 |
-| `aab9be576` | `fn/sub_08241350.c` | 1 | 436 |
-| `c60312757` | `fn/sub_0824AC74.c` | 1 | 112 |
+| `b5371dafb` | `background_controller.c` | 1 | 5,372 |
+| `3b4cfdfe5` | `scene_catalog.c` | 1 | 2,664 |
+| `5666ce868` | `vorn_main.c` | 1 | 25,404 |
+| `63b2b86ed` | `bat_restore.c` | 2 | 9,548 |
+| `e5697e888` | `fn/sub_0801EC4C.c` | 1 | 732 |
+| `0447996bf` | `fn/sub_0801F5EC.c` | 1 | 840 |
+| `90e79c2ef` | `fn/sub_08038AD4.c` | 3 | 520 |
+| `c9aa85a5b` | `fn/sub_0810D688.c` | 1 | 216 |
+| `806244d84` | `fn/sub_0812A2BC.c` | 2 | 348 |
+| `0c31602ee` | `fn/sub_0820C4D4.c` | 3 | 1,200 |
+| `9809fd8bd` | `fn/sub_08241350.c` | 1 | 436 |
+| `fd179f563` | `fn/sub_0824AC74.c` | 1 | 112 |
 
 The substantive changes are direct field reads and calculations, ordinary
 navigation tests, and ordinary control flow for script arguments and input

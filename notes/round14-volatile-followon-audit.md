@@ -44,28 +44,28 @@ made no project progress-report change.
 
 ## Accepted commits
 
-Worker commit IDs may differ after integration cherry-picks. Each commit
-changes one translation unit and removes one reported warning line.
+Commit IDs below refer to the integrated delivery branch. Each commit changes
+one translation unit and removes one reported warning line.
 
-| Unit | Source improvement | Whole-unit bytes | Worker commit |
+| Unit | Source improvement | Whole-unit bytes | Integration commit |
 | --- | --- | ---: | --- |
-| `src/background_controller.c` | Copy the actual queue arguments with the shared source/destination index. | 5,372 | `0a075fe05` |
-| `0812A7B8` | Use shared playback state for linked-effect removal. | 368 | `66c0f58a2` |
-| `0812AA0C` | Use shared playback state for rising linked effects. | 676 | `34f78e1c2` |
-| `0812ACB0` | Use shared playback state for linked-effect tracking. | 980 | `c690358b5` |
-| `0818EF64` | Use shared playback state for moving Nidhoggr effects. | 408 | `769f5c1f6` |
-| `0818F0FC` | Use shared playback state for panel effect lifetime updates. | 284 | `fd1a33a8c` |
-| `0818F444` | Use shared playback state and restart parameter for Nidhoggr burst creation. | 200 | `5ff8d0d67` |
-| `0818FEE4` | Use shared playback state for seeking Nidhoggr effects. | 912 | `ed05ad26f` |
-| `081A39E0` | Replace the copied animation implementation with the existing shared playback API. | 800 | `702293fba` |
-| `0820212C` | Use shared playback state for scripted combat actors. | 1,244 | `ce60dbde3` |
-| `08204230` | Delete the unused `FanSeq` declaration. | 1,236 | `f875c8342` |
-| `08209AC4` | Use shared playback state for fan cannon updates. | 2,052 | `fcc5f3b43` |
-| `0820A5CC` | Use shared playback state for fan cannon creation. | 1,392 | `a2d1157f0` |
-| `0820B3E0` | Use shared playback state for dragon puppy combat. | 1,012 | `98cea7403` |
-| `0820B7E0` | Delete the unused sequence declaration from dragon puppy setup. | 1,280 | `37a74e2fc` |
-| `0820E724` | Delete the unused sequence declaration from poison hand setup. | 1,156 | `b2c51f93f` |
-| `0820F830` | Delete the unused sequence declaration from orange spine setup. | 1,248 | `0c97e6886` |
+| `src/background_controller.c` | Copy the actual queue arguments with the shared source/destination index. | 5,372 | `03ef42221` |
+| `0812A7B8` | Use shared playback state for linked-effect removal. | 368 | `afabcb494` |
+| `0812AA0C` | Use shared playback state for rising linked effects. | 676 | `bead12fa8` |
+| `0812ACB0` | Use shared playback state for linked-effect tracking. | 980 | `84822ec4c` |
+| `0818EF64` | Use shared playback state for moving Nidhoggr effects. | 408 | `eb0a95ebe` |
+| `0818F0FC` | Use shared playback state for panel effect lifetime updates. | 284 | `8f79dd568` |
+| `0818F444` | Use shared playback state and restart parameter for Nidhoggr burst creation. | 200 | `72cefd594` |
+| `0818FEE4` | Use shared playback state for seeking Nidhoggr effects. | 912 | `96d9affad` |
+| `081A39E0` | Replace the copied animation implementation with the existing shared playback API. | 800 | `ca40079a8` |
+| `0820212C` | Use shared playback state for scripted combat actors. | 1,244 | `a6de537e2` |
+| `08204230` | Delete the unused `FanSeq` declaration. | 1,236 | `3765389d0` |
+| `08209AC4` | Use shared playback state for fan cannon updates. | 2,052 | `cfb850f7e` |
+| `0820A5CC` | Use shared playback state for fan cannon creation. | 1,392 | `bb2d07238` |
+| `0820B3E0` | Use shared playback state for dragon puppy combat. | 1,012 | `56a9ddc95` |
+| `0820B7E0` | Delete the unused sequence declaration from dragon puppy setup. | 1,280 | `ca1fa3707` |
+| `0820E724` | Delete the unused sequence declaration from poison hand setup. | 1,156 | `1789e3684` |
+| `0820F830` | Delete the unused sequence declaration from orange spine setup. | 1,248 | `4ca23f162` |
 
 ## Background command arguments: recover the real array induction
 

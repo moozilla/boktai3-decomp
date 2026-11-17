@@ -11,10 +11,10 @@ or diagnostic suppression changed.
 
 | Function | Source commit | Complete stock extent | Once-loops removed |
 |---|---|---:|---:|
-| `BackgroundFlash_UpdateAppearing` | `6a043dcb8` | 108 bytes | 1 |
-| `BackgroundFlash_UpdateDisappearing` | `1d482cca6` | 68 bytes | 2 |
-| `InteractionMarker_TickIdle` | `dd97bb530` | 392 bytes | 1 |
-| `SavedPositionMarker_TickIdle` | `eb5f8c692` | 336 bytes | 1 |
+| `BackgroundFlash_UpdateAppearing` | `bd5581747` | 108 bytes | 1 |
+| `BackgroundFlash_UpdateDisappearing` | `79400dfdf` | 68 bytes | 2 |
+| `InteractionMarker_TickIdle` | `72405755d` | 392 bytes | 1 |
+| `SavedPositionMarker_TickIdle` | `1a35f0f22` | 336 bytes | 1 |
 
 ## Recovered operations
 

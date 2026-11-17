@@ -2,9 +2,8 @@
 
 Tags: #round14 #matching #once-loop #source-recovery #cleanup
 
-Date: 2026-11-16. Inventory snapshot: worker synchronization commit
-`80cd3fc05f5a015189cc60fa077e7023857c7f9f`. Replayable candidates use the canonical
-root ancestor `1a35f0f22ed5fc7ecfdcf9c7e4e40763d814323b` as their source-blob base.
+Date: 2026-11-16. The companion TSV preserves the complete inventory snapshot.
+Replayable candidates use the canonical root ancestor `1a35f0f22ed5fc7ecfdcf9c7e4e40763d814323b` as their source-blob base.
 
 This pass removes **19 once-loop warnings and four constant-local warnings** in
 15 source units. All **135,800 bytes** of those complete units independently
@@ -16,21 +15,21 @@ No new ignore, compiler setting, or linter exemption is introduced.
 
 | Source | Once-loop sites | Reported constant locals | Exact unit bytes | Commit |
 | --- | ---: | ---: | ---: | --- |
-| `actor_position_effects.c` | 1 | 0 | 1,340 | `9ff18ada7` |
-| `converging_effects.c` | 1 | 0 | 1,196 | `7c6b45d98` |
-| `fn/sub_08239480.c` | 1 | 0 | 364 | `dad234cb6` |
-| `fn/sub_080A8144.c` | 2 | 1 | 316 | `e3e553793` |
-| `dog.c` | 2 | 1 | 37,088 | `04e1bf508` |
-| `golem_2.c` | 2 | 1 | 12,492 | `99700ea11` |
-| `mummy_entry.c` | 2 | 1 | 49,808 | `1fb83013a` |
-| `axe.c` | 1 | 0 | 29,148 | `bd57d94d3` |
-| `fn/sub_0812F3CC.c` | 1 | 0 | 340 | `46c26f6b1` |
-| `fn/sub_0813FE30.c` | 1 | 0 | 436 | `6277b368b` |
-| `contact_burst.c` | 1 | 0 | 1,080 | `be5d42784` |
-| `fn/sub_081E2910.c` | 1 | 0 | 576 | `be5d42784` |
-| `fn/sub_0816F6B4.c` | 1 | 0 | 180 | `146e6a434` |
-| `fn/sub_0816F8AC.c` | 1 | 0 | 180 | `932104c05` |
-| `fn/sub_081FF454.c` | 1 | 0 | 1,256 | `2dc865db6` |
+| `actor_position_effects.c` | 1 | 0 | 1,340 | `2c5b790ca` |
+| `converging_effects.c` | 1 | 0 | 1,196 | `6d4f25abe` |
+| `fn/sub_08239480.c` | 1 | 0 | 364 | `7d1cac08c` |
+| `fn/sub_080A8144.c` | 2 | 1 | 316 | `90e7f59a6` |
+| `dog.c` | 2 | 1 | 37,088 | `18756cb69` |
+| `golem_2.c` | 2 | 1 | 12,492 | `abaf7be05` |
+| `mummy_entry.c` | 2 | 1 | 49,808 | `42be2887b` |
+| `axe.c` | 1 | 0 | 29,148 | `1b9de3e89` |
+| `fn/sub_0812F3CC.c` | 1 | 0 | 340 | `3cdeda0cc` |
+| `fn/sub_0813FE30.c` | 1 | 0 | 436 | `36880fd91` |
+| `contact_burst.c` | 1 | 0 | 1,080 | `9f25dd09d` |
+| `fn/sub_081E2910.c` | 1 | 0 | 576 | `9f25dd09d` |
+| `fn/sub_0816F6B4.c` | 1 | 0 | 180 | `4343389e9` |
+| `fn/sub_0816F8AC.c` | 1 | 0 | 180 | `aa2ba1d15` |
+| `fn/sub_081FF454.c` | 1 | 0 | 1,256 | `268d39283` |
 | **Total** | **19** | **4** | **135,800** | |
 
 The aggregate compiler-inclusive scans of these source units and the changed
@@ -59,8 +58,8 @@ wrappers directly. HomingProjectile_UpdateDefaultState uses literals for its
 state-entry checks and stores, also removing an unreported `register u32 one`
 temporary. That extra local removal is not counted as a fifth warning reduction.
 
-**Complete random draw.** Header commit `71fed525f` adds PARTICLE_RANDOM_DRAW;
-caller commit `be5d42784` uses it in contact bursts and presentation shake. Its
+**Complete random draw.** Header commit `b47db9e0f` adds PARTICLE_RANDOM_DRAW;
+caller commit `9f25dd09d` uses it in contact bursts and presentation shake. Its
 body performs only the cursor advance and selected-halfword read. Both operations
 already repeat at both sites and in the existing sampler API. The original macro
 spelling is unknown. Ordinary blocks and existing clean inlines were tried first.
@@ -74,8 +73,8 @@ complete-unit checks and source-candidate records.
 
 | Family | Once-loop sites removed | Exact complete-unit bytes | Source commits |
 | --- | ---: | ---: | --- |
-| Flash and interaction markers | 5 | 904 | `dd97bb530`, `eb5f8c692`, `1d482cca6`, `6a043dcb8` |
-| Palette-bank traversal | 3 | 5,416 | `9bcb69ed6`, `12dc441cb`, `0ec7d1750` |
+| Flash and interaction markers | 5 | 904 | `72405755d`, `1a35f0f22`, `79400dfdf`, `bd5581747` |
+| Palette-bank traversal | 3 | 5,416 | `8ff81912e`, `de7e3bcc1`, `7a8fec89e` |
 
 The marker functions use direct input predicates. The flash functions use their
 actual frame-range branches and display flags. The three palette routines use

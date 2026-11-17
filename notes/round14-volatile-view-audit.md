@@ -56,22 +56,22 @@ contains one.
 
 | Unit | Source improvement | Warning lines removed | Bytes | Worker commit |
 | --- | --- | ---: | ---: | --- |
-| `080364C0` | Poll the shared IRQ-volatile session byte directly. | 1 | 120 | `c632bcbb4` |
-| `0803670C` | Use the same direct session-state access in the parent NI poller. | 1 | 108 | `0966fff93` |
-| `0805D2B0` | Read `sequence.index` directly; remove the volatile index pointers and copy chain. | 2 | 724 | `16b6df4b9` |
-| `0806AF74` | Read the actual sequence command table through an ordinary const pointer. | 1 | 848 | `090bb1a66` |
-| `080838AC` | Remove volatility from the task-owned motion flag pointers. | 2 | 480 | `fbada147d` |
-| `08126D88` | Use ordinary commands and the shared sequence-duration operation. | 5 | 1,260 | `22a6a908d` |
-| `08128F98` | Use indexed reads of the ordinary RAM random table. | 2 | 828 | `f57ef3c2f` |
-| `081294B4` | Replace the private sequence layout and copied playback body with shared types and playback. | 2 | 540 | `54840f382` |
-| `0818F218` | Read and update the pool's actual occupancy field. | 1 | 52 | `356ae900d` |
-| `081B0F34` | Store through the actual vector fields and typed target pointer. | 2 | 600 | `127b9404f` |
-| `081B1334` | Write vector `x` directly, like the other components. | 1 | 1,428 | `65a0dfc89` |
-| `081FFAB8` | Use ordinary commands and the shared sequence-duration operation. | 3 | 704 | `0c080da9b` |
-| `08223580` | Use shared RFU clock/ACK fields and remove the dummy pre-store read. | 1 | 64 | `d90cd5158` |
-| `08224C84` | Clear the shared clock flag directly; remove the dummy read. | 1 | 32 | `24dacaa6a` |
-| `08224CA4` | Request completion through the shared clock flag; remove the dummy read. | 1 | 40 | `aa79c00de` |
-| `src/result_tutorial.c` | Clear the scheduler pause word through an ordinary pointer. | 1 | 3,836 | `5d16f607f` |
+| `080364C0` | Poll the shared IRQ-volatile session byte directly. | 1 | 120 | `57e9db548` |
+| `0803670C` | Use the same direct session-state access in the parent NI poller. | 1 | 108 | `c1e2053ad` |
+| `0805D2B0` | Read `sequence.index` directly; remove the volatile index pointers and copy chain. | 2 | 724 | `e83fea2a1` |
+| `0806AF74` | Read the actual sequence command table through an ordinary const pointer. | 1 | 848 | `9c658040d` |
+| `080838AC` | Remove volatility from the task-owned motion flag pointers. | 2 | 480 | `01b9bb7d6` |
+| `08126D88` | Use ordinary commands and the shared sequence-duration operation. | 5 | 1,260 | `ac4380de2` |
+| `08128F98` | Use indexed reads of the ordinary RAM random table. | 2 | 828 | `5dea8c717` |
+| `081294B4` | Replace the private sequence layout and copied playback body with shared types and playback. | 2 | 540 | `47245a65a` |
+| `0818F218` | Read and update the pool's actual occupancy field. | 1 | 52 | `3f3c7f038` |
+| `081B0F34` | Store through the actual vector fields and typed target pointer. | 2 | 600 | `0d91f4763` |
+| `081B1334` | Write vector `x` directly, like the other components. | 1 | 1,428 | `ac3598f00` |
+| `081FFAB8` | Use ordinary commands and the shared sequence-duration operation. | 3 | 704 | `f279db406` |
+| `08223580` | Use shared RFU clock/ACK fields and remove the dummy pre-store read. | 1 | 64 | `28cee231e` |
+| `08224C84` | Clear the shared clock flag directly; remove the dummy read. | 1 | 32 | `6501b47d9` |
+| `08224CA4` | Request completion through the shared clock flag; remove the dummy read. | 1 | 40 | `a7e4599da` |
+| `src/result_tutorial.c` | Clear the scheduler pause word through an ordinary pointer. | 1 | 3,836 | `9104426f1` |
 
 The existing duplicate flag pointers and once-loop in `080838AC`, the
 cursor/sample union in `08128F98`, and the constant locals in the actor and

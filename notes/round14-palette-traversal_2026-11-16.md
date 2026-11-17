@@ -10,9 +10,9 @@ were removed. Each complete source unit independently matches stock bytes.
 
 | Function | Address | Source commit | Function size | Complete unit checked |
 |---|---|---|---:|---:|
-| `Vanargand_BlendPaletteBanks` | `081A55D4` | `9bcb69ed6` | 64 bytes | 64 bytes |
-| `RegistrySelection_BlendPaletteBanks` | `081B9BC0` | `12dc441cb` | 64 bytes | 3,604 bytes |
-| `ScenePaletteFade_BlendPaletteBanks` | `081C0478` | `0ec7d1750` | 64 bytes | 1,748 bytes |
+| `Vanargand_BlendPaletteBanks` | `081A55D4` | `8ff81912e` | 64 bytes | 64 bytes |
+| `RegistrySelection_BlendPaletteBanks` | `081B9BC0` | `de7e3bcc1` | 64 bytes | 3,604 bytes |
+| `ScenePaletteFade_BlendPaletteBanks` | `081C0478` | `7a8fec89e` | 64 bytes | 1,748 bytes |
 
 ## Source evidence and adopted algorithm
 
