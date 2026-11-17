@@ -114,20 +114,18 @@ s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct Scene
                             u32 kind)
 {
     struct SceneGroundManager *manager = ResourceRegistry_GetResource(0xf0de);
-    u32 zero;
     void *drawable;
     if (!manager) {
         manager = GroundEffect_CreateManager(0, 0);
         if (!manager)
             return -1;
     }
-    zero = 0;
-    effect->active = zero;
+    effect->active = 0u;
     effect->position = position;
     effect->kind = kind;
-    effect->counter = zero;
-    effect->value4 = zero;
-    effect->value6 = zero;
+    effect->counter = 0u;
+    effect->value4 = 0u;
+    effect->value6 = 0u;
     drawable = &effect->flags;
     ParticleSprite_Initialize(drawable, manager->resource, 0x210);
     Effect_SetOrigin(drawable, -8, -8);
