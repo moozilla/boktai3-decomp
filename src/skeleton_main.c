@@ -2296,7 +2296,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
                 u32 *field = saved->base.drawable;
                 *field |= one;
             } else {
-                struct SceneActorAnimationTile *tile = (void *)((u8 *)saved->base.drawable + 0x20);
+                struct SceneInputWidget *tile = (void *)((u8 *)saved->base.drawable + 0x20);
                 tile->flags |= one;
             }
             {
@@ -3385,13 +3385,6 @@ void Skeleton_UpdateHeavyAttackRecovery(struct S *p)
 
 u32 Route_GetCurrentPointFacing(void *);
 
-struct SkeletonTurnTile {
-    struct SceneActorAnimationTile base;
-    u16 elapsed;
-    u8 unknownE[6];
-    u16 frame;
-};
-
 static inline s32 SkeletonTurn_Octant(s16 direction)
 {
     return (direction + 0x70) >> 5;
@@ -3416,7 +3409,7 @@ void Skeleton_TurnTowardRouteFacing(struct ChaseActor *a)
     u8 prepared = SceneActorReaction_TakePrepared(a);
     s32 direction, target, delta;
     const u8 *entry;
-    struct SkeletonTurnTile *tile;
+    struct SceneInputWidget *tile;
 
     motionFlags = &a->base.motionFlags;
     if (prepared) {
@@ -3477,8 +3470,8 @@ void Skeleton_TurnTowardRouteFacing(struct ChaseActor *a)
                 break;
         }
     }
-    tile = (void *)&((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
-    if (tile->elapsed == 0 && (u16)(tile->frame - 1) <= 1) {
+    tile = &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
+    if (tile->elapsed == 0 && (u16)(tile->frameIndex - 1) <= 1) {
         s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
@@ -4403,7 +4396,7 @@ static inline void Show_SinkThenDefeat(struct ChaseActor *a)
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->base.drawable + 0x20);
+        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }

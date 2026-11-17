@@ -141,7 +141,7 @@ void Skeleton_UpdateProbeApproach(struct Skeleton *actor)
     }
     if (actor->chase.base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->chase.base.drawable)->sequence,
+            &((struct SceneActorAnimationSequenceDrawable *)actor->chase.base.drawable)->sequence,
             *scale);
     else
         Anim_SetFrameDurationScale(

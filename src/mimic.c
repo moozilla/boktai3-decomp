@@ -440,7 +440,7 @@ void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor))
         SceneActorAnimation_SelectEntryFlags(
             (void *)actor, 10, SceneActor_GetDirectionFlags(actor->base.body.direction));
-    ResetElapsed(((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence);
+    ResetElapsed(&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence);
     if (frame <= 19)
         return;
     if (!(frame & 1)) {

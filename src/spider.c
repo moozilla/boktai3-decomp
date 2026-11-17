@@ -188,7 +188,7 @@ static inline void Spider_ApplyDuration(struct ChaseActor *actor)
     }
     if (!actor->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
@@ -235,7 +235,7 @@ void Spider_AdvanceTurnAnimation(struct ChaseActor *actor)
                 break;
         }
     }
-    sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (sequence->elapsed == 0) {
         s32 target = Spider_TargetDirection(actor);
         Spider_StepDirection(body, target, 64);

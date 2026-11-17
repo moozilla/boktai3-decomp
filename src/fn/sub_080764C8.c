@@ -44,7 +44,7 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct RoomActor *actor, s3
         actor->animationIndex = selection;
         drawable = actor->drawable;
         {
-            void *sequence = drawable->sequence;
+            void *sequence = &drawable->sequence;
             void *resource = (void *)drawable->resource;
             u32 selected = (u16)selection;
             u32 variant;
@@ -53,7 +53,7 @@ void SceneActorAnimation_SelectDirectionFlagsVariant(struct RoomActor *actor, s3
         }
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 

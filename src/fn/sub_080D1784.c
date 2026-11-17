@@ -54,7 +54,7 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
     struct RecoverySequence *sequence;
     body = &actor->base.body;
     sequence =
-        (void *)((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        (void *)&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct SceneActorRegistryControl *reaction = &group->common.control;
         {

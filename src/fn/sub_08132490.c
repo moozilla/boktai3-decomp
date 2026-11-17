@@ -39,7 +39,7 @@ static inline void Hide(struct ChaseActor *a)
         u32 mask = ~1;
         *flags &= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)a->base.drawable + 0x20);
+        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
         u32 mask = ~1;
         tile->flags &= mask;
     }

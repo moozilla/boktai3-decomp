@@ -202,11 +202,11 @@ static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->base.animationIndex = selection;
         drawable = actor->base.drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->base.restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -261,7 +261,7 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
         u32 *flags = actor->base.drawable;
         *flags |= mask;
     } else {
-        struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= mask;
     }
     queued = TakeSaved(&actor->base.field2B2, &prepared);
@@ -600,7 +600,7 @@ static inline struct SceneActorChaseFlags16 *Mummy_BeginRecovery(struct ChaseAct
 void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *sequence =
-        (void *)((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        (void *)&((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     struct SceneActorChaseFlags16 *reactionFlags;
     SceneActorReaction_TakePrepared(actor);
     reactionFlags = Mummy_BeginRecovery(actor, 0x10);
@@ -866,9 +866,7 @@ static inline u8 Mummy_DisplacementStopped(s32 x, s32 z)
 void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
-        (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)
-                                            actor->base.drawable)
-            ->sequence;
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     struct ContactPackedVector range;
     struct SceneActorChaseGroup *group;
     s16 *x, *z;
@@ -1104,12 +1102,12 @@ static inline u32 Mummy_HalfFlags(u16 *field, u32 mask)
     return *field & mask;
 }
 
-static inline void ShowTile(struct SceneActorAnimationTile *tile, u32 mask)
+static inline void ShowTile(struct SceneInputWidget *tile, u32 mask)
 {
     tile->flags |= mask;
 }
 
-static inline void HideTile(struct SceneActorAnimationTile *tile)
+static inline void HideTile(struct SceneInputWidget *tile)
 {
     u32 mask = ~1;
     tile->flags = mask & tile->flags;
@@ -1896,7 +1894,7 @@ static inline void Mummy_ApplyDuration(struct ChaseActor *a)
     }
     if (!a->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);

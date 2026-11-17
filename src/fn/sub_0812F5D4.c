@@ -43,7 +43,7 @@ static inline void ContactRoute_ApplyDuration(struct ChaseActor *a, u32 mask,
     }
     if (!a->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);

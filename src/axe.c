@@ -695,11 +695,11 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -781,7 +781,7 @@ inline static void Control_UpdateTurnAnimation(struct RoomActor *a, void *callba
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
-    u8 *sequence;
+    struct DisplaySequenceState *sequence;
     if (Take(&actor->field2B2)) {
         s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
@@ -806,7 +806,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
     }
     {
         struct ChaseActor *state = (void *)actor;
-        sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+        sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
         {
             u32 mask = 0xA02F;
             u16 *scale;
@@ -822,7 +822,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
             }
             if (!actor->drawableKind)
                 Anim_SetDurationScale(
-                    ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence,
+                    &((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence,
                     *scale);
             else
                 Anim_SetFrameDurationScale(
@@ -841,7 +841,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         else
             direction[9] -= 32;
         Axe_GetDirectionalFrame(direction[9], &variant, &flags);
-        sequence[5] = 0;
+        sequence->frameCount = 0;
         selection = entry->value;
         Select(actor, selection, variant, flags);
     }

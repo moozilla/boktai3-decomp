@@ -9,7 +9,7 @@ void SceneActorTerrain_ResumeDrawable(struct RoomActor *actor)
         struct SceneActorRegistrySequenceDrawable *drawable = actor->drawable;
         drawable->flags &= mask + 2;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u32 clear = -2;
         tile->flags &= clear;

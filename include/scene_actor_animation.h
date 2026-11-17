@@ -2,6 +2,9 @@
 #define GUARD_SCENE_ACTOR_ANIMATION_H
 #include "scene_actor_profile.h"
 #include "room_actor.h"
+#include "display_sequence.h"
+#include "scene_input_widget.h"
+#include "sprite.h"
 /* Animation-phase actor and drawable views; selection names are provisional. */
 struct SceneActorAnimationLink {
     u8 unknown0[0x6CC];
@@ -12,17 +15,14 @@ struct SceneActorAnimationLink {
     u16 phaseDuration;
 };
 struct SceneActorAnimationSequenceDrawable {
-    u8 unknown0[0x48];
-    u8 sequence[0x10];
-    const void *resource;
-};
-struct SceneActorAnimationTile {
-    u8 unknown0[8];
-    u32 flags;
+    struct DisplaySequenceSprite sprite;
+    struct SpriteRenderResource graphics;
+    struct DisplaySequenceState sequence;
+    const u8 *resource;
 };
 struct SceneActorAnimationTileDrawable {
-    u8 unknown0[0x20];
-    struct SceneActorAnimationTile tile;
+    struct SceneInputResource resource;
+    struct SceneInputWidget tile;
 };
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 void SceneActorAnimation_SelectDirectionalEntryFlags(struct RoomActor *, s32, u32);

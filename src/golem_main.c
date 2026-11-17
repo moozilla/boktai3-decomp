@@ -949,7 +949,7 @@ void Golem_TurnTowardRouteFacing(struct ChaseActor *a)
         a->base.restart = 0;
     }
     if (GolemTurn_Elapsed(
-            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence) == 0) {
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence) == 0) {
         s32 targetDirection = SceneActorTurn_OctantDirection(a->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
         if (difference < 0)
@@ -1888,11 +1888,11 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
             struct SceneActorAnimationSequenceDrawable *drawable;
             actor->base.animationIndex = selection;
             drawable = actor->base.drawable;
-            Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+            Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                              (u8)variant, (u8)flags);
             restart = &actor->base.restart;
         } else {
-            struct SceneActorAnimationTile *tile =
+            struct SceneInputWidget *tile =
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
             u8 *savedSelection;
 
