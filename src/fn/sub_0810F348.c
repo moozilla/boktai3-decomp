@@ -31,9 +31,7 @@ struct RecordMenuSelectionView {
     u8 cursorResource[0x20];
     u8 unknown3A4[0x30];
     u16 cursorGlyph;
-    u8 unknown3D6[0x36];
-    u8 palettePulse[0x20];
-    u8 unknown42C[0x10AC];
+    u8 unknown3D6[0x14D8 - 0x3D6];
     void (*update)(struct RecordMenu *);
     const u8 *titleScript;
     u32 choiceScript, recordScript;
@@ -82,7 +80,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         *redraw = 0;
     }
 
-    Palette_UpdateHighlightPulse(&view->palettePulse, &view->pulsePhase);
+    Palette_UpdateHighlightPulse(&menu->palette[12], &view->pulsePhase);
     {
         if (gPadState[1] & 0x20) {
             if (view->choice != 0)
