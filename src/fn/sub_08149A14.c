@@ -73,7 +73,6 @@ void Player_UpdateRecoilMotion(struct Player *p)
                      p->side);
     PlayerCue_StepSequence((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
     {
-        u32 dummy;
         u32 off270;
         u16 *q270;
         off270 = 0x270;
