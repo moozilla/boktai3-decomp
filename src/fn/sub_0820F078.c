@@ -59,7 +59,7 @@ void OrangeSpine_FireProjectile(struct OrangeSpine *p)
     angle &= -(facing != 0);
     t1 = &position;
     pos = t1;
-    *(&position) = p->position;
+    position = p->position;
     (&position)->y += 128;
     vector(&delta, angle, 160);
     add(&position, &position, &delta);
