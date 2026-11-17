@@ -7,10 +7,11 @@ Read `README.md`, `CLAUDE.md`, `docs/ROADMAP.md` (the four phases), `docs/HANDOF
 files apply to every model.
 
 Aim for the final form: C that matches with no register pins, barriers or compiler
-overrides and reads like the original authors wrote it. The project is in phase 3,
-which removes pins, so pins are heavily discouraged: the landing tools refuse a match
-that adds one unless given `--allow-pins`, which is for the hardest functions after
-real attempts without. Work in ROM order through a subsystem and stay on a function
+overrides and reads like the original authors wrote it. The project is in phase 3b
+(`docs/ROADMAP.md`): the pins and barriers are gone, and the work is the steering C the
+linter reports as warnings (`python3 tools/concessions.py`). Errors stay at zero, warnings
+go down, and a change adds none. The landing tools refuse a match that adds a pin unless
+given `--allow-pins`, which is for the hardest functions after real attempts without. Work in ROM order through a subsystem and stay on a function
 until it matches. Proving the compiler decision that blocks it is the halfway point;
 then find the C that produces it. A pinned match or a holdout comes only after the
 extreme effort `docs/WORKER.md` "Stay on a function until it matches" describes, and a

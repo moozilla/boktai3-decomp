@@ -49,9 +49,11 @@ write `~`). The hooks in `.githooks` run `tools/pii_check.py`.
 
 ## Decompiling a function
 
-The project is in phase 3 of four (draft, match, no concessions, cleanup;
-`docs/ROADMAP.md`): the last drafts get matched, and existing matches lose their pins.
-Aim for the final form: matching C with no pins, written like the original. Go through
+The project is in phase 3b of four phases (draft, match, no concessions, cleanup;
+`docs/ROADMAP.md`). Every function matches and the pins and barriers are gone (3a). What is
+left is steering: valid C nobody would write, which the linter reports as warnings
+(`python3 tools/concessions.py`). Errors stay at zero, warnings go down, and a change adds
+none. Aim for the final form: matching C written like the original. Go through
 a subsystem in ROM order and stay on a function until it matches. The loop is
 `tools/scope/WORKER.md`; the frame is `docs/WORKER.md`.
 
