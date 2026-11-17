@@ -75,15 +75,12 @@ s32 LinkSelection_WaitForInputCompletion(struct AreaEffectLinkState *p)
     flags = ready;
     i = 0;
     if (ready < p->participantCount) {
-        u32 initialMask = 0x3c00;
-        u32 mask;
-        *(&mask) = initialMask;
         do {
             u16 value = Slot(p, i);
-            if (ModeLeave(value, mask)) {
+            if (ModeLeave(value, 0x3c00)) {
                 LinkSelection_RecordSlotState(p, value, i, &flags, 0);
                 ready++;
-            } else if (ModeInput(value, mask) || ModeCancel(value, mask)) {
+            } else if (ModeInput(value, 0x3c00) || ModeCancel(value, 0x3c00)) {
                 LinkSelection_RecordSlotState(p, value, i, &flags, 0);
                 p->menuElapsed = 0;
             } else if (value == 0xffff) {
