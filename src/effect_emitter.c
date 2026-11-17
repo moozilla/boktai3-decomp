@@ -94,16 +94,15 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     struct SceneCollider *collision;
     struct SceneAnimation *resource;
     struct EmitterSprite *sprite;
-    u32 zero = 0;
     object->id = id;
     object->maximum = Script_GetKeywordValue(108, 200);
     object->health = 1;
-    object->cooldown = zero;
+    object->cooldown = 0u;
     object->count = Script_GetKeywordValue(110, 4);
     object->kind = Script_GetKeywordValue(101, 50);
-    object->phase = zero;
-    object->timer = zero;
-    object->flash = zero;
+    object->phase = 0u;
+    object->timer = 0u;
+    object->flash = 0u;
     if (Script_SeekToKeyword(112)) {
         position.x = Script_GetValue();
         position.y = Script_GetValue() + 100;
