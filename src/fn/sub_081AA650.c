@@ -26,11 +26,10 @@ void Vanargand_UpdateTimedAnimationAttack(struct VanargandPairAttack *p)
         {
             u32 one = 1;
             u32 five = 5;
-            u32 zero = 0;
             p->attackParameter5B8 = one;
             p->attackParameter5BA = five;
             PairedSceneActor_ApplyToSelectedHalves(p->pair, 3, 0x13);
-            p->phase = zero;
+            p->phase = 0u;
             p->timer = value.callbackResult;
         }
         Sound_PlaySong(0x591);
