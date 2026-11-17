@@ -601,9 +601,9 @@ static inline void ReportDrain(struct ChaseActor *victim)
     struct ContactPackedVector range;
     if (MayCount(victim)) {
         s32 health = victim->base.health;
-        u32 max = *(u16 *)((u8 *)victim + 0xB0);
-        s32 kind = *(s16 *)((u8 *)victim + 0xB2);
-        s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
+        u32 max = (u16)victim->base.defaultHealth;
+        s32 kind = (s16)victim->base.hudKind;
+        s32 parameter = (s16)victim->base.hudLabel;
         SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
         if (victim->base.reactionSoundVariant || !(victim->base.hitAttributes & 0x20000))
