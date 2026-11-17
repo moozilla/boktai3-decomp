@@ -60,7 +60,6 @@ s32 Projectile_SpawnAtPosition(struct SceneProjectileParams *params,
     u8 *component;
     s32 magnitude;
     s32 angle;
-    u32 zero;
     struct OrbitEffectSprite *sprite;
     if (!pool) {
         SceneProjectile_CreatePool();
@@ -80,7 +79,6 @@ s32 Projectile_SpawnAtPosition(struct SceneProjectileParams *params,
     ((struct OrbitEffectPosition *)component)->y = 0;
     ((struct OrbitEffectPosition *)component)->z =
         Truncate(magnitude * gUnk_086149C4[angle & 0xff]);
-    zero = 0;
     component = (u8 *)&projectile->attack;
     Collider_SetAttackProperties(component, params->collisionProperties[2],
                                  params->collisionProperties[3], params->collisionProperties[0],
@@ -113,18 +111,18 @@ s32 Projectile_SpawnAtPosition(struct SceneProjectileParams *params,
         projectile->scriptProc = proc;
         if (projectile->params.mode == 0) {
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, 0,
-                             zero);
+                             0u);
         } else if (projectile->params.mode == 1) {
             u32 var = (((u16)projectile->params.direction + 0x70) >> 5) & 7;
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, var,
-                             zero);
+                             0u);
         } else {
             u32 var;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             var = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             var &= 3;
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, var,
-                             zero);
+                             0u);
         }
         {
             struct ContactSwarmSprite *sequenceSprite = (struct ContactSwarmSprite *)sprite;
