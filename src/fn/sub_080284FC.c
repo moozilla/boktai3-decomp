@@ -65,14 +65,12 @@ void sub_08027214(void *);
 
 static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->reset = zero;
-    p->pending = zero;
+    p->reset = 0;
+    p->pending = 0;
 }
 
 static inline void Vampire_SetReactionState(struct VampireDamage *p, void (*fn)(void *), u8 id)
