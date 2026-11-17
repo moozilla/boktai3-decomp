@@ -96,12 +96,11 @@ void SceneNpc_UpdateProjectedMove(void *ctx, struct SceneNpc *npc, s32 tick)
 {
     struct Tag *tag = &npc->tag;
     if (npc->entered) {
-        s32 zero = 0;
-        npc->entered = zero;
-        npc->done = zero;
+        npc->entered = 0;
+        npc->done = 0;
         GroundEffect_EnableProjection(npc->groundEffect);
         Actor_PlayAnimationEntry(npc, 3, 1, 0, 4);
-        npc->phase = zero;
+        npc->phase = 0;
     }
     if (npc->callback(npc) != 1) {
         switch (npc->phase) {
