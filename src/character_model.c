@@ -610,12 +610,11 @@ void ActorStats_ApplyPendingDamage(struct ActorStats *actor)
 {
     if (HasPendingDamage(actor)) {
         u32 cleared = ClearDamageFlag(&actor->damageFlags, 1);
-        u32 zero = 0;
         actor->damageFlags = cleared;
         PaletteFlash_SelectPalette((void *)&actor->pendingDamage, 1);
         actor->amount -= ModifierStats_ApplyKinds4And14(actor, actor->pendingDamage);
-        actor->damageTimer = zero;
-        actor->pendingDamage = zero;
+        actor->damageTimer = 0u;
+        actor->pendingDamage = 0u;
         Character_SetLowResourceColorEffect(actor->state44, actor->state48);
         if (actor->amount <= 0)
             SetDamageFlag(&actor->damageFlags, 2);
@@ -768,7 +767,6 @@ void GameState_ClearSlots7A8FromScript(void)
 void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
 {
     s32 i;
-    u32 zero;
     struct GameState *state = gGameState;
     style->adjustedA = *(u8 *)&state->unk7A0[2] + 12;
     style->adjustedB = *(u8 *)&state->unk7A0[0] + 6;
@@ -776,7 +774,6 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
     style->parameterE = state->styleParameterE;
     for (i = 0; i <= 3; i++)
         style->entries[i] = ((u16 *)state->modifierIdsBytes)[i];
-    zero = 0;
     style->count = ModifierMenu_CountAppearanceModifiers(style);
     state = gGameState;
     style->parameterD = (u16)state->unk81A;
@@ -791,8 +788,8 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
         style->initialHalfword = initial;
         style->currentHalfword = initial;
     }
-    style->initialWord = zero;
-    style->currentWord = zero;
+    style->initialWord = 0u;
+    style->currentWord = 0u;
 }
 
 void SceneActorStyle_Initialize(struct SceneActorStyle *style, s32 body, s32 face, s32 accessory,
