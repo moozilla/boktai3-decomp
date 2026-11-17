@@ -559,20 +559,18 @@ static inline void Bee_AnchorPolarOffset(struct ContactPosition *out, u16 angle,
 
 static inline void Bee_SetAnchorControl(struct ChaseActor *a, void *cb, u32 kind)
 {
-    u32 zero;
     u8 *taken = &a->base.field2B2;
-    zero = 0;
     *taken = 1;
-    a->base.stepDone = zero;
+    a->base.stepDone = 0;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0;
 }
 
 static inline void Bee_ClearAnchorMotion(u32 *zero, void *out)
@@ -663,7 +661,6 @@ void Bee_ResetRoute(struct ChaseActor *actor)
     u8 *bytes;
     struct Bee *context = actor->base.context;
     struct ContactPosition *source;
-    u32 zero;
     s32 height, slope;
     u8 *c;
     u32 cellIndex;
@@ -671,16 +668,15 @@ void Bee_ResetRoute(struct ChaseActor *actor)
     u32 fill;
     u8 *first;
     first = &context->routeReset;
-    zero = 0;
     zero8 = 0;
-    *first = zero;
-    context->curveTime = zero;
+    *first = 0;
+    context->curveTime = 0;
     context->flightPhase = zero8;
     context->curveActive = 1;
-    context->curve = zero;
+    context->curve = 0;
     context->curveDirection = zero8;
     context->curveMode = zero8;
-    context->flags = zero;
+    context->flags = 0;
     source = &context->initialPosition;
     actor->base.body.position = *source;
     {
@@ -1468,18 +1464,17 @@ void Bee_UpdateReactionPhase(struct ChaseActor *actor)
 
 static inline void Bee_SetRecoveryControl(struct ChaseActor *a, void *cb, u32 kind)
 {
-    u32 zero = 0;
     a->base.field2B2 = 1;
-    a->base.stepDone = zero;
+    a->base.stepDone = 0;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0;
 }
 
 // confidence=low: approaches a saved player position during the recovery animation.
