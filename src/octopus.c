@@ -1050,13 +1050,15 @@ void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
             actor->base.placementFlags = bit | actor->base.placementFlags;
         }
         {
-            u32 bit = 0x20;
-            actor->base.motionFlags = *(&bit) | actor->base.motionFlags;
+            u32 flags = 0x20;
+            flags |= actor->base.motionFlags;
+            actor->base.motionFlags = flags;
         }
     }
     {
-        u32 bit = 0x10;
-        actor->base.reactionFlags = *(&bit) | actor->base.reactionFlags;
+        u32 flags = 0x10;
+        flags |= actor->base.reactionFlags;
+        actor->base.reactionFlags = flags;
     }
     if (frame <= 17 && sequence->index == 0) {
         u16 elapsed = sequence->elapsed;
