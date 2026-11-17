@@ -11,13 +11,13 @@ static inline s32 ActorController_TruncateMotion(s32 x)
     return -((-x) >> 12);
 }
 
-static inline void ActorController_SetMotion(s16 *velocity, s32 angle, s32 speed)
+static inline void ActorController_SetMotion(struct ActorControllerVelocity *velocity, s32 angle, s32 speed)
 {
     s32 x = ActorController_TruncateMotion(gUnk_086149C4[(angle + 64) & 255] * speed);
     s32 zero = 0;
-    velocity[0] = x;
-    velocity[1] = zero;
-    velocity[2] = ActorController_TruncateMotion(gUnk_086149C4[angle] * speed);
+    velocity->x = x;
+    velocity->y = zero;
+    velocity->z = ActorController_TruncateMotion(gUnk_086149C4[angle] * speed);
 }
 
 void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
@@ -42,7 +42,7 @@ void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
             actor->flags |= 0x20;
         }
         case 1: {
-            ActorController_SetMotion(actor->velocity, (actor->heading + 0x80) & 255, 20);
+            ActorController_SetMotion(&actor->velocity, (actor->heading + 0x80) & 255, 20);
             if (actor->animationComplete) {
                 actor->actionPhase = 0xFF;
                 actor->actionReady = 1;
@@ -82,5 +82,5 @@ void ActorController_UpdateTimedMotion(struct SceneCombatActor *actor)
             }
             break;
     }
-    ActorController_SetMotion(actor->velocity, actor->motionHeading, 25);
+    ActorController_SetMotion(&actor->velocity, actor->motionHeading, 25);
 }

@@ -262,21 +262,21 @@ void ActorController_UpdateMovementVelocity(struct SceneCombatActor *actor)
 {
     ActorController_UpdateMovingAttackCollider(actor);
     if ((u16)(actor->animationEvent - 7) <= 4) {
-        s16 *velocity;
+        struct ActorControllerVelocity *velocity;
         u8 *heading;
         int angle, speed;
         actor->flags |= 0x20;
         heading = &actor->heading;
-        velocity = actor->velocity;
+        velocity = &actor->velocity;
         angle = *heading;
         speed = 25;
         {
             int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
             int zero = 0;
-            velocity[0] = x;
-            velocity[1] = zero;
+            velocity->x = x;
+            velocity->y = zero;
         }
-        velocity[2] = ActorController_TruncateFixed(gUnk_086149C4[angle] * speed);
+        velocity->z = ActorController_TruncateFixed(gUnk_086149C4[angle] * speed);
     } else
         actor->flags &= ~0x20;
 }
@@ -288,22 +288,22 @@ void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
         u8 *heading = &actor->heading;
         int shift = actor->actionCounter >> 1;
         int speed = 20;
-        s16 *velocity = actor->velocity;
+        struct ActorControllerVelocity *velocity = &actor->velocity;
         int angle = *heading;
         speed >>= shift;
         {
             int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
             int zero = 0;
-            velocity[0] = x;
-            velocity[1] = zero;
+            velocity->x = x;
+            velocity->y = zero;
         }
         {
             const s16 *table = gUnk_086149C4;
             const s16 *entry = (const void *)((angle * sizeof(*table)) + (const u8 *)table);
-            velocity[2] = ActorController_TruncateFixed(*entry * speed);
+            velocity->z = ActorController_TruncateFixed(*entry * speed);
         }
     }
-    if (actor->velocity[0] || actor->velocity[2]) {
+    if (actor->velocity.x || actor->velocity.z) {
         u16 *flags = &actor->flags;
         u32 value = *flags;
         u32 mask = 0x20;

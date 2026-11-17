@@ -60,12 +60,16 @@ struct ActorControllerColliderGroup {
     u8 unknown8[8];
     struct ContactCollider colliders[4];
 };
+struct ActorControllerVelocity {
+    s16 x, y, z;
+};
+
 /* One actor owns two loose particles, a facing marker, and nine fragments. */
 struct SceneCombatActor {
     u8 unknown0[0x18];
     struct ActorControllerNavigation navigation;
-    s16 velocity[3];
-    u8 unknown56[0x6A];
+    struct ActorControllerVelocity velocity;
+    u8 unknown58[0x68];
     u16 animationFrame;
     u8 unknownC2[2];
     u16 animationDuration;
