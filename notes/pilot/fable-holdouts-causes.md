@@ -166,3 +166,37 @@ combine-formed constant written before the loops scores worse (52).
   unions, then retain a bounded exit lifetime and a cross-block zero reference.
   This preserves Skeleton's sb/r8/sl values and spills the shared origin (080BD1F0;
   fact 257). All listed forms are allocation-only phase 4 review items.
+
+
+## Round 13 completion recipes (2026-11-17)
+
+All 36 functions in the original concession queue now match with zero counted
+concessions. The earlier open-member lists above are historical checkpoints;
+[the completion report](../round13-batch5_2026-11-17.md) maps every function to
+its matching commit.
+
+* A saved pointer is forwarded into a callback too early: keep a typed dead
+  store through regmove and retain the pointer's earlier CSE lifetime. The final
+  store disappears in jump2 (0803B40C; fact 258).
+* A timer needs a different argument register after reload: first admit the
+  missing low scratch register with bounded signed loads, then supply the
+  separate argument-copy preference without crossing the dead call (0805AC3C;
+  fact 259). The rig initializer uses the existing late-table recipe (0805B0F0).
+* A sample should remain local while its result is global: a bounded negative
+  halfword guard after the coordinate sum preserves that allocation boundary,
+  and cursor reuse keeps the next address in its required register (081D3620;
+  fact 260).
+* A dead preference arm disables the desired implicit GIV: make the real key
+  cursor explicit, preserving the guard, initializer order and pointer-before-
+  index increments (08217430; fact 261).
+* A mask and later pointer need the same saved register: reuse a typed union
+  across disjoint lifetimes and weight its references with single-pass loops.
+  Unlike a dead branch, this leaves the original PRE boundary intact (0804373C;
+  fact 263).
+* Correct scalar spills become unwanted induction cursors: retain a bounded
+  zero in the halfword index until after loop.c, then use explicit byte-offset
+  pointer additions. Declaration order now controls the original six homes
+  (08071F50; fact 264).
+
+Every listed source form is named as allocation-only in its function commit for
+phase 4. The ordinary stock compiler is the acceptance authority throughout.

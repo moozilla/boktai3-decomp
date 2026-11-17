@@ -3051,3 +3051,85 @@ which is exactly `10:1`. Not tested.
    arms disappear. All 7,924 bytes match. The unions, initializer, guards and
    zero term are allocation-only; numeric statistics selectors were also replaced
    by checked, named fields in enemy_defeat_statistics.h.
+
+258. **A dead store can block regmove from forwarding a saved pointer into a callback.**
+   WirelessResultPanel_Init (0803B40C) needs the final state stores through r1,
+   followed by a callback address through sb. Reuse a pointer union for the
+   earlier visible address and final state address, retaining a dead read across
+   the CSE block. A bounded zero offset preserves the state-store copy. The final
+   negative-byte arm's unreachable typed store prevents regmove from forwarding
+   r1 into the callback and avoids a new r2 spill requirement. Earlier bounded
+   resource-copy arms preserve the two source moves before ldm/stm; a dead parent
+   byte store controls reload rotation. All 684 bytes match. The union, typed byte
+   view, guards, zero and dead accesses are allocation-only phase 4 forms.
+
+259. **Admitting a scratch register and choosing an argument register are separate decisions.**
+   ScenePanel_TickRig (0805AC3C) first needs r3 in reload's spill set. An impossible
+   negative-byte arm with two signed field loads supplies that demand. A separate
+   bounded timer fallback passes the timer in argument four and the interval
+   pointer in argument two, supplying their r3/r1 preferences. Reusing the timer
+   for the second frame sample avoids another fallback. Preserve both timer
+   reads, but use an ordinary second halfword load so no extra volatile copy
+   survives. Both arms disappear in jump2; all 220 bytes match. ScenePanel_InitRig
+   (0805B0F0) separately uses the known-zero halfword-state offset from fact 231
+   to avoid the random table's REG_EQUIV penalty and retain r4 ahead of mask r5.
+   These guards, scalar reuse and table identity are allocation-only forms.
+
+260. **Bounded guards can keep accumulators global while samples remain local.**
+   sub_081D3620 needs each sample in r0, with coordinate sums in r2 then r1.
+   After each sum, widen the unsigned halfword coordinate and guard a zero
+   assignment with its impossible signed-negative test. The branch retains a
+   global coordinate quantity through local allocation; each random sample is
+   allocated first as a local. Reuse one cursor through both draws and the second
+   numeric sample address, keeping the cursor in r1. The guards disappear in
+   jump2 and all 132 bytes match. The guards, scalar reuse and retained table
+   halves union are allocation-only phase 4 items.
+
+261. **A dead argument preference may require making the real induction cursor explicit.**
+   sub_08217430 needs the completed palette-bank pointer in r3 while its loaded
+   base stays in r1. A negative guard over an unsigned halfword key shifted by
+   five passes bank as argument four to an unreachable callback-setup call, then
+   jumps past CpuFastSet. This gives bank r3 without keeping it live across the
+   dead call. The extra path makes loop.c reject the implicit key-address GIV
+   (benefit two, net zero), so use a guarded do-loop with an explicit key cursor.
+   Load the base-pointer address before the cursor, and increment keys before
+   the index; all 1,328 bytes match. The fallback, dead call and join are
+   allocation-only. A pre-existing single-iteration source-increment wrapper in
+   a later fade loop is retained and explicitly marked for phase 4.
+
+262. **An aggregate hard-register conflict can be a wide pseudo's own upper word.**
+   The two-word palette-bank experiment in sub_08217430 allocated pseudo 43
+   starting at r2, occupying r2/r3. Its low-word output needed r3, but the old
+   holder lookup excluded the queried pseudo and reported an unknown blocker.
+   Preserve SUBREG word offsets when recovering allocation bases and mapping
+   emitted operands. Report the allocation span and the scalar word separately:
+   moving word zero to r3 means moving the whole pair to r3/r4, not independently
+   assigning its low word. The scope fix has synthetic self-occupancy, high-word
+   and base-recovery tests, plus the ignored real diagnostic reproduction.
+
+263. **Single-pass loop notes can change reference weights without adding a branch boundary.**
+   ContactActor_UpdateRetreat (0804373C) needs the early angle mask and later
+   random-index pointer in r6, leaving the actor in r7. A typed union reuses their
+   disjoint storage; assign the cursor after the first trig product but before
+   truncation. Single-pass loops around the mask initializer and the cursor
+   helper's increment/store give the union 16 weighted references over 99 live
+   instructions, priority 6464 ahead of the actor's 5970. A third single-pass
+   loop around the radius AND makes its mask win the local tie: priority 40000
+   against sample 15000, selecting mask r0 and sample r1. Unlike a bounded dead
+   arm here, these loops do not introduce a PRE boundary that moves the cursor
+   handoff. The origin's known-zero low bits end its lifetime at the first x
+   join, preserving r8/sl. All 788 bytes match. The union, assignment boundary,
+   weighting loops and origin identity are explicit allocation-only phase 4 items.
+
+264. **Preserve scalar spill order by delaying unwanted induction-variable recognition.**
+   SceneActorPalette_ApplyTransition (08071F50) needs six homes in this order:
+   deltaRed, red, deltaGreen, green, actorFlags, blue at sp+0/4/8/C/10/14.
+   Declare typed scalar pointers in that order. Plain halfword indexing lets
+   loop.c replace their lifetimes with extra GIV cursors and loses the layout.
+   Use `u32 halfOffset = (i + ((u16)i >> 16)) * 2`: the bounded term survives
+   loop strength reduction and disappears in combine. Only the color cursor
+   remains a GIV. Explicit pointer-first integer additions then resolve the
+   last three commuted ADDs. A separate category predicate's negative-halfword
+   guard prevents regmove tying the AND to the live flags; the ordinary first
+   predicate retains its mask/load order. All 468 bytes match. The declaration
+   order, guard, index identity and explicit offset are allocation-only forms.
