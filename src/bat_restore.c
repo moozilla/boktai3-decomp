@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_delayed_response.h"
@@ -380,14 +381,14 @@ static inline u8 Bat_Arrive(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -587,14 +588,14 @@ static inline u8 Bat_Arrive_UpdateRecoilRecovery(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
