@@ -94,8 +94,19 @@ compiler-switch experiment authorizes changing the stock acceptance rule.
 
 ## Preserved evidence
 
-All evidence below is in the ignored `build/round14/addr-deref/` directory of the
-address-expression worktree; accepted source and rationale are in the commits.
+Replayable source evidence is tracked in
+[round14-address-candidates_2026-11-16.jsonl](evidence/round14-address-candidates_2026-11-16.jsonl):
+138 complete candidate patches for all 29 open functions in 28 units, with
+hypotheses, rejection reasons, and historical score summaries. Apply each patch
+independently to its named source at integration commit `ea3b1c59d`; the manifest
+records the full commit and baseline blob IDs. Each reconstructed source is
+checked by its recorded SHA-256. Only the named function was historically scored;
+some snapshots contain earlier states of unrelated functions. These are preserved
+hypotheses, not proposed source changes, and carry no generated assembly or RTL.
+
+The fuller tooling records below remain in the ignored
+`build/round14/addr-deref/` directory of the address-expression worktree; accepted
+source and rationale are in the commits.
 
 - `remaining.json` records the exact 30-site, 28-unit remainder.
 - `family-matches.json` records each accepted structural and literal change,
