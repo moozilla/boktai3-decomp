@@ -61,8 +61,7 @@ int WirelessController_PollInputExchange(struct Engine *p)
         changed = &p->changed;
     }
     {
-        int one = 1;
-        *changed = one;
+        *changed = 1;
     }
     return result;
 }
