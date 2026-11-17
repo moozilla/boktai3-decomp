@@ -32,11 +32,9 @@ static inline long long LinkGet(s32 i)
 
 void Player_UpdateActionPhase(u8 *p)
 {
-    u32 *new_var;
     u32 m = 0x54000;
     u32 f = *(u32 *)(p + 0x20) | m;
-    new_var = (u32 *)(p + 0x20);
-    *new_var = f;
+    *(u32 *)(p + 0x20) = f;
     switch (*(s32 *)(p + 0x1c)) {
         case 1: {
             s32 r;
