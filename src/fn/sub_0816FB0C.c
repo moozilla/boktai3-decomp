@@ -1,11 +1,11 @@
 #define gSceneHudActionDefinitions gUnk_08E61280
 #include "global.h"
 #include "scene_hud_display.h"
+#include "inventory_grid.h"
 #include "scene_item_values.h"
 extern const struct SceneValueItemDefinition gUnk_08E61280[];
 void Sound_PlaySong(u32);
 s32 Inventory_GetQuantityByStorage(u32, u32);
-void InventoryGrid_BeginIconTransfer(void *);
 void MenuTransition_BeginSelectedWidget(void *);
 void sub_0816E570(void *);
 void PauseMenu_BeginCharacterItemUse(void *, u32);
