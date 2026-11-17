@@ -3,6 +3,7 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "scene_input_widget.h"
 #include "scene_event_dispatch.h"
 
 /* Tentative: Nidhoggr, a dragon boss task (allocated at 0x72FC bytes, Task_Create(8, ...)).
@@ -13,14 +14,6 @@
  * is the sub-state within whichever behavior is active. Field names are provisional
  * (confidence=low); several short byte/word fields, and most of the suspended-object
  * and terrain-cell sub-regions, are still guesses. */
-
-struct NidhoggrAnimRow {
-    u8 unknown0[8];
-    u32 flags;
-    u8 unknown12[0x20 - 12];
-    struct SceneVec pos;
-    u8 unknown28[0x60 - 0x28];
-};
 
 struct NidhoggrCollider {
     u8 unknown0[6];
@@ -53,8 +46,8 @@ struct Nidhoggr {
     s16 bgScrollX;                /* 0x5416 */
     s16 bgScrollY;                /* 0x5418 */
     u8 unknown541A[0x541C - 0x541A];
-    u8 animHdr[0x20];                /* 0x541C: shared keyframe/resource header for all part rows */
-    struct NidhoggrAnimRow rows[26]; /* 0x543C: one per body segment */
+    struct SceneInputResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
+    struct SceneInputWidget rows[26]; /* 0x543C: one per body segment */
     struct NidhoggrCollider
         altColliders[26]; /* 0x5DFC: a second collider per part; [0] is refreshed
                                                 * each frame in Update while flags[0] counts down */

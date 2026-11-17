@@ -4,7 +4,6 @@
 #include "engine.h"
 #include "render.h"
 #include "ram.h"
-#include "display_keyframe.h"
 
 void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
 {
@@ -13,11 +12,11 @@ void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xa, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xa, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation11(struct Nidhoggr *p, s32 i)
@@ -27,11 +26,11 @@ void SceneAnimation_UpdateSlotAnimation11(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xb, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xb, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation0(struct Nidhoggr *p, s32 i)
@@ -41,11 +40,11 @@ void SceneAnimation_UpdateSlotAnimation0(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation2(struct Nidhoggr *p, s32 i)
@@ -55,11 +54,11 @@ void SceneAnimation_UpdateSlotAnimation2(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 2, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 2, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation1(struct Nidhoggr *p, s32 i)
@@ -69,11 +68,11 @@ void SceneAnimation_UpdateSlotAnimation1(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 1, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 1, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation3(struct Nidhoggr *p, s32 i)
@@ -83,11 +82,11 @@ void SceneAnimation_UpdateSlotAnimation3(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 3, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 3, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation12(struct Nidhoggr *p, s32 i)
@@ -99,11 +98,11 @@ void SceneAnimation_UpdateSlotAnimation12(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xc, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xc, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -118,11 +117,11 @@ void SceneAnimation_UpdateSlotAnimation13(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xd, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xd, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -137,11 +136,11 @@ void SceneAnimation_UpdateSlotAnimation14(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xe, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xe, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -156,11 +155,11 @@ void SceneAnimation_UpdateSlotAnimation15(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0xf, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0xf, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -175,11 +174,11 @@ void SceneAnimation_UpdateSlotAnimation16(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x10, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x10, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -194,11 +193,11 @@ void SceneAnimation_UpdateSlotAnimation17(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x11, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x11, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -213,11 +212,11 @@ void SceneAnimation_UpdateSlotAnimation18(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x12, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x12, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -232,11 +231,11 @@ void SceneAnimation_UpdateSlotAnimation19(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x13, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x13, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -251,11 +250,11 @@ void SceneAnimation_UpdateSlotAnimation20(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x14, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x14, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -270,11 +269,11 @@ void SceneAnimation_UpdateSlotAnimation21(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x15, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x15, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -289,11 +288,11 @@ void SceneAnimation_UpdateSlotAnimation22(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x16, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x16, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -308,11 +307,11 @@ void SceneAnimation_UpdateSlotAnimation23(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x17, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x17, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -325,11 +324,11 @@ void SceneAnimation_UpdateSlotAnimation45(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2d, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2d, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void SceneAnimation_UpdateSlotAnimation46(struct Nidhoggr *p, s32 i)
@@ -339,11 +338,11 @@ void SceneAnimation_UpdateSlotAnimation46(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2e, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2e, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void Nidhoggr_UpdateLoopAnimation29(struct Nidhoggr *p, s32 i)
@@ -353,11 +352,11 @@ void Nidhoggr_UpdateLoopAnimation29(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x29, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x29, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void Nidhoggr_UpdateLoopAnimation2B(struct Nidhoggr *p, s32 i)
@@ -367,11 +366,11 @@ void Nidhoggr_UpdateLoopAnimation2B(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2b, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2b, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void Nidhoggr_UpdateLoopAnimation2A(struct Nidhoggr *p, s32 i)
@@ -381,11 +380,11 @@ void Nidhoggr_UpdateLoopAnimation2A(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2a, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2a, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void Nidhoggr_UpdateLoopAnimation2C(struct Nidhoggr *p, s32 i)
@@ -395,11 +394,11 @@ void Nidhoggr_UpdateLoopAnimation2C(struct Nidhoggr *p, s32 i)
     s = t + i;
     if (*s == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2c, 1, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2c, 1, 4);
         (*s)++;
         p->rowDoneFlag[i] = 1;
     }
-    Anim_Step(&p->rows[i], p->animHdr);
+    Anim_Step(&p->rows[i], &p->animHdr);
 }
 
 void Nidhoggr_UpdateOneShotAnimation2F(struct Nidhoggr *p, s32 i)
@@ -411,11 +410,11 @@ void Nidhoggr_UpdateOneShotAnimation2F(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x2f, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x2f, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -430,11 +429,11 @@ void Nidhoggr_UpdateOneShotAnimation30(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x30, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x30, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -449,11 +448,11 @@ void Nidhoggr_UpdateOneShotAnimation31(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x31, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x31, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -468,11 +467,11 @@ void Nidhoggr_UpdateOneShotAnimation32(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x32, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x32, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -487,11 +486,11 @@ void Nidhoggr_UpdateOneShotAnimation33(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x33, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x33, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -506,11 +505,11 @@ void Nidhoggr_UpdateOneShotAnimation34(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x34, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x34, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -525,11 +524,11 @@ void Nidhoggr_UpdateOneShotAnimation35(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x35, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x35, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -544,11 +543,11 @@ void Nidhoggr_UpdateOneShotAnimation36(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x36, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x36, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -563,11 +562,11 @@ void Nidhoggr_UpdateOneShotAnimation37(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x37, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x37, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -582,11 +581,11 @@ void Nidhoggr_UpdateOneShotAnimation15(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x15, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x15, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -601,11 +600,11 @@ void Nidhoggr_UpdateOneShotAnimation39(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x39, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x39, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -620,11 +619,11 @@ void Nidhoggr_UpdateOneShotAnimation3A(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x3a, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x3a, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -639,11 +638,11 @@ void Nidhoggr_UpdateOneShotAnimation18(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x18, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x18, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -658,11 +657,11 @@ void Nidhoggr_UpdateOneShotAnimation19(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x19, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x19, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -677,11 +676,11 @@ void Nidhoggr_UpdateOneShotAnimation1A(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1a, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1a, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -696,11 +695,11 @@ void Nidhoggr_UpdateOneShotAnimation1B(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1b, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1b, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -715,11 +714,11 @@ void Nidhoggr_UpdatePartAnimation1C(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1c, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1c, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -734,11 +733,11 @@ void Nidhoggr_UpdatePartAnimation1D(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1d, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1d, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -753,11 +752,11 @@ void Nidhoggr_UpdatePartAnimation1E(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1e, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1e, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -772,11 +771,11 @@ void Nidhoggr_UpdatePartAnimation1F(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x1f, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x1f, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -791,11 +790,11 @@ void Nidhoggr_UpdatePartAnimation20(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x20, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x20, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -810,11 +809,11 @@ void Nidhoggr_UpdatePartAnimation21(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x21, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x21, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -829,11 +828,11 @@ void Nidhoggr_UpdatePartAnimation22(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x22, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x22, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -848,11 +847,11 @@ void Nidhoggr_UpdatePartAnimation23(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x23, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x23, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -867,11 +866,11 @@ void Nidhoggr_UpdatePartAnimation24(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x24, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x24, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -886,11 +885,11 @@ void Nidhoggr_UpdatePartAnimation25(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x25, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x25, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -905,11 +904,11 @@ void Nidhoggr_UpdatePartAnimation26(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x26, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x26, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -924,11 +923,11 @@ void Nidhoggr_UpdatePartAnimation28(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x28, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x28, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -943,11 +942,11 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
     z = *s;
     if (z == 0) {
         p->rows[i].flags &= ~1;
-        Anim_SetKeyframes(&p->rows[i], p->animHdr, 0x27, 2, 4);
+        Anim_SetKeyframes(&p->rows[i], &p->animHdr, 0x27, 2, 4);
         (*s)++;
         p->rowDoneFlag[i] = z;
     }
-    if (Anim_Step(&p->rows[i], p->animHdr) != 0) {
+    if (Anim_Step(&p->rows[i], &p->animHdr) != 0) {
         *s = 0xff;
         p->rowDoneFlag[i] = 1;
     }
@@ -956,7 +955,7 @@ void Nidhoggr_UpdatePartAnimation27(struct Nidhoggr *p, s32 i)
 /* Tentative: called once per frame from Nidhoggr_Update. For each of the 26 parts it looks up
  * a callback in gUnk_0824F364 keyed by t->partState[i] and runs it through sub_08249240
  * (or resets the row latches when there is none), blinks the row via rowBlink, then
- * repositions each row's offset (rows[i].pos) and collider from t->pos plus constant offset
+ * repositions each row's offset (rows[i].position) and collider from t->pos plus constant offset
  * tables. confidence=low. */
 
 extern void (*const gUnk_0824F364[])(void);
@@ -971,7 +970,7 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
     void **q;
     s32 i;
     s32 j;
-    struct SceneVec *p21, *p20;
+    struct ContactPosition *p21, *p20;
     struct SceneVec *pa, *pb, *pc, *pd, *pe, *pf;
     for (i = 0; i <= 25; i++) {
         if (gUnk_0824F364[t->partState[i]] == 0) {
@@ -993,30 +992,30 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
             t->rowCounter[i]++;
         }
     }
-    for (i = 0, p21 = &t->rows[21].pos, p20 = &t->rows[20].pos, pa = &t->pos; i <= 1; i++) {
-        t->rows[i].pos.x = pa->x + gUnk_0824F344->x;
-        t->rows[i].pos.y = pa->y + gUnk_0824F344->y;
-        t->rows[i].pos.z = pa->z + gUnk_0824F344->z;
+    for (i = 0, p21 = &t->rows[21].position, p20 = &t->rows[20].position, pa = &t->pos; i <= 1; i++) {
+        t->rows[i].position.x = pa->x + gUnk_0824F344->x;
+        t->rows[i].position.y = pa->y + gUnk_0824F344->y;
+        t->rows[i].position.z = pa->z + gUnk_0824F344->z;
         Collider_SetPosition(&t->colliders[i], pa, 0);
         Collider_SetPosition(&t->altColliders[i + 1], pa, 0);
     }
     for (i = 2, j = 0, pb = &t->pos; i <= 9; i++, j++) {
-        t->rows[i].pos.x = pb->x + j[gUnk_0824F2E4].x;
-        t->rows[i].pos.y = pb->y + j[gUnk_0824F2E4].y;
-        t->rows[i].pos.z = pb->z + j[gUnk_0824F2E4].z;
-        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+        t->rows[i].position.x = pb->x + j[gUnk_0824F2E4].x;
+        t->rows[i].position.y = pb->y + j[gUnk_0824F2E4].y;
+        t->rows[i].position.z = pb->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].position, 0);
     }
     for (i = 10, j = 0, pc = &t->pos; i <= 17; i++, j++) {
-        t->rows[i].pos.x = pc->x + j[gUnk_0824F2E4].x;
-        t->rows[i].pos.y = pc->y + j[gUnk_0824F2E4].y;
-        t->rows[i].pos.z = pc->z + j[gUnk_0824F2E4].z;
-        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+        t->rows[i].position.x = pc->x + j[gUnk_0824F2E4].x;
+        t->rows[i].position.y = pc->y + j[gUnk_0824F2E4].y;
+        t->rows[i].position.z = pc->z + j[gUnk_0824F2E4].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].position, 0);
     }
     for (i = 18, j = 0, pd = &t->pos; i <= 19; i++, j++) {
-        t->rows[i].pos.x = pd->x + j[gUnk_0824F324].x;
-        t->rows[i].pos.y = pd->y + j[gUnk_0824F324].y;
-        t->rows[i].pos.z = pd->z + j[gUnk_0824F324].z;
-        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+        t->rows[i].position.x = pd->x + j[gUnk_0824F324].x;
+        t->rows[i].position.y = pd->y + j[gUnk_0824F324].y;
+        t->rows[i].position.z = pd->z + j[gUnk_0824F324].z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].position, 0);
     }
     pe = &t->pos;
     p21->x = pe->x + gUnk_0824F334->x;
@@ -1027,10 +1026,10 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
     p20->z = pe->z + gUnk_0824F33C->z;
     i = 22;
     for (; i <= 23; i++) {
-        t->rows[i].pos.x = (&t->pos)->x + gUnk_0824F344->x;
-        t->rows[i].pos.y = (&t->pos)->y + gUnk_0824F344->y;
-        t->rows[i].pos.z = (&t->pos)->z + gUnk_0824F344->z;
-        Collider_SetPosition(&t->colliders[i], &t->rows[i].pos, 0);
+        t->rows[i].position.x = (&t->pos)->x + gUnk_0824F344->x;
+        t->rows[i].position.y = (&t->pos)->y + gUnk_0824F344->y;
+        t->rows[i].position.z = (&t->pos)->z + gUnk_0824F344->z;
+        Collider_SetPosition(&t->colliders[i], &t->rows[i].position, 0);
     }
     q = (void **)t->unknown72C4;
     if (*q != 0)
@@ -1557,9 +1556,6 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
 /* Initialize Nidhoggr's part animations, attack/body colliders, target records,
  * and the time-dependent palette used by part 21. */
 
-struct NidhoggrResourceHeader {
-    u32 words[8];
-};
 struct NidhoggrPartVector {
     u32 words[2];
 };
@@ -1575,12 +1571,6 @@ struct NidhoggrTargetRecord {
     u32 flags;
     void *callback;
     void *next;
-};
-struct NidhoggrPartRow {
-    struct DisplayKeyframeState widget;
-    u8 unk_3c[0x48 - 0x3c];
-    void *palette;
-    u8 unk_4c[0x60 - 0x4c];
 };
 extern const u8 gUnk_0824F490[];
 extern u8 gUnk_0824F4AC[];
@@ -1611,8 +1601,8 @@ struct NidhoggrPartInit {
     u8 unk_00[0x4c];
     u32 actorId;
     u8 unk_50[0x541c - 0x50];
-    struct NidhoggrResourceHeader animHdr;
-    struct NidhoggrPartRow rows[26];
+    struct SceneInputResource animHdr;
+    struct SceneInputWidget rows[26];
     struct NidhoggrPartCollider timedCollider;
     struct NidhoggrPartCollider attackColliders[26];
     struct NidhoggrPartCollider colliders[26];
@@ -1628,9 +1618,9 @@ struct NidhoggrPartInit {
 void Nidhoggr_InitParts(void *arg0)
 {
     struct NidhoggrPartInit *t = arg0;
-    struct NidhoggrResourceHeader *src;
+    struct SceneInputResource *src;
     s32 i;
-    struct NidhoggrPartRow *row;
+    struct SceneInputWidget *row;
     struct NidhoggrTargetRecord *target;
     struct NidhoggrPartCollider *collider;
     u32 damage;
@@ -1750,8 +1740,9 @@ void Nidhoggr_InitParts(void *arg0)
             if (--i < 0) {
                 TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,
                                            gPaletteBankData + 0x3560, gPaletteBankData + 0x3580);
-                t->rows[21].widget.paletteIndex = 0xf1a3;
-                t->rows[21].palette = &t->rowBlink[18];
+                t->rows[21].paletteBank = 0xf1a3;
+                /* This palette aliases packed status storage; its layout is unresolved. */
+                t->rows[21].palette = (u16 *)&t->rowBlink[18];
             }
         }
     }
