@@ -25,6 +25,7 @@
 #include "render.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_chase_reaction.h"
 
 void SceneActorControl_OnIdle(u8 *);
 
@@ -1389,8 +1390,6 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
         u8 *state = &s->base.state2A8;
         u8 zero = 0;
         u8 one;
-        void (*fn)(void);
-        u8 code;
         *state = zero;
         s->base.phase2A9 = zero;
         s->base.behavior2AA = three;
@@ -1400,19 +1399,7 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
             one = 1;
             *queued = one;
         }
-        fn = SceneActorControl_OnIdle;
-        code = 0x10;
-        s->base.field2B2 = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        {
-            u32 *flags = &s->base.pendingControlFlags;
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->base.pendingControl = zero;
+        SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
     }
 }
 
