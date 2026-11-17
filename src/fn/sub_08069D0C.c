@@ -9,13 +9,11 @@ struct BurstEmitter *BurstEmitter_AllocateSlot(struct BurstEmitterPool *input)
 {
     struct BurstEmitterPool *pool = input;
     s32 index = 0;
-    u32 one;
-    *(&one) = 1;
     for (; index <= 4; index++) {
-        if (!BurstEmitter_IsOccupied(pool, index, one)) {
+        if (!BurstEmitter_IsOccupied(pool, index, 1)) {
             struct BurstEmitter *emitter = &pool->slots[index];
             emitter->index = index;
-            pool->used |= one << index;
+            pool->used |= 1U << index;
             return emitter;
         }
     }
