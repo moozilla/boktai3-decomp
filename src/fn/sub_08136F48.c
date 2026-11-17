@@ -13,9 +13,8 @@ struct SceneActorScriptCursor {
 // confidence=low: clears a script cursor's position fields and the owner's word at +0xDC.
 void sub_08136F48(u8 *owner, struct SceneActorScriptCursor *cursor)
 {
-    u32 zero = 0;
-    cursor->unknown18 = zero;
-    cursor->unknown14 = zero;
-    cursor->unknown8 = zero;
-    *(u32 *)(owner + 0xdc) = zero;
+    cursor->unknown18 = 0u;
+    cursor->unknown14 = 0u;
+    cursor->unknown8 = 0u;
+    *(u32 *)(owner + 0xdc) = 0u;
 }
