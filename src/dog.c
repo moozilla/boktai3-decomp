@@ -3147,34 +3147,10 @@ struct Sscripted {
 void Dog_UpdateScriptedAction(struct Sscripted *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = Dog_UpdateArrivalAnimation;
-        u8 code = 10;
-        u32 zero;
-        u32 *f;
-        s32 mask;
         u16 *h;
         u16 value;
         s32 off;
-        {
-            u8 *taken = &obj->taken;
-            zero = 0;
-            *taken = 1;
-        }
-        do {
-            u32 field = 0x2B0;
-            do {
-                ((u8 *)obj)[field] = zero;
-            } while (0);
-            field += 5;
-            ((u8 *)obj)[off = field] = code;
-            obj->callback = fn;
-            field += 0x13;
-            *((u16 *)(((u8 *)obj) + field)) = zero;
-        } while (0);
-        f = (u32 *)(((u8 *)obj) + 0x114);
-        mask = -2;
-        *f &= mask;
-        *((u32 *)(((u8 *)obj) + 0x104)) = zero;
+        SceneActorChase_SetControl(obj, Dog_UpdateArrivalAnimation, 10);
         {
             u32 byte = obj->atE9;
             obj->at59 = byte;
