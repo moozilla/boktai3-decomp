@@ -997,8 +997,6 @@ void sub_081E4D14(void)
 
 /* Script command: configure the singleton animation controller. */
 
-#define OWNER_V(o) (*(u16 *)(*(u8 *volatile *)((u8 *)g + 0x18) + (o)))
-
 void Actor_BeginCurveToPosition(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
