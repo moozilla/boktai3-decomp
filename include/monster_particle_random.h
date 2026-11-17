@@ -27,6 +27,13 @@ static inline u32 ParticleRandom_NextSample(const u16 *table, u32 *seed, u32 mas
     return *sample;
 }
 
+/* Advance a 1024-entry sample cursor and capture the selected halfword. */
+#define PARTICLE_RANDOM_DRAW(sample, table, cursor)                                                  \
+    do {                                                                                           \
+        (cursor) = ((cursor) + 1) & 1023;                                                            \
+        (sample) = (table)[(cursor)];                                                               \
+    } while (0)
+
 
 /* The original draw code retains this numeric origin before rebasing to the sample table. */
 #define PARTICLE_RANDOM_SAVE_ORIGIN(out_, origin_)                                                 \
