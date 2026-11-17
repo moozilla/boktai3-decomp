@@ -2,6 +2,8 @@
 #define GUARD_AXE_H
 
 #include "chase_actor.h"
+#include "sprite.h"
+#include "display_sequence.h"
 
 /* Axe's class fields past the chase actor (Axe_Create allocates 0xF24 bytes; provisional). */
 struct Axe {
@@ -9,14 +11,9 @@ struct Axe {
     u8 unknown624[0x264];
     struct ContactPosition position;
     u8 unknown890[0x1A8];
-    u32 spriteFlags;
-    u8 unknownA3C[2];
-    u8 spriteAngle;
-    u8 unknownA3F[0x15];
-    u16 spriteX;
-    u8 unknownA56[2];
-    u16 spriteZ;
-    u8 unknownA5A[0x36];
+    struct DisplaySequenceSprite auxiliarySprite;
+    struct SpriteRenderResource auxiliaryGraphics;
+    struct DisplaySequenceState auxiliarySequence;
     struct ContactCollider attack[3];
     struct ContactCollider body[3];
     struct ContactPosition origin;
@@ -27,11 +24,13 @@ struct Axe {
     u8 speed;
     s8 direction;
     u8 heading;
-    u8 unknownCA7[2];
+    u8 shadowActive;
+    u8 unknownCA8;
     u8 angle;
     u8 unknownCAA;
     u8 flagsCAB;
-    u8 unknownCAC[0x192];
+    u8 auxiliaryShadow[0x40];
+    u8 unknownCEC[0x152];
     u8 delay;
     u8 turnStep;
     u8 unknownE40[8];
@@ -53,7 +52,9 @@ struct Axe {
     u8 active;
     u8 unknownED1[2];
     u8 savedAngle;
-    u8 unknownED4[0x40];
+    u8 unknownED4[3];
+    u8 variant;
+    u8 unknownED8[0x3C];
     u32 clearF14[2];
     struct ContactPosition target;
 };

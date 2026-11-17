@@ -3336,21 +3336,6 @@ u8 ActorPhase_UpdateFlicker(u32 *flags, s32 timer, s32 low, s32 high)
     return 0;
 }
 
-struct AxeAttackTrailContext {
-    u8 unknown0[0xA38];
-    struct DisplaySequenceSprite sprite;
-    struct ContactSwarmGraphics graphics;
-    struct DisplaySequenceState sequence;
-    struct ContactCollider attack[3], body[3];
-    struct ContactPosition origin;
-    u8 unknownC90[0xCA7 - 0xC90];
-    u8 shadowActive;
-    u8 unknownCA8[4];
-    u8 shadow[0x40];
-    u8 unknownCEC[0xED7 - 0xCEC];
-    u8 variant;
-};
-
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
@@ -3443,27 +3428,27 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     struct ContactPackedVector bodyOffset;
     struct ContactPackedVector attackSize;
     struct ContactPackedVector attackOffset;
-    struct AxeAttackTrailContext *d = s->base.context;
-    void *resource = &d->graphics;
+    struct Axe *d = s->base.context;
+    void *resource = &d->auxiliaryGraphics;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *frames;
     void *sequence;
     s32 i;
     AnimData_Load(resource, 0x5291);
-    sprite = &d->sprite;
+    sprite = &d->auxiliarySprite;
     Sprite_Init(sprite, resource, 0);
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
         struct DisplaySequenceState *drawable =
             &((struct SceneActorControlMotionDrawable *)s->base.drawable)->sequence;
         u32 index = Axe_SequenceSelection(drawable);
-        frames = &d->sequence;
+        frames = &d->auxiliarySequence;
         Anim_SetSequence(frames, sequence, index, d->variant, 0);
     }
     Axe_StepSequence(sprite, frames);
-    d->sprite.flags |= 1;
-    d->sprite.position = s->base.body.position;
-    d->sprite.priority = 1;
+    d->auxiliarySprite.flags |= 1;
+    d->auxiliarySprite.position = s->base.body.position;
+    d->auxiliarySprite.priority = 1;
     bodySize.x = 24;
     bodySize.y = 70;
     bodySize.z = 24;
@@ -3499,8 +3484,8 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
         Collider_SetCallback(c, Axe_OnSecondaryColliderContact, d);
     }
 
-    d->shadowActive = Shadow_Initialize(d->shadow, &d->sprite.position, 0);
-    ActorShadow_Disable(d->shadow);
+    d->shadowActive = Shadow_Initialize(d->auxiliaryShadow, &d->auxiliarySprite.position, 0);
+    ActorShadow_Disable(d->auxiliaryShadow);
 }
 
 struct S080FC7F4 {
@@ -3553,8 +3538,8 @@ void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
 
 void Axe_CopyAuxiliaryVector(struct ChaseActor *s, const struct ContactPosition *src)
 {
-    struct AxeAttackTrailContext *trail = s->base.context;
-    trail->sprite.position = *src;
+    struct Axe *trail = s->base.context;
+    trail->auxiliarySprite.position = *src;
 }
 
 struct S080FC8B0 {
