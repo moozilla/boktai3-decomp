@@ -635,11 +635,10 @@ int Script_GetKeywordValue(int, int);
 
 static inline void Actor_SetScriptState(struct SceneActor *actor, u8 state)
 {
-    int zero = 0;
-    actor->stage = zero;
-    actor->phase = zero;
+    actor->stage = 0;
+    actor->phase = 0;
     actor->state = state;
-    actor->ticks = zero;
+    actor->ticks = 0;
     actor->commandEntered = 1;
 }
 
@@ -788,22 +787,20 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->paramC = Script_GetValue();
         actor->paramD = Script_GetValue();
     } else {
-        int zero = 0;
-        actor->hasParameters = zero;
+        actor->hasParameters = 0;
         actor->paramA = 9;
-        actor->paramB = zero;
+        actor->paramB = 0;
         actor->paramC = 21;
-        actor->paramD = zero;
+        actor->paramD = 0;
     }
     if (Script_SeekToKeyword(0x62)) {
         actor->modeA = Script_GetValue();
         actor->modeB = Script_GetValue();
         actor->modeValue = Script_GetValue();
     } else {
-        int zero = 0;
-        actor->modeA = zero;
+        actor->modeA = 0;
         actor->modeB = 1;
-        actor->modeValue = zero;
+        actor->modeValue = 0;
     }
     if (Script_SeekToKeyword(0x77)) {
         actor->rateC = Script_GetValue();
@@ -879,10 +876,9 @@ static inline int SceneActor_TerrainHeight(struct ContactPosition *pos)
 void Actor_OnHiddenIdleUpdate(void *unused, struct SceneActor *actor)
 {
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 0, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
     }
     {
         u32 mask = 256;
@@ -894,10 +890,9 @@ void Actor_OnHiddenIdleUpdate(void *unused, struct SceneActor *actor)
 void Actor_OnIdleUpdate(void *unused, struct SceneActor *actor)
 {
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 0, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
     }
     {
         u32 mask = 4096;
@@ -912,10 +907,9 @@ void Actor_UpdateWalkToPosition(void *unused, struct SceneActor *arg)
 {
     struct SceneActor *actor = arg;
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 1, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
     }
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
@@ -1155,10 +1149,9 @@ void Actor_OnRisingFadeUpdate(void *unused, struct SceneActor *actor, int ticks)
                 break;
             }
             case 2: {
-                u32 one = 1;
                 u32 mask;
-                actor->finished = one;
-                mask = one + 0xff;
+                actor->finished = 1;
+                mask = 1 + 0xff;
                 actor->flags |= mask;
             }
                 DisplayAnimation_ClearFlags(&actor->drawable.common.kind, 2);
@@ -1189,10 +1182,9 @@ void Actor_OnRisingFadeUpdate(void *unused, struct SceneActor *actor, int ticks)
 void Actor_OnConfiguredAnimationUpdate(void *unused, struct SceneActor *actor)
 {
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, actor->modeA, actor->modeB, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, actor->modeA, actor->modeB, 0, 4);
     }
     {
         u32 mask = 4096;
@@ -1214,9 +1206,8 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
     struct ContactPosition *pos = &actor->body.position;
     union SceneActorDisplay *anim = &actor->drawable;
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
+        actor->animationEntered = 0;
+        actor->finished = 0;
         {
             struct SceneActorRouteCursor *c3 = ctx;
             u16 *t = (u16 *)c3->point;
@@ -1226,8 +1217,8 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
             actor->facing4 = SceneFacing_FourWay(r);
         }
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
-        actor->routeProgress = zero;
-        actor->routeStepFinished = zero;
+        actor->routeProgress = 0;
+        actor->routeStepFinished = 0;
     }
     {
         u32 mask = 4096;
@@ -1386,10 +1377,9 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
 void Actor_OnTimedIdleUpdate(void *unused, struct SceneActor *actor, int ticks)
 {
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 0, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
         actor->routeProgress = 1;
     }
     {
@@ -1490,16 +1480,15 @@ void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
     struct SceneActorNavigationProbe *probe = (void *)&actor->probe;
     u32 *anim = (void *)&actor->drawable.common.kind;
     if (actor->animationEntered) {
-        s32 zero = 0;
         struct ContactPosition *pos;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 3, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 3, 1, 0, 4);
         actor->routeProgress = 1;
         pos = (void *)&actor->body.position;
         ProximityVolume_TranslateBounds(probe, pos);
         Terrain_ApplyBlocked(probe, pos, TerrainResponse(actor));
-        ClearCounter(actor, zero);
+        ClearCounter(actor, 0);
         Actor_SetAttachmentEffect(actor, 0, 0, 0);
     }
     {
@@ -1573,12 +1562,11 @@ void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
     struct SceneActorNavigationProbe *probe = &actor->probe;
     u32 *animType = &actor->drawable.common.kind;
     if (actor->animationEntered) {
-        s32 zero = 0;
         struct ContactPosition *pos;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 1, 1, zero, 4);
-        actor->routeProgress = zero;
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
+        actor->routeProgress = 0;
         pos = &actor->body.position;
         ProximityVolume_TranslateBounds(probe, pos);
         Terrain_ApplyBlocked(probe, pos, &actor->destination);
@@ -1711,10 +1699,9 @@ void Actor_UpdateRunToPosition(void *unused, struct SceneActor *arg)
 {
     struct SceneActor *actor = arg;
     if (actor->animationEntered) {
-        int zero = 0;
-        actor->animationEntered = zero;
-        actor->finished = zero;
-        Actor_PlayAnimationEntry(actor, 3, 1, zero, 4);
+        actor->animationEntered = 0;
+        actor->finished = 0;
+        Actor_PlayAnimationEntry(actor, 3, 1, 0, 4);
     }
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
@@ -1847,7 +1834,6 @@ void SceneCharacter_UpdateStandState(u32 a, struct SceneActor *actor)
 void SceneCharacter_UpdateOneShotActionState(void *unused, struct SceneActor *actor)
 {
     u32 one;
-    u32 zero;
     if (actor->commandEntered != 0) {
         actor->commandEntered = 0;
         actor->finished = 0;
@@ -1855,9 +1841,8 @@ void SceneCharacter_UpdateOneShotActionState(void *unused, struct SceneActor *ac
     }
     if (actor->finished != 0) {
         one = 1;
-        zero = 0;
         actor->state = one;
-        actor->ticks = zero;
+        actor->ticks = 0;
         actor->commandEntered = one;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -1915,18 +1900,16 @@ done:
 void SceneCharacter_UpdateTurnState(void *unused, struct SceneActor *actor)
 {
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 4;
     }
     if (actor->finished) {
         int controlled = actor->controlled;
         if (controlled) {
             int state = actor->savedState;
-            int zero = 0;
             actor->state = state;
-            actor->ticks = zero;
+            actor->ticks = 0;
             actor->commandEntered = 1;
         } else {
             actor->state = 1;
@@ -1941,7 +1924,6 @@ void SceneCharacter_UpdateTurnState(void *unused, struct SceneActor *actor)
 void SceneCharacter_UpdateAlternateOneShotActionState(void *unused, struct SceneActor *actor)
 {
     u32 one;
-    u32 zero;
     if (actor->commandEntered != 0) {
         actor->commandEntered = 0;
         actor->finished = 0;
@@ -1949,9 +1931,8 @@ void SceneCharacter_UpdateAlternateOneShotActionState(void *unused, struct Scene
     }
     if (actor->finished != 0) {
         one = 1;
-        zero = 0;
         actor->state = one;
-        actor->ticks = zero;
+        actor->ticks = 0;
         actor->commandEntered = one;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -1961,15 +1942,13 @@ void SceneCharacter_UpdateAlternateOneShotActionState(void *unused, struct Scene
 void SceneCharacter_UpdateStopState(void *unused, struct SceneActor *actor)
 {
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 6;
     }
     if (actor->finished) {
-        int zero = 0;
-        actor->state = zero;
-        actor->ticks = zero;
+        actor->state = 0;
+        actor->ticks = 0;
         actor->commandEntered = 1;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -1981,9 +1960,8 @@ void SceneCharacter_UpdateProximityWaitState(struct SceneActorManager *manager,
 {
     int close;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 2;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -2008,9 +1986,8 @@ void SceneCharacter_UpdatePathWaitState(struct SceneActorManager *manager, struc
     int nextState;
     int zero;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 2;
     }
     if (!(actor->ticks & 15)) {
@@ -2099,9 +2076,8 @@ void SceneCharacter_UpdatePathTurnState(struct SceneActorManager *manager, struc
 {
     int close;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 4;
         actor->direction = (actor->nodeFacing + 5) << 5;
     }
@@ -2130,9 +2106,8 @@ void SceneCharacter_UpdatePathActionState(struct SceneActorManager *manager,
     int nextState;
     int zero;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 8;
     }
     if (!(actor->ticks & 15)) {
@@ -2245,9 +2220,8 @@ void SceneCharacter_UpdateTargetProximityState(struct SceneActorManager *manager
 {
     struct SceneActorBody *body = (struct SceneActorBody *)&actor->body;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 9;
     }
     if (manager->player && manager->target) {
@@ -2307,9 +2281,8 @@ void SceneCharacter_UpdatePhaseTransitionState(struct SceneActorManager *manager
 {
     int close;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 12;
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
@@ -2336,9 +2309,8 @@ void SceneCharacter_UpdatePhaseWindowWaitState(struct SceneActorManager *manager
                                                struct SceneActor *actor)
 {
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 1;
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -2363,9 +2335,8 @@ void SceneCharacter_UpdatePhaseWindowWaitState(struct SceneActorManager *manager
     }
 transition: {
     int state = 15;
-    int zero = 0;
     actor->state = state;
-    actor->ticks = zero;
+    actor->ticks = 0;
     actor->commandEntered = 1;
 }
     goto done;
@@ -2381,9 +2352,8 @@ void SceneCharacter_UpdatePathResumeState(struct SceneActorManager *manager,
 {
     int close;
     if (actor->commandEntered) {
-        int zero = 0;
-        actor->commandEntered = zero;
-        actor->finished = zero;
+        actor->commandEntered = 0;
+        actor->finished = 0;
         actor->action = 13;
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
