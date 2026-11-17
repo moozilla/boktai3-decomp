@@ -77,10 +77,9 @@ void DialogueTransition_UpdateSkipFadeOut(struct DialogueTransition *transition)
     if (transition->skipProcedure) {
         if (transition->ticks > 15) {
             u32 *brightness = &gBgFadeLevel;
-            int zero = 0;
-            *brightness = zero;
+            *brightness = 0;
             Script_Call(transition->skipProcedure, 0);
-            transition->skipProcedure = zero;
+            transition->skipProcedure = 0;
             Task_Kill(transition);
         } else
             gBgFadeLevel = 64 - Div(transition->ticks << 6, 16);
@@ -114,12 +113,11 @@ int DialogueTransition_OnTaskDestroy(struct DialogueTransition *transition)
 
 int DialogueTransition_LoadFromScript(struct DialogueTransition *transition)
 {
-    int zero = 0;
-    transition->state = zero;
-    transition->entered = zero;
-    transition->ticks = zero;
+    transition->state = 0;
+    transition->entered = 0;
+    transition->ticks = 0;
     transition->index = Script_GetKeywordValue('p', 0);
-    transition->parameter = zero;
+    transition->parameter = 0;
     if (!Script_SeekToKeyword('s'))
         return -1;
     transition->script = Script_GetTextSourcePc();
@@ -145,7 +143,6 @@ int DialogueTransition_LoadFromScript(struct DialogueTransition *transition)
     }
     {
         int procedure = Script_GetKeywordValue('e', 0);
-        zero = 0;
         transition->completionProcedure = procedure;
     }
     transition->skipProcedure = Script_GetKeywordValue('c', 0);
@@ -156,7 +153,7 @@ int DialogueTransition_LoadFromScript(struct DialogueTransition *transition)
     DialogueTransition_ApplyEntryBounds(transition);
     gBgFadeColor = 0x1084;
     gBgFadeBankMask = 0x8000;
-    gBgFadeLevel = zero;
+    gBgFadeLevel = 0;
     DialogueTransition_SetState(transition, 0);
     return 0;
 }
