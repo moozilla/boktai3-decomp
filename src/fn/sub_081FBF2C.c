@@ -74,9 +74,8 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
                     s32 angle = cfg->angle;
                     s32 speed = cfg->speed;
                     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-                    s32 zero = 0;
                     dst->x = x;
-                    dst->y = zero;
+                    dst->y = 0;
                     dst->z = Scale(gUnk_086149C4[angle & 255] * speed);
                     ClearFlags(~1, e);
                 }
@@ -107,8 +106,7 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
             }
         }
         {
-            u32 one = 1;
-            i += one;
+            i += 1u;
         }
         e++;
         last = i;
