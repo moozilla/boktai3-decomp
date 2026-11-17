@@ -58,25 +58,14 @@ void ModifierMenu_DrawSelectedLabels(struct ModifierMenu *menu)
                     struct ModifierSelection *base = current;
                     capacity = base->capacity;
                 }
-                if (id < capacity) {
-                    s32 row;
-                    window = (s32 *)(id * sizeof(*window) + (u32)menu->listWindows);
-                    {
-                        s32 rowBase = id * 2;
-                        row = rowBase + 4;
-                    }
-                    do {
-                        TextWindow_SetBounds(*window, 13, row, 16, 2);
-                        TextWindow_SetScript(*window, (*(&menu))->textSources[0]);
-                        TextWindow_Refresh(*window, 5);
-                        TextWindow_StartPlayback(*window++);
-                        row += 2;
-                        id++;
-                        {
-                            struct ModifierSelection *base = current;
-                            capacity = base->capacity;
-                        }
-                    } while (id < capacity);
+                while (id < capacity) {
+                    window = &menu->listWindows[id];
+                    TextWindow_SetBounds(*window, 13, id * 2 + 4, 16, 2);
+                    TextWindow_SetScript(*window, menu->textSources[0]);
+                    TextWindow_Refresh(*window, 5);
+                    TextWindow_StartPlayback(*window);
+                    id++;
+                    capacity = current->capacity;
                 }
             }
             break;
