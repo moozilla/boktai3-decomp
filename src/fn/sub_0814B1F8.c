@@ -89,9 +89,8 @@ static inline void PlayerMotion_SetPolar(struct ContactPosition *out, u16 angle,
 {
     s32 rawX = gUnk_086149C4[(angle + 64) & 255] * magnitude;
     s32 x = PlayerMotion_Scale12(rawX);
-    s32 zero = 0;
     out->x = x;
-    out->y = zero;
+    out->y = 0;
     out->z = PlayerMotion_Scale12(gUnk_086149C4[angle & 255] * magnitude);
 }
 
