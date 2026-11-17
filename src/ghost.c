@@ -656,7 +656,6 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
     {
         u32 mask = 0x4000;
         u16 *flags;
-        u32 one;
         u16 masked;
         u32 test = actor->base.motionFlags & mask;
         flags = &actor->base.motionFlags;
@@ -671,7 +670,7 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         if (!masked) {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            one = (actor->base.field2B2 = 1);
+            actor->base.field2B2 = 1;
             actor->base.stepDone = masked;
             actor->base.controlKind = kind;
             actor->base.target = callback;
@@ -684,11 +683,11 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
             actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
-                actor->base.state2A8 = one;
+                actor->base.state2A8 = 1;
                 actor->base.phase2A9 = 0;
                 actor->base.behavior2AA = behavior;
                 actor->base.counter2AC = masked;
-                actor->base.field2B1 = one;
+                actor->base.field2B1 = 1;
             }
         }
     }
