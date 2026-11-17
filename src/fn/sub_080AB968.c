@@ -88,14 +88,12 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
                 raw = actor.parts[0];
                 if ((s32)raw < 0)
                     actor.parts[0] = 0;
-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
                 raw = actor.parts[0];
             } else {
                 Advance(actor.ptr, ax, az);
                 raw = actor.parts[0];
                 if ((s32)raw < 0)
                     actor.parts[0] = 0;
-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
                 raw = actor.parts[0];
             }
         } else {
@@ -104,14 +102,12 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
                 raw = actor.parts[0];
                 if ((s32)raw < 0)
                     actor.parts[0] = 0;
-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
                 raw = actor.parts[0];
             } else {
                 Advance(actor.ptr, ax, az);
                 raw = actor.parts[0];
                 if ((s32)raw < 0)
                     actor.parts[0] = 0;
-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
                 raw = actor.parts[0];
             }
         }
