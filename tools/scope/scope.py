@@ -6896,9 +6896,11 @@ def cmd_hoist(src, func, env):
     or read before its set while used across blocks (maybe_never / used_before), or the move test."""
     n, info = score(src, func, env, full=True)
     wd = info["wd"]
+    # Keep resolved overrides, but always enable the trace this diagnostic requires.
+    trace_env = {**os.environ, **info["env"], "AGBCC_LOOP_TRACE": "1"}
     tr = subprocess.run([INSTR] + build.cflags_for(src) + ["-g", "u.i", "-o", "/dev/null"], cwd=wd,
                         capture_output=True, text=True,
-                        env=dict(os.environ, AGBCC_LOOP_TRACE="1", **info["env"])).stderr
+                        env=trace_env).stderr
     fnames = (func, rom_name(src, func))
     names, lines = pseudo_names(wd, info["obj_name"]), uid_lines(wd)
     passes, cur = [], None
