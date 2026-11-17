@@ -487,17 +487,16 @@ static inline u8 TakePrepared(u8 *field)
 static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
-    u32 zero = 0;
     *prepared = 1;
-    actor->base.stepDone = zero;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
-        actor->base.pendingControl = zero;
+        actor->base.pendingControl = 0;
         actor->base.pendingControl =
             *(u32 *)&actor->base.onAlternateEntry; /* a u32 read keeps the store above */
         actor->base.pendingControlData = 0;
@@ -2537,10 +2536,9 @@ void SceneActor_TrySoloAction(struct Vorn *p)
         p->chase.base.counter2AC = zero;
         p->chase.base.field2B1 = 1;
         {
-            u32 one = 1;
             void *callback = SceneActorReaction_UpdateFacingAttack;
             u32 mode = 0x2A;
-            p->chase.base.field2B2 = one;
+            p->chase.base.field2B2 = 1;
             p->chase.base.stepDone = zero;
             p->chase.base.controlKind = mode;
             p->chase.base.target = callback;
