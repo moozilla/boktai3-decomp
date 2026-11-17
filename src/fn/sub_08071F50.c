@@ -6,16 +6,9 @@ static inline u8 Test(u32 value, u32 mask)
         return TRUE;
     return FALSE;
 }
-static inline u8 TestCategory(u32 value, u32 mask)
+static inline u8 TestManagerFlag(struct SceneActorPaletteManagerView *manager, u32 mask)
 {
-    mask &= value;
-    /* Allocation-only: the folded guard keeps regmove from tying the AND to value. */
-    {
-        u32 narrow = (u16)value;
-        if ((s32)narrow < 0)
-            mask = 0;
-    }
-    if (mask)
+    if (manager->flags & mask)
         return TRUE;
     return FALSE;
 }
@@ -80,11 +73,11 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
     if (category != 23)
         goto success;
     transition = &manager->category23;
-    flagSet = TestCategory(categoryFlags, 0x8000);
+    flagSet = TestManagerFlag(manager, 0x8000);
     goto selected;
 category10:
     transition = &manager->category10;
-    flagSet = TestCategory(categoryFlags, 0x4000);
+    flagSet = TestManagerFlag(manager, 0x4000);
 selected:
     if (flagSet)
         alreadyAdvanced = 1;
