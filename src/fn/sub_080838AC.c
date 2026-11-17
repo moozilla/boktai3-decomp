@@ -35,10 +35,10 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
         return;
     }
     {
-        volatile u32 *stateFlags;
+        u32 *stateFlags;
         u32 firstValue;
         {
-            volatile u32 *firstFlags;
+            u32 *firstFlags;
             u32 firstMask = 2;
             firstFlags = &state->flags3D4;
             firstValue = *firstFlags & firstMask;
