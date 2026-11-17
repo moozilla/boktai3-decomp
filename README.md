@@ -37,17 +37,21 @@ with this project.
 | | |
 |---|---|
 | Matching | **every function matches**: all 11,810 compile from C to the original bytes, and the ROM rebuilds byte-identical ([PROGRESS.md](PROGRESS.md)) |
-| Concessions | about 16% of code still matches only with register pins, `asm("")` barriers or another concession ([tools/concessions.py](tools/concessions.py)); removing them is the current work, and decomp.dev counts a function as matched only once it has none |
+| Concessions | none left in any function: no register pins, no `asm("")` barriers, no compiler overrides ([tools/concessions.py](tools/concessions.py)) |
+| Steering | some functions still match only through C nobody would write (a constant parked in a local, a loop that runs once, a branch that can never be taken); removing it is the current work ([PROGRESS.md](PROGRESS.md) has the counts) |
 | Data | every ROM pointer is a symbol, so all data can move or grow ([shiftability](docs/SHIFTABILITY.md)) |
 | Scripts | the scene scripts are compiled GCL, Konami's scripting language (documented by the Metal Gear Solid reverse-engineering community: [KCEJ wiki](https://github.com/metalgeardev/KCEJ_Wiki/tree/master/common/gcl), [mgs_reversing](https://github.com/FoxdieTeam/mgs_reversing/tree/master/source/libgcl)); bytecode, interpreter and recovered names in [gcl/](gcl/README.md) |
 | Assets | text bank, font, sprites, maps, palettes, terrain and stage scripts decoded ([docs/ASSETS.md](docs/ASSETS.md)) |
 
-Every function now matches, but not all of it is the C the original authors wrote. The
-work left comes in two phases ([docs/ROADMAP.md](docs/ROADMAP.md)):
+Every function now matches, and nothing in the source is addressed to the compiler any more.
+Not all of it is the C the original authors wrote yet. The work left
+([docs/ROADMAP.md](docs/ROADMAP.md)):
 
-1. **No concessions** (current): rewrite the remaining matches as ordinary C, with no register
-   pins (`register T x asm("rN")`) and no empty `asm("")` barriers. These are stopgaps that
-   force a register choice or block an optimization, so the C only matches with them.
+1. **No steering** (current): some functions match only because the C is bent to nudge the
+   compiler, in ways that are valid C but that no one would write. A linter reports each one
+   as a warning, two kinds straight from what the compiler deletes or proves constant. Each
+   is rewritten as the C the authors plausibly wrote, or kept with a stated reason to
+   believe the original had it.
 2. **Cleanup**: make the source read like the original, with real names for every function
    and RAM object, shared structs and types, files grouped by subsystem instead of one file per
    function, and code and RAM that the linker places itself.
