@@ -12,13 +12,16 @@ struct SmallCallbackPool {
 s32 Callback_InvokeActor(void *, void *);
 s32 CallbackPool_InvokeActiveSmall(struct SmallCallbackPool *pool)
 {
-    void **new_var;
     s32 i;
     for (i = 0; i <= 15; i++) {
         if (pool->entries[i].active) {
-            void **callback = (new_var = &pool->entries[0].callback) + i * (0xB8 / 4);
-            u32 offset = i * 0xB8 + 0x18;
-            struct SmallCallbackEntry *entry = (struct SmallCallbackEntry *)((u32)pool + offset);
+            void **callback;
+            u32 offset;
+            struct SmallCallbackEntry *entry;
+            callback = &pool->entries[0].callback;
+            callback += i * (0xB8 / 4);
+            offset = i * 0xB8 + 0x18;
+            entry = (struct SmallCallbackEntry *)((u32)pool + offset);
             Callback_InvokeActor(entry, *callback);
         }
     }
