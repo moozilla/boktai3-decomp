@@ -472,7 +472,10 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-enemy-constant-locals.md](../notes/round14-enemy-constant-locals.md) | Round 14: bounded enemy constant-local pass | #round14 #concessions #matching | 9 |
 | [notes/round14-fields-warning-review.md](../notes/round14-fields-warning-review.md) | Round 14: field-worker compiler-warning review | #round14 #concessions #matching | 10 |
 | [notes/round14-input-camera-warning-audit_2026-11-16.md](../notes/round14-input-camera-warning-audit_2026-11-16.md) | Round 14: input, camera, and compiler-warning audit | #matching #round14 #concessions #input #camera #compiler | 8 |
+| [notes/round14-libgcc-multiply-source.md](../notes/round14-libgcc-multiply-source.md) | Libgcc integer multiplication: source evidence | #matching #cleanup #round14 #libraries | 2 |
 | [notes/round14-mechanical-constant-review.md](../notes/round14-mechanical-constant-review.md) | Round 14: direct constant values across the remaining source units |  | 3 |
+| [notes/round14-placeholder-audit.md](../notes/round14-placeholder-audit.md) | Round 14: placeholder-name audit | #matching #actors #animation #tooling | 12 |
+| [notes/round14-statement-expression-review.md](../notes/round14-statement-expression-review.md) | Round 14: remaining statement expressions | #matching #cleanup #round14 #compiler | 8 |
 | [notes/round14-union-review.md](../notes/round14-union-review.md) | Round 14: separate unrelated values from two local unions | #round14 #concessions #local-union | 3 |
 | [notes/round14-volatile-known-zero.md](../notes/round14-volatile-known-zero.md) | Round 14: four further known-zero functions remain open | #round14 #concessions #matching | 7 |
 | [notes/round14-volatile-stage2.md](../notes/round14-volatile-stage2.md) | Round 14: volatile cleanup and remaining compiler-dead sites | #round14 #concessions #matching | 8 |

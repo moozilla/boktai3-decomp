@@ -1,0 +1,186 @@
+# Natural nonmatching candidates from the round-14 placeholder audit.
+# Each file patch is independent and applies to the accepted source at 9bafe2435.
+# These are retained investigation candidates, not production changes.
+
+--- a/src/fn/sub_08065904.c
++++ b/src/fn/sub_08065904.c
+@@ -9,12 +9,10 @@
+     if (!finished) {
+         struct ActorAttachmentSlotView *view = slot;
+         s16 *value;
+-        s16 new_var;
+         s32 current;
+         s16 *sample;
+         value = view->value;
+-        new_var = *value;
+-        current = new_var;
++        current = *value;
+         sample = value;
+         if (current <= 0) {
+             s16 *timer = &slot->timer;
+--- a/src/fn/sub_08109AEC.c
++++ b/src/fn/sub_08109AEC.c
+@@ -29,8 +29,6 @@
+     u8 *src;
+     s32 i;
+     s32 party;
+-    unsigned int new_var;
+-    new_var = 16;
+     record = s->bytes;
+     src = (u8 *)gGameState + 0x780;
+     for (i = 0; i < 16; i++)
+@@ -39,7 +37,7 @@
+     i = 0;
+     values = s->values;
+     record += 0xC0;
+-    dest = s->bytes + new_var;
++    dest = s->bytes + 16;
+     for (; i < 16; i++)
+         dest[i] = src[i];
+     for (i = 0; i < 5; i++)
+--- a/src/fn/sub_08136AF0.c
++++ b/src/fn/sub_08136AF0.c
+@@ -21,7 +21,6 @@
+ }
+ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
+ {
+-    u8 new_var;
+     u32 flags = MaskFlags(&s->motionFlags, 0xFFFFFEFF);
+     switch (s->category) {
+         case 0x12:
+@@ -43,7 +42,7 @@
+             if (!s->reactionSoundVariant) {
+             fallback:
+                 Sound_PlaySong(0x211);
+-            } else if ((new_var = TestFlags(flags, 8))) {
++            } else if (TestFlags(flags, 8)) {
+                 Sound_PlaySong(0x13E);
+                 Sound_PlaySong(0x12A);
+             } else {
+--- a/src/fn/sub_081A117C.c
++++ b/src/fn/sub_081A117C.c
+@@ -42,14 +42,12 @@
+ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
+ {
+     struct ActorReaction *p = actor;
+-    struct ActorReaction **new_var3;
+     u32 t = tick;
+     RestoreHeading(p);
+     p->motion[0] = 0;
+-    new_var3 = &p;
+-    (*new_var3)->motion[1] = 0;
+-    (*new_var3)->motion[2] = 0;
+-    (*new_var3)->motion[3] = 0;
++    p->motion[1] = 0;
++    p->motion[2] = 0;
++    p->motion[3] = 0;
+     {
+         u32 flags = 12;
+         p->flags |= flags;
+@@ -60,7 +58,7 @@
+         gRandomIndex = (gRandomIndex + 1) & 0x3ff;
+         random = *(u16 *)(RANDOM_TABLE_ADDR + (gRandomIndex << 1));
+         anim = sub_08249350(random >> 3, 5) + 27;
+-        Hresvelgr_SetAnimation(*new_var3, (*new_var3)->collider194, (*new_var3)->collider174, anim,
++        Hresvelgr_SetAnimation(p, p->collider194, p->collider174, anim,
+                                2, 4);
+     }
+ }
+--- a/src/fn/sub_081BF440.c
++++ b/src/fn/sub_081BF440.c
+@@ -34,14 +34,12 @@
+ void SceneInventory_UpdateSortConfirmation(struct SceneInventoryCategoryMenu *);
+ void Storage_BeginCategoryMode(struct SceneInventoryCategoryMenu *p, u32 mode)
+ {
+-    int new_var;
+     Storage_InitSlotMapping(p, (p->categoryKinds[p->category] & 1) << 4);
+     Storage_RefreshCategoryWidgets(p);
+     Storage_RefreshSelectedItemDetails(p);
+     {
+         u32 modeIndex = mode - 1;
+         p->mode = mode;
+-        new_var = -1;
+         if (modeIndex <= 1) {
+             Storage_InitSelectionGrid(&p->grid, 0, 4, 0, 16);
+             Storage_UpdateCursorPosition(&p->grid, p->cursor);
+@@ -50,12 +48,10 @@
+             Sound_PlaySong(0xDD);
+             {
+                 s32 descriptionMode = 4;
+-                s32 none;
+                 void *description = p->description;
+                 void *panel = p;
+ 
+-                none = new_var;
+-                MenuPanel_ShowDescription(panel, descriptionMode, description, (void *)none);
++                MenuPanel_ShowDescription(panel, descriptionMode, description, (void *)-1);
+             }
+             SceneInput_BeginChoice(&p->prompt, p->choiceResource, &p->choiceState, 1, 0);
+             SceneInventory_ResetCategoryPalette(p, p->colors);
+--- a/src/fn/sub_081D1E78.c
++++ b/src/fn/sub_081D1E78.c
+@@ -41,7 +41,6 @@
+ // Remaining difference: entry-flag pointer lifetime in the airborne phase.
+ void TaggedSceneNpc_UpdateJumpToTarget(void *manager, struct Npc *p)
+ {
+-    struct Tagged *new_var;
+     struct Tagged *t = &p->tagged;
+     struct Vec *pos = &p->position;
+     if (p->entered) {
+@@ -80,7 +79,6 @@
+             u32 entered = a->entered;
+             s32 dx, dz, curve;
+             a->entered = 0;
+-            new_var = a;
+             if (entered)
+                 TaggedSceneNpc_PlayTaggedAnimation(p, 8, 2, 0, 4);
+             dx = p->target.x - t->x;
+@@ -91,9 +89,9 @@
+             pos->y = t->velocity * t->ticks + t->y + curve;
+             if (t->ticks >= t->duration) {
+                 pos->y = p->target.y;
+-                new_var->phase = 2;
+-                new_var->entered = 1;
+-                new_var->ticks = 0;
++                a->phase = 2;
++                a->entered = 1;
++                a->ticks = 0;
+             }
+             break;
+         }
+--- a/src/fn/sub_081D76F4.c
++++ b/src/fn/sub_081D76F4.c
+@@ -38,7 +38,6 @@
+     u16 mul;
+     s32 dir;
+     s32 dir_2;
+-    unsigned char new_var;
+     s32 *np;
+     s32 ri;
+     const u16 *tab;
+@@ -52,7 +51,7 @@
+     dir_2 = (s32)tab[ri];
+     p->e[p->next].speed = ((dir_2 >> 3) & 0x7f) + 0x40;
+     p->e[*np].offset = Mod(Rand2(ri), 0x60) - 0x30;
+-    dir = (new_var = (((u16)(s8)src[0x1e]) + 0x70) >> 5) & 7;
++    dir = ((((u16)(s8)src[0x1e]) + 0x70) >> 5) & 7;
+     dir = ((dir + 5) & 7) << 5;
+     dir = (dir + (p->e[p->next].offset + k2)) & 0xff;
+     p->e[p->next].position = *(struct ContactPosition *)(src + 0xa8);
+--- a/src/mimic.c
++++ b/src/mimic.c
+@@ -733,13 +733,11 @@
+         if (player && !(*(u32 *)((u32)gPlayerSlotStatus + indexOffset) & excluded)) {
+             struct SceneVec *source = &player->position;
+             s32 x, z;
+-            s16 new_var;
+             delta->x = (u16)player->position.x - (u16)position->x;
+             delta->y = (u16)source->y - (u16)position->y;
+             delta->z = (u16)source->z - (u16)position->z;
+             x = Square(delta->x);
+-            new_var = delta->z;
+-            z = Square(new_var);
++            z = Square(delta->z);
+             if (x + z <= 0x2400) {
+                 struct Player *nearby = *cursor;
+                 if (nearby->inputKeys[1] & 1) {
