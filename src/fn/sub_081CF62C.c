@@ -30,20 +30,18 @@ static inline s32 trunc12(s32 x)
 static inline void polar(struct ContactPosition *v, u32 angle, s32 speed)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle] * speed);
 }
 void SceneNpc_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
 {
     struct NpcTag *tag = &npc->tag;
     if (npc->entered) {
-        s32 zero = 0;
-        npc->entered = zero;
-        npc->done = zero;
+        npc->entered = 0;
+        npc->done = 0;
         Actor_PlayAnimationEntry(npc, 9, 2, 0, 4);
-        npc->phase = zero;
+        npc->phase = 0;
         npc->pos.y += 160;
         tag->height = 300;
     }
