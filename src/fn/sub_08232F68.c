@@ -31,9 +31,8 @@ void EffectQuad_StartRemoteEntry(s32 player, const struct EffectQuadPosition *po
             SpriteDrawable_SelectTileFrame(entry->drawable, gEffectQuad->resource, 0x33);
             {
                 u32 one = 1;
-                u32 zero = 0;
                 entry->state = one;
-                entry->frame = zero;
+                entry->frame = 0u;
                 entry->active = one;
             }
         }
