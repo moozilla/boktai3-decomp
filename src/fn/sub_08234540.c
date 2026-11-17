@@ -51,15 +51,15 @@ void SpiralBurst_InitParticles(struct SpiralBurst *burst)
             s32 radius = frame->motion.radius;
             wave.table = gUnk_086149C4;
             wave.sample = wave.table[((frame->motion.angle + 64) & 255)];
-            frame->motion.position.world.x =
+            frame->motion.position.x =
                 burst->origin.x + SpiralBurst_ScaleOffset(radius * wave.sample);
         }
-        frame->motion.position.world.y = burst->origin.y;
-        frame->motion.position.world.z =
+        frame->motion.position.y = burst->origin.y;
+        frame->motion.position.z =
             burst->origin.z +
             SpiralBurst_ScaleOffset(frame->motion.radius * gUnk_086149C4[frame->motion.angle]);
-        ((struct SpiralParticle *)sprite)->renderMode = 2;
-        frame->status = 0xEC;
+        ((struct SpiralParticle *)sprite)->priority = 2;
+        frame->depthOffset = -20;
         {
             u32 v = SpiralBurst_Random(table, mask) & 7;
             frame->motion.animationFrame = v;

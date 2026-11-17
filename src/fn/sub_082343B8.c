@@ -39,17 +39,17 @@ void SpiralBurst_UpdateParticles(struct SpiralBurst *p)
         } else {
             alive = 1;
             motion->angle += motion->angularSpeed;
-            motion->position.world.x =
+            motion->position.x =
                 p->origin.x +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[(motion->angle + 64) & 255]);
 
-            motion->position.world.z =
+            motion->position.z =
                 p->origin.z +
                 SpiralBurst_ScaleOffset(motion->radius * gUnk_086149C4[motion->angle]);
             if (*timer >= motion->riseDelay) {
                 if ((*timer & 7) == 0 && motion->angularSpeed > 2)
                     motion->angularSpeed--;
-                motion->position.world.y += motion->riseRate;
+                motion->position.y += motion->riseRate;
             }
             if (motion->animationFrame == 0)
                 SpriteDrawable_SelectTileFrame(sprite, p->resource, 12);
