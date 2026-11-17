@@ -2899,10 +2899,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
 }
 
 struct AxeTrailSlotEmitTrailSprite {
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct ContactSwarmSprite spatial;
-    } draw;
+    struct DisplaySequenceSprite sprite;
     struct ContactSwarmGraphics graphics;
     struct DisplaySequenceState sequence;
     const void *resource;
@@ -2927,13 +2924,13 @@ static inline const void *Axe_TrailResource(struct AxeTrailContextEmitTrailSprit
 static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source,
                                        struct AxeTrailContextEmitTrailSprite *row)
 {
-    row->trail[0].draw.sprite.palette = source->palette;
+    row->trail[0].sprite.palette = source->palette;
 }
 
 static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
                                        struct AxeTrailContextEmitTrailSprite *row)
 {
-    row->trail[0].draw.sprite.paletteVariant = source->paletteVariant;
+    row->trail[0].sprite.paletteVariant = source->paletteVariant;
 }
 
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
@@ -2976,11 +2973,11 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
                  *)((u8 *)state + (u32) &
                     ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0].sequence);
     PlayerCue_StepSequenceEnded(sprite, state);
-    context->trail[context->nextTrail].draw.spatial.position = *position;
-    context->trail[context->nextTrail].draw.sprite.flags &= ~1;
-    context->trail[context->nextTrail].draw.sprite.flags |= 2;
+    context->trail[context->nextTrail].sprite.position = *position;
+    context->trail[context->nextTrail].sprite.flags &= ~1;
+    context->trail[context->nextTrail].sprite.flags |= 2;
     context->trail[context->nextTrail].lifetime = 8;
-    context->trail[context->nextTrail].draw.sprite.attribute = angle;
+    context->trail[context->nextTrail].sprite.attribute = angle;
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
         struct AxeTrailContextEmitTrailSprite *row =
@@ -3341,10 +3338,7 @@ u8 ActorPhase_UpdateFlicker(u32 *flags, s32 timer, s32 low, s32 high)
 
 struct AxeAttackTrailContext {
     u8 unknown0[0xA38];
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct ContactSwarmSprite spatial;
-    } draw;
+    struct DisplaySequenceSprite sprite;
     struct ContactSwarmGraphics graphics;
     struct DisplaySequenceState sequence;
     struct ContactCollider attack[3], body[3];
@@ -3456,7 +3450,7 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     void *sequence;
     s32 i;
     AnimData_Load(resource, 0x5291);
-    sprite = &d->draw.sprite;
+    sprite = &d->sprite;
     Sprite_Init(sprite, resource, 0);
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
@@ -3467,9 +3461,9 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
         Anim_SetSequence(frames, sequence, index, d->variant, 0);
     }
     Axe_StepSequence(sprite, frames);
-    d->draw.sprite.flags |= 1;
-    d->draw.spatial.position = s->base.body.position;
-    d->draw.sprite.priority = 1;
+    d->sprite.flags |= 1;
+    d->sprite.position = s->base.body.position;
+    d->sprite.priority = 1;
     bodySize.x = 24;
     bodySize.y = 70;
     bodySize.z = 24;
@@ -3505,7 +3499,7 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
         Collider_SetCallback(c, Axe_OnSecondaryColliderContact, d);
     }
 
-    d->shadowActive = Shadow_Initialize(d->shadow, &d->draw.spatial.position, 0);
+    d->shadowActive = Shadow_Initialize(d->shadow, &d->sprite.position, 0);
     ActorShadow_Disable(d->shadow);
 }
 
@@ -3560,7 +3554,7 @@ void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
 void Axe_CopyAuxiliaryVector(struct ChaseActor *s, const struct ContactPosition *src)
 {
     struct AxeAttackTrailContext *trail = s->base.context;
-    trail->draw.spatial.position = *src;
+    trail->sprite.position = *src;
 }
 
 struct S080FC8B0 {
