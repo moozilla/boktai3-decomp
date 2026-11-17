@@ -1,0 +1,510 @@
+--- a/src/fn/sub_08014CA4.c
++++ b/src/fn/sub_08014CA4.c
+@@ -71,7 +71,7 @@
+                     struct SceneVec *velocity;
+                     u16 *speedOut;
+                     u8 *life;
+-                    table = (const u16 *)(0x0203B400 + (g->type >> 8));
++                    table = gRandomTable;
+                     cursor = (u8 *)base;
+                     velocity = base->velocity;
+                     speedOut = speeds;
+@@ -81,8 +81,7 @@
+                         s32 direction;
+                         u8 *out;
+                         p = &base->sprites[i];
+-                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))
+-                            ->initialized[i] = 1;
++                        base->initialized[i] = 1;
+                         if (!lifetimeRange) {
+                             u8 value = lifetime;
+                             out = life;
+@@ -133,7 +132,7 @@
+                             p->flags |= 4;
+                         else
+                             p->flags &= ~4;
+-                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))->enabled[i] = 1;
++                        base->enabled[i] = 1;
+                         cursor += 8;
+                         velocity++;
+                         speedOut++;
+--- a/src/fn/sub_080154EC.c
++++ b/src/fn/sub_080154EC.c
+@@ -161,44 +161,17 @@
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
+                 setFrame(&p->sprite, 32);
+-                {
+-                    union {
+-                        struct Anim *ptr;
+-                        u8 parts[4];
+-                    } handle;
+-                    u32 raw;
+-                    handle.ptr = &p->anim;
+-                    Anim_SetSequence(handle.ptr,
+-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+-                                     6, 0, 0);
+-                    raw = handle.parts[0];
+-                    if ((s32)raw < 0)
+-                        handle.parts[0] = 0;
+-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 8));
+-                    done = handle.parts[0];
+-                }
++                a = &p->anim;
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 6, 0, 0);
+                 goto saveAnimation;
+             } else if (p->pad1 == 7) {
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
+                 setFrame(&p->sprite, 45);
+-                {
+-                    union {
+-                        struct Anim *ptr;
+-                        u16 parts[2];
+-                    } handle;
+-                    u32 raw;
+-                    handle.ptr = &p->anim;
+-                    Anim_SetSequence(handle.ptr,
+-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+-                                     8, 0, 0);
+-                    raw = handle.parts[0];
+-                    if ((s32)raw < 0)
+-                        handle.parts[0] = 0;
+-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 16) +
+-                                        ((u8)handle.parts[1] >> 8));
+-                    done = handle.parts[0];
+-                }
++                a = &p->anim;
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 8, 0, 0);
+                 goto saveAnimation;
+             } else {
+                 AnimData_Load(p->resource, 0x4384);
+--- a/src/fn/sub_08016118.c
++++ b/src/fn/sub_08016118.c
+@@ -32,7 +32,6 @@
+                 p->sprite.position.x += scale(p->velocity.x, *speed);
+                 p->sprite.position.y += p->velocity.y;
+                 p->sprite.position.z += scale(p->velocity.z, *speed);
+-                p = (struct FadingParticleMotion *)((u32)p + (p->anim.flags >> 8));
+                 p->velocity.y -= 2;
+                 Anim_SetDurationScale(anim, 16);
+                 resource = ((struct FadingParticleManager *)gFadingParticleManager)->graphics;
+@@ -93,8 +92,6 @@
+                     u32 compare;
+                     u32 time;
+                     compare = raw;
+-                    if ((s32)raw < 0)
+-                        raw = 0;
+                     time = raw;
+                     if (compare > 8) {
+                         if (p->anim.index == 5)
+--- a/src/fn/sub_0804373C.c
++++ b/src/fn/sub_0804373C.c
+@@ -31,10 +31,8 @@
+ static inline u32 nextRandomFrom(const u16 *table, u32 *cursor)
+ {
+     u32 index;
+-    do {
+-        index = (*cursor + 1) & 1023;
+-        *cursor = index;
+-    } while (0);
++    index = (*cursor + 1) & 1023;
++    *cursor = index;
+     return table[index];
+ }
+ static inline s32 terrainHeight(struct ContactPosition *position, s32 index)
+@@ -69,14 +67,10 @@
+     if (slot->enter) {
+         struct ContactPosition *center;
+         struct ContactPosition *entryDestination;
+-        u32 origin;
+         const u16 *table;
+         const u16 *earlyTable;
+         u32 angle;
+-        union {
+-            u32 mask;
+-            u32 *cursor;
+-        } random;
++        u32 *cursor;
+         u32 radiusBits;
+         u32 radius;
+         s32 jitter;
+@@ -88,35 +82,29 @@
+         }
+         center = &pool->retreatCenter;
+         pool->retreatCenter.y = terrainHeight(center, cellIndex(center));
+-        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
+-        earlyTable = (const u16 *)0x0203B400;
++        earlyTable = gRandomTable;
+         angle = nextRandom(earlyTable);
+-        do {
+-            random.mask = 255;
+-        } while (0);
+-        angle &= random.mask;
++        angle &= 255;
+         radiusBits = nextRandom(earlyTable);
+-        do {
+-            radiusBits &= 127;
+-        } while (0);
++        radiusBits &= 127;
+         write = &delta;
+         radius = radiusBits + 16;
+         {
+-            s32 product = gUnk_086149C4[(angle + 64) & random.mask] * radius;
+-            random.cursor = &gRandomIndex;
+-            write->x = truncateShift12(product) | (origin & 3);
++            s32 product = gUnk_086149C4[(angle + 64) & 255] * radius;
++            cursor = &gRandomIndex;
++            write->x = truncateShift12(product);
+         }
+         write->y = 0;
+         write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+         entryDestination = &slot->destination;
+         addPosition(entryDestination, &delta, &pool->retreatCenter);
+         table = gRandomTable;
+-        slot->targetHeight = (nextRandomFrom(table, random.cursor) & 511) + slot->desiredHeight;
++        slot->targetHeight = (nextRandomFrom(table, cursor) & 511) + slot->desiredHeight;
+         slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
+                                      entryDestination->z - slot->position.z);
+-        jitter = (nextRandomFrom(table, random.cursor) & 15) - 8;
++        jitter = (nextRandomFrom(table, cursor) & 15) - 8;
+         slot->direction += jitter;
+-        slot->steeringTimer = (nextRandomFrom(table, random.cursor) & 7) + 8;
++        slot->steeringTimer = (nextRandomFrom(table, cursor) & 7) + 8;
+         slot->speed = 16;
+     }
+     if (!slot->steeringTimer) {
+--- a/src/fn/sub_0805B0F0.c
++++ b/src/fn/sub_0805B0F0.c
+@@ -29,8 +29,7 @@
+         u32 *seed;
+         {
+             u32 first, second;
+-            /* Allocation-only: fold the bounded offset after constant-equivalence analysis. */
+-            table = (const u16 *)((u32)gRandomTable + (rig->state >> 16));
++            table = gRandomTable;
+             seed = &gRandomIndex;
+             first = *seed + 1;
+             mask = 1023;
+--- a/src/fn/sub_080AB968.c
++++ b/src/fn/sub_080AB968.c
+@@ -58,70 +58,44 @@
+     u16 k[] = {0x6400};
+     sub_080A9DB0(p, 4, k[0]);
+ }
+-union RetractionActorHandle {
+-    struct ChaseActor *ptr;
+-    u8 parts[4];
+-};
+ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
+ {
+-    union RetractionActorHandle actor;
+-    u32 raw;
+-    actor.ptr = input;
+-    if (TakeEntry(actor.ptr)) {
+-        SetControl(actor.ptr, TentacleBody_UpdateChargeSpread, 0x23);
+-        actor.ptr->base.field2E8 = 8;
++    struct ChaseActor *actor = input;
++    if (TakeEntry(actor)) {
++        SetControl(actor, TentacleBody_UpdateChargeSpread, 0x23);
++        actor->base.field2E8 = 8;
+     }
+     {
+-        s32 x = actor.ptr->base.secondaryMotion.x;
++        s32 x = actor->base.secondaryMotion.x;
+         s32 ax = x;
+         s32 z;
+         s32 az;
+         if (x < 0)
+             ax = -x;
+-        z = actor.ptr->base.secondaryMotion.z;
++        z = actor->base.secondaryMotion.z;
+         az = z;
+         if (z < 0)
+             az = -z;
+         if (ax > az) {
+             if (x < 0) {
+-                Advance(actor.ptr, ax, az);
+-                raw = actor.parts[0];
+-                if ((s32)raw < 0)
+-                    actor.parts[0] = 0;
+-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+-                raw = actor.parts[0];
++                Advance(actor, ax, az);
+             } else {
+-                Advance(actor.ptr, ax, az);
+-                raw = actor.parts[0];
+-                if ((s32)raw < 0)
+-                    actor.parts[0] = 0;
+-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+-                raw = actor.parts[0];
++                Advance(actor, ax, az);
+             }
+         } else {
+             if (z < 0) {
+-                Advance(actor.ptr, ax, az);
+-                raw = actor.parts[0];
+-                if ((s32)raw < 0)
+-                    actor.parts[0] = 0;
+-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+-                raw = actor.parts[0];
++                Advance(actor, ax, az);
+             } else {
+-                Advance(actor.ptr, ax, az);
+-                raw = actor.parts[0];
+-                if ((s32)raw < 0)
+-                    actor.parts[0] = 0;
+-                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+-                raw = actor.parts[0];
++                Advance(actor, ax, az);
+             }
+         }
+     }
+-    TentacleActor_UpdateOscillation(actor.ptr, 0x1ae, 0x28);
+-    if (actor.ptr->base.stepDone) {
+-        TentacleActor_SelectWanderRoute(actor.ptr);
+-        SetControl(actor.ptr, actor.ptr->base.onAlternateEntry, 1);
+-        SetState(actor.ptr, 2);
++    TentacleActor_UpdateOscillation(actor, 0x1ae, 0x28);
++    if (actor->base.stepDone) {
++        TentacleActor_SelectWanderRoute(actor);
++        SetControl(actor, actor->base.onAlternateEntry, 1);
++        SetState(actor, 2);
+     } else {
+-        actor.ptr->base.counter2AC++;
++        actor->base.counter2AC++;
+     }
+ }
+--- a/src/fn/sub_080AEE08.c
++++ b/src/fn/sub_080AEE08.c
+@@ -120,10 +120,6 @@
+                 (origin = (const struct ContactPosition *)&actor->base.body.position),
+                 Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                 (const struct ContactPosition *)spread, 0x20, 4, 20, (sparkKind = 2), 1);
+-            /* Keep the three shared spark values distinct through CSE. */
+-            sparkKind |= ((u32)actor & 255) >> 8;
+-            spread = (union VornSpreadVector *)((u32)spread + (((u32)actor & 31) >> 5));
+-            origin = (const struct ContactPosition *)((u32)origin + (((u32)actor & 127) >> 7));
+             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                 (const struct ContactPosition *)spread, 0x40, 4, 20, sparkKind, 1);
+             SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+--- a/src/fn/sub_080BD1F0.c
++++ b/src/fn/sub_080BD1F0.c
+@@ -269,11 +269,7 @@
+ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
+ {
+     s32 values[8];
+-    /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
+-    union {
+-        struct SkeletonContext *context;
+-        s32 one;
+-    } state = {actor->base.context};
++    struct SkeletonContext *context = actor->base.context;
+     struct SceneActorRegistryControlGroup *group = &actor->group.common;
+     u32 mask;
+     u32 wrap = 1023;
+@@ -281,10 +277,7 @@
+     s32 count = 4;
+     s32 life = 20;
+     s32 size = 2;
+-    union {
+-        u16 *flags;
+-        s32 one;
+-    } response;
++    u16 *responseFlags;
+     u32 *ctxFlags;
+     u8 blocked;
+     u8 *categoryp;
+@@ -317,9 +310,6 @@
+         }
+     }
+     SceneActorTerrain_ClearCollisionTimers((void *)actor);
+-    /* Allocation-only: the two bounded exit arms preserve this global table
+-     * lifetime until jump2; neither arm nor this initial copy emits code. */
+-    lateTable = (const u16 *)actor;
+     if (!actor->base.restart)
+         return;
+     actor->base.stepDone = 1;
+@@ -328,7 +318,7 @@
+     mask = 0x4000;
+     {
+         u32 test = actor->base.motionFlags & mask;
+-        response.flags = &actor->base.motionFlags;
++        responseFlags = &actor->base.motionFlags;
+         if (!test)
+             goto notHidden;
+     }
+@@ -349,7 +339,7 @@
+             Script_Call(script, &arguments);
+         }
+         {
+-            u32 t = *response.flags & mask;
++            u32 t = *responseFlags & mask;
+             categoryp = &actor->base.category;
+             if (!t && (u32)(*categoryp - 11) > 2)
+                 Bestiary_UnlockEntry(
+@@ -364,29 +354,23 @@
+             range.z = 60;
+             table = gRandomTable;
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0x20, count, life, size, state.one = 1);
++                                0x20, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0x40, count, life, size, state.one);
++                                0x40, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0x5E, count, life, size, state.one);
++                                0x5E, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0x80, count, life, size, state.one);
++                                0x80, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0xC4, count, life, size, state.one);
++                                0xC4, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
+-                                0xF0, count, life, size, state.one);
++                                0xF0, count, life, size, 1);
+             category = *categoryp;
+             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
+                 category == 0x18 || category == 0x19)
+-                /* The late zero retains the response/table conflict through combine. */
+-                Sound_PlaySong(0xE5 | (((u32)response.flags & 31) >> 5));
++                Sound_PlaySong(0xE5);
+         }
+ 
+-        {
+-            u32 bound = (u8)(u32)actor;
+-            if ((s32)bound < 0)
+-                Sound_PlaySong((u32)lateTable);
+-        }
+         SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
+         SetState(actor, 3, 0, 0);
+         {
+@@ -400,13 +384,13 @@
+ notHidden:
+     if (actor->base.hitReactionFlags & 0x7F) {
+         u32 hit = actor->base.hitAttributes & 0x100017;
+-        ctxFlags = &state.context->flags;
++        ctxFlags = &context->flags;
+         if (hit)
+             goto defeated;
+     }
+     {
+         u32 m = 0x1800;
+-        u32 *f = &state.context->flags;
++        u32 *f = &context->flags;
+         u32 v = *f & m;
+         ctxFlags = f;
+         blocked = Test(v, ~0);
+@@ -438,7 +422,7 @@
+         actor->base.health = 1;
+         {
+             u32 bit = 0x40;
+-            *response.flags &= ~bit;
++            *responseFlags &= ~bit;
+             if (Test(*ctxFlags, bit)) {
+                 u32 c = 7;
+                 actor->base.category = c;
+@@ -446,7 +430,7 @@
+                 Skeleton_InitVariantMotion(actor);
+             }
+         }
+-        if (state.context->rank > 19999) {
++        if (context->rank > 19999) {
+             u16 script = (u16)actor->base.script1F8;
+             if (script) {
+                 struct ScriptUtilityArguments arguments;
+@@ -462,24 +446,19 @@
+                 arguments.values = values;
+                 Script_Call(script, &arguments);
+             }
+-            if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
++            if (!Masked16(responseFlags, 0x4000) && (u32)(actor->base.category - 11) > 2)
+                 Bestiary_UnlockEntry(
+                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+-            sub_08159164(state.context->rewardHigh);
++            sub_08159164(context->rewardHigh);
+             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
+         } else {
+-            sub_08159164(state.context->rewardLow);
++            sub_08159164(context->rewardLow);
+         }
+         {
+             u32 m = 0x10;
+             *ctxFlags |= m;
+         }
+         Sound_PlaySong(0x3AD);
+-        {
+-            u32 bound = ((u32)actor & 4095);
+-            if ((s32)bound < 0)
+-                Sound_PlaySong((u32)lateTable);
+-        }
+ 
+     } else {
+     defeated:
+@@ -509,9 +488,9 @@
+                 Script_Call(script, &arguments);
+             }
+         }
+-        if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
++        if (!Masked16(responseFlags, 0x4000) && (u32)(*categoryp - 11) > 2)
+             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
+-        sub_08159164(state.context->rewardHigh);
++        sub_08159164(context->rewardHigh);
+         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
+         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
+         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
+@@ -524,17 +503,17 @@
+             range.z = 60;
+             lateTable = gRandomTable;
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0x20, count, life, size, response.one = 1);
++                                &range, 0x20, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0x40, count, life, size, response.one);
++                                &range, 0x40, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0x5E, count, life, size, response.one);
++                                &range, 0x5E, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0x80, count, life, size, response.one);
++                                &range, 0x80, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0xC4, count, life, size, response.one);
++                                &range, 0xC4, count, life, size, 1);
+             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+-                                &range, 0xF0, count, life, size, response.one);
++                                &range, 0xF0, count, life, size, 1);
+             category = *categoryp;
+             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
+                 category == 0x18 || category == 0x19)
+--- a/src/fn/sub_08234540.c
++++ b/src/fn/sub_08234540.c
+@@ -28,16 +28,13 @@
+     }
+     burst->resource = AnimData_FindEntry(0x1C1E);
+     i = 0;
+-    /* Form the table copy after CSE has finished tracking constants. */
+-    table = (const u16 *)((u32)gRandomTable & ~(phase >> 8));
++    table = gRandomTable;
+     frame = &burst->particles[0].frame;
+     sprite = burst->particles;
+     for (; i < 8; i++) {
+         ParticleSprite_Initialize(sprite, burst->resource, 0);
+         Effect_SetOrigin(sprite, -4, -4);
+         Effect_SetPalette(sprite, 1);
+-        /* Preserve the table's reference weight until combine. */
+-        table = (const u16 *)((u32)table | (((u32)burst & 31) >> 5));
+         frame->motion.angle = phase + (i << 5) + (SpiralBurst_Random(table, mask) & 15);
+         frame->motion.riseRate = ((i & 3) << 1) + 3;
+         frame->motion.radius = (SpiralBurst_Random(table, mask) & 31) + 64;
+@@ -68,7 +65,6 @@
+             else
+                 SpriteDrawable_SelectTileFrame(sprite, burst->resource, 13);
+         }
+-        table = (const u16 *)((u32)table | (((u32)burst & 127) >> 7));
+         frame->motion.lifetime = (SpiralBurst_Random(table, mask) & 15) + 0x38;
+         frame = (void *)((u8 *)frame + sizeof(struct SpiralParticle));
+         sprite = (u8 *)sprite + sizeof(struct SpiralParticle);
