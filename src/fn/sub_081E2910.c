@@ -8,10 +8,7 @@ s32 Div(s32, s32);
 static inline u32 ShakeSample(const u16 *table)
 {
     u32 sample;
-    do {
-        gRandomIndex = (gRandomIndex + 1) & 1023;
-    } while (0);
-    PARTICLE_RANDOM_READ_SAMPLE(sample, table, gRandomIndex);
+    PARTICLE_RANDOM_DRAW(sample, table, gRandomIndex);
     return sample;
 }
 // Animate a presentation layer dropping, shaking, then blinking with its alternate.

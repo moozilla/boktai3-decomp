@@ -1,4 +1,5 @@
 #include "contact_burst.h"
+#include "monster_particle_random.h"
 
 #include "projected_display.h"
 
@@ -144,10 +145,7 @@ s32 ContactBurst_Update(struct ContactBurst *effect)
             do {
                 u32 sample, frame;
                 s32 direction;
-                do {
-                    *randomState = (*randomState + 1) & 1023;
-                    sample = randomTable[*randomState];
-                } while (0);
+                PARTICLE_RANDOM_DRAW(sample, randomTable, *randomState);
                 direction = index << 5;
                 sample &= 15;
                 direction += sample;
