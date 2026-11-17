@@ -13,7 +13,7 @@ static inline s32 ScaledComponent(s32 component, s32 speed)
     s32 product = (u32)component * (u32)speed;
     if (product >= 0)
         return product >> 16;
-    return -((s32)(0u - (u32)product) >> 16);
+    return -((s32)(0 - (u32)product) >> 16);
 }
 u8 SceneActorBehavior_AddDescriptorAcceleration(struct RoomActor *actor,
                                                 struct SceneActorBehaviorDestination *descriptor,

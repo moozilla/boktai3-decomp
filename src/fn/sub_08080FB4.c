@@ -70,14 +70,12 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
-            u32 zero;
             field = (void *)((u8 *)actor + fieldOffset);
             mask = ~0x141C0;
             *field &= mask;
-            zero = 0;
-            control->counter = zero;
-            control->field14 = zero;
-            control->timer = zero;
+            control->counter = 0;
+            control->field14 = 0;
+            control->timer = 0;
         }
         /* Frame127 releases attachments without consuming offset outputs. */
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);

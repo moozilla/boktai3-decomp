@@ -128,9 +128,7 @@ void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
         gTetherActor->position = panel->center;
         {
             u8 *heading = &gTetherActor->heading;
-            u32 zero;
-            zero = 0;
-            *heading = zero;
+            *heading = 0;
         }
         panel->paletteSprite.flags |= 1;
         Sound_PlaySong(249);

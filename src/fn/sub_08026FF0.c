@@ -86,7 +86,6 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
     s16 *velocity;
     s16 *minimum;
     s16 *maximum;
-    u32 zero;
 
     if (p->changed) {
         int sequence;
@@ -136,9 +135,8 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
             *maximum = 0;
     }
     p->unk39B = 8;
-    zero = 0;
-    p->unk33C = zero;
-    p->unk340 = zero;
+    p->unk33C = 0;
+    p->unk340 = 0;
     {
         u32 mask = 12;
         base->flags |= mask;

@@ -368,8 +368,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
     HitSwitch_InitCollider(entry);
     {
         u8 *cooldown = &entry->hitCooldown;
-        u32 zero = 0;
-        *cooldown = zero;
+        *cooldown = 0;
     }
     {
         u32 found = Script_SeekToKeyword('s');

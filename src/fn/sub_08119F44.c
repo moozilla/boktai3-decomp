@@ -31,8 +31,7 @@ void Glove_StopFromScript(void)
         void (*update)(void) = Glove_UpdateStopping;
         u8 *active = &glove->active;
         u32 zero = 0;
-        u16 one = 1;
-        *active = one;
+        *active = 1;
         glove->update = update;
         glove->timer = zero;
         clearDrawFlags(&glove->draw, ~1);

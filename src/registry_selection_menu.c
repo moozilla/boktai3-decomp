@@ -175,23 +175,13 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
 void RegistrySelection_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int shift,
                                          int bankCount)
 {
-    u8 *target;
-    if (bankCount > 0) {
-        u8 *targetBank = to;
-        u8 *sourceBank = from;
-        u8 *outputBank = output;
-        int remaining = bankCount;
-        /* do-while(0) only keeps agbcc's block layout */
-        do {
-            target = targetBank;
-            Palette_InterpolateBanks(outputBank, sourceBank, target, amount, shift);
-            targetBank += 0x20;
-            sourceBank += 0x20;
-            /* do-while(0) only keeps agbcc's block layout */
-            do {
-                outputBank += (unsigned short)0x20;
-            } while (0);
-        } while (--remaining);
+    u16 (*outputBank)[16] = (u16 (*)[16])output;
+    u16 (*firstBank)[16] = (u16 (*)[16])from;
+    u16 (*secondBank)[16] = (u16 (*)[16])to;
+    int bank;
+    for (bank = 0; bank < bankCount; bank++) {
+        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank],
+                                 amount, shift);
     }
 }
 

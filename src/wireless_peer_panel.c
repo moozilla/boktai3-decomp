@@ -46,11 +46,9 @@ static inline void WirelessPeerPanel_StepSprite(struct ContactSwarmSprite *sprit
 void WirelessPeerMenu_InitBackground(struct WirelessPeerMenu *menu, int layer)
 {
     void *resource = ScriptProc_Start(0xC091, 0xCF15);
-    int zero;
     menu->background = resource;
-    zero = 0;
-    Bg_SetupLayers(1, 0, resource, 0, zero, 1, &layer);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    Bg_SetupLayers(1, 0, resource, 0, 0, 1, &layer);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     {
         struct PaletteResource *palette = ScriptProc_Start(0x92B3, 0x26BB);
         CpuSet(palette->banks, gBgPaletteBuffer, 256);
@@ -95,14 +93,13 @@ int WirelessPeerPanel_Init(struct WirelessPeerMenu *owner, struct WirelessPeerPa
     sprite = initialSprite;
     WirelessPeerPanel_StepSprite(sprite, &animation);
     {
-        int one = 1;
         struct WirelessPeerPanel *write;
         const struct WirelessPeerStyle *table;
         int kind;
         u32 offset;
         const struct WirelessPeerStyle *entry;
         write = panelState;
-        write->sprite.priority = one;
+        write->sprite.priority = 1;
         table = gUnk_0824DE64;
         kind = type;
         offset = kind << 1;
@@ -270,10 +267,9 @@ void WirelessPeerMenu_UpdateCancelInput(struct WirelessPeerMenu *menu)
                 Wireless_RequestAdvanceConnection();
                 {
                     u32 state = 7;
-                    u32 zero = 0;
                     menu->state = state;
                     menu->entered = 1;
-                    menu->timer = zero;
+                    menu->timer = 0;
                 }
             }
         } else {
@@ -300,10 +296,9 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct WirelessPeerMenu *menu)
             Wireless_RequestAdvanceConnection();
             {
                 u32 state = 7;
-                u32 zero = 0;
                 menu->state = state;
                 menu->entered = 1;
-                menu->timer = zero;
+                menu->timer = 0;
             }
         }
     }

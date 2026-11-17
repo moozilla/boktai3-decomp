@@ -7,7 +7,6 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
     u32 priority;
     u16 *nearby;
     u32 script;
-    u32 zero;
     if (Script_SeekToKeyword('p')) {
         u32 cell;
         u32 height, surface;
@@ -60,8 +59,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         AnimData_Load(graphics, graphicsId);
         sprite = &emitter->primary.sprite;
         Sprite_Init(sprite, graphics, 0);
-        zero = 0;
-        sprite->frame = zero;
+        sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA2);
         emitter->primary.sprite.flags |= 0x200;
         {
@@ -85,7 +83,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         AnimData_Load(graphics, graphicsId);
         sprite = &emitter->secondary.sprite;
         Sprite_Init(sprite, graphics, 0);
-        sprite->frame = zero;
+        sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA0);
         emitter->secondary.sprite.flags |= 0x400;
         {

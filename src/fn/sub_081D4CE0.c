@@ -29,15 +29,14 @@ static inline void CpuSetArgs(void *dest, u32 control, void *src)
 
 int sub_081D4CE0(struct PalTrans081D4CE0 *p)
 {
-    u32 zero = 0;
     u32 fill;
     u8 *anim, *spr;
     u16 *org, *q;
-    p->index = zero;
-    p->bA03 = zero;
-    p->b25 = zero;
+    p->index = 0;
+    p->bA03 = 0;
+    p->b25 = 0;
     if (p->index > 0x52)
-        p->index = zero;
+        p->index = 0;
     PaletteTransition_StartDisplay(p, p->index);
     anim = p->animData;
     AnimData_Load(anim, 0x1c1b);
@@ -52,9 +51,9 @@ int sub_081D4CE0(struct PalTrans081D4CE0 *p)
     p->h9c4 = *q;
     ((u8 *)p)[0x9ac] = 0x80;
     ((u8 *)p)[0x9ad] = 0x40;
-    p->w18 = zero;
-    p->h26 = zero;
-    fill = zero;
+    p->w18 = 0;
+    p->h26 = 0;
+    fill = 0;
     CpuSetArgs(org, 0x05000002, &fill);
     return 0;
 }

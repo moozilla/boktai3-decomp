@@ -54,10 +54,9 @@ int Wireless_HandleSendError(struct Engine *p)
     }
     if (WirelessController_ConsumeAdvanceRequest(p)) {
         int operation = 30;
-        int zero = 0;
-        p->flag = zero;
+        p->flag = 0;
         p->operation = operation;
-        p->ticks = zero;
+        p->ticks = 0;
         *pending = 1;
     }
     return 0;

@@ -9,7 +9,7 @@ void ScalarApproach_QuarterAngleArray(s16 *values, const s16 *targets, s32 count
     const s16 *targetCursor;
     cursor = values;
     targetCursor = targets;
-    while ((remaining = (s32)((u32)remaining - 1u)) >= 0) {
+    while ((remaining = (s32)((u32)remaining - 1)) >= 0) {
         s32 current;
         s32 target;
         s32 result;
@@ -42,7 +42,7 @@ void ScalarApproach_QuarterAngleArray(s16 *values, const s16 *targets, s32 count
         if (delta >= 0)
             step = delta >> 2;
         else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 2));
+            step = (s32)(0 - (u32)((s32)(0 - (u32)delta) >> 2));
         result = (s32)((u32)near + (u32)step);
 
     store:

@@ -94,12 +94,6 @@ static inline s32 random_value(void)
     return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
 
-static inline s32 random_first(void)
-{
-    u8 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)(table + (gRandomIndex << 1));
-}
 
 void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *position)
 {
@@ -109,14 +103,14 @@ void ConvergingEffects_EmitFarParticle(struct Player *player, struct SceneVec *p
         struct ConvergingParticle *draw = e;
         s32 angle;
         s32 radius;
+        u16 radiusSample;
         draw->flags &= ~1;
         e->kind = 4;
         SpriteDrawable_SelectTileFrame(draw, player->convergingEffects.graphics, 4);
-        angle = random_first() & 255;
-        radius = (random_first() & 127) + 256;
-        do {
-            e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        } while (0);
+        angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
+        radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
+        radius = radiusSample % 128 + 256;
+        e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
         e->offsetZ = scale(radius * gUnk_086149C4[angle]);
         draw->position = *position;
         draw->position.x += (u16)e->offsetX;

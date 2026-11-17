@@ -805,14 +805,12 @@ s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactP
         if (slot) {
             struct PlayerCloneConfiguration *handler = &slot->configuration;
             struct SceneInputWidget *display;
-            u32 zero;
             struct ContactPosition *tmp;
             Memory_Copy(handler, resource, sizeof(*resource));
-            zero = 0;
-            slot->timer = zero;
-            slot->behaviorPhase = zero;
-            slot->paletteTimer = zero;
-            slot->animationIndex = zero;
+            slot->timer = 0;
+            slot->behaviorPhase = 0;
+            slot->paletteTimer = 0;
+            slot->animationIndex = 0;
             display = &slot->animation;
             Anim_LoadKeyframe(display, &slot->resource, 0, 1);
             slot->speed = resource->speed;
@@ -826,7 +824,7 @@ s32 PlayerClone_Spawn(struct PlayerCloneConfiguration *resource, struct ContactP
             slot->targetPosition = *tmp;
             {
                 struct ContactPosition *target = &slot->velocity;
-                scratch.fill = zero;
+                scratch.fill = 0;
                 PlayerClone_ClearVelocity(&scratch.fill, target);
             }
             display->flags |= 1;
@@ -918,8 +916,7 @@ void PlayerClone_BeginActiveReactions(void)
                     ->behaviorPhase = 5;
                 *speed = resetValue;
                 {
-                    u16 one = 1;
-                    *flags |= one;
+                    *flags |= 1;
                 }
                 {
                     struct ContactCollider *collider = &s->collider;

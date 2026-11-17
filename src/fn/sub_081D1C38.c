@@ -81,10 +81,9 @@ void sub_081D1C38(void *unused, struct Actor *arg)
 {
     struct Actor *p = arg;
     if (p->entered) {
-        int zero = 0;
-        p->entered = zero;
-        p->done = zero;
-        TaggedSceneNpc_PlayTaggedAnimation(p, 3, 1, zero, 4);
+        p->entered = 0;
+        p->done = 0;
+        TaggedSceneNpc_PlayTaggedAnimation(p, 3, 1, 0, 4);
     }
     {
         struct Vec *pos = &p->pos;

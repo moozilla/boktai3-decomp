@@ -62,18 +62,17 @@ void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct NidhoggrEffectVect
     sprite = &effect->sprite;
     Sprite_Init(sprite, animation, 0);
     {
-        u16 zero = 0;
         u8 byteZero = 0;
-        sprite->frame = zero;
+        sprite->frame = 0;
         effect->phase = byteZero;
         effect->phaseTimer = byteZero;
         position = &effect->position;
         position->x = anchor->x + offset->x;
         position->y = anchor->y + offset->y;
         position->z = anchor->z + offset->z;
-        effect->field174 = zero;
+        effect->field174 = 0;
         effect->speedX = 0x26;
-        effect->speedY = zero;
+        effect->speedY = 0;
     }
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
     {

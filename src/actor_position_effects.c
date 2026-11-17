@@ -75,12 +75,6 @@ static inline s32 random_value(void)
     return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
 
-static inline s32 random_first(void)
-{
-    u8 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)(table + (gRandomIndex << 1));
-}
 
 void SceneActors_SpawnConvergingParticle(struct ActorState *actor, struct ConvergingParticlePoint *pos)
 {
@@ -89,14 +83,14 @@ void SceneActors_SpawnConvergingParticle(struct ActorState *actor, struct Conver
         struct ConvergingParticle *draw = particle;
         s32 angle;
         s32 radius;
+        u16 radiusSample;
         draw->flags &= ~1;
         particle->kind = 4;
         SpriteDrawable_SelectTileFrame(draw, actor->convergingParticles.graphics, 4);
-        angle = random_first() & 255;
-        radius = (random_first() & 127) + 256;
-        do {
-            particle->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        } while (0);
+        angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
+        radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
+        radius = radiusSample % 128 + 256;
+        particle->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
         particle->dy = scale(radius * gUnk_086149C4[angle]);
         draw->position = *pos;
         draw->position.x += (u16)particle->dx;

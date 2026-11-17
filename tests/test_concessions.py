@@ -178,6 +178,16 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
 
+    def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
+        for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
+            with self.subTest(statement=statement):
+                self.assertEqual(warns("int f(void) {\n    " + statement + "\n}\n"), [])
+        # Typedef names still count, and returning a real local must not add a second report.
+        self.assertEqual(warns("int f(void) {\n    FlagWord zero = 0;\n    return zero;\n}\n"),
+                         ["const-local"])
+        self.assertEqual(warns("int f(void) {\n    unsigned int one = 1;\n    return one;\n}\n"),
+                         ["const-local"])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
@@ -228,6 +238,26 @@ class Compiler(unittest.TestCase):
     def test_proved_zero(self):
         self.assertEqual(self.kinds_of("void f(u32 i) {\n    const u16 *t = (const u16 *)((u32)gTable + ((u16)i >> 16));\n    g(t[i & 3]);\n}\n"), ["proved-zero"])
         self.assertEqual(self.kinds_of("void f(u32 i) {\n    g((i & 0xFF00) >> 8);\n}\n"), [])
+
+    def test_rejected_narrow_load_combinations_are_not_zero_proofs(self):
+        # Serial, EEPROM and RTC bit reads from three real source units.
+        # combine tries, then rejects, a narrowing with a zero intermediate;
+        # none of these C expressions is identically zero.
+        bodies = (
+            "void f(void) {\n    if (*(volatile u16 *)0x04000128 & 0x40) g(1);\n}\n",
+            "void f(void) {\n    if (*(volatile u16 *)0x0D000000 & 1) g(1);\n}\n",
+            "void f(void) {\n    u8 bit = (u16)(*(volatile u16 *)0x080000C4 & 2) >> 1;\n    g(bit);\n}\n",
+        )
+        for body in bodies:
+            with self.subTest(body=body):
+                self.assertEqual(self.kinds_of(body), [])
+
+    def test_real_zero_proofs_survive_volatile_reads(self):
+        for expression in ("(*(volatile u16 *)0x04000128 & 31) >> 5",
+                           "*(volatile u16 *)0x04000128 >> 16"):
+            with self.subTest(expression=expression):
+                self.assertEqual(self.kinds_of("void f(void) {\n    g(" + expression + ");\n}\n"),
+                                 ["proved-zero"])
 
 
 if __name__ == "__main__":

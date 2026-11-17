@@ -60,33 +60,29 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
     if (fire) {
         switch (*kindAddress) {
             case 2: {
-                u32 zero;
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                zero = 0;
-                velocity.y = zero;
-                velocity.z = zero;
+                velocity.y = 0;
+                velocity.z = 0;
                 level = actor->restrictionMetric - 0x16000;
                 NativeEffect_CreateFromProfile(&actor->position, level, &velocity,
-                                               actor->emissionProfile, 5, zero, 3, zero);
+                                               actor->emissionProfile, 5, 0, 3, 0);
                 break;
             }
             case 3: {
                 struct ScenePoolVec32 *position;
                 void *profile;
-                u32 zero;
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                zero = 0;
-                velocity.y = zero;
-                velocity.z = zero;
+                velocity.y = 0;
+                velocity.z = 0;
                 level = actor->restrictionMetric - 0x8000;
                 position = &actor->position;
                 profile = actor->emissionProfile;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, zero);
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, 0);
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                velocity.y = zero;
-                velocity.z = zero;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, zero, 4, 1);
-                Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, zero);
+                velocity.y = 0;
+                velocity.z = 0;
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 0, 4, 1);
+                Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, 0);
                 actor->unknown308 = 60;
                 break;
             }

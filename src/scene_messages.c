@@ -150,8 +150,7 @@ int SceneMessages_Update(struct SceneMessages *controller)
         if (controller->advance) {
             {
                 int next = ((u16)controller->step) + 1;
-                int zero = 0;
-                zero16 = zero;
+                zero16 = 0;
                 controller->step = next;
                 controller->queued = 0;
                 controller->advance = zero16;
@@ -234,12 +233,11 @@ int SceneMessages_RegisterReceiver(struct SceneMessageReceiver *receiver, int id
 {
     int result;
     if (gSceneEventDispatchState) {
-        int zero = 0;
         receiver->queue.id = id;
         receiver->queue.kind = kind;
-        receiver->queue.count[0] = zero;
-        receiver->queue.count[1] = zero;
-        receiver->queue.trigger = zero;
+        receiver->queue.count[0] = 0;
+        receiver->queue.count[1] = 0;
+        receiver->queue.trigger = 0;
         result =
             SceneMessages_LinkReceiver((struct SceneMessages *)gSceneEventDispatchState, receiver);
     } else

@@ -82,10 +82,9 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
     }
     if (p->timer > 29) {
         int state = 3;
-        int zero = 0;
         p->state = state;
         p->entered = 1;
-        p->timer = zero;
+        p->timer = 0;
     } else {
         p->timer++;
     }

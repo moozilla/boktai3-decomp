@@ -327,7 +327,7 @@ void SceneActors_UpdateEffects(struct StateActor *actor)
         if (disableDamage & actor->actionFlags) {
             damage = &actor->damageEffect;
             {
-                u32 clear = ~1u;
+                u32 clear = ~1;
                 damage->flags = clear & damage->flags;
             }
         } else {

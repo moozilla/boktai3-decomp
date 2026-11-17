@@ -430,9 +430,8 @@ static inline u8 EnterState_3848(struct ChildGroupOscillationState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -525,9 +524,8 @@ static inline u8 ChildGroup_TakeEntryFlag(struct Group080F38E0 *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -617,9 +615,8 @@ static inline u8 EnterState_3ABC(struct ChildGroupInactiveState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -720,9 +717,8 @@ static inline u8 EnterState_3B60(struct ChildGroupTrailingState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -831,9 +827,8 @@ static inline u8 EnterState_3CC4(struct ChildGroupOrbitState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -951,9 +946,8 @@ static inline u8 EnterState_3F48(struct ChildGroupLandingState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }
@@ -1027,9 +1021,8 @@ static inline u8 EnterState_40C8(struct ChildGroupCallbackState *p)
         u32 cleared = ~1;
         cleared &= flags;
         {
-            u32 zero = 0;
             p->flags = cleared;
-            p->reset = zero;
+            p->reset = 0;
         }
         return 1;
     }

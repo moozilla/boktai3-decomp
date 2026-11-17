@@ -44,16 +44,11 @@ available:
         fraction = mask;
     } else {
         seconds = Div(time, 60);
-        fraction = Div(({
-                           s32 t = time - seconds * 60;
-                           t * 169;
-                       }),
-                       10);
+        fraction = Div((time - seconds * 60) * 169, 10);
     }
     {
-        int zero = 0;
-        PanelText_DrawDecimal(seconds, 100, 2, 12, zero);
-        PanelText_DrawDecimal(fraction, 100, 6, 12, zero);
+        PanelText_DrawDecimal(seconds, 100, 2, 12, 0);
+        PanelText_DrawDecimal(fraction, 100, 6, 12, 0);
     }
     *Bg_GetWrappedTilemapEntry(3, 9, 12) = 1;
 }

@@ -452,7 +452,6 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
     switch (p->actionCounters[0]) {
         case 0: {
             struct ContactPosition delta;
-            u32 one;
             void *motion;
             Vanargand_SetFlags(p, 8);
             entering = p->actionEntered;
@@ -462,8 +461,7 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
                 Vanargand_MakeVector(&delta, (Vanargand_AimAngle(p) + 128) & 255, 128);
                 Vanargand_AddVectorReversedValue(&delta, &p->offset, &delta);
                 motion = &p->motion;
-                one = 1;
-                MotionTrack_Initialize(motion, &p->offset, &delta, 0, one);
+                MotionTrack_Initialize(motion, &p->offset, &delta, 0, 1);
                 {
                     void *data = boss->effectResource;
                     struct DisplaySequenceState *seq = &p->graphics.sequence;

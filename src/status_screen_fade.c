@@ -184,7 +184,6 @@ void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 
 int StatusScreen_Update(struct StatusScreen *p)
 {
-    int zero;
     if (p->state)
         p->state(p);
     if (p->effect)
@@ -193,11 +192,10 @@ int StatusScreen_Update(struct StatusScreen *p)
         p->noise(p);
     {
         u16 next = 1 - p->active;
-        zero = 0;
         p->active = next;
     }
     StatusScreen_RefreshDirtyDisplays(p);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
 }
 
 int StatusScreen_Destroy(struct StatusScreen *p)

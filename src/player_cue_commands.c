@@ -1045,14 +1045,12 @@ void Player_ConfigureAttachmentEffect(struct Player *player, u32 action, s32 val
 
 void PlayerCue_ReleaseControl(struct Player *player)
 {
-    u32 zero;
     if (player->tetherMode != 6)
         player->tetherMode = 0;
     player->tetherPhase = 0;
     player->tetherFrame = 0;
-    zero = 0;
     if (player->kindTwoEntered != 0)
-        player->kindTwoEntered = zero;
+        player->kindTwoEntered = 0;
     player->kind = 1;
-    player->terrainClampBlocked = zero;
+    player->terrainClampBlocked = 0;
 }

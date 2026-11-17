@@ -43,13 +43,12 @@ static inline void changeState(struct VanargandPairAttack *p, s32 state,
     if (p->state == 3)
         restorePalette(p, self);
     {
-        u32 zero = 0;
         p->state = state;
         p->stateCallback = callback;
-        p->actionTimer = zero;
+        p->actionTimer = 0;
         p->pending = 1;
-        p->phase = zero;
-        p->timer = zero;
+        p->phase = 0;
+        p->timer = 0;
     }
 }
 

@@ -195,14 +195,12 @@ void GridAttackActor_SpawnGridPattern(struct GridAttackActor *p)
 
 static inline void GridAttack_SetState(struct GridAttackActor *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->stateReset = zero;
-    p->pending = zero;
+    p->stateReset = 0;
+    p->pending = 0;
 }
 
 static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int zero)
@@ -456,12 +454,11 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (p->changed) {
-        int zero = 0;
-        p->changed = zero;
+        p->changed = 0;
         GridAttack_SetFacing(p, p->requestedAngles[0]);
         GridAttackActor_SetAnimation(p, 3, 1, 8);
-        p->stage = zero;
-        p->counter = zero;
+        p->stage = 0;
+        p->counter = 0;
         GridAttackActor_ResetAttackAnimationHistory(p);
         Sound_PlaySongChecked(955);
     }
@@ -683,11 +680,9 @@ void GridAttack_UpdateIdleState(struct GridAttackActor *s)
         GridAttackActor_SetAnimation(s, 2, 1, 0);
     }
     {
-        u32 zero;
         u32 *p = (u32 *)&s->damage;
-        zero = 0;
-        *p = zero;
-        s->special = zero;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;
@@ -726,11 +721,9 @@ void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
         GridAttackActor_SetAnimation(s, 11, 1, 8);
     }
     {
-        u32 zero;
         u32 *p = (u32 *)&s->damage;
-        zero = 0;
-        *p = zero;
-        s->special = zero;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;
@@ -747,11 +740,9 @@ void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
         GridAttackActor_SetAnimation(s, 2, 1, 0);
     }
     {
-        u32 zero;
         u32 *p = (u32 *)&s->damage;
-        zero = 0;
-        *p = zero;
-        s->special = zero;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;
@@ -903,8 +894,7 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
                         value = react;
                         *accum = value;
                         {
-                            int one = 1;
-                            react = one;
+                            react = 1;
                         }
                     }
                 }
@@ -966,9 +956,8 @@ int GridAttack_SelectNextAction(struct GridAttackActor *p)
     struct GridAttackActor *base = p;
     int trigger = p->forceAction;
     if (trigger) {
-        int zero = 0;
-        p->forceAction = zero;
-        GridAttack_SelectAction(p, 2, zero);
+        p->forceAction = 0;
+        GridAttack_SelectAction(p, 2, 0);
         return 1;
     } else {
         int active = ContactBurst_GetEnabled(p->contactBurst);

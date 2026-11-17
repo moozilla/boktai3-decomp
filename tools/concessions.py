@@ -38,13 +38,15 @@ its spelling, so each one is a question, not a verdict:
 * `dead-code`: a call, store or branch the compiler deleted as unreachable after working out a
   condition the C left open (`x < 0` on a value that came from an unsigned halfword). People do
   write dead code by accident; an arm that looks like a real gap in the algorithm can be excused.
-* `proved-zero`: an operation the compiler proved is always zero (`(u16)x >> 16`, `(x & 31) >> 5`).
+* `proved-zero`: an operation an accepted compiler transformation proved is always zero
+  (`(u16)x >> 16`, `(x & 31) >> 5`); rejected speculative combinations do not count.
   These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
   instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
 * `const-local`: a local named `zero` or `one` that only holds that constant.
+  A `goto` label or `return` operand is not a declaration.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
@@ -100,7 +102,7 @@ _REGEX = {
 }
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
-    "const-local": re.compile(r"(?m)^[ \t]+(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b)\w+\s+\*?(?:zero|one)\s*(?:=\s*[01]\s*)?;"),
+    "const-local": re.compile(r"(?m)^[ \t]+(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b)\w+\s+\*?(?:zero|one)\s*(?:=\s*[01]\s*)?;"),
     "addr-deref": re.compile(r"\*\s*\(\s*&\s*\w+\s*\)"),
     "placeholder-name": re.compile(r"(?m)^[ \t]+[\w \t]*?\w[ \t]+\**\s*(?:new_var\w*|dummy\w*|fake\w*)\s*[=;,\[]"),
     "volatile-view": re.compile(

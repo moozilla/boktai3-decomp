@@ -696,7 +696,7 @@ int ResultTutorial_Close(struct ResultMenu *tutorial)
                 if (tutorial->completionScript)
                     Script_Call(tutorial->completionScript, &args);
                 {
-                    volatile u32 *flags = &gEnginePauseFlags;
+                    u32 *flags = &gEnginePauseFlags;
                     u32 mask;
                     mask = ~4;
                     *flags &= mask;

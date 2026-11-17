@@ -24,10 +24,9 @@ void WirelessGameMenu_UpdateReadyExchange(struct P *p)
         WirelessExchange_SendPacket(p, 3, &data, 1);
     }
     if (p->ready && p->resend) {
-        u32 zero = 0;
-        retry = zero;
+        retry = 0;
         WirelessExchange_SendPacket(p, 3, &retry, 1);
-        p->resend = zero;
+        p->resend = 0;
     }
     if (test(&p->flags, 0x30) == 0x30) {
         u32 six;

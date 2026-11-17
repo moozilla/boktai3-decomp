@@ -38,7 +38,7 @@ s32 SpriteGroup_UpdateEntries(struct SpriteGroup *input)
     slot = pool->entries;
     table = gUnk_086106D4;
     for (; i < 8; slot++, i++) {
-        if (Occupied(used, 1u << i))
+        if (Occupied(used, 1 << i))
             sub_08249240(pool, slot, table[slot->state]);
     }
     return 0;

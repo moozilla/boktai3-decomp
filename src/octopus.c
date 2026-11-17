@@ -107,22 +107,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         Sound_PlaySong(0x2A0);
     }
     if (actor->base.restart) {
-        void (*callback)(void) = Ivy_UpdateActiveState_080E98B4;
-        u32 kind = 0x22;
-        u32 zero;
-        u8 *prepared = &actor->base.field2B2;
-        u32 *flags;
-        s32 mask;
-        zero = 0;
-        *prepared = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = zero;
-        flags = &actor->base.pendingControlFlags;
-        mask = -2;
-        *flags = mask & *flags;
-        actor->base.pendingControl = zero;
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 0x22);
     }
 }
 
@@ -601,9 +586,9 @@ static inline void ReportDrain(struct ChaseActor *victim)
     struct ContactPackedVector range;
     if (MayCount(victim)) {
         s32 health = victim->base.health;
-        u32 max = *(u16 *)((u8 *)victim + 0xB0);
-        s32 kind = *(s16 *)((u8 *)victim + 0xB2);
-        s32 parameter = *(s16 *)((u8 *)victim + 0x9A);
+        u32 max = (u16)victim->base.defaultHealth;
+        s32 kind = (s16)victim->base.hudKind;
+        s32 parameter = (s16)victim->base.hudLabel;
         SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
         ClearVector(&range);
         if (victim->base.reactionSoundVariant || !(victim->base.hitAttributes & 0x20000))
@@ -1050,13 +1035,15 @@ void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
             actor->base.placementFlags = bit | actor->base.placementFlags;
         }
         {
-            u32 bit = 0x20;
-            actor->base.motionFlags = *(&bit) | actor->base.motionFlags;
+            u32 flags = 0x20;
+            flags |= actor->base.motionFlags;
+            actor->base.motionFlags = flags;
         }
     }
     {
-        u32 bit = 0x10;
-        actor->base.reactionFlags = *(&bit) | actor->base.reactionFlags;
+        u32 flags = 0x10;
+        flags |= actor->base.reactionFlags;
+        actor->base.reactionFlags = flags;
     }
     if (frame <= 17 && sequence->index == 0) {
         u16 elapsed = sequence->elapsed;
@@ -1457,7 +1444,6 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
         u8 kind;
         u8 *prepared;
         u32 zero;
-        u8 one;
         u8 byteZero;
         u32 state;
         actor->base.tracking.target = (u32)target;
@@ -1465,8 +1451,7 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
         kind = 45;
         prepared = &actor->base.field2B2;
         zero = 0;
-        one = 1;
-        *prepared = one;
+        *prepared = 1;
         actor->base.stepDone = zero;
         actor->base.controlKind = kind;
         actor->base.target = callback;
@@ -1484,14 +1469,13 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
         ResetState_AwaitTargetControl(actor, 3, 0, 0);
     } else {
         if ((s32)actor->base.counter2AC > 300 || SceneActorReaction_FindAdjacentTarget(actor, 1)) {
-            u32 one = 1;
             u32 zero = (u32)target;
             void *callback;
             u32 kind;
             ResetState_AwaitTargetControl(actor, 0, 0, 1);
             callback = SceneActorControl_OnIdle;
             kind = 16;
-            actor->base.field2B2 = one;
+            actor->base.field2B2 = 1;
             actor->base.stepDone = zero;
             actor->base.controlKind = kind;
             actor->base.target = callback;
@@ -1606,19 +1590,17 @@ void SceneActorReaction_RestoreAfterControl(struct ChaseActor *actor)
         struct SceneActorReactionCommand *command = (void *)&actor->group.saved.control;
         void *callback = SceneActorControl_OnIdle;
         u32 one = 1;
-        u32 zero;
         u32 state;
         command->duration = 30;
         command->payload = callback;
-        zero = 0;
-        command->first = zero;
-        command->second = zero;
+        command->first = 0;
+        command->second = 0;
         command->kind = one;
         state = 3;
         actor->base.state2A8 = state;
-        actor->base.phase2A9 = zero;
-        actor->base.behavior2AA = zero;
-        actor->base.counter2AC = zero;
+        actor->base.phase2A9 = 0;
+        actor->base.behavior2AA = 0;
+        actor->base.counter2AC = 0;
         {
             u16 offset = 0x2B1;
             *((u8 *)actor + offset) = one;
@@ -1645,13 +1627,11 @@ static inline void SetControl_StartHoldControl(struct ChaseActor *actor, void *c
 static inline void SetStateB(struct ChaseActor *actor)
 {
     u32 two = 2;
-    u32 one = 1;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
+    *field = 0;
     actor->base.phase2A9 = two;
-    actor->base.behavior2AA = one;
-    actor->base.counter2AC = zero;
+    actor->base.behavior2AA = 1;
+    actor->base.counter2AC = 0;
     {
         u16 offset = 0x2A9;
         offset += 8;
@@ -1717,11 +1697,10 @@ static inline void SetState_EnterThrowPhase(struct ChaseActor *actor)
     u32 two = 2;
     u32 behavior = 2;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
+    *field = 0;
     actor->base.phase2A9 = two;
     actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
+    actor->base.counter2AC = 0;
     {
         u16 offset = 0x2A9;
         offset += 8;
@@ -1760,11 +1739,10 @@ static inline void SetState_EnterReleasePhase(struct ChaseActor *actor)
     u32 two = 2;
     u32 behavior = 4;
     u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
+    *field = 0;
     actor->base.phase2A9 = two;
     actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
+    actor->base.counter2AC = 0;
     {
         u16 offset = 0x2A9;
         offset += 8;

@@ -1,5 +1,5 @@
 #include "global.h"
-#include "display_sequence.h"
+#include "display_sequence_inline.h"
 #include "contact_position.h"
 #include "ram.h"
 #include "engine_globals.h"
@@ -211,13 +211,13 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
     {
         struct DisplaySequenceState *state = &p->sequence;
         struct Projectile *base = p;
-        const volatile u16 *command;
+        const u16 *command;
         u32 flags, bit;
         {
             u32 offset = state->index << 1;
-            const volatile u16 *table;
+            const u16 *table;
             table = base->sequence.commands;
-            command = (const volatile u16 *)((u32)table + offset);
+            command = (const u16 *)((u32)table + offset);
         }
         {
             u32 frame = *command >> 6;
@@ -292,20 +292,13 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
             }
             {
                 u32 offset = state->index << 1;
-                const volatile u16 *table;
+                const u16 *table;
                 table = state->commands;
-                command = (const volatile u16 *)((u32)table + offset);
+                command = (const u16 *)((u32)table + offset);
             }
-            state->frameWeight = *command & 15;
-            {
-                s32 weight = state->frameWeight;
-                s32 speed = state->speed;
-                speed *= weight;
-                speed >>= 6;
-                state->duration = speed;
-                if (!(u8)speed)
-                    state->duration = 1;
-            }
+            DisplaySequence_UpdateWeight(state, command);
+            if (!state->duration)
+                state->duration = 1;
         }
     }
     if (p->colliderFlags & 1) {

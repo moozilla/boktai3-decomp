@@ -46,9 +46,7 @@ void sub_0813FE30(struct Player *p)
         Anim_SetKeyframes(&p->secondaryAnimation, p->animationData,
                           (u16)(p->animationIndex + p->heading), 1, 0);
         if (p->side) {
-            do {
-                (&p->animation)->flags |= 4;
-            } while (0);
+            (&p->animation)->flags |= 4;
             (&p->secondaryAnimation)->flags |= 4;
         } else {
             (&p->animation)->flags &= ~4;

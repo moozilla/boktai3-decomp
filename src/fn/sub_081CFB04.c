@@ -17,10 +17,9 @@ s32 DisplayAnimation_TestFinished(void *);
 void sub_081CFB04(void *unused, struct Actor *p)
 {
     if (p->entered) {
-        int zero = 0;
-        p->entered = zero;
-        p->done = zero;
-        Actor_PlayAnimationEntry(p, 14, 2, zero, 4);
+        p->entered = 0;
+        p->done = 0;
+        Actor_PlayAnimationEntry(p, 14, 2, 0, 4);
     }
     if (Callback_InvokeActor(p, p->callback) != 1 && DisplayAnimation_TestFinished(p->display))
         p->done = 1;

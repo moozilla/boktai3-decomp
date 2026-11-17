@@ -788,19 +788,17 @@ static inline s32 Slime_ShiftTowardZero(s32 n, u32 bits)
 
 static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 kind)
 {
-    u32 zero;
     a->base.field2B2 = 1;
-    zero = 0;
-    a->base.stepDone = zero;
+    a->base.stepDone = 0;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0;
 }
 
 static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
@@ -1231,9 +1229,10 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
         Slime_EmitDeathDebris(actor);
         context->splitScript = 0;
         {
-            u32 mask = 8;
+            u32 flags = 8;
             u16 *p = &context->flags;
-            *p = (*(&mask)) | (*p);
+            flags |= *p;
+            *p = flags;
         }
         {
             void *callback = (void *)SceneActorControl_OnIdle;

@@ -139,10 +139,9 @@ struct OrbitContactActor *OrbitContactActor_Create(const struct ContactPosition 
 void OrbitContactActor_BeginExpansion(struct OrbitContactActor *actor)
 {
     u32 one = 1;
-    u32 zero = 0;
     actor->state = one;
     actor->stateFlag = one;
-    actor->stateFrame = zero;
+    actor->stateFrame = 0;
     actor->angle = 192;
-    actor->radius = zero;
+    actor->radius = 0;
 }

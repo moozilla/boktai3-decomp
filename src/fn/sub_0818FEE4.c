@@ -3,11 +3,6 @@
 #include "ram.h"
 #include "player_cue_sequence.h"
 
-struct NidhoggrPoolSequence {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unk_A, speed, elapsed;
-};
 struct NidhoggrEffectVector {
     u16 x, y, z, unk_6;
 };
@@ -23,7 +18,7 @@ struct NidhoggrAnimatedSlot {
     void *update, *onComplete;
     u8 animationData[0x1c];
     struct NidhoggrPoolSprite sprite;
-    struct NidhoggrPoolSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unk_60[0x178 - 0x60];
     struct NidhoggrEffectVector motion;
     u8 state, age;

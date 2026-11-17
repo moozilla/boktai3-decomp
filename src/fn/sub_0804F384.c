@@ -13,15 +13,13 @@ void ResourceStation_ReadDisplayCommands(u8 *p)
     if (n > 0) {
         u8 *t = p + 0x265;
         struct M *e = m;
-        u32 one = 1;
-        u32 zero = 0;
         do {
             switch (*e->b) {
                 case 0:
-                    *t = one;
+                    *t = 1;
                     break;
                 case 1:
-                    *t = zero;
+                    *t = 0;
                     break;
             }
             e++;

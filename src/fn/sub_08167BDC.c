@@ -24,9 +24,8 @@ void Hud_UpdateCountdownDigits(struct Hud *);
 void Hud_RefreshActivePanel(struct Hud *hud)
 {
     if (hud->panel && hud->mode != 7 && hud->mode <= 2) {
-        s32 one = 1;
-        Hud_DrawHealthMeter(hud, 0, 4, 1, one);
-        Hud_DrawEnergyMeter(hud, 0, 4, 2, hud->panel->a, hud->panel->b, one);
+        Hud_DrawHealthMeter(hud, 0, 4, 1, 1);
+        Hud_DrawEnergyMeter(hud, 0, 4, 2, hud->panel->a, hud->panel->b, 1);
         Hud_DrawPlayerGauge(hud, 3, 3);
         Hud_DrawWarningMeter(hud, 0, 9, 0x12);
         Hud_UpdateTimedStatusIcon(hud);

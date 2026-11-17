@@ -506,20 +506,14 @@ static inline void Bat_CellCenter(s32 cell, struct ContactPosition *position)
 {
     s32 x = Mod(cell, Bat_MapWidth(SceneActorChase_CurrentMap()));
     s32 z = Div(cell, Bat_MapWidth(SceneActorChase_CurrentMap()));
-    position->x = ({
-        s32 grid_coordinate_ = (x);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->x = (s16)(((u32)x << 8) + 0x80);
     {
         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
         u32 height = 15;
         height &= attributes;
         position->y = SceneActorChase_TerrainLevelHeight(height);
     }
-    position->z = ({
-        s32 grid_coordinate_ = (z);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->z = (s16)(((u32)z << 8) + 0x80);
 }
 
 static inline u8 Bat_CoordinateFraction(s16 coordinate)
@@ -960,8 +954,6 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     {
         u32 mask = 0x4000;
         u16 *flags;
-        u32 zero;
-        u32 one;
         u16 masked;
         u32 test = actor->base.motionFlags & mask;
         flags = &actor->base.motionFlags;
@@ -969,11 +961,9 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         actor->base.attachmentTimer = 0;
-        zero = 0;
         drawable->alpha8 = 0x40;
         drawable->alpha9 = 0x40;
         drawable->flags = (drawable->flags & ~2) | 1;
-        one = 1;
         {
             u32 mask2 = 0x4000;
             u32 value = *flags;
@@ -982,8 +972,8 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         if (!masked) {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            actor->base.field2B2 = one;
-            actor->base.stepDone = zero;
+            actor->base.field2B2 = 1;
+            actor->base.stepDone = 0;
             actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = masked;
@@ -995,11 +985,11 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
-                actor->base.state2A8 = one;
-                actor->base.phase2A9 = zero;
+                actor->base.state2A8 = 1;
+                actor->base.phase2A9 = 0;
                 actor->base.behavior2AA = behavior;
                 actor->base.counter2AC = masked;
-                actor->base.field2B1 = one;
+                actor->base.field2B1 = 1;
             }
         }
     }

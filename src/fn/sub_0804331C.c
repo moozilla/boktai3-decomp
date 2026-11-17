@@ -17,7 +17,6 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
                                    s32 index)
 {
     struct ContactPosition delta;
-    u32 zero;
     if (slot->enter) {
         const u16 *table;
         slot->enter = 0;
@@ -53,7 +52,6 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
         write->y = 0;
         write->z = truncateShift12(gUnk_086149C4[direction] * speed);
     }
-    zero = 0;
     {
         struct ContactPosition *position = &slot->position;
         const struct ContactPosition *read = &delta;
@@ -73,11 +71,11 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
             u32 mode = pool->mode;
             if (mode == 2) {
                 if (index > 7)
-                    slot->targetIndex = zero;
+                    slot->targetIndex = 0;
                 else
                     slot->targetIndex = 1;
             } else if (mode == 1)
-                slot->targetIndex = zero;
+                slot->targetIndex = 0;
             else {
                 mode = 255;
                 slot->targetIndex = mode;

@@ -82,7 +82,7 @@ void SpriteEffectController_UpdateTileBounce(struct SpriteEffectControllerPool *
         void *raw = *(prefix++);
         struct DisplaySequenceState *state = (struct DisplaySequenceState *)prefix;
         const struct SpriteEffectTileResource *graphics;
-        const volatile u16 *command;
+        const u16 *command;
         u32 flags;
         graphics = ((struct SpriteEffectTileDrawable *)raw)->graphics;
         command = state->commands + state->index;

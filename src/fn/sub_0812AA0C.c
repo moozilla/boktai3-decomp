@@ -15,15 +15,10 @@ struct Sprite {
     struct Vec position;
     u8 pad24[0x24];
 };
-struct Anim {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 
 struct Effect {
     struct Sprite sprite;
-    struct Anim anim;
+    struct DisplaySequenceState anim;
     u8 pad58[0xA8];
     struct Vec *target;
     u8 pad104[0x68];
@@ -101,7 +96,7 @@ void LinkedEffect_BeginRisingTravel(struct Pool *pool, struct Effect *p)
         p->riseTimer--;
     }
     p->ended = PlayerCue_StepSequenceEnded((struct ContactSwarmSprite *)&p->sprite,
-                                           (struct DisplaySequenceState *)&p->anim);
+                                           &p->anim);
     if (p->ended && !p->riseTimer) {
         p->state = 2;
         p->sprite.flags &= ~2;

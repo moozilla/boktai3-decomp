@@ -5,14 +5,12 @@ void sub_081A1D18(void *);
 void sub_081A14FC(void *);
 static inline void SetState(struct GridAttackActor *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->stateReset = zero;
-    p->pending = zero;
+    p->stateReset = 0;
+    p->pending = 0;
 }
 int Hresvelgr_BeginDamageReaction(struct GridAttackActor *p, int kind, int damage)
 {
@@ -33,12 +31,11 @@ int Hresvelgr_BeginDamageReaction(struct GridAttackActor *p, int kind, int damag
             }
             {
                 int one = 1;
-                int zero = 0;
                 int id = 3;
                 p->active = one;
-                p->actionReset = zero;
+                p->actionReset = 0;
                 p->action = id;
-                p->actionTimer = zero;
+                p->actionTimer = 0;
                 p->entered = one;
             }
             SetState(p, ActorReaction_BeginCollisionPhase, 0x24);
@@ -55,14 +52,13 @@ int Hresvelgr_BeginDamageReaction(struct GridAttackActor *p, int kind, int damag
             SetState(p, sub_081A1D18, 0x25);
         } break;
         case 1: {
-            int one = 1;
             int zero = 0;
             int id = 5;
-            p->active = one;
+            p->active = 1;
             p->actionReset = zero;
             p->action = id;
             p->actionTimer = zero;
-            p->entered = one;
+            p->entered = 1;
         }
             SetState(p, sub_081A14FC, 0x26);
             break;

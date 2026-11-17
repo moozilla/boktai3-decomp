@@ -229,45 +229,37 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
     applied = 0;
     actor = object;
     if (actor->type == 0) {
-        if (({
-                u32 mask = 0x17;
-                mask & contact->contactFlags;
-            }) &&
-            ({
-                u32 mask = 0x10;
-                mask & contact->contactFlags2;
-            })) {
-            actor->health -= 24;
-            actor->damageTimer = 10;
-            actor->animationTimer = 2;
-            AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
-            applied = 1;
+        u32 firstMask = 0x17;
+        if (firstMask & contact->contactFlags) {
+            u32 secondMask = 0x10;
+            if (secondMask & contact->contactFlags2) {
+                actor->health -= 24;
+                actor->damageTimer = 10;
+                actor->animationTimer = 2;
+                AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
+                applied = 1;
+            }
         }
     } else if (actor->type == 1) {
-        if (({
-                u32 mask = 4;
-                mask & contact->contactFlags2;
-            }) &&
-            ({
-                u32 mask = 0x80017;
-                mask & contact->contactFlags;
-            })) {
-            actor->health -= 24;
-            actor->damageTimer = 10;
-            actor->animationTimer = 2;
-            AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
-            if (!actor->cooldown) {
-                actor->cooldown = 10;
-                Sound_PlaySong(0x15C);
-                AnimatedParticles_EmitBurst(&actor->body.position, 0, 0, 0x40, 12, 12, 4, 4);
+        u32 firstMask = 4;
+        if (firstMask & contact->contactFlags2) {
+            u32 secondMask = 0x80017;
+            if (secondMask & contact->contactFlags) {
+                actor->health -= 24;
+                actor->damageTimer = 10;
+                actor->animationTimer = 2;
+                AnimData_SelectPaletteBank(&actor->animationData, actor->animation);
+                if (!actor->cooldown) {
+                    actor->cooldown = 10;
+                    Sound_PlaySong(0x15C);
+                    AnimatedParticles_EmitBurst(&actor->body.position, 0, 0, 0x40, 12, 12, 4, 4);
+                }
+                applied = 1;
             }
-            applied = 1;
         }
     } else if (actor->type == 2) {
-        if (({
-                u32 mask = 1;
-                mask & contact->contactFlags;
-            })) {
+        u32 mask = 1;
+        if (mask & contact->contactFlags) {
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
@@ -698,13 +690,10 @@ s32 Scene_TryStepDown(struct SceneObject *actor, s32 index, s32 direction)
     struct SceneCell *cell;
     u8 *dynamic;
     s32 type, saved;
-    if (({
-            u8 active = 0;
-            if (gPlayerPassageState && gPlayerInteractionMode == 2)
-                active = 1;
-            active;
-        }) ||
-        actor->type == 1) {
+    u8 active = 0;
+    if (gPlayerPassageState && gPlayerInteractionMode == 2)
+        active = 1;
+    if (active || actor->type == 1) {
         step = 16;
         speed = 16;
     } else {
@@ -993,11 +982,11 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
             terrain->height = (terrain->height & 0xF0) | 15;
         else
             terrain->height = (terrain->height & 0xF0) | height;
-        if (({
-                u32 mask = 8;
-                mask & p->flags;
-            }))
-            p->cellRef.cell.flags |= 0x21;
+        {
+            u32 mask = 8;
+            if (mask & p->flags)
+                p->cellRef.cell.flags |= 0x21;
+        }
     }
     body->vy = p->targetY - body->position.y;
     if (body->vy < -16)
@@ -1005,10 +994,8 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
     else if (body->vy > 0)
         body->vy = 0;
     if (body->vy == 0) {
-        if (({
-                u32 mask = 8;
-                mask & p->flags;
-            })) {
+        u32 mask = 8;
+        if (mask & p->flags) {
             p->cellRef.cell.flags |= 0x21;
             p->health = 0;
         } else {

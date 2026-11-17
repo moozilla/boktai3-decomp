@@ -29,9 +29,8 @@ void TaggedSceneNpc_PlayTaggedAnimation(void *, int, int, int, int);
 void SceneNpc_TurnTowardAngle(void *ctx, struct Npc081D1BA8 *npc)
 {
     if (npc->entered) {
-        s32 zero = 0;
-        npc->entered = zero;
-        npc->done = zero;
+        npc->entered = 0;
+        npc->done = 0;
         TaggedSceneNpc_PlayTaggedAnimation(npc, 0, 1, 0, 4);
     }
     {

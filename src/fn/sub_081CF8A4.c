@@ -38,12 +38,11 @@ void Actor_OnHiddenIdleUpdate(void);
 void SceneNpc_UpdateParticleDisappearance(void *ctx, struct SceneNpc *npc, s32 tick)
 {
     if (npc->enter) {
-        u32 zero = 0;
-        npc->enter = zero;
-        npc->done = zero;
+        npc->enter = 0;
+        npc->done = 0;
         Actor_PlayAnimationEntry(npc, 0, 0, 8, 0);
-        npc->phase = zero;
-        npc->stateFrame = zero;
+        npc->phase = 0;
+        npc->stateFrame = 0;
         CpuSet(gPaletteBankData + 0x2AE0, npc->palette, 0x04000008);
     }
     npc->displayFlags |= 1;

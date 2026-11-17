@@ -37,22 +37,21 @@ struct ModeState {
 };
 void WirelessController_ResetSession(struct Engine *p)
 {
-    int zero = 0;
     int i;
     u8 *ids;
     volatile u8 *global;
     int byteZero;
     int secondZero, secondByteZero, one, clearZero;
     u8 *active;
-    p->flag = zero;
-    p->bits = zero;
-    p->pad1a = zero;
-    p->state = zero;
-    p->flag1f = zero;
-    p->mode = zero;
-    p->index = zero;
+    p->flag = 0;
+    p->bits = 0;
+    p->pad1a = 0;
+    p->state = 0;
+    p->flag1f = 0;
+    p->mode = 0;
+    p->index = 0;
     byteZero = 0;
-    p->mask = zero;
+    p->mask = 0;
     p->scroll = byteZero;
     p->selected = byteZero;
     p->allowed = byteZero;

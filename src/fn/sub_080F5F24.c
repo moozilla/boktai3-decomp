@@ -56,11 +56,9 @@ static inline u8 reset(u8 *p)
     if (old & one) {
         s32 mask = ~1;
         s32 value = mask;
-        s32 zero;
         value &= old;
-        zero = 0;
         flag->flags = value;
-        p[0x12e] = zero;
+        p[0x12e] = 0;
         return 1;
     }
     return 0;
@@ -72,7 +70,6 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
 {
     if (reset((u8 *)p)) {
         struct StretchBody *parent = p->parent;
-        s32 one;
         s32 choice;
         p->id10A = parent->value;
         p->angle = parent->base + Div(256, parent->count) * p->index118;
@@ -82,15 +79,14 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
         p->flags &= ~1;
         p->rotation = 128;
         p->byte8 = 127;
-        one = 1;
-        p->byte9 = one;
+        p->byte9 = 1;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 offset = gRandomIndex * 2;
             const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
             choice = *(const u16 *)(offset + (u32)table);
         }
-        choice &= one;
+        choice &= 1;
         p->spin = Sword_OrbitDirection(choice);
         p->target = &parent->x;
         p->flagsA2 &= ~4;

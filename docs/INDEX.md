@@ -122,7 +122,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/FOUNDRY.md](../docs/FOUNDRY.md) | The foundry: asm to a committed match, measured as a funnel | #matching #tooling | 12 |
 | [docs/GAME_LAYOUT.md](../docs/GAME_LAYOUT.md) | Boktai 3 game layout: from ROM to gameplay | *#assets* | 34 |
 | [docs/GHOUL_CONTACT_RESPONSE.md](../docs/GHOUL_CONTACT_RESPONSE.md) | Ghoul contact response: 0808B3EC | #matching #ghoul #scene-actor #regalloc #0808B3EC | 3 |
-| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 11 |
+| [docs/HANDOFF.md](../docs/HANDOFF.md) | Handoff: current state and how to continue | #process | 12 |
 | [docs/HIT_SWITCH.md](../docs/HIT_SWITCH.md) | Hit-counted switch pool (tentative identity) |  | 5 |
 | [docs/KNIDL_PROCESS_REVIEW_2026-10-09.md](../docs/KNIDL_PROCESS_REVIEW_2026-10-09.md) | KNIDL workflow review and implications for Boktai 3 | *#process* | 13 |
 | [docs/LAYOUTS.md](../docs/LAYOUTS.md) | RAM object layouts merged across files | #tooling #matching | 12 |
@@ -236,8 +236,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #compiler #depin #matching #round13 | 14 |
-| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 1 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 16 |
+| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -461,8 +461,36 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round13-batch1_2026-11-16.md](../notes/round13-batch1_2026-11-16.md) | Round 13, batch 1: eight concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch2_2026-11-16.md](../notes/round13-batch2_2026-11-16.md) | Round 13, batch 2: six more concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch3_2026-11-17.md](../notes/round13-batch3_2026-11-17.md) | Round 13, batch 3: eight more concessions removed | #matching #depin #compiler #round13 | 6 |
-| [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 4 |
-| [notes/round13-batch5_2026-11-17.md](../notes/round13-batch5_2026-11-17.md) | Round 13 complete: all 36 concessions removed | #matching #depin #compiler #round13 | 2 |
+| [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 5 |
+| [notes/round13-batch5_2026-11-17.md](../notes/round13-batch5_2026-11-17.md) | Round 13 complete: all 36 concessions removed | #matching #depin #compiler #round13 | 7 |
+| [notes/round14-accepted-zero-diagnostics.md](../notes/round14-accepted-zero-diagnostics.md) | Round 14: discard zero proofs from rejected combine attempts |  | 3 |
+| [notes/round14-address-expressions_2026-11-16.md](../notes/round14-address-expressions_2026-11-16.md) | Round 14: address-expression cleanup checkpoint | #round14 #concessions #matching | 7 |
+| [notes/round14-address-followup_2026-11-16.md](../notes/round14-address-followup_2026-11-16.md) | Round 14: address-expression follow-up and open families | #round14 #matching #concessions #cleanup | 10 |
+| [notes/round14-animation-constant-review.md](../notes/round14-animation-constant-review.md) | Round 14: bounded animation constant-local pass | #round14 #concessions #matching | 4 |
+| [notes/round14-batch1_2026-11-16.md](../notes/round14-batch1_2026-11-16.md) | Round 14 batch 1: ordinary fields and task state | #round14 #matching #compiler #concessions #object-model | 7 |
+| [notes/round14-batch2_2026-11-16.md](../notes/round14-batch2_2026-11-16.md) | Boktai 3 round 14 — checkpoint 2 | #round14 #matching #concessions #tooling #cleanup | 9 |
+| [notes/round14-batch3_2026-11-16.md](../notes/round14-batch3_2026-11-16.md) | Boktai 3 round 14 — checkpoint 3 | #round14 #matching #concessions #object-model #cleanup | 11 |
+| [notes/round14-constant-declaration-diagnostics.md](../notes/round14-constant-declaration-diagnostics.md) | Round 14: distinguish declarations from jumps and returns |  | 2 |
+| [notes/round14-decimal-rendering_2026-11-16.md](../notes/round14-decimal-rendering_2026-11-16.md) | Round 14: decimal-rendering once-loop investigation | *#hud* | 5 |
+| [notes/round14-enemy-constant-locals.md](../notes/round14-enemy-constant-locals.md) | Round 14: bounded enemy constant-local pass | #round14 #concessions #matching | 9 |
+| [notes/round14-fields-warning-review.md](../notes/round14-fields-warning-review.md) | Round 14: field-worker compiler-warning review | #round14 #concessions #matching | 10 |
+| [notes/round14-flash-marker_2026-11-16.md](../notes/round14-flash-marker_2026-11-16.md) | Round 14: flash and interaction-marker once-loops |  | 6 |
+| [notes/round14-input-camera-warning-audit_2026-11-16.md](../notes/round14-input-camera-warning-audit_2026-11-16.md) | Round 14: input, camera, and compiler-warning audit | #matching #round14 #concessions #input #camera #compiler | 8 |
+| [notes/round14-libgcc-multiply-source.md](../notes/round14-libgcc-multiply-source.md) | Libgcc integer multiplication: source evidence | #matching #cleanup #round14 #libraries | 2 |
+| [notes/round14-mechanical-constant-review.md](../notes/round14-mechanical-constant-review.md) | Round 14: direct constant values across the remaining source units |  | 3 |
+| [notes/round14-once-loop-review_2026-11-16.md](../notes/round14-once-loop-review_2026-11-16.md) | Round 14: once-loop inventory and checkpoint-three source recovery | #round14 #matching #once-loop #source-recovery #cleanup | 11 |
+| [notes/round14-palette-traversal_2026-11-16.md](../notes/round14-palette-traversal_2026-11-16.md) | Round 14: indexed palette-bank traversal | *#assets* | 4 |
+| [notes/round14-placeholder-audit.md](../notes/round14-placeholder-audit.md) | Round 14: placeholder-name audit | #matching #actors #animation #tooling | 12 |
+| [notes/round14-random-draw-operation.md](../notes/round14-random-draw-operation.md) | Round 14: shared random-table draw operation | #round14 #matching #once-loop #random-table | 4 |
+| [notes/round14-scoped-constant-review.md](../notes/round14-scoped-constant-review.md) | Round 14: independent block-local constants | #round14 #concessions #matching #cleanup | 3 |
+| [notes/round14-state-union-review_2026-11-16.md](../notes/round14-state-union-review_2026-11-16.md) | Round 14: shared state operations and ordinary union alternatives | #round14 #matching #concessions #object-model #cleanup | 4 |
+| [notes/round14-statement-expression-review.md](../notes/round14-statement-expression-review.md) | Round 14: remaining statement expressions | #matching #cleanup #round14 #compiler | 8 |
+| [notes/round14-union-review.md](../notes/round14-union-review.md) | Round 14: separate unrelated values from two local unions | #round14 #concessions #local-union | 3 |
+| [notes/round14-volatile-followon-audit.md](../notes/round14-volatile-followon-audit.md) | Round 14: remaining sequence views and background queue | #matching #animation #backgrounds #tooling | 9 |
+| [notes/round14-volatile-known-zero.md](../notes/round14-volatile-known-zero.md) | Round 14: four further known-zero functions remain open | #round14 #concessions #matching | 7 |
+| [notes/round14-volatile-stage2.md](../notes/round14-volatile-stage2.md) | Round 14: volatile cleanup and remaining compiler-dead sites | #round14 #concessions #matching | 8 |
+| [notes/round14-volatile-view-audit.md](../notes/round14-volatile-view-audit.md) | Round 14: volatile-view audit and RFU field recovery | #matching #animation #wireless #tooling | 13 |
+| [notes/round14-wrapper-cleanup.md](../notes/round14-wrapper-cleanup.md) | Round 14: object, trigger and palette wrapper cleanup | #round14 #concessions #matching | 5 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
@@ -611,6 +639,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/tether_actor.md](../notes/tether_actor.md) | Tether actor unit consolidation | #tether-actor #unit #matching #types | 5 |
 | [notes/tile-trigger-press-round9.md](../notes/tile-trigger-press-round9.md) | TileTrigger_StepPress | *#assets* | 1 |
 | [notes/tilemap-stream-columns-round9.md](../notes/tilemap-stream-columns-round9.md) | TilemapPanel_StreamColumns |  | 0 |
+| [notes/uncounted-concessions_2026-11-16.md](../notes/uncounted-concessions_2026-11-16.md) | Steering C the concession scanner does not count (first sweep) | #concessions #phase3 #phase4 #tooling | 4 |
 | [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) | Functions that match alone but not inside a unit | #units #selector-macros #scene-actors | 7 |
 | [notes/volatile-typedef-scanner_2026-11-13.md](../notes/volatile-typedef-scanner_2026-11-13.md) | Volatile typedef detection in the concession scanner | #tooling #matching #progress | 2 |
 | [notes/w0.md](../notes/w0.md) | w0 notes | *#tooling* | 5 |

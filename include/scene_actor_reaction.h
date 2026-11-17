@@ -54,9 +54,9 @@ static inline void SceneActorReaction_ClearRoute(struct ChaseActor *actor)
 static inline void SceneActorReaction_Show(struct ChaseActor *actor)
 {
     if (actor->base.drawableKind == 0)
-        *(u32 *)actor->base.drawable &= ~1;
+        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags &= ~1;
     else
-        *(u32 *)((u8 *)actor->base.drawable + 0x28) &= ~1;
+        ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->flags &= ~1;
 }
 static inline void SceneActorReaction_ResetAnimation(struct ChaseActor *actor, u32 phase)
 {

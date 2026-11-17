@@ -57,8 +57,7 @@ static inline void SetLayers(u8 *p)
     ((struct Layer *)(p + 0x190))->flags &= ~four;
     {
         struct RenderFlags *render = (void *)(p + 0x180);
-        u32 one = 1;
-        render->flags |= one;
+        render->flags |= 1;
     }
     *(u16 *)(p + 0xB32) &= ~0x20;
 }

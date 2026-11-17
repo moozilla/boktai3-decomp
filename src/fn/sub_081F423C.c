@@ -57,13 +57,11 @@ static inline void palette(struct DirectionalActor *p, u32 duration, u8 rate, u8
 void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 frame)
 {
     struct DirectionalActor *q = p;
-    u32 zero;
     facing(p, p->requestedAngle);
-    zero = 0;
     if (p->changed) {
-        p->changed = zero;
+        p->changed = 0;
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
-        palette(p, 500, 5, 4, zero);
+        palette(p, 500, 5, 4, 0);
         q->motionE52 = 0;
         q->motionE54 = 0;
         q->motionE58 = 0;

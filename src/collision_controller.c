@@ -77,7 +77,7 @@ void CollisionController_UpdateIdleAnimationPaused(u32 x, struct CollisionSlot *
     }
 }
 
-static inline s32 stateMode(void)
+static inline u8 stateMode(void)
 {
     struct Player *a = gPlayers[0];
     if (a) {
@@ -90,7 +90,7 @@ static inline s32 stateMode(void)
     return 0;
 }
 
-static inline s32 globalMode(void)
+static inline u8 globalMode(void)
 {
     u32 active = gPlayerPassageState;
     s32 yes = 0;
@@ -386,14 +386,14 @@ s32 CollisionController_DestroyManager(struct CollisionManager *manager)
 s32 CollisionController_InitManager(struct CollisionManager *manager, void *owner)
 {
     u32 mode;
-    s32 available;
+    u8 available;
     gCollisionManager = manager;
     mode = gSunClock.mode;
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
     }
     if (gEngineFlags & 2048) {
-        *(&available) = stateMode();
+        available = stateMode();
     } else {
         struct Player *actor;
         if (gWeatherCollisionTimer > 0) {

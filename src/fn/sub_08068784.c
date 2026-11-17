@@ -24,7 +24,7 @@ s32 SceneParticlePool_Update(struct SceneParticlePool *pool)
     slot = pool->slots;
     table = gUnk_08605B5C;
     for (; i < 8; slot++, i++) {
-        if (Occupied(used, 1u << i))
+        if (Occupied(used, 1 << i))
             sub_08249240(pool, slot, table[slot->state]);
     }
     return 0;

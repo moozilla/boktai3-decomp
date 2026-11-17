@@ -105,14 +105,12 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
 
         u32 *field;
         u32 mask;
-        u32 zero;
         field = &actor->base.behaviorFlags;
         mask = ~0x141C0;
         *field &= mask;
-        zero = 0;
-        control->counter = zero;
-        control->field14 = zero;
-        control->timer = zero;
+        control->counter = 0;
+        control->field14 = 0;
+        control->timer = 0;
         {
             struct ContactCollider *collider;
 
@@ -122,9 +120,9 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
             collider->flags = bit | collider->flags;
             {
                 u16 *field = &collider->responseValue;
-                *field = zero;
+                *field = 0;
             }
-            actor->base.attachmentTimer = zero;
+            actor->base.attachmentTimer = 0;
         }
     }
     {

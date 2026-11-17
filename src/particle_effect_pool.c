@@ -48,36 +48,17 @@ void ScriptedColliderPool_RunIdleHook(void)
 {
 }
 
-static inline u8 test(volatile u32 *p, s32 one, s32 i)
-{
-    s32 mask = one;
-    mask <<= i;
-    if (*p & mask)
-        return 1;
-    return 0;
-}
-
 struct SceneParticle *SceneMovingParticle_AllocateEntry_0812D670(struct SceneParticlePool *pool)
 {
-    s32 i = 0;
-    volatile u32 *flags = &pool->occupied;
-    s32 one = 1;
-    s8 *kind = &pool->particles[0].slotIndex;
-    struct SceneParticle *entry = pool->particles;
-    do {
-        if (test(flags, one, i)) {
-            kind += 0x40;
-            entry++;
-            ++i;
-        } else {
-            s32 bit;
-            bit = one;
-            *(&bit) <<= i;
-            *flags |= bit;
-            *kind = i;
+    s32 i;
+    for (i = 0; i < 26; i++) {
+        if (!SceneParticlePool_IsOccupied(&pool->occupied, i)) {
+            struct SceneParticle *entry = &pool->particles[i];
+            pool->occupied |= 1 << i;
+            entry->slotIndex = i;
             return entry;
         }
-    } while (i <= 25);
+    }
     return 0;
 }
 
@@ -246,7 +227,7 @@ u32 ParticleEffectPool_Update(struct SceneParticlePool *pool)
     if (!pool->occupied)
         return 0;
     i = 0;
-    occupied = (u32 *)SceneParticlePool_SlotMask(pool);
+    occupied = SceneParticlePool_SlotMask(pool);
     callbacks = gUnk_08610808;
     state = &pool->particles[0].state;
     entry = start;
@@ -260,7 +241,7 @@ u32 ParticleEffectPool_Update(struct SceneParticlePool *pool)
 u32 ParticleEffectPool_DestroyTask(struct SceneParticlePool *pool)
 {
     s32 i = 0;
-    volatile u32 *occupied = &pool->occupied;
+    u32 *occupied = &pool->occupied;
     struct SceneParticle *particle = pool->particles;
     for (; i < 26; particle++, i++) {
         if (SceneParticlePool_IsOccupied(occupied, i))

@@ -52,11 +52,11 @@ void RoamingObject_SteerWander(struct RoamingObject *owner)
         u32 *counter = &gRandomIndex;
         u32 index;
         u32 mask;
-        u32 sample;
+        u16 sample;
         index = *counter + 1;
         mask = 1023;
         index &= mask;
-        *(&sample) = table[index];
+        sample = table[index];
         sample &= 3;
         sample <<= 6;
         owner->targetAngle = sample;
@@ -322,11 +322,11 @@ void RoamingObjectB_SteerWander(struct RoamingObject *owner)
         u32 *counter = &gRandomIndex;
         u32 index;
         u32 mask;
-        u32 sample;
+        u16 sample;
         index = *counter + 1;
         mask = 1023;
         index &= mask;
-        *(&sample) = table[index];
+        sample = table[index];
         sample &= 3;
         sample <<= 6;
         owner->targetAngle = sample;

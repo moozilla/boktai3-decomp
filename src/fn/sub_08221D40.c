@@ -8,7 +8,7 @@ void ScalarApproach_ApplyProfileArray(s16 *values, const s16 *targets, s32 profi
         profile = 15;
     }
     profile = ScalarApproach_ProfileCoefficient(profile);
-    while ((count = (s32)((u32)count - 1u)) >= 0) {
+    while ((count = (s32)((u32)count - 1)) >= 0) {
         *values = ScalarApproach_Profile(*values, *targets, profile);
         do {
             ++values;

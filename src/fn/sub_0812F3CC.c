@@ -41,7 +41,6 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
     u8 *group = (u8 *)&a->group.common;
     void *contact;
     u32 *flags;
-    u32 zero;
     u32 result;
     u8 byteZero;
     s32 reactionMask;
@@ -83,18 +82,15 @@ fail:
 
 success: {
     u8 *control = group + 0x4C;
-    do {
-        SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
-    } while (0);
-    zero = 0;
-    *(u32 *)(control + 0x18) = zero;
+    SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
+    *(u32 *)(control + 0x18) = 0;
     byteZero = 0;
-    *(u16 *)(control + 0x14) = zero;
-    *(u16 *)(control + 8) = zero;
+    *(u16 *)(control + 0x14) = 0;
+    *(u16 *)(control + 8) = 0;
 }
 
     *(void **)(group + 0x88) = contact;
-    SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, zero, byteZero);
+    SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, 0, byteZero);
     {
         u32 state = 3;
         u8 *field = &a->base.state2A8;
@@ -102,7 +98,7 @@ success: {
     }
     a->base.phase2A9 = 1;
     a->base.behavior2AA = byteZero;
-    a->base.counter2AC = zero;
+    a->base.counter2AC = 0;
     a->base.field2B1 = 1;
     SceneActorReaction_ClearBits(flags, ~0x10);
     reactionMask = 0x800;

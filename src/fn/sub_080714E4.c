@@ -140,21 +140,19 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     Collider_SetPosition(collider, cachedPosition, 0);
     {
         u32 offset;
-        u32 zero;
         u16 *address;
         struct ContactCollider *lowCollider = collider;
         u32 savedFlags = lowCollider->flags;
         u32 value;
         value = 0xFFFB;
         value &= savedFlags;
-        zero = 0;
         collider->flags = value;
         offset = 0x1EA;
         address = &actor->base.paletteTimer;
-        *address = zero;
+        *address = 0;
         offset -= 2;
         address = &actor->base.flashTimer;
-        *address = zero;
+        *address = 0;
     }
     {
         u32 mode = 2;

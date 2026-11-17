@@ -34,14 +34,13 @@ struct ModeState {
 };
 void WirelessController_ResetPeerExchange(struct Engine *p)
 {
-    int zero = 0;
-    p->state = zero;
-    p->mask = zero;
-    p->flag35 = zero;
-    p->flag36 = zero;
-    p->flag3c = zero;
-    p->flag3d = zero;
-    p->flag3e = zero;
-    p->flag3f = zero;
+    p->state = 0;
+    p->mask = 0;
+    p->flag35 = 0;
+    p->flag36 = 0;
+    p->flag3c = 0;
+    p->flag3d = 0;
+    p->flag3e = 0;
+    p->flag3f = 0;
     Memory_Clear(p->scratch, 64);
 }

@@ -2,8 +2,7 @@
 void SceneActorTerrain_ClearCollisionTimers(struct RoomActor *actor)
 {
     struct ContactCollider *collider = &actor->colliderA;
-    u16 zero = 0;
-    collider->cost = zero;
-    actor->reactionSoundVariant = zero;
-    actor->field2E6 = zero;
+    collider->cost = 0;
+    actor->reactionSoundVariant = 0;
+    actor->field2E6 = 0;
 }

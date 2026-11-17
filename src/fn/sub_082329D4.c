@@ -10,21 +10,18 @@ void Effect_SetOrigin(void *, s32, s32);
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
 {
-    u32 zero = 0;
-    u8 one;
     void *p;
-    s->a = zero;
-    s->f4 = zero;
-    one = 1;
-    s->c = one;
-    s->b = zero;
+    s->a = 0;
+    s->f4 = 0;
+    s->c = 1;
+    s->b = 0;
     p = s->p8;
     a += 0x100;
     ParticleSprite_Initialize(p, *(void **)a, 0x13);
     Effect_SetOrigin(p, -4, -4);
     SpriteDrawable_SelectTileFrame(p, *(void **)a, 0x33);
-    ((u8 *)s)[0x17] = one;
-    s->h30 = zero;
-    s->h32 = zero;
-    s->h34 = zero;
+    ((u8 *)s)[0x17] = 1;
+    s->h30 = 0;
+    s->h32 = 0;
+    s->h34 = 0;
 }

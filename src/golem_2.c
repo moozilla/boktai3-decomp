@@ -562,34 +562,10 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 void Golem_UpdateScriptedAction(struct ChaseActor *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = SceneActorReaction_PlayAnimationBUntilComplete;
-        u8 code = 10;
-        u32 zero;
-        u32 *f;
-        s32 mask;
         u16 *h;
         u16 value;
         s32 off;
-        {
-            u8 *taken = &obj->base.field2B2;
-            zero = 0;
-            *taken = 1;
-        }
-        do {
-            u32 field = 0x2B0;
-            do {
-                ((u8 *)obj)[field] = zero;
-            } while (0);
-            field += 5;
-            ((u8 *)obj)[off = field] = code;
-            obj->base.target = (void *)fn;
-            field += 0x13;
-            *((u16 *)(((u8 *)obj) + field)) = zero;
-        } while (0);
-        f = (u32 *)(((u8 *)obj) + 0x114);
-        mask = -2;
-        *f &= mask;
-        *((u32 *)(((u8 *)obj) + 0x104)) = zero;
+        SceneActorChase_SetControl(obj, SceneActorReaction_PlayAnimationBUntilComplete, 10);
         {
             u32 byte = obj->base.tracking.heading;
             obj->base.body.direction = byte;

@@ -79,9 +79,8 @@ void Hresvelgr_UpdateHazardVisit(HresvelgrActor *p)
                 Anim_SetFrameDurationScale(self->animation, 0x40);
                 {
                     u8 st = 2;
-                    u32 zero = 0;
                     p->state = st;
-                    p->timer = zero;
+                    p->timer = 0;
                 }
             }
             break;

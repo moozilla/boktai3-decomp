@@ -70,20 +70,13 @@ void SunDiscPool_SpawnDisc(const struct SunDiscVec *fromArg, const struct SunDis
     {
         s32 sine = gUnk_086149C4[(angle + 0x40) & 0xFF];
         s32 spd = speed;
-        s->velX = (({
-            s32 vx = TruncateShift(spd * sine, 12);
-            vx;
-        }));
+        s->velX = TruncateShift(spd * sine, 12);
     }
     {
         u32 d;
         s32 sine;
         sine = gUnk_086149C4[angle & 0xFF];
-        s->velZ = TruncateShift(sine * ((({
-                                    s32 t = speed;
-                                    t;
-                                }))),
-                                12);
+        s->velZ = TruncateShift(sine * speed, 12);
     }
     s->velY = 0;
     {

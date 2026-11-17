@@ -134,15 +134,13 @@ struct TerrainShadowManager *ShadowTask_Create(void *argument, s32 unused)
 s32 Shadow_Initialize(struct TerrainShadow *shadow, struct SceneVec *source, s32 mode)
 {
     struct ShadowTileSprite *sprite;
-    s32 zero;
     if (!((struct TerrainShadowManager *)gShadowManager) && !ShadowTask_Create(0, 0))
         return -1;
-    zero = 0;
-    shadow->active = zero;
+    shadow->active = 0;
     shadow->source = source;
-    shadow->flags = zero;
-    shadow->unknown2 = zero;
-    shadow->unknown4 = zero;
+    shadow->flags = 0;
+    shadow->unknown2 = 0;
+    shadow->unknown4 = 0;
     if (!mode)
         shadow->update = Shadow_UpdateTerrain;
     else

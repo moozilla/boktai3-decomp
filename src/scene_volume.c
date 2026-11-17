@@ -307,12 +307,11 @@ void SceneVolume_UpdateImpactSlide(struct SceneVolumeActor *actor)
 {
     struct SceneVolumeActor *volume = actor;
     if (actor->restart) {
-        u32 zero = 0;
-        actor->restart = zero;
+        actor->restart = 0;
         SceneActors_StartDirectionalAnimation(actor, &actor->animation, actor->animationState,
                                               0x114, 1, 1, 4);
-        actor->phase = zero;
-        actor->timer = zero;
+        actor->phase = 0;
+        actor->timer = 0;
         sub_0817AEC8(actor, actor->impactDirection);
         SceneVolume_ConfigureAttackCollider(actor, 128, ((u8)actor->target->unk2D + 128) & 255, 16);
         SceneActors_SetParticleControlMode(actor, 30);
@@ -496,9 +495,8 @@ void SceneVolume_UpdateKnockbackLanding(struct SceneVolumeActor *actor, s32 elap
         case 2:
             if (++actor->timer > 19) {
                 u32 phase = 3;
-                u32 zero = 0;
                 actor->phase = phase;
-                actor->timer = zero;
+                actor->timer = 0;
             }
             break;
         case 3:

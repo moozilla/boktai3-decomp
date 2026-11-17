@@ -2129,23 +2129,18 @@ static inline void SetState_FollowParticipantDisplacement(struct ChaseActor *a, 
 
 void Lun_FollowParticipantDisplacement(struct ChaseActor *a)
 {
-    u8 **new_var;
     u8 *ctx = a->base.context;
     struct ContactPosition delta;
     if (TakeFlag(&a->base.field2B1)) {
         SetControl_FollowParticipantDisplacement(a, ActorBehavior_TickParticipantProgress, 0x23);
         *(struct ContactPosition *)(ctx + 0x414) =
-            *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
+            *(struct ContactPosition *)&gPlayers[0]->position;
         SceneActorControl_ResetTargetFlags(a);
     }
-    {
-        u8 **players = &(*(u8 **)gPlayers);
-        Delta(&delta, (void *)(ctx + 0x414), (void *)((*(new_var = &(*(u8 **)gPlayers))) + 0x30));
-    }
+    Delta(&delta, (void *)(ctx + 0x414), (void *)&gPlayers[0]->position);
     a->base.body.motion.x += delta.x;
     a->base.body.motion.z += delta.z;
-    *(struct ContactPosition *)(ctx + 0x414) =
-        *(struct ContactPosition *)((*(u8 **)gPlayers) + 0x30);
+    *(struct ContactPosition *)(ctx + 0x414) = *(struct ContactPosition *)&gPlayers[0]->position;
     if (a->base.stepDone) {
         SetState_FollowParticipantDisplacement(a, 0, 3, 0);
         SetControl_FollowParticipantDisplacement(a, SceneActorControl_OnIdle, 0x10);

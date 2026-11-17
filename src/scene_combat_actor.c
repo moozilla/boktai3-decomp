@@ -98,9 +98,7 @@ void SceneCombatActor_ResetDefenseMode(struct SceneCombatActor *actor)
 
 void SceneParticle_UpdateBounce(struct BouncingSceneParticle *actor)
 {
-    u32 zero;
     actor->sprite.phase += 8;
-    zero = 0;
     actor->sprite.position.packed.x += actor->velocity.packed.x;
     actor->sprite.position.packed.y += actor->velocity.packed.y;
     actor->sprite.position.packed.z += actor->velocity.packed.z;
@@ -112,10 +110,10 @@ void SceneParticle_UpdateBounce(struct BouncingSceneParticle *actor)
             actor->velocity.packed.y = -(actor->velocity.packed.y >> 1);
             actor->velocity.packed.z >>= 1;
         } else {
-            actor->update = (void *)zero;
+            actor->update = (void *)0;
             if (actor->destroy) {
                 Callback_InvokeActor(actor, actor->destroy);
-                actor->destroy = (void *)zero;
+                actor->destroy = (void *)0;
             }
         }
     }

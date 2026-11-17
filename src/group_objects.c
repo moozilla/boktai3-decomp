@@ -313,10 +313,9 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
         p = r;
         {
             u32 state = 7;
-            u32 zero = 0;
             p->state = state;
             p->active = 1;
-            p->timer = zero;
+            p->timer = 0;
         }
         dp->x = o->x - p->position.x;
         dp->y = o->y - p->position.y;

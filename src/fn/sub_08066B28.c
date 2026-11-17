@@ -16,15 +16,12 @@ s32 ActorAttachment_DestroyManager(struct ActorAttachmentManagerView *manager)
         if (Occupied(manager, i)) {
             struct ActorAttachmentSlotView *slot = &manager->slots[i];
             s32 j = 0;
-            struct ActorAttachmentPartSprite *part;
-            part = (*(&slot))->parts;
             do {
                 s32 bits = slot->partMask >> j;
                 s32 bit = 1;
                 if (bits & bit) {
-                    Effect_Remove(part);
+                    Effect_Remove(&slot->parts[j]);
                 }
-                part++;
                 j++;
             } while (j <= 2);
             if (slot->active48) {

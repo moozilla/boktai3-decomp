@@ -46,9 +46,8 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 {
                     u8 next = 1;
-                    u32 zero = 0;
                     p->phase = next;
-                    p->timer = zero;
+                    p->timer = 0;
                 }
             }
             break;
@@ -59,9 +58,8 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 {
                     u8 next = 2;
-                    u32 zero = 0;
                     p->phase = next;
-                    p->timer = zero;
+                    p->timer = 0;
                 }
             }
             break;
@@ -84,9 +82,8 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
                     self->flash = 60;
                 {
                     u8 next = 3;
-                    u32 zero = 0;
                     p->phase = next;
-                    p->timer = zero;
+                    p->timer = 0;
                 }
             }
             break;

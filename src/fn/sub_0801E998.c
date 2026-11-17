@@ -28,11 +28,10 @@ int SceneObjects_ScriptLower(void)
         struct SceneObjSlot **slots = &p->slots;
         int one;
         u32 mask;
-        int zero = 0;
         do {
             struct SceneObjSlot *s = *slots + i;
             if (s->id == id) {
-                s->timer = zero;
+                s->timer = 0;
                 one = 1;
                 s->variant = SceneObjects_GetVariantByte(one);
                 s->callback = fn;
@@ -42,7 +41,7 @@ int SceneObjects_ScriptLower(void)
                 s->block->w6 &= mask;
                 s->block->w6 |= 3;
                 s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
-                s->lift = zero;
+                s->lift = 0;
                 s->spritePos.position.y = s->q0.position.y;
                 found = 1;
             }

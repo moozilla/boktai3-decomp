@@ -12,10 +12,9 @@ void ContactActor_UpdateAwaitHide(struct ContactActorPool *pool, struct ContactA
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (pool->hideRequested) {
         u32 state = 8;
-        u32 zero = 0;
         slot->state = state;
         slot->enter = 1;
-        slot->stateFrame = zero;
+        slot->stateFrame = 0;
     } else
         slot->stateFrame++;
 }

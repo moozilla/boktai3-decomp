@@ -1241,17 +1241,15 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
     }
     {
         u32 mask = 0x4000;
-        u32 zero;
         u32 test = (*motionFlags) & mask;
         if (!test && (u32)(actor->category - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
-        zero = 0;
         {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
             actor->field2B2 = 1;
-            actor->field2B0 = zero;
+            actor->field2B0 = 0;
             actor->field2B5 = kind;
             actor->target = callback;
             actor->field2C8 = 0;
@@ -1264,7 +1262,7 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
             {
                 u32 behavior = 2;
                 actor->state2A8 = 1;
-                actor->phase2A9 = zero;
+                actor->phase2A9 = 0;
                 actor->behavior2AA = behavior;
                 actor->counter2AC = 0;
                 actor->field2B1 = 1;
@@ -1761,34 +1759,10 @@ struct SUpdateScriptedAction {
 void Mummy_UpdateScriptedAction(struct SUpdateScriptedAction *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = SceneActorAnimation_UpdateDirectionalEntry;
-        u8 code = 10;
-        u32 zero;
-        u32 *f;
-        s32 mask;
         u16 *h;
         u16 value;
         s32 off;
-        {
-            u8 *taken = &obj->taken;
-            zero = 0;
-            *taken = 1;
-        }
-        do {
-            u32 field = 0x2B0;
-            do {
-                ((u8 *)obj)[field] = zero;
-            } while (0);
-            field += 5;
-            ((u8 *)obj)[off = field] = code;
-            obj->callback = fn;
-            field += 0x13;
-            *((u16 *)(((u8 *)obj) + field)) = zero;
-        } while (0);
-        f = (u32 *)(((u8 *)obj) + 0x114);
-        mask = -2;
-        *f &= mask;
-        *((u32 *)(((u8 *)obj) + 0x104)) = zero;
+        SceneActorChase_SetControl(obj, SceneActorAnimation_UpdateDirectionalEntry, 10);
         {
             u32 byte = obj->atE9;
             obj->at59 = byte;

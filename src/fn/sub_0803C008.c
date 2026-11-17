@@ -27,16 +27,14 @@ void ScenePool_ReleaseActorSlot(struct P *input, struct Slot *slotInput, struct 
     int shift = Mod(id, 32);
     u32 index = (id >> 5) * 4;
     u32 *mask;
-    u32 one;
     mask = p->mask;
     mask = (u32 *)((u8 *)mask + index);
-    one = 1;
-    *mask &= ~(one << shift);
+    *mask &= ~(1 << shift);
     CharacterModel_SetAnimationFlags((u8 *)slot + 0x600, 1);
     ActorMarkerPool_HideMarker((s8)slot->selector);
     {
         u32 *flags = (u32 *)((u8 *)slot + 0x56c);
-        *flags |= one;
+        *flags |= 1;
     }
     CallbackList_ResetDispatch(slot);
     {

@@ -147,18 +147,16 @@ s32 ScaledShadow_Initialize(struct ScaledShadow *shadow, struct SceneVec *source
     struct ScaledShadowManager *manager = (void *)gScaledShadowManager;
     struct ShadowAnimationResource *resource;
     struct ScaledShadowSprite *sprite;
-    int zero;
     if (!manager) {
         manager = ScaledShadowManager_Create(0, 0);
         if (!manager)
             return -1;
     }
-    zero = 0;
-    shadow->active = zero;
+    shadow->active = 0;
     shadow->source = source;
-    shadow->flags = zero;
-    shadow->unknown2 = zero;
-    shadow->unknown4 = zero;
+    shadow->flags = 0;
+    shadow->unknown2 = 0;
+    shadow->unknown4 = 0;
     shadow->scale = scale;
     shadow->minScale = minScale;
     shadow->maxScale = maxScale;

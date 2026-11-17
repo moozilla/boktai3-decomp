@@ -23,7 +23,6 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         struct SceneActorReactionCommand *command;
         void *callback;
         u8 one;
-        u32 zero;
         u8 kind;
         actor->base.behaviorFlags |= mask;
         command = (void *)((u8 *)group + 0x8C);
@@ -31,14 +30,13 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
         one = 1;
         command->duration = 30;
         command->payload = callback;
-        zero = 0;
-        command->first = zero;
+        command->first = 0;
         command->second = one;
         command->kind = one;
         callback = (void *)SceneActorReaction_RestoreAfterDelay;
         kind = 14;
         actor->base.field2B2 = one;
-        actor->base.stepDone = zero;
+        actor->base.stepDone = 0;
         actor->base.controlKind = kind;
         actor->base.target = callback;
         {
@@ -49,17 +47,17 @@ static inline void SceneActorReaction_UpdateReturnToRoute(struct ChaseActor *act
             u32 state;
             halfField = &actor->base.field2C8;
             byteZero = 0;
-            *halfField = zero;
+            *halfField = 0;
             field = &actor->base.pendingControlFlags;
             clearMask = ~1;
             *field &= clearMask;
-            actor->base.pendingControl = zero;
+            actor->base.pendingControl = 0;
             state = 3;
             actor->base.state2A8 = state;
             actor->base.phase2A9 = one;
             actor->base.behavior2AA = byteZero;
             {
-                actor->base.counter2AC = zero;
+                actor->base.counter2AC = 0;
             }
             actor->base.field2B1 = one;
             {

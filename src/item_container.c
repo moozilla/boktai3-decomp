@@ -104,11 +104,7 @@ static inline s32 scaleHeight(s32 input)
 }
 static inline u8 sameRegion(struct Trigger *p)
 {
-    u32 current = ({
-        struct GameState *world = gGameState;
-        u32 offset = 0x5A0;
-        *(u32 *)((u8 *)world + offset);
-    });
+    u32 current = gGameState->region;
     u32 region = p->sound;
     if (current == region)
         return 1;
@@ -215,11 +211,7 @@ void Trigger_UpdateShake(struct Trigger *p)
             {
                 struct SceneVec *position = p->position;
                 random &= 7;
-                position->z = random + ({
-                                  u32 base = (u16)p->baseZ;
-                                  base;
-                              }) -
-                              4;
+                position->z = random + (u16)p->baseZ - 4;
             }
         }
     }
@@ -569,14 +561,15 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                             s32 available;
                             if (gEngineFlags & 2048)
                                 available = stateMode();
-                            else if (gPlayers[0] && ({
-                                         u32 *flags = &gPlayers[0]->actionFlags;
-                                         u32 mask = 16;
-                                         *flags &mask;
-                                     }))
-                                goto available;
-                            else
+                            else {
+                                if (gPlayers[0]) {
+                                    u32 *flags = &gPlayers[0]->actionFlags;
+                                    u32 mask = 16;
+                                    if (*flags & mask)
+                                        goto available;
+                                }
                                 available = globalMode();
+                            }
                             if (available) {
                             available:
                                 if (trigger->visible)
@@ -667,10 +660,7 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
     p->head = 0;
     for (i = 0; i < 4; i++) {
         struct Player *actor;
-        actor = ({
-            struct Player *a = gPlayers[i];
-            a;
-        });
+        actor = gPlayers[i];
         p->actors[i] = actor;
         if (actor) {
             u32 offset = i * 8;
@@ -680,16 +670,10 @@ s32 TriggerManager_Initialize(struct TriggerManager *p, void *unused)
             out = (struct SceneVec *)(offset + (u32)p);
             out = (struct SceneVec *)((u8 *)out + 60);
             in = &actor->position;
-            x = ({
-                s32 value = actor->position.x;
-                value;
-            });
-            *(&z) = in->z;
+            x = actor->position.x;
+            z = in->z;
             out->x = scale(x - z);
-            horizontal = scale(({
-                s32 sum = x + z;
-                sum;
-            }));
+            horizontal = scale(x + z);
             height = scaleHeight(in->y);
             out->y = horizontal - height;
             out->z = horizontal + height;
@@ -928,12 +912,12 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
         } else {
             if (gWeatherCollisionTimer > 0)
                 goto reveal;
-            if (gPlayers[0] && (({
-                    u32 *flags = &gPlayers[0]->actionFlags;
-                    u32 mask = 16;
-                    *flags &mask;
-                })))
-                goto reveal;
+            if (gPlayers[0]) {
+                u32 *flags = &gPlayers[0]->actionFlags;
+                u32 mask = 16;
+                if (*flags & mask)
+                    goto reveal;
+            }
             available = globalMode();
         }
         if (!available)

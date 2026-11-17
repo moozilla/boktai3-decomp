@@ -49,11 +49,9 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
     {
         struct SceneObjSlot *sprite = obj;
         u8 *cf2;
-        switch (({
-            u32 ty = obj->type;
-            cf2 = cellField;
-            ty;
-        })) {
+        u32 type = obj->type;
+        cf2 = cellField;
+        switch (type) {
             case 0:
             case 3:
                 Sprite_Init(sprite, mgr + (obj->value * 28 + 0x3c), 0);

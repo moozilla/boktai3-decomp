@@ -11,7 +11,7 @@ struct Particle {
     u16 cell;
     s16 height;
     struct Vec velocity;
-    volatile u32 flags;
+    u32 flags;
     u8 pad14[4];
     u16 tile;
     u8 pad1a[4], palette, priority, pad20[8];
@@ -60,7 +60,7 @@ static inline s32 Random(u16 *table, u32 mask, u32 *rng)
     sample = table[r];
     return sample;
 }
-static inline void ClearFlag(volatile u32 *p, u32 mask)
+static inline void ClearFlag(u32 *p, u32 mask)
 {
     u32 v = *p;
     v &= ~mask;

@@ -30,8 +30,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             u32 t = *(u32 *)(p + 0x74);
             const u16 *tab;
             u32 *cur;
-            u32 zero = 0;
-            *(u32 *)(p + 0x74) = zero;
+            *(u32 *)(p + 0x74) = 0;
             if (t != 0)
                 p[0x1f] = 2;
             tab = gRandomTable;
@@ -59,7 +58,7 @@ s32 SceneNpc_UpdateTransitionEffect(u8 *p)
             }
             if (*(s32 *)(p + 0x70) > 0x3a) {
                 *(u32 *)(p + 0x6c) = 2;
-                *(u32 *)(p + 0x70) = zero;
+                *(u32 *)(p + 0x70) = 0;
                 *(u32 *)(p + 0x74) = 1;
             }
             break;

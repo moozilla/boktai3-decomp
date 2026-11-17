@@ -14,13 +14,6 @@ asm(".include \"asm/macros.inc\"");
  * choice; see docs/REGALLOC.md). Each names its symbol in a trailing comment;
  * tools/check_ram_literals.py verifies the address against the link map on
  * every build, so these cannot drift from the symbols. */
-/* An empty statement macro: the shape a debug check compiled out of a release
- * build takes. Its empty loop still splits the code around it, which some
- * functions need to match. Like a bare empty do/while(0), it counts as a
- * barrier (docs/WORKER.md). The original name is unknown (confidence=low). */
-#define DEBUG_NOP()                                                                                \
-    do {                                                                                           \
-    } while (0)
 #define RANDOM_TABLE_ADDR 0x0203B400 /* gRandomTable */
 
 /* libagbsyscall; the constants as in gba/syscall.h */

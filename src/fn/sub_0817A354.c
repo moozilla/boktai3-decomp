@@ -432,14 +432,12 @@ struct Common {
 
 static inline void state(struct Common *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->reset = zero;
-    p->pending = zero;
+    p->reset = 0;
+    p->pending = 0;
 }
 
 int GridAttack_SelectNextAction(void *);

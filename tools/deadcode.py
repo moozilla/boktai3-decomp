@@ -10,8 +10,9 @@ scope's instrumented agbcc (tools/scope/build_agbcc.sh), run with AGBCC_DEAD, re
   pass. The first pass removes what the syntax already made dead (code after a return, `if (0)`);
   anything later is a branch whose condition the compiler had to work out, such as `x < 0` on a
   value that came from an unsigned halfword.
-* `zero`: an operation combine proved is always zero from the known-zero bits of its operands,
-  such as `(u16)x >> 16` or `(x & 31) >> 5`, in a statement that shifts, masks or divides.
+* `zero`: an operation an accepted combine transformation proved is always zero from the
+  known-zero bits of its operands, such as `(u16)x >> 16` or `(x & 31) >> 5`, in a statement
+  that shifts, masks or divides. Speculative proofs from rejected combinations are discarded.
 
 Both are found from what the compiler does, not from how the C is spelled. tools/concessions.py
 turns them into the warning kinds `dead-code` and `proved-zero`. A site inside a header (an inline

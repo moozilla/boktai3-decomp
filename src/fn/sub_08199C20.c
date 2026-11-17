@@ -1,14 +1,12 @@
 #include "global.h"
-struct CallbackPosition {
-    u32 x, z;
-};
+#include "contact_position.h"
 struct CallbackSlot {
     u8 unknown0[0x24];
     u32 flags;
     u8 unknown28[0x18];
-    struct CallbackPosition position;
+    struct ContactPosition position;
     u8 unknown48[0x5c];
-    struct CallbackPosition savedPosition;
+    struct ContactPosition savedPosition;
     u8 unknownAC[0x24];
     u16 timer;
     u8 phase;
@@ -16,13 +14,10 @@ struct CallbackSlot {
 };
 void CallbackSlot_RestorePosition(struct CallbackSlot *slot)
 {
-    u16 *component;
-    if (slot->flags & 4) {
-        *(&component) = (u16 *)(&slot->position.x);
-    } else {
-        component = (u16 *)&slot->position.z;
-    }
-    *component -= 3;
+    if (slot->flags & 4)
+        slot->position.x -= 3;
+    else
+        slot->position.z -= 3;
     if (++slot->timer > 19) {
         slot->position = slot->savedPosition;
         slot->state = 0;

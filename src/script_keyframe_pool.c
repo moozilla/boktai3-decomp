@@ -232,9 +232,8 @@ s32 ScriptKeyframe_DestroyManager(struct ScriptKeyframeManager *manager)
 s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *manager, u32 unused1, u32 unused2,
                                u32 capacity)
 {
-    u32 zero = 0;
     manager->capacity = capacity;
-    manager->count = zero;
+    manager->count = 0;
     gScriptKeyframeManager = manager;
     return 0;
 }

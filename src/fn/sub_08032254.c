@@ -25,8 +25,7 @@ const u8 *TextState_ParseTagValue(struct Tag *p, const u8 *s)
         int length;
         int c = *s;
         if (c == '=') {
-            int one = 1;
-            first = one;
+            first = 1;
             p->hasValue = first;
         } else if (p->hasValue) {
             length = p->length;

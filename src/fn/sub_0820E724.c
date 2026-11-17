@@ -5,11 +5,6 @@
 struct PHVec {
     s16 x, y, z, pad;
 };
-struct FanSeq {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
-};
 struct PHTerrain {
     u8 pad[0x24];
     u16 rows[1];

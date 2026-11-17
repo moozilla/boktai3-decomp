@@ -52,9 +52,7 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
     }
     {
         u32 m = 0x400;
-        u32 zero;
         npc->flags = m | npc->flags;
-        zero = 0;
         switch (tag->mode) {
             case 0: {
                 u32 zero2 = 0;
@@ -62,7 +60,7 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
                 s32 dz;
                 struct ArcTag *t;
                 s32 v;
-                tag->field6 = zero;
+                tag->field6 = 0;
                 dx = npc->targetX - tag->startX;
                 dz = npc->targetZ - tag->startZ;
                 pos[0] = tag->startX + Div(tag->elapsed * dx, tag->duration);
@@ -83,7 +81,7 @@ void TaggedSceneNpc_UpdateArcMove(void *ctx, struct ArcNpc *npc)
                 break;
             }
             case 1:
-                tag->field6 = zero;
+                tag->field6 = 0;
                 break;
         }
     }

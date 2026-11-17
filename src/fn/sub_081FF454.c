@@ -42,17 +42,13 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
     u8 *saved;
     switch (*state) {
         case 0: {
-            register u32 one;
             u32 time = p->lifetime;
-            do {
-                one = 1;
-            } while (0);
-            if (time & one)
+            if (time & 1)
                 SpawnTrail(p);
             p->sprite.flags |= 0x400;
             p->sprite.position.y = p->target.y - ((30 - p->lifetime) * 2);
             if (p->lifetime > 30) {
-                *state = one;
+                *state = 1;
                 p->sprite.flags &= ~0x400;
                 Aim(p, params);
                 sequence = (params->variant == 0) ? (7) : (0);
@@ -68,7 +64,7 @@ s32 HomingProjectile_UpdateDefaultState(struct HomingSlot *p, s32 slot)
                     check = (u8)(direction - 1);
                     saved = second;
                     if (check <= 1)
-                        *first = one;
+                        *first = 1;
                     else
                         *first = 0;
                     if (direction > 1)

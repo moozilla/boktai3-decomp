@@ -64,7 +64,6 @@ s32 sub_0801C24C(Ctx *p)
     u16 *pal;
     Graphic *g;
     Graphic *g4;
-    u32 zero;
     s32 last, lo;
     s16 *range;
     u8 *pHideBar, *pLayer, *pHideTime, *pCounter;
@@ -78,7 +77,6 @@ s32 sub_0801C24C(Ctx *p)
     Clamp(&p->last32);
     Clamp(&p->mid32);
     p->last = p->last32 >> 5;
-    zero = 0;
     p->mid = p->mid32 >> 5;
     g4 = &p->g[4];
     g4->x = p->last - 0xb0;
@@ -89,16 +87,16 @@ s32 sub_0801C24C(Ctx *p)
     if (last < lo) {
         if (p->state != 1) {
             p->state = 1;
-            Anim_SetKeyframes(g4, p->anim, 1, 1, zero);
+            Anim_SetKeyframes(g4, p->anim, 1, 1, 0);
         }
     } else if (last < p->hi) {
         if (p->state != 2) {
             p->state = 2;
-            Anim_SetKeyframes(g4, p->anim, 2, 1, zero);
+            Anim_SetKeyframes(g4, p->anim, 2, 1, 0);
         }
     } else if (p->state != 3) {
         p->state = 3;
-        Anim_SetKeyframes(g4, p->anim, 3, 1, zero);
+        Anim_SetKeyframes(g4, p->anim, 3, 1, 0);
     }
     pHideBar = &p->hideBar;
     pLayer = &p->layer;

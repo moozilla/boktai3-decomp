@@ -1,42 +1,14 @@
-#include "global.h"
+#include "scene_actor_lifecycle.h"
 #include "ram.h"
-#include "player.h"
-struct Actor {
-    u8 pad[0x2e0];
-    void (*destroy)(void *, struct Actor *);
-    u8 pad2e4[8];
-    struct Actor *prev;
-};
-struct Manager {
-    u8 pad0[0x18];
-    u32 ticks;
-    struct Actor *head;
-    u8 changed, previous, phase;
-    volatile u8 frame;
-    u8 event, pad25[3];
-    u32 buffer, count[2];
-    u8 pad34[0x400];
-    struct SceneVec *target;
-    struct Player *player;
-};
-int Weather_GetType(void);
-int SunClock_GetBaseHour(void);
-int SunClock_GetBaseMinute(void);
-void Actor_RunCallbacks(void *, struct Actor *);
-void Actor_UpdateInteractionCue(struct Manager *);
-void Actor_EmitTowardNearbyActors(void *);
-int Actor_Destroy(struct Actor *);
-int SceneActorManager_Init(struct Manager *m)
+int SceneActorManager_Init(struct SceneActorManager *m)
 {
-    int zero;
     struct Player *player;
     gSceneActorListManager = m;
-    zero = 0;
-    m->ticks = zero;
-    m->head = zero;
-    m->buffer = zero;
-    m->count[0] = zero;
-    m->count[1] = zero;
+    m->ticks = 0;
+    m->head = 0;
+    m->buffer = 0;
+    m->count[0] = 0;
+    m->count[1] = 0;
     player = gPlayers[0];
     m->player = player;
     if (player)

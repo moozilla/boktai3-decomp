@@ -1,4 +1,5 @@
 #include "global.h"
+#include "monster_particle_random.h"
 #include "engine_globals.h"
 #include "ram.h"
 // Cleanup: remove the angle register hint while retaining exact codegen.
@@ -30,12 +31,6 @@ static inline s32 random_value(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return *(u16 *)((u8 *)gRandomTable + (gRandomIndex << 1));
 }
-static inline s32 random_first(void)
-{
-    u8 *table = gRandomTable;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return *(u16 *)(table + (gRandomIndex << 1));
-}
 static inline s32 scale(s32 v)
 {
     if (v >= 0)
@@ -49,14 +44,14 @@ void Player_EmitConvergingParticle(State *s, Point *pos)
         Effect *draw = e;
         s32 angle;
         s32 radius;
+        u16 radiusSample;
         draw->flags &= ~1;
         e->kind = 4;
         SpriteDrawable_SelectTileFrame(draw, s->graphics, 4);
-        angle = random_first() & 255;
-        radius = (random_first() & 127) + 256;
-        do {
-            e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
-        } while (0);
+        angle = ParticleRandom_ReadDirectSample(gRandomTable) & 255;
+        radiusSample = ParticleRandom_ReadDirectSample(gRandomTable);
+        radius = radiusSample % 128 + 256;
+        e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
         e->dy = scale(radius * gUnk_086149C4[angle]);
         draw->pos = *pos;
         draw->pos.x += (u16)e->dx;

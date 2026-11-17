@@ -219,20 +219,18 @@ void DarkLoan_SetState(struct DarkLoanScreen *panel, void (*update)(struct DarkL
 
 void DarkLoan_BeginOpening(struct DarkLoanScreen *panel)
 {
-    u32 zero;
     DarkLoan_ResetBackground(panel);
     DarkLoan_ShowPrompt(panel);
     Bg_SetLayerMap(0, panel->map, 3);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(panel);
     panel->widgets[DARK_LOAN_BACKGROUND].flags &= ~1;
-    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 4, 2, zero);
+    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 4, 2, 0);
     panel->widgets[DARK_LOAN_RATE].flags &= ~1;
     panel->widgets[DARK_LOAN_DECIMAL_DIGITS].flags &= ~1;
     panel->widgets[4].flags &= ~1;
     MessageWindow_ShowMessage(0);
-    ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xe000, zero);
+    ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xe000, 0);
     if (!panel->exitScript)
         DarkLoan_FinishOpening(panel);
     else
@@ -241,13 +239,11 @@ void DarkLoan_BeginOpening(struct DarkLoanScreen *panel)
 
 void DarkLoan_FinishOpening(struct DarkLoanScreen *panel)
 {
-    u32 zero;
     Bg_SetLayerMap(0, panel->map, 3);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(panel);
     panel->widgets[DARK_LOAN_BACKGROUND].flags &= ~1;
-    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 7, 2, zero);
+    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 7, 2, 0);
     panel->widgets[DARK_LOAN_RATE].flags &= ~1;
     panel->widgets[DARK_LOAN_DECIMAL_DIGITS].flags &= ~1;
     panel->widgets[4].flags &= ~1;
@@ -255,7 +251,7 @@ void DarkLoan_FinishOpening(struct DarkLoanScreen *panel)
     panel->widgets[DARK_LOAN_CURSOR].flags &= ~1;
     Anim_LoadKeyframe(&panel->widgets[DARK_LOAN_CURSOR], &panel->secondaryResource, 0x4b, 1);
     MessageWindow_ShowMessage(1);
-    panel->adjustment = zero;
+    panel->adjustment = 0;
     DarkLoan_SetState(panel, DarkLoan_UpdateConfirmation);
 }
 
@@ -330,16 +326,14 @@ void DarkLoan_ShowCompletionMessage(struct DarkLoanScreen *panel)
 
 void DarkLoan_BeginAlternateOpening(struct DarkLoanScreen *panel)
 {
-    u32 zero;
     DarkLoan_ResetBackground(panel);
     DarkLoan_ShowPrompt(panel);
     Bg_SetLayerMap(0, panel->map, 5);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(panel);
     panel->widgets[DARK_LOAN_BACKGROUND].flags &= ~1;
-    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, zero);
-    ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xe000, zero);
+    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, 0);
+    ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xe000, 0);
     MessageWindow_ShowMessage(13);
     DarkLoan_SetState(panel, DarkLoan_UpdateClosing);
 }

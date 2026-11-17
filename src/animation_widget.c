@@ -93,11 +93,9 @@ s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct WidgetGlyphRe
                            u16 index)
 {
     struct WidgetGlyphEntry *entry = resource->glyphs + index;
-    u32 zero;
     if (entry == 0)
         return -1;
     widget->glyphKind = entry->kind;
-    zero = 0;
     widget->width = entry->width;
     widget->height = entry->height;
     widget->originX = entry->originX;
@@ -106,7 +104,7 @@ s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct WidgetGlyphRe
     widget->centerY = entry->centerY;
     widget->scaleX = 0x40;
     widget->scaleY = 0x40;
-    widget->rotation = zero;
+    widget->rotation = 0;
     if (widget->palette == 0) {
         widget->paletteBank = resource->paletteIndex;
         widget->palette = gPaletteBankData + (widget->paletteBank << 5);

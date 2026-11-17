@@ -67,17 +67,10 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
         p->active = 1;
     }
     WirelessGameMenu_UpdateHealthIndicators(p);
-    if (((({
-            struct P *view = p;
-            view->timer;
-        }))) == 30) {
+    if (p->timer == 30) {
         WirelessGameMenu_SignalStatusPanel(p);
     }
-    if (Mod((({
-                struct P *view = p;
-                view->timer;
-            })),
-            60) == 0) {
+    if (Mod(p->timer, 60) == 0) {
         struct Actor *actor = (*(struct Actor **)gPlayers);
         struct Target *target = SceneActors_GetBySlot(0);
         int a, b;
@@ -150,10 +143,7 @@ void WirelessGameMenu_UpdateActiveRound(struct P *input)
             i++;
             shift += 4;
         } while (i <= 3);
-        if (((({
-                int v = total;
-                v;
-            }))) > 0) {
+        if (total > 0) {
             WirelessGame_AddWeightedScore(3, 1);
         }
         {

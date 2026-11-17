@@ -78,9 +78,8 @@ u32 ShadowRegistry_OnDestroy(struct ShadowRegistry *registry)
         entry = next;
     }
     {
-        u32 zero = 0;
-        registry->head = (void *)zero;
-        gShadowRegistry = zero;
+        registry->head = (void *)0;
+        gShadowRegistry = 0;
     }
     return 0;
 }

@@ -8,7 +8,6 @@ s32 GameState_HasUnlockedInventoryEntry(s32);
 void Sound_PlaySong(u32);
 
 #define UNLOCK_SLOT(i) (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x78))
-#define UNLOCK_CUR     (*(s16 *)((u8 *)gGameState + 0x50))
 
 s32 GameState_ToggleUnlockEquipSlot(u8 *p)
 {
@@ -30,11 +29,11 @@ s32 GameState_ToggleUnlockEquipSlot(u8 *p)
             n = 0;
             for (i = 0; i <= 7; i++) {
                 if (buf[i] == slot) {
-                    s16 *cur = &UNLOCK_CUR;
-                    if (*cur > 7) {
-                        if (n == *cur - 8)
+                    u16 *cur = &gGameState->unk50;
+                    if ((s16)*cur > 7) {
+                        if (n == (s16)*cur - 8)
                             *cur = 8;
-                        else if (n < *cur - 8)
+                        else if (n < (s16)*cur - 8)
                             (*cur)--;
                     }
                 } else {
@@ -73,7 +72,7 @@ s32 GameState_ToggleUnlockEquipSlot(u8 *p)
             buf[n] = -1;
         for (i = 0; i <= 7; i++)
             UNLOCK_SLOT(i) = buf[i];
-        UNLOCK_CUR = sel;
+        gGameState->unk50 = sel;
         Sound_PlaySong(0xdd);
     }
     return 1;

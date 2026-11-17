@@ -32,14 +32,12 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct Hresvelgr
     void *graphics = p->graphics;
     struct HresvelgrSprite *sprite;
     void *shadow;
-    u32 zero;
     if (!AnimData_Load(graphics, 0x3070))
         return -1;
     sprite = &p->sprite;
     Sprite_Init(sprite, graphics, 0);
     {
         u32 value = 5;
-        zero = 0;
         sprite->field10 = value;
     }
     AnimData_SelectPaletteBank(graphics, 0x2f2);
@@ -52,8 +50,8 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct Hresvelgr
     p->velocity = *velocity;
     Hresvelgr_InitializeMotionCollider(p);
     shadow = p->shadow;
-    ScaledShadow_Initialize(shadow, &p->sprite.position, 64, 64, 64, 64, 0x1900, 1, 6, 1, zero);
+    ScaledShadow_Initialize(shadow, &p->sprite.position, 64, 64, 64, 64, 0x1900, 1, 6, 1, 0);
     ScaledShadow_SetGraphic(shadow, 0x1c1b, 7);
-    p->state = zero;
-    p->stateFrame = zero;
+    p->state = 0;
+    p->stateFrame = 0;
 }

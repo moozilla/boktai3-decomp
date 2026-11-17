@@ -87,14 +87,12 @@ struct Engine *Wireless_CreateController(void)
         return 0;
     }
     {
-        int one;
         Task_SetCallbacks(p, 0, 0);
-        one = 1;
-        p->task.list = one;
-        ((u8 *)p)[0x16] = one;
+        p->task.list = 1;
+        ((u8 *)p)[0x16] = 1;
         p->task.id = 0;
         Task_LinkToPriorityList(p);
-        gClockSynced = one;
+        gClockSynced = 1;
         *singleton = p;
         return p;
     }

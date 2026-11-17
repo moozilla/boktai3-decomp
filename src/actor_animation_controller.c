@@ -997,8 +997,6 @@ void sub_081E4D14(void)
 
 /* Script command: configure the singleton animation controller. */
 
-#define OWNER_V(o) (*(u16 *)(*(u8 *volatile *)((u8 *)g + 0x18) + (o)))
-
 void Actor_BeginCurveToPosition(void)
 {
     struct ActorAnimController *g = (struct ActorAnimController *)gScriptedActorController;
@@ -1574,7 +1572,6 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
         done = 0;
     p->done = done;
     if (done) {
-        s32 zero;
         ActorShadow_Enable(p->p2);
         p->phase = 0;
         if (p->oldMode == 3 && p->mode == 3) {
@@ -1584,12 +1581,11 @@ void Actor_UpdateAppearanceAnimation(struct ActorAnimController *p)
         {
             u8 one = 1;
             p->flags |= one;
-            zero = 0;
         }
-        Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
+        Anim_SetSequence(&p->anim, p->arg, 0, 4, 0);
         if (p->handle) {
             void *h = p->handle;
-            p->handle = (void *)zero;
+            p->handle = 0;
             Script_Call(h, 0);
         }
     }
@@ -1916,7 +1912,6 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        s32 zero;
         p->obj.flags &= ~1;
         p->obj.flags &= ~16;
         p->obj.flags &= ~32;
@@ -1935,9 +1930,8 @@ void Actor_UpdateShadowedRestAnimation(struct ActorAnimController *p)
         {
             u8 one = 1;
             p->flags |= one;
-            zero = 0;
         }
-        Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
+        Anim_SetSequence(&p->anim, p->arg, 0, 4, 0);
     }
     o = &p->obj;
     a = &p->anim;
@@ -2020,7 +2014,6 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
     u32 flag;
     u8 done;
     if (take(p)) {
-        s32 zero;
         p->obj.flags &= ~1;
         p->obj.flags |= 48;
         p->obj.scaleY = 127;
@@ -2036,9 +2029,8 @@ void Actor_UpdateLargeRestAnimation(struct ActorAnimController *p)
         {
             u8 one = 1;
             p->flags |= one;
-            zero = 0;
         }
-        Anim_SetSequence(&p->anim, p->arg, 0, 4, zero);
+        Anim_SetSequence(&p->anim, p->arg, 0, 4, 0);
     }
     o = &p->obj;
     a = &p->anim;
@@ -4650,19 +4642,16 @@ void TimeDisplay_InitAnimatedObjects(u8 *s)
 {
     void *p = ScriptProc_Start(0xCB05, 0x731D);
     u8 *obj = s + 0x4E0;
-    u32 zero;
-    u32 two;
-    u32 one;
     ResourceHeader_Relocate(obj, p);
-    Widget_InitLinked(s + 0x18, obj, 1, 0x10, zero = 0, 0, 0, 0);
-    Widget_InitLinked(s + 0xA0, obj, 2, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x128, obj, 11, 0x10, two = 2, zero, zero, zero);
-    Widget_InitLinked(s + 0x1B0, obj, 11, 0x10, two, zero, zero, zero);
-    Widget_InitLinked(s + 0x458, obj, 0, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x238, obj, 7, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x2C0, obj, 3, 0x10, zero, zero, zero, zero);
-    Widget_InitLinked(s + 0x348, obj, 7, 0x30, one = 1, zero, zero, zero);
-    Widget_InitLinked(s + 0x3D0, obj, 3, 0x30, one, zero, zero, zero);
+    Widget_InitLinked(s + 0x18, obj, 1, 0x10, 0, 0, 0, 0);
+    Widget_InitLinked(s + 0xA0, obj, 2, 0x10, 0, 0, 0, 0);
+    Widget_InitLinked(s + 0x128, obj, 11, 0x10, 2, 0, 0, 0);
+    Widget_InitLinked(s + 0x1B0, obj, 11, 0x10, 2, 0, 0, 0);
+    Widget_InitLinked(s + 0x458, obj, 0, 0x10, 0, 0, 0, 0);
+    Widget_InitLinked(s + 0x238, obj, 7, 0x10, 0, 0, 0, 0);
+    Widget_InitLinked(s + 0x2C0, obj, 3, 0x10, 0, 0, 0, 0);
+    Widget_InitLinked(s + 0x348, obj, 7, 0x30, 1, 0, 0, 0);
+    Widget_InitLinked(s + 0x3D0, obj, 3, 0x30, 1, 0, 0, 0);
     TimeDisplay_HideAnimatedObjects(s);
 }
 

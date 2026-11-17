@@ -5,11 +5,6 @@
 struct FanVec {
     s16 x, y, z, pad;
 };
-struct FanSeq {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
-};
 struct FanCannon {
     s32 age;
     s32 name;
@@ -24,7 +19,7 @@ struct FanCannon {
     u8 collider[0x54];
     u8 body[0x48];
     void (*update)(void);
-    struct FanSeq sequence;
+    struct DisplaySequenceState sequence;
     s32 range;
     s16 maximumWind, health, damage, reaction;
     s16 f114, dead, flash;
@@ -183,7 +178,7 @@ s32 FanCannon_CreateFromScript(void)
         Anim_SetSequence(&p->sequence, p->resource, 0x16, (u8)p->direction, (u8)p->variant);
     }
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&p->flags,
-                           (struct DisplaySequenceState *)&p->sequence);
+                           &p->sequence);
     if (!p->initialDead)
         sub_082093F8(p);
     if (p->terrain && !p->initialDead) {

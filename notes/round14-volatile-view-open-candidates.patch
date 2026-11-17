@@ -1,0 +1,141 @@
+--- a/src/fn/sub_080340AC.c
++++ b/src/fn/sub_080340AC.c
+@@ -39,7 +39,6 @@
+ {
+     int i;
+     u8 *ids;
+-    volatile u8 *global;
+     int byteZero;
+     int secondZero, secondByteZero, one, clearZero;
+     u8 *active;
+@@ -56,7 +55,6 @@
+     p->selected = byteZero;
+     p->allowed = byteZero;
+     p->count = byteZero;
+-    global = &gWirelessSessionState;
+     clearZero = 0;
+     i = 7;
+     ids = &p->ids[7];
+@@ -87,7 +85,7 @@
+     p->flag42 = secondByteZero;
+     p->flag43 = secondByteZero;
+     p->pointer = 0;
+-    *global = secondByteZero;
++    gWirelessSessionState = secondByteZero;
+     p->flagFB = secondByteZero;
+     p->phase = secondByteZero;
+     p->head = 0;
+--- a/src/fn/sub_0805E7D8.c
++++ b/src/fn/sub_0805E7D8.c
+@@ -1,24 +1,21 @@
+ #include "scene_input_navigation.h"
+ u32 SceneInput_GetNavigationKeys(struct SceneInputGridView *grid)
+ {
+-    const volatile u16 *keys = gPadState;
+-    u32 value = keys[1];
++    u32 value = gPadState[1];
+     u32 mask = 0xF0;
+     u32 pressed;
+     pressed = mask;
+     pressed &= value;
+     if (pressed) {
+         grid->repeat = 0;
+-        return keys[1];
++        return gPadState[1];
+     } else {
+-        do {
+-            mask &= keys[0];
+-        } while (0);
++        mask &= gPadState[0];
+         if (mask) {
+             grid->repeat++;
+             if (grid->repeat > 9) {
+                 grid->repeat = pressed;
+-                return keys[0];
++                return gPadState[0];
+             }
+         } else {
+             grid->repeat = mask;
+--- a/src/fn/sub_08184F04.c
++++ b/src/fn/sub_08184F04.c
+@@ -1,16 +1,10 @@
+ #include "global.h"
+ #include "engine.h"
++#include "scene_input_widget.h"
+ #include "ram.h"
+ 
+-// foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
+ #define gActorStateCallbacks gUnk_0824EF10
+ 
+-struct ActorAnimationStatus {
+-    u32 flags : 8;
+-};
+-struct ActorControllerAnimation {
+-    u32 unk0, unk4, flags;
+-};
+ extern u32 gUnk_02000560;
+ extern void *gUnk_0824EF10[];
+ 
+@@ -22,7 +16,7 @@
+ void ActorController_UpdateAnimation(u8 *p)
+ {
+     u8 *finished;
+-    struct ActorControllerAnimation *anim;
++    struct SceneInputWidget *anim;
+     u32 mask = 0x400;
+     if (!((gEngineFlags | gScenePauseFlags) & mask)) {
+         u32 four = 4;
+@@ -35,9 +29,7 @@
+     if (Anim_Step(anim, p + 0x94))
+         *finished = 1;
+     {
+-        u8 *q = p + 0xD1;
+-        u32 r = *(volatile u8 *)q;
+-        if (1u & r)
++        if (anim->status & 1)
+             *finished = 1u;
+         if (*(u16 *)(p + 0xB32) & 0x800)
+             anim->flags |= 1u;
+--- a/src/fn/sub_08220C8C.c
++++ b/src/fn/sub_08220C8C.c
+@@ -1,9 +1,4 @@
+-#include "global.h"
+-struct DisplaySequenceState {
+-    const u16 *commands;
+-    u8 flags, frameCount, frameWeight, duration;
+-    u16 index, sequence, speed, elapsed;
+-};
++#include "display_sequence_inline.h"
+ u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence, u8 row, u8 flags)
+ {
+     u8 *entry = data + (sequence * 4 + 4);
+@@ -11,7 +6,7 @@
+     u32 prod = entry[1] * row * 2;
+     state->commands = (const u16 *)(base + prod);
+     state->speed = 0x40;
+-    if (state->sequence == sequence && state->frameCount) {
++    if (state->unknownA == sequence && state->frameCount) {
+         if (flags & 4) {
+             if (!(state->flags & 4))
+                 goto restart;
+@@ -28,16 +23,16 @@
+         state->index = 0;
+     {
+         u32 offset = state->index << 1;
+-        const volatile u16 *command;
++        const u16 *command;
+         u8 weight;
+         base = (u8 *)((u32)state->commands + offset);
+-        command = (const volatile u16 *)base;
+-        weight = *command & 0xF;
++        command = (const u16 *)base;
++        weight = DisplaySequence_ReadCommand(command) & 0xF;
+         state->frameWeight = weight;
+         state->duration = weight;
+     }
+     state->elapsed = 0;
+-    state->sequence = sequence;
++    state->unknownA = sequence;
+     state->flags = flags;
+     return 1;
+ same:

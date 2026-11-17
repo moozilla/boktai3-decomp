@@ -64,23 +64,21 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
     u32 off = 0x46a;
     s32 damage;
     u8 *specialPtr;
-    union {
-        u32 flags;
-        s16 *health;
-    } pending;
+    u32 flags;
+    s16 *health;
     u32 sound;
     damage = *(s16 *)(q + off);
     specialPtr = q + 0x470;
     special = *specialPtr;
     off += 2;
-    pending.flags = *(u32 *)(q + off);
+    flags = *(u32 *)(q + off);
     ActorExtension_ResetState(base);
     *specialPtr = 0;
     off = TestFlags((struct FlagsHolder *)base, 0x100000);
     if (off) {
         damage = damage >= 0 ? damage >> 1 : -(-damage >> 1);
     }
-    if (pending.flags & 0x40) {
+    if (flags & 0x40) {
         special = 0;
         sound = 0x211;
     } else
@@ -99,13 +97,13 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         } else
             (*hitstun)--;
     }
-    if (damage > 0 || ((s16)pending.flags & 0x40)) {
+    if (damage > 0 || ((s16)flags & 0x40)) {
         s32 knockback = 0;
         struct Packed size;
         damage = ActorResource_ClampDecrease(base, damage);
         base->health -= damage;
         Sound_PlaySong(sound);
-        pending.health = &base->health;
+        health = &base->health;
         if (damage > 0 && base->state != 0xb) {
             B(0x475) = 0;
             B(0x474)++;
@@ -114,7 +112,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
             B(0x474) = 0;
             knockback = 1;
         }
-        if (ActorResource_IsBelowSelectedLimit(q, *pending.health))
+        if (ActorResource_IsBelowSelectedLimit(q, *health))
             knockback = 1;
         H(0x4ec) = 10;
         if (special) {
@@ -126,14 +124,14 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         size.y = 0;
         size.z = 16;
         DamageNumberDisplay_Show(collider, damage, 0, position + 0xc, &size, 1);
-        if (*pending.health <= 0) {
+        if (*health <= 0) {
             s16 clearedHealth[1];
             int zero;
             u32 callback;
             int state;
             clearedHealth[0] = 0;
             zero = 0;
-            *pending.health = clearedHealth[0];
+            *health = clearedHealth[0];
             SetFlags((struct FlagsHolder *)base, 2);
             callback = (u32)SceneEventActor_UpdateRemovalSequence;
             state = 0xd;

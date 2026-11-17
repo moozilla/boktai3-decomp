@@ -1,14 +1,9 @@
 #include "global.h"
-#include "display_sequence.h"
+#include "player_cue_sequence.h"
 #include "ram.h"
 #include "engine_globals.h"
 struct Vec {
     s16 x, y, z, pad;
-};
-struct FeatherSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
 };
 struct Feather {
     u32 flags;
@@ -19,7 +14,7 @@ struct Feather {
     u8 unknown12[10];
     struct Vec position;
     u8 unknown24[8];
-    struct FeatherSequence sequence;
+    struct DisplaySequenceState sequence;
     u8 unknown3C[0x54];
     u16 age;
     u8 state;
@@ -35,9 +30,6 @@ struct FeatherPool {
     u32 used;
 };
 void Sprite_Remove(void *);
-void Sprite_Init(void *, void *, u32);
-void AnimData_SelectPaletteBank(void *, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline void SelectDirection(u32 angle, u8 *row, u8 *flip)
 {
     u8 quadrant = ((((s32)(angle >> 24)) + 0x60) >> 6) & 3;
@@ -103,63 +95,7 @@ struct Feather *FeatherEffectPool_CreateDirectional(struct Vec *position, u32 an
         AnimData_SelectPaletteBank(sprite->graphics, 0x277);
         p->effectFlags = 0x400008;
     }
-    {
-        struct FeatherSequence *a = &p->sequence;
-        const volatile u16 *entry;
-        {
-            u32 offset = a->index * 2;
-            const u16 *table = p->sequence.commands;
-            entry = (const volatile u16 *)((u32)table + offset);
-        }
-        sprite->frame = *entry >> 6;
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = a->flags;
-            bit = 1;
-            first = (u8)(control.raw & bit);
-            if (first != (((*entry & 0x30) >> 4) & bit))
-                sprite->flags |= 4;
-            else
-                sprite->flags &= ~4;
-        }
-        {
-            union DisplaySequenceControl control;
-            u32 bit, first;
-            control.raw = a->flags;
-            bit = 2;
-            first = (u8)(control.raw & bit);
-            if (first != (((*entry & 0x30) >> 4) & bit))
-                sprite->flags |= 8;
-            else
-                sprite->flags &= ~8;
-        }
-        if (++a->elapsed >= a->duration) {
-            a->elapsed = 0;
-            if (a->flags & 4) {
-                if (a->index == 0) {
-                    if (a->flags & 8)
-                        a->elapsed = a->duration;
-                    else
-                        a->index = a->frameCount - 1;
-                } else
-                    --a->index;
-            } else {
-                if (++a->index >= a->frameCount) {
-                    if ((u8)(a->flags & 8)) {
-                        a->elapsed = a->duration;
-                        a->index = a->frameCount - 1;
-                    } else
-                        a->index = 0;
-                }
-            }
-            entry = a->commands + a->index;
-            a->frameWeight = *entry & 15;
-            a->duration = (a->frameWeight * a->speed) >> 6;
-            if (!a->duration)
-                a->duration = 1;
-        }
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &p->sequence);
     {
         u32 combined = sprite->flags | 1;
         sprite->priority = 1;

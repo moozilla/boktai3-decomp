@@ -50,13 +50,12 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->foreground.mode;
-                u32 one = 1;
-                *field = one;
+                *field = 1;
                 screen->foreground.sequenceId = 3;
                 state = &screen->foreground.sequence;
                 Anim_SetSequence(state, screen->sequenceResource, 3, 0, 0);
                 foreground = &screen->foreground;
-                StepPlaybackOne(foreground, state, one);
+                StepPlaybackOne(foreground, state, 1);
                 screen->endingPhase = 1;
                 screen->endingTimer = 0;
             }
@@ -64,8 +63,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
         case 1:
             if ((s16)screen->endingTimer > 0x78) {
                 u32 *field = &screen->foreground.mode;
-                u32 zero = 0;
-                *field = zero;
+                *field = 0;
                 screen->targetX = 0xA0;
                 {
                     u16 *timer = &screen->targetMode;
@@ -75,13 +73,13 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     *timer = duration;
 
                     SetCallback((void (*)(void))SceneMover_InterpolateScreenX, &motion->callback);
-                    motion->callbackTimer = zero;
+                    motion->callbackTimer = 0;
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
                         *phase = phaseReset[0];
                     }
-                    motion->phaseTimer = zero;
+                    motion->phaseTimer = 0;
                 }
                 screen->endingPhase = 2;
             }
@@ -96,14 +94,13 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
         case 3:
             if ((s16)screen->endingTimer > 0x78) {
                 u32 *field = &screen->foreground.mode;
-                u32 zero = 0;
                 struct DisplaySequenceState *state;
-                *field = zero;
+                *field = 0;
                 screen->foreground.sequenceId = 3;
                 ReverseEndingPose(&screen->foreground);
                 state = &screen->foreground.sequence;
                 Anim_RestartSequence(state, screen->sequenceResource,
-                                     (u16)screen->foreground.sequenceId, 0, zero);
+                                     (u16)screen->foreground.sequenceId, 0, 0);
                 screen->targetX = 0x3C;
                 {
                     u16 *timer = &screen->targetMode;
@@ -113,13 +110,13 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     *timer = duration;
 
                     SetCallback((void (*)(void))SceneMover_InterpolateScreenX, &motion->callback);
-                    motion->callbackTimer = zero;
+                    motion->callbackTimer = 0;
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
                         *phase = phaseReset[0];
                     }
-                    motion->phaseTimer = zero;
+                    motion->phaseTimer = 0;
                 }
                 screen->endingPhase = 4;
             }
@@ -130,13 +127,12 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->endingFinished;
-                u32 one = 1;
-                *field = one;
+                *field = 1;
                 screen->foreground.sequenceId = 0;
                 state = &screen->foreground.sequence;
                 Anim_SetSequence(state, screen->sequenceResource, 0, 0, 0);
                 foreground = &screen->foreground;
-                StepPlaybackOne(foreground, state, one);
+                StepPlaybackOne(foreground, state, 1);
                 Trigger_ConsumePending(&((struct DepartureActor *)motion)->messages, 1);
             }
             break;

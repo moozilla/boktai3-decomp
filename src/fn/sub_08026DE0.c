@@ -69,7 +69,6 @@ void SceneActorGraphics_SelectResource(void *);
 void SceneActors_UpdateShrinkingReaction(ActorAnimation *p)
 {
     ActorAnimation *p2 = p;
-    u32 zero;
     if (p->changed) {
         int sequence;
         int angle;
@@ -86,9 +85,8 @@ void SceneActors_UpdateShrinkingReaction(ActorAnimation *p)
     }
     {
         u32 *dst = (u32 *)((u8 *)p + 0x33c);
-        zero = 0;
-        *dst = zero;
-        *((u8 *)p + 0x340) = zero;
+        *dst = 0;
+        *((u8 *)p + 0x340) = 0;
     }
     {
         u32 value;
@@ -100,6 +98,6 @@ void SceneActors_UpdateShrinkingReaction(ActorAnimation *p)
     if (p->minScale > 23)
         p->minScale -= 24;
     else
-        p->minScale = zero;
+        p->minScale = 0;
     decay(&p->maxScale);
 }

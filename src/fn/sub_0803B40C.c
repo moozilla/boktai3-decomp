@@ -189,11 +189,9 @@ initialize:
         Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), 16);
         Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), 16);
         {
-            int one;
             value.write = (struct ResultMenu *)((u8 *)p + (p->entered >> 8));
             value.write->state = zero;
-            one = 1;
-            value.write->entered = one;
+            value.write->entered = 1;
             value.write->timer = zero;
             {
                 u32 raw = p->entered;

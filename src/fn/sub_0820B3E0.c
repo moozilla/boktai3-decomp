@@ -3,11 +3,6 @@
 #include "scene_vec.h"
 #include "engine.h"
 #include "ram.h"
-struct FanSeq {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
-};
 struct EffectVector {
     s32 x : 16;
     u32 y : 16;
@@ -36,7 +31,7 @@ struct DragonPuppyCombatView {
     u16 blinkTimer;
     u8 unknownB2[0x56];
     void *update;
-    struct FanSeq animation;
+    struct DisplaySequenceState animation;
     u8 unknown11C[0xA];
     s16 health;
     s16 damage;
@@ -168,6 +163,6 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
             PUPPY_FIELD(spriteFlags) &= ~1;
     }
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&PUPPY_FIELD(spriteFlags),
-                           (struct DisplaySequenceState *)&PUPPY_FIELD(animation));
+                           &PUPPY_FIELD(animation));
     (PUPPY_FIELD(ticks))++;
 }

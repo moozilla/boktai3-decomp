@@ -36,7 +36,7 @@ void Anim_DrawDecimalDigits(struct DigitWidget *widget, void *graphics, s32 valu
     DIGIT(1)
 #undef DIGIT
     firstDigit = digitCount - width;
-    leading = ((0u - suppressZero) | suppressZero) >> 31;
+    leading = ((0 - suppressZero) | suppressZero) >> 31;
     screenX = x;
     for (digitIndex = 0; digitIndex < width; screenX += spacing, digitIndex++, widget++) {
         if (leading) {

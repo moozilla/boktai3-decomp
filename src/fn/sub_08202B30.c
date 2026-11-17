@@ -21,7 +21,6 @@ s32 Projectile_SpawnFromConfig(struct ProjectileConfig *params, struct ContactPo
     u8 *q;
     s32 magnitude;
     s32 angle;
-    u32 zero;
     struct DisplaySequenceSprite *o;
     if (!pool) {
         pool = ProjectilePool_Create();
@@ -39,7 +38,6 @@ s32 Projectile_SpawnFromConfig(struct ProjectileConfig *params, struct ContactPo
     ((struct ContactPosition *)q)->x = Truncate(magnitude * gUnk_086149C4[(angle + 0x40) & 0xff]);
     ((struct ContactPosition *)q)->y = 0;
     ((struct ContactPosition *)q)->z = Truncate(magnitude * gUnk_086149C4[angle & 0xff]);
-    zero = 0;
     q = (u8 *)&e->collider;
     Collider_SetAttackProperties(q, params->power, params->knockback, params->rewardFlags,
                                  params->attackFlags, params->immunity);
@@ -63,13 +61,13 @@ s32 Projectile_SpawnFromConfig(struct ProjectileConfig *params, struct ContactPo
     if (e->params.script) {
         e->scriptProc = ScriptProc_Start(0x922E, (u16)e->params.script);
         if (e->params.variants == 0) {
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, 0, zero);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, 0, 0);
         } else if (e->params.variants == 4) {
             u32 var = (((u16)e->params.angle + 0x60) >> 6) & 3;
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, zero);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0);
         } else {
             u32 var = (((u16)e->params.angle + 0x70) >> 5) & 7;
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, zero);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0);
         }
         {
             struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)o;

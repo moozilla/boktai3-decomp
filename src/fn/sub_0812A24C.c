@@ -19,25 +19,16 @@ static inline u8 EffectPool_IsUsed(u32 *used, u32 mask)
 }
 struct EffectPoolSlot *EffectPoolA_AllocateSlot(u8 *poolArg)
 {
-    u8 *pool = poolArg;
-    s32 i = 0;
-    u32 one = 1;
-    u8 *index = pool + 0x12F;
-    u8 *slot = pool + 0x3C;
-    struct EffectPoolSlot *result;
-    do {
-        if (!EffectPool_IsUsed((u32 *)(pool + 0x38), one << i)) {
-            Memory_Clear(slot, 0xFC);
-            *(u32 *)(pool + 0x38) |= one << i;
-            *index = i;
-            result = (struct EffectPoolSlot *)slot;
-            goto done;
+    struct EffectPool *pool = (void *)poolArg;
+    s32 i;
+    for (i = 0; i < 12; i++) {
+        if (!EffectPool_IsUsed(&pool->used, 1U << i)) {
+            struct EffectPoolSlot *slot = &pool->slots[i];
+            Memory_Clear(slot, sizeof(*slot));
+            pool->used |= 1U << i;
+            slot->index = i;
+            return slot;
         }
-        index += 0xFC;
-        slot += 0xFC;
-        (*(&i))++;
-    } while (i <= 11);
-    result = NULL;
-done:
-    return result;
+    }
+    return NULL;
 }

@@ -154,53 +154,53 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
             (menu->entryCount)++;
             goto allocationChanged;
         }
-    } else if (({
-                   inputState = 0x10;
-                   inputState &= key;
-                   inputState;
-               })) {
-        u16 *remaining = &menu->entryCount;
-        s32 index;
-        s32 stat;
-        s16 *adjustment;
-        struct Player *player;
-        if (!(*remaining)) {
-            goto refreshDisplay;
-        }
-        player = menu->actionOwner;
-        index = menu->rowIndex;
-        {
-            u32 offset = index << 1;
-            u8 *base;
-            u8 *stats = (u8 *)player->derivedStats;
-            stat = *(u16 *)(stats + offset);
-            base = (u8 *)menu->comparisonOffsets;
-            adjustment = (s16 *)(base + offset);
-        }
-        if ((stat + (*adjustment)) > 99) {
-            goto refreshDisplay;
-        }
-        if ((menu->comparisonValues[index] + (*adjustment)) > 99) {
-            goto refreshDisplay;
-        }
-        (*adjustment)++;
-        (*remaining)--;
-    allocationChanged:
-        Presentation_DrawEntryCount(menu);
-        InventoryGrid_LayoutStatMarkers(menu);
-        Sound_PlaySong(0x19a);
     } else {
-        if ((gPadState[1] & 1) && menu->comparisonModifier) {
-            Sound_PlaySong(0xdd);
-            menu->allocationDescription = 24;
-            PauseMenu_SetConfirmationIndicator(menu, 0);
-            MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, inputState);
-            Hud_SetInteractionCallback(menu, MenuSelection_ProcessConfirmation, 1);
-        } else if (gPadState[1] & 2) {
-            Sound_PlaySong(0xde);
-            Presentation_InitListValues(menu);
+        inputState = 0x10;
+        inputState &= key;
+        if (inputState) {
+            u16 *remaining = &menu->entryCount;
+            s32 index;
+            s32 stat;
+            s16 *adjustment;
+            struct Player *player;
+            if (!(*remaining)) {
+                goto refreshDisplay;
+            }
+            player = menu->actionOwner;
+            index = menu->rowIndex;
+            {
+                u32 offset = index << 1;
+                u8 *base;
+                u8 *stats = (u8 *)player->derivedStats;
+                stat = *(u16 *)(stats + offset);
+                base = (u8 *)menu->comparisonOffsets;
+                adjustment = (s16 *)(base + offset);
+            }
+            if ((stat + (*adjustment)) > 99) {
+                goto refreshDisplay;
+            }
+            if ((menu->comparisonValues[index] + (*adjustment)) > 99) {
+                goto refreshDisplay;
+            }
+            (*adjustment)++;
+            (*remaining)--;
+        allocationChanged:
             Presentation_DrawEntryCount(menu);
             InventoryGrid_LayoutStatMarkers(menu);
+            Sound_PlaySong(0x19a);
+        } else {
+            if ((gPadState[1] & 1) && menu->comparisonModifier) {
+                Sound_PlaySong(0xdd);
+                menu->allocationDescription = 24;
+                PauseMenu_SetConfirmationIndicator(menu, 0);
+                MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, inputState);
+                Hud_SetInteractionCallback(menu, MenuSelection_ProcessConfirmation, 1);
+            } else if (gPadState[1] & 2) {
+                Sound_PlaySong(0xde);
+                Presentation_InitListValues(menu);
+                Presentation_DrawEntryCount(menu);
+                InventoryGrid_LayoutStatMarkers(menu);
+            }
         }
     }
     do {
@@ -276,14 +276,12 @@ s32 SceneCatalog_GetLevelScaledValue(struct SceneHudState *s)
 void MenuSelection_DrawNumericSummary(struct SceneHudState *s)
 {
     if (s->actionOwner->actionMode != 6) {
-        s32 zero;
         s32 max;
         s32 divisor;
         s32 value;
         Hud_DrawDecimalDigits(Hud_GetMinimum(gGameState->level, 99), 10, 21, 3, 0);
-        zero = 0;
         value = Hud_GetMinimum(gGameState->rewardTotal, max = 999999);
-        Hud_DrawDecimalDigits(value, divisor = 100000, 23, 4, zero);
+        Hud_DrawDecimalDigits(value, divisor = 100000, 23, 4, 0);
         if (gGameState->level > 98) {
             u16 *p = Hud_GetTilemapCell(0, 23, 5);
             s32 i;
@@ -293,7 +291,7 @@ void MenuSelection_DrawNumericSummary(struct SceneHudState *s)
             } while (++i < 6);
         } else {
             Hud_DrawDecimalDigits(Hud_GetMinimum(SceneCatalog_GetLevelScaledValue(s), max),
-                                       divisor, 23, 5, zero);
+                                       divisor, 23, 5, 0);
         }
     } else {
         Hud_DrawDecimalDigits(Hud_GetMinimum(gGameState->level + 10, 99), 10, 21, 3, 0);
@@ -345,7 +343,6 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
 {
     struct Player *p;
     s32 neg;
-    u32 zero;
     PauseMenu_CloseTextWindows(s);
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
@@ -376,26 +373,25 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     PauseMenu_SetPromptIconPositions(s, 0, 8);
     neg = -1;
     PauseMenu_SetPairedIcons(s, 1, neg);
-    zero = 0;
-    InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, zero);
-    InventoryPanel_UpdateSelectedEquipment(s, 26, 7, 0, zero);
+    InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(s, 26, 7, 0, 0);
     if (!s->entryCount) {
         s->categoryWidgets[5].flags |= 1;
         s->allocationDescription = 0xFF;
         SceneCatalog_SetDescription(s, neg);
         Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
-        MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, zero);
+        MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
     } else {
         struct SceneInputWidget *obj = &s->comparisonIndicators[0];
         u32 n;
         obj->flags &= ~1;
-        s->comparisonIndicators[0].position.x = zero;
+        s->comparisonIndicators[0].position.x = 0;
         s->comparisonIndicators[0].position.y = 8;
         n = s->rowIndex + 20;
         s->allocationDescription = n;
         SceneCatalog_SetDescription(s, (s8)s->allocationDescription);
         Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
-        MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, zero);
+        MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
     {
         u16 *reg = &gDispCntShadow;

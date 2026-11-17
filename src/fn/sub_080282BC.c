@@ -70,12 +70,10 @@ void SceneActors_UpdateBlinkReaction(ActorAnimation *p, int tick)
     int done;
     if (p->changed) {
         int sequence;
-        int one;
         p->changed = 0;
         {
             int test = p->mode;
-            one = 1;
-            test &= one;
+            test &= 1;
             sequence = 70;
             if (test)
                 sequence = 32;
@@ -83,7 +81,7 @@ void SceneActors_UpdateBlinkReaction(ActorAnimation *p, int tick)
         {
             int offset = 0x240;
             SceneActors_StartUnmirroredAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence,
-                                                 one, 4);
+                                                 1, 4);
         }
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }

@@ -39,8 +39,6 @@ void StageResults_UpdateRecordBlink(struct StageResults *);
 void Sound_PlaySong(u32);
 void MessagePanel_UpdateExitDelay(struct StageResults *);
 
-#define SCORE (*(s16 *)((u8 *)gGameState + 0x7b2))
-
 #define CLAMP(x, max)                                                                              \
     {                                                                                              \
         s32 r_ = (x);                                                                              \
@@ -82,12 +80,14 @@ void sub_08112508(struct StageResults *p)
         SceneGauge_SelectThresholdFrame(p, total);
         p->record = StageResults_RecordStagePerformance();
         {
-            s32 sum = SCORE + total;
+            s32 sum = gGameState->clockDisplayValue + total;
+            s16 *score;
             if (sum > 9999)
                 sum = 9999;
             else if (sum < 0)
                 sum = 0;
-            SCORE = sum;
+            score = &gGameState->clockDisplayValue;
+            *score = sum;
         }
         StageResults_ShowTimeDigits(p, 8, elapsed);
         StageResults_ShowTimeDigits(p, 14, timeScore);

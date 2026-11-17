@@ -8,7 +8,6 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
 
     s32 x, z;
     u32 value;
-    CellGateUpdate callback;
     u32 cell;
     gate->id = id;
     gate->registered = 0;
@@ -49,21 +48,16 @@ s32 CellGate_InitializeFromScript(struct CellGate *gate, u32 id)
     gate->scriptId = value;
     {
         u32 flags = gate->flags;
-        if (flags & 1) {
-            *(&callback) = CellGate_UpdatePassageBarrier;
-            goto assign;
-        }
-        {
+        if (flags & 1)
+            gate->update = CellGate_UpdatePassageBarrier;
+        else {
             u32 mask = 2;
             mask &= flags;
-            if (mask) {
-                callback = CellGate_UpdateForcedDirection;
-                goto assign;
-            }
+            if (mask)
+                gate->update = CellGate_UpdateForcedDirection;
+            else
+                gate->update = CellGate_UpdateConditionalBarrier;
         }
-        callback = CellGate_UpdateConditionalBarrier;
-    assign:
-        gate->update = callback;
     }
     return 0;
 }

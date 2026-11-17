@@ -9,7 +9,7 @@ static inline s32 Divide32(s32 value)
 {
     if (value >= 0)
         return value >> 5;
-    return -((s32)(0u - (u32)value) >> 5);
+    return -((s32)(0 - (u32)value) >> 5);
 }
 u8 SceneActorBehavior_RequestDescriptorTurn(struct RoomActor *actor,
                                             struct SceneActorBehaviorDestination *descriptor,

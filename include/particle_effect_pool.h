@@ -37,17 +37,17 @@ struct SceneParticlePool {
     struct Task task;
     void *resource;
     struct SceneParticle particles[26];
-    volatile u32 occupied;
+    u32 occupied;
 };
 
 typedef void (*SceneParticleUpdate)(struct SceneParticlePool *, struct SceneParticle *);
 
-static inline volatile u32 *SceneParticlePool_SlotMask(struct SceneParticlePool *pool)
+static inline u32 *SceneParticlePool_SlotMask(struct SceneParticlePool *pool)
 {
     return &pool->occupied;
 }
 
-static inline u8 SceneParticlePool_IsOccupied(volatile u32 *occupied, s32 index)
+static inline u8 SceneParticlePool_IsOccupied(u32 *occupied, s32 index)
 {
     if (*occupied & (1 << index))
         return TRUE;

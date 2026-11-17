@@ -44,7 +44,7 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
                     table = low;
                 }
                 do {
-                    if (Occupied(used, 1u << i)) {
+                    if (Occupied(used, 1 << i)) {
                         struct BouncingObject *slot =
                             (void *)((u32)i * sizeof(*slots) + (u32)slots);
                         table[slot->state](pool, slot);

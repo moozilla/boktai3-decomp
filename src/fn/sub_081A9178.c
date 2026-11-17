@@ -70,9 +70,8 @@ static inline u8 IsComplete(struct DashActor *p)
 static inline void SetPolar(struct Vector *v, s32 angle, s32 radius)
 {
     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * radius);
 }
 
@@ -132,9 +131,8 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             MotionTrack_Update(self->track);
             if (IsComplete(self)) {
                 u8 next = 2;
-                u32 zero = 0;
                 p->phase = next;
-                p->timer = zero;
+                p->timer = 0;
             } else {
                 VanargandAfterimagePool_Spawn(self->afterimages, p->position);
             }

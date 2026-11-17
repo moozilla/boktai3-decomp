@@ -53,11 +53,9 @@ static inline u8 reset(u8 *p)
     if (old & one) {
         s32 mask = ~1;
         s32 value = mask;
-        s32 zero;
         value &= old;
-        zero = 0;
         flag->flags = value;
-        p[0x12e] = zero;
+        p[0x12e] = 0;
         return 1;
     }
     return 0;

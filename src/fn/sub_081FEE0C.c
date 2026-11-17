@@ -30,7 +30,7 @@ s32 SpriteParticle_UpdateManager(struct Pool *pool)
     struct Entry *base = pool->e, *cursor;
     s32 i;
     for (i = 0, cursor = base; i <= 31; i++, cursor++, base++) {
-        if (pool->mask & (1u << i)) {
+        if (pool->mask & (1 << i)) {
             struct ContactSwarmSprite *o = &base->sprite;
             int done = 0;
             if (sub_08249240(base, i, cursor->callback) == 1) {

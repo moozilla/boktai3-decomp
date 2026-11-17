@@ -487,18 +487,14 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
         options[6] = 3;
     }
     if (Script_SeekToKeyword('A')) {
-        s32 *arg;
+        s32 argument;
         base = arguments;
-        arg = base;
-        do {
-            s32 value = Script_GetPc();
-            if (value) {
-                *(&value) = Script_GetValue();
-                *arg = value;
-            } else
-                *arg = value;
-            arg++;
-        } while ((s32)arg <= (s32)(base + 3));
+        for (argument = 0; argument < 4; argument++) {
+            if (Script_GetPc())
+                base[argument] = Script_GetValue();
+            else
+                base[argument] = 0;
+        }
     } else {
         s32 *arg, *begin;
         s32 zero;

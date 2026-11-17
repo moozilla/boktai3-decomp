@@ -98,13 +98,12 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
             struct Ghost *p = s->base.context;
             void *fn = SceneActorControl_OnIdle;
             u8 code = 0x10;
-            u8 one = 1;
             u8 zero8;
             u32 *flags;
             u32 two;
             u8 linked;
 
-            s->base.field2B2 = one;
+            s->base.field2B2 = 1;
             s->base.stepDone = zero;
             s->base.controlKind = code;
             s->base.target = fn;
@@ -121,7 +120,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
             s->base.phase2A9 = two;
             s->base.behavior2AA = zero8;
             s->base.counter2AC = zero;
-            s->base.field2B1 = one;
+            s->base.field2B1 = 1;
             Ghost_EnableCollider(&s->base.colliderB);
             Ghost_EnableCollider(&s->base.colliderA);
             {
@@ -657,8 +656,6 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
     {
         u32 mask = 0x4000;
         u16 *flags;
-        u32 zero;
-        u32 one;
         u16 masked;
         u32 test = actor->base.motionFlags & mask;
         flags = &actor->base.motionFlags;
@@ -673,8 +670,7 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
         if (!masked) {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            one = (actor->base.field2B2 = 1);
-            zero = 0;
+            actor->base.field2B2 = 1;
             actor->base.stepDone = masked;
             actor->base.controlKind = kind;
             actor->base.target = callback;
@@ -687,11 +683,11 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
             actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
-                actor->base.state2A8 = one;
-                actor->base.phase2A9 = zero;
+                actor->base.state2A8 = 1;
+                actor->base.phase2A9 = 0;
                 actor->base.behavior2AA = behavior;
                 actor->base.counter2AC = masked;
-                actor->base.field2B1 = one;
+                actor->base.field2B1 = 1;
             }
         }
     }
@@ -2053,8 +2049,7 @@ static inline void Hide(struct ChaseActor *input)
     {
         u32 *flags = actor->base.drawable;
         u32 value = *flags;
-        u32 one = 1;
-        *flags = value | one;
+        *flags = value | 1;
     }
     {
 
@@ -2144,8 +2139,7 @@ void Ghost_TickVisibilityTransition(struct ChaseActor *input)
                 {
                     u32 *field = actor->base.drawable;
                     u32 value = *field;
-                    u32 one = 1;
-                    *field = value | one;
+                    *field = value | 1;
                 }
                 {
                     u32 mask = ~0x40;
@@ -3046,7 +3040,6 @@ static inline void Ghost_InstallPrimaryCallbacks(struct ChaseActor *actor, void 
                                                  void *cb234, void *defaultReaction,
                                                  void *targetQuery, void *damage, void *contact)
 {
-    u32 zero = 0;
     u32 mask = 0x2000;
     MonsterInit_SetBehaviorFlags(actor, mask);
     actor->base.onUpdate = cb274;

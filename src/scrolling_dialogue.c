@@ -12,21 +12,19 @@ void ScrollingDialogue_ClearTextArea(struct ScrollingDialogue *dialogue)
 int ScrollingDialogue_ResetPlayback(struct ScrollingDialogue *dialogue, int clear)
 {
     struct MessagePlaybackState *text = &dialogue->text;
-    int zero;
     s32 *row;
     if (clear)
         ScrollingDialogue_ClearTextArea(dialogue);
     row = &dialogue->row;
-    zero = 0;
-    *row = zero;
-    dialogue->column = zero;
-    dialogue->ticks = zero;
-    dialogue->scrolling = zero;
+    *row = 0;
+    dialogue->column = 0;
+    dialogue->ticks = 0;
+    dialogue->scrolling = 0;
     dialogue->delay = 30;
-    dialogue->blocked = zero;
-    dialogue->wait = zero;
+    dialogue->blocked = 0;
+    dialogue->wait = 0;
     text->pc = dialogue->script;
-    text->stream = zero;
+    text->stream = 0;
     text->wrap = 2;
     TextState_Reset(text);
 }

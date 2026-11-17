@@ -1,12 +1,6 @@
 #include "global.h"
 #include "player_cue_sequence.h"
 
-// Exact with register-pinning and empty-asm concessions.
-struct NidhoggrPoolSequence {
-    const volatile u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
 struct NidhoggrEffectMotion {
     u16 x, y, z, unknown6;
 };
@@ -23,7 +17,7 @@ struct NidhoggrAnimatedSlot {
     void (*onComplete)(struct NidhoggrAnimatedSlot *);
     u8 animationData[0x1c];
     struct NidhoggrPoolSprite sprite;
-    struct NidhoggrPoolSequence sequence;
+    struct DisplaySequenceState sequence;
     struct NidhoggrEffectMotion motion;
     u8 lifetime;
     u8 unknown69[3];

@@ -44,8 +44,9 @@ s32 SceneActorTarget_ResolvePendingObject(struct ChaseActor *actor)
             *flags = mask;
         }
         {
-            u32 mask = 0x10;
-            state->flags = (*(&mask)) | state->flags;
+            u32 flags = 0x10;
+            flags |= state->flags;
+            state->flags = flags;
         }
         {
             u8 *object = SceneActorContacts_FindObjectById(*pendingId);

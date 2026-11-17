@@ -29,7 +29,6 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
         PauseMenu_SmoothPoint(&p->motionWidgets[0].position, &p->actionTargets[0],
                               12 - p->actionTransferDelay);
     } else {
-        s32 zero;
         p->motionWidgets[0].flags |= 1;
         Sound_PlaySong(0x10C);
         GameState_EquipConsumableSlot(p->actionSelection);
@@ -43,8 +42,7 @@ void SceneHud_TickStatTransfer(struct SceneHudState *p)
             differences[i] = value - Player_GetCurrentAttribute(i);
         }
         SceneHud_DrawComparisonBars(p, 10, 6, differences);
-        zero = 0;
-        InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, zero);
-        InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, zero);
+        InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, 0);
+        InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, 0);
     }
 }

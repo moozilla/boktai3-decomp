@@ -15,7 +15,7 @@ s32 SceneParticlePool_Destroy(struct SceneParticlePool *input)
     u32 *used = &pool->used;
     slot = pool->slots;
     for (i = 0; i < 8; slot++, i++) {
-        if (Occupied(used, 1u << i)) {
+        if (Occupied(used, 1 << i)) {
             s32 index = slot->index;
             Effect_Remove(&pool->effects[index]);
         }

@@ -128,9 +128,8 @@ static inline s32 RandomOffset(s32 base)
 static inline void SetPhase(struct Vanargand *p, u32 phase)
 {
     u32 next = phase;
-    u32 zero = 0;
     p->phase = next;
-    p->timer = zero;
+    p->timer = 0;
 }
 static inline void SetPhasePointer(u8 *phase, u32 *timer, u32 value)
 {

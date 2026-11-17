@@ -93,9 +93,8 @@ static inline void Vg_SetFlags(struct VanargandBoss *actor, u32 mask)
 }
 static inline void Vg_ChangePhase(struct VanargandBoss *actor, u32 next)
 {
-    u32 zero = 0;
     actor->phase = next;
-    actor->timer = zero;
+    actor->timer = 0;
 }
 static inline void Vg_SetPalette(struct VanargandBoss *actor, u32 first, u32 last, u32 frame)
 {

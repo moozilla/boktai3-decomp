@@ -304,32 +304,30 @@ void SceneActor14_Shutdown(void)
 
 s32 SceneActor14_UpdateAnimState(struct SceneActor14 *actor)
 {
-    union {
-        struct SceneActor14Manager *manager;
-        void *animation;
-    } data;
+    struct SceneActor14Manager *manager;
+    void *animation;
     s32 idx;
-    data.manager = gAnimatedBodyPool;
+    manager = gAnimatedBodyPool;
 
     if (actor->animationFlags & 1) {
         if (actor->state == -1 && actor->frame > actor->frameLimit) {
-            Anim_SetKeyframes(actor, data.manager->animation, gUnk_086106F0[0x12], 2, 0);
+            Anim_SetKeyframes(actor, manager->animation, gUnk_086106F0[0x12], 2, 0);
             return 0;
         }
         if (actor->state == 0 && !(gEngineFlags & 0x800))
             Sound_PlaySong(0x1A8);
         if (actor->state == 1 && actor->counter > 0) {
-            data.animation = data.manager->animation;
-            Anim_SetKeyframes(actor, data.animation, gUnk_086106F0[actor->base + actor->state], 2,
+            animation = manager->animation;
+            Anim_SetKeyframes(actor, animation, gUnk_086106F0[actor->base + actor->state], 2,
                               0);
-            Anim_Step(actor, data.animation);
+            Anim_Step(actor, animation);
             return 0;
         }
         actor->state += actor->step;
         idx = actor->base + actor->state;
         if (actor->state == 3) {
             s32 b = actor->slot;
-            data.manager->used &= ~(1 << b);
+            manager->used &= ~(1 << b);
             actor->flags |= 1;
             Anim_Remove(actor);
             if (actor->bodyFlags & 1)
@@ -339,11 +337,11 @@ s32 SceneActor14_UpdateAnimState(struct SceneActor14 *actor)
             actor->phase = 2;
             return 1;
         }
-        data.animation = data.manager->animation;
-        Anim_SetKeyframes(actor, data.animation, gUnk_086106F0[idx], 2, 0);
-        Anim_Step(actor, data.animation);
+        animation = manager->animation;
+        Anim_SetKeyframes(actor, animation, gUnk_086106F0[idx], 2, 0);
+        Anim_Step(actor, animation);
     } else {
-        Anim_Step(actor, data.manager->animation);
+        Anim_Step(actor, manager->animation);
     }
     if (actor->state == 1)
         actor->counter--;

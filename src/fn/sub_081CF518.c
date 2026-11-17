@@ -15,9 +15,8 @@ struct Npc081CF518 {
 void SceneNpc_UpdateBlinkWithCallback(void *ctx, struct Npc081CF518 *npc)
 {
     if (npc->entered) {
-        s32 zero = 0;
-        npc->entered = zero;
-        npc->done = zero;
+        npc->entered = 0;
+        npc->done = 0;
         npc->timer = 16;
     }
     if (npc->callback(npc) != 1) {

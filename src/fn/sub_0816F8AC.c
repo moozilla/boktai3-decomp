@@ -30,11 +30,9 @@ void PauseMenu_BeginTypeFourteenItemUse(u8 *s)
     s32 result;
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
-    do {
-        ScrollingDialogue_RequestHide();
-        kind = s + 0x438A;
-        index = (*kind) + 10;
-    } while (0);
+    ScrollingDialogue_RequestHide();
+    kind = s + 0x438A;
+    index = (*kind) + 10;
     {
         u32 off = index * sizeof(struct E);
         u8 *base = s + 0x1428;

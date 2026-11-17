@@ -50,10 +50,8 @@ void Palette_CopyBank(void *, const void *);
 void TimePalette_InitTransition(struct TimePalette *palette, const u16 *phase12, const u16 *phase3,
                                 const u16 *otherPhases)
 {
-    u32 zero;
     s32 source;
     source = TimePalette_GetSourceIndex(SunClock_GetPhase());
-    zero = 0;
     palette->from = source;
     palette->to = source;
     palette->sources[0] = phase12;
@@ -61,5 +59,5 @@ void TimePalette_InitTransition(struct TimePalette *palette, const u16 *phase12,
     palette->sources[2] = otherPhases;
     Palette_CopyBank(palette->colors, palette->sources[source]);
     palette->update = TimePalette_UpdateTransition;
-    palette->onComplete = (void *)zero;
+    palette->onComplete = (void *)0;
 }

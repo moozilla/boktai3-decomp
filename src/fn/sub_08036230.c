@@ -51,7 +51,6 @@ void Wireless_BeginChildTransfer(struct Engine *p)
     struct RfuLinkStatus **links;
     u8 *buffer;
     void *listener;
-    int zero;
     Bg_ClearTilemap(0);
     index = 0;
     {
@@ -76,7 +75,6 @@ void Wireless_BeginChildTransfer(struct Engine *p)
             } while (*next != (*cursor)->my.id);
         }
     }
-    zero = 0;
     p->flag1f = index;
     Wireless_InitPacketQueue(p->message);
     Memory_Clear((u8 *)p + 0xB8, 12);
@@ -86,7 +84,7 @@ void Wireless_BeginChildTransfer(struct Engine *p)
     RfuManager_SetMscCallback(Wireless_OnChildTransferReceiveRequest);
     rfu_setRecvBuffer(32, p->index, buffer, 12);
     p->phase = 2;
-    setOperation(p, 24, zero);
+    setOperation(p, 24, 0);
     listener = *(void **)((u8 *)p + 0x4C);
     if (listener) {
         Script_Call(listener, 0);

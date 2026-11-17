@@ -10,7 +10,7 @@ static inline s32 ScaleProduct(s32 product)
     if (product >= 0)
         product >>= 16;
     else
-        product = -((s32)(0u - (u32)product) >> 16);
+        product = -((s32)(0 - (u32)product) >> 16);
     return product;
 }
 u8 SceneActorBehavior_AccelerateTowardDescriptor(struct RoomActor *actor,

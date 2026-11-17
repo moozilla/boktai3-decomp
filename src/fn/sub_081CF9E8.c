@@ -16,11 +16,10 @@ struct Npc {
 void SceneNpc_UpdateRisingToTerrain(void *ctx, struct Npc *npc, s32 tick)
 {
     if (npc->entered) {
-        s32 zero = 0;
-        npc->entered = zero;
-        npc->done = zero;
+        npc->entered = 0;
+        npc->done = 0;
         Actor_PlayAnimationEntry(npc, 13, 2, 0, 4);
-        npc->phase = zero;
+        npc->phase = 0;
     }
     {
         u32 mask = 0x409;

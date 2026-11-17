@@ -13,7 +13,6 @@ void SceneCharacter_UpdateCommands(void *ctx, struct StateActor *p);
 void SceneCharacter_WaitForState0EAndResume(void *ctx, struct StateActor *p)
 {
     u32 one;
-    u32 zero;
     if (p->enterCommand != 0) {
         p->enterCommand = 0;
         p->done = 0;
@@ -21,9 +20,8 @@ void SceneCharacter_WaitForState0EAndResume(void *ctx, struct StateActor *p)
     }
     if (p->done != 0) {
         one = 1;
-        zero = 0;
         p->state = one;
-        p->timer = zero;
+        p->timer = 0;
         p->enterCommand = one;
         Trigger_ConsumePending(p->receiver, 1);
     }

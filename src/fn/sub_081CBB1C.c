@@ -79,9 +79,8 @@ void sub_081CBB1C(void *unused, struct Actor *arg)
 {
     struct Actor *p = arg;
     if (p->entered) {
-        int zero = 0;
-        p->entered = zero;
-        p->done = zero;
+        p->entered = 0;
+        p->done = 0;
     }
     {
         struct Vec *pos = &p->pos;

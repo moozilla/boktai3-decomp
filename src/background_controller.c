@@ -456,20 +456,19 @@ s32 Background_LoadMapFromScript(void)
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
-    if (!({
-            u8 found = FALSE;
-            u8 *arg;
-            if (Script_SeekToKeyword('i') && (arg = Script_GetPc())) {
-                index = Script_ReadValue(arg);
-                found = TRUE;
-            } else
-                index = 0;
-            found;
-        }) &&
-        Script_SeekToKeyword('c')) {
-        u8 *p = Script_GetPc();
-        if (p)
-            index = (u16)Background_FindMapId(&resource, Script_ReadValue(p));
+    {
+        u8 found = FALSE;
+        u8 *arg;
+        if (Script_SeekToKeyword('i') && (arg = Script_GetPc())) {
+            index = Script_ReadValue(arg);
+            found = TRUE;
+        } else
+            index = 0;
+        if (!found && Script_SeekToKeyword('c')) {
+            u8 *p = Script_GetPc();
+            if (p)
+                index = (u16)Background_FindMapId(&resource, Script_ReadValue(p));
+        }
     }
     Bg_SetLayerMap(layer, base, index);
     return index;
@@ -535,25 +534,12 @@ done:
 
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args)
 {
-    u32 commandType = type;
-    s32 lengthLimit = length;
-    s32 *input = args;
     struct Background *p = gBackgrounds[layer];
     if (p && p->queue.count <= 7) {
         s32 j;
-        p->queue.types[p->queue.count] = commandType;
-        j = 0;
-        if (j < lengthLimit) {
-            /* Retain the original count reload on each argument copy. The byte offset
-             * is commands[count].args[j]; this operand order keeps agbcc's index order. */
-            volatile u32 *count = &p->queue.count;
-            struct BackgroundCommand *commands = p->queue.commands;
-            s32 *source = input;
-            do {
-                *(s16 *)((u8 *)commands + ((j << 1) + (*count << 4))) = *source++;
-                j++;
-            } while (j < length);
-        }
+        p->queue.types[p->queue.count] = type;
+        for (j = 0; j < length; j++)
+            p->queue.commands[p->queue.count].args[j] = args[j];
         p->queue.count++;
     }
 }

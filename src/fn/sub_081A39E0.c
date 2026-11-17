@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_cue_sequence.h"
 #include "engine_globals.h"
 #include "ram.h"
 
@@ -10,11 +11,6 @@ struct Types {
 struct Vec {
     s16 x, y, z, pad;
 };
-struct Animation {
-    const u16 *data;
-    u8 flags, count, duration, rate;
-    u16 frame, unknownA, scale, timer;
-};
 struct Entry {
     u32 flags;
     u8 pad4[0xc];
@@ -22,7 +18,7 @@ struct Entry {
     u8 pad12[0xa];
     struct Vec position;
     u8 pad24[8];
-    struct Animation animation;
+    struct DisplaySequenceState animation;
     u8 collider[0xa8];
     struct Vec velocity;
     u8 padEC[0x6c];
@@ -39,8 +35,6 @@ extern const u32 gUnk_0824F760[4];
 s32 sub_08249350(s32, s32);
 void *Player_GetEffectivePosition(s32);
 s32 Hresvelgr_GetHomingShotTargetAngle(void *, void *);
-void Collider_SetPosition(void *, void *, s32);
-void Collider_Refresh(void *);
 s32 Mod(s32, s32);
 void *MotionEntry_CreateConfigured(void *, s32, s32, s32, u32, s32);
 void EffectEntry_Release(void *);
@@ -75,60 +69,9 @@ static inline void AddVelocity(struct Vec *out, struct Vec *position, struct Vec
         out->z = velocity->z + z;
     }
 }
-static inline u8 MaskFlags(u8 input, u32 mask)
-{
-    return input & mask;
-}
 static inline void Animate(struct Entry *p)
 {
-    struct Animation *a = &p->animation;
-    const volatile u16 *entry = a->data + a->frame;
-    p->tile = *entry >> 6;
-    {
-        u8 input = *(const volatile u8 *)&a->flags;
-        u32 mask = 1;
-        u32 left = MaskFlags(input, mask);
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            p->flags |= 4;
-        else
-            p->flags &= ~4;
-    }
-    {
-        u8 input = *(const volatile u8 *)&a->flags;
-        u32 mask = 2;
-        u32 left;
-        left = MaskFlags(input, mask);
-        left = (u8)left;
-        if (left != (((*entry & 0x30) >> 4) & mask))
-            p->flags |= 8;
-        else
-            p->flags &= ~8;
-    }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
-        if (a->flags & 4) {
-            if (a->frame == 0) {
-                if (a->flags & 8)
-                    a->timer = a->rate;
-                else
-                    a->frame = a->count - 1;
-            } else
-                a->frame--;
-        } else {
-            if (++a->frame >= a->count) {
-                if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
-                } else
-                    a->frame = 0;
-            }
-        }
-        entry = a->data + a->frame;
-        a->duration = *entry & 15;
-        a->rate = (a->duration * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
-    }
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)p, &p->animation);
 }
 static inline u32 Frame(struct Entry *p)
 {

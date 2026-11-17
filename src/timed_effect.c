@@ -97,7 +97,6 @@ void TimedEffect_RemoveFromManager(struct TimedEffectManager *manager, struct Ti
 {
     struct TimedEffectConfig *config = &effect->config;
     struct ContactSwarmSprite *sprite;
-    u32 one;
     u32 flags;
     if (!(config->flags & 0x2010))
         manager->categoryCounts[config->category]--;
@@ -105,10 +104,9 @@ void TimedEffect_RemoveFromManager(struct TimedEffectManager *manager, struct Ti
     Task4E01_ClearTrailSprites(manager);
     sprite = &effect->sprite;
     flags = sprite->flags;
-    one = 1;
-    sprite->flags = flags | one;
+    sprite->flags = flags | 1;
     Sprite_Remove(sprite);
-    manager->activeMask &= ~(one << slot);
+    manager->activeMask &= ~(1 << slot);
 }
 
 /* sub_081DA1DC.c */
@@ -144,9 +142,8 @@ static inline s32 trunc12(s32 x)
 static inline void polar(struct ContactPosition *v, s32 angle, s32 speed)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle & 255] * speed);
 }
 
@@ -220,9 +217,8 @@ static inline s32 Scale(s32 value)
 static inline void Polar(struct ContactPosition *output, s32 direction, s32 speed)
 {
     s32 x = Scale(gUnk_086149C4[(direction + 64) & 255] * speed);
-    s32 zero = 0;
     output->x = x;
-    output->y = zero;
+    output->y = 0;
     output->z = Scale(gUnk_086149C4[direction & 255] * speed);
 }
 s32 TimedEffect_UpdateManager(struct TimedEffectManager *manager)

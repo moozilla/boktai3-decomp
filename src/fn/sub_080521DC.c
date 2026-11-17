@@ -13,7 +13,6 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
         u32 index = *rng + 1;
         u32 mask = 1023;
         u32 mask31;
-        u32 zero;
         u32 sample;
         u32 coordinate;
         u32 scratch;
@@ -25,7 +24,6 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
         mask31 = 31;
         sample &= mask31;
         coordinate += sample;
-        zero = 0;
         particle->position.x = coordinate;
         index += 1;
         index &= mask;
@@ -41,7 +39,7 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
         particle->position.z = coordinate;
         particle->life = 24;
         {
-            u32 zeroX = zero;
+            u32 zeroX = 0;
             particle->velocityX = zeroX;
         }
         index += 1;
@@ -54,7 +52,7 @@ void StackedActor_InitRisingParticle(struct StackedActorParticle *particle,
             u32 sample = random[index];
             particle->velocityY = -((sample & mask31) + 32);
         }
-        scratch = zero;
+        scratch = 0;
         particle->velocityZ = scratch;
         particle->flags &= ~1;
         particle->enabled = 1;

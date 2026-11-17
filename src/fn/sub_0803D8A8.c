@@ -2,19 +2,17 @@
 s32 ScenePool_ResumeAfterIdle(u8 *owner, struct ScenePoolEntry *entry)
 {
     if ((s8)owner[0x5ec] <= 0 && entry->idleFrame > 79) {
-        s32 zero = 0;
-        entry->idleFrame = zero;
+        entry->idleFrame = 0;
         if (entry->direction > 0) {
-            s32 one = 1;
             do { /* scope block steers register allocation */
-                entry->state = one;
+                entry->state = 1;
             } while (0);
-            entry->stateFrame = zero;
-            entry->stateEntered = one;
+            entry->stateFrame = 0;
+            entry->stateEntered = 1;
             Memory_Clear(entry->history, 0x100);
         } else {
             entry->state = 2;
-            entry->stateFrame = zero;
+            entry->stateFrame = 0;
             entry->stateEntered = 1;
             Memory_Clear(entry->history, 0x100);
         }

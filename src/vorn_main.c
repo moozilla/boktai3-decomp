@@ -487,17 +487,16 @@ static inline u8 TakePrepared(u8 *field)
 static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
     u8 *prepared = &actor->base.field2B2;
-    u32 zero = 0;
     *prepared = 1;
-    actor->base.stepDone = zero;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
-        actor->base.pendingControl = zero;
+        actor->base.pendingControl = 0;
         actor->base.pendingControl =
             *(u32 *)&actor->base.onAlternateEntry; /* a u32 read keeps the store above */
         actor->base.pendingControlData = 0;
@@ -2169,15 +2168,9 @@ void Vorn_InitMotionLimits(struct PInitMotionLimits *p)
 static inline u8 Vorn_TryRoute(struct ChaseActor *actor, void *route,
                                struct ContactPosition *position, struct ContactPosition *target)
 {
-    s32 result = ({
-        void *route_owner_ = (route);
-        struct ContactPosition *route_position_ = (position);
-        struct ContactPosition *route_target_ = (target);
-        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);
-        if (route_status_)
-            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);
-        route_status_;
-    });
+    s32 result = Nav_IsPositionInMesh(route, position, target);
+    if (result)
+        result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(SceneActorChase_MotionOf(actor), 8);
@@ -2537,10 +2530,9 @@ void SceneActor_TrySoloAction(struct Vorn *p)
         p->chase.base.counter2AC = zero;
         p->chase.base.field2B1 = 1;
         {
-            u32 one = 1;
             void *callback = SceneActorReaction_UpdateFacingAttack;
             u32 mode = 0x2A;
-            p->chase.base.field2B2 = one;
+            p->chase.base.field2B2 = 1;
             p->chase.base.stepDone = zero;
             p->chase.base.controlKind = mode;
             p->chase.base.target = callback;

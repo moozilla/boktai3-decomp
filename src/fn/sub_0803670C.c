@@ -46,9 +46,8 @@ extern void *gUnk_086056EC[];
 void Wireless_UpdateParentNiSession(struct Engine *argument)
 {
     struct Engine *p = argument;
-    volatile u8 *busy = &gWirelessSessionState;
     u8 *lost;
-    while (*busy == 1)
+    while (gWirelessSessionState == 1)
         ;
     sub_08223BC0(0);
     lost = &p->flag35;

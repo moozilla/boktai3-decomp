@@ -9,7 +9,6 @@ static inline s32 truncateShift12(s32 value)
 void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor *slot, s32 index)
 {
     struct ContactPosition delta;
-    u32 zero;
     u32 frame;
     u32 speed;
     if (slot->enter) {
@@ -47,7 +46,6 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         write->y = 0;
         write->z = truncateShift12(gUnk_086149C4[direction] * speed);
     }
-    zero = 0;
     {
         struct ContactPosition *position = &slot->position;
         const struct ContactPosition *origin = &slot->origin;
@@ -74,9 +72,9 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
                 if (index <= 7)
                     slot->targetIndex = 1;
                 else
-                    slot->targetIndex = zero;
+                    slot->targetIndex = 0;
             } else if (mode == 1)
-                slot->targetIndex = zero;
+                slot->targetIndex = 0;
             else {
                 mode = 255;
                 slot->targetIndex = mode;

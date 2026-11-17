@@ -5,19 +5,12 @@ void BackgroundFlash_UpdateDisappearing(struct BackgroundFlashController *contro
 {
     u32 visible;
     u32 flags;
-    u32 previous;
     u32 frame;
-    do {
-        BackgroundFlash_TakeEntryFlag(controller);
-        visible = 0x200;
-        previous = gDispCntShadow;
-    } while (0);
-    flags = visible;
-    flags |= previous;
-    do {
-        gDispCntShadow = flags;
-        frame = controller->stateFrame;
-    } while (0);
+    BackgroundFlash_TakeEntryFlag(controller);
+    visible = 0x200;
+    flags = gDispCntShadow | 0x200;
+    gDispCntShadow = flags;
+    frame = controller->stateFrame;
     if (frame <= 9) {
         if (!(frame & 1))
             gDispCntShadow = flags & ~visible;

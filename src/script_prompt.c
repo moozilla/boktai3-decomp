@@ -126,7 +126,6 @@ void ScriptPrompt_Destroy(struct ScriptPromptScreen *p)
 
 s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
 {
-    u32 zero;
     u32 layer;
     u32 resourceBank;
     void *background;
@@ -140,29 +139,28 @@ s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
     u16 **savedPalette;
     u16 *colors;
     Bg_ClearTilemap(0);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     background = ScriptProc_Start(0xC091, 0x3536);
     layer = 5;
-    Bg_SetupLayers(2, 0, background, 0, zero, 1, &layer);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    Bg_SetupLayers(2, 0, background, 0, 0, 1, &layer);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     palette = ((struct ScriptPromptPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
     CpuSet(palette, gBgPaletteBuffer, 0x100);
     resourceBank = 0xCB05;
     resource = ScriptProc_Start(resourceBank, 0xE2AB);
     frameResource = &s->widgets[0].resource;
     ResourceHeader_Relocate(frameResource, resource);
-    Widget_InitLinked(&s->widgets[0], frameResource, 0x37, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[0], frameResource, 0x37, 0x10, 0, 0, 0, 0);
     resource = ScriptProc_Start(resourceBank, 0x530D);
     acceptResource = &s->widgets[1].resource;
     ResourceHeader_Relocate(acceptResource, resource);
-    Widget_InitLinked(&s->widgets[1], acceptResource, 0x4B, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[1], acceptResource, 0x4B, 0x10, 0, 0, 0, 0);
     cancelResource = &s->widgets[2].resource;
     ResourceHeader_Relocate(cancelResource, resource);
-    Widget_InitLinked(&s->widgets[2], cancelResource, 0x4C, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[2], cancelResource, 0x4C, 0x10, 0, 0, 0, 0);
     savedPalette = &s->savedPalette;
     widgetPalette = &s->widgets[1].sprite.palette;
     sourcePalette = *widgetPalette;
@@ -171,7 +169,7 @@ s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
     CpuSet(sourcePalette, colors, 0x10);
     *widgetPalette = colors;
     s->widgets[2].sprite.palette = colors;
-    s->fadeSpeed = zero;
+    s->fadeSpeed = 0;
     Menu_StartFadeIn(0);
     ScriptPrompt_ResetDisplay(s);
     return 0;

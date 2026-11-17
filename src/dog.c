@@ -7,6 +7,7 @@
 #include "scene_actor_palette.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
+#include "scene_actor_turn.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_state.h"
 #include "scene_actor_registry.h"
@@ -1755,56 +1756,6 @@ static inline void DogTurn_SetControl(struct DogTurnState *a, void *control, u32
     a->motionCounter = 0;
 }
 
-static inline void DogTurn_SelectAnimation(struct DogTurnState *a, u32 selection, u32 variant,
-                                           u32 flags)
-{
-    u32 force;
-    if (flags & 0x10) {
-        force = 0x10;
-        flags &= ~0x10;
-    } else
-        force = 0;
-    if (!a->drawableKind) {
-        struct SceneActorAnimationSequenceDrawable *drawable;
-        a->selection = selection;
-        drawable = a->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
-                         (u8)variant, (u8)flags);
-    } else {
-        struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)a->drawable)->tile;
-        u8 *savedSelection;
-        selection += variant;
-        {
-            u8 *selectionAddress = &a->selection;
-            u32 previous = *selectionAddress;
-            savedSelection = selectionAddress;
-            if (!force && previous == selection && !a->restart) {
-                if (flags == 1 && (tile->flags & 4))
-                    return;
-                if (flags == 0 && !(tile->flags & 4))
-                    return;
-            }
-        }
-        *savedSelection = selection;
-        {
-            u32 mask = 4;
-            u32 mode;
-            if (flags & mask)
-                mode = 6;
-            else
-                mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                              a->drawable, (u16)selection, 2, (u16)mode);
-            if (flags & 1)
-                tile->flags |= mask;
-            else
-                tile->flags &= ~4;
-        }
-    }
-    a->restart = 0;
-}
-
 void Dog_UpdateCardinalTurn(struct DogTurnState *a)
 {
     struct DogTurnBody *body = &a->body;
@@ -1838,37 +1789,37 @@ void Dog_UpdateCardinalTurn(struct DogTurnState *a)
         switch (direction) {
             case 0:
                 if ((u32)(target - 2) <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 1, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 0, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 1:
                 if ((u32)(target - 4) <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 2, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 3, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 0);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 2:
                 if ((u32)(target - 1) > 4) {
-                    DogTurn_SelectAnimation(a, 13, 3, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 1);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 2, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 3:
                 if ((u32)target <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 0, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 1, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
@@ -2454,19 +2405,17 @@ static inline u8 TakePending(u8 *flag)
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
-    u32 zero;
     actor->base.field2B2 = 1;
-    zero = 0;
-    actor->base.stepDone = zero;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.pendingControl = zero;
+    actor->base.pendingControl = 0;
 }
 
 void Dog_UpdateLeapWindup(struct ChaseActor *actor)
@@ -2876,14 +2825,12 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
-            u32 zero;
             field = (void *)((u8 *)actor + fieldOffset);
             mask = ~0x141C0;
             *field &= mask;
-            zero = 0;
-            control->counter = zero;
-            control->field14 = zero;
-            control->timer = zero;
+            control->counter = 0;
+            control->field14 = 0;
+            control->timer = 0;
         }
         {
             u16 *colliderFlags = (u16 *)((u8 *)actor + 0x13A);
@@ -3200,34 +3147,10 @@ struct Sscripted {
 void Dog_UpdateScriptedAction(struct Sscripted *obj)
 {
     if (TakeFlag(((u8 *)obj) + 0x2B1)) {
-        void (*fn)(void) = Dog_UpdateArrivalAnimation;
-        u8 code = 10;
-        u32 zero;
-        u32 *f;
-        s32 mask;
         u16 *h;
         u16 value;
         s32 off;
-        {
-            u8 *taken = &obj->taken;
-            zero = 0;
-            *taken = 1;
-        }
-        do {
-            u32 field = 0x2B0;
-            do {
-                ((u8 *)obj)[field] = zero;
-            } while (0);
-            field += 5;
-            ((u8 *)obj)[off = field] = code;
-            obj->callback = fn;
-            field += 0x13;
-            *((u16 *)(((u8 *)obj) + field)) = zero;
-        } while (0);
-        f = (u32 *)(((u8 *)obj) + 0x114);
-        mask = -2;
-        *f &= mask;
-        *((u32 *)(((u8 *)obj) + 0x104)) = zero;
+        SceneActorChase_SetControl(obj, Dog_UpdateArrivalAnimation, 10);
         {
             u32 byte = obj->atE9;
             obj->at59 = byte;

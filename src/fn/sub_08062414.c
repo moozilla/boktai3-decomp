@@ -60,9 +60,8 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 index = p->grid.savedSelection - 16;
                 u8 *page = &catalog->page;
                 s8 *entries;
-                s32 offset = *page * 8;
+                s32 offset = index + *page * 8;
                 s32 value;
-                *(&offset) = index + offset;
                 entries = catalog->catalog;
                 value = SceneItemValue_GetItemBaseValue(entries[offset]);
                 ((struct SceneInventoryFunds *)gGameState)->funds -= value;
@@ -76,13 +75,11 @@ s32 SceneInventory_TickPurchaseTransition(struct SceneInventoryTail *p)
                 s32 index = p->grid.savedSelection - 16;
                 u8 *page = &catalog->page;
                 s8 *entries;
-                s32 offset = *page * 8;
+                s32 offset = index + *page * 8;
                 s32 value;
-                *(&offset) = index + offset;
                 entries = catalog->catalog;
                 GameState_GetConsumableDescriptor(entries[offset]);
-                offset = *page * 8;
-                offset = index + offset;
+                offset = index + *page * 8;
                 Inventory_SetConsumableEntry(destination, entries[offset]);
                 index += *page * 8;
                 entries += index;

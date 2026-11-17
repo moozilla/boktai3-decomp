@@ -57,19 +57,17 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
 }
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
-    u32 zero;
     a->base.field2B2 = 1;
-    zero = 0;
-    a->base.stepDone = zero;
+    a->base.stepDone = 0;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0;
 }
 static inline void State(struct ChaseActor *a)
 {

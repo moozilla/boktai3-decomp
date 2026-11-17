@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ram.h"
 
 struct SpriteGroupEntry {
     u8 pad[10];
@@ -11,7 +12,6 @@ struct SpriteGroup {
     u32 used;
     struct SpriteGroupEntry entries[8];
 };
-extern struct SpriteGroup *volatile gSpriteGroup;
 void Sprite_Remove(void *);
 static inline u8 Occupied(u32 *used, u32 mask)
 {
@@ -26,7 +26,7 @@ s32 SpriteGroup_RemoveSprites(struct SpriteGroup *pool)
     u32 *used = &pool->used;
     struct SpriteGroupEntry *entry = pool->entries;
     for (; i < 8; entry++, i++) {
-        if (Occupied(used, 1u << i))
+        if (Occupied(used, 1 << i))
             Sprite_Remove(pool->sprites + entry->slot * 0x2c);
     }
     zero = 0;

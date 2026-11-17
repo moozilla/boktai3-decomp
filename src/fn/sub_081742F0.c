@@ -25,7 +25,6 @@ void ScrollingDialogue_HideImmediately(void);
 void Hud_InitInventoryMenu(u8 *s)
 {
     u8 *p;
-    u32 zero;
     PauseMenu_CloseTextWindows(s);
     Hud_SetupBackgroundLayer(s, *(u32 *)(s + 0x18), 0, 6, *(u32 *)(s + 0x2C));
     PauseMenu_HideAllSprites(s);
@@ -37,9 +36,8 @@ void Hud_InitInventoryMenu(u8 *s)
     p = *(u8 **)(s + 0xA40);
     Hud_DrawDefaultEnergyMeter(s, 1, 2, 14, *(u16 *)(p + 0x428), *(u16 *)(p + 0x42A));
     Hud_DrawHeaderCounter();
-    zero = 0;
-    InventoryPanel_UpdateSelectedUnlock(s, 8, 3, 0, zero);
-    InventoryPanel_UpdateSelectedEquipment(s, 8, 4, 0, zero);
+    InventoryPanel_UpdateSelectedUnlock(s, 8, 3, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(s, 8, 4, 0, 0);
     MenuDisplay_SnapshotValues(s);
     MenuDisplay_DrawStatComparison(s, 10, 6);
     PauseInventory_InitItemCursors(s);
@@ -49,6 +47,6 @@ void Hud_InitInventoryMenu(u8 *s)
     Hud_SetInteractionCallback(s, Hud_UpdateInventoryMenuInput, 0);
     PauseMenu_SetPromptIconPositions(s, 0, 0);
     MenuDisplay_UpdateActionPrompt(s, 2);
-    MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, zero);
+    MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
     ScrollingDialogue_HideImmediately();
 }

@@ -409,7 +409,6 @@ void ResultScreen_Destroy(struct ResultScreen *p)
 
 s32 ResultScreen_Initialize(struct ResultScreen *s)
 {
-    u32 zero;
     u32 value;
     u32 bank;
     u32 size;
@@ -424,26 +423,25 @@ s32 ResultScreen_Initialize(struct ResultScreen *s)
     u32 *save;
     u8 *dest;
     Bg_ClearTilemap(0);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     a = ScriptProc_Start(0xC091, 0x3536);
     value = 11;
-    Bg_SetupLayers(2, 0, a, 0, zero, 1, &value);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    Bg_SetupLayers(2, 0, a, 0, 0, 1, &value);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     p = ((struct ModeMenuPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
     CpuSet(p, gBgPaletteBuffer, size = 0x100);
     bank = 0xCB05;
     q = ScriptProc_Start(bank, 0xE2AB);
     obj = &s->widgets[0].resource;
     ResourceHeader_Relocate(obj, q);
-    Widget_InitLinked(&s->widgets[0].sprite, obj, 0x3C, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[0].sprite, obj, 0x3C, 0x10, 0, 0, 0, 0);
     q = ScriptProc_Start(bank, 0x530D);
     obj2 = &s->widgets[1].resource;
     ResourceHeader_Relocate(obj2, q);
-    Widget_InitLinked(&s->widgets[1].sprite, obj2, 0x80, 0x10, zero, zero, zero, zero);
+    Widget_InitLinked(&s->widgets[1].sprite, obj2, 0x80, 0x10, 0, 0, 0, 0);
     s->fadeShift = 3;
     return Menu_StartFadeIn(3);
 }

@@ -56,7 +56,7 @@ DItype Libgcc_MultiplyInt64(DItype u, DItype v)
     DIunion w;
     DIunion uu, vv;
     uu.ll = u, vv.ll = v;
-    w.ll = ({
+    {
         DIunion __w;
         do {
             USItype __x0, __x1, __x2, __x3;
@@ -77,9 +77,9 @@ DItype Libgcc_MultiplyInt64(DItype u, DItype v)
             (__w.s.low) = ((USItype)(__x1) % (1L << ((sizeof(SItype) * 8) / 2))) *
                               (1L << ((sizeof(SItype) * 8) / 2)) +
                           ((USItype)(__x0) % (1L << ((sizeof(SItype) * 8) / 2)));
-        } while (0);
-        __w.ll;
-    });
+        } while (0); // concession-ok(once-loop): GCC libgcc/longlong.h umul_ppmm expansion, called by libgcc2.c __muldi3
+        w.ll = __w.ll;
+    }
     w.s.high += ((USItype)uu.s.low * (USItype)vv.s.high + (USItype)uu.s.high * (USItype)vv.s.low);
     return w.ll;
 }

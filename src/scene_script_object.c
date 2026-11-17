@@ -156,13 +156,11 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptObject *object)
         u32 mask;
         struct ContactPosition *v;
         s16 *parameterPtr;
-        s32 zero;
         statePtr = &object->state;
         parameterPtr = &object->parameter;
         position = &object->sprite.position;
         mask = 0x3ff;
         v = &velocity;
-        zero = 0;
         do {
             s32 kind = (i & 1) ? (0x400) : (0x200);
             u32 table = 0x0203B400;
@@ -186,9 +184,9 @@ void SceneScriptObject_UpdateBurst(struct SceneScriptObject *object)
             index = (index + 1) & mask;
             gRandomIndex = index;
             threshold = ((AdvanceAndSample(&table, index) >> 4) & 0x7f) + 0x20;
-            sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, zero,
-                         PaletteIndex(*statePtr, *parameterPtr), zero, i & 1, zero, zero, zero,
-                         zero);
+            sub_08127590(position, &velocity, 0x83A6, 0x99CB, *statePtr, threshold, kind, 0,
+                         PaletteIndex(*statePtr, *parameterPtr), 0, i & 1, 0, 0, 0,
+                         0);
             i++;
         } while (i <= 3);
     }

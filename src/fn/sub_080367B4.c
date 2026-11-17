@@ -74,10 +74,9 @@ int Wireless_UpdateControllerTask(struct Engine *p)
             break;
     }
     if (p->flag3d) {
-        int zero = 0;
-        p->flag3d = zero;
+        p->flag3d = 0;
         sub_082238F0(1);
-        setOperation(p, zero, zero);
+        setOperation(p, 0, 0);
     }
     if (p->pad1d) {
         gClockSynced = 0;

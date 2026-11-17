@@ -244,21 +244,13 @@ void Palette_InterpolateBanks(void *, void *, void *, int, int);
 void ScenePaletteFade_BlendPaletteBanks(u8 *destination, u8 *first, u8 *second, int frame,
                                         int shift, int banks)
 {
-    if (banks > 0) {
-        u8 *secondBank = second;
-        u8 *firstBank = first;
-        u8 *destinationBank = destination;
-        int count = banks;
-        /* do-while(0) only keeps agbcc's block layout */
-        do {
-            Palette_InterpolateBanks(destinationBank, firstBank, secondBank, frame, shift);
-            secondBank += 0x20;
-            firstBank += 0x20;
-            /* do-while(0) only keeps agbcc's block layout */
-            do {
-                destinationBank += 0x20;
-            } while (0);
-        } while (--count);
+    u16 (*outputBank)[16] = (u16 (*)[16])destination;
+    u16 (*firstBank)[16] = (u16 (*)[16])first;
+    u16 (*secondBank)[16] = (u16 (*)[16])second;
+    int bank;
+    for (bank = 0; bank < banks; bank++) {
+        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank],
+                                 frame, shift);
     }
 }
 

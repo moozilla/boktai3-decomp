@@ -141,9 +141,8 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
                 Vanargand_SetPairedMotionParameter(self->pair, self->parameter584);
                 {
                     u8 next = 2;
-                    u32 zero = 0;
                     p->phase = next;
-                    p->timer = zero;
+                    p->timer = 0;
                 }
             }
             break;

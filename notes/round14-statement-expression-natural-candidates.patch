@@ -1,0 +1,90 @@
+diff --git a/src/terrain_modifier.c b/src/terrain_modifier.c
+--- a/src/terrain_modifier.c
++++ b/src/terrain_modifier.c
+@@ -240,10 +240,7 @@
+         position.y = Script_GetValue();
+         position.z = Script_GetValue();
+         cell = cellIndex((struct TerrainVec *)&position);
+-        height = ({
+-            s32 value = heightLevel(((struct TerrainVec *)&position)->y);
+-            value;
+-        });
++        height = heightLevel(((struct TerrainVec *)&position)->y);
+     } else {
+         height = -1;
+         cell = height;
+diff --git a/src/golem_2.c b/src/golem_2.c
+--- a/src/golem_2.c
++++ b/src/golem_2.c
+@@ -245,16 +245,9 @@
+ static inline u8 Golem_TryRoute(struct ChaseActor *actor, void *route,
+                                 struct ContactPosition *position, struct ContactPosition *target)
+ {
+-    s32 result = ({
+-        void *route_owner_ = (route);
+-        struct ContactPosition *route_position_ = (position);
+-        struct ContactPosition *route_target_ = (target);
+-        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);
+-        if (route_status_)
+-            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);
+-        route_status_;
+-    });
+-    if (result) {
++    s32 result;
++    if (Nav_IsPositionInMesh(route, position, target) &&
++        (result = Terrain_ApplyBlocked(route, position, target))) {
+         if (result != 2)
+             Memory_Clear(SceneActorChase_MotionOf(actor), 8);
+         return 1;
+diff --git a/src/dog.c b/src/dog.c
+--- a/src/dog.c
++++ b/src/dog.c
+@@ -2083,20 +2083,14 @@
+ {
+     s32 x = Mod(cell, Dog_MapWidth(SceneActorChase_CurrentMap()));
+     s32 z = Div(cell, Dog_MapWidth(SceneActorChase_CurrentMap()));
+-    position->x = ({
+-        s32 grid_coordinate_ = (x);
+-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
+-    });
++    position->x = (s16)(((u32)x << 8) + 0x80);
+     {
+         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
+         u32 height = 15;
+         height &= attributes;
+         position->y = SceneActorChase_TerrainLevelHeight(height);
+     }
+-    position->z = ({
+-        s32 grid_coordinate_ = (z);
+-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
+-    });
++    position->z = (s16)(((u32)z << 8) + 0x80);
+ }
+ 
+ static inline u8 Dog_Arrive(void *obj)
+diff --git a/src/mummy_entry.c b/src/mummy_entry.c
+--- a/src/mummy_entry.c
++++ b/src/mummy_entry.c
+@@ -4185,20 +4185,14 @@
+ {
+     s32 x = Mod(cell, Mummy_MapWidth(SceneActorChase_CurrentMap()));
+     s32 z = Div(cell, Mummy_MapWidth(SceneActorChase_CurrentMap()));
+-    position->x = ({
+-        s32 grid_coordinate_ = (x);
+-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
+-    });
++    position->x = (s16)(((u32)x << 8) + 0x80);
+     {
+         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
+         u32 height = 15;
+         height &= attributes;
+         position->y = SceneActorChase_TerrainLevelHeight(height);
+     }
+-    position->z = ({
+-        s32 grid_coordinate_ = (z);
+-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
+-    });
++    position->z = (s16)(((u32)z << 8) + 0x80);
+ }
+ 
+ static inline void Mummy_BeginTurn_path(void *obj, u32 saved, const u16 *randomSamples)

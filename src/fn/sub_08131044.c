@@ -12,24 +12,22 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
 {
     u32 offset;
-    u32 zero;
     {
         u8 *field = &actor->base.field2B2;
-        zero = 0;
         *field = 1;
     }
     offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
+    *((u8 *)actor + offset) = 0;
     actor->base.controlKind = kind;
     offset -= 0x94;
     *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = ~1;
         *flags &= mask;
     }
-    actor->base.pendingControl = zero;
+    actor->base.pendingControl = 0;
 }
 
 static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)

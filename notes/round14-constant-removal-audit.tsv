@@ -1,0 +1,736 @@
+source	function	local	baseline_line	result	accepted_commit
+src/actor_ability.c	Modifier_InitFourthSourceEffect	zero	209	removed	793cf84b72ded675e57aefd71e9b964d976591a2
+src/actor_controller_motion.c	ActorController_SetMotion	zero	17	open	
+src/actor_controller_motion.c	ActorController_UpdateRetreatMotion	one	40	removed	d5e25016c74adcac379cdc41e23f6b948bccfb97
+src/actor_controller_motion.c	ActorController_UpdateTimedMotion	one	74	open	
+src/actor_glyph_trail.c	ActorGlyphTrail_HideParticles	one	142	open	
+src/actor_impact.c	ActorImpact_TestForwardPoint	zero	204	open	
+src/actor_impact.c	ActorImpact_FindNearbyPoint	zero	258	open	
+src/actor_pool.c	ActorPool_InitManager	zero	85	open	
+src/actor_position_effects.c	ActorPosition_StartReaction	one	145	open	
+src/actor_position_effects.c	ActorPosition_BeginReaction	zero	192	open	
+src/actor_position_search.c	ActorMovement_FindQuarterTurnPoint	zero	35	open	
+src/actor_recoil.c	ActorRecoil_ReceiveBodyContact	one	159	open	
+src/actor_recoil.c	ActorRecoil_InitCollisionVolumes	one	311	removed	83889e68aa88fe3076e5562b76140551561eae1c
+src/animated_hazard.c	AnimatedHazard_Initialize	zero	34	open	
+src/animated_hazard.c	AnimatedHazard_Create	zero	442	open	
+src/animated_hazard.c	AnimatedHazard_CreateProximity	zero	495	open	
+src/animated_tile.c	Pool1BC_FindByName	one	45	open	
+src/animation_widget.c	Anim_SelectWidgetGlyph	zero	96	removed	193f4797790fd6d2e81d113af26d3ea8d150ca0e
+src/armor_motion.c	Armor_EnterFacingAnimation	one	165	open	
+src/armor_motion.c	Armor_UpdateRunMotion	zero	357	open	
+src/armor_motion.c	Armor_UpdatePositiveTurn	one	580	open	
+src/armor_motion.c	Armor_UpdateNegativeTurn	one	630	open	
+src/background_controller.c	Background_LoadTilesFromScript	zero	518	open	
+src/background_controller.c	sub_08002284	zero	584	open	
+src/background_layers.c	Bg_ResetDisplay	zero	87	open	
+src/ballistic_sprite_effect.c	BallisticSpriteEffect_DestroyManager	zero	95	open	
+src/bat_restore.c	Bat_RestoreSavedState	one	139	open	
+src/bat_restore.c	Bat_UpdateDefeat	zero	963	removed	e45f7f5b98c79bab1ad727d55d6d7629eabf7728
+src/bat_restore.c	Bat_UpdateDefeat	one	964	removed	e45f7f5b98c79bab1ad727d55d6d7629eabf7728
+src/blend_transition.c	BlendFade_ClearCoefficients	zero	30	open	
+src/challenge_menu.c	ChallengeMenu_InitializeKeyframes	zero	354	open	
+src/character_model.c	ActorStats_ApplyPendingDamage	zero	613	removed	e2608019ced4f485e2cae6e4e2e04297afbb5acb
+src/character_model.c	SceneActorStyle_InitializeFromGameState	zero	771	removed	e2608019ced4f485e2cae6e4e2e04297afbb5acb
+src/character_model.c	SceneActorStyle_Initialize	zero	809	open	
+src/child_group.c	ChildGroup_LaunchNextInactiveMember	one	91	open	
+src/child_group.c	ChildGroup_WaitForInactiveMembers	one	153	open	
+src/child_group.c	EnterState_3848	zero	433	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	ChildGroup_TakeEntryFlag	zero	528	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	EnterState_3ABC	zero	620	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	EnterState_3B60	zero	723	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	EnterState_3CC4	zero	834	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	EnterState_3F48	zero	954	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/child_group.c	EnterState_40C8	zero	1030	removed	89a12df042be3e0c67225f47a17e03d980eb38d5
+src/clock_events.c	ClockEvents_Update	zero	29	open	
+src/clock_events.c	ClockEvents_Initialize	one	91	open	
+src/contact_actor_display.c	ContactActor_ApplyHealthContact	zero	68	removed	51dd675f31fdece10fd791259edf575962480168
+src/contact_impact_effect.c	ContactImpactEffect_UpdateBlinkFrame	one	300	removed	29fdab04a7b3d175def64b6776c217ddc9524fce
+src/contact_sequence_actor.c	ContactSequenceActor_SetState	zero	26	removed	62d059ba2934ecc6039b33ea3597a43a032f78b2
+src/control_panel.c	ControlPanel_Destroy	zero	567	open	
+src/control_panel.c	ControlPanel_InitializeFromScript	zero	664	open	
+src/countdown_controller.c	Countdown_Tick	zero	26	open	
+src/crow.c	Crow_BeginScriptedAction	one	800	open	
+src/crow.c	Crow_BeginReaction	one	1181	open	
+src/crow.c	Crow_ResetReturnState	one	1596	open	
+src/crow.c	Crow_ResetReturnState	zero	1598	open	
+src/crow.c	Crow_ReturnToGround	one	1612	open	
+src/crow.c	Crow_ReturnToGround	zero	1614	open	
+src/damage_number_display.c	DamageNumberDisplay_Initialize	zero	370	removed	b6b753e559474df3ff7a80a6cf4e9c105fd5a077
+src/dark_loan.c	DarkLoan_UpdateBalanceDigits	zero	93	open	
+src/dark_loan.c	DarkLoan_HideSprites	one	203	open	
+src/dark_loan.c	DarkLoan_BeginOpening	zero	222	removed	6a2ae41a85abd64b27437bcb6f45ad8b3a272b88
+src/dark_loan.c	DarkLoan_FinishOpening	zero	244	removed	6a2ae41a85abd64b27437bcb6f45ad8b3a272b88
+src/dark_loan.c	DarkLoan_BeginAlternateOpening	zero	333	removed	6a2ae41a85abd64b27437bcb6f45ad8b3a272b88
+src/date_entry_menu.c	DateMenu_HideAnimations	one	11	open	
+src/dialogue_transition.c	DialogueTransition_UpdateSkipFadeOut	zero	80	removed	904f8cadacc079e607bc82f55bcb1e81f17d84c4
+src/dialogue_transition.c	DialogueTransition_LoadFromScript	zero	117	removed	904f8cadacc079e607bc82f55bcb1e81f17d84c4
+src/effect_emitter.c	EffectEmitter_Initialize	zero	97	removed	ec0a609b9e899209f520dc6b4e606ad9922ee19e
+src/falling_objects.c	FallingObject_Create	one	142	removed	aa02996f4d25c99ae36440c5da7a9ea13c480807
+src/falling_objects.c	FallingObject_UpdateFalling	one	309	open	
+src/falling_objects.c	FallingObject_UpdateFalling	zero	310	removed	aa02996f4d25c99ae36440c5da7a9ea13c480807
+src/field_hud.c	MeterDisplay_InitializeWidgets	zero	286	open	
+src/floating_item_effect.c	FloatingEffect_Init	zero	5	removed	b716b2dc1832d8faf3cda0ff87308d7be19715d6
+src/floating_item_effect.c	FloatingEffect_Init	one	6	removed	b716b2dc1832d8faf3cda0ff87308d7be19715d6
+src/floating_item_effect.c	FloatingEffect_RiseAndSettle	zero	181	removed	b716b2dc1832d8faf3cda0ff87308d7be19715d6
+src/floating_item_effect.c	FloatingEffectManager_Destroy	zero	301	open	
+src/fn/sub_08001590.c	Boot_ClearReservedWords	zero	11	open	
+src/fn/sub_080177AC.c	Weather_SpawnTerrainParticles	one	120	open	
+src/fn/sub_0801C24C.c	sub_0801C24C	zero	67	removed	08ca647c56b0a25e84137c2654a509c09bc2237d
+src/fn/sub_0801C69C.c	ResultGame_SetUpdateCallback	zero	6	open	
+src/fn/sub_0801CAF0.c	ResultGame_ScorePress	zero	21	open	
+src/fn/sub_0801E630.c	SceneObjects_SetActive	one	8	open	
+src/fn/sub_0801E630.c	SceneObjects_SetActive	zero	9	open	
+src/fn/sub_0801E698.c	SceneObjects_SetInactive	zero	9	open	
+src/fn/sub_0801E700.c	SceneObjects_Lock	one	7	removed	0e042da8f5c65787e64f3527791a21d6ec505c78
+src/fn/sub_0801E998.c	SceneObjects_ScriptLower	one	29	open	
+src/fn/sub_0801E998.c	SceneObjects_ScriptLower	zero	31	removed	669aaedcbc83382b74f9957198852c71c0739223
+src/fn/sub_0801EA70.c	SceneObjects_ScriptPromote	zero	19	open	
+src/fn/sub_0801EC4C.c	SceneObject_InitPlacement	zero	44	open	
+src/fn/sub_0801EFDC.c	SceneObject_AnimateActive	one	17	open	
+src/fn/sub_0801F5EC.c	SceneObject_InitSlotPlacement	zero	44	open	
+src/fn/sub_0802048C.c	SceneObjects_Init	zero	11	open	
+src/fn/sub_0802533C.c	SceneActorAnimation_UpdateLungeAttack	zero	113	open	
+src/fn/sub_08025550.c	SceneActorAnimation_UpdateHomingLunge	zero	117	open	
+src/fn/sub_08025714.c	SceneActorAnimation_UpdateRecoilSlide	zero	82	open	
+src/fn/sub_080257D0.c	SceneActorAnimation_UpdateChargeSlide	zero	93	open	
+src/fn/sub_08026398.c	SceneActorAnimation_UpdateImpactRelease	zero	76	removed	b3b6c2140a516879e4ad5d84496cb4f808dc2c83
+src/fn/sub_0802667C.c	effect	zero	70	removed	749d3d11ec4382ad9921298b2cf1791766f2e5e3
+src/fn/sub_08026AA4.c	SceneActors_UpdateRouteProjectileAttack	zero	100	open	
+src/fn/sub_08026C38.c	SceneActors_UpdateTravelProjectileAttack	zero	100	open	
+src/fn/sub_08026DE0.c	SceneActors_UpdateShrinkingReaction	zero	72	removed	a0747def663e344530ae2c8f1eafb0d4c27bfeb5
+src/fn/sub_08026EB4.c	SceneActors_UpdateKnockbackReaction	zero	72	removed	f46b70b97418b321809c993d627cacf208ea4799
+src/fn/sub_08026FF0.c	sub_08026FF0	zero	89	removed	06318d3526b845dd317b327236b19dcb9080d26a
+src/fn/sub_08026FF0.c	sub_08026FF0	one	150	open	
+src/fn/sub_08027214.c	sub_08027214	zero	133	removed	77be4309403c28356b2d88ca0e191c4fea8d47ce
+src/fn/sub_08027AD4.c	SceneActors_UpdateContractingShake	one	75	removed	59fde7f77f7eeb3427a602d11ec4f55e4669f3c4
+src/fn/sub_08027AD4.c	SceneActors_UpdateContractingShake	zero	122	open	
+src/fn/sub_08027BF0.c	SceneActors_UpdateExpandingShake	one	70	removed	0fe117faf0ca29aaba15ea95c748bf69176fcd4e
+src/fn/sub_08027BF0.c	SceneActors_UpdateExpandingShake	zero	103	open	
+src/fn/sub_080280CC.c	add	zero	58	removed	7d850287b304ea3b756da134f35c8e7e0f6e7149
+src/fn/sub_080282BC.c	SceneActors_UpdateBlinkReaction	one	73	removed	fe52d43b7049aebc573e770bef928b39a710958a
+src/fn/sub_080284FC.c	Vampire_SetState	zero	68	removed	be604630db095287928a65c6f53d1c694cc976fc
+src/fn/sub_080289FC.c	sub_080289FC	zero	225	open	
+src/fn/sub_08030710.c	SceneActorManager_Update	zero	32	open	
+src/fn/sub_0803209C.c	Text_FormatDecimal	zero	8	open	
+src/fn/sub_08032254.c	TextState_ParseTagValue	one	28	removed	5bff3c844512e36c345913b09b3ec7ec6bbc2a86
+src/fn/sub_0803232C.c	TextState_ProcessTag	zero	289	open	
+src/fn/sub_08032C80.c	TextState_Init	zero	18	removed	9b45067b73cc6a61e999df8db1d604b10e66b2ed
+src/fn/sub_080340AC.c	WirelessController_ResetSession	zero	40	removed	da1cfefcc989576248c8e4add06eac74de460af6
+src/fn/sub_08034178.c	WirelessController_ResetPeerExchange	zero	37	removed	3884f9aead8d9ac22723fe1bea045af7745c1491
+src/fn/sub_080341E0.c	WirelessController_PollInputExchange	one	64	removed	b76d458b1c28b01fe24877d5a4446123e9fef10e
+src/fn/sub_08034C28.c	Wireless_StartChildSearch	one	70	removed	9614d195b0d2a74c329e155279fb1941d679177c
+src/fn/sub_08034CA0.c	Wireless_StartParentSearch	one	68	removed	8e5474890e94a45dc18330300dca3e30aea63743
+src/fn/sub_0803524C.c	Wireless_ResetAfterError	zero	47	removed	57f3b5ab2e4abcf1500ab0e6335ba66fb9bddd9a
+src/fn/sub_08035320.c	Wireless_UpdateUniAcknowledgedSlots	zero	47	open	
+src/fn/sub_080356FC.c	Wireless_OnParentUniSessionEvent	zero	150	open	
+src/fn/sub_08035864.c	Wireless_OnChildUniSessionEvent	zero	135	open	
+src/fn/sub_08035D58.c	Wireless_OnParentNiSessionEvent	zero	145	open	
+src/fn/sub_0803614C.c	Wireless_OnChildTransferEvent	zero	120	open	
+src/fn/sub_08036778.c	Wireless_UpdateChildNiSession	zero	55	open	
+src/fn/sub_080367B4.c	Wireless_UpdateControllerTask	zero	77	removed	9164c3786d38c24a36d170b30963febb8c56861e
+src/fn/sub_080368AC.c	Wireless_InitControllerFromScript	one	36	open	
+src/fn/sub_08036910.c	Wireless_CreateController	one	90	removed	3896a90f9efc3d7171ef21ac6461f2f7bdc25925
+src/fn/sub_080380C4.c	WirelessGameMenu_LoadBackground	zero	50	removed	6063bbe3aab4a65be83239a373e07b6ccaf70635
+src/fn/sub_08038688.c	WirelessGameMenu_UpdateStartupDelay	zero	16	open	
+src/fn/sub_08038764.c	WirelessGameMenu_UpdateSelection	zero	30	removed	639dfd68b406a845a6a1e371bfd0ca353fd2e53f
+src/fn/sub_08038838.c	WirelessGameMenu_UpdateSelectionExchange	zero	88	open	
+src/fn/sub_080389AC.c	WirelessGameMenu_UpdateRoundPreparation	zero	40	open	
+src/fn/sub_080389AC.c	WirelessGameMenu_UpdateRoundPreparation	one	41	open	
+src/fn/sub_08038CDC.c	WirelessGameMenu_UpdateRoundResultExchange	zero	48	open	
+src/fn/sub_08038D80.c	WirelessGameMenu_UpdateOutcomeExchange	zero	33	open	
+src/fn/sub_08038DF8.c	WirelessGameMenu_UpdateResultsDelay	zero	19	open	
+src/fn/sub_08038E48.c	WirelessTradeMenu_UpdateResultsPanel	zero	57	open	
+src/fn/sub_08038F08.c	WirelessTradeMenu_UpdateSaveResult	zero	54	open	
+src/fn/sub_0803AD3C.c	WirelessResultPanel_InitBackground	zero	50	removed	84379227cd49948c9b9a6cff4437b96764714503
+src/fn/sub_0803B01C.c	WirelessResultPanel_UpdateOutcomeReveal	zero	85	removed	b933e6bd8c79fbb8865992e872166c6d1e1fe711
+src/fn/sub_0803B40C.c	WirelessResultPanel_Init	one	192	removed	46b1660212bd9af87b729ca78c638cfafd68350c
+src/fn/sub_0803B700.c	sub_0803B700	zero	70	removed	a76d604d6bda9a408dd627c48cf6756541458b45
+src/fn/sub_0803BC88.c	sub_0803BC88	zero	86	open	
+src/fn/sub_0803C008.c	ScenePool_ReleaseActorSlot	one	30	removed	19dba1617a306300d2791121839ccf42f6386dfe
+src/fn/sub_0803C940.c	WirelessObj_ApplyKnockback	one	109	open	
+src/fn/sub_0803D680.c	ScenePool_SelectInitialDirection	one	21	removed	7fad7482f9e2ae6531ea561a051c70073d1463fa
+src/fn/sub_0803D680.c	ScenePool_SelectInitialDirection	zero	22	removed	7fad7482f9e2ae6531ea561a051c70073d1463fa
+src/fn/sub_0803D78C.c	ScenePool_SelectRepeatedDirection	one	21	removed	9b682c7f2c33fd560a45804731a80c296e6f169f
+src/fn/sub_0803D78C.c	ScenePool_SelectRepeatedDirection	zero	22	removed	9b682c7f2c33fd560a45804731a80c296e6f169f
+src/fn/sub_0803D8A8.c	ScenePool_ResumeAfterIdle	zero	5	removed	3fbef4aa5ae0b95e21c68dfaac669c1f97ad94ae
+src/fn/sub_0803D8A8.c	ScenePool_ResumeAfterIdle	one	8	removed	3fbef4aa5ae0b95e21c68dfaac669c1f97ad94ae
+src/fn/sub_08040BF8.c	ModifierMenu_DrawOverview	one	15	removed	38c178fbda37688bf7b74cc5a4be97b077046b94
+src/fn/sub_08040BF8.c	ModifierMenu_DrawOverview	zero	57	open	
+src/fn/sub_08040CF4.c	ModifierMenu_DrawPendingChoice	one	13	removed	e0a2497a3721b5539514e5dca86123f454b000ce
+src/fn/sub_0804331C.c	ContactActor_UpdateRandomWalk	zero	20	removed	cdc80ac6529946d80c77a336c2d4e6dd91cbd765
+src/fn/sub_080434A8.c	ContactActor_UpdateBurst	zero	12	removed	684912c13d594ab4faba2838ff62004843a8fffb
+src/fn/sub_08043A50.c	ContactActor_UpdateAwaitHide	zero	15	removed	050c8c71626fad9936622d4a778e5ac9b64c2008
+src/fn/sub_0804413C.c	ContactSwarm_HideSlot	one	4	removed	725a18fbd7ab46441d49d47b9065124a6a37c702
+src/fn/sub_08044290.c	ContactSwarm_UpdateTracking	zero	72	removed	784d9b2d0dc555ee958be325b3c88cc54a9262a3
+src/fn/sub_08044594.c	ContactSwarm_Update	zero	94	open	
+src/fn/sub_08044854.c	ContactSwarm_ActivateChargeSlot	one	18	open	
+src/fn/sub_08044934.c	ContactSwarm_SpawnPairedAdvance	zero	77	open	
+src/fn/sub_08044AD4.c	ContactSwarm_SpawnPairedAdvanceCount	zero	77	open	
+src/fn/sub_0804F384.c	ResourceStation_ReadDisplayCommands	one	16	removed	08a54b84feba4e34e867fc72cf86bfc93df7e45b
+src/fn/sub_0804F384.c	ResourceStation_ReadDisplayCommands	zero	17	removed	08a54b84feba4e34e867fc72cf86bfc93df7e45b
+src/fn/sub_08051CB4.c	ProximityEmitter_TickRise	zero	18	removed	29776d2b1a02f6fe226957cb0047cbae67dea168
+src/fn/sub_08051E10.c	ProximityEmitter_InitializeParticles	zero	45	open	
+src/fn/sub_08051EA8.c	ProximityEmitter_InitializeFromScript	zero	10	removed	19b487080fd63930843ce292055e33ad94c887c9
+src/fn/sub_080521DC.c	StackedActor_InitRisingParticle	zero	16	removed	aa3aad8f2d855c569d5409b103acc4e0b0e79dc3
+src/fn/sub_0805228C.c	StackedActor_InitFallingParticle	zero	11	removed	0bb56d78829fdc348399aab98927544d46def4f0
+src/fn/sub_08053AEC.c	InteractionMarker_InitializeFromScript	zero	98	open	
+src/fn/sub_08054028.c	SavedPositionMarker_InitializeFromScript	zero	95	open	
+src/fn/sub_080555F8.c	DisplayTrack_InitManager	zero	5	removed	908db75f374d880fb6a3005b6c285d417e26a426
+src/fn/sub_08055DA0.c	StageIconDisplay_Destroy	zero	15	open	
+src/fn/sub_08057158.c	LevelAdvanceDisplay_UpdateAnimation	zero	41	open	
+src/fn/sub_080573C8.c	LevelAdvanceDisplay_DestroyManager	zero	13	open	
+src/fn/sub_0805AE58.c	ScenePanelRig_InitPrimarySprites	one	9	removed	3a10cf53d441937772ab7a3f6a86856efb9adc0f
+src/fn/sub_0805E270.c	SceneInput_InitGlyphPair	zero	8	open	
+src/fn/sub_0805E3FC.c	SceneInput_InitMarkerPair	zero	10	open	
+src/fn/sub_0805E484.c	SceneInput_BeginPairTransition	zero	68	open	
+src/fn/sub_0805EA20.c	SceneInput_InitGrid	zero	4	removed	e98fd42896d3bfc675d1270e83ccfa589c2e27e0
+src/fn/sub_0806466C.c	ActorAttachment_TickRemoval	zero	23	open	
+src/fn/sub_080659C4.c	ActorAttachment_TickValueFrame	one	15	open	
+src/fn/sub_08066278.c	ActorAttachment_SetupPart	one	23	open	
+src/fn/sub_080681DC.c	SceneParticleBurst_Destroy	zero	20	open	
+src/fn/sub_080687EC.c	SceneParticlePool_Destroy	zero	24	open	
+src/fn/sub_080692C8.c	BouncingObject_Spawn	one	14	open	
+src/fn/sub_08069964.c	BurstEmitter_EmitFrame	one	18	removed	1fad2efbd27b92761578d4c3b4466b668115b55c
+src/fn/sub_08069DB8.c	BurstEmitter_CreateFromScript	zero	49	open	
+src/fn/sub_0806A138.c	SparkParticle_DestroyPool	zero	12	open	
+src/fn/sub_0806B96C.c	SpriteEffectController_DestroyPool	zero	47	open	
+src/fn/sub_0806CCC8.c	sub_0806CCC8	one	17	removed	d35dab9a131038a47df4187cac7ed5a1c49cac65
+src/fn/sub_0806CD68.c	SceneSteeringActor_RequestRemovalAll	one	16	open	
+src/fn/sub_0806CE24.c	SceneSteeringActor_DestroyPool	zero	42	open	
+src/fn/sub_0806CF4C.c	SceneSteeringActor_CreateFixedTravelActor	zero	24	removed	6570fc70062ed51893716bf6225dbab017f1ba8c
+src/fn/sub_0806DFC8.c	RouteSpriteActor_Create	zero	14	open	
+src/fn/sub_0806DFC8.c	RouteSpriteActor_Create	one	15	open	
+src/fn/sub_0806E1C0.c	RouteSpritePool_Destroy	zero	23	open	
+src/fn/sub_0806E2A8.c	RouteSpritePool_RequestFinishAll	one	13	open	
+src/fn/sub_080704EC.c	SceneActorRegistry_DefeatActorsFromScript	zero	64	open	
+src/fn/sub_080704EC.c	SceneActorRegistry_DefeatActorsFromScript	one	65	open	
+src/fn/sub_080706DC.c	SceneActorRegistry_ResetCategoryControl	zero	24	open	
+src/fn/sub_080706DC.c	SceneActorRegistry_ResetCategoryControl	one	25	open	
+src/fn/sub_08070910.c	sub_08070910	zero	83	open	
+src/fn/sub_08070B1C.c	SceneActorRegistry_ResetEligibleCategoryState	one	42	removed	408b44b416e232d9d2b61a223b646fcc6c55cb66
+src/fn/sub_08070B1C.c	SceneActorRegistry_ResetEligibleCategoryState	zero	43	removed	408b44b416e232d9d2b61a223b646fcc6c55cb66
+src/fn/sub_08070FA8.c	SceneActorRegistry_UpdateActors	zero	243	open	
+src/fn/sub_0807171C.c	SceneActorRegistry_ResetRouteState	zero	29	open	
+src/fn/sub_08074698.c	SceneActorRoute_StartWait	zero	15	open	
+src/fn/sub_080771C4.c	SceneActorTerrain_ClearCollisionTimers	zero	5	removed	6dece8df72b2882c552207b3d8af0c673bce9a58
+src/fn/sub_08078DEC.c	SceneActorBehavior_ActivatePendingControl	zero	29	open	
+src/fn/sub_0807D220.c	SceneActorAttachment_RetargetNearestPlayer	zero	66	open	
+src/fn/sub_0807F4B8.c	SceneActorTarget_ResetContactResponse	one	84	open	
+src/fn/sub_0807FDC0.c	SceneActorReaction_RestoreAfterDelay	zero	9	open	
+src/fn/sub_0807FDC0.c	SceneActorReaction_RestoreAfterDelay	one	10	open	
+src/fn/sub_0807FE80.c	SceneActorReaction_RestoreAndClearRestart	zero	9	open	
+src/fn/sub_0807FE80.c	SceneActorReaction_RestoreAndClearRestart	one	18	open	
+src/fn/sub_0807FF48.c	SceneActorReaction_RestoreAlternateAfterDelay	zero	9	open	
+src/fn/sub_0807FF48.c	SceneActorReaction_RestoreAlternateAfterDelay	one	10	open	
+src/fn/sub_080800A4.c	SceneActorReaction_UpdateContactRouteRecovery	zero	93	open	
+src/fn/sub_08080494.c	SceneActorReaction_BeginDefeatBurst	zero	108	removed	b8529ea01dc774b11b7d17efabee7b5dbb5058e8
+src/fn/sub_08080984.c	SceneActorReaction_BeginReactionSound	zero	56	open	
+src/fn/sub_08080AF0.c	SceneActorReaction_UpdateReturnToRoute	one	25	open	
+src/fn/sub_08080AF0.c	SceneActorReaction_UpdateReturnToRoute	zero	26	removed	f00e157105fe1a3d13d169256e0f57323321e6a4
+src/fn/sub_08080BE0.c	SceneActorReaction_SetMotionMode	zero	86	open	
+src/fn/sub_08080FB4.c	SceneActorReaction_BeginHiddenDefeat	zero	73	removed	46510ca6f7e62c9af6a862bf9b7883d9623dccda
+src/fn/sub_08081290.c	SceneActorReaction_SinkAndRemove	zero	59	open	
+src/fn/sub_08083E98.c	SceneActorControl_StartPositionCurve	one	15	open	
+src/fn/sub_08083F5C.c	SceneActorControl_ReflectTerrainProbe	zero	21	open	
+src/fn/sub_08084210.c	SceneActorControl_TickHiddenResponse	one	19	open	
+src/fn/sub_080A7700.c	Control	zero	37	removed	aa687f7fcc380169dbe3cbf67534f4ff4d4d957f
+src/fn/sub_080A7700.c	TentacleBody_ApproachWaypoint	zero	130	open	
+src/fn/sub_080A7700.c	TentacleBody_ApproachWaypoint	one	131	open	
+src/fn/sub_080A79E8.c	Control	zero	60	removed	a7b3a0f0b0e2a517285a7de0f0d9b9bdb1d80d23
+src/fn/sub_080A7C84.c	Control	zero	39	removed	334cb010988f87d54b5f62c08beb3283856437ee
+src/fn/sub_080A7F60.c	Control	zero	42	removed	4d8d5b3542df441282dfa3b4239d5f060f736cae
+src/fn/sub_080A85BC.c	SetControl	zero	17	open	
+src/fn/sub_080A8750.c	SetControl	zero	17	open	
+src/fn/sub_080AADE4.c	TentacleActor_ApplyPendingRadialVelocity	zero	18	open	
+src/fn/sub_080AAE64.c	TentacleActor_InitSegmentColliders	zero	61	open	
+src/fn/sub_080AB57C.c	SceneActor_ResetQueuedState	zero	7	open	
+src/fn/sub_080AB57C.c	SceneActor_ResetQueuedState	one	8	open	
+src/fn/sub_080AB968.c	SetControl	zero	23	open	
+src/fn/sub_080F2858.c	ColorPulse_AlignTargetHeading	zero	52	open	
+src/fn/sub_080F29C4.c	Ivy_UpdatePositionTransition	one	32	open	
+src/fn/sub_080F2AAC.c	PhaseObject_TickEntryReset	zero	50	removed	9af88eae5d83b1b83de842e3323568c229cbb628
+src/fn/sub_080F2AAC.c	PhaseObject_TickEntryReset	one	54	open	
+src/fn/sub_080F2C34.c	PhaseObject_TickCountdown	one	44	open	
+src/fn/sub_080F3230.c	PhaseObject_ConvergeEntries	one	96	open	
+src/fn/sub_080F52C0.c	Sword_BeginTargetOrbit	one	40	removed	1be20014d92ae8389ace24750962f4664a54a2a8
+src/fn/sub_080F5F24.c	reset	zero	59	removed	3040d22d0aca4f22209f1f13ff246ab154c2071e
+src/fn/sub_080F5F24.c	Sword_BeginRestOrbit	one	75	removed	3040d22d0aca4f22209f1f13ff246ab154c2071e
+src/fn/sub_080F60B8.c	Take	zero	12	open	
+src/fn/sub_080F6118.c	Take	zero	11	open	
+src/fn/sub_080F6170.c	Take	zero	11	open	
+src/fn/sub_080F61C8.c	Take	zero	11	open	
+src/fn/sub_080F645C.c	Sword_UpdateDamage	zero	38	open	
+src/fn/sub_080FF820.c	WoodenCrate_FindByName	one	16	open	
+src/fn/sub_081004F8.c	FloorSwitch_Release	one	34	open	
+src/fn/sub_081004F8.c	FloorSwitch_Release	zero	35	open	
+src/fn/sub_08101E20.c	NamedObject_IsMapCellOccupied	one	15	removed	333c8351a0b191e18ca4518c3b6254f76abfb31e
+src/fn/sub_08104350.c	ActorGroup_CreateFromScript	zero	168	open	
+src/fn/sub_08104350.c	ActorGroup_CreateFromScript	one	169	open	
+src/fn/sub_08109D94.c	ScriptPanel_ConfirmSelection	zero	24	open	
+src/fn/sub_08109DF8.c	ScriptPanel_Retry	zero	30	open	
+src/fn/sub_08109E98.c	ScriptPanel_WaitForSelectionData	zero	29	open	
+src/fn/sub_0810B914.c	Registry1745_Create	one	85	removed	f35bd26594553132ccd955fd48e391b0e5d60470
+src/fn/sub_0810B914.c	Registry1745_Create	zero	86	removed	f35bd26594553132ccd955fd48e391b0e5d60470
+src/fn/sub_0810BFD8.c	SceneMenu_InitializeDisplay	zero	23	open	
+src/fn/sub_0810D688.c	RecordPanel_DrawTime	zero	54	removed	a859aeaa41974e541b2aae8faeeb4b2147f54d60
+src/fn/sub_0810E9D4.c	RecordMenu_DrawRecords	one	100	open	
+src/fn/sub_0810F544.c	RecordMenu_UpdateRecords	one	33	open	
+src/fn/sub_0810F678.c	RecordMenu_Initialize	zero	44	open	
+src/fn/sub_0810FA54.c	RecordList_InitializeSprites	zero	25	open	
+src/fn/sub_08111DE0.c	MessagePanel_InitSprites	zero	24	open	
+src/fn/sub_08112758.c	MessagePanel_ConfigureFromScript	zero	42	open	
+src/fn/sub_08115674.c	Collectible_UpdateEntry	one	94	open	
+src/fn/sub_08116918.c	MotionActor_ParsePosition	zero	39	open	
+src/fn/sub_08116D14.c	MotionActor_RunPendingScript	zero	47	open	
+src/fn/sub_08116DA0.c	MotionActor_RunDelayedScript	zero	45	open	
+src/fn/sub_08116E44.c	sub_08116E44	zero	179	open	
+src/fn/sub_08117F6C.c	Glove_ChangeUpdate	zero	127	removed	57c59472c6955f8304f1c54e4ba9a26d89cedded
+src/fn/sub_08119378.c	Glove_UpdateRecoilReturn	zero	171	open	
+src/fn/sub_08119638.c	Glove_UpdateStaggerReturn	zero	171	open	
+src/fn/sub_08119EF0.c	Glove_StartFromScript	zero	28	open	
+src/fn/sub_08119EF0.c	Glove_StartFromScript	one	29	open	
+src/fn/sub_08119F44.c	Glove_StopFromScript	zero	33	open	
+src/fn/sub_08119F44.c	Glove_StopFromScript	one	34	removed	94dac45054591195101662ae23a00c61fee6f46b
+src/fn/sub_08119F9C.c	Glove_StopWithMessage	one	22	open	
+src/fn/sub_08121E90.c	SpriteGroup_RemoveSprites	zero	25	open	
+src/fn/sub_0812642C.c	SpriteParticle_Create	zero	24	open	
+src/fn/sub_08128F98.c	SetVelocity	zero	80	removed	c815b9c527fa311f5b5a174b62c3fa754840560e
+src/fn/sub_08128F98.c	FeatherEffectPool_SpawnGroundScatter	zero	154	removed	c815b9c527fa311f5b5a174b62c3fa754840560e
+src/fn/sub_0812B350.c	FragmentProjectilePool_RequestRemovalAll	one	30	open	
+src/fn/sub_0812E7EC.c	SetBehaviorAndIdle	zero	78	open	
+src/fn/sub_0812F3CC.c	SceneActorReaction_BeginContactResponse	zero	44	removed	9490187ccc6eec00252f196517d3ccff4cc51a20
+src/fn/sub_0812F8F4.c	BeginControlZero	zero	33	open	
+src/fn/sub_081304C8.c	BeginControlZero	zero	22	removed	afe50ee6470b8bacc1f9542510ea5159f9bdebd7
+src/fn/sub_081304C8.c	SetState	zero	44	open	
+src/fn/sub_0813067C.c	SceneActorControl_UpdateSavedControlPhase	zero	15	open	
+src/fn/sub_08130994.c	BeginControlZero	zero	29	open	
+src/fn/sub_08130CAC.c	BeginControlZero	zero	13	open	
+src/fn/sub_08130CAC.c	TurnState	zero	44	open	
+src/fn/sub_08131044.c	BeginControlZero	zero	15	removed	ea72559dcaff4bda7afa42eebdfc9370f5d7b553
+src/fn/sub_08131044.c	TurnState	zero	46	open	
+src/fn/sub_081312F4.c	BeginControlZero	zero	31	open	
+src/fn/sub_081314E8.c	BeginControlZero	zero	28	removed	7aed728548161875225f53cb9e7d7eb7ea363f80
+src/fn/sub_08131A2C.c	BeginControlZero	zero	9	removed	97f1b72ff050caf3938420952a2985957f012486
+src/fn/sub_08131B40.c	SceneActorBehavior_DispatchTable284OrEnterState2	one	20	open	
+src/fn/sub_08131B40.c	SceneActorBehavior_DispatchTable284OrEnterState2	zero	21	open	
+src/fn/sub_08131BC4.c	SceneActorBehavior_DispatchOrEnterState2	one	19	open	
+src/fn/sub_08131BC4.c	SceneActorBehavior_DispatchOrEnterState2	zero	20	open	
+src/fn/sub_08131C48.c	SceneActorBehavior_DispatchAlternateOrEnterState2	one	19	open	
+src/fn/sub_08131C48.c	SceneActorBehavior_DispatchAlternateOrEnterState2	zero	20	open	
+src/fn/sub_08132748.c	SceneActorReaction_EndHitCheckDefeat	zero	47	open	
+src/fn/sub_08132D2C.c	SceneActorReaction_DefeatRecordStats	one	126	open	
+src/fn/sub_08135F70.c	UpdateHitFlagsShared	zero	114	open	
+src/fn/sub_081363F4.c	UpdateHitFlagsShared	zero	50	open	
+src/fn/sub_081369C8.c	SceneActorPlacement_ResetStateThree	zero	19	open	
+src/fn/sub_081369C8.c	SceneActorPlacement_ResetStateThree	one	20	open	
+src/fn/sub_08136AF0.c	SceneActorPlacement_PlayResponseAndResetState	zero	57	open	
+src/fn/sub_08136AF0.c	SceneActorPlacement_PlayResponseAndResetState	one	58	open	
+src/fn/sub_08136C80.c	SceneActorPlacement_HideActor	one	35	open	
+src/fn/sub_08136F48.c	sub_08136F48	zero	16	removed	0ee4cb57c92bc8ef5d60ab15443798c586c7a7b4
+src/fn/sub_08137180.c	sub_08137180	zero	30	open	
+src/fn/sub_0813FC38.c	Player_InitActionMode	zero	85	open	
+src/fn/sub_08144AAC.c	Player_UpdateBarrierRecovery	zero	44	removed	be36302e9b540c63d72ee865ac80d085cbe2868d
+src/fn/sub_081462DC.c	Player_UpdateTimedScreenTransition	zero	20	open	
+src/fn/sub_08146EAC.c	Player_UpdateAlternateFormCue	one	153	open	
+src/fn/sub_0814A7D8.c	Player_CalculateTotalAttackPower	zero	24	open	
+src/fn/sub_0814B1F8.c	PlayerMotion_SetPolar	zero	92	removed	5cf08444261ce05385bbac75225c92fd03f684fe
+src/fn/sub_0814D9C4.c	ClearContactTimer	zero	44	removed	113896ee1974cc1ac42bbc0cf7dda9ae884ca34f
+src/fn/sub_0814D9C4.c	Player_UpdateWeaponCueCombo	zero	132	open	
+src/fn/sub_0814E3D8.c	Player_UpdateSelectedAttackCharge	zero	49	open	
+src/fn/sub_08159030.c	Player_EvaluateItemStatA	zero	49	open	
+src/fn/sub_0815A1AC.c	sub_0815A1AC	zero	30	open	
+src/fn/sub_0815E790.c	Player_EnterKindFour	zero	10	open	
+src/fn/sub_0815E8A4.c	PlayerContact_ApplyTerrainDamage	zero	92	removed	fe657f0ee28a3269f4c99c0f0fd2ed5568797e12
+src/fn/sub_0816233C.c	PlayerAttackEffect_UpdateParticles	one	127	open	
+src/fn/sub_081625C0.c	PlayerAttackEffect_Initialize	zero	12	open	
+src/fn/sub_08167BDC.c	Hud_RefreshActivePanel	one	27	removed	857525cb63673b6169a3e3f4a3b06c33683e0d8e
+src/fn/sub_08167C84.c	Hud_UpdateEquipmentPrompt	zero	53	open	
+src/fn/sub_08167F1C.c	Hud_InitializeThreeIcons	zero	29	open	
+src/fn/sub_081687D8.c	SceneHud_UpdateTertiaryWidgets	one	15	open	
+src/fn/sub_08168850.c	sub_08168850	zero	64	open	
+src/fn/sub_0816A5A8.c	ScenePanel_BeginDetail	zero	47	open	
+src/fn/sub_0816AE38.c	ScenePanel_BeginAccountExit	zero	54	open	
+src/fn/sub_0816AEE8.c	SceneSequence_BeginAnimation6	zero	20	open	
+src/fn/sub_0816E6F0.c	sub_0816E6F0	zero	73	open	
+src/fn/sub_0816ECF0.c	PauseMenu_BeginVitalRatioExchange	zero	65	open	
+src/fn/sub_08170718.c	SceneHud_LayoutActionGrid	zero	13	open	
+src/fn/sub_08170EE8.c	put	zero	4	open	
+src/fn/sub_081712D4.c	SceneHud_OpenStatComparison	zero	21	open	
+src/fn/sub_081716B4.c	SceneHud_UpdateStatComparison	zero	37	open	
+src/fn/sub_08171888.c	SceneHud_TickStatTransfer	zero	32	removed	3b65a94ed88ab0fe02206210526422661d8d091b
+src/fn/sub_08173864.c	put	zero	4	open	
+src/fn/sub_081742F0.c	Hud_InitInventoryMenu	zero	28	removed	9b3d56e38ee74694c765bcb2d66198d3159b9828
+src/fn/sub_08176BA4.c	SceneHud_FinishPageExit	zero	27	open	
+src/fn/sub_08177C9C.c	SceneHud_ReadPageVisibility	one	10	open	
+src/fn/sub_08178588.c	Hud_ShowPanelFromScript	one	22	removed	10dc0af4e3b0023cba2288af86476093357d1cdd
+src/fn/sub_08178AA0.c	SceneHud_InitializeOwner	one	26	open	
+src/fn/sub_08178C80.c	SceneHud_InitFromScript	one	33	open	
+src/fn/sub_08178FC8.c	Hud_InitAlternateLayout	one	22	open	
+src/fn/sub_0817A354.c	state	zero	435	removed	70429872cfc0c01df49deb991d8cf70a8b8e1b16
+src/fn/sub_0817B2DC.c	sub_0817B2DC	zero	37	open	
+src/fn/sub_0817C390.c	SceneActorState_WaitForFlagClear	zero	33	removed	a0cd83d23b71dfe03d6b0268ef2bc43feff708f3
+src/fn/sub_0817C3F4.c	BossSlot2_SelectCombatAction	zero	524	open	
+src/fn/sub_0817FDE0.c	sub_0817FDE0	zero	175	open	
+src/fn/sub_08183CAC.c	ActorController_UpdateLayeredMid	one	42	open	
+src/fn/sub_08183D9C.c	ActorController_UpdateLayeredEnd	one	35	open	
+src/fn/sub_0818400C.c	ActorController_UpdateLayeredMidNoSound	one	37	open	
+src/fn/sub_081840F0.c	ActorController_UpdateLayeredMidWithRestoreDelay	zero	20	open	
+src/fn/sub_081840F0.c	ActorController_UpdateLayeredMidWithRestoreDelay	one	41	open	
+src/fn/sub_081841D4.c	ActorController_UpdateBounceParticle	one	34	open	
+src/fn/sub_081842B0.c	Armor_UpdateDefeatSequence	one	36	open	
+src/fn/sub_081842B0.c	Armor_UpdateDefeatSequence	zero	71	open	
+src/fn/sub_08184430.c	SetLayers	one	60	removed	357e1c5c240c24a150e96e862de176e04895863e
+src/fn/sub_08184430.c	ActorController_UpdateBreakApartTransition	one	90	open	
+src/fn/sub_081846F4.c	ActorController_UpdateChargeAttackTransition	one	61	open	
+src/fn/sub_08184930.c	ActorController_FinishDelayedTransition	one	44	open	
+src/fn/sub_08184C1C.c	ActorController_CompleteMotionTransition	one	35	open	
+src/fn/sub_08184D18.c	ActorController_UpdateArmorAnimationTransition	one	36	open	
+src/fn/sub_08184F04.c	ActorController_UpdateAnimation	one	38	removed	739fa75709953cb11b09b3373940904bf173e658
+src/fn/sub_0818B2A0.c	Armor_UpdateBehaviorAfterContact	zero	103	removed	76c10e9631d6e89cd511e1ae1499022f58687ee0
+src/fn/sub_0818C0BC.c	Armor_InitFromScript	one	120	open	
+src/fn/sub_0818CA6C.c	Armor_RetractPartStretch	one	29	open	
+src/fn/sub_0818CF10.c	Armor_UpdatePartWaveXReturn	one	17	open	
+src/fn/sub_0818CFEC.c	Armor_UpdatePartWaveZReturn	one	17	open	
+src/fn/sub_0818D21C.c	Armor_InitPartLunge	one	16	removed	2c24c5014138760abdba286d841395f4d7dd8ce5
+src/fn/sub_0818DEBC.c	Armor_UpdatePartRebound	one	35	open	
+src/fn/sub_0818DFF8.c	reset	zero	56	removed	c56b05ecbf9e669bb636722aa4ef490b06a4abb6
+src/fn/sub_0818E170.c	reset	zero	15	removed	d4f281d98fdf4a5b03a7e5f764f883bc114aeb2e
+src/fn/sub_0818E1BC.c	reset	zero	13	removed	2d841d7b0459a713377606d3888188d81f527909
+src/fn/sub_0818E200.c	reset	zero	13	removed	0f60af20016b1911921df6a072672266aeb7024e
+src/fn/sub_0818E244.c	reset	zero	13	removed	b52050507e579b2e5e4c8e09255c55662ac6b7fd
+src/fn/sub_0818E288.c	reset	zero	46	removed	eef3defa1e84c479247740551ad66c74d10b976e
+src/fn/sub_0818E288.c	Armor_UpdatePartFlash	one	73	open	
+src/fn/sub_0818E3F4.c	reset	zero	85	removed	90df3e25cbb0ee2d483c2327d4b6447df7901da6
+src/fn/sub_0818E5E4.c	Armor_InitParts	zero	66	open	
+src/fn/sub_0818EBF4.c	ScenePanelEffect_InitPool	zero	39	open	
+src/fn/sub_08190498.c	Nidhoggr_CreateDistanceLimitedEffect	zero	65	removed	316590627b185aa591c1b6174530359620dac486
+src/fn/sub_08190C98.c	Nidhoggr_ChangeCompletedPartState	zero	11	open	
+src/fn/sub_0819B96C.c	Hresvelgr_SetAnimation	zero	23	removed	b5f8d42840a94e4f1e2ed927f8568e4b5e8bc94a
+src/fn/sub_0819C29C.c	SetState	zero	8	removed	a90d557e8dc672e858d5379bc78ade459479c1be
+src/fn/sub_0819D4D8.c	Start	zero	17	open	
+src/fn/sub_0819D718.c	start	zero	5	open	
+src/fn/sub_0819D928.c	Start	zero	17	open	
+src/fn/sub_0819DAB4.c	Start	zero	17	open	
+src/fn/sub_0819DAB4.c	Hresvelgr_UpdateOpeningAttackCycle	zero	44	removed	2ab79b9d693efc0174ec4d005e5431ebd8068a47
+src/fn/sub_0819DD44.c	Start	zero	15	open	
+src/fn/sub_0819DD44.c	Hresvelgr_UpdateAttackCycle	zero	38	open	
+src/fn/sub_0819E028.c	start	zero	5	open	
+src/fn/sub_0819E170.c	ActorAction_WaitThenChangeBehavior	one	35	open	
+src/fn/sub_0819E170.c	ActorAction_WaitThenChangeBehavior	zero	36	open	
+src/fn/sub_0819E7B0.c	sub_0819E7B0	zero	8	open	
+src/fn/sub_0819E978.c	Hresvelgr_UpdateHazardVisit	zero	82	removed	fab56823f7702621eb522e0c09863d58ebc20eb8
+src/fn/sub_0819FB4C.c	OffsetActor_PlayTargetSequence	zero	29	open	
+src/fn/sub_081A0888.c	Hresvelgr_UpdateAlternatingOrbit	zero	56	open	
+src/fn/sub_081A1EFC.c	setReaction	zero	99	removed	79a662f8ac4b2706f3e70043fa6f1c4324bbe687
+src/fn/sub_081A4718.c	EffectSpritePool_InitializeEntries	zero	21	open	
+src/fn/sub_081A4F78.c	Hresvelgr_ResetMotionState	one	32	open	
+src/fn/sub_081A522C.c	Hresvelgr_InitializeFallingActor	zero	35	removed	2b80327f0cef17a5527c845746f1daf210422dae
+src/fn/sub_081A8A0C.c	Vanargand_UpdateMode23Transition	zero	29	open	
+src/fn/sub_081A8A74.c	Vanargand_UpdateMode20	zero	27	open	
+src/fn/sub_081A8F48.c	Vanargand_UpdatePlayerDrain	one	54	open	
+src/fn/sub_081A9178.c	SetPolar	zero	73	removed	074e94a5ffdd4818d8e3aa6bab5603cfabac7206
+src/fn/sub_081A9178.c	Vanargand_UpdateTargetDash	zero	135	removed	074e94a5ffdd4818d8e3aa6bab5603cfabac7206
+src/fn/sub_081A9BB4.c	Vanargand_UpdateFacingPairAttack	zero	144	removed	df419326691b36599b7989a43e3c6a51b43e9d40
+src/fn/sub_081AA650.c	Vanargand_UpdateTimedAnimationAttack	one	27	open	
+src/fn/sub_081AA650.c	Vanargand_UpdateTimedAnimationAttack	zero	29	removed	147738fc4d463b15af9d05ed34c2c4b0f8154fa9
+src/fn/sub_081AA788.c	SetPhase	zero	131	removed	11cb0d931107c35bcdf4310319494a16204162c4
+src/fn/sub_081AAE10.c	Vanargand_UpdateLeapTrack	zero	109	removed	a4182cff8b73a8ada88242985e4d8b140205dab1
+src/fn/sub_081AB50C.c	Vanargand_RunDefeatSequence	zero	210	open	
+src/fn/sub_081AB904.c	Vanargand_UpdatePartDebugControls	one	71	open	
+src/fn/sub_081ABA64.c	Vg_ChangePhase	zero	96	removed	edc5237a4a686ce8a73d81d989032e76384075ce
+src/fn/sub_081ABA64.c	Vanargand_UpdateChargeSequence	zero	506	open	
+src/fn/sub_081ACB60.c	Vanargand_UpdateDelayedPartAnimation	zero	52	removed	0171b3a5f0beb7454a9ee8bd7fbaa3fc8b9dff0d
+src/fn/sub_081ACC24.c	changeState	zero	46	removed	2f88ff1439925ba4c5ca6b53edb1b0450d3a9437
+src/fn/sub_081AD0D0.c	changeState	zero	86	open	
+src/fn/sub_081ADBF8.c	SetState	zero	34	removed	2d1049c9ce0fc26c88c0c7413c14ef2ba517cd8b
+src/fn/sub_081AE008.c	Vanargand_InitAnimatedAttachment	zero	14	open	
+src/fn/sub_081B0018.c	PairedSceneActor_InitializeHalf	one	28	open	
+src/fn/sub_081B03C0.c	PairedSceneActor_UpdatePlayerCapture	zero	164	open	
+src/fn/sub_081B0F34.c	ActorStatus_UpdatePlayerCapture	one	109	open	
+src/fn/sub_081BB658.c	SolarBank_BeginAmountEntry	zero	19	open	
+src/fn/sub_081C6954.c	StateActor_CreateFromScriptEntry	one	123	removed	8da88e1edbd94bdee0c214c439566761d374ace2
+src/fn/sub_081C74F0.c	polar	zero	35	removed	a8c8ef0a1b98517bb1ad266ba503c886dfa502ec
+src/fn/sub_081C74F0.c	StateActor_UpdateDashAnimation13	zero	108	removed	a8c8ef0a1b98517bb1ad266ba503c886dfa502ec
+src/fn/sub_081C7F00.c	StateActor_RunEntryAnimSequence	zero	73	open	
+src/fn/sub_081C879C.c	StateActor_StartAndMaybeFinishAnim	zero	56	open	
+src/fn/sub_081C8C8C.c	polar	zero	33	removed	d4e240b5348dbb9df4a08baac9461119b086628a
+src/fn/sub_081C8C8C.c	StateActor_UpdateDescendingDash	zero	130	removed	d4e240b5348dbb9df4a08baac9461119b086628a
+src/fn/sub_081CB3F4.c	StateActor_UpdateKind29AttackEffect	zero	57	open	
+src/fn/sub_081CB5B0.c	sub_081CB5B0	zero	41	removed	dd1bad9a03f9295df8867eba47cda5989e3ccc49
+src/fn/sub_081CB6AC.c	StateActor_UpdateFacingAnimation	zero	93	open	
+src/fn/sub_081CBA04.c	SceneCharacter_UpdatePalettePulse	zero	10	open	
+src/fn/sub_081CBA80.c	SceneCharacter_UpdateAlternatePalettePulse	zero	10	open	
+src/fn/sub_081CBB1C.c	sub_081CBB1C	zero	82	removed	56d02022cb25861e7cb25a828c3006fd0507f860
+src/fn/sub_081CBC44.c	SceneCharacter_UpdateParticleDissolve	zero	14	open	
+src/fn/sub_081CBE30.c	StateActor_UpdateDelayedAttackEffect	zero	59	open	
+src/fn/sub_081CC540.c	SceneCharacter_UpdateSlowingBlink	one	13	removed	afb8668341f47aa6daf75180166128c0e905e0af
+src/fn/sub_081CC64C.c	Actor_TickCallbacks	zero	14	open	
+src/fn/sub_081CD484.c	setInitialFacing	zero	100	open	
+src/fn/sub_081CDE14.c	SceneCharacter_UpdatePaletteFade	zero	15	open	
+src/fn/sub_081CE1BC.c	SceneCharacter_PlaceFromScript	one	238	open	
+src/fn/sub_081CE6DC.c	SceneCharacter_CommandFromScript	one	145	open	
+src/fn/sub_081CF518.c	SceneNpc_UpdateBlinkWithCallback	zero	18	removed	12000e79c5245693897f162e5e8d8fe1443e8d1e
+src/fn/sub_081CF62C.c	polar	zero	33	removed	be7d05068b9de1489a13ec64d7b6197f86efa1f1
+src/fn/sub_081CF62C.c	SceneNpc_UpdateDescendingDash	zero	42	removed	be7d05068b9de1489a13ec64d7b6197f86efa1f1
+src/fn/sub_081CF84C.c	SceneNpc_PlayAnimation12	zero	9	removed	0a652876fc70a1dc49cf150adda58adf019ff816
+src/fn/sub_081CF8A4.c	SceneNpc_UpdateParticleDisappearance	zero	41	removed	bde66d060c61fd204742b9e0e1aa02b9a04e8108
+src/fn/sub_081CF9E8.c	SceneNpc_UpdateRisingToTerrain	zero	19	removed	f27e4dfbe36299a414e3663d3a5f45586cd94418
+src/fn/sub_081CFB04.c	sub_081CFB04	zero	20	removed	12bc8dc34f314488520575f766b47236d77b97a1
+src/fn/sub_081CFB54.c	SceneNpc_UpdateTurnInPlace	zero	36	removed	853bbcffb0a9a7c2a0f70c8a61a34b841ba438c2
+src/fn/sub_081CFDA4.c	SceneNpc_UpdateProjectedMove	zero	99	removed	fe57f70cbb555842202acdaffb32bce0b9836947
+src/fn/sub_081D0928.c	SceneNpc_OnStateEffectUpdate	zero	66	open	
+src/fn/sub_081D0C04.c	SceneNpc_CreateFromScript	one	196	open	
+src/fn/sub_081D1404.c	SceneNpc_UpdateTransitionEffect	zero	33	removed	5bd0d6ba86cbf45dba3e3a8e9234ba5e9fb6f6a3
+src/fn/sub_081D1A8C.c	sub_081D1A8C	zero	83	removed	844a13816b6d1e3de5d9d7bf26601593dd0d780a
+src/fn/sub_081D1BA8.c	SceneNpc_TurnTowardAngle	zero	32	removed	c1b7dd4e7501339b74e75af45de8bbf8cb1c3bcb
+src/fn/sub_081D1C38.c	sub_081D1C38	zero	84	removed	eb74b7fedc0d5c532251fc55a52ace83285a502d
+src/fn/sub_081D1DF8.c	TaggedSceneNpc_UpdateState17AnimationA	zero	12	open	
+src/fn/sub_081D201C.c	TaggedSceneNpc_UpdateArcMove	zero	55	removed	874f0f9a710011201acc969b4bc0f0d46516f6b8
+src/fn/sub_081D201C.c	TaggedSceneNpc_UpdateArcMove	one	76	open	
+src/fn/sub_081D227C.c	TaggedSceneNpc_UpdateState17AnimationB	zero	13	open	
+src/fn/sub_081D2544.c	SceneNpc_EnterRequestedState	zero	12	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
+src/fn/sub_081D2544.c	SceneNpc_EnterRequestedState	one	13	removed	f27d847474bf9e9a828ab4101d1aa958b759a147
+src/fn/sub_081D2A38.c	TaggedSceneNpc_Create	zero	134	open	
+src/fn/sub_081D2A38.c	TaggedSceneNpc_Create	one	206	open	
+src/fn/sub_081D31EC.c	sub_081D31EC	zero	95	removed	c012eb1e2f683f05cc13c56664be2f2972a96bce
+src/fn/sub_081D3A98.c	PaletteTransition_UpdateBlink	one	30	open	
+src/fn/sub_081D4AC0.c	BestiaryDisplay_UpdateEntry	zero	57	open	
+src/fn/sub_081D4CE0.c	sub_081D4CE0	zero	32	removed	ffdfe24523a3870f8120e286802c2bf5e0bebf39
+src/fn/sub_081D7874.c	Task4E01_ClearTrailSprites	one	6	open	
+src/fn/sub_081D9024.c	TimedEffect_BeginPhase26	zero	28	removed	b3f8eff83d520dd1deaa568850b909a07a4f2ac5
+src/fn/sub_081D905C.c	TimedEffect_UpdateHoming	one	109	open	
+src/fn/sub_081D934C.c	Boss_FinalExplosions	zero	37	open	
+src/fn/sub_081D95F0.c	Task4E01_UpdateExpandingImpact	one	17	open	
+src/fn/sub_081EC974.c	ActorDisplay_UpdateAccentSprite	zero	11	removed	02915f5f071ae5f74e8accda7e548fbfb62f38c9
+src/fn/sub_081ECF18.c	SceneActors_UpdateIdleDisplay	zero	31	open	
+src/fn/sub_081ED5F4.c	SceneActors_UpdateMovingDisplay	zero	36	open	
+src/fn/sub_081ED8A0.c	SceneActors_UpdateDelayedMovement	zero	49	removed	173f9920e1f834cb2c76a4ba54b8079e5e8ab22a
+src/fn/sub_081EE130.c	SceneActors_UpdatePeriodicEffectAction	zero	57	open	
+src/fn/sub_081F1C2C.c	SingletonSlot7_InitFromScript	zero	28	open	
+src/fn/sub_081F213C.c	SingletonSlot7_SetTimerFromScript	zero	11	open	
+src/fn/sub_081F21C0.c	MotionEffectPool_FindFreeEntry	one	5	open	
+src/fn/sub_081F21F8.c	SingletonSlot7_OnEffectMotionComplete	one	5	open	
+src/fn/sub_081F2534.c	SpriteTrail_BeginImpact	one	29	open	
+src/fn/sub_081F2678.c	SpriteGroup_UpdateExpiringSlot	one	17	open	
+src/fn/sub_081F2C64.c	TimedSprite_Init	zero	21	open	
+src/fn/sub_081F3C68.c	polar	zero	96	removed	5bcdd9ebba28de4f28a84db14732ee28726c1bdf
+src/fn/sub_081F423C.c	ActorMotion_UpdateTimedPaletteAnimation	zero	60	removed	91329c95fa87bcb9593f270d1a16521a22968901
+src/fn/sub_081F4378.c	Vec_SetPolar	zero	71	removed	c917543abf251943766d6a2de772f5b59637af60
+src/fn/sub_081F4378.c	Ratatosk_UpdateProjectileVolley	zero	105	removed	c917543abf251943766d6a2de772f5b59637af60
+src/fn/sub_081F48AC.c	Ratatosk_UpdateSunOrbSummon	zero	67	removed	fd99cf88c50337e61e5bb8361f85895d15a9b647
+src/fn/sub_081F4CF8.c	polar	zero	76	removed	d0b269a09f03f650196201abbd37623c8848b5d7
+src/fn/sub_081F5290.c	polar	zero	62	removed	faedeb6d372cf273e07cfe61261488a950f8b146
+src/fn/sub_081F55B0.c	polar	zero	56	removed	ca2cba00a41fdca387aeffe06ccee9555879fbd0
+src/fn/sub_081F5E60.c	Ratatosk_UpdateDecayingShake	zero	70	open	
+src/fn/sub_081F5F28.c	SceneActors_UpdateSpawnShake	zero	89	open	
+src/fn/sub_081F6078.c	SceneActors_UpdateTimedAnimationReset	zero	42	removed	7cf379c1a1d269693a2295cac887cfb6e86c48ac
+src/fn/sub_081F6428.c	Ratatosk_ApplyQueuedDamage	zero	130	removed	1bf55d5e54d921cf364c632f2e73d389609e0980
+src/fn/sub_081F6428.c	Ratatosk_ApplyQueuedDamage	one	193	open	
+src/fn/sub_081F7728.c	SceneActor_UpdateState30AndRestartCommand	one	36	open	
+src/fn/sub_081F79F8.c	Ratatosk_ProcessDefeatState	one	75	open	
+src/fn/sub_081F8CBC.c	Ratatosk_UpdateRetreatSequence	zero	69	open	
+src/fn/sub_081F9F10.c	Ratatosk_ApplyDamageReaction	zero	78	open	
+src/fn/sub_081FB8A0.c	Ratatosk_UpdateParticlePool	zero	72	removed	08388b0c88ef079f18f3a67006704bfc557f5f64
+src/fn/sub_081FB8A0.c	Ratatosk_UpdateParticlePool	one	102	removed	08388b0c88ef079f18f3a67006704bfc557f5f64
+src/fn/sub_081FBE30.c	Ratatosk_UpdateParticleFallAndWander	one	37	open	
+src/fn/sub_081FBF2C.c	Ratatosk_UpdateAnimatedParticlePool	zero	77	removed	6911541739b31649c298345bcc549bd4318a92d4
+src/fn/sub_081FBF2C.c	Ratatosk_UpdateAnimatedParticlePool	one	110	removed	6911541739b31649c298345bcc549bd4318a92d4
+src/fn/sub_081FE760.c	SunOrb_CreateAtPosition	zero	59	removed	64db9f3d00eaa14c2024d4b26a984edb5317e474
+src/fn/sub_081FF09C.c	SpriteParticle_Emit	one	82	open	
+src/fn/sub_08202B30.c	Projectile_SpawnFromConfig	zero	24	removed	f2f7a8babc0b24ff01eab4004c133d653dffe5e2
+src/fn/sub_08202F48.c	sub_08202F48	one	37	open	
+src/fn/sub_08204D84.c	EnemyD459_UpdateAttackTiming	zero	44	removed	7476b32d4a3781007925f21b28fd8292cc2ac1d6
+src/fn/sub_08204F40.c	EnemyD459_Update	zero	112	open	
+src/fn/sub_0820539C.c	EnemyD459_InitializeFromScript	zero	287	open	
+src/fn/sub_08208740.c	CannonTurret_FinishDamage	zero	86	open	
+src/fn/sub_08208740.c	CannonTurret_ClearBlink	zero	93	removed	057a4227e9ad9b01f27c44e1e6451fc043d72b1a
+src/fn/sub_08209AC4.c	FanCannon_Update	zero	208	open	
+src/fn/sub_0820B174.c	DragonPuppy_UpdateAttackTiming	zero	13	removed	477aeb35efc80ccd71012c8b5f84e34f55ca53f9
+src/fn/sub_0820B3E0.c	DragonPuppy_UpdateCombat	zero	152	open	
+src/fn/sub_0820E2A4.c	PoisonHand_Update	zero	234	open	
+src/fn/sub_0820F378.c	OrangeSpine_BeginDefeat	zero	117	open	
+src/fn/sub_0820F378.c	OrangeSpine_UpdateDamageState	zero	194	open	
+src/fn/sub_082124D8.c	ForgingBook_InitSprites	zero	30	removed	67162789763ea8d246da433d4e2f2862be78caa9
+src/fn/sub_08220F00.c	Anim_SetFrameDurationScale	zero	27	removed	e4e33f0a536d28cd6d1a4b1ac082e55b0ecc5361
+src/fn/sub_08225AB4.c	SceneBody_Init	zero	9	removed	c07ceb27d00ee40d6671f8023b9c5411f54d4a31
+src/fn/sub_08229258.c	Clock_ReadValidatedRtcDateTime	zero	18	open	
+src/fn/sub_0822B6C8.c	sub_0822B6C8	zero	17	open	
+src/fn/sub_0822B968.c	SceneStimulus_AddFromScript	zero	13	open	
+src/fn/sub_0822CA5C.c	Solar_InitControllerState	zero	11	open	
+src/fn/sub_0822D7C0.c	ItemDescriptor_Reset	zero	17	open	
+src/fn/sub_082314C4.c	EffectGroup_FadeFirstActive	zero	16	open	
+src/fn/sub_08231500.c	EffectGroup_SpawnPart	zero	23	open	
+src/fn/sub_08231568.c	EffectGroup_Reset	zero	26	open	
+src/fn/sub_08232420.c	sub_08232420	zero	108	removed	7fe4d943c62f21e985c3ec4a43b9eeb936517f4e
+src/fn/sub_082329D4.c	ScreenOrbitEffect_InitSlot	zero	13	removed	f6758a604d8869cd881fd3bc4ec4a18c82fdf7bd
+src/fn/sub_082329D4.c	ScreenOrbitEffect_InitSlot	one	14	removed	f6758a604d8869cd881fd3bc4ec4a18c82fdf7bd
+src/fn/sub_08232F68.c	EffectQuad_StartRemoteEntry	one	33	open	
+src/fn/sub_08232F68.c	EffectQuad_StartRemoteEntry	zero	34	removed	9b6343e4f20febf5b3662ca2be2d2be8b3ceb1ea
+src/fn/sub_082349A0.c	HealthRestoreEffect_InitRisingParticle	zero	27	removed	71d88f04075c8baa405884c1c3cf43226ca4f670
+src/fn/sub_08234A84.c	HealthRestoreEffect_InitSparkle	zero	27	removed	34d627aae449b9eec9bc6fe7fa2fd4c8e5a95bec
+src/fn/sub_08234F18.c	HealthRestoreEffect_InitAnimation	zero	14	open	
+src/fn/sub_08234F88.c	HealthRestoreEffect_InitParticlePool	zero	24	open	
+src/fn/sub_08235000.c	HealthRestoreEffect_Init	zero	24	open	
+src/fn/sub_0823565C.c	HealthBurstEffect_UpdateBursts	one	25	open	
+src/fn/sub_0823565C.c	HealthBurstEffect_UpdateBursts	zero	27	open	
+src/fn/sub_08235AB8.c	HealthBurstEffect_InitParticlePool	zero	24	open	
+src/fn/sub_08235DB0.c	sub_08235DB0	one	24	open	
+src/fn/sub_082368DC.c	OrbitEffect_Initialize	one	46	open	
+src/fn/sub_08237280.c	sub_08237280	zero	26	open	
+src/fn/sub_0823A5EC.c	sub_0823A5EC	zero	41	open	
+src/fn/sub_0823AC34.c	LinkPlayer_InitAbilityState	zero	12	open	
+src/fn/sub_0823C0A4.c	LinkPlayer_ResetToIdleState	zero	62	open	
+src/fn/sub_0824000C.c	Player_UpdateLinkedScreenTransition	zero	38	open	
+src/fn/sub_08240DB0.c	Player_UpdateDefeatSequence	zero	35	open	
+src/fn/sub_082438F4.c	Player_UpdateLinkCore	zero	49	open	
+src/following_sprite_effect.c	FollowingSpriteEffect_OnStop	zero	20	open	
+src/following_sprite_effect.c	SpriteParticle_ReleaseSlot	zero	413	removed	04389cbe6ea510c3d09b2b3a53a346bbdfc5f4cc
+src/following_sprite_effect.c	SpriteParticle_AllocateSlot	one	425	open	
+src/frost_emitter.c	FrostEmitter_Initialize	zero	151	open	
+src/game_over.c	GameOver_UpdateOpening	zero	133	open	
+src/golem_2.c	Golem_UpdateDefeat	zero	161	open	
+src/golem_2.c	Golem_UpdateDefeat	one	162	open	
+src/golem_2.c	Golem_UpdateScriptedAction	zero	567	open	
+src/golem_main.c	Golem_UpdateRevival	one	1165	open	
+src/golem_main.c	Golem_UpdateChargeRecovery	zero	1572	open	
+src/golem_main.c	SceneActorReaction_SlideBack	zero	1981	open	
+src/golem_main_2.c	BeginControl	zero	691	removed	c7b19122cc9ff937688c2d0a2f3acd2be4d42e05
+src/grid_attack_actor.c	GridAttack_SetState	zero	198	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_StartAction	one	210	open	
+src/grid_attack_actor.c	GridAttackActor_OnDamage	zero	286	open	
+src/grid_attack_actor.c	GridAttackActor_UpdateElevatedGridAttack	zero	459	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_UpdateStaggerState	zero	614	open	
+src/grid_attack_actor.c	GridAttack_UpdateIdleState	zero	686	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_UpdateAnimationElevenState	zero	729	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_UpdateAlternateIdleState	zero	750	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_ApplyPendingDamage	one	906	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_SelectNextAction	zero	969	removed	0cbedb3f36bbb13d48ff617f0d78a7904aee2ad7
+src/grid_attack_actor.c	GridAttack_UpdateCollidersAndPalette	zero	1659	open	
+src/ground_effect.c	GroundEffect_Initialize	zero	117	removed	e7e92a3ceafcc878450d537ecae95e86ea73b64e
+src/hit_switch.c	HitSwitch_InitEntryFromScript	zero	371	removed	b3be790abf5ad30c68ec9cea873aa83270849a11
+src/ivy_child.c	ActorPhase_ApproachNeutral	one	649	open	
+src/keyframe_actor.c	KeyframeActor_InitKeyframeDisplay	zero	30	open	
+src/keyframe_actor.c	KeyframeActor_InitAuxiliarySprite	zero	69	open	
+src/keyframe_actor.c	KeyframeActor_InitBodyFromScript	zero	127	open	
+src/large_scene_animation_controller.c	Nidhoggr_SetBackgroundMode	zero	1123	open	
+src/large_scene_animation_controller.c	Nidhoggr_ReadOptions	zero	3792	removed	1fa1ad4bfd90fab2a82e6ca793bd3c5ea926c11d
+src/link_panel.c	LinkPanel_InitFromScript	zero	413	open	
+src/link_record_panel.c	LinkRecordPanel_InitializeWidgets	zero	214	open	
+src/link_record_panel.c	LinkRecordPanel_UpdateDelay	one	404	open	
+src/menu_prompt.c	Hud_InitRetryPanel	zero	251	open	
+src/menu_prompt.c	ScenePanel_BeginAccountMenu	zero	291	open	
+src/message_actor_08612344.c	SceneCharacter_WaitForState0EAndResume	one	15	open	
+src/message_actor_08612344.c	SceneCharacter_WaitForState0EAndResume	zero	16	removed	5561ba820f517d6467400fcf1ecb3c6a6a2cda69
+src/message_panel.c	MessagePanel_InitFromScript	zero	354	open	
+src/message_window.c	MessageWindow_SetMessageTable	zero	203	open	
+src/message_window.c	MessageWindow_SetMessageTable	one	214	open	
+src/message_window.c	MessageWindow_ShowMessage	zero	296	removed	b8d010b1e0ca83ce1fe8b4479041fbff4b437ac5
+src/message_window.c	MessageWindow_SetAutoAdvance	zero	467	open	
+src/message_window.c	MessageWindow_UpdateFastPlayback	zero	648	removed	b8d010b1e0ca83ce1fe8b4479041fbff4b437ac5
+src/mimic.c	SaveStoppedControl	zero	21	removed	a7c5c51c3379993a08b095030f2889d7ce3ee24e
+src/mimic.c	SceneActor_RestoreSavedTargetOnCompletion	zero	356	removed	a7c5c51c3379993a08b095030f2889d7ce3ee24e
+src/mode_menu.c	ResultScreen_Initialize	zero	412	removed	1e30782e7f0b2f520f43bcb9930a722a684a3cbb
+src/name_entry.c	NameEntry_Update	zero	611	open	
+src/native_effect.c	NativeEffect_DestroyEntry	zero	112	open	
+src/native_particle.c	NativeParticle_AllocateEntry	one	57	open	
+src/options.c	Options_InitScreen	zero	138	removed	aaef3a876f8405f9ba58e200c0a0f9525157f8de
+src/orbit_contact_actor.c	OrbitContactActor_BeginExpansion	one	141	open	
+src/orbit_contact_actor.c	OrbitContactActor_BeginExpansion	zero	142	removed	2ae175a399e8b643a5b9c4ece7539272d5408dad
+src/orbiting_particles.c	OrbitingParticles_Initialize	one	222	removed	6ac4338b282091388d5360488aeb83688779940b
+src/particle_emitter.c	ParticleEmitter_OnStop	zero	37	open	
+src/particle_pool.c	ParticlePool_InitParticles	zero	279	open	
+src/play_stats.c	PlayStats_Initialize	zero	481	open	
+src/player_3.c	Player_BuildActionModifiers	zero	1379	open	
+src/player_3.c	PlayerAction_RefreshFlagState	zero	1751	open	
+src/player_cue_commands.c	PlayerCue_Windblown	zero	706	open	
+src/player_cue_commands.c	PlayerCue_WindblownVariant3	zero	726	open	
+src/player_cue_commands.c	PlayerCue_WindblownVariant4	zero	746	open	
+src/player_cue_commands.c	PlayerCue_WindblownVariant2	zero	766	open	
+src/player_cue_commands.c	PlayerCue_FaceSide	zero	810	open	
+src/player_cue_commands.c	PlayerCue_ReleaseControl	zero	1048	removed	fca5d6bf54989719de11e7a9c04f5c576a6b99be
+src/player_script_stats.c	ScriptActor_ClearField534FromScript	zero	215	open	
+src/pooled_motion.c	MotionPool_FindFreeSlot	one	165	open	
+src/presentation.c	Presentation_InitListValues	zero	521	open	
+src/projectile_config.c	TimedEffect_SpawnProjectile	one	99	open	
+src/projectile_config.c	Projectile_SetEntryDirection	zero	329	open	
+src/region_actor.c	RegionActor_CreateFromScript	one	361	removed	80479e028e806fefc475b2ff576a29ed44ab87ed
+src/registry_actor_collision.c	Actor_ApplyKnockback	one	56	open	
+src/registry_actor_manager.c	RegistryA8CB_StartFallFromScript	zero	27	open	
+src/registry_actor_manager.c	RegistryA8CB_StartFallFromScript	one	28	open	
+src/registry_actor_script.c	RegistryA8CB_CreateFromScript	zero	28	open	
+src/registry_choice_menu.c	Registry3F74_InitFromScript	zero	269	open	
+src/registry_selection_menu.c	RegistrySelection_InitializeAnimations	zero	304	open	
+src/registry_selection_menu.c	RegistrySelection_InitializeFromScript	zero	511	open	
+src/result_tutorial.c	ResultTutorial_HidePrompt	one	82	open	
+src/result_tutorial.c	ResultTutorial_Initialize	zero	826	open	
+src/scaled_shadow.c	ScaledShadow_Initialize	zero	150	removed	3899ce45d0e7a40ea459e9057778cf04a0cf08c1
+src/scene_arc.c	SceneArc_Create	zero	325	removed	69014c9beed9ea517a85d03eb0d99ce6b1dafafc
+src/scene_catalog.c	MenuSelection_DrawNumericSummary	zero	279	removed	56a05f72939d67912535afa35bebe63020fdec18
+src/scene_catalog.c	Hud_InitStatusMenu	zero	348	removed	56a05f72939d67912535afa35bebe63020fdec18
+src/scene_combat_actor.c	SceneParticle_UpdateBounce	zero	101	removed	68d8e8f94f009fa55020ef908efe9d0c83e0baf4
+src/scene_effect.c	ShadowActor_UpdateTransition	one	34	open	
+src/scene_effect.c	SceneEffect_UpdateFinishAnimation	zero	54	removed	dc7139597cd58627442872aa26b48f8141834fb1
+src/scene_effect.c	SceneEffectRing_Update	zero	591	open	
+src/scene_effect_queue.c	SceneEffect_InitializeEmitterOptions	zero	133	open	
+src/scene_effect_queue.c	SceneEffectQueue_QueueTypeOneEffect	one	267	open	
+src/scene_indicator.c	SceneIndicator_Initialize	zero	15	open	
+src/scene_messages.c	SceneMessages_Update	zero	153	removed	500439ad442444ad735cdee7cdce4e30fcda9fe5
+src/scene_messages.c	SceneMessages_RegisterReceiver	zero	237	removed	500439ad442444ad735cdee7cdce4e30fcda9fe5
+src/scene_panel_control_and_lifecycle.c	ScenePanel_AdvanceTetherAcquisition	zero	131	removed	f28a332ca02c228022cb5d3aba31b5c1397b49ca
+src/scene_panel_control_and_lifecycle.c	ScenePanel_BeginArrivalRamp	zero	834	open	
+src/scene_projectile_config.c	Projectile_SpawnAtPosition	zero	63	removed	bed1bb42ca48d66c2a74bb2070430e5264c59dcc
+src/scene_range_watch.c	SceneRangeWatch_Initialize	zero	92	open	
+src/scene_scheduled_effect.c	StateSprite_InitAnimation	zero	216	open	
+src/scene_script_object.c	SceneScriptObject_UpdateBurst	zero	159	removed	94d3226e341da466b86b5a02fa0a8827e2ce63ab
+src/scene_transition.c	SceneTransition_BeginOffsetMove	zero	119	open	
+src/scene_transition.c	SceneTransition_BeginVectorTween	zero	145	open	
+src/scene_transition.c	SceneTransition_Initialize	zero	408	removed	67c980fb8248adf2d888b4870a21423f58742d6b
+src/scene_volume.c	SetProjectileOrigin	zero	24	open	
+src/scene_volume.c	SceneVolume_UpdateImpactSlide	zero	310	removed	08e252ec873d0af0701e5841ca8b6fc626698574
+src/scene_volume.c	SetVelocity	zero	440	open	
+src/scene_volume.c	SceneVolume_UpdateKnockbackLanding	zero	499	removed	08e252ec873d0af0701e5841ca8b6fc626698574
+src/script_keyframe_pool.c	ScriptKeyframe_InitManager	zero	235	removed	c602a467bd1c615a42e17e6282f89f4d1f45dfbd
+src/script_prompt.c	ScriptPrompt_Initialize	zero	129	removed	65ff674d1101b6e3d43ae99bcf6a78b5b78b941f
+src/scrolling_dialogue.c	ScrollingDialogue_ResetPlayback	zero	15	removed	4678a1e7a04b531ecd7098cab6d3dd08e46f09bd
+src/scrolling_dialogue.c	ScrollingDialogue_Init	zero	215	open	
+src/selection_panel.c	SelectionPanel_UpdateInput	one	496	open	
+src/selection_panel.c	SelectionPanel_InitializeFromScript	zero	564	open	
+src/shadow_registry.c	ShadowRegistry_OnDestroy	zero	81	removed	32c4ba233e072c8942e784e2c98fc6686b4f801d
+src/shipwheel_presentation.c	SceneFade_BeginSoundFade	zero	126	open	
+src/shipwheel_presentation.c	SceneFade_BeginTargetMove	zero	147	open	
+src/shipwheel_presentation.c	SceneFade_BeginSecondMove	zero	181	open	
+src/shipwheel_presentation.c	SceneFade_BeginFinalMove	zero	199	open	
+src/spider.c	Spider_SetLandingReady	zero	660	removed	864321a64c10605955341fe2ee0ffb0ddd7bd735
+src/spider.c	SceneActorControl_UpdateEntryWait	zero	1110	open	
+src/spider.c	SceneActorControl_UpdateRouteResponse	zero	1157	open	
+src/sprite.c	Sprite_InitSystem	zero	32	open	
+src/sprite.c	SpriteOam_ResetQueue	zero	941	open	
+src/sprite_notice.c	SpriteNotice_Create	zero	92	open	
+src/tentacle_body.c	ActorTrail_RestoreSavedState	one	158	open	
+src/terrain_shadow.c	Shadow_Initialize	zero	137	removed	4c7277f807778224f1cef235d4184654e8c94c98
+src/tether_actor.c	TetherActor_InitStateParameters	zero	2121	open	
+src/tile_animation.c	TileAnimation_Initialize	zero	57	open	
+src/time_palette.c	TimePalette_InitTransition	zero	53	removed	ada5e083a0609560120d554f02ccb6c97e67c7fd
+src/time_result.c	Actor_UpdateStateThree	zero	339	removed	252cb2843a1446c6911f4f7ca6bfaf797274e209
+src/time_result.c	Actor_UpdateStateFour	zero	356	removed	252cb2843a1446c6911f4f7ca6bfaf797274e209
+src/vanargand_parts.c	Vanargand_UpdatePartPairedStrike	zero	108	open	
+src/vanargand_parts.c	Vanargand_UpdatePartRetreat	zero	245	open	
+src/vanargand_parts.c	Vanargand_UpdatePartOffsetStrike	one	455	removed	4d43d8c6aef7c3a78578f326279f1b730b3ef364
+src/vanargand_parts.c	Vanargand_UpdatePartOffsetStrike	zero	487	open	
+src/vanargand_parts.c	Vanargand_UpdatePartImpact	zero	917	open	
+src/vanargand_parts.c	Vanargand_UpdatePartSidestep	zero	1064	open	
+src/vanargand_parts.c	Vanargand_UpdatePartVerticalOscillation	zero	1228	open	
+src/vanargand_parts.c	Vanargand_UpdatePartRevealFade	zero	1451	open	
+src/vanargand_parts.c	Vanargand_DestroyPartController	zero	1593	open	
+src/vorn.c	Vorn_RestoreSavedState	one	497	open	
+src/wireless_peer_panel.c	WirelessPeerMenu_InitBackground	zero	49	removed	9a551b43ee968ba52cfadbe563a2fcfb4322b19d
+src/wireless_peer_panel.c	WirelessPeerPanel_Init	one	98	removed	9a551b43ee968ba52cfadbe563a2fcfb4322b19d
+src/wireless_peer_panel.c	WirelessPeerPanel_Init	zero	116	open	
+src/wireless_peer_panel.c	WirelessPeerPanel_ClearName	zero	191	open	
+src/wireless_peer_panel.c	WirelessPeerMenu_UpdateCancelInput	zero	273	removed	9a551b43ee968ba52cfadbe563a2fcfb4322b19d
+src/wireless_peer_panel.c	WirelessPeerMenu_UpdateDismissibleNotice	zero	303	removed	9a551b43ee968ba52cfadbe563a2fcfb4322b19d
+src/wireless_peer_panel.c	WirelessPeerMenu_UpdateConnectionState	one	477	open	
+src/wireless_status_menu.c	WirelessStatusMenu_LoadStatusBackground	zero	39	removed	3af1eae410b915dae0dbe7bbdaa90a9aadfe0a9b
+src/wireless_status_menu.c	WirelessStatusMenu_UpdateDismissibleMessageState	zero	111	removed	3af1eae410b915dae0dbe7bbdaa90a9aadfe0a9b
+src/wireless_status_menu.c	WirelessStatusMenu_InitFromScript	zero	171	removed	3af1eae410b915dae0dbe7bbdaa90a9aadfe0a9b

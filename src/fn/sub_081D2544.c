@@ -9,19 +9,16 @@ s32 SceneNpc_EnterRequestedState(struct StateActor *p)
     s32 result;
     if ((u8)(p->nextState - 1) <= 0x17) {
         void (*callback)(void) = gUnk_0861265C[p->nextState];
-        s32 zero = 0;
-        s32 one;
         p->prevState = p->nextState;
         p->stateCallback = callback;
-        p->stateFrame = zero;
-        one = 1;
-        p->enter = one;
-        p->phase = zero;
+        p->stateFrame = 0;
+        p->enter = 1;
+        p->phase = 0;
         tag->attachment = ActorAttachment_UpdateFromDescriptor(tag->attachment, p->motion, 2, 0x7F,
                                                                0, 0, 0x80, 0);
-        tag->field4 = zero;
-        tag->field6 = one;
-        tag->state.word = zero;
+        tag->field4 = 0;
+        tag->field6 = 1;
+        tag->state.word = 0;
         result = 1;
     } else
         result = 0;

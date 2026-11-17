@@ -38,13 +38,7 @@ void Player_BeginWalk(struct PRecover *p)
     sub_08238238(p);
     Anim_SetSequence(&p->seq, p->resource, 1, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);
-    if (({
-            u32 o = 0x404;
-            u8 *q;
-            q = (u8 *)p + o;
-            *(u16 *)q;
-        }) == 2 &&
-        p->seq.elapsed == 0) {
+    if (p->seq.index == 2 && p->seq.elapsed == 0) {
         if (p->stepSoundFlag) {
             p->stepSoundFlag = 0;
             Player_PlayLocalSong(p->song, 0xC7);
