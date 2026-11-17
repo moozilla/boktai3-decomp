@@ -788,19 +788,17 @@ static inline s32 Slime_ShiftTowardZero(s32 n, u32 bits)
 
 static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 kind)
 {
-    u32 zero;
     a->base.field2B2 = 1;
-    zero = 0;
-    a->base.stepDone = zero;
+    a->base.stepDone = 0u;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0u;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0u;
 }
 
 static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
