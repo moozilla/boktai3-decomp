@@ -41,8 +41,7 @@ void Hresvelgr_UpdateOpeningAttackCycle(u8 *p)
     struct Action *a = (void *)(p + 0x300);
     if (Start(p)) {
         u16 *counter = (void *)(p + 0x318);
-        u32 zero = 0;
-        *counter = zero;
+        *counter = 0u;
         ActionState_Reset(a);
         ActionState_SetState(a, 0);
     }
