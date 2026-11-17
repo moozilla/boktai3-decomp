@@ -72,9 +72,8 @@ void SceneEventActor_UpdateRecoil(struct ActorState *eventActor)
                                                          0xf4, 1, 1, 1);
                 {
                     u32 next = 2;
-                    u32 zero = 0;
                     eventActor->stateReset = next;
-                    eventActor->pendingAction = zero;
+                    eventActor->pendingAction = 0;
                 }
             }
             break;
@@ -113,9 +112,8 @@ void SceneEventActor_UpdateRemovalSequence(struct ActorState *actor)
             if (actor->finished) {
                 {
                     u32 phase = 2;
-                    u32 zero = 0;
                     actor->stateReset = phase;
-                    actor->pendingAction = zero;
+                    actor->pendingAction = 0;
                 }
             }
             break;
@@ -123,9 +121,8 @@ void SceneEventActor_UpdateRemovalSequence(struct ActorState *actor)
             if (actor->graphics.eventFlags & 2) {
                 {
                     u32 phase = 3;
-                    u32 zero = 0;
                     actor->stateReset = phase;
-                    actor->pendingAction = zero;
+                    actor->pendingAction = 0;
                 }
                 SceneActors_RunSecondEventScript(actor, actor->graphics.eventScripts);
             }
@@ -198,9 +195,8 @@ static inline int TerrainHeight(struct ContactPosition *position)
 static inline void SetVelocity(struct ContactPosition *velocity, u32 angle, s32 speed)
 {
     s32 x = ScaleCoordinate(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
     velocity->x = x;
-    velocity->y = zero;
+    velocity->y = 0;
     velocity->z = ScaleCoordinate(gUnk_086149C4[angle & 255] * speed);
 }
 
@@ -422,9 +418,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             }
             if ((++eventActor->pendingAction) > 8) {
                 u32 phase = 1;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             }
             break;
         }
@@ -437,9 +432,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             }
             if (eventActor->finished == 1) {
                 u32 phase = 2;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             }
             break;
 
@@ -451,9 +445,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             }
             if (eventActor->pendingAction > 30) {
                 u32 phase = 3;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             } else
                 eventActor->pendingAction++;
             break;
@@ -464,9 +457,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
                                                      4);
             if ((++eventActor->pendingAction) > 30) {
                 u32 phase = 4;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             }
             break;
 
@@ -479,9 +471,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             }
             if ((++eventActor->pendingAction) > 20) {
                 u32 phase = 5;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             }
             break;
 
@@ -511,9 +502,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             }
             if (eventActor->pendingAction > 20) {
                 u32 phase = 8;
-                u32 zero = 0;
                 eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                eventActor->pendingAction = 0;
             } else
                 eventActor->pendingAction++;
             break;
@@ -569,9 +559,8 @@ void SceneEventActor_UpdateDelayedFinish(struct ActorState *actor)
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
                 {
                     u32 phase = 2;
-                    u32 zero = 0;
                     actor->stateReset = phase;
-                    actor->pendingAction = zero;
+                    actor->pendingAction = 0;
                 }
             }
             break;
@@ -682,13 +671,11 @@ void SceneEventActor_UpdateSongStopTransition(struct ActorState *actor)
                 actor->pendingAction++;
             }
             if (actor->finished) {
-                u32 zero;
                 u32 phase;
                 int shifted;
                 u32 facing;
                 facing = 0x20;
                 actor->body.direction = facing;
-                zero = 0;
                 k2 = 2;
                 phase = k2;
                 shifted = actor->body.direction + 0x60;
@@ -708,7 +695,7 @@ void SceneEventActor_UpdateSongStopTransition(struct ActorState *actor)
                 SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
                                                          actor->animationData, 0xF4, 1, 1, 4);
                 actor->stateReset = phase;
-                actor->pendingAction = zero;
+                actor->pendingAction = 0;
                 actor->pending = 1;
             }
             break;
