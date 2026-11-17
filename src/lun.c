@@ -25,6 +25,7 @@
 #include "render.h"
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_chase_reaction.h"
 
 void SceneActorControl_OnIdle(u8 *);
 
@@ -33,8 +34,6 @@ void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);
 void Player_QueueStatusEffect(struct Player *player, s32 effect);
 
 void Sound_PlaySong(u32 song); /* m4aSongNumStart, remembering the song per track unless muted */
-
-extern struct Player *gUnknown_02000580;
 
 static inline void Lun_SetControl(struct ChaseActor *actor, void *target, u32 kind)
 {
@@ -160,10 +159,10 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     actor = object;
     if (Lun_IsUnavailable(actor))
         return;
-    distance = actor->base.body.position.y - gUnknown_02000580->position.y;
+    distance = actor->base.body.position.y - gPlayers[0]->position.y;
     {
         s32 fast = Lun_IsPlayerFast();
-        if (fast || gUnknown_02000580->actionMode == 4) {
+        if (fast || gPlayers[0]->actionMode == 4) {
             limit = 0x3C;
         } else {
             limit = 0x104;
@@ -182,7 +181,7 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     Lun_ClearReactionFlags(actor, 0x180);
     while (Lun_CapturePalette(actor, &palette) == 0) {
         LUN_READ_CONTACT_FLAG(phase, actor, phase);
-        Player_IncrementActionSpeedBonus(gUnknown_02000580, 0);
+        Player_IncrementActionSpeedBonus(gPlayers[0], 0);
         Lun_ApplyContactFlag(actor->base.context);
         Sound_PlaySong(0x2AD);
         return;
@@ -190,9 +189,9 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     LUN_READ_CONTACT_FLAG(phase, actor, phase);
     Lun_ApplyContactFlag(actor->base.context);
     if (*palette == 1) {
-        Player_QueueStatusEffect(gUnknown_02000580, 1);
+        Player_QueueStatusEffect(gPlayers[0], 1);
     } else {
-        Player_QueueStatusEffect(gUnknown_02000580, 2);
+        Player_QueueStatusEffect(gPlayers[0], 2);
     }
 }
 
@@ -1391,8 +1390,6 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
         u8 *state = &s->base.state2A8;
         u8 zero = 0;
         u8 one;
-        void (*fn)(void);
-        u8 code;
         *state = zero;
         s->base.phase2A9 = zero;
         s->base.behavior2AA = three;
@@ -1402,19 +1399,7 @@ void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
             one = 1;
             *queued = one;
         }
-        fn = SceneActorControl_OnIdle;
-        code = 0x10;
-        s->base.field2B2 = one;
-        s->base.stepDone = zero;
-        s->base.controlKind = code;
-        s->base.target = fn;
-        s->base.field2C8 = zero;
-        {
-            u32 *flags = &s->base.pendingControlFlags;
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->base.pendingControl = zero;
+        SceneActorChase_SetControl(s, SceneActorControl_OnIdle, 0x10);
     }
 }
 
@@ -1458,7 +1443,7 @@ void Lun_UpdateHoverHeight(struct ChaseActor *actor)
         passageActive = 0;
         if (mode != 0 && gPlayerInteractionMode == 5)
             passageActive = 1;
-        if (passageActive || gUnknown_02000580->actionMode == 4)
+        if (passageActive || gPlayers[0]->actionMode == 4)
             cap = 0x3c;
         else
             cap = 0x104;

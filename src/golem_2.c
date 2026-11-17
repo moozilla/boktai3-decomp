@@ -332,14 +332,14 @@ static inline u8 Golem_Arrive(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellIndex((t)->position.x >> 8, (t)->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -446,7 +446,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
         actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         if (!Golem_Arrive(object)) {
             if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                                 &actor->base.tracking.target->position)) {
@@ -504,7 +504,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         if (!actor->base.tracking.target)
             return 0;
         actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         if (!Golem_Arrive(object)) {
@@ -523,7 +523,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         if (!actor->base.tracking.target)
             return 0;
         actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         actor->base.body.direction = actor->base.tracking.heading;
         group->destination->pad = 1;
         if (!Golem_Arrive(object)) {
@@ -545,7 +545,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
     GolemReaction_LatchHitReact(object);
     if (!actor->base.tracking.target)
         return 0;
-    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     SceneActorChase_SetActorFlags(actor, 0x90);
     group->destination->pad = 0;
     if (!Golem_Arrive(object)) {
@@ -658,14 +658,14 @@ static inline u8 Golem_Arrive_ResumeDelayedRoute(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellIndex((t)->position.x >> 8, (t)->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))

@@ -1,10 +1,9 @@
 #include "global.h"
+#include "player.h"
 #include "render.h"
 
 /* confidence=low: Initialize the Vampire actor from script options and create its visual and contact objects. */
 
-struct VampireInitPlayer;
-extern struct VampireInitPlayer *gUnknown_02000580[];
 extern void *gGameState;
 extern const u8 gUnk_0824DC78[];
 void *ScriptProc_Start(u32, u32);
@@ -40,11 +39,6 @@ void sub_08022B18(void);
 
 struct VampireInitPosition {
     s32 x : 16, y : 16, z : 16, pad : 16;
-};
-
-struct VampireInitPlayer {
-    u8 pad0[0x30];
-    struct VampireInitPosition position;
 };
 
 struct VampireResourceHeader {
@@ -208,10 +202,10 @@ int sub_08028F78(struct VampireInit *s, u32 id)
     if (i < n) {
         u8 *count = &base->targetCount;
         void **dst = base->targetWords;
-        struct VampireInitPlayer **src = gUnknown_02000580;
+        struct Player **src = gPlayers;
         /* Each entry advances one word; its position pointer shares the next slot. */
         do {
-            struct VampireInitPlayer *q = *src;
+            struct Player *q = *src;
             if (q) {
                 dst[0] = q;
                 dst[1] = &q->position;

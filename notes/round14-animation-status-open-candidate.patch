@@ -1,0 +1,61 @@
+--- a/src/fn/sub_08220C8C.c
++++ b/src/fn/sub_08220C8C.c
+@@ -1,17 +1,20 @@
+-#include "global.h"
+-struct DisplaySequenceState {
+-    const u16 *commands;
+-    u8 flags, frameCount, frameWeight, duration;
+-    u16 index, sequence, speed, elapsed;
++#include "display_sequence_inline.h"
++struct DisplaySequenceResourceEntry {
++    u8 unknown0, frameCount;
++    u16 offset;
+ };
+-u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence, u8 row, u8 flags)
++struct DisplaySequenceResource {
++    u16 sequenceCount, commandCount;
++    struct DisplaySequenceResourceEntry entries[1];
++};
++typedef char DisplaySequenceResourceEntrySize[sizeof(struct DisplaySequenceResourceEntry) == 4 ? 1 : -1];
++u32 Anim_SetSequence(struct DisplaySequenceState *state, const struct DisplaySequenceResource *data, u16 sequence, u8 row, u8 flags)
+ {
+-    u8 *entry = data + (sequence * 4 + 4);
+-    u8 *base = data + *(u16 *)(entry + 2);
+-    u32 prod = entry[1] * row * 2;
+-    state->commands = (const u16 *)(base + prod);
++    const struct DisplaySequenceResourceEntry *entry = &data->entries[sequence];
++    const u16 *commands = (const u16 *)((const u8 *)data + entry->offset);
++    state->commands = commands + entry->frameCount * row;
+     state->speed = 0x40;
+-    if (state->sequence == sequence && state->frameCount) {
++    if (state->unknownA == sequence && state->frameCount) {
+         if (flags & 4) {
+             if (!(state->flags & 4))
+                 goto restart;
+@@ -21,23 +24,18 @@
+             goto same;
+     }
+ restart:
+-    state->frameCount = entry[1];
++    state->frameCount = entry->frameCount;
+     if (flags & 4)
+         state->index = state->frameCount - 1;
+     else
+         state->index = 0;
+     {
+-        u32 offset = state->index << 1;
+-        const volatile u16 *command;
+-        u8 weight;
+-        base = (u8 *)((u32)state->commands + offset);
+-        command = (const volatile u16 *)base;
+-        weight = *command & 0xF;
++        u8 weight = DisplaySequence_ReadCommand(state->commands + state->index) & 15;
+         state->frameWeight = weight;
+         state->duration = weight;
+     }
+     state->elapsed = 0;
+-    state->sequence = sequence;
++    state->unknownA = sequence;
+     state->flags = flags;
+     return 1;
+ same:

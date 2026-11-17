@@ -803,14 +803,14 @@ static inline u8 Mummy_Arrive(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -1970,7 +1970,7 @@ void Mummy_UpdateProbeNavigation(struct ChaseActor *actor)
         }
         Mummy_SetBehavior(actor, 13);
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32, speed)) {
-        if (SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,
+        if (SceneActorChase_Bits32(&gPlayers[0]->statusFlags,
                                    8) &&
             !body->pursuitDelay) {
             if (Mummy_RequestStraightRoute(actor))
@@ -2005,14 +2005,14 @@ static inline u8 Mummy_Arrive_pursuit(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellIndex((t)->position.x >> 8, (t)->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -2431,14 +2431,14 @@ static inline u8 Mummy_ArriveWithDirectFallback(void *obj)
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -2869,14 +2869,14 @@ static inline u8 Mummy_Arrive_path(void *obj, struct SceneActorChaseTracking *tr
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -2952,7 +2952,7 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
     cell = ((struct MummyContactTarget *)(*target))->cell->index;
     if (*(u32 *)actor->base.unknown100) {
         if (SceneActorChase_TestField(&actor->base.placementFlags, 2))
-            (*target) = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            (*target) = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         else if (!((*target)))
             goto threshold;
         {
@@ -4213,14 +4213,14 @@ static inline u8 Mummy_Arrive_SelectMovementResponse(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -4391,14 +4391,14 @@ static inline u8 Mummy_Arrive_ResumePlayerPursuit(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -4451,7 +4451,7 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         SceneActorChase_ClearFlagComponent(&body->flags6F2, 0x800);
         actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         if (Mummy_Arrive_ResumePlayerPursuit(actor)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);

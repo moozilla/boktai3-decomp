@@ -30,4 +30,13 @@ struct SwordWaveComponent {
     u8 done, pad18C, rotationStep;
 };
 
+/* Activate a component's action and raise its entry flag. */
+static inline void SwordWaveComponent_SetAction(struct SwordWaveComponent *p,
+                                               u8 active, u8 action)
+{
+    p->active = active;
+    p->phase = action;
+    p->flags |= active;
+}
+
 #endif

@@ -16,22 +16,22 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 |---|---:|
 | `dead-code` | 13 |
 | `proved-zero` | 35 |
-| `once-loop` | 123 (+1 excused) |
+| `once-loop` | 114 (+1 excused) |
 | `stmt-expr` | 6 |
-| `const-local` | 982 |
+| `const-local` | 977 |
 | `addr-deref` | 41 |
 | `placeholder-name` | 8 |
-| `volatile-view` | 6 |
+| `volatile-view` | 5 |
 | `local-union` | 131 |
-| total | 1,345 |
+| total | 1,330 |
 
-Source files with no warning: **5,317** of 6,041.
+Source files with no warning: **5,323** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.
 
-RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **99.9%** (29,456 / 29,473 bytes); no other declaration left: 88.6%.
+RAM objects with one shared declaration (`symbols/ram.csv`, tracked here only): **99.9%** (29,456 / 29,473 bytes); no other declaration left: 88.5%.
 
 ```
 ██████████████████████████████████████████████████ 100.00%

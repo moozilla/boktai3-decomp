@@ -1,7 +1,7 @@
 #include "contact_swarm.h"
+#include "player.h"
 #include "display_sequence_inline.h"
 
-extern void *gUnknown_02000580;
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 s32 Terrain_GetHeightAt(void *);
 void Ivy_InitPaletteBuffers(void *);
@@ -286,7 +286,7 @@ void Sword_InitTask(struct SwordTask *p)
     s32 i;
     s32 sb;
 
-    p->target = gUnknown_02000580;
+    p->target = gPlayers[0];
     animMain = &p->graphics;
     spriteMain = &p->sprite;
     p->field64 = 0;

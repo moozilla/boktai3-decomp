@@ -1,7 +1,6 @@
-#include "global.h"
-/* FeatherEffectPool_InitModule: Empty module initialization hook; feather effect identity is tentative from the nearby sprite resource */
-#define FeatherEffectPool_InitModule sub_08128B48
+#include "feather_effect_pool.h"
 
-void sub_08128B48(void)
+/* State zero is the empty feather callback in gUnk_086107A0. */
+void sub_08128B48(struct FeatherPool *pool, struct Feather *feather)
 {
 }

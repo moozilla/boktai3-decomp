@@ -48,7 +48,7 @@ static inline void Ghoul_CaptureTarget(struct ChaseActor *actor, struct Ghoul *c
         s32 player = Ghoul_TargetPlayerSlot(actor);
         if (player >= 0)
             context->discTargets[slot] =
-                ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->target.position;
+                ((struct SceneActorChasePlayer *)gPlayers[player])->target.position;
     } else {
         context->discTargets[slot] = actor->base.tracking.target->position;
     }

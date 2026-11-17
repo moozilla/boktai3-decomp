@@ -16,15 +16,8 @@ void Sword_UpdateDepthWaveReturn(struct SwordWaveComponent *p)
     p->z = p->startZ + Div(p->dz * p->timer, 128) + wave;
     p->timer--;
     if (p->timer == 0) {
-        u32 one;
-        do {
-            p->rotation = 128;
-            one = 1;
-            p->active = one;
-        } while (0);
-        p->phase = one;
-        one |= p->flags;
-        p->flags = one;
+        p->rotation = 128;
+        SwordWaveComponent_SetAction(p, 1, 1);
         p->update = IvyChild_UpdateAfterBob;
     }
 }
