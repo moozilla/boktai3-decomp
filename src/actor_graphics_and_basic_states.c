@@ -703,14 +703,12 @@ static inline void reactionAction(struct ReactionActor *p, int one, int id, int 
 
 static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->reset = zero;
-    p->pending = zero;
+    p->reset = 0;
+    p->pending = 0;
 }
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
@@ -1751,14 +1749,12 @@ struct Common {
 
 static inline void state(struct Common *p, void (*fn)(void *), int id)
 {
-    int zero;
     p->state = id;
-    zero = 0;
     p->callback = fn;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->reset = zero;
-    p->pending = zero;
+    p->reset = 0;
+    p->pending = 0;
 }
 
 int GridAttack_SelectNextAction(void *);
@@ -1861,10 +1857,8 @@ void SceneActorState_WaitForDelayedAction(Actor_08023E24 *p)
         sub_08022EA4(p, (u8 *)p + 0x9c4);
         {
             u32 one = 1;
-            u32 zero;
             s->phase = one;
-            zero = 0;
-            s->elapsed = zero;
+            s->elapsed = 0;
             s->enter_08023E24 = one;
         }
     } else
@@ -1963,10 +1957,8 @@ void SceneActorState_PlayAnimation5ThenAdvance(State_08023F34 *p)
     }
     if (p->finished) {
         u32 next = 3;
-        u32 zero;
         p->phase = next;
-        zero = 0;
-        p->elapsed = zero;
+        p->elapsed = 0;
         p->enter_08023F34 = 1;
     } else
         p->elapsed++;
@@ -2024,10 +2016,8 @@ void SceneActorState_EnterPhase6AndResetAnimation(State_08023F98 *p)
     int bit;
     {
         u32 next = 6;
-        u32 zero;
         p->phase = next;
-        zero = 0;
-        p->elapsed = zero;
+        p->elapsed = 0;
         p->enter_08023F98 = 1;
     }
     {
@@ -2169,10 +2159,8 @@ void sub_08023FE8(State_08023F98 *p)
         }
         if (bad || p->finished) {
             u32 next = 5;
-            u32 zero;
             p->phase = next;
-            zero = 0;
-            p->elapsed = zero;
+            p->elapsed = 0;
             p->enter_08023F98 = 1;
         } else
             p->elapsed++;
