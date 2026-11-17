@@ -46,10 +46,17 @@ u16 PairTable_Lookup(u16 *table, u16 stride, s32 a, s32 b)
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
+static inline struct NavMeshGraph *GetMesh(struct NavMeshResource *res, u32 idx)
+{
+    u32 byteOffset = idx << 2;
+    u32 *offset = res->offsets;
+    offset = (u32 *)((u8 *)offset + byteOffset);
+    return (void *)((u8 *)res + *offset);
+}
+
 u32 Nav_IsPositionInMesh(struct NavMeshQuery *q, void *unused, struct ContactPosition *pos)
 {
     struct NavMeshResource *resource = gTerrainMap->navigation;
-    u32 *new_var;
     s32 x = (s16)pos->x >> 8;
     s32 z = (s16)pos->z >> 8;
     s32 cell;
@@ -73,9 +80,7 @@ u32 Nav_IsPositionInMesh(struct NavMeshQuery *q, void *unused, struct ContactPos
     if (flags & mask)
         return 0;
     for (meshIndex = 0; meshIndex < resource->count; meshIndex++) {
-        u32 sh = meshIndex << 2;
-        struct NavMeshGraph *mesh =
-            (void *)((u8 *)resource + *(u32 *)((u32)(new_var = resource->offsets) + sh));
+        struct NavMeshGraph *mesh = GetMesh(resource, meshIndex);
         struct NavMeshRegion *regions = (void *)((u8 *)mesh + mesh->regionOffset);
         s32 i;
         for (i = 0; i < mesh->count; i++) {
@@ -338,13 +343,6 @@ u32 NavMesh_ConsumeProbeEvent(u16 *p)
         r = 1;
     }
     return r;
-}
-
-static inline struct NavMeshGraph *GetMesh(struct NavMeshResource *res, u32 idx)
-{
-    u32 sh = idx << 2;
-    u32 *offsets;
-    return (void *)((u8 *)res + *(u32 *)((u32)(offsets = res->offsets) + sh));
 }
 
 void NavMesh_UpdateContainingRegion(void *resource, void *query, void *position)
