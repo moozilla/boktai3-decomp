@@ -13,32 +13,23 @@ static inline u8 IsUsed(struct SpriteEffectControllerPool *p, u32 index)
 s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
 {
     struct SpriteEffectControllerPool *p = input;
-    struct SpriteEffectController *slot;
-    do {
-        do {
-            slot = p->slots;
-        } while (0);
-    } while (0);
+    struct SpriteEffectController *slots = p->slots;
     if (p->used) {
         u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask) {
+        if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
-        }
         {
             u32 mask = 4;
-            if (gUnk_02000560 & mask) {
+            if (gUnk_02000560 & mask)
                 return 0;
-            }
         }
         SpriteEffectController_QueueColliders(p);
         {
             s32 i = 0;
             void **table = gUnk_08605B84;
-            u8 *state = &p->slots[0].state;
-            for (; i < 24; state += 0x7c, slot++, i++) {
-                if (IsUsed(p, i)) {
-                    sub_08249240(p, slot, table[*state]);
-                }
+            for (; i < 24; i++) {
+                if (IsUsed(p, i))
+                    sub_08249240(p, &slots[i], table[slots[i].state]);
             }
         }
     }
