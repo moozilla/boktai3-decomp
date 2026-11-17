@@ -10,6 +10,9 @@
 #include "render.h"
 #include "field_hud_widgets.h"
 #include "task.h"
+#include "sprite_oam.h"
+
+struct SpriteEffectTileResource;
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -278,7 +281,9 @@ struct SceneHudState {
     u8 unknown491E[0xE];
     struct FieldHudWidgets fieldWidgets; /* 0x492C */
     u8 initializationFlag; /* 0x4CD8: cleared by both initializers */
-    u8 unknown4CD9[0x4D80 - 0x4CD9];
+    u8 unknown4CD9[3];
+    const struct SpriteEffectTileResource *numberDigitResource; /* 0x4CDC */
+    struct SpriteDrawable numberDigits[4]; /* 0x4CE0: temporary action-value digits */
     s8 categoryEntrySlots[8]; /* 0x4D80 */
     s8 unlockEntrySlots[8];   /* 0x4D88 */
     s8 equippedIconSlots[8];  /* 0x4D90: inventory slot for each visible equipped icon */
