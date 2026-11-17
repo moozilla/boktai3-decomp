@@ -293,8 +293,7 @@ int MessageWindow_ShowMessage(int index)
                 u32 *counter;
                 counter = &window->playbackCounter;
                 {
-                    u32 zero = 0;
-                    *counter = zero;
+                    *counter = 0u;
                 }
             }
             {
@@ -645,8 +644,7 @@ void MessageWindow_UpdateFastPlayback(struct MessageWindow *window)
         state->skip = window->skipFlags;
     if (state->pc) {
         if (!state->stream && !*((u8 *)state->pc)) {
-            int zero = 0;
-            window->pageAdvanceTimer = zero;
+            window->pageAdvanceTimer = 0;
             MessageWindow_SetPlayback(window, MessageWindow_UpdatePageAdvance);
             if (!window->autoAdvance && !window->pageAdvanceDelay)
                 window->widget.flags &= ~1;
