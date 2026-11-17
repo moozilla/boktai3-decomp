@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_palette.h"
 #include "scene_actor_placement.h"
 static inline u8 Test(u32 value, u32 mask)
@@ -7,29 +6,32 @@ static inline u8 Test(u32 value, u32 mask)
         return TRUE;
     return FALSE;
 }
+static inline u8 TestCategory(u32 value, u32 mask)
+{
+    mask &= value;
+    /* Allocation-only: the folded guard keeps regmove from tying the AND to value. */
+    {
+        u32 narrow = (u16)value;
+        if ((s32)narrow < 0)
+            mask = 0;
+    }
+    if (mask)
+        return TRUE;
+    return FALSE;
+}
 static inline u32 ReadMasked(u32 mask, u32 *field)
 {
     return *field & mask;
 }
-static inline u8 Unavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
-{
-    return SceneActorPlacement_IsUnavailable(&actor->base);
-}
 static inline u16 Remaining(struct SceneActorPaletteTransition *transition)
 {
-    register struct SceneActorPaletteTransition *low asm("r1") = transition;
+    struct SceneActorPaletteTransition *low = transition;
     return low->remaining;
-}
-static inline s32 ReadSignedByte(const s8 *input)
-{
-    u32 encoded = *(const u8 *)input;
-    encoded <<= 24;
-    return (s32)encoded >> 24;
 }
 static inline void BindPalette(struct ChaseActor *actor,
                                struct SceneActorPaletteTransition *inputTransition)
 {
-    register struct SceneActorPaletteTransition *transition asm("r12") = inputTransition;
+    struct SceneActorPaletteTransition *transition = inputTransition;
     if (actor->base.drawableKind == 0) {
         void *drawable = actor->base.drawable;
         const u16 *colors;
@@ -46,24 +48,23 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
                                       struct ChaseActor *inputActor)
 {
     struct SceneActorPaletteManagerView *manager = inputManager;
-    register struct SceneActorPaletteTransition *transition asm("r12");
+    struct SceneActorPaletteTransition *transition;
     struct ChaseActor *actorInput = inputActor;
     struct ChaseActor *actor;
     u32 alreadyAdvanced;
     u32 category;
-    register u32 categoryFlags asm("r1");
+    u32 categoryFlags;
     u32 flagSet;
-    register s32 i asm("r5");
-    struct {
-        s8 *deltaRed;
-        s16 *red;
-        s8 *deltaGreen;
-        s16 *green;
-        u32 *actorFlags;
-        s16 *blue;
-    } channels;
+    s32 i;
+    /* Allocation-only: declaration order preserves the six spilled channel homes. */
+    s8 *deltaRed;
+    s16 *red;
+    s8 *deltaGreen;
+    s16 *green;
+    u32 *actorFlags;
+    s16 *blue;
     actor = actorInput;
-    if (Unavailable(actor, 0x40, 0x20000))
+    if (SceneActorPlacement_IsUnavailable(&actor->base))
         goto failure;
     {
         u32 mask = 0x2000;
@@ -79,11 +80,11 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *input
     if (category != 23)
         goto success;
     transition = &manager->category23;
-    flagSet = Test(categoryFlags, 0x8000);
+    flagSet = TestCategory(categoryFlags, 0x8000);
     goto selected;
 category10:
     transition = &manager->category10;
-    flagSet = Test(categoryFlags, 0x4000);
+    flagSet = TestCategory(categoryFlags, 0x4000);
 selected:
     if (flagSet)
         alreadyAdvanced = 1;
@@ -92,106 +93,44 @@ selected:
             BindPalette(actor, transition);
         goto success;
     }
-    {
-        u32 offset = 0x2CC;
-        asm("" : "+r"(offset));
-        channels.actorFlags = (void *)((u32)actor + offset);
-    }
+    actorFlags = &actor->base.behaviorFlags;
     if (!alreadyAdvanced) {
-        s8 *deltaBlue;
-        register u16 *colorCursor asm("r6");
         i = 0;
-        {
-            s16 *red = transition->red;
-            s8 *deltaRed;
-            register s16 *green asm("r0");
-            channels.red = red;
-            deltaRed = transition->deltaRed;
-            channels.deltaRed = deltaRed;
-            green = transition->green;
-            channels.green = green;
-            channels.deltaGreen = (void *)((u32)red + 0x70);
-            channels.blue = (void *)((u32)deltaRed - 0x20);
-        }
-        {
-            s8 *base = transition->deltaBlue;
-            deltaBlue = base;
-        }
-        colorCursor = transition->colors;
-    nextColor: {
-        u32 halfOffset = i * 2;
-        s16 *redValue;
-        s16 *greenValue;
-        register s32 blueSum asm("r2");
-        {
-            register s16 *base asm("r2") = channels.red;
-            redValue = (void *)((u32)base + halfOffset);
-        }
-        {
-            register s8 *base asm("r2") = channels.deltaRed;
-            register s8 *input asm("r0");
-            input = base + i;
-            asm("" : "+r"(input));
-            *redValue += ReadSignedByte(input);
-        }
-        {
-            register s16 *base asm("r0") = channels.green;
-            greenValue = (void *)((u32)base + halfOffset);
-        }
-        {
-            register s8 *base asm("r2") = channels.deltaGreen;
-            register s8 *input asm("r0");
-            input = base + i;
-            asm("" : "+r"(input));
-            *greenValue += ReadSignedByte(input);
-        }
-        {
-            register s16 *base asm("r0") = channels.blue;
-            s16 *blueValue;
-            register s8 *input asm("r0");
-            blueValue = (void *)((u32)base + halfOffset);
-            input = deltaBlue + i;
-            blueSum = *input;
-            blueSum += (u16)*blueValue;
-            *blueValue = blueSum;
-        }
-        {
-            s32 packed = *redValue >> 5;
-            s32 green = *greenValue >> 5;
-            packed |= (u32)green << 5;
-            blueSum = (s16)blueSum >> 5;
-            packed |= (u32)blueSum << 10;
-            *colorCursor++ = packed;
-        }
-    }
-        i++;
-        if (i < 16)
-            goto nextColor;
-        {
-            struct SceneActorPaletteTransition *low = transition;
-            low->remaining--;
-        }
-        {
-            u32 mask;
-            register u32 current asm("r2") = category;
-            if (current == 10)
-                goto firstCategory;
-            if (current != 23)
-                goto stepFinished;
-            mask = 0x8000;
-            goto writeFlag;
-        firstCategory:
-            mask = 0x4000;
-        writeFlag: {
-            struct SceneActorPaletteManagerView *low = manager;
-            low->flags |= mask;
-        }
+        red = transition->red;
+        deltaRed = transition->deltaRed;
+        green = transition->green;
+        deltaGreen = transition->deltaGreen;
+        blue = transition->blue;
+        do {
+            s32 blueSum;
+            /* Allocation-only: the bounded term folds after loop strength reduction. */
+            u32 halfOffset = (i + ((u16)i >> 16)) * 2;
+            (*(s16 *)((u32)red + halfOffset)) += deltaRed[i];
+            (*(s16 *)((u32)green + halfOffset)) += deltaGreen[i];
+            blueSum = (*(s16 *)((u32)blue + halfOffset)) += transition->deltaBlue[i];
+            transition->colors[i] = ((*(s16 *)((u32)red + halfOffset)) >> 5) |
+                                    ((u32)((*(s16 *)((u32)green + halfOffset)) >> 5) << 5) |
+                                    ((u32)((s16)blueSum >> 5) << 10);
+            i++;
+        } while (i < 16);
+        transition->remaining--;
+        switch (category) {
+            case 23: {
+                u32 mask = 0x8000;
+                manager->flags |= mask;
+                break;
+            }
+            case 10: {
+                u32 mask = 0x4000;
+                manager->flags |= mask;
+                break;
+            }
         }
     }
 stepFinished: {
     u32 mask = 0x02008000;
-    register u32 *field asm("r2");
-    field = channels.actorFlags;
+    u32 *field;
+    field = actorFlags;
     if (!(*field & mask))
         BindPalette(actor, transition);
 }
