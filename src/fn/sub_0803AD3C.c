@@ -47,10 +47,8 @@ void Anim_Remove(void *);
 void WirelessResultPanel_InitBackground(struct LinkMenu *p, int layer)
 {
     void *resource = ScriptProc_Start(0xC091, 0xCF15);
-    int zero;
     p->resource = resource;
-    zero = 0;
-    Bg_SetupLayers(1, 0, resource, 0, zero, 1, &layer);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    Bg_SetupLayers(1, 0, resource, 0, 0, 1, &layer);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x26BB) + 0x14, gBgPaletteBuffer, 256);
 }
