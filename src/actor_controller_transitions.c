@@ -1,4 +1,5 @@
 #include "actor_controller.h"
+#include "scene_particle_burst_api.h"
 
 void ActorController_UpdateNegativeTurnSpeed91(struct SceneCombatActor *actor)
 {
@@ -153,11 +154,9 @@ extern const u32 gUnk_0824EC84[];
 
 extern const struct ContactPosition gUnk_0824ECB4, gUnk_0824EC94[];
 
-extern const u8 gUnk_0824ECBC[];
+extern const struct ContactPosition gUnk_0824ECBC;
 
 void Camera_RequestShake(u32);
-
-void SceneParticleBurst_CreateWithPause(void *, u32, const void *, u32, u32, u32);
 
 static inline s32 ActorController_TruncateFixed(s32 value)
 {
@@ -228,7 +227,7 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
                 dest[1] = right->y + left->y;
                 dest[2] = right->z + left->z;
             }
-            SceneParticleBurst_CreateWithPause(&out, 0, gUnk_0824ECBC, 15, 1, zero);
+            SceneParticleBurst_CreateWithPause(&out.position, 0, &gUnk_0824ECBC, 15, 1, zero);
             if (actor->animationFrame == 0)
                 Sound_PlaySongChecked(0xba);
             break;

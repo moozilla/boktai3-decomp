@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_particle_burst_api.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_reset.h"
 #include "skeleton.h"
@@ -3018,9 +3019,6 @@ void Skeleton_UpdateAttackWindup(struct S *p)
 
 void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_);
 
-s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *,
-                                       const struct ContactPosition *, const void *, s32, u32, u32);
-
 static inline s32 Truncate(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
@@ -3057,7 +3055,7 @@ void SceneActorReaction_TickForwardBurst(struct ChaseActor *p_)
         u32 zero;
         struct ContactPosition step;
     } scratch;
-    struct ContactPackedVector jitter;
+    struct ContactPosition jitter;
     struct ContactPosition *step;
     if (SceneActorReaction_TakePrepared(p)) {
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x14);
@@ -3131,7 +3129,7 @@ void Skeleton_TickDecayingLunge(struct ChaseActor *p, s32 tick_)
         u32 zero;
         struct ContactPosition step;
     } scratch;
-    struct ContactPackedVector jitter;
+    struct ContactPosition jitter;
     struct ContactPosition empty;
     struct ContactPosition *np;
     context = *(u8 **)((u8 *)p + 0x3D0);

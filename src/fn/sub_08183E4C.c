@@ -1,11 +1,10 @@
 #include "actor_controller.h"
+#include "scene_particle_burst_api.h"
 
 /* tentative: faces a direction, sets a fixed-speed motion vector, nudges toward the cell centre and spawns a particle burst */
 
 extern u32 gUnk_0824EDF8[];
 extern const struct ContactPosition gUnk_0824EE08;
-s32 SceneParticleBurst_CreateWithPause(const struct ContactPosition *, const struct ContactPosition *,
-                                       const struct ContactPosition *, s32, u32, u32);
 
 void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *p)
 {

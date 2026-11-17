@@ -1,4 +1,5 @@
 #include "scene_actor_chase.h"
+#include "scene_particle_burst_api.h"
 #include "global.h"
 #include "player.h"
 #include "scene_actor_control_phase.h"
@@ -3142,8 +3143,6 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     out->z = entry[1];
 }
 
-void SceneParticleBurst_CreateWithPause(const void *, const void *, const void *, s32, s32, s32);
-
 struct Burst080FC094Drawable {
     u8 unk_00[6];
     u8 heading;
@@ -3166,7 +3165,7 @@ static inline s32 Burst080FC094_Scale(s32 value)
 void Axe_SpawnHeadingBurst(struct ChaseActor *actor, s32 count)
 {
     struct Burst080FC094Drawable *drawable = actor->base.drawable;
-    struct ContactPackedVector range;
+    struct ContactPosition range;
     struct ContactPosition offset;
     struct ContactPosition velocity;
     union {
@@ -3189,7 +3188,7 @@ void Axe_SpawnHeadingBurst(struct ChaseActor *actor, s32 count)
     x2 = Burst080FC094_Scale(-(offset.x * gUnk_086149C4[drawable->heading]));
     z2 = Burst080FC094_Scale(offset.z * gUnk_086149C4[(drawable->heading + 64) & 255]);
     position.v.z = x2 + z2 + position.p.z;
-    SceneParticleBurst_CreateWithPause(&position, &velocity, &range, count, 2, 4);
+    SceneParticleBurst_CreateWithPause(&position.p, &velocity, &range, count, 2, 4);
 }
 
 struct AxeSparkContext {

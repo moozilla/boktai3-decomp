@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_particle_burst_api.h"
 #include "engine.h"
 #include "contact_actor.h"
 #include "scene_actor_reset.h"
@@ -1398,17 +1399,12 @@ void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: neighboring Golem controls establish the state role.
 
-struct GolemRouteMotion {
-    u8 unknown[0x14];
-    s16 x, y, z;
-};
-
 // confidence=low: return-home behaviors use this control while moving to a cell center.
 
 void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
 {
     u8 *body = actor->base.context;
-    struct GolemRouteMotion *motion = (void *)((u8 *)actor + 0x50);
+    struct SceneActorBody *motion = &actor->base.body;
     if (TakeFlag(&actor->base.field2B2))
         actor->base.restart = 0;
     Golem_SetMotionFlags(actor, 0x100);
@@ -1420,15 +1416,14 @@ void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
     actor->base.field2C2 = 0x40 >> (*(s16 *)(body + 0x682) >> 7);
     Golem_ApplyDuration(actor);
     if (!(frame & 3)) {
-        struct SceneExtent velocity, size;
-        velocity.x = -motion->x;
+        struct ContactPosition velocity, size;
+        velocity.x = -motion->motion.x;
         velocity.y = 0;
-        velocity.z = -motion->z;
+        velocity.z = -motion->motion.z;
         size.x = 32;
         size.y = 0;
         size.z = 32;
-        SceneParticleBurst_CreateWithPause((void *)((u8 *)motion + 0xC), (s32)&velocity, &size, 1,
-                                           3, 4);
+        SceneParticleBurst_CreateWithPause(&motion->position, &velocity, &size, 1, 3, 4);
     }
 }
 
@@ -1591,7 +1586,7 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
     }
     Golem_SetMotionFlags(actor, 0x100);
     if ((frame & 3) == 0) {
-        struct SceneExtent velocity, size;
+        struct ContactPosition velocity, size;
         u32 origin, savedOrigin, direction, count;
         PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         direction = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 0xFF;
@@ -1605,7 +1600,7 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
         count =
             (ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) & 1) +
             2;
-        SceneParticleBurst_CreateWithPause((void *)&body->position, (s32)&velocity, &size, 2, count,
+        SceneParticleBurst_CreateWithPause(&body->position, &velocity, &size, 2, count,
                                            4);
     }
     speed = &context->charge.speed;
@@ -1679,15 +1674,14 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         (context->speed * gUnk_086149C4[(body->direction + 64) & 255]) >> 16;
     actor->base.body.motion.z += (context->speed * gUnk_086149C4[body->direction]) >> 16;
     if ((frame & 3) == 0) {
-        struct SceneExtent velocity, spread;
+        struct ContactPosition velocity, spread;
         velocity.x = -body->motion.x;
         velocity.y = 0;
         velocity.z = -body->motion.z;
         spread.x = 32;
         spread.y = 0;
         spread.z = 32;
-        SceneParticleBurst_CreateWithPause((void *)&body->position, (s32)&velocity, &spread, 1, 3,
-                                           4);
+        SceneParticleBurst_CreateWithPause(&body->position, &velocity, &spread, 1, 3, 4);
     }
     if (actor->base.unknown9[0x40 - 9] & 1) {
         struct SceneExtent velocity, spread;
