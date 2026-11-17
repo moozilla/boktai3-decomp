@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
@@ -125,18 +124,27 @@ int sub_0803198C(void *arg0, void *arg1)
         st->valueCount = 0;
         fnSlot = &p->fnDone;
     }
-    p->wait = 0xFFFF;
     {
-        register void (*callback)(void) asm("r1") = MessageWindow_ClearTextCompletion;
-        *fnSlot = callback;
-    }
-    switch (p->mode) {
-        case 0:
-            proc = ScriptProc_Start(0xCB05, 0x530D);
-            break;
-        default:
-            proc = ScriptProc_Start(0xCB05, 0x530D);
-            break;
+        struct WaitView {
+            u16 value;
+        };
+        union {
+            struct WaitView *wait;
+            void (*callback)(void);
+        } value;
+        value.wait = (void *)&p->wait;
+        value.wait->value = 0xFFFF;
+        value.callback = MessageWindow_ClearTextCompletion;
+        *fnSlot = value.callback;
+        switch (p->mode) {
+            case 0:
+                proc = ScriptProc_Start(0xCB05, 0x530D);
+                break;
+            default:
+                proc = ScriptProc_Start(0xCB05, 0x530D);
+                break;
+        }
+        bufferMask = (u32)value.callback;
     }
     if (!proc)
         return -1;
