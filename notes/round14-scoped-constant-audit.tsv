@@ -1,0 +1,104 @@
+base	source	function	name	original_line	status	commit
+ea3b1c59d	src/control_panel.c	ControlPanel_UpdateInteraction	zero	490	open	
+ea3b1c59d	src/control_panel.c	ControlPanel_UpdateInteraction	zero	503	open	
+ea3b1c59d	src/fn/sub_0801C874.c	ResultGame_TrackTarget	zero	51	open	
+ea3b1c59d	src/fn/sub_0801CC24.c	ResultGame_TimedPress	zero	44	open	
+ea3b1c59d	src/fn/sub_0801CC24.c	ResultGame_TimedPress	zero	71	open	
+ea3b1c59d	src/fn/sub_08035288.c	Wireless_HandleSendError	zero	48	open	
+ea3b1c59d	src/fn/sub_08035288.c	Wireless_HandleSendError	zero	57	accepted	6007826504304575fa6a5a326af7f7bbd614d6e5
+ea3b1c59d	src/fn/sub_080386C8.c	WirelessGameMenu_UpdateRoundHandshake	zero	26	accepted	edf27dbda268026165ed252d0f3f794786952307
+ea3b1c59d	src/fn/sub_080386C8.c	WirelessGameMenu_UpdateRoundHandshake	zero	42	open	
+ea3b1c59d	src/fn/sub_08038928.c	WirelessGameMenu_UpdateReadyExchange	zero	27	accepted	bdfcdbbc80846b677d24bf2e8be6f488ded5a19c
+ea3b1c59d	src/fn/sub_08038928.c	WirelessGameMenu_UpdateReadyExchange	zero	35	open	
+ea3b1c59d	src/fn/sub_0803B40C.c	WirelessResultPanel_Init	zero	108	open	
+ea3b1c59d	src/fn/sub_0803B40C.c	WirelessResultPanel_Init	zero	184	open	
+ea3b1c59d	src/fn/sub_0803E998.c	ScenePool_StateEmitBursts	zero	63	accepted	9610d6c9f49ce9014a27237e611c6a08c328fd63
+ea3b1c59d	src/fn/sub_0803E998.c	ScenePool_StateEmitBursts	zero	76	accepted	9610d6c9f49ce9014a27237e611c6a08c328fd63
+ea3b1c59d	src/fn/sub_0803ED84.c	ScenePool_StateDepartForward	zero	11	accepted	8e4bd902503c4b64805e8105c24d3c8143c91324
+ea3b1c59d	src/fn/sub_0803ED84.c	ScenePool_StateDepartForward	zero	20	open	
+ea3b1c59d	src/fn/sub_08051A8C.c	ProximityEmitter_EmitParticle	zero	48	accepted	48b466289b0caa889a7a9273972e265f14319cb4
+ea3b1c59d	src/fn/sub_08051A8C.c	ProximityEmitter_EmitParticle	zero	64	accepted	48b466289b0caa889a7a9273972e265f14319cb4
+ea3b1c59d	src/fn/sub_0805AE58.c	ScenePanelRig_InitPrimarySprites	zero	14	accepted	b967776fbee4f2226bcdaba4e2462b5fe9ecb49b
+ea3b1c59d	src/fn/sub_0805AE58.c	ScenePanelRig_InitPrimarySprites	zero	45	accepted	b967776fbee4f2226bcdaba4e2462b5fe9ecb49b
+ea3b1c59d	src/fn/sub_08064790.c	ActorAttachment_TickWideShake	one	6	open	
+ea3b1c59d	src/fn/sub_08064790.c	ActorAttachment_TickWideShake	one	13	open	
+ea3b1c59d	src/fn/sub_08064820.c	ActorAttachment_TickNarrowShake	one	6	open	
+ea3b1c59d	src/fn/sub_08064820.c	ActorAttachment_TickNarrowShake	one	13	open	
+ea3b1c59d	src/fn/sub_080714E4.c	SceneActorRegistry_ResetRouteState	zero	143	accepted	c0e5a4f91c742103cb6ade6e8137b2ea7878cdd8
+ea3b1c59d	src/fn/sub_08080868.c	SceneActorReaction_BeginFadedState	zero	30	accepted	098c7c036701bc24563d148f2c0b001731fa6e4f
+ea3b1c59d	src/fn/sub_08080868.c	SceneActorReaction_BeginFadedState	zero	47	open	
+ea3b1c59d	src/fn/sub_0810EEFC.c	RecordMenu_InitializeSprites	zero	16	open	
+ea3b1c59d	src/fn/sub_0810EEFC.c	RecordMenu_InitializeSprites	zero	26	open	
+ea3b1c59d	src/fn/sub_08132490.c	SceneActorReaction_ApplyCategoryDamage	zero	101	open	
+ea3b1c59d	src/fn/sub_08132D2C.c	SceneActorReaction_DefeatRecordStats	zero	109	open	
+ea3b1c59d	src/fn/sub_08132D2C.c	SceneActorReaction_DefeatRecordStats	zero	120	open	
+ea3b1c59d	src/fn/sub_08135F70.c	SceneActorReaction_ResolveDamage	zero	217	open	
+ea3b1c59d	src/fn/sub_08142CC0.c	Player_UpdateFlaggedResourceRecovery	zero	36	accepted	e0f2d1b01b1d9893ee95a7bc70adb975ed9581cc
+ea3b1c59d	src/fn/sub_08142FC4.c	Player_UpdateUnflaggedResourceRecovery	zero	44	accepted	e077ab8b9059499b3ed3cf2c4ffd19b85950cb97
+ea3b1c59d	src/fn/sub_0814B1F8.c	Player_UpdateTargetMotion	zero	213	open	
+ea3b1c59d	src/fn/sub_0814B1F8.c	Player_UpdateTargetMotion	zero	318	accepted	e7fe304dbc4922ab00adddaa608768df959e649b
+ea3b1c59d	src/fn/sub_0814F328.c	Player_UpdateAttachedAttackCharge	zero	75	open	
+ea3b1c59d	src/fn/sub_081685B4.c	SceneHud_RefreshWidgetVisibility	one	16	open	
+ea3b1c59d	src/fn/sub_081685B4.c	SceneHud_RefreshWidgetVisibility	one	39	open	
+ea3b1c59d	src/fn/sub_08169F44.c	PauseMenu_RefreshPriceDigits	zero	24	open	
+ea3b1c59d	src/fn/sub_08169F44.c	PauseMenu_RefreshPriceDigits	zero	48	open	
+ea3b1c59d	src/fn/sub_081711D8.c	sub_081711D8	zero	10	open	
+ea3b1c59d	src/fn/sub_081711D8.c	sub_081711D8	zero	33	open	
+ea3b1c59d	src/fn/sub_0817F49C.c	BossSlot2_ApplyPendingDamage	zero	129	open	
+ea3b1c59d	src/fn/sub_0817F49C.c	BossSlot2_ApplyPendingDamage	zero	147	open	
+ea3b1c59d	src/fn/sub_08184430.c	ActorController_UpdateBreakApartTransition	zero	100	open	
+ea3b1c59d	src/fn/sub_081846F4.c	ActorController_UpdateChargeAttackTransition	zero	75	open	
+ea3b1c59d	src/fn/sub_081846F4.c	ActorController_UpdateChargeAttackTransition	zero	102	open	
+ea3b1c59d	src/fn/sub_08189D04.c	Armor_UpdateAlignedStrikeDecision	zero	91	open	
+ea3b1c59d	src/fn/sub_08189D04.c	Armor_UpdateAlignedStrikeDecision	zero	103	open	
+ea3b1c59d	src/fn/sub_0819A470.c	CannonBattery_ReadOptions	zero	37	open	
+ea3b1c59d	src/fn/sub_0819A470.c	CannonBattery_ReadOptions	zero	44	open	
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	one	33	open	
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	zero	34	accepted	638f4df4d4b7301bf14f406e0dd6fa7f804e8b5b
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	one	45	open	
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	zero	46	open	
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	one	56	accepted	638f4df4d4b7301bf14f406e0dd6fa7f804e8b5b
+ea3b1c59d	src/fn/sub_0819C29C.c	Hresvelgr_BeginDamageReaction	zero	57	open	
+ea3b1c59d	src/fn/sub_081A96E0.c	Vanargand_UpdateSequencedPairAttack	zero	49	accepted	82d1bb19b31d48f520091657fe69cd569ab64a3d
+ea3b1c59d	src/fn/sub_081A96E0.c	Vanargand_UpdateSequencedPairAttack	zero	62	accepted	82d1bb19b31d48f520091657fe69cd569ab64a3d
+ea3b1c59d	src/fn/sub_081A96E0.c	Vanargand_UpdateSequencedPairAttack	zero	87	accepted	82d1bb19b31d48f520091657fe69cd569ab64a3d
+ea3b1c59d	src/fn/sub_081A9910.c	Vanargand_UpdateSynchronizedPairAttack	zero	47	accepted	b5059a10e8e261e1a3a6ed9a4dd9d4808055631e
+ea3b1c59d	src/fn/sub_081A9910.c	Vanargand_UpdateSynchronizedPairAttack	zero	60	accepted	b5059a10e8e261e1a3a6ed9a4dd9d4808055631e
+ea3b1c59d	src/fn/sub_081A9910.c	Vanargand_UpdateSynchronizedPairAttack	zero	99	accepted	b5059a10e8e261e1a3a6ed9a4dd9d4808055631e
+ea3b1c59d	src/fn/sub_081A9910.c	Vanargand_UpdateSynchronizedPairAttack	zero	116	accepted	b5059a10e8e261e1a3a6ed9a4dd9d4808055631e
+ea3b1c59d	src/fn/sub_081A9DDC.c	Vanargand_UpdateAlternatingPairAttack	zero	71	accepted	fd86aef067a176e17750f8c4fd595a78faabb2fe
+ea3b1c59d	src/fn/sub_081A9DDC.c	Vanargand_UpdateAlternatingPairAttack	zero	86	accepted	fd86aef067a176e17750f8c4fd595a78faabb2fe
+ea3b1c59d	src/fn/sub_081A9F88.c	Vanargand_UpdateChargedPairAttack	zero	49	accepted	4cfa9f021435c605f9a42e8558454a6681df5ab6
+ea3b1c59d	src/fn/sub_081A9F88.c	Vanargand_UpdateChargedPairAttack	zero	61	accepted	4cfa9f021435c605f9a42e8558454a6681df5ab6
+ea3b1c59d	src/fn/sub_081A9F88.c	Vanargand_UpdateChargedPairAttack	zero	82	accepted	4cfa9f021435c605f9a42e8558454a6681df5ab6
+ea3b1c59d	src/fn/sub_081A9F88.c	Vanargand_UpdateChargedPairAttack	zero	93	accepted	4cfa9f021435c605f9a42e8558454a6681df5ab6
+ea3b1c59d	src/fn/sub_081B08B8.c	ActorStatus_UpdatePlayerApproach	zero	76	open	
+ea3b1c59d	src/fn/sub_081B08B8.c	ActorStatus_UpdatePlayerApproach	zero	88	open	
+ea3b1c59d	src/fn/sub_081B08B8.c	ActorStatus_UpdatePlayerApproach	zero	111	open	
+ea3b1c59d	src/fn/sub_081B08B8.c	ActorStatus_UpdatePlayerApproach	zero	157	open	
+ea3b1c59d	src/fn/sub_081B18C8.c	ActorStatus_UpdateRisingStrike	zero	145	open	
+ea3b1c59d	src/fn/sub_081B18C8.c	ActorStatus_UpdateRisingStrike	zero	163	open	
+ea3b1c59d	src/fn/sub_081B18C8.c	ActorStatus_UpdateRisingStrike	zero	215	open	
+ea3b1c59d	src/fn/sub_081B1B90.c	ActorStatus_UpdateFlankingStrike	zero	65	open	
+ea3b1c59d	src/fn/sub_081B1B90.c	ActorStatus_UpdateFlankingStrike	zero	98	open	
+ea3b1c59d	src/fn/sub_081BB3D4.c	SolarBank_RefreshAmountDigits	zero	17	open	
+ea3b1c59d	src/fn/sub_081BB3D4.c	SolarBank_RefreshAmountDigits	zero	43	open	
+ea3b1c59d	src/fn/sub_081EAB64.c	Params3D0_UpdateDisplay	zero	277	open	
+ea3b1c59d	src/fn/sub_081EAB64.c	Params3D0_UpdateDisplay	zero	307	open	
+ea3b1c59d	src/fn/sub_081EF914.c	SingletonSlot7_UpdateEndingScene	one	53	accepted	eb78da36ed88c825700204fe216aa88525427bda
+ea3b1c59d	src/fn/sub_081EF914.c	SingletonSlot7_UpdateEndingScene	zero	67	accepted	eb78da36ed88c825700204fe216aa88525427bda
+ea3b1c59d	src/fn/sub_081EF914.c	SingletonSlot7_UpdateEndingScene	zero	99	accepted	eb78da36ed88c825700204fe216aa88525427bda
+ea3b1c59d	src/fn/sub_081EF914.c	SingletonSlot7_UpdateEndingScene	one	133	accepted	eb78da36ed88c825700204fe216aa88525427bda
+ea3b1c59d	src/fn/sub_081F23A0.c	SpriteGroup_RemoveSlot	one	31	open	
+ea3b1c59d	src/fn/sub_081F23A0.c	SpriteGroup_RemoveSlot	one	41	open	
+ea3b1c59d	src/fn/sub_081F61A0.c	SceneActors_UpdateOrbitingParticleAnimation	zero	53	open	
+ea3b1c59d	src/fn/sub_081FA718.c	Ratatosk_UpdateCollidersAndPalette	zero	320	open	
+ea3b1c59d	src/fn/sub_08225624.c	Trap_CreateFromScript	zero	48	open	
+ea3b1c59d	src/fn/sub_08225624.c	Trap_CreateFromScript	zero	59	open	
+ea3b1c59d	src/octopus.c	SceneActor_BeginReactionAnimation	zero	100	open	
+ea3b1c59d	src/octopus.c	SceneActor_BeginReactionAnimation	zero	112	open	
+ea3b1c59d	src/palette_level_transitions.c	PaletteLevels_ConfigureFromScript	zero	146	open	
+ea3b1c59d	src/palette_level_transitions.c	PaletteLevels_ConfigureFromScript	zero	161	open	
+ea3b1c59d	src/palette_level_transitions.c	PaletteLevels_ConfigureFromScript	zero	173	open	
+ea3b1c59d	src/vanargand_parts.c	Vanargand_UpdatePartEmergence	zero	1349	open	
+ea3b1c59d	src/vanargand_parts.c	Vanargand_UpdatePartEmergence	zero	1357	open	
