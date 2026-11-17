@@ -46,6 +46,7 @@ its spelling, so each one is a question, not a verdict:
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
 * `const-local`: a local named `zero` or `one` that only holds that constant.
+  A `goto` label or `return` operand is not a declaration.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
@@ -101,7 +102,7 @@ _REGEX = {
 }
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
-    "const-local": re.compile(r"(?m)^[ \t]+(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b)\w+\s+\*?(?:zero|one)\s*(?:=\s*[01]\s*)?;"),
+    "const-local": re.compile(r"(?m)^[ \t]+(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b)\w+\s+\*?(?:zero|one)\s*(?:=\s*[01]\s*)?;"),
     "addr-deref": re.compile(r"\*\s*\(\s*&\s*\w+\s*\)"),
     "placeholder-name": re.compile(r"(?m)^[ \t]+[\w \t]*?\w[ \t]+\**\s*(?:new_var\w*|dummy\w*|fake\w*)\s*[=;,\[]"),
     "volatile-view": re.compile(

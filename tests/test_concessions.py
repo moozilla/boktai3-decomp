@@ -178,6 +178,16 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
 
+    def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
+        for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
+            with self.subTest(statement=statement):
+                self.assertEqual(warns("int f(void) {\n    " + statement + "\n}\n"), [])
+        # Typedef names still count, and returning a real local must not add a second report.
+        self.assertEqual(warns("int f(void) {\n    FlagWord zero = 0;\n    return zero;\n}\n"),
+                         ["const-local"])
+        self.assertEqual(warns("int f(void) {\n    unsigned int one = 1;\n    return one;\n}\n"),
+                         ["const-local"])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
