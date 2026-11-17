@@ -6,7 +6,6 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
     struct ScenePanelRig *owner;
     s32 i;
     s32 compare;
-    u32 one;
     {
         struct ScenePanelRig *input = rig;
         owner = input;
@@ -73,8 +72,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
             }
         }
         {
-            one = 1;
-            i += one;
+            i += 1u;
             compare = i;
         }
     } while (compare <= 7);
