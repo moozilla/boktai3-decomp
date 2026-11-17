@@ -27,12 +27,10 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
             struct ContactCollider *collider = &actor->base.colliderA;
             u32 old;
             u32 flag;
-            u32 zero;
             old = collider->flags;
             flag = 4;
             collider->flags = flag | collider->flags;
-            zero = 0;
-            actor->base.colliderA.responseValue = zero;
+            actor->base.colliderA.responseValue = 0u;
         }
         if (actor->base.drawableKind == 0) {
             u32 *sequence = actor->base.drawable;
