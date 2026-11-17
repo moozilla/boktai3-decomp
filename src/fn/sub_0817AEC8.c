@@ -37,7 +37,6 @@ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
         int life;
         int spread;
         int speed;
-        int zero = 0;
         const s16 *sine;
         int heading;
         spread = i * 4;
@@ -49,7 +48,7 @@ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
         if (radius < 0)
             sine++;
         v->x = Scale((sine[((heading + 64) & 255)]) * speed);
-        v->y = zero;
+        v->y = 0;
         v->z = Scale((sine[(heading & 255)]) * speed);
         life = (((s32)ParticleRandom_NextSample(table, cursor, mask) >> 4) & 15) + 16;
         SpriteEffectController_Create(&p->position, &offset, 0x1C1E, 0xD43F, 0, 0, 0x11, 1, 1, 2, 0,
