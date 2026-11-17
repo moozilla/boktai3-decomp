@@ -25,9 +25,8 @@ s32 TimedEffect_BeginPhase26(struct TimedEffect *effect)
     phase = (void *)((u8 *)effect + 0x8C);
     {
         u32 phaseId = 0x1A;
-        u32 zero = 0;
         phase->phase = phaseId;
-        effect->timer = zero;
+        effect->timer = 0u;
     }
     if (config->duration < 120)
         config->duration = 120;
