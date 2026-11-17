@@ -82,9 +82,7 @@ fail:
 
 success: {
     u8 *control = group + 0x4C;
-    do {
-        SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
-    } while (0);
+    SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
     *(u32 *)(control + 0x18) = 0u;
     byteZero = 0;
     *(u16 *)(control + 0x14) = 0u;
