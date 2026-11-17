@@ -1,0 +1,883 @@
+dead-read	src/background_controller.c	467	found;
+dead-read	src/background_layers.c	357	d->control;
+dead-read	src/dog.c	564	externalOffset;
+dead-read	src/fn/sub_080154EC.c	49	horizontalDecayRange;
+dead-read	src/fn/sub_0801EC4C.c	55	ty;
+dead-read	src/fn/sub_0801F5EC.c	55	m;
+dead-read	src/fn/sub_08031E54.c	5	pad14;
+dead-read	src/fn/sub_08031E84.c	5	pad14;
+dead-read	src/fn/sub_08031EAC.c	5	pad14;
+dead-read	src/fn/sub_08031ED8.c	5	pad14;
+dead-read	src/fn/sub_08031EFC.c	6	pad14;
+dead-read	src/fn/sub_08031F58.c	5	pad14;
+dead-read	src/fn/sub_08031FA0.c	5	pad14;
+dead-read	src/fn/sub_08032A44.c	5	pad14;
+dead-read	src/fn/sub_08032B24.c	5	pad14;
+dead-read	src/fn/sub_08032C80.c	5	pad14;
+dead-read	src/fn/sub_0803360C.c	6	pad14;
+dead-read	src/fn/sub_08033654.c	6	pad14;
+dead-read	src/fn/sub_08033690.c	6	pad14;
+dead-read	src/fn/sub_08033778.c	6	pad14;
+dead-read	src/fn/sub_0803381C.c	6	pad14;
+dead-read	src/fn/sub_0803386C.c	6	pad14;
+dead-read	src/fn/sub_08033A38.c	6	pad14;
+dead-read	src/fn/sub_08033A5C.c	6	pad14;
+dead-read	src/fn/sub_08033AF0.c	6	pad14;
+dead-read	src/fn/sub_08033AF8.c	6	pad14;
+dead-read	src/fn/sub_08033B44.c	6	pad14;
+dead-read	src/fn/sub_08033B94.c	6	pad14;
+dead-read	src/fn/sub_08033C1C.c	6	pad14;
+dead-read	src/fn/sub_080340AC.c	11	pad37;
+dead-read	src/fn/sub_08034178.c	11	pad37;
+dead-read	src/fn/sub_080341B8.c	11	pad37;
+dead-read	src/fn/sub_080341E0.c	8	pad37;
+dead-read	src/fn/sub_08034270.c	11	pad37;
+dead-read	src/fn/sub_08034310.c	13	pad37;
+dead-read	src/fn/sub_0803441C.c	8	pad37;
+dead-read	src/fn/sub_0803451C.c	8	pad37;
+dead-read	src/fn/sub_080345D8.c	11	pad37;
+dead-read	src/fn/sub_08034A2C.c	8	pad37;
+dead-read	src/fn/sub_08034A80.c	8	pad37;
+dead-read	src/fn/sub_08034BCC.c	8	pad37;
+dead-read	src/fn/sub_08034C28.c	8	pad37;
+dead-read	src/fn/sub_08034CA0.c	8	pad37;
+dead-read	src/fn/sub_08034CFC.c	8	pad37;
+dead-read	src/fn/sub_08034E18.c	8	pad37;
+dead-read	src/fn/sub_08034ED8.c	8	pad37;
+dead-read	src/fn/sub_08034F0C.c	8	pad37;
+dead-read	src/fn/sub_08034F44.c	8	pad37;
+dead-read	src/fn/sub_08034F90.c	8	pad37;
+dead-read	src/fn/sub_08034FC8.c	8	pad37;
+dead-read	src/fn/sub_08034FF8.c	8	pad37;
+dead-read	src/fn/sub_0803521C.c	8	pad37;
+dead-read	src/fn/sub_0803524C.c	8	pad37;
+dead-read	src/fn/sub_08035288.c	8	pad37;
+dead-read	src/fn/sub_080352E8.c	8	pad37;
+dead-read	src/fn/sub_08035320.c	8	pad37;
+dead-read	src/fn/sub_0803536C.c	12	pad37;
+dead-read	src/fn/sub_0803545C.c	8	pad37;
+dead-read	src/fn/sub_0803548C.c	12	pad37;
+dead-read	src/fn/sub_0803559C.c	18	pad37;
+dead-read	src/fn/sub_080356AC.c	8	pad37;
+dead-read	src/fn/sub_080356FC.c	8	pad37;
+dead-read	src/fn/sub_08035864.c	8	pad37;
+dead-read	src/fn/sub_08035958.c	8	pad37;
+dead-read	src/fn/sub_080359E4.c	8	pad37;
+dead-read	src/fn/sub_08035B98.c	8	pad37;
+dead-read	src/fn/sub_08035CE8.c	8	pad37;
+dead-read	src/fn/sub_08035D20.c	8	pad37;
+dead-read	src/fn/sub_08035D58.c	8	pad37;
+dead-read	src/fn/sub_08035EB8.c	8	pad37;
+dead-read	src/fn/sub_08035F5C.c	8	pad37;
+dead-read	src/fn/sub_08035FF4.c	8	pad37;
+dead-read	src/fn/sub_080360A0.c	8	pad37;
+dead-read	src/fn/sub_080360C8.c	8	pad37;
+dead-read	src/fn/sub_0803614C.c	8	pad37;
+dead-read	src/fn/sub_08036230.c	8	pad37;
+dead-read	src/fn/sub_080362E0.c	8	pad37;
+dead-read	src/fn/sub_080363D0.c	8	pad37;
+dead-read	src/fn/sub_08036468.c	8	pad37;
+dead-read	src/fn/sub_080364C0.c	8	pad37;
+dead-read	src/fn/sub_08036538.c	8	pad37;
+dead-read	src/fn/sub_08036568.c	14	pad37;
+dead-read	src/fn/sub_08036678.c	8	pad37;
+dead-read	src/fn/sub_0803670C.c	8	pad37;
+dead-read	src/fn/sub_08036778.c	8	pad37;
+dead-read	src/fn/sub_080367B4.c	8	pad37;
+dead-read	src/fn/sub_08036910.c	9	pad37;
+dead-read	src/fn/sub_08036A10.c	8	pad37;
+dead-read	src/fn/sub_08036A3C.c	8	pad37;
+dead-read	src/fn/sub_08036B2C.c	8	pad37;
+dead-read	src/fn/sub_08036B64.c	8	pad37;
+dead-read	src/fn/sub_08036C0C.c	8	pad37;
+dead-read	src/fn/sub_08038AD4.c	72	view->timer;
+dead-read	src/fn/sub_08038AD4.c	78	view->timer;
+dead-read	src/fn/sub_08038AD4.c	155	v;
+dead-read	src/fn/sub_08058700.c	78	velocity;
+dead-read	src/fn/sub_0805A7E4.c	51	liftOrPhase.lift;
+dead-read	src/fn/sub_0805A7E4.c	54	liftOrPhase.lift;
+dead-read	src/fn/sub_08068500.c	55	jitter->x;
+dead-read	src/fn/sub_08068500.c	59	jitter->y;
+dead-read	src/fn/sub_08068500.c	63	jitter->z;
+dead-read	src/fn/sub_08069FA4.c	29	graphics->tileBase;
+dead-read	src/fn/sub_08070FA8.c	261	actor->base.paletteBank;
+dead-read	src/fn/sub_080714E4.c	64	actor->base.body.position;
+dead-read	src/fn/sub_080714E4.c	67	actor->base.body.position;
+dead-read	src/fn/sub_0807171C.c	23	actor->base.body.position;
+dead-read	src/fn/sub_0807171C.c	26	actor->base.body.position;
+dead-read	src/fn/sub_08072204.c	26	actor->base.paletteOffset;
+dead-read	src/fn/sub_08072204.c	28	transition->colors;
+dead-read	src/fn/sub_08074A98.c	69	actor->base.body.position;
+dead-read	src/fn/sub_08074A98.c	72	actor->base.body.position;
+dead-read	src/fn/sub_08077444.c	39	body->position;
+dead-read	src/fn/sub_08077444.c	42	body->position;
+dead-read	src/fn/sub_08081290.c	84	actor->base.body.position;
+dead-read	src/fn/sub_08081290.c	87	actor->base.body.position;
+dead-read	src/fn/sub_08083560.c	32	actor->base.body.position;
+dead-read	src/fn/sub_08083560.c	35	actor->base.body.position;
+dead-read	src/fn/sub_080A9DB0.c	93	quotient;
+dead-read	src/fn/sub_0812A2BC.c	75	vx;
+dead-read	src/fn/sub_0812A2BC.c	84	t;
+dead-read	src/fn/sub_0812E7EC.c	140	command->data.args[0];
+dead-read	src/fn/sub_0812E7EC.c	142	command->data.args[1];
+dead-read	src/fn/sub_0812E7EC.c	144	command->data.args[2];
+dead-read	src/fn/sub_0812E7EC.c	244	command->data.attachment.value;
+dead-read	src/fn/sub_0812E7EC.c	247	command->data.attachment.initial;
+dead-read	src/fn/sub_0812E7EC.c	264	command->data.attachment.value;
+dead-read	src/fn/sub_0812E7EC.c	267	command->data.attachment.initial;
+dead-read	src/fn/sub_0819FC34.c	112	p->body.position.z;
+dead-read	src/fn/sub_0819FC34.c	116	p->body.position.x;
+dead-read	src/fn/sub_081F1274.c	205	actor->accent.sprite.position.y;
+dead-read	src/fn/sub_0820C4D4.c	34	*field;
+dead-read	src/fn/sub_0820C4D4.c	39	*field;
+dead-read	src/fn/sub_0820C4D4.c	66	value;
+dead-read	src/fn/sub_082173A8.c	14	d->ctl;
+dead-read	src/fn/sub_082173A8.c	18	d->ctl;
+dead-read	src/fn/sub_08217414.c	12	dma[2];
+dead-read	src/fn/sub_08223E28.c	228	lman.nameAcceptTimer.count_max;
+dead-read	src/fn/sub_08224CA4.c	11	p[2];
+dead-read	src/fn/sub_08235174.c	89	FlickerParticle_UpdateSecondaryMotion;
+dead-read	src/fn/sub_0824AC74.c	81	__w.ll;
+dead-read	src/golem_2.c	255	route_status_;
+dead-read	src/interrupts_video.c	225	gScanlineDmaCount;
+dead-read	src/inventory_panel.c	344	group->callbacks.metadataView.metadata;
+dead-read	src/item_container.c	220	base;
+dead-read	src/item_container.c	672	a;
+dead-read	src/item_container.c	685	value;
+dead-read	src/item_container.c	691	sum;
+dead-read	src/ivy_child.c	231	position.x;
+dead-read	src/ivy_child.c	234	position.z;
+dead-read	src/large_scene_animation_controller.c	1639	Nidhoggr_ReceivePartContact;
+dead-read	src/native_particle.c	124	spread[0];
+dead-read	src/native_particle.c	128	spread[1];
+dead-read	src/octopus.c	1021	actor->base.body.position;
+dead-read	src/octopus.c	1024	actor->base.body.position;
+dead-read	src/palette_controller.c	656	hint;
+dead-read	src/palette_cycle.c	146	outputColor;
+dead-read	src/play_stats.c	9	gUnk_0824F990[];
+dead-read	src/player_core.c	453	player->derivedStats[0];
+dead-read	src/player_core.c	469	player->derivedStats[1];
+dead-read	src/presentation.c	504	panel->comparisonOffsets[i];
+dead-read	src/scene_catalog.c	160	inputState;
+dead-read	src/scene_object.c	705	active;
+dead-read	src/skeleton_main.c	650	s->chase.base.body.direction;
+dead-read	src/skeleton_main.c	4481	actor->base.body.position;
+dead-read	src/skeleton_main.c	4484	actor->base.body.position;
+dead-read	src/slime.c	2136	actor->base.body.position;
+dead-read	src/terrain_modifier.c	245	value;
+dead-read	src/text_graphics.c	21	d->control;
+dead-read	src/tile_animation.c	112	dma[2];
+dead-read	src/vanargand_projectiles.c	359	effect->direction;
+dead-read	src/vanargand_projectiles.c	547	projectile->position;
+dead-read	src/vorn_main.c	2179	route_status_;
+            base[16] = BlendLinkColor(source, base, altern
+            base[16] = Player_BlendColor(source, base, alt
+local-union	src/actor_animation_controller.c	1279	union
+local-union	src/actor_animation_controller.c	1433	union
+local-union	src/actor_animation_controller.c	1444	union
+local-union	src/actor_animation_controller.c	1520	union
+local-union	src/actor_animation_controller.c	1531	union
+local-union	src/actor_animation_controller.c	1631	union
+local-union	src/actor_animation_controller.c	1642	union
+local-union	src/actor_animation_controller.c	1735	union
+local-union	src/actor_animation_controller.c	1746	union
+local-union	src/actor_animation_controller.c	1839	union
+local-union	src/actor_animation_controller.c	1850	union
+local-union	src/actor_animation_controller.c	1947	union
+local-union	src/actor_animation_controller.c	1958	union
+local-union	src/actor_animation_controller.c	2048	union
+local-union	src/actor_animation_controller.c	2059	union
+local-union	src/actor_animation_controller.c	2137	union
+local-union	src/actor_animation_controller.c	2215	union
+local-union	src/actor_animation_controller.c	2226	union
+local-union	src/actor_animation_controller.c	2326	union
+local-union	src/actor_animation_controller.c	2337	union
+local-union	src/actor_animation_controller.c	2556	union
+local-union	src/actor_animation_controller.c	2567	union
+local-union	src/actor_animation_controller.c	2639	union
+local-union	src/actor_animation_controller.c	2650	union
+local-union	src/actor_animation_controller.c	2719	union
+local-union	src/actor_animation_controller.c	2730	union
+local-union	src/actor_animation_controller.c	2805	union
+local-union	src/actor_animation_controller.c	2816	union
+local-union	src/actor_animation_controller.c	2889	union
+local-union	src/actor_animation_controller.c	2900	union
+local-union	src/actor_animation_controller.c	2979	union
+local-union	src/actor_animation_controller.c	3028	union
+local-union	src/actor_animation_controller.c	3039	union
+local-union	src/actor_animation_controller.c	3114	union
+local-union	src/actor_animation_controller.c	3125	union
+local-union	src/actor_animation_controller.c	3200	union
+local-union	src/actor_animation_controller.c	3211	union
+local-union	src/actor_animation_controller.c	3286	union
+local-union	src/actor_animation_controller.c	3297	union
+local-union	src/actor_animation_controller.c	3391	union
+local-union	src/actor_animation_controller.c	3402	union
+local-union	src/actor_animation_controller.c	3477	union
+local-union	src/actor_animation_controller.c	3488	union
+local-union	src/actor_animation_controller.c	3563	union
+local-union	src/actor_animation_controller.c	3574	union
+local-union	src/actor_animation_controller.c	3649	union
+local-union	src/actor_animation_controller.c	3660	union
+local-union	src/actor_animation_controller.c	3728	union
+local-union	src/actor_animation_controller.c	3739	union
+local-union	src/actor_animation_controller.c	3798	union
+local-union	src/actor_animation_controller.c	3875	union
+local-union	src/actor_animation_controller.c	3886	union
+local-union	src/actor_controller_transitions.c	202	union
+local-union	src/actor_graphics_and_basic_states.c	91	union
+local-union	src/actor_impact.c	91	union
+local-union	src/actor_impact.c	109	union
+local-union	src/actor_impact.c	126	union
+local-union	src/actor_position_effects.c	134	union
+local-union	src/actor_position_search.c	23	union
+local-union	src/animated_hazard.c	122	union
+local-union	src/animated_hazard.c	133	union
+local-union	src/animated_hazard.c	195	union
+local-union	src/animated_hazard.c	206	union
+local-union	src/animated_hazard.c	270	union
+local-union	src/animated_hazard.c	281	union
+local-union	src/animated_hazard.c	544	union
+local-union	src/animated_hazard.c	555	union
+local-union	src/axe.c	1131	union
+local-union	src/axe.c	2905	union
+local-union	src/axe.c	3107	union
+local-union	src/axe.c	3176	union
+local-union	src/axe.c	3222	union
+local-union	src/axe.c	3349	union
+local-union	src/axe.c	3388	union
+local-union	src/axe.c	3399	union
+local-union	src/axe.c	3646	union
+local-union	src/axe.c	3778	union
+local-union	src/background_layers.c	250	union
+local-union	src/ballistic_sprite_effect.c	159	union
+local-union	src/bat_restore.c	930	union
+local-union	src/callback_pool_feedback.c	199	union
+local-union	src/collision_controller.c	155	union
+local-union	src/collision_controller.c	166	union
+local-union	src/collision_controller.c	270	union
+local-union	src/collision_controller.c	281	union
+local-union	src/contact_sequence_actor.c	186	union
+local-union	src/directional_sprite_effect.c	23	union
+local-union	src/directional_sprite_effect.c	42	union
+local-union	src/display_animation.c	7	union
+local-union	src/dog.c	481	union
+local-union	src/dog.c	647	union
+local-union	src/dog.c	648	union
+local-union	src/dog.c	649	union
+local-union	src/dog.c	1527	union
+local-union	src/dog.c	2370	union
+local-union	src/dog.c	3069	union
+local-union	src/dog.c	3090	union
+local-union	src/fn/sub_0801404C.c	84	union
+local-union	src/fn/sub_080154EC.c	165	union
+local-union	src/fn/sub_080154EC.c	186	union
+local-union	src/fn/sub_08015F60.c	67	union
+local-union	src/fn/sub_08015F60.c	69	union
+local-union	src/fn/sub_08016118.c	45	union
+local-union	src/fn/sub_08016118.c	56	union
+local-union	src/fn/sub_080177AC.c	80	union
+local-union	src/fn/sub_0802592C.c	46	union
+local-union	src/fn/sub_08025FFC.c	4	union
+local-union	src/fn/sub_08025FFC.c	22	union
+local-union	src/fn/sub_08025FFC.c	70	union
+local-union	src/fn/sub_08025FFC.c	77	union
+local-union	src/fn/sub_080289FC.c	36	union
+local-union	src/fn/sub_080289FC.c	61	union
+local-union	src/fn/sub_0803198C.c	131	union
+local-union	src/fn/sub_08034A80.c	85	union
+local-union	src/fn/sub_08037DEC.c	9	union
+local-union	src/fn/sub_08038448.c	15	union
+local-union	src/fn/sub_0803B40C.c	47	union
+local-union	src/fn/sub_0803B40C.c	131	union
+local-union	src/fn/sub_0803B40C.c	142	union
+local-union	src/fn/sub_0803D430.c	4	union
+local-union	src/fn/sub_0803D430.c	17	union
+local-union	src/fn/sub_0804373C.c	76	union
+local-union	src/fn/sub_08043C4C.c	8	union
+local-union	src/fn/sub_08043D2C.c	38	union
+local-union	src/fn/sub_08044594.c	19	union
+local-union	src/fn/sub_08044594.c	30	union
+local-union	src/fn/sub_080475F8.c	9	union
+local-union	src/fn/sub_08047DF4.c	19	union
+local-union	src/fn/sub_080515DC.c	7	union
+local-union	src/fn/sub_080515DC.c	46	union
+local-union	src/fn/sub_080561E8.c	4	union
+local-union	src/fn/sub_08056298.c	24	union
+local-union	src/fn/sub_08056840.c	7	union
+local-union	src/fn/sub_08056840.c	19	union
+local-union	src/fn/sub_08056840.c	20	union
+local-union	src/fn/sub_08056840.c	32	union
+local-union	src/fn/sub_08057A44.c	3	union
+local-union	src/fn/sub_08058700.c	92	union
+local-union	src/fn/sub_08058700.c	101	union
+local-union	src/fn/sub_08058700.c	118	union
+local-union	src/fn/sub_08058700.c	146	union
+local-union	src/fn/sub_080597E0.c	21	union
+local-union	src/fn/sub_08059DF8.c	21	union
+local-union	src/fn/sub_0805A044.c	19	union
+local-union	src/fn/sub_0805A7E4.c	30	union
+local-union	src/fn/sub_0805A7E4.c	36	union
+local-union	src/fn/sub_0805A7E4.c	40	union
+local-union	src/fn/sub_0805AE58.c	21	union
+local-union	src/fn/sub_0805CFE8.c	4	union
+local-union	src/fn/sub_0805EB0C.c	11	union
+local-union	src/fn/sub_0805EB0C.c	22	union
+local-union	src/fn/sub_08067018.c	13	union
+local-union	src/fn/sub_08068500.c	70	union
+local-union	src/fn/sub_08068A78.c	4	union
+local-union	src/fn/sub_08068BE4.c	71	union
+local-union	src/fn/sub_08069FA4.c	33	union
+local-union	src/fn/sub_08069FA4.c	44	union
+local-union	src/fn/sub_0806A160.c	52	union
+local-union	src/fn/sub_0806A420.c	2	union
+local-union	src/fn/sub_0806A420.c	16	union
+local-union	src/fn/sub_0806A420.c	17	union
+local-union	src/fn/sub_0806A420.c	40	union
+local-union	src/fn/sub_0806AF74.c	97	union
+local-union	src/fn/sub_0806AF74.c	108	union
+local-union	src/fn/sub_0806BA58.c	17	union
+local-union	src/fn/sub_0806BBD0.c	6	union
+local-union	src/fn/sub_0806CF4C.c	15	union
+local-union	src/fn/sub_0806DCE4.c	44	union
+local-union	src/fn/sub_08070FA8.c	62	union
+local-union	src/fn/sub_08070FA8.c	66	union
+local-union	src/fn/sub_08070FA8.c	204	union
+local-union	src/fn/sub_08077C48.c	13	union
+local-union	src/fn/sub_08077C48.c	32	union
+local-union	src/fn/sub_0807D2E0.c	238	union
+local-union	src/fn/sub_0807D2E0.c	239	union
+local-union	src/fn/sub_0807E6FC.c	11	union
+local-union	src/fn/sub_0807E9D0.c	122	union
+local-union	src/fn/sub_0807E9D0.c	125	union
+local-union	src/fn/sub_08080494.c	88	union
+local-union	src/fn/sub_08080BE0.c	95	union
+local-union	src/fn/sub_0808148C.c	49	union
+local-union	src/fn/sub_08082648.c	134	union
+local-union	src/fn/sub_08082648.c	156	union
+local-union	src/fn/sub_080829C0.c	22	union
+local-union	src/fn/sub_080A8F38.c	28	union
+local-union	src/fn/sub_080A8F38.c	39	union
+local-union	src/fn/sub_080A915C.c	48	union
+local-union	src/fn/sub_080A915C.c	63	union
+local-union	src/fn/sub_080AB294.c	34	union
+local-union	src/fn/sub_080AB968.c	67	union
+local-union	src/fn/sub_080AEE08.c	74	union
+local-union	src/fn/sub_080AEE08.c	110	union
+local-union	src/fn/sub_080BD1F0.c	272	union
+local-union	src/fn/sub_080BD1F0.c	284	union
+local-union	src/fn/sub_080F67AC.c	104	union
+local-union	src/fn/sub_080F67AC.c	115	union
+local-union	src/fn/sub_080F67AC.c	186	union
+local-union	src/fn/sub_080F67AC.c	197	union
+local-union	src/fn/sub_080F67AC.c	284	union
+local-union	src/fn/sub_080F67AC.c	285	union
+local-union	src/fn/sub_080F6F90.c	83	union
+local-union	src/fn/sub_080F6F90.c	94	union
+local-union	src/fn/sub_08103110.c	51	union
+local-union	src/fn/sub_08104350.c	99	union
+local-union	src/fn/sub_08104350.c	110	union
+local-union	src/fn/sub_081172C4.c	27	union
+local-union	src/fn/sub_081175F8.c	27	union
+local-union	src/fn/sub_08117948.c	49	union
+local-union	src/fn/sub_08117F6C.c	241	union
+local-union	src/fn/sub_08117F6C.c	242	union
+local-union	src/fn/sub_08117F6C.c	243	union
+local-union	src/fn/sub_081182E4.c	61	union
+local-union	src/fn/sub_0811A158.c	58	union
+local-union	src/fn/sub_0811A6C4.c	60	union
+local-union	src/fn/sub_0811AE9C.c	37	union
+local-union	src/fn/sub_08126170.c	36	union
+local-union	src/fn/sub_08126D88.c	228	union
+local-union	src/fn/sub_08126D88.c	242	union
+local-union	src/fn/sub_08127590.c	72	union
+local-union	src/fn/sub_08127590.c	85	union
+local-union	src/fn/sub_08127590.c	152	union
+local-union	src/fn/sub_08128268.c	66	union
+local-union	src/fn/sub_08128268.c	77	union
+local-union	src/fn/sub_08128554.c	103	union
+local-union	src/fn/sub_08128554.c	114	union
+local-union	src/fn/sub_08128F98.c	34	union
+local-union	src/fn/sub_08128F98.c	111	union
+local-union	src/fn/sub_081294B4.c	116	union
+local-union	src/fn/sub_081294B4.c	127	union
+local-union	src/fn/sub_08129C64.c	146	union
+local-union	src/fn/sub_08129C64.c	157	union
+local-union	src/fn/sub_08129FF0.c	61	union
+local-union	src/fn/sub_08129FF0.c	74	union
+local-union	src/fn/sub_0812A660.c	44	union
+local-union	src/fn/sub_0812A660.c	46	union
+local-union	src/fn/sub_0812A928.c	34	union
+local-union	src/fn/sub_0812A928.c	38	union
+local-union	src/fn/sub_0812E7EC.c	5	union
+local-union	src/fn/sub_0812E7EC.c	100	union
+local-union	src/fn/sub_0812E7EC.c	114	union
+local-union	src/fn/sub_08135F70.c	132	union
+local-union	src/fn/sub_08135F70.c	231	union
+local-union	src/fn/sub_08135F70.c	362	union
+local-union	src/fn/sub_081363F4.c	45	union
+local-union	src/fn/sub_081363F4.c	68	union
+local-union	src/fn/sub_081363F4.c	340	union
+local-union	src/fn/sub_08148318.c	43	union
+local-union	src/fn/sub_08148318.c	54	union
+local-union	src/fn/sub_08149DF0.c	50	union
+local-union	src/fn/sub_08149DF0.c	61	union
+local-union	src/fn/sub_0814B1F8.c	207	union
+local-union	src/fn/sub_0815788C.c	90	union
+local-union	src/fn/sub_08157CFC.c	85	union
+local-union	src/fn/sub_08158848.c	85	union
+local-union	src/fn/sub_0815E1F0.c	72	union
+local-union	src/fn/sub_0815F5B4.c	6	union
+local-union	src/fn/sub_081608B0.c	48	union
+local-union	src/fn/sub_0816233C.c	64	union
+local-union	src/fn/sub_0816233C.c	75	union
+local-union	src/fn/sub_0816E570.c	17	union
+local-union	src/fn/sub_0816E570.c	48	union
+local-union	src/fn/sub_08176F70.c	52	union
+local-union	src/fn/sub_08176F70.c	63	union
+local-union	src/fn/sub_0817A354.c	22	union
+local-union	src/fn/sub_0817AEC8.c	24	union
+local-union	src/fn/sub_0817C3F4.c	35	union
+local-union	src/fn/sub_0817F49C.c	67	union
+local-union	src/fn/sub_0818A820.c	119	union
+local-union	src/fn/sub_0819BB18.c	4	union
+local-union	src/fn/sub_0819BB18.c	71	union
+local-union	src/fn/sub_0819BB18.c	73	union
+local-union	src/fn/sub_0819BB18.c	86	union
+local-union	src/fn/sub_0819F788.c	70	union
+local-union	src/fn/sub_081A0EA4.c	43	union
+local-union	src/fn/sub_081A0FF0.c	44	union
+local-union	src/fn/sub_081A14FC.c	166	union
+local-union	src/fn/sub_081A14FC.c	219	union
+local-union	src/fn/sub_081A1D18.c	44	union
+local-union	src/fn/sub_081A8E08.c	13	union
+local-union	src/fn/sub_081AA650.c	9	union
+local-union	src/fn/sub_081ABA64.c	157	union
+local-union	src/fn/sub_081ABA64.c	168	union
+local-union	src/fn/sub_081AF540.c	18	union
+local-union	src/fn/sub_081B03C0.c	48	union
+local-union	src/fn/sub_081B03C0.c	59	union
+local-union	src/fn/sub_081B18C8.c	44	union
+local-union	src/fn/sub_081B18C8.c	55	union
+local-union	src/fn/sub_081D0864.c	40	union
+local-union	src/fn/sub_081D11E4.c	18	union
+local-union	src/fn/sub_081D31EC.c	13	union
+local-union	src/fn/sub_081D31EC.c	29	union
+local-union	src/fn/sub_081D33A0.c	45	union
+local-union	src/fn/sub_081D3620.c	14	union
+local-union	src/fn/sub_081D905C.c	22	union
+local-union	src/fn/sub_081E2910.c	21	union
+local-union	src/fn/sub_081EEECC.c	38	union
+local-union	src/fn/sub_081F6B90.c	115	union
+local-union	src/fn/sub_081F8988.c	9	union
+local-union	src/fn/sub_081F8988.c	36	union
+local-union	src/fn/sub_081FC26C.c	66	union
+local-union	src/fn/sub_081FC26C.c	79	union
+local-union	src/fn/sub_081FDAF4.c	7	union
+local-union	src/fn/sub_081FFAB8.c	88	union
+local-union	src/fn/sub_081FFAB8.c	102	union
+local-union	src/fn/sub_0820212C.c	58	union
+local-union	src/fn/sub_0820212C.c	69	union
+local-union	src/fn/sub_08203DF4.c	106	union
+local-union	src/fn/sub_08203DF4.c	117	union
+local-union	src/fn/sub_0820539C.c	17	union
+local-union	src/fn/sub_0820539C.c	104	union
+local-union	src/fn/sub_0820539C.c	115	union
+local-union	src/fn/sub_08206C00.c	10	union
+local-union	src/fn/sub_08208740.c	46	union
+local-union	src/fn/sub_08208740.c	109	union
+local-union	src/fn/sub_08208740.c	120	union
+local-union	src/fn/sub_082095B8.c	46	union
+local-union	src/fn/sub_0820CD00.c	23	union
+local-union	src/fn/sub_0820CD00.c	34	union
+local-union	src/fn/sub_0820D2C4.c	88	union
+local-union	src/fn/sub_0820D2C4.c	158	union
+local-union	src/fn/sub_0820D2C4.c	169	union
+local-union	src/fn/sub_0820E2A4.c	99	union
+local-union	src/fn/sub_0820E2A4.c	110	union
+local-union	src/fn/sub_0820F378.c	57	union
+local-union	src/fn/sub_0820F378.c	68	union
+local-union	src/fn/sub_08210654.c	28	union
+local-union	src/fn/sub_08210654.c	39	union
+local-union	src/fn/sub_0821E5C4.c	13	union
+local-union	src/fn/sub_08227A10.c	49	union
+local-union	src/fn/sub_08227AD4.c	28	union
+local-union	src/fn/sub_08227B80.c	28	union
+local-union	src/fn/sub_082335F0.c	34	union
+local-union	src/fn/sub_08234138.c	65	union
+local-union	src/fn/sub_08234540.c	47	union
+local-union	src/fn/sub_08234868.c	48	union
+local-union	src/fn/sub_08235174.c	60	union
+local-union	src/fn/sub_082362EC.c	75	union
+local-union	src/fn/sub_08238744.c	8	union
+local-union	src/fn/sub_08238744.c	13	union
+local-union	src/fn/sub_08248F0C.c	36	union
+local-union	src/following_sprite_effect.c	390	union
+local-union	src/following_sprite_effect.c	500	union
+local-union	src/following_sprite_effect.c	507	union
+local-union	src/ghost.c	1414	union
+local-union	src/ghost.c	1859	union
+local-union	src/ghost.c	1870	union
+local-union	src/golem_2.c	141	union
+local-union	src/golem_main.c	776	union
+local-union	src/golem_main.c	1521	union
+local-union	src/group_objects.c	73	union
+local-union	src/group_objects.c	84	union
+local-union	src/group_objects.c	330	union
+local-union	src/group_objects.c	382	union
+local-union	src/homing_effect.c	692	union
+local-union	src/homing_effect.c	703	union
+local-union	src/homing_effect.c	836	union
+local-union	src/homing_effect.c	847	union
+local-union	src/homing_effect.c	956	union
+local-union	src/homing_effect.c	967	union
+local-union	src/homing_effect.c	1068	union
+local-union	src/homing_effect.c	1079	union
+local-union	src/homing_effect.c	1139	union
+local-union	src/homing_effect.c	1150	union
+local-union	src/homing_effect.c	1256	union
+local-union	src/homing_effect.c	1267	union
+local-union	src/ivy.c	1221	union
+local-union	src/ivy.c	1847	union
+local-union	src/message_window.c	101	union
+local-union	src/message_window.c	112	union
+local-union	src/mimic.c	700	union
+local-union	src/mode_menu.c	12	union
+local-union	src/moving_glyph.c	171	union
+local-union	src/mummy_entry.c	1207	union
+local-union	src/nav_mesh.c	417	union
+local-union	src/octopus.c	2026	union
+local-union	src/octopus.c	2046	union
+local-union	src/octopus.c	2182	union
+local-union	src/palette_fade.c	154	union
+local-union	src/particle_burst_effect.c	231	union
+local-union	src/particle_pool.c	114	union
+local-union	src/path.c	202	union
+local-union	src/player_cue_actions.c	274	union
+local-union	src/player_cue_actions.c	2831	union
+local-union	src/positioned_effect.c	84	union
+local-union	src/region_actor.c	297	union
+local-union	src/region_actor.c	302	union
+local-union	src/registry_actor_collision.c	111	union
+local-union	src/registry_actor_collision.c	112	union
+local-union	src/registry_e7bc.c	232	union
+local-union	src/registry_e7bc.c	233	union
+local-union	src/registry_e7bc.c	234	union
+local-union	src/scene_actor_animation.c	1215	union
+local-union	src/scene_debris.c	73	union
+local-union	src/scene_debris.c	85	union
+local-union	src/scene_debris.c	326	union
+local-union	src/scene_debris.c	333	union
+local-union	src/scene_effect_queue.c	201	union
+local-union	src/scene_effect_queue.c	233	union
+local-union	src/scene_effect_queue.c	264	union
+local-union	src/scene_effect_queue.c	297	union
+local-union	src/scene_object.c	523	union
+local-union	src/scene_object.c	529	union
+local-union	src/scene_object.c	550	union
+local-union	src/scene_object.c	557	union
+local-union	src/scene_projectile_pool.c	308	union
+local-union	src/script_keyframe_pool.c	46	union
+local-union	src/script_keyframe_pool.c	221	union
+local-union	src/selection_menu.c	271	union
+local-union	src/selection_menu.c	282	union
+local-union	src/skeleton_main.c	770	union
+local-union	src/skeleton_main.c	771	union
+local-union	src/skeleton_main.c	772	union
+local-union	src/skeleton_main.c	773	union
+local-union	src/skeleton_main.c	855	union
+local-union	src/skeleton_main.c	863	union
+local-union	src/sprite_effect.c	14	union
+local-union	src/sprite_effect.c	163	union
+local-union	src/sprite_effect.c	174	union
+local-union	src/sprite_effect.c	212	union
+local-union	src/sprite_effect.c	307	union
+local-union	src/tether_actor.c	576	union
+local-union	src/tether_actor.c	1315	union
+local-union	src/time_result.c	185	union
+local-union	src/vanargand_parts.c	1583	union
+local-union	src/vanargand_projectiles.c	346	union
+local-union	src/vorn_main.c	1115	union
+local-union	src/vorn_main.c	1116	union
+local-union	src/vorn_main.c	1245	union
+local-union	src/wireless_game_items_and_display.c	1379	union
+local-union	src/wireless_peer_panel.c	14	union
+local-union	src/wireless_peer_panel.c	26	union
+never-negative	src/axe.c	378	angle < 0 (u8)
+never-negative	src/breakable_barrier.c	349	v < 0 (u8)
+never-negative	src/fn/sub_0803BC88.c	153	heading < 0 (u16)
+never-negative	src/fn/sub_0803C114.c	291	heading < 0 (u16)
+never-negative	src/fn/sub_0807AF94.c	129	direction < 0 (u8)
+never-negative	src/fn/sub_080F5170.c	61	x < 0 (u16)
+never-negative	src/fn/sub_08100F60.c	21	x < 0 (u16)
+never-negative	src/fn/sub_08127274.c	51	x < 0 (u16)
+never-negative	src/fn/sub_08127C24.c	37	x < 0 (u16)
+never-negative	src/fn/sub_08127C24.c	75	x < 0 (u16)
+never-negative	src/fn/sub_0816C230.c	61	index < 0 (u8)
+never-negative	src/fn/sub_08178238.c	17	value < 0 (u16)
+never-negative	src/fn/sub_081A14FC.c	185	(s32)side < 0 (u8)
+never-negative	src/fn/sub_0822DB54.c	48	h < 0 (u8)
+never-negative	src/ghost.c	782	x < 0 (u16)
+never-negative	src/ghost.c	782	z < 0 (u16)
+never-negative	src/ivy.c	923	v < 0 (u16)
+never-negative	src/ivy.c	1970	z < 0 (u16)
+never-negative	src/large_scene_animation_controller.c	2380	b < 0 (u16)
+never-negative	src/link_record_panel.c	128	value < 0 (u8)
+never-negative	src/lun.c	100	value < 0 (u16)
+never-negative	src/mummy_entry.c	2289	value < 0 (u16)
+never-negative	src/nav_mesh.c	59	x < 0 (u16)
+never-negative	src/nav_mesh.c	300	x < 0 (u16)
+never-negative	src/scene_object.c	804	x < 0 (u16)
+never-negative	src/scene_object.c	804	z < 0 (u16)
+never-negative	src/scene_object.c	1384	x < 0 (u16)
+never-negative	src/scene_object.c	1384	z < 0 (u16)
+never-negative	src/spider.c	158	distance < 0 (u16)
+never-negative	src/spider.c	1993	angle < 0 (u8)
+never-negative	src/spider.c	2048	angle < 0 (u8)
+once-loop	src/actor_animation_controller.c	4311	orientation += sizeof(*children);             slot++;
+once-loop	src/actor_particles.c	128	h = pos.y - 8;
+once-loop	src/actor_particles.c	132	h = pos.y + 8;
+once-loop	src/actor_position_effects.c	99	particle->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+once-loop	src/actor_state_commands.c	25	mask &= direction;
+once-loop	src/axe.c	3581	a = src[0];         b = src[1];         dst[0] = a;
+once-loop	src/background_controller.c	387	entry++;
+once-loop	src/character_model.c	721	value -= digit * divisor;
+once-loop	src/child_group.c	158	*q = one;
+once-loop	src/child_group.c	768	i = 3;
+once-loop	src/clock_events.c	33	zero = 0;
+once-loop	src/collection.c	124	if (v > 9) {             out = 0x1b;             if (v > 0x11) {      
+once-loop	src/contact_actor_display.c	42	owner->direction = direction;
+once-loop	src/contact_burst.c	17	effect->contactTimer = 18;
+once-loop	src/contact_burst.c	150	*randomState = (*randomState + 1) & 1023;                     sample =
+once-loop	src/converging_effects.c	119	e->offsetX = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+once-loop	src/dark_loan.c	824	rateField = &panel->rate;         *rateField = rate;         if (rate 
+once-loop	src/dog.c	1976	clear = ~1;                 *flags &= clear;                 *((u32 *)
+once-loop	src/dog.c	3220	((u8 *)obj)[field] = zero;
+once-loop	src/dog.c	3226	u32 field = 0x2B0;             do {                 ((u8 *)obj)[field]
+once-loop	src/fn/sub_0801F4C4.c	59	{             u16 *offset = (u16 *)(s + 0x80);             int base;  
+once-loop	src/fn/sub_0801F5B8.c	11	(*(u16 *)(s + 0x82))--;
+once-loop	src/fn/sub_0801F5B8.c	18	if (*((int *)(s + 0x64))) {                 Script_Call(*(int *)(s + 0
+once-loop	src/fn/sub_08035958.c	66	if (!status) {                 u8 *seen = ((u8 *)p) + 0xE7;           
+once-loop	src/fn/sub_08035F5C.c	58	check &= flags;
+once-loop	src/fn/sub_080362E0.c	92	rfu_clearSlot(4, *slot);
+once-loop	src/fn/sub_08038838.c	50	data = 0;             e = &p->entry;             packed = 0;          
+once-loop	src/fn/sub_08038AD4.c	120	if ((b == 0) && (target->current > 0)) {                 b = 1;       
+once-loop	src/fn/sub_0803D8A8.c	11	entry->state = one;
+once-loop	src/fn/sub_0804373C.c	37	index = (*cursor + 1) & 1023;         *cursor = index;
+once-loop	src/fn/sub_0804373C.c	96	random.mask = 255;
+once-loop	src/fn/sub_0804373C.c	101	radiusBits &= 127;
+once-loop	src/fn/sub_080478A4.c	22	flags = visible;         flags |= previous;         *control = flags;
+once-loop	src/fn/sub_080479B0.c	14	BackgroundFlash_TakeEntryFlag(controller);         visible = 0x200;   
+once-loop	src/fn/sub_080479B0.c	20	gDispCntShadow = flags;         frame = controller->stateFrame;
+once-loop	src/fn/sub_0805386C.c	29	edge &= pressed;
+once-loop	src/fn/sub_08053DF8.c	29	edge &= pressed;
+once-loop	src/fn/sub_08054DC4.c	21	variant = 0;                     if (Script_SeekToKeyword('E')) {     
+once-loop	src/fn/sub_08055C04.c	7	if (!display->stateFrame)             Sound_PlaySong(706);
+once-loop	src/fn/sub_08055DD4.c	28	scratch = (u32)&position;
+once-loop	src/fn/sub_08055DD4.c	34	scratch = 0;                 point = &position;
+once-loop	src/fn/sub_08059AC4.c	26	ScenePanelRig_RandomizeMovement(rig);             rig->speed = 448;   
+once-loop	src/fn/sub_0805E394.c	20	index >>= 2;             position->y = index * 24 + 32;
+once-loop	src/fn/sub_0805E7D8.c	16	mask &= keys[0];
+once-loop	src/fn/sub_08060A70.c	41	address <<= 1;
+once-loop	src/fn/sub_0806B8DC.c	20	slot = p->slots;
+once-loop	src/fn/sub_0806B8DC.c	21	do {             slot = p->slots;         } while (0);
+once-loop	src/fn/sub_0806E130.c	37	table = gUnk_08605BB0;                     state = (u32)&pool->slots[0
+once-loop	src/fn/sub_08070FA8.c	27	game = gGameState;
+once-loop	src/fn/sub_08072E50.c	29	gate->enabled = result;
+once-loop	src/fn/sub_080764C8.c	33	variantReload = &directionVariant;         mirrorValue = *mirrorPointe
+once-loop	src/fn/sub_08080984.c	43	switch (actor->base.category) {                 case 4:               
+once-loop	src/fn/sub_080838AC.c	91	{             u32 offset = actor->base.heightOffset;             {    
+once-loop	src/fn/sub_080A8144.c	31	*((u8 *)p + offset) = zero;
+once-loop	src/fn/sub_080A8144.c	37	u32 offset = 0x2B0;             do {                 *((u8 *)p + offse
+once-loop	src/fn/sub_080F4FA8.c	24	p->rotation = 128;             one = 1;             p->active = one;
+once-loop	src/fn/sub_080F508C.c	24	p->rotation = 128;             one = 1;             p->active = one;
+once-loop	src/fn/sub_080F5B68.c	43	one = 1;
+once-loop	src/fn/sub_080F645C.c	98	*((s16 *)(gGameState + 0x548)) = ((*((s16 *)(gGameState + 0x548))) < 9
+once-loop	src/fn/sub_080F645C.c	99	setState((void *)p, 1, 6);                 *(void (**)(void))(p + 0xcc
+once-loop	src/fn/sub_081004F8.c	48	*flags = v & mask;             FloorSwitch_RunStateScript(p);         
+once-loop	src/fn/sub_081029F8.c	75	v = 1 | f;
+once-loop	src/fn/sub_08103110.c	211	follow = Script_GetKeywordValue('f', 0);
+once-loop	src/fn/sub_08109040.c	25	m = 0xFF;
+once-loop	src/fn/sub_0810B3BC.c	52	record = (u8 *)p->records;         if (Registry1745_ConsumeStateEntry(
+once-loop	src/fn/sub_0810D60C.c	19	value = value - digit * divisor;
+once-loop	src/fn/sub_0811A030.c	74	zero = 0;
+once-loop	src/fn/sub_081296D0.c	39	if (test((u32 *)(s + 0x38), 1 << i))                             sub_0
+once-loop	src/fn/sub_0812F3CC.c	88	SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
+once-loop	src/fn/sub_08136F58.c	96	bit = 0x200;
+once-loop	src/fn/sub_0813FE30.c	51	(&p->animation)->flags |= 4;
+once-loop	src/fn/sub_08140F40.c	98	angle = d + 1;             d = angle << 5;             return d;
+once-loop	src/fn/sub_08140F40.c	99	do {             angle = d + 1;             d = angle << 5;           
+once-loop	src/fn/sub_0816F6B4.c	37	ScrollingDialogue_RequestHide();         kind = s + 0x438A;         in
+once-loop	src/fn/sub_0816F8AC.c	37	ScrollingDialogue_RequestHide();         kind = s + 0x438A;         in
+once-loop	src/fn/sub_08173C0C.c	53	equipped = Inventory_IsEquipmentAssigned(slot);                 if (eq
+once-loop	src/fn/sub_081A55D4.c	18	x += 0x20;
+once-loop	src/fn/sub_081A8820.c	42	Vanargand_StopActionSequence((u8 *)q + 0x21C);             q->st = v;
+once-loop	src/fn/sub_081D010C.c	78	npc->sub = zero;
+once-loop	src/fn/sub_081D07D8.c	65	update = SceneNpc_UpdateProjectedVisible;         npc->prevState = 0x1
+once-loop	src/fn/sub_081E2910.c	13	gRandomIndex = (gRandomIndex + 1) & 1023;
+once-loop	src/fn/sub_081F28C4.c	37	saved = position;
+once-loop	src/fn/sub_081F2A08.c	41	renderOrigin = origin;
+once-loop	src/fn/sub_081FF454.c	49	one = 1;
+once-loop	src/fn/sub_0821211C.c	27	if (v > 9) {             out = 0x1b;             if (v > 0x11) {      
+once-loop	src/fn/sub_08213294.c	27	if (v > 9) {             out = 0x1b;             if (v > 0x11) {      
+once-loop	src/fn/sub_08217430.c	106	src++;
+once-loop	src/fn/sub_082210B8.c	12	gRandomTable[i] = value >> (Random_Next15() & 3);
+once-loop	src/fn/sub_08221D40.c	15	++values;
+once-loop	src/fn/sub_082237A0.c	49	gRfuLinkManager.state = 0xc;             gRfuLinkManager.next_state = 
+once-loop	src/fn/sub_08228DB8.c	54	day = 0;
+once-loop	src/fn/sub_08228DB8.c	64	day = 0;
+once-loop	src/fn/sub_08228DB8.c	101	day = 0;
+once-loop	src/fn/sub_08228DB8.c	111	day = 0;
+once-loop	src/fn/sub_082392E8.c	72	radius = (random_first() & 63) + 128;
+once-loop	src/fn/sub_082392E8.c	75	e->dx = scale(radius * gUnk_086149C4[(angle + 64) & mask]);
+once-loop	src/fn/sub_08239480.c	59	e->dx = scale(radius * gUnk_086149C4[(angle + 64) & 255]);
+once-loop	src/fn/sub_0823A028.c	18	result = value;         goto done;
+once-loop	src/fn/sub_0824AC74.c	80	USItype __x0, __x1, __x2, __x3;             USItype __ul, __vl, __uh, 
+once-loop	src/golem_2.c	582	((u8 *)obj)[field] = zero;
+once-loop	src/golem_2.c	588	u32 field = 0x2B0;             do {                 ((u8 *)obj)[field]
+once-loop	src/golem_main.c	1270	clear = ~1;                 *flags &= clear;                 *((u32 *)
+once-loop	src/group_objects.c	485	table = gRandomTable;
+once-loop	src/group_objects.c	486	do {                         table = gRandomTable;                    
+once-loop	src/group_objects.c	487	do {                     do {                         table = gRandomT
+once-loop	src/group_objects.c	488	do {                 do {                     do {                    
+once-loop	src/heap_memory.c	33	next->prev = block;                     next->next = block->next;     
+once-loop	src/hud.c	1541	#include "sun_clock.h"             value -= divisor * digit; #include 
+once-loop	src/hud_tilemaps.c	72	*cell++ = tile;             empty++;
+once-loop	src/mode_menu.c	171	loop:                         if (i == 15) {                          
+once-loop	src/modifier_selection_and_stat_previews.c	698	ModifierMenu_DrawStatComparison(first, first, 21, 6, 2);
+once-loop	src/modifier_selection_and_stat_previews.c	720	validPreview:                     ModifierMenu_DrawStatComparison(firs
+once-loop	src/modifier_selection_and_stat_previews.c	878	switch (menu->state) {             case 1:                 visible = 1
+once-loop	src/monster_book.c	362	if (v > 9) {             out = 0x1b;             if (v > 0x11) {      
+once-loop	src/mummy_entry.c	1781	((u8 *)obj)[field] = zero;
+once-loop	src/mummy_entry.c	1787	u32 field = 0x2B0;             do {                 ((u8 *)obj)[field]
+once-loop	src/mummy_entry.c	4011	value &= loaded;
+once-loop	src/palette_controller.c	71	fromG = greenMask & from;
+once-loop	src/palette_controller.c	499	gPaletteController = p;         p->pending = 0;         t->callback = 
+once-loop	src/palette_controller.c	714	setMode:             t->mode = mode;         waiting:             t->c
+once-loop	src/password.c	42	while ((c = *src) != 0) {             {                 u32 held = c; 
+once-loop	src/password.c	173	if (Text_CopyWithoutTags(e->text, src, 0x30) != 0x30) {             re
+once-loop	src/player_3.c	650	u32 count = p->movementModifierActive;                 offset = 0;    
+once-loop	src/registry_actor_manager.c	87	control = (void *)((u8 *)control + sizeof(struct RegistryActor));
+once-loop	src/registry_selection_menu.c	193	outputBank += (unsigned short)0x20;
+once-loop	src/resource_registry.c	13	if (!(entry->flags & 0x80))                     return entry;
+once-loop	src/resource_registry.c	18	for (entry = gResourceRegistryEntries, i = 0; i < gResourceRegistryCou
+once-loop	src/scene_actor_animation.c	1799	kind = value >> 4;         actor->nodeId = Path_GetPointNodeId(node, 0
+once-loop	src/scene_catalog.c	229	refreshDisplay:         menu->comparisonIndicators[0].flags &= ~1;    
+once-loop	src/scene_messages.c	81	*(out++) = *(in++);
+once-loop	src/script_record.c	194	return input;
+once-loop	src/script_record.c	200	return input;
+once-loop	src/script_record.c	216	return input;
+once-loop	src/script_record.c	222	return input;
+once-loop	src/script_record.c	238	result = value;
+once-loop	src/script_record.c	244	result = value;
+once-loop	src/script_utility.c	175	flags = &gEngineFlags;
+once-loop	src/script_utility.c	176	do {                 flags = &gEngineFlags;             } while (0);
+once-loop	src/script_utility.c	177	do {             do {                 flags = &gEngineFlags;          
+once-loop	src/skeleton_main.c	1482	mask = 3;
+once-loop	src/skeleton_main.c	3579	clear = ~1;                 *flags &= clear;                 *((u32 *)
+once-loop	src/spatial_index.c	32	delay = count - 1;
+once-loop	src/sprite.c	515	p = gSpriteListHeads[gRenderListIndex];         if (!p) {             
+once-loop	src/sprite.c	599	p = gSpriteListHeads[gRenderListIndex];             if (!p) {         
+once-loop	src/sprite.c	600	do {             p = gSpriteListHeads[gRenderListIndex];             i
+once-loop	src/status_screen.c	24	row = 0;         values = digits;
+once-loop	src/status_screen.c	70	row = 0;         values = digits;
+once-loop	src/tether_actor.c	1088	if ((((x < 0) || (z < 0)) || (((u32)x) >= gTerrainWidth)) || (((u32)z)
+once-loop	src/tether_actor.c	2968	table = gUnk_086149C4;
+once-loop	src/tether_presentation.c	260	destinationBank += 0x20;
+once-loop	src/text_sequence.c	56	++p->stepIndex;
+once-loop	src/time_result.c	87	r = table[gRandomIndex];
+once-loop	src/wireless_game_items_and_display.c	885	if (q->entered) {             int choice;             void *draw;     
+once-loop	src/wireless_game_items_and_display.c	1253	q->entered = 1;                     q->timer = zero;
+volatile-view	src/background_controller.c	549	volatile u32 *count =
+volatile-view	src/fn/sub_080340AC.c	43	volatile u8 *global;
+volatile-view	src/fn/sub_080364C0.c	49	volatile u8 *busy =
+volatile-view	src/fn/sub_0803670C.c	49	volatile u8 *busy =
+volatile-view	src/fn/sub_0805AC3C.c	46	(volatile u16 *)f
+volatile-view	src/fn/sub_0805AC3C.c	58	(volatile u16 *)i
+volatile-view	src/fn/sub_0805D2B0.c	5	const volatile u16 *source =
+volatile-view	src/fn/sub_0805D2B0.c	7	const volatile u16 *index =
+volatile-view	src/fn/sub_0805E7D8.c	4	const volatile u16 *keys =
+volatile-view	src/fn/sub_0806AF74.c	85	const volatile u16 *command;
+volatile-view	src/fn/sub_080838AC.c	38	volatile u32 *stateFlags;
+volatile-view	src/fn/sub_080838AC.c	41	volatile u32 *firstFlags;
+volatile-view	src/fn/sub_08126D88.c	214	const volatile u16 *command;
+volatile-view	src/fn/sub_08126D88.c	218	const volatile u16 *table;
+volatile-view	src/fn/sub_08126D88.c	220	(const volatile u16 *)(
+volatile-view	src/fn/sub_08126D88.c	295	const volatile u16 *table;
+volatile-view	src/fn/sub_08126D88.c	297	(const volatile u16 *)(
+volatile-view	src/fn/sub_08128F98.c	30	(const volatile u16 *)(
+volatile-view	src/fn/sub_08128F98.c	43	(const volatile u16 *)(
+volatile-view	src/fn/sub_081294B4.c	108	const volatile u16 *entry;
+volatile-view	src/fn/sub_081294B4.c	112	(const volatile u16 *)(
+volatile-view	src/fn/sub_0812A7B8.c	19	const volatile u16 *commands;
+volatile-view	src/fn/sub_0812AA0C.c	19	const volatile u16 *commands;
+volatile-view	src/fn/sub_0812ACB0.c	22	const volatile u16 *commands;
+volatile-view	src/fn/sub_08184F04.c	40	(volatile u8 *)q
+volatile-view	src/fn/sub_0818EF64.c	6	const volatile u16 *commands;
+volatile-view	src/fn/sub_0818F0FC.c	5	const volatile u16 *commands;
+volatile-view	src/fn/sub_0818F218.c	15	volatile u32 *occupied =
+volatile-view	src/fn/sub_0818F444.c	5	const volatile u16 *commands;
+volatile-view	src/fn/sub_0818FEE4.c	7	const volatile u16 *commands;
+volatile-view	src/fn/sub_081A39E0.c	85	const volatile u16 *entry =
+volatile-view	src/fn/sub_081B0F34.c	45	(volatile s16 *)p
+volatile-view	src/fn/sub_081B0F34.c	101	volatile s16 *out =
+volatile-view	src/fn/sub_081B1334.c	38	(volatile s16 *)p
+volatile-view	src/fn/sub_081FFAB8.c	83	const volatile u16 *command =
+volatile-view	src/fn/sub_081FFAB8.c	155	const volatile u16 *table;
+volatile-view	src/fn/sub_081FFAB8.c	157	(const volatile u16 *)(
+volatile-view	src/fn/sub_0820212C.c	7	const volatile u16 *commands;
+volatile-view	src/fn/sub_08204230.c	11	const volatile u16 *commands;
+volatile-view	src/fn/sub_08209AC4.c	9	const volatile u16 *commands;
+volatile-view	src/fn/sub_0820A5CC.c	9	const volatile u16 *commands;
+volatile-view	src/fn/sub_0820B3E0.c	7	const volatile u16 *commands;
+volatile-view	src/fn/sub_0820B7E0.c	9	const volatile u16 *commands;
+volatile-view	src/fn/sub_0820E724.c	9	const volatile u16 *commands;
+volatile-view	src/fn/sub_0820F830.c	9	const volatile u16 *commands;
+volatile-view	src/fn/sub_08217084.c	5	(volatile u16 *)0
+volatile-view	src/fn/sub_08220C8C.c	31	const volatile u16 *command;
+volatile-view	src/fn/sub_08220C8C.c	34	(const volatile u16 *)b
+volatile-view	src/fn/sub_08222CB0.c	6	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	7	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	9	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	10	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	11	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	12	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	13	(volatile u16 *)0
+volatile-view	src/fn/sub_08222CB0.c	14	(volatile u16 *)0
+volatile-view	src/fn/sub_08223580.c	18	(volatile u8 *)p
+volatile-view	src/fn/sub_08224C84.c	9	(volatile u8 *)p
+volatile-view	src/fn/sub_08224CA4.c	7	volatile u8 *p =
+volatile-view	src/fn/sub_08224CA4.c	7	(volatile u8 *)0
+volatile-view	src/fn/sub_0822ED7C.c	27	(volatile u16 *)0
+volatile-view	src/fn/sub_0822ED7C.c	30	(volatile u16 *)0
+volatile-view	src/fn/sub_0822EDF8.c	15	(volatile u16 *)0
+volatile-view	src/fn/sub_0822EDF8.c	19	(volatile u16 *)0
+volatile-view	src/fn/sub_0822EDF8.c	25	(volatile u16 *)0
+volatile-view	src/particle_effect_pool.c	63	volatile u32 *flags =
+volatile-view	src/particle_effect_pool.c	263	volatile u32 *occupied =
+volatile-view	src/result_tutorial.c	699	volatile u32 *flags =
+volatile-view	src/scene_status_indicator.c	30	volatile u32 *allocated =
+volatile-view	src/status_screen_fade.c	270	(volatile u16 *)0
+volatile-view	src/tile_animation.c	103	volatile u32 *dma =
+volatile-view	src/tile_animation.c	103	(volatile u32 *)0
+zero-shift	src/animation_widget.c	194	& 0x80) >> 31
+zero-shift	src/fn/sub_080154EC.c	199	(u8)handle.parts[1] >> 8
+zero-shift	src/fn/sub_08071F50.c	107	(u16)i >> 16
+zero-shift	src/fn/sub_080AEE08.c	124	& 255) >> 8
+zero-shift	src/fn/sub_080AEE08.c	125	& 31) >> 5
+zero-shift	src/fn/sub_080AEE08.c	126	& 127) >> 7
+zero-shift	src/fn/sub_080BD1F0.c	382	& 31) >> 5
+zero-shift	src/fn/sub_08142194.c	70	v >> 12 (u8)
+zero-shift	src/fn/sub_08183E4C.c	81	a >> 8 (u8)
+zero-shift	src/fn/sub_08234540.c	32	phase >> 8 (u8)
+zero-shift	src/fn/sub_08234540.c	40	& 31) >> 5
+zero-shift	src/fn/sub_08234540.c	71	& 127) >> 7
+zero-shift	src/large_fragment_effect.c	118	v >> 12 (u8)
+zero-shift	src/lun.c	1264	n >> 12 (u8)
+zero-shift	src/skeleton_main.c	490	counter >> 16 (u16)
+zero-shift	src/skeleton_main.c	492	counter >> 18 (u16)
+zero-shift	src/skeleton_main.c	497	counter >> 17 (u16)
+zero-shift	src/skeleton_main.c	3623	n >> 12 (u8)
+zero-shift	src/spider.c	1821	(u16)mask >> 16
+zero-shift	src/spider.c	1821	mask >> 16 (u16)
+zero-shift	src/sprite.c	175	& 0x80) >> 31

@@ -1,0 +1,183 @@
+src/actor_animation_controller.c	1298	/* Tentative role: Wait through a child-triggered delay, then enter mode 2 / phase 4. */
+src/actor_graphics_and_basic_states.c	288	/* A flat `pad[0x344]` prefix (matching groundEffect's offset) rather than * struct StateActor + a nested Scen
+src/axe.c	4029	// foundry draft (worker best 92.0%); what differs is mostly register allocation and instruction order
+src/axe.c	4861	/* first-fit allocation from gHeapHead; NULL on failure */
+src/background_controller.c	547	/* Retain the original count reload on each argument copy. The byte offset * is commands[count].args[j]; this 
+src/bee.c	1051	/* Keeping the indexed base before the member address preserves agbcc * addition ordering; direct array indexi
+src/child_group.c	765	// allocation (flow weights refs by loop depth): i gets r2 as in the ROM.
+src/contact_sequence_actor.c	165	/* The 63 masks are 16-bit literals: cse shares one HImode constant register (sl) among them, and reload takes
+src/crow.c	584	// confidence=low: distance and angle gates suggest approach and orbit flight steering.
+src/dark_loan.c	458	/* The balance update is unsigned; the following lifetime total saturates. */
+src/dog.c	4002	/* first-fit allocation from gHeapHead; NULL on failure */
+src/explosion.c	128	/* Explosion_CreateImmediate: Allocates an explosion with default collision parameters and zero activation del
+src/explosion.c	145	/* Explosion_CreateDelayed: Allocates an explosion with default collision parameters and a caller-supplied act
+src/fn/sub_080148CC.c	4	// confidence=medium: fills a particle group with randomized polar velocities.
+src/fn/sub_08014CA4.c	2	// confidence=low: allocates a fragment group with randomized direction and lifetime.
+src/fn/sub_08018028.c	92	// constant cse could hand to the later unk876 read, which reloads 0x876 as in the ROM.
+src/fn/sub_08018F38.c	26	// flow deletes the dead store, jump2 then the branch: the ROM keeps only the subtract.
+src/fn/sub_0801BD44.c	181	/* overwritten at once, but needed to match */
+src/fn/sub_0802048C.c	5	// confidence=low: loads the animation resources of the scene object manager and allocates its slot pool.
+src/fn/sub_08038764.c	47	/* s16 copy steers register allocation */
+src/fn/sub_0803C114.c	2	// Open: motion-pointer lifetimes, initial control layout and register allocation differ.
+src/fn/sub_0803D8A8.c	9	/* scope block steers register allocation */
+src/fn/sub_08042F44.c	48	/* One pointer serves the health collider on entry and the random table while steering. */
+src/fn/sub_080513B8.c	75	/* The shared macro's loop notes count random's refs twice in flow, so global alloc gives it r4 before the 102
+src/fn/sub_080513B8.c	83	/* Stored directly (a HImode copy), so jump2 does not cross-jump this arm into case 2's; the random arm is sha
+src/fn/sub_08059AC4.c	19	// arm afresh: it compares the new count again and reloads stateFrame (fact 193).
+src/fn/sub_0805A7E4.c	31	// pair in one register (r2, r3, r4); separate variables reorder the allocation.
+src/fn/sub_0805AC3C.c	12	/* Allocation-only: this unreachable signed-load arm reserves reload scratch. */
+src/fn/sub_0805AC3C.c	49	/* Allocation-only: the bounded fallback retains the timer preferences. */
+src/fn/sub_0805B0F0.c	32	/* Allocation-only: fold the bounded offset after constant-equivalence analysis. */
+src/fn/sub_080697C8.c	11	// The plain conditional expression keeps each of the six expansions short before combine,
+src/fn/sub_080697C8.c	12	// which keeps &pos ahead of b in global allocation (r8 and sb, as in the ROM).
+src/fn/sub_0806BA58.c	12	/* Requires p and v keyword triples. All five literal-key7314 GCX call sites * supply both (reviewed in SPRITE
+src/fn/sub_0806BE80.c	2	/* SceneSteeringActor_NoOp: Empty function in the steering actor state family */
+src/fn/sub_0806C3A0.c	7	// confidence=low: steers an actor toward its target, advances its frame sequence, and checks the terrain cell
+src/fn/sub_0806C3A0.c	38	// confidence=low: steers an actor toward its target, advances its frame sequence, and checks the terrain cell
+src/fn/sub_0806CCC8.c	8	// confidence=low: gives every waiting (state 3) steering actor a target, lifetime and vertical
+src/fn/sub_0806CF18.c	2	/* SceneSteeringActor_RequestTravelDepartureAll: Changes all state-four travel actors to departure state five 
+src/fn/sub_0806CF4C.c	3	/* SceneSteeringActor_CreateFixedOriginTravelActor: Creates a travel actor at fixed coordinates aimed toward t
+src/fn/sub_0806D740.c	32	/* Copy of RouteSpriteActor_StepPlayback taking the sequence separately; the * hint in the reverse-hold branch
+src/fn/sub_080703A8.c	9	/* The allocated terminal node carries a NULL actor; an absent list head * is outside this helper's caller con
+src/fn/sub_080703F0.c	9	/* The allocated terminal node carries a NULL actor; an absent list head * is outside this helper's caller con
+src/fn/sub_08070444.c	6	/* Byte98 and halfword1E6 are caller-supplied classification filters; the * field1E6 interpretation remains te
+src/fn/sub_080704A4.c	8	/* The allocated terminal node carries a NULL actor; an absent list head * is outside this helper's caller con
+src/fn/sub_08071F50.c	12	/* Allocation-only: the folded guard keeps regmove from tying the AND to value. */
+src/fn/sub_08071F50.c	59	/* Allocation-only: declaration order preserves the six spilled channel homes. */
+src/fn/sub_08071F50.c	106	/* Allocation-only: the bounded term folds after loop strength reduction. */
+src/fn/sub_080762A8.c	2	/* SceneActorAnimation_SelectDirectionalExtraFlags: Selects a profile animation with variant zero and combines
+src/fn/sub_08078550.c	2	/* SceneActorBehavior_AddDescriptorAcceleration: Steers toward the descriptor destination by adding speed-scal
+src/fn/sub_080A985C.c	43	/* unused, but its declaration affects register allocation */
+src/fn/sub_080BD1F0.c	272	/* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
+src/fn/sub_080BD1F0.c	320	/* Allocation-only: the two bounded exit arms preserve this global table * lifetime until jump2; neither arm n
+src/fn/sub_080BD1F0.c	381	/* The late zero retains the response/table conflict through combine. */
+src/fn/sub_080D1784.c	26	/* Allocation-only: share the signed destination offset and motion flag. */
+src/fn/sub_080D1784.c	99	/* Allocation-only: retain PRE expression order before these folds die. */
+src/fn/sub_080FF87C.c	45	// confidence=low: allocates a crate slot and reads sprite, trigger and callback options from the script.
+src/fn/sub_08100388.c	2	/* FloorSwitch_InitHooks: Empty function beside switch allocation; initialization hook role is tentative */
+src/fn/sub_08104D6C.c	4	// foundry draft (worker best 98.4%); what differs is mostly register allocation and instruction order
+src/fn/sub_08109AEC.c	5	// foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
+src/fn/sub_0810B238.c	4	// foundry draft (worker best 96.4%); what differs is mostly register allocation and instruction order
+src/fn/sub_0810BBD4.c	51	// confidence=low: the formula combines two result counters and relative elapsed time into bounded points.
+src/fn/sub_0810E9D4.c	71	/* The store goes through a plain s16 lvalue (not a struct field), so the score pointer is reloaded after it. 
+src/fn/sub_08121D14.c	29	// The same function as SceneParticle_AllocateSlot over this pool's layout.
+src/fn/sub_08127274.c	66	// confidence=low: stationary projectile state expires on animation completion or lifetime.
+src/fn/sub_08128F98.c	98	/* Defaults pack priority in bits 0-7, controller flags in 8-15, and contactB in 16-31. */
+src/fn/sub_081296D0.c	35	// what gives the ROM's allocation (found by tools/autosolve.py)
+src/fn/sub_0812ACB0.c	6	// confidence=low: steers and accelerates a linked effect toward a target until expiry.
+src/fn/sub_08135F70.c	207	// The clear is written in both places it applies. jump2 cross-jumps the
+src/fn/sub_08135F70.c	208	// two copies into one, but reload has already loaded the 0x2CC offset for
+src/fn/sub_08136F58.c	93	// global allocation, which gives it r8 ahead of group (rasolve).
+src/fn/sub_081383E0.c	72	/* A no-op rewrite of i (combine folds it away). Setting i inside the inner loop keeps gcse from computing the
+src/fn/sub_081493E4.c	5	// Remaining differences: instruction selection and register allocation.
+src/fn/sub_0814957C.c	5	// Remaining differences: instruction selection and register allocation.
+src/fn/sub_0814E3D8.c	5	// confidence=low: charge tiers and buffered input inferred from phase transitions.
+src/fn/sub_0814E990.c	5	// confidence=low: charge tiers and buffered input inferred from phase transitions.
+src/fn/sub_0814E990.c	41	// confidence=low: attached task charge values choose tiers before recoil and buffered restart.
+src/fn/sub_0814F328.c	57	// confidence=low: attached task tiers and buffered restart define this charge handler.
+src/fn/sub_0815EC14.c	4	/* Byte view preserves the original global-pointer reloads between stores. */
+src/fn/sub_081606C0.c	4	// Allocate an attack particle and initialize its sequence when requested.
+src/fn/sub_081606C0.c	14	/* PlayerAttackEffect_Create allocates 0x5A8 bytes. Its initializer sets up sixteen slots. */
+src/fn/sub_08160EA4.c	45	// reload, whose spill rotation gives the original r3/r4 choices
+src/fn/sub_081616D0.c	45	// reload, whose spill rotation gives the original r3/r4 choices
+src/fn/sub_08161AF4.c	45	// reload, whose spill rotation gives the original r3/r4 choices
+src/fn/sub_08161F18.c	45	// reload, whose spill rotation gives the original r3/r4 choices
+src/fn/sub_0816233C.c	4	// confidence=low: updates attack particles and advances their animation or lifetime.
+src/fn/sub_08169868.c	6	// foundry draft (worker best 99.2%); what differs is mostly register allocation and instruction order
+src/fn/sub_0817A354.c	41	/* Raw offsets throughout: routing any of this through struct StateActor / * SceneActorGraphics changes regist
+src/fn/sub_0817A354.c	45	/* A flat `pad[0x344]` prefix (matching groundEffect's offset) rather than * struct StateActor + a nested Scen
+src/fn/sub_08183E4C.c	81	/* always 0 (u8 >> 8); combine folds it late, leaving the dead `movs r7, #0` */
+src/fn/sub_08184F04.c	5	// foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
+src/fn/sub_081879A8.c	73	// confidence=low: steers toward the player and selects aligned attacks.
+src/fn/sub_08187F44.c	89	// confidence=low: steers toward the player and selects aligned attacks.
+src/fn/sub_0818FA54.c	44	// confidence=low: allocates a falling effect with attack/body colliders and an initially disabled shadow.
+src/fn/sub_08190274.c	46	// confidence=low: allocates a player-seeking effect with two collision channels and a small shadow.
+src/fn/sub_0819C6AC.c	48	// it is not a constant register, so its priority is not halved and it wins r4 over the 1023 mask
+src/fn/sub_0819C6AC.c	49	// (update_equiv_regs in local-alloc.c only marks a pseudo whose every set stores one constant).
+src/fn/sub_0819C870.c	30	// allocation. The s16 conversion adds RTL that combine folds away later, but
+src/fn/sub_0819C870.c	31	// flow counts it, so speed outlives actor and is allocated after it; the
+src/fn/sub_0819C8F8.c	30	// allocation. The s16 conversion adds RTL that combine folds away later, but
+src/fn/sub_0819C8F8.c	31	// flow counts it, so speed outlives actor and is allocated after it; the
+src/fn/sub_0819CFEC.c	3	// confidence=low: prioritizes defeat, recovery, and interrupted charge reactions.
+src/fn/sub_081A0BC8.c	176	// compute the quotient in x itself. Here the division is a
+src/fn/sub_081A0BC8.c	177	// subexpression, so the quotient gets its own register, as in the ROM.
+src/fn/sub_081A14FC.c	179	/* Allocation-only: preserve the table and raw-sample lifetimes. */
+src/fn/sub_081A14FC.c	184	/* Allocation-only: this bounded fallback retains the argument copy. */
+src/fn/sub_081A2378.c	45	// it in register allocation.
+src/fn/sub_081A3554.c	40	// rematerialized in the loop, which sets reload's register rotation.
+src/fn/sub_081A388C.c	5	// confidence=low: updates homing effect entries, animation, trails and lifetime.
+src/fn/sub_081A39E0.c	5	// confidence=low: updates homing effect entries, animation, trails and lifetime.
+src/fn/sub_081B7954.c	3	// foundry draft (worker best 83.3%); what differs is mostly register allocation and instruction order
+src/fn/sub_081B7A2C.c	6	// foundry draft (worker best 99.1%); what differs is mostly register allocation and instruction order
+src/fn/sub_081BB904.c	97	// Each direction resets its own hold; jump2 merges this copy into the second one, and
+src/fn/sub_081BB904.c	98	// its reload choice still moves the spill rotation (README fact 59).
+src/fn/sub_081CE1BC.c	123	/* two update temporaries; an array keeps agbcc's allocation */
+src/fn/sub_081D0C04.c	102	/* Registry routine BB34: creates a scene NPC (0x384-byte object from Actor_Allocate) named -n, variant -k (de
+src/fn/sub_081D0F28.c	32	/* Sets the motion angle and the derived 8- and 4-way facings. The facing math needs register pins and an empt
+src/fn/sub_081D1E78.c	41	// Remaining difference: entry-flag pointer lifetime in the airborne phase.
+src/fn/sub_081D3C90.c	31	// The ROM reloads p->phase every iteration (not hoisted) and keeps the anchor coordinate addresses in registe
+src/fn/sub_081F5290.c	167	/* Sign-symmetric fixed-point conversions. The samples are never negative, * but combine folds the tests only 
+src/fn/sub_081F9E20.c	3	// foundry draft (worker best 98.2%); what differs is mostly register allocation and instruction order
+src/fn/sub_081FDCB0.c	32	/* Both end paths are written out; jump2 merges them into one tail. */
+src/fn/sub_0820EE34.c	30	/* Allocation-only: reuse the incoming values for the response copy. */
+src/fn/sub_0820EE34.c	46	/* Allocation-only: this bounded guard preserves reload pressure. */
+src/fn/sub_0820F078.c	3	// foundry draft (worker best 84.1%); what differs is mostly register allocation and instruction order
+src/fn/sub_08217430.c	4	/* Used only by the allocation-only bounded fallback below. */
+src/fn/sub_08217430.c	68	/* Allocation-only: offset comes from a u16 key, so this * arm is unreachable. Its fourth argument retains the
+src/fn/sub_08217430.c	103	/* Retained allocation-only loop note from the matching source. */
+src/fn/sub_08221834.c	2	/* ScalarApproach_UnwrapAngle: Returns the period-256 angle representative nearest the center with a positive 
+src/fn/sub_08225624.c	79	/* reproduces the original's reload and store */
+src/fn/sub_08228368.c	7	/* Task_Create variant (allocator Heap_AllocFromEnd) */
+src/fn/sub_08228DB8.c	3	/* The light phase from the clock: whether the base (current) time lies in the window from time A to time B (w
+src/fn/sub_08234540.c	39	/* Preserve the table's reference weight until combine. */
+src/fn/sub_082392E8.c	54	// changes reload register rotation (r2 instead of r1), as in the original.
+src/ghost.c	329	// Remaining differences include octant-mask lifetime, control initialization and registers.
+src/golem_main_2.c	1046	/* first-fit allocation from gHeapHead; NULL on failure */
+src/grid_attack_actor.c	260	/* Keep the transform base live: direct actor fields change register allocation. */
+src/grid_attack_actor.c	702	/* Keep the transform base live: direct actor fields change register allocation. */
+src/grid_attack_actor.c	819	/* Keep the transform base live: direct actor fields change register allocation. */
+src/grid_attack_actor.c	875	/* Keep the transform base live: direct actor fields change register allocation. */
+src/ivy.c	544	/* Ivy hold (tentative): keeps the held actor or player at the vine's per-frame offset * (gUnk_08606384, mirro
+src/ivy.c	864	/* Ivy defeat state (tentative), a variant of Skeleton_UpdateDefeat (Skeleton_UpdateDefeat). On entry: * hides
+src/ivy.c	1485	/* Count frames; after 30, restart the phase (the count still advances). The empty test of the taken flag is w
+src/ivy.c	2212	/* first-fit allocation from gHeapHead; NULL on failure */
+src/iwram_code.c	179	/* Retain this initialization for matching compiler behavior. */
+src/lun.c	385	// Remaining differences include octant-mask lifetime, control initialization and registers.
+src/lun.c	2407	/* first-fit allocation from gHeapHead; NULL on failure */
+src/mummy_entry.c	3077	// confidence=low: selects attack bounds and properties from mummy movement flags.
+src/mummy_entry.c	4289	/* Choose a route, react to contact, or resume pursuit in motion-flag priority order. */
+src/mummy_entry.c	4597	/* first-fit allocation from gHeapHead; NULL on failure */
+src/nav_mesh.c	512	// Steers a nav probe: when the probe lies to the side of `angle` (relative to `target`),
+src/nav_mesh.c	543	// 8-direction variant of NavMesh_SteerCardinal: steers a nav probe; when the probe lies to the side of `angle
+src/octopus.c	967	// Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
+src/octopus.c	1683	/* Count frames; after 60, restart the phase (the count still advances). The empty test of the taken flag is w
+src/octopus.c	2489	/* first-fit allocation from gHeapHead; NULL on failure */
+src/path.c	482	// symbol form changes reload order and register choice in the loop.
+src/player_3.c	2213	// Preserved owner/request registers differ; one exit reloads the mode.
+src/player_3.c	2298	/* Add the slot index before the field offset to retain the original address lifetime. */
+src/player_clone.c	589	/* Advance each active clone, its animation and colliders, and its lifetime. */
+src/projectile_config.c	3	// confidence=low: allocates a timed-effect entry for the projectile configuration.
+src/region_actor.c	99	/* Pool128_OnStateNoOp: Empty function preceding the 0x128-byte pool allocator; state callback role is tentati
+src/scene_actor_approach.c	155	// foundry draft (worker best 94.9%); what differs is mostly register allocation and instruction order
+src/scene_debris.c	181	// confidence=low: planar debris lifetime follows completion of its visual animation.
+src/scene_debris.c	183	/* ROM copies an uninitialized projected depth halfword; keep it uninitialized to match. */
+src/scene_object.c	1219	/* Allocate the object pool (default 8 objects) and initialize the palette-fade state. */
+src/scene_panel_control_and_lifecycle.c	223	/* Keep the indexed slot calculation: direct indexing becomes a different * induction loop in agbcc. The slot 
+src/scene_scheduled_effect.c	122	// confidence=low: allocates one of four 0x144-byte slots, recording its index at 0x13E.
+src/skeleton.c	521	/* Actor_StepTowardTargetAxis: steps toward a target point along one axis (the larger delta, or the current fa
+src/skeleton_main.c	78	// foundry draft (worker best 96.2%); what differs is mostly register allocation and instruction order
+src/skeleton_main.c	1218	// foundry draft (worker best 93.0%); what differs is mostly register allocation and instruction order
+src/spider.c	2275	/* first-fit allocation from gHeapHead; NULL on failure */
+src/spread_shot.c	374	/* Keep the cell lookup and height calculation together here: sharing CellHeight * changes the step's register
+src/sprite.c	321	// Culls one sprite's frame pieces against the Sprite_ProjectPosition, allocates its affine matrix,
+src/sprite.c	323	// tiles and palette, and queues the visible pieces as OAM entries (immediate or by priority).
+src/tether_actor.c	1736	/* Keep the existing pinned offset calculations: direct member addresses change allocation. */
+src/vorn_main.c	1558	// few insns before combine, enough that `active` (8 refs) outranks it for r4.
+src/wireless_game_items_and_display.c	546	/* Keep the byte-offset temporary for the original register lifetime. */
+src/wireless_game_items_and_display.c	562	/* Never true (count is a sum of two bytes). The compiler folds the test late and the * label it leaves keeps 
+src/wireless_game_items_and_display.c	1055	/* Field-derived byte offsets preserve the matched address lifetimes. */
+src/wireless_game_items_and_display.c	1084	/* What is left for the queued slot: nothing, as the sum is never negative. */
+src/wireless_game_items_and_display.c	1159	/* Field-derived byte offsets preserve the matched address lifetimes. */
+src/wireless_game_items_and_display.c	1204	/* What is left for the queued slot: nothing, as the sum is never negative. */
+src/wireless_game_items_and_display.c	1244	/* Direct items[i] indexing changes agbcc register allocation. */
+src/wireless_peer_panel.c	12	// Combine the animation and frame orientation flags for the sprite.
