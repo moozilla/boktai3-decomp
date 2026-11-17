@@ -853,6 +853,13 @@ def concession_counts(source_root):
     from statement_macros import single_use_names
     once = frozenset(single_use_names(Path(ROOT)))
     counts = {}
+    import deadcode
+    compiled = deadcode.available()
+    if compiled:
+        deadcode.tree()  # compile every unit in parallel; compiler_sites below reads the cache
+    else:
+        print("warning: scope's compiler is not built (sh tools/scope/build_agbcc.sh): "
+              "dead-code and proved-zero are not counted", file=sys.stderr)
     for path in sorted([*Path(source_root).rglob("*.c"), *(Path(ROOT) / "include").rglob("*.h")]):
         text, _ = split_nonmatching(path.read_text())
         rel = path.relative_to(ROOT)
@@ -860,9 +867,15 @@ def concession_counts(source_root):
         flags = concessions.cflags(text, rel)
         found += [flags] if flags else []
         found += [concessions.Site(0, "alias", ok) for ok in concessions.aliases(text, rel).values()]
+        if compiled and path.suffix == ".c":
+            found += concessions.compiler_sites(rel, path.read_text())
         for s in found:
             n, ok = counts.get(s.kind, (0, 0))
             counts[s.kind] = (n + (not s.excused), ok + s.excused)
+        if path.suffix == ".c":
+            n, ok = counts.get("_units", (0, 0))  # (units with an unexcused warning, units without)
+            dirty = any(s.kind in concessions.WARN and not s.excused for s in found)
+            counts["_units"] = (n + dirty, ok + (not dirty))
     return counts
 
 
@@ -876,7 +889,9 @@ def concession_lines_md(counts):
             *[f"| `{k}` (tracked, not scored) | {cell(k)} |" for k in concessions.TRACKED if k in counts], "",
             "| Warnings (`python3 tools/concessions.py`; not scored) | |", "|---|---:|",
             *[f"| `{k}` | {cell(k)} |" for k in concessions.WARN if k in counts],
-            f"| total | {sum(counts.get(k, (0, 0))[0] for k in concessions.WARN):,} |", ""]
+            f"| total | {sum(counts.get(k, (0, 0))[0] for k in concessions.WARN):,} |", "",
+            f"Source files with no warning: **{counts.get('_units', (0, 0))[1]:,}** of "
+            f"{sum(counts.get('_units', (0, 0))):,}.", ""]
 
 
 def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,

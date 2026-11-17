@@ -35,10 +35,12 @@ Errors and warnings. Run as a linter (`python3 tools/concessions.py [PATH...]`),
 scored site is an **error**. A **warning** is C a person plausibly would not have written, found by
 its spelling, so each one is a question, not a verdict:
 
-* `dead-arm`: a branch on `x < 0` where x is declared unsigned in the function (the arm can never
-  run). People do write dead code by accident; an arm that looks like a real gap in the algorithm
-  can be excused.
-* `known-zero`: a term that is always zero (`(u16)x >> 16`, `(x & 31) >> 5`).
+* `dead-code`: a call, store or branch the compiler deleted as unreachable after working out a
+  condition the C left open (`x < 0` on a value that came from an unsigned halfword). People do
+  write dead code by accident; an arm that looks like a real gap in the algorithm can be excused.
+* `proved-zero`: an operation the compiler proved is always zero (`(u16)x >> 16`, `(x & 31) >> 5`).
+  These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
+  instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
@@ -58,13 +60,15 @@ matching) is an admission, not a justification, and `lint` rejects it.
 """
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 
 HARD = ("pin", "operand", "clobber", "barrier")
 EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatile", "alias", "cflags", "raw-offset")
 SCORED = HARD + EXCUSABLE
-WARN = ("dead-arm", "known-zero", "once-loop", "stmt-expr", "const-local", "addr-deref", "placeholder-name",
+COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
+WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "addr-deref", "placeholder-name",
         "volatile-view", "local-union")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
@@ -103,16 +107,9 @@ _WARN_REGEX = {
         r"\(\s*(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\)\s*(?!&|REG_|0x0?4[0-9A-Fa-f]{6}\b)[\w(*]"
         r"|(?m:^[ \t]+(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\w+\s*[=;])"),
     "local-union": re.compile(r"(?m)^[ \t]+union\b[^;{}()]*\{"),
-    "known-zero": re.compile(r"\(\s*u16\s*\)\s*(?:\(\s*\w+\s*\)\s*)*[\w.\->\[\]]+\s*>>\s*(?:16|24)\b"
-                             r"|\(\s*u8\s*\)\s*(?:\(\s*\w+\s*\)\s*)*[\w.\->\[\]]+\s*>>\s*(?:8|16|24)\b"),
 }
-_MASK_SHIFT = re.compile(r"&\s*(0x[0-9A-Fa-f]+|\d+)\s*\)\s*>>\s*(\d+)\b")
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
-_LOCAL_DECL = re.compile(r"\b(?:const\s+)?(u8|u16|u32|bool8|s8|s16|s32|int)\s+(\w+)\s*[;=,)]")
-_UNSIGNED = {"u8": 8, "u16": 16, "u32": 32, "bool8": 8}
-_NEG_TEST = re.compile(r"(?<=[(&|])\s*(?:\(\s*s32\s*\)\s*)?(\w+)\s*<\s*0\s*(?=[)&|])")
-_SHIFT = re.compile(r"(?<![\w.>\]])(\w+)\s*>>\s*(\d+)\b")
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
@@ -202,9 +199,6 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
-    for m in _MASK_SHIFT.finditer(code):
-        if int(m.group(1), 0) >> int(m.group(2)) == 0:
-            yield m.start(), "known-zero"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:
@@ -217,24 +211,6 @@ def _warn_sites(code: str):
             i -= 1
         if i >= 0 and code[i + 1:m.start()].strip():
             yield m.start(), "once-loop"
-    # the typed kinds read each function's own declarations
-    from merge_unit import items
-    offset = 0
-    for item in items(code):
-        start = code.find(item, offset)
-        offset = start + len(item)
-        if "{" not in item:
-            continue
-        types: dict[str, set[str]] = {}
-        for m in _LOCAL_DECL.finditer(item):
-            types.setdefault(m.group(2), set()).add(m.group(1))
-        width = {n: _UNSIGNED[next(iter(t))] for n, t in types.items() if len(t) == 1 and next(iter(t)) in _UNSIGNED}
-        for m in _NEG_TEST.finditer(item):
-            if m.group(1) in width:
-                yield start + m.start(), "dead-arm"
-        for m in _SHIFT.finditer(item):
-            if width.get(m.group(1), 99) <= min(int(m.group(2)), 31) and width[m.group(1)] < 32:
-                yield start + m.start(), "known-zero"
 
 
 def sites(text: str, path=None, *, single_use=frozenset(), kinds=SCORED + WARN + TRACKED) -> list[Site]:
@@ -297,6 +273,20 @@ def cflags(text: str, path=None) -> Site | None:
     return Site(line, "cflags", is_library(path) or "cflags" in allows(text).get(line, {}))
 
 
+def compiler_sites(path, text=None) -> list[Site]:
+    """The dead-code and proved-zero sites on PATH's own lines (a unit under src/), from the
+    instrumented compiler. Empty for headers and when the compiler isn't built."""
+    import deadcode
+    rel = str(path).replace("\\", "/")
+    if not rel.endswith(".c") or is_library(rel) or not deadcode.available():
+        return []
+    if text is None:
+        text = open(os.path.join(deadcode.ROOT, rel), errors="replace").read()
+    ok = allows(text)
+    seen = {(line, kind) for kind, file, line, _, _ in deadcode.unit(rel) if file == rel}
+    return [Site(line, kind, kind in ok.get(line, {})) for line, kind in sorted(seen)]
+
+
 def warnings(found) -> list[Site]:
     """The unexcused warning sites."""
     return [s for s in found if s.kind in WARN and not s.excused]
@@ -321,7 +311,7 @@ def score(body: str, lines_with_concessions: int) -> float:
     return min(round(100 * (1 - lines_with_concessions / n), 1), 99.9)
 
 
-def lint(text: str, path=None, *, single_use=frozenset()) -> list[str]:
+def lint(text: str, path=None, *, single_use=frozenset(), compiler=None) -> list[str]:
     """Problems with TEXT's concession-ok comments: unknown kinds, kinds no comment can excuse,
     a missing reason, or a comment with nothing to excuse."""
     problems = []
@@ -334,6 +324,8 @@ def lint(text: str, path=None, *, single_use=frozenset()) -> list[str]:
     code = strip(text)
     for m in _ALIAS.finditer(code):
         used.setdefault(_line(code, m.start()), set()).add("alias")
+    for s in compiler or ():
+        used.setdefault(s.line, set()).add(s.kind)
     for m in _ALLOW.finditer(text):
         line = _line(text, m.start())
         where = f"{path or '<text>'}:{line}"
@@ -345,6 +337,8 @@ def lint(text: str, path=None, *, single_use=frozenset()) -> list[str]:
                 problems.append(f"{where}: {k} is never the original's C, so no comment excuses it")
             elif k not in EXCUSABLE + WARN:
                 problems.append(f"{where}: unknown concession kind {k!r} (one of {', '.join(EXCUSABLE + WARN)})")
+            elif k in COMPILER and compiler is None:
+                pass  # only a compile can say whether there is one here
             elif k not in used.get(line, set()) | used.get(line + 1, set()):
                 problems.append(f"{where}: concession-ok({k}) has no {k} on this line or the next to excuse")
         if len(m.group(2)) < 10:
@@ -367,6 +361,7 @@ def main(argv=None) -> int:
     ap.add_argument("--errors-only", action="store_true")
     ap.add_argument("--kind", action="append", help="only these kinds")
     ap.add_argument("--summary", action="store_true", help="totals per kind only")
+    ap.add_argument("--no-compiler", action="store_true", help="skip dead-code and proved-zero (no compiles)")
     args = ap.parse_args(argv)
     from statement_macros import single_use_names
     once = frozenset(single_use_names(root))
@@ -374,6 +369,16 @@ def main(argv=None) -> int:
     for p in args.paths or [root / "src", root / "include"]:
         p = Path(p)
         files += sorted([*p.rglob("*.c"), *p.rglob("*.h")]) if p.is_dir() else [p]
+    import deadcode
+    use_compiler = not args.no_compiler
+    if use_compiler and not deadcode.available():
+        sys.exit("dead-code and proved-zero need scope's compiler: sh tools/scope/build_agbcc.sh (or pass --no-compiler)")
+    if use_compiler:  # compile in parallel up front; the loop below reads the cache
+        from concurrent.futures import ThreadPoolExecutor
+        units = [str(f.resolve().relative_to(root)) for f in files
+                 if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
+        with ThreadPoolExecutor(8) as pool:
+            list(pool.map(deadcode.unit, units))
     totals: dict[str, int] = {}
     for f in files:
         text = f.read_text(errors="replace")
@@ -381,7 +386,8 @@ def main(argv=None) -> int:
         lines = text.splitlines()
         found = sites(text, rel, single_use=once)
         flags = cflags(text, rel)
-        for s in found + ([flags] if flags else []):
+        compiled = compiler_sites(rel, text) if use_compiler else None
+        for s in sorted(found + (compiled or []), key=lambda s: (s.line, s.kind)) + ([flags] if flags else []):
             if s.excused or s.kind in TRACKED or (args.kind and s.kind not in args.kind):
                 continue
             level = "warning" if s.kind in WARN else "error"
@@ -390,7 +396,7 @@ def main(argv=None) -> int:
             totals[s.kind] = totals.get(s.kind, 0) + 1
             if not args.summary:
                 print(f"{rel}:{s.line}: {level} [{s.kind}] {lines[s.line - 1].strip()[:100] if 0 < s.line <= len(lines) else ''}")
-        for problem in lint(text, rel, single_use=once):
+        for problem in lint(text, rel, single_use=once, compiler=compiled if f.suffix == ".c" else None):
             totals["bad-ignore"] = totals.get("bad-ignore", 0) + 1
             if not args.summary:
                 print(f"{problem.split(': ', 1)[0]}: error [bad-ignore] {problem.split(': ', 1)[1]}")

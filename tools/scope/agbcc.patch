@@ -1213,7 +1213,42 @@
  #include "tree.h"
  #include "regs.h"
  #include "flags.h"
-@@ -2403,6 +2405,7 @@
+@@ -1343,9 +1345,34 @@
+    (rtx)-1 if we could not substitute the function
+    0 if we substituted it and it does not produce a value
+    else an rtx for where the value is stored.  */
++
++/* scope: AGBCC_DEAD skips code expanded from an inline function a header defines: a constant
++   argument there leaves dead arms that are the original's own.  */
++int agbcc_inline_header = 0;
++static rtx expand_inline_function_1 ();
+ 
+ rtx
+ expand_inline_function (fndecl, parms, target, ignore, type,
++			structure_value_addr)
++     tree fndecl, parms;
++     rtx target;
++     int ignore;
++     tree type;
++     rtx structure_value_addr;
++{
++  extern char *main_input_filename;
++  int saved = agbcc_inline_header;
++  rtx result;
++  if (DECL_SOURCE_FILE (fndecl) && main_input_filename
++      && strcmp (DECL_SOURCE_FILE (fndecl), main_input_filename) != 0)
++    agbcc_inline_header = 1;
++  result = expand_inline_function_1 (fndecl, parms, target, ignore, type, structure_value_addr);
++  agbcc_inline_header = saved;
++  return result;
++}
++
++static rtx
++expand_inline_function_1 (fndecl, parms, target, ignore, type,
+ 			structure_value_addr)
+      tree fndecl, parms;
+      rtx target;
+@@ -2403,6 +2430,7 @@
        if (map->reg_map[regno] == NULL)
  	{
  	  map->reg_map[regno] = gen_reg_rtx (mode);
@@ -1714,7 +1749,7 @@
  	      m->lifetime += m1->lifetime;
  	      m->savings += m1->savings;
  	      m1->done = 1;
-@@ -1828,7 +1871,17 @@
+@@ -1828,8 +1871,18 @@
  	  /* It is also desirable to move if it can be moved at no
  	     extra cost because something else was already moved.  */
  
@@ -1733,7 +1768,8 @@
 +	      || uid_listed (getenv ("AGBCC_MOVE"), INSN_UID (p))  /* scope what-if: hoist it */
  	      || (threshold * savings * m->lifetime) >=
  		 (moved_once[regno] ? insn_count * 2 : insn_count)
-@@ -4533,6 +4585,12 @@
+ 	      || (m->forces && m->forces->done
+@@ -4533,6 +4586,12 @@
  	{
  	  struct induction *tv;
  
@@ -1746,7 +1782,7 @@
  	  if (v->ignore || v->same)
  	    continue;
  
-@@ -4591,8 +4649,25 @@
+@@ -4591,8 +4650,25 @@
  	     of such giv's whether or not we know they are used after the loop
  	     exit.  */
  
@@ -1783,7 +1819,29 @@
  
  static int init_label_info		(rtx);
  static void delete_barrier_successors	(rtx);
-@@ -186,6 +187,8 @@
+@@ -178,6 +179,21 @@
+      int noop_moves;
+      int after_regscan;
+ {
++  {
++    extern char *current_function_name;
++    extern int agbcc_jump_pass;
++    extern int agbcc_late;
++    static char *agbcc_last_function;
++    if (agbcc_last_function != current_function_name)
++      {
++	extern int agbcc_lines_on;
++	agbcc_jump_pass = 0;
++	agbcc_lines_on = 0;
++      }
++    agbcc_last_function = current_function_name;
++    agbcc_jump_pass++;
++    agbcc_late = cross_jump;
++  }
+   register rtx insn, next;
+   int changed;
+   int old_max_reg;
+@@ -186,6 +202,8 @@
    rtx last_insn;
  
    cross_jump_death_matters = (cross_jump == 2);
@@ -1792,7 +1850,87 @@
  /* CYGNUS LOCAL -- branch prediction */
    /* Do any branch prediction reorganization if desired on the last pass
       (branch prediction needs combine to be run).  We do it now, so that
-@@ -2692,13 +2695,52 @@
+@@ -2093,6 +2111,66 @@
+     }
+ 
+   return largest_uid;
++}
++
++/* scope: AGBCC_DEAD reports source lines whose code an optimization proved unreachable
++   (after the first jump pass, which removes what the syntax already made dead; or by flow), and
++   expressions combine proved to be zero.  One line each on stderr:
++   AGBCC_DEAD <tab> kind <tab> file <tab> line <tab> function <tab> detail  */
++int agbcc_unreach = 0;
++int agbcc_jump_pass = 0;
++/* Nonzero in the jump pass after reload.  Code a constant argument or an `if (0)` makes dead is
++   gone long before; what is still here was alive while registers were allocated.  */
++int agbcc_late = 0;
++extern char *current_function_name;
++
++int
++agbcc_dead_enabled ()
++{
++  static int on = -1;
++  if (on < 0)
++    on = getenv ("AGBCC_DEAD") != 0;
++  return on;
++}
++
++void
++agbcc_dead_report (insn, kind, detail)
++     rtx insn;
++     const char *kind;
++     const char *detail;
++{
++  extern int agbcc_line_of ();
++  char *file = 0;
++  int line;
++  if (! agbcc_dead_enabled () || insn == 0)
++    return;
++  line = agbcc_line_of (INSN_UID (insn), &file);
++  if (line <= 0)
++    return;
++  fprintf (stderr, "AGBCC_DEAD\t%s\t%s\t%d\t%s\t%s\n", kind, file ? file : "?", line,
++	   current_function_name ? current_function_name : "?", detail);
++}
++
++static void
++agbcc_unreachable_insn (insn)
++     rtx insn;
++{
++  const char *what;
++  if (GET_RTX_CLASS (GET_CODE (insn)) != 'i')
++    return;
++  if (agbcc_jump_pass < 2)
++    return;
++  if (GET_CODE (PATTERN (insn)) == USE || GET_CODE (PATTERN (insn)) == CLOBBER)
++    return;
++  if (GET_CODE (insn) == CALL_INSN)
++    what = "call";
++  else if (GET_CODE (insn) == JUMP_INSN)
++    what = "jump";
++  else if (GET_CODE (PATTERN (insn)) == SET && GET_CODE (SET_DEST (PATTERN (insn))) == MEM)
++    what = "store";
++  else
++    what = "insn";
++  agbcc_dead_report (insn, "unreachable", what);
+ }
+ 
+ /* Delete insns following barriers, up to next label.  */
+@@ -2113,7 +2191,11 @@
+ 		  && NOTE_LINE_NUMBER (insn) != NOTE_INSN_FUNCTION_END)
+ 		insn = NEXT_INSN (insn);
+ 	      else
+-		insn = delete_insn (insn);
++		{
++		  agbcc_unreach++;
++		  insn = delete_insn (insn);
++		  agbcc_unreach--;
++		}
+ 	    }
+ 	  /* INSN is now the code_label.  */
+ 	}
+@@ -2692,13 +2774,52 @@
    register rtx i1 = e1, i2 = e2;
    register rtx p1, p2;
    int lose = 0;
@@ -1845,7 +1983,7 @@
    while (1)
      {
        i1 = prev_nonnote_insn (i1);
-@@ -2825,11 +2867,20 @@
+@@ -2825,11 +2946,20 @@
  	  /* Ok, this insn is potentially includable in a cross-jump here.  */
  	  afterlast1 = last1, afterlast2 = last2;
  	  last1 = i1, last2 = i2, --minimum;
@@ -1867,7 +2005,7 @@
  }
  
  static void
-@@ -2868,6 +2918,11 @@
+@@ -2868,6 +2998,11 @@
    while (newjpos != insn)
      {
        rtx lnote;
@@ -1879,6 +2017,29 @@
  
        for (lnote = REG_NOTES (newlpos); lnote; lnote = XEXP (lnote, 1))
  	if ((REG_NOTE_KIND (lnote) == REG_EQUAL
+@@ -3745,6 +3880,9 @@
+   if (INSN_DELETED_P (insn))
+     return next;
+ 
++  if (agbcc_unreach)
++    agbcc_unreachable_insn (insn);
++
+   /* Don't delete user-declared labels.  Convert them to special NOTEs
+      instead.  */
+   if (was_code_label && LABEL_NAME (insn) != 0
+@@ -3867,7 +4005,11 @@
+ 	       deletion of unreachable code, after a different label.
+ 	       As long as the value from this recursive call is correct,
+ 	       this invocation functions correctly.  */
+-	    next = delete_insn (next);
++	    {
++	      agbcc_unreach++;
++	      next = delete_insn (next);
++	      agbcc_unreach--;
++	    }
+ 	}
+     }
+ 
 --- a/combine.c
 +++ b/combine.c
 @@ -1518,6 +1518,20 @@
@@ -1902,6 +2063,25 @@
    /* Verify that I2 and I1 are valid for combining.  */
    if (! can_combine_p (i2, i3, i1, NULL_RTX, &i2dest, &i2src)
        || (i1 && ! can_combine_p (i1, i3, NULL_RTX, i2, &i1dest, &i1src)))
+@@ -3318,6 +3332,18 @@
+   enum machine_mode mode = GET_MODE (x);
+   rtx temp;
+   int i;
++
++  /* scope: AGBCC_DEAD: an operation whose value the known-zero bits prove to be zero.  */
++  {
++    extern int agbcc_dead_enabled ();
++    extern void agbcc_dead_report ();
++    if (agbcc_dead_enabled () && ! in_dest && subst_insn
++	&& GET_MODE_CLASS (mode) == MODE_INT
++	&& GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
++	&& (GET_RTX_CLASS (code) == '2' || GET_RTX_CLASS (code) == 'c' || GET_RTX_CLASS (code) == '1')
++	&& nonzero_bits (x, mode) == 0)
++      agbcc_dead_report (subst_insn, "zero", GET_RTX_NAME (code));
++  }
+ 
+   /* If this is a commutative operation, put a constant last and a complex
+      expression first.  We don't need to do this for comparisons here.  */
 --- a/regclass.c
 +++ b/regclass.c
 @@ -1005,7 +1005,26 @@
@@ -1949,3 +2129,122 @@
  	}
      }
  #endif /* REGISTER_CONSTRAINTS */
+--- a/emit-rtl.c
++++ b/emit-rtl.c
+@@ -2102,6 +2102,47 @@
+   return trial;
+ }
+ 
++/* scope: AGBCC_DEAD: the source line each insn was expanded from, by uid.  This compiler keeps
++   no line notes without -g, and an insn an optimizer makes later has no line of its own.  */
++int agbcc_lines_on = 0;
++static int *agbcc_uid_line;
++static char **agbcc_uid_file;
++static int agbcc_uid_size;
++
++static void
++agbcc_note_line (uid)
++     int uid;
++{
++  extern int agbcc_dead_enabled ();
++  if (! agbcc_dead_enabled ())
++    return;
++  if (uid >= agbcc_uid_size)
++    {
++      int size = uid * 2 + 1024, i;
++      agbcc_uid_line = (int *) xrealloc (agbcc_uid_line, size * sizeof (int));
++      agbcc_uid_file = (char **) xrealloc (agbcc_uid_file, size * sizeof (char *));
++      for (i = agbcc_uid_size; i < size; i++)
++	agbcc_uid_line[i] = 0;
++      agbcc_uid_size = size;
++    }
++  {
++    extern int agbcc_inline_header;
++    agbcc_uid_line[uid] = agbcc_lines_on && ! agbcc_inline_header ? emit_lineno : 0;
++  }
++  agbcc_uid_file[uid] = emit_filename;
++}
++
++int
++agbcc_line_of (uid, file)
++     int uid;
++     char **file;
++{
++  if (uid < 0 || uid >= agbcc_uid_size)
++    return 0;
++  *file = agbcc_uid_file[uid];
++  return agbcc_uid_line[uid];
++}
++
+ /* Make and return an INSN rtx, initializing all its slots.
+    Store PATTERN in the pattern slots.  */
+ 
+@@ -2122,6 +2163,7 @@
+     insn = rtx_alloc (INSN);
+ 
+   INSN_UID (insn) = cur_insn_uid++;
++  agbcc_note_line (INSN_UID (insn));
+   PATTERN (insn) = pattern;
+   INSN_CODE (insn) = -1;
+   LOG_LINKS (insn) = NULL;
+@@ -2140,6 +2182,7 @@
+ 
+   insn = rtx_alloc (JUMP_INSN);
+   INSN_UID (insn) = cur_insn_uid++;
++  agbcc_note_line (INSN_UID (insn));
+ 
+   PATTERN (insn) = pattern;
+   INSN_CODE (insn) = -1;
+@@ -2160,6 +2203,7 @@
+ 
+   insn = rtx_alloc (CALL_INSN);
+   INSN_UID (insn) = cur_insn_uid++;
++  agbcc_note_line (INSN_UID (insn));
+ 
+   PATTERN (insn) = pattern;
+   INSN_CODE (insn) = -1;
+@@ -2519,6 +2563,7 @@
+   register rtx insn = rtx_alloc (BARRIER);
+ 
+   INSN_UID (insn) = cur_insn_uid++;
++  agbcc_note_line (INSN_UID (insn));
+ 
+   add_insn_before (insn, before);
+   return insn;
+@@ -2623,6 +2668,7 @@
+   register rtx insn = rtx_alloc (BARRIER);
+ 
+   INSN_UID (insn) = cur_insn_uid++;
++  agbcc_note_line (INSN_UID (insn));
+ 
+   add_insn_after (insn, after);
+   return insn;
+@@ -2869,6 +2915,7 @@
+ {
+   emit_filename = file;
+   emit_lineno = line;
++  agbcc_lines_on = 1;
+ 
+ #if 0
+   if (no_line_numbers)
+--- a/flow.c
++++ b/flow.c
+@@ -269,6 +269,7 @@
+ static void mark_label_ref		(int, rtx);
+ static void delete_unreachable_blocks	(void);
+ static int delete_block			(int);
++extern void agbcc_dead_report ();
+ static void life_analysis_1		(rtx, int);
+ static void propagate_block		(regset, rtx, rtx, int, 
+ 					       regset, int);
+@@ -1042,6 +1043,10 @@
+     {
+       if (GET_CODE (insn) == BARRIER)
+ 	abort ();
++      else if (GET_RTX_CLASS (GET_CODE (insn)) == 'i' && GET_CODE (PATTERN (insn)) != USE
++	       && GET_CODE (PATTERN (insn)) != CLOBBER)
++	agbcc_dead_report (insn, "unreachable",
++			   GET_CODE (insn) == CALL_INSN ? "call" : GET_CODE (insn) == JUMP_INSN ? "jump" : "insn");
+       else if (GET_CODE (insn) == NOTE && NOTE_LINE_NUMBER (insn) != NOTE_INSN_DELETED)
+ 	{
+ 	  if (kept_head == 0)
