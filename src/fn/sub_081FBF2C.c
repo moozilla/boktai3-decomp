@@ -37,7 +37,7 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct RatatoskParticlePool *aIn)
         if (TestMask(1 << i, a)) {
             struct DisplaySequenceSprite *sprite = &e->sprite;
             struct RatatoskParticleConfig *cfg = &e->config;
-            if (sub_08249240(e, (void *)i, cfg->callback) == 1) {
+            if (cfg->callback(e, i) == 1) {
                 Ratatosk_ReleaseAnimatedParticle(a, e, i);
             } else {
                 u32 active = e->motionFlags & 1;
