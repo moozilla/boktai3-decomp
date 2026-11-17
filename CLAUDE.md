@@ -117,5 +117,5 @@ Units with pins are marked `// MATCHING_CONCESSION: register-pinning` and report
 in the With concessions category. `tools/concessions.py` lists every kind the tools count
 (pins, barriers, empty bodies, single-use macros, volatile locals, `asm("Symbol")` aliases,
 CFLAGS overrides, constant raw offsets); a judgment-call kind can be excused with `// concession-ok(kind): reason`
-(`docs/WORKER.md`). decomp.dev counts a function as matched only with no concession left. Take the pins out of a unit you touch
+(`docs/WORKER.md`). decomp.dev counts a function as matched only with no concession left. `python3 tools/concessions.py [FILE...]` is the linter: scored kinds are errors, and C a person plausibly would not have written (dead arms, known-zero terms, single-pass loops, `zero`/`one` locals, ...) is a warning. Drive errors to zero, then warnings; add none. A warning is silenced only by a `concession-ok(kind): reason` that argues the original authors wrote it so; a reason about the compiler is rejected. Take the pins out of a unit you touch
 (`scope.py FILE.c pins`, `tools/depin.py`); the marker goes when the last one does.

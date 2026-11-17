@@ -873,7 +873,10 @@ def concession_lines_md(counts):
     cell = lambda k: f"{counts.get(k, (0, 0))[0]:,}" + (f" (+{counts[k][1]:,} excused)" if counts.get(k, (0, 0))[1] else "")
     return ["| Concession sites | |", "|---|---:|",
             *[f"| `{k}` | {cell(k)} |" for k in concessions.SCORED if k in counts],
-            *[f"| `{k}` (tracked, not scored) | {cell(k)} |" for k in concessions.TRACKED if k in counts], ""]
+            *[f"| `{k}` (tracked, not scored) | {cell(k)} |" for k in concessions.TRACKED if k in counts], "",
+            "| Warnings (`python3 tools/concessions.py`; not scored) | |", "|---|---:|",
+            *[f"| `{k}` | {cell(k)} |" for k in concessions.WARN if k in counts],
+            f"| total | {sum(counts.get(k, (0, 0))[0] for k in concessions.WARN):,} |", ""]
 
 
 def write_markdown(out, funcs, sizes, done, total_b, done_b, pinned_b=0, fuzzy=None, report=None,

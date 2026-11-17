@@ -164,5 +164,55 @@ class Tree(unittest.TestCase):
         self.assertEqual(problems, [])
 
 
+def warns(text, path=None):
+    return [s.kind for s in c.warnings(c.sites(text, path))]
+
+
+class Warnings(unittest.TestCase):
+    def test_dead_arm_needs_an_unsigned_declaration(self):
+        self.assertEqual(warns("void f(u8 *p) {\n    u32 raw = *p;\n    if ((s32)raw < 0) {\n        g();\n    }\n}\n"), ["dead-arm"])
+        self.assertEqual(warns("void f(s32 *p) {\n    s32 raw = *p;\n    if (raw < 0) {\n        g();\n    }\n}\n"), [])
+        self.assertEqual(warns("void f(void) {\n    u32 width = w();\n    if (left + (s32)width < 0)\n        g();\n}\n"), [])
+
+    def test_types_are_read_per_function(self):
+        text = "void a(void) {\n    u16 x = g();\n    h(x);\n}\nvoid b(void) {\n    s32 x = g();\n    if (x < 0)\n        h(x);\n}\n"
+        self.assertEqual(warns(text), [])
+
+    def test_known_zero(self):
+        self.assertEqual(warns("void f(u32 i) {\n    u32 o = (i + ((u16)i >> 16)) * 2;\n}\n"), ["known-zero"])
+        self.assertEqual(warns("void f(u32 b) {\n    t = t | ((b & 31) >> 5);\n}\n"), ["known-zero"])
+        self.assertEqual(warns("void f(u32 b) {\n    t = (b & 0xFF00) >> 8;\n}\n"), [])
+        self.assertEqual(warns("void f(void) {\n    u8 phase = g();\n    t = phase >> 8;\n}\n"), ["known-zero"])
+
+    def test_once_loop_with_a_body_but_not_in_a_macro(self):
+        self.assertEqual(warns("void f(void) {\n    do {\n        zero = 0;\n    } while (0);\n}\n"), ["once-loop"])
+        self.assertEqual(warns("#define SET(x) do { x = 0; } while (0)\nvoid f(void) {\n    SET(a);\n}\n"), [])
+        self.assertEqual(kinds("void f(void) {\n    do { } while (0);\n}\n"), ["empty-loop"])
+
+    def test_small_forms(self):
+        self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
+                         ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
+
+    def test_volatile_view_not_hardware(self):
+        self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
+        self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
+
+    def test_local_union_defined_in_a_function(self):
+        self.assertEqual(warns("void f(void) {\n    union {\n        u32 mask;\n        u32 *cursor;\n    } r;\n}\n"), ["local-union"])
+        self.assertEqual(warns("void f(void) {\n    union Fixed value;\n}\n"), [])
+
+    def test_warnings_do_not_score_and_library_is_exempt(self):
+        text = "void f(void) {\n    int zero = 0;\n}\n"
+        self.assertEqual(kinds(text), [])
+        self.assertEqual(warns(text, "src/lib/m4a.c"), [])
+
+    def test_a_justification_silences_and_an_admission_does_not(self):
+        good = "void f(void) {\n    do {\n        a = 0;\n    } while (0);  // concession-ok(once-loop): expansion of the SDK's DmaClear macro\n}\n"
+        bad = good.replace("expansion of the SDK's DmaClear macro", "keeps the table in r4 through reload")
+        self.assertEqual(warns(good), [])
+        self.assertEqual(c.lint(good), [])
+        self.assertTrue(any("admission" in p for p in c.lint(bad)))
+
+
 if __name__ == "__main__":
     unittest.main()
