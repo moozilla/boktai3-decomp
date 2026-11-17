@@ -35,7 +35,7 @@ static inline void SetAnimation(struct ActorStatusPart *p, void *data, u32 id, u
 }
 static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
-    ((volatile s16 *)p)[0] = x;
+    p->x = x;
     p->y = y;
     p->z = z;
 }
