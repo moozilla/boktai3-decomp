@@ -44,12 +44,11 @@ int sub_082238F0(int);
 int Wireless_ResetAfterError(struct Engine *p)
 {
     if (p->pending) {
-        int zero = 0;
-        p->pending = zero;
+        p->pending = 0;
         Wireless_SetStatus(1);
         sub_082238F0(1);
-        p->entered = zero;
-        p->flag = zero;
+        p->entered = 0;
+        p->flag = 0;
     }
     if (WirelessController_ConsumeAdvanceRequest(p))
         WirelessController_ResetSession(p);
