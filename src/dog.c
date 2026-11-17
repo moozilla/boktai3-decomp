@@ -7,6 +7,7 @@
 #include "scene_actor_palette.h"
 #include "scene_actor_control_motion.h"
 #include "scene_actor_animation.h"
+#include "scene_actor_turn.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_state.h"
 #include "scene_actor_registry.h"
@@ -1755,56 +1756,6 @@ static inline void DogTurn_SetControl(struct DogTurnState *a, void *control, u32
     a->motionCounter = 0;
 }
 
-static inline void DogTurn_SelectAnimation(struct DogTurnState *a, u32 selection, u32 variant,
-                                           u32 flags)
-{
-    u32 force;
-    if (flags & 0x10) {
-        force = 0x10;
-        flags &= ~0x10;
-    } else
-        force = 0;
-    if (!a->drawableKind) {
-        struct SceneActorAnimationSequenceDrawable *drawable;
-        a->selection = selection;
-        drawable = a->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
-                         (u8)variant, (u8)flags);
-    } else {
-        struct SceneActorAnimationTile *tile =
-            &((struct SceneActorAnimationTileDrawable *)a->drawable)->tile;
-        u8 *savedSelection;
-        selection += variant;
-        {
-            u8 *selectionAddress = &a->selection;
-            u32 previous = *selectionAddress;
-            savedSelection = selectionAddress;
-            if (!force && previous == selection && !a->restart) {
-                if (flags == 1 && (tile->flags & 4))
-                    return;
-                if (flags == 0 && !(tile->flags & 4))
-                    return;
-            }
-        }
-        *savedSelection = selection;
-        {
-            u32 mask = 4;
-            u32 mode;
-            if (flags & mask)
-                mode = 6;
-            else
-                mode = 4;
-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                              a->drawable, (u16)selection, 2, (u16)mode);
-            if (flags & 1)
-                tile->flags |= mask;
-            else
-                tile->flags &= ~4;
-        }
-    }
-    a->restart = 0;
-}
-
 void Dog_UpdateCardinalTurn(struct DogTurnState *a)
 {
     struct DogTurnBody *body = &a->body;
@@ -1838,37 +1789,37 @@ void Dog_UpdateCardinalTurn(struct DogTurnState *a)
         switch (direction) {
             case 0:
                 if ((u32)(target - 2) <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 1, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 0, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 1:
                 if ((u32)(target - 4) <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 2, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 3, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 0);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 2:
                 if ((u32)(target - 1) > 4) {
-                    DogTurn_SelectAnimation(a, 13, 3, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 1);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 2, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
             case 3:
                 if ((u32)target <= 3) {
-                    DogTurn_SelectAnimation(a, 13, 0, 0);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 0);
                     DogTurn_SetBits(0x10000, &a->flags);
                 } else {
-                    DogTurn_SelectAnimation(a, 13, 1, 1);
+                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 1);
                     DogTurn_ClearBits(&a->flags, 0x10000);
                 }
                 break;
