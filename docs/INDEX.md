@@ -236,7 +236,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-10-early-state.md](../docs/history/2026-10-early-state.md) | Handoff history: state as of October 9-12 | #actors #assets #hardware #inventory #library #menu #process #scripts #sound #tooling #wireless | 22 |
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
-| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 17 |
+| [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 2 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
@@ -471,7 +471,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-batch1_2026-11-16.md](../notes/round14-batch1_2026-11-16.md) | Round 14 batch 1: ordinary fields and task state | #round14 #matching #compiler #concessions #object-model | 7 |
 | [notes/round14-batch2_2026-11-16.md](../notes/round14-batch2_2026-11-16.md) | Boktai 3 round 14 — checkpoint 2 | #round14 #matching #concessions #tooling #cleanup | 9 |
 | [notes/round14-batch3_2026-11-16.md](../notes/round14-batch3_2026-11-16.md) | Boktai 3 round 14 — checkpoint 3 | #round14 #matching #concessions #object-model #cleanup | 11 |
-| [notes/round14-batch4_2026-11-16.md](../notes/round14-batch4_2026-11-16.md) | Boktai 3 round 14 — checkpoint 4 | #round14 #matching #concessions #object-model #cleanup | 15 |
+| [notes/round14-batch4_2026-11-16.md](../notes/round14-batch4_2026-11-16.md) | Boktai 3 round 14 — checkpoint 4 | #round14 #matching #concessions #object-model #cleanup | 16 |
 | [notes/round14-constant-declaration-diagnostics.md](../notes/round14-constant-declaration-diagnostics.md) | Round 14: distinguish declarations from jumps and returns |  | 2 |
 | [notes/round14-decimal-rendering_2026-11-16.md](../notes/round14-decimal-rendering_2026-11-16.md) | Round 14: decimal-rendering once-loop investigation | *#hud* | 5 |
 | [notes/round14-downed-control_2026-11-16.md](../notes/round14-downed-control_2026-11-16.md) | Round 14: typed downed-state control transitions | #round14 #matching #once-loop #shared-types #checkpoint4 | 4 |
