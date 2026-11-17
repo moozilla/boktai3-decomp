@@ -49,11 +49,9 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
     {
         struct SceneObjSlot *sprite = obj;
         u8 *cf2;
-        if (((({
-                s32 m = *(s32 *)(mgr + 0x34);
-                cf2 = cellField;
-                m;
-            }))) == 0) {
+        s32 mode = *(s32 *)(mgr + 0x34);
+        cf2 = cellField;
+        if (mode == 0) {
             switch (obj->type) {
                 case 2:
                     AnimData_SelectPaletteBank(mgr + (obj->value * 28 + 0x154), 0xe6);
