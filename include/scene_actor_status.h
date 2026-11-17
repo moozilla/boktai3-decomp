@@ -10,7 +10,6 @@
 #include "scene_actor_contact_list.h"
 
 extern u32 gLinkSession;
-extern u8 *gUnknown_02000580[];
 void SceneActorPalette_BeginTransition(u32, u32, u32, s32, u32);
 void ActorShadow_Enable(void *);
 void ActorShadow_Disable(void *);
@@ -225,11 +224,11 @@ static inline u32 ActorStatus_EnvironmentPaletteActive(s32 player)
 {
     struct Player *object;
     if (gEngineFlags & 0x800) {
-        return ActorStatus_LinkPaletteActive((struct Player *)gUnknown_02000580[player]);
+        return ActorStatus_LinkPaletteActive(gPlayers[player]);
     }
     if (gWeatherCollisionTimer > 0)
         return 1;
-    object = (struct Player *)gUnknown_02000580[player];
+    object = gPlayers[player];
     if (object != 0 && ActorStatus_PalettePlayerFlags(&object->actionFlags, 0x10))
         return 1;
     return ActorStatus_PassagePaletteActive();
@@ -459,7 +458,7 @@ static inline void ActorStatus_Particles(struct ChaseActor *actor)
 static inline void ActorStatus_FaceTarget(struct ChaseActor *actor)
 {
     if (ActorStatus_BodyFlags(actor, 2)) {
-        actor->base.tracking.target = (u32)(gUnknown_02000580[0] + 0x24);
+        actor->base.tracking.target = (u32)&gPlayers[0]->positionalEffectGroup;
     } else if (actor->base.tracking.target == 0) {
         return;
     }

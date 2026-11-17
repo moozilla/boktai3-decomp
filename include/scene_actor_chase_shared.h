@@ -2,12 +2,12 @@
 #define GUARD_SCENE_ACTOR_CHASE_SHARED_H
 
 #include "scene_actor_chase_types.h"
+#include "player.h"
 #include "engine.h"
 #include "engine_globals.h"
 #include "ram.h"
 #include "scene_actor_animation.h"
 
-extern u8 *gUnknown_02000580[];
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -338,7 +338,7 @@ static inline u8 SceneActorChase_BeginContactAnimation(struct ChaseActor *actor)
 
 static inline void SceneActorChase_TrackPlayer(struct ChaseActor *actor)
 {
-    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
 }
 
 static inline void SceneActorChase_ClearActorFlags(void *object, u32 bits)
