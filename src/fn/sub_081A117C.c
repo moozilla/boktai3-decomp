@@ -41,7 +41,6 @@ static inline void RestoreHeading(struct ActorReaction *p)
 }
 void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
 {
-    int new_var;
     struct ActorReaction *p = actor;
     struct ActorReaction **new_var3;
     u32 t = tick;
@@ -49,10 +48,9 @@ void Hresvelgr_UpdateRandomAnimation(struct ActorReaction *actor, u32 tick)
     new_var2 = actor;
     RestoreHeading(p);
     new_var2->motion[0] = 0;
-    new_var = 0;
     new_var3 = &new_var2;
     (*new_var3)->motion[1] = 0;
-    (*new_var3)->motion[2] = new_var;
+    (*new_var3)->motion[2] = 0;
     (*new_var3)->motion[3] = 0;
     {
         u32 flags = 12;
