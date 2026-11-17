@@ -2,7 +2,9 @@
 #include "engine.h"
 #include "ram.h"
 extern u32 gUnk_02000560;
-extern void *gUnk_08605B84[];
+typedef void (*SpriteEffectStateCallback)(struct SpriteEffectControllerPool *,
+                                          struct SpriteEffectController *);
+extern SpriteEffectStateCallback gUnk_08605B84[];
 void SpriteEffectController_QueueColliders(struct SpriteEffectControllerPool *);
 static inline u8 IsUsed(struct SpriteEffectControllerPool *p, u32 index)
 {
@@ -26,10 +28,10 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
         SpriteEffectController_QueueColliders(p);
         {
             s32 i = 0;
-            void **table = gUnk_08605B84;
+            SpriteEffectStateCallback *table = gUnk_08605B84;
             for (; i < 24; i++) {
                 if (IsUsed(p, i))
-                    sub_08249240(p, &slots[i], table[slots[i].state]);
+                    table[slots[i].state](p, &slots[i]);
             }
         }
     }
