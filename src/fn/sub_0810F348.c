@@ -1,4 +1,5 @@
 #include "global.h"
+#include "palette_pulse.h"
 
 #include "record_menu.h"
 #include "input.h"
@@ -8,7 +9,6 @@ void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void BgGfx_LoadTilemapSimple(u32, u32, u32, u32, u32);
 void LinkLobbyPanel_ClearTextWindows(struct RecordMenu *);
 void LinkLobbyPanel_HideSprites(struct RecordMenu *);
-void Palette_UpdateHighlightPulse(void *, void *);
 void TextWindow_SetBounds(s32, s32, s32, s32, s32);
 void TextWindow_SetScript(s32, const u8 *);
 void TextWindow_Refresh(u32, u32);

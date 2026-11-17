@@ -1,4 +1,5 @@
 #include "mode_menu.h"
+#include "palette_pulse.h"
 #include "game_state.h"
 #include "session_save.h"
 #include "ram.h"

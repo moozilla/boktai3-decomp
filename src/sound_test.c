@@ -1,4 +1,5 @@
 #include "sound_test.h"
+#include "palette_pulse.h"
 #include "menu_parameters.h"
 #include "input.h"
 #include "render.h"

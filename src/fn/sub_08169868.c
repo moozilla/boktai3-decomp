@@ -1,4 +1,5 @@
 #include "global.h"
+#include "palette_pulse.h"
 #include "scene_hud_display.h"
 #include "game_state.h"
 #include "render.h"

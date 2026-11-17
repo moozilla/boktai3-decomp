@@ -1,4 +1,5 @@
 #include "screen_message.h"
+#include "palette_pulse.h"
 
 void ScreenMessage_UpdateChoiceHighlight(struct ScreenMessage *p)
 {

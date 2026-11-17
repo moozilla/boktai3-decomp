@@ -1,4 +1,5 @@
 #include "global.h"
+#include "palette_pulse.h"
 #include "region_menu.h"
 #include "menu_parameters.h"
 #include "runtime.h"
@@ -87,8 +88,6 @@ void Menu_StartFadeOut(s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
 void Menu_SetTextRect(void *, struct Rect16 *);
-
-void Palette_UpdateHighlightPulse(void *, u8 *);
 
 void Time_HandleRegionKeypad(struct RegionMenu *menu)
 {
