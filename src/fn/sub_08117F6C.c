@@ -124,10 +124,9 @@ union GloveResourceHalfword {
 static inline void Glove_ChangeUpdate(struct Glove *p, void (*callback)(void *))
 {
     u8 *active = &p->active;
-    u32 zero = 0;
     *active = 1;
     p->update = callback;
-    p->timer = zero;
+    p->timer = 0u;
 }
 void Glove_UpdateRecoveryFlash(struct Glove *p)
 {
