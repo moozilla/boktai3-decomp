@@ -130,8 +130,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
     u8 *pos;
 
     if (base->entered) {
-        u32 zero = 0;
-        base->entered = zero;
+        base->entered = 0u;
         SceneActors_RunFirstEventScript(base, (u8 *)base + 0x260);
         if (base->entryMode == 1) {
             s32 angle = base->heading + 0x80;
@@ -154,23 +153,23 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             SceneActors_StartDirectionalAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
                                                   sequence, 2, 1, 4);
             Death_SetState(&base->state, state);
-            base->elapsed = zero;
+            base->elapsed = 0u;
             Sound_PlaySongChecked(0x359);
         } else {
             u32 flash = Death_GetMode(base) & 1;
             s32 sequence = flash ? 0x20 : 0x46;
             SceneActors_StartUnmirroredAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
-                                                 sequence, 1, zero);
-            base->minimumScale = zero;
-            base->maximumScale = zero;
+                                                 sequence, 1, 0u);
+            base->minimumScale = 0u;
+            base->maximumScale = 0u;
             base->variant = 0;
             if (base->mode & 1) {
                 base->state.value = 1;
-                base->elapsed = zero;
+                base->elapsed = 0u;
                 Sound_PlaySongChecked(0x1C5);
             } else {
-                base->state.value = zero;
-                base->elapsed = zero;
+                base->state.value = 0u;
+                base->elapsed = 0u;
                 Sound_PlaySongChecked(0x359);
             }
         }
