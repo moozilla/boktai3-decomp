@@ -505,20 +505,19 @@ static inline u32 Axe_TestFlags(u32 k_, u32 *flags)
 
 inline static void Axe_BeginRotationControl(struct ChaseActor *a, void *callback, u8 phase)
 {
-    u32 zero = 0;
     {
         typeof(a->base.field2B2) *q1 = &a->base.field2B2;
         *q1 = 1;
     }
-    a->base.stepDone = zero;
+    a->base.stepDone = 0;
     a->base.controlKind = phase;
     a->base.target = callback;
-    a->base.field2C8 = zero;
+    a->base.field2C8 = 0;
     {
         u8 k1 = 1;
         a->base.pendingControlFlags &= ~k1;
     }
-    a->base.pendingControl = zero;
+    a->base.pendingControl = 0;
 }
 
 struct AxeLungePlayer {
@@ -738,18 +737,17 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 static inline void Control(struct RoomActor *a, void *callback, u32 phase)
 {
-    u32 zero = 0;
     a->field2B2 = 1;
-    a->stepDone = zero;
+    a->stepDone = 0;
     FIELD(a, 0x2B5, u8) = phase;
     FIELD(a, 0x21C, void *) = callback;
-    FIELD(a, 0x2C8, u16) = zero;
+    FIELD(a, 0x2C8, u16) = 0;
     {
         u32 *flags = &FIELD(a, 0x114, u32);
         u32 mask = ~1;
         *flags &= mask;
     }
-    FIELD(a, 0x104, u32) = zero;
+    FIELD(a, 0x104, u32) = 0;
 }
 
 // confidence=low: turns one octant toward the requested direction on animation ticks.
@@ -1464,19 +1462,17 @@ static inline u8 TakePending(struct ChaseActor *actor)
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
-    u32 zero;
     actor->base.field2B2 = 1;
-    zero = 0;
-    actor->base.stepDone = zero;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.pendingControl = zero;
+    actor->base.pendingControl = 0;
 }
 
 struct AxeFlags16 {
@@ -4268,11 +4264,9 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
         context->fieldED1 = 1;
     if (actor->base.stepDone) {
         u8 zero8;
-        u32 zero;
         Axe_SetAuxiliarySpriteRenderState(actor, context->target888, 0x13C);
         actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
         zero8 = 0;
-        zero = 0;
         {
             u32 *flags = &context->flagsE4C;
             u32 mask = ~0x1000;
@@ -4283,7 +4277,7 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
             actor->base.state2A8 = zero8;
             actor->base.phase2A9 = zero8;
             actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = zero;
+            actor->base.counter2AC = 0;
             actor->base.field2B1 = 1;
         }
     } else {
@@ -4303,10 +4297,8 @@ struct SceneActorControl2AContext {
 static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 {
     u8 zero8;
-    u32 zero;
     actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
     zero8 = 0;
-    zero = 0;
     {
         void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
         u32 kind = 0x23;
@@ -4317,19 +4309,19 @@ static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
         actor->base.stepDone = zero8;
         actor->base.controlKind = kind;
         actor->base.target = callback;
-        actor->base.field2C8 = zero;
+        actor->base.field2C8 = 0;
         {
             u32 *flags = &actor->base.pendingControlFlags;
             u32 mask = ~1;
             *flags &= mask;
         }
-        actor->base.pendingControl = zero;
+        actor->base.pendingControl = 0;
         {
             u32 behavior = 4;
             actor->base.state2A8 = zero8;
             actor->base.phase2A9 = zero8;
             actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = zero;
+            actor->base.counter2AC = 0;
             actor->base.field2B1 = one;
         }
     }
@@ -4619,7 +4611,6 @@ static inline void SetState_UpdateRouteDestinationPhase(struct ChaseActor *actor
 void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
-    u32 zero;
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeVec *copy;
@@ -4643,10 +4634,9 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
             copy = target;
             target->y = CellHeight(target, CellIndex_UpdateRouteDestinationPhase(cellX, cellZ));
         }
-        zero = 0;
         Axe_SetMovementEndpoints(actor, copy);
         Axe_StepCurveMotion(actor);
-        SetState_UpdateRouteDestinationPhase(actor, 0, 0, 1, zero);
+        SetState_UpdateRouteDestinationPhase(actor, 0, 0, 1, 0);
         {
             struct AxeVec *position = (struct AxeVec *)(&actor->base.body.position);
             target = &targetStorage;
