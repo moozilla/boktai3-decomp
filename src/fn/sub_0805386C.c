@@ -22,12 +22,7 @@ void InteractionMarker_TickIdle(struct InteractionMarker *marker)
         {
             u32 button = 1;
             if (gUnk_02000560 & button) {
-                u32 pressed = gPadState[1];
-                u32 edge = button;
-                do {
-                    edge &= pressed;
-                } while (0);
-                if (edge) {
+                if (gPadState[1] & 1) {
                     struct Player *player = gPlayers[0];
                     u32 blocked = 0x100000;
                     if (!(player->statusFlags & blocked) && marker->inputCooldown > 9) {
