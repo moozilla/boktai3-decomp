@@ -92,18 +92,16 @@ u32 sub_081D31EC(struct CloudTask *task)
     for (i = 39; i >= 0; i--, e++) {
         if (e->kind) {
             u32 value, mask, frame;
-            u8 zero;
             value = e->timer + 1;
-            zero = 0;
             e->timer = value;
             mask = 255;
             frame = e->frame;
             if ((u8)value >= gUnk_086126C8[frame & mask]) {
-                e->timer = zero;
+                e->timer = 0;
                 value = CloudParticle_NextFrame(e);
                 e->frame = value;
                 if ((value & mask) > 1)
-                    e->frame = zero;
+                    e->frame = 0;
                 SpriteDrawable_SelectTileFrame(e->sprite, *(u32 *)(p + 0x2c),
                                                *(u32 *)(p + 0x20) + e->frame);
             }
