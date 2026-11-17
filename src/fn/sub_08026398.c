@@ -73,13 +73,12 @@ void SceneActorAnimation_UpdateImpactRelease(ActorAnimation *p)
     ActorAnimation *p2 = p;
     if (p->changed) {
         int sequence;
-        u32 zero = 0;
-        p->changed = zero;
+        p->changed = 0u;
         sequence = choose(p->mode, 62, 24);
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
                                               6);
-        p->minScale = zero;
-        p->maxScale = zero;
+        p->minScale = 0u;
+        p->maxScale = 0u;
         p->variant = 0;
         effect((u8 *)p, 2, 827, 6);
     }
