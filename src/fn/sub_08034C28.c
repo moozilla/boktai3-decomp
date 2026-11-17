@@ -67,14 +67,12 @@ int Wireless_StartChildSearch(struct Engine *p)
 
 success: {
     int operation = 7;
-    int one;
     p->flag = status;
     p->operation = operation;
     p->ticks = status;
     {
         u8 *pending = &p->pending;
-        one = 1;
-        *pending = one;
+        *pending = 1;
     }
 }
 }
