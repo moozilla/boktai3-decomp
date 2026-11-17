@@ -27,7 +27,6 @@ u32 ForgingBook_InitSprites(u8 *p)
     struct IbSprite *sprite;
     void *animation;
     u16 coordinate;
-    u32 zero;
 
     res = ScriptProc_Start(0xcb05, 0xe2ab);
     *((struct SceneInputResource *)(p + 0x24)) = *res;
@@ -76,7 +75,6 @@ u32 ForgingBook_InitSprites(u8 *p)
             }
         }
     }
-    zero = 0;
     {
         u32 *r5 = (u32 *)(p + 0x10c);
         CpuSet((void *)(*r5), p + 0x364, 0x10);
@@ -87,7 +85,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         struct SceneInputResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
         ResourceHeader_Relocate(p + 0xa68, objectRes);
     }
-    Widget_InitLinked(p + 0xa88, p + 0xa68, zero, zero, zero, 1, zero, 0);
+    Widget_InitLinked(p + 0xa88, p + 0xa68, 0u, 0u, 0u, 1, 0u, 0);
     *((u32 *)(p + 0xa90)) &= ~1;
     *((u8 *)(p + 0xaa2)) = 2;
     {
@@ -114,7 +112,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     *((u8 *)(p + 0xb17)) = 1;
     *((u16 *)(p + 0xb2c)) = 0x2e;
     *((u16 *)(p + 0xb2e)) = 0x48;
-    *((u16 *)(p + 0xb30)) = zero;
+    *((u16 *)(p + 0xb30)) = 0u;
     *((u8 *)(p + 0xb18)) = 0x40;
     *((u8 *)(p + 0xb19)) = 0x40;
 }
