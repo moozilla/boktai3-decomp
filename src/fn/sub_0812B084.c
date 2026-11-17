@@ -19,25 +19,16 @@ static inline u8 LargeEffectPool_IsUsed(u32 *used, u32 mask)
 }
 struct LargeEffectPoolSlot *LargeEffectPool_AllocateSlot(u8 *poolArg)
 {
-    u8 *pool = poolArg;
-    s32 i = 0;
-    u32 one = 1;
-    u8 *index = pool + 0x197;
-    u8 *slot = pool + 0x20;
-    struct LargeEffectPoolSlot *result;
-    do {
-        if (!LargeEffectPool_IsUsed((u32 *)(pool + 0x1C), one << i)) {
-            Memory_Clear(slot, 0x18C);
-            *(u32 *)(pool + 0x1C) |= one << (*(&i));
-            *index = i;
-            result = (struct LargeEffectPoolSlot *)slot;
-            goto done;
+    struct LargeEffectPool *pool = (void *)poolArg;
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        if (!LargeEffectPool_IsUsed(&pool->used, 1U << i)) {
+            struct LargeEffectPoolSlot *slot = &pool->slots[i];
+            Memory_Clear(slot, sizeof(*slot));
+            pool->used |= 1U << i;
+            slot->index = i;
+            return slot;
         }
-        index += 0x18C;
-        slot += 0x18C;
-        i++;
-    } while (i <= 7);
-    result = NULL;
-done:
-    return result;
+    }
+    return NULL;
 }
