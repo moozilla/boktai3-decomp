@@ -2,15 +2,13 @@
 #include "ram.h"
 int SceneActorManager_Init(struct SceneActorManager *m)
 {
-    int zero;
     struct Player *player;
     gSceneActorListManager = m;
-    zero = 0;
-    m->ticks = zero;
-    m->head = zero;
-    m->buffer = zero;
-    m->count[0] = zero;
-    m->count[1] = zero;
+    m->ticks = 0;
+    m->head = 0;
+    m->buffer = 0;
+    m->count[0] = 0;
+    m->count[1] = 0;
     player = gPlayers[0];
     m->player = player;
     if (player)
