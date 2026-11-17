@@ -7917,6 +7917,9 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text, path)
         if any(added):
             sys.exit(land.pin_refusal(name, *added, dest))
+    new_warnings = land.added_warnings(open(path).read() if os.path.exists(path) else "", text, path)
+    if new_warnings:
+        print(land.warning_note(name, new_warnings), file=sys.stderr)
 
     def remember(p):
         if p not in before:

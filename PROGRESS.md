@@ -14,6 +14,19 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | `raw-offset` | 8 |
 | `goto` (tracked, not scored) | 2,129 |
 
+| Warnings (`python3 tools/concessions.py`; not scored) | |
+|---|---:|
+| `dead-arm` | 27 |
+| `known-zero` | 16 |
+| `once-loop` | 154 |
+| `stmt-expr` | 40 |
+| `const-local` | 1,521 |
+| `addr-deref` | 75 |
+| `placeholder-name` | 24 |
+| `volatile-view` | 55 |
+| `local-union` | 133 |
+| total | 2,045 |
+
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
 Intentional assembly (GBA header, crt0, SDK assembly; not counted above): 4,916 bytes.

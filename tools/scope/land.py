@@ -238,6 +238,31 @@ def added_concessions(before, after, path=None):
     return max(p1 - p0, 0), max(b1 - b0, 0)
 
 
+def added_warnings(before, after, path=None):
+    """{kind: n}: the linter warnings (tools/concessions.py WARN) AFTER has beyond BEFORE."""
+    tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    import concessions as kinds
+    rel = os.path.relpath(path, os.path.dirname(tools)) if path else None
+
+    def count(text):
+        out = {}
+        for s in kinds.warnings(kinds.sites(without_drafts(text), rel, kinds=kinds.WARN)):
+            out[s.kind] = out.get(s.kind, 0) + 1
+        return out
+    old, new = count(before), count(after)
+    return {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}
+
+
+def warning_note(func, added):
+    what = ", ".join(f"{n} {k}" for k, n in added.items())
+    return (f"{func}: this match adds linter warnings: {what}.\n"
+            "A warning is C a person plausibly would not have written (python3 tools/concessions.py FILE lists them).\n"
+            "Rewrite it the way the original would have been written. Only when you can argue the original authors\n"
+            "wrote it this way, add `// concession-ok(kind): reason`; a reason about the compiler is rejected.")
+
+
 def pin_refusal(func, pins, bars, unit):
     what = " and ".join(x for x in (f"{pins} register pin{'s' * (pins != 1)}" if pins else "",
                                     f"{bars} other concession{'s' * (bars != 1)} (asm barriers, empty "
