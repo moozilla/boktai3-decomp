@@ -8,10 +8,10 @@ void LevelAdvanceDisplay_InitParticles(struct LevelAdvanceManager *manager)
     scale = -4;
     particle = manager->particles;
     for (i = 7; i >= 0; i--) {
-        ParticleSprite_Initialize(particle, manager->particleResource, 1);
-        SpriteDrawable_SelectTileFrame(particle, manager->particleResource, 0);
-        Effect_SetOrigin(particle, scale, scale);
-        Effect_SetPalette(particle, 1);
+        ParticleSprite_Initialize(&particle->sprite, manager->particleResource, 1);
+        SpriteDrawable_SelectTileFrame(&particle->sprite, manager->particleResource, 0);
+        Effect_SetOrigin(&particle->sprite, scale, scale);
+        Effect_SetPalette(&particle->sprite, 1);
         particle++;
     }
 }
