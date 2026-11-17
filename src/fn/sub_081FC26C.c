@@ -2,7 +2,7 @@
 #include "ratatosk_particle.h"
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
-#include "display_sequence_inline.h"
+#include "display_sequence_sprite.h"
 #include "ram.h"
 
 extern RatatoskParticleUpdate const gUnk_08613F6C[];
@@ -18,78 +18,12 @@ static inline u32 RandomSample(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-static inline void StepSequence(struct RatatoskParticle *owner, struct DisplaySequenceState *state,
-                                struct DisplaySequenceSprite *sprite,
-                                struct DisplaySequenceSprite **result)
-{
-    const u16 *command;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = owner->sequence.commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    sprite->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first, second;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        second = (((*command & 0x30) >> 4) & bit);
-        *result = sprite;
-        if (first != second)
-            owner->sprite.flags |= 4;
-        else
-            owner->sprite.flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-            } else {
-                state->index--;
-            }
-        } else {
-            if (++state->index >= state->frameCount) {
-                if (state->flags & 8) {
-                    state->elapsed = state->duration;
-                    state->index = state->frameCount - 1;
-                } else {
-                    state->index = 0;
-                }
-            }
-        }
-        command = state->commands + state->index;
-        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
-        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-        if (state->duration == 0)
-            state->duration = 1;
-    }
-}
-
 // Initialize one particle with a random appearance, animation, and flip state.
 s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
                                    struct ContactPosition *position)
 {
     struct RatatoskParticlePool *pool = gRatatoskParticlePool;
     struct RatatoskParticle *e;
-    struct DisplaySequenceSprite *sprite;
     s32 slot;
     u32 kind;
     if (!pool) {
@@ -127,7 +61,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
     if ((e->config.appearanceFlags & 15) <= 1) {
         if (RandomSample() & 1) {
             Anim_SetSequence(&e->sequence, pool->sequenceResource, 1, 0, 0);
-            StepSequence(e, &e->sequence, &e->sprite, &sprite);
+            DisplaySequence_StepSprite(&e->sprite, &e->sequence);
         } else {
             struct DisplaySequenceSprite *draw;
             u32 frame;
@@ -139,7 +73,6 @@ s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
             draw = &e->sprite;
             draw->frame = frame + 3;
             e->config.appearanceFlags |= 0x200;
-            sprite = draw;
         }
     } else {
         struct DisplaySequenceSprite *draw;
@@ -149,7 +82,6 @@ s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
         draw = &e->sprite;
         draw->frame = frame + 0x26;
         e->config.appearanceFlags |= 0x200;
-        sprite = draw;
     }
     if (RandomSample() & 1) {
         e->sprite.flags |= 4;
@@ -168,7 +100,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
         }
     }
     e->sprite.flags &= ~1;
-    Sprite_LinkToList(sprite, 0);
+    Sprite_LinkToList(&e->sprite, 0);
     e->sprite.priority = 1;
     pool->mask |= 1 << slot;
     pool->activeCount += 1;
