@@ -39,8 +39,6 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
         u32 reject = 0xa007;
         const void *callback = (const void *)SceneActorControl_OnIdle;
         u32 substate = 16;
-        u32 one = 1;
-        u32 zero = 0;
         do {
             u16 *flags;
             {
@@ -50,7 +48,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                     if (category == 4 || category == 1 || category == 3) {
                         u32 selected = *flags & reject;
                         if (!selected) {
-                            actor->base.field2B2 = one;
+                            actor->base.field2B2 = 1u;
                             actor->base.stepDone = selected;
                             actor->base.controlKind = substate;
                             actor->base.target = callback;
@@ -63,11 +61,11 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                                 *flags = value;
                             }
                             actor->base.pendingControl = selected;
-                            actor->base.state2A8 = zero;
-                            actor->base.phase2A9 = one;
-                            actor->base.behavior2AA = zero;
+                            actor->base.state2A8 = 0u;
+                            actor->base.phase2A9 = 1u;
+                            actor->base.behavior2AA = 0u;
                             actor->base.counter2AC = selected;
-                            actor->base.field2B1 = one;
+                            actor->base.field2B1 = 1u;
                         }
                     }
                 }
