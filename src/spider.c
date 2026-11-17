@@ -2342,8 +2342,6 @@ void Spider_UpdateHiddenRecovery(struct ChaseActor *a);
 
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
-extern u8 *gUnknown_02000580;
-
 void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
 void SceneActorReaction_BeginTargetRecovery(void);
