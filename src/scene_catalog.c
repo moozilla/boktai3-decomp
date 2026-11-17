@@ -154,53 +154,53 @@ void Presentation_UpdateAllocationSelection(struct SceneHudState *menu)
             (menu->entryCount)++;
             goto allocationChanged;
         }
-    } else if (({
-                   inputState = 0x10;
-                   inputState &= key;
-                   inputState;
-               })) {
-        u16 *remaining = &menu->entryCount;
-        s32 index;
-        s32 stat;
-        s16 *adjustment;
-        struct Player *player;
-        if (!(*remaining)) {
-            goto refreshDisplay;
-        }
-        player = menu->actionOwner;
-        index = menu->rowIndex;
-        {
-            u32 offset = index << 1;
-            u8 *base;
-            u8 *stats = (u8 *)player->derivedStats;
-            stat = *(u16 *)(stats + offset);
-            base = (u8 *)menu->comparisonOffsets;
-            adjustment = (s16 *)(base + offset);
-        }
-        if ((stat + (*adjustment)) > 99) {
-            goto refreshDisplay;
-        }
-        if ((menu->comparisonValues[index] + (*adjustment)) > 99) {
-            goto refreshDisplay;
-        }
-        (*adjustment)++;
-        (*remaining)--;
-    allocationChanged:
-        Presentation_DrawEntryCount(menu);
-        InventoryGrid_LayoutStatMarkers(menu);
-        Sound_PlaySong(0x19a);
     } else {
-        if ((gPadState[1] & 1) && menu->comparisonModifier) {
-            Sound_PlaySong(0xdd);
-            menu->allocationDescription = 24;
-            PauseMenu_SetConfirmationIndicator(menu, 0);
-            MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, inputState);
-            Hud_SetInteractionCallback(menu, MenuSelection_ProcessConfirmation, 1);
-        } else if (gPadState[1] & 2) {
-            Sound_PlaySong(0xde);
-            Presentation_InitListValues(menu);
+        inputState = 0x10;
+        inputState &= key;
+        if (inputState) {
+            u16 *remaining = &menu->entryCount;
+            s32 index;
+            s32 stat;
+            s16 *adjustment;
+            struct Player *player;
+            if (!(*remaining)) {
+                goto refreshDisplay;
+            }
+            player = menu->actionOwner;
+            index = menu->rowIndex;
+            {
+                u32 offset = index << 1;
+                u8 *base;
+                u8 *stats = (u8 *)player->derivedStats;
+                stat = *(u16 *)(stats + offset);
+                base = (u8 *)menu->comparisonOffsets;
+                adjustment = (s16 *)(base + offset);
+            }
+            if ((stat + (*adjustment)) > 99) {
+                goto refreshDisplay;
+            }
+            if ((menu->comparisonValues[index] + (*adjustment)) > 99) {
+                goto refreshDisplay;
+            }
+            (*adjustment)++;
+            (*remaining)--;
+        allocationChanged:
             Presentation_DrawEntryCount(menu);
             InventoryGrid_LayoutStatMarkers(menu);
+            Sound_PlaySong(0x19a);
+        } else {
+            if ((gPadState[1] & 1) && menu->comparisonModifier) {
+                Sound_PlaySong(0xdd);
+                menu->allocationDescription = 24;
+                PauseMenu_SetConfirmationIndicator(menu, 0);
+                MenuDisplay_SetPaletteOverrides(menu, 0, 0, 1, inputState);
+                Hud_SetInteractionCallback(menu, MenuSelection_ProcessConfirmation, 1);
+            } else if (gPadState[1] & 2) {
+                Sound_PlaySong(0xde);
+                Presentation_InitListValues(menu);
+                Presentation_DrawEntryCount(menu);
+                InventoryGrid_LayoutStatMarkers(menu);
+            }
         }
     }
     do {
