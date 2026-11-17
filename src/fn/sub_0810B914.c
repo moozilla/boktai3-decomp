@@ -82,24 +82,21 @@ struct Registry1745 *Registry1745_Create(void)
     gLinkSession = p;
     Task_SetCallbacks(p, 0, SessionMenu_Destroy);
     {
-        s32 one = 1;
-        u32 zero;
-        p->field14 = one;
-        p->field16 = one;
-        zero = 0;
+        p->field14 = 1;
+        p->field16 = 1;
         p->field10 = (u32)existing;
         Task_LinkToPriorityList(p);
-        gClockSynced = one;
+        gClockSynced = 1;
         sub_08223180();
         p->field18 = 0xFFFF;
-        p->field1E = zero;
+        p->field1E = 0u;
         p->field40 = entry = p->field68;
         p->field44 = -1;
         p->field48 = -1;
-        p->field4C = zero;
-        p->field4D = one;
-        p->field4E = zero;
-        p->field4F = zero;
+        p->field4C = 0u;
+        p->field4D = 1;
+        p->field4E = 0u;
+        p->field4F = 0u;
         p->fieldB8 = -1;
     }
     for (i = 0; i <= 3; i++) {
