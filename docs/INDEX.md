@@ -147,7 +147,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/RESEARCH_2026-10-12.md](../docs/RESEARCH_2026-10-12.md) | RESEARCH_2026-10-12.md |  | 28 |
 | [docs/RETROSPECTIVE_2026-10-08.md](../docs/RETROSPECTIVE_2026-10-08.md) | Boktai 3 matching run retrospective | *#matching #process* | 26 |
 | [docs/RFU.md](../docs/RFU.md) | RFU wireless SDK source matches | *#wireless #library* | 6 |
-| [docs/ROADMAP.md](../docs/ROADMAP.md) | Roadmap: the four phases and the side threads | #process | 4 |
+| [docs/ROADMAP.md](../docs/ROADMAP.md) | Roadmap: the four phases and the side threads | #process | 5 |
 | [docs/ROM_MAP.md](../docs/ROM_MAP.md) | ROM map — Boktai 3 (U33J) | *#assets #text* | 5 |
 | [docs/ROUTE_SPRITE_ACTOR.md](../docs/ROUTE_SPRITE_ACTOR.md) | Route sprite actor pool (tentative) | *#actors #assets* | 9 |
 | [docs/RTC.md](../docs/RTC.md) | Cartridge RTC matching evidence | *#hardware #matching* | 4 |
@@ -215,7 +215,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/STACKED_ACTOR.md](../docs/STACKED_ACTOR.md) | Stacked display actor (tentative identity) | *#actors #particles #assets* | 5 |
 | [docs/TERRAIN_EDGE_MARKER.md](../docs/TERRAIN_EDGE_MARKER.md) | Terrain edge marker manager (tentative identity) | *#scripts* | 4 |
 | [docs/UNIT_WORKER.md](../docs/UNIT_WORKER.md) | Subsystem unit worker | *#text* | 5 |
-| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 14 |
+| [docs/WORKER.md](../docs/WORKER.md) | Worker playbook: matching with scope | #matching #process | 16 |
 | [docs/tasks/m4a.md](../docs/tasks/m4a.md) | Task: lift the MP2K (m4a) sound library from pokeemerald | *#sound #library* | 3 |
 | [docs/tasks/relatives.md](../docs/tasks/relatives.md) | Unmatched functions with matched relatives | *#tooling* | 35 |
 | [docs/tasks/script_targets.md](../docs/tasks/script_targets.md) | Decomp targets: the code the scripts call | *#scripts #assets #tooling* | 2 |
@@ -237,7 +237,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-13.md](../docs/history/2026-11-13.md) | 2026-11-13 | #actors #animation #cleanup #compiler #hud #integration #matching #menu #particles #phase3 #port #process #scene #structs #studio #text #tooling #wireless | 10 |
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
-| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #round13 | 2 |
+| [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -501,6 +501,8 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-volatile-stage2.md](../notes/round14-volatile-stage2.md) | Round 14: volatile cleanup and remaining compiler-dead sites | #round14 #concessions #matching | 8 |
 | [notes/round14-volatile-view-audit.md](../notes/round14-volatile-view-audit.md) | Round 14: volatile-view audit and RFU field recovery | #matching #animation #wireless #tooling | 13 |
 | [notes/round14-wrapper-cleanup.md](../notes/round14-wrapper-cleanup.md) | Round 14: object, trigger and palette wrapper cleanup | #round14 #concessions #matching | 5 |
+| [notes/round15-priority-recovery.md](../notes/round15-priority-recovery.md) | Round 15 — priority source recovery | #matching #compiler #structs #phase3 #round15 | 30 |
+| [notes/round15-union-review.md](../notes/round15-union-review.md) | Round 15 — union ownership review | #matching #structs #phase3 #round15 | 11 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
