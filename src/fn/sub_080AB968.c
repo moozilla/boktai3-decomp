@@ -1,57 +1,13 @@
 #include "global.h"
-#include "scene_actor_reset.h"
+#include "tentacle_body.h"
 
 // confidence=low: state advances segment interpolation and oscillation before restoring control.
 
 // confidence=low: inferred from segment state and collider updates.
 
-void TentacleBody_UpdateChargeSpread(void);
 void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-static inline u8 TakeEntry(struct ChaseActor *p)
-{
-    if (p->base.field2B1) {
-        p->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void SetControl(struct ChaseActor *s, void *control, u32 code)
-{
-    u32 zero;
-    u32 *flags;
-    u8 *field = &s->base.field2B2;
-    zero = 0;
-    *field = 1;
-    s->base.stepDone = zero;
-    s->base.controlKind = code;
-    s->base.target = control;
-    s->base.field2C8 = zero;
-    flags = &s->base.pendingControlFlags;
-    {
-        u32 mask = -2;
-        *flags &= mask;
-    }
-    s->base.pendingControl = zero;
-}
-static inline void SetState(struct ChaseActor *p, u32 b)
-{
-    u32 behavior = b;
-    p->base.state2A8 = 0;
-    p->base.phase2A9 = 0;
-    p->base.behavior2AA = behavior;
-    p->base.counter2AC = 0;
-    p->base.field2B1 = 1;
-}
-static inline s32 Abs(s32 x)
-{
-    s32 r = x;
-    if (x < 0)
-        r = -x;
-    return r;
-}
 static inline void Advance(void *p, s32 x, s32 z)
 {
 
@@ -67,8 +23,8 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
     union RetractionActorHandle actor;
     u32 raw;
     actor.ptr = input;
-    if (TakeEntry(actor.ptr)) {
-        SetControl(actor.ptr, TentacleBody_UpdateChargeSpread, 0x23);
+    if (SceneActorControl_TakeStateEntry(actor.ptr)) {
+        SceneActorChase_SetControl(actor.ptr, TentacleBody_UpdateChargeSpread, 0x23);
         actor.ptr->base.field2E8 = 8;
     }
     {
@@ -115,8 +71,8 @@ void TentacleActor_UpdateRetraction(struct ChaseActor *input)
     TentacleActor_UpdateOscillation(actor.ptr, 0x1ae, 0x28);
     if (actor.ptr->base.stepDone) {
         TentacleActor_SelectWanderRoute(actor.ptr);
-        SetControl(actor.ptr, actor.ptr->base.onAlternateEntry, 1);
-        SetState(actor.ptr, 2);
+        SceneActorChase_SetControl(actor.ptr, actor.ptr->base.onAlternateEntry, 1);
+        SceneActorChase_SetBehavior(actor.ptr, 2);
     } else {
         actor.ptr->base.counter2AC++;
     }
