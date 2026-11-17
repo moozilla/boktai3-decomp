@@ -281,7 +281,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
             pos.z = actor->base.body.position.z + gUnk_08606384[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,
+                Player_BeginPositionRequest((void *)gPlayers[target->kind], (void *)&pos,
                                             0, 0, flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct ChaseActor *t = target->actor;
