@@ -1,5 +1,6 @@
 #include "global.h"
 #include "display_animation.h"
+#include "display_sequence_inline.h"
 #include "engine.h"
 #include "ram.h"
 #include "homing_projectile.h"
@@ -80,7 +81,7 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
             position->z += velocity->z;
             {
                 struct DisplaySequenceState *state = &p->sequence;
-                const volatile u16 *command = p->sequence.commands + p->sequence.index;
+                const u16 *command = p->sequence.commands + p->sequence.index;
                 u32 duration;
                 u32 flags, bit;
                 sprite->frame = (*command) >> 6;
@@ -152,20 +153,13 @@ s32 HomingProjectile_UpdateManager(struct HomingManager *m)
                     }
                     {
                         u32 offset = state->index << 1;
-                        const volatile u16 *table;
+                        const u16 *table;
                         table = state->commands;
-                        command = (const volatile u16 *)((u32)table + offset);
+                        command = (const u16 *)((u32)table + offset);
                     }
-                    state->frameWeight = *command & 15;
-                    {
-                        s32 weight = state->frameWeight;
-                        s32 speed = state->speed;
-                        speed *= weight;
-                        speed >>= 6;
-                        state->duration = speed;
-                        if (!(u8)speed)
-                            state->duration = 1;
-                    }
+                    DisplaySequence_UpdateWeight(state, command);
+                    if (!state->duration)
+                        state->duration = 1;
                 }
             }
             {
