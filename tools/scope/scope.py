@@ -1659,6 +1659,14 @@ def regs_of(rtl):
     return [int(n) for n in re.findall(r"\(reg(?:/[a-z]+)*:\w+ (\d+)", rtl or "")]
 
 
+def register_words(rtl):
+    """Register operands and their SUBREG word offsets (agbcc offsets are ARM words)."""
+    pattern = (r"\(subreg:\w+\s+\(reg(?:/[a-z]+)*:\w+ (\d+)[^()]*\)\s+(\d+)\)"
+               r"|\(reg(?:/[a-z]+)*:\w+ (\d+)")
+    return [(int(subreg or reg), int(word or 0))
+            for subreg, word, reg in re.findall(pattern, rtl or "")]
+
+
 def register_widths(insns):
     """Pseudo/hard-register widths in 32-bit ARM words, including enclosing SUBREGs.
 
@@ -1833,11 +1841,11 @@ def hard_of(wd):
     after = {u: r for u, _, r in insn_list(wd, "greg")}
     out = {}
     for u, _, r in insn_list(wd, "lreg"):
-        a, b = regs_of(r), regs_of(after.get(u))
+        a, b = register_words(r), register_words(after.get(u))
         if len(a) == len(b):
-            for x, y in zip(a, b):
+            for (x, xword), (y, yword) in zip(a, b):
                 if x >= 16 and y < 16:
-                    out.setdefault(x, y)
+                    out.setdefault(x, y + yword - xword)
     # the operand can be a reload register (a value loaded into r2, then copied to ip): what global
     # alloc decided wins for its pseudos
     out.update(dispositions(wd))
@@ -3137,6 +3145,29 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
     """Why PSEUDO got hard register GOT and not WANT (the ROM's)."""
     recs, conf, hard = alloc_records(wd, func), conflicts(wd), hard_of(wd)
     rec = recs.get(pseudo)
+    seq = insn_list(wd, "lreg")
+    widths = register_widths(seq)
+    first, width = hard.get(pseudo, -1), widths.get(pseudo, 1)
+    if width > 1 and occupies_hard_register(pseudo, got, hard, widths) \
+            and occupies_hard_register(pseudo, want, hard, widths):
+        # greg's aggregate conflicts include a locally placed pseudo's own
+        # hard registers. Its upper word is not an unknown competing holder.
+        word, wanted_first = got - first, want - (got - first)
+        kind = {"L": "local-alloc", "G": "global-alloc"}.get(rec[0], "allocated") if rec else "allocated"
+        priority = f" (priority {rec[2]})" if rec else ""
+        print(f"    {nm(pseudo)} is a {width}-word {kind} value{priority}, starting at {rname(first)}"
+              f" and spanning {regset(set(range(first, first + width)))}.")
+        print(f"    this instruction uses word {word} in {rname(got)}; the ROM wants that scalar word"
+              f" in {rname(want)}. {rname(want)} already holds word {want - first} of"
+              f" {nm(pseudo)} itself, not a separate holder.")
+        print("    the aggregate hard-register conflicts can include the existing allocation itself;"
+              " they do not establish an external blocker here.")
+        print(f"    placing word {word} in {rname(want)} requires allocation start {rname(wanted_first)}"
+              f" and span {regset(set(range(wanted_first, wanted_first + width)))}."
+              " Check the wide value's representation and whole-register lifetime; the scalar"
+              " word cannot be allocated independently.")
+        print(f"    what-if: AGBCC_FORCE={kref(wd, func, pseudo)}:{wanted_first} (moves the whole allocation)")
+        return
     path = os.path.join(wd, "names.txt")
     total = sum(1 for ln in (open(path) if os.path.exists(path) else [])
                 if ln.startswith("G " + dump_func(wd, func) + " "))
@@ -3196,8 +3227,6 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
         return
     pc, hc = conf.get(pseudo, (set(), set()))
     holders, calls = {}, []
-    seq = insn_list(wd, "lreg")
-    widths = register_widths(seq)
     if want in hc:
         idx = [i for i, (_, _, r) in enumerate(seq) if pseudo in regs_of(r)]
         if idx:
@@ -5841,7 +5870,7 @@ def cmd_why(src, func, uid, env, via=None):
         for a, b in ([] if commuted else zip(rr, dr)):
             if a == b:
                 continue
-            ps = [x for x in regs_of(pre) if hmap.get(x, x) == int(b)]
+            ps = [x for x, word in register_words(pre) if hmap.get(x, x) + word == int(b)]
             alloc_diffs.append((ps[0] if ps else None, int(a), int(b)))
             print(f"  ROM {rname(a)} where the draft has {rname(b)}" + (f" = pseudo {nm(ps[0])}" if ps else ""))
     if row and not via:
