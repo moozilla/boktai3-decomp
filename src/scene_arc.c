@@ -331,7 +331,7 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
     if (!slot)
         return -1;
     sprite = &slot->sprite;
-    slot->frame = 0u;
+    slot->frame = 0;
     slot->flightDuration = duration;
     slot->endFrame = end;
     slot->releaseFrame = end + 8;
@@ -339,7 +339,7 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
     slot->start = *startArg;
     slot->position = *startArg;
     slot->target = *targetArg;
-    slot->grounded = 0u;
+    slot->grounded = 0;
     {
         struct ScenePoolVec32 *position = &slot->position;
         struct ContactPosition *screen = &slot->sprite.position;
@@ -350,9 +350,9 @@ s32 SceneArc_Create(const struct ScenePoolVec32 *from, const struct ScenePoolVec
         }
         screen->z = position->z >> 12;
     }
-    sprite->frame = 0u;
+    sprite->frame = 0;
     sprite->flags &= ~1;
-    Anim_SetSequence(&slot->animation, manager->animationResource, 2, 0, 0u);
+    Anim_SetSequence(&slot->animation, manager->animationResource, 2, 0, 0);
     GroundEffect_EnableProjection(&slot->ground);
     manager->activeMask |= 1 << index;
     return 0;

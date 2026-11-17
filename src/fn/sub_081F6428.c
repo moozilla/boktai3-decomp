@@ -127,7 +127,7 @@ s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
         p->health -= damage;
         p2->damageTimer = 8;
         if (p->health <= 0) {
-            p->health = 0u;
+            p->health = 0;
             {
                 u32 mask = 2;
                 changed = p->flags | mask;
@@ -141,10 +141,10 @@ s32 Ratatosk_ApplyQueuedDamage(struct Actor *p)
                 animation = 15;
                 p->animationId = animation;
                 p->update = update;
-                p->timer = 0u;
+                p->timer = 0;
                 p->changed = changed;
                 p->mode = 0;
-                p->modeTime = 0u;
+                p->modeTime = 0;
             }
             Bestiary_UnlockEntry(1);
             return 1;

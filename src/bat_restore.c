@@ -973,8 +973,8 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         if (!masked) {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
-            actor->base.field2B2 = 1u;
-            actor->base.stepDone = 0u;
+            actor->base.field2B2 = 1;
+            actor->base.stepDone = 0;
             actor->base.controlKind = kind;
             actor->base.target = callback;
             actor->base.field2C8 = masked;
@@ -986,11 +986,11 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             actor->base.pendingControl = masked;
             {
                 u32 behavior = 2;
-                actor->base.state2A8 = 1u;
-                actor->base.phase2A9 = 0u;
+                actor->base.state2A8 = 1;
+                actor->base.phase2A9 = 0;
                 actor->base.behavior2AA = behavior;
                 actor->base.counter2AC = masked;
-                actor->base.field2B1 = 1u;
+                actor->base.field2B1 = 1;
             }
         }
     }

@@ -80,7 +80,7 @@ void Hresvelgr_UpdateHazardVisit(HresvelgrActor *p)
                 {
                     u8 st = 2;
                     p->state = st;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;

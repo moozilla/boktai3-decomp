@@ -29,11 +29,11 @@ void HealthRestoreEffect_InitRisingParticle(struct Elem *p)
     table = gRandomTable;
     p->x = Mod(rnd(table), 16) + 8;
     p->y = Mod(rnd(table), 16) + 24;
-    p->z = 0u;
-    p->dx = 0u;
+    p->z = 0;
+    p->dx = 0;
     p->dy = -(Mod(rnd(table), 2) + 2);
-    p->dz = 0u;
+    p->dz = 0;
     p->active = 1;
-    p->age = 0u;
+    p->age = 0;
     p->update = FlickerParticle_UpdateVerticalMotion;
 }

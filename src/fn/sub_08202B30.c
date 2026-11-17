@@ -61,13 +61,13 @@ s32 Projectile_SpawnFromConfig(struct ProjectileConfig *params, struct ContactPo
     if (e->params.script) {
         e->scriptProc = ScriptProc_Start(0x922E, (u16)e->params.script);
         if (e->params.variants == 0) {
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, 0, 0u);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, 0, 0);
         } else if (e->params.variants == 4) {
             u32 var = (((u16)e->params.angle + 0x60) >> 6) & 3;
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0u);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0);
         } else {
             u32 var = (((u16)e->params.angle + 0x70) >> 5) & 7;
-            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0u);
+            Anim_SetSequence(&e->anim, e->scriptProc, (u16)e->params.sequence, var, 0);
         }
         {
             struct ContactSwarmSprite *sprite = (struct ContactSwarmSprite *)o;

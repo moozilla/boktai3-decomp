@@ -367,7 +367,7 @@ s32 DamageNumberDisplay_Initialize(struct DamageNumberDisplay *display)
         } while (remaining >= 0);
         group->priority = 3;
         {
-            group->digitCount = 0u;
+            group->digitCount = 0;
         }
         i = nextIndex;
         group = nextGroup;

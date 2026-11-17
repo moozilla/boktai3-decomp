@@ -33,10 +33,10 @@ void SceneNpc_UpdateTurnInPlace(void *ctx, struct SceneNpc *npc)
 {
     u8 facing8;
     if (npc->entered) {
-        npc->entered = 0u;
-        npc->done = 0u;
+        npc->entered = 0;
+        npc->done = 0;
         Actor_PlayAnimationEntry(npc, 0, 0, 0, 4);
-        npc->phase = 0u;
+        npc->phase = 0;
     }
     if (npc->callback(npc) == 1)
         return;

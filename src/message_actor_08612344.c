@@ -21,7 +21,7 @@ void SceneCharacter_WaitForState0EAndResume(void *ctx, struct StateActor *p)
     if (p->done != 0) {
         one = 1;
         p->state = one;
-        p->timer = 0u;
+        p->timer = 0;
         p->enterCommand = one;
         Trigger_ConsumePending(p->receiver, 1);
     }

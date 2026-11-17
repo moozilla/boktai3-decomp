@@ -105,9 +105,9 @@ void TimedEffect_RemoveFromManager(struct TimedEffectManager *manager, struct Ti
     Task4E01_ClearTrailSprites(manager);
     sprite = &effect->sprite;
     flags = sprite->flags;
-    sprite->flags = flags | 1u;
+    sprite->flags = flags | 1;
     Sprite_Remove(sprite);
-    manager->activeMask &= ~(1u << slot);
+    manager->activeMask &= ~(1 << slot);
 }
 
 /* sub_081DA1DC.c */

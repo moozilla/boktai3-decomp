@@ -22,7 +22,7 @@ void sub_08235B34(struct HealthBurstTask *p)
     offset.y = 0;
     offset.z = 0;
     if (!p->kind) {
-        flags = 1u << p->owner->movementRequestBlocked;
+        flags = 1 << p->owner->movementRequestBlocked;
         amount = p->owner->maximumStatA - p->owner->currentStatA;
         attackFlags = 0x1000;
     } else {

@@ -4,7 +4,7 @@
 #define ScalarApproach_EighthArray     sub_08221BE8
 void ScalarApproach_EighthArray(s16 *values, const s16 *targets, s32 count)
 {
-    while ((count = (s32)((u32)count - 1u)) >= 0) {
+    while ((count = (s32)((u32)count - 1)) >= 0) {
         ScalarApproach_AdvanceValue(values, targets, 3);
         ++values;
         ++targets;

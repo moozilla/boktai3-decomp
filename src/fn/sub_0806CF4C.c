@@ -40,5 +40,5 @@ void SceneSteeringActor_CreateFixedTravelActor(void)
     }
     angle = Math_Atan2(delta->x, delta->z);
     SceneSteeringActor_CreateTravelActor(&origin.position, &(*location)->position, 20, angle, 60, 4,
-                                         12, 4, 24, 0u, 0u, 0u, 0u);
+                                         12, 4, 24, 0, 0, 0, 0);
 }

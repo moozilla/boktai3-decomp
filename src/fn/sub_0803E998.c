@@ -61,28 +61,28 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
         switch (*kindAddress) {
             case 2: {
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                velocity.y = 0u;
-                velocity.z = 0u;
+                velocity.y = 0;
+                velocity.z = 0;
                 level = actor->restrictionMetric - 0x16000;
                 NativeEffect_CreateFromProfile(&actor->position, level, &velocity,
-                                               actor->emissionProfile, 5, 0u, 3, 0u);
+                                               actor->emissionProfile, 5, 0, 3, 0);
                 break;
             }
             case 3: {
                 struct ScenePoolVec32 *position;
                 void *profile;
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                velocity.y = 0u;
-                velocity.z = 0u;
+                velocity.y = 0;
+                velocity.z = 0;
                 level = actor->restrictionMetric - 0x8000;
                 position = &actor->position;
                 profile = actor->emissionProfile;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, 0u);
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 1, 4, 0);
                 velocity.x = Player_GetHorizontalVelocity(entry->motionPhase) + 1;
-                velocity.y = 0u;
-                velocity.z = 0u;
-                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 0u, 4, 1);
-                Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, 0u);
+                velocity.y = 0;
+                velocity.z = 0;
+                NativeEffect_CreateFromProfile(position, level, &velocity, profile, 5, 0, 4, 1);
+                Anim_SetKeyframes((u8 *)actor + 0x660, (u8 *)actor + 0x7e0, 30, 2, 0);
                 actor->unknown308 = 60;
                 break;
             }

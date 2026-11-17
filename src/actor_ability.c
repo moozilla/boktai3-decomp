@@ -208,15 +208,15 @@ void Modifier_InitFourthSourceEffect(struct ActorStats *stats, u32 owner)
     struct ActorAbility *ability = &stats->ability;
     void (*callback)(void);
     void *config;
-    ability->callback = (void (*)(void))0u;
-    ability->enabled = 0u;
+    ability->callback = (void (*)(void))0;
+    ability->enabled = 0;
     ability->owner = (void *)owner;
     config = &stats->ability.id;
     Memory_Clear(config, 0xc);
     if (ScriptRecord_FindAttributeModifier(config, (s8)selection[ACTOR_ABILITY_FOURTH_SOURCE]) <
         0) {
         ability->callback = (void (*)(void))CallbackStatus_ResetSelectorAndTest;
-        ability->enabled = 0u;
+        ability->enabled = 0;
     } else {
         switch (ability->kind) {
             case 0:

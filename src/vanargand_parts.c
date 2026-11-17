@@ -461,7 +461,7 @@ void Vanargand_UpdatePartOffsetStrike(struct VanargandAttackPair *boss, struct P
                 Vanargand_MakeVector(&delta, (Vanargand_AimAngle(p) + 128) & 255, 128);
                 Vanargand_AddVectorReversedValue(&delta, &p->offset, &delta);
                 motion = &p->motion;
-                MotionTrack_Initialize(motion, &p->offset, &delta, 0, 1u);
+                MotionTrack_Initialize(motion, &p->offset, &delta, 0, 1);
                 {
                     void *data = boss->effectResource;
                     struct DisplaySequenceState *seq = &p->graphics.sequence;

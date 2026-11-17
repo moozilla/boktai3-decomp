@@ -233,7 +233,7 @@ s32 ScriptKeyframe_InitManager(struct ScriptKeyframeManager *manager, u32 unused
                                u32 capacity)
 {
     manager->capacity = capacity;
-    manager->count = 0u;
+    manager->count = 0;
     gScriptKeyframeManager = manager;
     return 0;
 }

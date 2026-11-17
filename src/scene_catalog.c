@@ -373,25 +373,25 @@ void Hud_InitStatusMenu(struct SceneHudState *s)
     PauseMenu_SetPromptIconPositions(s, 0, 8);
     neg = -1;
     PauseMenu_SetPairedIcons(s, 1, neg);
-    InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, 0u);
-    InventoryPanel_UpdateSelectedEquipment(s, 26, 7, 0, 0u);
+    InventoryPanel_UpdateSelectedUnlock(s, 20, 7, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(s, 26, 7, 0, 0);
     if (!s->entryCount) {
         s->categoryWidgets[5].flags |= 1;
         s->allocationDescription = 0xFF;
         SceneCatalog_SetDescription(s, neg);
         Hud_SetInteractionCallback(s, InventoryGrid_UpdateModifierPreview, 0);
-        MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0u);
+        MenuDisplay_SetPaletteOverrides(s, 0, 0, 0, 0);
     } else {
         struct SceneInputWidget *obj = &s->comparisonIndicators[0];
         u32 n;
         obj->flags &= ~1;
-        s->comparisonIndicators[0].position.x = 0u;
+        s->comparisonIndicators[0].position.x = 0;
         s->comparisonIndicators[0].position.y = 8;
         n = s->rowIndex + 20;
         s->allocationDescription = n;
         SceneCatalog_SetDescription(s, (s8)s->allocationDescription);
         Hud_SetInteractionCallback(s, Presentation_UpdateAllocationSelection, 0);
-        MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0u);
+        MenuDisplay_SetPaletteOverrides(s, 1, 0, 0, 0);
     }
     {
         u16 *reg = &gDispCntShadow;

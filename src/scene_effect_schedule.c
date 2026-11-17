@@ -223,7 +223,7 @@ void SceneEffectSchedule_RemoveFromScript(void)
         s32 index = entry->index;
         u32 *mask;
         mask = &manager->occupiedMask;
-        *mask &= ~(1u << index);
+        *mask &= ~(1 << index);
     }
 
     Memory_Clear(entry, sizeof(*entry));

@@ -45,7 +45,7 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
         particle->position.z = *address + ((sample >> 4) & 255) - 127;
     }
     {
-        particle->velocityX = 0u;
+        particle->velocityX = 0;
     }
     index += 1;
     index &= mask;
@@ -60,8 +60,8 @@ void ProximityEmitter_EmitParticle(struct ProximityEmitter *emitter, void *resou
         particle->velocityY = sample;
     }
     {
-        particle->velocityZ = 0u;
-        particle->frame = 0u;
+        particle->velocityZ = 0;
+        particle->frame = 0;
     }
     particle->active = 1;
     {

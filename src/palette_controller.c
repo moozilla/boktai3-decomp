@@ -654,7 +654,7 @@ void Palette_SetBrightnessFromScript(void)
         struct PaletteTransition *t = &p->transition;
         s32 enabled = Script_GetKeywordValue('n', 0);
         u32 query = Script_SeekToKeyword('q');
-        u32 immediate = ((0u - query) | query) >> 31;
+        u32 immediate = ((0 - query) | query) >> 31;
         s32 callback = Script_GetKeywordValue('p', 0);
         u32 mode;
         p->transition.callback = 0;

@@ -87,7 +87,7 @@ int sub_0803B700(int mode, int side, int time0, int time1, int score0, int score
                              sub_0821969C);
     p->state = 1;
     p->entered = 1;
-    p->timer = 0u;
+    p->timer = 0;
     p->time0[0] = Div(time0, 3600);
     rem = Mod(time0, 3600);
     p->time0[1] = Div(rem, 60);
@@ -101,7 +101,7 @@ int sub_0803B700(int mode, int side, int time0, int time1, int score0, int score
     if ((s16)score0 > 9999)
         p->score0 = 9999;
     else if ((s16)score0 < 0)
-        p->score0 = 0u;
+        p->score0 = 0;
     if (p->score1 > 9999)
         p->score1 = 9999;
     else if (p->score1 < 0)

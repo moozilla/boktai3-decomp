@@ -26,7 +26,7 @@ static inline void SlotPool_DispatchOccupied(struct SlotPool *pool, struct PoolS
     used = &pool->used;
     table = gUnk_0860649C;
     do {
-        if (Occupied(used, 1u << i)) {
+        if (Occupied(used, 1 << i)) {
             struct PoolSlot *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
             sub_08249240(pool, slot, table[slot->state]);
         }

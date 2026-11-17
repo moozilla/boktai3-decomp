@@ -132,7 +132,7 @@ void Vanargand_UpdateTargetDash(struct DashActor *p)
             if (IsComplete(self)) {
                 u8 next = 2;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
             } else {
                 VanargandAfterimagePool_Spawn(self->afterimages, p->position);
             }

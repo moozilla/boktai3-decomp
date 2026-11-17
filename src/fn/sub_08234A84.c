@@ -29,8 +29,8 @@ void HealthRestoreEffect_InitSparkle(struct Elem *p)
     table = gRandomTable;
     p->x = Mod(rnd(table), 80) + 24;
     p->y = (rnd(table) & 7) + 8;
-    p->z = 0u;
+    p->z = 0;
     p->active = 1;
-    p->age = 0u;
+    p->age = 0;
     p->update = FlickerParticle_UpdateStationary;
 }

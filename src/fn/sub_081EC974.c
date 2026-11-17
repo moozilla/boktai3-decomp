@@ -18,10 +18,10 @@ void ActorDisplay_UpdateAccentSprite(struct DepartureActor *actor)
     if (!actor->blinkActive)
         draw->sprite.flags &= ~1;
     if (++draw->ended > 2)
-        draw->ended = 0u;
+        draw->ended = 0;
     if (draw->mode == 0) {
         if (StepPlayback(draw) == 1)
             draw->ended = 0;
     } else
-        draw->ended = 0u;
+        draw->ended = 0;
 }

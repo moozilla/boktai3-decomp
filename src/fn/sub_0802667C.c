@@ -67,7 +67,7 @@ static inline void effect(u8 *p, int id, int mode, int duration)
         p[0x38c] = value;
     } else if (p[0x38e] == 1) {
         u8 *dst = p + 0x38c;
-        *dst = 0u;
+        *dst = 0;
     }
 }
 void SceneActors_UpdateAnimation(void *, void *, void *);

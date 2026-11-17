@@ -85,7 +85,7 @@ u32 ForgingBook_InitSprites(u8 *p)
         struct SceneInputResource *objectRes = ScriptProc_Start(0xcb05, 0xde23);
         ResourceHeader_Relocate(p + 0xa68, objectRes);
     }
-    Widget_InitLinked(p + 0xa88, p + 0xa68, 0u, 0u, 0u, 1, 0u, 0);
+    Widget_InitLinked(p + 0xa88, p + 0xa68, 0, 0, 0, 1, 0, 0);
     *((u32 *)(p + 0xa90)) &= ~1;
     *((u8 *)(p + 0xaa2)) = 2;
     {
@@ -112,7 +112,7 @@ u32 ForgingBook_InitSprites(u8 *p)
     *((u8 *)(p + 0xb17)) = 1;
     *((u16 *)(p + 0xb2c)) = 0x2e;
     *((u16 *)(p + 0xb2e)) = 0x48;
-    *((u16 *)(p + 0xb30)) = 0u;
+    *((u16 *)(p + 0xb30)) = 0;
     *((u8 *)(p + 0xb18)) = 0x40;
     *((u8 *)(p + 0xb19)) = 0x40;
 }

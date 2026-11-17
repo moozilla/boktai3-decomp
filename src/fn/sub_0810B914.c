@@ -89,14 +89,14 @@ struct Registry1745 *Registry1745_Create(void)
         gClockSynced = 1;
         sub_08223180();
         p->field18 = 0xFFFF;
-        p->field1E = 0u;
+        p->field1E = 0;
         p->field40 = entry = p->field68;
         p->field44 = -1;
         p->field48 = -1;
-        p->field4C = 0u;
+        p->field4C = 0;
         p->field4D = 1;
-        p->field4E = 0u;
-        p->field4F = 0u;
+        p->field4E = 0;
+        p->field4F = 0;
         p->fieldB8 = -1;
     }
     for (i = 0; i <= 3; i++) {

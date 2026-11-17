@@ -454,9 +454,9 @@ s32 VanargandProjectile_Create(struct VanargandProjectilePool *pool,
     if (!projectile)
         return -1;
     {
-        projectile->state = 0u;
+        projectile->state = 0;
         projectile->entered = 1;
-        projectile->timer = 0u;
+        projectile->timer = 0;
         projectile->direction = direction;
         projectile->targetAngle = direction << 8;
         projectile->angle = direction << 8;
@@ -465,7 +465,7 @@ s32 VanargandProjectile_Create(struct VanargandProjectilePool *pool,
         projectile->steeringTimer = 64;
         projectile->trailIndex = 0;
         projectile->target = target;
-        projectile->targetSource = (void *)0u;
+        projectile->targetSource = (void *)0;
     }
     projectile->position = *position;
     sprite = projectile->sprites;
@@ -521,9 +521,9 @@ s32 VanargandProjectile_CreateWithSource(struct VanargandProjectilePool *pool,
     if (!projectile)
         return -1;
     {
-        projectile->state = 0u;
+        projectile->state = 0;
         projectile->entered = 1;
-        projectile->timer = 0u;
+        projectile->timer = 0;
         projectile->direction = direction;
         projectile->targetAngle = direction << 8;
         projectile->angle = direction << 8;

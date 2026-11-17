@@ -405,10 +405,10 @@ s32 SceneTransition_Initialize(struct SceneTransition *transition, void *scriptA
         transition->exitScript = value;
     Registry6A37_StartFadeIn(transition);
     {
-        transition->motion.position = 0u;
-        transition->motion.state = 0u;
-        transition->motion.mode = 0u;
-        transition->motion.timer = 0u;
+        transition->motion.position = 0;
+        transition->motion.state = 0;
+        transition->motion.mode = 0;
+        transition->motion.timer = 0;
     }
     transition->target = RegistryF3E4_CreateHidden(2);
     transition->particleFlags = 1;

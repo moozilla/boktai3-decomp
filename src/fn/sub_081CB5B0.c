@@ -38,12 +38,12 @@ void Actor_OnHiddenIdleUpdate(void);
 void sub_081CB5B0(void *ctx, struct SceneNpc *npc, s32 tick)
 {
     if (npc->enter) {
-        npc->enter = 0u;
-        npc->done = 0u;
+        npc->enter = 0;
+        npc->done = 0;
         CpuSet(gPaletteBankData + 0x680, npc->palette, 0x04000008);
         Actor_PlayAnimationEntry(npc, 0, 2, 1, 4);
-        npc->phase = 0u;
-        npc->stateFrame = 0u;
+        npc->phase = 0;
+        npc->stateFrame = 0;
     }
     switch (npc->phase) {
         case 0: {

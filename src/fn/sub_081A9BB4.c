@@ -142,7 +142,7 @@ void Vanargand_UpdateFacingPairAttack(struct Vanargand *p)
                 {
                     u8 next = 2;
                     p->phase = next;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;

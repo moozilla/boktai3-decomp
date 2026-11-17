@@ -26,9 +26,9 @@ void ActorController_UpdateAnimation(struct SceneCombatActor *p)
         *finished = 1;
     {
         if (p->animationStatus & 1)
-            *finished = 1u;
+            *finished = 1;
         if (p->flags & 0x800)
-            anim->flags |= 1u;
+            anim->flags |= 1;
         else
             anim->flags &= ~1;
     }

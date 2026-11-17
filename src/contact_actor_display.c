@@ -67,7 +67,7 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
         u32 state = 5;
         owner->state = state;
         owner->enter = mode;
-        owner->stateFrame = 0u;
+        owner->stateFrame = 0;
     }
     if (!other->cost) {
         Sound_PlaySongChecked(0x211);

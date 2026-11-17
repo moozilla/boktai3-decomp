@@ -37,16 +37,16 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
-    a->base.stepDone = 0u;
+    a->base.stepDone = 0;
     a->base.controlKind = kind;
     a->base.target = cb;
-    a->base.field2C8 = 0u;
+    a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
         u32 mask = ~1;
         *flags &= mask;
     }
-    a->base.pendingControl = 0u;
+    a->base.pendingControl = 0;
 }
 static inline void State0(struct ChaseActor *a)
 {

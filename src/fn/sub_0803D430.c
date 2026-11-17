@@ -48,7 +48,7 @@ s32 ScenePool_UpdateManager(struct ScenePoolManager *m)
             u32 region = (u32)pos[0] >> 24;
             *(u32 *)((u8 *)regions + (offset & ~3)) = region;
         }
-        *mask |= 1u << playerIndex;
+        *mask |= 1 << playerIndex;
         (*count)++;
         pos += 4;
         pp++;

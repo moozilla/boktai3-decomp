@@ -9,7 +9,7 @@ void ScalarApproach_HalfAngleArray(s16 *values, const s16 *targets, s32 count)
     const s16 *targetCursor;
     cursor = values;
     targetCursor = targets;
-    while ((remaining = (s32)((u32)remaining - 1u)) >= 0) {
+    while ((remaining = (s32)((u32)remaining - 1)) >= 0) {
         s32 current;
         s32 target;
         s32 result;
@@ -29,14 +29,14 @@ void ScalarApproach_HalfAngleArray(s16 *values, const s16 *targets, s32 count)
         converted = angle;
         near = (s32)((u32)target + (u32)converted);
         delta = (s32)((u32)target - (u32)near);
-        if (((u32)delta + 1u) <= 2) {
+        if (((u32)delta + 1) <= 2) {
             result = target;
             goto store;
         }
         if (delta >= 0)
             step = delta >> 1;
         else
-            step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 1));
+            step = (s32)(0 - (u32)((s32)(0 - (u32)delta) >> 1));
         result = (s32)((u32)near + (u32)step);
 
     store:

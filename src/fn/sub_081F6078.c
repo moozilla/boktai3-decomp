@@ -39,13 +39,13 @@ static inline void setFacing(TimedSceneActor *p, int angle)
 void SceneActors_UpdateTimedAnimationReset(TimedSceneActor *p, int tick)
 {
     if (p->changed) {
-        p->changed = 0u;
+        p->changed = 0;
         setFacing(p, p->savedAngle);
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 26, 1, 1, 4);
-        p->motion = 0u;
-        p->fieldE52 = 0u;
-        p->fieldE54 = 0u;
-        p->fieldE58 = 0u;
+        p->motion = 0;
+        p->fieldE52 = 0;
+        p->fieldE54 = 0;
+        p->fieldE58 = 0;
     }
     if (tick == 35) {
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 17, 0, 4, 4);

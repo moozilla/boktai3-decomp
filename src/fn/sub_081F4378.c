@@ -101,10 +101,10 @@ void Ratatosk_UpdateProjectileVolley(struct Actor *p, s32 tick)
     struct Vec spawn;
     struct Actor *p2 = p;
     if (p->changed) {
-        p->changed = 0u;
+        p->changed = 0;
         Ratatosk_SetFacing(p, p->requestedAngle);
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 17, 1, 4, 4);
-        p->phase = 0u;
+        p->phase = 0;
     }
     switch (p->phase) {
         case 0:

@@ -140,39 +140,39 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     void *resource;
     state = screen;
     Bg_ClearTilemap(0);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0u);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0u);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     background = ScriptProc_Start(0xC091, 0x3536);
     layer = 9;
-    Bg_SetupLayers(2, 0, background, 0, 0u, one = 1, &layer);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0u);
+    Bg_SetupLayers(2, 0, background, 0, 0, one = 1, &layer);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     palette = ScriptProc_Start(0x92B3, 0x204);
     CpuSet(((struct OptionsPalette *)palette)->colors, gBgPaletteBuffer, 0x100);
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     backgroundGraphics = &screen->background.graphics;
     ResourceHeader_Relocate(backgroundGraphics, resource);
-    Widget_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, 0u, 0u, 0u,
+    Widget_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, 0, 0, 0,
                       0);
     resource = ScriptProc_Start(0xCB05, 0x530D);
     menuGraphics = &screen->menu.graphics;
     ResourceHeader_Relocate(menuGraphics, resource);
-    Widget_InitLinked(&screen->menu.sprite, menuGraphics, 0x8A, 0x10, 0u, 0u, 0u, 0);
+    Widget_InitLinked(&screen->menu.sprite, menuGraphics, 0x8A, 0x10, 0, 0, 0, 0);
     cursorGraphics = &screen->cursor.graphics;
     ResourceHeader_Relocate(cursorGraphics, resource);
-    Widget_InitLinked(&screen->cursor.sprite, cursorGraphics, 0x47, 0x10, 0u, 0u, 0u, 0);
+    Widget_InitLinked(&screen->cursor.sprite, cursorGraphics, 0x47, 0x10, 0, 0, 0, 0);
     leftArrowGraphics = &screen->leftArrow.graphics;
     ResourceHeader_Relocate(leftArrowGraphics, resource);
     leftArrow = &screen->leftArrow.sprite;
-    Widget_InitLinked(leftArrow, leftArrowGraphics, 0x45, 0x10, 0u, 0u, 0u, 0);
+    Widget_InitLinked(leftArrow, leftArrowGraphics, 0x45, 0x10, 0, 0, 0, 0);
     rect.x = 0x40;
     rect.y = 0x60;
     rect.width = 0;
     Menu_SetTextRect(leftArrow, &rect);
     ResourceHeader_Relocate(&screen->rightArrow.graphics, resource);
     rightArrow = &screen->rightArrow.sprite;
-    Widget_InitLinked(rightArrow, &screen->rightArrow.graphics, 0x46, 0x10, 0u, 0u, 0u, 0);
+    Widget_InitLinked(rightArrow, &screen->rightArrow.graphics, 0x46, 0x10, 0, 0, 0, 0);
     rect.x = 0xD8;
     rect.y = 0x60;
     rect.width = 0;
@@ -196,7 +196,7 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     if ((gChoiceMenuParameters.b == 0) || (gChoiceMenuParameters.n == 2))
         state->fade = 3;
     else
-        state->fade = 0u;
+        state->fade = 0;
     Menu_StartFadeIn(state->fade);
     state->selection = gChoiceMenuParameters.n;
     return 0;

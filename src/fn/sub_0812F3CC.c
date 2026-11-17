@@ -83,14 +83,14 @@ fail:
 success: {
     u8 *control = group + 0x4C;
     SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
-    *(u32 *)(control + 0x18) = 0u;
+    *(u32 *)(control + 0x18) = 0;
     byteZero = 0;
-    *(u16 *)(control + 0x14) = 0u;
-    *(u16 *)(control + 8) = 0u;
+    *(u16 *)(control + 0x14) = 0;
+    *(u16 *)(control + 8) = 0;
 }
 
     *(void **)(group + 0x88) = contact;
-    SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, 0u, byteZero);
+    SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, 0, byteZero);
     {
         u32 state = 3;
         u8 *field = &a->base.state2A8;
@@ -98,7 +98,7 @@ success: {
     }
     a->base.phase2A9 = 1;
     a->base.behavior2AA = byteZero;
-    a->base.counter2AC = 0u;
+    a->base.counter2AC = 0;
     a->base.field2B1 = 1;
     SceneActorReaction_ClearBits(flags, ~0x10);
     reactionMask = 0x800;

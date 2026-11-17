@@ -269,7 +269,7 @@ void WirelessPeerMenu_UpdateCancelInput(struct WirelessPeerMenu *menu)
                     u32 state = 7;
                     menu->state = state;
                     menu->entered = 1;
-                    menu->timer = 0u;
+                    menu->timer = 0;
                 }
             }
         } else {
@@ -298,7 +298,7 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct WirelessPeerMenu *menu)
                 u32 state = 7;
                 menu->state = state;
                 menu->entered = 1;
-                menu->timer = 0u;
+                menu->timer = 0;
             }
         }
     }

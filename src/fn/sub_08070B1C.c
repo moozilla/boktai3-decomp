@@ -48,7 +48,7 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                     if (category == 4 || category == 1 || category == 3) {
                         u32 selected = *flags & reject;
                         if (!selected) {
-                            actor->base.field2B2 = 1u;
+                            actor->base.field2B2 = 1;
                             actor->base.stepDone = selected;
                             actor->base.controlKind = substate;
                             actor->base.target = callback;
@@ -61,11 +61,11 @@ void SceneActorRegistry_ResetEligibleCategoryState(void)
                                 *flags = value;
                             }
                             actor->base.pendingControl = selected;
-                            actor->base.state2A8 = 0u;
-                            actor->base.phase2A9 = 1u;
-                            actor->base.behavior2AA = 0u;
+                            actor->base.state2A8 = 0;
+                            actor->base.phase2A9 = 1;
+                            actor->base.behavior2AA = 0;
                             actor->base.counter2AC = selected;
-                            actor->base.field2B1 = 1u;
+                            actor->base.field2B1 = 1;
                         }
                     }
                 }

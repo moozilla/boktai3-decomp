@@ -111,18 +111,18 @@ s32 Projectile_SpawnAtPosition(struct SceneProjectileParams *params,
         projectile->scriptProc = proc;
         if (projectile->params.mode == 0) {
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, 0,
-                             0u);
+                             0);
         } else if (projectile->params.mode == 1) {
             u32 var = (((u16)projectile->params.direction + 0x70) >> 5) & 7;
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, var,
-                             0u);
+                             0);
         } else {
             u32 var;
             gRandomIndex = (gRandomIndex + 1) & 1023;
             var = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
             var &= 3;
             Anim_SetSequence(&projectile->sequence, proc, (u16)projectile->params.sequence, var,
-                             0u);
+                             0);
         }
         {
             struct ContactSwarmSprite *sequenceSprite = (struct ContactSwarmSprite *)sprite;

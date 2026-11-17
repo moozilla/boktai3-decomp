@@ -50,7 +50,7 @@ void Vanargand_UpdateDelayedPartAnimation(struct Vanargand *p)
             if (++p->timer > 15) {
                 u8 next = 2;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
                 p->finished = 1;
             }
             break;

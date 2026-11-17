@@ -69,7 +69,7 @@ void Vanargand_UpdateAlternatingPairAttack(struct Vanargand *p)
             if (++p->timer > 60) {
                 u8 next = 2;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
             }
             break;
         case 2:
@@ -83,7 +83,7 @@ void Vanargand_UpdateAlternatingPairAttack(struct Vanargand *p)
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 u8 next = 3;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
             }
             break;
         case 3:

@@ -37,7 +37,7 @@ void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1u);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags |= 0x20;
         }

@@ -2,12 +2,12 @@
 
 void FloatingEffect_Init(struct FloatingEffect *effect)
 {
-    effect->key = 0u;
-    effect->state = 1u;
-    effect->entered = 0u;
-    effect->kind = 0u;
-    effect->timer = 0u;
-    effect->sprite.flags = (effect->sprite.flags | 1u) & ~2;
+    effect->key = 0;
+    effect->state = 1;
+    effect->entered = 0;
+    effect->kind = 0;
+    effect->timer = 0;
+    effect->sprite.flags = (effect->sprite.flags | 1) & ~2;
 }
 
 static inline int FloatingEffect_ProjectScalar(int input)
@@ -177,7 +177,7 @@ void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct Floati
         u32 nextState = 4;
         effect->state = nextState;
         effect->entered = 1;
-        effect->timer = 0u;
+        effect->timer = 0;
     }
     goto done;
 increment:

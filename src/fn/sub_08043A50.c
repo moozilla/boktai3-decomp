@@ -14,7 +14,7 @@ void ContactActor_UpdateAwaitHide(struct ContactActorPool *pool, struct ContactA
         u32 state = 8;
         slot->state = state;
         slot->enter = 1;
-        slot->stateFrame = 0u;
+        slot->stateFrame = 0;
     } else
         slot->stateFrame++;
 }

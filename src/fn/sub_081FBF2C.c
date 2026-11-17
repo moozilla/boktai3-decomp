@@ -61,7 +61,7 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
     e = a->particles;
     i = 0;
     do {
-        if (TestMask(1u << i, a)) {
+        if (TestMask(1 << i, a)) {
             struct ContactSwarmSprite *sprite = &e->sprite;
             struct RatatoskParticleConfig *cfg = &e->config;
             if (sub_08249240(e, (void *)i, cfg->callback) == 1) {
@@ -106,7 +106,7 @@ s32 Ratatosk_UpdateAnimatedParticlePool(struct ParticlePool *aIn)
             }
         }
         {
-            i += 1u;
+            i += 1;
         }
         e++;
         last = i;

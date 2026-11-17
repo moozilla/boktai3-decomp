@@ -149,10 +149,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         collider->flags = value;
         offset = 0x1EA;
         address = &actor->base.paletteTimer;
-        *address = 0u;
+        *address = 0;
         offset -= 2;
         address = &actor->base.flashTimer;
-        *address = 0u;
+        *address = 0;
     }
     {
         u32 mode = 2;

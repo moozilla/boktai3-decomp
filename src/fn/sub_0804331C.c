@@ -71,11 +71,11 @@ void ContactActor_UpdateRandomWalk(struct ContactActorPool *pool, struct Contact
             u32 mode = pool->mode;
             if (mode == 2) {
                 if (index > 7)
-                    slot->targetIndex = 0u;
+                    slot->targetIndex = 0;
                 else
                     slot->targetIndex = 1;
             } else if (mode == 1)
-                slot->targetIndex = 0u;
+                slot->targetIndex = 0;
             else {
                 mode = 255;
                 slot->targetIndex = mode;

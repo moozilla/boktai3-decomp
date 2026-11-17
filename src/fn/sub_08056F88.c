@@ -40,7 +40,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
     particle->position.world.y = gPlayers[0]->position.y + y;
     particle->position.world.z = gPlayers[0]->position.z + z;
     {
-        u32 value = 0u;
+        u32 value = 0;
         particle->velocityX = value;
     }
     index = ((*(&index)) + 1) & mask;
@@ -51,7 +51,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         particle->velocityY = (value & lowMask) + 12;
     }
     {
-        u32 value = 0u;
+        u32 value = 0;
         particle->velocityZ = value;
         particle->frame = value;
     }

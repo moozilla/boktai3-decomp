@@ -50,8 +50,8 @@ s32 Hresvelgr_InitializeFallingActor(struct HresvelgrMotion *p, struct Hresvelgr
     p->velocity = *velocity;
     Hresvelgr_InitializeMotionCollider(p);
     shadow = p->shadow;
-    ScaledShadow_Initialize(shadow, &p->sprite.position, 64, 64, 64, 64, 0x1900, 1, 6, 1, 0u);
+    ScaledShadow_Initialize(shadow, &p->sprite.position, 64, 64, 64, 64, 0x1900, 1, 6, 1, 0);
     ScaledShadow_SetGraphic(shadow, 0x1c1b, 7);
-    p->state = 0u;
-    p->stateFrame = 0u;
+    p->state = 0;
+    p->stateFrame = 0;
 }

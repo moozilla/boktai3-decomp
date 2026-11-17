@@ -20,16 +20,16 @@ void Hresvelgr_SetAnimation(struct HresvelgrAnimActor *actor, struct HresvelgrAn
                             void *data, u32 index, u32 row, u32 flags)
 {
     u8 *resetp = &actor->reset;
-    *resetp = 0u;
+    *resetp = 0;
     actor->index = index;
     Anim_SetKeyframes(anim, data, actor->index, (u16)row, (u16)flags);
     if (!(flags & 1))
-        actor->clearOnStart = 0u;
+        actor->clearOnStart = 0;
     if (actor->side == 0) {
         actor->mirrored = 1;
         anim->flags |= 4;
     } else {
-        actor->mirrored = 0u;
+        actor->mirrored = 0;
         anim->flags &= ~4;
     }
 }
