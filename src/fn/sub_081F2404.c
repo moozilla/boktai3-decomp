@@ -10,14 +10,14 @@ void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 
 void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
 {
-    struct ContactSwarmSprite *head = p->head;
-    struct ContactSwarmSprite *tail = p->tail;
-    struct ContactSwarmSprite *next;
+    struct DisplaySequenceSprite *head = p->head;
+    struct DisplaySequenceSprite *tail = p->tail;
+    struct DisplaySequenceSprite *next;
     struct TrailVector *position;
     s32 index, i;
     u32 *flags = &p->frame;
     u32 *savedFlags;
-    /* Bit 0 freezes the leading sprite and the position history. */
+    /* Record and project a new leading position on even frames. */
     if (!(*flags & 1)) {
         struct TrailVector *position = &p->position;
         struct ContactPosition *out = &p->head[0].position;

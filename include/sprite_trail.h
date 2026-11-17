@@ -1,7 +1,7 @@
 #ifndef GUARD_SPRITE_TRAIL_H
 #define GUARD_SPRITE_TRAIL_H
 
-#include "contact_swarm_sprite.h"
+#include "sprite.h"
 #include "task.h"
 
 struct TrailVector {
@@ -17,8 +17,8 @@ struct SpriteTrail {
     s32 historyIndex;
     u32 frame;
     u8 collider[0x40], renderCollider[0x40];
-    struct ContactSwarmSprite head[4], tail[3];
-    u8 graphics[0x1C];
+    struct DisplaySequenceSprite head[4], tail[3];
+    struct SpriteRenderResource graphics;
 };
 
 struct SpriteTrailPool {
