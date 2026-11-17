@@ -1,112 +1,69 @@
 #include "scene_actor_palette.h"
-#include "scene_actor_placement.h"
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return TRUE;
-    return FALSE;
-}
+#include "scene_actor_status.h"
+
 static inline u8 TestManagerFlag(struct SceneActorPaletteManagerView *manager, u32 mask)
 {
     if (manager->flags & mask)
         return TRUE;
     return FALSE;
 }
-static inline u32 ReadMasked(u32 mask, u32 *field)
+
+static inline void BindPalette(struct RoomActor *actor, const u16 *colors)
 {
-    return *field & mask;
+    if (ActorStatus_BehaviorFlags(actor, 0x02008000))
+        return;
+    if (actor->drawableKind == 0)
+        ((struct SceneActorPaletteSequenceView *)actor->drawable)->palette = colors;
+    else
+        ((struct SceneActorPaletteTileView *)actor->drawable)->palette = colors;
 }
-static inline u16 Remaining(struct SceneActorPaletteTransition *transition)
+
+static inline void AdvancePaletteTransition(struct SceneActorPaletteTransition *transition)
 {
-    struct SceneActorPaletteTransition *low = transition;
-    return low->remaining;
-}
-static inline void BindPalette(struct ChaseActor *actor,
-                               struct SceneActorPaletteTransition *inputTransition)
-{
-    struct SceneActorPaletteTransition *transition = inputTransition;
-    if (actor->base.drawableKind == 0) {
-        void *drawable = actor->base.drawable;
-        const u16 *colors;
-        colors = transition->colors;
-        ((struct SceneActorPaletteSequenceView *)drawable)->palette = colors;
-    } else {
-        void *drawable = actor->base.drawable;
-        const u16 *colors;
-        colors = transition->colors;
-        ((struct SceneActorPaletteTileView *)drawable)->palette = colors;
+    s32 i;
+    for (i = 0; i < 16; i++) {
+        transition->red[i] += transition->deltaRed[i];
+        transition->green[i] += transition->deltaGreen[i];
+        transition->blue[i] += transition->deltaBlue[i];
+        transition->colors[i] = (transition->red[i] >> 5) |
+                                ((u32)(transition->green[i] >> 5) << 5) |
+                                ((u32)(transition->blue[i] >> 5) << 10);
     }
+    transition->remaining--;
 }
-u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *inputManager,
-                                      struct ChaseActor *inputActor)
+
+u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *manager,
+                                      struct ChaseActor *actor)
 {
-    struct SceneActorPaletteManagerView *manager = inputManager;
     struct SceneActorPaletteTransition *transition;
-    struct ChaseActor *actorInput = inputActor;
-    struct ChaseActor *actor;
     u32 alreadyAdvanced;
     u32 category;
-    u32 categoryFlags;
-    u32 flagSet;
-    s32 i;
-    /* Allocation-only: declaration order preserves the six spilled channel homes. */
-    s8 *deltaRed;
-    s16 *red;
-    s8 *deltaGreen;
-    s16 *green;
-    u32 *actorFlags;
-    s16 *blue;
-    actor = actorInput;
-    if (SceneActorPlacement_IsUnavailable(&actor->base))
-        goto failure;
-    {
-        u32 mask = 0x2000;
-        struct SceneActorPaletteManagerView *low = manager;
-        categoryFlags = low->flags;
-        if (!Test(categoryFlags, mask))
-            goto failure;
-    }
+    if (ActorStatus_IsDown(actor))
+        return 0;
+    if (!TestManagerFlag(manager, 0x2000))
+        return 0;
     alreadyAdvanced = 0;
     category = actor->base.category;
-    if (category == 10)
-        goto category10;
-    if (category != 23)
-        goto success;
-    transition = &manager->category23;
-    flagSet = TestManagerFlag(manager, 0x8000);
-    goto selected;
-category10:
-    transition = &manager->category10;
-    flagSet = TestManagerFlag(manager, 0x4000);
-selected:
-    if (flagSet)
-        alreadyAdvanced = 1;
-    if (!Remaining(transition)) {
-        if (!ReadMasked(0x02008000, &actor->base.behaviorFlags))
-            BindPalette(actor, transition);
-        goto success;
+    switch (category) {
+        case 23:
+            transition = &manager->category23;
+            if (TestManagerFlag(manager, 0x8000))
+                alreadyAdvanced = 1;
+            break;
+        case 10:
+            transition = &manager->category10;
+            if (TestManagerFlag(manager, 0x4000))
+                alreadyAdvanced = 1;
+            break;
+        default:
+            return 1;
     }
-    actorFlags = &actor->base.behaviorFlags;
+    if (!transition->remaining) {
+        BindPalette(&actor->base, transition->colors);
+        return 1;
+    }
     if (!alreadyAdvanced) {
-        i = 0;
-        red = transition->red;
-        deltaRed = transition->deltaRed;
-        green = transition->green;
-        deltaGreen = transition->deltaGreen;
-        blue = transition->blue;
-        do {
-            s32 blueSum;
-            /* Allocation-only: the bounded term folds after loop strength reduction. */
-            u32 halfOffset = (i + ((u16)i >> 16)) * 2;
-            (*(s16 *)((u32)red + halfOffset)) += deltaRed[i];
-            (*(s16 *)((u32)green + halfOffset)) += deltaGreen[i];
-            blueSum = (*(s16 *)((u32)blue + halfOffset)) += transition->deltaBlue[i];
-            transition->colors[i] = ((*(s16 *)((u32)red + halfOffset)) >> 5) |
-                                    ((u32)((*(s16 *)((u32)green + halfOffset)) >> 5) << 5) |
-                                    ((u32)((s16)blueSum >> 5) << 10);
-            i++;
-        } while (i < 16);
-        transition->remaining--;
+        AdvancePaletteTransition(transition);
         switch (category) {
             case 23: {
                 u32 mask = 0x8000;
@@ -120,17 +77,8 @@ selected:
             }
         }
     }
-stepFinished: {
-    u32 mask = 0x02008000;
-    u32 *field;
-    field = actorFlags;
-    if (!(*field & mask))
-        BindPalette(actor, transition);
-}
-    if (!Remaining(transition))
-        goto success;
-failure:
+    BindPalette(&actor->base, transition->colors);
+    if (!transition->remaining)
+        return 1;
     return 0;
-success:
-    return 1;
 }
