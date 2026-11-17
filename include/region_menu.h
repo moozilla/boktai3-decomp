@@ -30,13 +30,7 @@ struct RegionMenu {
     struct RegionMenuAnim anims[4];
     struct RegionEntry entries[64];
     void *savedPalette;
-    union {
-        u16 colors[16];
-        struct {
-            u8 reserved[24];
-            u8 pulseState[8];
-        } pulse;
-    } highlightPalette;
+    u16 highlightPalette[16];
     s32 state;
     s32 confirmed;
     s32 timer;
