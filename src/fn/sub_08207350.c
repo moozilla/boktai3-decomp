@@ -12,7 +12,7 @@ s32 VulcanCannon_UpdateFacingTurn(struct VulcanCannon *p)
         Anim_RestartSequence(&p->sequence, p->resource, 0x11, (u8)p->facing, loop = 0);
         return 0;
     }
-    if (DisplaySequence_StepSprite(&p->display.sprite, &p->sequence)) {
+    if (DisplaySequence_StepSprite(&p->display, &p->sequence)) {
         if (!p->facing)
             p->facing = 1;
         else

@@ -2,23 +2,16 @@
 #define GUARD_VULCAN_CANNON_WORKER_H
 #include "global.h"
 #include "display_animation.h"
-#include "scene_vec.h"
-#include "player_cue_sequence.h"
+#include "display_sequence_sprite.h"
 #include "task.h"
 /* Layout observed in initialization, state callbacks and collision consumers. */
 struct VulcanCannon {
     struct Task task;
     s32 timer;
     u8 body[0x48];
-    struct SceneVec initialPosition;
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct {
-            u8 pad[0x1c];
-            struct SceneVec position;
-        } spatial;
-    } display;
-    u8 graphics[0x1c];
+    struct ContactPosition initialPosition;
+    struct DisplaySequenceSprite display;
+    struct SpriteRenderResource graphics;
     u8 collider[0x54];
     void (*state)(void);
     struct DisplaySequenceState sequence;
@@ -40,7 +33,15 @@ struct VulcanCannon {
 };
 static inline u32 VulcanCannon_StepAnimation(struct VulcanCannon *owner)
 {
-    return PlayerCue_StepSequenceEnded(&owner->display.sprite, &owner->sequence);
+    return DisplaySequence_StepSprite(&owner->display, &owner->sequence);
+}
+
+/* Defeat particles and explosions originate half a world unit above the sprite. */
+static inline void VulcanCannon_GetEffectPosition(struct ContactPosition *out,
+                                                  const struct VulcanCannon *owner)
+{
+    *out = owner->display.position;
+    out->y += 128;
 }
 
 #endif
