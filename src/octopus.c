@@ -107,22 +107,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         Sound_PlaySong(0x2A0);
     }
     if (actor->base.restart) {
-        void (*callback)(void) = Ivy_UpdateActiveState_080E98B4;
-        u32 kind = 0x22;
-        u32 zero;
-        u8 *prepared = &actor->base.field2B2;
-        u32 *flags;
-        s32 mask;
-        zero = 0;
-        *prepared = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = zero;
-        flags = &actor->base.pendingControlFlags;
-        mask = -2;
-        *flags = mask & *flags;
-        actor->base.pendingControl = zero;
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 0x22);
     }
 }
 
