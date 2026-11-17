@@ -77,7 +77,7 @@ s32 ResourceHeader_Relocate(void *destination, void *source)
     return 0;
 }
 
-struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct WidgetGlyphResource *table, u16 id)
+struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct SceneInputResource *table, u16 id)
 {
     struct WidgetGlyphEntry *entry = table->glyphs;
     s32 i;
@@ -89,7 +89,7 @@ struct WidgetGlyphEntry *Anim_FindGlyphEntryById(struct WidgetGlyphResource *tab
     return NULL;
 }
 
-s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct WidgetGlyphResource *resource,
+s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct SceneInputResource *resource,
                            u16 index)
 {
     struct WidgetGlyphEntry *entry = resource->glyphs + index;
@@ -132,7 +132,7 @@ s32 Anim_InitPositionedWidget(struct SceneInputWidget *widget, void *resource, u
     return 0;
 }
 
-s32 Anim_LoadKeyframe(struct SceneInputWidget *widget, struct WidgetGlyphResource *resource,
+s32 Anim_LoadKeyframe(struct SceneInputWidget *widget, struct SceneInputResource *resource,
                       u16 glyph, u8 attribute)
 {
     if (Anim_SelectWidgetGlyph(widget, resource, glyph) < 0)
@@ -176,7 +176,7 @@ s32 Widget_InitLinked(struct SceneInputWidget *widget, void *resource, u16 glyph
         widget->scaleY = 0;
         widget->rotation = zero;
         widget->value3C = zero;
-        widget->renderData = zero;
+        widget->frames = NULL;
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
@@ -219,7 +219,7 @@ s32 Widget_InitCleared(struct SceneInputWidget *widget, void *resource, u16 glyp
         widget->scaleY = 0;
         widget->rotation = zero;
         widget->value3C = zero;
-        widget->renderData = zero;
+        widget->frames = NULL;
         widget->palette = zero;
         widget->tileData = zero;
         widget->extraData = zero;
@@ -271,7 +271,7 @@ void Widget_CopyMasked(struct SceneInputWidget *dst, struct SceneInputWidget *sr
         dst->paletteBank = src->paletteBank;
     dst->tileData = src->tileData;
     dst->extraData = src->extraData;
-    dst->renderData = src->renderData;
+    dst->frames = src->frames;
 }
 
 void Anim_SelectPaletteBank(struct SceneInputWidget *animation, u32 index)

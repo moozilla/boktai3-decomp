@@ -1,33 +1,5 @@
-#include "global.h"
+#include "scene_input_widget.h"
 
-struct AnimFrame {
-    u16 key, duration;
-};
-struct AnimSequence {
-    u8 pad0[2];
-    u16 frameCount;
-    u32 offset;
-};
-struct AnimData {
-    u8 pad0[4];
-    u16 sequenceCount;
-    u8 pad6[0x10 - 6];
-    struct AnimSequence *sequences;
-    u8 pad14[4];
-    u8 *frameData;
-};
-struct AnimState {
-    u8 pad0[6];
-    u16 unk6;
-    u8 pad8[4];
-    u16 timer, duration, scale, sequence, frame, frameCount, flags;
-    u8 pad1a;
-    u8 mode;
-    u8 pad1c;
-    u8 status;
-    u8 pad1e[0x54 - 0x1e];
-    struct AnimFrame *frames;
-};
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 
 static inline s32 Scale6(s32 v)
@@ -37,17 +9,17 @@ static inline s32 Scale6(s32 v)
     return -((-v) >> 6);
 }
 
-void Anim_SetKeyframes(struct AnimState *anim, struct AnimData *data, u16 sequence, u16 mode,
+void Anim_SetKeyframes(struct SceneInputWidget *anim, struct SceneInputResource *data, u16 sequence, u16 mode,
                        u16 flags)
 {
-    struct AnimSequence *seqs;
-    struct AnimFrame *frames;
-    struct AnimFrame *frame;
+    struct AnimationKeyframeSequence *seqs;
+    struct AnimationKeyframe *frames;
+    struct AnimationKeyframe *frame;
 
     if (sequence >= data->sequenceCount)
         sequence = 0;
     seqs = data->sequences;
-    frames = (struct AnimFrame *)(data->frameData + seqs[sequence].offset);
+    frames = (struct AnimationKeyframe *)(data->frameData + seqs[sequence].offset);
     {
         s32 off;
         if (!(flags & 1)) {
@@ -58,28 +30,28 @@ void Anim_SetKeyframes(struct AnimState *anim, struct AnimData *data, u16 sequen
                 goto have_frame;
             }
         } else
-            off = anim->frame * 4;
-        frame = (struct AnimFrame *)((u8 *)frames + off);
+            off = anim->frameTimer * 4;
+        frame = (struct AnimationKeyframe *)((u8 *)frames + off);
     }
 have_frame:
-    if (anim->sequence != sequence || (flags & 4))
+    if (anim->frame != sequence || (flags & 4))
         Anim_LoadKeyframe(anim, data, frame->key, (u8)mode);
-    anim->sequence = sequence;
-    anim->frameCount = seqs[sequence].frameCount;
-    anim->duration = Scale6(frame->duration * anim->scale);
-    if (anim->duration == 0)
-        anim->duration = 1;
-    anim->flags = flags;
+    anim->frame = sequence;
+    anim->frameDuration = seqs[sequence].frameCount;
+    anim->attributeE = Scale6(frame->duration * anim->scale);
+    if (anim->attributeE == 0)
+        anim->attributeE = 1;
+    anim->value18 = flags;
     anim->frames = frames;
-    anim->mode = mode;
+    anim->attribute1B = mode;
     if (flags & 1)
         return;
     if (flags & 2)
-        anim->frame = anim->frameCount - 1;
+        anim->frameTimer = anim->frameDuration - 1;
     else
-        anim->frame = 0;
-    anim->unk6 = 0;
-    anim->timer = 0;
+        anim->frameTimer = 0;
+    anim->value6 = 0;
+    anim->fieldC = 0;
     anim->status = 0;
     anim->scale = 0x40;
 }

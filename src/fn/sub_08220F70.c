@@ -1,20 +1,5 @@
-#include "global.h"
+#include "scene_input_widget.h"
 
-struct AnimFrame {
-    u16 key, duration;
-};
-struct AnimState {
-    u8 pad0[6];
-    u16 unk6;
-    u32 unk8;
-    u16 timer, duration, scale, sequence, frame, frameCount, flags;
-    u8 pad1a;
-    u8 mode;
-    u8 pad1c;
-    u8 status;
-    u8 pad1e[0x54 - 0x1e];
-    struct AnimFrame *frames;
-};
 s32 Anim_LoadKeyframe(void *anim, void *data, u32 index, u32 mode);
 
 static inline s32 Scale6(s32 v)
@@ -24,64 +9,64 @@ static inline s32 Scale6(s32 v)
     return -((-v) >> 6);
 }
 
-s32 Anim_Step(struct AnimState *anim, void *data)
+s32 Anim_Step(struct SceneInputWidget *anim, void *data)
 {
     s32 done;
     u32 flags;
-    struct AnimFrame *f;
+    struct AnimationKeyframe *f;
 
-    if (!anim->mode)
+    if (!anim->attribute1B)
         return 0;
     done = 0;
     anim->status = 0;
-    if (anim->timer == 0) {
-        f = &anim->frames[anim->frame];
-        Anim_LoadKeyframe(anim, data, f->key, anim->mode);
+    if (anim->fieldC == 0) {
+        f = &anim->frames[anim->frameTimer];
+        Anim_LoadKeyframe(anim, data, f->key, anim->attribute1B);
     }
-    anim->unk6++;
-    if (++anim->timer >= anim->duration) {
-        if (anim->flags & 2) {
-            if (anim->frame == 0) {
+    anim->value6++;
+    if (++anim->fieldC >= anim->attributeE) {
+        if (anim->value18 & 2) {
+            if (anim->frameTimer == 0) {
                 done = 1;
                 goto finished;
             }
-            anim->frame--;
+            anim->frameTimer--;
         } else {
-            anim->frame++;
-            if (anim->frame >= anim->frameCount) {
+            anim->frameTimer++;
+            if (anim->frameTimer >= anim->frameDuration) {
                 done = 1;
-                anim->frame = anim->frameCount - 1;
+                anim->frameTimer = anim->frameDuration - 1;
             }
         }
         if (done) {
         finished:
             anim->status |= 2;
-            if (anim->mode == 2) {
-                anim->mode = 0;
+            if (anim->attribute1B == 2) {
+                anim->attribute1B = 0;
                 goto reset;
             }
-            if (anim->mode == 3) {
-                anim->mode = 0;
-                anim->unk8 |= 1;
+            if (anim->attribute1B == 3) {
+                anim->attribute1B = 0;
+                anim->flags |= 1;
                 goto reset;
             }
-            if ((u16)(anim->flags & 2))
-                anim->frame = anim->frameCount - 1;
+            if ((u16)(anim->value18 & 2))
+                anim->frameTimer = anim->frameDuration - 1;
             else
-                anim->frame = 0;
+                anim->frameTimer = 0;
         }
         anim->status |= 4;
     reset:
-        f = &anim->frames[anim->frame];
-        anim->timer = 0;
-        anim->duration = Scale6(f->duration * anim->scale);
-        if (anim->duration == 0)
-            anim->duration = 1;
-    } else if (anim->timer + 1 >= anim->duration) {
-        if (anim->flags & 2) {
-            if (anim->frame == 0)
+        f = &anim->frames[anim->frameTimer];
+        anim->fieldC = 0;
+        anim->attributeE = Scale6(f->duration * anim->scale);
+        if (anim->attributeE == 0)
+            anim->attributeE = 1;
+    } else if (anim->fieldC + 1 >= anim->attributeE) {
+        if (anim->value18 & 2) {
+            if (anim->frameTimer == 0)
                 anim->status |= 1;
-        } else if (anim->frame + 1 >= anim->frameCount)
+        } else if (anim->frameTimer + 1 >= anim->frameDuration)
             anim->status |= 1;
     }
     return done;
