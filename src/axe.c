@@ -2849,7 +2849,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
         {
             struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
             struct DisplaySequenceState *source = &drawable->sequence;
-            u16 sequence = source->unknownA;
+            u16 sequence = source->sequenceId;
             {
                 u32 offset = trail->nextSlot * sizeof(struct AxeTrailSlot);
                 u32 spriteOffset = 0x708;
@@ -2952,7 +2952,7 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
         {
             struct DisplaySequenceState *source =
                 &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
-            u16 selection = source->unknownA;
+            u16 selection = source->sequenceId;
             u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite);
             struct AxeTrailSlotEmitTrailSprite *slot;
             struct DisplaySequenceState *destination;
@@ -3440,7 +3440,7 @@ static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
 
 static inline u16 Axe_SequenceSelection(struct DisplaySequenceState *source)
 {
-    return source->unknownA;
+    return source->sequenceId;
 }
 
 void Axe_InitAttackTrail(struct ChaseActor *s)

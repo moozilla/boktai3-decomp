@@ -1590,7 +1590,7 @@ void PlayerCue_UpdateAlternateFormChange(struct Player *player)
         Anim_SetSequence(&player->auxiliarySequence, player->auxiliaryResource, 21, 0, 0);
     player->auxiliarySequenceEnded = PlayerCue_StepSequenceEnded(
         &player->auxiliarySprite[0].sprite, (void *)(&player->auxiliarySequence));
-    if (player->auxiliarySequence.unknownA == 21) {
+    if (player->auxiliarySequence.sequenceId == 21) {
         if (player->auxiliarySprite[0].sprite.position.pad == 1)
             player->auxiliarySprite[0].sprite.position.y -= 10;
         else
