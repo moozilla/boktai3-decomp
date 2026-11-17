@@ -2405,19 +2405,17 @@ static inline u8 TakePending(u8 *flag)
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
-    u32 zero;
     actor->base.field2B2 = 1;
-    zero = 0;
-    actor->base.stepDone = zero;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = zero;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.pendingControl = zero;
+    actor->base.pendingControl = 0;
 }
 
 void Dog_UpdateLeapWindup(struct ChaseActor *actor)
@@ -2827,14 +2825,12 @@ void SceneActorControl_BeginHiddenDefeat(struct ChaseActor *actor)
             u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
-            u32 zero;
             field = (void *)((u8 *)actor + fieldOffset);
             mask = ~0x141C0;
             *field &= mask;
-            zero = 0;
-            control->counter = zero;
-            control->field14 = zero;
-            control->timer = zero;
+            control->counter = 0;
+            control->field14 = 0;
+            control->timer = 0;
         }
         {
             u16 *colliderFlags = (u16 *)((u8 *)actor + 0x13A);
