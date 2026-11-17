@@ -56,7 +56,6 @@ s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct OrbitEffectPos
     s32 slot;
     struct Orb *o;
     struct OrbSprite *sa, *sb;
-    s32 zero;
     if (!m) {
         SunOrb_GetOrCreateManager();
         return -1;
@@ -75,7 +74,6 @@ s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct OrbitEffectPos
         v->y = 0;
         v->z = scale(gUnk_086149C4[angle & 255] * radius);
     }
-    zero = 0;
     F(struct OrbitEffectPosition, 0x50) = *pos;
     F(struct OrbitEffectPosition, 0x7C) = *pos;
     o->a.flags = ((o->a.flags | 2) & ~1) | 0x200;
@@ -84,7 +82,7 @@ s32 SunOrb_CreateAtPosition(struct OrbitEffectParams *cfg, struct OrbitEffectPos
     o->b.flags = ((o->b.flags | 2) & ~1) | 0x400;
     sb = &o->b;
     Sprite_LinkToList(sb, 0);
-    sa->frame = zero;
+    sa->frame = 0;
     sb->frame = 1;
     if (o->mode == 1) {
         AnimData_SelectPaletteBank(o->a.resource, 0x4F);
