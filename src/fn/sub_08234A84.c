@@ -24,15 +24,13 @@ static inline s32 rnd(u16 *table)
 void HealthRestoreEffect_InitSparkle(struct Elem *p)
 {
     u16 *table;
-    u32 zero;
     p->flags &= ~1;
     SpriteDrawable_SelectTileFrame(p, p->data, 2);
     table = gRandomTable;
     p->x = Mod(rnd(table), 80) + 24;
-    zero = 0;
     p->y = (rnd(table) & 7) + 8;
-    p->z = zero;
+    p->z = 0u;
     p->active = 1;
-    p->age = zero;
+    p->age = 0u;
     p->update = FlickerParticle_UpdateStationary;
 }
