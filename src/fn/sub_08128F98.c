@@ -27,7 +27,7 @@ static inline u32 Random(const u16 *table, u32 *rng)
 {
     u32 index = (*rng + 1) & 1023;
     *rng = index;
-    return *(const volatile u16 *)(index * 2 + (u32)table);
+    return table[index];
 }
 static inline u32 ScatterRandomByte(const u16 *table, u32 *rng)
 {
@@ -40,7 +40,7 @@ static inline u32 ScatterRandomByte(const u16 *table, u32 *rng)
     operand.cursorMask = 1023;
     index &= operand.cursorMask;
     *rng = index;
-    operand.sample = *(const volatile u16 *)(table + index);
+    operand.sample = table[index];
     return operand.sample & 255;
 }
 static inline s32 CellIndex(struct ContactPosition *p)
