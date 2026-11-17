@@ -308,8 +308,7 @@ void ActorRecoil_InitCollisionVolumes(struct RecoilCollisionActor *p)
     void *owner = p->owner;
     s32 group = p->group;
     {
-        s32 one = 1;
-        group += one;
+        group += 1;
     }
     pos.x = p->width;
     pos.y = p->height - 96;
