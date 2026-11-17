@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase.h"
 struct RecoverySequence {
     u8 pad[7];
@@ -7,26 +6,28 @@ struct RecoverySequence {
     u8 padA[4];
     u16 timer;
 };
-static inline void SaveDelay(u8 *saved, void *target, u32 behavior, u32 delay)
+static inline void SaveDelay(struct SceneActorReactionCommand *saved, void *target, u32 behavior,
+                             u32 delay)
 {
-    *(u32 *)(saved + 0xC) = delay;
-    *(void **)(saved + 0x10) = target;
-    saved[8] = 0;
-    saved[9] = 0;
-    saved[10] = behavior;
+    saved->duration = delay;
+    saved->payload = target;
+    saved->first = 0;
+    saved->second = 0;
+    saved->kind = behavior;
 }
 static inline void ClearFlags(u16 *field, u32 mask)
 {
     *field = *field & ~mask;
 }
-static inline u8 TryRoute(struct ChaseActor *actor, u8 *group)
+static inline u8 TryRoute(struct ChaseActor *actor, struct SceneActorChaseGroup *group)
 {
-    void *route = *(void **)(group + 0x1FC);
+    void *route = group->route;
     struct ContactPosition *position = &actor->base.body.position;
-    register u32 mask asm("r8") = 0x200;
+    /* Allocation-only: share the signed destination offset and motion flag. */
+    s16 mask = (u8 *)&group->destination - (u8 *)group;
     struct ContactPosition *target;
     s32 result;
-    target = *(struct ContactPosition **)(group + mask);
+    target = *(struct ContactPosition **)((u8 *)group + mask);
     result = Nav_IsPositionInMesh(route, position, target);
     if (!result) {
         ClearFlags(&actor->base.motionFlags, mask);
@@ -49,21 +50,21 @@ void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
 {
     void *body;
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct RecoverySequence *sequence;
-    body = (u8 *)actor + 0x50;
-    sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    body = &actor->base.body;
+    sequence =
+        (void *)((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
-        register u8 *reaction asm("r2") = group + 0x4C;
+        struct SceneActorRegistryControl *reaction = &group->common.control;
         {
-            register u32 *flags asm("r3") = &actor->base.behaviorFlags;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
-            asm("" : "+r"(mask) : "r"(flags), "r"(reaction));
             *flags &= mask;
         }
-        *(u32 *)(reaction + 0x18) = 0;
-        *(u16 *)(reaction + 0x14) = 0;
-        *(u16 *)(reaction + 8) = 0;
+        reaction->counter = 0;
+        reaction->field14 = 0;
+        reaction->timer = 0;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
         actor->base.restart = 0;
     }
@@ -72,26 +73,33 @@ void Mummy_ResumeSavedRouteAfterAnimation(struct ChaseActor *actor, s32 frame)
         sequence->timer = 0;
     }
     if (actor->base.restart) {
-        ((struct RecoveryCounter *)((u8 *)actor + 0xAA))->value &= 0;
+        ((struct RecoveryCounter *)&actor->base.attachmentTimer)->value &= 0;
         actor->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Chase_SetCtl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
         Chase_SetState(actor, 3, 1, 0);
         {
-            u8 *route = group + 0x74;
-            SceneBody_StartRoute(body, route, group[0x84], group[0x85], group[0x86]);
-            Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), route);
+            struct SceneActorRegistryRoute *route = &group->homeRoute;
+            SceneBody_StartRoute(body, route, group->homeRoute.routeId, group->homeRoute.parameterB,
+                                 group->homeRoute.pointId);
+            Chase_SnapToRoute(group->destination, (void *)route);
         }
         if (!TryRoute(actor, group)) {
             Chase_SetCtl(actor, (void *)SceneActorControl_OnIdle, 0);
             Chase_SetState(actor, 3, 0, 0);
         } else {
-            (*(struct ContactPosition **)(group + 0x200))->pad = 1;
+            group->destination->pad = 1;
             {
                 u32 mask = 0x10;
                 actor->base.behaviorFlags |= mask;
             }
-            SaveDelay(group + 0x8C, actor->base.onAlternateEntry, 7, 0x3C);
+            SaveDelay((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x3C);
         }
+    }
+    /* Allocation-only: retain PRE expression order before these folds die. */
+    {
+        u32 folded = (u32)frame;
+        folded += folded >> 3;
+        folded += folded >> 5;
     }
 }
