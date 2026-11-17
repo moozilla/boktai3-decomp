@@ -30,9 +30,8 @@ static inline s32 trunc12(s32 x)
 static inline void polar(struct ContactPosition *v, u32 angle, s32 speed)
 {
     s32 x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle] * speed);
 }
 void StateActor_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
@@ -127,9 +126,8 @@ void StateActor_UpdateDescendingDash(void *ctx, struct Npc *npc, s32 tick)
         }
         Actor_PlayAnimationEntry(npc, anim, 1, 0, 4);
         {
-            s32 zero = 0;
             tag->height = 300;
-            npc->phase = zero;
+            npc->phase = 0;
         }
     }
     {
