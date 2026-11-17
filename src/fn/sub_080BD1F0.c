@@ -1,4 +1,5 @@
 #include "scene_actor_behavior.h"
+#include "skeleton.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
@@ -9,7 +10,7 @@
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
  * flag 0x4000 (no reward) sparks and idles; while the context is not finished it switches to
- * SceneActorReaction_TickHiddenTimeout (revival, with the rank 20000 reward); otherwise the
+ * SceneActorReaction_TickHiddenTimeout (revival is disabled for delays above 19999); otherwise the
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
  * counter per collider reaction flag) and a six-spark burst.
  * The burst arguments live in function-scope variables and are rematerialized at each call. */
@@ -24,17 +25,8 @@ void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
-void SceneActorReaction_TickHiddenTimeout(void);
 void SceneActorRecord_RecordPair(u32, u32);
 
-struct SkeletonContext {
-    u8 unknown0[0x6D2];
-    u16 rank;
-    u16 rewardLow;
-    u16 rewardHigh;
-    u8 unknown6D8[4];
-    u32 flags;
-};
 
 static inline void Count(s16 *p)
 {
@@ -271,7 +263,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     s32 values[8];
     /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
     union {
-        struct SkeletonContext *context;
+        struct Skeleton *context;
         s32 one;
     } state = {actor->base.context};
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
@@ -400,13 +392,13 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 notHidden:
     if (actor->base.hitReactionFlags & 0x7F) {
         u32 hit = actor->base.hitAttributes & 0x100017;
-        ctxFlags = &state.context->flags;
+        ctxFlags = &state.context->actionFlags;
         if (hit)
             goto defeated;
     }
     {
         u32 m = 0x1800;
-        u32 *f = &state.context->flags;
+        u32 *f = &state.context->actionFlags;
         u32 v = *f & m;
         ctxFlags = f;
         blocked = Test(v, ~0);
@@ -446,7 +438,7 @@ notHidden:
                 Skeleton_InitVariantMotion(actor);
             }
         }
-        if (state.context->rank > 19999) {
+        if (state.context->revivalDelay > 19999) {
             u16 script = (u16)actor->base.script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
@@ -465,10 +457,10 @@ notHidden:
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-            sub_08159164(state.context->rewardHigh);
+            sub_08159164(state.context->defeatExperience);
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         } else {
-            sub_08159164(state.context->rewardLow);
+            sub_08159164(state.context->downedExperience);
         }
         {
             u32 m = 0x10;
@@ -511,7 +503,7 @@ notHidden:
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-        sub_08159164(state.context->rewardHigh);
+        sub_08159164(state.context->defeatExperience);
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
