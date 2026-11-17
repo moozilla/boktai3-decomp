@@ -123,3 +123,25 @@ combine-formed constant written before the loops scores worse (52).
   stores or early-release returns before jump2 (080AA8C4, 08101B1C). Use actual byte
   or halfword field widths to tune the measured competing live spans; jump2 shares
   the tails back to the ROM. All these allocation-only forms require phase 4 review.
+
+
+## Round 13 batch 3 recipes (2026-11-17)
+
+* A shared random-index address hoists too early: change first-pass invariant
+  moves so loop.c defers it to pass two; staged union complements and the first
+  sample offset cleared sub_0819BB18 (fact 244).
+* Call tails share incorrectly: preserve distinct post-call USE counts to keep
+  them separate (080154EC), or equal counts to let jump2 merge them (080AB968).
+  Pointer unions and bounded guards preserve the needed late boundaries (fact 245).
+* A macro's removal changes constant loads: check reload before blaming CSE.
+  Reuse a global completion scalar, then independent late-zero self-assignments
+  of the cached spark values to recover priorities (080AEE08; facts 246-247).
+* A near tie needs one definition: an impossible signed-negative arm over a
+  bounded value retains weighted definitions through allocation. Tune the real
+  competing lifetimes and, for equal priorities, declaration order (0815F5B4,
+  0817AEC8; fact 248). These forms are recorded for phase 4 review.
+
+* A callback needs an earlier address's register preference: use one union for
+  the disjoint values and retain a dead read across the later CSE block, so their
+  pseudo stays canonical (0803198C; fact 250). The first address's overlap with a
+  fixed argument excludes r0 and leaves the callback in r1.

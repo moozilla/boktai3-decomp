@@ -2904,3 +2904,81 @@ which is exactly `10:1`. Not tested.
    sides of the tie; increasing priority without checking the next competitor can
    choose a different wrong register. Repeated equivalent tails and temporary reuse
    are allocation-only wording to review in phase 4.
+
+
+244. **Changing first-pass invariant moves can put a shared address after a loop counter.**
+   sub_0819BB18 needs its random-index address to move on loop.c's second pass,
+   after the reverse-counter initialization. A symbolic resource-bank word read
+   through a union, complemented through a second union and complemented back,
+   delays CSE folding. Building the first sample offset through halfword stores
+   supplies four first-pass invariant moves. The movement threshold drops from
+   13 to 1, deferring the address until pass two. Combine removes the staging,
+   preserving the 416-byte ROM. The union-separated complement and offset are
+   allocation-only forms; ordinary double negation folds too soon.
+
+245. **Post-call USE counts can either prevent or enable late cross-jumping.**
+   AnimatedParticles_Create (080154EC) needs three whole animation-call tails,
+   while jump2 wants to share their identical final arguments and call. A pointer
+   union with byte/halfword views, an impossible signed-negative clamp, and a
+   bounded zero-offset read preserves a post-call USE. One arm has one USE and
+   another has two, so jump2 cannot merge the calls. The narrowed reads themselves
+   emit no instructions. TentacleActor_UpdateRetraction (080AB968) needs the
+   opposite: four equal Advance paths must merge after allocation. Give all four
+   the same post-call USE tail, using one caller-owned pointer union. This prevents
+   the second basic-block pass from adding a unique fallthrough USE0, and jump2
+   merges the paths while preserving their earlier absolute-value calculations.
+   These unions, guards, identities and trailing dead reads are phase 4 candidates.
+
+246. **A changed constant load may be reload rematerialization, not changed CSE sharing.**
+   Vorn_UpdateDefeat (080AEE08) has separate visible loads of one at its final
+   state stores. Both the original and unwrapped source share that constant in
+   CSE. The original statement wrappers raise its reference count so local
+   allocation chooses r4; reload spills r4 and rematerializes one at the stores.
+   Without the wrappers it can keep the constant in r5/r6. Reuse the existing
+   completion-state scalar in all three final calls instead: its global lifetime
+   recovers the rematerializations without private wrappers. Check the local and
+   global dumps before treating a new load as evidence of a missing CSE fence.
+
+247. **Independent late-zero self-assignments can replace macro reference weights.**
+   Vorn_UpdateDefeat's spark kind, spread and origin need a precise local order
+   before the global random-table value evicts one local. After the first spawn,
+   self-assign each through a different masked zero, such as `(actorWord & 255)
+   >> 8`. Flow retains the read/set references until combine erases the identity:
+   kind/spread/origin have 9/11/9 references and the ROM allocation follows.
+   The zero expressions must remain independent. Reusing the same masked zero
+   lets CSE share it; combine reduces the common definition to zero but leaves
+   six real operations on its multiple users. Distinct masks 255, 31 and 127
+   with their corresponding shifts let each whole expression fold. These three
+   identities and the reused scalars are explicitly allocation-only wording.
+
+248. **An impossible definition can adjust weighted references without an extra read.**
+   TargetRegistry_FindById (0815F5B4) loads a halfword ID before comparing it with
+   the requested ID. `if ((s32)entryId < 0) requestedId = 0` survives long enough
+   to add a loop-weighted definition, raising requestedId from three references
+   to five. Combine deletes the condition; a narrowed pointer identity adjusts
+   its live length to 31 and priority to 3225, between competing flag priorities
+   3333 and 3125. sub_0817AEC8 similarly retains a read/set of its sine pointer
+   under an impossible negative masked-radius test, raising references from six
+   to ten. Its delayed symbolic base avoids early hoisting and REG_EQUIV doubling;
+   a narrow zero extends the heading to the same priority 12000, so declaring
+   sine first settles the pseudo-order tie. All are phase 4 allocation-only forms.
+
+249. **Separate semantic lifetimes before tuning a rounded quotient's register.**
+   Hresvelgr_EmitFacingMotion (0819BCB8) reused one direction scalar for unrelated
+   vector and later facing computations, making a quantity too competitive.
+   Separate those values, keep the symbolic RNG origin, and use a constant-first
+   second polar mask. The final quotient still differs: an explicit negative
+   rounding bias followed by `q >>= 10; q <<= 10` preserves its copy and both
+   shifts in one pseudo, whereas a nested shift expression chooses r0. The
+   sampled quotient is nonnegative and combine deletes the bias guard. A forced
+   r1 diagnostic confirmed the last decision before the ordinary rewrite matched.
+
+
+250. **A reused union can carry a hard-register preference between disjoint lifetimes.**
+   sub_0803198C needs the completion callback in r1 instead of r0. Use one union
+   for the earlier wait-field address and the later callback. A dead callback
+   read beyond the mode switch makes the union canonical across the CSE block,
+   preserving both definitions in one pseudo. Its first lifetime overlaps the
+   wait constant in r0, so the later callback naturally gets r1. A one-field
+   wait view preserves the original field-store expansion. The union, typed view
+   and dead read are allocation-only forms; the 948-byte stock result is exact.
