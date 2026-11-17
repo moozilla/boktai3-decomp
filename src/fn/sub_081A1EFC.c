@@ -96,14 +96,12 @@ static inline void spawnSparks(struct HresvelgrDamage *p)
 }
 static inline void setReaction(struct HresvelgrDamage *p, void (*callback)(void *), s32 state)
 {
-    int zero;
     p->state = state;
-    zero = 0;
     p->callback = callback;
-    p->timer = zero;
+    p->timer = 0;
     p->changed = 1;
-    p->stateReset = zero;
-    p->pending = zero;
+    p->stateReset = 0;
+    p->pending = 0;
 }
 static inline void setScale(struct ShortVector *v, s16 x, s16 y, s16 z)
 {
