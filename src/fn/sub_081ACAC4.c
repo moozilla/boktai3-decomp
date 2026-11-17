@@ -28,7 +28,7 @@ void Vanargand_WaitForActionRelease(struct Vanargand *p)
     p->flags |= flag;
     Vanargand_SetPendingCue(p, 3);
     if (p->pending) {
-        (*(&p))->pending = 0;
+        p->pending = 0;
         if (p->modeF34 <= 2) {
             u16 delay = 6;
             u16 *field;
