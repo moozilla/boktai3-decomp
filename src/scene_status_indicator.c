@@ -26,24 +26,15 @@ void ScriptedParticle_RunIdleHook(void)
 
 struct SceneStatusIndicator *SceneStatusIndicator_Allocate(struct SceneStatusIndicatorManager *pool)
 {
-    s32 index = 0;
-    volatile u32 *allocated = &pool->allocated;
-    u16 one = 1;
-    u8 *kind = &pool->entries[0].slotIndex;
-    struct SceneStatusIndicator *entry = pool->entries;
-    do {
-        if (SceneStatusIndicator_IsAllocated(allocated, one, index)) {
-            kind += 0x30;
-            entry++;
-            index++;
-        } else {
-            u32 bit = one;
-            (*(&bit)) <<= index;
-            *allocated |= bit;
-            *kind = index;
+    s32 index;
+    for (index = 0; index < 12; index++) {
+        if (!SceneStatusIndicator_IsAllocated(&pool->allocated, 1, index)) {
+            struct SceneStatusIndicator *entry = &pool->entries[index];
+            pool->allocated |= 1U << index;
+            entry->slotIndex = index;
             return entry;
         }
-    } while (index <= 11);
+    }
     return NULL;
 }
 
