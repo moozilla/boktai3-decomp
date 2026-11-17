@@ -315,9 +315,8 @@ void Player_UpdateTargetMotion(struct Player *p)
                     }
                     {
                         s32 x = PlayerMotion_Scale12(gUnk_086149C4[(r0 + 0x40) & 0xFF] * r1);
-                        s32 zero = 0;
                         velocity->x = x;
-                        velocity->y = zero;
+                        velocity->y = 0;
                         velocity->z = PlayerMotion_Scale12(gUnk_086149C4[r0] * r1);
                     }
                 }
