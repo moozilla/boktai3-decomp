@@ -77,9 +77,8 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *, struct ContactPosition *,
 static inline void SetVelocity(struct ContactPosition *v, s32 angle, s32 speed)
 {
     s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
-    s32 zero = 0;
     v->x = x;
-    v->y = zero;
+    v->y = 0;
     v->z = Scale(gUnk_086149C4[angle & 255] * speed);
 }
 static inline s32 Divide64(s32 n)
@@ -151,17 +150,15 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
                     goto next;
             }
             {
-                u32 zero;
                 u32 defaults;
                 scatter->y = difference << 8;
-                zero = 0;
                 if (!p->variant) {
                     s32 life = (((u8)Random((const u16 *)RANDOM_TABLE_ADDR, rng)) & 63) + 20;
                     defaults = 0x00013101;
-                    CreateScatter(p, scatter, &velocity, 3, life, zero, &defaults);
+                    CreateScatter(p, scatter, &velocity, 3, life, 0u, &defaults);
                 } else {
                     defaults = 0x00011101;
-                    CreateScatter(p, scatter, &velocity, 0x12, zero, zero, &defaults);
+                    CreateScatter(p, scatter, &velocity, 0x12, 0u, 0u, &defaults);
                 }
             }
         next:
