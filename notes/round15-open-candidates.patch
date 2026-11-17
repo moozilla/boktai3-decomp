@@ -1,4 +1,3 @@
-diff --git a/src/fn/sub_08014CA4.c b/src/fn/sub_08014CA4.c
 --- a/src/fn/sub_08014CA4.c
 +++ b/src/fn/sub_08014CA4.c
 @@ -71,7 +71,7 @@
@@ -29,159 +28,80 @@ diff --git a/src/fn/sub_08014CA4.c b/src/fn/sub_08014CA4.c
                          cursor += 8;
                          velocity++;
                          speedOut++;
-diff --git a/src/fn/sub_08071F50.c b/src/fn/sub_08071F50.c
---- a/src/fn/sub_08071F50.c
-+++ b/src/fn/sub_08071F50.c
-@@ -1,71 +1,46 @@
- #include "scene_actor_palette.h"
- #include "scene_actor_placement.h"
--static inline u8 Test(u32 value, u32 mask)
+--- a/src/slime.c
++++ b/src/slime.c
+@@ -228,70 +228,11 @@
+
+ // confidence=low: plays profile animation 15 with a random duration, then enters the next Slime control.
+
+-static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index, u32 variant,
+-                                             u32 inputFlags)
 -{
--    if (value & mask)
--        return TRUE;
--    return FALSE;
--}
-+#include "scene_actor_status.h"
- static inline u8 TestManagerFlag(struct SceneActorPaletteManagerView *manager, u32 mask)
- {
-     if (manager->flags & mask)
-         return TRUE;
-     return FALSE;
- }
--static inline u32 ReadMasked(u32 mask, u32 *field)
-+static inline void BindPalette(struct RoomActor *actor, const u16 *colors)
- {
--    return *field & mask;
-+    if (ActorStatus_BehaviorFlags(actor, 0x02008000))
-+        return;
-+    if (actor->drawableKind == 0)
-+        ((struct SceneActorPaletteSequenceView *)actor->drawable)->palette = colors;
-+    else
-+        ((struct SceneActorPaletteTileView *)actor->drawable)->palette = colors;
- }
--static inline u16 Remaining(struct SceneActorPaletteTransition *transition)
-+static inline void AdvancePaletteTransition(struct SceneActorPaletteTransition *transition)
- {
--    struct SceneActorPaletteTransition *low = transition;
--    return low->remaining;
-+    s32 i;
-+    for (i = 0; i < 16; i++) {
-+        transition->red[i] += transition->deltaRed[i];
-+        transition->green[i] += transition->deltaGreen[i];
-+        transition->blue[i] += transition->deltaBlue[i];
-+        transition->colors[i] = (transition->red[i] >> 5) |
-+                                ((u32)(transition->green[i] >> 5) << 5) |
-+                                ((u32)(transition->blue[i] >> 5) << 10);
-+    }
-+    transition->remaining--;
- }
--static inline void BindPalette(struct ChaseActor *actor,
--                               struct SceneActorPaletteTransition *inputTransition)
-+
-+u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *manager,
-+                                      struct ChaseActor *actor)
- {
--    struct SceneActorPaletteTransition *transition = inputTransition;
--    if (actor->base.drawableKind == 0) {
--        void *drawable = actor->base.drawable;
--        const u16 *colors;
--        colors = transition->colors;
--        ((struct SceneActorPaletteSequenceView *)drawable)->palette = colors;
+-    struct SceneActorProfileEntry *entry =
+-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
+-    u32 selection = entry->value;
+-    u32 flags = inputFlags;
+-    u32 force;
+-    u8 *restart;
+-    if (flags & 0x10) {
+-        force = 0x10;
+-        flags &= ~0x10;
+-    } else
+-        force = 0;
+-    if (!actor->drawableKind) {
+-        struct SceneActorAnimationSequenceDrawable *drawable;
+-        actor->animationIndex = selection;
+-        drawable = actor->drawable;
+-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, selection, variant, flags);
+-        restart = &actor->restart;
 -    } else {
--        void *drawable = actor->base.drawable;
--        const u16 *colors;
--        colors = transition->colors;
--        ((struct SceneActorPaletteTileView *)drawable)->palette = colors;
+-        struct SceneActorAnimationTile *tile =
+-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+-        u8 *selectionAddress;
+-        u32 previous;
+-        u8 *savedSelection;
+-        selection += variant;
+-        selectionAddress = &actor->animationIndex;
+-        previous = *selectionAddress;
+-        savedSelection = selectionAddress;
+-        restart = &actor->restart;
+-        if (!force && previous == selection && !*restart) {
+-            if (flags == 1 && (tile->flags & 4))
+-                return;
+-            if (flags == 0 && !(tile->flags & 4))
+-                return;
+-        }
+-        *savedSelection = selection;
+-        {
+-            u32 mask = 4;
+-            u32 mode;
+-            if (flags & mask)
+-                mode = 6;
+-            else
+-                mode = 4;
+-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
+-                              actor->drawable, (u16)selection, 2, mode);
+-            {
+-                u8 playbackFlags = flags;
+-                if (playbackFlags & 1)
+-                    tile->flags |= mask;
+-                else
+-                    tile->flags &= ~4;
+-            }
+-        }
 -    }
+-    *restart = 0;
 -}
--u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *inputManager,
--                                      struct ChaseActor *inputActor)
--{
--    struct SceneActorPaletteManagerView *manager = inputManager;
-     struct SceneActorPaletteTransition *transition;
--    struct ChaseActor *actorInput = inputActor;
--    struct ChaseActor *actor;
-     u32 alreadyAdvanced;
-     u32 category;
--    u32 categoryFlags;
-     u32 flagSet;
--    s32 i;
--    /* Allocation-only: declaration order preserves the six spilled channel homes. */
--    s8 *deltaRed;
--    s16 *red;
--    s8 *deltaGreen;
--    s16 *green;
--    u32 *actorFlags;
--    s16 *blue;
--    actor = actorInput;
-     if (SceneActorPlacement_IsUnavailable(&actor->base))
-         goto failure;
--    {
--        u32 mask = 0x2000;
--        struct SceneActorPaletteManagerView *low = manager;
--        categoryFlags = low->flags;
--        if (!Test(categoryFlags, mask))
--            goto failure;
--    }
-+    if (!TestManagerFlag(manager, 0x2000))
-+        goto failure;
-     alreadyAdvanced = 0;
-     category = actor->base.category;
-     if (category == 10)
-@@ -81,32 +56,12 @@
- selected:
-     if (flagSet)
-         alreadyAdvanced = 1;
--    if (!Remaining(transition)) {
--        if (!ReadMasked(0x02008000, &actor->base.behaviorFlags))
--            BindPalette(actor, transition);
-+    if (!transition->remaining) {
-+        BindPalette(&actor->base, transition->colors);
-         goto success;
-     }
--    actorFlags = &actor->base.behaviorFlags;
-     if (!alreadyAdvanced) {
--        i = 0;
--        red = transition->red;
--        deltaRed = transition->deltaRed;
--        green = transition->green;
--        deltaGreen = transition->deltaGreen;
--        blue = transition->blue;
--        do {
--            s32 blueSum;
--            /* Allocation-only: the bounded term folds after loop strength reduction. */
--            u32 halfOffset = (i + ((u16)i >> 16)) * 2;
--            (*(s16 *)((u32)red + halfOffset)) += deltaRed[i];
--            (*(s16 *)((u32)green + halfOffset)) += deltaGreen[i];
--            blueSum = (*(s16 *)((u32)blue + halfOffset)) += transition->deltaBlue[i];
--            transition->colors[i] = ((*(s16 *)((u32)red + halfOffset)) >> 5) |
--                                    ((u32)((*(s16 *)((u32)green + halfOffset)) >> 5) << 5) |
--                                    ((u32)((s16)blueSum >> 5) << 10);
--            i++;
--        } while (i < 16);
--        transition->remaining--;
-+        AdvancePaletteTransition(transition);
-         switch (category) {
-             case 23: {
-                 u32 mask = 0x8000;
-@@ -120,14 +75,8 @@
-             }
-         }
-     }
--stepFinished: {
--    u32 mask = 0x02008000;
--    u32 *field;
--    field = actorFlags;
--    if (!(*field & mask))
--        BindPalette(actor, transition);
--}
--    if (!Remaining(transition))
-+    BindPalette(&actor->base, transition->colors);
-+    if (!transition->remaining)
-         goto success;
- failure:
-     return 0;
-diff --git a/src/fn/sub_0815F5B4.c b/src/fn/sub_0815F5B4.c
+-
+ void Slime_UpdateRandomWait(struct ChaseActor *actor)
+ {
+     if (Slime_TakePrepared(actor)) {
+         u32 index;
+-        Slime_SelectWaitAnimation((void *)actor, 15, 0, 0);
++        SceneActorTurn_SelectProfileAnimation((void *)actor, 15, 0, 0);
+         index = (gRandomIndex + 1) & 1023;
+         gRandomIndex = index;
+         {
 --- a/src/fn/sub_0815F5B4.c
 +++ b/src/fn/sub_0815F5B4.c
 @@ -18,32 +18,27 @@
@@ -223,10 +143,9 @@ diff --git a/src/fn/sub_0815F5B4.c b/src/fn/sub_0815F5B4.c
              } while (entry);
          }
      }
-diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
 --- a/src/fn/sub_081A0BC8.c
 +++ b/src/fn/sub_081A0BC8.c
-@@ -1,18 +1,17 @@
+@@ -1,18 +1,18 @@
  #include "global.h"
 
  #include "engine.h"
@@ -235,6 +154,7 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
 -} __attribute__((aligned(4)));
 +#include "scene_input_widget.h"
 +#include "monster_particle_random.h"
++#include "terrain_sampling.h"
  struct Action {
 -    u8 state, pad[3];
 -    u32 frame;
@@ -250,7 +170,7 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
      u8 pad5C[0x40];
      u32 flags;
      u8 padA0[8];
-@@ -22,20 +21,17 @@
+@@ -22,20 +22,17 @@
      u8 padB2[0x1a];
      u8 targetHeading;
      u8 padCD[0x43];
@@ -278,17 +198,27 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
  };
  void ActionState_Reset(void *);
  void ActionState_SetState(void *, u32);
-@@ -68,20 +64,13 @@
+@@ -43,7 +40,6 @@
+ void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
+ void Actor_SetHeadingVelocity(void *, u32);
+ void Hresvelgr_SpawnProjectile(void *, u32, u32);
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ static inline s32 FacingSector4(s16 angle)
+ {
+     return (angle + 96) >> 6;
+@@ -68,78 +64,40 @@
          p->direction8 = mask;
      }
  }
 -static inline s32 RandomValue(const u16 *table)
--{
++static inline s16 ScatterOffset(s32 sample)
+ {
 -    u32 offset;
 -    gRandomIndex = (gRandomIndex + 1) & 1023;
 -    offset = gRandomIndex * 2;
 -    return *(const u16 *)((u32)table + offset);
--}
++    return (sample >> 3) % 512;
+ }
 -static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
 +static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
  {
@@ -297,34 +227,45 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
      p->z = z;
  }
 -static inline s32 CellIndex(struct Vec *p)
-+static inline s32 CellIndex(struct ContactPosition *p)
- {
-     s32 x = p->x >> 8, z = p->z >> 8;
-     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-@@ -95,7 +84,7 @@
-         return p + 4;
-     return (cell * 4 + 12) + gTerrainMap->cells;
- }
--static inline s32 Height(struct Vec *p)
-+static inline s32 Height(struct ContactPosition *p)
- {
-     u8 *cell = CellProperties(CellIndex(p));
-     u32 shape = *cell >> 4;
-@@ -110,36 +99,30 @@
-     }
-     return height;
- }
--static inline u32 *EnableFlags(struct Hresvelgr *actor, u32 mask)
 +static inline void EnableFlags(struct Hresvelgr *actor, u32 mask)
  {
+-    s32 x = p->x >> 8, z = p->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
++    actor->flags |= mask;
+ }
+-static inline u8 *CellProperties(s32 cell)
++static inline void SetPaletteBank(struct Hresvelgr *actor, u32 mask)
+ {
+-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+-    if (p)
+-        return p + 4;
+-    return (cell * 4 + 12) + gTerrainMap->cells;
+-}
+-static inline s32 Height(struct Vec *p)
+-{
+-    u8 *cell = CellProperties(CellIndex(p));
+-    u32 shape = *cell >> 4;
+-    s32 height = (*cell & 15) << 8;
+-    switch (shape) {
+-        case 1:
+-            height -= *(u8 *)&p->z;
+-            break;
+-        case 2:
+-            height -= *(u8 *)&p->x;
+-            break;
+-    }
+-    return height;
+-}
+-static inline u32 *EnableFlags(struct Hresvelgr *actor, u32 mask)
+-{
 -    u32 *p = &actor->flags;
 -    *p |= mask;
 -    return p;
-+    actor->flags |= mask;
- }
+-}
 -static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
-+static inline void SetPaletteBank(struct Hresvelgr *actor, u32 mask)
- {
+-{
 -    actor->collisionMask = mask;
 +    actor->animation.paletteBank = mask;
  }
@@ -355,7 +296,7 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
              if (action->frame > 128) {
                  if (!actor->side)
                      SetVector(&actor->position, 1024, 512, target->z);
-@@ -149,34 +132,29 @@
+@@ -149,44 +107,36 @@
              } else
                  action->frame++;
              break;
@@ -392,16 +333,21 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
 -                    s32 rawX = RandomValue(table);
 +                    s32 rawX = ParticleRandom_ReadDirectSample(table);
                      s32 px = actor->position.x;
-                     // Not `% 512`: as the whole right-hand side, expand_divmod would
-                     // compute the quotient in x itself. Here the division is a
-                     // subexpression, so the quotient gets its own register, as in the ROM.
-                     s32 x = (rawX >> 3) - ((rawX >> 3) / 512) * 512;
+-                    // Not `% 512`: as the whole right-hand side, expand_divmod would
+-                    // compute the quotient in x itself. Here the division is a
+-                    // subexpression, so the quotient gets its own register, as in the ROM.
+-                    s32 x = (rawX >> 3) - ((rawX >> 3) / 512) * 512;
 -                    s32 rawZ = RandomValue(table);
++                    s32 x = ScatterOffset(rawX);
 +                    s32 rawZ = ParticleRandom_ReadDirectSample(table);
                      s32 pz = actor->position.z;
                      u32 height;
-                     SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
-@@ -186,7 +164,7 @@
+-                    SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
+-                    height = Height(&pos) - 256;
++                    SetVector(&pos, px + x - 256, 0x2000, pz + ScatterOffset(rawZ) - 256);
++                    height = Terrain_SampleHeight(&pos) - 256;
+                     if (height <= 0x6ff)
+                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
                  }
                  {
                      u32 direction =
@@ -410,7 +356,7 @@ diff --git a/src/fn/sub_081A0BC8.c b/src/fn/sub_081A0BC8.c
                      if (direction == 0 && actor->position.x > 0x1400)
                          ActionState_AdvanceState(action);
                      else if (direction == 1 && actor->position.z > 0x1400)
-@@ -195,12 +173,9 @@
+@@ -195,12 +145,9 @@
              }
              break;
          case 2:
