@@ -55,12 +55,10 @@ static inline int choose(u32 mode, int normal, int alternate)
 }
 static inline int add(struct ContactPosition *a, struct ContactPosition *b)
 {
-    int zero;
     a->x += b->x;
-    zero = 0;
     a->y += b->y;
     a->z += b->z;
-    return zero;
+    return 0;
 }
 void SceneActors_UpdateSwarmAttack(ActorAnimation *p, int tick)
 {
