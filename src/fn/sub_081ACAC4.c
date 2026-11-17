@@ -31,14 +31,9 @@ void Vanargand_WaitForActionRelease(struct Vanargand *p)
         p->pending = 0;
         if (p->modeF34 <= 2) {
             u16 delay = 6;
-            u16 *field;
-            u16 *new_var;
             p->counterF1C = 0;
-            new_var = &p->delayF20;
-            field = new_var;
-            *field = delay;
-            field++;
-            *field = delay;
+            p->delayF20 = delay;
+            p->delayF22 = delay;
             p->counterF18 = 0;
         }
         p->phase = 0;
