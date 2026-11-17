@@ -2168,15 +2168,9 @@ void Vorn_InitMotionLimits(struct PInitMotionLimits *p)
 static inline u8 Vorn_TryRoute(struct ChaseActor *actor, void *route,
                                struct ContactPosition *position, struct ContactPosition *target)
 {
-    s32 result = ({
-        void *route_owner_ = (route);
-        struct ContactPosition *route_position_ = (position);
-        struct ContactPosition *route_target_ = (target);
-        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);
-        if (route_status_)
-            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);
-        route_status_;
-    });
+    s32 result = Nav_IsPositionInMesh(route, position, target);
+    if (result)
+        result = Terrain_ApplyBlocked(route, position, target);
     if (result) {
         if (result != 2)
             Memory_Clear(SceneActorChase_MotionOf(actor), 8);
