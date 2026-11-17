@@ -28,12 +28,9 @@ void SceneInventory_BeginItemSpecialMove(struct SceneInventoryActionView *panel)
         frameOut[1] = placeholder;
         attributeOut = attributes;
         attributeOut[1] = savedAttribute;
-        {
-            struct SceneInputPosition *start = starts;
-            (*(&start))[1].x = 0;
-            start[1].y = 0;
-            start[1].z = 0;
-        }
+        starts[1].x = 0;
+        starts[1].y = 0;
+        starts[1].z = 0;
         target[1].x = 0;
         target[1].y = 0;
         target[1].z = 0;
