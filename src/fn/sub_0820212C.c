@@ -3,11 +3,6 @@
 #include "engine_globals.h"
 #include "player_cue_sequence.h"
 #include "terrain_cell_probe.h"
-struct ScriptActorSequence {
-    const volatile u16 *commands;
-    u8 flags, count, weight, duration;
-    u16 index, unused, speed, elapsed;
-};
 struct ScriptActor {
     u8 unknown0[0x1c];
     struct SceneVec origin;
@@ -15,7 +10,7 @@ struct ScriptActor {
     struct SceneVec position;
     u8 unknown48[8], animation[0x1c], passiveCollider[0x54], bodyCollider[0x54], body[0x48];
     void (*action)(void);
-    struct ScriptActorSequence playback;
+    struct DisplaySequenceState playback;
     s32 attackDistance;
     s16 attackA, attackB, attackC;
     u8 unknown17A[2];
@@ -207,7 +202,7 @@ s32 ScriptCombatActor_InitializeFromScript(struct ScriptActor *p, void *parent)
     }
     {
         struct ContactSwarmSprite *frameSprite = sprite;
-        ScriptActor_StepAnimation(p, frameSprite, (struct DisplaySequenceState *)&p->playback);
+        ScriptActor_StepAnimation(p, frameSprite, &p->playback);
     }
     {
         s16 *initialDead = &p->initialDead;
