@@ -15,12 +15,12 @@ struct MotionTargets {
     u8 task[0x18];
     struct MotionTarget *first;
 };
-// MATCHING_CONCESSION: register-pinning
 
 struct MotionTarget *TargetRegistry_FindById(u32 id)
 {
-    register u32 requestedId asm("r3") = id;
+    u32 requestedId = id;
     struct MotionTargets *registry = gSceneLinkList;
+    registry = (struct MotionTargets *)((u32)registry | ((u16)((u8)(u32)registry << 8) >> 16));
     if (registry) {
         struct MotionTarget *entry = registry->first;
         /* An ID mismatch repeats the same entry, as in the original routine. */
@@ -33,6 +33,8 @@ struct MotionTarget *TargetRegistry_FindById(u32 id)
                 if (!sceneActor)
                     goto actorId;
                 entryId = entry->target.collider->collisionId;
+                if ((s32)entryId < 0)
+                    requestedId = 0;
             compareId:
                 if (entryId != requestedId)
                     continue;
