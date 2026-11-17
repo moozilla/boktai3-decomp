@@ -188,6 +188,28 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("int f(void) {\n    unsigned int one = 1;\n    return one;\n}\n"),
                          ["const-local"])
 
+    def test_const_local_number_names(self):
+        for decl in ("u32 zeroX = 0;", "u32 two = 2;", "int four;", "s32 minusOne = -1;", "u32 one_ = 1;"):
+            with self.subTest(decl=decl):
+                self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), ["const-local"])
+        for decl in ("u32 zeroed;", "u32 oneshot;", "u32 tenth;"):
+            with self.subTest(decl=decl):
+                self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
+
+    def test_literal_local_is_never_changed(self):
+        self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
+                         ["literal-local"])
+        # a counter, an accumulator, something passed by address, and a later scope's own variable
+        for body in ("    int i = 0;\n    while (i < 4)\n        g(i++);\n",
+                     "    u32 sum = 0;\n    sum += a;\n    g(sum);\n",
+                     "    u32 out = 0;\n    h(&out);\n    g(out);\n",
+                     "    s32 state = 1;\n    if (a)\n        state = 2;\n    g(state);\n"):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 a) {\n" + body + "}\n"), [])
+        # only the block the declaration is in counts
+        self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
+                         ["literal-local"])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
@@ -251,6 +273,13 @@ class Compiler(unittest.TestCase):
         for body in bodies:
             with self.subTest(body=body):
                 self.assertEqual(self.kinds_of(body), [])
+
+    def test_signed_division_sign_correction_is_not_a_zero_proof(self):
+        # (sample >> 3) % 2 on a halfword read as s32: expand_divmod's shifts by 31 are always
+        # zero, the remainder is not. A shift the C wrote that is zero still reports.
+        head = "extern u16 gHalf;\nstatic inline s32 sample(void) { return gHalf; }\n"
+        self.assertEqual(self.kinds_of(head + "void f(void) {\n    g((sample() >> 3) % 2);\n}\n"), [])
+        self.assertEqual(self.kinds_of(head + "void f(void) {\n    g((sample() >> 16) % 2);\n}\n"), ["proved-zero"])
 
     def test_real_zero_proofs_survive_volatile_reads(self):
         for expression in ("(*(volatile u16 *)0x04000128 & 31) >> 5",
