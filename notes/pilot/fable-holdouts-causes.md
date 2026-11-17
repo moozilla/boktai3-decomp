@@ -145,3 +145,24 @@ combine-formed constant written before the loops scores worse (52).
   the disjoint values and retain a dead read across the later CSE block, so their
   pseudo stays canonical (0803198C; fact 250). The first address's overlap with a
   fixed argument excludes r0 and leaves the callback in r1.
+
+
+## Round 13 batch 4 recipes (2026-11-17)
+
+* A needed low spill register is missing: a bounded unreachable arm can request
+  it before jump2, while preserving the final real loads (0820EE34; fact 251).
+* A table's copy survives but still loses its loop register: remove REG_EQUIV,
+  then measure and restore its reference weight with independent late identities
+  without changing direct sample modes (08234540; fact 252).
+* An unused saved high register is missing: bounded dead global carriers retain
+  a reload home. A nested condition distinguishes global quantities from local
+  callee homes; dead low results can control scratch rotation (08038448; fact 254).
+* A value needs one argument register: an unreachable call can supply its copy
+  preference, provided its exit rejoins the original control flow (081A14FC; fact 255).
+* PRE inserts the right expressions in the wrong order: inspect its stock hash
+  bucket count. Two dead unsigned folds change 141 to 145 and restore Mummy's
+  spill order; all folds vanish before output (080D1784; fact 256).
+* Pins reserve registers across a large state machine: reuse disjoint values in
+  unions, then retain a bounded exit lifetime and a cross-block zero reference.
+  This preserves Skeleton's sb/r8/sl values and spills the shared origin (080BD1F0;
+  fact 257). All listed forms are allocation-only phase 4 review items.

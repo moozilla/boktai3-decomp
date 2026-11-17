@@ -2982,3 +2982,72 @@ which is exactly `10:1`. Not tested.
    wait constant in r0, so the later callback naturally gets r1. A one-field
    wait view preserves the original field-store expansion. The union, typed view
    and dead read are allocation-only forms; the 948-byte stock result is exact.
+
+251. **A bounded dead arm can admit a low register into reload's spill set.**
+   OrangeSpine_ApplyHitReaction (0820EE34) needs r3 available for the health loads.
+   Reuse the input parameters for the response bits and destination first. After
+   loading maximum health, widen the unsigned health halfword into `raw` and use
+   `if ((s32)raw < 0)` around two additional signed field reads. Combine removes
+   the test, but the unreachable reads request r3 while r0/r1/r2 are occupied.
+   Reload admits r3 before jump2 deletes the arm. All 424 bytes match; the
+   parameter reuse, guard and dead reads are allocation-only phase 4 items.
+
+252. **An undoubled table still needs enough references to win its loop register.**
+   SpiralBurst_InitParticles (08234540) first forms its symbolic table with
+   `(u32)gRandomTable & ~(phase >> 8)`, where phase is a byte. This preserves the
+   required table copy without REG_EQUIV. Two in-loop self-identities using
+   independent zero masks then give table 19 refs / 156 live / priority 4,871,
+   ahead of sprite 4,444 and burst 3,657. The original five direct random draws
+   must remain: inserting a sample macro changes the fourth draw's regmove tie
+   and the final small mask's mode. The late constant and identities are
+   allocation-only; the 428-byte stock result is exact.
+
+253. **Resolve equivalent-pointer penalties, equal-priority order and late conflicts separately.**
+   Spider_UpdateWanderGoal (080A4018) first needs symbolic bit-clears to remove
+   REG_EQUIVs from its random table, cursor and mask. Declaring the goal pointer
+   before the mesh resolves the remaining equal-priority ownership; an s16
+   route result lets the input win its register. Finally, independent late zeros
+   in the real flag test retain mask/cursor references across the branch.
+   Their priorities become 685 and 659, giving sb/sl. These width, order and
+   identity choices are allocation-only; the full 15,172-byte spider unit matches.
+
+254. **A dead global carrier can explain a saved high register with no final use.**
+   WirelessGameMenu_InitEquipmentChoices (08038448) saves sl although its final
+   body does not use it. A negative guard over an unsigned halfword keeps a dead
+   arm through reload. Four word values cross a dead Mod call; a nested condition
+   makes them global quantities, avoiding local callee homes that alter find_reg's
+   first pass. Reload's mark_home_live retains the sl save. Two dead arithmetic
+   results and their destination occupy the low registers, selecting scratch r3
+   and rotating the later seed-pointer reload to r0. Jump2 erases the entire arm.
+   The guard, call, arithmetic, stores and word overlay are allocation-only forms.
+
+255. **A dead call argument can supply a copy preference without a live value across the call.**
+   sub_081A14FC needs sampleY in r3. An impossible negative-side-byte arm passes
+   sampleY as argument four to MotionEntry_CreateWithDelta, then jumps to the
+   existing pulse join after the real call. The argument copy gives the needed
+   preference; jump2 deletes the fallback. An explicit return changes PRE and
+   does not match. Separately, an unsigned random sample's negative guard keeps
+   rawY live through its shift and raises table priority. Both guards and the
+   fallback call are allocation-only; all 1,764 stock bytes match.
+
+256. **Dead expansion instructions can affect PRE through the expression hash-table size.**
+   Mummy_ResumeSavedRouteAfterAnimation (080D1784) has the right expressions but
+   wrong spill-slot order. gcse.c sizes its expression table as `(n_insns / 2) | 1`;
+   the diagnostic AGBCC_GCSE_T=145 proves the bucket count is decisive. Two dead
+   unsigned tail folds raise the stock table from 141 to 145 buckets, changing
+   expression traversal and reproducing PRE's original insertion order. Flow
+   deletes the folds. Keep the existing typed group-relative bases and the signed
+   destination offset reused as the 0x200 motion flag. Both forms are allocation-only.
+
+257. **Disjoint value reuse plus bounded exit uses can reproduce a pin's global pressure.**
+   Skeleton_UpdateDefeat (080BD1F0) needs two burst constants in sb/r8 and its
+   second random table in sl, leaving the shared position origin spilled. Two
+   unions reuse context/one and flags-pointer/one. Initialize the second table
+   from the actor after the collision-timer call, then retain it in negative
+   guards over an unsigned byte and a masked pointer on the other exits.
+   A zero term in the first real sound argument keeps the response/table conflict
+   across the branch. Response, state and table now have priorities 747, 636 and
+   540; the shared origin at 254 spills. The initial copy and both dead sound
+   arms disappear. All 7,924 bytes match. The unions, initializer, guards and
+   zero term are allocation-only; numeric statistics selectors were also replaced
+   by checked, named fields in enemy_defeat_statistics.h.

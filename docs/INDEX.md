@@ -461,6 +461,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round13-batch1_2026-11-16.md](../notes/round13-batch1_2026-11-16.md) | Round 13, batch 1: eight concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch2_2026-11-16.md](../notes/round13-batch2_2026-11-16.md) | Round 13, batch 2: six more concessions removed | #matching #depin #compiler #round13 | 5 |
 | [notes/round13-batch3_2026-11-17.md](../notes/round13-batch3_2026-11-17.md) | Round 13, batch 3: eight more concessions removed | #matching #depin #compiler #round13 | 6 |
+| [notes/round13-batch4_2026-11-17.md](../notes/round13-batch4_2026-11-17.md) | Round 13, batch 4: seven more concessions removed | #matching #depin #compiler #round13 | 4 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
 | [notes/round2-sol.md](../notes/round2-sol.md) | Sol production round 2 |  | 5 |
