@@ -1,6 +1,6 @@
 #include "global.h"
+#include "player.h"
 
-extern struct Sub0802592CPlayer *gUnknown_02000580[];
 extern u32 gUnk_02000560;
 
 s32 Callback_InvokeActor(void *arg, void *function);
@@ -12,13 +12,6 @@ void DamageNumberDisplay_Show(void *, s32, s32, void *, void *, s32);
 void sub_08022694(void *);
 void Sound_PlaySongChecked(u32);
 u32 Player_GetInputDirection(void *);
-
-struct Sub0802592CPlayer {
-    u8 unk0[0x418];
-    u8 unk418;
-    u8 unk419[0x4F4 - 0x419];
-    u8 unk4F4;
-};
 
 struct Sub0802592CSize {
     s32 x : 16, y : 16, z : 16, pad : 16;
@@ -44,7 +37,7 @@ struct Sub0802592CActor {
     void *unk104;
     void *unk108;
     union {
-        struct Sub0802592CPlayer *players[69];
+        struct Player *players[69];
         struct {
             u32 unknown;
             struct Sub0802592CPair *positions[68];
@@ -102,7 +95,7 @@ static inline u8 SceneTrail_DirectionToAngle(u8 direction)
 void sub_0802592C(struct Sub0802592CActor *base, s32 param)
 {
     struct Sub0802592CActor *actor = base;
-    struct Sub0802592CPlayer *q;
+    struct Player *q;
     struct Sub0802592CSize size;
     s32 idx;
     s32 state;
@@ -119,7 +112,7 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
     if (base->unkB1) {
         base->unkB1 = 0;
         idx = (s8)SceneTrail_TargetIndex(base);
-        state = gUnknown_02000580[idx]->unk418;
+        state = gPlayers[idx]->actionMode;
         switch (state) {
             case 0:
             default:
@@ -165,10 +158,10 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
         }
         SceneTrail_CopySavedPosition(actor);
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,
+        Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,
                                     2);
         if ((s8)actor->unk395 >= 0) {
-            v = base->targets.players[(s8)actor->unk395]->unk4F4;
+            v = base->targets.players[(s8)actor->unk395]->facingChangeEffects;
             actor->unk396 = v;
             actor->unk397 = v;
         }
@@ -179,7 +172,7 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
     cb = (u8)Callback_InvokeActor(base, base->unk104);
     if (cb != 0) {
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,
+        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32,
                                     0, 0, 0);
         return;
     }
@@ -187,21 +180,21 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
     cb2 = (u8)Callback_InvokeActor(base, base->unk108);
     if (cb2 != 0) {
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,
+        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32,
                                     0, 0, 0);
         return;
     }
 
     {
         u8 sample;
-        struct Sub0802592CPlayer **targets;
+        struct Player **targets;
         s8 *index = (s8 *)&actor->unk395;
         idx = *index;
         {
             u32 offset = idx * 4;
-            struct Sub0802592CPlayer **references = base->targets.players;
-            q = *(struct Sub0802592CPlayer **)((u8 *)references + offset);
-            sample = q->unk4F4;
+            struct Player **references = base->targets.players;
+            q = *(struct Player **)((u8 *)references + offset);
+            sample = q->facingChangeEffects;
             w = actor->unk397;
             targets = references;
         }
@@ -216,7 +209,7 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
         }
         if (actor->unk254 == 3 && actor->unk24C == 0) {
             idx = *index;
-            reqRes = Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0,
+            reqRes = Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0,
                                                  0, 0, 1, actor->unk368, 2);
             hp = actor->unk94;
             SceneActors_SetHealth(actor, hp + reqRes);
@@ -233,9 +226,9 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
 
         idx = (s8)SceneTrail_TargetIndex(actor);
         {
-            struct Sub0802592CPlayer *currentPlayer = targets[idx];
+            struct Player *currentPlayer = targets[idx];
             s32 previous = actor->unk396;
-            s32 current = currentPlayer->unk4F4;
+            s32 current = currentPlayer->facingChangeEffects;
             if (SceneTrail_WrappedDifference(current, previous) > 0xf)
                 actor->unk383 = 1;
         }
