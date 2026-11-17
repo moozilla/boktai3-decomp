@@ -69,7 +69,6 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);
     {
-        u32 dummy;
         u32 off270;
         u16 *q270;
         off270 = 0x270;
