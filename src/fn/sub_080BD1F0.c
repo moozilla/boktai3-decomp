@@ -3,6 +3,7 @@
 #include "script_utility.h"
 #include "engine.h"
 #include "runtime.h"
+#include "spark_particle.h"
 #include "enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
@@ -18,7 +19,6 @@ void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
@@ -356,7 +356,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
                     Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
         }
         {
-            struct ContactPackedVector range;
+            struct ContactPosition range;
             const u16 *table;
             u8 category;
             range.x = 80;
@@ -517,7 +517,7 @@ notHidden:
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
         RecordKill(actor, categoryp);
         {
-            struct ContactPackedVector range;
+            struct ContactPosition range;
             u8 category;
             range.x = 80;
             range.y = 60;
