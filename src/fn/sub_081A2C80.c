@@ -1,9 +1,9 @@
 #include "global.h"
+#include "player.h"
 #include "render.h"
 #include "game_state.h"
 
 // confidence=low: Hresvelgr setup: reads script keywords into the 0x358-0x372 parameter block, creates the pools, sets callbacks and animation state.
-extern u32 gUnknown_02000580[4];
 struct F2C80Block {
     u32 w[8];
 };
@@ -66,7 +66,7 @@ struct HresvelgrInit {
     void *animationCallback;
     void *damageCallback;
     void *stateCallback;
-    u32 targets[0x1A];
+    void *targets[0x1A];
     struct F2C80Block resource;
     struct HresSprite sprite;
     u8 attackCollider[0xE3];
@@ -133,10 +133,10 @@ s32 sub_081A2C80(struct HresvelgrInit *self, void *arg1)
     s32 v;
     u8 r5;
     u8 *hdr;
-    u32 *w;
-    u32 src;
+    void **w;
+    struct Player *src;
     u32 off;
-    u32 *players;
+    struct Player **players;
     u16 *targetCount;
     u8 *paletteSource;
     u8 *paletteDestination;
@@ -152,12 +152,12 @@ s32 sub_081A2C80(struct HresvelgrInit *self, void *arg1)
     if (i < count) {
         targetCount = &actor->targetCount;
         w = actor->targets;
-        players = gUnknown_02000580;
+        players = gPlayers;
         do {
             src = *players;
             if (src) {
                 w[0] = src;
-                w[1] = src + 0x30;
+                w[1] = &src->position;
             } else {
                 w[0] = 0;
                 w[1] = 0;

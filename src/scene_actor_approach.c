@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_chase_reaction.h"
@@ -264,14 +265,14 @@ static inline u8 Skeleton_ApproachTargetCell(void *obj)
             Callback_InvokeActor(actor, group->fallback);
             return 0;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))

@@ -4859,7 +4859,6 @@ struct AxeActorInit {
     struct SceneVec playerPositionF1C;
 };
 
-extern u8 *gUnknown_02000580;
 
 static inline void AxeInit_InstallPrimary(struct ChaseActor *arg0, void *cb0, s32 (*cb1)(void),
                                           void *cb2, void *cb3, void *cb4, void *hidden, void *cb5,

@@ -1,0 +1,287 @@
+{
+  "baseline_commit": "c940902f6",
+  "canonical_compiler_sha256": "84daffe956ec7d8e6745f4776e5cba3cccb1d673f402cef846ebcc7e6595def1",
+  "compiler_patch_sha256": "52b5a0cead7a2dc225446ab4f846ee9860f8f78db824a39be9c1f187650bc1b8",
+  "cases": [
+    {
+      "source": "src/fn/sub_0819FC34.c",
+      "line": 131,
+      "function": "Hresvelgr_UpdateTurningCharge",
+      "source_sha256": "13774a892dd9473d5eb3272b9f6d68c8693014aefd23f59313ae77b6127a074d",
+      "rtl": {
+        "rtl": "(insn/i 611 610 612 (set (reg:SI 279)\n        (zero_extend:SI (mem:HI (reg:SI 278) 3))) -1 (nil)\n    (nil))\n\n(insn 618 617 619 (set (reg:SI 280)\n        (ashiftrt:SI (reg:SI 264)\n            (const_int 3))) -1 (nil)\n    (nil))\n\n(insn 619 618 620 (set (reg:SI 282)\n        (ashiftrt:SI (reg:SI 280)\n            (const_int 31))) -1 (nil)\n    (nil))\n\n(insn 620 619 621 (set (reg:SI 283)\n        (lshiftrt:SI (reg:SI 282)\n            (const_int 31))) -1 (nil)\n    (nil))\n\n(insn 621 620 622 (set (reg:SI 284)\n        (plus:SI (reg:SI 280)\n            (reg:SI 283))) -1 (nil)\n    (nil))\n\n(insn 622 621 624 (set (reg:SI 281)\n        (ashiftrt:SI (reg:SI 284)\n            (const_int 1))) -1 (nil)\n    (expr_list:REG_EQUAL (div:SI (reg:SI 280)\n            (const_int 2))\n        (nil)))\n\n(insn 625 624 626 (set (reg:SI 286)\n        (ashift:SI (reg:SI 285)\n            (const_int 1))) -1 (nil)\n    (expr_list:REG_EQUAL (mult:SI (reg:SI 281)\n            (const_int 2))\n        (nil)))\n\n(insn 626 625 628 (set (reg:SI 287)\n        (minus:SI (reg:SI 280)\n            (reg:SI 286))) -1 (nil)\n    (nil))\n\n(insn 629 628 631 (set (reg:SI 289)\n        (ashift:SI (subreg:SI (reg:HI 288) 0)\n            (const_int 5))) -1 (nil)\n    (nil))\n\n(insn 632 631 634 (set (reg:SI 291)\n        (plus:SI (subreg:SI (reg:HI 290) 0)\n            (const_int -16))) -1 (nil)\n    (nil))\n",
+        "flow": "(insn/i 611 610 615 (set (reg:SI 279)\n        (zero_extend:SI (mem:HI (reg:SI 278) 3))) 15 {*zero_extendhisi2_insn} (insn_list 610 (nil))\n    (expr_list:REG_DEAD (reg:SI 278)\n        (nil)))\n\n(insn 618 617 619 (set (reg:SI 280)\n        (ashiftrt:SI (reg:SI 279)\n            (const_int 3))) 40 {ashrsi3} (insn_list 611 (nil))\n    (nil))\n\n(insn 619 618 620 (set (reg:SI 282)\n        (ashiftrt:SI (reg:SI 279)\n            (const_int 31))) 40 {ashrsi3} (nil)\n    (expr_list:REG_DEAD (reg:SI 279)\n        (nil)))\n\n(insn 620 619 621 (set (reg:SI 283)\n        (lshiftrt:SI (reg:SI 282)\n            (const_int 31))) 41 {lshrsi3} (insn_list 619 (nil))\n    (expr_list:REG_DEAD (reg:SI 282)\n        (nil)))\n\n(insn 621 620 622 (set (reg:SI 284)\n        (plus:SI (reg:SI 280)\n            (reg:SI 283))) 27 {addsi3} (insn_list 618 (insn_list 620 (nil)))\n    (expr_list:REG_DEAD (reg:SI 283)\n        (nil)))\n\n(insn 622 621 625 (set (reg:SI 281)\n        (ashiftrt:SI (reg:SI 284)\n            (const_int 1))) 40 {ashrsi3} (insn_list 621 (nil))\n    (expr_list:REG_DEAD (reg:SI 284)\n        (expr_list:REG_EQUAL (div:SI (reg:SI 280)\n                (const_int 2))\n            (nil))))\n\n(insn 625 622 626 (set (reg:SI 286)\n        (ashift:SI (reg:SI 281)\n            (const_int 1))) 39 {ashlsi3} (insn_list 622 (nil))\n    (expr_list:REG_DEAD (reg:SI 281)\n        (expr_list:REG_EQUAL (mult:SI (reg:SI 281)\n                (const_int 2))\n            (nil))))\n\n(insn 626 625 629 (set (reg:SI 287)\n        (minus:SI (reg:SI 280)\n            (reg:SI 286))) 30 {subsi3} (insn_list 625 (nil))\n    (expr_list:REG_DEAD (reg:SI 280)\n        (expr_list:REG_DEAD (reg:SI 286)\n            (nil))))\n\n(insn 629 626 632 (set (reg:SI 289)\n        (ashift:SI (reg:SI 287)\n            (const_int 5))) 39 {ashlsi3} (insn_list 626 (nil))\n    (expr_list:REG_DEAD (reg:SI 287)\n        (nil)))\n\n(insn 632 629 652 (set (reg:SI 291)\n        (plus:SI (reg:SI 289)\n            (const_int -16))) 27 {addsi3} (insn_list 629 (nil))\n    (expr_list:REG_DEAD (reg:SI 289)\n        (nil)))\n",
+        "combine": "(insn/i 611 610 615 (set (reg:SI 279)\n        (zero_extend:SI (mem:HI (reg:SI 278) 3))) 15 {*zero_extendhisi2_insn} (insn_list 610 (nil))\n    (expr_list:REG_DEAD (reg:SI 278)\n        (nil)))\n\n(insn 618 617 619 (set (reg:SI 280)\n        (ashiftrt:SI (reg:SI 279)\n            (const_int 3))) 40 {ashrsi3} (insn_list 611 (nil))\n    (expr_list:REG_DEAD (reg:SI 279)\n        (nil)))\n\n(note 619 618 620 \"\" NOTE_INSN_DELETED)\n\n(note 620 619 621 \"\" NOTE_INSN_DELETED)\n\n(note 621 620 622 \"\" NOTE_INSN_DELETED)\n\n(insn 622 621 625 (set (reg:SI 281)\n        (lshiftrt:SI (reg:SI 280)\n            (const_int 1))) 41 {lshrsi3} (insn_list 618 (nil))\n    (nil))\n\n(insn 625 622 626 (set (reg:SI 286)\n        (ashift:SI (reg:SI 281)\n            (const_int 1))) 39 {ashlsi3} (insn_list 622 (nil))\n    (expr_list:REG_DEAD (reg:SI 281)\n        (expr_list:REG_EQUAL (mult:SI (reg:SI 281)\n                (const_int 2))\n            (nil))))\n\n(insn 626 625 629 (set (reg:SI 287)\n        (minus:SI (reg:SI 280)\n            (reg:SI 286))) 30 {subsi3} (insn_list 625 (nil))\n    (expr_list:REG_DEAD (reg:SI 280)\n        (expr_list:REG_DEAD (reg:SI 286)\n            (nil))))\n\n(insn 629 626 632 (set (reg:SI 289)\n        (ashift:SI (reg:SI 287)\n            (const_int 5))) 39 {ashlsi3} (insn_list 626 (nil))\n    (expr_list:REG_DEAD (reg:SI 287)\n        (nil)))\n\n(insn 632 629 652 (set (reg:SI 291)\n        (plus:SI (reg:SI 289)\n            (const_int -16))) 27 {addsi3} (insn_list 629 (nil))\n    (expr_list:REG_DEAD (reg:SI 289)\n        (nil)))\n"
+      },
+      "baseline_commit": "c940902f6",
+      "accepted_zero_traces": [
+        "AGBCC_ZERO_TRACE\tHresvelgr_UpdateTurningCharge\tuid=620\tashiftrt\nproof:\n(ashiftrt:SI (reg:SI 279)\n    (const_int 31))\nbefore:\n\n(set (reg:SI 283)\n    (lshiftrt:SI (reg:SI 282)\n        (const_int 31)))\naccepted:\n\n(set (reg:SI 283)\n    (const_int 0))\nAGBCC_DEAD\tzero\tsrc/fn/sub_0819FC34.c\t131\tHresvelgr_UpdateTurningCharge\tashiftrt\n",
+        "AGBCC_ZERO_TRACE\tHresvelgr_UpdateTurningCharge\tuid=620\tlshiftrt\nproof:\n\n(lshiftrt:SI (reg:SI 279)\n    (const_int 31))\nbefore:\n\n(set (reg:SI 283)\n    (lshiftrt:SI (reg:SI 282)\n        (const_int 31)))\naccepted:\n\n(set (reg:SI 283)\n    (const_int 0))\nAGBCC_DEAD\tzero\tsrc/fn/sub_0819FC34.c\t131\tHresvelgr_UpdateTurningCharge\tlshiftrt\n"
+      ],
+      "canonical_and_trace_assembly_identical": true,
+      "canonical_assembly_sha256": "f4c4ada2847d1e495062367624ca07126f2111625193b09b2b7958bd2369dcc5"
+    },
+    {
+      "source": "src/fn/sub_081A9DDC.c",
+      "line": 47,
+      "function": "Vanargand_UpdateAlternatingPairAttack",
+      "source_sha256": "ba20700f7c1179ac7fac6383b62f869b7f34a17d3f640aa0b475a6a187ba86fa",
+      "rtl": {
+        "rtl": "(insn/i 96 95 97 (set (reg:SI 65)\n        (zero_extend:SI (mem:HI (reg:SI 64) 3))) -1 (nil)\n    (nil))\n\n(insn 107 106 108 (set (reg:SI 69)\n        (ashiftrt:SI (reg:SI 53)\n            (const_int 3))) -1 (nil)\n    (nil))\n\n(insn 108 107 109 (set (reg:SI 71)\n        (ashiftrt:SI (reg:SI 69)\n            (const_int 31))) -1 (nil)\n    (nil))\n\n(insn 109 108 110 (set (reg:SI 72)\n        (lshiftrt:SI (reg:SI 71)\n            (const_int 31))) -1 (nil)\n    (nil))\n\n(insn 110 109 111 (set (reg:SI 73)\n        (plus:SI (reg:SI 69)\n            (reg:SI 72))) -1 (nil)\n    (nil))\n\n(insn 111 110 113 (set (reg:SI 70)\n        (ashiftrt:SI (reg:SI 73)\n            (const_int 1))) -1 (nil)\n    (expr_list:REG_EQUAL (div:SI (reg:SI 69)\n            (const_int 2))\n        (nil)))\n\n(insn 114 113 115 (set (reg:SI 75)\n        (ashift:SI (reg:SI 74)\n            (const_int 1))) -1 (nil)\n    (expr_list:REG_EQUAL (mult:SI (reg:SI 70)\n            (const_int 2))\n        (nil)))\n\n(insn 115 114 117 (set (reg:SI 76)\n        (minus:SI (reg:SI 69)\n            (reg:SI 75))) -1 (nil)\n    (nil))\n\n(insn 117 115 120 (set (mem/s:SI (reg:SI 68) 2)\n        (reg:SI 76)) -1 (nil)\n    (nil))\n",
+        "flow": "(insn/i 96 95 101 (set (reg:SI 65)\n        (zero_extend:SI (mem:HI (reg:SI 64) 3))) 15 {*zero_extendhisi2_insn} (insn_list 95 (nil))\n    (expr_list:REG_DEAD (reg:SI 64)\n        (nil)))\n\n(insn 107 106 108 (set (reg:SI 69)\n        (ashiftrt:SI (reg:SI 65)\n            (const_int 3))) 40 {ashrsi3} (insn_list 96 (nil))\n    (nil))\n\n(insn 108 107 109 (set (reg:SI 71)\n        (ashiftrt:SI (reg:SI 65)\n            (const_int 31))) 40 {ashrsi3} (nil)\n    (expr_list:REG_DEAD (reg:SI 65)\n        (nil)))\n\n(insn 109 108 110 (set (reg:SI 72)\n        (lshiftrt:SI (reg:SI 71)\n            (const_int 31))) 41 {lshrsi3} (insn_list 108 (nil))\n    (expr_list:REG_DEAD (reg:SI 71)\n        (nil)))\n\n(insn 110 109 111 (set (reg:SI 73)\n        (plus:SI (reg:SI 69)\n            (reg:SI 72))) 27 {addsi3} (insn_list 107 (insn_list 109 (nil)))\n    (expr_list:REG_DEAD (reg:SI 72)\n        (nil)))\n\n(insn 111 110 114 (set (reg:SI 70)\n        (ashiftrt:SI (reg:SI 73)\n            (const_int 1))) 40 {ashrsi3} (insn_list 110 (nil))\n    (expr_list:REG_DEAD (reg:SI 73)\n        (expr_list:REG_EQUAL (div:SI (reg:SI 69)\n                (const_int 2))\n            (nil))))\n\n(insn 114 111 115 (set (reg:SI 75)\n        (ashift:SI (reg:SI 70)\n            (const_int 1))) 39 {ashlsi3} (insn_list 111 (nil))\n    (expr_list:REG_DEAD (reg:SI 70)\n        (expr_list:REG_EQUAL (mult:SI (reg:SI 70)\n                (const_int 2))\n            (nil))))\n\n(insn 115 114 117 (set (reg:SI 76)\n        (minus:SI (reg:SI 69)\n            (reg:SI 75))) 30 {subsi3} (insn_list 114 (nil))\n    (expr_list:REG_DEAD (reg:SI 69)\n        (expr_list:REG_DEAD (reg:SI 75)\n            (nil))))\n\n(insn 117 115 122 (set (mem/s:SI (reg:SI 68) 2)\n        (reg:SI 76)) 1 {*movsi_insn} (insn_list 106 (insn_list 115 (nil)))\n    (expr_list:REG_DEAD (reg:SI 76)\n        (expr_list:REG_DEAD (reg:SI 68)\n            (nil))))\n",
+        "combine": "(insn/i 96 95 101 (set (reg:SI 65)\n        (zero_extend:SI (mem:HI (reg:SI 64) 3))) 15 {*zero_extendhisi2_insn} (insn_list 95 (nil))\n    (expr_list:REG_DEAD (reg:SI 64)\n        (nil)))\n\n(insn 107 106 108 (set (reg:SI 69)\n        (ashiftrt:SI (reg:SI 65)\n            (const_int 3))) 40 {ashrsi3} (insn_list 96 (nil))\n    (expr_list:REG_DEAD (reg:SI 65)\n        (nil)))\n\n(note 108 107 109 \"\" NOTE_INSN_DELETED)\n\n(note 109 108 110 \"\" NOTE_INSN_DELETED)\n\n(note 110 109 111 \"\" NOTE_INSN_DELETED)\n\n(insn 111 110 114 (set (reg:SI 70)\n        (lshiftrt:SI (reg:SI 69)\n            (const_int 1))) 41 {lshrsi3} (insn_list 107 (nil))\n    (nil))\n\n(insn 114 111 115 (set (reg:SI 75)\n        (ashift:SI (reg:SI 70)\n            (const_int 1))) 39 {ashlsi3} (insn_list 111 (nil))\n    (expr_list:REG_DEAD (reg:SI 70)\n        (expr_list:REG_EQUAL (mult:SI (reg:SI 70)\n                (const_int 2))\n            (nil))))\n\n(insn 115 114 117 (set (reg:SI 76)\n        (minus:SI (reg:SI 69)\n            (reg:SI 75))) 30 {subsi3} (insn_list 114 (nil))\n    (expr_list:REG_DEAD (reg:SI 69)\n        (expr_list:REG_DEAD (reg:SI 75)\n            (nil))))\n\n(insn 117 115 122 (set (mem/s:SI (reg:SI 68) 2)\n        (reg:SI 76)) 1 {*movsi_insn} (insn_list 106 (insn_list 115 (nil)))\n    (expr_list:REG_DEAD (reg:SI 76)\n        (expr_list:REG_DEAD (reg:SI 68)\n            (nil))))\n"
+      },
+      "baseline_commit": "c940902f6",
+      "accepted_zero_traces": [
+        "AGBCC_ZERO_TRACE\tVanargand_UpdateAlternatingPairAttack\tuid=109\tashiftrt\nproof:\n(ashiftrt:SI (reg:SI 65)\n    (const_int 31))\nbefore:\n\n(set (reg:SI 72)\n    (lshiftrt:SI (reg:SI 71)\n        (const_int 31)))\naccepted:\n\n(set (reg:SI 72)\n    (const_int 0))\nAGBCC_DEAD\tzero\tsrc/fn/sub_081A9DDC.c\t47\tVanargand_UpdateAlternatingPairAttack\tashiftrt\n",
+        "AGBCC_ZERO_TRACE\tVanargand_UpdateAlternatingPairAttack\tuid=109\tlshiftrt\nproof:\n\n(lshiftrt:SI (reg:SI 65)\n    (const_int 31))\nbefore:\n\n(set (reg:SI 72)\n    (lshiftrt:SI (reg:SI 71)\n        (const_int 31)))\naccepted:\n\n(set (reg:SI 72)\n    (const_int 0))\nAGBCC_DEAD\tzero\tsrc/fn/sub_081A9DDC.c\t47\tVanargand_UpdateAlternatingPairAttack\tlshiftrt\n"
+      ],
+      "canonical_and_trace_assembly_identical": true,
+      "canonical_assembly_sha256": "9b9fa4a52da0ac9b2ccdba0b0bf85bc76fdec309032a4846239b821f06ddcf6d"
+    },
+    {
+      "source": "src/vorn_main.c",
+      "line": 2117,
+      "function": "Vorn_BeginPursuitRoute",
+      "source_sha256": "b42a9f1ca7f91a573b9a87f696734fa719f0715522cb3463d8f54a20073bb945",
+      "rtl": {
+        "rtl": "(insn/i 142 141 143 (set (reg:HI 75)\n        (mem/s:HI (reg/v:SI 73) 0)) -1 (nil)\n    (nil))\n\n(insn/i 143 142 144 (set (reg:SI 76)\n        (ior:SI (reg/v:SI 74)\n            (subreg:SI (reg:HI 75) 0))) -1 (nil)\n    (nil))\n\n(insn/i 150 149 151 (set (reg:SI 83)\n        (ior:SI (subreg:SI (reg:HI 81) 0)\n            (subreg:SI (reg:HI 82) 0))) -1 (nil)\n    (nil))\n\n(insn/i 152 151 153 (set (mem/s:HI (reg/v:SI 73) 0)\n        (reg:HI 84)) -1 (nil)\n    (nil))\n\n(insn 161 159 163 (set (reg:HI 87)\n        (mem/s:HI (reg:SI 86) 0)) -1 (nil)\n    (nil))\n\n(insn 163 161 165 (set (reg:HI 88)\n        (const_int -3)) -1 (nil)\n    (expr_list:REG_EQUAL (const_int -3)\n        (nil)))\n\n(insn 165 163 166 (set (reg:SI 90)\n        (subreg:SI (reg:HI 88) 0)) -1 (nil)\n    (nil))\n\n(insn 166 165 168 (set (reg:SI 89)\n        (and:SI (subreg:SI (reg:HI 87) 0)\n            (reg:SI 90))) -1 (nil)\n    (expr_list:REG_EQUAL (and:SI (subreg:SI (reg:HI 87) 0)\n            (subreg:SI (reg:HI 88) 0))\n        (nil)))\n\n(insn 168 166 170 (set (reg:HI 91)\n        (mem/s:HI (reg:SI 85) 0)) -1 (nil)\n    (nil))\n\n(insn 170 168 172 (set (reg:HI 92)\n        (const_int 0)) -1 (nil)\n    (expr_list:REG_EQUAL (const_int 0)\n        (nil)))\n\n(insn 172 170 173 (set (reg:SI 94)\n        (subreg:SI (reg:HI 92) 0)) -1 (nil)\n    (nil))\n\n(insn 173 172 175 (set (reg:SI 93)\n        (and:SI (subreg:SI (reg:HI 91) 0)\n            (reg:SI 94))) -1 (nil)\n    (expr_list:REG_EQUAL (and:SI (subreg:SI (reg:HI 91) 0)\n            (subreg:SI (reg:HI 92) 0))\n        (nil)))\n\n(insn 175 173 177 (set (reg:HI 95)\n        (subreg:HI (reg:SI 93) 0)) -1 (nil)\n    (nil))\n\n(insn 177 175 178 (set (reg:HI 96)\n        (subreg:HI (reg:SI 89) 0)) -1 (nil)\n    (nil))\n\n(insn 178 177 180 (set (reg:SI 97)\n        (ior:SI (subreg:SI (reg:HI 95) 0)\n            (subreg:SI (reg:HI 96) 0))) -1 (nil)\n    (nil))\n\n(insn 180 178 181 (set (reg:HI 98)\n        (subreg:HI (reg:SI 97) 0)) -1 (nil)\n    (nil))\n\n(insn 181 180 185 (set (mem/s:HI (reg:SI 85) 0)\n        (reg:HI 98)) -1 (nil)\n    (nil))\n",
+        "flow": "(insn/i 142 141 143 (set (reg:HI 75)\n        (mem/s:HI (reg/v:SI 39) 0)) 5 {*movhi_insn} (nil)\n    (nil))\n\n(insn/i 143 142 150 (set (reg:SI 76)\n        (ior:SI (subreg:SI (reg:HI 75) 0)\n            (reg/v:SI 74))) 36 {iorsi3} (insn_list 140 (insn_list 142 (nil)))\n    (expr_list:REG_DEAD (reg:HI 75)\n        (nil)))\n\n(insn/i 150 143 152 (set (reg:SI 83)\n        (ior:SI (reg:SI 76)\n            (subreg:SI (reg:HI 66) 0))) 36 {iorsi3} (insn_list 123 (insn_list 143 (nil)))\n    (expr_list:REG_DEAD (reg:SI 76)\n        (nil)))\n\n(note/i 152 150 154 \"\" NOTE_INSN_DELETED)\n\n(note 161 157 163 \"\" NOTE_INSN_DELETED)\n\n(insn 163 161 165 (set (reg:HI 88)\n        (const_int -3)) 5 {*movhi_insn} (nil)\n    (expr_list:REG_EQUAL (const_int -3)\n        (nil)))\n\n(insn 165 163 166 (set (reg:SI 90)\n        (subreg:SI (reg:HI 88) 0)) 1 {*movsi_insn} (insn_list 163 (nil))\n    (expr_list:REG_DEAD (reg:HI 88)\n        (expr_list:REG_EQUAL (const_int -3)\n            (nil))))\n\n(insn 166 165 181 (set (reg:SI 89)\n        (and:SI (reg:SI 83)\n            (reg:SI 90))) 34 {*andsi3_insn} (insn_list 150 (insn_list 165 (nil)))\n    (expr_list:REG_DEAD (reg:SI 83)\n        (expr_list:REG_DEAD (reg:SI 90)\n            (expr_list:REG_EQUAL (and:SI (reg:SI 83)\n                    (subreg:SI (reg:HI 88) 0))\n                (nil)))))\n\n(insn 181 166 187 (set (mem/s:HI (reg/v:SI 39) 0)\n        (subreg:HI (reg:SI 89) 0)) 5 {*movhi_insn} (insn_list 166 (nil))\n    (expr_list:REG_DEAD (reg:SI 89)\n        (expr_list:REG_DEAD (reg/v:SI 39)\n            (nil))))\n",
+        "combine": "(insn/i 142 141 143 (set (reg:HI 75)\n        (mem/s:HI (reg/v:SI 39) 0)) 5 {*movhi_insn} (nil)\n    (nil))\n\n(insn/i 143 142 150 (set (reg:SI 76)\n        (ior:SI (subreg:SI (reg:HI 75) 0)\n            (reg/v:SI 74))) 36 {iorsi3} (insn_list 140 (insn_list 142 (nil)))\n    (expr_list:REG_DEAD (reg:HI 75)\n        (nil)))\n\n(insn/i 150 143 152 (set (reg:HI 66)\n        (const_int 0)) 5 {*movhi_insn} (nil)\n    (nil))\n\n(note/i 152 150 154 \"\" NOTE_INSN_DELETED)\n\n(note 161 157 163 \"\" NOTE_INSN_DELETED)\n\n(note 163 161 165 \"\" NOTE_INSN_DELETED)\n\n(insn 165 163 166 (set (reg:SI 90)\n        (const_int -3)) 1 {*movsi_insn} (nil)\n    (expr_list:REG_EQUAL (const_int -3)\n        (nil)))\n\n(insn 166 165 181 (set (reg:SI 89)\n        (and:SI (reg:SI 76)\n            (reg:SI 90))) 34 {*andsi3_insn} (insn_list 143 (insn_list 165 (nil)))\n    (expr_list:REG_DEAD (reg:SI 76)\n        (expr_list:REG_DEAD (reg:SI 90)\n            (nil))))\n\n(insn 181 166 187 (set (mem/s:HI (reg/v:SI 39) 0)\n        (subreg:HI (reg:SI 89) 0)) 5 {*movhi_insn} (insn_list 166 (nil))\n    (expr_list:REG_DEAD (reg:SI 89)\n        (expr_list:REG_DEAD (reg/v:SI 39)\n            (nil))))\n"
+      },
+      "baseline_commit": "c940902f6",
+      "accepted_zero_traces": [
+        "AGBCC_ZERO_TRACE\tVorn_BeginPursuitRoute\tuid=166\tand\nproof:\n(and:SI (const_int 0)\n    (reg:SI 90))\nbefore:\n\n(set (reg:SI 89)\n    (ior:SI (and:SI (const_int 0)\n            (reg:SI 90))\n        (and:SI (not:SI (subreg:SI (const_int 0) 0))\n            (and:SI (reg:SI 76)\n                (reg:SI 90)))))\naccepted:\n\n(set (reg:SI 89)\n    (and:SI (reg:SI 76)\n        (reg:SI 90)))\nAGBCC_DEAD\tzero\tsrc/vorn_main.c\t2117\tVorn_BeginPursuitRoute\tand\n"
+      ],
+      "canonical_and_trace_assembly_identical": true,
+      "canonical_assembly_sha256": "3c810665f76aa0449abc7939e0aa426cb4311b977138b278840b529204133543"
+    }
+  ],
+  "counterexamples": {
+    "abstract_sampler_counterexample": {
+      "u16_sample": 8,
+      "shift_by_three": 1,
+      "signed_remainder_two": 1,
+      "hresvelgr_turn": 16,
+      "vanargand_selected": 1,
+      "synthetic_sign_shift31": 0,
+      "synthetic_logical_shift31": 0
+    },
+    "sampler_full_domain": {
+      "inputs": 65536,
+      "source_remainder_counts": {
+        "0": 32768,
+        "1": 32768
+      },
+      "all_synthetic_sign_corrections_zero": true
+    },
+    "vorn_counterexample": {
+      "entry_flags": 0,
+      "after_set4": 4,
+      "after_clear2": 4,
+      "synthetic_preservation_and0": 0
+    },
+    "vorn_full_domain": {
+      "inputs": 65536,
+      "source_result_zero_count": 0,
+      "bit2_always_set": true
+    },
+    "initial_table_counterexample": {
+      "initial_seed": 123456,
+      "table_index": 1,
+      "sample": 25215,
+      "source_remainder": 1,
+      "hresvelgr_turn": 16
+    },
+    "initial_table_remainders": {
+      "0": 512,
+      "1": 512
+    }
+  },
+  "minimal_diagnostic_controls": {
+    "remainder-sampler": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstatic inline s32 sample(void) { return gHalf; }\nu32 select(void) {\n    return (sample() >> 3) % 2;\n}\n",
+      "diagnostics": [
+        [
+          "proved-zero",
+          "build/round14-zero-origin/remainder-sampler.c",
+          5,
+          "select",
+          "ashiftrt"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/remainder-sampler.c",
+          5,
+          "select",
+          "lshiftrt"
+        ]
+      ]
+    },
+    "remainder-turn": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstatic inline s32 sample(void) { return gHalf; }\ns16 turn(void) {\n    return (((sample() >> 3) % 2) << 5) - 16;\n}\n",
+      "diagnostics": [
+        [
+          "proved-zero",
+          "build/round14-zero-origin/remainder-turn.c",
+          5,
+          "turn",
+          "ashiftrt"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/remainder-turn.c",
+          5,
+          "turn",
+          "lshiftrt"
+        ]
+      ]
+    },
+    "fullwidth-bitfield": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nstatic inline void set(struct F *p, u16 bits) { p->bits |= bits; }\nvoid clear(struct F *p) {\n    set(p, 4);\n    p->bits &= ~2;\n}\n",
+      "diagnostics": []
+    },
+    "true-shift-before-remainder": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstatic inline s32 sample(void) { return gHalf; }\nu32 select(void) {\n    return (sample() >> 16) % 2;\n}\n",
+      "diagnostics": [
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-shift-before-remainder.c",
+          5,
+          "select",
+          "ashift"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-shift-before-remainder.c",
+          5,
+          "select",
+          "ashiftrt"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-shift-before-remainder.c",
+          5,
+          "select",
+          "lshiftrt"
+        ]
+      ]
+    },
+    "true-shift-in-bitfield-store": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nvoid clear(struct F *p) {\n    p->bits = gHalf >> 16;\n}\n",
+      "diagnostics": [
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-shift-in-bitfield-store.c",
+          5,
+          "clear",
+          "ashiftrt"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-shift-in-bitfield-store.c",
+          5,
+          "clear",
+          "lshiftrt"
+        ]
+      ]
+    },
+    "true-masked-remainder": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nu32 select(void) {\n    return ((s32)gHalf & 2) % 2;\n}\n",
+      "diagnostics": [
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-masked-remainder.c",
+          4,
+          "select",
+          "and"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-masked-remainder.c",
+          4,
+          "select",
+          "ashift"
+        ],
+        [
+          "proved-zero",
+          "build/round14-zero-origin/true-masked-remainder.c",
+          4,
+          "select",
+          "lshiftrt"
+        ]
+      ]
+    },
+    "true-bitfield-zero": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef int s32;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nvoid clear(struct F *p) {\n    p->bits = 2;\n    p->bits &= ~2;\n}\n",
+      "diagnostics": []
+    }
+  },
+  "bitfield_minimizations": {
+    "bitfield-context": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef unsigned char u8;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nstruct Context { u16 cooldown, flags; };\nstatic inline void set(struct F *p, u16 bits) { p->bits |= bits; }\nvoid clear(struct Context *c) {\n    struct F *p=(void *)&c->flags;\n    c->cooldown=60;\n    set(p,4);\n    p->bits &= ~2;\n}\n",
+      "diagnostics": []
+    },
+    "bitfield-live-zero": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef unsigned char u8;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nstruct Context { u16 cooldown, flags; };\nstatic inline void set(struct F *p, u16 bits) { p->bits |= bits; }\nvoid clear(struct Context *c) {\n    struct F *p=(void *)&c->flags;\n    c->cooldown=60;\n    set(p,4);\n    p->bits &= ~2;\n    g(0);\n}\n",
+      "diagnostics": []
+    },
+    "bitfield-tested-cursor": {
+      "source": "typedef unsigned short u16; typedef short s16; typedef unsigned int u32; typedef unsigned char u8;\nextern u16 gHalf; void g(u32);\nstruct F { s16 bits : 16; };\nstruct Context { u16 cooldown, flags; };\nstatic inline void set(struct F *p, u16 bits) { p->bits |= bits; }\nstatic inline u8 has(struct F *const *cursor, u16 mask)\n{\n    u16 value = (*cursor)->bits;\n    value &= mask;\n    if (value) return 1;\n    return 0;\n}\nstatic inline u8 test(struct F *flags, u32 mask)\n{\n    u16 value = flags->bits;\n    if (value & mask) return 1;\n    return 0;\n}\nu8 clear(struct Context *c, u32 reset) {\n    struct F *flags=(void *)&c->flags;\n    if (c->cooldown) return 0;\n    if (reset != 1 && has(&flags, 4) && !test(flags, 2)) return 0;\n    c->cooldown=60;\n    set(flags,4);\n    flags->bits &= ~2;\n    g(0);\n    return 1;\n}\n",
+      "diagnostics": []
+    }
+  },
+  "canonical_replays": [
+    {
+      "source": "src/fn/sub_0819FC34.c",
+      "baseline": "c940902f6",
+      "preprocessed_source_identical": true,
+      "assembly_identical": true,
+      "traces_identical": true,
+      "preprocessed_sha256": "ee2db1f4129435982f08fa890d1bf9870be91aeb5e72b69843b86fa6b7c1b645"
+    },
+    {
+      "source": "src/fn/sub_081A9DDC.c",
+      "baseline": "c940902f6",
+      "preprocessed_source_identical": true,
+      "assembly_identical": true,
+      "traces_identical": true,
+      "preprocessed_sha256": "23508a255ed1d8fc83a5a7a9ff9a502952522009e97e3acfc0cd6384597b4489"
+    },
+    {
+      "source": "src/vorn_main.c",
+      "baseline": "c940902f6",
+      "preprocessed_source_identical": true,
+      "assembly_identical": true,
+      "traces_identical": true,
+      "preprocessed_sha256": "4120966c0dc70a70033857d0a5fad80cb63ea8186b9288a5be7f14fc05177077"
+    }
+  ],
+  "root_ordinary_field_check": {
+    "base": "99d30862c1d150abe81df639011c41c0509bca5a",
+    "case": "ordinary-signed-field",
+    "source_change": "struct VornResponseFlags: s16 bits : 16 to s16 bits",
+    "stock_result": {
+      "status": "match",
+      "candidate_bytes": 25404,
+      "target_bytes": 25404,
+      "different_byte_count": 0,
+      "extent_basis": "reviewed"
+    },
+    "proved_zero_report_persists": true,
+    "other_nonmatching_cases": [
+      "ordinary-unsigned-field",
+      "actual-owned-flag-word"
+    ],
+    "root_evidence_directory": "build/round14/vorn-flag-fields-pass",
+    "worker_compiler_diagnostics": [
+      [
+        "proved-zero",
+        "build/round14-zero-origin/vorn-ordinary-signed-field.c",
+        2117,
+        "Vorn_BeginPursuitRoute",
+        "and"
+      ]
+    ]
+  }
+}

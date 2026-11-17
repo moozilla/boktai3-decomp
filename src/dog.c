@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player.h"
 #include "dog.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_chase.h"
@@ -1337,7 +1338,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
     if (palette != 0 && palette != 2)
         return;
     position =
-        *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gUnknown_02000580[0])
+        *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gPlayers[0])
              ->target.position;
     position.y += 200;
     if (!InventorySlot_PickRandom(&context->slot, &context->kind, &context->parameter))
@@ -1367,7 +1368,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
             actor->base.reactionSoundVariant = responseValue;
     }
     context->slot = -1;
-    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     actor->base.hitOwners = 1;
     Dog_ClearResponseFlags(actor);
     responseValue = 0;
@@ -1378,7 +1379,7 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
     actor->base.field2E6 = 1;
     if (Dog_TracksPlayer(actor))
         actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     else if (!actor->base.tracking.target)
         return;
     {
@@ -1878,19 +1879,17 @@ inline static u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void Dog_UpdateDefeatDelay(u8 *s, s32 arg)
+void Dog_UpdateDefeatDelay(struct ChaseActor *actor, s32 frame)
 {
-    u8 *part = s + 0x3D4;
-    s32 zero;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    s32 off;
-    if (TakeFlag(s + 0x2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         u32 test;
         u16 *flags;
         u32 value;
-        SceneActorAnimation_SelectDirectionalEntry(s, 6);
+        SceneActorAnimation_SelectDirectionalEntry((u8 *)actor, 6);
         test = 2;
-        flags = (u16 *)(s + 0x2D4);
+        flags = &actor->base.motionFlags;
         value = *flags;
         test &= value;
         if (test == 0) {
@@ -1899,33 +1898,12 @@ void Dog_UpdateDefeatDelay(u8 *s, s32 arg)
             *flags = test;
         }
     }
-    if (Mod(arg, 60) == 0) {
-        SceneActorAttachment_ReplaceResponseSlot(s, 2, 0, s[0x98]);
-    }
-    off = 0xF9;
-    off <<= 1;
-    if ((*((s16 *)(part + off))) <= 0) {
-        mask = 0x80;
-        mask <<= 5;
-        off += 0xDE;
-        zero = (*((u32 *)(s - (-off)))) & mask;
-        if (zero == 0) {
-            void (*fn)(void) = Dog_UpdateDefeatFinish;
-            u32 code = 6;
-            u32 *flags;
-            u32 clear;
-            s[0x2B2] = 1;
-            s[0x2B0] = zero;
-            s[0x2B5] = code;
-            *((void (**)(void))(s + 0x21C)) = fn;
-            *((u16 *)(s + 0x2C8)) = zero;
-            flags = (u32 *)(s + 0x114);
-            do {
-                clear = ~1;
-                *flags &= clear;
-                *((u32 *)(s + 0x104)) = zero;
-            } while (0);
-        }
+    if (Mod(frame, 60) == 0)
+        SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 2, 0, actor->base.category);
+    if ((s16)group->field5C6 <= 0) {
+        mask = 0x1000;
+        if ((actor->base.statusFlags & mask) == 0)
+            SceneActorChase_SetControl(actor, Dog_UpdateDefeatFinish, 6);
     }
 }
 
@@ -2119,14 +2097,14 @@ static inline u8 Dog_Arrive(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&(t)->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -3597,14 +3575,14 @@ static inline u8 Dog_Arrive_BeginDelayedRouteRecovery(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellIndex((t)->position.x >> 8, (t)->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -3974,7 +3952,7 @@ u8 SceneActorTarget_UpdateTrackedContact(void *);
 
 s32 Dog_ResolvePendingObject(struct ChaseActor *actor);
 
-void Dog_UpdateDefeatDelay(u8 *s, s32 arg);
+void Dog_UpdateDefeatDelay(struct ChaseActor *, s32);
 
 void Dog_ResumeAfterReaction(struct ChaseActor *a);
 

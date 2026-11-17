@@ -1221,19 +1221,17 @@ inline static u8 TakeFlag(u8 *flag)
     return 0;
 }
 
-void Golem_UpdateDying(u8 *s, s32 arg)
+void Golem_UpdateDying(struct ChaseActor *actor, s32 frame)
 {
-    u8 *part = s + 0x3D4;
-    s32 zero;
+    struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    s32 off;
-    if (TakeFlag(s + 0x2B2)) {
+    if (TakeFlag(&actor->base.field2B2)) {
         u32 test;
         u16 *flags;
         u32 value;
-        SceneActorAnimation_SelectDirectionalEntry(s, 6);
+        SceneActorAnimation_SelectDirectionalEntry((u8 *)actor, 6);
         test = 2;
-        flags = (u16 *)(s + 0x2D4);
+        flags = &actor->base.motionFlags;
         value = *flags;
         test &= value;
         if (test == 0) {
@@ -1242,33 +1240,12 @@ void Golem_UpdateDying(u8 *s, s32 arg)
             *flags = test;
         }
     }
-    if (Mod(arg, 60) == 0) {
-        SceneActorAttachment_ReplaceResponseSlot(s, 2, 0, s[0x98]);
-    }
-    off = 0xF9;
-    off <<= 1;
-    if ((*((s16 *)(part + off))) <= 0) {
-        mask = 0x80;
-        mask <<= 5;
-        off += 0xDE;
-        zero = (*((u32 *)(s - (-off)))) & mask;
-        if (zero == 0) {
-            void (*fn)(void) = Golem_UpdateDeath;
-            u32 code = 6;
-            u32 *flags;
-            u32 clear;
-            s[0x2B2] = 1;
-            s[0x2B0] = zero;
-            s[0x2B5] = code;
-            *((void (**)(void))(s + 0x21C)) = fn;
-            *((u16 *)(s + 0x2C8)) = zero;
-            flags = (u32 *)(s + 0x114);
-            do {
-                clear = ~1;
-                *flags &= clear;
-                *((u32 *)(s + 0x104)) = zero;
-            } while (0);
-        }
+    if (Mod(frame, 60) == 0)
+        SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 2, 0, actor->base.category);
+    if ((s16)group->field5C6 <= 0) {
+        mask = 0x1000;
+        if ((actor->base.statusFlags & mask) == 0)
+            SceneActorChase_SetControl(actor, Golem_UpdateDeath, 6);
     }
 }
 
@@ -2153,14 +2130,14 @@ static inline u8 Golem_ArriveAfterDelay(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = SceneActorChase_CellAt(&t->position);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
@@ -2334,14 +2311,14 @@ static inline u8 Golem_Arrive(void *obj)
             callback = &group->fallback;
             goto invoke;
         }
-        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;
+        cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
         cell = Golem_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
                                 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))

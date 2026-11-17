@@ -92,7 +92,7 @@ u8 SceneActorTarget_UpdateTrackedContact(void *);
 void TentacleBody_UpdateReactionTransition(u8 *s, s32 arg);
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor);
 void SceneActorPlacement_ResetStateThree(void);
-void Skeleton_UpdateDownedState(u8 *s, s32 arg);
+void Skeleton_UpdateDownedState(struct ChaseActor *, s32);
 void SceneActorReaction_ReturnToRouteEntry(struct ChaseActor *actor, s32 frame);
 void SceneActorReaction_BeginTargetRecovery(void);
 void Skeleton_ResetRouteReaction(struct ChaseActor *actor);

@@ -20,30 +20,14 @@ static inline u32 Locked(void)
 s32 RouteSpritePool_Tick(struct RouteSpritePool *pool)
 {
     struct RouteSpriteActor *start = pool->slots;
-    struct RouteSpriteActor *slot;
-    /* Keep the post-loop state stride as an integer address; its final value
-     * is unused and may extend beyond the complete pool object. */
-    u32 state;
-    RouteSpriteStateCallback *table;
-    s32 i;
     if (pool->occupiedMask) {
         if (!Paused()) {
             if (!Locked()) {
-                i = 0;
-                do {
-                    table = gUnk_08605BB0;
-                    state = (u32)&pool->slots[0].state;
-                    slot = start;
-                } while (0);
-                for (; i < 4;) {
+                s32 i = 0;
+                RouteSpriteStateCallback *table = gUnk_08605BB0;
+                for (; i < 4; i++) {
                     if (Occupied(&pool->occupiedMask, i))
-                        sub_08249240(pool, slot, (void *)table[*(u8 *)state]);
-                    {
-                        u32 stride = 0x178;
-                        state += stride;
-                        slot = (void *)((u32)slot + stride);
-                    }
-                    i++;
+                        table[start[i].state](pool, &start[i]);
                 }
             }
         }

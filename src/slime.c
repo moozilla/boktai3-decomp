@@ -1111,7 +1111,7 @@ u32 Slime_TryEnrage(struct ChaseActor *actor)
     if (!Slime_TestFlag(actor))
         return 0;
     dy = actor->base.body.position.y -
-         ((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target.position.y;
+         ((struct SceneActorChasePlayer *)gPlayers[0])->target.position.y;
     if (dy < 0)
         dy = -dy;
     if (dy > 0x200)
@@ -1150,7 +1150,7 @@ void Slime_FollowPlayer(struct ChaseActor *actor)
         m->flags = v;
     }
     dst = &q->wanderTarget.position;
-    p = (struct SceneActorChasePlayer *)gUnknown_02000580[0];
+    p = (struct SceneActorChasePlayer *)gPlayers[0];
     *dst = p->target.position;
     if (q->enrageCount >= q->launchThreshold) {
         SceneActorChase_SetControl(actor, Slime_UpdateShake, 0x2A);

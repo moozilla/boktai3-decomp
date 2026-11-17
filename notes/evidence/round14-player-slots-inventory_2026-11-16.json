@@ -1,0 +1,3093 @@
+{
+  "schema": 1,
+  "before_commit": "c940902f6ba266133e4e3cd5edf46f308cd03136",
+  "integrated_source_commit": "eee8e20b6abe7d3a8fc433d8e73f71c8e549b665",
+  "worker_source_commit": "0690367d297e66da1b379547ba261f1938f6d0bf",
+  "compiler": {
+    "stock_revision": "da598c1d918402c42c0c0d7128ba14567f3175e9",
+    "binary_sha256": "e9cb8508fd608de54ab0009e7a4c9989964e810e78f298c83bdea0c70e31ef43",
+    "flags": [
+      "-O2",
+      "-mthumb-interwork",
+      "-fhex-asm"
+    ],
+    "rom_sha1": "2651c5e6875ac60abff734510d152166d211c87c"
+  },
+  "ram_object": {
+    "address": "0x02000580",
+    "size": 16,
+    "slots": 4,
+    "stride": 4,
+    "owner": "include/player.h",
+    "declaration": "extern struct Player *gPlayers[4];",
+    "next_object": "gPlayerEffectPendingCount at 0x02000590"
+  },
+  "layout": {
+    "slots_size": 16,
+    "pointer_size": 4,
+    "player_slot": 24,
+    "player_status_flags": 32,
+    "player_body_prefix": 36,
+    "player_body_mode": 44,
+    "player_position": 48,
+    "player_movement_source": 64,
+    "player_action_mode": 1048,
+    "player_facing_effects": 1268,
+    "scene_vec_size": 8,
+    "scene_vec_alignment": 4,
+    "contact_position_size": 8,
+    "contact_position_alignment": 4,
+    "chase_player_flags": 32,
+    "chase_player_target": 36,
+    "chase_player_cell": 64,
+    "chase_cell_index": 6
+  },
+  "layout_probe_source": "#include \"player.h\"\n#include \"scene_actor_chase_types.h\"\nconst u32 playerSlotLayout[] = {\n    sizeof(gPlayers),\n    sizeof(struct Player *),\n    (u32)&((struct Player *)0)->slot,\n    (u32)&((struct Player *)0)->statusFlags,\n    (u32)&((struct Player *)0)->positionalEffectGroup,\n    (u32)&((struct Player *)0)->movementRequestBlocked,\n    (u32)&((struct Player *)0)->position,\n    (u32)&((struct Player *)0)->followTarget,\n    (u32)&((struct Player *)0)->actionMode,\n    (u32)&((struct Player *)0)->facingChangeEffects,\n    sizeof(struct SceneVec),\n    __alignof__(struct SceneVec),\n    sizeof(struct ContactPosition),\n    __alignof__(struct ContactPosition),\n    (u32)&((struct SceneActorChasePlayer *)0)->flags,\n    (u32)&((struct SceneActorChasePlayer *)0)->target,\n    (u32)&((struct SceneActorChasePlayer *)0)->cell,\n    (u32)&((struct SceneActorChasePlayerCell *)0)->index,\n};\n",
+  "legacy_before": {
+    "src/golem_main.c": [
+      {
+        "line": 2156,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2163,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 2337,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2344,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/vorn_main.c": [
+      {
+        "line": 2375,
+        "text": "        SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,"
+      },
+      {
+        "line": 2416,
+        "text": "                &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 2430,
+        "text": "                &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      }
+    ],
+    "src/golem_main_2.c": [
+      {
+        "line": 914,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 921,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/ivy.c": [
+      {
+        "line": 284,
+        "text": "                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,"
+      }
+    ],
+    "src/mummy_entry.c": [
+      {
+        "line": 806,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 813,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 1973,
+        "text": "        if (SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,"
+      },
+      {
+        "line": 2008,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2015,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 2434,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2441,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 2872,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2879,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 2955,
+        "text": "            (*target) = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 4216,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 4223,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 4394,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 4401,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 4454,
+        "text": "            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      }
+    ],
+    "src/scene_actor_approach.c": [
+      {
+        "line": 267,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 274,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/lun.c": [
+      {
+        "line": 37,
+        "text": "extern struct Player *gUnknown_02000580;"
+      },
+      {
+        "line": 163,
+        "text": "    distance = actor->base.body.position.y - gUnknown_02000580->position.y;"
+      },
+      {
+        "line": 166,
+        "text": "        if (fast || gUnknown_02000580->actionMode == 4) {"
+      },
+      {
+        "line": 185,
+        "text": "        Player_IncrementActionSpeedBonus(gUnknown_02000580, 0);"
+      },
+      {
+        "line": 193,
+        "text": "        Player_QueueStatusEffect(gUnknown_02000580, 1);"
+      },
+      {
+        "line": 195,
+        "text": "        Player_QueueStatusEffect(gUnknown_02000580, 2);"
+      },
+      {
+        "line": 1461,
+        "text": "        if (passageActive || gUnknown_02000580->actionMode == 4)"
+      }
+    ],
+    "src/skeleton_main.c": [
+      {
+        "line": 2621,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2628,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 4136,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 4143,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/golem_2.c": [
+      {
+        "line": 335,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 342,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 449,
+        "text": "            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 507,
+        "text": "            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 526,
+        "text": "            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 548,
+        "text": "    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 661,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 668,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/slime.c": [
+      {
+        "line": 1114,
+        "text": "         ((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target.position.y;"
+      },
+      {
+        "line": 1153,
+        "text": "    p = (struct SceneActorChasePlayer *)gUnknown_02000580[0];"
+      }
+    ],
+    "src/actor_animation_controller.c": [
+      {
+        "line": 4434,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 4472,
+        "text": "    p->owner = gUnknown_02000580;"
+      }
+    ],
+    "src/timed_effect.c": [
+      {
+        "line": 207,
+        "text": "extern struct EffectPlayer *gUnknown_02000580;"
+      },
+      {
+        "line": 306,
+        "text": "                        struct EffectPlayer *player = gUnknown_02000580;"
+      }
+    ],
+    "src/bat_restore.c": [
+      {
+        "line": 383,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 390,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 590,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 597,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/octopus.c": [
+      {
+        "line": 348,
+        "text": "                Player_BeginPositionRequest((void *)gUnknown_02000580[target->kind], (void *)&pos,"
+      },
+      {
+        "line": 2143,
+        "text": "extern u8 *gUnknown_02000580[];"
+      },
+      {
+        "line": 2166,
+        "text": "        struct Player *initial = (struct Player *)gUnknown_02000580[0];"
+      }
+    ],
+    "src/dog.c": [
+      {
+        "line": 1340,
+        "text": "        *(struct SceneActorEffectsOffset *)&((struct SceneActorChasePlayer *)gUnknown_02000580[0])"
+      },
+      {
+        "line": 1370,
+        "text": "    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 1381,
+        "text": "            &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      },
+      {
+        "line": 2122,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 2129,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 3600,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 3607,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/axe.c": [
+      {
+        "line": 4862,
+        "text": "extern u8 *gUnknown_02000580;"
+      }
+    ],
+    "src/spider.c": [
+      {
+        "line": 2345,
+        "text": "extern u8 *gUnknown_02000580;"
+      }
+    ],
+    "src/skeleton_rise.c": [
+      {
+        "line": 244,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 251,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      },
+      {
+        "line": 403,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 410,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/fn/sub_080F67AC.c": [
+      {
+        "line": 4,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 289,
+        "text": "    p->target = gUnknown_02000580;"
+      }
+    ],
+    "src/fn/sub_081FAE0C.c": [
+      {
+        "line": 32,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 424,
+        "text": "    RatatoskInit_SetTarget(self, gUnknown_02000580);"
+      }
+    ],
+    "src/fn/sub_0812FA0C.c": [
+      {
+        "line": 73,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 80,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "src/fn/sub_0802592C.c": [
+      {
+        "line": 3,
+        "text": "extern struct Sub0802592CPlayer *gUnknown_02000580[];"
+      },
+      {
+        "line": 122,
+        "text": "        state = gUnknown_02000580[idx]->unk418;"
+      },
+      {
+        "line": 168,
+        "text": "        Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,"
+      },
+      {
+        "line": 182,
+        "text": "        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,"
+      },
+      {
+        "line": 190,
+        "text": "        Player_ApplyPositionRequest(gUnknown_02000580[idx], &actor->saved, 0x32, actor->unk51, 0x32,"
+      },
+      {
+        "line": 219,
+        "text": "            reqRes = Player_BeginPositionRequest(gUnknown_02000580[idx], (u8 *)actor + 0x260, 0, 0,"
+      }
+    ],
+    "src/fn/sub_0801CC24.c": [
+      {
+        "line": 3,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 39,
+        "text": "            PlayerCue_BeginModeSeven(gUnknown_02000580, 1);"
+      },
+      {
+        "line": 103,
+        "text": "                        PlayerCue_BeginModeSeven(gUnknown_02000580, 0);"
+      }
+    ],
+    "src/fn/sub_081A2C80.c": [
+      {
+        "line": 6,
+        "text": "extern u32 gUnknown_02000580[4];"
+      },
+      {
+        "line": 155,
+        "text": "        players = gUnknown_02000580;"
+      }
+    ],
+    "src/fn/sub_08028F78.c": [
+      {
+        "line": 7,
+        "text": "extern struct VampireInitPlayer *gUnknown_02000580[];"
+      },
+      {
+        "line": 211,
+        "text": "        struct VampireInitPlayer **src = gUnknown_02000580;"
+      }
+    ],
+    "src/fn/sub_0806D438.c": [
+      {
+        "line": 9,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 106,
+        "text": "    target = PrepareSourceDelta(&gUnknown_02000580, &delta, actor);"
+      }
+    ],
+    "include/scene_actor_chase_shared.h": [
+      {
+        "line": 10,
+        "text": "extern u8 *gUnknown_02000580[];"
+      },
+      {
+        "line": 341,
+        "text": "    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;"
+      }
+    ],
+    "include/scene_actor_status.h": [
+      {
+        "line": 13,
+        "text": "extern u8 *gUnknown_02000580[];"
+      },
+      {
+        "line": 228,
+        "text": "        return ActorStatus_LinkPaletteActive((struct Player *)gUnknown_02000580[player]);"
+      },
+      {
+        "line": 232,
+        "text": "    object = (struct Player *)gUnknown_02000580[player];"
+      },
+      {
+        "line": 462,
+        "text": "        actor->base.tracking.target = (u32)(gUnknown_02000580[0] + 0x24);"
+      }
+    ],
+    "include/scene_actor_chase_step.h": [
+      {
+        "line": 140,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 147,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "include/scene_actor_chase_direct_arrival.h": [
+      {
+        "line": 26,
+        "text": "        cell = ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->cell->index;"
+      },
+      {
+        "line": 33,
+        "text": "        !SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[player])->flags,"
+      }
+    ],
+    "include/ghoul_disc.h": [
+      {
+        "line": 51,
+        "text": "                ((struct SceneActorChasePlayer *)gUnknown_02000580[player])->target.position;"
+      }
+    ]
+  },
+  "declarations_before": [
+    {
+      "source": "src/lun.c",
+      "line": 37,
+      "text": "extern struct Player *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/actor_animation_controller.c",
+      "line": 4434,
+      "text": "extern void *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/timed_effect.c",
+      "line": 207,
+      "text": "extern struct EffectPlayer *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/octopus.c",
+      "line": 2143,
+      "text": "extern u8 *gUnknown_02000580[];",
+      "shape": "array"
+    },
+    {
+      "source": "src/axe.c",
+      "line": 4862,
+      "text": "extern u8 *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/spider.c",
+      "line": 2345,
+      "text": "extern u8 *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/fn/sub_080F67AC.c",
+      "line": 4,
+      "text": "extern void *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/fn/sub_081FAE0C.c",
+      "line": 32,
+      "text": "extern void *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/fn/sub_0802592C.c",
+      "line": 3,
+      "text": "extern struct Sub0802592CPlayer *gUnknown_02000580[];",
+      "shape": "array"
+    },
+    {
+      "source": "src/fn/sub_0801CC24.c",
+      "line": 3,
+      "text": "extern void *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "src/fn/sub_081A2C80.c",
+      "line": 6,
+      "text": "extern u32 gUnknown_02000580[4];",
+      "shape": "array"
+    },
+    {
+      "source": "src/fn/sub_08028F78.c",
+      "line": 7,
+      "text": "extern struct VampireInitPlayer *gUnknown_02000580[];",
+      "shape": "array"
+    },
+    {
+      "source": "src/fn/sub_0806D438.c",
+      "line": 9,
+      "text": "extern void *gUnknown_02000580;",
+      "shape": "scalar"
+    },
+    {
+      "source": "include/scene_actor_chase_shared.h",
+      "line": 10,
+      "text": "extern u8 *gUnknown_02000580[];",
+      "shape": "array"
+    },
+    {
+      "source": "include/scene_actor_status.h",
+      "line": 13,
+      "text": "extern u8 *gUnknown_02000580[];",
+      "shape": "array"
+    }
+  ],
+  "legacy_remaining": {
+    "src/octopus.c": [
+      {
+        "line": 2143,
+        "text": "extern u8 *gUnknown_02000580[];"
+      },
+      {
+        "line": 2166,
+        "text": "struct Player *initial = (struct Player *)gUnknown_02000580[0];"
+      }
+    ],
+    "src/fn/sub_0806D438.c": [
+      {
+        "line": 9,
+        "text": "extern void *gUnknown_02000580;"
+      },
+      {
+        "line": 106,
+        "text": "target = PrepareSourceDelta(&gUnknown_02000580, &delta, actor);"
+      }
+    ]
+  },
+  "raw_address_remaining": [
+    {
+      "source": "src/ivy.c",
+      "function": "SceneActor_FindNearbyPlayerTarget",
+      "address": "0x02000580"
+    }
+  ],
+  "changed_header_dependents": {
+    "include/scene_actor_chase_shared.h": [
+      "src/axe_contact.c",
+      "src/bat_restore.c",
+      "src/bee.c",
+      "src/collision_controller.c",
+      "src/crow.c",
+      "src/dog.c",
+      "src/fn/sub_08075588.c",
+      "src/fn/sub_08077444.c",
+      "src/fn/sub_08078EE8.c",
+      "src/fn/sub_0807AF94.c",
+      "src/fn/sub_0807DB34.c",
+      "src/fn/sub_0807F130.c",
+      "src/fn/sub_0807F710.c",
+      "src/fn/sub_0807F81C.c",
+      "src/fn/sub_0808170C.c",
+      "src/fn/sub_080A71A0.c",
+      "src/fn/sub_080A8144.c",
+      "src/fn/sub_080AEE08.c",
+      "src/fn/sub_0812E7EC.c",
+      "src/fn/sub_0812F5D4.c",
+      "src/fn/sub_0812FA0C.c",
+      "src/fn/sub_08131820.c",
+      "src/fn/sub_08135F70.c",
+      "src/ghost.c",
+      "src/ghoul.c",
+      "src/ghoul_states.c",
+      "src/golem_2.c",
+      "src/golem_main.c",
+      "src/golem_main_2.c",
+      "src/ivy.c",
+      "src/mimic.c",
+      "src/mummy.c",
+      "src/mummy_entry.c",
+      "src/octopus.c",
+      "src/scene_actor_approach.c",
+      "src/skeleton.c",
+      "src/skeleton_main.c",
+      "src/skeleton_rise.c",
+      "src/slime.c",
+      "src/tentacle_body.c",
+      "src/vorn.c",
+      "src/vorn_main.c"
+    ],
+    "include/scene_actor_status.h": [
+      "src/collision_controller.c",
+      "src/fn/sub_08075588.c",
+      "src/fn/sub_08077444.c",
+      "src/fn/sub_08078EE8.c",
+      "src/fn/sub_0807DB34.c"
+    ],
+    "include/scene_actor_chase_step.h": [
+      "src/bat_restore.c",
+      "src/bee.c",
+      "src/collision_controller.c",
+      "src/crow.c",
+      "src/dog.c",
+      "src/fn/sub_08075588.c",
+      "src/fn/sub_08077444.c",
+      "src/fn/sub_08078EE8.c",
+      "src/fn/sub_0807AF94.c",
+      "src/fn/sub_0807DB34.c",
+      "src/fn/sub_0807F130.c",
+      "src/fn/sub_0807F710.c",
+      "src/fn/sub_0807F81C.c",
+      "src/fn/sub_0808170C.c",
+      "src/fn/sub_080A71A0.c",
+      "src/fn/sub_080AEE08.c",
+      "src/fn/sub_0812E7EC.c",
+      "src/fn/sub_0812F5D4.c",
+      "src/fn/sub_0812FA0C.c",
+      "src/fn/sub_08135F70.c",
+      "src/ghost.c",
+      "src/ghoul.c",
+      "src/ghoul_states.c",
+      "src/golem_2.c",
+      "src/golem_main.c",
+      "src/golem_main_2.c",
+      "src/ivy.c",
+      "src/mimic.c",
+      "src/mummy.c",
+      "src/mummy_entry.c",
+      "src/octopus.c",
+      "src/scene_actor_approach.c",
+      "src/skeleton.c",
+      "src/skeleton_main.c",
+      "src/skeleton_rise.c",
+      "src/slime.c",
+      "src/tentacle_body.c",
+      "src/vorn.c",
+      "src/vorn_main.c"
+    ],
+    "include/scene_actor_chase_direct_arrival.h": [
+      "src/fn/sub_0807AF94.c",
+      "src/mummy_entry.c"
+    ],
+    "include/ghoul_disc.h": [
+      "src/ghoul.c",
+      "src/ghoul_states.c"
+    ]
+  },
+  "player_header_dependents_before": 685,
+  "player_header_dependents_after": 710,
+  "current_direct_users": {
+    "src/actor_phase.c": {
+      "lines": [
+        245
+      ],
+      "uses": 1
+    },
+    "src/player_script_stats.c": {
+      "lines": [
+        31,
+        52,
+        63,
+        71,
+        80,
+        97,
+        109,
+        137,
+        148,
+        155,
+        163,
+        199,
+        212,
+        226,
+        240,
+        249,
+        270,
+        271,
+        281,
+        290,
+        304,
+        320
+      ],
+      "uses": 22
+    },
+    "src/golem_main.c": {
+      "lines": [
+        331,
+        825,
+        827,
+        2133,
+        2140,
+        2314,
+        2321
+      ],
+      "uses": 7
+    },
+    "src/game_over.c": {
+      "lines": [
+        265,
+        329
+      ],
+      "uses": 2
+    },
+    "src/vorn_main.c": {
+      "lines": [
+        1029,
+        1057,
+        2375,
+        2416,
+        2430
+      ],
+      "uses": 5
+    },
+    "src/player_orbit_effect.c": {
+      "lines": [
+        158,
+        181,
+        182,
+        274,
+        277
+      ],
+      "uses": 5
+    },
+    "src/golem_main_2.c": {
+      "lines": [
+        327,
+        335,
+        395,
+        399,
+        502,
+        504,
+        819,
+        828,
+        914,
+        921
+      ],
+      "uses": 10
+    },
+    "src/scene_actor_stored_motion.c": {
+      "lines": [
+        111,
+        210,
+        228,
+        245,
+        707
+      ],
+      "uses": 5
+    },
+    "src/grid_attack_actor.c": {
+      "lines": [
+        1801
+      ],
+      "uses": 1
+    },
+    "src/bee.c": {
+      "lines": [
+        510,
+        1130,
+        1493,
+        1728
+      ],
+      "uses": 4
+    },
+    "src/mimic.c": {
+      "lines": [
+        556,
+        729,
+        964,
+        1065
+      ],
+      "uses": 4
+    },
+    "src/scene_status_indicator.c": {
+      "lines": [
+        97,
+        103
+      ],
+      "uses": 2
+    },
+    "src/ivy.c": {
+      "lines": [
+        284,
+        563,
+        623,
+        1890,
+        1906
+      ],
+      "uses": 5
+    },
+    "src/spread_shot.c": {
+      "lines": [
+        253
+      ],
+      "uses": 1
+    },
+    "src/dark_loan.c": {
+      "lines": [
+        192,
+        193,
+        441,
+        442
+      ],
+      "uses": 4
+    },
+    "src/mummy_entry.c": {
+      "lines": [
+        806,
+        813,
+        1392,
+        1398,
+        1481,
+        1973,
+        2008,
+        2015,
+        2434,
+        2441,
+        2622,
+        2872,
+        2879,
+        2955,
+        3864,
+        3894,
+        3896,
+        4216,
+        4223,
+        4394,
+        4401,
+        4454
+      ],
+      "uses": 22
+    },
+    "src/scene_actor_approach.c": {
+      "lines": [
+        268,
+        275
+      ],
+      "uses": 2
+    },
+    "src/actor_graphics_and_basic_states.c": {
+      "lines": [
+        113,
+        725,
+        2120
+      ],
+      "uses": 3
+    },
+    "src/hud.c": {
+      "lines": [
+        795,
+        800
+      ],
+      "uses": 2
+    },
+    "src/player_script_actions.c": {
+      "lines": [
+        6,
+        15,
+        23,
+        31,
+        39,
+        48,
+        56,
+        72,
+        103
+      ],
+      "uses": 9
+    },
+    "src/lun.c": {
+      "lines": [
+        161,
+        164,
+        183,
+        191,
+        193,
+        239,
+        250,
+        259,
+        261,
+        268,
+        588,
+        750,
+        1459,
+        1920,
+        2033,
+        2089,
+        2092,
+        2135,
+        2138,
+        2141,
+        2189,
+        2329
+      ],
+      "uses": 22
+    },
+    "src/hit_switch.c": {
+      "lines": [
+        158
+      ],
+      "uses": 1
+    },
+    "src/skeleton_main.c": {
+      "lines": [
+        48,
+        285,
+        2621,
+        2628,
+        4113,
+        4120
+      ],
+      "uses": 6
+    },
+    "src/player_script_cues.c": {
+      "lines": [
+        24,
+        34,
+        45,
+        57,
+        68,
+        80,
+        92,
+        104,
+        117,
+        130,
+        148,
+        166,
+        190,
+        215,
+        227,
+        239,
+        250,
+        262,
+        273,
+        290,
+        307,
+        323,
+        343,
+        353,
+        369,
+        379,
+        391,
+        403,
+        415,
+        427,
+        439,
+        451,
+        463,
+        475,
+        487,
+        502,
+        515,
+        530,
+        545,
+        560,
+        575,
+        590,
+        606,
+        630,
+        638
+      ],
+      "uses": 45
+    },
+    "src/vorn.c": {
+      "lines": [
+        301,
+        303,
+        304,
+        680
+      ],
+      "uses": 4
+    },
+    "src/golem_2.c": {
+      "lines": [
+        335,
+        342,
+        449,
+        507,
+        526,
+        548,
+        661,
+        668
+      ],
+      "uses": 8
+    },
+    "src/actor_pool.c": {
+      "lines": [
+        35
+      ],
+      "uses": 1
+    },
+    "src/pursuing_actor.c": {
+      "lines": [
+        155
+      ],
+      "uses": 1
+    },
+    "src/item_container.c": {
+      "lines": [
+        71,
+        322,
+        519,
+        565,
+        566,
+        663,
+        915,
+        916
+      ],
+      "uses": 8
+    },
+    "src/slime.c": {
+      "lines": [
+        1114,
+        1153,
+        1867
+      ],
+      "uses": 3
+    },
+    "src/ghost.c": {
+      "lines": [
+        134,
+        261,
+        274,
+        278,
+        280,
+        281,
+        284,
+        1135,
+        1346,
+        1351,
+        1355,
+        1498,
+        1535,
+        1753,
+        1756,
+        1758,
+        1774,
+        1783,
+        2192,
+        2229,
+        2316,
+        2469,
+        2493,
+        2496,
+        2499,
+        2566,
+        2599,
+        2644,
+        2677,
+        2727,
+        2809,
+        2812,
+        2874,
+        3280
+      ],
+      "uses": 34
+    },
+    "src/actor_animation_controller.c": {
+      "lines": [
+        4471
+      ],
+      "uses": 1
+    },
+    "src/pause_menu_actions.c": {
+      "lines": [
+        101
+      ],
+      "uses": 1
+    },
+    "src/timed_effect.c": {
+      "lines": [
+        302
+      ],
+      "uses": 1
+    },
+    "src/callback_pool_feedback.c": {
+      "lines": [
+        242,
+        256
+      ],
+      "uses": 2
+    },
+    "src/proximity_icon.c": {
+      "lines": [
+        6,
+        8,
+        11
+      ],
+      "uses": 3
+    },
+    "src/bat_restore.c": {
+      "lines": [
+        384,
+        391,
+        591,
+        598
+      ],
+      "uses": 4
+    },
+    "src/scene_actor_animation.c": {
+      "lines": [
+        449
+      ],
+      "uses": 1
+    },
+    "src/octopus.c": {
+      "lines": [
+        348,
+        611,
+        658,
+        2143,
+        2166,
+        2179
+      ],
+      "uses": 6
+    },
+    "src/axe_contact.c": {
+      "lines": [
+        367,
+        383
+      ],
+      "uses": 2
+    },
+    "src/dog.c": {
+      "lines": [
+        1235,
+        1341,
+        1371,
+        1382,
+        2100,
+        2107,
+        3414,
+        3423,
+        3578,
+        3585
+      ],
+      "uses": 10
+    },
+    "src/axe.c": {
+      "lines": [
+        205,
+        443,
+        564,
+        1326,
+        1341,
+        1565,
+        1816,
+        2270,
+        4416,
+        4446,
+        4489,
+        4519,
+        4568,
+        4733,
+        4977
+      ],
+      "uses": 15
+    },
+    "src/contact_actor_display.c": {
+      "lines": [
+        52
+      ],
+      "uses": 1
+    },
+    "src/directional_interaction.c": {
+      "lines": [
+        371
+      ],
+      "uses": 1
+    },
+    "src/player_cue_commands.c": {
+      "lines": [
+        7,
+        15,
+        25
+      ],
+      "uses": 3
+    },
+    "src/scene_indicator.c": {
+      "lines": [
+        103,
+        167,
+        168
+      ],
+      "uses": 3
+    },
+    "src/floating_item_effect.c": {
+      "lines": [
+        76,
+        239,
+        379
+      ],
+      "uses": 3
+    },
+    "src/spider.c": {
+      "lines": [
+        1424,
+        1432,
+        1438,
+        1462,
+        1972,
+        1976,
+        2038,
+        2051,
+        2053
+      ],
+      "uses": 9
+    },
+    "src/named_actor_commands.c": {
+      "lines": [
+        209,
+        214,
+        301
+      ],
+      "uses": 3
+    },
+    "src/pooled_actor_controller.c": {
+      "lines": [
+        297
+      ],
+      "uses": 1
+    },
+    "src/homing_effect.c": {
+      "lines": [
+        210,
+        260
+      ],
+      "uses": 2
+    },
+    "src/crow.c": {
+      "lines": [
+        601,
+        630,
+        644,
+        772,
+        796,
+        1134,
+        1535,
+        1687
+      ],
+      "uses": 8
+    },
+    "src/scene_projectile_pool.c": {
+      "lines": [
+        126,
+        127
+      ],
+      "uses": 2
+    },
+    "src/tether_actor.c": {
+      "lines": [
+        587,
+        594,
+        597,
+        604,
+        605,
+        606,
+        611,
+        1750,
+        2527,
+        2531,
+        2537,
+        2541,
+        2643,
+        2653,
+        2686,
+        2688,
+        2698,
+        2702,
+        2707,
+        2709,
+        2711,
+        2712,
+        2736,
+        2739,
+        2740,
+        2749,
+        2750,
+        2752,
+        3567,
+        3568,
+        3569,
+        3570,
+        3571
+      ],
+      "uses": 33
+    },
+    "src/collision_controller.c": {
+      "lines": [
+        82,
+        402
+      ],
+      "uses": 2
+    },
+    "src/inventory_panel.c": {
+      "lines": [
+        45
+      ],
+      "uses": 1
+    },
+    "src/skeleton_rise.c": {
+      "lines": [
+        245,
+        252,
+        404,
+        411
+      ],
+      "uses": 4
+    },
+    "src/countdown_controller.c": {
+      "lines": [
+        7,
+        22,
+        23,
+        25,
+        28,
+        29
+      ],
+      "uses": 6
+    },
+    "src/armor_actions.c": {
+      "lines": [
+        179
+      ],
+      "uses": 1
+    },
+    "src/control_panel.c": {
+      "lines": [
+        30,
+        33,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        48,
+        51,
+        54,
+        57,
+        60,
+        78,
+        79,
+        90,
+        155,
+        258,
+        349,
+        350,
+        351,
+        352,
+        360,
+        415,
+        416,
+        417,
+        430,
+        443,
+        446,
+        457,
+        479,
+        493,
+        494,
+        495,
+        496,
+        497,
+        498,
+        505,
+        517
+      ],
+      "uses": 42
+    },
+    "src/fn/sub_080505BC.c": {
+      "lines": [
+        19
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0817FDE0.c": {
+      "lines": [
+        195
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815A324.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080F67AC.c": {
+      "lines": [
+        289
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081FDAAC.c": {
+      "lines": [
+        8
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081AFAC0.c": {
+      "lines": [
+        44
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08053DF8.c": {
+      "lines": [
+        26,
+        31
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08057114.c": {
+      "lines": [
+        8
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0807D220.c": {
+      "lines": [
+        26
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0824372C.c": {
+      "lines": [
+        13
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0801BAA8.c": {
+      "lines": [
+        30
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081CD484.c": {
+      "lines": [
+        198
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08137CA8.c": {
+      "lines": [
+        29,
+        35
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0815F578.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08243704.c": {
+      "lines": [
+        10
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081B7A2C.c": {
+      "lines": [
+        42
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08159010.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0814DE0C.c": {
+      "lines": [
+        51
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08050310.c": {
+      "lines": [
+        4,
+        25
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0815F224.c": {
+      "lines": [
+        26
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080177AC.c": {
+      "lines": [
+        99
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08158FE8.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080570BC.c": {
+      "lines": [
+        7
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08030710.c": {
+      "lines": [
+        31
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080532B0.c": {
+      "lines": [
+        158,
+        159
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08019130.c": {
+      "lines": [
+        40,
+        42
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08078078.c": {
+      "lines": [
+        21
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0807E9D0.c": {
+      "lines": [
+        44,
+        61,
+        64,
+        67,
+        70
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_0810103C.c": {
+      "lines": [
+        26
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08084100.c": {
+      "lines": [
+        23
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081FAE0C.c": {
+      "lines": [
+        424
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815F53C.c": {
+      "lines": [
+        14
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081F7FD0.c": {
+      "lines": [
+        132,
+        136,
+        159,
+        169,
+        215
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_081B0F34.c": {
+      "lines": [
+        108,
+        116,
+        118
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_082439EC.c": {
+      "lines": [
+        20
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08159860.c": {
+      "lines": [
+        8
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822C598.c": {
+      "lines": [
+        32,
+        36,
+        67,
+        68
+      ],
+      "uses": 4
+    },
+    "src/fn/sub_08101FF8.c": {
+      "lines": [
+        27,
+        28,
+        29,
+        32,
+        33,
+        50
+      ],
+      "uses": 6
+    },
+    "src/fn/sub_08159210.c": {
+      "lines": [
+        8,
+        9
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08102E98.c": {
+      "lines": [
+        14,
+        17
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08137AFC.c": {
+      "lines": [
+        34,
+        40,
+        83
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_0812FA0C.c": {
+      "lines": [
+        74,
+        81
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0806CF4C.c": {
+      "lines": [
+        27
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0804ECD0.c": {
+      "lines": [
+        27
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081B03C0.c": {
+      "lines": [
+        171,
+        173,
+        200
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_08159164.c": {
+      "lines": [
+        39,
+        40,
+        42
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_081A8E08.c": {
+      "lines": [
+        72
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0804EA54.c": {
+      "lines": [
+        36
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080501E8.c": {
+      "lines": [
+        4,
+        28
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08242F7C.c": {
+      "lines": [
+        12
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822C2B0.c": {
+      "lines": [
+        21,
+        22
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_081021DC.c": {
+      "lines": [
+        30,
+        31,
+        41,
+        42,
+        57
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_080AB7BC.c": {
+      "lines": [
+        95
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08050280.c": {
+      "lines": [
+        11
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815A35C.c": {
+      "lines": [
+        7,
+        9
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_080ACBE0.c": {
+      "lines": [
+        17
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080501AC.c": {
+      "lines": [
+        6,
+        8
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08070070.c": {
+      "lines": [
+        7,
+        113
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08082A6C.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081FA418.c": {
+      "lines": [
+        37,
+        45,
+        62
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_08101E6C.c": {
+      "lines": [
+        31,
+        32,
+        33,
+        50,
+        54
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_08052A40.c": {
+      "lines": [
+        19,
+        20,
+        37,
+        42
+      ],
+      "uses": 4
+    },
+    "src/fn/sub_08038688.c": {
+      "lines": [
+        20
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0805704C.c": {
+      "lines": [
+        11
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0801BA0C.c": {
+      "lines": [
+        19
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0802592C.c": {
+      "lines": [
+        115,
+        161,
+        175,
+        183,
+        212
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_08050574.c": {
+      "lines": [
+        12
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815F5A0.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0801E3A4.c": {
+      "lines": [
+        7
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0801CC24.c": {
+      "lines": [
+        39,
+        103
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08178FC8.c": {
+      "lines": [
+        32
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0817A918.c": {
+      "lines": [
+        50
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081782E0.c": {
+      "lines": [
+        17
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08137DE8.c": {
+      "lines": [
+        10
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081A2C80.c": {
+      "lines": [
+        155
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081A8F48.c": {
+      "lines": [
+        60,
+        65
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_081B118C.c": {
+      "lines": [
+        28
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08101D2C.c": {
+      "lines": [
+        49
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08038AD4.c": {
+      "lines": [
+        74
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08158E68.c": {
+      "lines": [
+        11
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08084044.c": {
+      "lines": [
+        43
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08158C14.c": {
+      "lines": [
+        10
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08102978.c": {
+      "lines": [
+        16,
+        18,
+        19
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_081015EC.c": {
+      "lines": [
+        75
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081010E0.c": {
+      "lines": [
+        59,
+        72,
+        73,
+        75,
+        88,
+        89,
+        91
+      ],
+      "uses": 7
+    },
+    "src/fn/sub_08050694.c": {
+      "lines": [
+        4
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815A340.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815F2C8.c": {
+      "lines": [
+        60
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080ABD14.c": {
+      "lines": [
+        8
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0823A590.c": {
+      "lines": [
+        19
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080539F4.c": {
+      "lines": [
+        14
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08056F88.c": {
+      "lines": [
+        39,
+        40,
+        41
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_08101094.c": {
+      "lines": [
+        13
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815F588.c": {
+      "lines": [
+        6
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080674F0.c": {
+      "lines": [
+        56
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08052EAC.c": {
+      "lines": [
+        10
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081CA490.c": {
+      "lines": [
+        119
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08028F78.c": {
+      "lines": [
+        205
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08052F48.c": {
+      "lines": [
+        15
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08053F48.c": {
+      "lines": [
+        14
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0815926C.c": {
+      "lines": [
+        8
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08243A50.c": {
+      "lines": [
+        39
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0804F5F4.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08237ED8.c": {
+      "lines": [
+        61
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08103110.c": {
+      "lines": [
+        225,
+        227,
+        231
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_080509E8.c": {
+      "lines": [
+        36,
+        37,
+        47,
+        50,
+        53,
+        57,
+        58,
+        59,
+        116,
+        119,
+        124,
+        140,
+        143,
+        148
+      ],
+      "uses": 14
+    },
+    "src/fn/sub_0806F140.c": {
+      "lines": [
+        5
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08070C24.c": {
+      "lines": [
+        33
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081788A8.c": {
+      "lines": [
+        14
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081D0F28.c": {
+      "lines": [
+        98
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08067258.c": {
+      "lines": [
+        24,
+        66
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08228130.c": {
+      "lines": [
+        10
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08101340.c": {
+      "lines": [
+        59,
+        61
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0822E498.c": {
+      "lines": [
+        21,
+        22
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_080503A0.c": {
+      "lines": [
+        5,
+        7,
+        9,
+        10,
+        14,
+        16,
+        18,
+        19
+      ],
+      "uses": 8
+    },
+    "src/fn/sub_0810056C.c": {
+      "lines": [
+        64,
+        65
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_081FB7D8.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081AE0C0.c": {
+      "lines": [
+        280
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08101550.c": {
+      "lines": [
+        18
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08057158.c": {
+      "lines": [
+        56,
+        82
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08178B98.c": {
+      "lines": [
+        13
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08072E98.c": {
+      "lines": [
+        59
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081806F0.c": {
+      "lines": [
+        18
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08102EE8.c": {
+      "lines": [
+        30,
+        32,
+        33,
+        34,
+        35,
+        36
+      ],
+      "uses": 6
+    },
+    "src/fn/sub_08083354.c": {
+      "lines": [
+        84
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0819FE9C.c": {
+      "lines": [
+        261
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08101B1C.c": {
+      "lines": [
+        71
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0806D438.c": {
+      "lines": [
+        9,
+        106
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08158FC0.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08050404.c": {
+      "lines": [
+        17,
+        19,
+        21,
+        29,
+        30,
+        45,
+        59
+      ],
+      "uses": 7
+    },
+    "src/fn/sub_08050128.c": {
+      "lines": [
+        4,
+        5
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_081029F8.c": {
+      "lines": [
+        53,
+        71,
+        90,
+        91,
+        93
+      ],
+      "uses": 5
+    },
+    "src/fn/sub_08050188.c": {
+      "lines": [
+        4
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081A95A8.c": {
+      "lines": [
+        61
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08047718.c": {
+      "lines": [
+        6,
+        7
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08226CF8.c": {
+      "lines": [
+        44
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08043C4C.c": {
+      "lines": [
+        35
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08178AA0.c": {
+      "lines": [
+        35
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08101500.c": {
+      "lines": [
+        14,
+        16
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_081D33A0.c": {
+      "lines": [
+        51
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822DC78.c": {
+      "lines": [
+        14,
+        15
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0815FEB0.c": {
+      "lines": [
+        23,
+        24,
+        26,
+        27,
+        28,
+        29
+      ],
+      "uses": 6
+    },
+    "src/fn/sub_080671E4.c": {
+      "lines": [
+        21
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822D94C.c": {
+      "lines": [
+        29,
+        32
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_080537D0.c": {
+      "lines": [
+        9
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08038CDC.c": {
+      "lines": [
+        42
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822D2E0.c": {
+      "lines": [
+        30
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08044594.c": {
+      "lines": [
+        71,
+        72
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0810480C.c": {
+      "lines": [
+        77,
+        83
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08050F40.c": {
+      "lines": [
+        16,
+        19,
+        22
+      ],
+      "uses": 3
+    },
+    "src/fn/sub_0805386C.c": {
+      "lines": [
+        26,
+        31
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_0823A060.c": {
+      "lines": [
+        96
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_080597E0.c": {
+      "lines": [
+        36,
+        37
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08082D80.c": {
+      "lines": [
+        108
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08178C80.c": {
+      "lines": [
+        41
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0801C5E4.c": {
+      "lines": [
+        24
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0805732C.c": {
+      "lines": [
+        5,
+        6
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_080837D4.c": {
+      "lines": [
+        41
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_0822D87C.c": {
+      "lines": [
+        46
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08074A98.c": {
+      "lines": [
+        55
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08159284.c": {
+      "lines": [
+        22
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_081F467C.c": {
+      "lines": [
+        102
+      ],
+      "uses": 1
+    },
+    "src/fn/sub_08052C28.c": {
+      "lines": [
+        18,
+        20
+      ],
+      "uses": 2
+    },
+    "src/fn/sub_08030818.c": {
+      "lines": [
+        12
+      ],
+      "uses": 1
+    },
+    "include/scene_panel_interaction.h": {
+      "lines": [
+        24
+      ],
+      "uses": 1
+    },
+    "include/player.h": {
+      "lines": [
+        17,
+        470,
+        471
+      ],
+      "uses": 3
+    },
+    "include/scene_pool.h": {
+      "lines": [
+        134
+      ],
+      "uses": 1
+    },
+    "include/scene_actor_chase_shared.h": {
+      "lines": [
+        341
+      ],
+      "uses": 1
+    },
+    "include/scene_actor_status.h": {
+      "lines": [
+        227,
+        231,
+        461
+      ],
+      "uses": 3
+    },
+    "include/scene_actor_chase_step.h": {
+      "lines": [
+        140,
+        147
+      ],
+      "uses": 2
+    },
+    "include/scene_actor_chase_direct_arrival.h": {
+      "lines": [
+        26,
+        33
+      ],
+      "uses": 2
+    },
+    "include/scene_actor_chase.h": {
+      "lines": [
+        241,
+        247
+      ],
+      "uses": 2
+    },
+    "include/ghoul_disc.h": {
+      "lines": [
+        51
+      ],
+      "uses": 1
+    }
+  },
+  "validation": {
+    "complete_units": 54,
+    "exact_bytes": 515476,
+    "units": {
+      "src/actor_animation_controller.c": {
+        "target_size": 30356,
+        "stock_match": true,
+        "sha256": "498d2a2254f2f8ee135baffa6c97418fb554962e2ce54094b5c4d409016d9a02"
+      },
+      "src/axe.c": {
+        "target_size": 29148,
+        "stock_match": true,
+        "sha256": "327a902a6a8b436ab340a76e25304fb7784d854cb99f326a531651053595eafe"
+      },
+      "src/axe_contact.c": {
+        "target_size": 2708,
+        "stock_match": true,
+        "sha256": "701c34dc95a7f0a6682e3843d4f8e7b9df44326d6027d4201fd60a02b9860180"
+      },
+      "src/bat_restore.c": {
+        "target_size": 9548,
+        "stock_match": true,
+        "sha256": "ffed9b4df3aec043388e34d9de2f242efb21e1d217a1a31601019b057283cb6a"
+      },
+      "src/bee.c": {
+        "target_size": 14112,
+        "stock_match": true,
+        "sha256": "827fed624a8f26c5ad93dc638a39a0c1ea96bd1989b8100dccc6a03697b769b7"
+      },
+      "src/collision_controller.c": {
+        "target_size": 2512,
+        "stock_match": true,
+        "sha256": "c84a443cd4dcdd539ac392bb12baece9961fe6f97efca20de8df4f6f34b0c78f"
+      },
+      "src/crow.c": {
+        "target_size": 13128,
+        "stock_match": true,
+        "sha256": "5611082f53012bc00c9012b3406c42156a235a8df3942e4e33099b2b4c670faa"
+      },
+      "src/dog.c": {
+        "target_size": 37088,
+        "stock_match": true,
+        "sha256": "a7d1d55ace44ef6e6317f99ebf8bb61117f6c4701db3f53c53f3f1c339d65316"
+      },
+      "src/fn/sub_0801CC24.c": {
+        "target_size": 520,
+        "stock_match": true,
+        "sha256": "65c436d8e119caba431c6afe0d485a20d7445dbacdc3a4f3e3ca55fa9782b021"
+      },
+      "src/fn/sub_0802592C.c": {
+        "target_size": 936,
+        "stock_match": true,
+        "sha256": "754afce26baeedea20826d070ed707e191a96a785cee8fd566934739ce23832d"
+      },
+      "src/fn/sub_08028F78.c": {
+        "target_size": 2080,
+        "stock_match": true,
+        "sha256": "47daf40e5871c1bb96a9189c2b456e4ba5bbd85a9cce01fa05b7f0ee28e22262"
+      },
+      "src/fn/sub_0806D438.c": {
+        "target_size": 776,
+        "stock_match": true,
+        "sha256": "7d353e8998ef56235a7d9aaee7632867fc0befce8b64f9a1b4fa87a8b0163ea9"
+      },
+      "src/fn/sub_08075588.c": {
+        "target_size": 2624,
+        "stock_match": true,
+        "sha256": "9dc8b9b42ac176de5b0caebd8a37a2da5dbb8586aa13b9ff4969eaff41f2a461"
+      },
+      "src/fn/sub_08077444.c": {
+        "target_size": 528,
+        "stock_match": true,
+        "sha256": "1396550e196a9dc3ed88477be5900b8b56afeab07d603c4470c691ebdadb84c6"
+      },
+      "src/fn/sub_08078EE8.c": {
+        "target_size": 5956,
+        "stock_match": true,
+        "sha256": "793f17ca8134104a98a9d164620619e184cb010a1a0280302e1fde2bd5b0c9bc"
+      },
+      "src/fn/sub_0807AF94.c": {
+        "target_size": 4488,
+        "stock_match": true,
+        "sha256": "2d9d09b8575c9e32e534d54afe569d0c48d1cdedd0700985a85838151e85c21e"
+      },
+      "src/fn/sub_0807DB34.c": {
+        "target_size": 2048,
+        "stock_match": true,
+        "sha256": "eb06438673e7081b19fbfa757cc1598c8ee7c45874946f5fb7b4baaa9ff9b330"
+      },
+      "src/fn/sub_0807F130.c": {
+        "target_size": 904,
+        "stock_match": true,
+        "sha256": "729331f2d98ee9a22de8cc1ecf22063b96283d0d74a661694b00198962f26771"
+      },
+      "src/fn/sub_0807F710.c": {
+        "target_size": 268,
+        "stock_match": true,
+        "sha256": "45c1a79cf608253676840f7b0c5dc288994946079ffc5f324352e5f525c727f3"
+      },
+      "src/fn/sub_0807F81C.c": {
+        "target_size": 700,
+        "stock_match": true,
+        "sha256": "5c6fb4202f3e7ead04da12fc16ae8c9ccb3b405f6c474e0903ae02a9b85e9390"
+      },
+      "src/fn/sub_0808170C.c": {
+        "target_size": 1168,
+        "stock_match": true,
+        "sha256": "0e5fe647384ae15f53064f647e9e50afe44c696ba3053b34812318b4625ca70d"
+      },
+      "src/fn/sub_080A71A0.c": {
+        "target_size": 532,
+        "stock_match": true,
+        "sha256": "e35c804b5f79d3be425d2878a82074c84518797b8e8238892c101e674e9dbe35"
+      },
+      "src/fn/sub_080A8144.c": {
+        "target_size": 316,
+        "stock_match": true,
+        "sha256": "13a86c454f204bd78123a1dbc5c2cdca3a513102a38547e923595bc6127bfdda"
+      },
+      "src/fn/sub_080AEE08.c": {
+        "target_size": 984,
+        "stock_match": true,
+        "sha256": "08e9cfa894cb6b0f967ceb1962613e1b85c84152232a76ef5412d9aa74660f0e"
+      },
+      "src/fn/sub_080F67AC.c": {
+        "target_size": 2020,
+        "stock_match": true,
+        "sha256": "43234b7eb45452b09a77b0d04f95e8975e896577658ca310b8e93666c2ca9f71"
+      },
+      "src/fn/sub_0812E7EC.c": {
+        "target_size": 1764,
+        "stock_match": true,
+        "sha256": "dbe1e62a29b37c4a50cf6fb6966bcbacda91f113d68b3bcaedae97e91c8daca6"
+      },
+      "src/fn/sub_0812F5D4.c": {
+        "target_size": 800,
+        "stock_match": true,
+        "sha256": "b9d608f37bae35f95972da5d069ff1c183733ced50c1a90223688f51cf3feac6"
+      },
+      "src/fn/sub_0812FA0C.c": {
+        "target_size": 1976,
+        "stock_match": true,
+        "sha256": "9d3591e6d9977e9dd6ae1aed9403e0fb78ca2f52d42667a25de00663f5ef6028"
+      },
+      "src/fn/sub_08131820.c": {
+        "target_size": 524,
+        "stock_match": true,
+        "sha256": "8106b885f29231ffd094c87539894ae1bda7eca6d6f9d10989a8ba06af1527e0"
+      },
+      "src/fn/sub_08135F70.c": {
+        "target_size": 1156,
+        "stock_match": true,
+        "sha256": "af0619ec55eeb9f6fd4fc9848372280af20960281fa1ec5da4e77505eb55bdd0"
+      },
+      "src/fn/sub_081A2C80.c": {
+        "target_size": 1520,
+        "stock_match": true,
+        "sha256": "ed34241d1ebba420d9ca7f1e6e19806a43d029ba33f9e268b55ea44fc8f1a05a"
+      },
+      "src/fn/sub_081FAE0C.c": {
+        "target_size": 2428,
+        "stock_match": true,
+        "sha256": "2d5c8a48b86edb1323dff74dbbdbca1fd9a7c626a42c7e1db0d849f71f0fde58"
+      },
+      "src/ghost.c": {
+        "target_size": 22680,
+        "stock_match": true,
+        "sha256": "7ecf819431ab0683ca2200eedcd8d0cb4a0f1d3a69ccf67768b906de527b4950"
+      },
+      "src/ghoul.c": {
+        "target_size": 20640,
+        "stock_match": true,
+        "sha256": "92e65de883f2d76856e71c59eeecb06cfcfb5e585bcf740681175841b17826b1"
+      },
+      "src/ghoul_states.c": {
+        "target_size": 3780,
+        "stock_match": true,
+        "sha256": "5d89bf3e6ffbc934409880eb7020c3a57801e5ce298adfeba17f008b1722a052"
+      },
+      "src/golem_2.c": {
+        "target_size": 12492,
+        "stock_match": true,
+        "sha256": "4a06632c24456f144357d3d754602807432ff3a71ba6b2c7b994eb19af3e2029"
+      },
+      "src/golem_main.c": {
+        "target_size": 20620,
+        "stock_match": true,
+        "sha256": "026d558ce93a6016c3118765209d28a2ca4166c8ad02e57a8f4d6881f1abafb9"
+      },
+      "src/golem_main_2.c": {
+        "target_size": 17184,
+        "stock_match": true,
+        "sha256": "656602cc5393873cd3ba4ee12daef47db5a0fc678a07dc489359e3ab3dc89ee9"
+      },
+      "src/ivy.c": {
+        "target_size": 21464,
+        "stock_match": true,
+        "sha256": "f1788d7f424d06b11cc7227ddb66b9889909a93aa1ffcc47d6ee452577848f6b"
+      },
+      "src/lun.c": {
+        "target_size": 16116,
+        "stock_match": true,
+        "sha256": "d83f3235fad40d3d20322fdab54c82c002ed2a222bc95e2adbbd5c4d1944d9b7"
+      },
+      "src/mimic.c": {
+        "target_size": 10908,
+        "stock_match": true,
+        "sha256": "9a1116c03a6cdc5c5f2da6f2cf892189b765f9ba770732e7e2f6951f52db08e2"
+      },
+      "src/mummy.c": {
+        "target_size": 2900,
+        "stock_match": true,
+        "sha256": "f34b00262f7c873c113d06353e99e2ec63c417ad3cf17c0ecc51bf4ff0d889a3"
+      },
+      "src/mummy_entry.c": {
+        "target_size": 49808,
+        "stock_match": true,
+        "sha256": "e8f0a99c6093065f3b906b99b466faca61bcdce8d84d731b60807e867863d5bd"
+      },
+      "src/octopus.c": {
+        "target_size": 14980,
+        "stock_match": true,
+        "sha256": "86e786d26aaa984f1313cc41b8a7676554c70c9fe884cd1993d80fac81ee518b"
+      },
+      "src/scene_actor_approach.c": {
+        "target_size": 3220,
+        "stock_match": true,
+        "sha256": "49164d65fa4720bcde00b3355ccbab665c36cd3f157bd04788f6b495dc35af44"
+      },
+      "src/skeleton.c": {
+        "target_size": 13500,
+        "stock_match": true,
+        "sha256": "221ecd6acc69f178725b955de8a17d405ddb32f6af169f63ec1e2651993f5991"
+      },
+      "src/skeleton_main.c": {
+        "target_size": 31956,
+        "stock_match": true,
+        "sha256": "eb3c1a9d5f466358cfc52ec94c24337e1b608a66e29f070e77a0f24bcbd9a8bc"
+      },
+      "src/skeleton_rise.c": {
+        "target_size": 5508,
+        "stock_match": true,
+        "sha256": "2301753725ca99c13e6d05b09be0280fc62ccbd79419340667804b78f80d8326"
+      },
+      "src/slime.c": {
+        "target_size": 15436,
+        "stock_match": true,
+        "sha256": "bf756a51d1372841312a6a9d9323ffeda93836e49140a74990c16a28b3a3bd27"
+      },
+      "src/spider.c": {
+        "target_size": 15172,
+        "stock_match": true,
+        "sha256": "f3814ada0fe79e6e9512087521bf041e68e5d57e0f1022626ef94ea068834d79"
+      },
+      "src/tentacle_body.c": {
+        "target_size": 5628,
+        "stock_match": true,
+        "sha256": "e56f3e46d399ed506b66c62198a9dedf1b6614d8e00e832533e88ccd19357534"
+      },
+      "src/timed_effect.c": {
+        "target_size": 1992,
+        "stock_match": true,
+        "sha256": "2690dcad6962cc228005af7d4650e339df8f91eb70d9d46243d04b46c2b8a697"
+      },
+      "src/vorn.c": {
+        "target_size": 8472,
+        "stock_match": true,
+        "sha256": "6ce0647294f257e40d38f687fafdbecd85e5acadd66e154bbaed008abb099228"
+      },
+      "src/vorn_main.c": {
+        "target_size": 25404,
+        "stock_match": true,
+        "sha256": "918d8107286067d2fac22962b916d35ef1ba7fad0c233eb24812bd0be8a4d804"
+      }
+    }
+  },
+  "worker_commits": [
+    {
+      "commit": "fb965f28122d59702ea8190b549404ac950dec02",
+      "source": "src/vorn_main.c",
+      "target_size": 25404,
+      "integrated_commit": "dbf58803afbb3b36af673bcb0d8a59f6d9b19ec5"
+    },
+    {
+      "commit": "b3f5f65d2ede52fca7f62a710c51ffc7cca7d81b",
+      "source": "src/golem_main_2.c",
+      "target_size": 17184,
+      "integrated_commit": "6f1f5a84af6047441a3638231b4414666a0b1c90"
+    },
+    {
+      "commit": "334d56a675b379655e545ce24df053eddc992470",
+      "source": "src/ivy.c",
+      "target_size": 21464,
+      "integrated_commit": "1da8d955d544b6c445865398adbadb4e3dabc165"
+    },
+    {
+      "commit": "a1f565e2ee05c4903ed99efb2a2aab79d3e3f9f3",
+      "source": "src/mummy_entry.c",
+      "target_size": 49808,
+      "integrated_commit": "c9723c09f32b2cd1b02dd9c2701df4619c3dd10f"
+    },
+    {
+      "commit": "2d261fce51e33b9443d83e6153832f48280ca91b",
+      "source": "src/scene_actor_approach.c",
+      "target_size": 3220,
+      "integrated_commit": "428db9f9b628627d84364b5d70909b5ef1723734"
+    },
+    {
+      "commit": "df16ab17bbfe405daed7fccc9ca8685bae7662fd",
+      "source": "src/lun.c",
+      "target_size": 16116,
+      "integrated_commit": "77e8c7e077b86a9bf9f65dfdc6d662cd0230f259"
+    },
+    {
+      "commit": "faa21f1250d1bcf8c51c446835605c5471daf6a8",
+      "source": "src/golem_2.c",
+      "target_size": 12492,
+      "integrated_commit": "748d53b4ea734da3b1bd34940a13529783fd6ec4"
+    },
+    {
+      "commit": "aa007ca8184c3ea712e31e30250021d75d24ecbf",
+      "source": "src/slime.c",
+      "target_size": 15436,
+      "integrated_commit": "84df995324671f3f6ba9db533d8dd7000206fd1b"
+    },
+    {
+      "commit": "d28b434037431e9c8a2f01dee60bbdcef8871fee",
+      "source": "src/actor_animation_controller.c",
+      "target_size": 30356,
+      "integrated_commit": "0d47b0e38a8cfda286282a9297a06fa770ac54d9"
+    },
+    {
+      "commit": "46587250e7f6786088900b317409d419ee051548",
+      "source": "src/bat_restore.c",
+      "target_size": 9548,
+      "integrated_commit": "e5ef6d02c1642920550ec5f80b007a7a43868e92"
+    },
+    {
+      "commit": "1b6604bdb7a158ae633dded7a7afcc98b37eb919",
+      "source": "src/axe.c",
+      "target_size": 29148,
+      "integrated_commit": "0b684b5ba96567d21858a05d9ade8dd4918fba33"
+    },
+    {
+      "commit": "7511e354a852cba03d57f511cade90d4aa828e1a",
+      "source": "src/spider.c",
+      "target_size": 15172,
+      "integrated_commit": "72f2c51d3644157c73522bca75f06b6b54680890"
+    },
+    {
+      "commit": "9c9d83d41f4df87d41926783ed916729eda26fff",
+      "source": "src/skeleton_rise.c",
+      "target_size": 5508,
+      "integrated_commit": "929ae1c7f1f5713847fe150af040c9cbb62d636b"
+    },
+    {
+      "commit": "5cf5fd5b5ae3261ab0fcec93075d89c8378643a2",
+      "source": "src/fn/sub_080F67AC.c",
+      "target_size": 2020,
+      "integrated_commit": "30efcfe14819979a883fb310d2023b0057b8fb84"
+    },
+    {
+      "commit": "5a5833204d1e7d0ddae149c0a37b2f34c717f12f",
+      "source": "src/fn/sub_081FAE0C.c",
+      "target_size": 2428,
+      "integrated_commit": "bc4351d0e42169ca2882f3e0a60168b61164fa04"
+    },
+    {
+      "commit": "aea8fef514c93815a6c3b93814204960a5d227fb",
+      "source": "src/fn/sub_0812FA0C.c",
+      "target_size": 1976,
+      "integrated_commit": "ad1c80594428179a29879782e4f3090a4c661261"
+    },
+    {
+      "commit": "3dc5a885a07dafd6ebdc7024efc41798abae1d1d",
+      "source": "src/fn/sub_0801CC24.c",
+      "target_size": 520,
+      "integrated_commit": "e21386b2a34f2e3900efc287979e29357c6ecb95"
+    },
+    {
+      "commit": "3a8e5c0ec70a818cb4856b3f80f3edbf9eaed9b4",
+      "source": "src/timed_effect.c",
+      "target_size": 1992,
+      "integrated_commit": "b8501a89898b72d9702457d775d102fa5d0c4fd2"
+    },
+    {
+      "commit": "7be6e69e9571acf0c087e9c76e5c77777b86e0db",
+      "source": "src/fn/sub_0802592C.c",
+      "target_size": 936,
+      "integrated_commit": "a624ced78a16f6ec9d356651c6e3921fa50086c3"
+    },
+    {
+      "commit": "28abd673bcd7855f779393d67349b33dc9a084d5",
+      "source": "src/fn/sub_08028F78.c",
+      "target_size": 2080,
+      "integrated_commit": "664ec4097d4f570603606e7386785f8a69847621"
+    },
+    {
+      "commit": "16451028da78564a0682740c8909935e94c02f65",
+      "source": "src/fn/sub_081A2C80.c",
+      "target_size": 1520,
+      "integrated_commit": "a02c81222a7b9eb438540ba95868446427671dc9"
+    },
+    {
+      "commit": "3c3dc2f75a947d1c12ab5b4a786c63a0f6bb1e5a",
+      "source": "src/dog.c",
+      "target_size": 37088,
+      "integrated_commit": "0f8a2baa122174c724674d8077c552dfab205f36"
+    },
+    {
+      "commit": "416b20c703f218a1c86a229364014c8173d49075",
+      "source": "src/golem_main.c",
+      "target_size": 20620,
+      "integrated_commit": "1fe2a334487c155ec2ffa4d4c492b8c626ede6ea"
+    },
+    {
+      "commit": "05a8c69e15c22a9d64c303e08da5958c48b099fd",
+      "source": "src/skeleton_main.c",
+      "target_size": 31956,
+      "integrated_commit": "59d420fb74eae8abe62fe3cb5ac78e0b702914f3"
+    },
+    {
+      "commit": "44aecadc4969a1f7daa8eb3a2ba07fed1d80359d",
+      "source": "src/octopus.c",
+      "target_size": 14980,
+      "integrated_commit": "39d2f2fca0a8f44c39266e7a6a29d3115eba0b01"
+    },
+    {
+      "commit": "0690367d297e66da1b379547ba261f1938f6d0bf",
+      "headers": [
+        "include/scene_actor_chase_shared.h",
+        "include/scene_actor_status.h",
+        "include/scene_actor_chase_step.h",
+        "include/scene_actor_chase_direct_arrival.h",
+        "include/ghoul_disc.h"
+      ],
+      "integrated_commit": "eee8e20b6abe7d3a8fc433d8e73f71c8e549b665"
+    }
+  ],
+  "excluded_sync_commits": [
+    "009b70720",
+    "170ec0f64",
+    "ec99806d2",
+    "202c22aed"
+  ],
+  "candidate_evidence": "notes/evidence/round14-player-slots-candidates_2026-11-16.jsonl",
+  "candidate_records": 12,
+  "candidate_patches_replayed": 9
+}

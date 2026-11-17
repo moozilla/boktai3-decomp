@@ -4431,7 +4431,6 @@ struct ActorInitController {
     u32 variant;
 };
 
-extern void *gUnknown_02000580;
 s32 AnimData_Load(void *, u32);
 void Sprite_Init(void *, void *, u32);
 void Sprite_SetOriginStub(void *, s32, s32);
@@ -4469,7 +4468,7 @@ s32 Actor_InitializeController(void *arg0)
     s32 i;
     u32 mask;
     gScriptedActorController = arg0;
-    p->owner = gUnknown_02000580;
+    p->owner = gPlayers[0];
     obj = &p->obj;
     ActorInit_InitMainSprite(p, obj);
     shadow = p->shadow;

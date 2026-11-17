@@ -1,38 +1,6 @@
-#include "global.h"
+#include "feather_effect_pool.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct FeatherSequence {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
-};
-struct Feather {
-    u32 flags;
-    u8 unknown4[3], priority;
-    u8 unknown8[4];
-    void *graphics;
-    u16 frame;
-    u8 unknown12[10];
-    struct Vec position;
-    u8 unknown24[8];
-    struct FeatherSequence sequence;
-    u8 unknown3C[0x54];
-    u16 age;
-    u8 state;
-    s8 slot;
-    u16 blinkAge;
-    u8 enter, angle;
-    u32 effectFlags, variant;
-};
-struct FeatherPool {
-    u8 task[0x18];
-    u8 graphics[0x1c];
-    void *sequences;
-    u32 used;
-};
 void Sprite_Remove(void *);
 static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
 {
@@ -45,18 +13,19 @@ static inline void SelectDirection(u8 *angle, u8 *row, u8 *flip)
         *row = quadrant;
     }
 }
-static inline u32 Step(struct Feather *owner, struct FeatherSequence *state, struct Feather *base)
+static inline u32 Step(struct ContactSwarmSprite *owner, struct DisplaySequenceState *state,
+                       struct Feather *base)
 {
     return PlayerCue_StepSequenceEnded(owner, &base->sequence);
 }
 
 void FeatherEffectPool_SpawnGroundScatter(struct Feather *, s32);
 // confidence=low: emits ground scatter on frame three, then releases the completed feather effect.
-void FeatherEffectPool_UpdateScatterAnimation(void *unused, struct Feather *p)
+void FeatherEffectPool_UpdateScatterAnimation(struct FeatherPool *unused, struct Feather *p)
 {
-    struct Feather *sprite = p;
+    struct ContactSwarmSprite *sprite = &p->sprite;
     if (p->enter) {
-        p->flags &= ~1;
+        p->sprite.flags &= ~1;
         p->enter = 0;
     }
     if (p->sequence.index == 3 && !p->sequence.elapsed)

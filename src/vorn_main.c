@@ -2372,7 +2372,7 @@ static inline u8 Vorn_TryTrackedCell(void *object)
     SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
     cell = SceneActorChase_CellAt(&tracking->target->position);
     if (cell == actor->base.terrainCell ||
-        SceneActorChase_Bits32(&((struct SceneActorChasePlayer *)gUnknown_02000580[0])->flags,
+        SceneActorChase_Bits32(&gPlayers[0]->statusFlags,
                                0x20000)) {
         SceneActor_DispatchContextAction(actor->base.context, 0);
         return 0;
@@ -2413,7 +2413,7 @@ u32 Vorn_SelectRetreatRoute(struct ChaseActor *actor, u32 reset)
         }
         if (!actor->base.tracking.target)
             actor->base.tracking.target =
-                &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+                &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         if ((!Vorn_TryTrackedCell(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
@@ -2427,7 +2427,7 @@ u32 Vorn_SelectRetreatRoute(struct ChaseActor *actor, u32 reset)
         }
         if (!actor->base.tracking.target)
             actor->base.tracking.target =
-                &((struct SceneActorChasePlayer *)gUnknown_02000580[0])->target;
+                &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         if ((!Vorn_TryTrackedCell(actor)) && (!Vorn_SelectReachableEscapeCell(actor, old)))
             return 0;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
