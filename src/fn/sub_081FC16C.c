@@ -12,5 +12,6 @@ u32 Ratatosk_OnAnimatedParticlePoolDestroy(struct RatatoskParticlePool *a)
         i++;
         e++;
     } while (i <= 0x1F);
-    return gRatatoskParticlePool = 0;
+    gRatatoskParticlePool = 0;
+    return 0;
 }

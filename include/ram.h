@@ -277,7 +277,7 @@ extern u16 gInventoryUseFlags; /* inventory use-permission flags */
 /* 0x020005AC */
 extern void *gHresvelgr; /* Hresvelgr boss task (Hresvelgr_Create/Destroy) */
 /* 0x020005E4 */
-extern u32 gRatatoskParticlePool; /* Ratatosk animated particle pool */
+extern struct RatatoskParticlePool *gRatatoskParticlePool; /* Ratatosk animated particle pool */
 /* 0x020005E8 */
 extern u32 gSceneProjectilePool; /* scene projectile pool (SceneProjectile_*) */
 /* 0x020005F0 */

@@ -219,7 +219,7 @@ addr,name,size,kind,decl,header,confidence,notes
 020005C0,gAnimPanelSavedSelections,1A,object,extern u8 gAnimPanelSavedSelections[];,include/ram.h,low,
 020005DC,gScreenTextSavedValue,4,object,extern s32 gScreenTextSavedValue;,include/ram.h,low,provisional: value retained between screen-text menu instances
 020005E0,gParticlePool,4,object,extern struct ParticlePool *gParticlePool;,include/ram.h,low,
-020005E4,gRatatoskParticlePool,4,object,extern u32 gRatatoskParticlePool;,include/ram.h,low,Ratatosk animated particle pool
+020005E4,gRatatoskParticlePool,4,object,extern struct RatatoskParticlePool *gRatatoskParticlePool;,include/ram.h,low,Ratatosk animated particle pool
 020005E8,gSceneProjectilePool,4,object,extern u32 gSceneProjectilePool;,include/ram.h,low,scene projectile pool (SceneProjectile_*)
 020005EC,gSlotController,4,object,extern u8 *gSlotController;,include/ram.h,low,
 020005F0,gSpriteParticleManager,4,object,extern u32 gSpriteParticleManager;,include/ram.h,low,sprite particle manager (SpriteParticle_*)
