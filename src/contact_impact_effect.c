@@ -297,8 +297,7 @@ static inline void SetFrame(struct OrbitEffectSprite *sprite, s32 frame)
 void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *effect)
 {
     u32 flags = effect->sprite.flags;
-    u32 one = 1;
-    flags &= one;
+    flags &= 1u;
     if (!flags) {
         switch (effect->blinkState) {
             case 0:
@@ -307,7 +306,7 @@ void ContactImpactEffect_UpdateBlinkFrame(struct ContactImpactEffect *effect)
                         s32 frame = effect->blinkState;
                         SetFrame(&effect->sprite, frame);
                     }
-                    effect->blinkState = one;
+                    effect->blinkState = 1u;
                     effect->blinkTimer = flags;
                 }
                 break;
