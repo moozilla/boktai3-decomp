@@ -27,17 +27,7 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
     switch (phase) {
         case 0:
             Screamer_StepAnimation(p);
-            if (({
-                    u32 off = 0x1ca;
-                    s16 *field;
-                    field = (void *)((u8 *)p + off);
-                    *field;
-                }) > ({
-                    u32 off = 0x1d4;
-                    s16 *field;
-                    field = (void *)((u8 *)p + off);
-                    *field;
-                })) {
+            if (p->f1CA > p->f1D4) {
                 Anim_RestartSequence(&p->sequence, p->f218, 0x1B, (u8)p->f1D8, 0);
                 Anim_SetDurationScale(&p->sequence, 0x20);
                 p->f1D6 = 1;
@@ -50,21 +40,13 @@ s32 Screamer_UpdateScream(struct ScreamerState *p)
         case 1:
             if (Screamer_StepScreamLoop(p, phase)) {
                 {
-                    u32 countOffset = 0x1D2;
-                    u16 *count;
+                    u16 *count = (u16 *)&p->f1D2;
                     u32 next;
-                    u32 limitOffset;
                     s16 *limit;
-                    count = (void *)((u8 *)p + countOffset);
                     next = *count + 1;
                     *count = next;
-                    limitOffset = 0x1D0;
-                    limit = (void *)((u8 *)p + limitOffset);
-                    if ((s16)next >= ({
-                            s32 value;
-                            value = *limit;
-                            value;
-                        })) {
+                    limit = &p->f1D0;
+                    if ((s16)next >= *limit) {
                         Anim_RestartSequence(&p->sequence, p->f218, 0x1D, (u8)p->f1D8, 0);
                         p->f1D6 = 2;
                     }
