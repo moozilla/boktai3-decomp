@@ -4,7 +4,7 @@ Tags: #matching #animation #concessions #input
 
 ## Result and scope
 
-This bounded follow-up starts from worker commit `5c3596031`, after the
+This bounded follow-up starts from canonical replay commit `72290d35f`, after the
 17-unit sequence-view/background batch. It investigates the remaining
 ordinary animation reads in `ActorController_UpdateAnimation` (`08184F04`)
 and `Anim_SetSequence` (`08220C8C`). The input function `0805E7D8` received a
@@ -145,8 +145,9 @@ declaration was added.
 records: two baselines, the accepted actor source, five compiled nonmatches,
 and two explicit compile failures. Each record includes its hypothesis,
 source hash, measurements, and a full patch against the named source file
-at `5c3596031`. Every patch was replayed against that baseline and its
-resulting source hash checked.
+at `72290d35f`. Both source baselines were verified byte-identical to the
+original worker commit before normalization. Every patch was replayed
+against the canonical baseline and its resulting source hash checked.
 
 `notes/round14-animation-status-open-candidate.patch` contains the final
 typed `.anm` resource candidate. It is unapplied and passes
