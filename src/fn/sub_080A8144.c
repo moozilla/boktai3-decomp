@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_reset.h"
 
 void TentacleBody_UpdateSpreadWindup(void);
@@ -12,33 +13,8 @@ static inline u8 TakeQueuedFlag(u8 *flag)
 }
 void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
 {
-    s32 savedOffset;
     if (TakeQueuedFlag(&p->base.field2B1)) {
-        void (*control)(void) = TentacleBody_UpdateSpreadWindup;
-        u8 kind = 38;
-        u32 zero;
-        u32 *flags;
-        s32 mask;
-        {
-            u8 *taken = &p->base.field2B2;
-            zero = 0;
-            *taken = 1;
-        }
-        do {
-            u32 offset = 0x2B0;
-            do {
-                *((u8 *)p + offset) = zero;
-            } while (0);
-            offset += 5;
-            *((u8 *)p + (savedOffset = offset)) = kind;
-            p->base.target = (void *)control;
-            offset += 0x13;
-            *(u16 *)(offset + (u32)p) = zero;
-        } while (0);
-        flags = &p->base.pendingControlFlags;
-        mask = -2;
-        *flags &= mask;
-        p->base.pendingControl = zero;
+        SceneActorChase_SetControl(p, TentacleBody_UpdateSpreadWindup, 38);
         {
             u32 mask = 0x100000;
             u32 *flags = &p->base.statusFlags;
@@ -46,8 +22,7 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
         }
         Sound_PlaySong(0x19B);
     }
-    savedOffset = 39;
-    if (p->base.controlKind == savedOffset &&
+    if (p->base.controlKind == 39 &&
         (u8)Callback_InvokeActor(p, p->base.contactQuery.opaque)) {
         u32 two = 2;
         u8 *field = &p->base.state2A8;
