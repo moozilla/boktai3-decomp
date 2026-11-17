@@ -651,10 +651,7 @@ void Palette_SetBrightnessFromScript(void)
 {
     struct PaletteController *p = gPaletteController;
     if (p) {
-        struct PaletteTransition *t = ({
-            struct PaletteTransition *hint = &p->transition;
-            hint;
-        });
+        struct PaletteTransition *t = &p->transition;
         s32 enabled = Script_GetKeywordValue('n', 0);
         u32 query = Script_SeekToKeyword('q');
         u32 immediate = ((0u - query) | query) >> 31;
