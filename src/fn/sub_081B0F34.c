@@ -42,7 +42,7 @@ static inline void SetAnimation(struct ActorStatusPart *p, u8 *boss, u32 id, u32
 }
 static inline void SetVector(struct SceneVec *p, s32 x, s32 y, s32 z)
 {
-    ((volatile s16 *)p)[0] = x;
+    p->x = x;
     p->y = y;
     p->z = z;
 }
@@ -98,11 +98,11 @@ void ActorStatus_UpdatePlayerCapture(u8 *boss, struct ActorStatusPart *p)
                     MotionTrack_Initialize(p->motion, &p->offset, &target, 0, 4);
                 }
                 {
-                    volatile s16 *out = (void *)(&playerTarget);
+                    struct SceneVec *out = &playerTarget;
                     struct SceneVec *position = &p->position;
-                    out[0] = position->x;
-                    out[1] = position->y - 128;
-                    out[2] = position->z;
+                    out->x = position->x;
+                    out->y = position->y - 128;
+                    out->z = position->z;
                 }
                 if (!p->variant) {
                     u8 *player = (*(u8 **)gPlayers);
