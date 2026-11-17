@@ -40,8 +40,7 @@ void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *actor,
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             break;
@@ -93,8 +92,7 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             break;
@@ -182,8 +180,7 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             break;
@@ -376,8 +373,7 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
                 ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[0], four);
                 {
                     struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
-                    u32 one = 1;
-                    motion->flags |= one;
+                    motion->flags |= 1;
                 }
                 actor->flags &= ~0x20;
                 {
@@ -469,8 +465,7 @@ void ActorController_UpdateFadeAnimationTransition(struct SceneCombatActor *acto
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             Sound_PlaySongChecked(0xC1);
@@ -518,8 +513,7 @@ void ActorController_UpdateSoundedAnimationTransition(struct SceneCombatActor *a
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             Sound_PlaySongChecked(0xC1);
@@ -555,8 +549,7 @@ void ActorController_UpdatePaletteAnimationTransition(struct SceneCombatActor *a
             ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
             ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
             {
-                u32 one = 1;
-                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, one);
+                ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
             actor->flags &= ~0x20;
             Armor_StartPaletteTransition(actor);
