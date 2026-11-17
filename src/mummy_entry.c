@@ -1241,17 +1241,15 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
     }
     {
         u32 mask = 0x4000;
-        u32 zero;
         u32 test = (*motionFlags) & mask;
         if (!test && (u32)(actor->category - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
         actor->fieldAA = 0;
-        zero = 0;
         {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind = 16;
             actor->field2B2 = 1;
-            actor->field2B0 = zero;
+            actor->field2B0 = 0;
             actor->field2B5 = kind;
             actor->target = callback;
             actor->field2C8 = 0;
@@ -1264,7 +1262,7 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
             {
                 u32 behavior = 2;
                 actor->state2A8 = 1;
-                actor->phase2A9 = zero;
+                actor->phase2A9 = 0;
                 actor->behavior2AA = behavior;
                 actor->counter2AC = 0;
                 actor->field2B1 = 1;
