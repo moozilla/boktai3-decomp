@@ -219,9 +219,8 @@ int OrbitingParticles_Initialize(struct OrbitingParticles *m, struct SceneVec *s
         p->sprite.position.y += m->position.y;
         p->sprite.position.z += m->position.z;
         {
-            int one = 1;
-            s->priority = one;
-            i += one;
+            s->priority = 1;
+            i += 1;
         }
     }
     return 0;
