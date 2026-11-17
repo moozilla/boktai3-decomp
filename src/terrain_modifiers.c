@@ -6,7 +6,7 @@
 #define Terrain_GetHeightDifference        sub_0821BE3C
 #define Terrain_GetCellFlagsAt             sub_0821BDD8
 #define Terrain_GetCardinalDirectionToCell sub_0821BCE4
-#include "terrain_collision.h"
+#include "terrain_sampling.h"
 #include "engine_globals.h"
 #include "engine.h"
 #include "ram.h"
@@ -153,8 +153,6 @@ s32 Terrain_GetCardinalDirectionToCell(s32 start, s32 target)
     return -1;
 }
 
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
-
 u16 Terrain_GetHeightAt(u16 *point)
 {
     s32 x, z;
@@ -208,36 +206,6 @@ u16 Terrain_GetCellFlagsAt(u16 *pos)
     return ((struct TerrainGrid *)(index * sizeof(struct TerrainCell) + (u32)cells))
         ->cells[0]
         .flags;
-}
-
-static inline s32 Terrain_GetCellIndex(struct ContactPosition *pos)
-{
-    s32 x = pos->x >> 8, z = pos->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
-static inline s32 Terrain_SampleHeight(struct ContactPosition *position)
-{
-    s32 index = Terrain_GetCellIndex(position), height;
-    u8 *cell = TerrainModifiers_FindCellOverride(index, 1);
-    u32 kind;
-    if (cell)
-        cell = (u8 *)&((struct TerrainCellOverride *)cell)->cell;
-    else
-        cell = (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[index];
-    kind = *cell >> 4;
-    height = (*cell & 15) << 8;
-    switch (kind) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
 }
 
 u16 Terrain_GetHeightDifference(struct ContactPosition *a, struct ContactPosition *b)
