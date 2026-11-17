@@ -24,16 +24,15 @@ s32 Anim_SetFrameDurationScale(struct AnimState *anim, u16 scale)
     if (anim->duration == 0)
         anim->duration = 1;
     {
-        s32 zero = 0;
         anim->status &= 0xfe;
         if (anim->timer + 1 >= anim->duration) {
             if (anim->flags & 2) {
-                if (anim->frame == zero)
+                if (anim->frame == 0)
                     anim->status |= 1;
             } else if (anim->frame + 1 >= anim->frameCount)
                 anim->status |= 1;
         }
-        return zero;
+        return 0;
     }
     return 0;
 }
