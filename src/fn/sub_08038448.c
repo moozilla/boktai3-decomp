@@ -1,170 +1,107 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
 
 // Tentative panel/save fields used to choose four distinct available entries.
-struct P {
+struct WirelessEquipmentMenu {
     u8 pad[0x1E];
     u16 round;
     u8 pad2[0x54];
     u32 rightMask;
 };
-struct Save {
+struct WirelessEquipmentSave {
     u8 pad[0x4C];
     u32 selection;
-    s16 leftSelected, rightSelected;
-    u8 pad2[0x34];
+    union {
+        struct {
+            s16 left, right;
+        } sides;
+        u32 word;
+    } selected;
+    u32 field54, field58;
+    u8 pad2[0x2C];
     s16 rightRows[16];
 };
-extern struct Save *gGameState;
+extern struct WirelessEquipmentSave *gGameState;
 void GameState_AddEquipment(int);
 int Mod(int, int);
 
-void WirelessGameMenu_InitEquipmentChoices(struct P *p)
+void WirelessGameMenu_InitEquipmentChoices(struct WirelessEquipmentMenu *p)
 {
     u32 mask = 0;
-    register int start asm("r4");
-    register int i asm("r5");
-    u32 *random;
+    int start, i, n, item;
+    u32 index;
     gGameState->selection = mask;
     GameState_AddEquipment(0);
-    {
-        u32 t = 1;
-        mask = t;
-    }
+    mask = 1;
     if ((p->rightMask & 2) && p->round > 3) {
         GameState_AddEquipment(1);
-        {
-            u32 t = 3;
-            mask = t;
-        }
+        mask = 3;
     }
     if ((p->rightMask & 4) && p->round > 3) {
         GameState_AddEquipment(2);
-        {
-            u32 t = mask;
-            t |= 4;
-            mask = t;
-        }
+        mask |= 4;
     }
     if (p->rightMask & 64) {
         GameState_AddEquipment(6);
-        {
-            u32 t = mask;
-            t |= 64;
-            mask = t;
-        }
+        mask |= 64;
     }
     if (p->rightMask & 128) {
         GameState_AddEquipment(7);
-        {
-            u32 t = mask;
-            t |= 128;
-            mask = t;
-        }
+        mask |= 128;
     }
     if (p->rightMask & 256) {
         GameState_AddEquipment(8);
-        {
-            u32 t = mask;
-            t |= 256;
-            mask = t;
-        }
+        mask |= 256;
     }
     if (p->rightMask & 512) {
         GameState_AddEquipment(9);
-        {
-            u32 t = mask;
-            t |= 512;
-            mask = t;
-        }
+        mask |= 512;
     }
     if (p->rightMask & 1024) {
         GameState_AddEquipment(10);
-        {
-            u32 t = mask;
-            t |= 1024;
-            mask = t;
-        }
+        mask |= 1024;
     }
     if (p->rightMask & 2048) {
         GameState_AddEquipment(11);
-        {
-            u32 t = mask;
-            t |= 2048;
-            mask = t;
-        }
+        mask |= 2048;
     }
     start = Mod(gSceneEffectPalettePhase, 12);
-    i = 0;
     {
-        register u32 *t asm("r0") = &gRandomIndex;
-        asm volatile("" : "+r"(t));
-        random = t;
-    }
-    do {
-        int n;
-        int limit;
-        int offset;
-        int index;
-        int byteOffset;
-        {
-            struct Save **slot = &gGameState;
-            struct Save *save;
-            s16 *row;
-            save = *slot;
-            byteOffset = i * 2;
-            row = (s16 *)(byteOffset + (u32)save + 0x88);
-            *row = -1;
+        u32 raw = (u16)gGameState->selected.sides.right;
+        if ((s32)raw < 0) {
+            u32 v0 = gGameState->selection;
+            u32 v1 = gGameState->selected.word;
+            u32 v2 = gGameState->field54;
+            u32 v3 = gGameState->field58;
+            Mod(0, 12);
+            if (v0) {
+                u32 sum = v0 + v1 + v2 + v3;
+                u32 other = v0 - v1;
+                struct WirelessEquipmentSave *save = gGameState;
+                save->selection = sum;
+                save->selected.word = other;
+            }
         }
-        n = start;
-        offset = byteOffset;
-        limit = start + 12;
-        i++;
-        goto condition;
-    next:
-        n++;
-    condition:
-        if (n < limit) {
-            register int item asm("r1") = n;
-            register u32 bit asm("r2");
-            asm volatile("" : "+r"(n), "+r"(limit), "+r"(offset)::"r10", "r12");
+    }
+    for (i = 0; i <= 3; i++) {
+        *(gGameState->rightRows + i) = -1;
+        for (n = start; n < start + 12; n++) {
+            item = n;
             if (item > 11)
                 item -= 12;
-            bit = 1 << item;
-            if (({
-                    u32 t = mask;
-                    t & bit;
-                }) != 0) {
-                {
-                    struct Save **slot = &gGameState;
-                    struct Save *save;
-                    save = *slot;
-                    *(s16 *)(offset + (u32)save + 0x88) = item;
-                }
-                {
-                    u32 t = mask;
-                    t &= ~bit;
-                    mask = t;
-                }
+            if (mask & (1 << item)) {
+                *(gGameState->rightRows + i) = item;
+                mask &= ~(1 << item);
                 start = item;
-                goto selected;
+                break;
             }
-            goto next;
         }
-    selected: {
-        register u32 *read asm("r1") = random;
-        u32 *write;
-
-        index = (*read + 1) & 1023;
-        write = random;
-
-        *write = index;
-    }
-        start += Mod(gRandomTable[index], 12);
+        index = (gRandomIndex + 1) & 1023;
+        gRandomIndex = index;
+        start += Mod(((u16 *)RANDOM_TABLE_ADDR)[index], 12);
         if (start > 11)
             start -= 12;
-    } while (i <= 3);
-    gGameState->rightSelected = 0;
+    }
+    gGameState->selected.sides.right = 0;
 }
