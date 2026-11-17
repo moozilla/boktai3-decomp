@@ -1,11 +1,13 @@
-#include "global.h"
+#include "ratatosk_particle.h"
 
-void Ratatosk_ConfigureAnimatedParticle(u8 *p, u16 a, u32 b, u8 c, u32 d, u32 e, u32 f)
+void Ratatosk_ConfigureAnimatedParticle(struct RatatoskParticleConfig *config, u16 lifespan,
+                                        u32 speed, u8 angle, u32 behavior, u32 acceleration,
+                                        u32 initialSpeed)
 {
-    *(u16 *)(p + 2) = a;
-    *(u32 *)(p + 8) = b;
-    *(u8 *)(p + 6) = c;
-    *(u32 *)(p + 0x18) = d;
-    *(u32 *)(p + 0xC) = e;
-    *(u32 *)(p + 0x10) = f;
+    config->lifespan = lifespan;
+    config->speed = speed;
+    config->angle = angle;
+    config->behavior = behavior;
+    config->fallAcceleration = acceleration;
+    config->initialFallSpeed = initialSpeed;
 }

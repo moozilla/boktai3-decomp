@@ -1,44 +1,12 @@
 #include "global.h"
+#include "ratatosk_particle.h"
 #define Ratatosk_SpawnAnimatedParticle sub_081FC26C
 #include "contact_swarm.h"
 #include "display_sequence_inline.h"
 #include "ram.h"
-struct ParticleConfig {
-    u16 appearanceFlags;
-    u16 animationId;
-    u16 unknown4;
-    s8 angle;
-    u8 unknown7;
-    s32 speed;
-    u32 scaleX, scaleZ;
-    u32 kind;
-    u32 behavior;
-};
-struct Particle {
-    u32 age;
-    u8 pad4[8];
-    struct ContactPosition velocity;
-    struct ParticleConfig config;
-    struct ContactSwarmSprite sprite;
-    u32 flags;
-    u32 pad5C;
-    u32 lift;
-    struct DisplaySequenceState sequence;
-};
-struct ParticlePool {
-    u8 task[0x18];
-    u32 mask;
-    u8 pad1C[0x1c];
-    struct Particle particles[32];
-    void *sequenceResource;
-    u32 activeCount;
-};
 
-extern void *const gUnk_08613F6C[];
+extern RatatoskParticleUpdate const gUnk_08613F6C[];
 extern const s16 gUnk_086149C4[];
-void *Ratatosk_CreateAnimatedParticlePool(void);
-struct Particle *Ratatosk_FindFreeAnimatedParticle(struct ParticlePool *, s32 *);
-void Ratatosk_SetAnimatedParticleUpdateCallback(void *, void *);
 void Sprite_LinkToList(void *, s32);
 static inline s32 Scale(s32 x)
 {
@@ -50,9 +18,9 @@ static inline u32 RandomSample(void)
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
-static inline void StepSequence(struct Particle *owner, struct DisplaySequenceState *state,
-                                struct ContactSwarmSprite *sprite,
-                                struct ContactSwarmSprite **result)
+static inline void StepSequence(struct RatatoskParticle *owner, struct DisplaySequenceState *state,
+                                struct DisplaySequenceSprite *sprite,
+                                struct DisplaySequenceSprite **result)
 {
     const u16 *command;
     {
@@ -116,11 +84,12 @@ static inline void StepSequence(struct Particle *owner, struct DisplaySequenceSt
 }
 
 // Initialize one particle with a random appearance, animation, and flip state.
-s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct ContactPosition *position)
+s32 Ratatosk_SpawnAnimatedParticle(struct RatatoskParticleConfig *config,
+                                   struct ContactPosition *position)
 {
-    struct ParticlePool *pool = gRatatoskParticlePool;
-    struct Particle *e;
-    struct ContactSwarmSprite *sprite;
+    struct RatatoskParticlePool *pool = gRatatoskParticlePool;
+    struct RatatoskParticle *e;
+    struct DisplaySequenceSprite *sprite;
     s32 slot;
     u32 kind;
     if (!pool) {
@@ -133,7 +102,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     Ratatosk_SetAnimatedParticleUpdateCallback(config, gUnk_08613F6C[config->behavior]);
     Memory_Copy(&e->config, config, sizeof(*config));
     e->age = 0;
-    e->lift = e->config.scaleZ;
+    e->fallSpeed = e->config.initialFallSpeed;
     {
         struct ContactPosition *vel = &e->velocity;
         s32 angle = config->angle;
@@ -151,7 +120,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
     e->config.appearanceFlags = kind;
     {
         u16 type = kind;
-        // Reject a kind outside the 4-bit field (kind is 0, 1 or 2 here).
+        /* TODO: allocation-only guard; kind is always 0, 1 or 2 here. */
         if (type >= 3 && (type & ~15))
             return -1;
     }
@@ -160,7 +129,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
             Anim_SetSequence(&e->sequence, pool->sequenceResource, 1, 0, 0);
             StepSequence(e, &e->sequence, &e->sprite, &sprite);
         } else {
-            struct ContactSwarmSprite *draw;
+            struct DisplaySequenceSprite *draw;
             u32 frame;
             s32 variant = RandomSample() & 7;
             if (variant > 5)
@@ -173,7 +142,7 @@ s32 Ratatosk_SpawnAnimatedParticle(struct ParticleConfig *config, struct Contact
             sprite = draw;
         }
     } else {
-        struct ContactSwarmSprite *draw;
+        struct DisplaySequenceSprite *draw;
         u32 frame;
         e->config.appearanceFlags |= (RandomSample() & 3) << 12;
         frame = e->config.appearanceFlags >> 12;

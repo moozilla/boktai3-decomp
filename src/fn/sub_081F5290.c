@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ratatosk_particle.h"
 #include "ratatosk_facing.h"
 #include "ram.h"
 #include "scene_actor_components.h"
@@ -63,17 +64,7 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-struct AnimatedParticleParams {
-    u16 kind, animation;
-    u8 reserved4[2];
-    u8 angle, reserved7;
-    u32 speed, variant, drift;
-    u32 field14, active;
-};
-void Ratatosk_InitAnimatedParticleParams(struct AnimatedParticleParams *);
-void Ratatosk_ConfigureAnimatedParticle(struct AnimatedParticleParams *, u16, u32, u8, u32, u32,
-                                        u32);
-void sub_081FC26C(struct AnimatedParticleParams *, struct ContactPosition *);
+
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
 static inline void setState(struct Actor *p, void (*update)(void), u8 state)
@@ -89,7 +80,7 @@ static inline void setState(struct Actor *p, void (*update)(void), u8 state)
 #define Ratatosk_UpdateKnockbackRecovery sub_081F5290
 void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
 {
-    struct AnimatedParticleParams params;
+    struct RatatoskParticleConfig params;
     struct ContactPosition spawn;
     struct Actor *p2 = p;
     struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);

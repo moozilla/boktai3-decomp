@@ -1,19 +1,12 @@
 #include "global.h"
-struct E {
-    u8 p[0x78];
-};
-struct A {
-    u8 p0[0x18];
-    u32 w18;
-    u8 p1[0x38 - 0x1c];
-    struct E e[24];
-};
-struct E *Ratatosk_FindFreeAnimatedParticle(struct A *a, s32 *out)
+#include "ratatosk_particle.h"
+
+struct RatatoskParticle *Ratatosk_FindFreeAnimatedParticle(struct RatatoskParticlePool *a, s32 *out)
 {
-    struct E *e = a->e;
+    struct RatatoskParticle *e = a->particles;
     s32 i = 0;
     u32 m = 1;
-    u32 w = a->w18;
+    u32 w = a->mask;
     do {
         if ((m << i & w) != 0) {
             i++;
