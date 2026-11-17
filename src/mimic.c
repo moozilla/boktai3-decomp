@@ -18,14 +18,12 @@ static inline void ClearContextFlag(u16 *flags, u32 zero)
 
 static inline u32 SaveStoppedControl(struct MimicDeferredResponse *packet, void *control)
 {
-    u32 zero;
     packet->delay = 30;
     packet->control = control;
-    zero = 0;
-    packet->state = zero;
-    packet->phase = zero;
-    packet->behavior = zero;
-    return zero;
+    packet->state = 0u;
+    packet->phase = 0u;
+    packet->behavior = 0u;
+    return 0u;
 }
 
 static inline void clearRouteFlag(u32 *flags)
@@ -353,27 +351,25 @@ void SceneActor_RestoreSavedTargetOnCompletion(struct ChaseActor *actor)
     {
         u32 mask = 0x10;
         if (actor->base.statusFlags & mask) {
-            u32 zero;
             void *saved;
             struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags &= 0xFFFB;
-            zero = 0;
             saved = actor->base.onStanding;
             actor->base.field2B2 = 1;
-            actor->base.stepDone = zero;
-            actor->base.controlKind = zero;
+            actor->base.stepDone = 0u;
+            actor->base.controlKind = 0u;
             actor->base.target = saved;
-            actor->base.field2C8 = zero;
+            actor->base.field2C8 = 0u;
             {
                 u32 *flags = &actor->base.pendingControlFlags;
                 u32 clear = ~1;
                 *flags &= clear;
             }
-            actor->base.pendingControl = zero;
-            actor->base.state2A8 = zero;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = zero;
-            actor->base.counter2AC = zero;
+            actor->base.pendingControl = 0u;
+            actor->base.state2A8 = 0u;
+            actor->base.phase2A9 = 0u;
+            actor->base.behavior2AA = 0u;
+            actor->base.counter2AC = 0u;
             actor->base.field2B1 = 1;
         }
     }
