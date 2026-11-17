@@ -7,7 +7,7 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
     u32 index;
     s32 x, y, z;
     u32 rangeMask;
-    particle->flags &= ~1;
+    particle->sprite.flags &= ~1;
     table = (const u16 *)RANDOM_TABLE_ADDR;
     randomIndex = &gRandomIndex;
     index = *randomIndex + 1;
@@ -36,9 +36,9 @@ void LevelAdvanceDisplay_StartParticle(struct LevelAdvanceParticle *particle)
         z = (value >> 3 & rangeMask) - 63;
     }
     particle->offsetZ = z;
-    particle->position.world.x = gPlayers[0]->position.x + x;
-    particle->position.world.y = gPlayers[0]->position.y + y;
-    particle->position.world.z = gPlayers[0]->position.z + z;
+    particle->sprite.position.x = gPlayers[0]->position.x + x;
+    particle->sprite.position.y = gPlayers[0]->position.y + y;
+    particle->sprite.position.z = gPlayers[0]->position.z + z;
     {
         u32 value = 0;
         particle->velocityX = value;
