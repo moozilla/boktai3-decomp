@@ -155,10 +155,10 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
                 if (!p->variant) {
                     s32 life = (((u8)Random((const u16 *)RANDOM_TABLE_ADDR, rng)) & 63) + 20;
                     defaults = 0x00013101;
-                    CreateScatter(p, scatter, &velocity, 3, life, 0u, &defaults);
+                    CreateScatter(p, scatter, &velocity, 3, life, 0, &defaults);
                 } else {
                     defaults = 0x00011101;
-                    CreateScatter(p, scatter, &velocity, 0x12, 0u, 0u, &defaults);
+                    CreateScatter(p, scatter, &velocity, 0x12, 0, 0, &defaults);
                 }
             }
         next:

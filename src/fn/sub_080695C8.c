@@ -12,7 +12,7 @@ s32 BouncingObject_DestroyPool(struct BouncingPool *input)
     u32 *used;
     used = &pool->used;
     do {
-        if (Occupied(used, 1u << i)) {
+        if (Occupied(used, 1 << i)) {
             u32 slotOffset = i;
             struct BouncingObject *slot;
             slotOffset *= sizeof(*slot);

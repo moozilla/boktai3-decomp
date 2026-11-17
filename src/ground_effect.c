@@ -120,12 +120,12 @@ s32 GroundEffect_Initialize(struct SceneGroundEffect *effect, const struct Scene
         if (!manager)
             return -1;
     }
-    effect->active = 0u;
+    effect->active = 0;
     effect->position = position;
     effect->kind = kind;
-    effect->counter = 0u;
-    effect->value4 = 0u;
-    effect->value6 = 0u;
+    effect->counter = 0;
+    effect->value4 = 0;
+    effect->value6 = 0;
     drawable = &effect->flags;
     ParticleSprite_Initialize(drawable, manager->resource, 0x210);
     Effect_SetOrigin(drawable, -8, -8);

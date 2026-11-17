@@ -26,7 +26,7 @@ void sub_0823E704(struct Player *p)
         q->contactExtentC = 9;
     }
     if (q->savedActionIndex >= 0) {
-        flags |= 1u << q->savedActionIndex;
+        flags |= 1 << q->savedActionIndex;
         Player_ConsumeActionResource(p);
     }
     Collider_SetAttackProperties(&q->drain, resource, q->actionTimer, 4, flags,

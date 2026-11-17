@@ -98,7 +98,7 @@ s32 Ratatosk_UpdateParticlePool(struct ParticlePool *aIn)
             }
         }
         {
-            i += 1u;
+            i += 1;
         }
         e++;
         last = i;

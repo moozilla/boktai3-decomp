@@ -27,10 +27,10 @@ static inline u32 test(u16 *flags, u32 mask)
 void WirelessGameMenu_UpdateSelection(struct P *p)
 {
     if (p->entered) {
-        p->entered = 0u;
+        p->entered = 0;
         WirelessGameMenu_InitItemChoices(p);
         WirelessGameMenu_InitEquipmentChoices(p);
-        p->requested = 0u;
+        p->requested = 0;
         SceneHud_EnterOptionControls();
         p->ready = 1;
         p->countdown = 8;

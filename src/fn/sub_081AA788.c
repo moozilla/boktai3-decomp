@@ -129,7 +129,7 @@ static inline void SetPhase(struct Vanargand *p, u32 phase)
 {
     u32 next = phase;
     p->phase = next;
-    p->timer = 0u;
+    p->timer = 0;
 }
 static inline void SetPhasePointer(u8 *phase, u32 *timer, u32 value)
 {

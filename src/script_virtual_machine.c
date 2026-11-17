@@ -890,7 +890,7 @@ void Script_ReadTypedVariable(u8 *p, s32 descriptor, s32 index, s32 *value)
             u32 mask, bits;
             index += (descriptor >> 16) & 15;
             byte = p + (index >> 3);
-            mask = 1u << (index & 7);
+            mask = 1 << (index & 7);
             bits = *byte & mask;
             *value = bits != 0;
             break;

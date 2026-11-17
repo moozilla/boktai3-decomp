@@ -10,7 +10,7 @@ void ScalarApproach_ApplyAngleProfileArray(s16 *values, const s16 *targets, s32 
     }
     profile = ScalarApproach_ProfileCoefficient(profile);
     cursor = values;
-    while ((count = (s32)((u32)count - 1u)) >= 0) {
+    while ((count = (s32)((u32)count - 1)) >= 0) {
         *cursor =
             ScalarApproach_Profile(ScalarApproach_Unwrap(*cursor, *targets), *targets, profile);
         ++cursor;

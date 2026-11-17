@@ -41,7 +41,7 @@ static inline void InvalidatePreviousAnimation(struct Player *p)
 static inline void ClearContactTimer(struct Player *p)
 {
     u16 *timer = &p->statModifierContext.contactTimer;
-    *timer = 0u;
+    *timer = 0;
 }
 void Player_UpdateWeaponCueCombo(struct Player *p)
 {

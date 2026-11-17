@@ -23,16 +23,16 @@ void ModifierMenu_DrawOverview(struct ModifierMenu *menu)
     object = &menu->displays[8];
     {
         u32 value = object->flags;
-        object->flags = value | 1u;
+        object->flags = value | 1;
     }
     object = &menu->displays[13];
     object->flags &= mask;
     object = &menu->displays[5];
-    object->flags |= 1u;
+    object->flags |= 1;
     object = &menu->displays[6];
-    object->flags |= 1u;
+    object->flags |= 1;
     object = &menu->displays[7];
-    object->flags |= 1u;
+    object->flags |= 1;
     {
         u32 bit = 1;
         u32 *column = &menu->displays[14].flags;

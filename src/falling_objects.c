@@ -139,12 +139,12 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     p->state = 0;
     p->timer = 0;
     {
-        p->entered = 1u;
+        p->entered = 1;
         p->flags = flags;
         p->parameter = parameter;
         p->position = *position;
         if (p->type == 0)
-            p->animated = 1u;
+            p->animated = 1;
         else
             p->animated = 0;
     }
@@ -309,7 +309,7 @@ void FallingObject_UpdateFalling(struct FallingObject *object)
             u32 frame;
             object->state = one;
             frame = 0;
-            object->timer = 0u;
+            object->timer = 0;
             object->entered = one;
             object->frame = frame;
             object->frameTimer = frame;

@@ -658,7 +658,7 @@ struct LandingReady {
 static inline u32 Spider_SetLandingReady(struct LandingReady *p)
 {
     p->value = 1;
-    return 0u;
+    return 0;
 }
 
 void Spider_UpdateLandingMotion(struct ChaseActor *a, s32 frame)

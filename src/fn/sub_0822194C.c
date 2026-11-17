@@ -21,6 +21,6 @@ s32 ScalarApproach_QuarterAngle(s32 current, s32 target)
     if (delta >= 0)
         step = delta >> 2;
     else
-        step = (s32)(0u - (u32)((s32)(0u - (u32)delta) >> 2));
+        step = (s32)(0 - (u32)((s32)(0 - (u32)delta) >> 2));
     return (s32)((u32)near + (u32)step);
 }

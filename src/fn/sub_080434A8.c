@@ -72,9 +72,9 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
                 if (index <= 7)
                     slot->targetIndex = 1;
                 else
-                    slot->targetIndex = 0u;
+                    slot->targetIndex = 0;
             } else if (mode == 1)
-                slot->targetIndex = 0u;
+                slot->targetIndex = 0;
             else {
                 mode = 255;
                 slot->targetIndex = mode;

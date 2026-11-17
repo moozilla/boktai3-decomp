@@ -44,11 +44,11 @@ void Player_UpdateUnflaggedResourceRecovery(u8 *p)
                 if ((u8)(B(0x3a4) - 2) <= 4) {
                     B(0x3a4) = 4;
                     B(0x3a2) = 1;
-                    B(0x3a3) = 0u;
+                    B(0x3a3) = 0;
                 } else {
-                    B(0x3a4) = 0u;
-                    B(0x3a2) = 0u;
-                    B(0x3a3) = 0u;
+                    B(0x3a4) = 0;
+                    B(0x3a2) = 0;
+                    B(0x3a3) = 0;
                 }
                 Player_SetActionOrigin(p);
                 ++H(0x45a);

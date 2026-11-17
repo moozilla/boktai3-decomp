@@ -59,7 +59,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         AnimData_Load(graphics, graphicsId);
         sprite = &emitter->primary.sprite;
         Sprite_Init(sprite, graphics, 0);
-        sprite->frame = 0u;
+        sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA2);
         emitter->primary.sprite.flags |= 0x200;
         {
@@ -83,7 +83,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         AnimData_Load(graphics, graphicsId);
         sprite = &emitter->secondary.sprite;
         Sprite_Init(sprite, graphics, 0);
-        sprite->frame = 0u;
+        sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA0);
         emitter->secondary.sprite.flags |= 0x400;
         {

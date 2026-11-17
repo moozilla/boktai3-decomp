@@ -8,7 +8,7 @@ void ScalarApproach_HalfArray(s16 *values, const s16 *targets, s32 count)
     s16 *cursor = values;
     const s16 *targetCursor;
     targetCursor = targets;
-    while ((remaining = (s32)((u32)remaining - 1u)) >= 0) {
+    while ((remaining = (s32)((u32)remaining - 1)) >= 0) {
         s32 target = *targetCursor;
         s32 current;
         s32 result;

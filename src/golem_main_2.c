@@ -689,16 +689,16 @@ void Golem_UpdateSlideImpact(void);
 static inline void BeginControl(struct ChaseActor *actor, void *control, u8 kind)
 {
     actor->base.field2B2 = 1;
-    actor->base.stepDone = 0u;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = control;
-    actor->base.field2C8 = 0u;
+    actor->base.field2C8 = 0;
     {
         u32 *flags = &actor->base.pendingControlFlags;
         s32 mask = -2;
         *flags &= mask;
     }
-    actor->base.pendingControl = 0u;
+    actor->base.pendingControl = 0;
 }
 
 void Golem_BeginSlideState(struct ChaseActor *actor)

@@ -386,14 +386,14 @@ void RegionActor_CreateFromScript(void)
     {
         struct ContactSwarmSprite *s = sprite;
         u32 f = s->flags;
-        s->flags = f | 1u;
+        s->flags = f | 1;
     }
     p->variant = Script_GetKeywordValue('m', 0);
     switch (p->variant) {
         case 0:
             AnimData_Load(&p->graphics, 0x4FDA);
             Anim_SetSequence(&p->sequence, manager->sequenceResource, 0, 0, 0);
-            p->kind = 1u;
+            p->kind = 1;
             sprite->priority = 3;
             flags = &p->behaviorFlags;
             break;

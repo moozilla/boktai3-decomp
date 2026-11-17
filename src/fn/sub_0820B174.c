@@ -15,14 +15,14 @@ u32 DragonPuppy_UpdateAttackTiming(u8 *p)
                 void *obj = p + 0x10c;
                 void *res = *(void **)(p + 0x170);
                 u32 value = p[0x132];
-                Anim_SetSequence(obj, res, 4, value, 0u);
+                Anim_SetSequence(obj, res, 4, value, 0);
             }
             *(u16 *)(p + 0x12c) = 30;
             *(void **)(p + 0x108) = DragonPuppy_UpdateAttackRecovery;
-            *(u32 *)(p + 0x18) = 0u;
+            *(u32 *)(p + 0x18) = 0;
             (*index)++;
             if (*index > *(s16 *)(p + 0x184) - 1)
-                *index = 0u;
+                *index = 0;
         }
     } else {
         s32 value = Mod(*(s32 *)(p + 0x18), *(s16 *)(p + 0x134));

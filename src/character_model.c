@@ -613,8 +613,8 @@ void ActorStats_ApplyPendingDamage(struct ActorStats *actor)
         actor->damageFlags = cleared;
         PaletteFlash_SelectPalette((void *)&actor->pendingDamage, 1);
         actor->amount -= ModifierStats_ApplyKinds4And14(actor, actor->pendingDamage);
-        actor->damageTimer = 0u;
-        actor->pendingDamage = 0u;
+        actor->damageTimer = 0;
+        actor->pendingDamage = 0;
         Character_SetLowResourceColorEffect(actor->state44, actor->state48);
         if (actor->amount <= 0)
             SetDamageFlag(&actor->damageFlags, 2);
@@ -788,8 +788,8 @@ void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *style)
         style->initialHalfword = initial;
         style->currentHalfword = initial;
     }
-    style->initialWord = 0u;
-    style->currentWord = 0u;
+    style->initialWord = 0;
+    style->currentWord = 0;
 }
 
 void SceneActorStyle_Initialize(struct SceneActorStyle *style, s32 body, s32 face, s32 accessory,

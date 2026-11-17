@@ -135,8 +135,8 @@ void sub_08026FF0(struct Actor08026FF0 *base, int time)
             *maximum = 0;
     }
     p->unk39B = 8;
-    p->unk33C = 0u;
-    p->unk340 = 0u;
+    p->unk33C = 0;
+    p->unk340 = 0;
     {
         u32 mask = 12;
         base->flags |= mask;

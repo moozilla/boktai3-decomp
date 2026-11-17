@@ -59,5 +59,5 @@ void TimePalette_InitTransition(struct TimePalette *palette, const u16 *phase12,
     palette->sources[2] = otherPhases;
     Palette_CopyBank(palette->colors, palette->sources[source]);
     palette->update = TimePalette_UpdateTransition;
-    palette->onComplete = (void *)0u;
+    palette->onComplete = (void *)0;
 }

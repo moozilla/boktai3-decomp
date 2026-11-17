@@ -64,9 +64,9 @@ void Ratatosk_UpdateSunOrbSummon(struct Actor *p, s32 tick)
     u8 config[0x20];
     struct Actor *p2 = p;
     if (p->changed) {
-        p->changed = 0u;
+        p->changed = 0;
         SceneActors_StartUnmirroredAnimation(p, p->animationData, p->animation, 15, 1, 4);
-        p->phase = 0u;
+        p->phase = 0;
         p->selectedPoint = 0xffff;
         p->selectedTarget = -1;
         Sound_PlaySong(0x570);

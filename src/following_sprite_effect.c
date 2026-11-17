@@ -411,8 +411,8 @@ void ScreenMote_ApproachTarget(struct ScreenMoteManager *m, struct ScreenMoteSta
 void SpriteParticle_ReleaseSlot(struct ScreenMoteManager *manager, struct ScreenMoteState *state)
 {
     Effect_Remove(&manager->sprites[state->control.spriteIndex]);
-    state->control.phase = 0u;
-    state->control.active = 0u;
+    state->control.phase = 0;
+    state->control.active = 0;
     Memory_Clear(state, sizeof(*state));
     state->control.spriteIndex = -1;
 }

@@ -46,7 +46,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             if (p->action > 3) {
                 p->phase = 1;
                 {
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;
@@ -58,7 +58,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
                 u8 next = 2;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
             }
             break;
         case 2:
@@ -78,7 +78,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
                 {
                     u8 next = 3;
                     p->phase = next;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;
@@ -88,7 +88,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
             if (++p->timer > 119) {
                 u8 next = 4;
                 p->phase = next;
-                p->timer = 0u;
+                p->timer = 0;
             }
             break;
         case 4:

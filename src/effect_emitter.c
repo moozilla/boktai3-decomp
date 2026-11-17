@@ -97,12 +97,12 @@ s32 EffectEmitter_Initialize(struct EffectEmitter *object, u32 id, u32 unused)
     object->id = id;
     object->maximum = Script_GetKeywordValue(108, 200);
     object->health = 1;
-    object->cooldown = 0u;
+    object->cooldown = 0;
     object->count = Script_GetKeywordValue(110, 4);
     object->kind = Script_GetKeywordValue(101, 50);
-    object->phase = 0u;
-    object->timer = 0u;
-    object->flash = 0u;
+    object->phase = 0;
+    object->timer = 0;
+    object->flash = 0;
     if (Script_SeekToKeyword(112)) {
         position.x = Script_GetValue();
         position.y = Script_GetValue() + 100;

@@ -293,7 +293,7 @@ int MessageWindow_ShowMessage(int index)
                 u32 *counter;
                 counter = &window->playbackCounter;
                 {
-                    *counter = 0u;
+                    *counter = 0;
                 }
             }
             {

@@ -47,7 +47,7 @@ void PhaseObject_TickEntryReset(struct PhaseObject *p)
             Ivy_InitBobbing(p);
             p->mode = 1;
             {
-                p->step = 0u;
+                p->step = 0;
             }
             {
                 u8 one = 1;

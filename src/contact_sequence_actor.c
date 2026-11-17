@@ -24,7 +24,7 @@ u32 ContactSequenceActor_GetFlags(struct ContactSequenceActor *actor, u32 mask)
 void ContactSequenceActor_SetState(struct ContactSequenceActor *actor, u32 state)
 {
     actor->state = state;
-    actor->stateFrame = 0u;
+    actor->stateFrame = 0;
     actor->enter = 1;
 }
 

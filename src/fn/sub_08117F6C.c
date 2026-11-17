@@ -126,7 +126,7 @@ static inline void Glove_ChangeUpdate(struct Glove *p, void (*callback)(void *))
     u8 *active = &p->active;
     *active = 1;
     p->update = callback;
-    p->timer = 0u;
+    p->timer = 0;
 }
 void Glove_UpdateRecoveryFlash(struct Glove *p)
 {

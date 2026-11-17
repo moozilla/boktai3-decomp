@@ -11,17 +11,17 @@ void SpriteDrawable_SelectTileFrame(void *, void *, u32);
 void ScreenOrbitEffect_InitSlot(u8 *a, struct S *s)
 {
     void *p;
-    s->a = 0u;
-    s->f4 = 0u;
+    s->a = 0;
+    s->f4 = 0;
     s->c = 1;
-    s->b = 0u;
+    s->b = 0;
     p = s->p8;
     a += 0x100;
     ParticleSprite_Initialize(p, *(void **)a, 0x13);
     Effect_SetOrigin(p, -4, -4);
     SpriteDrawable_SelectTileFrame(p, *(void **)a, 0x33);
     ((u8 *)s)[0x17] = 1;
-    s->h30 = 0u;
-    s->h32 = 0u;
-    s->h34 = 0u;
+    s->h30 = 0;
+    s->h32 = 0;
+    s->h34 = 0;
 }

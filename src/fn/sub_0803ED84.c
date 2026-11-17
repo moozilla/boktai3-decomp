@@ -8,10 +8,10 @@ s32 ScenePool_StateDepartForward(void *manager, struct ScenePoolActor *actor,
                                  struct ScenePoolEntry *entry)
 {
     if (entry->stateEntered) {
-        entry->stateEntered = 0u;
+        entry->stateEntered = 0;
         entry->turnStep = 0x200;
         actor->savedPosition = actor->position;
-        ActorStats_ConfigureScaledParameters(actor, 0x3000, 0x2000, -0x2000, 0x5000, 0u, 0x6000);
+        ActorStats_ConfigureScaledParameters(actor, 0x3000, 0x2000, -0x2000, 0x5000, 0, 0x6000);
     }
     {
         u8 *flags = &actor->flags5ee;

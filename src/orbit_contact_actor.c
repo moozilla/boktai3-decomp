@@ -141,7 +141,7 @@ void OrbitContactActor_BeginExpansion(struct OrbitContactActor *actor)
     u32 one = 1;
     actor->state = one;
     actor->stateFlag = one;
-    actor->stateFrame = 0u;
+    actor->stateFrame = 0;
     actor->angle = 192;
-    actor->radius = 0u;
+    actor->radius = 0;
 }

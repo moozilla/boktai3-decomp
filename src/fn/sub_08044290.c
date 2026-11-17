@@ -73,7 +73,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
                 slot->direction = newDirection;
                 slot->state = 3;
                 slot->enter = 1;
-                slot->stateFrame = 0u;
+                slot->stateFrame = 0;
             }
         } else
             slot->stateFrame = frame + 1;

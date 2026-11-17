@@ -41,7 +41,7 @@ s32 StateSlotPool_Update(struct StateSlotPool *input)
                 }
                 table = gUnk_08610770;
                 do {
-                    if (Occupied(used, 1u << i)) {
+                    if (Occupied(used, 1 << i)) {
                         struct StateSlot *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
                         sub_08249240(pool, slot, table[slot->state]);
                     }

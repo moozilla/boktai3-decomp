@@ -22,9 +22,9 @@ void Armor_InitPartLunge(struct Motion0818Object *p)
         const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
         choice = *(const u16 *)(offset + (u32)table);
     }
-    choice &= 1u;
+    choice &= 1;
     p->turnDirection = Sword_OrbitDirection(choice);
-    p->done = 1u;
+    p->done = 1;
     p->startX = p->x;
     p->startY = p->y;
     p->startZ = p->z;

@@ -90,7 +90,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
             if (++*timer > 14) {
                 u16 *pending = &p->particleEmissionCount;
                 ++*pending;
-                *timer = 0u;
+                *timer = 0;
             }
         }
     }

@@ -50,12 +50,12 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->foreground.mode;
-                *field = 1u;
+                *field = 1;
                 screen->foreground.sequenceId = 3;
                 state = &screen->foreground.sequence;
                 Anim_SetSequence(state, screen->sequenceResource, 3, 0, 0);
                 foreground = &screen->foreground;
-                StepPlaybackOne(foreground, state, 1u);
+                StepPlaybackOne(foreground, state, 1);
                 screen->endingPhase = 1;
                 screen->endingTimer = 0;
             }
@@ -63,7 +63,7 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
         case 1:
             if ((s16)screen->endingTimer > 0x78) {
                 u32 *field = &screen->foreground.mode;
-                *field = 0u;
+                *field = 0;
                 screen->targetX = 0xA0;
                 {
                     u16 *timer = &screen->targetMode;
@@ -73,13 +73,13 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     *timer = duration;
 
                     SetCallback((void (*)(void))SceneMover_InterpolateScreenX, &motion->callback);
-                    motion->callbackTimer = 0u;
+                    motion->callbackTimer = 0;
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
                         *phase = phaseReset[0];
                     }
-                    motion->phaseTimer = 0u;
+                    motion->phaseTimer = 0;
                 }
                 screen->endingPhase = 2;
             }
@@ -95,12 +95,12 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
             if ((s16)screen->endingTimer > 0x78) {
                 u32 *field = &screen->foreground.mode;
                 struct DisplaySequenceState *state;
-                *field = 0u;
+                *field = 0;
                 screen->foreground.sequenceId = 3;
                 ReverseEndingPose(&screen->foreground);
                 state = &screen->foreground.sequence;
                 Anim_RestartSequence(state, screen->sequenceResource,
-                                     (u16)screen->foreground.sequenceId, 0, 0u);
+                                     (u16)screen->foreground.sequenceId, 0, 0);
                 screen->targetX = 0x3C;
                 {
                     u16 *timer = &screen->targetMode;
@@ -110,13 +110,13 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                     *timer = duration;
 
                     SetCallback((void (*)(void))SceneMover_InterpolateScreenX, &motion->callback);
-                    motion->callbackTimer = 0u;
+                    motion->callbackTimer = 0;
                     motion->callbackEntered = 1;
                     {
                         u8 *phase = &motion->phase;
                         *phase = phaseReset[0];
                     }
-                    motion->phaseTimer = 0u;
+                    motion->phaseTimer = 0;
                 }
                 screen->endingPhase = 4;
             }
@@ -127,12 +127,12 @@ void SingletonSlot7_UpdateEndingScene(struct DepartureActor *input)
                 struct DepartureDrawable *foreground;
                 struct DisplaySequenceState *state;
                 u32 *field = &screen->endingFinished;
-                *field = 1u;
+                *field = 1;
                 screen->foreground.sequenceId = 0;
                 state = &screen->foreground.sequence;
                 Anim_SetSequence(state, screen->sequenceResource, 0, 0, 0);
                 foreground = &screen->foreground;
-                StepPlaybackOne(foreground, state, 1u);
+                StepPlaybackOne(foreground, state, 1);
                 Trigger_ConsumePending(&((struct DepartureActor *)motion)->messages, 1);
             }
             break;

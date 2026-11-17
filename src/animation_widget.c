@@ -104,7 +104,7 @@ s32 Anim_SelectWidgetGlyph(struct SceneInputWidget *widget, struct WidgetGlyphRe
     widget->centerY = entry->centerY;
     widget->scaleX = 0x40;
     widget->scaleY = 0x40;
-    widget->rotation = 0u;
+    widget->rotation = 0;
     if (widget->palette == 0) {
         widget->paletteBank = resource->paletteIndex;
         widget->palette = gPaletteBankData + (widget->paletteBank << 5);

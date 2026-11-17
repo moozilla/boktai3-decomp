@@ -1050,7 +1050,7 @@ void PlayerCue_ReleaseControl(struct Player *player)
     player->tetherPhase = 0;
     player->tetherFrame = 0;
     if (player->kindTwoEntered != 0)
-        player->kindTwoEntered = 0u;
+        player->kindTwoEntered = 0;
     player->kind = 1;
-    player->terrainClampBlocked = 0u;
+    player->terrainClampBlocked = 0;
 }

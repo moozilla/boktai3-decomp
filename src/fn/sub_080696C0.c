@@ -25,7 +25,7 @@ s32 BouncingObject_GetNearbyHeading(const struct ContactPosition *input)
     used = firstMask;
     delta = &difference;
     do {
-        if (Occupied(used, 1u << i)) {
+        if (Occupied(used, 1 << i)) {
             struct BouncingObject *slot;
             {
                 u32 offset = (u32)i * sizeof(*slots);

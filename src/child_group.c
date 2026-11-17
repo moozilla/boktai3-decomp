@@ -431,7 +431,7 @@ static inline u8 EnterState_3848(struct ChildGroupOscillationState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -525,7 +525,7 @@ static inline u8 ChildGroup_TakeEntryFlag(struct Group080F38E0 *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -616,7 +616,7 @@ static inline u8 EnterState_3ABC(struct ChildGroupInactiveState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -718,7 +718,7 @@ static inline u8 EnterState_3B60(struct ChildGroupTrailingState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -828,7 +828,7 @@ static inline u8 EnterState_3CC4(struct ChildGroupOrbitState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -947,7 +947,7 @@ static inline u8 EnterState_3F48(struct ChildGroupLandingState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }
@@ -1022,7 +1022,7 @@ static inline u8 EnterState_40C8(struct ChildGroupCallbackState *p)
         cleared &= flags;
         {
             p->flags = cleared;
-            p->reset = 0u;
+            p->reset = 0;
         }
         return 1;
     }

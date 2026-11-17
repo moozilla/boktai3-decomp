@@ -18,8 +18,8 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
             index = 0;
             position = &emitter->position;
             for (; index <= 3; index++) {
-                BurstSpark_Create(position, 1, 8, index << 6, 34, 1u, emitter->context);
-                BurstSpark_Create(position, 1, 14, index << 6, 64, 1u, emitter->context);
+                BurstSpark_Create(position, 1, 8, index << 6, 34, 1, emitter->context);
+                BurstSpark_Create(position, 1, 14, index << 6, 64, 1, emitter->context);
             }
             break;
         }

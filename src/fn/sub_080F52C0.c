@@ -42,9 +42,9 @@ void Sword_BeginTargetOrbit(u8 *p)
             const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
             choice = *(const u16 *)(offset + (u32)table);
         }
-        choice &= 1u;
+        choice &= 1;
         o->spin = Sword_OrbitDirection(choice);
-        o->spinActive = 1u;
+        o->spinActive = 1;
     }
 
     o->startX = *(u16 *)(p + 0x1c);

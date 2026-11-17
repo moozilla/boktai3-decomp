@@ -32,7 +32,7 @@ void EffectQuad_StartRemoteEntry(s32 player, const struct EffectQuadPosition *po
             {
                 u32 one = 1;
                 entry->state = one;
-                entry->frame = 0u;
+                entry->frame = 0;
                 entry->active = one;
             }
         }

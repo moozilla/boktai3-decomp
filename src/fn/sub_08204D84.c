@@ -41,14 +41,14 @@ u32 EnemyD459_UpdateAttackTiming(struct EnemyD459 *enemy)
             void *anim = enemy->animation;
             void *resource = enemy->animationResource;
             u32 facing = enemy->facing;
-            Anim_RestartSequence(anim, resource, 3, facing, 0u);
+            Anim_RestartSequence(anim, resource, 3, facing, 0);
             Anim_SetDurationScale(anim, 64);
             enemy->callback = SceneSequence_UpdateCountdown;
             enemy->attackDuration = 80;
-            enemy->timer = 0u;
+            enemy->timer = 0;
             (*index)++;
             if (*index > enemy->attackCount - 1)
-                *index = 0u;
+                *index = 0;
         }
     } else {
         s32 value = Mod(enemy->timer, enemy->attackPeriod);

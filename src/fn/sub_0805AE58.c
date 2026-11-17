@@ -11,7 +11,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         owner = input;
     }
     {
-        i = 0u;
+        i = 0;
     }
     do {
         struct SceneRigSprite *sprite;
@@ -42,7 +42,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         }
         {
             u32 mode;
-            sprite->frame = 0u;
+            sprite->frame = 0;
             mode = 1;
             sprite->renderMode = mode;
         }
@@ -70,7 +70,7 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
             }
         }
         {
-            i += 1u;
+            i += 1;
             compare = i;
         }
     } while (compare <= 7);

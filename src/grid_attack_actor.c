@@ -681,8 +681,8 @@ void GridAttack_UpdateIdleState(struct GridAttackActor *s)
     }
     {
         u32 *p = (u32 *)&s->damage;
-        *p = 0u;
-        s->special = 0u;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;
@@ -722,8 +722,8 @@ void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
     }
     {
         u32 *p = (u32 *)&s->damage;
-        *p = 0u;
-        s->special = 0u;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;
@@ -741,8 +741,8 @@ void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
     }
     {
         u32 *p = (u32 *)&s->damage;
-        *p = 0u;
-        s->special = 0u;
+        *p = 0;
+        s->special = 0;
     }
     {
         u32 mask = 12;

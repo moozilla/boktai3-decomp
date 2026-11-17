@@ -6,5 +6,5 @@ void SceneInput_InitGrid(struct SceneInputGridView *grid, u32 kind, u32 x, u32 y
     grid->cursorX = x;
     grid->cursorY = y;
     grid->selection = SceneInput_GetGridSelection(grid);
-    grid->repeat = 0u;
+    grid->repeat = 0;
 }

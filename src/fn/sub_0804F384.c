@@ -16,10 +16,10 @@ void ResourceStation_ReadDisplayCommands(u8 *p)
         do {
             switch (*e->b) {
                 case 0:
-                    *t = 1u;
+                    *t = 1;
                     break;
                 case 1:
-                    *t = 0u;
+                    *t = 0;
                     break;
             }
             e++;

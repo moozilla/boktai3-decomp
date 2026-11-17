@@ -90,7 +90,7 @@ static inline void CannonTurret_FinishDamage(struct CannonTurretCombat *p)
 }
 static inline void CannonTurret_ClearBlink(u16 *timer)
 {
-    *timer = 0u;
+    *timer = 0;
 }
 static inline u32 CannonTurret_StepSequence(struct DisplaySequenceSprite *owner,
                                             struct DisplaySequenceState *state)

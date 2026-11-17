@@ -112,9 +112,9 @@ s32 sub_08232420(s32 id, s32 flags, s32 delay, s32 health, struct HazardVec *pos
         ((struct HazardVec *)&size)->x = 100;
         ((struct HazardVec *)&size)->y = 120;
         ((struct HazardVec *)&size)->z = 100;
-        ((struct HazardVec *)&offset)->x = 0u;
-        ((struct HazardVec *)&offset)->y = 0u;
-        ((struct HazardVec *)&offset)->z = 0u;
+        ((struct HazardVec *)&offset)->x = 0;
+        ((struct HazardVec *)&offset)->y = 0;
+        ((struct HazardVec *)&offset)->z = 0;
         Collider_Init(p->attack, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(p->attack, TimedHazard_OnAttackContact, p);
         Collider_SetAttackPowerAndForce(p->attack, 50, 20);

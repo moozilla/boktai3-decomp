@@ -34,7 +34,7 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
             particle->position.z = coordinate;
             particle->life = 24;
             {
-                u32 zeroX = 0u;
+                u32 zeroX = 0;
                 particle->velocityX = zeroX;
             }
             index += 1;
@@ -49,7 +49,7 @@ void StackedActor_InitFallingParticle(struct StackedActorParticle *particle,
             }
         }
         {
-            u32 zeroZ = 0u;
+            u32 zeroZ = 0;
             particle->velocityZ = zeroZ;
         }
         particle->flags &= ~1;

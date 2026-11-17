@@ -17,7 +17,7 @@ void sub_0806CCC8(struct ContactPosition *target, s32 lifetime, s32 speed)
         i = 0;
         do {
             slot = (struct SceneSteeringActor *)initial + i;
-            if (Used(&pool->used, 1u << i) && slot->state == 3) {
+            if (Used(&pool->used, 1 << i) && slot->state == 3) {
                 slot->lifetime = lifetime;
                 {
                     s16 *velocityY = &pool->slots[i].velocity.y;
@@ -25,7 +25,7 @@ void sub_0806CCC8(struct ContactPosition *target, s32 lifetime, s32 speed)
                 }
                 slot->target = *target;
                 slot->state = 4;
-                slot->enter = 1u;
+                slot->enter = 1;
             }
             i++;
         } while (i < 8);

@@ -47,7 +47,7 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
                 {
                     u8 next = 1;
                     p->phase = next;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;
@@ -59,7 +59,7 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
                 {
                     u8 next = 2;
                     p->phase = next;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;
@@ -83,7 +83,7 @@ void Vanargand_UpdateSequencedPairAttack(struct VanargandPairAttack *p)
                 {
                     u8 next = 3;
                     p->phase = next;
-                    p->timer = 0u;
+                    p->timer = 0;
                 }
             }
             break;

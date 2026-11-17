@@ -15,7 +15,7 @@ void ProximityEmitter_TickRise(struct ProximityEmitter *input)
                 *spriteY = emitter->position.y + 30;
             }
             {
-                *frameAddress = 0u;
+                *frameAddress = 0;
             }
             emitter->update = ProximityEmitter_TickActive;
         } else {

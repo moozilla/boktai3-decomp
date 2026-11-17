@@ -11,9 +11,9 @@ struct BouncingObject *BouncingObject_Allocate(struct BouncingPool *pool)
     u32 *used = &pool->used;
     for (; i < 12; i++) {
         used = &pool->used;
-        if (!Occupied(used, 1u << i)) {
+        if (!Occupied(used, 1 << i)) {
             struct BouncingObject *slot = &pool->slots[i];
-            *used |= 1u << i;
+            *used |= 1 << i;
             slot->index = i;
             return slot;
         }

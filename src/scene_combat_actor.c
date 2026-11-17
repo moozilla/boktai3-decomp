@@ -110,10 +110,10 @@ void SceneParticle_UpdateBounce(struct BouncingSceneParticle *actor)
             actor->velocity.packed.y = -(actor->velocity.packed.y >> 1);
             actor->velocity.packed.z >>= 1;
         } else {
-            actor->update = (void *)0u;
+            actor->update = (void *)0;
             if (actor->destroy) {
                 Callback_InvokeActor(actor, actor->destroy);
-                actor->destroy = (void *)0u;
+                actor->destroy = (void *)0;
             }
         }
     }

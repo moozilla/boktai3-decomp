@@ -20,7 +20,7 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     object->flags &= ~1;
     object->y = menu->choice.cursor.index << 4;
     object = &menu->displays[13];
-    object->flags |= 1u;
+    object->flags |= 1;
     mask = ~1;
     object = &menu->displays[5];
     object->flags = mask & object->flags;

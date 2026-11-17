@@ -45,10 +45,10 @@ static inline void changeState(struct VanargandPairAttack *p, s32 state,
     {
         p->state = state;
         p->stateCallback = callback;
-        p->actionTimer = 0u;
+        p->actionTimer = 0;
         p->pending = 1;
-        p->phase = 0u;
-        p->timer = 0u;
+        p->phase = 0;
+        p->timer = 0;
     }
 }
 

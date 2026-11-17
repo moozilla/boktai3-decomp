@@ -59,9 +59,9 @@ void ActorMotion_UpdateTimedPaletteAnimation(struct DirectionalActor *p, s32 fra
     struct DirectionalActor *q = p;
     facing(p, p->requestedAngle);
     if (p->changed) {
-        p->changed = 0u;
+        p->changed = 0;
         SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
-        palette(p, 500, 5, 4, 0u);
+        palette(p, 500, 5, 4, 0);
         q->motionE52 = 0;
         q->motionE54 = 0;
         q->motionE58 = 0;

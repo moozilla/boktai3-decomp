@@ -123,10 +123,10 @@ void Player_AddExpFromScript(void)
 static inline u32 ScriptActor_TestFlag(struct Player *actor, u32 flag)
 {
     if (flag >= 64)
-        return actor->actionStateFlags & (1u << (flag - 64));
+        return actor->actionStateFlags & (1 << (flag - 64));
     if (flag >= 32)
-        return actor->actionFlags & (1u << (flag - 32));
-    return actor->statBonusFlags & (1u << flag);
+        return actor->actionFlags & (1 << (flag - 32));
+    return actor->statBonusFlags & (1 << flag);
 }
 
 u32 ScriptActor_TestFlagFromScript(void)
