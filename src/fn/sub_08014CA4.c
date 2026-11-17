@@ -33,11 +33,11 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, const struct ContactPosition 
     u16 *speeds;
     u32 *rng;
     s32 i;
-    struct SceneAnimation *animation;
+    struct SpriteRenderResource *animation;
     u8 *cursor;
     u8 *lifetimes;
     s32 j;
-    struct SceneAnimation *animData;
+    struct SpriteRenderResource *animData;
     if ((!gFragmentManager) && (!FragmentManager_Create(0, 0)))
         return -1;
     m = gFragmentManager;
@@ -63,7 +63,7 @@ s32 FragmentGroup_SpawnRadial(s32 count, s32 type, const struct ContactPosition 
             if (!loaded)
                 return -1;
             if ((g->type == 4) || (g->type == 8))
-                AnimData_SelectPaletteBank(animation, g->animation.paletteIndex + 1);
+                AnimData_SelectPaletteBank(animation, g->animation.paletteKey + 1);
             {
                 i = 0;
                 if (i < count) {

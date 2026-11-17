@@ -6,7 +6,7 @@
 /* Four groups of six ballistic fragments; resources and motion come from the spawner. */
 struct FragmentGroup {
     u8 active, count, type, unknown3;
-    struct SceneAnimation animation;
+    struct SpriteRenderResource animation;
     u8 initialized[6], lifetime[6], enabled[6];
     u16 speed[6];
     struct SceneVec velocity[6];
