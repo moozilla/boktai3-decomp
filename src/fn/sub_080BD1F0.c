@@ -70,31 +70,6 @@ static inline u32 Skeleton_StatusFlags(struct ChaseActor *actor, u32 maskInput)
     u32 mask = maskInput;
     return actor->base.statusFlags & mask;
 }
-static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    u32 state = s;
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
 {
     u32 index = (gRandomIndex + 1) & wrap;
@@ -379,8 +354,8 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             if ((s32)bound < 0)
                 Sound_PlaySong((u32)lateTable);
         }
-        SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-        SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         {
             u32 m = 0x1000;
             actor->base.reactionFlags = m | actor->base.reactionFlags;
@@ -404,29 +379,8 @@ notHidden:
         blocked = Test(v, ~0);
     }
     if (!blocked) {
-        {
-            void *callback = (void *)SceneActorReaction_TickHiddenTimeout;
-            u32 kind = 0x39;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = blocked;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = blocked;
-            {
-                u32 *field = &actor->base.pendingControlFlags;
-                s32 clear = ~1;
-                *field &= clear;
-            }
-            actor->base.pendingControl = blocked;
-        }
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-        }
-        actor->base.phase2A9 = 0;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = blocked;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetControl(actor, SceneActorReaction_TickHiddenTimeout, 0x39);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         actor->base.health = 1;
         {
             u32 bit = 0x40;
@@ -475,8 +429,8 @@ notHidden:
 
     } else {
     defeated:
-        SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-        SetState(actor, 1, 0, 2);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 1, 0, 2);
         {
             u8 b = TestBits(ctxFlags, 0x40);
             categoryp = &actor->base.category;
