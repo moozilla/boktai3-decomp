@@ -31,14 +31,12 @@ static inline void StartAction(struct VanargandDamage *p, s32 one, s32 zero, s32
 }
 static inline void SetState(struct VanargandDamage *p, void (*callback)(void *), s32 id)
 {
-    s32 zero;
     p->requestedState = id;
-    zero = 0;
     p->callback = callback;
-    p->timer = zero;
+    p->timer = 0;
     p->pendingAnimation = 1;
-    p->phase = zero;
-    p->phaseTimer = zero;
+    p->phase = 0;
+    p->phaseTimer = 0;
 }
 s32 Vanargand_OnDamage(struct VanargandDamage *p, s32 kind, s32 damage)
 {
