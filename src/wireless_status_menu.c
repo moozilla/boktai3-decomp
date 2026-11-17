@@ -36,11 +36,9 @@ void WirelessStatusMenu_LoadPrimaryBackground(struct WirelessStatusMenu *menu, u
 void WirelessStatusMenu_LoadStatusBackground(struct WirelessStatusMenu *menu, int layer)
 {
     void *resource = ScriptProc_Start(0xC091, 0xCF15);
-    int zero;
     menu->background = resource;
-    zero = 0;
-    Bg_SetupLayers(1, 0, resource, 0, zero, 1, &layer);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    Bg_SetupLayers(1, 0, resource, 0, 0, 1, &layer);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     {
         struct PaletteResource *palette = ScriptProc_Start(0x92B3, 0x26BB);
         CpuSet(palette->banks, gBgPaletteBuffer, 256);
@@ -108,10 +106,9 @@ void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu 
     if (menu->timer > 59 && (gPadState[1] & 11)) {
         {
             int state = 3;
-            int zero = 0;
             menu->state = state;
             menu->entered = 1;
-            menu->timer = zero;
+            menu->timer = 0;
         }
     } else
         menu->timer++;
@@ -168,7 +165,6 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
 {
     struct SceneInputResource *resource;
     struct SceneInputResource *blob;
-    int zero;
     gLinkMenu = (void *)menu;
     PaletteLevels_Reset();
     if (!Script_SeekToKeyword('s'))
@@ -186,14 +182,13 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
         void *drawable = &menu->widget;
         int flags;
         flags = 0x2011;
-        zero = 0;
-        Widget_InitLinked(drawable, blob, 3, flags, zero, zero, 60, zero);
+        Widget_InitLinked(drawable, blob, 3, flags, 0, 0, 60, 0);
     }
     menu->completionProcedure = Script_GetKeywordValue('r', 0);
     menu->window = -1;
-    menu->state = zero;
+    menu->state = 0;
     menu->entered = 1;
-    menu->timer = zero;
+    menu->timer = 0;
     return 0;
 }
 
