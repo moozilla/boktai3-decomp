@@ -18,12 +18,9 @@ s32 ScenePool_SelectRepeatedDirection(void *owner, struct ScenePoolEntry *entry)
         goto wait;
     if (entry->direction > 0) {
     forward: {
-        s32 one = 1;
-        s32 zero;
         entry->state = 1;
-        zero = 0;
-        entry->stateFrame = zero;
-        entry->stateEntered = one;
+        entry->stateFrame = 0;
+        entry->stateEntered = 1;
         {
             u32 *arg = history;
             ClearHistory(0x100, arg);
