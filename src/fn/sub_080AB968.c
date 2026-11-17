@@ -1,5 +1,5 @@
 #include "global.h"
-// MATCHING_CONCESSION: register-pinning
+#include "scene_actor_reset.h"
 
 // confidence=low: state advances segment interpolation and oscillation before restoring control.
 
@@ -9,20 +9,15 @@ void TentacleBody_UpdateChargeSpread(void);
 void TentacleActor_SelectWanderRoute(void *);
 void sub_080A9DB0(void *, s32, s32);
 void TentacleActor_UpdateOscillation(void *, s32, s32);
-#define B(o) (*(u8 *)(p + (o)))
-#define H(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-
-static inline u8 TakeEntry(u8 *p)
+static inline u8 TakeEntry(struct ChaseActor *p)
 {
-    if (B(0x2b1)) {
-        B(0x2b1) = 0;
+    if (p->base.field2B1) {
+        p->base.field2B1 = 0;
         return 1;
     }
     return 0;
 }
 
-#include "scene_actor_reset.h"
 static inline void SetControl(struct ChaseActor *s, void *control, u32 code)
 {
     u32 zero;
@@ -63,33 +58,70 @@ static inline void Advance(void *p, s32 x, s32 z)
     u16 k[] = {0x6400};
     sub_080A9DB0(p, 4, k[0]);
 }
+union RetractionActorHandle {
+    struct ChaseActor *ptr;
+    u8 parts[4];
+};
 void TentacleActor_UpdateRetraction(struct ChaseActor *input)
 {
-    struct ChaseActor *s = input;
-    if (TakeEntry((u8 *)s)) {
-        SetControl(s, TentacleBody_UpdateChargeSpread, 0x23);
-        s->base.field2E8 = 8;
+    union RetractionActorHandle actor;
+    u32 raw;
+    actor.ptr = input;
+    if (TakeEntry(actor.ptr)) {
+        SetControl(actor.ptr, TentacleBody_UpdateChargeSpread, 0x23);
+        actor.ptr->base.field2E8 = 8;
     }
     {
-        s32 x = s->base.secondaryMotion.x;
+        s32 x = actor.ptr->base.secondaryMotion.x;
         s32 ax = x;
         s32 z;
         s32 az;
         if (x < 0)
             ax = -x;
-        z = s->base.secondaryMotion.z;
+        z = actor.ptr->base.secondaryMotion.z;
         az = z;
         if (z < 0)
             az = -z;
-        asm volatile("" ::"r"(ax), "r"(az), "r"(x), "r"(z));
-        Advance(s, ax, az);
+        if (ax > az) {
+            if (x < 0) {
+                Advance(actor.ptr, ax, az);
+                raw = actor.parts[0];
+                if ((s32)raw < 0)
+                    actor.parts[0] = 0;
+                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+                raw = actor.parts[0];
+            } else {
+                Advance(actor.ptr, ax, az);
+                raw = actor.parts[0];
+                if ((s32)raw < 0)
+                    actor.parts[0] = 0;
+                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+                raw = actor.parts[0];
+            }
+        } else {
+            if (z < 0) {
+                Advance(actor.ptr, ax, az);
+                raw = actor.parts[0];
+                if ((s32)raw < 0)
+                    actor.parts[0] = 0;
+                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+                raw = actor.parts[0];
+            } else {
+                Advance(actor.ptr, ax, az);
+                raw = actor.parts[0];
+                if ((s32)raw < 0)
+                    actor.parts[0] = 0;
+                actor.ptr = (struct ChaseActor *)((u8 *)actor.ptr + (actor.parts[0] >> 8));
+                raw = actor.parts[0];
+            }
+        }
     }
-    TentacleActor_UpdateOscillation(s, 0x1ae, 0x28);
-    if (s->base.stepDone) {
-        TentacleActor_SelectWanderRoute(s);
-        SetControl(s, s->base.onAlternateEntry, 1);
-        SetState(s, 2);
+    TentacleActor_UpdateOscillation(actor.ptr, 0x1ae, 0x28);
+    if (actor.ptr->base.stepDone) {
+        TentacleActor_SelectWanderRoute(actor.ptr);
+        SetControl(actor.ptr, actor.ptr->base.onAlternateEntry, 1);
+        SetState(actor.ptr, 2);
     } else {
-        s->base.counter2AC++;
+        actor.ptr->base.counter2AC++;
     }
 }

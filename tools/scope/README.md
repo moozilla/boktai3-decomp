@@ -2819,3 +2819,317 @@ which is exactly `10:1`. Not tested.
 
 `SCOPE_AGBCC=PATH` runs scope with another compiler build, for example a scratch copy of
 `build/scope/agbcc/gcc` with a what-if knob that is not in the shared patch yet.
+
+
+237. **Branch-local symbolic constants can give a joined value the preference that priority cannot.**
+   In sub_08012B34 (08012B34), the shared dead RNG origin has three references over
+   a long span and cannot naturally outrank angle. Each direction arm instead uses
+   `u32 origin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;`, draws its angle,
+   then sets `sampleOrigin = origin`. The distinct sources are local to their arms
+   and occupy r3. The copies survive CSE, so global.c's set_preference and
+   prune_preferences reserve r3 for the joined origin and give angle/speed r4/r5.
+   Numeric 0x0403B714 folds the copies and loses the preference. No artificial late
+   uses or initializers are needed. Keep only the first later sample relative to
+   the origin; direct subsequent draws avoid extending it across calls.
+
+238. **A normalized inline result can retain both a byte snapshot copy and its later extension.**
+   ParticleGroup_UpdateFrozen (08014330) needs `ldrb r0; adds r3,r0` at the loop top
+   and a zero extension of r3 at the later test. Plain field reads get the snapshot
+   from PRE but combine removes the extension (`AGBCC_COMBKEEP=104` diagnoses it).
+   `s32 type = g->type; if (type < 0) type = -1; return type;` in an inline, assigned
+   to the caller's cache, matches. The impossible negative arm contributes unknown
+   bits when combine first computes reg_nonzero_bits; its branch then disappears.
+   Copying before normalization loses the initial r0-to-r3 copy, whereas copying
+   the normalized result afterward keeps it. The redundant range guard is an
+   allocation-only form to review during phase 4.
+
+239. **Bit-clearing a known-zero mask can defer a symbolic constant until combine.**
+   GameState_SelectRamBase (0821B084) uses
+   `(u8 *)((u32)gGameStateStorage & ~(timer >> 16))`, with timer loaded from a u16
+   hardware register. It keeps the RAM symbol while making its value unavailable
+   to CSE; combine folds the known-zero mask. Symbol-plus-zero and symbol-or-zero
+   do not reproduce this behavior. The form preserves the ROM base-plus-offset
+   operand order without a pin; like the numeric forms in fact 231, its wording
+   was chosen for allocation and needs phase 4 review.
+
+
+240. **A late owner identity can prevent PRE from creating array-base spills.**
+   FragmentGroup_SpawnRadial (08014CA4) computes initialized/enabled array bases
+   inside the particle loop. With ordinary unpinned `base->initialized[i]` and
+   `base->enabled[i]`, PRE creates invariant base+32/base+44 values and spills both;
+   the draft differs in 84 ROM instructions. Index through
+   `(struct FragmentGroup *)((u32)base + (base->active >> 8))` at those two sites.
+   CSE/PRE cannot fold the byte-derived zero, while combine does, leaving the ROM's
+   per-iteration addresses and all register decisions. The numeric random table
+   can then use the fact 231 byte-zero form instead of an address-taken halves
+   union. ParticleGroup_SpawnBouncing (08014634) also needs its fact 231 constant
+   inside the inner setup block, where a byte zero avoids the union's extra live
+   span. These identities are allocation-only phase 4 review items.
+
+241. **An impossible signed-negative normalization can preserve two copies until jump2.**
+   FadingParticleGroup_Update (08016118) needs a byte loaded in r0 followed by
+   independent copies to r1 and r2. Plain `compare = raw; time = raw` lets CSE
+   remove the first copy. A known-zero addition preserves it until combine, but
+   regmove's optimize_reg_copy_1 rewrites the later time copy to use compare, then
+   the allocator shares compare with raw. Instead use `raw = *life; compare = raw;
+   if ((s32)raw < 0) raw = 0; time = raw;`. In this function the branch survives CSE;
+   combine replaces its test by an unconditional jump because the current value is
+   a zero-extended byte. The unreachable assignment, branch and join remain through
+   regmove, and the join retains both values in its live set. Jump2 deletes the
+   unreachable arm after allocation. This is not a generic tautology recipe:
+   `raw > 255` leaves a real compare in this compiler. The signed range guard is an
+   allocation-only form. A separate self-assignment of the motion pointer through
+   a byte-derived zero preserves the gravity reload without a memory barrier.
+
+242. **A zero-valued late use can preserve a flow conflict after combine erases the use.**
+   Hresvelgr_UpdateBoundaryBarrage (081A0BC8) has the right instructions but reload
+   reuses sl for the random-index mask; forcing that mask to ip gives an exact
+   diagnostic match. OR the direction with
+   `normalCollisionMask & (actor->direction4 >> 8)`. The byte field makes the term
+   zero, but only combine knows that. Flow first extends the normal mask's live
+   span from 34 to 188 (references 3 to 4); after the term disappears, the retained
+   cross-block live information still conflicts with the random mask. Reload now
+   excludes sl and naturally chooses ip. This is a conflict change, not merely
+   REG_EQUIV priority tuning. Name the allocation-only zero use in the commit.
+
+243. **Equivalent source tails can tune global priorities before late jump sharing.**
+   TentacleActor_AlignSegmentsToTerrain (080AA8C4) needs its y-store induction
+   pointer above the slope helper's position pointer. Two separate failed ascent
+   tests with identical fallback stores raise the y pointer's references from 15
+   to 17. Actual byte-sized attribute/kind locals slightly extend the competitor;
+   jump2 merges the stores back to the exact ROM. NamedObject_RegisterFollowCells
+   (08101B1C) similarly uses five explicit early-release returns: the object gains
+   references 12 to 16, moving above width/index, while a halfword flags snapshot
+   increases its live length enough to keep it below the row pointer. Measure both
+   sides of the tie; increasing priority without checking the next competitor can
+   choose a different wrong register. Repeated equivalent tails and temporary reuse
+   are allocation-only wording to review in phase 4.
+
+
+244. **Changing first-pass invariant moves can put a shared address after a loop counter.**
+   sub_0819BB18 needs its random-index address to move on loop.c's second pass,
+   after the reverse-counter initialization. A symbolic resource-bank word read
+   through a union, complemented through a second union and complemented back,
+   delays CSE folding. Building the first sample offset through halfword stores
+   supplies four first-pass invariant moves. The movement threshold drops from
+   13 to 1, deferring the address until pass two. Combine removes the staging,
+   preserving the 416-byte ROM. The union-separated complement and offset are
+   allocation-only forms; ordinary double negation folds too soon.
+
+245. **Post-call USE counts can either prevent or enable late cross-jumping.**
+   AnimatedParticles_Create (080154EC) needs three whole animation-call tails,
+   while jump2 wants to share their identical final arguments and call. A pointer
+   union with byte/halfword views, an impossible signed-negative clamp, and a
+   bounded zero-offset read preserves a post-call USE. One arm has one USE and
+   another has two, so jump2 cannot merge the calls. The narrowed reads themselves
+   emit no instructions. TentacleActor_UpdateRetraction (080AB968) needs the
+   opposite: four equal Advance paths must merge after allocation. Give all four
+   the same post-call USE tail, using one caller-owned pointer union. This prevents
+   the second basic-block pass from adding a unique fallthrough USE0, and jump2
+   merges the paths while preserving their earlier absolute-value calculations.
+   These unions, guards, identities and trailing dead reads are phase 4 candidates.
+
+246. **A changed constant load may be reload rematerialization, not changed CSE sharing.**
+   Vorn_UpdateDefeat (080AEE08) has separate visible loads of one at its final
+   state stores. Both the original and unwrapped source share that constant in
+   CSE. The original statement wrappers raise its reference count so local
+   allocation chooses r4; reload spills r4 and rematerializes one at the stores.
+   Without the wrappers it can keep the constant in r5/r6. Reuse the existing
+   completion-state scalar in all three final calls instead: its global lifetime
+   recovers the rematerializations without private wrappers. Check the local and
+   global dumps before treating a new load as evidence of a missing CSE fence.
+
+247. **Independent late-zero self-assignments can replace macro reference weights.**
+   Vorn_UpdateDefeat's spark kind, spread and origin need a precise local order
+   before the global random-table value evicts one local. After the first spawn,
+   self-assign each through a different masked zero, such as `(actorWord & 255)
+   >> 8`. Flow retains the read/set references until combine erases the identity:
+   kind/spread/origin have 9/11/9 references and the ROM allocation follows.
+   The zero expressions must remain independent. Reusing the same masked zero
+   lets CSE share it; combine reduces the common definition to zero but leaves
+   six real operations on its multiple users. Distinct masks 255, 31 and 127
+   with their corresponding shifts let each whole expression fold. These three
+   identities and the reused scalars are explicitly allocation-only wording.
+
+248. **An impossible definition can adjust weighted references without an extra read.**
+   TargetRegistry_FindById (0815F5B4) loads a halfword ID before comparing it with
+   the requested ID. `if ((s32)entryId < 0) requestedId = 0` survives long enough
+   to add a loop-weighted definition, raising requestedId from three references
+   to five. Combine deletes the condition; a narrowed pointer identity adjusts
+   its live length to 31 and priority to 3225, between competing flag priorities
+   3333 and 3125. sub_0817AEC8 similarly retains a read/set of its sine pointer
+   under an impossible negative masked-radius test, raising references from six
+   to ten. Its delayed symbolic base avoids early hoisting and REG_EQUIV doubling;
+   a narrow zero extends the heading to the same priority 12000, so declaring
+   sine first settles the pseudo-order tie. All are phase 4 allocation-only forms.
+
+249. **Separate semantic lifetimes before tuning a rounded quotient's register.**
+   Hresvelgr_EmitFacingMotion (0819BCB8) reused one direction scalar for unrelated
+   vector and later facing computations, making a quantity too competitive.
+   Separate those values, keep the symbolic RNG origin, and use a constant-first
+   second polar mask. The final quotient still differs: an explicit negative
+   rounding bias followed by `q >>= 10; q <<= 10` preserves its copy and both
+   shifts in one pseudo, whereas a nested shift expression chooses r0. The
+   sampled quotient is nonnegative and combine deletes the bias guard. A forced
+   r1 diagnostic confirmed the last decision before the ordinary rewrite matched.
+
+
+250. **A reused union can carry a hard-register preference between disjoint lifetimes.**
+   sub_0803198C needs the completion callback in r1 instead of r0. Use one union
+   for the earlier wait-field address and the later callback. A dead callback
+   read beyond the mode switch makes the union canonical across the CSE block,
+   preserving both definitions in one pseudo. Its first lifetime overlaps the
+   wait constant in r0, so the later callback naturally gets r1. A one-field
+   wait view preserves the original field-store expansion. The union, typed view
+   and dead read are allocation-only forms; the 948-byte stock result is exact.
+
+251. **A bounded dead arm can admit a low register into reload's spill set.**
+   OrangeSpine_ApplyHitReaction (0820EE34) needs r3 available for the health loads.
+   Reuse the input parameters for the response bits and destination first. After
+   loading maximum health, widen the unsigned health halfword into `raw` and use
+   `if ((s32)raw < 0)` around two additional signed field reads. Combine removes
+   the test, but the unreachable reads request r3 while r0/r1/r2 are occupied.
+   Reload admits r3 before jump2 deletes the arm. All 424 bytes match; the
+   parameter reuse, guard and dead reads are allocation-only phase 4 items.
+
+252. **An undoubled table still needs enough references to win its loop register.**
+   SpiralBurst_InitParticles (08234540) first forms its symbolic table with
+   `(u32)gRandomTable & ~(phase >> 8)`, where phase is a byte. This preserves the
+   required table copy without REG_EQUIV. Two in-loop self-identities using
+   independent zero masks then give table 19 refs / 156 live / priority 4,871,
+   ahead of sprite 4,444 and burst 3,657. The original five direct random draws
+   must remain: inserting a sample macro changes the fourth draw's regmove tie
+   and the final small mask's mode. The late constant and identities are
+   allocation-only; the 428-byte stock result is exact.
+
+253. **Resolve equivalent-pointer penalties, equal-priority order and late conflicts separately.**
+   Spider_UpdateWanderGoal (080A4018) first needs symbolic bit-clears to remove
+   REG_EQUIVs from its random table, cursor and mask. Declaring the goal pointer
+   before the mesh resolves the remaining equal-priority ownership; an s16
+   route result lets the input win its register. Finally, independent late zeros
+   in the real flag test retain mask/cursor references across the branch.
+   Their priorities become 685 and 659, giving sb/sl. These width, order and
+   identity choices are allocation-only; the full 15,172-byte spider unit matches.
+
+254. **A dead global carrier can explain a saved high register with no final use.**
+   WirelessGameMenu_InitEquipmentChoices (08038448) saves sl although its final
+   body does not use it. A negative guard over an unsigned halfword keeps a dead
+   arm through reload. Four word values cross a dead Mod call; a nested condition
+   makes them global quantities, avoiding local callee homes that alter find_reg's
+   first pass. Reload's mark_home_live retains the sl save. Two dead arithmetic
+   results and their destination occupy the low registers, selecting scratch r3
+   and rotating the later seed-pointer reload to r0. Jump2 erases the entire arm.
+   The guard, call, arithmetic, stores and word overlay are allocation-only forms.
+
+255. **A dead call argument can supply a copy preference without a live value across the call.**
+   sub_081A14FC needs sampleY in r3. An impossible negative-side-byte arm passes
+   sampleY as argument four to MotionEntry_CreateWithDelta, then jumps to the
+   existing pulse join after the real call. The argument copy gives the needed
+   preference; jump2 deletes the fallback. An explicit return changes PRE and
+   does not match. Separately, an unsigned random sample's negative guard keeps
+   rawY live through its shift and raises table priority. Both guards and the
+   fallback call are allocation-only; all 1,764 stock bytes match.
+
+256. **Dead expansion instructions can affect PRE through the expression hash-table size.**
+   Mummy_ResumeSavedRouteAfterAnimation (080D1784) has the right expressions but
+   wrong spill-slot order. gcse.c sizes its expression table as `(n_insns / 2) | 1`;
+   the diagnostic AGBCC_GCSE_T=145 proves the bucket count is decisive. Two dead
+   unsigned tail folds raise the stock table from 141 to 145 buckets, changing
+   expression traversal and reproducing PRE's original insertion order. Flow
+   deletes the folds. Keep the existing typed group-relative bases and the signed
+   destination offset reused as the 0x200 motion flag. Both forms are allocation-only.
+
+257. **Disjoint value reuse plus bounded exit uses can reproduce a pin's global pressure.**
+   Skeleton_UpdateDefeat (080BD1F0) needs two burst constants in sb/r8 and its
+   second random table in sl, leaving the shared position origin spilled. Two
+   unions reuse context/one and flags-pointer/one. Initialize the second table
+   from the actor after the collision-timer call, then retain it in negative
+   guards over an unsigned byte and a masked pointer on the other exits.
+   A zero term in the first real sound argument keeps the response/table conflict
+   across the branch. Response, state and table now have priorities 747, 636 and
+   540; the shared origin at 254 spills. The initial copy and both dead sound
+   arms disappear. All 7,924 bytes match. The unions, initializer, guards and
+   zero term are allocation-only; numeric statistics selectors were also replaced
+   by checked, named fields in enemy_defeat_statistics.h.
+
+258. **A dead store can block regmove from forwarding a saved pointer into a callback.**
+   WirelessResultPanel_Init (0803B40C) needs the final state stores through r1,
+   followed by a callback address through sb. Reuse a pointer union for the
+   earlier visible address and final state address, retaining a dead read across
+   the CSE block. A bounded zero offset preserves the state-store copy. The final
+   negative-byte arm's unreachable typed store prevents regmove from forwarding
+   r1 into the callback and avoids a new r2 spill requirement. Earlier bounded
+   resource-copy arms preserve the two source moves before ldm/stm; a dead parent
+   byte store controls reload rotation. All 684 bytes match. The union, typed byte
+   view, guards, zero and dead accesses are allocation-only phase 4 forms.
+
+259. **Admitting a scratch register and choosing an argument register are separate decisions.**
+   ScenePanel_TickRig (0805AC3C) first needs r3 in reload's spill set. An impossible
+   negative-byte arm with two signed field loads supplies that demand. A separate
+   bounded timer fallback passes the timer in argument four and the interval
+   pointer in argument two, supplying their r3/r1 preferences. Reusing the timer
+   for the second frame sample avoids another fallback. Preserve both timer
+   reads, but use an ordinary second halfword load so no extra volatile copy
+   survives. Both arms disappear in jump2; all 220 bytes match. ScenePanel_InitRig
+   (0805B0F0) separately uses the known-zero halfword-state offset from fact 231
+   to avoid the random table's REG_EQUIV penalty and retain r4 ahead of mask r5.
+   These guards, scalar reuse and table identity are allocation-only forms.
+
+260. **Bounded guards can keep accumulators global while samples remain local.**
+   sub_081D3620 needs each sample in r0, with coordinate sums in r2 then r1.
+   After each sum, widen the unsigned halfword coordinate and guard a zero
+   assignment with its impossible signed-negative test. The branch retains a
+   global coordinate quantity through local allocation; each random sample is
+   allocated first as a local. Reuse one cursor through both draws and the second
+   numeric sample address, keeping the cursor in r1. The guards disappear in
+   jump2 and all 132 bytes match. The guards, scalar reuse and retained table
+   halves union are allocation-only phase 4 items.
+
+261. **A dead argument preference may require making the real induction cursor explicit.**
+   sub_08217430 needs the completed palette-bank pointer in r3 while its loaded
+   base stays in r1. A negative guard over an unsigned halfword key shifted by
+   five passes bank as argument four to an unreachable callback-setup call, then
+   jumps past CpuFastSet. This gives bank r3 without keeping it live across the
+   dead call. The extra path makes loop.c reject the implicit key-address GIV
+   (benefit two, net zero), so use a guarded do-loop with an explicit key cursor.
+   Load the base-pointer address before the cursor, and increment keys before
+   the index; all 1,328 bytes match. The fallback, dead call and join are
+   allocation-only. A pre-existing single-iteration source-increment wrapper in
+   a later fade loop is retained and explicitly marked for phase 4.
+
+262. **An aggregate hard-register conflict can be a wide pseudo's own upper word.**
+   The two-word palette-bank experiment in sub_08217430 allocated pseudo 43
+   starting at r2, occupying r2/r3. Its low-word output needed r3, but the old
+   holder lookup excluded the queried pseudo and reported an unknown blocker.
+   Preserve SUBREG word offsets when recovering allocation bases and mapping
+   emitted operands. Report the allocation span and the scalar word separately:
+   moving word zero to r3 means moving the whole pair to r3/r4, not independently
+   assigning its low word. The scope fix has synthetic self-occupancy, high-word
+   and base-recovery tests, plus the ignored real diagnostic reproduction.
+
+263. **Single-pass loop notes can change reference weights without adding a branch boundary.**
+   ContactActor_UpdateRetreat (0804373C) needs the early angle mask and later
+   random-index pointer in r6, leaving the actor in r7. A typed union reuses their
+   disjoint storage; assign the cursor after the first trig product but before
+   truncation. Single-pass loops around the mask initializer and the cursor
+   helper's increment/store give the union 16 weighted references over 99 live
+   instructions, priority 6464 ahead of the actor's 5970. A third single-pass
+   loop around the radius AND makes its mask win the local tie: priority 40000
+   against sample 15000, selecting mask r0 and sample r1. Unlike a bounded dead
+   arm here, these loops do not introduce a PRE boundary that moves the cursor
+   handoff. The origin's known-zero low bits end its lifetime at the first x
+   join, preserving r8/sl. All 788 bytes match. The union, assignment boundary,
+   weighting loops and origin identity are explicit allocation-only phase 4 items.
+
+264. **Preserve scalar spill order by delaying unwanted induction-variable recognition.**
+   SceneActorPalette_ApplyTransition (08071F50) needs six homes in this order:
+   deltaRed, red, deltaGreen, green, actorFlags, blue at sp+0/4/8/C/10/14.
+   Declare typed scalar pointers in that order. Plain halfword indexing lets
+   loop.c replace their lifetimes with extra GIV cursors and loses the layout.
+   Use `u32 halfOffset = (i + ((u16)i >> 16)) * 2`: the bounded term survives
+   loop strength reduction and disappears in combine. Only the color cursor
+   remains a GIV. Explicit pointer-first integer additions then resolve the
+   last three commuted ADDs. A separate category predicate's negative-halfword
+   guard prevents regmove tying the AND to the live flags; the ordinary first
+   predicate retains its mask/load order. All 468 bytes match. The declaration
+   order, guard, index identity and explicit offset are allocation-only forms.

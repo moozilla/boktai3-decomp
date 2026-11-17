@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 struct Vec {
@@ -164,21 +163,30 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                     s32 period = (step + 1) * 4;
                     if (!sub_08249498(action->frame, period)) {
                         struct Vec delta, position;
-                        register const u16 *table asm("r6") = (const u16 *)RANDOM_TABLE_ADDR;
+                        union RandomTableView view = {gRandomTable};
+                        const u16 *table = view.samples;
                         s32 ox, px, oy, py, oz, pz;
                         s32 sampleX, sampleZ;
-                        register s32 sampleY asm("r3");
-                        s32 valueY;
-                        register s32 rawY asm("r0");
+                        s32 sampleY;
+                        s32 rawY;
                         SetVector(&delta, (RandomValue(table) >> 3) % 32 - 16, actor->delta.y,
                                   (RandomValue(table) >> 3) % 32 - 16);
                         sampleX = RandomValue(table) >> 3;
                         ox = sampleX - (sampleX / 256) * 256;
                         px = actor->renderPosition.x;
                         rawY = RandomValue(table);
-                        valueY = rawY >> 3;
-                        asm("" : : "r"(valueY));
-                        sampleY = valueY;
+                        sampleY = rawY >> 3;
+                        /* Allocation-only: preserve the table and raw-sample lifetimes. */
+                        if (rawY < 0)
+                            table++;
+                        {
+                            u32 side = actor->side;
+                            /* Allocation-only: this bounded fallback retains the argument copy. */
+                            if ((s32)side < 0) {
+                                MotionEntry_CreateWithDelta(&saved->position, &delta, 0, sampleY);
+                                goto sprayDone;
+                            }
+                        }
                         oy = sampleY - (sampleY / 128) * 128;
                         py = actor->renderPosition.y;
                         sampleZ = RandomValue(table) >> 3;
@@ -189,6 +197,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                                                     (RandomValue(table) >> 3) % 4, 64);
                     }
                 }
+            sprayDone:
                 if (saved->pulse)
                     Sound_PlaySong(0x3d9);
                 action->frame++;

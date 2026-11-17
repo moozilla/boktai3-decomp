@@ -1,7 +1,6 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-// MATCHING_CONCESSION: register-pinning
 struct TrailSegment {
     u8 unknown0[0x1c];
     struct ContactPosition position;
@@ -42,9 +41,9 @@ static inline u8 IsInactive(struct ChaseActor *actor)
 }
 static inline s32 Height(s32 cell, struct ContactPosition *position)
 {
-    register struct ContactPosition *p asm("r6") = position;
-    u32 attr = *SceneActorTerrain_GetCell(cell);
-    u32 kind = attr >> 4;
+    struct ContactPosition *p = position;
+    u8 attr = *SceneActorTerrain_GetCell(cell);
+    u8 kind = attr >> 4;
     u32 mask = 15;
     s32 height;
     mask &= attr;
@@ -65,12 +64,6 @@ static inline s32 Abs(s32 n)
         return -n;
     return n;
 }
-static inline s32 NearHeight(s32 x, s32 z, s32 limit)
-{
-    if (Abs(x) > limit || Abs(z) > limit)
-        return 0;
-    return 1;
-}
 void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
 {
     struct TentacleTrail *trail;
@@ -78,31 +71,33 @@ void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
     u32 positionY = (u32) & ((struct TentacleTrail *)0)->segments[0].position.y;
     if (IsInactive(actor))
         return;
-    do {
-        trail = actor->base.context;
-    } while (0);
+    trail = actor->base.context;
     if (WordFlag(actor, 0x100000))
         return;
     for (i = 0; i < trail->segmentCount; i++) {
         struct TrailSegment *segment = &trail->segments[i];
+        struct ContactPosition *position = &segment->position;
         if (TestSegment(segment, 2) && (!TestSegment(segment, 1))) {
-            s32 rawHeight = Height(SceneActorTerrain_GetCellIndex(&segment->position),
-                                   &trail->segments[i].position);
+            s32 rawHeight = Height(SceneActorTerrain_GetCellIndex(position), position);
             s32 height = rawHeight;
             s16 y;
-            asm("" : "+r"(height));
             y = segment->position.y;
             if (y != height) {
                 if (y < height) {
                     s32 delta = height - y;
-                    if (!NearHeight(delta, delta, 255))
+                    if (Abs(delta) > 255)
+                        *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
+                                  positionY)) = actor->base.body.position.y;
+                    else if (Abs(delta) > 255)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) = actor->base.body.position.y;
                     else
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) = height;
                 } else {
-                    s32 delta = rawHeight - y;
+                    s32 delta;
+                    height = rawHeight - y;
+                    delta = height;
                     if (Abs(delta) > 256)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TrailSegment))) +
                                   positionY)) = actor->base.body.position.y;

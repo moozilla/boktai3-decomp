@@ -1,7 +1,4 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
-// 0xFFFF lives in an unallocated pseudo outside the loop, so reload
-// rematerialises it into r7 at the compare.
 
 struct SlotMonitor {
     u8 unk0[0x20];
@@ -34,17 +31,21 @@ u8 SlotMonitor_CheckTimeout(struct SlotMonitor *);
 u8 LinkHandshake_AdvanceTimeout(void *);
 void LinkHandshake_UpdateRestartState(void);
 
+static inline u16 SlotMonitor_Flags(struct SlotMonitor *obj)
+{
+    return obj->flags;
+}
 void sub_08108C94(struct SlotMonitor *obj)
 {
     s32 i;
     s32 count = 0;
-    register s32 matches asm("r6") = 0;
+    s32 matches = 0;
     s32 ready = 0;
     s32 first = 1;
     s32 stop;
 
     obj->result = Serial_ReceivePacket(obj->peers);
-    obj->field44 = SerialLink_QueueSendWord(obj->flags);
+    obj->field44 = SerialLink_QueueSendWord(SlotMonitor_Flags(obj));
     if (obj->finished == 0 && obj->selection == 0)
         SerialLink_StartTransferIfIdle();
     stop = (u8)SlotMonitor_CheckTimeout(obj);
@@ -56,20 +57,20 @@ void sub_08108C94(struct SlotMonitor *obj)
     }
     if (obj->result >= 0) {
         u16 *base;
-        u16 *p;
-        s32 zero;
-        s32 none = 0xFFFF;
+        s32 none;
         obj->ticks++;
         base = obj->peers;
-        zero = 0;
+        none = 0xFFFF;
         for (i = 0; i < 4; i++) {
-            register u16 raw asm("r3") = base[i];
-            s32 v = raw;
+            u16 peer[1];
+            u16 v;
+            peer[0] = base[i];
+            v = peer[0];
             if (v != none) {
-                if (first) {
+                if ((u8)first) {
                     if (v == (0x1BC0 | obj->config)) {
                         matches++;
-                    } else if ((raw & 0xFFC0) == 0x2FC0) {
+                    } else if ((peer[0] & 0xFFC0) == 0x2FC0) {
                         obj->field6f = *(u8 *)base & 0x3F;
                         if (obj->field6f) {
                             matches++;
@@ -81,6 +82,7 @@ void sub_08108C94(struct SlotMonitor *obj)
             } else {
                 first = 0;
             }
+            v = peer[0];
         }
         if (count == 2 && matches == 2) {
             obj->field38++;
@@ -90,7 +92,7 @@ void sub_08108C94(struct SlotMonitor *obj)
         } else {
             if (LinkHandshake_AdvanceTimeout(obj))
                 obj->finished = 1;
-            obj->field38 = zero;
+            obj->field38 = 0;
         }
         if (ready == 2) {
             obj->field28 = 1;

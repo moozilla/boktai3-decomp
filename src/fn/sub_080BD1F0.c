@@ -1,9 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_behavior.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
 #include "runtime.h"
+#include "enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
@@ -11,9 +11,7 @@
  * SceneActorReaction_TickHiddenTimeout (revival, with the rank 20000 reward); otherwise the
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
  * counter per collider reaction flag) and a six-spark burst.
- * Pins: the spark table and the constant 1 of the two spark bursts. Kill counters are an
- * if/else, as in Ivy_UpdateDefeat, which keeps them pin-free. The burst arguments
- * live in function-scope variables, which the ROM rematerialises at each call. */
+ * The burst arguments live in function-scope variables and are rematerialized at each call. */
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);
@@ -37,10 +35,6 @@ struct SkeletonContext {
     u8 unknown6D8[4];
     u32 flags;
 };
-
-#define STAT(n)  (*(s16 *)((u8 *)gGameState + (n)))
-#define COUNT(n) Count(&STAT(n))
-#define INC(n)   STAT(n) = Clamp(STAT(n) + 1)
 
 static inline void Count(s16 *p)
 {
@@ -79,10 +73,10 @@ static inline u8 TestBits(u32 *p, u32 maskInput)
         return 1;
     return 0;
 }
-static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
+static inline u32 Skeleton_StatusFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return off == 0x2D4 ? *(u16 *)((u8 *)actor + off) & mask : *(u32 *)((u8 *)actor + off) & mask;
+    return actor->base.statusFlags & mask;
 }
 static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
 {
@@ -139,15 +133,20 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
 #define FLAG_COUNTS()                                                                              \
     {                                                                                              \
         if (flags & 0x80)                                                                          \
-            INC(0x58A);                                                                            \
+            ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[0] =                      \
+                Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[0] + 1);        \
         else if (flags & 0x100)                                                                    \
-            INC(0x58C);                                                                            \
+            ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[1] =                      \
+                Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[1] + 1);        \
         else if (flags & 0x200)                                                                    \
-            INC(0x58E);                                                                            \
+            ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[2] =                      \
+                Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[2] + 1);        \
         else if (flags & 0x400)                                                                    \
-            INC(0x590);                                                                            \
+            ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] =                      \
+                Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[3] + 1);        \
         else if (flags &= 0x800)                                                                   \
-            INC(0x592);                                                                            \
+            ((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] =                      \
+                Clamp(((struct EnemyDefeatStatistics *)gGameState)->reactionCounts[4] + 1);        \
     }
 static inline void RecordKill(struct ChaseActor *actor, u8 *category)
 {
@@ -155,43 +154,43 @@ static inline void RecordKill(struct ChaseActor *actor, u8 *category)
     switch (*category) {
         case 4: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x53A);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category4);
             FLAG_COUNTS();
             break;
         }
         case 1: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x53C);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category1);
             FLAG_COUNTS();
             break;
         }
         case 2: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x53E);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category2);
             FLAG_COUNTS();
             break;
         }
         case 3: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x540);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category3);
             FLAG_COUNTS();
             break;
         }
         case 14: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x54C);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category14);
             FLAG_COUNTS();
             break;
         }
         case 24: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x55C);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category24);
             FLAG_COUNTS();
             break;
         }
         case 10: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x546);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category10);
             FLAG_COUNTS();
             break;
         }
@@ -199,68 +198,68 @@ static inline void RecordKill(struct ChaseActor *actor, u8 *category)
         case 6:
         case 7: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x542);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category5To7);
             FLAG_COUNTS();
             break;
         }
         case 21: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x554);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category21);
             FLAG_COUNTS();
             break;
         }
         case 18: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x550);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category18);
             FLAG_COUNTS();
             break;
         }
         case 19: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x552);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category19);
             FLAG_COUNTS();
             break;
         }
         case 17: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x54E);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category17);
             FLAG_COUNTS();
             break;
         }
         case 22: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x556);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category22);
             FLAG_COUNTS();
             break;
         }
         case 20: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x558);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category20);
             FLAG_COUNTS();
             break;
         }
         case 9: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x544);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category9);
             FLAG_COUNTS();
             break;
         }
         case 23: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x55A);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category23);
             FLAG_COUNTS();
             break;
         }
         case 12:
         case 13: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x54A);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category12And13);
             FLAG_COUNTS();
             break;
         }
         case 25: {
             u32 flags = collider->reactionFlags;
-            COUNT(0x560);
+            Count(&((struct EnemyDefeatStatistics *)gGameState)->category25);
             FLAG_COUNTS();
             break;
         }
@@ -270,18 +269,26 @@ static inline void RecordKill(struct ChaseActor *actor, u8 *category)
 void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
-    struct SkeletonContext *context = actor->base.context;
-    u8 *group = (u8 *)&actor->group.common;
+    /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
+    union {
+        struct SkeletonContext *context;
+        s32 one;
+    } state = {actor->base.context};
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u32 mask;
     u32 wrap = 1023;
     u32 bits = 3;
     s32 count = 4;
     s32 life = 20;
     s32 size = 2;
-    u16 *flags2D4;
+    union {
+        u16 *flags;
+        s32 one;
+    } response;
     u32 *ctxFlags;
     u8 blocked;
     u8 *categoryp;
+    const u16 *lateTable;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->base.restart = 0;
@@ -291,7 +298,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         SceneActorEffects_AdvanceSteps(actor, 4);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
-            struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
+            struct SceneActorRegistryControl *control = &group->control;
             u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *field &= mask;
@@ -310,6 +317,9 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         }
     }
     SceneActorTerrain_ClearCollisionTimers((void *)actor);
+    /* Allocation-only: the two bounded exit arms preserve this global table
+     * lifetime until jump2; neither arm nor this initial copy emits code. */
+    lateTable = (const u16 *)actor;
     if (!actor->base.restart)
         return;
     actor->base.stepDone = 1;
@@ -318,7 +328,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     mask = 0x4000;
     {
         u32 test = actor->base.motionFlags & mask;
-        flags2D4 = &actor->base.motionFlags;
+        response.flags = &actor->base.motionFlags;
         if (!test)
             goto notHidden;
     }
@@ -339,7 +349,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             Script_Call(script, &arguments);
         }
         {
-            u32 t = *flags2D4 & mask;
+            u32 t = *response.flags & mask;
             categoryp = &actor->base.category;
             if (!t && (u32)(*categoryp - 11) > 2)
                 Bestiary_UnlockEntry(
@@ -348,28 +358,34 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
         {
             struct ContactPackedVector range;
             const u16 *table;
-            register s32 one asm("sb");
             u8 category;
             range.x = 80;
             range.y = 60;
             range.z = 60;
             table = gRandomTable;
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x20, count, life, size, one = 1);
+                                0x20, count, life, size, state.one = 1);
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x40, count, life, size, one);
+                                0x40, count, life, size, state.one);
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x5E, count, life, size, one);
+                                0x5E, count, life, size, state.one);
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x80, count, life, size, one);
+                                0x80, count, life, size, state.one);
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0xC4, count, life, size, one);
+                                0xC4, count, life, size, state.one);
             SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0xF0, count, life, size, one);
+                                0xF0, count, life, size, state.one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
                 category == 0x18 || category == 0x19)
-                Sound_PlaySong(0xE5);
+                /* The late zero retains the response/table conflict through combine. */
+                Sound_PlaySong(0xE5 | (((u32)response.flags & 31) >> 5));
+        }
+
+        {
+            u32 bound = (u8)(u32)actor;
+            if ((s32)bound < 0)
+                Sound_PlaySong((u32)lateTable);
         }
         SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
         SetState(actor, 3, 0, 0);
@@ -377,20 +393,20 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             u32 m = 0x1000;
             actor->base.reactionFlags = m | actor->base.reactionFlags;
         }
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
         Trigger_ConsumePending((u8 *)actor + 0xC, 1);
         return;
     }
 notHidden:
     if (actor->base.hitReactionFlags & 0x7F) {
         u32 hit = actor->base.hitAttributes & 0x100017;
-        ctxFlags = &context->flags;
+        ctxFlags = &state.context->flags;
         if (hit)
             goto defeated;
     }
     {
         u32 m = 0x1800;
-        u32 *f = &context->flags;
+        u32 *f = &state.context->flags;
         u32 v = *f & m;
         ctxFlags = f;
         blocked = Test(v, ~0);
@@ -422,7 +438,7 @@ notHidden:
         actor->base.health = 1;
         {
             u32 bit = 0x40;
-            *flags2D4 &= ~bit;
+            *response.flags &= ~bit;
             if (Test(*ctxFlags, bit)) {
                 u32 c = 7;
                 actor->base.category = c;
@@ -430,7 +446,7 @@ notHidden:
                 Skeleton_InitVariantMotion(actor);
             }
         }
-        if (context->rank > 19999) {
+        if (state.context->rank > 19999) {
             u16 script = (u16)actor->base.script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
@@ -446,19 +462,25 @@ notHidden:
                 arguments.values = values;
                 Script_Call(script, &arguments);
             }
-            if (!Masked16(flags2D4, 0x4000) && (u32)(actor->base.category - 11) > 2)
+            if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-            sub_08159164(context->rewardHigh);
-            Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
+            sub_08159164(state.context->rewardHigh);
+            Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         } else {
-            sub_08159164(context->rewardLow);
+            sub_08159164(state.context->rewardLow);
         }
         {
             u32 m = 0x10;
             *ctxFlags |= m;
         }
         Sound_PlaySong(0x3AD);
+        {
+            u32 bound = ((u32)actor & 4095);
+            if ((s32)bound < 0)
+                Sound_PlaySong((u32)lateTable);
+        }
+
     } else {
     defeated:
         SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
@@ -487,41 +509,39 @@ notHidden:
                 Script_Call(script, &arguments);
             }
         }
-        if (!Masked16(flags2D4, 0x4000) && (u32)(*categoryp - 11) > 2)
+        if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-        sub_08159164(context->rewardHigh);
-        Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
-        COUNT(0x87C);
-        COUNT(0x538);
+        sub_08159164(state.context->rewardHigh);
+        Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
+        Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
+        Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
         RecordKill(actor, categoryp);
         {
             struct ContactPackedVector range;
-            register const u16 *table asm("sl");
-            register s32 one asm("r8");
             u8 category;
             range.x = 80;
             range.y = 60;
             range.z = 60;
-            table = gRandomTable;
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x20, count, life, size, one = 1);
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x40, count, life, size, one);
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x5E, count, life, size, one);
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0x80, count, life, size, one);
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0xC4, count, life, size, one);
-            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(table, wrap, bits), &range,
-                                0xF0, count, life, size, one);
+            lateTable = gRandomTable;
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0x20, count, life, size, response.one = 1);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0x40, count, life, size, response.one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0x5E, count, life, size, response.one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0x80, count, life, size, response.one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0xC4, count, life, size, response.one);
+            SparkParticle_Spawn(&actor->base.body.position, RandomFrom(lateTable, wrap, bits),
+                                &range, 0xF0, count, life, size, response.one);
             category = *categoryp;
             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
                 category == 0x18 || category == 0x19)
                 Sound_PlaySong(0xE5);
         }
-        if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+        if (!Test(gEngineFlags, 0x4800) && !Skeleton_StatusFlags(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
     }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
 }

@@ -1,9 +1,9 @@
-// MATCHING_CONCESSION: register-pinning
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_behavior.h"
 #include "script_utility.h"
 #include "spark_particle.h"
+#include "monster_particle_random.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -25,52 +25,23 @@ static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.behaviorFlags & mask;
 }
-#define VORN_READ_RANDOM_SAMPLE(out_, samples_, offset_)                                           \
-    do {                                                                                           \
-        (out_) = *(const u16 *)((offset_) + (u32)(samples_));                                      \
-    } while (0)
 static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
 {
     u32 index = (*cursor + 1) & 1023;
     u32 value;
     *cursor = index;
     index *= 2;
-    VORN_READ_RANDOM_SAMPLE(value, table, index);
+    PARTICLE_RANDOM_READ_SAMPLE(value, (const u16 *)(index + (u32)table), 0);
     value &= 3;
     return value + 1;
 }
-#define VORN_CLEAR_ROUTE_FIELDS(control_, zero_)                                                   \
-    do {                                                                                           \
-        (control_)->counter = (zero_);                                                             \
-        (control_)->field14 = (zero_);                                                             \
-        (control_)->timer = (zero_);                                                               \
-    } while (0)
-#define VORN_CAPTURE_SPARK_ORIGIN(out_, actor_)                                                    \
-    do {                                                                                           \
-        (out_) = (const struct ContactPosition *)&(actor_)->base.body.position;                    \
-    } while (0)
-#define VORN_SPARK_ORIGIN(actor_)                                                                  \
-    ({                                                                                             \
-        const struct ContactPosition *position;                                                    \
-        VORN_CAPTURE_SPARK_ORIGIN(position, actor_);                                               \
-        position;                                                                                  \
-    })
-#define VORN_RESET_ENTRY_FIELDS(actor_, prepared_)                                                 \
-    do {                                                                                           \
-        (actor_)->base.counter2AC = 0;                                                             \
-        (actor_)->base.field2B1 = (prepared_);                                                     \
-    } while (0)
-#define VORN_COMPLETE_DEFEAT(actor_, state_)                                                       \
-    do {                                                                                           \
-        Vorn_InstallIdleControl((actor_), SceneActorControl_OnIdle, 16, 1);                        \
-        SceneActorChase_SelectState((actor_), (state_), 0, 2);                                     \
-        Vorn_ResetStateEntry((actor_), 1);                                                         \
-    } while (0)
 static inline void Vorn_ClearRoute(struct ChaseActor *actor,
                                    struct SceneActorRegistryControl *control, u32 cleared)
 {
     SceneActorChase_ClearActorFlags(actor, 0x141C0);
-    VORN_CLEAR_ROUTE_FIELDS(control, cleared);
+    control->counter = cleared;
+    control->field14 = cleared;
+    control->timer = cleared;
 }
 
 static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 bits)
@@ -78,37 +49,20 @@ static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 b
     tile->flags |= bits;
 }
 
-#define VORN_PREPARE_ENTRY_BYTE(actor_, prepared_)                                                 \
-    do {                                                                                           \
-        (actor_)->base.field2B2 = (prepared_);                                                     \
-        (actor_)->base.stepDone = 0;                                                               \
-    } while (0)
 static inline void Vorn_InstallIdleControl(struct ChaseActor *actor, void *callback, u32 kind,
                                            u32 prepared)
 {
-    VORN_PREPARE_ENTRY_BYTE(actor, prepared);
+    actor->base.field2B2 = prepared;
+    actor->base.stepDone = 0;
     actor->base.controlKind = kind;
     actor->base.target = callback;
     SceneActorChase_ResetMotionControl(actor);
 }
 static inline void Vorn_ResetStateEntry(struct ChaseActor *actor, u32 prepared)
 {
-    VORN_RESET_ENTRY_FIELDS(actor, prepared);
+    actor->base.counter2AC = 0;
+    actor->base.field2B1 = prepared;
 }
-#define VORN_SET_SPARK_KIND(out_, kind_)                                                           \
-    do {                                                                                           \
-        (out_) = (kind_);                                                                          \
-    } while (0)
-#define VORN_DEFEAT_SPARK_KIND()                                                                   \
-    ({                                                                                             \
-        s32 kind;                                                                                  \
-        VORN_SET_SPARK_KIND(kind, 2);                                                              \
-        kind;                                                                                      \
-    })
-#define VORN_CAPTURE_SPARK_SPREAD(out_, range_)                                                    \
-    do {                                                                                           \
-        (out_) = &(range_);                                                                        \
-    } while (0)
 union VornSpreadVector {
     struct ContactPackedVector bits;
     u32 words[2];
@@ -154,30 +108,32 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
         SceneActor_CallContextScriptB(actor);
         {
             union VornSpreadVector *spread;
+            const struct ContactPosition *origin;
+            u32 sparkKind;
             range.bits.x = 80;
             range.bits.y = 60;
-            VORN_CAPTURE_SPARK_SPREAD(spread, range);
+            spread = &range;
             /* Preserve the unused upper half of the packed depth word. */
             spread->words[1] = (spread->words[1] & 0xFFFF0000) | 60;
             workValue = (u32)gRandomTable;
             SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x20, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
-            SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x40, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
-            SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x5E, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
-            SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0x80, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
-            SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0xC4, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
-            SparkParticle_Spawn(
-                VORN_SPARK_ORIGIN(actor), Vorn_RandomSparkCount((const u16 *)workValue, cursor),
-                (const struct ContactPosition *)spread, 0xF0, 4, 20, VORN_DEFEAT_SPARK_KIND(), 1);
+                (origin = (const struct ContactPosition *)&actor->base.body.position),
+                Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                (const struct ContactPosition *)spread, 0x20, 4, 20, (sparkKind = 2), 1);
+            /* Keep the three shared spark values distinct through CSE. */
+            sparkKind |= ((u32)actor & 255) >> 8;
+            spread = (union VornSpreadVector *)((u32)spread + (((u32)actor & 31) >> 5));
+            origin = (const struct ContactPosition *)((u32)origin + (((u32)actor & 127) >> 7));
+            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                (const struct ContactPosition *)spread, 0x40, 4, 20, sparkKind, 1);
+            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                (const struct ContactPosition *)spread, 0x5E, 4, 20, sparkKind, 1);
+            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                (const struct ContactPosition *)spread, 0x80, 4, 20, sparkKind, 1);
+            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                (const struct ContactPosition *)spread, 0xC4, 4, 20, sparkKind, 1);
+            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+                                (const struct ContactPosition *)spread, 0xF0, 4, 20, sparkKind, 1);
         }
         category = actor->base.category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -211,6 +167,8 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
             Vorn_SetTileFlags(
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, mask);
     }
-    VORN_COMPLETE_DEFEAT(actor, completedState);
+    Vorn_InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
+    SceneActorChase_SelectState(actor, completedState, 0, 2);
+    Vorn_ResetStateEntry(actor, completedState);
     ActorShadow_Disable(actor->base.shadow);
 }

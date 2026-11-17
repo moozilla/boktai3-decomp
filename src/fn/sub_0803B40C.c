@@ -1,20 +1,8 @@
-// MATCHING_CONCESSION: register-pinning
+#include "display_sequence_sprite.h"
 #include "global.h"
 #include "ram.h"
 struct Blob {
     u32 words[8];
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[3], visible;
-    u8 pad8[8];
-    u16 tile;
-    u8 pad12[0x1a];
-};
-struct Animation {
-    const u16 *frames;
-    u8 flags, length, duration, period;
-    u16 frame, base, speed, timer;
 };
 struct Drawing {
     u8 bytes[0x60];
@@ -25,7 +13,7 @@ struct ResultMenu {
     u8 state, entered;
     u8 pad1e[0x12];
     struct Blob primary, secondary;
-    struct Sprite sprite;
+    struct DisplaySequenceSprite sprite;
     u8 glyph[0x1c];
     struct Drawing draws[22];
     void *onClose, *resource;
@@ -34,15 +22,9 @@ struct ResultMenu {
 };
 int Script_SeekToKeyword(int);
 void *Script_GetTextSourcePc(void);
-void *ScriptProc_Start(int, int);
-void ResourceHeader_Relocate(void *, void *);
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
-void AnimData_Load(void *, int);
-void AnimData_SelectPaletteBank(void *, int);
-void Sprite_Init(void *, void *, int);
 void Anim_RestartSequence(void *, void *, int, int, int);
 void *WirelessExchange_GetPeerEntry(int);
-void Memory_Copy(void *, void *, int);
 int WirelessResultPanel_Init(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
@@ -51,18 +33,22 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
     int pack;
     struct Blob *primary;
     struct Blob *secondary;
-    int i;
     void *resource;
     void *glyph;
     struct Saved {
-        struct Animation animation;
+        struct DisplaySequenceState animation;
         u8 *visible;
     } saved;
-    struct Animation *a;
-    const u16 *frame;
-    struct Sprite *sprite;
-    struct Sprite *savedSprite;
-    int flags;
+    struct DisplaySequenceSprite *sprite;
+    struct DisplaySequenceSprite *savedSprite;
+    struct ByteView {
+        u8 value;
+    };
+    union {
+        u8 *visible;
+        struct ByteView *byte;
+        struct ResultMenu *write;
+    } value;
     gResultMenu = p;
     if (Script_SeekToKeyword(115)) {
         void *value = Script_GetTextSourcePc();
@@ -78,7 +64,11 @@ initialize:
     res = ScriptProc_Start(pack, 0x530D);
     if (!res)
         goto failed;
-    asm("" : "+r"(res));
+    {
+        u32 raw = (u8)(u32)res;
+        if ((s32)raw < 0)
+            res = 0;
+    }
     p->primary = *res;
     first = &p->primary;
     ResourceHeader_Relocate(first, res);
@@ -86,7 +76,11 @@ initialize:
     primary = first;
     if (!res)
         goto failed;
-    asm("" : "+r"(res));
+    {
+        u32 raw = (u8)(u32)res;
+        if ((s32)raw < 0)
+            res = 0;
+    }
     p->secondary = *res;
     secondary = &p->secondary;
     ResourceHeader_Relocate(secondary, res);
@@ -100,18 +94,26 @@ initialize:
         glyph = p->glyph;
         savedSprite = &p->sprite;
         {
-            register u8 *visible asm("r1") = &p->sprite.visible;
-            saved.visible = visible;
+            u32 raw = p->state;
+            if ((s32)raw < 0) {
+                value.byte = (void *)p->left;
+                value.byte->value = 255;
+                p->state = 255;
+            }
         }
+        value.visible = &p->sprite.priority;
+        saved.visible = value.visible;
         {
-            register int zero asm("r5") = 0;
-            int count = 19;
+            int count;
+            int zero = 0;
+            count = 19;
             do {
                 Widget_InitLinked(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
                 count--;
                 draw++;
             } while (count >= 0);
         }
+        resource = value.visible;
     }
     resource = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(glyph, 0x593A);
@@ -119,122 +121,64 @@ initialize:
     Sprite_Init(savedSprite, glyph, 0x2011);
     Anim_RestartSequence(&saved.animation, resource, 0, 0, 0);
     sprite = savedSprite;
-    a = &saved.animation;
     {
-        int offset = a->frame << 1;
-        const u16 *table;
-        table = saved.animation.frames;
-        frame = (const u16 *)((u32)table + offset);
-    }
-    sprite->tile = *frame >> 6;
-
-    // Combine the animation and frame orientation flags for the sprite.
-    {
-        int observed = a->flags;
-        register int one asm("r3");
-        register int side asm("r1");
-        int word;
-        u32 encoded;
-        one = 1;
-        side = one;
-        side &= observed;
-        word = *frame;
-        encoded = 48;
-        encoded &= word;
-        encoded >>= 4;
-        encoded &= one;
-        if (side != encoded) {
-            register struct ResultMenu *write asm("r3") = p;
-            int value = write->sprite.flags;
-            value |= 4;
-            write->sprite.flags = value;
-        } else {
-            register struct ResultMenu *write asm("r4") = p;
-            int value = write->sprite.flags;
-            int mask = -5;
-            value &= mask;
-            write->sprite.flags = value;
-        }
-    }
-    {
-        register u32 observed asm("r4") = a->flags;
-        u32 flipMask = 2;
-        u32 side = (u8)(flipMask & observed);
-        if (side != (((*frame & 0x30) >> 4) & flipMask))
-            sprite->flags |= 8;
-        else
-            sprite->flags &= ~8;
-        flags = observed;
-    }
-    {
-        u32 elapsed = a->timer + 1;
-        u32 limit;
-        u32 initialPeriod;
-        register int savedPeriod asm("r6");
-        register int bits asm("r2");
-        a->timer = elapsed;
+        struct DisplaySequenceState *state = &saved.animation;
+        const u16 *command;
+        u32 ended;
+        command = state->commands + state->index;
+        sprite->frame = *command >> 6;
         {
-            register u32 constant asm("r6") = 65535;
-            asm("" : "+r"(constant));
-            limit = constant;
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = state->flags;
+            bit = 1;
+            first = (u8)(control.raw & bit);
+            if (first != (((*command & 0x30) >> 4) & bit))
+                p->sprite.flags |= 4;
+            else
+                p->sprite.flags &= ~4;
         }
-        initialPeriod = a->period;
-        elapsed = (u16)elapsed;
-        savedPeriod = initialPeriod;
-        if (elapsed < initialPeriod)
-            goto animationDone;
-        a->timer = 0;
-        bits = flags;
-        if (bits & 4) {
-            int previous;
-            previous = a->frame;
-            if (previous)
-                goto decrementFrame;
-            if (bits & 8) {
-                a->timer = savedPeriod;
-                goto recalculate;
-            }
-            previous = a->length;
-        decrementFrame:
-            previous--;
-            a->frame = previous;
-            goto recalculate;
-        } else {
-            u32 next = a->frame + 1;
-            int length;
-            a->frame = next;
-            length = a->length;
-            next &= limit;
-            if (next < (u32)length)
-                goto recalculate;
-            next = 8;
-            next &= flags;
-            next = (u8)next;
-            if (next) {
-                a->timer = initialPeriod;
-                next = length - 1;
-            }
-            a->frame = next;
+        {
+            union DisplaySequenceControl control;
+            u32 bit, first;
+            control.raw = state->flags;
+            bit = 2;
+            first = (u8)(control.raw & bit);
+            if (first != (((*command & 0x30) >> 4) & bit))
+                sprite->flags |= 8;
+            else
+                sprite->flags &= ~8;
         }
-    recalculate: {
-        int index = a->frame << 1;
-        const u16 *table;
-        register int word asm("r1");
-        int value;
-        table = a->frames;
-        frame = (const u16 *)((u32)table + index);
-        word = *frame;
-        value = 15;
-        value &= word;
-        a->duration = value;
-        value = a->duration * a->speed;
-        value >>= 6;
-        a->period = value;
-        value = (u32)value << 24;
-        if (!value)
-            a->period = 1;
-    }
-    animationDone:;
+        if (++state->elapsed >= state->duration) {
+            state->elapsed = 0;
+            if (state->flags & 4) {
+                if (state->index == 0) {
+                    if (state->flags & 8)
+                        state->elapsed = state->duration;
+                    else
+                        state->index = state->frameCount - 1;
+                    ended = 1;
+                } else {
+                    state->index--;
+                    ended = 0;
+                }
+            } else if (++state->index >= state->frameCount) {
+                if ((u8)(state->flags & 8)) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                    ended = 1;
+                } else {
+                    state->index = 0;
+                    ended = 1;
+                }
+            } else
+                ended = 0;
+            command = state->commands + state->index;
+            DisplaySequence_UpdateWeight(state, command);
+            if (!state->duration)
+                state->duration = 1;
+        } else
+            ended = 0;
     }
     {
         int zero = 0;
@@ -245,12 +189,17 @@ initialize:
         Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), 16);
         Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), 16);
         {
-            struct ResultMenu *write = p;
             int one;
-            write->state = zero;
+            value.write = (struct ResultMenu *)((u8 *)p + (p->entered >> 8));
+            value.write->state = zero;
             one = 1;
-            write->entered = one;
-            write->timer = zero;
+            value.write->entered = one;
+            value.write->timer = zero;
+            {
+                u32 raw = p->entered;
+                if ((s32)raw < 0)
+                    value.write->state = 255;
+            }
         }
         {
             void **callback = &p->onClose;

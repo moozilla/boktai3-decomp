@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -27,30 +26,46 @@ s32 PlayerParticleCloud_ScatterAnchors(void)
     mask = 1023;
     bias = -512;
     for (i = 39; i >= 0; i--, particle++) {
-        u32 xIndex, zIndex;
-        register u32 random asm("r0");
-        xIndex = (*indexPtr + 1) & mask;
-        *indexPtr = xIndex;
+        u32 sampleIndex;
+        sampleIndex = *indexPtr;
+        sampleIndex++;
+        sampleIndex &= mask;
+        *indexPtr = sampleIndex;
         {
-            const u16 *sample = ParticleRandom_SampleAddress(table, xIndex);
+            const u16 *sample = ParticleRandom_SampleAddress(table, sampleIndex);
             s32 coordinate;
-            random = *sample;
+            u32 random = *sample;
             coordinate = (u16)particle->origin.x;
             coordinate += bias;
             random &= mask;
             coordinate += random;
+            {
+                u32 raw = (u16)particle->origin.x;
+                if ((s32)raw < 0)
+                    coordinate = 0;
+            }
             particle->origin.x = coordinate;
         }
-        zIndex = (xIndex + 1) & mask;
-        *indexPtr = zIndex;
+        sampleIndex++;
+        sampleIndex &= mask;
+        *indexPtr = sampleIndex;
         {
-            const u16 *sample = ParticleRandom_SampleAddress(table, zIndex);
+            const u16 *sample;
             s32 coordinate;
+            u32 random;
+            sampleIndex *= 2;
+            sampleIndex += (u32)table;
+            sample = (const u16 *)sampleIndex;
             random = *sample;
             coordinate = (u16)particle->origin.z;
             coordinate += bias;
             random &= mask;
             coordinate += random;
+            {
+                u32 raw = (u16)particle->origin.z;
+                if ((s32)raw < 0)
+                    coordinate = 0;
+            }
             particle->origin.z = coordinate;
         }
         particle->origin.y += 4096;

@@ -3304,73 +3304,42 @@ void TetherActor_UpdateRapidDescendingState(struct TetherActor *actor)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
-
-/* Matching adaptation: retain pinned field offsets and unsigned halfword accesses. */
-
 void TetherActor_UpdateBounceReturn(struct TetherActor *actor)
 {
-    u16 *frame;
-    u32 zero;
-    register u32 frameValue asm("r0");
     if (actor->state != 8)
         TetherActor_SetState(actor, 8);
-    {
-        u16 *glow = &actor->glowMode;
-        zero = 0;
-        *glow = zero;
-    }
-    frame = &actor->stateFrame;
-    frameValue = *frame;
-    if (!frameValue) {
-        u16 *height;
-        actor->shakeX = zero;
-        actor->shakeZ = zero;
-        height = &actor->displayOffsetY;
-        if (*height <= 30) {
+    actor->glowMode = 0;
+    if (!actor->stateFrame) {
+        actor->shakeX = 0;
+        actor->shakeZ = 0;
+        if (actor->displayOffsetY <= 30) {
             TetherActor_RemoveAuxiliarySprite(actor);
-            *height = zero;
-            *frame = 1;
+            actor->displayOffsetY = 0;
+            actor->stateFrame = 1;
         } else
-            *height -= 30;
+            actor->displayOffsetY -= 30;
         return;
     }
-    {
-        register u32 incremented asm("r1") = frameValue + 1;
-        u32 current;
-        *frame = incremented;
-        current = (u16)incremented;
-        if (current <= 7) {
-            current = (u16)incremented;
-            if (current <= 3)
-                actor->displayOffsetY = incremented << 4;
-            else {
-                u32 height = (7 - incremented) << 4;
-                register u32 heightOffset asm("r6") = 0x380;
-                u16 *destination;
-                destination = (u16 *)((u8 *)actor + heightOffset);
-                *destination = height;
-            }
-        } else
-            actor->displayOffsetY = zero;
+    if (++actor->stateFrame <= 7) {
+        if (actor->stateFrame <= 3)
+            actor->displayOffsetY = actor->stateFrame << 4;
+        else
+            actor->displayOffsetY = (7 - actor->stateFrame) << 4;
+    } else
+        actor->displayOffsetY = 0;
+    if (actor->stateFrame <= 11) {
+        const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (actor->stateFrame >> 16));
+        actor->shakeX = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
+        actor->shakeZ = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
     }
-    {
-        u16 *counter = &actor->stateFrame;
-        if (*counter <= 11) {
-            const u16 *table = gRandomTable;
-            actor->shakeX = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
-            actor->shakeZ = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
-        }
-        if (*counter == 2)
-            TetherActor_EmitRingEffects(actor);
-        if (*counter > 29) {
-            TetherActor_SetState(actor, 0);
-            actor->chargeReady = 1;
-            actor->charge = 287;
-            actor->pendingEffectHandle =
-                ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
-                                                     1, 0, &actor->charge, 287, 250, 290);
-        }
+    if (actor->stateFrame == 2)
+        TetherActor_EmitRingEffects(actor);
+    if (actor->stateFrame > 29) {
+        TetherActor_SetState(actor, 0);
+        actor->chargeReady = 1;
+        actor->charge = 287;
+        actor->pendingEffectHandle = ActorAttachment_UpdateFromDescriptor(
+            actor->pendingEffectHandle, &actor->bodyConfig, 1, 0, &actor->charge, 287, 250, 290);
     }
 }
 

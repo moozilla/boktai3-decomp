@@ -1,9 +1,17 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "engine.h"
+#include "resource_registry.h"
 
 // confidence=low: emits sixteen motion entries around the actor's facing direction.
 #define Hresvelgr_EmitFacingMotionBurst sub_0819BB18
+union BurstWord {
+    u32 value;
+    u16 halves[2];
+};
+static inline u32 ReadBurstWord(const union BurstWord *word)
+{
+    return word->value;
+}
 struct BurstVector {
     s16 x, y, z, pad;
 };
@@ -44,25 +52,15 @@ static inline u32 NextRandomIndex(void)
 }
 static inline s32 randomValue(const u16 *table)
 {
-    u32 offset;
-    table += 512;
-    offset = NextRandomIndex() * 2;
-    return *(const u16 *)(offset + (u32)table);
+    const u16 *base = table + 512;
+    u32 offset = NextRandomIndex() * 2;
+    return *(const u16 *)(offset + (u32)base);
 }
-/* Keep the shared random source and motion addresses through their inline uses. */
-static inline const u16 *RetainRandomSource(const u16 *raw)
+static inline s32 firstRandomValue(const u16 *table, u32 skip)
 {
-    const u16 *out;
-    asm("" : "=r"(out) : "0"(raw));
-    return out;
-}
-static inline const u16 *RandomSourceAddress(const u16 *raw)
-{
-    return RetainRandomSource(raw);
-}
-static inline void RetainMotionAddress(struct BurstVector *p)
-{
-    asm("" : : "r"(p), "r"(p));
+    const u16 *base = table + skip;
+    u32 offset = NextRandomIndex() * 2;
+    return *(const u16 *)(offset + (u32)base);
 }
 void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
 {
@@ -70,28 +68,29 @@ void Hresvelgr_EmitFacingMotionBurst(struct BurstActor *actor)
     struct BurstVector position;
     struct BurstVector delta;
     s32 i;
+    union BurstWord skip;
+    const u16 *table;
+    union BurstWord source;
     polar(&offset, (actor->direction + 128) & 255, 768);
     {
         struct BurstVector *target = actor->target;
         add(&position, target, &offset);
     }
+    skip.halves[0] = 512;
+    skip.halves[1] = 0;
+    source.value = (u32)gResourceRegistryEntries;
     for (i = 0; i < 16; i++) {
-        const u16 *raw = (const u16 *)0x0203B000;
-        const u16 *source;
-        const u16 *storage;
-        const u16 *table;
         s32 type;
         s32 vertical;
         s32 sample;
-        source = RandomSourceAddress(raw);
-        asm("" : "=r"(storage) : "0"(source));
-        asm("" : "=r"(table) : "0"(storage));
-        sample = randomValue(table);
+        union BurstWord inverted;
+        inverted.value = ~ReadBurstWord(&source);
+        table = (u16 *)~ReadBurstWord(&inverted);
+        sample = firstRandomValue(table, ReadBurstWord(&skip));
         polar(&delta, ((actor->direction + ((sample >> 3) % 64)) - 32) & 255, 128);
         type = randomValue(table) >> 3;
         type %= 4;
         vertical = 32 - ((randomValue(table) >> 3) % 64);
-        RetainMotionAddress(&delta);
         MotionEntry_CreateWithDelta(&actor->position, &delta, type, vertical);
     }
 }

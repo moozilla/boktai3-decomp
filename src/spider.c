@@ -1759,23 +1759,21 @@ static inline u8 SelectHeading(u16 random, u8 *direction)
 
 static inline s32 ReadCounter(struct ChaseActor *actor)
 {
-    register u32 offset asm("r1") = (u32) & ((struct ChaseActor *)0)->base.counter2AC;
+    u32 offset = (u32) & ((struct ChaseActor *)0)->base.counter2AC;
     s32 *counter = (void *)((u8 *)actor + offset);
-    asm("" : : "r"(offset));
     return *counter;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Spider_UpdateWanderGoal(struct ChaseActor *input)
 {
     struct SpiderContext *ctx = input->base.context;
     struct SpiderGroupView *group = (void *)&input->group.common;
-    register struct Transform *transform asm("r5") = (void *)&input->base.body.id;
+    struct Transform *transform = (void *)&input->base.body.id;
     struct ContactPackedVector target;
-    register const u16 *table asm("r6") = gRandomTable;
-    register u32 *indexAddress asm("sl") = &gRandomIndex;
+    const u16 *table = (const u16 *)((u32)gRandomTable & ~((u16)(u32)input >> 16));
+    u32 *indexAddress = (u32 *)((u32)&gRandomIndex & ~((u16)(u32)input >> 16));
     u32 rawIndex = *indexAddress + 1;
-    u32 mask = 1023;
+    u32 mask = 1023 & ~((u16)(u32)input >> 16);
     u16 index = rawIndex & mask;
     u16 distance = table[index];
     u8 heading;
@@ -1809,10 +1807,10 @@ void Spider_UpdateWanderGoal(struct ChaseActor *input)
             else
                 input->base.field2C2 = 64;
             {
-                void *mesh = group->mesh;
                 struct ContactPosition *to;
+                void *mesh = group->mesh;
                 struct ContactPosition *from = &transform->position;
-                u8 moved;
+                s16 moved;
                 to = Spider_GetGoal((u32) & ((struct SpiderMovementView *)0)->goal, input);
                 moved = Chase_TryRoute(input, mesh, from, to);
                 if (!moved) {
@@ -1820,7 +1818,7 @@ void Spider_UpdateWanderGoal(struct ChaseActor *input)
                     ctx->timer = moved;
                 }
             }
-            if (Test(ctx, 8)) {
+            if (Test(ctx, 8 | (((u16)mask >> 16) | ((u16)(u32)indexAddress >> 16)))) {
                 u32 value = 60;
                 s16 *timer = &ctx->timer;
                 *timer = value;

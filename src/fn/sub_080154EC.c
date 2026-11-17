@@ -2,7 +2,6 @@
 #include "engine_globals.h"
 #include "ram.h"
 #include "display_sequence_inline.h"
-// MATCHING_CONCESSION: register-pinning
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -162,19 +161,44 @@ start:
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
                 setFrame(&p->sprite, 32);
-                a = &p->anim;
-                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
-                                 6, 0, 0);
-                asm("" : : "r"(a), "i"(6));
+                {
+                    union {
+                        struct Anim *ptr;
+                        u8 parts[4];
+                    } handle;
+                    u32 raw;
+                    handle.ptr = &p->anim;
+                    Anim_SetSequence(handle.ptr,
+                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+                                     6, 0, 0);
+                    raw = handle.parts[0];
+                    if ((s32)raw < 0)
+                        handle.parts[0] = 0;
+                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 8));
+                    done = handle.parts[0];
+                }
                 goto saveAnimation;
             } else if (p->pad1 == 7) {
                 AnimData_Load(p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
                 setFrame(&p->sprite, 45);
-                a = &p->anim;
-                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
-                                 8, 0, 0);
-                asm("" : : "r"(a), "i"(7));
+                {
+                    union {
+                        struct Anim *ptr;
+                        u16 parts[2];
+                    } handle;
+                    u32 raw;
+                    handle.ptr = &p->anim;
+                    Anim_SetSequence(handle.ptr,
+                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+                                     8, 0, 0);
+                    raw = handle.parts[0];
+                    if ((s32)raw < 0)
+                        handle.parts[0] = 0;
+                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 16) +
+                                        ((u8)handle.parts[1] >> 8));
+                    done = handle.parts[0];
+                }
                 goto saveAnimation;
             } else {
                 AnimData_Load(p->resource, 0x4384);

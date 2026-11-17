@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "contact_actor.h"
 #include "monster_particle_random.h"
@@ -39,14 +38,16 @@ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
         int spread;
         int speed;
         int zero = 0;
+        const s16 *sine;
         int heading;
-        register const s16 *sine asm("r2");
         spread = i * 4;
         heading = angle + direction;
         heading -= 32;
         speed = radius + spread;
         speed += 2;
-        sine = gUnk_086149C4;
+        sine = (const s16 *)((u32)gUnk_086149C4 & ~((u16)((u8)radius << 8) >> 16));
+        if (radius < 0)
+            sine++;
         v->x = Scale((sine[((heading + 64) & 255)]) * speed);
         v->y = zero;
         v->z = Scale((sine[(heading & 255)]) * speed);

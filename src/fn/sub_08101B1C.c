@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "global.h"
 #include "player.h"
 #include "terrain_cell_probe.h"
@@ -42,14 +41,14 @@ static inline u8 TestV(u32 flags, u32 bit)
 }
 static inline u8 HasBits(u16 *p)
 {
-    u32 v = *p;
+    u16 v = *p;
     if (!(v & 0xC0))
         return 0;
     return 1;
 }
 void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
 {
-    register struct NamedObject *object asm("r8") = objectArg;
+    struct NamedObject *object = objectArg;
     struct NamedObjectManager *manager = gNamedActorManager;
     s32 base, cell, col, row;
     s32 i;
@@ -57,8 +56,23 @@ void NamedObject_RegisterFollowCells(struct NamedObject *objectArg)
     struct Pos16 *w;
     u16 *flags;
     u8 *registration;
-    if (!manager || object->name != manager->followName || object->kind == 2 ||
-        *((u8 *)gPlayers[0] + 0x457) != 6 || (s16)object->state != 3) {
+    if (!manager) {
+        ActorGroup_ReleaseMember(object);
+        return;
+    }
+    if (object->name != manager->followName) {
+        ActorGroup_ReleaseMember(object);
+        return;
+    }
+    if (object->kind == 2) {
+        ActorGroup_ReleaseMember(object);
+        return;
+    }
+    if (gPlayers[0]->tetherMode != 6) {
+        ActorGroup_ReleaseMember(object);
+        return;
+    }
+    if ((s16)object->state != 3) {
         ActorGroup_ReleaseMember(object);
         return;
     }

@@ -1,10 +1,8 @@
 #include "scene_panel_rig_setup.h"
 
-// MATCHING_CONCESSION: register-pinning
-
 void ScenePanel_InitRig(struct ScenePanel *input)
 {
-    struct SceneRigSetupParentView *panel = (void *)input;
+    struct ScenePanel *panel = input;
     struct ScenePanelRig *rig = &panel->rig;
     s32 rate;
     s32 power;
@@ -31,10 +29,8 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         u32 *seed;
         {
             u32 first, second;
-            table = gRandomTable;
-            /* The ROM ranks the table above the index mask; without this barrier
-               the table counts as a constant (doubled live length) and loses r4. */
-            asm("" : "+r"(table));
+            /* Allocation-only: fold the bounded offset after constant-equivalence analysis. */
+            table = (const u16 *)((u32)gRandomTable + (rig->state >> 16));
             seed = &gRandomIndex;
             first = *seed + 1;
             mask = 1023;

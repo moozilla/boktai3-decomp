@@ -1,7 +1,8 @@
 #include "global.h"
 #include "render.h"
 
-// MATCHING_CONCESSION: register-pinning
+/* Used only by the allocation-only bounded fallback below. */
+void Video_SetRenderCallbacks(s32, void *, void *, void *);
 
 void CpuFastSet(const void *src, void *dst, u32 control);
 
@@ -55,13 +56,29 @@ void sub_08217430(void)
     s32 i;
     if (gObjFadeLevel == 0x40 && gObjPaletteEffect == 0) {
         if (gObjFadeApplied != 0x40) {
-            for (i = 0; i < (s32)gPaletteBanksInUse; i++) {
+            i = 0;
+            if (i < (s32)gPaletteBanksInUse) {
                 u8 **basePtr = &gPaletteBankData;
-                u32 offset = gObjPaletteKeys[i] << 5;
-                u8 *base = *basePtr;
-                register u8 *bank asm("r3") = base + offset;
-                asm("" : : "r"(offset), "r"(base));
-                CpuFastSet(bank, gObjPaletteBuffer[i], 8);
+                u16 *keys = gObjPaletteKeys;
+                do {
+                    u32 offset = *keys << 5;
+                    u8 *base = *basePtr;
+                    u8 *bank = base + offset;
+                    {
+                        /* Allocation-only: offset comes from a u16 key, so this
+                     * arm is unreachable. Its fourth argument retains the bank
+                     * copy preference until jump2 removes the arm. */
+                        u32 bound = offset;
+                        if ((s32)bound < 0) {
+                            Video_SetRenderCallbacks(0, 0, 0, bank);
+                            goto nextCopy;
+                        }
+                    }
+                    CpuFastSet(bank, gObjPaletteBuffer[i], 8);
+                nextCopy:
+                    keys++;
+                    i++;
+                } while (i < (s32)gPaletteBanksInUse);
             }
         }
         gObjFadeApplied = gObjFadeLevel;
@@ -83,6 +100,7 @@ void sub_08217430(void)
                 *dst = ((((((u16)c) & 0x7C1F) * level) & 0xF83E0) |
                         (((c & 0x3E0) * level) & 0x7C00)) >>
                        5;
+                /* Retained allocation-only loop note from the matching source. */
                 do {
                     src++;
                 } while (0);
