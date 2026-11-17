@@ -479,6 +479,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/round14-union-review.md](../notes/round14-union-review.md) | Round 14: separate unrelated values from two local unions | #round14 #concessions #local-union | 3 |
 | [notes/round14-volatile-known-zero.md](../notes/round14-volatile-known-zero.md) | Round 14: four further known-zero functions remain open | #round14 #concessions #matching | 7 |
 | [notes/round14-volatile-stage2.md](../notes/round14-volatile-stage2.md) | Round 14: volatile cleanup and remaining compiler-dead sites | #round14 #concessions #matching | 8 |
+| [notes/round14-volatile-view-audit.md](../notes/round14-volatile-view-audit.md) | Round 14: volatile-view audit and RFU field recovery | #matching #animation #wireless #tooling | 13 |
 | [notes/round14-wrapper-cleanup.md](../notes/round14-wrapper-cleanup.md) | Round 14: object, trigger and palette wrapper cleanup | #round14 #concessions #matching | 5 |
 | [notes/round2-luna-a.md](../notes/round2-luna-a.md) | Luna A production round 2 |  | 2 |
 | [notes/round2-luna-b.md](../notes/round2-luna-b.md) | Luna B production round 2 |  | 1 |
