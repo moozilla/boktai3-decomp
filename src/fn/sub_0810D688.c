@@ -44,11 +44,7 @@ available:
         fraction = mask;
     } else {
         seconds = Div(time, 60);
-        fraction = Div(({
-                           s32 t = time - seconds * 60;
-                           t * 169;
-                       }),
-                       10);
+        fraction = Div((time - seconds * 60) * 169, 10);
     }
     {
         PanelText_DrawDecimal(seconds, 100, 2, 12, 0);
