@@ -456,20 +456,19 @@ s32 Background_LoadMapFromScript(void)
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
-    if (!({
-            u8 found = FALSE;
-            u8 *arg;
-            if (Script_SeekToKeyword('i') && (arg = Script_GetPc())) {
-                index = Script_ReadValue(arg);
-                found = TRUE;
-            } else
-                index = 0;
-            found;
-        }) &&
-        Script_SeekToKeyword('c')) {
-        u8 *p = Script_GetPc();
-        if (p)
-            index = (u16)Background_FindMapId(&resource, Script_ReadValue(p));
+    {
+        u8 found = FALSE;
+        u8 *arg;
+        if (Script_SeekToKeyword('i') && (arg = Script_GetPc())) {
+            index = Script_ReadValue(arg);
+            found = TRUE;
+        } else
+            index = 0;
+        if (!found && Script_SeekToKeyword('c')) {
+            u8 *p = Script_GetPc();
+            if (p)
+                index = (u16)Background_FindMapId(&resource, Script_ReadValue(p));
+        }
     }
     Bg_SetLayerMap(layer, base, index);
     return index;
