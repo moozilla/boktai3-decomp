@@ -788,11 +788,7 @@ void Script_InitRuntime(void)
     GameState_ClearActiveRegions();
     Script_ClearCommandTables();
     Script_RegisterBuiltinCommands();
-    ScriptProc_Start(0xA8D9, 0x49BC);
-    /* Falls through: r0 (ScriptProc_Start's resource pointer) becomes Script_LoadScript's
-     * argument. The cast avoids a hard arg-count mismatch against its real prototype now
-     * that both are in the same translation unit. */
-    ((s32(*)())Script_LoadScript)();
+    Script_LoadScript(ScriptProc_Start(0xA8D9, 0x49BC));
     Script_SetEntryProcedure(0);
 }
 
