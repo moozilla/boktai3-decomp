@@ -8,7 +8,6 @@ s32 SolarFruit_IsInventorySlotEquipped(s32);
 void Sound_PlaySong(u32);
 
 #define FRUIT_SLOT(i) (*(s16 *)((u8 *)gGameState + (i) * 2 + 0x90))
-#define FRUIT_CUR     (*(s16 *)((u8 *)gGameState + 0x54))
 
 void SolarFruit_ToggleEquipSlot(u8 *p)
 {
@@ -29,7 +28,7 @@ void SolarFruit_ToggleEquipSlot(u8 *p)
             n = 0;
             for (i = 0; i <= 7; i++) {
                 if (buf[i] == slot) {
-                    s16 *cur = &FRUIT_CUR;
+                    s16 *cur = &gGameState->actionAuxiliarySlot;
                     if (n == *cur)
                         *cur = 0;
                     else if (n < *cur)
@@ -70,7 +69,7 @@ void SolarFruit_ToggleEquipSlot(u8 *p)
                 buf[n] = -1;
             for (i = 0; i <= 7; i++)
                 FRUIT_SLOT(i) = buf[i];
-            FRUIT_CUR = sel;
+            gGameState->actionAuxiliarySlot = sel;
             Sound_PlaySong(0xdd);
         }
     }
