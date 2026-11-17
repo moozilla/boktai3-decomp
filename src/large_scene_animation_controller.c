@@ -3789,10 +3789,8 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
 {
     u32 value;
     u8 zero8;
-    u16 zero;
     p->maxLife = value = Script_GetKeywordValue('l', 4000);
     zero8 = 0;
-    zero = 0;
     p->life = value;
     p->maxHp = Script_GetKeywordValue('g', 100);
     p->optionY = Script_GetKeywordValue('Y', 1000);
@@ -3801,9 +3799,9 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
     p->optionD = Script_GetKeywordValue('D', 20);
     p->optionE = Script_GetKeywordValue('E', 100);
     p->optionS = Script_GetKeywordValue('S', 0);
-    p->targetSourceX = zero;
-    p->targetSourceY = zero;
-    p->targetSourceZ = zero;
+    p->targetSourceX = 0;
+    p->targetSourceY = 0;
+    p->targetSourceZ = 0;
     p->targetMode = zero8;
     if (Script_SeekToKeyword('c')) {
         p->targetSourceX = Script_GetValue();
