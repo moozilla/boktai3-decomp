@@ -1709,36 +1709,13 @@ void SceneActorPlacement_UpdateMovementSlowdown(struct ChaseActor *a)
 
 // confidence=low: periodically probes a randomized heading and updates the Spider route endpoint and cooldown.
 
-struct SpiderMovementView {
-    u8 pad[0x310];
-    struct ContactPosition goal;
-};
-
-struct Transform {
-    u8 pad[9];
-    u8 facing;
-    u8 gap[2];
-    struct ContactPosition position;
-};
-
-struct SpiderContext {
-    u8 pad[0x628];
-    s16 timer, delay;
-    u16 flags;
-};
-
 extern const s16 gUnk_086149C4[];
 
-static inline u8 Test(struct SpiderContext *ctx, u32 mask)
+static inline u8 Test(struct Spider *ctx, u32 mask)
 {
-    if (ctx->flags & mask)
+    if (ctx->flags62C & mask)
         return 1;
     return 0;
-}
-
-static inline struct ContactPosition *Spider_GetGoal(u32 offset, struct ChaseActor *input)
-{
-    return (void *)((u8 *)input + offset);
 }
 
 static inline u32 RandomChoice(u32 *counter, const u16 *table, u32 mask)
@@ -1756,19 +1733,12 @@ static inline u8 SelectHeading(u16 random, u8 *direction)
     return angle + *direction;
 }
 
-static inline s32 ReadCounter(struct ChaseActor *actor)
-{
-    u32 offset = (u32) & ((struct ChaseActor *)0)->base.counter2AC;
-    s32 *counter = (void *)((u8 *)actor + offset);
-    return *counter;
-}
-
 void Spider_UpdateWanderGoal(struct ChaseActor *input)
 {
-    struct SpiderContext *ctx = input->base.context;
-    struct SpiderGroupView *group = (void *)&input->group.common;
-    struct Transform *transform = (void *)&input->base.body.id;
-    struct ContactPackedVector target;
+    struct Spider *ctx = input->base.context;
+    struct SceneActorChaseGroup *group = &input->group;
+    struct SceneActorBody *body = &input->base.body;
+    struct ContactPosition target;
     const u16 *table = (const u16 *)((u32)gRandomTable & ~((u16)(u32)input >> 16));
     u32 *indexAddress = (u32 *)((u32)&gRandomIndex & ~((u16)(u32)input >> 16));
     u32 rawIndex = *indexAddress + 1;
@@ -1787,46 +1757,46 @@ void Spider_UpdateWanderGoal(struct ChaseActor *input)
         field = &input->base.body.direction;
         heading = SelectHeading(sample, field);
     }
-    if (Mod(ReadCounter(input), 30) == 0) {
-        if (ctx->timer > 0)
+    if (Mod(input->base.counter2AC, 30) == 0) {
+        if (ctx->wanderTimer > 0)
             goto decrement;
-        target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + transform->position.x;
-        target.y = transform->position.y;
-        target.z = ((gUnk_086149C4[heading] * distance) >> 14) + transform->position.z;
+        target.x = ((gUnk_086149C4[(heading + 64) & 255] * distance) >> 14) + body->position.x;
+        target.y = body->position.y;
+        target.z = ((gUnk_086149C4[heading] * distance) >> 14) + body->position.z;
         if (!Nav_IsPositionInMesh(input->group.route, &input->base.body.position,
-                                  (void *)(&target))) {
+                                  &target)) {
             if (!Test(ctx, 16))
                 input->base.field2C2 = 64;
             SceneActorMovement_ResolveRoutePosition(input);
-            ctx->timer = 0;
+            ctx->wanderTimer = 0;
         } else {
-            ((struct SpiderMovementView *)input)->goal = *((struct ContactPosition *)(&target));
+            input->base.reactionStart = target;
             if (!(RandomChoice(indexAddress, table, mask)))
                 input->base.field2C2 = 16;
             else
                 input->base.field2C2 = 64;
             {
                 struct ContactPosition *to;
-                void *mesh = group->mesh;
-                struct ContactPosition *from = &transform->position;
+                void *mesh = group->route;
+                struct ContactPosition *from = &body->position;
                 s16 moved;
-                to = Spider_GetGoal((u32) & ((struct SpiderMovementView *)0)->goal, input);
+                to = &input->base.reactionStart;
                 moved = Chase_TryRoute(input, mesh, from, to);
                 if (!moved) {
                     SceneActorMovement_ResolveRoutePosition(input);
-                    ctx->timer = moved;
+                    ctx->wanderTimer = moved;
                 }
             }
             if (Test(ctx, 8 | (((u16)mask >> 16) | ((u16)(u32)indexAddress >> 16)))) {
                 u32 value = 60;
-                s16 *timer = &ctx->timer;
+                s16 *timer = &ctx->wanderTimer;
                 *timer = value;
             } else
-                ctx->timer = 120;
+                ctx->wanderTimer = 120;
         }
-    } else if (ctx->timer > 0) {
+    } else if (ctx->wanderTimer > 0) {
     decrement: {
-        s16 *timer = &ctx->timer;
+        s16 *timer = &ctx->wanderTimer;
         u16 value = *timer;
         --value;
         *timer = value;
