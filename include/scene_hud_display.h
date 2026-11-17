@@ -13,6 +13,8 @@
 #include "sprite_oam.h"
 
 struct SpriteEffectTileResource;
+struct DarkLoanScreen;
+
 struct SceneHudControlAnimation {
     u8 unknown0[8];
     u32 flags;
@@ -62,7 +64,9 @@ struct SceneHudNavigationPage {
 struct SceneHudState {
     struct Task task;
     u32 panelResource; /* 0x18: passed to panel initialization */
-    u8 unknown1C[0x10];
+    u8 unknown1C[8];
+    void *accountLayerMap; /* 0x24: selection/detail background map */
+    u8 unknown28[4];
     u32 panelConfig; /* 0x2C: passed to panel initialization */
     u8 unknown30[0xC];
     const void *actionTextScript;        /* 0x3C */
@@ -77,7 +81,8 @@ struct SceneHudState {
     s32 optionEValue;               /* 0x60: -e */
     u8 widgetResource[0x40];        /* 0x64 */
     u8 motionResource[0x20];        /* 0xA4: keyframe resource */
-    u8 unknownC4[0x40];
+    struct SceneInputResource accountResource; /* 0xC4: account prompt glyphs and keyframes */
+    u8 unknownE4[0x20];
     u8 actionResultResources[2][0x20];      /* 0x104: normal and bonus keyframes */
     u8 controlAnimationResource[0x20];      /* 0x144 */
     u8 comparisonResource[0x20];            /* 0x164 */
@@ -196,7 +201,13 @@ struct SceneHudState {
     struct SceneInputWidget settingsArrows[2];       /* 0x3760: left and right */
     u8 unknown3820[0x240];
     struct SceneInputWidget navigationArrows[4]; /* 0x3A60: up, down, left, right. */
-    u8 unknown3BE0[0x600];
+    struct SceneInputWidget accountAnimation;    /* 0x3BE0 */
+    struct SceneInputWidget accountChoices[2];   /* 0x3C40 */
+    struct SceneInputWidget accountCursor;       /* 0x3D00 */
+    struct SceneInputWidget accountCountDigits[3]; /* 0x3D60 */
+    struct SceneInputWidget accountValueDigits[4]; /* 0x3E80 */
+    struct SceneInputWidget accountRateIcon;       /* 0x4000 */
+    struct SceneInputWidget accountTotalDigits[4]; /* 0x4060 */
     struct SceneInputWidget transferWidgets[2]; /* 0x41E0: hidden after action transfer */
     u8 statusRefreshRequested;                  /* 0x42A0 */
     u8 pageRepeatTimer;                         /* 0x42A1: held shoulder-button repeat */
@@ -261,7 +272,7 @@ struct SceneHudState {
     s32 primaryTextWindow;     /* 0x48C4: status description text */
     s32 timedMessageWindow;    /* 0x48C8 */
     s32 settingsWindows[3][2]; /* 0x48CC: label and value window IDs per row */
-    u8 unknown48E4;
+    u8 accountSelection; /* 0x48E4: account prompt choice */
     u8 pageReturnToParent; /* 0x48E5 */
     u8 selectedQuantity;   /* 0x48E6: multiplied by valueRate */
     u8 unknown48E7;
@@ -270,7 +281,8 @@ struct SceneHudState {
     u16 valueRate;         /* 0x48EA */
     u16 balanceLimitTimer; /* 0x48EC: frames left of the over-limit warning */
     u16 balanceLimitShown; /* 0x48EE: over-limit message already shown */
-    u8 unknown48F0[8];
+    u32 accountCompletionScript; /* 0x48F0: script -d, run after account confirmation */
+    struct DarkLoanScreen *loanDisplay; /* 0x48F4: optional child account display */
     struct SceneHudNavigationPage *navigationPages; /* 0x48F8 */
     u8 unknown48FC[8];
     u8 navigationPage, showAllMapLinks;

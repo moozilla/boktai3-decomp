@@ -83,4 +83,5 @@ struct DarkLoanScreen *DarkLoan_Create(void);
 struct DarkLoanScreen *DarkLoan_CreateHiddenDisplay(u32 rate, s32 valueD, u32 displayMode,
                                                     u32 callbackPc);
 void DarkLoan_OpenDisplay(struct DarkLoanScreen *panel);
+s32 ScriptPanel_IsCallbackActive(struct DarkLoanScreen *panel);
 #endif

@@ -1,16 +1,12 @@
-#include "global.h"
-struct SceneSequence {
-    u8 unknown0[0xA4C];
-    u16 phaseTimer;
-};
+#include "menu_prompt.h"
+#include "player.h"
 void Hud_InitSelectionBounds(u32, u32);
-void MenuPrompt_ResumeChild(void *);
-void SceneSequence_UpdateRampDown64(struct SceneSequence *s)
+void SceneSequence_UpdateRampDown64(struct SceneHudState *s)
 {
-    if (s->phaseTimer <= 15)
-        Hud_InitSelectionBounds((16 - s->phaseTimer) * 4, 0);
+    if (s->pageFadeTimer <= 15)
+        Hud_InitSelectionBounds((16 - s->pageFadeTimer) * 4, 0);
     else
         Hud_InitSelectionBounds(0, 0);
-    if (++s->phaseTimer > 15)
+    if (++s->pageFadeTimer > 15)
         MenuPrompt_ResumeChild(s);
 }
