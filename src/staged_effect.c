@@ -124,10 +124,10 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
         u32 *indexCursor;
         u32 index = (gRandomIndex + 1) & 0x3FF;
-        u32 sample;
+        u16 sample;
         u32 mask;
         indexCursor = &index;
-        *(&sample) = random[*indexCursor];
+        sample = random[*indexCursor];
         mask = 31;
         sample &= mask;
         sample -= 16;
@@ -198,7 +198,7 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
     u16 *random = (u16 *)RANDOM_TABLE_ADDR;
     u32 *indexCursor;
     u32 index = (gRandomIndex + 1) & 0x3FF;
-    u32 sample = random[index];
+    u16 sample = random[index];
     u32 mask = 31;
     sample &= mask;
     sample -= 16;
@@ -206,7 +206,7 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
     index = (index + 1) & 0x3FF;
     gRandomIndex = index;
     indexCursor = &index;
-    *(&sample) = random[*indexCursor];
+    sample = random[*indexCursor];
     sample &= mask;
     sample -= 16;
     effect->shakeZ = sample;
@@ -248,10 +248,10 @@ void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
         u16 *random = (u16 *)RANDOM_TABLE_ADDR;
         u32 *indexCursor;
         u32 index = (gRandomIndex + 1) & 0x3FF;
-        u32 sample;
+        u16 sample;
         u32 mask;
         indexCursor = &index;
-        *(&sample) = random[*indexCursor];
+        sample = random[*indexCursor];
         mask = 31;
         sample &= mask;
         sample -= 16;
