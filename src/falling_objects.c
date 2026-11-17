@@ -139,13 +139,12 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     p->state = 0;
     p->timer = 0;
     {
-        u32 one = 1;
-        p->entered = one;
+        p->entered = 1u;
         p->flags = flags;
         p->parameter = parameter;
         p->position = *position;
         if (p->type == 0)
-            p->animated = one;
+            p->animated = 1u;
         else
             p->animated = 0;
     }
@@ -307,11 +306,10 @@ void FallingObject_UpdateFalling(struct FallingObject *object)
             Sound_PlaySong(326);
         {
             u32 one = 1;
-            u32 zero = 0;
             u32 frame;
             object->state = one;
             frame = 0;
-            object->timer = zero;
+            object->timer = 0u;
             object->entered = one;
             object->frame = frame;
             object->frameTimer = frame;
