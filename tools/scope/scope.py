@@ -3781,9 +3781,20 @@ def needs_g(env):
 def g_sensitive(src, func):
     """Does -g change agbcc's code for FUNC in SRC (without knobs)? Storage_RefreshConsumableSlots: -g keeps
     a loop counting up that the build's compile reverses, so a uid knob's MATCH there is the -g compile's."""
-    key = ("g", src, func, open(os.path.join(ROOT, src)).read())
+    with open(os.path.join(ROOT, src)) as source:
+        key = ("g", src, func, source.read())
     if key not in _MEMO:
-        plain, g = fast_compile(src, func, {}, plain=True), fast_compile(src, func, {}, plain=False)
+        # fast_compile imports shell knobs through resolve_knobs. A uid knob
+        # refers to different instructions with and without -g, so letting it
+        # into this baseline comparison can falsely report a debug effect.
+        saved = {k: os.environ.pop(k) for k in tuple(os.environ)
+                 if k.startswith(("AGBCC_", "CSE_"))
+                 and k not in ("AGBCC_SERVER", "AGBCC_DUMPPRI", "AGBCC_EXTRA")}
+        try:
+            plain = fast_compile(src, func, {}, plain=True)
+            g = fast_compile(src, func, {}, plain=False)
+        finally:
+            os.environ.update(saved)
         _MEMO[key] = plain is not None and g is not None and plain[0] != g[0]
     return _MEMO[key]
 
