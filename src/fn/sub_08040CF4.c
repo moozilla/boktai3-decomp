@@ -10,19 +10,17 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
 {
     struct ModifierSelection *current = &menu->current;
     struct ModifierDisplayObject *object;
-    u32 one;
     u32 mask;
     s32 i;
     s32 mode;
     s32 end;
     menu->previewFlags |= 1;
-    one = 1;
     object = &menu->displays[8];
     Anim_LoadKeyframe(object, &menu->graphicsB, 29, 0);
     object->flags &= ~1;
     object->y = menu->choice.cursor.index << 4;
     object = &menu->displays[13];
-    object->flags |= one;
+    object->flags |= 1u;
     mask = ~1;
     object = &menu->displays[5];
     object->flags = mask & object->flags;
