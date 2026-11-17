@@ -6,11 +6,10 @@ void SceneNpc_PlayAnimation12(void *unused, struct StateActor *p)
 {
     struct StateActorTag *tag = &p->tag;
     if (p->enter) {
-        s32 zero = 0;
-        p->enter = zero;
-        p->done = zero;
+        p->enter = 0;
+        p->done = 0;
         Actor_PlayAnimationEntry(p, 12, 0, 0, 4);
-        tag->state.halves.fieldA = zero;
+        tag->state.halves.fieldA = 0;
     }
     {
         u32 mask = 0x409;
