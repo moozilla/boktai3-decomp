@@ -189,9 +189,7 @@ s32 StatModifier_ScaleForGlobalMode(struct StatModifier *modifier_, s32 value)
     s32 result;
     s32 input = value;
     if (modifier->state.enabled == 0)
-        do {
-            return input;
-        } while (0);
+        return input;
     {
         u16 mask = 0x800;
         if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 1)
@@ -211,9 +209,7 @@ s32 StatModifier_AddForGlobalMode(struct StatModifier *arg, s32 value)
     s32 result;
     s32 input = value;
     if (modifier->state.enabled == 0)
-        do {
-            return input;
-        } while (0);
+        return input;
     {
         u16 mask = 0x800;
         if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 1)
@@ -233,9 +229,7 @@ s32 StatModifier_AddForOwnerMode(struct StatModifier *modifier_, s32 value_)
     s32 value = value_;
     s32 result;
     if (modifier->state.enabled == 0)
-        do {
-            result = value;
-        } while (0);
+        result = value;
     else {
         u32 mask = 0x800;
         if (!((gEngineFlags | gScenePauseFlags) & mask) || modifier->state.owner->mode == 0)
@@ -280,19 +274,11 @@ void Actor_RecomputeScriptedValue(struct ScenePoolActor *actor)
     s32 i;
     struct StatModifier *modifiers = actor->modifiers;
     struct StatModifier *entry;
-    struct StatModifier *cursor;
-    actor->amountLimit = (*(&actor))->baseAmount;
-    i = 0;
-    if (i < actor->modifierCount) {
-        entry = modifiers;
-        cursor = entry;
-        do {
-            if (entry->state.record.kind == 6)
-                actor->amountLimit = entry->callback(cursor, actor->amountLimit);
-            entry++;
-            cursor++;
-            i++;
-        } while (i < actor->modifierCount);
+    actor->amountLimit = actor->baseAmount;
+    for (i = 0; i < actor->modifierCount; i++) {
+        entry = &modifiers[i];
+        if (entry->state.record.kind == 6)
+            actor->amountLimit = entry->callback(entry, actor->amountLimit);
     }
     actor->amountLimit = ClampAmount(actor->amountLimit);
     actor->currentAmount = actor->amountLimit;
@@ -607,9 +593,8 @@ s32 ActorDrain_Update(struct ScenePoolActor *actor)
 void Modifier_InitDrainState(struct ActorDrainState *state, void *resource, u16 duration,
                              u8 valueBase)
 {
-    u8 zero = 0;
-    state->active = zero;
-    state->timer = zero;
+    state->active = 0;
+    state->timer = 0;
     state->duration = duration;
     state->valueBase = valueBase;
     state->resource = resource;
