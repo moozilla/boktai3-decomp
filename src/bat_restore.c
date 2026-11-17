@@ -506,20 +506,14 @@ static inline void Bat_CellCenter(s32 cell, struct ContactPosition *position)
 {
     s32 x = Mod(cell, Bat_MapWidth(SceneActorChase_CurrentMap()));
     s32 z = Div(cell, Bat_MapWidth(SceneActorChase_CurrentMap()));
-    position->x = ({
-        s32 grid_coordinate_ = (x);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->x = (s16)(((u32)x << 8) + 0x80);
     {
         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
         u32 height = 15;
         height &= attributes;
         position->y = SceneActorChase_TerrainLevelHeight(height);
     }
-    position->z = ({
-        s32 grid_coordinate_ = (z);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->z = (s16)(((u32)z << 8) + 0x80);
 }
 
 static inline u8 Bat_CoordinateFraction(s16 coordinate)
