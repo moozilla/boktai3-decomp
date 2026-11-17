@@ -2042,7 +2042,7 @@
  
 --- a/combine.c
 +++ b/combine.c
-@@ -110,6 +110,46 @@
+@@ -110,7 +110,61 @@
  /* Number of instructions combined in this function.  */
  
  static int combine_successes;
@@ -2054,16 +2054,18 @@
 +{
 +  rtx insn;
 +  enum rtx_code code;
++  int count;	/* a constant shift count, or -1 */
 +};
 +static struct agbcc_zero_event *agbcc_zero_events;
 +static int agbcc_zero_count, agbcc_zero_capacity;
 +static void
-+agbcc_zero_record (rtx insn, enum rtx_code code)
++agbcc_zero_record (rtx insn, enum rtx_code code, int count)
 +{
 +  int i;
 +
 +  for (i = 0; i < agbcc_zero_count; i++)
-+    if (agbcc_zero_events[i].insn == insn && agbcc_zero_events[i].code == code)
++    if (agbcc_zero_events[i].insn == insn && agbcc_zero_events[i].code == code
++	&& agbcc_zero_events[i].count == count)
 +      return;
 +  if (agbcc_zero_count == agbcc_zero_capacity)
 +    {
@@ -2072,6 +2074,7 @@
 +        (agbcc_zero_events, agbcc_zero_capacity * sizeof (*agbcc_zero_events));
 +    }
 +  agbcc_zero_events[agbcc_zero_count].insn = insn;
++  agbcc_zero_events[agbcc_zero_count].count = count;
 +  agbcc_zero_events[agbcc_zero_count++].code = code;
 +}
 +static void
@@ -2080,16 +2083,28 @@
 +  extern void agbcc_dead_report ();
 +  int i;
 +
++  /* A shift by a constant is reported with its count ("lshiftrt:31"), so the
++     reader can tell the sign correction expand_divmod makes for a signed
++     power-of-two division (shifts by the word size less one) from a shift
++     the C wrote.  */
 +  for (i = 0; i < agbcc_zero_count; i++)
-+    agbcc_dead_report (agbcc_zero_events[i].insn, "zero",
-+                       GET_RTX_NAME (agbcc_zero_events[i].code));
++    {
++      char detail[32];
++      if (agbcc_zero_events[i].count >= 0)
++	sprintf (detail, "%s:%d", GET_RTX_NAME (agbcc_zero_events[i].code),
++		 agbcc_zero_events[i].count);
++      else
++	strcpy (detail, GET_RTX_NAME (agbcc_zero_events[i].code));
++      agbcc_dead_report (agbcc_zero_events[i].insn, "zero", detail);
++    }
 +  agbcc_zero_count = 0;
 +}
-+
  
++
  /* Totals over entire compilation.  */
  
-@@ -1372,6 +1412,8 @@
+ static int total_attempts, total_merges, total_extras, total_successes;
+@@ -1363,6 +1417,8 @@
       REG_LIBCALL note since we don't want to disrupt the contiguity of a
       libcall.  */
  
@@ -2098,7 +2113,7 @@
    if (GET_RTX_CLASS (GET_CODE (i3)) != 'i'
        || GET_RTX_CLASS (GET_CODE (i2)) != 'i'
        || (i1 && GET_RTX_CLASS (GET_CODE (i1)) != 'i')
-@@ -1527,6 +1569,20 @@
+@@ -1518,6 +1574,20 @@
      }
  #endif
  
@@ -2119,7 +2134,7 @@
    /* Verify that I2 and I1 are valid for combining.  */
    if (! can_combine_p (i2, i3, i1, NULL_RTX, &i2dest, &i2src)
        || (i1 && ! can_combine_p (i1, i3, NULL_RTX, i2, &i1dest, &i1src)))
-@@ -1725,6 +1781,7 @@
+@@ -1716,6 +1786,7 @@
  	      PATTERN (i3) = newpat;
  	      INSN_CODE (i2) = i2_code_number;
  	      INSN_CODE (i3) = insn_code_number;
@@ -2127,7 +2142,7 @@
  	      return i2;
  	    }
  	  else
-@@ -2638,6 +2695,7 @@
+@@ -2629,6 +2700,7 @@
        emit_barrier_after (i3);
    }
  
@@ -2135,7 +2150,7 @@
    combine_successes++;
  
    /* Clear this here, so that subsequent get_last_value calls are not
-@@ -3331,6 +3389,17 @@
+@@ -3318,6 +3390,20 @@
    enum machine_mode mode = GET_MODE (x);
    rtx temp;
    int i;
@@ -2148,7 +2163,10 @@
 +	&& GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
 +	&& (GET_RTX_CLASS (code) == '2' || GET_RTX_CLASS (code) == 'c' || GET_RTX_CLASS (code) == '1')
 +	&& nonzero_bits (x, mode) == 0)
-+      agbcc_zero_record (subst_insn, code);
++      agbcc_zero_record (subst_insn, code,
++			 ((code == ASHIFTRT || code == LSHIFTRT || code == ASHIFT)
++			  && GET_CODE (XEXP (x, 1)) == CONST_INT)
++			 ? (int) INTVAL (XEXP (x, 1)) : -1);
 +  }
  
    /* If this is a commutative operation, put a constant last and a complex

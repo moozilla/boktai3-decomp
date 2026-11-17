@@ -12,7 +12,9 @@ scope's instrumented agbcc (tools/scope/build_agbcc.sh), run with AGBCC_DEAD, re
   value that came from an unsigned halfword.
 * `zero`: an operation an accepted combine transformation proved is always zero from the
   known-zero bits of its operands, such as `(u16)x >> 16` or `(x & 31) >> 5`, in a statement
-  that shifts, masks or divides. Speculative proofs from rejected combinations are discarded.
+  that shifts, masks or divides. Speculative proofs from rejected combinations are discarded,
+  and so is the sign correction of a signed division by a power of two (a shift by 31 the C
+  never wrote; the compiler reports a constant shift with its count, `lshiftrt:31`).
 
 Both are found from what the compiler does, not from how the C is spelled. tools/concessions.py
 turns them into the warning kinds `dead-code` and `proved-zero`. A site inside a header (an inline
@@ -38,6 +40,15 @@ EFFECTS = ("call", "store")
 # proved-zero is only reported for a statement that itself shifts, masks or divides. The compiler
 # also proves zeros in its own expansion of a packed struct local (`pos.y -= 16`), which nobody wrote.
 _OPERATOR = re.compile(r">>|<<|\s[&/%]=?\s")
+_DIVIDE = re.compile(r"\s[/%]=?\s")
+SIGN_SHIFT = ":31"  # a shift by the word size less one
+
+
+def _sign_correction(detail: str, statement: str) -> bool:
+    """True for the sign correction expand_divmod makes for a signed division or remainder by a
+    power of two: shifts by 31 that the C never wrote. On a value that cannot be negative the
+    correction is always zero, but the division itself is live."""
+    return detail.endswith(SIGN_SHIFT) and bool(_DIVIDE.search(statement)) and "31" not in statement
 
 
 def _statement(lines: list[str], line: int) -> str:
@@ -81,7 +92,8 @@ def compile_unit(src: str) -> list[tuple[str, str, int, str, str]]:
                         sources[file] = open(os.path.join(ROOT, file), errors="replace").read().splitlines()
                     except OSError:
                         sources[file] = []
-                if not _OPERATOR.search(_statement(sources[file], int(ln))):
+                statement = _statement(sources[file], int(ln))
+                if not _OPERATOR.search(statement) or _sign_correction(detail, statement):
                     continue
             found.add((KIND[kind], file, int(ln), func, detail))
     if r.returncode:

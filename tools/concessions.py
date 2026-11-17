@@ -45,8 +45,12 @@ its spelling, so each one is a question, not a verdict:
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
-* `const-local`: a local named `zero` or `one` that only holds that constant.
-  A `goto` label or `return` operand is not a declaration.
+* `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
+  only holds that constant. A `goto` label or `return` operand is not a declaration.
+* `literal-local`: any other local that is initialized to a literal and never changed
+  (`u32 mask = 0x17;` then `if (mask & flags)`). A person does name a constant now and then, so
+  this is the weakest kind: write the literal where it is used when that matches, and leave
+  the rest for the owner to rule on. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
@@ -70,8 +74,8 @@ HARD = ("pin", "operand", "clobber", "barrier")
 EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatile", "alias", "cflags", "raw-offset")
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
-WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "addr-deref", "placeholder-name",
-        "volatile-view", "local-union")
+WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
+        "placeholder-name", "volatile-view", "local-union")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -100,9 +104,15 @@ _REGEX = {
     "raw-offset": re.compile(r"\*\s*\(\s*(?:const\s+)?(?:volatile\s+)?(?:v?[us](?:8|16|32)|s?int|void)\s*\*\s*\)\s*"
                              r"\(\s*\(\s*(?:const\s+)?u8\s*\*\s*\)\s*[\w>.\-\[\]]+\s*\+\s*(?:0x[0-9A-Fa-f]+|\d+)\s*\)"),
 }
+# a local named for a number: zero, one, zeroX, two_, four2 (not zeroed, oneshot, tenth)
+_NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixteen|minusOne|negOne|allOnes)"
+                r"(?:[A-Z_0-9]\w*)?")
+_LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
+_DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
+_LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
-    "const-local": re.compile(r"(?m)^[ \t]+(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b)\w+\s+\*?(?:zero|one)\s*(?:=\s*[01]\s*)?;"),
+    "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
     "addr-deref": re.compile(r"\*\s*\(\s*&\s*\w+\s*\)"),
     "placeholder-name": re.compile(r"(?m)^[ \t]+[\w \t]*?\w[ \t]+\**\s*(?:new_var\w*|dummy\w*|fake\w*)\s*[=;,\[]"),
     "volatile-view": re.compile(
@@ -201,6 +211,25 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    for m in _LITERAL_LOCAL.finditer(code):
+        name = m.group(1)
+        if re.fullmatch(_NUMBER_NAME, name):
+            continue  # const-local has it
+        # the rest of the block the declaration is in
+        depth, i = 0, m.end()
+        while i < len(code):
+            if code[i] == "{":
+                depth += 1
+            elif code[i] == "}":
+                if depth == 0:
+                    break
+                depth -= 1
+            i += 1
+        n = re.escape(name)
+        changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
+        if not changed:
+            yield m.start(), "literal-local"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:
