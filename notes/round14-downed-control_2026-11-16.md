@@ -14,11 +14,11 @@ zero errors: **three once-loops and three constant locals are removed**.
 
 | Source and callback | Exact complete unit | Source commit |
 | --- | ---: | --- |
-| `dog.c`: Dog_UpdateDefeatDelay | 37,088 bytes | `1c6aeff5f` |
-| `golem_main.c`: Golem_UpdateDying | 20,620 bytes | `87be428e8` |
-| `skeleton_main.c`: Skeleton_UpdateDownedState | 31,956 bytes | `a49d6d0c5` |
+| `dog.c`: Dog_UpdateDefeatDelay | 37,088 bytes | `48aef5318` |
+| `golem_main.c`: Golem_UpdateDying | 20,620 bytes | `2cf9fe4cd` |
+| `skeleton_main.c`: Skeleton_UpdateDownedState | 31,956 bytes | `37dca1272` |
 
-Header commit `234182715` corrects the owned Skeleton_UpdateDownedState
+Header commit `500ab34a5` corrects the owned Skeleton_UpdateDownedState
 declaration to accept ChaseActor. It is paired with the source definition change;
 there is no layout or runtime calling-convention change. **Both skeleton.h
 dependent units independently match.**

@@ -4,7 +4,7 @@ Tags: phase3, checkpoint4, shared-types, player-slots, global-ownership
 
 Source-evidence base: `c940902f6ba266133e4e3cd5edf46f308cd03136`.
 Accepted source at integration: `eee8e20b6abe7d3a8fc433d8e73f71c8e549b665`.
-Worker source head: `0690367d297e66da1b379547ba261f1938f6d0bf`.
+Worker source head: `eee8e20b6abe7d3a8fc433d8e73f71c8e549b665`.
 
 The shared consumers now use the existing `struct Player *gPlayers[4]`
 declaration in `include/player.h`. Twenty-four source units lose their legacy
@@ -142,6 +142,11 @@ route-planner failures must not be described as an ABI alignment discrepancy.
 
 Existing chase target and movement-source views remain explicit where they
 are still needed. The target begins inside the Player body prefix at `+0x24`.
+`ActorStatus_FaceTarget` now anchors that existing view at
+`&gPlayers[0]->positionalEffectGroup`. That member supplies the known body-prefix
+address; its provisional scalar type does not recover the complete target
+subobject. This is a declaration-ownership improvement with residual layout
+debt, not a claim that the body view has been eliminated.
 The pointer at `+0x40` refers to a separate movement-source record; it is not a
 license to substitute a fixed field in the Player object. For example, body
 initialization installs the record at player `+0x284`, and named-object release

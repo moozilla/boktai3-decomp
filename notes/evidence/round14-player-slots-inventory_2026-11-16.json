@@ -2922,127 +2922,152 @@
     {
       "commit": "fb965f28122d59702ea8190b549404ac950dec02",
       "source": "src/vorn_main.c",
-      "target_size": 25404
+      "target_size": 25404,
+      "integrated_commit": "dbf58803afbb3b36af673bcb0d8a59f6d9b19ec5"
     },
     {
       "commit": "b3f5f65d2ede52fca7f62a710c51ffc7cca7d81b",
       "source": "src/golem_main_2.c",
-      "target_size": 17184
+      "target_size": 17184,
+      "integrated_commit": "6f1f5a84af6047441a3638231b4414666a0b1c90"
     },
     {
       "commit": "334d56a675b379655e545ce24df053eddc992470",
       "source": "src/ivy.c",
-      "target_size": 21464
+      "target_size": 21464,
+      "integrated_commit": "1da8d955d544b6c445865398adbadb4e3dabc165"
     },
     {
       "commit": "a1f565e2ee05c4903ed99efb2a2aab79d3e3f9f3",
       "source": "src/mummy_entry.c",
-      "target_size": 49808
+      "target_size": 49808,
+      "integrated_commit": "c9723c09f32b2cd1b02dd9c2701df4619c3dd10f"
     },
     {
       "commit": "2d261fce51e33b9443d83e6153832f48280ca91b",
       "source": "src/scene_actor_approach.c",
-      "target_size": 3220
+      "target_size": 3220,
+      "integrated_commit": "428db9f9b628627d84364b5d70909b5ef1723734"
     },
     {
       "commit": "df16ab17bbfe405daed7fccc9ca8685bae7662fd",
       "source": "src/lun.c",
-      "target_size": 16116
+      "target_size": 16116,
+      "integrated_commit": "77e8c7e077b86a9bf9f65dfdc6d662cd0230f259"
     },
     {
       "commit": "faa21f1250d1bcf8c51c446835605c5471daf6a8",
       "source": "src/golem_2.c",
-      "target_size": 12492
+      "target_size": 12492,
+      "integrated_commit": "748d53b4ea734da3b1bd34940a13529783fd6ec4"
     },
     {
       "commit": "aa007ca8184c3ea712e31e30250021d75d24ecbf",
       "source": "src/slime.c",
-      "target_size": 15436
+      "target_size": 15436,
+      "integrated_commit": "84df995324671f3f6ba9db533d8dd7000206fd1b"
     },
     {
       "commit": "d28b434037431e9c8a2f01dee60bbdcef8871fee",
       "source": "src/actor_animation_controller.c",
-      "target_size": 30356
+      "target_size": 30356,
+      "integrated_commit": "0d47b0e38a8cfda286282a9297a06fa770ac54d9"
     },
     {
       "commit": "46587250e7f6786088900b317409d419ee051548",
       "source": "src/bat_restore.c",
-      "target_size": 9548
+      "target_size": 9548,
+      "integrated_commit": "e5ef6d02c1642920550ec5f80b007a7a43868e92"
     },
     {
       "commit": "1b6604bdb7a158ae633dded7a7afcc98b37eb919",
       "source": "src/axe.c",
-      "target_size": 29148
+      "target_size": 29148,
+      "integrated_commit": "0b684b5ba96567d21858a05d9ade8dd4918fba33"
     },
     {
       "commit": "7511e354a852cba03d57f511cade90d4aa828e1a",
       "source": "src/spider.c",
-      "target_size": 15172
+      "target_size": 15172,
+      "integrated_commit": "72f2c51d3644157c73522bca75f06b6b54680890"
     },
     {
       "commit": "9c9d83d41f4df87d41926783ed916729eda26fff",
       "source": "src/skeleton_rise.c",
-      "target_size": 5508
+      "target_size": 5508,
+      "integrated_commit": "929ae1c7f1f5713847fe150af040c9cbb62d636b"
     },
     {
       "commit": "5cf5fd5b5ae3261ab0fcec93075d89c8378643a2",
       "source": "src/fn/sub_080F67AC.c",
-      "target_size": 2020
+      "target_size": 2020,
+      "integrated_commit": "30efcfe14819979a883fb310d2023b0057b8fb84"
     },
     {
       "commit": "5a5833204d1e7d0ddae149c0a37b2f34c717f12f",
       "source": "src/fn/sub_081FAE0C.c",
-      "target_size": 2428
+      "target_size": 2428,
+      "integrated_commit": "bc4351d0e42169ca2882f3e0a60168b61164fa04"
     },
     {
       "commit": "aea8fef514c93815a6c3b93814204960a5d227fb",
       "source": "src/fn/sub_0812FA0C.c",
-      "target_size": 1976
+      "target_size": 1976,
+      "integrated_commit": "ad1c80594428179a29879782e4f3090a4c661261"
     },
     {
       "commit": "3dc5a885a07dafd6ebdc7024efc41798abae1d1d",
       "source": "src/fn/sub_0801CC24.c",
-      "target_size": 520
+      "target_size": 520,
+      "integrated_commit": "e21386b2a34f2e3900efc287979e29357c6ecb95"
     },
     {
       "commit": "3a8e5c0ec70a818cb4856b3f80f3edbf9eaed9b4",
       "source": "src/timed_effect.c",
-      "target_size": 1992
+      "target_size": 1992,
+      "integrated_commit": "b8501a89898b72d9702457d775d102fa5d0c4fd2"
     },
     {
       "commit": "7be6e69e9571acf0c087e9c76e5c77777b86e0db",
       "source": "src/fn/sub_0802592C.c",
-      "target_size": 936
+      "target_size": 936,
+      "integrated_commit": "a624ced78a16f6ec9d356651c6e3921fa50086c3"
     },
     {
       "commit": "28abd673bcd7855f779393d67349b33dc9a084d5",
       "source": "src/fn/sub_08028F78.c",
-      "target_size": 2080
+      "target_size": 2080,
+      "integrated_commit": "664ec4097d4f570603606e7386785f8a69847621"
     },
     {
       "commit": "16451028da78564a0682740c8909935e94c02f65",
       "source": "src/fn/sub_081A2C80.c",
-      "target_size": 1520
+      "target_size": 1520,
+      "integrated_commit": "a02c81222a7b9eb438540ba95868446427671dc9"
     },
     {
       "commit": "3c3dc2f75a947d1c12ab5b4a786c63a0f6bb1e5a",
       "source": "src/dog.c",
-      "target_size": 37088
+      "target_size": 37088,
+      "integrated_commit": "0f8a2baa122174c724674d8077c552dfab205f36"
     },
     {
       "commit": "416b20c703f218a1c86a229364014c8173d49075",
       "source": "src/golem_main.c",
-      "target_size": 20620
+      "target_size": 20620,
+      "integrated_commit": "1fe2a334487c155ec2ffa4d4c492b8c626ede6ea"
     },
     {
       "commit": "05a8c69e15c22a9d64c303e08da5958c48b099fd",
       "source": "src/skeleton_main.c",
-      "target_size": 31956
+      "target_size": 31956,
+      "integrated_commit": "59d420fb74eae8abe62fe3cb5ac78e0b702914f3"
     },
     {
       "commit": "44aecadc4969a1f7daa8eb3a2ba07fed1d80359d",
       "source": "src/octopus.c",
-      "target_size": 14980
+      "target_size": 14980,
+      "integrated_commit": "39d2f2fca0a8f44c39266e7a6a29d3115eba0b01"
     },
     {
       "commit": "0690367d297e66da1b379547ba261f1938f6d0bf",
@@ -3052,7 +3077,8 @@
         "include/scene_actor_chase_step.h",
         "include/scene_actor_chase_direct_arrival.h",
         "include/ghoul_disc.h"
-      ]
+      ],
+      "integrated_commit": "eee8e20b6abe7d3a8fc433d8e73f71c8e549b665"
     }
   ],
   "excluded_sync_commits": [

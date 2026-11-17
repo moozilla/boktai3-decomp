@@ -11,7 +11,7 @@ and `Anim_SetSequence` (`08220C8C`). The input function `0805E7D8` received a
 writer/sibling review, with no new source experiment.
 
 **One source fix landed; `Anim_SetSequence` remains open.** Commit
-`65f5d8bde` uses the existing shared actor layout and removes the unjustified
+`c940902f6` uses the existing shared actor layout and removes the unjustified
 status-byte volatility from `08184F04`. An independent stock
 `tools/check.py src/fn/sub_08184F04.c --target-size 228` check reports zero
 differing bytes across the entire unit. The compiler-aware concession scan

@@ -12,9 +12,9 @@ two once-loops and two constant locals are removed.
 
 | Concern | Commit |
 | --- | --- |
-| Shared SwordWaveComponent_SetAction operation | `206ddbc93` |
-| Sword_UpdateHorizontalWaveReturn, `080F4FA8` | `f3a13c05a` |
-| Sword_UpdateDepthWaveReturn, `080F508C` | `2fccf50dc` |
+| Shared SwordWaveComponent_SetAction operation | `46333ea51` |
+| Sword_UpdateHorizontalWaveReturn, `080F4FA8` | `ac1f8e664` |
+| Sword_UpdateDepthWaveReturn, `080F508C` | `cff10d781` |
 
 ## Source evidence
 

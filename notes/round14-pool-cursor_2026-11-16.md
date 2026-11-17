@@ -12,9 +12,9 @@ Each complete unit independently matches the ROM under stock agbcc.
 
 | Function | Source commits | Complete unit | Once-loops removed |
 |---|---|---:|---:|
-| `SpriteEffectController_UpdatePool` | `14daa5e28`, then `a7e0be57f` | 144 bytes | 2 |
-| `RouteSpritePool_Tick` | `137db0468` | 144 bytes | 1 |
-| `FeatherEffectPool_UpdateTask` | `bdd23030b` | 140 bytes | 1 |
+| `SpriteEffectController_UpdatePool` | `f34e49943`, then `df3c3e18e` | 144 bytes | 2 |
+| `RouteSpritePool_Tick` | `bfdab71f1` | 144 bytes | 1 |
+| `FeatherEffectPool_UpdateTask` | `b769f832a` | 140 bytes | 1 |
 
 All three resulting units have zero focused errors and warnings. No compiler,
 linter, suppression, dummy operation, replacement weighting loop, or new call
@@ -72,11 +72,15 @@ An ignored layout probe compiled with stock ARM agbcc measured:
 | Slot count | 20 |
 | `sizeof(struct FeatherPool)` | `0xCBC` |
 
-The header currently has one dependent source unit, `src/fn/sub_081296D0.c`;
-that complete 140-byte unit was independently checked. The dependency inventory
-and stock result are preserved in `header-dependents.json`. Existing private
-feather views in other units were not migrated in this bounded series. No
-existing shared header changed.
+At the original indexed-loop commit, the header had one dependent source unit,
+`src/fn/sub_081296D0.c`; that complete 140-byte unit was independently checked.
+Review then found incompatible private definitions at the four state callback
+targets. The [interface follow-up](round14-feather-callback-interfaces_2026-11-16.md)
+migrates all four to the owner and embeds the actual ContactSwarmSprite prefix.
+The resulting six header dependents and the unchanged creator caller match.
+The retained Scatter Step helper, broader scheduler callback contract and other
+private family views remain explicit debt. The initial dependency inventory
+and stock result remain preserved in `header-dependents.json`.
 
 ## Failed deletion and recovered source choices
 
