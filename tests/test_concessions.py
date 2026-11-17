@@ -229,6 +229,26 @@ class Compiler(unittest.TestCase):
         self.assertEqual(self.kinds_of("void f(u32 i) {\n    const u16 *t = (const u16 *)((u32)gTable + ((u16)i >> 16));\n    g(t[i & 3]);\n}\n"), ["proved-zero"])
         self.assertEqual(self.kinds_of("void f(u32 i) {\n    g((i & 0xFF00) >> 8);\n}\n"), [])
 
+    def test_rejected_narrow_load_combinations_are_not_zero_proofs(self):
+        # Serial, EEPROM and RTC bit reads from three real source units.
+        # combine tries, then rejects, a narrowing with a zero intermediate;
+        # none of these C expressions is identically zero.
+        bodies = (
+            "void f(void) {\n    if (*(volatile u16 *)0x04000128 & 0x40) g(1);\n}\n",
+            "void f(void) {\n    if (*(volatile u16 *)0x0D000000 & 1) g(1);\n}\n",
+            "void f(void) {\n    u8 bit = (u16)(*(volatile u16 *)0x080000C4 & 2) >> 1;\n    g(bit);\n}\n",
+        )
+        for body in bodies:
+            with self.subTest(body=body):
+                self.assertEqual(self.kinds_of(body), [])
+
+    def test_real_zero_proofs_survive_volatile_reads(self):
+        for expression in ("(*(volatile u16 *)0x04000128 & 31) >> 5",
+                           "*(volatile u16 *)0x04000128 >> 16"):
+            with self.subTest(expression=expression):
+                self.assertEqual(self.kinds_of("void f(void) {\n    g(" + expression + ");\n}\n"),
+                                 ["proved-zero"])
+
 
 if __name__ == "__main__":
     unittest.main()

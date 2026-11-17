@@ -2042,7 +2042,63 @@
  
 --- a/combine.c
 +++ b/combine.c
-@@ -1518,6 +1518,20 @@
+@@ -110,6 +110,46 @@
+ /* Number of instructions combined in this function.  */
+ 
+ static int combine_successes;
++
++/* scope: AGBCC_DEAD records speculative zero proofs, but reports them only
++   when try_combine accepts the transformation.  A rejected narrow-load
++   combination may contain zero-valued intermediates unrelated to the C.  */
++struct agbcc_zero_event
++{
++  rtx insn;
++  enum rtx_code code;
++};
++static struct agbcc_zero_event *agbcc_zero_events;
++static int agbcc_zero_count, agbcc_zero_capacity;
++static void
++agbcc_zero_record (rtx insn, enum rtx_code code)
++{
++  int i;
++
++  for (i = 0; i < agbcc_zero_count; i++)
++    if (agbcc_zero_events[i].insn == insn && agbcc_zero_events[i].code == code)
++      return;
++  if (agbcc_zero_count == agbcc_zero_capacity)
++    {
++      agbcc_zero_capacity = agbcc_zero_capacity * 2 + 16;
++      agbcc_zero_events = (struct agbcc_zero_event *) xrealloc
++        (agbcc_zero_events, agbcc_zero_capacity * sizeof (*agbcc_zero_events));
++    }
++  agbcc_zero_events[agbcc_zero_count].insn = insn;
++  agbcc_zero_events[agbcc_zero_count++].code = code;
++}
++static void
++agbcc_zero_commit (void)
++{
++  extern void agbcc_dead_report ();
++  int i;
++
++  for (i = 0; i < agbcc_zero_count; i++)
++    agbcc_dead_report (agbcc_zero_events[i].insn, "zero",
++                       GET_RTX_NAME (agbcc_zero_events[i].code));
++  agbcc_zero_count = 0;
++}
++
+ 
+ /* Totals over entire compilation.  */
+ 
+@@ -1372,6 +1412,8 @@
+      REG_LIBCALL note since we don't want to disrupt the contiguity of a
+      libcall.  */
+ 
++  agbcc_zero_count = 0;
++
+   if (GET_RTX_CLASS (GET_CODE (i3)) != 'i'
+       || GET_RTX_CLASS (GET_CODE (i2)) != 'i'
+       || (i1 && GET_RTX_CLASS (GET_CODE (i1)) != 'i')
+@@ -1527,6 +1569,20 @@
      }
  #endif
  
@@ -2063,7 +2119,23 @@
    /* Verify that I2 and I1 are valid for combining.  */
    if (! can_combine_p (i2, i3, i1, NULL_RTX, &i2dest, &i2src)
        || (i1 && ! can_combine_p (i1, i3, NULL_RTX, i2, &i1dest, &i1src)))
-@@ -3318,6 +3332,18 @@
+@@ -1725,6 +1781,7 @@
+ 	      PATTERN (i3) = newpat;
+ 	      INSN_CODE (i2) = i2_code_number;
+ 	      INSN_CODE (i3) = insn_code_number;
++	      agbcc_zero_commit ();
+ 	      return i2;
+ 	    }
+ 	  else
+@@ -2638,6 +2695,7 @@
+       emit_barrier_after (i3);
+   }
+ 
++  agbcc_zero_commit ();
+   combine_successes++;
+ 
+   /* Clear this here, so that subsequent get_last_value calls are not
+@@ -3331,6 +3389,17 @@
    enum machine_mode mode = GET_MODE (x);
    rtx temp;
    int i;
@@ -2071,13 +2143,12 @@
 +  /* scope: AGBCC_DEAD: an operation whose value the known-zero bits prove to be zero.  */
 +  {
 +    extern int agbcc_dead_enabled ();
-+    extern void agbcc_dead_report ();
 +    if (agbcc_dead_enabled () && ! in_dest && subst_insn
 +	&& GET_MODE_CLASS (mode) == MODE_INT
 +	&& GET_MODE_BITSIZE (mode) <= HOST_BITS_PER_WIDE_INT
 +	&& (GET_RTX_CLASS (code) == '2' || GET_RTX_CLASS (code) == 'c' || GET_RTX_CLASS (code) == '1')
 +	&& nonzero_bits (x, mode) == 0)
-+      agbcc_dead_report (subst_insn, "zero", GET_RTX_NAME (code));
++      agbcc_zero_record (subst_insn, code);
 +  }
  
    /* If this is a commutative operation, put a constant last and a complex

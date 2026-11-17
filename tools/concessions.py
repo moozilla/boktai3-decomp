@@ -38,7 +38,8 @@ its spelling, so each one is a question, not a verdict:
 * `dead-code`: a call, store or branch the compiler deleted as unreachable after working out a
   condition the C left open (`x < 0` on a value that came from an unsigned halfword). People do
   write dead code by accident; an arm that looks like a real gap in the algorithm can be excused.
-* `proved-zero`: an operation the compiler proved is always zero (`(u16)x >> 16`, `(x & 31) >> 5`).
+* `proved-zero`: an operation an accepted compiler transformation proved is always zero
+  (`(u16)x >> 16`, `(x & 31) >> 5`); rejected speculative combinations do not count.
   These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
   instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
