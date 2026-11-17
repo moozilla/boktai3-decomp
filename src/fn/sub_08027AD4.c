@@ -72,12 +72,10 @@ void SceneActors_UpdateContractingShake(ActorAnimation *p, int time)
     u8 *position = ((u8 *)p) + 0x48;
     if (p->changed) {
         int sequence;
-        int one;
         p->changed = 0;
         {
             int test = p->mode;
-            one = 1;
-            test &= one;
+            test &= 1;
             sequence = 43;
             if (test) {
                 sequence = 5;
@@ -86,7 +84,7 @@ void SceneActors_UpdateContractingShake(ActorAnimation *p, int time)
         {
             int offset = 0x240;
             SceneActors_StartDirectionalAnimation(p, ((u8 *)p) + offset, ((u8 *)p) + 0x220,
-                                                  sequence, one, one, 4);
+                                                  sequence, 1, 1, 4);
         }
         {
             u32 mask = 16;
