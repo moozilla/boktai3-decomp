@@ -359,11 +359,9 @@ void Golem_ResetCombatState(u8 *p)
     }
 }
 
-void Golem_ClearControlFlag(u8 *p)
+void Golem_ClearControlFlag(struct ChaseActor *actor)
 {
-    u32 *q = (u32 *)(p + 0x2d0);
-    u32 m = -3;
-    *q = *q & m;
+    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 2);
 }
 
 struct ActorMotion {
