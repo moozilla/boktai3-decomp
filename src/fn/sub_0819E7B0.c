@@ -1,13 +1,13 @@
-#include "global.h"
-void Hresvelgr_SetAnimation(u8 *, void *, void *, s32, s32, s32);
+#include "hresvelgr_travel.h"
+
+void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, s32, s32, s32);
 s32 Callback_InvokeActor(void *, void *);
 
-void sub_0819E7B0(u8 *p)
+void sub_0819E7B0(struct HresvelgrTravelActor *p)
 {
-    if (p[0xb1] != 0) {
-        s32 zero = 0;
-        p[0xb1] = zero;
-        Hresvelgr_SetAnimation(p, p + 0x194, p + 0x174, zero, 1, zero);
+    if (p->changed != 0) {
+        p->changed = 0;
+        Hresvelgr_SetAnimation(p, &p->animation, &p->animationData, 0, 1, 0);
     }
-    Callback_InvokeActor(p, *(void **)(p + 0x104));
+    Callback_InvokeActor(p, p->callback);
 }
