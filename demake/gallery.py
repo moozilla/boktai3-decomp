@@ -23,8 +23,8 @@ def contact(rows, path):
     out.save(path)
 
 
-def actor_gallery(source, key, frames, path, palette=None, size=(24, 32), scale=.85, floor=None, enemy=None):
-    total, render = source.actor(key, palette)
+def actor_gallery(source, key, frames, path, palette=None, size=(24, 32), scale=.85, floor=None, enemy=None, group=None, record=None):
+    total, render = source.actor(key, palette, group, record)
     rows = []
     if enemy is None:
         enemy = key in source.big_ids
@@ -66,5 +66,6 @@ def room_gallery(rooms, path, budgets):
                  ("Four inks before tile fitting", screen_image(r.background)),
                  (f"{len(tiles)} hardware patterns from {n}", screen_image(display)),
                  ("HP floor edges and ramps", terrain_overlay(r))]
-        rows.append((f"SCENE {r.stage['scene']}    MP {mp['map']}    PTN {mp['tileset']}    HP {mp['hp']}", views))
+        title = f"SCENE {r.stage['scene']}" if r.stage["scene"] is not None else "STAGE"
+        rows.append((f"{title}    MP {mp['map']}    PTN {mp['tileset']}    HP {mp['hp']}", views))
     contact(rows, path)

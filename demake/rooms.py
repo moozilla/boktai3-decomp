@@ -49,8 +49,17 @@ def connected_scenes(source, start):
     return [start, *sorted(seen - {start})]
 
 
-def convert(source, number, palette=None, side_pixels=512):
-    stage, terrain = source.scene(number)
+def convert(source, number, palette=None):
+    return convert_stage(source, *source.scene(number), palette)
+
+
+def convert_resources(source, map_id, tileset_id, hp_id, palette=None):
+    terrain = hp.decode(source.entry("tAE6C", int(hp_id, 16)))
+    stage = dict(scene=None, stage=dict(map=map_id, tileset=tileset_id, hp=hp_id))
+    return convert_stage(source, stage, terrain, palette)
+
+
+def convert_stage(source, stage, terrain, palette, side_pixels=512):
     mp = stage["stage"]
     indexed = source.map(mp["map"], mp["tileset"])
     key, colors = source.palette(stage, palette)
@@ -64,7 +73,7 @@ def convert(source, number, palette=None, side_pixels=512):
                 y = cell[0] * 256 - (dz if cell[1] == 1 else dx if cell[1] == 2 else 0)
                 points.append(hp.project(terrain, x + dx, y, z + dz))
     if not points:
-        raise ValueError(f"scene {number} contains no walkable terrain")
+        points = [(0, 0), (indexed.shape[1], indexed.shape[0])]
     x, y = np.array(points).T
     extent = max(np.ptp(x) + 48, np.ptp(y) + 64)
     # Prefer simple sample ratios to keep repeated masonry tiles in phase.

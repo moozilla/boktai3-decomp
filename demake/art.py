@@ -139,16 +139,21 @@ class Source:
             raise ValueError("no evidenced BG palette; supply --palette HASH")
         return key, np.array(gfx.read_pal(self.entry("t92B3", int(key, 16)), 20, 256), dtype=np.uint8)
 
-    def actor(self, key, override=None):
-        if key in self.archives["tCB05"]:
+    def actor(self, key, override=None, group=None, record=None):
+        pool_count = struct.unpack_from("<H", self.pool)[0]
+        if override is not None and not 0 <= override < pool_count:
+            raise ValueError(f"OBJ palette bank must be in 0..{pool_count-1}")
+        if record is not None and (group == "CB05" or not 0 <= record < len(self.big.records)
+                                   or self.big.records[record][0] != key):
+            raise ValueError("record index must match the hash of a large-sprite record")
+        if group == "CB05" or (group is None and record is None and key in self.archives["tCB05"]):
             pkg = sprites.Package(self.entry("tCB05", key))
             base = pkg.h0 if override is None else override
-            pool_count = struct.unpack_from("<H", self.pool)[0]
             banks = [gfx.read_pal(self.pool, 4 + 32 * (base + i)) if base + i < pool_count
                      else [(0, 0, 0)] * 16 for i in range(16)]
             frames = list(pkg.frames())
             return len(frames), lambda i: pkg.render(frames[i], banks)
-        index = self.big_ids[key]
+        index = self.big_ids[key] if record is None else record
         frames = list(self.big.frames(index))
 
         def render(i):

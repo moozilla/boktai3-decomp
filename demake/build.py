@@ -12,7 +12,7 @@ from journal import Journal
 from gallery import actor_gallery, room_gallery
 from music import compile_song
 from pack import LAYOUT, objects, pack_room, enemy_constants, ghoul_palette
-from rooms import connected_scenes, convert
+from rooms import connected_scenes, convert, convert_resources
 from screens import screen_bank
 from sm83 import assemble, cartridge
 
@@ -104,8 +104,15 @@ def main():
     room = cmds.add_parser("room", help="convert a scene by script call ID")
     room.add_argument("scene", type=int)
     room.add_argument("--palette", help="BGR555 resource hash, overriding script or capture")
+    stage = cmds.add_parser("stage", help="convert a decoded MP, PTN and HP triple directly")
+    stage.add_argument("resources", nargs=3, type=lambda v: f"{int(v, 16):04X}", metavar="HASH")
+    stage.add_argument("--palette", help="BGR555 resource hash if the map has no matched capture")
+    catalog = cmds.add_parser("catalog", help="index decoded resources and verify their conversions")
+    catalog.add_argument("--check", action="store_true", help="convert every stage and every frame of every actor")
     actor = cmds.add_parser("actor", help="convert a CB05 or 98F5 actor by hexadecimal resource hash")
     actor.add_argument("hash", type=lambda k: int(k, 16))
+    actor.add_argument("--record", type=int, help="98F5 record index for duplicate names")
+    actor.add_argument("--archive", choices=("CB05", "98F5"), help="choose an archive for a shared hash")
     actor.add_argument("--frames", default="0", help="comma-separated frame indices, or all")
     actor.add_argument("--palette", type=int, help="first OBJ pool bank, decimal")
     actor.add_argument("--size", type=int, nargs=2, default=(24, 32), metavar=("WIDTH", "HEIGHT"))
@@ -117,7 +124,10 @@ def main():
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     source = Source()
-    if args.cmd == "music":
+    if args.cmd == "catalog":
+        from catalog import catalog
+        catalog(source, OUT, args.check)
+    elif args.cmd == "music":
         if not 1 <= args.frames <= 36000:
             ap.error("--frames must be between 1 and 36000")
         data, wave, meta = compile_song(args.song, args.frames)
@@ -127,9 +137,13 @@ def main():
         (dest / "wave.bin").write_bytes(wave)
         (dest / "score.json").write_text(json.dumps(meta, indent=2) + "\n")
         print(dest.relative_to(ROOT))
-    elif args.cmd == "room":
-        r = convert(source, args.scene, args.palette)
-        dest = OUT / f"scene-{args.scene}"
+    elif args.cmd in ("room", "stage"):
+        if args.cmd == "room":
+            r = convert(source, args.scene, args.palette)
+            dest = OUT / f"scene-{args.scene}"
+        else:
+            r = convert_resources(source, *args.resources, args.palette)
+            dest = OUT / ("stage-" + "-".join(args.resources))
         dest.mkdir(exist_ok=True)
         tiles, ids, display, _ = fit_tiles(r.background, 256)
         (dest / "bg.2bpp").write_bytes(b"".join(encode_tile(t) for t in tiles))
@@ -139,7 +153,7 @@ def main():
         room_gallery([r], dest / "contact.png", [256])
         print(dest.relative_to(ROOT))
     elif args.cmd == "actor":
-        count, render = source.actor(args.hash, args.palette)
+        count, render = source.actor(args.hash, args.palette, args.archive, args.record)
         seq = list(range(count)) if args.frames == "all" else [int(i) for i in args.frames.split(",")]
         if not seq or any(i < 0 or i >= count for i in seq):
             ap.error(f"select frames in 0..{count - 1}")
@@ -148,14 +162,15 @@ def main():
         w, h = args.size
         if w <= 0 or h <= 0 or w % 8 or h % 16 or w > 80 or w*h > 40*128 or not 0 < args.scale <= 4:
             ap.error("use 8x16 cells, at most 40 total and ten per row, and a scale in (0, 4]")
-        enemy = args.hash in source.big_ids if args.obp is None else bool(args.obp)
+        large = args.record is not None or args.archive == "98F5" or (args.archive is None and args.hash not in source.archives["tCB05"])
+        enemy = large if args.obp is None else bool(args.obp)
         (dest / "poses.2bpp").write_bytes(b"".join(pose_tiles(actor_pose(render(i), size=(w, h), scale=args.scale)) for i in seq))
         cells = [(x, y) for y in range(0, h, 16) for x in range(0, w, 8)]
         (dest / "poses.json").write_text(json.dumps(dict(frames=seq, width=w, height=h, bytes_per_pose=w*h//4,
             oam=[[x, y, i * 2] for i, (x, y) in enumerate(cells)], obp=int(enemy)), indent=2) + "\n")
         for page in range(0, len(seq), 16):
             path = dest / ("contact.png" if page == 0 else f"contact-{page//16+1}.png")
-            actor_gallery(source, args.hash, seq[page:page+16], path, args.palette, (w, h), args.scale, enemy=enemy)
+            actor_gallery(source, args.hash, seq[page:page+16], path, args.palette, (w, h), args.scale, enemy=enemy, group=args.archive, record=args.record)
         print(dest.relative_to(ROOT))
     else:
         scenes = None
