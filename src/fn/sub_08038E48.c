@@ -17,7 +17,7 @@ void WirelessTradeMenu_UpdateResultsPanel(struct WirelessGameExchange *p)
         s32 points, localTime, remoteTime;
         p->entered = 0;
         p->resultPanelClosed = 0;
-        offset = (p->roundCount - 1) * 720;
+        offset = (p->roundCount - 1) * WIRELESS_ROUND_FRAMES;
         localTime = offset + p->local.elapsed;
         remoteTime = offset + p->remote.elapsed;
         side = Wireless_IsSessionActive();
