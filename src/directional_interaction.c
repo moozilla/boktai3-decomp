@@ -24,13 +24,13 @@ u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
 s32 DirectionalController_InitSlot(struct DirectionalManager *manager,
                                    struct DirectionalController *p, s32 index)
 {
-    void *animation = p->animation;
+    void *animation = &p->graphics;
     s32 r;
     if (AnimData_Load(animation, 0xA850) != 0) {
-        struct DirectionalDrawable *q = &p->drawable;
+        struct DisplaySequenceSprite *q = &p->drawable;
         Sprite_Init(q, animation, 1);
-        q->scale = 1;
-        p->drawable.mode = 2;
+        q->frame = 1;
+        p->drawable.priority = 2;
         r = 0;
     } else
         r = -1;
@@ -59,17 +59,16 @@ DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id,
 /* Picks the marker animation for a fade level. */
 u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u32 level)
 {
-    void *animation = p->animation;
+    void *animation = &p->graphics;
     if (p->disabled == 0)
         AnimData_SelectPaletteBank(animation, level + 0x6b);
 }
 
 /* Places the controller and its marker around the given point. */
 u32 DirectionalController_SetPosition(struct DirectionalManager *manager,
-                                      struct DirectionalController *p,
-                                      struct DirectionalPackedVec *in)
+                                      struct DirectionalController *p, const struct SceneVec *in)
 {
-    struct DirectionalDrawable *q = &p->drawable;
+    struct DisplaySequenceSprite *q = &p->drawable;
     p->position.x = in->x;
     p->position.y = in->y;
     p->position.z = in->z;
@@ -374,7 +373,7 @@ void *DirectionalController_CreateManagerTask(void *a)
     struct DirectionalManager *p;
     if (gDirectionalManager != 0)
         return gDirectionalManager;
-    p = Task_Create(8, 0x30);
+    p = Task_Create(8, sizeof(*p));
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))DirectionalController_UpdateAll,
                           (void (*)(void))DirectionalController_DestroyManager);
@@ -388,7 +387,7 @@ void *DirectionalController_CreateManagerTask(void *a)
 
 s32 DirectionalController_ScriptCreate(void)
 {
-    struct DirectionalPackedVec position;
+    struct SceneVec position;
     s32 findRegion;
     struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
@@ -476,7 +475,7 @@ s32 DirectionalController_ScriptRelease(void)
 
 s32 DirectionalController_ScriptMove(void)
 {
-    struct DirectionalPackedVec position;
+    struct SceneVec position;
     struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
     if (!manager)
