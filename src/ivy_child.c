@@ -6,7 +6,6 @@
 #include "ram.h"
 #include "engine_globals.h"
 
-
 struct IvyBurstVector {
     s32 x : 16;
     s32 y : 16;
@@ -264,7 +263,6 @@ void Ivy_UpdateDefeatBurst(struct IvyBurstPrefix *actor)
 
 /* Ivy_OnUpdateIdle: Empty callback at the end of the main Ivy state handlers; idle role tentative */
 
-
 void Ivy_OnUpdateIdle(void)
 {
 }
@@ -292,11 +290,11 @@ void Ivy_UpdateActions(struct P *p)
 
 extern void (*gUnk_08606434[])(void);
 
-void Ivy_DispatchState(u8 *p)
+void Ivy_DispatchState(struct IvyBurstPrefix *actor)
 {
     u32 m = 0x10;
-    if ((p[0x8d] & m) == 0)
-        Callback_InvokeActor(p, gUnk_08606434[p[0x92]]);
+    if ((actor->control.flags & m) == 0)
+        Callback_InvokeActor(actor, gUnk_08606434[actor->control.state]);
 }
 
 void Ivy_OnChildDestroy(void)
@@ -394,7 +392,8 @@ static inline u32 Sword_ContactFlags(struct SwordContact *contact, u32 mask)
     return contact->contactFlags & mask;
 }
 
-static inline void Sword_SetChildState(struct SwordComponentOnChildContact *child, u8 active, u8 phase)
+static inline void Sword_SetChildState(struct SwordComponentOnChildContact *child, u8 active,
+                                       u8 phase)
 {
     child->active = active;
     child->phase = phase;
@@ -416,7 +415,8 @@ static inline u32 Sword_GetPhase(struct SwordComponentOnChildContact *child, u8 
     return value;
 }
 
-static inline void Sword_BeginContactReturn(struct SwordComponentOnChildContact *child, u8 *phaseField)
+static inline void Sword_BeginContactReturn(struct SwordComponentOnChildContact *child,
+                                            u8 *phaseField)
 {
     u32 phase = *phaseField;
     if (phase == 2) {
@@ -432,7 +432,7 @@ static inline void Sword_BeginContactReturn(struct SwordComponentOnChildContact 
 }
 
 void Ivy_OnChildContact(struct SwordContact *source, struct SwordContact *target,
-                  struct SwordComponentOnChildContact *child)
+                        struct SwordComponentOnChildContact *child)
 {
     struct SceneVec displacement;
     s16 *health;
