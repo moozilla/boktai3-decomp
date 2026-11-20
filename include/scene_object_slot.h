@@ -59,4 +59,22 @@ struct SceneObjSlot {
 
 typedef char SceneObjSlotSizeCheck[sizeof(struct SceneObjSlot) == 0x8c ? 1 : -1];
 
+enum SceneObjActivationState {
+    SCENE_OBJ_INACTIVE,
+    SCENE_OBJ_ACTIVE,
+    SCENE_OBJ_ACTIVATING,
+    SCENE_OBJ_DEACTIVATING
+};
+
+/* Start a sprite pose at the first frame of its animation. */
+static inline void SceneObjSlot_SetAnimation(struct SceneObjSlot *slot,
+                                             enum SceneObjActivationState state,
+                                             void (*callback)(struct SceneObjSlot *), u8 pose)
+{
+    slot->variant = state;
+    slot->callback = callback;
+    slot->b39 = pose;
+    slot->b3a = 0;
+}
+
 #endif
