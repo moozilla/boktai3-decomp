@@ -1,5 +1,6 @@
 #include "scene_indicator.h"
 #include "contact_actor.h"
+#include "terrain_sampling.h"
 
 struct SceneIndicators *SceneIndicators_GetInstance(void)
 {
@@ -213,14 +214,6 @@ struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 k
     return 0;
 }
 
-static inline int cellIndex(struct ContactPosition *p)
-{
-    int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 static inline u8 *cell(int i)
 {
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
@@ -253,7 +246,7 @@ int SceneIndicator_CreateFromScript(void)
         p->sprite.position.x = (p->sprite.position.x & ~255) + 128;
         p->sprite.position.z = (p->sprite.position.z & ~255) + 128;
         position = &p->sprite.position;
-        c = cell(cellIndex(position));
+        c = cell(Terrain_GetCellIndex(position));
         slope = *c >> 4;
         height = (*c & 15) << 8;
         switch (slope) {
