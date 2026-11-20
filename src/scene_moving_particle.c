@@ -1,6 +1,7 @@
 #include "scene_moving_particle.h"
 #include "ram.h"
 #include "scene_actor_chase_types.h"
+#include "terrain_sampling.h"
 
 /* SceneTerrainProbe_NoopHook: Empty function at the end of the tentative terrain probe subsystem */
 
@@ -41,16 +42,7 @@ u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 s32 Div(s32, s32);
 
-static inline s32 CellIndex(struct ContactPackedVector *position)
-{
-    s32 x = position->x >> 8;
-    s32 z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
-static inline s32 GroundHeight(s32 cell, struct ContactPackedVector *position)
+static inline s32 GroundHeight(s32 cell, struct ContactPosition *position)
 {
     u8 *definition = TerrainModifiers_FindCellOverride(cell, 1);
     u32 kind;
@@ -75,11 +67,10 @@ static inline s32 GroundHeight(s32 cell, struct ContactPackedVector *position)
     return height;
 }
 
-static inline u8 Move(struct ContactPackedVector *position, struct ContactPosition *velocity,
-                      s32 cell)
+static inline u8 Move(struct ContactPosition *position, struct ContactPosition *velocity, s32 cell)
 {
     s32 height;
-    struct ContactPackedVector target;
+    struct ContactPosition target;
     s32 targetCell;
     Math_Atan2(velocity->x, velocity->z);
     height = GroundHeight(cell, position);
@@ -94,7 +85,7 @@ static inline u8 Move(struct ContactPackedVector *position, struct ContactPositi
     target.x = position->x + velocity->x;
     target.y = position->y + velocity->y;
     target.z = position->z + velocity->z;
-    targetCell = CellIndex(&target);
+    targetCell = Terrain_GetCellIndex(&target);
     if (cell != targetCell) {
         if (height < GroundHeight(targetCell, &target)) {
             velocity->x = -Div(velocity->x * 5, 10);
@@ -115,10 +106,9 @@ void SceneMovingParticle_Update(struct MovingParticlePool *manager,
         particle->reset = 0;
     }
     if (!(particle->motionFlags & 1)) {
-        particle->cell = CellIndex((struct ContactPackedVector *)&particle->sprite.position);
+        particle->cell = Terrain_GetCellIndex(&particle->sprite.position);
         particle->velocity.y--;
-        if (Move((struct ContactPackedVector *)&particle->sprite.position, &particle->velocity,
-                 particle->cell))
+        if (Move(&particle->sprite.position, &particle->velocity, particle->cell))
             particle->motionFlags |= 1;
     }
     SceneMovingParticle_UpdateAnimation(manager, particle);
