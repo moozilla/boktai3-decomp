@@ -103,6 +103,8 @@ def main():
             room_gallery([r for r, _ in rooms.values()], OUT / "rooms.png")
             actor_gallery(source, 0xDE23, [0, 2, 4, 23], OUT / "django.png")
             actor_gallery(source, 0x9247, [0, 2, 5, 7], OUT / "ghoul.png")
+            from verify import verify
+            verify(OUT, meta)
 
 if __name__ == "__main__":
     main()

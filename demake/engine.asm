@@ -71,6 +71,7 @@ loop:
     call damage
 .render:
     call draw
+    call sort_oam
     call vblank
     ld a,[camera_x]
     ldh [0x43],a
@@ -148,7 +149,7 @@ load_room:
     ld [enemy_phase],a
     ld [point_index],a
     ld [walking],a
-    ld [oam_count],a
+    ; draw clears the previous room's emitted slots as well.
     ld a,4
     ld [facing],a
     ld a,1
@@ -174,6 +175,7 @@ load_room:
     call surface
     ld [player_h],a
     call draw
+    call sort_oam
     ld a,[camera_x]
     ldh [0x43],a
     ld a,[camera_y]
@@ -413,7 +415,9 @@ interactions:
     ld [player_z],a
     ld a,1
     ld [used_a],a
-    jr .next
+    pop hl
+    pop bc
+    ret
 .fruit:
     ld a,[hl]
     call fruit_bit
@@ -984,6 +988,55 @@ marker_oam:
     ld [hl+],a
     ld a,l
     ld [oam_count],a
+    ret
+
+; Put smaller X first, the DMG overlap order. Equal X keeps emission order.
+; The compiler bounds the number of active objects in the room descriptor.
+sort_oam:
+    ld a,[oam_count]
+    rrca
+    rrca
+    and 63
+    cp 2
+    ret c
+    dec a
+    ld b,a
+.pass:
+    ld c,b
+    ld hl,0xc001
+.pair:
+    ld d,[hl]
+    ld a,l
+    add 4
+    ld l,a
+    ld a,[hl]
+    cp d
+    jr nc,.next
+    ; HL points to the right record's X. Exchange the whole two records.
+    push bc
+    push hl
+    dec l
+    ld d,h
+    ld a,l
+    sub 4
+    ld e,a
+    ld b,4
+.swap:
+    ld a,[de]
+    ld c,[hl]
+    ld [hl+],a
+    ld a,c
+    ld [de],a
+    inc e
+    dec b
+    jr nz,.swap
+    pop hl
+    pop bc
+.next:
+    dec c
+    jr nz,.pair
+    dec b
+    jr nz,.pass
     ret
 
 hud:

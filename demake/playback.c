@@ -57,7 +57,25 @@ int main(int argc, char** argv) {
         if (!strcmp(command, "step") && sscanf(line, "%*s %u %u", &n, &mask) == 2) {
             core->setKeys(core, mask);
             while (n--) core->runFrame(core);
+        } else if (!strcmp(command, "tick")) {
+            unsigned target;
+            if (sscanf(line, "%*s %x %u %u", &target, &n, &mask) != 3) return 9;
+            core->setKeys(core, mask);
+            while (n--) {
+                unsigned pc, budget = 300000;
+                do {
+                    core->step(core);
+                    pc = 0;
+                    if (!budget-- || !core->readRegister(core, "pc", &pc)) return 10;
+                } while (pc != target);
+            }
         } else if (!strcmp(command, "frame") && sscanf(line, "%*s %959[^\n]", path) == 1) {
+            /* The engine commits OAM at VBlank. Display the following scan
+             * before replay resumes at precisely the same instruction. */
+            size_t size = core->stateSize(core);
+            void* saved = malloc(size);
+            if (!saved || !core->saveState(core, saved)) return 11;
+            core->runFrame(core);
             FILE* out = fopen(path, "wb");
             if (!out) return 6;
             fprintf(out, "P6\n%u %u\n255\n", width, height);
@@ -67,6 +85,8 @@ int main(int argc, char** argv) {
                 fputc(channel(pixels[i], M_COLOR_BLUE), out);
             }
             if (fclose(out)) return 7;
+            if (!core->loadState(core, saved)) return 12;
+            free(saved);
         } else if (!strcmp(command, "read") && sscanf(line, "%*s %x %u", &mask, &n) == 2) {
             printf("%04x ", mask);
             for (unsigned i = 0; i < n; ++i) printf("%02x", (unsigned)core->busRead8(core, mask + i));
