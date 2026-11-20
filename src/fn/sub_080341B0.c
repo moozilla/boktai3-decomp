@@ -1,10 +1,6 @@
-#include "global.h"
+#include "wireless_controller.h"
 
-struct S {
-    u8 f[0xee];
-    u16 a;
-};
-u32 WirelessController_SetLocalInput(struct S *p, u16 v)
+u32 WirelessController_SetLocalInput(WirelessController *p, u32 input)
 {
-    p->a = v;
+    p->localInput = input;
 }

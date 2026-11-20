@@ -1,12 +1,9 @@
-#include "global.h"
+#include "wireless_trade_menu.h"
 
-struct S {
-    u8 f[0x60];
-    void *a;
-};
-void WirelessGameDisplay_RequestCompletion(void *);
-void WirelessGameMenu_SignalStatusPanel(struct S *p)
+u32 WirelessGameDisplay_RequestCompletion(struct WirelessGameDisplay *);
+
+void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *menu)
 {
-    if (p->a)
-        WirelessGameDisplay_RequestCompletion(p->a);
+    if (menu->display)
+        WirelessGameDisplay_RequestCompletion(menu->display);
 }

@@ -1,12 +1,9 @@
-#include "global.h"
+#include "wireless_trade_menu.h"
 
-struct S {
-    u8 f[0x60];
-    void *a;
-};
-void WirelessGameDisplay_UpdateStatusIcons(void *);
-void WirelessGameMenu_UpdateHealthIndicators(struct S *p)
+void WirelessGameDisplay_UpdateStatusIcons(struct WirelessGameDisplay *);
+
+void WirelessGameMenu_UpdateHealthIndicators(struct WirelessGameExchange *menu)
 {
-    if (p->a)
-        WirelessGameDisplay_UpdateStatusIcons(p->a);
+    if (menu->display)
+        WirelessGameDisplay_UpdateStatusIcons(menu->display);
 }

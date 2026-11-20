@@ -4929,6 +4929,13 @@ def why_all_issues(text):
             issues.append((key, title, whatif, uid))
             found = True
         if not found:
+            moved = re.search(r"^  moved: (the ROM has this same instruction[^\n]*?);", part, re.M)
+            draft = re.search(r"^  ROM: .*?   draft: (.*?)   \[differs\]$", part, re.M)
+            if moved and draft:
+                insn = draft[1]
+                title = f"order: `{insn}` (draft line {line}): {moved[1]}"
+                issues.append((('order', norm_insn(insn), moved[1]), title, None, uid))
+                continue
             shape = re.search(r"^  (this is a shape difference[^\n]*|insn \d+ is in no RTL dump[^\n]*)", part, re.M)
             title = shape.group(1) if shape else f"insn {uid}, line {line}: no supported causal summary; see details"
             issues.append((('shape/emission', uid), title, knob(part), uid))

@@ -6,6 +6,7 @@ struct SceneValueEquipment {
     u16 condition;
     u8 modifierA, unknown5[3];
     u8 modifierB, unknown9[3];
-    u8 grade, unknownD[3];
+    u8 grade, gradeValue;
+    u8 unknownE, unknownF;
 };
 #endif

@@ -1,37 +1,20 @@
+#include "wireless_trade_menu.h"
 #include "global.h"
 #include "render.h"
 #include "game_state.h"
-struct P {
-    u8 pad[0x1e];
-    u16 rounds;
-    u8 pad2[4];
-    u32 timer;
-    u8 state, entered;
-    u8 pad3[0xc2];
-    u8 mode;
-};
-struct Save {
-    u8 pad[0x52];
-    s16 selected;
-};
-void WirelessGameMenu_SetStatusPanelState(struct P *, int);
-void WirelessGameMenu_SignalStatusPanel(struct P *);
+void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
+void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 void Player_EnterStateTen(void);
 void Player_EnterStateEleven(void);
 void WirelessGame_GetSelectedEquipmentEffect(int);
 void Player_SetTransitionMode(void);
-static inline int item(void)
-{
-    struct Save *s = gGameState;
-    return *(s16 *)((u8 *)s + s->selected * 2 + 0x88);
-}
-void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
+void WirelessGameMenu_UpdateRoundPreparation(struct WirelessGameExchange *p)
 {
     if (p->entered) {
         p->entered = 0;
-        p->rounds++;
-        if (p->rounds > 98)
-            p->rounds = 99;
+        p->roundCount++;
+        if (p->roundCount > 98)
+            p->roundCount = 99;
         WirelessGameMenu_SetStatusPanelState(p, 3);
     }
     if (p->timer > 89) {
@@ -52,10 +35,10 @@ void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
             *global &= mask;
         }
         WirelessGameMenu_SignalStatusPanel(p);
-        mode = &p->mode;
+        mode = &p->equipmentMode;
         switch (*mode) {
             case 0: {
-                int n = item();
+                int n = *(gGameState->slots88 + gGameState->selected);
                 if (n == 1)
                     goto mode2;
                 if (n != 2)
@@ -63,28 +46,28 @@ void WirelessGameMenu_UpdateRoundPreparation(struct P *p)
                 goto mode1;
             }
             case 2:
-                if (item() == 2) {
+                if (*(gGameState->slots88 + gGameState->selected) == 2) {
                 mode1:
                     *mode = one;
                     Player_EnterStateTen();
                 } else {
-                    *mode = zero;
+                    *mode = 0;
                     Player_EnterStateEleven();
                 }
                 break;
             case 1:
-                if (item() == 1) {
+                if (*(gGameState->slots88 + gGameState->selected) == 1) {
                 mode2:
                     *mode = 2;
                     Player_EnterStateEleven();
                 } else {
-                    *mode = zero;
+                    *mode = 0;
                     Player_EnterStateTen();
                 }
                 break;
         }
     done:
-        WirelessGame_GetSelectedEquipmentEffect(item());
+        WirelessGame_GetSelectedEquipmentEffect(*(gGameState->slots88 + gGameState->selected));
         Player_SetTransitionMode();
     } else
         p->timer++;

@@ -3,45 +3,60 @@
 
 #include "engine.h"
 #include "scene_input_widget.h"
+#include "scene_value_equipment.h"
+#include "scene_vec.h"
+#include "sprite_oam.h"
 
 /* The result game and its tutorial share the same task and display objects.
  * Position and velocity use five fractional bits. Identities are tentative. */
-struct ResultTutorialMarker {
-    u32 flags;
-    u8 unknown04[0x14];
-    s16 x, y, z;
-    u8 unknown1E[0xA];
+struct ResultMarkerFeedback {
+    u16 phase, elapsed;
 };
 
 struct ResultMenu {
     struct Task task;
-    u8 unknown18[0x2E];
+    struct SceneVec cameraPosition, initialCameraPosition;
+    struct SceneVec revealStart, revealEnd;
+    u8 phaseStart;
+    u8 unknown39[3];
+    u32 phaseFrame;
+    s16 targetLeft, targetRight, targetCenter;
     u16 lastPressScore;
-    u8 unknown48[8];
+    u8 markerAnimationState, unknown49, nextFeedbackSlot;
+    u8 unknown4B[5];
     s32 level;
     u8 unknown54[0x20];
     void *messageTable, *owner;
-    u8 unknown7C[0x10];
+    struct SceneValueEquipment transformationResult;
     s32 playerPosition, playerVelocity;
     s32 targetMinimum, targetMaximum, targetPosition;
-    u8 unknownA0[8];
+    u16 trackingScore, trackingSamples, pressScoreTotal, pressSamples;
     s16 elapsed, timer;
     u16 countdown;
     u8 difficulty, phase;
-    u8 pressState, pressed, accelerationDelay, unknownB3;
+    u8 pressState, pressed, accelerationDelay;
+    s8 gaugeBrightness;
     u8 step, alpha, prompt, layer;
     u8 hideLevel, hideTimer;
-    u8 unknownBA[6];
+    u8 equipmentSlot, consumableSlot, wideTimingWindow;
+    u8 unknownBD[2], lastTimingGrade;
     u8 pressScore;
-    u8 unknownC1[0x43];
+    u8 revealPose, unknownC2[2], finishState;
+    u8 unknownC5[0x13];
+    s32 preciseCount, closeCount, missedCount;
+    u16 meterPalette[16];
     struct SceneInputResource primaryResource, secondaryResource;
     struct SceneInputWidget widgets[15];
-    struct ResultTutorialMarker markers[4];
-    u8 unknown784[0x1C];
+    struct SpriteDrawable markers[4];
+    u8 callbackPending;
+    u8 unknown785[3];
+    u32 unknown788;
+    struct ResultMarkerFeedback markerFeedback[5];
     u16 completionScript;
     u8 unknown7A2[2];
     void *update;
-    u8 unknown7A8[0x4C];
+    void (*gameUpdate)(struct ResultMenu *);
+    u8 unknown7AC[0x48];
 };
 
 struct ResultTutorialStep {

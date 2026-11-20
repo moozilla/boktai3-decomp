@@ -1,17 +1,13 @@
 #ifndef GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #define GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #include "engine.h"
+#include "scene_input_widget.h"
+#include "wireless_trade_menu.h"
 
 /* Layouts recovered from the item state handlers and display lifecycle.
  * Interpretations are tentative; unknown ranges retain their offsets. */
-struct WirelessGameResource {
-    u32 words[8];
-};
 struct WirelessGamePair {
     u32 x, y;
-};
-struct WirelessGameVector {
-    s16 x, y, z;
 };
 struct WirelessGamePosition {
     u16 x, y, z, unk6;
@@ -31,85 +27,76 @@ struct WirelessGameDrawing {
     u8 unkC[0xe];
     u8 changed;
     u8 unk1B[5];
+    // concession-ok(local-union): Item motion edits the halfwords and sprite placement copies the same two position words.
     union {
         struct WirelessGamePair words;
         struct WirelessGamePosition coords;
     } position;
     u8 unk28[0x38];
 };
+enum WirelessGameItemState {
+    WIRELESS_GAME_ITEM_HIDDEN = 0,
+    WIRELESS_GAME_ITEM_STEADY = 1,
+    WIRELESS_GAME_ITEM_BLINKING = 2,
+    WIRELESS_GAME_ITEM_MERGING = 3,
+    WIRELESS_GAME_ITEM_OUTGOING = 4,
+    WIRELESS_GAME_ITEM_INCOMING = 5,
+    WIRELESS_GAME_ITEM_SCATTERED = 6,
+    WIRELESS_GAME_ITEM_TEMPORARY = 7,
+};
+
 struct WirelessGameItem {
     u8 state, entered, pendingFlag, count, shakeTicks, unk5;
     s16 arcVelocity;
     u16 timer;
     u8 unkA[2];
-    struct WirelessGameVector start;
-    struct WirelessGameVector end;
-    struct WirelessGameVector drift;
+    struct ContactPosition start;
+    struct ContactPosition end;
+    struct ContactPosition drift;
     struct WirelessGameSprite sprite;
     struct WirelessGameDrawing drawing;
 };
+static inline void WirelessGameItem_EnterState(struct WirelessGameItem *item, u8 state)
+{
+    item->state = state;
+    item->entered = 1;
+    item->timer = 0;
+}
+
 struct WirelessGameItems {
     struct Task task;
     u8 current[4], pending[4];
     u8 sprite[0x1c]; /* animation-data descriptor, not a sprite instance */
-    struct WirelessGameResource resource;
+    struct SceneInputResource resource;
     struct WirelessGameItem items[16];
 };
 struct WirelessGameDisplay {
     struct Task task;
     u32 timer;
     u8 state, entered, finished, unk1F;
-    struct WirelessGameResource resource;
+    struct SceneInputResource resource;
     struct WirelessGameDrawing drawings[4];
-    struct WirelessGameResource extraResource;
+    struct SceneInputResource extraResource;
     struct WirelessGameDrawing extra[2];
 };
-struct WirelessGameRemoteStats {
-    u8 unk0[4];
-    u8 playerHealthPercent, opponentHealthPercent;
-};
-struct WirelessGameExchange {
-    u8 unk0[0x1e];
-    u16 roundCount;
-    u8 unk20[4];
-    u32 timer;
-    u8 state, entered;
-    u8 unk2A[3];
-    u8 playerDefeated, opponentDefeated, unk2F;
-    u8 pendingEvent, unk31, enabled;
-    u8 unk33[9];
-    u8 counts[4];
-    u8 unk40[2];
-    u8 itemMode;
-    u8 unk43[5];
-    struct WirelessGameRemoteStats remote;
-    u8 unk50[0x10];
-    struct WirelessGameDisplay *display;
-    u8 unk64[0x78];
-    s32 total;
-    u8 unkE0[2];
-    u16 weights[4];
-    u8 choice, counter;
-};
-struct WirelessGameExchange *WirelessExchange_Get(void);
 /* 0x02000100 */
 extern struct WirelessGameItems *gWirelessGameItems;
-int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *, int, int);
+int WirelessGameItems_QueueLocalItem(struct ContactPosition *, int, int);
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *);
 
 void WirelessGame_AddItem(void *p, int index);
 int WirelessGame_TryAddCyclingItem(void *owner);
 void WirelessGame_NotifyPlayerDefeated(void);
 void WirelessGame_NotifyOpponentDefeated(void);
-u32 sub_08039708(void);
+u32 WirelessGame_ConsumePendingEvent(void);
 u32 WirelessGame_GetRemotePlayerHealthPercent(void);
 u32 WirelessGame_GetRemoteOpponentHealthPercent(void);
 u32 WirelessGame_IsItemToggleEnabled(void);
 int WirelessGame_ToggleItemMode(void);
 u32 WirelessGame_GetRoundCount(void);
-void sub_080397C0(void);
+void WirelessGame_SuppressPlayerReset(void);
 void WirelessGame_AddWeightedScore(int index, int amount);
-u32 sub_08039800(void);
+u32 WirelessGame_IsRoundActive(void);
 void WirelessGame_ResetCyclingItemLatch(void);
 void WirelessGame_InitDisplayAndLinkCallbacks(struct WirelessGameExchange *p);
 void WirelessGame_RestartSession(void);

@@ -2,29 +2,9 @@
 #define GUARD_SPATIAL_INDEX_H
 
 #include "engine.h"
-#include "contact_position.h"
+#include "spatial_entry.h"
 #include "tilemap_panel.h"
 #include "background_controller.h"
-
-struct SpatialEntry;
-typedef void (*SpatialContactCallback)(void *owner, struct SpatialEntry *other);
-
-struct SpatialEntry {
-    u32 flags, mask, category; /* 0x00 */
-    u16 kind;                  /* 0x0C */
-    u8 hit, registrationFlags;
-    struct ContactPosition position; /* 0x10 */
-    struct ContactPosition extents;  /* 0x18 */
-    struct ContactPosition offset;   /* 0x20 */
-    struct ContactPosition screen;   /* 0x28 */
-    u8 unknown30;
-    s8 bucket;
-    s16 hitTimer;
-    s16 updateDelay; /* 0x34 */
-    u8 parameter, unknown37;
-    void *owner;                     /* 0x38 */
-    SpatialContactCallback callback; /* 0x3C: contact handler */
-};
 
 struct SpatialLink {
     struct SpatialEntry *entry;

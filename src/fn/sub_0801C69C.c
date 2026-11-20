@@ -1,15 +1,11 @@
-#include "global.h"
+#include "result_tutorial.h"
 
-void ResultGame_SetUpdateCallback(u8 *p, void *fn)
+void ResultGame_SetUpdateCallback(struct ResultMenu *menu, void (*callback)(struct ResultMenu *))
 {
-    u8 *a;
-    u32 zero;
-    *(void **)(p + 0x7a8) = fn;
-    a = p + 0x784;
-    zero = 0;
-    *a = 1;
-    *(u32 *)(p + 0x788) = zero;
-    *(u8 *)(p + 0xaf) = zero;
-    *(u16 *)(p + 0xaa) = zero;
-    *(u16 *)(p + 0xa8) = zero;
+    menu->gameUpdate = callback;
+    menu->callbackPending = 1;
+    menu->unknown788 = 0;
+    menu->phase = 0;
+    menu->timer = 0;
+    menu->elapsed = 0;
 }

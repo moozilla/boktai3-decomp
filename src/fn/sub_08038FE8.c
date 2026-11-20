@@ -1,8 +1,5 @@
+#include "wireless_trade_menu.h"
 #include "global.h"
-struct P {
-    u8 pad[0x24];
-    u32 w24;
-};
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 void Hud_SetMode(u32);
 void Video_SetRenderCallbacks(u32, void *, void *, void *);
@@ -10,20 +7,18 @@ void Script_Call(u32, u32);
 void SpriteOam_QueueProjectedSprites(void);
 void Sprite_RenderScaledList(void);
 void sub_08219624(void);
-void WirelessTradeMenu_UpdateExit(u8 *p)
+void WirelessTradeMenu_UpdateExit(struct WirelessGameExchange *p)
 {
-    u8 *f = p + 0x29;
-    if (*f != 0) {
-        u32 z = 0;
-        *f = z;
-        ScreenTransition_SendCommand(3, 3, 0, 0, z, 0xFFFF, z);
+    if (p->entered != 0) {
+        p->entered = 0;
+        ScreenTransition_SendCommand(3, 3, 0, 0, 0, 0xFFFF, 0);
     }
-    if (*(u32 *)(p + 0x24) == 10) {
+    if (p->timer == 10) {
         Hud_SetMode(7);
         Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                                  sub_08219624);
-        if (*(u32 *)(p + 0xd4) != 0)
-            Script_Call(*(u32 *)(p + 0xd4), 0);
+        if (p->completionScript != 0)
+            Script_Call(p->completionScript, 0);
     }
-    *(u32 *)(p + 0x24) += 1;
+    p->timer += 1;
 }

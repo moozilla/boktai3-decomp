@@ -10,7 +10,8 @@ struct SceneValueEquipmentDefinition {
     u16 baseValue;
     u8 unknown8[4];
     u8 modifierTextA, unknownD[3];
-    u8 modifierTextB, unknown11[15];
+    u8 modifierTextB, unknown11[4];
+    u8 gradeValues[3], unknown18[8];
 };
 struct SceneValueItemDefinition {
     u16 unknown0;

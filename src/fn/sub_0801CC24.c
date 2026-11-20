@@ -1,103 +1,74 @@
-#include "global.h"
+#include "result_tutorial.h"
 #include "player.h"
 extern int gUnk_0824DB94[];
 void ResultGame_ShowTargetMarker(void *);
 void ResultGame_SetPressVisibility(void *);
 void PlayerCue_BeginModeSeven(void *, int);
 void ResultMenu_SendCommand(void *, int, int, void *);
-void Sound_PlaySong(int);
 void ResultGame_HandlePress(void *);
-void ResultGame_ScorePress(void *);
+void ResultGame_ScorePress(struct ResultMenu *);
 void ResultGame_HidePressMarker(void *);
 void ResultGame_HideTargetMarker(void *);
-void ResultGame_SetUpdateCallback(void *, void *);
-void ResultGame_TrackTarget(void *);
-#define I(o) (*(int *)(p + (o)))
-#define H(o) (*(s16 *)(p + (o)))
-void ResultGame_TimedPress(u8 *p)
+void ResultGame_SetUpdateCallback(struct ResultMenu *, void (*)(struct ResultMenu *));
+void ResultGame_TrackTarget(struct ResultMenu *);
+enum ResultPressState { RESULT_PRESS_READY = 0, RESULT_PRESS_DISABLED = 255 };
+
+void ResultGame_TimedPress(struct ResultMenu *p)
 {
-    s16 k2 = 0;
-    switch (p[0xaf]) {
+    switch (p->phase) {
         case 0:
-            I(0x8c) = 0;
-            p[0xb3] = 0;
-            I(0x9c) = 1536;
+            p->playerPosition = 0;
+            p->gaugeBrightness = 0;
+            p->targetPosition = 1536;
             ResultGame_ShowTargetMarker(p);
             ResultGame_SetPressVisibility(p);
-            {
-                u8 *state = p + 0xb0;
-                int minus;
-                *state = 255;
-                p[0xb1] = 0;
-                ++p[0xaf];
-                {
-                    u8 *out = p + 0xbf;
-                    minus = -1;
-                    *out = minus;
-                }
-            }
+            p->pressState = RESULT_PRESS_DISABLED;
+            p->pressed = 0;
+            ++p->phase;
+            p->lastTimingGrade = 255;
             PlayerCue_BeginModeSeven(gPlayers[0], 1);
             ResultMenu_SendCommand(p, 0x35, 0, 0);
             Sound_PlaySong(0x4b2);
             break;
-        case 1: {
-            int zero;
-            int zeroByte;
-            int next = p[0xaf] + 1;
-            s16 *timer;
-            zero = 0;
-            p[0xaf] = next;
-            timer = (s16 *)(p + 0xaa);
-            zeroByte = k2;
-            *timer = 60;
-            H(0xa8) = zero;
-            p[0xb0] = 255;
-            p[0xb1] = zeroByte;
+        case 1:
+            ++p->phase;
+            p->timer = 60;
+            p->elapsed = 0;
+            p->pressState = RESULT_PRESS_DISABLED;
+            p->pressed = 0;
             break;
-        }
         case 2:
-            if ((*((s16 *)(p + 0xaa))) <= 0) {
-                ++p[0xaf];
-            }
+            if (p->timer <= 0)
+                ++p->phase;
             break;
         case 3:
-            I(0x8c) += 1024;
-            p[0xb0] = 255;
-            if (I(0x8c) > 5631) {
-                I(0x8c) = 5632;
-                {
-                    u8 *state = p + 0xaf;
-                    int next;
-                    int zero;
-                    next = *state + 1;
-                    zero = 0;
-                    *state = next;
-                    p[0xb0] = zero;
-                }
+            p->playerPosition += 1024;
+            p->pressState = RESULT_PRESS_DISABLED;
+            if (p->playerPosition > 5631) {
+                p->playerPosition = 5632;
+                ++p->phase;
+                p->pressState = RESULT_PRESS_READY;
             }
             break;
         case 4:
-            I(0x8c) -= gUnk_0824DB94[I(0x50)];
+            p->playerPosition -= gUnk_0824DB94[p->level];
             ResultGame_HandlePress(p);
-            if (I(0x8c) <= 0) {
-                {
-                    int signedState = (s8)p[0xb0];
-                    if (signedState == 0) {
-                        ResultGame_ScorePress(p);
-                        ResultGame_HidePressMarker(p);
-                        ResultMenu_SendCommand(p, 0x34, 0, 0);
-                        p[0xb1] = 1;
-                    }
+            if (p->playerPosition <= 0) {
+                if ((s8)p->pressState == RESULT_PRESS_READY) {
+                    ResultGame_ScorePress(p);
+                    ResultGame_HidePressMarker(p);
+                    ResultMenu_SendCommand(p, 0x34, 0, 0);
+                    p->pressed = 1;
                 }
-                p[0xb0] = 255;
-                I(0x8c) = 0;
-                p[0xaf] = 3;
-                if (p[0xc4] == 1 || H(0xa8) > 899) {
+                p->pressState = RESULT_PRESS_DISABLED;
+                p->playerPosition = 0;
+                p->phase = 3;
+                if (p->finishState == 1 || p->elapsed > 899) {
                     ResultGame_SetUpdateCallback(p, ResultGame_TrackTarget);
                     ResultGame_HideTargetMarker(p);
                     ResultGame_HidePressMarker(p);
-                    if (p[0xc4] == 1) {
-                        p[0xc4] = 2;
+                    if (p->finishState == 1) {
+                        p->finishState = 2;
                     } else {
                         ResultMenu_SendCommand(p, 0x36, 0, 0);
                         PlayerCue_BeginModeSeven(gPlayers[0], 0);
@@ -106,9 +77,9 @@ void ResultGame_TimedPress(u8 *p)
             }
             break;
     }
-    p[0xb3] = Div(H(0xa8) << 5, 900);
-    ++H(0xa8);
-    --H(0xaa);
-    if (H(0xa8) > 900)
-        H(0xa8) = 900;
+    p->gaugeBrightness = Div(p->elapsed << 5, 900);
+    ++p->elapsed;
+    --p->timer;
+    if (p->elapsed > 900)
+        p->elapsed = 900;
 }
