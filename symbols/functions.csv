@@ -5737,6 +5737,7 @@ addr,name,mode,confidence,source,notes
 081581AC,Player_TestMovementPosition,thumb,low,src-alias,
 08158234,Player_ClampInteractionVelocity,thumb,low,src-alias,
 08158320,Player_UpdateInteractionHoverDisplay,thumb,low,src-alias,
+0815849C,Player_UpdateInteractionCallbacks,thumb,low,src-alias,Dispatches the interaction callback and updates the player camera and movement.
 08158588,Player_SelectAlternateInteractionMode,thumb,low,src-alias,
 08158650,Player_SynchronizeInteractionDisplay,thumb,low,src-alias,
 08158848,Player_UpdateLinkModeMovement,thumb,low,src-alias,
