@@ -211,6 +211,15 @@ class Warnings(unittest.TestCase):
                          [(2, "literal-local"), (3, "literal-local"), (5, "const-local"),
                           (6, "literal-local")])
 
+    def test_member_write_does_not_modify_a_same_named_local(self):
+        body = """void update(struct Actor *actor, struct Sprite sprite) {
+    int state = 4;
+    actor -> state = state;
+    sprite.state++;
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])

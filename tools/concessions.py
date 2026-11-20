@@ -236,6 +236,8 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    # A write to actor->state or sprite.state cannot modify a local named state.
+    locals_only = re.sub(r"(?:->|\.)\s*[A-Za-z_]\w*", lambda m: "@" * len(m[0]), code)
     for name, pos, end in _literal_initializers(code):
         if re.fullmatch(_NUMBER_NAME, name):
             yield pos, "const-local"
@@ -252,7 +254,7 @@ def _warn_sites(code: str):
             i += 1
         n = re.escape(name)
         changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[end:i])
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), locals_only[end:i])
         if not changed:
             yield pos, "literal-local"
     for m in _ONCE_END.finditer(code):
