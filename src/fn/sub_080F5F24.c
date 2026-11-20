@@ -93,20 +93,11 @@ void Sword_BeginRestOrbit(struct StretchPart *p)
         p->flags4E &= ~4;
         p->paramA6 = 16;
         p->param52 = 16;
-        {
-            u32 off = 0x16C;
-            u32 addr;
-            addr = (u32)p + off;
-            *(void **)addr = Ivy_BeginChildPulse;
-        }
+        p->callback = Ivy_BeginChildPulse;
     }
     {
-        u32 off = 0x16c;
-        u8 *address;
-        void *callback;
-        address = (u8 *)p + off;
-        callback = *(void **)address;
-        if (callback)
-            Callback_InvokeActor(p, callback);
+        void (*update)(struct StretchPart *) = p->callback;
+        if (update)
+            Callback_InvokeActor(p, update);
     }
 }
