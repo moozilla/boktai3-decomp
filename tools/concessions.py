@@ -42,6 +42,8 @@ its spelling, so each one is a question, not a verdict:
   (`(u16)x >> 16`, `(x & 31) >> 5`); rejected speculative combinations do not count.
   These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
   instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
+* `dead-local-update`: a block initializes a scalar and updates only that scalar using
+  its own value and integer constants, then discards it.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
@@ -75,7 +77,7 @@ EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatil
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
-        "placeholder-name", "volatile-view", "local-union")
+        "placeholder-name", "volatile-view", "local-union", "dead-local-update")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -110,6 +112,18 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+_INTEGER_SCALAR = r"[us](?:8|16|32|64)"
+_SCALAR_DECLARATOR = rf"\w+(?:\s*=\s*{_LITERAL})?"
+_SCALAR_DECLARATION_GROUP = re.compile(
+    rf"(?m)^[ \t]+(?:const[ \t]+)?{_INTEGER_SCALAR}[ \t]+"
+    rf"(?P<declarations>{_SCALAR_DECLARATOR}(?:\s*,\s*{_SCALAR_DECLARATOR})+)\s*;"
+)
+_NUMBER_DECLARATOR = re.compile(rf"{_NUMBER_NAME}(?:\s*=\s*{_LITERAL})?")
+_DEAD_LOCAL_BLOCK = re.compile(
+    rf"(?m)^[ \t]*\{{\s*{_INTEGER_SCALAR}\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
+    rf"(?:\(\s*{_INTEGER_SCALAR}\s*\)\s*)?(?:[A-Za-z_]\w*|{_LITERAL})\s*;"
+    r"(?P<updates>(?:\s*(?P=name)\s*(?:<<|>>|[-+*/%&^|])?=(?!=)[^;{}]+;)+)\s*\}"
+)
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -211,6 +225,17 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    for m in _SCALAR_DECLARATION_GROUP.finditer(code):
+        for declaration in m["declarations"].split(","):
+            if _NUMBER_DECLARATOR.fullmatch(declaration.strip()):
+                yield m.start(), "const-local"
+                break
+    for m in _DEAD_LOCAL_BLOCK.finditer(code):
+        updates = m["updates"]
+        name = re.escape(m["name"])
+        operators = re.sub(rf"(?<!\w)(?:{name}|{_LITERAL})(?!\w)", "", updates)
+        if re.fullmatch(r"[\s()+\-*/%&|^~<>=!;]+", operators):
+            yield m.start("updates") + len(updates) - len(updates.lstrip()), "dead-local-update"
     for m in _LITERAL_LOCAL.finditer(code):
         name = m.group(1)
         if re.fullmatch(_NUMBER_NAME, name):

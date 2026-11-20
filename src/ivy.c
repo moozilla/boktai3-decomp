@@ -23,6 +23,7 @@
 #include "scene_actor_animation.h"
 #include "scene_actor_registry.h"
 #include "scene_actor_state.h"
+#include "scene_actor_drawable_flags.h"
 #include "scene_body_api.h"
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_init_group.h"
@@ -106,18 +107,9 @@ void Ivy_UpdateActiveState(u8 *p)
 
 void Sound_PlaySong(u32);
 
-static inline u8 TakePrepared(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
 {
-    if (TakePrepared(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u8 *drawable = actor->base.drawable;
         u32 zero = 0;
         drawable[7] = 2;
@@ -140,13 +132,11 @@ void SceneActorReaction_PlayHiddenCue(struct ChaseActor *actor)
 
 /* Ivy_UpdateInactiveState: Empty Ivy state handler; inactive role is tentative */
 
-
 void Ivy_UpdateInactiveState(void)
 {
 }
 
 /* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
-
 
 static inline u8 Consume(u8 *flag)
 {
@@ -281,8 +271,8 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
             pos.z = actor->base.body.position.z + gUnk_08606384[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gPlayers[target->kind], (void *)&pos,
-                                            0, 0, flip, 0, 0, 0, 0);
+                Player_BeginPositionRequest((void *)gPlayers[target->kind], (void *)&pos, 0, 0,
+                                            flip, 0, 0, 0, 0);
             } else if (target->kind == 4) {
                 struct ChaseActor *t = target->actor;
                 t->base.colliderA.responseValue = 0;
@@ -313,32 +303,6 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 
 void Ivy_UpdateActiveState(u8 *p);
 
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void SetStateB(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = two;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
@@ -356,8 +320,8 @@ void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
     if (actor->base.restart) {
-        SetControl(actor, Ivy_UpdateActiveState, 0x22);
-        SetStateB(actor);
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
+        SceneActorChase_SetBehavior(actor, 2);
     }
 }
 
@@ -743,16 +707,6 @@ struct IvyTransitionActor {
     u16 animationFlags;
 };
 
-static inline void ResetPhase(u8 *p)
-{
-    u8 *state = &((struct IvyTransitionActor *)p)->phase;
-    *state = 0;
-    ((struct IvyTransitionActor *)p)->subphase = 0;
-    ((struct IvyTransitionActor *)p)->phaseFlags = 0;
-    *(u32 *)(p + 0x2AC) = 0;
-    ((struct IvyTransitionActor *)p)->restart = 1;
-}
-
 struct IvyTransitionAnimation {
     u8 unknown0[7];
     u8 mode;
@@ -788,20 +742,9 @@ static inline void Ivy_SetBlend(u8 *p)
 
 static inline void Ivy_EnterActive(u8 *p, void (*callback)(void), u32 kind)
 {
-    u8 *prepared = &((struct IvyTransitionActor *)p)->prepared;
-    u32 one = 1;
-    *prepared = one;
-    ((struct IvyTransitionActor *)p)->active = 0;
-    ((struct IvyTransitionActor *)p)->kind = kind;
-    *(void (**)(void))(p + 0x21C) = callback;
-    *(u16 *)(p + 0x2C8) = 0;
-    {
-        u32 *flags = (u32 *)(p + 0x114);
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    *(u32 *)(p + 0x104) = 0;
-    ResetPhase(p);
+    struct ChaseActor *actor = (void *)p;
+    SceneActorChase_SetControl(actor, callback, kind);
+    SceneActorChase_SetBehavior(actor, 0);
 }
 
 static inline void Ivy_ClearHalf(u8 *p, u32 offset, u32 bits)
@@ -816,7 +759,9 @@ static inline void Ivy_ClearHalf(u8 *p, u32 offset, u32 bits)
 
 void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 {
-    struct IvyTransitionAnimation *animation = (void *)((*((u8 **)(p + 4))) + 0x48);
+    struct ChaseActor *actor = (void *)p;
+    struct DisplaySequenceState *animation =
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     if (SceneActorControl_TakeFlag(&((struct IvyTransitionActor *)p)->prepared)) {
         SceneActorAnimation_SelectDirectionalFlags((struct RoomActor *)p, 3);
         ((struct IvyTransitionActor *)p)->complete = 0;
@@ -825,10 +770,10 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
         Ivy_SetHalf(p, 0x2D4, 0x20);
     }
     Ivy_SetHalf(p, 0x2D6, 0x10);
-    if ((((frame <= 17) && (animation->count == 0)) &&
-         (animation->frame == (animation->mode != 0))) &&
-        (animation->mode != 1))
-        animation->frame = 0;
+    if ((((frame <= 17) && (animation->index == 0)) &&
+         (animation->elapsed == (animation->duration != 0))) &&
+        (animation->duration != 1))
+        animation->elapsed = 0;
     if (((struct IvyTransitionActor *)p)->complete) {
         ((struct IvyTransitionActor *)p)->active = 0;
         Ivy_ClearHalf(p, 0x2D4, 0x20);
@@ -846,14 +791,7 @@ void Ivy_UpdateRestartFlags(u8 *p)
     if (TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalFlags(p, 0x10);
     if (*(u8 *)(p + 0x2B3)) {
-        u32 one = 1;
-        if (*(u8 *)(p + 8) == 0) {
-            u32 *q = *(u32 **)(p + 4);
-            *q |= one;
-        } else {
-            u32 *q = (u32 *)((u8 *)*(u32 **)(p + 4) + 0x20);
-            q[2] |= one;
-        }
+        ActorStatus_SetDrawableFlags((void *)p, 1);
         *(u8 *)(p + 0x2B0) = 1;
     }
 }
@@ -1118,17 +1056,13 @@ struct DefeatContext {
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
+        // concession-ok(const-local): CpuSet reads this fixed word twice to clear the launch vector.
         u32 zero;
         s32 values[8];
     } buf;
-    struct DefeatContext *context = actor->base.context;
+    struct Ivy *context = actor->base.context;
     u32 *drawable = actor->base.drawable;
     u8 *categoryp;
-    u32 wrap;
-    u32 bits;
-    s32 count;
-    s32 life;
-    s32 size;
     if (SceneActorReaction_TakePrepared(actor)) {
         struct ContactPosition vec;
         s32 single;
@@ -1162,7 +1096,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         if (hidden)
             Sound_PlaySong(0xE5);
         else {
-            u32 *script = (u32 *)((u8 *)context + 0x638);
+            u32 *script = &context->field638;
             if (*script) {
                 single = actor->base.body.id;
                 arguments.count = 1;
@@ -1181,12 +1115,9 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             if (h <= 0)
                 h = 0;
             actor->base.health = h;
-            {
-                u32 bit = 0x40;
-                actor->base.motionFlags &= ~bit;
-            }
-            SetState(actor, 0, 0, 1);
-            SetCtl(actor, (void *)SceneActorReaction_PlayHiddenCue, 0x2A);
+            SceneActorChase_ClearMotionFlagComponent(actor, 0x40);
+            SceneActorChase_SetBehavior(actor, 1);
+            SceneActorChase_SetControl(actor, SceneActorReaction_PlayHiddenCue, 0x2A);
             {
                 struct ContactCollider *collider = &actor->base.colliderA;
                 {
@@ -1194,23 +1125,13 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                     collider->flags = (collider->flags | 8 | hidden) & ~bit;
                 }
             }
-            {
-                u32 bit = 0x800;
-                actor->base.placementFlags &= ~bit;
-            }
+            SceneActorChase_ClearFlagComponent((void *)&actor->base.placementFlags, 0x800);
             return;
         }
     }
-    wrap = 1023;
-    bits = 3;
-    count = 4;
-    life = 20;
     if (SaveFlag(0x400)) {
         Sound_PlaySong(0xE5);
-        {
-            u32 m = 0x1000;
-            actor->base.reactionFlags = m | actor->base.reactionFlags;
-        }
+        SceneActorChase_SetReactionFlags(actor, 0x1000);
         categoryp = &actor->base.category;
     } else {
         struct ContactPackedVector range;
@@ -1256,8 +1177,8 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
     if (!Flag(actor, 0x4000, 0x2D4) && (u32)(*categoryp - 11) > 2)
         Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-    SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-    SetState(actor, 1, 0, 2);
+    SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
+    SceneActorChase_SetTypedState(actor, 1, 0, 2);
     COUNT(0x87C);
     COUNT(0x538);
     RecordKill(actor, categoryp);
@@ -1280,8 +1201,7 @@ struct S {
 s32 Ivy_SetAuxiliaryColliderFlag(struct S *s)
 {
     struct T *t = &s->t;
-    u32 m = 4;
-    t->flags = m | t->flags;
+    t->flags = 4 | t->flags;
     return 1;
 }
 
@@ -1308,48 +1228,9 @@ static inline void SetCollider(struct ContactCollider *collider)
     collider->flags = flags;
 }
 
-static inline void BeginTargetControl(struct ChaseActor *actor, s32 zero)
-{
-    u32 three = 3;
-    u32 stateOffset = 0x2A8;
-    u32 phaseOffset = 0x2A9;
-    u8 *field = (u8 *)actor + stateOffset;
-    *field = three;
-    field = (u8 *)actor + phaseOffset;
-    *field = zero;
-    stateOffset += 2;
-    field = (u8 *)actor + stateOffset;
-    *field = zero;
-    phaseOffset += 3;
-    *(u32 *)((u8 *)actor + phaseOffset) = zero;
-    stateOffset += 7;
-    field = (u8 *)actor + stateOffset;
-    *field = 1;
-    {
-        void *callback = Ivy_UpdateGrabAttack;
-        stateOffset += 1;
-        *((u8 *)actor + stateOffset) = 1;
-        phaseOffset = 0x2B0;
-        *((u8 *)actor + phaseOffset) = zero;
-        stateOffset += 3;
-        *((u8 *)actor + stateOffset) = three;
-        phaseOffset -= 0x94;
-        *(void **)((u8 *)actor + phaseOffset) = callback;
-        stateOffset += 0x13;
-        *(u16 *)((u8 *)actor + stateOffset) = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags = mask & *flags;
-        }
-        actor->base.pendingControl = zero;
-    }
-}
-
 void SceneActorControl_WaitForTarget(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    s32 zero;
     struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetCollider(&actor->base.colliderA);
@@ -1359,14 +1240,11 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
         state->targetMissFrames++;
     else
         state->targetMissFrames = 0;
-    if ((s32)actor->base.counter2AC > 30 && (zero = state->targetMissFrames) == 0) {
-        BeginTargetControl(actor, zero);
+    if ((s32)actor->base.counter2AC > 30 && state->targetMissFrames == 0) {
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, Ivy_UpdateGrabAttack, 3);
     }
-    {
-        u32 offset = 0x2AC;
-        u32 *counter = (void *)((u8 *)actor + offset);
-        *counter += 1;
-    }
+    actor->base.counter2AC++;
 }
 
 /* The collider's flags as a 16-bit bitfield: the read-modify-write leaves the zeros that the
@@ -1379,37 +1257,12 @@ struct IvyColliderBits {
 
 #define SceneActorControl_UpdateDirectionalIdle Ivy_UpdateActiveState
 
-static inline void BeginControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void ResetPhase_UpdateTargetApproachPhase(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
 {
     struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = SceneActorReaction_PlayHiddenCue;
-        u32 kind = 0x2A;
-        BeginControl(actor, callback, kind);
+        SceneActorChase_SetControl(actor, callback, 0x2A);
         state->targetMissFrames = 0;
     }
     if (actor->base.stepDone) {
@@ -1422,8 +1275,8 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
             u32 mask = ~0x800;
             *flags = mask & *flags;
         }
-        BeginControl(actor, Ivy_UpdateActiveState, 0x22);
-        ResetPhase_UpdateTargetApproachPhase(actor, 2);
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
+        SceneActorChase_SetBehavior(actor, 2);
     }
     actor->base.counter2AC++;
 }
@@ -1432,39 +1285,14 @@ void SceneActorControl_UpdateTargetApproachPhase(struct ChaseActor *actor)
    arguments, the early address and the local constants give the ROM's
    instruction order: agbcc emits code in source evaluation order. */
 
-static inline void Ivy_BeginHold(u8 *p, void (*update)(), u8 state)
+void Ivy_WaitForHold(struct ChaseActor *actor)
 {
-    u8 *active = &p[0x2B2];
-    u32 zero = 0;
-    *active = 1;
-    p[0x2B0] = zero;
-    p[0x2B5] = state;
-    *(void (**)())(p + 0x21C) = update;
-    *(u16 *)(p + 0x2C8) = zero;
-    {
-        u32 *flags = (u32 *)(p + 0x114);
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    *(u32 *)(p + 0x104) = zero;
-    {
-        u8 two = 2;
-        p[0x2A8] = 0;
-        p[0x2A9] = two;
-    }
-    p[0x2AA] = 1;
-    *(u32 *)(p + 0x2AC) = zero;
-    p[0x2B1] = 1;
-}
-
-void Ivy_WaitForHold(u8 *p)
-{
-    if (p[0x2B1])
-        p[0x2B1] = 0;
-    if (p[0x2B0])
-        Ivy_BeginHold(p, Ivy_UpdateHold, 0x25);
-    else
-        (*(u32 *)(p + 0x2AC))++;
+    SceneActorControl_TakeStateEntry(actor);
+    if (actor->base.stepDone) {
+        SceneActorChase_SetControl(actor, Ivy_UpdateHold, 0x25);
+        SceneActorChase_SetPhase(actor, 2, 1);
+    } else
+        actor->base.counter2AC++;
 }
 
 struct SClearAnimationRestartFlag {
@@ -1495,61 +1323,21 @@ void Ivy_WaitThenResetPhase(u8 *p)
 
 void Ivy_BeginRelease(struct ChaseActor *actor);
 
-static inline u8 TakeReset(struct ChaseActor *actor)
-{
-    u8 *flag = &actor->base.field2B1;
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void SetState_WaitThenBeginRelease(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = two;
-    actor->base.behavior2AA = two;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
-    }
-}
-
 void Ivy_WaitThenBeginRelease(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
-        SetControl(actor, Ivy_BeginRelease, 0x29);
-        SetState_WaitThenBeginRelease(actor);
-    }
-}
-
-static inline void SetStateB_WaitThenResumeActive(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = two;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
+        SceneActorChase_SetControl(actor, Ivy_BeginRelease, 0x29);
+        SceneActorChase_SetPhase(actor, 2, 2);
     }
 }
 
 void Ivy_WaitThenResumeActive(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
-        SetControl(actor, Ivy_UpdateActiveState, 0x22);
-        SetStateB_WaitThenResumeActive(actor);
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
+        SceneActorChase_SetPhase(actor, 0, 2);
     }
 }
 
@@ -1572,22 +1360,10 @@ void Ivy_WaitLimitThenResetPhase(u8 *p)
 
 void SceneActorTerrain_DisableCollision(void *);
 
-static inline void Hide(struct ChaseActor *actor)
-{
-    u32 mask = 1;
-    if (!actor->base.drawableKind) {
-        u32 *flags = actor->base.drawable;
-        *flags |= mask;
-    } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-        tile->flags |= mask;
-    }
-}
-
 void SceneActorControl_HideAndDisableCollision(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
         {
             u32 state = 3;
             u8 *field = &actor->base.state2A8;
@@ -1608,14 +1384,11 @@ void Ivy_UpdateRestartFlags(u8 *p);
 void Ivy_UpdateIdle(struct ChaseActor *actor)
 {
     if (Chase_TakeArrived(actor))
-        Chase_SetCtl(actor, Ivy_UpdateRestartFlags, 0x2E);
+        SceneActorChase_SetControl(actor, Ivy_UpdateRestartFlags, 0x2E);
     if (actor->base.stepDone) {
-        Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
-        Chase_SetState(actor, 3, 0, 0);
-        {
-            u32 bit = 0x1000;
-            actor->base.reactionFlags = bit | actor->base.reactionFlags;
-        }
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetReactionFlags(actor, 0x1000);
     }
 }
 
@@ -1644,40 +1417,6 @@ void Ivy_InitControlPresets(struct SInitControlPresets *s)
 
 void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame);
 
-static inline void BeginTransition(struct ChaseActor *actor, u16 zero, u32 offset)
-{
-    u32 state = 3;
-    u32 stateOffset = 0x2A8;
-    u8 *field = (u8 *)actor + stateOffset;
-    *field = state;
-    offset -= 0x2B;
-    *((u8 *)actor + offset) = zero;
-    actor->base.behavior2AA = zero;
-    stateOffset += 4;
-    *(u32 *)((u8 *)actor + stateOffset) = zero;
-    offset += 8;
-    *((u8 *)actor + offset) = 1;
-    {
-        void *callback = SceneActorControl_UpdateAnimationTransition;
-        u32 kind = 0x2B;
-        offset++;
-        *((u8 *)actor + offset) = 1;
-        stateOffset = 0x2B0;
-        *((u8 *)actor + stateOffset) = zero;
-        offset += 3;
-        *((u8 *)actor + offset) = kind;
-        stateOffset -= 0x94;
-        *(void **)((u8 *)actor + stateOffset) = callback;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-    }
-}
-
 s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
 {
     u16 *flags;
@@ -1692,12 +1431,13 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
     {
         u32 mask = 0x100;
         offset = 0x2D4;
-        flags = (void *)((u8 *)actor + offset);
+        flags = &actor->base.motionFlags;
         value = *flags;
         suppressed = mask & value;
     }
     if (!suppressed) {
-        BeginTransition(actor, suppressed, offset);
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_UpdateAnimationTransition, 0x2B);
         result = 1;
     } else {
         u32 mask = ~0x20;
@@ -1748,8 +1488,8 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
         }
         ((u8 *)actor->base.drawable)[7] = 2;
     }
-    SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-    SetState(actor, 0, 0, 3);
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+    SceneActorChase_SetBehavior(actor, 3);
     {
         struct ContactCollider *collider = &actor->base.colliderA;
         collider->flags |= 4;
@@ -1801,8 +1541,7 @@ struct IvyPlacement {
 
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
- * display sequence (the step is ScenePanelRig_TickSprites's, with the same pins). The drawable
- * pointer passes through r0, as in the ROM. */
+ * display sequence. */
 
 void Ivy_TickDrawable(struct ChaseActor *actor)
 {
@@ -1844,8 +1583,8 @@ void SceneActor_InitCollision5005(struct ChaseActor *actor)
     bodySize.packed.z = 0x40;
     *(u32 *)&bodyOffset = 0x800000;
     *(u32 *)((u8 *)&bodyOffset + 4) &= 0xFFFF0000;
-    SceneActorCollision_InitBodyWithFlags(actor, &bodySize, &bodyOffset, Ivy_OnPrimaryContact, actor,
-                                          0x5005);
+    SceneActorCollision_InitBodyWithFlags(actor, &bodySize, &bodyOffset, Ivy_OnPrimaryContact,
+                                          actor, 0x5005);
     *(u32 *)&attackSize = 0;
     *(u32 *)((u8 *)&attackSize + 4) &= 0xFFFF0000;
     *(u32 *)&attackOffset = 0;
@@ -1902,10 +1641,7 @@ void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
         u32 blocked = 0x1000;
         struct ContactPosition *delta = &difference;
         const struct ContactPosition *origin = &actor->base.body.position;
-        {
-            u32 address = (u32)gPlayers;
-            slot = (struct Player **)address;
-        }
+        slot = gPlayers;
         i = 0;
         do {
             struct Player *player = *slot;
@@ -1918,7 +1654,7 @@ void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
                 distance = delta->x * delta->x + delta->z * delta->z;
                 if (limit > distance) {
                     limit = distance;
-                    target = &(*slot)->positionalEffectGroup;
+                    target = &((struct SceneActorChasePlayer *)*slot)->target;
                 }
             }
             slot++;
@@ -2341,6 +2077,7 @@ s32 Ivy_Init(void *object)
     struct ChaseActor *arg0 = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
+    // concession-ok(const-local): Both CpuSet fills read the same fixed source word.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
@@ -2684,7 +2421,6 @@ void Armor_PlacePrimaryCollider(struct Sub080F2028Actor *actor)
 }
 
 // confidence=low: trigonometric offsets position the main and four paired part colliders.
-
 
 struct ArmorPosition {
     s32 x : 16;

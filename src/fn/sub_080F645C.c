@@ -34,7 +34,6 @@ static inline s32 SubtractDamage(u16 *health, u16 *damage)
 }
 void Sword_UpdateDamage(u8 *p)
 {
-    u32 flags;
     u32 zero;
     if (U(p, 0xcb4))
         U(p, 0xcb4)--;
@@ -54,23 +53,20 @@ void Sword_UpdateDamage(u8 *p)
         *((s16 *)(p + 0xd78)) = zero;
         if ((*((s16 *)(p + 0x7e))) <= 0) {
             do {
+                u32 flags;
                 setState((void *)p, 1, 6);
                 *(void (**)(void))(p + 0xcc8) = Ivy_UpdateDefeatBurst;
                 H(gGameState, 0x87C) =
                     H(gGameState, 0x87C) < 9999 ? H(gGameState, 0x87C) + 1 : 9999;
                 {
                     u8 *g = gGameState;
-                    u32 off = 0x538;
                     s16 *q;
                     u32 v;
-                    q = (s16 *)(g + off);
+                    q = (s16 *)(g + 0x538);
                     v = *(u16 *)q;
                     *q = *q < 9999 ? v + 1 : 9999;
                 }
-                {
-                    u32 read = *((u32 *)(p + 0xCA8));
-                    flags = read;
-                }
+                flags = W(p, 0xCA8);
                 do {
                     *((s16 *)(gGameState + 0x548)) = ((*((s16 *)(gGameState + 0x548))) < 9999)
                                                          ? ((*((s16 *)(gGameState + 0x548))) + 1)

@@ -238,6 +238,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
+| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #compiler #matching #monsters #phase3 | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -394,6 +395,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/monster_init_primitives_2026-10-30.md](../notes/monster_init_primitives_2026-10-30.md) | Shared initializer script and terrain operations | *#scripts #text* | 5 |
 | [notes/monster_init_shared_groups_2026-10-30.md](../notes/monster_init_shared_groups_2026-10-30.md) | Shared monster initialization groups | *#actors* | 4 |
 | [notes/monsters-units_2026-11-13.md](../notes/monsters-units_2026-11-13.md) | Monsters unit cleanup | #monsters #cleanup #ghoul #slime | 4 |
+| [notes/monsters2-source-recovery_2026-11-20.md](../notes/monsters2-source-recovery_2026-11-20.md) | Golem through Axe source recovery | #monsters #matching #compiler #phase3 #structs | 1 |
 | [notes/named-actor-move-mode-round9.md](../notes/named-actor-move-mode-round9.md) | NamedActor_SetMoveModeFromScript | #matching #round9b #named-object | 0 |
 | [notes/named-object-create-round9.md](../notes/named-object-create-round9.md) | NamedObject_CreateFromScript | #matching #round9b #named-object | 1 |
 | [notes/native-effect-profile-round9.md](../notes/native-effect-profile-round9.md) | NativeEffect_CreateFromProfile |  | 1 |

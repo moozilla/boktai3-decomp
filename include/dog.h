@@ -15,7 +15,7 @@ struct Dog {
     u32 currentSpeed;
     u16 timer690;
     u16 limitX, limitZ;
-    u8 unknown696[2];
+    u16 actionCooldown; /* Counts down beside the near and far attack timers. */
     u16 nearTimer;
     u16 farTimer;
     u16 nearDistance, farDistance;

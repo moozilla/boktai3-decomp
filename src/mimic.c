@@ -1,4 +1,5 @@
 #include "mimic.h"
+#include "scene_actor_visibility.h"
 
 static inline void SaveControl(struct MimicDeferredResponse *packet, void *control, u8 behavior)
 {
@@ -7,23 +8,6 @@ static inline void SaveControl(struct MimicDeferredResponse *packet, void *contr
     packet->state = 0;
     packet->phase = 0;
     packet->behavior = behavior;
-}
-
-static inline void ClearContextFlag(u16 *flags, u32 zero)
-{
-    s32 mask = zero - 2;
-    mask &= *flags;
-    *flags = mask;
-}
-
-static inline u32 SaveStoppedControl(struct MimicDeferredResponse *packet, void *control)
-{
-    packet->delay = 30;
-    packet->control = control;
-    packet->state = 0;
-    packet->phase = 0;
-    packet->behavior = 0;
-    return 0;
 }
 
 static inline void clearRouteFlag(u32 *flags)
@@ -72,11 +56,9 @@ static inline void Mimic_SaveRouteControl(struct ChaseActor *actor, struct Mimic
         ClearSavedFlags(flags, ~0xc0);
         SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.onAlternateEntry, 2);
     } else {
-        u32 zero;
-        ClearSavedFlags(flags, ~0xc0);
-        zero = SaveStoppedControl((struct MimicDeferredResponse *)&group->saved,
-                                  actor->base.onStanding);
-        ClearContextFlag(&context->reactionFlags, zero);
+        ClearSavedFlags(flags, ~0xC0);
+        SaveControl((struct MimicDeferredResponse *)&group->saved, actor->base.onStanding, 0);
+        SceneActorChase_ClearBits(&context->reactionFlags, 1);
     }
     actor->base.field2C2 = 0x40;
 }
@@ -87,11 +69,11 @@ void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
 {
     struct Mimic *context = actor->base.context;
     if (MimicChase_TakeArrived(actor)) {
-        struct SceneActorReactionMotion *motion;
+        struct SceneActorChaseTracking *motion;
         struct SceneActorRegistryControl *control;
         u16 *flags;
-        motion = (void *)&actor->base.tracking.target;
-        motion->fieldDC = 0;
+        motion = &actor->base.tracking;
+        motion->target = NULL;
         {
             u16 *h;
             u32 v;
@@ -150,7 +132,7 @@ void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
             mode->bits |= mask;
         }
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-        MimicChase_SetState(actor, 3, 1, 0);
+        SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         {
             void *route = actor->group.route;
@@ -355,22 +337,8 @@ void SceneActor_RestoreSavedTargetOnCompletion(struct ChaseActor *actor)
             struct ContactCollider *collider = &actor->base.colliderA;
             collider->flags &= 0xFFFB;
             saved = actor->base.onStanding;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = 0;
-            actor->base.target = saved;
-            actor->base.field2C8 = 0;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 clear = ~1;
-                *flags &= clear;
-            }
-            actor->base.pendingControl = 0;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
+            SceneActorChase_SetControl(actor, saved, 0);
+            SceneActorChase_SetBehavior(actor, 0);
         }
     }
 }
@@ -403,28 +371,6 @@ void SceneActor_WaitForCategoryAttachment(struct ChaseActor *actor, s32 frame)
     }
 }
 
-static inline u8 DrawableVisible(struct ChaseActor *actor)
-{
-    u32 mask = 1;
-    if (!actor->base.drawableKind) {
-        if (((struct ActorSprite *)actor->base.drawable)->flags & mask)
-            return 1;
-        return 0;
-    }
-    if (((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 static inline void ResetElapsed(struct DisplaySequenceState *sequence)
 {
     sequence->elapsed = 0;
@@ -454,7 +400,7 @@ void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
     if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
         u16 script;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-        SetState(actor, 1, 0, 2);
+        SceneActorChase_SetState(actor, 1, 0, 2);
         ((struct ActorSprite *)actor->base.drawable)->flags |= 1;
         ActorShadow_Disable(actor->base.shadow);
         SceneActorBehavior_CallTerrainScript(actor);
@@ -473,12 +419,12 @@ void Mimic_UpdateDefeatBlink(struct ChaseActor *actor, s32 frame)
             Script_Call(script, &arguments);
         }
         {
-            u32 m = 0x4000;
-            if (!(actor->base.motionFlags & m) && (u32)(actor->base.category - 11) > 2)
+            if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+                (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         }
-    } else if (DrawableVisible(actor))
+    } else if (SceneActorVisibility_IsHidden(actor))
         ActorShadow_Disable(actor->base.shadow);
     else
         ActorShadow_Enable(actor->base.shadow);
@@ -501,15 +447,6 @@ static inline void ClearBits(u16 *field, u32 bits)
     *field &= ~bits;
 }
 
-static inline void SetBehavior(struct ChaseActor *actor, u32 b)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
 {
     s16 *px, *pz;
@@ -517,11 +454,7 @@ void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectEntryFlags(
             (void *)actor, 3, SceneActor_GetDirectionFlags(actor->base.body.direction));
-        {
-            u16 mask = 0x10;
-            u16 *flags = &actor->base.reactionFlags;
-            *flags = mask | *flags;
-        }
+        SceneActorChase_SetReactionFlags(actor, 0x10);
     }
     x = SceneActorDisplacement_ReadAxis(actor->base.reactionStart.x, &actor->base.reactionEnd.x,
                                         &px);
@@ -553,7 +486,7 @@ void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
                 return;
             }
         } else {
-            actor->base.tracking.target = (void *)&gPlayers[0]->positionalEffectGroup;
+            SceneActorChase_TrackPlayer(actor);
         }
         tracking = &actor->base.tracking;
         if (tracking->target) {
@@ -568,15 +501,12 @@ void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
                 u8 mask = 8;
                 tracking->flags |= mask;
             }
-            SetBehavior(actor, 2);
+            SceneActorChase_SetBehavior(actor, 2);
         } else {
-            SetBehavior(actor, 0);
+            SceneActorChase_SetBehavior(actor, 0);
         }
     }
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
 }
 
 static inline u32 Cell(struct ContactPosition *p)
@@ -628,12 +558,6 @@ void Mimic_InitProfile(struct ChaseActor *actor)
     actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
-static inline void Mimic_ClearRouteFlag(u32 *flags)
-{
-    u32 mask = ~0x1000000;
-    *flags &= mask;
-}
-
 static inline u32 Mimic_TestFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.behaviorFlags & mask;
@@ -651,10 +575,10 @@ void Mimic_ResetExpiredTarget(struct ChaseActor *actor)
         return;
     timer = &actor->group.common.gate.counter;
     if (!*timer && !(*flags & 0x38)) {
-        struct SceneActorReactionMotion *motion;
+        struct SceneActorChaseTracking *motion;
         struct SceneActorRegistryControl *control;
-        motion = (void *)&actor->base.tracking.target;
-        motion->fieldDC = 0;
+        motion = &actor->base.tracking;
+        motion->target = NULL;
         actor->base.field2C2 = 0x40;
         actor->group.common.gate.flags = 0;
         *timer = 0;
@@ -670,7 +594,7 @@ void Mimic_ResetExpiredTarget(struct ChaseActor *actor)
         }
         control = &actor->group.common.control;
         if (Mimic_TestFlags(actor, 0x200000)) {
-            Mimic_ClearRouteFlag(&actor->base.statusFlags);
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, ROOM_ACTOR_STATUS_INTERACTING);
             {
                 u32 mask = ~0x200;
                 mask &= *flags;
@@ -687,31 +611,27 @@ void Mimic_ResetExpiredTarget(struct ChaseActor *actor)
         }
         actor->group.turn.turnsRemaining = 0xFF;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
-        MimicChase_SetState(actor, 0, 0, 17);
+        SceneActorChase_SetBehavior(actor, 17);
     }
 }
 
 void SceneActor_InitializeReactionColliders(void *p)
 {
-    union {
-        struct ContactPackedVector packed;
-        struct ContactPosition position;
-    } bounds, offset;
-    bounds.packed.x = 50;
-    bounds.packed.y = 30;
-    bounds.packed.z = 50;
-    offset.packed.x = 0;
-    offset.packed.y = 40;
-    offset.packed.z = 0;
-    SceneActorCollision_InitAttack(p, &bounds.position, &offset.position, Mimic_OnAttackContact, 0,
-                                   p);
-    bounds.position.x = 80;
-    bounds.position.y = 120;
-    bounds.position.z = 80;
-    offset.position.x = 0;
-    offset.position.y = 120;
-    offset.position.z = 0;
-    SceneActorCollision_InitBody(p, &bounds.position, &offset.position, Mimic_OnBodyContact, p);
+    struct ContactPosition bounds, offset;
+    bounds.x = 50;
+    bounds.y = 30;
+    bounds.z = 50;
+    offset.x = 0;
+    offset.y = 40;
+    offset.z = 0;
+    SceneActorCollision_InitAttack(p, &bounds, &offset, Mimic_OnAttackContact, 0, p);
+    bounds.x = 80;
+    bounds.y = 120;
+    bounds.z = 80;
+    offset.x = 0;
+    offset.y = 120;
+    offset.z = 0;
+    SceneActorCollision_InitBody(p, &bounds, &offset, Mimic_OnBodyContact, p);
 }
 
 static inline s32 Square(s32 x)
@@ -733,18 +653,17 @@ u8 SceneActor_FindNearbyActivePlayer(struct ChaseActor *p)
         if (player && !(*(u32 *)((u32)gPlayerSlotStatus + indexOffset) & excluded)) {
             struct SceneVec *source = &player->position;
             s32 x, z;
-            s16 new_var;
+            s16 deltaZ;
             delta->x = (u16)player->position.x - (u16)position->x;
             delta->y = (u16)source->y - (u16)position->y;
             delta->z = (u16)source->z - (u16)position->z;
             x = Square(delta->x);
-            new_var = delta->z;
-            z = Square(new_var);
+            deltaZ = delta->z;
+            z = Square(deltaZ);
             if (x + z <= 0x2400) {
                 struct Player *nearby = *cursor;
                 if (nearby->inputKeys[1] & 1) {
-                    struct SceneActorReactionMotion *motion = (void *)&p->base.tracking.target;
-                    motion->fieldDC = (u32)&nearby->positionalEffectGroup;
+                    p->base.tracking.target = &((struct SceneActorChasePlayer *)nearby)->target;
                     return 1;
                 }
             }
@@ -753,41 +672,6 @@ u8 SceneActor_FindNearbyActivePlayer(struct ChaseActor *p)
         i++;
     } while (i <= 3);
     return 0;
-}
-
-static inline s32 PlayerSlot(struct SceneActorChaseTarget *actor)
-{
-    if (actor->playerIndex <= 3)
-        return actor->playerIndex;
-    return -1;
-}
-
-static inline void ClearFlags16(u16 *p, u32 mask)
-{
-    *p &= mask;
-}
-
-static inline u8 TryMove(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
-                         struct SceneActorChaseTarget **slot)
-{
-    void *route = group->route;
-    struct ContactPosition *position = &actor->base.body.position;
-    struct ContactPosition *destination = &(*slot)->position;
-    s32 result;
-    if (!Nav_IsPositionInMesh(route, position, destination)) {
-        ClearFlags16(&actor->base.motionFlags, ~0x200);
-        return 0;
-    } else {
-        result = Terrain_ApplyBlocked(route, position, destination);
-        if (result) {
-            if (result != 2)
-                Memory_Clear(&actor->base.body.motion, 8);
-            return 1;
-        } else {
-            ClearFlags16(&actor->base.motionFlags, ~0x200);
-            return 0;
-        }
-    }
 }
 
 u8 Mimic_TryTargetRoute(struct ChaseActor *actor)
@@ -802,7 +686,7 @@ u8 Mimic_TryTargetRoute(struct ChaseActor *actor)
         slot = p;
         if (!partner)
             goto fail;
-        index = PlayerSlot(partner);
+        index = SceneActorChase_PlayerSlot(partner);
         if (index < 0)
             goto fail;
         {
@@ -820,7 +704,8 @@ u8 Mimic_TryTargetRoute(struct ChaseActor *actor)
             goto fail;
     }
 join:
-    if (TryMove(actor, group, slot))
+    if (SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
+                                 &(*slot)->position))
         return 1;
 fail:
     return 0;
@@ -831,17 +716,12 @@ fail:
 u8 Mimic_TryPursuitRoute(struct ChaseActor *actor)
 {
     u32 output;
-    u32 result = MimicChase_TryRoute(actor, actor->group.route, &actor->base.body.position,
-                                     &((struct Mimic *)actor)->origin);
+    u32 result = SceneActorChase_TryRoute(actor, actor->group.route, &actor->base.body.position,
+                                          &((struct Mimic *)actor)->origin);
     if (result)
         output = 1;
     else {
-        u32 behavior = 17;
-        actor->base.state2A8 = result;
-        actor->base.phase2A9 = result;
-        actor->base.behavior2AA = behavior;
-        actor->base.counter2AC = result;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetBehavior(actor, 17);
         output = 0;
     }
     return output;
@@ -901,24 +781,6 @@ void Mimic_UpdateIdleState(void)
 {
 }
 
-static inline u8 motionFlag(struct ChaseActor *actor)
-{
-    struct SceneActorChaseTracking *motion = &actor->base.tracking;
-    u32 mask = 2;
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 nearFlag(struct ChaseActor *actor)
-{
-    struct SceneActorChaseTracking *motion = &actor->base.tracking;
-    u32 mask = 8;
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-
 static inline u8 collisionMode(void)
 {
     if (gEngineFlags & 0x4800)
@@ -946,12 +808,12 @@ s32 SceneActor_AcquireCollisionTarget(struct ChaseActor *actor)
     struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorChaseTarget *target;
     s32 d;
-    if (!motionFlag(actor))
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 2))
         goto zero;
     if ((s32)actor->base.counter304 > 0) {
         setTargetFlags(actor);
         actor->base.tracking.target =
-            (u32)SceneActorContacts_FindObjectById((u16)actor->base.counter304);
+            SceneActorContacts_FindObjectById((u16)actor->base.counter304);
         return 1;
     }
     if (collisionMode()) {
@@ -980,7 +842,7 @@ collision:
         goto zero;
     if (!Nav_IsPositionInMesh(group->route, &actor->base.body.position, &target->position))
         goto zero;
-    if (!nearFlag(actor))
+    if (!SceneActorChase_TrackingFlags(&actor->base.tracking, 8))
         goto zero;
     setTargetFlags(actor);
 zero:
@@ -1014,17 +876,6 @@ static inline void clearFlag(u32 *flags)
     *flags &= mask;
 }
 
-static inline void prepareControl(struct ChaseActor *actor, void *control, u8 kind, s32 zero)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = zero;
-    clearFlag(&actor->base.pendingControlFlags);
-    actor->base.pendingControl = zero;
-}
-
 void SceneActor_PrepareStationaryReaction(struct ChaseActor *actor)
 {
     struct SceneActorReactionMotion *motion;
@@ -1041,12 +892,8 @@ void SceneActor_PrepareStationaryReaction(struct ChaseActor *actor)
         (offset = *(s16 *)&actor->base.heightOffset)) {
         Mimic_BeginTargetResponse(actor);
     } else {
-        prepareControl(actor, SceneActorControl_OnIdle, 0x10, offset);
-        actor->base.state2A8 = 0;
-        actor->base.phase2A9 = 1;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = offset;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SetPhase(actor, 1, 0);
     }
     {
         u32 mask = 8;
@@ -1146,15 +993,6 @@ void SceneActor_ResetCollisionReaction(struct ChaseActor *actor)
     actor->group.turn.turnsRemaining = 0xFF;
 }
 
-static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = 0;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 u8 Mimic_StartHitReaction(struct ChaseActor *actor)
 {
     struct Mimic *ctx = actor->base.context;
@@ -1164,24 +1002,16 @@ u8 Mimic_StartHitReaction(struct ChaseActor *actor)
         Sound_PlaySong(0x13E);
     if (actor->base.hitReactionFlags & 0xC0000) {
         SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
-        ResetState(actor, 3, 0);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         return 1;
     }
     ClearBits(&actor->base.motionFlags, 0x20);
     if (actor->base.tracking.target) {
         if (HasMode(actor->base.context)) {
-            {
-                u16 mask = 0x80;
-                u16 *flags = &actor->base.reactionFlags;
-                *flags = mask | *flags;
-            }
+            SceneActorChase_SetReactionFlags(actor, 0x80);
             ClearBits(&((struct Mimic *)actor->base.context)->reactionFlags, 1);
         } else if (actor->base.health < ctx->healthThreshold) {
-            {
-                u16 mask = 0x80;
-                u16 *flags = &actor->base.reactionFlags;
-                *flags = mask | *flags;
-            }
+            SceneActorChase_SetReactionFlags(actor, 0x80);
             ClearBits(&((struct Mimic *)actor->base.context)->reactionFlags, 1);
         }
     }
@@ -1192,16 +1022,10 @@ u8 Mimic_StartHitReaction(struct ChaseActor *actor)
 
 void Mimic_BeginActionResponse(struct ChaseActor *actor)
 {
-    if (MimicChase_TakeArrived(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         Mimic_BeginTargetResponse(actor);
-        {
-            u32 behavior = 2;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorChase_SelectState(actor, 0, 0, 2);
+        SceneActorChase_ResetStateEntry(actor);
     } else
         actor->base.counter2AC++;
 }
@@ -1346,6 +1170,7 @@ s32 Mimic_Init(void *object)
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &instance->chase.group;
     struct SceneActorBody *body = &instance->chase.base.body;
+    // concession-ok(const-local): Both CpuSet fills read the same fixed source word.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
