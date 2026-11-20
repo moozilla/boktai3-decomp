@@ -1,18 +1,13 @@
 #ifndef GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #define GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #include "engine.h"
+#include "scene_input_widget.h"
 #include "wireless_trade_menu.h"
 
 /* Layouts recovered from the item state handlers and display lifecycle.
  * Interpretations are tentative; unknown ranges retain their offsets. */
-struct WirelessGameResource {
-    u32 words[8];
-};
 struct WirelessGamePair {
     u32 x, y;
-};
-struct WirelessGameVector {
-    s16 x, y, z;
 };
 struct WirelessGamePosition {
     u16 x, y, z, unk6;
@@ -38,36 +33,54 @@ struct WirelessGameDrawing {
     } position;
     u8 unk28[0x38];
 };
+enum WirelessGameItemState {
+    WIRELESS_GAME_ITEM_HIDDEN = 0,
+    WIRELESS_GAME_ITEM_STEADY = 1,
+    WIRELESS_GAME_ITEM_BLINKING = 2,
+    WIRELESS_GAME_ITEM_MERGING = 3,
+    WIRELESS_GAME_ITEM_OUTGOING = 4,
+    WIRELESS_GAME_ITEM_INCOMING = 5,
+    WIRELESS_GAME_ITEM_SCATTERED = 6,
+    WIRELESS_GAME_ITEM_TEMPORARY = 7,
+};
+
 struct WirelessGameItem {
     u8 state, entered, pendingFlag, count, shakeTicks, unk5;
     s16 arcVelocity;
     u16 timer;
     u8 unkA[2];
-    struct WirelessGameVector start;
-    struct WirelessGameVector end;
-    struct WirelessGameVector drift;
+    struct ContactPosition start;
+    struct ContactPosition end;
+    struct ContactPosition drift;
     struct WirelessGameSprite sprite;
     struct WirelessGameDrawing drawing;
 };
+static inline void WirelessGameItem_EnterState(struct WirelessGameItem *item, u8 state)
+{
+    item->state = state;
+    item->entered = 1;
+    item->timer = 0;
+}
+
 struct WirelessGameItems {
     struct Task task;
     u8 current[4], pending[4];
     u8 sprite[0x1c]; /* animation-data descriptor, not a sprite instance */
-    struct WirelessGameResource resource;
+    struct SceneInputResource resource;
     struct WirelessGameItem items[16];
 };
 struct WirelessGameDisplay {
     struct Task task;
     u32 timer;
     u8 state, entered, finished, unk1F;
-    struct WirelessGameResource resource;
+    struct SceneInputResource resource;
     struct WirelessGameDrawing drawings[4];
-    struct WirelessGameResource extraResource;
+    struct SceneInputResource extraResource;
     struct WirelessGameDrawing extra[2];
 };
 /* 0x02000100 */
 extern struct WirelessGameItems *gWirelessGameItems;
-int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *, int, int);
+int WirelessGameItems_QueueLocalItem(struct ContactPosition *, int, int);
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *);
 
 void WirelessGame_AddItem(void *p, int index);

@@ -363,7 +363,7 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
     p->sprite.flags &= ~1;
     {
         struct WirelessGameDrawing *d = drawing = &p->drawing;
-        struct WirelessGameResource *res = &owner->resource;
+        struct SceneInputResource *res = &owner->resource;
         if (index > 7)
             choice = (index & 3) + 4;
         else
@@ -508,7 +508,7 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
         Anim_LoadKeyframe(draw, resource, gUnk_0824DE7C[choice], 0);
         p->drawing.flags &= ~1;
         {
-            struct WirelessGameVector *end = &p->end;
+            struct ContactPosition *end = &p->end;
             y = 128;
             if (index > 7)
                 y = 144;
@@ -585,7 +585,7 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     int choice;
     drawing = &p->drawing;
     if (p->entered) {
-        struct WirelessGameVector *start, *end;
+        struct ContactPosition *start, *end;
         const u16 *entry;
         p->entered = 0;
         start = &p->start;
@@ -661,7 +661,7 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
         Anim_LoadKeyframe(draw, resource, gUnk_0824DE7C[choice], 0);
         p->drawing.flags &= ~1;
         {
-            struct WirelessGameVector *start, *end;
+            struct ContactPosition *start, *end;
             const u16 *entry;
             start = &p->start;
             {
@@ -751,7 +751,7 @@ static inline u32 WirelessGame_Random(void)
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
-static inline void WirelessGameItem_SetDrift(struct WirelessGameVector *drift, int angle)
+static inline void WirelessGameItem_SetDrift(struct ContactPosition *drift, int angle)
 {
     int k = 8;
     drift->x = ScaleSine(gUnk_086149C4[(angle + 64) & 255] * 8);
@@ -764,8 +764,8 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
     struct WirelessGameDrawing *drawing = &p->drawing;
     struct WirelessGameSprite *sprite = &p->sprite;
     if (p->entered) {
-        struct WirelessGameVector *start;
-        struct WirelessGameVector *end;
+        struct ContactPosition *start;
+        struct ContactPosition *end;
         const u16 *entry;
         int choice;
         s8 angle;
@@ -774,7 +774,7 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         p->sprite.flags &= ~1;
         {
             struct WirelessGameDrawing *d = drawing;
-            struct WirelessGameResource *res = &owner->resource;
+            struct SceneInputResource *res = &owner->resource;
             if (index > 7)
                 choice = (index & 3) + 4;
             else
@@ -814,7 +814,7 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
         WirelessGameItems_ApplyMotionWave(position, p->timer, p->arcVelocity);
     } else {
         struct WirelessGamePosition *pos = &drawing->position.coords;
-        struct WirelessGameVector *drift = &p->drift;
+        struct ContactPosition *drift = &p->drift;
         pos->x += drift->x;
         pos->y += drift->y;
         pos->z += drift->z;
@@ -968,7 +968,7 @@ int WirelessGameItems_Destroy(struct WirelessGameItems *p)
 
 int WirelessGameItems_Init(struct WirelessGameItems *p)
 {
-    struct WirelessGameResource *resource;
+    struct SceneInputResource *resource;
     struct WirelessGameItem *item;
     u8 *current;
     u8 *pending;
@@ -1017,7 +1017,7 @@ ok:
     return p;
 }
 
-int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int index, int amount)
+int WirelessGameItems_QueueLocalItem(struct ContactPosition *position, int index, int amount)
 {
     struct WirelessGameItems *owner = gWirelessGameItems;
     struct WirelessGameItem *target;
@@ -1082,7 +1082,7 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
             target->timer = zero;
         }
         {
-            struct WirelessGameVector *start = &target->start;
+            struct ContactPosition *start = &target->start;
             int x = position->x;
             int z = position->z;
             int v = (x - z) * 3;
@@ -1106,9 +1106,9 @@ int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *position, int in
             height = v;
             start->y = y - height;
             start->z = y + height;
-            start->x = start->x - (*(const struct WirelessGameVector *)gCameraOrigin).x + 120;
-            start->y = (y - height) - (*(const struct WirelessGameVector *)gCameraOrigin).y + 80;
-            start->z = (y + height) - (*(const struct WirelessGameVector *)gCameraOrigin).z;
+            start->x = start->x - (*(const struct ContactPosition *)gCameraOrigin).x + 120;
+            start->y = (y - height) - (*(const struct ContactPosition *)gCameraOrigin).y + 80;
+            start->z = (y + height) - (*(const struct ContactPosition *)gCameraOrigin).z;
         }
     }
     return 0;
@@ -1448,10 +1448,10 @@ int WirelessGameDisplay_Destroy(struct WirelessGameDisplay *p)
 
 int WirelessGameDisplay_Init(struct WirelessGameDisplay *p)
 {
-    struct WirelessGameResource *resource;
+    struct SceneInputResource *resource;
     struct WirelessGameDrawing *drawing;
     int i;
-    struct WirelessGameVector position;
+    struct ContactPosition position;
     resource = ScriptProc_Start(0xcb05, 0x7c8b);
     if (!resource)
         return -1;
