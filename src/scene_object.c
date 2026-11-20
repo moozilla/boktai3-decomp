@@ -967,6 +967,11 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
     }
 }
 
+static inline u16 SceneObject_ReadFlags(const struct SceneObject *object, u32 mask)
+{
+    return object->flags & mask;
+}
+
 void Scene_UpdateFallingObject(struct SceneObject *p)
 {
     struct SceneBody *body = &p->body;
@@ -979,11 +984,8 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
             terrain->height = (terrain->height & 0xF0) | 15;
         else
             terrain->height = (terrain->height & 0xF0) | height;
-        {
-            u32 mask = 8;
-            if (mask & p->flags)
-                p->cellRef.cell.flags |= 0x21;
-        }
+        if (SceneObject_ReadFlags(p, 8))
+            p->cellRef.cell.flags |= 0x21;
     }
     body->vy = p->targetY - body->position.y;
     if (body->vy < -16)
@@ -991,8 +993,7 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
     else if (body->vy > 0)
         body->vy = 0;
     if (body->vy == 0) {
-        u32 mask = 8;
-        if (mask & p->flags) {
+        if (SceneObject_ReadFlags(p, 8)) {
             p->cellRef.cell.flags |= 0x21;
             p->health = 0;
         } else {
@@ -1297,11 +1298,6 @@ static inline void setStepFlags(struct SceneCollider *c)
     c->contactFlags2 = 0;
 }
 
-static inline u16 flags16(struct SceneObject *p, u32 mask)
-{
-    return mask & p->flags;
-}
-
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
                               u32 animationResource, s32 drawMode, s32 health, s32 basePalette,
                               s32 animation, u32 script)
@@ -1337,7 +1333,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     SceneBody_Init(&p->body, id, position, 0, 7, p);
     SceneBody_SetSprite(&p->body, draw);
     p->body.position = p->center;
-    if (flags16(p, 16)) {
+    if (SceneObject_ReadFlags(p, 16)) {
         p->owner = Region_FindContaining(&p->body.position);
         pos = &p->body.position;
     } else {
@@ -1347,7 +1343,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->dx = 0;
     p->dz = 0;
     p->direction = 0;
-    if (flags16(p, 4)) {
+    if (SceneObject_ReadFlags(p, 4)) {
         {
             UpdateFn callback = Scene_UpdateObjectFlash;
             slot = &p->update;
