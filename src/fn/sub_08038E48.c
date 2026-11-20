@@ -3,7 +3,7 @@
 #include "session_save.h"
 int Wireless_IsSessionActive(void);
 void WirelessGameMenu_OnResultPanelClosed(void);
-int sub_0803B700(int, int, int, int, int, int, u32);
+int WirelessResultPanel_Show(int, int, int, int, int, int, u32);
 void WirelessGameMenu_LoadBackground(struct WirelessGameExchange *, int);
 int TextWindow_Create(int, int, int, int);
 void TextWindow_SetScript(int, void *);
@@ -22,7 +22,7 @@ void WirelessTradeMenu_UpdateResultsPanel(struct WirelessGameExchange *p)
         remoteTime = offset + p->remote.elapsed;
         side = Wireless_IsSessionActive();
         points = ((struct SessionSave *)gSessionState)->points;
-        sub_0803B700(side, p->outcome, localTime, remoteTime, p->total, points,
+        WirelessResultPanel_Show(side, p->outcome, localTime, remoteTime, p->total, points,
                      (u32)WirelessGameMenu_OnResultPanelClosed);
     }
     if (p->resultPanelClosed) {

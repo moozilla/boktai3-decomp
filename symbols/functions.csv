@@ -1506,6 +1506,7 @@ addr,name,mode,confidence,source,notes
 0803B3B4,WirelessResultPanel_Destroy,thumb,low,src-alias,Task destruction callback that removes graphics and windows and clears the singleton
 0803B40C,WirelessResultPanel_Init,thumb,low,src-alias,Loads panel resources and initializes drawables and the sprite and copied player data
 0803B6B8,WirelessResultPanel_Create,thumb,low,src-alias,Returns the existing panel or creates and initializes its task with lifecycle callbacks
+0803B700,WirelessResultPanel_Show,thumb,low,src-alias,Shows the two elapsed times and point totals with the supplied close callback
 0803BA84,ScenePool_GetInstance,thumb,low,src-alias,Returns the singleton scene pool pointer used by script entry creation
 0803BA90,ScenePool_PackResourceKey,thumb,low,src-alias,Packs the first argument's high byte above the second argument's low halfword; resource key interpretation is tentative
 0803BAA0,ScenePool_FindFreeActorSlot,thumb,low,src-alias,Returns the first actor slot whose entry index is -1 or null when none is free
