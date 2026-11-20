@@ -21,7 +21,7 @@ def fit(source, english, ctx):
         raise ValueError("Translation changes the sequence of engine controls")
     if any(c != '\n' and not (' ' <= c <= '~') for c in english):
         raise ValueError("Use printable English glyphs in the native narrow font")
-    if ctx["kind"] == "graphic":
+    if ctx["kind"] in ("graphic","ticker"):
         return english
     limit, max_lines = ctx["columns"], ctx["lines"]
     def advance(word):

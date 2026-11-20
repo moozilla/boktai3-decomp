@@ -16,7 +16,7 @@ class Localizer:
         self.catalog = None
         self.pointers = {}
         self.seen = set()
-        self.counts = {}
+        self.dialogue_id = None
         self.graphics = None
 
     def record(self, key, **fields):
@@ -42,6 +42,7 @@ class Localizer:
             if source is None:
                 return 0
             kind = "dialogue" if lr == 0x080313DE else "text"
+            if kind=="dialogue": self.dialogue_id=sid
             key = f"text/{sid}"
         else:
             sid = c.ids.get(ptr, self.pointers.get(ptr))
@@ -55,10 +56,14 @@ class Localizer:
                     return 0
                 source = c.decode(raw)
                 key = "literal/"+hashlib.sha256(raw).hexdigest()[:16]
-            kind = "name" if hook==4 else "menu"
+            kind = {2:"menu",4:"name",5:"ticker"}[hook]
         if not source or not re.search(r"[^\x00-\x7f]",CONTROLS.sub("",source)):
             return 0
         ctx = c.context(game,scene,proc,lr,kind,source,sid,arg if hook==2 else 0,aux if hook==2 else None)
+        if hook==1 and 0x02000000<=aux<0x02040000:
+            x,y,w,h=game.read(aux+4,4)
+            if 1<=w<=30 and 1<=h<=20:
+                ctx.update(window=[x,y,w,h],columns=w,lines=max(1,h//2))
         if kind=="name":
             # A custom save's player name belongs to the player; render only
             # explicitly approved spellings in the local glossary.

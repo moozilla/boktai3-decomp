@@ -193,7 +193,7 @@ class ArtTranslator:
 
     def __call__(self, resolver, game, key, ptr, kind, lr, scene, proc, frame):
         code=f"{key:04X}"
-        if code not in REGIONS:
+        if kind != 0xCB05 or code not in REGIONS:
             return 0
         if key in self.loaded:
             return self.loaded[key]

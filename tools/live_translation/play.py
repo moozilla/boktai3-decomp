@@ -19,12 +19,19 @@ def main():
     parser.add_argument("--japanese", action="store_true")
     sub=parser.add_subparsers(dest="cmd")
     sub.add_parser("replay")
+    sub.add_parser("proof", help="Capture paired Japanese and English game frames")
+    live=sub.add_parser("play")
+    live.add_argument("--save",type=Path,help="Start from a private copy of a battery save")
+    live.add_argument("--from-boot",action="store_true",help="Play from the first frame")
     sub.add_parser("review").add_argument("key", nargs="?")
     ed=sub.add_parser("correct"); ed.add_argument("key"); ed.add_argument("english")
     term=sub.add_parser("term");term.add_argument("japanese");term.add_argument("english")
     a=parser.parse_args()
     OUT.mkdir(parents=True,exist_ok=True)
     m=Memory(a.db,Ollama(a.endpoint,a.model) if a.model else None)
+    if a.cmd=="proof":
+        from proof import run
+        run(m); return
     if a.cmd=="correct":
         m.correct(a.key,a.english); print("Correction saved for",a.key);return
     if a.cmd=="review":
@@ -41,7 +48,11 @@ def main():
     with (target/"transcript.jsonl").open("w") as log:
         loc=Localizer(m,log,not a.japanese)
         loc.graphics=ArtTranslator()
-        with closing(Game(loc,prison_save())) as game:
+        with closing(Game(loc,getattr(a,"save",None) or prison_save())) as game:
+            if a.cmd in (None,"play"):
+                from player import play
+                play(game,quick=not getattr(a,"from_boot",False))
+                return
             for i,(n,key) in enumerate([(300,"START"),(60,"A"),(150,"START"),(120,"A"),(120,"START"),
                                         (300,"START"),(120,"START"),(120,"A"),(150,"A")]+[(100,"A")]*24):
                 game.step(n)

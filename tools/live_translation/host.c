@@ -11,14 +11,14 @@
 #include <stdio.h>
 #include <string.h>
 
-enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME };
+enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER };
 typedef uint32_t (*Resolver)(unsigned hook, unsigned id, unsigned ptr, unsigned arg,
                              unsigned caller, unsigned scene, unsigned proc, unsigned frame);
 static struct mCore *core;
 static struct ARMCore *cpu;
 static uint32_t pixels[240 * 160];
 static Resolver resolve;
-static uint32_t string_id, resource_type, resource_key, resource_caller, last_proc;
+static uint32_t text_window, string_id, resource_type, resource_key, resource_caller, last_proc;
 static void logger_fn(struct mLogger *l, int c, enum mLogLevel level, const char *fmt, va_list a)
 {
     if (level & (mLOG_FATAL | mLOG_ERROR)) { vfprintf(stderr, fmt, a); fputc('\n', stderr); }
@@ -27,6 +27,22 @@ static struct mLogger logger = {.log = logger_fn};
 static uint8_t lux(struct GBALuminanceSource *l) { return 80; }
 static void sample(struct GBALuminanceSource *l) {}
 static struct GBALuminanceSource light = {.readLuminance = lux, .sample = sample};
+
+static int capture_audio;
+static int16_t stereo[8192];
+static unsigned nsamples, sample_rate;
+static void sample_audio(struct mAVStream *s, int16_t left, int16_t right) {
+    if (capture_audio && nsamples < 4096) {
+        stereo[nsamples*2] = left; stereo[nsamples*2+1] = right; nsamples++;
+    }
+}
+static void audio_rate(struct mAVStream *s, unsigned rate) { sample_rate = rate; }
+static struct mAVStream av = {.postAudioFrame=sample_audio, .audioRateChanged=audio_rate};
+void lt_sound(int enabled) { capture_audio=enabled; nsamples=0; }
+unsigned lt_take_audio(int16_t *out) {
+    memcpy(out,stereo,nsamples*4); unsigned n=nsamples; nsamples=0; return n;
+}
+unsigned lt_rate(void) { return sample_rate; }
 
 int lt_open(const char *rom, const char *battery, Resolver callback)
 {
@@ -40,6 +56,8 @@ int lt_open(const char *rom, const char *battery, Resolver callback)
     core->rtc.override = RTC_FIXED;
     core->rtc.value = 1128150000000LL;
     core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &light);
+    sample_rate=32768; nsamples=capture_audio=0;
+    core->setAVStream(core,&av);
     core->reset(core);
     cpu = core->cpu;
     resolve = callback;
@@ -74,10 +92,14 @@ void lt_step(unsigned frames, unsigned keys)
             while (cpu->cycles >= cpu->nextEvent) cpu->irqh.processEvents(cpu);
             uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
             switch (pc) {
+            case 0x080335F4: text_window=cpu->gprs[0]; break; /* TextWindow_ResolveString */
+            case 0x0803343C:
+                if (cpu->gprs[0]) cpu->gprs[0]=request(TICKER,0,cpu->gprs[0],0,cpu->gprs[14]);
+                break;
             case 0x0821AD08: last_proc = cpu->gprs[0]; break; /* Script_Call */
             case 0x0821ADD4: string_id = cpu->gprs[0]; break; /* Text_LookupString */
             case 0x0821ADF8:
-                cpu->gprs[0] = request(BANK, string_id, cpu->gprs[0], 0, cpu->gprs[14]);
+                cpu->gprs[0] = request(BANK, string_id, cpu->gprs[0], (cpu->gprs[14] & ~1u)==0x08033604 ? text_window : 0, cpu->gprs[14]);
                 break;
             case 0x0803242A: case 0x0803292E: /* <NAME> assigned to the text interpreter's stream */
                 cpu->gprs[0] = request(PLAYER_NAME, 0, cpu->gprs[0], 0, pc);
@@ -91,7 +113,7 @@ void lt_step(unsigned frames, unsigned keys)
                 resource_caller = cpu->gprs[14];
                 break;
             case 0x0821A65E:
-                if (resource_type == 0xCB05 && cpu->gprs[0])
+                if ((resource_type == 0xCB05 || resource_type == 0xC091 || resource_type == 0xCEEF) && cpu->gprs[0])
                     cpu->gprs[0] = request(RESOURCE, resource_key, cpu->gprs[0], resource_type, resource_caller);
                 break;
             }
