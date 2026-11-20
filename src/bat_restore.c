@@ -11,6 +11,7 @@
 #include "script_utility.h"
 #include "engine.h"
 #include "scene_actor_part_burst.h"
+#include "scene_actor_init_actor.h"
 
 void ActorShadow_Enable(void *);
 
@@ -218,10 +219,7 @@ static inline u8 Bat_Arrive(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_GroupClearFlags(group, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -425,10 +423,7 @@ static inline u8 Bat_Arrive_UpdateRecoilRecovery(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_GroupClearFlags(group, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -489,10 +484,7 @@ void Bat_UpdateRecoilRecovery(struct ChaseActor *actor, s32 frame)
         actor->base.restart = 0;
     }
     SceneActorChase_SetActorFlags(actor, 0x2000);
-    {
-        u32 mask = 0x10000;
-        actor->base.statusFlags |= mask;
-    }
+    MonsterInit_SetStatusFlags(actor, 0x10000);
     if (frame <= 17 && animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
         animation->duration != 1)
         animation->elapsed = 0;
