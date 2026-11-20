@@ -7,9 +7,8 @@ static inline s32 RegistryActor_ScaleVelocity(s32 value)
     return -((-value) >> 12);
 }
 
-static inline u8 RegistryActor_HasPendingDamage(struct RegistryActor *actor)
+static inline u8 RegistryActor_TestDamageFlags(u32 mask, struct RegistryActor *actor)
 {
-    u32 mask = 1;
     if (actor->stats.damageFlags & mask)
         return TRUE;
     return FALSE;
@@ -40,7 +39,7 @@ void Actor_ApplyKnockback(struct RegistryActor *actor, struct RegistryCollisionM
     s32 angle;
     s32 t;
 
-    if (RegistryActor_HasPendingDamage(actor))
+    if (RegistryActor_TestDamageFlags(1, actor))
         return;
     if (msg->type == 7) {
         actor->stats.damageTimer = 0;
@@ -52,10 +51,7 @@ void Actor_ApplyKnockback(struct RegistryActor *actor, struct RegistryCollisionM
     }
     actor->stats.pendingDamage = msg->value;
     actor->stats.damageType = msg->type;
-    {
-        u8 one = 1;
-        actor->stats.damageFlags |= one;
-    }
+    ActorStats_SetDamageFlags(1, &actor->stats.damageFlags);
     positions.self.x = actor->stats.contactPosition.x + actor->stats.contactOffset.x;
     positions.self.y = actor->stats.contactPosition.y + actor->stats.contactOffset.y;
     positions.self.z = actor->stats.contactPosition.z + actor->stats.contactOffset.z;
@@ -81,8 +77,6 @@ void Actor_ApplyKnockback(struct RegistryActor *actor, struct RegistryCollisionM
         actor->stats.boost = 0;
     }
 }
-
-
 
 void ActorMotion_SetKnockback(struct RegistryActor *actor, struct RegistryCollisionMessage *other)
 {
@@ -155,7 +149,8 @@ static inline void ApplyBoost(struct RegistryActor *actor)
         if (owner->control.boostFrames == 0) {
             health = actor->stats.value - 20;
             if (owner->control.boostEffect < 0)
-                owner->control.boostEffect = SpriteSlots_AttachSource(&actor->model.view.parts[0].x);
+                owner->control.boostEffect =
+                    SpriteSlots_AttachSource(&actor->model.view.parts[0].x);
         } else {
             health = actor->stats.value - 2;
         }
