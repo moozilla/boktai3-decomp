@@ -1,13 +1,13 @@
 #include "effect_emitter.h"
 #include "word_flags.h"
 
-void EffectEmitter_ReceiveHit(struct EmitterAttack *attack, void *unused,
+void EffectEmitter_ReceiveHit(struct ContactCollider *attack, struct ContactCollider *unused,
                               struct EffectEmitter *object)
 {
-    s32 damage = attack->damage;
+    s32 damage = attack->cost;
     struct EmitterVec position;
     if (!damage) {
-        if (Flags_MaskedWord(0x40, &attack->flags))
+        if (Flags_MaskedWord(0x40, &attack->reactionFlags))
             damage = 50;
         else
             damage = 30;
