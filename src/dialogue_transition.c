@@ -1,5 +1,6 @@
 #include "dialogue_transition.h"
 #include "input.h"
+#include "gba/io_reg.h"
 
 void DialogueTransition_ApplyEntryBounds(struct DialogueTransition *transition)
 {
@@ -91,11 +92,7 @@ int DialogueTransition_OnTaskUpdate(struct DialogueTransition *transition)
     void *callback = gUnk_086056D8[transition->state];
     if (callback)
         Callback_InvokeActor(transition, callback);
-    {
-        u16 *reg = &gBgPaletteBuffer;
-        int value = 0x1084;
-        *reg = value;
-    }
+    gBgPaletteBuffer[0] = 0x1084;
     if ((gPadState[1] & 9) && transition->skipProcedure && transition->state <= 2)
         DialogueTransition_SetState(transition, 3);
     transition->ticks++;
@@ -166,10 +163,9 @@ int DialogueTransition_Initialize(struct DialogueTransition *transition)
         int previous = gDispCntShadow;
         transition->savedDisplayControl = previous;
         {
-            int value = previous & ~0xE00;
-            int bits = 0x100;
-            value |= bits;
-            gDispCntShadow = value;
+            int displayControl = previous & ~(DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
+            displayControl |= DISPCNT_BG0_ON;
+            gDispCntShadow = displayControl;
         }
     }
     return DialogueTransition_LoadFromScript(transition);
