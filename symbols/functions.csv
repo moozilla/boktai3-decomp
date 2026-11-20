@@ -5304,6 +5304,7 @@ addr,name,mode,confidence,source,notes
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
 08130F60,SceneActorRoute_UpdateTriggeredWaitPhase,thumb,low,src-alias,Tentative: advances a timed route after its entry control completes
 08131044,SceneActorRoute_UpdateRouteCompletion,thumb,low,src-alias,Chooses the next behavior when the route descriptor completes
+081312F4,SceneActorRoute_UpdateReturnEntry,thumb,low,src-alias,Chooses a route return phase from motion and route flags
 081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,

@@ -4,7 +4,6 @@
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-#define SceneActorRoute_UpdateReturnEntry sub_081312F4
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
