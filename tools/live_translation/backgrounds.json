@@ -1,0 +1,663 @@
+{
+  "52AE": {
+    "2": {
+      "palette": "D985",
+      "regions": [
+        {
+          "id": "heading",
+          "box": [
+            108,
+            25,
+            219,
+            49
+          ],
+          "font": 18,
+          "source": "注意",
+          "english": "Caution"
+        },
+        {
+          "id": "body",
+          "box": [
+            24,
+            55,
+            221,
+            140
+          ],
+          "font": 13,
+          "source": "外で遊ぶときは強い日差しや気温の変化に注意して遊びましょう。",
+          "english": "When playing outdoors, watch out for strong sunlight and changes in temperature."
+        }
+      ]
+    }
+  },
+  "A597": {
+    "6": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        },
+        {
+          "id": "body",
+          "box": [
+            48,
+            48,
+            72,
+            56
+          ],
+          "source": "カラダ",
+          "english": "Body",
+          "font": 7
+        },
+        {
+          "id": "spirit",
+          "box": [
+            48,
+            56,
+            72,
+            64
+          ],
+          "source": "ココロ",
+          "english": "Spirit",
+          "font": 7
+        },
+        {
+          "id": "power",
+          "box": [
+            48,
+            64,
+            72,
+            72
+          ],
+          "source": "チカラ",
+          "english": "Power",
+          "font": 7
+        }
+      ]
+    },
+    "7": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "8": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        },
+        {
+          "id": "body",
+          "box": [
+            48,
+            48,
+            72,
+            56
+          ],
+          "source": "カラダ",
+          "english": "Body",
+          "font": 7
+        },
+        {
+          "id": "spirit",
+          "box": [
+            48,
+            56,
+            72,
+            64
+          ],
+          "source": "ココロ",
+          "english": "Spirit",
+          "font": 7
+        },
+        {
+          "id": "power",
+          "box": [
+            48,
+            64,
+            72,
+            72
+          ],
+          "source": "チカラ",
+          "english": "Power",
+          "font": 7
+        }
+      ]
+    },
+    "9": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "12": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "13": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "16": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    }
+  },
+  "5AF3": {
+    "common": {
+      "palette": "4596",
+      "pattern_bank": 13,
+      "fixed_tiles": [
+        [
+          0,
+          1
+        ],
+        [
+          32,
+          128
+        ]
+      ],
+      "regions": [
+        {
+          "id": "date",
+          "box": [
+            64,
+            88,
+            80,
+            104
+          ],
+          "source": "月",
+          "english": "/",
+          "font": 13,
+          "style": "center"
+        },
+        {
+          "id": "separator",
+          "box": [
+            96,
+            88,
+            128,
+            104
+          ],
+          "source": "日 /",
+          "english": "|",
+          "font": 12,
+          "style": "center"
+        },
+        {
+          "id": "hour",
+          "box": [
+            144,
+            88,
+            160,
+            104
+          ],
+          "source": "時",
+          "english": "h",
+          "font": 12,
+          "style": "center"
+        },
+        {
+          "id": "minute",
+          "box": [
+            176,
+            88,
+            192,
+            104
+          ],
+          "source": "分",
+          "english": "m",
+          "font": 12,
+          "style": "center"
+        },
+        {
+          "id": "until",
+          "box": [
+            80,
+            120,
+            128,
+            136
+          ],
+          "source": "まで：",
+          "english": "in",
+          "font": 12,
+          "style": "left"
+        },
+        {
+          "id": "hours",
+          "box": [
+            144,
+            120,
+            176,
+            136
+          ],
+          "source": "時間",
+          "english": "h",
+          "font": 12,
+          "style": "center"
+        },
+        {
+          "id": "minutes",
+          "box": [
+            192,
+            120,
+            208,
+            136
+          ],
+          "source": "分",
+          "english": "m",
+          "font": 12,
+          "style": "center"
+        }
+      ],
+      "pattern_regions": [
+        {
+          "id": "sun",
+          "box": [
+            80,
+            48,
+            112,
+            64
+          ],
+          "source": "日の",
+          "english": "Sun",
+          "font": 12,
+          "style": "right"
+        },
+        {
+          "id": "rise",
+          "box": [
+            112,
+            48,
+            128,
+            64
+          ],
+          "source": "出",
+          "english": "rise",
+          "font": 9,
+          "style": "left"
+        },
+        {
+          "id": "set",
+          "box": [
+            112,
+            32,
+            128,
+            48
+          ],
+          "source": "入",
+          "english": "set",
+          "font": 9,
+          "style": "left"
+        }
+      ]
+    },
+    "0": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "閉ざされた牢獄",
+          "english": "Sealed Prison",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "トザサレタロウゴク",
+          "english": "- TOZASARETA ROGOKU -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "1": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "死灰の街",
+          "english": "Lifeless Town",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "シカイノマチ",
+          "english": "- SHIKAI NO MACHI -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "2": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "古の大樹",
+          "english": "Ancient Tree",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "イニシエノタイジュ",
+          "english": "- INISHIE NO TAIJU -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "3": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "白き森",
+          "english": "White Forest",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "シロキモリ",
+          "english": "- SHIROKI MORI -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "4": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "海賊の島",
+          "english": "Pirate Island",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "カイゾクノシマ",
+          "english": "- KAIZOKU NO SHIMA -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "5": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "暗黒城",
+          "english": "Dark Castle",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "アンコクジョウ",
+          "english": "- ANKOKUJO -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    },
+    "6": {
+      "regions": [
+        {
+          "id": "name",
+          "box": [
+            8,
+            13,
+            232,
+            49
+          ],
+          "source": "楽園",
+          "english": "Paradise",
+          "font": 25,
+          "style": "serif"
+        },
+        {
+          "id": "reading",
+          "box": [
+            12,
+            48,
+            228,
+            63
+          ],
+          "source": "ラクエン",
+          "english": "- RAKUEN -",
+          "font": 9,
+          "style": "center"
+        }
+      ]
+    }
+  }
+}
