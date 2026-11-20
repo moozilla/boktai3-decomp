@@ -4,17 +4,17 @@ import shutil
 import tempfile
 from uuid import uuid4
 
-from . import graphics, recipe, runner
+from . import fields, graphics, interventions, recipe, runner
 
 
-def input_until(spec, trial, frame):
+def input_until(spec, trial, frame, actions):
     commands = recipe.timeline(recipe.compile_steps(trial["input"], spec["duration"]),
-                               spec["duration"], spec["sample_every"])
+                               spec["duration"], spec["sample_every"], interventions=actions)
     for line in commands:
         action, argument = line.split(" ", 1)
         if action == "sample" and argument == f"f{frame:04d}":
             return
-        if action in {"hold", "wait", "lux"}:
+        if action in {"hold", "wait", "lux", "setfield"}:
             yield line
     raise ValueError("Choose a sampled frame")
 
@@ -74,7 +74,9 @@ def execute(directory, result, trial_id, frame, x, y, slot):
 
     rtc = spec["rtc"]
     setup = ["trace off", "load fork", f"lux {trial['snapshots'][0]['sensor']}", f"rtc {rtc}", graphics.trace_command()]
-    controller = list(input_until(spec, trial, frame))
+    observed = [fields.Field(**row) for row in result["fields"]] if trial.get("interventions") else []
+    setup.extend(field.command() for field in observed)
+    controller = list(input_until(spec, trial, frame, interventions.encoded(trial, observed)))
     suppress = f"hideobj {slot} {snap['frame']}"
     binary = runner.build_harness()
     with tempfile.TemporaryDirectory(prefix="pixel-", dir=runner.HARNESS.parent) as temporary:

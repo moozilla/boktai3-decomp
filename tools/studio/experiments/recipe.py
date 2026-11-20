@@ -114,6 +114,7 @@ def validate(value):
     raw_trials = value.get("trials")
     if not isinstance(raw_trials, list) or not 1 <= len(raw_trials) <= MAX_TRIALS:
         raise ValueError(f"A recipe needs 1 to {MAX_TRIALS} trials")
+    from .interventions import validate as validate_interventions
     trials = []
     seen = set()
     for trial in raw_trials:
@@ -125,7 +126,11 @@ def validate(value):
         seen.add(key)
         script = trial.get("input", "")
         compile_steps(script, duration)
-        trials.append({"id": key, "label": label(trial.get("label", key), 60, "Trial label"), "input": script})
+        item = {"id": key, "label": label(trial.get("label", key), 60, "Trial label"), "input": script}
+        actions = validate_interventions(trial.get("interventions", []), fields, duration)
+        if actions:
+            item["interventions"] = actions
+        trials.append(item)
     from .checks import validate_checks
     frames = set(range(0, duration, interval)) | {duration}
     assertions = validate_checks(value.get("checks", []), seen, fields, functions, frames)
@@ -153,7 +158,7 @@ def instruction(count, keys, lux):
     return f"hold {keys} {count}" if keys else f"wait {count}"
 
 
-def timeline(program, duration, interval, *, save_states=False):
+def timeline(program, duration, interval, *, save_states=False, interventions=None):
     """Sample the shared start and the end of each interval before new inputs."""
     def snapshot(frame):
         name = f"f{frame:04d}"
@@ -167,16 +172,23 @@ def timeline(program, duration, interval, *, save_states=False):
     if short:
         program.append((short, None, None))
     frame, next_sample = 0, interval
+    plan = interventions or {}
+    boundaries = iter(sorted(at for at in plan if at))
+    next_action = next(boundaries, duration)
     yield from snapshot(0)
+    yield from plan.get(0, ())
     for count, keys, lux in program:
         if lux is not None:
             yield instruction(count, keys, lux)
         while count:
-            stop = min(duration, next_sample)
+            stop = min(duration, next_sample, next_action)
             chunk = min(count, stop - frame)
             yield instruction(chunk, keys, None)
             frame += chunk
             count -= chunk
-            if frame == stop:
+            if frame == min(next_sample, duration):
                 yield from snapshot(frame)
                 next_sample += interval
+            if frame == next_action:
+                yield from plan.get(frame, ())
+                next_action = next(boundaries, duration)

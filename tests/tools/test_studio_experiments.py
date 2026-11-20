@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/studio"))
-from experiments import annotations, centaur, checks, fields, graphics, http, obj_pixels, recipe, runner, sweep
+from experiments import annotations, centaur, checks, fields, graphics, http, interventions, obj_pixels, recipe, runner, sweep
 
 
 class RecipeTests(unittest.TestCase):
@@ -28,6 +28,22 @@ class RecipeTests(unittest.TestCase):
             "sample f0015", "shot f0015", "lux 90", "wait 5",
             "sample f0020", "shot f0020", "wait 1", "sample f0021", "shot f0021",
         ])
+
+    def test_interventions_preserve_shared_and_later_sample_order(self):
+        scalar = fields.Field("signedField", "signedField", 0x02000000, (0,), 1, True, "include/test.h")
+        actions = interventions.encoded({"interventions": [
+            {"frame": 2, "field": scalar.path, "value": -1},
+            {"frame": 3, "field": scalar.path, "value": 127},
+        ]}, [scalar])
+        lines = list(recipe.timeline(recipe.compile_steps("hold UP 6"), 6, 3, interventions=actions))
+        self.assertEqual(lines, ["sample f0000", "shot f0000", "hold UP 2", "setfield 0 FF",
+                                 "hold UP 1", "sample f0003", "shot f0003", "setfield 0 7F",
+                                 "hold UP 3", "sample f0006", "shot f0006"])
+        bad = {"interventions": [{"frame": 0, "field": scalar.path, "value": 128}]}
+        with self.assertRaises(ValueError):
+            interventions.encoded(bad, [scalar])
+        with self.assertRaisesRegex(ValueError, "once"):
+            interventions.validate(bad["interventions"] * 2, [scalar.path], 6)
 
     def test_script_disallows_host_io_memory_writes_and_unbounded_input(self):
         for text in ("loadstate ../../secret", "sample foo", "observe 02000000 4 0",
@@ -414,6 +430,16 @@ class HTTPTests(unittest.TestCase):
             child = run(proof_branch(parent))
             self.assertTrue(all(c["state"] == "confirmed" for c in child["checks"]))
             self.assertEqual(child["checkpoint"]["fork"]["run"], parent["id"])
+            cause = run(runner.sample_recipe("pause-cause"))
+            self.assertTrue(all(claim["state"] == "confirmed" for claim in cause["checks"]))
+            field, flag, menu, allow = (trial["snapshots"][-1]["fields"] for trial in cause["trials"])
+            self.assertEqual([trial[0]["value"] for trial in (field, flag, menu, allow)], [2343, 2694, 2694, 2343])
+            authored = flag[1]["last_intervention"]
+            self.assertEqual((authored["before"], authored["value"]), (0, 4))
+            self.assertIsNone(authored["pc"])
+            self.assertIsNone(flag[1]["last_write"])
+            self.assertEqual(allow[1]["value"], 4)
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "title": "Does the engine pause bit stop Django on its own?",
+  "checkpoint": "test-save",
+  "continue": true,
+  "rtc": 1128150000,
+  "prepare": "",
+  "duration": 120,
+  "sample_every": 15,
+  "sprite_trace": false,
+  "observe": [
+    "gPlayers[0]->position.z",
+    "gEnginePauseFlags",
+    "gTaskLists[6].pauseMask"
+  ],
+  "probe": [
+    "Player_Update",
+    "Terrain_SampleSurface",
+    "SceneHud_UpdatePageInput",
+    "TaskSystem_RunFrame",
+    "Hud_BeginSavedBlend"
+  ],
+  "checks": [
+    {
+      "statement": "Django moves under Up input in the field.",
+      "trial": "field",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "ne",
+      "value": 0
+    },
+    {
+      "statement": "Setting the pause bit alone stops movement.",
+      "trial": "flag",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "eq",
+      "value": 0
+    },
+    {
+      "statement": "Django stays in place when the menu pauses his list.",
+      "trial": "menu",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "eq",
+      "value": 0
+    },
+    {
+      "statement": "Django can move behind the menu if his list ignores bit 2.",
+      "trial": "allow",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "ne",
+      "value": 0
+    },
+    {
+      "statement": "The engine pause bit stays set while Django moves behind the menu.",
+      "trial": "allow",
+      "field": "gEnginePauseFlags",
+      "frame": 120,
+      "compare": "eq",
+      "value": 4,
+      "mask": 4
+    }
+  ],
+  "trials": [
+    {
+      "id": "field",
+      "label": "Field · normal",
+      "input": "wait 60\nhold UP 60"
+    },
+    {
+      "id": "flag",
+      "label": "Field · set pause bit",
+      "input": "wait 60\nhold UP 60",
+      "interventions": [
+        {
+          "frame": 60,
+          "field": "gEnginePauseFlags",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "id": "menu",
+      "label": "Menu · normal",
+      "input": "tap START\nwait 50\nhold UP 60"
+    },
+    {
+      "id": "allow",
+      "label": "Menu · allow player task",
+      "input": "tap START\nwait 50\nhold UP 60",
+      "interventions": [
+        {
+          "frame": 60,
+          "field": "gTaskLists[6].pauseMask",
+          "value": 3
+        }
+      ]
+    }
+  ]
+}

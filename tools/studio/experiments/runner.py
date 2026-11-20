@@ -13,7 +13,7 @@ import threading
 import time
 from uuid import uuid4
 
-from . import annotations, centaur, checks, fields, graphics, recipe, references
+from . import annotations, centaur, checks, fields, graphics, interventions, recipe, references
 
 ROOT = fields.ROOT
 HERE = Path(__file__).resolve().parent
@@ -48,7 +48,8 @@ def public_path(path):
     return str(path).replace(str(ROOT), ".").replace(str(Path.home()), "~")
 
 
-EXAMPLES = {"pause": "Pause and movement", "attack": "Tap or hold attack"}
+EXAMPLES = {"pause": "Pause and movement", "pause-cause": "Change one pause field",
+            "attack": "Tap or hold attack"}
 
 
 def sample_recipe(name="pause"):
@@ -270,8 +271,8 @@ def parse_events(path, observed, index):
             event = {"frame": frame, "sequence": sequence, "field": field_index,
                      "address": row["address"] if address else None, "value": value}
             match row["kind"]:
-                case "write" | "bind":
-                    pc = int(row["pc"], 16)
+                case "write" | "bind" | "intervention" | "intervention_bind":
+                    pc = int(row["pc"], 16) or None
                     kind = row["kind"]
                     context = []
                     for pair in (row.get("context") or "").split(","):
@@ -279,11 +280,12 @@ def parse_events(path, observed, index):
                             entered, resume = pair.split(":")
                             context.append({"entry": entered, "resume": resume,
                                             "function": index.lookup(int(entered, 16))})
-                    event.update(kind=kind, pc=format_address(pc), function=index.lookup(pc), context=context)
-                    if kind == "write":
+                    event.update(kind=kind, pc=format_address(pc) if pc else None,
+                                 function=index.lookup(pc) if pc else None, context=context)
+                    if kind in {"write", "intervention"}:
                         event["before"] = field.decode(row["before"])
                         latest[field_index] = event
-                        activity[field_index] += 1
+                        activity[field_index] += kind == "write"
                     else:
                         event["before_address"] = row["before"]
                         binding_epoch[field_index] += 1
@@ -308,12 +310,14 @@ def parse_events(path, observed, index):
                         elif before["value"] == value:
                             state = "unchanged"
                         elif writer and before["sequence"] < writer["sequence"]:
-                            state = "observed"
+                            state = "intervened" if writer["kind"] == "intervention" else "observed"
                         else:
                             state = "unobserved"
                     snap = snapshots.setdefault(row["label"], {"label": row["label"], "frame": frame, "fields": []})
                     snap["fields"].append({**event, "previous": before["value"] if before else None,
-                                           "state": state, "last_write": writer,
+                                           "state": state,
+                                           "last_write": writer if writer and writer["kind"] == "write" else None,
+                                           "last_intervention": writer if writer and writer["kind"] == "intervention" else None,
                                            "writes_since_sample": activity[field_index]})
                     previous[field_index] = event
                     activity[field_index] = 0
@@ -357,7 +361,7 @@ def analyze_trial(directory, observed, index, probes, sensor):
         with Image.open(directory / f"{name}.ppm") as image:
             image.save(directory / f"{name}.png")
         (directory / f"{name}.ppm").unlink()
-    trial = {"snapshots": snapshots, "write_count": len(writes),
+    trial = {"snapshots": snapshots, "write_count": sum(w["kind"] in {"write", "bind"} for w in writes),
              "probes": read_probes(directory / "probes.tsv", probes, index, start_frame)}
     return trial, writes
 
@@ -402,6 +406,8 @@ def build_proof_artifacts(directory, result):
     lines.append("")
     for trial in trials:
         lines.append(trial["label"])
+        for action in trial.get("interventions", []):
+            lines.append(f"  Recipe set {action['field']} to {action['value']} after sampling frame {action['frame']}.")
         for f, start, end in zip(result["fields"], trial["snapshots"][0]["fields"], trial["snapshots"][-1]["fields"]):
             provenance = end["last_write"]
             tail = ""
@@ -414,6 +420,8 @@ def build_proof_artifacts(directory, result):
                 context = [link["function"]["name"] for link in provenance.get("context", []) if link["function"]]
                 if context:
                     tail += f" {{active probed entries: {' → '.join(context)}}}"
+            if patch := end.get("last_intervention"):
+                tail = f" (last changed by recipe, game frame {patch['frame']})"
             lines.append(f"  {f['path']}: {start['value']} -> {end['value']}{tail}")
         lines.extend(f"  {p['name']}: {p['count']} observed entries" for p in trial["probes"])
         lines.append("")
@@ -432,6 +440,7 @@ def execute(directory, spec, trans=None):
             if address is None:
                 raise ValueError(f"Unknown function {name!r}")
             probes.append((name, address))
+        plans = {trial["id"]: interventions.encoded(trial, observed) for trial in spec["trials"]}
         status(directory, "running", "Booting the shared starting state")
         binary = build_harness()
         prefix = directory / "prepare"
@@ -485,7 +494,8 @@ def execute(directory, spec, trans=None):
                     *(f.command() for f in observed)]
             cmds.extend(f"probe p{i} {address:08X}" for i, (_, address) in enumerate(probes))
             cmds.extend(recipe.timeline(recipe.compile_steps(trial["input"], spec["duration"]),
-                                        spec["duration"], spec["sample_every"], save_states=True))
+                                        spec["duration"], spec["sample_every"], save_states=True,
+                                        interventions=plans[trial["id"]]))
             if spec["sprite_trace"]:
                 cmds = list(graphics.expand_commands(cmds))
             run_harness(binary, case, cmds, spec["rtc"])

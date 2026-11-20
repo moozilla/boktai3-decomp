@@ -169,6 +169,14 @@ def main():
                     if not all(check["state"] == "confirmed" for check in attack_run["checks"]):
                         raise RuntimeError("The attack comparison did not reproduce its expected observations")
                     data["attack_experiment"] = {"id": attack_run["id"], **artifact_paths(attack_path)}
+                    pause_cause = runner.sample_recipe("pause-cause")
+                    cause_path = runner.init_run(pause_cause)
+                    cause = runner.execute(cause_path, pause_cause)
+                    external = cause["trials"][1]["snapshots"][-1]["fields"][1]
+                    if (not all(check["state"] == "confirmed" for check in cause["checks"]) or
+                            external["last_write"] or external["last_intervention"]["value"] != 4):
+                        raise RuntimeError("The typed pause intervention did not reproduce the expected behavior")
+                    data["pause_cause_experiment"] = {"id": cause["id"], **artifact_paths(cause_path)}
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         parser.exit(1, f"{runner.public_path(str(error))}\n")
     print(json.dumps(data, ensure_ascii=False, indent=2))

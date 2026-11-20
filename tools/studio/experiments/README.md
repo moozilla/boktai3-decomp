@@ -14,7 +14,8 @@ build/venv/bin/python tools/studio/serve.py --no-preload
 The proof tests pressing Up from one state in the field and in the pause menu,
 then forks directly from the captured paused frame and tests reopening the
 field. It also compares the exact frame at which a tap and a held attack
-initialize contact. The command prints paths to the contact sheets,
+initialize contact, and tests the pause bit by changing one typed field at a
+time. The command prints paths to the contact sheets,
 transcripts, JSON results, and an annotated pixel-to-sprite frame. Each trial directory has numbered PNGs.
 
 Open `http://127.0.0.1:8642/experiments` for the notebook. Run the example,
@@ -63,6 +64,13 @@ build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments
   field operators and constant array indices. Stock agbcc measures offsets,
   index bounds, widths and signedness. A pointer chain can become unbound
   during play. Include more than one field for a synchronized comparison.
+- Each trial can add `interventions`, a list of objects with `frame`, an
+  observed `field` and an integer `value`. An intervention runs after
+  sampling that frame and before the next emulated frame. The compiler
+  checks its field width and signedness. The harness resolves the named
+  field against live RAM and labels the observed change as authored input.
+  Open **Change one pause field** for paired trials that set the engine
+  pause bit by itself or let Django's task run under the ordinary menu.
 - `probe` takes function names. Each entry records its VBlank and registers.
   On stores, the observer reports active entries from the configured probes,
   using observed return addresses and stack depth. Calls between those entries
@@ -126,7 +134,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | POST `/api/experiments/runs/ID/snapshot/TRIAL/FRAME` | Read a JSON array of named fields from the restored frame. |
 | GET `/api/experiments/runs/ID/pixel/TRIAL/FRAME/X/Y` | Read matching OBJ fragments and their native queue, source, actor, and art evidence. |
 | POST `/api/experiments/runs/ID/pixel-check/TRIAL/FRAME/X/Y/SLOT` | Send an empty JSON object to replay with one matching slot hidden and return a saved comparison. |
-| GET `/api/experiments/runs/ID/artifact/TRIAL/writes.json` | Read the value-changing CPU stores for one trial. |
+| GET `/api/experiments/runs/ID/artifact/TRIAL/writes.json` | Read the value-changing CPU stores and optional authored interventions for one trial. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/probes.tsv` | Read the raw function entry and register trace. |
 
 The observer measures selected CPU-written fields. DMA, direct emulator writes

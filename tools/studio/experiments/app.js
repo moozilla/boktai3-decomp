@@ -55,7 +55,9 @@ function header() {
 function drawPreview(spec) {
   $('sweep-results').hidden = true;
   $('preview').innerHTML = spec.trials.map(trial =>
-    `<article><h2>${esc(trial.label)}</h2><pre>${esc(trial.input || 'Wait for the trial duration')}</pre></article>`
+    `<article><h2>${esc(trial.label)}</h2><pre>${esc(trial.input || 'Wait for the trial duration')}</pre>
+      ${(trial.interventions || []).map(action => `<p class="claim-math">After frame ${action.frame},
+        set <code>${esc(action.field)}</code> to ${showValue(action.value)}.</p>`).join('')}</article>`
   ).join('');
 }
 
@@ -399,6 +401,14 @@ function drawEvidence() {
     <p class="meta">${esc(trial.label)} · frame ${snap.relative} ${row.address ? '· RAM ' + unsignedHex(row.address) : ''}</p>
     <p class="big-value">${before}${showValue(row.value)}</p>`;
   if (!record) {
+    const intervention = row.last_intervention;
+    if (intervention) {
+      const moment = intervention.frame - trial.snapshots[0].frame;
+      details.innerHTML = header + `<p class="observed">Recipe intervention after frame ${moment}</p>
+        <p><code>${showValue(intervention.before)} → ${showValue(intervention.value)}</code></p>
+        <a href="${artifact(trial.id + '/writes.json')}" target="_blank" rel="noopener">Observed events</a>`;
+      return;
+    }
     const notes = {
       initial: 'Read from the shared starting state.',
       unchanged: 'The sampled value stayed the same. No earlier value-changing CPU store is available here.',
@@ -513,6 +523,10 @@ function trialRow(trial) {
   row.dataset.id = trial.id;
   row.innerHTML = `<label>Trial label <input class="tlabel" maxlength="60" required value="${esc(trial.label)}"></label>
     <label>Controller input <textarea class="tinput" rows="4" spellcheck="false">${esc(trial.input)}</textarea></label>
+    <details ${trial.interventions?.length ? 'open' : ''}><summary>Set a named field</summary>
+      <label>Interventions (JSON) <textarea class="tinterventions" rows="4" spellcheck="false"
+        placeholder='[{"frame":60,"field":"gEnginePauseFlags","value":4}]'>${esc(JSON.stringify(trial.interventions || [], null, 2))}</textarea></label>
+    </details>
     <button type="button" class="remove-trial">Remove</button>`;
   return row;
 }
@@ -557,7 +571,8 @@ function formRecipe() {
     prepare: $('prep').value, observe: readLines('observe'), probe: readLines('probe'),
     checks: JSON.parse($('checks').value || '[]'),
     trials: [...$('trial-editor').children].map(row => ({ id: row.dataset.id,
-      label: row.querySelector('.tlabel').value, input: row.querySelector('.tinput').value })) };
+      label: row.querySelector('.tlabel').value, input: row.querySelector('.tinput').value,
+      interventions: JSON.parse(row.querySelector('.tinterventions').value || '[]') })) };
 }
 
 function openEditor(spec = primary?.recipe || example) {

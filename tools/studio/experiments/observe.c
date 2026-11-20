@@ -28,6 +28,7 @@ static const char *outdir;
 static FILE *events;
 static struct Watch fields[MAX_FIELDS];
 static unsigned nfields, sequence;
+static unsigned intervention_field = MAX_FIELDS;
 static uint32_t touched, low, high;
 
 static void stop(const char *reason)
@@ -172,9 +173,9 @@ void observe_instruction(uint32_t pc, uint32_t sp, uint32_t lr, unsigned mode, b
     stack->entries[stack->depth++] = (struct Entry){ pc, sp, resume };
 }
 
-static void end_store_line(void)
+static void end_store_line(bool intervention)
 {
-    unsigned depth = active_context ? active_context->depth : 0;
+    unsigned depth = !intervention && active_context ? active_context->depth : 0;
     for (unsigned i = 0; i < depth; ++i) {
         const struct Entry *entry = &active_context->entries[i];
         fprintf(events, "%s%08" PRIX32 ":%08" PRIX32, i ? "," : "", entry->pc, entry->resume);
@@ -184,6 +185,9 @@ static void end_store_line(void)
 
 void observe_after_store(uint32_t pc)
 {
+    bool intervention = intervention_field < MAX_FIELDS;
+    if (intervention)
+        pc = 0;
     for (unsigned i = 0; i < nfields; ++i) {
         if (!(touched & (1u << i)))
             continue;
@@ -194,16 +198,16 @@ void observe_after_store(uint32_t pc)
         unsigned frame = core->frameCounter(core);
         if (previous != watch->address) {
             count_event();
-            fprintf(events, "bind\t%u\t%u\t%u\t-\t%08" PRIX32 "\t%08" PRIX32
-                    "\t%08" PRIX32 "\t%08" PRIX32 "\t", sequence, frame, i,
+            fprintf(events, "%s\t%u\t%u\t%u\t-\t%08" PRIX32 "\t%08" PRIX32
+                    "\t%08" PRIX32 "\t%08" PRIX32 "\t", intervention ? "intervention_bind" : "bind", sequence, frame, i,
                     watch->address, value, previous, pc);
-            end_store_line();
-        } else if (watch->address && value != watch->old_value) {
+            end_store_line(intervention);
+        } else if (watch->address && (value != watch->old_value || i == intervention_field)) {
             count_event();
-            fprintf(events, "write\t%u\t%u\t%u\t-\t%08" PRIX32 "\t%08" PRIX32
-                    "\t%08" PRIX32 "\t%08" PRIX32 "\t", sequence, frame, i,
+            fprintf(events, "%s\t%u\t%u\t%u\t-\t%08" PRIX32 "\t%08" PRIX32
+                    "\t%08" PRIX32 "\t%08" PRIX32 "\t", intervention ? "intervention" : "write", sequence, frame, i,
                     watch->address, value, watch->old_value, pc);
-            end_store_line();
+            end_store_line(intervention);
         }
     }
     recalculate_bounds();
@@ -235,6 +239,29 @@ bool observe_command(const char *line)
         open_events();
         resolve(watch);
         recalculate_bounds();
+        return true;
+    }
+    if (!strncmp(line, "setfield ", 9)) {
+        unsigned index, value;
+        if (sscanf(line + 9, "%u %x", &index, &value) != 2 || index >= nfields)
+            stop("invalid named-field intervention");
+        struct Watch *watch = &fields[index];
+        resolve(watch);
+        recalculate_bounds();
+        if (!watch->address)
+            stop("the intervention's named field is unbound at this frame");
+        if (watch->width < 4 && value >= (1u << (8 * watch->width)))
+            stop("the intervention value does not fit its field");
+        // The memory callbacks see this store just like CPU stores. Mark it
+        // as authored input so the current PC is never reported as its writer.
+        intervention_field = index;
+        if (watch->width == 1)
+            core->busWrite8(core, watch->address, value);
+        else if (watch->width == 2)
+            core->busWrite16(core, watch->address, value);
+        else
+            core->busWrite32(core, watch->address, value);
+        intervention_field = MAX_FIELDS;
         return true;
     }
     if (!strncmp(line, "sample ", 7)) {
