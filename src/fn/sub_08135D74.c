@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 /* When flags2D0 bit 27 and flags2D4 bit 13 are set and field2B8 is live, switch to control kind 29 (SceneActorReaction_UpdateTimedBurst) and reset hit state. */
@@ -20,28 +21,6 @@ static inline u32 Mask(u16 *flags, u32 maskInput)
     u32 mask = maskInput;
     return *flags & mask;
 }
-static inline void SetControl(struct ChaseActor *actor, u32 zero)
-{
-    void *callback = SceneActorReaction_UpdateTimedBurst;
-    u32 kind = 29;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    {
-        u32 off = 0x2C8;
-        {
-            u16 *field = (void *)((u8 *)actor + off);
-            *field = zero;
-        }
-    }
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
 u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
 {
     u32 mask = 0x8000000;
@@ -60,15 +39,8 @@ u32 SceneActorReaction_TryBeginControl29(struct ChaseActor *actor)
             struct ContactCollider *collider;
             if (actor->base.controlKind == 29)
                 return 1;
-            SetControl(actor, blocked);
-            {
-                u32 state = 3;
-                actor->base.state2A8 = state;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = 0;
-                actor->base.counter2AC = blocked;
-                actor->base.field2B1 = 1;
-            }
+            SceneActorTerrain_InstallControl(actor, SceneActorReaction_UpdateTimedBurst, 29);
+            SceneActorTerrain_EnterState(actor, 3, 0, 0);
             SceneActorTerrain_ClearCollisionTimers((void *)actor);
             {
                 u32 clear = ~0x13;
