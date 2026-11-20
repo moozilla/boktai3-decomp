@@ -32,27 +32,27 @@ static inline void SceneObjSlot_ResetPose(struct SceneObjSlot *slot, u8 pose)
     slot->b3a = 0;
 }
 
+static inline void SceneObjSlot_EnterIdle(struct SceneObjSlot *slot,
+                                          enum SceneObjActivationState state)
+{
+    slot->variant = state;
+    slot->callback =
+        state == SCENE_OBJ_ACTIVE ? SceneObject_UpdateActiveIdle : SceneObject_UpdateInactiveIdle;
+}
+
 /* Active animations start at the first pose and inactive animations start at the last. */
 static inline void SceneObjSlot_ApplyActivation(struct SceneObjSlot *slot,
                                                 enum SceneObjActivationState state)
 {
-    slot->variant = state;
-    switch (state) {
-        case SCENE_OBJ_INACTIVE:
-            slot->callback = SceneObject_UpdateInactiveIdle;
-            break;
-        case SCENE_OBJ_ACTIVE:
-            slot->callback = SceneObject_UpdateActiveIdle;
-            break;
-        case SCENE_OBJ_ACTIVATING:
-            slot->callback = SceneObject_AnimateActive;
-            break;
-        case SCENE_OBJ_DEACTIVATING:
-            slot->callback = SceneObject_AnimateInactive;
-            break;
+    if (state == SCENE_OBJ_ACTIVE || state == SCENE_OBJ_INACTIVE) {
+        SceneObjSlot_EnterIdle(slot, state);
+    } else {
+        slot->variant = state;
+        slot->callback =
+            state == SCENE_OBJ_ACTIVATING ? SceneObject_AnimateActive : SceneObject_AnimateInactive;
     }
-    SceneObjSlot_ResetPose(slot,
-                           (state == SCENE_OBJ_INACTIVE || state == SCENE_OBJ_DEACTIVATING) ? 2 : 0);
+    SceneObjSlot_ResetPose(
+        slot, (state == SCENE_OBJ_INACTIVE || state == SCENE_OBJ_DEACTIVATING) ? 2 : 0);
 }
 
 #endif
