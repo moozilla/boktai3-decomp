@@ -1,20 +1,11 @@
-#include "global.h"
+#include "message_window.h"
 
-struct S {
-    u8 f[6];
-    u8 a;
-    u8 b;
-    u8 g[0xf];
-    u8 c;
-    u8 h[0x108 - 0x18];
-    u8 d;
-};
-void TextState_Reset(struct S *p)
+void TextState_Reset(void *playback)
 {
-    u32 z = 0;
-    p->a = z;
-    p->d = z;
-    p->b = z;
-    if (p->c != 2)
-        p->c = z;
+    struct MessagePlaybackState *state = playback;
+    state->palette = 0;
+    state->depth = 0;
+    state->stream = 0;
+    if (state->wrap != 2)
+        state->wrap = 0;
 }
