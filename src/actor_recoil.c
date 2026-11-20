@@ -48,11 +48,6 @@ static inline u8 Recoil_TestDamageFlags(u32 mask, struct ActorStats *obj, u8 **o
     return FALSE;
 }
 
-static inline void Recoil_SetDamageFlags(u8 bits, u8 *flags)
-{
-    *flags = bits | *flags;
-}
-
 static inline bool32 ActorRecoil_IsDamageCategory(s32 kind, s32 want)
 {
     if (kind == want)
@@ -109,7 +104,7 @@ void ActorRecoil_ReceiveBodyContact(void *owner, struct SpatialEntry *other)
     }
     obj->pendingDamage = msg->kind;
     obj->damageType = msg->mask;
-    Recoil_SetDamageFlags(1, flags);
+    ActorStats_SetDamageFlags(1, flags);
     positions.self.x = obj->contactPosition.x + obj->contactOffset.x;
     positions.self.y = obj->contactPosition.y + obj->contactOffset.y;
     positions.self.z = obj->contactPosition.z + obj->contactOffset.z;
