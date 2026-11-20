@@ -1461,88 +1461,25 @@ void SceneActorState_PlayAnimation5ThenAdvance(struct StateActor *p)
         p->actionTimer++;
 }
 
-typedef struct State_08023F98 {
-    u8 pad0[0x90];
-    u32 tick;
-    s16 hp;
-    s16 maxHp;
-    u16 extra;
-    u8 vulnerable;
-    u8 kind;
-    u32 flags;
-    u8 unknownA0[2];
-    u8 unknownA2;
-    u8 unknownA3;
-    u32 unknownA4;
-    u8 facing;
-    u8 facing8;
-    u8 animation;
-    u8 state;
-    u8 mode;
-    u8 submode;
-    u8 phase;
-    u8 finished;
-    u8 enter_08023F98;
-    u8 changed;
-    u8 padB2[0x12];
-    u32 elapsed;
-    u8 padC8[0x38];
-    void (*callback)(void *, int);
-} State_08023F98;
-
-typedef struct Actor_08023F98 {
-    State_08023F98 base;
-    u8 pad104[0x23f];
-    u8 variant;
-    u8 pad344[0x12];
-    u16 delay;
-} Actor_08023F98;
-
-static inline u8 enter_08023F98(State_08023F98 *p)
+static inline void SceneActorState_ClearFlags(struct StateActor *actor, u32 flags)
 {
-    if (p->enter_08023F98) {
-        p->enter_08023F98 = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
+    actor->actionFlags &= ~flags;
 }
 
-void SceneActorState_EnterPhase6AndResetAnimation(State_08023F98 *p)
+void SceneActorState_EnterPhase6AndResetAnimation(struct StateActor *p)
 {
-    int bit;
-    {
-        u32 next = 6;
-        p->phase = next;
-        p->elapsed = 0;
-        p->enter_08023F98 = 1;
-    }
-    {
-        u32 k = 9;
-        p->animation = k;
-    }
-    (*((void (**)(void *))(((u8 *)p) + 0x108)))(p);
-    p->animation = 0;
-    {
-        u32 *flags = &p->flags;
-        u32 mask = ~0x40u;
-        bit = 0x40;
-        p->flags &= ~bit;
-    }
-    ((u8 *)p)[0x383] = 0;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    SceneActorState_EnterPhase(p, 6);
+    SceneActorState_SetAnimation(p, 9);
+    p->actionReset(p);
+    p->actionAnimation = 0;
+    SceneActorState_ClearFlags(p, 0x40);
+    actor->graphics.trackedPlayerEscaped = 0;
 }
 
 struct ProbeBox {
     s32 x : 16, y : 16, z : 16, w : 16;
 };
-
-// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
-// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
-// ahead is more than two tiles above or below.
-
-// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
-// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
-// ahead is more than two tiles above or below.
 
 // confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
 // front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
@@ -1591,16 +1528,27 @@ static inline u8 *ProbeCellProps(s32 cell)
 // confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
 // front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
 // ahead is more than two tiles above or below.
-void sub_08023FE8(State_08023F98 *p)
+static inline u32 SceneActorState_TestPlayerFlags(const struct Player *player, u32 flags)
 {
-    u8 *actor = (u8 *)p;
+    return player->statusFlags & flags;
+}
+
+static inline bool32 ProbeHeightOutOfRange(s32 height, s32 referenceHeight, s32 minDelta,
+                                           s32 maxDelta)
+{
+    u32 delta = height - referenceHeight - minDelta;
+    u32 span = maxDelta - minDelta;
+    return delta > span;
+}
+
+void sub_08023FE8(struct StateActor *p)
+{
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     struct ProbePos *sprite = (struct ProbePos *)((u8 *)p + 0x48);
     p->vulnerable = 1;
-    if (enter_08023F98(p)) {
-        u32 k = 6;
-        p->animation = k;
-    }
-    if (actor[0x394] == 1) {
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 6);
+    if (actor->graphics.particleFlag == 1) {
         struct ProbePos off, min, max;
         s32 r;
         ProbeProject(&off, ((u8 *)sprite)[9], 0x80);
@@ -1611,14 +1559,12 @@ void sub_08023FE8(State_08023F98 *p)
         max.x = 0x80;
         max.z = 0x80;
         ProbeAdd(&max, &off);
-        r = sub_08022624(actor, actor[0x174], (struct BoxSearchPosition *)&min,
+        r = sub_08022624(actor, ((u8 *)actor)[0x174], (struct BoxSearchPosition *)&min,
                          (struct BoxSearchPosition *)&max);
         if (r >= 0) {
-            u8 **players = (u8 **)gPlayers;
-            u8 *q = players[r];
-            u32 mask = 0x40000;
-            if (!(*(u32 *)(q + 0x20) & mask)) {
-                actor[0x395] = r;
+            struct Player *player = gPlayers[r];
+            if (!SceneActorState_TestPlayerFlags(player, 0x40000)) {
+                actor->graphics.trackedPlayer = r;
                 SceneActorState_EnterPhase6AndResetAnimation(p);
                 return;
             }
@@ -1627,7 +1573,7 @@ void sub_08023FE8(State_08023F98 *p)
     {
         struct ProbePos pos;
         s32 distance = 0x190;
-        u8 *s = actor + 0x48;
+        u8 *s = (u8 *)actor + 0x48;
         u8 *props;
         struct ProbePos *at;
         u32 type;
@@ -1647,481 +1593,134 @@ void sub_08023FE8(State_08023F98 *p)
                 h -= (u8)at->x;
                 break;
         }
-        {
-            u32 d = h - *(s16 *)(actor + 0x352) + 0x1ff;
-            u32 bound = 0x2fe;
-            bad = 0;
-            if (d > bound)
-                bad = 1;
-        }
-        if (bad || p->finished) {
-            u32 next = 5;
-            p->phase = next;
-            p->elapsed = 0;
-            p->enter_08023F98 = 1;
-        } else
-            p->elapsed++;
-    }
-}
-
-struct S_0802429C {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_0802429C(struct S_0802429C *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayAnimation7ThenRecover(struct S_0802429C *p)
-{
-    struct S_0802429C *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_0802429C(p, z)) {
-        u32 k = 7;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
+        bad = ProbeHeightOutOfRange(h, actor->graphics.recoveryGroundHeight, -0x1ff, 0xff);
+        if (bad || p->actionFinished)
+            SceneActorState_EnterPhase(p, 5);
         else
-            p2->h356 = 0x5a;
-    } else
-        p->c4++;
-}
-
-struct S_08024334 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024334(struct S_08024334 *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
+            p->actionTimer++;
     }
-    return 0;
 }
 
-void SceneActorState_PlayAnimation8ThenRecover(struct S_08024334 *p)
+static inline void SceneActorState_StartRecovery(struct SceneGraphicsActor *actor, u32 duration)
 {
-    struct S_08024334 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_08024334(p, z)) {
-        u32 k = 8;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
-        else
-            p2->h356 = 0x1E;
-    } else
-        p->c4++;
+    SceneActorState_StartAction((struct StateActor *)actor, 0, 0, 0);
+    if (gEngineFlags & 0x1000)
+        actor->graphics.recoveryTimer = 0;
+    else
+        actor->graphics.recoveryTimer = duration;
 }
 
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
-struct S_080243CC {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f1[0x13];
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x2bb];
-    u8 b383;
-};
-
-static inline u8 SceneRecovery_TakeEntry(State_08023F98 *p, u32 zero)
+void SceneActorState_PlayAnimation7ThenRecover(struct SceneGraphicsActor *actor)
 {
-    if (p->enter_08023F98) {
-        p->enter_08023F98 = zero;
-        p->finished = zero;
-        return 1;
-    }
-    return 0;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 7);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 90);
+    else
+        p->actionTimer++;
 }
-
-void sub_080243CC(State_08023F98 *p)
+void SceneActorState_PlayAnimation8ThenRecover(struct SceneGraphicsActor *actor)
 {
-    u8 *actor = (u8 *)p;
-    u8 *vulnerable = &p->vulnerable;
-    u32 zero = 0;
-    *vulnerable = 1;
-    if (SceneRecovery_TakeEntry(p, zero)) {
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 8);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 30);
+    else
+        p->actionTimer++;
+}
+// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
+// confidence=low: the tracked player escaping selects the next recovery phase.
+void sub_080243CC(struct StateActor *p)
+{
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    p->vulnerable = 1;
+    if (TakeFlag(p)) {
         DEBUG_PRINT();
     }
-    if (p->finished) {
-        u32 variant = actor[0x383];
-        if (variant) {
-            u32 phase = 8;
-            u32 elapsed;
-            p->phase = phase;
-            elapsed = 0;
-            p->elapsed = elapsed;
-            p->enter_08023F98 = 1;
-        } else {
-            u32 phase = 7;
-            p->phase = phase;
-            p->elapsed = variant;
-            p->enter_08023F98 = 1;
-        }
-    } else {
-        p->elapsed++;
-    }
-}
-
-struct S_08024440 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024440(struct S_08024440 *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayAnimation10ThenRecover(struct S_08024440 *p)
-{
-    struct S_08024440 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_08024440(p, z)) {
-        u32 k = 10;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
+    if (p->actionFinished) {
+        if (actor->graphics.trackedPlayerEscaped)
+            SceneActorState_EnterPhase(p, 8);
         else
-            p2->h356 = 0x1E;
-    } else
-        p->c4++;
-}
-
-struct S_080244D8 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_080244D8(struct S_080244D8 *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
+            SceneActorState_EnterPhase(p, 7);
+    } else {
+        p->actionTimer++;
     }
-    return 0;
 }
 
-void SceneActorState_PlayAnimation11ThenRecover(struct S_080244D8 *p)
+void SceneActorState_PlayAnimation10ThenRecover(struct SceneGraphicsActor *actor)
 {
-    struct S_080244D8 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_080244D8(p, z)) {
-        u32 k = 11;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
-        else
-            p2->h356 = 0x1E;
-    } else
-        p->c4++;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 10);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 30);
+    else
+        p->actionTimer++;
 }
-
-struct S_08024570 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 ab;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024570(struct S_08024570 *p, u32 z)
+void SceneActorState_PlayAnimation11ThenRecover(struct SceneGraphicsActor *actor)
 {
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 11);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 30);
+    else
+        p->actionTimer++;
 }
-
-void SceneActorState_PlayVariantAnimation12ThenRecover(struct S_08024570 *p)
+void SceneActorState_PlayVariantAnimation12ThenRecover(struct SceneGraphicsActor *actor)
 {
-    struct S_08024570 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_08024570(p, z))
-        SceneActorState_SetValueClampedWhenActive(p2, 0xc);
-    if (p->af) {
-        if (p2->ab == 3) {
-            u32 k = 0xc;
-            p2->aa = k;
-            goto inc;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetValueClampedWhenActive(actor, 12);
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState == 3) {
+            SceneActorState_SetAnimation((struct StateActor *)actor, 12);
+            goto tick;
         } else {
-            u32 z2 = 0;
-            p2->ac = z2;
-            p2->ad = z2;
-            p2->ae = z2;
-            p2->c4 = z2;
-            p2->b0 = 1;
-            if (gEngineFlags & 0x1000)
-                p2->h356 = z2;
-            else
-                p2->h356 = 0x5a;
+            SceneActorState_StartRecovery(actor, 90);
         }
     } else {
-    inc:
-        p->c4++;
+    tick:
+        p->actionTimer++;
     }
 }
-
-struct S_0802461C {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 ab;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_0802461C(struct S_0802461C *p, u32 z)
+void SceneActorState_PlayVariantAnimation13ThenRecover(struct SceneGraphicsActor *actor)
 {
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayVariantAnimation13ThenRecover(struct S_0802461C *p)
-{
-    struct S_0802461C *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_0802461C(p, z))
-        SceneActorState_SetValueClampedWhenActive(p2, 0xD);
-    if (p->af) {
-        if (p2->ab == 3) {
-            u32 k = 0xD;
-            p2->aa = k;
-            goto inc;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetValueClampedWhenActive(actor, 13);
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState == 3) {
+            SceneActorState_SetAnimation((struct StateActor *)actor, 13);
+            goto tick;
         } else {
-            u32 z2 = 0;
-            p2->ac = z2;
-            p2->ad = z2;
-            p2->ae = z2;
-            p2->c4 = z2;
-            p2->b0 = 1;
-            if (gEngineFlags & 0x1000)
-                p2->h356 = z2;
-            else
-                p2->h356 = 0x96;
+            SceneActorState_StartRecovery(actor, 150);
         }
     } else {
-    inc:
-        p->c4++;
+    tick:
+        p->actionTimer++;
     }
 }
-
-typedef struct State_080246C8 {
-    u8 pad0[0x90];
-    u32 tick;
-    s16 hp, maxHp;
-    u16 extra;
-    u8 vulnerable, kind;
-    u32 flags;
-    u8 unknownA0[2];
-    u8 unknownA2, unknownA3;
-    u32 unknownA4;
-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_080246C8, changed;
-    u8 padB2[0x12];
-    u32 elapsed;
-    u8 padC8[0x38];
-    void (*callback)(void *, int);
-} State_080246C8;
-
-typedef struct Actor_080246C8 {
-    State_080246C8 base;
-    u8 pad104[0x2A0];
-    s32 f3a4;
-    u8 pad3a8[0x630];
-    void *pool;
-} Actor_080246C8;
-
 void ContactActorPool_Start();
 
-static inline u8 enter_080246C8(State_080246C8 *p)
+void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
 {
-    if (p->enter_080246C8) {
-        p->enter_080246C8 = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_StartContactPool(Actor_080246C8 *a)
-{
-    State_080246C8 *p = &a->base;
+    struct StateActor *p = (struct StateActor *)actor;
     struct ContactPosition pos;
     struct ContactPosition pos2;
     u8 *src = (u8 *)p + 0x48;
 
-    if (enter_080246C8(p)) {
-        u32 k = 0xE;
-        p->animation = k;
-    }
-    if (p->finished) {
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 14);
+    if (p->actionFinished) {
         struct ContactPosition *pp = &pos;
         struct ContactPosition *pp2;
         pos = *(struct ContactPosition *)(src + 0xC);
@@ -2129,404 +1728,128 @@ void SceneActorState_StartContactPool(Actor_080246C8 *a)
         pp2 = &pos2;
         pos2 = *pp;
         {
-            s32 v = p->hp;
-            a->f3a4 = v;
+            s32 health = p->health;
+            actor->graphics.healthCostBaseline = health;
         }
-        if (a->pool)
-            ContactActorPool_Start(a->pool, pp, pp2, 10, 10);
-        {
-            u32 next = 0xC;
-            p->phase = next;
-        }
-        p->elapsed = 0;
-        p->enter_080246C8 = 1;
+        if (actor->graphics.contactPool)
+            ContactActorPool_Start(actor->graphics.contactPool, pp, pp2, 10, 10);
+        SceneActorState_EnterPhase(p, 12);
     } else
-        p->elapsed++;
+        p->actionTimer++;
 }
 
 void SceneActorState_HoldAnimation15(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
-        u32 v = 0xF;
-        p->actionAnimation = v;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 15);
     p->actionTimer++;
 }
-
-struct S_080247AC {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_080247AC(struct S_080247AC *p)
+void SceneActorState_UpdateLongRecovery(struct SceneGraphicsActor *actor)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
+    struct StateActor *p = (struct StateActor *)actor;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 16);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 90);
+    else
+        p->actionTimer++;
 }
-
-void SceneActorState_UpdateLongRecovery(struct S_080247AC *p)
-{
-    struct S_080247AC *p2 = p;
-    if (chk_080247AC(p)) {
-        u32 k = 0x10;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
-        else
-            p2->h356 = 0x5a;
-    } else
-        p->c4++;
-}
-
 // confidence=low: variant-dependent recovery animations and timed return to the default action.
 #define SceneActorState_UpdateVariantRecovery sub_0802483C
-struct VariantRecoveryActor {
-    u8 pad0[0xaa];
-    u8 animation, state, mode, index, phase, finished, enter;
-    u8 padb1[0x13];
-    u32 timer;
-    u8 padc8[0x28e];
-    u16 delay;
-    u32 kind;
-    u8 pad35c[0x50];
-    u32 flags;
-    u8 pad3b0[9];
-    u8 alternate;
-};
-static inline u8 enterVariant(struct VariantRecoveryActor *p)
+void SceneActorState_UpdateVariantRecovery(struct SceneGraphicsActor *actor)
 {
-    if (p->enter) {
-        p->enter = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-static inline u8 variantAlternate(struct VariantRecoveryActor *q, u32 offset)
-{
-    u32 adjusted = offset + 0x61;
-    {
-        u8 *address = (u8 *)q + adjusted;
-        return *address;
-    }
-}
-void SceneActorState_UpdateVariantRecovery(struct VariantRecoveryActor *p)
-{
-    struct VariantRecoveryActor *q = p;
-    if (enterVariant(p)) {
-        u32 offset = 0x358;
-        if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset))
-            SceneActorState_SetValueClampedWhenActive(q, 38);
+    struct StateActor *p = (struct StateActor *)actor;
+    if (TakeFlag(p)) {
+        if (actor->graphics.stepTableKind == 3 && actor->graphics.flashPhase)
+            SceneActorState_SetValueClampedWhenActive(actor, 38);
         else
-            SceneActorState_SetValueClampedWhenActive(q, 17);
+            SceneActorState_SetValueClampedWhenActive(actor, 17);
     }
-    if (p->finished) {
-        if (q->state == 3) {
-            u32 offset = 0x358;
-            if (*(u32 *)((u8 *)q + offset) == 3 && variantAlternate(q, offset)) {
-                u32 animation = 38;
-                q->animation = animation;
-            } else {
-                u32 animation = 17;
-                q->animation = animation;
-            }
-        } else if (p->state == 17) {
-            if (q->flags & 4) {
-                u32 animation = 19;
-                p->animation = animation;
-            } else {
-                u32 animation = 18;
-                p->animation = animation;
-            }
-        } else {
-            u32 zero = 0;
-            q->mode = zero;
-            q->index = zero;
-            q->phase = zero;
-            q->timer = zero;
-            q->enter = 1;
-            if (gEngineFlags & 0x1000)
-                q->delay = zero;
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState == 3) {
+            if (actor->graphics.stepTableKind == 3 && actor->graphics.flashPhase)
+                SceneActorState_SetAnimation((struct StateActor *)actor, 38);
             else
-                q->delay = 90;
+                SceneActorState_SetAnimation((struct StateActor *)actor, 17);
+        } else if (p->actionState == 17) {
+            if (actor->graphics.animationFlags & 4)
+                SceneActorState_SetAnimation(p, 19);
+            else
+                SceneActorState_SetAnimation(p, 18);
+        } else {
+            SceneActorState_StartRecovery(actor, 90);
             return;
         }
     }
-    p->timer++;
-}
-
-struct S_08024944 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 ab;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024944(struct S_08024944 *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_UpdateAction20Recovery(struct S_08024944 *p)
-{
-    struct S_08024944 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_08024944(p, z))
-        SceneActorState_SetValueClampedWhenActive(p2, 0x14);
-    if (p->af) {
-        if (p2->ab == 3) {
-            u32 k = 0x14;
-            p2->aa = k;
-            goto inc;
-        } else {
-            u32 z2 = 0;
-            p2->ac = z2;
-            p2->ad = z2;
-            p2->ae = z2;
-            p2->c4 = z2;
-            p2->b0 = 1;
-            if (gEngineFlags & 0x1000)
-                p2->h356 = z2;
-            else
-                p2->h356 = 0x5a;
-        }
-    } else {
-    inc:
-        p->c4++;
-    }
-}
-
-struct S_080249F0 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 ab;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_080249F0(struct S_080249F0 *p, u32 z)
-{
-    if (p->b0) {
-        p->b0 = z;
-        p->af = z;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_UpdateAction21Recovery(struct S_080249F0 *p)
-{
-    struct S_080249F0 *p2 = p;
-    u32 z;
-    u8 *a = &p->a9a;
-    z = 0;
-    *a = 1;
-    if (chk_080249F0(p, z))
-        SceneActorState_SetValueClampedWhenActive(p2, 0x15);
-    if (p->af) {
-        if (p2->ab == 3) {
-            u32 k = 0x15;
-            p2->aa = k;
-            goto inc;
-        } else {
-            u32 z2 = 0;
-            p2->ac = z2;
-            p2->ad = z2;
-            p2->ae = z2;
-            p2->c4 = z2;
-            p2->b0 = 1;
-            if (gEngineFlags & 0x1000)
-                p2->h356 = z2;
-            else
-                p2->h356 = 0x5a;
-        }
-    } else {
-    inc:
-        p->c4++;
-    }
-}
-
-void SceneActorState_UpdateAction22(struct StateActor *p)
-{
-    if (TakeFlag(p)) {
-        u32 v = 0x16;
-        p->actionAnimation = v;
-    }
     p->actionTimer++;
 }
 
-struct S_08024AD4 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024AD4(struct S_08024AD4 *p)
+void SceneActorState_UpdateAction20Recovery(struct SceneGraphicsActor *actor)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_UpdateShortRecovery(struct S_08024AD4 *p)
-{
-    struct S_08024AD4 *p2 = p;
-    if (chk_08024AD4(p)) {
-        u32 k = 0x17;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000)
-            p2->h356 = z2;
-        else
-            p2->h356 = 0x1e;
-    }
-    p->c4++;
-}
-
-struct S_08024B60 {
-    u8 f0[0x9a];
-    u8 a9a;
-    u8 f9[0xf];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 f3[0x28e];
-    u16 h356;
-};
-
-static inline u8 chk_08024B60(struct S_08024B60 *p)
-{
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_WaitForFlagRelease(struct S_08024B60 *p)
-{
-    struct S_08024B60 *p2 = p;
-    int one;
-    if (chk_08024B60(p)) {
-        u32 k = 0x18;
-        p->aa = k;
-    }
-    one = 1;
-    {
-        u32 mask = one;
-    }
-    if (!((*((u32 *)(((u8 *)p) + 0x9c))) & 1)) {
-        u32 z2 = 0;
-        p2->ac = z2;
-        p2->ad = z2;
-        p2->ae = z2;
-        p2->c4 = z2;
-        p2->b0 = 1;
-        if (gEngineFlags & 0x1000) {
-            p2->h356 = z2;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetValueClampedWhenActive(actor, 20);
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState == 3) {
+            SceneActorState_SetAnimation((struct StateActor *)actor, 20);
+            goto tick;
         } else {
-            p2->h356 = 0x1e;
+            SceneActorState_StartRecovery(actor, 90);
         }
     } else {
-        p->c4++;
+    tick:
+        p->actionTimer++;
     }
 }
-
-struct S_08024BEC {
-    u8 f0[0xb0];
-    u8 b0;
-    u8 f1[0x13];
-    u32 c4;
-};
-
-void SceneActorState_UpdatePassiveAction(struct S_08024BEC *p)
+void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
 {
-    u8 *q = &p->b0;
-    if (*q) {
-        *q = 0;
-        q--;
-        *q = 0;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetValueClampedWhenActive(actor, 21);
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState == 3) {
+            SceneActorState_SetAnimation((struct StateActor *)actor, 21);
+            goto tick;
+        } else {
+            SceneActorState_StartRecovery(actor, 90);
+        }
+    } else {
+    tick:
+        p->actionTimer++;
     }
-    p->c4++;
+}
+void SceneActorState_UpdateAction22(struct StateActor *p)
+{
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 22);
+    p->actionTimer++;
+}
+void SceneActorState_UpdateShortRecovery(struct SceneGraphicsActor *actor)
+{
+    struct StateActor *p = (struct StateActor *)actor;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 23);
+    if (p->actionFinished)
+        SceneActorState_StartRecovery(actor, 30);
+    p->actionTimer++;
+}
+void SceneActorState_WaitForFlagRelease(struct SceneGraphicsActor *actor)
+{
+    struct StateActor *p = (struct StateActor *)actor;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 24);
+    if (!SceneActorState_TestFlags(p, 1))
+        SceneActorState_StartRecovery(actor, 30);
+    else
+        p->actionTimer++;
+}
+
+void SceneActorState_UpdatePassiveAction(struct StateActor *p)
+{
+    TakeFlag(p);
+    p->actionTimer++;
 }
 
 extern const u32 gUnk_08604E9C[];
