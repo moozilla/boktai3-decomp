@@ -17,9 +17,8 @@ struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManag
 /* Starts a new state. */
 void Breakable_EnterState(struct PooledInteractable *slot, u32 state)
 {
-    u32 z = 0;
     slot->state = state;
-    slot->counter = z;
+    slot->counter = 0;
     slot->entered = 1;
 }
 
@@ -41,12 +40,10 @@ void Breakable_OnHit(struct SceneCollider *other, u32 unused, struct PooledInter
 {
     struct PooledInteractable *c = slot;
     if (slot->state == 1) {
-        u32 m = 4;
-        if (other->contactFlags2 & m)
+        if (SceneCollider_ReadReactionFlags(other, 4))
             Breakable_EnterState(slot, 3);
     } else if (slot->state == 2) {
-        u32 m = 8;
-        if (other->contactFlags2 & m)
+        if (SceneCollider_ReadReactionFlags(other, 8))
             Breakable_EnterState(c, 4);
     }
 }
@@ -395,17 +392,16 @@ void Breakable_ScriptSetTimeout(void)
 
 void Breakable_ScriptSetState(void)
 {
-    struct PooledInteractableManager *g = gPooledInteractableManager;
-    if (g != 0) {
-        u32 id = Script_GetKeywordValue(0x6e, 0);
-        s32 m1 = -1;
-        s32 v = Script_GetKeywordValue(0x6d, m1);
-        if (v != m1 && v <= 4) {
-            struct PooledInteractable *e = g->slots;
+    struct PooledInteractableManager *manager = gPooledInteractableManager;
+    if (manager != 0) {
+        u32 id = Script_GetKeywordValue('n', 0);
+        s32 state = Script_GetKeywordValue('m', -1);
+        if (state != -1 && state <= 4) {
+            struct PooledInteractable *slot = manager->slots;
             u32 i = 0;
-            for (; i < g->count; i++, e++) {
-                if (e->active == 1 && e->id == id)
-                    Breakable_EnterState(e, v);
+            for (; i < manager->count; i++, slot++) {
+                if (slot->active == 1 && slot->id == id)
+                    Breakable_EnterState(slot, state);
             }
         }
     }
