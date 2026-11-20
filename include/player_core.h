@@ -29,6 +29,10 @@ void Player_RecalculateDerivedStats(struct Player *);
 void Player_ClampStatsAndSyncStatus(struct Player *);
 void Player_InitializeStatsFromScript(struct Player *);
 void Player_RefreshBodyCollision(struct Player *);
+static inline void Player_SetPositionResetDuration(struct Player *player, u16 duration)
+{
+    player->positionResetValue = duration;
+}
 void PlayerAction_RefreshModifiers(void *);
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 void SparkParticle_Spawn(void *, s32, void *, s32, s32, s32, s32, s32);
