@@ -1,3 +1,4 @@
+#include "player_status_flags.h"
 #include "global.h"
 extern u8 *gGameState;
 extern void *gUnk_08610D18[];
@@ -23,15 +24,11 @@ struct Vec2 {
 
 void sub_08158754(u8 *p)
 {
-    u32 flags;
-    u32 bit = 0x54000;
-    flags = *(u32 *)(p + 0x20);
-    flags |= bit;
-    *(u32 *)(p + 0x20) = flags;
+    Player_AddStatusFlags((struct Player *)p, 0x54000);
     switch (*(s32 *)(p + 0x1c)) {
         case 1: {
             s32 mode;
-            if (flags & 0x10)
+            if (((struct Player *)p)->statusFlags & 0x10)
                 Player_AccumulateAction(p, *(s16 *)(gGameState + 0x876));
             if (Player_CanUseSceneFeature(p)) {
                 Player_UpdateTimedScriptEvent(p);
