@@ -613,19 +613,23 @@ addr,name,mode,confidence,source,notes
 08019FD8,Presentation_ShowItemDescription,thumb,low,src-alias,Parses the item's description string ref and pushes it into the text box; called from Presentation_UpdateItemGraphic.
 0801A01C,Presentation_UpdateItemGraphic,thumb,low,src-alias,
 0801A094,SelectionMenu_CallConfirmScript,thumb,low,src-alias,Packs the two highlighted actor/item slots into script args and calls the menu's confirm script hook via Script_Call.
+0801A0D0,SelectionMenu_PlaySelectionSound,thumb,low,src-alias,Plays the sound for the selected menu action
 0801A10C,SelectionMenu_ConfigureLayers,thumb,low,src-alias,
 0801A1A4,SelectionMenu_HandleHorizontalInput,thumb,low,src-alias,
+0801A218,SelectionMenu_InitPanel,thumb,low,src-alias,Initializes the panel widgets and main panel sprite
 0801A3C0,SelectionMenu_InitCursors,thumb,low,src-alias,
 0801A418,SelectionMenu_InitMarkers,thumb,low,src-alias,
 0801A470,SelectionMenu_InitHighlight,thumb,low,src-alias,Creates the persistent selection highlight/glow object at p+0x5b4 during SelectionMenu_Initialize; hidden again in SelectionMenu_ReviewChoice on confi
 0801A4B4,SelectionMenu_PositionCursors,thumb,low,src-alias,
 0801A53C,SelectionMenu_PositionInventoryMarkers,thumb,low,src-alias,
 0801A5A8,SelectionMenu_PositionEquipmentMarkers,thumb,low,src-alias,
+0801A614,SelectionMenu_HideMarkers,thumb,low,src-alias,Sets the hidden flag on all eight grid markers
 0801A634,SelectionMenu_StepCursors,thumb,low,src-alias,"Advances Anim_Step on the three cursor graphics (p+0x194/0x1f4/0x254) set up by SelectionMenu_PositionCursors, called from SelectionMenu_DrawStatistic"
 0801A658,SelectionMenu_RemovePanel,thumb,low,src-alias,"Removes the sprite and two anims at the menu's lowest offsets (0x8c/0xd4/0x134), created early in initialization; torn down alongside the other cleanu"
 0801A67C,SelectionMenu_RemoveCursors,thumb,low,src-alias,"Removes the three cursor anims at p+0x194/0x1f4/0x254, the counterpart teardown for SelectionMenu_StepCursors/PositionCursors."
 0801A69C,SelectionMenu_RemoveMarkerAnim,thumb,low,src-alias,"Removes the eight inventory/equipment marker anims at p+0x2b4+i*0x60, the counterpart teardown for SelectionMenu_PositionInventoryMarkers/PositionEqui"
 0801A6BC,SelectionMenu_RemoveHighlight,thumb,low,src-alias,Removes the single highlight anim at p+0x5b4 created by SelectionMenu_InitHighlight.
+0801A6D0,SelectionMenu_InitIconGrid,thumb,low,src-alias,Initializes the icon grid and its heading widget
 0801A75C,SelectionMenu_PopulateActors,thumb,low,src-alias,
 0801A814,SelectionMenu_PopulateItems,thumb,low,src-alias,
 0801A8CC,SelectionMenu_RemoveIconGrid,thumb,low,src-alias,Removes the 19 icon-grid graphics at p+0x674 (shared by actor/item populate) plus the border frame at p+0x614.

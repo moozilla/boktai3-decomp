@@ -1,8 +1,6 @@
 #include "selection_menu.h"
 #include "render.h"
 #include "display_sequence_inline.h"
-#define Presentation_PlaySelectionSound sub_0801A0D0
-#define SelectionMenu_HideMarkers       sub_0801A614
 
 void ActionRecord_CopyFromEntry(u8 *, void *);
 void Presentation_ApplyGraphicData(void *, void *);
@@ -35,10 +33,10 @@ int Inventory_GetConsumableId(u32);
 void ScrollingDialogue_SetScript(u32);
 void MessageWindow_SetMessageTable(u32);
 void MessageWindow_ShowMessage(u32);
-void sub_0801A218(struct SelectionMenu *);
+void SelectionMenu_InitPanel(struct SelectionMenu *);
 void SelectionMenu_InitCursors(struct SelectionMenu *);
 void SelectionMenu_InitMarkers(struct SelectionMenu *);
-void sub_0801A6D0(struct SelectionMenu *);
+void SelectionMenu_InitIconGrid(struct SelectionMenu *);
 int SelectionMenu_NavigateGrid(struct SelectionMenu *);
 u32 Script_GetTextSourcePc(void);
 
@@ -52,7 +50,7 @@ void Presentation_UpdateActorGraphic(struct SelectionMenu *p, u32 fallback);
 void Presentation_ShowItemDescription(u8 *p, u32 q);
 void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback);
 void SelectionMenu_CallConfirmScript(struct SelectionMenu *p);
-void Presentation_PlaySelectionSound(void *p, int selection);
+void SelectionMenu_PlaySelectionSound(void *p, int selection);
 int SelectionMenu_ConfigureLayers(int value, int mode);
 void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p);
 void SelectionMenu_InitHighlight(struct SelectionMenu *p);
@@ -204,7 +202,7 @@ void SelectionMenu_CallConfirmScript(struct SelectionMenu *p)
 
 /* Tentative: choose one of three selection sounds. */
 
-void Presentation_PlaySelectionSound(void *p, int selection)
+void SelectionMenu_PlaySelectionSound(void *p, int selection)
 {
     switch (selection) {
         case 0:
@@ -298,7 +296,7 @@ static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
     }
 }
 
-void sub_0801A218(struct SelectionMenu *m)
+void SelectionMenu_InitPanel(struct SelectionMenu *m)
 {
     struct DisplaySequenceState a;
     long long attr;
@@ -458,7 +456,7 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 }
 
 // confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
-void sub_0801A6D0(struct SelectionMenu *p)
+void SelectionMenu_InitIconGrid(struct SelectionMenu *p)
 {
     struct ContactPosition position;
     struct SceneInputWidget *heading;
@@ -1033,9 +1031,9 @@ configure:
         goto fail;
     if (!(p->promptMessages = Script_GetTextSourcePc()))
         goto fail;
-    sub_0801A218(p);
+    SelectionMenu_InitPanel(p);
     SelectionMenu_InitMarkers(p);
-    sub_0801A6D0(p);
+    SelectionMenu_InitIconGrid(p);
     SelectionMenu_InitCursors(p);
     SelectionMenu_InitHighlight(p);
     MessageWindow_SetBounds(0, 16, 30, 2);
