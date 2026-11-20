@@ -3744,7 +3744,7 @@ addr,name,mode,confidence,source,notes
 080D1CD0,Mummy_UpdateHiddenRecovery,thumb,low,src-alias,
 080D1EA0,Mummy_UpdateRevival,thumb,low,src-alias,Tentative revival callback restores saved actor state and health after reenabling the shadow
 080D203C,Mummy_UpdateDying,thumb,low,src-alias,
-080D211C,Golem_UpdateDeath_080D211C,thumb,low,src-alias,
+080D211C,Mummy_UpdateDeath,thumb,low,src-alias,
 080D2194,Mummy_ResumeRouteAfterRecovery,thumb,low,src-alias,
 080D2584,Mummy_UpdateDisplacementRecovery,thumb,low,src-alias,Mummy recoil displacement decay and route/pursuit recovery
 080D3878,Mummy_UpdateDefeat,thumb,low,src-alias,

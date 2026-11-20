@@ -308,9 +308,7 @@ s32 Mod(s32, s32);
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
-struct S;
-
-void Golem_UpdateDeath_080D211C(struct S *p, s32 n);
+void Mummy_UpdateDeath(struct ChaseActor *actor, s32 frame);
 
 struct Sub {
     u8 f0[8];
@@ -328,7 +326,6 @@ void Mummy_UpdateDying(u8 *s, s32 arg)
 {
     struct Sub *c = &(*(struct Ctx **)(s + 4))->sub;
     u8 *part = s + 0x3D4;
-    s32 zero;
     u32 mask;
     s32 off;
     if (TakeFlag(s + 0x2B2)) {
@@ -355,21 +352,8 @@ void Mummy_UpdateDying(u8 *s, s32 arg)
         mask = 0x80;
         mask <<= 5;
         off += 0xDE;
-        zero = (*((u32 *)(s - (-off)))) & mask;
-        if (zero == 0) {
-            void (*fn)(void) = Golem_UpdateDeath_080D211C;
-            u32 code = 6;
-            u32 *flags;
-            u32 clear;
-            s[0x2B2] = 1;
-            s[0x2B0] = zero;
-            s[0x2B5] = code;
-            *((void (**)(void))(s + 0x21C)) = fn;
-            *((u16 *)(s + 0x2C8)) = zero;
-            flags = (u32 *)(s + 0x114);
-            clear = ~1;
-            *flags &= clear;
-            *((u32 *)(s + 0x104)) = zero;
+        if (!(*((u32 *)(s - (-off))) & mask)) {
+            SceneActorChase_SetControl(s, Mummy_UpdateDeath, 6);
             return;
         }
     }
@@ -377,51 +361,20 @@ void Mummy_UpdateDying(u8 *s, s32 arg)
         c->hE = 0;
 }
 
-/* Golem_UpdateDeath_080D211C: Golem_UpdateDeath variant: entry 9, and resets the facing entry while +0x2B3 is set (provisional name) */
+/* Mummy poses after dying before signaling that the control finished. */
 
-static inline u32 orr(u32 k, u16 *a)
+void Mummy_UpdateDeath(struct ChaseActor *actor, s32 frame)
 {
-    return k | *a;
-}
-
-struct S {
-    u8 f0[0x2b0];
-    u8 b0;
-    u8 f1;
-    u8 b2;
-    u8 b3;
-    u8 f2[0x20];
-    u16 h4;
-    u16 h6;
-};
-
-static inline u8 tk(u8 *a)
-{
-    if (*a) {
-        *a = 0;
-        return 1;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 9);
+        SceneActorChase_ClearBits(&actor->base.motionFlags, 1);
     }
-    return 0;
-}
-
-void Golem_UpdateDeath_080D211C(struct S *p, s32 n)
-{
-    if (tk(&p->b2)) {
-        s32 m;
-        u16 *a;
-        SceneActorAnimation_SelectDirectionalEntry(p, 9);
-        a = &p->h4;
-        m = -2;
-        *a = m & *a;
-    }
-    if (n == 0x28) {
-        u16 k = 0x10;
-        p->h6 = k | p->h6;
-    }
-    if (p->b3) {
-        SceneActorAnimation_SelectDirectionalEntry(p, 0);
-        if (n > 0x3C)
-            p->b0 = 1;
+    if (frame == 40)
+        SceneActorChase_SetReactionFlags(actor, 0x10);
+    if (actor->base.restart) {
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0);
+        if (frame > 60)
+            actor->base.stepDone = 1;
     }
 }
 
