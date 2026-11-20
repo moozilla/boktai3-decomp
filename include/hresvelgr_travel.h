@@ -2,34 +2,55 @@
 #define GUARD_HRESVELGR_TRAVEL_H
 
 #include "scene_vec.h"
+#include "boss_action_state.h"
+#include "scene_input_widget.h"
 
 struct HresvelgrTravelActor {
     u8 pad0[0x51];
     u8 facing;
     u8 pad52[2];
-    struct SceneVec position;
-    u8 pad5C[0x40];
+    struct SceneVec position, velocity;
+    u8 pad64[0x38];
     u32 flags;
-    u8 padA0[8];
-    u8 facing4, facing8;
-    u8 padAA[5];
-    u8 finished;
-    u8 padB0;
-    u8 changed, pulse;
-    u8 padB3[0x51];
+    u8 padA0[2];
+    u8 phase, animationCompletions;
+    u32 phaseFrame;
+    u8 facing4, facing8, requestedAnimation, currentAnimation;
+    u8 actionMode, actionIndex, actionPhase, finished;
+    u8 actionEnter, changed, pulse;
+    u8 padB3[0xCC - 0xB3];
+    u8 targetHeading;
+    u8 padCD[0x104 - 0xCD];
     void *callback;
     u8 pad108[8];
     struct SceneVec *origin;
-    u8 pad114[0x60];
-    u8 animationData[0x20], animation[0x20];
-    u8 pad1B4[0x13C];
-    u8 action[0x10];
-    u8 pad300[0x2B];
+    s8 savedHeading;
+    u8 pad115[0x5F];
+    struct SceneInputResource animationData;
+    struct SceneInputWidget animation;
+    u8 pad1F4[0x2F0 - 0x1F4];
+    struct BossActionState action, behavior; /* 0x2F0, 0x300 */
+    u8 pad310[8];
+    u16 recoveryFrames;
+    u8 pad31A[2];
+    s16 motionX, motionY, motionZ, motionW;
+    u8 pad324[7];
     u8 side;
-    u8 pad32C[0x5E];
+    u8 pad32C[4];
+    u16 chargeCount;
+    u8 pad332[6];
+    struct SceneVec shotOffsets[3];
+    u8 pad350[0x383 - 0x350];
+    u8 behaviorFinished;
+    void *savedCallback;
+    u8 savedPhase, savedAnimation;
     s16 travel;
     u8 pad38C[0x10];
-    struct SceneVec target;
+    struct SceneVec target, delta;
+    u8 pad3AC[0x424 - 0x3AC];
+    u16 normalPalette[16][16]; /* 0x424: copied from bank 0x2F0 at initialization. */
+    u8 pad624[0x704 - 0x624];
+    u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
 };
 
 s32 Hresvelgr_RefreshTarget(struct HresvelgrTravelActor *);
