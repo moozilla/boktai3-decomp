@@ -35,12 +35,8 @@ void Player_UpdateSpiralTrailAction(struct Player *p)
         p->previousPosition = p->position;
     }
     Player_SetAnimation(p, 0x9A, 64, 1);
-    {
-        u16 *resource = &p->spriteResource;
-        u32 id = 0x16F;
-        *resource = id;
-        p->actionVariantResource = (u32)(gPaletteBankData + id * 32);
-    }
+    p->spriteResource = 0x16F;
+    p->actionVariantResource = (u32)(gPaletteBankData + p->spriteResource * 32);
     state = (void *)((u8 *)p + 0x3FC);
     Anim_SetSequence(state, *(void **)((u8 *)p + 0x410), 0, p->heading, p->side);
     sprite = (void *)((u8 *)p + 0x14C);
