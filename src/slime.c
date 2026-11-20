@@ -24,18 +24,20 @@
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor)
 {
-    s32 k2 = 1;
-    if ((!SceneActor_ActionsBlocked((void *)actor)) && (info->contactFlags == k2)) {
-        if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
-            actor->base.counter304 = info->collisionId;
-            {
-                u32 *field = &actor->base.statusFlags;
-                u32 mask = ~0x1000000;
-                *field &= mask;
-            }
-        }
-        if (actor->base.paletteOffset == 3) {
-            target->reactionFlags = Slime_GetRandomVariantFlags((u8 *)actor);
+    if (!SceneActor_ActionsBlocked(actor)) {
+        switch (info->contactFlags) {
+            case 1:
+                if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
+                    actor->base.counter304 = info->collisionId;
+                    {
+                        u32 *field = &actor->base.statusFlags;
+                        u32 mask = ~0x1000000;
+                        *field &= mask;
+                    }
+                }
+                if (actor->base.paletteOffset == 3) {
+                    target->reactionFlags = Slime_GetRandomVariantFlags((u8 *)actor);
+                }
         }
     }
 }
@@ -246,7 +248,8 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant, flags);
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant,
+                         flags);
         restart = &actor->restart;
     } else {
         struct SceneInputWidget *tile =
@@ -267,9 +270,8 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -278,7 +280,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
             {
                 u8 playbackFlags = flags;
                 if (playbackFlags & 1)
-                    tile->flags |= mask;
+                    tile->flags |= 4;
                 else
                     tile->flags &= ~4;
             }
