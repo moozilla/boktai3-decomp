@@ -1399,9 +1399,7 @@ void Mummy_UpdateMovementCooldown(struct SUpdateMovementCooldown *s);
 
 void Mummy_UpdateBurnDamage(struct ChaseActor *actor);
 
-struct SUpdateTemporaryFlagTimer;
-
-void Mummy_UpdateTemporaryFlagTimer(struct SUpdateTemporaryFlagTimer *s);
+void Mummy_UpdateTemporaryFlagTimer(struct ChaseActor *actor);
 
 s32 Mummy_UpdateBehavior(void *p)
 {
@@ -2263,26 +2261,15 @@ static inline u8 MotionStarted(struct SceneActorReactionMotion *motion)
 
 void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
 {
-    u32 *flags = &actor->base.statusFlags;
-    s32 mask = -5;
     struct Mummy *parent;
     u32 started;
-    *flags &= mask;
+    SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 4);
     parent = actor->base.context;
-    {
-        u16 *p = &parent->flags6F2;
-        u32 mask = 0xFFFFEBFF;
-        *p = mask & *p;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&parent->flags6F2, 0x1400);
     started = MotionStarted((void *)&actor->base.tracking.target);
     if (started) {
-        u16 *motionFlags = &actor->group.common.gate.flags;
-        {
-            u32 mask = 4;
-            u32 value = *motionFlags;
-            mask |= value;
-            *motionFlags = mask;
-        }
+        u16 *motionFlags;
+        SceneActorChase_GroupSetFlags(&actor->group, 4);
         {
             u32 mask = 0x80;
             motionFlags = &actor->base.motionFlags;
@@ -2301,27 +2288,8 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
         }
         Mummy_EnterIdleControl(actor);
     } else {
-        u32 one = 1;
-        actor->base.state2A8 = 0;
-        actor->base.phase2A9 = one;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = one;
-        {
-            void *control = SceneActorControl_OnIdle;
-            u32 kind = 0x10;
-            actor->base.field2B2 = one;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = kind;
-            actor->base.target = control;
-            actor->base.field2C8 = 0;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                s32 mask = -2;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = 0;
-        }
+        SceneActorChase_SetPhase(actor, 1, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     }
     {
         struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
@@ -2334,16 +2302,11 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor)
     }
 }
 
-struct SOnMovementUpdate {
-    u8 filler[0x2d4];
-    u16 f;
-};
-
-void Mummy_OnMovementUpdate(struct SOnMovementUpdate *s)
+void Mummy_OnMovementUpdate(struct ChaseActor *actor)
 {
     u32 m = 0x100;
-    if (!(s->f & m))
-        Mummy_RequestStraightRoute(s);
+    if (!(actor->base.motionFlags & m))
+        Mummy_RequestStraightRoute(actor);
 }
 
 struct MummyContactTarget {
@@ -2427,10 +2390,7 @@ static inline u8 Mummy_Arrive_path(void *obj, struct SceneActorChaseTracking *tr
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Mummy_SetBehavior(actor, 12);
@@ -2723,12 +2683,10 @@ void Mummy_UpdateMovementTimers(struct SUpdateMovementTimers *s)
     struct TUpdateMovementTimers *t = s->t;
     u32 m = 0x40;
     if (!(s->flags & m)) {
-        u16 *p = &t->h6d0;
-        if (*p != 0)
-            *p = *p - 1;
-        p = &t->h6d6;
-        if (*p != 0)
-            *p = *p - 1;
+        if (t->h6d0)
+            t->h6d0--;
+        if (t->h6d6)
+            t->h6d6--;
     }
 }
 
@@ -3019,11 +2977,9 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
                     u32 n = 8;
                     actor->base.flashTimer = n;
                 }
-                {
-                    u32 bit = 0x8000;
-                    actor->base.behaviorFlags |= bit;
-                }
+                SceneActorChase_SetActorFlags(actor, 0x8000);
                 if (ShouldShowDamage(actor)) {
+                    // concession-ok(const-local): CpuSet reads this fixed word twice to clear the damage buffer.
                     u32 zero;
                     u32 buffer[2];
                     s32 health = CurrentHealth(actor);
@@ -3079,12 +3035,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
         if (kind != 5 && kind != 7 && kind != 6) {
             STAT_INC(0x87C);
             STAT_INC(0x538);
-            {
-                u32 offset = 0x134;
-                u8 *pinned;
-                pinned = (u8 *)actor + offset;
-                hit = pinned;
-            }
+            hit = (u8 *)&actor->base.colliderA;
             {
                 u32 index = *category - 1; /* category 1..25 */
                 collider = hit;
@@ -3164,31 +3115,16 @@ done:
 
 extern const u16 gUnk_086061B8[];
 
-struct Q {
-    u8 filler[8];
-    u16 h8;
-    u8 f2[4];
-    u16 hE;
-};
-
-struct R {
-    u8 f[4];
-    u8 *p;
-    u8 f2[0x2c2 - 8];
-    u16 h2c2;
-    u8 f3[0x2d0 - 0x2c4];
-    u32 flags;
-};
-
-s32 Mummy_GetAnimationStepOffset(struct R *s)
+s32 Mummy_GetAnimationStepOffset(struct ChaseActor *actor)
 {
-    struct Q *q = (struct Q *)(s->p + 0x48);
-    if (q->hE == 0) {
-        s32 m = Mod(q->h8, 4);
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *q = &drawable->sequence;
+    if (q->elapsed == 0) {
+        s32 m = Mod(q->index, 4);
         u32 c = 0x10000;
-        s->flags |= c;
+        actor->base.statusFlags |= c;
         if (m != 0) {
-            u16 h = s->h2c2;
+            u16 h = actor->base.field2C2;
             s32 k = 1;
             if (h <= 0x1f)
                 k = 2;
@@ -3215,9 +3151,8 @@ void Mummy_UpdateMovementCooldown(struct SUpdateMovementCooldown *s)
     struct TUpdateMovementCooldown *t = s->t;
     u32 m = 0x40;
     if (!(s->flags & m)) {
-        u16 *p = &t->h6d2;
-        if (*p != 0)
-            *p = *p - 1;
+        if (t->h6d2)
+            t->h6d2--;
     }
 }
 
@@ -3338,12 +3273,12 @@ s32 SceneActor_StartAdjacentCellRoute(struct Mummy *actor);
 u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
 {
     struct ChaseActor *actor = arg;
-    struct SceneActorControlState **slot = &((struct SceneActorControlPhaseView *)actor)->control;
-    u8 *context = (u8 *)*slot;
+    struct Mummy **slot = (void *)&actor->base.context;
+    struct Mummy *context = *slot;
     u16 *counter;
     u32 v;
     u32 saved;
-    counter = (u16 *)(context + 0x6D4);
+    counter = &context->flags6D4;
     v = *counter;
     saved = (unsigned short)v;
     if (saved) {
@@ -3351,16 +3286,16 @@ u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *arg)
         return 0;
     }
     if (BouncingObject_GetNearbyHeading(&actor->base.body.position) < 0) {
-        u16 *flags = (u16 *)((u8 *)*slot + 0x6F2);
+        u16 *flags = &(*slot)->flags6F2;
         u32 mask = ~0x400;
         *flags &= mask;
         *counter = saved;
         return 0;
     }
     {
-        u8 *control = (u8 *)*slot;
+        struct Mummy *control = *slot;
         u32 mask = 0x400;
-        u16 *flags = (u16 *)(control + 0x6F2);
+        u16 *flags = &control->flags6F2;
         *flags = mask | *flags;
     }
     SceneActor_StartAdjacentCellRoute(actor);
@@ -3398,7 +3333,7 @@ static inline void SubtractPosition(struct ContactPosition *out, struct ContactP
 u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosition *input,
                                    u32 playerId)
 {
-    u8 *group = (void *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition delta;
     struct ContactPosition *deltaPointer;
     struct ContactPosition *position;
@@ -3416,22 +3351,18 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
     SubtractPosition(deltaPointer, input, &actor->base.body.position);
     distance = delta.x * delta.x + deltaPointer->z * deltaPointer->z;
     {
-        u32 range = *(u32 *)(group + 0x50);
+        u32 range = group->common.control.radiusSquared;
         position = &actor->base.body.position;
         if (distance >= range)
             goto fail;
     }
     if (!(u8)SceneActorPath_FaceAndCheckStraightPath(actor))
         goto fail;
+    SceneActorChase_ClearActorFlags(actor, 0x80);
     {
-        u32 *flags = &actor->base.behaviorFlags;
-        s32 mask = -0x81;
-        *flags &= mask;
-    }
-    {
-        struct SceneActorTrackingParent *parent = actor->base.context;
+        struct Mummy *parent = actor->base.context;
         u32 mask = 0x800;
-        u16 *flags = &parent->flags;
+        u16 *flags = &parent->flags6F2;
         u32 value = *flags;
         mask |= value;
         *flags = mask;
@@ -3497,14 +3428,6 @@ void Mummy_ResetMotionState(struct S2 *s)
 
 // confidence=low: clears movement response flags and restores the response speed and sentinel.
 
-struct ResponseState {
-    u8 pad[8];
-    u16 timer;
-    u8 mode;
-    u8 padB[13];
-    u32 counter;
-};
-
 static inline void ClearHalf(u16 *p, u32 mask)
 {
     *p = *p & mask;
@@ -3515,51 +3438,33 @@ static inline u32 WordFlag(u8 *p, u32 mask, u32 off)
     return *(u32 *)(p + off) & mask;
 }
 
-void Mummy_ResetResponseState(u8 *p)
+void Mummy_ResetResponseState(struct ChaseActor *actor)
 {
-    u8 *body = p + 0xDC;
+    u8 *p = (u8 *)actor;
+    struct SceneActorChaseTracking *body = (void *)(p + 0xDC);
     u32 mask = ~0x18;
-    u32 zero;
     u32 *flags;
     u16 *motion;
-    struct ResponseState *response;
-    {
-        u32 loaded = body[15];
-        u32 value = mask;
-        do {
-            value &= loaded;
-        } while (0);
-        zero = 0;
-        body[15] = value;
-    }
-    flags = (u32 *)(p + 0x2D0);
-    {
-        u32 mask = 0xFEFFFFFF;
-        *flags &= mask;
-    }
-    *(u16 *)(p + 0x2C2) = 64;
-    *(u16 *)(p + 0x414) = zero;
-    *(u16 *)(p + 0x418) = zero;
-    motion = (u16 *)(p + 0x2D4);
+    struct SceneActorRegistryControl *response;
+    body->flags &= mask;
+    flags = &actor->base.statusFlags;
+    SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
+    actor->base.field2C2 = 64;
+    actor->group.common.gate.flags = 0;
+    actor->group.common.gate.counter = 0;
+    motion = &actor->base.motionFlags;
     ClearHalf(motion, 0xFFFFFC7F);
-    body[15] &= mask;
-    response = (void *)(p + 0x420);
+    body->flags &= mask;
+    response = &actor->group.common.control;
     if (WordFlag(p, 0x200000, 0x2CC)) {
-        {
-            u32 mask = 0xFEFFFFFF;
-            *flags &= mask;
-        }
+        SceneActorChase_ClearWordFlags(flags, ROOM_ACTOR_STATUS_INTERACTING);
         ClearHalf(motion, 0xFFFFFDFF);
         response->mode = 0;
-        response->counter = zero;
-        response->timer = zero;
+        response->counter = 0;
+        response->timer = 0;
     }
     ClearHalf(motion, 0xFFFFFBFF);
-    {
-        u32 offset = 0x5DA;
-        u8 *address = p + offset;
-        *address = 255;
-    }
+    actor->group.turn.turnsRemaining = -1;
 }
 
 // confidence=low: clears mummy motion counters and restarts the directional animation.
@@ -3597,27 +3502,16 @@ void Mummy_OnClearActivityFlag(struct SOnClearActivityFlag *s)
     *p = *p & m;
 }
 
-struct TUpdateTemporaryFlagTimer {
-    u8 filler[0x6ea];
-    u8 cnt;
-};
-
-struct SUpdateTemporaryFlagTimer {
-    u8 filler[0x2d0];
-    u32 flags;
-    u8 filler2[0x3d0 - 0x2d4];
-    struct TUpdateTemporaryFlagTimer *t;
-};
-
-void Mummy_UpdateTemporaryFlagTimer(struct SUpdateTemporaryFlagTimer *s)
+void Mummy_UpdateTemporaryFlagTimer(struct ChaseActor *actor)
 {
-    u8 *p = &s->t->cnt;
-    if (*p != 0)
-        *p = *p - 1;
+    struct Mummy *context = actor->base.context;
+    u8 *frames = &context->interactionFrames;
+    if (*frames)
+        --*frames;
     else {
-        u32 *q = &s->flags;
+        u32 *flags = &actor->base.statusFlags;
         u32 m = 0xFEFFFFFF;
-        *q = *q & m;
+        *flags = *flags & m;
     }
 }
 
@@ -3707,20 +3601,14 @@ static inline void Mummy_CellCenter_path(s32 cell, struct ContactPosition *posit
 {
     s32 x = Mod(cell, Mummy_MapWidth(SceneActorChase_CurrentMap()));
     s32 z = Div(cell, Mummy_MapWidth(SceneActorChase_CurrentMap()));
-    position->x = ({
-        s32 grid_coordinate_ = (x);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->x = SceneActorChase_CellCenterCoordinate(x);
     {
         u32 attributes = SceneActorChase_CellProperties(cell)->attributes;
         u32 height = 15;
         height &= attributes;
         position->y = SceneActorChase_TerrainLevelHeight(height);
     }
-    position->z = ({
-        s32 grid_coordinate_ = (z);
-        (s16)(((u32)grid_coordinate_ << 8) + 0x80);
-    });
+    position->z = SceneActorChase_CellCenterCoordinate(z);
 }
 
 static inline void Mummy_BeginTurn_path(void *obj, u32 saved, const u16 *randomSamples)
@@ -3994,7 +3882,7 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
     }
     if (actor->base.stepDone) {
         SceneActorChase_ClearFlagComponent(&body->flags6F2, 0x800);
-        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        SceneActorChase_TrackPlayer(actor);
         if (Mummy_Arrive_ResumePlayerPursuit(actor)) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
@@ -4007,11 +3895,6 @@ void Mummy_ResumePlayerPursuit(struct ChaseActor *actor)
 // confidence=low: checkpoint completion restores player-route control and retries the route.
 
 void SceneActor_UpdateAnimationCheckpoint(void);
-
-struct MummyCheckpointContext {
-    u8 unknown0[0x6F2];
-    s16 flags6F2 : 16;
-};
 
 static inline void Mummy_ClearMotion(struct ChaseActor *actor, u32 bits)
 {
@@ -4027,28 +3910,28 @@ static inline void Mummy_ClearCheckpointFlags(struct ChaseFlags40 *flags, s32 ma
 
 void Mummy_ResumeRouteAfterCheckpoint(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
-    struct MummyCheckpointContext *body = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct Mummy *body = actor->base.context;
     if (Chase_TakeArrived(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Chase_SetCtl(actor, SceneActor_UpdateAnimationCheckpoint, 0x26);
+        SceneActorChase_SetControl(actor, SceneActor_UpdateAnimationCheckpoint, 0x26);
     }
     if (actor->base.stepDone) {
         s32 contextBits = 0x800;
         Mummy_ClearMotion(actor, 0x100);
         body->flags6F2 &= ~contextBits;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Mummy_ClearCheckpointFlags((void *)(group + 0x40), ~6);
+        Mummy_ClearCheckpointFlags((void *)&group->common.gate.flags, ~6);
         {
             u32 mask = 0x1000;
             body->flags6F2 = mask | body->flags6F2;
         }
-        Chase_SetCtl(actor, Mummy_UpdatePlayerRoute, 0x27);
-        Chase_SetBehavior(actor, 0x10);
-        if (!Chase_TryRoute(actor, *(void **)(group + 0x1FC), &actor->base.body.position,
+        SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
+        SceneActorChase_SetBehavior(actor, 0x10);
+        if (!Chase_TryRoute(actor, group->route, &actor->base.body.position,
                             &actor->base.body.position)) {
-            Chase_SetCtl(actor, SceneActorControl_OnIdle, 0);
-            Chase_SetState(actor, 3, 0, 0);
+            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
+            SceneActorChase_SetState(actor, 3, 0, 0);
         }
     }
 }
@@ -4155,8 +4038,6 @@ void Mummy_SetBehaviorTable(struct SSetBehaviorTable *s);
 
 s32 Mummy_OnUpdate(struct SOnUpdate *s);
 
-s32 Mummy_GetAnimationStepOffset(struct R *s);
-
 void Mummy_TurnTowardRoute(void *);
 
 void Mummy_UpdateWalking(void *);
@@ -4180,8 +4061,6 @@ void SceneActor_EnterMotionPhase(struct ChaseActor *actor);
 u8 Mummy_SelectMovementResponse(struct ChaseActor *actor);
 
 void Mummy_OnClearActivityFlag(struct SOnClearActivityFlag *s);
-
-void Mummy_OnMovementUpdate(struct SOnMovementUpdate *s);
 
 s32 Mummy_OnInteractionUpdate(void);
 
@@ -4227,6 +4106,7 @@ s32 Mummy_Init(void *object)
     struct Mummy *arg0 = object;
     struct Mummy *actor = object;
     struct SceneActorChaseGroup *group = &arg0->chase.group;
+    // concession-ok(const-local): Both CpuSet fills read the same fixed source word.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
