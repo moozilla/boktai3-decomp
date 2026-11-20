@@ -1,3 +1,4 @@
+#include "player_status_flags.h"
 #include "global.h"
 #include "player.h"
 void Task_Kill(void *);
@@ -57,11 +58,7 @@ s32 PlayerOrbitEffect_UpdateMovingParticle(struct OrbitParticle *p)
         p->z += p->vz;
         Collider_SetPosition((u8 *)p + 0x60, &p->x, 0);
         Collider_Refresh((u8 *)p + 0x60);
-        {
-            u32 *flags = (u32 *)(((u8 **)gPlayers)[0] + 0x20);
-            u32 bits = 0x80002;
-            *flags |= bits;
-        }
+        Player_AddStatusFlags(gPlayers[0], 0x80002);
         if (Terrain_GetHeightAt(&p->x) > p->y) {
             p->phase = 1;
             p->timer = 0;
