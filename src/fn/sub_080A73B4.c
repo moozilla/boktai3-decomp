@@ -1,3 +1,4 @@
+#include "scene_actor_availability.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
@@ -113,11 +114,8 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     actor->base.stepDone = 1;
     ActorTrail_RemoveAllSegments(actor);
     TentacleActor_SpawnSparkBurst(&actor->base.body.position);
-    {
-        u32 mask = 0x400;
-        if (!(actor->base.behaviorFlags & mask))
-            SceneActorBehavior_CallTerrainScript((void *)actor);
-    }
+    if (!(SceneActor_MaskedWord(0x400, &actor->base.behaviorFlags)))
+        SceneActorBehavior_CallTerrainScript(&actor->base);
     script = (u16)actor->base.script1F8;
     if (script) {
         values[0] = actor->base.body.position.x;
