@@ -1109,6 +1109,7 @@ s32 Golem_Init(void *object)
     struct Golem *arg0 = object;
     struct Golem *actor = object;
     struct SceneActorChaseGroup *group = &arg0->chase.group;
+    // concession-ok(const-local): CpuSet reads this fixed source word for both 8-byte fills.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
