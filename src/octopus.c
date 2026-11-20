@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_delayed_response.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -113,7 +114,6 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
 
 /* Octopus_UpdateIdleState: Empty hook within the Octopus behavior code with idle role tentative */
 
-
 void Octopus_UpdateIdleState(void)
 {
 }
@@ -128,23 +128,6 @@ struct DamageTarget {
 void SpriteParticle_SpawnBatch(void *, s32, s32, s32, s32);
 
 void SpriteEffect_SpawnTowardObject(void *, void *, u32, u32, u32, u32);
-
-static inline void SetControl(struct ChaseActor *actor, u32 kind, void *target)
-{
-    void *callback = target;
-    u32 type = kind;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = type;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -185,8 +168,8 @@ void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
     if (SceneActorReaction_TakePrepared(actor)) {
         struct DamageTarget *target = (void *)actor->base.tracking.target;
         if (target->kind == 4) {
-            SetControl(actor, 16, SceneActorControl_OnIdle);
-            SetState(actor, 0, 0, 1);
+            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+            SceneActorChase_SetBehavior(actor, 1);
             return;
         }
         if (target->kind <= 3) {
@@ -203,8 +186,8 @@ void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
         HideCollider(actor);
     }
     if (frame > 60) {
-        SetControl(actor, 16, SceneActorControl_OnIdle);
-        SetState(actor, 0, 0, 4);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetBehavior(actor, 4);
     }
 }
 
@@ -345,8 +328,8 @@ void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
             pos.z = actor->base.body.position.z + gUnk_086062B0[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
             if (target->kind <= 3) {
-                Player_BeginPositionRequest(gPlayers[target->kind], (void *)&pos,
-                                            0, 0, flip, 0, 0, 0, 0);
+                Player_BeginPositionRequest(gPlayers[target->kind], (void *)&pos, 0, 0, flip, 0, 0,
+                                            0, 0);
             } else if (target->kind == 4) {
                 struct ChaseActor *t = target->actor;
                 t->base.colliderA.responseValue = 0;
@@ -375,53 +358,12 @@ void SceneActorReaction_PlayEntry17(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
-        {
-            u16 *field = &actor->base.placementFlags;
-            u32 mask = ~0x800;
-            *field = mask & *field;
-        }
+        SceneActorChase_ClearFlagComponent((void *)&actor->base.placementFlags, 0x800);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 17);
     }
-    {
-        u32 controlOffset = 0x2B3;
-        if (*((u8 *)actor + controlOffset)) {
-            void *callback = Ivy_UpdateActiveState_080E98B4;
-            u8 kind = 34;
-            u8 *prepared = &actor->base.field2B2;
-            u32 zero = 0;
-            u8 one = 1;
-            u32 offset;
-            u32 mask;
-            u8 byteZero;
-            *prepared = one;
-            controlOffset -= 3;
-            *(((u8 *)actor) - (-controlOffset)) = zero;
-            controlOffset += 5;
-            *((u8 *)actor + controlOffset) = kind;
-            actor->base.target = callback;
-            offset = 0x2C8;
-            byteZero = 0;
-            *(u16 *)((u8 *)actor + offset) = zero;
-            {
-                u32 *field = &actor->base.pendingControlFlags;
-                mask = ~1;
-                *field = *field & mask;
-            }
-            actor->base.pendingControl = zero;
-            {
-                u32 state = 3;
-                actor->base.state2A8 = byteZero;
-                actor->base.phase2A9 = byteZero;
-                {
-                    u32 behOff = 0x2AA;
-                    u8 *bq;
-                    bq = (u8 *)actor + behOff;
-                    *bq = state;
-                }
-                actor->base.counter2AC = zero;
-                actor->base.field2B1 = one;
-            }
-        }
+    if (actor->base.restart) {
+        SceneActorChase_SetControl(actor, Ivy_UpdateActiveState_080E98B4, 34);
+        SceneActorChase_SetBehavior(actor, 3);
     }
 }
 
@@ -597,7 +539,6 @@ static inline void ReportDrain(struct ChaseActor *victim)
     }
 }
 
-// MATCHING_CONCESSION: register-pinning
 void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct Octopus *context = actor->base.context;
@@ -714,7 +655,8 @@ void *SceneActorRegistry_FindById(u32);
 
 void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
 {
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     struct OctopusTarget *target;
     s32 index;
     u8 quadrant, flip;
@@ -857,18 +799,7 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
     group = (u8 *)actor + 0x3D4;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
-        {
-            struct ContactCollider *collider = &actor->base.colliderA;
-            u32 flags = collider->flags;
-            u32 mask = 4;
-            mask |= flags;
-            mask &= 0xFFF7;
-            collider->flags = mask;
-        }
-        {
-            u32 bit = 0x800;
-            actor->base.placementFlags = bit | actor->base.placementFlags;
-        }
+        HideCollider(actor);
         {
             struct ContactPosition *dest = &actor->base.body.position;
             struct GolemRouteLink *link = (void *)(group + 0x74);
@@ -886,10 +817,7 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
             u32 eight = 8;
             actor->base.flashTimer = eight;
         }
-        {
-            u32 bit = 0x8000;
-            actor->base.behaviorFlags |= bit;
-        }
+        SceneActorChase_SetActorFlags(actor, 0x8000);
         if (target->kind <= 3) {
             u32 request, option;
             player = target->player;
@@ -941,39 +869,26 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
             delay->b = 0;
             delay->c = one;
         }
-        SetCtl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
-        SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         actor->base.body.position.x += 32;
         actor->base.body.position.z += 32;
         *(struct ContactPosition *)(drawable + 0x1C) = actor->base.body.position;
     }
 }
 
-// Remaining differences: register allocation and instruction scheduling; see notes/codex-low.md.
-
 void SceneActorTerrain_DisableCollision(void *);
 
 void Octopus_ReturnToRoutePoint(struct ChaseActor *actor)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        u8 *group = (u8 *)actor + 0x3D4;
+        struct SceneActorChaseGroup *group = &actor->group;
         u16 *bank;
         struct ContactPosition *dest;
-        {
-            struct ContactCollider *collider = &actor->base.colliderA;
-            u32 flags = collider->flags;
-            u32 bit = 4;
-            bit |= flags;
-            bit &= 0xFFF7;
-            collider->flags = bit;
-        }
-        {
-            u32 bit = 0x800;
-            actor->base.placementFlags = bit | actor->base.placementFlags;
-        }
+        HideCollider(actor);
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
         {
-            u16 *b = (void *)((u8 *)actor + 0x1E0);
+            u16 *b = &actor->base.basePaletteBank;
             u32 v = *b + 3;
             u32 kind = actor->base.drawableKind;
             bank = b;
@@ -992,11 +907,11 @@ void Octopus_ReturnToRoutePoint(struct ChaseActor *actor)
             u32 value = *bank + *offset;
             Palette(actor, value);
         }
-        SetCtl(actor, SceneActorControl_OnIdle, 16);
-        SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         dest = &actor->base.body.position;
         {
-            struct GolemRouteLink *link = (void *)(group + 0x74);
+            struct SceneActorRegistryRoute *link = &group->homeRoute;
             dest->x = link->point->x;
             dest->z = link->point->z;
             dest->y = CellHeight(dest, CellIndex(dest));
@@ -1018,7 +933,8 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor);
 
 void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
 {
-    struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 3);
         actor->base.restart = 0;
@@ -1053,17 +969,14 @@ void Octopus_UpdateStagger(struct ChaseActor *actor, s32 frame)
     }
     if (actor->base.restart) {
         actor->base.stepDone = 0;
-        {
-            u16 bit = 0x20;
-            actor->base.motionFlags &= ~bit;
-        }
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
         {
             u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x80;
             *field &= mask;
         }
-        SetCtl(actor, SceneActor_EndReactionAnimation, 0x23);
-        SetState(actor, 1, 0, 3);
+        SceneActorChase_SetControl(actor, SceneActor_EndReactionAnimation, 0x23);
+        SceneActorChase_SetState(actor, 1, 0, 3);
         actor->base.body.direction = actor->base.tracking.heading;
     }
 }
@@ -1136,10 +1049,7 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             u32 bit = 0x800;
             actor->base.placementFlags = bit | actor->base.placementFlags;
         }
-        {
-            u16 bit = 0x40;
-            actor->base.motionFlags &= ~bit;
-        }
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x40);
         {
             u8 k1 = 1;
             actor->base.health = k1;
@@ -1210,15 +1120,15 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             }
             SceneActorBehavior_CallTerrainScript(actor);
             {
-                u16 script = *((u16 *)(((u8 *)actor) + 0x1F8));
+                u16 script = (u16)actor->base.script1F8;
                 if (script) {
                     struct ScriptUtilityArguments arguments;
                     values[0] = pos->x;
                     values[1] = actor->base.body.position.y;
                     values[2] = actor->base.body.position.z;
-                    values[3] = *((u32 *)(((u8 *)actor) + 0x1FC));
-                    values[4] = *((u32 *)(((u8 *)actor) + 0x200));
-                    values[5] = *((u32 *)(((u8 *)actor) + 0x204));
+                    values[3] = actor->base.parameters1FC[0];
+                    values[4] = actor->base.parameters1FC[1];
+                    values[5] = actor->base.parameters1FC[2];
                     values[6] = actor->base.hitOwners;
                     values[7] = actor->base.body.id;
                     arguments.count = 8;
@@ -1259,8 +1169,7 @@ struct S {
 s32 Octopus_SetAnimationRefreshFlag(struct S *s)
 {
     struct T *t = &s->t;
-    u32 m = 4;
-    t->flags = m | t->flags;
+    t->flags = 4 | t->flags;
     return 1;
 }
 
@@ -1306,7 +1215,6 @@ static inline void Or(u16 m, u16 *f)
 // confidence=low: hides the actor and waits for an adjacent target; one starts the reaction
 
 // animation, otherwise after 60 frames it moves on to phase 2, behavior 5.
-
 
 void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
 {
@@ -1420,72 +1328,19 @@ static inline u8 TakeReset(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void ResetState_AwaitTargetControl(struct ChaseActor *actor, u32 state, u32 phase,
-                                                 u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
-    }
-}
-
 void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
 {
     void *target;
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     target = SceneActorTarget_FindNearbyPlayer(actor);
     if (target) {
-        void *callback;
-        u8 kind;
-        u8 *prepared;
-        u32 zero;
-        u8 byteZero;
-        u32 state;
-        actor->base.tracking.target = (u32)target;
-        callback = Ivy_ApplyHeldTargetDamage;
-        kind = 45;
-        prepared = &actor->base.field2B2;
-        zero = 0;
-        *prepared = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        {
-            u16 *field = &actor->base.field2C8;
-            byteZero = 0;
-            *field = zero;
-        }
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-        ResetState_AwaitTargetControl(actor, 3, 0, 0);
+        actor->base.tracking.target = target;
+        SceneActorChase_SetControl(actor, Ivy_ApplyHeldTargetDamage, 45);
+        SceneActorChase_SetState(actor, 3, 0, 0);
     } else {
         if ((s32)actor->base.counter2AC > 300 || SceneActorReaction_FindAdjacentTarget(actor, 1)) {
-            u32 zero = (u32)target;
-            void *callback;
-            u32 kind;
-            ResetState_AwaitTargetControl(actor, 0, 0, 1);
-            callback = SceneActorControl_OnIdle;
-            kind = 16;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = zero;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = zero;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = zero;
+            SceneActorChase_SetBehavior(actor, 1);
+            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         }
         actor->base.counter2AC++;
     }
@@ -1503,49 +1358,11 @@ struct AdjacentWaitTarget {
 
 s32 Math_Atan2(s32, s32);
 
-static inline void BeginControl(struct ChaseActor *actor, s32 zero)
-{
-    u32 three = 3;
-    u32 stateOffset = 0x2A8;
-    u32 phaseOffset = 0x2A9;
-    u8 *field = (u8 *)actor + stateOffset;
-    *field = three;
-    field = (u8 *)actor + phaseOffset;
-    *field = zero;
-    stateOffset += 2;
-    field = (u8 *)actor + stateOffset;
-    *field = zero;
-    phaseOffset += 3;
-    *(u32 *)((u8 *)actor + phaseOffset) = zero;
-    stateOffset += 7;
-    field = (u8 *)actor + stateOffset;
-    *field = 1;
-    {
-        void *callback = Octopus_UpdateCaptureAttack;
-        stateOffset += 1;
-        *((u8 *)actor + stateOffset) = 1;
-        phaseOffset = 0x2B0;
-        *((u8 *)actor + phaseOffset) = zero;
-        stateOffset += 3;
-        *((u8 *)actor + stateOffset) = three;
-        phaseOffset -= 0x94;
-        *(void **)((u8 *)actor + phaseOffset) = callback;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags = mask & *flags;
-        }
-        actor->base.pendingControl = zero;
-    }
-}
-
 void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)
 {
     struct AdjacentWaitContext *ctx = a->base.context;
     struct AdjacentWaitTarget *target = (void *)a->base.tracking.target;
     s32 found;
-    s32 zero;
     if (SceneActorControl_TakeFlag(&a->base.field2B1))
         ctx->missed = 0;
     found = SceneActorReaction_FindAdjacentTarget(a, 1);
@@ -1556,95 +1373,35 @@ void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)
             ctx->missed++;
     } else
         ctx->missed = 0;
-    if ((s32)a->base.counter2AC > 30 && (zero = ctx->missed) == 0) {
+    if ((s32)a->base.counter2AC > 30 && ctx->missed == 0) {
         struct ContactPosition *position = &a->base.body.position;
         a->base.body.direction =
             Math_Atan2(target->position.x - position->x, target->position.z - position->z);
-        BeginControl(a, zero);
+        SceneActorChase_SetState(a, 3, 0, 0);
+        SceneActorChase_SetControl(a, Octopus_UpdateCaptureAttack, 3);
     }
     a->base.counter2AC++;
-}
-
-static inline void SetControl_RestoreAfterControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
 }
 
 void SceneActorReaction_RestoreAfterControl(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetControl_RestoreAfterControl(actor, SceneActor_EndReactionAnimation, 35);
+        SceneActorChase_SetControl(actor, SceneActor_EndReactionAnimation, 35);
         actor->base.stepDone = 0;
     }
     if (actor->base.stepDone) {
-        struct SceneActorReactionCommand *command = (void *)&actor->group.saved.control;
-        void *callback = SceneActorControl_OnIdle;
-        u32 one = 1;
-        u32 state;
-        command->duration = 30;
-        command->payload = callback;
-        command->first = 0;
-        command->second = 0;
-        command->kind = one;
-        state = 3;
-        actor->base.state2A8 = state;
-        actor->base.phase2A9 = 0;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = 0;
-        {
-            u16 offset = 0x2B1;
-            *((u8 *)actor + offset) = one;
-        }
-        SetControl_RestoreAfterControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
-    }
-}
-
-static inline void SetControl_StartHoldControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void SetStateB(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = two;
-    actor->base.behavior2AA = 1;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
+        SceneActorDelay_Prepare((void *)&actor->group.saved, SceneActorControl_OnIdle, 1, 30);
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
     }
 }
 
 void Octopus_StartHoldControl(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
-        SetControl_StartHoldControl(actor, Octopus_UpdateHold, 0x25);
-        SetStateB(actor);
+        SceneActorChase_SetControl(actor, Octopus_UpdateHold, 0x25);
+        SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
 }
@@ -1677,85 +1434,23 @@ void Octopus_WaitThenResetPhase(u8 *p)
 
 void Octopus_ThrowCapturedTarget(struct ChaseActor *actor);
 
-static inline void SetControl_EnterThrowPhase(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void SetState_EnterThrowPhase(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u32 behavior = 2;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = two;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
-    }
-}
-
 void Octopus_EnterThrowPhase(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
-        SetControl_EnterThrowPhase(actor, Octopus_ThrowCapturedTarget, 0x26);
-        SetState_EnterThrowPhase(actor);
+        SceneActorChase_SetControl(actor, Octopus_ThrowCapturedTarget, 0x26);
+        SceneActorChase_SetPhase(actor, 2, 2);
     }
 }
 
 void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame);
 
-static inline void SetControl_EnterReleasePhase(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void SetState_EnterReleasePhase(struct ChaseActor *actor)
-{
-    u32 two = 2;
-    u32 behavior = 4;
-    u8 *field = &actor->base.state2A8;
-    *field = 0;
-    actor->base.phase2A9 = two;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
-    }
-}
-
 void Octopus_EnterReleasePhase(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
-        SetControl_EnterReleasePhase(actor, Octopus_ReleaseCapturedTarget, 0x28);
-        SetState_EnterReleasePhase(actor);
+        SceneActorChase_SetControl(actor, Octopus_ReleaseCapturedTarget, 0x28);
+        SceneActorChase_SetPhase(actor, 2, 4);
     }
 }
 
@@ -1799,21 +1494,6 @@ void Octopus_WaitLimitThenResetPhase(u8 *p)
         (*(s32 *)(p + 0x2AC))++;
 }
 
-static inline void SetControl_ReturnToIdle(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void ResetState_ReturnToIdle(struct ChaseActor *actor)
 {
     u32 one = 1;
@@ -1832,10 +1512,10 @@ static inline void ResetState_ReturnToIdle(struct ChaseActor *actor)
 
 void SceneActorReaction_ReturnToIdle(struct ChaseActor *actor)
 {
-    TakeReset(actor);
+    SceneActorControl_TakeStateEntry(actor);
     if (actor->base.stepDone) {
         ResetState_ReturnToIdle(actor);
-        SetControl_ReturnToIdle(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     }
 }
 
@@ -1844,13 +1524,7 @@ struct RoomActor;
 void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
-        u32 mask = 1;
-        if (!actor->base.drawableKind)
-            *(u32 *)actor->base.drawable |= mask;
-        else {
-            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-            tile->flags |= mask;
-        }
+        Hide(actor);
         ResetState(actor, 3);
         SceneActorTerrain_DisableCollision((void *)actor);
     }
@@ -1884,40 +1558,6 @@ void Octopus_InitControlPresets(struct SInitControlPresets *s)
 
 void Octopus_UpdateStagger(struct ChaseActor *, s32);
 
-static inline void BeginTransition(struct ChaseActor *actor, u16 zero, u32 offset)
-{
-    u32 state = 3;
-    u32 stateOffset = 0x2A8;
-    u8 *field = (u8 *)actor + stateOffset;
-    *field = state;
-    offset -= 0x2B;
-    *((u8 *)actor + offset) = zero;
-    actor->base.behavior2AA = zero;
-    stateOffset += 4;
-    *(u32 *)((u8 *)actor + stateOffset) = zero;
-    offset += 8;
-    *((u8 *)actor + offset) = 1;
-    {
-        void *callback = Octopus_UpdateStagger;
-        u32 kind = 0x2A;
-        offset++;
-        *((u8 *)actor + offset) = 1;
-        stateOffset = 0x2B0;
-        *((u8 *)actor + stateOffset) = zero;
-        offset += 3;
-        *((u8 *)actor + offset) = kind;
-        stateOffset -= 0x94;
-        *(void **)((u8 *)actor + stateOffset) = callback;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-    }
-}
-
 s32 SceneActorControl_BeginSoundTransition_080EBC38(struct ChaseActor *actor)
 {
     u16 *flags;
@@ -1932,12 +1572,13 @@ s32 SceneActorControl_BeginSoundTransition_080EBC38(struct ChaseActor *actor)
     {
         u32 mask = 0x100;
         offset = 0x2D4;
-        flags = (void *)((u8 *)actor + offset);
+        flags = &actor->base.motionFlags;
         value = *flags;
         suppressed = mask & value;
     }
     if (!suppressed) {
-        BeginTransition(actor, suppressed, offset);
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, Octopus_UpdateStagger, 0x2A);
         result = 1;
     } else {
         u32 mask = ~0x20;
@@ -1977,8 +1618,7 @@ struct IvyPlacement {
 
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
- * display sequence (the step is ScenePanelRig_TickSprites's, with the same pins). The drawable
- * pointer passes through r0, as in the ROM. */
+ * display sequence. */
 
 void SceneActorControl_UpdateMotionPhase_080EBD0C(struct ChaseActor *actor)
 {
@@ -2041,17 +1681,6 @@ void Octopus_ReturnToRoutePoint(struct ChaseActor *actor);
 
 void SceneActorTerrain_ResumeDrawable(struct ChaseActor *);
 
-static inline void SetState_BeginReturnToRoutePoint(struct ChaseActor *actor, u32 s)
-{
-    u8 *state = &actor->base.state2A8;
-    u32 zero = 0;
-    *state = s;
-    actor->base.phase2A9 = zero;
-    actor->base.behavior2AA = zero;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = 1;
-}
-
 struct Delay {
     u8 pad[8];
     u8 a, b, c, d;
@@ -2064,7 +1693,8 @@ struct Delay {
 
 void Octopus_BeginReturnToRoutePoint(struct ChaseActor *actor)
 {
-    SetState_BeginReturnToRoutePoint(actor, 3);
+    SceneActorChase_SelectState(actor, 3, 0, 0);
+    SceneActorChase_ResetStateEntry(actor);
     {
         struct Delay *delay = (void *)((u8 *)actor + 0x460);
         void *cb = Octopus_ReturnToRoutePoint;
@@ -2074,46 +1704,15 @@ void Octopus_BeginReturnToRoutePoint(struct ChaseActor *actor)
         delay->b = 0;
         delay->c = 0;
     }
-    SetCtl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
+    SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
     SceneActorTerrain_ResumeDrawable(actor);
-    {
-        u8 *a = (u8 *)actor;
-        if (a[8] == 0)
-            **(u32 **)(a + 4) |= 1;
-        else {
-            u32 *d = *(u32 **)(a + 4) + 8;
-            d[2] |= 1;
-        }
-    }
-}
-
-static inline void SetControl_BeginIdleAnimation(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
+    Hide(actor);
 }
 
 void Octopus_BeginIdleAnimation(struct ChaseActor *actor)
 {
-    u32 flag;
     SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
-    flag = 1;
-    if (actor->base.drawableKind == 0) {
-        u32 *flags = actor->base.drawable;
-        *flags |= flag;
-    } else {
-        u32 *flags = (u32 *)((u8 *)actor->base.drawable + 0x20);
-        flags[2] |= flag;
-    }
+    Hide(actor);
     {
         u32 one = 1;
         actor->base.state2A8 = 0;
@@ -2122,7 +1721,7 @@ void Octopus_BeginIdleAnimation(struct ChaseActor *actor)
         actor->base.counter2AC = 0;
         actor->base.field2B1 = one;
     }
-    SetControl_BeginIdleAnimation(actor, SceneActorControl_OnIdle, 0x10);
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
 }
 
 /* The target handle starts twelve bytes before the player's position. */
@@ -2306,12 +1905,13 @@ struct A {
 
 u32 Octopus_GetAnimationStatus(struct ChaseActor *actor)
 {
-    struct A *a = (struct A *)((u8 *)actor->base.drawable + 0x48);
-    if (a->v == 3)
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *a = &drawable->sequence;
+    if (a->index == 3)
         return 1;
-    if (a->v == 4)
+    if (a->index == 4)
         return 0;
-    return a->v;
+    return a->index;
 }
 
 s32 Callback_InvokeActor(void *, void *);
@@ -2592,6 +2192,7 @@ s32 Octopus_Init(void *object)
     struct ChaseActor *arg0 = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &arg0->group;
+    // concession-ok(const-local): Both CpuSet fills read the same fixed source word.
     u32 zero;
     struct ContactPosition tmp;
     u32 flag;
