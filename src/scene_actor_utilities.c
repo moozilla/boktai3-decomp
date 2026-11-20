@@ -207,12 +207,11 @@ void SceneActor_SetPositionXZ(struct SceneActorFacingBody *actor, s32 x, s32 y)
 void SceneActorReaction_ResetResponseState(struct SceneActorResponseState *state, const void *table,
                                            u32 index)
 {
-    u32 z = 0;
-    state->state = z;
-    state->phase = z;
-    state->behavior = z;
-    state->threshold = z;
-    state->control = z;
+    state->state = 0;
+    state->phase = 0;
+    state->behavior = 0;
+    state->threshold = 0;
+    state->control = 0;
 }
 
 static inline u32 Random(void)
