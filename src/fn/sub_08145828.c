@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 
 void Sound_PlaySong(u32);
 s32 ActorVariant_GetTableValue(u32, s32);
@@ -35,10 +35,7 @@ void Player_UpdateContactKnockdown(struct Player *p)
             p->contactActionTag = 0;
         }
     }
-    {
-        u32 mask = 0x40000;
-        p->statusFlags |= mask;
-    }
+    Player_AddStatusFlags(p, 0x40000);
     switch (p->tetherPhase) {
         case 0:
             Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x29), 0x40, 1);
