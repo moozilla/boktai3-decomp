@@ -14,26 +14,22 @@ static inline s32 Read(void)
  * must preserve that precondition. An absent keyword has no invented default. */
 void SpriteEffectController_CreateFromScript(void)
 {
-    union {
-        struct ContactPackedVector packed;
-        struct ContactPosition position;
-    } position, velocity;
+    struct ContactPosition position, velocity;
     s32 priority, variant, animationFlags, lifetime;
-    if (Script_SeekToKeyword(0x70)) {
-        position.packed.x = Read();
-        position.packed.y = Read();
-        position.packed.z = Read();
+    if (Script_SeekToKeyword('p')) {
+        position.x = Read();
+        position.y = Read();
+        position.z = Read();
     }
-    if (Script_SeekToKeyword(0x76)) {
-        velocity.packed.x = Read();
-        velocity.packed.y = Read();
-        velocity.packed.z = Read();
+    if (Script_SeekToKeyword('v')) {
+        velocity.x = Read();
+        velocity.y = Read();
+        velocity.z = Read();
     }
-    priority = Script_GetKeywordValue(0x50, 0);
-    variant = Script_GetKeywordValue(0x64, 0);
-    animationFlags = Script_GetKeywordValue(0x72, 0);
-    lifetime = Script_GetKeywordValue(0x6c, 0);
-    SpriteEffectController_Create(&position.position, &velocity.position, 0x1c1e, 0xd43f, 0, 0,
-                                  0x11, 1, priority, variant, animationFlags, lifetime, 0, 0, 0, 0,
-                                  -4, -4);
+    priority = Script_GetKeywordValue('P', 0);
+    variant = Script_GetKeywordValue('d', 0);
+    animationFlags = Script_GetKeywordValue('r', 0);
+    lifetime = Script_GetKeywordValue('l', 0);
+    SpriteEffectController_Create(&position, &velocity, 0x1c1e, 0xd43f, 0, 0, 0x11, 1, priority,
+                                  variant, animationFlags, lifetime, 0, 0, 0, 0, -4, -4);
 }
