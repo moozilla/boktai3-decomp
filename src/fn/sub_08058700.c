@@ -1,4 +1,7 @@
 #include "scene_panel.h"
+#include "scene_panel_effects.h"
+#include "gba/io_reg.h"
+#include "gba/syscall.h"
 
 void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 tileY, s32 screenX,
                                        s32 screenY)
@@ -12,11 +15,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
         value = shifted >> 16;
         if (value == 0)
             goto hide;
-        {
-            u32 mask = 0x200;
-            u16 *shadow = &gDispCntShadow;
-            *shadow = mask | *shadow;
-        }
+        Bg_EnableDisplay(DISPCNT_BG1_ON);
         if (value > 31) {
             alpha = 16;
             if (value > 35) {
@@ -38,20 +37,16 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
         }
         {
             u32 blend = ((16 - alpha) >> 1) + 8;
-            *(vu16 *)0x04000052 = (blend << 8) | alpha;
+            REG_BLDALPHA = (blend << 8) | alpha;
         }
         BgGfx_LoadTilemapSimple(1, tileX, tileY, screenX, screenY + panel->shakeOffset);
         panel->mode--;
     } else {
-        CpuSet((u8 *)panel->palette + 32, (void *)0x03005140, 0x04000008);
+        CpuCopy32((u16 *)panel->palette + 16, gBgPaletteBank12, 32);
         if (panel->effectPhase == 0) {
             s32 count;
 
-            {
-                u32 mask = 0x200;
-                u16 *shadow = &gDispCntShadow;
-                *shadow = mask | *shadow;
-            }
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
             if (++panel->mode > 63)
                 panel->mode = 0;
             if (panel->mode > 32)
@@ -61,7 +56,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             effectAlpha = count + 12;
             {
                 u32 blend = ((16 - effectAlpha) >> 1) + 8;
-                *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
+                REG_BLDALPHA = (blend << 8) | effectAlpha;
             }
             gRandomIndex = (gRandomIndex + 1) & 1023;
             {
@@ -89,35 +84,21 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
             if (*frame == 0)
                 goto hide;
             {
-                union ScenePanelPackedVector {
-                    struct ContactPackedVector packed;
-                    struct {
-                        u32 xy, zpad;
-                    } words;
-                } position, velocity;
+                union ScenePanelPosition position, velocity;
                 const u16 *table;
-                u32 indexMask;
                 u32 highMask;
-                union ScenePanelPackedVector *positionWords;
+                union ScenePanelPosition *positionWords;
                 u32 next;
-                position.packed = (*(struct ContactPackedVector *)&panel->center);
-                {
-                    const u16 *load = (const u16 *)RANDOM_TABLE_ADDR;
-                    table = load;
-                }
-                {
-                    u32 nextIndex = gRandomIndex + 1;
-                    u32 lowMask = 1023;
-                    indexMask = lowMask;
-                    gRandomIndex = nextIndex & lowMask;
-                }
+                position.world = *(struct SceneVec *)&panel->center;
+                table = gRandomTable;
+                gRandomIndex = (gRandomIndex + 1) & 1023;
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
                     s32 coordinate;
                     {
-                        union ScenePanelPackedVector *lowPosition = &position;
+                        union ScenePanelPosition *lowPosition = &position;
                         positionWords = lowPosition;
-                        coordinate = (u16)lowPosition->packed.x - 250;
+                        coordinate = (u16)lowPosition->world.x - 250;
                     }
                     coordinate += offset;
                     {
@@ -125,62 +106,55 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                         coordinate = narrowed;
                     }
                     highMask = 0xFFFF0000;
-                    position.words.xy = (position.words.xy & highMask) | coordinate;
+                    position.words[0] = (position.words[0] & highMask) | coordinate;
                 }
-                gRandomIndex = (gRandomIndex + 1) & indexMask;
+                gRandomIndex = (gRandomIndex + 1) & 1023;
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    s32 coordinate = ((s32)position.words.xy >> 16) - 250;
+                    s32 coordinate = ((s32)position.words[0] >> 16) - 250;
                     coordinate += offset;
                     coordinate = (u32)coordinate << 16;
                     {
-                        u32 previous = position.words.xy;
+                        u32 previous = position.words[0];
                         u32 lowMask = 0xFFFF;
                         lowMask &= previous;
-                        position.words.xy = lowMask | coordinate;
+                        position.words[0] = lowMask | coordinate;
                     }
                 }
-                gRandomIndex = (gRandomIndex + 1) & indexMask;
+                gRandomIndex = (gRandomIndex + 1) & 1023;
                 {
                     s32 offset = Mod(table[gRandomIndex], 500);
-                    union ScenePanelPackedVector *lowPosition = positionWords;
+                    union ScenePanelPosition *lowPosition = positionWords;
                     s32 coordinate;
-                    coordinate = (u16)lowPosition->packed.z - 250;
+                    coordinate = (u16)lowPosition->world.z - 250;
                     coordinate += offset;
                     {
                         u16 narrowed = coordinate;
                         coordinate = narrowed;
                     }
-                    lowPosition->words.zpad = (lowPosition->words.zpad & highMask) | coordinate;
+                    lowPosition->words[1] = (lowPosition->words[1] & highMask) | coordinate;
                 }
-                velocity.words.xy &= highMask;
+                velocity.words[0] &= highMask;
                 {
-                    u32 mask;
                     next = gRandomIndex + 1;
-                    mask = indexMask;
-                    next &= mask;
+                    next &= 1023;
                     {
                         u32 sample = table[next];
                         sample &= 31;
                         sample += 16;
-                        velocity.words.xy = sample << 16;
+                        velocity.words[0] = sample << 16;
                     }
-                    velocity.words.zpad &= highMask;
-                    gRandomIndex = (next + 1) & mask;
+                    velocity.world.z = 0;
+                    gRandomIndex = (next + 1) & 1023;
                 }
                 {
                     u32 life = table[gRandomIndex];
                     life &= 7;
                     life += 8;
-                    ScenePanel_AddParticle(panel, (union ScenePanelPosition *)positionWords,
-                                           (union ScenePanelPosition *)&velocity, life, 1);
+                    ScenePanel_AddParticle(panel, positionWords, &velocity, life, 1);
                 }
             }
-            {
-                u32 mask = 0x200;
-                u16 *shadow = &gDispCntShadow;
-                *shadow = mask | *shadow;
-            }
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
             {
                 u16 *lowFrame = frame;
                 u32 frameValue;
@@ -188,7 +162,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
                 effectAlpha = frameValue >> 2;
                 {
                     u32 blend = ((16 - effectAlpha) >> 1) + 8;
-                    *(vu16 *)0x04000052 = (blend << 8) | effectAlpha;
+                    REG_BLDALPHA = (blend << 8) | effectAlpha;
                 }
             }
             {
@@ -207,7 +181,7 @@ void ScenePanel_UpdateBackgroundEffect(struct ScenePanel *panel, s32 tileX, s32 
     return;
 hide: {
     u16 *shadow = &gDispCntShadow;
-    u32 mask = ~0x200;
+    u32 mask = ~DISPCNT_BG1_ON;
     mask &= *shadow;
     *shadow = mask;
 }
