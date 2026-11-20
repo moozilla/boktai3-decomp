@@ -1,4 +1,5 @@
 #include "scene_messages.h"
+#include "script_utility.h"
 
 struct SceneMessageReceiver *SceneMessages_FindReceiver(struct SceneMessages *controller, u32 id,
                                                         u32 kind)
@@ -67,7 +68,7 @@ void SceneMessages_RunScript(struct SceneMessages *controller, struct SceneEvent
                              struct SceneEventCommand *message)
 {
     int args[8];
-    struct SceneMessageArguments call;
+    struct ScriptUtilityArguments call;
     int id = (u16)SceneMessages_FindScript((u16)message->value);
     if (id) {
         int count = message->argumentCount;
@@ -82,14 +83,7 @@ void SceneMessages_RunScript(struct SceneMessages *controller, struct SceneEvent
                 remaining--;
             } while (remaining);
         }
-        {
-            u32 mask = 0xffff0000;
-            u32 header;
-            header = call.header;
-            header &= mask;
-            header |= 8;
-            call.header = header;
-        }
+        call.count = 8;
         call.values = args;
         Script_Call(id, &call);
     }
@@ -142,20 +136,15 @@ int SceneMessages_Dispatch(struct SceneMessages *controller)
 
 int SceneMessages_Update(struct SceneMessages *controller)
 {
-    short zero16;
     int dispatch = 0;
     int active = controller->active;
     if (active == 1) {
         controller->changed = 0;
         if (controller->advance) {
-            {
-                int next = ((u16)controller->step) + 1;
-                zero16 = 0;
-                controller->step = next;
-                controller->queued = 0;
-                controller->advance = zero16;
-                controller->changed = active;
-            }
+            ++controller->step;
+            controller->queued = 0;
+            controller->advance = 0;
+            controller->changed = TRUE;
         }
         if (controller->changed) {
             struct SceneEventCommand *message;
