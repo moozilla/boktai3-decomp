@@ -86,71 +86,29 @@ void Bat_RestoreSavedState(struct ChaseActor *actor)
     }
 }
 
-void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
-
-struct Seq {
-    u8 pad0[7];
-    u8 b7;
-    u16 h8;
-    u8 padA[4];
-    u16 hE;
-};
-
-struct BatAnimationRequest {
-    u8 pad0[4];
-    u8 *inner;
-};
-
-static inline u8 TakeFlag(u8 *flag)
+static inline void Bat_RewindAnimation(struct DisplaySequenceState *sequence)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
+    sequence->elapsed = 0;
 }
 
-static inline void Clr(u8 *q)
+void Bat_UpdateAnimationRequest(struct ChaseActor *actor)
 {
-    ((struct Seq *)q)->hE = 0;
-}
+    struct DisplaySequenceState *sequence;
 
-void Bat_UpdateAnimationRequest(u8 *p)
-{
-    struct Seq *s;
-
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 5);
-    s = (struct Seq *)(*(u8 **)(p + 4) + 0x48);
-    if (s->h8 == 7 && s->hE == (s->b7 != 0) && s->b7 != 1) {
-        s->h8 = 2;
-        Clr(*(u8 **)(p + 4) + 0x48);
+    if (SceneActorReaction_TakePrepared(actor))
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 5);
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    if (sequence->index == 7 && sequence->elapsed == (sequence->duration != 0) &&
+        sequence->duration != 1) {
+        sequence->index = 2;
+        Bat_RewindAnimation(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence);
     }
 }
 
 /* Bat variant of SceneActorReaction_ResumeSavedTarget (tentative): after 60 frames it
  * resumes either the saved route target (kind 1) or, when flag 0x80 is set, group +0x48
  * (kind 0x1A); before that it rewinds a mode-2 animation. */
-
-struct BatRoutePoint {
-    u8 unknown0[0x1C];
-    s16 x;
-    u8 unknown1E[2];
-    s16 z;
-};
-
-struct BatAnim {
-    u8 unknown0[7];
-    u8 loop;
-    u16 mode;
-    u8 unknownA[4];
-    u16 frame;
-};
-
-struct BatDrawable {
-    u8 unknown0[0x48];
-    struct BatAnim anim;
-};
 
 void SceneActor_SetPositionXZ(void *, s32, s32);
 
@@ -159,24 +117,9 @@ static inline u32 Bat_MaskFlags(struct ChaseActor *actor, u32 mask)
     return actor->base.motionFlags & mask;
 }
 
-static inline void Bat_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 12);
         actor->base.restart = 0;
@@ -190,52 +133,33 @@ void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         if (blocked) {
             void *target;
             SceneActor_SetPositionXZ(&actor->base.body.id,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->z);
+                                     ((struct ChaseRouteProbe *)group->route)->destination.x,
+                                     ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            target = *(void **)(group + 0x48);
-            Bat_SetControl(actor, 0x1A, target);
-            {
-                u32 behavior = 12;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
-            {
-                u16 *flags = (u16 *)(group + 0x40);
-                u16 mask = 4;
-                *flags = mask | *flags;
-            }
+            target = group->common.gate.control;
+            SceneActorChase_SetControl(actor, target, 0x1A);
+            SceneActorChase_SetState(actor, 0, 0, 12);
+            SceneActorChase_SetFlagComponent(
+                (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
         } else {
             void *target;
             SceneActor_SetPositionXZ(&actor->base.body.id,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->z);
+                                     ((struct ChaseRouteProbe *)group->route)->destination.x,
+                                     ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             target = actor->base.onAlternateEntry;
-            Bat_SetControl(actor, 1, target);
-            {
-                u32 behavior = 7;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
-            {
-                u32 mask = 16;
-                actor->base.behaviorFlags |= mask;
-            }
+            SceneActorChase_SetControl(actor, target, 1);
+            SceneActorChase_SetState(actor, 0, 0, 7);
+            SceneActorChase_SetActorFlags(actor, 16);
         }
     } else {
-        struct BatAnim *anim = &((struct BatDrawable *)actor->base.drawable)->anim;
-        if (anim->mode == 2) {
-            u16 f = anim->frame;
-            u8 loop = anim->loop;
+        struct DisplaySequenceState *anim =
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        if (anim->index == 2) {
+            u16 f = anim->elapsed;
+            u8 loop = anim->duration;
             if (f == (loop != 0) && loop != 1)
-                anim->frame = 0;
+                anim->elapsed = 0;
         }
     }
 }
