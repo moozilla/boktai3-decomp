@@ -1,0 +1,358 @@
+; Each actor has a live 24x32 metasprite and a spare 192-byte tile region.
+; It stays visible while its next pose is assembled in the spare region over
+; VBlanks. Tile pairs remain even for the original DMG's 8x16 OBJ mode.
+pose_source:
+    ld e,a
+    ld d,0
+    ld hl,pose_ptrs
+    add hl,de
+    add hl,de
+    add hl,de
+    ld a,[hl+]
+    ld b,a
+    ld a,[hl+]
+    ld h,[hl]
+    ld l,a
+    ld a,b
+    ret
+load_pose:
+    ; Room setup runs with the LCD off. Preserve the destination across lookup.
+    push de
+    call pose_source
+    ld [0x2000],a
+    pop de
+    ld bc,192
+    call copy
+    ld a,[bank]
+    ld [0x2000],a
+    ret
+tile_address:
+    ; DE = $8000 + tile * 16.
+    ld d,a
+    swap a
+    and 0xf0
+    ld e,a
+    ld a,d
+    swap a
+    and 15
+    or 0x80
+    ld d,a
+    ret
+reset_poses:
+    xor a
+    ld [upload_left],a
+    ld [upload_slot],a
+    ld [live_tile],a
+    ld a,12
+    ld [spare_tile],a
+    ld a,24
+    ld [live_tile+1],a
+    ld a,36
+    ld [spare_tile+1],a
+    ld a,48
+    ld [live_tile+2],a
+    ld a,60
+    ld [spare_tile+2],a
+    ld a,4
+    ld [want_pose],a
+    ld [live_pose],a
+    ld de,0x8000
+    call load_pose
+    ld a,ghoul_pose
+    ld [want_pose+1],a
+    ld [live_pose+1],a
+    ld de,0x8180
+    call load_pose
+    ld a,255
+    ld [want_pose+2],a
+    ld [live_pose+2],a
+    ret
+
+prepare_pose:
+    ld a,[upload_left]
+    and a
+    ret nz
+    ld a,[upload_slot]
+    ld e,a
+    ld d,0
+    ld b,3
+.scan:
+    inc e
+    ld a,e
+    cp 3
+    jr c,.slot
+    ld e,0
+.slot:
+    ld hl,want_pose
+    add hl,de
+    ld a,[hl]
+    cp 255
+    jr z,.next
+    ld hl,live_pose
+    add hl,de
+    cp [hl]
+    jr nz,.fetch
+.next:
+    dec b
+    jr nz,.scan
+    ret
+.fetch:
+    ld [upload_pose],a
+    push de
+    call pose_source
+    ld [upload_bank],a
+    ld a,h
+    ld [upload_src_hi],a
+    ld a,l
+    ld [upload_src_lo],a
+    pop de
+    ld a,e
+    ld [upload_slot],a
+    ld hl,spare_tile
+    add hl,de
+    ld a,[hl]
+    call tile_address
+    ld a,d
+    ld [upload_dest_hi],a
+    ld a,e
+    ld [upload_dest_lo],a
+    ld a,6
+    ld [upload_left],a
+    ret
+
+flush_pose:
+    ; OAM, map and HUD have already been committed. Leave three whole
+    ; scanlines for each bounded 32-byte transfer and its pointer update.
+    ld a,[upload_left]
+    and a
+    ret z
+    ldh a,[0x44]
+    cp 144
+    ret c
+    cp 151
+    ret nc
+    ld a,[upload_bank]
+    ld [0x2000],a
+    ld a,[upload_src_hi]
+    ld h,a
+    ld a,[upload_src_lo]
+    ld l,a
+    ld a,[upload_dest_hi]
+    ld d,a
+    ld a,[upload_dest_lo]
+    ld e,a
+.chunk:
+    ld b,8
+.copy:
+    ld a,[hl+]
+    ld [de],a
+    inc de
+    ld a,[hl+]
+    ld [de],a
+    inc de
+    ld a,[hl+]
+    ld [de],a
+    inc de
+    ld a,[hl+]
+    ld [de],a
+    inc de
+    dec b
+    jr nz,.copy
+    ld a,[upload_left]
+    dec a
+    ld [upload_left],a
+    jr z,.ready
+    ldh a,[0x44]
+    cp 144
+    jr c,.pause
+    cp 151
+    jr c,.chunk
+.pause:
+    ld a,h
+    ld [upload_src_hi],a
+    ld a,l
+    ld [upload_src_lo],a
+    ld a,d
+    ld [upload_dest_hi],a
+    ld a,e
+    ld [upload_dest_lo],a
+    ld a,[bank]
+    ld [0x2000],a
+    ret
+.ready:
+    ld a,[bank]
+    ld [0x2000],a
+    ld a,[upload_slot]
+    ld e,a
+    ld d,0
+    ld hl,live_pose
+    add hl,de
+    ld a,[upload_pose]
+    ld [hl],a
+    ld hl,live_tile
+    add hl,de
+    ld b,[hl]
+    push hl
+    ld hl,spare_tile
+    add hl,de
+    ld a,[hl]
+    ld [hl],b
+    pop hl
+    ld [hl],a
+    ret
+
+; Player and monsters are emitted first. In a crowded scene a lower-priority
+; marker can lose its slot. The DMG resolves overlap by X after its ten-slot OAM search.
+limit_oam:
+    ld a,[header+17]
+    and a
+    ret z
+    ld a,[oam_count]
+    cp 41
+    ret c
+    ld hl,0xc600
+    ld b,160
+    xor a
+.zero:
+    ld [hl+],a
+    dec b
+    jr nz,.zero
+    ld de,0xc000
+.loop:
+    ld a,[de]
+    and a
+    jr z,.next
+    cp 160
+    jr nc,.next
+    ; OAM Y is screen Y + 16. Unseen lines above the LCD need no slots.
+    ld b,16
+    sub 16
+    jr nc,.span
+    add 16
+    ld b,a
+    xor a
+.span:
+    ld c,a
+    ld h,0xc6
+    ld l,c
+    push bc
+.test:
+    ld a,[hl+]
+    cp 10
+    jr nc,.hide
+    dec b
+    jr nz,.test
+    pop bc
+    ld l,c
+.claim:
+    inc [hl]
+    inc l
+    dec b
+    jr nz,.claim
+    jr .next
+.hide:
+    pop bc
+    xor a
+    ld [de],a
+.next:
+    ld a,e
+    add 4
+    ld e,a
+    ld hl,oam_count
+    cp [hl]
+    jr c,.loop
+    ret
+
+; Equal-X ties retain emission priority. Sort record indices first so a
+; crossing between two metasprites moves one-byte indices, then gather once.
+; This also gives renderers using OAM priority the original DMG X ordering.
+sort_oam:
+    ld de,0xc900
+    ld a,[oam_count]
+    and a
+    jr z,.tail
+    ld de,0xc000
+    ld c,0
+.record:
+    inc e
+    ld a,[de]
+    ld b,a
+    dec e
+    push de
+    ld a,c
+    add 0xa0
+    ld l,a
+    ld h,0xc6
+.shift:
+    ld a,l
+    cp 0xa0
+    jr z,.insert
+    dec l
+    ld e,[hl]
+    inc e
+    ld a,[de]
+    cp b
+    jr c,.after
+    jr z,.after
+    ld a,[hl+]
+    ld [hl-],a
+    jr .shift
+.after:
+    inc l
+.insert:
+    pop de
+    ld [hl],e
+    inc c
+    ld a,e
+    add 4
+    ld e,a
+    ld a,[oam_count]
+    cp e
+    jr nz,.record
+    ld hl,0xc6a0
+    ld de,0xc900
+    ld b,c
+.gather:
+    ld a,[hl+]
+    push hl
+    ld h,0xc0
+    ld l,a
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl]
+    ld [de],a
+    inc e
+    pop hl
+    dec b
+    jr nz,.gather
+.tail:
+    ; Hide only trailing Y coordinates from the preceding DMA image.
+    ld a,[dma_count]
+    cp e
+    jr c,.done
+    jr z,.done
+    sub e
+    ld b,a
+    xor a
+.hide:
+    ld [de],a
+    inc e
+    inc e
+    inc e
+    inc e
+    dec b
+    dec b
+    dec b
+    dec b
+    jr nz,.hide
+.done:
+    ld a,[oam_count]
+    ld [dma_count],a
+    ret
