@@ -40,7 +40,7 @@ void TentacleActor_UpdateKnockbackSlide(struct ChaseActor *p)
     }
     sub_080A9DB0(p, 6, 0x1000);
     {
-        if (SceneActor_MaskedWord(16, &p->base.statusFlags)) {
+        if (Flags_MaskedWord(16, &p->base.statusFlags)) {
             TentacleActor_SelectWanderRoute(p);
             SceneActorChase_SetControl(p, p->base.onAlternateEntry, 1);
             SceneActorChase_SetState(p, 0, 0, 2);

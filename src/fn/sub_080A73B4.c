@@ -114,7 +114,7 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     actor->base.stepDone = 1;
     ActorTrail_RemoveAllSegments(actor);
     TentacleActor_SpawnSparkBurst(&actor->base.body.position);
-    if (!(SceneActor_MaskedWord(0x400, &actor->base.behaviorFlags)))
+    if (!(Flags_MaskedWord(0x400, &actor->base.behaviorFlags)))
         SceneActorBehavior_CallTerrainScript(&actor->base);
     script = (u16)actor->base.script1F8;
     if (script) {

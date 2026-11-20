@@ -390,7 +390,7 @@ void Bee_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         (u32)(actor->base.category - 11) > 2)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-    if (!SceneActor_MaskedWord(0x400, &actor->base.behaviorFlags))
+    if (!Flags_MaskedWord(0x400, &actor->base.behaviorFlags))
         SceneActorBehavior_CallTerrainScript((void *)actor);
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
     Bee_SetState(actor, 1, 0, 2);

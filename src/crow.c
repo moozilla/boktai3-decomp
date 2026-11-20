@@ -337,7 +337,7 @@ void Crow_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         (u32)(actor->base.category - 11) > 2)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-    if (!SceneActor_MaskedWord(0x400, &actor->base.behaviorFlags))
+    if (!Flags_MaskedWord(0x400, &actor->base.behaviorFlags))
         SceneActorBehavior_CallTerrainScript((void *)actor);
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
@@ -767,7 +767,7 @@ void Crow_UpdateGroundHeight(struct ChaseActor *actor)
         return;
     }
     {
-        if (SceneActor_MaskedWord(0x100000, &actor->base.statusFlags)) {
+        if (Flags_MaskedWord(0x100000, &actor->base.statusFlags)) {
             if (kind != 0x23)
                 goto adjust;
             {
