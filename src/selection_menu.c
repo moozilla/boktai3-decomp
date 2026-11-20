@@ -604,21 +604,15 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
 
 void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
 {
-    int i, mask;
-    s16 *slot;
-    p->availableSlots = 0xffff;
-    {
-        struct GameState *base = gGameState;
-        mask = 1;
-        slot = base->inventory;
+    int i;
+    struct GameState *state;
+    p->availableSlots = 0xFFFF;
+    state = gGameState;
+    for (i = 0; i < 8; i++) {
+        s16 slot = state->inventory[i];
+        if (slot >= 0)
+            p->availableSlots &= ~(1 << slot);
     }
-    i = 7;
-    do {
-        if (*slot >= 0)
-            p->availableSlots &= ~(mask << *slot);
-        slot++;
-        i--;
-    } while (i >= 0);
     for (i = 0; i < 16; i++) {
         u8 *actor = Inventory_GetEquipmentEntry(i);
         if (*actor != 255) {
@@ -922,8 +916,7 @@ void SelectionMenu_Close(struct SelectionMenu *p)
 void SelectionMenu_Hide(struct SelectionMenu *arg)
 {
     struct SelectionMenu *p = arg;
-    int i, mask;
-    u32 *flags;
+    int i;
     u32 *state;
     struct SceneInputWidget *g;
     g = &p->panels[0];
@@ -931,30 +924,12 @@ void SelectionMenu_Hide(struct SelectionMenu *arg)
     g = &p->panels[1];
     g->flags |= 1;
     state = &gEnginePauseFlags;
-    mask = 1;
-    flags = &p->icons[0].flags;
-    i = 18;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
-    mask = 1;
-    flags = &p->cursors[0].flags;
-    i = 2;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
-    mask = 1;
-    flags = &p->markers[0].flags;
-    i = 7;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 19; i++)
+        p->icons[i].flags |= 1;
+    for (i = 0; i < 3; i++)
+        p->cursors[i].flags |= 1;
+    for (i = 0; i < 8; i++)
+        p->markers[i].flags |= 1;
     g = &p->highlight;
     g->flags |= 1;
     {
