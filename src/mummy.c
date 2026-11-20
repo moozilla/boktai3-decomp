@@ -10,7 +10,6 @@
 
 /* Records attack contacts and queues a timed reaction (tentative). */
 
-
 static inline u32 Mummy_Flag(u8 *a, u32 m, u32 off)
 {
     return off == 0x2D4 ? *(u16 *)(a + off) & m : *(u32 *)(a + off) & m;
@@ -31,19 +30,9 @@ static inline u32 Mummy_TestOwnerFlag(u32 *p, u32 mask)
     return *p & mask;
 }
 
-struct MummyContext {
-    u8 unknown0[0x6F2];
-    u16 flags;
-};
-
-struct MummyContactOwner {
-    u8 unknown0[0x20];
-    u32 flags;
-};
-
-static inline u8 Mummy_LoadContactLatch(struct MummyContext *state, u16 **saved, u32 mask)
+static inline u8 Mummy_LoadContactLatch(struct Mummy *state, u16 **saved, u32 mask)
 {
-    u16 *p = &state->flags;
+    u16 *p = &state->flags6F2;
     u32 v = *p & mask;
     *saved = p;
     if (v)
@@ -59,7 +48,7 @@ static inline u32 Mummy_ResponseAddress(u32 k_, void *base)
 void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
 {
     struct ChaseActor *base = (void *)input;
-    struct MummyContext *state = ((struct ChaseActor *)input)->base.context;
+    struct Mummy *state = ((struct ChaseActor *)input)->base.context;
     u16 responseCost;
     u16 contactFlags;
     u32 rawKind;
@@ -72,7 +61,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     if (kindIndex <= 7) {
         u16 *flags;
         if ((!Mummy_LoadContactLatch(state, &flags, 0x800)) &&
-            Mummy_TestOwnerFlag(&((struct MummyContactOwner *)obj->owner)->flags, 8))
+            Mummy_TestOwnerFlag(&((struct Player *)obj->owner)->statusFlags, 8))
             return;
         {
             u32 mask = ~0x800;
@@ -80,11 +69,8 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
         }
         if ((!Mummy_IsAttackBlocked(input)) && ((obj->contactFlags) & 15)) {
             ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
-            {
-                u32 *field = &((struct ChaseActor *)input)->base.statusFlags;
-                u32 mask = 0xFEFFFFFF;
-                *field &= mask;
-            }
+            SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
+                                           ROOM_ACTOR_STATUS_INTERACTING);
         }
         base->base.tracking.target =
             SceneActorContacts_FindObjectById(*(u16 *)&base->base.counter304);
@@ -96,7 +82,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
         }
         if ((!(*((u16 *)Mummy_ResponseAddress(
                 (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
-            Mummy_TestOwnerFlag(&((struct MummyContactOwner *)obj->owner)->flags, 0x200)) {
+            Mummy_TestOwnerFlag(&((struct Player *)obj->owner)->statusFlags, 0x200)) {
             base->base.hitOwners = 1;
             base->base.hitReactionFlags = 4;
             base->base.hitAttributes = 0;
@@ -112,11 +98,8 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
         }
     } else if ((!Mummy_IsAttackBlocked(input)) && (contactFlags & 15)) {
         ((struct ChaseActor *)input)->base.counter304 = obj->collisionId;
-        {
-            u32 *field = &((struct ChaseActor *)input)->base.statusFlags;
-            u32 mask = 0xFEFFFFFF;
-            *field &= mask;
-        }
+        SceneActorChase_ClearWordFlags(&((struct ChaseActor *)input)->base.statusFlags,
+                                       ROOM_ACTOR_STATUS_INTERACTING);
     }
 }
 
@@ -368,7 +351,6 @@ static inline void SetHalf(struct ChaseActor *a, u16 mask)
 }
 
 // confidence=low: waits for the recovery timer before restoring route animation.
-
 
 void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
 {
