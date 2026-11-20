@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_placement.h"
 
@@ -21,7 +22,6 @@ static inline u16 TestFlags(u32 value, u32 mask)
 }
 s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
 {
-    u8 new_var;
     u32 flags = MaskFlags(&s->motionFlags, 0xFFFFFEFF);
     switch (s->category) {
         case 0x12:
@@ -43,7 +43,7 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
             if (!s->reactionSoundVariant) {
             fallback:
                 Sound_PlaySong(0x211);
-            } else if ((new_var = TestFlags(flags, 8))) {
+            } else if ((u8)TestFlags(flags, 8)) {
                 Sound_PlaySong(0x13E);
                 Sound_PlaySong(0x12A);
             } else {
@@ -52,35 +52,8 @@ s32 SceneActorPlacement_PlayResponseAndResetState(struct RoomActor *s)
             break;
     }
     {
-        const void *control = s->onReaction;
-        u8 code = 0x12;
-        u32 zero;
-        u8 one;
-        u8 zero8;
-        u32 *flags;
-        u8 *taken;
-        u32 three;
-        taken = &s->field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        s->stepDone = zero;
-        s->controlKind = code;
-        s->target = control;
-        zero8 = 0;
-        s->field2C8 = zero;
-        flags = &s->pendingControlFlags;
-        {
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->pendingControl = zero;
-        three = 3;
-        s->state2A8 = three;
-        s->phase2A9 = zero8;
-        s->behavior2AA = zero8;
-        s->counter2AC = zero;
-        s->field2B1 = one;
+        SceneActorTerrain_InstallControl((struct ChaseActor *)s, s->onReaction, 0x12);
+        SceneActorTerrain_EnterState((struct ChaseActor *)s, 3, 0, 0);
         SceneActorPlacement_ClearFlags(&s->reactionFlags, 0xFFFFF636);
         ClearFlags32(&s->statusFlags, 0xFEFFFFFF);
     }
