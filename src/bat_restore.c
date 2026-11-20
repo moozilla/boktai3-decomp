@@ -12,6 +12,7 @@
 #include "engine.h"
 #include "scene_actor_part_burst.h"
 #include "ghoul.h"
+#include "bestiary.h"
 #include "scene_actor_init_actor.h"
 
 void ActorShadow_Enable(void *);
@@ -608,24 +609,9 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 
 void SceneActorEffects_AdvanceSteps(void *, u32);
 
-void *Bestiary_GetEntryForActor(u32, u32);
-
-void Bestiary_UnlockEntry(void *);
-
 void SceneActorBehavior_CallTerrainScript(void *);
 
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-
-struct BatDrawableUpdateDefeat {
-    u32 flags;
-    u8 unknown4[4];
-    u8 alpha8, alpha9;
-    u8 unknownA[0x3E];
-    u8 anim[8];
-    u16 mode;
-    u8 unknown52[4];
-    u16 frame;
-};
 
 static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
@@ -664,8 +650,8 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     struct ContactPackedVector rangeA;
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
-    struct BatDrawableUpdateDefeat *drawable = actor->base.drawable;
-    u8 *anim = drawable->anim;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *animation = &drawable->sequence;
     u16 script;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
@@ -674,7 +660,7 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
-        drawable->flags |= 2;
+        drawable->sprite.flags |= 2;
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Flag(actor, 8, 0x2D4))
             Sound_PlaySong(0x12A);
@@ -701,13 +687,13 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
                             actor->base.body.direction + 128, 10, 8, 2, 2);
     }
     if (frame <= 0x22)
-        *(u16 *)(anim + 0xE) = 0;
-    if (*(u16 *)(anim + 8) <= 2) {
-        drawable->alpha8 = 0x46;
-        drawable->alpha9 = 0x46;
+        animation->elapsed = 0;
+    if (animation->index <= 2) {
+        drawable->sprite.palette = 0x46;
+        drawable->sprite.paletteVariant = 0x46;
     } else {
-        drawable->alpha8 = 0x40;
-        drawable->alpha9 = 0x40;
+        drawable->sprite.palette = 0x40;
+        drawable->sprite.paletteVariant = 0x40;
     }
     if (!actor->base.restart)
         return;
@@ -759,37 +745,14 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         actor->base.attachmentTimer = 0;
-        drawable->alpha8 = 0x40;
-        drawable->alpha9 = 0x40;
-        drawable->flags = (drawable->flags & ~2) | 1;
-        {
-            u32 mask2 = 0x4000;
-            u32 value = *flags;
-            masked = value & mask2;
-        }
+        drawable->sprite.palette = 0x40;
+        drawable->sprite.paletteVariant = 0x40;
+        drawable->sprite.flags = (drawable->sprite.flags & ~2) | 1;
+        masked = SceneActorChase_FlagComponentBits((struct SceneActorChaseFlags16 *)flags, 0x4000);
         if (!masked) {
-            void *callback = (void *)SceneActorControl_OnIdle;
-            u32 kind = 16;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = masked;
-            {
-                u32 *field = &actor->base.pendingControlFlags;
-                s32 clear = ~1;
-                *field &= clear;
-            }
-            actor->base.pendingControl = masked;
-            {
-                u32 behavior = 2;
-                actor->base.state2A8 = 1;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = masked;
-                actor->base.field2B1 = 1;
-            }
+            SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+            SceneActorChase_SetState(actor, 1, 0, 2);
         }
     }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
 }
