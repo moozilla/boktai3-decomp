@@ -110,12 +110,6 @@ static inline u8 trackFinished(struct PairedSceneHalf *half)
 {
     return half->motion.active == 2;
 }
-static inline void setPhase(struct PairedSceneHalf *half, u32 phase)
-{
-    half->actionCounters[0] = phase;
-    half->actionCounters[1] = 0;
-    half->actionEntered = 1;
-}
 void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
                                           struct PairedSceneHalf *half)
 {
@@ -132,7 +126,7 @@ void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
             Anim_SetSequence(&half->graphics.sequence, resource, 12, (u8)half->mode, 0);
         }
         Pair_StepSequence(half);
-        setPhase(half, 0);
+        PairedSceneHalf_BeginActionPhase(half, 0);
     }
     switch (half->actionCounters[0]) {
         case 0: {
@@ -170,7 +164,7 @@ void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
                     SetCaptureAnimation(half, resource, 9, 0);
                 }
                 Pair_StepSequence(half);
-                setPhase(half, 2);
+                PairedSceneHalf_BeginActionPhase(half, 2);
             }
             break;
 
@@ -181,7 +175,7 @@ void PairedSceneActor_UpdatePlayerCapture(struct VanargandAttackPair *owner,
                 SetCaptureAnimation(half, resource, 9, 0);
             }
             Pair_StepSequence(half);
-            setPhase(half, 3);
+            PairedSceneHalf_BeginActionPhase(half, 3);
             break;
 
         case 3:
