@@ -441,27 +441,25 @@ struct Seq {
     u16 hE;
 };
 
-struct AnimationLookupActor {
-    u8 pad0[4];
-    u8 *inner;
-    u8 pad8[0x2D0 - 8];
-    u32 flags;
-};
+static inline void Golem_SetStatusFlags(struct ChaseActor *actor, u32 mask)
+{
+    actor->base.statusFlags |= mask;
+}
 
 extern u16 gUnk_08606120[];
 
-u16 Skeleton_LookupAnimationEntry(struct AnimationLookupActor *p)
+u16 Skeleton_LookupAnimationEntry(struct ChaseActor *actor)
 {
-    struct Seq *s = (struct Seq *)(p->inner + 0x48);
-    struct Seq *t = s;
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *sequence = &drawable->sequence;
+    struct DisplaySequenceState *wrapped = sequence;
 
-    if (s->hE == 0) {
-        u32 m = 0x10000;
-        p->flags |= m;
-        if (s->h8 <= 7)
-            return gUnk_08606120[s->h8];
-        if ((u16)(s->h8 - 8) <= 7)
-            return gUnk_08606120[t->h8 - 8];
+    if (sequence->elapsed == 0) {
+        Golem_SetStatusFlags(actor, 0x10000);
+        if (sequence->index <= 7)
+            return gUnk_08606120[sequence->index];
+        if ((u16)(sequence->index - 8) <= 7)
+            return gUnk_08606120[wrapped->index - 8];
     }
     return 0;
 }
@@ -1579,11 +1577,6 @@ static inline void GolemSlide_SetDelay(struct ChaseActor *actor, u16 delay)
     actor->base.attachmentTimer = delay;
 }
 
-static inline void GolemSlide_SetStatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.statusFlags |= mask;
-}
-
 void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
 {
     struct GolemSlideContext *context = actor->base.context;
@@ -1630,7 +1623,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
             actor->base.stepDone = 1;
         } else {
             GolemSlide_SetDelay(actor, 180);
-            GolemSlide_SetStatusFlags(actor, 1);
+            Golem_SetStatusFlags(actor, 1);
             SceneActorChase_SetState(actor, 3, 0, 0);
             SceneActorChase_SetControl(actor, group->contactControl, 7);
             GolemSlide_ClearColliderFlags(&actor->base.colliderA, 0x100);
