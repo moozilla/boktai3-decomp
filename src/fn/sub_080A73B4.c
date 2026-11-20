@@ -1,3 +1,4 @@
+#include "scene_actor_chase_reaction.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
@@ -48,16 +49,15 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }
@@ -77,8 +77,7 @@ static inline u32 Random4(void)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     {
         u32 value = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
-        u32 mask = 3;
-        return (mask & value) + 1;
+        return (3 & value) + 1;
     }
 }
 void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
@@ -134,27 +133,13 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         Script_Call(script, &arguments);
     }
     {
-        u32 mask = 0x4000;
-        if (!(actor->base.motionFlags & mask) && (u32)(actor->base.category - 11) > 2)
+        if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+            (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     }
     actor->base.attachmentTimer = 0;
-    {
-        void *callback = (void *)SceneActorControl_OnIdle;
-        u32 kind = 16;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *p = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *p &= mask;
-        }
-        actor->base.pendingControl = 0;
-    }
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     SetAnimation(actor, 1, 0, 2);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }
