@@ -1,5 +1,7 @@
 #include "tentacle_body.h"
 
+#include "scene_actor_init_actor.h"
+
 void TentacleBody_OnAttackCollision(u8 *unused, struct ContactCollider *collider,
                                     struct ChaseActor *actor)
 {
@@ -109,22 +111,8 @@ void TentacleBody_UpdateHiddenTransition(struct ChaseActor *actor, s32 frame, u3
         }
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
-        void (*nextState)(struct ChaseActor *);
-        u32 stateKind;
-        u32 *flags;
-        u32 mask;
         SceneActorAnimation_SelectDirectionalEntry(actor, 9);
-        nextState = ActorTrail_RestoreSavedState;
-        stateKind = 0xD;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = queued;
-        actor->base.controlKind = stateKind;
-        actor->base.target = nextState;
-        actor->base.field2C8 = queued;
-        flags = &actor->base.pendingControlFlags;
-        mask = ~1;
-        *flags &= mask;
-        actor->base.pendingControl = queued;
+        SceneActorChase_SetControl(actor, ActorTrail_RestoreSavedState, 13);
     } else {
         actor->base.restart = queued;
     }
@@ -162,7 +150,7 @@ void ActorTrail_RestoreSavedState(struct ChaseActor *actor)
     }
     {
         struct DisplaySequenceState *sequence =
-            &((struct TentacleBodyDrawable *)actor->base.drawable)->sequence;
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (sequence->index == 3 && sequence->elapsed == 4)
             Sound_PlaySong(0xEE);
     }
@@ -221,36 +209,20 @@ static inline void TentacleBody_SetAttackFlag(struct TentacleBody *body, u32 inp
     *f = mask;
 }
 
-static inline void TentacleBody_FillMotion(void *dst, u32 *tmp, u32 v)
-{
-    *tmp = v;
-    CpuSet(tmp, dst, 0x05000002);
-}
-
 // confidence=low: winds up a segment-spread attack while backing away from the target.
 
 void TentacleBody_UpdateSpreadWindup(struct ChaseActor *actor)
 {
     struct TentacleBody *body = actor->base.context;
     s32 activeSegment, segmentIndex, threshold, speed;
-    u32 zero;
-    struct {
-        u32 zero, variant, flags;
-    } params;
+    u32 variant, flags;
     if (TentacleSpread_Take(&actor->base.field2B2)) {
-        {
-            u32 mask = 0x100000;
-            actor->base.statusFlags |= mask;
-        }
-        TentacleBody_GetDirectionFrame(actor->base.body.direction, &params.variant, &params.flags);
-        TentacleBody_RestartSegmentAnimations(body, 18, params.variant, params.flags);
+        MonsterInit_SetStatusFlags(actor, 0x100000);
+        TentacleBody_GetDirectionFrame(actor->base.body.direction, &variant, &flags);
+        TentacleBody_RestartSegmentAnimations(body, 18, variant, flags);
         TentacleBody_SetAttackFlag(body, 2);
     }
-    {
-        struct ContactPosition *destination = &actor->base.secondaryMotion;
-        zero = 0;
-        TentacleBody_FillMotion(destination, &params.zero, zero);
-    }
+    ZeroFill8(&actor->base.secondaryMotion);
     {
         u32 count = body->spreadStage;
         threshold = 200;
@@ -258,19 +230,7 @@ void TentacleBody_UpdateSpreadWindup(struct ChaseActor *actor)
             threshold = 300;
     }
     if ((s16)actor->base.heightOffset >= threshold) {
-        void *target = TentacleBody_UpdateSpreadRelease;
-        u32 kind = 39;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = target;
-        actor->base.field2C8 = zero;
-        {
-            u32 *f = &actor->base.pendingControlFlags;
-            s32 mask = -2;
-            *f &= mask;
-        }
-        actor->base.pendingControl = zero;
+        SceneActorChase_SetControl(actor, TentacleBody_UpdateSpreadRelease, 39);
     } else {
         u32 angle;
         if ((s32)actor->base.counter2AC <= 29) {
@@ -381,16 +341,8 @@ void TentacleBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
     }
     if (frame > body->releaseFrame) {
         actor->base.stepDone = 1;
-        {
-            u16 *p = &actor->base.field2E8;
-            u32 two = 2;
-            *p = two;
-            {
-                u16 *flags = &body->attackFlags;
-                s32 mask = two - 5;
-                *flags = mask & *flags;
-            }
-        }
+        actor->base.field2E8 = 2;
+        SceneActorChase_ClearFlagComponent((void *)&body->attackFlags, 2);
     } else
         sub_080A9DB0(actor, 64, 0xFFFF);
 }
@@ -399,39 +351,17 @@ void TentacleBody_UpdateSpreadRelease(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: winds up a segment-spread attack while backing away from the target.
 
-static inline void TentacleBody_ClearMotion(const u32 *source, void *destination)
-{
-    CpuSet(source, destination, 0x05000002);
-}
-
 void TentacleBody_UpdateSpreadPreparation(struct ChaseActor *actor)
 {
-    u32 zero;
-    struct ContactPosition *dst;
     s32 speed;
     s32 angle;
 
     if (TentacleSpread_Take(&actor->base.field2B2)) {
-        u32 mask = 0x100000;
-        actor->base.statusFlags |= mask;
+        MonsterInit_SetStatusFlags(actor, 0x100000);
     }
-    dst = &actor->base.secondaryMotion;
-    zero = 0;
-    TentacleBody_ClearMotion(&zero, dst);
+    ZeroFill8(&actor->base.secondaryMotion);
     if ((s16)actor->base.heightOffset > 255) {
-        void *target = (void *)TentacleBody_UpdateChargeSpread;
-        u32 kind = 0x23;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = target;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, TentacleBody_UpdateChargeSpread, 35);
         return;
     }
     if ((s32)actor->base.counter2AC <= 29) {
@@ -525,10 +455,7 @@ void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor)
     if (entered) {
         SceneActor_AimArcAtPlayer(actor);
         *direction = Math_Atan2(actor->base.secondaryMotion.x, actor->base.secondaryMotion.z);
-        {
-            u32 mask = 256;
-            actor->base.motionFlags |= mask;
-        }
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         {
             u32 mask = ~0x100000;
             *attackFlags &= mask;
@@ -555,24 +482,9 @@ void TentacleBody_BeginDirectedAttack(struct ChaseActor *actor)
                 s32 mask = ~256;
                 actor->base.motionFlags = *field & mask;
             }
-            {
-                void *callback = (void *)TentacleBody_UpdateAttackRecovery;
-                u32 kind = 37;
-                actor->base.field2B2 = 1;
-                actor->base.stepDone = 0;
-                actor->base.controlKind = kind;
-                actor->base.target = callback;
-                actor->base.field2C8 = 0;
-                {
-                    u32 *flags = &actor->base.pendingControlFlags;
-                    u32 mask = ~1;
-                    *flags &= mask;
-                }
-                actor->base.pendingControl = 0;
-            }
+            SceneActorChase_SetControl(actor, TentacleBody_UpdateAttackRecovery, 37);
         } else {
-            u32 mask = 8192;
-            actor->base.behaviorFlags |= mask;
+            SceneActorChase_SetActorFlags(actor, 0x2000);
         }
     }
 }
