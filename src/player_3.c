@@ -2172,25 +2172,6 @@ void PlayerBarrier_Hide(void *);
 
 s32 PlayerBarrier_IsActive(void *);
 
-static inline void ClearModeFlag(struct Player *p)
-{
-    if (p) {
-        u32 *flags = &p->actionStateFlags;
-        u32 mask = ~16;
-        *flags &= mask;
-    }
-}
-
-static inline void SetModeFlag(struct Player *p)
-{
-    if (p) {
-        u32 *flags = &p->actionStateFlags;
-        u32 mask = 16;
-        u32 m = mask;
-        *flags |= m;
-    }
-}
-
 // Preserved owner/request registers differ; one exit reloads the mode.
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
@@ -2247,9 +2228,9 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
             p->actionVariant = 0;
         }
         request->kind = kind;
-        ClearModeFlag(p);
+        ClearEquipmentFlag(p, 68);
         if (kind == 3)
-            SetModeFlag(p);
+            SetEquipmentFlag(p, 68);
         else if (PlayerBarrier_IsActive(p->actionRequestEffect))
             PlayerBarrier_Hide(p->actionRequestEffect);
         if ((u8)request->kind > 5) {
@@ -2291,9 +2272,9 @@ void Player_InitActionRequest(struct Player *p)
         request->kind = 0xFF;
     else
         request->kind = Player_GetSelectedAbility(p);
-    ClearModeFlag(p);
+    ClearEquipmentFlag(p, 68);
     if (request->kind == 3)
-        SetModeFlag(p);
+        SetEquipmentFlag(p, 68);
     if (request->kind < 0) {
         request->duration = 0;
         request->enabled = 0;
