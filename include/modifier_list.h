@@ -95,6 +95,10 @@ union ModifierCursorWord {
     struct ModifierCursor cursor;
     u32 word;
 };
+/* Sixteen colors followed by a two-frame rotation timer. */
+struct CharacterPaletteCycle {
+    u16 colors[16], timer;
+};
 /* Observed layout through 0x1088, the size allocated by 08042158.
  * Preview resource/model storage remains opaque within unknown83C. */
 struct ModifierMenu {
@@ -105,7 +109,7 @@ struct ModifierMenu {
     u32 stateFrame;
     void *backgroundResource;
     void *tilemap;
-    u8 unknown3C[0x24];
+    struct CharacterPaletteCycle paletteCycle;
     void *backgroundScript; /* 0x60: background setup resource, distinct from the close script. */
     u32 dirtyFlags;
     struct ModifierSelection current, pending;
