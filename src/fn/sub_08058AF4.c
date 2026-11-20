@@ -18,13 +18,10 @@ void ScenePanel_InitOverlay(struct ScenePanel *panel)
     Bg_SetPriority(3, 1);
     panel->overlayPalette = (u8 *)ScriptProc_Start(0x92B3, 0xE2BA) + 0x114;
     {
-        u32 level = 5;
-        u8 *levels = panel->targetLevels;
-        s32 i = 3;
-        do {
-            levels[4] = level;
-            levels[0] = level;
-            levels++;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 4; i++) {
+            panel->currentLevels[i] = 5;
+            panel->targetLevels[i] = 5;
+        }
     }
 }
