@@ -4,7 +4,7 @@
 void ActorDebris_Hide(struct FrameDisplay *display)
 {
     if (display) {
-        WordFlags_Set(&display->flags, 1);
-        WordFlags_Set(&display->sprite.flags, 1);
+        WordFlags_Set(1, &display->flags);
+        WordFlags_Set(1, &display->sprite.flags);
     }
 }
