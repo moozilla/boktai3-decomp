@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -275,6 +276,29 @@ class Compiler(unittest.TestCase):
 
     def test_unreachable_arm_on_a_narrow_value(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gHalf;\n    if ((s32)raw < 0) {\n        g(raw);\n        return;\n    }\n    g(1);\n}\n"), ["dead-code"])
+
+    def test_explicit_narrow_guard_recovers_a_dead_register_assignment(self):
+        path = "src/sample.c"
+        body = ("void f(void *resource) {\n"
+                "    u32 raw = (u8)(u32)resource;\n"
+                "    if ((s32)raw < 0)\n"
+                "        resource = 0;\n"
+                "}\n")
+        compiler_reports = ([], [("dead-code", path, 4, "f", "store")])
+        for reports in compiler_reports:
+            with self.subTest(reports=reports), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=reports):
+                self.assertEqual(c.compiler_sites(path, body), [c.Site(4, "dead-code")])
+
+    def test_narrow_guard_requires_the_value_to_stay_bounded(self):
+        path = "src/sample.c"
+        for setup in ("    u32 raw = (s8)value;",
+                      "    u32 raw = (u8)value + delta;",
+                      "    u32 raw = (u8)value;\n    raw = delta;"):
+            with self.subTest(setup=setup), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=[]):
+                body = f"void f(void) {{\n{setup}\n    if ((s32)raw < 0)\n        value = 0;\n}}\n"
+                self.assertEqual(c.compiler_sites(path, body), [])
 
     def test_respelling_the_guard_does_not_hide_it(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gByte;\n    if (raw & 0x100) {\n        gWord = raw;\n    }\n    g(1);\n}\n"), ["dead-code", "proved-zero"])

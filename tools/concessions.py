@@ -35,13 +35,12 @@ Errors and warnings. Run as a linter (`python3 tools/concessions.py [PATH...]`),
 scored site is an **error**. A **warning** is C a person plausibly would not have written, found by
 its spelling, so each one is a question, not a verdict:
 
-* `dead-code`: a call, store or branch the compiler deleted as unreachable after working out a
-  condition the C left open (`x < 0` on a value that came from an unsigned halfword). People do
-  write dead code by accident; an arm that looks like a real gap in the algorithm can be excused.
+* `dead-code`: unreachable code after the compiler works out a condition the C left open
+  (`x < 0` on a value that came from an unsigned halfword). A narrow source check supplements
+  the compiler for assignments in explicit negative guards that disappear as register copies.
 * `proved-zero`: an operation an accepted compiler transformation proved is always zero
-  (`(u16)x >> 16`, `(x & 31) >> 5`); rejected speculative combinations do not count.
-  These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
-  instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
+  (`(u16)x >> 16`, `(x & 31) >> 5`). Rejected speculative combinations do not count.
+  Both checks use the reports from scope's instrumented agbcc (tools/deadcode.py).
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
@@ -136,6 +135,15 @@ _VOLATILE_TYPEDEF = re.compile(
     r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?[A-Za-z_]\w*\s*[=;,\[]")
 _FUNCTION_BODY = re.compile(r"[A-Za-z_][\w\s\*]*?\b\w+\s*\([^;{]*\)\s*\{", re.S)
 _FUNCTION_MACRO = re.compile(r"#\s*define\s+\w+\(")
+# Only a simple value narrowed before the comparison is proved here. A change to
+# the local or arithmetic following the cast can invalidate the range.
+_NARROW_NEGATIVE_ASSIGNMENT = re.compile(
+    r"(?m)^[ \t]+(?:const\s+)?[us]32\s+(?P<local>[A-Za-z_]\w*)\s*=\s*"
+    r"\(\s*u(?:8|16)\s*\)\s*(?:\(\s*[us]32\s*\)\s*)?"
+    r"[A-Za-z_]\w*(?:\s*(?:->|\.)\s*[A-Za-z_]\w*)*\s*;\s*"
+    r"if\s*\(\s*\(\s*s32\s*\)\s*(?P=local)\s*<\s*0\s*\)\s*"
+    r"(?:\{\s*)?(?P<assignment>[A-Za-z_]\w*\s*=(?!=)[^;{}]+;)"
+)
 
 
 @dataclass(frozen=True)
@@ -327,8 +335,12 @@ def cflags(text: str, path=None) -> Site | None:
 
 
 def compiler_sites(path, text=None) -> list[Site]:
-    """The dead-code and proved-zero sites on PATH's own lines (a unit under src/), from the
-    instrumented compiler. Empty for headers and when the compiler isn't built."""
+    """The dead-code and proved-zero sites on PATH's own lines.
+
+    The compiler filters register-only deletions because most are incidental.
+    An explicit assignment in a provably impossible guard can be recovered
+    from the source even when that filter hides it.
+    """
     import deadcode
     rel = str(path).replace("\\", "/")
     if not rel.endswith(".c") or is_library(rel) or not deadcode.available():
@@ -337,6 +349,9 @@ def compiler_sites(path, text=None) -> list[Site]:
         text = open(os.path.join(deadcode.ROOT, rel), errors="replace").read()
     ok = allows(text)
     seen = {(line, kind) for kind, file, line, _, _ in deadcode.unit(rel) if file == rel}
+    code = strip(text)
+    for guard in _NARROW_NEGATIVE_ASSIGNMENT.finditer(code):
+        seen.add((_line(code, guard.start("assignment")), "dead-code"))
     return [Site(line, kind, kind in ok.get(line, {})) for line, kind in sorted(seen)]
 
 
