@@ -37,13 +37,6 @@ struct GhoulCollisionVector {
     struct GhoulPackedPair xy, zw;
 };
 
-struct GhoulRouteOrigin {
-    u8 unknown0[0x1C];
-    s16 x;
-    u8 unknown1E[2];
-    s16 z;
-};
-
 void Ghoul_OnAttackCollision(struct ContactCollider *, struct ContactCollider *,
                              struct ChaseActor *);
 void Ghoul_OnBodyCollision(void);
@@ -67,7 +60,7 @@ void Ghoul_SetActionHandlers(struct ChaseActor *actor);
 void Ghoul_UpdateAimedDiscControl(struct ChaseActor *actor);
 void Ghoul_SetSpecialHandlers(struct ChaseActor *actor);
 void Ghoul_EnterIdleControl(struct ChaseActor *actor);
-void SceneActorControl_RefreshMotionRoute_0808A90C(struct ChaseActor *actor);
+void Ghoul_RefreshMotionRoute(struct ChaseActor *actor);
 void Ghoul_ResumeContactRoute(struct ChaseActor *actor);
 void Ghoul_InitCollision(struct ChaseActor *actor);
 void Ghoul_ResetRouteState(struct ChaseActor *actor);
@@ -78,7 +71,7 @@ void Ghoul_TickCooldown(struct ChaseActor *actor);
 void Ghoul_SelectRandomRoutePoint(struct ChaseActor *actor);
 void Ghoul_SelectRetreatRoutePoint(struct ChaseActor *actor);
 void Ghoul_BeginAlternateRoute(struct ChaseActor *actor);
-void Vorn_ParseField624_0808B320(struct ChaseActor *actor);
+void Ghoul_ReadDelayedScript(struct ChaseActor *actor);
 void Bat_TickDelayedScript(struct ChaseActor *actor);
 u8 Ghoul_ReactToContact(struct ChaseActor *actor);
 s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor);

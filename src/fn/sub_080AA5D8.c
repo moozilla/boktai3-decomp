@@ -1,42 +1,26 @@
+#include "tentacle_body.h"
 #include "global.h"
 #include "scene_actor_reset.h"
-struct TrailSegment {
-    u8 unknown0[0x1C];
-    struct ContactPosition position;
-    u8 unknown24[0x78];
-    u8 collider[0x69];
-    u8 flags;
-    u8 unknown106[0x22];
-};
-struct ActorTrail {
-    u8 unknown0[0x3D4];
-    struct TrailSegment segments[4];
-    u8 unknown874[0x66];
-    s16 segmentCount;
-    u8 unknown8DC[0xE];
-    u8 activeCount;
-};
 void TentacleActor_SpawnSparkBurst(struct ContactPosition *);
-static inline u8 isRemoved(struct TrailSegment *segment)
+static inline u8 isRemoved(struct TentacleAnimationSegment *segment)
 {
-    u32 mask = 1;
-    u32 value = segment->flags;
-    if (mask & value)
+    u32 value = segment->animation.status;
+    if (1 & value)
         return 1;
     return 0;
 }
 void ActorTrail_RemoveAllSegments(struct ChaseActor *actor)
 {
-    struct ActorTrail *trail = actor->base.context;
-    struct TrailSegment *segments = trail->segments;
+    struct TentacleBody *trail = actor->base.context;
+    struct TentacleAnimationSegment *segments = trail->segments;
     s32 i;
-    if (trail->activeCount) {
+    if (trail->spreadStage) {
         for (i = trail->segmentCount - 1; i >= 0; i--) {
             if (!isRemoved(&segments[i])) {
-                struct TrailSegment *segment = &segments[i];
-                Collider_Remove(segment->collider);
-                segment->flags |= 1;
-                trail->activeCount--;
+                struct TentacleAnimationSegment *segment = &segments[i];
+                Collider_Remove(&segment->bodyCollider);
+                segment->animation.status |= 1;
+                trail->spreadStage--;
                 TentacleActor_SpawnSparkBurst(&segment->position);
             }
         }

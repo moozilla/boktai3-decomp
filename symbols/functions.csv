@@ -3073,7 +3073,7 @@ addr,name,mode,confidence,source,notes
 0808A664,Ghoul_UpdateAimedDiscControl,thumb,low,src-alias,Starts an aimed disc attack and restores pursuit after the configured recovery delay
 0808A870,Ghoul_SetSpecialHandlers,thumb,low,src-alias,Installs the single special behavior callback table at actor offset 0x28C
 0808A880,Ghoul_EnterIdleControl,thumb,low,src-alias,Installs the shared idle callback and resets action state and queued control fields
-0808A90C,SceneActorControl_RefreshMotionRoute_0808A90C,thumb,low,src-alias,
+0808A90C,Ghoul_RefreshMotionRoute,thumb,low,src-alias,Refreshes the chase gate from tracking flags and restores idle control. Name tentative.
 0808A9EC,Ghoul_ResumeContactRoute,thumb,low,src-alias,
 0808AC4C,Ghoul_InitCollision,thumb,low,src-alias,Initializes body and attack collision volumes with the ghoul collision callbacks
 0808ACD4,Ghoul_ResetRouteState,thumb,low,src-alias,
@@ -3084,7 +3084,7 @@ addr,name,mode,confidence,source,notes
 0808AED8,Ghoul_SelectRandomRoutePoint,thumb,low,src-alias,Chooses a route point different from the current point and resets its progress
 0808AF38,Ghoul_SelectRetreatRoutePoint,thumb,low,src-alias,Selects a route point behind the tracked target or a random fallback and requests a path
 0808B264,Ghoul_BeginAlternateRoute,thumb,low,src-alias,Sets owner context flag bits and starts the route group alternate route in behavior 15
-0808B320,Vorn_ParseField624_0808B320,thumb,low,src-alias,
+0808B320,Ghoul_ReadDelayedScript,thumb,low,src-alias,Reads the script and delay from keyword x and clears the elapsed counter. Name tentative.
 0808B3A0,Bat_TickDelayedScript,thumb,low,src-alias,
 0808B3EC,Ghoul_ReactToContact,thumb,low,src-alias,
 0808CC48,Ghoul_ResumePendingRoute,thumb,low,src-alias,
@@ -3114,8 +3114,8 @@ addr,name,mode,confidence,source,notes
 0808EF58,Slime_UpdateShake,thumb,low,src-alias,
 0808F03C,Slime_UpdateLaunch,thumb,low,src-alias,"Sets a heading-based launch velocity and plays sound 0x3C1, then enters Slime_UpdateStill when flag 0x10 sets; tentative"
 0808F1C4,Slime_UpdateStill,thumb,low,src-alias,
-0808F2A0,Bat_RunDefeatScript,thumb,low,src-alias,
-0808F490,Bat_UpdateActionScript,thumb,low,src-alias,
+0808F2A0,Slime_RunDefeatScript,thumb,low,src-alias,Slime defeat callback uses the Slime debris emitter and the terrain script. Name tentative.
+0808F490,Slime_UpdateActionScript,thumb,low,src-alias,Slime behavior callback invokes its action script and records completion in its own context. Name tentative.
 0808F500,Slime_SetSecondaryStateTable,thumb,low,src-alias,Assigns the table at offset 0x288 during initialization; table role is tentative
 0808F510,Slime_ApproachSavedTarget,thumb,low,src-alias,
 0808F6F0,Slime_RestoreSavedTarget,thumb,low,src-alias,"On arrival restores the saved target as the control callback, then runs update270"
@@ -3130,7 +3130,7 @@ addr,name,mode,confidence,source,notes
 0808FCB0,Slime_TryEnrage,thumb,low,src-alias,"Checks vertical distance to the player and health/context flags, sets reaction flags 0x80 or 0x100; returns 1 when the trigger applies; tentative"
 0808FD9C,Slime_FollowPlayer,thumb,low,src-alias,
 0808FE64,Slime_OnInterrupt,thumb,low,src-alias,"Unless already in wait kinds 0x22-0x24 or 0x26, restarts the random wait control with behavior 0xF; tentative"
-0808FF00,Bat_ReadScriptValuePair,thumb,low,src-alias,
+0808FF00,Slime_ReadSplitScript,thumb,low,src-alias,Reads the script and parameter later passed by Slime_RunPendingActionScript. Name tentative.
 0808FF68,Slime_RunPendingActionScript,thumb,low,src-alias,
 08090118,Slime_GetRandomVariantFlags,thumb,low,src-alias,Returns one of two random flag combinations for variant 3 and zero otherwise
 08090160,Slime_EmitDeathDebris,thumb,low,src-alias,
@@ -3173,7 +3173,7 @@ addr,name,mode,confidence,source,notes
 08093644,Bee_SubVector,thumb,low,src-alias,
 0809366C,SceneActorCollision_FireSecondaryAttack,thumb,low,src-alias,
 08093718,Bee_OnDetectionCheck,thumb,low,src-alias,Detection callback consumes a detection flag and accepts targets within height and distance limits
-08093798,Slime_SetStateFlag,thumb,low,src-alias,
+08093798,Bee_SetTrackingReactionFlag,thumb,low,src-alias,Bee installs this reaction gate. It sets bit 8 of the native tracking flags. Name tentative.
 080937A4,Bee_GetMovementVariant,thumb,low,src-alias,Tentatively maps the actor variant field to a movement selection value
 080937D0,Bee_TickActionCooldown,thumb,low,src-alias,Decrements the saturating action cooldown byte at actor offset 0x42B
 080937E8,Bee_UpdateGroundHeight,thumb,low,src-alias,Wraps the Bee ground-height adjustment routine and returns success

@@ -1,3 +1,4 @@
+#include "chase_actor.h"
 #include "global.h"
 struct Pos080A97AC {
     u32 v[2];
@@ -34,9 +35,9 @@ inline static u8 TestMask16(u16 *flags, u32 mask)
     return 0;
 }
 
-void TentacleActor_TargetMarkedSegment(u8 *p)
+void TentacleActor_TargetMarkedSegment(struct ChaseActor *actor)
 {
-    struct Group080A97AC *g = *(struct Group080A97AC **)(p + 0x3d0);
+    struct Group080A97AC *g = actor->base.context;
     s32 found = 0xff;
     s32 i;
     for (i = 0; i < g->count; i++) {

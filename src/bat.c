@@ -80,7 +80,7 @@ extern SceneActorCommandHandler const gUnk_08605C74[];
 
 extern SceneActorCommandHandler const gUnk_086108B0[];
 
-static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -91,7 +91,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
     arg0->base.placementFlags = MonsterInit_ReadKeywordHalfword(0x4D, 0);
-    MonsterInit_ClearPosition(fill, &origin);
+    ZeroFill8(&origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->base.tracking);
@@ -200,7 +200,6 @@ s32 Bat_Init(void *object)
 {
     struct Bat *bat = object;
     struct ChaseActor *actor = object;
-    u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     bat->flags3D4 = 0;
@@ -222,14 +221,14 @@ s32 Bat_Init(void *object)
         actor->base.drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
-        MonsterInit_ClearPosition(&zero, &tmp);
+        ZeroFill8(&tmp);
         res = ScriptProc_Start(0xCB05, 0xDA6D);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializeBody(actor, &zero);
+    MonsterInit_InitializeBody(actor);
     if (Script_SeekToKeyword(0x67)) {
         bat->parameter3DA = MonsterInit_ReadByte(0);
         bat->parameter3DC = MonsterInit_ReadByte(0);

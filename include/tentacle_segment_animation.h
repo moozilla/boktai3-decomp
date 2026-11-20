@@ -2,7 +2,7 @@
 #define GUARD_TENTACLE_SEGMENT_ANIMATION_H
 
 #include "display_sequence.h"
-#include "contact_position.h"
+#include "contact_collider.h"
 
 struct TentacleSegmentAnimation {
     struct DisplaySequenceState sequence;
@@ -16,9 +16,12 @@ struct TentacleAnimationSegment {
     u16 frame;
     u8 unknown12[0x1C - 0x12];
     struct ContactPosition position;
-    u8 unknown24[0xF0 - 0x24];
+    u8 unknown24[0x48 - 0x24];
+    struct ContactCollider attackCollider, bodyCollider;
     struct TentacleSegmentAnimation animation;
-    u8 unknown108[0x11C - 0x108];
+    u8 impulseHeading;
+    u8 unknown109[0xB];
+    struct ContactPosition targetPosition;
     struct ContactPosition offset;
     u8 unknown124[4];
 };

@@ -1,5 +1,6 @@
 #include "lun.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_availability.h"
 #include "player.h"
 #include "ram.h"
 #include "global.h"
@@ -34,21 +35,6 @@ void Player_IncrementActionSpeedBonus(struct Player *player, u32 value);
 void Player_QueueStatusEffect(struct Player *player, s32 effect);
 
 void Sound_PlaySong(u32 song); /* m4aSongNumStart, remembering the song per track unless muted */
-
-static inline void Lun_SetControl(struct ChaseActor *actor, void *target, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = target;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 static inline void Lun_SetState(struct ChaseActor *actor, u32 state, u8 phase, u32 behavior)
 {
@@ -172,7 +158,7 @@ void Lun_HandlePlayerContact(void *unused, struct ContactCollider *other, void *
     if (limit > 0x20) {
         return;
     }
-    Lun_SetControl(actor, SceneActorControl_OnIdle, 16);
+    SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     phase = 2;
     Lun_SetState(actor, 0, phase, 0);
     Lun_EnableCollider(&actor->base.colliderB);
@@ -289,7 +275,8 @@ void ActorBehavior_TickParticipantProgress(struct ChaseActor *a)
 
 void Lun_GetDirectionalFrame(u16 a, s32 *b, s32 *c);
 
-static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u32 flags)
+static inline void Lun_SelectDirectionalAnimation(struct RoomActor *actor, u32 selection,
+                                                  u32 variant, u32 flags)
 {
     u32 force;
     u8 *restart;
@@ -320,16 +307,15 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }
@@ -345,7 +331,7 @@ void Lun_UpdateDirectionalPoseNoSelect(struct RoomActor *actor)
     if (actor->field2B2)
         actor->field2B2 = 0;
     Lun_GetDirectionalFrame(actor->body.direction, &variant, &flags);
-    Select(actor, entry->value, variant, flags);
+    Lun_SelectDirectionalAnimation(actor, entry->value, variant, flags);
 }
 
 // A bool8 (u8) result from an inline helper keeps the materialised 0/15 and
@@ -376,7 +362,7 @@ void Lun_UpdateDirectionalPose(struct RoomActor *actor)
         actor->field2B2 = 0;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     Lun_GetDirectionalFrame(actor->body.direction, &variant, &flags);
-    Select(actor, entry->value, variant, flags);
+    Lun_SelectDirectionalAnimation(actor, entry->value, variant, flags);
 }
 
 // fix.py best version (reprinted C)
@@ -434,11 +420,11 @@ void sub_0813D834(void *, u32, u32);
 
 void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
 {
-    u8 *motion = ((u8 *)actor) + 0x50;
-    u8 *sequence;
+    struct SceneActorBody *motion = &actor->base.body;
+    struct DisplaySequenceState *sequence;
     if (Take(&actor->base.field2B2)) {
         s32 current = ((((s32)actor->base.body.direction) + 0x70) >> 5) & 7;
-        u8 desired = *(((u8 *)actor) + 0x3CD);
+        u8 desired = actor->base.nextDirection;
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->base.body.direction = desired;
@@ -454,12 +440,11 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
-                u32 mask = 0x10000;
-                actor->base.behaviorFlags |= mask;
+                SceneActorChase_SetActorFlags(actor, 0x10000);
             }
         }
     }
-    sequence = (*((u8 **)(((u8 *)actor) + 4))) + 0x48;
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     {
         u32 mask = 0xA02F;
         u16 *scale;
@@ -473,10 +458,13 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
             if (!value)
                 *scale = 64;
         }
-        if (!(*(((u8 *)actor) + 8)))
-            Anim_SetDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x48, *scale);
+        if (!actor->base.drawableKind)
+            Anim_SetDurationScale(
+                &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+                *scale);
         else
-            Anim_SetFrameDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x20, *scale);
+            Anim_SetFrameDurationScale(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     }
     if (actor->base.frameCounter & 4) {
         u32 variant;
@@ -486,13 +474,13 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
             actor->base.profileId, actor->base.profileMode, 1);
         Control(actor, actor->base.onEntry, 2);
         if (Bits(actor, 0x10000))
-            motion[9] += 32;
+            motion->direction += 32;
         else
-            motion[9] -= 32;
-        Lun_GetDirectionalFrame(motion[9], &variant, &flags);
-        sequence[5] = 0;
+            motion->direction -= 32;
+        Lun_GetDirectionalFrame(motion->direction, &variant, &flags);
+        sequence->frameCount = 0;
         selection = entry->value;
-        Select((void *)actor, selection, variant, flags);
+        Lun_SelectDirectionalAnimation((void *)actor, selection, variant, flags);
     }
 }
 
@@ -513,7 +501,7 @@ void Lun_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
         actor->field2B2 = 0;
     Lun_GetDirectionalFrame(actor->body.direction, &variant, &flags);
     selection = entry->value;
-    Select(actor, selection, variant, flags);
+    Lun_SelectDirectionalAnimation(actor, selection, variant, flags);
     if (frame <= 29)
         Flag(actor, 32);
     if (frame > 59)
@@ -526,7 +514,7 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input);
 
 void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input);
 
-void Lun_BeginMoveToPosition(u8 *s, s16 *v);
+void Lun_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target);
 
 void Lun_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
 
@@ -570,23 +558,19 @@ void Lun_ResumeAfterLiftPenalty(struct ChaseActor *input, s32 elapsed)
         flags |= value;
         *p = flags;
     }
-    {
-        u32 mask = 0x100000;
-        u32 *p = &input->base.statusFlags;
-        *p |= mask;
-    }
+    MonsterInit_SetStatusFlags(input, 0x100000);
     if (frame > 30) {
-        u8 *ctx = input->base.context;
+        struct Lun *ctx = input->base.context;
         u16 delay;
         SceneActorControl_ResetCollisionFlags(input);
-        delay = *((u16 *)(ctx + 0x444));
+        delay = ctx->routeDelay;
         if (delay) {
             u32 flags = 0x100;
             u16 *p = &input->base.motionFlags;
             flags = flags | (*p);
             *p = flags;
-            *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
-            Lun_BeginMoveToPosition(input, (*(u8 **)gPlayers) + 0x30);
+            ctx->routeDelay = ctx->field442;
+            Lun_BeginMoveToPosition(input, &gPlayers[0]->position);
             SetState(input, 2, 0, zero8);
         } else {
             u32 zero = delay;
@@ -704,7 +688,7 @@ inline static u16 SetAnimationFlags(struct ChaseActor *actor, u32 mask)
 
 void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
 {
-    u8 *ctx = a->base.context;
+    struct Lun *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B2)) {
         SetFlag(32, (struct LunFlagWord *)&a->base.motionFlags);
         if (a->base.motionFlags & 8)
@@ -737,7 +721,7 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
             *p &= mask;
         }
         SetMotionFlags(a, 0x100000);
-        ctx[0x3E2] = 0;
+        ctx->hoverPhase = 0;
         {
             u16 liftFlag = 8;
             if (a->base.motionFlags & liftFlag) {
@@ -745,10 +729,10 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
                 SetControl_ApproachMovementTarget(a, Lun_ResumeAfterLiftPenalty, 20);
                 ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~8);
                 a->base.field2C2 = 64;
-            } else if (*((u16 *)(ctx + 0x444))) {
+            } else if (ctx->routeDelay) {
                 SetFlag(0x100, (struct LunFlagWord *)&a->base.motionFlags);
-                *((u16 *)(ctx + 0x444)) = *((u16 *)(ctx + 0x442));
-                Lun_BeginMoveToPosition(a, ((u8 **)gPlayers)[0] + 0x30);
+                ctx->routeDelay = ctx->field442;
+                Lun_BeginMoveToPosition(a, &gPlayers[0]->position);
                 SetState_ApproachMovementTarget(a, 0, 2, 1);
                 SceneActorControl_ResetCollisionFlags(a);
             } else {
@@ -766,23 +750,6 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
 void *Bestiary_GetEntryForActor(u32, u32);
 
 void Bestiary_UnlockEntry(void *);
-
-static inline void SetControl_UpdateDefeat(struct ChaseActor *actor, u32 kind, void *target)
-{
-    void *callback = target;
-    u32 type = kind;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = type;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 static inline void SetState_UpdateDefeat(struct ChaseActor *actor, u32 state, u32 phase,
                                          u32 behavior)
@@ -817,10 +784,7 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
             struct ContactCollider *c = &actor->base.colliderA;
             c->flags |= 4;
         }
-        {
-            u32 m = 0x800;
-            actor->base.placementFlags = m | actor->base.placementFlags;
-        }
+        MonsterInit_SetMotionFlags(actor, 0x800);
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
     }
     if (actor->base.restart) {
@@ -840,13 +804,11 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
             arguments.values = values;
             Script_Call(script, &arguments);
         }
-        {
-            u32 m = 0x4000;
-            if (!(actor->base.motionFlags & m) && (u32)(actor->base.category - 11) > 2)
-                Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-        }
-        SetControl_UpdateDefeat(actor, 16, SceneActorControl_OnIdle);
+        if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+            (u32)(actor->base.category - 11) > 2)
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         SetState_UpdateDefeat(actor, 1, 0, 2);
     }
 }
@@ -887,20 +849,6 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->z = from->z + out->z;
 }
 
-static inline void State(struct ChaseActor *a)
-{
-    u32 behavior = 8;
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = 0;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
-struct SavedPair {
-    u32 x, z;
-};
-
 struct SavedMotion {
     u8 pad[12];
     struct ContactPosition position;
@@ -937,27 +885,16 @@ static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s
     return 0;
 }
 
-static inline void Scale(struct ChaseActor *actor)
+static inline void Lun_UpdateRouteAnimationScale(struct ChaseActor *actor)
 {
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
 }
 
 void Lun_UpdateSway(struct ChaseActor *actor);
@@ -966,15 +903,7 @@ struct S0809CB58;
 
 void Lun_SelectRandomRouteEntry(struct S0809CB58 *p);
 
-struct LunCurveActor;
-
-u8 Lun_StepCurveMotion(struct LunCurveActor *actor);
-
-static inline void Fill(void *dst, u32 *tmp, u32 value)
-{
-    *tmp = value;
-    CpuSet(tmp, dst, 0x05000002);
-}
+u8 Lun_StepCurveMotion(struct ChaseActor *actor);
 
 static inline s32 CellIndex(const struct ContactPosition *position, struct ContactPosition **saved)
 {
@@ -990,29 +919,28 @@ static inline s32 CellIndex(const struct ContactPosition *position, struct Conta
 
 void Lun_FollowRoute(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct Lun *body = actor->base.context;
     s32 speed;
-    u32 zero[1];
     struct ContactPosition target;
     if (Take(&actor->base.field2B1)) {
         Control(actor, actor->base.onAlternateEntry, 1);
-        Fill(body + 0x424, zero, 0);
-        body[0x3E3] = 1;
+        ZeroFill8(&body->routeMotion);
+        body->swayStep = 1;
     }
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)))
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
-    Scale(actor);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
+    Lun_UpdateRouteAnimationScale(actor);
     Lun_UpdateSway(actor);
-    if (Approach(actor, (void *)(body + 0x3E8), speed) && Lun_StepCurveMotion(actor)) {
+    if (Approach(actor, (void *)(&body->curveSubject), speed) && Lun_StepCurveMotion(actor)) {
         struct SceneActorRouteCursor *route;
         struct ContactPosition *p;
         struct ContactPosition *saved;
         s32 cell, height;
         u32 kind;
         u16 attr;
-        Polar((void *)(body + 0x424), actor->base.body.direction, speed);
-        route = (void *)(body + 0x42C);
+        Polar((void *)(&body->routeMotion), actor->base.body.direction, speed);
+        route = (void *)(&body->route);
         Lun_SelectRandomRouteEntry(route);
         p = &target;
         p->x = route->point->x;
@@ -1068,23 +996,17 @@ static inline void SetState_DecayRouteMotion(struct ChaseActor *a, u32 phase, u3
 
 void Lun_DecayRouteMotion(struct ChaseActor *a)
 {
-    u8 *ctx = a->base.context;
+    struct Lun *ctx = a->base.context;
     if (TakeFlag(&a->base.field2B1))
         SetControl_DecayRouteMotion(a, a->base.onEntry, 2);
-    a->base.body.motion.x += *(s16 *)(ctx + 0x424);
-    a->base.body.motion.z += *(s16 *)(ctx + 0x428);
+    a->base.body.motion.x += ctx->routeMotion.x;
+    a->base.body.motion.z += ctx->routeMotion.z;
     if (Mod(a->base.counter2AC, 4) == 0) {
-        *(s16 *)(ctx + 0x424) >>= 1;
-        *(s16 *)(ctx + 0x428) >>= 1;
+        ctx->routeMotion.x >>= 1;
+        ctx->routeMotion.z >>= 1;
     }
     if (a->base.stepDone) {
-        u32 mask = 0x100;
-        u16 *p = &a->base.motionFlags;
-        u16 flags;
-        {
-            u32 raw = *p & mask;
-            flags = (u16)raw;
-        }
+        u16 flags = SceneActorChase_QueryMotionFlagComponent(a, 0x100);
         if (flags)
             SetState_DecayRouteMotion(a, 2, 1, 0);
         else
@@ -1264,12 +1186,6 @@ static inline s32 Scale12(s32 n)
     return -((-n) >> 12);
 }
 
-static inline void ClearVector(u32 *zero, struct ContactPosition *v)
-{
-    *zero = 0;
-    CpuSet(zero, v, 0x05000002);
-}
-
 static inline void SetControl_UpdateLaunchedReaction(struct ChaseActor *actor, void *callback,
                                                      u32 kind)
 {
@@ -1300,8 +1216,7 @@ static inline void SetState_UpdateLaunchedReaction(struct ChaseActor *actor, u8 
 
 void Lun_UpdateLaunchedReaction(struct ChaseActor *actor)
 {
-    u8 *state = actor->base.context;
-    u32 zero;
+    struct Lun *state = actor->base.context;
     u8 entered = SceneActorControl_TakeFlag(&actor->base.field2B1);
     u32 *flags = &actor->base.statusFlags;
     if (entered) {
@@ -1309,22 +1224,18 @@ void Lun_UpdateLaunchedReaction(struct ChaseActor *actor)
         SetControl_UpdateLaunchedReaction(actor, Lun_OnSpecialAnimation, 0x24);
         SceneActorControl_ConsumeLiftFlagPenalty(actor);
         angle = Random() & 255;
-        ClearVector(&zero, (struct ContactPosition *)((u8 *)state + 0x424));
+        ZeroFill8(&state->routeMotion);
         actor->base.secondaryMotion.x = Scale12(gUnk_086149C4[angle] * 12);
         actor->base.secondaryMotion.y = 10;
         actor->base.secondaryMotion.z = Scale12(gUnk_086149C4[(angle + 64) & 255] * 12);
         flags = ClearFlags(&actor->base.statusFlags, ~0x100000);
     }
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags |= mask;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u32 mask = 0x10;
         if (*flags & mask) {
-            u32 value = 0x100000;
-            *flags |= value;
-            ClearVector(&zero, &actor->base.secondaryMotion);
+            *flags |= 0x100000;
+            ZeroFill8(&actor->base.secondaryMotion);
             SetState_UpdateLaunchedReaction(actor, 0, 0, 4);
             SetControl_UpdateLaunchedReaction(actor, SceneActorControl_OnIdle, 16);
         }
@@ -1341,51 +1252,17 @@ void Lun_InitMotionPreset(u8 *p)
 
 /* SceneActor_BeginLinkedIdleReaction_0809C834: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
 
-struct LinkedReactionContext {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    u8 unknown55C[0x5BB - 0x55C];
-    u8 phase;
-};
-
-struct LinkedReactionCommand {
-    u8 unknown0[10];
-    u16 kind;
-};
-
-static inline u8 Blocked(struct ChaseActor *s)
-{
-    if (!s)
-        goto zero;
-    {
-        u32 mask = 0x40;
-        if (s->base.motionFlags & mask)
-            goto one;
-    }
-    {
-        u32 mask = 0x20000;
-        if (s->base.statusFlags & mask)
-            goto one;
-    }
-    if (s->base.health > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
-static inline u8 LinkedFlag(struct LinkedReactionContext *p)
+static inline u8 LinkedFlag(struct Lun *p)
 {
     u32 mask = 0x2;
-    if (p->flags & mask)
+    if (p->flags3D4 & mask)
         return 1;
     return 0;
 }
 
 void SceneActor_BeginLinkedIdleReaction_0809C834(struct ChaseActor *s)
 {
-    if (!Blocked(s) && LinkedFlag(s->base.context)) {
+    if (!SceneActor_ActionsBlocked(s) && LinkedFlag(s->base.context)) {
         u32 three = 3;
         u8 *state = &s->base.state2A8;
         u8 zero = 0;
@@ -1560,54 +1437,27 @@ u32 Lun_GetRouteProgressRate(void *actor)
     return gLunRouteProgressRates[index];
 }
 
-typedef struct {
-    u32 a, b;
-} P;
-
 void Lun_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *target)
 {
-    u8 *p = (u8 *)actor;
-    P *q = (P *)target;
-    u8 *r = *(u8 **)(p + 0x3d0);
-    *(P *)(r + 0x414) = *(P *)(p + 0x5c);
-    *(P *)(r + 0x41c) = *q;
-    *(u16 *)(r + 0x3e0) = 0;
+    struct Lun *context = actor->base.context;
+    context->curveStart = actor->base.body.position;
+    context->curveEnd = *target;
+    context->curveTime = 0;
 }
 
-struct LunCurveContext {
-    u8 pad[0x3E0];
-    u16 time;
-    u8 pad3E2[2];
-    s16 curve;
-    u8 pad3E6[0xE];
-    struct ContactPosition output;
-    u8 pad3FC[0x18];
-    struct ContactPosition start, end;
-};
-
-struct LunCurveActor {
-    u8 pad[0x3D0];
-    struct LunCurveContext *context;
-};
-
-u8 Lun_StepCurveMotion(struct LunCurveActor *actor)
+u8 Lun_StepCurveMotion(struct ChaseActor *actor)
 {
-    struct LunCurveContext *ctx = actor->context;
+    struct Lun *ctx = actor->base.context;
     struct ContactPosition start, end;
-    start = ctx->start;
-    {
-        u32 mask = 0xFFFF;
-        *(u32 *)&start = mask & *(u32 *)&start;
-    }
-    end = ctx->end;
-    {
-        u32 mask = 0xFFFF;
-        *(u32 *)&end = mask & *(u32 *)&end;
-    }
-    MovementCurve_InterpolatePosition(&ctx->output, &start, &end, 1, ctx->time, 0, ctx->curve);
-    if (ctx->time > 1023)
+    start = ctx->curveStart;
+    start.y = 0;
+    end = ctx->curveEnd;
+    end.y = 0;
+    MovementCurve_InterpolatePosition(&ctx->curveSubject.position, &start, &end, 1, ctx->curveTime,
+                                      0, ctx->sway);
+    if (ctx->curveTime > 1023)
         return 1;
-    ctx->time += 128;
+    ctx->curveTime += 128;
     return 0;
 }
 
@@ -1629,37 +1479,21 @@ struct IvyPlacement {
     u32 xy, z;
 };
 
-struct LunMovement {
-    u8 pad[0x3d4];
-    u32 flags;
-    u8 pad2[8];
-    u16 time;
-    u8 phase, active;
-    u16 speed;
-    u8 a, b;
-};
-
 // confidence=low: resets movement interpolation and starts the directional animation.
 
 void Lun_ResetMovementState(struct ChaseActor *actor)
 {
-    struct LunMovement *context = actor->base.context;
-    u32 tmp;
-    u32 one;
-    context->time = 0;
-    context->phase = 0;
-    {
-        u8 *active = &context->active;
-        one = 1;
-        *active = one;
-    }
-    context->speed = 0;
-    context->a = 0;
-    context->b = 0;
-    context->flags = 0;
-    Fill((u8 *)context + 0x414, &tmp, 0);
-    Fill((u8 *)context + 0x41c, &tmp, 0);
-    Fill((u8 *)context + 0x424, &tmp, 0);
+    struct Lun *context = actor->base.context;
+    context->curveTime = 0;
+    context->hoverPhase = 0;
+    context->swayStep = 1;
+    context->sway = 0;
+    context->participantElapsed = 0;
+    context->participantStart = 0;
+    context->flags3D4 = 0;
+    ZeroFill8(&context->curveStart);
+    ZeroFill8(&context->curveEnd);
+    ZeroFill8(&context->routeMotion);
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     {
         struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
@@ -1670,17 +1504,11 @@ void Lun_ResetMovementState(struct ChaseActor *actor)
 void SceneActorControl_ResetCollisionFlags(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    u32 *state = (void *)SceneActorControl_GetMotionState(actor);
+    struct SceneActorControlMotionState *state = SceneActorControl_GetMotionState(actor);
     u32 mask = 0x100000;
     u32 *flags = &actor->base.statusFlags;
     *flags |= mask;
-    {
-        u32 offset = 0x3D4;
-        u32 mask;
-        state = (void *)((u8 *)state + offset);
-        mask = ~1;
-        *state &= mask;
-    }
+    SceneActorChase_ClearWordFlags(&state->flags3D4, 1);
     {
         struct ContactCollider *colliderB = &actor->base.colliderB;
         u32 mask;
@@ -1712,34 +1540,16 @@ void Lun_GetDirectionalFrame(u16 a, s32 *b, s32 *c)
     }
 }
 
-void Lun_BeginMoveToPosition(u8 *s, s16 *v)
+void Lun_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target)
 {
-    u8 *p = *(u8 **)(s + 0x3d0);
-    u32 stack[3];
-    s16 *a;
-    s16 *b;
-    Lun_SetMovementEndpoints(s, v);
-    Lun_StepCurveMotion(s);
-    {
-        u32 one = 1;
-        u8 *q = s + 0x2a8;
-        u32 zero = 0;
-        *q = zero;
-        {
-            s32 off = 0x2a9;
-            s[off] = zero;
-            s[0x2aa] = one;
-            *(u32 *)(s + off + 3) = zero;
-        }
-        s[0x2b1] = one;
-        b = (s16 *)(stack + 1);
-        a = (s16 *)(s + 0x5c);
-        b[0] = v[0] - a[0];
-        b[1] = v[1] - a[1];
-        b[2] = v[2] - a[2];
-        s[0x3cd] = Math_Atan2(b[0], b[2]);
-        Fill(p + 0x424, stack, zero);
-    }
+    struct Lun *context = actor->base.context;
+    struct ContactPosition delta;
+    Lun_SetMovementEndpoints(actor, target);
+    Lun_StepCurveMotion(actor);
+    SetState_ChooseMovementDestination(actor, 0, 0, 1);
+    Delta(&delta, &actor->base.body.position, target);
+    actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
+    ZeroFill8(&context->routeMotion);
 }
 
 struct SceneActorTargetLink {
@@ -1822,7 +1632,7 @@ void RouteActor_UpdateRandomDestination(struct ChaseActor *actor)
                 break;
         }
         p->y = height;
-        Lun_BeginMoveToPosition((u8 *)actor, (s16 *)&target);
+        Lun_BeginMoveToPosition(actor, &target);
         SceneActorControl_ResetTargetFlags((u8 *)actor);
     }
 }
@@ -1883,35 +1693,27 @@ void RouteActor_ReflectAtRaisedTerrain(struct ChaseActor *actor)
     }
 }
 
-static inline u8 Test_OnTargetCheck(u8 *s)
+u32 Lun_OnTargetCheck(struct ChaseActor *actor)
 {
-    u8 *p = s + 0xDC;
-    u32 mask = 2;
-    if (p[15] & mask)
-        return 1;
-    return 0;
-}
-
-u32 Lun_OnTargetCheck(u8 *s)
-{
-    u8 *p;
+    struct SceneActorChaseTracking *p;
     s32 distance;
-    if (!Test_OnTargetCheck(s))
+    if (!MonsterInit_TestTargetingFlags(&actor->base.tracking, 2))
         goto zero;
-    p = s + 0xDC;
+    p = &actor->base.tracking;
     {
         s32 mask = -3;
-        mask &= p[15];
-        p[15] = mask;
+        mask &= p->flags;
+        p->flags = mask;
     }
-    distance = *(s16 *)(s + 0x5E) - *(s16 *)((*(u8 **)gPlayers) + 0x32);
+    distance = actor->base.body.position.y -
+               ((struct SceneActorChasePlayer *)gPlayers[0])->target.position.y;
     if (distance < 0)
         distance = -distance;
     if (distance > 0x200)
         goto zero;
     {
-        u32 *a = (u32 *)(s + 0xF0);
-        u32 *b = (u32 *)(s + 0xF8);
+        u32 *a = &actor->base.tracking.distance;
+        u32 *b = &actor->base.tracking.limit;
         if (*a >= *b)
             goto zero;
     }
@@ -1920,86 +1722,61 @@ zero:
     return 0;
 one: {
     u32 mask = 0x80;
-    u16 *flags = (u16 *)(s + 0x2D6);
+    u16 *flags = &actor->base.reactionFlags;
     mask |= *flags;
     *flags = mask;
 }
     {
         u32 mask = 0x10;
-        mask |= p[15];
-        p[15] = mask;
+        mask |= p->flags;
+        p->flags = mask;
     }
     return 1;
 }
 
-struct S {
-    u8 pad[0xDC];
-    u8 extra[0x10];
-    u8 pad3[0x104 - 0xEC];
-    u32 at104;
-    u8 pad4[0x114 - 0x108];
-    u32 flags114;
-    u8 pad5[0x21C - 0x118];
-    void (*callback)(void);
-    u8 pad6[0x2A8 - 0x220];
-    u8 a, b, c, pad7;
-    u32 count;
-    u8 done, queued, taken;
-    u8 pad8[2];
-    u8 code;
-    u8 pad9[0x2C8 - 0x2B6];
-    u16 timer;
-    u8 pad10[0x2D4 - 0x2CA];
-    u16 hflags;
-    u8 pad11[0x3D0 - 0x2D6];
-    u8 *other;
-};
-
-void Lun_EnterIdleOrCopyCell(struct S *s)
+void Lun_EnterIdleOrCopyCell(struct ChaseActor *s)
 {
     u32 mask;
-    u8 *g;
+    struct Lun *g;
     u16 zero;
     u16 zero_2;
-    g = s->other;
+    g = s->base.context;
     mask = 0x100;
-    zero_2 = s->hflags;
+    zero_2 = s->base.motionFlags;
     zero = zero_2 & mask;
     if (zero) {
-        u16 v = *(u16 *)(g + 0x442);
-        *(u16 *)(g + 0x444) = v;
+        u16 v = g->field442;
+        g->routeDelay = v;
     } else {
         void (*fn)(void) = SceneActorControl_OnIdle;
         u8 code = 0x10;
         u8 one;
-        u8 zero8;
         u32 *flags;
         u8 *taken;
-        u8 *extra;
-        taken = &s->taken;
+        struct SceneActorChaseTracking *tracking;
+        taken = &s->base.field2B2;
         one = 1;
         *taken = one;
-        s->done = zero;
-        s->code = code;
-        s->callback = fn;
-        zero8 = 0;
-        s->timer = zero;
-        flags = &s->flags114;
+        s->base.stepDone = zero;
+        s->base.controlKind = code;
+        s->base.target = fn;
+        s->base.field2C8 = zero;
+        flags = &s->base.pendingControlFlags;
         {
             u32 clear = -2;
             *flags &= clear;
         }
-        s->at104 = zero;
-        s->a = zero8;
-        s->b = one;
-        s->c = zero8;
-        s->count = zero;
-        s->queued = one;
-        extra = s->extra;
+        s->base.pendingControl = zero;
+        s->base.state2A8 = 0;
+        s->base.phase2A9 = one;
+        s->base.behavior2AA = 0;
+        s->base.counter2AC = zero;
+        s->base.field2B1 = one;
+        tracking = &s->base.tracking;
         {
             u32 bit = 8;
-            bit |= extra[15];
-            extra[15] = bit;
+            bit |= tracking->flags;
+            tracking->flags = bit;
         }
     }
 }
@@ -2007,8 +1784,7 @@ void Lun_EnterIdleOrCopyCell(struct S *s)
 static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
 {
     u32 mask = 2;
-    u32 offset = 0x3D4;
-    return Test(*(u32 *)((u8 *)state + offset), mask);
+    return Test(state->flags3D4, mask);
 }
 
 void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
@@ -2017,11 +1793,10 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
         return;
     if (actor->base.paletteOffset == 0) {
-        u8 *p = (*(u8 **)gPlayers) + 0x4F6;
-        *p = *p - 1;
+        gPlayers[0]->movementSpeedReduction--;
     }
     {
-        u32 *flags = (void *)((u8 *)SceneActorControl_GetMotionState(actor) + 0x3D4);
+        u32 *flags = &SceneActorControl_GetMotionState(actor)->flags3D4;
         u32 clearMask = ~2;
         *flags &= clearMask;
     }
@@ -2059,25 +1834,24 @@ static inline void State_RenewPlayerRoute(struct ChaseActor *a, u8 state, u8 pha
 
 void Lun_RenewPlayerRoute(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct Lun *body = actor->base.context;
     s32 speed;
-    u32 zero[1];
     struct ContactPosition delta;
     if (Take(&actor->base.field2B1)) {
         Control(actor, actor->base.onAlternateEntry, 1);
-        Fill(body + 0x424, zero, 0);
-        body[0x3E3] = 1;
+        ZeroFill8(&body->routeMotion);
+        body->swayStep = 1;
     }
-    Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270));
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
-    Scale(actor);
+    Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
+    Lun_UpdateRouteAnimationScale(actor);
     Lun_UpdateSway(actor);
-    if (Approach(actor, (void *)(body + 0x3E8), speed) && Lun_StepCurveMotion(actor)) {
-        Lun_SetMovementEndpoints(actor, ((u8 **)gPlayers)[0] + 0x30);
+    if (Approach(actor, (void *)(&body->curveSubject), speed) && Lun_StepCurveMotion(actor)) {
+        Lun_SetMovementEndpoints(actor, &gPlayers[0]->position);
         Lun_StepCurveMotion(actor);
         State_RenewPlayerRoute(actor, 0, 0, 1);
         Delta(&delta, &actor->base.body.position, (void *)(((u8 **)gPlayers)[0] + 0x30));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     actor->base.counter2AC++;
 }
@@ -2114,18 +1888,17 @@ static inline void SetState_FollowParticipantDisplacement(struct ChaseActor *a, 
 
 void Lun_FollowParticipantDisplacement(struct ChaseActor *a)
 {
-    u8 *ctx = a->base.context;
+    struct Lun *ctx = a->base.context;
     struct ContactPosition delta;
     if (TakeFlag(&a->base.field2B1)) {
         SetControl_FollowParticipantDisplacement(a, ActorBehavior_TickParticipantProgress, 0x23);
-        *(struct ContactPosition *)(ctx + 0x414) =
-            *(struct ContactPosition *)&gPlayers[0]->position;
+        ctx->curveStart = *(struct ContactPosition *)&gPlayers[0]->position;
         SceneActorControl_ResetTargetFlags(a);
     }
-    Delta(&delta, (void *)(ctx + 0x414), (void *)&gPlayers[0]->position);
+    Delta(&delta, &ctx->curveStart, (void *)&gPlayers[0]->position);
     a->base.body.motion.x += delta.x;
     a->base.body.motion.z += delta.z;
-    *(struct ContactPosition *)(ctx + 0x414) = *(struct ContactPosition *)&gPlayers[0]->position;
+    ctx->curveStart = *(struct ContactPosition *)&gPlayers[0]->position;
     if (a->base.stepDone) {
         SetState_FollowParticipantDisplacement(a, 0, 3, 0);
         SetControl_FollowParticipantDisplacement(a, SceneActorControl_OnIdle, 0x10);
@@ -2156,24 +1929,12 @@ void RouteActor_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     if (TakeFlag(&actor->base.field2B1)) {
         struct RouteActorDestinationStateUpdatePlayerDestinationPhase *state = actor->base.context;
-        void *callback = Lun_UpdateWaitingAnimation;
-        u32 kind = 10;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, Lun_UpdateWaitingAnimation, 10);
         SetFlag_UpdatePlayerDestinationPhase(actor, 0x100);
         state->delay = state->delayDuration;
     }
     if (actor->base.stepDone)
-        Lun_BeginMoveToPosition(actor, ((u8 **)gPlayers)[0] + 0x30);
+        Lun_BeginMoveToPosition(actor, &gPlayers[0]->position);
     else
         actor->base.counter2AC++;
 }
@@ -2255,35 +2016,8 @@ s32 Lun_PlayResponseAndResetState(struct RoomActor *s)
     if (s->hitReactionFlags & 0x40000)
         SetFlags(s, 0x20);
     {
-        const void *control = s->onReaction;
-        u8 code = 0x12;
-        u32 zero;
-        u8 one;
-        u8 zero8;
-        u32 *flags;
-        u8 *taken;
-        u32 three;
-        taken = &s->field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        s->stepDone = zero;
-        s->controlKind = code;
-        s->target = control;
-        zero8 = 0;
-        s->field2C8 = zero;
-        flags = &s->pendingControlFlags;
-        {
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        s->pendingControl = zero;
-        three = 3;
-        s->state2A8 = three;
-        s->phase2A9 = zero8;
-        s->behavior2AA = zero8;
-        s->counter2AC = zero;
-        s->field2B1 = one;
+        SceneActorChase_SetControl(s, s->onReaction, 0x12);
+        SceneActorChase_SetState(s, 3, 0, 0);
         ClearFlags32(&s->statusFlags, 0xFEFFFFFF);
         SceneActorPlacement_ClearFlags(&s->reactionFlags, 0xFFFFF636);
     }
@@ -2343,41 +2077,33 @@ static inline u8 tst(u16 *a, u32 m)
     return 0;
 }
 
-struct SDestroy {
-    u8 f0[4];
-    u8 *p4;
-    u8 b8;
-    u8 f1[0x2b7];
-    u16 h2c0;
-};
-
-u32 Lun_Destroy(struct SDestroy *s)
+u32 Lun_Destroy(struct ChaseActor *s)
 {
-    u8 *p = s->p4;
+    u8 *p = s->base.drawable;
     u8 *q;
     u32 m;
     u32 v;
-    if (s->b8 == 0)
+    if (s->base.drawableKind == 0)
         Sprite_Remove(p);
     else
-        Anim_Remove(p + 0x20);
+        Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (tst((u16 *)((u8 *)s + 0x2c0), m))
-        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+    if (tst(&s->base.placementFlags, m))
+        SceneMessages_UnregisterReceiver(&s->base.unknown9[3]);
     {
-        u8 *r = (u8 *)s + 0x320;
+        u8 *r = s->base.shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.statusFlags & m;
-    q = (u8 *)s + 0x50;
+    v = s->base.statusFlags & m;
+    q = (void *)&s->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove((u8 *)s + 0x134);
+    Collider_Remove(&s->base.colliderA);
     SceneActorRegistry_UnlinkActor(s);
     return 0;
 }
@@ -2418,15 +2144,15 @@ void SceneActorReaction_SinkAndRemove(void);
 
 void Lun_ResetMovementState(struct ChaseActor *actor);
 
-void Lun_EnterIdleOrCopyCell(struct S *s);
+void Lun_EnterIdleOrCopyCell(struct ChaseActor *s);
 
-u32 Lun_OnTargetCheck(u8 *s);
+u32 Lun_OnTargetCheck(struct ChaseActor *actor);
 
 void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 u32 Lun_OnPlayerTargetInit(u8 *p);
 
-u32 Lun_Destroy(struct SDestroy *s);
+u32 Lun_Destroy(struct ChaseActor *s);
 
 void AnimData_SelectPaletteBank(void *, s32);
 
@@ -2466,7 +2192,7 @@ void Lun_InitReactionTable(u8 *p);
 
 #define SV(d) MonsterInit_ReadWord(d)
 
-static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill)
+static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0)
 {
     struct SceneActorBody *body = &arg0->base.body;
     struct ContactPosition origin;
@@ -2477,7 +2203,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
     arg0->base.placementFlags = Script_GetKeywordValue(0x4D, 0);
-    MonsterInit_ClearPosition(fill, &origin);
+    ZeroFill8(&origin);
     mode = Script_GetKeywordValue(0x4E, 0);
 
     MonsterInit_ReadTargeting(&MonsterInit_ReadAttacks(arg0)->base.tracking);
@@ -2532,7 +2258,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void Lun_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
@@ -2647,7 +2373,6 @@ s32 Lun_Init(void *object)
 {
     struct Lun *lun = object;
     struct ChaseActor *actor = object;
-    u32 zero;
     struct ContactPosition tmp;
     u32 flag;
     s32 r1v;
@@ -2670,14 +2395,14 @@ s32 Lun_Init(void *object)
         actor->base.drawable = Heap_Alloc(0x80);
         Memory_Clear(actor->base.drawable, 0x80);
         heap = MonsterInit_Drawable(actor);
-        MonsterInit_ClearPosition(&zero, &tmp);
+        ZeroFill8(&tmp);
         res = ScriptProc_Start(0xCB05, 0xD28E);
         *(struct DisplayResourceHeader *)heap = *(struct DisplayResourceHeader *)res;
         ResourceHeader_Relocate(heap, res);
         Widget_InitLinked(heap + 0x20, heap, 0, 0, 2, 2, 0x3C, &tmp);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializeBody(actor, &zero);
+    MonsterInit_InitializeBody(actor);
     {
         struct SceneActorRegistryRoute *route = &lun->route;
         if (Lun_ReadRoute(actor, lun, route)) {

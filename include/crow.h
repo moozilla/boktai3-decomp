@@ -61,14 +61,6 @@ struct CrowColliderVector {
     struct CrowColliderHalfwords a, b;
 };
 
-struct CrowDrawable {
-    struct ActorSprite sprite;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    void *resource;
-};
-
 struct CrowSignedFlags {
     s32 bits : 16;
 };

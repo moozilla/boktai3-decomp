@@ -1,3 +1,4 @@
+#include "scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -55,20 +56,6 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = out->y + from->y;
     out->z = from->z + out->z;
 }
-static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 static inline void State(struct ChaseActor *a)
 {
     u32 behavior = 8;
@@ -111,21 +98,7 @@ static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s
 }
 static inline void Scale(struct ChaseActor *actor)
 {
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
@@ -138,7 +111,7 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
     s32 speed;
     struct ContactPosition delta;
     if (Take(&actor->base.field2B1)) {
-        Control(actor, *(void **)((u8 *)actor + 0x228), 1);
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         TentacleActor_ResetOscillation(actor);
         {
             u32 direction = (((*((u8 *)actor + 0xE9)) + 128) & 255) >> 6;

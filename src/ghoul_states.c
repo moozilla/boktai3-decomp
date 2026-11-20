@@ -18,6 +18,7 @@
 #include "scene_actor_chase_reaction.h"
 
 #include "scene_actor_turn.h"
+#include "scene_actor_status.h"
 
 void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactCollider *contact,
                              struct ChaseActor *actor)
@@ -283,32 +284,19 @@ void Ghoul_UpdateDeathAnimation(struct ChaseActor *actor, s32 frame)
         mask = -2;
         *motionFlags = mask & *motionFlags;
     }
-    if (frame == 0x28) {
-        u16 flags = 0x10;
-        actor->base.reactionFlags = flags | actor->base.reactionFlags;
-    }
+    if (frame == 0x28)
+        SceneActorChase_SetReactionFlags(actor, 0x10);
     if (actor->base.restart && frame > 0x78)
         actor->base.stepDone = 1;
 }
 
-void Bat_RestoreSavedState(void);
+void Bat_RestoreSavedState(struct ChaseActor *);
 
 void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
 {
     u32 queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {
-        u32 mask = 1;
-        if (actor->base.drawableKind == 0) {
-            struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
-            u32 value = drawable->flags;
-            drawable->flags = value | mask;
-        } else {
-            struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
-            struct SceneInputWidget *tile =
-                &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
-            u32 value = tile->flags;
-            tile->flags = value | mask;
-        }
+        ActorStatus_SetDrawableFlags(actor, 1);
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
         void *control;

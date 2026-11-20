@@ -993,11 +993,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
-    mv = moved_rows(rows_json)
-    if mv:
-        ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
-        print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
-              f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
+    moved = moved_rows_note(rows_json)
+    if moved:
+        print(moved)
     for i, ln, tied, shared in and_tie_hints(rows_json):
         if shared:
             print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
@@ -2084,6 +2082,17 @@ def moved_rows(rows, window=8):
     return out
 
 
+def moved_rows_note(rows):
+    moved = moved_rows(rows)
+    if not moved:
+        return ""
+    uid = next((rows[i]["uid"] for i in sorted(moved)
+                if rows[i]["tag"] == "+" and rows[i].get("uid") is not None), None)
+    detail = f"`why {uid}` names what reads each copy" if uid is not None else "see the full listing"
+    return (f"{len(moved) // 2} of the differing insns are the same instruction at another position"
+            f" (an order difference, not a missing one): {detail}")
+
+
 def constant_def(texts, i, reg, window=8):
     """True when register REG holds a constant at TEXTS[i]: its last write within WINDOW lines
     before i is `movs`/`ldr =`, possibly through a self-applied `rsbs`/`lsls`/`mvns` of it."""
@@ -2785,6 +2794,45 @@ def find_reg_view(wd, func):
     return out
 
 
+@by_dumps("names.txt")
+def local_takeovers(wd, func):
+    """Actual global-alloc takeovers, keyed by (taker, hard register).
+
+    K records the density comparison for a candidate register. Only E
+    records confirm eviction and identify the displaced pseudos.
+    """
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    comparisons, takeovers = {}, {}
+    if not os.path.exists(path):
+        return takeovers
+    with open(path) as stream:
+        for line in stream:
+            fields = line.split()
+            if len(fields) < 2 or fields[1] != func:
+                continue
+            if fields[0] == "K" and len(fields) == 9:
+                taker, reg, local_refs, local_live, refs, live, wins = map(int, fields[2:])
+                if wins:
+                    comparisons[taker, reg] = (local_refs, local_live, refs, live)
+                else:
+                    comparisons.pop((taker, reg), None)
+            elif fields[0] == "E" and len(fields) == 5:
+                taker, victim, reg = map(int, fields[2:])
+                key = taker, reg
+                _, victims = takeovers.setdefault(key, (comparisons.get(key), []))
+                victims.append(victim)
+    return takeovers
+
+
+def takeover_density(comparison):
+    if comparison is None:
+        return ""
+    local_refs, local_live, refs, live = comparison
+    return (f" The taker has {refs} refs / {live} live insns against"
+            f" {local_refs} refs / {local_live} live insns for the local assignments there.")
+
+
 def regset(rs):
     return "{" + ", ".join(rname(r) for r in sorted(rs)) + "}" if rs else "{}"
 
@@ -2799,10 +2847,13 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return False
     f = next((entry for entry in view if not entry["retrying"] and entry["final"] >= 0), view[0])
     if f["first"] < 0 and f["final"] >= 0:
+        comparison, victims = local_takeovers(wd, func).get((pseudo, f["final"]), (None, []))
         print(f"    find_reg (global.c) found no free register for {nm(pseudo)}. It took"
               f" {rname(f['final'])} from local allocation: its references per live instruction"
               " exceed the aggregate for the locals placed there. All their assignments are"
-              " cleared, including locals in other blocks.")
+              " cleared, including locals in other blocks." + takeover_density(comparison))
+        if victims:
+            print("      evicted: " + ", ".join(map(nm, victims)) + ".")
         return True
     lo = set(range(8))
     used = f["used1"] & lo
@@ -3242,6 +3293,24 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             what.append(f"a call at {at(calls[0])}")
         print(f"    {rname(want)} was already taken during its life (local alloc or a fixed use runs first): "
               + (", ".join(what) if what else "holder not found in its span"))
+        if rec and rec[0] == "L":
+            for (taker, reg), (comparison, victims) in local_takeovers(wd, func).items():
+                if reg != want or taker not in holders:
+                    continue
+                for victim in victims:
+                    local = recs.get(victim)
+                    if not local or local[0] != "L" or local[1] != blk:
+                        continue
+                    if max(local[3], birth) >= min(local[4], death):
+                        continue
+                    print(f"    during local allocation, {rname(want)} held {nm(victim)}"
+                          f" (local priority {local[2]}). Global allocation later evicted it"
+                          f" for {nm(taker)}." + takeover_density(comparison))
+                    new_home = hard.get(victim, -1)
+                    if new_home >= 0 and new_home != want:
+                        print(f"    what-if: AGBCC_FORCE={kref(wd, func, victim)}:{new_home}"
+                              f" (place {nm(victim)} in its final register during local allocation)")
+                    return
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
               f" {rname(want)}; or make the other value land elsewhere")
         return
@@ -3447,14 +3516,22 @@ def source_lines(wd):
 
 def gotos_before(wd, func, uid, limit=4, src=None, lines=None):
     """The `goto` statements of FUNC's C that come before insn UID's line, nearest last (at most LIMIT):
-    [(line, text)]. The function's span is the lines its insns carry."""
+    [(line, text)]. Bound the search by the function definition in the preprocessed source."""
+    import land
+
     lines = uid_lines(wd) if lines is None else lines
     src = source_lines(wd) if src is None else src
     at = lines.get(uid)
-    span = [ln for ln in lines.values() if isinstance(ln, int) and ln > 0]
-    if not isinstance(at, int) or not span:
+    if not isinstance(at, int) or at not in src:
         return []
-    first = min(span)
+    text = "\n".join(src.get(line, "") for line in range(1, max(src) + 1))
+    span = land.definition_span(text, dump_func(wd, func))
+    if not span:
+        return []
+    first = text.count("\n", 0, span[0]) + 1
+    last = text.count("\n", 0, span[1] - 1) + 1
+    if not first <= at <= last:
+        return []
     hits = [(ln, src[ln].strip()) for ln in sorted(src) if first <= ln < at and re.search(r"\bgoto\s+\w+\s*;", src[ln])]
     return hits[-limit:]
 
@@ -4812,10 +4889,13 @@ def why_all_issues(text):
                 pseudo = int(alloc.group(1))
                 other = re.search(r"the ROM keeps (\d+)|went to a conflicting pseudo allocated earlier: (\d+)", section)
                 pair = tuple(sorted((pseudo, int(other.group(1) or other.group(2))))) if other else (pseudo,)
-                mechanism = ('allocation order' if 'to flip the order' in section else
+                takeover = next((s.strip() for s in section.splitlines()
+                                 if 'Global allocation later evicted it' in s), None)
+                mechanism = ('local eviction' if takeover else
+                             'allocation order' if 'to flip the order' in section else
                              'reload eviction' if 'reload then needed' in section else 'allocation')
                 lines = [s.strip() for s in section.splitlines()[1:] if s.strip()]
-                summary = next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
+                summary = takeover or next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
                 key = (mechanism, pair)
                 title = f"{mechanism}, pseudos {' / '.join(map(str, pair))}: {summary}"
             elif cse:
