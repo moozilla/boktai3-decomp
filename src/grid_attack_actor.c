@@ -143,13 +143,13 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
 
 void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
 {
+    struct SceneVec *position = (struct SceneVec *)p;
     if (x != 1 || z) {
-        p[0] = (x << 8) + 0xa80;
+        position->x = (x << 8) + 0xa80;
         {
-            int height = 256;
-            p[1] = height;
+            position->y = 256;
         }
-        p[2] = (z << 8) + 0xa80;
+        position->z = (z << 8) + 0xa80;
     }
 }
 
@@ -203,14 +203,13 @@ static inline void GridAttack_SetState(struct GridAttackActor *p, void (*fn)(voi
     p->pending = 0;
 }
 
-static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int zero)
+static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
 {
-    int one = 1;
-    p->active = one;
+    p->active = mode;
     p->actionReset = zero;
     p->action = id;
     p->actionTimer = zero;
-    p->entered = one;
+    p->entered = 1;
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
@@ -267,11 +266,11 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->coordinates,
                                          &size, 1);
             }
-            GridAttack_StartAction(p, 0, 0);
+            GridAttack_StartActionMode(p, 1, 0, 0);
             GridAttack_SetState(p, GridAttackActor_UpdateDamageHold, 5);
             break;
         case 2:
-            GridAttack_StartAction(p, 1, 0);
+            GridAttack_StartActionMode(p, 1, 0, 1);
             GridAttack_SetState(p, GridAttackActor_UpdateDamageRecovery, 6);
             {
                 int angle = position->angle;
@@ -287,7 +286,7 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 u32 mask = 2;
                 p->flags |= mask;
             }
-            GridAttack_StartAction(p, 3, zero);
+            GridAttack_StartActionMode(p, 1, zero, 3);
             GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
         } break;
     }
@@ -361,33 +360,31 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
 
 void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p)
 {
-    struct GridAttackPacket *packet = (void *)&p->packet;
+    struct SceneEventCommand *packet = (void *)&p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 0) {
-        int zero = 0;
-        p->linkedActorPhase = zero;
+        p->linkedActorPhase = 0;
         packet->id = p->linkedActorId;
-        packet->kind = 5;
-        packet->zero = 0;
-        packet->reserved = zero;
-        packet->command = 1;
-        packet->count = 1;
-        packet->args[0] = 3;
+        packet->receiverKind = 5;
+        packet->trigger = 0;
+        packet->unknown4 = 0;
+        packet->kind = 1;
+        packet->argumentCount = 1;
+        packet->value = 3;
         SceneMessages_Send(packet);
     }
 }
 
 void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
 {
-    struct GridAttackPacket *packet = (void *)&p->packet;
+    struct SceneEventCommand *packet = (void *)&p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 1) {
-        int zero = 0;
         p->linkedActorPhase = 1;
         packet->id = p->linkedActorId;
-        packet->kind = 5;
-        packet->zero = 0;
-        packet->reserved = zero;
-        packet->command = 92;
-        packet->count = 0;
+        packet->receiverKind = 5;
+        packet->trigger = 0;
+        packet->unknown4 = 0;
+        packet->kind = 92;
+        packet->argumentCount = 0;
         SceneMessages_Send(packet);
     }
 }
@@ -982,15 +979,6 @@ static inline u8 GridAttack_TakeActionEntry(struct GridAttackActor *p)
         return TRUE;
     }
     return FALSE;
-}
-
-static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
-{
-    p->active = mode;
-    p->actionReset = zero;
-    p->action = id;
-    p->actionTimer = zero;
-    p->entered = 1;
 }
 
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
