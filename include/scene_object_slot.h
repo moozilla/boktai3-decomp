@@ -66,6 +66,17 @@ enum SceneObjActivationState {
     SCENE_OBJ_DEACTIVATING
 };
 
+enum SceneObjLiftPosition {
+    SCENE_OBJ_LIFT_LOWERED,
+    SCENE_OBJ_LIFT_RAISED
+};
+
+/* The script position and the slot's idle lift variants use opposite values. */
+static inline u8 SceneObjSlot_LiftVariant(enum SceneObjLiftPosition position)
+{
+    return position == SCENE_OBJ_LIFT_LOWERED;
+}
+
 /* Start a sprite pose at the first frame of its animation. */
 static inline void SceneObjSlot_SetAnimation(struct SceneObjSlot *slot,
                                              enum SceneObjActivationState state,
