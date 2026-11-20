@@ -1,4 +1,5 @@
 #include "burst_emitter.h"
+#include "monster_particle_random.h"
 void BurstSpark_Create(const struct ContactPosition *, s32, s32, s32, s32, s32, u32);
 void SpriteParticle_CreateVariant4384(const struct ContactPosition *, s32, s32, s32, s32, s32, s32,
                                       s32, s32, s32, s32, s32, s32);
@@ -25,34 +26,22 @@ void BurstEmitter_EmitFrame(struct BurstEmitter *emitter)
         }
         case 2: {
             const u16 *table;
-            u32 *current;
             index = 0;
             origin = &emitter->position;
             table = gRandomTable;
-            current = &gRandomIndex;
             for (; index <= 5; index++) {
-                u32 random = (*current + 1) & 0x3FF;
-                s32 value;
-                *current = random;
-                value = *(u16 *)((random << 1) + (u32)table);
-                value &= 15;
+                s32 value = ParticleRandom_ReadDirectSample(table) & 15;
                 BurstSpark_Create(origin, 1, value, index << 6, 150, 1, emitter->context);
             }
             break;
         }
         case 3: {
             const u16 *table;
-            u32 *current;
             index = 0;
             origin = &emitter->position;
             table = gRandomTable;
-            current = &gRandomIndex;
             for (; index <= 7; index++) {
-                u32 random = (*current + 1) & 0x3FF;
-                s32 value;
-                *current = random;
-                value = *(u16 *)((random << 1) + (u32)table);
-                value &= 31;
+                s32 value = ParticleRandom_ReadDirectSample(table) & 31;
                 BurstSpark_Create(origin, 1, value, index << 5, 100, 1, emitter->context);
             }
             break;
