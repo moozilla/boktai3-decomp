@@ -1,5 +1,6 @@
 """ROM assets to original Game Boy tiles. All intermediate images are generated."""
 import csv
+from functools import lru_cache
 import struct
 import sys
 from pathlib import Path
@@ -66,6 +67,7 @@ class Source:
         offset, size = entries[next(iter(entries)) if key is None else key]
         return self.rom[offset:offset + size]
 
+    @lru_cache(maxsize=128)
     def scene(self, number):
         if self.walker is None:
             self.walker = stages.Walker(self.rom)
@@ -74,6 +76,12 @@ class Source:
             raise ValueError(f"scene {number} has no decoded stage load")
         key = int(scene["stage"]["hp"], 0)
         terrain = hp.decode(self.entry("tAE6C", key))
+        calls = scene["calls"]
+        scene["skylights"] = [(int(args[1], 0) + 128, int(args[2], 0) + 128)
+                              for c in calls if c["proc"] == 1072 and len(args := c["args"]) >= 3
+                              and all(stages.num(v) is not None for v in args[1:3])]
+        scene["songs"] = [stages.num(c["args"][0]) for c in calls if c["proc"] == 1048 and c["args"]
+                          and stages.num(c["args"][0]) is not None]
         stages.resolve(scene, {key: terrain}, {})
         return scene, terrain
 

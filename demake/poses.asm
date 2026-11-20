@@ -173,7 +173,7 @@ flush_pose:
     ret
 
 ; Player and monsters are emitted first. In a crowded scene a lower-priority
-; marker can lose its slot. Enforce the ten-OBJ limit before sorting by X.
+; marker can lose its slot. The DMG resolves overlap by X after its ten-slot OAM search.
 limit_oam:
     ld a,[header+17]
     and a

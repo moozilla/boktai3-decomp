@@ -295,7 +295,7 @@ sk_step:
     ld b,a
     ld a,[sk_z]
     ld c,a
-    call surface
+    call enemy_surface
     ld [sk_facing],a
     ld a,[sk_dx]
     add b
@@ -303,7 +303,7 @@ sk_step:
     ld a,[sk_dz]
     add c
     ld c,a
-    call surface
+    call enemy_surface
     ret c
     ld hl,sk_facing
     sub [hl]

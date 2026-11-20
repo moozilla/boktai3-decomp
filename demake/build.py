@@ -10,8 +10,8 @@ from PIL import Image
 from art import ROOT, Source, actor_pose, encode_tile, fit_tiles, pose_tiles, screen_image
 from gallery import actor_gallery, room_gallery
 from music import compile_song
-from pack import SCENES, LAYOUT, objects, pack_room, enemy_constants, ghoul_palette
-from rooms import convert, place_skylight, terrain_overlay
+from pack import LAYOUT, objects, pack_room, enemy_constants, ghoul_palette
+from rooms import connected_scenes, convert
 from screens import screen_bank
 from sm83 import assemble, cartridge
 
@@ -36,11 +36,12 @@ def direction_table():
     return data
 
 
-def build(source, out):
+def build(source, out, scenes=None, song=None):
     out.mkdir(parents=True, exist_ok=True)
-    rooms = {n: (convert(source, n), i) for i, n in enumerate(SCENES, 1)}
-    for room, _ in rooms.values():
-        place_skylight(source, room)
+    scenes = scenes if scenes is not None else connected_scenes(source, 2698)
+    if len(scenes) > 128 or len(set(scenes)) != len(scenes):
+        raise ValueError("use up to 128 distinct rooms per cartridge")
+    rooms = {n: (convert(source, n), i) for i, n in enumerate(scenes, 1)}
     poses, markers = objects(source)
     obj = b"".join(poses)
     directions = direction_table()
@@ -53,7 +54,8 @@ def build(source, out):
     symbols.update(sk_records=0xC320, sk_base=0xC300, sk_slot=0xC310)
     symbols.update({name: 0xC300 + i for i, name in enumerate(
         "sk_x sk_z sk_phase sk_timer sk_point sk_dx sk_dz sk_speed sk_frac sk_facing".split())})
-    bgm = next(int(t.split()[1], 0) for _, t in source.walker.text(2712) if t.startswith("proc_1048 "))
+    song_ids = rooms[scenes[0]][0].stage["songs"]
+    bgm = song if song is not None else song_ids[0] if song_ids else 18
     score, wave, music_info = compile_song(bgm)
     symbols.update(screen_bank=len(rooms) + 2, music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
     asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text() + (HERE / "skeleton.asm").read_text() + (HERE / "screens.asm").read_text() + (HERE / "printer.asm").read_text()
@@ -90,7 +92,11 @@ def build(source, out):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     cmds = ap.add_subparsers(dest="cmd")
-    cmds.add_parser("rom", help="build just the cartridge and its manifest")
+    rom = cmds.add_parser("rom", help="build the cartridge without running the replays")
+    group = rom.add_mutually_exclusive_group()
+    group.add_argument("--scenes", type=int, nargs="+", help="pack these decoded scene IDs in order")
+    group.add_argument("--area-start", type=int, help="follow nearby door links from this scene")
+    rom.add_argument("--song", type=int, help="override the starting room's MP2K song")
     room = cmds.add_parser("room", help="convert a scene by script call ID")
     room.add_argument("scene", type=int)
     room.add_argument("--palette", help="BGR555 resource hash, overriding script or capture")
@@ -148,9 +154,14 @@ def main():
             actor_gallery(source, args.hash, seq[page:page+16], path, args.palette, (w, h), args.scale, enemy=enemy)
         print(dest.relative_to(ROOT))
     else:
-        rooms, meta = build(source, OUT)
+        scenes = None
+        dest = OUT
+        if args.cmd == "rom" and (args.scenes or args.area_start or args.song is not None):
+            scenes = args.scenes or connected_scenes(source, args.area_start or 2698)
+            dest = OUT / "custom"
+        rooms, meta = build(source, dest, scenes, getattr(args, "song", None))
         if args.cmd is None:
-            room_gallery([rooms[n][0] for n in SCENES[:3]], OUT / "rooms.png", [r["bg_tiles"] for r in meta["rooms"][:3]])
+            room_gallery([rooms[n][0] for n in (2698, 2705, 2712)], OUT / "rooms.png", [r["bg_tiles"] for r in meta["rooms"][:3]])
             floor = Image.open(OUT / "room-2698.png")
             actor_gallery(source, 0xDE23, [0, 2, 4, 23], OUT / "django.png", floor=floor)
             actor_gallery(source, 0x9247, [0, 2, 5, 7], OUT / "ghoul.png", ghoul_palette(source), floor=floor)

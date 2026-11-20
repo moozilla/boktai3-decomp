@@ -1,13 +1,11 @@
 """Lower a decoded stage to DMG background, terrain and room events."""
 from dataclasses import dataclass
-import math
-import re
-import struct
+from collections import deque
 
 import numpy as np
 from PIL import Image, ImageDraw
 
-from art import ROOT, encode_tile, fit_tiles, hp, quantize_bg, room_ramp, screen_image, unpack_4bpp
+from art import hp, quantize_bg, room_ramp
 
 
 @dataclass
@@ -30,8 +28,25 @@ class Room:
 
 
 def walkable(cell):
-    # SceneActorTerrain_CanTraverseCell (scene_actor_utilities.c).
-    return not (cell[3] & 0x43)
+    # Terrain_AreCellsConnected selects bit zero for normal movement.
+    # Bit one also blocks enemy routes, including the narrow exit in 2731.
+    return not (cell[3] & 1)
+
+
+def connected_scenes(source, start):
+    """Follow the short door links used by the repository's area grouping."""
+    from areas import GAP
+    seen = {start}
+    todo = deque([start])
+    while todo:
+        scene = todo.popleft()
+        stage, _ = source.scene(scene)
+        for door in stage["doors"]:
+            dest = door["scene"]
+            if dest is not None and dest not in seen and abs(dest - scene) < GAP:
+                seen.add(dest)
+                todo.append(dest)
+    return [start, *sorted(seen - {start})]
 
 
 def convert(source, number, palette=None, side_pixels=512):
@@ -91,8 +106,8 @@ def room_events(room, rooms):
             continue
         x0, z0, x1, z1 = d["rect"]
         # A at the threshold can activate doors whose center is in a wall.
-        events.append((1, max(0, x0 // 32 - 3), max(0, z0 // 32 - 3), x1 // 32 + 2,
-                       z1 // 32 + 2, bank, *nearest_floor(dest, entrance["x"], entrance["z"])))
+        events.append((1, max(0, x0 // 32 - 3), max(0, z0 // 32 - 3), min(255, x1 // 32 + 2),
+                       min(255, z1 // 32 + 2), bank, *nearest_floor(dest, entrance["x"], entrance["z"])))
     items = set()
     for item in room.stage["items"]:
         if item["category"] != 0 or item["item"] not in (1, 13) or item.get("x") is None:
@@ -102,19 +117,14 @@ def room_events(room, rooms):
             continue
         items.add(p)
         x, z = p
-        events.append((2, x - 3, z - 3, x + 3, z + 3, len(items) - 1, x, z))
-    if room.stage["scene"] == 2712:
-        # proc_2716 -> proc_1072(..., x, z, ...). Verify the position from
-        # the script during the build, including its cell-center adjustment.
-        x, z = room.stage["skylight"]
-        events.append((3, x - 5, z - 5, x + 5, z + 5, 0, x, z))
+        if len(items) > 8:
+            raise ValueError(f"scene {room.stage['scene']} exceeds the eight-item room flag byte")
+        kind = 2 if item["item"] == 13 else 4
+        events.append((kind, max(0, x - 3), max(0, z - 3), min(255, x + 3), min(255, z + 3), len(items) - 1, x, z))
+    for sx, sz in room.stage["skylights"]:
+        x, z = nearest_floor(room, sx, sz)
+        events.append((3, max(0, x - 5), max(0, z - 5), min(255, x + 5), min(255, z + 5), 0, x, z))
     return list(dict.fromkeys(events))
-
-
-def place_skylight(source, room):
-    if room.stage["scene"] == 2712:
-        args = next(t.split() for _, t in source.walker.text(2716) if t.startswith("proc_1072 "))
-        room.stage["skylight"] = nearest_floor(room, int(args[2], 0) + 128, int(args[3], 0) + 128)
 
 
 def terrain_overlay(room):

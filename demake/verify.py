@@ -142,7 +142,7 @@ class Replay:
         cell = rom[start + 0x400 + z // 8 * w + x // 8]
         if cell == 255:
             return None
-        level, kind = (cell & 15) * 8, cell >> 4
+        level, kind = (cell & 15) * 8, (cell >> 4) & 3
         return level - (z % 8 if kind == 1 else x % 8 if kind == 2 else 0)
 
     def move(self, pos, dx, dz):
@@ -157,7 +157,7 @@ class Replay:
             z += dz
         return x, z
 
-    def walk(self, predicate):
+    def walk(self, predicate, halfway=None):
         """Find D-pad presses with a decoded HP grid, replay each on the CPU."""
         start = self.pos()
         seen = {start: None}
@@ -178,18 +178,22 @@ class Replay:
             before, key = seen[point]
             path.append((key, point))
             point = before
-        for key, expected in reversed(path):
+        for i, (key, expected) in enumerate(reversed(path)):
             self.run(key, 2)
             check(self.pos() == expected, f"walk to {expected} reached {self.pos()}")
+            if halfway and i == len(path) // 2:
+                halfway()
+        if halfway and not path:
+            halfway()
 
-    def event(self, kind, target=None):
+    def event(self, kind, target=None, halfway=None):
         rows = self.meta["rooms"][self.model.bank - 1]["events"]
         e = next(e for e in rows if e[0] == kind and (target is None or e[5] == target))
-        self.walk(lambda x, z: e[1] <= x <= e[3] and e[2] <= z <= e[4])
+        self.walk(lambda x, z: e[1] <= x <= e[3] and e[2] <= z <= e[4], halfway)
         return e
 
-    def door(self, dest):
-        self.event(1, dest)
+    def door(self, dest, halfway=None):
+        self.event(1, dest, halfway)
         self.run(A)
         check(self.model.bank == dest, f"door did not enter bank {dest}")
         self.run(0)
@@ -298,6 +302,42 @@ def patrol(r):
     r.record("patrol", "2698   /   Ghoul on patrol")
 
 
+def prison_tour(r):
+    """Walk the door graph, including the side room. Capture each room on foot."""
+    r.run(START)
+    r.run(0)
+    rooms = r.meta["rooms"]
+    captured = set()
+    def capture():
+        bank = r.model.bank
+        if bank in captured:
+            return
+        scene = rooms[bank - 1]["scene"]
+        r.record(f"prison-{scene}", f"{bank:02d}   /   Scene {scene}")
+        captured.add(bank)
+
+    visited = set()
+    def visit(bank):
+        visited.add(bank)
+        room = rooms[bank - 1]
+        if r.state("health") < 3 and any(e[0] == 4 for e in room["events"]):
+            r.event(4)
+            check(r.state("health") == 3, "Earth Fruit must restore health")
+        exits = sorted({e[5] for e in room["events"] if e[0] == 1})
+        for dest in exits:
+            if dest in visited:
+                continue
+            r.door(dest, capture)
+            visit(dest)
+            if len(visited) == len(rooms):
+                break
+            r.door(bank, capture)
+        capture()
+
+    visit(1)
+    check(len(captured) == len(rooms) == 20, "walk the entire Sealed Prison door graph")
+
+
 def printer_packet(command, payload=b"", compressed=False, bad=False):
     body = bytes([command, int(compressed)]) + len(payload).to_bytes(2, "little") + payload
     checksum = (sum(body) + int(bad)) & 65535
@@ -356,7 +396,7 @@ def verify(out, manifest):
     host = playback(out)
     snapshots = []
     checks = []
-    for name, script in (("campaign", campaign), ("patrol", patrol), ("sunlight", sunlight)):
+    for name, script in (("campaign", campaign), ("patrol", patrol), ("sunlight", sunlight), ("prison", prison_tour)):
         replay = Replay(out, manifest, name)
         script(replay)
         replay.verify_native(host)
@@ -365,14 +405,25 @@ def verify(out, manifest):
                            peak_sprites_on_line=replay.model.peak_line, lowest_sp=hex(replay.model.lowest_sp),
                            missed_vblanks=replay.missed_vblanks, vblank_writes=replay.model.vblank_writes))
     rows = []
-    for i in range(0, len(snapshots), 3):
+    story = [s for s in snapshots if not s["name"].startswith("prison-")]
+    for i in range(0, len(story), 3):
         views = []
-        for s in snapshots[i:i+3]:
+        for s in story[i:i+3]:
             path = out / (("" if host else "ref-") + s["name"] + ".png")
             with Image.open(path) as im:
                 views.append((s["caption"], im.resize((320, 288), Image.Resampling.NEAREST)))
         rows.append(("DMG  /  " + ("mGBA" if host else "reference CPU and PPU"), views))
     contact(rows, out / "contact.png")
+    atlas = [s for s in snapshots if s["name"].startswith("prison-")]
+    rows = []
+    for i in range(0, len(atlas), 4):
+        views = []
+        for snap in atlas[i:i+4]:
+            path = out / (("" if host else "ref-") + snap["name"] + ".png")
+            with Image.open(path) as im:
+                views.append((snap["caption"], im.resize((240, 216), Image.Resampling.NEAREST)))
+        rows.append(("Sealed Prison   /   DMG traversal", views))
+    contact(rows, out / "prison-atlas.png")
     results = dict(native="libmgba" if host else None, checked=checks,
                    frames=[{k: v for k, v in s.items() if k != "state"} for s in snapshots])
     if host:

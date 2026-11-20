@@ -98,7 +98,6 @@ loop:
 .render:
     call draw
     call limit_oam
-    call sort_oam
     call prepare_map
     call prepare_pose
     call vblank
@@ -215,7 +214,6 @@ load_room:
 show_field:
     call draw
     call limit_oam
-    call sort_oam
     call initial_map
     xor a
     ld [camera_snap],a
@@ -308,7 +306,7 @@ surface:
     add a
     ld d,a
     ld a,e
-    and 0xf0
+    and 0x30
     jr z,.flat
     cp 0x10
     ld a,c
@@ -326,6 +324,14 @@ surface:
     and a
     ret
 .solid:
+    scf
+    ret
+
+enemy_surface:
+    call surface
+    ret c
+    bit 7,[hl]
+    ret z
     scf
     ret
 
@@ -417,18 +423,22 @@ interactions:
     inc hl
     ld a,[player_x]
     ld e,[hl]
-    inc e
     cp e
+    jr z,.inside_x
     jp nc,.next
+.inside_x:
     inc hl
     ld a,[player_z]
     ld e,[hl]
-    inc e
     cp e
+    jr z,.inside_z
     jp nc,.next
+.inside_z:
     inc hl
     ld a,d
     cp 2
+    jr z,.fruit
+    cp 4
     jr z,.fruit
     cp 3
     jr z,.light
@@ -447,13 +457,22 @@ interactions:
     pop bc
     ret
 .fruit:
+    push de
     ld a,[hl]
     call fruit_bit
+    pop de
     and [hl]
     jp nz,.next
     ld a,c
     or [hl]
     ld [hl],a
+    ld a,d
+    cp 4
+    jr nz,.solar
+    ld a,3
+    ld [health],a
+    jr .chime
+.solar:
     ld a,[energy]
     add 3
     cp 7
@@ -461,6 +480,7 @@ interactions:
     ld a,6
 .store:
     ld [energy],a
+.chime:
     call chime
     jr .next
 .light:
@@ -695,7 +715,7 @@ update_ghoul:
     dec b
     dec b
 .x_ready:
-    call surface
+    call enemy_surface
     jr c,.restore_x
     ld a,b
     ld [enemy_x],a
@@ -713,7 +733,7 @@ update_ghoul:
     dec c
     dec c
 .z_ready:
-    call surface
+    call enemy_surface
     jr c,.arrive
     ld a,c
     ld [enemy_z],a
@@ -793,7 +813,7 @@ hit_sound:
 
 draw:
     ; Hide exactly the sprites emitted last frame, including their unused
-    ; scanlines. Every metasprite below uses at most two slots per scanline.
+    ; scanlines. Every metasprite below uses at most three slots per scanline.
     ld a,[oam_count]
     and a
     jr z,.cleared
@@ -1005,90 +1025,6 @@ marker_oam:
     ld [hl+],a
     ld a,l
     ld [oam_count],a
-    ret
-
-; Put smaller X first, the DMG overlap order. Equal X keeps emission order.
-; The compiler bounds the number of active objects in the room descriptor.
-sort_oam:
-    ld a,[oam_count]
-    cp 8
-    ret c
-    ld c,4
-    ld h,0xc0
-.record:
-    ld l,c
-    inc l
-    ld b,[hl]
-    ld a,l
-    sub 4
-    ld l,a
-    ld a,[hl]
-    cp b
-    jr c,.next
-    jr z,.next
-    ; Insert this record into the already sorted prefix. Adjacent records
-    ; in one metasprite usually arrive sorted, so most comparisons stop here.
-    ld l,c
-    ld a,[hl+]
-    ld d,a
-    ld a,[hl+]
-    ld e,a
-    push de
-    ld a,[hl+]
-    ld d,a
-    ld e,[hl]
-    push de
-    ld e,l
-    ld d,h
-    ld a,l
-    sub 4
-    ld l,a
-.shift:
-    ld a,[hl-]
-    ld [de],a
-    dec e
-    ld a,[hl-]
-    ld [de],a
-    dec e
-    ld a,[hl-]
-    ld [de],a
-    dec e
-    ld a,[hl-]
-    ld [de],a
-    dec e
-    ld a,e
-    cp 3
-    jr z,.insert
-    dec l
-    dec l
-    ld a,[hl]
-    inc l
-    inc l
-    cp b
-    jr z,.insert
-    jr nc,.shift
-.insert:
-    pop hl
-    ld a,l
-    ld [de],a
-    dec e
-    ld a,h
-    ld [de],a
-    dec e
-    pop hl
-    ld a,l
-    ld [de],a
-    dec e
-    ld a,h
-    ld [de],a
-    ld h,0xc0
-.next:
-    ld a,c
-    add 4
-    ld c,a
-    ld a,[oam_count]
-    cp c
-    jr nz,.record
     ret
 
 hud:
