@@ -170,15 +170,17 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     }
 }
 
+enum { STATUS_DIRTY_DATE = 1, STATUS_DIRTY_BASE_TIME = 2, STATUS_DIRTY_CLOCK = 4 };
+
 void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 {
     s32 a, b, c;
     Clock_UnpackDate(&a, &b, &c, SunClock_GetPackedDate());
-    if (s->dirty & 1)
+    if (s->dirty & STATUS_DIRTY_DATE)
         NumericDisplay_DrawPair(s, b, c);
-    if (s->dirty & 2)
+    if (s->dirty & STATUS_DIRTY_BASE_TIME)
         NumericDisplay_DrawStatusValues(s);
-    if (s->dirty & 4)
+    if (s->dirty & STATUS_DIRTY_CLOCK)
         StatusScreen_DrawClock(s);
     s->dirty = 0;
 }
@@ -220,13 +222,10 @@ void StatusScreen_Close(struct StatusScreen *p)
     }
     {
         u32 flags = p->dirty;
-        u32 result;
-        result = 4;
+        u32 result = 4;
         result |= flags;
-        {
-            u32 mask = 65532;
-            p->dirty = result & mask;
-        }
+        result &= 0xFFFC;
+        p->dirty = result;
     }
     p->timer++;
 }
