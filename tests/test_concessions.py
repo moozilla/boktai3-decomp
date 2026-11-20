@@ -187,6 +187,19 @@ class Warnings(unittest.TestCase):
             with self.subTest(expression=expression):
                 self.assertEqual(warns("int f(void) { return " + expression + "; }\n"), [])
 
+    def test_duplicate_branches_preserve_literal_differences(self):
+        text = """void f(u32 flag) {
+    if (flag) {
+        use("yes");
+    } else {
+        use("yes");
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace('} else {\n        use("yes");', '} else {\n        use("no");')), [])
+        self.assertEqual(warns(text.replace('} else {', '} else if (flag > 1) {')), [])
+
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
             with self.subTest(statement=statement):

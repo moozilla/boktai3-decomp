@@ -53,6 +53,7 @@ its spelling, so each one is a question, not a verdict:
   the rest for the owner to rule on. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `subtract-negative`: `x - -y` in place of addition, often to preserve operand order.
+* `duplicate-branches`: the same statements in both arms of a simple if/else.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
@@ -76,7 +77,7 @@ EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatil
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
-        "subtract-negative", "placeholder-name", "volatile-view", "local-union")
+        "subtract-negative", "duplicate-branches", "placeholder-name", "volatile-view", "local-union")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -127,6 +128,8 @@ _WARN_REGEX = {
     "local-union": re.compile(r"(?m)^[ \t]+union\b[^;{}()]*\{"),
 }
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
+_IF_ELSE = re.compile(r"\bif\s*\([^{};]*?\)\s*\{(?P<yes>[^{}]*)\}"
+                      r"\s*else\s*\{(?P<no>[^{}]*)\}")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
@@ -252,13 +255,20 @@ def _literal_locals(code: str):
 
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
-    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
-    code = _QUOTED.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
+    source = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
+    code = _QUOTED.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), source)
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
     for offset in _literal_locals(code):
         yield offset, "literal-local"
+    for match in _IF_ELSE.finditer(code):
+        bodies = [
+            [line.strip() for line in source[match.start(arm):match.end(arm)].splitlines() if line.strip()]
+            for arm in ("yes", "no")
+        ]
+        if bodies[0] and bodies[0] == bodies[1]:
+            yield match.start(), "duplicate-branches"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:
