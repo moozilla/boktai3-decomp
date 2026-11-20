@@ -340,40 +340,6 @@ void SceneActorState_SetValueClampedWhenActive(struct StateActor *p, u32 v)
     p->actionAnimation = v;
 }
 
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[2];
-    struct {
-        u32 x, y;
-    } pos;
-    u8 pad5c[0x4c];
-    u8 facing, facing8, padAA[2], mode, state, phase, finished, enter;
-    u8 padB1[0x13];
-    u32 elapsed;
-    u8 padC8[4];
-    u8 requestedAngle;
-    u8 padCD[0x2df];
-    u32 graphicsMode;
-} ActorAnimation;
-
-static inline void setFacing(ActorAnimation *p, int angle)
-{
-    int shifted;
-    u32 value;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->facing8 = value;
-}
-
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
 static inline void SceneActorState_EnterPhase(struct StateActor *actor, u32 phase)
@@ -398,8 +364,8 @@ void SceneActors_StartDisappearEffect(u32 *position)
         int sequence;
         SceneActorState_StartAction(p, 0, 0, 13);
         p->target = *(struct StateActorPos *)position;
-        setFacing((ActorAnimation *)p, p->requestedAngle);
-        sequence = (((ActorAnimation *)p)->graphicsMode & 1) ? 24 : 62;
+        SceneActors_SetFacing(p, p->requestedAngle);
+        sequence = (((struct SceneGraphicsActor *)p)->graphics.animationFlags & 1) ? 24 : 62;
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
                                               6);
         Sound_PlaySongChecked(839);
@@ -1481,9 +1447,6 @@ struct ProbeBox {
     s32 x : 16, y : 16, z : 16, w : 16;
 };
 
-// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
-// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
-// ahead is more than two tiles above or below.
 struct ProbePos {
     s16 x, y, z, w;
 };
@@ -1525,9 +1488,6 @@ static inline u8 *ProbeCellProps(s32 cell)
     return gTerrainMap->cells + (cell * 4 + 12);
 }
 
-// confidence=low: state 6 of the actor's recovery pipeline: grab a tracked target in reach in
-// front (variant 1), otherwise advance to phase 5 once the animation ends or the ground 0x190
-// ahead is more than two tiles above or below.
 static inline u32 SceneActorState_TestPlayerFlags(const struct Player *player, u32 flags)
 {
     return player->statusFlags & flags;
@@ -1541,6 +1501,34 @@ static inline bool32 ProbeHeightOutOfRange(s32 height, s32 referenceHeight, s32 
     return delta > span;
 }
 
+static inline bool32
+SceneActorGraphics_IsForwardGroundOutOfRange(const struct SceneGraphicsActor *actor, s32 distance)
+{
+    struct ProbePos pos;
+    u8 *s = (u8 *)actor + 0x48;
+    u8 *props;
+    struct ProbePos *at;
+    u32 type;
+    s32 h;
+    ProbeProject(&pos, s[9], distance);
+    ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
+    at = &pos;
+    props = ProbeCellProps(ProbeCellAt(at));
+    type = *props >> 4;
+    h = (*props & 0xf) << 8;
+    switch (type) {
+        case 1:
+            h -= (u8)at->z;
+            break;
+        case 2:
+            h -= (u8)at->x;
+            break;
+    }
+    return ProbeHeightOutOfRange(h, actor->graphics.recoveryGroundHeight, -0x1ff, 0xff);
+}
+
+// confidence=low: grab a player in reach, or advance when the animation ends or the
+// forward terrain height is outside the permitted interval.
 void sub_08023FE8(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
@@ -1570,35 +1558,10 @@ void sub_08023FE8(struct StateActor *p)
             }
         }
     }
-    {
-        struct ProbePos pos;
-        s32 distance = 0x190;
-        u8 *s = (u8 *)actor + 0x48;
-        u8 *props;
-        struct ProbePos *at;
-        u32 type;
-        s32 h;
-        u32 bad;
-        ProbeProject(&pos, s[9], distance);
-        ProbeAdd(&pos, (struct ProbePos *)(s + 0xc));
-        at = &pos;
-        props = ProbeCellProps(ProbeCellAt(at));
-        type = *props >> 4;
-        h = (*props & 0xf) << 8;
-        switch (type) {
-            case 1:
-                h -= (u8)at->z;
-                break;
-            case 2:
-                h -= (u8)at->x;
-                break;
-        }
-        bad = ProbeHeightOutOfRange(h, actor->graphics.recoveryGroundHeight, -0x1ff, 0xff);
-        if (bad || p->actionFinished)
-            SceneActorState_EnterPhase(p, 5);
-        else
-            p->actionTimer++;
-    }
+    if (SceneActorGraphics_IsForwardGroundOutOfRange(actor, 0x190) || p->actionFinished)
+        SceneActorState_EnterPhase(p, 5);
+    else
+        p->actionTimer++;
 }
 
 static inline void SceneActorState_StartRecovery(struct SceneGraphicsActor *actor, u32 duration)
@@ -1621,6 +1584,7 @@ void SceneActorState_PlayAnimation7ThenRecover(struct SceneGraphicsActor *actor)
     else
         p->actionTimer++;
 }
+
 void SceneActorState_PlayAnimation8ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
@@ -1632,7 +1596,6 @@ void SceneActorState_PlayAnimation8ThenRecover(struct SceneGraphicsActor *actor)
     else
         p->actionTimer++;
 }
-// confidence=low: when byte 0x383 is clear, the flag at 0xAF arms a reset that sets 0xAE to 7 or 8, clears c4, sets b0; otherwise bumps c4.
 // confidence=low: the tracked player escaping selects the next recovery phase.
 void sub_080243CC(struct StateActor *p)
 {
@@ -1662,6 +1625,7 @@ void SceneActorState_PlayAnimation10ThenRecover(struct SceneGraphicsActor *actor
     else
         p->actionTimer++;
 }
+
 void SceneActorState_PlayAnimation11ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
@@ -1673,6 +1637,7 @@ void SceneActorState_PlayAnimation11ThenRecover(struct SceneGraphicsActor *actor
     else
         p->actionTimer++;
 }
+
 void SceneActorState_PlayVariantAnimation12ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
@@ -1691,6 +1656,7 @@ void SceneActorState_PlayVariantAnimation12ThenRecover(struct SceneGraphicsActor
         p->actionTimer++;
     }
 }
+
 void SceneActorState_PlayVariantAnimation13ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
@@ -1802,6 +1768,7 @@ void SceneActorState_UpdateAction20Recovery(struct SceneGraphicsActor *actor)
         p->actionTimer++;
     }
 }
+
 void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
@@ -1820,6 +1787,7 @@ void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
         p->actionTimer++;
     }
 }
+
 void SceneActorState_UpdateAction22(struct StateActor *p)
 {
     if (TakeFlag(p))
@@ -1870,10 +1838,14 @@ extern u32 gUnk_02000560;
 
 extern const u32 gUnk_08604EF0[];
 
+static inline u32 SceneActorState_TestDispatchFlags(u32 flags)
+{
+    return gUnk_02000560 & flags;
+}
+
 void SceneActorState_UpdateActiveActions(struct StateActor *p)
 {
-    u32 m = 4;
-    if (!(gUnk_02000560 & m)) {
+    if (!SceneActorState_TestDispatchFlags(4)) {
         if (SceneActorState_TryStartDeathOrFlaggedAction(p) == 0) {
             Callback_InvokeActor(p, gUnk_08604EF0[p->actionIndex]);
         }
@@ -1903,60 +1875,18 @@ void SceneActorState_UpdateActionController(struct StateActor *p)
     Callback_InvokeActor(p, gUnk_08604EFC[p->actionMode]);
 }
 
-typedef struct ActorAnimation_08024CE0 {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[7];
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    void (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    u16 scale, minScale, maxScale;
-    u8 pad34A[0x62];
-    u32 mode;
-} ActorAnimation_08024CE0;
-
-static inline void setFacing_08024CE0(ActorAnimation_08024CE0 *p, int angle)
+void SceneActorAnimation_UpdateDirectionalCallback(struct StateActor *p)
 {
-    int shifted;
-    u32 value;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->facing8 = value;
-}
-
-void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation_08024CE0 *p)
-{
-    ActorAnimation_08024CE0 *p2 = p;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     if (!p->locked)
-        setFacing_08024CE0(p, p->requestedAngle);
-    if (p->changed) {
+        SceneActors_SetFacing(p, p->requestedAngle);
+    if (p->actionChanged) {
         int sequence;
-        p->changed = 0;
+        p->actionChanged = 0;
         if (p->locked)
-            setFacing_08024CE0(p, p->savedAngle);
+            SceneActors_SetFacing(p, p->savedFacing);
         {
-            int test = p->mode & 1;
+            int test = actor->graphics.animationFlags & 1;
             sequence = 43;
             if (test)
                 sequence = 5;
@@ -1966,7 +1896,7 @@ void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation_08024CE0 *p)
     } else {
         int sequence;
         {
-            int test = p->mode & 1;
+            int test = actor->graphics.animationFlags & 1;
             sequence = 43;
             if (test)
                 sequence = 5;
@@ -1974,71 +1904,29 @@ void SceneActorAnimation_UpdateDirectionalCallback(ActorAnimation_08024CE0 *p)
         SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
                                               1);
     }
-    p2->minScale = 0;
-    p2->maxScale = 0;
-    p2->variant = 0;
-    if (!p->tryUpdate(p)) {
-        u32 mask = 0x40;
-        p->flags |= mask;
-        p->reset(p);
+    actor->graphics.scaleMin = 0;
+    actor->graphics.scaleMax = 0;
+    actor->variant = 0;
+    if (!p->actionTryUpdate(p)) {
+        SceneActorState_SetFlags(p, 0x40);
+        p->actionReset(p);
     }
-}
-
-typedef struct ActorAnimation_08024E18 {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[7];
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    void (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    u16 scale, minScale, maxScale;
-    u8 pad34A[0x62];
-    u32 mode;
-} ActorAnimation_08024E18;
-
-static inline void setFacing_08024E18(ActorAnimation_08024E18 *p, int angle)
-{
-    int shifted;
-    u32 value;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->facing8 = value;
 }
 
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 
-void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p)
+void SceneActorAnimation_UpdateEightDirectionCallback(struct StateActor *p)
 {
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     if (!p->locked)
-        setFacing_08024E18(p, p->requestedAngle);
-    if (p->changed) {
+        SceneActors_SetFacing(p, p->requestedAngle);
+    if (p->actionChanged) {
         int sequence;
-        p->changed = 0;
+        p->actionChanged = 0;
         if (p->locked)
-            setFacing_08024E18(p, p->savedAngle);
+            SceneActors_SetFacing(p, p->savedFacing);
         {
-            int test = p->mode & 1;
+            int test = actor->graphics.animationFlags & 1;
             sequence = 38;
             if (test)
                 sequence = 0;
@@ -2048,7 +1936,7 @@ void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p
     } else {
         int sequence;
         {
-            int test = p->mode & 1;
+            int test = actor->graphics.animationFlags & 1;
             sequence = 38;
             if (test)
                 sequence = 0;
@@ -2056,9 +1944,8 @@ void SceneActorAnimation_UpdateEightDirectionCallback(ActorAnimation_08024E18 *p
         SceneActors_StartEightDirectionAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1,
                                                  1, 1);
     }
-    if (!p->tryUpdate(p)) {
-        u32 mask = 0x40;
-        p->flags |= mask;
-        p->reset(p);
+    if (!p->actionTryUpdate(p)) {
+        SceneActorState_SetFlags(p, 0x40);
+        p->actionReset(p);
     }
 }
