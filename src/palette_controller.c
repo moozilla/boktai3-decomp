@@ -1,4 +1,6 @@
 #include "palette_controller.h"
+#include "palette_channel.h"
+#include "palette_resource.h"
 #include "render.h"
 /* Palette_ClearActiveController: zeroes gPaletteController (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
 #define Palette_ClearActiveController sub_08002AD4
@@ -66,9 +68,7 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
                     u32 fromG;
                     u32 to;
                     fromRB = k2 & from;
-                    do {
-                        fromG = greenMask & from;
-                    } while (0);
+                    PALETTE_EXTRACT_CHANNEL(fromG, from, greenMask);
                     to = *b;
                     {
                         u32 rb = (((to & 0x7C1F) * amount) + (inverse * fromRB)) & 0xF83E0;
@@ -139,11 +139,10 @@ s32 Palette_GetBrightnessThreshold(void)
 
 void Palette_BrightnessIdle(struct PaletteTransition *t)
 {
-    u32 z = 0;
-    t->brightness = z;
+    t->brightness = 0;
     if (t->callback != 0) {
         Script_Call(t->callback, 0);
-        t->callback = z;
+        t->callback = 0;
     }
 }
 
@@ -458,45 +457,44 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
-    do {
-        gPaletteController = p;
-        p->pending = 0;
-        t->callback = 0;
-        p->hardware = gBgPaletteBuffer;
-        gBgFadeLevel = 64;
-        gBgFadeApplied = 64;
-        gBgFadeColor = 0x1084;
-        gBgFadeBankMask = 0;
-        p->flags = Script_GetKeywordValue('f', 0);
-        if (Script_SeekToKeyword('p')) {
-            s32 i = 0;
-            u16 **out = p->colorSets[PALETTE_SET_SOURCE];
-            while (Script_GetPc() && i <= 3) {
-                s32 value = Script_GetValue();
-                if (value != 0x30) {
-                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-                } else {
-                    *out = 0;
-                }
-                out++;
-                i++;
+    s32 i;
+    gPaletteController = p;
+    p->pending = 0;
+    t->callback = 0;
+    p->hardware = gBgPaletteBuffer;
+    gBgFadeLevel = 64;
+    gBgFadeApplied = 64;
+    gBgFadeColor = 0x1084;
+    gBgFadeBankMask = 0;
+    p->flags = Script_GetKeywordValue('f', 0);
+    if (Script_SeekToKeyword('p')) {
+        u16 **out;
+        i = 0;
+        out = p->colorSets[PALETTE_SET_SOURCE];
+        for (; Script_GetPc() && i < 4; i++) {
+            s32 value = Script_GetValue();
+            if (value != 0x30) {
+                *out = ((struct PaletteResource *)ScriptProc_Start(0x92B3, value))->banks[0];
+            } else {
+                *out = 0;
             }
+            out++;
         }
-        if (Script_SeekToKeyword('d')) {
-            s32 i = 0;
-            u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
-            while (Script_GetPc() && i <= 3) {
-                s32 value = Script_GetValue();
-                if (value != 0x30) {
-                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-                } else {
-                    *out = 0;
-                }
-                out++;
-                i++;
+    }
+    if (Script_SeekToKeyword('d')) {
+        u16 **out;
+        i = 0;
+        out = p->colorSets[PALETTE_SET_DESTINATION];
+        for (; Script_GetPc() && i < 4; i++) {
+            s32 value = Script_GetValue();
+            if (value != 0x30) {
+                *out = ((struct PaletteResource *)ScriptProc_Start(0x92B3, value))->banks[0];
+            } else {
+                *out = 0;
             }
+            out++;
         }
-    } while (0);
+    }
     if (p->flags & 8) {
         Palette_SetVariantsFromPalettes(p);
     } else {
