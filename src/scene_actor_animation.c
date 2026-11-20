@@ -21,6 +21,7 @@ struct ContactPosition *TetherActor_GetPosition(void);
 #include "engine_globals.h"
 
 #include "scene_actor_route.h"
+#include "scene_actor_charge_offset.h"
 
 #include "display_keyframe.h"
 
@@ -38,7 +39,6 @@ static inline u8 *SceneActor_GetTerrainCell(int i)
 
 int Actor_UpdateMovementAnimationAndEffects(void *unused, struct SceneActor *actor)
 {
-    s16 k2 = 0;
     struct SceneActorBody *body = &actor->body;
     void *drawable = &actor->drawable.common.kind;
     Obj_StepPosition(body);
@@ -76,12 +76,9 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct SceneActor *act
             if (actor->flashing && (!(gEngineFlags & 0x200))) {
                 actor->timer = actor->duration;
             } else {
-                s16 *timer = &actor->timer;
-                int zero;
-                zero = k2;
-                *timer = 0;
+                actor->timer = 0;
                 Actor_SetAttachmentEffect(actor, 8, 180, 180);
-                actor->flashing = zero;
+                actor->flashing = 0;
             }
         }
     }
@@ -820,11 +817,8 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->interaction.turning.turnRate = 4;
         actor->interaction.turning.turnState = 255;
     } else {
-        u8 *dst = &actor->interaction.turning.firstDirection;
-        int six;
-        six = 6;
-        *dst = six;
-        actor->interaction.turning.secondDirection = six;
+        actor->interaction.turning.firstDirection = 6;
+        actor->interaction.turning.secondDirection = 6;
         actor->interaction.turning.turnRate = 4;
         actor->interaction.turning.turnState = 255;
     }
@@ -1546,14 +1540,6 @@ static inline s32 RouteWalk_Scale12(s32 value)
     return -((-value) >> 12);
 }
 
-static inline void SceneActor_FixedNavigationStep(struct ContactPosition *step, s32 angle)
-{
-    s32 speed = 48;
-    step->x = RouteWalk_Scale12(speed * gUnk_086149C4[(angle + 64) & 255]);
-    step->y = 0;
-    step->z = RouteWalk_Scale12(speed * gUnk_086149C4[angle]);
-}
-
 // confidence=low: walks toward the navigation target while the animation permits a fixed motion step.
 
 void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
@@ -1598,7 +1584,7 @@ void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
                 actor->body.direction = angle;
                 actor->facing8 = SceneFacing_EightWay(angle);
                 actor->facing4 = SceneFacing_FourWay(angle);
-                SceneActor_FixedNavigationStep(&step, motion->direction);
+                SceneActor_SetChargeOffset(motion->direction, &step, 48);
                 motion->position.x += step.x;
                 motion->position.z += step.z;
             }
@@ -1760,30 +1746,26 @@ int Path_GetPointFacing(struct SceneActorRoutePoint *, int);
 
 int Actor_SelectPathNodeAction(struct SceneActor *actor, struct SceneActorRoutePoint *node)
 {
-    u32 value = node->attributes;
-    int kind;
-    do {
-        kind = value >> 4;
-        actor->nodeId = Path_GetPointNodeId(node, 0);
-        switch (kind) {
-            case 1: {
-                int angle = (u16)Path_GetPointFacing(node, 0);
-                int facing = (angle + 112) >> 5;
-                int mask;
-                mask = 7;
-                actor->nodeFacing = facing & mask;
-                if ((((actor->body.direction + 112) >> 5) & mask) != actor->nodeFacing) {
-                    return 8;
-                }
-                break;
+    int kind = node->attributes >> 4;
+    actor->nodeId = Path_GetPointNodeId(node, 0);
+    switch (kind) {
+        case 1: {
+            int angle = (u16)Path_GetPointFacing(node, 0);
+            int facing = (angle + 112) >> 5;
+            int mask;
+            mask = 7;
+            actor->nodeFacing = facing & mask;
+            if ((((actor->body.direction + 112) >> 5) & mask) != actor->nodeFacing) {
+                return 8;
             }
-            case 2:
-                return 9;
-            case 0:
-            default:
-                break;
+            break;
         }
-    } while (0);
+        case 2:
+            return 9;
+        case 0:
+        default:
+            break;
+    }
     return 7;
 }
 
@@ -1807,6 +1789,19 @@ int SceneCharacter_GetPathNodeState(struct SceneActor *actor)
     } else
         result = 9;
     return result;
+}
+
+static inline void SceneCharacter_EnterState(struct SceneActor *actor, u8 state)
+{
+    actor->state = state;
+    actor->ticks = 0;
+    actor->commandEntered = 1;
+}
+
+static inline void SceneCharacter_InterruptForTarget(struct SceneActor *actor)
+{
+    actor->savedState = actor->state;
+    SceneCharacter_EnterState(actor, 10);
 }
 
 void SceneCharacter_UpdateIdleState(u32 a, struct SceneActor *actor)
@@ -1833,17 +1828,13 @@ void SceneCharacter_UpdateStandState(u32 a, struct SceneActor *actor)
 
 void SceneCharacter_UpdateOneShotActionState(void *unused, struct SceneActor *actor)
 {
-    u32 one;
     if (actor->commandEntered != 0) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 3;
     }
     if (actor->finished != 0) {
-        one = 1;
-        actor->state = one;
-        actor->ticks = 0;
-        actor->commandEntered = one;
+        SceneCharacter_EnterState(actor, 1);
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
     actor->ticks += 1;
@@ -1907,14 +1898,9 @@ void SceneCharacter_UpdateTurnState(void *unused, struct SceneActor *actor)
     if (actor->finished) {
         int controlled = actor->controlled;
         if (controlled) {
-            int state = actor->savedState;
-            actor->state = state;
-            actor->ticks = 0;
-            actor->commandEntered = 1;
+            SceneCharacter_EnterState(actor, actor->savedState);
         } else {
-            actor->state = 1;
-            actor->ticks = controlled;
-            actor->commandEntered = 1;
+            SceneCharacter_EnterState(actor, 1);
         }
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
@@ -1923,17 +1909,13 @@ void SceneCharacter_UpdateTurnState(void *unused, struct SceneActor *actor)
 
 void SceneCharacter_UpdateAlternateOneShotActionState(void *unused, struct SceneActor *actor)
 {
-    u32 one;
     if (actor->commandEntered != 0) {
         actor->commandEntered = 0;
         actor->finished = 0;
         actor->action = 5;
     }
     if (actor->finished != 0) {
-        one = 1;
-        actor->state = one;
-        actor->ticks = 0;
-        actor->commandEntered = one;
+        SceneCharacter_EnterState(actor, 1);
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
     actor->ticks += 1;
@@ -1947,9 +1929,7 @@ void SceneCharacter_UpdateStopState(void *unused, struct SceneActor *actor)
         actor->action = 6;
     }
     if (actor->finished) {
-        actor->state = 0;
-        actor->ticks = 0;
-        actor->commandEntered = 1;
+        SceneCharacter_EnterState(actor, 0);
         Trigger_ConsumePending(actor->messageReceiver, 1);
     }
     actor->ticks++;
@@ -1967,14 +1947,7 @@ void SceneCharacter_UpdateProximityWaitState(struct SceneActorManager *manager,
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
     } else
         actor->ticks++;
 }
@@ -2040,14 +2013,7 @@ void SceneCharacter_UpdatePathWaitState(struct SceneActorManager *manager, struc
 afterPhase:
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
         goto done;
     }
     if (actor->routeId >= 0) {
@@ -2083,18 +2049,9 @@ void SceneCharacter_UpdatePathTurnState(struct SceneActorManager *manager, struc
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
     } else if (actor->finished) {
-        actor->state = 7;
-        actor->ticks = close;
-        actor->commandEntered = 1;
+        SceneCharacter_EnterState(actor, 7);
     } else
         actor->ticks++;
 }
@@ -2157,14 +2114,7 @@ void SceneCharacter_UpdatePathActionState(struct SceneActorManager *manager,
 afterPhase:
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
         goto done;
     } else if (actor->finished) {
         actor->state = 7;
@@ -2230,13 +2180,10 @@ void SceneCharacter_UpdateTargetProximityState(struct SceneActorManager *manager
             int registered = actor->registered;
             if (registered) {
                 actor->direction = actor->savedAngle;
-                actor->state = 3;
-                actor->ticks = close;
+                SceneCharacter_EnterState(actor, 3);
             } else {
-                actor->state = actor->savedState;
-                actor->ticks = registered;
+                SceneCharacter_EnterState(actor, actor->savedState);
             }
-            actor->commandEntered = 1;
         } else
             actor->ticks++;
     }
@@ -2250,11 +2197,7 @@ void SceneCharacter_UpdateTetherReactionState(u8 *a, struct SceneActor *actor)
         actor->action = 0xa;
     }
     if (actor->finished != 0) {
-        u32 c = 0xc;
-        u32 z = 0;
-        actor->state = c;
-        actor->ticks = z;
-        actor->commandEntered = 1;
+        SceneCharacter_EnterState(actor, 0xc);
     }
     actor->ticks += 1;
 }
@@ -2267,11 +2210,7 @@ void SceneCharacter_UpdatePhaseReactionState(u8 *a, struct SceneActor *actor)
         actor->action = 0xB;
     }
     if (actor->finished != 0) {
-        u32 c = 0xE;
-        u32 z = 0;
-        actor->state = c;
-        actor->ticks = z;
-        actor->commandEntered = 1;
+        SceneCharacter_EnterState(actor, 0xE);
     }
     actor->ticks += 1;
 }
@@ -2287,19 +2226,10 @@ void SceneCharacter_UpdatePhaseTransitionState(struct SceneActorManager *manager
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
     } else {
         if (actor->finished) {
-            actor->state = 14;
-            actor->ticks = close;
-            actor->commandEntered = 1;
+            SceneCharacter_EnterState(actor, 14);
         }
         actor->ticks++;
     }
@@ -2334,10 +2264,7 @@ void SceneCharacter_UpdatePhaseWindowWaitState(struct SceneActorManager *manager
             goto tick;
     }
 transition: {
-    int state = 15;
-    actor->state = state;
-    actor->ticks = 0;
-    actor->commandEntered = 1;
+    SceneCharacter_EnterState(actor, 15);
 }
     goto done;
 decrement:
@@ -2358,19 +2285,10 @@ void SceneCharacter_UpdatePathResumeState(struct SceneActorManager *manager,
     }
     close = SceneActor_HasNearbyTarget(manager, actor);
     if (close) {
-        int state = actor->state;
-        u8 *dst = &actor->savedState;
-        int zero;
-        zero = 0;
-        *dst = state;
-        actor->state = 10;
-        actor->ticks = zero;
-        actor->commandEntered = 1;
+        SceneCharacter_InterruptForTarget(actor);
     } else {
         if (actor->finished) {
-            actor->state = SceneCharacter_GetPathNodeState(actor);
-            actor->ticks = close;
-            actor->commandEntered = 1;
+            SceneCharacter_EnterState(actor, SceneCharacter_GetPathNodeState(actor));
         }
         actor->ticks++;
     }
