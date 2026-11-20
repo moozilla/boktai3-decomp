@@ -756,11 +756,8 @@ void ResultTutorial_UpdateSequence(struct ResultMenu *tutorial)
         case 2:
             if (gUnk_0824DBC0[index].hide) {
                 if (ResultTutorial_HidePrompt(tutorial)) {
-                    int next = tutorial->step + 1;
-                    int zero;
-                    zero = 0;
-                    tutorial->step = next;
-                    tutorial->phase = zero;
+                    ++tutorial->step;
+                    tutorial->phase = 0;
                 }
                 break;
             }
@@ -768,12 +765,9 @@ void ResultTutorial_UpdateSequence(struct ResultMenu *tutorial)
             tutorial->phase = 0;
         case 3:
             if (gUnk_0824DBC0[index].run) {
-                if (sub_08249240(tutorial, &gUnk_0824DBC0[index].run, gUnk_0824DBC0[index].run)) {
-                    int next = tutorial->step + 1;
-                    int zero;
-                    zero = 0;
-                    tutorial->step = next;
-                    tutorial->phase = zero;
+                if (gUnk_0824DBC0[index].run(tutorial)) {
+                    ++tutorial->step;
+                    tutorial->phase = 0;
                     Sound_StopSong(0x3ed);
                     Sound_StopSong(0x3ee);
                 }
