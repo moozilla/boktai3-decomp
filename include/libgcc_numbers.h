@@ -8,7 +8,7 @@ struct SoftDoubleNumber {
     fp_class_type class;
     unsigned int sign;
     int normal_exp;
-    // concession-ok(local-union): Original fp-bit-base.c double fraction uses a 64-bit word and two 32-bit halves.
+    /* fp-bit-base.c exposes the fraction as a 64-bit word and two 32-bit halves. */
     union {
         unsigned long long ll;
         unsigned int l[2];
@@ -19,7 +19,7 @@ struct SoftSingleNumber {
     fp_class_type class;
     unsigned int sign;
     int normal_exp;
-    // concession-ok(local-union): Original fp-bit-base.c float fraction uses a 32-bit word and two 16-bit halves.
+    /* fp-bit-base.c exposes the fraction as a 32-bit word and two 16-bit halves. */
     union {
         unsigned int ll;
         unsigned short l[2];

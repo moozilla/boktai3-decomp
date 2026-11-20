@@ -118,8 +118,8 @@ _WARN_REGEX = {
     "volatile-view": re.compile(
         r"\(\s*(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\)\s*(?!&|REG_|0x0?4[0-9A-Fa-f]{6}\b)[\w(*]"
         r"|(?m:^[ \t]+(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\w+\s*[=;])"),
-    "local-union": re.compile(r"(?m)^[ \t]+union\b[^;{}()]*\{"),
 }
+_LOCAL_UNION = re.compile(r"(?m)^[ \t]*union\b[^;{}()]*\{")
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
@@ -183,6 +183,19 @@ def asm_kind(rest: str) -> str:
     return "barrier"
 
 
+def _function_items(code: str, *, include_macros=False):
+    """Yield source offsets and text for function definitions."""
+    from merge_unit import items
+
+    offset = 0
+    for item in items(code):
+        start = code.find(item, offset)
+        offset = start + len(item)
+        declaration = item.lstrip()
+        if _FUNCTION_BODY.match(declaration) or (include_macros and _FUNCTION_MACRO.match(declaration)):
+            yield start, item
+
+
 def _volatile_typedef_locals(code: str):
     """Offsets of scalar volatile-typedef declarations in functions and macros.
 
@@ -191,14 +204,7 @@ def _volatile_typedef_locals(code: str):
     """
     if not _VOLATILE_TYPEDEF.search(code):
         return
-    from merge_unit import items
-
-    offset = 0
-    for item in items(code):
-        start = code.find(item, offset)
-        offset = start + len(item)
-        if not (_FUNCTION_BODY.match(item.lstrip()) or _FUNCTION_MACRO.match(item.lstrip())):
-            continue
+    for start, item in _function_items(code, include_macros=True):
         # String contents are data even when they spell a declaration.
         declarations = _COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), item)
         for match in _VOLATILE_TYPEDEF.finditer(declarations):
@@ -211,6 +217,10 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    if _LOCAL_UNION.search(code):
+        for start, item in _function_items(code):
+            for m in _LOCAL_UNION.finditer(item):
+                yield start + m.start(), "local-union"
     for m in _LITERAL_LOCAL.finditer(code):
         name = m.group(1)
         if re.fullmatch(_NUMBER_NAME, name):
