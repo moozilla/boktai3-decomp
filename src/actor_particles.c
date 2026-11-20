@@ -3,83 +3,38 @@
 #include "background_controller.h"
 #include "scene_object.h"
 #include "game_state.h"
+#include "actor_stats.h"
+#include "contact_actor.h"
+#include "modifier_list.h"
+#include "scene_debris_types.h"
 
-void Actor_ClampMovementSpeed(u8 *s)
+void Actor_ClampMovementSpeed(struct ActorStats *actor)
 {
-    s32 *p = (s32 *)(s + 0x5dc);
+    s32 *p = &actor->movementOffset;
     if (*p > 0xc8000)
         *p = 0xc8000;
     if (*p <= 0x1ffff)
         *p = 0x20000;
 }
 
-struct E {
-    u8 pad[0x24];
-    s16 v;
-    u8 pad2[0x3A];
-};
-
-struct S {
-    struct E e[5];
-};
-
 extern s8 gUnk_086106C0[];
 
-void Actor_SetSpriteDepthOffsets(struct S *p, s32 d)
+void Actor_SetSpriteDepthOffsets(struct CharacterPreviewModel *model, s32 d)
 {
     s32 i;
     for (i = 0; i < 3; i++)
-        p->e[i].v = gUnk_086106C0[i] + d;
-    p->e[3].v = gUnk_086106C0[3] + d;
-    p->e[4].v = gUnk_086106C0[3] + d;
+        model->view.parts[i].z = gUnk_086106C0[i] + d;
+    model->view.parts[3].z = gUnk_086106C0[3] + d;
+    model->view.parts[4].z = gUnk_086106C0[3] + d;
 }
 
 /* tentative: positions sprite parts, easing two toward terrain clearance */
 
-struct H {
-    u32 lo : 16;
-    u32 hi : 16;
-};
-
-struct Z {
-    struct H a, b;
-};
-
-struct Vec {
-    s16 x, y, z;
-};
-
-struct Part {
-    u8 pad[0x20];
-    s16 x, y, z;
-    u8 pad2[0x3A];
-};
-
-struct Sprite {
-    struct Part e[5];
-};
-
-struct Actor {
-    u8 pad[0x10];
-    s32 x, y, z;
-    u8 pad1[0x38 - 0x1C];
-    s32 yOff;
-    u8 pad2[0x5AC - 0x3C];
-    s32 v5AC;
-};
-
-struct Cam {
-    u8 pad[0x44];
-    s32 x;
-};
-
 extern const u16 gUnk_086141BC[];
 
-s32 Terrain_GetCellClearance(struct Z *);
+s32 Terrain_GetCellClearance(s16 *);
 
 void Anim_SetFrameDurationScale(void *, u32);
-
-void Actor_SetSpriteDepthOffsets();
 
 static inline int Rand(void)
 {
@@ -87,74 +42,73 @@ static inline int Rand(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-void Actor_UpdateShadowSpriteParts(struct Actor *a, struct Sprite *s)
+void Actor_UpdateShadowSpriteParts(struct ActorStats *actor, struct CharacterPreviewModel *model)
 {
-    struct Vec pos;
-    struct Z tmp;
+    struct ContactPosition pos;
+    struct ContactPackedVector tmp;
     s32 i;
-    s32 h;
+    s32 shadowHeight;
+    s32 groundHeight;
+    s32 delta;
     s32 v;
-    s16 *out;
-
-    out = &pos.x;
-    pos.x = (a->x >> 12) - ((struct Cam *)gSceneCamera)->x;
-    out[1] = ((a->z + (a->y + a->yOff)) >> 12) + 0x5A;
-    out[2] = a->z >> 12;
+    s16 *coordinates = &pos.x;
+    pos.x = (actor->position.x >> 12) - gSceneCamera->x;
+    coordinates[1] = ((actor->position.z + (actor->position.y + actor->height)) >> 12) + 0x5A;
+    coordinates[2] = actor->position.z >> 12;
     for (i = 0; i < 3; i++) {
-        s->e[i].x = pos.x;
-        s->e[i].y = pos.y;
+        model->view.parts[i].x = pos.x;
+        model->view.parts[i].y = pos.y;
     }
     for (i = 3; i <= 4; i++) {
-        s32 ax = a->x >> 12;
-        pos.x = ax - ((struct Cam *)gSceneCamera)->x;
-        tmp.a.hi = a->y >> 12;
-        tmp.b.lo = a->z >> 12;
+        s32 ax = actor->position.x >> 12;
+        pos.x = ax - gSceneCamera->x;
+        tmp.y = actor->position.y >> 12;
+        tmp.z = actor->position.z >> 12;
         switch (i) {
             case 3:
                 pos.x += 15;
                 pos.y -= 2;
-                tmp.a.lo = ax + 15;
+                tmp.x = ax + 15;
                 break;
             case 4:
                 pos.x -= 19;
                 pos.y -= 2;
-                tmp.a.lo = ax - 19;
+                tmp.x = ax - 19;
                 break;
         }
-        h = Terrain_GetCellClearance(&tmp) - 6;
-        if (pos.y - h > 8)
-            do {
-                h = pos.y - 8;
-            } while (0);
-        else if (pos.y - h < -8)
-            do {
-                h = pos.y + 8;
-            } while (0);
-        s->e[i].x = pos.x;
-        if (s->e[i].y + 3 < h)
-            s->e[i].y += 3;
-        else if (s->e[i].y - 3 > h)
-            s->e[i].y -= 3;
+        groundHeight = Terrain_GetCellClearance((s16 *)&tmp) - 6;
+        delta = pos.y - groundHeight;
+        if (delta > 8)
+            shadowHeight = pos.y - 8;
+        else if (delta < -8)
+            shadowHeight = pos.y + 8;
         else
-            s->e[i].y = h;
-        s->e[i].z = (a->z >> 12) - 6;
+            shadowHeight = groundHeight;
+        model->view.parts[i].x = pos.x;
+        if (model->view.parts[i].y + 3 < shadowHeight)
+            model->view.parts[i].y += 3;
+        else if (model->view.parts[i].y - 3 > shadowHeight)
+            model->view.parts[i].y -= 3;
+        else
+            model->view.parts[i].y = shadowHeight;
+        model->view.parts[i].z = (actor->position.z >> 12) - 6;
         if ((Rand() & 15) > 9) {
-            s->e[i].y += (Rand() & 3) - 1;
+            model->view.parts[i].y += (Rand() & 3) - 1;
         }
     }
-    v = (a->v5AC >> 12) + 1;
+    v = (actor->motion.forward >> 12) + 1;
     if (v != 1) {
         s32 sc = 0x40 - v * 2;
         sc = sc < 0x20 ? 0x20 : sc;
-        Anim_SetFrameDurationScale(&s->e[3], (u16)sc);
-        Anim_SetFrameDurationScale(&s->e[4], (u16)sc);
+        Anim_SetFrameDurationScale(&model->view.parts[3], (u16)sc);
+        Anim_SetFrameDurationScale(&model->view.parts[4], (u16)sc);
     }
-    Actor_SetSpriteDepthOffsets(s, a->z >> 12);
+    Actor_SetSpriteDepthOffsets(model, actor->position.z >> 12);
 }
 
 u32 ActorEffect_SpawnAtActorPos();
 
-static inline u32 NextRandom(void)
+static inline u32 ActorParticles_NextRandom(void)
 {
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
     return gUnk_086141BC[gEffectRandomTableIndex];
@@ -178,9 +132,9 @@ void ActorParticles_SpawnImpactBurst(void *actor)
     Memory_Clear(&offset, 8);
     modifier = HasModifier(8);
     for (i = 0; i < 4; i++) {
-        offset.x = (NextRandom() & 31) - 7;
-        velocity.x = (NextRandom() & 3) - 2;
-        velocity.y = -(NextRandom() & 1);
+        offset.x = (ActorParticles_NextRandom() & 31) - 7;
+        velocity.x = (ActorParticles_NextRandom() & 3) - 2;
+        velocity.y = -(ActorParticles_NextRandom() & 1);
         velocity.z = 0;
         ActorEffect_SpawnAtActorPos(actor, &offset, &velocity, 0x409C, 0x1C22, 4, 0, modifier, 0,
                                     0xE3, 30, 0, 512, 1, 0);
@@ -188,8 +142,6 @@ void ActorParticles_SpawnImpactBurst(void *actor)
                                     0xE3, 12, 0, 1024, 1, 0);
     }
 }
-
-#define gRandomValues gUnk_086141BC
 
 u32 ActorParticles_CreateAtOffset();
 
@@ -214,48 +166,36 @@ void ActorParticles_EmitOffsetBurst(void *actor)
 
 /* tentative: spawns a jittered pair of particles moving left and right */
 
-struct ParticleOffset {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-    s32 unused : 16;
-};
-
 struct SideBurstActor {
     u8 pad0[0x4a];
     u8 field4A;
     u8 field4B;
 };
 
-u32 ActorEffect_SpawnAtActorPos(struct SideBurstActor *, struct ParticleOffset *, struct ParticleOffset *,
-                                u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
-
-static inline u32 ParticleRandom(void)
-{
-    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 1023;
-    return gUnk_086141BC[gEffectRandomTableIndex];
-}
+u32 ActorEffect_SpawnAtActorPos(struct SideBurstActor *, struct ContactPackedVector *,
+                                struct ContactPackedVector *, u32, u32, u32, u32, u32, u32, u32,
+                                u32, u32, u32, u32, u32);
 
 /* Spawns two 0x3D99 particles from the actor: a shared jittered base offset
    (y = -32) and two velocity offsets, one leftward then one rightward (tentative). */
 
 void ActorParticles_SpawnSideBurst(struct SideBurstActor *p)
 {
-    struct ParticleOffset a, b;
+    struct ContactPackedVector a, b;
     u32 anim = p->field4B + 0x378;
-    a.x = (ParticleRandom() & 31) - 7;
+    a.x = (ActorParticles_NextRandom() & 31) - 7;
     a.y = -32;
     a.z = 0;
-    b.x = -(ParticleRandom() & 3) - 3;
-    b.y = -(ParticleRandom() & 7) - 3;
-    b.z = (ParticleRandom() & 7) - 3;
+    b.x = -(ActorParticles_NextRandom() & 3) - 3;
+    b.y = -(ActorParticles_NextRandom() & 7) - 3;
+    b.z = (ActorParticles_NextRandom() & 7) - 3;
     {
         u8 layer = p->field4A;
         ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
     }
-    b.x = (ParticleRandom() & 3) + 2;
-    b.y = -(ParticleRandom() & 7) - 2;
-    b.z = (ParticleRandom() & 7) - 3;
+    b.x = (ActorParticles_NextRandom() & 3) + 2;
+    b.y = -(ActorParticles_NextRandom() & 7) - 2;
+    b.z = (ActorParticles_NextRandom() & 7) - 3;
     {
         u8 layer = p->field4A;
         ActorEffect_SpawnAtActorPos(p, &a, &b, 0x3d99, 0, layer, 1, 0, 0, anim, 0x30, 1, 0, 2, 6);
@@ -269,12 +209,6 @@ struct ActorParticleEmitter {
 u32 ActorParticles_CreateAtOffset(void *, struct SceneExtent *, struct SceneExtent *, u32, u32, u32,
                                   u32, u32, u32, u32, u32, u32, u32, u32, u32);
 
-static inline u32 NextEmitterRandom(void)
-{
-    gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
-    return gUnk_086141BC[gEffectRandomTableIndex];
-}
-
 void ActorParticles_UpdateEmitter(void *actor, struct ActorParticleEmitter *emitter)
 {
     struct SceneExtent offset, velocity;
@@ -287,11 +221,11 @@ void ActorParticles_UpdateEmitter(void *actor, struct ActorParticleEmitter *emit
     }
     emitter->countdown = emitter->interval;
     for (i = 0; i < emitter->count; i++) {
-        offset.x = (NextEmitterRandom() & 31) - 7;
+        offset.x = (ActorParticles_NextRandom() & 31) - 7;
         offset.y = 0;
         offset.z = 0;
-        velocity.x = (NextEmitterRandom() & 1) + 1;
-        velocity.y = -(NextEmitterRandom() & 1);
+        velocity.x = (ActorParticles_NextRandom() & 1) + 1;
+        velocity.y = -(ActorParticles_NextRandom() & 1);
         velocity.z = 0;
         ActorParticles_CreateAtOffset(actor, &offset, &velocity, 0x4384, 0xf62b, 0, 0, 0, 0, 0xb8,
                                       30, 0, !(i & 1) ? 512 : 1024, 1, 0);
@@ -310,7 +244,6 @@ void Character_SetLowResourceColorEffect(u8 *p, struct State *s)
     s32 six = Div(s->limit * 6, 10);
     s32 four = Div(s->limit * 4, 10);
     s32 two = Div(s->limit * 2, 10);
-    u32 result;
     if (s->value <= two) {
         p[0] = 20;
         p[2] = 2;
@@ -332,10 +265,6 @@ void Character_SetLowResourceColorEffect(u8 *p, struct State *s)
 
 /* tentative: counts a held charge, spawning particles, and fires the callback on release */
 
-struct Pos {
-    s16 x, y, z, w;
-};
-
 struct Size {
     s16 w, h, a, b;
 };
@@ -348,7 +277,7 @@ struct Input {
 
 struct Owner {
     u8 filler0[0x20];
-    struct Pos pos;
+    struct ContactPosition pos;
     u8 filler28[0x251 - 0x28];
     s8 markerSlot;
 };
@@ -372,9 +301,8 @@ void ActorMarker_ShowSlot(s32);
 
 void ActorMarker_HideSlot(s32);
 
-
-s32 SpriteParticle_SpawnSingleFrameBatch(struct Pos *, struct Pos *, struct Size *, u32, u32, u32,
-                                         u32);
+s32 SpriteParticle_SpawnSingleFrameBatch(struct ContactPosition *, struct ContactPosition *,
+                                         struct Size *, u32, u32, u32, u32);
 
 void ChargeMarker_TickHold(struct Self *self, struct Owner *owner, struct Input *input)
 {
@@ -392,7 +320,7 @@ void ChargeMarker_TickHold(struct Self *self, struct Owner *owner, struct Input 
             } else {
                 s32 r = Mod(self->timer, 12);
                 if (r == 0) {
-                    struct Pos pos;
+                    struct ContactPosition pos;
                     struct Size size;
                     u32 n;
                     pos = owner->pos;
