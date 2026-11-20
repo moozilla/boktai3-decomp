@@ -689,15 +689,6 @@ void SceneActors_UpdateKnockbackReaction(void *);
 void sub_08027214(void *);
 void WirelessGame_AddItem(void *, s32);
 
-static inline void reactionAction(struct ReactionActor *p, int one, int id, int zero)
-{
-    p->active = one;
-    p->actionReset = zero;
-    p->action = id;
-    p->actionTimer = zero;
-    p->entered = one;
-}
-
 static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
 {
     p->state = id;
@@ -710,6 +701,11 @@ static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), in
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
 // (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
+static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags |= flags;
+}
+
 s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
 {
     u8 *actor = (u8 *)p;
@@ -731,11 +727,10 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 DamageNumberDisplay_Show(actor + 0x1cc, shown, 0, sprite + 0xc, &size, 1);
             }
             {
-                u32 mask = 0x100000;
-                if (p->flags & mask)
+                if (SceneActorState_TestFlags((struct StateActor *)p, 0x100000))
                     SceneActors_StopBackgroundFlash((struct StateActor *)actor);
             }
-            reactionAction(p, 1, 0, 0);
+            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 0);
             reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
             if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
@@ -752,26 +747,22 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
             break;
         }
         case 2:
-            reactionAction(p, 1, 1, 0);
+            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 1);
             reactionState(p, SceneActors_UpdateKnockbackReaction, 0x17);
             {
                 u8 v = sprite[9] + 0x80;
-                ((u8 *)p)[0x342] = v;
+                ((struct SceneGraphicsActor *)p)->hitAngle = v;
             }
             break;
         case 1: {
-            s32 zero;
             {
                 u8 v = (*(u8 **)((u8 *)p + 0x10c))[0x2d];
-                u8 *dst = (u8 *)p + 0x342;
-                zero = 0;
-                *dst = v;
+                ((struct SceneGraphicsActor *)p)->hitAngle = v;
             }
             {
-                u32 mask = 2;
-                p->flags |= mask;
+                SceneActorState_SetFlags((struct StateActor *)p, 2);
             }
-            reactionAction(p, 1, 3, zero);
+            SceneActorState_StartAction((struct StateActor *)p, 1, 0, 3);
             reactionState(p, sub_08027214, 0x19);
             break;
         }
