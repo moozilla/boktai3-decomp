@@ -5792,6 +5792,7 @@ addr,name,mode,confidence,source,notes
 08159FF4,Player_RequestTimedReset,thumb,low,src-alias,
 0815A110,Player_StartForcedStun,thumb,low,src-alias,Invokes the timed reaction helper with forced setup enabled; stun interpretation is tentative
 0815A11C,Player_AdvanceTetherPhase,thumb,low,src-alias,
+0815A1AC,Player_SpawnMovementModifierEffects,thumb,low,src-alias,Spawns a batch into the player movement modifier group and applies the effect kind after a successful spawn.
 0815A324,Player_ClearFlag740,thumb,low,src-alias,Clears the player byte flag at offset 740; its gameplay meaning remains uncertain
 0815A340,Player_SetFlag740,thumb,low,src-alias,Sets the player byte flag at offset 740; paired with its clearing helper
 0815A35C,Player_GetCollisionData,thumb,low,src-alias,Returns player field D4 or fallback data; collision data interpretation is tentative

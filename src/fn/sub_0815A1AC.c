@@ -11,7 +11,7 @@ void Player_FlushQueuedEffects(u8 *);
 s32 EffectGroup_Spawn(void *, u32, u32, struct SpawnOffset *);
 void Sound_PlaySong(u32);
 
-void sub_0815A1AC(u8 *p, u32 kind, s32 count)
+void Player_SpawnMovementModifierEffects(u8 *p, u32 kind, s32 count)
 {
     struct SpawnOffset off;
     s32 i, spawned;
