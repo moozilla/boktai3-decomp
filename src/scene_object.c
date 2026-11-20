@@ -223,6 +223,16 @@ void SceneObjects_PlayPushSound(s32 type)
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
+static inline u32 SceneCollider_ReadContactFlags(const struct SceneCollider *contact, u32 mask)
+{
+    return contact->contactFlags & mask;
+}
+
+static inline u32 SceneCollider_ReadReactionFlags(const struct SceneCollider *contact, u32 mask)
+{
+    return contact->contactFlags2 & mask;
+}
+
 void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
                                    struct SceneObject *object)
 {
@@ -231,10 +241,8 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
     applied = 0;
     actor = object;
     if (actor->type == 0) {
-        u32 firstMask = 0x17;
-        if (firstMask & contact->contactFlags) {
-            u32 secondMask = 0x10;
-            if (secondMask & contact->contactFlags2) {
+        if (SceneCollider_ReadContactFlags(contact, 0x17)) {
+            if (SceneCollider_ReadReactionFlags(contact, 0x10)) {
                 actor->health -= 24;
                 actor->damageTimer = 10;
                 actor->animationTimer = 2;
@@ -243,10 +251,8 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             }
         }
     } else if (actor->type == 1) {
-        u32 firstMask = 4;
-        if (firstMask & contact->contactFlags2) {
-            u32 secondMask = 0x80017;
-            if (secondMask & contact->contactFlags) {
+        if (SceneCollider_ReadReactionFlags(contact, 4)) {
+            if (SceneCollider_ReadContactFlags(contact, 0x80017)) {
                 actor->health -= 24;
                 actor->damageTimer = 10;
                 actor->animationTimer = 2;
@@ -260,8 +266,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             }
         }
     } else if (actor->type == 2) {
-        u32 mask = 1;
-        if (mask & contact->contactFlags) {
+        if (SceneCollider_ReadContactFlags(contact, 1)) {
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
@@ -678,8 +683,8 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 break;
             }
         }
-        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)particle, 0, &size, 1,
-                                           2, 4);
+        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)particle, 0, &size, 1, 2,
+                                           4);
         i--;
     } while (i >= 0);
 }
