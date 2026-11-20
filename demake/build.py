@@ -8,6 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 from art import ROOT, Source, actor_pose, encode_tile, fit_tiles, pose_tiles, screen_image
+from journal import Journal
 from gallery import actor_gallery, room_gallery
 from music import compile_song
 from pack import LAYOUT, objects, pack_room, enemy_constants, ghoul_palette
@@ -22,7 +23,7 @@ direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase en
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
 shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise
 world_x world_x_hi world_y world_y_hi camera_x_hi camera_y_hi projected_h projected_h_hi
-camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter""".split()
+camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter note_index note_lang note_count""".split()
 
 
 def direction_table():
@@ -42,6 +43,8 @@ def build(source, out, scenes=None, song=None):
     if len(scenes) > 128 or len(set(scenes)) != len(scenes):
         raise ValueError("use up to 128 distinct rooms per cartridge")
     rooms = {n: (convert(source, n), i) for i, n in enumerate(scenes, 1)}
+    journal = Journal(source, len(rooms) + 3)
+    notes = {n: journal.room(room, rooms) for n, (room, _) in rooms.items()}
     poses, markers = objects(source)
     obj = b"".join(poses)
     directions = direction_table()
@@ -58,13 +61,13 @@ def build(source, out, scenes=None, song=None):
     bgm = song if song is not None else song_ids[0] if song_ids else 18
     score, wave, music_info = compile_song(bgm)
     symbols.update(screen_bank=len(rooms) + 2, music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
-    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text() + (HERE / "skeleton.asm").read_text() + (HERE / "screens.asm").read_text() + (HERE / "printer.asm").read_text()
+    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text() + (HERE / "skeleton.asm").read_text() + (HERE / "screens.asm").read_text() + (HERE / "printer.asm").read_text() + (HERE / "journal.asm").read_text()
     symbols.update({name: 0xc700 + i for i, name in enumerate("""
         pr_state pr_command pr_compress pr_length_lo pr_length_hi pr_checksum_lo pr_checksum_hi
         pr_raw_lo pr_raw_hi pr_ink_lo pr_ink_hi pr_run pr_repeat pr_bad pr_status
         pr_size_lo pr_size_hi pr_total_lo pr_total_hi pr_packet_lo pr_packet_hi pr_busy
         photo_ready photo_level pr_byte pr_received_lo pr_palette""".split())})
-    reloc = {"pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
+    reloc = {"journal_ptrs": 0, "pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
     code, _ = assemble(asm, {**symbols, **reloc})
     fixed_end = 0x150 + len(code)
     table_addr = fixed_end + len(directions)
@@ -72,18 +75,19 @@ def build(source, out, scenes=None, song=None):
     ptrs = b"".join(struct.pack("<H", first_pose + 192 * i) for i in range(len(poses)))
     reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=first_pose + len(obj),
                  wave_pattern=first_pose + len(obj) + len(markers))
+    reloc["journal_ptrs"] = reloc["wave_pattern"] + len(wave)
     code, symbols = assemble(asm, {**symbols, **reloc})
     info, banks = [], []
     for room, _ in rooms.values():
-        data, meta, display = pack_room(source, room, rooms)
+        data, meta, display = pack_room(source, room, rooms, *notes[room.stage["scene"]])
         info.append(meta)
         banks.append(data)
         screen_image(display).save(out / f"room-{meta['scene']}.png")
-    rom = cartridge(code + directions + ptrs + obj + markers + wave, [*banks, score, screen_bank(source)])
+    rom = cartridge(code + directions + ptrs + obj + markers + wave + journal.directory, [*banks, score, screen_bank(source), *journal.banks])
     path = out / "boktai.gb"
     path.write_bytes(rom)
     manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_pose_count=len(poses), obj_tiles_per_pose=12, obj_marker_tiles=len(markers) // 16,
-                    music=music_info, state={name: symbols[name] for name in [*STATE, "pickups"]}, engine=symbols)
+                    journal_pages=len(journal.directory) // 3, music=music_info, state={name: symbols[name] for name in [*STATE, "pickups"]}, engine=symbols)
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"{path.relative_to(ROOT)}  {len(rom)//1024} KiB MBC5  {len(banks)} rooms  {len(code)} bytes SM83")
     return rooms, manifest

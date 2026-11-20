@@ -2,6 +2,7 @@
 import csv
 from functools import lru_cache
 import struct
+import re
 import sys
 from pathlib import Path
 
@@ -76,6 +77,18 @@ class Source:
             raise ValueError(f"scene {number} has no decoded stage load")
         key = int(scene["stage"]["hp"], 0)
         terrain = hp.decode(self.entry("tAE6C", key))
+        # Journal selection is a host-side extraction of a director's first
+        # message. The opening cutscene and the gun lesson have specific cues.
+        messages = []
+        for pid in sorted({pid for pid, _ in self.walker.visited}):
+            lines = self.walker.text(pid)
+            if any("command 0x7348 " in op for _, op in lines):
+                for _, op in lines:
+                    match = re.search(r"command 0x1c64 .*?text#(\d+)", op)
+                    if match:
+                        messages.append(int(match[1]))
+                        break
+        scene["message"] = {2698: 5599, 2705: 8687, 2712: 8701}.get(number, min(messages, default=None))
         calls = scene["calls"]
         scene["skylights"] = [(int(args[1], 0) + 128, int(args[2], 0) + 128)
                               for c in calls if c["proc"] == 1072 and len(args := c["args"]) >= 3

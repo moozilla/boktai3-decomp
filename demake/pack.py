@@ -3,17 +3,14 @@ import re
 import struct
 
 import numpy as np
-from PIL import Image
 
 from art import ROOT, actor_pose, encode_tile, fit_tiles, pose_tiles, unpack_4bpp
 from rooms import nearest_floor, room_events, walkable
-import text as game_text
 
 # Bank addresses stay fixed so the same SM83 code can run every room.
 LAYOUT = dict(header=0x4000, route=0x4020, events=0x4100, rows=0x4200, projection=0x4300,
-              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00, worldmap=0x6000, projection_hi=0x7000, skeleton_routes=0x7100)
+              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00, worldmap=0x6000, projection_hi=0x7000, skeleton_routes=0x7100, map_x=0x7200, map_z=0x7300)
 ROOM_NAMES = {2698: "SEALED PRISON", 2705: "THE CORRIDOR", 2712: "THE SKYLIGHT"}
-STORY = {2698: 5599, 2705: 8697, 2712: 8701}
 
 
 def icon(rows):
@@ -53,45 +50,11 @@ class Window:
             ink[:7] = np.minimum(3, glyph.reshape(7, 2, 8).min(axis=1) - 1)
             self.map[y, col] = self.tile(ink)
 
-    def dialogue(self, source, scene):
-        # A short original line, in its own font. Keep the actual raw glyph IDs,
-        # including identical-looking characters mapped to different slots.
-        n = STORY[scene]
-        offset, = struct.unpack_from("<I", source.rom, game_text.TABLE - 0x08000000 + 4 * n)
-        a = game_text.BASE - 0x08000000 + (offset & 0x7FFFFFFF)
-        raw = source.rom[a:source.rom.index(b'\0', a)]
-        raw = re.sub(rb"<LABEL=[^>]*>.*?</LABEL>", b"", raw, flags=re.S)
-        raw = re.sub(rb"<[^>]*>", b"", raw)
-        codes = []
-        i = 0
-        while i < len(raw) and len(codes) < 9:
-            if 0x80 <= raw[i] <= 0x85:
-                codes.append((raw[i] - 128) * 256 + raw[i + 1])
-                i += 2
-            else:
-                i += 1
-        for k, code in enumerate(codes):
-            addr = 0x200C + code * 128
-            glyph = np.minimum(3, unpack_4bpp(self.font[addr:addr + 128]) - 1)
-            for t, tile in enumerate(glyph):
-                self.map[4 + t // 2, 1 + 2 * k + t % 2] = self.tile(tile)
-        return n
-
-    def populate(self, source, scene, bank):
-        self.ascii(16, 0, f"{bank:02d}")
-        self.ascii(1, 2, ROOM_NAMES.get(scene, f"SCENE {scene}"))
-        if scene in STORY:
-            self.dialogue(source, scene)
-        self.ascii(1, 7, "A  FIRE / DOOR")
-        self.ascii(1, 8, "B  STORE SUNLIGHT")
-        self.ascii(1, 10, "START  RETURN")
-
-
-def pack_room(source, room, rooms):
+def pack_room(source, room, rooms, journal, map_coords):
     scene = room.stage["scene"]
     bank = rooms[scene][1]
     ui = Window(source)
-    ui.populate(source, scene, bank)
+    ui.ascii(16, 0, f"{bank:02d}")
     patterns, tilemap, display, unique = fit_tiles(room.background, 256 - len(ui.tiles))
     # Signed BG indices 0x80..0xff,0..0x7f address sequential $8800..$97ff.
     count = len(patterns)
@@ -130,6 +93,7 @@ def pack_room(source, room, rooms):
     if 6 * (1 + bool(path) + len(skeletons)) + len(events) + 1 > 40:
         raise ValueError(f"scene {scene} exceeds the OAM table")
     header += bytes([len(skeletons), max_on_line > 10])
+    header += struct.pack("<HBB", journal["offset"], journal["jp"], journal["en"])
     sections = {
         "header": header, "route": route, "events": bytes(v for e in events for v in e),
         "rows": b"".join(struct.pack("<H", LAYOUT["cells"] + row * w) for row in range(h)),
@@ -137,18 +101,18 @@ def pack_room(source, room, rooms):
         "cells": bytes((c[0] | (c[1] if c[1] in (1, 2) else 0) << 4 | (128 if c[3] & 0x43 else 0))
                        if walkable(c) else 255 for c in t["cells"]),
         "patterns": all_tiles, "background": bytes(1024), "window": winmap, "worldmap": bgmap,
-        "skeleton_routes": sk_routes,
+        "skeleton_routes": sk_routes, "map_x": map_coords[:256], "map_z": map_coords[256:],
         "projection_hi": bytes(round(i * 3 * room.scale) >> 8 for i in range(256)),
     }
-    buf = bytearray(0x3200)
-    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x7200]):
+    buf = bytearray(0x3400)
+    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x7400]):
         data = sections[name]
         if len(data) > end - addr:
             raise ValueError(f"scene {scene}: {name} exceeds its bank region")
         buf[addr - 0x4000:addr - 0x4000 + len(data)] = data
     info = dict(scene=scene, resources=room.stage["stage"], palette=room.palette, scale=room.scale,
                 crop=[room.left, room.top], start=start, route=[list(p.values()) for p in path], events=events,
-                skeleton_paths=skeletons, source_tiles=unique, bg_tiles=count, window_tiles=len(ui.tiles), text_id=STORY.get(scene))
+                skeleton_paths=skeletons, source_tiles=unique, bg_tiles=count, window_tiles=len(ui.tiles), journal=journal)
     return bytes(buf), info, display
 
 
@@ -183,6 +147,7 @@ def objects(source):
         "00000000 00011000 00013000 00333300 03111130 03112130 00333300 00000000",
         "00010000 01010100 00333000 01111100 03111310 00333000 01010100 00010000",
         "00000000 00001000 00013100 00111110 00013100 00001000 00000000 00000000",
+        "00030000 00313000 03111300 31111130 33333330 00000000 00000000 00000000",
     ]
     marker_tiles = bytearray()
     for rows in markers:

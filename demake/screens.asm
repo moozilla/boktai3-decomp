@@ -1,6 +1,8 @@
 ; Full-screen pages use the same signed BG tile addressing as the rooms.
 ; Bank switches do not disturb player, actor or inventory WRAM.
 static_page:
+    xor a
+    ldh [0x25],a
     push hl
     call lcd_off
     ld a,screen_bank
@@ -44,6 +46,8 @@ restore_field:
     jp show_field
 
 static_tick:
+    cp 4
+    jp nc,journal_tick
     cp 3
     jp z,link_frame
     call input

@@ -43,6 +43,7 @@ boot:
     ld a,[header+5]
     ld [player_z],a
     ld a,1
+    ld [note_lang],a
     ld [shadow_choice],a
     call title_screen
 
@@ -59,14 +60,10 @@ loop:
     jp loop
 .pause:
     bit 3,a
-    jr z,.menu_set
-    ld a,[menu]
-    xor 1
-    ld [menu],a
-.menu_set:
-    ld a,[menu]
-    and a
-    jr nz,.render
+    jr z,.play
+    call open_map
+    jp loop
+.play:
     ld hl,tick
     inc [hl]
     call move_player
@@ -105,12 +102,7 @@ loop:
     ldh [0x43],a
     ld a,[camera_y]
     ldh [0x42],a
-    ld a,[menu]
-    and a
     ld a,136
-    jr z,.window
-    ld a,48
-.window:
     ldh [0x4a],a
     call 0xff80
     call flush_pose
@@ -212,6 +204,8 @@ load_room:
     call reset_poses
     call sk_init
 show_field:
+    ld a,0xff
+    ldh [0x25],a
     call draw
     call limit_oam
     call initial_map
