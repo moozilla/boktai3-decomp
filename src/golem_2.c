@@ -219,15 +219,14 @@ static inline u32 Golem_HeightAt(s32 cell, struct ContactPosition *position)
 static inline u8 Golem_TryRoute(struct ChaseActor *actor, void *route,
                                 struct ContactPosition *position, struct ContactPosition *target)
 {
-    s32 result = ({
-        void *route_owner_ = (route);
-        struct ContactPosition *route_position_ = (position);
-        struct ContactPosition *route_target_ = (target);
-        s32 route_status_ = Nav_IsPositionInMesh(route_owner_, route_position_, route_target_);
-        if (route_status_)
-            route_status_ = Terrain_ApplyBlocked(route_owner_, route_position_, route_target_);
-        route_status_;
-    });
+    s32 result;
+    void *routeOwner = route;
+    struct ContactPosition *from = position;
+    struct ContactPosition *to = target;
+    s32 status = Nav_IsPositionInMesh(routeOwner, from, to);
+    if (status)
+        status = Terrain_ApplyBlocked(routeOwner, from, to);
+    result = status;
     if (result) {
         if (result != 2)
             Memory_Clear(SceneActorChase_MotionOf(actor), 8);
@@ -317,10 +316,7 @@ static inline u8 Golem_Arrive(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Golem_SetBehavior(actor, 12);
@@ -389,7 +385,7 @@ static inline void GolemReaction_SetChargeHeight(struct ChaseActor *actor, s32 h
 static inline void GolemReaction_EnterCharge(struct ChaseActor *actor, s16 height)
 {
     GolemReaction_SetChargeHeight(actor, height);
-    SceneActorChase_SetTypedControl(actor, actor->base.onReaction, 0x12);
+    SceneActorChase_SetControl(actor, actor->base.onReaction, 0x12);
     Golem_SetTypedState(actor, 3, 0, 0);
 }
 
@@ -401,6 +397,12 @@ static inline void GolemReaction_Settle(struct ChaseActor *actor)
 }
 
 /* Dispatch the hit-reaction state; return one when entering a state. */
+
+static inline void Golem_InvokeRouteFallback(struct ChaseActor *actor,
+                                             struct SceneActorChaseGroup *group)
+{
+    Callback_InvokeActor(actor, group->fallback);
+}
 
 s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 {
@@ -422,7 +424,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         if (!Golem_Arrive(object)) {
             if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                                 &actor->base.tracking.target->position)) {
-                Callback_InvokeActor(actor, group->fallback);
+                Golem_InvokeRouteFallback(actor, group);
                 return 0;
             }
         }
@@ -435,7 +437,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
     }
     if (SceneActorChase_QueryMotionFlags(actor, 2)) {
         actor->base.reactionStart = actor->base.reactionEnd = actor->base.body.position;
-        SceneActorChase_SetTypedControl(actor, group->contactControl, 7);
+        SceneActorChase_SetControl(actor, group->contactControl, 7);
         Golem_SetTypedState(actor, 3, 0, 0);
         return 1;
     }
@@ -481,7 +483,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         if (!Golem_Arrive(object)) {
             if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                                 &actor->base.tracking.target->position)) {
-                Callback_InvokeActor(actor, group->fallback);
+                Golem_InvokeRouteFallback(actor, group);
                 return 0;
             }
         }
@@ -499,7 +501,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         if (!Golem_Arrive(object)) {
             if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                                 &actor->base.tracking.target->position)) {
-                Callback_InvokeActor(actor, group->fallback);
+                Golem_InvokeRouteFallback(actor, group);
                 return 0;
             }
         }
@@ -521,7 +523,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
     if (!Golem_Arrive(object)) {
         if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                             &actor->base.tracking.target->position)) {
-            Callback_InvokeActor(actor, group->fallback);
+            Golem_InvokeRouteFallback(actor, group);
             return 0;
         }
     }
