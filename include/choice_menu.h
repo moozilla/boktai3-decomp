@@ -62,7 +62,7 @@ void ChoiceMenu_PrintText(struct ChoiceMenu *p);
 u8 *ChoiceMenu_ParseTag(struct ChoiceMenu *p, u8 *text);
 void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window);
 s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options);
-struct ChoiceMenu *sub_08006CD0(void *window, s32 stringBase, void *callback, s32 *options);
+struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32 *options);
 struct ChoiceMenu *ChoiceMenu_CreateFromScript(void);
 void ChoiceMenu_ReloadFromScript(void);
 

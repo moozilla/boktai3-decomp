@@ -153,6 +153,7 @@ addr,name,mode,confidence,source,notes
 08006770,ChoiceMenu_ParseTag,thumb,low,src-alias,
 08006A04,ChoiceMenu_LayoutText,thumb,low,src-alias,
 08006B60,ChoiceMenu_Initialize,thumb,low,src-alias,
+08006CD0,ChoiceMenu_Create,thumb,low,src-alias,Creates a choice menu with a native callback
 08006D44,ChoiceMenu_CreateFromScript,thumb,low,src-alias,
 08006E98,ChoiceMenu_ReloadFromScript,thumb,low,src-alias,"script-driven handler that, while a menu is already active (gUnk_0200002C set), re-reads window/stringBase/selected from script keywords and relays ou"
 08006F00,Trigger_RunScript,thumb,low,src-alias,

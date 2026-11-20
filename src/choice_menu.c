@@ -1,7 +1,5 @@
 #include "choice_menu.h"
 #include "input.h"
-/* ChoiceMenu_Create: non-script constructor (already aliased via #define in choice_menu.c) that creates the task, installs ChoiceMenu_Update/ChoiceMenu_Destroy as callback */
-#define ChoiceMenu_Create sub_08006CD0
 
 struct Args {
     u32 count : 16;
@@ -424,8 +422,6 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
         Sound_PlaySong(263);
     return 0;
 }
-
-#define ChoiceMenu_Create sub_08006CD0
 
 struct ChoiceMenu *ChoiceMenu_Create(void *window, s32 stringBase, void *callback, s32 *options)
 {
