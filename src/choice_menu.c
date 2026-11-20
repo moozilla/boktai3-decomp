@@ -492,16 +492,9 @@ struct ChoiceMenu *ChoiceMenu_CreateFromScript(void)
                 base[argument] = 0;
         }
     } else {
-        s32 *arg, *begin;
-        s32 zero;
         base = arguments;
-        begin = base;
-        zero = 0;
-        arg = arguments + 3;
-        do {
-            *arg = zero;
-            arg--;
-        } while ((s32)arg >= (s32)begin);
+        for (i = 0; i < 4; i++)
+            arguments[i] = 0;
     }
     p = Task_Create(11, 0x1E8);
     if (p) {
