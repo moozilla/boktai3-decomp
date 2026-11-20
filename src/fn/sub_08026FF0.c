@@ -17,7 +17,7 @@ static inline int f08026FF0_choose(u32 mode, int normal, int alternate)
 }
 
 /* Update the reaction sway and restore the directional state when it completes. */
-void sub_08026FF0(struct StateActor *base, int time)
+void Vampire_UpdateSwayReaction(struct StateActor *base, int time)
 {
     struct StateActor *p = base;
     u8 *position = (u8 *)p + 0x48;

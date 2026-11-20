@@ -915,6 +915,7 @@ addr,name,mode,confidence,source,notes
 08026C38,SceneActors_UpdateTravelProjectileAttack,thumb,low,src-alias,Plays an attack animation and repeatedly launches steering travel actors toward the requested angle
 08026DE0,SceneActors_UpdateShrinkingReaction,thumb,low,src-alias,Reaction callback that selects directional graphics and reduces both scale bounds toward zero
 08026EB4,SceneActors_UpdateKnockbackReaction,thumb,low,src-alias,Reaction callback that reduces scale bounds and applies brief directional movement before finishing
+08026FF0,Vampire_UpdateSwayReaction,thumb,low,src-alias,Tentative: applies a timed hit sway and restores the directional callback
 080277B8,SceneActors_UpdateStationaryReaction,thumb,low,src-alias,Reaction callback that clears movement fields and resets scale bounds and variant
 08027824,SceneActors_UpdateDirectionalTurn,thumb,low,src-alias,Turns toward the saved angle in eight-unit steps while maintaining a directional animation
 0802797C,SceneActors_UpdateEightDirectionTurn,thumb,low,src-alias,Turns toward the saved angle while maintaining an eight-direction animation
