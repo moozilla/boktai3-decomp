@@ -179,19 +179,8 @@ void Player_UpdateTransitionAnimation(struct Player *player)
             break;
         case 3:
             Player_SetAnimation(player, 0x160, 0x40, 1);
-            {
-                u32 frame = player->tetherFrame;
-                s32 mask = 7;
-                s32 low;
-                /* Low three frame bits. */
-                low = ~(~frame | ~mask);
-                frame >>= 3;
-                {
-                    s32 threshold = mask - frame;
-                    if (low < threshold)
-                        Player_AddControlFlags(player, 5);
-                }
-            }
+            if ((player->tetherFrame & 7) < 7 - (player->tetherFrame >> 3))
+                Player_AddControlFlags(player, 5);
             if (++player->tetherFrame > 55) {
                 ActorSequence_Begin(player, 0, 1);
                 PlayerCue_CompleteAction(player);
@@ -199,19 +188,8 @@ void Player_UpdateTransitionAnimation(struct Player *player)
             break;
         case 4:
             Player_SetAnimation(player, 0x160, 0x40, 1);
-            {
-                u32 frame = player->tetherFrame;
-                s32 mask = 7;
-                s32 low;
-                /* Low three frame bits. */
-                low = ~(~frame | ~mask);
-                frame >>= 3;
-                {
-                    s32 threshold = mask - frame;
-                    if (low >= threshold)
-                        Player_AddControlFlags(player, 5);
-                }
-            }
+            if ((player->tetherFrame & 7) >= 7 - (player->tetherFrame >> 3))
+                Player_AddControlFlags(player, 5);
             if (++player->tetherFrame > 55) {
                 ActorSequence_Begin(player, 0, 0);
                 player->triggerAnimationCallback = PlayerCue_UpdateHidden;
