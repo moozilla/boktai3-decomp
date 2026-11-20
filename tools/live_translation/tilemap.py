@@ -55,7 +55,8 @@ class TileMap:
                         out[x0+x, y0+y] = (tile >> 12)*16 + nibble
         return image
 
-    def replace(self, index, original, rendered, *, private_layer=False, preserve_other_layers=False, limit=1024):
+    def replace(self, index, original, rendered, *, private_layer=False, preserve_other_layers=False,
+                limit=1024, fixed_tiles=(), recycle_unused=False):
         """Copy on write. A private HUD upload may reuse an exclusively edited slot."""
         w, h, _, grid = self.layers[index]
         if original.size != rendered.size or original.size != (w*16, h*16):
@@ -94,9 +95,16 @@ class TileMap:
                         if slot in demand:
                             demand[slot].add(self.tiles[slot])
         for slot, desired in demand.items():
-            if self.tiles[slot] not in desired:
+            if slot not in fixed_tiles and self.tiles[slot] not in desired:
                 self.tiles[slot] = min(desired)
-        tile_ids = {tile: i+self.tile_base for i,tile in enumerate(self.tiles)}
+        # A single-layer upload can borrow tiles belonging only to other map
+        # variants. Keep fixed native digit and animation slots at their IDs.
+        free = set()
+        if recycle_unused and private_layer and not preserve_other_layers:
+            visible = {(entry & 1023) - self.tile_base for m in grid for entry in self.metas[m]}
+            free = set(range(len(self.tiles))) - visible - set(fixed_tiles)
+        tile_ids = {tile: i+self.tile_base for i,tile in enumerate(self.tiles) if i not in free}
+        available = sorted(free)
         meta_ids = {m: i for i,m in enumerate(self.metas)}
         for i, mid in enumerate(grid):
             entries = list(self.metas[mid])
@@ -105,10 +113,15 @@ class TileMap:
                 if desired is None:
                     continue
                 if desired not in tile_ids:
-                    new_id = len(self.tiles) + self.tile_base
-                    if new_id >= limit:
-                        raise ValueError(f"Replacement exceeds the loader's {limit}-tile budget")
-                    self.tiles.append(desired)
+                    if available:
+                        slot = available.pop()
+                        new_id = slot + self.tile_base
+                        self.tiles[slot] = desired
+                    else:
+                        new_id = len(self.tiles) + self.tile_base
+                        if new_id >= limit:
+                            raise ValueError(f"Replacement exceeds the loader's {limit}-tile budget")
+                        self.tiles.append(desired)
                     tile_ids[desired] = new_id
                 entries[q] = (entry & ~1023) | tile_ids[desired]
             encoded = tuple(entries)
@@ -116,6 +129,24 @@ class TileMap:
                 meta_ids[encoded] = len(self.metas)
                 self.metas.append(encoded)
             grid[i] = meta_ids[encoded]
+
+    def pattern_sheet(self, bank):
+        """Native 16-column patterns also feed tiles assembled directly in C."""
+        im = Image.new("P", (128, ((len(self.tiles)+15)//16)*8), bank*16)
+        for i, tile in enumerate(self.tiles):
+            indices = bytes(bank*16+n for b in tile for n in (b & 15, b >> 4))
+            im.paste(Image.frombytes("P", (8, 8), indices), ((i%16)*8, (i//16)*8))
+        return im
+
+    def update_patterns(self, original, edited):
+        for i in range((original.height//8)*16):
+            x, y = (i%16)*8, (i//16)*8
+            box = x, y, x+8, y+8
+            pixels = edited.crop(box).tobytes()
+            if original.crop(box).tobytes() != pixels:
+                if i >= len(self.tiles):
+                    raise ValueError("Lettering extends beyond the native pattern table")
+                self.tiles[i] = bytes((a & 15) | ((b & 15) << 4) for a,b in zip(pixels[::2],pixels[1::2]))
 
     def pack(self):
         table = bytearray()
@@ -140,14 +171,14 @@ def palette(data):
     return [((v >> shift) & 31)*255//31 for v in values for shift in (0, 5, 10)]
 
 
-def text_mask(size, text, font_size, line_gap=3):
+def text_mask(size, text, font_size, style="sampled", line_gap=3):
     """Use the same line breaks and size for model feedback and encoded tiles."""
     from PIL import ImageDraw
-    from graphics import font
+    from graphics import font, serif
 
     width, height = size
     for pixels in range(font_size, min(6, font_size - 1), -1):
-        face = font(pixels)
+        face = serif(pixels) if style == "serif" else font(pixels)
         lines = []
         for paragraph in text.splitlines():
             row = ""
@@ -170,16 +201,24 @@ def text_mask(size, text, font_size, line_gap=3):
     for i, line in enumerate(lines):
         if line:
             pen.text((0, i * line_height), line, 255, font=face, anchor="lt")
+    if style in ("left", "right", "center", "serif") and mask.getbbox():
+        ink = mask.crop(mask.getbbox())
+        x = {"left": 0, "right": width-ink.width}.get(style, (width-ink.width)//2)
+        y = (height-ink.height)//2
+        mask = Image.new("L", size)
+        if style == "serif":
+            mask.paste(ink.point(lambda v: v//3), (x+1,y+2))
+        mask.paste(ink, (x,y), ink)
     return mask
 
 
-def typeset(image, box, colors, text, size):
+def typeset(image, box, colors, text, size, style="sampled"):
     """Preserve each original 4bpp tile's palette bank under the new glyphs."""
     from collections import Counter, defaultdict
 
     crop = image.crop(box)
     source = crop.tobytes()
-    mask = text_mask(crop.size, text, size)
+    mask = text_mask(crop.size, text, size, style)
     banks = defaultdict(Counter)
     for index in source:
         banks[index >> 4][index] += 1

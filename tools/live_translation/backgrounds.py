@@ -11,6 +11,11 @@ from vision import ArtIndex, png, write_cache
 import archive
 
 
+def lettering(choices):
+    return [(r["box"], word, r.get("font", min(15, r["box"][3]-r["box"][1])),
+             r.get("style", "sampled")) for r, word in choices]
+
+
 class MapTranslator:
     def __init__(self):
         self.specs = json.loads((HERE/"backgrounds.json").read_text())
@@ -105,10 +110,12 @@ class MapTranslator:
         request = resolver.resource_requests.get((0xC091, int(code, 16)))
         if request and request["frame"] <= frame:
             ctx["resource_request"] = request
-        ctx.update(archive="C091", layer=index, resource=code)
+        ctx.update(archive="C091", layer=index, resource=code, loader_mode="HUD" if hud else mode)
         if active_sets:
             ctx.update(pattern_archive="CEEF", tilesets=active_sets, verified_native_upload=True)
-        spec = self.specs.get(code, {}).get(str(index), {})
+        family = self.specs.get(code, {})
+        common = family.get("common", {})
+        spec = family.get(str(index), {})
         try:
             doc = TileMap(raw, patterns)
             if not 0 <= index < len(doc.layers):
@@ -118,7 +125,6 @@ class MapTranslator:
                 resolver.record(asset, event="large-map", width_px=w*16, height_px=h*16, frame=frame, **ctx)
                 return 0
             image = doc.render(index)
-            family = self.specs.get(code, {})
             palette_name = (spec.get("palette") or self.stage_colors.get(code) or
                             next((s["palette"] for s in family.values() if "palette" in s), None))
             if hud:
@@ -138,11 +144,21 @@ class MapTranslator:
             variant = "-"+("+".join(active_sets)) if active_sets else ""
             stem = f"MP-{code}-{index}{variant}-{palette_name.replace(' ', '-')}"
             path = gallery / (stem+"-ja.png")
-            selected = self.index.translate(resolver, game, asset, image, ctx, path, spec.get("regions", []), frame)
-            choices = [(r["box"], word, r.get("font") or min(15,r["box"][3]-r["box"][1])) for r,word in selected]
-            if not choices:
+            regions = spec.get("regions", []) + common.get("regions", [])
+            choices = lettering(self.index.translate(resolver, game, asset, image, ctx, path, regions, frame))
+            patterns_to_edit = []
+            if common.get("pattern_regions"):
+                sheet = doc.pattern_sheet(common["pattern_bank"])
+                sheet.putpalette(colors)
+                sheet_ctx = dict(ctx, width_px=sheet.width, height_px=sheet.height,
+                                 consumer="native tile indices", columns_of_tiles=16)
+                sheet_path = gallery / f"MP-{code}-patterns-{palette_name}-ja.png"
+                patterns_to_edit = lettering(self.index.translate(
+                    resolver, game, f"patterns/{code}", sheet, sheet_ctx, sheet_path, common["pattern_regions"], frame))
+            if not choices and not patterns_to_edit:
                 return 0
-            cache_key = [6, active_sets, ctx["rom_sha256"], asset, palette_name, colors, choices, hud, mode if not hud else None]
+            cache_key = [8, active_sets, ctx["rom_sha256"], asset, palette_name, colors, choices,
+                         patterns_to_edit, hud, mode if not hud else None]
             digest = sha256(json.dumps(cache_key).encode()).hexdigest()
             cache = OUT / "compiled" / (digest + ".mp")
             if cache.exists():
@@ -150,15 +166,24 @@ class MapTranslator:
                 event = "tile-cache"
             else:
                 edited = image.copy()
-                for box, word, height in choices:
-                    typeset(edited, box, colors, word, height)
+                for box, word, height, style in choices:
+                    typeset(edited, box, colors, word, height, style)
                 # The HUD's native font cache starts just after its first 256
                 # tiles. The private resource is used for this single selection.
                 limit = 256 if hud or mode in (0, 6) else 1024
                 if external:
                     limit = doc.tile_base + len(doc.tiles)
-                doc.replace(index, image, edited, private_layer=hud or external,
-                            preserve_other_layers=external, limit=limit)
+                fixed = {i for start, end in common.get("fixed_tiles", []) for i in range(start, end)}
+                single = bool(fixed and mode == 0 and not hud)
+                if single:
+                    limit = len(doc.tiles) + doc.tile_base
+                doc.replace(index, image, edited, private_layer=hud or external or single,
+                            preserve_other_layers=external, limit=limit, fixed_tiles=fixed, recycle_unused=single)
+                if patterns_to_edit:
+                    result = sheet.copy()
+                    for box, word, height, style in patterns_to_edit:
+                        typeset(result, box, colors, word, height, style)
+                    doc.update_patterns(sheet, result)
                 compiled = doc.pack()
                 write_cache(cache, compiled)
                 write_cache(gallery / (stem+"-en.png"), png(edited))

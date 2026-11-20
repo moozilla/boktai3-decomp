@@ -11,6 +11,24 @@ CONTROLS = re.compile(r"<[^>\n]*>|\\x[0-9a-fA-F]{2}|\{[0-9a-fA-F]{4}\}")
 PROVIDER = "Codex, authored offline"
 
 
+def place_name(source, glossary, columns):
+    """Compose a file-menu location from its proper name, wing and floor."""
+    match = re.fullmatch(r"([^\x00-\x7f]+)([A-Z]?) +\[(B?\d+F?)(?: +([^]]+))?\]", source)
+    if not match:
+        return None
+    area, wing, floor, section = match.groups()
+    if area not in glossary or (section and section not in glossary):
+        return None
+    place = glossary[area] + (" " + wing if wing else "")
+    floor_tag = f"[{floor}]"
+    if section:
+        full = f"{place}, {glossary[section]} {floor_tag}"
+        if len(full) <= columns:
+            return full
+        place = glossary[section]
+    return f"{place} {floor_tag}"
+
+
 def fit(source, english, ctx):
     if not isinstance(english, str) or not english.strip():
         raise ValueError("Translation is empty")
@@ -22,7 +40,7 @@ def fit(source, english, ctx):
         if ctx.get("archive") == "C091":
             from tilemap import text_mask
             text_mask((ctx["width_px"], ctx["height_px"]), english,
-                      ctx.get("font_px", min(15, ctx["height_px"])))
+                      ctx.get("font_px", min(15, ctx["height_px"])), ctx.get("typography", "sampled"))
         elif "width_px" in ctx:
             from graphics import check_letter_width
             width = ctx["width_px"]
@@ -56,6 +74,15 @@ def fit(source, english, ctx):
 
     lines = []
     for paragraph in english.split("\n"):
+        # Choice coordinates come from the marker positions in the rendered
+        # line. Lay out adjacent alternatives across the native row.
+        choices = re.findall(r"<ALTER>.*?</ALTER>", paragraph)
+        if len(choices) > 1 and not re.sub(r"<ALTER>.*?</ALTER>", "", paragraph).strip():
+            column = limit // len(choices)
+            if any(width(option) >= column for option in choices[:-1]) or width(choices[-1]) > limit-column*(len(choices)-1):
+                raise ValueError("A choice is too wide for its menu column")
+            lines.append("".join(option + " "*(column-width(option)) for option in choices[:-1]) + choices[-1])
+            continue
         line = ""
         for word in paragraph.split():
             if width(word) > limit:
@@ -265,6 +292,8 @@ class Memory:
             english, origin = self.answers[key], PROVIDER
         elif source.strip() in glossary:
             english, origin = glossary[source.strip()], "glossary"
+        elif (location := place_name(source, glossary, ctx.get("columns", 30))):
+            english, origin = location, "glossary, location and floor"
         elif self.model:
             english, terms = self.ask_model(key, source, ctx, glossary, crop)
             origin = self.model.model

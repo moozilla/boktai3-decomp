@@ -24,6 +24,8 @@ ROWS = {
     "08-puppeteer": "Sabata's dream / new game",
     "09-title-card": "Prologue title card",
     "10-tree": "Ancient Tree / first visit",
+    "11-location": "Lifeless Town / native entrance card and live sun clock",
+    "12-ending": "Final conversation / the warrior of legend",
 }
 
 
@@ -158,6 +160,30 @@ def prologue(game, directory):
     raise RuntimeError(f"Prologue did not reach {sorted(wanted)}")
 
 
+def location(game, directory):
+    # The native card waits for confirm. Keep the last boot-route A press
+    # until after its scanline reveal and palette fade have finished.
+    for frames, key in BOOT[:-1]:
+        game.step(frames)
+        game.tap(key)
+    game.step(250)
+    capture(game, directory, "11-location")
+
+
+def ending(game, directory):
+    for frames, key in BOOT:
+        game.step(frames)
+        game.tap(key)
+    for _ in range(18):
+        game.step(160)
+        if game.resolver.dialogue_id == 8439:
+            game.step(185)
+            capture(game, directory, "12-ending")
+            return
+        game.tap("A")
+    raise RuntimeError("Final conversation did not display the Solar Clan line")
+
+
 def title_correction(memory, directory, transcript, save):
     private = Memory(":memory:")
     memory.db.backup(private.db)
@@ -240,7 +266,8 @@ def run(memory):
     directory.mkdir(exist_ok=True)
     opening_save = prison_save()
     routes = [(prison, opening_save), (inventory, saves.TEMPLATE), (prologue, None),
-              (tree, checkpoint(19, 3363, 66, 2))]
+              (tree, checkpoint(19, 3363, 66, 2)), (location, checkpoint(9, 2961, 32, 2)),
+              (ending, checkpoint(85, 6612, 192, 58))]
     inputs = {"cartridge": Path(baserom_path())}
     inputs.update({route.__name__ + "_save": Path(save) for route, save in routes if save})
     def input_hashes():
@@ -267,7 +294,8 @@ def run(memory):
         raise RuntimeError("The cartridge or an input save changed during the proof")
     events = [json.loads(line) for line in (directory / "transcript.jsonl").read_text().splitlines()]
     keys = {e["key"] for e in events if e["run"] == "english" and e.get("english")}
-    required = {"background/52AE/2/body", "graphic/731D/1", "graphic/530D/138", "text/5599", "text/5601", "text/1009", "text/1064", "text/5492", "text/2171", "text/6105", "graphic/530D/131/swap"}
+    required = {"background/52AE/2/body", "graphic/731D/1", "graphic/530D/138", "text/5599", "text/5601", "text/1009", "text/1064", "text/5492", "text/2171", "text/6105", "graphic/530D/131/swap", "background/5AF3/1/name", "patterns/5AF3/rise",
+                "text/8439"}
     if required - keys:
         raise RuntimeError(f"Missing proof encounters {sorted(required-keys)}")
     for key in ROWS:

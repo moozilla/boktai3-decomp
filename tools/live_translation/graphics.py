@@ -29,6 +29,16 @@ def font(size, heavy=False):
     return ImageFont.load_default(size=size)
 
 
+@lru_cache(maxsize=24)
+def serif(size):
+    for name in ("Georgia Bold.ttf", "DejaVuSerif-Bold.ttf", "Times New Roman Bold.ttf"):
+        try:
+            return ImageFont.truetype(name, size)
+        except OSError:
+            continue
+    return font(size, heavy=True)
+
+
 def check_letter_width(text, width):
     if "\n" in text:
         raise ValueError("Use one line for this sprite label")
