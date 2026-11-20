@@ -8,7 +8,7 @@ struct P {
 };
 s32 ResultMenu_IsPhaseStart(void);
 u8 ResultMenu_ConfigureLayers(u32, u32);
-void sub_0801BD44(struct P *);
+void ResultGame_InitializeDisplay(struct P *);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
 void PlayerCue_BeginModeSeven(u32, u32);
 void ResultMenu_SetPhase(struct P *, void (*)(void));
@@ -19,7 +19,7 @@ void ResultMenu_UpdateIntro(struct P *p)
         u32 z;
         p->bb7 = ResultMenu_ConfigureLayers(0xe, 0);
         z = 0;
-        sub_0801BD44(p);
+        ResultGame_InitializeDisplay(p);
         ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, z);
         PlayerCue_BeginModeSeven((*(u32 *)gPlayers), 0);
     }

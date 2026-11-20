@@ -18,7 +18,7 @@ void MessageWindow_SetMessageTable(void *);
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_SetPalette(int);
 void MessageWindow_SetDisplayMode(int);
-void sub_0801BD44(void *);
+void ResultGame_InitializeDisplay(void *);
 void ResultMenu_SetPhase(void *, void *);
 void sub_0801C24C(void *);
 void *Script_GetTextSourcePc(void);
@@ -720,7 +720,7 @@ void ResultTutorial_Open(struct ResultMenu *tutorial)
             MessageWindow_SetBounds(1, 1, 30, 6);
             MessageWindow_SetPalette(0x81b);
             MessageWindow_SetDisplayMode(1);
-            sub_0801BD44(tutorial);
+            ResultGame_InitializeDisplay(tutorial);
             MessageWindow_ShowMessage(tutorial->prompt);
             ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xffff, 0);
             ++tutorial->phase;

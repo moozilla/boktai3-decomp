@@ -658,6 +658,7 @@ addr,name,mode,confidence,source,notes
 0801BAA8,Transformation_Reveal,thumb,low,src-alias,
 0801BC54,Transformation_Finish,thumb,low,src-alias,
 0801BCA8,ResultMenu_CreateGraphics,thumb,low,src-alias,
+0801BD44,ResultGame_InitializeDisplay,thumb,low,src-alias,Initializes result-game widgets; marker sprites; timer; and target range; also used by the tutorial.
 0801C064,ResultMenu_EnqueueMarker,thumb,low,src-alias,
 0801C0C8,ResultMenu_UpdateMarkers,thumb,low,src-alias,
 0801C154,ResultGame_ShowPressMarker,thumb,low,src-alias,Captures the final press height into the press marker object then clears its hidden flag to reveal it; called at the end of ResultGame_HandlePress
