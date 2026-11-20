@@ -1,43 +1,37 @@
 #define gActorLayeredMidRestoreAnimations gUnk_0824EE20
-#include "global.h"
-struct ActorAnimationLayer {
-    u16 unknown[3];
-    u16 flags;
-};
-struct ActorRenderFlags {
-    u32 unknown, flags;
-};
+#include "scene_combat_actor.h"
 extern const u32 gActorLayeredMidRestoreAnimations[];
-void Armor_SetAnimationFromStart(u32, u32);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Armor_StartPaletteRestoreDelay(void *);
-void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
+void ActorController_UpdateLayeredMidWithRestoreDelay(struct SceneCombatActor *actor)
 {
-    u8 *s = p + 0xb40;
+    u8 *p = (void *)actor;
+    u8 *s = &actor->actionPhase;
     u32 st = *s;
     switch (st) {
         case 0: {
             u32 four = 4;
             u32 zero;
             u16 *c4;
-            st = ((p[0xb39] + 0x60) >> 6) & 3;
-            Armor_SetAnimationFromStart((u32)p, (u32)&gActorLayeredMidRestoreAnimations[st]);
+            st = ((actor->heading + 0x60) >> 6) & 3;
+            Armor_SetAnimationFromStart(actor, &gActorLayeredMidRestoreAnimations[st]);
             c4 = (u16 *)(p + 0xc4);
             zero = 0;
             *c4 = 0x10;
             (*s)++;
-            p[0xb41] = zero;
+            actor->actionReady = zero;
             *(u16 *)(p + 0xb32) |= 2;
-            ((struct ActorAnimationLayer *)(p + 0x238))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x1e4))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x28c))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x238))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x1e4))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x28c))->flags &= ~four;
             {
-                struct ActorAnimationLayer *l = (struct ActorAnimationLayer *)(p + 0x190);
+                struct ContactCollider *l = (struct ContactCollider *)(p + 0x190);
                 u16 f = l->flags;
                 f |= four;
                 l->flags = f;
             }
             {
-                struct ActorRenderFlags *render = (void *)(p + 0x180);
+                struct ActorControllerMotion *render = (void *)(p + 0x180);
                 u32 one = 1;
                 render->flags &= ~one;
             }
@@ -46,9 +40,9 @@ void ActorController_UpdateLayeredMidWithRestoreDelay(u8 *p)
             break;
         }
         case 1:
-            if (p[0xb43]) {
+            if (actor->animationComplete) {
                 *s = 0xff;
-                p[0xb41] = st;
+                actor->actionReady = st;
             }
             break;
     }
