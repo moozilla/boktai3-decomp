@@ -3,6 +3,8 @@
 
 #include "engine.h"
 #include "scene_input_widget.h"
+#include "scene_value_equipment.h"
+#include "scene_vec.h"
 #include "sprite_oam.h"
 
 /* The result game and its tutorial share the same task and display objects.
@@ -13,8 +15,8 @@ struct ResultMarkerFeedback {
 
 struct ResultMenu {
     struct Task task;
-    struct ContactPosition cameraPosition, initialCameraPosition;
-    struct ContactPosition revealStart, revealEnd;
+    struct SceneVec cameraPosition, initialCameraPosition;
+    struct SceneVec revealStart, revealEnd;
     u8 phaseStart;
     u8 unknown39[3];
     u32 phaseFrame;
@@ -25,7 +27,7 @@ struct ResultMenu {
     s32 level;
     u8 unknown54[0x20];
     void *messageTable, *owner;
-    u8 unknown7C[0x10];
+    struct SceneValueEquipment transformationResult;
     s32 playerPosition, playerVelocity;
     s32 targetMinimum, targetMaximum, targetPosition;
     u16 trackingScore, trackingSamples, pressScoreTotal, pressSamples;
