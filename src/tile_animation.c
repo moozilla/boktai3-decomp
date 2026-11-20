@@ -1,4 +1,5 @@
 #include "tile_animation.h"
+#include "interrupts_video.h"
 
 struct TileAnimation *TileAnimation_GetTask(void)
 {
@@ -100,16 +101,16 @@ void TileAnimation_Upload(void)
         channel = animation->channels;
         {
             void **tiles = &animation->tiles;
-            volatile u32 *dma = (volatile u32 *)0x040000d4;
+            struct VideoDmaRegisters *dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3;
             index = 7;
             do {
                 if (channel->active && channel->dirty) {
                     u32 src = (u32)*tiles + channel->source[channel->frame] * 32;
-                    u32 dst = 0x06000000 + channel->destination[channel->frame] * 32;
-                    dma[0] = src;
-                    dma[1] = dst;
-                    dma[2] = (channel->tileCount * 8) | 0x84000000;
-                    dma[2];
+                    u32 dst = VRAM + channel->destination[channel->frame] * 32;
+                    dma->source = src;
+                    dma->destination = dst;
+                    dma->control = (channel->tileCount * 8) | ((u32)(DMA_ENABLE | DMA_32BIT) << 16);
+                    dma->control;
                     channel->dirty = 0;
                 }
                 index--;
