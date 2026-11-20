@@ -20,36 +20,35 @@ static inline s32 ActorPosition_ScaleOffset(s32 v)
 
 void ActorMovement_FindQuarterTurnPoint(struct ActorState *actor, struct ContactPosition *out)
 {
-    union ActorPositionVector point;
+    struct ContactPosition point;
     struct ContactPosition *center = actor->selectedPoint;
     u32 start = actor->body.direction;
     s32 quarterTurn = 0;
     u32 mask = 255;
     u32 speed = 128;
-    s16 *coordinates = point.components;
+    struct ContactPosition *coordinates = &point;
     const s16 *sine = gUnk_086149C4;
     do {
         u32 angle = (start + (quarterTurn << 6)) & mask;
         {
             s32 x = ActorPosition_ScaleOffset(gUnk_086149C4[(angle + 64) & mask] * 128);
-            s32 zero = 0;
-            coordinates[0] = x;
-            coordinates[1] = zero;
+            coordinates->x = x;
+            coordinates->y = 0;
         }
         {
             s32 sample = sine[angle & mask];
             s32 z = ActorPosition_ScaleOffset((s32)(speed * sample));
-            coordinates[2] = z;
+            coordinates->z = z;
             {
                 u32 x = (u16)center->x;
-                u32 dx = (u16)coordinates[0];
-                coordinates[0] = x + dx;
+                u32 dx = (u16)coordinates->x;
+                coordinates->x = x + dx;
             }
-            coordinates[1] = (u16)coordinates[1] + (u16)center->y;
-            coordinates[2] += center->z;
+            coordinates->y = (u16)coordinates->y + (u16)center->y;
+            coordinates->z += center->z;
         }
-        if (ActorPosition_TestPath(actor, &point.position)) {
-            *out = point.position;
+        if (ActorPosition_TestPath(actor, &point)) {
+            *out = point;
             return;
         }
         quarterTurn++;
