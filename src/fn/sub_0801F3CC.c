@@ -7,7 +7,7 @@ void SceneObject_BeginLowering(struct SceneObjSlot *s)
     s->b3a = 0;
     s->block->w6 |= 2;
     s->block->w6 |= 3;
-    s->variant = 3;
+    s->variant = SceneObjSlot_LiftMotionVariant(SCENE_OBJ_LIFT_LOWERED);
     s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
     s->block->flags &= ~1;
     s->callback = SceneObject_UpdateLowering;
