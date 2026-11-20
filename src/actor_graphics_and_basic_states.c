@@ -1157,33 +1157,25 @@ static inline u8 TakeFlag(struct StateActor *p)
     return FALSE;
 }
 
+static inline void SceneActorState_SetAnimation(struct StateActor *actor, u32 animation)
+{
+    actor->actionAnimation = animation;
+}
+
 void SceneActorState_AdvanceToState1A(struct StateActor *p)
 {
     if (TakeFlag(p)) {
-        u32 v = 0x1a;
-        p->actionAnimation = v;
+        SceneActorState_SetAnimation(p, 0x1a);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;
 }
 
-static inline u8 chk_08023638(struct StateActor *p)
-{
-    u8 *q = &p->actionEnter;
-    if (*q) {
-        *q = 0;
-        q--;
-        *q = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorState_AdvanceToState01(struct StateActor *p)
 {
-    u8 r = chk_08023638(p);
-    if (r == 1) {
-        p->actionAnimation = r;
+    u8 entered = TakeFlag(p);
+    if (entered == TRUE) {
+        p->actionAnimation = entered;
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;
@@ -1192,318 +1184,125 @@ void SceneActorState_AdvanceToState01(struct StateActor *p)
 void SceneActorState_AdvanceToState02(struct StateActor *p)
 {
     if (TakeFlag(p)) {
-        u32 v = 2;
-        p->actionAnimation = v;
+        SceneActorState_SetAnimation(p, 2);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;
 }
 
-static inline u8 chk_080236C0(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorState_Acknowledge(struct StateActor *p)
 {
-    if (chk_080236C0(p)) {
-        u32 k = 3;
-        p->actionAnimation = k;
+    if (TakeFlag(p)) {
+        SceneActorState_SetAnimation(p, 3);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
-}
-
-static inline u8 chk_08023720(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
 }
 
 void SceneActorState_AdvanceToState1B(struct StateActor *p)
 {
-    if (chk_08023720(p)) {
-        u32 k = 0x1b;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x1b);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
-}
-
-static inline u8 chk_08023770(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
 }
 
 void SceneActorState_AdvanceToState1C(struct StateActor *p)
 {
-    if (chk_08023770(p)) {
-        u32 k = 0x1C;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x1C);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
 }
 
-/* Raw offsets throughout the recovery block below (actionMode 0xAC,
- * actionIndex 0xAD, actionPhase 0xAE, actionTimer 0xC4, actionFinished 0xAF):
- * struct-field writes for that cluster pick a different (still correct, but
- * non-matching) register for the last store. */
-
-struct S_080237C0 {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
-
-static inline u8 chk_080237C0(struct S_080237C0 *p)
+void SceneActorState_Resume(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
+    if (TakeFlag(p)) {
+        SceneActorState_SetAnimation(p, 0x1d);
+        Trigger_ConsumePending(p->receiver2, 1);
     }
-    return 0;
-}
-
-void SceneActorState_Resume(struct S_080237C0 *p)
-{
-    if (chk_080237C0(p)) {
-        u32 k = 0x1d;
-        p->aa = k;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
-    }
-    if (p->af) {
-        u32 two = 2;
-        u32 z = 0;
-        u32 one = 1;
-        p->ac = two;
-        p->ad = z;
-        p->ae = one;
-        p->c4 = z;
-        p->b0 = one;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (p->actionFinished) {
+        SceneActorState_StartAction(p, 2, 0, 1);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
+        p->actionTimer++;
 }
 
-/* Raw offsets in the recovery block: see SceneActorState_Resume for why. */
-
-struct S_0802383C {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
-
-static inline u8 chk_0802383C(struct S_0802383C *p)
+void SceneActorState_AdvanceToState1E(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_AdvanceToState1E(struct S_0802383C *p)
-{
-    if (chk_0802383C(p)) {
-        u32 k = 0x1e;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 two = 2;
-        u32 z = 0;
-        p->ac = two;
-        p->ad = z;
-        p->ae = z;
-        p->c4 = z;
-        p->b0 = 1;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x1e);
+    if (p->actionFinished) {
+        SceneActorState_StartAction(p, 2, 0, 0);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
-}
-
-static inline u8 chk_080238A8(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
+        p->actionTimer++;
 }
 
 void SceneActorState_AdvanceToState23(struct StateActor *p)
 {
-    if (chk_080238A8(p)) {
-        u32 k = 0x23;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x23);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
-}
-
-static inline u8 chk_080238F8(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
 }
 
 void SceneActorState_AdvanceToState24(struct StateActor *p)
 {
-    if (chk_080238F8(p)) {
-        u32 k = 0x24;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x24);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
 }
 
-/* Raw offsets: see SceneActorState_Resume for why the triplet write needs this shape. */
-
-struct S_08023948 {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1[4];
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-    u8 padC8[0x2cc];
-    u8 particle;
-};
-
-static inline u8 chk_08023948(struct S_08023948 *p)
+void SceneActorState_AdvanceToState06(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
+    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
+    if (TakeFlag(p)) {
+        SceneActorState_SetAnimation(p, 6);
+        graphicsActor->graphics.particleFlag = 0;
     }
-    return 0;
-}
-
-void SceneActorState_AdvanceToState06(struct S_08023948 *arg)
-{
-    struct S_08023948 *p = arg;
-    struct S_08023948 *base = p;
-    if (chk_08023948(p)) {
-        u32 k = 6;
-        u8 *state = &p->aa;
-        u32 zero;
-        zero = 0;
-        *state = k;
-        base->particle = zero;
-    }
-    if (p->af)
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (p->actionFinished)
+        Trigger_ConsumePending(p->receiver2, 1);
     else
-        p->c4++;
-}
-
-static inline u8 chk_080239A8(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
+        p->actionTimer++;
 }
 
 void SceneActorState_AdvanceToState20(struct StateActor *p)
 {
-    if (chk_080239A8(p)) {
-        u32 k = 0x20;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x20);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
-}
-
-static inline u8 chk_080239F8(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
 }
 
 void SceneActorState_AdvanceToState21(struct StateActor *p)
 {
-    if (chk_080239F8(p)) {
-        u32 k = 0x21;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x21);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
 }
 
-static inline u8 chk(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorState_Hold(struct StateActor *p)
 {
-    if (chk(p)) {
-        u32 k = 0x22;
-        p->actionAnimation = k;
+    if (TakeFlag(p)) {
+        SceneActorState_SetAnimation(p, 0x22);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     if (!p->actionFinished)
@@ -1512,10 +1311,8 @@ void SceneActorState_Hold(struct StateActor *p)
 
 void SceneActorState_PlayAnimation17AndConsumeTrigger(struct StateActor *p)
 {
-    if (chk(p)) {
-        u32 k = 0x11;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x11);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
@@ -1524,176 +1321,70 @@ void SceneActorState_PlayAnimation17AndConsumeTrigger(struct StateActor *p)
 
 void SceneActorState_PlayAnimation19AndConsumeTrigger(struct StateActor *p)
 {
-    if (chk(p)) {
-        u32 k = 0x13;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x13);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
 }
 
-/* Raw offsets: see SceneActorState_Resume. */
-
-struct S_08023B38 {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
-
-static inline u8 chk_08023B38(struct S_08023B38 *p)
+void SceneActorState_PlayAnimation14ThenAdvance(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayAnimation14ThenAdvance(struct S_08023B38 *p)
-{
-    if (chk_08023B38(p)) {
-        u32 k = 0xe;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 next = 0x11;
-        u32 z;
-        p->ae = next;
-        z = 0;
-        p->c4 = z;
-        p->b0 = 1;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0xe);
+    if (p->actionFinished) {
+        SceneActorState_EnterPhase(p, 0x11);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
+        p->actionTimer++;
 }
 
 void SceneActorState_PlayAnimation15AndConsumeTrigger(struct StateActor *p)
 {
     if (TakeFlag(p)) {
-        u32 v = 0xf;
-        p->actionAnimation = v;
+        SceneActorState_SetAnimation(p, 0xf);
         Trigger_ConsumePending(p->receiver2, 1);
     }
     p->actionTimer++;
 }
 
-/* Raw offsets: see SceneActorState_Resume. */
-
-struct S_08023BE4 {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
-
-static inline u8 chk_08023BE4(struct S_08023BE4 *p)
+void SceneActorState_ResumeAfterAction(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_ResumeAfterAction(struct S_08023BE4 *p)
-{
-    if (chk_08023BE4(p)) {
-        u32 k = 0x10;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 two = 2;
-        u32 z = 0;
-        u32 one = 1;
-        p->ac = two;
-        p->ad = z;
-        p->ae = one;
-        p->c4 = z;
-        p->b0 = one;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x10);
+    if (p->actionFinished) {
+        SceneActorState_StartAction(p, 2, 0, 1);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
+        p->actionTimer++;
 }
 
 void SceneActorState_PlayAnimation31AndConsumeTrigger(struct StateActor *p)
 {
-    if (chk(p)) {
-        u32 k = 0x1F;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x1F);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
         p->actionTimer++;
 }
 
-/* Raw offsets: see SceneActorState_Resume. */
-
-struct S_08023CA0 {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
-
-static inline u8 chk_08023CA0(struct S_08023CA0 *p)
+void SceneActorState_PlayAnimation37ThenResume(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayAnimation37ThenResume(struct S_08023CA0 *p)
-{
-    if (chk_08023CA0(p)) {
-        u32 k = 0x25;
-        p->aa = k;
-    }
-    if (p->af) {
-        u32 two = 2;
-        u32 z = 0;
-        p->ac = two;
-        p->ad = z;
-        p->ae = z;
-        p->c4 = z;
-        p->b0 = 1;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x25);
+    if (p->actionFinished) {
+        SceneActorState_StartAction(p, 2, 0, 0);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
+        p->actionTimer++;
 }
 
 void SceneActorState_PlayAnimation39AndConsumeTrigger(struct StateActor *p)
 {
-    if (chk(p)) {
-        u32 k = 0x27;
-        p->actionAnimation = k;
-    }
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 0x27);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
     else
