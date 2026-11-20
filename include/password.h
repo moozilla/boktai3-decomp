@@ -16,6 +16,12 @@ struct PasswordEntry {
     int key;
 };
 
+#define PASSWORD_REQUIRE(condition, onFailure) \
+    do { \
+        if (!(condition)) \
+            onFailure; \
+    } while (0)
+
 int Text_CopyWithoutTags(u8 *dst, u8 *src, int limit);
 s32 GlyphTable_FindPair(u8 *p, u32 a, u32 b);
 s32 Password_EncodeSymbols(struct PasswordEntry *e);

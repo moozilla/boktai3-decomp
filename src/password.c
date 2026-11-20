@@ -147,26 +147,26 @@ void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
 
 s32 Password_DecodeEntry(u8 *src, s32 tableRef, s32 script, u8 *output)
 {
-    struct PasswordEntry *e = Heap_Alloc(0x90);
+    struct PasswordEntry *e = Heap_Alloc(sizeof(*e));
     s32 result;
-    if (!e)
-        return -1;
-    Memory_Clear(e, 0x90);
+    if (e)
+        goto initialize;
+    return -1;
+invalidLength:
+    result = -1;
+    goto release;
+initialize:
+    Memory_Clear(e, sizeof(*e));
     e->table = Text_LookupString(Script_ParseStringRef((void *)tableRef));
     e->script = script;
-    do {
-        if (Text_CopyWithoutTags(e->text, src, 0x30) != 0x30) {
-            result = -1;
-            break;
-        }
-        result = Password_EncodeSymbols(e);
-        if (result < 0)
-            break;
-        result = NameEntry_DecodeAndValidate(e);
-        if (result < 0)
-            break;
-        Password_ApplyDecoded(e, output);
-    } while (0);
+    PASSWORD_REQUIRE(Text_CopyWithoutTags(e->text, src, sizeof(e->text)) == sizeof(e->text),
+                     goto invalidLength);
+    result = Password_EncodeSymbols(e);
+    PASSWORD_REQUIRE(result >= 0, goto release);
+    result = NameEntry_DecodeAndValidate(e);
+    PASSWORD_REQUIRE(result >= 0, goto release);
+    Password_ApplyDecoded(e, output);
+release:
     Heap_Free(e);
     return result;
 }
@@ -175,19 +175,14 @@ void Password_DecodeWordList(void)
 {
     u8 *a, *b, *c;
     s32 i;
-    if (!Script_SeekToKeyword(0x63))
-        return;
+    PASSWORD_REQUIRE(Script_SeekToKeyword('c'), return);
     a = Script_GetPc();
-    if (!Script_SeekToKeyword(0x6e))
-        return;
+    PASSWORD_REQUIRE(Script_SeekToKeyword('n'), return);
     b = Script_GetPc();
-    if (b == 0)
-        return;
-    if (!Script_SeekToKeyword(0x64))
-        return;
+    PASSWORD_REQUIRE(b != 0, return);
+    PASSWORD_REQUIRE(Script_SeekToKeyword('d'), return);
     c = Script_GetPc();
-    if (c == 0)
-        return;
+    PASSWORD_REQUIRE(c != 0, return);
     i = 0;
     do {
         u8 *r = Text_LookupString(Script_ParseStringRef(c) + i);
