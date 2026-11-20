@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[3]
 AGBCC = ROOT / "build/tools/agbcc/agbcc"
 TOKEN = re.compile(r"([A-Za-z_]\w*)((?:\[[0-9]{1,4}\]){0,3})", re.ASCII)
 OPERATOR = re.compile(r"->|\.")
+# The symbol is declared as a byte pointer because different game routines
+# overlay it. Observe named members through its existing persistent-header type.
+TYPED_VIEWS = {"gSessionState": ("session_save.h", "struct SessionSave *")}
 WORD = re.compile(r"^\s*\.word\s+(-?(?:0x[\da-fA-F]+|\d+))\s*$", re.M)
 
 
@@ -60,9 +63,9 @@ def parse(path):
         operator, pos = separator[0], separator.end()
 
 
-def layout_request(parts, header):
+def layout_request(parts, header, typed_view=None):
     """For each ->, measure where to read the next pointer from the current base."""
-    root = parts[0][1]
+    root = "experiment_typed_root" if typed_view else parts[0][1]
     actual = root
     based = f"(*(typeof(&{root}))0)"
     offsets, indices = [], []
@@ -87,7 +90,10 @@ def layout_request(parts, header):
     guard = f"(((typeof({actual}))0) | 0)"
     signed = f"((typeof({actual}))-1) < ((typeof({actual}))0)"
     exprs = offsets + [width, guard, signed] + [bound for _, bound in indices]
-    source = f'#include "global.h"\n#include "{header}"\nconst unsigned experiment_layout[] = {{\n'
+    source = f'#include "global.h"\n#include "{header}"\n'
+    if typed_view:
+        source += f"extern {typed_view}experiment_typed_root;\n"
+    source += "const unsigned experiment_layout[] = {\n"
     source += ",\n".join(exprs) + "\n};\n"
     return source, len(offsets), indices
 
@@ -127,7 +133,10 @@ def measure(path):
     header = symbol["header"].removeprefix("include/")
     if not re.fullmatch(r"[\w/.-]+\.h", header) or ".." in header.split("/") or not (ROOT / "include" / header).is_file():
         raise ValueError(f"{root} has no shared type declaration")
-    source, depth, indices = layout_request(parts, header)
+    typed_view = None
+    if root in TYPED_VIEWS and len(parts) > 1 and not parts[0][2] and parts[1][0] == "->":
+        header, typed_view = TYPED_VIEWS[root]
+    source, depth, indices = layout_request(parts, header, typed_view)
     values = compile_layout(source, path)
     if len(values) != depth + 3 + len(indices):
         raise ValueError(f"{path!r} did not compile to a static field layout")

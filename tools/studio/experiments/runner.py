@@ -48,11 +48,14 @@ def public_path(path):
     return str(path).replace(str(ROOT), ".").replace(str(Path.home()), "~")
 
 
-EXAMPLES = {"pause": "Pause and movement", "pause-cause": "Change one pause field",
+EXAMPLES = {"recharge": "SUN bars and energy recharge", "pause": "Pause and movement", "pause-cause": "Change one pause field",
             "attack": "Tap or hold attack"}
 
 
 def sample_recipe(name="pause"):
+    if name == "recharge":
+        from .recharge import reference_example
+        return recipe.validate(reference_example())
     if name not in EXAMPLES:
         raise FileNotFoundError("Experiment example not found")
     return recipe.validate(read_json(HERE / f"{name}.json"))

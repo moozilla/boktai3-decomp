@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import centaur, fields, graphics, pixel_proof, recipe, runner, sweep
+from . import centaur, fields, graphics, pixel_proof, recipe, recharge, runner, sweep, tool_api
 
 
 def proof_branch(parent):
@@ -95,6 +95,9 @@ def main():
     cohort.add_argument("--trans", type=Path, help="Local translation checkout with story checkpoints")
     show = commands.add_parser("show", help="Read a completed run's JSON result")
     show.add_argument("id")
+    commands.add_parser("recharge-proof", help="Answer the SUN recharge question through the public tool API")
+    commands.add_parser("tool-spec", help="List local experiment tools and their input schemas")
+    commands.add_parser("tool-server", help="Read one JSON tool call per line and stream JSON replies")
     commands.add_parser("checkpoints", help="List available starting saves")
     measure = commands.add_parser("fields", help="Resolve scalar fields from the target headers")
     measure.add_argument("paths", nargs="+")
@@ -129,6 +132,13 @@ def main():
                 data = sweep.execute(spec, sweep.select(args.checkpoint, args.all_story, args.trans), args.trans)
             case "show":
                 data = runner.read_json(runner.run_dir(args.id) / "result.json")
+            case "recharge-proof":
+                data = recharge.execute()
+            case "tool-spec":
+                data = tool_api.describe()
+            case "tool-server":
+                tool_api.serve(sys.stdin, sys.stdout)
+                return
             case "checkpoints":
                 data = runner.checkpoints()
             case "fields":

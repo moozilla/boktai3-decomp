@@ -164,3 +164,8 @@ code, pre { font-family: var(--mono); }
 }
 
 .sweep-links { display: flex; flex-wrap: wrap; gap: 8px; }
+#recharge-ledger { overflow-x: auto; }
+#recharge-ledger .claim-math { display: inline; margin-left: 4px; }
+#recharge-links { padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 5px 12px; font-size: 12px; }
+#recharge-links:empty { display: none; }
+#recharge-links span { flex-basis: 100%; color: var(--muted); }

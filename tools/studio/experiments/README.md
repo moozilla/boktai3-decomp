@@ -4,7 +4,34 @@ Run the same Boktai 3 state with different inputs, then link a measured change
 to the instruction that wrote it. Experiments run the stock ROM locally in
 headless mGBA. Results stay under `build/studio/experiments/runs/`.
 
-## Run and inspect
+## Lead experiment
+
+**How much faster does holding A recharge Django?** The study runs all eleven
+SUN levels starting from the same save. At every positive level, holding A
+gains eight times the passive ENE when the game's coverage bit is enabled.
+Full SUN gave +160 with A held, +20 passively, and zero in the same light
+outside coverage, over 240 measured frames.
+
+```sh
+build/venv/bin/python -m tools.studio.experiments recharge-proof
+```
+
+The command prints the table, contact sheet, human transcript, and JSONL
+transcript paths. The script uses the public tool server over pipes to list
+checkpoints, read the reference fields, run recipes, find the native ENE
+writers, and open the C. The table compares actual sampled values at each
+SUN level and links to both the native function and the corresponding ROM
+bounds. The recipe authors a dark calibration baseline of 230, starts ENE
+at 100, and sets only the global area coverage bit for the passive and hold-A
+trials. The game computes intensity and SUN bars from its sensor input.
+The bounds are game intensity units. The emulator thresholds are raw
+sensor counts.
+
+Start Studio and open `/experiments` to see the study. Choose **Run all 11
+SUN levels** to regenerate the table or open one SUN-level recipe to edit
+the conditions. Choose **Pause and movement** for the smoke test.
+
+## Smoke test and replay controls
 
 ```sh
 build/venv/bin/python -m tools.studio.experiments proof
@@ -18,7 +45,7 @@ initialize contact, and tests the pause bit by changing one typed field at a
 time. The command prints paths to the contact sheets,
 transcripts, JSON results, and an annotated pixel-to-sprite frame. Each trial directory has numbered PNGs.
 
-Open `http://127.0.0.1:8642/experiments` for the notebook. Run the example,
+Open `http://127.0.0.1:8642/experiments#example/pause` for the pause recipe. Run it,
 scrub the synchronized playbacks and select a field value. The sidebar shows the
 last observed store that changed it, the actual written values, any active
 probed functions, and a C excerpt when scope reproduces the ROM bytes. **Fork
@@ -157,3 +184,29 @@ types remain outside the current lookup. A matching unblended OBJ color is
 evidence of a candidate fragment. Scanline composition can still affect
 visibility. Running the optional render comparison measures a selected
 hardware slot's contribution independently of the candidate color match.
+
+## Model-facing tools on standard input and output
+
+The tool server accepts a JSON object per input line and emits one JSON reply
+per line. It uses the same local runner, RAM field resolver, and Code source
+extractor as Studio. Each request contains `tool`, an `arguments` object,
+and an optional `id` echoed in the reply. A reply has `result` or `error`.
+The server keeps diagnostics out of the JSON stream. The CLI schema lists each
+argument and required fields.
+
+```sh
+build/venv/bin/python -m tools.studio.experiments tool-spec
+printf '%s\n' '{"id":1,"tool":"open_c","arguments":{"pc":"08159518"}}' |
+  build/venv/bin/python -m tools.studio.experiments tool-server
+```
+
+| Tool | Arguments and evidence |
+| --- | --- |
+| `list_checkpoints` | No arguments. Returns available starting checkpoints. |
+| `run_recipe` | `recipe_document` is the same version 1 JSON accepted by Studio. Returns the run ID, sampled frame numbers, fingerprints, and claim verdicts when execution finishes. |
+| `read_field` | `run`, `trial`, `frame`, and a named `field`. Restores the captured frame and returns the measured C layout, resolved address, and value. |
+| `recorded_fields` | `run`, `trial`, an array of `frames`, and an array of named `paths`. Returns observed values at every requested sample. |
+| `find_writers` | `run`, `trial`, a watched `field`, and optional inclusive `first` and `last` frames. Returns observed CPU writers by PC, up to 32, with values, counts, exact compiler evidence when available, and links back to sampled frames. |
+| `probe_values` | `run`, `trial`, a probed `function`, `register` from 0 through 15, and optional `first` and `last` frames. Returns the frequency of the register values on entry in that half-open interval. |
+| `open_c` | `pc` is an eight-digit hex address, optionally prefixed with `0x`. Returns the containing function, matching C body when present, and its Studio Code link. |
+| `read_solar_table` | `symbol` is `gUnk_08E87974` (upper bounds) or `gUnk_08E8798A` (lower bounds). Returns the original ROM words and the function that reads them. |

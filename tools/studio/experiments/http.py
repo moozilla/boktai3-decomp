@@ -6,12 +6,13 @@ import subprocess
 import threading
 import urllib.parse
 
-from . import centaur, fields, graphics, pixel_proof, recipe, references, runner, sweep
+from . import centaur, fields, graphics, pixel_proof, recipe, recharge, references, runner, sweep
 
 API = "/api/experiments"
 PAGE = "/experiments"
 ASSETS = {
     f"{PAGE}/app.js": ("app.js", "application/javascript; charset=utf-8"),
+    f"{PAGE}/recharge.js": ("recharge.js", "application/javascript; charset=utf-8"),
     f"{PAGE}/sweeps.js": ("sweeps.js", "application/javascript; charset=utf-8"),
     f"{PAGE}/app.css": ("app.css", "text/css; charset=utf-8"),
 }
@@ -138,6 +139,60 @@ def post_sweep(handler):
     handler.send(202, {"id": directory.name, "url": f"{PAGE}#sweep/{directory.name}"})
 
 
+def execute_recharge(directory):
+    try:
+        recharge.execute(directory)
+    except Exception as error:
+        runner.status(directory, "failed", runner.public_path(str(error)))
+    finally:
+        BATCH_SLOT.release()
+
+
+def recharge_route(handler, method, suffix):
+    if method == "POST" and not suffix:
+        if body(handler) != {}:
+            raise ValueError("Send an empty object to run the SUN recharge study")
+        if not BATCH_SLOT.acquire(blocking=False):
+            handler.send(429, {"error": "An experiment batch is already running"})
+            return
+        try:
+            directory = recharge.prepare()
+            BATCH_POOL.submit(execute_recharge, directory)
+        except Exception:
+            BATCH_SLOT.release()
+            raise
+        handler.send(202, {"id": directory.name})
+    elif method == "GET" and not suffix:
+        try:
+            directory = recharge.latest()
+        except FileNotFoundError:
+            handler.send(200, {"status": {"state": "idle", "message": "Ready to measure all 11 SUN levels"}})
+            return
+        result = directory / "result.json"
+        handler.send(200, {"status": runner.read_status(directory),
+                           "result": runner.read_json(result) if result.is_file() else None})
+    elif (method == "GET" and len(suffix) == 3 and recipe.RUN_ID.fullmatch(suffix[0]) and
+          suffix[1] == "bounds" and re.fullmatch(r"[0-9]|10", suffix[2])):
+        data = runner.read_json(recharge.FOLDER / suffix[0] / "result.json")
+        bars = int(suffix[2])
+        if bars >= len(data["rows"]):
+            raise FileNotFoundError("This SUN level is still being recorded")
+        lower, upper = data["rows"][bars]["bounds"]
+        handler.send(200, {"bars": bars,
+                           "lower": {**lower, "reader": data["tables"]["lower"]["url"]},
+                           "upper": {**upper, "reader": data["tables"]["upper"]["url"]},
+                           "gauge": data["source"]["gauge"]["function"]["url"]})
+    elif method == "GET" and len(suffix) == 2 and recipe.RUN_ID.fullmatch(suffix[0]):
+        art = {"contact.png": "image/png", "recharge.tsv": "text/tab-separated-values; charset=utf-8",
+               "result.json": "application/json", "tool-transcript.jsonl": "application/x-ndjson",
+               "transcript.txt": "text/plain; charset=utf-8"}
+        if suffix[1] not in art:
+            raise FileNotFoundError("No such recharge artifact")
+        handler.send(200, (recharge.FOLDER / suffix[0] / suffix[1]).read_bytes(), art[suffix[1]])
+    else:
+        raise FileNotFoundError("No such recharge route")
+
+
 def catalog(handler):
     rows = fields.ram_symbols((fields.ROOT / "symbols/ram.csv").stat().st_mtime_ns)
     symbols = [{"name": row["name"], "declaration": row["decl"], "header": row["header"]}
@@ -202,6 +257,9 @@ def routes(handler, method):
             if not re.fullmatch(r"[0-9A-F]{8}", address):
                 raise ValueError("Use an eight-digit function address")
             handler.send(200, references.preview(address, recent() + recent(only_sweeps=True), runner.JOBS))
+        elif path == API + "/recharge" or path.startswith(API + "/recharge/"):
+            tail = path.removeprefix(API + "/recharge").removeprefix("/")
+            recharge_route(handler, method, tail.split("/") if tail else [])
         elif path == API + "/sweeps":
             if method == "POST":
                 post_sweep(handler)

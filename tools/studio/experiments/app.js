@@ -31,7 +31,15 @@ function setStatus(text, error = false) {
   $('status-line').classList.toggle('error', error);
 }
 
+function isRechargePage() {
+  return location.hash === '#recharge' || (!location.hash && !requestProbe);
+}
+
 function header() {
+  const onRecharge = isRechargePage();
+  $('recharge-link').hidden = onRecharge;
+  for (const id of ['run', 'edit', 'sweep-open']) $(id).hidden = onRecharge;
+  if (onRecharge) return;
   const spec = primary?.recipe || example;
   if (!spec) return;
   const label = catalog?.checkpoints.find(checkpoint => checkpoint.id === spec.checkpoint)?.label || spec.checkpoint;
@@ -54,6 +62,7 @@ function header() {
 
 function drawPreview(spec) {
   $('sweep-results').hidden = true;
+  $('recharge-study').hidden = true;
   $('preview').innerHTML = spec.trials.map(trial =>
     `<article><h2>${esc(trial.label)}</h2><pre>${esc(trial.input || 'Wait for the trial duration')}</pre>
       ${(trial.interventions || []).map(action => `<p class="claim-math">After frame ${action.frame},
@@ -172,6 +181,7 @@ function describeRequirement(condition) {
 
 function showResult(result, route) {
   $('sweep-results').hidden = true;
+  $('recharge-study').hidden = true;
   primary = result;
   draft = result.recipe;
   comparison = null;
@@ -724,6 +734,7 @@ $('apply-json').onclick = () => {
 window.addEventListener('hashchange', () => {
   const route = splitHash();
   if (route) openRun(route);
+  else if (location.hash.startsWith('#example/')) openExample(location.hash.slice(9));
 });
 
 async function openExample(id) {
@@ -741,9 +752,9 @@ async function openExample(id) {
     $('results').hidden = true;
     $('artifacts').innerHTML = '';
     setStatus('');
+    history.replaceState(null, '', '#example/' + id);
     header();
     drawPreview(spec);
-    history.replaceState(null, '', '#example/' + id);
     await refreshHistory();
   } catch (error) {
     if (token === loadToken) setStatus(error.message, true);
@@ -759,14 +770,14 @@ async function start() {
   try {
     let examples;
     [example, catalog, examples] = await Promise.all([
-      json(API + '/example'), json(API + '/catalog'), json(API + '/examples'),
+      json(API + (isRechargePage() ? '/example/recharge' : '/example')), json(API + '/catalog'), json(API + '/examples'),
     ]);
     $('examples').innerHTML = '<option value="">Example questions and recordings</option>' + examples.map(item =>
       `<option value="${esc(item.id)}">${esc(item.label)}</option>`).join('');
     $('checkpoint').innerHTML = catalog.checkpoints.map(c =>
       `<option value="${esc(c.id)}">${esc(c.label)}${c.scene == null ? '' : ' · scene ' + c.scene}</option>`).join('');
     header();
-    drawPreview(example);
+    if (!isRechargePage()) drawPreview(example);
     if (requestProbe) seedProbe();
     const route = splitHash();
     if (route) await openRun(route);

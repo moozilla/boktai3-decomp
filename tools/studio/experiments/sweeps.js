@@ -102,6 +102,7 @@ async function openSweep() {
   $('preview').hidden = true;
   $('results').hidden = true;
   $('sweep-results').hidden = false;
+  $('recharge-study').hidden = true;
   $('sweep-progress').textContent = 'Opening checkpoint results…';
   $('sweep-ledger').innerHTML = '';
   $('sweep-export').removeAttribute('href');
