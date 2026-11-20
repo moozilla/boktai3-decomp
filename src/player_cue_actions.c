@@ -1848,20 +1848,14 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
     }
     Player_SetAnimation(player, 0x9A, 64, 1);
     {
-        u16 *destination = &player->spriteResource;
-        u32 resource = 0x16F;
-        *destination = resource;
-        player->actionVariantResource = (u32)(gPaletteBankData + (resource << 5));
+        player->spriteResource = 0x16F;
+        player->actionVariantResource = (u32)(gPaletteBankData + (player->spriteResource << 5));
     }
     Anim_SetSequence(&player->cueCollider.sequence, (void *)player->cueCollider.setupResource, 0,
                      player->heading, player->side);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                            &player->cueCollider.sequence);
-    {
-        u16 *destination = &player->actionEighteenParameter;
-        u32 resource = 0x2DD;
-        *destination = resource;
-    }
+    player->actionEighteenParameter = 0x2DD;
     PlayerCue_AdvanceSpiralCounters(player, 32, 31);
 }
 
