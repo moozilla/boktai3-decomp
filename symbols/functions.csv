@@ -536,6 +536,7 @@ addr,name,mode,confidence,source,notes
 080174C4,Weather_GetStormVolume,thumb,low,src-alias,"Computes storm ambient volume from p[0x18]/p[0x19], halved during certain game states via sub_08228DB8"
 08017700,Weather_ClearEffects,thumb,low,src-alias,"Iterates the 32-entry effect slot array and calls Effect_Remove on any active slot, clearing it"
 08017730,WeatherParticles_Update,thumb,low,src-alias,
+08017A6C,Weather_UpdateStormTrigger,thumb,low,src-alias,
 08017BB8,Weather_WaitForStorm,thumb,low,src-alias,
 08017BEC,Weather_StormOnset,thumb,low,src-alias,
 08017C8C,Weather_ActiveStorm,thumb,low,src-alias,
