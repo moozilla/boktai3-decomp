@@ -223,11 +223,6 @@ void SceneObjects_PlayPushSound(s32 type)
 
 void AnimatedParticles_EmitBurst(struct SceneVec *, s32, s32, s32, s32, s32, s32, s32);
 
-static inline u32 SceneCollider_ReadContactFlags(const struct SceneCollider *contact, u32 mask)
-{
-    return contact->contactFlags & mask;
-}
-
 void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
                                    struct SceneObject *object)
 {
