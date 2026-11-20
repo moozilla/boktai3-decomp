@@ -53,7 +53,8 @@ its spelling, so each one is a question, not a verdict:
   the rest for the owner to rule on. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `subtract-negative`: `x - -y` in place of addition, often to preserve operand order.
-* `duplicate-branches`: the same statements in both arms of a simple if/else.
+* `duplicate-branches`: the same statements in both arms of a simple if/else or every arm of a
+  switch with a default.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
@@ -130,6 +131,9 @@ _WARN_REGEX = {
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
 _IF_ELSE = re.compile(r"\bif\s*\([^{};]*?\)\s*\{(?P<yes>[^{}]*)\}"
                       r"\s*else\s*\{(?P<no>[^{}]*)\}")
+_SWITCH = re.compile(r"\bswitch\s*\([^{};]*?\)\s*\{(?P<body>[^{}]*)\}")
+_SWITCH_LABEL = re.compile(r"\b(?:case\s+[^:;\n]+|(?P<default>default))\s*:")
+_SWITCH_EXIT = re.compile(r"(?:^|;)\s*(?:break|return\b[^;]*|goto\s+\w+)\s*;\s*$")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
@@ -253,6 +257,31 @@ def _literal_locals(code: str):
             yield location
 
 
+def _branch_statements(source: str, start: int, end: int) -> tuple[str, ...]:
+    return tuple(line.strip() for line in source[start:end].splitlines() if line.strip())
+
+
+def _duplicate_branches(code: str, source: str):
+    for match in _IF_ELSE.finditer(code):
+        yes = _branch_statements(source, *match.span("yes"))
+        no = _branch_statements(source, *match.span("no"))
+        if yes and yes == no:
+            yield match.start()
+    for match in _SWITCH.finditer(code):
+        body_start, body_end = match.span("body")
+        labels = list(_SWITCH_LABEL.finditer(code, body_start, body_end))
+        if not any(label["default"] for label in labels):
+            continue
+        ends = [label.start() for label in labels[1:]] + [body_end]
+        arms = [_branch_statements(source, label.end(), end) for label, end in zip(labels, ends)]
+        if not arms[-1]:
+            continue
+        # Consecutive labels without statements already share a single arm.
+        arms = [arm for arm in arms if arm]
+        if len(arms) > 1 and _SWITCH_EXIT.search("\n".join(arms[0])) and all(arm == arms[0] for arm in arms[1:]):
+            yield match.start()
+
+
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     source = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
@@ -262,13 +291,8 @@ def _warn_sites(code: str):
             yield m.start(), kind
     for offset in _literal_locals(code):
         yield offset, "literal-local"
-    for match in _IF_ELSE.finditer(code):
-        bodies = [
-            [line.strip() for line in source[match.start(arm):match.end(arm)].splitlines() if line.strip()]
-            for arm in ("yes", "no")
-        ]
-        if bodies[0] and bodies[0] == bodies[1]:
-            yield match.start(), "duplicate-branches"
+    for offset in _duplicate_branches(code, source):
+        yield offset, "duplicate-branches"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:

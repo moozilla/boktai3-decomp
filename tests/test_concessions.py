@@ -200,6 +200,23 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns(text.replace('} else {\n        use("yes");', '} else {\n        use("no");')), [])
         self.assertEqual(warns(text.replace('} else {', '} else if (flag > 1) {')), [])
 
+    def test_duplicate_switch_arms_require_a_default(self):
+        text = """void f(int mode) {
+    switch (mode) {
+        case 0:
+            load(3);
+            break;
+        default:
+            load(3);
+            break;
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace("default:", "case 1:")), [])
+        self.assertEqual(warns(text.replace("case 0:\n            load(3);\n            break;", "case 0:")), [])
+        self.assertEqual(warns(text.replace("            break;\n", "")), [])
+
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
             with self.subTest(statement=statement):
