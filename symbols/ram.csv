@@ -19,7 +19,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/ram.h,low,scene actor effects manager (SceneActorEffects_*)
 02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/ram.h,low,provisional: six-group particle manager singleton (ParticleManager_Initialize)
 02000064,gFragmentManager,4,object,extern struct FragmentManager *gFragmentManager;,include/ram.h,low,fragment manager singleton (FragmentManager_*)
-02000068,gAnimatedParticleManager,4,object,extern u32 gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
+02000068,gAnimatedParticleManager,4,object,extern void *gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
 0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/ram.h,low,fading particle manager (FadingParticleManager_*)
 02000070,gPaletteLevels,4,object,extern struct PaletteLevels *gPaletteLevels;,include/palette_level_transitions.h,low,
 02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/damage_number_display.h,low,

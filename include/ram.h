@@ -227,7 +227,7 @@ extern void *gSceneActorEffectsManager; /* scene actor effects manager (SceneAct
 /* 0x02000064 */
 extern struct FragmentManager *gFragmentManager; /* fragment manager singleton */
 /* 0x02000068 */
-extern u32 gAnimatedParticleManager; /* animated particle manager (AnimatedParticleManager_*) */
+extern void *gAnimatedParticleManager; /* animated particle manager (AnimatedParticleManager_*) */
 /* 0x0200006C */
 extern void *gFadingParticleManager; /* fading particle manager (FadingParticleManager_*) */
 /* 0x0200007C */
