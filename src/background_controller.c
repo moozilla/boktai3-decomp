@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "background_controller.h"
+#include "background_layers.h"
 #include "array_fill.h"
 /* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
 #define Background_LoadLayerMap sub_080020BC
@@ -375,12 +376,12 @@ void *Background_CreateFromScript(u32 id)
     return Background_Create(id, &c);
 }
 
-s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
+s32 Background_FindMapId(struct BgMapResource *resource, u16 id)
 {
-    const struct BackgroundMapEntry *entries = (const struct BackgroundMapEntry *)resource->maps;
+    const struct BgMapEntry *entries = (const struct BgMapEntry *)resource->maps;
     s32 i;
-    for (i = 0; i < resource->count; i++) {
-        if (entries[i].id == id)
+    for (i = 0; i < resource->mapCount; i++) {
+        if ((u16)entries[i].nameHash == id)
             return i;
     }
     return 0;
@@ -389,10 +390,10 @@ s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 s32 Background_LoadMapsFromScript(void)
 {
     s32 indices[4];
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
     s32 target, x, y, n, explicitIndices, i;
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -445,11 +446,11 @@ s32 Background_LoadMapsFromScript(void)
 
 s32 Background_LoadMapFromScript(void)
 {
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u16 layer = Script_GetKeywordValue('p', 0);
     u16 index;
     u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -473,9 +474,9 @@ s32 Background_LoadMapFromScript(void)
 
 s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
 {
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u8 *base = sub_08216E54(resourceId);
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -488,10 +489,10 @@ s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
 s32 Background_LoadTilesFromScript(void)
 {
     u16 entries[64];
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u16 layer = Script_GetKeywordValue('t', 0);
     u16 data = Script_GetKeywordValue('d', 0);
-    u16 size = Script_GetKeywordValue('s', 0);
+    u16 startTile = Script_GetKeywordValue('s', 0);
     void *base = ScriptProc_Start(0xCEEF, data);
     s32 count = 0;
     if (Script_SeekToKeyword('c')) {
@@ -515,12 +516,11 @@ s32 Background_LoadTilesFromScript(void)
     }
 done:
     if (Script_SeekToKeyword('m')) {
-        struct BackgroundResource *loaded =
-            (struct BackgroundResource *)sub_08216E54(Script_GetValue());
+        struct BgMapResource *loaded = (struct BgMapResource *)sub_08216E54(Script_GetValue());
         resource = *loaded;
-        size = resource.size;
+        startTile = resource.tileCount;
     }
-    sub_08215D40(layer, base, count, entries, size);
+    sub_08215D40(layer, base, count, entries, startTile);
     return 0;
 }
 
