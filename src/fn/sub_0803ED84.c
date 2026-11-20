@@ -22,12 +22,12 @@ s32 ScenePool_StateDepartForward(void *manager, struct ScenePoolActor *actor,
         zero = 0;
         *flags = mask;
         actor->unknown57a = zero;
-        actor->unknown68 = zero;
+        actor->unknown68 = 0;
         Or(0x2c, &actor->stateFlags);
         if ((actor->position.x - actor->savedPosition.x) >> 12 > 127) {
-            actor->controlFlags = zero;
-            actor->forwardSpeed = zero;
-            actor->forwardBias = zero;
+            actor->controlFlags = 0;
+            actor->forwardSpeed = 0;
+            actor->forwardBias = 0;
         } else
             actor->controlFlags |= 0x110;
     }
