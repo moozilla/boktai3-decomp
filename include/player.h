@@ -256,11 +256,8 @@ struct Player {
     const struct PlayerActionConfig *actionConfig; /* 0x344 */
     const u16 *inputKeys;     /* 0x348: directional key bits consumed by Player_GetInputDirection */
     u16 directionHistory[10]; /* 0x34C: signed samples; 0xFFFF means absent (read through s16) */
-    u8 visualParameters[0xA]; /* 0x360: animation parameter block */
-    u16 visualParameterA, visualParameterB; /* 0x36A */
-    u8 unk36E[0xC];
-    u16 visualParameterC; /* 0x37A */
-    u8 unk37C[0x24];
+    u16 basePalette[16]; /* 0x360: actor palette before blending */
+    u16 workPalette[16]; /* 0x380: blended palette bound to the active drawable */
     u16 animationIndex; /* 0x3A0: selected base keyframe index */
     u8 heading, side;   /* 0x3A2: folded direction and side */
     u8 facing;          /* (guess) direction index */

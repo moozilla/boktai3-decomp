@@ -1342,15 +1342,15 @@ void PlayerCue_UpdateTurningPalette(struct Player *player)
     red = ((30 * a) + (19 * b)) >> 3;
     green = ((13 * a) + (12 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterA = green;
+    player->basePalette[5] = green;
     red = ((31 * a) + (25 * b)) >> 3;
     green = ((18 * a) + (12 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterB = green;
+    player->basePalette[6] = green;
     red = (31 * (a + b)) >> 3;
     green = ((22 * a) + (13 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterC = green;
+    player->basePalette[13] = green;
     if ((++(player->unk5A0)) > 15)
         player->unk5A0 = 0;
     if (gGameState->form != 2) {

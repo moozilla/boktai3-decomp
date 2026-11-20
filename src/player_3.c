@@ -34,9 +34,9 @@ void Player_LoadVisualParameters(struct Player *p)
         i -= 10;
     }
     t += i * 3;
-    p->visualParameterA = *t++;
-    p->visualParameterB = *t;
-    p->visualParameterC = t[1];
+    p->basePalette[5] = *t++;
+    p->basePalette[6] = *t;
+    p->basePalette[13] = t[1];
 }
 
 static inline u16 Player_BlendColor(const u16 *source, const u16 *base, const u8 *brightnessPtr,
@@ -73,9 +73,9 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
     const u8 *alternateBrightness;
     if (sourceWeight == 0) {
         if (!p->unk419)
-            p->actionVariantResource = (u32)p->visualParameters;
+            p->actionVariantResource = (u32)p->basePalette;
         else
-            p->visualObject->parameters = (u32)p->visualParameters;
+            p->visualObject->parameters = (u32)p->basePalette;
         return;
     }
     source = input;
@@ -83,7 +83,7 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
         u32 *palette;
         i = 0;
         palette = &p->actionVariantResource;
-        base = (u16 *)p->visualParameters;
+        base = p->basePalette;
         brightnessPtr = p->unkAC6;
         for (; i <= 15; i++) {
             if (i == 5 || i == 6 || i == 13)
@@ -94,11 +94,11 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
             source++;
             base++;
         }
-        *palette = (u32)(((u8 *)p) + 0x380);
+        *palette = (u32)p->workPalette;
     } else {
         i = 0;
         alternateBrightness = p->unkAC6;
-        base = (u16 *)p->visualParameters;
+        base = p->basePalette;
         while (1) {
             base[16] = Player_BlendColor(source, base, alternateBrightness, sourceWeight,
                                          baseWeight, shift);
@@ -107,7 +107,7 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
             if (++i > 15)
                 break;
         }
-        p->visualObject->parameters = (u32)(((u8 *)p) + 0x380);
+        p->visualObject->parameters = (u32)p->workPalette;
     }
 }
 
@@ -178,9 +178,9 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
             p->actionRequestHold = 0;
             p->actionRequestTimer = 0;
             if (!p->unk419)
-                p->actionVariantResource = (u32)p->visualParameters;
+                p->actionVariantResource = (u32)p->basePalette;
             else
-                p->visualObject->parameters = (u32)p->visualParameters;
+                p->visualObject->parameters = (u32)p->basePalette;
         }
     } else {
         const u16 *source;
@@ -191,8 +191,8 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 u32 *palette;
                 i = 0;
                 palette = &p->actionVariantResource;
-                destination = (u16 *)((u8 *)p + 0x380);
-                base = (u16 *)p->visualParameters;
+                destination = p->workPalette;
+                base = p->basePalette;
                 for (; i < 16; i++) {
                     if ((u32)(i - 5) <= 1 || i == 13)
                         *destination = *base;
@@ -202,13 +202,13 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                     destination++;
                     base++;
                 }
-                *palette = (u32)((u8 *)p + 0x380);
+                *palette = (u32)p->workPalette;
             } else {
-                destination = (u16 *)((u8 *)p + 0x380);
+                destination = p->workPalette;
                 for (i = 15; i >= 0; i--) {
                     *destination++ = *source++;
                 }
-                p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                p->visualObject->parameters = (u32)p->workPalette;
             }
         } else {
             source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
@@ -248,8 +248,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                     u32 *palette;
                     i = 0;
                     palette = &p->actionVariantResource;
-                    destination = (u16 *)((u8 *)p + 0x380);
-                    base = (u16 *)p->visualParameters;
+                    destination = p->workPalette;
+                    base = p->basePalette;
                     for (; i < 16; i++) {
                         if ((u32)(i - 5) <= 1 || i == 13)
                             *destination = *base;
@@ -259,12 +259,12 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                         destination++;
                         base++;
                     }
-                    *palette = (u32)((u8 *)p + 0x380);
+                    *palette = (u32)p->workPalette;
                 } else {
-                    destination = (u16 *)((u8 *)p + 0x380);
+                    destination = p->workPalette;
                     for (i = 15; i >= 0; i--)
                         *destination++ = *source++;
-                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                    p->visualObject->parameters = (u32)p->workPalette;
                 }
             }
         } else {
@@ -293,8 +293,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                     u32 *palette;
                     i = 0;
                     palette = &p->actionVariantResource;
-                    destination = (u16 *)((u8 *)p + 0x380);
-                    base = (u16 *)p->visualParameters;
+                    destination = p->workPalette;
+                    base = p->basePalette;
                     for (; i < 16; i++) {
                         if ((u32)(i - 5) <= 1 || i == 13)
                             *destination = *base;
@@ -304,12 +304,12 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                         destination++;
                         base++;
                     }
-                    *palette = (u32)((u8 *)p + 0x380);
+                    *palette = (u32)p->workPalette;
                 } else {
-                    destination = (u16 *)((u8 *)p + 0x380);
+                    destination = p->workPalette;
                     for (i = 15; i >= 0; i--)
                         *destination++ = *source++;
-                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                    p->visualObject->parameters = (u32)p->workPalette;
                 }
             }
         } else {
@@ -334,9 +334,9 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     } else {
         p->actionRequestTimer = 0;
         if (!p->unk419)
-            p->actionVariantResource = (u32)p->visualParameters;
+            p->actionVariantResource = (u32)p->basePalette;
         else
-            p->visualObject->parameters = (u32)p->visualParameters;
+            p->visualObject->parameters = (u32)p->basePalette;
     }
 }
 
@@ -431,9 +431,9 @@ void Player_InitVisualState(struct Player *p)
     p->savedSpriteResource = 0xFFFF;
     p->baseActionVariant = 0xFF;
     p->spriteResource = p->baseSpriteResource;
-    p->actionVariantResource = (u32)p->visualParameters;
+    p->actionVariantResource = (u32)p->basePalette;
     p->visualObject->resource = p->baseSpriteResource;
-    p->visualObject->parameters = (u32)p->visualParameters;
+    p->visualObject->parameters = (u32)p->basePalette;
     Player_UpdateVisualPalette(p, 0);
 }
 
