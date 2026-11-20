@@ -405,6 +405,13 @@ static inline u32 Slime_IsReactionComplete(struct ChaseActor *actor)
     return complete;
 }
 
+static inline u32 *Slime_EnableReactionMotion(struct ChaseActor *actor, u32 bits)
+{
+    u32 *flags = &actor->base.behaviorFlags;
+    *flags |= bits;
+    return flags;
+}
+
 void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
@@ -427,11 +434,7 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         }
         actor->base.restart = 0;
     }
-    {
-        u32 mask = 0x2000;
-        t = &actor->base.behaviorFlags;
-        *t |= mask;
-    }
+    t = Slime_EnableReactionMotion(actor, 0x2000);
     MonsterInit_SetStatusFlags(actor, 0x10000);
     {
         s32 current = actor->base.reactionStart.x;
@@ -1545,9 +1548,9 @@ static inline void Slime_ClearPendingFlags(u16 *q, u32 m)
     *q = m & *q;
 }
 
-static inline u8 Slime_TestPendingFlags(u16 *m, u32 b)
+static inline u8 Slime_TestPendingFlag(u16 mask, const u16 *field)
 {
-    if (*m & b)
+    if (*field & mask)
         return TRUE;
     return FALSE;
 }
@@ -1555,8 +1558,7 @@ static inline u8 Slime_TestPendingFlags(u16 *m, u32 b)
 void Slime_PlayPendingSound(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
-    u32 m = 0x10;
-    if (Slime_TestPendingFlags(&context->flags, m)) {
+    if (Slime_TestPendingFlag(0x10, &context->flags)) {
         Sound_PlaySong(0x3C2);
         Slime_ClearPendingFlags(&context->flags, ~0x10);
     }
@@ -1696,8 +1698,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
 
 u32 Slime_ProcessPendingStateChange(struct ChaseActor *actor)
 {
-    u32 m = 0x100;
-    if (Slime_TestPendingFlags(&actor->base.reactionFlags, m)) {
+    if (Slime_TestPendingFlag(0x100, &actor->base.reactionFlags)) {
         Slime_OnInterrupt(actor);
         Slime_ClearPendingFlags(&actor->base.reactionFlags, ~0x100);
     }
