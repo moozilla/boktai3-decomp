@@ -109,7 +109,7 @@ void Golem_UpdateChargeSettle(struct ChaseActor *actor)
     u8 busy;
     if (TakeFlag2B1(actor)) {
         void *target = Golem_UpdateChargeBuildup;
-        SetControl(actor, 0x22, target);
+        SceneActorChase_SetTypedControl(actor, target, 0x22);
         actor->base.stepDone = 0;
     }
     busy = Golem_InvokeEnabledBehavior(actor);
@@ -118,16 +118,9 @@ void Golem_UpdateChargeSettle(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         {
             void *target = Golem_UpdateRouteMotion;
-            SetControl(actor, 0x23, target);
+            SceneActorChase_SetTypedControl(actor, target, 0x23);
         }
-        {
-            u32 phase = 2;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = 1;
-        }
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
 }
