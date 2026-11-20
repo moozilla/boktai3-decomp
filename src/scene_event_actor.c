@@ -10,7 +10,8 @@ void SceneEventActor_UpdateJitter(struct ActorState *eventActor)
 {
     if (eventActor->changed) {
         eventActor->changed = 0;
-        SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x114, 1, 1, 4);
+        SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id,
+                                              eventActor->animationData, 0x114, 1, 1, 4);
         eventActor->jitterTicks = 6;
     }
     if (eventActor->jitterTicks) {
@@ -42,15 +43,18 @@ void SceneEventActor_UpdateRecoil(struct ActorState *eventActor)
     struct ActorState *actor = eventActor;
     if (eventActor->changed) {
         eventActor->changed = 0;
-        SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x11a, 1, 1, 4);
+        SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id,
+                                              eventActor->animationData, 0x11a, 1, 1, 4);
         eventActor->flags |= 1;
     }
     switch (eventActor->stateReset) {
         case 0:
             if (eventActor->hitParameter) {
                 u32 angle = eventActor->direction;
-                eventActor->body.motion.x = ScaleMovement(gUnk_086149C4[(angle + 64) & 255] * eventActor->hitParameter);
-                eventActor->body.motion.z = ScaleMovement(gUnk_086149C4[angle] * actor->hitParameter);
+                eventActor->body.motion.x =
+                    ScaleMovement(gUnk_086149C4[(angle + 64) & 255] * eventActor->hitParameter);
+                eventActor->body.motion.z =
+                    ScaleMovement(gUnk_086149C4[angle] * actor->hitParameter);
                 actor->hitParameter = (actor->hitParameter * 3) >> 3;
                 {
                     u32 one = 1;
@@ -58,22 +62,21 @@ void SceneEventActor_UpdateRecoil(struct ActorState *eventActor)
                 }
             } else {
                 eventActor->hitParameter = 0;
-                SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x11c, 1,
-                                                      1, 1);
+                SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id,
+                                                      eventActor->animationData, 0x11c, 1, 1, 1);
                 if (eventActor->finished)
-                    SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x11e,
-                                                          1, 1, 1);
+                    SceneActors_StartDirectionalAnimation(eventActor, &eventActor->graphics.id,
+                                                          eventActor->animationData, 0x11e, 1, 1,
+                                                          1);
             }
             /* Fall through while the movement animation settles. */
         case 1:
             ++eventActor->pendingAction;
             if (eventActor->finished || eventActor->pendingAction > 30) {
-                SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id, actor->animationData,
-                                                         0xf4, 1, 1, 1);
+                SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id,
+                                                         actor->animationData, 0xf4, 1, 1, 1);
                 {
-                    u32 next = 2;
-                    eventActor->stateReset = next;
-                    eventActor->pendingAction = 0;
+                    SceneEventActor_EnterSequenceStep(eventActor, 2);
                 }
             }
             break;
@@ -87,10 +90,9 @@ void SceneEventActor_UpdateRemovalSequence(struct ActorState *actor)
 {
     if (actor->changed) {
         actor->changed = 0;
-        actor->stateReset = 0;
-        actor->pendingAction = 0;
-        SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData, 0x114, 2,
-                                                 1, 4);
+        SceneEventActor_EnterSequenceStep(actor, 0);
+        SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData,
+                                                 0x114, 2, 1, 4);
         Sound_PlaySong(0x2EB);
         SceneSteeringActor_RequestRemovalAll();
     }
@@ -98,31 +100,26 @@ void SceneEventActor_UpdateRemovalSequence(struct ActorState *actor)
         case 0:
             if (++actor->pendingAction > 15 && !Player_IsSlotInActionTwelveOrThirtyEight(0)) {
                 SceneActors_RunFirstEventScript(actor, actor->graphics.eventScripts);
-                actor->stateReset = 1;
-                actor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(actor, 1);
             }
             break;
         case 1:
             if (!actor->pendingAction) {
-                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData,
-                                                         0x148, 2, 1, 4);
+                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
+                                                         actor->animationData, 0x148, 2, 1, 4);
                 Anim_SetFrameDurationScale(&actor->graphics.id, 0x100);
                 actor->pendingAction++;
             }
             if (actor->finished) {
                 {
-                    u32 phase = 2;
-                    actor->stateReset = phase;
-                    actor->pendingAction = 0;
+                    SceneEventActor_EnterSequenceStep(actor, 2);
                 }
             }
             break;
         case 2:
             if (actor->graphics.eventFlags & 2) {
                 {
-                    u32 phase = 3;
-                    actor->stateReset = phase;
-                    actor->pendingAction = 0;
+                    SceneEventActor_EnterSequenceStep(actor, 3);
                 }
                 SceneActors_RunSecondEventScript(actor, actor->graphics.eventScripts);
             }
@@ -208,7 +205,8 @@ static inline void SceneEventActor_SetPalette(struct ActorState *eventActor, u32
     eventActor->palette = eventActor->paletteData;
 }
 
-static inline void AddPosition(struct ContactPosition *out, struct SceneActorBody *a, struct ContactPosition *b)
+static inline void AddPosition(struct ContactPosition *out, struct SceneActorBody *a,
+                               struct ContactPosition *b)
 {
     out->x = b->x + a->position.x;
     out->y = a->position.y + b->y;
@@ -227,8 +225,7 @@ static inline void FinishLunge(struct ActorState *eventActor, void *callback, u3
     eventActor->stateCallback = callback;
     eventActor->stateTicks = 0;
     eventActor->changed = one;
-    eventActor->stateReset = 0;
-    eventActor->pendingAction = 0;
+    SceneEventActor_EnterSequenceStep(eventActor, 0);
     eventActor->pending = one;
 }
 
@@ -297,34 +294,22 @@ void BossSlot2_UpdateLungeApproach(struct ActorState *eventActor)
         eventActor->body.motion.x = dx;
         eventActor->body.motion.z = dz;
         actor->animationPhase = 1;
-        SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id, actor->animationData, 0xF4,
-                                                 1, 1, 4);
+        SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id,
+                                                 actor->animationData, 0xF4, 1, 1, 4);
         return;
     }
 advance:
     SetHorizontalVelocity(eventActor, angle, speed);
     SceneEventActor_SetDirection(eventActor, angle);
-    SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id, actor->animationData, 0xF9, 1,
-                                             1, 4);
+    SceneActors_StartEightDirectionAnimation(eventActor, &actor->graphics.id, actor->animationData,
+                                             0xF9, 1, 1, 4);
 }
 
 void SceneEventActor_UpdateTimedAnimation(struct ActorState *actor, s32 tick)
 {
     if (actor->changed) {
         actor->changed = 0;
-        actor->body.direction = actor->requestedDirection;
-        {
-            int shifted;
-            u32 value;
-            shifted = (actor->body.direction + 0x60) >> 6;
-            value = 3;
-            value &= shifted;
-            actor->facing4 = value;
-            shifted = (actor->body.direction + 0x70) >> 5;
-            value = 7;
-            value &= shifted;
-            actor->facing8 = value;
-        }
+        SceneEventActor_SetDirection(actor, actor->requestedDirection);
         {
             u32 mask = 0x400004;
             actor->flags |= mask;
@@ -389,8 +374,7 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
     if (eventActor->changed) {
         eventActor->changed = 0;
         boss->impactCount = 0;
-        eventActor->stateReset = 0;
-        eventActor->pendingAction = 0;
+        SceneEventActor_EnterSequenceStep(eventActor, 0);
     }
     {
         u32 mask = 0x400004;
@@ -403,8 +387,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 BossSlot2_SetDirection(eventActor, 32);
                 {
                     u32 paletteMode = 3;
-                    SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id, boss->animationData,
-                                                             0xF4, 1, 1, 4);
+                    SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
+                                                             boss->animationData, 0xF4, 1, 1, 4);
                     Sound_PlaySong(0x2E4);
                     Sound_PlaySong(0x1A8);
                     {
@@ -417,78 +401,68 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
                 }
             }
             if ((++eventActor->pendingAction) > 8) {
-                u32 phase = 1;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 1);
             }
             break;
         }
 
         case 1:
             if (!eventActor->pendingAction) {
-                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x12B, 2,
-                                                     4);
+                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id,
+                                                     boss->animationData, 0x12B, 2, 4);
                 eventActor->pendingAction++;
             }
             if (eventActor->finished == 1) {
-                u32 phase = 2;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 2);
             }
             break;
 
         case 2:
             if (!eventActor->pendingAction) {
-                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x12D, 2,
-                                                     4);
+                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id,
+                                                     boss->animationData, 0x12D, 2, 4);
                 BossSlot2_SpawnBobbingFormation(eventActor);
             }
             if (eventActor->pendingAction > 30) {
-                u32 phase = 3;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 3);
             } else
                 eventActor->pendingAction++;
             break;
 
         case 3:
             if (!eventActor->pendingAction)
-                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x12F, 2,
-                                                     4);
+                SceneActors_StartUnmirroredAnimation(eventActor, &boss->graphics.id,
+                                                     boss->animationData, 0x12F, 2, 4);
             if ((++eventActor->pendingAction) > 30) {
-                u32 phase = 4;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 4);
             }
             break;
 
         case 4:
             if (!eventActor->pendingAction) {
                 BossSlot2_SetDirection(eventActor, 0);
-                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x134,
-                                                         1, 1, 4);
+                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
+                                                         boss->animationData, 0x134, 1, 1, 4);
                 Sound_PlaySong(0x2E9);
             }
             if ((++eventActor->pendingAction) > 20) {
-                u32 phase = 5;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 5);
             }
             break;
 
         case 5: {
             BossSlot2_SetDirection(eventActor, eventActor->pendingAction + 15);
-            SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x13E, 1,
-                                                     1, 1);
-            ActorEffect_SpawnAtAngle(boss->effect, &eventActor->body.position, eventActor->pendingAction);
+            SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
+                                                     boss->animationData, 0x13E, 1, 1, 1);
+            ActorEffect_SpawnAtAngle(boss->effect, &eventActor->body.position,
+                                     eventActor->pendingAction);
             {
                 u32 mask = 0x100000;
                 eventActor->flags |= mask;
                 eventActor->flags &= ~0x400000;
             }
             if ((eventActor->pendingAction += 16) > 512) {
-                eventActor->stateReset = 7;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 7);
             }
             if (eventActor->pendingAction == 128)
                 sub_0806CCC8(eventActor->selectedPoint, 180, -2);
@@ -497,13 +471,11 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
         case 7:
             if (!eventActor->pendingAction) {
                 BossSlot2_SetDirection(eventActor, 0);
-                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id, boss->animationData, 0x134,
-                                                         1, 1, 4);
+                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
+                                                         boss->animationData, 0x134, 1, 1, 4);
             }
             if (eventActor->pendingAction > 20) {
-                u32 phase = 8;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(eventActor, 8);
             } else
                 eventActor->pendingAction++;
             break;
@@ -511,8 +483,8 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
         case 8:
             if (!eventActor->pendingAction) {
                 BossSlot2_SetDirection(eventActor, 32);
-                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id, boss->animationData, 0xF4,
-                                                         1, 1, 1);
+                SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
+                                                         boss->animationData, 0xF4, 1, 1, 1);
                 eventActor->pendingAction++;
             }
             eventActor->pending = 1;
@@ -532,20 +504,19 @@ void SceneEventActor_UpdateDelayedFinish(struct ActorState *actor)
     switch (actor->stateReset) {
         case 0:
             if (!actor->pendingAction) {
-                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData,
-                                                         0x148, 2, 1, 1);
+                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
+                                                         actor->animationData, 0x148, 2, 1, 1);
                 actor->pendingAction++;
             }
             if (actor->finished) {
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
-                actor->stateReset = 1;
-                actor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(actor, 1);
             }
             break;
         case 1:
             if (!actor->pendingAction)
-                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id, actor->animationData,
-                                                         0x14D, 1, 1, 1);
+                SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
+                                                         actor->animationData, 0x14D, 1, 1, 1);
             {
                 u32 mask = 0x200000;
                 actor->flags |= mask;
@@ -558,9 +529,7 @@ void SceneEventActor_UpdateDelayedFinish(struct ActorState *actor)
             if (actor->pendingAction > 120) {
                 ProximityVolume_SetPosition(actor->proximityVolume, &actor->body.position);
                 {
-                    u32 phase = 2;
-                    actor->stateReset = phase;
-                    actor->pendingAction = 0;
+                    SceneEventActor_EnterSequenceStep(actor, 2);
                 }
             }
             break;
@@ -581,24 +550,15 @@ void SceneEventActor_UpdateDelayedFinish(struct ActorState *actor)
     }
 }
 
-static inline void BossSlot2_SetChargePalette(struct ActorState *eventActor, u32 mode, u32 shift, u32 zero)
-{
-    eventActor->paletteMode = mode;
-    eventActor->paletteShift = shift;
-    eventActor->paletteTimer = zero;
-    eventActor->palette = eventActor->paletteData;
-}
-
 void BossSlot2_UpdateChargePaletteSequence(struct ActorState *eventActor)
 {
     if (eventActor->changed) {
         eventActor->changed = 0;
         SceneEventActor_SetDirection(eventActor, 32);
-        SceneActors_StartEightDirectionAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0xF4, 1, 1,
-                                                 1);
+        SceneActors_StartEightDirectionAnimation(eventActor, &eventActor->graphics.id,
+                                                 eventActor->animationData, 0xF4, 1, 1, 1);
         ActorPosition_SetOffsetPoint(eventActor);
-        eventActor->stateReset = 0;
-        eventActor->pendingAction = 0;
+        SceneEventActor_EnterSequenceStep(eventActor, 0);
     }
     {
         u32 mask = 0x400004;
@@ -607,30 +567,26 @@ void BossSlot2_UpdateChargePaletteSequence(struct ActorState *eventActor)
     switch (eventActor->stateReset) {
         case 0:
             if (!eventActor->pendingAction) {
-                SceneActors_StartUnmirroredAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x12B, 2,
-                                                     4);
+                SceneActors_StartUnmirroredAnimation(eventActor, &eventActor->graphics.id,
+                                                     eventActor->animationData, 0x12B, 2, 4);
                 eventActor->pendingAction++;
             }
             if (eventActor->finished == 1) {
-                u32 phase = 1, zero = 0;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                SceneEventActor_EnterSequenceStep(eventActor, 1);
             }
             break;
         case 1:
             if (!eventActor->pendingAction)
-                SceneActors_StartUnmirroredAnimation(eventActor, &eventActor->graphics.id, eventActor->animationData, 0x12D, 2,
-                                                     4);
+                SceneActors_StartUnmirroredAnimation(eventActor, &eventActor->graphics.id,
+                                                     eventActor->animationData, 0x12D, 2, 4);
             if (eventActor->pendingAction > 30) {
-                u32 phase = 2, zero = 0;
-                eventActor->stateReset = phase;
-                eventActor->pendingAction = zero;
+                SceneEventActor_EnterSequenceStep(eventActor, 2);
             } else
                 eventActor->pendingAction++;
             break;
         case 2:
             if (!eventActor->pendingAction) {
-                BossSlot2_SetChargePalette(eventActor, 4, 5, eventActor->pendingAction);
+                SceneEventActor_SetPalette(eventActor, 4, 5);
                 Sound_PlaySong(0x239);
                 eventActor->finished = 1;
                 eventActor->pendingAction++;
@@ -645,8 +601,7 @@ void SceneEventActor_UpdateSongStopTransition(struct ActorState *actor)
     s16 k2;
     if (actor->changed) {
         actor->changed = 0;
-        actor->stateReset = 0;
-        actor->pendingAction = 0;
+        SceneEventActor_EnterSequenceStep(actor, 0);
         Sound_StopSong(0x239);
     }
     {
@@ -657,8 +612,7 @@ void SceneEventActor_UpdateSongStopTransition(struct ActorState *actor)
         case 0:
             if (++actor->pendingAction > 8 && !actor->paletteTimer) {
                 SceneVolume_ResetPendingSequence(actor);
-                actor->stateReset = 1;
-                actor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(actor, 1);
             }
             break;
         case 2:
@@ -694,8 +648,7 @@ void SceneEventActor_UpdateSongStopTransition(struct ActorState *actor)
                 }
                 SceneActors_StartEightDirectionAnimation(actor, &actor->graphics.id,
                                                          actor->animationData, 0xF4, 1, 1, 4);
-                actor->stateReset = phase;
-                actor->pendingAction = 0;
+                SceneEventActor_EnterSequenceStep(actor, phase);
                 actor->pending = 1;
             }
             break;

@@ -1,3 +1,4 @@
+#include "paired_scene_actor.h"
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_control_motion.h"
@@ -5,42 +6,32 @@
 #include "player.h"
 #include "player_cue_sequence.h"
 // confidence=low: positions player before setting release phase
-struct Status {
-    u8 pad[0x15C];
-    u8 animationVariant;
-    u8 unknown15D[3];
-    u32 flags, state, timer;
-    u8 a, b, entered, phase, done;
-};
 void Player_ApplyPositionRequest(void *, void *, u32, u32, u32, u32, u32, u32);
-void ActorStatus_BeginPlayerRelease(u8 *owner, struct Status *s)
+void ActorStatus_BeginPlayerRelease(struct VanargandAttackPair *owner, struct PairedSceneHalf *s)
 {
     u32 mask = 12;
-    s->flags |= mask;
+    s->actionFlags |= mask;
     if (s->entered) {
         s->entered = 0;
-        s->state = 0;
-        s->timer = 0;
-        s->phase = 1;
+        PairedSceneHalf_BeginActionPhase(s, 0);
     }
-    switch (s->state) {
+    switch (s->actionCounters[0]) {
         case 0:
-            Player_ApplyPositionRequest((*(void **)gPlayers), (u8 *)s + 0x1c, 80, 32, 128, 0, 0, 0);
+            Player_ApplyPositionRequest(gPlayers[0], &s->sprite.position, 80, 32, 128, 0, 0, 0);
             {
-                void *data = *(void **)(owner + 0x4d0);
-                Anim_SetSequence((u8 *)s + 0x48, data, 9, s->animationVariant, 0);
+                void *data = (void *)owner->effectResource;
+                Anim_SetSequence(&s->graphics.sequence, data, 9, (u8)s->mode, 0);
             }
-            PlayerCue_StepSequence((struct ContactSwarmSprite *)s,
-                                   (struct DisplaySequenceState *)((u8 *)s + 0x48));
+            PlayerCue_StepSequence(&s->sprite, &s->graphics.sequence);
             {
                 u32 next = 1;
-                s->state = next;
-                s->timer = 0;
-                s->phase = next;
+                s->actionCounters[0] = next;
+                s->actionCounters[1] = 0;
+                s->actionEntered = next;
             }
             break;
         case 1:
-            s->done = 1;
+            s->finished = 1;
             break;
     }
 }

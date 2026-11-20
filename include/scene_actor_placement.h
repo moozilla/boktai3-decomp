@@ -36,6 +36,10 @@ static inline u8 SceneActorPlacement_TestFlags(const u16 *flags, u32 mask)
         return 1;
     return 0;
 }
+static inline void SceneActorPlacement_SetFlags(u32 bits, struct RoomActor *actor)
+{
+    actor->placementFlags = bits | actor->placementFlags;
+}
 static inline void SceneActorPlacement_ClearFlags(u16 *flags, u32 mask)
 {
     *flags &= mask;

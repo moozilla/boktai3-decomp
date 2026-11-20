@@ -54,21 +54,19 @@ s32 ActorAbility_ActivatePaletteEffect(struct ActorAbility *ability)
 {
     struct ActorAbilityOwner *owner;
     struct ActorStats *stats;
-    u32 zero;
     s32 cost;
     ability->request = 255;
     if (Modifier_IsFourthSourceReady(ability)) {
         owner = ability->owner;
         stats = &owner->actors[0].stats;
-        zero = ability->cooldown;
-        if (zero == 0) {
+        if (!ability->cooldown) {
             cost = CallbackList_RunMatchingState(stats, ability->cost, 10);
             if (stats->value >= cost) {
                 s32 palette;
                 ability->cooldown = ability->interval;
                 CallbackList_SubtractStateTenValue(stats, ability, cost);
                 palette = CharacterModel_GetPrimaryPaletteIndex(&owner->actors[0].model);
-                PalFade_Start(stats, 0x385, 0x385, palette, stats->recoveryValue, 16, 4, zero);
+                PalFade_Start(stats, 0x385, 0x385, palette, stats->recoveryValue, 16, 4, 0);
                 ability->remaining = ability->duration;
                 Sound_PlaySong(0x3e3);
             }
@@ -137,8 +135,8 @@ s32 ActorAbility_SpawnProjectile(struct ActorAbility *ability)
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x12000;
-    if (SceneProcSprites_CreateEntry(&stats->position, height, owner->actors[0].control.projectile, owner->actors[0].control.direction,
-                                     &ability->id) < 0) {
+    if (SceneProcSprites_CreateEntry(&stats->position, height, owner->actors[0].control.projectile,
+                                     owner->actors[0].control.direction, &ability->id) < 0) {
     fail:
         return 0;
     }
@@ -166,7 +164,8 @@ s32 ActorAbility_SpawnAlternateProjectile(struct ActorAbility *ability)
     args.y = 0;
     args.z = 0;
     height = stats->height - 0x1a000;
-    if (SpritePool_StartEntry(&stats->position, height, 0, &ability->id, owner->actors[0].control.direction) < 0) {
+    if (SpritePool_StartEntry(&stats->position, height, 0, &ability->id,
+                              owner->actors[0].control.direction) < 0) {
     fail:
         return 0;
     }
@@ -249,11 +248,10 @@ s32 ModifierAction_SpawnBurst(struct ActorStats *stats, void *target)
     struct ActorAbility *ability = &stats->ability;
     ability->request = 0xff;
     if (Modifier_IsFourthSourceReady(ability)) {
-        u32 zero = ability->cooldown;
-        if (!zero) {
+        if (!ability->cooldown) {
             ability->cooldown = ability->interval;
             CallbackList_SubtractStateTenValue(stats, ability, 0);
-            PalFade_Start(stats, 0x385, 0x385, (s32)target, stats->recoveryValue, 16, 4, zero);
+            PalFade_Start(stats, 0x385, 0x385, (s32)target, stats->recoveryValue, 16, 4, 0);
             ability->remaining = ability->duration;
             Sound_PlaySong(0x3e3);
         }

@@ -5330,11 +5330,13 @@ addr,name,mode,confidence,source,notes
 081301C4,SceneActorReaction_UpdateRouteRecovery,thumb,low,src-alias,
 0813042C,SceneActorControl_EnterTimedState,thumb,low,src-alias,
 08130490,SceneActorControl_AdvancePhaseIfFlagged,thumb,low,src-alias,Clears the phase entry byte and increments the phase counter when flag 2 at offset 2D4 is set
+081304C8,SceneActorControl_HideOffscreen,thumb,low,src-alias,Moves the actor and drawable above the active field and disables collision
 081305D0,SceneActorControl_AdvancePhase,thumb,low,src-alias,Clears the phase entry byte and unconditionally increments the counter at offset 2AC
 081305F8,SceneActorControl_BeginIdleControl,thumb,low,src-alias,
 0813067C,SceneActorControl_UpdateSavedControlPhase,thumb,low,src-alias,
 08130714,SceneActorControl_UpdateTriggerApproach,thumb,low,src-alias,
 08130884,SceneActorControl_UpdateTriggerPhase,thumb,low,src-alias,
+08130994,SceneActorControl_UpdateCallbackTrigger,thumb,low,src-alias,Runs the callback then consumes its trigger when the controller completes
 08130AB4,SceneActorState_DispatchTable294State,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x294; table role remains tentative
 08130AD8,SceneActorState_DispatchTable29CState,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x29C; table role remains tentative
 08130AFC,SceneActorState_DispatchTable2A0State,thumb,low,src-alias,Invokes the callback selected by byte 0x2A9 from table 0x2A0; table role remains tentative
@@ -5343,9 +5345,14 @@ addr,name,mode,confidence,source,notes
 08130B7C,SceneActorState_DispatchTable290State,thumb,low,src-alias,Invokes the callback selected by byte 0x2A9 from table 0x290; table role remains tentative
 08130BA0,SceneActor_DispatchActivePhase,thumb,low,src-alias,
 08130BD4,SceneActorRoute_UpdateTimedPhase,thumb,low,src-alias,
+08130CAC,SceneActorRoute_UpdateAdvancePhase,thumb,low,src-alias,Chooses idle or turn behavior after advancing a route descriptor
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
+08130F60,SceneActorRoute_UpdateTriggeredWaitPhase,thumb,low,src-alias,Tentative: advances a timed route after its entry control completes
+08131044,SceneActorRoute_UpdateRouteCompletion,thumb,low,src-alias,Chooses the next behavior when the route descriptor completes
+081312F4,SceneActorRoute_UpdateReturnEntry,thumb,low,src-alias,Chooses a route return phase from motion and route flags
 081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
+08131B40,SceneActorBehavior_DispatchPrimaryOrEnterState2,thumb,low,src-alias,Tentative: runs the primary behavior callback or enters state two while paused
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
 08131CCC,SceneActorBehavior_InstallCallbackTables,thumb,low,src-alias,
@@ -5368,6 +5375,7 @@ addr,name,mode,confidence,source,notes
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive
 08136C74,SceneActorScript_ApplyTargetResetCommand,thumb,low,src-alias,
 08136C80,SceneActorPlacement_HideActor,thumb,low,src-alias,
+08136D40,SceneActorPlacement_ResumeResetControl,thumb,low,src-alias,Tentative: resumes the drawable and shadow before restoring the reset control
 08136DFC,SceneActorPlacement_ShowActor,thumb,low,src-alias,
 08136EB0,SceneActorControl_RestoreInactiveDefaults,thumb,low,src-alias,
 08136F1C,SceneActorScript_OnCommand,thumb,low,src-alias,Shared enemy command callback dispatches through the actor command table using the first command halfword
@@ -6630,6 +6638,7 @@ addr,name,mode,confidence,source,notes
 0817A234,ActorProperty_GetConstant34,thumb,low,src-alias,
 0817A23C,ActorMovement_CanReachTarget,thumb,low,src-alias,
 0817A324,ActorPosition_SaveSelectedPoint,thumb,low,src-alias,
+0817A354,ActorPosition_FindTrackedPointInBounds,thumb,low,src-alias,Returns the index of the first tracked point inside the inclusive X and Z bounds or minus one
 0817A3C4,SceneActors_InitConvergingParticles,thumb,low,src-alias,Initializes four effect sprites and clears the converging particle controller
 0817A41C,SceneActors_RemoveConvergingParticles,thumb,low,src-alias,Removes the four effect sprites initialized by the paired particle setup
 0817A43C,SceneActors_UpdateConvergingParticles,thumb,low,src-alias,Moves active particles toward their shared origin and hides them on arrival

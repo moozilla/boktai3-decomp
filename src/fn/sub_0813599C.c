@@ -25,11 +25,6 @@ struct NavRoute {
     u8 choices[2];
     u8 current;
 };
-static inline void Fill(u32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet(zero, dst, 0x05000002);
-}
 u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
     u8 *nav = (u8 *)actor + 0x3D4;
@@ -82,20 +77,19 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                 actor->base.health -= d;
             }
             if (SceneActorDamage_ShouldShow(actor)) {
-                u32 zero;
-                u32 buffer[2];
+                struct ContactPosition offset;
                 {
                     s32 h = actor->base.health;
-                    s32 maxh = FIELD(actor, 0xB0, u16);
-                    s32 kind = FIELD(actor, 0xB2, s16);
-                    s32 param = FIELD(actor, 0x9A, s16);
-                    SceneHud_SetTimedState(FIELD(actor, 0x50, u32), h, maxh, kind, 1, param);
+                    s32 maxh = (u16)actor->base.defaultHealth;
+                    s32 kind = (s16)actor->base.hudKind;
+                    s32 param = (s16)actor->base.hudLabel;
+                    SceneHud_SetTimedState(actor->base.body.id, h, maxh, kind, 1, param);
                 }
-                Fill(&zero, buffer);
+                ZeroFill8(&offset);
                 if (actor->base.reactionSoundVariant || !(actor->base.hitAttributes & 0x20000))
                     DamageNumberDisplay_Show(&actor->base.colliderA,
                                              actor->base.reactionSoundVariant, 0,
-                                             &actor->base.body.position, buffer, 1);
+                                             &actor->base.body.position, &offset, 1);
             }
             SceneBody_StartRoute(
                 (u8 *)actor + 0x50, nav + 0x74,

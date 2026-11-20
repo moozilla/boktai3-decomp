@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 
@@ -22,15 +23,6 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
     }
     actor->base.pendingControl = 0;
 }
-static inline void ResetState(struct ChaseActor *actor)
-{
-    u32 state = 2;
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = state;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
@@ -42,8 +34,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionalEntry(actor, 1);
         speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
         {
-            u32 mask = 0xa02f;
-            if (actor->base.motionFlags & mask) {
+            if (SceneActorBehavior_MotionBits(0xA02F, actor)) {
                 u16 *p = &actor->base.field2C2;
                 *p = 64;
                 scale = p;
@@ -62,7 +53,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *(void **)(group + 0x1fc), 32, 32,
                                                           speed)) {
             Trigger_ConsumePending((u8 *)actor + 0xc, 1);
-            ResetState(actor);
+            SceneActorTerrain_EnterState(actor, 2, 0, 2);
             SetControl(actor, actor->base.onStanding, 0);
         } else {
             actor->base.counter2AC++;

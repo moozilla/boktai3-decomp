@@ -24,11 +24,15 @@ struct RegistryActorControl {
     u32 ticks, active;
     u16 boostFrames, updateFlags;
     void *owner;
-    u8 unknown8C0[0xC];
+    u32 attachmentFlags, attachmentParameter;
+    s16 attachmentScreenX, attachmentScreenY;
     u32 effectFlags, projectile;
     u8 unknown8D4[0xC];
     s8 direction;
-    u8 unknown8E1[0x27];
+    u8 unknown8E1[0xF];
+    s16 attachmentOffsetX, attachmentOffsetY;
+    u8 unknown8F4[0x10];
+    void *attachment;
 };
 struct RegistryActor {
     struct ActorStats stats;
@@ -39,16 +43,40 @@ struct RegistryActor {
     u8 resetKeys, unknown851[3];
     struct RegistryActorControl control;
 };
+enum {
+    REGISTRY_ACTOR_SLOT_COUNT = 1,
+    REGISTRY_ACTOR_MOTION_COMMANDS = 1,
+    REGISTRY_ACTOR_MESSAGES_PAUSED = 0x800,
+};
+
 /* The ability callback owner is the task containing this one-slot registry. */
 struct ActorAbilityOwner {
     struct Task task;
-    struct RegistryActor actors[1];
+    struct RegistryActor actors[REGISTRY_ACTOR_SLOT_COUNT];
 };
 typedef struct ActorAbilityOwner RegistryActorManager;
 
+static inline void RegistryActor_StartMotion(struct RegistryActor *actor,
+                                             void (*update)(struct RegistryActor *))
+{
+    actor->resetKeys = 1;
+    actor->control.update = update;
+    actor->fallTimer = 0;
+}
+
+static inline void RegistryActor_SetMotionFlags(u16 bits, struct RegistryActorMotion *motion)
+{
+    motion->flags = bits | motion->flags;
+}
+
+static inline u32 RegistryActor_MessagePauseBits(u32 mask)
+{
+    return (gEngineFlags | gScenePauseFlags) & mask;
+}
+
 struct RegistryActor *RegistryA8CB_FindOwnedEntry(void *);
 void ActorMotion_UpdateFallFrame(struct RegistryActor *);
-void SceneActor_DispatchCommands(struct RegistryActor *);
+s32 SceneActor_DispatchCommands(struct RegistryActor *);
 void Character_UpdateTimedEffect(void *);
 void Anim_Remove(void *);
 void SpatialIndex_RemoveEntry(void *);

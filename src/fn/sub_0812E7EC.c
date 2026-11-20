@@ -1,3 +1,5 @@
+#include "scene_event_dispatch.h"
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_chase_reaction.h"
 struct ActorCommand {
     u8 unknown0[6];
@@ -8,15 +10,6 @@ struct ActorCommand {
             s32 kind : 16, value : 16, initial : 16, count : 16;
         } attachment;
     } data;
-};
-struct CommandReceiver {
-    u8 unknown0[6];
-    u8 counts[2];
-    struct ActorCommand *commands[2][4];
-};
-struct CommandScene {
-    u8 unknown0[0x24];
-    u8 bank;
 };
 struct CommandRoute {
     u8 unknown0[0xC];
@@ -32,7 +25,7 @@ struct CommandAttachmentValues {
 };
 struct SceneActorCommandFields {
     u8 unknown0[0xC];
-    struct CommandReceiver receiver;
+    struct SceneEventReceiver receiver;
     u8 unknown34[0xA8 - 0x34];
     struct CommandAttachmentValues attachmentValues;
     u8 unknownAC[0x2FC - 0xAC];
@@ -41,10 +34,8 @@ struct SceneActorCommandFields {
     u8 desiredDirection;
 };
 #define CommandFields(actor) ((struct SceneActorCommandFields *)(actor))
-extern struct CommandScene *gSceneEventDispatchState;
 void SceneActorControl_OnIdle(void);
 u32 Trigger_ConsumePending(void *, u32);
-void SceneMessages_SetPendingTrigger(void *, void *);
 void SceneActorRegistry_SendToActorId(u8, void *, u16);
 void SceneActorAttachment_ApplySlotCommand(struct ChaseActor *, void *, u32, u32, u32);
 void SceneActorAttachment_SelectOffsets(u8, u8, s32 *, s32 *);
@@ -74,28 +65,8 @@ static inline u8 HasGroup(struct ChaseActor *actor)
 }
 static inline void SetBehaviorAndIdle(struct ChaseActor *actor, u32 state, u32 behavior)
 {
-    u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = state;
-    actor->base.phase2A9 = zero;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = 1;
-    {
-        void *control = SceneActorControl_OnIdle;
-        u32 kind = 0x10;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = control;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            s32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-    }
+    SceneActorTerrain_EnterState(actor, state, 0, behavior);
+    SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 0x10);
 }
 /* Command payloads and attachment offsets reuse this local workspace. */
 union CommandWorkspace {
@@ -108,7 +79,7 @@ union CommandWorkspace {
 s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
 {
     struct ChaseActor *actor = input;
-    struct CommandReceiver *receiver = NULL;
+    struct SceneEventReceiver *receiver = NULL;
     struct SceneActorChaseGroup *group;
     void *attachment;
     union CommandWorkspace workspace;
@@ -124,10 +95,10 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
     receiver = &CommandFields(actor)->receiver;
     category = actor->base.category;
     i = 0;
-    if (i < receiver->counts[gSceneEventDispatchState->bank]) {
+    if (i < receiver->count[gSceneEventDispatchState->phase]) {
         do {
-            struct CommandScene *scene = gSceneEventDispatchState;
-            struct ActorCommand *command = receiver->commands[scene->bank][i];
+            struct SceneEventDispatchState *scene = gSceneEventDispatchState;
+            struct ActorCommand *command = (void *)receiver->pending[scene->phase][i];
             switch (command->command) {
                 case 0:
                     if (category == 18) {
@@ -305,9 +276,9 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
                     Trigger_ConsumePending(&CommandFields(actor)->receiver, 1);
                     break;
             }
-            SceneMessages_SetPendingTrigger(receiver, command);
+            SceneMessages_SetPendingTrigger(receiver, (struct SceneEventCommand *)command);
             ++i;
-        } while (i < receiver->counts[gSceneEventDispatchState->bank]);
+        } while (i < receiver->count[gSceneEventDispatchState->phase]);
     }
     return 1;
 }

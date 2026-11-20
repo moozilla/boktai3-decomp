@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_sequence.h"
+#include "fixed8_interpolation.h"
 #include "render.h"
 
 void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
@@ -23,51 +24,10 @@ void SceneActorSequence_BeginFadeIn(struct SceneActorSequence *p)
 
 void SceneActorSequence_BeginDownwardMotion(struct SceneActorSequence *p);
 
-s32 __divsi3(s32, s32);
-
 void SceneActorSequence_UpdateFadeIn(struct SceneActorSequence *p)
 {
-    s32 v;
-
-    {
-        s32 duration = 160;
-        s32 timer = p->timer;
-        if (timer <= 0) {
-            v = 320;
-        } else if (timer >= duration) {
-            v = 192;
-        } else {
-            s32 k = -32768;
-            k *= timer;
-            k = __divsi3(k, duration);
-            if (k >= 0)
-                k >>= 8;
-            else
-                k = -((-k) >> 8);
-            v = k + 320;
-        }
-        p->layer3X = v;
-    }
-
-    {
-        s32 duration = 160;
-        s32 timer = p->timer;
-        if (timer <= 0) {
-            v = 224;
-        } else if (timer >= duration) {
-            v = 32;
-        } else {
-            s32 k = -49152;
-            k *= timer;
-            k = __divsi3(k, duration);
-            if (k >= 0)
-                k >>= 8;
-            else
-                k = -((-k) >> 8);
-            v = k + 224;
-        }
-        p->layer1X = v;
-    }
+    p->layer3X = Fixed8_Interpolate(320, 192, 160, p->timer);
+    p->layer1X = Fixed8_Interpolate(224, 32, 160, p->timer);
 
     {
         s32 n = p->timer + 1;
@@ -107,47 +67,8 @@ void SceneActorSequence_BeginCenterMotion(struct SceneActorSequence *p);
 
 void SceneActorSequence_UpdateFadeInHold(struct SceneActorSequence *p)
 {
-    s32 v;
-
-    {
-        s32 duration = 0x40;
-        s32 timer = p->timer;
-        if (timer <= 0) {
-            v = 192;
-        } else if (timer >= duration) {
-            v = 168;
-        } else {
-            s32 k = -6144;
-            k *= timer;
-            k = __divsi3(k, duration);
-            if (k >= 0)
-                k >>= 8;
-            else
-                k = -((-k) >> 8);
-            v = k + 192;
-        }
-        p->layer3X = v;
-    }
-
-    {
-        s32 duration = 0x40;
-        s32 timer = p->timer;
-        if (timer <= 0) {
-            v = 32;
-        } else if (timer >= duration) {
-            v = 16;
-        } else {
-            s32 k = -4096;
-            k *= timer;
-            k = __divsi3(k, duration);
-            if (k >= 0)
-                k >>= 8;
-            else
-                k = -((-k) >> 8);
-            v = k + 32;
-        }
-        p->layer1X = v;
-    }
+    p->layer3X = Fixed8_Interpolate(192, 168, 64, p->timer);
+    p->layer1X = Fixed8_Interpolate(32, 16, 64, p->timer);
 
     {
         s32 n = p->timer + 1;
@@ -211,9 +132,7 @@ void SceneActorSequence_UpdateSecondWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *p)
 {
-    struct V {
-        s16 x, y, z;
-    } v;
+    struct SceneActorSequencePoint v;
     s16 *q = (s16 *)&v;
     int a = 0x70, b = 0x48, z = 0;
     v.x = a;
@@ -221,7 +140,7 @@ void SceneActorSequence_BeginSecondWaypointMotion(struct SceneActorSequence *p)
     q[2] = z;
     SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x10, p->firstWaypointSpeed, 0x32);
     p->updateState = SceneActorSequence_UpdateSecondWaypointMotion;
-    p->timer = z;
+    p->timer = 0;
 }
 
 void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *);
@@ -236,9 +155,7 @@ void SceneActorSequence_UpdateFinalWaypointMotion(struct SceneActorSequence *);
 
 void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *p)
 {
-    struct V {
-        s16 x, y, z;
-    } v;
+    struct SceneActorSequencePoint v;
     s16 *q = (s16 *)&v;
     int a = 0x36, b = 0x52, z = 0;
     v.x = a;
@@ -246,7 +163,7 @@ void SceneActorSequence_BeginFinalWaypointMotion(struct SceneActorSequence *p)
     q[2] = z;
     SceneTarget_BeginMove(p->actor, 0, (s16 *)&v, -1, 0x1, p->finalWaypointSpeed, 0x3C);
     p->updateState = SceneActorSequence_UpdateFinalWaypointMotion;
-    p->timer = z;
+    p->timer = 0;
 }
 
 void SceneActorSequence_BeginFadeOut(struct SceneActorSequence *);
@@ -283,28 +200,28 @@ void SceneActorSequence_UpdateCompletionDelay(struct SceneActorSequence *p)
     }
 }
 
-static inline s32 State(u8 *p)
+static inline s32 SceneActorSequence_ReadAnimationPhase(const s16 *state)
 {
-    return *(s16 *)(p + 0x86);
+    return *state;
 }
 
-void SceneActorSequence_UpdateActorAnimation(u8 *p)
+void SceneActorSequence_UpdateActorAnimation(struct SceneActorSequenceActor *p)
 {
-    if (*(u32 *)(p + 0x1c) & 1)
+    if (p->flags & 1)
         return;
-    switch (*(s16 *)(p + 0x86)) {
+    switch (p->animationState) {
         case 0:
-            if (++*(s16 *)(p + 0x84) > 1) {
-                *(s16 *)(p + 0x2c) = State(p);
-                *(s16 *)(p + 0x86) = 1;
-                *(s16 *)(p + 0x84) = 0;
+            if (++p->animationTimer > 1) {
+                p->animationFrame = SceneActorSequence_ReadAnimationPhase(&p->animationState);
+                p->animationState = 1;
+                p->animationTimer = 0;
             }
             break;
         case 1:
-            if (++*(s16 *)(p + 0x84) > 0) {
-                *(s16 *)(p + 0x2c) = State(p);
-                *(s16 *)(p + 0x86) = 0;
-                *(s16 *)(p + 0x84) = 0;
+            if (++p->animationTimer > 0) {
+                p->animationFrame = SceneActorSequence_ReadAnimationPhase(&p->animationState);
+                p->animationState = 0;
+                p->animationTimer = 0;
             }
             break;
     }
@@ -368,20 +285,13 @@ u32 RegistryF3E4_CreateHidden(s32, s32);
 
 void SceneActorSequence_BeginFadeIn(struct SceneActorSequence *);
 
-static inline void fill32(void *dst, u32 *tmp, u32 ctl)
-{
-    *tmp = 0;
-    CpuSet(tmp, dst, ctl);
-}
-
 s32 SceneActorSequence_InitFromScript(struct SceneActorSequence *p, void *scriptContext)
 {
-    u32 zero;
     u32 e;
     SceneActorSequence_InitDisplayResources(p);
     p->actor = RegistryF3E4_CreateHidden(2, 0);
-    fill32(&p->layer3X, &zero, 0x05000002);
-    fill32(&p->layer1X, &zero, 0x05000002);
+    ZeroFill8(&p->layer3X);
+    ZeroFill8(&p->layer1X);
     p->layer1X = 0xE0;
     p->layer3X = 0x140;
     if ((e = Script_SeekToKeyword('e')) != 0)

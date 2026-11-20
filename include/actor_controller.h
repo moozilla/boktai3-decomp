@@ -34,6 +34,23 @@ static inline void ActorController_SetColliderFlags(struct ContactCollider *coll
     collider->flags |= flags;
 }
 
+/* Collider zero is the attack collider. These profiles leave it inactive. */
+static inline void ActorController_SelectDefenseColliders(struct SceneCombatActor *actor)
+{
+    ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], 4);
+    ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
+    ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
+    ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], 4);
+}
+
+static inline void ActorController_SelectPairedColliders(struct SceneCombatActor *actor)
+{
+    ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], 4);
+    ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
+    ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
+    ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], 4);
+}
+
 static inline void ActorController_ClearMotionFlags(struct ActorControllerMotion *motion, u32 flags)
 {
     motion->flags &= ~flags;

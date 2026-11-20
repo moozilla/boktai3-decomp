@@ -1,25 +1,9 @@
+#include "paired_scene_actor.h"
 #include "global.h"
 
-struct ActorStatus {
-    u8 pad0[0x15C];
-    u32 mode;
-    u32 flags;
-    u8 pad164[8];
-    u8 state;
-    u8 pad16D[3];
-    u8 phase;
-    u8 pad171[3];
-    s16 duration;
-    u8 pad176[0xC];
-    s16 remaining;
-    u8 pad184[6];
-    u16 elapsed;
-    u8 pad18C[0x10];
-    u32 timer;
-};
 struct ActorStatusOwner {
     u8 pad[0x50];
-    struct ActorStatus *status;
+    struct PairedSceneHalf *status;
 };
 static inline u32 masked(u32 *p, u32 mask)
 {
@@ -27,28 +11,28 @@ static inline u32 masked(u32 *p, u32 mask)
 }
 s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *owner, s32 cancel, s32 duration)
 {
-    struct ActorStatus *status = owner->status;
+    struct PairedSceneHalf *status = owner->status;
     if (cancel == 0) {
         if (status->mode == 0)
-            duration = status->duration;
+            duration = status->health;
         else
-            duration -= status->elapsed;
+            duration -= *(u16 *)status->unknown18A;
         if (duration > 0) {
             u32 mask = 0x100;
-            if (!masked(&status->flags, mask)) {
+            if (!masked(&status->actionFlags, mask)) {
                 status->state = 0x15;
-                status->phase = 0;
+                status->finished = 0;
             }
-            status->remaining = duration;
-            status->timer = 15;
+            status->specialDamage = duration;
+            status->shake = 15;
         }
     } else {
         u32 state, phase;
-        status->flags = masked(&status->flags, ~0x100);
+        status->actionFlags = masked(&status->actionFlags, ~0x100);
         state = 0x16;
         phase = 0;
         status->state = state;
-        status->phase = phase;
+        status->finished = phase;
     }
     return 1;
 }

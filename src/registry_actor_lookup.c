@@ -3,7 +3,7 @@
 struct RegistryActor *RegistryA8CB_FindAvailableEntry(RegistryActorManager *manager)
 {
     s32 index;
-    for (index = 0; index < 1; index++) {
+    for (index = 0; index < REGISTRY_ACTOR_SLOT_COUNT; index++) {
         if (manager->actors[index].control.active != 1)
             return &manager->actors[index];
     }
@@ -13,7 +13,7 @@ struct RegistryActor *RegistryA8CB_FindAvailableEntry(RegistryActorManager *mana
 struct RegistryActor *RegistryA8CB_FindEntryByName(RegistryActorManager *manager, u32 name)
 {
     s32 index;
-    for (index = 0; index < 1; index++) {
+    for (index = 0; index < REGISTRY_ACTOR_SLOT_COUNT; index++) {
         if (manager->actors[index].control.active != 0 &&
             (u32)manager->actors[index].control.owner == name)
             return &manager->actors[index];
@@ -23,8 +23,7 @@ struct RegistryActor *RegistryA8CB_FindEntryByName(RegistryActorManager *manager
 
 void RegistryA8CB_RegisterMessageReceiver(struct RegistryActor *actor)
 {
-    u32 mask = 0x800;
-    if (((gEngineFlags | gScenePauseFlags) & mask) == 0)
+    if (RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED) == 0)
         SceneMessages_RegisterReceiver(actor->control.messages, (u32)actor->control.owner, 0xc);
 }
 

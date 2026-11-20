@@ -1,37 +1,15 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-#define SceneActorRoute_UpdateReturnEntry sub_081312F4
 
 static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;
     {
         u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
-static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
-{
-    u32 offset;
-    u32 zero;
-    {
-        u8 *field = &actor->base.field2B2;
-        zero = 0;
         *field = 1;
     }
     offset = 0x2B0;
@@ -69,7 +47,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
     u8 *group = (u8 *)&actor->group.common;
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        BeginControlZero(actor, actor->base.onEntry, 2);
+        SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     result = sub_0812F3CC(actor);
@@ -88,7 +66,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
                     State(actor, 7, flags);
                 else
                     State(actor, 2, bits);
-                BeginControlZero(actor, actor->base.onAlternateEntry, 1);
+                SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
             }
         } else
             actor->base.counter2AC++;

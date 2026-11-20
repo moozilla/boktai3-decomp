@@ -1,3 +1,4 @@
+#include "scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "debug.h"
@@ -12,35 +13,12 @@ static inline u8 TakeReset(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void Enter(struct ChaseActor *actor, u32 zero)
-{
-    u32 state = 10;
-    u8 *field = &actor->base.state2A8;
-    u32 offset;
-    *field = zero;
-    offset = 0x2A9;
-    *((u8 *)actor + offset) = zero;
-    offset++;
-    *((u8 *)actor + offset) = state;
-    offset += 2;
-    *(u32 *)((u8 *)actor + offset) = zero;
-    actor->base.field2B1 = 1;
-}
-
 void SceneActorControl_EnterTimedState(struct ChaseActor *actor)
 {
-    u32 masked;
-    u16 flags;
-    u32 zero;
-    u32 bit;
     if (TakeReset(actor)) {
         DEBUG_PRINT();
     }
-    bit = 0x20;
-    masked = actor->base.motionFlags & bit;
-    flags = (u16)masked;
-    zero = flags;
-    if ((bit = zero) == 0)
-        Enter(actor, zero);
+    if (!SceneActorChase_MotionFlags(actor, 0x20))
+        SceneActorChase_SetBehavior(actor, 10);
     actor->base.counter2AC++;
 }

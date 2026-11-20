@@ -1,15 +1,5 @@
 #include "actor_decision.h"
 
-static inline u8 ActorDecision_ConsumeTrigger(struct ActorState *actor)
-{
-    if (actor->triggered) {
-        actor->triggered = 0;
-        actor->pending = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline s32 GetPulseTrigger(struct ActorStateOwner *owner, u8 **trigger)
 {
     *trigger = &owner->actor.triggered;
@@ -28,7 +18,7 @@ static inline s32 RandomValue(void)
 void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         stateData->animationState = 3;
         stateData->movementTarget = stateData->nearbyPosition;
         {
@@ -50,9 +40,7 @@ void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
     else if (actor->timer > 60 && SceneVolume_FindNearbyPosition(stateData) == 1)
         SceneVolume_BeginPhase(actor, 3);
     else if (actor->timer > 600 || SceneVolume_ConsumePendingEvent(stateData)) {
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     } else if (actor->pending) {
         stateData->animationState = 3;
         {
@@ -66,15 +54,13 @@ void ActorDecision_UpdateTimedPhase(struct ActorState *actor)
 void ActorDecision_UpdateDelayPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 phase = 5;
         actor->state = phase;
     }
     stateData->decisionTimeout = 600;
     if (actor->timer > 30) {
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     }
     actor->timer++;
 }
@@ -98,9 +84,7 @@ void ActorDecision_UpdatePulsePhase(struct ActorStateOwner *input)
     else if (owner->actor.timer > 60 && SceneVolume_FindNearbyPosition(&actor->actor) == 1)
         SceneVolume_BeginPhase(&owner->actor, 3);
     else if (owner->actor.timer > 210) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
     }
     if (actor->actor.requestMode == 2)
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 30, 1);
@@ -116,18 +100,18 @@ void ActorDecision_UpdatePulsePhase(struct ActorStateOwner *input)
 void ActorDecision_UpdateHazardPath(struct ActorState *actor)
 {
     struct ActorState *path = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         path->animationState = 3;
         path->animationIndex = (RandomValue() >> 8) & 3;
         path->animationDetail = Mod(RandomValue(), 5);
-        Path_GetPointPositionById(&path->movementTarget, path->animationIndex, path->animationDetail);
+        Path_GetPointPositionById(&path->movementTarget, path->animationIndex,
+                                  path->animationDetail);
         {
             u32 state = 4;
             actor->state = state;
         }
         {
-            u32 mask = 2;
-            path->attackFlags |= mask;
+            path->attackFlags |= 2;
         }
     }
     if (SceneVolume_GetActivityState(actor))
@@ -136,12 +120,12 @@ void ActorDecision_UpdateHazardPath(struct ActorState *actor)
         if (SceneVolume_ConsumePendingEvent(path)) {
             path->animationDetail++;
             if (++actor->timer > 3) {
-                actor->requestedVariant = actor->variant;
-                actor->request = 1;
-                actor->requestPhase = 0;
+                SceneVolume_RequestRestart(actor);
             } else
-                AnimatedHazard_CreateProximity(&actor->body.position, path->hazardParameter, 800, 60);
-            Path_GetPointPositionById(&path->movementTarget, path->animationIndex, path->animationDetail);
+                AnimatedHazard_CreateProximity(&actor->body.position, path->hazardParameter, 800,
+                                               60);
+            Path_GetPointPositionById(&path->movementTarget, path->animationIndex,
+                                      path->animationDetail);
             path->animationState = 3;
             {
                 u32 state = 4;
@@ -161,7 +145,7 @@ void ActorDecision_UpdateFlagPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
     s32 result;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 phase = 8;
         actor->state = phase;
     }
@@ -170,24 +154,20 @@ void ActorDecision_UpdateFlagPhase(struct ActorState *actor)
         SceneVolume_BeginPhase(actor, 2);
         stateData->attackFlags |= 1;
     } else if (actor->timer > 600) {
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     }
     actor->timer++;
 }
 
 void SceneActorState_UpdateAnimationRequest(struct ActorState *actor)
 {
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 state = 7;
         actor->state = state;
     }
     if (actor->pending == 1) {
         actor->state = 1;
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     }
     actor->timer++;
 }
@@ -195,16 +175,14 @@ void SceneActorState_UpdateAnimationRequest(struct ActorState *actor)
 void ActorDecision_UpdatePendingPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 phase = 2;
         actor->state = phase;
     } else if (actor->pending == 1) {
         if (stateData->transitionBlocked)
             SceneVolume_BeginPhase(actor, 1);
         else {
-            actor->requestedVariant = actor->variant;
-            actor->request = 1;
-            actor->requestPhase = 0;
+            SceneVolume_RequestRestart(actor);
         }
     }
     actor->timer++;
@@ -213,7 +191,7 @@ void ActorDecision_UpdatePendingPhase(struct ActorState *actor)
 void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
 {
     struct ActorState *stateData = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         stateData->animationState = 3;
         ActorMovement_FindQuarterTurnPoint(stateData, &stateData->movementTarget);
         {
@@ -231,9 +209,7 @@ void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
         }
     } else if (actor->controlPhase == 3) {
         if (actor->pending == 1) {
-            actor->requestedVariant = actor->variant;
-            actor->request = 1;
-            actor->requestPhase = 0;
+            SceneVolume_RequestRestart(actor);
         }
     } else if (actor->pending == 1) {
         if (stateData->requestMode == 0)
@@ -252,17 +228,14 @@ void ActorDecision_UpdateThresholdPhase(struct ActorState *actor)
 
 void ActorDecision_ClearTrigger(struct ActorState *actor)
 {
-    if (actor->triggered != 0) {
-        actor->triggered = 0;
-        actor->pending = 0;
-    }
+    ActorState_TakeEntryTrigger(actor);
 }
 
 void ActorDecision_UpdateFlaggedWait(struct ActorState *actor)
 {
     u32 mask;
     u32 flags;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 state = 0xc;
         actor->state = state;
     }
@@ -283,32 +256,28 @@ void ActorDecision_UpdateFlaggedWait(struct ActorState *actor)
 void ActorState_UpdateTrigger(struct ActorState *actor)
 {
     struct ActorState *actorData = actor;
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 state = 9;
         actor->state = state;
         ActorExtension_ResetState(actorData);
         actorData->hitParameter = 0x70;
     }
     if (actor->pending) {
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     }
     actor->timer++;
 }
 
 void ActorState_UpdateConditionalTrigger(struct ActorState *actor)
 {
-    if (ActorDecision_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         u32 state = 10;
         actor->state = state;
     }
     if (SceneVolume_GetActivityState(actor)) {
         SceneVolume_BeginPhase(actor, 2);
     } else if (actor->pending) {
-        actor->requestedVariant = actor->variant;
-        actor->request = 1;
-        actor->requestPhase = 0;
+        SceneVolume_RequestRestart(actor);
     }
     actor->timer++;
 }

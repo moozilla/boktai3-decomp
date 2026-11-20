@@ -78,14 +78,13 @@ static inline u8 SceneActorReaction_Arrive(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
     {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
+        SceneActorChase_ClearFlagComponent(
+            (struct SceneActorChaseFlags16 *)&group->common.gate.flags, 4);
     }
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
@@ -122,7 +121,6 @@ success:
 void SceneActorReaction_UpdateRouteReturn(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u32 zero;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
@@ -130,8 +128,7 @@ void SceneActorReaction_UpdateRouteReturn(struct ChaseActor *actor)
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    zero = (u8)sub_0812F3CC(actor);
-    if (zero)
+    if ((u8)sub_0812F3CC(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;

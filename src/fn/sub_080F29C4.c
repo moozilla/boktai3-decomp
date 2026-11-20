@@ -1,46 +1,23 @@
-#include "global.h"
-struct Elem {
-    u32 flags;
-    u8 pad4[0x28];
-};
-struct Obj {
-    u8 pad0[0xa8];
-    struct Elem elems[4];
-    u8 pad158[0x330];
-    u16 endX, endY, endZ, pad48E;
-    s16 dx, dy, dz, pad496;
-    u16 startX, startY, startZ;
-    u8 pad49E[0x16];
-    u16 timer;
-    u8 pad4B6[0x6ce];
-    u16 x, y, z;
-    u8 padB8A[0x14e];
-    void (*callback)(struct Obj *);
-};
+#include "phase_object.h"
 s32 Div(s32, s32);
-void PhaseObject_TickEntryReset(struct Obj *);
-void Ivy_UpdatePositionTransition(struct Obj *p)
+void PhaseObject_TickEntryReset(struct PhaseObject *);
+void Ivy_UpdatePositionTransition(struct PhaseObject *p)
 {
     u32 age;
-    p->x = p->startX + Div(p->dx * p->timer, 16);
-    p->y = p->startY + Div(p->dy * p->timer, 16);
-    p->z = p->startZ + Div(p->dz * p->timer, 16);
-    age = p->timer++;
+    p->position.x = p->start.x + Div(p->delta.x * p->turnFrames, 16);
+    p->position.y = p->start.y + Div(p->delta.y * p->turnFrames, 16);
+    p->position.z = p->start.z + Div(p->delta.z * p->turnFrames, 16);
+    age = p->turnFrames++;
     if ((u16)age > 16) {
-        struct Elem *e;
-        void (*callback)(struct Obj *);
-        u32 one;
-        p->timer = 0;
-        p->x = p->endX;
-        p->y = p->endY;
-        p->z = p->endZ;
+        s32 i;
+        void (*callback)(struct PhaseObject *);
+        p->turnFrames = 0;
+        p->position.x = p->goal.x;
+        p->position.y = p->goal.y;
+        p->position.z = p->goal.z;
         callback = PhaseObject_TickEntryReset;
-        one = 1;
-        e = p->elems;
-        do {
-            e->flags |= one;
-            e++;
-        } while ((s32)e <= (s32)(p->elems + 3));
-        p->callback = callback;
+        for (i = 0; i < 4; i++)
+            p->entries[i].flags |= 1;
+        p->transition = callback;
     }
 }

@@ -241,6 +241,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #compiler #matching #monsters #phase3 | 0 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | November 20 | #actors #matching #tooling #wireless | 0 |
 | [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #matching #phase3 #scene-actors | 0 |
+| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #actors #matching #scene #tooling | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -601,6 +602,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
 | [notes/scene-actor-warning-cleanup_2026-11-20.md](../notes/scene-actor-warning-cleanup_2026-11-20.md) | Scene actor warning cleanup checkpoint | #scene-actors #phase3 #matching #0801E000 #080297E8 | 1 |
+| [notes/scene-actors-second-half_2026-11-20.md](../notes/scene-actors-second-half_2026-11-20.md) | Scene actors and NPCs, second half | #scene #actors #matching #tooling | 2 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
 | [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |

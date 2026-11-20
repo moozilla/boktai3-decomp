@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_chase.h"
 
@@ -62,7 +63,7 @@ static inline struct SceneActorReactionMotion *MakeMotionPointer(void *actor)
 }
 u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct SceneActorReactionMotion *motion;
     if (!ActorFlags(actor, 0x400000) || !ActorFlags(actor, 0x200000) ||
         !HasTargetFlag(&motion, MakeMotionPointer(actor), 1))
@@ -73,9 +74,9 @@ u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
     SetState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetActorFlags(actor, 0x10);
-    SaveDelay(group + 0x8c, actor->base.onStanding, 9);
-    Chase_SnapToRoute(*(struct ContactPosition **)(group + 0x200), group + 0x74);
-    (*(struct ContactPosition **)(group + 0x200))->pad = 1;
+    SaveDelay((u8 *)&group->saved, actor->base.onStanding, 9);
+    Chase_SnapToRoute(group->destination, &group->homeRoute);
+    group->destination->pad = 1;
     actor->base.field2C2 = 64;
     actor->group.common.gate.flags = 0;
     actor->group.common.gate.counter = 0;
@@ -86,21 +87,17 @@ u8 SceneActorReaction_BeginTargetRecovery(struct ChaseActor *actor)
     }
     ClearTargetFlags(motion, ~0x18);
     {
-        u8 *control = (u8 *)actor + 0x420;
+        struct SceneActorRegistryControl *control = &actor->group.common.control;
         if (ActorFlags(actor, 0x200000)) {
             {
                 u32 *flags = &actor->base.statusFlags;
                 u32 mask = ~0x1000000;
                 *flags &= mask;
             }
-            {
-                u16 *flags = &actor->base.motionFlags;
-                u32 mask = 0x200;
-                *flags &= ~mask;
-            }
-            control[10] = 0;
-            *(u32 *)(control + 24) = 0;
-            *(u16 *)(control + 8) = 0;
+            SceneActorChase_ClearBits(&actor->base.motionFlags, 0x200);
+            control->mode = 0;
+            control->counter = 0;
+            control->timer = 0;
         }
     }
     {

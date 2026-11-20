@@ -305,6 +305,28 @@ void clear(void) {
         self.assertEqual(warns("void f(void) {\n    union {\n        u32 mask;\n        u32 *cursor;\n    } r;\n}\n"), ["local-union"])
         self.assertEqual(warns("void f(void) {\n    union Fixed value;\n}\n"), [])
 
+    def test_file_scope_member_union_is_not_local(self):
+        source = """\
+struct ActorCommand {
+    union {
+        s16 args[4];
+        struct {
+            s16 kind, value, initial, count;
+        } attachment;
+    } data;
+};
+
+static inline void ReadCommand(void)
+{
+union Local {
+    u32 word;
+    u16 halves[2];
+} sample;
+}
+"""
+        reports = [site for site in c.sites(source) if site.kind == "local-union"]
+        self.assertEqual([site.line for site in reports], [12])
+
     def test_warnings_do_not_score_and_library_is_exempt(self):
         text = "void f(void) {\n    int zero = 0;\n}\n"
         self.assertEqual(kinds(text), [])

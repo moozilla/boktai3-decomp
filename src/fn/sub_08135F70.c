@@ -70,8 +70,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
 {
     if (actor) {
         {
-            u32 mask = 0x40;
-            if (mask & flags)
+            if (0x40 & flags)
                 return 1;
         }
         {
@@ -89,8 +88,7 @@ static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *
 {
     if (actor) {
         {
-            u32 mask = 0x40;
-            if (mask & flags)
+            if (0x40 & flags)
                 return 1;
         }
         {
@@ -179,12 +177,6 @@ clearShared: {
     u32 mask = ~0x2000;
     *flags2CC &= mask;
 }
-}
-
-static inline void Fill(u32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet(zero, dst, 0x05000002);
 }
 
 u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
@@ -367,8 +359,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                 } decision;
                 decision.raw = ShouldShowDamage(actor);
                 if (decision.part.value) {
-                    u32 zero;
-                    u32 buffer[2];
+                    struct ContactPosition offset;
                     s32 h = *savedHealth;
                     s32 maxh = (u16)actor->base.defaultHealth;
                     s32 kind = (s16)actor->base.hudKind;
@@ -378,11 +369,11 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                     decision.part.value = 1;
                     priority = decision.part.value;
                     SceneHud_SetTimedState(id, h, maxh, kind, mode >> 2, param);
-                    Fill(&zero, buffer);
+                    ZeroFill8(&offset);
                     if (actor->base.reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                         DamageNumberDisplay_Show(&actor->base.colliderA,
                                                  actor->base.reactionSoundVariant, 0,
-                                                 &actor->base.body.position, buffer, priority);
+                                                 &actor->base.body.position, &offset, priority);
                 }
             }
         }

@@ -8,14 +8,10 @@ void ActorStatus_InitializeCollider(void *, s32, s32, s32);
 void ActorStatus_InitializeBodyCollider(void *);
 s32 ActorStatus_BeginTimedState(struct ActorStatusOwner *, s32, s32);
 s32 TargetRegistry_RegisterSceneActor(struct PairedHalfTarget *, struct ContactCollider *,
-                                     s32 (*)(struct ActorStatusOwner *, s32, s32));
+                                      s32 (*)(struct ActorStatusOwner *, s32, s32));
 void ScaledShadow_Initialize(void *, void *, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 void ScaledShadow_SetGraphic(void *, u32, s32);
 void ScaledShadow_Enable(void *);
-static inline void FillOffset(void *destination, u32 value)
-{
-    CpuSet(&value, destination, 0x05000002);
-}
 
 void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin, s32 mode)
 {
@@ -37,7 +33,7 @@ void PairedSceneActor_InitializeHalf(struct PairedSceneHalf *half, void *origin,
     if (mode == 1)
         part->sprite.flags |= 4;
     part->sprite.flags |= 1;
-    FillOffset(&part->offset, initialFrame);
+    ZeroFill8(&part->offset);
     part->origin = origin;
     if (mode == 0)
         part->heading = 64;

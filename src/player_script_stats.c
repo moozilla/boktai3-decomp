@@ -211,12 +211,9 @@ void ScriptActor_ClearField534FromScript(void)
     s32 index = Script_GetActorIndex();
     player = gPlayers[index];
     if (player) {
-        u16 *mode = &player->sceneMode;
-        u32 zero;
-        zero = 0;
-        *mode = zero;
-        player->active = zero;
-        player->unk536 = zero;
+        player->sceneMode = 0;
+        player->active = 0;
+        player->unk536 = 0;
     }
 }
 

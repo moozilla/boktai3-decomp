@@ -1,38 +1,16 @@
-#include "global.h"
+#include "scene_combat_actor.h"
+#include "game_state.h"
+
+extern struct GameState *gGameState;
 
 /* tentative: 4-state break-apart sequence with particles and camera shake */
 
-struct Layer {
-    u16 unknown[3];
-    u16 flags;
-};
-struct RenderFlags {
-    u32 unknown, flags;
-};
-struct Pair {
-    u32 a, b;
-};
-struct Collider {
-    u8 pad[0x14];
-    struct Pair dir;
-    struct Pair size;
-    u8 pad2[0x14];
-    u32 flags;
-};
-struct Player {
-    u8 pad[0x30];
-    s16 x;
-    u16 pad2;
-    s16 z;
-};
-
 extern u32 gUnk_0824EE50[];
 extern u32 gUnk_0824EE60[];
-extern struct Pair gUnk_0824EE70;
-extern struct Pair gUnk_0824EE78;
-extern struct Player *gGameState;
+extern struct ContactPosition gUnk_0824EE70;
+extern struct ContactPosition gUnk_0824EE78;
 
-void Armor_SetAnimationFromStart(u32 a, u32 b);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Sound_PlaySongChecked(u32 a);
 void ActorPalette_BeginTransition(void *);
 void ActorPalette_Reset(void *);
@@ -51,12 +29,12 @@ void Camera_RequestShake(u32);
 static inline void SetLayers(u8 *p)
 {
     u32 four = 4;
-    ((struct Layer *)(p + 0x238))->flags |= four;
-    ((struct Layer *)(p + 0x1E4))->flags |= four;
-    ((struct Layer *)(p + 0x28C))->flags |= four;
-    ((struct Layer *)(p + 0x190))->flags &= ~four;
+    ((struct ContactCollider *)(p + 0x238))->flags |= four;
+    ((struct ContactCollider *)(p + 0x1E4))->flags |= four;
+    ((struct ContactCollider *)(p + 0x28C))->flags |= four;
+    ((struct ContactCollider *)(p + 0x190))->flags &= ~four;
     {
-        struct RenderFlags *render = (void *)(p + 0x180);
+        struct ActorControllerMotion *render = (void *)(p + 0x180);
         render->flags |= 1;
     }
     *(u16 *)(p + 0xB32) &= ~0x20;
@@ -68,24 +46,19 @@ static inline s32 FixToInt(s32 x)
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
 
-static inline void SetAttack(struct Collider *c, s32 v)
+void ActorController_UpdateBreakApartTransition(struct SceneCombatActor *actor)
 {
-    c->flags |= 0x40000;
-    Collider_SetAttackPowerAndForce(c, (u16)FixToInt(v), 100);
-}
-
-void ActorController_UpdateBreakApartTransition(u8 *p)
-{
+    u8 *p = (void *)actor;
     u8 *s = p + 0xB40;
     u8 st = *s;
 
     switch (st) {
         case 0:
-            Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EE50[((p[0xB39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EE50[((p[0xB39] + 0x60) >> 6) & 3]);
             (*s)++;
             p[0xB41] = st;
             {
-                struct RenderFlags *r = (struct RenderFlags *)(p + 0x180);
+                struct ActorControllerMotion *r = (struct ActorControllerMotion *)(p + 0x180);
                 u32 one = 1;
                 r->flags |= one;
             }
@@ -93,8 +66,7 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             break;
         case 1:
             if (p[0xB43] != 0) {
-                Armor_SetAnimationFromStart((u32)p,
-                                            (u32)&gUnk_0824EE60[((p[0xB39] + 0x60) >> 6) & 3]);
+                Armor_SetAnimationFromStart(actor, &gUnk_0824EE60[((p[0xB39] + 0x60) >> 6) & 3]);
                 {
                     u32 next = *s + 1;
                     u32 zero = 0;
@@ -107,7 +79,7 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             break;
         case 2: {
             u8 zero;
-            struct Collider *c;
+            struct ContactCollider *c;
             u8 *t = p + 0xB42;
             if (*t <= 0x1D)
                 break;
@@ -136,17 +108,17 @@ void ActorController_UpdateBreakApartTransition(u8 *p)
             p[0xB44] = 0x14;
             *(u16 *)(p + 0x196) &= ~4;
             {
-                struct Collider *c2 = (struct Collider *)(p + 0x190);
+                struct ContactCollider *c2 = (struct ContactCollider *)(p + 0x190);
                 u32 m = 0x40000;
-                c2->flags |= m;
+                c2->reactionFlags |= m;
                 c = c2;
             }
             Collider_SetAttackPowerAndForce(c, (u16)FixToInt(*(s16 *)(p + 0xB26) << 12), 100);
-            c = (struct Collider *)(p + 0x190);
-            c->size = gUnk_0824EE78;
-            c->dir = gUnk_0824EE70;
-            p[0x1D2] =
-                Math_Atan2(gGameState->x - *(s16 *)(p + 0x48), gGameState->z - *(s16 *)(p + 0x4C));
+            c = (struct ContactCollider *)(p + 0x190);
+            c->bounds = gUnk_0824EE78;
+            c->offset = gUnk_0824EE70;
+            p[0x1D2] = Math_Atan2(gGameState->positionX - *(s16 *)(p + 0x48),
+                                  gGameState->positionZ - *(s16 *)(p + 0x4C));
         }
         case 3: {
             u8 *t = p + 0xB42;

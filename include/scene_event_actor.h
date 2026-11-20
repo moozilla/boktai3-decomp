@@ -3,6 +3,14 @@
 #include "engine.h"
 #include "actor_state.h"
 #include "ram.h"
+
+/* Each event sequence step begins with a fresh frame counter. */
+static inline void SceneEventActor_EnterSequenceStep(struct ActorState *actor, u8 step)
+{
+    actor->stateReset = step;
+    actor->pendingAction = 0;
+}
+
 void SceneActors_StartEightDirectionAnimation(void *, void *, void *, int, int, int, int);
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 s32 Callback_InvokeActor(void *, void *);
