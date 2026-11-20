@@ -1,17 +1,10 @@
-#include "global.h"
+#include "scene_combat_actor.h"
 
 /* tentative: 4-state armor defeat sequence with particle bursts */
 
-struct ActorAnimationLayer {
-    u16 unknown[3];
-    u16 flags;
-};
-struct ActorRenderFlags {
-    u32 unknown, flags;
-};
 extern const u32 gUnk_0824EE40[];
 void Sound_PlaySongChecked(u32);
-void Armor_SetAnimationFromStart(u32, u32);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Armor_SpawnRandomDirectionalParticle(u8 *);
 void Armor_SpawnDirectionalParticleFan(u8 *);
 void Anim_UnlinkFromList(void *, u32);
@@ -26,23 +19,23 @@ static inline void Armor_CheckFlagRefresh(u8 *q)
     if (*(u16 *)(q + 0xb32) & 1)
         ActorMarker_InitOffsetPosition(q);
 }
-void Armor_UpdateDefeatSequence(u8 *p)
+void Armor_UpdateDefeatSequence(struct SceneCombatActor *actor)
 {
+    u8 *p = (void *)actor;
     u8 *s = p + 0xb40;
     u8 st = *s;
     switch (st) {
         case 0: {
-            u32 four = 4;
             u32 one;
-            Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EE40[((p[0xb39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EE40[((p[0xb39] + 0x60) >> 6) & 3]);
             (*s)++;
             p[0xb41] = st;
-            ((struct ActorAnimationLayer *)(p + 0x238))->flags |= four;
-            ((struct ActorAnimationLayer *)(p + 0x1e4))->flags |= four;
-            ((struct ActorAnimationLayer *)(p + 0x28c))->flags |= four;
-            ((struct ActorAnimationLayer *)(p + 0x190))->flags |= four;
+            ((struct ContactCollider *)(p + 0x238))->flags |= 4;
+            ((struct ContactCollider *)(p + 0x1e4))->flags |= 4;
+            ((struct ContactCollider *)(p + 0x28c))->flags |= 4;
+            ((struct ContactCollider *)(p + 0x190))->flags |= 4;
             {
-                struct ActorRenderFlags *render = (void *)(p + 0x180);
+                struct ActorControllerMotion *render = (void *)(p + 0x180);
                 one = 1;
                 render->flags |= one;
             }
