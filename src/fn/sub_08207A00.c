@@ -108,10 +108,10 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     } else
         p->hudDuration = 0;
     p->owner = owner;
-    AnimData_Load(p->graphics, 0x7e7d);
-    Sprite_Init(&p->display.sprite, p->graphics, 1);
-    p->display.spatial.position = p->initialPosition;
-    AnimData_SelectPaletteBank(p->graphics, 0x1be);
+    AnimData_Load(&p->graphics, 0x7e7d);
+    Sprite_Init(&p->display, &p->graphics, 1);
+    p->display.position = p->initialPosition;
+    AnimData_SelectPaletteBank(&p->graphics, 0x1be);
     p->resource = ScriptProc_Start(0x922e, 0x5184);
     if (!p->inert) {
         p->state = VulcanCannon_UpdateTargeting;
@@ -125,7 +125,7 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
     if (!p->inert)
         VulcanCannon_InitCollider(p);
     if (p->terrainEnabled && (!p->inert)) {
-        struct SceneVec *position = &p->display.spatial.position;
+        struct ContactPosition *position = &p->display.position;
         s32 x = position->x >> 8;
         s32 z = position->z >> 8;
         s32 index;
@@ -133,12 +133,11 @@ s32 VulcanCannon_InitializeFromScript(struct VulcanCannon *p, void *owner)
             index = 0;
         else
             index = gTerrainMap->rows[z] + x;
-        TerrainModifiers_RegisterCell(p->terrain, index, 0, p->display.spatial.position.y >> 8, 0,
-                                      1);
+        TerrainModifiers_RegisterCell(p->terrain, index, 0, p->display.position.y >> 8, 0, 1);
     }
-    SceneBody_Init(p->body, p->owner, &p->display.spatial.position, 0, 4, p);
+    SceneBody_Init(p->body, p->owner, &p->display.position, 0, 4, p);
     if (p->unknown14c) {
-        SceneBody_SetSprite(p->body, &p->display.sprite);
+        SceneBody_SetSprite(p->body, &p->display);
         TerrainOverlay_QueueAddActor(p->body);
     }
     if (p->delayScript)

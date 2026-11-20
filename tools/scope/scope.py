@@ -3781,9 +3781,20 @@ def needs_g(env):
 def g_sensitive(src, func):
     """Does -g change agbcc's code for FUNC in SRC (without knobs)? Storage_RefreshConsumableSlots: -g keeps
     a loop counting up that the build's compile reverses, so a uid knob's MATCH there is the -g compile's."""
-    key = ("g", src, func, open(os.path.join(ROOT, src)).read())
+    with open(os.path.join(ROOT, src)) as source:
+        key = ("g", src, func, source.read())
     if key not in _MEMO:
-        plain, g = fast_compile(src, func, {}, plain=True), fast_compile(src, func, {}, plain=False)
+        # fast_compile imports shell knobs through resolve_knobs. A uid knob
+        # refers to different instructions with and without -g, so letting it
+        # into this baseline comparison can falsely report a debug effect.
+        saved = {k: os.environ.pop(k) for k in tuple(os.environ)
+                 if k.startswith(("AGBCC_", "CSE_"))
+                 and k not in ("AGBCC_SERVER", "AGBCC_DUMPPRI", "AGBCC_EXTRA")}
+        try:
+            plain = fast_compile(src, func, {}, plain=True)
+            g = fast_compile(src, func, {}, plain=False)
+        finally:
+            os.environ.update(saved)
         _MEMO[key] = plain is not None and g is not None and plain[0] != g[0]
     return _MEMO[key]
 
@@ -4782,13 +4793,22 @@ def why_all_issues(text):
         uid, line = int(head.group(1)), head.group(2)
         found = False
         for section in re.split(r"(?m)(?=^  (?:allocation:|cse pass \d replaced|regmove replaced|reload:))", part):
+            inserted = re.search(
+                r"^    regmove inserted (.*?) = (.*?) at insn (\d+)(?: \(line [^)]+\))?"
+                r" immediately before insn (\d+)\b", section, re.M)
             alloc = re.match(r"  allocation: (\d+)([^\n]*)", section)
             cse = re.match(r"  cse pass (\d) replaced (.*?) by (.*?)\.\n", section)
             regmove = re.match(r"  regmove replaced (.*?) by (.*?)\.\n", section)
             reload = re.match(r"  reload:.*?choice #(\d+)", section)
             inherit = re.match(r"  reload: (\S+) is inherited by find_equiv_reg[^\n]*?: (\d+) \(?(\w*)", section)
             whatif = knob(section)
-            if alloc:
+            if inserted:
+                dest, source, copy_uid, operation_uid = inserted.groups()
+                key = ('regmove operand copy', int(copy_uid), int(operation_uid))
+                title = (f"regmove operand copy: insn {copy_uid} copies {source} into {dest} for"
+                         f" two-address insn {operation_uid}; inspect operand order before regmove")
+                whatif = None
+            elif alloc:
                 pseudo = int(alloc.group(1))
                 other = re.search(r"the ROM keeps (\d+)|went to a conflicting pseudo allocated earlier: (\d+)", section)
                 pair = tuple(sorted((pseudo, int(other.group(1) or other.group(2))))) if other else (pseudo,)
@@ -5178,6 +5198,28 @@ def regmove_inserted_operand_copy(wd, uid):
     copy = re.fullmatch(r"\(set " + reg + " " + reg + r"\)", previous[2])
     if copy and int(copy.group(2)) == dest and int(copy.group(4)) == source:
         return previous[1], dest, source
+    return None
+
+
+def regmove_operand_copy_operation(wd, uid):
+    """The operation served by a new regmove copy UID, without crossing a boundary."""
+    path = os.path.join(wd, "u.i.regmove")
+    if not os.path.exists(path):
+        return None
+    with open(path) as stream:
+        forms = [(m.group(1), int(m.group(2))) for m in re.finditer(
+            r"^\((insn|jump_insn|call_insn|code_label|barrier|note)(?:/\w)* (\d+)\b",
+            stream.read(), re.M)]
+    start = next((i for i, (kind, u) in enumerate(forms) if kind == "insn" and u == uid), None)
+    if start is None:
+        return None
+    for kind, operation in forms[start + 1:]:
+        if kind == "note":
+            continue
+        if kind != "insn":
+            return None
+        inserted = regmove_inserted_operand_copy(wd, operation)
+        return operation if inserted and inserted[0] == uid else None
     return None
 
 
@@ -5905,6 +5947,12 @@ def cmd_why(src, func, uid, env, via=None):
               " split or branch), so its cause is the insns around it")
     else:
         print("  registers through the passes: " + "  ->  ".join(trail))
+    copied_operation = regmove_operand_copy_operation(wd, uid)
+    if copied_operation is not None:
+        explain_regmove(wd, copied_operation, [], [], nm, at)
+        print("  allocation advice omitted for this inserted copy: establish which operand the"
+              " two-address operation needs to copy first.")
+        alloc_diffs = []
     if row and trail and trail[0].startswith("greg"):  # born in reload
         explain_slot_reload(wd, info["obj_name"], uid, rows, row, nm, at)
     if row and row["rom"] and row["draft"] and row["rom"].split()[0] != row["draft"].split()[0]:

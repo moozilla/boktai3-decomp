@@ -154,7 +154,7 @@ int SceneActors_SetShake(struct StateActor *actor, int frames, int strength)
     return 0;
 }
 
-void SceneActors_StartAnimation(struct StateActor *actor, struct SceneActorAnimationTile *animation,
+void SceneActors_StartAnimation(struct StateActor *actor, struct SceneInputWidget *animation,
                                 int resource, int sequence, int speed, int flags)
 {
     actor->animationOffset = 0;
@@ -174,7 +174,7 @@ void SceneActors_StartAnimation(struct StateActor *actor, struct SceneActorAnima
 }
 
 void SceneActors_StartDirectionalAnimation(struct StateActor *actor,
-                                           struct SceneActorAnimationTile *animation, int resource,
+                                           struct SceneInputWidget *animation, int resource,
                                            int sequence, int speed, int offset, int flags)
 {
     int savedFlags = flags;
@@ -208,7 +208,7 @@ void SceneActors_StartDirectionalAnimation(struct StateActor *actor,
 }
 
 void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
-                                              struct SceneActorAnimationTile *animation,
+                                              struct SceneInputWidget *animation,
                                               int resource, int sequence, int speed, int offset,
                                               int flags)
 {
@@ -248,7 +248,7 @@ void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
 }
 
 void SceneActors_StartUnmirroredAnimation(struct StateActor *actor,
-                                          struct SceneActorAnimationTile *animation, int resource,
+                                          struct SceneInputWidget *animation, int resource,
                                           int sequence, int speed, int flags)
 {
     actor->animationOffset = 0;

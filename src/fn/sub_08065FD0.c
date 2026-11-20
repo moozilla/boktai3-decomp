@@ -57,7 +57,7 @@ static inline void ActorAttachment_SetupSprite(struct ActorAttachmentManagerView
     } else {
         sprite->priority = 1;
     }
-    slot->sequences[0].unknownA = 255;
+    slot->sequences[0].sequenceId = 255;
     switch (slot->kind) {
         case 0:
             sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;

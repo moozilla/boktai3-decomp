@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_particle_burst_api.h"
 #include "scene_object.h"
 #include "ram.h"
 #include "monster_particle_random.h"
@@ -12,7 +13,7 @@ static inline void scatter(u16 *coordinate, const u16 *sample)
 
 void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
 {
-    struct SceneExtent size;
+    struct ContactPosition size;
     struct SceneVec point;
     u16 *p;
     s32 i;
@@ -34,7 +35,8 @@ void Scene_SpawnEdgeParticles(struct SceneVec *position, s32 offset)
             p[2] += offset + (ParticleRandom_ReadDirectSample(table) & 15);
         }
         table = 0;
-        SceneParticleBurst_CreateWithPause(&point, (s32)table, &size, 1, 3, 4);
+        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)&point,
+                                           (const struct ContactPosition *)table, &size, 1, 3, 4);
     }
 }
 
@@ -563,7 +565,7 @@ static inline u32 backEdge(u32 random, u32 coordinate)
 void Scene_SpawnDirectionalDust(struct SceneObject *input)
 {
     struct SceneObject *actor = input;
-    struct SceneExtent size;
+    struct ContactPosition size;
     struct DustPoint point;
     struct DustPoint *particle;
     s32 i;
@@ -676,7 +678,8 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 break;
             }
         }
-        SceneParticleBurst_CreateWithPause((struct SceneVec *)particle, 0, &size, 1, 2, 4);
+        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)particle, 0, &size, 1,
+                                           2, 4);
         i--;
     } while (i >= 0);
 }

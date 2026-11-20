@@ -1,10 +1,9 @@
 #include "global.h"
+#include "palette_pulse.h"
 #include "date_entry_menu.h"
 #include "input.h"
 #include "menu_parameters.h"
 #include "render.h"
-
-
 
 void DateMenu_HideAnimations(struct DateMenu *p)
 {
@@ -54,8 +53,8 @@ void DateMenu_LoadCurrentDate(struct DateMenu *p)
     s32 i;
     u32 *flags;
     v = SunClock_GetPackedDate() >> 16;
-    p->year = ((u32)v >> 12) * 1000 + ((u32)(v & 0xf00) >> 8) * 100 +
-                          ((u32)(v & 0xf0) >> 4) * 10 + (v & 0xf);
+    p->year = ((u32)v >> 12) * 1000 + ((u32)(v & 0xf00) >> 8) * 100 + ((u32)(v & 0xf0) >> 4) * 10 +
+              (v & 0xf);
     t = SunClock_GetPackedDate() & 0xff00;
     v = t >> 8;
     p->month = ((u32)v >> 4) * 10 + (v & 0xf);
@@ -302,8 +301,6 @@ void Menu_StartFadeOut(s32);
 
 void DateMenu_UpdateCursor(struct DateMenu *);
 
-void Palette_UpdateHighlightPulse(void *, void *);
-
 void DateMenu_HideAnimations(struct DateMenu *);
 
 void Script_Call(u32, void *);
@@ -364,7 +361,6 @@ void DateMenu_Update(struct DateMenu *p)
 void Anim_Remove(void *);
 
 /* Tentative panel family: four main animations and twelve small entries. */
-
 
 void DateMenu_Destroy(struct DateMenu *p)
 {

@@ -19,7 +19,8 @@ struct Skeleton {
     u16 callScriptId;
     u8 callLimit, callCount;
     u8 collisionDelay, unknown6D1;
-    u16 parameter6D2, parameter6D4, parameter6D6;
+    u16 revivalDelay; /* keyword d: hidden-state frames; values above 19999 disable revival. */
+    u16 downedExperience, defeatExperience; /* keyword E: temporary and final defeat rewards. */
     u16 timer6D8;
     u8 unknown6DA[2];
     u32 actionFlags;
@@ -87,7 +88,7 @@ void Skeleton_TurnTowardRouteFacing(struct ChaseActor *a);
 void Skeleton_UpdateInactiveState(u8 *p);
 void Skeleton_UpdateIdleState(u8 *p);
 void Skeleton_ConvergeDisplacedPosition(struct ChaseActor *actor);
-void Skeleton_UpdateDefeat(void *);
+void Skeleton_UpdateDefeat(struct ChaseActor *);
 u8 SceneActorTarget_UpdateTrackedContact(void *);
 void TentacleBody_UpdateReactionTransition(u8 *s, s32 arg);
 s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor);

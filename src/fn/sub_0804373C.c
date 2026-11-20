@@ -1,5 +1,6 @@
 #include "contact_actor.h"
 #include "monster_particle_random.h"
+#include "terrain_sampling.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)
@@ -7,20 +8,6 @@ static inline s32 truncateShift12(s32 value)
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
-}
-static inline s32 cellIndex(struct ContactPosition *position)
-{
-    s32 x = position->x >> 8, z = position->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline u8 *cell(s32 index)
-{
-    u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
-    if (dynamic)
-        return dynamic + 4;
-    return gTerrainMap->cells + 12 + index * 4;
 }
 static inline u32 nextRandom(const u16 *table)
 {
@@ -37,22 +24,6 @@ static inline u32 nextRandomFrom(const u16 *table, u32 *cursor)
     } while (0);
     return table[index];
 }
-static inline s32 terrainHeight(struct ContactPosition *position, s32 index)
-{
-    u8 *properties = cell(index);
-    u32 type = *properties >> 4;
-    s32 height = (*properties & 15) << 8;
-    switch (type) {
-        case 1:
-            height -= (u8)position->z;
-            break;
-        case 2:
-            height -= (u8)position->x;
-            break;
-    }
-    return height;
-}
-
 static inline void addPosition(struct ContactPosition *out, const struct ContactPosition *delta,
                                const struct ContactPosition *base)
 {
@@ -87,7 +58,7 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
             collider->flags |= 4;
         }
         center = &pool->retreatCenter;
-        pool->retreatCenter.y = terrainHeight(center, cellIndex(center));
+        pool->retreatCenter.y = Terrain_SampleHeight(center);
         PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         earlyTable = (const u16 *)0x0203B400;
         angle = nextRandom(earlyTable);

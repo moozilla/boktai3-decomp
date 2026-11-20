@@ -225,7 +225,7 @@ extern u32 gScaledShadowManager; /* scaled shadow manager singleton (ScaledShado
 /* 0x0200005C */
 extern void *gSceneActorEffectsManager; /* scene actor effects manager (SceneActorEffects_*) */
 /* 0x02000064 */
-extern u32 gFragmentManager; /* fragment manager singleton (FragmentManager_*) */
+extern struct FragmentManager *gFragmentManager; /* fragment manager singleton */
 /* 0x02000068 */
 extern u32 gAnimatedParticleManager; /* animated particle manager (AnimatedParticleManager_*) */
 /* 0x0200006C */
@@ -277,7 +277,7 @@ extern u16 gInventoryUseFlags; /* inventory use-permission flags */
 /* 0x020005AC */
 extern void *gHresvelgr; /* Hresvelgr boss task (Hresvelgr_Create/Destroy) */
 /* 0x020005E4 */
-extern u32 gRatatoskParticlePool; /* Ratatosk animated particle pool */
+extern struct RatatoskParticlePool *gRatatoskParticlePool; /* Ratatosk animated particle pool */
 /* 0x020005E8 */
 extern u32 gSceneProjectilePool; /* scene projectile pool (SceneProjectile_*) */
 /* 0x020005F0 */

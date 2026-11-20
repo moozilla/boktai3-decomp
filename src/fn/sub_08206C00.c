@@ -1,52 +1,17 @@
 #include "global.h"
-#include "display_animation.h"
+#include "vulcan_cannon_worker.h"
 #include "scene_vec.h"
-#include "player_cue_sequence.h"
 
-struct VulcanCannon {
-    u8 pad0[0x18];
-    s32 timer;
-    u8 pad1c[0x6c - 0x1c];
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct {
-            u8 pad[0x1c];
-            struct SceneVec position;
-        } spatial;
-    } display;
-    u8 pad98[0x108 - 0x98];
-    void (*state)(void);
-    struct DisplaySequenceState sequence;
-    s32 range;
-    u8 pad120[0x132 - 0x120];
-    s8 facing;
-    u8 unknown133;
-    s16 turnDelay, unknown136, shotCount, targetVisible;
-    u8 pad13c[6];
-    s16 aimTimer;
-    u8 pad144[0x170 - 0x144];
-    u32 useDelayTable;
-    u8 pad174[8];
-    void *resource;
-    u8 pad180[0x194 - 0x180];
-    s16 delayCount, delayIndex, delays[1];
-};
 struct SceneVec *Player_GetEffectivePosition(s32);
 u32 Anim_RestartSequence(struct DisplaySequenceState *, void *, u16, u8, u8);
 s32 VulcanCannon_HasClearShot(struct VulcanCannon *);
 s32 Math_Atan2(s32, s32);
 void VulcanCannon_UpdateFacingTurn(void);
 void VulcanCannon_UpdateFiringBurst(void);
-static inline u32 VulcanCannon_StepIdleAnimation(struct DisplaySequenceSprite *sprite,
-                                                 struct DisplaySequenceState *state)
-{
-    return PlayerCue_StepSequenceEnded(sprite, state);
-}
-
-static inline s32 TargetDistance(struct SceneVec *player, struct SceneVec *position)
+static inline s32 TargetDistance(struct SceneVec *player, struct ContactPosition *position)
 {
     struct SceneVec *a = player;
-    struct SceneVec *b = position;
+    struct ContactPosition *b = position;
     s32 dx, dz;
     dx = a->x - b->x;
     dz = a->z - b->z;
@@ -56,11 +21,11 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
 {
     s32 facingRight = 0;
     struct SceneVec *player = Player_GetEffectivePosition(0);
-    s32 distance = TargetDistance(player, &p->display.spatial.position);
+    s32 distance = TargetDistance(player, &p->display.position);
     struct SceneVec target;
 
     SceneVec_Copy(&target, Player_GetEffectivePosition(0));
-    if (p->useDelayTable) {
+    if (p->delayScript) {
         if (p->timer > p->delays[p->delayIndex]) {
             if (p->facing == facingRight)
                 Anim_RestartSequence(&p->sequence, p->resource, 0x1c, 0, 8);
@@ -84,9 +49,8 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
     }
     if (distance < p->range * p->range) {
         if (!p->facing) {
-            if (target.z > p->display.spatial.position.z - 0x80 &&
-                target.z < p->display.spatial.position.z + 0x80 &&
-                target.x > p->display.spatial.position.x) {
+            if (target.z > p->display.position.z - 0x80 &&
+                target.z < p->display.position.z + 0x80 && target.x > p->display.position.x) {
                 if (VulcanCannon_HasClearShot(p)) {
                     p->aimTimer = 0;
                     p->targetVisible = 1;
@@ -98,9 +62,8 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
             } else
                 p->targetVisible = 0;
         } else {
-            if (target.x > p->display.spatial.position.x - 0x80 &&
-                target.x < p->display.spatial.position.x + 0x80 &&
-                target.z > p->display.spatial.position.z) {
+            if (target.x > p->display.position.x - 0x80 &&
+                target.x < p->display.position.x + 0x80 && target.z > p->display.position.z) {
                 if (VulcanCannon_HasClearShot(p)) {
                     p->aimTimer = 0;
                     p->targetVisible = 1;
@@ -118,9 +81,10 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
         u8 angle;
         s32 facing;
         {
-            struct SceneVec *targetPosition, *emitterPosition;
+            struct SceneVec *targetPosition;
+            struct ContactPosition *emitterPosition;
             targetPosition = Player_GetEffectivePosition(0);
-            emitterPosition = &p->display.spatial.position;
+            emitterPosition = &p->display.position;
             angle = Math_Atan2(targetPosition->x - emitterPosition->x,
                                targetPosition->z - emitterPosition->z);
         }
@@ -141,6 +105,6 @@ s32 VulcanCannon_UpdateTargeting(struct VulcanCannon *p)
             }
         }
     }
-    VulcanCannon_StepIdleAnimation(&p->display.sprite, &p->sequence);
+    VulcanCannon_StepAnimation(p);
     return 0;
 }

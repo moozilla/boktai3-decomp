@@ -61,19 +61,14 @@ types in `include/script_virtual_machine.h`.
   caller's value. Since nothing in this unit calls them by name with a literal
   argument count, they got a real declared parameter instead of the implicit
   passthrough — cleaner and still byte-exact.
-* `Script_InitRuntime` is a genuine same-file register-passthrough: it calls
-  `ScriptProc_Start(0xA8D9, 0x49BC)` then falls into `Script_LoadScript` with
-  no argument, relying on r0 carrying the previous call's return value (visible
-  in the ROM: `bl ScriptProc_Start` is immediately followed by
-  `bl Script_LoadScript`, no register setup between). Giving `Script_LoadScript`
-  a real prototype (needed since its own definition appears earlier in the
-  merged file) makes a 0-argument call to it a hard compile error once both
-  are in one translation unit (confirmed: GCC/agbcc checks argument count
-  against any visible full prototype, even mid-file). The call is instead
-  written as `((s32 (*)())Script_LoadScript)();` — a cast to an
-  unprototyped function-pointer type, which agbcc compiles to the identical
-  bare `bl Script_LoadScript` (confirmed byte-identical) without tripping the
-  argument-count check. No register pin, no handwritten instructions.
+* `Script_InitRuntime` passes the resource returned by
+  `ScriptProc_Start(0xA8D9, 0x49BC)` directly to `Script_LoadScript`. The ordinary
+  nested call preserves the ROM's consecutive calls: the returned pointer is
+  already in the argument register, so no intervening move is needed. Round 15
+  replaced the earlier unprototyped zero-argument call cast with this explicit
+  dataflow and verified all 5,800 bytes of the merged unit. Consecutive calls
+  were insufficient evidence for the earlier claim that an implicit register
+  passthrough was required.
 * `sub_0821AB78` is a byte-for-byte duplicate of `Script_GetValueSafe`
   (0821AB88) kept as a separate ROM function; noted rather than merged away.
 

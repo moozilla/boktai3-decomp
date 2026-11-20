@@ -1,4 +1,5 @@
 #include "sound_test.h"
+#include "palette_pulse.h"
 #include "menu_parameters.h"
 #include "input.h"
 #include "render.h"
@@ -226,7 +227,7 @@ void SoundTest_UpdatePlaybackIndicators(struct SoundTest *p)
             s->flags &= ~1;
             Anim_Step(s, &p->digitsResource);
         } else if (!(s->flags & 1)) {
-            s->attribute1B = 2;
+            s->mode = 2;
             if (Anim_Step(s, &p->digitsResource))
                 s->flags |= 1;
         }

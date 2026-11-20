@@ -1695,7 +1695,7 @@ static inline void DogTurn_ApplyDuration(struct DogTurnState *a, u16 *motionFlag
             *scale = 64;
     }
     if (!a->drawableKind)
-        Anim_SetDurationScale(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
+        Anim_SetDurationScale(&((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence,
                               *scale);
     else
         Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
@@ -1827,7 +1827,7 @@ void Dog_UpdateCardinalTurn(struct DogTurnState *a)
         }
         a->restart = 0;
     }
-    if (DogTurn_Elapsed(((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence) ==
+    if (DogTurn_Elapsed(&((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence) ==
         1) {
         if (DogTurn_ActorFlags(a, 0x10000))
             motion->direction += 0x20;

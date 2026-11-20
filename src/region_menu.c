@@ -1,4 +1,5 @@
 #include "global.h"
+#include "palette_pulse.h"
 #include "region_menu.h"
 #include "menu_parameters.h"
 #include "runtime.h"
@@ -88,8 +89,6 @@ s32 Anim_LoadKeyframe(void *, void *, u32, u32);
 
 void Menu_SetTextRect(void *, struct Rect16 *);
 
-void Palette_UpdateHighlightPulse(void *, u8 *);
-
 void Time_HandleRegionKeypad(struct RegionMenu *menu)
 {
     s32 value = 1;
@@ -156,8 +155,7 @@ void Time_HandleRegionKeypad(struct RegionMenu *menu)
                 rect.z = 0;
                 Menu_SetTextRect(&menu->anims[3], &rect);
                 menu->anims[3].flags &= ~1;
-                Palette_UpdateHighlightPulse(menu->highlightPalette.pulse.pulseState,
-                                             &menu->highlightPulse);
+                Palette_UpdateHighlightPulse(&menu->highlightPalette[12], &menu->highlightPulse);
             }
             break;
         case 1:
@@ -205,7 +203,6 @@ u8 *Script_SetPc(u8 *pc);
 u8 *Script_GetPc(void);
 
 s32 Script_GetValue(void);
-
 
 s32 Time_LoadRegionList(struct RegionMenu *menu)
 {
@@ -268,7 +265,7 @@ s32 Time_LoadRegionList(struct RegionMenu *menu)
         void **pal = &menu->anims[3].palette;
         u16 *copy;
         *saved = *pal;
-        copy = menu->highlightPalette.colors;
+        copy = menu->highlightPalette;
         CpuSet(*saved, copy, 0x10);
         *pal = copy;
     }

@@ -3,6 +3,7 @@
 #include "engine.h"
 #include "scene_vec.h"
 #include "scene_animation.h"
+#include "scene_particle_burst_api.h"
 
 /*
  * Scene objects: pushable/breakable blocks and similar props (types 0-6) that live in a fixed
@@ -124,8 +125,6 @@ struct SceneObjectManager {
 extern struct SceneObjectManager *gSceneObjectManager;
 
 /* Engine helpers shared by the functions below. */
-void SceneParticleBurst_CreateWithPause(struct SceneVec *, s32, struct SceneExtent *, s32, s32,
-                                        s32);
 void AnimatedParticles_EmitDirectional(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32, void *);
 
 /* Update states (stored in SceneObject.update). */

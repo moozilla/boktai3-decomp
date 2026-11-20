@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ratatosk_particle.h"
 #include "ram.h"
 #include "contact_position.h"
 #include "engine_globals.h"
@@ -77,17 +78,7 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->y = 0;
     v->z = trunc12(gUnk_086149C4[angle & 255] * radius);
 }
-struct AnimatedParticleParams {
-    u16 kind, animation;
-    u8 reserved4[2];
-    u8 angle, reserved7;
-    u32 speed, variant, drift;
-    u32 field14, active;
-};
-void Ratatosk_InitAnimatedParticleParams(struct AnimatedParticleParams *);
-void Ratatosk_ConfigureAnimatedParticle(struct AnimatedParticleParams *, u16, u32, u8, u32, u32,
-                                        u32);
-void sub_081FC26C(struct AnimatedParticleParams *, struct ContactPosition *);
+
 // confidence=low: defeat role inferred from event flag 0x51 and persistent counters.
 struct Map {
     u32 pad;
@@ -144,7 +135,7 @@ static inline u32 Arg1(u32 k_, struct Actor *p)
 
 void Ratatosk_UpdateDefeatSequence(struct Actor *p, s32 tick)
 {
-    struct AnimatedParticleParams params;
+    struct RatatoskParticleConfig params;
     struct ContactPosition spawn;
     struct Actor *p2 = p;
     s32 i;

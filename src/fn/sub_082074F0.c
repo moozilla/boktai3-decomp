@@ -36,10 +36,6 @@ static inline s32 CannonRandom(const u16 *table)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }
-static inline void CannonEffectOffset(struct SceneVec *v)
-{
-    v->y += 128;
-}
 s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
 {
     struct CannonCollider *collider;
@@ -47,11 +43,11 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         return 0;
     p->previousVisible = p->targetVisible;
     Callback_InvokeActor(p, p->state);
-    p->display.sprite.flags &= ~1;
+    p->display.flags &= ~1;
     if (!p->dead) {
         struct CannonCollider *c = (void *)p->collider;
         c->flags &= ~4;
-        Collider_SetPosition(c, &p->display.spatial.position, 0);
+        Collider_SetPosition(c, &p->display.position, 0);
         collider = c;
     } else {
         struct CannonCollider *c = (void *)p->collider;
@@ -72,15 +68,14 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         if (p->state == VulcanCannon_UpdateTargeting)
             p->aimTimer = 120;
         if (p->hp <= 0) {
-            struct SceneVec center, smoke;
+            struct ContactPosition center, smoke;
             s32 explosionFrame = 0;
             struct CannonEffectVector velocity, spread;
             const u16 *table;
             p->dead = 1;
             if (p->terrainEnabled)
                 TerrainModifiers_UnregisterCell(p->terrain);
-            SceneVec_Copy(&center, &p->display.spatial.position);
-            CannonEffectOffset(&center);
+            VulcanCannon_GetEffectPosition(&center, p);
             velocity.a.lo = -4;
             table = (const u16 *)RANDOM_TABLE_ADDR;
             velocity.a.hi = (CannonRandom(table) & 7);
@@ -89,8 +84,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
             spread.a.hi = (CannonRandom(table) & 7) + 3;
             spread.b.lo = 24;
             sub_08014634((CannonRandom(table) & 3) + 4, 13, &center, &velocity, &spread, 15, 15);
-            SceneVec_Copy(&smoke, &p->display.spatial.position);
-            CannonEffectOffset(&smoke);
+            VulcanCannon_GetEffectPosition(&smoke, p);
             Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 0);
             smoke.x += 128;
             Explosion_CreateAt(&smoke, 16, 0, 0, 0, 60, explosionFrame, 2);
@@ -115,7 +109,7 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
                 }
                 Anim_RestartSequence(seq, res, 0x13, facing, 0);
             }
-            AnimData_SelectPaletteBank(p->graphics, 0x1be);
+            AnimData_SelectPaletteBank(&p->graphics, 0x1be);
             p->flash = 0;
             p->state = VulcanCannon_UpdateDefeatEffects;
             p->timer = 0;
@@ -147,16 +141,16 @@ s32 VulcanCannon_UpdateDamageState(struct VulcanCannon *p)
         Sound_PlaySong(0x1b1);
     }
     if (p->flash > 0 && !p->dead) {
-        AnimData_SelectPaletteBank(p->graphics, 0x192);
+        AnimData_SelectPaletteBank(&p->graphics, 0x192);
         p->flash--;
     } else
-        AnimData_SelectPaletteBank(p->graphics, 0x1be);
+        AnimData_SelectPaletteBank(&p->graphics, 0x1be);
     if (((struct ContactCollider *)p->collider)->responseValue) {
         u16 n = --((struct ContactCollider *)p->collider)->responseValue;
         if ((n >> 2) & 1)
-            p->display.sprite.flags |= 1;
+            p->display.flags |= 1;
         else
-            p->display.sprite.flags &= ~1;
+            p->display.flags &= ~1;
     }
     p->timer++;
     if (p->aimTimer > 0)

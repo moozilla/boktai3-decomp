@@ -246,10 +246,10 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, selection, variant, flags);
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant, flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *selectionAddress;
         u32 previous;

@@ -44,14 +44,14 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
         actor->animationIndex = selection;
         drawable = actor->drawable;
         {
-            void *sequence = drawable->sequence;
+            void *sequence = &drawable->sequence;
             void *resource = (void *)drawable->resource;
             u32 selected = (u16)selection;
             Anim_SetSequence(sequence, resource, selected, (u8)variant, (u8)flags);
         }
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 

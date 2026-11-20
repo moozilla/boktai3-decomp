@@ -34,7 +34,7 @@ static inline void SceneActorTurn_ApplyDuration(struct ChaseActor *a, u16 *motio
     }
     if (!a->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
@@ -63,10 +63,10 @@ static inline void SceneActorTurn_SelectAnimation(struct ChaseActor *a, u32 sele
         struct SceneActorAnimationSequenceDrawable *drawable;
         a->base.animationIndex = selection;
         drawable = a->base.drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
         selection += variant;
         {

@@ -204,7 +204,7 @@ void Ghoul_TurnTowardRoute(struct ChaseActor *actor)
         }
         actor->base.restart = 0;
     }
-    sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (sequence->elapsed == 0 && (sequence->index == 1 || sequence->index == 3)) {
         s32 targetDirection = SceneActorTurn_OctantDirection(actor->base.nextDirection);
         s32 difference = motion->direction - targetDirection;
@@ -304,7 +304,7 @@ void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
             drawable->flags = value | mask;
         } else {
             struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
-            struct SceneActorAnimationTile *tile =
+            struct SceneInputWidget *tile =
                 &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
             u32 value = tile->flags;
             tile->flags = value | mask;

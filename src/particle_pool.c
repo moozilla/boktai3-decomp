@@ -1,4 +1,5 @@
 #include "gba/gba.h"
+#include "palette_pulse.h"
 #include "particle_pool.h"
 
 void Palette_UpdateHighlightPulse(u16 *out, u8 *c)

@@ -251,7 +251,7 @@ void Mummy_TurnTowardRoute(struct ChaseActor *a)
 {
     struct SceneActorChaseGroup *group;
     struct SceneActorBody *motion = &a->base.body;
-    void *sequence = ((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
+    void *sequence = &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence;
     u16 *motionFlags;
     u8 prepared;
     s32 direction, target, delta;

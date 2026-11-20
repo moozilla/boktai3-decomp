@@ -1,0 +1,1253 @@
+--- a/src/fn/sub_08014CA4.c
++++ b/src/fn/sub_08014CA4.c
+@@ -71,7 +71,7 @@
+                     struct SceneVec *velocity;
+                     u16 *speedOut;
+                     u8 *life;
+-                    table = (const u16 *)(0x0203B400 + (g->type >> 8));
++                    table = gRandomTable;
+                     cursor = (u8 *)base;
+                     velocity = base->velocity;
+                     speedOut = speeds;
+@@ -81,8 +81,7 @@
+                         s32 direction;
+                         u8 *out;
+                         p = &base->sprites[i];
+-                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))
+-                            ->initialized[i] = 1;
++                        base->initialized[i] = 1;
+                         if (!lifetimeRange) {
+                             u8 value = lifetime;
+                             out = life;
+@@ -133,7 +132,7 @@
+                             p->flags |= 4;
+                         else
+                             p->flags &= ~4;
+-                        ((struct FragmentGroup *)((u32)base + (base->active >> 8)))->enabled[i] = 1;
++                        base->enabled[i] = 1;
+                         cursor += 8;
+                         velocity++;
+                         speedOut++;
+--- a/src/fn/sub_080154EC.c
++++ b/src/fn/sub_080154EC.c
+@@ -161,44 +161,17 @@
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a7);
+                 setFrame(&p->sprite, 32);
+-                {
+-                    union {
+-                        struct Anim *ptr;
+-                        u8 parts[4];
+-                    } handle;
+-                    u32 raw;
+-                    handle.ptr = &p->anim;
+-                    Anim_SetSequence(handle.ptr,
+-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+-                                     6, 0, 0);
+-                    raw = handle.parts[0];
+-                    if ((s32)raw < 0)
+-                        handle.parts[0] = 0;
+-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 8));
+-                    done = handle.parts[0];
+-                }
++                a = &p->anim;
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 6, 0, 0);
+                 goto saveAnimation;
+             } else if (p->pad1 == 7) {
+                 AnimData_Load(p->resource, 0x61f9);
+                 AnimData_SelectPaletteBank(p->resource, 0x2a6);
+                 setFrame(&p->sprite, 45);
+-                {
+-                    union {
+-                        struct Anim *ptr;
+-                        u16 parts[2];
+-                    } handle;
+-                    u32 raw;
+-                    handle.ptr = &p->anim;
+-                    Anim_SetSequence(handle.ptr,
+-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
+-                                     8, 0, 0);
+-                    raw = handle.parts[0];
+-                    if ((s32)raw < 0)
+-                        handle.parts[0] = 0;
+-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 16) +
+-                                        ((u8)handle.parts[1] >> 8));
+-                    done = handle.parts[0];
+-                }
++                a = &p->anim;
++                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
++                                 8, 0, 0);
+                 goto saveAnimation;
+             } else {
+                 AnimData_Load(p->resource, 0x4384);
+--- a/src/fn/sub_08016118.c
++++ b/src/fn/sub_08016118.c
+@@ -32,7 +32,6 @@
+                 p->sprite.position.x += scale(p->velocity.x, *speed);
+                 p->sprite.position.y += p->velocity.y;
+                 p->sprite.position.z += scale(p->velocity.z, *speed);
+-                p = (struct FadingParticleMotion *)((u32)p + (p->anim.flags >> 8));
+                 p->velocity.y -= 2;
+                 Anim_SetDurationScale(anim, 16);
+                 resource = ((struct FadingParticleManager *)gFadingParticleManager)->graphics;
+--- a/src/fn/sub_08038448.c
++++ b/src/fn/sub_08038448.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "game_state.h"
+ #include "ram.h"
+ #include "engine_globals.h"
+ 
+@@ -9,20 +10,6 @@
+     u8 pad2[0x54];
+     u32 rightMask;
+ };
+-struct WirelessEquipmentSave {
+-    u8 pad[0x4C];
+-    u32 selection;
+-    union {
+-        struct {
+-            s16 left, right;
+-        } sides;
+-        u32 word;
+-    } selected;
+-    u32 field54, field58;
+-    u8 pad2[0x2C];
+-    s16 rightRows[16];
+-};
+-extern struct WirelessEquipmentSave *gGameState;
+ void GameState_AddEquipment(int);
+ int Mod(int, int);
+ 
+@@ -31,7 +18,7 @@
+     u32 mask = 0;
+     int start, i, n, item;
+     u32 index;
+-    gGameState->selection = mask;
++    gGameState->unlockMask = mask;
+     GameState_AddEquipment(0);
+     mask = 1;
+     if ((p->rightMask & 2) && p->round > 3) {
+@@ -67,31 +54,14 @@
+         mask |= 2048;
+     }
+     start = Mod(gSceneEffectPalettePhase, 12);
+-    {
+-        u32 raw = (u16)gGameState->selected.sides.right;
+-        if ((s32)raw < 0) {
+-            u32 v0 = gGameState->selection;
+-            u32 v1 = gGameState->selected.word;
+-            u32 v2 = gGameState->field54;
+-            u32 v3 = gGameState->field58;
+-            Mod(0, 12);
+-            if (v0) {
+-                u32 sum = v0 + v1 + v2 + v3;
+-                u32 other = v0 - v1;
+-                struct WirelessEquipmentSave *save = gGameState;
+-                save->selection = sum;
+-                save->selected.word = other;
+-            }
+-        }
+-    }
+     for (i = 0; i <= 3; i++) {
+-        *(gGameState->rightRows + i) = -1;
++        *(gGameState->slots88 + i) = -1;
+         for (n = start; n < start + 12; n++) {
+             item = n;
+             if (item > 11)
+                 item -= 12;
+             if (mask & (1 << item)) {
+-                *(gGameState->rightRows + i) = item;
++                *(gGameState->slots88 + i) = item;
+                 mask &= ~(1 << item);
+                 start = item;
+                 break;
+@@ -103,5 +73,5 @@
+         if (start > 11)
+             start -= 12;
+     }
+-    gGameState->selected.sides.right = 0;
++    gGameState->selected = 0;
+ }
+--- a/src/fn/sub_0803B40C.c
++++ b/src/fn/sub_0803B40C.c
+@@ -51,12 +51,6 @@
+     res = ScriptProc_Start(pack, 0x530D);
+     if (!res)
+         goto failed;
+-    /* Both bounded resource guards remain unresolved allocation-only forms. */
+-    {
+-        u32 raw = (u8)(u32)res;
+-        if ((s32)raw < 0)
+-            res = 0;
+-    }
+     p->primary = *res;
+     first = &p->primary;
+     ResourceHeader_Relocate(first, res);
+@@ -64,11 +58,6 @@
+     primary = first;
+     if (!res)
+         goto failed;
+-    {
+-        u32 raw = (u8)(u32)res;
+-        if ((s32)raw < 0)
+-            res = 0;
+-    }
+     p->secondary = *res;
+     secondary = &p->secondary;
+     ResourceHeader_Relocate(secondary, res);
+--- a/src/fn/sub_0804373C.c
++++ b/src/fn/sub_0804373C.c
+@@ -40,7 +40,6 @@
+     if (slot->enter) {
+         struct ContactPosition *center;
+         struct ContactPosition *entryDestination;
+-        u32 origin;
+         const u16 *table;
+         const u16 *earlyTable;
+         u32 angle;
+@@ -59,7 +58,6 @@
+         }
+         center = &pool->retreatCenter;
+         pool->retreatCenter.y = Terrain_SampleHeight(center);
+-        PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
+         earlyTable = (const u16 *)0x0203B400;
+         angle = nextRandom(earlyTable);
+         do {
+@@ -75,7 +73,7 @@
+         {
+             s32 product = gUnk_086149C4[(angle + 64) & random.mask] * radius;
+             random.cursor = &gRandomIndex;
+-            write->x = truncateShift12(product) | (origin & 3);
++            write->x = truncateShift12(product);
+         }
+         write->y = 0;
+         write->z = truncateShift12(gUnk_086149C4[angle] * radius);
+--- a/src/tether_actor.c
++++ b/src/tether_actor.c
+@@ -3328,7 +3328,7 @@
+     } else
+         actor->displayOffsetY = 0;
+     if (actor->stateFrame <= 11) {
+-        const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (actor->stateFrame >> 16));
++        const u16 *table = (const u16 *)RANDOM_TABLE_ADDR;
+         actor->shakeX = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
+         actor->shakeZ = (ParticleRandom_ReadDirectSample(table) & 31) - 16;
+     }
+--- a/src/fn/sub_0805B0F0.c
++++ b/src/fn/sub_0805B0F0.c
+@@ -29,8 +29,7 @@
+         u32 *seed;
+         {
+             u32 first, second;
+-            /* Allocation-only: fold the bounded offset after constant-equivalence analysis. */
+-            table = (const u16 *)((u32)gRandomTable + (rig->state >> 16));
++            table = gRandomTable;
+             seed = &gRandomIndex;
+             first = *seed + 1;
+             mask = 1023;
+--- a/src/fn/sub_0805E1D0.c
++++ b/src/fn/sub_0805E1D0.c
+@@ -5,30 +5,31 @@
+     void *savedResource = resource;
+     u8 *savedSelection = selection;
+     u8 *savedBlink = blink;
++    u32 keys;
+     u32 change;
+     u32 confirm;
+     u32 accepted;
+-    resource = (void *)(u32)gPadState[1];
+-    confirm = 1 + ((u32)resource >> 16);
++    keys = gPadState[1];
++    confirm = 1;
+     accepted = confirm;
+-    accepted &= (u32)resource;
++    accepted &= keys;
+     if (accepted) {
+         widget->flags |= confirm;
+         return *savedSelection;
+     }
+-    if ((u32)resource & 2) {
++    if (keys & 2) {
+         widget->flags |= confirm;
+         return 0;
+     }
+     change = 0;
+     if (*savedSelection) {
+         u32 pressed = 0x10;
+-        pressed &= (u32)resource;
++        pressed &= keys;
+         /* Normalize the narrowed key mask to 0 or 1. */
+         change = (u32)(-(s32)(u16)pressed) >> 31;
+     } else {
+         u32 pressed = 0x20;
+-        pressed &= (u32)resource;
++        pressed &= keys;
+         if (pressed)
+             change = 1;
+     }
+--- a/src/slime.c
++++ b/src/slime.c
+@@ -228,70 +228,11 @@
+ 
+ // confidence=low: plays profile animation 15 with a random duration, then enters the next Slime control.
+ 
+-static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index, u32 variant,
+-                                             u32 inputFlags)
+-{
+-    struct SceneActorProfileEntry *entry =
+-        (void *)SceneActorProfiles_GetEntryAddress(actor->profileId, actor->profileMode, index);
+-    u32 selection = entry->value;
+-    u32 flags = inputFlags;
+-    u32 force;
+-    u8 *restart;
+-    if (flags & 0x10) {
+-        force = 0x10;
+-        flags &= ~0x10;
+-    } else
+-        force = 0;
+-    if (!actor->drawableKind) {
+-        struct SceneActorAnimationSequenceDrawable *drawable;
+-        actor->animationIndex = selection;
+-        drawable = actor->drawable;
+-        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant, flags);
+-        restart = &actor->restart;
+-    } else {
+-        struct SceneInputWidget *tile =
+-            &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
+-        u8 *selectionAddress;
+-        u32 previous;
+-        u8 *savedSelection;
+-        selection += variant;
+-        selectionAddress = &actor->animationIndex;
+-        previous = *selectionAddress;
+-        savedSelection = selectionAddress;
+-        restart = &actor->restart;
+-        if (!force && previous == selection && !*restart) {
+-            if (flags == 1 && (tile->flags & 4))
+-                return;
+-            if (flags == 0 && !(tile->flags & 4))
+-                return;
+-        }
+-        *savedSelection = selection;
+-        {
+-            u32 mask = 4;
+-            u32 mode;
+-            if (flags & mask)
+-                mode = 6;
+-            else
+-                mode = 4;
+-            Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
+-                              actor->drawable, (u16)selection, 2, mode);
+-            {
+-                u8 playbackFlags = flags;
+-                if (playbackFlags & 1)
+-                    tile->flags |= mask;
+-                else
+-                    tile->flags &= ~4;
+-            }
+-        }
+-    }
+-    *restart = 0;
+-}
+-
+ void Slime_UpdateRandomWait(struct ChaseActor *actor)
+ {
+     if (Slime_TakePrepared(actor)) {
+         u32 index;
+-        Slime_SelectWaitAnimation((void *)actor, 15, 0, 0);
++        SceneActorTurn_SelectProfileAnimation((void *)actor, 15, 0, 0);
+         index = (gRandomIndex + 1) & 1023;
+         gRandomIndex = index;
+         {
+--- a/src/spider.c
++++ b/src/spider.c
+@@ -1739,10 +1739,10 @@
+     struct SceneActorChaseGroup *group = &input->group;
+     struct SceneActorBody *body = &input->base.body;
+     struct ContactPosition target;
+-    const u16 *table = (const u16 *)((u32)gRandomTable & ~((u16)(u32)input >> 16));
+-    u32 *indexAddress = (u32 *)((u32)&gRandomIndex & ~((u16)(u32)input >> 16));
++    const u16 *table = gRandomTable;
++    u32 *indexAddress = &gRandomIndex;
+     u32 rawIndex = *indexAddress + 1;
+-    u32 mask = 1023 & ~((u16)(u32)input >> 16);
++    u32 mask = 1023;
+     u16 index = rawIndex & mask;
+     u16 distance = table[index];
+     u8 heading;
+@@ -1787,7 +1787,7 @@
+                     ctx->wanderTimer = moved;
+                 }
+             }
+-            if (Test(ctx, 8 | (((u16)mask >> 16) | ((u16)(u32)indexAddress >> 16)))) {
++            if (Test(ctx, 8)) {
+                 u32 value = 60;
+                 s16 *timer = &ctx->wanderTimer;
+                 *timer = value;
+--- a/src/fn/sub_080AEE08.c
++++ b/src/fn/sub_080AEE08.c
+@@ -35,12 +35,12 @@
+     return value + 1;
+ }
+ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
+-                                   struct SceneActorRegistryControl *control, u32 cleared)
++                                   struct SceneActorRegistryControl *control)
+ {
+     SceneActorChase_ClearActorFlags(actor, 0x141C0);
+-    control->counter = cleared;
+-    control->field14 = cleared;
+-    control->timer = cleared;
++    control->counter = 0;
++    control->field14 = 0;
++    control->timer = 0;
+ }
+ 
+ static inline void Vorn_SetTileFlags(struct SceneInputWidget *tile, u32 bits)
+@@ -62,28 +62,19 @@
+     actor->base.counter2AC = 0;
+     actor->base.field2B1 = prepared;
+ }
+-union VornSpreadVector {
+-    struct ContactPackedVector bits;
+-    u32 words[2];
+-};
+ /* Completes the defeat sequence, dispatches its script, and enters idle control. */
+ void Vorn_UpdateDefeat(struct ChaseActor *actor)
+ {
+     s32 values[8];
+-    union VornSpreadVector range;
++    struct ContactPosition range;
+     struct ScriptUtilityArguments arguments;
+     u16 script;
+-    u32 workValue;
+     u32 completedState;
+     u32 *cursor = &gRandomIndex;
+     completedState = 1;
+     if (SceneActorReaction_TakePrepared(actor)) {
+         SceneActorAnimation_SelectDirectionalEntry(&actor->base, 10);
+-        {
+-            u8 *entry = &actor->base.restart;
+-            workValue = 0;
+-            *entry = workValue;
+-        }
++        actor->base.restart = 0;
+         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
+         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
+         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
+@@ -91,7 +82,7 @@
+         SceneActorPlacement_PlayCategoryEventSound(actor);
+         if (SceneActorChase_QueryMotionFlagComponent(actor, 8))
+             Sound_PlaySong(0x12A);
+-        Vorn_ClearRoute(actor, &actor->group.common.control, workValue);
++        Vorn_ClearRoute(actor, &actor->group.common.control);
+         {
+             struct ContactCollider *collider = &actor->base.colliderA;
+             collider->flags |= 4;
+@@ -106,33 +97,25 @@
+         u8 category;
+         SceneActor_CallContextScriptB(actor);
+         {
+-            union VornSpreadVector *spread;
+-            const struct ContactPosition *origin;
+-            u32 sparkKind;
+-            range.bits.x = 80;
+-            range.bits.y = 60;
+-            spread = &range;
+-            /* Preserve the unused upper half of the packed depth word. */
+-            spread->words[1] = (spread->words[1] & 0xFFFF0000) | 60;
+-            workValue = (u32)gRandomTable;
++            const u16 *table;
++            range.x = 80;
++            range.y = 60;
++            range.z = 60;
++            table = gRandomTable;
+             SparkParticle_Spawn(
+-                (origin = (const struct ContactPosition *)&actor->base.body.position),
+-                Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                (const struct ContactPosition *)spread, 0x20, 4, 20, (sparkKind = 2), 1);
+-            /* Keep the three shared spark values distinct through CSE. */
+-            sparkKind |= ((u32)actor & 255) >> 8;
+-            spread = (union VornSpreadVector *)((u32)spread + (((u32)actor & 31) >> 5));
+-            origin = (const struct ContactPosition *)((u32)origin + (((u32)actor & 127) >> 7));
+-            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                                (const struct ContactPosition *)spread, 0x40, 4, 20, sparkKind, 1);
+-            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                                (const struct ContactPosition *)spread, 0x5E, 4, 20, sparkKind, 1);
+-            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                                (const struct ContactPosition *)spread, 0x80, 4, 20, sparkKind, 1);
+-            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                                (const struct ContactPosition *)spread, 0xC4, 4, 20, sparkKind, 1);
+-            SparkParticle_Spawn(origin, Vorn_RandomSparkCount((const u16 *)workValue, cursor),
+-                                (const struct ContactPosition *)spread, 0xF0, 4, 20, sparkKind, 1);
++                &actor->base.body.position,
++                Vorn_RandomSparkCount(table, cursor),
++                &range, 0x20, 4, 20, 2, 1);
++            SparkParticle_Spawn(&actor->base.body.position, Vorn_RandomSparkCount(table, cursor),
++                                &range, 0x40, 4, 20, 2, 1);
++            SparkParticle_Spawn(&actor->base.body.position, Vorn_RandomSparkCount(table, cursor),
++                                &range, 0x5E, 4, 20, 2, 1);
++            SparkParticle_Spawn(&actor->base.body.position, Vorn_RandomSparkCount(table, cursor),
++                                &range, 0x80, 4, 20, 2, 1);
++            SparkParticle_Spawn(&actor->base.body.position, Vorn_RandomSparkCount(table, cursor),
++                                &range, 0xC4, 4, 20, 2, 1);
++            SparkParticle_Spawn(&actor->base.body.position, Vorn_RandomSparkCount(table, cursor),
++                                &range, 0xF0, 4, 20, 2, 1);
+         }
+         category = actor->base.category;
+         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
+--- a/src/fn/sub_080BD1F0.c
++++ b/src/fn/sub_080BD1F0.c
+@@ -284,9 +284,6 @@
+         }
+     }
+     SceneActorTerrain_ClearCollisionTimers((void *)actor);
+-    /* Allocation-only: the two bounded exit arms preserve this global table
+-     * lifetime until jump2; neither arm nor this initial copy emits code. */
+-    lateTable = (const u16 *)actor;
+     if (!actor->base.restart)
+         return;
+     actor->base.stepDone = 1;
+@@ -345,15 +342,9 @@
+             category = *categoryp;
+             if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
+                 category == 0x18 || category == 0x19)
+-                /* The late zero retains the response/table conflict through combine. */
+-                Sound_PlaySong(0xE5 | (((u32)response.flags & 31) >> 5));
+-        }
+-
+-        {
+-            u32 bound = (u8)(u32)actor;
+-            if ((s32)bound < 0)
+-                Sound_PlaySong((u32)lateTable);
+-        }
++                Sound_PlaySong(0xE5);
++        }
++
+         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+         SceneActorChase_SetState(actor, 3, 0, 0);
+         {
+@@ -421,11 +412,6 @@
+             *ctxFlags |= m;
+         }
+         Sound_PlaySong(0x3AD);
+-        {
+-            u32 bound = ((u32)actor & 4095);
+-            if ((s32)bound < 0)
+-                Sound_PlaySong((u32)lateTable);
+-        }
+ 
+     } else {
+     defeated:
+--- a/src/fn/sub_0815F5B4.c
++++ b/src/fn/sub_0815F5B4.c
+@@ -18,32 +18,27 @@
+ 
+ struct MotionTarget *TargetRegistry_FindById(u32 id)
+ {
+-    u32 requestedId = id;
+     struct MotionTargets *registry = gSceneLinkList;
+-    registry = (struct MotionTargets *)((u32)registry | ((u16)((u8)(u32)registry << 8) >> 16));
+     if (registry) {
+         struct MotionTarget *entry = registry->first;
+-        /* An ID mismatch repeats the same entry, as in the original routine. */
+         if (entry) {
+             do {
+-                u32 entryId;
+                 u32 flags = entry->flags;
+                 u32 sceneActor = flags & 0x10;
+                 u32 disabled = flags & 1;
+                 if (!sceneActor)
+                     goto actorId;
+-                entryId = entry->target.collider->collisionId;
+-                if ((s32)entryId < 0)
+-                    requestedId = 0;
+-            compareId:
+-                if (entryId != requestedId)
++                if (entry->target.collider->collisionId != id)
+                     continue;
+                 if (!disabled)
+                     return entry;
+                 break;
+             actorId:
+-                entryId = entry->target.actor->id;
+-                goto compareId;
++                if (entry->target.actor->id != id)
++                    continue;
++                if (!disabled)
++                    return entry;
++                break;
+             } while (entry);
+         }
+     }
+--- a/src/fn/sub_0815F6A8.c
++++ b/src/fn/sub_0815F6A8.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "task.h"
+ 
+ static inline void andm(u32 *a, u32 m)
+ {
+@@ -8,26 +9,27 @@
+ {
+     *a |= m;
+ }
+-struct N {
+-    u32 v;
++struct TargetRegistryEntry {
++    void *object;
+     u32 flags;
+-    u32 w8;
+-    struct N *next;
++    void *callback;
++    struct TargetRegistryEntry *next;
+ };
+-struct L {
+-    u8 f00[0x18];
+-    struct N *head;
++struct TargetRegistry {
++    struct Task task;
++    struct TargetRegistryEntry *head;
++    u32 unknown1C;
+ };
+-extern struct L *volatile gSceneLinkList;
++extern struct TargetRegistry *gSceneLinkList;
+ 
+-s32 TargetRegistry_RegisterActor(struct N *n, u32 v, u32 w)
++s32 TargetRegistry_RegisterActor(struct TargetRegistryEntry *n, void *object, void *callback)
+ {
+-    struct N *q;
+-    struct L *g = gSceneLinkList;
++    struct TargetRegistryEntry *q;
++    struct TargetRegistry *g = gSceneLinkList;
+     if (g == 0)
+         return 0;
+-    n->v = v;
+-    n->w8 = w;
++    n->object = object;
++    n->callback = callback;
+     q = g->head;
+     if (q != 0) {
+         do {
+--- a/src/fn/sub_0815F6F0.c
++++ b/src/fn/sub_0815F6F0.c
+@@ -1,29 +1,31 @@
+ #include "global.h"
++#include "task.h"
+ 
+ static inline void orm(u32 *a, u32 m)
+ {
+     *a |= m;
+ }
+-struct N {
+-    u32 v;
++struct TargetRegistryEntry {
++    void *object;
+     u32 flags;
+-    u32 w8;
+-    struct N *next;
++    void *callback;
++    struct TargetRegistryEntry *next;
+ };
+-struct L {
+-    u8 f00[0x18];
+-    struct N *head;
++struct TargetRegistry {
++    struct Task task;
++    struct TargetRegistryEntry *head;
++    u32 unknown1C;
+ };
+-extern struct L *volatile gSceneLinkList;
++extern struct TargetRegistry *gSceneLinkList;
+ 
+-s32 TargetRegistry_RegisterSceneActor(struct N *n, u32 v, u32 w)
++s32 TargetRegistry_RegisterSceneActor(struct TargetRegistryEntry *n, void *object, void *callback)
+ {
+-    struct N *q;
+-    struct L *g = gSceneLinkList;
++    struct TargetRegistryEntry *q;
++    struct TargetRegistry *g = gSceneLinkList;
+     if (g == 0)
+         return 0;
+-    n->v = v;
+-    n->w8 = w;
++    n->object = object;
++    n->callback = callback;
+     q = g->head;
+     if (q != 0) {
+         do {
+--- a/src/fn/sub_0816E570.c
++++ b/src/fn/sub_0816E570.c
+@@ -15,21 +15,6 @@
+ void Hud_SetInteractionCallback(u8 *, void (*)(void), u32);
+ void PauseMenu_OnCharacterSelectionUpdate(void);
+ 
+-/* The sample table as a halfword address: bit 0 of a u16 pointer is always clear. Built from
+-   its fields, the pointer has no REG_EQUAL note, so it keeps a register of its own
+-   (scope README facts 20 and 48). */
+-union RandomTableAddress {
+-    const u16 *table;
+-    struct {
+-        u32 odd : 1;
+-        u32 halfword : 31;
+-    } bits;
+-};
+-static inline const u16 *RandomTableAddress_Get(const union RandomTableAddress *address)
+-{
+-    return address->table;
+-}
+-
+ void sub_0816E570(void *owner)
+ {
+     struct SceneVec pos;
+@@ -44,12 +29,7 @@
+     SceneHud_GetActionIconPosition(&pos, *kind);
+     pos.x += 8;
+     pos.y += 8;
+-    {
+-        union RandomTableAddress address;
+-        address.bits.odd = 0;
+-        address.bits.halfword = RANDOM_TABLE_ADDR >> 1;
+-        table = RandomTableAddress_Get(&address);
+-    }
++    table = gRandomTable;
+     velocity.x = -6 - Mod(ParticleRandom_ReadDirectSample(table), 3);
+     velocity.y = -5 - Mod(ParticleRandom_ReadDirectSample(table), 5);
+     speed = Mod(ParticleRandom_ReadDirectSample(table), 10) + 5;
+--- a/src/fn/sub_0817AEC8.c
++++ b/src/fn/sub_0817AEC8.c
+@@ -19,6 +19,13 @@
+     struct ContactPosition position;
+ };
+ 
++static inline void ContactPosition_SetPolar(struct ContactPosition *out, s32 heading, s32 speed)
++{
++    out->x = Scale(gUnk_086149C4[(heading + 64) & 255] * speed);
++    out->y = 0;
++    out->z = Scale(gUnk_086149C4[heading & 255] * speed);
++}
++
+ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
+ {
+     union ParticleRandomTableSource randomSource;
+@@ -37,19 +44,13 @@
+         int life;
+         int spread;
+         int speed;
+-        const s16 *sine;
+         int heading;
+         spread = i * 4;
+         heading = angle + direction;
+         heading -= 32;
+         speed = radius + spread;
+         speed += 2;
+-        sine = (const s16 *)((u32)gUnk_086149C4 & ~((u16)((u8)radius << 8) >> 16));
+-        if (radius < 0)
+-            sine++;
+-        v->x = Scale((sine[((heading + 64) & 255)]) * speed);
+-        v->y = 0;
+-        v->z = Scale((sine[(heading & 255)]) * speed);
++        ContactPosition_SetPolar(v, heading, speed);
+         life = (((s32)ParticleRandom_NextSample(table, cursor, mask) >> 4) & 15) + 16;
+         SpriteEffectController_Create(&p->position, &offset, 0x1C1E, 0xD43F, 0, 0, 0x11, 1, 1, 2, 0,
+                                       life, 0, 0, 0, 0, -4, -4);
+--- a/src/fn/sub_081A0BC8.c
++++ b/src/fn/sub_081A0BC8.c
+@@ -1,18 +1,18 @@
+ #include "global.h"
+ 
+ #include "engine.h"
+-struct Vec {
+-    s16 x, y, z, pad;
+-} __attribute__((aligned(4)));
++#include "scene_input_widget.h"
++#include "monster_particle_random.h"
++#include "terrain_sampling.h"
+ struct Action {
+-    u8 state, pad[3];
+-    u32 frame;
++    u8 state, unknown1, unknown2, unused;
++    u32 frame, unknown8, unknownC;
+ };
+ struct Hresvelgr {
+     u8 pad0[0x51];
+     u8 heading;
+     u8 pad52[2];
+-    struct Vec position;
++    struct ContactPosition position;
+     u8 pad5C[0x40];
+     u32 flags;
+     u8 padA0[8];
+@@ -22,20 +22,17 @@
+     u8 padB2[0x1a];
+     u8 targetHeading;
+     u8 padCD[0x43];
+-    struct Vec *target;
++    struct ContactPosition *target;
+     u8 pad114[0x60];
+-    u8 animationData[0x20], animation[0x20];
+-    u8 pad1B4[0x1a];
+-    u16 collisionMask;
+-    u8 pad1D0[0xc];
+-    void *collisionBounds;
+-    u8 pad1E0[0x110];
++    struct SceneInputResource animationData;
++    struct SceneInputWidget animation;
++    u8 pad1F4[0xFC];
+     struct Action action;
+-    u8 pad2F8[0x33];
++    u8 pad300[0x2b];
+     u8 side;
+     u8 pad32C[0xf8];
+-    u8 boundsLow[0x2e0];
+-    u8 boundsHigh[4];
++    u16 paletteBuffer[0x170];
++    u16 tileMap[0x70];
+ };
+ void ActionState_Reset(void *);
+ void ActionState_SetState(void *, u32);
+@@ -43,7 +40,6 @@
+ void Hresvelgr_SetAnimation(void *, void *, void *, u32, u32, u32);
+ void Actor_SetHeadingVelocity(void *, u32);
+ void Hresvelgr_SpawnProjectile(void *, u32, u32);
+-u8 *TerrainModifiers_FindCellOverride(s32, s32);
+ static inline s32 FacingSector4(s16 angle)
+ {
+     return (angle + 96) >> 6;
+@@ -68,78 +64,40 @@
+         p->direction8 = mask;
+     }
+ }
+-static inline s32 RandomValue(const u16 *table)
++static inline s16 ScatterOffset(s32 sample)
+ {
+-    u32 offset;
+-    gRandomIndex = (gRandomIndex + 1) & 1023;
+-    offset = gRandomIndex * 2;
+-    return *(const u16 *)((u32)table + offset);
++    return (sample >> 3) % 512;
+ }
+-static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
++static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
+ {
+     p->x = x;
+     p->y = y;
+     p->z = z;
+ }
+-static inline s32 CellIndex(struct Vec *p)
++static inline void EnableFlags(struct Hresvelgr *actor, u32 mask)
+ {
+-    s32 x = p->x >> 8, z = p->z >> 8;
+-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
+-        return 0;
+-    return gTerrainMap->rows[z] + x;
++    actor->flags |= mask;
+ }
+-static inline u8 *CellProperties(s32 cell)
++static inline void SetPaletteBank(struct Hresvelgr *actor, u32 mask)
+ {
+-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
+-    if (p)
+-        return p + 4;
+-    return (cell * 4 + 12) + gTerrainMap->cells;
+-}
+-static inline s32 Height(struct Vec *p)
+-{
+-    u8 *cell = CellProperties(CellIndex(p));
+-    u32 shape = *cell >> 4;
+-    s32 height = (*cell & 15) << 8;
+-    switch (shape) {
+-        case 1:
+-            height -= *(u8 *)&p->z;
+-            break;
+-        case 2:
+-            height -= *(u8 *)&p->x;
+-            break;
+-    }
+-    return height;
+-}
+-static inline u32 *EnableFlags(struct Hresvelgr *actor, u32 mask)
+-{
+-    u32 *p = &actor->flags;
+-    *p |= mask;
+-    return p;
+-}
+-static inline void SetCollisionMask(struct Hresvelgr *actor, u32 mask)
+-{
+-    actor->collisionMask = mask;
++    actor->animation.paletteBank = mask;
+ }
+ // confidence=low: traverses a boundary and spawns falling projectiles over valid terrain.
+ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
+ {
+-    u32 normalCollisionMask = 0x2f0;
+     struct Action *action = &actor->action;
+-    struct Vec *target = actor->target;
+-    u32 *flags;
++    struct ContactPosition *target = actor->target;
+     s32 state;
+     if (actor->pending) {
+         actor->pending = 0;
+         ActionState_Reset(action);
+         ActionState_SetState(action, 0);
+     }
+-    flags = EnableFlags(actor, 12);
++    EnableFlags(actor, 12);
+     state = action->state;
+     switch (state) {
+-        case 0: {
+-            u32 mask = 16;
+-            *flags |= mask;
+-        }
++        case 0:
++            EnableFlags(actor, 16);
+             if (action->frame > 128) {
+                 if (!actor->side)
+                     SetVector(&actor->position, 1024, 512, target->z);
+@@ -149,44 +107,36 @@
+             } else
+                 action->frame++;
+             break;
+-        case 1: {
+-            u32 mask = 0x1010000;
+-            *flags |= mask;
+-        }
++        case 1:
++            EnableFlags(actor, 0x1010000);
+             if (!action->frame) {
+-                action->frame = state;
++                action->frame = 1;
+                 SetHeading(actor, actor->targetHeading);
+-                Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 2, state, 0);
+-                SetCollisionMask(actor, 0xd000);
+-                actor->collisionBounds = actor->boundsHigh;
++                Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData, 2, 1, 0);
++                SetPaletteBank(actor, 0xd000);
++                actor->animation.palette = actor->tileMap;
+                 Sound_PlaySong(0x4d0);
+             } else {
+                 Actor_SetHeadingVelocity(actor, 32);
+-                state &= tick;
+-                if (!state) {
+-                    u32 mask = 16;
+-                    *flags |= mask;
+-                }
++                if (!(tick & 1))
++                    EnableFlags(actor, 16);
+                 if (!(tick & 7)) {
+-                    struct Vec pos;
++                    struct ContactPosition pos;
+                     const u16 *table = gRandomTable;
+-                    s32 rawX = RandomValue(table);
++                    s32 rawX = ParticleRandom_ReadDirectSample(table);
+                     s32 px = actor->position.x;
+-                    // Not `% 512`: as the whole right-hand side, expand_divmod would
+-                    // compute the quotient in x itself. Here the division is a
+-                    // subexpression, so the quotient gets its own register, as in the ROM.
+-                    s32 x = (rawX >> 3) - ((rawX >> 3) / 512) * 512;
+-                    s32 rawZ = RandomValue(table);
++                    s32 x = ScatterOffset(rawX);
++                    s32 rawZ = ParticleRandom_ReadDirectSample(table);
+                     s32 pz = actor->position.z;
+                     u32 height;
+-                    SetVector(&pos, px + x - 256, 0x2000, pz + ((rawZ >> 3) % 512) - 256);
+-                    height = Height(&pos) - 256;
++                    SetVector(&pos, px + x - 256, 0x2000, pz + ScatterOffset(rawZ) - 256);
++                    height = Terrain_SampleHeight(&pos) - 256;
+                     if (height <= 0x6ff)
+                         Hresvelgr_SpawnProjectile(&pos, 0, 1);
+                 }
+                 {
+                     u32 direction =
+-                        (actor->direction4 >> 1) | (normalCollisionMask & (actor->direction4 >> 8));
++                        actor->direction4 >> 1;
+                     if (direction == 0 && actor->position.x > 0x1400)
+                         ActionState_AdvanceState(action);
+                     else if (direction == 1 && actor->position.z > 0x1400)
+@@ -195,12 +145,9 @@
+             }
+             break;
+         case 2:
+-            actor->collisionMask = normalCollisionMask;
+-            actor->collisionBounds = actor->boundsLow;
+-            {
+-                u32 mask = 16;
+-                *flags |= mask;
+-            }
++            actor->animation.paletteBank = 0x2F0;
++            actor->animation.palette = actor->paletteBuffer;
++            EnableFlags(actor, 16);
+             actor->finished = 1;
+             break;
+     }
+--- a/src/fn/sub_081A14FC.c
++++ b/src/fn/sub_081A14FC.c
+@@ -2,6 +2,7 @@
+ #include "engine.h"
+ #include "scene_input_widget.h"
+ #include "terrain_sampling.h"
++#include "monster_particle_random.h"
+ struct Action {
+     u8 state, substate, step, pad3;
+     u32 frame, substateFrame, stepFrame;
+@@ -66,11 +67,6 @@
+ {
+     actor->flags |= mask;
+ }
+-static inline s32 RandomValue(const u16 *table)
+-{
+-    gRandomIndex = (gRandomIndex + 1) & 1023;
+-    return table[gRandomIndex];
+-}
+ static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
+ {
+     p->x = x;
+@@ -135,41 +131,23 @@
+                     s32 period = (step + 1) * 4;
+                     if (!sub_08249498(action->frame, period)) {
+                         struct ContactPosition delta, position;
+-                        union RandomTableView view = {gRandomTable};
+-                        const u16 *table = view.samples;
+-                        s32 ox, px, oy, py, oz, pz;
+-                        s32 sampleX, sampleZ;
+-                        s32 sampleY;
+-                        s32 rawY;
+-                        SetVector(&delta, (RandomValue(table) >> 3) % 32 - 16, actor->delta.y,
+-                                  (RandomValue(table) >> 3) % 32 - 16);
+-                        sampleX = RandomValue(table) >> 3;
+-                        ox = sampleX - (sampleX / 256) * 256;
+-                        px = actor->animation.position.x;
+-                        rawY = RandomValue(table);
+-                        sampleY = rawY >> 3;
+-                        /* Allocation-only: preserve the table and raw-sample lifetimes. */
+-                        if (rawY < 0)
+-                            table++;
+-                        {
+-                            u32 side = actor->side;
+-                            /* Allocation-only: this bounded fallback retains the argument copy. */
+-                            if ((s32)side < 0) {
+-                                MotionEntry_CreateWithDelta(&saved->position, &delta, 0, sampleY);
+-                                goto sprayDone;
+-                            }
+-                        }
+-                        oy = sampleY - (sampleY / 128) * 128;
+-                        py = actor->animation.position.y;
+-                        sampleZ = RandomValue(table) >> 3;
+-                        oz = sampleZ - (sampleZ / 256) * 256;
+-                        pz = actor->animation.position.z;
+-                        SetVector(&position, px + ox - 128, py + oy, pz + oz - 128);
+-                        MotionEntry_CreateWithDelta(&position, &delta,
+-                                                    (RandomValue(table) >> 3) % 4, 64);
++                        const u16 *table = gRandomTable;
++                        SetVector(&delta,
++                                  ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 32 - 16,
++                                  actor->delta.y,
++                                  ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 32 - 16);
++                        SetVector(&position,
++                                  ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 256 +
++                                      actor->animation.position.x - 128,
++                                  ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 128 +
++                                      actor->animation.position.y,
++                                  ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 256 +
++                                      actor->animation.position.z - 128);
++                        MotionEntry_CreateWithDelta(
++                            &position, &delta,
++                            ((s32)ParticleRandom_ReadDirectSample(table) >> 3) % 4, 64);
+                     }
+                 }
+-            sprayDone:
+                 if (saved->pulse)
+                     Sound_PlaySong(0x3d9);
+                 action->frame++;
+@@ -189,8 +167,10 @@
+                 for (i = 0; i < 2; i++) {
+                     struct ContactPosition position;
+                     union RandomTableView table = {gRandomTable};
+-                    SetVector(&position, (RandomValue(table.samples) >> 3) % 1024 - 512, 0,
+-                              -((RandomValue(table.samples) >> 3) % 256));
++                    SetVector(
++                        &position,
++                        ((s32)ParticleRandom_ReadDirectSample(table.samples) >> 3) % 1024 - 512, 0,
++                        -(((s32)ParticleRandom_ReadDirectSample(table.samples) >> 3) % 256));
+                     AddVector(&position, &position, &saved->position);
+                     AnimatedParticles_EmitBurst(&position, 7, 0, 64, 4, 4, 4, 4);
+                 }
+--- a/src/fn/sub_081AE0C0.c
++++ b/src/fn/sub_081AE0C0.c
+@@ -116,10 +116,6 @@
+ 
+ void Vanargand_StopActionSequence(void *);
+ 
+-/* TODO: recover the palette-selection API; this one-word preset remains an allocation concession. */
+-struct VanargandPaletteSelection {
+-    s32 bank;
+-};
+ static inline void ApplyPaletteBank(struct Vanargand *p, struct Vanargand *self, s32 bank)
+ {
+     switch (bank) {
+@@ -142,11 +138,6 @@
+             break;
+     }
+     Vanargand_ResetPaletteTransition(self);
+-}
+-static inline void ApplyPaletteSelection(struct Vanargand *p, struct Vanargand *self,
+-                                         const struct VanargandPaletteSelection *selection)
+-{
+-    ApplyPaletteBank(p, self, selection->bank);
+ }
+ static inline void RestorePalette(struct Vanargand *p, struct Vanargand *self)
+ {
+@@ -382,11 +373,7 @@
+             SetMode(self, 2, 0, 9);
+             ChangeState(self, 29, Vanargand_OnAlternateStopState);
+             p->attachment = Vanargand_CreatePartController(&p->coordinates.position, p->palette, 0);
+-            {
+-                struct VanargandPaletteSelection selection;
+-                selection.bank = 0x82;
+-                ApplyPaletteSelection(p, p, &selection);
+-            }
++            ApplyPaletteBank(p, p, 0x82);
+             SetPosition(&self->position, 0x33B, 0x100, 0x33B);
+             p->presentationMode = 1;
+             break;
+--- a/src/fn/sub_081F2404.c
++++ b/src/fn/sub_081F2404.c
+@@ -1,11 +1,7 @@
+ #include "sprite_trail.h"
+ 
+-struct Camera {
+-    u8 unk_00[0x44];
+-    s32 x;
+-};
+-/* Read the camera pointer separately for each projected position. */
+-extern struct Camera *volatile gSceneCamera;
++#include "tilemap_panel.h"
++extern struct TilemapPanel *gSceneCamera;
+ void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
+ 
+ void SpriteTrail_UpdatePositions(struct SpriteTrail *p)
+@@ -17,11 +13,11 @@
+     s32 index, i;
+     u32 *flags = &p->frame;
+     u32 *savedFlags;
+-    /* Record and project a new leading position on even frames. */
++    /* Bit 0 freezes the leading sprite and the position history. */
+     if (!(*flags & 1)) {
+         struct TrailVector *position = &p->position;
+         struct ContactPosition *out = &p->head[0].position;
+-        out->x = (p->position.x >> 12) - gSceneCamera->x;
++        out->x = (p->position.x >> 12) - gSceneCamera->scroll.x;
+         {
+             s32 y = position->y;
+             s32 z = position->z;
+@@ -42,7 +38,7 @@
+     }
+     for (; i >= 0;) {
+         struct ContactPosition *out = &next->position;
+-        next->position.x = (position->x >> 12) - gSceneCamera->x;
++        next->position.x = (position->x >> 12) - gSceneCamera->scroll.x;
+         {
+             s32 y = position->y;
+             s32 z = position->z;
+--- a/src/fn/sub_081FC26C.c
++++ b/src/fn/sub_081FC26C.c
+@@ -50,14 +50,9 @@
+     e->config.appearanceFlags = 0;
+     kind = RandomSample() & 3;
+     if (kind == 3)
+-        kind = 1;
+-    e->config.appearanceFlags = kind;
+-    {
+-        u16 type = kind;
+-        /* TODO: allocation-only guard; kind is always 0, 1 or 2 here. */
+-        if (type >= 3 && (type & ~15))
+-            return -1;
+-    }
++        e->config.appearanceFlags = 1;
++    else
++        e->config.appearanceFlags = kind;
+     if ((e->config.appearanceFlags & 15) <= 1) {
+         if (RandomSample() & 1) {
+             Anim_SetSequence(&e->sequence, pool->sequenceResource, 1, 0, 0);
+--- a/src/fn/sub_08217430.c
++++ b/src/fn/sub_08217430.c
+@@ -1,8 +1,5 @@
+ #include "global.h"
+ #include "render.h"
+-
+-/* Used only by the allocation-only bounded fallback below. */
+-void Video_SetRenderCallbacks(s32, void *, void *, void *);
+ 
+ void CpuFastSet(const void *src, void *dst, u32 control);
+ 
+@@ -64,18 +61,7 @@
+                     u32 offset = *keys << 5;
+                     u8 *base = *basePtr;
+                     u8 *bank = base + offset;
+-                    {
+-                        /* Allocation-only: offset comes from a u16 key, so this
+-                     * arm is unreachable. Its fourth argument retains the bank
+-                     * copy preference until jump2 removes the arm. */
+-                        u32 bound = offset;
+-                        if ((s32)bound < 0) {
+-                            Video_SetRenderCallbacks(0, 0, 0, bank);
+-                            goto nextCopy;
+-                        }
+-                    }
+                     CpuFastSet(bank, gObjPaletteBuffer[i], 8);
+-                nextCopy:
+                     keys++;
+                     i++;
+                 } while (i < (s32)gPaletteBanksInUse);
+@@ -100,10 +86,7 @@
+                 *dst = ((((((u16)c) & 0x7C1F) * level) & 0xF83E0) |
+                         (((c & 0x3E0) * level) & 0x7C00)) >>
+                        5;
+-                /* Retained allocation-only loop note from the matching source. */
+-                do {
+-                    src++;
+-                } while (0);
++                src++;
+                 dst++;
+             }
+         }
+--- a/src/script_virtual_machine.c
++++ b/src/script_virtual_machine.c
+@@ -804,7 +804,7 @@
+ void GameState_SelectRamBase(void)
+ {
+     u32 timer = *(vu16 *)0x0400010C;
+-    u8 *base = (u8 *)((u32)gGameStateStorage & ~(timer >> 16));
++    u8 *base = gGameStateStorage;
+     base += (timer & 127) * 8;
+     gGameState = (struct GameState *)base;
+     gBackupGameState = base + 0xb00;
+--- a/src/fn/sub_08234540.c
++++ b/src/fn/sub_08234540.c
+@@ -28,16 +28,13 @@
+     }
+     burst->resource = AnimData_FindEntry(0x1C1E);
+     i = 0;
+-    /* Form the table copy after CSE has finished tracking constants. */
+-    table = (const u16 *)((u32)gRandomTable & ~(phase >> 8));
++    table = gRandomTable;
+     frame = &burst->particles[0].frame;
+     sprite = burst->particles;
+     for (; i < 8; i++) {
+         ParticleSprite_Initialize(sprite, burst->resource, 0);
+         Effect_SetOrigin(sprite, -4, -4);
+         Effect_SetPalette(sprite, 1);
+-        /* Preserve the table's reference weight until combine. */
+-        table = (const u16 *)((u32)table | (((u32)burst & 31) >> 5));
+         frame->motion.angle = phase + (i << 5) + (SpiralBurst_Random(table, mask) & 15);
+         frame->motion.riseRate = ((i & 3) << 1) + 3;
+         frame->motion.radius = (SpiralBurst_Random(table, mask) & 31) + 64;
+@@ -68,7 +65,6 @@
+             else
+                 SpriteDrawable_SelectTileFrame(sprite, burst->resource, 13);
+         }
+-        table = (const u16 *)((u32)table | (((u32)burst & 127) >> 7));
+         frame->motion.lifetime = (SpiralBurst_Random(table, mask) & 15) + 0x38;
+         frame = (void *)((u8 *)frame + sizeof(struct SpiralParticle));
+         sprite = (u8 *)sprite + sizeof(struct SpiralParticle);

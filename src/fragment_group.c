@@ -63,7 +63,8 @@ u32 FragmentManager_Destroy(struct FragmentManager *manager)
         }
         i = next;
     } while (i <= 3);
-    return gFragmentManager = 0;
+    gFragmentManager = 0;
+    return 0;
 }
 
 s32 FragmentManager_Initialize(struct FragmentManager *manager, void *unused)
@@ -81,7 +82,7 @@ s32 FragmentManager_Initialize(struct FragmentManager *manager, void *unused)
         i = next;
     } while (i <= 3);
     manager->frame = 0;
-    gFragmentManager = (u32)manager;
+    gFragmentManager = manager;
     return 0;
 }
 

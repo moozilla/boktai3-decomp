@@ -77,7 +77,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
         Anim_SetSequence(&V->sequence, V->resource, 21, 0, 0);
     V->done = PlayerCue_StepSequenceEnded(&V->sprite, &V->sequence);
     /* Anim_SetSequence records the active sequence ID at +0xA. */
-    if (V->sequence.unknownA == 21) {
+    if (V->sequence.sequenceId == 21) {
         if (V->sprite.position.pad == 1)
             V->sprite.position.y -= 10;
         else

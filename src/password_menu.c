@@ -1,4 +1,5 @@
 #include "password_menu.h"
+#include "palette_pulse.h"
 #include "render.h"
 #include "game_state.h"
 #include "session_save.h"

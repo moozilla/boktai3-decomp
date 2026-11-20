@@ -326,7 +326,7 @@ static inline void Skeleton_UpdateApproachAnimation(struct ChaseActor *actor)
     }
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);

@@ -10,23 +10,23 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 |---|---:|
 | `volatile` | 3 (+17 excused) |
 | `cflags` | 0 (+50 excused) |
-| `goto` (tracked, not scored) | 2,117 |
+| `goto` (tracked, not scored) | 2,110 |
 
 | Warnings (`python3 tools/concessions.py`; not scored) | |
 |---|---:|
-| `dead-code` | 13 |
-| `proved-zero` | 33 |
+| `dead-code` | 9 (+1 excused) |
+| `proved-zero` | 26 |
 | `once-loop` | 114 (+1 excused) |
 | `stmt-expr` | 6 |
-| `const-local` | 1,187 |
-| `literal-local` | 2,733 |
+| `const-local` | 1,183 |
+| `literal-local` | 2,726 |
 | `addr-deref` | 41 |
 | `placeholder-name` | 8 |
 | `volatile-view` | 5 |
-| `local-union` | 131 |
-| total | 4,271 |
+| `local-union` | 120 (+2 excused) |
+| total | 4,238 |
 
-Source files with no warning: **4,570** of 6,041.
+Source files with no warning: **4,573** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 

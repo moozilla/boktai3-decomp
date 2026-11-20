@@ -137,9 +137,9 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
                 {
                     u32 key = 0xB96C;
                     resource = address;
-                    if (firstResource == key && p->sequence.unknownA == 6)
+                    if (firstResource == key && p->sequence.sequenceId == 6)
                         Sound_PlaySong(0x3C4);
-                    else if (*resource == 0xD45E && p->sequence.unknownA == 6)
+                    else if (*resource == 0xD45E && p->sequence.sequenceId == 6)
                         Sound_PlaySong(0x3B0);
                     {
                         u32 value = 10;

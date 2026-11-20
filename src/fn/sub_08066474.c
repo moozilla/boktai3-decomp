@@ -39,7 +39,7 @@ static inline void ActorAttachment_SetupMeterPart(struct ActorAttachmentManagerV
     part->flags |= 1;
     part->unknownC[4] = 127;
     part->unknownC[3] = 1;
-    slot->sequences[index].unknownA = 255;
+    slot->sequences[index].sequenceId = 255;
     switch (slot->kind) {
         case 0:
             sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;

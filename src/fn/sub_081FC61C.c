@@ -1,29 +1,16 @@
 #include "global.h"
-
-struct Unk081FC61C {
-    u16 unk0;
-    u16 unk2;
-    u8 filler4[2];
-    u8 unk6;
-    u8 filler7;
-    u32 unk8;
-    u32 unkC;
-    u8 filler10[8];
-    u32 unk18;
-};
+#include "ratatosk_particle.h"
 
 void Memory_Clear(void *, u32);
-void Ratatosk_SetAnimatedParticleUpdateCallback(void *, void (*)(void));
-void Ratatosk_OnAnimatedParticleUpdate(void);
 
-void Ratatosk_InitAnimatedParticleParams(struct Unk081FC61C *p)
+void Ratatosk_InitAnimatedParticleParams(struct RatatoskParticleConfig *p)
 {
-    Memory_Clear(p, 0x1C);
+    Memory_Clear(p, sizeof(*p));
     Ratatosk_SetAnimatedParticleUpdateCallback(p, Ratatosk_OnAnimatedParticleUpdate);
-    p->unk0 = 0;
-    p->unk2 = 20;
-    p->unk8 = 5;
-    p->unk6 = 0;
-    p->unk18 = 0;
-    p->unkC = 0x200;
+    p->appearanceFlags = 0;
+    p->lifespan = 20;
+    p->speed = 5;
+    p->angle = 0;
+    p->behavior = 0;
+    p->fallAcceleration = 0x200;
 }

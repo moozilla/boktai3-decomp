@@ -1,4 +1,5 @@
 #include "scene_volume.h"
+#include "scene_particle_burst_api.h"
 
 void Projectile_InitializeParams(struct Task4E01Params *);
 
@@ -78,8 +79,6 @@ s32 ActorPosition_TestPath(void *, void *);
 s32 SceneVolume_TestPlayerPosition(void *);
 
 s32 SpriteComponent_GetCollisionStatus(void *);
-
-void SceneParticleBurst_CreateWithPause(void *, void *, void *, int, int, int);
 
 int Math_Atan2(int, int);
 
@@ -250,7 +249,8 @@ void SceneVolume_UpdatePursuitSpin(struct SceneVolumeActor *actor, s32 elapsed)
                 b.x = 0x20;
                 b.y = 0;
                 b.z = 0x20;
-                SceneParticleBurst_CreateWithPause(actor->position, &a, &b, 1, 2, 4);
+                SceneParticleBurst_CreateWithPause(
+                    (const struct ContactPosition *)actor->position, &a, &b, 1, 2, 4);
             }
             if (volume->movementMode == 1 || volume->movementMode == 3) {
                 int speed = 5;

@@ -19,7 +19,7 @@ void PauseMenu_RefreshPriceDigits(struct SceneHudState *p)
 
     value = p->valueRate;
     if (value == 0) {
-        data = p->unknownC4;
+        data = &p->accountResource;
         {
             s32 zero = 0;
             s32 *clear = &digits[3];
@@ -34,7 +34,7 @@ void PauseMenu_RefreshPriceDigits(struct SceneHudState *p)
         value -= digits[1] * 100;
         digits[2] = Div(value, 10);
         digits[3] = value - digits[2] * 10;
-        data = p->unknownC4;
+        data = &p->accountResource;
     }
     digit = digits;
     for (i = 0; i <= 3; i++) {

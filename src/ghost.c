@@ -200,11 +200,11 @@ static inline void Ghost_SelectDirectionalAnimation(struct RoomActor *actor, u32
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -3130,10 +3130,10 @@ static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->base.animationIndex = selection;
         drawable = (void *)actor->base.drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         selection += variant;
         if (!force && Ghost_GetAnimationIndex(actor) == selection &&

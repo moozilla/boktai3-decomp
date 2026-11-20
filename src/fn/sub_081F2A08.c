@@ -32,7 +32,7 @@ s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVec
     {
         struct TrailVector *origin = position;
         s32 i;
-        struct ContactSwarmSprite *head, *tail, *sprite;
+        struct DisplaySequenceSprite *head, *tail, *sprite;
         struct TrailVector *history;
         head = p->head;
         tail = p->tail;
@@ -75,7 +75,7 @@ s32 SpriteTrail_CreateMotionEffect(struct SpriteTrailPool *pool, struct TrailVec
             tail++;
         }
     }
-    AnimData_SelectPaletteBank(p->graphics, 485);
+    AnimData_SelectPaletteBank(&p->graphics, 485);
     SpriteTrail_InitRenderCollider(p);
     SpriteTrail_InitCollider(p);
     pool->activeMask |= 1 << index;

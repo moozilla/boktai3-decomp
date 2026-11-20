@@ -1,25 +1,23 @@
 #include "global.h"
+#include "ratatosk_particle.h"
 #include "ram.h"
-struct E {
-    u8 p[0x78];
-};
-void OverlaySlot_InitializeExtended(u8 *, struct E *, s32);
-void AnimData_Load(u8 *, u32);
-u32 ScriptProc_Start(u32, u32);
-u32 Ratatosk_InitAnimatedParticlePool(u8 *a)
+
+s32 AnimData_Load(struct SpriteRenderResource *, u32);
+void *ScriptProc_Start(u16, u16);
+s32 Ratatosk_InitAnimatedParticlePool(struct RatatoskParticlePool *a)
 {
-    struct E *e;
+    struct RatatoskParticle *e;
     s32 i;
     gRatatoskParticlePool = a;
-    *(u32 *)(a + 0x18) = 0;
-    e = (struct E *)(a + 0x38);
+    a->mask = 0;
+    e = a->particles;
     i = 0;
     do {
         OverlaySlot_InitializeExtended(a, e, i);
         i++;
         e++;
     } while (i <= 0x1f);
-    AnimData_Load(a + 0x1c, 0x8E5A);
-    *(u32 *)(a + 0xF38) = ScriptProc_Start(0x922E, 0x4363);
+    AnimData_Load(&a->graphics, 0x8E5A);
+    a->sequenceResource = ScriptProc_Start(0x922E, 0x4363);
     return 0;
 }

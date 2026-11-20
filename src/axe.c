@@ -1,4 +1,5 @@
 #include "scene_actor_chase.h"
+#include "scene_particle_burst_api.h"
 #include "global.h"
 #include "player.h"
 #include "scene_actor_control_phase.h"
@@ -694,11 +695,11 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -780,7 +781,7 @@ inline static void Control_UpdateTurnAnimation(struct RoomActor *a, void *callba
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
     u8 *direction = ((u8 *)actor) + 0x50;
-    u8 *sequence;
+    struct DisplaySequenceState *sequence;
     if (Take(&actor->field2B2)) {
         s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
@@ -805,7 +806,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
     }
     {
         struct ChaseActor *state = (void *)actor;
-        sequence = ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
+        sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence;
         {
             u32 mask = 0xA02F;
             u16 *scale;
@@ -821,7 +822,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
             }
             if (!actor->drawableKind)
                 Anim_SetDurationScale(
-                    ((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence,
+                    &((struct SceneActorAnimationSequenceDrawable *)actor->drawable)->sequence,
                     *scale);
             else
                 Anim_SetFrameDurationScale(
@@ -840,7 +841,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         else
             direction[9] -= 32;
         Axe_GetDirectionalFrame(direction[9], &variant, &flags);
-        sequence[5] = 0;
+        sequence->frameCount = 0;
         selection = entry->value;
         Select(actor, selection, variant, flags);
     }
@@ -2848,7 +2849,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
         {
             struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
             struct DisplaySequenceState *source = &drawable->sequence;
-            u16 sequence = source->unknownA;
+            u16 sequence = source->sequenceId;
             {
                 u32 offset = trail->nextSlot * sizeof(struct AxeTrailSlot);
                 u32 spriteOffset = 0x708;
@@ -2898,10 +2899,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
 }
 
 struct AxeTrailSlotEmitTrailSprite {
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct ContactSwarmSprite spatial;
-    } draw;
+    struct DisplaySequenceSprite sprite;
     struct ContactSwarmGraphics graphics;
     struct DisplaySequenceState sequence;
     const void *resource;
@@ -2926,20 +2924,91 @@ static inline const void *Axe_TrailResource(struct AxeTrailContextEmitTrailSprit
 static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source,
                                        struct AxeTrailContextEmitTrailSprite *row)
 {
-    row->trail[0].draw.sprite.palette = source->palette;
+    row->trail[0].sprite.palette = source->palette;
 }
 
 static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
                                        struct AxeTrailContextEmitTrailSprite *row)
 {
-    row->trail[0].draw.sprite.paletteVariant = source->paletteVariant;
+    row->trail[0].sprite.paletteVariant = source->paletteVariant;
+}
+
+static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
+                                   struct DisplaySequenceState *state)
+{
+    const u16 *command;
+    u32 ended;
+    {
+        u32 offset = DisplaySequence_GetIndex(state) << 1;
+        const u16 *table;
+        table = state->commands;
+        command = (const u16 *)((u32)table + offset);
+    }
+    owner->frame = *command >> 6;
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 1;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 4;
+        else
+            owner->flags &= ~4;
+    }
+    {
+        union DisplaySequenceControl control;
+        u32 bit, first;
+        control.raw = state->flags;
+        bit = 2;
+        first = (u8)(control.raw & bit);
+        if (first != (((*command & 0x30) >> 4) & bit))
+            owner->flags |= 8;
+        else
+            owner->flags &= ~8;
+    }
+    if (++state->elapsed >= state->duration) {
+        state->elapsed = 0;
+        if (state->flags & 4) {
+            if (state->index == 0) {
+                if (state->flags & 8)
+                    state->elapsed = state->duration;
+                else
+                    state->index = state->frameCount - 1;
+                ended = 1;
+            } else {
+                state->index--;
+                ended = 0;
+            }
+        } else {
+            if (++state->index >= state->frameCount) {
+                if (state->flags & 8) {
+                    state->elapsed = state->duration;
+                    state->index = state->frameCount - 1;
+                } else {
+                    state->index = 0;
+                }
+                ended = 1;
+            } else {
+                ended = 0;
+            }
+        }
+        command = state->commands + state->index;
+        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
+        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
+        if (state->duration == 0)
+            state->duration = 1;
+    } else {
+        ended = 0;
+    }
+    return ended;
 }
 
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
                                 u32 angle)
 {
     struct AxeTrailContextEmitTrailSprite *context = actor->base.context;
-    struct ContactSwarmSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *state;
     u32 spriteOffset;
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
@@ -2951,7 +3020,7 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
         {
             struct DisplaySequenceState *source =
                 &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
-            u16 selection = source->unknownA;
+            u16 selection = source->sequenceId;
             u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite);
             struct AxeTrailSlotEmitTrailSprite *slot;
             struct DisplaySequenceState *destination;
@@ -2964,22 +3033,22 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
             Anim_SetSequence(destination, resource, selection, context->variant, zero);
         }
     }
-    sprite = (struct ContactSwarmSprite *)(context->nextTrail *
+    sprite = (struct DisplaySequenceSprite *)(context->nextTrail *
                                                sizeof(struct AxeTrailSlotEmitTrailSprite) +
                                            (u32)context);
-    sprite = (struct ContactSwarmSprite *)((u8 *)sprite + spriteOffset);
+    sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
     state = (struct DisplaySequenceState *)(context->nextTrail *
                                                 sizeof(struct AxeTrailSlotEmitTrailSprite) +
                                             (u32)context);
     state = (struct DisplaySequenceState
                  *)((u8 *)state + (u32) &
                     ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0].sequence);
-    PlayerCue_StepSequenceEnded(sprite, state);
-    context->trail[context->nextTrail].draw.spatial.position = *position;
-    context->trail[context->nextTrail].draw.sprite.flags &= ~1;
-    context->trail[context->nextTrail].draw.sprite.flags |= 2;
+    Axe_StepSequence(sprite, state);
+    context->trail[context->nextTrail].sprite.position = *position;
+    context->trail[context->nextTrail].sprite.flags &= ~1;
+    context->trail[context->nextTrail].sprite.flags |= 2;
     context->trail[context->nextTrail].lifetime = 8;
-    context->trail[context->nextTrail].draw.sprite.attribute = angle;
+    context->trail[context->nextTrail].sprite.attribute = angle;
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
         struct AxeTrailContextEmitTrailSprite *row =
@@ -3142,8 +3211,6 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     out->z = entry[1];
 }
 
-void SceneParticleBurst_CreateWithPause(const void *, const void *, const void *, s32, s32, s32);
-
 struct Burst080FC094Drawable {
     u8 unk_00[6];
     u8 heading;
@@ -3166,7 +3233,7 @@ static inline s32 Burst080FC094_Scale(s32 value)
 void Axe_SpawnHeadingBurst(struct ChaseActor *actor, s32 count)
 {
     struct Burst080FC094Drawable *drawable = actor->base.drawable;
-    struct ContactPackedVector range;
+    struct ContactPosition range;
     struct ContactPosition offset;
     struct ContactPosition velocity;
     union {
@@ -3189,7 +3256,7 @@ void Axe_SpawnHeadingBurst(struct ChaseActor *actor, s32 count)
     x2 = Burst080FC094_Scale(-(offset.x * gUnk_086149C4[drawable->heading]));
     z2 = Burst080FC094_Scale(offset.z * gUnk_086149C4[(drawable->heading + 64) & 255]);
     position.v.z = x2 + z2 + position.p.z;
-    SceneParticleBurst_CreateWithPause(&position, &velocity, &range, count, 2, 4);
+    SceneParticleBurst_CreateWithPause(&position.p, &velocity, &range, count, 2, 4);
 }
 
 struct AxeSparkContext {
@@ -3340,24 +3407,6 @@ u8 ActorPhase_UpdateFlicker(u32 *flags, s32 timer, s32 low, s32 high)
     return 0;
 }
 
-struct AxeAttackTrailContext {
-    u8 unknown0[0xA38];
-    union {
-        struct DisplaySequenceSprite sprite;
-        struct ContactSwarmSprite spatial;
-    } draw;
-    struct ContactSwarmGraphics graphics;
-    struct DisplaySequenceState sequence;
-    struct ContactCollider attack[3], body[3];
-    struct ContactPosition origin;
-    u8 unknownC90[0xCA7 - 0xC90];
-    u8 shadowActive;
-    u8 unknownCA8[4];
-    u8 shadow[0x40];
-    u8 unknownCEC[0xED7 - 0xCEC];
-    u8 variant;
-};
-
 void Collider_SetBodyProperties(void *, u16, u32, u32);
 
 void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
@@ -3368,80 +3417,9 @@ void Axe_OnSecondaryColliderContact(void);
 
 u32 Shadow_Initialize(void *, void *, s32);
 
-static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
-                                   struct DisplaySequenceState *state)
-{
-    const u16 *command;
-    u32 ended;
-    {
-        u32 offset = DisplaySequence_GetIndex(state) << 1;
-        const u16 *table;
-        table = state->commands;
-        command = (const u16 *)((u32)table + offset);
-    }
-    owner->frame = *command >> 6;
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 1;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 4;
-        else
-            owner->flags &= ~4;
-    }
-    {
-        union DisplaySequenceControl control;
-        u32 bit, first;
-        control.raw = state->flags;
-        bit = 2;
-        first = (u8)(control.raw & bit);
-        if (first != (((*command & 0x30) >> 4) & bit))
-            owner->flags |= 8;
-        else
-            owner->flags &= ~8;
-    }
-    if (++state->elapsed >= state->duration) {
-        state->elapsed = 0;
-        if (state->flags & 4) {
-            if (state->index == 0) {
-                if (state->flags & 8)
-                    state->elapsed = state->duration;
-                else
-                    state->index = state->frameCount - 1;
-                ended = 1;
-            } else {
-                state->index--;
-                ended = 0;
-            }
-        } else {
-            if (++state->index >= state->frameCount) {
-                if (state->flags & 8) {
-                    state->elapsed = state->duration;
-                    state->index = state->frameCount - 1;
-                } else {
-                    state->index = 0;
-                }
-                ended = 1;
-            } else {
-                ended = 0;
-            }
-        }
-        command = state->commands + state->index;
-        state->frameWeight = DisplaySequence_MaskCommand(DisplaySequence_ReadCommand(command), 15);
-        state->duration = (state->frameWeight * (s32)state->speed) >> 6;
-        if (state->duration == 0)
-            state->duration = 1;
-    } else {
-        ended = 0;
-    }
-    return ended;
-}
-
 static inline u16 Axe_SequenceSelection(struct DisplaySequenceState *source)
 {
-    return source->unknownA;
+    return source->sequenceId;
 }
 
 void Axe_InitAttackTrail(struct ChaseActor *s)
@@ -3450,27 +3428,27 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     struct ContactPackedVector bodyOffset;
     struct ContactPackedVector attackSize;
     struct ContactPackedVector attackOffset;
-    struct AxeAttackTrailContext *d = s->base.context;
-    void *resource = &d->graphics;
+    struct Axe *d = s->base.context;
+    void *resource = &d->auxiliaryGraphics;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *frames;
     void *sequence;
     s32 i;
     AnimData_Load(resource, 0x5291);
-    sprite = &d->draw.sprite;
+    sprite = &d->auxiliarySprite;
     Sprite_Init(sprite, resource, 0);
     sequence = ScriptProc_Start(0x922e, 0x3f72);
     {
         struct DisplaySequenceState *drawable =
             &((struct SceneActorControlMotionDrawable *)s->base.drawable)->sequence;
         u32 index = Axe_SequenceSelection(drawable);
-        frames = &d->sequence;
+        frames = &d->auxiliarySequence;
         Anim_SetSequence(frames, sequence, index, d->variant, 0);
     }
     Axe_StepSequence(sprite, frames);
-    d->draw.sprite.flags |= 1;
-    d->draw.spatial.position = s->base.body.position;
-    d->draw.sprite.priority = 1;
+    d->auxiliarySprite.flags |= 1;
+    d->auxiliarySprite.position = s->base.body.position;
+    d->auxiliarySprite.priority = 1;
     bodySize.x = 24;
     bodySize.y = 70;
     bodySize.z = 24;
@@ -3506,8 +3484,8 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
         Collider_SetCallback(c, Axe_OnSecondaryColliderContact, d);
     }
 
-    d->shadowActive = Shadow_Initialize(d->shadow, &d->draw.spatial.position, 0);
-    ActorShadow_Disable(d->shadow);
+    d->shadowActive = Shadow_Initialize(d->auxiliaryShadow, &d->auxiliarySprite.position, 0);
+    ActorShadow_Disable(d->auxiliaryShadow);
 }
 
 struct S080FC7F4 {
@@ -3560,8 +3538,8 @@ void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
 
 void Axe_CopyAuxiliaryVector(struct ChaseActor *s, const struct ContactPosition *src)
 {
-    struct AxeAttackTrailContext *trail = s->base.context;
-    trail->draw.spatial.position = *src;
+    struct Axe *trail = s->base.context;
+    trail->auxiliarySprite.position = *src;
 }
 
 struct S080FC8B0 {

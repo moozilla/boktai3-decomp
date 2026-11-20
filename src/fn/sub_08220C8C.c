@@ -1,9 +1,4 @@
-#include "global.h"
-struct DisplaySequenceState {
-    const u16 *commands;
-    u8 flags, frameCount, frameWeight, duration;
-    u16 index, sequence, speed, elapsed;
-};
+#include "display_sequence.h"
 u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence, u8 row, u8 flags)
 {
     u8 *entry = data + (sequence * 4 + 4);
@@ -11,7 +6,7 @@ u32 Anim_SetSequence(struct DisplaySequenceState *state, u8 *data, u16 sequence,
     u32 prod = entry[1] * row * 2;
     state->commands = (const u16 *)(base + prod);
     state->speed = 0x40;
-    if (state->sequence == sequence && state->frameCount) {
+    if (state->sequenceId == sequence && state->frameCount) {
         if (flags & 4) {
             if (!(state->flags & 4))
                 goto restart;
@@ -37,7 +32,7 @@ restart:
         state->duration = weight;
     }
     state->elapsed = 0;
-    state->sequence = sequence;
+    state->sequenceId = sequence;
     state->flags = flags;
     return 1;
 same:

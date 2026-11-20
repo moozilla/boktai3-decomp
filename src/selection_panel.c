@@ -1,4 +1,5 @@
 #include "selection_panel.h"
+#include "palette_pulse.h"
 #include "area_effect_link.h"
 #include "scrolling_dialogue.h"
 #include "runtime.h"

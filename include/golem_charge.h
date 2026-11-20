@@ -61,11 +61,11 @@ static inline void Golem_SelectAnimation(struct ChaseActor *actor, u32 selection
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->base.animationIndex = selection;
         drawable = actor->base.drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->base.restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         u8 *savedSelection;
         selection += variant;
@@ -115,7 +115,7 @@ static inline void Golem_ApplyDuration(struct ChaseActor *actor)
     }
     if (!actor->base.drawableKind)
         Anim_SetDurationScale(
-            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);

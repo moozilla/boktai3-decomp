@@ -1,14 +1,16 @@
 #include "scene_actor_behavior.h"
+#include "skeleton.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "engine.h"
 #include "runtime.h"
+#include "spark_particle.h"
 #include "enemy_defeat_statistics.h"
 
 /* Skeleton defeat state (tentative). On entry: releases attachments, clears the route and,
  * for categories 6/7, emits a bone burst through sub_08127590. Then three outcomes:
  * flag 0x4000 (no reward) sparks and idles; while the context is not finished it switches to
- * SceneActorReaction_TickHiddenTimeout (revival, with the rank 20000 reward); otherwise the
+ * SceneActorReaction_TickHiddenTimeout (revival is disabled for delays above 19999); otherwise the
  * full defeat: script, reward, kill counters per category (saturating at 9999, plus one
  * counter per collider reaction flag) and a six-spark burst.
  * The burst arguments live in function-scope variables and are rematerialized at each call. */
@@ -18,23 +20,13 @@ void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
-void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 void sub_08127590(void *, void *, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32, u32);
 void sub_08159164(u32);
 void Player_RefreshLifeState(u32, u32);
 void Skeleton_InitializeCategoryProfile(void *);
 void Skeleton_InitVariantMotion(void *);
-void SceneActorReaction_TickHiddenTimeout(void);
 void SceneActorRecord_RecordPair(u32, u32);
 
-struct SkeletonContext {
-    u8 unknown0[0x6D2];
-    u16 rank;
-    u16 rewardLow;
-    u16 rewardHigh;
-    u8 unknown6D8[4];
-    u32 flags;
-};
 
 static inline void Count(s16 *p)
 {
@@ -77,31 +69,6 @@ static inline u32 Skeleton_StatusFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.statusFlags & mask;
-}
-static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    u32 state = s;
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 static inline u32 RandomFrom(const u16 *table, u32 wrap, u32 bits)
 {
@@ -271,7 +238,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
     s32 values[8];
     /* Allocation-only: reuse disjoint pointer and spark-priority lifetimes. */
     union {
-        struct SkeletonContext *context;
+        struct Skeleton *context;
         s32 one;
     } state = {actor->base.context};
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
@@ -356,7 +323,7 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
                     Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
         }
         {
-            struct ContactPackedVector range;
+            struct ContactPosition range;
             const u16 *table;
             u8 category;
             range.x = 80;
@@ -387,8 +354,8 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
             if ((s32)bound < 0)
                 Sound_PlaySong((u32)lateTable);
         }
-        SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-        SetState(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         {
             u32 m = 0x1000;
             actor->base.reactionFlags = m | actor->base.reactionFlags;
@@ -400,41 +367,20 @@ void Skeleton_UpdateDefeat(struct ChaseActor *actor)
 notHidden:
     if (actor->base.hitReactionFlags & 0x7F) {
         u32 hit = actor->base.hitAttributes & 0x100017;
-        ctxFlags = &state.context->flags;
+        ctxFlags = &state.context->actionFlags;
         if (hit)
             goto defeated;
     }
     {
         u32 m = 0x1800;
-        u32 *f = &state.context->flags;
+        u32 *f = &state.context->actionFlags;
         u32 v = *f & m;
         ctxFlags = f;
         blocked = Test(v, ~0);
     }
     if (!blocked) {
-        {
-            void *callback = (void *)SceneActorReaction_TickHiddenTimeout;
-            u32 kind = 0x39;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = blocked;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = blocked;
-            {
-                u32 *field = &actor->base.pendingControlFlags;
-                s32 clear = ~1;
-                *field &= clear;
-            }
-            actor->base.pendingControl = blocked;
-        }
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-        }
-        actor->base.phase2A9 = 0;
-        actor->base.behavior2AA = 0;
-        actor->base.counter2AC = blocked;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetControl(actor, SceneActorReaction_TickHiddenTimeout, 0x39);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         actor->base.health = 1;
         {
             u32 bit = 0x40;
@@ -446,7 +392,7 @@ notHidden:
                 Skeleton_InitVariantMotion(actor);
             }
         }
-        if (state.context->rank > 19999) {
+        if (state.context->revivalDelay > 19999) {
             u16 script = (u16)actor->base.script1F8;
             if (script) {
                 struct ScriptUtilityArguments arguments;
@@ -465,10 +411,10 @@ notHidden:
             if (!Masked16(response.flags, 0x4000) && (u32)(actor->base.category - 11) > 2)
                 Bestiary_UnlockEntry(
                     Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-            sub_08159164(state.context->rewardHigh);
+            sub_08159164(state.context->defeatExperience);
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         } else {
-            sub_08159164(state.context->rewardLow);
+            sub_08159164(state.context->downedExperience);
         }
         {
             u32 m = 0x10;
@@ -483,8 +429,8 @@ notHidden:
 
     } else {
     defeated:
-        SetCtl(actor, (void *)SceneActorControl_OnIdle, 16);
-        SetState(actor, 1, 0, 2);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SetState(actor, 1, 0, 2);
         {
             u8 b = TestBits(ctxFlags, 0x40);
             categoryp = &actor->base.category;
@@ -511,13 +457,13 @@ notHidden:
         }
         if (!Masked16(response.flags, 0x4000) && (u32)(*categoryp - 11) > 2)
             Bestiary_UnlockEntry(Bestiary_GetEntryForActor(*categoryp, actor->base.paletteOffset));
-        sub_08159164(state.context->rewardHigh);
+        sub_08159164(state.context->defeatExperience);
         Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->lifetimeTotal);
         Count(&((struct EnemyDefeatStatistics *)gGameState)->total);
         RecordKill(actor, categoryp);
         {
-            struct ContactPackedVector range;
+            struct ContactPosition range;
             u8 category;
             range.x = 80;
             range.y = 60;

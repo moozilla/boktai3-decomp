@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_INPUT_H
 #define GUARD_SCENE_INPUT_H
 #include "engine.h"
+#include "palette_pulse.h"
 #include "contact_actor.h"
 #include "scene_input_widget.h"
 #include "input.h"
@@ -20,7 +21,6 @@ struct SceneInputPair {
 
 s32 Anim_SelectWidgetGlyph(void *, void *, u32);
 s32 Widget_InitLinked(void *, void *, u32, u32, u32, u32, u32, void *);
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void SceneInput_BeginChoice(struct SceneInputWidget *, void *, u8 *, u32, u8 *);
 s32 SceneInput_TickChoice(struct SceneInputWidget *, void *, u8 *, u8 *);
 void SceneInput_InitGlyphPair(struct SceneInputPair *);

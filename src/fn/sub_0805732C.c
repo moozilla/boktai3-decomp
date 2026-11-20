@@ -9,7 +9,7 @@ s32 LevelAdvanceDisplay_UpdateManager(struct LevelAdvanceManager *manager)
                 manager->sprite.flags |= 1;
                 manager->active = 0;
                 for (i = 0; i < 8; i++) {
-                    manager->particles[i].flags |= 1;
+                    manager->particles[i].sprite.flags |= 1;
                     manager->particles[i].active = 0;
                 }
             }

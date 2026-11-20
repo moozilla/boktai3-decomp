@@ -24,7 +24,7 @@ static inline void Reaction_Show(struct ChaseActor *actor)
         s32 mask = ~1;
         *flags = mask & *flags;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
         s32 mask = ~1;
         tile->flags = mask & tile->flags;
