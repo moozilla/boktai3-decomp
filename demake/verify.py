@@ -57,6 +57,8 @@ class Replay:
         self.trace = []
         self.snaps = []
         self.ticks = 0
+        self.missed_vblanks = 0
+        self._ram = np.frombuffer(self.model.mem, dtype=np.uint8)
         self._window_x, self._window_y = np.meshgrid(np.arange(21), np.arange(19))
         self.run(0, 1)
 
@@ -71,7 +73,17 @@ class Replay:
             return
         self.model.keys = key
         for _ in range(ticks):
+            before, room = self.model.frames, self.model.bank
             self.model.until(self.loop)
+            if self.ticks and room == self.model.bank:
+                self.missed_vblanks += max(0, self.model.frames - before - 1)
+            y = self._ram[0xfe00:0xfea0:4].astype(int)
+            starts, stops = np.maximum(y - 16, 0), np.minimum(y, 144)
+            visible = starts < stops
+            loads = np.bincount(starts[visible], minlength=145) - np.bincount(stops[visible], minlength=145)
+            self.model.peak_line = max(self.model.peak_line, int(np.cumsum(loads).max()))
+            self.model.peak_oam = max(self.model.peak_oam, int(visible.sum()))
+            check(self.model.peak_line <= 10, "OAM line overflow during replay")
             self.check_scroll()
         self.ticks += ticks
         if self.trace and self.trace[-1][0] == "tick" and self.trace[-1][2] == key:
@@ -280,7 +292,7 @@ def verify(out, manifest):
         snapshots += replay.snaps
         checks.append(dict(replay=name, ticks=replay.ticks, peak_oam=replay.model.peak_oam,
                            peak_sprites_on_line=replay.model.peak_line, lowest_sp=hex(replay.model.lowest_sp),
-                           vblank_writes=replay.model.vblank_writes))
+                           missed_vblanks=replay.missed_vblanks, vblank_writes=replay.model.vblank_writes))
     rows = []
     for i in range(0, len(snapshots), 3):
         views = []

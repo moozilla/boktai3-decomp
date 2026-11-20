@@ -70,6 +70,11 @@ camera:
     ld e,80
     ld bc,352
     call clamp_axis
+    ld a,[camera_x_hi]
+    ld d,a
+    ld a,[camera_x]
+    ld e,a
+    call follow_axis
     ld a,l
     ld [camera_x],a
     ld a,h
@@ -81,11 +86,53 @@ camera:
     ld e,82
     ld bc,368
     call clamp_axis
+    ld a,[camera_y_hi]
+    ld d,a
+    ld a,[camera_y]
+    ld e,a
+    call follow_axis
     ld a,l
     ld [camera_y],a
     ld a,h
     ld [camera_y_hi],a
     ret
+; Cap normal tracking at seven pixels per frame. A high step or slope can
+; shift the projected feet faster than the single entering tile row.
+follow_axis:
+    ld a,[camera_snap]
+    and a
+    ret nz
+    push hl
+    call subtract_de
+    bit 7,h
+    jr nz,.negative
+    ld a,h
+    and a
+    jr nz,.forward
+    ld a,l
+    cp 8
+    jr c,.near
+.forward:
+    pop hl
+    ld hl,7
+    add hl,de
+    ret
+.negative:
+    ld a,h
+    cp 255
+    jr nz,.back
+    ld a,l
+    cp 249
+    jr nc,.near
+.back:
+    pop hl
+    ld hl,0xfff9
+    add hl,de
+    ret
+.near:
+    pop hl
+    ret
+
 clamp_axis:
     ld d,0
     call subtract_de

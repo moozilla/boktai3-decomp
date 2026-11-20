@@ -11,7 +11,7 @@ import text as game_text
 
 # Bank addresses stay fixed so the same SM83 code can run every room.
 LAYOUT = dict(header=0x4000, route=0x4020, events=0x4100, rows=0x4200, projection=0x4300,
-              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00, worldmap=0x6000, projection_hi=0x7000)
+              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00, worldmap=0x6000, projection_hi=0x7000, skeleton_routes=0x7100)
 SCENES = [2698, 2705, 2712]
 ROOM_NAMES = {2698: "SEALED PRISON", 2705: "THE CORRIDOR", 2712: "THE SKYLIGHT"}
 STORY = {2698: 5599, 2705: 8697, 2712: 8701}
@@ -111,29 +111,44 @@ def pack_room(source, room, rooms):
         start = nearest_floor(room, 0, 0)
     enemy = next((e for e in room.stage["enemies"] if "ghoul" in e["families"] and e.get("route")), None)
     path = t["paths"][enemy["path"]] if enemy else []
+    skeletons = []
+    for e in room.stage["enemies"]:
+        if "skeleton" in e["families"] and e.get("route") and e["path"] not in skeletons:
+            skeletons.append(e["path"])
+    skeletons = skeletons[:2] if not path else []
+    sk_routes = bytearray()
+    for p in skeletons:
+        points = t["paths"][p][:31]
+        route_bytes = bytes(v for q in points for v in (*nearest_floor(room, q["x"], q["z"]), q["wait"], q["dir"]))
+        sk_routes.extend((bytes([len(points)]) + route_bytes).ljust(128, b"\0"))
     events = room_events(room, rooms)
     route = bytes(v for p in path for v in (*nearest_floor(room, p["x"], p["z"]), p["wait"], p["dir"]))
     ox, oy = t["origin"]
     offset = [round((ox - room.left) * room.scale) & 255, round((oy - room.top) * room.scale) & 255]
     header = bytes([*offset, w, h, *start, len(path), len(events), *(encode_id(i) for i in ui.ids)])
     header += struct.pack("<hh", round((ox - room.left) * room.scale), round((oy - room.top) * room.scale))
+    max_on_line = 3 * (1 + bool(path) + len(skeletons)) + sum(e[0] in (2, 3) for e in events) + 1
+    if 6 * (1 + bool(path) + len(skeletons)) + len(events) + 1 > 40:
+        raise ValueError(f"scene {scene} exceeds the OAM table")
+    header += bytes([len(skeletons), max_on_line > 10])
     sections = {
         "header": header, "route": route, "events": bytes(v for e in events for v in e),
         "rows": b"".join(struct.pack("<H", LAYOUT["cells"] + row * w) for row in range(h)),
         "projection": bytes(round(i * 3 * room.scale) & 255 for i in range(256)),
         "cells": bytes(c[0] | c[1] << 4 if walkable(c) else 255 for c in t["cells"]),
         "patterns": all_tiles, "background": bytes(1024), "window": winmap, "worldmap": bgmap,
+        "skeleton_routes": sk_routes,
         "projection_hi": bytes(round(i * 3 * room.scale) >> 8 for i in range(256)),
     }
-    buf = bytearray(0x3100)
-    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x7100]):
+    buf = bytearray(0x3200)
+    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x7200]):
         data = sections[name]
         if len(data) > end - addr:
             raise ValueError(f"scene {scene}: {name} exceeds its bank region")
         buf[addr - 0x4000:addr - 0x4000 + len(data)] = data
     info = dict(scene=scene, resources=room.stage["stage"], palette=room.palette, scale=room.scale,
                 crop=[room.left, room.top], start=start, route=[list(p.values()) for p in path], events=events,
-                source_tiles=unique, bg_tiles=count, window_tiles=len(ui.tiles), text_id=STORY.get(scene))
+                skeleton_paths=skeletons, source_tiles=unique, bg_tiles=count, window_tiles=len(ui.tiles), text_id=STORY.get(scene))
     return bytes(buf), info, display
 
 
@@ -156,6 +171,9 @@ def objects(source):
             poses.append(pose_tiles(actor_pose(django(frame), size=(24, 32), scale=.85)))
     for frame in (0, 2, 5, 7):
         poses.append(pose_tiles(actor_pose(ghoul(frame), True, size=(24, 32), scale=.85)))
+    _, skeleton = source.actor(0xAE52)
+    for frame in (0, 3, 5, 7):
+        poses.append(pose_tiles(actor_pose(skeleton(frame), True, size=(24, 32), scale=.85)))
     # Custom interface sprites for dropped fruit, skylight and solar shot.
     markers = [
         "00000000 00011000 00013000 00333300 03111130 03112130 00333300 00000000",
@@ -176,9 +194,12 @@ def enemy_constants():
     states = (ROOT / "src/ghoul_states.c").read_text()
     chase = (ROOT / "src/ghoul.c").read_text()
     def literal(source, function, pattern):
-        body = source.split("void " + function + "(", 1)[1].split("\n}", 1)[0]
+        body = re.search(r"^void " + function + r"\([^;]*?\)\s*\{(.*?)^}", source, re.M | re.S)[1]
         return int(re.search(pattern, body)[1], 0)
+    skeleton = (ROOT / "src/skeleton_main.c").read_text()
     return {
+        "lunge_speed": literal(skeleton, "Skeleton_TickDecayingLunge", r"context\[0x6D1\] = (0x[0-9A-Fa-f]+)"),
+        "lunge_period": literal(skeleton, "Skeleton_TickDecayingLunge", r"Mod\(tick, (\d+)\)"),
         "death_mark": literal(states, "Ghoul_UpdateDeathAnimation", r"frame == (\w+)"),
         "death_end": literal(states, "Ghoul_UpdateDeathAnimation", r"frame > (\w+)") + 1,
         "delay_end": literal(chase, "Ghoul_ResumeDelayedChase", r"counter2AC <= (\w+)") + 1,

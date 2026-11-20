@@ -171,3 +171,65 @@ flush_pose:
     pop hl
     ld [hl],a
     ret
+
+; Player and monsters are emitted first. In a crowded scene a lower-priority
+; marker can lose its slot. Enforce the ten-OBJ limit before sorting by X.
+limit_oam:
+    ld a,[header+17]
+    and a
+    ret z
+    ld a,[oam_count]
+    cp 41
+    ret c
+    ld hl,0xc600
+    ld b,160
+    xor a
+.zero:
+    ld [hl+],a
+    dec b
+    jr nz,.zero
+    ld de,0xc000
+.loop:
+    ld a,[de]
+    and a
+    jr z,.next
+    cp 160
+    jr nc,.next
+    ; OAM Y is screen Y + 16. Unseen lines above the LCD need no slots.
+    ld b,16
+    sub 16
+    jr nc,.span
+    add 16
+    ld b,a
+    xor a
+.span:
+    ld c,a
+    ld h,0xc6
+    ld l,c
+    push bc
+.test:
+    ld a,[hl+]
+    cp 10
+    jr nc,.hide
+    dec b
+    jr nz,.test
+    pop bc
+    ld l,c
+.claim:
+    inc [hl]
+    inc l
+    dec b
+    jr nz,.claim
+    jr .next
+.hide:
+    pop bc
+    xor a
+    ld [de],a
+.next:
+    ld a,e
+    add 4
+    ld e,a
+    ld hl,oam_count
+    cp [hl]
+    jr c,.loop
+    ret

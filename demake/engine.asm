@@ -70,9 +70,16 @@ loop:
 .stay:
     call update_shot
     call update_ghoul
+    call sk_update
     call damage
+    ld a,[next_bank]
+    and a
+    jr z,.render
+    call load_room
+    jp loop
 .render:
     call draw
+    call limit_oam
     call sort_oam
     call prepare_map
     call prepare_pose
@@ -180,10 +187,16 @@ load_room:
     ld c,a
     call surface
     ld [player_h],a
+    ld a,1
+    ld [camera_snap],a
     call reset_poses
+    call sk_init
     call draw
+    call limit_oam
     call sort_oam
     call initial_map
+    xor a
+    ld [camera_snap],a
     ld a,[camera_x]
     ldh [0x43],a
     ld a,[camera_y]
@@ -689,6 +702,7 @@ damage:
     add 2
     cp 5
     ret nc
+player_hit:
     call hit_sound
     ld a,90
     ld [grace],a
@@ -696,6 +710,8 @@ damage:
     dec [hl]
     ret nz
     ld [hl],3
+    ld a,[bank]
+    ld [next_bank],a
     ld a,[header+4]
     ld [player_x],a
     ld b,a
@@ -809,6 +825,7 @@ draw:
     call project
     call actor_oam
 .markers:
+    call sk_draw
     ld a,[header+7]
     and a
     jr z,.shot
@@ -948,49 +965,84 @@ marker_oam:
 ; The compiler bounds the number of active objects in the room descriptor.
 sort_oam:
     ld a,[oam_count]
-    rrca
-    rrca
-    and 63
-    cp 2
+    cp 8
     ret c
-    dec a
-    ld b,a
-.pass:
-    ld c,b
-    ld hl,0xc001
-.pair:
-    ld d,[hl]
+    ld c,4
+    ld h,0xc0
+.record:
+    ld l,c
+    inc l
+    ld b,[hl]
     ld a,l
-    add 4
+    sub 4
     ld l,a
     ld a,[hl]
-    cp d
-    jr nc,.next
-    ; HL points to the right record's X. Exchange the whole two records.
-    push bc
-    push hl
-    dec l
+    cp b
+    jr c,.next
+    jr z,.next
+    ; Insert this record into the already sorted prefix. Adjacent records
+    ; in one metasprite usually arrive sorted, so most comparisons stop here.
+    ld l,c
+    ld a,[hl+]
+    ld d,a
+    ld a,[hl+]
+    ld e,a
+    push de
+    ld a,[hl+]
+    ld d,a
+    ld e,[hl]
+    push de
+    ld e,l
     ld d,h
     ld a,l
     sub 4
-    ld e,a
-    ld b,4
-.swap:
-    ld a,[de]
-    ld c,[hl]
-    ld [hl+],a
-    ld a,c
+    ld l,a
+.shift:
+    ld a,[hl-]
     ld [de],a
-    inc e
-    dec b
-    jr nz,.swap
+    dec e
+    ld a,[hl-]
+    ld [de],a
+    dec e
+    ld a,[hl-]
+    ld [de],a
+    dec e
+    ld a,[hl-]
+    ld [de],a
+    dec e
+    ld a,e
+    cp 3
+    jr z,.insert
+    dec l
+    dec l
+    ld a,[hl]
+    inc l
+    inc l
+    cp b
+    jr z,.insert
+    jr nc,.shift
+.insert:
     pop hl
-    pop bc
+    ld a,l
+    ld [de],a
+    dec e
+    ld a,h
+    ld [de],a
+    dec e
+    pop hl
+    ld a,l
+    ld [de],a
+    dec e
+    ld a,h
+    ld [de],a
+    ld h,0xc0
 .next:
-    dec c
-    jr nz,.pair
-    dec b
-    jr nz,.pass
+    ld a,c
+    add 4
+    ld c,a
+    ld a,[oam_count]
+    cp c
+    jr nz,.record
     ret
 
 hud:
