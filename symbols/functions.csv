@@ -388,6 +388,7 @@ addr,name,mode,confidence,source,notes
 08012058,AnimatedHazard_ConsumeEntered,thumb,low,src-alias,"Tests the hazard's ""entered"" flag, clearing it and returning whether this is the first tick of the current state."
 08012070,AnimatedHazard_Initialize,thumb,low,src-alias,
 08012114,AnimatedHazard_Deactivate,thumb,low,src-alias,"Hides the hazard's sprite, resets its state via AnimatedHazard_SetState, and clears active; called at the end of AnimatedHazard_AnimateRetraction."
+08012134,AnimatedHazard_Noop,thumb,low,src-alias,Empty callback in the animated-hazard unit.
 08012138,AnimatedHazard_WaitForPlayer,thumb,low,src-alias,
 080121C4,AnimatedHazard_EmitWarning,thumb,low,src-alias,
 08012224,AnimatedHazard_AnimateAttack,thumb,low,src-alias,
