@@ -136,10 +136,8 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
     flags = EnableFlags(actor, 12);
     state = action->state;
     switch (state) {
-        case 0: {
-            u32 mask = 16;
-            *flags |= mask;
-        }
+        case 0:
+            *flags |= 16;
             if (action->frame > 128) {
                 if (!actor->side)
                     SetVector(&actor->position, 1024, 512, target->z);
@@ -149,10 +147,8 @@ void Hresvelgr_UpdateBoundaryBarrage(struct Hresvelgr *actor, u32 tick)
             } else
                 action->frame++;
             break;
-        case 1: {
-            u32 mask = 0x1010000;
-            *flags |= mask;
-        }
+        case 1:
+            *flags |= 0x1010000;
             if (!action->frame) {
                 action->frame = state;
                 SetHeading(actor, actor->targetHeading);
