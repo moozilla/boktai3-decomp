@@ -1,5 +1,5 @@
-#include "scene_object_slot.h"
-void SceneObject_UpdateActiveIdle(void);
+#include "scene_object_controller.h"
+
 void SceneObject_AnimateActive(struct SceneObjSlot *s)
 {
     if ((*(u32 *)&s->dir & 0xffff00) == 0) {
@@ -13,11 +13,7 @@ void SceneObject_AnimateActive(struct SceneObjSlot *s)
         s->b39++;
         s->b3a = 0;
         if (s->b39 > 1) {
-            {
-                int one = 1;
-                s->variant = one;
-            }
-            s->callback = SceneObject_UpdateActiveIdle;
+            SceneObjSlot_EnterIdle(s, SCENE_OBJ_ACTIVE);
         }
     }
 }
