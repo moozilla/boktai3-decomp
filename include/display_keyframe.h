@@ -4,7 +4,9 @@
 #include "global.h"
 
 struct DisplayKeyframeState {
-    u8 unknown0[0x14];
+    u8 unknown0[8];
+    u32 flags;
+    u8 unknownC[8];
     u16 frame;
     u8 unknown16[4];
     u8 priority;
