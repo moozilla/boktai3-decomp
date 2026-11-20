@@ -73,14 +73,16 @@ its spelling, so each one is a question, not a verdict:
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
 * `literal-param`: a `static inline` of at most two statements with an integer parameter that
-  is only a mask, a shift count or a stored value (an operand of `&`, `|`, `^`, `~` or a shift,
-  or assigned to a field or through a pointer) and that gets a literal or an ALL_CAPS constant
-  at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the parameter is
-  a local initialized to the literal, so this is `literal-local` moved into a helper, and as
-  weak: a real accessor of the original's looks the same. Reported at the definition with the
-  number of calls; a helper nobody calls, or one that gets a variable somewhere, is not
+  is only an operand of bitwise operations (`&`, `|`, `^`, `~`, shifts and their compound
+  assignments, as in `*flags & mask` or `*flags |= mask`) and that gets a literal or an ALL_CAPS
+  constant at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the
+  parameter is a local initialized to the literal, so this is `literal-local` moved into a
+  helper, and as weak: a real accessor of the original's looks the same. Reported at the
+  definition with the number of calls; a helper nobody calls, one that gets a variable
+  somewhere, and a setter that only stores the parameter (`p->state = state`) are not
   reported. It needs every call, so it comes from a pass over src and include
-  (`literal_params`), not from `sites`.
+  (`literal_params`, `literal_param_sites`), not from `sites`; the linter, tools/progress.py
+  and land's added-warnings check all run it.
 
 Warnings don't lower a score. The order of work is errors to zero, then warnings to zero, adding
 none. A warning is silenced the way a linter's is, by a `concession-ok(kind): reason` comment, and
@@ -549,19 +551,19 @@ _OPERATOR = r"<<=|>>=|[-+*/%&|^]=|&&|\|\||==|!=|<=|>=|<<|>>|\+\+|--|[-+*/%&|^~=<
 _OPERATOR_BEFORE = re.compile(r"(?:" + _OPERATOR + r")$")
 _OPERATOR_AFTER = re.compile(_OPERATOR)
 _BITWISE = ("&", "|", "^", "~", "<<", ">>")
-_STORE = ("=", "&=", "|=", "^=", "<<=", ">>=")
+_BITWISE_STORE = ("&=", "|=", "^=", "<<=", ">>=")
 # a call argument that is a constant: literals and ALL_CAPS names, joined by constant operators
 _CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL.removeprefix("-?")
                            + r"|[A-Z][A-Z0-9_]*)(?![\w.]))+")
 _DECLARED_ARG = re.compile(r"\s*(?:void|(?:const\s+|struct\s+|union\s+|enum\s+)*[A-Za-z_]\w*[\s*]+\**\s*[A-Za-z_]\w*)\s*")
 _INCLUDE = re.compile(r'(?m)^[ \t]*#[ \t]*include[ \t]+"([^"\n]+)"')
-_literal_params_cache: dict[str, dict[str, list[Site]]] = {}
+_literal_params_cache: dict[str, dict] = {}  # root -> _tree_index
 
 
 def _operand_use(body: str, start: int, end: int) -> bool:
-    """True when the operand at BODY[start:end] is only masked, shifted or stored: an operand of
-    `&`, `|`, `^`, `~` or a shift, or the value assigned to a field or through a pointer.
-    BODY has its member accesses (`->name`, `.name`) replaced by `@`s."""
+    """True when the operand at BODY[start:end] is an operand of a bitwise operation: `&`, `|`,
+    `^`, `~`, a shift, or the right side of `&=`, `|=`, `^=`, `<<=`, `>>=`. A plain assignment of
+    it (a setter) is not one. BODY has its member accesses (`->name`, `.name`) replaced by `@`s."""
     i, before = start, None
     while before is None:
         head = body[:i].rstrip()
@@ -584,21 +586,18 @@ def _operand_use(body: str, start: int, end: int) -> bool:
         tail = tail[1:].lstrip()
     m = _OPERATOR_AFTER.match(tail)
     after = m[0] if m else ""
-    if before in _STORE:
-        statement = head[max(head.rfind(c) for c in ";{}") + 1:len(head) - len(before)]
-        if not re.search(r"@|\*|\[", statement):  # @: a member access, masked by the caller
-            return False  # a local or a parameter gets it
-    elif before not in _BITWISE + ("", ";", "{", "}", "!", "?", ":", "&&", "||"):
+    # a plain `=` decides nothing: `p->flags = mask | p->flags` is a bitwise use, `p->state = value` a setter
+    if before not in _BITWISE + _BITWISE_STORE + ("", "=", ";", "{", "}", "!", "?", ":", "&&", "||"):
         return False
     if not closed and after not in _BITWISE + ("", ";", "?", ":", "&&", "||"):
         return False
-    return before in _BITWISE + _STORE or (not closed and after in _BITWISE)
+    return before in _BITWISE + _BITWISE_STORE or (not closed and after in _BITWISE)
 
 
 def _inline_definitions(code: str):
     """(name, offset, {parameter index: name}) for each static inline in CODE (comments blanked)
-    that literal-param could report: a short body and an integer parameter used only as a mask,
-    a shift count or a stored value."""
+    that literal-param could report: a short body and an integer parameter used only as an
+    operand of bitwise operations."""
     for m in _INLINE_DEF.finditer(code):
         stop = _scope_end(code, m.end())
         body = _SCALAR_CAST.sub("", _QUOTED.sub(_blank, code[m.end():stop]))
@@ -637,41 +636,81 @@ def _arguments(code: str, start: int):
     return None, start
 
 
-def literal_params(root=None) -> dict[str, list[Site]]:
+_CALLED = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+
+
+def _file_calls(text: str, names, called=None):
+    """({name: [arguments or None, ...]}, {names TEXT defines a function for}) for the calls in
+    TEXT to NAMES. CALLED is the set of names TEXT has before a `(`, when the caller kept it."""
+    calls: dict[str, list] = {}
+    defines = set()
+    names = names & (set(_CALLED.findall(text)) if called is None else called)
+    if names:
+        code = _QUOTED.sub(_blank, strip(text))
+        for m in re.finditer(r"\b(" + "|".join(sorted(names)) + r")\s*\(", code):
+            arguments, end = _arguments(code, m.end())
+            if arguments is not None and code[end:end + 200].lstrip().startswith("{"):
+                defines.add(m[1])
+            elif arguments is None or not all(_DECLARED_ARG.fullmatch(a) for a in arguments):  # not a prototype
+                calls.setdefault(m[1], []).append(arguments)
+    return calls, defines
+
+
+def _file_definitions(rel: str, text: str) -> list:
+    if "inline" not in text or is_library(rel):
+        return []
+    return list(_inline_definitions(strip(text)))
+
+
+def _tree_index(root) -> dict:
+    """The per-file facts literal_params works from, for the tree on disk (cached per ROOT)."""
+    from pathlib import Path
+    if str(root) not in _literal_params_cache:
+        texts = {}
+        for sub in ("src", "include"):
+            for path in sorted(Path(root, sub).rglob("*.[ch]")):
+                texts[path.relative_to(root).as_posix()] = path.read_text(errors="replace")
+        definitions = {rel: found for rel, text in texts.items() if (found := _file_definitions(rel, text))}
+        names = {name for found in definitions.values() for name, _, _ in found}
+        called = {rel: set(_CALLED.findall(text)) for rel, text in texts.items()}
+        _literal_params_cache[str(root)] = {
+            "texts": texts, "definitions": definitions, "names": names, "called": called,
+            "calls": {rel: _file_calls(text, names, called[rel]) for rel, text in texts.items()}}
+    return _literal_params_cache[str(root)]
+
+
+def literal_params(root=None, overlay=None) -> dict[str, list[Site]]:
     """{path relative to ROOT: [Site(line, "literal-param", note="N call sites, ..."), ...]} for src and
-    include (excused is not set here; literal_param_sites does that for one file).
+    include (excused is not set here; literal_param_sites does that for one file). OVERLAY is
+    {path: text} to use in place of what is on disk (a candidate that is not written yet).
 
     A call belongs to the definition in its own file when there is one (per-object clones share
     names), otherwise to the headers of that name the file includes."""
     from pathlib import Path
     root = Path(root or Path(__file__).resolve().parent.parent)
-    if str(root) in _literal_params_cache:
-        return _literal_params_cache[str(root)]
-    texts = {}
-    for sub in ("src", "include"):
-        for path in sorted((root / sub).rglob("*.[ch]")):
-            texts[path.relative_to(root).as_posix()] = path.read_text(errors="replace")
+    index = _tree_index(root)
+    if not overlay and "sites" in index:
+        return index["sites"]
+    texts, per_file, file_calls = index["texts"], index["definitions"], index["calls"]
+    if overlay:
+        texts, per_file = {**texts, **overlay}, dict(per_file)
+        for rel, text in overlay.items():
+            per_file[rel] = _file_definitions(rel, text)
+        names = {name for found in per_file.values() for name, _, _ in found}
+        file_calls = {**file_calls, **{rel: _file_calls(text, names) for rel, text in overlay.items()}}
+        new = names - index["names"]
+        for rel, text in index["texts"].items() if new else ():  # a new helper: any file may call it
+            if rel not in overlay and new & index["called"][rel]:
+                more, defines = _file_calls(text, new, index["called"][rel])
+                file_calls[rel] = ({**file_calls[rel][0], **more}, file_calls[rel][1] | defines)
     definitions: dict[str, dict[str, list]] = {}  # name -> file -> [(offset, params)]
-    for rel, text in texts.items():
-        if "inline" not in text or is_library(rel):
-            continue
-        code = strip(text)
-        for name, offset, params in _inline_definitions(code):
+    for rel, found in per_file.items():
+        for name, offset, params in found:
             definitions.setdefault(name, {}).setdefault(rel, []).append((offset, params))
-    called = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
-    calls: dict[tuple[str, str], list] = {}  # (name, file) -> [arguments or None, ...]
-    defines: set[tuple[str, str]] = set()  # (name, file): the file has its own function of that name
-    for rel, text in texts.items():
-        names = definitions.keys() & set(called.findall(text))
-        if not names:
-            continue
-        code = _QUOTED.sub(_blank, strip(text))
-        for m in re.finditer(r"\b(" + "|".join(sorted(names)) + r")\s*\(", code):
-            arguments, end = _arguments(code, m.end())
-            if arguments is not None and code[end:end + 200].lstrip().startswith("{"):
-                defines.add((m[1], rel))
-            elif arguments is None or not all(_DECLARED_ARG.fullmatch(a) for a in arguments):  # not a prototype
-                calls.setdefault((m[1], rel), []).append(arguments)
+    calls: dict[str, dict[str, list]] = {}  # name -> file -> [arguments or None, ...]
+    for rel, (found, _) in file_calls.items():
+        for name, arguments in found.items():
+            calls.setdefault(name, {})[rel] = arguments
 
     direct: dict[str, list[str]] = {}
     reached: dict[str, set] = {}
@@ -697,12 +736,10 @@ def literal_params(root=None) -> dict[str, list[Site]]:
     for name, files in definitions.items():
         headers = [rel for rel in files if rel.endswith(".h")]
         received: dict[str, list] = {rel: [] for rel in files}
-        for (called, rel), found in calls.items():
-            if called != name:
-                continue
+        for rel, found in calls.get(name, {}).items():
             if rel in files:
                 owners = [rel]
-            elif (name, rel) in defines:
+            elif name in file_calls[rel][1]:
                 continue  # another function of the same name
             else:
                 owners = [h for h in headers if h in reach(rel)] or headers
@@ -721,7 +758,8 @@ def literal_params(root=None) -> dict[str, list[Site]]:
                         _line(code, offset), "literal-param",
                         note=f"{len(found)} call site{'s' if len(found) != 1 else ''}, each with a constant"
                              f" for `{'`, `'.join(constant)}`"))
-    _literal_params_cache[str(root)] = out
+    if not overlay:
+        index["sites"] = out
     return out
 
 
@@ -730,16 +768,20 @@ def literal_param_calls(site: Site) -> int:
     return int(re.match(r"(\d+) call site", site.note)[1])
 
 
-def literal_param_sites(path, text=None, root=None) -> list[Site]:
+def literal_param_sites(path, text=None, root=None, *, candidate=False) -> list[Site]:
     """The literal-param sites of PATH (relative to the tree), with TEXT's concession-ok comments
-    applied. The calls come from the tree on disk."""
+    applied. The calls come from the tree on disk; with CANDIDATE, TEXT stands in for PATH's
+    own contents there (what land is about to write)."""
+    from pathlib import Path
     rel = str(path).replace("\\", "/")
-    found = literal_params(root).get(rel, [])
+    root = Path(root or Path(__file__).resolve().parent.parent)
+    if rel.startswith("..") or os.path.isabs(rel) or not rel.endswith((".c", ".h")):
+        return []
+    found = literal_params(root, {rel: text} if candidate and text is not None else None).get(rel, [])
     if not found:
         return []
     if text is None:
-        from pathlib import Path
-        text = (Path(root or Path(__file__).resolve().parent.parent) / rel).read_text(errors="replace")
+        text = (root / rel).read_text(errors="replace")
     ok = allows(text)
     return [Site(s.line, s.kind, s.kind in ok.get(s.line, {}), s.note) for s in found]
 

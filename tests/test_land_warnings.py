@@ -27,6 +27,14 @@ class LandWarnings(unittest.TestCase):
             self.assertEqual(land.added_warnings(self.before, self.after, self.path),
                              ({"const-local": 1}, "previous"))
 
+    def test_literal_moved_into_an_inline_parameter_is_an_added_warning(self):
+        helper = ("static inline u32 TestLandFlags(u32 *flags, u32 mask)\n{\n    return *flags & mask;\n}\n"
+                  "u32 f(u32 *p) {\n    return TestLandFlags(p, 1);\n}\n")
+        with patch.object(deadcode, "available", return_value=False):
+            self.assertEqual(land.added_warnings("u32 f(u32 *p) {\n    return *p & 1;\n}\n", helper, self.path),
+                             ({"literal-param": 1}, None))
+            self.assertEqual(land.added_warnings(helper, helper, self.path), ({}, None))
+
     def test_compiler_warning_delta_uses_both_successful_compiles(self):
         with tempfile.TemporaryDirectory() as cache, patch.object(deadcode, "CACHE", cache), \
                 patch.object(deadcode, "available", return_value=True), \

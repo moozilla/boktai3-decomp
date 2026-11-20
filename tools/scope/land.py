@@ -248,7 +248,11 @@ def added_warnings(before, after, path=None):
 
     def count(text):
         out = {}
-        for s in kinds.warnings(kinds.sites(without_drafts(text), rel, kinds=kinds.WARN)):
+        text = without_drafts(text)
+        found = kinds.sites(text, rel, kinds=kinds.WARN)
+        if rel:  # literal-param reads its calls from the tree, with this text in the file's place
+            found += kinds.literal_param_sites(rel, text, candidate=True)
+        for s in kinds.warnings(found):
             out[s.kind] = out.get(s.kind, 0) + 1
         return out
     old, new = count(before), count(after)

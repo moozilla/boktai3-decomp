@@ -530,7 +530,7 @@ class LiteralParam(unittest.TestCase):
         self.assertEqual(c.literal_params(root).get("src/a.c"), None)
         self.assertEqual(c.warnings(c.literal_param_sites("include/word_flags.h", root=root)), [site])
 
-    def test_mask_set_and_shift_helpers(self):
+    def test_bitwise_helpers_but_not_setters(self):
         files = {"src/a.c": """static inline void Set(u32 mask, u32 *flags)
 {
     *flags |= mask;
@@ -554,8 +554,34 @@ void f(struct P *p) {
     p->x = Scale(p->x, 8);
 }
 """}
+        # Store is a setter: assigning the parameter to a field is ordinary C
         self.assertEqual(self.found(files), {"src/a.c": [(1, "literal-param"), (5, "literal-param"),
-                                                         (9, "literal-param"), (13, "literal-param")]})
+                                                         (9, "literal-param")]})
+
+    def test_a_setter_is_quiet(self):
+        for body in ("entry->value = value;", "*out = value;", "entry->value = value;\n    entry->dirty = 1;",
+                     "table[0] = value;"):
+            with self.subTest(body=body):
+                text = ("static inline void Set(struct E *entry, u32 *out, u32 *table, u32 value)\n{\n    " + body
+                        + "\n}\nvoid f(struct E *e, u32 *p) {\n    Set(e, p, p, 3);\n}\n")
+                self.assertEqual(self.found({"src/a.c": text}), {})
+        merged = ("static inline void Add(u8 bits, struct E *entry)\n{\n    entry->flags = bits | entry->flags;\n}\n"
+                  "void f(struct E *e) {\n    Add(1, e);\n}\n")
+        self.assertEqual(self.found({"src/a.c": merged}), {"src/a.c": [(1, "literal-param")]})
+
+    def test_candidate_text_stands_in_for_the_file(self):
+        caller = "void f(u32 *p, u32 m) {\n    WordFlags_Test(p, m);\n}\n"
+        root = self.tree({"include/word_flags.h": self.HEADER, "src/a.c": '#include "word_flags.h"\n' + caller,
+                          "src/b.c": "void g(void) {\n}\n"})
+        self.assertEqual(c.literal_params(root), {})
+        # the candidate replaces the only call with a variable
+        after = '#include "word_flags.h"\n' + caller.replace("WordFlags_Test(p, m)", "WordFlags_Test(p, 2)")
+        self.assertEqual(c.literal_params(root, {"src/a.c": after}), {"include/word_flags.h": [c.Site(1, "literal-param")]})
+        # a candidate with a helper of its own, which no file on disk knows about
+        own = "static inline u32 Low(u32 value, u32 mask)\n{\n    return value & mask;\n}\nu32 g(u32 v) {\n    return Low(v, 15);\n}\n"
+        self.assertEqual(c.literal_param_sites("src/b.c", own, root, candidate=True), [c.Site(1, "literal-param")])
+        self.assertEqual(c.literal_param_sites("src/b.c", own, root), [])
+        self.assertEqual(c.literal_params(root), {})
 
     def test_a_variable_at_one_call_is_quiet(self):
         caller = "void f(struct P *p, u32 m) {\n    WordFlags_Test(&p->flags, 1);\n    WordFlags_Test(&p->flags, %s);\n}\n"
