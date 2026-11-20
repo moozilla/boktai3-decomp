@@ -2489,7 +2489,14 @@ def asm_dest(text):
 def asm_reads(text):
     """Registers an assembly line reads."""
     regs = reg_nums(text)
-    return regs if asm_dest(text) is None else regs[1:] + (regs[:1] if re.match(r"(adds|subs|ands|orrs|eors|bics|muls|lsls|lsrs|asrs|adcs|sbcs|rors|mvns|negs)\b", text) and len(regs) == 2 else [])
+    if asm_dest(text) is None:
+        return regs
+    if text.count(",") == 1 and re.match(
+        r"(?:add|sub|and|orr|eor|mul|lsl|lsr|asr|adc|sbc|ror)s?\b", text
+    ):
+        # The two-operand form uses the destination as its first input.
+        return regs[1:] + regs[:1]
+    return regs[1:]
 
 
 def readers_after(rows, i, side, reg, limit=12):
@@ -5791,8 +5798,11 @@ def explain_moved(wd, rows, row, nm, at):
     for side, start in (("rom", j), ("draft", i)):
         rd = readers_after(rows, start, side, reg)
         txt = ", ".join(f"{rows[x][side]}" + (f" [{rows[x]['rom_addr']}]" if side == "rom" else f" (insn {rows[x]['uid']})")
-                        for x in rd) or "nothing"
-        print(f"  {side}: {rname(reg)} set here is read by {txt}")
+                        for x in rd)
+        if txt:
+            print(f"  {side}: {rname(reg)} set here is read by {txt}")
+        else:
+            print(f"  {side}: no later read of {rname(reg)} found in the local listing")
         if side == "draft":
             seen.update(rows[x]["uid"] for x in rd if rows[x]["uid"])
     # the draft readers' operands through the passes
