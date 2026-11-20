@@ -2785,6 +2785,45 @@ def find_reg_view(wd, func):
     return out
 
 
+@by_dumps("names.txt")
+def local_takeovers(wd, func):
+    """Actual global-alloc takeovers, keyed by (taker, hard register).
+
+    K records the density comparison for a candidate register. Only E
+    records confirm eviction and identify the displaced pseudos.
+    """
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    comparisons, takeovers = {}, {}
+    if not os.path.exists(path):
+        return takeovers
+    with open(path) as stream:
+        for line in stream:
+            fields = line.split()
+            if len(fields) < 2 or fields[1] != func:
+                continue
+            if fields[0] == "K" and len(fields) == 9:
+                taker, reg, local_refs, local_live, refs, live, wins = map(int, fields[2:])
+                if wins:
+                    comparisons[taker, reg] = (local_refs, local_live, refs, live)
+                else:
+                    comparisons.pop((taker, reg), None)
+            elif fields[0] == "E" and len(fields) == 5:
+                taker, victim, reg = map(int, fields[2:])
+                key = taker, reg
+                _, victims = takeovers.setdefault(key, (comparisons.get(key), []))
+                victims.append(victim)
+    return takeovers
+
+
+def takeover_density(comparison):
+    if comparison is None:
+        return ""
+    local_refs, local_live, refs, live = comparison
+    return (f" The taker has {refs} refs / {live} live insns against"
+            f" {local_refs} refs / {local_live} live insns for the local assignments there.")
+
+
 def regset(rs):
     return "{" + ", ".join(rname(r) for r in sorted(rs)) + "}" if rs else "{}"
 
@@ -2799,10 +2838,13 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return False
     f = next((entry for entry in view if not entry["retrying"] and entry["final"] >= 0), view[0])
     if f["first"] < 0 and f["final"] >= 0:
+        comparison, victims = local_takeovers(wd, func).get((pseudo, f["final"]), (None, []))
         print(f"    find_reg (global.c) found no free register for {nm(pseudo)}. It took"
               f" {rname(f['final'])} from local allocation: its references per live instruction"
               " exceed the aggregate for the locals placed there. All their assignments are"
-              " cleared, including locals in other blocks.")
+              " cleared, including locals in other blocks." + takeover_density(comparison))
+        if victims:
+            print("      evicted: " + ", ".join(map(nm, victims)) + ".")
         return True
     lo = set(range(8))
     used = f["used1"] & lo
@@ -3242,6 +3284,24 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             what.append(f"a call at {at(calls[0])}")
         print(f"    {rname(want)} was already taken during its life (local alloc or a fixed use runs first): "
               + (", ".join(what) if what else "holder not found in its span"))
+        if rec and rec[0] == "L":
+            for (taker, reg), (comparison, victims) in local_takeovers(wd, func).items():
+                if reg != want or taker not in holders:
+                    continue
+                for victim in victims:
+                    local = recs.get(victim)
+                    if not local or local[0] != "L" or local[1] != blk:
+                        continue
+                    if max(local[3], birth) >= min(local[4], death):
+                        continue
+                    print(f"    during local allocation, {rname(want)} held {nm(victim)}"
+                          f" (local priority {local[2]}). Global allocation later evicted it"
+                          f" for {nm(taker)}." + takeover_density(comparison))
+                    new_home = hard.get(victim, -1)
+                    if new_home >= 0 and new_home != want:
+                        print(f"    what-if: AGBCC_FORCE={kref(wd, func, victim)}:{new_home}"
+                              f" (place {nm(victim)} in its final register during local allocation)")
+                    return
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
               f" {rname(want)}; or make the other value land elsewhere")
         return
@@ -4812,10 +4872,13 @@ def why_all_issues(text):
                 pseudo = int(alloc.group(1))
                 other = re.search(r"the ROM keeps (\d+)|went to a conflicting pseudo allocated earlier: (\d+)", section)
                 pair = tuple(sorted((pseudo, int(other.group(1) or other.group(2))))) if other else (pseudo,)
-                mechanism = ('allocation order' if 'to flip the order' in section else
+                takeover = next((s.strip() for s in section.splitlines()
+                                 if 'Global allocation later evicted it' in s), None)
+                mechanism = ('local eviction' if takeover else
+                             'allocation order' if 'to flip the order' in section else
                              'reload eviction' if 'reload then needed' in section else 'allocation')
                 lines = [s.strip() for s in section.splitlines()[1:] if s.strip()]
-                summary = next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
+                summary = takeover or next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
                 key = (mechanism, pair)
                 title = f"{mechanism}, pseudos {' / '.join(map(str, pair))}: {summary}"
             elif cse:
