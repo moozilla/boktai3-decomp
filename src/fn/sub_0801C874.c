@@ -1,130 +1,105 @@
-#include "global.h"
+#include "result_tutorial.h"
+
 extern u8 gUnk_0824DB8A[], gUnk_0824DB7A[];
 void ResultGame_HidePressMarker(void *);
 void ResultGame_ShowTargetMarker(void *);
 void ResultGame_SetTrackingVisibility(void *);
 void ResultGame_HideTargetMarker(void *);
-void Sound_PlaySong(int);
-void Sound_StopSong(int);
 void ResultGame_UpdatePlayerMarker(void *);
 void ResultGame_ScoreAlignment(void *);
-void ResultGame_SetUpdateCallback(void *, void *);
-void ResultGame_TimedPress(void *);
-#define I(o) (*(int *)(p + (o)))
-#define H(o) (*(s16 *)(p + (o)))
-void ResultGame_TrackTarget(u8 *p)
+void ResultGame_SetUpdateCallback(struct ResultMenu *, void (*)(struct ResultMenu *));
+void ResultGame_TimedPress(struct ResultMenu *);
+
+void ResultGame_TrackTarget(struct ResultMenu *p)
 {
-    int *startPtr;
-    int speed = gUnk_0824DB8A[p[0xae]];
-    switch (p[0xaf]) {
+    int speed = gUnk_0824DB8A[p->difficulty];
+
+    switch (p->phase) {
         case 0:
-            startPtr = (int *)(p + 0x8c);
-            {
-                int zero;
-                int *start = startPtr;
-                {
-                    int z = 0;
-                    zero = z;
-                }
-                *((int *)(p + 0x8c)) = zero;
-                *((int *)(p + 0x90)) = zero;
-                p[0xb2] = zero;
-                *((int *)(p + 0x9c)) = zero;
-                *((int *)(p + 0x94)) = gUnk_0824DB7A[p[0xae] * 2] << 5;
-                *((int *)(p + 0x98)) = (gUnk_0824DB7A + 1)[p[0xae] * 2] << 5;
-                ++p[0xaf];
-                *((s16 *)(p + 0xaa)) = zero;
-                *((s16 *)(p + 0xa8)) = zero;
-                p[0xb3] = 32;
-                p[0xbf] = 255;
-                ResultGame_HidePressMarker(p);
-                ResultGame_ShowTargetMarker(p);
-                ResultGame_SetTrackingVisibility(p);
-                Sound_PlaySong(0x4b1);
-                break;
-            }
+            p->playerPosition = 0;
+            p->playerVelocity = 0;
+            p->accelerationDelay = 0;
+            p->targetPosition = 0;
+            p->targetMinimum = gUnk_0824DB7A[p->difficulty * 2] << 5;
+            p->targetMaximum = (gUnk_0824DB7A + 1)[p->difficulty * 2] << 5;
+            ++p->phase;
+            p->timer = 0;
+            p->elapsed = 0;
+            p->gaugeBrightness = 32;
+            p->lastTimingGrade = 255;
+            ResultGame_HidePressMarker(p);
+            ResultGame_ShowTargetMarker(p);
+            ResultGame_SetTrackingVisibility(p);
+            Sound_PlaySong(0x4b1);
+            break;
 
         case 1:
-            *((int *)(p + 0x8c)) += 176;
-            *((int *)(p + 0x9c)) = *((int *)(p + 0x8c));
-            if ((*((int *)(p + 0x9c))) >= (*((int *)(p + 0x98)))) {
-                int zero;
-                u8 *state = p + 0xaf;
-                zero = 0;
-                *state = 4;
-                *((s16 *)(p + 0xa8)) = zero;
+            p->playerPosition += 176;
+            p->targetPosition = p->playerPosition;
+            if (p->targetPosition >= p->targetMaximum) {
+                p->phase = 4;
+                p->elapsed = 0;
             }
             break;
 
         case 2:
-            *((int *)(p + 0x9c)) += speed;
+            p->targetPosition += speed;
             ResultGame_UpdatePlayerMarker(p);
-            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
+            if ((p->elapsed & 15) == 0)
                 ResultGame_ScoreAlignment(p);
-            }
-            if ((*((int *)(p + 0x9c))) >= (*((int *)(p + 0x98)))) {
-                ++p[0xaf];
-                *((s16 *)(p + 0xaa)) = 30;
+            if (p->targetPosition >= p->targetMaximum) {
+                ++p->phase;
+                p->timer = 30;
             }
             break;
 
         case 3:
             ResultGame_UpdatePlayerMarker(p);
-            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
+            if ((p->elapsed & 15) == 0)
                 ResultGame_ScoreAlignment(p);
-            }
-            if ((*((s16 *)(p + 0xaa))) <= 0) {
-                ++p[0xaf];
-            }
+            if (p->timer <= 0)
+                ++p->phase;
             break;
 
         case 4:
-            *((int *)(p + 0x9c)) -= speed;
+            p->targetPosition -= speed;
             ResultGame_UpdatePlayerMarker(p);
-            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
+            if ((p->elapsed & 15) == 0)
                 ResultGame_ScoreAlignment(p);
-            }
-            if ((*((int *)(p + 0x9c))) <= (*((int *)(p + 0x94)))) {
-                ++p[0xaf];
-                *((s16 *)(p + 0xaa)) = 10;
+            if (p->targetPosition <= p->targetMinimum) {
+                ++p->phase;
+                p->timer = 10;
             }
             break;
 
         case 5:
             ResultGame_UpdatePlayerMarker(p);
-            if (((*((s16 *)(p + 0xa8))) & 15) == 0) {
+            if ((p->elapsed & 15) == 0)
                 ResultGame_ScoreAlignment(p);
-            }
-            if ((*((s16 *)(p + 0xaa))) <= 0) {
-                p[0xaf] = 2;
-            }
+            if (p->timer <= 0)
+                p->phase = 2;
             break;
 
         case 6:
-            *((int *)(p + 0x8c)) -= 176;
-            if ((*((int *)(p + 0x8c))) <= 0) {
-                *((int *)(p + 0x8c)) = 0;
+            p->playerPosition -= 176;
+            if (p->playerPosition <= 0) {
+                p->playerPosition = 0;
                 ResultGame_SetUpdateCallback(p, ResultGame_TimedPress);
-                if (p[0xc4] == 1) {
-                    p[0xc4] = 2;
-                }
+                if (p->finishState == 1)
+                    p->finishState = 2;
             }
             break;
     }
 
-    {
-        int fade = 32 - Div((*((s16 *)(p + 0xa8))) << 5, 1200);
-        p[0xb3] = fade;
-    }
-    --(*((s16 *)(p + 0xaa)));
-    if ((++(*((s16 *)(p + 0xa8)))) > 1200) {
-        *((s16 *)(p + 0xa8)) = 1200;
-    }
-    if ((p[0xaf] != 6) && ((p[0xc4] == 1) || ((*((s16 *)(p + 0xa8))) > 1199))) {
+    p->gaugeBrightness = 32 - Div(p->elapsed << 5, 1200);
+    --p->timer;
+    if (++p->elapsed > 1200)
+        p->elapsed = 1200;
+    if (p->phase != 6 && (p->finishState == 1 || p->elapsed > 1199)) {
         Sound_StopSong(0x3ed);
         Sound_StopSong(0x3ee);
-        p[0xaf] = 6;
-        p[0xb3] = 0;
+        p->phase = 6;
+        p->gaugeBrightness = 0;
         ResultGame_HideTargetMarker(p);
     }
 }
