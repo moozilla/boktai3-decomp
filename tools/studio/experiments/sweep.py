@@ -42,30 +42,73 @@ def write_ledger(directory, base, cohort):
     preview.replace(directory / "answers.tsv")
 
 
-def execute(base, choices, trans=None):
+def prepare(base, choices):
+    """Persist an inspectable execution plan before launching its first core."""
     if base["fork"]:
         raise ValueError("A checkpoint sweep starts from saves or captures, not a captured experimental branch")
     directory = SWEEPS / uuid4().hex
     directory.mkdir(parents=True)
+    runner.atomic_json(directory / "plan.json", {"recipe": base, "choices": choices})
+    write_ledger(directory, base, [])
+    runner.status(directory, "queued", "Waiting to run checkpoints", done=0, total=len(choices))
+    return directory
+
+
+def sweep_dir(identifier):
+    if not isinstance(identifier, str) or not recipe.RUN_ID.fullmatch(identifier):
+        raise ValueError("Invalid sweep ID")
+    directory = SWEEPS / identifier
+    if not (directory / "status.json").is_file():
+        raise FileNotFoundError("Sweep not found")
+    return directory
+
+
+def recent():
+    if not SWEEPS.is_dir():
+        return []
+    paths = (p for p in SWEEPS.iterdir() if recipe.RUN_ID.fullmatch(p.name) and (p / "plan.json").is_file())
+    output = []
+    for directory in sorted(paths, key=lambda p: p.stat().st_mtime_ns, reverse=True)[:20]:
+        try:
+            plan = runner.read_json(directory / "plan.json")
+            state = runner.read_status(directory)
+        except FileNotFoundError:
+            continue
+        output.append({**state, "title": plan["recipe"]["title"]})
+    return output
+
+
+def readback(directory):
+    plan = runner.read_json(directory / "plan.json")
+    return {**runner.read_json(directory / "result.json"), "choices": plan["choices"],
+            "status": runner.read_status(directory)}
+
+
+def execute(base, choices, trans=None, *, directory=None):
+    directory = directory or prepare(base, choices)
     cohort = []
-    write_ledger(directory, base, cohort)
     for checkpoint in choices:
+        runner.status(directory, "running", f"Running {checkpoint['label']}",
+                      done=len(cohort), total=len(choices))
         kind = checkpoint["kind"]
         spec = recipe.validate({**base, "checkpoint": checkpoint["id"],
                                 "continue": base["continue"] and kind in {"save", "bank"}})
-        case = runner.init_run(spec)
+        case = runner.init_run(spec, sweep_id=directory.name)
         row = {**checkpoint, "run": case.name}
         try:
             result = runner.execute(case, spec, trans=trans)
         except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as error:
             row.update(state="failed", error=runner.public_path(str(error)))
         else:
-            row.update(state="complete", checks=result["checks"])
+            row.update(state="complete", checks=result["checks"],
+                       trial=result["trials"][0]["id"], game_frame=result["trials"][0]["snapshots"][0]["frame"])
         cohort.append(row)
         write_ledger(directory, base, cohort)
+    runner.status(directory, "complete", "Checkpoint sweep complete", done=len(cohort), total=len(choices))
+    output = directory.relative_to(runner.ROOT) if directory.is_relative_to(runner.ROOT) else directory
     return {
         "id": directory.name,
-        "result": str((directory / "result.json").relative_to(runner.ROOT)),
-        "answers": str((directory / "answers.tsv").relative_to(runner.ROOT)),
+        "result": str(output / "result.json"),
+        "answers": str(output / "answers.tsv"),
         "runs": [{"checkpoint": row["id"], "run": row["run"], "state": row["state"]} for row in cohort],
     }

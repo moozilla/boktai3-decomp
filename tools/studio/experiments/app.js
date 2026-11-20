@@ -42,13 +42,18 @@ function header() {
   $('run').textContent = primary ? 'Run again' : 'Run experiment';
   $('run').disabled = running;
   $('edit').disabled = !spec;
+  $('sweep-open').disabled = !catalog || Boolean(spec.fork);
   const origin = primary?.checkpoint.fork;
-  $('parent-run').hidden = !origin;
+  const sweep = primary?.sweep;
+  $('parent-run').hidden = !origin && !sweep;
+  $('parent-run').textContent = sweep ? 'Back to checkpoint results' : 'Open the parent frame';
+  if (sweep) $('parent-run').href = `#sweep/${sweep.id}`;
   if (origin) $('parent-run').href = `#run/${origin.run}/${origin.frame}/${origin.trial}`;
   pageTitle(spec.title, 'Experiments');
 }
 
 function drawPreview(spec) {
+  $('sweep-results').hidden = true;
   $('preview').innerHTML = spec.trials.map(trial =>
     `<article><h2>${esc(trial.label)}</h2><pre>${esc(trial.input || 'Wait for the trial duration')}</pre></article>`
   ).join('');
@@ -155,6 +160,7 @@ async function openRun(route) {
 }
 
 function showResult(result, route) {
+  $('sweep-results').hidden = true;
   primary = result;
   draft = result.recipe;
   comparison = null;

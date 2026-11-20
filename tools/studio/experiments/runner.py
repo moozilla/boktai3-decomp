@@ -57,10 +57,12 @@ def sample_recipe(name="pause"):
     return recipe.validate(read_json(HERE / f"{name}.json"))
 
 
-def init_run(spec):
+def init_run(spec, *, sweep_id=None):
     directory = JOBS / uuid4().hex
     directory.mkdir(parents=True)
     atomic_json(directory / "recipe.json", spec)
+    if sweep_id:
+        atomic_json(directory / "sweep.json", {"id": sweep_id})
     status(directory, "queued", "Waiting for the emulator")
     return directory
 
@@ -467,6 +469,9 @@ def execute(directory, spec, trans=None):
         result = {"id": directory.name, "recipe": spec, "identity": identity,
                   "checkpoint": {k: v for k, v in checkpoint.items() if k != "path"},
                   "fields": [f.to_dict() for f in observed], "trials": []}
+        sweep = directory / "sweep.json"
+        if sweep.is_file():
+            result["sweep"] = read_json(sweep)
         writes_by_trial = {}
         for trial in spec["trials"]:
             status(directory, "running", f"Recording {trial['label']}")

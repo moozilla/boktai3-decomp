@@ -143,3 +143,22 @@ code, pre { font-family: var(--mono); }
 .pixel-replay { margin-top: 8px; }
 .pixel-replay:empty { display: none; }
 .pixel-replay img { display: block; height: auto; width: min(100%, 760px); margin: 5px 0; border-radius: 5px; }
+.toolbar { flex-wrap: wrap; justify-content: end; }
+#sweep-form { display: flex; flex-direction: column; max-height: 90vh; }
+#sweep-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); max-height: 43vh;
+  overflow: auto; column-gap: 12px; }
+#sweep-choices label { padding: 6px 0; align-items: center; }
+#sweep-choices input { flex: none; }
+#sweep-choices code { display: block; color: var(--muted); font-size: 10px; }
+#sweep-error { color: var(--accent); }
+#sweep-error:empty { display: none; }
+.sweep-results { background: var(--panel); border: 1px solid var(--line); border-radius: 11px; }
+#sweep-ledger { overflow: auto; }
+#sweep-ledger tbody th { min-width: 145px; }
+#sweep-ledger thead th { vertical-align: bottom; }
+.sweep-thumb { display: block; image-rendering: pixelated; object-fit: contain; }
+.sweep-verdict { display: block; min-width: 96px; text-decoration: none; }
+.sweep-verdict:hover { text-decoration: underline; }
+@media (max-width: 850px) {
+  .toolbar { justify-content: start; }
+}

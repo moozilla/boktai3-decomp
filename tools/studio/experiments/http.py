@@ -6,16 +6,19 @@ import subprocess
 import threading
 import urllib.parse
 
-from . import centaur, fields, graphics, pixel_proof, recipe, references, runner
+from . import centaur, fields, graphics, pixel_proof, recipe, references, runner, sweep
 
 API = "/api/experiments"
 PAGE = "/experiments"
 ASSETS = {
     f"{PAGE}/app.js": ("app.js", "application/javascript; charset=utf-8"),
+    f"{PAGE}/sweeps.js": ("sweeps.js", "application/javascript; charset=utf-8"),
     f"{PAGE}/app.css": ("app.css", "text/css; charset=utf-8"),
 }
 POOL = ThreadPoolExecutor(max_workers=2, thread_name_prefix="studio-experiment")
 SLOTS = threading.BoundedSemaphore(4)
+BATCH_POOL = ThreadPoolExecutor(max_workers=1, thread_name_prefix="studio-checkpoints")
+BATCH_SLOT = threading.BoundedSemaphore(1)
 FIXED_ARTIFACTS = {
     "contact.png": "image/png",
     "pixel.json": "application/json",
@@ -43,13 +46,17 @@ def body(handler):
     return json.loads(handler.rfile.read(length))
 
 
-def recent():
+def recent(*, only_sweeps=False):
     if not runner.JOBS.is_dir():
         return []
     directories = sorted((path for path in runner.JOBS.iterdir() if runner.RUN_ID.fullmatch(path.name)),
                          key=lambda path: path.stat().st_mtime_ns, reverse=True)
     output = []
-    for directory in directories[:30]:
+    for directory in directories:
+        if len(output) >= 30:
+            break
+        if (directory / "sweep.json").is_file() != only_sweeps:
+            continue
         try:
             state = runner.read_status(directory)
             spec = runner.read_json(directory / "recipe.json")
@@ -98,6 +105,38 @@ def post_run(handler):
         SLOTS.release()
         raise
     handler.send(202, {"id": directory.name, "url": f"{PAGE}#run/{directory.name}"})
+
+
+def execute_sweep(directory, spec, choices, trans):
+    try:
+        sweep.execute(spec, choices, trans, directory=directory)
+    except Exception as error:
+        runner.status(directory, "failed", runner.public_path(str(error)))
+    finally:
+        BATCH_SLOT.release()
+
+
+def post_sweep(handler):
+    value = body(handler)
+    if not isinstance(value, dict):
+        raise ValueError("Send a recipe and a checkpoint selection")
+    spec = recipe.validate(value.get("recipe"))
+    ids = recipe.strings(value.get("checkpoints", []), 100, "Checkpoint IDs")
+    all_story = value.get("all_story", False)
+    if type(all_story) is not bool:
+        raise ValueError("The whole story selection must be true or false")
+    trans = getattr(handler.server, "trans", None)
+    choices = sweep.select(ids, all_story, trans)
+    if not BATCH_SLOT.acquire(blocking=False):
+        handler.send(429, {"error": "A checkpoint sweep is already running"})
+        return
+    try:
+        directory = sweep.prepare(spec, choices)
+        BATCH_POOL.submit(execute_sweep, directory, spec, choices, trans)
+    except Exception:
+        BATCH_SLOT.release()
+        raise
+    handler.send(202, {"id": directory.name, "url": f"{PAGE}#sweep/{directory.name}"})
 
 
 def catalog(handler):
@@ -159,7 +198,21 @@ def routes(handler, method):
             address = path.removeprefix(API + "/by-function/").upper()
             if not re.fullmatch(r"[0-9A-F]{8}", address):
                 raise ValueError("Use an eight-digit function address")
-            handler.send(200, references.preview(address, recent(), runner.JOBS))
+            handler.send(200, references.preview(address, recent() + recent(only_sweeps=True), runner.JOBS))
+        elif path == API + "/sweeps":
+            if method == "POST":
+                post_sweep(handler)
+            else:
+                handler.send(200, sweep.recent())
+        elif method == "GET" and path.startswith(API + "/sweeps/"):
+            identifier, *parts = path.removeprefix(API + "/sweeps/").split("/")
+            directory = sweep.sweep_dir(identifier)
+            if not parts:
+                handler.send(200, sweep.readback(directory))
+            elif parts == ["answers.tsv"]:
+                handler.send(200, (directory / "answers.tsv").read_bytes(), "text/tab-separated-values")
+            else:
+                raise FileNotFoundError("No such sweep artifact")
         elif path == API + "/runs":
             if method == "POST":
                 post_run(handler)

@@ -291,6 +291,38 @@ class HTTPTests(unittest.TestCase):
 
     @unittest.skipUnless(os.getenv("STUDIO_EXPERIMENT_ROM_TESTS") == "1" and runner.ROM.is_file(),
                          "Local ROM and explicit integration opt-in required")
+    def test_checkpoint_sweep_keeps_links_and_separate_history(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder = Path(temp)
+            with patch.object(sweep, "SWEEPS", folder / "sweeps"), patch.object(runner, "JOBS", folder / "runs"):
+                spec = dict(runner.sample_recipe(), duration=2, sample_every=1,
+                            sprite_trace=False, checks=[], probe=[],
+                            trials=[{"id": "idle", "input": "wait 2"}])
+                payload = {"recipe": spec, "checkpoints": ["boot", "test-save"]}
+                code, response = self.request("POST", "/api/experiments/sweeps", payload,
+                                              **{"Content-Type": "application/json"})
+                self.assertEqual(code, 202, response)
+                identifier = json.loads(response)["id"]
+                endpoint = f"/api/experiments/sweeps/{identifier}"
+                end = time.monotonic() + 45
+                while time.monotonic() < end:
+                    code, response = self.request("GET", endpoint)
+                    self.assertEqual(code, 200, response)
+                    report = json.loads(response)
+                    if report["status"]["state"] not in {"queued", "running"}:
+                        break
+                    time.sleep(0.1)
+                self.assertEqual(report["status"]["state"], "complete", report)
+                self.assertEqual([row["id"] for row in report["checkpoints"]], ["boot", "test-save"])
+                self.assertTrue(all(row["state"] == "complete" for row in report["checkpoints"]))
+                self.assertIn(b"test-save", self.request("GET", endpoint + "/answers.tsv")[1])
+                self.assertEqual(json.loads(self.request("GET", "/api/experiments/runs")[1]), [])
+                child = report["checkpoints"][1]["run"]
+                result = json.loads(self.request("GET", f"/api/experiments/runs/{child}/result")[1])
+                self.assertEqual(result["sweep"], {"id": identifier})
+
+    @unittest.skipUnless(os.getenv("STUDIO_EXPERIMENT_ROM_TESTS") == "1" and runner.ROM.is_file(),
+                         "Local ROM and explicit integration opt-in required")
     def test_actual_run_and_snapshot_fork_through_http(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(runner, "JOBS", Path(temp)):
             def run(spec):

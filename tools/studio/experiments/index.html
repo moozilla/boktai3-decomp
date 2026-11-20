@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/experiments/app.css">
   <script defer src="/static/common.js"></script>
   <script defer src="/experiments/app.js"></script>
+  <script defer src="/experiments/sweeps.js"></script>
 </head>
 <body>
   <header id="top"></header>
@@ -22,6 +23,7 @@
       <div class="toolbar">
         <select id="examples" aria-label="Open an example question"><option>Example questions and recordings</option></select>
         <button id="edit" type="button">Edit recipe</button>
+        <button id="sweep-open" type="button" title="Run the same recipe across several saves" disabled>Run across saves</button>
         <button id="run" class="primary" type="button" disabled>Run experiment</button>
       </div>
     </header>
@@ -87,12 +89,43 @@
         <div id="comparison"></div>
       </section>
     </section>
+    <section id="sweep-results" class="sweep-results" aria-labelledby="sweep-heading" hidden>
+      <div class="section-head"><div>
+        <h2 id="sweep-heading">Checkpoint results</h2>
+        <p class="muted" id="sweep-progress" role="status"></p>
+      </div><a id="sweep-export">Download TSV</a></div>
+      <div id="sweep-ledger"></div>
+    </section>
     <footer class="notebook-footer">
       <label for="history-select">Saved runs</label>
       <select id="history-select"><option value="">Choose a run</option></select>
+      <label for="sweep-history" id="sweep-history-label" hidden>Saved sweeps</label>
+      <select id="sweep-history" aria-label="Saved sweeps" hidden></select>
       <div id="artifacts"></div>
     </footer>
   </main>
+  <dialog id="sweep-dialog" aria-labelledby="sweep-title">
+    <form id="sweep-form">
+      <header class="dialog-head">
+        <div><h2 id="sweep-title">Run across saves</h2><p id="sweep-question"></p></div>
+        <button id="sweep-close" type="button" aria-label="Close checkpoint selection">×</button>
+      </header>
+      <div class="dialog-body">
+        <div class="section-head">
+          <h3>Checkpoints</h3>
+          <div class="form-actions">
+            <button id="sweep-all" type="button">Select story bank</button>
+            <button id="sweep-clear" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="sweep-choices"></div>
+        <p id="sweep-error" role="alert"></p>
+      </div>
+      <footer class="dialog-foot">
+        <button id="sweep-submit" class="primary" type="submit">Run selected checkpoints</button>
+      </footer>
+    </form>
+  </dialog>
   <dialog id="editor" aria-labelledby="editor-title">
     <form id="recipe-form">
       <header class="dialog-head">
