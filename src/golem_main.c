@@ -977,9 +977,7 @@ s32 Mod(s32, s32);
 
 void SceneActorAttachment_ReplaceResponseSlot(u8 *, s32, s32, u32);
 
-struct S;
-
-void Golem_UpdateDeath(struct S *p, s32 n);
+void Golem_UpdateDeath(struct ChaseActor *actor, s32 frame);
 
 inline static u8 TakeFlag(u8 *flag)
 {
@@ -1018,47 +1016,16 @@ void Golem_UpdateDying(struct ChaseActor *actor, s32 frame)
     }
 }
 
-static inline u32 orr(u32 k, u16 *a)
+void Golem_UpdateDeath(struct ChaseActor *actor, s32 frame)
 {
-    return k | *a;
-}
-
-struct S {
-    u8 f0[0x2b0];
-    u8 b0;
-    u8 f1;
-    u8 b2;
-    u8 b3;
-    u8 f2[0x20];
-    u16 h4;
-    u16 h6;
-};
-
-static inline u8 tk(u8 *a)
-{
-    if (*a) {
-        *a = 0;
-        return 1;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 7);
+        SceneActorChase_ClearBits(&actor->base.motionFlags, 1);
     }
-    return 0;
-}
-
-void Golem_UpdateDeath(struct S *p, s32 n)
-{
-    if (tk(&p->b2)) {
-        s32 m;
-        u16 *a;
-        SceneActorAnimation_SelectDirectionalEntry(p, 7);
-        a = &p->h4;
-        m = -2;
-        *a = m & *a;
-    }
-    if (n == 0x28) {
-        u16 k = 0x10;
-        p->h6 = k | p->h6;
-    }
-    if (p->b3 && n > 0x78)
-        p->b0 = 1;
+    if (frame == 40)
+        SceneActorChase_SetReactionFlags(actor, 0x10);
+    if (actor->base.restart && frame > 120)
+        actor->base.stepDone = 1;
 }
 
 void Skeleton_ClearDirectionalEntryFlag(struct RoomActor *s)
