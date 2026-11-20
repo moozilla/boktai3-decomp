@@ -56,6 +56,24 @@ class SourceStatement(unittest.TestCase):
         self.assertEqual(issues[0][3], 4)
         self.assertIn('2 (include/step.h)', issues[0][1])
 
+    def test_why_summary_recognizes_a_move_between_hunks(self):
+        details = (
+            "hunk at ROM 08000100:\n"
+            "  (no insn with an RTL uid here)\n\n"
+            "hunk at ROM ?:\n"
+            "why insn 7  line 14: for (i = 3; i >= 0; i--) {\n"
+            "  ROM: (none)   draft: movs r7, #0   [differs]\n"
+            "  moved: the ROM has this same instruction at 08000100, 5 ROM insn(s) earlier; "
+            "nothing is missing, only the order differs\n"
+        )
+        issue, = self.scope.why_all_issues(details)
+        key, title, knob, uid = issue
+        self.assertEqual(key[0], 'order')
+        self.assertIn('movs r7, #0', title)
+        self.assertIn('08000100', title)
+        self.assertIsNone(knob)
+        self.assertEqual(uid, 7)
+
 
 if __name__ == '__main__':
     unittest.main()
