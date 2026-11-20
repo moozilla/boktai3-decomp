@@ -903,6 +903,7 @@ addr,name,mode,confidence,source,notes
 08025CD4,SceneActorAnimation_UpdateSwingLight,thumb,low,src-alias,Plays a plain (non-directional) animation variant and finishes once the animation-done flag at +0x25d is set; pairs with the adjacent heavier swing ha
 08025D60,SceneActorAnimation_UpdateSwingHeavy,thumb,low,src-alias,"Same structure as the adjacent light-swing handler but selects the next sequence pair (61/23), finishing on the same animation-done flag."
 08025DEC,SceneActorAnimation_UpdateChargeShotRelease,thumb,low,src-alias,"Plays the charge animation then periodically spawns a ContactSwarm projectile with randomized spread direction, finishing after tick 40."
+08025FFC,SceneActorAnimation_UpdateImpactHazard,thumb,low,src-alias,Tentative: plays the impact cues and spawns a hazard on the source terrain level
 08026248,SceneActorAnimation_UpdateImpactFinish,thumb,low,src-alias,"Plays the hit animation with an effect/sound pair, clears per-action counters, and on completion resets scale and variant to end the action."
 0802634C,SceneActorAnimation_ResetActionState,thumb,low,src-alias,"No-tick cleanup entry that clears the action's counters and flag bits and calls reset(), used to drop back to a neutral state."
 08026398,SceneActorAnimation_UpdateImpactRelease,thumb,low,src-alias,"Variant of the impact finisher with no tick param: resets scale/variant up front, spawns its effect, and finishes once the animation-done flag is set."
