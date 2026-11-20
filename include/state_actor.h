@@ -162,6 +162,23 @@ struct StateActor {
                           * include/actor_graphics_and_basic_states.h for what this unit learned. */
 };
 
+static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)
+{
+    int shifted;
+    u32 direction;
+    actor->bodyDirection = angle;
+    shifted = actor->bodyDirection + 0x60;
+    shifted >>= 6;
+    direction = 3;
+    direction &= shifted;
+    actor->animationFacing4 = direction;
+    shifted = actor->bodyDirection + 0x70;
+    shifted >>= 5;
+    direction = 7;
+    direction &= shifted;
+    actor->animationFacing8 = direction;
+}
+
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 
 /* On entry select the next state, then consume a message once done. */
