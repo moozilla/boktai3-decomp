@@ -10,10 +10,6 @@ void Player_RefreshLifeState(u32, u32);
 void sub_08159164(u32);
 #define STATS   ((u8 *)gGameState)
 #define H(p, n) (*(s16 *)((p) + (n)))
-struct GroupLink {
-    u32 unknown0;
-    u32 flags;
-};
 static inline s32 clamp(s32 v)
 {
     if (v > 9999)
@@ -79,7 +75,7 @@ static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 }
 u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     u16 *flags2C0;
     u8 *category;
     struct ContactCollider *collider;
@@ -89,7 +85,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
         u32 mask = 0x1000;
         u16 *flags2D4 = &actor->base.motionFlags;
         if (*flags2D4 & mask) {
-            void **node = (void **)((u8 *)actor + 0x45C);
+            void **node = &group->contactNode;
             SceneActorContacts_ReleaseNode(*node);
             {
                 u16 value = *flags2D4 & ~mask;
@@ -109,7 +105,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             actor->base.hitLockTimer = zero;
         }
         if (Test2(&flags2C0, actor, 0x200)) {
-            struct GroupLink *link = (void *)(group + 0x30);
+            struct SceneActorChasePlacement *link = &group->common.placement;
             u32 one = 1;
             link->flags |= one;
         }
