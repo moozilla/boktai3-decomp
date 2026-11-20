@@ -609,7 +609,7 @@ static inline void Slime_SetReactionState(struct ChaseActor *actor, u8 state, u8
     actor->base.field2B1 = 1;
 }
 
-void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
+void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -686,7 +686,7 @@ inline static u8 Slime_TakeActionEntry(u8 *p)
     return 0;
 }
 
-void Bat_UpdateActionScript(struct ChaseActor *obj)
+void Slime_UpdateActionScript(struct ChaseActor *obj)
 {
     struct Slime *context = obj->base.context;
 
@@ -1079,7 +1079,7 @@ void Slime_OnInterrupt(struct ChaseActor *actor)
     }
 }
 
-void Bat_ReadScriptValuePair(struct ChaseActor *actor)
+void Slime_ReadSplitScript(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     s32 a = Script_SeekToKeyword('s');
@@ -2045,12 +2045,12 @@ s32 Slime_Init(void *object)
     actor->base.heightOffset = Script_GetKeywordValue('f', 0);
     if (actor->base.heightOffset)
         Slime_SetFlags(slime, 0x10);
-    Bat_ReadScriptValuePair(actor);
+    Slime_ReadSplitScript(actor);
     Slime_ReadPalette(actor, 0xCC, 0x192);
     Slime_InitColliders(actor);
     MonsterInit_InstallPrimary(actor, Slime_Update, Slime_GetAnimationMovePulse, 0,
                                Slime_ResetAnimation, Slime_RollMoveFlag, 0,
-                               Slime_ConvergeReactionMotion, Bat_RunDefeatScript,
+                               Slime_ConvergeReactionMotion, Slime_RunDefeatScript,
                                SceneActorReaction_OnEnemyDefault, 0,
                                SceneActorReaction_ResolveDamage, Slime_ResolveDamageReaction);
     Slime_InstallRoutes(actor);
