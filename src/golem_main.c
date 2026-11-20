@@ -1658,55 +1658,16 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
  * +0x48 (kind 0x1A, flag 0x80 set) or goes idle (kind 0x10) and routes to group +0x58;
  * before that it rewinds a mode-2 animation. */
 
-struct BatRoutePoint {
-    u8 unknown0[0x1C];
-    s16 x;
-    u8 unknown1E[2];
-    s16 z;
-};
-
-struct BatAnim {
-    u8 unknown0[7];
-    u8 loop;
-    u16 mode;
-    u8 unknownA[4];
-    u16 frame;
-};
-
-struct BatDrawable {
-    u8 unknown0[0x48];
-    struct BatAnim anim;
-};
-
 void SceneActor_SetPositionXZ(void *, s32, s32);
-
-static inline u32 Bat_MaskFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
-static inline void Bat_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 void SceneActorRoute_SetReachableDestination(struct ChaseActor *actor,
                                              struct ContactPosition *destination);
 
 void Golem_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
-    u8 *group = (u8 *)&actor->group.common;
-    struct BatAnim *anim = &((struct BatDrawable *)actor->base.drawable)->anim;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *sequence = &drawable->sequence;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         actor->base.restart = 0;
@@ -1716,57 +1677,40 @@ void Golem_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         if (!actor->base.restart)
             return;
         actor->base.stepDone = 1;
-        blocked = Bat_MaskFlags(actor, 128);
+        blocked = SceneActorChase_QueryMotionFlags(actor, 0x80);
         if (blocked) {
             void *target;
             SceneActor_SetPositionXZ(&actor->base.body.id,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->z);
+                                     ((struct ChaseRouteProbe *)group->route)->destination.x,
+                                     ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            target = *(void **)(group + 0x48);
-            Bat_SetControl(actor, 0x1A, target);
-            {
-                u32 behavior = 12;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
-            {
-                u16 *flags = (u16 *)(group + 0x40);
-                u16 mask = 4;
-                *flags = mask | *flags;
-            }
+            target = group->common.gate.control;
+            SceneActorChase_SetTypedControl(actor, target, 0x1A);
+            SceneActorChase_SelectState(actor, 0, 0, 12);
+            SceneActorChase_ResetStateEntry(actor);
+            SceneActorChase_GroupSetFlags(group, 4);
             actor->base.field2C2 = 0x20;
         } else {
             SceneActor_SetPositionXZ(&actor->base.body.id,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->x,
-                                     (*(struct BatRoutePoint **)(group + 0x1FC))->z);
+                                     ((struct ChaseRouteProbe *)group->route)->destination.x,
+                                     ((struct ChaseRouteProbe *)group->route)->destination.z);
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             {
                 void *target = SceneActorControl_OnIdle;
-                Bat_SetControl(actor, 0x10, target);
+                SceneActorChase_SetTypedControl(actor, target, 0x10);
             }
-            {
-                u32 phase = 2;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = phase;
-                actor->base.behavior2AA = 0;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
+            SceneActorChase_SelectState(actor, 0, 2, 0);
+            SceneActorChase_ResetStateEntry(actor);
 
             actor->base.behaviorFlags |= 16;
-            SceneActorRoute_SetReachableDestination(actor,
-                                                    (struct ContactPosition *)(group + 0x58));
+            SceneActorRoute_SetReachableDestination(actor, &group->common.control.targetPosition);
         }
     } else {
-        if (anim->mode == 2) {
-            u16 f = anim->frame;
-            u8 loop = anim->loop;
-            if (f == (loop != 0) && loop != 1)
-                anim->frame = 0;
+        if (sequence->index == 2) {
+            u16 elapsed = sequence->elapsed;
+            u8 duration = sequence->duration;
+            if (elapsed == (duration != 0) && duration != 1)
+                sequence->elapsed = 0;
         }
     }
 }
