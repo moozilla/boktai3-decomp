@@ -102,6 +102,9 @@ def validate(value):
     resume = value.get("continue", can_continue)
     if type(resume) is not bool or (resume and not can_continue):
         raise ValueError("Continue is available for battery saves")
+    sprite_trace = value.get("sprite_trace", False)
+    if type(sprite_trace) is not bool:
+        raise ValueError("Sprite evidence must be true or false")
     fields = strings(value.get("observe", []), MAX_FIELDS, "Observed fields")
     functions = strings(value.get("probe", []), MAX_PROBES, "Probed functions")
     if not fields:
@@ -136,6 +139,7 @@ def validate(value):
         "prepare": prepare,
         "duration": duration,
         "sample_every": interval,
+        "sprite_trace": sprite_trace,
         "observe": fields,
         "probe": functions,
         "checks": assertions,

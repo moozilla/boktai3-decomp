@@ -5,7 +5,7 @@ import re
 import threading
 import urllib.parse
 
-from . import centaur, fields, recipe, references, runner
+from . import centaur, fields, graphics, recipe, references, runner
 
 API = "/api/experiments"
 PAGE = "/experiments"
@@ -17,6 +17,8 @@ POOL = ThreadPoolExecutor(max_workers=2, thread_name_prefix="studio-experiment")
 SLOTS = threading.BoundedSemaphore(4)
 FIXED_ARTIFACTS = {
     "contact.png": "image/png",
+    "pixel.json": "application/json",
+    "pixel.png": "image/png",
     "recipe.json": "application/json",
     "transcript.txt": "text/plain; charset=utf-8",
 }
@@ -158,6 +160,10 @@ def routes(handler, method):
                 handler.send(200, runner.read_status(directory))
             elif parts == ["result"]:
                 handler.send(200, runner.read_json(directory / "result.json"))
+            elif len(parts) == 5 and parts[0] == "pixel" and all(re.fullmatch(r"[0-9]{1,4}", value) for value in parts[2:]):
+                frame, x, y = map(int, parts[2:])
+                result = runner.read_json(directory / "result.json")
+                handler.send(200, graphics.inspect(directory, result, parts[1], frame, x, y, runner.ROM))
             elif parts[0] == "artifact":
                 file, mime = artifact(directory, parts[1:])
                 handler.send(200, file.read_bytes(), mime)

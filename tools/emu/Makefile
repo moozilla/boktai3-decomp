@@ -23,7 +23,7 @@ build/studio/play-host: tools/emu/play.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DM_CORE_GBA -DENABLE_VFS -o $@ $< $(LDFLAGS) -lmgba
 
 # Optional typed observations. The shared harness binary is never replaced.
-build/studio/experiments/harness: tools/emu/harness.c tools/studio/experiments/observe.c tools/studio/experiments/observe.h tools/emu/Makefile
+build/studio/experiments/harness: tools/emu/harness.c tools/studio/experiments/observe.c tools/studio/experiments/observe.h tools/studio/experiments/draw_trace.c tools/studio/experiments/draw_trace.h tools/emu/Makefile
 	@mkdir -p build/studio/experiments
 	@set -e; tmp="$@.$$$$"; trap 'rm -f "$$tmp"' EXIT; \
 	$(CC) $(CPPFLAGS) $(CFLAGS) -DM_CORE_GBA -DENABLE_VFS -DSTUDIO_EXPERIMENTS -o "$$tmp" $(filter %.c,$^) $(LDFLAGS) -lmgba; \

@@ -13,7 +13,7 @@ import threading
 import time
 from uuid import uuid4
 
-from . import annotations, centaur, checks, fields, recipe, references
+from . import annotations, centaur, checks, fields, graphics, recipe, references
 
 ROOT = fields.ROOT
 HERE = Path(__file__).resolve().parent
@@ -478,10 +478,14 @@ def execute(directory, spec, trans=None):
             cmds.extend(f"probe p{i} {address:08X}" for i, (_, address) in enumerate(probes))
             cmds.extend(recipe.timeline(recipe.compile_steps(trial["input"], spec["duration"]),
                                         spec["duration"], spec["sample_every"], save_states=True))
+            if spec["sprite_trace"]:
+                cmds = list(graphics.expand_commands(cmds))
             run_harness(binary, case, cmds, spec["rtc"])
             shutil.copyfile(prefix / "fork.ppm", case / "f0000.ppm")
             sensor, _ = light_at_sample(cmds, starting_lux)
             evidence, writes_by_trial[trial["id"]] = analyze_trial(case, observed, index, probes, sensor)
+            if spec["sprite_trace"]:
+                graphics.store_graphics(case, evidence["snapshots"])
             result["trials"].append({**trial, **evidence})
             (case / "fork.ss").unlink()
         start = result["trials"][0]["snapshots"][0]

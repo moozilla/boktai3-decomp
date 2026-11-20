@@ -61,6 +61,7 @@ typedef mColor color_t;
 #include <ctype.h>
 
 #include "../studio/experiments/observe.h"
+#include "../studio/experiments/draw_trace.h"
 
 #define ROM_SIZE 0x1000000
 
@@ -220,6 +221,8 @@ static void note_store(uint32_t a, uint32_t v, int w) {
 static void h_store32(struct ARMCore* c, uint32_t a, int32_t v, int* cc) {
 	bool observe = observe_before_store(a & ~3u, 4);
 	note_store(a & ~3u, v, 4);
+	if (a >= 0x040000D4 && a <= 0x040000DC && draw_trace_active())
+		draw_trace_dma(a & ~3u, v, cur_pc());
 	orig.store32(c, a, v, cc);
 	if (observe) observe_after_store(cur_pc());
 }
@@ -279,7 +282,7 @@ static int until_hit;
 static void run_frames(int n) {
 	for (int f = 0; f < n; ++f) {
 		for (int i = 0; i < nfreeze; ++i) poke(freezes[i].addr, freezes[i].size, freezes[i].val);
-		if (!tracing && !nprobes && !until_pc) { core->runFrame(core); continue; }
+		if (!tracing && !nprobes && !until_pc && !draw_trace_active()) { core->runFrame(core); continue; }
 		uint32_t frame = core->frameCounter(core);
 		while (core->frameCounter(core) == frame) {
 			// ARMRun processes events before executing an instruction. Drain
@@ -290,6 +293,8 @@ static void run_frames(int n) {
 			// cur_pc() is instead for in-instruction memory hooks.
 			uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
 			if (tracing) note_exec(pc);
+			if (draw_trace_active())
+				draw_trace_step(pc, cpu->gprs[ARM_SP], cpu->gprs[ARM_LR], cpu->gprs[0], cpu->privilegeMode);
 			if (nprobes) {
 				observe_instruction(pc, cpu->gprs[ARM_SP], cpu->gprs[ARM_LR],
 				                    cpu->privilegeMode, note_probes(pc));
@@ -520,11 +525,12 @@ int main(int argc, char** argv) {
 			memset(seg_exec, 0, ROM_SIZE / 2);
 			strncpy(seg_name, a1, sizeof(seg_name) - 1);
 		}
-		else if (!observe_command(line)) { fprintf(stderr, "unknown command %s\n", cmd); return 1; }
+		else if (!observe_command(line) && !draw_trace_command(core, outdir, line)) { fprintf(stderr, "unknown command %s\n", cmd); return 1; }
 		fprintf(stderr, "[frame %u] %s %s %s\n", core->frameCounter(core), cmd, a1, a2);
 	}
 	end_segment();
 	observe_close();
+	draw_trace_close();
 #ifdef USE_FFMPEG
 	stop_recording();
 #endif

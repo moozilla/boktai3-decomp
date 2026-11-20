@@ -38,7 +38,7 @@ h3 { font-size: 15px; }
   color: #eae3dc; background: transparent; border: 0; border-radius: 0; border-top: 2px solid transparent; font-size: 12px; }
 .notebook .screen.active button { border-top-color: #f0b889; background: #302936; }
 .screen button span:last-child { color: #b3a8bd; font: 10px var(--mono); text-align: right; }
-.screen img { display: block; width: 100%; aspect-ratio: 3/2; object-fit: contain; image-rendering: pixelated; background: #14131a; }
+.screen img { display: block; width: 100%; height: auto; aspect-ratio: 3/2; object-fit: contain; image-rendering: pixelated; background: #14131a; }
 .transport { padding: 8px 13px; background: #23212d; }
 .notebook .transport button { min-height: 30px; padding: 4px 9px; background: #302e3c; color: #eee6dc; border-color: #4d4958; }
 .transport input { flex: 1; min-width: 60px; accent-color: #e9ab85; }
@@ -119,3 +119,21 @@ code, pre { font-family: var(--mono); }
   .form-row label:first-child { grid-column: 1 / -1; }
   #artifacts { margin-left: 0; width: 100%; }
 }
+
+.frame-view { position: relative; }
+.screen img.inspectable { cursor: crosshair; }
+.pixel-mark { position: absolute; transform: translate(-50%, -50%); width: 13px; height: 13px;
+  border: 1px solid #ffd77a; outline: 1px solid #25202b; pointer-events: none; }
+.sprite-evidence { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; }
+.sprite-evidence .section-head { flex-wrap: wrap; align-items: end; }
+.sprite-evidence p, .sprite-evidence label { font-size: 12px; }
+#pixel-query { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+#pixel-query input { width: 52px; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 6px; padding: 4px; font: 12px var(--mono); }
+#pixel-results:not(:empty) { padding: 0 14px 10px; }
+#pixel-results article { padding: 8px 0; border-top: 1px solid var(--line); margin-top: 8px; }
+.pixel-source { margin-top: 7px; border-left: 2px solid var(--accent); padding-left: 10px; }
+.pixel-source a, .pixel-source code { overflow-wrap: anywhere; }
+.pixel-source a + code { margin: 0 6px; }
+.pixel-fields { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0; }
+.notebook .pixel-fields button { font-size: 11px; min-height: 25px; padding: 3px 6px; }

@@ -40,6 +40,18 @@
           <button id="fork-frame" type="button" title="Start a new experiment from the selected trial and frame">Fork frame</button>
         </div>
       </section>
+      <section id="sprite-evidence" class="sprite-evidence" aria-labelledby="sprite-heading" hidden>
+        <div class="section-head">
+          <div><h2 id="sprite-heading">Inspect a sprite</h2>
+            <p class="muted">Click a pixel in a trial frame to follow its sprite into the game code.</p></div>
+          <form id="pixel-query" aria-label="Pixel coordinates">
+            <label>X <input id="pixel-x" type="number" min="0" max="239" value="117" required></label>
+            <label>Y <input id="pixel-y" type="number" min="0" max="159" value="88" required></label>
+            <button type="submit">Inspect</button>
+          </form>
+        </div>
+        <div id="pixel-results" aria-live="polite"></div>
+      </section>
       <div class="inspection">
         <section class="measurements" aria-labelledby="measure-heading">
           <div class="section-head">
@@ -103,6 +115,7 @@
         <div class="section-head"><h3>Trials</h3><button type="button" id="add-trial">Add trial</button></div>
         <p class="help">Use <code>hold UP 60</code>, <code>tap START</code>, <code>wait 15</code>, or <code>lux 80</code>.</p>
         <div id="trial-editor"></div>
+        <label class="checkbox"><input id="sprite-trace" type="checkbox"> Capture sprite rendering evidence</label>
         <label>Watch fields <textarea id="observe" rows="3" spellcheck="false" placeholder="gPlayers[0]->position.x"></textarea></label>
         <label>Probe function entries <textarea id="probe" rows="2" spellcheck="false" placeholder="Player_Update"></textarea></label>
         <details>

@@ -4,7 +4,7 @@ const API = '/api/experiments';
 let example, catalog, historyRows = [], draft, primary, comparison;
 let selected = { trial: 0, kind: 'field', index: 0 };
 let sample = 0, timer, loadToken = 0, compareToken = 0, running = false;
-let readbackKey = '', queryToken = 0;
+let readbackKey = '', queryToken = 0, pixelToken = 0;
 const requestProbe = new URLSearchParams(location.search).get('probe');
 
 const pad = n => String(n).padStart(4, '0');
@@ -174,7 +174,8 @@ function showResult(result, route) {
   $('screens').style.setProperty('--trials', trials.length);
   $('screens').innerHTML = trials.map((item, i) => `<article class="screen" id="screen-${i}">
     <button type="button" data-trial="${i}"><span>${esc(item.label)}</span><span id="input-${i}"></span></button>
-    <img id="image-${i}" width="240" height="160" alt="${esc(item.label)} game frame">
+    <div class="frame-view"><img id="image-${i}" data-pixel-trial="${i}" width="240" height="160"
+      alt="${esc(item.label)} game frame"><span class="pixel-mark" id="pixel-mark-${i}" hidden></span></div>
   </article>`).join('');
   $('claims').innerHTML = (result.checks || []).map((item, i) => {
     const mark = { confirmed: '✓', contradicted: '×', unresolved: '?' }[item.state];
@@ -218,22 +219,77 @@ function renderFrame() {
   const selectedPoint = selectedTrial.snapshots[sample];
   $('fork-frame').disabled = !selectedPoint.state_sha256;
   $('snapshot-query').hidden = !selectedPoint.state_sha256;
+  $('sprite-evidence').hidden = !selectedPoint.graphics;
   const key = `${primary.id}/${selectedTrial.id}/${selectedPoint.relative}`;
   if (key !== readbackKey) {
     readbackKey = key;
     $('snapshot-value').value = '';
     ++queryToken;
+    ++pixelToken;
+    $('pixel-results').innerHTML = '';
+    primary.trials.forEach((_, i) => { $('pixel-mark-' + i).hidden = true; });
   }
   primary.trials.forEach((t, i) => {
     const image = $('image-' + i);
     const url = artifact(`${t.id}/${t.snapshots[sample].label}.png`);
     if (image.getAttribute('src') !== url) image.src = url;
+    image.classList.toggle('inspectable', Boolean(t.snapshots[sample].graphics));
     $('screen-' + i).classList.toggle('active', selected.trial === i);
     $('input-' + i).textContent = snap.relative === 0 ? 'Shared start' : lastInput(t.input, snap.relative);
   });
   drawMatrix();
   drawEvidence();
   deepLink();
+}
+
+function spriteSubmission(draw) {
+  if (!draw.function) return '<p>Native submission was outside the traced renderer routines.</p>';
+  const actor = draw.actor;
+  const state = !actor ? '' : `<p><code>${esc(actor.member)}</code> in <code>${esc(actor.type)}</code>
+    at ${unsignedHex(actor.address)}</p>` + (actor.fields.length ? `<div class="pixel-fields">${actor.fields.map(row =>
+    `<button type="button" data-pixel-field="${row.field}"><code>${esc(row.path)}</code> ${showValue(row.value)}</button>`
+  ).join('')}</div>` : '');
+  return `<div class="pixel-source">
+    <div><a href="${esc(draw.function.url)}" data-peek>${esc(draw.function.name)}</a>
+      <code>${unsignedHex(draw.runtime_pc)}</code>
+      ${draw.caller ? `<a href="${esc(draw.caller.url)}" data-peek>Caller</a>` : ''}</div>
+    ${state}
+    ${draw.asset ? `<p><a href="${esc(draw.asset.url)}" data-peek>ROM art ${esc(draw.asset.archive)}/${esc(draw.asset.hash)}</a>
+      · tile source <code>${unsignedHex(draw.asset.tile_source)}</code></p>` : ''}
+  </div>`;
+}
+
+async function inspectPixel(trialIndex, x, y) {
+  const trial = primary.trials[trialIndex], point = trial.snapshots[sample];
+  if (!point.graphics) return;
+  stopPlayback();
+  selected.trial = trialIndex;
+  renderFrame();
+  const token = ++pixelToken;
+  $('pixel-x').value = x;
+  $('pixel-y').value = y;
+  const mark = $('pixel-mark-' + trialIndex);
+  mark.style.left = ((x + .5) / 240 * 100) + '%';
+  mark.style.top = ((y + .5) / 160 * 100) + '%';
+  mark.hidden = false;
+  const pane = $('pixel-results');
+  pane.textContent = 'Reading the captured sprite buffers…';
+  try {
+    const evidence = await json(`${resultPath(primary.id)}/pixel/${trial.id}/${point.relative}/${x}/${y}`);
+    if (token !== pixelToken) return;
+    const header = `<p><b>${esc(trial.label)} · frame ${point.relative} · (${x}, ${y})</b>
+      · RGB ${evidence.rgb.join(', ')}
+      ${evidence.upload ? `· <a href="${esc(evidence.upload.function?.url || '#')}" data-peek>OAM upload</a>` : ''}</p>`;
+    const source = evidence.objects.map(object => `<article>
+      <h3>Matching sprite · hardware slot ${object.slot}</h3>
+      <p class="muted">VRAM tile ${object.tile} · OBJ palette index ${object.palette_index}</p>
+      ${object.submissions.length ? object.submissions.map(spriteSubmission).join('') :
+        '<p>This frame has hardware sprite data and no traced submission for this slot.</p>'}
+    </article>`).join('');
+    pane.innerHTML = header + (source || '<p>No unblended sprite fragment matched this pixel.</p>');
+  } catch (error) {
+    if (token === pixelToken) pane.textContent = error.message;
+  }
 }
 
 function countEntries(probe, snapshots, index) {
@@ -431,6 +487,7 @@ function setForm(spec) {
   $('duration').value = spec.duration;
   $('interval').value = spec.sample_every;
   $('resume-save').checked = spec.continue;
+  $('sprite-trace').checked = Boolean(spec.sprite_trace);
   $('resume-save').disabled = !savedGame(spec.checkpoint) || Boolean(spec.fork);
   $('prep').value = spec.prepare;
   $('observe').value = spec.observe.join('\n');
@@ -449,6 +506,7 @@ function formRecipe() {
   return { version: 1, title: $('recipe-title').value, checkpoint: draft.fork ? draft.checkpoint : $('checkpoint').value, fork: draft.fork,
     continue: $('resume-save').checked && !$('resume-save').disabled, rtc: draft.rtc,
     duration: Number($('duration').value), sample_every: Number($('interval').value),
+    sprite_trace: $('sprite-trace').checked,
     prepare: $('prep').value, observe: readLines('observe'), probe: readLines('probe'),
     checks: JSON.parse($('checks').value || '[]'),
     trials: [...$('trial-editor').children].map(row => ({ id: row.dataset.id,
@@ -510,8 +568,27 @@ $('fork-frame').onclick = () => {
 };
 $('next').onclick = () => { stopPlayback(); chooseFrame(sample + 1); };
 $('screens').onclick = event => {
+  const image = event.target.closest('img[data-pixel-trial].inspectable');
+  if (image) {
+    const rect = image.getBoundingClientRect();
+    const x = Math.max(0, Math.min(239, Math.floor((event.clientX - rect.left) * 240 / rect.width)));
+    const y = Math.max(0, Math.min(159, Math.floor((event.clientY - rect.top) * 160 / rect.height)));
+    inspectPixel(Number(image.dataset.pixelTrial), x, y);
+    return;
+  }
   const button = event.target.closest('[data-trial]');
   if (button) { selected.trial = Number(button.dataset.trial); renderFrame(); }
+};
+$('pixel-query').onsubmit = event => {
+  event.preventDefault();
+  inspectPixel(selected.trial, Number($('pixel-x').value), Number($('pixel-y').value));
+};
+$('pixel-results').onclick = event => {
+  const field = event.target.closest('[data-pixel-field]');
+  if (!field) return;
+  selected = { trial: selected.trial, kind: 'field', index: Number(field.dataset.pixelField) };
+  renderFrame();
+  $('evidence').scrollIntoView({block: 'nearest'});
 };
 $('matrix').onclick = event => {
   const button = event.target.closest('[data-index]');

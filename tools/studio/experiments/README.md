@@ -15,14 +15,17 @@ The proof tests pressing Up from one state in the field and in the pause menu,
 then forks directly from the captured paused frame and tests reopening the
 field. It also compares the exact frame at which a tap and a held attack
 initialize contact. The command prints paths to the contact sheets,
-transcripts and JSON results. Each trial directory has numbered PNGs.
+transcripts, JSON results, and an annotated pixel-to-sprite frame. Each trial directory has numbered PNGs.
 
 Open `http://127.0.0.1:8642/experiments` for the notebook. Run the example,
 scrub the synchronized playbacks and select a field value. The sidebar shows the
 last observed store that changed it, the actual written values, any active
 probed functions, and a C excerpt when scope reproduces the ROM bytes. **Fork
 frame** starts an editable experiment from the selected trial and frame. Code's
-**Probe this function in an experiment** preloads the selected C entry point.
+**Probe this function in an experiment** preloads the selected C entry point. On the pause example, select frame 60 and
+click Django's coat in the field trial or enter coordinates 117, 88. The sprite
+evidence links the hardware slot to its native renderer, drawable address,
+typed owner, watched fields, and the art archive containing the tile source.
 
 ## Author a recipe
 
@@ -34,6 +37,7 @@ build/venv/bin/python -m tools.studio.experiments checkpoints
 build/venv/bin/python -m tools.studio.experiments fields 'gPlayers[0]->position.x' 'gGameState->life'
 build/venv/bin/python -m tools.studio.experiments run ./my-experiment.json
 build/venv/bin/python -m tools.studio.experiments show RUN_ID
+build/venv/bin/python -m tools.studio.experiments pixel RUN_ID field 60 117 88
 build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGameState->life'
 build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments/pause.json \
   --checkpoint bank-0004 --checkpoint bank-0064
@@ -58,6 +62,13 @@ build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments
   On stores, the observer reports active entries from the configured probes,
   using observed return addresses and stack depth. Calls between those entries
   can be absent from the path.
+- Set `sprite_trace` to true to capture OBJ video state, native OAM submission
+  and DMA upload evidence at the sampled frames. It is optional because it
+  adds capture work. It works with arbitrary trial input. Sprite fragments are
+  matched using position, shape, affine transforms, palette and tile data,
+  with a check against the screenshot color. The tool preserves multiple
+  matching fragments or queue entries. Exact typed instance binding is
+  currently available for the player drawable members.
 - Optional `checks` turn a claim into a comparison. Select a trial, a pair of
   sample frames using `from` and `to`, and either a watched `field` or probed
   `function`. The comparison uses the field delta or the number of entries
@@ -100,6 +111,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | GET `/api/experiments/runs/ID` | Poll job state. |
 | GET `/api/experiments/runs/ID/result` | Read frame values, environment fingerprints, checked claims and attributed stores. |
 | POST `/api/experiments/runs/ID/snapshot/TRIAL/FRAME` | Read a JSON array of named fields from the restored frame. |
+| GET `/api/experiments/runs/ID/pixel/TRIAL/FRAME/X/Y` | Read matching OBJ fragments and their native queue, source, actor, and art evidence. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/writes.json` | Read the value-changing CPU stores for one trial. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/probes.tsv` | Read the raw function entry and register trace. |
 
@@ -109,3 +121,11 @@ Values that lack matching evidence carry an explicit attribution state. Writer
 PCs resolve to known symbol extents. C line and compiler-pass evidence is
 optional and attached only to an exact scope comparison. Savestates and the
 ROM are local inputs and are excluded from the artifact routes.
+
+
+Sprite attribution requires an exact match between captured OAM and the
+observed game upload. The start frame was restored before submissions were
+observed. Background tiles, blended or mosaic output, and unresolved actor
+types remain outside the current lookup. A matching unblended OBJ color is
+evidence of a candidate fragment. Scanline composition can still affect
+visibility.

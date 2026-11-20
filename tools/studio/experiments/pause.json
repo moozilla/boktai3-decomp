@@ -5,6 +5,7 @@
   "continue": true,
   "duration": 120,
   "sample_every": 15,
+  "sprite_trace": true,
   "prepare": "",
   "observe": [
     "gPlayers[0]->position.x",

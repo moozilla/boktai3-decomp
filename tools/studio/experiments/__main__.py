@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import centaur, fields, recipe, runner, sweep
+from . import centaur, fields, graphics, recipe, runner, sweep
 
 
 def proof_branch(parent):
@@ -35,6 +35,43 @@ def artifact_paths(directory):
             (("result", "result.json"), ("transcript", "transcript.txt"), ("contact_sheet", "contact.png"))}
 
 
+def pixel_proof(directory, result):
+    from PIL import Image, ImageDraw
+
+    x, y = 117, 88
+    evidence = graphics.inspect(directory, result, "field", 60, x, y, runner.ROM)
+    if len(evidence["objects"]) != 1 or len(evidence["objects"][0]["submissions"]) != 1:
+        raise RuntimeError("The sprite proof did not find one matching hardware object and submission")
+    submission = evidence["objects"][0]["submissions"][0]
+    if (submission["runtime_pc"] != "030000E0" or submission["actor"]["member"] != "gPlayers[0]->animation" or
+            submission["asset"]["hash"] != "DE23"):
+        raise RuntimeError("The sprite proof did not recover Django's renderer, typed owner and ROM art")
+    runner.atomic_json(directory / "pixel.json", evidence)
+    lines = [
+        f"Field frame 60, pixel ({x}, {y})",
+        f"OBJ slot {evidence['objects'][0]['slot']} in the exact captured OAM upload",
+        f"{submission['runtime_pc']} {submission['function']['name']} in {submission['function']['source']}",
+        f"{submission['actor']['member']} at {submission['drawable']}",
+        f"{submission['asset']['archive']}/{submission['asset']['hash']} from {submission['asset']['tile_source']}",
+    ]
+    with Image.open(directory / "field/f0060.png") as image:
+        panel = Image.new("RGB", (540, 368), "#181b25")
+        panel.paste(image.resize((480, 320), Image.Resampling.NEAREST), (30, 30))
+    draw = ImageDraw.Draw(panel)
+    dx, dy = 30 + x * 2, 30 + y * 2
+    draw.rectangle((dx - 4, dy - 4, dx + 6, dy + 6), outline="#ffe19d")
+    draw.line((dx + 7, dy - 2, dx + 32, dy - 2, dx + 48, dy - 19), fill="#ffe19d")
+    draw.text((dx + 51, dy - 27), "Django's sprite submission", fill="#ffe19d",
+              stroke_width=2, stroke_fill="#181b25")
+    draw.text((30, 11), lines[0], fill="white")
+    panel.save(directory / "pixel.png")
+    with (directory / "transcript.txt").open("a") as log:
+        log.write("\nSprite provenance\n" + "\n".join(lines) + "\n")
+    return {"evidence": str((directory / "pixel.json").relative_to(runner.ROOT)),
+            "frame": str((directory / "pixel.png").relative_to(runner.ROOT)),
+            "pixel": [x, y]}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -57,6 +94,12 @@ def main():
     inspect.add_argument("trial")
     inspect.add_argument("frame", type=int)
     inspect.add_argument("paths", nargs="+")
+    pixel = commands.add_parser("pixel", help="Trace a sampled pixel into native sprite queues")
+    pixel.add_argument("id")
+    pixel.add_argument("trial")
+    pixel.add_argument("frame", type=int)
+    pixel.add_argument("x", type=int)
+    pixel.add_argument("y", type=int)
     import_live = commands.add_parser("import-live", help="Turn a Centaur recording into a replay recipe")
     import_live.add_argument("id")
     args = parser.parse_args()
@@ -73,6 +116,10 @@ def main():
                 data = [fields.measure(path).to_dict() for path in args.paths]
             case "import-live":
                 data = centaur.import_recording(args.id)
+            case "pixel":
+                directory = runner.run_dir(args.id)
+                data = graphics.inspect(directory, runner.read_json(directory / "result.json"),
+                                        args.trial, args.frame, args.x, args.y, runner.ROM)
             case "snapshot":
                 data = runner.inspect_frame({"run": args.id, "trial": args.trial, "frame": args.frame}, args.paths)
             case "proof" | "run":
@@ -90,6 +137,7 @@ def main():
                         raise RuntimeError("Proof did not distinguish the field, menu and idle trials")
                 data = {"id": result["id"], **artifact_paths(directory)}
                 if args.command == "proof":
+                    data["pixel"] = pixel_proof(directory, result)
                     branch = proof_branch(result)
                     branch_path = runner.init_run(branch)
                     forked = runner.execute(branch_path, branch)

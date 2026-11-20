@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import struct
 import tempfile
 import time
 from types import SimpleNamespace
@@ -13,7 +14,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/studio"))
-from experiments import annotations, centaur, checks, fields, http, recipe, runner, sweep
+from experiments import annotations, centaur, checks, fields, graphics, http, obj_pixels, recipe, runner, sweep
 
 
 class RecipeTests(unittest.TestCase):
@@ -65,6 +66,36 @@ class RecipeTests(unittest.TestCase):
         self.assertEqual(values, {"f0000": 86, "f0005": 86, "f0010": 12})
         self.assertIn("save f0005", commands)
         self.assertEqual(end, 12)
+
+
+class SpriteEvidenceTests(unittest.TestCase):
+    def test_uses_2d_tile_row_and_checks_captured_color(self):
+        oam = bytearray(struct.pack("<4H", 0x200, 0, 0, 0) * 128)
+        struct.pack_into("<4H", oam, 24, 0x4000, 10, 0x601F, 0)
+        vram = bytearray(0x8000)
+        vram[0] = 9  # the second horizontal tile wraps from slot 31 to slot 0
+        palette = bytearray(0x200)
+        struct.pack_into("<H", palette, 2 * (6 * 16 + 9), 0x001F)
+        matched = obj_pixels.matching_objects(oam, vram, palette, 0x1000, 18, 0, (255, 0, 0))
+        self.assertEqual([(row["slot"], row["tile"]) for row in matched], [(3, 0)])
+        self.assertEqual(obj_pixels.matching_objects(oam, vram, palette, 0x1000, 18, 0, (0, 0, 0)), [])
+        self.assertEqual(obj_pixels.matching_objects(oam, vram, palette, 0x0000, 18, 0, (255, 0, 0)), [])
+
+    def test_affine_double_size_coordinates_and_boundaries(self):
+        oam = bytearray(0x400)
+        for offset, word in zip((6, 14, 22, 30), (0, 256, -256, 0)):
+            struct.pack_into("<h", oam, offset, word)
+        attrs = (0x0306, 10, 0)
+        self.assertEqual(obj_pixels.tile_xy(oam, attrs, 18, 14), (4, 4, 8))
+        self.assertEqual(obj_pixels.tile_xy(oam, attrs, 20, 12), (2, 2, 8))
+        self.assertIsNone(obj_pixels.tile_xy(oam, attrs, 10, 6))
+
+    def test_duplicate_pending_submissions_keep_identity_unresolved(self):
+        attrs = {"attr0": "0001", "attr1": "0002", "attr2": "0003"}
+        direct = {**attrs, "queue": "d", "index": "1"}
+        pending = [{**attrs, "queue": "p", "index": str(i)} for i in range(2)]
+        self.assertEqual(graphics.sources_for([direct, *pending], 1, (1, 2, 3)), [direct])
+        self.assertEqual(graphics.sources_for([direct, *pending], 5, (1, 2, 3)), pending)
 
 
 class RecordingTests(unittest.TestCase):
@@ -300,6 +331,20 @@ class HTTPTests(unittest.TestCase):
             links = json.loads(payload)
             self.assertTrue(any(link["kind"] == "stores" and parent["id"] in link["url"] for link in links))
             self.assertTrue(any(link["kind"] == "entries" for link in links))
+            code, payload = self.request("GET", f"/api/experiments/runs/{parent['id']}/pixel/field/60/117/88")
+            self.assertEqual(code, 200)
+            pixel = json.loads(payload)
+            self.assertEqual(pixel["upload"]["upload_pc"], "082141E8")
+            self.assertEqual(pixel["upload"]["upload_frame"] + 1, pixel["game_frame"])
+            self.assertEqual(len(pixel["objects"]), 1)
+            draw = pixel["objects"][0]["submissions"][0]
+            self.assertEqual(draw["runtime_pc"], "030000E0")
+            self.assertEqual(draw["function"]["source"], "src/iwram_code.c")
+            self.assertEqual(draw["asset"]["hash"], "DE23")
+            self.assertEqual(draw["actor"]["member"], "gPlayers[0]->animation")
+            self.assertEqual(draw["actor"]["fields"][1]["value"], 2694)
+            bad = f"/api/experiments/runs/{parent['id']}/pixel/field/60/240/88"
+            self.assertEqual(self.request("GET", bad)[0], 400)
             from experiments.__main__ import proof_branch
             child = run(proof_branch(parent))
             self.assertTrue(all(c["state"] == "confirmed" for c in child["checks"]))
