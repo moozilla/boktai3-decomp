@@ -24,14 +24,6 @@ struct TentacleBody {
     u8 spreadStage;
     u8 unknown8EB[0x934 - 0x8EB];
 };
-struct TentacleBodyDrawable {
-    struct ActorSprite sprite;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    void *resource;
-};
-
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
                                              struct RoomActor *);
