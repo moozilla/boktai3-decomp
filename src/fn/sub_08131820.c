@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 // confidence=low: follows the route probe, then selects a new route point outside link mode.
 
@@ -15,25 +16,11 @@ u32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetState(struct ChaseActor *actor)
-{
-    u32 behavior = 6;
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 static inline void BeginRouteSelection(struct ChaseActor *actor, struct SceneActorChaseGroup *nav)
 {
     void *control;
     u32 kind;
-    u32 behavior = 8;
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
+    SceneActorTerrain_EnterState(actor, 0, 0, 8);
     /* The route callback is installed after the reset fields. */
     control = nav->routeChoiceControl;
     kind = 0x13;
@@ -66,9 +53,7 @@ void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
         actor->base.field2B1 = 0;
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     {
-        u32 mask = 0xA02F;
-        u16 *flagAddress = &actor->base.motionFlags;
-        if (*flagAddress & mask) {
+        if (SceneActorBehavior_MotionBits(0xA02F, actor)) {
             u16 *p = &actor->base.field2C2;
             *p = 0x40;
             scale = p;
@@ -82,14 +67,15 @@ void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
     }
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
-            SetState(actor);
+            SceneActorTerrain_EnterState(actor, 0, 0, 6);
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
                                                              speed)) {
