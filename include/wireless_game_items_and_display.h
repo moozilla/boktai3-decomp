@@ -1,6 +1,7 @@
 #ifndef GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #define GUARD_WIRELESS_GAME_ITEMS_AND_DISPLAY_H
 #include "engine.h"
+#include "wireless_trade_menu.h"
 
 /* Layouts recovered from the item state handlers and display lifecycle.
  * Interpretations are tentative; unknown ranges retain their offsets. */
@@ -64,34 +65,6 @@ struct WirelessGameDisplay {
     struct WirelessGameResource extraResource;
     struct WirelessGameDrawing extra[2];
 };
-struct WirelessGameRemoteStats {
-    u8 unk0[4];
-    u8 playerHealthPercent, opponentHealthPercent;
-};
-struct WirelessGameExchange {
-    u8 unk0[0x1e];
-    u16 roundCount;
-    u8 unk20[4];
-    u32 timer;
-    u8 state, entered;
-    u8 unk2A[3];
-    u8 playerDefeated, opponentDefeated, unk2F;
-    u8 pendingEvent, unk31, enabled;
-    u8 unk33[9];
-    u8 counts[4];
-    u8 unk40[2];
-    u8 itemMode;
-    u8 unk43[5];
-    struct WirelessGameRemoteStats remote;
-    u8 unk50[0x10];
-    struct WirelessGameDisplay *display;
-    u8 unk64[0x78];
-    s32 total;
-    u8 unkE0[2];
-    u16 weights[4];
-    u8 choice, counter;
-};
-struct WirelessGameExchange *WirelessExchange_Get(void);
 /* 0x02000100 */
 extern struct WirelessGameItems *gWirelessGameItems;
 int WirelessGameItems_QueueLocalItem(struct WirelessGameVector *, int, int);
