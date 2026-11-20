@@ -1,0 +1,21 @@
+{
+  "731D": {
+    "1": ["新・ボクらの太陽", "masthead", "Boktai 3"],
+    "2": ["逆襲のサバタ", "subtitle", "Sabata's Counterattack"]
+  },
+  "530D": {
+    "81": ["マップ", "tab", "Map"],
+    "82": ["アイテム", "tab", "Items"],
+    "83": ["貴重品", "tab", "Valuables"],
+    "84": ["太陽銃", "tab", "Solar Gun"],
+    "85": ["ソード", "tab", "Swords"],
+    "86": ["アクセサリー", "tab", "Accessories"],
+    "87": ["ステータス", "tab", "Status"],
+    "88": ["コンフィグ", "tab", "Settings"],
+    "89": ["スリープ", "tab", "Sleep"],
+    "90": ["セーブ", "tab", "Save"],
+    "126": ["Ⓐけってい", "buttons", "Confirm"],
+    "127": ["Ⓑもどる", "buttons", "Back"],
+    "138": ["Ⓐけってい　Ⓑもどる", "buttons", "Confirm | Back"]
+  }
+}

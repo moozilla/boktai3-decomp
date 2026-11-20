@@ -8,6 +8,7 @@ import sys
 from runtime import Game, OUT, prison_save
 from translator import Memory, Ollama
 from localize import Localizer
+from graphics import ArtTranslator
 
 
 def main():
@@ -39,6 +40,7 @@ def main():
     target.mkdir(exist_ok=True)
     with (target/"transcript.jsonl").open("w") as log:
         loc=Localizer(m,log,not a.japanese)
+        loc.graphics=ArtTranslator()
         with closing(Game(loc,prison_save())) as game:
             for i,(n,key) in enumerate([(300,"START"),(60,"A"),(150,"START"),(120,"A"),(120,"START"),
                                         (300,"START"),(120,"START"),(120,"A"),(150,"A")]+[(100,"A")]*24):
