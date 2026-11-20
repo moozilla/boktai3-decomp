@@ -1,10 +1,13 @@
 #ifndef GUARD_SELECTION_PANEL_H
 #define GUARD_SELECTION_PANEL_H
 #include "character_preview_actor.h"
+#include "modifier_list.h"
 #include "scene_input.h"
-struct SelectionPanelPaletteCycle {
-    u16 colors[16], frame;
-    u8 unknown22[2];
+enum SelectionPanelState {
+    SELECTION_PANEL_INPUT,
+    SELECTION_PANEL_CONFIRM,
+    SELECTION_PANEL_CANCEL,
+    SELECTION_PANEL_SCRIPT
 };
 struct SelectionPanel {
     struct Task task;
@@ -14,7 +17,7 @@ struct SelectionPanel {
     u16 entryIds[10], cachedIds[10];
     void *widgetScript, *auxiliaryScript;
     u16 widgetPalette[16];
-    struct SelectionPanelPaletteCycle paletteCycle;
+    struct CharacterPaletteCycle paletteCycle;
     struct CharacterPreviewActor preview;
     void (*update)(struct SelectionPanel *);
     void *sourceScript;
@@ -35,6 +38,15 @@ struct SelectionPanel {
     u16 timer;
     u32 cancelScript, selectionScript;
 };
+static inline void SelectionPanel_SetState(struct SelectionPanel *panel,
+                                           void (*update)(struct SelectionPanel *),
+                                           enum SelectionPanelState state)
+{
+    panel->update = update;
+    panel->entering = 1;
+    panel->state = state;
+}
+
 struct SelectionPanelScriptArgs {
     u32 count : 16, reserved : 16;
     s32 *values;
