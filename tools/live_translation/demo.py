@@ -31,7 +31,7 @@ SHOTS = [
     ("title", "01-title", "The game typesets its own English logo.", 4),
     ("file", "02-file", "The file menu reads your save in English.", 3),
     ("awake", "04-awake", "Otenko calls the player by name.", 5),
-    ("config", "06-config", "Change the text speed in the original settings menu.", 3),
+    ("config", "06-config", "Select text speed in the translated settings menu.", 3),
     ("items", "07-items", "Choco Banana’s description scrolls in English.", 5),
     ("card", "11-location", "The place name and sunrise clock change language together.", 4),
     ("before", "05-blood", "Otenko’s line, before the edit.", 4),
@@ -233,7 +233,7 @@ def menus(game, language):
         elif args[0] == "wait":
             game.step(int(args[1]))
         elif args == ["shot", "06_config"]:
-            take(game, language, "config", {10: "A", 27: "DOWN", 43: "RIGHT", 74: "B"})
+            take(game, language, "config", {10: "A", 27: "DOWN", 62: "DOWN", 79: "B"})
         elif args == ["shot", "10_items"]:
             game.tap("A")
             take(game, language, "items")
