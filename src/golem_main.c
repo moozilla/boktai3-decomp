@@ -422,21 +422,13 @@ void SceneActor_AccelerateForTerrain(struct ChaseActor *actor)
         motion->speed = maximum;
 }
 
-struct P {
-    u8 f[0x26c];
-    void *cb;
-    u8 g[0x2d4 - 0x270];
-    u16 fl;
-};
-
 s32 Callback_InvokeActor(void *, void *);
 
-u8 Golem_InvokeEnabledBehavior(struct P *p)
+u8 Golem_InvokeEnabledBehavior(struct ChaseActor *actor)
 {
-    u32 m = 0x100;
     u8 r;
-    if (p->fl & m)
-        r = Callback_InvokeActor(p, p->cb);
+    if (SceneActorChase_QueryMotionFlags(actor, 0x100))
+        r = Callback_InvokeActor(actor, actor->base.targetQuery);
     else
         r = 0;
     return r;
