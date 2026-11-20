@@ -289,25 +289,18 @@ int ResultTutorial_DemonstrateTracking(struct ResultMenu *tutorial)
 {
     int speed = gUnk_0824DB8A[tutorial->difficulty];
     switch (tutorial->phase) {
-        case 0: {
-            int next = tutorial->phase + 1;
-            int zero;
-            zero = 0;
-            tutorial->phase = next;
-            tutorial->elapsed = zero;
-            tutorial->timer = zero;
+        case 0:
+            ++tutorial->phase;
+            tutorial->elapsed = 0;
+            tutorial->timer = 0;
             break;
-        }
         case 1:
         case 5:
         case 9:
             tutorial->targetPosition += speed;
             if (tutorial->targetPosition > 4096) {
-                int next = tutorial->phase + 1;
-                int zero;
-                zero = 0;
-                tutorial->phase = next;
-                tutorial->timer = zero;
+                ++tutorial->phase;
+                tutorial->timer = 0;
             }
             break;
         case 2:
@@ -321,11 +314,8 @@ int ResultTutorial_DemonstrateTracking(struct ResultMenu *tutorial)
         case 11:
             tutorial->targetPosition -= speed;
             if (tutorial->targetPosition <= 3071) {
-                int next = tutorial->phase + 1;
-                int zero;
-                zero = 0;
-                tutorial->phase = next;
-                tutorial->timer = zero;
+                ++tutorial->phase;
+                tutorial->timer = 0;
             }
             break;
         case 4:
