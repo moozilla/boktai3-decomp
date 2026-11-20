@@ -209,7 +209,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
 void Vampire_DecrementBarrierCount(void);
 void Palette_StartSlide(s32, s32, s32);
 
-void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
+void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
     u32 index_3;
     u32 index_2;
@@ -235,18 +235,16 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         angle = (u8)table[index];
         index_2 = (index + 1) & mask;
         {
-            u32 v = table[index_2];
-            u32 m3 = 3;
-            v &= m3;
-            count = v + 2;
+            u32 sample = table[index_2];
+            sample &= 3;
+            count = sample + 2;
         }
         index_3 = (index_2 + 1) & mask;
         *indexPtr = index_3;
         {
-            u32 v = table[index_3];
-            u32 m3 = 3;
-            v &= m3;
-            speed = v + 20;
+            u32 sample = table[index_3];
+            sample &= 3;
+            speed = sample + 20;
         }
         SparkParticle_Spawn(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
         sub_08012B34(m, p);

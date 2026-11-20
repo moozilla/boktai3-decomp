@@ -413,6 +413,7 @@ addr,name,mode,confidence,source,notes
 08012F0C,BreakableBarrier_Destroy,thumb,low,src-alias,Removes a single barrier's collider and sprite; per-barrier helper called from the manager destroy loop
 08012F28,BreakableBarrier_Hide,thumb,low,src-alias,
 08012F50,BreakableBarrier_Update,thumb,low,src-alias,
+0801310C,BreakableBarrier_UpdateBroken,thumb,low,src-alias,
 08013220,BreakableBarrier_UpdateSprite,thumb,low,src-alias,Advances a barrier's timer and updates its sprite via the per-state table gUnk_08604B84; per-barrier helper for the manager update loop
 0801324C,BreakableBarriers_Update,thumb,low,src-alias,Updates all 4 barriers in the manager by calling BreakableBarrier_UpdateSprite; registered as BatCurtain_Create's update callback
 08013270,BreakableBarriers_Destroy,thumb,low,src-alias,Destroys all 4 barriers in the manager by calling BreakableBarrier_Destroy; registered as BatCurtain_Create's destroy callback
