@@ -35,11 +35,6 @@ struct ActorImpact {
     u16 response;
 };
 
-union ActorImpactVector {
-    struct ContactPackedVector packed;
-    u32 words[2];
-};
-
 void CollisionReaction_RecordImpact(struct ContactCollider *, struct ContactCollider *,
                                     struct ActorImpact *);
 void ActorImpact_CopyContact(struct ContactCollider *, struct ContactCollider *, struct ActorImpact *);
