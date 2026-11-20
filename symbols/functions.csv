@@ -338,6 +338,10 @@ addr,name,mode,confidence,source,notes
 0800FA40,BoardPiece_Destroy,thumb,low,src-alias,Clears a piece's transform (Shadow_Destroy) and removes its sprite; called per-piece from GroupObjects_Destroy
 0800FA5C,BoardPiece_SetFacingAnim,thumb,low,src-alias,Derives left/right flip flags from p->direction and applies them via Anim_SetSequence; called by every movement handler after repositioning
 0800FAB8,BoardPiece_UpdateAnimation,thumb,low,src-alias,
+0800FC28,BoardPieces_StartStraightAdvance,thumb,low,src-alias,Tentative delayed straight advance command.
+0800FE98,BoardPieces_StartLaunch,thumb,low,src-alias,Tentative launch command leading to the wander state.
+0801010C,BoardPieces_StartConvergence,thumb,low,src-alias,Move the pieces toward the command origin.
+08010298,BoardPieces_StartActorChase,thumb,low,src-alias,Target the registered actor and start its chase state.
 0801037C,BoardPieces_DispatchCommands,thumb,low,src-alias,
 08010454,BoardPiece_Launch,thumb,low,src-alias,
 08010514,BoardPiece_Wander,thumb,low,src-alias,"Randomly re-picks heading/speed toward target while active, moves, then re-faces toward origin; sets state 1 once the wander timer exceeds 0x5F"
@@ -345,6 +349,7 @@ addr,name,mode,confidence,source,notes
 08010860,BoardPiece_ConvergeOnTarget,thumb,low,src-alias,"Same drift-toward-target movement as BoardPiece_ApproachTarget but signals state 8 on arrival, used for a different staged-effect role"
 08010A34,BoardPiece_Deactivate,thumb,low,src-alias,"Clears active flag, sets a hide sprite flag and disables the piece's actor shadow"
 08010A58,BoardPiece_ChasePlayer,thumb,low,src-alias,"Re-targets p->target to m->actor->position (the player) each call and homes in on it, signalling state 4 on arrival"
+08010C10,BoardPiece_AdvanceWithOffset,thumb,low,src-alias,Tentative interpolated actor approach with a wandering offset.
 08010D84,BoardPiece_AdvanceStraight,thumb,low,src-alias,Moves straight along the existing p->direction at double speed with no heading recalculation; sets state 6 after a timed delay
 08010E44,BoardPiece_HomeToTarget,thumb,low,src-alias,"Homes directly on p->target using p->direction (no separate drift heading like ApproachTarget), signalling state 2 on arrival"
 08010FD4,GroupObjects_Update,thumb,low,src-alias,

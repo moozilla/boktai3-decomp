@@ -8,9 +8,9 @@ static inline void BoardPiece_SelectPalette(void *resource)
 }
 int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int index)
 {
-    struct GroupResource *resource;
-    struct GroupSprite *sprite;
-    struct GroupVec *position;
+    struct SpriteRenderResource *resource;
+    struct DisplaySequenceSprite *sprite;
+    struct ContactPosition *position;
     u16 initialTimer[] = {0};
     p->state = 0;
     p->active = 1;
@@ -22,7 +22,7 @@ int BoardPiece_Initialize(struct GroupObjects *owner, struct GroupPiece *p, int 
     resource->palette = owner->palette;
     sprite = &p->sprite;
     Sprite_Init(sprite, resource, 1);
-    sprite->mode = 2;
+    sprite->priority = 2;
     position = &p->sprite.position;
     ZeroFill8(position);
     Shadow_Initialize(p->transform, position, 0);
@@ -60,13 +60,13 @@ void BoardPiece_SetFacingAnim(struct GroupObjects *m, struct GroupPiece *p, int 
 
 void BoardPiece_UpdateAnimation(struct GroupPiece *p)
 {
-    struct GroupSprite *o = &p->sprite;
-    struct GroupAnim *a;
+    struct DisplaySequenceSprite *o = &p->sprite;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     int done;
     p->sprite.position = p->position;
     a = &p->anim;
-    entry = a->data + a->frame;
+    entry = a->commands + a->index;
     o->frame = *entry >> 6;
     {
         union DisplaySequenceControl control;
@@ -90,37 +90,37 @@ void BoardPiece_UpdateAnimation(struct GroupPiece *p)
         else
             o->flags &= ~8;
     }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
+    if (++a->elapsed >= a->duration) {
+        a->elapsed = 0;
         if (a->flags & 4) {
-            if (a->frame == 0) {
+            if (a->index == 0) {
                 if (a->flags & 8) {
-                    a->timer = a->rate;
+                    a->elapsed = a->duration;
                 } else {
-                    a->frame = a->count - 1;
+                    a->index = a->frameCount - 1;
                 }
                 done = 1;
             } else {
-                a->frame--;
+                a->index--;
                 done = 0;
             }
         } else {
-            if (++a->frame >= a->count) {
+            if (++a->index >= a->frameCount) {
                 if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
+                    a->elapsed = a->duration;
+                    a->index = a->frameCount - 1;
                 } else {
-                    a->frame = 0;
+                    a->index = 0;
                 }
                 done = 1;
             } else
                 done = 0;
         }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
+        entry = a->commands + a->index;
+        a->frameWeight = frame_factor(*entry);
+        a->duration = (a->frameWeight * a->speed) >> 6;
+        if (!a->duration)
+            a->duration = 1;
     } else
         done = 0;
     p->done = done;
@@ -144,7 +144,8 @@ void BoardPiece_UpdateAnimation(struct GroupPiece *p)
     p->angle += 4;
 }
 
-static inline void addPositionAt(struct GroupVec *d, struct GroupVec *dst, struct GroupVec *src)
+static inline void addPositionAt(struct ContactPosition *d, struct ContactPosition *dst,
+                                 struct ContactPosition *src)
 {
     d->x += src->x;
     dst->y += src->y;
@@ -161,9 +162,9 @@ static inline int BoardPieces_RandomValue(void)
     return result;
 }
 
-int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BoardPieces_StartStraightAdvance(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
-    struct GroupVec origin;
+    struct ContactPosition origin;
     int i;
     int radius0;
     int radius1;
@@ -220,9 +221,9 @@ int sub_0800FC28(struct GroupObjects *m, struct GroupQueue *q, struct GroupComma
     return 0;
 }
 
-int sub_0800FE98(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BoardPieces_StartLaunch(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
-    struct GroupVec origin;
+    struct ContactPosition origin;
     int i;
     int radius0;
     int radius1;
@@ -283,12 +284,11 @@ struct PackedVec {
 };
 
 // confidence=low: converges the board pieces on the command origin at a scaled speed.
-#define BoardPieces_StartConvergence sub_0801010C
 int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
                                  struct GroupCommand *cmd)
 {
-    struct PackedVec origin;
-    struct GroupVec d;
+    struct ContactPosition origin;
+    struct ContactPosition d;
     int i;
     int radius;
     void *palette;
@@ -300,15 +300,15 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
     radius = cmd->radius0;
     if (radius <= 0)
         radius = 1;
-    *(struct PackedVec *)&m->origin = origin;
+    m->origin = origin;
     m->timer = 0;
     r = m->pieces;
     i = 0;
     palette = m->palette;
     for (; i < 16; i++, r++) {
         int angle;
-        struct GroupVec *dp = &d;
-        struct GroupVec *o = (struct GroupVec *)&origin;
+        struct ContactPosition *dp = &d;
+        struct ContactPosition *o = &origin;
         p = r;
         {
             u32 state = 7;
@@ -323,7 +323,7 @@ int BoardPieces_StartConvergence(struct GroupObjects *m, struct GroupQueue *q,
         p->duration = Div(
             scale(dp->x * gUnk_086149C4[(angle + 64) & 255] + dp->z * gUnk_086149C4[angle & 255]),
             radius);
-        *(struct PackedVec *)&p->target = origin;
+        p->target = origin;
         {
             union RandomTableView table = {gRandomTable};
             p->angle = randomWith(table.samples);
@@ -349,11 +349,11 @@ static inline int BoardPieces_NextRandomValue(const u16 *table, u32 *index, u32 
     return *(const u16 *)(offset + (u32)table);
 }
 
-int sub_08010298(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
+int BoardPieces_StartActorChase(struct GroupObjects *m, struct GroupQueue *q, struct GroupCommand *cmd)
 {
-    struct GroupActor *actor;
+    struct SceneActorBody *actor;
     s32 duration;
-    struct GroupVec position;
+    struct ContactPosition position;
     int i;
     struct GroupPiece *p;
     u32 *index;
@@ -406,19 +406,19 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
             SceneMessages_SetPendingTrigger(queue, cmd);
             switch (cmd->type) {
                 case 0:
-                    sub_0800FC28(manager, queue, cmd);
+                    BoardPieces_StartStraightAdvance(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 1:
-                    sub_0800FE98(manager, queue, cmd);
+                    BoardPieces_StartLaunch(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 2:
-                    sub_08010298(manager, queue, cmd);
+                    BoardPieces_StartActorChase(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
                 case 11:
-                    sub_0801010C(manager, queue, cmd);
+                    BoardPieces_StartConvergence(manager, queue, cmd);
                     Trigger_ConsumePending(&manager->queue, 1);
                     break;
             }
@@ -427,17 +427,18 @@ int BoardPieces_DispatchCommands(struct GroupObjects *manager)
     return 0;
 }
 
-static inline void addPosition(struct GroupVec *d, struct GroupVec *s)
+static inline void addPosition(struct ContactPosition *d, struct ContactPosition *s)
 {
     d->x = d->x + s->x;
     d->y = d->y + s->y;
     d->z = d->z + s->z;
 }
 
-static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec *s)
+static inline struct ContactPosition *addPositionN(struct ContactPosition *d,
+                                                   struct ContactPosition *s)
 {
-    struct GroupVec *src = s;
-    struct GroupVec *dst = d;
+    struct ContactPosition *src = s;
+    struct ContactPosition *dst = d;
     d->x += s->x;
     dst->y += src->y;
     dst->z += src->z;
@@ -453,7 +454,7 @@ static inline void BoardPiece_SetState(struct GroupPiece *piece, u32 state)
 
 void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
-    struct GroupVec delta;
+    struct ContactPosition delta;
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
@@ -469,9 +470,9 @@ void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 
 void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *moved;
-    struct GroupVec *origin;
+    struct ContactPosition delta;
+    struct ContactPosition *moved;
+    struct ContactPosition *origin;
     const u16 *table;
     if (p->active) {
         p->active = 0;
@@ -510,14 +511,14 @@ void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
 }
 void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *position;
-    struct GroupVec *moved;
+    struct ContactPosition delta;
+    struct ContactPosition *position;
+    struct ContactPosition *moved;
     int dx, dz;
     if (p->active) {
         const u16 *table;
-        struct GroupVec *current;
-        struct GroupVec *origin;
+        struct ContactPosition *current;
+        struct ContactPosition *origin;
         p->active = 0;
         current = &p->position;
         origin = &m->origin;
@@ -544,7 +545,7 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
         polar(&delta, p->heading, p->duration);
         moved = addPositionN(&p->position, &delta);
         {
-            struct GroupVec *origin = &m->origin;
+            struct ContactPosition *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
         BoardPiece_SetFacingAnim(m, p, 0);
@@ -553,14 +554,14 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
 }
 void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *position;
-    struct GroupVec *moved;
+    struct ContactPosition delta;
+    struct ContactPosition *position;
+    struct ContactPosition *moved;
     int dx, dz;
     if (p->active) {
         const u16 *table;
-        struct GroupVec *current;
-        struct GroupVec *origin;
+        struct ContactPosition *current;
+        struct ContactPosition *origin;
         p->active = 0;
         current = &p->position;
         origin = &m->origin;
@@ -587,7 +588,7 @@ void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, i
         polar(&delta, p->heading, p->duration);
         moved = addPositionN(&p->position, &delta);
         {
-            struct GroupVec *origin = &m->origin;
+            struct ContactPosition *origin = &m->origin;
             p->direction = Math_Atan2(origin->x - p->position.x, origin->z - moved->z);
         }
         BoardPiece_SetFacingAnim(m, p, 0);
@@ -606,9 +607,9 @@ void BoardPiece_Deactivate(struct GroupObjects *m, struct GroupPiece *p)
 
 void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *position;
-    struct GroupVec *target;
+    struct ContactPosition delta;
+    struct ContactPosition *position;
+    struct ContactPosition *target;
     int dx, dz;
     int active;
     if (m->actor)
@@ -639,7 +640,7 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     } else {
         polar(&delta, p->direction, p->duration);
         {
-            struct GroupVec *src = &delta;
+            struct ContactPosition *src = &delta;
             p->position.x += delta.x;
             position->y += src->y;
             position->z += src->z;
@@ -655,10 +656,10 @@ static inline int GroupObjects_Random(void)
     return ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
 }
 
-void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
+void BoardPiece_AdvanceWithOffset(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *offset;
+    struct ContactPosition delta;
+    struct ContactPosition *offset;
     int active;
     if (m->actor)
         p->target = m->actor->position;
@@ -681,7 +682,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
         p->speed--;
     polar(&delta, p->direction, p->duration);
     {
-        struct GroupVec *src = &delta;
+        struct ContactPosition *src = &delta;
         p->offset.x += delta.x;
         offset->y += src->y;
         offset->z += src->z;
@@ -693,7 +694,7 @@ void sub_08010C10(struct GroupObjects *m, struct GroupPiece *p, int index)
 }
 void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
-    struct GroupVec delta;
+    struct ContactPosition delta;
     if (p->active)
         p->active = 0;
     polar(&delta, p->direction, p->duration * 2);
@@ -708,8 +709,8 @@ void BoardPiece_AdvanceStraight(struct GroupObjects *m, struct GroupPiece *p, in
 }
 void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int index)
 {
-    struct GroupVec delta;
-    struct GroupVec *position;
+    struct ContactPosition delta;
+    struct ContactPosition *position;
     int dx, dz;
     int active = p->active;
     if (active) {
