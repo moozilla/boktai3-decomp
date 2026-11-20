@@ -1077,7 +1077,6 @@ static inline void SetAnimation(struct ChaseActor *a, u8 s, u8 p, u8 b)
 void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
-        // concession-ok(const-local): CpuSet reads this fixed source word twice to clear the position.
         u32 zero;
         s32 values[8];
     } buf;
@@ -3134,7 +3133,6 @@ static inline s32 Scale_SpawnSparks(s32 x)
 void Axe_SpawnSparks(struct ChaseActor *actor, struct ContactPosition *origin, s32 angle, s32 frame)
 {
     struct {
-        // concession-ok(const-local): CpuSet reads this fixed source word twice to clear the position.
         u32 zero;
         u32 values[0];
     } buf;
@@ -3450,7 +3448,6 @@ void Axe_UpdateTrailColliders(u8 *actor)
     u32 idx;
     s32 i;
     struct {
-        // concession-ok(const-local): CpuSet reads this fixed source word twice to clear the position.
         u32 zero;
         u32 values[0];
     } buf;
@@ -3574,7 +3571,6 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
     s32 index = 0;
     struct ContactCollider *attack = &actor->attack;
     struct {
-        // concession-ok(const-local): CpuSet reads this fixed source word twice to clear the position.
         u32 zero;
         u32 values[0];
     } buf;

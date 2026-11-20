@@ -27,7 +27,6 @@ struct WirelessGameDrawing {
     u8 unkC[0xe];
     u8 changed;
     u8 unk1B[5];
-    // concession-ok(local-union): Item motion edits the halfwords and sprite placement copies the same two position words.
     union {
         struct WirelessGamePair words;
         struct WirelessGamePosition coords;

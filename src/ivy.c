@@ -1056,7 +1056,6 @@ struct DefeatContext {
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
-        // concession-ok(const-local): CpuSet reads this fixed word twice to clear the launch vector.
         u32 zero;
         s32 values[8];
     } buf;

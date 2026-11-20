@@ -6,7 +6,6 @@ struct Entry {
 struct Packet {
     u8 pad, type;
     u8 pad2[2];
-    // concession-ok(local-union): WirelessExchange_SendPacket writes the whole NI payload word, while the receiver also reads its timer and flags as halfwords.
     union {
         s32 word;
         struct {
