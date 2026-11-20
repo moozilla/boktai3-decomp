@@ -194,7 +194,8 @@ class Tree(unittest.TestCase):
                         path = Path(dirpath, f)
                         text = path.read_text(errors="replace")
                         if "concession-ok" in text:
-                            problems += c.lint(text, path.relative_to(ROOT), single_use=once)
+                            rel = path.relative_to(ROOT)
+                            problems += c.lint(text, rel, single_use=once, tree=c.literal_param_sites(rel, text))
         self.assertEqual(problems, [])
 
 
@@ -492,6 +493,132 @@ union Local {
         self.assertEqual(warns(good), [])
         self.assertEqual(c.lint(good), [])
         self.assertTrue(any("admission" in p for p in c.lint(bad)))
+
+
+class LiteralParam(unittest.TestCase):
+    """literal-param needs every call, so each case is a small tree on disk."""
+    HEADER = """static inline u32 WordFlags_Test(const u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+"""
+
+    def tree(self, files):
+        import tempfile
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        for sub in ("src", "include"):
+            os.makedirs(os.path.join(tmp.name, sub))
+        for rel, text in files.items():
+            Path(tmp.name, rel).write_text(text)
+        return tmp.name
+
+    def found(self, files):
+        return {rel: [(s.line, s.kind) for s in sites] for rel, sites in c.literal_params(self.tree(files)).items()}
+
+    def test_literal_at_every_call(self):
+        root = self.tree({
+            "include/word_flags.h": "#ifndef GUARD\n#define GUARD\n" + self.HEADER + "#endif\n",
+            "src/a.c": '#include "word_flags.h"\nvoid f(struct P *p) {\n    if (WordFlags_Test(&p->flags, 1))\n        g();\n}\n',
+            "src/b.c": '#include "word_flags.h"\nu32 h(struct P *p) {\n'
+                       "    return WordFlags_Test(&p->flags, FLAG_READY | 0x10) + WordFlags_Test(&p->flags, (u32)(1 << 4));\n}\n",
+        })
+        site, = c.literal_params(root)["include/word_flags.h"]
+        self.assertEqual(site, c.Site(3, "literal-param"))
+        self.assertEqual(c.literal_param_calls(site), 3)
+        self.assertEqual(site.note, "3 call sites, each with a constant for `mask`")
+        self.assertEqual(c.literal_params(root).get("src/a.c"), None)
+        self.assertEqual(c.warnings(c.literal_param_sites("include/word_flags.h", root=root)), [site])
+
+    def test_mask_set_and_shift_helpers(self):
+        files = {"src/a.c": """static inline void Set(u32 mask, u32 *flags)
+{
+    *flags |= mask;
+}
+static inline void Clear(struct P *p, u16 bits)
+{
+    p->flags &= ~bits;
+}
+static inline s32 Scale(s32 value, u32 shift)
+{
+    return value >> shift;
+}
+static inline void Store(struct P *p, u8 state)
+{
+    p->state = state;
+}
+void f(struct P *p) {
+    Set(4, &p->flags);
+    Clear(p, 0x100);
+    Store(p, 3);
+    p->x = Scale(p->x, 8);
+}
+"""}
+        self.assertEqual(self.found(files), {"src/a.c": [(1, "literal-param"), (5, "literal-param"),
+                                                         (9, "literal-param"), (13, "literal-param")]})
+
+    def test_a_variable_at_one_call_is_quiet(self):
+        caller = "void f(struct P *p, u32 m) {\n    WordFlags_Test(&p->flags, 1);\n    WordFlags_Test(&p->flags, %s);\n}\n"
+        for argument in ("m", "p->mask", "1 << m", "Mask(2)", "kMask"):
+            with self.subTest(argument=argument):
+                self.assertEqual(self.found({"src/a.c": self.HEADER + caller % argument}), {})
+        self.assertEqual(self.found({"src/a.c": self.HEADER + caller % "2"}), {"src/a.c": [(1, "literal-param")]})
+
+    def test_no_calls_is_quiet(self):
+        self.assertEqual(self.found({"include/word_flags.h": self.HEADER,
+                                     "src/a.c": "static inline u32 WordFlags_Test(const u32 *flags, u32 mask);\n"}), {})
+
+    def test_a_longer_body_is_quiet(self):
+        longer = """static inline u32 Test(struct P *p, u32 mask)
+{
+    u32 *flags = &p->flags;
+    u32 value = *flags;
+    return value & mask;
+}
+void f(struct P *p) {
+    Test(p, 1);
+}
+"""
+        self.assertEqual(self.found({"src/a.c": longer}), {})
+        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = *flags;\n", "").replace("value", "*flags")}),
+                         {"src/a.c": [(1, "literal-param")]})
+
+    def test_other_uses_of_the_parameter_are_quiet(self):
+        for body in ("return *flags + mask;", "return flags[mask];", "return *flags == mask;",
+                     "return Lookup(*flags, mask);", "return *flags & (mask - 1);", "u32 m = mask; return *flags & m;",
+                     "return *flags;"):
+            with self.subTest(body=body):
+                text = ("static inline u32 Test(u32 *flags, u32 mask)\n{\n    " + body + "\n}\n"
+                        "void f(u32 *p) {\n    Test(p, 1);\n}\n")
+                self.assertEqual(self.found({"src/a.c": text}), {})
+
+    def test_a_pointer_parameter_is_not_one(self):
+        text = "static inline u32 Read(u32 *flags)\n{\n    return *flags & 1;\n}\nvoid f(void) {\n    Read(0);\n}\n"
+        self.assertEqual(self.found({"src/a.c": text}), {})
+
+    def test_calls_belong_to_the_file_own_clone(self):
+        clone = "static inline u32 TestFlags(u32 *flags, u32 mask)\n{\n    return *flags & mask;\n}\n"
+        files = {
+            "src/a.c": clone + "void f(u32 *p) {\n    TestFlags(p, 1);\n}\n",
+            "src/b.c": clone + "void g(u32 *p, u32 m) {\n    TestFlags(p, m);\n}\n",
+            "include/shared.h": clone,
+            "include/other.h": clone,
+            "src/c.c": '#include "shared.h"\nvoid h(u32 *p) {\n    TestFlags(p, 8);\n}\n',
+            "src/d.c": '#include "other.h"\nvoid i(u32 *p, u32 m) {\n    TestFlags(p, m);\n}\n',
+        }
+        self.assertEqual(self.found(files), {"src/a.c": [(1, "literal-param")], "include/shared.h": [(1, "literal-param")]})
+
+    def test_comment_excuses_and_lint_checks_it(self):
+        allow = "// concession-ok(literal-param): the SDK header documents this accessor by name\n"
+        text = allow + self.HEADER + "void f(u32 *p) {\n    WordFlags_Test(p, 1);\n}\n"
+        root = self.tree({"src/a.c": text})
+        sites = c.literal_param_sites("src/a.c", text, root)
+        self.assertEqual(sites, [c.Site(2, "literal-param", True)])
+        self.assertEqual(c.warnings(sites), [])
+        self.assertEqual(c.lint(text, "src/a.c", tree=sites), [])
+        self.assertEqual(c.lint(text, "src/a.c"), [])  # without the tree pass there is nothing to check against
+        stale, = c.lint(text, "src/a.c", tree=[])
+        self.assertIn("has no literal-param", stale)
 
 
 class Compiler(unittest.TestCase):

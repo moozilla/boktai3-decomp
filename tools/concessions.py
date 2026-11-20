@@ -72,6 +72,15 @@ its spelling, so each one is a question, not a verdict:
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
+* `literal-param`: a `static inline` of at most two statements with an integer parameter that
+  is only a mask, a shift count or a stored value (an operand of `&`, `|`, `^`, `~` or a shift,
+  or assigned to a field or through a pointer) and that gets a literal or an ALL_CAPS constant
+  at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the parameter is
+  a local initialized to the literal, so this is `literal-local` moved into a helper, and as
+  weak: a real accessor of the original's looks the same. Reported at the definition with the
+  number of calls; a helper nobody calls, or one that gets a variable somewhere, is not
+  reported. It needs every call, so it comes from a pass over src and include
+  (`literal_params`), not from `sites`.
 
 Warnings don't lower a score. The order of work is errors to zero, then warnings to zero, adding
 none. A warning is silenced the way a linter's is, by a `concession-ok(kind): reason` comment, and
@@ -83,15 +92,16 @@ from __future__ import annotations
 
 import os
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 HARD = ("pin", "operand", "clobber", "barrier")
 EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatile", "alias", "cflags", "raw-offset")
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
+TREE = ("literal-param",)  # found by literal_params(), a pass over the whole tree, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
         "subtract-negative", "duplicate-branches", "placeholder-name", "volatile-view", "local-union",
-        "dead-local-update")
+        "dead-local-update") + TREE
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -195,6 +205,7 @@ class Site:
     line: int  # 1-based, in the text scanned
     kind: str
     excused: bool = False
+    note: str = field(default="", compare=False)  # detail for the report ("12 call sites, ...")
 
 
 def strip(text: str) -> str:
@@ -527,6 +538,212 @@ def compiler_sites(path, text=None) -> list[Site]:
     return [Site(line, kind, kind in ok.get(line, {})) for line, kind in sorted(seen)]
 
 
+_SCALAR_TYPE = (r"(?:(?:unsigned|signed)\s+)?(?:[us](?:8|16|32|64)|bool(?:8|16|32)|int|short|long|char)"
+                r"|unsigned|signed")
+_SCALAR_CAST = re.compile(r"\(\s*(?:const\s+)?(?:" + _SCALAR_TYPE + r")\s*\)")
+_SCALAR_PARAM = re.compile(r"\s*(?:const\s+)?(?:" + _SCALAR_TYPE + r")\s+(?:const\s+)?([A-Za-z_]\w*)\s*")
+_INLINE_DEF = re.compile(
+    r"(?m)^[ \t]*(?:static\s+(?:inline|__inline__)|inline\s+static)\b[^;{}()=]*?"
+    r"\b(?P<name>[A-Za-z_]\w*)\s*\((?P<params>[^(){};]*)\)\s*\{")
+_OPERATOR = r"<<=|>>=|[-+*/%&|^]=|&&|\|\||==|!=|<=|>=|<<|>>|\+\+|--|[-+*/%&|^~=<>!,?:\[;{}]"
+_OPERATOR_BEFORE = re.compile(r"(?:" + _OPERATOR + r")$")
+_OPERATOR_AFTER = re.compile(_OPERATOR)
+_BITWISE = ("&", "|", "^", "~", "<<", ">>")
+_STORE = ("=", "&=", "|=", "^=", "<<=", ">>=")
+# a call argument that is a constant: literals and ALL_CAPS names, joined by constant operators
+_CONSTANT_ARG = re.compile(r"(?:\s|[-+~*()|&^]|<<|>>|(?<![\w.])(?:" + _LITERAL.removeprefix("-?")
+                           + r"|[A-Z][A-Z0-9_]*)(?![\w.]))+")
+_DECLARED_ARG = re.compile(r"\s*(?:void|(?:const\s+|struct\s+|union\s+|enum\s+)*[A-Za-z_]\w*[\s*]+\**\s*[A-Za-z_]\w*)\s*")
+_INCLUDE = re.compile(r'(?m)^[ \t]*#[ \t]*include[ \t]+"([^"\n]+)"')
+_literal_params_cache: dict[str, dict[str, list[Site]]] = {}
+
+
+def _operand_use(body: str, start: int, end: int) -> bool:
+    """True when the operand at BODY[start:end] is only masked, shifted or stored: an operand of
+    `&`, `|`, `^`, `~` or a shift, or the value assigned to a field or through a pointer.
+    BODY has its member accesses (`->name`, `.name`) replaced by `@`s."""
+    i, before = start, None
+    while before is None:
+        head = body[:i].rstrip()
+        if head.endswith("("):  # look out through the parentheses around it
+            outer = head[:-1].rstrip()
+            word = re.search(r"\w+$", outer)
+            if word and word[0] not in ("if", "while", "return", "switch"):
+                return False  # an argument of a call
+            if word:
+                before = ""
+            i = len(head) - 1
+            continue
+        m = _OPERATOR_BEFORE.search(head)
+        before = m[0] if m else ""
+        if before in ("&", "*", "-", "+") and not re.search(r"[\w)\]@]$", head[:m.start()].rstrip()):
+            return False  # address-of, dereference or sign
+    tail = body[end:].lstrip()
+    closed = tail.startswith(")")
+    while tail.startswith(")"):
+        tail = tail[1:].lstrip()
+    m = _OPERATOR_AFTER.match(tail)
+    after = m[0] if m else ""
+    if before in _STORE:
+        statement = head[max(head.rfind(c) for c in ";{}") + 1:len(head) - len(before)]
+        if not re.search(r"@|\*|\[", statement):  # @: a member access, masked by the caller
+            return False  # a local or a parameter gets it
+    elif before not in _BITWISE + ("", ";", "{", "}", "!", "?", ":", "&&", "||"):
+        return False
+    if not closed and after not in _BITWISE + ("", ";", "?", ":", "&&", "||"):
+        return False
+    return before in _BITWISE + _STORE or (not closed and after in _BITWISE)
+
+
+def _inline_definitions(code: str):
+    """(name, offset, {parameter index: name}) for each static inline in CODE (comments blanked)
+    that literal-param could report: a short body and an integer parameter used only as a mask,
+    a shift count or a stored value."""
+    for m in _INLINE_DEF.finditer(code):
+        stop = _scope_end(code, m.end())
+        body = _SCALAR_CAST.sub("", _QUOTED.sub(_blank, code[m.end():stop]))
+        body = _MEMBER_ACCESS.sub(lambda access: "@" * len(access[0]), body)  # p->mask is not the parameter mask
+        if body.count(";") > 2:
+            continue
+        params = {}
+        for index, param in enumerate(m["params"].split(",")):
+            scalar = _SCALAR_PARAM.fullmatch(param)
+            if not scalar:
+                continue
+            uses = list(re.finditer(r"\b%s\b" % re.escape(scalar[1]), body))
+            if uses and all(_operand_use(body, use.start(), use.end()) for use in uses):
+                params[index] = scalar[1]
+        if params:
+            yield m["name"], m.start("name"), params
+
+
+def _arguments(code: str, start: int):
+    """(arguments, offset after the `)`) of the call whose `(` is at CODE[start - 1], or (None, start)."""
+    depth, last, out = 0, start, []
+    for token in _DECL_PUNCT.finditer(code, start):
+        char = token[0]
+        if char in "([{":
+            depth += 1
+        elif char in ")]}":
+            if not depth:
+                out.append(code[last:token.start()])
+                return (out, token.end()) if char == ")" else (None, start)
+            depth -= 1
+        elif char == "," and not depth:
+            out.append(code[last:token.start()])
+            last = token.end()
+        elif char == ";" and not depth:
+            break
+    return None, start
+
+
+def literal_params(root=None) -> dict[str, list[Site]]:
+    """{path relative to ROOT: [Site(line, "literal-param", note="N call sites, ..."), ...]} for src and
+    include (excused is not set here; literal_param_sites does that for one file).
+
+    A call belongs to the definition in its own file when there is one (per-object clones share
+    names), otherwise to the headers of that name the file includes."""
+    from pathlib import Path
+    root = Path(root or Path(__file__).resolve().parent.parent)
+    if str(root) in _literal_params_cache:
+        return _literal_params_cache[str(root)]
+    texts = {}
+    for sub in ("src", "include"):
+        for path in sorted((root / sub).rglob("*.[ch]")):
+            texts[path.relative_to(root).as_posix()] = path.read_text(errors="replace")
+    definitions: dict[str, dict[str, list]] = {}  # name -> file -> [(offset, params)]
+    for rel, text in texts.items():
+        if "inline" not in text or is_library(rel):
+            continue
+        code = strip(text)
+        for name, offset, params in _inline_definitions(code):
+            definitions.setdefault(name, {}).setdefault(rel, []).append((offset, params))
+    called = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+    calls: dict[tuple[str, str], list] = {}  # (name, file) -> [arguments or None, ...]
+    defines: set[tuple[str, str]] = set()  # (name, file): the file has its own function of that name
+    for rel, text in texts.items():
+        names = definitions.keys() & set(called.findall(text))
+        if not names:
+            continue
+        code = _QUOTED.sub(_blank, strip(text))
+        for m in re.finditer(r"\b(" + "|".join(sorted(names)) + r")\s*\(", code):
+            arguments, end = _arguments(code, m.end())
+            if arguments is not None and code[end:end + 200].lstrip().startswith("{"):
+                defines.add((m[1], rel))
+            elif arguments is None or not all(_DECLARED_ARG.fullmatch(a) for a in arguments):  # not a prototype
+                calls.setdefault((m[1], rel), []).append(arguments)
+
+    direct: dict[str, list[str]] = {}
+    reached: dict[str, set] = {}
+
+    def reach(rel):
+        """REL and every project header it includes, directly or not."""
+        if rel not in reached:
+            found, queue = {rel}, [rel]
+            while queue:
+                current = queue.pop()
+                if current not in direct:
+                    direct[current] = [target for name in _INCLUDE.findall(texts[current]) for target in (
+                        "include/" + name, os.path.normpath(os.path.join(os.path.dirname(current), name)))
+                        if target in texts]
+                for target in direct[current]:
+                    if target not in found:
+                        found.add(target)
+                        queue.append(target)
+            reached[rel] = found
+        return reached[rel]
+
+    out: dict[str, list[Site]] = {}
+    for name, files in definitions.items():
+        headers = [rel for rel in files if rel.endswith(".h")]
+        received: dict[str, list] = {rel: [] for rel in files}
+        for (called, rel), found in calls.items():
+            if called != name:
+                continue
+            if rel in files:
+                owners = [rel]
+            elif (name, rel) in defines:
+                continue  # another function of the same name
+            else:
+                owners = [h for h in headers if h in reach(rel)] or headers
+            for owner in owners:
+                received[owner] += found
+        for rel, sites_ in files.items():
+            code = None
+            for offset, params in sites_:
+                found = received[rel]
+                constant = [p for i, p in params.items() if found and all(
+                    a is not None and i < len(a) and re.search(r"\w", a[i])
+                    and _CONSTANT_ARG.fullmatch(_SCALAR_CAST.sub("", a[i])) for a in found)]
+                if constant:
+                    code = code if code is not None else strip(texts[rel])
+                    out.setdefault(rel, []).append(Site(
+                        _line(code, offset), "literal-param",
+                        note=f"{len(found)} call site{'s' if len(found) != 1 else ''}, each with a constant"
+                             f" for `{'`, `'.join(constant)}`"))
+    _literal_params_cache[str(root)] = out
+    return out
+
+
+def literal_param_calls(site: Site) -> int:
+    """The number of calls a literal-param site's note counts."""
+    return int(re.match(r"(\d+) call site", site.note)[1])
+
+
+def literal_param_sites(path, text=None, root=None) -> list[Site]:
+    """The literal-param sites of PATH (relative to the tree), with TEXT's concession-ok comments
+    applied. The calls come from the tree on disk."""
+    rel = str(path).replace("\\", "/")
+    found = literal_params(root).get(rel, [])
+    if not found:
+        return []
+    if text is None:
+        from pathlib import Path
+        text = (Path(root or Path(__file__).resolve().parent.parent) / rel).read_text(errors="replace")
+    ok = allows(text)
+    return [Site(s.line, s.kind, s.kind in ok.get(s.line, {}), s.note) for s in found]
+
+
 def warnings(found) -> list[Site]:
     """The unexcused warning sites."""
     return [s for s in found if s.kind in WARN and not s.excused]
@@ -551,9 +768,11 @@ def score(body: str, lines_with_concessions: int) -> float:
     return min(round(100 * (1 - lines_with_concessions / n), 1), 99.9)
 
 
-def lint(text: str, path=None, *, single_use=frozenset(), compiler=None) -> list[str]:
+def lint(text: str, path=None, *, single_use=frozenset(), compiler=None, tree=None) -> list[str]:
     """Problems with TEXT's concession-ok comments: unknown kinds, kinds no comment can excuse,
-    a missing reason, or a comment with nothing to excuse."""
+    a missing reason, or a comment with nothing to excuse. COMPILER and TREE are the file's
+    compiler_sites and literal_param_sites; without them a comment for one of those kinds is
+    not checked for something to excuse."""
     problems = []
     used: dict[int, set[str]] = {}
     for s in sites(text, path, single_use=single_use, kinds=EXCUSABLE + WARN):
@@ -564,7 +783,7 @@ def lint(text: str, path=None, *, single_use=frozenset(), compiler=None) -> list
     code = strip(text)
     for m in _ALIAS.finditer(code):
         used.setdefault(_line(code, m.start()), set()).add("alias")
-    for s in compiler or ():
+    for s in [*(compiler or ()), *(tree or ())]:
         used.setdefault(s.line, set()).add(s.kind)
     for m in _ALLOW.finditer(text):
         line = _line(text, m.start())
@@ -577,8 +796,8 @@ def lint(text: str, path=None, *, single_use=frozenset(), compiler=None) -> list
                 problems.append(f"{where}: {k} is never the original's C, so no comment excuses it")
             elif k not in EXCUSABLE + WARN:
                 problems.append(f"{where}: unknown concession kind {k!r} (one of {', '.join(EXCUSABLE + WARN)})")
-            elif k in COMPILER and compiler is None:
-                pass  # only a compile can say whether there is one here
+            elif k in COMPILER and compiler is None or k in TREE and tree is None:
+                pass  # only a compile, or a pass over the tree, can say whether there is one here
             elif k not in used.get(line, set()) | used.get(line + 1, set()):
                 problems.append(f"{where}: concession-ok({k}) has no {k} on this line or the next to excuse")
         if len(m.group(2)) < 10:
@@ -619,6 +838,7 @@ def main(argv=None) -> int:
                  if f.suffix == ".c" and f.resolve().is_relative_to(root) and not is_library(f.resolve().relative_to(root))]
         with ThreadPoolExecutor(8) as pool:
             list(pool.map(deadcode.unit, units))
+    use_tree = not args.errors_only and (not args.kind or any(k in TREE for k in args.kind))
     totals: dict[str, int] = {}
     for f in files:
         text = f.read_text(errors="replace")
@@ -627,7 +847,9 @@ def main(argv=None) -> int:
         found = sites(text, rel, single_use=once)
         flags = cflags(text, rel)
         compiled = compiler_sites(rel, text) if use_compiler else None
-        for s in sorted(found + (compiled or []), key=lambda s: (s.line, s.kind)) + ([flags] if flags else []):
+        params = literal_param_sites(rel, text, root) if use_tree else None
+        for s in sorted(found + (compiled or []) + (params or []), key=lambda s: (s.line, s.kind)) \
+                + ([flags] if flags else []):
             if s.excused or s.kind in TRACKED or (args.kind and s.kind not in args.kind):
                 continue
             level = "warning" if s.kind in WARN else "error"
@@ -635,8 +857,10 @@ def main(argv=None) -> int:
                 continue
             totals[s.kind] = totals.get(s.kind, 0) + 1
             if not args.summary:
-                print(f"{rel}:{s.line}: {level} [{s.kind}] {lines[s.line - 1].strip()[:100] if 0 < s.line <= len(lines) else ''}")
-        for problem in lint(text, rel, single_use=once, compiler=compiled if f.suffix == ".c" else None):
+                print(f"{rel}:{s.line}: {level} [{s.kind}] "
+                      f"{lines[s.line - 1].strip()[:100] if 0 < s.line <= len(lines) else ''}"
+                      + (f"  ({s.note})" if s.note else ""))
+        for problem in lint(text, rel, single_use=once, compiler=compiled if f.suffix == ".c" else None, tree=params):
             totals["bad-ignore"] = totals.get("bad-ignore", 0) + 1
             if not args.summary:
                 print(f"{problem.split(': ', 1)[0]}: error [bad-ignore] {problem.split(': ', 1)[1]}")
