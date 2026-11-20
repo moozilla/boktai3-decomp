@@ -1,5 +1,14 @@
 #include "registry_actor.h"
 
+enum {
+    REGISTRY_ACTOR_UPDATE_FALL = 0x10,
+};
+
+static inline void RegistryActor_SetUpdateFlags(u16 bits, struct RegistryActor *actor)
+{
+    actor->control.updateFlags |= bits;
+}
+
 s32 ActorMotion_UpdateDampedFall(struct RegistryActor *actor)
 {
     struct RegistryActor *motion = actor;
@@ -28,23 +37,24 @@ void ActorMotion_UpdateFallFrame(struct RegistryActor *actor)
         RegistryA8CB_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
-    {
-        u16 bit = 0x10;
-        actor->control.updateFlags |= bit;
-    }
+    RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
     ActorMotion_UpdateDampedFall(actor);
     forwardSpeed = actor->stats.motion.forward + actor->stats.boost;
     actor->stats.motion.vertical += 0x200;
     if (actor->stats.knockbackTimer > 0) {
         actor->stats.movementOffset += actor->stats.knockback.forward;
-        actor->stats.knockback.forward += Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
-        actor->stats.knockback.vertical += Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
-        actor->stats.knockback.lateral += Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
+        actor->stats.knockback.forward +=
+            Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
+        actor->stats.knockback.vertical +=
+            Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
+        actor->stats.knockback.lateral +=
+            Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
         actor->stats.knockbackTimer--;
     } else {
         Memory_Clear(&actor->stats.knockback.forward, 16);
     }
-    motion->stats.position.stepX = forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
+    motion->stats.position.stepX =
+        forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
     motion->stats.position.stepY = motion->stats.motion.vertical + motion->stats.knockback.vertical;
     motion->stats.position.stepZ = motion->stats.motion.lateral + motion->stats.knockback.lateral;
     displacementX = (motion->stats.movementOffset - motion->stats.relativeOrigin[0]) >> 12;
@@ -66,7 +76,8 @@ void ActorMotion_UpdateFallFrame(struct RegistryActor *actor)
     Terrain_ResolveActorMotion(motion);
     verticalNonnegative = (u32) ~(motion->stats.verticalClearance >> 12) >> 31;
     horizontalNonnegative = (u32) ~(motion->stats.height >> 12) >> 31;
-    if (motion->stats.terrainState != motion->stats.previousTerrainState && (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) &&
+    if (motion->stats.terrainState != motion->stats.previousTerrainState &&
+        (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) &&
         horizontalNonnegative <= 1 && verticalNonnegative == 1) {
         s32 v = ((motion->stats.motion.forward >> 10) + (motion->stats.boost >> 8)) >> 1;
         if (v < 4)
@@ -103,23 +114,24 @@ void SceneActor_UpdateFallState(struct RegistryActor *actor)
         Trigger_ConsumePending(actor->control.messages, 1);
         actor->resetKeys = 0;
     }
-    {
-        u16 bit = 0x10;
-        actor->control.updateFlags |= bit;
-    }
+    RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
     ActorMotion_UpdateDampedFall(actor);
     forwardSpeed = actor->stats.motion.forward + actor->stats.boost;
     actor->stats.motion.vertical += 0x200;
     if (actor->stats.knockbackTimer > 0) {
         actor->stats.movementOffset += actor->stats.knockback.forward;
-        actor->stats.knockback.forward += Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
-        actor->stats.knockback.vertical += Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
-        actor->stats.knockback.lateral += Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
+        actor->stats.knockback.forward +=
+            Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
+        actor->stats.knockback.vertical +=
+            Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
+        actor->stats.knockback.lateral +=
+            Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
         actor->stats.knockbackTimer--;
     } else {
         Memory_Clear(&actor->stats.knockback.forward, 0x10);
     }
-    motion->stats.position.stepX = forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
+    motion->stats.position.stepX =
+        forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
     motion->stats.position.stepY = motion->stats.motion.vertical + motion->stats.knockback.vertical;
     motion->stats.position.stepZ = motion->stats.motion.lateral + motion->stats.knockback.lateral;
     dx = (motion->stats.movementOffset - motion->stats.relativeOrigin[0]) >> 12;
@@ -141,8 +153,9 @@ void SceneActor_UpdateFallState(struct RegistryActor *actor)
     Terrain_ResolveActorMotion(motion);
     verticalNonnegative = (u32) ~(motion->stats.verticalClearance >> 12) >> 31;
     horizontalNonnegative = (u32) ~(motion->stats.height >> 12) >> 31;
-    if (motion->stats.terrainState != motion->stats.previousTerrainState && (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) && horizontalNonnegative <= 1 &&
-        verticalNonnegative == 1) {
+    if (motion->stats.terrainState != motion->stats.previousTerrainState &&
+        (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) &&
+        horizontalNonnegative <= 1 && verticalNonnegative == 1) {
         s32 v = ((motion->stats.motion.forward >> 10) + (motion->stats.boost >> 8)) >> 1;
         if (v < 4)
             v = 4;
@@ -164,13 +177,6 @@ void SceneActor_UpdateFallState(struct RegistryActor *actor)
     actor->fallTimer++;
 }
 
-static inline void RegistryActor_BeginMotion(struct RegistryActor *actor, void (*fn)(struct RegistryActor *))
-{
-    actor->resetKeys = 1;
-    actor->control.update = fn;
-    actor->fallTimer = 0;
-}
-
 void SceneActor_UpdateKnockbackFall(struct RegistryActor *actor)
 {
     struct RegistryActor *motion = actor;
@@ -185,23 +191,24 @@ void SceneActor_UpdateKnockbackFall(struct RegistryActor *actor)
         RegistryA8CB_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
-    {
-        u16 bit = 0x10;
-        actor->control.updateFlags |= bit;
-    }
+    RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
     finished = ActorMotion_UpdateDampedFall(actor) != 0;
     forwardSpeed = actor->stats.motion.forward + actor->stats.boost;
     actor->stats.motion.vertical += 0x200;
     if (actor->stats.knockbackTimer > 0) {
         actor->stats.movementOffset += actor->stats.knockback.forward;
-        actor->stats.knockback.forward += Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
-        actor->stats.knockback.vertical += Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
-        actor->stats.knockback.lateral += Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
+        actor->stats.knockback.forward +=
+            Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
+        actor->stats.knockback.vertical +=
+            Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
+        actor->stats.knockback.lateral +=
+            Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
         actor->stats.knockbackTimer--;
     } else {
         Memory_Clear(&actor->stats.knockback, 0x10);
     }
-    motion->stats.position.stepX = forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
+    motion->stats.position.stepX =
+        forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
     motion->stats.position.stepY = motion->stats.motion.vertical + motion->stats.knockback.vertical;
     motion->stats.position.stepZ = motion->stats.motion.lateral + motion->stats.knockback.lateral;
     dx = (motion->stats.movementOffset - motion->stats.relativeOrigin[0]) >> 12;
@@ -223,7 +230,8 @@ void SceneActor_UpdateKnockbackFall(struct RegistryActor *actor)
     Terrain_ResolveActorMotion(motion);
     verticalNonnegative = (u32) ~(motion->stats.verticalClearance >> 12) >> 31;
     horizontalNonnegative = (u32) ~(motion->stats.height >> 12) >> 31;
-    if (motion->stats.terrainState != motion->stats.previousTerrainState && (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) &&
+    if (motion->stats.terrainState != motion->stats.previousTerrainState &&
+        (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) &&
         (u32)horizontalNonnegative <= 1 && verticalNonnegative == 1) {
         s32 t = ((motion->stats.motion.forward >> 10) + (motion->stats.boost >> 8)) >> 1;
         if (t < 4)
@@ -244,7 +252,7 @@ void SceneActor_UpdateKnockbackFall(struct RegistryActor *actor)
     CharacterModel_UpdateAccessoryAnimations(&actor->model);
     if (finished == 1) {
         Trigger_ConsumePending(actor->control.messages, 1);
-        RegistryActor_BeginMotion(actor, ActorPhysics_UpdateFallMotion);
+        RegistryActor_StartMotion(actor, ActorPhysics_UpdateFallMotion);
     } else {
         actor->fallTimer++;
     }
@@ -261,18 +269,18 @@ void ActorPhysics_UpdateFallMotion(struct RegistryActor *actor)
         RegistryA8CB_SetKeyframes(actor, 1);
         actor->resetKeys = 0;
     }
-    {
-        u16 bit = 0x10;
-        actor->control.updateFlags |= bit;
-    }
+    RegistryActor_SetUpdateFlags(REGISTRY_ACTOR_UPDATE_FALL, actor);
     ActorMotion_UpdateDampedFall(actor);
     forwardSpeed = actor->stats.motion.forward + actor->stats.boost;
     actor->stats.motion.vertical += 0x200;
     if (actor->stats.knockbackTimer > 0) {
         actor->stats.movementOffset += actor->stats.knockback.forward;
-        actor->stats.knockback.forward += Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
-        actor->stats.knockback.vertical += Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
-        actor->stats.knockback.lateral += Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
+        actor->stats.knockback.forward +=
+            Div(-actor->stats.knockback.forward, actor->stats.knockbackTimer);
+        actor->stats.knockback.vertical +=
+            Div(-actor->stats.knockback.vertical, actor->stats.knockbackTimer);
+        actor->stats.knockback.lateral +=
+            Div(-actor->stats.knockback.lateral, actor->stats.knockbackTimer);
         actor->stats.knockbackTimer--;
     } else {
         Memory_Clear(&actor->stats.knockback.forward, 0x10);
@@ -280,9 +288,12 @@ void ActorPhysics_UpdateFallMotion(struct RegistryActor *actor)
     {
         s32 *pprevZ, *pprevX, *pvz, *px, *py;
         s32 forwardLimit;
-        motion->stats.position.stepX = forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
-        motion->stats.position.stepY = motion->stats.motion.vertical + motion->stats.knockback.vertical;
-        motion->stats.position.stepZ = motion->stats.motion.lateral + motion->stats.knockback.lateral;
+        motion->stats.position.stepX =
+            forwardSpeed + motion->stats.movementOffset - motion->stats.relativeOrigin[0];
+        motion->stats.position.stepY =
+            motion->stats.motion.vertical + motion->stats.knockback.vertical;
+        motion->stats.position.stepZ =
+            motion->stats.motion.lateral + motion->stats.knockback.lateral;
         dx = (motion->stats.movementOffset - motion->stats.relativeOrigin[0]) >> 12;
         dz = (motion->stats.position.z - motion->stats.relativeOrigin[2]) >> 12;
         forwardLimit = 0x3000;
@@ -302,7 +313,9 @@ void ActorPhysics_UpdateFallMotion(struct RegistryActor *actor)
         Terrain_ResolveActorMotion(motion);
         verticalNonnegative = (u32) ~(motion->stats.verticalClearance >> 12) >> 31;
         horizontalNonnegative = (u32) ~(motion->stats.height >> 12) >> 31;
-        if (motion->stats.terrainState != motion->stats.previousTerrainState && (motion->stats.terrainState & 0x1000) && !(motion->stats.previousTerrainState & 0xF000) && horizontalNonnegative <= 1 &&
+        if (motion->stats.terrainState != motion->stats.previousTerrainState &&
+            (motion->stats.terrainState & 0x1000) &&
+            !(motion->stats.previousTerrainState & 0xF000) && horizontalNonnegative <= 1 &&
             verticalNonnegative == 1) {
             s32 v = ((motion->stats.motion.forward >> 10) + (motion->stats.boost >> 8)) >> 1;
             if (v < 4)
