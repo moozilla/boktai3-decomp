@@ -1271,18 +1271,14 @@ void Golem_UpdateChargeRecovery(struct ChaseActor *actor)
             return;
         }
     } else {
-        u8 *counter = &context->charge.settleFrames;
-        u32 value = *counter + 1;
-        u32 zero = 0;
-        *counter = value;
-        if ((u8)value > 15) {
+        if (++context->charge.settleFrames > 15) {
             context->charge.stopPosition = context->charge.routePosition;
             Golem_AlignChargeTarget(context);
             context->charge.savedDirection = context->charge.routeDirection;
             actor->base.body.direction = context->charge.routeDirection;
             actor->base.stepDone = 1;
-            *counter = zero;
-            context->charge.speed = zero;
+            context->charge.settleFrames = 0;
+            context->charge.speed = 0;
             return;
         }
     }
