@@ -1,24 +1,21 @@
-#include "global.h"
-struct Task {
-    u8 pad0[0x16];
-    u8 active;
-};
-void *Task_Create(int, int);
-void Task_SetCallbacks(void *, void *, void *);
-int WirelessTradeMenu_Update(void *);
-int WirelessTradeMenu_Destroy(void *);
-int WirelessTradeMenu_InitFromScript(void *);
-void Task_Kill(void *);
-struct Task *WirelessTradeMenu_Create(void)
+#include "engine.h"
+#include "wireless_trade_menu.h"
+
+int WirelessTradeMenu_Update(struct WirelessGameExchange *);
+u32 WirelessTradeMenu_Destroy(struct WirelessGameExchange *);
+int WirelessTradeMenu_InitFromScript(struct WirelessGameExchange *);
+
+struct WirelessGameExchange *WirelessTradeMenu_Create(void)
 {
-    struct Task *p = Task_Create(2, 276);
-    if (p) {
-        Task_SetCallbacks(p, WirelessTradeMenu_Update, WirelessTradeMenu_Destroy);
-        if (WirelessTradeMenu_InitFromScript(p) < 0) {
-            Task_Kill(p);
+    struct WirelessGameExchange *menu = Task_Create(2, sizeof(*menu));
+    if (menu) {
+        Task_SetCallbacks(menu, (void (*)(void *))WirelessTradeMenu_Update,
+                          (void (*)(void *))WirelessTradeMenu_Destroy);
+        if (WirelessTradeMenu_InitFromScript(menu) < 0) {
+            Task_Kill(menu);
             return 0;
         }
-        p->active = 1;
+        menu->task.unk16 = 1;
     }
-    return p;
+    return menu;
 }
