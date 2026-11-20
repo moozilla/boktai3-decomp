@@ -347,7 +347,7 @@ static inline void SetHalf(struct ChaseActor *a, u16 mask)
 
 void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
 {
-    u8 *group = (u8 *)&a->group.common;
+    struct SceneActorChaseGroup *group = &a->group;
     u16 *speed;
     if (SceneActorReaction_TakePrepared(a)) {
         SceneActorAttachment_ReplaceResponseSlot(a, 0, 127, 0);
@@ -358,7 +358,7 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 1);
     a->base.field2C2 = Div(64, 6);
     speed = &a->base.field2C2;
-    if (!*(u16 *)(group + 0x1F0)) {
+    if (!group->field5C4) {
         a->base.stepDone = 1;
         SceneActorAnimation_SelectDirectionalEntry((void *)a, 6);
         Mummy_ResetMotionState(a);
@@ -370,10 +370,7 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
             s32 mask = ~0x30;
             *p &= mask;
         }
-        {
-            u32 mask = 16;
-            a->base.behaviorFlags |= mask;
-        }
+        SceneActorChase_SetActorFlags(a, 16);
         *speed = 64;
     }
 }
