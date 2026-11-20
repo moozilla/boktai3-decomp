@@ -31,8 +31,7 @@ inline static u8 TakeFlag(u8 *p)
 
 static inline u32 Flags16(struct ChaseActor *a, u32 m)
 {
-    u32 off = 0x2D4;
-    return *(u16 *)((u8 *)a + off) & m;
+    return a->base.motionFlags & m;
 }
 
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -83,7 +82,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
     s32 values[8];
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u16 script;
     if (TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
@@ -93,7 +92,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
         {
-            struct SceneActorRegistryControl *control = (void *)(group + 0x4C);
+            struct SceneActorRegistryControl *control = &group->control;
             u32 *field = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *field &= mask;
@@ -103,7 +102,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         }
         Sound_PlaySong(0x13E);
         {
-            u16 *flags = (u16 *)((u8 *)actor + 0x13A);
+            u16 *flags = &actor->base.colliderA.flags;
             u32 value = *flags;
             u32 m = 4;
             m |= value;
@@ -155,35 +154,10 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
             category == 0x18 || category == 0x19)
             Sound_PlaySong(0xE5);
     }
-    {
-        void *callback = (void *)SceneActorControl_OnIdle;
-        u32 kind = 16;
-        u32 zero;
-        u32 one;
-        u8 *ready = &actor->base.field2B2;
-        zero = 0;
-        one = 1;
-        *ready = one;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = zero;
-        {
-            u32 *field = &actor->base.pendingControlFlags;
-            s32 clear = ~1;
-            *field &= clear;
-        }
-        actor->base.pendingControl = zero;
-        {
-            u32 behavior = 2;
-            actor->base.state2A8 = one;
-            actor->base.phase2A9 = zero;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = zero;
-            actor->base.field2B1 = one;
-        }
-    }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
+    SceneActorChase_SelectState(actor, 1, 0, 2);
+    SceneActorChase_ResetStateEntry(actor);
+    ActorShadow_Disable(actor->base.shadow);
     if (!*((u8 *)actor + 8))
         **(u32 **)((u8 *)actor + 4) |= 1;
     else {
@@ -339,8 +313,7 @@ static inline u8 Golem_Arrive(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
@@ -445,8 +418,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         SceneActorChase_ClearMotionFlags(actor, 0x2020);
         SceneActorChase_SetActorFlags(actor, 0x10);
         group->destination->pad = 0;
-        actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         if (!Golem_Arrive(object)) {
             if (!Golem_TryRoute(object, group->route, &actor->base.body.position,
                                 &actor->base.tracking.target->position)) {
@@ -503,8 +475,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         GolemReaction_LatchHitReact(object);
         if (!actor->base.tracking.target)
             return 0;
-        actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         SceneActorChase_SetActorFlags(actor, 0x80);
         SceneActorChase_GroupSetFlags(group, 4);
         if (!Golem_Arrive(object)) {
@@ -522,8 +493,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
         GolemReaction_LatchHitReact(object);
         if (!actor->base.tracking.target)
             return 0;
-        actor->base.tracking.target =
-            &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+        actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
         actor->base.body.direction = actor->base.tracking.heading;
         group->destination->pad = 1;
         if (!Golem_Arrive(object)) {
@@ -665,8 +635,7 @@ static inline u8 Golem_Arrive_ResumeDelayedRoute(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
