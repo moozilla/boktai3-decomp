@@ -4,16 +4,11 @@ s32 StageIconDisplay_Destroy(struct StageIconDisplay *display)
     struct ProjectedDisplayEntry *indicator;
     s32 i;
     Anim_Remove(&display->icon);
-    indicator = display->indicators;
-    i = 2;
-    do {
+    for (i = 0; i < 3; i++) {
+        indicator = &display->indicators[i];
         if (indicator->registered)
             Anim_Remove(indicator);
-        indicator++;
-    } while (--i >= 0);
-    {
-        u32 zero = 0;
-        gStageIconDisplay = (void *)zero;
     }
+    gStageIconDisplay = 0;
     return 0;
 }
