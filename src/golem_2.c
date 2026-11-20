@@ -1,6 +1,5 @@
 #include "golem.h"
 #include "scene_actor_behavior.h"
-#include "golem_2.h"
 #include "script_utility.h"
 #include "engine.h"
 #include "player.h"
@@ -756,13 +755,11 @@ s32 Golem_TickFacingQuadrant(struct Golem *a)
 
 s32 Golem_UpdateEffectsAndContacts(struct Golem *actor)
 {
-    struct GolemState *state = actor->chase.base.context;
-    u32 m = 0x40;
-    if (!(actor->chase.base.motionFlags & m)) {
-        u16 *p = &state->shakeTimer6AE;
-        if (*p != 0) {
-            Camera_RequestShake(state->shakeStrength6AC);
-            *p = *p - 1;
+    struct Golem *state = actor->chase.base.context;
+    if (!(SceneActorChase_QueryMotionFlags(&actor->chase, 0x40))) {
+        if (state->shakeTimer != 0) {
+            Camera_RequestShake(state->shakeStrength);
+            state->shakeTimer--;
         }
     }
     Skeleton_TryTriggerAction(actor);
