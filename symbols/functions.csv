@@ -321,6 +321,7 @@ addr,name,mode,confidence,source,notes
 0800F1BC,StatusScreen_Destroy,thumb,low,src-alias,
 0800F220,StatusScreen_Initialize,thumb,low,src-alias,
 0800F474,StatusScreen_Open,thumb,low,src-alias,"creates the status screen task, wires StatusScreen_Update/Destroy as its callbacks, and runs StatusScreen_Initialize with the given id"
+0800F4B8,NumericOverlay_ClearActive,thumb,low,src-alias,Clears the active numeric overlay pointer
 0800F4C4,NumericOverlay_GetTileMapPtr,thumb,low,src-alias,"Returns a pointer into gUnk_03004C30[bg]'s tilemap at column x/row y; identical helper to status_screen.c's StatusScreen_GetTilePtr, duplicated here for the over"
 0800F6B0,NumericOverlay_RefreshDisplay,thumb,low,src-alias,"Forces a full redraw by setting s->dirty to 0xf, calling the draw routine sub_0800F4EC, then clearing dirty; already referenced via the NumericOverlay"
 0800F6E0,NumericOverlay_Update,thumb,low,src-alias,Task update callback wired via Task_SetCallbacks; just forwards to NumericOverlay_RefreshDisplay and returns its result.

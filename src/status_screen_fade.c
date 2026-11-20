@@ -3,8 +3,6 @@
 #include "engine.h"
 #include "numeric_overlay.h"
 #include "ram.h"
-/* NumericOverlay_ClearActive: sets gNumericOverlay (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
-#define NumericOverlay_ClearActive sub_0800F4B8
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
@@ -299,7 +297,7 @@ void *StatusScreen_Open(u32 arg)
     return obj;
 }
 
-void sub_0800F4B8(void)
+void NumericOverlay_ClearActive(void)
 {
     gNumericOverlay = 0;
 }
