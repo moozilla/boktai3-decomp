@@ -80,6 +80,13 @@ static inline void f(void)
                          [c.Site(1, "volatile"), c.Site(5, "volatile")])
         self.assertEqual(c.sites(source, kinds=("pin",)), [])
 
+    def test_volatile_value_parameters(self):
+        self.assertEqual(kinds("void f(volatile int value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(u8 *out, volatile s32 value) { use(out, value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(vu16 value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(volatile u16 *reg) { use(*reg); }"), [])
+        self.assertEqual(kinds("int f(int value) { return (volatile u32 const)value; }"), [])
+
     def test_volatile_typedef_allow_and_library_rules(self):
         source = "void f(void) {\n    // concession-ok(volatile): the DMA fill source must be stored in memory\n    vu32 zero = 0;\n}\n"
         self.assertEqual(c.sites(source), [c.Site(3, "volatile", True)])

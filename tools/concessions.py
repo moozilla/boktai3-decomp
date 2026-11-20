@@ -11,7 +11,7 @@ Scored kinds, in two groups:
   `asm("" ::: "memory")`).
 * Judgment calls: `debug-nop` (DEBUG_NOP()), `empty-loop` (`do { } while (0)`), `empty-if`
   (an `if` with nothing in its body), `single-use-macro` (a statement macro used at one site,
-  tools/statement_macros.py), `volatile` (a volatile local, including the `vu32`/`vs16`
+  tools/statement_macros.py), `volatile` (a volatile local or by-value parameter, including the `vu32`/`vs16`
   family of typedefs, a `T *volatile` or a
   `(volatile T *)&x` cast), `alias` (an `extern ... asm("Symbol")` declaration that gives a
   function a second prototype), `cflags` (a `// CFLAGS:` line other than the default flags,
@@ -100,7 +100,8 @@ _REGEX = {
     # an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
     "empty-if": re.compile(r"\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)"),
     "volatile": re.compile(
-        r"(?<![(*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+\s+(?:const\s+)?\w+\s*[=;,\[]"
+        r"(?<![*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+"
+        r"\s+(?:const\s+)?(?!(?:const|volatile|restrict)\b)\w+\s*[=;,\[)]"
         r"|\*\s*volatile\b"
         r"|\(\s*(?:volatile\s+(?:const\s+)?\w+|v[us](?:8|16|32))\s*\*\s*\)\s*&\s*(?!REG_)"),
     "goto": re.compile(r"\bgoto\b"),
@@ -140,7 +141,8 @@ _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
 _COMMENTS = re.compile(r'"(?:\\.|[^"\\\n])*"|/\*.*?\*/|//[^\n]*', re.S)
 _VOLATILE_TYPEDEF = re.compile(
-    r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?[A-Za-z_]\w*\s*[=;,\[]")
+    r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?"
+    r"(?!(?:const|volatile|restrict)\b)[A-Za-z_]\w*\s*[=;,\[)]")
 _FUNCTION_BODY = re.compile(r"[A-Za-z_][\w\s\*]*?\b\w+\s*\([^;{]*\)\s*\{", re.S)
 _FUNCTION_MACRO = re.compile(r"#\s*define\s+\w+\(")
 
