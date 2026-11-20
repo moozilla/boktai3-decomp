@@ -119,10 +119,8 @@ u32 Player_ConsumeStateEntry(struct Player *player)
 
 void Player_SetActionPhase(struct Player *player, u8 phase)
 {
-    u8 *currentPhase = &player->tetherPhase;
-    u16 firstFrame = 0;
-    *currentPhase = phase;
-    player->tetherFrame = firstFrame;
+    player->tetherPhase = phase;
+    player->tetherFrame = 0;
 }
 
 void Player_SetPendingCallback(struct Player *player, void (*callback)(struct Player *))
