@@ -714,8 +714,7 @@ void Crow_InitActionTable(struct ChaseActor *actor)
 
 void Crow_BeginScriptedAction(struct ChaseActor *actor)
 {
-    u32 zero = SceneActor_ActionsBlocked(actor);
-    if (zero == 0 && (*(u8 **)gPlayers)) {
+    if (!SceneActor_ActionsBlocked(actor) && gPlayers[0]) {
         struct Crow *p = actor->base.context;
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetState(actor, 0, 0, 3);
@@ -1030,11 +1029,9 @@ static inline u8 Crow_GetReactionTracking(struct ChaseActor *actor,
 void Crow_BeginReaction(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *extra;
-    u32 zero;
     if (SceneActorChase_QueryMotionFlagComponent(actor, 0x100))
         return;
-    zero = Crow_GetReactionTracking(actor, &extra);
-    if (zero == 0) {
+    if (!Crow_GetReactionTracking(actor, &extra)) {
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         SceneActorChase_SetState(actor, 0, 0, 3);
         {
@@ -1340,16 +1337,9 @@ void Crow_ApproachPlayerThenRecoil(struct ChaseActor *actor)
         actor->base.body.direction = Math_Atan2(delta.x, delta.z);
         body->vectors[2].x = Crow_ShiftMotion(
             gUnk_086149C4[(actor->base.body.direction + 64) & 255] * body->distance, 12);
-        {
-            s32 depth =
-                Crow_ShiftMotion(gUnk_086149C4[actor->base.body.direction] * body->distance, 12);
-            {
-                typeof(body->vectors[2].z) *q1 = &(body->vectors[2].z);
-                u32 z1 = 0;
-                *q1 = depth;
-                body->vectors[2].y = z1;
-            }
-        }
+        body->vectors[2].z =
+            Crow_ShiftMotion(gUnk_086149C4[actor->base.body.direction] * body->distance, 12);
+        body->vectors[2].y = 0;
         if (body->vectors[2].x)
             body->vectors[2].x = Div(delta.x, body->vectors[2].x);
         if (body->vectors[2].z)
