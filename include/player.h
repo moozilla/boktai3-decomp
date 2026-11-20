@@ -296,7 +296,9 @@ struct Player {
     u8 unk461[3];
     u8 actionLatch464, actionLatch465;
     u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
-    u8 unk467[4];
+    u8 colliderHeightTarget, colliderHeightRetargetTimer; /* 0x467: hover target and frames until resampling */
+    u8 unk469;
+    u8 footstepSide; /* 0x46A: alternates the walking effect and sound */
     u8 movementMode46B;
     u8 unk46C[6];
     u8 timedEventSlot; /* 0x472: index into GameState counters620/counters628 */
