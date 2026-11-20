@@ -1,5 +1,6 @@
 #include "scene_effect_schedule.h"
 #include "engine.h"
+#include "player.h"
 #include "game_state.h"
 #include "ram.h"
 
@@ -56,12 +57,9 @@ struct SceneEffectScheduleEntry *SceneEffectSchedule_Allocate(struct SceneEffect
 
 s32 Div(s32, s32);
 
-static inline s32 Scale(s32 input)
+static inline s32 SceneEffectSchedule_ScaleDuration(s16 value)
 {
-    s32 value = input;
-    u32 flags = gEngineFlags;
-    u32 mask = 0x800;
-    if (flags & mask)
+    if (gEngineFlags & 0x800)
         return value;
     return Div((10 - gGameState->unk876) * value, 10);
 }
@@ -80,14 +78,14 @@ s32 SceneEffectSchedule_Tick(struct SceneEffectSchedule *manager)
     }
     {
         u32 mask = 4;
-        if (gUnk_02000560 & mask)
+        if (gPlayerSlotStatus[0] & mask)
             return 0;
     }
     entry = initial;
     for (i = 11; i >= 0; entry++, i--) {
         if (entry->effect && (s16)entry->effect->slot < 0) {
-            s32 scale = Scale(entry->scaleValue);
-            s32 random = Scale(entry->randomValue);
+            s32 scale = SceneEffectSchedule_ScaleDuration(entry->scaleValue);
+            s32 random = SceneEffectSchedule_ScaleDuration(entry->randomValue);
             entry->effect = SceneScheduledEffect_Create(
                 &entry->position, entry->id, scale, entry->kind, entry->style, -1, entry->offset.x,
                 entry->offset.y, entry->offset.z, random, entry->flags);
@@ -135,18 +133,6 @@ static inline u32 Random(void)
     return *(u16 *)(offset + RANDOM_TABLE_ADDR);
 }
 
-static inline s32 scaleByDifficulty(s32 value)
-{
-    return Div((10 - gGameState->unk876) * value, 10);
-}
-
-static inline s32 scaleUnlessFlagged(s32 value)
-{
-    if (gEngineFlags & 0x800)
-        return value;
-    return scaleByDifficulty(value);
-}
-
 /* Registry routine FD6B: schedules a scene effect (unless engine flag 0x400 is
    set): -p position, -a vector, -f kind then a random delay in [min, max), -n,
    -d, -t time, -s; time and delay shrink with game state +0x876 unless engine
@@ -192,8 +178,8 @@ void SceneEffectSchedule_AddFromScript(void)
     entry->flags = 0;
     if (Script_GetKeywordValue('s', 0))
         entry->flags = 1;
-    time = scaleUnlessFlagged(entry->scaleValue);
-    delay = scaleUnlessFlagged(entry->randomValue);
+    time = SceneEffectSchedule_ScaleDuration(entry->scaleValue);
+    delay = SceneEffectSchedule_ScaleDuration(entry->randomValue);
     entry->effect = SceneScheduledEffect_Create(&entry->position, entry->id, time, entry->kind,
                                                 entry->style, -1, entry->offset.x, entry->offset.y,
                                                 entry->offset.z, delay, entry->flags);
