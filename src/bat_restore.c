@@ -644,6 +644,14 @@ static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
     return r->table;
 }
 
+static inline u16 Bat_ReadDefeatMotionFlags(struct ChaseActor *actor, u16 mask, u16 **field)
+{
+    u16 *flags = &actor->base.motionFlags;
+    u16 value = *flags & mask;
+    *field = flags;
+    return value;
+}
+
 void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
@@ -736,11 +744,9 @@ void Bat_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         Script_Call(script, &arguments);
     }
     {
-        u32 mask = 0x4000;
         u16 *flags;
         u16 masked;
-        u32 test = actor->base.motionFlags & mask;
-        flags = &actor->base.motionFlags;
+        u32 test = Bat_ReadDefeatMotionFlags(actor, 0x4000, &flags);
         if (!test && (u32)(actor->base.category - 11) > 2)
             Bestiary_UnlockEntry(
                 Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
