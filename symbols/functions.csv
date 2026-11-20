@@ -272,6 +272,7 @@ addr,name,mode,confidence,source,notes
 0800C954,DamageController_Destroy,thumb,low,src-alias,Removes the controller's collider; set as the Task_SetCallbacks destroy callback alongside DamageController_Update
 0800C964,DamageController_Initialize,thumb,low,src-alias,
 0800CB60,DamageController_Create,thumb,low,src-alias,"Allocates a task, wires DamageController_Update/Destroy as its callbacks, and calls DamageController_Initialize, killing the task on init failure"
+0800CBA0,FallingObjectManager_ClearGlobal,thumb,low,src-alias,Clear the falling object manager pointer.
 0800CBAC,FallingObject_ReceiveHit,thumb,low,src-alias,collider hit callback wired via Collider_SetCallback in FallingObject_Create; applies (possibly doubled) damage to health for type-0 objects
 0800CBDC,FallingObject_ReceiveAttackHit,thumb,low,src-alias,empty collider hit callback wired to the object's attack hitbox via Collider_SetCallback; intentionally does nothing
 0800CBE0,FallingObjectManager_AddObject,thumb,low,src-alias,"inserts a FallingObject at the head of the manager's linked list, called from FallingObject_Create"
