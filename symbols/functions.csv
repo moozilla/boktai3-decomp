@@ -1446,12 +1446,15 @@ addr,name,mode,confidence,source,notes
 0803962C,WirelessGame_TryAddCyclingItem,thumb,low,src-alias,Processes a one-shot item award and cycles the selected item type after success
 080396D8,WirelessGame_NotifyPlayerDefeated,thumb,low,src-alias,Sets flag at offset 0x2D from player-related callers; defeat interpretation tentative
 080396F0,WirelessGame_NotifyOpponentDefeated,thumb,low,src-alias,Sets flag at offset 0x2E from an opponent-related caller; defeat interpretation tentative
+08039708,WirelessGame_ConsumePendingEvent,thumb,low,src-alias,Returns and clears the pending wireless event flag.
 0803972C,WirelessGame_GetRemotePlayerHealthPercent,thumb,low,src-alias,Reads received health percentage at offset 0x4C for the link display
 08039744,WirelessGame_GetRemoteOpponentHealthPercent,thumb,low,src-alias,Reads received opponent health percentage at offset 0x4D for the link display
 0803975C,WirelessGame_IsItemToggleEnabled,thumb,low,src-alias,Returns the flag that enables toggling the local item mode
 08039774,WirelessGame_ToggleItemMode,thumb,low,src-alias,Toggles the local item-entry flag when enabled and plays feedback sound
 080397AC,WirelessGame_GetRoundCount,thumb,low,src-alias,Returns the round counter used by the round announcement display
+080397C0,WirelessGame_SuppressPlayerReset,thumb,low,src-alias,Sets the engine flag used by player reset checks. Interpretation tentative.
 080397D4,WirelessGame_AddWeightedScore,thumb,low,src-alias,Adds the selected score weight multiplied by the supplied amount
+08039800,WirelessGame_IsRoundActive,thumb,low,src-alias,Tests whether the wireless menu is in its active round phase.
 0803981C,WirelessGame_ResetCyclingItemLatch,thumb,low,src-alias,Clears the counter that gates the one-shot cycling item award
 08039834,WirelessGame_InitDisplayAndLinkCallbacks,thumb,low,src-alias,Resets item display state and creates the display task before registering link callbacks
 08039870,WirelessGame_RestartSession,thumb,low,src-alias,Resets the controller to state 1 and initializes its display and link callbacks
@@ -1461,10 +1464,12 @@ addr,name,mode,confidence,source,notes
 08039968,WirelessGameItem_SetRandomNegativeArcVelocity,thumb,low,src-alias,Sets arc velocity to the negative of a base plus masked random magnitude
 08039998,WirelessGameItems_ApplyMotionWave,thumb,low,src-alias,Adds a table-based wave offset to both coordinates during item movement
 080399D4,WirelessGameItems_UpdateHiddenItem,thumb,low,src-alias,Hides the item sprite and drawing on state entry
+080399F4,WirelessGameItems_UpdateSteadyItem,thumb,low,src-alias,Draws the item count at its resting position and starts the next animation.
 08039C24,WirelessGameItems_UpdateBlinkingItem,thumb,low,src-alias,Blinks the item for ten ticks before clearing its count
 08039CB0,WirelessGameItems_UpdateItemMerge,thumb,low,src-alias,Animates an item into its destination slot and merges capped counts
 08039DE4,WirelessGameItems_UpdateOutgoingItem,thumb,low,src-alias,Animates an item from its slot toward the upper right before clearing it
 08039EEC,WirelessGameItems_UpdateIncomingItem,thumb,low,src-alias,Animates an incoming item into its slot and credits current or pending counts
+0803A068,WirelessGameItems_UpdateScatteredItem,thumb,low,src-alias,Updates an item thrown from the remote side with a randomized direction.
 0803A238,WirelessGameItems_UpdateTemporaryItem,thumb,low,src-alias,Displays an item for 32 ticks before returning it to the hidden state
 0803A2A8,WirelessGameItems_InitItem,thumb,low,src-alias,Initializes one item sprite and drawing with its indexed animation
 0803A350,WirelessGameItems_DestroyItem,thumb,low,src-alias,Removes one item's sprite and animation

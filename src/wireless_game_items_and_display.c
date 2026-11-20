@@ -93,9 +93,8 @@ void WirelessGame_NotifyOpponentDefeated(void)
 
 /* WirelessGame_ConsumePendingEvent: Returns and clears the pending event flag at offset 0x30 */
 
-#define WirelessGame_ConsumePendingEvent sub_08039708
 
-u32 sub_08039708(void)
+u32 WirelessGame_ConsumePendingEvent(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
     u8 *flag;
@@ -169,9 +168,8 @@ u32 WirelessGame_GetRoundCount(void)
 
 /* WirelessGame_SuppressPlayerReset: Sets global flag 0x1000 which suppresses a player reset call; interpretation tentative */
 
-#define WirelessGame_SuppressPlayerReset sub_080397C0
 
-void sub_080397C0(void)
+void WirelessGame_SuppressPlayerReset(void)
 {
     gEngineFlags |= 0x1000;
 }
@@ -192,9 +190,8 @@ void WirelessGame_AddWeightedScore(int index, int amount)
 
 /* WirelessGame_IsRoundActive: Tests whether the controller is in gameplay state 7 */
 
-#define WirelessGame_IsRoundActive sub_08039800
 
-u32 sub_08039800(void)
+u32 WirelessGame_IsRoundActive(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
     if (p == NULL || p->state != 7)
@@ -406,7 +403,7 @@ static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSpr
     *(struct WirelessGamePair *)&sprite->x = drawing->position.words;
 }
 
-void sub_080399F4(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
+void WirelessGameItems_UpdateSteadyItem(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
 {
     if (p->entered) {
         p->entered = 0;
@@ -746,7 +743,7 @@ static inline void WirelessGameItem_SetDrift(struct ContactPosition *drift, int 
     drift->z = 0;
 }
 
-void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
+void WirelessGameItems_UpdateScatteredItem(struct WirelessGameItems *owner, struct WirelessGameItem *p, int index)
 {
     struct WirelessGameDrawing *drawing = &p->drawing;
     struct WirelessGameSprite *sprite = &p->sprite;
