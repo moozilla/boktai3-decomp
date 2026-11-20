@@ -21,13 +21,9 @@ s32 Countdown_Tick(struct CountdownTask *task)
         if (done) {
             if (gPlayers[0]->tetherMode != 0x18) {
                 Player_EnterKindFour(gPlayers[0]);
-                {
-                    u8 *transition = &gPlayers[0]->tetherMode;
-                    s32 zero = 0;
-                    *transition = 0x24;
-                    gPlayers[0]->tetherPhase = zero;
-                    gPlayers[0]->tetherFrame = zero;
-                }
+                gPlayers[0]->tetherMode = 0x24;
+                gPlayers[0]->tetherPhase = 0;
+                gPlayers[0]->tetherFrame = 0;
                 Task_Kill(task);
             }
         }
@@ -45,8 +41,10 @@ s32 Countdown_InitializeFromScript(struct CountdownTask *task, u32 script, u32 c
     s32 *q = &gGameState->unk618;
     if (*q <= 0)
         *q = 1;
-    /* Script values are narrowed through the signed halfword representation. */
-    *(s16 *)&task->interval = Script_SeekToKeyword('s') ? Script_GetValue() : 30;
+    if (Script_SeekToKeyword('s'))
+        task->interval = Script_GetValue();
+    else
+        task->interval = 30;
     task->frame = 0;
     Hud_UpdateCountdownDisplay(gGameState->unk618, gGameState->unk61C, 0);
     return 0;

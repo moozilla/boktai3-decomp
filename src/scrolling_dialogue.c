@@ -210,28 +210,23 @@ int ScrollingDialogue_OnTaskDestroy(struct ScrollingDialogue *dialogue)
 int ScrollingDialogue_Init(struct ScrollingDialogue *dialogue)
 {
     struct MessagePlaybackState *text;
-    int zero;
     gScrollingDialogue = (void *)dialogue;
     text = &dialogue->text;
-    {
-        u8 *active = &dialogue->active;
-        zero = 0;
-        *active = zero;
-    }
-    dialogue->showRequest = zero;
-    dialogue->hideRequest = zero;
-    dialogue->frames = zero;
-    dialogue->row = zero;
-    dialogue->column = zero;
+    dialogue->active = 0;
+    dialogue->showRequest = 0;
+    dialogue->hideRequest = 0;
+    dialogue->frames = 0;
+    dialogue->row = 0;
+    dialogue->column = 0;
     TextState_Init(text, 0, 18, 2, 2);
-    text->unknown14 = zero;
+    text->unknown14 = 0;
     dialogue->script = gUnk_086056D0;
     text->pc = gUnk_086056D0;
     ScrollingDialogue_ResetPlayback(dialogue, 0);
-    text->spacing = zero;
+    text->spacing = 0;
     text->skip = 1;
-    dialogue->ticks = zero;
-    gDialogueScrollOffset = zero;
+    dialogue->ticks = 0;
+    gDialogueScrollOffset = 0;
     return 0;
 }
 

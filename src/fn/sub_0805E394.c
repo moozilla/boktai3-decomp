@@ -9,15 +9,11 @@ void SceneInput_GetGridPosition(struct SceneInputPosition *position, s32 index)
             position->y = row * 24 + 32;
         }
     } else if (index <= 23) {
-        s32 column;
-        index -= 16;
-        column = 3;
-        column &= index;
+        s32 slot = index - 16;
+        s32 column = slot & 3;
         position->x = column * 24 + 8;
-        do {
-            index >>= 2;
-            position->y = index * 24 + 32;
-        } while (0);
+        slot >>= 2;
+        position->y = slot * 24 + 32;
     } else if (index == 24) {
         position->x = 216;
         position->y = 104;

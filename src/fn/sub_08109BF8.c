@@ -1,26 +1,23 @@
 #include "global.h"
 
-struct P {
-    u8 f[0x84];
-    u16 a[2];
-    u16 b[2];
-    u8 g[0x94 - 0x8c - 0];
-    u32 c;
-    u32 d[2];
+/* Transfer bookkeeping prefix for the Registry1745 session. */
+struct Registry1745TransferState {
+    u8 unknown0[0x84];
+    u16 counters84[2];
+    u8 unknown88[4];
+    u16 counters8C[2];
+    u8 unknown90[4];
+    u32 counter94;
+    u32 counters98[2];
 };
 
-void Registry1745_ResetTransferCounters(struct P *p)
+void Registry1745_ResetTransferCounters(struct Registry1745TransferState *transfer)
 {
-    u32 z = 0;
-    u32 *d = p->d;
-    u16 *a = p->a;
-    s32 i = 1;
-    do {
-        *a = z;
-        a[4] = z;
-        *d++ = z;
-        a++;
-        i--;
-    } while (i >= 0);
-    p->c = 0;
+    s32 i;
+    for (i = 0; i < 2; i++) {
+        transfer->counters84[i] = 0;
+        transfer->counters8C[i] = 0;
+        transfer->counters98[i] = 0;
+    }
+    transfer->counter94 = 0;
 }

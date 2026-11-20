@@ -8349,26 +8349,34 @@ def c_change(base_lines, path):
     return f"lines {lo}-{hi} (+{plus} -{minus})" if lo != hi else f"line {lo} (+{plus} -{minus})"
 
 
-def is_snippet(base_lines, text, func):
+def is_snippet(base_lines, text, func, canonical_names=None):
     """Is TEXT a `put` snippet rather than a whole copy of the workspace: it lacks a function or
     INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines. A static helper
-    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count."""
+    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count.
+    Known address labels and their inventory names refer to the same function."""
     base = "\n".join(base_lines)
+    canonical_names = canonical_names or {}
 
     def defined(t):
-        return (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
-                | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
-    if (defined(base) - {func}) - defined(text):
+        names = (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
+                 | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
+        return {canonical_names.get(name, name) for name in names}
+
+    if (defined(base) - {canonical_names.get(func, func)}) - defined(text):
         return True
     return bool(re.search(r"^#include", base, re.M)) and not re.search(r"^#include", text, re.M)
 
 
 def cmd_try(src, func, variants, env):
     """Score each variant (a whole-file .c, or one KNOB=V) through the fork server, best first."""
+    import progress
+
     t0 = time.perf_counter()
     base_n, base_info = score(src, func, env)
     rows = []
     base_lines = open(os.path.join(ROOT, src)).read().splitlines()
+    functions, _ = progress.load_functions()
+    canonical_names = {f"sub_{addr:08X}": name for name, addr in functions}
     for v in variants:
         if "=" in v and not v.endswith(".c"):
             k, val = v.split("=", 1)
@@ -8386,7 +8394,7 @@ def cmd_try(src, func, variants, env):
         if not os.path.isfile(path):
             rows.append((None, rel, "source file not found", "missing file", {}))
             continue
-        if is_snippet(base_lines, open(path).read(), func):
+        if is_snippet(base_lines, open(path).read(), func, canonical_names):
             # a snippet (FUNC and what it needs, as `put` takes) is scored as the workspace with it put in
             import contextlib
             import io

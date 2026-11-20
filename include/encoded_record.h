@@ -18,4 +18,5 @@ struct EncodedAlternateRecordFields {
 void EncodedRecord_WriteBits(u8 *, s32, u32 *, s32, s32);
 u32 EncodedRecord_ReadBits(const u8 *, u32 *, s32, s32);
 void EncodedRecord_XorRange(u8 *, s32, s32, u32, s32, u32);
+void EncodedRecord_DecodeAlternateFields(struct EncodedAlternateRecordFields *, u8 *, s32);
 #endif

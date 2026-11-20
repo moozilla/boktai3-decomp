@@ -15,7 +15,7 @@ void Camera_SetPosition(const void *);
 void ScenePanel_DispatchCommands(struct ScenePanel *);
 void ScenePanel_UnregisterReceiver(struct ScenePanel *);
 void ScenePanel_RegisterReceiver(struct ScenePanel *);
-void sub_0805C754(void);
+void ScenePanel_ClearGlobal(void);
 u32 ScenePanel_IsPresent(void);
 void ScenePanel_SelectMode(struct ScenePanel *);
 s32 ScenePanel_CountActiveSubjects(struct ScenePanel *);

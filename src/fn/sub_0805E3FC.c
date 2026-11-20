@@ -1,26 +1,16 @@
 #include "scene_input.h"
 void SceneInput_InitMarkerPair(struct SceneInputPair *pair)
 {
-    struct {
-        u32 first, second;
-    } position;
+    struct ContactPosition position;
     struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x5D04);
-    struct SceneInputWidget *widget;
-    s32 remaining;
-    u32 zero;
+    s32 i;
     pair->resource = *resource;
     ResourceHeader_Relocate(pair, resource);
     {
-        u32 mask = 0xFFFF0000;
-        position.first = 0;
-        position.second &= mask;
+        position.x = 0;
+        position.y = 0;
+        position.z = 0;
     }
-    zero = 0;
-    widget = pair->widgets;
-    remaining = 1;
-    do {
-        Widget_InitLinked(widget, pair, 0, 0x31, zero, zero, 60, &position);
-        widget++;
-        remaining--;
-    } while (remaining >= 0);
+    for (i = 0; i < 2; i++)
+        Widget_InitLinked(&pair->widgets[i], pair, 0, 0x31, 0, 0, 60, &position);
 }

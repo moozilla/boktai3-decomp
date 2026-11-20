@@ -1,5 +1,5 @@
 #include "scene_panel_rig.h"
-void ScenePanelRig_ApplyContact(struct SceneRigContact *source, struct SceneRigContact *target,
+void ScenePanelRig_ApplyContact(struct ContactCollider *source, struct ContactCollider *target,
                                 struct ScenePanelRig *input)
 {
     u32 reactionMask = 0x7F;
@@ -9,11 +9,11 @@ void ScenePanelRig_ApplyContact(struct SceneRigContact *source, struct SceneRigC
         u32 flags, mask;
         rig->contactDirection = source->direction;
         Sound_PlaySong(243);
-        force = source->power - target->power;
+        force = source->unknown3C - target->unknown3C;
         if (force < 0)
             force = 0;
         mask = 1;
-        flags = source->typeFlags;
+        flags = source->statRewardFlags;
         if (flags & mask) {
             rig->contactForce = force + 20;
             rig->contactEffect = 32;

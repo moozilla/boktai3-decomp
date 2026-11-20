@@ -60,16 +60,13 @@ void SceneHud_DrawCenteredMeter(s32 count)
     u32 offset = 0;
     const u16 *selected = gUnk_0824DEC0;
     do {
-        u16 tile;
-        if ((i >= start) && (i < end)) {
-            tile = *(const u16 *)(offset + (u32)selected);
-        } else {
-            tile = *empty;
-        }
-        do {
-            *cell++ = tile;
+        if (i >= start && i < end) {
+            *cell++ = *(const u16 *)(offset + (u32)selected);
             empty++;
-        } while (0);
+        } else {
+            *cell++ = *empty;
+            empty++;
+        }
         offset += 2;
         i++;
     } while (i <= 7);
@@ -192,11 +189,12 @@ void SceneHud_ShowFourDigits(struct SceneInputPanel *parent, const struct Contac
 
 void SceneHud_HideFourDigits(struct SceneInputPanel *parent)
 {
-    struct SceneInputWidget *widget = &parent->numericLabel;
-    u32 hidden = 1;
-    s32 remaining = 4;
+    u8 *body = (u8 *)parent;
+    u8 *entry = body + ((u8 *)&parent->numericLabel - body);
+    s32 i = 0;
     do {
-        widget->flags |= hidden;
-        widget++;
-    } while (--remaining >= 0);
+        struct SceneInputWidget *widget = (void *)entry;
+        widget->flags |= 1;
+        entry += sizeof(*widget);
+    } while (++i < 5);
 }

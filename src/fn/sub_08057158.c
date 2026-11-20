@@ -36,46 +36,41 @@ void LevelAdvanceDisplay_UpdateAnimation(struct LevelAdvanceManager *manager)
     kindValue = *kind;
     kindCache = kind;
     if (kindValue == 1) {
-        struct LevelAdvanceParticle *particle;
         s32 i;
-        u32 zero;
-        u16 *frame = &manager->frame;
-        particle = manager->particles;
-        for (i = 7; i >= 0; i--) {
+        for (i = 0; i < 8; i++) {
+            struct LevelAdvanceParticle *particle = &manager->particles[i];
             if (particle->active)
                 LevelAdvanceDisplay_UpdateParticle(particle, manager->particleResource);
-            particle++;
         }
-        if (*frame < 64 && !(*frame & 3))
-            LevelAdvanceDisplay_StartParticle(&manager->particles[(*frame >> 2) & 7]);
+        if (manager->frame < 64 && !(manager->frame & 3))
+            LevelAdvanceDisplay_StartParticle(&manager->particles[(manager->frame >> 2) & 7]);
         {
-            u32 next = *frame + 1;
-            zero = 0;
-            *frame = next;
+            u32 next = manager->frame + 1;
+            manager->frame = next;
         }
         manager->sprite.position.world = gPlayers[0]->position;
-        if (*frame < 120) {
+        if (manager->frame < 120) {
             {
                 struct LevelAdvanceSprite *sprite = &manager->sprite;
-                sprite->frame = zero;
+                sprite->frame = 0;
             }
-            if (*frame < 5) {
-                manager->sprite.position.world.y += 250 + *frame * 30;
+            if (manager->frame < 5) {
+                manager->sprite.position.world.y += 250 + manager->frame * 30;
             } else {
-                if (*frame < 20)
+                if (manager->frame < 20)
                     LevelAdvanceDisplay_Shake(manager);
                 manager->sprite.position.world.y += 400;
             }
-        } else if (*frame < 123) {
+        } else if (manager->frame < 123) {
             manager->sprite.position.world.y += 400;
             manager->sprite.frame = 1;
-        } else if (*frame < 126) {
+        } else if (manager->frame < 126) {
             manager->sprite.position.world.y += 400;
             manager->sprite.frame = 2;
         } else {
             manager->sprite.flags |= 1;
-            manager->active = zero;
-            *kindCache = zero;
+            manager->active = 0;
+            *kindCache = 0;
         }
     } else if (kindValue == 2) {
         manager->frame++;

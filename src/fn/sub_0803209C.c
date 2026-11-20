@@ -5,12 +5,9 @@ void Text_FormatDecimal(u8 *buffer, volatile int value)
     int started = 0;
     u8 *out = buffer;
     int digit;
-    int zero = 0;
-    u8 *q = buffer + 11;
-    do {
-        *q = zero;
-        q--;
-    } while ((s32)q >= (s32)buffer);
+    int i;
+    for (i = 0; i < 12; i++)
+        buffer[i] = 0;
     if (value < 0) {
         *out = '-';
         out++;

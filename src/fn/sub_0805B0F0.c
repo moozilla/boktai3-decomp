@@ -1,3 +1,4 @@
+#include "monster_particle_random.h"
 #include "scene_panel_rig_setup.h"
 
 void ScenePanel_InitRig(struct ScenePanel *input)
@@ -29,14 +30,14 @@ void ScenePanel_InitRig(struct ScenePanel *input)
         u32 *seed;
         {
             u32 first, second;
-            /* Allocation-only: fold the bounded offset after constant-equivalence analysis. */
-            table = (const u16 *)((u32)gRandomTable + (rig->state >> 16));
+            table = gRandomTable;
             seed = &gRandomIndex;
             first = *seed + 1;
             mask = 1023;
             first &= mask;
             {
-                u32 sample = table[first];
+                u32 sample;
+                PARTICLE_RANDOM_READ_SAMPLE(sample, table, first);
                 sample &= 15;
                 rate = sample + 8;
             }

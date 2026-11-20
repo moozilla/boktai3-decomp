@@ -3,6 +3,7 @@
 #include "area_effect_link.h"
 #include "scrolling_dialogue.h"
 #include "runtime.h"
+#include "script_utility.h"
 
 void TextWindow_StartPlayback(s32);
 
@@ -26,7 +27,7 @@ void CharacterModel_UpdatePairedAnimations(void *, s32);
 
 void CharacterModel_RemoveAnimations(void *);
 
-void PaletteFade_CycleMenuColors(void *);
+void PaletteFade_CycleMenuColors(struct CharacterPaletteCycle *cycle);
 
 void Bg_SetLayerMap(u32, void *, u16);
 
@@ -54,20 +55,20 @@ void ModifierMenu_InitSelectionSnapshot(void *, void *);
 
 extern const u8 gUnk_0860654C[];
 
-static inline u8 TestSel(struct SelectionPanel *panel)
+static inline u8 SelectionPanel_IsEntryUnlocked(struct SelectionPanel *panel)
 {
     if (StateFlags_TestIndexedFlag(SelectionPanel_GetSelection(panel)))
         return 1;
     return 0;
 }
 
-static inline u32 LinkActive(void)
+static inline u32 SelectionPanel_GetLinkModeFlag(void)
 {
     u32 mask = 0x800;
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
 
-static inline void Refresh(struct SelectionPanel *panel)
+static inline void SelectionPanel_RefreshBackgroundOnEntry(struct SelectionPanel *panel)
 {
     if (panel->entering) {
         Bg_SetLayerMap(3, panel->backgroundResource, 1);
@@ -103,8 +104,8 @@ void SelectionPanel_InitEntryIds(struct SelectionPanel *panel)
     panel->entryIds[5] = 0x21;
     panel->entryIds[6] = 0x26;
     {
-        u32 mask = 0x800;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+
+        if (SelectionPanel_GetLinkModeFlag())
             panel->entryIds[1] = 0x20;
         else
             panel->entryIds[1] = 0x1f;
@@ -137,8 +138,8 @@ void SelectionPanel_InitializeWidgets(struct SelectionPanel *panel)
                           1, 0, 0, 0);
         panel->cachedIds[i] = 0xFFFF;
         {
-            u32 mask = 0x800;
-            if ((gEngineFlags | gScenePauseFlags) & mask)
+
+            if (SelectionPanel_GetLinkModeFlag())
                 panel->widgets[i].flags |= 1;
         }
     }
@@ -180,8 +181,8 @@ void SelectionPanel_InitPreview(struct SelectionPanel *panel)
     struct SceneInputPackedPosition pos;
     u8 *base, *sprite;
     u32 frame;
-    u32 mask = 0x800;
-    u32 flags = (gEngineFlags | gScenePauseFlags) & mask;
+
+    u32 flags = SelectionPanel_GetLinkModeFlag();
     if (flags) {
         struct AreaEffectLinkState *source = gLinkSession;
         u8 *values;
@@ -217,14 +218,9 @@ void SelectionPanel_InitPreview(struct SelectionPanel *panel)
 
 void SelectionPanel_HideDisplayObjects(struct SelectionPanel *panel)
 {
-    u32 m = 1;
-    u32 *q = &panel->widgets[0].flags;
-    s32 i = 9;
-    do {
-        *q |= m;
-        q += sizeof(panel->widgets[0]) / sizeof(*q);
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 10; i++)
+        panel->widgets[i].flags |= 1;
     CharacterModel_SetAnimationFlags(&panel->preview.model, 1);
 }
 
@@ -375,7 +371,6 @@ void SelectionPanel_Close(struct SelectionPanel *panel)
 
 void SelectionPanel_CommitSelection(struct SelectionPanel *panel)
 {
-    unsigned int two;
     struct AreaEffectLinkState *context = gLinkSession;
     if (context && context->unavailable == 1) {
         if (&context->exchangeValue) {
@@ -384,8 +379,7 @@ void SelectionPanel_CommitSelection(struct SelectionPanel *panel)
             if (*column > 4) {
                 u32 offset;
                 gRandomIndex = (gRandomIndex + 1) & 1023;
-                two = 2;
-                offset = gRandomIndex * two;
+                offset = gRandomIndex * 2;
                 *column = Mod(*(const u16 *)(offset + (u32)((const u16 *)0x0203B400)), 5);
             }
             /* This protocol writes only the low byte of the shared exchange word. */
@@ -397,7 +391,7 @@ void SelectionPanel_CommitSelection(struct SelectionPanel *panel)
 void SelectionPanel_RunSelectionScript(struct SelectionPanel *panel)
 {
     s32 value;
-    struct SelectionPanelScriptArgs args;
+    struct ScriptUtilityArguments args;
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_HideImmediately();
     Bg_ClearTilemap(0);
@@ -410,13 +404,7 @@ void SelectionPanel_RunSelectionScript(struct SelectionPanel *panel)
         args.count = 1;
         args.values = &value;
         Script_Call(panel->selectionScript, &args);
-        {
-            void (*update)(struct SelectionPanel *) = SelectionPanel_OnTransitionIdle;
-            u32 state = 3;
-            panel->update = update;
-            panel->entering = 1;
-            panel->state = state;
-        }
+        SelectionPanel_SetState(panel, SelectionPanel_OnTransitionIdle, SELECTION_PANEL_SCRIPT);
     }
 }
 
@@ -431,13 +419,7 @@ void SelectionPanel_RunCancelScript(struct SelectionPanel *panel)
     SelectionPanel_HideDisplayObjects(panel);
     if (panel->cancelScript) {
         Script_Call(panel->cancelScript, 0);
-        {
-            void (*update)(struct SelectionPanel *) = SelectionPanel_OnTransitionIdle;
-            u32 state = 3;
-            panel->update = update;
-            panel->entering = 1;
-            panel->state = state;
-        }
+        SelectionPanel_SetState(panel, SelectionPanel_OnTransitionIdle, SELECTION_PANEL_SCRIPT);
     }
 }
 
@@ -462,7 +444,7 @@ void SelectionPanel_UpdateConfirmTransition(struct SelectionPanel *panel)
         *flag = 0;
     }
     CharacterModel_UpdatePairedAnimations(&panel->preview.model, 0);
-    PaletteFade_CycleMenuColors(panel->paletteCycle.colors);
+    PaletteFade_CycleMenuColors(&panel->paletteCycle);
     Palette_UpdateHighlightPulse(&panel->widgetPalette[12], &panel->pulseFrame);
     if (panel->timer <= 31)
         ++panel->timer;
@@ -479,7 +461,7 @@ void SelectionPanel_UpdateCancelTransition(struct SelectionPanel *panel)
         *flag = 0;
     }
     CharacterModel_UpdatePairedAnimations(&panel->preview.model, 0);
-    PaletteFade_CycleMenuColors(panel->paletteCycle.colors);
+    PaletteFade_CycleMenuColors(&panel->paletteCycle);
     Palette_UpdateHighlightPulse(&panel->widgetPalette[12], &panel->pulseFrame);
     if (panel->timer <= 31)
         ++panel->timer;
@@ -494,10 +476,9 @@ void SelectionPanel_OnTransitionIdle(void)
 void SelectionPanel_UpdateInput(struct SelectionPanel *panel)
 {
     void (*cb)(struct SelectionPanel *);
-    u8 one;
-    Refresh(panel);
+    SelectionPanel_RefreshBackgroundOnEntry(panel);
     CharacterModel_UpdatePairedAnimations(&panel->preview.model, 0);
-    PaletteFade_CycleMenuColors(panel->paletteCycle.colors);
+    PaletteFade_CycleMenuColors(&panel->paletteCycle);
     Palette_UpdateHighlightPulse(&panel->widgetPalette[12], &panel->pulseFrame);
     if (panel->timer < 30) {
         panel->timer++;
@@ -507,30 +488,24 @@ void SelectionPanel_UpdateInput(struct SelectionPanel *panel)
     SelectionPanel_UpdateDescription(panel);
     panel->previousSelection = panel->selection;
     if (gPadState[1] & 1) {
-        if (TestSel(panel)) {
+        if (SelectionPanel_IsEntryUnlocked(panel)) {
             Sound_PlaySong(0xdd);
-            if (LinkActive()) {
-                cb = SelectionPanel_OnCloseRequested;
-                one = 1;
-                panel->update = cb;
-                panel->entering = one;
-                panel->state = one;
+            if (SelectionPanel_GetLinkModeFlag()) {
+                SelectionPanel_SetState(panel, SelectionPanel_OnCloseRequested,
+                                        SELECTION_PANEL_CONFIRM);
             } else {
-                cb = SelectionPanel_UpdateConfirmTransition;
-                one = 1;
-                panel->update = cb;
-                panel->entering = one;
-                panel->state = one;
+                SelectionPanel_SetState(panel, SelectionPanel_UpdateConfirmTransition,
+                                        SELECTION_PANEL_CONFIRM);
             }
         } else {
             Sound_PlaySong(0x192);
         }
     } else if (gPadState[1] & 2) {
-        if (!LinkActive()) {
+        if (!SelectionPanel_GetLinkModeFlag()) {
             cb = SelectionPanel_UpdateCancelTransition;
             panel->update = cb;
             panel->entering = 1;
-            panel->state = 2;
+            panel->state = SELECTION_PANEL_CANCEL;
             Sound_PlaySong(0xde);
         }
     }
@@ -538,8 +513,8 @@ void SelectionPanel_UpdateInput(struct SelectionPanel *panel)
 
 s32 SelectionPanel_Update(struct SelectionPanel *panel)
 {
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+
+    if (SelectionPanel_GetLinkModeFlag()) {
         if (Registry1745_GetSessionState() == 0) {
             ScrollingDialogue_HideImmediately();
             Task_Kill(panel);
@@ -562,8 +537,6 @@ s32 SelectionPanel_OnDestroy(struct SelectionPanel *panel)
 
 s32 SelectionPanel_InitializeFromScript(struct SelectionPanel *panel)
 {
-    s32 zero;
-    void (*cb)(struct SelectionPanel *);
     if (Script_SeekToKeyword(0x73)) {
         panel->sourceScript = Script_GetTextSourcePc();
         if (panel->sourceScript == 0)
@@ -585,8 +558,8 @@ s32 SelectionPanel_InitializeFromScript(struct SelectionPanel *panel)
             return -1;
     }
     {
-        u32 mask = 0x800;
-        u32 m = (gEngineFlags | gScenePauseFlags) & mask;
+
+        u32 m = SelectionPanel_GetLinkModeFlag();
         if (m) {
             panel->page = 1;
             panel->maximumPage = 0;
@@ -619,14 +592,10 @@ s32 SelectionPanel_InitializeFromScript(struct SelectionPanel *panel)
     RecordPanel_ShowName(panel);
     SelectionPanel_InitializeTextState(panel);
     SelectionPanel_UpdateDescription(panel);
-    cb = SelectionPanel_UpdateInput;
-    zero = 0;
-    panel->update = cb;
-    panel->entering = 1;
-    panel->state = zero;
+    SelectionPanel_SetState(panel, SelectionPanel_UpdateInput, SELECTION_PANEL_INPUT);
     panel->widgets[9].flags |= 1;
     if (Script_GetKeywordValue(0x66, 0)) {
-        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, zero);
+        ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xFFFF, 0);
     }
     gConfirmPanel = (u32)panel;
     return 1;

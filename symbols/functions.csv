@@ -157,6 +157,7 @@ addr,name,mode,confidence,source,notes
 08006770,ChoiceMenu_ParseTag,thumb,low,src-alias,
 08006A04,ChoiceMenu_LayoutText,thumb,low,src-alias,
 08006B60,ChoiceMenu_Initialize,thumb,low,src-alias,
+08006CD0,ChoiceMenu_Create,thumb,low,src-alias,Creates a choice menu with a native callback
 08006D44,ChoiceMenu_CreateFromScript,thumb,low,src-alias,
 08006E98,ChoiceMenu_ReloadFromScript,thumb,low,src-alias,"script-driven handler that, while a menu is already active (gUnk_0200002C set), re-reads window/stringBase/selected from script keywords and relays ou"
 08006F00,Trigger_RunScript,thumb,low,src-alias,
@@ -327,6 +328,7 @@ addr,name,mode,confidence,source,notes
 0800F1BC,StatusScreen_Destroy,thumb,low,src-alias,
 0800F220,StatusScreen_Initialize,thumb,low,src-alias,
 0800F474,StatusScreen_Open,thumb,low,src-alias,"creates the status screen task, wires StatusScreen_Update/Destroy as its callbacks, and runs StatusScreen_Initialize with the given id"
+0800F4B8,NumericOverlay_ClearActive,thumb,low,src-alias,Clears the active numeric overlay pointer
 0800F4C4,NumericOverlay_GetTileMapPtr,thumb,low,src-alias,"Returns a pointer into gUnk_03004C30[bg]'s tilemap at column x/row y; identical helper to status_screen.c's StatusScreen_GetTilePtr, duplicated here for the over"
 0800F6B0,NumericOverlay_RefreshDisplay,thumb,low,src-alias,"Forces a full redraw by setting s->dirty to 0xf, calling the draw routine sub_0800F4EC, then clearing dirty; already referenced via the NumericOverlay"
 0800F6E0,NumericOverlay_Update,thumb,low,src-alias,Task update callback wired via Task_SetCallbacks; just forwards to NumericOverlay_RefreshDisplay and returns its result.
@@ -368,6 +370,7 @@ addr,name,mode,confidence,source,notes
 0801150C,Text_CopyWithoutTags,thumb,low,src-alias,
 08011578,GlyphTable_FindPair,thumb,low,src-alias,
 080115A4,Password_EncodeSymbols,thumb,low,src-alias,
+080115DC,Password_ValidateNameGlyphs,thumb,low,src-alias,Checks decoded name bytes against both glyph pages and substitutes the fallback glyph
 08011660,NameEntry_DecodeAndValidate,thumb,low,src-alias,
 08011714,Password_ApplyDecoded,thumb,low,src-alias,
 08011794,Password_DecodeEntry,thumb,low,src-alias,"Allocates a PasswordEntry, copies/encodes the input text, then decodes and validates it before applying the result to output; the per-entry decode wra"
@@ -626,19 +629,23 @@ addr,name,mode,confidence,source,notes
 08019FD8,Presentation_ShowItemDescription,thumb,low,src-alias,Parses the item's description string ref and pushes it into the text box; called from Presentation_UpdateItemGraphic.
 0801A01C,Presentation_UpdateItemGraphic,thumb,low,src-alias,
 0801A094,SelectionMenu_CallConfirmScript,thumb,low,src-alias,Packs the two highlighted actor/item slots into script args and calls the menu's confirm script hook via Script_Call.
+0801A0D0,SelectionMenu_PlaySelectionSound,thumb,low,src-alias,Plays the sound for the selected menu action
 0801A10C,SelectionMenu_ConfigureLayers,thumb,low,src-alias,
 0801A1A4,SelectionMenu_HandleHorizontalInput,thumb,low,src-alias,
+0801A218,SelectionMenu_InitPanel,thumb,low,src-alias,Initializes the panel widgets and main panel sprite
 0801A3C0,SelectionMenu_InitCursors,thumb,low,src-alias,
 0801A418,SelectionMenu_InitMarkers,thumb,low,src-alias,
 0801A470,SelectionMenu_InitHighlight,thumb,low,src-alias,Creates the persistent selection highlight/glow object at p+0x5b4 during SelectionMenu_Initialize; hidden again in SelectionMenu_ReviewChoice on confi
 0801A4B4,SelectionMenu_PositionCursors,thumb,low,src-alias,
 0801A53C,SelectionMenu_PositionInventoryMarkers,thumb,low,src-alias,
 0801A5A8,SelectionMenu_PositionEquipmentMarkers,thumb,low,src-alias,
+0801A614,SelectionMenu_HideMarkers,thumb,low,src-alias,Sets the hidden flag on all eight grid markers
 0801A634,SelectionMenu_StepCursors,thumb,low,src-alias,"Advances Anim_Step on the three cursor graphics (p+0x194/0x1f4/0x254) set up by SelectionMenu_PositionCursors, called from SelectionMenu_DrawStatistic"
 0801A658,SelectionMenu_RemovePanel,thumb,low,src-alias,"Removes the sprite and two anims at the menu's lowest offsets (0x8c/0xd4/0x134), created early in initialization; torn down alongside the other cleanu"
 0801A67C,SelectionMenu_RemoveCursors,thumb,low,src-alias,"Removes the three cursor anims at p+0x194/0x1f4/0x254, the counterpart teardown for SelectionMenu_StepCursors/PositionCursors."
 0801A69C,SelectionMenu_RemoveMarkerAnim,thumb,low,src-alias,"Removes the eight inventory/equipment marker anims at p+0x2b4+i*0x60, the counterpart teardown for SelectionMenu_PositionInventoryMarkers/PositionEqui"
 0801A6BC,SelectionMenu_RemoveHighlight,thumb,low,src-alias,Removes the single highlight anim at p+0x5b4 created by SelectionMenu_InitHighlight.
+0801A6D0,SelectionMenu_InitIconGrid,thumb,low,src-alias,Initializes the icon grid and its heading widget
 0801A75C,SelectionMenu_PopulateActors,thumb,low,src-alias,
 0801A814,SelectionMenu_PopulateItems,thumb,low,src-alias,
 0801A8CC,SelectionMenu_RemoveIconGrid,thumb,low,src-alias,Removes the 19 icon-grid graphics at p+0x674 (shared by actor/item populate) plus the border frame at p+0x614.
@@ -2407,6 +2414,7 @@ addr,name,mode,confidence,source,notes
 0805BAE4,ScenePanel_WaitRigIdle,thumb,low,src-alias,
 0805BB20,ScenePanel_WaitTetherReturn,thumb,low,src-alias,
 0805BC10,ScenePanel_AdvanceTetherReturn,thumb,low,src-alias,
+0805BCE8,ScenePanel_HoldInteraction,thumb,low,src-alias,Empty callback for interaction state 14
 0805BCEC,ScenePanel_InitPaletteSprite,thumb,low,src-alias,
 0805BD78,ScenePanel_InitAuxiliarySprite,thumb,low,src-alias,
 0805BDD0,ScenePanel_CreateSubjects,thumb,low,src-alias,
@@ -2425,6 +2433,7 @@ addr,name,mode,confidence,source,notes
 0805C680,ScenePanel_DispatchCommands,thumb,low,src-alias,
 0805C728,ScenePanel_UnregisterReceiver,thumb,low,src-alias,
 0805C73C,ScenePanel_RegisterReceiver,thumb,low,src-alias,
+0805C754,ScenePanel_ClearGlobal,thumb,low,src-alias,Clears the scene panel singleton
 0805C760,ScenePanel_IsPresent,thumb,low,src-alias,
 0805C774,ScenePanel_SelectMode,thumb,low,src-alias,
 0805C7B4,ScenePanel_CountActiveSubjects,thumb,low,src-alias,

@@ -10,7 +10,7 @@ static inline s32 absolute(s32 v)
 void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
 {
     s32 i;
-    for (i = 0;;) {
+    for (i = 0; i < 8; i++) {
         struct SceneRigSprite *sprite = &rig->primary[i];
         struct SceneRigSprite *output = sprite;
         s32 radius;
@@ -30,14 +30,5 @@ void ScenePanelRig_TickPrimarySprites(struct ScenePanelRig *rig, u32 palette)
             sprite->phase = (sprite->phase + 255) & 255;
         ScenePanelRig_StepSprite(sprite);
         AnimData_SelectPaletteBank(sprite->graphics, palette);
-        {
-            u32 step = 1;
-            i += step;
-        }
-        {
-            s32 compare = i;
-            if (compare > 7)
-                break;
-        }
     }
 }

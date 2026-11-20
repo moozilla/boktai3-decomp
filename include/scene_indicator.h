@@ -1,21 +1,13 @@
 #ifndef GUARD_SCENE_INDICATOR_H
 #define GUARD_SCENE_INDICATOR_H
 
+#include "contact_collider.h"
 #include "engine.h"
 #include "player.h"
+#include "sprite.h"
 
 struct Vec {
     s16 x, y, z, pad;
-};
-
-/* Sprite object embedded in an indicator (0x2C bytes). */
-struct IndicatorSprite {
-    u32 flags; /* bit 0: hidden */
-    u8 pad4[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
 };
 
 /* One blinking terrain marker (0xB4 bytes). */
@@ -28,26 +20,20 @@ struct SceneIndicator {
     u8 animation, index, count, visible, mode, disabled; /* mode: 0 timed, 1 triggered, 2 manual */
     int delay, period, value;
     u16 times[8];  /* phase durations, alternating hidden/visible */
-    u8 effect[84]; /* collider */
-    struct IndicatorSprite sprite;
+    struct ContactCollider collider;
+    struct DisplaySequenceSprite sprite;
 };
 
-static inline void IndicatorSprite_SetFrame(struct IndicatorSprite *s, int frame)
+static inline void IndicatorSprite_SetFrame(struct DisplaySequenceSprite *s, int frame)
 {
     s->frame = frame;
 }
-
-struct IndicatorAnimation {
-    u8 pad[6];
-    u16 frame;
-    u8 tail[20];
-};
 
 /* Scene indicator controller task (0xBD0 bytes, priority list 8). */
 struct SceneIndicators {
     struct Task task;
     int count;
-    struct IndicatorAnimation animations[4];
+    struct SpriteRenderResource animations[4];
     struct SceneIndicator indicators[16];
     int tile; /* terrain cell index under the player */
 };

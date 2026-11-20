@@ -7,31 +7,20 @@ void RecordMenu_InitializeSprites(struct RecordMenu *menu)
 {
     void *proc;
     s32 i;
-    struct RecordMenuSprite *sprite;
     proc = ScriptProc_Start(0xcb05, 0x1289);
     menu->rowProc = proc;
     ResourceHeader_Relocate(menu->rowResource, proc);
-    i = 0;
-    {
-        s32 zero = 0;
-        sprite = menu->sprites;
-        for (; i < 8; i++) {
-            Widget_InitLinked(sprite, menu->rowResource, menu->spriteIds[i], 16, zero, zero, zero,
-                              (void *)zero);
-            menu->states[i] = -1;
-            sprite++;
-        }
+    for (i = 0; i < 8; i++) {
+        Widget_InitLinked(&menu->sprites[i], menu->rowResource, menu->spriteIds[i], 16, 0, 0, 0,
+                          NULL);
+        menu->states[i] = -1;
     }
-    {
-        s32 zero = 0;
-        proc = ScriptProc_Start(0xcb05, 0x530d);
-        menu->cursorProc = proc;
-        ResourceHeader_Relocate(menu->resource, proc);
-        Widget_InitLinked(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, zero, zero,
-                          zero, (void *)zero);
-    }
+    proc = ScriptProc_Start(0xcb05, 0x530d);
+    menu->cursorProc = proc;
+    ResourceHeader_Relocate(menu->resource, proc);
+    Widget_InitLinked(&menu->sprites[8], menu->resource, menu->spriteIds[i], 17, 0, 0, 0, NULL);
     menu->states[i] |= -1;
-    CpuSet(menu->sprites[8].tiles, menu->palette, 0x4000008);
+    CpuCopy32(menu->sprites[8].tiles, menu->palette, sizeof(menu->palette));
     menu->sprites[8].flags = 0xa000;
     menu->sprites[8].tiles = menu->palette;
 }

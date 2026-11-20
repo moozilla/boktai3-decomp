@@ -8,17 +8,10 @@ void StageIconDisplay_TickReveal(struct StageIconDisplay *display)
     if (++display->stateFrame > 60) {
         s32 *revealed = &display->revealedCount;
         if (*revealed > 2) {
-            u32 *flags;
             s32 i;
-            u32 hidden;
             Anim_LoadKeyframe(&display->icon, &display->resource, 50, 0);
-            hidden = 1;
-            flags = &display->indicators[0].flags;
-            i = 2;
-            do {
-                *flags |= hidden;
-                flags = (void *)((u8 *)flags + sizeof(struct ProjectedDisplayEntry));
-            } while (--i >= 0);
+            for (i = 0; i < 3; i++)
+                display->indicators[i].flags |= 1;
             StageIconDisplay_SetUpdate(display, StageIconDisplay_TickShake);
             StageIconDisplay_NotifyCompletion(display);
         } else {

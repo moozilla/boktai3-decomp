@@ -73,15 +73,13 @@ s32 ScenePanel_IsTetherDistant(struct ScenePanel *input)
     return 1;
 }
 
-void ScenePanel_WaitInitialTether(struct ScenePanel *input)
+void ScenePanel_WaitInitialTether(struct ScenePanel *panel)
 {
-    struct ScenePanel *panel = (void *)input;
-    if (ScenePanel_CanAcquireTether(input) != 0) {
-        u32 zero;
-        PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, zero = 0);
-        panel->variant = zero;
-        ScenePanel_SetEffectState(input, 1);
-    }
+    if (!ScenePanel_CanAcquireTether(panel))
+        return;
+    PlayerCue_MoveTo(SCENE_PANEL_PLAYER, 0, -1, 0, 0);
+    panel->variant = 0;
+    ScenePanel_SetEffectState(panel, 1);
 }
 
 void ScenePanel_AdvanceTetherAcquisition(struct ScenePanel *panel)
@@ -435,7 +433,6 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
 
 /* ScenePanel_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
 
-#define ScenePanel_HoldInteraction sub_0805BCE8
 
 void ScenePanel_HoldInteraction(struct ScenePanel *input)
 {
@@ -502,7 +499,7 @@ void ScenePanel_InitAuxiliarySprite(struct ScenePanel *input)
 void ScenePanel_CreateSubjects(struct ScenePanel *parent)
 {
     u32 initialStates[4];
-    struct ScenePanelSpawnPosition position;
+    struct ContactPosition position;
     s32 contactLimit, colliderSetting;
     u32 category = parent->initialMode;
     u32 kind = 0;
@@ -531,11 +528,10 @@ void ScenePanel_CreateSubjects(struct ScenePanel *parent)
     {
         for (i = 0; i < parent->subjectCount; i++) {
             u32 row, variant, appearDelay;
-            s32 negative = -514;
-            position = *(struct ScenePanelSpawnPosition *)&parent->origin;
+            position = parent->origin;
             switch (i) {
                 case 0:
-                    position.x += negative;
+                    position.x -= 514;
                     position.z += 76;
                     row = 1;
                     variant = 0;
@@ -543,7 +539,7 @@ void ScenePanel_CreateSubjects(struct ScenePanel *parent)
                     break;
                 case 2:
                     position.x += 76;
-                    position.z += negative;
+                    position.z -= 514;
                     row = 1;
                     variant = 1;
                     appearDelay = 3;
@@ -568,8 +564,8 @@ void ScenePanel_CreateSubjects(struct ScenePanel *parent)
                     appearDelay = 0;
             }
             parent->subjects[i] = (struct ScenePanelSubject *)ScenePanelSubject_Create(
-                (const void *)&position, row, variant, initialStates[i], kind, contactLimit,
-                colliderSetting, appearDelay);
+                &position, row, variant, initialStates[i], kind, contactLimit, colliderSetting,
+                appearDelay);
         }
     }
 }
@@ -828,10 +824,8 @@ void ScenePanel_BeginArrivalRamp(void)
 {
     struct ScenePanel *panel = SCENE_PANEL_GLOBAL;
     if (panel) {
-        u8 *enabled = &panel->arrivalRampEnabled;
-        u32 zero = 0;
-        *enabled = 1;
-        SCENE_PANEL_GLOBAL->arrivalRampFrame = zero;
+        panel->arrivalRampEnabled = 1;
+        SCENE_PANEL_GLOBAL->arrivalRampFrame = 0;
     }
 }
 
@@ -886,7 +880,6 @@ void ScenePanel_RegisterReceiver(struct ScenePanel *panel)
 
 /* ScenePanel_ClearGlobal: Clears the global panel pointer used by ScenePanel_IsPresent */
 
-#define ScenePanel_ClearGlobal sub_0805C754
 
 void ScenePanel_ClearGlobal(void)
 {

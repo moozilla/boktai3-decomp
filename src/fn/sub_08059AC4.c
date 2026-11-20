@@ -1,7 +1,7 @@
 #include "scene_panel_rig.h"
 void ScenePanelRig_TickRise(struct ScenePanelRig *rig)
 {
-    struct SceneRigParentView *parent = (void *)rig->parent;
+    struct ScenePanel *parent = rig->parent;
     u16 *counter;
     u32 frame;
     rig->colliderHold = 16;
@@ -11,7 +11,7 @@ void ScenePanelRig_TickRise(struct ScenePanelRig *rig)
     *counter = frame;
     if ((u16)frame > 15) {
         rig->position.y += 128;
-        if (parent->mode != 0 && parent->activeCount != 0) {
+        if (parent->paletteMode != 0 && parent->activeCount != 0) {
             ScenePanelRig_SetState(rig, 2);
             return;
         }

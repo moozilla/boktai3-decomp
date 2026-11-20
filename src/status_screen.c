@@ -17,11 +17,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
     int *values;
     digits[0] = left > 9;
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 6, 11);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 6, 11);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -63,11 +59,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
     digits[0] = Div(left, 10);
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 11);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 16, 11);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -170,15 +162,17 @@ void StatusScreen_DrawClock(struct StatusScreen *unused)
     }
 }
 
+enum { STATUS_DIRTY_DATE = 1, STATUS_DIRTY_BASE_TIME = 2, STATUS_DIRTY_CLOCK = 4 };
+
 void StatusScreen_RefreshDirtyDisplays(struct StatusScreen *s)
 {
     s32 a, b, c;
     Clock_UnpackDate(&a, &b, &c, SunClock_GetPackedDate());
-    if (s->dirty & 1)
+    if (s->dirty & STATUS_DIRTY_DATE)
         NumericDisplay_DrawPair(s, b, c);
-    if (s->dirty & 2)
+    if (s->dirty & STATUS_DIRTY_BASE_TIME)
         NumericDisplay_DrawStatusValues(s);
-    if (s->dirty & 4)
+    if (s->dirty & STATUS_DIRTY_CLOCK)
         StatusScreen_DrawClock(s);
     s->dirty = 0;
 }
@@ -220,13 +214,10 @@ void StatusScreen_Close(struct StatusScreen *p)
     }
     {
         u32 flags = p->dirty;
-        u32 result;
-        result = 4;
+        u32 result = 4;
         result |= flags;
-        {
-            u32 mask = 65532;
-            p->dirty = result & mask;
-        }
+        result &= 0xFFFC;
+        p->dirty = result;
     }
     p->timer++;
 }
