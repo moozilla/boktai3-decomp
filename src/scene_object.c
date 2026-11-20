@@ -6,7 +6,7 @@
 
 static inline void scatter(u16 *coordinate, const u16 *sample)
 {
-    s32 value = *coordinate - 128;
+    s32 value = (u16)*coordinate - 128;
     u32 noise = (u8)*sample;
     *coordinate = value + noise;
 }
@@ -516,26 +516,9 @@ void Scene_PlayObjectImpactEffect(struct SceneObject *object)
     sub_08014CA4(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
 }
 
-/* Packed position words used by directional dust. */
-
-struct DustPoint {
-    union {
-        u32 word;
-        struct {
-            u16 x, y;
-        } half;
-    } xy;
-    union {
-        u32 word;
-        struct {
-            u16 z, pad;
-        } half;
-    } zp;
-};
-
-static inline u32 dustScatter(const u8 *random, const u16 *coordinate)
+static inline u32 dustScatter(const u8 *random, const s16 *coordinate)
 {
-    s32 value = *coordinate - 128;
+    s32 value = (u16)*coordinate - 128;
     return value + *random;
 }
 
@@ -546,8 +529,7 @@ union DustJitterMask {
 static inline u32 frontEdge(u32 random, u32 coordinate)
 {
     s32 value = coordinate + 120;
-    union DustJitterMask mask = {15};
-    return value + (random & mask.bits);
+    return value + (random & 15);
 }
 
 static inline u32 backEdge(u32 random, u32 coordinate)
@@ -571,8 +553,15 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
 {
     struct SceneObject *actor = input;
     struct ContactPosition size;
-    struct DustPoint point;
-    struct DustPoint *particle;
+    // Dust updates x and z separately while preserving y and the padding halfword.
+    // concession-ok(local-union): Scene_SpawnEdgeParticles copies this same two-word position.
+    union DustPoint {
+        struct SceneVec position;
+        struct {
+            u32 xy, zAndPad;
+        } words;
+    } point;
+    union DustPoint *particle;
     s32 i;
     const u16 *table;
     u32 *cursor;
@@ -588,7 +577,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     do {
         struct SceneObject *local = actor;
 
-        point = *(struct DustPoint *)&local->body.position;
+        point.position = local->body.position;
         switch (local->direction) {
             case 0: {
                 u32 index;
@@ -596,9 +585,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 value = dustScatter((const u8 *)random, &particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -606,9 +595,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = frontEdge(*second, point.zp.half.z);
+                        u32 value = frontEdge(*second, (u16)point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -619,9 +608,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = backEdge(*random, particle->xy.half.x);
+                    u32 value = backEdge(*random, (u16)particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -629,9 +618,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 value = dustScatter((const u8 *)second, &point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -642,9 +631,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 value = dustScatter((const u8 *)random, &particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -652,9 +641,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = backEdge(*second, point.zp.half.z);
+                        u32 value = backEdge(*second, (u16)point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -665,9 +654,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = frontEdge(*random, particle->xy.half.x);
+                    u32 value = frontEdge(*random, (u16)particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -675,9 +664,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 value = dustScatter((const u8 *)second, &point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
