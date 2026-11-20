@@ -5,7 +5,7 @@ import re
 import threading
 import urllib.parse
 
-from . import centaur, fields, recipe, runner
+from . import centaur, fields, recipe, references, runner
 
 API = "/api/experiments"
 PAGE = "/experiments"
@@ -123,6 +123,11 @@ def routes(handler, method):
             handler.send(200, spec)
         elif method == "GET" and path == API + "/catalog":
             catalog(handler)
+        elif method == "GET" and path.startswith(API + "/by-function/"):
+            address = path.removeprefix(API + "/by-function/").upper()
+            if not re.fullmatch(r"[0-9A-F]{8}", address):
+                raise ValueError("Use an eight-digit function address")
+            handler.send(200, references.preview(address, recent(), runner.JOBS))
         elif path == API + "/runs":
             if method == "POST":
                 post_run(handler)

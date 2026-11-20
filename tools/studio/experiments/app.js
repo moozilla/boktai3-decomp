@@ -42,6 +42,9 @@ function header() {
   $('run').textContent = primary ? 'Run again' : 'Run experiment';
   $('run').disabled = running;
   $('edit').disabled = !spec;
+  const origin = primary?.checkpoint.fork;
+  $('parent-run').hidden = !origin;
+  if (origin) $('parent-run').href = `#run/${origin.run}/${origin.frame}/${origin.trial}`;
   pageTitle(spec.title, 'Experiments');
 }
 

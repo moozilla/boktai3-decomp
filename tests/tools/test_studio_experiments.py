@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/studio"))
-from experiments import annotations, centaur, checks, fields, http, recipe, runner
+from experiments import annotations, centaur, checks, fields, http, recipe, runner, sweep
 
 
 class RecipeTests(unittest.TestCase):
@@ -85,6 +85,16 @@ class RecordingTests(unittest.TestCase):
             text.write_text("loadstate ../outside.ss\nwait 2\n")
             with self.assertRaises(FileNotFoundError):
                 centaur.import_recording("recording-day-one")
+
+
+class SweepTests(unittest.TestCase):
+    def test_selection_preserves_order_and_reports_missing_checkpoints(self):
+        fixtures = [{"id": "bank-0040", "kind": "bank"}, {"id": "test-save", "kind": "save"}]
+        with patch.object(sweep.runner, "checkpoints", return_value=fixtures):
+            self.assertEqual(sweep.select(["test-save", "bank-0040"], False, None), list(reversed(fixtures)))
+            self.assertEqual(sweep.select([], True, None), fixtures[:1])
+            with self.assertRaisesRegex(ValueError, "unavailable"):
+                sweep.select(["bank-1234"], False, None)
 
 
 class FieldTests(unittest.TestCase):
@@ -285,6 +295,11 @@ class HTTPTests(unittest.TestCase):
             result = json.loads(payload)
             self.assertEqual(result["game_frame"], parent["trials"][1]["snapshots"][4]["frame"])
             self.assertEqual([row["value"] for row in result["fields"]], [616, 2694])
+            code, payload = self.request("GET", "/api/experiments/by-function/0821C754")
+            self.assertEqual(code, 200)
+            links = json.loads(payload)
+            self.assertTrue(any(link["kind"] == "stores" and parent["id"] in link["url"] for link in links))
+            self.assertTrue(any(link["kind"] == "entries" for link in links))
             from experiments.__main__ import proof_branch
             child = run(proof_branch(parent))
             self.assertTrue(all(c["state"] == "confirmed" for c in child["checks"]))

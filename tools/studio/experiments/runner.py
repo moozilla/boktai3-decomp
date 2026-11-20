@@ -13,7 +13,7 @@ import threading
 import time
 from uuid import uuid4
 
-from . import annotations, centaur, checks, fields, recipe
+from . import annotations, centaur, checks, fields, recipe, references
 
 ROOT = fields.ROOT
 HERE = Path(__file__).resolve().parent
@@ -493,6 +493,7 @@ def execute(directory, spec, trans=None):
         result["compiler"] = annotations.annotate(directory.name, [event for log in writes_by_trial.values() for event in log])
         for trial, events in writes_by_trial.items():
             atomic_json(directory / trial / "writes.json", events)
+        atomic_json(directory / "functions.json", references.summarize(result, writes_by_trial))
         result["checks"] = checks.evaluate(spec["checks"], result)
         build_proof_artifacts(directory, result)
         atomic_json(directory / "result.json", result)

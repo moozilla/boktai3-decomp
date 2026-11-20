@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import centaur, fields, recipe, runner
+from . import centaur, fields, recipe, runner, sweep
 
 
 def proof_branch(parent):
@@ -42,6 +42,11 @@ def main():
     run = commands.add_parser("run", help="Run a recipe JSON file")
     run.add_argument("recipe", type=Path)
     run.add_argument("--trans", type=Path, help="Local translation checkout with story checkpoints")
+    cohort = commands.add_parser("sweep", help="Apply the same recipe to several story checkpoints")
+    cohort.add_argument("recipe", type=Path)
+    cohort.add_argument("--checkpoint", action="append", default=[], help="Checkpoint ID, repeat to add")
+    cohort.add_argument("--all-story", action="store_true", help="Use the complete available story bank")
+    cohort.add_argument("--trans", type=Path, help="Local translation checkout with story checkpoints")
     show = commands.add_parser("show", help="Read a completed run's JSON result")
     show.add_argument("id")
     commands.add_parser("checkpoints", help="List available starting saves")
@@ -57,6 +62,9 @@ def main():
     args = parser.parse_args()
     try:
         match args.command:
+            case "sweep":
+                spec = recipe.validate(runner.read_json(args.recipe))
+                data = sweep.execute(spec, sweep.select(args.checkpoint, args.all_story, args.trans), args.trans)
             case "show":
                 data = runner.read_json(runner.run_dir(args.id) / "result.json")
             case "checkpoints":

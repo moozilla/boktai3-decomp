@@ -35,6 +35,8 @@ build/venv/bin/python -m tools.studio.experiments fields 'gPlayers[0]->position.
 build/venv/bin/python -m tools.studio.experiments run ./my-experiment.json
 build/venv/bin/python -m tools.studio.experiments show RUN_ID
 build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGameState->life'
+build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments/pause.json \
+  --checkpoint bank-0004 --checkpoint bank-0064
 ```
 
 - `checkpoint` selects power-on, the reference save, or an available story-bank
@@ -64,6 +66,10 @@ build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGame
 - A `fork` has the form `{"run": "RUN_ID", "trial": "TRIAL_ID", "frame": 60}`.
   Use a capture from the same ROM that mGBA can restore. The playback preserves the recorded sensor threshold when starting a new fork.
 
+A sweep writes an answer ledger and links each checkpoint to its own
+experiment. It preserves contradicted and unresolved checks alongside
+confirmed ones. Pass `--all-story` to use the available story bank.
+
 ## Bring in a play session
 
 Use **Record from here** in Studio Live with Centaur connected. Stop the
@@ -89,6 +95,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | GET `/api/experiments/examples` | List built-in example IDs. Append an ID to the example route. |
 | POST `/api/experiments/fields` | Resolve a JSON array of named paths to their target ABI layouts. |
 | GET `/api/codemap/fn/NAME` | Read a function's C, disassembly and cross-references. |
+| GET `/api/experiments/by-function/ADDRESS` | Find recent recorded stores and entry probes by function address. |
 | POST `/api/experiments/runs` | Submit a recipe. The response identifies the persisted run. |
 | GET `/api/experiments/runs/ID` | Poll job state. |
 | GET `/api/experiments/runs/ID/result` | Read frame values, environment fingerprints, checked claims and attributed stores. |
