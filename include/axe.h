@@ -50,7 +50,8 @@ struct Axe {
     u16 fieldEC2;
     u8 unknownEC4[0xC];
     u8 active;
-    u8 unknownED1[2];
+    u8 lungeQueued;
+    u8 sparkStep;
     u8 savedAngle;
     u8 unknownED4[3];
     u8 variant;
