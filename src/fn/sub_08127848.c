@@ -1,17 +1,8 @@
+#include "sprite_projectile.h"
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
 
-struct StateSlot {
-    u8 unknown00[0xc0];
-    u8 state;
-    u8 unknownC1[0x13];
-};
-struct StateSlotPool {
-    u8 task[0x18];
-    struct StateSlot slots[10];
-    u32 used;
-};
 extern u32 gUnk_02000560;
 extern void *gUnk_08610770[];
 s32 sub_08249240(void *, void *, void *);
@@ -21,12 +12,12 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
         return TRUE;
     return FALSE;
 }
-s32 StateSlotPool_Update(struct StateSlotPool *input)
+s32 StateSlotPool_Update(struct ProjectilePool *input)
 {
-    struct StateSlotPool *pool = input;
-    struct StateSlot *slots = pool->slots;
+    struct ProjectilePool *pool = input;
+    struct Projectile *slots = pool->entries;
     s32 i;
-    if (pool->used) {
+    if (pool->allocated) {
         u32 mask = 0x400;
         if (!((gEngineFlags | gScenePauseFlags) & mask)) {
             u32 blockedMask = 4;
@@ -36,14 +27,14 @@ s32 StateSlotPool_Update(struct StateSlotPool *input)
                 void **table;
                 i = 0;
                 {
-                    u16 usedOffset = (u32) & ((struct StateSlotPool *)0)->used;
+                    u16 usedOffset = (u32) & ((struct ProjectilePool *)0)->allocated;
                     used = (void *)((u32)slots + usedOffset - 0x18);
                 }
                 table = gUnk_08610770;
                 do {
                     if (Occupied(used, 1 << i)) {
-                        struct StateSlot *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
-                        sub_08249240(pool, slot, table[slot->state]);
+                        struct Projectile *slot = (void *)((u32)i * sizeof(*slots) + (u32)slots);
+                        sub_08249240(pool, slot, table[slot->active]);
                     }
                     i++;
                 } while (i < 10);

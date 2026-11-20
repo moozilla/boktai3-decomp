@@ -1,60 +1,19 @@
+#include "display_sequence_sprite.h"
+#include "sprite_projectile.h"
+#include "terrain_sampling.h"
 #include "global.h"
 #include "display_sequence_inline.h"
 #include "contact_position.h"
 #include "ram.h"
 #include "engine_globals.h"
-struct Projectile {
-    u32 flags;
-    u8 unknown4[2], angle, unknown7[9];
-    u16 frame;
-    u8 unknown12[10];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    struct DisplaySequenceState sequence;
-    u8 unknown3C[0x1C];
-    u8 collider[0x58];
-    struct ContactPosition velocity;
-    u8 unknownB8;
-    s8 spin;
-    u8 spinScale, colliderFlags;
-    u16 timer, state;
-    u8 active;
-    s8 slot;
-    u8 unknownC2[2];
-    u32 resourceId;
-    u8 enter, soundDelay;
-    u16 lifetime, cell;
-};
-struct ProjectilePool {
-    u8 unknown0[0x860];
-    u32 allocated;
-};
-struct TerrainMap {
-    u32 unknown0;
-    u8 *cells;
-    u8 unknown8[0x1C];
-    u16 rows[1];
-};
-void *TerrainModifiers_FindCellOverride(u32, u32);
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
-void Sound_PlaySong(u32);
-void Sprite_Remove(void *);
-void Collider_SetPosition(void *, void *, u32);
-void Collider_Refresh(void *);
-static inline s32 Cell(struct ContactPosition *p)
-{
-    s32 x = (s16)p->x >> 8, z = (s16)p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return ((struct TerrainMap *)gTerrainMap)->rows[z] + x;
-}
 static inline u8 *Properties(u32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
     if (p)
         return p + 4;
-    return ((struct TerrainMap *)gTerrainMap)->cells + (cell * 4 + 12);
+    return (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
 }
 static inline s32 Height(u32 cell, struct ContactPosition *p)
 {
@@ -105,11 +64,11 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
     u8 *delay;
     u16 *lifetime;
     if (p->enter) {
-        p->flags &= ~1;
+        p->sprite.flags &= ~1;
         p->enter = 0;
     }
-    p->cell = Cell(&p->position);
-    position = &sprite->position;
+    p->cell = Terrain_GetCellIndex(&p->sprite.position);
+    position = &sprite->sprite.position;
     velocity = &p->velocity;
     cell = p->cell;
     Math_Atan2((s16)velocity->x, (s16)velocity->z);
@@ -121,7 +80,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
         velocity->x = Div((s16)velocity->x * 5, 10);
         velocity->y = -Div((s16)velocity->y * 4, 10);
         velocity->z = Div((s16)velocity->z * 5, 10);
-        if (p->flags & 2) {
+        if (p->sprite.flags & 2) {
             s8 *spin = &p->spin;
             s32 value = *spin;
             *spin = -value;
@@ -132,7 +91,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
             delay = source;
             if (!value) {
                 u32 *resource;
-                u32 *address = (void *)(source - 5);
+                u32 *address = &p->resourceId;
                 u32 firstResource = *address;
                 {
                     u32 key = 0xB96C;
@@ -142,8 +101,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
                     else if (*resource == 0xD45E && p->sequence.sequenceId == 6)
                         Sound_PlaySong(0x3B0);
                     {
-                        u32 value = 10;
-                        *delay = value;
+                        *delay = 10;
                     }
                 }
             }
@@ -172,7 +130,7 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
         }
         delay = &p->soundDelay;
     }
-    nextCell = Cell(&next);
+    nextCell = Terrain_GetCellIndex(&next);
     nextFloor = Height(nextCell, &next);
     attrs = Attributes(nextCell);
     if (cell != nextCell && (floor < nextFloor || (Attributes(nextCell) & 3))) {
@@ -192,117 +150,25 @@ void SpriteProjectile_UpdateRebounds(void *unused, struct Projectile *input)
         u32 flags;
         {
             struct Projectile *src = sprite;
-            flags = src->flags;
+            flags = src->sprite.flags;
         }
         if (flags & 2) {
             s32 amount = p->spinScale * p->spin;
             u32 angle;
             {
                 struct Projectile *src = sprite;
-                angle = src->angle;
+                angle = src->sprite.attribute;
             }
             amount += angle;
             {
                 struct Projectile *dst = sprite;
-                dst->angle = amount;
+                dst->sprite.attribute = amount;
             }
         }
     }
-    {
-        struct DisplaySequenceState *state = &p->sequence;
-        struct Projectile *base = p;
-        const u16 *command;
-        u32 flags, bit;
-        {
-            u32 offset = state->index << 1;
-            const u16 *table;
-            table = base->sequence.commands;
-            command = (const u16 *)((u32)table + offset);
-        }
-        {
-            u32 frame = *command >> 6;
-            struct Projectile *dst = sprite;
-            dst->frame = frame;
-        }
-        {
-            union DisplaySequenceControl input;
-            u32 first;
-            input.raw = state->flags;
-            bit = 1;
-            first = (u8)(input.raw & bit);
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                struct Projectile *dst = sprite;
-                dst->flags |= 4;
-            } else {
-                struct Projectile *dst = sprite;
-                dst->flags &= ~4;
-            }
-        }
-        {
-            union DisplaySequenceControl input;
-            u32 bit;
-            u32 first;
-            input.raw = state->flags;
-            bit = 2;
-            first = (u8)(input.raw & bit);
-            if (first != (((*command & 0x30) >> 4) & bit)) {
-                u32 value;
-                {
-                    struct Projectile *src = sprite;
-                    value = src->flags;
-                }
-                {
-                    u32 mask = 8;
-                    value |= mask;
-                }
-                {
-                    struct Projectile *dst = sprite;
-                    dst->flags = value;
-                }
-            } else {
-                struct Projectile *dst = sprite;
-                dst->flags &= ~8;
-            }
-        }
-        if (++state->elapsed >= state->duration) {
-            state->elapsed = 0;
-            flags = state->flags;
-            if (flags & 4) {
-                if (state->index == 0) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if (hold)
-                        state->elapsed = state->duration;
-                    else
-                        state->index = state->frameCount - 1;
-                } else {
-                    state->index--;
-                }
-            } else {
-                if (++state->index >= state->frameCount) {
-                    u32 hold = 8;
-                    hold &= flags;
-                    if ((u8)hold) {
-                        state->elapsed = state->duration;
-                        state->index = state->frameCount - 1;
-                    } else {
-                        state->index = 0;
-                    }
-                }
-            }
-            {
-                u32 offset = state->index << 1;
-                const u16 *table;
-                table = state->commands;
-                command = (const u16 *)((u32)table + offset);
-            }
-            DisplaySequence_UpdateWeight(state, command);
-            if (!state->duration)
-                state->duration = 1;
-        }
-    }
+    DisplaySequence_StepSprite(&sprite->sprite, &p->sequence);
     if (p->colliderFlags & 1) {
-        Collider_SetPosition(p->collider, &p->position, 0);
+        Collider_SetPosition(p->collider, &p->sprite.position, 0);
         Collider_Refresh(p->collider);
     }
     {
