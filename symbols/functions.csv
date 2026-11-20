@@ -466,6 +466,7 @@ addr,name,mode,confidence,source,notes
 0801450C,ParticleManager_Kill,thumb,low,src-alias,Task kill callback for the particle manager: removes active effects from each of the 6 particle groups' 8 slots and clears the gUnk_02000060 singleton
 08014568,ParticleManager_Initialize,thumb,low,src-alias,
 080145E4,ParticleManager_Create,thumb,low,src-alias,Singleton accessor/creator called by 08014634 and 080148CC: returns the existing manager via gUnk_02000060 or creates the task with ParticleManager_Up
+08014C28,ParticleManager_ClearActiveGroups,thumb,low,src-alias,
 08014F64,FragmentGroup_Update,thumb,low,src-alias,
 08015040,FragmentManager_Update,thumb,low,src-alias,"Task update callback for the FragmentManager: updates FragmentGroup_Update for each of 4 active entries, matching the ParticleManager_Update/AnimatedP"
 08015074,FragmentManager_Destroy,thumb,low,src-alias,"Task destroy callback (2nd arg to Task_SetCallbacks) for the FragmentManager: removes sprites of all active fragment pieces and zeroes gUnk_02000064, "

@@ -2,7 +2,7 @@
 #include "ram.h"
 void Effect_Remove(void *);
 
-void sub_08014C28(void)
+void ParticleManager_ClearActiveGroups(void)
 {
     struct ParticleGroupManager *manager = gParticleGroupManager;
     if (manager != 0) {
