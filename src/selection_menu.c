@@ -339,11 +339,11 @@ void SelectionMenu_InitMarkers(struct SelectionMenu *p)
 
 void SelectionMenu_InitHighlight(struct SelectionMenu *p)
 {
-    struct ContactPosition z;
-    u32 m = 0xFFFF0000;
-    *(u32 *)&z = 0x800000;
-    *((u32 *)&z + 1) &= m;
-    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &z);
+    struct ContactPosition position;
+    position.x = 0;
+    position.y = 0x80;
+    position.z = 0;
+    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_PositionCursors(struct SelectionMenu *p)
@@ -407,16 +407,9 @@ void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p)
 
 void SelectionMenu_HideMarkers(struct SelectionMenu *p)
 {
-    int mask = 1;
-    u32 *flags;
     int i;
-    flags = &p->markers[0].flags;
-    i = 7;
-    do {
-        *flags |= mask;
-        flags += sizeof(struct SceneInputWidget) / sizeof(u32);
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 8; i++)
+        p->markers[i].flags |= 1;
 }
 
 void SelectionMenu_StepCursors(struct SelectionMenu *p)
@@ -598,10 +591,7 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
     } else if (value < 0) {
         value = 0;
     }
-    {
-        int x = 10;
-        Text_DrawNumber(0, k2, 9, value, 33, 2, 15);
-    }
+    Text_DrawNumber(0, k2, 9, value, 33, 2, 15);
     a = 0;
     b = 0;
     SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
@@ -650,35 +640,20 @@ void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
     }
 }
 
-void SelectionMenu_ItemAvailability(struct SelectionMenu *arg)
+void SelectionMenu_ItemAvailability(struct SelectionMenu *p)
 {
-    struct SelectionMenu *p = arg;
     int i;
-    int index;
-    u8 alias;
-    int mask;
-    p->availableSlots = 0xffff;
-    i = 0;
-    mask = 1;
-    /* do-while(0) only keeps agbcc's block layout */
-    do {
-        index = Inventory_GetConsumableId(i);
-        if (index >= 0) {
-            struct SelectionMenuItem *table = gUnk_08E60F80;
-            alias = table[index].available;
-            if (alias && (!GameState_IsConsumableSlotEquipped(i))) {
-                goto next;
-            }
+    p->availableSlots = 0xFFFF;
+    for (i = 0; i < 16; i++) {
+        int index = Inventory_GetConsumableId(i);
+        if (index < 0) {
+            p->availableSlots &= ~(1 << i);
+        } else if (!gUnk_08E60F80[index].available) {
+            p->availableSlots &= ~(1 << i);
+        } else if (GameState_IsConsumableSlotEquipped(i)) {
+            p->availableSlots &= ~(1 << i);
         }
-        if (p) {
-            p->availableSlots &= ~(mask << i);
-        } else {
-            p->availableSlots &= ~(mask << i);
-        }
-    next:
-        i++;
-
-    } while (i < 16);
+    }
 }
 
 void SelectionMenu_OpenActorPage(struct SelectionMenu *p)
