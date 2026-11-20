@@ -78,6 +78,10 @@ int main(int argc, char** argv) {
         if (!strcmp(command, "step") && sscanf(line, "%*s %u %u", &n, &mask) == 2) {
             core->setKeys(core, mask);
             while (n--) core->runFrame(core);
+        } else if (!strcmp(command, "channels") && sscanf(line, "%*s %u", &mask) == 1) {
+            /* Solo original APU voices for the video soundtrack. */
+            for (unsigned ch = 0; ch < 4; ++ch)
+                core->enableAudioChannel(core, ch, (mask & (1u << ch)) != 0);
         } else if (!strcmp(command, "power")) {
             core->setKeys(core, 0);
             core->reset(core);
