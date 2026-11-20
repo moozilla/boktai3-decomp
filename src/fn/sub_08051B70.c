@@ -30,7 +30,6 @@ u32 ProximityEmitter_IsTetherNearby(struct ProximityEmitter *emitter)
         }
         if (((dx * dx) + (dz * dz)) <= 16383) {
             return 1;
-            return result;
         }
     }
 }
