@@ -2,7 +2,7 @@
 
 #include "global.h"
 
-#include "player.h"
+#include "player_status_flags.h"
 
 #include "scene_vec.h"
 
@@ -2481,9 +2481,8 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
         }
 
         case 2: {
-            u32 flags = 160;
             u16 *count;
-            player->statusFlags |= flags;
+            Player_AddStatusFlags(player, 0xA0);
             count = &player->chargeCounter;
             if ((*count) <= 4) {
                 if (((++(*count)) == 5) && (!(player->actionMode)))
@@ -2534,8 +2533,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
         }
 
         case 3: {
-            u32 flags = 128;
-            player->statusFlags |= flags;
+            Player_AddStatusFlags(player, 0x80);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64, 1);
             player->resetValue6FC = 30;
             if (!((player->inputKeys[0]) & 1)) {
