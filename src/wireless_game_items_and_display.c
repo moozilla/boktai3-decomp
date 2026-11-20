@@ -471,12 +471,8 @@ void WirelessGameItems_UpdateBlinkingItem(struct WirelessGameItems *p, struct Wi
         q->drawing.flags |= 1;
     }
     if (q->timer > 9) {
-        int one = 1;
-        q->state = one;
-        q->entered = one;
-        one = 0;
-        q->timer = 0;
-        q->count = one;
+        WirelessGameItem_EnterState(q, WIRELESS_GAME_ITEM_STEADY);
+        q->count = 0;
     }
     q->timer++;
 }
@@ -531,12 +527,7 @@ void WirelessGameItems_UpdateItemMerge(struct WirelessGameItems *owner, struct W
         count = p->count;
         if (target->state == 1)
             count += target->count;
-        {
-            int one = 1;
-            target->state = one;
-            target->entered = one;
-            target->timer = 0;
-        }
+        WirelessGameItem_EnterState(target, WIRELESS_GAME_ITEM_STEADY);
         /* Never true (count is a sum of two bytes). The compiler folds the test late and the
          * label it leaves keeps the next block apart, as in the ROM. */
         if (count < 0)
@@ -712,11 +703,7 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
         first = owner->current[slot];
         second = owner->pending[slot];
         {
-            int one;
-            one = 1;
-            target->state = one;
-            target->entered = one;
-            target->timer = 0;
+            WirelessGameItem_EnterState(target, WIRELESS_GAME_ITEM_STEADY);
             {
                 int value = first + second;
                 int clear;
@@ -831,32 +818,16 @@ void sub_0803A068(struct WirelessGameItems *owner, struct WirelessGameItem *p, i
 void WirelessGameItems_UpdateTemporaryItem(struct WirelessGameItems *p, struct WirelessGameItem *q,
                                            int index)
 {
-    void *alias;
-    /* do-while(0) only keeps agbcc's block layout */
-    do {
-        if (q->entered) {
-            int choice;
-            void *draw;
-            q->entered = 0;
-            q->sprite.value = q->count;
-            q->sprite.flags &= ~1;
-            draw = &q->drawing;
-            p = (void *)&p->resource;
-            if (index > 7) {
-                choice = (index & 3) + 4;
-            } else {
-                choice = index & 3;
-            }
-            Anim_LoadKeyframe(alias = draw, p, gUnk_0824DE7C[choice], 0);
-            q->drawing.flags &= ~1;
-        }
-        if (q->timer > 31) {
-            q->state = 0;
-            q->entered = 1;
-            q->timer = 0;
-        }
-        q->timer++;
-    } while (0);
+    if (q->entered) {
+        q->entered = 0;
+        Item_LoadFrame(p, q, index);
+    }
+    if (q->timer > 31) {
+        q->state = 0;
+        q->entered = 1;
+        q->timer = 0;
+    }
+    q->timer++;
 }
 
 extern const u8 gUnk_0824DE94[];
@@ -878,11 +849,10 @@ void WirelessGameItems_InitItem(struct WirelessGameItems *owner, struct Wireless
     sprite = &p->sprite;
     Sprite_Init(sprite, owner->sprite, 0x10011);
     {
-        int clear = 0;
         u8 *visible;
         sprite->value = 0;
         visible = &p->sprite.visible;
-        *visible = clear;
+        *visible = 0;
     }
     if (index > 7)
         choice = (index & 3) + 4;
@@ -970,8 +940,6 @@ int WirelessGameItems_Init(struct WirelessGameItems *p)
 {
     struct SceneInputResource *resource;
     struct WirelessGameItem *item;
-    u8 *current;
-    u8 *pending;
     int i;
     gWirelessGameItems = p;
     resource = ScriptProc_Start(0xcb05, 0x5d04);
@@ -983,22 +951,14 @@ int WirelessGameItems_Init(struct WirelessGameItems *p)
         return -1;
     item = p->items;
     i = 0;
-    current = p->current;
-    pending = p->pending;
     do {
         WirelessGameItems_InitItem(p, item, i);
         i++;
         item++;
     } while (i <= 15);
-    i = 0;
-    {
-        u8 *first = current;
-        int zero = 0;
-        u8 *second = pending;
-        do {
-            first[i] = zero;
-            second[i] = zero;
-        } while (++i <= 3);
+    for (i = 0; i < (int)sizeof(p->current); i++) {
+        p->current[i] = 0;
+        p->pending[i] = 0;
     }
     return 0;
 }
@@ -1039,12 +999,7 @@ int WirelessGameItems_QueueLocalItem(struct ContactPosition *position, int index
                 count = target->count;
             else
                 count = current->count + target->count;
-            {
-                int one = 1, zero = 0;
-                current->state = one;
-                current->entered = one;
-                current->timer = zero;
-            }
+            WirelessGameItem_EnterState(current, WIRELESS_GAME_ITEM_STEADY);
             {
                 int value = count;
                 int clear;
@@ -1123,10 +1078,8 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
     struct WirelessGameItem *target;
     if (!owner)
         return -1;
-    if (amount <= 0) {
-        int result = 0;
-        return result;
-    }
+    if (amount <= 0)
+        return 0;
     {
         /* Field-derived byte offsets preserve the matched address lifetimes. */
         int size = sizeof(struct WirelessGameItem);
@@ -1158,15 +1111,9 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
             {
                 int a;
                 int b;
-                int one;
-                int zero;
                 a = owner->current[index];
                 b = owner->pending[index];
-                one = 1;
-                zero = 0;
-                current->state = one;
-                current->entered = one;
-                current->timer = zero;
+                WirelessGameItem_EnterState(current, WIRELESS_GAME_ITEM_STEADY);
                 {
                     int value = a + b;
                     int clear;
@@ -1186,19 +1133,17 @@ int WirelessGameItems_QueueIncomingItem(int indexArg, int amountArg, int pending
     }
     {
         int value = amount;
-        int zero;
         if (value > 10)
             value = 10;
         else if (value < 0)
             value = 0;
-        zero = 0;
         target->count = value;
         value = pendingFlag;
         target->pendingFlag = value;
         target->state = 5;
         target->entered = 1;
-        target->timer = zero;
-        return zero;
+        target->timer = 0;
+        return 0;
     }
 }
 
@@ -1209,21 +1154,16 @@ void WirelessGameItems_StartOutgoingItems(void)
         int i = 0;
         int state = 4;
         int zero = 0;
-        u8 *count = p->pending;
         do {
-            if (*count) {
+            if (p->pending[i]) {
                 int value;
-                /* Direct items[i] indexing changes agbcc register allocation. */
-                int offset = i * sizeof(struct WirelessGameItem) + (u32) &
-                             ((struct WirelessGameItems *)0)->items;
-                struct WirelessGameItem *q;
-                q = (struct WirelessGameItem *)(((u8 *)p) + (*(&offset)));
+                struct WirelessGameItem *q = &p->items[i];
                 q->state = state;
                 do {
                     q->entered = 1;
                     q->timer = zero;
                 } while (0);
-                value = *count;
+                value = p->pending[i];
                 {
                     int clear = 0;
                     if (value > 10) {
@@ -1232,9 +1172,8 @@ void WirelessGameItems_StartOutgoingItems(void)
                     q->count = value;
                     q->pendingFlag = clear;
                 }
-                *count = zero;
+                p->pending[i] = zero;
             }
-            count++;
             i++;
         } while (i <= 3);
     }
