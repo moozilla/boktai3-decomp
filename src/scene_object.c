@@ -228,11 +228,6 @@ static inline u32 SceneCollider_ReadContactFlags(const struct SceneCollider *con
     return contact->contactFlags & mask;
 }
 
-static inline u32 SceneCollider_ReadReactionFlags(const struct SceneCollider *contact, u32 mask)
-{
-    return contact->contactFlags2 & mask;
-}
-
 void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
                                    struct SceneObject *object)
 {

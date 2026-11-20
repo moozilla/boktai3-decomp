@@ -57,6 +57,11 @@ struct SceneCollider {
     u8 tail[24];
 };
 
+static inline u32 SceneCollider_ReadReactionFlags(const struct SceneCollider *contact, u32 mask)
+{
+    return contact->contactFlags2 & mask;
+}
+
 struct SceneLink {
     u16 id;
     u8 pad2[2];
