@@ -1,34 +1,20 @@
+#include "tentacle_body.h"
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "engine.h"
 #include "ram.h"
 #define ActorTrail_ResetPositions     TentacleActor_ResetSegmentPositions
 #define ActorTrail_CopyTerrainSamples TentacleActor_ResetRouteHistory
-struct ActorTrail {
-    u8 unknown0[0x875];
-    u8 field875;
-    u8 unknown876[3];
-    u8 field879;
-    u16 field87A;
-    u8 unknown87C[0x54];
-    u16 flags8D0;
-    u8 unknown8D2[0x17];
-    u8 variant;
-    u8 unknown8EA[0xA];
-    u16 field8F4;
-    u8 unknown8F6[0x36];
-    struct ContactPosition savedPosition;
-};
 void TentacleActor_ResetRouteHistory(void *);
 void TentacleActor_ResetSegmentPositions(void *, struct ContactPosition *);
 void TentacleActor_SelectWanderRoute(void *);
 void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
 {
-    struct ActorTrail *trail = actor->base.context;
+    struct TentacleBody *trail = actor->base.context;
     struct ContactPosition *saved;
-    trail->flags8D0 &= 0xFFFD;
-    trail->field879 = 0;
-    trail->field87A = 0;
+    trail->attackFlags &= 0xFFFD;
+    trail->blockedFrameCount = 0;
+    trail->returnCell = 0;
     {
         u32 index = (gRandomIndex + 1) & 1023;
         u32 value, mask;
@@ -36,10 +22,10 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
         index *= 2;
         value = *(const u16 *)((u32)gRandomTable + index);
         mask = 3;
-        trail->variant = mask & value;
+        trail->wanderDirection = mask & value;
     }
-    trail->field875 = 0;
-    trail->field8F4 = 0;
+    trail->spin = 0;
+    trail->unknown8F4 = 0;
     saved = &trail->savedPosition;
     if (!actor->base.drawableKind)
         *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x1C) = *saved;
@@ -57,18 +43,5 @@ void ActorTrail_ResetAtSavedPosition(struct ChaseActor *actor)
         actor->base.counter2AC = 0;
     }
     actor->base.field2B1 = 1;
-    {
-        void *target = actor->base.onAlternateEntry;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = 1;
-        actor->base.target = target;
-    }
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
 }
