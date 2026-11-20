@@ -1,8 +1,7 @@
-#include "global.h"
+#include "boss_action_state.h"
 
-void sub_0819AEA8(u8 *p, u8 step)
+void sub_0819AEA8(struct BossActionState *p, u8 step)
 {
-    u32 z = 0;
-    p[2] = step;
-    *(u32 *)(p + 0xc) = z;
+    p->step = step;
+    p->stepFrame = 0;
 }
