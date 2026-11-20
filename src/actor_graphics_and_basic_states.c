@@ -86,17 +86,14 @@ void WirelessGame_AddItem(void *, s32);
 struct ContactVector {
     s16 x, y, z;
 };
-struct DamageContactActor {
-    u8 pad[0x33c];
-    union {
-        u32 value;
-        u16 halves[2];
-    } damage;
-};
-
 static inline u32 TestContactFlags(u32 *flags, u32 mask)
 {
     return *flags & mask;
+}
+
+static inline u32 TestColliderFlags(const struct ContactCollider *collider, u32 mask)
+{
+    return collider->flags & mask;
 }
 
 void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
@@ -112,51 +109,54 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
         return;
     mode = (*(u8 **)gPlayers)[0x418];
     Collision_CalculateDamageResponse(source, contact);
-    if (((*((u32 *)(p + 0x358))) == 1) && (mode != 2))
-        *((u16 *)(contact + 0x3e)) = 0;
+    if ((((struct SceneGraphicsActor *)p)->graphics.stepTableKind == 1) && (mode != 2))
+        ((struct ContactCollider *)contact)->cost = 0;
     if (!(gEngineFlags & 0x1000))
         PlayerStats_AddContactHundredths(source, contact, *((s16 *)(p + 0x380)));
-    ((struct DamageContactActor *)p)->damage.value = *((u16 *)(contact + 0x3e));
-    if ((*((u16 *)(contact + 0x3e))) == 0) {
+    ((struct SceneGraphicsActor *)p)->pendingDamage = ((struct ContactCollider *)contact)->cost;
+    if ((((struct ContactCollider *)contact)->cost) == 0) {
         Sound_PlaySongChecked(0x211);
         *((u16 *)(p + 0x34c)) = 10;
         *((void **)(p + 0x288)) = p + 0x5c4;
         size.x = 16;
         size.y = 0;
         size.z = 16;
-        DamageNumberDisplay_Show(contact, *((u16 *)(contact + 0x3e)), 0, sprite + 12, &size, 1);
+        DamageNumberDisplay_Show(contact, ((struct ContactCollider *)contact)->cost, 0, sprite + 12,
+                                 &size, 1);
     }
     {
-        u32 k1 = 0x100;
-        if ((*((u16 *)(source + 6))) & k1) {
-            u8 angle = source[0x42];
-            p[0x342] = angle;
+        if (TestColliderFlags((struct ContactCollider *)source, 0x100)) {
+            u8 angle = ((struct ContactCollider *)source)->direction;
+            ((struct SceneGraphicsActor *)p)->hitAngle = angle;
         } else
-            p[0x342] = Math_Atan2((*((s16 *)(contact + 0x24))) - (*((s16 *)(source + 0x24))),
-                                  (*((s16 *)(contact + 0x28))) - (*((s16 *)(source + 0x28))));
+            ((struct SceneGraphicsActor *)p)->hitAngle = Math_Atan2(
+                ((struct ContactCollider *)contact)->x - ((struct ContactCollider *)source)->x,
+                ((struct ContactCollider *)contact)->z - ((struct ContactCollider *)source)->z);
     }
     {
-        u32 value = *((u32 *)(source + 0x34));
+        u32 value = ((struct ContactCollider *)source)->statRewardFlags;
         *((u32 *)(actor + 0xbc)) = value;
-        value = *((u32 *)(source + 0x38));
+        value = ((struct ContactCollider *)source)->reactionFlags;
         *((u32 *)(actor + 0xc0)) = value;
     }
-    responseValue = *((u16 *)(source + 0x44));
+    responseValue = ((struct ContactCollider *)source)->responseValue;
     *((u16 *)(p + 0x34e)) = responseValue;
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
-    if (((*((s32 *)(p + 0x33c))) > 0) && TestContactFlags((u32 *)(source + 0x38), 1))
-        p[0x340] = 1;
+    if ((((struct SceneGraphicsActor *)p)->pendingDamage > 0) &&
+        TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 1))
+        ((struct SceneGraphicsActor *)p)->damagePending = 1;
     if (!(gEngineFlags & 0x1000))
         return;
     if ((mode - 1) <= 1) {
         position = contact + 0xc;
-        if (WirelessGame_TryAddCyclingItem(position) && (contact[0x43] & 8))
+        if (WirelessGame_TryAddCyclingItem(position) &&
+            (((struct ContactCollider *)contact)->costFlags & 8))
             WirelessGame_AddItem(position, 0);
         return;
     }
-    if (contact[0x43] & 8)
+    if (((struct ContactCollider *)contact)->costFlags & 8)
         WirelessGame_AddItem(contact + 0xc, 0);
-    if (!TestContactFlags((u32 *)(source + 0x38), 0x800000))
+    if (!TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 0x800000))
         return;
     {
         u8 *stats = (u8 *)gGameState;
@@ -252,35 +252,37 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_Refresh(drawable);
 }
 
+static inline u32 SceneActorState_TestFlags(const struct StateActor *actor, u32 mask)
+{
+    return actor->actionFlags & mask;
+}
+
 void SceneActorGraphics_UpdateVariant(struct StateActor *p)
 {
-    u8 *drawable = p->bodyDrawable;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    struct ContactCollider *drawable = (struct ContactCollider *)p->bodyDrawable;
     {
-        u32 mask = 0x40000;
-        if (p->actionFlags & mask)
-            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 1;
+        if (SceneActorState_TestFlags(p, 0x40000))
+            actor->graphics.variantToggle = 1;
         else
-            ((struct SceneGraphicsActor *)p)->graphics.variantToggle = 0;
+            actor->graphics.variantToggle = 0;
     }
-    if (((struct SceneGraphicsActor *)p)->graphics.variantToggle !=
-        ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev) {
-        switch (((struct SceneGraphicsActor *)p)->graphics.variantToggle) {
+    if (actor->graphics.variantToggle != actor->graphics.variantTogglePrev) {
+        switch (actor->graphics.variantToggle) {
             case 0:
-                Collider_SetAttackProperties(
-                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth0,
-                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight0, 0, 0,
-                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth0);
+                Collider_SetAttackProperties(drawable, actor->graphics.attackWidth0,
+                                             actor->graphics.attackHeight0, 0, 0,
+                                             actor->graphics.attackDepth0);
                 break;
             case 1:
-                Collider_SetAttackProperties(
-                    drawable, ((struct SceneGraphicsActor *)p)->graphics.attackWidth1,
-                    ((struct SceneGraphicsActor *)p)->graphics.attackHeight1, 0, 0x60000,
-                    ((struct SceneGraphicsActor *)p)->graphics.attackDepth1);
+                Collider_SetAttackProperties(drawable, actor->graphics.attackWidth1,
+                                             actor->graphics.attackHeight1, 0, 0x60000,
+                                             actor->graphics.attackDepth1);
                 break;
         }
         {
-            int value = ((struct SceneGraphicsActor *)p)->graphics.variantToggle;
-            ((struct SceneGraphicsActor *)p)->graphics.variantTogglePrev = value;
+            int value = actor->graphics.variantToggle;
+            actor->graphics.variantTogglePrev = value;
         }
     }
 }
@@ -374,32 +376,27 @@ static inline void setFacing(ActorAnimation *p, int angle)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
+static inline void SceneActorState_StartAction(struct StateActor *actor, u32 mode, u32 index,
+                                               u32 phase)
+{
+    actor->actionMode = mode;
+    actor->actionIndex = index;
+    actor->actionPhase = phase;
+    actor->actionTimer = 0;
+    actor->actionEnter = 1;
+}
+
 void SceneActors_StartDisappearEffect(u32 *position)
 {
-    ActorAnimation *p = SceneActors_GetBySlot(0);
+    struct StateActor *p = SceneActors_GetBySlot(0);
     if (p) {
         int sequence;
-        u32 one;
-        u32 zero = 0, phase = 13;
-        p->mode = zero;
-        p->state = zero;
-        p->phase = phase;
-        p->elapsed = zero;
-        {
-            u8 *dst = &p->enter;
-            one = 1;
-            *dst = one;
-        }
-        p->pos = *(typeof(p->pos) *)position;
-        setFacing(p, p->requestedAngle);
-        {
-            int test = p->graphicsMode & one;
-            sequence = 62;
-            if (test)
-                sequence = 24;
-        }
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, one,
-                                              one, 6);
+        SceneActorState_StartAction(p, 0, 0, 13);
+        p->target = *(struct StateActorPos *)position;
+        setFacing((ActorAnimation *)p, p->requestedAngle);
+        sequence = (((ActorAnimation *)p)->graphicsMode & 1) ? 24 : 62;
+        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 1, 1,
+                                              6);
         Sound_PlaySongChecked(839);
         Sound_PlaySongChecked(1335);
     }
