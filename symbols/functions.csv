@@ -3173,7 +3173,7 @@ addr,name,mode,confidence,source,notes
 08093644,Bee_SubVector,thumb,low,src-alias,
 0809366C,SceneActorCollision_FireSecondaryAttack,thumb,low,src-alias,
 08093718,Bee_OnDetectionCheck,thumb,low,src-alias,Detection callback consumes a detection flag and accepts targets within height and distance limits
-08093798,Slime_SetStateFlag,thumb,low,src-alias,
+08093798,Bee_SetTrackingReactionFlag,thumb,low,src-alias,Bee installs this reaction gate. It sets bit 8 of the native tracking flags. Name tentative.
 080937A4,Bee_GetMovementVariant,thumb,low,src-alias,Tentatively maps the actor variant field to a movement selection value
 080937D0,Bee_TickActionCooldown,thumb,low,src-alias,Decrements the saturating action cooldown byte at actor offset 0x42B
 080937E8,Bee_UpdateGroundHeight,thumb,low,src-alias,Wraps the Bee ground-height adjustment routine and returns success

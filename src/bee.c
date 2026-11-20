@@ -1030,7 +1030,7 @@ one: {
     return 1;
 }
 
-void Slime_SetStateFlag(struct ChaseActor *actor)
+void Bee_SetTrackingReactionFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
     MonsterInit_SetTargetingFlags(tracking, 8);
@@ -1715,7 +1715,7 @@ static inline void Bee_InstallRoutes(struct ChaseActor *actor)
 {
     MonsterInit_WriteCommandTable(&actor->base.commandTable.handlers, gUnk_08605DB8);
     actor->base.routeReset = Bee_ResetRoute;
-    actor->base.reactionGate = Slime_SetStateFlag;
+    actor->base.reactionGate = Bee_SetTrackingReactionFlag;
     MonsterInit_WriteCallback(&actor->base.contactQuery.opaque, Bee_OnDetectionCheck);
 }
 
