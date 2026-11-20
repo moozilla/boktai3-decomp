@@ -228,6 +228,7 @@ addr,name,mode,confidence,source,notes
 08009B7C,DirectionalController_ScriptCreate,thumb,low,src-alias,
 08009D40,DirectionalController_ScriptRelease,thumb,low,src-alias,
 08009D84,DirectionalController_ScriptMove,thumb,low,src-alias,
+08009E30,CollisionController_ClearGlobal,thumb,low,src-alias,Clear the collision manager pointer.
 08009E3C,CollisionController_FindFreeSlot,thumb,low,src-alias,Scans the 16 manager slots for one with active==0; called by CollisionController_ScriptCreate before initializing a new slot.
 08009E5C,CollisionController_ReceiveHit,thumb,low,src-alias,Collider contact callback (set via Collider_SetCallback in CollisionController_InitSlot) that flags the other object hit and switches the slot into hi
 08009E98,CollisionController_InitSlot,thumb,low,src-alias,
