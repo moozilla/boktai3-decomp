@@ -1,31 +1,24 @@
-#include "global.h"
+#include "result_tutorial.h"
 #include "player.h"
-struct P {
-    u8 pad[0x3c];
-    u32 w3c;
-    u8 pad1[0x77];
-    u8 bb7;
-};
-s32 ResultMenu_IsPhaseStart(void);
+
+s32 ResultMenu_IsPhaseStart(struct ResultMenu *);
 u8 ResultMenu_ConfigureLayers(u32, u32);
-void ResultGame_InitializeDisplay(struct P *);
+void ResultGame_InitializeDisplay(struct ResultMenu *);
 void ScreenTransition_SendCommand(u32, u32, u32, u32, u32, u32, u32);
-void PlayerCue_BeginModeSeven(u32, u32);
-void ResultMenu_SetPhase(struct P *, void (*)(void));
+void PlayerCue_BeginModeSeven(void *, u32);
+void ResultMenu_SetPhase(struct ResultMenu *, void (*)(void));
 void ResultMenu_Countdown(void);
-void ResultMenu_UpdateIntro(struct P *p)
+
+void ResultMenu_UpdateIntro(struct ResultMenu *p)
 {
-    if (ResultMenu_IsPhaseStart() != 0) {
-        u32 z;
-        p->bb7 = ResultMenu_ConfigureLayers(0xe, 0);
-        z = 0;
+    if (ResultMenu_IsPhaseStart(p)) {
+        p->layer = ResultMenu_ConfigureLayers(0xe, 0);
         ResultGame_InitializeDisplay(p);
-        ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, z);
-        PlayerCue_BeginModeSeven((*(u32 *)gPlayers), 0);
+        ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xFFFF, 0);
+        PlayerCue_BeginModeSeven(gPlayers[0], 0);
     }
-    if (p->w3c > 0x1f) {
+    if (p->phaseFrame > 0x1f)
         ResultMenu_SetPhase(p, ResultMenu_Countdown);
-    } else {
-        p->w3c++;
-    }
+    else
+        p->phaseFrame++;
 }
