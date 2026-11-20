@@ -3,7 +3,6 @@
 #include "scene_actor_control_phase.h"
 void SceneActorControl_OnIdle(void);
 // confidence=low: starts the actor callback at 0x234 then consumes its trigger.
-#define SceneActorControl_UpdateCallbackTrigger sub_08130994
 static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
 {
     u32 offset;

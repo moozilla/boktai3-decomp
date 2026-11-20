@@ -5291,6 +5291,7 @@ addr,name,mode,confidence,source,notes
 0813067C,SceneActorControl_UpdateSavedControlPhase,thumb,low,src-alias,
 08130714,SceneActorControl_UpdateTriggerApproach,thumb,low,src-alias,
 08130884,SceneActorControl_UpdateTriggerPhase,thumb,low,src-alias,
+08130994,SceneActorControl_UpdateCallbackTrigger,thumb,low,src-alias,Runs the callback then consumes its trigger when the controller completes
 08130AB4,SceneActorState_DispatchTable294State,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x294; table role remains tentative
 08130AD8,SceneActorState_DispatchTable29CState,thumb,low,src-alias,Invokes the callback selected by byte 0x2AA from table 0x29C; table role remains tentative
 08130AFC,SceneActorState_DispatchTable2A0State,thumb,low,src-alias,Invokes the callback selected by byte 0x2A9 from table 0x2A0; table role remains tentative
