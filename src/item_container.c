@@ -800,13 +800,8 @@ s32 Trigger_CreateDropFromScript(void)
     mode = Script_GetKeywordValue('M', 0);
     persistent = Script_GetKeywordValue('i', 0);
     option = Script_GetKeywordValue('O', 0);
-    {
-        s32 zero = 0;
-        s32 *clear = arguments + 2;
-        do {
-            *clear-- = zero;
-        } while ((s32)clear >= (s32)arguments);
-    }
+    for (count = 0; count < 3; count++)
+        arguments[count] = 0;
     if (Script_SeekToKeyword('a')) {
         count = 0;
         out = arguments;
@@ -969,13 +964,8 @@ s32 Trigger_CreateContainerFromScript(void)
     sound = Script_GetKeywordValue('M', 0);
     hidden = Script_GetKeywordValue('S', 0);
     condition = Script_GetKeywordValue('c', 0);
-    {
-        s32 zero = 0;
-        s32 *clear = arguments + 2;
-        do {
-            *clear-- = zero;
-        } while ((s32)clear >= (s32)arguments);
-    }
+    for (count = 0; count < 3; count++)
+        arguments[count] = 0;
     if (Script_SeekToKeyword('a')) {
         count = 0;
         out = arguments;
