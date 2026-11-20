@@ -802,9 +802,6 @@ int ResultTutorial_ReadScript(struct ResultMenu *tutorial)
 int ResultTutorial_Initialize(struct ResultMenu *tutorial, void *owner, void *unused)
 {
     struct SceneInputResource *r;
-    int four;
-    u8 *difficulty;
-    int zero;
     tutorial->owner = owner;
     r = ScriptProc_Start(0xcb05, 0x530d);
     if (!r) {
@@ -821,17 +818,14 @@ int ResultTutorial_Initialize(struct ResultMenu *tutorial, void *owner, void *un
     if (ResultTutorial_ReadScript(tutorial) < 0) {
         return -1;
     }
-    difficulty = &tutorial->difficulty;
-    zero = 0;
-    four = 4;
-    *difficulty = four;
-    tutorial->step = zero;
-    tutorial->prompt = zero;
+    tutorial->difficulty = 4;
+    tutorial->step = 0;
+    tutorial->prompt = 0;
     tutorial->level = 3;
     ResultMenu_CreateGraphics(tutorial);
     ResultMenu_SetPhase(tutorial, ResultTutorial_Open);
     Sound_PlayTrackedSong(0xaa);
-    gEnginePauseFlags |= four;
+    gEnginePauseFlags |= (1 << 2);
     return 0;
 }
 
