@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimationIndex(struct Player *, s32, s32);
@@ -57,8 +57,7 @@ void Player_UpdateConvergingChargeAction(struct Player *p)
             break;
         case 2: {
             u8 z;
-            u32 mask = 0xA0;
-            p->statusFlags = mask | p->statusFlags;
+            Player_AddStatusFlags(p, 0xA0);
             if (p->chargeCounter <= 4) {
                 p->chargeCounter++;
                 if (p->chargeCounter == 5)
@@ -89,8 +88,7 @@ void Player_UpdateConvergingChargeAction(struct Player *p)
             break;
         }
         case 3: {
-            u32 mask = 0x80;
-            p->statusFlags = mask | p->statusFlags;
+            Player_AddStatusFlags(p, 0x80);
         }
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 10), 0x40);
             p->resetValue6FC = 30;

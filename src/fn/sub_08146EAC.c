@@ -1,7 +1,8 @@
 #include "contact_swarm.h"
-#include "player.h"
+#include "player_status_flags.h"
 #include "engine.h"
 #include "ram.h"
+#include "player_timed_cue.h"
 #include "player_cue_sequence.h"
 // confidence=low: motion eleven toggles actionMode two with a secondary sprite animation.
 u32 Player_ConsumeStateEntry(struct Player *);
@@ -68,10 +69,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
     }
     if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
-    {
-        u32 mask = 0x100000;
-        p->statusFlags = mask | p->statusFlags;
-    }
+    Player_AddStatusFlags(p, 0x100000);
     p->statusValue = 4000;
     if (V->done)
         Anim_SetSequence(&V->sequence, V->resource, 21, 0, 0);
@@ -149,12 +147,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
             if (++p->tetherFrame > 9) {
                 if (p->actionMode != 2) {
                     p->actionMode = 2;
-                    {
-                        u32 one = 1;
-                        u32 duration = 1800;
-                        gPlayerActionPending = one;
-                        gPlayerCueTimer = duration;
-                    }
+                    Player_SetTimedCue(1, 1800);
                     ScreenTransition_SendCommand(0, 4, 31, 31, 20, 0x1FFF, 0);
                     gPlayerEffectPendingCount++;
                     p->statHundredths = 0;

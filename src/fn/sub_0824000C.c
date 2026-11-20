@@ -1,3 +1,4 @@
+#include "player.h"
 #include "global.h"
 #define B(o) (*(u8 *)(p + (o)))
 #define H(o) (*(u16 *)(p + (o)))
@@ -13,7 +14,6 @@ u32 ActorVariant_GetTableValue(u32, u32);
 void Player_SetAnimationIndex(void *, u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 // confidence=low: linked action camera, screen fade and timed animation phases.
-#define Player_UpdateLinkedScreenTransition sub_0824000C
 void Player_UpdateLinkedScreenTransition(u8 *p)
 {
     struct TransitionPosition position;
@@ -28,16 +28,15 @@ void Player_UpdateLinkedScreenTransition(u8 *p)
             else
                 ScreenTransition_SendCommand(3, 3, 4, 4, 4, 0x1FFF, 1);
             Player_PlayLocalSong(W(0x18), 0x1AD);
-            if (B(0x3A4) > 4) {
-                s32 frame = (8 - B(0x3A4)) >> 1;
-                B(0x3A2) = frame;
-                B(0x3A3) = 1;
-            } else {
-                u32 frame = B(0x3A4) >> 1;
-                u8 *target = p + 0x3A2;
-                u32 zero = 0;
-                *target = frame;
-                B(0x3A3) = zero;
+            {
+                struct Player *player = (struct Player *)p;
+                if (player->facing > 4) {
+                    player->heading = (8 - player->facing) >> 1;
+                    player->side = 1;
+                } else {
+                    player->heading = player->facing >> 1;
+                    player->side = 0;
+                }
             }
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x29), 64);
             Player_SetTetherMode(p, 0x1B, 1);

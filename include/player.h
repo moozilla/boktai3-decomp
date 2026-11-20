@@ -256,11 +256,8 @@ struct Player {
     const struct PlayerActionConfig *actionConfig; /* 0x344 */
     const u16 *inputKeys;     /* 0x348: directional key bits consumed by Player_GetInputDirection */
     u16 directionHistory[10]; /* 0x34C: signed samples; 0xFFFF means absent (read through s16) */
-    u8 visualParameters[0xA]; /* 0x360: animation parameter block */
-    u16 visualParameterA, visualParameterB; /* 0x36A */
-    u8 unk36E[0xC];
-    u16 visualParameterC; /* 0x37A */
-    u8 unk37C[0x24];
+    u16 basePalette[16]; /* 0x360: actor palette before blending */
+    u16 workPalette[16]; /* 0x380: blended palette bound to the active drawable */
     u16 animationIndex; /* 0x3A0: selected base keyframe index */
     u8 heading, side;   /* 0x3A2: folded direction and side */
     u8 facing;          /* (guess) direction index */
@@ -296,7 +293,9 @@ struct Player {
     u8 unk461[3];
     u8 actionLatch464, actionLatch465;
     u8 colliderHeightOffset; /* 0x466: added to the spiral collider Y position. */
-    u8 unk467[4];
+    u8 colliderHeightTarget, colliderHeightRetargetTimer; /* 0x467: hover target and frames until resampling */
+    u8 unk469;
+    u8 footstepSide; /* 0x46A: alternates the walking effect and sound */
     u8 movementMode46B;
     u8 unk46C[6];
     u8 timedEventSlot; /* 0x472: index into GameState counters620/counters628 */

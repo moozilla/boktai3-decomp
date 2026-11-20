@@ -5545,6 +5545,7 @@ addr,name,mode,confidence,source,notes
 08140748,Player_BeginTerrainFacingAction,thumb,low,src-alias,
 08140834,Player_RequestNearbyEffectTarget,thumb,low,src-alias,Requests a nearby repeated effect and initializes its target to the current grid cell center when available
 081408AC,Player_BeginTerrainRecovery_081408AC,thumb,low,src-alias,
+081409BC,Player_IsTurnTerrainBlocked,thumb,low,src-alias,Tentative: tests candidate height and terrain occupancy during locked turning
 08140AC8,Player_SelectLockedTurnDirection,thumb,low,src-alias,
 08140CC4,Player_UpdateLockedMovement,thumb,low,src-alias,
 08140F40,Player_GetForceDirection,thumb,low,src-alias,
@@ -5595,6 +5596,7 @@ addr,name,mode,confidence,source,notes
 0814499C,Player_UpdateActionEffectSequence,thumb,low,src-alias,
 08144A98,Player_OnRecoveryActionEnd,thumb,low,src-alias,Recovery action cleanup callback that returns the attached object to state 2 and selects palette bank 0x65; action interpretation tentative
 08144D60,Player_OnChargeMotionExit,thumb,low,src-alias,Empty exit callback for the attachment charge motion; charge interpretation is tentative
+08144D64,Player_UpdateChargeMotion,thumb,low,src-alias,Counts down the charge motion while advancing three animation phases.
 08145130,Player_UpdateCountdownAnimation,thumb,low,src-alias,
 08145220,Player_UpdateFallPose,thumb,low,src-alias,Selects motion 28 or 29 from the fall variant and sets movement flags; fall interpretation is tentative
 081453F0,Player_OnFadeMotionExit,thumb,low,src-alias,Clears the sprite fade flag when the fade motion exits
@@ -5604,6 +5606,7 @@ addr,name,mode,confidence,source,notes
 08145B18,Player_UpdateDefeatSlide,thumb,low,src-alias,
 08145DA0,Player_UpdateDefeatRecoil,thumb,low,src-alias,
 081460F4,Player_UpdateDeathSequence,thumb,low,src-alias,Sequences animation sounds screen transition and health clearing before setting completion; death interpretation is tentative
+081462DC,Player_UpdateTimedScreenTransition,thumb,low,src-alias,Advances timed animation phases and requests the screen transition.
 08146478,Player_UpdateTimedCuePhase,thumb,low,src-alias,
 08146574,Player_UpdateInputCadenceCue,thumb,low,src-alias,
 08146870,Player_UpdateBriefAction,thumb,low,src-alias,
@@ -5663,6 +5666,7 @@ addr,name,mode,confidence,source,notes
 0814E3A0,Player_UpdateAttachedEntryPosition,thumb,low,src-alias,
 0814E3D8,Player_UpdateSelectedAttackCharge,thumb,low,src-alias,
 0814E978,Player_OnChargedAttackExit,thumb,low,src-alias,Releases the active managed attack handle when the charging attack motion exits
+0814E990,Player_UpdateAttachedChargeTiers,thumb,low,src-alias,Advances the attached action through its charge tiers.
 0814EED4,Player_StopActionSongOnExit,thumb,low,src-alias,Action exit callback that stops song 0xCC
 0814F310,Player_ReleaseActionEffectOnExit,thumb,low,src-alias,Action exit callback that releases the effect handle at 0xC74 when valid; effect ownership is tentative
 0814F328,Player_UpdateAttachedAttackCharge,thumb,low,src-alias,
@@ -5733,8 +5737,10 @@ addr,name,mode,confidence,source,notes
 081581AC,Player_TestMovementPosition,thumb,low,src-alias,
 08158234,Player_ClampInteractionVelocity,thumb,low,src-alias,
 08158320,Player_UpdateInteractionHoverDisplay,thumb,low,src-alias,
+0815849C,Player_UpdateInteractionCallbacks,thumb,low,src-alias,Dispatches the interaction callback and updates the player camera and movement.
 08158588,Player_SelectAlternateInteractionMode,thumb,low,src-alias,
 08158650,Player_SynchronizeInteractionDisplay,thumb,low,src-alias,
+08158754,Player_UpdateAlternateInteractionCallbacks,thumb,low,src-alias,Dispatches the alternate interaction mode and updates its display and movement.
 08158848,Player_UpdateLinkModeMovement,thumb,low,src-alias,
 08158CD8,Player_BeginTerrainInteraction,thumb,low,src-alias,
 08158DF0,Player_BeginDirectionSequence,thumb,low,src-alias,
@@ -5786,6 +5792,7 @@ addr,name,mode,confidence,source,notes
 08159FF4,Player_RequestTimedReset,thumb,low,src-alias,
 0815A110,Player_StartForcedStun,thumb,low,src-alias,Invokes the timed reaction helper with forced setup enabled; stun interpretation is tentative
 0815A11C,Player_AdvanceTetherPhase,thumb,low,src-alias,
+0815A1AC,Player_SpawnMovementModifierEffects,thumb,low,src-alias,Spawns a batch into the player movement modifier group and applies the effect kind after a successful spawn.
 0815A324,Player_ClearFlag740,thumb,low,src-alias,Clears the player byte flag at offset 740; its gameplay meaning remains uncertain
 0815A340,Player_SetFlag740,thumb,low,src-alias,Sets the player byte flag at offset 740; paired with its clearing helper
 0815A35C,Player_GetCollisionData,thumb,low,src-alias,Returns player field D4 or fallback data; collision data interpretation is tentative
@@ -10593,6 +10600,7 @@ addr,name,mode,confidence,source,notes
 0823F928,Player_UpdateChargedSpinAttack,thumb,low,src-alias,
 0823FE60,Player_RunConfiguredActionHandler,thumb,low,src-alias,Enters state three and invokes the configured callback stored at offset 0xC88
 0823FE94,Player_UpdateSolarBombCharge,thumb,low,src-alias,
+0824000C,Player_UpdateLinkedScreenTransition,thumb,low,src-alias,Updates the linked camera and timed animation during a screen transition.
 08240200,Player_UpdateTetherRecoil,thumb,low,src-alias,
 08240408,Player_UpdateKnockback,thumb,low,src-alias,
 08240708,Player_UpdateRecoil,thumb,low,src-alias,

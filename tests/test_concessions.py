@@ -210,6 +210,13 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_same_named_member_does_not_change_literal_local(self):
+        for store in ("p->state = state;", "record. state += state;", "p-> state++;"):
+            with self.subTest(store=store):
+                body = "void f(void) {\n    u32 state = 12;\n    " + store + "\n"
+                self.assertEqual(warns(body + "}\n"), ["literal-local"])
+                self.assertEqual(warns(body + "    state++;\n}\n"), [])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])

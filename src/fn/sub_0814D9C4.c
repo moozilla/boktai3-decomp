@@ -127,13 +127,11 @@ void Player_UpdateWeaponCueCombo(struct Player *p)
         }
 
         case 5: {
-            u8 *pending = &p->statModifierContext.bufferedAttack;
-            u32 zero = 0;
-            *pending = zero;
+            p->statModifierContext.bufferedAttack = 0;
             if (Player_SetAnimation(p, Player_SelectActionCue(p), record->speed, 2) ||
                 ((p->tetherFrame) > 30)) {
                 ActorSequence_Begin(p, 0, 0);
-                p->actionResetCounter = zero;
+                p->actionResetCounter = 0;
             }
             break;
         }

@@ -1,15 +1,8 @@
-#include "contact_swarm.h"
-#include "player.h"
+#include "player_cue.h"
+#include "player_status_flags.h"
 #include "render.h"
 #include "player_cue_sequence.h"
 // confidence=low: action pulses a spiral effect while alternating the folded facing.
-struct ReleaseAnimation {
-    u8 pad[0x14C];
-    struct ContactSwarmSprite sprite;
-    u8 pad2[0x3FC - 0x14C - sizeof(struct ContactSwarmSprite)];
-    struct DisplaySequenceState seq;
-    const void *resource;
-};
 
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -33,10 +26,7 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
         Sound_PlaySong(0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 32, 56);
     }
-    {
-        u32 mask = 0x100000;
-        p->statusFlags = mask | p->statusFlags;
-    }
+    Player_AddStatusFlags(p, 0x100000);
     if ((p->tetherFrame & 7) < 7 - (p->tetherFrame >> 2)) {
         if (p->facing > 3) {
             p->heading = (7 - p->facing) >> 1;
@@ -46,11 +36,8 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
             p->side = 0;
         }
     } else {
-        struct Words {
-            u32 a, b;
-        };
         Player_AddControlFlags(p, 0x41);
-        *(struct Words *)((u8 *)p + 0xAC) = *(struct Words *)((u8 *)p + 0x30);
+        p->previousPosition = p->position;
         if (p->facing > 4) {
             p->heading = 8 - p->facing;
             p->side = 1;
@@ -62,28 +49,12 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
     Player_SetAnimation(p, 0x9A, 64, 1);
     p->spriteResource = 0x16F;
     p->actionVariantResource = (u32)(gPaletteBankData + (p->spriteResource << 5));
-    Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x40C), 0,
-                     p->heading, p->side);
-    PlayerCue_StepSequence(&((struct ReleaseAnimation *)p)->sprite,
-                           &((struct ReleaseAnimation *)p)->seq);
-    {
-        u32 offset = 0xAD6;
-        u16 *parameter;
-        parameter = (u16 *)((u8 *)p + offset);
-        {
-            register u32 value = 0x2DD;
-            *parameter = value;
-        }
-    }
-    {
-        u32 durationOffset = (u32) & ((struct Player *)0)->actionEighteenDuration;
-        struct Duration {
-            u16 actionEighteenDuration;
-        } *duration;
-        duration = (struct Duration *)((u8 *)p + durationOffset);
-        if ((duration->actionEighteenDuration += 3) > 32)
-            duration->actionEighteenDuration = 32;
-    }
+    Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.setupResource, 0, p->heading,
+                     p->side);
+    PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
+    p->actionEighteenParameter = 0x2DD;
+    if ((p->actionEighteenDuration += 3) > 32)
+        p->actionEighteenDuration = 32;
     if (++p->tetherFrame > 31) {
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;

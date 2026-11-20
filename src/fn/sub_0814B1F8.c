@@ -208,14 +208,10 @@ void Player_UpdateTargetMotion(struct Player *p)
     if (Player_ConsumeStateEntry(p)) {
         if (MOTION->particles == 0)
             MOTION->particles = ParticlePool_Create();
-        {
-            u16 *speed = &MOTION->speed;
-            u32 zero = 0;
-            *speed = 50;
-            PlayerMotion_SetTarget(sub_0814B078(p, 1000000, zero));
-            gUnk_0200051C = zero;
-            gUnk_02000524 = zero;
-        }
+        p->cueSpeed = 50;
+        PlayerMotion_SetTarget(sub_0814B078(p, 1000000, 0));
+        gUnk_0200051C = 0;
+        gUnk_02000524 = 0;
         p->movementStart = p->position;
         MOTION->position = p->previousPosition;
         PlayerMotion_ClearAnimationFlags(&p->secondaryAnimation, 1);
@@ -308,8 +304,7 @@ void Player_UpdateTargetMotion(struct Player *p)
                     r0 = PlayerMotion_RandomFrom(earlyTable) & 0xFF;
                     {
                         s32 raw = PlayerMotion_RandomFrom(earlyTable);
-                        s32 mask = 31;
-                        raw &= mask;
+                        raw &= 31;
                         velocity = &vel.value;
                         r1 = raw - 16;
                     }

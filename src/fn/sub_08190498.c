@@ -77,8 +77,7 @@ void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct NidhoggrEffectVect
     gEffectRandomTableIndex = (gEffectRandomTableIndex + 1) & 0x3ff;
     {
         u32 randomValue = gUnk_086141BC[gEffectRandomTableIndex];
-        u32 mask = 7;
-        effect->speedZ = (randomValue & mask) - 3;
+        effect->speedZ = (randomValue & 7) - 3;
     }
     effect->startX = position->x;
     {

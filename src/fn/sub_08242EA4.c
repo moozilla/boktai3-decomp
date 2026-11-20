@@ -1,3 +1,4 @@
+#include "player_status_flags.h"
 #include "global.h"
 #include "area_effect_link.h"
 
@@ -32,13 +33,11 @@ static inline long long LinkGet(s32 i)
 
 void Player_UpdateActionPhase(u8 *p)
 {
-    u32 m = 0x54000;
-    u32 f = *(u32 *)(p + 0x20) | m;
-    *(u32 *)(p + 0x20) = f;
+    Player_AddStatusFlags((struct Player *)p, 0x54000);
     switch (*(s32 *)(p + 0x1c)) {
         case 1: {
             s32 r;
-            if (f & 0x10) {
+            if (((struct Player *)p)->statusFlags & 0x10) {
                 Player_AccumulateActionCharge(p, LinkGet(*(s32 *)(p + 0x18)));
             }
             sub_082420D4(p);

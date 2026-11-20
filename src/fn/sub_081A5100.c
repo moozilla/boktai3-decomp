@@ -19,17 +19,13 @@ static inline void ClearFlags(u16 *p, u32 mask)
 {
     p[3] &= ~mask;
 }
-static inline void ClearWords(void *dest)
-{
-    u32 zero = 0;
-    CpuSet(&zero, dest, 0x05000002);
-}
+
 void TimedEffect_UpdateShutdown(struct TimedEffect *p)
 {
     if (p->timer == 0) {
         p->state = 6;
         ClearFlags((u16 *)&p->animation, 4);
-        ClearWords(p->clearedBC);
+        ZeroFill8(p->clearedBC);
         p->timer++;
     }
     if (p->timer > 0x7f)

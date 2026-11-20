@@ -15,14 +15,8 @@ extern const s16 gUnk_086149C4[];
 #define SH(o) (*(s16 *)((u8 *)p + (o)))
 static inline void Approach(struct Player *p)
 {
-    u32 o47c = 0x47C;
-    u8 *a47c;
-    s16 *target;
-    s32 x, z;
-    a47c = (u8 *)p + o47c;
-    target = *(s16 **)a47c;
-    x = target[0] - SH(0x30);
-    z = target[2] - SH(0x34);
+    s32 x = p->terrainTarget->x - p->position.x;
+    s32 z = p->terrainTarget->z - p->position.z;
     if (x >= 0)
         SH(0x38) = x >> 3;
     else
@@ -78,10 +72,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
         off270 = 0x270;
         q270 = (u16 *)((u8 *)p + off270);
         if (*q270) {
-            u32 o479 = 0x479;
-            u8 *a479;
-            a479 = (u8 *)p + o479;
-            if (*a479) {
+            if (p->terrainClampBlocked) {
                 Approach(p);
                 if (H(0x45A) <= 5) {
                     if (!(H(0x45A) & 1)) {

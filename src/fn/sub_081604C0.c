@@ -1,23 +1,12 @@
-#include "global.h"
+#include "frame_display.h"
+#include "word_flags.h"
 
-struct P {
-    u8 f00[0x34];
-    u32 w34;
-    u8 f38[0x60 - 0x38];
-    u32 w60;
-    u8 f64[4];
-    u32 w68;
-};
-
-void FrameDisplay_UpdateSprite(struct P *);
-
-s32 ActorDebris_Update(struct P *p)
+s32 ActorDebris_Update(struct FrameDisplay *display)
 {
-    u32 m = 1;
-    if (p->w60 & m) {
-        p->w34 |= m;
+    if (WordFlags_Test(&display->flags, 1)) {
+        WordFlags_Set(1, &display->sprite.flags);
         return 0;
     }
-    FrameDisplay_UpdateSprite(p);
-    p->w68++;
+    FrameDisplay_UpdateSprite(display);
+    display->frameCounter++;
 }

@@ -226,9 +226,11 @@ def _warn_sites(code: str):
                 depth -= 1
             i += 1
         n = re.escape(name)
-        changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
-        if not changed:
+        scope = code[m.end():i]
+        writes = re.finditer(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), scope)
+        # Assigning p->state or record.state does not change a local named state.
+        if all(scope[:write.start()].rstrip().endswith(("->", ".")) for write in writes):
             yield m.start(), "literal-local"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()

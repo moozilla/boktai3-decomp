@@ -2,69 +2,36 @@
 
 /* tentative: burst phase that also pushes the body back along its facing while firing */
 
-struct ReactionVector {
-    s16 x, y, z, pad;
-};
-struct ActorReaction {
-    u8 unk0[0x54];
-    struct ReactionVector position;
-    struct ReactionVector velocity;
-    u8 unk64[0x38];
-    u32 flags;
-    u8 unkA0[0xF];
-    u8 finished;
-    u8 unkB0;
-    u8 pending;
-    u8 unkB2[0x52];
-    void *callback;
-    u8 unk108[8];
-    struct ReactionVector *ground;
-    u8 unk114[0x60];
-    u8 collider174[0x20];
-    u8 collider194[0x20];
-    u8 unk1B4[0x177];
-    u8 variant;
-    u8 unk32C[0x14];
-    struct ReactionVector offsets[2];
-};
+#include "hresvelgr_travel.h"
+#include "scene_vec_polar.h"
+
 struct ReactionIds {
-    u32 a, b;
+    u32 ids[2];
 };
 extern const u32 gUnk_0824F72C[2];
-void Hresvelgr_SetAnimation(struct ActorReaction *, void *, void *, u32, u32, u32);
+void Hresvelgr_SetAnimation(struct HresvelgrTravelActor *, void *, void *, u32, u32, u32);
 void Sound_PlaySong(u32);
-extern const s16 gUnk_086149C4[];
 void DirectionBurst_Emit(const void *, u32, u32, u32);
 s32 Callback_InvokeActor(void *, void *);
-static inline s16 *AddReactionVector(s16 *out, struct ReactionVector *b, struct ReactionVector *a)
+static inline struct SceneVec *AddReactionVector(struct SceneVec *out, struct SceneVec *b,
+                                                 struct SceneVec *a)
 {
-    out[0] = b->x + a->x;
-    out[1] = b->y + a->y;
-    out[2] = b->z + a->z;
+    out->x = b->x + a->x;
+    out->y = b->y + a->y;
+    out->z = b->z + a->z;
     return out;
 }
-static inline s32 scale(s32 n)
+
+void Hresvelgr_UpdateRecoilBurstPhase(struct HresvelgrTravelActor *actor, s32 frame)
 {
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
-static inline void polar(struct ReactionVector *v, s32 angle, s32 radius)
-{
-    v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
-    v->y = 0;
-    v->z = scale(gUnk_086149C4[angle & 255] * radius);
-}
-void Hresvelgr_UpdateRecoilBurstPhase(struct ActorReaction *actor, s32 frame)
-{
-    struct {
-        u32 ids[2];
-        s16 pos[4];
-    } scratch;
+    struct ReactionIds sequences;
+    struct SceneVec offset;
     u32 step;
-    *(struct ReactionIds *)scratch.ids = *(const struct ReactionIds *)gUnk_0824F72C;
-    if (actor->pending) {
-        actor->pending = 0;
-        Hresvelgr_SetAnimation(actor, actor->collider194, actor->collider174,
-                               scratch.ids[actor->variant], 2, 4);
+    sequences = *(const struct ReactionIds *)gUnk_0824F72C;
+    if (actor->changed) {
+        actor->changed = 0;
+        Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData,
+                               sequences.ids[actor->side], 2, 4);
         Sound_PlaySong(0x4D2);
     }
     {
@@ -76,17 +43,17 @@ void Hresvelgr_UpdateRecoilBurstPhase(struct ActorReaction *actor, s32 frame)
     step = frame - 16;
     if (step <= 4) {
         u32 angle;
-        s16 *p;
-        p = AddReactionVector(scratch.pos, &actor->offsets[actor->variant], &actor->position);
-        p[1] = actor->ground->y + 0x80;
-        angle = ((actor->variant << 6) - 16) & 255;
+        struct SceneVec *p;
+        p = AddReactionVector(&offset, &actor->shotOffsets[actor->side + 1], &actor->position);
+        p->y = actor->origin->y + 0x80;
+        angle = ((actor->side << 6) - 16) & 255;
         {
             u32 turn = step << 4;
             angle -= 32;
             turn += angle;
             DirectionBurst_Emit(p, turn & 255, 12, 128);
         }
-        polar(&actor->velocity, actor->variant * 64 + 0x80, 28 - frame);
+        SceneVec_SetPolarXZ(&actor->velocity, actor->side * 64 + 0x80, 28 - frame);
     }
     if (frame > 50)
         actor->finished = 1;

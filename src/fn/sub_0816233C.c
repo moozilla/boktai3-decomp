@@ -4,41 +4,25 @@
 // confidence=low: updates attack particles and advances their animation or lifetime.
 #define PlayerAttackEffect_UpdateParticles sub_0816233C
 #include "contact_swarm.h"
+#include "player_attack_particles.h"
 extern void (*const gUnk_08610E2C[])(u8 *);
 extern const s16 gUnk_086149C4[];
-struct Vec {
-    u16 x, y, z, pad;
-};
 static inline s32 Divide4096(s32 x)
 {
     if (x >= 0)
         return x >> 12;
     return -((-x) >> 12);
 }
-static inline void CircleVector(struct Vec *vector, s32 angle, s32 radius)
+static inline void CircleVector(struct ContactPosition *vector, s32 angle, s32 radius)
 {
     vector->x = Divide4096(gUnk_086149C4[(angle + 64) & 255] * radius);
     vector->y = 0;
     vector->z = Divide4096(gUnk_086149C4[angle & 255] * radius);
 }
-struct ParticleSlot {
-    u32 life, sequence, mode;
-    s32 angle;
-};
-struct ParticleEffect {
-    u8 gap[0xc4];
-    struct ContactSwarmSprite sprites[16];
-    struct DisplaySequenceState sequences[16];
-    struct ParticleSlot slots[16];
-    u32 frame, unknown588;
-    u8 *direction, *rotation, *owner;
-    u32 previous, current, element;
-    void *resource;
-};
 struct SpriteRef {
-    struct ContactSwarmSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
 };
-static inline struct SpriteRef SpriteRef_FromSprite(struct ContactSwarmSprite *sprite)
+static inline struct SpriteRef SpriteRef_FromSprite(struct DisplaySequenceSprite *sprite)
 {
     struct SpriteRef ref;
     ref.sprite = sprite;
@@ -48,7 +32,7 @@ static inline u32 AddParticleFrame(u32 base, u32 frame)
 {
     return frame + base;
 }
-static inline u32 StepParticles(struct ContactSwarmSprite *owner,
+static inline u32 StepParticles(struct DisplaySequenceSprite *owner,
                                 struct DisplaySequenceState *state, u32 one)
 {
     u32 ended;
@@ -118,12 +102,12 @@ static inline u32 StepParticles(struct ContactSwarmSprite *owner,
     }
     return ended;
 }
-void PlayerAttackEffect_UpdateParticles(struct ParticleEffect *p)
+void PlayerAttackEffect_UpdateParticles(struct AttackParticleEffect *p)
 {
-    struct Vec delta;
-    register s32 i;
-    struct Vec *motion;
-    struct ContactSwarmSprite *sprite;
+    struct ContactPosition delta;
+    s32 i;
+    struct ContactPosition *motion;
+    struct DisplaySequenceSprite *sprite;
     u32 one;
     Callback_InvokeActor(p, gUnk_08610E2C[p->element]);
     p->previous = p->current;
@@ -132,7 +116,7 @@ void PlayerAttackEffect_UpdateParticles(struct ParticleEffect *p)
     one = 1;
     motion = &delta;
     for (sprite = p->sprites; i < 16; sprite++, i++) {
-        struct ParticleSlot *slot = &p->slots[i];
+        struct AttackParticleSlot *slot = &p->slots[i];
         u32 old = slot->life;
         if (old == 0)
             sprite->flags |= one;
@@ -156,7 +140,7 @@ void PlayerAttackEffect_UpdateParticles(struct ParticleEffect *p)
             } else {
 
                 slot->life = 5;
-                if (*p->rotation)
+                if (*p->side)
                     slot->angle -= 60;
                 else
                     slot->angle += 60;

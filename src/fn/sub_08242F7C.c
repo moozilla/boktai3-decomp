@@ -8,21 +8,10 @@ struct PlayerSelection {
 
 struct Player *Player_FindMaskedSlot(const struct PlayerSelection *selection)
 {
-    s32 i = 0;
-    struct Player **base = gPlayers;
-    s32 mask = selection->playerMask;
-    s32 one = 1;
-    struct Player **slot = base;
-    struct Player *result;
-    do {
-        if ((mask >> i) & one) {
-            result = *slot;
-            goto done;
-        }
-        slot++;
-        i++;
-    } while (i <= 3);
-    result = *base;
-done:
-    return result;
+    s32 i;
+    for (i = 0; i < 4; i++) {
+        if (selection->playerMask & (1 << i))
+            return gPlayers[i];
+    }
+    return gPlayers[0];
 }

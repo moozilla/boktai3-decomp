@@ -75,11 +75,7 @@ static inline s32 groundHeight(struct HresvelgrPosition *position)
     }
     return height;
 }
-static inline void clear(void *dest)
-{
-    u32 zero = 0;
-    CpuSet(&zero, dest, 0x05000002);
-}
+
 static inline void advance(struct HresvelgrPosition *d, struct HresvelgrPosition *v)
 {
     d->x += v->x;
@@ -93,7 +89,7 @@ void Hresvelgr_UpdateFallingMotion(struct HresvelgrMotion *p)
     if (!p->stateFrame) {
         setFlags(&p->motion, 4);
         p->sprite.flags &= ~1;
-        clear(&p->offset);
+        ZeroFill8(&p->offset);
         ++p->stateFrame;
     }
     advance(&p->sprite.position, &p->velocity);

@@ -1,13 +1,13 @@
 #include "global.h"
 #include "player.h"
 #include "ram.h"
+#include "player_timed_cue.h"
 void Player_EmitQueuedEffects(struct Player *);
 void Player_StopActionSounds(struct Player *);
 void Player_RestoreCameraFollow(struct Player *);
 void Player_EnterKindFour(struct Player *p)
 {
     s32 i;
-    u16 zero;
     if ((u8)(p->actionMode - 3) <= 2) {
         p->actionLatch464 = 1;
         p->actionLatch465 = 1;
@@ -26,15 +26,13 @@ void Player_EnterKindFour(struct Player *p)
     p->positionResetValue = 0;
     p->actionSelectionStamp = 0;
     gPlayerSolarActionPending = 0;
-    gPlayerActionPending = 0;
-    gPlayerCueTimer = 0;
+    Player_SetTimedCue(0, 0);
     Player_EmitQueuedEffects(p);
     p->sceneMode = 0;
     p->unk536 = 0;
     p->active = 0;
-    zero = 0;
-    for (i = 1; i >= 0; i--)
-        p->scriptStatus[i] = zero;
+    for (i = 0; i < 2; i++)
+        p->scriptStatus[i] = 0;
     Player_StopActionSounds(p);
     if (p->cameraOffsetActive)
         Player_RestoreCameraFollow(p);

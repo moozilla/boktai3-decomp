@@ -1,24 +1,13 @@
-#include "global.h"
-static inline u8 start(u8 *p)
+#include "hresvelgr_travel.h"
+
+void Hresvelgr_UpdateActionTwoRequest(struct HresvelgrTravelActor *p)
 {
-    u8 *flag = p + 0x9a;
-    s32 zero = 0;
-    *flag = 1;
-    if (p[0xb0]) {
-        p[0xb0] = zero;
-        p[0xaf] = zero;
-        return 1;
-    }
-    return 0;
-}
-void Hresvelgr_UpdateActionTwoRequest(u8 *p)
-{
-    u8 *q = p;
-    if (start(q)) {
+    struct HresvelgrTravelActor *q = p;
+    if (Hresvelgr_EnterVulnerableBehavior(q)) {
         s32 kind = 2;
-        u8 *field = p + 0xaa;
+        u8 *field = &p->requestedAnimation;
         *field = kind;
     }
-    if (p[0xaf])
-        q[0x383] = 1;
+    if (p->finished)
+        q->behaviorFinished = 1;
 }

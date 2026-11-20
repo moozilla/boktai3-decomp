@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
@@ -56,10 +56,7 @@ s32 Player_UpdateSweepAction(struct Player *p)
         Collider_SetPosition(q->collider, &q->dest, 0);
         Collider_Refresh(q->collider);
         if (q->index >= 0) {
-            {
-                u32 m = 0x80000;
-                p->statusFlags |= m;
-            }
+            Player_AddStatusFlags(p, 0x80000);
             if (q->timer & 1)
                 Player_EmitSweepSpark(p, &q->origin, angle, p->side, q->index);
         }
