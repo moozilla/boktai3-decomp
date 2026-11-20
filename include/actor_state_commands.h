@@ -4,6 +4,24 @@
 #include "actor_state.h"
 #include "engine_globals.h"
 #include "ram.h"
+
+static inline u8 ActorState_TakeEntryTrigger(struct ActorState *actor)
+{
+    if (actor->triggered) {
+        actor->triggered = 0;
+        actor->pending = 0;
+        return 1;
+    }
+    return 0;
+}
+
+static inline void SceneVolume_RequestRestart(struct ActorState *actor)
+{
+    actor->requestedVariant = actor->variant;
+    actor->request = 1;
+    actor->requestPhase = 0;
+}
+
 s32 sub_08249350(s32, s32);
 s32 ActorMovement_CanReachTarget(struct ActorState *);
 s32 SceneVolume_GetActivityState(struct ActorState *);
