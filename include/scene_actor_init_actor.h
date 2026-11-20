@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_INIT_ACTOR_H
 #define GUARD_SCENE_ACTOR_INIT_ACTOR_H
 
+#include "game_state_flags.h"
 #include "scene_actor_state.h"
 #include "scene_actor_init_primitives.h"
 #include "game_state.h"
@@ -318,12 +319,7 @@ static inline u8 MonsterInit_IsInCurrentRegion(struct ChaseActor *actor)
         return 1;
     return 0;
 }
-static inline u8 MonsterInit_TestWorldFlags(u32 mask)
-{
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
+#define MonsterInit_TestWorldFlags GameState_TestWorldFlags
 static inline void MonsterInit_InitializeRegion(struct ChaseActor *actor)
 {
     if (MonsterInit_TestMotionFlags(actor, 2))
