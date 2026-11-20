@@ -2,9 +2,6 @@
 #define GUARD_SCENE_PANEL_CONFIG_H
 #include "scene_panel_rig.h"
 
-struct ScenePanelSpawnPosition {
-    u32 x : 16, y : 16, z : 16;
-};
 struct ScenePanelSubject;
 struct ScenePanelSubject *ScenePanelSubject_Create(const struct ContactPosition *, u32, u32, u32,
                                                    u32, u32, u32, u32);

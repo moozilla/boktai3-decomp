@@ -2387,6 +2387,7 @@ addr,name,mode,confidence,source,notes
 0805BAE4,ScenePanel_WaitRigIdle,thumb,low,src-alias,
 0805BB20,ScenePanel_WaitTetherReturn,thumb,low,src-alias,
 0805BC10,ScenePanel_AdvanceTetherReturn,thumb,low,src-alias,
+0805BCE8,ScenePanel_HoldInteraction,thumb,low,src-alias,Empty callback for interaction state 14
 0805BCEC,ScenePanel_InitPaletteSprite,thumb,low,src-alias,
 0805BD78,ScenePanel_InitAuxiliarySprite,thumb,low,src-alias,
 0805BDD0,ScenePanel_CreateSubjects,thumb,low,src-alias,
@@ -2405,6 +2406,7 @@ addr,name,mode,confidence,source,notes
 0805C680,ScenePanel_DispatchCommands,thumb,low,src-alias,
 0805C728,ScenePanel_UnregisterReceiver,thumb,low,src-alias,
 0805C73C,ScenePanel_RegisterReceiver,thumb,low,src-alias,
+0805C754,ScenePanel_ClearGlobal,thumb,low,src-alias,Clears the scene panel singleton
 0805C760,ScenePanel_IsPresent,thumb,low,src-alias,
 0805C774,ScenePanel_SelectMode,thumb,low,src-alias,
 0805C7B4,ScenePanel_CountActiveSubjects,thumb,low,src-alias,

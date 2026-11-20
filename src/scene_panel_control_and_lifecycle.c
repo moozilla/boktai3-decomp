@@ -433,7 +433,6 @@ void ScenePanel_AdvanceTetherReturn(struct ScenePanel *input)
 
 /* ScenePanel_HoldInteraction: Empty callback for interaction state 14 that leaves the panel state unchanged */
 
-#define ScenePanel_HoldInteraction sub_0805BCE8
 
 void ScenePanel_HoldInteraction(struct ScenePanel *input)
 {
@@ -881,7 +880,6 @@ void ScenePanel_RegisterReceiver(struct ScenePanel *panel)
 
 /* ScenePanel_ClearGlobal: Clears the global panel pointer used by ScenePanel_IsPresent */
 
-#define ScenePanel_ClearGlobal sub_0805C754
 
 void ScenePanel_ClearGlobal(void)
 {
