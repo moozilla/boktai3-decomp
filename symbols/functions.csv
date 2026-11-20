@@ -5596,6 +5596,7 @@ addr,name,mode,confidence,source,notes
 0814499C,Player_UpdateActionEffectSequence,thumb,low,src-alias,
 08144A98,Player_OnRecoveryActionEnd,thumb,low,src-alias,Recovery action cleanup callback that returns the attached object to state 2 and selects palette bank 0x65; action interpretation tentative
 08144D60,Player_OnChargeMotionExit,thumb,low,src-alias,Empty exit callback for the attachment charge motion; charge interpretation is tentative
+08144D64,Player_UpdateChargeMotion,thumb,low,src-alias,Counts down the charge motion while advancing three animation phases.
 08145130,Player_UpdateCountdownAnimation,thumb,low,src-alias,
 08145220,Player_UpdateFallPose,thumb,low,src-alias,Selects motion 28 or 29 from the fall variant and sets movement flags; fall interpretation is tentative
 081453F0,Player_OnFadeMotionExit,thumb,low,src-alias,Clears the sprite fade flag when the fade motion exits

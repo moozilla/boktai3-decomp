@@ -11,7 +11,7 @@ void Player_StopActionSounds(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(void));
 void ActorSequence_Begin(void *, s32, s32);
 void Player_OnChargeMotionExit(void);
-void sub_08144D64(struct Player *p)
+void Player_UpdateChargeMotion(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         Player_StopActionSounds(p);
