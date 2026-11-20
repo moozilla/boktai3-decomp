@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_drawable_flags.h"
 #include "scene_actor_delayed_response.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -70,28 +71,11 @@ void Ivy_UpdateActiveState_080E98B4(u8 *p)
 
 void Ivy_UpdateActiveState_080E98B4(u8 *p);
 
-static inline void clearFlag(u32 *flags)
-{
-    u32 mask = ~1;
-    *flags &= mask;
-}
-
 static inline void clearColliderFlag(u16 *flags)
 {
     u32 mask = ~0x800;
     mask &= *flags;
     *flags = mask;
-}
-
-static inline void showActor(struct ChaseActor *actor)
-{
-    if (actor->base.drawableKind == 0)
-        clearFlag(actor->base.drawable);
-    else {
-        u8 *drawable = (u8 *)actor->base.drawable + 0x20;
-        u32 mask = ~1;
-        *(u32 *)(drawable + 8) &= mask;
-    }
 }
 
 void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
@@ -101,7 +85,7 @@ void SceneActor_BeginReactionAnimation(struct ChaseActor *actor)
         u32 zero = 0;
         drawable[7] = 2;
         actor->base.colliderA.responseValue = zero;
-        showActor(actor);
+        ActorStatus_ClearDrawableFlags(actor, 1);
         actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
         clearColliderFlag(&actor->base.placementFlags);
         SceneActorAnimation_SelectDirectionalFlags((void *)actor, 15);
@@ -638,17 +622,6 @@ animate:
 
 // captured actor (kind & 4) or player (kind <= 3) from the arm's offset.
 
-static inline void Hide(struct ChaseActor *a)
-{
-    u32 bit = 1;
-    if (a->base.drawableKind == 0)
-        *(u32 *)a->base.drawable |= bit;
-    else {
-        u8 *p = (u8 *)a->base.drawable + 0x20;
-        *(u32 *)(p + 8) |= bit;
-    }
-}
-
 extern const struct OctopusOffset gUnk_08606300[2][2];
 
 void *SceneActorRegistry_FindById(u32);
@@ -699,7 +672,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
     if (actor->base.restart) {
         actor->base.stepDone = 1;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
         Sound_PlaySong(0x1E0);
         if (target->kind & 4) {
             who = SceneActorRegistry_FindById(*(u32 *)target);
@@ -832,13 +805,13 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
             SceneActorBehavior_PlayReactionSound(victim);
         }
     } else
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
     if ((u32)(frame - 51) <= 8)
         Camera_RequestShake(20);
     if ((u32)(frame - 81) <= 8)
         Camera_RequestShake(40);
     if (frame > 120) {
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
         if (target->kind & 4) {
             victim = target->player;
             SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0x40, 0);
@@ -897,7 +870,7 @@ void Octopus_ReturnToRoutePoint(struct ChaseActor *actor)
             else
                 *(u8 **)((u8 *)actor->base.drawable + 0x68) = gPaletteBankData + v * 32;
         }
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 3;
         SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 2, 1, 0x154);
         Sound_PlaySong(0x1D9);
@@ -1068,15 +1041,7 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             if (abs < 10)
                 *((s16 *)(((u8 *)context) + 0x62A)) = 10;
         }
-        {
-            u32 bit = 2;
-            if (actor->base.drawableKind == 0)
-                *((u32 *)actor->base.drawable) |= bit;
-            else {
-                u8 *p = ((u8 *)actor->base.drawable) + 0x20;
-                *((u32 *)(p + 8)) |= bit;
-            }
-        }
+        ActorStatus_SetDrawableFlags(actor, 2);
         SceneActorPlacement_PlayCategoryEventSound(actor);
     }
     drawable[6] += context[0x62A];
@@ -1524,7 +1489,7 @@ struct RoomActor;
 void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
-        Hide(actor);
+        ActorStatus_SetDrawableFlags(actor, 1);
         ResetState(actor, 3);
         SceneActorTerrain_DisableCollision((void *)actor);
     }
@@ -1706,13 +1671,13 @@ void Octopus_BeginReturnToRoutePoint(struct ChaseActor *actor)
     }
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
     SceneActorTerrain_ResumeDrawable(actor);
-    Hide(actor);
+    ActorStatus_SetDrawableFlags(actor, 1);
 }
 
 void Octopus_BeginIdleAnimation(struct ChaseActor *actor)
 {
     SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
-    Hide(actor);
+    ActorStatus_SetDrawableFlags(actor, 1);
     {
         u32 one = 1;
         actor->base.state2A8 = 0;
