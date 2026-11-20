@@ -2,6 +2,7 @@
 #include "global.h"
 #include "ram.h"
 #include "engine.h"
+#include "player.h"
 #include "contact_actor.h"
 
 u8 SceneActor14_UpdateAnimState(struct SceneScheduledEffect *);
@@ -62,8 +63,6 @@ s32 AnimatedBodyPool_Destroy(struct SceneScheduledEffectPool *pool)
     return 0;
 }
 
-extern u32 gUnk_02000560;
-
 extern void *gUnk_08610704[];
 
 s32 Callback_InvokeActor(void *, void *);
@@ -84,7 +83,7 @@ static inline u32 Paused(void)
 static inline u32 Locked(void)
 {
     u32 mask = 4;
-    return gUnk_02000560 & mask;
+    return gPlayerSlotStatus[0] & mask;
 }
 
 s32 StateSpritePool_Tick(struct SceneScheduledEffectPool *pool)
@@ -210,17 +209,16 @@ extern const u8 gUnk_086106F0[];
 void StateSprite_InitAnimation(struct SceneScheduledEffect *sprite, s32 type, s32 direction,
                                s32 variant)
 {
-    u8 *data = gAnimatedBodyPool;
+    struct SceneScheduledEffectPool *pool = gAnimatedBodyPool;
+    struct SceneInputResource *data;
     s32 index = direction * 3 + type * 9;
-    u16 *indexPtr = &sprite->animationIndex;
-    u32 zero = 0;
-    *indexPtr = index;
+    sprite->animationIndex = index;
     sprite->variant = variant;
     sprite->active = 1;
-    data = (void *)&((struct SceneScheduledEffectPool *)data)->resource;
-    Widget_InitLinked(sprite, data, 13, 0, 1, 2, 0x78, &sprite->position);
-    Anim_SetKeyframes(sprite, data, gUnk_086106F0[0x12], 2, zero);
-    Anim_Step(sprite, data);
+    data = &pool->resource;
+    Widget_InitLinked(&sprite->animation, data, 13, 0, 1, 2, 0x78, &sprite->position);
+    Anim_SetKeyframes(&sprite->animation, data, gUnk_086106F0[0x12], 2, 0);
+    Anim_Step(&sprite->animation, data);
     sprite->animation.flags &= ~1;
 }
 
@@ -245,7 +243,7 @@ struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPos
     }
     {
         u32 mask = 4;
-        if (gUnk_02000560 & mask)
+        if (gPlayerSlotStatus[0] & mask)
             return 0;
     }
     if (!gAnimatedBodyPool)
@@ -312,7 +310,7 @@ s32 SceneScheduledEffect_InitializeManager(struct SceneScheduledEffectPool *p)
     gAnimatedBodyPool = p;
     SceneScheduledEffect_LoadResource(p);
     for (i = 0; i < 4; i++) {
-        p->slots[i].slot |= 0xFFFF;
+        p->slots[i].slot = -1;
     }
     p->occupied = 0;
     return 0;
