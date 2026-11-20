@@ -1365,17 +1365,12 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
                                  const void *descriptor)
 {
     s32 i;
-    u32 zero = 0;
-    void **flags = p->flagCallbacks;
-    void **callbacks = context->statModifierCallbacks;
-    for (i = 2; i >= 0; i--) {
-        *callbacks = (void *)zero;
+    for (i = 0; i < 3; i++) {
+        context->statModifierCallbacks[i] = NULL;
         if (p) {
-            *flags = (void *)zero;
-            flags[3] = (void *)zero;
+            p->flagCallbacks[i] = NULL;
+            p->contactCostCallbacks[i] = NULL;
         }
-        flags++;
-        callbacks++;
     }
     if (p) {
         s32 bit;
