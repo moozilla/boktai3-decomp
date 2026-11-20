@@ -6586,6 +6586,7 @@ addr,name,mode,confidence,source,notes
 0817A234,ActorProperty_GetConstant34,thumb,low,src-alias,
 0817A23C,ActorMovement_CanReachTarget,thumb,low,src-alias,
 0817A324,ActorPosition_SaveSelectedPoint,thumb,low,src-alias,
+0817A354,ActorPosition_FindTrackedPointInBounds,thumb,low,src-alias,Returns the index of the first tracked point inside the inclusive X and Z bounds or minus one
 0817A3C4,SceneActors_InitConvergingParticles,thumb,low,src-alias,Initializes four effect sprites and clears the converging particle controller
 0817A41C,SceneActors_RemoveConvergingParticles,thumb,low,src-alias,Removes the four effect sprites initialized by the paired particle setup
 0817A43C,SceneActors_UpdateConvergingParticles,thumb,low,src-alias,Moves active particles toward their shared origin and hides them on arrival

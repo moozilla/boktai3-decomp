@@ -92,25 +92,20 @@ void SceneActors_RequestContactPoolClear(void);
 
 // confidence=low: index of the first of the count tracked positions at 0x110 that lies inside
 // the box min..max on x and z, or -1.
-struct BoxSearchPosition {
-    s16 x, y, z;
-};
-
-static inline s32 ReadPositionReference(u32 *entry, struct BoxSearchPosition **out)
+static inline s32 ReadPositionReference(u32 *entry, struct ContactPosition **out)
 {
-    *out = (struct BoxSearchPosition *)*entry;
+    *out = (struct ContactPosition *)*entry;
     return *out != NULL;
 }
 
 // Finds the first tracked position inside the inclusive x/z bounds.
-s32 sub_0817A354(void *actor, s32 count, struct BoxSearchPosition *min,
-                 struct BoxSearchPosition *max)
+s32 ActorPosition_FindTrackedPointInBounds(void *actor, s32 count, struct ContactPosition *min, struct ContactPosition *max)
 {
     u8 *bytes = actor;
     s32 i;
     for (i = 0; i < count; i++) {
         s32 offset = i * 4;
-        struct BoxSearchPosition *pos;
+        struct ContactPosition *pos;
         u32 address = (u32)(bytes + 0x110);
 
         address += offset;
