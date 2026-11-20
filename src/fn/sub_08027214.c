@@ -1,6 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "terrain_cell_probe.h"
+#include "scene_actor_charge_offset.h"
+#include "state_actor.h"
 
 void SceneActors_RunFirstEventScript(void *, void *);
 void SceneActors_RunSecondEventScript(void *, void *);
@@ -103,15 +105,14 @@ static inline s32 Death_CellBlocks(struct Pos16 *position)
     return flags;
 }
 
-static inline void Death_SetVelocity(s16 *vector, s32 angle, s32 speed)
+static inline void Death_SetVelocity(struct ContactPosition *vector, s32 angle, s32 speed)
 {
     {
         s32 x = sub_08027214_Scale(gUnk_086149C4[(angle + 0x40) & 0xff] * speed);
-        s32 y = 0;
-        vector[0] = x;
-        vector[1] = y;
+        vector->x = x;
+        vector->y = 0;
     }
-    vector[2] = sub_08027214_Scale(gUnk_086149C4[angle & 0xff] * speed);
+    vector->z = sub_08027214_Scale(gUnk_086149C4[angle & 0xff] * speed);
 }
 
 static inline u32 Death_GetMode(struct DeathActor *actor)
@@ -122,6 +123,12 @@ static inline u32 Death_GetMode(struct DeathActor *actor)
 static inline void Death_SetState(struct DeathState *out, struct DeathState state)
 {
     *out = state;
+}
+
+static inline void SceneActorState_EnterDeathPhase(struct StateActor *actor, u32 phase)
+{
+    actor->reactionPhase = phase;
+    actor->reactionTimer = 0;
 }
 
 void sub_08027214(struct DeathActor *base, s32 tick)
@@ -164,12 +171,10 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             base->maximumScale = 0;
             base->variant = 0;
             if (base->mode & 1) {
-                base->state.value = 1;
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 1);
                 Sound_PlaySongChecked(0x1C5);
             } else {
-                base->state.value = 0;
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 0);
                 Sound_PlaySongChecked(0x359);
             }
         }
@@ -207,7 +212,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             s32 dx = origin[0] - *(s16 *)(pos + 0);
             s32 dy = origin[2] - *(s16 *)(pos + 4);
             s32 angle = Math_Atan2(dx, dy);
-            Death_SetVelocity((s16 *)((u8 *)base + 0x5c), angle, 20);
+            Death_SetVelocity((struct ContactPosition *)&base->velocity, angle, 20);
         }
     }
 
@@ -215,8 +220,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
         case 0:
             p->delay = 8;
             if (base->frame > 4) {
-                base->state.value = 2;
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 2);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
                                                      2, 0);
                 Sound_PlaySongChecked(0x350);
@@ -228,8 +232,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             }
             p->delay = 8;
             if (base->frame > 4) {
-                base->state.value = 2;
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 2);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
                                                      2, 0);
                 p->mode &= ~1;
@@ -241,11 +244,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                 Sound_PlaySongChecked(0x350);
             }
             if (p->animationFlags & 2) {
-                {
-                    u32 nextState = 3;
-                    base->state.value = nextState;
-                }
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 3);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x22,
                                                      2, 0);
                 sub_08022878((u8 *)p + 0x260);
@@ -253,11 +252,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             break;
         case 3:
             if (p->animationFlags & 2) {
-                {
-                    u32 nextState = 4;
-                    base->state.value = nextState;
-                }
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 4);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x23,
                                                      2, 0);
             }
@@ -267,22 +262,14 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                 Sound_PlaySongChecked(0x354);
             }
             if (p->animationFlags & 2) {
-                {
-                    u32 nextState = 5;
-                    base->state.value = nextState;
-                }
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 5);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x24,
                                                      2, 0);
             }
             break;
         case 5:
             if (p->animationFlags & 2) {
-                {
-                    u32 nextState = 6;
-                    base->state.value = nextState;
-                }
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 6);
                 Bestiary_UnlockEntry(0x4D);
                 SceneActors_RunSecondEventScript(base, (u8 *)p + 0x260);
             }
@@ -292,11 +279,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
         case 7:
             p->delay = 8;
             if (base->elapsed > 0xEF) {
-                {
-                    u32 nextState = 5;
-                    base->state.value = nextState;
-                }
-                base->elapsed = 0;
+                SceneActorState_EnterDeathPhase((struct StateActor *)base, 5);
             }
             break;
         default:
