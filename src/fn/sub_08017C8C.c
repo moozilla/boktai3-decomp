@@ -1,89 +1,77 @@
 #include "global.h"
+#include "weather_state.h"
 #include "render.h"
+#include "game_state.h"
+#include "sun_clock.h"
+#include "gba/io_reg.h"
 #include "ram.h"
 #include "engine_globals.h"
-struct Weather {
-    u8 pad[24];
-    u32 timer;
-    u8 entered, state;
-    u16 countdown;
-    u8 enabled, flags;
-    u16 light, phase;
-    u8 variant, pad27;
-    u16 duration, randomDuration;
-    u8 pad2c[36];
-    int bank;
-};
-extern u8 *gGameState;
-extern u8 gSunClock[];
 void Palette_SetBrightnessMode(int);
 int Weather_TestFlags(int, int);
 void Weather_SetRandomDuration(void *);
-void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
 int Mod(int, int);
 void Sound_PlaySong(int);
 void ScreenTransition_SendCommand(int, int, int, int, int, int, int);
-static inline int randomValue(void)
+static inline int Weather_DrawRandomSample(void)
 {
     u32 offset;
     gRandomIndex = (gRandomIndex + 1) & 1023;
     offset = gRandomIndex * 2;
     return *(u16 *)((u8 *)gRandomTable + offset);
 }
-static inline void flags(void)
+static inline void Weather_EnableActiveStormDisplay(void)
 {
-    int mask = 512;
-    gDispCntShadow = mask | gDispCntShadow;
+    Bg_EnableDisplay(DISPCNT_BG1_ON);
     {
         int bit = 4096;
-        *(u32 *)(gGameState + 0x868) |= bit;
+        gGameState->flags868 |= bit;
     }
 }
-static inline int light(struct Weather *p)
+static inline int Weather_GetAccumulatedLight(struct WeatherState *p)
 {
-    int v = *(s16 *)(gGameState + 0x876);
-    v += p->light;
+    int v = gGameState->unk876;
+    v += p->stormLight;
     return v;
 }
-static inline int interrupted(void)
+static inline int Weather_IsInterrupted(void)
 {
     int mask = 1024;
     return (gEngineFlags | gScenePauseFlags) & mask;
 }
-int Weather_ActiveStorm(struct Weather *p)
+int Weather_ActiveStorm(struct WeatherState *p)
 {
     if (p->entered) {
         p->entered = 0;
         if (!gStormTimer) {
-            gStormTimer = p->duration;
-            if (p->randomDuration)
-                gStormTimer += Mod(randomValue(), p->randomDuration);
+            gStormTimer = p->stormDuration;
+            if (p->stormDurationRange)
+                gStormTimer += Mod(Weather_DrawRandomSample(), p->stormDurationRange);
         }
-        p->light = 0;
-        flags();
+        p->stormLight = 0;
+        Weather_EnableActiveStormDisplay();
         Palette_SetBrightnessMode(2);
     }
     if (!Weather_TestFlags(p->flags, 8)) {
-        if (!p->countdown) {
+        if (!p->thunderCountdown) {
             if (!(gEngineFlags & 1024) && gWeatherCollisionTimer > 0) {
                 gGrayscaleControl = 5;
                 Sound_PlaySong(103);
             }
             Weather_SetRandomDuration(p);
         } else {
-            if (gSunClock[14] > 2) {
-                if (p->countdown == 5)
+            if (gSunClock.phase > 2) {
+                if (p->thunderCountdown == 5)
                     ScreenTransition_SendCommand(0, 2, 31, 31, 31, 8191, 0);
-                else if (p->countdown == 3)
+                else if (p->thunderCountdown == 3)
                     gWeatherCollisionTimer = 6;
             }
-            p->countdown--;
+            p->thunderCountdown--;
         }
     }
-    if (!Weather_TestFlags(p->flags, 1) && p->timer > 29) {
-        p->light = light(p);
-        if (p->light > 59 || interrupted()) {
+    if (!Weather_TestFlags(p->flags, 1) && p->phaseTimer > 29) {
+        p->stormLight = Weather_GetAccumulatedLight(p);
+        if (p->stormLight > 59 || Weather_IsInterrupted()) {
             gStormTimer = 0;
             Weather_EnterPhase(p, 4);
             return 1;
@@ -97,8 +85,8 @@ int Weather_ActiveStorm(struct Weather *p)
         } else
             gStormTimer--;
     }
-    sub_080177AC(p, (randomValue() & 3) + 4, 1, 0);
-    p->bank = 1 - p->bank;
-    p->timer++;
+    sub_080177AC(p, (Weather_DrawRandomSample() & 3) + 4, 1, 0);
+    p->tilemapLayer = 1 - p->tilemapLayer;
+    p->phaseTimer++;
     return 0;
 }

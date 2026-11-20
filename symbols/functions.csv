@@ -3,6 +3,7 @@ addr,name,mode,confidence,source,notes
 080001F0,IntrMain,arm,high,disasm,SDK interrupt dispatcher; copied to IWRAM 0x03003A60; table at 0x03003A10
 08000350,Palette_CacheObjectBankArm,arm,medium,disasm,ARM twin of Palette_CacheObjectBank (08217344); first of six ARM C functions (APCS frames) copied to IWRAM 0x03000000 by AgbMain; looks up a u16 key in a 16-entry table (0x030051F0) and otherwise appends a 32-byte palette to 0x03004DC0
 0800145C,AgbMain,thumb,high,disasm,Game main entry (pointer at 0x08000344)
+08001590,Background_ClearSlots,thumb,low,src-alias,Clear the background task pointer table.
 080015AC,Background_ApplyQueuedCommands,thumb,low,src-alias,
 08001768,Background_Update,thumb,low,src-alias,
 08001AD0,Background_Destroy,thumb,low,src-alias,"Clears the layer's slot in gUnk_02000000; set as the destroy callback via Task_SetCallbacks alongside Background_Update, mirroring ScrollingBackground"
@@ -127,6 +128,7 @@ addr,name,mode,confidence,source,notes
 08005830,SceneObjects_CreateObject,thumb,low,src-alias,
 08005B8C,SceneObjects_CreateFromScript,thumb,low,src-alias,
 08005D30,SceneObjects_SwitchPaletteFromScript,thumb,low,src-alias,
+08005E10,TerrainModifiers_ClearGlobal,thumb,low,src-alias,Clear the terrain modifier manager pointer.
 08005E1C,TerrainModifiers_AddToList,thumb,low,src-alias,Prepends a TerrainModifier node onto the manager's linked list (gUnk_02000028->head); called by TerrainModifiers_Create
 08005E40,TerrainModifiers_RemoveFromList,thumb,low,src-alias,"Unlinks a TerrainModifier node from the manager's linked list, patching neighbor pointers; called when destroying a node"
 08005E64,TerrainModifiers_Create,thumb,low,src-alias,
@@ -193,6 +195,7 @@ addr,name,mode,confidence,source,notes
 08008ABC,Breakable_OnHit,thumb,low,src-alias,Collider callback registered via Breakable_InitSlot; moves the slot to state 3 or 4 when hit by the attack kind matching its current state.
 08008AF4,Breakable_InitSlot,thumb,low,src-alias,
 08008BD0,Breakable_RunScript,thumb,low,src-alias,"Builds a 3-arg packed-args block (id, state-derived flag, arg) and dispatches it to the slot's script via Script_Call."
+08008C18,Breakable_NullCallback,thumb,low,src-alias,Empty callback in the breakable state unit.
 08008C1C,Breakable_UpdateAnimation,thumb,low,src-alias,Runs once when a state is freshly entered (via Breakable_ConsumeEnteredFlag) to set the drawable's keyframes and palette bank from per-kind tables.
 08008C84,Breakable_Idle,thumb,low,src-alias,
 08008CF0,Breakable_React,thumb,low,src-alias,
@@ -227,6 +230,7 @@ addr,name,mode,confidence,source,notes
 08009B7C,DirectionalController_ScriptCreate,thumb,low,src-alias,
 08009D40,DirectionalController_ScriptRelease,thumb,low,src-alias,
 08009D84,DirectionalController_ScriptMove,thumb,low,src-alias,
+08009E30,CollisionController_ClearGlobal,thumb,low,src-alias,Clear the collision manager pointer.
 08009E3C,CollisionController_FindFreeSlot,thumb,low,src-alias,Scans the 16 manager slots for one with active==0; called by CollisionController_ScriptCreate before initializing a new slot.
 08009E5C,CollisionController_ReceiveHit,thumb,low,src-alias,Collider contact callback (set via Collider_SetCallback in CollisionController_InitSlot) that flags the other object hit and switches the slot into hi
 08009E98,CollisionController_InitSlot,thumb,low,src-alias,
@@ -270,6 +274,7 @@ addr,name,mode,confidence,source,notes
 0800C954,DamageController_Destroy,thumb,low,src-alias,Removes the controller's collider; set as the Task_SetCallbacks destroy callback alongside DamageController_Update
 0800C964,DamageController_Initialize,thumb,low,src-alias,
 0800CB60,DamageController_Create,thumb,low,src-alias,"Allocates a task, wires DamageController_Update/Destroy as its callbacks, and calls DamageController_Initialize, killing the task on init failure"
+0800CBA0,FallingObjectManager_ClearGlobal,thumb,low,src-alias,Clear the falling object manager pointer.
 0800CBAC,FallingObject_ReceiveHit,thumb,low,src-alias,collider hit callback wired via Collider_SetCallback in FallingObject_Create; applies (possibly doubled) damage to health for type-0 objects
 0800CBDC,FallingObject_ReceiveAttackHit,thumb,low,src-alias,empty collider hit callback wired to the object's attack hitbox via Collider_SetCallback; intentionally does nothing
 0800CBE0,FallingObjectManager_AddObject,thumb,low,src-alias,"inserts a FallingObject at the head of the manager's linked list, called from FallingObject_Create"
@@ -335,6 +340,10 @@ addr,name,mode,confidence,source,notes
 0800FA40,BoardPiece_Destroy,thumb,low,src-alias,Clears a piece's transform (Shadow_Destroy) and removes its sprite; called per-piece from GroupObjects_Destroy
 0800FA5C,BoardPiece_SetFacingAnim,thumb,low,src-alias,Derives left/right flip flags from p->direction and applies them via Anim_SetSequence; called by every movement handler after repositioning
 0800FAB8,BoardPiece_UpdateAnimation,thumb,low,src-alias,
+0800FC28,BoardPieces_StartStraightAdvance,thumb,low,src-alias,Tentative delayed straight advance command.
+0800FE98,BoardPieces_StartLaunch,thumb,low,src-alias,Tentative launch command leading to the wander state.
+0801010C,BoardPieces_StartConvergence,thumb,low,src-alias,Move the pieces toward the command origin.
+08010298,BoardPieces_StartActorChase,thumb,low,src-alias,Target the registered actor and start its chase state.
 0801037C,BoardPieces_DispatchCommands,thumb,low,src-alias,
 08010454,BoardPiece_Launch,thumb,low,src-alias,
 08010514,BoardPiece_Wander,thumb,low,src-alias,"Randomly re-picks heading/speed toward target while active, moves, then re-faces toward origin; sets state 1 once the wander timer exceeds 0x5F"
@@ -342,6 +351,7 @@ addr,name,mode,confidence,source,notes
 08010860,BoardPiece_ConvergeOnTarget,thumb,low,src-alias,"Same drift-toward-target movement as BoardPiece_ApproachTarget but signals state 8 on arrival, used for a different staged-effect role"
 08010A34,BoardPiece_Deactivate,thumb,low,src-alias,"Clears active flag, sets a hide sprite flag and disables the piece's actor shadow"
 08010A58,BoardPiece_ChasePlayer,thumb,low,src-alias,"Re-targets p->target to m->actor->position (the player) each call and homes in on it, signalling state 4 on arrival"
+08010C10,BoardPiece_AdvanceWithOffset,thumb,low,src-alias,Tentative interpolated actor approach with a wandering offset.
 08010D84,BoardPiece_AdvanceStraight,thumb,low,src-alias,Moves straight along the existing p->direction at double speed with no heading recalculation; sets state 6 after a timed delay
 08010E44,BoardPiece_HomeToTarget,thumb,low,src-alias,"Homes directly on p->target using p->direction (no separate drift heading like ApproachTarget), signalling state 2 on arrival"
 08010FD4,GroupObjects_Update,thumb,low,src-alias,
@@ -380,6 +390,7 @@ addr,name,mode,confidence,source,notes
 08012058,AnimatedHazard_ConsumeEntered,thumb,low,src-alias,"Tests the hazard's ""entered"" flag, clearing it and returning whether this is the first tick of the current state."
 08012070,AnimatedHazard_Initialize,thumb,low,src-alias,
 08012114,AnimatedHazard_Deactivate,thumb,low,src-alias,"Hides the hazard's sprite, resets its state via AnimatedHazard_SetState, and clears active; called at the end of AnimatedHazard_AnimateRetraction."
+08012134,AnimatedHazard_Noop,thumb,low,src-alias,Empty callback in the animated-hazard unit.
 08012138,AnimatedHazard_WaitForPlayer,thumb,low,src-alias,
 080121C4,AnimatedHazard_EmitWarning,thumb,low,src-alias,
 08012224,AnimatedHazard_AnimateAttack,thumb,low,src-alias,
@@ -404,6 +415,7 @@ addr,name,mode,confidence,source,notes
 08012F0C,BreakableBarrier_Destroy,thumb,low,src-alias,Removes a single barrier's collider and sprite; per-barrier helper called from the manager destroy loop
 08012F28,BreakableBarrier_Hide,thumb,low,src-alias,
 08012F50,BreakableBarrier_Update,thumb,low,src-alias,
+0801310C,BreakableBarrier_UpdateBroken,thumb,low,src-alias,
 08013220,BreakableBarrier_UpdateSprite,thumb,low,src-alias,Advances a barrier's timer and updates its sprite via the per-state table gUnk_08604B84; per-barrier helper for the manager update loop
 0801324C,BreakableBarriers_Update,thumb,low,src-alias,Updates all 4 barriers in the manager by calling BreakableBarrier_UpdateSprite; registered as BatCurtain_Create's update callback
 08013270,BreakableBarriers_Destroy,thumb,low,src-alias,Destroys all 4 barriers in the manager by calling BreakableBarrier_Destroy; registered as BatCurtain_Create's destroy callback
@@ -527,6 +539,7 @@ addr,name,mode,confidence,source,notes
 080174C4,Weather_GetStormVolume,thumb,low,src-alias,"Computes storm ambient volume from p[0x18]/p[0x19], halved during certain game states via sub_08228DB8"
 08017700,Weather_ClearEffects,thumb,low,src-alias,"Iterates the 32-entry effect slot array and calls Effect_Remove on any active slot, clearing it"
 08017730,WeatherParticles_Update,thumb,low,src-alias,
+08017A6C,Weather_UpdateStormTrigger,thumb,low,src-alias,
 08017BB8,Weather_WaitForStorm,thumb,low,src-alias,
 08017BEC,Weather_StormOnset,thumb,low,src-alias,
 08017C8C,Weather_ActiveStorm,thumb,low,src-alias,
@@ -1880,6 +1893,7 @@ addr,name,mode,confidence,source,notes
 080492F0,TetherActor_SelectInteractionState,thumb,low,src-alias,
 08049364,TetherActor_BeginAuxiliaryState,thumb,low,src-alias,
 0804945C,TetherActor_AdjustSlopeMovement,thumb,low,src-alias,
+080497E4,TetherActor_ClearInstance,thumb,low,src-alias,Clears the global tether pointer.
 080497F0,TetherActor_ClearExternalStatus,thumb,low,src-alias,
 08049818,TetherActor_TestMatchingStatus,thumb,low,src-alias,
 08049840,TetherActor_TestNearbyInteraction,thumb,low,src-alias,
@@ -1899,6 +1913,7 @@ addr,name,mode,confidence,source,notes
 08049EBC,TetherActor_BeginDisplayPositionState,thumb,low,src-alias,
 08049F08,TetherActor_GetStatusFlags,thumb,low,src-alias,
 08049F28,TetherActor_TestStatusFlags,thumb,low,src-alias,
+08049F54,TetherActor_GetStatusTag,thumb,low,src-alias,Returns the status tag when a tether exists.
 08049F78,TetherActor_AddStatusFlags,thumb,low,src-alias,
 08049FA8,TetherActor_RemoveStatusFlags,thumb,low,src-alias,
 08049FD8,TetherActor_CopyPosition,thumb,low,src-alias,
@@ -1913,6 +1928,7 @@ addr,name,mode,confidence,source,notes
 0804A294,TetherActor_SetTransformFromScript,thumb,low,src-alias,
 0804A3AC,TetherActor_RequestPositionSample,thumb,low,src-alias,
 0804A3CC,TetherActor_StartAuxiliaryState,thumb,low,src-alias,
+0804A400,TetherActor_GetSavedKind,thumb,low,src-alias,Reads the signed saved tether kind.
 0804A418,TetherActor_GetConfiguredKind,thumb,low,src-alias,Returns the same saved kind as a signed word for initialization when script parameter k is absent
 0804A430,TetherActor_InitKindFromScript,thumb,low,src-alias,
 0804A4C8,TetherActor_InitInteractionFromScript,thumb,low,src-alias,

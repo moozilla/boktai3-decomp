@@ -3,6 +3,8 @@
 
 #include "contact_position.h"
 
+struct DisplayKeyframeState;
+
 struct SceneActorChaseTarget {
     u8 unknown0[8];
     u8 playerIndex;
@@ -23,7 +25,8 @@ struct SceneActorBody {
     u32 field24;
     void *currentRoute;
     void *sprite;
-    u8 unknown30[0xC];
+    struct DisplayKeyframeState *keyframeDisplay;
+    u8 unknown34[8];
     void *owner;
     u8 unknown40[8];
 };

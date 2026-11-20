@@ -1,15 +1,9 @@
 #include "proximity_emitter.h"
-static inline void *resourceAt(void **resource)
-{
-    void **address = resource;
-    return *address;
-}
+#include "sprite_oam.h"
 void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
 {
     struct ProximityEmitter *emitter = input;
     void **resource;
-    s32 scale;
-    u32 one;
     s32 i;
     {
         void *found = AnimData_FindEntry(0x1C1E);
@@ -18,33 +12,18 @@ void ProximityEmitter_InitializeParticles(struct ProximityEmitter *input)
         i = 0;
         resource = address;
     }
-    {
-        s32 value = -4;
-        scale = value;
-    }
-    {
-        u32 value = 1;
-        one = value;
-    }
     do {
-        u32 offset = i * sizeof(struct ProximityEmitterParticle);
-        u32 particleOffset = offset + 0xC0;
-        struct ProximityEmitterParticle *particle;
-        particle = (void *)((u8 *)emitter + particleOffset);
-        ParticleSprite_Initialize(particle, resourceAt(resource), 0);
-        Effect_SetOrigin(particle, scale, scale);
-        SpriteDrawable_SelectTileFrame(particle, resourceAt(resource), 2);
+        struct ProximityEmitterParticle *particle = &emitter->particles[i];
+        struct SpriteDrawable *sprite;
+        ParticleSprite_Initialize(particle, *resource, 0);
+        Effect_SetOrigin(particle, -4, -4);
+        SpriteDrawable_SelectTileFrame(particle, *resource, 2);
         Effect_SetPalette(particle, 1);
-        {
-            u32 value = one;
-            ((u8 *)particle)[0xF] = value;
-        }
-        ((u8 *)particle)[0x10] = 20;
-        particle->flags |= one;
-        {
-            u32 zero = 0;
-            emitter->particles[i].active = zero;
-        }
+        sprite = (void *)particle;
+        sprite->priority = 1;
+        sprite->depthOffset = 20;
+        sprite->flags |= 1;
+        emitter->particles[i].active = 0;
     } while (++i <= 7);
     emitter->nextParticle = 0;
     emitter->particleFrame = 0;

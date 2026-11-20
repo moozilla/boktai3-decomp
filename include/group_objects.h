@@ -2,36 +2,12 @@
 #define GROUP_OBJECTS_H
 #include "global.h"
 #include "engine.h"
+#include "display_sequence.h"
+#include "scene_actor_components.h"
+#include "sprite.h"
 
 // Tentative: a task managing sixteen small board pieces. Command packets queued by the scene
-// launch them (sub_0800FC28 and friends), each piece then drifts, animates and bobs.
-
-struct GroupVec {
-    s16 x, y, z, pad;
-};
-
-// Animation header embedded in each piece (frame table walker in BoardPiece_UpdateAnimation).
-struct GroupAnim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-
-struct GroupSprite {
-    u32 flags;
-    u8 pad4[3];
-    u8 mode;
-    u8 pad8[8];
-    u16 frame;
-    u8 pad12[10];
-    struct GroupVec position;
-};
-
-struct GroupResource {
-    u8 pad[12];
-    void *palette;
-    u8 tail[12];
-};
+// launch them (BoardPieces_StartStraightAdvance and friends), each piece then drifts, animates and bobs.
 
 struct GroupPiece {
     u8 active, state, done, angle;
@@ -40,12 +16,11 @@ struct GroupPiece {
     s8 heading;
     u8 speed, pad9;
     u16 targetY, duration, pade;
-    struct GroupVec position, target;
-    struct GroupVec anchor, offset; // 0x20, 0x28
-    struct GroupAnim anim;
-    struct GroupSprite sprite; // 0x40
-    u8 pad64[8];
-    struct GroupResource resource; // 0x6C
+    struct ContactPosition position, target;
+    struct ContactPosition anchor, offset; // 0x20, 0x28
+    struct DisplaySequenceState anim;
+    struct DisplaySequenceSprite sprite; // 0x40
+    struct SpriteRenderResource resource; // 0x6C
     u8 transform[64];              // 0x88, shadow
 };
 
@@ -67,11 +42,6 @@ struct GroupQueue {
     u8 tail[12];
 };
 
-struct GroupActor {
-    u8 pad0[12];
-    struct GroupVec position;
-};
-
 struct GroupObjects {
     struct Task task;
     u32 active, timer;
@@ -80,8 +50,8 @@ struct GroupObjects {
     s8 paletteActive, paletteMask;
     u16 actorId;
     u8 palette[32];
-    struct GroupActor *actor;
-    struct GroupVec origin;
+    struct SceneActorBody *actor;
+    struct ContactPosition origin;
     struct GroupQueue queue; // 0xCD4
 };
 
@@ -97,7 +67,7 @@ void Shadow_Initialize(void *, void *, int);
 void SceneMessages_RegisterReceiver(void *, int, int);
 void SceneMessages_UnregisterReceiver(void *);
 void SceneMessages_SetPendingTrigger(void *, void *);
-struct GroupActor *SceneBody_GetById(int);
+struct SceneActorBody *SceneBody_GetById(u16);
 int Mod(int, int);
 
 int BoardPiece_Initialize(struct GroupObjects *, struct GroupPiece *, int);
@@ -113,10 +83,10 @@ void *GroupObjects_CreateTask(void *);
 
 void Vec16_Lerp(void *, void *, void *, int, int);
 void BoardPiece_SetFacingAnim(struct GroupObjects *, struct GroupPiece *, int);
-int sub_0800FC28(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int sub_0800FE98(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int sub_0801010C(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
-int sub_08010298(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BoardPieces_StartStraightAdvance(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BoardPieces_StartLaunch(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BoardPieces_StartConvergence(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
+int BoardPieces_StartActorChase(struct GroupObjects *, struct GroupQueue *, struct GroupCommand *);
 
 static inline int randomValue(void)
 {
@@ -147,7 +117,7 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void polar(struct GroupVec *v, int angle, int radius)
+static inline void polar(struct ContactPosition *v, int angle, int radius)
 {
     v->x = scale(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;

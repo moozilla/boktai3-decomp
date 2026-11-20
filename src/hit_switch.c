@@ -7,7 +7,7 @@ void HitSwitch_SetUpdate(struct HitSwitchEntry *entry, void (*update)(struct Hit
     entry->frame = 0;
 }
 
-void TerrainModifiers_RegisterCell(struct SceneCellRef *, u32, u32, s32, u32, u32);
+void TerrainModifiers_RegisterCell(struct TerrainCellOverride *, u32, u32, s32, u32, u32);
 
 void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
 {
@@ -37,13 +37,13 @@ void HitSwitch_RegisterCompletedCell(struct HitSwitchEntry *entry)
     entry->cellRegistered = 1;
 }
 
-void HitSwitch_ReceiveCollision(struct SceneCollider *other, void *unused,
+void HitSwitch_ReceiveCollision(struct ContactCollider *other, void *unused,
                                 struct HitSwitchEntry *entry)
 {
     u8 *cooldown = &entry->hitCooldown;
     if (*cooldown == 0) {
         u32 mask = 0x20;
-        if (other->contactFlags2 & mask) {
+        if (other->reactionFlags & mask) {
             entry->hitCount++;
             *cooldown = mask;
             gHitSwitchManager->hitPending = 1;
@@ -59,7 +59,7 @@ void HitSwitch_UpdateStatic(struct HitSwitchEntry *entry)
         u32 mask;
         entry->completed = 1;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.state;
+        state = &entry->collider.flags;
         flags = *state;
         mask = 4;
         mask |= flags;
@@ -114,7 +114,7 @@ void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
         u32 flags;
         entry->completed = 1;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.state;
+        state = &entry->collider.flags;
         flags = *state;
         {
             u32 mask = 4;
@@ -127,16 +127,12 @@ void HitSwitch_UpdateBobbing(struct HitSwitchEntry *entry)
 
 void HitSwitch_AnimateBobbingCompletion(struct HitSwitchEntry *entry)
 {
-    s32 k2 = 0;
-    u16 *frame = &entry->frame;
-    if ((*frame) == k2) {
+    if (entry->frame == 0) {
         Sound_PlaySong(426);
     }
     {
-        u32 next = *frame + 1;
-        *frame = next;
-        if ((u16)next <= 7) {
-            entry->sprite.position = *(struct ContactPosition *)&entry->world;
+        if (++entry->frame <= 7) {
+            entry->sprite.position = entry->world;
             entry->sprite.frame = 1;
         } else {
             entry->sprite.frame = 2;
@@ -234,7 +230,7 @@ s32 HitSwitch_UpdateManager(struct HitSwitchManager *manager)
         if (entry->hitCooldown) {
             entry->hitCooldown--;
             if (entry->hitCooldown) {
-                entry->animation.paletteIndex = 214;
+                entry->animation.paletteKey = 214;
                 entry->animation.palette = manager->palette;
             } else
                 AnimData_SelectPaletteBank(&entry->animation, 213);
@@ -243,9 +239,9 @@ s32 HitSwitch_UpdateManager(struct HitSwitchManager *manager)
     return 0;
 }
 
-void SceneBody_Unregister(struct SceneBody *);
+void SceneBody_Unregister(struct SceneActorBody *);
 
-void TerrainModifiers_UnregisterCell(struct SceneCellRef *);
+void TerrainModifiers_UnregisterCell(struct TerrainCellOverride *);
 
 s32 HitSwitch_DestroyManager(struct HitSwitchManager *manager)
 {
@@ -263,12 +259,12 @@ s32 HitSwitch_DestroyManager(struct HitSwitchManager *manager)
     return 0;
 }
 
-void HitSwitch_ReceiveCollision(struct SceneCollider *, void *, struct HitSwitchEntry *);
+void HitSwitch_ReceiveCollision(struct ContactCollider *, void *, struct HitSwitchEntry *);
 
 void HitSwitch_InitCollider(struct HitSwitchEntry *entry)
 {
     struct HitSwitchExtent size, offset;
-    struct SceneCollider *collider = &entry->collider;
+    struct ContactCollider *collider = &entry->collider;
     size.a.lo = 0x80;
     size.a.hi = 0x78;
     size.b.lo = 0x80;
@@ -280,16 +276,17 @@ void HitSwitch_InitCollider(struct HitSwitchEntry *entry)
     Collider_Refresh(collider);
 }
 
-void SceneBody_Init(struct SceneBody *, u32, struct SceneVec *, u32, u32, struct HitSwitchEntry *);
+void SceneBody_Init(struct SceneActorBody *, u32, struct ContactPosition *, u32, u32,
+                    struct HitSwitchEntry *);
 
-void TerrainOverlay_QueueAddActor(struct SceneBody *);
+void TerrainOverlay_QueueAddActor(struct SceneActorBody *);
 
 void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
 {
     struct HitSwitchManager *manager = input;
     struct HitSwitchEntry *entry;
-    struct SceneVec *world;
-    struct SceneAnimation *animation;
+    struct ContactPosition *world;
+    struct SpriteRenderResource *animation;
     struct DisplaySequenceSprite *sprite;
     u32 present;
     entry = &manager->entries[manager->count];
@@ -340,13 +337,12 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
     }
     if (Script_SeekToKeyword('r') && Script_GetValue())
         sprite->flags |= 4;
-    sprite->position = *(struct ContactPosition *)world;
+    sprite->position = *world;
     if (Script_SeekToKeyword('h')) {
         entry->bodyEnabled = Script_GetValue();
         if (entry->bodyEnabled) {
-            struct SceneBody *body = &entry->body;
-            SceneBody_Init(body, entry->collisionId, (struct SceneVec *)&sprite->position, 0, 7,
-                           entry);
+            struct SceneActorBody *body = &entry->body;
+            SceneBody_Init(body, entry->collisionId, &sprite->position, 0, 7, entry);
             TerrainOverlay_QueueAddActor(body);
         }
     } else
@@ -381,7 +377,7 @@ void HitSwitch_InitEntryFromScript(struct HitSwitchManager *input)
         u16 *state;
         u32 flags, mask;
         HitSwitch_RegisterCompletedCell(entry);
-        state = &entry->collider.state;
+        state = &entry->collider.flags;
         flags = *state;
         mask = 4;
         mask |= flags;

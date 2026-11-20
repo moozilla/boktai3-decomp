@@ -57,11 +57,11 @@ int BreakableBarrier_Initialize(struct BreakableBarrierManager *m, struct Breaka
 {
     struct BarrierExtent size, offset;
     int active = 0;
-    void *resource;
-    struct SceneCollider *c;
+    struct SpriteRenderResource *resource;
+    struct ContactCollider *c;
     if (i < m->count)
         active = 1;
-    resource = p->resource;
+    resource = &p->resource;
     if (!AnimData_Load(resource, 0x9929))
         return -1;
     Sprite_Init(p, resource, 0);
@@ -89,7 +89,7 @@ int BreakableBarrier_Initialize(struct BreakableBarrierManager *m, struct Breaka
     }
     Collider_Init(c, 0, 0x4001, 0, 16, &size, &offset);
     if (!active)
-        c->state |= 4;
+        c->flags |= 4;
     Collider_SetPosition(c, &p->sprite.position, 0);
     Collider_SetCallback(c, BreakableBarrier_OnColliderHit, p);
     Collider_SetBodyProperties(c, 0, 0, 0);
@@ -109,9 +109,9 @@ u32 BreakableBarrier_Destroy(u32 a, struct BreakableBarrier *p)
     return 0;
 }
 
-static inline void disable(struct SceneCollider *c)
+static inline void disable(struct ContactCollider *c)
 {
-    c->state |= 4;
+    c->flags |= 4;
 }
 
 u32 BreakableBarrier_ConsumeEntered(struct BreakableBarrier *);
@@ -124,10 +124,10 @@ void BreakableBarrier_Hide(void *m, struct BreakableBarrier *p)
     }
 }
 
-static inline void enable(struct SceneCollider *c)
+static inline void enable(struct ContactCollider *c)
 {
     u32 mask = ~4;
-    c->state = mask & c->state;
+    c->flags = mask & c->flags;
 }
 
 static inline void BreakableBarrier_NextRandomIndex(u32 cursor, u32 *next)
@@ -139,7 +139,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
     struct BarrierExtent size;
     if (BreakableBarrier_ConsumeEntered(p)) {
         p->sprite.flags &= ~1;
-        AnimData_SelectPaletteBank(p->resource, 136);
+        AnimData_SelectPaletteBank(&p->resource, 136);
     }
     p->frame++;
     if (p->frame == 7)
@@ -193,13 +193,13 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             sub_08012B34(m, p);
             sub_08012B34(m, p);
             Sound_PlaySongChecked(232);
-            AnimData_SelectPaletteBank(p->resource, 402);
+            AnimData_SelectPaletteBank(&p->resource, 402);
         }
     }
     if (p->flash) {
         p->flash--;
         if (!p->flash) {
-            AnimData_SelectPaletteBank(p->resource, 136);
+            AnimData_SelectPaletteBank(&p->resource, 136);
             enable(&p->collider);
         } else
             disable(&p->collider);
@@ -209,7 +209,7 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
 void Vampire_DecrementBarrierCount(void);
 void Palette_StartSlide(s32, s32, s32);
 
-void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
+void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
 {
     u32 index_3;
     u32 index_2;
@@ -235,18 +235,16 @@ void sub_0801310C(struct BreakableBarrierManager *m, struct BreakableBarrier *p)
         angle = (u8)table[index];
         index_2 = (index + 1) & mask;
         {
-            u32 v = table[index_2];
-            u32 m3 = 3;
-            v &= m3;
-            count = v + 2;
+            u32 sample = table[index_2];
+            sample &= 3;
+            count = sample + 2;
         }
         index_3 = (index_2 + 1) & mask;
         *indexPtr = index_3;
         {
-            u32 v = table[index_3];
-            u32 m3 = 3;
-            v &= m3;
-            speed = v + 20;
+            u32 sample = table[index_3];
+            sample &= 3;
+            speed = sample + 20;
         }
         SparkParticle_Spawn(&p->sprite.position, 1, &size, angle, count, speed, 2, 2);
         sub_08012B34(m, p);
@@ -362,7 +360,7 @@ u32 BreakableBarriers_Destroy(struct BreakableBarrierManager *);
 void *BatCurtain_Create(void)
 {
     void *obj;
-    obj = Task_Create(8, 0x2FC);
+    obj = Task_Create(8, sizeof(struct BreakableBarrierManager));
     if (obj != 0) {
         Task_SetCallbacks(obj, (void (*)(void *))BreakableBarriers_Update,
                           (void (*)(void *))BreakableBarriers_Destroy);

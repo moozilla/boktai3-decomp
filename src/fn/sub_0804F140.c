@@ -1,9 +1,10 @@
 #include "resource_station.h"
+#include "player.h"
 void ResourceStation_UpdateAnimation(struct ResourceStation *station)
 {
-    struct ResourceStationPlayer *player = station->player;
+    struct Player *player = (void *)station->player;
     u32 mask = 64;
-    if (player->flags & mask) {
+    if (player->statusFlags & mask) {
         switch ((s32)((station->animationFrame >> 1) & 3)) {
             case 1:
                 AnimData_SelectPaletteBank(station->graphics, 0x1B0);

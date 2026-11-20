@@ -24,11 +24,7 @@ struct AnimatedParticleConfig {
     u16 verticalStart, verticalStartRange, verticalDecay, verticalDecayRange;
     u16 horizontalStart, horizontalStartRange, horizontalDecay, horizontalDecayRange;
 };
-struct BreakablePropContact {
-    u8 unknown0[0x34];
-    u32 flags;
-};
-void BreakableProp_RequestBreakOnContact(struct BreakablePropContact *, s32,
+void BreakableProp_RequestBreakOnContact(struct ContactCollider *, s32,
                                          struct BreakableProp *);
 void BreakableProp_EmitBreakParticles(struct BreakableProp *);
 u32 BreakableProp_Tick(struct BreakableProp *);

@@ -1,49 +1,43 @@
 #include "global.h"
+#include "weather_state.h"
 #include "render.h"
-struct Weather {
-    u8 pad[24];
-    u32 timer;
-    u8 entered, pad1d[51];
-    int bank;
-    void *script;
-};
-extern u8 *gGameState;
+#include "game_state.h"
+#include "gba/io_reg.h"
 void Script_Call(void *, int);
-void Weather_EnterPhase(void *, int);
 int sub_080177AC(void *, int, int, int);
-static inline void setFlag(void)
+static inline void Weather_SetStormActiveFlag(void)
 {
     u32 mask = 4096;
-    *(u32 *)(gGameState + 0x868) |= mask;
+    gGameState->flags868 |= mask;
 }
-int Weather_StormOnset(struct Weather *p)
+int Weather_StormOnset(struct WeatherState *p)
 {
     int mask;
     if (p->entered) {
         p->entered = 0;
-        setFlag();
-        if (p->script)
-            Script_Call(p->script, 0);
+        Weather_SetStormActiveFlag();
+        if (p->onStormStart)
+            Script_Call(p->onStormStart, 0);
     }
     mask = 512;
     gDispCntShadow = mask | gDispCntShadow;
-    if (p->timer <= 14) {
-        if ((p->timer & 3) <= 2)
+    if (p->phaseTimer <= 14) {
+        if ((p->phaseTimer & 3) <= 2)
             gDispCntShadow &= ~mask;
-    } else if (p->timer <= 29) {
-        if ((p->timer & 3) <= 1)
+    } else if (p->phaseTimer <= 29) {
+        if ((p->phaseTimer & 3) <= 1)
             gDispCntShadow &= ~mask;
     } else {
-        if (!(p->timer & 3))
+        if (!(p->phaseTimer & 3))
             gDispCntShadow &= ~mask;
     }
     sub_080177AC(p, 3, 10, 10);
-    if (p->timer > 44) {
+    if (p->phaseTimer > 44) {
         Weather_EnterPhase(p, 3);
         return 1;
     } else {
-        p->bank = 0;
-        p->timer++;
+        p->tilemapLayer = 0;
+        p->phaseTimer++;
         return 0;
     }
 }

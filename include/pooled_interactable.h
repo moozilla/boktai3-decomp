@@ -1,5 +1,6 @@
 #ifndef POOLED_INTERACTABLE_H
 #define POOLED_INTERACTABLE_H
+#include "scene_input_widget.h"
 #include "scene_object.h"
 #include "task.h"
 
@@ -10,22 +11,10 @@
  * jump table; kinds 0-2 pick the animations.
  */
 
-struct PooledResource {
-    u32 data[8]; /* copied animation resource; three are held by the manager */
-};
-
 /* Route follower state (copied/stepped by Route_Start and friends). */
 struct PooledRoute {
     u32 data[2];
     void *current; /* current route point */
-};
-
-struct PooledDrawable {
-    u32 pad0[2];
-    u32 flags; /* bit 0: hidden */
-    u8 pad0C[20];
-    struct SceneVec position;
-    u8 tail[56];
 };
 
 struct PooledInteractable {
@@ -44,19 +33,19 @@ struct PooledInteractable {
     s32 region;  /* region the slot belongs to, or -1 for all */
     u32 kind;    /* 0-2, selects resource and animations ('D') */
     u32 arg;     /* script argument ('a') */
-    struct SceneVec *target;
+    struct ContactPosition *target;
     u16 speed, range;
     struct PooledRoute route;
-    struct PooledDrawable drawable;
+    struct SceneInputWidget drawable;
     struct SceneCollider collider;
-    struct PooledResource *resource;
+    struct SceneInputResource *resource;
 };
 
 struct PooledInteractableManager {
     struct Task task;
     u32 count;
     struct PooledInteractable *slots;
-    struct PooledResource resources[3];
+    struct SceneInputResource resources[3];
 };
 
 /* 0x02000034 */
@@ -86,9 +75,9 @@ u32 sub_0821E67C(void *, void *, void *, void *, u32, u32, u32);
 void Route_AdvancePoint(void *);
 u16 Route_GetCurrentPointNodeId(void *);
 u8 Route_Start(struct PooledRoute *, s32, s32, s32);
-void Path_GetPointPosition(struct SceneVec *, void *, u32);
-struct SceneVec *NamedObject_GetPositionByName(s32);
-s32 Region_FindContaining(struct SceneVec *);
+void Path_GetPointPosition(struct ContactPosition *, void *, u32);
+struct ContactPosition *NamedObject_GetPositionByName(s32);
+s32 Region_FindContaining(struct ContactPosition *);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
 /* Slot helpers and state handlers. */
@@ -98,7 +87,7 @@ u32 Breakable_ConsumeEnteredFlag(struct PooledInteractable *);
 void Breakable_OnHit(struct SceneCollider *, u32, struct PooledInteractable *);
 s32 Breakable_InitSlot(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_RunScript(struct PooledInteractable *);
-void sub_08008C18(void);
+void Breakable_NullCallback(void);
 void Breakable_UpdateAnimation(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_Idle(struct PooledInteractableManager *, struct PooledInteractable *);
 void Breakable_React(struct PooledInteractableManager *, struct PooledInteractable *);

@@ -64,12 +64,9 @@ void ScriptKeyframe_HideFromScript(void)
 {
     struct ScriptKeyframeEntry *entry = ScriptKeyframe_FindFromScript();
     if (entry) {
-        u32 flags = entry->animation.display.flags;
-        u32 mask = 1;
-        flags |= mask;
-        entry->animation.display.flags = flags;
+        entry->animation.display.flags |= 1;
         if (entry->conditionalVisibility)
-            entry->hidden = mask;
+            entry->hidden = 1;
     }
 }
 
@@ -151,8 +148,7 @@ void ScriptKeyframe_AddFromScript(void)
         return;
     {
         u32 id = Script_GetValue();
-        u32 key = 0xCB05;
-        resource = ScriptProc_Start(key, id);
+        resource = ScriptProc_Start(0xCB05, id);
     }
     entry->resource = *resource;
     ResourceHeader_Relocate(&entry->resource, resource);
@@ -249,7 +245,8 @@ struct ScriptKeyframeManager *ScriptKeyframe_CreateManagerFromScript(u32 arg1, u
             capacity = Script_GetValue();
         else
             capacity = 1;
-        manager = Task_Create(8, capacity * sizeof(struct ScriptKeyframeEntry) + 0x1C);
+        manager = Task_Create(8, sizeof(*manager) - sizeof(manager->entries) +
+                                     capacity * sizeof(manager->entries[0]));
         if (manager) {
             Task_SetCallbacks(manager, (void (*)(void *))ScriptKeyframe_TickManager,
                               (void (*)(void *))ScriptKeyframe_DestroyManager);

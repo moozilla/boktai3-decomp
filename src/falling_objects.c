@@ -1,9 +1,7 @@
 #include "falling_objects.h"
+#include "terrain_collision.h"
 #include "player_cue_sequence.h"
-/* FallingObjectManager_ClearGlobal: clears the global FallingObjectManager pointer (gFallingObjectManager); already aliased this way in src/falling_objects.c */
-#define FallingObjectManager_ClearGlobal sub_0800CBA0
 
-#define FallingObjectManager_ClearGlobal sub_0800CBA0
 
 void FallingObjectManager_ClearGlobal(void)
 {
@@ -86,11 +84,6 @@ u32 FallingObject_Destroy(struct FallingObject *s)
     Heap_Free(s);
 }
 
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-
 extern u16 gUnk_08604ABC[];
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -107,12 +100,12 @@ static inline s32 cellIndex(struct FallingVec *pos)
     return gTerrainMap->rows[z] + x;
 }
 
-static inline struct Cell *getCell(s32 index)
+static inline struct TerrainCell *getCell(s32 index)
 {
     u8 *dynamic = TerrainModifiers_FindCellOverride(index, 1);
     if (dynamic)
-        return (struct Cell *)(dynamic + 4);
-    return (struct Cell *)(gTerrainMap->cells + 12 + index * 4);
+        return &((struct TerrainCellOverride *)dynamic)->cell;
+    return &((struct TerrainGrid *)gTerrainMap->cells)->cells[index];
 }
 
 s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, u32 health,
@@ -152,7 +145,7 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
     {
         struct FallingVec *groundPos = &p->position;
         s32 x = p->position.x >> 8, z = groundPos->z >> 8, index;
-        struct Cell *cell;
+        struct TerrainCell *cell;
         u32 slope;
         s32 height;
         pos = groundPos;
@@ -161,8 +154,8 @@ s32 FallingObject_Create(u16 id, s32 type, u32 flags, u32 parameter, u32 speed, 
         else
             index = gTerrainMap->rows[z] + x;
         cell = getCell(index);
-        slope = cell->height >> 4;
-        height = (cell->height & 15) << 8;
+        slope = cell->shapeAndHeight >> 4;
+        height = (cell->shapeAndHeight & 15) << 8;
         switch (slope) {
             case 1:
                 height -= (u8)groundPos->z;
@@ -304,16 +297,9 @@ void FallingObject_UpdateFalling(struct FallingObject *object)
                 Sound_PlaySong(511);
         } else
             Sound_PlaySong(326);
-        {
-            u32 one = 1;
-            u32 frame;
-            object->state = one;
-            frame = 0;
-            object->timer = 0;
-            object->entered = one;
-            object->frame = frame;
-            object->frameTimer = frame;
-        }
+        FallingObject_SetState(object, FALLING_STATE_LANDING);
+        object->frame = 0;
+        object->frameTimer = 0;
     }
     if (object->type > 1) {
         object->frameTimer++;

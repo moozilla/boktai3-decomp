@@ -1,4 +1,5 @@
 #include "saved_position_marker.h"
+#include "terrain_collision.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker, u32 unused1,
                                              u32 unused2)
@@ -25,7 +26,8 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
     if (Script_SeekToKeyword('p')) {
         u32 cell;
         u32 height, surface;
-        u8 *properties;
+        struct TerrainCell *properties;
+        struct TerrainCellOverride *override;
         s32 x, z;
         marker->position.x = Script_GetValue();
         marker->position.y = Script_GetValue();
@@ -39,16 +41,13 @@ s32 SavedPositionMarker_InitializeFromScript(struct SavedPositionMarker *marker,
             u32 row = gTerrainMap->rows[z];
             cell = row + x;
         }
-        properties = TerrainModifiers_FindCellOverride(cell, 1);
-        if (properties)
-            properties += 4;
-        else {
-            struct EngineMap *map = gTerrainMap;
-            u32 offset = cell * 4 + 12;
-            properties = map->cells + offset;
-        }
-        surface = *properties >> 4;
-        height = (*properties & 15) << 8;
+        override = (struct TerrainCellOverride *)TerrainModifiers_FindCellOverride(cell, 1);
+        if (override)
+            properties = &override->cell;
+        else
+            properties = &((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
+        surface = properties->shapeAndHeight >> 4;
+        height = (properties->shapeAndHeight & 15) << 8;
         switch (surface) {
             case 1:
                 height -= (u8)position->z;

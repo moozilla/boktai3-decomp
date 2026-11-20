@@ -3,8 +3,7 @@
 #include "ram.h"
 #include "display_sequence_inline.h"
 #include "player_cue_sequence.h"
-
-extern u32 gUnk_02000560[];
+#include "player_slot_status.h"
 
 void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
@@ -111,10 +110,6 @@ static inline u8 sameRegion(struct Trigger *p)
     return 0;
 }
 
-static inline u32 Trigger_PlayerStatus(s32 index, u32 mask)
-{
-    return gUnk_02000560[index] & mask;
-}
 s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
 {
     u16 script = scriptInput;
@@ -122,7 +117,8 @@ s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
     struct TriggerScriptArgs args;
     s32 actor, i;
     u32 busy;
-    if (!script || p->actor == -1 || (busy = Trigger_PlayerStatus(p->actor, 12), actor = p->actor, busy))
+    if (!script || p->actor == -1 ||
+        (busy = PlayerSlot_ReadStatus(p->actor, 12), actor = p->actor, busy))
         return -1;
     if (p->type == 1) {
         values[0] = p->position->x;
@@ -255,11 +251,8 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
         s16 *o = box;
         if (!actor)
             continue;
-        {
-            u32 mask = 12;
-            if (gUnk_02000560[i] & mask)
-                continue;
-        }
+        if (PlayerSlot_ReadStatus(i, 12))
+            continue;
         v = p->position;
         proj = (struct SceneVec *)(i * 8 + (u32)manager);
         proj = (struct SceneVec *)((u8 *)proj + 60);
@@ -563,9 +556,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                                 available = stateMode();
                             else {
                                 if (gPlayers[0]) {
-                                    u32 *flags = &gPlayers[0]->actionFlags;
-                                    u32 mask = 16;
-                                    if (*flags & mask)
+                                    if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
                                         goto available;
                                 }
                                 available = globalMode();
@@ -799,13 +790,8 @@ s32 Trigger_CreateDropFromScript(void)
     mode = Script_GetKeywordValue('M', 0);
     persistent = Script_GetKeywordValue('i', 0);
     option = Script_GetKeywordValue('O', 0);
-    {
-        s32 zero = 0;
-        s32 *clear = arguments + 2;
-        do {
-            *clear-- = zero;
-        } while ((s32)clear >= (s32)arguments);
-    }
+    for (count = 0; count < 3; count++)
+        arguments[count] = 0;
     if (Script_SeekToKeyword('a')) {
         count = 0;
         out = arguments;
@@ -913,9 +899,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
             if (gWeatherCollisionTimer > 0)
                 goto reveal;
             if (gPlayers[0]) {
-                u32 *flags = &gPlayers[0]->actionFlags;
-                u32 mask = 16;
-                if (*flags & mask)
+                if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
                     goto reveal;
             }
             available = globalMode();
@@ -970,13 +954,8 @@ s32 Trigger_CreateContainerFromScript(void)
     sound = Script_GetKeywordValue('M', 0);
     hidden = Script_GetKeywordValue('S', 0);
     condition = Script_GetKeywordValue('c', 0);
-    {
-        s32 zero = 0;
-        s32 *clear = arguments + 2;
-        do {
-            *clear-- = zero;
-        } while ((s32)clear >= (s32)arguments);
-    }
+    for (count = 0; count < 3; count++)
+        arguments[count] = 0;
     if (Script_SeekToKeyword('a')) {
         count = 0;
         out = arguments;

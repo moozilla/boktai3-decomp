@@ -4,11 +4,8 @@
 #include "monster_particle_random.h"
 #include "armor_decision_ops.h"
 
-#define TetherActor_GetStatusTag sub_08049F54
 
-#define TetherActor_GetSavedKind sub_0804A400
 
-#define TetherActor_ClearInstance sub_080497E4
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
@@ -547,14 +544,14 @@ struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b);
 
 void TetherActor_InitializeSegments(struct TetherActor *actor)
 {
-    struct TetherSegment *segment = actor->segments;
+    struct SpriteDrawable *segment = actor->segments;
     s32 offset = -4;
     s32 remaining = 6;
     do {
         void *resource = AnimData_FindEntry(0x1C1C);
         ParticleSprite_Initialize(segment, resource, 0);
         Effect_SetOrigin(segment, offset, offset);
-        segment->priority = 255;
+        segment->depthOffset = -1;
         segment->flags |= 1;
         --remaining;
         ++segment;
@@ -572,17 +569,14 @@ static inline s32 scaleOffsetR(s32 value)
 }
 void TetherActor_UpdateSegments(struct TetherActor *actor)
 {
-    struct TetherSegment *segment;
-    union {
-        struct ContactPackedVector bits;
-        struct ContactPosition position;
-    } start, end;
+    struct SpriteDrawable *segment;
+    struct ContactPosition start, end;
     s32 x;
     s32 z;
     s32 offsetX;
     s32 offsetZ;
     u32 angle;
-    s32 priority;
+    s32 depthOffset;
     s32 i;
     if ((*gPlayers)->tetherMode != 6) {
         s32 n;
@@ -601,23 +595,23 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
         offsetX = scaleOffsetR(20 * (x + z));
         offsetZ = scaleOffsetR(20 * (z - x));
     }
-    start.bits.x = (*gPlayers)->position.x + offsetX;
-    start.bits.y = (*gPlayers)->position.y + 220;
-    start.bits.z = (*gPlayers)->position.z + offsetZ;
+    start.x = (*gPlayers)->position.x + offsetX;
+    start.y = (*gPlayers)->position.y + 220;
+    start.z = (*gPlayers)->position.z + offsetZ;
     angle = ((actor->heading + 5) & 7) * 32;
-    end.bits.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
-    end.bits.y = actor->position.y - 50;
-    end.bits.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
-    priority = ((*gPlayers)->heading == 4) ? (-20) : (-2);
+    end.x = actor->position.x + scaleOffsetR(100 * gUnk_086149C4[(angle + 64) & 255]);
+    end.y = actor->position.y - 50;
+    end.z = actor->position.z + scaleOffsetR(100 * gUnk_086149C4[angle & 255]);
+    depthOffset = ((*gPlayers)->heading == 4) ? (-20) : (-2);
     segment = actor->segments;
     i = 0;
     do {
         s32 count = i + 1;
         s32 remaining = 7 - i;
-        segment->position.x = ((end.position.x * count) + (start.position.x * remaining)) >> 3;
-        segment->position.y = ((end.position.y * count) + (start.position.y * remaining)) >> 3;
-        segment->position.z = ((end.position.z * count) + (start.position.z * remaining)) >> 3;
-        segment->priority = priority;
+        segment->position.x = ((end.x * count) + (start.x * remaining)) >> 3;
+        segment->position.y = ((end.y * count) + (start.y * remaining)) >> 3;
+        segment->position.z = ((end.z * count) + (start.z * remaining)) >> 3;
+        segment->depthOffset = depthOffset;
         segment->flags &= ~1;
         i = count;
         ++segment;
@@ -626,7 +620,7 @@ void TetherActor_UpdateSegments(struct TetherActor *actor)
 
 void TetherActor_RemoveSegments(struct TetherActor *actor)
 {
-    struct TetherSegment *segment = actor->segments;
+    struct SpriteDrawable *segment = actor->segments;
     s32 remaining = 6;
     do {
         Effect_Remove(segment);
@@ -669,8 +663,7 @@ void TetherActor_UpdateShake(struct TetherActor *actor)
         gRandomIndex = (gRandomIndex + 1) & 1023;
         {
             u32 sample = ((const u16 *)RANDOM_TABLE_ADDR)[gRandomIndex];
-            u32 mask = 1;
-            shake = (sample & mask) * 11 - 5;
+            shake = (sample & 1) * 11 - 5;
         }
         actor->shakeX = shake;
         actor->shakeZ = -shake;
@@ -1242,9 +1235,8 @@ void TetherActor_ClearExternalStatus(void)
 {
     Inventory_AddItem(43, 0);
     {
-        const s8 cleared = -1;
-        s16 *status = &gGameState->unk5AA;
-        *status = cleared;
+        s16 *savedKind = &gGameState->unk5AA;
+        *savedKind = -1;
     }
 }
 
@@ -1312,10 +1304,7 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
     s32 height;
     s32 diff;
     u32 state;
-    union {
-        struct ContactPackedVector v;
-        struct ContactPosition p;
-    } corner;
+    struct ContactPosition corner;
     if (!gTetherActor)
         goto no;
     dx = position->x - gTetherActor->position.x;
@@ -1358,10 +1347,10 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
         diff = -diff;
     if (diff > 255)
         goto no;
-    corner.v.x = position->x - dx;
-    corner.v.z = position->z;
+    corner.x = position->x - dx;
+    corner.z = position->z;
     {
-        struct ContactPackedVector *cp = &corner.v;
+        struct ContactPosition *cp = &corner;
         s32 cx = cp->x >> 8;
         s32 cz = cp->z >> 8;
         if (cx < 0 || cz < 0 || (u32)cx >= gTerrainWidth || (u32)cz >= gTerrainHeight)
@@ -1375,10 +1364,10 @@ u32 TetherActor_TestNearbyInteraction(struct ContactPosition *position, u32 tag,
         diff = -diff;
     if (diff <= 127)
         goto yes;
-    corner.p.x = position->x;
-    corner.p.z = position->z - dz;
+    corner.x = position->x;
+    corner.z = position->z - dz;
     {
-        struct ContactPosition *cp = &corner.p;
+        struct ContactPosition *cp = &corner;
         NEAR_CELL(own, cp->x, cp->z);
         NEAR_HEIGHT(height, cp, own);
     }
@@ -2118,31 +2107,25 @@ void TetherActor_InitSecondaryCollider(struct TetherActor *p)
 
 void TetherActor_InitStateParameters(struct TetherActor *p)
 {
-    u16 zero;
-    u16 two;
-    u16 *first;
-    first = &p->stateOption;
-    zero = 0;
-    two = 2;
-    *first = two;
-    p->stateCounter = zero;
+    p->stateOption = 2;
+    p->stateCounter = 0;
     p->stateRadius = 0x40;
     p->stateSpeed = 3;
     p->stateDuration = 6;
-    p->stateRepeat = two;
-    p->stateDelay = two;
+    p->stateRepeat = 2;
+    p->stateDelay = 2;
     p->stateRecovery = 0x3c;
     p->stateStep = 8;
-    p->statePhase = zero;
+    p->statePhase = 0;
     p->stateLimitA = 0xff;
     p->stateLimitB = 0xff;
-    p->stateFlagA = zero;
+    p->stateFlagA = 0;
     p->stateLimitC = 0xff;
-    p->stateFlagB = zero;
+    p->stateFlagB = 0;
     p->stateLimitD = 0xff;
-    p->stateFlagC = zero;
+    p->stateFlagC = 0;
     p->stateLimitE = 0xff;
-    p->stateFlagD = zero;
+    p->stateFlagD = 0;
 }
 
 void TetherActor_AccumulateCharge(struct TetherActor *p, u32 a)
@@ -2399,9 +2382,9 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
         actor->position.z + actor->shakeZ;
     Collider_SetPosition(&actor->chargeCollider, position, 0);
     oldCell = actor->movementProbeStorage.cell;
-    oldSlope = actor->movementProbeStorage.slope;
+    oldSlope = actor->movementProbeStorage.shape;
     oldHeight = actor->movementProbeStorage.height;
-    oldAttributes = actor->movementProbeStorage.attributes;
+    oldAttributes = actor->movementProbeStorage.flags;
     if (actor->kind == 9) {
         if (!actor->movementProbe) {
             CellObject_Init(&actor->movementProbeStorage, position);
@@ -2423,14 +2406,14 @@ void TetherActor_UpdateWorldPosition(struct TetherActor *actor)
                 properties = map->cells + offset;
             }
         }
-        actor->movementProbeStorage.slope = *properties >> 4;
+        actor->movementProbeStorage.shape = *properties >> 4;
         actor->movementProbeStorage.height = *properties & 15;
-        actor->movementProbeStorage.attributes = *(u16 *)(properties + 2);
+        actor->movementProbeStorage.flags = *(u16 *)(properties + 2);
     }
     actor->movementProbeStorage.previousCell = oldCell;
-    actor->movementProbeStorage.previousSlope = oldSlope;
+    actor->movementProbeStorage.previousShape = oldSlope;
     actor->movementProbeStorage.previousHeight = oldHeight;
-    actor->movementProbeStorage.previousAttributes = oldAttributes;
+    actor->movementProbeStorage.previousFlags = oldAttributes;
     if (actor->kind == 9)
         TetherActor_HandleFlaggedCell(actor);
     TetherActor_UpdateSampledPosition(actor);
@@ -2956,19 +2939,15 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
         }
     } else if (actor->roamFrame > 90) {
         u32 angle;
-        const s16 *table;
         struct ContactPackedVector delta;
         struct ContactPosition *position;
         {
             u32 value = (actor->heading + 5) & 7;
             angle = value << 5;
         }
-        do {
-            table = gUnk_086149C4;
-        } while (0);
-        delta.x = scale(table[(angle + 64) & 255] * 3);
+        delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
         delta.y = 0;
-        delta.z = scale(table[angle] * 3);
+        delta.z = scale(gUnk_086149C4[angle] * 3);
         position = &actor->position;
         if (TetherActor_TestStepDelta((struct ContactPackedVector *)position, &delta, 0x843)) {
             position->x += delta.x;
@@ -3258,16 +3237,14 @@ void *ActorAttachment_ReleaseResource(void *, u32, u32);
 
 void TetherActor_UpdateDescendingState(struct TetherActor *actor)
 {
-    u32 zero;
     if (actor->state != 6)
         TetherActor_SetState(actor, 6);
-    zero = gEngineFlags & 512;
-    if (zero)
+    if (gEngineFlags & 512)
         return;
-    actor->glowMode = zero;
+    actor->glowMode = 0;
     if (++actor->stateFrame <= 5) {
         if (actor->stateFrame == 1) {
-            actor->effectValue = zero;
+            actor->effectValue = 0;
             actor->pendingEffectHandle =
                 ActorAttachment_UpdateFromDescriptor(actor->pendingEffectHandle, &actor->bodyConfig,
                                                      1, 0, &actor->effectValue, 200, 250, 290);
@@ -3635,7 +3612,7 @@ struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b)
     struct TetherActor *r;
     if (gTetherActor != 0)
         return gTetherActor;
-    r = Task_Create(9, 0x484);
+    r = Task_Create(9, sizeof(*r));
     if (r) {
         Task_SetCallbacks(r, (void (*)(void *))TetherActor_Tick,
                           (void (*)(void *))TetherActor_Destroy);

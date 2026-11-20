@@ -5,32 +5,14 @@
 #include "player.h"
 #include "ram.h"
 #include "task.h"
+#include "display_sequence.h"
+#include "sprite_drawable_api.h"
 
 // Tentative: a pool of 16 small hit-detecting props (idle sprite, hit animation, then spawns an
 // effect burst) owned by a task, created from script. Each slot embeds a collider
 // (struct SceneCollider), a sprite record and an animation player.
 
-struct CollisionVec {
-    s16 x, y, z, pad;
-};
-
-struct CollisionSprite {
-    u32 flags; // bit 0: animation finished, bit 2/3: flip
-    u8 pad4[4];
-    u16 tile;
-    u8 width, height;
-    u8 pad0C[12];
-    struct CollisionVec position;
-    u8 tail[8];
-};
-
-struct CollisionAnim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-
-// Update modes (CollisionSlot.mode): 0 idle animation, 1 hit animation.
+// Update modes: 0 idle, 1 hit delay, 2 hit animation.
 struct CollisionSlot {
     u16 id;
     u8 mode;
@@ -44,21 +26,16 @@ struct CollisionSlot {
     u16 timer, delay;
     u16 attack, range, script; // effect parameters from the script
     struct SceneCollider collider;
-    struct CollisionSprite sprite;
-    struct CollisionAnim anim;
-};
-
-struct CollisionGraphics {
-    u32 pad;
-    u16 base;
+    struct SpriteDrawable sprite;
+    struct DisplaySequenceState anim;
 };
 
 struct CollisionManager {
     struct Task task;
     u8 paused;
     u8 pad19[3];
-    struct CollisionGraphics *graphics;          // hit sprite graphics
-    struct CollisionGraphics *animationGraphics; // idle sprite graphics
+    struct SpriteEffectTileResource *graphics;          // hit sprite graphics
+    struct SpriteEffectTileResource *animationGraphics; // idle sprite graphics
     void *hitResource;
     void *idleResource;
     struct CollisionSlot slots[16];
@@ -70,17 +47,11 @@ struct CollisionOther {
     u8 hit;
 };
 
-struct CollisionScene {
-    u8 pad[14];
-    u8 mode;
-};
-
 /* 0x0200003C */
 extern struct CollisionManager *gCollisionManager;
-extern struct CollisionScene gSunClock;
 extern void *gUnk_08604A00[2][3];
 
-void sub_08009E30(void);
+void CollisionController_ClearGlobal(void);
 struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *);
 s32 CollisionController_InitSlot(struct CollisionManager *, struct CollisionSlot *);
 u32 CollisionController_RemoveSlot(struct CollisionManager *, struct CollisionSlot *);
@@ -99,12 +70,8 @@ s32 CollisionController_ScriptGetActiveCount(void);
 void CollisionController_ScriptRemoveAll(void);
 
 /* Engine helpers. */
-void ParticleSprite_Initialize(void *, void *, u32);
-void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void Effect_SetOrigin(void *, s32, s32);
 void Script_ReadReference(void *);
 void Script_WriteReferenceValue(void *, s32, s32);
-void EffectManager_SpawnParticles(u32, u32, u32, struct CollisionVec *, struct SceneExtent *, u32,
-                                  u32);
+s32 EffectManager_SpawnParticles(s32, u32, u32, void *, void *, s32, s32);
 
 #endif

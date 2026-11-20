@@ -46,7 +46,8 @@ its spelling, so each one is a question, not a verdict:
   its own value and integer constants, then discards it.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
-* `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
+* `stmt-expr`: a `({ ... })` outside a macro, or an expression macro that wraps a single
+  assignment in a one-pass loop before returning the assigned temporary.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant. A `goto` label or `return` operand is not a declaration.
 * `literal-local`: any other local that is initialized to a literal and never changed
@@ -110,7 +111,8 @@ _REGEX = {
 _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixteen|minusOne|negOne|allOnes)"
                 r"(?:[A-Z_0-9]\w*)?")
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
-_DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
+_DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
+              r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
 _INTEGER_SCALAR = r"[us](?:8|16|32|64)"
 _SCALAR_DECLARATOR = rf"\w+(?:\s*=\s*{_LITERAL})?"
@@ -136,6 +138,12 @@ _WARN_REGEX = {
 }
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
+_WRAPPED_EXPR_MACRO = re.compile(
+    r"[ \t]*#[ \t]*define[ \t]+\w+\([^()\n]*\)\s*\(\s*\{"
+    r"\s*(?:[A-Za-z_]\w*\s+)+(?:\*\s*)*(?P<temporary>[A-Za-z_]\w*)\s*;"
+    r"\s*do\s*\{\s*(?P=temporary)\s*=(?!=)[^;{}]+;\s*\}\s*while\s*\(\s*0\s*\)\s*;"
+    r"\s*(?P=temporary)\s*;\s*\}\s*\)\s*"
+)
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
@@ -221,7 +229,10 @@ def _volatile_typedef_locals(code: str):
 
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
-    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
+    for macro in _MACRO_DEF.finditer(code):
+        if _WRAPPED_EXPR_MACRO.fullmatch(macro.group(0).replace("\\\n", " ")):
+            yield macro.start(), "stmt-expr"
+    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind

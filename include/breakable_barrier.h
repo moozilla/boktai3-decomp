@@ -1,6 +1,8 @@
 #ifndef BREAKABLE_BARRIER_H
 #define BREAKABLE_BARRIER_H
 #include "engine.h"
+#include "contact_collider.h"
+#include "sprite.h"
 #include "scene_object.h"
 #include "render.h"
 
@@ -24,8 +26,8 @@ struct BarrierSprite {
 
 struct BreakableBarrier {
     struct BarrierSprite sprite;
-    u8 resource[28];
-    struct SceneCollider collider;
+    struct SpriteRenderResource resource;
+    struct ContactCollider collider;
     u16 health;
     u8 state, entered, flash, hit, frame, pada3;
     u32 timer;

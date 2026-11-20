@@ -8,9 +8,9 @@ void TerrainEdgeMarker_AddFromScript(void)
         position.packed.y = Script_GetValue();
         position.packed.z = Script_GetValue();
     } else {
-        u32 mask = 0xFFFF0000;
-        position.words[0] = 0;
-        position.words[1] &= mask;
+        position.packed.x = 0;
+        position.packed.y = 0;
+        position.packed.z = 0;
     }
     if (Script_SeekToKeyword('f'))
         preserveHeight = Script_GetValue();

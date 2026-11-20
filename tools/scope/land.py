@@ -239,7 +239,7 @@ def added_concessions(before, after, path=None):
 
 
 def added_warnings(before, after, path=None):
-    """{kind: n}: the linter warnings (tools/concessions.py WARN) AFTER has beyond BEFORE."""
+    """Return added warning counts and any source that prevented compiler comparison."""
     tools = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if tools not in sys.path:
         sys.path.insert(0, tools)
@@ -252,22 +252,32 @@ def added_warnings(before, after, path=None):
             out[s.kind] = out.get(s.kind, 0) + 1
         return out
     old, new = count(before), count(after)
+    compiler_failure = None
     import deadcode
     if rel and rel.endswith(".c") and deadcode.available():  # the two kinds only a compile finds
         os.makedirs(deadcode.CACHE, exist_ok=True)
-        for text, into in ((without_drafts(before), old), (without_drafts(after), new)):
+        compiler_counts = []
+        for version, text in (("previous", without_drafts(before)), ("candidate", without_drafts(after))):
             if not text.strip():
+                compiler_counts.append({})
                 continue
             tmp = os.path.join(deadcode.CACHE, f"_land_{os.getpid()}.c")
-            open(tmp, "w").write(text)
+            with open(tmp, "w") as stream:
+                stream.write(text)
             try:
-                for kind in {(s[0], s[2]) for s in deadcode.compile_unit(os.path.relpath(tmp, deadcode.ROOT))}:
-                    into[kind[0]] = into.get(kind[0], 0) + 1
+                counts = {}
+                for kind, _ in {(s[0], s[2]) for s in deadcode.compile_unit(os.path.relpath(tmp, deadcode.ROOT))}:
+                    counts[kind] = counts.get(kind, 0) + 1
+                compiler_counts.append(counts)
             except RuntimeError:
-                pass  # a unit that doesn't compile is reported by the land itself
+                compiler_failure = version
+                break
             finally:
                 os.remove(tmp)
-    return {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}
+        if compiler_failure is None:
+            old.update(compiler_counts[0])
+            new.update(compiler_counts[1])
+    return {k: n - old.get(k, 0) for k, n in new.items() if n > old.get(k, 0)}, compiler_failure
 
 
 def warning_note(func, added):
