@@ -1,22 +1,15 @@
+#include "sprite.h"
+#include "contact_collider.h"
+#include "display_sequence_inline.h"
+#include "scene_effect_projection.h"
 #include "global.h"
 #include "render.h"
 #include "display_sequence.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct FragmentSprite {
-    u32 flags;
-    u8 unknown4[0xc];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct Vec position;
-    u8 unknown24[8];
-};
 struct FragmentBurst {
-    struct FragmentSprite sprites[4];
+    struct DisplaySequenceSprite sprites[4];
     struct DisplaySequenceState sequences[4];
-    struct Vec origin, position;
-    u8 collider[0x54];
+    struct ContactPosition origin, position;
+    struct ContactCollider collider;
     u16 age;
     u8 state;
     s8 slot;
@@ -27,58 +20,27 @@ struct FragmentBurst {
 void Sound_PlaySong(u32);
 void Collider_SetPosition(void *, void *, u32);
 void Collider_Refresh(void *);
-static inline s32 ProjectScale(s32 n)
-{
-    s32 v = n * 3;
-    if (v >= 0)
-        v >>= 5;
-    else
-        v = -(-v >> 5);
-    return v;
-}
-static inline s32 ProjectHeight(s32 n)
-{
-    s32 v = n * 3;
-    if (v >= 0)
-        return v >> 5;
-    return -(-v >> 5);
-}
-static inline void Project(struct Vec *out, struct Vec *in)
+static inline void Project(struct ContactPosition *out, struct ContactPosition *in)
 {
     s32 x = in->x, z = in->z, h, y;
-    out->x = ProjectScale(x - z);
-    h = ProjectScale(x + z);
-    y = ProjectHeight(in->y);
+    out->x = SceneEffect_ScaleProjection(3 * (x - z));
+    h = SceneEffect_ScaleProjection(3 * (x + z));
+    y = SceneEffect_ScaleProjection(3 * in->y);
     out->y = h - y;
     out->z = h + y;
 }
 // confidence=low: animates three projected burst sprites and enables their short-lived impact collider.
-static inline void ProjectShift(struct Vec *out, struct Vec *in, struct Vec *camera)
+static inline void ProjectShift(struct ContactPosition *out, struct ContactPosition *in,
+                                struct ContactPosition *camera)
 {
     Project(out, in);
     out->x = out->x - camera->x + 120;
     out->y = out->y - camera->y + 80;
     out->z -= camera->z;
 }
-static inline u16 DisplaySequence_GetIndex(struct DisplaySequenceState *state)
-{
-    return state->index;
-}
-
-static inline u32 DisplaySequence_ReadCommand(const u16 *command)
-{
-    return *command;
-}
-
-static inline u32 DisplaySequence_MaskCommand(u32 command, u32 mask)
-{
-    mask &= command;
-    return mask;
-}
-
 /* Apply the current frame and flips, then advance the stored playback state.
  * The duration calculation uses the newly selected command's low four bits. */
-static inline void FragmentBurst_StepAnimation(struct FragmentSprite *owner,
+static inline void FragmentBurst_StepAnimation(struct DisplaySequenceSprite *owner,
                                                struct DisplaySequenceState *state, u32 endMask)
 {
     const u16 *command;
@@ -143,8 +105,8 @@ static inline void FragmentBurst_StepAnimation(struct FragmentSprite *owner,
     }
 }
 
-static inline struct DisplaySequenceState *FragmentBurst_BeginAnimation(struct FragmentBurst *p,
-                                                                        struct Vec **origin)
+static inline struct DisplaySequenceState *
+FragmentBurst_BeginAnimation(struct FragmentBurst *p, struct ContactPosition **origin)
 {
     *origin = &p->origin;
     return p->sequences;
@@ -153,8 +115,8 @@ static inline struct DisplaySequenceState *FragmentBurst_BeginAnimation(struct F
 void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
 {
     s32 i;
-    struct Vec *camera;
-    struct Vec *origin;
+    struct ContactPosition *camera;
+    struct ContactPosition *origin;
     struct DisplaySequenceState *sequence;
     u32 endMask;
     if (p->enter) {
@@ -164,9 +126,9 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
     i = 0;
     sequence = FragmentBurst_BeginAnimation(p, &origin);
     do {
-        struct FragmentSprite *sprite = &p->sprites[i];
+        struct DisplaySequenceSprite *sprite = &p->sprites[i];
         endMask = 8;
-        camera = &gCameraOrigin;
+        camera = (struct ContactPosition *)gCameraOrigin;
         sprite->flags &= ~1;
         FragmentBurst_StepAnimation(sprite, sequence, endMask);
         ProjectShift(&sprite->position, origin, camera);
@@ -178,8 +140,8 @@ void FragmentBurst_UpdateImpactAnimation(void *unused, struct FragmentBurst *p)
         p->state = 2;
         p->enter = 1;
     } else {
-        Collider_SetPosition(p->collider, &p->position, 0);
-        Collider_Refresh(p->collider);
+        Collider_SetPosition(&p->collider, &p->position, 0);
+        Collider_Refresh(&p->collider);
         p->timer++;
     }
 }
