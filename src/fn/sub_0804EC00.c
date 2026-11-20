@@ -1,11 +1,7 @@
 #include "global.h"
 #include "game_state.h"
 #include "area_effect_link.h"
-struct S {
-    u8 f[0x868];
-    u32 fl;
-};
-s32 AreaEffect_FindContainingEntry(u8 *);
+s32 AreaEffect_FindContainingEntry(struct SceneVec *);
 s32 AreaEffect_ScaleLinkResourceGain(s32);
 static inline u32 mk(u32 *a, u32 m)
 {
@@ -17,23 +13,23 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-static inline u16 g62(u8 *p)
+static inline u16 AreaEffect_GetLinkResourceValue(const struct AreaEffectLinkState *link)
 {
-    if (p == 0)
+    if (link == 0)
         return 0;
-    return *(u16 *)(p + 0x62);
+    return link->value;
 }
-s32 AreaEffect_ScaleLinkGainAtPosition(u8 *a, s32 gain)
+s32 AreaEffect_ScaleLinkGainAtPosition(struct SceneVec *position, s32 gain)
 {
-    if (g62(gLinkSession) == 0)
+    if (AreaEffect_GetLinkResourceValue(gLinkSession) == 0)
         goto no;
     {
         u32 m = 2;
-        struct S *g = gGameState;
-        if (tst(mk(&g->fl, m)) != 0)
+        struct GameState *g = gGameState;
+        if (tst(mk(&g->flags868, m)) != 0)
             goto yes;
     }
-    if (AreaEffect_FindContainingEntry(a) >= 0)
+    if (AreaEffect_FindContainingEntry(position) >= 0)
         goto yes;
 no:
     return 0;
