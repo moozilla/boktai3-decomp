@@ -34,7 +34,7 @@ def walkable(cell):
     return not (cell[3] & 0x43)
 
 
-def convert(source, number, palette=None):
+def convert(source, number, palette=None, side_pixels=512):
     stage, terrain = source.scene(number)
     mp = stage["stage"]
     indexed = source.map(mp["map"], mp["tileset"])
@@ -53,15 +53,15 @@ def convert(source, number, palette=None):
     x, y = np.array(points).T
     extent = max(np.ptp(x) + 48, np.ptp(y) + 64)
     # Prefer simple sample ratios to keep repeated masonry tiles in phase.
-    scale = next((s for s in (1, .75, .5, .375, .25, .1875, .125) if extent * s <= 256),
-                 256 / extent)
-    side = round(256 / scale)
+    scale = next((s for s in (1, .75, .5, .375, .25, .1875, .125) if extent * s <= side_pixels),
+                 side_pixels / extent)
+    side = round(side_pixels / scale)
     left = round(((x.min() + x.max() - side) / 2) / 8) * 8
     top = round(((y.min() + y.max() - side) / 2 - 12) / 8) * 8
     box = (left, top, left + side, top + side)
-    color = Image.fromarray(colors[indexed]).crop(box).resize((256, 256), Image.Resampling.LANCZOS)
+    color = Image.fromarray(colors[indexed]).crop(box).resize((side_pixels, side_pixels), Image.Resampling.LANCZOS)
     lookup = np.uint8(np.rint(room_ramp(indexed, colors) * 255))
-    plane = Image.fromarray(lookup[indexed]).crop(box).resize((256, 256), Image.Resampling.LANCZOS)
+    plane = Image.fromarray(lookup[indexed]).crop(box).resize((side_pixels, side_pixels), Image.Resampling.LANCZOS)
     return Room(stage, terrain, color, quantize_bg(plane), key, scale, left, top)
 
 

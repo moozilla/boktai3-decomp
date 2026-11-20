@@ -74,6 +74,7 @@ loop:
 .render:
     call draw
     call sort_oam
+    call prepare_map
     call vblank
     ld a,[camera_x]
     ldh [0x43],a
@@ -87,6 +88,7 @@ loop:
 .window:
     ldh [0x4a],a
     call 0xff80
+    call flush_map
     call hud
     jp loop
 
@@ -178,6 +180,7 @@ load_room:
     ld [player_h],a
     call draw
     call sort_oam
+    call initial_map
     ld a,[camera_x]
     ldh [0x43],a
     ld a,[camera_y]
@@ -280,27 +283,6 @@ surface:
     ret
 .solid:
     scf
-    ret
-
-; Additive projection tables replace the GBA multiplies. All accepted
-; samples project inside the compiled 256x256 room, including slope height.
-project:
-    call surface
-    ld l,a
-    ld h,0x43
-    ld e,[hl]
-    ld l,b
-    ld d,[hl]
-    ld l,c
-    ld a,[header+1]
-    add d
-    add [hl]
-    sub e
-    ld e,a
-    ld a,[header]
-    add d
-    sub [hl]
-    ld d,a
     ret
 
 move_player:
@@ -765,26 +747,7 @@ draw:
     ld a,[player_z]
     ld c,a
     call project
-    ld a,d
-    sub 80
-    jr nc,.x_lower
-    xor a
-.x_lower:
-    cp 97
-    jr c,.x_ok
-    ld a,96
-.x_ok:
-    ld [camera_x],a
-    ld a,e
-    sub 82
-    jr nc,.y_lower
-    xor a
-.y_lower:
-    cp 113
-    jr c,.y_ok
-    ld a,112
-.y_ok:
-    ld [camera_y],a
+    call camera
     ld a,[menu]
     and a
     ret nz
@@ -892,40 +855,15 @@ draw:
     ld a,[shot_z]
     ld c,a
     call project
-    ld a,e
+    ld hl,world_y
+    ld a,[hl]
     sub 9
-    ld e,a
+    ld [hl+],a
+    ld a,[hl]
+    sbc 0
+    ld [hl],a
     ld a,116
     jp marker_oam
-
-; D,E = projected feet. Carry if outside the open playfield.
-screen_xy:
-    ld a,[camera_x]
-    ld b,a
-    ld a,d
-    sub b
-    jr nc,.right
-    cp 249
-    jr c,.skip
-    jr .horizontal
-.right:
-    cp 168
-    jr nc,.skip
-.horizontal:
-    ld d,a
-    ld a,[camera_y]
-    ld b,a
-    ld a,e
-    sub b
-    jr c,.skip
-    cp 136
-    jr nc,.skip
-    ld e,a
-    and a
-    ret
-.skip:
-    scf
-    ret
 
 actor_oam:
     call screen_xy

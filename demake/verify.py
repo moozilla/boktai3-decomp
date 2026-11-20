@@ -57,6 +57,7 @@ class Replay:
         self.trace = []
         self.snaps = []
         self.ticks = 0
+        self._window_x, self._window_y = np.meshgrid(np.arange(21), np.arange(19))
         self.run(0, 1)
 
     def state(self, key):
@@ -71,11 +72,24 @@ class Replay:
         self.model.keys = key
         for _ in range(ticks):
             self.model.until(self.loop)
+            self.check_scroll()
         self.ticks += ticks
         if self.trace and self.trace[-1][0] == "tick" and self.trace[-1][2] == key:
             self.trace[-1][1] += ticks
         else:
             self.trace.append(["tick", ticks, key])
+
+    def check_scroll(self):
+        # Compare every tile the LCD might fetch, including partial edge tiles.
+        # Both emulators could agree while the game itself loaded a wrong column.
+        origin_x = (self.state("camera_x") + 256 * self.state("camera_x_hi")) // 8
+        origin_y = (self.state("camera_y") + 256 * self.state("camera_y_hi")) // 8
+        x, y = self._window_x + origin_x, self._window_y + origin_y
+        hw = np.frombuffer(self.model.mem, dtype=np.uint8)
+        rom = np.frombuffer(self.model.rom, dtype=np.uint8)
+        expected = rom[self.model.bank * 0x4000 + 0x2000 + (y % 64) * 64 + x % 64]
+        actual = hw[0x9800 + (y % 32) * 32 + x % 32]
+        check(np.array_equal(expected, actual), f"BG stream differs from full map at camera tile {origin_x},{origin_y}")
 
     def record(self, name, caption):
         frame = self.model.render()

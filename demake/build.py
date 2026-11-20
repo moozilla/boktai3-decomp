@@ -18,7 +18,9 @@ OUT = ROOT / "build/demake"
 STATE = """bank next_bank player_x player_z player_h camera_x camera_y health energy tick
 direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase enemy_x
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
-shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise""".split()
+shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise
+world_x world_x_hi world_y world_y_hi camera_x_hi camera_y_hi projected_h projected_h_hi
+tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x""".split()
 
 
 def direction_table():
@@ -45,7 +47,7 @@ def build(source, out):
     bgm = next(int(t.split()[1], 0) for _, t in source.walker.text(2712) if t.startswith("proc_1048 "))
     score, wave, music_info = compile_song(bgm)
     symbols.update(music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
-    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text()
+    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text()
     code, _ = assemble(asm, {**symbols, "obj_patterns": 0, "directions": 0, "wave_pattern": 0})
     fixed_end = 0x150 + len(code)
     code, symbols = assemble(asm, {**symbols, "directions": fixed_end, "obj_patterns": fixed_end + len(directions),

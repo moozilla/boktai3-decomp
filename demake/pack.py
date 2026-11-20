@@ -11,7 +11,7 @@ import text as game_text
 
 # Bank addresses stay fixed so the same SM83 code can run every room.
 LAYOUT = dict(header=0x4000, route=0x4020, events=0x4100, rows=0x4200, projection=0x4300,
-              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00)
+              cells=0x4400, patterns=0x4800, background=0x5800, window=0x5C00, worldmap=0x6000, projection_hi=0x7000)
 SCENES = [2698, 2705, 2712]
 ROOM_NAMES = {2698: "SEALED PRISON", 2705: "THE CORRIDOR", 2712: "THE SKYLIGHT"}
 STORY = {2698: 5599, 2705: 8697, 2712: 8701}
@@ -116,15 +116,17 @@ def pack_room(source, room, rooms):
     ox, oy = t["origin"]
     offset = [round((ox - room.left) * room.scale) & 255, round((oy - room.top) * room.scale) & 255]
     header = bytes([*offset, w, h, *start, len(path), len(events), *(encode_id(i) for i in ui.ids)])
+    header += struct.pack("<hh", round((ox - room.left) * room.scale), round((oy - room.top) * room.scale))
     sections = {
         "header": header, "route": route, "events": bytes(v for e in events for v in e),
         "rows": b"".join(struct.pack("<H", LAYOUT["cells"] + row * w) for row in range(h)),
         "projection": bytes(round(i * 3 * room.scale) & 255 for i in range(256)),
         "cells": bytes(c[0] | c[1] << 4 if walkable(c) else 255 for c in t["cells"]),
-        "patterns": all_tiles, "background": bgmap, "window": winmap,
+        "patterns": all_tiles, "background": bytes(1024), "window": winmap, "worldmap": bgmap,
+        "projection_hi": bytes(round(i * 3 * room.scale) >> 8 for i in range(256)),
     }
-    buf = bytearray(0x2000)
-    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x6000]):
+    buf = bytearray(0x3100)
+    for (name, addr), end in zip(LAYOUT.items(), [*list(LAYOUT.values())[1:], 0x7100]):
         data = sections[name]
         if len(data) > end - addr:
             raise ValueError(f"scene {scene}: {name} exceeds its bank region")
