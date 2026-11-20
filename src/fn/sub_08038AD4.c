@@ -31,7 +31,7 @@ void WirelessGameMenu_UpdateActiveRound(struct WirelessGameExchange *p)
     u8 *entered = &p->entered;
     if (*entered) {
         *entered = 0;
-        p->roundTimeLeft = 720;
+        p->roundTimeLeft = WIRELESS_ROUND_FRAMES;
         Hud_RegisterTimer(&p->roundTimeLeft);
         WirelessGameMenu_SetStatusPanelState(p, 4);
         Sound_PlayTrackedSong(22);
