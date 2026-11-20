@@ -22,7 +22,7 @@ struct Vec2 {
     s32 x, y;
 };
 
-void sub_08158754(u8 *p)
+void Player_UpdateAlternateInteractionCallbacks(u8 *p)
 {
     Player_AddStatusFlags((struct Player *)p, 0x54000);
     switch (*(s32 *)(p + 0x1c)) {

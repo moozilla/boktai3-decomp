@@ -5740,6 +5740,7 @@ addr,name,mode,confidence,source,notes
 0815849C,Player_UpdateInteractionCallbacks,thumb,low,src-alias,Dispatches the interaction callback and updates the player camera and movement.
 08158588,Player_SelectAlternateInteractionMode,thumb,low,src-alias,
 08158650,Player_SynchronizeInteractionDisplay,thumb,low,src-alias,
+08158754,Player_UpdateAlternateInteractionCallbacks,thumb,low,src-alias,Dispatches the alternate interaction mode and updates its display and movement.
 08158848,Player_UpdateLinkModeMovement,thumb,low,src-alias,
 08158CD8,Player_BeginTerrainInteraction,thumb,low,src-alias,
 08158DF0,Player_BeginDirectionSequence,thumb,low,src-alias,
