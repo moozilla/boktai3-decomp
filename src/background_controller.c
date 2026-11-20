@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "background_controller.h"
+#include "array_fill.h"
 /* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
 #define Background_LoadLayerMap sub_080020BC
 /* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gScrollingBackgrounds, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
@@ -510,12 +511,7 @@ s32 Background_LoadTilesFromScript(void)
             out++;
         }
     } else {
-        s32 zero = 0;
-        u16 *out = entries + 63;
-        do {
-            *out = zero;
-            out--;
-        } while ((s32)out >= (s32)entries);
+        Array_FillDescending(entries[0], entries[63], 0);
     }
 done:
     if (Script_SeekToKeyword('m')) {
@@ -562,12 +558,8 @@ void Background_QueueCommandFromScript(void)
 
 void sub_08002284(void)
 {
-    u32 *base = (u32 *)gScrollingBackgrounds;
-    u32 zero = 0;
-    u32 *p = base + 3;
-    do {
-        *p-- = zero;
-    } while ((s32)p >= (s32)base);
+    struct ScrollingBackground **slots = gScrollingBackgrounds;
+    Array_FillDescending(slots[0], slots[3], NULL);
 }
 
 static inline s32 fixed4(s32 v)
