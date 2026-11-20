@@ -34,21 +34,6 @@ struct Bee {
     u8 unknown458[0x18];
     struct ContactPosition start, end, motion, initialPosition;
 };
-struct BeeDrawable {
-    u32 flags;
-    u8 unknown4[4];
-    u8 scaleX;
-    s8 scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    const void *resource;
-};
-
 struct BeePackedPair {
     u32 lo : 16, hi : 16;
 };
