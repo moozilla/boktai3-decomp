@@ -7,7 +7,7 @@ import struct
 from PIL import Image
 import archive
 import sprites
-from graphics import BASE, REGIONS, SIZES, font, letter_mask, lettering, palette_pool, quantize, rectangles
+from graphics import BASE, REGIONS, SIZES, font, letter_mask, lettering, palette_pool, pixels, quantize, rectangles
 from runtime import HERE, OUT, ROOT
 from vision import ArtIndex, png, write_cache
 
@@ -16,9 +16,9 @@ MARKED = json.loads((HERE / "regions.json").read_text())
 
 def foreground(region):
     """Estimate backing and ink from an original label, retaining alpha."""
-    border = list(region.crop((0, 0, region.width, 1)).getdata())
-    border += list(region.crop((0, region.height-1, region.width, region.height)).getdata())
-    counts = Counter(region.getdata())
+    border = list(pixels(region.crop((0, 0, region.width, 1))))
+    border += list(pixels(region.crop((0, region.height-1, region.width, region.height))))
+    counts = Counter(pixels(region))
     bg = Counter(border).most_common(1)[0][0]
     opaque = [color for color in counts if color[3] and color != bg]
     if not opaque:
@@ -152,6 +152,9 @@ class ArtTranslator:
         self.loaded[key,index] = 0
         palettes = self.pool[pkg.h0:pkg.h0+16]
         ctx = resolver.catalog.context(game, scene, proc, lr, "graphic", "", None)
+        request = resolver.resource_requests.get((0xCB05, key))
+        if request and request["frame"] <= frame:
+            ctx["resource_request"] = request
         ctx.update(archive="CB05", package=code, frame_index=index, glyph_id=frames[index]["id"],
                    palette_banks=sorted({p["palette"] for p in pkg.parts(frames[index])}))
         recipe = REGIONS.get(code, {}).get(str(index))

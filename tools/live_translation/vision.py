@@ -35,7 +35,8 @@ class ArtIndex:
 
     def encounter(self, asset, context, preview):
         with self.db:
-            self.db.execute("INSERT OR IGNORE INTO artwork(asset,context,preview) VALUES (?,?,?)",
+            self.db.execute("""INSERT INTO artwork(asset,context,preview) VALUES (?,?,?)
+                            ON CONFLICT(asset) DO UPDATE SET context=excluded.context, preview=excluded.preview""",
                             (asset, json.dumps(context, ensure_ascii=False), preview))
 
     def status(self, asset):
@@ -109,8 +110,10 @@ class ArtIndex:
             region.update({k:v for k,v in authored.get(rid, {}).items() if k in ("font", "style")})
             layout = dict(ctx, region=box, width_px=crop.width, height_px=crop.height,
                           typography=region.get("style", "sampled"))
-            resolver.bookmark_art(game, key, region["source"], layout, frame, preview)
-            if resolver.original_art == key:
+            if ctx.get("archive") == "C091":
+                layout["font_px"] = region.get("font", min(15, crop.height))
+            resolver.bookmark_choice(game, key, region["source"], layout, frame, preview)
+            if resolver.original_key == key:
                 resolver.record(key, source=region["source"], event="japanese", frame=frame, **layout)
                 continue
             english, origin, event = resolver.memory.choose(key, region["source"], layout, png(crop),

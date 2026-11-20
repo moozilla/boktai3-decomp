@@ -140,44 +140,66 @@ def palette(data):
     return [((v >> shift) & 31)*255//31 for v in values for shift in (0, 5, 10)]
 
 
-def typeset(image, box, colors, text, size, line_gap=3):
-    """Fit new lettering inside a plaque using its native bank and ink ramp."""
-    from collections import Counter
+def text_mask(size, text, font_size, line_gap=3):
+    """Use the same line breaks and size for model feedback and encoded tiles."""
     from PIL import ImageDraw
     from graphics import font
 
-    x0, y0, x1, y1 = box
-    crop = image.crop(box)
-    bg, _ = Counter(crop.tobytes()).most_common(1)[0]
-    bank = bg // 16
-    if any((p >> 4) != bank for p in crop.tobytes()):
-        raise ValueError("The lettering region crosses palette banks")
-    old_colors = set(crop.tobytes())
-    fg = max(old_colors, key=lambda i: sum((colors[3*i+k]-colors[3*bg+k])**2 for k in range(3)))
-    for height in range(size, min(6, size-1), -1):
-        face = font(height)
+    width, height = size
+    for pixels in range(font_size, min(6, font_size - 1), -1):
+        face = font(pixels)
         lines = []
         for paragraph in text.splitlines():
             row = ""
             for word in paragraph.split():
                 trial = (row + " " + word).strip()
-                if row and face.getlength(trial) > crop.width:
+                if row and face.getlength(trial) > width:
                     lines.append(row)
                     row = word
                 else:
                     row = trial
             lines.append(row)
-        line_height = height + line_gap
-        if len(lines)*line_height-line_gap <= crop.height and all(face.getlength(s) <= crop.width for s in lines):
+        line_height = pixels + line_gap
+        if (len(lines) * line_height - line_gap <= height
+                and all(face.getlength(line) <= width for line in lines)):
             break
     else:
-        raise ValueError("The translated graphic does not fit")
-    mask = Image.new("L", crop.size)
-    draw = ImageDraw.Draw(mask)
+        raise ValueError(f"The translated lettering does not fit the {width} by {height} pixel region")
+    mask = Image.new("L", size)
+    pen = ImageDraw.Draw(mask)
     for i, line in enumerate(lines):
-        draw.text((0, i*line_height), line, 255, font=face, anchor="lt")
-    ramp = []
-    for alpha in range(256):
-        rgb = [(a*(255-alpha)+b*alpha)//255 for a,b in zip(colors[3*bg:3*bg+3],colors[3*fg:3*fg+3])]
-        ramp.append(min(old_colors,key=lambda p: sum((a-b)**2 for a,b in zip(rgb,colors[3*p:3*p+3]))))
-    image.paste(Image.frombytes("P", crop.size, bytes(ramp[v] for v in mask.tobytes())), (x0,y0))
+        if line:
+            pen.text((0, i * line_height), line, 255, font=face, anchor="lt")
+    return mask
+
+
+def typeset(image, box, colors, text, size):
+    """Preserve each original 4bpp tile's palette bank under the new glyphs."""
+    from collections import Counter, defaultdict
+
+    crop = image.crop(box)
+    source = crop.tobytes()
+    mask = text_mask(crop.size, text, size)
+    banks = defaultdict(Counter)
+    for index in source:
+        banks[index >> 4][index] += 1
+
+    def rgb(i):
+        return colors[i*3:i*3+3]
+
+    def distance(a, b):
+        return sum((u-v)**2 for u, v in zip(a, b))
+
+    ramps = {}
+    for bank, inks in banks.items():
+        background = inks.most_common(1)[0][0]
+        others = inks if len(inks) > 1 else range(bank*16, bank*16+16)
+        foreground = max(others, key=lambda i: distance(rgb(i), rgb(background)))
+        ramp = []
+        for alpha in range(256):
+            blend = [(a*(255-alpha) + b*alpha)//255
+                     for a, b in zip(rgb(background), rgb(foreground))]
+            ramp.append(min(others, key=lambda i: distance(blend, rgb(i))))
+        ramps[bank] = ramp
+    recolored = bytes(ramps[index >> 4][alpha] for index, alpha in zip(source, mask.tobytes()))
+    image.paste(Image.frombytes("P", crop.size, recolored), tuple(box[:2]))

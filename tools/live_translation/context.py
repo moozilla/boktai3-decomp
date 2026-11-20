@@ -24,6 +24,7 @@ class Catalog:
         self.procs = sorted((BASE+self.script.proc_address(i), i+1) for i,v in enumerate(self.script.procs) if v)
         with (ROOT / "symbols/functions.csv").open() as f:
             self.functions = sorted((int(r["addr"],16),r["name"]) for r in csv.DictReader(f))
+        self.entry_names = dict(self.functions)
         with (ROOT / "gcl/names/proc.csv").open() as f:
             self.names = {int(r["proc"]):r["name"] for r in csv.DictReader(f)}
 
@@ -66,10 +67,36 @@ class Catalog:
             p = start+n
         return None
 
+    def callback(self, ptr):
+        if BASE <= ptr < BASE + len(self.rom):
+            addr = ptr & ~1
+            return self.entry_names.get(addr, f"sub_{addr:08X}")
+        return None
+
+    def interface(self, game):
+        task = game.core.lt_task()
+        callback = self.callback(game.core.lt_callback())
+        result = {"active_task": callback} if callback else {}
+        hud = int.from_bytes(game.read(0x02000214, 4), "little")  # gFieldHud
+        if 0x02000000 <= hud <= 0x02040000 - 0x1415:
+            # SceneDialog_ConfigureVariantSlot dispatches on SceneHudState.mode;
+            # the page and its input callback can change within the same room.
+            update, page = struct.unpack("<II", game.read(hud + 0xA50, 8))
+            mode = game.read(hud + 0x1414, 1)[0]
+            result["hud"] = {"update": self.callback(update), "page_callback": self.callback(page)}
+            if mode < 10 and page and (task == hud or result["hud"]["update"] == "SceneHud_UpdatePageInput"):
+                tabs = ("Map", "Items", "Valuables", "Gun Del Sol", "Swords",
+                        "Accessories", "Status", "Settings", "Sleep", "Save")
+                init = struct.unpack_from("<I", self.rom, 0x611C34 + mode*4)[0]
+                result["menu"] = {"tab": tabs[mode], "index": mode,
+                                  "page_initializer": self.callback(init), **result["hud"]}
+        return result
+
     def context(self, game, scene, recent_proc, lr, kind, source, key, col=0, row=None):
         ctx = dict(kind=kind, scene=scene, scene_name=self.scenes.get(scene, {}).get("place") or self.names.get(scene), caller=self.caller(lr),
                    caller_pc=f"{lr:08X}", last_called_proc=recent_proc,
                    columns=30, lines=3, name_cells=8)
+        ctx.update(self.interface(game))
         ctx["rom_sha256"] = self.rom_digest
         pc = int.from_bytes(game.read(0x02000610,4),"little")
         ctx["script_cursor"] = f"{pc:08X}"

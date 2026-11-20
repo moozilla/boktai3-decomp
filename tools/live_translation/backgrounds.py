@@ -102,6 +102,9 @@ class MapTranslator:
             return self.loaded[signature]
         self.loaded[signature] = 0
         ctx = resolver.catalog.context(game, scene, proc, lr, "graphic", "", None)
+        request = resolver.resource_requests.get((0xC091, int(code, 16)))
+        if request and request["frame"] <= frame:
+            ctx["resource_request"] = request
         ctx.update(archive="C091", layer=index, resource=code)
         if active_sets:
             ctx.update(pattern_archive="CEEF", tilesets=active_sets, verified_native_upload=True)
@@ -139,7 +142,7 @@ class MapTranslator:
             choices = [(r["box"], word, r.get("font") or min(15,r["box"][3]-r["box"][1])) for r,word in selected]
             if not choices:
                 return 0
-            cache_key = [5, active_sets, ctx["rom_sha256"], asset, palette_name, colors, choices, hud, mode if not hud else None]
+            cache_key = [6, active_sets, ctx["rom_sha256"], asset, palette_name, colors, choices, hud, mode if not hud else None]
             digest = sha256(json.dumps(cache_key).encode()).hexdigest()
             cache = OUT / "compiled" / (digest + ".mp")
             if cache.exists():

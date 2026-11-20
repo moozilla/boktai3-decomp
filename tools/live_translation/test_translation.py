@@ -9,10 +9,10 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from runtime import load_rom
+from runtime import baserom_path
 from translator import Memory, Ollama, fit
 from vision import ArtIndex, png
-from tilemap import TileMap
+from tilemap import TileMap, typeset
 
 
 class ResolverTests(unittest.TestCase):
@@ -48,6 +48,36 @@ class ResolverTests(unittest.TestCase):
                 self.assertEqual(memory.choose("unit/line", source, context)[2], "cache")
                 self.assertEqual(len(requests), 2)
                 memory.db.close()
+
+    def test_narrower_second_use_keeps_an_independent_cached_wording(self):
+        wide = dict(kind="menu", columns=20, lines=1)
+        small = dict(kind="menu", columns=6, lines=1)
+        source, key = "魔法機械", "unit/device"
+        model = Ollama("http://model.invalid", "layout-test")
+        mem = Memory(":memory:", model)
+        mem.choose(key, source, wide, suggested="Magic machine", author="editor")
+        with patch.object(model, "translate", return_value=("Device", {})) as call:
+            self.assertEqual(mem.choose(key, source, small), ("Device", "layout-test", "fitted"))
+            context = call.call_args.args[1]
+            self.assertEqual(context["previous_wording"], "Magic machine")
+            self.assertEqual(context["columns"], 6)
+        mem.model = None
+        self.assertEqual(mem.choose(key, source, small)[0], "Device")
+        self.assertEqual(mem.choose(key, source, wide)[0], "Magic machine")
+        mem.correct(key, "Engine")
+        self.assertEqual(mem.choose(key, source, small)[0], "Engine")
+        mem.db.close()
+
+    def test_speaker_name_and_graphic_geometry_survive_editing(self):
+        from editor import editable_body
+        original = "<LABEL=OTENKO>???</LABEL>\nAwake, <NAME>?"
+        label, body = editable_body(original)
+        self.assertEqual(body, "Awake, <NAME>?")
+        self.assertEqual(label + body, original)
+        layout = dict(kind="graphic", archive="CB05", width_px=112, height_px=8, typography="buttons")
+        with self.assertRaises(ValueError):
+            fit("Ⓐけってい　Ⓑもどる", "Confirm", layout)
+        fit("Ⓐけってい　Ⓑもどる", "Choose | Back", layout)
 
     def test_failing_provider_leaves_an_editable_encounter(self):
         ctx = dict(kind="menu", columns=6, lines=1)
@@ -104,6 +134,19 @@ class ResolverTests(unittest.TestCase):
 
 
 class GraphicTests(unittest.TestCase):
+    def test_map_lettering_can_cross_banks_without_changing_a_tile_bank(self):
+        original = Image.new("P", (32, 12), 17)
+        original.paste(35, (16, 0, 32, 12))
+        original.putpixel((0, 2), 18)
+        original.putpixel((18, 3), 36)
+        colors = [0]*768
+        for i in (18, 36):
+            colors[3*i:3*i+3] = [255, 255, 255]
+        edited = original.copy()
+        typeset(edited, (0, 0, 32, 12), colors, "Gate", 10)
+        self.assertNotEqual(edited.tobytes(), original.tobytes())
+        self.assertEqual([i >> 4 for i in original.tobytes()], [i >> 4 for i in edited.tobytes()])
+
     def test_shared_map_edit_retains_other_layers_and_flips(self):
         header = struct.pack("<4s4H3I", b"MP\0\0", 2, 1, 1, 0, 24, 48, 80)
         tables = struct.pack("<HHIIHHII", 1,1,11,88, 1,1,12,90)
@@ -124,7 +167,7 @@ class GraphicTests(unittest.TestCase):
         from frames import FrameEncoder, paint_region
         from graphics import palette_pool
         import sprites
-        rom = load_rom()
+        rom = Path(baserom_path()).read_bytes()
         package = sprites.package(rom, 0x530D)
         index = 114
         frame = list(package.frames())[index]

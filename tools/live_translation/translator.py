@@ -18,7 +18,26 @@ def fit(source, english, ctx):
         raise ValueError("Keep the sequence of engine control tags unchanged")
     if any(c != "\n" and not (" " <= c <= "~") for c in english):
         raise ValueError("Use printable English glyphs in the native narrow font")
-    if ctx["kind"] in ("graphic", "ticker"):
+    if ctx["kind"] == "graphic":
+        if ctx.get("archive") == "C091":
+            from tilemap import text_mask
+            text_mask((ctx["width_px"], ctx["height_px"]), english,
+                      ctx.get("font_px", min(15, ctx["height_px"])))
+        elif "width_px" in ctx:
+            from graphics import check_letter_width
+            width = ctx["width_px"]
+            if ctx.get("typography") == "buttons":
+                labels = [word.strip() for word in english.split("|")]
+                groups = sum(button in source for button in ("Ⓐ", "Ⓑ"))
+                if len(labels) != groups or not all(labels):
+                    raise ValueError(f"Keep {groups} button labels separated by |")
+                for label, space in zip(labels, [width] if groups == 1 else [56, width-56]):
+                    check_letter_width(label, space-9)
+            else:
+                margin = {"masthead": 24, "subtitle": 8, "tab": 2}.get(ctx.get("typography"), 0)
+                check_letter_width(english, width-margin)
+        return english
+    if ctx["kind"] == "ticker":
         return english
     limit, max_lines = ctx["columns"], ctx["lines"]
 
@@ -135,6 +154,13 @@ class Memory:
             context TEXT NOT NULL, updated TEXT DEFAULT CURRENT_TIMESTAMP);
           CREATE TABLE IF NOT EXISTS glossary (japanese TEXT PRIMARY KEY, english TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS term_origins (japanese TEXT PRIMARY KEY, origin TEXT NOT NULL);
+          CREATE TABLE IF NOT EXISTS forms (
+            key TEXT NOT NULL, layout TEXT NOT NULL, parent TEXT NOT NULL,
+            english TEXT NOT NULL, origin TEXT NOT NULL, PRIMARY KEY(key,layout));
+          CREATE TABLE IF NOT EXISTS uses (
+            key TEXT NOT NULL, scene INTEGER NOT NULL, caller TEXT NOT NULL,
+            role TEXT NOT NULL, tab TEXT NOT NULL, context TEXT NOT NULL,
+            PRIMARY KEY(key,scene,caller,role,tab));
           CREATE TABLE IF NOT EXISTS issues (key TEXT PRIMARY KEY, reason TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS edits (key TEXT, previous TEXT, english TEXT, at TEXT DEFAULT CURRENT_TIMESTAMP);
         """)
@@ -150,6 +176,15 @@ class Memory:
     def glossary(self):
         return dict(self.db.execute("SELECT japanese,english FROM glossary ORDER BY japanese"))
 
+    def observe(self, key, context):
+        """Keep each distinct native use available after the player exits."""
+        menu = context.get("menu") or {}
+        with self.db:
+            self.db.execute("""INSERT INTO uses VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(key,scene,caller,role,tab) DO UPDATE SET context=excluded.context""",
+                (key, context["scene"], context["caller_pc"], context["kind"], menu.get("tab", ""),
+                 json.dumps(context, ensure_ascii=False)))
+
     def remember_issue(self, key, reason):
         with self.db:
             self.db.execute("INSERT OR REPLACE INTO issues VALUES (?,?)", (key, reason))
@@ -164,7 +199,7 @@ class Memory:
                             (english, japanese))
 
     def ask_model(self, key, source, ctx, glossary, crop):
-        fingerprint = (key, ctx.get("columns"), ctx.get("lines"))
+        fingerprint = (key, self.layout(ctx), ctx.get("previous_wording"))
         if fingerprint in self.failed:
             raise ValueError(self.failed[fingerprint])
         feedback = None
@@ -178,13 +213,46 @@ class Memory:
         self.failed[fingerprint] = feedback
         raise ValueError(feedback)
 
+    @staticmethod
+    def layout(ctx):
+        return json.dumps({k: ctx[k] for k in ("kind", "columns", "lines", "name_cells", "width_px",
+                                               "height_px", "font_px", "typography") if k in ctx},
+                          sort_keys=True)
+
+    def cached(self, key, source, row, ctx, crop):
+        parent = row["english"]
+        try:
+            fit(source, parent, ctx)
+            return parent, row["origin"], "cache"
+        except ValueError as exc:
+            reason = str(exc)
+        layout = self.layout(ctx)
+        form = self.db.execute("SELECT english,origin FROM forms WHERE key=? AND layout=? AND parent=?",
+                               (key, layout, parent)).fetchone()
+        if form:
+            return form["english"], form["origin"], "cache"
+        if not self.model:
+            raise ValueError(reason)
+        request = dict(ctx, previous_wording=parent, fit_error=reason)
+        word, _ = self.ask_model(key, source, request, self.glossary(), crop)
+        with self.db:
+            # A reviewer can change the main wording while a model is running.
+            wrote = self.db.execute("""INSERT INTO forms SELECT key, ?, english, ?, ? FROM entries
+                WHERE key=? AND english=?
+                ON CONFLICT(key,layout) DO UPDATE SET parent=excluded.parent, english=excluded.english,
+                origin=excluded.origin""", (layout, word, self.model.model, key, parent))
+            if wrote.rowcount:
+                self.db.execute("DELETE FROM issues WHERE key=?", (key,))
+                return word, self.model.model, "fitted"
+        return self.choose(key, source, ctx, crop)
+
     def choose(self, key, source, ctx, crop=None, suggested=None, author=None):
         row = self.db.execute("SELECT source,english,origin FROM entries WHERE key=?", (key,)).fetchone()
         if row:
             if row["source"] != source:
                 raise ValueError(f"Source changed for {key}")
             if row["english"] is not None:
-                return row["english"], row["origin"], "cache"
+                return self.cached(key, source, row, ctx, crop)
         else:
             with self.db:
                 self.db.execute("INSERT OR IGNORE INTO entries(key,source,origin,context) VALUES (?,?,?,?)",
@@ -229,4 +297,5 @@ class Memory:
                             (english, key))
             self.db.execute("UPDATE entries SET english=?,origin=?,updated=CURRENT_TIMESTAMP WHERE key=?",
                             (english, author, key))
+            self.db.execute("DELETE FROM forms WHERE key=?", (key,))
             self.db.execute("DELETE FROM issues WHERE key=?", (key,))

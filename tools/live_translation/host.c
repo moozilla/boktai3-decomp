@@ -34,7 +34,7 @@ struct FrameChoice {
     uint32_t glyphs, index, replacement;
 };
 static struct FrameChoice frame_cache[2048], actor_cache[2048];
-static uint32_t actor_frame, actor_palette;
+static uint32_t actor_frame, actor_palette, active_task, active_callback;
 static struct mCore *core;
 static struct ARMCore *cpu;
 static uint32_t pixels[240 * 160];
@@ -45,7 +45,8 @@ static uint32_t text_window, string_id, resource_type, resource_key, resource_ca
 static unsigned erase_x, erase_y, erase_w, erase_h, erase_frame;
 struct Bookmark {
     void *state;
-    unsigned id, proc, window, actor_frame, actor_palette;
+    unsigned id, proc, window, actor_frame, actor_palette, active_task, active_callback;
+    unsigned erase_x, erase_y, erase_w, erase_h, erase_frame;
 };
 static struct Bookmark bookmarks[2];
 int lt_bookmark(unsigned slot)
@@ -59,6 +60,13 @@ int lt_bookmark(unsigned slot)
         return 0;
     b->actor_frame = actor_frame;
     b->actor_palette = actor_palette;
+    b->active_task = active_task;
+    b->active_callback = active_callback;
+    b->erase_x = erase_x;
+    b->erase_y = erase_y;
+    b->erase_w = erase_w;
+    b->erase_h = erase_h;
+    b->erase_frame = erase_frame;
     b->id = string_id;
     b->proc = last_proc;
     b->window = text_window;
@@ -73,6 +81,13 @@ int lt_rewind(unsigned slot)
         return -1;
     actor_frame = b->actor_frame;
     actor_palette = b->actor_palette;
+    active_task = b->active_task;
+    active_callback = b->active_callback;
+    erase_x = b->erase_x;
+    erase_y = b->erase_y;
+    erase_w = b->erase_w;
+    erase_h = b->erase_h;
+    erase_frame = b->erase_frame;
     string_id = b->id;
     last_proc = b->proc;
     text_window = b->window;
@@ -153,7 +168,7 @@ int lt_open(const char *rom, const char *battery, Resolver callback)
     core->reset(core);
     cpu = core->cpu;
     resolve = callback;
-    last_proc = 0;
+    active_task = active_callback = last_proc = 0;
     erase_w = erase_h = 0;
     memset(frame_cache, 0, sizeof(frame_cache));
     memset(actor_cache, 0, sizeof(actor_cache));
@@ -194,6 +209,14 @@ static uint32_t request(unsigned hook, unsigned id, unsigned ptr, unsigned arg, 
                 core->frameCounter(core));
     return replacement ? replacement : ptr;
 }
+uint32_t lt_task(void)
+{
+    return active_task;
+}
+uint32_t lt_callback(void)
+{
+    return active_callback;
+}
 void lt_step(unsigned frames, unsigned keys)
 {
     core->setKeys(core, keys);
@@ -204,6 +227,15 @@ void lt_step(unsigned frames, unsigned keys)
                 cpu->irqh.processEvents(cpu);
             uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
             switch (pc) {
+                case 0x0821A086: /* TaskSystem_RunFrame calling task->update(task) */
+                case 0x0821A09C: /* or task->destroy(task) */
+                    active_task = cpu->gprs[0];
+                    active_callback = cpu->gprs[1];
+                    break;
+                case 0x0821A08A:
+                case 0x0821A0A0:
+                    active_task = active_callback = 0;
+                    break;
                 case 0x08032CD4: /* TextState_SetString(state, index, string) */
                     if (cpu->gprs[2])
                         cpu->gprs[2] =
@@ -320,7 +352,7 @@ void lt_step(unsigned frames, unsigned keys)
                     break;
                 case 0x0821A65E:
                     if ((resource_type == 0xCB05 || resource_type == 0xC091 ||
-                         resource_type == 0xCEEF) &&
+                         resource_type == 0xCEEF || resource_type == 0x98F5) &&
                         cpu->gprs[0])
                         cpu->gprs[0] = request(RESOURCE, resource_key, cpu->gprs[0], resource_type,
                                                resource_caller);

@@ -43,7 +43,7 @@ def play(game, *, start="title", limit=None):
     if not ui.lt_window():
         raise RuntimeError("SDL video: " + ui.lt_window_error().decode(errors="replace"))
     audio = (C.c_int16 * 8192)()
-    game.resolver.bookmarks = True
+    game.resolver.bookmarks = game.resolver.enabled
     try:
         print("Arrows move. X confirms, Z cancels, Enter opens Start. A/S are L/R.\n"
               "F1 compares Japanese and English. F2 edits the current encounter. Space pauses. Esc exits.", flush=True)
@@ -65,7 +65,7 @@ def play(game, *, start="title", limit=None):
                 if not edit(ui, game):
                     return
                 deadline = time.monotonic()
-            title = "Boktai 3   |   Live English"
+            title = "Boktai 3   |   " + ("Live English" if game.resolver.enabled else "Japanese")
             if line:
                 title += f'   |   {line["key"]}   ·   F1 compare   ·   F2 edit'
             if title != last_title:

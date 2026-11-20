@@ -1,5 +1,7 @@
 """Replay semantic checkpoints twice, retaining raw GBA frames and encounter evidence."""
 from contextlib import closing
+from hashlib import sha256
+from pathlib import Path
 import json
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
@@ -8,7 +10,7 @@ from translator import Memory
 
 from frames import ArtTranslator
 from localize import Localizer
-from runtime import Game, OUT, ROOT, checkpoint, prison_save, saves
+from runtime import Game, OUT, ROOT, baserom_path, checkpoint, prison_save, saves
 
 ROWS = {
     "00-sunlight": "Cartridge sunlight advisory / baked background",
@@ -149,14 +151,14 @@ def prologue(game, directory):
             game.tap(words[1])
         ident = game.resolver.dialogue_id
         if ident in wanted:
-            game.step(120 if ident == 5492 else 20)
+            game.step(280 if ident == 5492 else 75)
             capture(game, directory, wanted.pop(ident))
         if not wanted:
             return
     raise RuntimeError(f"Prologue did not reach {sorted(wanted)}")
 
 
-def title_correction(memory, directory, transcript):
+def title_correction(memory, directory, transcript, save):
     private = Memory(":memory:")
     memory.db.backup(private.db)
     where = directory / "english/logo-correction"
@@ -164,9 +166,9 @@ def title_correction(memory, directory, transcript):
     key = "graphic/731D/1"
     path = where / "encounters.jsonl"
     try:
-        with path.open("w") as log, session(private, prison_save(), True, log) as game:
+        with path.open("w") as log, session(private, save, True, log) as game:
             loc = game.resolver
-            loc.inspect_art = key
+            loc.inspect_key = key
             for n, button in BOOT[:6]:
                 game.step(n)
                 game.tap(button)
@@ -177,9 +179,9 @@ def title_correction(memory, directory, transcript):
                 image.save(where/(label+".png"))
                 return image
             first = take("01-english")
-            loc.original_art = key
+            loc.original_key = key
             original = take("02-japanese-wordmark")
-            loc.original_art = None
+            loc.original_key = None
             old = private.db.execute("SELECT english FROM entries WHERE key=?", (key,)).fetchone()["english"]
             new = "Solar Boy" if old != "Solar Boy" else "Boktai"
             private.correct(key,new,author="scripted proof correction")
@@ -189,7 +191,7 @@ def title_correction(memory, directory, transcript):
                 if not bounds or bounds[3] > 97:
                     raise RuntimeError(f"Unexpected change outside title lettering: {bounds}")
             from editor import render
-            view = render(edited,loc.art_line,new,len(new),False,"scripted proof correction","")
+            view = render(edited,loc.inspected,new,len(new),False,"scripted proof correction","")
             Image.frombytes("RGBA",(900,600),view).save(where/"04-editor.png")
             # Leave the gallery's most recent preview on the owner's wording.
             private.correct(key,old,author="proof restore")
@@ -236,12 +238,19 @@ def contact_sheet(directory):
 def run(memory):
     directory = OUT / "proof"
     directory.mkdir(exist_ok=True)
+    opening_save = prison_save()
+    routes = [(prison, opening_save), (inventory, saves.TEMPLATE), (prologue, None),
+              (tree, checkpoint(19, 3363, 66, 2))]
+    inputs = {"cartridge": Path(baserom_path())}
+    inputs.update({route.__name__ + "_save": Path(save) for route, save in routes if save})
+    def input_hashes():
+        return {role: sha256(path.read_bytes()).hexdigest() for role, path in inputs.items()}
+    original = input_hashes()
     with (directory / "transcript.jsonl").open("w") as transcript:
         for mode in ("japanese", "english"):
             dest = directory / mode
             dest.mkdir(exist_ok=True)
-            for route, save in ((prison, prison_save()), (inventory, saves.TEMPLATE), (prologue, None),
-                                (tree, checkpoint(19, 3363, 66, 2))):
+            for route, save in routes:
                 log_path = dest / (route.__name__ + ".jsonl")
                 with log_path.open("w") as stream:
                     with session(memory, save, mode == "english", stream) as game:
@@ -253,7 +262,9 @@ def run(memory):
                     event = dict(run=mode, route=route.__name__, **json.loads(line))
                     transcript.write(json.dumps(event, ensure_ascii=False) + "\n")
             print(f"Captured {len(ROWS)} {mode} frames", flush=True)
-        title_correction(memory, directory, transcript)
+        title_correction(memory, directory, transcript, opening_save)
+    if input_hashes() != original:
+        raise RuntimeError("The cartridge or an input save changed during the proof")
     events = [json.loads(line) for line in (directory / "transcript.jsonl").read_text().splitlines()]
     keys = {e["key"] for e in events if e["run"] == "english" and e.get("english")}
     required = {"background/52AE/2/body", "graphic/731D/1", "graphic/530D/138", "text/5599", "text/5601", "text/1009", "text/1064", "text/5492", "text/2171", "text/6105", "graphic/530D/131/swap"}
@@ -272,8 +283,8 @@ def run(memory):
         "text_and_art_choices": len(keys),
         "routes": sorted({e["route"] for e in events}),
         "sources": sorted({e["provenance"] for e in events if e.get("provenance")}),
-        "original_rom_and_battery_modified": False,
+        "verified_unchanged_sha256": original,
     }
     (directory/"summary.json").write_text(json.dumps(summary, indent=2)+"\n")
-    print(directory / "contact-sheet.png")
-    print(directory / "transcript.jsonl")
+    print((directory / "contact-sheet.png").relative_to(ROOT))
+    print((directory / "transcript.jsonl").relative_to(ROOT))

@@ -16,14 +16,15 @@ class Localizer:
         self.catalog = None
         self.pointers = {}
         self.looked_up = {}
+        self.resource_requests = {}
         self.seen = set()
         self.dialogue_id = None
         self.bookmarks = False
         self.line = None
         self.source_preview = None
-        self.inspect_art = None
-        self.art_line = None
-        self.original_art = None
+        self.inspect_key = None
+        self.inspected = None
+        self.original_key = None
         self.graphics = None
         self.actor_art = None
         from backgrounds import MapTranslator
@@ -31,27 +32,33 @@ class Localizer:
 
     def record(self, key, **fields):
         identity = (key, fields.get("event"), fields.get("scene"), fields.get("kind"),
-                    fields.get("caller_pc"), fields.get("english"), fields.get("digest"), fields.get("reason"))
+                    fields.get("caller_pc"), (fields.get("menu") or {}).get("tab"), fields.get("english"), fields.get("digest"), fields.get("reason"))
         if identity in self.seen:
             return
         self.seen.add(identity)
+        if fields.get("source") and fields.get("kind"):
+            context = {k: v for k, v in fields.items() if k not in
+                       ("source", "english", "rendered", "event", "provenance", "reason", "frame")}
+            self.memory.observe(key, context)
         self.transcript.write(json.dumps(dict(key=key, **fields), ensure_ascii=False)+"\n")
         self.transcript.flush()
 
-    def bookmark_art(self, game, key, source, ctx, frame, preview):
-        if key == self.inspect_art and game.core.lt_bookmark(1):
-            self.art_line = {"key": key, "source": source, "context": ctx, "frame": frame,
-                             "preview": preview, "slot": 1}
+    def bookmark_choice(self, game, key, source, ctx, frame, preview=None):
+        if self.enabled and key == self.inspect_key and game.core.lt_bookmark(1):
+            self.inspected = {"key": key, "source": source, "context": ctx, "frame": frame,
+                             "slot": 1}
+            if preview is not None:
+                self.inspected["preview"] = preview
 
     def current_choice(self, game):
         scene = int.from_bytes(game.read(0x030039F0, 2), "little")
-        if self.art_line and self.art_line["context"]["scene"] == scene:
-            return self.art_line
+        if self.inspected and self.inspected["context"]["scene"] == scene:
+            return self.inspected
         return self.current_line(game)
 
     def compare(self, game, choice):
         if choice.get("slot") == 1:
-            self.original_art = None if self.original_art else choice["key"]
+            self.original_key = None if self.original_key else choice["key"]
         else:
             self.source_preview = None if self.source_preview is not None else choice["id"]
         game.rewind_line(choice.get("slot", 0))
@@ -81,7 +88,11 @@ class Localizer:
             return 0
         if hook in (6, 10):
             return self.backgrounds.select(self, game, arg, ptr, aux, lr, scene, proc, frame, hud=hook==10)
-        if hook == 3:
+        if hook == 3:  # ScriptProc_Start returned the selected archive entry.
+            self.resource_requests[aux, arg] = {
+                "caller": c.caller(lr), "caller_pc": f"{lr:08X}", "frame": frame,
+                "scene": scene, "last_called_proc": proc, "pointer": f"{ptr:08X}",
+            }
             return 0
         if hook == 1:
             sid = arg
@@ -130,11 +141,12 @@ class Localizer:
             # explicitly approved spellings in the local glossary.
             if source.strip() not in self.memory.glossary():
                 return 0
+        self.bookmark_choice(game, key, source, ctx, frame)
         if self.bookmarks and kind == "dialogue" and ctx.get("lines", 0) > 1:
             if game.core.lt_bookmark(0):
                 self.line = {"key": key, "id": sid, "source": source, "context": ctx, "frame": frame,
                              "window": int.from_bytes(game.read(0x020000DC, 4), "little")}
-        enabled = self.enabled and not (self.source_preview is not None and
+        enabled = self.enabled and key != self.original_key and not (self.source_preview is not None and
                                         (sid == self.source_preview or kind == "name"))
         word = origin = rendered = None
         try:

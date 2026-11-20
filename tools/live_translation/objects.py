@@ -4,7 +4,6 @@ import json
 import struct
 
 from runtime import OUT
-from graphics import BASE
 from frames import MARKED, paint_region
 from vision import ArtIndex, png, write_cache
 import archive
@@ -73,6 +72,9 @@ class ActorArt:
         code = f"{key:04X}"
         asset = f"object/{code}/{index}"
         ctx = resolver.catalog.context(game, scene, proc, lr, "graphic", "", None)
+        request = resolver.resource_requests.get((0x98F5, key))
+        if request and request["frame"] <= tick:
+            ctx["resource_request"] = request
         ctx.update(archive="98F5", package=code, frame_index=index, default_palette=frame[2],
                    palette_pointer=f"{pal_at:08X}", native_tile_count=frame[1])
         try:

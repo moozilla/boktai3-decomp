@@ -1,5 +1,6 @@
 """An SDL text editor for the line the cartridge is currently displaying."""
 import ctypes as C
+import re
 from functools import lru_cache
 from PIL import Image, ImageDraw, ImageFont
 
@@ -37,6 +38,14 @@ def wrap(text, font, width):
     return rows
 
 
+def editable_body(english):
+    """Keep a leading speaker-name record intact when editing spoken prose."""
+    label = re.match(r"^(<LABEL(?:=[^>]+)?>[^<>]*</LABEL>\n?)", english)
+    if label and label.end() < len(english):
+        return label[0], english[label.end():]
+    return "", english
+
+
 def render(frame, line, buffer, cursor, selected, origin, error):
     ctx = line["context"]
     im = Image.new("RGB", (900,600), "#f7f2e7")
@@ -51,10 +60,13 @@ def render(frame, line, buffer, cursor, selected, origin, error):
     x = 520
     d.text((x,57), ctx.get("scene_name") or f'Scene {ctx["scene"]}', font=face(22,bold=True), fill=dark)
     label = ctx.get("speaker_label")
-    if label:
-        d.text((x,87), label, font=face(16), fill=accent)
+    menu = ctx.get("menu") or {}
+    subject = label or menu.get("tab")
+    if subject:
+        d.text((x,87), subject, font=face(16), fill=accent)
     d.text((x,124), "Japanese", font=face(15,bold=True), fill=dim)
-    source = CONTROLS.sub("",line["source"]).strip()
+    _, body = editable_body(line["source"])
+    source = CONTROLS.sub(lambda m: m[0] if m[0] in ("<NAME>", "<BIKE>") else "", body).strip()
     jp = face(18,japanese=True)
     for i,(a,b) in enumerate(wrap(source, jp, 355)[:6]):
         d.text((x,151+i*25), source[a:b], font=jp, fill=dark)
@@ -84,8 +96,11 @@ def render(frame, line, buffer, cursor, selected, origin, error):
         if i+top == caret_row and not selected:
             cx = 28 + wordface.getlength(buffer[a:cursor])
             d.line((cx,y+2,cx,y+22), fill=accent, width=2)
-    if error:
-        d.text((20,538), error, font=face(15), fill=accent)
+    _, message = editable_body(line["source"])
+    tokens = list(dict.fromkeys(CONTROLS.findall(message)))
+    hint = "Keep " + "  ".join(tokens) + " in the English." if tokens else ""
+    if error or hint:
+        d.text((20,538), error or hint, font=face(15), fill=accent if error else dim)
     d.text((20,570), "Enter  Save and replay     Shift + Enter  New line     Esc  Cancel",
            font=face(16), fill=dim)
     return im.convert("RGBA").tobytes()
@@ -100,6 +115,7 @@ def edit(ui, game):
     if row is None:
         return True
     value = row["english"] or "".join(CONTROLS.findall(line["source"]))
+    prefix, value = editable_body(value)
     pos, selected = len(value), True
     image = game.image()
     if not ui.lt_begin_edit():
@@ -122,13 +138,13 @@ def edit(ui, game):
                 return event == 10
             if event == 9:
                 try:
-                    fit(line["source"], value, line["context"])
-                    resolver.memory.correct(line["key"], value)
+                    fit(line["source"], prefix + value, line["context"])
+                    resolver.memory.correct(line["key"], prefix + value)
                 except ValueError as exc:
                     error = str(exc)
                     continue
                 resolver.source_preview = None
-                resolver.original_art = None
+                resolver.original_key = None
                 game.rewind_line(line.get("slot",0))
                 return True
             error = ""

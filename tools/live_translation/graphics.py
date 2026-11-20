@@ -5,12 +5,10 @@ for menu resources where a single Japanese glyph tile appears in several labels.
 """
 from collections import Counter
 from functools import lru_cache
-from io import BytesIO
 import json
-from pathlib import Path
 import struct
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from runtime import HERE, OUT
+from runtime import HERE
 import archive
 import sprites
 
@@ -31,9 +29,24 @@ def font(size, heavy=False):
     return ImageFont.load_default(size=size)
 
 
+def check_letter_width(text, width):
+    if "\n" in text:
+        raise ValueError("Use one line for this sprite label")
+    # Reserve at least two pixels of horizontal ink per non-space character.
+    if sum(1 if char == " " else 2 for char in text) > width:
+        raise ValueError(f"Shorten the sprite label to fit its {width}-pixel ink area")
+
+
+def pixels(image):
+    if hasattr(image, "get_flattened_data"):
+        return image.get_flattened_data()
+    return image.getdata()
+
+
 def letter_mask(text, width, height, heavy=False):
     if not text.strip() or width < 1 or height < 1:
         raise ValueError("Empty graphic or empty lettering")
+    check_letter_width(text, width)
     face = font(max(24,height*3),heavy)
     box = face.getbbox(text)
     mask = Image.new("L",(max(1,box[2]-box[0]),max(1,box[3]-box[1])))
@@ -132,7 +145,7 @@ def rectangles(image):
 
 
 def quantize(im,palettes,banks):
-    colors=Counter(rgb[:3] for rgb in im.getdata() if rgb[3])
+    colors=Counter(rgb[:3] for rgb in pixels(im) if rgb[3])
     if not colors: return None
     best=None
     for bank in banks:
@@ -143,4 +156,4 @@ def quantize(im,palettes,banks):
             score+=distance*n;mapping[color]=idx
         if best is None or score<best[0]:
             best=score,bank,mapping
-    return best[1], [best[2].get(rgb[:3],0) if rgb[3] else 0 for rgb in im.getdata()]
+    return best[1], [best[2].get(rgb[:3],0) if rgb[3] else 0 for rgb in pixels(im)]

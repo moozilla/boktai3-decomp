@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from runtime import Game, OUT, prison_save
+from runtime import Game, OUT, ROOT, prison_save
 from frames import ArtTranslator
 from graphics import REGIONS
 from localize import Localizer
@@ -25,17 +25,23 @@ def arguments():
     source = live.add_mutually_exclusive_group()
     source.add_argument("--save", type=Path, help="A battery save or a VBA .sgm checkpoint")
     source.add_argument("--new", action="store_true", help="Start without an existing save")
-    live.add_argument("--inspect", metavar="ART-KEY", help="Enable F1/F2 on this graphic when encountered")
+    live.add_argument("--inspect", metavar="KEY", help="Enable F1/F2 on this graphic, menu label or other text when encountered")
     landing = live.add_mutually_exclusive_group()
     landing.add_argument("--from-boot", action="store_true", help="Show the entire startup")
     landing.add_argument("--title", action="store_true", help="Start on the translated title screen")
     sub.add_parser("proof", help="Capture paired Japanese and English game frames")
+    story = sub.add_parser("story", help="Replay story checkpoints and collect untranslated encounters")
+    story.add_argument("--bank", type=Path, help="Directory containing VBA story checkpoints")
+    story.add_argument("--first", type=int, default=0, help="First numbered checkpoint")
+    story.add_argument("--last", type=int, default=9999, help="Last numbered checkpoint")
     replay = sub.add_parser("replay", help="Capture the prison or replay a harness input file")
     replay.add_argument("--inputs", type=Path, help="Controller route, e.g. tests/prologue.txt")
     source = replay.add_mutually_exclusive_group()
     source.add_argument("--save", type=Path, help="Battery save or VBA .sgm checkpoint")
     source.add_argument("--new", action="store_true", help="Boot the input route with a blank save")
-    sub.add_parser("review", help="Show original, English and provenance").add_argument("key", nargs="?")
+    review = sub.add_parser("review", help="Show original, English, provenance and uses")
+    review.add_argument("key", nargs="?")
+    review.add_argument("--pending", action="store_true", help="Only unanswered or rejected encounters")
     edit = sub.add_parser("correct", help="Change a previously encountered translation")
     edit.add_argument("key")
     edit.add_argument("english")
@@ -53,19 +59,29 @@ def arguments():
     return parser.parse_args()
 
 
-def review(memory, key):
-    rows = memory.db.execute("SELECT * FROM entries WHERE ? IS NULL OR key=? ORDER BY key", (key, key))
+def review(memory, key, pending=False):
+    rows = memory.db.execute("""
+        SELECT e.*, i.reason FROM entries e LEFT JOIN issues i ON i.key=e.key
+        WHERE (? IS NULL OR e.key=?) AND (?=0 OR e.english IS NULL OR i.reason IS NOT NULL)
+        ORDER BY e.key""", (key, key, pending))
     found = False
     for row in rows:
         found = True
         print(f'{row["key"]}  [{row["origin"]}]\n{row["source"]}\n{row["english"] or "(awaiting translation)"}')
+        if row["reason"]:
+            print("Review needed:", row["reason"])
         if key:
-            issue = memory.db.execute("SELECT reason FROM issues WHERE key=?", (key,)).fetchone()
-            if issue:
-                print("Review needed:", issue[0])
-            print(json.dumps(json.loads(row["context"]), ensure_ascii=False, indent=2))
+            contexts = memory.db.execute("SELECT context FROM uses WHERE key=? ORDER BY scene, role", (key,))
+            uses = [json.loads(r[0]) for r in contexts] or [json.loads(row["context"])]
+            edits = memory.db.execute("SELECT previous,english,at FROM edits WHERE key=? ORDER BY rowid", (key,))
+            forms = memory.db.execute("SELECT layout, english, origin FROM forms WHERE key=?", (key,))
+            fitted = [dict(r, layout=json.loads(r["layout"])) for r in forms]
+            print(json.dumps({"uses": uses, "fitted_forms": fitted, "edits": [dict(r) for r in edits]},
+                             ensure_ascii=False, indent=2))
     if key and not found:
-        raise ValueError(f"No encounter for {key} in this memory")
+        raise ValueError(f"No matching encounter for {key} in this memory")
+    if pending and not found:
+        print("No pending encounters.")
 
 
 def artwork(memory, key):
@@ -96,6 +112,9 @@ def battery(args):
 
 
 def dispatch(args, memory):
+    if args.cmd == "story":
+        from bank import survey
+        return survey(memory, args)
     if args.cmd == "proof":
         from proof import run
         return run(memory)
@@ -104,7 +123,7 @@ def dispatch(args, memory):
         print("Correction saved for", args.key)
         return
     if args.cmd == "review":
-        return review(memory, args.key)
+        return review(memory, args.key, args.pending)
     if args.cmd == "art":
         return artwork(memory, args.asset)
     if args.cmd == "mark":
@@ -131,9 +150,9 @@ def dispatch(args, memory):
     with (target / "transcript.jsonl").open("w") as log:
         resolver = Localizer(memory, log, enabled=not args.japanese)
         resolver.graphics = ArtTranslator()
-        resolver.inspect_art = getattr(args, "inspect", None)
-        if getattr(args, "title", False) and not resolver.inspect_art:
-            resolver.inspect_art = "graphic/731D/1"
+        resolver.inspect_key = getattr(args, "inspect", None)
+        if getattr(args, "title", False) and not resolver.inspect_key:
+            resolver.inspect_key = "graphic/731D/1"
         with closing(Game(resolver, battery(args))) as game:
             if args.cmd == "replay":
                 if route:
@@ -142,7 +161,7 @@ def dispatch(args, memory):
                 else:
                     from proof import prison
                     prison(game, target)
-                print(target)
+                print(target.relative_to(ROOT))
             else:
                 from player import play
                 start = "opening"
