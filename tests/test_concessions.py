@@ -210,6 +210,20 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_literal_assignment_expression_requires_an_unread_local(self):
+        source = """u32 f(u32 sample)
+{
+    u32 horizontalMask;
+    u32 spread = sample & (horizontalMask = 0x7f);
+    return spread;
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(4, "literal-local")])
+        self.assertEqual(warns(source.replace("return spread;", "return spread + horizontalMask;")), [])
+        self.assertEqual(warns(source.replace("    u32 horizontalMask;\n", "extern u32 horizontalMask;\n")), [])
+        self.assertEqual(warns(source.replace("sample & (horizontalMask = 0x7f)",
+                                              'Lookup("(horizontalMask = 0x7f)")')), [])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])

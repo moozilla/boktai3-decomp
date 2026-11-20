@@ -50,7 +50,8 @@ its spelling, so each one is a question, not a verdict:
 * `literal-local`: any other local that is initialized to a literal and never changed
   (`u32 mask = 0x17;` then `if (mask & flags)`). A person does name a constant now and then, so
   this is the weakest kind: write the literal where it is used when that matches, and leave
-  the rest for the owner to rule on. A loop counter or anything reassigned is not one.
+  the rest for the owner to rule on. Also reports a literal assignment used inside an expression
+  when the assigned local has no other references. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
@@ -110,6 +111,8 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+_UNINITIALIZED_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*;")
+_LITERAL_ASSIGN_EXPR = re.compile(r"\(\s*(\w+)\s*=\s*" + _LITERAL + r"\s*\)")
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -205,6 +208,45 @@ def _volatile_typedef_locals(code: str):
             yield start + match.start()
 
 
+def _block_tail(code: str, start: int) -> str:
+    """The text from START to the end of its enclosing block."""
+    depth = 0
+    for i in range(start, len(code)):
+        if code[i] == "{":
+            depth += 1
+        elif code[i] == "}":
+            if depth == 0:
+                return code[start:i]
+            depth -= 1
+    return code[start:]
+
+
+def _literal_assign_expr_sites(code: str):
+    """Warn on a literal assignment expression whose local exists only for that assignment."""
+    if not _LITERAL_ASSIGN_EXPR.search(code):
+        return
+    from merge_unit import items
+
+    offset = 0
+    for item in items(code):
+        start = code.find(item, offset)
+        offset = start + len(item)
+        if not _FUNCTION_BODY.match(item.lstrip()):
+            continue
+        body = _COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), item)
+        assignments = {match.group(1) for match in _LITERAL_ASSIGN_EXPR.finditer(body)}
+        for decl in _UNINITIALIZED_LOCAL.finditer(body):
+            name = decl.group(1)
+            if name not in assignments or re.fullmatch(_NUMBER_NAME, name):
+                continue
+            tail = _block_tail(body, decl.end())
+            if len(re.findall(r"\b" + re.escape(name) + r"\b", tail)) != 1:
+                continue
+            for match in _LITERAL_ASSIGN_EXPR.finditer(tail):
+                if match.group(1) == name:
+                    yield start + decl.end() + match.start(1)
+
+
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
@@ -215,21 +257,13 @@ def _warn_sites(code: str):
         name = m.group(1)
         if re.fullmatch(_NUMBER_NAME, name):
             continue  # const-local has it
-        # the rest of the block the declaration is in
-        depth, i = 0, m.end()
-        while i < len(code):
-            if code[i] == "{":
-                depth += 1
-            elif code[i] == "}":
-                if depth == 0:
-                    break
-                depth -= 1
-            i += 1
         n = re.escape(name)
         changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), _block_tail(code, m.end()))
         if not changed:
             yield m.start(), "literal-local"
+    for offset in _literal_assign_expr_sites(code):
+        yield offset, "literal-local"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:
