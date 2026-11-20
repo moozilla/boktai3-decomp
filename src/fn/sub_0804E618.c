@@ -55,15 +55,8 @@ void AreaEffect_AccumulatePlayerResource(struct AreaEffectManager *manager, s32 
             }
         }
     }
-    {
-        u32 kindOffset = 0x418;
-        {
-            u8 *kindAddress = (u8 *)player + kindOffset;
-            if ((*kindAddress) == 2) {
-                object->resourceFraction <<= 2;
-            }
-        }
-    }
+    if (player->actionMode == 2)
+        object->resourceFraction <<= 2;
     {
         s32 amount = 0;
         u32 fraction = object->resourceFraction;
