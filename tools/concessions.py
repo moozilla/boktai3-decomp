@@ -109,7 +109,10 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
                 r"(?:[A-Z_0-9]\w*)?")
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
-_LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+# Commas in calls, array subscripts, and quoted literals do not start new declarators.
+_DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,\[])")
+_DECL_PUNCT = re.compile(r""""(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[][(){},;]""")
+_LITERAL_INIT = re.compile(r"\s*\*?\s*([A-Za-z_]\w*)\s*=\s*" + _LITERAL + r"\s*")
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -205,18 +208,40 @@ def _volatile_typedef_locals(code: str):
             yield start + match.start()
 
 
+def _literal_initializers(code: str):
+    """Yield (name, source position, end of initializer) for integer-literal locals."""
+    for declaration in _DECL_START.finditer(code):
+        start = declaration.start("first")
+        depth = 0
+        for token in _DECL_PUNCT.finditer(code, start):
+            char = token[0]
+            if char in ("(", "[", "{"):
+                depth += 1
+            elif char in (")", "]", "}"):
+                if not depth:
+                    break
+                depth -= 1
+            elif not depth and char in (",", ";"):
+                item = _LITERAL_INIT.fullmatch(code, start, token.start())
+                if item:
+                    yield item[1], item.start(1), token.end()
+                if char == ";":
+                    break
+                start = token.end()
+
+
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
-    for m in _LITERAL_LOCAL.finditer(code):
-        name = m.group(1)
+    for name, pos, end in _literal_initializers(code):
         if re.fullmatch(_NUMBER_NAME, name):
-            continue  # const-local has it
+            yield pos, "const-local"
+            continue
         # the rest of the block the declaration is in
-        depth, i = 0, m.end()
+        depth, i = 0, end
         while i < len(code):
             if code[i] == "{":
                 depth += 1
@@ -227,9 +252,9 @@ def _warn_sites(code: str):
             i += 1
         n = re.escape(name)
         changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[end:i])
         if not changed:
-            yield m.start(), "literal-local"
+            yield pos, "literal-local"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:

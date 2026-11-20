@@ -196,6 +196,21 @@ class Warnings(unittest.TestCase):
             with self.subTest(decl=decl):
                 self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
 
+    def test_grouped_literal_initializers(self):
+        body = """void draw(void) {
+    u32 redBlue = 0x7c1f, product = 0xf83e0;
+    int i = 0, limit = 8;
+    int mutable = 3, value = update(&mutable);
+    int nested = consume('(', pair(i, value = 7)), one = 1;
+    u32 scales[] = {4, 8}, mask = 31;
+    i++;
+}
+"""
+        sites = c.warnings(c.sites(body))
+        self.assertEqual([(s.line, s.kind) for s in sites],
+                         [(2, "literal-local"), (3, "literal-local"), (5, "const-local"),
+                          (6, "literal-local")])
+
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])
