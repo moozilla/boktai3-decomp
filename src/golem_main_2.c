@@ -628,36 +628,25 @@ void Golem_UpdateRecoil(void);
 
 void Golem_UpdateSettle(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
+    struct Golem *body = actor->base.context;
     u8 busy;
     if (TakeFlag2B1(actor)) {
         void *target = Golem_UpdateRecoil;
-        SetControl(actor, 0x2A, target);
+        SceneActorChase_SetTypedControl(actor, target, 0x2A);
         actor->base.stepDone = 0;
-        {
-            u32 bit = 0x2000;
-            u32 *flags = &actor->base.behaviorFlags;
-            *flags |= bit;
-        }
+        SceneActorChase_SetActorFlags(actor, 0x2000);
     }
     busy = Golem_InvokeEnabledBehavior(actor);
     if (busy)
         return;
     if (actor->base.stepDone) {
-        *(struct ContactPosition *)(body + 0x69C) = *(struct ContactPosition *)(body + 0x694);
+        body->target69C = body->home694;
         Golem_AlignChargeTarget(body);
         {
             void *target = Golem_UpdateRouteMotion;
-            SetControl(actor, 0x23, target);
+            SceneActorChase_SetTypedControl(actor, target, 0x23);
         }
-        {
-            u32 phase = 2;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = 1;
-        }
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
 }
