@@ -1,11 +1,9 @@
-#include "scene_object_slot.h"
+#include "scene_object_controller.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
-void SceneObject_UpdateInactiveIdle(void);
-void SceneObject_UpdateActiveIdle(void);
 
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
-void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
+void SceneObject_InitPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -21,7 +19,7 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
             obj->pos.position.z += 0x80;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             break;
@@ -32,7 +30,7 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             break;
     }
@@ -40,11 +38,8 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         u16 c = obj->cellA;
         u8 v = *SceneActorTerrain_GetCell(c) & 15;
         cellField = &obj->b3b;
-        {
-            u32 zero = 0;
-            *cellField = v;
-            TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, *cellField, 0xff, zero);
-        }
+        obj->b3b = v;
+        TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, obj->b3b, 0xff, 0);
     }
     {
         struct SceneObjSlot *sprite = obj;
@@ -54,21 +49,21 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         switch (type) {
             case 0:
             case 3:
-                Sprite_Init(sprite, mgr + (obj->value * 28 + 0x3c), 0);
+                Sprite_Init(sprite, &mgr->animationData[0][obj->value], 0);
                 break;
             case 4:
-                Sprite_Init(sprite, mgr + (obj->value * 28 + 0x1e0), 0);
+                Sprite_Init(sprite, &mgr->animationData[3][obj->value], 0);
                 break;
             case 5:
-                Sprite_Init(sprite, mgr + (obj->value * 28 + 0x26c), 0);
-                AnimData_SelectPaletteBank(mgr + (obj->value * 28 + 0x26c), 0x3e);
+                Sprite_Init(sprite, &mgr->animationData[4][obj->value], 0);
+                AnimData_SelectPaletteBank(&mgr->animationData[4][obj->value], 0x3e);
                 break;
             case 6:
             case 7:
-                Sprite_Init(sprite, mgr + (obj->value * 28 + 0x2f8), 0);
+                Sprite_Init(sprite, &mgr->animationData[5][obj->value], 0);
                 break;
             case 15:
-                Sprite_Init(sprite, mgr + (obj->value * 28 + 0x384), 0);
+                Sprite_Init(sprite, &mgr->animationData[6][obj->value], 0);
                 break;
         }
         sprite->spritePos.words = obj->r0.words;
@@ -84,18 +79,13 @@ void SceneObject_InitPlacement(u8 *mgr, struct SceneObjSlot *obj)
         t = obj->variant;
         if (t == 0) {
             obj->callback = SceneObject_UpdateInactiveIdle;
-            obj->b39 = 0;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 0);
         } else if (t == 1) {
-            u32 two;
             obj->callback = SceneObject_UpdateActiveIdle;
-            two = 2;
-            obj->b39 = two;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 2);
         } else {
             obj->callback = SceneObject_UpdateInactiveIdle;
-            obj->b39 = 0;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 0);
         }
         if (obj->variant == 0) {
             obj->block->w6 &= 0xfffd;
