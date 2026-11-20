@@ -1,23 +1,17 @@
+#include "wireless_trade_menu.h"
 #include "global.h"
 #include "render.h"
-struct P {
-    u8 pad[0x20];
-    u32 flags, timer;
-    u8 state, entered;
-    u8 pad2[0x18];
-    u8 flag;
-};
 void PaletteLevels_Reset(void);
-int WirelessExchange_SendPacket(struct P *, int, const u32 *, int);
-void WirelessGameMenu_SetStatusPanelState(struct P *, int);
-void WirelessGameMenu_SignalStatusPanel(struct P *);
+int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
+void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
+void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 void WirelessGameItems_StartOutgoingItems(void);
 void Hud_ClearTimer(void);
 static inline void set(u32 mask)
 {
     gEnginePauseFlags |= mask;
 }
-void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
+void WirelessGameMenu_UpdateRoundHandshake(struct WirelessGameExchange *p)
 {
     u32 data;
     u32 bits;
@@ -29,32 +23,20 @@ void WirelessGameMenu_UpdateRoundHandshake(struct P *p)
         WirelessExchange_SendPacket(p, 1, &data, 1);
         set(4);
         WirelessGameMenu_SetStatusPanelState(p, 1);
-        p->flag = 0;
+        p->itemMode = 0;
         WirelessGameItems_StartOutgoingItems();
     }
     bits = 128;
-    flags = p->flags;
+    flags = p->exchangeFlags;
     bits &= flags;
     if (bits) {
-        u32 eight;
-        u8 *state;
-        u32 zero;
         Hud_ClearTimer();
-        eight = 8;
-        state = &p->state;
-        zero = 0;
-        *state = eight;
-        p->entered = 1;
-        p->timer = zero;
+        WirelessGameMenu_EnterState(p, WIRELESS_MENU_ROUND_RESULT_EXCHANGE);
     } else {
-        u32 three = 3;
-        three &= flags;
-        if (three != 3)
+        if ((flags & WIRELESS_EXCHANGE_HANDSHAKE) != WIRELESS_EXCHANGE_HANDSHAKE)
             goto tick;
-        p->flags = flags & ~3;
-        p->state = three;
-        p->entered = 1;
-        p->timer = bits;
+        p->exchangeFlags = flags & ~WIRELESS_EXCHANGE_HANDSHAKE;
+        WirelessGameMenu_EnterState(p, WIRELESS_MENU_SELECTION);
     }
     WirelessGameMenu_SignalStatusPanel(p);
     return;
