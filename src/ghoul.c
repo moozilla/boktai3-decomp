@@ -472,7 +472,7 @@ void Ghoul_EnterIdleControl(struct ChaseActor *actor)
     SceneActorChase_SetState(actor, 0, 2, 0);
 }
 
-/* SceneActorControl_RefreshMotionRoute_0808A90C: same code as SceneActorControl_RefreshMotionRoute at another address (ported by relatives.py; provisional name) */
+/* Refresh the chase gate from the actor's tracking flags. */
 
 static inline u32 Ghoul_TestMotionFlags(u16 *flags, u32 mask)
 {
@@ -495,7 +495,7 @@ static inline void Ghoul_RestoreIdleController(struct ChaseActor *actor, void *c
     actor->base.pendingControl = zero;
 }
 
-void SceneActorControl_RefreshMotionRoute_0808A90C(struct ChaseActor *actor)
+void Ghoul_RefreshMotionRoute(struct ChaseActor *actor)
 {
     u32 active = MonsterInit_TestTargetingFlags(&actor->base.tracking, 8);
     if (active) {
@@ -885,9 +885,9 @@ void Ghoul_BeginAlternateRoute(struct ChaseActor *actor)
     Ghoul_ClearContextFlags(&context->discFlags, 2);
 }
 
-/* Vorn_ParseField624_0808B320: same code as Vorn_ParseField624 at another address (ported by relatives.py; provisional name) */
+/* Keyword 'x' supplies a script and its frame delay. */
 
-void Vorn_ParseField624_0808B320(struct ChaseActor *actor)
+void Ghoul_ReadDelayedScript(struct ChaseActor *actor)
 {
     struct Ghoul *context = (struct Ghoul *)actor->base.context;
 
@@ -1241,7 +1241,7 @@ u8 SceneActorRegistry_LinkActor(void *);
 static inline void GhoulInit_InstallRouteDefaults(struct ChaseActor *rootActor)
 {
     rootActor->base.routeReset = Ghoul_ResetRouteState;
-    rootActor->base.reactionGate = SceneActorControl_RefreshMotionRoute_0808A90C;
+    rootActor->base.reactionGate = Ghoul_RefreshMotionRoute;
 }
 
 static inline void GhoulInit_InstallCompletionCallbacks(struct ChaseActor *rootActor)
@@ -1273,7 +1273,7 @@ s32 Ghoul_Init(void *object)
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GHOUL);
     Ghoul_BindProfile(actor);
-    Vorn_ParseField624_0808B320(actor);
+    Ghoul_ReadDelayedScript(actor);
 
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
