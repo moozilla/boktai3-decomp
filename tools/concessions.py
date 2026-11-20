@@ -47,7 +47,7 @@ its spelling, so each one is a question, not a verdict:
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant. A `goto` label or `return` operand is not a declaration.
-* `literal-local`: any other local that is initialized to a literal and never changed
+* `literal-local`: any other local that is initialized or first assigned to a literal and never changed
   (`u32 mask = 0x17;` then `if (mask & flags)`). A person does name a constant now and then, so
   this is the weakest kind: write the literal where it is used when that matches, and leave
   the rest for the owner to rule on. A loop counter or anything reassigned is not one.
@@ -109,7 +109,10 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
                 r"(?:[A-Z_0-9]\w*)?")
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
-_LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+_LITERAL_LOCAL = re.compile(
+    r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<name>\w+)\s*(?:=\s*(?P<initializer>" + _LITERAL + r")\s*)?;")
+_LITERAL_ASSIGNMENT = re.compile(r"\s*=\s*" + _LITERAL + r"\s*;")
+_QUOTED = re.compile(r'"(?:\\.|[^"\\\n])*"' r"|'(?:\\.|[^'\\\n])*'")
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -205,14 +208,11 @@ def _volatile_typedef_locals(code: str):
             yield start + match.start()
 
 
-def _warn_sites(code: str):
-    """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
-    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
-    for kind, rx in _WARN_REGEX.items():
-        for m in rx.finditer(code):
-            yield m.start(), kind
+def _literal_locals(code: str):
+    """Offsets of locals that receive a literal once, at or after declaration."""
+    code = _QUOTED.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
     for m in _LITERAL_LOCAL.finditer(code):
-        name = m.group(1)
+        name = m["name"]
         if re.fullmatch(_NUMBER_NAME, name):
             continue  # const-local has it
         # the rest of the block the declaration is in
@@ -226,10 +226,36 @@ def _warn_sites(code: str):
                 depth -= 1
             i += 1
         n = re.escape(name)
+        scope = code[m.end():i]
+        location = m.start()
+        if m["initializer"] is None:
+            first_use = re.search(r"\b%s\b" % n, scope)
+            if not first_use:
+                continue
+            prefix = scope[:first_use.start()].rstrip()
+            # A direct assignment in the declaration's block is enough.
+            # A nested block or a control header could set it conditionally.
+            if prefix.count("{") != prefix.count("}") or (prefix and prefix[-1] not in ";}"):
+                continue
+            assignment = _LITERAL_ASSIGNMENT.match(scope, first_use.end())
+            if not assignment:
+                continue
+            location = m.end() + first_use.start()
+            scope = scope[assignment.end():]
         changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), scope)
         if not changed:
-            yield m.start(), "literal-local"
+            yield location
+
+
+def _warn_sites(code: str):
+    """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
+    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
+    for kind, rx in _WARN_REGEX.items():
+        for m in rx.finditer(code):
+            yield m.start(), kind
+    for offset in _literal_locals(code):
+        yield offset, "literal-local"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:

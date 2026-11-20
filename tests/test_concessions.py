@@ -210,6 +210,29 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_literal_local_catches_a_separate_assignment(self):
+        text = """void f(void) {
+    u32 blueMask;
+    g("blueMask }");
+    blueMask = 0x7C00;
+    h(blueMask);
+}
+"""
+        self.assertEqual(
+            [site.line for site in c.sites(text) if site.kind == "literal-local"], [4]
+        )
+
+    def test_literal_local_ignores_mutable_or_conditional_assignments(self):
+        for body in (
+            "    mask = 0x7C00;\n    mask &= a;\n    g(mask);\n",
+            "    mask = 0x7C00;\n    h(&mask);\n    g(mask);\n",
+            "    if (a)\n        mask = 0x7C00;\n    else\n        mask = a;\n    g(mask);\n",
+            "    if (a) {\n        u32 mask = a;\n        g(mask);\n    }\n    mask = a;\n    g(mask);\n",
+            "    h(&mask);\n    mask = 0x7C00;\n    g(mask);\n",
+        ):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 a) {\n    u32 mask;\n" + body + "}\n"), [])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
