@@ -13,7 +13,7 @@ struct ParticleGroupParticle {
     u32 flags;
     u8 unknown14[4];
     u16 tile;
-    u8 unknown1A[5], priority, unknown20[8];
+    u8 unknown1A[4], palette, priority, unknown20[8];
     struct ContactPosition position;
     u8 unknown30[8];
 };
@@ -25,7 +25,7 @@ struct ParticleGroup {
 
 struct ParticleGroupGraphics {
     u32 reserved;
-    u16 tileBase, reserved6;
+    u16 tileBase, paletteBank;
 };
 
 struct ParticleGroupManager {

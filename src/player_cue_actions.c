@@ -2,7 +2,7 @@
 
 #include "global.h"
 
-#include "player.h"
+#include "player_status_flags.h"
 
 #include "scene_vec.h"
 
@@ -179,19 +179,8 @@ void Player_UpdateTransitionAnimation(struct Player *player)
             break;
         case 3:
             Player_SetAnimation(player, 0x160, 0x40, 1);
-            {
-                u32 frame = player->tetherFrame;
-                s32 mask = 7;
-                s32 low;
-                /* Low three frame bits. */
-                low = ~(~frame | ~mask);
-                frame >>= 3;
-                {
-                    s32 threshold = mask - frame;
-                    if (low < threshold)
-                        Player_AddControlFlags(player, 5);
-                }
-            }
+            if ((player->tetherFrame & 7) < 7 - (player->tetherFrame >> 3))
+                Player_AddControlFlags(player, 5);
             if (++player->tetherFrame > 55) {
                 ActorSequence_Begin(player, 0, 1);
                 PlayerCue_CompleteAction(player);
@@ -199,19 +188,8 @@ void Player_UpdateTransitionAnimation(struct Player *player)
             break;
         case 4:
             Player_SetAnimation(player, 0x160, 0x40, 1);
-            {
-                u32 frame = player->tetherFrame;
-                s32 mask = 7;
-                s32 low;
-                /* Low three frame bits. */
-                low = ~(~frame | ~mask);
-                frame >>= 3;
-                {
-                    s32 threshold = mask - frame;
-                    if (low >= threshold)
-                        Player_AddControlFlags(player, 5);
-                }
-            }
+            if ((player->tetherFrame & 7) >= 7 - (player->tetherFrame >> 3))
+                Player_AddControlFlags(player, 5);
             if (++player->tetherFrame > 55) {
                 ActorSequence_Begin(player, 0, 0);
                 player->triggerAnimationCallback = PlayerCue_UpdateHidden;
@@ -1364,15 +1342,15 @@ void PlayerCue_UpdateTurningPalette(struct Player *player)
     red = ((30 * a) + (19 * b)) >> 3;
     green = ((13 * a) + (12 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterA = green;
+    player->basePalette[5] = green;
     red = ((31 * a) + (25 * b)) >> 3;
     green = ((18 * a) + (12 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterB = green;
+    player->basePalette[6] = green;
     red = (31 * (a + b)) >> 3;
     green = ((22 * a) + (13 * b)) >> 3;
     green = PackPaletteGreen(0x2C00, green) | red;
-    player->visualParameterC = green;
+    player->basePalette[13] = green;
     if ((++(player->unk5A0)) > 15)
         player->unk5A0 = 0;
     if (gGameState->form != 2) {
@@ -1870,20 +1848,14 @@ void PlayerCue_UpdateSpiralMotion(struct Player *player)
     }
     Player_SetAnimation(player, 0x9A, 64, 1);
     {
-        u16 *destination = &player->spriteResource;
-        u32 resource = 0x16F;
-        *destination = resource;
-        player->actionVariantResource = (u32)(gPaletteBankData + (resource << 5));
+        player->spriteResource = 0x16F;
+        player->actionVariantResource = (u32)(gPaletteBankData + (player->spriteResource << 5));
     }
     Anim_SetSequence(&player->cueCollider.sequence, (void *)player->cueCollider.setupResource, 0,
                      player->heading, player->side);
     PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
                            &player->cueCollider.sequence);
-    {
-        u16 *destination = &player->actionEighteenParameter;
-        u32 resource = 0x2DD;
-        *destination = resource;
-    }
+    player->actionEighteenParameter = 0x2DD;
     PlayerCue_AdvanceSpiralCounters(player, 32, 31);
 }
 
@@ -2509,9 +2481,8 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
         }
 
         case 2: {
-            u32 flags = 160;
             u16 *count;
-            player->statusFlags |= flags;
+            Player_AddStatusFlags(player, 0xA0);
             count = &player->chargeCounter;
             if ((*count) <= 4) {
                 if (((++(*count)) == 5) && (!(player->actionMode)))
@@ -2562,8 +2533,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
         }
 
         case 3: {
-            u32 flags = 128;
-            player->statusFlags |= flags;
+            Player_AddStatusFlags(player, 0x80);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64, 1);
             player->resetValue6FC = 30;
             if (!((player->inputKeys[0]) & 1)) {

@@ -1,3 +1,4 @@
+#include "chase_actor.h"
 #include "global.h"
 #define gTrailSineTable gUnk_086149C4
 extern const s16 gUnk_086149C4[];
@@ -16,23 +17,17 @@ struct ActorTrail {
     u8 unknown768[0x172];
     s16 segmentCount;
 };
-struct TrailActor {
-    u8 unknown0[0x3D0];
-    struct ActorTrail *trail;
-};
 static inline u8 isActive(struct TrailOscillator *segment)
 {
     u32 value = segment->flags;
-    u32 mask = 2;
-    if (mask & value)
+    if (2 & value)
         return 1;
     return 0;
 }
 static inline u8 isHidden(struct TrailOscillator *segment)
 {
     u32 value = segment->flags;
-    u32 mask = 1;
-    if (mask & value)
+    if (1 & value)
         return 1;
     return 0;
 }
@@ -43,10 +38,10 @@ static inline s32 fixedMultiply(s32 a, s32 b)
         return product >> 12;
     return -((-product) >> 12);
 }
-void ActorTrail_ApplyAngularOffsets(struct TrailActor *actor, s32 magnitude, s32 angleStep,
+void ActorTrail_ApplyAngularOffsets(struct ChaseActor *actor, s32 magnitude, s32 angleStep,
                                     s32 mode)
 {
-    struct ActorTrail *trail = actor->trail;
+    struct ActorTrail *trail = actor->base.context;
     s32 i;
     for (i = 0; i < trail->segmentCount; i++) {
         if (isActive(&trail->segments[i]) && !isHidden(&trail->segments[i])) {

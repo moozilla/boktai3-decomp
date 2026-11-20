@@ -27,19 +27,13 @@ void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *actor,
 
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
-            Armor_SetAnimationFromStart(
-                actor,
-                &gUnk_0824EBE4[((actor->heading + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EBE4[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
             Armor_StartFullPaletteRestoreDelay(actor);
             if (setSpeed != 0)
                 actor->animationDuration = 120;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -67,7 +61,8 @@ void ActorController_UpdateResetMotionSpeed120(struct SceneCombatActor *actor)
 
 extern const u32 gUnk_0824EBF4[];
 
-extern const struct ContactPosition gUnk_0824EC04[], gUnk_0824EC24[], gUnk_0824EC44[], gUnk_0824EC64[];
+extern const struct ContactPosition gUnk_0824EC04[], gUnk_0824EC24[], gUnk_0824EC44[],
+    gUnk_0824EC64[];
 
 void Collider_SetAttackPowerAndForce(void *, s32, s32);
 
@@ -84,14 +79,10 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
 
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, &gUnk_0824EBF4[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -123,13 +114,17 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
                 u32 mask = 0x60000;
                 attackCollider->reactionFlags |= mask;
             }
-            Collider_SetAttackPowerAndForce(&actor->colliderGroup.colliders[0], (u16)ActorController_HalfAttack((s16)actor->attack), 50);
+            Collider_SetAttackPowerAndForce(&actor->colliderGroup.colliders[0],
+                                            (u16)ActorController_HalfAttack((s16)actor->attack),
+                                            50);
             facing = &actor->heading;
             tableOffset = ((*facing + 0x60) >> 6) & 3;
             collider = &actor->colliderGroup.colliders[0];
             tableOffset *= sizeof(struct ContactPosition);
-            collider->bounds = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC24);
-            collider->offset = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC04);
+            collider->bounds =
+                *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC24);
+            collider->offset =
+                *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC04);
             {
                 u8 heading = *facing;
                 actor->colliderGroup.colliders[0].direction = heading;
@@ -141,8 +136,10 @@ void ActorController_UpdateAttackCollider(struct SceneCombatActor *actor)
             u32 tableOffset = ((actor->heading + 0x60) >> 6) & 3;
             collider = &actor->colliderGroup.colliders[0];
             tableOffset *= sizeof(struct ContactPosition);
-            collider->bounds = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC64);
-            collider->offset = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC44);
+            collider->bounds =
+                *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC64);
+            collider->offset =
+                *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC44);
             if (actor->animationFrame == 0)
                 Sound_PlaySongChecked(0xBF);
             break;
@@ -169,15 +166,11 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
     u8 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, &gUnk_0824EC84[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
             Sound_PlaySongChecked(0xb9);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -205,13 +198,16 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
                 u32 mask = 0x60000;
                 attackCollider->reactionFlags |= mask;
             }
-            Collider_SetAttackPowerAndForce(&actor->colliderGroup.colliders[0], (u16)ActorController_TruncateFixed((s16)actor->attack << 12), 100);
+            Collider_SetAttackPowerAndForce(
+                &actor->colliderGroup.colliders[0],
+                (u16)ActorController_TruncateFixed((s16)actor->attack << 12), 100);
             collider = &actor->colliderGroup.colliders[0];
             collider->bounds = gUnk_0824ECB4;
             facing = &actor->heading;
             tableOffset = ((*facing + 0x60) >> 6) & 3;
             tableOffset *= sizeof(struct ContactPosition);
-            collider->offset = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC94);
+            collider->offset =
+                *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824EC94);
             {
                 u8 heading = *facing;
                 u8 *dest = &actor->colliderGroup.colliders[0].direction;
@@ -237,7 +233,9 @@ void ActorController_UpdateMovingAttackCollider(struct SceneCombatActor *actor)
             u32 mask = 0xfff9ffff;
             attackCollider->reactionFlags &= mask;
         }
-            Collider_SetAttackPowerAndForce(&actor->colliderGroup.colliders[0], (u16)ActorController_TruncateFixed((s16)actor->attack << 11), 50);
+            Collider_SetAttackPowerAndForce(
+                &actor->colliderGroup.colliders[0],
+                (u16)ActorController_TruncateFixed((s16)actor->attack << 11), 50);
             break;
         case 14: {
             u16 *flags = &actor->colliderGroup.colliders[0].flags;
@@ -271,9 +269,8 @@ void ActorController_UpdateMovementVelocity(struct SceneCombatActor *actor)
         speed = 25;
         {
             int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
-            int zero = 0;
             velocity->x = x;
-            velocity->y = zero;
+            velocity->y = 0;
         }
         velocity->z = ActorController_TruncateFixed(gUnk_086149C4[angle] * speed);
     } else
@@ -292,9 +289,8 @@ void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
         speed >>= shift;
         {
             int x = ActorController_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * speed);
-            int zero = 0;
             velocity->x = x;
-            velocity->y = zero;
+            velocity->y = 0;
         }
         {
             const s16 *table = gUnk_086149C4;
@@ -305,8 +301,7 @@ void ActorController_UpdateDecayingVelocity(struct SceneCombatActor *actor)
     if (actor->velocity.x || actor->velocity.z) {
         u16 *flags = &actor->flags;
         u32 value = *flags;
-        u32 mask = 0x20;
-        value |= mask;
+        value |= 0x20;
         *flags = value;
         return;
     }
@@ -343,14 +338,10 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
     s32 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, gUnk_0824ECC4);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
                 u32 one = 1;
@@ -361,15 +352,14 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
         }
         case 1:
             if (actor->animationComplete) {
-                u32 four = 4;
                 struct ContactCollider *collider;
                 Armor_SetAnimationFromStart(actor, gUnk_0824ECC8);
                 (*phase)++;
                 actor->actionReady = initialPhase;
-                ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], four);
-                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[0], four);
+                ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], 4);
+                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], 4);
+                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], 4);
+                ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[0], 4);
                 {
                     struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
                     motion->flags |= 1;
@@ -384,7 +374,8 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
                     attackCollider->reactionFlags |= mask;
                     collider = attackCollider;
                 }
-                Collider_SetAttackPowerAndForce(collider, (u16)ActorController_ScaleHeavyAttack((s16)actor->attack), 80);
+                Collider_SetAttackPowerAndForce(
+                    collider, (u16)ActorController_ScaleHeavyAttack((s16)actor->attack), 80);
             }
             break;
         case 2:
@@ -398,8 +389,10 @@ void ActorController_UpdateHeavyAttackCollider(struct SceneCombatActor *actor)
         u32 frame = actor->animationEvent;
         struct ContactCollider *collider = &actor->colliderGroup.colliders[0];
         u32 tableOffset = frame * sizeof(struct ContactPosition);
-        collider->bounds = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ED0C);
-        collider->offset = *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ECCC);
+        collider->bounds =
+            *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ED0C);
+        collider->offset =
+            *(const struct ContactPosition *)(tableOffset + (const u8 *)gUnk_0824ECCC);
         {
             u8 heading = gUnk_0824ED4C[frame];
             actor->colliderGroup.colliders[0].direction = heading;
@@ -417,14 +410,10 @@ void ActorController_UpdateFixedAnimationTransition(struct SceneCombatActor *act
     u8 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, gUnk_0824ED54);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *render = &actor->colliderGroup.motion;
                 u32 one = 1;
@@ -454,15 +443,10 @@ void ActorController_UpdateFadeAnimationTransition(struct SceneCombatActor *acto
 
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
-            Armor_SetAnimationFromStart(
-                actor, &gUnk_0824ED58[((actor->heading + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824ED58[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -472,8 +456,8 @@ void ActorController_UpdateFadeAnimationTransition(struct SceneCombatActor *acto
         }
         case 1:
             if (actor->animationComplete != 0) {
-                Armor_SetAnimationFromStart(
-                    actor, &gUnk_0824ED68[((actor->heading + 0x60) >> 6) & 3]);
+                Armor_SetAnimationFromStart(actor,
+                                            &gUnk_0824ED68[((actor->heading + 0x60) >> 6) & 3]);
                 {
                     u32 next = *phase + 1;
                     u32 zero = 0;
@@ -503,14 +487,10 @@ void ActorController_UpdateSoundedAnimationTransition(struct SceneCombatActor *a
 
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, &gUnk_0824ED78[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -538,15 +518,10 @@ void ActorController_UpdatePaletteAnimationTransition(struct SceneCombatActor *a
 
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
-            Armor_SetAnimationFromStart(
-                actor, &gUnk_0824ED98[((actor->heading + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824ED98[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -573,16 +548,11 @@ void ActorController_UpdateLayeredAnimationTransition(struct SceneCombatActor *a
     u8 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
-            Armor_SetAnimationFromStart(
-                actor, &gUnk_0824EDA8[((actor->heading + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EDA8[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
             Sound_PlaySongChecked(0xc1);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectPairedColliders(actor);
             {
                 struct ActorControllerMotion *render = &actor->colliderGroup.motion;
                 u32 one = 1;
@@ -593,8 +563,8 @@ void ActorController_UpdateLayeredAnimationTransition(struct SceneCombatActor *a
         }
         case 1:
             if (actor->animationComplete) {
-                Armor_SetAnimationFromStart(
-                    actor, &gUnk_0824EDB8[((actor->heading + 0x60) >> 6) & 3]);
+                Armor_SetAnimationFromStart(actor,
+                                            &gUnk_0824EDB8[((actor->heading + 0x60) >> 6) & 3]);
                 *phase = 0xff;
                 actor->actionReady = initialPhase;
             }

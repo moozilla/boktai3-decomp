@@ -1,22 +1,18 @@
-#include "global.h"
-struct Menu {
-    u8 pad0[0x28];
-    u8 state, entered, pending;
-    u8 pad2b[0x29];
-    u8 message[16];
-};
+#include "wireless_trade_menu.h"
+
 int Wireless_GetStatus(void);
-void Callback_InvokeActor(void *, void *);
-int Wireless_QueueNiPacket(void *);
-extern void *gUnk_086057A0[];
-int WirelessTradeMenu_Update(struct Menu *p)
+int Wireless_QueueNiPacket(u8 *);
+
+extern void (*const gUnk_086057A0[])(struct WirelessGameExchange *);
+
+int WirelessTradeMenu_Update(struct WirelessGameExchange *menu)
 {
     int busy = Wireless_GetStatus();
     if (!busy) {
-        Callback_InvokeActor(p, gUnk_086057A0[p->state]);
-        if (p->pending) {
-            if (Wireless_QueueNiPacket(p->message) >= 0)
-                p->pending = busy;
+        gUnk_086057A0[menu->state](menu);
+        if (menu->pendingPacket) {
+            if (Wireless_QueueNiPacket(menu->sendPacket) >= 0)
+                menu->pendingPacket = 0;
         }
     }
     return 0;

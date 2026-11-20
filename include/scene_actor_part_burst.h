@@ -6,6 +6,7 @@
 #include "effect_group.h"
 #include "spark_particle.h"
 #include "scene_actor_state.h"
+#include "monster_particle_random.h"
 
 static inline u32 SceneActorEffects_NextSample(const u16 *table)
 {
@@ -42,6 +43,13 @@ static inline u8 SceneActorEffects_NextSparkCount(const u16 *table)
 {
     return (SceneActorEffects_NextSample(table) & 3) + 1;
 }
+
+/* Each ring draws its particle count from the shared random sample cursor. */
+#define SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, range, table, radius) \
+    do { \
+        u8 count = (ParticleRandom_ReadSample((table)) & 3) + 1; \
+        SparkParticle_Spawn(&(actor)->base.body.position, count, (range), (radius), 4, 20, 2, 1); \
+    } while (0)
 
 static inline void SceneActorEffects_SpawnDefeatSparks(struct ChaseActor *actor,
                                                        const struct ContactPosition *range,

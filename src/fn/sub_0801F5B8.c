@@ -1,20 +1,15 @@
-#include "global.h"
+#include "scene_object_slot.h"
+
 void Camera_RequestShake(int);
-void Script_Call(int, int);
-void SceneObject_UpdateLowered(u8 *s)
+
+void SceneObject_UpdateLowered(struct SceneObjSlot *slot)
 {
-    int timer = *(s16 *)(s + 0x82);
+    s16 timer = slot->timer;
     if (timer) {
-        Camera_RequestShake(timer);
-        do {
-            (*(u16 *)(s + 0x82))--;
-        } while (0);
-    } else {
-        do {
-            if (*((int *)(s + 0x64))) {
-                Script_Call(*(int *)(s + 0x64), 0);
-                *(int *)(s + 0x64) = timer;
-            }
-        } while (0);
+        Camera_RequestShake((s16)slot->timer);
+        slot->timer--;
+    } else if (slot->loweredScript) {
+        Script_Call(slot->loweredScript, NULL);
+        slot->loweredScript = 0;
     }
 }

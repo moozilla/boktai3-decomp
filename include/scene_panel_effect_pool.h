@@ -17,7 +17,7 @@ struct ScenePanelOwnedEffect {
     struct ContactPosition *anchor;                      /* 0x174 */
     struct ContactPosition motion;                       /* 0x178 */
     u8 state, age;
-    s16 unknown182;
+    s16 referenceCoordinate; /* starting X for lateral motion, height for falling effects */
     struct ScenePanelEffect *owner;
 };
 struct ScenePanelSmallEffect {

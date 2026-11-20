@@ -1,60 +1,35 @@
-#include "global.h"
-void Sound_PlaySong(int);
-void Sound_StopSong(int);
-void SceneObject_UpdateLowered(void);
-void SceneParticleBurst_CreateWhilePaused(void *, int, void *, int, int, int);
-void SceneObject_UpdateLowering(u8 *s)
+#include "contact_actor.h"
+#include "scene_object_controller.h"
+
+void SceneObject_UpdateLowered(struct SceneObjSlot *);
+s32 SceneParticleBurst_CreateWhilePaused(const struct ContactPosition *position,
+                                         const struct ContactPosition *range,
+                                         const struct ContactPosition *jitter, s32 count,
+                                         u32 priority, u32 flip);
+
+void SceneObject_UpdateLowering(struct SceneObjSlot *slot)
 {
-    s16 k2;
-    struct {
-        s16 x, y, z;
-    } v;
-    int clear;
-    int one;
-    {
-        int next = *(u16 *)(s + 0x80) - 15;
-        k2 = 0;
-        clear = k2;
-        *(u16 *)(s + 0x80) = next;
-    }
-    if (*(s16 *)(s + 0x80) < 0) {
-        *(u16 *)(s + 0x80) = clear;
+    slot->lift -= 15;
+    if ((s16)slot->lift < 0) {
+        struct ContactPackedVector jitter;
+        slot->lift = 0;
         Sound_StopSong(0x152);
         Sound_PlaySong(0x153);
-        *(u16 *)(s + 0x82) = 30;
-        {
-            one = 1;
-            s[0x37] = one;
-        }
-        {
-            int pose = s[0x84];
-            s[0x39] = pose;
-        }
-        s[0x3a] = 0;
-        *(void **)(s + 0x30) = SceneObject_UpdateLowered;
-        {
-            struct {
-                s16 x, y, z;
-            } zero = {0, 0, 0};
-            v.z = zero.z;
-            *(u32 *)&v = clear;
-        }
-        one &= s[0x38];
-        if (one) {
-            *(u32 *)&v = 128;
-            SceneParticleBurst_CreateWhilePaused(s + 0x70, 0, &v, 5, 2, clear);
+        slot->timer = 30;
+        slot->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_LOWERED);
+        SceneObjSlot_ResetPose(slot, *(u8 *)&slot->loweredPose);
+        slot->callback = SceneObject_UpdateLowered;
+
+        jitter.x = jitter.y = jitter.z = 0;
+        if (slot->dir & 1) {
+            jitter.x = 128;
+            SceneParticleBurst_CreateWhilePaused((const struct ContactPosition *)&slot->q0, NULL,
+                                                 (const struct ContactPosition *)&jitter, 5, 2, 0);
         } else {
-            v.z = 128;
-            SceneParticleBurst_CreateWhilePaused(s + 0x70, 0, &v, 5, 2, one);
+            jitter.z = 128;
+            SceneParticleBurst_CreateWhilePaused((const struct ContactPosition *)&slot->q0, NULL,
+                                                 (const struct ContactPosition *)&jitter, 5, 2, 0);
         }
     }
-    do {
-        {
-            u16 *offset = (u16 *)(s + 0x80);
-            int base;
-            base = *(u16 *)(s + 0x7a);
-            base += *offset;
-            *(u16 *)(s + 0x72) = base;
-        }
-    } while (0);
+    slot->q0.position.y = slot->lift + slot->r0.position.y;
 }

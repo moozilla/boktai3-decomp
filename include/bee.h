@@ -34,21 +34,6 @@ struct Bee {
     u8 unknown458[0x18];
     struct ContactPosition start, end, motion, initialPosition;
 };
-struct BeeDrawable {
-    u32 flags;
-    u8 unknown4[4];
-    u8 scaleX;
-    s8 scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    const void *resource;
-};
-
 struct BeePackedPair {
     u32 lo : 16, hi : 16;
 };
@@ -94,7 +79,7 @@ void Bee_BuildMovementCurve(struct ChaseActor *actor, struct ContactPosition *ta
 void *Bee_SubVector(void *unused, struct BeeDisplacement *a, struct BeeDisplacement *b);
 void SceneActorCollision_FireSecondaryAttack(struct ChaseActor *actor);
 u32 Bee_OnDetectionCheck(struct ChaseActor *actor);
-void Slime_SetStateFlag(struct ChaseActor *actor);
+void Bee_SetTrackingReactionFlag(struct ChaseActor *actor);
 u32 Bee_GetMovementVariant(struct ChaseActor *actor);
 void Bee_TickActionCooldown(struct Bee *context);
 u32 Bee_UpdateGroundHeight(struct ChaseActor *actor);

@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
 #include "scene_actor_reaction.h"
@@ -15,20 +16,6 @@ static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.statusFlags & mask;
-}
-static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
 }
 static inline void Hide(struct ChaseActor *a)
 {
@@ -59,11 +46,6 @@ static inline void ClearHitFlags(struct FlagHalfword *p, u32 mask)
 static inline void SetHitFlags(s16 bit, struct FlagHalfword *p)
 {
     p->bits = bit | p->bits;
-}
-static inline void Fill(u32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet(zero, dst, 0x05000002);
 }
 s32 AreaEffect_ScaleGainAtPosition(void *, u32);
 s32 AreaEffect_ScaleLinkGainAtPosition(void *, u32);
@@ -164,17 +146,16 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
                 *flags2CC |= bit;
             }
             if (SceneActorDamage_ShouldShow(actor)) {
-                u32 zero;
-                u32 buffer[2];
+                struct ContactPosition offset;
                 s32 h = *health;
                 u32 max = *maxHealth;
                 s32 kind = (s16)actor->base.hudKind;
                 s32 param = (s16)actor->base.hudLabel;
                 SceneHud_SetTimedState(actor->base.body.id, h, max, kind, 0, param);
-                Fill(&zero, buffer);
+                ZeroFill8(&offset);
                 if (actor->base.reactionSoundVariant || (!((*flags2D8) & 0x20000)))
                     DamageNumberDisplay_Show(displayCollider, actor->base.reactionSoundVariant, 0,
-                                             position, buffer, 1);
+                                             position, &offset, 1);
             }
         }
     }
@@ -191,16 +172,9 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         Hide(actor);
         {
             void *control = actor->base.onDefeat;
-            Reaction_SetControl(actor, 17, control);
+            SceneActorTerrain_InstallControl(actor, control, 17);
         }
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.hitOwners = 32;
         if ((!Test(gEngineFlags, 0x4800)) && (!Flag2D0(actor, 0x800)))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
@@ -208,16 +182,9 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
         SetHitFlags(0x20, (void *)&actor->base.motionFlags);
         {
             void *control = actor->base.onReaction;
-            Reaction_SetControl(actor, 0x12, control);
+            SceneActorTerrain_InstallControl(actor, control, 0x12);
         }
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
     }
     {
         u32 mask = 0x2000;

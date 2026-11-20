@@ -1,4 +1,5 @@
 #include "contact_impact_effect.h"
+#include "fixed8_interpolation.h"
 
 u32 RegistryF3E4_GetStateResult(struct ContactImpactEffect *p)
 {
@@ -55,10 +56,12 @@ static inline void ToScreen(struct ContactPosition *screen, struct ContactPositi
 
 // confidence=low: configures a contact effect's movement and independent scale ramp.
 
-static inline void SetCallback(void (*callback)(struct ContactImpactEffect *),
-                               void (**slot)(struct ContactImpactEffect *))
+static inline void ContactImpactEffect_EnterUpdate(struct ContactImpactEffect *effect,
+                                                   void (*update)(struct ContactImpactEffect *))
 {
-    *slot = callback;
+    effect->update = update;
+    effect->timer = 0;
+    effect->stateResult = 0;
 }
 
 void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input,
@@ -97,9 +100,7 @@ void ContactImpactEffect_BeginMotion(struct ContactImpactEffect *input,
     effect->sprite.scaleX = effect->rampFrom;
     effect->sprite.scaleY = effect->rampFrom;
     effect->sprite.flags &= ~1;
-    SetCallback(ContactImpactEffect_UpdateContact, &effect->update);
-    effect->timer = 0;
-    effect->stateResult = 0;
+    ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateContact);
 }
 
 void OrbitMotion_BeginArc(void *, void *, void *, u32, u32);
@@ -189,9 +190,7 @@ void SceneTarget_BeginMove(struct ContactImpactEffect *input, struct ContactPosi
     OrbitMotion_BeginArc(&effect->motion, origin, target, arcParameter, trackMode);
     effect->shakeThreshold = trackMode;
     effect->sprite.flags &= ~1;
-    SetCallback(ContactImpactEffect_UpdateContact, &effect->update);
-    effect->timer = 0;
-    effect->stateResult = 0;
+    ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateContact);
     Callback_InvokeActor(effect, effect->update);
 }
 
@@ -214,19 +213,14 @@ void ContactImpactEffect_BeginTimedPosition(struct ContactImpactEffect *input,
                        (struct ContactPosition *)(u16 *)&effect->sprite.position.x, 0);
         effect->shakeThreshold = duration;
         effect->sprite.flags &= ~1;
-        SetCallback(ContactImpactEffect_UpdateShakingPosition, &effect->update);
-        effect->timer = 0;
-        effect->stateResult = 0;
+        ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateShakingPosition);
     }
 }
 
 void RegistryF3E4_ClearState(struct ContactImpactEffect *p)
 {
     if (p) {
-        u32 z = 0;
-        p->update = z;
-        p->timer = z;
-        p->stateResult = z;
+        ContactImpactEffect_EnterUpdate(p, NULL);
     }
 }
 
@@ -281,9 +275,7 @@ void ContactImpactEffect_BeginInterpolatedPosition(struct ContactImpactEffect *i
         effect->sprite.scaleX = effect->rampFrom;
         effect->sprite.scaleY = effect->rampFrom;
         effect->sprite.flags &= ~1;
-        SetCallback(ContactImpactEffect_UpdateInterpolatedPosition, &effect->update);
-        effect->timer = 0;
-        effect->stateResult = 0;
+        ContactImpactEffect_EnterUpdate(effect, ContactImpactEffect_UpdateInterpolatedPosition);
     }
 }
 
@@ -360,47 +352,16 @@ void SpriteController_UpdateStopped(struct ContactImpactEffect *controller)
 
 void SpriteController_AnimateGrowing(struct ContactImpactEffect *p)
 {
-    s32 counter = p->timer;
-    s32 value;
-    s32 limit2;
+    s32 duration;
+    s32 value = Fixed8_Interpolate(0x26, 0x40, 8, p->timer);
 
-    if (counter > 0)
-        goto checkUpper;
-    value = 0x26;
-    goto store;
-
-checkUpper: {
-    s32 limit = 8;
-    if (counter < limit)
-        goto interp;
-}
-    value = 0x40;
-    goto store;
-
-interp: {
-    s32 k = 0xd0 << 5;
-    s32 t = counter * k;
-    s32 d = 8;
-    s32 result;
-    t = t / d;
-    if (t >= 0)
-        result = t >> 8;
-    else
-        result = -(-t >> 8);
-    value = result;
-    value += 0x26;
-}
-
-store:
     p->sprite.scaleX = value;
     p->sprite.scaleY = value;
 
-    limit2 = 8;
-    if ((s32)p->timer >= limit2) {
+    duration = 8;
+    if ((s32)p->timer >= duration) {
         p->sprite.flags &= -2;
-        SetCallback(RegistryF3E4_UpdateVisibleIdle, &p->update);
-        p->timer = 0;
-        p->stateResult = 0;
+        ContactImpactEffect_EnterUpdate(p, RegistryF3E4_UpdateVisibleIdle);
     } else {
         p->timer++;
     }
@@ -408,25 +369,11 @@ store:
 
 void SpriteController_AnimateShrinking(struct ContactImpactEffect *p)
 {
-    s32 scale;
     s32 duration = 8;
-    s32 timer = p->timer;
-    if (timer <= 0)
-        scale = 0x40;
-    else if (timer >= duration)
-        scale = 0x26;
-    else {
-        s32 delta = -0x1a00;
-        delta *= timer;
-        delta = __divsi3(delta, duration);
-        if (delta >= 0)
-            delta >>= 8;
-        else
-            delta = -((-delta) >> 8);
-        scale = delta + 0x40;
-    }
-    p->sprite.scaleX = scale;
-    p->sprite.scaleY = scale;
+    s32 value = Fixed8_Interpolate(0x40, 0x26, 8, p->timer);
+
+    p->sprite.scaleX = value;
+    p->sprite.scaleY = value;
     if (p->timer >= duration)
         RegistryF3E4_SetHidden(p);
     else
@@ -490,25 +437,6 @@ static inline s32 EffectProjectScale(s32 x)
     return r;
 }
 
-static inline s32 EffectScale8(s32 x)
-{
-    s32 r;
-    if (x >= 0)
-        r = x >> 8;
-    else
-        r = -((-x) >> 8);
-    return r;
-}
-
-static inline s32 InterpolatePosition(s32 start, s32 end, s32 duration, s32 time)
-{
-    if (time <= 0)
-        return start;
-    if (time >= duration)
-        return end;
-    return start + EffectScale8(((end - start) << 8) * time / duration);
-}
-
 void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *effect)
 {
     {
@@ -519,15 +447,7 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
         s32 *timerPtr = &effect->timer;
         s32 timer = *timerPtr;
         s32 result;
-        if (timer <= 0)
-            result = rampFrom;
-        else if (timer >= threshold)
-            result = rampTo;
-        else {
-            s32 delta = rampTo - rampFrom;
-            s32 scaled = __divsi3(timer * (delta << 8), threshold);
-            result = rampFrom + EffectScale8(scaled);
-        }
+        result = Fixed8_Interpolate(rampFrom, rampTo, threshold, timer);
         effect->sprite.scaleX = result;
         effect->sprite.scaleY = result;
     }
@@ -539,12 +459,12 @@ void ContactImpactEffect_UpdateInterpolatedPosition(struct ContactImpactEffect *
         s32 z;
         s32 y;
         s32 sum;
-        pos.x = InterpolatePosition(effect->world.x, effect->target.x, effect->shakeThreshold,
-                                    effect->timer);
-        pos.y = InterpolatePosition(effect->world.y, effect->target.y, effect->shakeThreshold,
-                                    effect->timer);
-        pos.z = InterpolatePosition(effect->world.z, effect->target.z, effect->shakeThreshold,
-                                    effect->timer);
+        pos.x = Fixed8_Interpolate(effect->world.x, effect->target.x, effect->shakeThreshold,
+                                   effect->timer);
+        pos.y = Fixed8_Interpolate(effect->world.y, effect->target.y, effect->shakeThreshold,
+                                   effect->timer);
+        pos.z = Fixed8_Interpolate(effect->world.z, effect->target.z, effect->shakeThreshold,
+                                   effect->timer);
         q = (u16 *)&effect->sprite.position.x;
         p = (struct ContactPosition *)&pos;
         x = ((s16 *)&pos)[0];
@@ -587,15 +507,7 @@ void ContactImpactEffect_UpdateContact(struct ContactImpactEffect *effect)
         s32 timer = *timerPtr;
         s32 result;
 
-        if (timer <= 0)
-            result = rampFrom;
-        else if (timer >= threshold)
-            result = rampTo;
-        else {
-            s32 delta = rampTo - rampFrom;
-            s32 scaled = __divsi3(timer * (delta << 8), threshold);
-            result = rampFrom + EffectScale8(scaled);
-        }
+        result = Fixed8_Interpolate(rampFrom, rampTo, threshold, timer);
         effect->sprite.scaleX = result;
         effect->sprite.scaleY = result;
     }
@@ -678,25 +590,16 @@ void RegistryF3E4_OnTaskDestroy(void *arg)
     gRegistryF3E4Actor = 0;
 }
 
-void CpuSet(const void *src, void *dest, u32 control);
-
-static inline void fill32(void *dst, u32 *tmp, u32 control)
-{
-    *tmp = 0;
-    CpuSet(tmp, dst, control);
-}
-
 struct ContactImpactEffect *RegistryF3E4_CreateHidden(s32 field3B, s32 mode)
 {
     struct ContactImpactEffect *p = Task_Create(0xA, 0xFC);
-    u32 zero;
     if (p)
         Task_SetCallbacks(p, RegistryF3E4_OnTaskUpdate, RegistryF3E4_OnTaskDestroy);
     p->coordinateMode = mode;
     AnimData_Load(p->animation, 0x3641);
     Sprite_Init(&p->sprite, p->animation, 0x12);
     p->sprite.priority = field3B;
-    fill32(&p->sprite.position.x, &zero, 0x05000002);
+    ZeroFill8(&p->sprite.position);
     p->blinkTimer = 0;
     p->blinkState = 0;
     {
@@ -731,7 +634,6 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
 {
     struct ContactImpactEffect **current = &gRegistryF3E4Actor;
     struct ContactImpactEffect *p = Task_Create(8, 0xFC);
-    u32 zero;
     if (p)
         Task_SetCallbacks(p, RegistryF3E4_OnTaskUpdate, RegistryF3E4_OnTaskDestroy);
     *current = p;
@@ -744,7 +646,7 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
         p->sprite.position.y = Script_GetValue();
         p->sprite.position.z = Script_GetValue();
     } else
-        fill32(&p->sprite.position.x, &zero, 0x05000002);
+        ZeroFill8(&p->sprite.position);
     if (Script_SeekToKeyword('c'))
         AnimData_SelectPaletteBank(p->animation, Script_GetValue() + 0x4B);
     p->coordinateMode = 2;
@@ -761,9 +663,7 @@ struct ContactImpactEffect *RegistryF3E4_Create(u32 name)
     if (Script_SeekToKeyword('i') && Script_GetValue())
         RegistryF3E4_SetHidden(p);
     else {
-        SetCallback(RegistryF3E4_UpdateVisibleIdle, &p->update);
-        p->timer = 0;
-        p->stateResult = 0;
+        ContactImpactEffect_EnterUpdate(p, RegistryF3E4_UpdateVisibleIdle);
     }
     return p;
 }

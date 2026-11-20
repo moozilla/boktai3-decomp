@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "state_actor.h"
 // confidence=low: Vampire pending-damage handler: applies queued damage, flash/shake, death and stagger transitions.
 struct VampireDamage {
     u8 pad0[0x48];
@@ -60,7 +61,7 @@ struct Packed {
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneActors_SpawnDestructionParticles(void *);
 int SceneActorGraphics_GetEffectState(void *);
-void sub_08026FF0(void *);
+void Vampire_UpdateSwayReaction(void *);
 void sub_08027214(void *);
 
 static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *), int id)
@@ -69,8 +70,7 @@ static inline void Vampire_SetState(struct VampireDamage *p, void (*fn)(void *),
     p->callback = fn;
     p->timer = 0;
     p->changed = 1;
-    p->reset = 0;
-    p->pending = 0;
+    SceneActorState_EnterReactionPhase((struct StateActor *)p, 0);
 }
 
 static inline void Vampire_SetReactionState(struct VampireDamage *p, void (*fn)(void *), u8 id)
@@ -187,7 +187,7 @@ int Vampire_ApplyPendingDamage(struct VampireDamage *p)
             trigger = flaggedBit;
         if (trigger) {
             Vampire_AddFlags(flags, 1);
-            Vampire_SetReactionState(base, sub_08026FF0, 24);
+            Vampire_SetReactionState(base, Vampire_UpdateSwayReaction, 24);
             return 1;
         }
         p->shakeAmplitude = 8;

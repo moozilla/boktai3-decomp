@@ -119,10 +119,8 @@ u32 Player_ConsumeStateEntry(struct Player *player)
 
 void Player_SetActionPhase(struct Player *player, u8 phase)
 {
-    u8 *currentPhase = &player->tetherPhase;
-    u16 firstFrame = 0;
-    *currentPhase = phase;
-    player->tetherFrame = firstFrame;
+    player->tetherPhase = phase;
+    player->tetherFrame = 0;
 }
 
 void Player_SetPendingCallback(struct Player *player, void (*callback)(struct Player *))
@@ -228,56 +226,41 @@ static inline u32 flagBits(u32 *flags, u32 mask)
 void Player_ApplyContactResponse(struct Player *player, struct ContactCollider *source,
                                  struct ContactCollider *target)
 {
-    s16 clearSpecial = 0;
-    u16 *response;
-    u16 *sourceResponse;
-    u16 magnitude;
-    u16 *targetResponse;
-    s32 clearValue;
-    if (player->positionResetState == 1) {
+    if (player->positionResetState == 1)
         target->responseParameter = 0;
-    }
-    sourceResponse = &source->responseParameter;
-    magnitude = *sourceResponse;
-    targetResponse = &target->responseParameter;
-    clearValue = clearSpecial;
-    *targetResponse = magnitude;
-    magnitude = *sourceResponse;
-    response = targetResponse;
-    if (magnitude > 200) {
-        *response = 200;
-    }
+    target->responseParameter = source->responseParameter;
+    if (source->responseParameter > 200)
+        target->responseParameter = 200;
     if (flagBits(&source->reactionFlags, 0x40000)) {
         player->contactSpecial = 1;
-    } else {
-        if (player->tetherMode == 5) {
-            u32 flags = target->flags;
-            target->flags = flags | 4;
-            *response = 0;
-            return;
-        }
-        if (flagBits(&player->statusFlags, 0x8000)) {
-            s32 direction;
-            if (source->flags & 0x100) {
-                direction = ((source->direction + 0x70) >> 5) & 7;
-                player->contactDirection = direction;
-            } else {
-                s32 deltaX = source->x - target->x;
-                s32 deltaZ = source->z - target->z;
-                if (deltaX == 0 && deltaZ == 0) {
-                    player->contactDirection = player->facing;
-                } else {
-                    direction = (((u16)Math_Atan2(deltaX, deltaZ) + 0x70) >> 5) & 7;
-                    player->contactDirection = (direction + 4) & 7;
-                }
-            }
-            player->contactMagnitude = *response;
-            *response = 0;
-            target->flags |= 4;
-            return;
-        }
-        player->contactSpecial = clearValue;
+        player->facing = ActorDirection_ComputeRelativeCardinal(source, target);
+        return;
     }
+    if (player->tetherMode == 5) {
+        target->flags |= 4;
+        target->responseParameter = 0;
+        return;
+    }
+    if (flagBits(&player->statusFlags, 0x8000)) {
+        s32 direction;
+        if (source->flags & 0x100) {
+            player->contactDirection = ((source->direction + 0x70) >> 5) & 7;
+        } else {
+            s32 deltaX = source->x - target->x;
+            s32 deltaZ = source->z - target->z;
+            if (deltaX == 0 && deltaZ == 0) {
+                player->contactDirection = player->facing;
+            } else {
+                direction = (((u16)Math_Atan2(deltaX, deltaZ) + 0x70) >> 5) & 7;
+                player->contactDirection = (direction + 4) & 7;
+            }
+        }
+        player->contactMagnitude = target->responseParameter;
+        target->responseParameter = 0;
+        target->flags |= 4;
+        return;
+    }
+    player->contactSpecial = 0;
     player->facing = ActorDirection_ComputeRelativeCardinal(source, target);
 }
 

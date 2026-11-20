@@ -26,6 +26,10 @@ from .store import Store, digest
 MAX_REQUEST = 16 * 1024 * 1024
 
 
+class SocketBindDenied(PermissionError):
+    """The resident server could open a socket but could not bind its path."""
+
+
 def _socket_path(directory: Path) -> Path:
     # Keep socket names below AF_UNIX's 104-byte bound (macOS) even for long sessions:
     # in the checkout when its path is short enough, else in the user's temp directory.
@@ -93,7 +97,10 @@ def serve(directory: Path, *, stdio: bool = False, idle_timeout: float = 1800) -
         if path.exists():
             path.unlink()
         with Session(directory) as session, socket.socket(socket.AF_UNIX) as server:
-            server.bind(str(path))
+            try:
+                server.bind(str(path))
+            except PermissionError as exc:
+                raise SocketBindDenied(*exc.args) from exc
             os.chmod(path, 0o600)
             server.listen(16)
             server.settimeout(idle_timeout)
@@ -138,7 +145,7 @@ def request(directory: Path, payload: dict[str, Any], *, local: bool = False) ->
             return _answer(session, payload)
     path = _socket_path(directory)
     directory.mkdir(parents=True, exist_ok=True)
-    startup = False
+    startup = None
     deadline = time.monotonic() + 30
     while True:
         try:
@@ -160,15 +167,19 @@ def request(directory: Path, payload: dict[str, Any], *, local: bool = False) ->
             client.close()
             if payload.get("op") == "shutdown":
                 return {"id": payload.get("id"), "ok": True, "result": {"already_stopped": True}}
-            if not startup:
-                log = directory / "server.log"
+            log = directory / "server.log"
+            if startup is None:
                 with log.open("ab") as output:
-                    subprocess.Popen([sys.executable, "-m", "tools.matchsearch", "serve", str(directory)],
+                    startup = subprocess.Popen([sys.executable, "-m", "tools.matchsearch", "serve", str(directory)],
                         cwd=Path(__file__).resolve().parents[2], stdin=subprocess.DEVNULL,
                         stdout=output, stderr=output, start_new_session=True)
-                startup = True
-            if time.monotonic() > deadline:
-                details = (directory / "server.log").read_text(errors="replace")[-3000:]
+            status = startup.poll()
+            if status == os.EX_NOPERM:
+                response = request(directory, payload, local=True)
+                response["transport"] = "local fallback; socket bind denied (serve --stdio stays resident)"
+                return response
+            if status or time.monotonic() > deadline:
+                details = log.read_text(errors="replace")[-3000:]
                 raise RuntimeError("search server failed to start: " + details)
             time.sleep(0.05)
     with client:
@@ -306,6 +317,9 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         print(json.dumps(result, indent=2))
         return 0 if result.get("ok", True) else 1
+    except SocketBindDenied as exc:
+        print(f"matchsearch: {exc}", file=sys.stderr)
+        return os.EX_NOPERM
     except Exception as exc:
         if args.command in {'propose', 'diff', 'export', 'land'} and not args.json_output:
             print(f'matchsearch: {type(exc).__name__}: {exc}', file=sys.stderr)

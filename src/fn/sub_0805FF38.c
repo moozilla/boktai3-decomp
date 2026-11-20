@@ -78,12 +78,6 @@ void SceneInventory_PopulateItemGrid(struct SceneInventoryPanel *panel)
             column2++;
         } while (column2 <= 3);
     }
-    {
-        u32 mask = 1;
-        struct SceneInventoryWidgetFlags *entry = &flagsBase[41];
-        for (slot = 0; slot < 8; slot++) {
-            entry->flags |= mask;
-            entry++;
-        }
-    }
+    for (slot = 0; slot < 8; slot++)
+        flagsBase[slot + 41].flags |= 1;
 }

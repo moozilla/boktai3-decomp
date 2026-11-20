@@ -1,6 +1,5 @@
 #include "global.h"
-#include "player.h"
-#include "engine.h"
+#include "player_core.h"
 s32 Player_BeginTerrainRecovery(struct Player *p)
 {
     u32 direction;
@@ -9,10 +8,7 @@ s32 Player_BeginTerrainRecovery(struct Player *p)
 
     p->terrainClampBlocked = 1;
     p->directionFrame = 50;
-    {
-        u16 duration = 60;
-        p->positionResetValue = duration;
-    }
+    Player_SetPositionResetDuration(p, 60);
     p->contactSpecial = 0;
     p->terrainRecoveryCounter = 0;
     angle = Math_Atan2(p->position.x - p->terrainTarget->x, p->position.z - p->terrainTarget->z);

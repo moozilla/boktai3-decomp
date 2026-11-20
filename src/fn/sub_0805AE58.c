@@ -3,34 +3,21 @@
 
 void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
 {
-    struct ScenePanelRig *owner;
     s32 i;
-    s32 compare;
-    {
-        struct ScenePanelRig *input = rig;
-        owner = input;
-    }
-    {
-        i = 0;
-    }
-    do {
-        struct SceneRigSprite *sprite;
-        struct SceneRigSprite *animated;
+    for (i = 0; i < 8; i++) {
+        struct SceneRigSprite *sprite = &rig->primary[i];
+        struct SceneRigSprite *animated = sprite;
         union {
             void *graphics;
             const u16 *table;
         } work;
         void *resource;
         u16 animationKey;
-        sprite = &owner->primary[i];
-        animated = sprite;
         work.graphics = sprite->graphics;
         AnimData_Load(work.graphics, (u16)String_Hash(gUnk_0824DEAC));
         {
             u32 parity = i;
-            u32 bit;
-            bit = 1;
-            if (parity & bit) {
+            if (parity & 1) {
                 struct SceneRigSprite *arg0 = sprite;
                 void *arg1 = work.graphics;
                 Sprite_Init(arg0, arg1, 512);
@@ -41,19 +28,17 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
             }
         }
         {
-            u32 mode;
             sprite->frame = 0;
-            mode = 1;
-            sprite->renderMode = mode;
+            sprite->renderMode = 1;
         }
-        sprite->position = owner->position;
+        sprite->position = rig->position;
         {
             u32 phase;
             u32 phaseIndex = i;
             phase = phaseIndex << 5;
             animated->phase = phase;
         }
-        work.table = (const u16 *)RANDOM_TABLE_ADDR;
+        work.table = gRandomTable;
         animated->randomPhase = (u8)ParticleRandom_ReadDirectSample(work.table);
         animationKey = (u16)String_Hash(gUnk_0824DEB0);
         resource = ScriptProc_Start(0x922E, animationKey);
@@ -63,15 +48,10 @@ void ScenePanelRig_InitPrimarySprites(struct ScenePanelRig *rig)
         {
             u32 sample = ParticleRandom_ReadDirectSample(work.table);
             {
-                u32 bit = 1;
-                sample &= bit;
+                sample &= 1;
                 if (sample)
                     sprite->flags |= 4;
             }
         }
-        {
-            i += 1;
-            compare = i;
-        }
-    } while (compare <= 7);
+    }
 }

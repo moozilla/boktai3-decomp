@@ -2,19 +2,23 @@
 #define GUARD_HIT_SWITCH_H
 #include "scene_object.h"
 #include "display_animation.h"
+#include "contact_collider.h"
+#include "scene_actor_components.h"
+#include "terrain_collision.h"
+#include "sprite.h"
 /* Tentative identity: hit-counted switches that alter a terrain cell. */
 struct HitSwitchEntry {
     struct DisplaySequenceSprite sprite;
-    struct SceneAnimation animation;
-    struct SceneCollider collider;
-    struct SceneBody body;
-    struct SceneVec world;
+    struct SpriteRenderResource animation;
+    struct ContactCollider collider;
+    struct SceneActorBody body;
+    struct ContactPosition world;
     u8 kind, bodyEnabled;
     u16 collisionId;
     s16 tag;
     u16 cellIndex, frame, bobPeriod, hitCount, requiredHits;
     u8 hitCooldown, unknownFD, completed, cellRegistered;
-    struct SceneCellRef cellRef;
+    struct TerrainCellOverride cellRef;
     void (*update)(struct HitSwitchEntry *);
     u32 completedScriptId;
 };

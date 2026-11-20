@@ -1,4 +1,5 @@
 #include "directional_interaction.h"
+#include "player_slot_status.h"
 
 /* Sets the controller's state and flags it as newly entered. */
 u32 DirectionalController_SetState(struct DirectionalController *p, u32 state)
@@ -23,13 +24,13 @@ u32 DirectionalController_ConsumeEntered(struct DirectionalController *p)
 s32 DirectionalController_InitSlot(struct DirectionalManager *manager,
                                    struct DirectionalController *p, s32 index)
 {
-    void *animation = p->animation;
+    void *animation = &p->graphics;
     s32 r;
     if (AnimData_Load(animation, 0xA850) != 0) {
-        struct DirectionalDrawable *q = &p->drawable;
+        struct DisplaySequenceSprite *q = &p->drawable;
         Sprite_Init(q, animation, 1);
-        q->scale = 1;
-        p->drawable.mode = 2;
+        q->frame = 1;
+        p->drawable.priority = 2;
         r = 0;
     } else
         r = -1;
@@ -58,17 +59,16 @@ DirectionalController_FindByScriptId(struct DirectionalManager *manager, s32 id,
 /* Picks the marker animation for a fade level. */
 u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *p, u32 level)
 {
-    void *animation = p->animation;
+    void *animation = &p->graphics;
     if (p->disabled == 0)
         AnimData_SelectPaletteBank(animation, level + 0x6b);
 }
 
 /* Places the controller and its marker around the given point. */
 u32 DirectionalController_SetPosition(struct DirectionalManager *manager,
-                                      struct DirectionalController *p,
-                                      struct DirectionalPackedVec *in)
+                                      struct DirectionalController *p, const struct SceneVec *in)
 {
-    struct DirectionalDrawable *q = &p->drawable;
+    struct DisplaySequenceSprite *q = &p->drawable;
     p->position.x = in->x;
     p->position.y = in->y;
     p->position.z = in->z;
@@ -115,17 +115,18 @@ void LevelController_Update(struct DirectionalManager *manager, struct Direction
     }
 }
 
+static inline u32 Directional_ReadPlayerStatus(const u32 *status, u32 mask)
+{
+    return *status & mask;
+}
+
 s32 Actor_CanInteractWithController(struct DirectionalManager *manager,
                                     struct DirectionalController *p)
 {
     struct Player *actor = manager->actor;
-    u32 mask = 0x186c;
-    u32 flags;
-    flags = actor->statusFlags;
-    if (flags & mask)
+    if (Directional_ReadPlayerStatus(&actor->statusFlags, 0x186c))
         return 0;
-    flags &= 0x100000;
-    if (!flags && manager->selected < 0)
+    if (!(actor->statusFlags & 0x100000) && manager->selected < 0)
         return 1;
     return 0;
 }
@@ -171,13 +172,9 @@ s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto done;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto done;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
@@ -211,13 +208,9 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto failed;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto failed;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
@@ -260,13 +253,9 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto done;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto done;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
@@ -384,7 +373,7 @@ void *DirectionalController_CreateManagerTask(void *a)
     struct DirectionalManager *p;
     if (gDirectionalManager != 0)
         return gDirectionalManager;
-    p = Task_Create(8, 0x30);
+    p = Task_Create(8, sizeof(*p));
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))DirectionalController_UpdateAll,
                           (void (*)(void))DirectionalController_DestroyManager);
@@ -398,7 +387,7 @@ void *DirectionalController_CreateManagerTask(void *a)
 
 s32 DirectionalController_ScriptCreate(void)
 {
-    struct DirectionalPackedVec position;
+    struct SceneVec position;
     s32 findRegion;
     struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
@@ -424,22 +413,17 @@ s32 DirectionalController_ScriptCreate(void)
                 p->distance = distance * distance;
             }
             if (Script_SeekToKeyword('a')) {
-                s16 *base = p->arguments;
-                s16 *out = *(&base);
-                do {
-                    s32 value = Script_GetPc();
-                    if (value) {
-                        *(&value) = Script_GetValue();
-                    }
-                    *out++ = value;
-                } while ((s32)out <= (s32)(base + 3));
+                s32 argument;
+                for (argument = 0; argument < 4; argument++) {
+                    if (Script_GetPc())
+                        p->arguments[argument] = Script_GetValue();
+                    else
+                        p->arguments[argument] = 0;
+                }
             } else {
-                s16 *base = p->arguments;
-                s32 zero = 0;
-                s16 *out = p->arguments + 3;
-                do {
-                    *out-- = zero;
-                } while ((s32)out >= (s32)base);
+                s32 argument;
+                for (argument = 0; argument < 4; argument++)
+                    p->arguments[argument] = 0;
             }
             if (Script_SeekToKeyword('p')) {
                 position.x = Script_GetValue();
@@ -491,7 +475,7 @@ s32 DirectionalController_ScriptRelease(void)
 
 s32 DirectionalController_ScriptMove(void)
 {
-    struct DirectionalPackedVec position;
+    struct SceneVec position;
     struct DirectionalManager *manager = gDirectionalManager;
     struct DirectionalController *p;
     if (!manager)

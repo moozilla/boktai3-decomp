@@ -1,40 +1,17 @@
-#include "global.h"
-struct TextVm {
-    u8 x, y, left, top, width, height, palette, style, entered, mode, skip, busy, previousMode,
-        choiceCount, advance, fresh, brackets, voice, toggle, lastWidth, allowRun;
-    s8 selection;
-    u8 instant, wrap;
-    u32 frame;
-    const u8 *pc, *streams[4];
-    int hasValue, length;
-    u8 text[64];
-    u8 pad78[4];
-    u8 numberText[12];
-    s32 numbers[16];
-    u32 choices[16];
-    u8 depth, styles[7];
-    const u8 *strings[16];
-    u32 selectedCount;
-    u8 selected[32];
-};
+#include "message_window.h"
+
 int Text_ComparePrefix(const u8 *, const u8 *, int);
-const u8 *TextState_ParseTagValue(struct TextVm *, const u8 *);
+const u8 *TextState_ParseTagValue(struct MessagePlaybackState *, const u8 *);
 int Text_ParseDecimal(const u8 *, int);
-void TextState_PushStream(struct TextVm *, int);
-void TextState_PlayGlyphSound(struct TextVm *, int);
-int TextState_DrawNarrowGlyph(struct TextVm *, int);
+void TextState_PushStream(struct MessagePlaybackState *, int);
+void TextState_PlayGlyphSound(struct MessagePlaybackState *, int);
+int TextState_DrawNarrowGlyph(struct MessagePlaybackState *, int);
 void Text_FormatDecimal(u8 *, int);
-void Sound_PlaySong(int);
 const u8 *Text_FindChar(const u8 *, u8);
 const u8 *PlayerName_GetBuffer(void);
 const u8 *GameState_GetBikeName(void);
 int TextState_GetPairSpeakerLabel(void);
 int TextState_GetPlayerSpeakerLabel(void);
-struct Sun {
-    u8 pad[0x12];
-    s16 level;
-};
-extern struct Sun *gGameState;
 extern const u8 gUnk_0824DC80[]; /* WEIGHT */
 extern const u8 gUnk_0824DC88[]; /* NONSEL */
 extern const u8 gUnk_0824DC90[]; /* UVMOJI */
@@ -92,7 +69,7 @@ extern const u8 gUnk_0824DE40[]; /* /UVMOJI */
 extern const u8 gUnk_0824DE48[]; /* /LABEL */
 extern const u8 gUnk_0824DE50[]; /* /PAREN */
 extern const u8 gUnk_0824DE58[]; /* /ALTER */
-const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
+const u8 *TextState_ProcessTag(struct MessagePlaybackState *p, const u8 *s)
 {
     const u8 *end = s;
     int value;
@@ -113,22 +90,22 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
     }
     if (!Text_ComparePrefix(s, gUnk_0824DC98, 4)) {
         end = TextState_ParseTagValue(p, s);
-        if (p->hasValue && p->length)
-            p->mode = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            p->characterDelay = Text_ParseDecimal(p->tag.value, p->tag.length);
         else {
-            int level = gGameState->level;
-            p->mode = level;
+            int delay = (s16)gGameState->unk12;
+            p->characterDelay = delay;
         }
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DCA0, 4)) {
         int value;
         end = TextState_ParseTagValue(p, s);
-        if (p->hasValue && p->length)
-            value = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            value = Text_ParseDecimal(p->tag.value, p->tag.length);
         else
             value = 0;
-        p->selected[p->selectedCount] = value;
+        p->selectedChoices[p->selectedCount] = value;
         p->selectedCount++;
         goto done;
     }
@@ -136,24 +113,24 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
         p->streams[0] = PlayerName_GetBuffer();
         TextState_PushStream(p, 1);
         end = Text_FindChar(s, '>');
-        p->advance = 1;
+        p->hold = 1;
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DCB0, 4)) {
         p->streams[3] = GameState_GetBikeName();
         TextState_PushStream(p, 4);
         end = Text_FindChar(s, '>');
-        p->advance = 1;
+        p->hold = 1;
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DCB8, 5)) {
         const u8 *name;
         end = TextState_ParseTagValue(p, s);
-        if (!p->hasValue)
+        if (!p->tag.hasValue)
             goto unknown;
-        if (!p->length)
+        if (!p->tag.length)
             goto unknown;
-        name = p->text;
+        name = p->tag.value;
         if (!Text_ComparePrefix(name, gUnk_0824DCC0, 4))
             goto unknown;
         value = Text_ComparePrefix(name, gUnk_0824DCC8, 8);
@@ -282,28 +259,23 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
     unknown:
         value = 255;
     selected: {
-        s8 *selection = &p->selection;
+        s8 *selection = &p->speaker;
         *selection = value;
     }
-        {
-            int zero = 0;
-            int one = 1;
-            p->busy = one;
-            one = p->mode;
-            p->previousMode = one;
-            p->mode = zero;
-        }
+        p->busy = 1;
+        p->defaultDelay = p->characterDelay;
+        p->characterDelay = 0;
         end = Text_FindChar(end, '>');
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDD4, 7)) {
-        p->selection = -1;
+        p->speaker = -1;
         goto findS;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDDC, 4)) {
         end = TextState_ParseTagValue(p, end);
-        if (p->hasValue && p->length)
-            value = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            value = Text_ParseDecimal(p->tag.value, p->tag.length);
         else
             value = 0;
         p->frame = value;
@@ -311,20 +283,20 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDE4, 6)) {
         end = TextState_ParseTagValue(p, end);
-        if (p->hasValue && p->length)
-            value = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            value = Text_ParseDecimal(p->tag.value, p->tag.length);
         else
             value = 0;
         p->streams[2] = p->strings[value];
         TextState_PushStream(p, 3);
         end = Text_FindChar(end, '>');
-        p->advance = 1;
+        p->hold = 1;
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DDEC, 5)) {
         end = TextState_ParseTagValue(p, end);
-        if (p->hasValue && p->length)
-            value = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            value = Text_ParseDecimal(p->tag.value, p->tag.length);
         else
             value = 221;
         Sound_PlaySong(value);
@@ -334,41 +306,41 @@ const u8 *TextState_ProcessTag(struct TextVm *p, const u8 *s)
         u8 *buffer;
         int number;
         end = TextState_ParseTagValue(p, end);
-        if (p->hasValue && p->length)
-            number = Text_ParseDecimal(p->text, p->length);
+        if (p->tag.hasValue && p->tag.length)
+            number = Text_ParseDecimal(p->tag.value, p->tag.length);
         else
             number = 0;
-        buffer = p->numberText;
+        buffer = p->tag.number;
         Text_FormatDecimal(buffer, p->numbers[number]);
         p->streams[1] = buffer;
         TextState_PushStream(p, 2);
         end = Text_FindChar(end, '>');
-        p->advance = 1;
+        p->hold = 1;
         goto done;
     }
     cmp = Text_ComparePrefix(s, gUnk_0824DDF8, 6);
     if (!cmp) {
         const u8 *name;
         end = TextState_ParseTagValue(p, end);
-        name = p->text;
+        name = p->tag.value;
         if (!Text_ComparePrefix(name, gUnk_0824DE00, 13)) {
-            p->voice = cmp;
+            p->spacing = cmp;
             goto done;
         }
         if (!Text_ComparePrefix(name, gUnk_0824DE10, 11))
-            p->voice = 1;
+            p->spacing = 1;
         else
-            p->voice = cmp;
+            p->spacing = cmp;
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DE1C, 3)) {
         p->streams[0] = PlayerName_GetBuffer();
         end = Text_FindChar(end, '>');
-        p->fresh = 1;
+        p->complete = 1;
         goto done;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DE20, 5)) {
-        if (p->brackets) {
+        if (p->unknown10) {
             TextState_PlayGlyphSound(p, 91);
             TextState_DrawNarrowGlyph(p, 59);
         }
@@ -396,11 +368,11 @@ close:
     }
     if (!Text_ComparePrefix(s, gUnk_0824DE48, 6)) {
         p->busy = 0;
-        p->mode = p->previousMode;
+        p->characterDelay = p->defaultDelay;
         goto findS;
     }
     if (!Text_ComparePrefix(s, gUnk_0824DE50, 5)) {
-        if (p->brackets) {
+        if (p->unknown10) {
             TextState_PlayGlyphSound(p, 93);
             TextState_DrawNarrowGlyph(p, 61);
         }
@@ -412,9 +384,9 @@ close:
 findS:
     end = Text_FindChar(s, '>');
 done:
-    if (!p->allowRun)
-        p->advance = 1;
-    if (p->advance)
+    if (!p->unknown14)
+        p->hold = 1;
+    if (p->hold)
         end++;
     s = end;
     return s;

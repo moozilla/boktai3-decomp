@@ -1,13 +1,7 @@
 #include "global.h"
 #include "game_state.h"
-struct S {
-    u8 f[0x868];
-    u32 fl;
-    u8 g[0xa];
-    s16 v;
-};
-extern u8 *gAreaEffectManager;
-s32 AreaEffect_FindContainingEntry(u8 *);
+#include "area_effect.h"
+s32 AreaEffect_FindContainingEntry(struct SceneVec *);
 s32 AreaEffect_ScaleResourceGain(s32);
 static inline u32 mk(u32 *a, u32 m)
 {
@@ -19,22 +13,22 @@ static inline u8 tst(u32 v)
         return TRUE;
     return FALSE;
 }
-s32 AreaEffect_ScaleGainAtPosition(u8 *a, s32 b)
+s32 AreaEffect_ScaleGainAtPosition(struct SceneVec *position, s32 amount)
 {
-    struct S *s = gGameState;
-    if (s->v == 0)
+    struct GameState *s = gGameState;
+    if (s->unk876 == 0)
         goto no;
     {
         u32 m = 2;
-        if (tst(mk(&s->fl, m)) != 0)
+        if (tst(mk(&s->flags868, m)) != 0)
             goto yes;
     }
-    if (AreaEffect_FindContainingEntry(a) >= 0)
+    if (AreaEffect_FindContainingEntry(position) >= 0)
         goto yes;
-    if (gAreaEffectManager[0x29] != 0)
+    if (gAreaEffectManager->override != 0)
         goto yes;
 no:
     return 0;
 yes:
-    return AreaEffect_ScaleResourceGain(b);
+    return AreaEffect_ScaleResourceGain(amount);
 }

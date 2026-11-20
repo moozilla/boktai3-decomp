@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#include "game_state.h"
+#include "game_state_flags.h"
 #include "player.h"
 #include "scene_object.h"
 #include "player_cue.h"
@@ -40,13 +40,6 @@ static inline u32 FlagSet(u32 v, u32 m)
     return v & m;
 }
 
-static inline u8 TerrainDamage_UsesAlternateReaction(void)
-{
-    u32 mask = 0x4000;
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
@@ -72,7 +65,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     else
         data = gTerrainMap->cells + (cell * 4 + 12);
     if (FlagSet(((struct SceneCell *)data)->flags, 0x40) && p->tetherStatusFlags == 0) {
-        if (TerrainDamage_UsesAlternateReaction())
+        if (GameState_TestWorldFlags(0x4000))
             Player_SetTetherMode(p, 0x22, 0);
         else
             Player_SetTetherMode(p, 0x21, 0);

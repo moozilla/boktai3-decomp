@@ -1,10 +1,11 @@
-#include "global.h"
+#include "sprite_trail.h"
+#include "spatial_index.h"
 
-void SingletonSlot7_OnEffectMotionComplete(u8 *p)
+void SingletonSlot7_OnEffectMotionComplete(void *owner, struct SpatialEntry *other)
 {
+    struct SpriteTrail *trail = owner;
     u8 one = 1;
-    u32 z = 0;
-    *(u8 *)(p + 1) = one;
-    *(u8 *)(p + 0) = one;
-    *(u32 *)(p + 0x84) = z;
+    trail->state = one;
+    trail->entered = one;
+    trail->frame = 0;
 }

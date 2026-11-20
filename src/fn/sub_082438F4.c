@@ -25,7 +25,6 @@ static inline s32 LocalPlayer(void)
 #define F(T, off) (*(T *)((u8 *)p + (off)))
 s32 Player_UpdateLinkCore(struct Player *p)
 {
-    u16 *clearPtr;
     Player_ResetActionState(p);
     if (p->kind == 1) {
         if (Player_ApplyTerrainDamage(p))
@@ -44,12 +43,8 @@ s32 Player_UpdateLinkCore(struct Player *p)
     if (p->slot == LocalPlayer()) {
         Player_SavePositionAndFacing(p);
     }
-    clearPtr = &p->lastContactFlags;
-    {
-        s32 zero = 0;
-        *clearPtr = zero;
-        p->lastContactRewardFlags = zero;
-    }
+    p->lastContactFlags = 0;
+    p->lastContactRewardFlags = 0;
     if (p->kind != 8) {
         F(u32, 0x298) = (u32)p + 0x30;
         sub_0821DE30(&F(u8, 0x294));

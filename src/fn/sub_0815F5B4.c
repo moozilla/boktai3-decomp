@@ -1,50 +1,29 @@
-#include "global.h"
+#include "target_registry.h"
 #include "scene_object.h"
 #include "contact_collider.h"
 #include "ram.h"
-struct MotionTarget {
-    union {
-        struct SceneBody *actor;
-        struct ContactCollider *collider;
-    } target;
-    u32 flags;
-    void (*onTarget)(void);
-    struct MotionTarget *next;
-};
-struct MotionTargets {
-    u8 task[0x18];
-    struct MotionTarget *first;
-};
 
 struct MotionTarget *TargetRegistry_FindById(u32 id)
 {
-    u32 requestedId = id;
     struct MotionTargets *registry = gSceneLinkList;
-    registry = (struct MotionTargets *)((u32)registry | ((u16)((u8)(u32)registry << 8) >> 16));
-    if (registry) {
-        struct MotionTarget *entry = registry->first;
-        /* An ID mismatch repeats the same entry, as in the original routine. */
-        if (entry) {
-            do {
-                u32 entryId;
-                u32 flags = entry->flags;
-                u32 sceneActor = flags & 0x10;
-                u32 disabled = flags & 1;
-                if (!sceneActor)
-                    goto actorId;
-                entryId = entry->target.collider->collisionId;
-                if ((s32)entryId < 0)
-                    requestedId = 0;
-            compareId:
-                if (entryId != requestedId)
-                    continue;
-                if (!disabled)
-                    return entry;
-                break;
-            actorId:
-                entryId = entry->target.actor->id;
-                goto compareId;
-            } while (entry);
+    struct MotionTarget *entry;
+
+    if (!registry)
+        return NULL;
+    entry = registry->first;
+    /* The original lookup repeats this entry when its ID differs. */
+    while (entry) {
+        u32 flags = entry->flags;
+        if (flags & MOTION_TARGET_COLLIDER) {
+            if (entry->target.collider->collisionId == id) {
+                if (flags & 1)
+                    return NULL;
+                return entry;
+            }
+        } else if (entry->target.actor->id == id) {
+            if (flags & 1)
+                return NULL;
+            return entry;
         }
     }
     return NULL;

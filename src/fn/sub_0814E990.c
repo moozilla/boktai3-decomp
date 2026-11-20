@@ -28,18 +28,11 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void SetChargeParameter(u8 *p)
-{
-    u16 *target = (u16 *)(p + 0xAD6);
-    u32 value = 0x16E;
-    *target = value;
-}
 void Player_OnChargedAttackExit(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 s32 Task4E01_GetKind7Value(s32);
 void Player_UpdateAttachedEntryPosition(void *);
 // confidence=low: attached task charge values choose tiers before recoil and buffered restart.
-#define Player_UpdateAttachedChargeTiers sub_0814E990
 void Player_UpdateAttachedChargeTiers(u8 *p)
 {
     struct ContactPackedVector origin;
@@ -47,10 +40,8 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
     u16 *t;
     u16 *r;
     if (Player_ConsumeStateEntry(p)) {
-        u16 *first = (u16 *)(p + 0xC0A);
-        s32 zero = 0;
-        *first = zero;
-        *(s32 *)(p + 0xC74) = --zero;
+        ((struct Player *)p)->statModifierContext.contactTimer = 0;
+        ((struct Player *)p)->statModifierContext.attachedEntry = -1;
         Player_SetPendingCallback(p, Player_OnChargedAttackExit);
     }
     switch (BYTE(0x458)) {
@@ -95,7 +86,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
             ANIMATE(0x24);
             if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 1) {
                 HALF(0x4D2) = 30;
-                SetChargeParameter(p);
+                ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;
                 Player_SetActionPhase(p, 3);
             }
@@ -108,7 +99,7 @@ void Player_UpdateAttachedChargeTiers(u8 *p)
             ANIMATE(0x24);
             if (Task4E01_GetKind7Value(*(s32 *)(p + 0xC74)) > 2) {
                 HALF(0x4D2) = 60;
-                SetChargeParameter(p);
+                ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F9);
                 Player_SetActionPhase(p, 4);

@@ -260,10 +260,9 @@ void PauseMenu_InitConfigChoice(struct SceneHudState *menu)
 
 void Hud_InitConfigMenu(struct SceneHudState *menu)
 {
-    u32 two;
-    u32 *firstLabel;
-    u32 *secondLabel;
-    u32 *thirdLabel;
+    s32 *firstLabel;
+    s32 *secondLabel;
+    s32 *thirdLabel;
     u32 first;
     PauseMenu_CloseTextWindows(menu);
     MessageWindow_Clear();
@@ -276,22 +275,21 @@ void Hud_InitConfigMenu(struct SceneHudState *menu)
     PauseMenu_HideAllSprites(menu);
     PauseMenu_LoadSpriteKeyframe(menu, 0, 0x58);
     PauseMenu_InitConfigChoice(menu);
-    firstLabel = (u32 *)&menu->settingsWindows[0][0];
+    firstLabel = &menu->settingsWindows[0][0];
     TextWindow_SetScript(*firstLabel, menu->optionUpperEScript);
     TextWindow_Refresh(*firstLabel, 0x19);
     first = *firstLabel;
-    two = 2;
-    TextWindow_SetBounds(first, 2, 3, 10, two);
+    TextWindow_SetBounds(first, 2, 3, 10, 2);
     TextWindow_StartPlayback(*firstLabel);
-    secondLabel = (u32 *)&menu->settingsWindows[1][0];
+    secondLabel = &menu->settingsWindows[1][0];
     TextWindow_SetScript(*secondLabel, menu->optionUpperEScript);
     TextWindow_Refresh(*secondLabel, 0x1A);
-    TextWindow_SetBounds(*secondLabel, 2, 5, 0x15, two);
+    TextWindow_SetBounds(*secondLabel, 2, 5, 0x15, 2);
     TextWindow_StartPlayback(*secondLabel);
-    thirdLabel = (u32 *)&menu->settingsWindows[2][0];
+    thirdLabel = &menu->settingsWindows[2][0];
     TextWindow_SetScript(*thirdLabel, menu->optionUpperEScript);
     TextWindow_Refresh(*thirdLabel, 0x1B);
-    TextWindow_SetBounds(*thirdLabel, 2, 7, 11, two);
+    TextWindow_SetBounds(*thirdLabel, 2, 7, 11, 2);
     TextWindow_StartPlayback(*thirdLabel);
     MenuSelection_RefreshAllOptionText(menu);
     MessageWindow_SetMessageTable(menu->optionUpperEScript);

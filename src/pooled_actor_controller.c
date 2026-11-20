@@ -406,15 +406,10 @@ static inline void ActorController_InitBodyCollider(struct PooledActor *actor,
 int Actor_InitializeControllerFromScript(struct PooledActor *actor)
 {
     struct SceneVec size, offset, size2, offset2;
-    int zero;
     Actor_InitControllerFromScript(actor);
     DisplayAnimation_InitializeSequence(&actor->drawable, 0xd495, 0xaf44, 0,
                                         (const struct DisplayPosition *)&actor->body.position);
-    {
-        int initialZero = 0;
-        zero = initialZero;
-        Actor_SetFacingAnimationEntry(actor, 1, initialZero, 1, initialZero, initialZero);
-    }
+    Actor_SetFacingAnimationEntry(actor, 1, 0, 1, 0, 0);
     {
         u32 mask = 2;
         actor->flags |= mask;
@@ -435,10 +430,10 @@ int Actor_InitializeControllerFromScript(struct PooledActor *actor)
     ActorController_InitBodyCollider(actor, &size2, Actor_OnHitboxContact, &offset2);
     ActorController_SetSelectionCallback(actor, Actor_TryStartPendingAction);
     ActorController_SetDamageCallback(actor, Actor_OnDamage);
-    actor->state = zero;
+    actor->state = 0;
     actor->stateChanged = 1;
-    actor->stateTicks = zero;
-    ActorController_SetAction(actor, Actor_OnTrackingAction, zero, 1);
+    actor->stateTicks = 0;
+    ActorController_SetAction(actor, Actor_OnTrackingAction, 0, 1);
     return 0;
 }
 

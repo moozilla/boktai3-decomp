@@ -1,23 +1,19 @@
-#include "scene_object_slot.h"
-void SceneObject_UpdateActiveIdle(void);
+#include "scene_object_controller.h"
+
 void SceneObject_AnimateActive(struct SceneObjSlot *s)
 {
     if ((*(u32 *)&s->dir & 0xffff00) == 0) {
         Sound_PlaySongChecked(0xce);
-        s->block->w6 &= ~3;
+        s->terrain->cell.flags &= ~3;
 
-        s->block->w6 |= 2;
-        s->block->b4 = (s->block->b4 & 0xf0) | s->b3b;
+        s->terrain->cell.flags |= 2;
+        s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | s->cellHeight;
     }
-    if (++s->b3a > 7) {
-        s->b39++;
-        s->b3a = 0;
-        if (s->b39 > 1) {
-            {
-                int one = 1;
-                s->variant = one;
-            }
-            s->callback = SceneObject_UpdateActiveIdle;
+    if (++s->poseFrame > 7) {
+        s->pose++;
+        s->poseFrame = 0;
+        if (s->pose > 1) {
+            SceneObjSlot_EnterIdle(s, SCENE_OBJ_ACTIVE);
         }
     }
 }

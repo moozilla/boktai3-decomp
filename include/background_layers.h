@@ -13,12 +13,12 @@ struct BgTileResource {
 };
 struct BgMapResource {
     u8 signature[2];
-    u16 unknown02, unknown04, count, unknown08, tileCount;
+    u16 unknown02, mapCount, count, unknown08, tileCount;
     u32 maps, tiles, extra;
 };
 struct BgMapEntry {
     u16 width, height;
-    u32 unknown04, data;
+    u32 nameHash, data;
 };
 struct BgLayerResource {
     u32 unknown00[3];

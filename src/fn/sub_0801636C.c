@@ -1,30 +1,28 @@
-#include "global.h"
+#include "fading_particle_group.h"
+#include "task_manager.h"
 #include "ram.h"
-void Effect_Remove(u8 *);
-u32 FadingParticleManager_Destroy(u8 *p)
+void Effect_Remove(void *);
+u32 FadingParticleManager_Destroy(struct FadingParticleManager *manager)
 {
     s32 i = 0;
     do {
-        u8 *e = p + 0x24 + i * 0x224;
-        u32 t = e[0];
+        struct FadingParticleGroup *group = &manager->groups[i];
+        u32 t = group->active;
         s32 next = i + 1;
         if (t != 0) {
             s32 j = 0;
-            u8 *q;
-            if (j < e[1]) {
-                q = e + 0x10;
+            struct SpriteDrawable *sprite;
+            if (j < group->count) {
+                sprite = &group->particles[0].motion.sprite;
                 do {
-                    Effect_Remove(q);
-                    q += 0x44;
+                    Effect_Remove(sprite);
+                    sprite = (void *)((u8 *)sprite + sizeof(struct FadingParticle));
                     j++;
-                } while (j < e[1]);
+                } while (j < group->count);
             }
         }
         i = next;
     } while (i <= 5);
-    {
-        u32 z = 0;
-        gFadingParticleManager = z;
-    }
+    Task_SetManager(NULL, &gFadingParticleManager);
     return 0;
 }

@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_chase.h"
 #include "scene_actor_straight_route.h"
@@ -69,11 +70,7 @@ void SceneActorReaction_UpdateRouteRecovery(struct ChaseActor *actor)
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
         SetState(actor, 3, 1, 0);
         SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-        {
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = 0x10;
-            *flags |= mask;
-        }
+        SceneActorBehavior_SetWordFlags(&actor->base.behaviorFlags, 0x10);
         {
             struct ContactPosition *p = &target;
             struct SceneActorChaseRoutePoint *route = group->homeRoute.point;

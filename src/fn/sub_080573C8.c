@@ -1,17 +1,10 @@
 #include "level_advance_display.h"
 s32 LevelAdvanceDisplay_DestroyManager(struct LevelAdvanceManager *manager)
 {
-    struct LevelAdvanceParticle *particle;
     s32 i;
     Sprite_Remove(&manager->sprite);
-    particle = manager->particles;
-    for (i = 7; i >= 0; i--) {
-        Effect_Remove(&particle->sprite);
-        particle++;
-    }
-    {
-        u32 zero = 0;
-        gLevelAdvanceManager = (void *)zero;
-    }
+    for (i = 0; i < 8; i++)
+        Effect_Remove(&manager->particles[i].sprite);
+    gLevelAdvanceManager = 0;
     return 0;
 }

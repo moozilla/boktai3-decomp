@@ -1,8 +1,8 @@
+#include "player.h"
 #include "global.h"
 #include "engine.h"
 
 // confidence=low: timed animation and screen-transition sequence; gameplay trigger is unknown.
-#define Player_UpdateTimedScreenTransition sub_081462DC
 #define B(n)                               (*(u8 *)(p + (n)))
 #define H(n)                               (*(u16 *)(p + (n)))
 void Player_AddControlFlags(void *, u32);
@@ -17,16 +17,13 @@ void Player_UpdateTimedScreenTransition(u8 *p)
     Player_AddControlFlags(p, 4);
     switch (B(0x458)) {
         case 0: {
-            u32 zero;
-            u8 *flag;
-            Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 41), 64, 1);
+            struct Player *player = (struct Player *)p;
+            Player_SetAnimation(p, ActorVariant_GetTableValue(player->actionMode, 41), 64, 1);
             Sound_PlaySong(0x1AD);
-            flag = p + 0x153;
-            zero = 0;
-            *flag = 1;
+            player->secondaryPriority = 1;
             Player_SetActionPhase(p, 1);
-            H(0x4E8) = zero;
-            *(u32 *)(p + 0x40) = zero;
+            player->terrainRecoveryCounter = 0;
+            player->followTarget = NULL;
             break;
         }
         case 1:

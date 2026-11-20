@@ -1,14 +1,14 @@
 #include "directional_force.h"
-void DirectionalForce_ConfigureRandom(u32 a, u32 b, u32 c, u32 d)
+void DirectionalForce_ConfigureRandom(u32 baseMagnitude, u32 magnitudeRange, u32 baseDelay,
+                                      u32 delayRange)
 {
-    struct DirectionalForce *p = gDirectionalForce;
-    if (p) {
-        u32 z = 0;
-        p->mode = 1;
-        p->baseMagnitude = a;
-        p->magnitudeRange = b;
-        p->baseDelay = c;
-        p->delayRange = d;
-        p->delay = z;
+    struct DirectionalForce *force = gDirectionalForce;
+    if (force) {
+        force->mode = 1;
+        force->baseMagnitude = baseMagnitude;
+        force->magnitudeRange = magnitudeRange;
+        force->baseDelay = baseDelay;
+        force->delayRange = delayRange;
+        force->delay = 0;
     }
 }

@@ -9,8 +9,12 @@
 struct Axe {
     struct ChaseActor chase;
     u8 unknown624[0x264];
-    struct ContactPosition position;
-    u8 unknown890[0x1A8];
+    struct ContactPosition position; /* Legacy name for the start of the black effect palette. */
+    u8 unknown890[0x78];
+    u16 originalEffectPalette[16];
+    struct ContactCollider auxiliaryAttack[3];
+    struct ContactPosition trailPosition, trailVelocity;
+    u8 trailAngle, trailHeading, trailSpinRate, unknownA37;
     struct DisplaySequenceSprite auxiliarySprite;
     struct SpriteRenderResource auxiliaryGraphics;
     struct DisplaySequenceState auxiliarySequence;
@@ -25,7 +29,7 @@ struct Axe {
     s8 direction;
     u8 heading;
     u8 shadowActive;
-    u8 unknownCA8;
+    u8 trailStartAngle;
     u8 angle;
     u8 unknownCAA;
     u8 flagsCAB;
@@ -33,7 +37,8 @@ struct Axe {
     u8 unknownCEC[0x152];
     u8 delay;
     u8 turnStep;
-    u8 unknownE40[8];
+    u8 relocationDelay;
+    u8 unknownE41[7];
     s32 healthThreshold;
     u32 flagsE4C;
     u8 unknownE50[6];
@@ -50,7 +55,8 @@ struct Axe {
     u16 fieldEC2;
     u8 unknownEC4[0xC];
     u8 active;
-    u8 unknownED1[2];
+    u8 lungeQueued;
+    u8 sparkStep;
     u8 savedAngle;
     u8 unknownED4[3];
     u8 variant;

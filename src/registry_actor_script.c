@@ -5,7 +5,6 @@ void RegistryA8CB_CreateFromScript(void)
     RegistryActorManager *manager = gActorManager;
     struct RegistryActor *actor;
     void *animation;
-    u16 active;
     if (!manager) {
         manager = RegistryA8CB_EnsureManager();
         if (!manager)
@@ -19,25 +18,15 @@ void RegistryA8CB_CreateFromScript(void)
     ActorScript_ParseParams(actor);
     animation = &actor->model;
     ActorSprite_InitPartDrawings(actor, animation, 0x3D99);
-    CharacterPreview_InitializePalette(&actor->stats.pendingDamage, animation, actor->stats.state48[3]);
+    CharacterPreview_InitializePalette(&actor->stats.pendingDamage, animation,
+                                       actor->stats.state48[3]);
     SceneSlot_RegisterObject(&actor->stats.position);
     ActorCollision_InitBounds(actor);
-    {
-        void (*update)(struct RegistryActor *) = ActorPhysics_UpdateFallMotion;
-        u8 *resetKeys = &actor->resetKeys;
-        u32 zero = 0;
-        active = 1;
-        *resetKeys = active;
-        actor->control.update = update;
-        actor->fallTimer = zero;
-    }
+    RegistryActor_StartMotion(actor, ActorPhysics_UpdateFallMotion);
     RegistryA8CB_RegisterMessageReceiver(actor);
-    {
-        struct RegistryActorMotion *motion = &actor->control.motion;
-        motion->flags = active | motion->flags;
-    }
+    RegistryActor_SetMotionFlags(REGISTRY_ACTOR_MOTION_COMMANDS, &actor->control.motion);
     Modifier_InitDrainState(&actor->stats.drain, &actor->model.view.parts[0].x, 0, 0);
-    actor->control.active = active;
+    actor->control.active = 1;
 }
 
 void RegistryA8CB_ResetFromScript(void)
@@ -53,8 +42,7 @@ void RegistryA8CB_ResetFromScript(void)
             Anim_Remove(part);
         SpatialIndex_RemoveEntry(entry->stats.contactHeader);
         {
-            u32 mask = 0x800;
-            if (!((gEngineFlags | gScenePauseFlags) & mask))
+            if (!RegistryActor_MessagePauseBits(REGISTRY_ACTOR_MESSAGES_PAUSED))
                 SceneMessages_UnregisterReceiver(actor->control.messages);
         }
     }

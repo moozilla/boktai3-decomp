@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 #include "engine_globals.h"
 // confidence=low: motion ten toggles actionMode between zero and one and refreshes equipment.
 extern u32 gUnk_02000560;
@@ -54,10 +54,7 @@ void Player_UpdateFormChangeCue(struct Player *p)
     p->statusValue = 4000;
     if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
-    {
-        u32 mask = 0x100000;
-        p->statusFlags = mask | p->statusFlags;
-    }
+    Player_AddStatusFlags(p, 0x100000);
     switch (p->tetherPhase) {
         case 0: {
             struct SceneVec v;

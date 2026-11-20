@@ -28,20 +28,16 @@ void Player_UpdateInteractionHoverDisplay(struct Player *p)
     Obj_StepPosition(&p->positionalEffectGroup);
     Actor_EmitTowardNearbyActors(&p->positionalEffectGroup);
     if (p->tetherMode <= 1) {
-        u8 *timer = (u8 *)p + 0x468;
+        u8 *timer = &p->colliderHeightRetargetTimer;
         if (!*timer) {
-            s32 value = hoverTarget();
-            u32 offset = 0x467;
-            u8 *target;
-            target = (u8 *)p + offset;
-            *target = value;
+            p->colliderHeightTarget = hoverTarget();
             *timer = 16;
         } else
             --*timer;
         {
-            u8 *height = (u8 *)p + 0x466;
+            u8 *height = &p->colliderHeightOffset;
             u32 current = *height;
-            u32 target = *((u8 *)p + 0x467);
+            u32 target = p->colliderHeightTarget;
             if ((s32)current <= (s32)target - 4)
                 *height = current + 4;
             else if ((s32)current >= (s32)target + 8)
@@ -50,7 +46,8 @@ void Player_UpdateInteractionHoverDisplay(struct Player *p)
                 *height = target;
         }
     }
-    p->colliderPosition.y = (u16)p->position.y + *((u8 *)p + 0x466) + p->terrainRecoveryCounter;
+    p->colliderPosition.y =
+        (u16)p->position.y + p->colliderHeightOffset + p->terrainRecoveryCounter;
     if (Player_GetControlFlags(p, 8))
         p->collider.flags |= 4;
     else {

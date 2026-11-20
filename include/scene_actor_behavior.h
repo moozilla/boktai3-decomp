@@ -27,4 +27,30 @@ struct SceneActorBehaviorDestination {
     u8 unknown14[8];
     struct ContactPosition destination;
 };
+
+static inline u32 SceneActorBehavior_GlobalPauseBits(u32 mask)
+{
+    return (gEngineFlags | gScenePauseFlags) & mask;
+}
+
+static inline u32 SceneActorBehavior_OverrideBits(u32 mask, const u32 *flags)
+{
+    return *flags & mask;
+}
+
+static inline u32 SceneActorBehavior_MotionBits(u32 mask, struct ChaseActor *actor)
+{
+    return actor->base.motionFlags & mask;
+}
+
+static inline void SceneActorBehavior_WriteSelector(u8 value, u8 *selector)
+{
+    *selector = value;
+}
+
+static inline void SceneActorBehavior_SetWordFlags(u32 *field, u32 bits)
+{
+    *field |= bits;
+}
+
 #endif

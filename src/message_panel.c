@@ -2,6 +2,8 @@
 #include "input.h"
 #include "runtime.h"
 #include "palette_resource.h"
+#include "gba/syscall.h"
+#include "script_utility.h"
 
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, u32 *);
 
@@ -30,11 +32,6 @@ void Solar_ResumeMeasurement(void);
 
 u32 Script_GetTextSourcePc(void);
 
-struct MessagePanelScriptArgs {
-    u32 count : 16, reserved : 16;
-    s32 *values;
-};
-
 static inline u8 MessagePanel_IsBlocking(struct MessagePanel *panel)
 {
     if (panel->flags & 1)
@@ -44,16 +41,16 @@ static inline u8 MessagePanel_IsBlocking(struct MessagePanel *panel)
 
 void MessagePanel_LoadBackground(struct MessagePanel *panel)
 {
-    u32 value;
+    u32 maps[1];
     void *resource;
     void *palette;
     resource = ScriptProc_Start(0xC091, 0xA597);
     panel->backgroundResource = resource;
-    value = 3;
-    Bg_SetupLayers(2, 0, resource, 0, 0, 1, &value);
+    maps[0] = 3;
+    Bg_SetupLayers(2, 0, resource, 0, 0, 1, maps);
     palette = ((struct PaletteResource *)ScriptProc_Start(0x92B3, 0x81B))->banks;
     panel->backgroundPalette = palette;
-    CpuSet(palette, gBgPaletteBuffer, 0x100);
+    CpuCopy16(palette, gBgPaletteBuffer, 0x200);
 }
 
 void MessagePanel_CreateTextWindow(struct MessagePanel *panel)
@@ -93,26 +90,14 @@ void MessagePanel_ShowOutcome(struct MessagePanel *panel, u32 unused, s32 succes
         TextWindow_SetScript(panel->window, panel->script);
         TextWindow_Refresh(panel->window, 2);
         TextWindow_StartPlayback(panel->window);
-        {
-            void (*callback)(struct MessagePanel *) = MessagePanel_DelayDismiss;
-            u32 state = 2;
-            panel->state = callback;
-            panel->entering = 1;
-            panel->mode = state;
-        }
+        MessagePanel_SetState(panel, MessagePanel_DelayDismiss, 2);
         Sound_PlaySong(0xde);
     } else {
         TextWindow_Clear(panel->window);
         TextWindow_SetScript(panel->window, panel->closeScript);
         TextWindow_Refresh(panel->window, 3);
         TextWindow_StartPlayback(panel->window);
-        {
-            void (*callback)(struct MessagePanel *) = MessagePanel_DelayDismiss;
-            u32 state = 2;
-            panel->state = callback;
-            panel->entering = 1;
-            panel->mode = state;
-        }
+        MessagePanel_SetState(panel, MessagePanel_DelayDismiss, 2);
         Sound_PlaySong(0x192);
     }
 }
@@ -121,7 +106,7 @@ void MessagePanel_RunOutcomeScript(struct MessagePanel *panel, u32 context, u32 
                                    u32 result)
 {
     s32 value;
-    struct MessagePanelScriptArgs args;
+    struct ScriptUtilityArguments args;
     if (result == 0) {
         MessagePanel_ShowOutcome(panel, context, 0, 0);
     } else {
@@ -133,13 +118,7 @@ void MessagePanel_RunOutcomeScript(struct MessagePanel *panel, u32 context, u32 
             args.count = 1;
             args.values = &value;
             Script_Call(panel->outcomeScript, &args);
-            {
-                void (*callback)(struct MessagePanel *) = MessagePanel_ShowNotice;
-                u32 state = 5;
-                panel->state = callback;
-                panel->entering = 1;
-                panel->mode = state;
-            }
+            MessagePanel_SetState(panel, MessagePanel_ShowNotice, 5);
         }
     }
 }
@@ -169,11 +148,7 @@ void MessagePanel_ShowNotice(struct MessagePanel *panel)
         panel->entering = 0;
     }
     if (panel->timer > 120) {
-        void (*update)(struct MessagePanel *) = MessagePanel_ShowFollowup;
-        u32 state = 6;
-        panel->state = update;
-        panel->entering = 1;
-        panel->mode = state;
+        MessagePanel_SetState(panel, MessagePanel_ShowFollowup, 6);
     }
     panel->timer++;
 }
@@ -190,17 +165,9 @@ void MessagePanel_ShowFollowup(struct MessagePanel *panel)
     }
     if (panel->timer == 120) {
         if (!Save_CopySelectedStateToAlternateSlot()) {
-            void (*update)(struct MessagePanel *) = MessagePanel_WaitForInput;
-            u32 state = 8;
-            panel->state = update;
-            panel->entering = 1;
-            panel->mode = state;
+            MessagePanel_SetState(panel, MessagePanel_WaitForInput, 8);
         } else {
-            void (*update)(struct MessagePanel *) = MessagePanel_SelectNextState;
-            u32 state = 9;
-            panel->state = update;
-            panel->entering = 1;
-            panel->mode = state;
+            MessagePanel_SetState(panel, MessagePanel_SelectNextState, 9);
         }
     } else {
         panel->timer++;
@@ -210,17 +177,9 @@ void MessagePanel_ShowFollowup(struct MessagePanel *panel)
 void MessagePanel_SelectNextState(struct MessagePanel *panel)
 {
     if (Save_ToggleSelectedSlot()) {
-        void (*update)(struct MessagePanel *) = MessagePanel_WaitForDismiss;
-        u32 state = 7;
-        panel->state = update;
-        panel->entering = 1;
-        panel->mode = state;
+        MessagePanel_SetState(panel, MessagePanel_WaitForDismiss, 7);
     } else {
-        void (*update)(struct MessagePanel *) = MessagePanel_WaitForInput;
-        u32 state = 8;
-        panel->state = update;
-        panel->entering = 1;
-        panel->mode = state;
+        MessagePanel_SetState(panel, MessagePanel_WaitForInput, 8);
     }
 }
 
@@ -234,11 +193,7 @@ void MessagePanel_WaitForDismiss(struct MessagePanel *panel)
         panel->entering = 0;
     }
     if (panel->timer == 120) {
-        void (*next)(struct MessagePanel *) = MessagePanel_BeginDismiss;
-        u32 mode = 3;
-        panel->state = next;
-        panel->entering = 1;
-        panel->mode = mode;
+        MessagePanel_SetState(panel, MessagePanel_BeginDismiss, 3);
     } else {
         panel->timer++;
     }
@@ -275,11 +230,7 @@ void MessagePanel_BeginDismiss(struct MessagePanel *panel)
         panel->entering = 0;
     }
     if (panel->timer == 60) {
-        void (*next)(struct MessagePanel *) = MessagePanel_OnExitState;
-        u32 mode = 4;
-        panel->state = next;
-        panel->entering = 1;
-        panel->mode = mode;
+        MessagePanel_SetState(panel, MessagePanel_OnExitState, 4);
     } else
         panel->timer++;
 }
@@ -291,11 +242,7 @@ void MessagePanel_DelayDismiss(struct MessagePanel *panel)
         panel->entering = 0;
     }
     if (panel->timer == 120) {
-        void (*next)(struct MessagePanel *) = MessagePanel_BeginDismiss;
-        u32 mode = 3;
-        panel->state = next;
-        panel->entering = 1;
-        panel->mode = mode;
+        MessagePanel_SetState(panel, MessagePanel_BeginDismiss, 3);
     } else {
         panel->timer++;
     }
@@ -349,15 +296,9 @@ s32 MessagePanel_InitFromScript(struct MessagePanel *panel)
     panel->outcomeScript = Script_GetKeywordValue('i', 0);
     MessagePanel_LoadBackground(panel);
     MessagePanel_CreateTextWindow(panel);
-    {
-        void (*state)(struct MessagePanel *) = MessagePanel_ResetDisplay;
-        u32 zero = 0;
-        panel->state = state;
-        panel->entering = 1;
-        panel->mode = zero;
-        if (Script_GetKeywordValue('f', 0))
-            ScreenTransition_SendCommand(2, 4, 4, 4, 4, 0xFFFF, zero);
-    }
+    MessagePanel_SetState(panel, MessagePanel_ResetDisplay, 0);
+    if (Script_GetKeywordValue('f', 0))
+        ScreenTransition_SendCommand(2, 4, 4, 4, 4, 0xFFFF, 0);
     panel->flags |= 1;
     return 1;
 }

@@ -1,3 +1,4 @@
+#include "scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -97,21 +98,7 @@ static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s
 }
 static inline void Scale(struct ChaseActor *actor)
 {
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
     else
@@ -130,10 +117,9 @@ void TentacleBody_ApproachWaypoint(struct ChaseActor *actor)
         *flag = one;
         *(u16 *)(body + 0x8D8) = zero;
         {
-            u32 zero2 = 0;
             void *cb = *(void **)((u8 *)actor + 0x228);
             actor->base.field2B2 = one;
-            actor->base.stepDone = zero2;
+            actor->base.stepDone = 0;
             actor->base.controlKind = one;
             actor->base.target = cb;
             actor->base.field2C8 = zero;

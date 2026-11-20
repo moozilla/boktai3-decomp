@@ -17,12 +17,6 @@ struct SceneRigParentView {
     u16 warningSounds[4];
 };
 
-struct SceneRigContact {
-    u8 unknown0[0x34];
-    u32 typeFlags, reactionFlags;
-    u16 power, unknown3E;
-    u8 unknown40[2], direction;
-};
 u32 ScenePanelRig_IsSubjectState(struct ScenePanelRig *, u32, u32);
 void ScenePanelRig_SetSubjectState(struct ScenePanelRig *, u32, u32);
 void ScenePanelRig_RequestSubject(struct ScenePanelRig *, u32, u32);

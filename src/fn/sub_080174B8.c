@@ -1,9 +1,8 @@
-#include "global.h"
+#include "weather_state.h"
 
-void Weather_EnterPhase(u8 *p, u32 v)
+void Weather_EnterPhase(struct WeatherState *weather, u32 phase)
 {
-    u32 z = 0;
-    p[0x1D] = v;
-    *(u32 *)(p + 0x18) = z;
-    p[0x1C] = 1;
+    weather->phase = phase;
+    weather->phaseTimer = 0;
+    weather->entered = 1;
 }

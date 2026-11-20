@@ -1,6 +1,5 @@
 #include "global.h"
-#include "player.h"
-#include "engine.h"
+#include "player_core.h"
 // confidence=low: charge motion pose with a countdown that shrinks the attachment descriptor.
 void Sound_PlaySong(u32);
 void *ActorAttachment_UpdateFromDescriptor(void *, void *, int, int, int, int, int, int);
@@ -12,13 +11,7 @@ void Player_StopActionSounds(struct Player *);
 void Player_SetPendingCallback(struct Player *, void (*)(void));
 void ActorSequence_Begin(void *, s32, s32);
 void Player_OnChargeMotionExit(void);
-static inline void SetReset(struct Player *p)
-{
-    u16 v = 90;
-    u16 *dst = &p->positionResetValue;
-    *dst = v;
-}
-void sub_08144D64(struct Player *p)
+void Player_UpdateChargeMotion(struct Player *p)
 {
     if (Player_ConsumeStateEntry(p)) {
         Player_StopActionSounds(p);
@@ -31,7 +24,7 @@ void sub_08144D64(struct Player *p)
         }
     }
     if (p->positionResetCounter == 1 && p->positionResetState == 1 && !(gEngineFlags & 0x1000))
-        SetReset(p);
+        Player_SetPositionResetDuration(p, 90);
     switch (p->tetherPhase) {
         case 0:
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x31), 0x40, 1)) {
@@ -55,7 +48,7 @@ void sub_08144D64(struct Player *p)
                     p->kindTwoAttachment, &p->positionalEffectGroup, p->kindTwoAttachmentDescriptor,
                     0x7F, 0, 0, 0, 0);
                 if (p->positionResetCounter == 1 && !(gEngineFlags & 0x1000))
-                    SetReset(p);
+                    Player_SetPositionResetDuration(p, 90);
                 p->positionResetState = 0;
                 p->positionResetCounter = 0;
             }

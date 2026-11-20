@@ -14,15 +14,11 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
     u32 *enabledBase;
     u32 *frameBase;
     u32 *attributeBase;
-    u32 *attributeOut, *frameOut, *enabledOut;
     enabledBase = enabled;
     frameBase = frames;
     attributeBase = attributes;
     targetBase = targets;
-    attributeOut = attributeBase;
-    frameOut = frameBase;
-    enabledOut = enabledBase;
-    for (; i < 2; frameOut++, enabledOut++, i++) {
+    for (; i < 2; i++) {
         u32 slot;
         s32 id, assigned;
         if (i == 0)
@@ -36,20 +32,18 @@ void SceneInventory_BeginConsumableSwapPair(struct SceneInventoryActionView *pan
         {
             u32 address = slot;
             struct GameState *game = gGameState;
-            do {
-                address <<= 1;
-            } while (0);
+            address <<= 1;
             address += (u32)game;
             id = ((struct SceneInventoryOwnedConsumables *)address)->id;
         }
         if (id >= 0) {
-            *enabledOut = 1;
-            *frameOut = id + 0x121;
+            enabled[i] = 1;
+            frames[i] = id + 0x121;
         } else {
-            *enabledOut = 0;
-            *frameOut = 0x121;
+            enabled[i] = 0;
+            frames[i] = 0x121;
         }
-        *attributeOut++ = 0x373;
+        attributes[i] = 0x373;
         SceneInput_GetGridPosition(&starts[i], slot);
     }
     for (i = 0; i < 2; i++)

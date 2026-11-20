@@ -21,20 +21,6 @@ struct Slime {
     u16 splitScript, splitParameter, waitTimer, flags;
 };
 
-struct SlimeDrawable {
-    u32 flags;
-    u8 unknown4[4];
-    u8 scaleX;
-    s8 scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    const void *resource;
-};
 struct SlimeHalfFlags {
     s16 bits : 16;
 };
@@ -73,8 +59,8 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor);
 void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed);
 void Slime_UpdateLaunch(struct ChaseActor *actor);
 void Slime_UpdateStill(struct ChaseActor *actor);
-void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame);
-void Bat_UpdateActionScript(struct ChaseActor *obj);
+void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame);
+void Slime_UpdateActionScript(struct ChaseActor *obj);
 void Slime_SetSecondaryStateTable(struct ChaseActor *actor);
 void Slime_ApproachSavedTarget(struct ChaseActor *actor);
 void Slime_RestoreSavedTarget(struct ChaseActor *actor);
@@ -89,7 +75,7 @@ void Slime_SelectWanderTarget(struct ChaseActor *actor, u32 direction);
 u32 Slime_TryEnrage(struct ChaseActor *actor);
 void Slime_FollowPlayer(struct ChaseActor *actor);
 void Slime_OnInterrupt(struct ChaseActor *actor);
-void Bat_ReadScriptValuePair(struct ChaseActor *actor);
+void Slime_ReadSplitScript(struct ChaseActor *actor);
 void Slime_RunPendingActionScript(struct ChaseActor *actor);
 u32 Slime_GetRandomVariantFlags(struct ChaseActor *actor);
 void Slime_EmitDeathDebris(struct ChaseActor *actor);

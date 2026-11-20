@@ -1,11 +1,10 @@
-#include "global.h"
-u32 Script_GetKeywordValue(u32, s32);
+#include "engine.h"
+
 void sub_0811D600(u32, u32);
 void GameState_RecordChallengeRankFromScript(void)
 {
-    s32 m = -1;
-    u32 a = Script_GetKeywordValue(0x63, m);
-    u32 b = Script_GetKeywordValue(0x72, m);
-    if (a <= 11 && b <= 4)
-        sub_0811D600(a, b);
+    u32 challenge = Script_GetKeywordValue('c', -1);
+    u32 rank = Script_GetKeywordValue('r', -1);
+    if (challenge <= 11 && rank <= 4)
+        sub_0811D600(challenge, rank);
 }

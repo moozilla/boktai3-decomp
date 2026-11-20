@@ -1,35 +1,27 @@
-#include "global.h"
-struct Z {
-    u32 x, y;
-};
-struct C {
-    u32 w[8];
-};
-struct C *ScriptProc_Start(u32, u32);
-void ResourceHeader_Relocate(u8 *, struct C *);
-void Widget_InitLinked(u8 *, u8 *, u32, u32, u32, u32, u32, struct Z *);
-void ResourceStation_InitializeDigits(u8 *p)
+#include "resource_station.h"
+#include "scene_input.h"
+void ResourceStation_InitializeDigits(struct ResourceStation *station)
 {
-    struct Z z;
-    struct C *r = ScriptProc_Start(0xCB05, 0x530D);
-    if (r != 0) {
-        u8 *a, *b;
-        s32 j;
-        *(struct C *)(p + 0x60) = *r;
-        a = p + 0x60;
-        ResourceHeader_Relocate(a, r);
+    struct SceneInputPackedPosition position;
+    struct SceneInputResource *source = ScriptProc_Start(0xCB05, 0x530D);
+    if (source != 0) {
+        u8 *cursor, *graphics;
+        s32 remaining;
+        *(struct SceneInputResource *)station->digitGraphics = *source;
+        cursor = station->digitGraphics;
+        ResourceHeader_Relocate(cursor, source);
         {
-            u32 m = 0xFFFF0000;
-            z.x = 0;
-            z.y &= m;
+            position.x = 0;
+            position.y = 0;
+            position.z = 0;
         }
-        b = a;
-        a += 0x20;
-        j = 3;
+        graphics = cursor;
+        cursor += sizeof(struct SceneInputResource);
+        remaining = 3;
         do {
-            Widget_InitLinked(a, b, 0x1e, 0x31, 1, 0, 0x3c, &z);
-            a += 0x60;
-            j--;
-        } while (j >= 0);
+            Widget_InitLinked(cursor, graphics, 0x1e, 0x31, 1, 0, 0x3c, &position);
+            cursor += sizeof(struct SceneInputWidget);
+            remaining--;
+        } while (remaining >= 0);
     }
 }

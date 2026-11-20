@@ -1,12 +1,11 @@
-#include "global.h"
+#include "boss_action_state.h"
 
-void ActionState_SetState(u8 *p, u32 v)
+void ActionState_SetState(struct BossActionState *p, u32 state)
 {
-    u32 z = 0;
-    *p = v;
-    *(p + 2) = z;
-    *(p + 1) = z;
-    *(u32 *)(p + 0xC) = z;
-    *(u32 *)(p + 8) = z;
-    *(u32 *)(p + 4) = z;
+    p->state = state;
+    p->step = 0;
+    p->substate = 0;
+    p->stepFrame = 0;
+    p->substateFrame = 0;
+    p->frame = 0;
 }

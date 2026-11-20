@@ -44,6 +44,12 @@ static inline u8 SceneActorReaction_TakePrepared(struct ChaseActor *actor)
     }
     return 0;
 }
+static inline void SceneActorReaction_BeginRevival(struct RoomActor *actor, s16 health)
+{
+    actor->health = health;
+    actor->colliderA.responseValue = 60;
+}
+
 static inline void SceneActorReaction_ClearRoute(struct ChaseActor *actor)
 {
     actor->base.behaviorFlags &= ~0x141C0;

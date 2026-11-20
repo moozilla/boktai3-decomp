@@ -1,5 +1,5 @@
-#include "global.h"
-#include "engine.h"
+#include "scene_actors.h"
+#include "scene_graphics_actor.h"
 #include "terrain_cell_probe.h"
 
 /* Play the impact cues and create a hazard at a nearby point on the same terrain level. */
@@ -8,25 +8,13 @@ union ImpactPosition {
     u32 words[2];
 };
 
-typedef struct Actor08025FFC {
-    u8 pad0[0x9c];
-    u32 flags;
-    u8 padA0[0xf];
-    u8 signalAF;
-    u8 padB0;
-    u8 changed;
-    u8 padB2[0x52];
-    void *callbackA;
-    void *callbackB;
-    u8 *q;
-    union ImpactPosition *copyFrom;
-    u8 pad114[0x149];
-    u8 field25D;
-    u8 pad25E[0x10c];
-    s16 field36A;
-    u8 pad36C[0x40];
-    u32 mode;
-} Actor08025FFC;
+struct SceneActorImpactTarget {
+    u8 unknown0[0x10C];
+    u8 *owner; /* 0x10C: supplies the impact heading. */
+    union ImpactPosition *position;
+    u8 unknown114[0x36A - 0x114];
+    s16 hazardResource;
+};
 
 static inline s32 s08025FFC_Trunc12(s32 v)
 {
@@ -64,9 +52,9 @@ static inline void Impact_AddPosition(struct Pos16 *out, const struct Pos16 *a,
     out->z = a->z + b->z;
 }
 
-void sub_08025FFC(Actor08025FFC *p, s32 arg)
+void SceneActorAnimation_UpdateImpactHazard(struct StateActor *p, s32 arg)
 {
-    Actor08025FFC *actor = p;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     union ImpactPosition copy;
     struct Pos16 d;
     struct Pos16 *delta;
@@ -78,28 +66,29 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
     s32 f;
     const u16 *table;
 
-    if (p->changed) {
+    if (p->actionChanged) {
         s32 seq;
-        p->changed = 0;
-        seq = (p->mode & 1) ? 0x1a : 0x40;
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, seq, 2, 1, 4);
+        p->actionChanged = 0;
+        seq = (actor->graphics.animationFlags & 1) ? 0x1a : 0x40;
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              seq, 2, 1, 4);
         Sound_PlaySongChecked(0x35A);
     }
-    if ((u8)Callback_InvokeActor(p, p->callbackA))
+    if ((u8)Callback_InvokeActor(p, (void *)p->actionTryUpdate))
         return;
     {
         u32 mask = 0x40;
-        p->flags |= mask;
+        p->actionFlags |= mask;
     }
-    if ((u8)Callback_InvokeActor(p, p->callbackB))
+    if ((u8)Callback_InvokeActor(p, (void *)p->actionReset))
         return;
     if (arg == 0x10)
         Sound_PlaySongChecked(0x351);
     f = arg & 0xf;
     if (f == 0xf) {
-        src = p->copyFrom;
+        src = ((struct SceneActorImpactTarget *)p)->position;
         copy = *src;
-        base = p->q[0x2d];
+        base = ((struct SceneActorImpactTarget *)p)->owner[0x2d];
         table = gRandomTable;
         a = Impact_Random(table) & f;
         b = Impact_Random(table) & 0x7f;
@@ -113,11 +102,13 @@ void sub_08025FFC(Actor08025FFC *p, s32 arg)
         delta->z = s08025FFC_Trunc12(gUnk_086149C4[base] * nb);
         Impact_AddPosition(&d, &d, &copy.vector);
         if (Impact_GetTerrainHeight(&d) == (s16)copy.vector.y) {
-            AnimatedHazard_Create(&d, actor->field36A, 0x3c);
+            AnimatedHazard_Create(&d, ((struct SceneActorImpactTarget *)actor)->hazardResource,
+                                  0x3c);
         } else {
-            AnimatedHazard_Create(&copy.vector, actor->field36A, 0x3c);
+            AnimatedHazard_Create(&copy.vector,
+                                  ((struct SceneActorImpactTarget *)actor)->hazardResource, 0x3c);
         }
     }
-    if (actor->field25D & 2)
-        p->signalAF = 1;
+    if (actor->animation.status & 2)
+        p->actionFinished = 1;
 }

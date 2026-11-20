@@ -1,36 +1,30 @@
 #define gActorBounceAnimations gUnk_0824EE30
-#include "global.h"
-struct ActorAnimationLayer {
-    u16 unknown[3];
-    u16 flags;
-};
-struct ActorRenderFlags {
-    u32 unknown, flags;
-};
+#include "scene_combat_actor.h"
 extern const u32 gActorBounceAnimations[];
-void Armor_SetAnimationFromStart(u32, u32);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void SceneCombatActor_SpawnBouncingParticle(void *);
-void ActorController_UpdateBounceParticle(u8 *p)
+void ActorController_UpdateBounceParticle(struct SceneCombatActor *actor)
 {
-    u8 *s = p + 0xb40;
+    u8 *p = (void *)actor;
+    u8 *s = &actor->actionPhase;
     u8 st = *s;
     switch (st) {
         case 0: {
             u32 four;
-            Armor_SetAnimationFromStart((u32)p,
-                                        (u32)&gActorBounceAnimations[((p[0xb39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(
+                actor, &gActorBounceAnimations[((actor->heading + 0x60) >> 6) & 3]);
             four = 0xb32;
             (*s)++;
-            p[0xb41] = st;
+            actor->actionReady = st;
             SceneCombatActor_SpawnBouncingParticle(p);
             *(u16 *)(p + four) &= ~1;
             four = 4;
-            ((struct ActorAnimationLayer *)(p + 0x238))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x1e4))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x28c))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x190))->flags |= four;
+            ((struct ContactCollider *)(p + 0x238))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x1e4))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x28c))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x190))->flags |= four;
             {
-                struct ActorRenderFlags *render = (void *)(p + 0x180);
+                struct ActorControllerMotion *render = (void *)(p + 0x180);
                 u32 one = 1;
                 render->flags &= ~one;
             }
@@ -38,9 +32,9 @@ void ActorController_UpdateBounceParticle(u8 *p)
             break;
         }
         case 1:
-            if (p[0xb43]) {
+            if (actor->animationComplete) {
                 *s = 0xff;
-                p[0xb41] = st;
+                actor->actionReady = st;
             }
             break;
     }

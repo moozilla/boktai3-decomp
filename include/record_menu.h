@@ -3,7 +3,9 @@
 
 #include "task.h"
 struct RecordMenuSprite {
-    u8 unknown[0x20];
+    u8 unknown0[8];
+    u32 displayFlags;
+    u8 unknownC[0x14];
     u16 x, y;
     u8 pad24[0x16];
     u16 flags;

@@ -2,6 +2,7 @@
 #define GUARD_SCENE_POOL_H
 #include "engine.h"
 #include "modifier_list.h"
+#include "spatial_entry.h"
 
 /* The copy helpers transfer 16 bytes; only x/y/z are interpreted.
  * The unnamed word is representation padding, not an uninitialized coordinate. */
@@ -19,7 +20,7 @@ struct ScenePoolEntry {
     u32 index;
     struct ScenePoolVec32 position;
     u8 active, kind;
-    u8 unknown26[2];
+    u16 boundsFlags;
     s32 duration, parameter;
     u32 origin, limit;
     u8 side, mode, repetitions;
@@ -38,6 +39,14 @@ struct ScenePoolEntry {
     u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
 };
+static inline void ScenePool_EnterStateAndClearHistory(struct ScenePoolEntry *entry, u32 state)
+{
+    entry->state = state;
+    entry->stateFrame = 0;
+    entry->stateEntered = 1;
+    Memory_Clear(entry->history, sizeof(entry->history));
+}
+
 /* Drain dispatch prefix at +0xB0; accumulator shares forwardBias at +0xC0. */
 struct ActorDrainState {
     u32 (*callback)(void *);
@@ -53,11 +62,13 @@ struct ScenePoolActor {
     u32 kind;
     u32 boundsFlags;
     struct ScenePoolVec32 position;
-    u8 unknown20[8];
+    s32 motionX, motionY;
     s32 motionDisplacement; /* +0x28: tween coordinate correction */
     u8 unknown2c[0xc];
     s32 restrictionMetric;
-    u8 unknown3c[0xc];
+    s32 terrainHeightB;
+    u32 movementFlags;
+    u8 colorEffect[4];
     u8 bodyAnimation, faceAnimation, accessoryAnimation, paletteState, paletteMode;
     u8 unknown4d[3];
     u8 sourceIds[4];
@@ -90,25 +101,37 @@ struct ScenePoolActor {
     u16 baseAmount;
     u8 unknown51e[6];
     u16 requestedSound, playingSound;
-    u8 unknown528[0x44];
+    u8 unknown528[4];
+    struct SpatialEntry hitCollider;
     u32 motionFlags;
     u8 unknown570[0xa];
     u8 unknown57a;
     u8 unknown57b[0x31];
     s32 forwardSpeed, verticalSpeed, lateralSpeed;
-    u8 unknown5b8[0x24];
+    u8 unknown5b8[4];
+    s32 previousX;
+    u8 unknown5c0[4];
+    s32 previousZ;
+    u8 unknown5c8[4];
+    s32 impulse[4];
     s32 steering;
     u8 unknown5e0[0xc];
     s8 motionLock;
     u8 unknown5ed;
     u8 flags5ee;
-    u8 unknown5ef[5];
+    u8 unknown5ef;
+    u16 heading;
+    u8 unknown5f2[2];
     struct ScenePoolPlayer *linkedPlayer; /* +0x5f4, restriction flag consumer 0811628C */
     u8 unknown5f8[4];
     u32 stateFlags;
-    u8 unknown600[0x258];
+    u8 model[0x250];
+    s8 marker;
+    u8 unknown851[3];
+    s32 entryIndex;
     u32 controlFlags;
-    u8 unknown85c[0x44];
+    s32 proximityCooldown;
+    struct SpatialEntry proximityCollider;
     struct ScenePoolVec32 savedPosition;
 };
 struct ScenePoolManager {

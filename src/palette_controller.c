@@ -1,4 +1,6 @@
 #include "palette_controller.h"
+#include "palette_channel.h"
+#include "palette_resource.h"
 #include "render.h"
 /* Palette_ClearActiveController: zeroes gPaletteController (the active controller pointer); identical body to the task's destroy callback Palette_Destroy */
 #define Palette_ClearActiveController sub_08002AD4
@@ -40,7 +42,7 @@ static inline void copy32(const void *source, void *dest, s32 size)
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {
-    s32 k2 = 0x7C1F;
+    s32 redBlueMask = 0x7C1F;
     s32 count;
     u32 inverse;
     amount >>= 1;
@@ -57,28 +59,22 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
             s32 i;
             dest += first;
             out = dest;
-            if (count > 0) {
-                u32 greenMask = 0x03E0;
-                i = count;
-                do {
-                    u32 from = *a;
-                    u32 fromRB;
-                    u32 fromG;
-                    u32 to;
-                    fromRB = k2 & from;
-                    do {
-                        fromG = greenMask & from;
-                    } while (0);
-                    to = *b;
-                    {
-                        u32 rb = (((to & 0x7C1F) * amount) + (inverse * fromRB)) & 0xF83E0;
-                        u32 g = (((to & greenMask) * amount) + (inverse * fromG)) & 0x7C00;
-                        *out = (rb | g) >> 5;
-                    }
-                    a++;
-                    b++;
-                    out++;
-                } while (--i);
+            for (i = 0; i < count; i++) {
+                u32 from = *a;
+                u32 fromRB;
+                u32 fromG;
+                u32 to;
+                fromRB = redBlueMask & from;
+                PALETTE_EXTRACT_CHANNEL(fromG, from, 0x03E0);
+                to = *b;
+                {
+                    u32 rb = (((to & redBlueMask) * amount) + (inverse * fromRB)) & 0xF83E0;
+                    u32 g = (((to & 0x03E0) * amount) + (inverse * fromG)) & 0x7C00;
+                    *out = (rb | g) >> 5;
+                }
+                a++;
+                b++;
+                out++;
             }
         }
     }
@@ -139,11 +135,10 @@ s32 Palette_GetBrightnessThreshold(void)
 
 void Palette_BrightnessIdle(struct PaletteTransition *t)
 {
-    u32 z = 0;
-    t->brightness = z;
+    t->brightness = 0;
     if (t->callback != 0) {
         Script_Call(t->callback, 0);
-        t->callback = z;
+        t->callback = 0;
     }
 }
 
@@ -458,45 +453,44 @@ s32 Palette_InitializeFromScript(struct PaletteController *p)
 {
     struct PaletteTransition *t = &p->transition;
     struct PaletteWave *w = &p->wave;
-    do {
-        gPaletteController = p;
-        p->pending = 0;
-        t->callback = 0;
-        p->hardware = gBgPaletteBuffer;
-        gBgFadeLevel = 64;
-        gBgFadeApplied = 64;
-        gBgFadeColor = 0x1084;
-        gBgFadeBankMask = 0;
-        p->flags = Script_GetKeywordValue('f', 0);
-        if (Script_SeekToKeyword('p')) {
-            s32 i = 0;
-            u16 **out = p->colorSets[PALETTE_SET_SOURCE];
-            while (Script_GetPc() && i <= 3) {
-                s32 value = Script_GetValue();
-                if (value != 0x30) {
-                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-                } else {
-                    *out = 0;
-                }
-                out++;
-                i++;
+    s32 i;
+    gPaletteController = p;
+    p->pending = 0;
+    t->callback = 0;
+    p->hardware = gBgPaletteBuffer;
+    gBgFadeLevel = 64;
+    gBgFadeApplied = 64;
+    gBgFadeColor = 0x1084;
+    gBgFadeBankMask = 0;
+    p->flags = Script_GetKeywordValue('f', 0);
+    if (Script_SeekToKeyword('p')) {
+        u16 **out;
+        i = 0;
+        out = p->colorSets[PALETTE_SET_SOURCE];
+        for (; Script_GetPc() && i < 4; i++) {
+            s32 value = Script_GetValue();
+            if (value != 0x30) {
+                *out = ((struct PaletteResource *)ScriptProc_Start(0x92B3, value))->banks[0];
+            } else {
+                *out = 0;
             }
+            out++;
         }
-        if (Script_SeekToKeyword('d')) {
-            s32 i = 0;
-            u16 **out = p->colorSets[PALETTE_SET_DESTINATION];
-            while (Script_GetPc() && i <= 3) {
-                s32 value = Script_GetValue();
-                if (value != 0x30) {
-                    *out = (u16 *)(ScriptProc_Start(0x92B3, value) + 20);
-                } else {
-                    *out = 0;
-                }
-                out++;
-                i++;
+    }
+    if (Script_SeekToKeyword('d')) {
+        u16 **out;
+        i = 0;
+        out = p->colorSets[PALETTE_SET_DESTINATION];
+        for (; Script_GetPc() && i < 4; i++) {
+            s32 value = Script_GetValue();
+            if (value != 0x30) {
+                *out = ((struct PaletteResource *)ScriptProc_Start(0x92B3, value))->banks[0];
+            } else {
+                *out = 0;
             }
+            out++;
         }
-    } while (0);
+    }
     if (p->flags & 8) {
         Palette_SetVariantsFromPalettes(p);
     } else {
@@ -656,7 +650,6 @@ void Palette_SetBrightnessFromScript(void)
         u32 query = Script_SeekToKeyword('q');
         u32 immediate = ((0 - query) | query) >> 31;
         s32 callback = Script_GetKeywordValue('p', 0);
-        u32 mode;
         p->transition.callback = 0;
         if (!(p->flags & 16)) {
             p->flags |= 16;
@@ -673,13 +666,15 @@ void Palette_SetBrightnessFromScript(void)
                 goto complete;
             }
             if (t->mode == 1) {
-                goto waiting;
+                t->callback = callback;
+                return;
             }
             if (t->mode == 2) {
                 goto complete;
             }
-            mode = 1;
-            goto setMode;
+            t->mode = 1;
+            t->callback = callback;
+            return;
         } else {
             if (!immediate) {
                 if (t->mode == 0) {
@@ -701,14 +696,9 @@ void Palette_SetBrightnessFromScript(void)
 
         return;
     fadeOut:
-        mode = 3;
-
-        do {
-        setMode:
-            t->mode = mode;
-        waiting:
-            t->callback = callback;
-        } while (0);
+        t->mode = 3;
+    waiting:
+        t->callback = callback;
     }
 }
 

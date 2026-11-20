@@ -1,10 +1,15 @@
-#include "global.h"
-void TransformMarker_SetTypeFromTable(u8 *p, u8 *q, u32 i)
+#include "scene_item_values.h"
+
+void TransformMarker_SetTypeFromTable(u8 *result, u8 *table, u32 grade)
 {
-    u32 z = 0;
-    p[0xc] = i;
-    q += 0x15;
-    p[0xd] = q[i];
-    p[0xe] = z;
-    p[0xf] = z;
+    struct SceneValueEquipment *entry = (struct SceneValueEquipment *)result;
+    const struct SceneValueEquipmentDefinition *definition =
+        (const struct SceneValueEquipmentDefinition *)table;
+    const u8 *values;
+
+    entry->grade = grade;
+    values = definition->gradeValues;
+    entry->gradeValue = values[grade];
+    entry->unknownE = 0;
+    entry->unknownF = 0;
 }

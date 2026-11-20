@@ -7,10 +7,6 @@
 #include "area_effect_link.h"
 #include "tilemap_panel.h"
 #include "background_controller.h"
-/* Sixteen colors followed by a two-frame rotation timer. */
-struct CharacterPaletteCycle {
-    u16 colors[16], timer;
-};
 struct CharacterPaletteSource {
     u8 unknown0[0x20];
     u16 colors[16];

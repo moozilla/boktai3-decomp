@@ -1,11 +1,7 @@
-#include "global.h"
+#include "wireless_game_items_and_display.h"
 
-struct S {
-    u8 f[0x1e];
-    u8 a;
-};
-u32 WirelessGameDisplay_RequestCompletion(struct S *p)
+u32 WirelessGameDisplay_RequestCompletion(struct WirelessGameDisplay *display)
 {
-    p->a = 1;
+    display->finished = 1;
     return 0;
 }

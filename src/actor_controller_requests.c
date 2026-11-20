@@ -109,12 +109,10 @@ u32 ActorController_SetBehaviorIfFinished(struct SceneCombatActor *actor, u32 be
 {
     u8 *currentBehavior = &actor->behavior;
     if (*currentBehavior != behavior) {
-        u8 *phase = &actor->behaviorPhase;
-        if (*phase == 0xff) {
-            u32 initialPhase = 0;
-            *currentBehavior = behavior;
-            *phase = initialPhase;
-            actor->behaviorCounter = initialPhase;
+        if (actor->behaviorPhase == 0xff) {
+            actor->behavior = behavior;
+            actor->behaviorPhase = 0;
+            actor->behaviorCounter = 0;
             return 1;
         }
     }
@@ -133,7 +131,8 @@ static inline void ActorController_SubtractPositions(struct ContactPosition *out
 u32 ActorController_IsNearTarget(struct SceneCombatActor *actor)
 {
     struct ContactPosition delta;
-    ActorController_SubtractPositions(&delta, &actor->navigation.position, &actor->navigation.referencePosition);
+    ActorController_SubtractPositions(&delta, &actor->navigation.position,
+                                      &actor->navigation.referencePosition);
     if (delta.x < 0)
         delta.x = -delta.x;
     if (delta.z < 0)
@@ -146,7 +145,8 @@ void ActorController_RequestIdleAction(struct SceneCombatActor *actor)
     DirectionalActor_TryBeginState(actor, 0);
 }
 
-void ActorController_UpdateTargetMovement(struct SceneCombatActor *actor, s32 movementMode, s32 attackMode)
+void ActorController_UpdateTargetMovement(struct SceneCombatActor *actor, s32 movementMode,
+                                          s32 attackMode)
 {
     struct ContactPosition targetPosition;
     u32 result;
@@ -156,7 +156,8 @@ void ActorController_UpdateTargetMovement(struct SceneCombatActor *actor, s32 mo
         targetPosition.x = game->positionX;
         targetPosition.y = game->positionY;
         targetPosition.z = game->positionZ;
-        result = Terrain_ApplyBlocked(&actor->navigation, &actor->navigation.referencePosition, &targetPosition);
+        result = Terrain_ApplyBlocked(&actor->navigation, &actor->navigation.referencePosition,
+                                      &targetPosition);
         if (result == 1) {
             actor->behaviorPhase = result;
         } else if (ActorController_IsNearTarget(actor) == 0) {
@@ -167,7 +168,8 @@ void ActorController_UpdateTargetMovement(struct SceneCombatActor *actor, s32 mo
     if (*phase == 0) {
         DirectionalActor_TryBeginState(actor, 0);
     } else if (*phase == 1) {
-        u32 targetHeading = NavMesh_SteerCardinal(&actor->navigation, &actor->navigation.referencePosition, actor->heading, 0x40);
+        u32 targetHeading = NavMesh_SteerCardinal(
+            &actor->navigation, &actor->navigation.referencePosition, actor->heading, 0x40);
         if (ActorController_IsNearTarget(actor) != 0) {
             *phase = 0;
             DirectionalActor_TryBeginState(actor, 0);

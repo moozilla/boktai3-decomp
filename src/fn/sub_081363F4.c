@@ -19,8 +19,7 @@ static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
 {
     if (actor) {
         {
-            u32 mask = 0x40;
-            if (mask & flags)
+            if (0x40 & flags)
                 return 1;
         }
         {
@@ -136,12 +135,6 @@ static inline u32 PlacementDamage_FieldBits(u32 mask, const u16 *field)
     return *field & mask;
 }
 
-static inline void Fill(u32 *zero, void *dst)
-{
-    *zero = 0;
-    CpuSet(zero, dst, 0x05000002);
-}
-
 // confidence=low: expanded scene-actor hit processing with route and collider cleanup.
 u8 SceneActorReaction_ApplyLinkedAreaDamage(void *);
 u8 SceneActorReaction_TryBeginControl29(void *);
@@ -203,10 +196,9 @@ static inline void PlacementDamage_ReportHud(struct ChaseActor *actor, u32 id, s
                                              u32 *damageFlags, s32 priority,
                                              struct ContactCollider **captured)
 {
-    u32 zero;
     struct ContactPosition offset;
     SceneHud_SetTimedState(id, health, maximum, kind, mode >> 2, parameter);
-    Fill(&zero, &offset);
+    ZeroFill8(&offset);
     if (actor->base.reactionSoundVariant || !(*damageFlags & 0x20000)) {
         struct ContactCollider *displayCollider = &actor->base.colliderA;
         DamageNumberDisplay_Show((void *)displayCollider, actor->base.reactionSoundVariant, 0,
@@ -380,8 +372,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
         u32 keep = bit & *flags2CC;
         struct SceneActorRegistryControl *control = &group->common.control;
         {
-            u32 mask = 0xFFFEBE3F;
-            *flags2CC &= mask;
+            *flags2CC &= 0xFFFEBE3F;
         }
         ResetMotion(control);
         *flags2CC |= keep;

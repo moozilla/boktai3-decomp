@@ -14,6 +14,11 @@ static inline const u16 *ParticleRandom_GetTable(const union ParticleRandomTable
     return source->table;
 }
 
+static inline u16 ParticleRandom_ReadCursor(const u16 *table, const u32 *cursor)
+{
+    return table[*cursor];
+}
+
 static inline const u16 *ParticleRandom_SampleAddress(const u16 *table, u32 index)
 {
     return (const u16 *)(index * sizeof(*table) + (u32)table);

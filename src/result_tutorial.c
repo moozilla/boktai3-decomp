@@ -18,7 +18,7 @@ void MessageWindow_SetMessageTable(void *);
 void MessageWindow_SetBounds(int, int, int, int);
 void MessageWindow_SetPalette(int);
 void MessageWindow_SetDisplayMode(int);
-void sub_0801BD44(void *);
+void ResultGame_InitializeDisplay(void *);
 void ResultMenu_SetPhase(void *, void *);
 void sub_0801C24C(void *);
 void *Script_GetTextSourcePc(void);
@@ -76,16 +76,13 @@ int ResultTutorial_ShowPrompt(struct ResultMenu *tutorial)
 
 int ResultTutorial_HidePrompt(struct ResultMenu *tutorial)
 {
-    u8 *state = &tutorial->phase;
-    switch (*state) {
+    switch (tutorial->phase) {
         case 0: {
-            int one = 1;
-            *state = one;
+            struct SceneInputWidget *promptWidget;
+            tutorial->phase = 1;
             tutorial->timer = 0;
-            {
-                struct SceneInputWidget *promptWidget = &tutorial->widgets[14];
-                promptWidget->flags |= one;
-            }
+            promptWidget = &tutorial->widgets[14];
+            promptWidget->flags |= 1;
         }
         case 1:
             if (ResultTutorial_FadeOut(tutorial))
@@ -292,25 +289,18 @@ int ResultTutorial_DemonstrateTracking(struct ResultMenu *tutorial)
 {
     int speed = gUnk_0824DB8A[tutorial->difficulty];
     switch (tutorial->phase) {
-        case 0: {
-            int next = tutorial->phase + 1;
-            int zero;
-            zero = 0;
-            tutorial->phase = next;
-            tutorial->elapsed = zero;
-            tutorial->timer = zero;
+        case 0:
+            ++tutorial->phase;
+            tutorial->elapsed = 0;
+            tutorial->timer = 0;
             break;
-        }
         case 1:
         case 5:
         case 9:
             tutorial->targetPosition += speed;
             if (tutorial->targetPosition > 4096) {
-                int next = tutorial->phase + 1;
-                int zero;
-                zero = 0;
-                tutorial->phase = next;
-                tutorial->timer = zero;
+                ++tutorial->phase;
+                tutorial->timer = 0;
             }
             break;
         case 2:
@@ -324,11 +314,8 @@ int ResultTutorial_DemonstrateTracking(struct ResultMenu *tutorial)
         case 11:
             tutorial->targetPosition -= speed;
             if (tutorial->targetPosition <= 3071) {
-                int next = tutorial->phase + 1;
-                int zero;
-                zero = 0;
-                tutorial->phase = next;
-                tutorial->timer = zero;
+                ++tutorial->phase;
+                tutorial->timer = 0;
             }
             break;
         case 4:
@@ -720,7 +707,7 @@ void ResultTutorial_Open(struct ResultMenu *tutorial)
             MessageWindow_SetBounds(1, 1, 30, 6);
             MessageWindow_SetPalette(0x81b);
             MessageWindow_SetDisplayMode(1);
-            sub_0801BD44(tutorial);
+            ResultGame_InitializeDisplay(tutorial);
             MessageWindow_ShowMessage(tutorial->prompt);
             ScreenTransition_SendCommand(0, 5, 4, 4, 4, 0xffff, 0);
             ++tutorial->phase;
@@ -769,11 +756,8 @@ void ResultTutorial_UpdateSequence(struct ResultMenu *tutorial)
         case 2:
             if (gUnk_0824DBC0[index].hide) {
                 if (ResultTutorial_HidePrompt(tutorial)) {
-                    int next = tutorial->step + 1;
-                    int zero;
-                    zero = 0;
-                    tutorial->step = next;
-                    tutorial->phase = zero;
+                    ++tutorial->step;
+                    tutorial->phase = 0;
                 }
                 break;
             }
@@ -781,12 +765,9 @@ void ResultTutorial_UpdateSequence(struct ResultMenu *tutorial)
             tutorial->phase = 0;
         case 3:
             if (gUnk_0824DBC0[index].run) {
-                if (sub_08249240(tutorial, &gUnk_0824DBC0[index].run, gUnk_0824DBC0[index].run)) {
-                    int next = tutorial->step + 1;
-                    int zero;
-                    zero = 0;
-                    tutorial->step = next;
-                    tutorial->phase = zero;
+                if (gUnk_0824DBC0[index].run(tutorial)) {
+                    ++tutorial->step;
+                    tutorial->phase = 0;
                     Sound_StopSong(0x3ed);
                     Sound_StopSong(0x3ee);
                 }
@@ -821,9 +802,6 @@ int ResultTutorial_ReadScript(struct ResultMenu *tutorial)
 int ResultTutorial_Initialize(struct ResultMenu *tutorial, void *owner, void *unused)
 {
     struct SceneInputResource *r;
-    int four;
-    u8 *difficulty;
-    int zero;
     tutorial->owner = owner;
     r = ScriptProc_Start(0xcb05, 0x530d);
     if (!r) {
@@ -840,17 +818,14 @@ int ResultTutorial_Initialize(struct ResultMenu *tutorial, void *owner, void *un
     if (ResultTutorial_ReadScript(tutorial) < 0) {
         return -1;
     }
-    difficulty = &tutorial->difficulty;
-    zero = 0;
-    four = 4;
-    *difficulty = four;
-    tutorial->step = zero;
-    tutorial->prompt = zero;
+    tutorial->difficulty = 4;
+    tutorial->step = 0;
+    tutorial->prompt = 0;
     tutorial->level = 3;
     ResultMenu_CreateGraphics(tutorial);
     ResultMenu_SetPhase(tutorial, ResultTutorial_Open);
     Sound_PlayTrackedSong(0xaa);
-    gEnginePauseFlags |= four;
+    gEnginePauseFlags |= (1 << 2);
     return 0;
 }
 

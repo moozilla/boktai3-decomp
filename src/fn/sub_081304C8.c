@@ -1,13 +1,8 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
-struct DrawablePart {
-    u32 unknown0[2];
-    u32 flags;
-};
-#define FIELD(p, n, t) (*(t *)((u8 *)(p) + (n)))
 // confidence=low: hides the drawable and moves the actor above the active field.
-#define SceneActorControl_HideOffscreen sub_081304C8
 static inline u8 TakeReset(struct ChaseActor *a)
 {
     if (a->base.field2B1) {
@@ -16,73 +11,42 @@ static inline u8 TakeReset(struct ChaseActor *a)
     }
     return 0;
 }
-static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
-{
-    u32 offset;
-    {
-        u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = 0;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-static inline void SetState(struct ChaseActor *actor, u32 state)
-{
-    u8 *field = &actor->base.state2A8;
-    u32 zero = 0;
-    *field = state;
-    actor->base.phase2A9 = zero;
-    actor->base.behavior2AA = zero;
-    {
-        u32 *counter = &actor->base.counter2AC;
-        *counter = zero;
-    }
-    actor->base.field2B1 = 1;
-}
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = mask;
     value |= actor->base.motionFlags;
     actor->base.motionFlags = value;
 }
+static inline void SceneActorControl_SetDrawableFlags(u32 bits, struct ChaseActor *actor)
+{
+    if (actor->base.drawableKind == 0) {
+        struct DisplaySequenceSprite *sprite = actor->base.drawable;
+        sprite->flags |= bits;
+    } else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        struct SceneInputWidget *tile = &drawable->tile;
+        tile->flags |= bits;
+    }
+}
+
 void SceneActorControl_HideOffscreen(struct ChaseActor *actor)
 {
     if (TakeReset(actor)) {
         struct ContactPosition *position;
         if (actor->base.drawableKind == 0)
-            position = (void *)((u8 *)actor->base.drawable + 0x1C);
+            position =
+                &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->position;
         else
-            position = (void *)((u8 *)actor->base.drawable + 0x40);
+            position = &((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position;
         position->y = 30000;
     }
     actor->base.body.position.x = 0;
     actor->base.body.position.y = 30000;
     actor->base.body.position.z = 0;
-    {
-        u32 mask = 1;
-        if (actor->base.drawableKind == 0)
-            FIELD(actor->base.drawable, 0, u32) |= mask;
-        else {
-            struct DrawablePart *part = (void *)((u8 *)actor->base.drawable + 0x20);
-            part->flags |= mask;
-        }
-    }
-    SetState(actor, 3);
-    BeginControlZero(actor, SceneActorControl_OnIdle, 16);
+    SceneActorControl_SetDrawableFlags(1, actor);
+    SceneActorTerrain_EnterState(actor, 3, 0, 0);
+    SceneActorTerrain_InstallControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorTerrain_DisableCollision(actor);
-    {
-        u32 mask = 0x40;
-        SetFlags(actor, mask);
-    }
+    SetFlags(actor, 0x40);
     actor->base.counter2AC++;
 }

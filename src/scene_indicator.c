@@ -1,34 +1,30 @@
 #include "scene_indicator.h"
+#include "contact_actor.h"
+#include "terrain_sampling.h"
 
 struct SceneIndicators *SceneIndicators_GetInstance(void)
 {
     return gSceneIndicators;
 }
 
-struct PackedVec {
-    s32 x : 16, y : 16, z : 16, pad : 16;
-};
-
 void SceneIndicator_Initialize(struct SceneIndicators *m, struct SceneIndicator *p)
 {
-    struct PackedVec size, offset;
-    int zero;
-    u8 *sprite = (u8 *)&p->sprite;
-    u8 *effect;
+    struct ContactPackedVector size, offset;
+    struct DisplaySequenceSprite *sprite = &p->sprite;
+    struct ContactCollider *collider;
     Sprite_Init(sprite, m->animations, 1);
-    zero = 0;
-    sprite[7] = 3;
-    effect = p->effect;
+    sprite->priority = 3;
+    collider = &p->collider;
     size.x = 120;
     size.y = 32;
     size.z = 120;
     offset.x = 0;
     offset.y = 32;
     offset.z = 0;
-    Collider_Init(effect, 0, 0x2001, 0, 16, &size, &offset);
-    Collider_SetCallback(effect, 0, p);
-    Collider_SetAttackProperties(effect, 10, 1, 0x400000, 0x60000, 30);
-    p->active = zero;
+    Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
+    Collider_SetCallback(collider, 0, p);
+    Collider_SetAttackProperties(collider, 10, 1, 0x400000, 0x60000, 30);
+    p->active = 0;
 }
 
 void SceneIndicator_Update(struct SceneIndicators *owner, struct SceneIndicator *p)
@@ -83,7 +79,7 @@ void SceneIndicator_Update(struct SceneIndicators *owner, struct SceneIndicator 
             IndicatorSprite_SetFrame(&p->sprite, p->frame + visible);
     }
     if (p->visible == 1)
-        Collider_Refresh(p->effect);
+        Collider_Refresh(&p->collider);
     p->timer++;
 }
 
@@ -120,7 +116,6 @@ u32 SceneIndicators_Destroy(struct SceneIndicators *s)
     return (u32)(gSceneIndicators = 0);
 }
 
-#include "scene_indicator.h"
 int SceneIndicators_Initialize(struct SceneIndicators *m)
 {
     int i;
@@ -155,7 +150,7 @@ int SceneIndicators_Initialize(struct SceneIndicators *m)
                     m->count++;
                 } else
                     value = 0;
-                AnimData_SelectPaletteBank(&m->animations[i], m->animations[i].frame + value);
+                AnimData_SelectPaletteBank(&m->animations[i], m->animations[i].paletteKey + value);
             }
         }
     }
@@ -219,15 +214,6 @@ struct SceneIndicator *SceneIndicators_FindById(struct SceneIndicators *p, u32 k
     return 0;
 }
 
-#include "scene_indicator.h"
-static inline int cellIndex(struct Vec *p)
-{
-    int x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 static inline u8 *cell(int i)
 {
     u8 *p = TerrainModifiers_FindCellOverride(i, 1);
@@ -240,9 +226,9 @@ int SceneIndicator_CreateFromScript(void)
 {
     struct SceneIndicators *m = SceneIndicators_GetInstance();
     struct SceneIndicator *p;
-    struct Vec *position;
-    struct IndicatorSprite *sprite;
-    void *effect;
+    struct ContactPosition *position;
+    struct DisplaySequenceSprite *sprite;
+    struct ContactCollider *collider;
     if (!m)
         return -1;
     p = SceneIndicators_FindFreeSlot(m);
@@ -260,7 +246,7 @@ int SceneIndicator_CreateFromScript(void)
         p->sprite.position.x = (p->sprite.position.x & ~255) + 128;
         p->sprite.position.z = (p->sprite.position.z & ~255) + 128;
         position = &p->sprite.position;
-        c = cell(cellIndex(position));
+        c = cell(Terrain_GetCellIndex(position));
         slope = *c >> 4;
         height = (*c & 15) << 8;
         switch (slope) {
@@ -313,14 +299,14 @@ int SceneIndicator_CreateFromScript(void)
         p->mode = 0;
         position = &p->sprite.position;
         sprite = &p->sprite;
-        effect = p->effect;
+        collider = &p->collider;
     } else {
         int i;
         position = &p->sprite.position;
         sprite = &p->sprite;
-        effect = p->effect;
+        collider = &p->collider;
         for (i = 0; i < 8; i++)
-            p->times[i] |= 65535;
+            p->times[i] = 0xFFFF;
     }
     p->delay = 0;
     p->period = Script_GetKeywordValue('T', -1);
@@ -333,18 +319,21 @@ int SceneIndicator_CreateFromScript(void)
     p->animation = Script_GetKeywordValue('E', 0);
     Sprite_ApplyAnimation(sprite, &m->animations[p->animation]);
     sprite->frame = p->frame + p->visible;
-    Collider_SetPosition(effect, position, 0);
+    Collider_SetPosition(collider, position, 0);
     if (Script_GetKeywordValue('v', 1))
         sprite->flags &= ~1;
     else
         sprite->flags |= 1;
-    Collider_SetAttackPowerAndForce(effect, (u16)Script_GetKeywordValue('d', 10), 1);
+    Collider_SetAttackPowerAndForce(collider, (u16)Script_GetKeywordValue('d', 10), 1);
     {
         int x = position->x >> 8, z = position->z >> 8;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             p->value = 0;
-        else
-            p->value = gTerrainMap->rows[z] - -x; /* keeps the add's operand order (row + x) */
+        else {
+            int row = gTerrainMap->rows[z];
+            row += x;
+            p->value = row;
+        }
     }
     p->active = 1;
     return 0;

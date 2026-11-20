@@ -1,52 +1,35 @@
-#include "scene_object_slot.h"
-void SceneObject_UpdateLowered(void);
-struct SceneObjPool {
-    u8 pad0[0x1a];
-    u16 count;
-    u8 pad1c[0x410];
-    struct SceneObjSlot *slots;
-};
-static inline u8 SceneObjects_GetVariantByte(int value)
-{
-    return value;
-}
+#include "scene_object_controller.h"
+
+void SceneObject_UpdateLowered(struct SceneObjSlot *);
+
 int SceneObjects_ScriptLower(void)
 {
     struct SceneObjPool *p = ResourceRegistry_GetResource(0x85e6);
     int found;
     int i;
     int id;
-    void (*fn)(void) = SceneObject_UpdateLowered;
+    void (*fn)(struct SceneObjSlot *) = SceneObject_UpdateLowered;
     if (!p)
         return -1;
     found = 0;
     if (!Script_SeekToKeyword(0x6e))
         return -1;
     id = Script_GetValue();
-    i = 0;
-    if (found < p->count) {
-        struct SceneObjSlot **slots = &p->slots;
-        int one;
-        u32 mask;
-        do {
-            struct SceneObjSlot *s = *slots + i;
-            if (s->id == id) {
-                s->timer = 0;
-                one = 1;
-                s->variant = SceneObjects_GetVariantByte(one);
-                s->callback = fn;
-                s->b39 = *(u8 *)&s->loweredPose;
-                s->b3a = 0;
-                mask = (u16)~2;
-                s->block->w6 &= mask;
-                s->block->w6 |= 3;
-                s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
-                s->lift = 0;
-                s->spritePos.position.y = s->q0.position.y;
-                found = 1;
-            }
-            i++;
-        } while (i < p->count);
+    for (i = 0; i < p->count; i++) {
+        struct SceneObjSlot *s = &p->slots[i];
+        if (s->id == id) {
+            s->timer = 0;
+            s->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_LOWERED);
+            s->callback = fn;
+            s->pose = *(u8 *)&s->loweredPose;
+            s->poseFrame = 0;
+            s->terrain->cell.flags &= (u16)~2;
+            s->terrain->cell.flags |= 3;
+            s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | (s->cellHeight + 1);
+            s->lift = 0;
+            s->sprite.position.y = s->q0.position.y;
+            found = 1;
+        }
     }
     return found;
 }

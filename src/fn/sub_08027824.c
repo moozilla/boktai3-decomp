@@ -1,51 +1,22 @@
-#include "global.h"
+#include "scene_actors.h"
 #include "scene_graphics_actor.h"
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[5];
-    u8 finished, enter;
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    u8 (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    s16 scale, minScale, maxScale, scaleStep;
-    u8 pad34C[0x60];
-    u32 mode;
-} ActorAnimation;
 
-static inline void setFacing(ActorAnimation *p, int angle)
+static inline void setFacing(struct StateActor *p, int angle)
 {
-    p->angle = angle;
+    p->bodyDirection = angle;
     {
-        int shifted = (p->angle + 0x60) >> 6;
+        int shifted = (p->bodyDirection + 0x60) >> 6;
         u32 value = 3;
         value &= shifted;
-        p->facing = value;
+        p->animationFacing4 = value;
     }
     {
-        int shifted = (p->angle + 0x70) >> 5;
+        int shifted = (p->bodyDirection + 0x70) >> 5;
         u32 value = 7;
         value &= shifted;
-        p->facing8 = value;
+        p->animationFacing8 = value;
     }
 }
-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void Sound_PlaySongChecked(int);
-int Math_Atan2(int, int);
-extern s16 gUnk_086149C4[];
 static inline int choose(u32 mode, int normal, int alternate)
 {
     int test = mode & 1;
@@ -55,54 +26,35 @@ static inline int choose(u32 mode, int normal, int alternate)
         result = alternate;
     return result;
 }
-static inline int trunc12(int x)
+void SceneActors_UpdateDirectionalTurn(struct StateActor *p)
 {
-    return x >= 0 ? x >> 12 : -(-x >> 12);
-}
-static inline void effect(u8 *p, int id, int mode, int duration)
-{
-    *(u32 *)(p + 0x390) = id;
-    p[0x38e] = mode;
-    p[0x38f] = duration;
-    if (p[0x38e] == 2) {
-        u32 value = duration == 5 ? 32 : 64;
-        p[0x38c] = value;
-    } else if (p[0x38e] == 1)
-        p[0x38c] = 0;
-}
-void SceneActors_UpdateDirectionalTurn(ActorAnimation *p)
-{
-    ActorAnimation *p2 = p;
+    struct StateActor *p2 = p;
     u8 *position = (u8 *)p + 0x48;
-    if (p->changed) {
+    if (p->actionChanged) {
         int sequence;
-        p->changed = 0;
-        sequence = choose(p->mode, 43, 5);
-        {
-            int offset = 0x240;
-            SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,
-                                                  1, 4);
-        }
+        p->actionChanged = 0;
+        sequence = choose(((struct SceneGraphicsActor *)p)->graphics.animationFlags, 43, 5);
+        SceneActors_StartDirectionalAnimation(
+            p, &((struct SceneGraphicsActor *)p)->animation,
+            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 4);
     } else {
-        int sequence = choose(p->mode, 43, 5);
-        {
-            int offset = 0x240;
-            SceneActors_StartDirectionalAnimation(p, (u8 *)p + offset, (u8 *)p + 0x220, sequence, 1,
-                                                  1, 1);
-        }
+        int sequence = choose(((struct SceneGraphicsActor *)p)->graphics.animationFlags, 43, 5);
+        SceneActors_StartDirectionalAnimation(
+            p, &((struct SceneGraphicsActor *)p)->animation,
+            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 1);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
     {
         u32 mask = 12;
-        p2->flags |= mask;
+        p2->actionFlags |= mask;
     }
-    if (!p2->reset(p2)) {
-        int delta = (s8)(position[9] - (u8)p2->savedAngle), distance = delta;
+    if (!p2->actionReset(p2)) {
+        int delta = (s8)(position[9] - (u8)p2->savedFacing), distance = delta;
         if (distance < 0)
             distance = -distance;
         if (distance <= 7) {
-            setFacing(p2, p2->savedAngle);
-            p2->finished = 1;
+            setFacing(p2, p2->savedFacing);
+            p2->actionFinished = 1;
         } else {
             int angle;
             if (delta < 0)
@@ -111,8 +63,8 @@ void SceneActors_UpdateDirectionalTurn(ActorAnimation *p)
                 angle = position[9] - 8;
             setFacing(p2, angle);
         }
-        p->minScale = 0;
-        p->maxScale = 0;
-        p->variant = 0;
+        ((struct SceneGraphicsActor *)p)->graphics.scaleMin = 0;
+        ((struct SceneGraphicsActor *)p)->graphics.scaleMax = 0;
+        ((struct SceneGraphicsActor *)p)->variant = 0;
     }
 }

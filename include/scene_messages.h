@@ -24,11 +24,6 @@ struct SceneMessages {
     struct SceneMessageReceiver self;       /* 0x78 */
 };
 
-struct SceneMessageArguments {
-    u32 header; /* low 16 bits: argument count; high 16 bits: preserved */
-    s32 *values;
-};
-
 struct SceneMessageReceiver *SceneMessages_FindReceiver(struct SceneMessages *, u32 id, u32 kind);
 u32 SceneMessages_LinkReceiver(struct SceneMessages *, struct SceneMessageReceiver *);
 u32 SceneMessages_UnlinkReceiver(struct SceneMessages *, struct SceneMessageReceiver *);

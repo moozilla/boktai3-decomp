@@ -1,17 +1,10 @@
-#include "global.h"
+#include "frame_display.h"
+#include "word_flags.h"
 
-struct P {
-    u8 f00[0x34];
-    u32 w34;
-    u8 f38[0x60 - 0x38];
-    u32 w60;
-};
-
-void ActorDebris_Hide(struct P *p)
+void ActorDebris_Hide(struct FrameDisplay *display)
 {
-    if (p != 0) {
-        u32 m = 1;
-        p->w60 |= m;
-        p->w34 |= m;
+    if (display) {
+        WordFlags_Set(1, &display->flags);
+        WordFlags_Set(1, &display->sprite.flags);
     }
 }

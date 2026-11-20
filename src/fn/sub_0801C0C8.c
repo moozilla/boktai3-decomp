@@ -1,50 +1,44 @@
-#include "global.h"
-typedef struct {
-    u32 pad[2], flags;
-    u8 pad2[20];
-    s16 x;
-    u8 tail[62];
-} Graphic;
-typedef struct {
-    u16 state, time;
-} State;
-void ResultMenu_UpdateMarkers(u8 *p)
+#include "result_tutorial.h"
+
+enum ResultMarkerFeedbackPhase {
+    FEEDBACK_INACTIVE,
+    FEEDBACK_ENTERING,
+    FEEDBACK_HOLDING,
+    FEEDBACK_LEAVING,
+};
+
+void ResultMenu_UpdateMarkers(struct ResultMenu *p)
 {
-    State *s = (State *)(p + 0x78c);
-    Graphic *g = (Graphic *)(p + 0x384);
+    struct ResultMarkerFeedback *s = p->markerFeedback;
+    struct SceneInputWidget *g = &p->widgets[6];
     int i;
-    int zero;
-    {
-        int initial = 0;
-        zero = initial;
-    }
-    for (i = 4; i >= 0; i--, s++, g++) {
-        switch (s->state) {
-            case 0:
+    for (i = 0; i < 5; i++, s++, g++) {
+        switch (s->phase) {
+            case FEEDBACK_INACTIVE:
                 break;
-            case 1:
-                g->x = (8 - s->time) * 8 + 4;
-                if (s->time > 7) {
-                    g->x = 4;
-                    s->state = 2;
-                    s->time = 0;
+            case FEEDBACK_ENTERING:
+                g->position.x = (8 - s->elapsed) * 8 + 4;
+                if (s->elapsed > 7) {
+                    g->position.x = 4;
+                    s->phase = FEEDBACK_HOLDING;
+                    s->elapsed = 0;
                 }
                 break;
-            case 2:
-                if (s->time > 63) {
-                    s->state = 3;
-                    s->time = zero;
+            case FEEDBACK_HOLDING:
+                if (s->elapsed > 63) {
+                    s->phase = FEEDBACK_LEAVING;
+                    s->elapsed = 0;
                     g->flags |= 0x200;
                 }
                 break;
-            case 3:
-                if (s->time > 7) {
-                    s->state = zero;
-                    s->time = zero;
+            case FEEDBACK_LEAVING:
+                if (s->elapsed > 7) {
+                    s->phase = FEEDBACK_INACTIVE;
+                    s->elapsed = 0;
                     g->flags = (g->flags & ~0x200) | 1;
                 }
                 break;
         }
-        s->time++;
+        s->elapsed++;
     }
 }

@@ -30,6 +30,13 @@ class Snippet(unittest.TestCase):
         text = '#include "global.h"\nstruct S { int a; };\nint F(struct S *s) { return s->a; }\n'
         self.assertTrue(scope.is_snippet(BASE, text, "F"))
 
+    def test_renamed_neighbor_remains_in_whole_file(self):
+        before = "\n".join(BASE).replace("Keep", "sub_08000000").splitlines()
+        after = "\n".join(BASE)
+        names = {"sub_08000000": "Keep"}
+        self.assertFalse(scope.is_snippet(before, after, "F", names))
+        self.assertFalse(scope.is_snippet(BASE, "\n".join(before), "F", names))
+
     def test_no_includes_is_a_snippet(self):
         self.assertTrue(scope.is_snippet(BASE, "int F(struct S *s) { return 0; }\n", "F"))
 

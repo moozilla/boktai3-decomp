@@ -1,51 +1,8 @@
-#include "global.h"
+#include "scene_actors.h"
+#include "scene_actor_charge_offset.h"
 #include "scene_graphics_actor.h"
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[5];
-    u8 finished, enter;
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    u8 (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    s16 scale, minScale, maxScale, scaleStep;
-    u8 pad34C[0x60];
-    u32 mode;
-} ActorAnimation;
 
-static inline void setFacing(ActorAnimation *p, int angle)
-{
-    int shifted;
-    u32 value;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3;
-    value &= shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7;
-    value &= shifted;
-    p->facing8 = value;
-}
-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void Sound_PlaySongChecked(int);
 int Math_Atan2(int, int);
-extern s16 gUnk_086149C4[];
 static inline int choose(u32 mode, int normal, int alternate)
 {
     int test = mode & 1;
@@ -55,10 +12,6 @@ static inline int choose(u32 mode, int normal, int alternate)
         result = alternate;
     return result;
 }
-static inline int trunc12(int x)
-{
-    return x >= 0 ? x >> 12 : -(-x >> 12);
-}
 static inline void decay(s16 *p)
 {
     if (*p > 23)
@@ -66,58 +19,51 @@ static inline void decay(s16 *p)
     else
         *p = 0;
 }
-void SceneActorAnimation_UpdateLungeAttack(ActorAnimation *p, int tick)
+void SceneActorAnimation_UpdateLungeAttack(struct StateActor *p, int tick)
 {
-    struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
-    ActorAnimation *p2 = p;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     u8 *position = (u8 *)p + 0x48;
     if (!p->locked)
-        setFacing(p, p->requestedAngle);
-    if (p->changed) {
+        SceneActors_SetFacing(p, p->requestedAngle);
+    if (p->actionChanged) {
         int sequence;
-        p->changed = 0;
+        p->actionChanged = 0;
         if (p->locked) {
             s16 *here = (s16 *)((u8 *)p + 0x54);
             s16 *dest;
             dest = (s16 *)((u8 *)p + 0x9c4);
-            p->savedAngle = Math_Atan2(dest[0] - *(s16 *)(position + 12), dest[2] - here[2]);
-            setFacing(p, p->savedAngle);
+            p->savedFacing = Math_Atan2(dest[0] - *(s16 *)(position + 12), dest[2] - here[2]);
+            SceneActors_SetFacing(p, p->savedFacing);
         } else {
-            if (graphicsActor->graphics.stepTableValuePrev == 2)
+            if (actor->graphics.stepTableValuePrev == 2)
                 Sound_PlaySongChecked(889);
             else
                 Sound_PlaySongChecked(888);
         }
-        sequence = choose(p2->mode, 51, 13);
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p2 + 0x240, (u8 *)p2 + 0x220, sequence, 2, 3,
-                                              4);
+        sequence = choose(actor->graphics.animationFlags, 51, 13);
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 2, 3, 4);
     } else {
-        int sequence = choose(p->mode, 51, 13);
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x240, (u8 *)p + 0x220, sequence, 2, 3,
-                                              1);
+        int sequence = choose(actor->graphics.animationFlags, 51, 13);
+        SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
+                                              sequence, 2, 3, 1);
     }
-    decay(&p2->minScale);
-    decay(&p2->maxScale);
-    if (!p->tryUpdate(p)) {
+    decay(&actor->graphics.scaleMin);
+    decay(&actor->graphics.scaleMax);
+    if (!p->actionTryUpdate(p)) {
         u32 mask = 64;
-        p->flags |= mask;
-        if (!p->reset(p)) {
+        p->actionFlags |= mask;
+        if (!p->actionReset(p)) {
             if (tick <= 63) {
                 int rate = ((int)mask - tick) >> 3;
-                s16 *velocity = (s16 *)(position + 20);
+                struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
                 u32 angle = position[9];
                 int speed;
                 speed = -rate;
-                {
-                    int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-                    int zero = 0;
-                    velocity[0] = x;
-                    velocity[1] = zero;
-                }
-                velocity[2] = trunc12(gUnk_086149C4[angle] * speed);
+                SceneActor_SetChargeOffset(angle, velocity, speed);
             }
             if (tick > 63)
-                p->finished = 1;
+                p->actionFinished = 1;
         }
     }
 }

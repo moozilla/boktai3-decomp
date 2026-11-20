@@ -3,13 +3,8 @@
 #include "contact_swarm.h"
 #include "engine.h"
 #include "player.h"
-struct TetherSegment {
-    u32 flags;
-    u8 unknown4[12];
-    u8 priority, unknown11[7];
-    struct ContactPosition position;
-    u8 unknown20[8];
-};
+#include "sprite_oam.h"
+#include "terrain_collision.h"
 /* Tentative identity: world actor with seven visible player-tether segments. */
 struct TetherPaletteView {
     u8 unknown0[0x18];
@@ -26,12 +21,6 @@ struct TetherMotionDelta {
 struct TetherBodyConfig {
     u32 id, flags;
     u8 category, angle, unknownA[2];
-};
-struct TetherMovementProbe {
-    u8 unknown0[4];
-    u16 previousCell, cell;
-    u8 previousHeight, height, previousSlope, slope;
-    u16 previousAttributes, attributes;
 };
 struct TetherInteractionProbe {
     u16 flags;
@@ -57,7 +46,7 @@ struct TetherActor {
         struct DisplayAnimation animation;
         struct TetherPaletteView colors;
     } display;
-    struct TetherMovementProbe movementProbeStorage;
+    struct SurfaceTrack movementProbeStorage;
     struct ContactCollider chargeCollider, secondaryCollider;
     struct TetherInteractionProbe interactionProbe;
     u8 actionRequested, actionAngle;
@@ -67,7 +56,7 @@ struct TetherActor {
     u16 stateFrame;
     struct ContactPosition savedPosition;
     u8 heading, unknown261[3];
-    struct TetherSegment segments[7];
+    struct SpriteDrawable segments[7];
     u16 paletteIndex;
     s16 shakeX;
     u16 displayOffsetY;

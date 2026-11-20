@@ -1,5 +1,5 @@
-#include "global.h"
-
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_init_actor.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
@@ -37,30 +37,6 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
     out->z = to->z - from->z;
 }
 
-static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
-static inline void State6(struct ChaseActor *a)
-{
-    u32 behavior = 6;
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = 0;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
 struct SavedPair {
     u32 x, z;
 };
@@ -91,28 +67,6 @@ static inline u8 Approach(struct ChaseActor *actor, struct SavedMotion *saved, s
     }
     return 0;
 }
-static inline void Scale(struct ChaseActor *actor)
-{
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
-}
 
 s32 Mod(s32, s32);
 static inline u8 Turned(s32 angle)
@@ -122,32 +76,19 @@ static inline u8 Turned(s32 angle)
         r = 1;
     return r;
 }
-static inline void Fill(void *dst, u32 *tmp, u32 v)
-{
-    *tmp = v;
-    CpuSet(tmp, dst, 0x05000002);
-}
 // confidence=low: spirals with decreasing speed and restores the saved facing direction.
 void TentacleBody_UpdateSpiral(struct ChaseActor *actor)
 {
-    u32 zero;
     s32 speed;
     s32 amplitude, turn, rate;
     s32 dx, dz;
     if (Take(&actor->base.field2B1)) {
-        Control(actor, *(void **)((u8 *)actor + 0x228), 1);
-        {
-            u32 m = 0x100000;
-            actor->base.statusFlags |= m;
-        }
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
+        MonsterInit_SetStatusFlags(actor, 0x100000);
     }
     if (Mod(actor->base.counter2AC, 48) == 0)
         Sound_PlaySong(0x3D7);
-    {
-        u8 *dst = (u8 *)actor + 0x2EC;
-        zero = 0;
-        Fill(dst, &zero, zero);
-    }
+    ZeroFill8(&actor->base.secondaryMotion);
     if ((s32)actor->base.counter2AC > 115) {
         s32 angle = *((u8 *)actor + 0xE9) - actor->base.body.direction;
         if (angle > 128)
@@ -156,7 +97,7 @@ void TentacleBody_UpdateSpiral(struct ChaseActor *actor)
             angle += 256;
         if (Turned(angle)) {
             actor->base.body.direction = *((u8 *)actor + 0xE9);
-            State6(actor);
+            SceneActorChase_SetState(actor, 0, 0, 6);
             return;
         }
     }

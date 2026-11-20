@@ -119,17 +119,14 @@ void RoamingObject_ApplyImpulse(struct RoamingObject *owner)
 
 void RoamingObject_UpdateAnimation(struct RoamingObject *owner)
 {
-    s32 angle = (owner->body.direction + 32) & 255;
-    s32 mask;
+    s32 heading = (owner->body.direction + 32) & 255;
+    s32 sector = heading >> 6;
+    s32 angle = (sector + 1) & 3;
     s32 row;
     u32 mirror;
     struct DisplaySequenceState *sequence;
-    *(&angle) >>= 6;
-    angle++;
-    mask = 3;
-    angle &= mask;
     if (angle > 1) {
-        row = mask - angle;
+        row = 3 - angle;
         mirror = 1;
     } else {
         row = angle;
@@ -382,17 +379,14 @@ void RoamingObjectB_ApplyImpulse(struct RoamingObject *owner)
 
 void RoamingObjectB_UpdateAnimation(struct RoamingObject *owner)
 {
-    s32 angle = (owner->body.direction + 32) & 255;
-    s32 mask;
+    s32 heading = (owner->body.direction + 32) & 255;
+    s32 sector = heading >> 6;
+    s32 angle = (sector + 1) & 3;
     s32 row;
     u32 mirror;
     struct DisplaySequenceState *sequence;
-    *(&angle) >>= 6;
-    angle++;
-    mask = 3;
-    angle &= mask;
     if (angle > 1) {
-        row = mask - angle;
+        row = 3 - angle;
         mirror = 1;
     } else {
         row = angle;

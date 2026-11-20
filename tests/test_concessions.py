@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -60,6 +61,13 @@ class Kinds(unittest.TestCase):
                 with self.subTest(declaration=declaration):
                     self.assertEqual(kinds(f"void f(void) {{ {declaration} }}"), ["volatile"])
 
+    def test_volatile_value_parameters(self):
+        self.assertEqual(kinds("void f(volatile int value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(u8 *out, volatile s32 value) { use(out, value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(vu16 value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(volatile u16 *reg) { use(*reg); }"), [])
+        self.assertEqual(kinds("int f(int value) { return (volatile u32 const)value; }"), [])
+
     def test_volatile_typedef_hardware_and_noncode(self):
         source = '''typedef vu32 HardwareWord;
 extern vu16 gInterruptFlags;
@@ -88,6 +96,32 @@ static inline void f(void)
 
     def test_comments_are_not_code(self):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
+
+    def test_const_local_in_scalar_declaration_group(self):
+        source = """void f(void)
+{
+    u32 kind, zero;
+    s16 one = 1, phase;
+    u8 direction, count;
+    u32 value = Select(0, one);
+}
+"""
+        self.assertEqual(c.sites(source), [c.Site(3, "const-local"), c.Site(4, "const-local")])
+
+    def test_dead_local_updates_discard_only_their_own_scalar(self):
+        source = """void f(s32 frame)
+{
+    {
+        u32 folded = (u32)frame;
+        folded += folded >> 3;
+        folded += folded >> 5;
+    }
+}
+"""
+        self.assertEqual(c.sites(source), [c.Site(5, "dead-local-update")])
+        self.assertEqual(kinds(source.replace("folded >> 5;", "folded >> 5;\n        emit(folded);")), [])
+        self.assertEqual(kinds(source.replace("folded >> 5", "ReadSample()")), [])
+        self.assertEqual(kinds(source.replace("(u32)frame;", "Publish(&folded);")), [])
 
     def test_tracked_kinds_are_not_counted(self):
         text = "void f(u8 *p) { again: g(); goto again; }"
@@ -160,7 +194,8 @@ class Tree(unittest.TestCase):
                         path = Path(dirpath, f)
                         text = path.read_text(errors="replace")
                         if "concession-ok" in text:
-                            problems += c.lint(text, path.relative_to(ROOT), single_use=once)
+                            rel = path.relative_to(ROOT)
+                            problems += c.lint(text, rel, single_use=once, tree=c.literal_param_sites(rel, text))
         self.assertEqual(problems, [])
 
 
@@ -177,6 +212,80 @@ class Warnings(unittest.TestCase):
     def test_small_forms(self):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
+
+    def test_expression_macro_with_one_wrapped_assignment(self):
+        macro = " \\\n".join((
+            "#define SAMPLE(table, i) ({",
+            "    const u16 *sample;",
+            "    do { sample = &(table)[i]; } while (0);",
+            "    sample;",
+            "})",
+        )) + "\n"
+        text = "\n" + macro + "void f(void) {\n    use(SAMPLE(table, 1), SAMPLE(table, 2));\n}\n"
+        self.assertEqual(c.warnings(c.sites(text)), [c.Site(2, "stmt-expr")])
+        # An ordinary expression macro can capture an argument for repeated reads.
+        capture = "#define SQUARE(x) ({ int value = (x); value * value; })\n"
+        self.assertEqual(warns(capture), [])
+        # A loop with additional statements may do work beyond assigning the result.
+        checked = macro.replace("sample = &(table)[i];", "checkIndex(i); sample = &(table)[i];")
+        self.assertEqual(warns(checked), [])
+
+    def test_subtracting_a_negated_variable(self):
+        for expression in ("rows[z] - -x", "rows[z] - (-x)"):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"),
+                                 ["subtract-negative"])
+        for expression in ("x - -1", "x-- - y", "x + y", "-(-value >> shift)", 'g("x - -y")'):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"), [])
+
+    def test_duplicate_branches_preserve_literal_differences(self):
+        text = """void f(u32 flag) {
+    if (flag) {
+        use("yes");
+    } else {
+        use("yes");
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace('} else {\n        use("yes");', '} else {\n        use("no");')), [])
+        self.assertEqual(warns(text.replace('} else {', '} else if (flag > 1) {')), [])
+
+    def test_duplicate_switch_arms_require_a_default(self):
+        text = """void f(int mode) {
+    switch (mode) {
+        case 0:
+            load(3);
+            break;
+        default:
+            load(3);
+            break;
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace("default:", "case 1:")), [])
+        self.assertEqual(warns(text.replace("case 0:\n            load(3);\n            break;", "case 0:")), [])
+        self.assertEqual(warns(text.replace("            break;\n", "")), [])
+
+    def test_duplicate_branches_match_the_same_field_update(self):
+        # spacing and comments do not make two arms different
+        source = """void f(struct Actor *p, int tick, u32 mask)
+{
+    if (tick) {
+        p->flags |= mask;
+    } else {
+        p->flags /* same value */ |= mask;
+    }
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("duplicate-branches",)), [c.Site(3, "duplicate-branches")])
+        self.assertEqual(warns(source.replace("flags /* same value */", "effectFlags")), [])
+        self.assertEqual(warns(source.replace("/* same value */ |= mask", "&= mask")), [])
+        # a condition with a side effect still decides nothing between two equal arms
+        self.assertEqual(warns(source.replace("if (tick)", "if (AdvanceTimer())")), ["duplicate-branches"])
+        self.assertEqual(warns('Print("if (tick) { p->flags |= mask; } else { p->flags |= mask; }");'), [])
 
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
@@ -196,6 +305,60 @@ class Warnings(unittest.TestCase):
             with self.subTest(decl=decl):
                 self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
 
+    def test_grouped_literal_initializers(self):
+        body = """void draw(void) {
+    u32 redBlue = 0x7c1f, product = 0xf83e0;
+    int i = 0, limit = 8;
+    int mutable = 3, value = update(&mutable);
+    int nested = consume('(', pair(i, value = 7)), one = 1;
+    u32 scales[] = {4, 8}, mask = 31;
+    i++;
+}
+"""
+        sites = c.warnings(c.sites(body))
+        self.assertEqual([(s.line, s.kind) for s in sites],
+                         [(2, "literal-local"), (3, "literal-local"), (5, "const-local"),
+                          (6, "literal-local")])
+
+    def test_shadowed_flag_writes_do_not_change_the_outer_local(self):
+        body = """void tick(void) {
+    u32 mask = 0x400;
+    if (enabled) {
+        use(mask);
+        u32 index, mask;
+        mask = 4;
+        change(&mask);
+    }
+    use(mask);
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+        self.assertEqual(warns(body.replace("    use(mask);\n}", "    mask++;\n}")), [])
+        self.assertEqual(warns(body.replace("        use(mask);", "        mask++;")), [])
+
+    def test_member_write_does_not_modify_a_same_named_local(self):
+        body = """void update(struct Actor *actor, struct Sprite sprite) {
+    int state = 4;
+    actor -> state = state;
+    sprite.state++;
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+
+    def test_number_named_record_members_are_not_locals(self):
+        body = """struct Header {
+    int one;
+};
+void clear(void) {
+    struct {
+        struct { int value; } inner;
+        u32 zero;
+    } scratch;
+    u32 zero = 0;
+}
+"""
+        self.assertEqual(warns(body), ["const-local"])
+
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])
@@ -210,6 +373,85 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_register_storage_does_not_hide_constant_locals(self):
+        source = ("void f(void) {\n    register u32 zero;\n    const register u32 mask = 4;\n"
+                  "    register int index = 0;\n    while (index < 4)\n        g(index++);\n"
+                  "    zero = 0;\n    g(zero, mask);\n}\n")
+        self.assertEqual(warns(source), ["const-local", "literal-local"])
+
+    def test_literal_local_with_separate_assignment(self):
+        source = """void f(void)
+{
+    int layer;
+    Prepare();
+    layer = 0;
+    Draw(layer, layer);
+}
+"""
+        # reported where the literal is
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(5, "literal-local")])
+
+    def test_separate_literal_assignment_can_change_or_be_conditional(self):
+        for body in (
+            "    layer = 0;\n    layer++;\n    Draw(layer);\n",
+            "    layer = 0;\n    Read(&layer);\n    Draw(layer);\n",
+            "    if (visible)\n        layer = 0;\n",
+            "    if (visible) {\n        layer = 0;\n        Draw(layer);\n    }\n",
+            "    if (visible)\n        layer = 1;\n    else\n        layer = 0;\n    Draw(layer);\n",
+            "    goto draw;\n    layer = 0;\ndraw:\n    Draw(layer);\n",
+        ):
+            with self.subTest(body=body):
+                source = "void f(int visible) {\n    int layer;\n" + body + "}\n"
+                self.assertEqual(c.sites(source, kinds=("literal-local",)), [])
+        # an inner local of the same name is its own local: the outer one is not reported
+        source = ("void f(int visible) {\n    int layer;\n    {\n        int layer;\n        layer = 0;\n"
+                  "        Draw(layer);\n    }\n    Draw(layer);\n}\n")
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(5, "literal-local")])
+
+    def test_literal_local_catches_a_separate_assignment(self):
+        text = """void f(void) {
+    u32 blueMask;
+    g("blueMask }");
+    blueMask = 0x7C00;
+    h(blueMask);
+}
+"""
+        self.assertEqual(
+            [site.line for site in c.sites(text) if site.kind == "literal-local"], [4]
+        )
+
+    def test_literal_local_ignores_mutable_or_conditional_assignments(self):
+        for body in (
+            "    mask = 0x7C00;\n    mask &= a;\n    g(mask);\n",
+            "    mask = 0x7C00;\n    h(&mask);\n    g(mask);\n",
+            "    if (a)\n        mask = 0x7C00;\n    else\n        mask = a;\n    g(mask);\n",
+            "    if (a) {\n        u32 mask = a;\n        g(mask);\n    }\n    mask = a;\n    g(mask);\n",
+            "    h(&mask);\n    mask = 0x7C00;\n    g(mask);\n",
+        ):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 a) {\n    u32 mask;\n" + body + "}\n"), [])
+
+    def test_literal_assignment_expression_requires_an_unread_local(self):
+        source = """u32 f(u32 sample)
+{
+    u32 horizontalMask;
+    u32 spread = sample & (horizontalMask = 0x7f);
+    return spread;
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(4, "literal-local")])
+        self.assertEqual(warns(source.replace("return spread;", "return spread + horizontalMask;")), [])
+        self.assertEqual(warns(source.replace("    u32 horizontalMask;\n", "extern u32 horizontalMask;\n")), [])
+        self.assertEqual(warns(source.replace("sample & (horizontalMask = 0x7f)",
+                                              'Lookup("(horizontalMask = 0x7f)")')), [])
+
+    def test_same_named_member_does_not_change_literal_local(self):
+        for store in ("p->state = state;", "record. state += state;", "p-> state++;"):
+            with self.subTest(store=store):
+                body = "void f(void) {\n    u32 state = 12;\n    " + store + "\n"
+                self.assertEqual(warns(body + "}\n"), ["literal-local"])
+                self.assertEqual(warns(body + "    state++;\n}\n"), [])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
@@ -217,6 +459,28 @@ class Warnings(unittest.TestCase):
     def test_local_union_defined_in_a_function(self):
         self.assertEqual(warns("void f(void) {\n    union {\n        u32 mask;\n        u32 *cursor;\n    } r;\n}\n"), ["local-union"])
         self.assertEqual(warns("void f(void) {\n    union Fixed value;\n}\n"), [])
+
+    def test_file_scope_member_union_is_not_local(self):
+        source = """\
+struct ActorCommand {
+    union {
+        s16 args[4];
+        struct {
+            s16 kind, value, initial, count;
+        } attachment;
+    } data;
+};
+
+static inline void ReadCommand(void)
+{
+union Local {
+    u32 word;
+    u16 halves[2];
+} sample;
+}
+"""
+        reports = [site for site in c.sites(source) if site.kind == "local-union"]
+        self.assertEqual([site.line for site in reports], [12])
 
     def test_warnings_do_not_score_and_library_is_exempt(self):
         text = "void f(void) {\n    int zero = 0;\n}\n"
@@ -229,6 +493,158 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns(good), [])
         self.assertEqual(c.lint(good), [])
         self.assertTrue(any("admission" in p for p in c.lint(bad)))
+
+
+class LiteralParam(unittest.TestCase):
+    """literal-param needs every call, so each case is a small tree on disk."""
+    HEADER = """static inline u32 WordFlags_Test(const u32 *flags, u32 mask)
+{
+    return *flags & mask;
+}
+"""
+
+    def tree(self, files):
+        import tempfile
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        for sub in ("src", "include"):
+            os.makedirs(os.path.join(tmp.name, sub))
+        for rel, text in files.items():
+            Path(tmp.name, rel).write_text(text)
+        return tmp.name
+
+    def found(self, files):
+        return {rel: [(s.line, s.kind) for s in sites] for rel, sites in c.literal_params(self.tree(files)).items()}
+
+    def test_literal_at_every_call(self):
+        root = self.tree({
+            "include/word_flags.h": "#ifndef GUARD\n#define GUARD\n" + self.HEADER + "#endif\n",
+            "src/a.c": '#include "word_flags.h"\nvoid f(struct P *p) {\n    if (WordFlags_Test(&p->flags, 1))\n        g();\n}\n',
+            "src/b.c": '#include "word_flags.h"\nu32 h(struct P *p) {\n'
+                       "    return WordFlags_Test(&p->flags, FLAG_READY | 0x10) + WordFlags_Test(&p->flags, (u32)(1 << 4));\n}\n",
+        })
+        site, = c.literal_params(root)["include/word_flags.h"]
+        self.assertEqual(site, c.Site(3, "literal-param"))
+        self.assertEqual(c.literal_param_calls(site), 3)
+        self.assertEqual(site.note, "3 call sites, each with a constant for `mask`")
+        self.assertEqual(c.literal_params(root).get("src/a.c"), None)
+        self.assertEqual(c.warnings(c.literal_param_sites("include/word_flags.h", root=root)), [site])
+
+    def test_bitwise_helpers_but_not_setters(self):
+        files = {"src/a.c": """static inline void Set(u32 mask, u32 *flags)
+{
+    *flags |= mask;
+}
+static inline void Clear(struct P *p, u16 bits)
+{
+    p->flags &= ~bits;
+}
+static inline s32 Scale(s32 value, u32 shift)
+{
+    return value >> shift;
+}
+static inline void Store(struct P *p, u8 state)
+{
+    p->state = state;
+}
+void f(struct P *p) {
+    Set(4, &p->flags);
+    Clear(p, 0x100);
+    Store(p, 3);
+    p->x = Scale(p->x, 8);
+}
+"""}
+        # Store is a setter: assigning the parameter to a field is ordinary C
+        self.assertEqual(self.found(files), {"src/a.c": [(1, "literal-param"), (5, "literal-param"),
+                                                         (9, "literal-param")]})
+
+    def test_a_setter_is_quiet(self):
+        for body in ("entry->value = value;", "*out = value;", "entry->value = value;\n    entry->dirty = 1;",
+                     "table[0] = value;"):
+            with self.subTest(body=body):
+                text = ("static inline void Set(struct E *entry, u32 *out, u32 *table, u32 value)\n{\n    " + body
+                        + "\n}\nvoid f(struct E *e, u32 *p) {\n    Set(e, p, p, 3);\n}\n")
+                self.assertEqual(self.found({"src/a.c": text}), {})
+        merged = ("static inline void Add(u8 bits, struct E *entry)\n{\n    entry->flags = bits | entry->flags;\n}\n"
+                  "void f(struct E *e) {\n    Add(1, e);\n}\n")
+        self.assertEqual(self.found({"src/a.c": merged}), {"src/a.c": [(1, "literal-param")]})
+
+    def test_candidate_text_stands_in_for_the_file(self):
+        caller = "void f(u32 *p, u32 m) {\n    WordFlags_Test(p, m);\n}\n"
+        root = self.tree({"include/word_flags.h": self.HEADER, "src/a.c": '#include "word_flags.h"\n' + caller,
+                          "src/b.c": "void g(void) {\n}\n"})
+        self.assertEqual(c.literal_params(root), {})
+        # the candidate replaces the only call with a variable
+        after = '#include "word_flags.h"\n' + caller.replace("WordFlags_Test(p, m)", "WordFlags_Test(p, 2)")
+        self.assertEqual(c.literal_params(root, {"src/a.c": after}), {"include/word_flags.h": [c.Site(1, "literal-param")]})
+        # a candidate with a helper of its own, which no file on disk knows about
+        own = "static inline u32 Low(u32 value, u32 mask)\n{\n    return value & mask;\n}\nu32 g(u32 v) {\n    return Low(v, 15);\n}\n"
+        self.assertEqual(c.literal_param_sites("src/b.c", own, root, candidate=True), [c.Site(1, "literal-param")])
+        self.assertEqual(c.literal_param_sites("src/b.c", own, root), [])
+        self.assertEqual(c.literal_params(root), {})
+
+    def test_a_variable_at_one_call_is_quiet(self):
+        caller = "void f(struct P *p, u32 m) {\n    WordFlags_Test(&p->flags, 1);\n    WordFlags_Test(&p->flags, %s);\n}\n"
+        for argument in ("m", "p->mask", "1 << m", "Mask(2)", "kMask"):
+            with self.subTest(argument=argument):
+                self.assertEqual(self.found({"src/a.c": self.HEADER + caller % argument}), {})
+        self.assertEqual(self.found({"src/a.c": self.HEADER + caller % "2"}), {"src/a.c": [(1, "literal-param")]})
+
+    def test_no_calls_is_quiet(self):
+        self.assertEqual(self.found({"include/word_flags.h": self.HEADER,
+                                     "src/a.c": "static inline u32 WordFlags_Test(const u32 *flags, u32 mask);\n"}), {})
+
+    def test_a_longer_body_is_quiet(self):
+        longer = """static inline u32 Test(struct P *p, u32 mask)
+{
+    u32 *flags = &p->flags;
+    u32 value = *flags;
+    return value & mask;
+}
+void f(struct P *p) {
+    Test(p, 1);
+}
+"""
+        self.assertEqual(self.found({"src/a.c": longer}), {})
+        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = *flags;\n", "").replace("value", "*flags")}),
+                         {"src/a.c": [(1, "literal-param")]})
+
+    def test_other_uses_of_the_parameter_are_quiet(self):
+        for body in ("return *flags + mask;", "return flags[mask];", "return *flags == mask;",
+                     "return Lookup(*flags, mask);", "return *flags & (mask - 1);", "u32 m = mask; return *flags & m;",
+                     "return *flags;"):
+            with self.subTest(body=body):
+                text = ("static inline u32 Test(u32 *flags, u32 mask)\n{\n    " + body + "\n}\n"
+                        "void f(u32 *p) {\n    Test(p, 1);\n}\n")
+                self.assertEqual(self.found({"src/a.c": text}), {})
+
+    def test_a_pointer_parameter_is_not_one(self):
+        text = "static inline u32 Read(u32 *flags)\n{\n    return *flags & 1;\n}\nvoid f(void) {\n    Read(0);\n}\n"
+        self.assertEqual(self.found({"src/a.c": text}), {})
+
+    def test_calls_belong_to_the_file_own_clone(self):
+        clone = "static inline u32 TestFlags(u32 *flags, u32 mask)\n{\n    return *flags & mask;\n}\n"
+        files = {
+            "src/a.c": clone + "void f(u32 *p) {\n    TestFlags(p, 1);\n}\n",
+            "src/b.c": clone + "void g(u32 *p, u32 m) {\n    TestFlags(p, m);\n}\n",
+            "include/shared.h": clone,
+            "include/other.h": clone,
+            "src/c.c": '#include "shared.h"\nvoid h(u32 *p) {\n    TestFlags(p, 8);\n}\n',
+            "src/d.c": '#include "other.h"\nvoid i(u32 *p, u32 m) {\n    TestFlags(p, m);\n}\n',
+        }
+        self.assertEqual(self.found(files), {"src/a.c": [(1, "literal-param")], "include/shared.h": [(1, "literal-param")]})
+
+    def test_comment_excuses_and_lint_checks_it(self):
+        allow = "// concession-ok(literal-param): the SDK header documents this accessor by name\n"
+        text = allow + self.HEADER + "void f(u32 *p) {\n    WordFlags_Test(p, 1);\n}\n"
+        root = self.tree({"src/a.c": text})
+        sites = c.literal_param_sites("src/a.c", text, root)
+        self.assertEqual(sites, [c.Site(2, "literal-param", True)])
+        self.assertEqual(c.warnings(sites), [])
+        self.assertEqual(c.lint(text, "src/a.c", tree=sites), [])
+        self.assertEqual(c.lint(text, "src/a.c"), [])  # without the tree pass there is nothing to check against
+        stale, = c.lint(text, "src/a.c", tree=[])
+        self.assertIn("has no literal-param", stale)
 
 
 class Compiler(unittest.TestCase):
@@ -250,6 +666,29 @@ class Compiler(unittest.TestCase):
 
     def test_unreachable_arm_on_a_narrow_value(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gHalf;\n    if ((s32)raw < 0) {\n        g(raw);\n        return;\n    }\n    g(1);\n}\n"), ["dead-code"])
+
+    def test_explicit_narrow_guard_recovers_a_dead_register_assignment(self):
+        path = "src/sample.c"
+        body = ("void f(void *resource) {\n"
+                "    u32 raw = (u8)(u32)resource;\n"
+                "    if ((s32)raw < 0)\n"
+                "        resource = 0;\n"
+                "}\n")
+        compiler_reports = ([], [("dead-code", path, 4, "f", "store")])
+        for reports in compiler_reports:
+            with self.subTest(reports=reports), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=reports):
+                self.assertEqual(c.compiler_sites(path, body), [c.Site(4, "dead-code")])
+
+    def test_narrow_guard_requires_the_value_to_stay_bounded(self):
+        path = "src/sample.c"
+        for setup in ("    u32 raw = (s8)value;",
+                      "    u32 raw = (u8)value + delta;",
+                      "    u32 raw = (u8)value;\n    raw = delta;"):
+            with self.subTest(setup=setup), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=[]):
+                body = f"void f(void) {{\n{setup}\n    if ((s32)raw < 0)\n        value = 0;\n}}\n"
+                self.assertEqual(c.compiler_sites(path, body), [])
 
     def test_respelling_the_guard_does_not_hide_it(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gByte;\n    if (raw & 0x100) {\n        gWord = raw;\n    }\n    g(1);\n}\n"), ["dead-code", "proved-zero"])

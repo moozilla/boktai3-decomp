@@ -1,5 +1,6 @@
 #include "slime.h"
 #include "scene_actor_turn.h"
+#include "scene_actor_visibility.h"
 #include "engine.h"
 #include "ram.h"
 #include "scene_actor_registry.h"
@@ -11,6 +12,7 @@
 #include "scene_actor_animation.h"
 #include "display_sequence_inline.h"
 #include "scene_actor_chase_reaction.h"
+#include "scene_actor_contact_response.h"
 #include "scene_actor_terrain.h"
 #include "engine_globals.h"
 #include "scene_actor_motion.h"
@@ -24,18 +26,20 @@
 void Slime_ApplyBodyHit(struct ContactCollider *target, struct ContactCollider *info,
                         struct ChaseActor *actor)
 {
-    s32 k2 = 1;
-    if ((!SceneActor_ActionsBlocked((void *)actor)) && (info->contactFlags == k2)) {
-        if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
-            actor->base.counter304 = info->collisionId;
-            {
-                u32 *field = &actor->base.statusFlags;
-                u32 mask = ~0x1000000;
-                *field &= mask;
-            }
-        }
-        if (actor->base.paletteOffset == 3) {
-            target->reactionFlags = Slime_GetRandomVariantFlags((u8 *)actor);
+    if (!SceneActor_ActionsBlocked(actor)) {
+        switch (info->contactFlags) {
+            case 1:
+                if (!SceneActor_ActionsBlocked((void *)actor) && (info->contactFlags & 0xF)) {
+                    actor->base.counter304 = info->collisionId;
+                    {
+                        u32 *field = &actor->base.statusFlags;
+                        u32 mask = ~0x1000000;
+                        *field &= mask;
+                    }
+                }
+                if (actor->base.paletteOffset == 3) {
+                    target->reactionFlags = Slime_GetRandomVariantFlags((u8 *)actor);
+                }
         }
     }
 }
@@ -152,7 +156,8 @@ void Slime_StartWalkChoice(struct ChaseActor *actor)
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 1);
         actor->base.field2C2 = 0x40;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
     }
     if (actor->base.restart) {
         s32 r;
@@ -171,7 +176,8 @@ void Slime_RollMoveFlag(struct ChaseActor *actor)
     if (Slime_TakePrepared(actor)) {
         u16 *scale = &actor->base.field2C2;
         *scale = 0x40;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x10);
     }
     {
@@ -200,7 +206,8 @@ void Slime_StartRandomWait(struct ChaseActor *actor)
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x11);
         actor->base.field2C2 = 0x40;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
     }
     if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_UpdateRandomWait, 0x22);
@@ -211,7 +218,8 @@ void Slime_UpdateReturnToIdle(struct ChaseActor *actor)
     if (Slime_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry((void *)actor, 0x12);
         actor->base.field2C2 = 0x40;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
     }
     if (actor->base.restart) {
         u8 *q = &actor->base.state2A8;
@@ -246,7 +254,8 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant, flags);
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, selection, variant,
+                         flags);
         restart = &actor->restart;
     } else {
         struct SceneInputWidget *tile =
@@ -267,9 +276,8 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -278,7 +286,7 @@ static inline void Slime_SelectWaitAnimation(struct RoomActor *actor, s32 index,
             {
                 u8 playbackFlags = flags;
                 if (playbackFlags & 1)
-                    tile->flags |= mask;
+                    tile->flags |= 4;
                 else
                     tile->flags &= ~4;
             }
@@ -300,8 +308,9 @@ void Slime_UpdateRandomWait(struct ChaseActor *actor)
         }
         if (!actor->base.field2C2)
             actor->base.field2C2 = 64;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence,
-                              actor->base.field2C2);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            actor->base.field2C2);
     }
     if (actor->base.restart)
         SceneActorChase_SetControl(actor, Slime_PlayWaitAnimation, 0x23);
@@ -342,30 +351,12 @@ static inline u8 Slime_TakeEntryFlag(struct ChaseActor *p)
     return 0;
 }
 
-static inline void Slime_ClearControlFlags(u32 *flags, u32 mask)
-{
-    u32 m = ~mask;
-    *flags &= m;
-}
-
-static inline void Slime_SetNextControl(struct ChaseActor *p, void (*fn)(void *), u32 wait)
-{
-    u8 *flag = &p->base.field2B2;
-    u32 zero = 0;
-    *flag = 1;
-    p->base.stepDone = zero;
-    p->base.controlKind = wait;
-    p->base.target = fn;
-    p->base.field2C8 = zero;
-    Slime_ClearControlFlags(&p->base.pendingControlFlags, 1);
-    p->base.pendingControl = zero;
-}
-
 void Slime_UpdateWalkTransition(struct ChaseActor *p)
 {
     if (Slime_TakeEntryFlag(p)) {
         SceneActorAnimation_SelectProfileEntry((void *)p, 0xe);
-        Anim_SetDurationScale(&((struct SlimeDrawable *)p->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)p->base.drawable)->sequence, 0x40);
     }
     if (p->base.restart != 0) {
         u32 index = (gRandomIndex + 1) & 1023;
@@ -374,9 +365,9 @@ void Slime_UpdateWalkTransition(struct ChaseActor *p)
         r = *(u16 *)(index * 2 + (u32)gRandomTable);
         r &= 0x1f;
         if (r <= 0x17)
-            Slime_SetNextControl(p, Slime_RollMoveFlag, 0);
+            SceneActorChase_SetControl(p, Slime_RollMoveFlag, 0);
         else
-            Slime_SetNextControl(p, Slime_StartWalkChoice, 0x29);
+            SceneActorChase_SetControl(p, Slime_StartWalkChoice, 0x29);
     }
 }
 
@@ -420,11 +411,18 @@ static inline u32 Slime_IsReactionComplete(struct ChaseActor *actor)
     return complete;
 }
 
+static inline u32 *Slime_EnableReactionMotion(struct ChaseActor *actor, u32 bits)
+{
+    u32 *flags = &actor->base.behaviorFlags;
+    *flags |= bits;
+    return flags;
+}
+
 void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     struct DisplaySequenceState *sequence =
-        (void *)(&((struct SlimeDrawable *)actor->base.drawable)->sequence);
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     s32 x;
     s32 z;
     s16 *priorX;
@@ -442,15 +440,8 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         }
         actor->base.restart = 0;
     }
-    {
-        u32 mask = 0x2000;
-        t = &actor->base.behaviorFlags;
-        *t |= mask;
-    }
-    {
-        u32 mask = 0x10000;
-        actor->base.statusFlags |= mask;
-    }
+    t = Slime_EnableReactionMotion(actor, 0x2000);
+    MonsterInit_SetStatusFlags(actor, 0x10000);
     {
         s32 current = actor->base.reactionStart.x;
         s16 *field = &actor->base.reactionEnd.x;
@@ -477,15 +468,8 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         if (!rest)
             sequence->elapsed = rest;
         else if (Slime_IsReactionComplete(actor)) {
-            u8 *field = &actor->base.stepDone;
-            u32 ready = 1;
-
-            *field = ready;
-            {
-                u16 *flags = &actor->base.motionFlags;
-                u32 mask = ready - 34;
-                *flags = mask & *flags;
-            }
+            actor->base.stepDone = 1;
+            SceneActorChase_ClearMotionFlagComponent(actor, 0x20);
             {
                 u32 mask = ~0x80;
                 *actorFlags = mask & *actorFlags;
@@ -510,16 +494,14 @@ void Slime_UpdateShake(struct ChaseActor *actor, s32 elapsed)
 {
     struct Slime *q = actor->base.context;
     struct DisplaySequenceState *st =
-        (struct DisplaySequenceState *)(&((struct SlimeDrawable *)actor->base.drawable)->sequence);
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     if (Slime_TakePrepared(actor)) {
         q->enrageCount = 0;
         actor->base.field2C2 = 0x40;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
         SceneActorAnimation_SelectProfileEntry(actor, 1);
-        {
-            u32 bit = 0x100;
-            actor->base.motionFlags = bit | actor->base.motionFlags;
-        }
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
     }
     st->index = 0;
     st->elapsed = 5;
@@ -544,16 +526,17 @@ static inline s32 Shift12(s32 x)
 
 void Slime_UpdateLaunch(struct ChaseActor *actor)
 {
-    struct SlimeDrawable *d = actor->base.drawable;
+    struct SceneActorAnimationSequenceDrawable *d = actor->base.drawable;
     u32 mask;
-    struct DisplaySequenceState *anim = (struct DisplaySequenceState *)&d->sequence;
+    struct DisplaySequenceState *anim = &d->sequence;
     if (Slime_TakePrepared(actor)) {
         struct ContactPosition *v;
         u32 heading;
         s32 speed;
         u8 *hp;
         actor->base.field2C2 = 0x20;
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, 0x40);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, 0x40);
         hp = &actor->base.tracking.heading;
         v = &actor->base.secondaryMotion;
         heading = *hp;
@@ -562,22 +545,23 @@ void Slime_UpdateLaunch(struct ChaseActor *actor)
         v->y = 0;
         v->z = Shift12(gUnk_086149C4[heading] * speed);
         actor->base.secondaryMotion.y = 0x28;
-        d->flags |= 2;
-        d->scaleX = 0x40;
-        d->scaleY = 0x40;
+        /* The affine renderer uses the palette bytes as signed scales. */
+        d->sprite.flags |= 2;
+        d->sprite.palette = 0x40;
+        d->sprite.paletteVariant = 0x40;
         Sound_PlaySong(0x3C1);
         actor->base.field2E8 = 0;
     }
     if (anim->index == 3)
         anim->elapsed = 0;
     if (actor->base.secondaryMotion.y > 0) {
-        if (d->scaleY <= 0x7E)
-            d->scaleY = d->scaleY + 1;
+        if ((s8)d->sprite.paletteVariant <= 0x7E)
+            d->sprite.paletteVariant = (s8)d->sprite.paletteVariant + 1;
     } else {
-        if (d->scaleY > 0x40)
-            d->scaleY = d->scaleY - 2;
-        if (d->scaleY <= 0x3F)
-            d->scaleY = 0x40;
+        if ((s8)d->sprite.paletteVariant > 0x40)
+            d->sprite.paletteVariant = (s8)d->sprite.paletteVariant - 2;
+        if ((s8)d->sprite.paletteVariant <= 0x3F)
+            d->sprite.paletteVariant = 0x40;
     }
     mask = 0x10;
     if (actor->base.statusFlags & mask) {
@@ -590,16 +574,12 @@ void Slime_UpdateLaunch(struct ChaseActor *actor)
 
 void Slime_UpdateStill(struct ChaseActor *actor)
 {
-    struct SlimeDrawable *d = actor->base.drawable;
+    struct SceneActorAnimationSequenceDrawable *d = actor->base.drawable;
     if (Slime_TakePrepared(actor)) {
-        d->scaleX = 0x40;
-        d->scaleY = 0x40;
-        d->flags &= ~2;
-        {
-            u16 *f = &actor->base.motionFlags;
-            u32 mask = 0xFFFFFEFF;
-            *f = mask & *f;
-        }
+        d->sprite.palette = 0x40;
+        d->sprite.paletteVariant = 0x40;
+        d->sprite.flags &= ~2;
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x100);
     }
     if (actor->base.restart) {
         actor->base.field2C2 = 0x40;
@@ -629,29 +609,7 @@ static inline void Slime_SetReactionState(struct ChaseActor *actor, u8 state, u8
     actor->base.field2B1 = 1;
 }
 
-/* Explicit branches retain the original shared true/false exit blocks. */
-
-static inline u8 Slime_IsHidden(struct ChaseActor *a)
-{
-    u32 mask = 1;
-    if (!a->base.drawableKind) {
-        if (((struct SlimeDrawable *)a->base.drawable)->flags & mask)
-            goto yes;
-        else
-            goto no;
-    } else {
-        if (((struct SceneActorRegistryTileDrawable *)a->base.drawable)->flags & mask)
-            goto yes;
-        else
-            goto no;
-    }
-yes:
-    return 1;
-no:
-    return 0;
-}
-
-void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
+void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ScriptUtilityArguments arguments;
@@ -667,14 +625,8 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
             *p = mask & *p;
         }
     }
-    {
-        u32 mask = 0x8000;
-        u32 *p = &actor->base.behaviorFlags;
-        u32 v = *p & mask;
-        stateFlags = p;
-        if (v)
-            return;
-    }
+    if (SceneActorContact_ReadActorFlags(actor, 0x8000, &stateFlags))
+        return;
 
     if (Sprite_BlinkUntilExpired(actor->base.drawable, frame, 10, 30)) {
         actor->base.stepDone = 1;
@@ -692,17 +644,12 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
             arguments.values = values;
             Script_Call(script, &arguments);
         }
-        {
-            u32 mask = 0x4000;
-            if (!(actor->base.motionFlags & mask) && (u32)(actor->base.category - 11) > 2)
-                Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-        }
-        {
-            u32 mask = 0x400;
-            if (!(*stateFlags & mask))
-                SceneActorBehavior_CallTerrainScript((void *)actor);
-        }
+        if (!(SceneActorChase_QueryMotionFlagComponent(actor, 0x4000)) &&
+            (u32)(actor->base.category - 11) > 2)
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+        if (!(SceneActorChase_Bits32(stateFlags, 0x400)))
+            SceneActorBehavior_CallTerrainScript((void *)actor);
         {
             void *callback = (void *)SceneActorControl_OnIdle;
             u32 kind;
@@ -721,7 +668,7 @@ void Bat_RunDefeatScript(struct ChaseActor *actor, s32 frame)
         }
         Slime_SetReactionState(actor, 1, 0, 2);
     } else {
-        if (Slime_IsHidden(actor))
+        if (SceneActorVisibility_IsHidden(actor))
             ActorShadow_Disable(actor->base.shadow);
         else
             ActorShadow_Enable(actor->base.shadow);
@@ -739,7 +686,7 @@ inline static u8 Slime_TakeActionEntry(u8 *p)
     return 0;
 }
 
-void Bat_UpdateActionScript(struct ChaseActor *obj)
+void Slime_UpdateActionScript(struct ChaseActor *obj)
 {
     struct Slime *context = obj->base.context;
 
@@ -820,23 +767,11 @@ static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
 
 static inline void Slime_SetMotionScale(struct ChaseActor *actor)
 {
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale(&((struct SlimeDrawable *)actor->base.drawable)->sequence, *scale);
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
@@ -859,12 +794,7 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
     Slime_SetMotionScale(actor);
     if (Slime_ApproachWanderTarget(actor, &context->wanderTarget, speed))
         Slime_SelectWanderTarget(actor, actor->base.body.direction);
-    {
-        u32 m = 0x2000;
-        u32 f = actor->base.behaviorFlags;
-        f |= m;
-        actor->base.behaviorFlags = f;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
     actor->base.counter2AC++;
 }
 
@@ -959,8 +889,7 @@ s32 Slime_GetAnimationMovePulse(struct ChaseActor *actor)
     if (sequence->elapsed)
         result = 0;
     else {
-        u32 mask = 0x10000;
-        actor->base.statusFlags |= mask;
+        MonsterInit_SetStatusFlags(actor, 0x10000);
         result = Mod(sequence->index, 6);
         {
             const u16 *table = gUnk_08605D58;
@@ -1078,23 +1007,6 @@ selected:
     context->wanderTarget.position = center;
 }
 
-static inline u8 Slime_TestFlag(struct ChaseActor *actor)
-{
-    struct SceneActorChaseTracking *p = &actor->base.tracking;
-    u32 mask = 2;
-    if (p->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 Slime_TestContext(struct Slime *q)
-{
-    u32 mask = 8;
-    if (q->flags & mask)
-        return 1;
-    return 0;
-}
-
 static inline void Slime_SetFlags2D6(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = bits;
@@ -1108,7 +1020,7 @@ u32 Slime_TryEnrage(struct ChaseActor *actor)
     struct Slime *q = actor->base.context;
     s32 dy;
     actor->base.field2C2 = 0x40;
-    if (!Slime_TestFlag(actor))
+    if (!MonsterInit_TestTargetingFlags(&actor->base.tracking, 2))
         return 0;
     dy = actor->base.body.position.y -
          ((struct SceneActorChasePlayer *)gPlayers[0])->target.position.y;
@@ -1118,7 +1030,7 @@ u32 Slime_TryEnrage(struct ChaseActor *actor)
         return 0;
     if (actor->base.tracking.distance > actor->base.tracking.limit)
         return 0;
-    if (actor->base.health < q->halfHealth || Slime_TestContext(q)) {
+    if (actor->base.health < q->halfHealth || Slime_HasContextFlag(q, 8)) {
         Slime_SetFlags2D6(actor, 0x80);
         {
             struct SceneActorChaseTracking *p = &actor->base.tracking;
@@ -1167,7 +1079,7 @@ void Slime_OnInterrupt(struct ChaseActor *actor)
     }
 }
 
-void Bat_ReadScriptValuePair(struct ChaseActor *actor)
+void Slime_ReadSplitScript(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     s32 a = Script_SeekToKeyword('s');
@@ -1234,21 +1146,7 @@ void Slime_RunPendingActionScript(struct ChaseActor *actor)
             flags |= *p;
             *p = flags;
         }
-        {
-            void *callback = (void *)SceneActorControl_OnIdle;
-            u32 kind = 16;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = kind;
-            actor->base.target = callback;
-            actor->base.field2C8 = 0;
-            {
-                u32 *p = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *p &= mask;
-            }
-            actor->base.pendingControl = 0;
-        }
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
         Slime_SetReactionState(actor, 0, 0, 2);
         {
             u16 *p = &actor->base.reactionFlags;
@@ -1661,9 +1559,9 @@ static inline void Slime_ClearPendingFlags(u16 *q, u32 m)
     *q = m & *q;
 }
 
-static inline u8 Slime_TestPendingFlags(u16 *m, u32 b)
+static inline u8 Slime_TestPendingFlag(u16 mask, const u16 *field)
 {
-    if (*m & b)
+    if (*field & mask)
         return TRUE;
     return FALSE;
 }
@@ -1671,8 +1569,7 @@ static inline u8 Slime_TestPendingFlags(u16 *m, u32 b)
 void Slime_PlayPendingSound(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
-    u32 m = 0x10;
-    if (Slime_TestPendingFlags(&context->flags, m)) {
+    if (Slime_TestPendingFlag(0x10, &context->flags)) {
         Sound_PlaySong(0x3C2);
         Slime_ClearPendingFlags(&context->flags, ~0x10);
     }
@@ -1694,12 +1591,7 @@ void SceneActorMotion_ArmPrimaryCollider(struct SceneActorMotionView *actor)
     actor->parameter2D8 = 0;
     actor->field2DC = 0;
     actor->mode2E6 = 1;
-    {
-        u32 mask = 0x2000;
-        u32 *flags;
-        flags = &actor->flags2CC;
-        *flags |= mask;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
 }
 
 static inline void Slime_ClearMotionBits(u16 *p, u32 mask)
@@ -1772,7 +1664,6 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     u16 *motionFlags;
-    u32 zero;
     u32 damage;
     if (actor->base.reactionSoundVariant == 0)
         Sound_PlaySong(0x211);
@@ -1804,8 +1695,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
     } else {
         if (Slime_MaskedMotionBits(motionFlags, 0x100))
             return 0;
-        if (actor->base.health < context->halfHealth ||
-            (zero = Slime_TestReactionFlag(context, 8))) {
+        if (actor->base.health < context->halfHealth || Slime_TestReactionFlag(context, 8)) {
             Slime_SetReactionControl(actor, SceneActorControl_OnIdle, 0x10);
             Slime_SetDamageState(actor, 0, 0, 2);
             Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
@@ -1819,8 +1709,7 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
 
 u32 Slime_ProcessPendingStateChange(struct ChaseActor *actor)
 {
-    u32 m = 0x100;
-    if (Slime_TestPendingFlags(&actor->base.reactionFlags, m)) {
+    if (Slime_TestPendingFlag(0x100, &actor->base.reactionFlags)) {
         Slime_OnInterrupt(actor);
         Slime_ClearPendingFlags(&actor->base.reactionFlags, ~0x100);
     }
@@ -2013,7 +1902,8 @@ static inline void Slime_ReadPalette(struct ChaseActor *actor, u16 base, u16 alt
     MonsterInit_SetAlternatePaletteOffset(actor, MonsterInit_GetPaletteOffset(actor) + 0xCC);
     r1v = MonsterInit_GetPaletteBase(actor) + MonsterInit_GetPaletteOffset(actor);
     if (MonsterInit_GetDrawableKind(actor) == 0)
-        AnimData_SelectPaletteBank(((struct SlimeDrawable *)actor->base.drawable)->animation, r1v);
+        AnimData_SelectPaletteBank(
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->graphics, r1v);
     else
         ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->palette =
             gPaletteBankData + (r1v << 5);
@@ -2129,7 +2019,8 @@ s32 Slime_Init(void *object)
         actor->base.groundHeight = ground;
         slime->previousGround = ground;
         if (MonsterInit_GetDrawableKind(actor) == 0)
-            ((struct SlimeDrawable *)actor->base.drawable)->position = actor->base.body.position;
+            ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sprite.position =
+                actor->base.body.position;
         else
             ((struct SceneActorRegistryTileDrawable *)actor->base.drawable)->position =
                 actor->base.body.position;
@@ -2154,12 +2045,12 @@ s32 Slime_Init(void *object)
     actor->base.heightOffset = Script_GetKeywordValue('f', 0);
     if (actor->base.heightOffset)
         Slime_SetFlags(slime, 0x10);
-    Bat_ReadScriptValuePair(actor);
+    Slime_ReadSplitScript(actor);
     Slime_ReadPalette(actor, 0xCC, 0x192);
     Slime_InitColliders(actor);
     MonsterInit_InstallPrimary(actor, Slime_Update, Slime_GetAnimationMovePulse, 0,
                                Slime_ResetAnimation, Slime_RollMoveFlag, 0,
-                               Slime_ConvergeReactionMotion, Bat_RunDefeatScript,
+                               Slime_ConvergeReactionMotion, Slime_RunDefeatScript,
                                SceneActorReaction_OnEnemyDefault, 0,
                                SceneActorReaction_ResolveDamage, Slime_ResolveDamageReaction);
     Slime_InstallRoutes(actor);

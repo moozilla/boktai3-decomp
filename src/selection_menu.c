@@ -1,8 +1,7 @@
 #include "selection_menu.h"
 #include "render.h"
 #include "display_sequence_inline.h"
-#define Presentation_PlaySelectionSound sub_0801A0D0
-#define SelectionMenu_HideMarkers       sub_0801A614
+#include "script_utility.h"
 
 void ActionRecord_CopyFromEntry(u8 *, void *);
 void Presentation_ApplyGraphicData(void *, void *);
@@ -35,10 +34,10 @@ int Inventory_GetConsumableId(u32);
 void ScrollingDialogue_SetScript(u32);
 void MessageWindow_SetMessageTable(u32);
 void MessageWindow_ShowMessage(u32);
-void sub_0801A218(struct SelectionMenu *);
+void SelectionMenu_InitPanel(struct SelectionMenu *);
 void SelectionMenu_InitCursors(struct SelectionMenu *);
 void SelectionMenu_InitMarkers(struct SelectionMenu *);
-void sub_0801A6D0(struct SelectionMenu *);
+void SelectionMenu_InitIconGrid(struct SelectionMenu *);
 int SelectionMenu_NavigateGrid(struct SelectionMenu *);
 u32 Script_GetTextSourcePc(void);
 
@@ -52,7 +51,7 @@ void Presentation_UpdateActorGraphic(struct SelectionMenu *p, u32 fallback);
 void Presentation_ShowItemDescription(u8 *p, u32 q);
 void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback);
 void SelectionMenu_CallConfirmScript(struct SelectionMenu *p);
-void Presentation_PlaySelectionSound(void *p, int selection);
+void SelectionMenu_PlaySelectionSound(void *p, int selection);
 int SelectionMenu_ConfigureLayers(int value, int mode);
 void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p);
 void SelectionMenu_InitHighlight(struct SelectionMenu *p);
@@ -193,18 +192,18 @@ void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback)
 
 void SelectionMenu_CallConfirmScript(struct SelectionMenu *p)
 {
-    struct SelectionMenuScriptValues a;
-    struct SelectionMenuScriptCall b;
-    b.flags = 2;
-    b.args = &a;
-    a.actor = p->choices[0];
-    a.item = p->choices[1];
-    Script_Call(p->confirmScript, &b);
+    s32 values[2];
+    struct ScriptUtilityArguments args;
+    args.count = 2;
+    args.values = values;
+    values[0] = p->choices[0];
+    values[1] = p->choices[1];
+    Script_Call(p->confirmScript, &args);
 }
 
 /* Tentative: choose one of three selection sounds. */
 
-void Presentation_PlaySelectionSound(void *p, int selection)
+void SelectionMenu_PlaySelectionSound(void *p, int selection)
 {
     switch (selection) {
         case 0:
@@ -253,14 +252,6 @@ void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p)
     }
 }
 
-struct PanelSprite {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[8];
-    u16 tile;
-    u8 pad12[10];
-    s16 x, y;
-};
 // Show the sequence's current frame and flips on the panel, then advance it.
 static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
                                            struct DisplaySequenceState *st)
@@ -298,14 +289,14 @@ static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
     }
 }
 
-void sub_0801A218(struct SelectionMenu *m)
+void SelectionMenu_InitPanel(struct SelectionMenu *m)
 {
     struct DisplaySequenceState a;
-    long long attr;
+    struct ContactPosition position;
     void *res;
-    ZeroFill8(&attr);
-    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
-    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
+    ZeroFill8(&position);
+    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &position);
+    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &position);
     res = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(m->panel.graphics, 0x593A);
     AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
@@ -339,11 +330,11 @@ void SelectionMenu_InitMarkers(struct SelectionMenu *p)
 
 void SelectionMenu_InitHighlight(struct SelectionMenu *p)
 {
-    struct ContactPosition z;
-    u32 m = 0xFFFF0000;
-    *(u32 *)&z = 0x800000;
-    *((u32 *)&z + 1) &= m;
-    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &z);
+    struct ContactPosition position;
+    position.x = 0;
+    position.y = 0x80;
+    position.z = 0;
+    Widget_InitLinked(&p->highlight, &p->iconResource, 0x189, 0x11, 0, 0, 0x3c, &position);
 }
 
 void SelectionMenu_PositionCursors(struct SelectionMenu *p)
@@ -407,16 +398,9 @@ void SelectionMenu_PositionEquipmentMarkers(struct SelectionMenu *p)
 
 void SelectionMenu_HideMarkers(struct SelectionMenu *p)
 {
-    int mask = 1;
-    u32 *flags;
     int i;
-    flags = &p->markers[0].flags;
-    i = 7;
-    do {
-        *flags |= mask;
-        flags += sizeof(struct SceneInputWidget) / sizeof(u32);
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 8; i++)
+        p->markers[i].flags |= 1;
 }
 
 void SelectionMenu_StepCursors(struct SelectionMenu *p)
@@ -465,7 +449,7 @@ void SelectionMenu_RemoveHighlight(struct SelectionMenu *p)
 }
 
 // confidence=low: lays out the 19 actor icons from the last one down, then the heading at x 32.
-void sub_0801A6D0(struct SelectionMenu *p)
+void SelectionMenu_InitIconGrid(struct SelectionMenu *p)
 {
     struct ContactPosition position;
     struct SceneInputWidget *heading;
@@ -484,12 +468,12 @@ void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
     struct SceneInputWidget *g = p->icons;
     int i;
-    struct SelectionMenuPackedPosition v;
+    struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
-        v.x = (i & 3) * 24 + 144;
-        v.y = (i >> 2) * 24 + 32;
+        position.x = (i & 3) * 24 + 144;
+        position.y = (i >> 2) * 24 + 32;
         SelectionMenu_SetActorIcon(p, g, i);
-        *(struct SelectionMenuPackedPosition *)&g->position = v;
+        g->position = position;
         if ((1 << i) & p->availableSlots) {
             g->paletteBank = 0x373;
             g->palette = SelectionMenu_GetIconPalette(0);
@@ -507,12 +491,12 @@ void SelectionMenu_PopulateItems(struct SelectionMenu *p)
 {
     struct SceneInputWidget *g = p->icons;
     int i;
-    struct SelectionMenuPackedPosition v;
+    struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
-        v.x = (i & 3) * 24 + 144;
-        v.y = (i >> 2) * 24 + 32;
+        position.x = (i & 3) * 24 + 144;
+        position.y = (i >> 2) * 24 + 32;
         Presentation_SetItemGraphic(p, g, i);
-        *(struct SelectionMenuPackedPosition *)&g->position = v;
+        g->position = position;
         if ((1 << i) & p->availableSlots) {
             g->paletteBank = 0x373;
             g->palette = SelectionMenu_GetIconPalette(0);
@@ -598,10 +582,7 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
     } else if (value < 0) {
         value = 0;
     }
-    {
-        int x = 10;
-        Text_DrawNumber(0, k2, 9, value, 33, 2, 15);
-    }
+    Text_DrawNumber(0, k2, 9, value, 33, 2, 15);
     a = 0;
     b = 0;
     SceneInputPanel_GetEquippedValues(&a, &b, 0, 0);
@@ -623,21 +604,15 @@ void SelectionMenu_DrawStatistics(struct SelectionMenu *p)
 
 void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
 {
-    int i, mask;
-    s16 *slot;
-    p->availableSlots = 0xffff;
-    {
-        struct GameState *base = gGameState;
-        mask = 1;
-        slot = base->inventory;
+    int i;
+    struct GameState *state;
+    p->availableSlots = 0xFFFF;
+    state = gGameState;
+    for (i = 0; i < 8; i++) {
+        s16 slot = state->inventory[i];
+        if (slot >= 0)
+            p->availableSlots &= ~(1 << slot);
     }
-    i = 7;
-    do {
-        if (*slot >= 0)
-            p->availableSlots &= ~(mask << *slot);
-        slot++;
-        i--;
-    } while (i >= 0);
     for (i = 0; i < 16; i++) {
         u8 *actor = Inventory_GetEquipmentEntry(i);
         if (*actor != 255) {
@@ -650,35 +625,20 @@ void SelectionMenu_ActorAvailability(struct SelectionMenu *p)
     }
 }
 
-void SelectionMenu_ItemAvailability(struct SelectionMenu *arg)
+void SelectionMenu_ItemAvailability(struct SelectionMenu *p)
 {
-    struct SelectionMenu *p = arg;
     int i;
-    int index;
-    u8 alias;
-    int mask;
-    p->availableSlots = 0xffff;
-    i = 0;
-    mask = 1;
-    /* do-while(0) only keeps agbcc's block layout */
-    do {
-        index = Inventory_GetConsumableId(i);
-        if (index >= 0) {
-            struct SelectionMenuItem *table = gUnk_08E60F80;
-            alias = table[index].available;
-            if (alias && (!GameState_IsConsumableSlotEquipped(i))) {
-                goto next;
-            }
+    p->availableSlots = 0xFFFF;
+    for (i = 0; i < 16; i++) {
+        int index = Inventory_GetConsumableId(i);
+        if (index < 0) {
+            p->availableSlots &= ~(1 << i);
+        } else if (!gUnk_08E60F80[index].available) {
+            p->availableSlots &= ~(1 << i);
+        } else if (GameState_IsConsumableSlotEquipped(i)) {
+            p->availableSlots &= ~(1 << i);
         }
-        if (p) {
-            p->availableSlots &= ~(mask << i);
-        } else {
-            p->availableSlots &= ~(mask << i);
-        }
-    next:
-        i++;
-
-    } while (i < 16);
+    }
 }
 
 void SelectionMenu_OpenActorPage(struct SelectionMenu *p)
@@ -956,8 +916,7 @@ void SelectionMenu_Close(struct SelectionMenu *p)
 void SelectionMenu_Hide(struct SelectionMenu *arg)
 {
     struct SelectionMenu *p = arg;
-    int i, mask;
-    u32 *flags;
+    int i;
     u32 *state;
     struct SceneInputWidget *g;
     g = &p->panels[0];
@@ -965,30 +924,12 @@ void SelectionMenu_Hide(struct SelectionMenu *arg)
     g = &p->panels[1];
     g->flags |= 1;
     state = &gEnginePauseFlags;
-    mask = 1;
-    flags = &p->icons[0].flags;
-    i = 18;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
-    mask = 1;
-    flags = &p->cursors[0].flags;
-    i = 2;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
-    mask = 1;
-    flags = &p->markers[0].flags;
-    i = 7;
-    do {
-        *flags |= mask;
-        flags += 24;
-        i--;
-    } while (i >= 0);
+    for (i = 0; i < 19; i++)
+        p->icons[i].flags |= 1;
+    for (i = 0; i < 3; i++)
+        p->cursors[i].flags |= 1;
+    for (i = 0; i < 8; i++)
+        p->markers[i].flags |= 1;
     g = &p->highlight;
     g->flags |= 1;
     {
@@ -1058,9 +999,9 @@ configure:
         goto fail;
     if (!(p->promptMessages = Script_GetTextSourcePc()))
         goto fail;
-    sub_0801A218(p);
+    SelectionMenu_InitPanel(p);
     SelectionMenu_InitMarkers(p);
-    sub_0801A6D0(p);
+    SelectionMenu_InitIconGrid(p);
     SelectionMenu_InitCursors(p);
     SelectionMenu_InitHighlight(p);
     MessageWindow_SetBounds(0, 16, 30, 2);

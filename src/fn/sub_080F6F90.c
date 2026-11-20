@@ -164,7 +164,6 @@ void Sword_InitAttackComponents(struct SwordAttackSetup *p)
     struct SwordSize offset;
     struct DisplaySequenceState sequence;
     s32 i;
-    u32 zero;
     size.x = 100;
     size.y = 100;
     size.z = 100;
@@ -192,37 +191,37 @@ void Sword_InitAttackComponents(struct SwordAttackSetup *p)
         p->count = 4;
     Anim_SetSequence(&sequence, (void *)ScriptProc_Start(0x922E, 0x3F72), 2,
                      (u8)((p->variant) << 2), 0);
-    for (i = 0, zero = i; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         struct SwordComponent *child = &p->components[i];
         struct DisplaySequenceSprite *sprite = &child->sprite;
         void *graphics = &child->graphics;
         void *collider;
-        child->fieldF0 = zero;
-        child->fieldF2 = zero;
-        child->fieldF4 = zero;
-        child->fieldF8 = zero;
+        child->fieldF0 = 0;
+        child->fieldF2 = 0;
+        child->fieldF4 = 0;
+        child->fieldF8 = 0;
         child->fieldFA = 1;
-        child->fieldFC = zero;
+        child->fieldFC = 0;
         child->field119 = 0;
-        child->field10A = zero;
+        child->field10A = 0;
         child->field11A = 0;
         Sword_ClearByte(&child->field12A);
         Sword_ClearByte(&child->field12B);
-        child->field126 = zero;
-        child->field128 = zero;
-        child->field168 = zero;
+        child->field126 = 0;
+        child->field128 = 0;
+        child->field168 = 0;
         AnimData_Load(graphics, 0x5291);
         Sprite_Init(child, graphics, 0);
         Sword_StepSequence(sprite, &sequence);
         sprite->flags = 3;
         AnimData_SelectPaletteBank((void *)sprite->resource, p->paletteBank);
         child->field118 = i;
-        child->field11E = zero;
-        child->field11F = zero;
+        child->field11E = 0;
+        child->field11F = 0;
         child->field119 |= 1;
         child->field160 = (u32)p;
         child->field180 = 20;
-        child->field184 = zero;
+        child->field184 = 0;
         collider = &child->attack;
         Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
         Collider_SetCallback(collider, Ivy_OnChildDestroy, child);

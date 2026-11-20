@@ -96,14 +96,8 @@ void OrbitBackground_UpdatePosition(struct OrbitBackground *background)
                         step = (difference >> 2) + 1;
                         background->angle = (angle + step) & 255;
                     } else {
-                        s32 full = 256;
-                        s32 next;
-                        step = full - difference;
-                        step >>= 2;
-                        step += 1;
-                        next = angle + full;
-                        next -= step;
-                        background->angle = next & 255;
+                        step = ((256 - difference) >> 2) + 1;
+                        background->angle = (angle + 256 - step) & 255;
                     }
                 }
                 if (background->radius <= 299)

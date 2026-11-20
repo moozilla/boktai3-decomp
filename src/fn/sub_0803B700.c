@@ -64,7 +64,7 @@ static inline s32 ClampScore(s32 v)
 #define ResultItem_DrawDigits(anim, resource, value, digits, x, y)                                 \
     Anim_DrawDecimalDigits(anim, resource, value, digits, 0x33, x, y, 8, 0)
 
-int sub_0803B700(int mode, int side, int time0, int time1, int score0, int score1, u32 script)
+int WirelessResultPanel_Show(int mode, int side, int time0, int time1, int score0, int score1, u32 script)
 {
     struct WirelessResultPanel *p = WirelessResultPanel_GetInstance();
     int rem;

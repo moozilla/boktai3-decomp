@@ -2,6 +2,9 @@
 #define TERRAIN_OVERLAY_H
 #include "engine.h"
 
+struct DisplaySequenceSprite;
+struct SceneActorBody;
+
 // Tentative: terrain-edge overlays drawn around tracked actors.
 struct TerrainOverlayDrawable {
     u32 flags; // bit 0: hidden
@@ -14,23 +17,10 @@ struct TerrainOverlayDrawable {
     u8 tail[10];
 };
 
-struct TerrainOverlayActorFlags {
-    u32 unused[2], flags;
-};
-
-struct TerrainOverlayActor {
-    u32 unused, flags;
-    u8 pad8[4];
-    s16 x, y, z;
-    u8 pad12[26];
-    u32 *state;
-    struct TerrainOverlayActorFlags *parent;
-};
-
 // Tracked actor slot
 struct TerrainOverlayEntry {
     u16 used, id;
-    struct TerrainOverlayActor *actor;
+    struct SceneActorBody *actor;
 };
 
 struct TerrainOverlay {
@@ -41,14 +31,9 @@ struct TerrainOverlay {
     u16 commands
         [16][2]; // {type, id}; type 0 = track actor, 1 = untrack (a struct pair changes codegen)
     u8 model[28];
-    struct TerrainOverlayDrawable *drawables;
+    struct DisplaySequenceSprite *drawables;
     u32 *keys; // dedupe keys, one per drawable
     struct TerrainOverlayEntry entries[1];
-};
-
-struct TerrainOverlayCell {
-    u8 height, tile;
-    u16 flags;
 };
 
 #endif

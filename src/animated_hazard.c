@@ -1,7 +1,7 @@
 #include "animated_hazard.h"
 #include "display_sequence_inline.h"
+#include "terrain_collision.h"
 /* AnimatedHazard_Noop: Empty function with no callers or taken address; placeholder/no-op in the animated-hazard unit. */
-#define AnimatedHazard_Noop sub_08012134
 
 struct AnimatedHazardManager *AnimatedHazard_GetManager(void)
 {
@@ -10,9 +10,8 @@ struct AnimatedHazardManager *AnimatedHazard_GetManager(void)
 
 void AnimatedHazard_SetState(void *unused, struct AnimatedHazard *p, u32 v)
 {
-    u32 z = 0;
     p->state = v;
-    p->timer = z;
+    p->timer = 0;
     p->entered = 1;
 }
 
@@ -31,13 +30,12 @@ s32 AnimatedHazard_ConsumeEntered(void *unused, struct AnimatedHazard *p)
 void AnimatedHazard_Initialize(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
     struct HazardExtent size, offset;
-    int zero;
-    u8 *sprite = (u8 *)&p->sprite, *effect;
-    Sprite_Init(sprite, m->animData, 1);
-    zero = 0;
-    sprite[7] = 2;
-    Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
-    effect = p->collider;
+    struct DisplaySequenceSprite *sprite = &p->sprite;
+    struct ContactCollider *effect;
+    Sprite_Init(sprite, &m->animData, 1);
+    sprite->priority = 2;
+    Anim_SetSequence(&p->anim, m->script, 0, 0, 0);
+    effect = &p->collider;
     size.x = 64;
     size.y = 128;
     size.z = 64;
@@ -47,7 +45,7 @@ void AnimatedHazard_Initialize(struct AnimatedHazardManager *m, struct AnimatedH
     Collider_Init(effect, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetCallback(effect, 0, p);
     Collider_SetAttackProperties(effect, 100, 50, 0, 0x60000, 30);
-    p->active = zero;
+    p->active = 0;
 }
 
 void AnimatedHazard_SetState(void *, struct AnimatedHazard *, u32);
@@ -59,7 +57,7 @@ void AnimatedHazard_Deactivate(void *a, struct AnimatedHazard *p)
     p->active = 0;
 }
 
-void sub_08012134(void)
+void AnimatedHazard_Noop(void)
 {
 }
 
@@ -72,8 +70,8 @@ void AnimatedHazard_WaitForPlayer(void *m, struct AnimatedHazard *p)
     if (++p->timer > p->duration)
         AnimatedHazard_SetState(m, p, 3);
     else {
-        struct SceneVec *player = Player_GetEffectivePosition(0);
-        struct SceneVec *pos = &p->sprite.position;
+        struct ContactPosition *player = Player_GetEffectivePosition(0);
+        struct ContactPosition *pos = &p->sprite.position;
         int x = player->x - pos->x, z = player->z - pos->z;
         if (x * x + z * z < 14400)
             AnimatedHazard_SetState(m, p, 3);
@@ -105,8 +103,8 @@ static inline u32 frame_factor(u16 v)
 
 void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
-    struct HazardSprite *o;
-    struct HazardAnim *a;
+    struct DisplaySequenceSprite *o;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
@@ -116,7 +114,7 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
     }
     o = &p->sprite;
     a = &p->anim;
-    entry = a->data + a->frame;
+    entry = a->commands + a->index;
     o->frame = *entry >> 6;
     {
         union DisplaySequenceControl control;
@@ -140,48 +138,48 @@ void AnimatedHazard_AnimateAttack(struct AnimatedHazardManager *m, struct Animat
         else
             o->flags &= ~8;
     }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
+    if (++a->elapsed >= a->duration) {
+        a->elapsed = 0;
         if (a->flags & 4) {
-            if (a->frame == 0) {
+            if (a->index == 0) {
                 if (a->flags & 8) {
-                    a->timer = a->rate;
+                    a->elapsed = a->duration;
                 } else {
-                    a->frame = a->count - 1;
+                    a->index = a->frameCount - 1;
                 }
                 done = 1;
             } else {
-                a->frame--;
+                a->index--;
                 done = 0;
             }
         } else {
-            if (++a->frame >= a->count) {
+            if (++a->index >= a->frameCount) {
                 if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
+                    a->elapsed = a->duration;
+                    a->index = a->frameCount - 1;
                 } else {
-                    a->frame = 0;
+                    a->index = 0;
                 }
                 done = 1;
             } else
                 done = 0;
         }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
+        entry = a->commands + a->index;
+        a->frameWeight = frame_factor(*entry);
+        a->duration = (a->frameWeight * a->speed) >> 6;
+        if (!a->duration)
+            a->duration = 1;
     } else
         done = 0;
     if (done)
         AnimatedHazard_SetState(m, p, 4);
-    Collider_Refresh(p->collider);
+    Collider_Refresh(&p->collider);
 }
 
 void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
-    struct HazardSprite *o;
-    struct HazardAnim *a;
+    struct DisplaySequenceSprite *o;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
@@ -189,7 +187,7 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
     }
     o = &p->sprite;
     a = &p->anim;
-    entry = a->data + a->frame;
+    entry = a->commands + a->index;
     o->frame = *entry >> 6;
     {
         union DisplaySequenceControl control;
@@ -213,50 +211,50 @@ void AnimatedHazard_AnimateHold(struct AnimatedHazardManager *m, struct Animated
         else
             o->flags &= ~8;
     }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
+    if (++a->elapsed >= a->duration) {
+        a->elapsed = 0;
         if (a->flags & 4) {
-            if (a->frame == 0) {
+            if (a->index == 0) {
                 if (a->flags & 8) {
-                    a->timer = a->rate;
+                    a->elapsed = a->duration;
                 } else {
-                    a->frame = a->count - 1;
+                    a->index = a->frameCount - 1;
                 }
                 done = 1;
             } else {
-                a->frame--;
+                a->index--;
                 done = 0;
             }
         } else {
-            if (++a->frame >= a->count) {
+            if (++a->index >= a->frameCount) {
                 if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
+                    a->elapsed = a->duration;
+                    a->index = a->frameCount - 1;
                 } else {
-                    a->frame = 0;
+                    a->index = 0;
                 }
                 done = 1;
             } else
                 done = 0;
         }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
+        entry = a->commands + a->index;
+        a->frameWeight = frame_factor(*entry);
+        a->duration = (a->frameWeight * a->speed) >> 6;
+        if (!a->duration)
+            a->duration = 1;
     } else
         done = 0;
     if (p->timer >= p->hold)
         AnimatedHazard_SetState(m, p, 5);
-    Collider_Refresh(p->collider);
+    Collider_Refresh(&p->collider);
 }
 
 void AnimatedHazard_Deactivate(void *, struct AnimatedHazard *);
 
 void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct AnimatedHazard *p)
 {
-    struct HazardSprite *o;
-    struct HazardAnim *a;
+    struct DisplaySequenceSprite *o;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     int done;
     if (AnimatedHazard_ConsumeEntered(m, p)) {
@@ -264,7 +262,7 @@ void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct An
     }
     o = &p->sprite;
     a = &p->anim;
-    entry = a->data + a->frame;
+    entry = a->commands + a->index;
     o->frame = *entry >> 6;
     {
         union DisplaySequenceControl control;
@@ -288,37 +286,37 @@ void AnimatedHazard_AnimateRetraction(struct AnimatedHazardManager *m, struct An
         else
             o->flags &= ~8;
     }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
+    if (++a->elapsed >= a->duration) {
+        a->elapsed = 0;
         if (a->flags & 4) {
-            if (a->frame == 0) {
+            if (a->index == 0) {
                 if (a->flags & 8) {
-                    a->timer = a->rate;
+                    a->elapsed = a->duration;
                 } else {
-                    a->frame = a->count - 1;
+                    a->index = a->frameCount - 1;
                 }
                 done = 1;
             } else {
-                a->frame--;
+                a->index--;
                 done = 0;
             }
         } else {
-            if (++a->frame >= a->count) {
+            if (++a->index >= a->frameCount) {
                 if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
+                    a->elapsed = a->duration;
+                    a->index = a->frameCount - 1;
                 } else {
-                    a->frame = 0;
+                    a->index = 0;
                 }
                 done = 1;
             } else
                 done = 0;
         }
-        entry = a->data + a->frame;
-        a->factor = frame_factor(*entry);
-        a->rate = (a->factor * a->scale) >> 6;
-        if (!a->rate)
-            a->rate = 1;
+        entry = a->commands + a->index;
+        a->frameWeight = frame_factor(*entry);
+        a->duration = (a->frameWeight * a->speed) >> 6;
+        if (!a->duration)
+            a->duration = 1;
     } else
         done = 0;
     if (done)
@@ -371,7 +369,7 @@ s32 AnimatedHazardManager_Initialize(struct AnimatedHazardManager *s)
     s32 i;
     gAnimatedHazardManager = s;
     s->script = ScriptProc_Start(0x922E, 0xE92A);
-    if (AnimData_Load(s->animData, 0xCD6C) == 0)
+    if (AnimData_Load(&s->animData, 0xCD6C) == 0)
         return -1;
     e = s->hazards;
     for (i = 7; i >= 0; i--, e++) {
@@ -391,7 +389,7 @@ void *AnimatedHazardManager_Create(void)
     struct AnimatedHazardManager *p;
     if (gAnimatedHazardManager != 0)
         return gAnimatedHazardManager;
-    p = Task_Create(8, 0x538);
+    p = Task_Create(8, sizeof(*p));
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void *))AnimatedHazardManager_Update,
                           (void (*)(void *))AnimatedHazardManager_Destroy);
@@ -423,23 +421,22 @@ void *AnimatedHazardManager_Create(void);
 
 struct AnimatedHazard *AnimatedHazardManager_GetFreeSlot(struct AnimatedHazardManager *);
 
-static inline u8 *cell(int i)
+static inline struct TerrainCell *AnimatedHazard_GetGroundCell(s32 index)
 {
-    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
-    if (p)
-        return p + 4;
-    return gTerrainMap->cells + 12 + i * 4;
+    u8 *override = TerrainModifiers_FindCellOverride(index, 1);
+    if (override)
+        return &((struct TerrainCellOverride *) override)->cell;
+    return &((struct TerrainGrid *)gTerrainMap->cells)->cells[index];
 }
 
-int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
+int AnimatedHazard_Create(struct ContactPosition *source, int damage, int hold)
 {
     struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
     struct AnimatedHazard *p;
-    struct SceneVec *pos;
-    void *effect;
-    u8 *c;
+    struct ContactPosition *pos;
+    struct ContactCollider *effect;
+    struct TerrainCell *cell;
     int height, slope;
-    int zero;
     if (!m) {
         m = AnimatedHazardManager_Create();
         if (!m)
@@ -450,16 +447,16 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
         return -1;
     p->sprite.position = *source;
     {
-        struct SceneVec *ground = &p->sprite.position;
+        struct ContactPosition *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
             index = gTerrainMap->rows[z] + x;
-        c = cell(index);
-        slope = *c >> 4;
-        height = (*c & 15) << 8;
+        cell = AnimatedHazard_GetGroundCell(index);
+        slope = cell->shapeAndHeight >> 4;
+        height = (cell->shapeAndHeight & 15) << 8;
         switch (slope) {
             case 1:
                 height -= (u8)ground->z;
@@ -469,30 +466,25 @@ int AnimatedHazard_Create(struct SceneVec *source, int damage, int hold)
                 break;
         }
     }
-    {
-        s16 *h = &p->sprite.position.y;
-        zero = 0;
-        *h = height;
-    }
-    effect = p->collider;
+    p->sprite.position.y = height;
+    effect = &p->collider;
     Collider_SetPosition(effect, pos, 0);
     Collider_SetAttackPowerAndForce(effect, (u16)damage, 50);
     AnimatedHazard_SetState(m, p, 2);
-    p->timer = zero;
+    p->timer = 0;
     p->hold = hold;
     p->active = 1;
     return 0;
 }
 
-int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int delay, int hold)
+int AnimatedHazard_CreateProximity(struct ContactPosition *source, int damage, int delay, int hold)
 {
     struct AnimatedHazardManager *m = AnimatedHazard_GetManager();
     struct AnimatedHazard *p;
-    struct SceneVec *pos;
-    void *effect;
-    u8 *c;
+    struct ContactPosition *pos;
+    struct ContactCollider *effect;
+    struct TerrainCell *cell;
     int height, slope;
-    int zero;
     if (!m) {
         m = AnimatedHazardManager_Create();
         if (!m)
@@ -503,16 +495,16 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
         return -1;
     p->sprite.position = *source;
     {
-        struct SceneVec *ground = &p->sprite.position;
+        struct ContactPosition *ground = &p->sprite.position;
         int x = ground->x >> 8, z = ground->z >> 8, index;
         pos = ground;
         if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
             index = 0;
         else
             index = gTerrainMap->rows[z] + x;
-        c = cell(index);
-        slope = *c >> 4;
-        height = (*c & 15) << 8;
+        cell = AnimatedHazard_GetGroundCell(index);
+        slope = cell->shapeAndHeight >> 4;
+        height = (cell->shapeAndHeight & 15) << 8;
         switch (slope) {
             case 1:
                 height -= (u8)ground->z;
@@ -522,23 +514,19 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
                 break;
         }
     }
-    {
-        s16 *h = &p->sprite.position.y;
-        zero = 0;
-        *h = height;
-    }
-    effect = p->collider;
+    p->sprite.position.y = height;
+    effect = &p->collider;
     Collider_SetPosition(effect, pos, 0);
     Collider_SetAttackProperties(effect, damage, 50, 0, 8, 30);
     AnimatedHazard_SetState(m, p, 1);
-    Anim_SetSequence(&p->anim, m->script, 0, 0, zero);
+    Anim_SetSequence(&p->anim, m->script, 0, 0, 0);
     {
-        struct HazardSprite *o = &p->sprite;
-        struct HazardAnim *a;
+        struct DisplaySequenceSprite *o = &p->sprite;
+        struct DisplaySequenceState *a;
         const u16 *entry;
         int done;
         a = &p->anim;
-        entry = a->data + a->frame;
+        entry = a->commands + a->index;
         o->frame = *entry >> 6;
         {
             union DisplaySequenceControl control;
@@ -562,41 +550,41 @@ int AnimatedHazard_CreateProximity(struct SceneVec *source, int damage, int dela
             else
                 o->flags &= ~8;
         }
-        if (++a->timer >= a->rate) {
-            a->timer = 0;
+        if (++a->elapsed >= a->duration) {
+            a->elapsed = 0;
             if (a->flags & 4) {
-                if (a->frame == 0) {
+                if (a->index == 0) {
                     if (a->flags & 8) {
-                        a->timer = a->rate;
+                        a->elapsed = a->duration;
                     } else {
-                        a->frame = a->count - 1;
+                        a->index = a->frameCount - 1;
                     }
                     done = 1;
                 } else {
-                    a->frame--;
+                    a->index--;
                     done = 0;
                 }
             } else {
-                if (++a->frame >= a->count) {
+                if (++a->index >= a->frameCount) {
                     if ((u8)(a->flags & 8)) {
-                        a->timer = a->rate;
-                        a->frame = a->count - 1;
+                        a->elapsed = a->duration;
+                        a->index = a->frameCount - 1;
                     } else {
-                        a->frame = 0;
+                        a->index = 0;
                     }
                     done = 1;
                 } else
                     done = 0;
             }
-            entry = a->data + a->frame;
-            a->factor = frame_factor(*entry);
-            a->rate = (a->factor * a->scale) >> 6;
-            if (!a->rate)
-                a->rate = 1;
+            entry = a->commands + a->index;
+            a->frameWeight = frame_factor(*entry);
+            a->duration = (a->frameWeight * a->speed) >> 6;
+            if (!a->duration)
+                a->duration = 1;
         } else
             done = 0;
     }
-    AnimData_SelectPaletteBank(m->animData, 0x33F);
+    AnimData_SelectPaletteBank(&m->animData, 0x33F);
     p->timer = 0;
     p->hold = hold;
     p->duration = delay;

@@ -36,24 +36,12 @@ static inline void SetFrame(struct SceneMarkerSprite *sprite, u16 frame)
 {
     sprite->frame = frame;
 }
-static inline void CpuSetFill(void *dest, u32 control, const void *src)
-{
-    CpuSet(src, dest, control);
-}
 s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
 {
-    struct {
-        u32 zero;
-        struct SceneVec position;
-    } local;
+    struct SceneVec position;
     struct SceneMarkerVector size, offset;
-    struct SceneVec *positionPtr = &local.position;
     void *collider;
-    local.zero = 0;
-    {
-        u32 *src = &local.zero;
-        CpuSetFill(positionPtr, 0x5000002, src);
-    }
+    ZeroFill8(&position);
     collider = p->collider;
     size.x = 128;
     size.y = 128;
@@ -62,7 +50,7 @@ s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
     offset.y = 128;
     offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 1, &size, &offset);
-    Collider_SetPosition(collider, positionPtr, 0);
+    Collider_SetPosition(collider, &position, 0);
     Collider_SetCallback(collider, PlayerBarrier_OnCollision, p);
     Collider_SetAttackProperties(collider, 100, 0, 0x100000, 1, 30);
     AnimData_Load(p->primaryData, 0xdc7a);

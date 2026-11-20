@@ -1,13 +1,17 @@
 #include "collision_controller.h"
 #include "scene_actor_status.h"
-#include "display_sequence.h"
-/* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
-#define CollisionController_ClearGlobal sub_08009E30
+#include "sprite_effect_controller.h"
+#include "sun_clock.h"
+#include "player_slot_status.h"
 
-#define CollisionController_ClearGlobal sub_08009E30
+static inline void CollisionController_SetManager(struct CollisionManager *manager)
+{
+    gCollisionManager = manager;
+}
+
 void CollisionController_ClearGlobal(void)
 {
-    gCollisionManager = 0;
+    gCollisionManager = NULL;
 }
 
 struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *manager)
@@ -24,18 +28,21 @@ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *
     return 0;
 }
 
+static inline void CollisionController_SetMode(struct CollisionSlot *slot, u32 mode)
+{
+    slot->mode = mode;
+    slot->timer = 0;
+    slot->entered = 1;
+}
+
 void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
                                     struct CollisionSlot *slot)
 {
-    u32 m = 0x4000;
-    if ((collider->contactFlags2 & m) == 0) {
-        u32 m2 = 0xe00;
-        u32 x = collider->contactFlags & m2;
-        if (x == 0) {
+    if (SceneCollider_ReadReactionFlags(collider, 0x4000) == 0) {
+        u32 attackBits = SceneCollider_ReadContactFlags(collider, 0xe00);
+        if (attackBits == 0) {
             other->hit = 1;
-            slot->mode = 1;
-            slot->timer = x;
-            slot->entered = 1;
+            CollisionController_SetMode(slot, 1);
             slot->collider.state |= 4;
         }
     }
@@ -114,8 +121,8 @@ static inline u32 randomDelay(void)
 void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                                              struct CollisionSlot *p)
 {
-    struct CollisionSprite *o;
-    struct CollisionAnim *a;
+    struct SpriteDrawable *o;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     u8 done;
     if (p->entered) {
@@ -128,10 +135,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     }
     {
         u32 flags = p->sprite.flags;
-        u32 low = 1;
-        u32 firstMask;
-        firstMask = low;
-        if (flags & low) {
+        if (flags & 1) {
             if (p->timer++ > p->delay) {
                 p->timer = 0;
                 p->delay = randomDelay();
@@ -143,19 +147,19 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
         } else {
             o = &p->sprite;
             {
-                struct CollisionGraphics *graphics = manager->animationGraphics;
+                struct SpriteEffectTileResource *graphics = manager->animationGraphics;
                 a = &p->anim;
-                entry = a->data + a->frame;
+                entry = a->commands + a->index;
                 {
                     u32 factor = *entry >> 6;
-                    o->tile = (o->width >> 3) * (o->height >> 3) * factor + graphics->base;
+                    o->tile = (o->width >> 3) * (o->height >> 3) * factor + graphics->tileBase;
                 }
             }
             {
                 union DisplaySequenceControl control;
                 u32 bit, first;
                 control.raw = a->flags;
-                bit = firstMask;
+                bit = 1;
                 first = (u8)(control.raw & bit);
                 if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 4;
@@ -173,35 +177,35 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 else
                     o->flags &= ~8;
             }
-            if (++a->timer >= a->rate) {
-                a->timer = 0;
+            if (++a->elapsed >= a->duration) {
+                a->elapsed = 0;
                 if (a->flags & 4) {
-                    if (a->frame == 0) {
+                    if (a->index == 0) {
                         if (a->flags & 8) {
-                            a->timer = a->rate;
+                            a->elapsed = a->duration;
                         } else {
-                            a->frame = a->count - 1;
+                            a->index = a->frameCount - 1;
                         }
                         done = 1;
                     } else {
-                        a->frame--;
+                        a->index--;
                         done = 0;
                     }
                 } else {
-                    if (++a->frame >= a->count) {
+                    if (++a->index >= a->frameCount) {
                         if ((u8)(a->flags & 8)) {
-                            a->timer = a->rate;
-                            a->frame = a->count - 1;
+                            a->elapsed = a->duration;
+                            a->index = a->frameCount - 1;
                             done = 1;
                         } else {
-                            a->frame = 0;
+                            a->index = 0;
                             done = 1;
                         }
                     } else
                         done = 0;
                 }
-                entry = a->data + a->frame;
-                a->rate = ((*entry & 15) * a->scale) >> 6;
+                entry = a->commands + a->index;
+                a->duration = ((*entry & 15) * a->speed) >> 6;
             } else
                 done = 0;
             p->done = done;
@@ -218,18 +222,15 @@ void CollisionController_UpdateHitDelayAnimation(u32 x, struct CollisionSlot *sl
         slot->entered = 0;
     n = slot->timer++;
     if (n > 0x1e) {
-        u32 t = 2;
-        slot->mode = t;
-        slot->timer = 0;
-        slot->entered = 1;
+        CollisionController_SetMode(slot, 2);
     }
 }
 
 void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
                                             struct CollisionSlot *p)
 {
-    struct CollisionSprite *o;
-    struct CollisionAnim *a;
+    struct SpriteDrawable *o;
+    struct DisplaySequenceState *a;
     const u16 *entry;
     u8 done;
     struct SceneExtent effect;
@@ -241,11 +242,11 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         Anim_SetSequence(&p->anim, manager->hitResource, 0, 0, 0);
         Sound_PlaySongChecked(290);
     }
-    if (p->anim.frame == 1 && p->anim.timer == 0)
+    if (p->anim.index == 1 && p->anim.elapsed == 0)
         p->sprite.position.y += 16;
-    if (p->anim.frame == 2 && p->anim.timer == 0)
+    if (p->anim.index == 2 && p->anim.elapsed == 0)
         p->sprite.position.y -= 16;
-    if (p->anim.frame == 4 && p->anim.timer == 0) {
+    if (p->anim.index == 4 && p->anim.elapsed == 0) {
         effect.x = 10;
         effect.y = 10;
         effect.z = 10;
@@ -258,12 +259,12 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
     }
     o = &p->sprite;
     {
-        struct CollisionGraphics *graphics = manager->graphics;
+        struct SpriteEffectTileResource *graphics = manager->graphics;
         a = &p->anim;
-        entry = a->data + a->frame;
+        entry = a->commands + a->index;
         {
             u32 factor = *entry >> 6;
-            o->tile = (o->width >> 3) * (o->height >> 3) * factor + graphics->base;
+            o->tile = (o->width >> 3) * (o->height >> 3) * factor + graphics->tileBase;
         }
     }
     {
@@ -288,35 +289,35 @@ void CollisionController_UpdateHitAnimation(struct CollisionManager *manager,
         else
             o->flags &= ~8;
     }
-    if (++a->timer >= a->rate) {
-        a->timer = 0;
+    if (++a->elapsed >= a->duration) {
+        a->elapsed = 0;
         if (a->flags & 4) {
-            if (a->frame == 0) {
+            if (a->index == 0) {
                 if (a->flags & 8) {
-                    a->timer = a->rate;
+                    a->elapsed = a->duration;
                 } else {
-                    a->frame = a->count - 1;
+                    a->index = a->frameCount - 1;
                 }
                 done = 1;
             } else {
-                a->frame--;
+                a->index--;
                 done = 0;
             }
         } else {
-            if (++a->frame >= a->count) {
+            if (++a->index >= a->frameCount) {
                 if ((u8)(a->flags & 8)) {
-                    a->timer = a->rate;
-                    a->frame = a->count - 1;
+                    a->elapsed = a->duration;
+                    a->index = a->frameCount - 1;
                     done = 1;
                 } else {
-                    a->frame = 0;
+                    a->index = 0;
                     done = 1;
                 }
             } else
                 done = 0;
         }
-        entry = a->data + a->frame;
-        a->rate = ((*entry & 15) * a->scale) >> 6;
+        entry = a->commands + a->index;
+        a->duration = ((*entry & 15) * a->speed) >> 6;
     } else
         done = 0;
     p->done = done;
@@ -331,25 +332,21 @@ s32 CollisionController_UpdateAll(struct CollisionManager *manager)
     s32 paused = 0;
     s32 i;
     struct CollisionSlot *p;
-    u32 mode = gSunClock.mode;
+    u32 mode = gSunClock.phase;
     if ((u8)(mode - 4) <= 1 || mode == 0 || ActorStatus_EnvironmentPaletteActive(0)) {
         paused = 1;
         if (manager->paused == 0)
             for (i = 0; i < 16; i++) {
                 struct CollisionSlot *slot = &manager->slots[i];
                 if (slot->mode == 0) {
-                    slot->mode = 0;
-                    slot->timer = 0;
-                    slot->entered = 1;
+                    CollisionController_SetMode(slot, 0);
                 }
             }
     } else if (manager->paused == 1)
         for (i = 0; i < 16; i++) {
             struct CollisionSlot *slot = &manager->slots[i];
             if (slot->mode == 0) {
-                slot->mode = 0;
-                slot->timer = 0;
-                slot->entered = 1;
+                CollisionController_SetMode(slot, 0);
             }
         }
     manager->paused = paused;
@@ -376,10 +373,7 @@ s32 CollisionController_DestroyManager(struct CollisionManager *manager)
             CollisionController_RemoveSlot(manager, slot);
         slot++;
     }
-    {
-        u32 z = 0;
-        gCollisionManager = (struct CollisionManager *)z;
-    }
+    CollisionController_SetManager(NULL);
     return 0;
 }
 
@@ -387,8 +381,8 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
 {
     u32 mode;
     u8 available;
-    gCollisionManager = manager;
-    mode = gSunClock.mode;
+    CollisionController_SetManager(manager);
+    mode = gSunClock.phase;
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
     }
@@ -401,9 +395,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
         }
         actor = gPlayers[0];
         if (actor) {
-            u32 *address = &actor->actionFlags;
-            u32 mask = 16;
-            if ((*address) & mask) {
+            if (Player_ReadStatusBits(&actor->actionFlags, 16)) {
                 goto pause;
             }
         }
@@ -423,7 +415,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
 
 struct CollisionManager *CollisionController_CreateManager(void *owner, u32 unused)
 {
-    struct CollisionManager *p = Task_Create(10, 0xA2C);
+    struct CollisionManager *p = Task_Create(10, sizeof(*p));
     if (p != 0) {
         Task_SetCallbacks(p, CollisionController_UpdateAll, CollisionController_DestroyManager);
         if (CollisionController_InitManager(p, owner) < 0) {
@@ -436,7 +428,7 @@ struct CollisionManager *CollisionController_CreateManager(void *owner, u32 unus
 
 s32 CollisionController_ScriptCreate(void)
 {
-    struct SceneExtent position;
+    struct ContactPosition position;
     struct CollisionManager *manager = gCollisionManager;
     struct CollisionSlot *p;
     if (!manager) {
@@ -449,7 +441,7 @@ s32 CollisionController_ScriptCreate(void)
     fail:
         return -1;
     }
-    Memory_Clear(p, 160);
+    Memory_Clear(p, sizeof(*p));
     p->id = Script_GetKeywordValue('n', 0);
     p->type = Script_GetKeywordValue('t', 0);
     p->kind = Script_GetKeywordValue('b', 0);
@@ -469,8 +461,8 @@ s32 CollisionController_ScriptCreate(void)
         position.y = 0;
         position.z = 0;
     }
-    Collider_SetPosition(&p->collider, (struct SceneVec *)&position, 0);
-    p->sprite.position = *(struct CollisionVec *)&position;
+    Collider_SetPosition(&p->collider, &position, 0);
+    p->sprite.position = position;
     p->sprite.position.y += 230;
     if (Script_SeekToKeyword('s')) {
         p->attack = Script_GetValue();

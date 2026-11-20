@@ -1,42 +1,23 @@
-#include "global.h"
+#include "hresvelgr_travel.h"
+
 #include "ram.h"
 
 // confidence=low: repeats charges until terrain or the attempt limit ends them.
 
-struct Action {
-    u8 state, pad[3];
-    u32 frame;
-};
 void ActionState_Reset(void *);
 void ActionState_SetState(void *, u32);
 void ActionState_AdvanceState(void *);
-// confidence=low: selects attacks until the arena departure sequence completes.
-static inline u8 Start(u8 *p)
+
+static inline void Request(struct HresvelgrTravelActor *p, u32 kind)
 {
-    u8 *flag = p + 0x9a;
-    s32 zero = 0;
-    *flag = 1;
-    if (p[0xb0]) {
-        p[0xb0] = zero;
-        p[0xaf] = zero;
-        return 1;
-    }
-    return 0;
-}
-static inline void Request(u8 *p, u32 kind)
-{
-    p[0xaa] = kind;
-}
-static inline u32 TestFlags(u8 *p, u32 mask)
-{
-    return *(u32 *)(p + 0x9c) & mask;
+    p->requestedAnimation = kind;
 }
 s32 Hresvelgr_HasCellOverride(void *);
-static inline s32 FacesBoundary(u8 *p)
+static inline s32 FacesBoundary(struct HresvelgrTravelActor *p)
 {
-    s32 direction = p[0xcc];
+    s32 direction = p->targetHeading;
     s32 result;
-    if (!p[0x32b]) {
+    if (!p->side) {
         direction = (direction + 32) & 255;
         if (direction > 64)
             goto outside;
@@ -51,12 +32,12 @@ static inline s32 FacesBoundary(u8 *p)
     }
     return result;
 }
-void Hresvelgr_UpdateRepeatedCharge(u8 *p)
+void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *p)
 {
-    u8 *q = p;
-    struct Action *a = (void *)(p + 0x300);
-    if (Start(p)) {
-        *(u16 *)(p + 0x330) = 0;
+    struct HresvelgrTravelActor *q = p;
+    struct BossActionState *a = &p->behavior;
+    if (Hresvelgr_EnterVulnerableBehavior(p)) {
+        p->chargeCount = 0;
         ActionState_Reset(a);
         ActionState_SetState(a, 0);
     }
@@ -65,7 +46,7 @@ void Hresvelgr_UpdateRepeatedCharge(u8 *p)
             if (!a->frame) {
                 Request(q, 24);
                 a->frame++;
-            } else if (q[0xaf])
+            } else if (q->finished)
                 ActionState_AdvanceState(a);
             break;
         case 1:
@@ -75,10 +56,10 @@ void Hresvelgr_UpdateRepeatedCharge(u8 *p)
                     break;
                 }
                 Request(q, 26);
-                (*(u16 *)(p + 0x330))++;
+                (p->chargeCount)++;
                 a->frame++;
-            } else if (q[0xaf]) {
-                if (*(u16 *)(p + 0x330) > 3)
+            } else if (q->finished) {
+                if (p->chargeCount > 3)
                     ActionState_SetState(a, 4);
                 else if (FacesBoundary(q))
                     ActionState_SetState(a, 1);
@@ -90,25 +71,25 @@ void Hresvelgr_UpdateRepeatedCharge(u8 *p)
             if (!a->frame) {
                 Request(q, 2);
                 a->frame++;
-            } else if (q[0xaf])
+            } else if (q->finished)
                 ActionState_SetState(a, 1);
             break;
         case 3:
             if (!a->frame) {
                 Request(q, 25);
                 a->frame++;
-            } else if (q[0xaf])
+            } else if (q->finished)
                 ActionState_SetState(a, 1);
             break;
         case 4:
             if (!a->frame) {
                 Request(q, 12);
                 a->frame++;
-            } else if (q[0xaf])
+            } else if (q->finished)
                 ActionState_SetState(a, 5);
             break;
         case 5:
-            p[0x383] = 1;
+            p->behaviorFinished = 1;
             break;
     }
 }

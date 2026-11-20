@@ -312,13 +312,7 @@ s32 SaveMenu_InitializeFromScript(struct SaveMenu *menu)
     ModifierMenu_InitSelectionSnapshot(&menu->paletteCycle, menu->paletteResource);
     LinkScorePanel_CreateTextWindows(menu);
     LinkScorePanel_RefreshPlayerName(menu);
-    {
-        void (*cb)(struct SaveMenu *) = SaveMenu_UpdateScoreReveal;
-        u8 nine = 9;
-        menu->update = cb;
-        menu->entering = 1;
-        menu->state = nine;
-    }
+    SetUpdate(menu, SaveMenu_UpdateScoreReveal, 9);
     if (Script_GetKeywordValue('f', 0))
         ScreenTransition_SendCommand(2, 5, 4, 4, 4, 0xffff, 0);
     gSaveMenu = menu;

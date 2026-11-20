@@ -1,5 +1,5 @@
-#include "contact_swarm.h"
-#include "player.h"
+#include "player_cue.h"
+#include "player_status_flags.h"
 #include "player_cue_sequence.h"
 u32 Player_ConsumeStateEntry(struct Player *);
 void Player_EmitQueuedEffects(struct Player *);
@@ -10,13 +10,6 @@ s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 void AnimData_SelectPaletteBank(void *, s32);
-struct ReleaseAnimation {
-    u8 pad[0x14C];
-    struct ContactSwarmSprite sprite;
-    u8 pad2[0x3FC - 0x14C - sizeof(struct ContactSwarmSprite)];
-    struct DisplaySequenceState seq;
-    const void *resource;
-};
 // confidence=low: timed palette cue follows the spiral release.
 void Player_UpdateSpiralAfterglow(struct Player *p)
 {
@@ -27,10 +20,7 @@ void Player_UpdateSpiralAfterglow(struct Player *p)
         Sound_PlaySong(0x39A);
         SpiralTrail_CreateWithParticles(p, 1, 0, 32, 56);
     }
-    {
-        u32 mask = 0x100000;
-        p->statusFlags = mask | p->statusFlags;
-    }
+    Player_AddStatusFlags(p, 0x100000);
     if (p->tetherFrame == 16)
         Sound_PlaySong(0x3A1);
     if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 2)) {
@@ -41,37 +31,12 @@ void Player_UpdateSpiralAfterglow(struct Player *p)
     p->actionEighteenParameter = 0x16F;
     if ((p->actionEighteenDuration += 3) > 32)
         p->actionEighteenDuration = 32;
-    Anim_SetSequence(&((struct ReleaseAnimation *)p)->seq, *(const void **)((u8 *)p + 0x410), 0,
-                     p->heading, p->side);
-    PlayerCue_StepSequence(&((struct ReleaseAnimation *)p)->sprite,
-                           &((struct ReleaseAnimation *)p)->seq);
-    {
-        u32 offset = 0x178;
-        {
-            void **resource = (void **)((u8 *)p + offset);
-            {
-                void *data = *resource;
-                AnimData_SelectPaletteBank(data, 0x16F);
-            }
-        }
-    }
-    {
-        u32 timerOffset = 0x45A;
-        u16 *timer;
-        timer = (u16 *)((u8 *)p + timerOffset);
-        if (++*timer > 31) {
-            u32 offset = 0x464;
-            {
-                u8 *flag = (u8 *)p + offset;
-                *flag = 1;
-            }
-            {
-                u32 latchOffset = 0x465;
-                u8 *latch;
-                latch = (u8 *)p + latchOffset;
-                *latch = 4;
-            }
-            ActorSequence_Begin(p, 0, 0);
-        }
+    Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.sideResource, 0, p->heading, p->side);
+    PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
+    AnimData_SelectPaletteBank(p->visualObject, 0x16F);
+    if (++p->tetherFrame > 31) {
+        p->actionLatch464 = 1;
+        p->actionLatch465 = 4;
+        ActorSequence_Begin(p, 0, 0);
     }
 }

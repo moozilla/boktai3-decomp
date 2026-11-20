@@ -1,5 +1,7 @@
+#include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_reset.h"
+
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);
 static inline u32 SceneActorReaction_ReadFlags(struct ChaseActor *a, u32 mask, u32 **out)
@@ -38,17 +40,14 @@ static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, 
 #define SceneActorReaction_BeginContactResponse sub_0812F3CC
 u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
 {
-    u8 *group = (u8 *)&a->group.common;
+    struct SceneActorChaseGroup *group = &a->group;
     void *contact;
     u32 *flags;
     u32 result;
     u8 byteZero;
     s32 reactionMask;
-    {
-        u32 mask = 0x1010;
-        if (a->base.motionFlags & mask)
-            goto fail;
-    }
+    if (SceneActorBehavior_MotionBits(0x1010, a))
+        goto fail;
     if (!SceneActorReaction_ReadFlags(a, 0x1000000, &flags))
         goto fail;
     if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->base.tracking.target,
@@ -81,21 +80,17 @@ fail:
     return 0;
 
 success: {
-    u8 *control = group + 0x4C;
+    struct SceneActorRegistryControl *control = &group->common.control;
     SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
-    *(u32 *)(control + 0x18) = 0;
+    control->counter = 0;
     byteZero = 0;
-    *(u16 *)(control + 0x14) = 0;
-    *(u16 *)(control + 8) = 0;
+    control->field14 = 0;
+    control->timer = 0;
 }
 
-    *(void **)(group + 0x88) = contact;
+    group->contactNode = contact;
     SceneActorReaction_SetControl(a, SceneActorControl_OnIdle, 0x10, 0, byteZero);
-    {
-        u32 state = 3;
-        u8 *field = &a->base.state2A8;
-        *field = state;
-    }
+    SceneActorBehavior_WriteSelector(3, &a->base.state2A8);
     a->base.phase2A9 = 1;
     a->base.behavior2AA = byteZero;
     a->base.counter2AC = 0;

@@ -1,34 +1,35 @@
 #include "orbit_background.h"
 #include "render.h"
+#include "gba/io_reg.h"
 #include "ram.h"
 void *ScriptProc_Start(u16, u16);
 void Bg_SetupLayers(u32, u32, void *, u32, u32, u32, void *);
 void Bg_SetPriority(u32, u32);
+static inline void Bg_DisableDisplay(u32 layers)
+{
+    gDispCntShadow &= ~layers;
+}
+
 void OrbitBackground_LoadResource(struct OrbitBackground *p)
 {
-    u32 z[1];
-    u32 f, v;
+    u32 layers[1];
+    u32 specialMode, pending;
     p->resource = ScriptProc_Start(0xC091, 0xB12);
-    z[0] = 0;
-    Bg_SetupLayers(3, 2, p->resource, 0, 0, 1, z);
+    layers[0] = 0;
+    Bg_SetupLayers(3, 2, p->resource, 0, 0, 1, layers);
     Bg_SetPriority(1, 1);
-    v = gPlayerActionPending;
-    f = 0;
-    if (v == 1)
-        f = 1;
-    if (f != 0) {
-        u16 *r = &gDispCntShadow;
-        u32 m = ~0x200;
-        *r = *r & m;
+    pending = gPlayerActionPending;
+    specialMode = 0;
+    if (pending == 1)
+        specialMode = 1;
+    if (specialMode != 0) {
+        Bg_DisableDisplay(DISPCNT_BG1_ON);
         p->specialMode = 1;
     } else {
         if (p->enabled != 0) {
-            u32 m = 0x200;
-            gDispCntShadow |= m;
+            Bg_EnableDisplay(DISPCNT_BG1_ON);
         } else {
-            u16 *r = &gDispCntShadow;
-            u32 m = ~0x200;
-            *r = *r & m;
+            Bg_DisableDisplay(DISPCNT_BG1_ON);
         }
         p->specialMode = 0;
     }

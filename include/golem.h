@@ -8,7 +8,7 @@ struct Golem {
     struct ChaseActor chase;
     u8 responseCount;
     u8 flag625;
-    u8 unknown626[2];
+    u16 countdown626; /* Decrements while the Golem can act. */
     u32 flags628;
     u32 rangeSquared62C;
     u8 unknown630[4];

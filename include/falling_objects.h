@@ -81,10 +81,8 @@ static inline u32 FallingObject_Random(void)
 
 static inline void FallingObject_SetState(struct FallingObject *object, u32 state)
 {
-    u32 value = state;
-    u32 zero = 0;
-    object->state = value;
-    object->timer = zero;
+    object->state = state;
+    object->timer = 0;
     object->entered = 1;
 }
 

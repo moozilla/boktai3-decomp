@@ -19,7 +19,7 @@ addr,name,size,kind,decl,header,confidence,notes
 0200005C,gSceneActorEffectsManager,4,object,extern void *gSceneActorEffectsManager;,include/ram.h,low,scene actor effects manager (SceneActorEffects_*)
 02000060,gParticleGroupManager,4,object,extern void *gParticleGroupManager;,include/ram.h,low,provisional: six-group particle manager singleton (ParticleManager_Initialize)
 02000064,gFragmentManager,4,object,extern struct FragmentManager *gFragmentManager;,include/ram.h,low,fragment manager singleton (FragmentManager_*)
-02000068,gAnimatedParticleManager,4,object,extern u32 gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
+02000068,gAnimatedParticleManager,4,object,extern void *gAnimatedParticleManager;,include/ram.h,low,animated particle manager (AnimatedParticleManager_*)
 0200006C,gFadingParticleManager,4,object,extern void *gFadingParticleManager;,include/ram.h,low,fading particle manager (FadingParticleManager_*)
 02000070,gPaletteLevels,4,object,extern struct PaletteLevels *gPaletteLevels;,include/palette_level_transitions.h,low,
 02000074,gDamageNumberDisplay,4,object,extern struct DamageNumberDisplay *gDamageNumberDisplay;,include/damage_number_display.h,low,
@@ -65,8 +65,8 @@ addr,name,size,kind,decl,header,confidence,notes
 02000134,gSceneParticleEmitterPool,4,object,extern struct SceneParticlePool *gSceneParticleEmitterPool;,include/ram.h,low,provisional: scene particle emitter pool singleton
 02000138,gSpriteGroup,4,object,extern struct SpriteParticlePool *gSpriteGroup;,include/ram.h,low,
 0200013C,gSpriteEffectPool,4,object,extern struct SpriteEffectPool *gSpriteEffectPool;,include/ram.h,low,
-02000140,gAnimatedBodyPool,4,object,extern u8 *gAnimatedBodyPool;,include/ram.h,low,
-02000144,gSpriteNoticeManager,4,object,extern u32 gSpriteNoticeManager;,include/ram.h,low,
+02000140,gAnimatedBodyPool,4,object,extern struct SceneScheduledEffectPool *gAnimatedBodyPool;,include/ram.h,low,
+02000144,gSpriteNoticeManager,4,object,extern struct SpriteNoticeManager *gSpriteNoticeManager;,include/ram.h,low,
 02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/ram.h,low,
 0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/bouncing_object.h,low,
 02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/ram.h,low,

@@ -65,24 +65,21 @@ void PaletteFade_ApplyBrightenedPalette(struct PalFadeObj *p)
                 dst++;
             }
         } else {
-            s32 mask = 0x1F;
-            u8 *add = &p->brighten;
-            u16 *dst = p->palette;
-            for (i = 15; i >= 0; i--) {
-                u16 c = *src;
-                s32 r, g, b;
-                r = (c & 0x1F) + *add;
+            for (i = 0; i < 16; i++) {
+                s32 r, g, b, red, brightness;
+                red = *src & 0x1F;
+                brightness = p->brighten;
+                r = red + brightness;
                 if (r > 0x1F)
                     r = 0x1F;
-                g = (((u32)(c << 16) >> 21) & mask) + *add;
+                g = ((*src >> 5) & 0x1F) + brightness;
                 if (g > 0x1F)
                     g = 0x1F;
-                b = (((u32)(c << 16) >> 26) & mask) + *add;
+                b = ((*src >> 10) & 0x1F) + brightness;
                 if (b > 0x1F)
                     b = 0x1F;
-                *dst = (b << 10) | (g << 5) | r;
+                p->palette[i] = (b << 10) | (g << 5) | r;
                 src++;
-                dst++;
             }
         }
     }

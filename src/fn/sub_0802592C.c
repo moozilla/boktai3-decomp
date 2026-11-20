@@ -36,13 +36,10 @@ struct Sub0802592CActor {
     u8 unkB2[0x104 - 0xB2];
     void *unk104;
     void *unk108;
-    union {
-        struct Player *players[69];
-        struct {
-            u32 unknown;
-            struct Sub0802592CPair *positions[68];
-        } references;
-    } targets;
+    /* The initializer advances by one word and writes the player's position
+     * after each player pointer. */
+    void *targetWords[26];
+    u8 pad174[0x220 - 0x174];
     u8 unk220[0x24C - 0x220];
     u16 unk24C;
     u8 unk24E[0x254 - 0x24E];
@@ -77,7 +74,11 @@ static inline void SceneTrail_CopySavedPosition(struct Sub0802592CActor *actor)
     s32 idx;
     u32 *pair;
     idx = (s8)SceneTrail_TargetIndex(actor);
-    pair = (u32 *)actor->targets.references.positions[idx];
+    {
+        s32 offset = idx * sizeof(void *);
+        u8 *positions = (u8 *)&actor->targetWords[1];
+        pair = *(void **)(positions + offset);
+    }
     *(struct Sub0802592CPair *)((u8 *)actor + 0x9cc) = *(struct Sub0802592CPair *)pair;
 }
 
@@ -92,7 +93,7 @@ static inline u8 SceneTrail_DirectionToAngle(u8 direction)
     return (((u32)direction << 29) + 0xA0000000) >> 24;
 }
 
-void sub_0802592C(struct Sub0802592CActor *base, s32 param)
+void SceneActorAnimation_UpdatePlayerGrab(struct Sub0802592CActor *base, s32 param)
 {
     struct Sub0802592CActor *actor = base;
     struct Player *q;
@@ -158,10 +159,10 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
         }
         SceneTrail_CopySavedPosition(actor);
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0,
-                                    2);
+        Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1, 0, 2);
         if ((s8)actor->unk395 >= 0) {
-            v = base->targets.players[(s8)actor->unk395]->facingChangeEffects;
+            struct Player *player = base->targetWords[(s8)actor->unk395];
+            v = player->facingChangeEffects;
             actor->unk396 = v;
             actor->unk397 = v;
         }
@@ -172,28 +173,28 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
     cb = (u8)Callback_InvokeActor(base, base->unk104);
     if (cb != 0) {
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32,
-                                    0, 0, 0);
+        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32, 0, 0,
+                                    0);
         return;
     }
 
     cb2 = (u8)Callback_InvokeActor(base, base->unk108);
     if (cb2 != 0) {
         idx = (s8)SceneTrail_TargetIndex(actor);
-        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32,
-                                    0, 0, 0);
+        Player_ApplyPositionRequest(gPlayers[idx], &actor->saved, 0x32, actor->unk51, 0x32, 0, 0,
+                                    0);
         return;
     }
 
     {
         u8 sample;
-        struct Player **targets;
+        void **targets;
         s8 *index = (s8 *)&actor->unk395;
         idx = *index;
         {
             u32 offset = idx * 4;
-            struct Player **references = base->targets.players;
-            q = *(struct Player **)((u8 *)references + offset);
+            void **references = base->targetWords;
+            q = *(void **)((u8 *)references + offset);
             sample = q->facingChangeEffects;
             w = actor->unk397;
             targets = references;
@@ -209,8 +210,8 @@ void sub_0802592C(struct Sub0802592CActor *base, s32 param)
         }
         if (actor->unk254 == 3 && actor->unk24C == 0) {
             idx = *index;
-            reqRes = Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0,
-                                                 0, 0, 1, actor->unk368, 2);
+            reqRes = Player_BeginPositionRequest(gPlayers[idx], (u8 *)actor + 0x260, 0, 0, 0, 0, 1,
+                                                 actor->unk368, 2);
             hp = actor->unk94;
             SceneActors_SetHealth(actor, hp + reqRes);
             if (hp != actor->unk94) {

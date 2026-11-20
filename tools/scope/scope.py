@@ -993,11 +993,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
-    mv = moved_rows(rows_json)
-    if mv:
-        ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
-        print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
-              f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
+    moved = moved_rows_note(rows_json)
+    if moved:
+        print(moved)
     for i, ln, tied, shared in and_tie_hints(rows_json):
         if shared:
             print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
@@ -2084,6 +2082,21 @@ def moved_rows(rows, window=8):
     return out
 
 
+def moved_rows_note(rows):
+    """One line for report() about the moved_rows pairs, or "". It suggests `why UID` only for a
+    moved draft row that has an RTL uid (pool data and other unattributed rows have none)."""
+    moved = moved_rows(rows)
+    if not moved:
+        return ""
+    uid = next((rows[i]["uid"] for i in sorted(moved)
+                if rows[i]["tag"] == "+" and rows[i].get("uid") is not None), None)
+    detail = (f"`why {uid}` names what reads each copy" if uid is not None else
+              "the moved rows have no RTL UIDs, see the full listing")
+    count = len(moved) // 2
+    return (f"The listings share {count} instruction{'s' if count != 1 else ''} at different positions"
+            f" (an order difference, not a missing one): {detail}")
+
+
 def constant_def(texts, i, reg, window=8):
     """True when register REG holds a constant at TEXTS[i]: its last write within WINDOW lines
     before i is `movs`/`ldr =`, possibly through a self-applied `rsbs`/`lsls`/`mvns` of it."""
@@ -2489,7 +2502,14 @@ def asm_dest(text):
 def asm_reads(text):
     """Registers an assembly line reads."""
     regs = reg_nums(text)
-    return regs if asm_dest(text) is None else regs[1:] + (regs[:1] if re.match(r"(adds|subs|ands|orrs|eors|bics|muls|lsls|lsrs|asrs|adcs|sbcs|rors|mvns|negs)\b", text) and len(regs) == 2 else [])
+    if asm_dest(text) is None:
+        return regs
+    if text.count(",") == 1 and re.match(
+        r"(?:add|sub|and|orr|eor|mul|lsl|lsr|asr|adc|sbc|ror)s?\b", text
+    ):
+        # The two-operand form uses the destination as its first input.
+        return regs[1:] + regs[:1]
+    return regs[1:]
 
 
 def readers_after(rows, i, side, reg, limit=12):
@@ -2785,6 +2805,45 @@ def find_reg_view(wd, func):
     return out
 
 
+@by_dumps("names.txt")
+def local_takeovers(wd, func):
+    """Actual global-alloc takeovers, keyed by (taker, hard register).
+
+    K records the density comparison for a candidate register. Only E
+    records confirm eviction and identify the displaced pseudos.
+    """
+    func = dump_func(wd, func)
+    path = os.path.join(wd, "names.txt")
+    comparisons, takeovers = {}, {}
+    if not os.path.exists(path):
+        return takeovers
+    with open(path) as stream:
+        for line in stream:
+            fields = line.split()
+            if len(fields) < 2 or fields[1] != func:
+                continue
+            if fields[0] == "K" and len(fields) == 9:
+                taker, reg, local_refs, local_live, refs, live, wins = map(int, fields[2:])
+                if wins:
+                    comparisons[taker, reg] = (local_refs, local_live, refs, live)
+                else:
+                    comparisons.pop((taker, reg), None)
+            elif fields[0] == "E" and len(fields) == 5:
+                taker, victim, reg = map(int, fields[2:])
+                key = taker, reg
+                _, victims = takeovers.setdefault(key, (comparisons.get(key), []))
+                victims.append(victim)
+    return takeovers
+
+
+def takeover_density(comparison):
+    if comparison is None:
+        return ""
+    local_refs, local_live, refs, live = comparison
+    return (f" The taker has {refs} refs / {live} live insns against"
+            f" {local_refs} refs / {local_live} live insns for the local assignments there.")
+
+
 def regset(rs):
     return "{" + ", ".join(rname(r) for r in sorted(rs)) + "}" if rs else "{}"
 
@@ -2799,10 +2858,13 @@ def explain_find_reg(wd, func, pseudo, want, got, nm, recs, rec):
         return False
     f = next((entry for entry in view if not entry["retrying"] and entry["final"] >= 0), view[0])
     if f["first"] < 0 and f["final"] >= 0:
+        comparison, victims = local_takeovers(wd, func).get((pseudo, f["final"]), (None, []))
         print(f"    find_reg (global.c) found no free register for {nm(pseudo)}. It took"
               f" {rname(f['final'])} from local allocation: its references per live instruction"
               " exceed the aggregate for the locals placed there. All their assignments are"
-              " cleared, including locals in other blocks.")
+              " cleared, including locals in other blocks." + takeover_density(comparison))
+        if victims:
+            print("      evicted: " + ", ".join(map(nm, victims)) + ".")
         return True
     lo = set(range(8))
     used = f["used1"] & lo
@@ -3242,6 +3304,24 @@ def explain_alloc(wd, func, pseudo, want, got, nm, at):
             what.append(f"a call at {at(calls[0])}")
         print(f"    {rname(want)} was already taken during its life (local alloc or a fixed use runs first): "
               + (", ".join(what) if what else "holder not found in its span"))
+        if rec and rec[0] == "L":
+            for (taker, reg), (comparison, victims) in local_takeovers(wd, func).items():
+                if reg != want or taker not in holders:
+                    continue
+                for victim in victims:
+                    local = recs.get(victim)
+                    if not local or local[0] != "L" or local[1] != blk:
+                        continue
+                    if max(local[3], birth) >= min(local[4], death):
+                        continue
+                    print(f"    during local allocation, {rname(want)} held {nm(victim)}"
+                          f" (local priority {local[2]}). Global allocation later evicted it"
+                          f" for {nm(taker)}." + takeover_density(comparison))
+                    new_home = hard.get(victim, -1)
+                    if new_home >= 0 and new_home != want:
+                        print(f"    what-if: AGBCC_FORCE={kref(wd, func, victim)}:{new_home}"
+                              f" (place {nm(victim)} in its final register during local allocation)")
+                    return
         print(f"    lever: shorten {nm(pseudo)}'s life or move the other value's, so they don't overlap in"
               f" {rname(want)}; or make the other value land elsewhere")
         return
@@ -3447,14 +3527,22 @@ def source_lines(wd):
 
 def gotos_before(wd, func, uid, limit=4, src=None, lines=None):
     """The `goto` statements of FUNC's C that come before insn UID's line, nearest last (at most LIMIT):
-    [(line, text)]. The function's span is the lines its insns carry."""
+    [(line, text)]. Bound the search by the function definition in the preprocessed source."""
+    import land
+
     lines = uid_lines(wd) if lines is None else lines
     src = source_lines(wd) if src is None else src
     at = lines.get(uid)
-    span = [ln for ln in lines.values() if isinstance(ln, int) and ln > 0]
-    if not isinstance(at, int) or not span:
+    if not isinstance(at, int) or at not in src:
         return []
-    first = min(span)
+    text = "\n".join(src.get(line, "") for line in range(1, max(src) + 1))
+    span = land.definition_span(text, dump_func(wd, func))
+    if not span:
+        return []
+    first = text.count("\n", 0, span[0]) + 1
+    last = text.count("\n", 0, span[1] - 1) + 1
+    if not first <= at <= last:
+        return []
     hits = [(ln, src[ln].strip()) for ln in sorted(src) if first <= ln < at and re.search(r"\bgoto\s+\w+\s*;", src[ln])]
     return hits[-limit:]
 
@@ -4812,10 +4900,13 @@ def why_all_issues(text):
                 pseudo = int(alloc.group(1))
                 other = re.search(r"the ROM keeps (\d+)|went to a conflicting pseudo allocated earlier: (\d+)", section)
                 pair = tuple(sorted((pseudo, int(other.group(1) or other.group(2))))) if other else (pseudo,)
-                mechanism = ('allocation order' if 'to flip the order' in section else
+                takeover = next((s.strip() for s in section.splitlines()
+                                 if 'Global allocation later evicted it' in s), None)
+                mechanism = ('local eviction' if takeover else
+                             'allocation order' if 'to flip the order' in section else
                              'reload eviction' if 'reload then needed' in section else 'allocation')
                 lines = [s.strip() for s in section.splitlines()[1:] if s.strip()]
-                summary = next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
+                summary = takeover or next((s for s in lines if 'the ROM keeps ' in s or 'went to a conflicting pseudo' in s), lines[0] if lines else 'see full explanation')
                 key = (mechanism, pair)
                 title = f"{mechanism}, pseudos {' / '.join(map(str, pair))}: {summary}"
             elif cse:
@@ -4842,6 +4933,13 @@ def why_all_issues(text):
             issues.append((key, title, whatif, uid))
             found = True
         if not found:
+            moved = re.search(r"^  moved: (the ROM has this same instruction[^\n]*?);", part, re.M)
+            draft = re.search(r"^  ROM: .*?   draft: (.*?)   \[differs\]$", part, re.M)
+            if moved and draft:
+                insn = draft[1]
+                title = f"order: `{insn}` (draft line {line}): {moved[1]}"
+                issues.append((('order', norm_insn(insn), moved[1]), title, None, uid))
+                continue
             shape = re.search(r"^  (this is a shape difference[^\n]*|insn \d+ is in no RTL dump[^\n]*)", part, re.M)
             title = shape.group(1) if shape else f"insn {uid}, line {line}: no supported causal summary; see details"
             issues.append((('shape/emission', uid), title, knob(part), uid))
@@ -5791,8 +5889,11 @@ def explain_moved(wd, rows, row, nm, at):
     for side, start in (("rom", j), ("draft", i)):
         rd = readers_after(rows, start, side, reg)
         txt = ", ".join(f"{rows[x][side]}" + (f" [{rows[x]['rom_addr']}]" if side == "rom" else f" (insn {rows[x]['uid']})")
-                        for x in rd) or "nothing"
-        print(f"  {side}: {rname(reg)} set here is read by {txt}")
+                        for x in rd)
+        if txt:
+            print(f"  {side}: {rname(reg)} set here is read by {txt}")
+        else:
+            print(f"  {side}: no later read of {rname(reg)} found in the local listing")
         if side == "draft":
             seen.update(rows[x]["uid"] for x in rd if rows[x]["uid"])
     # the draft readers' operands through the passes
@@ -7031,11 +7132,14 @@ def cmd_hoist(src, func, env):
 
 def hoist_levers(src, func, env, passes, names, lines, base, info):
     """For each named variable loop.c hoisted, write the variant that stores it again (dead) just
-    before its loop's closing brace and score it: the second set in a later block makes it
+    before the closing brace of its block in the loop and score it: the second set makes it
     may_not_optimize, and flow deletes the dead store (EffectManager_SpawnParticles and
     EffectManager_SpawnParticlesAt matched this way)."""
-    text = open(os.path.join(ROOT, src)).read()
+    with open(os.path.join(ROOT, src)) as source:
+        text = source.read()
     rows = text.split("\n")
+    code_rows = re.sub(r"""/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'""",
+                       lambda m: re.sub(r"[^\n]", " ", m[0]), text, flags=re.S).split("\n")
     locations = uid_locations(info["wd"])
     tried = set()
     for ps in passes:
@@ -7050,17 +7154,29 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 tried.add(name)
                 m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])
                 head = next((i for i in range(ln - 1, -1, -1)
-                             if re.search(r"\b(for|while)\s*\(|\bdo\b", rows[i])), None)
+                             if re.search(r"\b(for|while)\s*\(|\bdo\b", code_rows[i])), None)
                 if not m or head is None:
                     continue
                 depth, close = 0, None
                 for i in range(head, len(rows)):
-                    for ch in rows[i]:
+                    for ch in code_rows[i]:
                         depth += (ch == "{") - (ch == "}")
-                    if depth == 0 and "{" in "".join(rows[head:i + 1]) and i > head:
+                    if depth == 0 and "{" in "".join(code_rows[head:i + 1]) and i > head:
                         close = i
                         break
                 if close is None or close < ln:
+                    continue
+                # A loop-local assignment can sit in a nested block whose variables expire
+                # earlier. Keep the probe in that block, even when a closing brace opens an else.
+                block = "\n".join(code_rows[ln - 1:close + 1])
+                depth = 0
+                for brace in re.finditer(r"[{}]", block[m.end():]):
+                    depth += 1 if brace[0] == "{" else -1
+                    if depth < 0:
+                        pos = m.end() + brace.start()
+                        close = ln - 1 + block.count("\n", 0, pos)
+                        break
+                if close < ln or not code_rows[close].lstrip().startswith("}"):
                     continue
                 indent = re.match(r"\s*", rows[close]).group(0) + "    "
                 out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]
@@ -7965,9 +8081,13 @@ def cmd_land(target, draft=None, new_name=None, rom=False, note=None, nonmatchin
         added = land.added_concessions(open(path).read() if os.path.exists(path) else "", text, path)
         if any(added):
             sys.exit(land.pin_refusal(name, *added, dest))
-    new_warnings = land.added_warnings(open(path).read() if os.path.exists(path) else "", text, path)
+    new_warnings, warning_comparison_error = land.added_warnings(
+        open(path).read() if os.path.exists(path) else "", text, path)
     if new_warnings:
         print(land.warning_note(name, new_warnings), file=sys.stderr)
+    if warning_comparison_error:
+        print(f"{name}: compiler warning comparison unavailable. The {warning_comparison_error} "
+              "source could not compile with the current headers.", file=sys.stderr)
 
     def remember(p):
         if p not in before:
@@ -8233,26 +8353,34 @@ def c_change(base_lines, path):
     return f"lines {lo}-{hi} (+{plus} -{minus})" if lo != hi else f"line {lo} (+{plus} -{minus})"
 
 
-def is_snippet(base_lines, text, func):
+def is_snippet(base_lines, text, func, canonical_names=None):
     """Is TEXT a `put` snippet rather than a whole copy of the workspace: it lacks a function or
     INCLUDE_ASM the workspace has besides FUNC, or the workspace's #include lines. A static helper
-    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count."""
+    (`static inline` or `inline static`) the variant drops, e.g. for a shared header's, does not count.
+    Known address labels and their inventory names refer to the same function."""
     base = "\n".join(base_lines)
+    canonical_names = canonical_names or {}
 
     def defined(t):
-        return (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
-                | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
-    if (defined(base) - {func}) - defined(text):
+        names = (set(re.findall(r"^(?!(?:inline\s+|__inline__\s+)*static\b)[A-Za-z_][^\n;=(){}]*?\b(\w+)\s*\([^;{}]*\)\s*\{", t, re.M))
+                 | set(re.findall(r"INCLUDE_ASM\([^,]+,\s*(\w+)\)", t)))
+        return {canonical_names.get(name, name) for name in names}
+
+    if (defined(base) - {canonical_names.get(func, func)}) - defined(text):
         return True
     return bool(re.search(r"^#include", base, re.M)) and not re.search(r"^#include", text, re.M)
 
 
 def cmd_try(src, func, variants, env):
     """Score each variant (a whole-file .c, or one KNOB=V) through the fork server, best first."""
+    import progress
+
     t0 = time.perf_counter()
     base_n, base_info = score(src, func, env)
     rows = []
     base_lines = open(os.path.join(ROOT, src)).read().splitlines()
+    functions, _ = progress.load_functions()
+    canonical_names = {f"sub_{addr:08X}": name for name, addr in functions}
     for v in variants:
         if "=" in v and not v.endswith(".c"):
             k, val = v.split("=", 1)
@@ -8270,7 +8398,7 @@ def cmd_try(src, func, variants, env):
         if not os.path.isfile(path):
             rows.append((None, rel, "source file not found", "missing file", {}))
             continue
-        if is_snippet(base_lines, open(path).read(), func):
+        if is_snippet(base_lines, open(path).read(), func, canonical_names):
             # a snippet (FUNC and what it needs, as `put` takes) is scored as the workspace with it put in
             import contextlib
             import io

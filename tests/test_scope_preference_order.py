@@ -3,6 +3,7 @@ import io
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 from tools.matchsearch.evaluator import _load_scope
 
@@ -34,6 +35,9 @@ class PreferenceOrder(unittest.TestCase):
                 "G F 23 1804 8 133 5 4 source\n"
                 "G F 454 625 2 32 0 5 zero\n"
                 "F F 23 0 0 1ffff 1ffff 0 0 0 -1 1 -1\n"
+                "K F 23 5 4 100 8 133 1\n"
+                "K F 23 4 2 32 8 133 1\n"
+                "E F 23 454 4\n"
                 "F F 23 0 1 1ffff 1ffff 0 0 0 -1 1 4\n"
             )
             recs = scope.alloc_records(wd, "F")
@@ -41,8 +45,32 @@ class PreferenceOrder(unittest.TestCase):
             with contextlib.redirect_stdout(out):
                 scope.explain_find_reg(wd, "F", 23, 2, 4, str, recs, recs[23])
             self.assertIn("took r4 from local allocation", out.getvalue())
+            self.assertIn("8 refs / 133 live insns against 2 refs / 32 live insns", out.getvalue())
+            self.assertIn("evicted: 454.", out.getvalue())
+            self.assertNotIn((23, 5), scope.local_takeovers(wd, "F"))
             self.assertNotIn("preference moved", out.getvalue())
             out = io.StringIO()
             with contextlib.redirect_stdout(out):
                 scope.explain_alloc(wd, "F", 454, 4, 5, str, str)
             self.assertIn("took that register for 23", out.getvalue())
+
+    def test_local_conflict_reports_the_holder_before_global_takeover(self):
+        scope, _ = _load_scope(Path(__file__).resolve().parents[1])
+        with tempfile.TemporaryDirectory() as wd:
+            Path(wd, "names.txt").write_text(
+                "L F 17 259 5 1134 26 264 9 2 6 spread\n"
+                "L F 17 234 8 1165 38 244 8 0 5 table\n"
+                "G F 263 1284 7 109 6 5 origin\n"
+                "K F 263 5 8 228 7 109 1\n"
+                "E F 263 234 5\n"
+            )
+            out = io.StringIO()
+            insns = [(100, "insn", "(set (reg:SI 259) (reg:SI 263))")]
+            with mock.patch.object(scope, "insn_list", return_value=insns), \
+                    mock.patch.object(scope, "hard_of", return_value={234: 10, 259: 6, 263: 5}), \
+                    mock.patch.object(scope, "conflicts", return_value={259: ({263}, {5})}), \
+                    contextlib.redirect_stdout(out):
+                scope.explain_alloc(wd, "F", 259, 5, 6, str, str)
+            self.assertIn("during local allocation, r5 held 234", out.getvalue())
+            self.assertIn("Global allocation later evicted it for 263", out.getvalue())
+            self.assertIn("AGBCC_FORCE=table:10", out.getvalue())

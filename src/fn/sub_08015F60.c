@@ -3,69 +3,34 @@
 #include "ram.h"
 #include "monster_particle_random.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Sprite {
-    u32 flags;
-    u8 pad4[4];
-    u16 tile;
-    u8 width, height;
-    u8 padc[12];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Motion {
-    struct Vec velocity;
-    struct Sprite sprite;
-    struct Anim anim;
-};
-struct Particle {
-    u8 active, lifetime;
-    s16 speed;
-    struct Motion motion;
-};
-struct Group {
-    u8 active, count, pad[2];
-    struct Particle particles[8];
-};
-struct Manager {
-    u8 pad[28];
-    u8 *resource;
-    void *animations;
-    struct Group groups[6];
-};
+#include "fading_particle_group.h"
 extern const s16 gUnk_086149C4[];
 void *FadingParticleManager_Create(u32, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, u32);
-void Anim_SetSequence(void *, void *, u32, u32, u32);
+u32 Anim_SetSequence(void *, void *, u32, u32, u32);
 static inline u16 FadingParticles_NextRandom(u32 *r, const u16 *table)
 {
     *r = (*r + 1) & 1023;
     return table[*r];
 }
-s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lifeRange, s32 speed,
-                              s32 speedRange, s32 angle, s32 angleRange, s32 rise, s32 riseRange)
+s32 FadingParticleGroup_Spawn(u32 count, struct ContactPosition *position, s32 life, s32 lifeRange,
+                              s32 speed, s32 speedRange, s32 angle, s32 angleRange, s32 rise,
+                              s32 riseRange)
 {
     s32 i, j;
     u32 *rng;
     const u16 *table;
     const s16 *sine;
-    if ((*(struct Manager **)&gFadingParticleManager) == NULL &&
-        FadingParticleManager_Create(0, 0) == NULL)
+    if (gFadingParticleManager == NULL && FadingParticleManager_Create(0, 0) == NULL)
         return -1;
     for (i = 0; i < 6; i++) {
-        struct Group *g = &(*(struct Manager **)&gFadingParticleManager)->groups[i];
+        struct FadingParticleGroup *g =
+            &((struct FadingParticleManager *)gFadingParticleManager)->groups[i];
         rng = &gRandomIndex;
         if (g->active == 0) {
             union {
-                struct Group *group;
+                struct FadingParticleGroup *group;
                 union ParticleRandomTableSource random;
             } input;
             g->active = 1;
@@ -75,9 +40,9 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
             j = 0;
             input.group = g;
             if (j < input.group->count) {
-                struct Anim *anim;
-                struct Sprite *sprite;
-                struct Particle *p;
+                struct DisplaySequenceState *anim;
+                struct SpriteDrawable *sprite;
+                struct FadingParticle *p;
                 input.random.halves[0] = 0xB400;
                 input.random.halves[1] = 0x0203;
                 table = ParticleRandom_GetTable(&input.random);
@@ -113,9 +78,12 @@ s32 FadingParticleGroup_Spawn(u32 count, struct Vec *position, s32 life, s32 lif
                     sub_08217E40(sprite, 0);
                     p->motion.sprite.flags &= ~1;
                     Anim_SetSequence(
-                        anim, (*(struct Manager **)&gFadingParticleManager)->animations, 3, 0, 0);
-                    anim = (struct Anim *)((u8 *)anim + sizeof(struct Particle));
-                    sprite = (struct Sprite *)((u8 *)sprite + sizeof(struct Particle));
+                        anim, ((struct FadingParticleManager *)gFadingParticleManager)->animations,
+                        3, 0, 0);
+                    anim =
+                        (struct DisplaySequenceState *)((u8 *)anim + sizeof(struct FadingParticle));
+                    sprite =
+                        (struct SpriteDrawable *)((u8 *)sprite + sizeof(struct FadingParticle));
                     p++;
                     j++;
                 } while (j < g->count);

@@ -869,6 +869,7 @@ def concession_counts(source_root):
         found += [concessions.Site(0, "alias", ok) for ok in concessions.aliases(text, rel).values()]
         if compiled and path.suffix == ".c":
             found += concessions.compiler_sites(rel, path.read_text())
+        found += concessions.literal_param_sites(rel, path.read_text())  # the tree pass; not in sites()
         for s in found:
             n, ok = counts.get(s.kind, (0, 0))
             counts[s.kind] = (n + (not s.excused), ok + s.excused)

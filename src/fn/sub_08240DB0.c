@@ -31,19 +31,11 @@ void Player_UpdateDefeatSequence(struct Player *p)
             }
             break;
         case 2: {
-            u16 *counter;
-            s32 zero;
             Player_SetAnimationIndex(p, 0x2C, 0x40);
-            counter = &F(u16, 0x4E8);
-            {
-                u16 t = *counter - 0x1E;
-                zero = 0;
-                *counter = t;
-            }
-            p->tetherFrame++;
-            if (p->tetherFrame > 8) {
-                p->currentStatA = zero;
-                *counter = zero;
+            p->terrainRecoveryCounter -= 30;
+            if (++p->tetherFrame > 8) {
+                p->currentStatA = 0;
+                p->terrainRecoveryCounter = 0;
                 Player_SetSecondaryActionFlags(p, 1);
                 Player_SetTetherMode(p, 0x21, 3);
             }

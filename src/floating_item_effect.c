@@ -1,9 +1,31 @@
 #include "floating_item_effect.h"
 
+enum FloatingEffectState {
+    FLOATING_EFFECT_BOB,
+    FLOATING_EFFECT_WAIT_AFTER_BOB,
+    FLOATING_EFFECT_SHRINK_AWAY,
+    FLOATING_EFFECT_RISE_AND_SETTLE,
+    FLOATING_EFFECT_WAIT_AFTER_RISE,
+    FLOATING_EFFECT_RISE_AND_SHRINK,
+    FLOATING_EFFECT_FLY
+};
+
+static inline void FloatingEffect_SetManager(struct LinkedWidgetSet *manager)
+{
+    gLinkedWidgetSet = manager;
+}
+
+static inline void FloatingEffect_SetState(struct FloatingEffect *effect, u8 state)
+{
+    effect->state = state;
+    effect->entered = 1;
+    effect->timer = 0;
+}
+
 void FloatingEffect_Init(struct FloatingEffect *effect)
 {
     effect->key = 0;
-    effect->state = 1;
+    effect->state = FLOATING_EFFECT_WAIT_AFTER_BOB;
     effect->entered = 0;
     effect->kind = 0;
     effect->timer = 0;
@@ -54,10 +76,7 @@ void FloatingEffect_Bob(struct LinkedWidgetSet *manager, struct FloatingEffect *
         effect->position.y -= 16;
     FloatingEffect_Project(effect);
     if (effect->timer > 3) {
-        int state = 1;
-        effect->state = state;
-        effect->entered = state;
-        effect->timer = 0;
+        FloatingEffect_SetState(effect, FLOATING_EFFECT_WAIT_AFTER_BOB);
     } else
         effect->timer++;
 }
@@ -74,21 +93,15 @@ void FloatingEffect_Wait(struct LinkedWidgetSet *manager, struct FloatingEffect 
         if (mode == 0) {
             u32 index = effect->index;
             if (gPlayers[index])
-                effect->state = 6;
+                effect->state = FLOATING_EFFECT_FLY;
             else
-                effect->state = 5;
+                effect->state = FLOATING_EFFECT_RISE_AND_SHRINK;
             effect->entered = 1;
             effect->timer = mode;
         } else if (mode == 1) {
-            int state = 2;
-            effect->state = state;
-            effect->entered = mode;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_SHRINK_AWAY);
         } else if (mode == 3) {
-            int state = 6;
-            effect->state = state;
-            effect->entered = 1;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_FLY);
         }
     } else
         effect->timer++;
@@ -126,10 +139,6 @@ static inline u32 FloatingEffect_RandomAt(const u16 *table, u16 index)
 {
     return table[index];
 }
-
-// confidence=low: rises for the first few frames, then sinks (shaking in mode 3) and moves to
-
-// state 4 after 8 (mode 3: 9) frames.
 
 void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct FloatingEffect *effect)
 {
@@ -173,16 +182,10 @@ void FloatingEffect_RiseAndSettle(struct LinkedWidgetSet *manager, struct Floati
             goto increment;
     } else if (effect->timer <= 7)
         goto increment;
-    {
-        u32 nextState = 4;
-        effect->state = nextState;
-        effect->entered = 1;
-        effect->timer = 0;
-    }
-    goto done;
+    FloatingEffect_SetState(effect, FLOATING_EFFECT_WAIT_AFTER_RISE);
+    return;
 increment:
     effect->timer++;
-done:;
 }
 
 void FloatingEffect_RiseAndShrink(struct LinkedWidgetSet *manager, struct FloatingEffect *effect,
@@ -279,7 +282,7 @@ s32 FloatingEffectManager_Update(struct LinkedWidgetSet *manager)
     effect = manager->effects;
     for (; i <= 7; state += sizeof(*effect), effect++, i++) {
         if (manager->active & (1 << i)) {
-            if (*state <= 6)
+            if (*state <= FLOATING_EFFECT_FLY)
                 table[*state](manager, effect, i);
         }
     }
@@ -293,10 +296,7 @@ u32 FloatingEffectManager_Destroy(struct LinkedWidgetSet *manager)
         Anim_Remove(sprite);
         sprite = (void *)((u8 *)sprite + sizeof(struct FloatingEffect));
     }
-    {
-        u32 zero = 0;
-        gLinkedWidgetSet = (void *)zero;
-    }
+    FloatingEffect_SetManager(NULL);
 }
 
 s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
@@ -304,7 +304,7 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
     struct ChoiceResource *resource;
     struct ContactPosition zero;
     s32 i;
-    gLinkedWidgetSet = manager;
+    FloatingEffect_SetManager(manager);
     resource = ScriptProc_Start(0xCB05, 0x5D04);
     if (!resource)
         return -1;
@@ -315,7 +315,7 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
     for (i = 0; i < 8; i++) {
         struct FloatingEffect *effect = &manager->effects[i];
         effect->key = 0;
-        effect->state = 1;
+        effect->state = FLOATING_EFFECT_WAIT_AFTER_BOB;
         effect->kind = 0;
         effect->timer = 0;
         Widget_InitLinked(&effect->sprite, &manager->resource, 0, 0x11, 1, 0, 0x3C, &zero);
@@ -382,24 +382,16 @@ s32 FloatingItemEffect_Spawn(int kind, int item, int mode, int index,
     effect->mode = mode;
     switch (effect->mode) {
         case 0:
-            effect->state = 3;
-            effect->entered = 1;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_RISE_AND_SETTLE);
             break;
         case 1:
-            effect->state = 0;
-            effect->entered = 1;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_BOB);
             break;
         case 2:
-            effect->state = 3;
-            effect->entered = 1;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_RISE_AND_SETTLE);
             break;
         case 3:
-            effect->state = 3;
-            effect->entered = 1;
-            effect->timer = 0;
+            FloatingEffect_SetState(effect, FLOATING_EFFECT_RISE_AND_SETTLE);
             break;
     }
     effect->kind = kind;

@@ -88,13 +88,14 @@ void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void ActorImpact_InitAttackCollider(struct ActorImpact *actor)
 {
     struct ContactPackedVector size;
-    union ActorImpactVector offset;
+    struct ContactPackedVector offset;
     struct ContactCollider *collider = &actor->attackCollider;
     size.x = 64;
     size.y = 128;
     size.z = 64;
-    offset.words[0] = 0x800000;
-    offset.words[1] &= 0xffff0000;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x2001, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->colliderPosition, 0);
     Collider_SetCallback(collider, ActorImpact_NoOp, actor);
@@ -106,13 +107,14 @@ void Collider_SetBodyProperties(void *, s32, s32, s32);
 void ActorImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
 {
     struct ContactPackedVector size;
-    union ActorImpactVector offset;
+    struct ContactPackedVector offset;
     struct ContactCollider *collider = &actor->bodyCollider;
     size.x = 128;
     size.y = 256;
     size.z = 128;
-    offset.words[0] = 0x800000;
-    offset.words[1] &= 0xffff0000;
+    offset.x = 0;
+    offset.y = 128;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x5101, 0, 16, &size, &offset);
     Collider_SetPosition(collider, &actor->colliderPosition, 0);
     Collider_SetCallback(collider, ActorImpact_CopyContact, actor);
@@ -123,13 +125,14 @@ void ActorImpact_InitBodyCollider(struct ActorImpact *actor, s32 resource)
 void ActorImpact_InitCollider(struct ActorImpact *actor)
 {
     struct ContactPackedVector size;
-    union ActorImpactVector offset;
+    struct ContactPackedVector offset;
     struct ContactCollider *collider = &actor->proximityCollider;
     size.x = 256;
     size.y = 128;
     size.z = 256;
-    offset.words[0] = 0;
-    offset.words[1] &= 0xffff0000;
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
     Collider_Init(collider, 0, 0x4002, 0, 16, &size, &offset);
     Collider_SetPosition(collider, (u8 *)&actor->colliderPosition, 0);
     Collider_SetCallback(collider, CollisionReaction_RecordImpact, actor);
@@ -183,7 +186,7 @@ s32 ActorResource_ClampDecrease(struct ActorImpact *actor, s32 decrease)
 
 extern const s16 gUnk_086149C4[];
 
-u8 sub_0821D4F0(void *, void *, u32, u32);
+s32 Terrain_IsSegmentBelowHeightLimit(struct ContactPosition *, struct ContactPosition *, s32, s32);
 
 static inline s32 ActorImpact_TruncateFixed(s32 components)
 {
@@ -196,18 +199,17 @@ u8 ActorImpact_TestForwardPoint(struct ActorImpact *actor)
 {
     struct ContactPosition point;
     u8 *anglePtr = &actor->body.direction;
-    s16 *components = (s16 *)&point;
+    struct ContactPosition *components = &point;
     u32 angle = *anglePtr;
     s32 speed = 256;
     {
         s32 x = ActorImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & 255] * 256);
-        s32 zero = 0;
-        components[0] = x;
-        components[1] = zero;
+        components->x = x;
+        components->y = 0;
     }
     {
         s32 sample = gUnk_086149C4[angle];
-        components[2] = ActorImpact_TruncateFixed(sample * speed);
+        components->z = ActorImpact_TruncateFixed(sample * speed);
     }
     {
         struct ContactPosition *destination = &point;
@@ -220,7 +222,7 @@ u8 ActorImpact_TestForwardPoint(struct ActorImpact *actor)
             u32 delta = (u16)destination->z;
             destination->z = z + delta;
         }
-        if (sub_0821D4F0(origin, &point, 2, 256) != 0)
+        if ((u8)Terrain_IsSegmentBelowHeightLimit(origin, &point, 2, 256) != 0)
             return 1;
         return 0;
     }
@@ -241,38 +243,36 @@ s32 SceneActors_GetEffectiveTimeStep(struct ActorImpact *actor)
     return result;
 }
 
-void ActorImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosition *out,
-                                 u32 start)
+void ActorImpact_FindNearbyPoint(struct ActorImpact *actor, struct ContactPosition *out, u32 start)
 {
     struct ContactPosition point;
     struct SceneActorBody *body = &actor->body;
     s32 attempt = 0;
     u32 mask = 255;
     u32 speed = 256;
-    s16 *components = (s16 *)&point;
+    struct ContactPosition *components = &point;
     struct ContactPosition *center = &actor->body.position;
     for (; attempt <= 7; attempt++) {
         u32 angle = (start + (attempt << 5)) & mask;
         {
             s32 x = ActorImpact_TruncateFixed(gUnk_086149C4[(angle + 64) & mask] * 256);
-            s32 zero = 0;
-            components[0] = x;
-            components[1] = zero;
+            components->x = x;
+            components->y = 0;
         }
         {
             s32 sample = gUnk_086149C4[angle & mask];
             s32 value = sample * speed;
             s32 z = ActorImpact_TruncateFixed(value);
-            components[2] = z;
+            components->z = z;
             {
                 u32 x = (u16)body->position.x;
-                u32 dx = (u16)components[0];
-                components[0] = x + dx;
+                u32 dx = (u16)components->x;
+                components->x = x + dx;
             }
-            components[1] = (u16)components[1] + (u16)center->y;
-            components[2] += center->z;
+            components->y = (u16)components->y + (u16)center->y;
+            components->z += center->z;
         }
-        if (sub_0821D4F0(center, &point, 3, 256)) {
+        if ((u8)Terrain_IsSegmentBelowHeightLimit(center, &point, 3, 256)) {
             *out = point;
             return;
         }

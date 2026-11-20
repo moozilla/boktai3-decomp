@@ -26,10 +26,7 @@ void BurstEmitter_CreateFromScript(void)
         return;
     if (Script_SeekToKeyword('p')) {
         emitter->position.x = BurstEmitter_GetScriptValue();
-        {
-            s32 y = BurstEmitter_GetScriptValue();
-            emitter->position.y = y;
-        }
+        emitter->position.y = BurstEmitter_GetScriptValue();
         emitter->position.z = BurstEmitter_GetScriptValue();
     }
     if (Script_SeekToKeyword('P')) {
@@ -44,13 +41,8 @@ void BurstEmitter_CreateFromScript(void)
         d = 0;
     }
     emitter->context = Script_GetKeywordValue('c', 0);
-    {
-        u8 *state = &emitter->state;
-        u32 zero;
-        zero = 0;
-        *state = 1;
-        emitter->frame = zero;
-        emitter->mode = 2;
-    }
+    emitter->state = 1;
+    emitter->frame = 0;
+    emitter->mode = 2;
     BurstEmitter_InitCollider(emitter, a, b, c, d);
 }

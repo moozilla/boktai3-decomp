@@ -1,26 +1,9 @@
-#include "global.h"
-struct P {
-    u8 f[0xAA];
-    u8 a;
-    u8 f1[4];
-    u8 b;
-    u8 c;
-};
-void Trigger_ConsumePending(void *, s32);
-static inline u8 chk(struct P *p)
+#include "state_actor_action_entry.h"
+void Hresvelgr_UpdateActionTwentyNineRequest(struct StateActor *p)
 {
-    if (p->c != 0) {
-        p->c = 0;
-        p->b = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-void Hresvelgr_UpdateActionTwentyNineRequest(struct P *p)
-{
-    if (chk(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         u8 k = 0x1d;
-        p->a = k;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+        p->actionAnimation = k;
+        Trigger_ConsumePending(p->receiver2, 1);
     }
 }

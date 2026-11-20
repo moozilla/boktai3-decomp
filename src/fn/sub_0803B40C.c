@@ -33,7 +33,6 @@ int WirelessResultPanel_Init(struct ResultMenu *arg)
     void *resource;
     void *glyph;
     struct DisplaySequenceState animation;
-    u8 *priority;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceSprite *savedSprite;
     gResultMenu = p;
@@ -74,23 +73,16 @@ initialize:
     ResourceHeader_Relocate(secondary, res);
     {
         struct SceneInputWidget *draw = p->draws;
-        u32 drawFlags = 0x2011;
-        Widget_InitLinked(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
+        Widget_InitLinked(draw, secondary, 30, 0x2011, 0, 0, 60, 0);
         draw = p->draws + 1;
-        Widget_InitLinked(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
+        Widget_InitLinked(draw, secondary, 2, 0x2011, 0, 0, 60, 0);
         draw = p->draws + 2;
         glyph = &p->glyph;
         savedSprite = &p->sprite;
-        priority = &p->sprite.priority;
         {
-            int count;
-            int zero = 0;
-            count = 19;
-            do {
-                Widget_InitLinked(draw, primary, 51, 0x2011, zero, zero, 60, (void *)zero);
-                count--;
-                draw++;
-            } while (count >= 0);
+            int i;
+            for (i = 0; i < 20; i++, draw++)
+                Widget_InitLinked(draw, primary, 51, 0x2011, 0, 0, 60, NULL);
         }
     }
     resource = ScriptProc_Start(0x922E, 0x4BBF);
@@ -158,21 +150,12 @@ initialize:
         } else
             ended = 0;
     }
-    {
-        int zero = 0;
-        {
-            u8 *visible = priority;
-            *visible = zero;
-        }
-        Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), 16);
-        Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), 16);
-        p->state = zero;
-        p->entered = 1;
-        p->timer = zero;
-        {
-            void **callback = &p->onClose;
-            *callback = (void *)zero;
-        }
-    }
+    p->sprite.priority = 0;
+    Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), sizeof(p->left));
+    Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), sizeof(p->right));
+    p->state = 0;
+    p->entered = 1;
+    p->timer = 0;
+    p->onClose = NULL;
     return 0;
 }

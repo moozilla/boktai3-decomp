@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 #include "game_state.h"
 #include "scene_facing.h"
 
@@ -96,10 +96,7 @@ void Player_UpdateHeldInteraction(struct Player *p)
                 Sound_PlaySong(0x124);
                 ActorSequence_Begin(p, 8, 3);
             } else {
-                {
-                    u32 mask = 0x40;
-                    p->statusFlags = mask | p->statusFlags;
-                }
+                Player_AddStatusFlags(p, 0x40);
             }
             break;
         }

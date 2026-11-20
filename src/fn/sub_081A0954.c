@@ -1,9 +1,10 @@
 #include "hresvelgr_travel.h"
-void ActionState_Reset(u8 *);
-void ActionState_AdvanceState(u8 *);
+
+void ActionState_Reset(struct BossActionState *);
+void ActionState_AdvanceState(struct BossActionState *);
 void Hresvelgr_PlayDelayedReposition(struct HresvelgrTravelActor *p)
 {
-    u8 *action = p->action;
+    struct BossActionState *action = &p->action;
     {
         u32 mask = 0x1c;
         p->flags |= mask;
@@ -12,9 +13,9 @@ void Hresvelgr_PlayDelayedReposition(struct HresvelgrTravelActor *p)
         p->changed = 0;
         ActionState_Reset(action);
     }
-    switch (*action) {
+    switch (action->state) {
         case 0:
-            if (++*(u32 *)(action + 4) > 119) {
+            if (++action->frame > 119) {
                 Hresvelgr_RefreshTarget(p);
                 p->position = p->target;
                 p->position.y = 0x2000;

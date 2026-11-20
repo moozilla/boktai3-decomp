@@ -1,55 +1,18 @@
 #include "global.h"
-#include "engine_globals.h"
+#include "engine.h"
+#include "particle_group.h"
 #include "ram.h"
 // confidence=medium: fills a particle group with randomized polar velocities.
 #define ParticleGroup_SpawnRadial sub_080148CC
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Particle {
-    u8 active, pad, timer, lifetime;
-    u16 cell;
-    s16 height;
-    struct Vec velocity;
-    u32 flags;
-    u8 pad14[4];
-    u16 tile;
-    u8 pad1a[4], palette, priority, pad20[8];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Group {
-    u8 active, count, type, priority;
-    struct Particle particles[8];
-};
-struct Manager {
-    u8 pad[24];
-    u32 timer;
-    u8 *small, *large;
-    struct Group groups[6];
-};
-struct Cell {
-    u8 height, tile;
-    u16 flags;
-};
-struct Map {
-    u32 pad;
-    u8 *cells;
-    u8 pad8[28];
-    u16 rows[1];
-};
-#define gRandomTable ((u16 *)0x0203B400)
 extern u32 gUnk_08604B90[];
-u8 *TerrainModifiers_FindCellOverride(int, int);
-void Effect_Remove(void *);
-static inline int CellIndex(struct Vec *p)
+static inline int CellIndex(struct ContactPosition *p)
 {
     int x = p->x >> 8, z = p->z >> 8;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         return 0xffff;
-    return ((struct Map *)gTerrainMap)->rows[z] + x;
+    return gTerrainMap->rows[z] + x;
 }
-struct Manager *ParticleManager_Create(void *, u32);
+struct ParticleGroupManager *ParticleManager_Create(void *, u32);
 s32 Mod(s32, s32);
 void sub_08217E40(void *, s32);
 static inline s32 Random(u16 *table, u32 mask, u32 *rng)
@@ -66,7 +29,6 @@ static inline void ClearFlag(u32 *p, u32 mask)
     v &= ~mask;
     *p = v;
 }
-extern s16 gUnk_086149C4[];
 static inline s32 FixedMultiply(s32 a, s32 b)
 {
     s32 value = a * b;
@@ -74,9 +36,10 @@ static inline s32 FixedMultiply(s32 a, s32 b)
         return value >> 12;
     return -(-value >> 12);
 }
-static inline void Direction(struct Vec *cursor, s32 baseDirection, s32 offset, s32 speed)
+static inline void Direction(struct ContactPosition *cursor, s32 baseDirection, s32 offset,
+                             s32 speed)
 {
-    struct Vec *out = cursor;
+    struct ContactPosition *out = cursor;
     s32 angle = baseDirection + offset;
     out->x = FixedMultiply(gUnk_086149C4[(angle + 64) & 255], speed);
     out->y = 0;
@@ -86,17 +49,17 @@ static inline s32 ReadScalar(const s32 *value)
 {
     return *value;
 }
-static inline struct Vec *ReadOrigin(struct Vec *const *value)
+static inline struct ContactPosition *ReadOrigin(struct ContactPosition *const *value)
 {
     return *value;
 }
-static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 angle,
+static inline s32 SpawnInline(s32 count, s32 options, struct ContactPosition *position, s32 angle,
                               s32 angleRange, s32 speed, s32 speedRange, s32 vertical,
                               s32 verticalRange, s32 lifetime, s32 lifetimeMask)
 {
-    struct Manager *m = gParticleGroupManager;
-    struct Group *g;
-    struct Group *pool;
+    struct ParticleGroupManager *m = gParticleGroupManager;
+    struct ParticleGroup *g;
+    struct ParticleGroup *pool;
     u32 *rng;
     s32 priority;
     s32 j;
@@ -104,7 +67,7 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
     s32 palette;
     s32 angleOffset;
     s32 i;
-    u8 *resource;
+    struct ParticleGroupGraphics *resource;
     if (!m) {
         m = ParticleManager_Create(0, 0);
         if (!m)
@@ -118,10 +81,10 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
         count = palette;
     if (options <= 20) {
         resource = m->small;
-        palette = *((u16 *)(resource + 6));
+        palette = resource->paletteBank;
     } else {
         resource = m->large;
-        palette = (*((u16 *)(resource + 6))) + 1;
+        palette = resource->paletteBank + 1;
     }
     halfRange = angleRange >> 1;
     j = 0;
@@ -142,9 +105,9 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
             angleOffset = count;
             if (i < angleOffset) {
                 u32 randomMask = 0x3ff;
-                u16 *table = (u16 *)0x0203B400;
-                struct Vec *vector = &pool->particles[0].velocity;
-                struct Particle *p;
+                u16 *table = gRandomTable;
+                struct ContactPosition *vector = &pool->particles[0].velocity;
+                struct ParticleGroupParticle *p;
                 u8 *sprite;
                 s32 normalizedAngle;
                 p = pool->particles;
@@ -155,7 +118,7 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
                 i = count;
                 do {
                     p->active = 1;
-                    p->pad = 1;
+                    p->unknown1 = 1;
                     p->timer = 0;
                     p->lifetime = lifetime + (Random(table, randomMask, rng) & lifetimeMask);
                     p->cell = CellIndex(ReadOrigin(&position));
@@ -173,7 +136,7 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
                             s32 baseDirection = angle - halfRange;
                             Direction(vector, baseDirection, offset, magnitude);
                         } else {
-                            struct Vec *out = vector;
+                            struct ContactPosition *out = vector;
                             out->x = FixedMultiply(gUnk_086149C4[(angle + 64) & 255], magnitude);
                             out->y = 0;
                             out->z = FixedMultiply(*((s16 *)(((u8 *)gUnk_086149C4) + angleOffset)),
@@ -190,24 +153,22 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
                     else
                         p->flags &= ~4;
                     ClearFlag(&p->flags, 1);
-                    {
-                        *(u64 *)&p->position = *(u64 *)position;
-                    }
+                    p->position = *position;
                     p->palette = *((u8 *)&palette);
-                    p->tile = (*((u16 *)(resource + 4))) + gUnk_08604B90[options];
+                    p->tile = resource->tileBase + gUnk_08604B90[options];
                     p->priority = g->priority;
                     sub_08217E40(sprite, 0);
-                    vector++;
-                    vector = (void *)(((u8 *)vector) + 48);
+                    vector = (void *)((u8 *)vector + sizeof(*p));
                     p++;
-                    sprite += 56;
+                    sprite += sizeof(*p);
                 } while (--i);
                 i = count;
             }
             if (i < 8) {
                 u32 inactive = 0, hidden = 1;
-                u32 offset = i * sizeof(struct Particle);
-                struct Particle *p = (struct Particle *)(offset + (u32)pool->particles);
+                u32 offset = i * sizeof(struct ParticleGroupParticle);
+                struct ParticleGroupParticle *p =
+                    (struct ParticleGroupParticle *)(offset + (u32)pool->particles);
                 do {
                     p->active = inactive;
                     p->flags |= hidden;
@@ -222,7 +183,7 @@ static inline s32 SpawnInline(s32 count, s32 options, struct Vec *position, s32 
     return 0;
 }
 
-s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct Vec *position, s32 angle,
+s32 ParticleGroup_SpawnRadial(s32 count, s32 options, struct ContactPosition *position, s32 angle,
                               s32 angleRange, s32 speed, s32 speedRange, s32 vertical,
                               s32 verticalRange, s32 lifetime, s32 lifetimeMask)
 {

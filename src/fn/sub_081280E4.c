@@ -1,35 +1,22 @@
-#include "global.h"
+#include "timed_sprite.h"
 #include "ram.h"
 
 void Sprite_Remove(void *);
 
-static inline u8 Tst(u32 *m, s32 i)
+static inline u8 DirectionalProjectile_IsAllocated(u32 *mask, s32 slot)
 {
-    if (*m & (1 << i))
+    if (*mask & (1 << slot))
         return TRUE;
     return FALSE;
 }
 
-struct E {
-    u8 a[0xA0];
-};
-struct S {
-    u8 pad[0x38];
-    u32 mask;
-    struct E e[12];
-};
-
-u32 DirectionalProjectile_DestroyPool(struct S *b)
+u32 DirectionalProjectile_DestroyPool(struct TimedSpritePool *pool)
 {
-    s32 i = 0;
-    struct E *e = b->e;
-    for (; i < 12; e++, i++) {
-        if (Tst(&b->mask, i))
-            Sprite_Remove(e);
+    s32 i;
+    for (i = 0; i < 12; i++) {
+        if (DirectionalProjectile_IsAllocated(&pool->allocated, i))
+            Sprite_Remove(&pool->sprites[i]);
     }
-    {
-        u32 z = 0;
-        gMovingSpritePool = z;
-    }
+    gMovingSpritePool = 0;
     return 0;
 }

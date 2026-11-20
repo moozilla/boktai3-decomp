@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
@@ -48,20 +48,14 @@ s32 Player_UpdateSpinAction(struct Player *p)
         s32 radius = q->speed * q->timer + 0xCC;
         PLACE(radius)
         if (q->index >= 0) {
-            {
-                u32 m = 0x80000;
-                p->statusFlags |= m;
-            }
+            Player_AddStatusFlags(p, 0x80000);
             Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
         }
     } else if (q->timer < q->phase1 + q->phase2) {
         s32 radius = q->speed * q->phase1 + 0xCC;
         PLACE(radius)
         if (q->index >= 0) {
-            {
-                u32 m = 0x80000;
-                p->statusFlags |= m;
-            }
+            Player_AddStatusFlags(p, 0x80000);
             if (!(q->timer & 1))
                 Player_EmitRandomSpark(p, &q->dest, q->heading, q->index);
         }

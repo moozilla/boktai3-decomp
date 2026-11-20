@@ -1,15 +1,15 @@
 #include "global.h"
 #include "sun_clock.h"
 #include "game_state.h"
+#include "scene_actor_style.h"
 
-// foundry draft (worker best 98.1%); what differs is mostly register allocation and instruction order
 struct ClockPanelSnapshot {
-    u8 bytes[0x20];
+    u8 nameBytes[32];
     u16 time;
     u16 party;
     s32 values[5];
     u8 unk38[0x88];
-    u8 record[1];
+    struct SceneActorStyle style;
 };
 struct ClockPanel {
     u8 unk0[0x1D];
@@ -19,7 +19,7 @@ struct ClockPanel {
 };
 s32 GameState_GetChallengeBestScore(u32);
 u32 GameState_HasEquippedConsumable(s32);
-void SceneActorStyle_InitializeFromGameState(void *);
+void SceneActorStyle_InitializeFromGameState(struct SceneActorStyle *);
 void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
 {
     u8 *record;
@@ -29,17 +29,17 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
     u8 *src;
     s32 i;
     s32 party;
-    unsigned int new_var;
-    new_var = 16;
-    record = s->bytes;
-    src = (u8 *)gGameState + 0x780;
+    unsigned int bikeNameOffset;
+    bikeNameOffset = 16;
+    record = (u8 *)s;
+    src = gGameState->playerName;
     for (i = 0; i < 16; i++)
-        s->bytes[i] = src[i];
-    src = (u8 *)gGameState + 0x790;
+        s->nameBytes[i] = src[i];
+    src = gGameState->playerName + 16;
     i = 0;
     values = s->values;
-    record += 0xC0;
-    dest = s->bytes + new_var;
+    record += (u8 *)&s->style - (u8 *)s;
+    dest = s->nameBytes + bikeNameOffset;
     for (; i < 16; i++)
         dest[i] = src[i];
     for (i = 0; i < 5; i++)
@@ -74,5 +74,5 @@ void ClockPanel_CaptureSnapshot(struct ClockPanel *p)
         }
         s->party = value;
     }
-    SceneActorStyle_InitializeFromGameState(record);
+    SceneActorStyle_InitializeFromGameState((struct SceneActorStyle *)record);
 }

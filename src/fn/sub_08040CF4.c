@@ -28,24 +28,10 @@ void ModifierMenu_DrawPendingChoice(struct ModifierMenu *menu)
     object->flags = mask & object->flags;
     object = &menu->displays[7];
     object->flags = mask & object->flags;
-    {
-        u32 bit = 1;
-        u32 *column = &menu->displays[9].flags;
-        i = 3;
-        do {
-            *column |= bit;
-            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
-        } while ((--i) >= 0);
-    }
-    {
-        u32 bit = 1;
-        u32 *column = &menu->displays[14].flags;
-        i = 3;
-        do {
-            *column |= bit;
-            column = (u32 *)(((u8 *)column) + (sizeof(struct ModifierDisplayObject)));
-        } while ((--i) >= 0);
-    }
+    for (i = 9; i < 13; i++)
+        menu->displays[i].flags |= 1;
+    for (i = 14; i < 18; i++)
+        menu->displays[i].flags |= 1;
     mode = menu->mode;
     switch (mode) {
         case 0: {

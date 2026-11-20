@@ -1,26 +1,15 @@
-#include "global.h"
-struct Draw {
-    u8 pad[8];
-    u32 flags;
-    u8 tail[0x54];
-};
-struct StatusMenu {
-    u8 task[0x18];
-    u32 timer;
-    u8 state, entered, flag, pad1f;
-    u8 pad20[0x20];
-    struct Draw draws[4];
-};
-int WirelessGameDisplay_SetState(struct StatusMenu *p, int state)
+#include "wireless_game_items_and_display.h"
+
+int WirelessGameDisplay_SetState(struct WirelessGameDisplay *p, int state)
 {
-    struct Draw *d;
+    struct WirelessGameDrawing *d;
     int i;
     u32 mask;
     p->state = state;
     p->entered = 1;
     p->timer = 0;
-    p->flag = 0;
-    d = p->draws;
+    p->finished = 0;
+    d = p->drawings;
     mask = 1;
     i = 3;
     do {

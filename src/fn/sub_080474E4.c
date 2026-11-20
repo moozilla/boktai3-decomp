@@ -25,12 +25,8 @@ s32 TransientSpriteEffects_Spawn(u32 kind, u32 options, const struct ContactPosi
             slot->drag = drag;
             if (velocity)
                 slot->velocity = *velocity;
-            else {
-                struct ContactPosition *destination = &slot->velocity;
-                u32 zero;
-                zero = 0;
-                CpuSet(&zero, destination, 0x05000002);
-            }
+            else
+                ZeroFill8(&slot->velocity);
             AnimData_SelectPaletteBank(&slot->graphics, kind + 0x153);
             sprite->position.vector = *position;
             sprite->priority = priority;

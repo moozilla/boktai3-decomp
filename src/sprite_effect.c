@@ -181,16 +181,14 @@ s32 SpriteEffect_SpawnTowardObject(struct SpriteEffectSource *source,
     gRandomIndex = (gRandomIndex + 1) & k2;
     {
         u32 v = tbl[gRandomIndex];
-        u32 m = 63;
-        duration = (v & m) + 30;
+        duration = (v & 63) + 30;
     }
     motion.packed.x = Div(motion.packed.x, duration);
     motion.packed.z = Div(motion.packed.z, duration);
     {
         s32 q = Div(duration, 2);
         u32 v = tbl[gRandomIndex = (gRandomIndex + 1) & 1023];
-        u32 m = 7;
-        motion.packed.y = q + (v & m);
+        motion.packed.y = q + (v & 7);
     }
     if (motion.packed.x > 48) {
         motion.packed.x = 48;
@@ -318,8 +316,7 @@ s32 SceneActor14_UpdateAnimState(struct SceneActor14 *actor)
             Sound_PlaySong(0x1A8);
         if (actor->state == 1 && actor->counter > 0) {
             animation = manager->animation;
-            Anim_SetKeyframes(actor, animation, gUnk_086106F0[actor->base + actor->state], 2,
-                              0);
+            Anim_SetKeyframes(actor, animation, gUnk_086106F0[actor->base + actor->state], 2, 0);
             Anim_Step(actor, animation);
             return 0;
         }

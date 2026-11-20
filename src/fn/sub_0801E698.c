@@ -1,25 +1,11 @@
-#include "global.h"
-void SceneObject_UpdateInactiveIdle(void);
-void SceneObjects_SetInactive(u8 *p, u16 id)
+#include "scene_object_controller.h"
+
+void SceneObjects_SetInactive(struct SceneObjPool *pool, u16 id)
 {
-    int i = 0;
-    if (i < *(u16 *)(p + 0x1a)) {
-        u8 **base = (u8 **)(p + 0x42c);
-        int two;
-        int zero;
-        void *fn;
-        zero = 0;
-        fn = SceneObject_UpdateInactiveIdle;
-        two = 2;
-        do {
-            u8 *s = *base + 140 * i;
-            if (*(u16 *)(s + 0x34) == id) {
-                s[0x37] = zero;
-                *(void **)(s + 0x30) = fn;
-                s[0x39] = two;
-                s[0x3a] = zero;
-            }
-            i++;
-        } while (i < *(u16 *)(p + 0x1a));
+    int i;
+    for (i = 0; i < pool->count; i++) {
+        struct SceneObjSlot *slot = &pool->slots[i];
+        if (slot->id == id)
+            SceneObjSlot_SetAnimation(slot, SCENE_OBJ_INACTIVE, SceneObject_UpdateInactiveIdle, 2);
     }
 }

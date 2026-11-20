@@ -1,11 +1,10 @@
-#include "global.h"
-u32 Script_GetKeywordValue(u32, s32);
-void GameRecords_UpdateMinimum(u32);
+#include "engine.h"
+
+s32 GameRecords_UpdateMinimum(u32 index, s32 value);
 void GameState_RecordChallengeScoreFromScript(void)
 {
-    s32 m = -1;
-    u32 a = Script_GetKeywordValue(0x63, m);
-    u32 b = Script_GetKeywordValue(0x74, m);
-    if (a <= 11 && b <= 60000)
-        GameRecords_UpdateMinimum(a);
+    u32 challenge = Script_GetKeywordValue('c', -1);
+    u32 score = Script_GetKeywordValue('t', -1);
+    if (challenge <= 11 && score <= 60000)
+        GameRecords_UpdateMinimum(challenge, score);
 }

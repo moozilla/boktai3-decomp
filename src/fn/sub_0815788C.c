@@ -1,6 +1,6 @@
 #include "global.h"
 #include "engine.h"
-#include "player.h"
+#include "player_status_flags.h"
 // confidence=low: action callback table and nearby interaction routines establish the family.
 void Player_AccumulateAction(struct Player *, s32);
 s32 Player_IsSlotInActionTwelveOrThirtyEight(s32);
@@ -88,8 +88,7 @@ static inline u32 terrainFlag(struct SceneVec *pos)
 void Player_UpdateActionModeMovement(struct Player *p)
 {
     union ProbePosition pos;
-    u32 mask = 0x4000;
-    p->statusFlags |= mask;
+    Player_AddStatusFlags(p, 0x4000);
     switch (p->kind) {
         case 1:
             Player_EmitPeriodicParticles(p);

@@ -1,13 +1,13 @@
 #include "modifier_list.h"
 #include "palette_pulse.h"
 #include "render.h"
-void PaletteFade_CycleMenuColors(void *);
+void PaletteFade_CycleMenuColors(struct CharacterPaletteCycle *);
 void CharacterModel_UpdatePairedAnimations(void *, s32);
 void ModifierMenu_UpdatePreviewAppearance(struct ModifierMenu *menu)
 {
     Palette_UpdateHighlightPulse(&menu->palette[12], &menu->colorCycle);
     if (menu->state != 1) {
-        PaletteFade_CycleMenuColors((u8 *)menu + 0x3C);
+        PaletteFade_CycleMenuColors(&menu->paletteCycle);
         CharacterModel_UpdatePairedAnimations((u8 *)menu + 0xE34, 0);
     } else {
         u16 *palette = gBgPaletteBuffer;

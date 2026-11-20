@@ -1,16 +1,17 @@
 #include "proximity_emitter.h"
+#include "terrain_collision.h"
 s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 unused1,
                                           u32 unused2)
 {
     struct ContactPosition *position;
     u32 graphicsId;
-    u32 priority;
     u16 *nearby;
     u32 script;
     if (Script_SeekToKeyword('p')) {
         u32 cell;
         u32 height, surface;
-        u8 *properties;
+        struct TerrainCell *properties;
+        struct TerrainCellOverride *override;
         struct ContactPosition *point;
         s32 x, z;
         emitter->position.x = Script_GetValue();
@@ -26,16 +27,13 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
             u32 row = gTerrainMap->rows[z];
             cell = row + x;
         }
-        properties = TerrainModifiers_FindCellOverride(cell, 1);
-        if (properties)
-            properties += 4;
-        else {
-            struct EngineMap *map = gTerrainMap;
-            u32 offset = cell * 4 + 12;
-            properties = map->cells + offset;
-        }
-        surface = *properties >> 4;
-        height = (*properties & 15) << 8;
+        override = (struct TerrainCellOverride *)TerrainModifiers_FindCellOverride(cell, 1);
+        if (override)
+            properties = &override->cell;
+        else
+            properties = &((struct TerrainGrid *)gTerrainMap->cells)->cells[cell];
+        surface = properties->shapeAndHeight >> 4;
+        height = (properties->shapeAndHeight & 15) << 8;
         switch (surface) {
             case 1:
                 height -= (u8)point->z;
@@ -62,14 +60,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA2);
         emitter->primary.sprite.flags |= 0x200;
-        {
-            u32 value = 3;
-            priority = value;
-        }
-        {
-            u32 value = priority;
-            emitter->primary.sprite.priority = value;
-        }
+        emitter->primary.sprite.priority = 3;
         {
             struct ContactPosition *source = position;
             emitter->primary.sprite.position = *source;
@@ -86,12 +77,7 @@ s32 ProximityEmitter_InitializeFromScript(struct ProximityEmitter *emitter, u32 
         sprite->frame = 0;
         AnimData_SelectPaletteBank(graphics, 0xA0);
         emitter->secondary.sprite.flags |= 0x400;
-        {
-            u8 *destination = &emitter->secondary.sprite.priority;
-            u32 value;
-            value = priority;
-            *destination = value;
-        }
+        emitter->secondary.sprite.priority = 3;
         {
             struct ContactPosition *destination = &emitter->secondary.sprite.position;
             struct ContactPosition *source;

@@ -1,3 +1,5 @@
+#include "tentacle_body.h"
+#include "scene_actor_chase_reaction.h"
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
@@ -8,13 +10,6 @@ s32 Callback_InvokeActor(void *, void *);
 void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 void sub_080A9DB0(void *, s32, s32);
-
-struct TentacleReturnContext {
-    u8 unknown0[0x87A];
-    u16 startCell;
-    u8 unknown87C[0x924 - 0x87C];
-    struct ContactPosition center;
-};
 
 static inline u8 Tentacle_TakeEntry(u8 *p)
 {
@@ -56,24 +51,11 @@ static inline void Tentacle_BeginForwardState(struct ChaseActor *a)
 
 static inline void Tentacle_ApplyDurationScale(struct ChaseActor *actor)
 {
-    u16 *scale;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 64;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0)
-                *scale = 64;
-        }
-    }
+    u16 *scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence, *scale);
+            &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+            *scale);
     else
         Anim_SetFrameDurationScale(
             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
@@ -100,7 +82,7 @@ static inline s32 Tentacle_HeadingDifference(u8 desired, u8 current)
 
 void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
 {
-    struct TentacleReturnContext *body = actor->base.context;
+    struct TentacleBody *body = actor->base.context;
     s32 speed;
     s32 difference;
     s32 index;
@@ -108,9 +90,9 @@ void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
     if (Tentacle_TakeEntry(&actor->base.field2B1)) {
         {
             u32 cell = actor->base.terrainCell;
-            body->startCell = cell;
+            body->returnCell = cell;
         }
-        SceneActorTerrain_GetCenter(body->startCell, &body->center);
+        SceneActorTerrain_GetCenter(body->returnCell, &body->returnCenter);
     }
     Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
@@ -128,14 +110,14 @@ void TentacleBody_ReturnToCellCenter(struct ChaseActor *actor)
     }
     Tentacle_AddPositions(&target, &actor->base.body.motion, &actor->base.body.position);
     index = SceneActorTerrain_GetCellIndex(&target);
-    if ((body->startCell) != index) {
-        Tentacle_SubtractPositions(&target, &target, &body->center);
+    if ((body->returnCell) != index) {
+        Tentacle_SubtractPositions(&target, &target, &body->returnCenter);
         actor->base.body.motion.x += Div(target.x, 10);
         actor->base.body.motion.z += Div(target.z, 10);
     }
     sub_080A9DB0(actor, 12, 0xA410);
     if (((difference < 0) ? (-difference) : (difference)) <= 7) {
-        if ((body->startCell) == index)
+        if ((body->returnCell) == index)
             Tentacle_BeginForwardState(actor);
     } else if (difference > 0) {
         actor->base.body.direction += (((64 - actor->base.field2C2) >> 4) << 1) + 1;

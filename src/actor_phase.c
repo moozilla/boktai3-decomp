@@ -1,52 +1,19 @@
 #include "global.h"
 #include "player.h"
+#include "axe.h"
+#include "directional_sprite_state.h"
+#include "engine.h"
+#include "scene_actor_reaction.h"
+#include "scene_actor_terrain_reaction.h"
 
-struct PhaseSprite {
-    u32 flags;
-    u8 pad4[2];
-    u8 field6, pad7;
-    s8 scaleX, scaleY;
-};
-
-struct PhaseCollision {
-    u8 pad0[6];
-    u16 flags;
-};
-
-struct PhaseActor {
-    u8 pad0[4];
-    struct PhaseSprite *sprite;
-    u8 pad8[0xfc];
-    u32 f104;
-    u8 pad108[0xc];
-    u32 flags114;
-    u8 pad118[0x1c];
-    struct PhaseCollision collision134;
-    u8 pad13c[0x4c];
-    struct PhaseCollision collision188;
-    u8 pad190[0x8c];
-    void (*phase)(void);
-    u8 pad220[0x90];
-    u8 phaseState;
-    u8 pad2b1;
-    u8 entered;
-    u8 pad2b3[2];
-    u8 phaseId;
-    u8 pad2b6[0xa];
-    u16 flags2c0;
-    u8 pad2c2[6];
-    u16 timer;
-    u8 pad2ca[0x106];
-    u8 *data;
-};
-
-static inline u8 consumeEntry(struct PhaseActor *s)
+static inline struct DirectionalSprite *ActorPhase_GetDrawable(struct ChaseActor *actor)
 {
-    if (s->entered) {
-        s->entered = 0;
-        return 1;
-    }
-    return 0;
+    return actor->base.drawable;
+}
+
+static inline void Axe_SetEffectFlags(u32 bits, struct Axe *axe)
+{
+    axe->flagsE4C |= bits;
 }
 
 static inline void clearFlags(u32 *p, u32 mask)
@@ -54,212 +21,145 @@ static inline void clearFlags(u32 *p, u32 mask)
     *p &= ~mask;
 }
 
-struct PhaseVector {
-    s32 x, y;
-};
+void ActorPhase_EmitTrailSprite(struct ChaseActor *, const struct ContactPosition *, u32);
 
-void ActorShadow_Disable(void *);
+void Axe_UpdateTrailColliders(struct ChaseActor *);
 
-void Sound_PlaySong(u32);
+void Axe_UpdateAttackColliderPositions(struct ChaseActor *);
 
-void ActorPhase_EmitTrailSprite(struct PhaseActor *, void *, u32);
+void Axe_ReleaseAuxiliarySprite(struct ChaseActor *);
 
-void Axe_UpdateTrailColliders(struct PhaseActor *);
+void SceneActorControl_ResetRotation(struct ChaseActor *);
 
-void Axe_UpdateAttackColliderPositions(struct PhaseActor *);
-
-void Axe_ReleaseAuxiliarySprite(struct PhaseActor *);
-
-void SceneActorControl_ResetRotation(void);
-
-void ActorPhase_UpdateAcceleratingTrail(struct PhaseActor *s, s32 frame)
+void ActorPhase_UpdateAcceleratingTrail(struct ChaseActor *actor, s32 frame)
 {
-    u8 *data = s->data;
-    if (consumeEntry(s)) {
-        *(u32 *)(data + 0xa38) |= 2;
-        data[0xcab] = 0;
-        data[0xa35] = 0;
-        *(struct PhaseVector *)(data + 0xa24) = *(struct PhaseVector *)(data + 0xa54);
+    struct Axe *axe = actor->base.context;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        axe->auxiliarySprite.flags |= 2;
+        axe->flagsCAB = 0;
+        axe->trailHeading = 0;
+        axe->trailPosition = axe->auxiliarySprite.position;
         {
-            u32 angle = data[0xca8];
-            data[0xa34] = angle;
+            u32 angle = axe->trailStartAngle;
+            axe->trailAngle = angle;
         }
-        data[0xa36] = 4;
-        ActorShadow_Disable(data + 0xcac);
-        *(u32 *)(data + 0xa38) = 1;
+        axe->trailSpinRate = 4;
+        ActorShadow_Disable(axe->auxiliaryShadow);
+        axe->auxiliarySprite.flags = 1;
     }
     {
-        s32 angle = data[0xa34];
-        s32 next = angle - data[0xa36];
-        data[0xa34] = next;
+        s32 angle = axe->trailAngle;
+        s32 next = angle - axe->trailSpinRate;
+        axe->trailAngle = next;
         if (angle < next)
             Sound_PlaySong(0x169);
     }
-    if ((1 & frame) && data[0xa36] <= 19)
-        data[0xa36]++;
-    ActorPhase_EmitTrailSprite(s, data + 0xa24, data[0xa34]);
-    Axe_UpdateTrailColliders(s);
-    Axe_UpdateAttackColliderPositions(s);
-    if ((*(u32 *)(data + 0xa38) & 1) && frame > 30) {
-        Axe_ReleaseAuxiliarySprite(s);
-        {
-            void (*next)(void) = SceneActorControl_ResetRotation;
-            u32 id = 0x34;
-            s->entered = 1;
-            s->phaseState = 0;
-            s->phaseId = id;
-            s->phase = next;
-            s->timer = 0;
-            clearFlags(&s->flags114, 1);
-            s->f104 = 0;
-        }
+    if ((1 & frame) && axe->trailSpinRate <= 19)
+        axe->trailSpinRate++;
+    ActorPhase_EmitTrailSprite(actor, &axe->trailPosition, axe->trailAngle);
+    Axe_UpdateTrailColliders(actor);
+    Axe_UpdateAttackColliderPositions(actor);
+    if ((axe->auxiliarySprite.flags & 1) && frame > 30) {
+        Axe_ReleaseAuxiliarySprite(actor);
+        SceneActorTerrain_InstallControl(actor, SceneActorControl_ResetRotation, 0x34);
     }
 }
 
-#define ActorPhase_SetAnimation Axe_SetAuxiliarySpriteParameters
-
 u8 ActorPhase_UpdateReverseFlickerTimer(u32 *, s32, s32, s32);
 
-void Axe_SetAuxiliarySpriteParameters(struct PhaseActor *, void *, u32);
+void Axe_SetAuxiliarySpriteParameters(struct ChaseActor *, const u16 *, u32);
 
-void ActorPhase_UpdateReverseFlickerExit();
+void ActorPhase_UpdateReverseFlickerExit(struct ChaseActor *, s32);
 
-void ActorPhase_UpdateReverseFlicker(struct PhaseActor *s, s32 frame)
+void ActorPhase_UpdateReverseFlicker(struct ChaseActor *actor, s32 frame)
 {
-    u8 *data = s->data;
+    struct Axe *axe = actor->base.context;
     u32 flags;
-    if (consumeEntry(s)) {
-        data[0xcab] = 0;
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
+    if (SceneActorReaction_TakePrepared(actor)) {
+        axe->flagsCAB = 0;
+        Axe_SetAuxiliarySpriteParameters(actor, axe->originalEffectPalette, 0x13f);
     }
     if (ActorPhase_UpdateReverseFlickerTimer(&flags, frame, 10, 30)) {
-        void (*next)(void) = ActorPhase_UpdateReverseFlickerExit;
-        u32 id = 0x30;
-        s->entered = 1;
-        s->phaseState = 0;
-        s->phaseId = id;
-        s->phase = next;
-        s->timer = 0;
-        clearFlags(&s->flags114, 1);
-        s->f104 = 0;
+        SceneActorTerrain_InstallControl(actor, ActorPhase_UpdateReverseFlickerExit, 0x30);
         goto visible;
     } else if (flags & 1) {
     visible:
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x888, 0x13c);
+        Axe_SetAuxiliarySpriteParameters(actor, (const u16 *)&axe->position, 0x13c);
     } else {
-        Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
+        Axe_SetAuxiliarySpriteParameters(actor, axe->originalEffectPalette, 0x13f);
     }
 }
 
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
 
-void ActorPhase_UpdateReverseFlickerExit(struct PhaseActor *s, s32 frame)
+void ActorPhase_UpdateReverseFlickerExit(struct ChaseActor *actor, s32 frame)
 {
-    u8 *data = s->data;
-    if (consumeEntry(s))
-        data[0xcab] = 0;
-    if (Sprite_BlinkUntilExpired(data + 0xa38, frame, 10, 30)) {
-        Axe_ReleaseAuxiliarySprite(s);
-        {
-            void (*next)(void) = SceneActorControl_ResetRotation;
-            u32 id = 0x34;
-            s->entered = 1;
-            s->phaseState = 0;
-            s->phaseId = id;
-            s->phase = next;
-            s->timer = 0;
-            clearFlags(&s->flags114, 1);
-            s->f104 = 0;
-        }
+    struct Axe *axe = actor->base.context;
+    if (SceneActorReaction_TakePrepared(actor))
+        axe->flagsCAB = 0;
+    if (Sprite_BlinkUntilExpired(&axe->auxiliarySprite.flags, frame, 10, 30)) {
+        Axe_ReleaseAuxiliarySprite(actor);
+        SceneActorTerrain_InstallControl(actor, SceneActorControl_ResetRotation, 0x34);
     }
 }
 
-void ActorPhase_WaitBeforeRelocation();
+void ActorPhase_WaitBeforeRelocation(struct ChaseActor *, s32);
 
-void ActorPhase_UpdateSpriteCollapse(struct PhaseActor *s)
+void ActorPhase_UpdateSpriteCollapse(struct ChaseActor *actor)
 {
-    u8 *data = s->data;
-    if (consumeEntry(s)) {
-        s->sprite->flags |= 2;
-        {
-            u32 mask = 4;
-            *(u32 *)(data + 0xe4c) |= mask;
-        }
+    struct Axe *axe = actor->base.context;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        ActorPhase_GetDrawable(actor)->flags |= 2;
+        Axe_SetEffectFlags(4, axe);
         Sound_PlaySong(0x16b);
-        {
-            u32 mask = 0x1800;
-            s->flags2c0 = mask | s->flags2c0;
-        }
+        SceneActorPlacement_SetFlags(0x1800, &actor->base);
     }
-    if (s->sprite->scaleX > 32) {
-        s->sprite->scaleX -= 4;
-    } else if (s->sprite->scaleX > 8) {
-        s->sprite->scaleX -= 2;
-        s->sprite->scaleY += 4;
-        ActorShadow_Disable((u8 *)s + 0x320);
-    } else if (s->sprite->scaleY <= 119) {
-        s->sprite->scaleY += 8;
-        ActorShadow_Disable((u8 *)s + 0x320);
+    if ((s8)ActorPhase_GetDrawable(actor)->scaleX > 32) {
+        ActorPhase_GetDrawable(actor)->scaleX -= 4;
+    } else if ((s8)ActorPhase_GetDrawable(actor)->scaleX > 8) {
+        ActorPhase_GetDrawable(actor)->scaleX -= 2;
+        ActorPhase_GetDrawable(actor)->scaleY += 4;
+        ActorShadow_Disable(actor->base.shadow);
+    } else if ((s8)ActorPhase_GetDrawable(actor)->scaleY <= 119) {
+        ActorPhase_GetDrawable(actor)->scaleY += 8;
+        ActorShadow_Disable(actor->base.shadow);
     } else {
-        void (*next)(void);
-        u32 id;
-        s->sprite->flags = 1;
-        next = ActorPhase_WaitBeforeRelocation;
-        id = 0x24;
-        s->entered = 1;
-        s->phaseState = 0;
-        s->phaseId = id;
-        s->phase = next;
-        s->timer = 0;
-        clearFlags(&s->flags114, 1);
-        s->f104 = 0;
-        ActorShadow_Disable((u8 *)s + 0x320);
-        {
-            u32 mask = 0x40;
-            *(u32 *)(data + 0xe4c) |= mask;
-        }
+        ActorPhase_GetDrawable(actor)->flags = 1;
+        SceneActorTerrain_InstallControl(actor, ActorPhase_WaitBeforeRelocation, 0x24);
+        ActorShadow_Disable(actor->base.shadow);
+        Axe_SetEffectFlags(0x40, axe);
     }
 }
 
-void ActorPhase_SelectDistantWaypoint(struct PhaseActor *, void *, void *, s32);
+void ActorPhase_SelectDistantWaypoint(struct ChaseActor *, struct ContactPosition *, const void *,
+                                      s32);
 
-void ActorPhase_UpdateSpriteRestore();
+void ActorPhase_UpdateSpriteRestore(struct ChaseActor *);
 
-void ActorPhase_WaitBeforeRelocation(struct PhaseActor *s, s32 frame)
+void ActorPhase_WaitBeforeRelocation(struct ChaseActor *actor, s32 frame)
 {
-    u8 *data = s->data;
-    if (consumeEntry(s)) {
-        s->sprite->flags &= ~2;
+    struct Axe *axe = actor->base.context;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        ActorPhase_GetDrawable(actor)->flags &= ~2;
         {
-            struct PhaseCollision *collision = &s->collision188;
+            struct ContactCollider *collision = &actor->base.colliderB;
             collision->flags |= 4;
         }
         {
-            struct PhaseCollision *collision = &s->collision134;
+            struct ContactCollider *collision = &actor->base.colliderA;
             collision->flags |= 4;
         }
     }
-    s->sprite->flags |= 1;
-    ActorShadow_Disable((u8 *)s + 0x320);
-    if (frame > data[0xe40]) {
-        ActorPhase_SelectDistantWaypoint(s, (u8 *)s + 0x5c, (*(u8 **)gPlayers) + 0x30, 0x40000);
-        {
-            void (*next)(void) = ActorPhase_UpdateSpriteRestore;
-            u32 id = 0x25;
-            s->entered = 1;
-            s->phaseState = 0;
-            s->phaseId = id;
-            s->phase = next;
-            s->timer = 0;
-            clearFlags(&s->flags114, 1);
-            s->f104 = 0;
-        }
+    ActorPhase_GetDrawable(actor)->flags |= 1;
+    ActorShadow_Disable(actor->base.shadow);
+    if (frame > axe->relocationDelay) {
+        ActorPhase_SelectDistantWaypoint(actor, &actor->base.body.position, &gPlayers[0]->position,
+                                         0x40000);
+        SceneActorTerrain_InstallControl(actor, ActorPhase_UpdateSpriteRestore, 0x25);
     }
 }
 
-void ActorShadow_Enable(void *);
-
-static inline void clearCollision(struct PhaseCollision *p, u32 mask)
+static inline void clearCollision(struct ContactCollider *p, u32 mask)
 {
     p->flags &= ~mask;
 }
@@ -269,29 +169,29 @@ static inline void clearFlags16(u16 *p, u32 mask)
     *p &= ~mask;
 }
 
-void ActorPhase_UpdateSpriteRestore(struct PhaseActor *s)
+void ActorPhase_UpdateSpriteRestore(struct ChaseActor *actor)
 {
-    u8 *data = s->data;
-    if (consumeEntry(s)) {
-        s->sprite->flags = (s->sprite->flags | 2) & ~1;
-        s->sprite->field6 = 0;
-        clearCollision(&s->collision188, 4);
-        clearCollision(&s->collision134, 4);
+    struct Axe *axe = actor->base.context;
+    if (SceneActorReaction_TakePrepared(actor)) {
+        ActorPhase_GetDrawable(actor)->flags = (ActorPhase_GetDrawable(actor)->flags | 2) & ~1;
+        ActorPhase_GetDrawable(actor)->angle = 0;
+        clearCollision(&actor->base.colliderB, 4);
+        clearCollision(&actor->base.colliderA, 4);
         Sound_PlaySong(0x16c);
     }
-    if (s->sprite->scaleY > 112) {
-        s->sprite->scaleY -= 8;
-    } else if (s->sprite->scaleY > 64) {
-        s->sprite->scaleX += 2;
-        s->sprite->scaleY -= 4;
-        ActorShadow_Enable((u8 *)s + 0x320);
-    } else if (s->sprite->scaleX <= 63) {
-        s->sprite->scaleX += 4;
+    if ((s8)ActorPhase_GetDrawable(actor)->scaleY > 112) {
+        ActorPhase_GetDrawable(actor)->scaleY -= 8;
+    } else if ((s8)ActorPhase_GetDrawable(actor)->scaleY > 64) {
+        ActorPhase_GetDrawable(actor)->scaleX += 2;
+        ActorPhase_GetDrawable(actor)->scaleY -= 4;
+        ActorShadow_Enable(actor->base.shadow);
+    } else if ((s8)ActorPhase_GetDrawable(actor)->scaleX <= 63) {
+        ActorPhase_GetDrawable(actor)->scaleX += 4;
     } else {
-        s->sprite->scaleX = 64;
-        s->sprite->scaleY = 64;
-        clearFlags((u32 *)(data + 0xe4c), 0x44);
-        s->phaseState = 1;
-        clearFlags16(&s->flags2c0, 0x1800);
+        ActorPhase_GetDrawable(actor)->scaleX = 64;
+        ActorPhase_GetDrawable(actor)->scaleY = 64;
+        clearFlags(&axe->flagsE4C, 0x44);
+        actor->base.stepDone = 1;
+        clearFlags16(&actor->base.placementFlags, 0x1800);
     }
 }

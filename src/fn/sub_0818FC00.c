@@ -1,75 +1,40 @@
-#define NIDHOGGR_MASK "r6"
 #include "global.h"
 #include "display_animation.h"
 #include "player_cue_sequence.h"
-struct NidhoggrVector {
-    s16 x, y, z, pad;
-};
-struct NidhoggrSprite {
-    u32 flags;
-    u8 pad4[12];
-    u16 frame;
-    u8 pad12[10];
-    struct NidhoggrVector position;
-    u8 pad24[8];
-};
-struct NidhoggrEffect {
-    void *update, *destroy;
-    u8 animation[0x1c];
-    struct NidhoggrSprite sprite;
-    struct DisplaySequenceState sequence;
-    u8 pad60[0x114];
-    void *anchor;
-    struct NidhoggrVector velocity;
-    u8 state, age;
-    s16 ground;
-    u8 *boss;
-};
-#ifndef NIDHOGGR_MASK
-#define NIDHOGGR_MASK "r5"
-#endif
-static inline u32 Nidhoggr_StepAnimation(struct NidhoggrEffect *owner)
+#include "scene_panel_effect_pool.h"
+static inline u32 Nidhoggr_StepAnimation(struct ScenePanelOwnedEffect *owner)
 {
-    return PlayerCue_StepSequenceEnded(&owner->sprite, &owner->sequence);
+    return PlayerCue_StepSequenceEnded((void *)&owner->sprite, &owner->sequence);
 }
 
-struct EffectCollider {
-    u8 pad[6];
-    u16 flags;
-};
-void Nidhoggr_UpdateDetachedAttackEffect(struct NidhoggrEffect *p)
+void Nidhoggr_UpdateDetachedAttackEffect(struct ScenePanelOwnedEffect *p)
 {
     u32 ended = Nidhoggr_StepAnimation(p);
-    u32 offset = 0x180;
-    u8 *state;
-    u32 old;
-    state = (u8 *)p + offset;
-    old = *state;
-    switch (old) {
+    switch (p->state) {
         case 0:
             if (ended) {
-                struct EffectCollider *collider;
+                struct ContactCollider *collider;
                 u32 mask;
-                p->anchor = 0;
-                p->velocity.x = 12;
-                p->velocity.y = old;
-                p->velocity.z = old;
-                p->ground = p->sprite.position.x;
-                (*state)++;
-                collider = (void *)((u8 *)p + 0xcc);
+                p->anchor = NULL;
+                p->motion.x = 12;
+                p->motion.y = 0;
+                p->motion.z = 0;
+                p->referenceCoordinate = p->sprite.position.x;
+                p->state++;
+                collider = &p->attackCollider;
                 mask = ~4;
                 collider->flags &= mask;
             }
             break;
         case 1:
-            if (p->sprite.position.x - p->ground > 0x1000) {
-                struct EffectCollider *collider;
+            if (p->sprite.position.x - p->referenceCoordinate > 0x1000) {
+                struct ContactCollider *collider;
                 p->update = 0;
-                if (p->destroy) {
-                    Callback_InvokeActor(p, p->destroy);
-                    p->destroy = 0;
+                if (p->onComplete) {
+                    Callback_InvokeActor(p, p->onComplete);
+                    p->onComplete = 0;
                 }
-                collider = (void *)((u8 *)p + 0xcc);
+                collider = &p->attackCollider;
                 collider->flags |= 4;
             }
             break;

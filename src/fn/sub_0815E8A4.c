@@ -1,7 +1,8 @@
+#include "game_state_flags.h"
 #include "global.h"
 // confidence=low: consumes pending damage and selects terrain/death reactions.
 #include "engine.h"
-#include "player.h"
+#include "player_status_flags.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void ActorSequence_Begin(struct Player *, s32, s32);
 s32 Player_BeginTerrainRecovery(struct Player *);
@@ -12,13 +13,6 @@ s32 Inventory_HasItem(s32);
 void Inventory_RemoveItem(s32);
 void HealthRestoreEffect_Create(struct Player *);
 #define H(off) (*(u16 *)((u8 *)p + (off)))
-static inline u8 sceneFlag(void)
-{
-    u32 mask = 0x4000;
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
 static inline u32 specialState(struct Player *p)
 {
     u32 active = p->active;
@@ -54,7 +48,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
     else
         properties = gTerrainMap->cells + 12 + cell * 4;
     if (((*(u32 *)properties >> 16 & 0x40) && !p->tetherStatusFlags)) {
-        if (sceneFlag()) {
+        if (GameState_TestWorldFlags(0x4000)) {
             ActorSequence_Begin(p, 0x22, 0);
             return 1;
         }
@@ -76,10 +70,7 @@ s32 PlayerContact_ApplyTerrainDamage(struct Player *p)
         p->particleEmissionCount += Player_BeginTerrainRecovery_081408AC(p);
     if (!p->positionResetValue) {
         if (p->movementModifierKind == 1 && p->movementModifierActive) {
-            {
-                u32 bits = 0x200;
-                p->statusFlags |= bits;
-            }
+            Player_AddStatusFlags(p, 0x200);
             if (++H(0x4C6) >= Div(60, p->movementModifierActive)) {
                 p->particleEmissionCount += 10;
                 H(0x4C6) = 0;

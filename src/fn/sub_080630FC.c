@@ -7,21 +7,14 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
     s8 *destination;
     const s8 *source;
     const s8 *table;
-    u8 *pageCount;
     s8 *base;
-    u32 pageOffset;
     const s8 *tableSource;
     p->page = 0;
-    pageOffset = 0x1AB1;
-    pageCount = (u8 *)p + pageOffset;
-    *pageCount = 2;
+    p->pageCount = 2;
     page = 0;
     tableSource = gUnk_0824DF7C;
     table = tableSource;
-    {
-        u32 baseOffset = 0x1AB3;
-        base = (s8 *)((u8 *)p + baseOffset);
-    }
+    base = p->catalog;
     do {
         s32 offset = page * 8;
         next = page + 1;
@@ -34,13 +27,11 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
             source++;
         } while (--count >= 0);
         page = next;
-    } while (page < (*(((u8 *)p) + pageOffset)));
+    } while (page < p->pageCount);
     if (page <= 6) {
         u32 mask = 0xFF;
-        s32 baseOffset;
         s8 *fillBase;
-        baseOffset = 0x1AB3;
-        fillBase = (s8 *)((u8 *)p + baseOffset);
+        fillBase = p->catalog;
         do {
             s32 offset = page * 8;
             s8 *cursor;
@@ -57,9 +48,6 @@ void SceneInventory_BuildConsumableCatalog(struct SceneInventoryScriptCatalog *i
     }
     if (Script_SeekToKeyword(0x61)) {
         u32 value = Script_GetTextSourcePc();
-        u32 textOffset = 0x1A98;
-        u32 *text;
-        text = (u32 *)((u8 *)p + textOffset);
-        *text = value;
+        p->consumableText = value;
     }
 }

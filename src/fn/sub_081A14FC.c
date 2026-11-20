@@ -135,8 +135,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                     s32 period = (step + 1) * 4;
                     if (!sub_08249498(action->frame, period)) {
                         struct ContactPosition delta, position;
-                        union RandomTableView view = {gRandomTable};
-                        const u16 *table = view.samples;
+                        const u16 *table = gRandomTable;
                         s32 ox, px, oy, py, oz, pz;
                         s32 sampleX, sampleZ;
                         s32 sampleY;

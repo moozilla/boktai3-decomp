@@ -1,23 +1,17 @@
+#include "game_state_flags.h"
 #include "player_3.h"
 #include "ram.h"
 #include "scene_consumable_definition.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 
-static inline u8 global_mode(void)
-{
-    u32 mask = 2;
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
 
 s32 Player_GetVisualEffectFlags(struct Player *s)
 {
     s32 result = 0;
     if (s->actionMode == 2)
         return 0;
-    if (!global_mode()) {
+    if (!GameState_TestWorldFlags(2)) {
         if (s->statusFlags & 16)
             result = 8;
     } else {
@@ -40,9 +34,9 @@ void Player_LoadVisualParameters(struct Player *p)
         i -= 10;
     }
     t += i * 3;
-    p->visualParameterA = *t++;
-    p->visualParameterB = *t;
-    p->visualParameterC = t[1];
+    p->basePalette[5] = *t++;
+    p->basePalette[6] = *t;
+    p->basePalette[13] = t[1];
 }
 
 static inline u16 Player_BlendColor(const u16 *source, const u16 *base, const u8 *brightnessPtr,
@@ -79,9 +73,9 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
     const u8 *alternateBrightness;
     if (sourceWeight == 0) {
         if (!p->unk419)
-            p->actionVariantResource = (u32)p->visualParameters;
+            p->actionVariantResource = (u32)p->basePalette;
         else
-            p->visualObject->parameters = (u32)p->visualParameters;
+            p->visualObject->parameters = (u32)p->basePalette;
         return;
     }
     source = input;
@@ -89,7 +83,7 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
         u32 *palette;
         i = 0;
         palette = &p->actionVariantResource;
-        base = (u16 *)p->visualParameters;
+        base = p->basePalette;
         brightnessPtr = p->unkAC6;
         for (; i <= 15; i++) {
             if (i == 5 || i == 6 || i == 13)
@@ -100,11 +94,11 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
             source++;
             base++;
         }
-        *palette = (u32)(((u8 *)p) + 0x380);
+        *palette = (u32)p->workPalette;
     } else {
         i = 0;
         alternateBrightness = p->unkAC6;
-        base = (u16 *)p->visualParameters;
+        base = p->basePalette;
         while (1) {
             base[16] = Player_BlendColor(source, base, alternateBrightness, sourceWeight,
                                          baseWeight, shift);
@@ -113,7 +107,7 @@ void sub_0813C9B4(struct Player *p, const u16 *input, s32 sourceWeight, s32 base
             if (++i > 15)
                 break;
         }
-        p->visualObject->parameters = (u32)(((u8 *)p) + 0x380);
+        p->visualObject->parameters = (u32)p->workPalette;
     }
 }
 
@@ -184,9 +178,9 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
             p->actionRequestHold = 0;
             p->actionRequestTimer = 0;
             if (!p->unk419)
-                p->actionVariantResource = (u32)p->visualParameters;
+                p->actionVariantResource = (u32)p->basePalette;
             else
-                p->visualObject->parameters = (u32)p->visualParameters;
+                p->visualObject->parameters = (u32)p->basePalette;
         }
     } else {
         const u16 *source;
@@ -197,8 +191,8 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                 u32 *palette;
                 i = 0;
                 palette = &p->actionVariantResource;
-                destination = (u16 *)((u8 *)p + 0x380);
-                base = (u16 *)p->visualParameters;
+                destination = p->workPalette;
+                base = p->basePalette;
                 for (; i < 16; i++) {
                     if ((u32)(i - 5) <= 1 || i == 13)
                         *destination = *base;
@@ -208,13 +202,13 @@ void Player_UpdateVisualPalette(struct Player *p, u32 requestedMode)
                     destination++;
                     base++;
                 }
-                *palette = (u32)((u8 *)p + 0x380);
+                *palette = (u32)p->workPalette;
             } else {
-                destination = (u16 *)((u8 *)p + 0x380);
+                destination = p->workPalette;
                 for (i = 15; i >= 0; i--) {
                     *destination++ = *source++;
                 }
-                p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                p->visualObject->parameters = (u32)p->workPalette;
             }
         } else {
             source = (u16 *)(gPaletteBankData + p->actionEighteenParameter * 32);
@@ -254,8 +248,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                     u32 *palette;
                     i = 0;
                     palette = &p->actionVariantResource;
-                    destination = (u16 *)((u8 *)p + 0x380);
-                    base = (u16 *)p->visualParameters;
+                    destination = p->workPalette;
+                    base = p->basePalette;
                     for (; i < 16; i++) {
                         if ((u32)(i - 5) <= 1 || i == 13)
                             *destination = *base;
@@ -265,12 +259,12 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                         destination++;
                         base++;
                     }
-                    *palette = (u32)((u8 *)p + 0x380);
+                    *palette = (u32)p->workPalette;
                 } else {
-                    destination = (u16 *)((u8 *)p + 0x380);
+                    destination = p->workPalette;
                     for (i = 15; i >= 0; i--)
                         *destination++ = *source++;
-                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                    p->visualObject->parameters = (u32)p->workPalette;
                 }
             }
         } else {
@@ -299,8 +293,8 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                     u32 *palette;
                     i = 0;
                     palette = &p->actionVariantResource;
-                    destination = (u16 *)((u8 *)p + 0x380);
-                    base = (u16 *)p->visualParameters;
+                    destination = p->workPalette;
+                    base = p->basePalette;
                     for (; i < 16; i++) {
                         if ((u32)(i - 5) <= 1 || i == 13)
                             *destination = *base;
@@ -310,12 +304,12 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
                         destination++;
                         base++;
                     }
-                    *palette = (u32)((u8 *)p + 0x380);
+                    *palette = (u32)p->workPalette;
                 } else {
-                    destination = (u16 *)((u8 *)p + 0x380);
+                    destination = p->workPalette;
                     for (i = 15; i >= 0; i--)
                         *destination++ = *source++;
-                    p->visualObject->parameters = (u32)((u8 *)p + 0x380);
+                    p->visualObject->parameters = (u32)p->workPalette;
                 }
             }
         } else {
@@ -340,9 +334,9 @@ void Player_UpdateAlternateVisualPalette(struct Player *p, u32 requestedMode)
     } else {
         p->actionRequestTimer = 0;
         if (!p->unk419)
-            p->actionVariantResource = (u32)p->visualParameters;
+            p->actionVariantResource = (u32)p->basePalette;
         else
-            p->visualObject->parameters = (u32)p->visualParameters;
+            p->visualObject->parameters = (u32)p->basePalette;
     }
 }
 
@@ -437,9 +431,9 @@ void Player_InitVisualState(struct Player *p)
     p->savedSpriteResource = 0xFFFF;
     p->baseActionVariant = 0xFF;
     p->spriteResource = p->baseSpriteResource;
-    p->actionVariantResource = (u32)p->visualParameters;
+    p->actionVariantResource = (u32)p->basePalette;
     p->visualObject->resource = p->baseSpriteResource;
-    p->visualObject->parameters = (u32)p->visualParameters;
+    p->visualObject->parameters = (u32)p->basePalette;
     Player_UpdateVisualPalette(p, 0);
 }
 
@@ -1094,6 +1088,11 @@ s32 Player_ModifyValueByEquipmentLevel(struct PlayerModifierInput *p, s32 n)
     return n - b * a;
 }
 
+static inline u32 PlayerModifier_TestTargetFlags(const struct PlayerModifierTarget *target, u32 mask)
+{
+    return target->flags & mask;
+}
+
 #define Player_GetScaledTargetFlagBonus sub_0813E284
 static inline s32 LimitTargetBonus(s32 value)
 {
@@ -1103,16 +1102,15 @@ static inline s32 LimitTargetBonus(s32 value)
 }
 s32 Player_GetScaledTargetFlagBonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *target)
 {
-    u32 mask = 0x80;
-    if (target->flags & mask)
+    if (PlayerModifier_TestTargetFlags(target, 0x80))
         return LimitTargetBonus(gGameState->targetFlagBonuses[0] >> 6);
-    else if (target->flags & 0x100)
+    else if (PlayerModifier_TestTargetFlags(target, 0x100))
         return LimitTargetBonus(gGameState->targetFlagBonuses[1] >> 6);
-    else if (target->flags & 0x200)
+    else if (PlayerModifier_TestTargetFlags(target, 0x200))
         return LimitTargetBonus(gGameState->targetFlagBonuses[2] >> 6);
-    else if (target->flags & 0x400)
+    else if (PlayerModifier_TestTargetFlags(target, 0x400))
         return LimitTargetBonus(gGameState->targetFlagBonuses[3] >> 6);
-    else if (target->flags & 0x800)
+    else if (PlayerModifier_TestTargetFlags(target, 0x800))
         return LimitTargetBonus(gGameState->targetFlagBonuses[4] >> 6);
     return 0;
 }
@@ -1135,8 +1133,7 @@ s32 Player_RollModifierBonus(void)
 
 s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x80)) {
         return 10;
     }
     return 0;
@@ -1144,9 +1141,7 @@ s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 1;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x100)) {
         return 10;
     }
     return 0;
@@ -1154,9 +1149,7 @@ s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 2;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x200)) {
         return 10;
     }
     return 0;
@@ -1164,9 +1157,7 @@ s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 3;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x400)) {
         return 10;
     }
     return 0;
@@ -1174,9 +1165,7 @@ s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, struct PlayerModifierT
 
 s32 Player_GetTargetFlag11Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 4;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x800)) {
         return 10;
     }
     return 0;
@@ -1376,17 +1365,12 @@ void Player_BuildActionModifiers(struct Player *p, struct PlayerStatModifierCont
                                  const void *descriptor)
 {
     s32 i;
-    u32 zero = 0;
-    void **flags = p->flagCallbacks;
-    void **callbacks = context->statModifierCallbacks;
-    for (i = 2; i >= 0; i--) {
-        *callbacks = (void *)zero;
+    for (i = 0; i < 3; i++) {
+        context->statModifierCallbacks[i] = NULL;
         if (p) {
-            *flags = (void *)zero;
-            flags[3] = (void *)zero;
+            p->flagCallbacks[i] = NULL;
+            p->contactCostCallbacks[i] = NULL;
         }
-        flags++;
-        callbacks++;
     }
     if (p) {
         s32 bit;
@@ -1610,7 +1594,7 @@ void sub_0814A9D4(void);
 
 void sub_0814EEE0(void);
 
-void sub_0814E990(void);
+void Player_UpdateAttachedChargeTiers(void);
 
 void Player_UpdateSelectedAttackCharge(void);
 
@@ -1636,7 +1620,7 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
     else if (p->statModifierContext.actionKind == 11)
         p->actionCallback = sub_0814EEE0;
     else if (p->statModifierContext.actionKind == 8)
-        p->actionCallback = sub_0814E990;
+        p->actionCallback = Player_UpdateAttachedChargeTiers;
     else
         p->actionCallback = Player_UpdateSelectedAttackCharge;
     Player_ConfigureActionCollider(p);
@@ -1747,11 +1731,8 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
     s32 i;
     struct SceneValueConsumableDefinition *override;
     state->special = 0;
-    {
-        u16 zero = 0;
-        for (i = 2; i >= 0; i--)
-            state->bonus[i] = zero;
-    }
+    for (i = 0; i < 3; i++)
+        state->bonus[i] = 0;
     if (p) {
         s32 bit;
         for (bit = 7; bit <= 67; bit++)
@@ -2191,25 +2172,6 @@ void PlayerBarrier_Hide(void *);
 
 s32 PlayerBarrier_IsActive(void *);
 
-static inline void ClearModeFlag(struct Player *p)
-{
-    if (p) {
-        u32 *flags = &p->actionStateFlags;
-        u32 mask = ~16;
-        *flags &= mask;
-    }
-}
-
-static inline void SetModeFlag(struct Player *p)
-{
-    if (p) {
-        u32 *flags = &p->actionStateFlags;
-        u32 mask = 16;
-        u32 m = mask;
-        *flags |= m;
-    }
-}
-
 // Preserved owner/request registers differ; one exit reloads the mode.
 
 s32 Player_SelectRequestedActionMode(struct Player *p)
@@ -2266,9 +2228,9 @@ void Player_SetActionRequest(struct Player *p, s32 kind)
             p->actionVariant = 0;
         }
         request->kind = kind;
-        ClearModeFlag(p);
+        ClearEquipmentFlag(p, 68);
         if (kind == 3)
-            SetModeFlag(p);
+            SetEquipmentFlag(p, 68);
         else if (PlayerBarrier_IsActive(p->actionRequestEffect))
             PlayerBarrier_Hide(p->actionRequestEffect);
         if ((u8)request->kind > 5) {
@@ -2310,9 +2272,9 @@ void Player_InitActionRequest(struct Player *p)
         request->kind = 0xFF;
     else
         request->kind = Player_GetSelectedAbility(p);
-    ClearModeFlag(p);
+    ClearEquipmentFlag(p, 68);
     if (request->kind == 3)
-        SetModeFlag(p);
+        SetEquipmentFlag(p, 68);
     if (request->kind < 0) {
         request->duration = 0;
         request->enabled = 0;

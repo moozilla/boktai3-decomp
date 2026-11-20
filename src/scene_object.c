@@ -6,7 +6,7 @@
 
 static inline void scatter(u16 *coordinate, const u16 *sample)
 {
-    s32 value = *coordinate - 128;
+    s32 value = (u16)*coordinate - 128;
     u32 noise = (u8)*sample;
     *coordinate = value + noise;
 }
@@ -231,10 +231,8 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
     applied = 0;
     actor = object;
     if (actor->type == 0) {
-        u32 firstMask = 0x17;
-        if (firstMask & contact->contactFlags) {
-            u32 secondMask = 0x10;
-            if (secondMask & contact->contactFlags2) {
+        if (SceneCollider_ReadContactFlags(contact, 0x17)) {
+            if (SceneCollider_ReadReactionFlags(contact, 0x10)) {
                 actor->health -= 24;
                 actor->damageTimer = 10;
                 actor->animationTimer = 2;
@@ -243,10 +241,8 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             }
         }
     } else if (actor->type == 1) {
-        u32 firstMask = 4;
-        if (firstMask & contact->contactFlags2) {
-            u32 secondMask = 0x80017;
-            if (secondMask & contact->contactFlags) {
+        if (SceneCollider_ReadReactionFlags(contact, 4)) {
+            if (SceneCollider_ReadContactFlags(contact, 0x80017)) {
                 actor->health -= 24;
                 actor->damageTimer = 10;
                 actor->animationTimer = 2;
@@ -260,8 +256,7 @@ void Scene_ApplyTerrainInteraction(struct SceneCollider *contact, void *unused,
             }
         }
     } else if (actor->type == 2) {
-        u32 mask = 1;
-        if (mask & contact->contactFlags) {
+        if (SceneCollider_ReadContactFlags(contact, 1)) {
             actor->health -= 24;
             actor->damageTimer = 10;
             actor->animationTimer = 2;
@@ -511,26 +506,9 @@ void Scene_PlayObjectImpactEffect(struct SceneObject *object)
     sub_08014CA4(8, 5, p, 0x3c, 0x1e, 0x16, 8, 8, 0, 0x100, 0x18, 0x10);
 }
 
-/* Packed position words used by directional dust. */
-
-struct DustPoint {
-    union {
-        u32 word;
-        struct {
-            u16 x, y;
-        } half;
-    } xy;
-    union {
-        u32 word;
-        struct {
-            u16 z, pad;
-        } half;
-    } zp;
-};
-
-static inline u32 dustScatter(const u8 *random, const u16 *coordinate)
+static inline u32 dustScatter(const u8 *random, const s16 *coordinate)
 {
-    s32 value = *coordinate - 128;
+    s32 value = (u16)*coordinate - 128;
     return value + *random;
 }
 
@@ -541,8 +519,7 @@ union DustJitterMask {
 static inline u32 frontEdge(u32 random, u32 coordinate)
 {
     s32 value = coordinate + 120;
-    union DustJitterMask mask = {15};
-    return value + (random & mask.bits);
+    return value + (random & 15);
 }
 
 static inline u32 backEdge(u32 random, u32 coordinate)
@@ -566,8 +543,15 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
 {
     struct SceneObject *actor = input;
     struct ContactPosition size;
-    struct DustPoint point;
-    struct DustPoint *particle;
+    // Dust updates x and z separately while preserving y and the padding halfword.
+    // concession-ok(local-union): Scene_SpawnEdgeParticles copies this same two-word position.
+    union DustPoint {
+        struct SceneVec position;
+        struct {
+            u32 xy, zAndPad;
+        } words;
+    } point;
+    union DustPoint *particle;
     s32 i;
     const u16 *table;
     u32 *cursor;
@@ -583,7 +567,7 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
     do {
         struct SceneObject *local = actor;
 
-        point = *(struct DustPoint *)&local->body.position;
+        point.position = local->body.position;
         switch (local->direction) {
             case 0: {
                 u32 index;
@@ -591,9 +575,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 value = dustScatter((const u8 *)random, &particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -601,9 +585,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = frontEdge(*second, point.zp.half.z);
+                        u32 value = frontEdge(*second, (u16)point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -614,9 +598,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = backEdge(*random, particle->xy.half.x);
+                    u32 value = backEdge(*random, (u16)particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -624,9 +608,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 value = dustScatter((const u8 *)second, &point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -637,9 +621,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = dustScatter((u8 *)random, &particle->xy.half.x);
+                    u32 value = dustScatter((const u8 *)random, &particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -647,9 +631,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = backEdge(*second, point.zp.half.z);
+                        u32 value = backEdge(*second, (u16)point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
@@ -660,9 +644,9 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                 index = (*cursor + 1) & mask;
                 random = DUST_SAMPLE_ADDRESS(table, index);
                 {
-                    u32 value = frontEdge(*random, particle->xy.half.x);
+                    u32 value = frontEdge(*random, (u16)particle->position.x);
                     u32 low = (u16)value;
-                    point.xy.word = (point.xy.word & 0xFFFF0000) | low;
+                    point.words.xy = (point.words.xy & 0xFFFF0000) | low;
                 }
                 {
                     u32 last = (index + 1) & mask;
@@ -670,16 +654,16 @@ void Scene_SpawnDirectionalDust(struct SceneObject *input)
                     *cursor = last;
                     second = DUST_SAMPLE_ADDRESS(table, last);
                     {
-                        u32 value = dustScatter((u8 *)second, &point.zp.half.z);
+                        u32 value = dustScatter((const u8 *)second, &point.position.z);
                         u32 low = (u16)value;
-                        point.zp.word = (point.zp.word & 0xFFFF0000) | low;
+                        point.words.zAndPad = (point.words.zAndPad & 0xFFFF0000) | low;
                     }
                 }
                 break;
             }
         }
-        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)particle, 0, &size, 1,
-                                           2, 4);
+        SceneParticleBurst_CreateWithPause((const struct ContactPosition *)particle, 0, &size, 1, 2,
+                                           4);
         i--;
     } while (i >= 0);
 }
@@ -973,6 +957,11 @@ void Scene_UpdateObjectStep(struct SceneObject *p)
     }
 }
 
+static inline u16 SceneObject_ReadFlags(const struct SceneObject *object, u32 mask)
+{
+    return object->flags & mask;
+}
+
 void Scene_UpdateFallingObject(struct SceneObject *p)
 {
     struct SceneBody *body = &p->body;
@@ -985,11 +974,8 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
             terrain->height = (terrain->height & 0xF0) | 15;
         else
             terrain->height = (terrain->height & 0xF0) | height;
-        {
-            u32 mask = 8;
-            if (mask & p->flags)
-                p->cellRef.cell.flags |= 0x21;
-        }
+        if (SceneObject_ReadFlags(p, 8))
+            p->cellRef.cell.flags |= 0x21;
     }
     body->vy = p->targetY - body->position.y;
     if (body->vy < -16)
@@ -997,8 +983,7 @@ void Scene_UpdateFallingObject(struct SceneObject *p)
     else if (body->vy > 0)
         body->vy = 0;
     if (body->vy == 0) {
-        u32 mask = 8;
-        if (mask & p->flags) {
+        if (SceneObject_ReadFlags(p, 8)) {
             p->cellRef.cell.flags |= 0x21;
             p->health = 0;
         } else {
@@ -1303,11 +1288,6 @@ static inline void setStepFlags(struct SceneCollider *c)
     c->contactFlags2 = 0;
 }
 
-static inline u16 flags16(struct SceneObject *p, u32 mask)
-{
-    return mask & p->flags;
-}
-
 s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *position,
                               u32 animationResource, s32 drawMode, s32 health, s32 basePalette,
                               s32 animation, u32 script)
@@ -1343,7 +1323,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     SceneBody_Init(&p->body, id, position, 0, 7, p);
     SceneBody_SetSprite(&p->body, draw);
     p->body.position = p->center;
-    if (flags16(p, 16)) {
+    if (SceneObject_ReadFlags(p, 16)) {
         p->owner = Region_FindContaining(&p->body.position);
         pos = &p->body.position;
     } else {
@@ -1353,7 +1333,7 @@ s32 SceneObjects_CreateObject(u32 id, s32 type, u32 flags, struct SceneVec *posi
     p->dx = 0;
     p->dz = 0;
     p->direction = 0;
-    if (flags16(p, 4)) {
+    if (SceneObject_ReadFlags(p, 4)) {
         {
             UpdateFn callback = Scene_UpdateObjectFlash;
             slot = &p->update;

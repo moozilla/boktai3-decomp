@@ -78,10 +78,7 @@ void Ghoul_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame)
             Sound_PlaySong(0x12A);
         actor->base.restart = 0;
     }
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags |= mask;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
     if (frame <= 17 && anim->index == 0 && anim->elapsed == (anim->duration != 0) &&
         anim->duration != 1)
         anim->elapsed = 0;
@@ -246,17 +243,15 @@ static inline u32 Ghoul_RouteFlags(struct ChaseActor *actor, u32 mask)
 void Ghoul_ResumeDelayedChase(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u32 zero;
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    zero = (u8)sub_0812F3CC(actor);
-    if (zero)
+    if (sub_0812F3CC(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
     SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
-    SceneActorChase_SetState(actor, 3, 1, zero);
+    SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
@@ -300,19 +295,8 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void Ghoul_ResetProbeState(struct ChaseActor *actor, u32 state, u32 phase,
-                                         u32 behavior)
+static inline void Ghoul_EnterRouteBehavior(struct ChaseActor *actor, u32 behavior)
 {
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
-static inline void Ghoul_EnterRetreatBehavior(struct ChaseActor *actor)
-{
-    u32 behavior = 16;
     actor->base.state2A8 = 0;
     actor->base.phase2A9 = 0;
     actor->base.behavior2AA = behavior;
@@ -324,6 +308,16 @@ static inline void Ghoul_ClearPendingRoute(u16 *flags)
 {
     u32 mask = ~1;
     *flags &= mask;
+}
+
+struct GhoulHalfFlags {
+    s16 bits : 16;
+};
+
+static inline void Ghoul_SetContextFlags(u16 bit, u16 *field)
+{
+    struct GhoulHalfFlags *p = (void *)field;
+    p->bits |= bit;
 }
 
 void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
@@ -347,22 +341,9 @@ void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
             return;
         }
     }
-    speed = Callback_InvokeActor(*(&actor), actor->base.animationQuery.opaque);
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     actor->base.field2C2 = Div(0x40, 6);
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *scaleField = &actor->base.field2C2;
-            *scaleField = 0x40;
-            scale = scaleField;
-        } else {
-            u16 *scaleField = &actor->base.field2C2;
-            u16 durationScale = *scaleField;
-            scale = scaleField;
-            if (durationScale == 0)
-                *scale = 0x40;
-        }
-    }
+    scale = SceneActorChase_PrepareAnimationScale(actor, 0xA02F);
     if (actor->base.drawableKind == 0)
         Anim_SetDurationScale(
             &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence, *scale);
@@ -372,32 +353,18 @@ void Ghoul_UpdateProbeApproach(struct ChaseActor *actor)
     event = NavMesh_ConsumeProbeEvent(group->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, group->route, 0x20, 0x20, speed)) {
-            Ghoul_EnterRetreatBehavior(actor);
+            Ghoul_EnterRouteBehavior(actor, 16);
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 0x20, 0x20,
                                                              speed)) {
-        Ghoul_ResetProbeState(actor, 3, 0, 0);
-        {
-            u16 bit = 2;
-            u16 *flags = &control->discFlags;
-            *flags |= bit;
-        }
+        SceneActorChase_SetState(actor, 3, 0, 0);
+        Ghoul_SetContextFlags(2, &control->discFlags);
         return;
     }
     actor->base.counter2AC++;
 }
 
 // confidence=low: restarts saved control or advances behavior after callbacks complete.
-
-static inline void Ghoul_EnterAlternateRouteBehavior(struct ChaseActor *actor)
-{
-    u32 behavior = 15;
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
 {
@@ -417,7 +384,7 @@ void SceneActorControl_RestartOrAdvance(struct ChaseActor *actor)
         }
     }
     if (actor->base.stepDone)
-        Ghoul_EnterAlternateRouteBehavior(actor);
+        Ghoul_EnterRouteBehavior(actor, 15);
     else
         ++actor->base.counter2AC;
 }
@@ -434,22 +401,15 @@ static inline u8 Ghoul_TakeStateEntry(u8 *field)
 void Ghoul_WaitForRouteResult(struct ChaseActor *actor)
 {
     u8 busy;
-    u8 zero;
     if (Ghoul_TakeStateEntry(&actor->base.field2B1)) {
         void *control = actor->base.onEntry;
         SceneActorChase_SetControl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
-        zero = sub_0812F3CC(actor);
-        if (!zero) {
+        if (!sub_0812F3CC(actor)) {
             if (actor->base.stepDone) {
-                u32 state = 5;
-                actor->base.state2A8 = zero;
-                actor->base.phase2A9 = zero;
-                actor->base.behavior2AA = state;
-                actor->base.counter2AC = zero;
-                actor->base.field2B1 = 1;
+                SceneActorChase_SetState(actor, 0, 0, 5);
                 SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
             } else
                 actor->base.counter2AC++;
@@ -512,29 +472,11 @@ void Ghoul_EnterIdleControl(struct ChaseActor *actor)
     SceneActorChase_SetState(actor, 0, 2, 0);
 }
 
-/* SceneActorControl_RefreshMotionRoute_0808A90C: same code as SceneActorControl_RefreshMotionRoute at another address (ported by relatives.py; provisional name) */
+/* Refresh the chase gate from the actor's tracking flags. */
 
 static inline u32 Ghoul_TestMotionFlags(u16 *flags, u32 mask)
 {
     return *flags & mask;
-}
-
-static inline u8 Ghoul_HasActiveMotion(struct SceneActorReactionMotion *motion)
-{
-    u32 mask = 8;
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline void Ghoul_RestoreWaitingState(struct ChaseActor *actor, u32 zero)
-{
-    u32 phase = 1;
-    actor->base.state2A8 = zero;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = zero;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = phase;
 }
 
 static inline void Ghoul_RestoreIdleController(struct ChaseActor *actor, void *control, u32 kind,
@@ -553,9 +495,9 @@ static inline void Ghoul_RestoreIdleController(struct ChaseActor *actor, void *c
     actor->base.pendingControl = zero;
 }
 
-void SceneActorControl_RefreshMotionRoute_0808A90C(struct ChaseActor *actor)
+void Ghoul_RefreshMotionRoute(struct ChaseActor *actor)
 {
-    u32 active = Ghoul_HasActiveMotion((void *)&actor->base.tracking.target);
+    u32 active = MonsterInit_TestTargetingFlags(&actor->base.tracking, 8);
     if (active) {
         {
             u16 *flags = &actor->group.common.gate.flags;
@@ -576,7 +518,7 @@ void SceneActorControl_RefreshMotionRoute_0808A90C(struct ChaseActor *actor)
             return;
         Ghoul_EnterIdleControl(actor);
     } else {
-        Ghoul_RestoreWaitingState(actor, active);
+        SceneActorChase_SetPhase(actor, 1, 0);
         Ghoul_RestoreIdleController(actor, (void *)SceneActorControl_OnIdle, 16, active);
     }
     {
@@ -620,13 +562,6 @@ static inline void Ghoul_PrepareSavedReturnAction(struct ChaseActor *actor, u32 
     action->behavior = behavior;
 }
 
-static inline void Ghoul_SetRouteFlag(struct SceneActorChaseGroup *group)
-{
-    u16 *flags = (void *)&group->common.gate.flags;
-    u16 mask = 4;
-    *flags |= mask;
-}
-
 static inline u32 Ghoul_MotionFlags(struct ChaseActor *actor, u32 mask)
 {
     return actor->base.motionFlags & mask;
@@ -647,7 +582,7 @@ void Ghoul_ResumeContactRoute(struct ChaseActor *actor)
     if (Ghoul_MotionFlags(actor, 0x80)) {
         actor->base.field2C2 = 32;
         Ghoul_PrepareReturnAction((void *)&group->saved, 30, group->common.gate.control, 12);
-        Ghoul_SetRouteFlag(group);
+        SceneActorChase_GroupSetFlags(group, 4);
         if (Ghoul_MotionFlags(actor, 0x80)) {
             u16 *timer = &group->common.gate.counter;
             *timer += 300;
@@ -655,10 +590,7 @@ void Ghoul_ResumeContactRoute(struct ChaseActor *actor)
                 *timer = group->common.gate.duration;
         }
     } else {
-        {
-            u32 mask = 16;
-            actor->base.behaviorFlags |= mask;
-        }
+        SceneActorChase_SetActorFlags(actor, 16);
         actor->base.field2C2 = 32;
         Ghoul_PrepareSavedReturnAction(actor, 60, 7);
     }
@@ -745,8 +677,7 @@ u32 Bat_LookupAnimationEntry(void *object)
     struct DisplaySequenceState *currentSequence = sequence;
 
     if (sequence->elapsed == 0) {
-        u32 flag = 0x10000;
-        actor->base.statusFlags |= flag;
+        MonsterInit_SetStatusFlags(actor, 0x10000);
         if (sequence->index <= 3)
             return gUnk_08605CE8[sequence->index];
         if ((u16)(sequence->index - 10) <= 3)
@@ -919,16 +850,6 @@ void Ghoul_SelectRetreatRoutePoint(struct ChaseActor *actor)
 
 void SceneBody_StartRoute(void *, void *, u32, u32, u32);
 
-struct GhoulHalfFlags {
-    s16 bits : 16;
-};
-
-static inline void Ghoul_SetContextFlags(u16 bit, u16 *field)
-{
-    struct GhoulHalfFlags *p = (void *)field;
-    p->bits |= bit;
-}
-
 static inline void Ghoul_ClearContextFlags(u16 *field, u32 bit)
 {
     struct GhoulHalfFlags *p = (void *)field;
@@ -938,15 +859,6 @@ static inline void Ghoul_ClearContextFlags(u16 *field, u32 bit)
 static inline void Ghoul_SetStatusFlags(u32 bit, u32 *field)
 {
     *field |= bit;
-}
-
-static inline void Ghoul_EnterRouteBehavior(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 
 static inline void Ghoul_StartAlternateRoute(void *body, void *path,
@@ -973,9 +885,9 @@ void Ghoul_BeginAlternateRoute(struct ChaseActor *actor)
     Ghoul_ClearContextFlags(&context->discFlags, 2);
 }
 
-/* Vorn_ParseField624_0808B320: same code as Vorn_ParseField624 at another address (ported by relatives.py; provisional name) */
+/* Keyword 'x' supplies a script and its frame delay. */
 
-void Vorn_ParseField624_0808B320(struct ChaseActor *actor)
+void Ghoul_ReadDelayedScript(struct ChaseActor *actor)
 {
     struct Ghoul *context = (struct Ghoul *)actor->base.context;
 
@@ -1003,23 +915,14 @@ void Vorn_ParseField624_0808B320(struct ChaseActor *actor)
 
 void Bat_TickDelayedScript(struct ChaseActor *actor)
 {
-    s32 zero = 0;
     struct Ghoul *context = actor->base.context;
-    u16 *script = &context->delayedScript;
-    u8 *count;
-    u8 *limit;
-
-    if (*script != 0) {
-        count = &context->scriptElapsed;
-        *count += 1;
-        limit = &context->scriptDelay;
-        if (*count >= *limit) {
-            u8 zeroByte;
-            Script_Call(*script, (void *)zero);
-            zeroByte = 0;
-            *script = 0;
-            *limit = zeroByte;
-            *count = zeroByte;
+    if (context->delayedScript) {
+        context->scriptElapsed++;
+        if (context->scriptElapsed >= context->scriptDelay) {
+            Script_Call(context->delayedScript, NULL);
+            context->delayedScript = 0;
+            context->scriptDelay = 0;
+            context->scriptElapsed = 0;
         }
     }
 }
@@ -1148,26 +1051,28 @@ static inline u8 Ghoul_TestPendingRoute(struct Ghoul *context, u32 mask, u16 **p
     return 0;
 }
 
+static inline u32 Ghoul_ReadRouteMotionFlags(struct ChaseActor *actor, u32 mask, u16 **out)
+{
+    *out = &actor->base.motionFlags;
+    return **out & mask;
+}
+
 s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
 {
     struct Ghoul *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
-    struct GhoulRouteOrigin **routeSlot;
+    void **routeSlot;
     u16 *flags;
     u16 *pending;
     u16 *timer;
-    struct GhoulRouteOrigin *route;
+    struct ChaseRouteProbe *route;
     void *body;
     if (Ghoul_ActionsUnavailable(actor))
         return 1;
     if (!Ghoul_TestPendingRoute(context, 1, &pending))
         return 1;
-    {
-        u32 mask = 0xA107;
-        flags = &actor->base.motionFlags;
-        if (mask & (*flags))
-            return 1;
-    }
+    if (Ghoul_ReadRouteMotionFlags(actor, 0xA107, &flags))
+        return 1;
     timer = &context->routeDelay;
     if (*timer)
         (*timer)--;
@@ -1178,9 +1083,9 @@ s32 Ghoul_ResumePendingRoute(struct ChaseActor *actor)
             *p = mask & (*p);
         }
         body = &actor->base.body.id;
-        routeSlot = (void *)&group->route;
+        routeSlot = &group->route;
         route = *routeSlot;
-        SceneActor_SetPositionXZ(body, route->x, route->z);
+        SceneActor_SetPositionXZ(body, route->destination.x, route->destination.z);
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         Ghoul_PrepareRouteDelay((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
@@ -1336,7 +1241,7 @@ u8 SceneActorRegistry_LinkActor(void *);
 static inline void GhoulInit_InstallRouteDefaults(struct ChaseActor *rootActor)
 {
     rootActor->base.routeReset = Ghoul_ResetRouteState;
-    rootActor->base.reactionGate = SceneActorControl_RefreshMotionRoute_0808A90C;
+    rootActor->base.reactionGate = Ghoul_RefreshMotionRoute;
 }
 
 static inline void GhoulInit_InstallCompletionCallbacks(struct ChaseActor *rootActor)
@@ -1353,13 +1258,19 @@ static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u3
     actor->base.paletteBank = MonsterInit_GetPaletteBase(actor) + current;
 }
 
+static inline struct ChaseActor *Ghoul_AllocateDrawable(struct ChaseActor *actor, u32 size)
+{
+    actor->base.drawable = Heap_Alloc(size);
+    Memory_Clear(actor->base.drawable, size);
+    return actor;
+}
+
 s32 Ghoul_Init(void *object)
 {
     struct Ghoul *rootActor = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &rootActor->chase.group;
     struct SceneActorBody *body = &rootActor->chase.base.body;
-    u32 zero;
     struct ContactPosition origin;
     u32 flag;
     s32 mode;
@@ -1368,27 +1279,23 @@ s32 Ghoul_Init(void *object)
     SceneActorRegistry_SetObjectContext(actor, actor, 0, 1);
     MonsterInit_SetCategory(actor, MONSTER_CATEGORY_GHOUL);
     Ghoul_BindProfile(actor);
-    Vorn_ParseField624_0808B320(actor);
+    Ghoul_ReadDelayedScript(actor);
 
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->base.drawable, 0x5C);
-        heap = MonsterInit_Drawable(actor);
+        heap = MonsterInit_Drawable(Ghoul_AllocateDrawable(actor, 0x5C));
         MonsterInit_InitializeSprite(heap, 0x9247, 0x1DF8);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->base.drawable, 0x80);
-        heap = MonsterInit_Drawable(actor);
-        MonsterInit_ClearPosition(&zero, &origin);
+        heap = MonsterInit_Drawable(Ghoul_AllocateDrawable(actor, 0x80));
+        ZeroFill8(&origin);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x9247, &origin);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(rootActor, &zero);
+    MonsterInit_LoadPursuitBody(rootActor);
     if (Script_SeekToKeyword('P')) {
         rootActor->discKind = MonsterInit_ReadByte(0x78);
         rootActor->recoveryDelay = MonsterInit_ReadHalfword(0x78);
@@ -1402,8 +1309,8 @@ s32 Ghoul_Init(void *object)
     Ghoul_InitCollision(actor);
     MonsterInit_InstallAnimationCallbacks(
         actor, Ghoul_Update, Bat_LookupAnimationEntry, Ghoul_TurnTowardRoute, Ghoul_UpdateIdleState,
-        Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, Bat_UpdateRecoilRecovery, Bat_UpdateDefeat,
-        SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
+        Ghoul_UpdateStandingState, Ghoul_UpdateHiddenRecovery, Bat_UpdateRecoilRecovery,
+        Bat_UpdateDefeat, SceneActorReaction_OnEnemyDefault, SceneActorTarget_UpdateTrackedContact,
         SceneActorTarget_ResolvePendingObject, SceneActorReaction_ResolvePlacementDamage,
         SceneActorPlacement_ResetStateThree);
     MonsterInit_InitializeGroupWithBounds(group, rootActor->routeBounds, &rootActor->routePosition,

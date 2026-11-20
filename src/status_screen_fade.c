@@ -3,33 +3,31 @@
 #include "engine.h"
 #include "numeric_overlay.h"
 #include "ram.h"
-/* NumericOverlay_ClearActive: sets gNumericOverlay (the live NumericOverlay pointer, per numeric_overlay.h) back to NULL; twin of NumericOverlay_Destroy in numeric_overlay.c */
-#define NumericOverlay_ClearActive sub_0800F4B8
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
-    int factor = 32 - p->timer, bank, i;
+    int factor = 32 - p->timer;
+    int bank, i;
     int blueMask;
     u16 *buffer;
+
     bank = 0;
-    *(&buffer) = p->buffer;
-    blueMask = 31744;
+    buffer = p->buffer;
+    blueMask = 0x7C00;
     for (; bank < 2; bank++) {
         for (i = 0; i < 16; i++) {
-            {
-                u16 *out = &buffer[bank * 16 + i];
-                int color = *out;
-                int r, g, blue, red, green;
-                PALETTE_EXTRACT_CHANNEL(red, color, 31);
-                r = (red * factor) & 0x7C0;
-                PALETTE_EXTRACT_CHANNEL(green, color, 992);
-                g = (green * factor) & 0xF800;
-                PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
-                {
-                    int b = (blue * factor) & 0x1F0000;
-                    *out = (r | g | b) >> 6;
-                }
-            }
+            int entry = bank * 16 + i;
+            int color = buffer[entry];
+            int r, g, b;
+            int red, green, blue;
+
+            PALETTE_EXTRACT_CHANNEL(red, color, 0x001F);
+            r = (red * factor) & 0x7C0;
+            PALETTE_EXTRACT_CHANNEL(green, color, 0x03E0);
+            g = (green * factor) & 0xF800;
+            PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
+            b = (blue * factor) & 0x1F0000;
+            buffer[entry] = (r | g | b) >> 6;
         }
     }
 
@@ -173,8 +171,7 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
 
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {
-    u32 zero = 0;
-    CpuSet(&zero, p->rows, 0x05000091);
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
@@ -200,8 +197,7 @@ int StatusScreen_Update(struct StatusScreen *p)
 
 int StatusScreen_Destroy(struct StatusScreen *p)
 {
-    u32 zero = 0;
-    CpuSet(&zero, p->rows, 0x05000091);
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
@@ -261,10 +257,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
         Bg_SetupLayer(p->bg, 0, map, 0, 0, 0, 0, dst);
     }
     p->source = (u16 *)(palette + 0x1B4);
-    {
-        u32 zero = 0;
-        CpuSet(&zero, p->buffer, 0x05000018);
-    }
+    CpuFill32(0, p->buffer, 3 * 16 * sizeof(*p->buffer));
     *(volatile u16 *)0x04000008 |= 0x40;
     p->delay = Script_GetKeywordValue('w', 0);
     {
@@ -278,10 +271,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     p->fade = 0;
     p->fadeStep = 1;
     p->effect = 0;
-    {
-        u32 zero = 0;
-        CpuSet(&zero, p->rows, 0x05000091);
-    }
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     p->active = 0;
     p->amplitude = 1024;
     p->delta = 1;
@@ -307,7 +297,7 @@ void *StatusScreen_Open(u32 arg)
     return obj;
 }
 
-void sub_0800F4B8(void)
+void NumericOverlay_ClearActive(void)
 {
     gNumericOverlay = 0;
 }

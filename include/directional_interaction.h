@@ -5,6 +5,7 @@
 #include "game_state.h"
 #include "player.h"
 #include "input.h"
+#include "sprite.h"
 #include "task.h"
 
 /*
@@ -14,18 +15,6 @@
  * idle state (0), and when the action button is pressed it becomes the manager's selected
  * controller and runs its start/end scripts. The "level" counts a short fade of its marker.
  */
-
-/* Marker draw record (embedded in a controller at +0x24). */
-struct DirectionalDrawable {
-    u32 flags; /* bit 0: hidden, bit 2: oriented along z */
-    u8 pad4[3];
-    u8 mode;
-    u8 pad8[8];
-    u16 scale;
-    u8 pad12[0x1c - 0x12];
-    struct SceneVec position; /* marker position, derived from the controller's */
-    u8 pad24[0x2c - 0x24];
-};
 
 struct DirectionalController {
     u16 id;
@@ -40,8 +29,8 @@ struct DirectionalController {
     u32 distance; /* squared trigger distance */
     s16 arguments[4];
     struct SceneVec position;
-    struct DirectionalDrawable drawable;
-    u8 animation[28];
+    struct DisplaySequenceSprite drawable;
+    struct SpriteRenderResource graphics;
 };
 
 struct DirectionalManager {
@@ -56,21 +45,14 @@ struct DirectionalManager {
     struct SceneVec position; /* copy of the actor's position */
 };
 
-struct DirectionalPackedVec {
-    u32 x : 16, y : 16, z : 16, pad : 16;
-};
-
-
-
 /* 0x02000038 */
 extern struct DirectionalManager *gDirectionalManager;
-extern u32 gUnk_02000560;
 extern void *gUnk_086049F4[];
 
 /* Engine helpers. */
 s32 Script_GetKeywordValue(u32, s32);
 s32 Script_SeekToKeyword(u32);
-s32 Script_GetPc(void);
+u8 *Script_GetPc(void);
 s32 Script_GetValue(void);
 s32 Region_FindContaining(struct SceneVec *);
 s32 Math_Atan2(s32, s32);
@@ -95,7 +77,7 @@ struct DirectionalController *DirectionalController_FindByScriptId(struct Direct
                                                                    s32 *);
 u32 DirectionalController_SetMarkerFadeLevel(struct DirectionalController *, u32);
 u32 DirectionalController_SetPosition(struct DirectionalManager *, struct DirectionalController *,
-                                      struct DirectionalPackedVec *);
+                                      const struct SceneVec *);
 void LevelController_Update(struct DirectionalManager *, struct DirectionalController *);
 s32 Actor_CanInteractWithController(struct DirectionalManager *, struct DirectionalController *);
 void LevelController_RunScript(struct DirectionalManager *, struct DirectionalController *, u32);

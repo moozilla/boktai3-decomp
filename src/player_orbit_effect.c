@@ -1,4 +1,6 @@
 #include "player_orbit_effect.h"
+#include "word_flags.h"
+#include "monster_particle_random.h"
 
 void PlayerBurst_SetStateCallback(struct PlayerOrbitEffect *effect,
                                   void (*callback)(struct PlayerOrbitEffect *))
@@ -73,34 +75,26 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
     if (slotIndex < 16) {
         {
             const u16 *randomTable;
-            u32 *randomIndex;
-            u32 range;
-            u32 mask;
             u32 index;
             particle = &effect->particles[slotIndex];
             particle->flags &= ~1;
             particle->position.coordinates = *position;
             randomTable = gRandomTable;
-            randomIndex = &gRandomIndex;
-            index = *randomIndex;
-            index++;
-            mask = 0x3FF;
-            index &= mask;
+            index = (gRandomIndex + 1) & 0x3FF;
             {
-                u32 random = randomTable[*(&index)];
+                u32 random = ParticleRandom_ReadCursor(randomTable, &index);
                 s32 x = (u16)particle->position.coordinates.x;
                 x -= 63;
-                range = 0x7F;
-                random &= range;
+                random &= 0x7F;
                 particle->position.coordinates.x = x + random;
             }
-            index = (index + 1) & mask;
-            *randomIndex = index;
+            index = (index + 1) & 0x3FF;
+            gRandomIndex = index;
             {
-                u32 random = randomTable[index];
+                u32 random = ParticleRandom_ReadCursor(randomTable, &index);
                 s32 z = (u16)particle->position.coordinates.z;
                 z -= 63;
-                random &= range;
+                random &= 0x7F;
                 particle->position.coordinates.z = z + random;
             }
         }
@@ -114,9 +108,8 @@ void PlayerOrbitEffect_SpawnParticle(struct PlayerOrbitEffect *effect, struct Sc
             u32 index = (gRandomIndex + 1) & 0x3FF;
             gRandomIndex = index;
             {
-                u32 random = *(u16 *)((index << 1) + (u32)gRandomTable);
-                u32 range = 7;
-                particle->motion.lifetime = (random & range) + 8;
+                u32 random = *(gRandomTable + index);
+                particle->motion.lifetime = (random & 7) + 8;
             }
         }
         particle->motion.active = 1;
@@ -150,8 +143,7 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 {
     struct Player *player;
     if (effect->phaseFrame == 0) {
-        u32 mask = 4;
-        gEnginePauseFlags |= mask;
+        WordFlags_Set(4, &gEnginePauseFlags);
         Sound_PlaySong(0x302);
         Sound_PlaySong(0x1FA);
     }

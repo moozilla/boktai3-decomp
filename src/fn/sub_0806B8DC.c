@@ -1,7 +1,7 @@
 #include "sprite_effect_controller.h"
 #include "engine.h"
 #include "ram.h"
-extern u32 gUnk_02000560;
+#include "player.h"
 typedef void (*SpriteEffectStateCallback)(struct SpriteEffectControllerPool *,
                                           struct SpriteEffectController *);
 extern SpriteEffectStateCallback gUnk_08605B84[];
@@ -22,7 +22,7 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
             return 0;
         {
             u32 mask = 4;
-            if (gUnk_02000560 & mask)
+            if (gPlayerSlotStatus[0] & mask)
                 return 0;
         }
         SpriteEffectController_QueueColliders(p);

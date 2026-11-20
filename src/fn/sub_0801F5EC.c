@@ -1,11 +1,11 @@
-#include "scene_object_slot.h"
+#include "scene_object_controller.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
 void SceneObject_UpdateIdleA(void);
 void SceneObject_UpdateIdleB(void);
 
 // confidence=low: places a newly appended scene object on its terrain cell and starts its idle state.
-void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
+void SceneObject_InitSlotPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -21,7 +21,7 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
             obj->pos.position.z += 0x80;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             break;
@@ -32,107 +32,99 @@ void SceneObject_InitSlotPlacement(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             break;
     }
     {
         u16 c = obj->cellA;
         u8 v = *SceneActorTerrain_GetCell(c) & 15;
-        cellField = &obj->b3b;
-        {
-            u32 zero = 0;
-            *cellField = v;
-            TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, *cellField, 0xff, zero);
-        }
+        cellField = &obj->cellHeight;
+        obj->cellHeight = v;
+        TerrainModifiers_RegisterCell(obj->terrain, obj->cellA, 0, obj->cellHeight, 0xff, 0);
     }
     {
         struct SceneObjSlot *sprite = obj;
         u8 *cf2;
-        s32 mode = *(s32 *)(mgr + 0x34);
+        s32 mode = mgr->separatePalettes;
         cf2 = cellField;
         if (mode == 0) {
             switch (obj->type) {
                 case 2:
-                    AnimData_SelectPaletteBank(mgr + (obj->value * 28 + 0x154), 0xe6);
-                    Sprite_Init(sprite, mgr + (obj->value * 28 + 0x154), 0);
+                    AnimData_SelectPaletteBank(&mgr->animationData[2][obj->animationIndex], 0xe6);
+                    Sprite_Init(sprite, &mgr->animationData[2][obj->animationIndex], 0);
                     break;
                 case 16:
-                    Sprite_Init(sprite, mgr + (obj->value * 28 + 0x1e0), 0);
+                    Sprite_Init(sprite, &mgr->animationData[3][obj->animationIndex], 0);
                     break;
             }
         } else {
             u8 *p;
-            u8 **tbl;
-            u32 k = obj->b45;
-            p = &obj->b45;
+            struct SceneAnimation **bank;
+            u32 k = obj->paletteBank;
+            p = &obj->paletteBank;
             switch (k) {
                 case 0:
-                    AnimData_SelectPaletteBank(mgr + (obj->value * 28 + 0x154), *p + 0xe6);
-                    Sprite_Init(sprite, mgr + (obj->value * 28 + 0x154), 0);
+                    AnimData_SelectPaletteBank(&mgr->animationData[2][obj->animationIndex], *p + 0xe6);
+                    Sprite_Init(sprite, &mgr->animationData[2][obj->animationIndex], 0);
                     break;
                 case 1:
-                    tbl = (u8 **)(mgr + 0x410);
+                    bank = &mgr->paletteAnimationData[0];
                     goto common;
                 case 2:
-                    tbl = (u8 **)(mgr + 0x414);
+                    bank = &mgr->paletteAnimationData[1];
                     goto common;
                 case 3:
-                    tbl = (u8 **)(mgr + 0x418);
+                    bank = &mgr->paletteAnimationData[2];
                     goto common;
                 case 4:
-                    tbl = (u8 **)(mgr + 0x41c);
+                    bank = &mgr->paletteAnimationData[3];
                     goto common;
                 case 5:
-                    tbl = (u8 **)(mgr + 0x420);
+                    bank = &mgr->paletteAnimationData[4];
                     goto common;
                 case 6:
-                    tbl = (u8 **)(mgr + 0x424);
+                    bank = &mgr->paletteAnimationData[5];
                 common:
-                    AnimData_SelectPaletteBank(obj->value * 28 + *tbl, *p + 0xe6);
-                    Sprite_Init(sprite, obj->value * 28 + *tbl, 0);
+                    AnimData_SelectPaletteBank(&(*bank)[obj->animationIndex], *p + 0xe6);
+                    Sprite_Init(sprite, &(*bank)[obj->animationIndex], 0);
                     break;
                 case 7:
-                    tbl = (u8 **)(mgr + 0x428);
-                    AnimData_SelectPaletteBank(obj->value * 28 + *tbl, *p + 0xe6);
-                    Sprite_Init(sprite, obj->value * 28 + *tbl, 0);
+                    bank = &mgr->paletteAnimationData[6];
+                    AnimData_SelectPaletteBank(&(*bank)[obj->animationIndex], *p + 0xe6);
+                    Sprite_Init(sprite, &(*bank)[obj->animationIndex], 0);
                     break;
             }
         }
-        sprite->spritePos.words = obj->r0.words;
+        sprite->sprite.position = obj->r0.signedPosition;
         if (!(*dir & 1)) {
-            sprite->spritePos.position.x -= 0x20;
-            sprite->spritePos.position.z += 0x20;
+            sprite->sprite.position.x -= 0x20;
+            sprite->sprite.position.z += 0x20;
         } else {
-            sprite->spritePos.position.x += 0x20;
-            sprite->spritePos.position.z -= 0x20;
-            *(u32 *)sprite |= 4;
+            sprite->sprite.position.x += 0x20;
+            sprite->sprite.position.z -= 0x20;
+            sprite->sprite.flags |= 4;
         }
-        obj->q0.words = sprite->spritePos.words;
+        obj->q0.signedPosition = sprite->sprite.position;
         t = obj->variant;
         if (t == 0) {
             obj->callback = SceneObject_UpdateIdleA;
-            obj->b39 = 0;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 0);
         } else if (t == 1) {
-            u32 two;
             obj->callback = SceneObject_UpdateIdleB;
-            two = 2;
-            obj->b39 = two;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 2);
         } else {
             obj->callback = SceneObject_UpdateIdleA;
-            obj->b39 = 0;
-            obj->b3a = 0;
+            SceneObjSlot_ResetPose(obj, 0);
         }
         if (obj->variant == 0) {
-            obj->block->w6 &= 0xfffd;
-            obj->block->w6 |= 3;
-            obj->block->b4 = (obj->block->b4 & 0xf0) | (*cf2 + 1);
+            obj->terrain->cell.flags &= 0xfffd;
+            obj->terrain->cell.flags |= 3;
+            obj->terrain->cell.shapeAndHeight = (obj->terrain->cell.shapeAndHeight & 0xf0) | (*cf2 + 1);
         } else if (obj->variant == 1) {
-            obj->block->w6 &= 0xfffc;
-            obj->block->w6 |= 2;
-            obj->block->b4 = (obj->block->b4 & 0xf0) | *cf2;
+            obj->terrain->cell.flags &= 0xfffc;
+            obj->terrain->cell.flags |= 2;
+            obj->terrain->cell.shapeAndHeight = (obj->terrain->cell.shapeAndHeight & 0xf0) | *cf2;
         }
     }
 }

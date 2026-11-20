@@ -1,5 +1,5 @@
 #include "global.h"
-#include "player.h"
+#include "player_status_flags.h"
 
 extern const s16 gUnk_086149C4[];
 void Player_PlayLocalSong(s32, u32);
@@ -60,8 +60,7 @@ s32 Player_UpdateThrowArc(struct Player *p)
             pos.y = (q->phase3 + q->phase1 - q->timer + 1) * 90 + q->origin.y - 0x104;
             pos.z = q->origin.z + scale(gUnk_086149C4[q->heading] * radius);
             if (q->index >= 0) {
-                u32 m = 0x80000;
-                p->statusFlags |= m;
+                Player_AddStatusFlags(p, 0x80000);
             }
             Collider_SetPosition((u8 *)p + 0xB8C, &pos, 0);
             Collider_Refresh(q->collider);
@@ -70,8 +69,7 @@ s32 Player_UpdateThrowArc(struct Player *p)
     }
     if (q->timer <= q->phase3 + q->phase1 + q->phase2) {
         if (q->index >= 0) {
-            u32 m = 0x80000;
-            p->statusFlags |= m;
+            Player_AddStatusFlags(p, 0x80000);
         }
         Collider_Refresh((u8 *)p + 0xB8C);
         return 0;

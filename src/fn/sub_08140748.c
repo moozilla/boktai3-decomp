@@ -1,7 +1,6 @@
 #include "global.h"
-#include "player.h"
+#include "player_core.h"
 
-s32 Math_Atan2(s32, s32);
 s32 Player_BeginTerrainFacingAction(struct Player *p)
 {
     u32 direction;
@@ -14,10 +13,7 @@ s32 Player_BeginTerrainFacingAction(struct Player *p)
     }
     p->actionActive489 = 1;
     p->directionFrame = 50;
-    {
-        u16 duration = 60;
-        p->positionResetValue = duration;
-    }
+    Player_SetPositionResetDuration(p, 60);
     p->contactSpecial = 0;
     p->terrainRecoveryCounter = 0;
     angle = Math_Atan2(p->position.x - p->terrainTarget->x, p->position.z - p->terrainTarget->z);

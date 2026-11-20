@@ -139,7 +139,9 @@ struct ResourceRef {
     struct BackgroundDimensions *data;
 };
 
-/* Map or tile resource header; maps/tiles/extra are relocated by adding the base. */
+struct BgMapResource;
+
+/* Legacy map header view used by SceneTransition. */
 struct BackgroundResource {
     u8 signature[2]; /* "MP" for map data */
     u16 unk02;
@@ -149,13 +151,6 @@ struct BackgroundResource {
     u32 maps;
     u32 tiles;
     u32 extra;
-};
-
-struct BackgroundMapEntry {
-    u32 unk00;
-    u16 id;
-    u16 unk06;
-    u32 unk08;
 };
 
 /* Shared globals (task pointer tables are indexed by layer). */
@@ -217,14 +212,14 @@ u32 Background_Destroy(struct Background *p);
 s32 Background_Initialize(struct Background *p, u16 id, struct BackgroundConfig *c);
 void *Background_Create(u16 id, struct BackgroundConfig *c);
 void *Background_CreateFromScript(u32 id);
-s32 Background_FindMapId(struct BackgroundResource *resource, u16 id);
+s32 Background_FindMapId(struct BgMapResource *resource, u16 id);
 s32 Background_LoadMapsFromScript(void);
 s32 Background_LoadMapFromScript(void);
-s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index);
+s32 Background_LoadLayerMap(s32 layer, u16 resourceId, s32 useIndex, u16 index);
 s32 Background_LoadTilesFromScript(void);
 void Background_QueueCommand(u32 layer, u32 type, s32 length, s32 *args);
 void Background_QueueCommandFromScript(void);
-void sub_08002284(void);
+void ScrollingBackground_ClearSlots(void);
 s32 ScrollingBackground_ApplyCommands(struct ScrollingBackground *p);
 s32 ScrollingBackground_Update(struct ScrollingBackground *p);
 u32 ScrollingBackground_Destroy(struct ScrollingBackground *p);

@@ -14,6 +14,15 @@ struct MessagePanel {
     u16 timer;
     u32 result, connectionKey, unknown40, exitScript, outcomeScript;
 };
+
+static inline void MessagePanel_SetState(struct MessagePanel *panel,
+                                         void (*update)(struct MessagePanel *), u32 mode)
+{
+    panel->state = update;
+    panel->entering = 1;
+    panel->mode = mode;
+}
+
 void MessagePanel_LoadBackground(struct MessagePanel *);
 void MessagePanel_CreateTextWindow(struct MessagePanel *);
 void MessagePanel_HideTextWindow(struct MessagePanel *);
