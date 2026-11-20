@@ -53,6 +53,8 @@ its spelling, so each one is a question, not a verdict:
   the rest for the owner to rule on. Also reports a literal assignment used inside an expression
   when the assigned local has no other references. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
+* `duplicate-arm`: both arms of a simple conditional assign the same value to the
+  same field. The duplicate can steer allocation even when the compiler folds the branch.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
@@ -76,7 +78,7 @@ EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatil
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
-        "placeholder-name", "volatile-view", "local-union")
+        "duplicate-arm", "placeholder-name", "volatile-view", "local-union")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -113,6 +115,13 @@ _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
 _UNINITIALIZED_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*;")
 _LITERAL_ASSIGN_EXPR = re.compile(r"\(\s*(\w+)\s*=\s*" + _LITERAL + r"\s*\)")
+_IDENTIFIER = r"[A-Za-z_]\w*"
+_DUPLICATE_ARM = re.compile(
+    r"\bif\s*\(\s*!?\s*" + _IDENTIFIER + r"\s*\)\s*\{\s*"
+    r"(?P<base>" + _IDENTIFIER + r")\s*(?P<access>->|\.)\s*(?P<field>" + _IDENTIFIER + r")\s*"
+    r"(?P<operator>[&|^+\-]?=)\s*(?P<value>" + _IDENTIFIER + r"|" + _LITERAL + r")\s*;\s*\}"
+    r"\s*else\s*\{\s*(?P=base)\s*(?P=access)\s*(?P=field)\s*(?P=operator)\s*(?P=value)\s*;\s*\}"
+)
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -264,6 +273,10 @@ def _warn_sites(code: str):
             yield m.start(), "literal-local"
     for offset in _literal_assign_expr_sites(code):
         yield offset, "literal-local"
+    if _DUPLICATE_ARM.search(code):
+        statements = _COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), code)
+        for m in _DUPLICATE_ARM.finditer(statements):
+            yield m.start(), "duplicate-arm"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:

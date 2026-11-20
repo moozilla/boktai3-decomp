@@ -178,6 +178,22 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
 
+    def test_duplicate_arm_matches_same_field_update(self):
+        source = """void f(struct Actor *p, int tick, u32 mask)
+{
+    if (tick) {
+        p->flags |= mask;
+    } else {
+        p->flags /* same value */ |= mask;
+    }
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("duplicate-arm",)), [c.Site(3, "duplicate-arm")])
+        self.assertEqual(warns(source.replace("flags /* same value */", "effectFlags")), [])
+        self.assertEqual(warns(source.replace("/* same value */ |= mask", "&= mask")), [])
+        self.assertEqual(warns(source.replace("if (tick)", "if (AdvanceTimer())")), [])
+        self.assertEqual(warns('Print("if (tick) { p->flags |= mask; } else { p->flags |= mask; }");'), [])
+
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
             with self.subTest(statement=statement):
