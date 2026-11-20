@@ -56,18 +56,11 @@ void TentacleActor_SelectWanderRoute(struct ChaseActor *actor)
     s32 count;
     s32 forward;
     s32 dir;
-    s32 *p;
     s32 i;
     s32 cell;
     u32 surface;
-    {
-        s32 empty = -1;
-        p = &cells[3];
-        do {
-            *p = empty;
-            p--;
-        } while ((s32)p >= (s32)cells);
-    }
+    for (i = 0; i < 4; i++)
+        cells[i] = -1;
     count = 0;
     forward = -1;
     surface = (*SceneActorTerrain_GetCell(actor->base.terrainCell)) >> 4;
