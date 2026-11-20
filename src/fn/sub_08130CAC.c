@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
@@ -7,28 +8,6 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: chooses idle or turn behavior after advancing a route descriptor.
 #define SceneActorRoute_UpdateAdvancePhase sub_08130CAC
-static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
-{
-    u32 offset;
-    u32 zero;
-    {
-        u8 *field = &actor->base.field2B2;
-        zero = 0;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
 
 static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
 {
@@ -36,19 +15,6 @@ static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavio
     a->base.phase2A9 = phase;
     a->base.behavior2AA = behavior;
     a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
-static inline void TurnState(struct ChaseActor *a, u32 behavior)
-{
-    u8 *field = &a->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = behavior;
-    {
-        u32 *counter = &a->base.counter2AC;
-        *counter = zero;
-    }
     a->base.field2B1 = 1;
 }
 static inline u32 Flags(struct ChaseActor *a, u32 mask)
@@ -62,7 +28,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     void **routeField;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        BeginControlZero(actor, actor->base.onAlternateEntry, 1);
+        SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((u8)sub_0812F3CC(actor))
@@ -96,7 +62,7 @@ void SceneActorRoute_UpdateAdvancePhase(struct ChaseActor *actor)
     } else {
         void *descriptor = *routeField;
         if (SceneActorBehavior_RequestDescriptorTurn(actor, descriptor, 32, 32, speed))
-            TurnState(actor, 6);
+            SceneActorTerrain_EnterState(actor, 0, 0, 6);
     }
     actor->base.counter2AC++;
 }
