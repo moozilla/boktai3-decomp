@@ -57,6 +57,12 @@ struct VanargandAttackPair {
     u16 palettes[7][16];
     u32 selectedMask;
 };
+static inline void PairedSceneHalf_BeginActionPhase(struct PairedSceneHalf *half, u32 phase)
+{
+    half->actionCounters[0] = phase;
+    half->actionCounters[1] = 0;
+    half->actionEntered = 1;
+}
 static inline u8 PairedSceneHalf_IsAlive(const struct PairedSceneHalf *half)
 {
     u8 alive = 0;
