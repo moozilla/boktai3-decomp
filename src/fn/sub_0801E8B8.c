@@ -1,9 +1,8 @@
-#include "global.h"
-#include "scene_object_slot.h"
-void SceneObject_UpdateRaised(void);
+#include "scene_object_controller.h"
+void SceneObject_UpdateRaised(struct SceneObjSlot *);
 int SceneObjects_ScriptRaise(void)
 {
-    u8 *p = ResourceRegistry_GetResource(0x85e6);
+    struct SceneObjPool *p = ResourceRegistry_GetResource(0x85e6);
     int found;
     int i;
     int id;
@@ -13,11 +12,11 @@ int SceneObjects_ScriptRaise(void)
     if (!Script_SeekToKeyword(0x6e))
         return 0;
     id = Script_GetValue();
-    for (i = 0; i < *(u16 *)(p + 0x1a); i++) {
-        struct SceneObjSlot *s = *(struct SceneObjSlot **)(p + 0x42c) + i;
+    for (i = 0; i < p->count; i++) {
+        struct SceneObjSlot *s = &p->slots[i];
         if (s->id == id) {
             s->timer = 0;
-            s->variant = 0;
+            s->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_RAISED);
             s->callback = SceneObject_UpdateRaised;
             s->b39 = 0;
             s->b3a = 0;
