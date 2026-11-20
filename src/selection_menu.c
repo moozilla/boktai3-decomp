@@ -1,6 +1,7 @@
 #include "selection_menu.h"
 #include "render.h"
 #include "display_sequence_inline.h"
+#include "script_utility.h"
 
 void ActionRecord_CopyFromEntry(u8 *, void *);
 void Presentation_ApplyGraphicData(void *, void *);
@@ -191,13 +192,13 @@ void Presentation_UpdateItemGraphic(struct SelectionMenu *p, u32 fallback)
 
 void SelectionMenu_CallConfirmScript(struct SelectionMenu *p)
 {
-    struct SelectionMenuScriptValues a;
-    struct SelectionMenuScriptCall b;
-    b.flags = 2;
-    b.args = &a;
-    a.actor = p->choices[0];
-    a.item = p->choices[1];
-    Script_Call(p->confirmScript, &b);
+    s32 values[2];
+    struct ScriptUtilityArguments args;
+    args.count = 2;
+    args.values = values;
+    values[0] = p->choices[0];
+    values[1] = p->choices[1];
+    Script_Call(p->confirmScript, &args);
 }
 
 /* Tentative: choose one of three selection sounds. */
@@ -251,14 +252,6 @@ void SelectionMenu_HandleHorizontalInput(struct SelectionMenu *p)
     }
 }
 
-struct PanelSprite {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[8];
-    u16 tile;
-    u8 pad12[10];
-    s16 x, y;
-};
 // Show the sequence's current frame and flips on the panel, then advance it.
 static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
                                            struct DisplaySequenceState *st)
@@ -299,11 +292,11 @@ static inline void SelectionMenu_StepPanel(struct SceneInputPanelDrawable *s,
 void SelectionMenu_InitPanel(struct SelectionMenu *m)
 {
     struct DisplaySequenceState a;
-    long long attr;
+    struct ContactPosition position;
     void *res;
-    ZeroFill8(&attr);
-    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &attr);
-    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &attr);
+    ZeroFill8(&position);
+    Widget_InitLinked(&m->panels[0], &m->panelResource, 0xB4, 0x10, 0, 0, 0x3C, &position);
+    Widget_InitLinked(&m->panels[1], &m->panelResource, 0xB5, 0x10, 0, 0, 0x3C, &position);
     res = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(m->panel.graphics, 0x593A);
     AnimData_SelectPaletteBank(m->panel.graphics, 0x1F7);
@@ -475,12 +468,12 @@ void SelectionMenu_PopulateActors(struct SelectionMenu *p)
 {
     struct SceneInputWidget *g = p->icons;
     int i;
-    struct SelectionMenuPackedPosition v;
+    struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
-        v.x = (i & 3) * 24 + 144;
-        v.y = (i >> 2) * 24 + 32;
+        position.x = (i & 3) * 24 + 144;
+        position.y = (i >> 2) * 24 + 32;
         SelectionMenu_SetActorIcon(p, g, i);
-        *(struct SelectionMenuPackedPosition *)&g->position = v;
+        g->position = position;
         if ((1 << i) & p->availableSlots) {
             g->paletteBank = 0x373;
             g->palette = SelectionMenu_GetIconPalette(0);
@@ -498,12 +491,12 @@ void SelectionMenu_PopulateItems(struct SelectionMenu *p)
 {
     struct SceneInputWidget *g = p->icons;
     int i;
-    struct SelectionMenuPackedPosition v;
+    struct ContactPosition position;
     for (i = 0; i < 16; i++, g++) {
-        v.x = (i & 3) * 24 + 144;
-        v.y = (i >> 2) * 24 + 32;
+        position.x = (i & 3) * 24 + 144;
+        position.y = (i >> 2) * 24 + 32;
         Presentation_SetItemGraphic(p, g, i);
-        *(struct SelectionMenuPackedPosition *)&g->position = v;
+        g->position = position;
         if ((1 << i) & p->availableSlots) {
             g->paletteBank = 0x373;
             g->palette = SelectionMenu_GetIconPalette(0);

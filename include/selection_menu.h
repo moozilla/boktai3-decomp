@@ -23,18 +23,6 @@ struct SelectionMenu {
     void (*callback)(struct SelectionMenu *);
     u32 actorMessages, itemMessages, promptMessages;
 };
-/* Packed copy preserves the original paired-word position copy; the z/pad
- * components are not initialized by the grid population routines. */
-struct SelectionMenuPackedPosition {
-    signed x : 16, y : 16, z : 16, pad : 16;
-};
-struct SelectionMenuScriptValues {
-    u32 actor, item;
-};
-struct SelectionMenuScriptCall {
-    u32 flags : 16, unused : 16;
-    struct SelectionMenuScriptValues *args;
-};
 struct SelectionMenuItem {
     u8 graphic, unknown1[9], available, unknownB[5];
 };
