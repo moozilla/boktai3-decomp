@@ -1,13 +1,11 @@
-#include "global.h"
-
-#include "scene_object_slot.h"
+#include "scene_object_controller.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
-void SceneObject_UpdateRaised(void);
-void SceneObject_UpdateLowered(void);
+void SceneObject_UpdateRaised(struct SceneObjSlot *);
+void SceneObject_UpdateLowered(struct SceneObjSlot *);
 void *SceneParticleBurst_EnsureSingleton(u32, u32);
 // confidence=low: places a raisable scene object (blocks/gates with 10 facings) on its terrain cell.
-void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
+void sub_0801F058(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -23,7 +21,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             obj->loweredPose = 1;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 1;
@@ -36,7 +34,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 2;
             break;
@@ -47,7 +45,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             obj->loweredPose = 0;
             break;
         case 5:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 0;
@@ -60,7 +58,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 7:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 1;
             break;
@@ -72,7 +70,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 9:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 0;
             break;
@@ -82,7 +80,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
     obj->pose = *(u8 *)&obj->loweredPose;
     obj->poseFrame = 0;
     sprite = obj;
-    Sprite_Init(sprite, mgr + (obj->animationIndex * 28 + 0xc8), 0);
+    Sprite_Init(sprite, &mgr->animationData[1][obj->animationIndex], 0);
     obj->sprite.position = obj->r0.signedPosition;
     if (!(*dir & 1)) {
         obj->sprite.position.z += 0x80;
@@ -106,7 +104,8 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
         obj->terrain->cell.flags &= 0xfffd;
         obj->terrain->cell.flags |= 3;
         obj->terrain->flags &= 0xfffe;
-        obj->terrain->cell.shapeAndHeight = (obj->terrain->cell.shapeAndHeight & 0xf0) | (obj->cellHeight + 1);
+        obj->terrain->cell.shapeAndHeight =
+            (obj->terrain->cell.shapeAndHeight & 0xf0) | (obj->cellHeight + 1);
         obj->lift = 0;
         {
             u16 t = obj->r0.position.y;
@@ -121,7 +120,8 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
         obj->terrain->cell.flags &= 0xfffc;
         obj->terrain->cell.flags |= 2;
         obj->terrain->flags |= 1;
-        obj->terrain->cell.shapeAndHeight = (obj->terrain->cell.shapeAndHeight & 0xf0) | obj->cellHeight;
+        obj->terrain->cell.shapeAndHeight =
+            (obj->terrain->cell.shapeAndHeight & 0xf0) | obj->cellHeight;
         {
             u16 t = obj->maxLift;
             obj->lift = t;
