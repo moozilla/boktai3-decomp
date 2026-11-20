@@ -89,6 +89,17 @@ static inline void f(void)
     def test_comments_are_not_code(self):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
 
+    def test_const_local_in_scalar_declaration_group(self):
+        source = """void f(void)
+{
+    u32 kind, zero;
+    s16 one = 1, phase;
+    u8 direction, count;
+    u32 value = Select(0, one);
+}
+"""
+        self.assertEqual(c.sites(source), [c.Site(3, "const-local"), c.Site(4, "const-local")])
+
     def test_dead_local_updates_discard_only_their_own_scalar(self):
         source = """void f(s32 frame)
 {

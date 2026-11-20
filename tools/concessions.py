@@ -113,6 +113,12 @@ _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
 _INTEGER_SCALAR = r"[us](?:8|16|32|64)"
+_SCALAR_DECLARATOR = rf"\w+(?:\s*=\s*{_LITERAL})?"
+_SCALAR_DECLARATION_GROUP = re.compile(
+    rf"(?m)^[ \t]+(?:const[ \t]+)?{_INTEGER_SCALAR}[ \t]+"
+    rf"(?P<declarations>{_SCALAR_DECLARATOR}(?:\s*,\s*{_SCALAR_DECLARATOR})+)\s*;"
+)
+_NUMBER_DECLARATOR = re.compile(rf"{_NUMBER_NAME}(?:\s*=\s*{_LITERAL})?")
 _DEAD_LOCAL_BLOCK = re.compile(
     rf"(?m)^[ \t]*\{{\s*{_INTEGER_SCALAR}\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
     rf"(?:\(\s*{_INTEGER_SCALAR}\s*\)\s*)?(?:[A-Za-z_]\w*|{_LITERAL})\s*;"
@@ -219,6 +225,11 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    for m in _SCALAR_DECLARATION_GROUP.finditer(code):
+        for declaration in m["declarations"].split(","):
+            if _NUMBER_DECLARATOR.fullmatch(declaration.strip()):
+                yield m.start(), "const-local"
+                break
     for m in _DEAD_LOCAL_BLOCK.finditer(code):
         updates = m["updates"]
         name = re.escape(m["name"])
