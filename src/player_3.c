@@ -1088,6 +1088,11 @@ s32 Player_ModifyValueByEquipmentLevel(struct PlayerModifierInput *p, s32 n)
     return n - b * a;
 }
 
+static inline u32 PlayerModifier_TestTargetFlags(const struct PlayerModifierTarget *target, u32 mask)
+{
+    return target->flags & mask;
+}
+
 #define Player_GetScaledTargetFlagBonus sub_0813E284
 static inline s32 LimitTargetBonus(s32 value)
 {
@@ -1097,16 +1102,15 @@ static inline s32 LimitTargetBonus(s32 value)
 }
 s32 Player_GetScaledTargetFlagBonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *target)
 {
-    u32 mask = 0x80;
-    if (target->flags & mask)
+    if (PlayerModifier_TestTargetFlags(target, 0x80))
         return LimitTargetBonus(gGameState->targetFlagBonuses[0] >> 6);
-    else if (target->flags & 0x100)
+    else if (PlayerModifier_TestTargetFlags(target, 0x100))
         return LimitTargetBonus(gGameState->targetFlagBonuses[1] >> 6);
-    else if (target->flags & 0x200)
+    else if (PlayerModifier_TestTargetFlags(target, 0x200))
         return LimitTargetBonus(gGameState->targetFlagBonuses[2] >> 6);
-    else if (target->flags & 0x400)
+    else if (PlayerModifier_TestTargetFlags(target, 0x400))
         return LimitTargetBonus(gGameState->targetFlagBonuses[3] >> 6);
-    else if (target->flags & 0x800)
+    else if (PlayerModifier_TestTargetFlags(target, 0x800))
         return LimitTargetBonus(gGameState->targetFlagBonuses[4] >> 6);
     return 0;
 }
@@ -1129,8 +1133,7 @@ s32 Player_RollModifierBonus(void)
 
 s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x80)) {
         return 10;
     }
     return 0;
@@ -1138,9 +1141,7 @@ s32 Player_GetTargetFlag7Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 1;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x100)) {
         return 10;
     }
     return 0;
@@ -1148,9 +1149,7 @@ s32 Player_GetTargetFlag8Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 2;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x200)) {
         return 10;
     }
     return 0;
@@ -1158,9 +1157,7 @@ s32 Player_GetTargetFlag9Bonus(s32 unused0, s32 unused1, struct PlayerModifierTa
 
 s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 3;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x400)) {
         return 10;
     }
     return 0;
@@ -1168,9 +1165,7 @@ s32 Player_GetTargetFlag10Bonus(s32 unused0, s32 unused1, struct PlayerModifierT
 
 s32 Player_GetTargetFlag11Bonus(s32 unused0, s32 unused1, struct PlayerModifierTarget *p)
 {
-    u32 m = 0x80;
-    m <<= 4;
-    if (p->flags & m) {
+    if (PlayerModifier_TestTargetFlags(p, 0x800)) {
         return 10;
     }
     return 0;
