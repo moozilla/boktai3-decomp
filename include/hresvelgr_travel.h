@@ -43,8 +43,8 @@ struct HresvelgrTravelActor {
     u16 chargeCount;
     u8 pad332[4];
     u16 burstCount;
-    struct SceneVec shotOffsets[3];
-    u8 pad350[0x383 - 0x350];
+    struct SceneVec shotOffsets[4];
+    u8 pad358[0x383 - 0x358];
     u8 behaviorFinished;
     void *savedCallback;
     u8 savedPhase, savedAnimation;
