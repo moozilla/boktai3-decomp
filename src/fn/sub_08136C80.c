@@ -1,3 +1,5 @@
+#include "scene_actor_animation.h"
+#include "scene_input_widget.h"
 #include "global.h"
 #include "scene_actor_placement.h"
 void ActorShadow_Disable(void *);
@@ -5,7 +7,7 @@ static inline void ClearWord(u32 *p, u32 mask)
 {
     *p &= mask;
 }
-static inline void ClearTile(struct SceneActorPlacementTileFlags *p, u32 mask)
+static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
 {
     p->flags &= mask;
 }
@@ -26,9 +28,9 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
                 ClearWord(p, ~2);
                 drawable = p;
             } else {
-                struct SceneActorPlacementTileFlags *p;
+                struct SceneInputWidget *p;
                 drawable = s->drawable;
-                p = (void *)((u8 *)drawable + 0x20);
+                p = &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
                 ClearTile(p, ~2);
             }
             {
@@ -36,11 +38,12 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
                 if (s->drawableKind == 0) {
                     *(u32 *)drawable |= one;
                 } else {
-                    struct SceneActorPlacementTileFlags *p = (void *)((u8 *)drawable + 0x20);
+                    struct SceneInputWidget *p =
+                        &((struct SceneActorAnimationTileDrawable *)drawable)->tile;
                     p->flags |= one;
                 }
             }
-            MarkCollider(&((struct ChaseActor *)s)->base.colliderA);
+            MarkCollider(&s->colliderA);
             if (s->shadow[0])
                 ActorShadow_Disable(s->shadow);
         }
