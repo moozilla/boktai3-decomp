@@ -46,6 +46,22 @@ class GotoHint(unittest.TestCase):
         self.assertEqual(self.scope.gotos_before(self.dir.name, "f", 11, lines=lines), [])
         self.assertEqual(self.scope.gotos_before(self.dir.name, "f", 99, lines=lines), [])
 
+    def test_does_not_suggest_gotos_from_earlier_functions_in_the_unit(self):
+        source = {
+            1: "void neighbor(void) {",
+            2: "    goto neighbor_end;",
+            3: "neighbor_end: return;",
+            4: "}",
+            6: "void f(void) {",
+            7: "    goto tail;",
+            8: "tail: g();",
+            9: "}",
+        }
+        lines = {10: 2, 11: 7, 12: 8}
+        hits = self.scope.gotos_before(self.dir.name, "f", 12, src=source, lines=lines)
+        self.assertEqual(hits, [(7, "goto tail;")])
+        self.assertEqual(self.scope.gotos_before(self.dir.name, "f", 10, src=source, lines=lines), [])
+
 
 if __name__ == "__main__":
     unittest.main()

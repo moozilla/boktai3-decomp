@@ -3507,14 +3507,22 @@ def source_lines(wd):
 
 def gotos_before(wd, func, uid, limit=4, src=None, lines=None):
     """The `goto` statements of FUNC's C that come before insn UID's line, nearest last (at most LIMIT):
-    [(line, text)]. The function's span is the lines its insns carry."""
+    [(line, text)]. Bound the search by the function definition in the preprocessed source."""
+    import land
+
     lines = uid_lines(wd) if lines is None else lines
     src = source_lines(wd) if src is None else src
     at = lines.get(uid)
-    span = [ln for ln in lines.values() if isinstance(ln, int) and ln > 0]
-    if not isinstance(at, int) or not span:
+    if not isinstance(at, int) or at not in src:
         return []
-    first = min(span)
+    text = "\n".join(src.get(line, "") for line in range(1, max(src) + 1))
+    span = land.definition_span(text, dump_func(wd, func))
+    if not span:
+        return []
+    first = text.count("\n", 0, span[0]) + 1
+    last = text.count("\n", 0, span[1] - 1) + 1
+    if not first <= at <= last:
+        return []
     hits = [(ln, src[ln].strip()) for ln in sorted(src) if first <= ln < at and re.search(r"\bgoto\s+\w+\s*;", src[ln])]
     return hits[-limit:]
 
