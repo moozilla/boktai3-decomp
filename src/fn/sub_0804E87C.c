@@ -1,36 +1,27 @@
-#include "global.h"
-struct O {
-    u8 f[0x18];
-    u32 *q;
-    u8 g[0xa];
-    u8 n;
-    u8 h;
-    u8 s;
-};
+#include "area_effect.h"
 static inline u32 tst(u32 *a, u32 m)
 {
     return *a & m;
 }
-void AreaEffect_AccumulatePlayerResource(struct O *, u32);
-void AreaEffect_HideSprites(struct O *o)
+void AreaEffect_HideSprites(struct AreaEffectManager *manager)
 {
-    if (o->s == 1) {
+    if (manager->visible == 1) {
         s32 i;
-        o->s = 0;
+        manager->visible = 0;
         i = 0;
-        if (i < o->n) {
+        if (i < manager->count) {
             u32 m = 1;
-            u8 *fp = (u8 *)o + 0xc9;
-            u8 *e = (u8 *)o;
-            u8 *np = &o->n;
+            u8 *fp = &manager->entries[0].hasSprite;
+            u8 *e = (u8 *)manager;
+            u8 *np = &manager->count;
             do {
                 if (*fp != 0)
                     *(u32 *)(e + 0x34) |= m;
-                fp += 0xa8;
-                e += 0xa8;
+                fp += sizeof(struct AreaEffectEntry);
+                e += sizeof(struct AreaEffectEntry);
                 i++;
             } while (i < *np);
         }
     }
-    AreaEffect_AccumulatePlayerResource(o, tst(&o->q[8], 0x20) ? 2 : 0);
+    AreaEffect_AccumulatePlayerResource(manager, tst(&manager->player->statusFlags, 0x20) ? 2 : 0);
 }
