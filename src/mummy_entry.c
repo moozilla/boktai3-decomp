@@ -1,5 +1,6 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_availability.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_delayed_response.h"
@@ -179,23 +180,11 @@ static inline void Mummy_SelectAnimation(struct ChaseActor *actor, u32 selection
     *restart = 0;
 }
 
-static inline u8 TakeSaved(u8 *flag, u8 **saved)
-{
-    u32 value = *flag;
-    *saved = flag;
-    if (value) {
-        **saved = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Mummy_UpdateRevival(void *);
 
 void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
 {
     u32 queued;
-    u8 *prepared;
     u32 mask = 1;
     if (!actor->base.drawableKind) {
         u32 *flags = actor->base.drawable;
@@ -204,31 +193,16 @@ void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
         struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         tile->flags |= mask;
     }
-    queued = TakeSaved(&actor->base.field2B2, &prepared);
+    queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
-        void *callback;
-        u32 kind, zero;
         {
             u8 directionVariant, mirror;
             Mummy_GetDirectionVariant(actor, &directionVariant, &mirror, queued);
             Mummy_SelectAnimation(actor, 8, directionVariant, mirror | 4);
         }
-        callback = Mummy_UpdateRevival;
-        kind = 13;
-        zero = 0;
-        *prepared = 1;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            s32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
+        SceneActorChase_SetControl(actor, Mummy_UpdateRevival, 13);
     } else
         actor->base.restart = queued;
 }
@@ -1248,13 +1222,6 @@ struct MummyStimulusGroup {
     void *fallback;
 };
 
-struct MummyStimulusContext {
-    u8 unknown0[0x6EA];
-    u8 phase[1];
-    u8 unknown6EB[7];
-    u16 flags;
-};
-
 static inline u8 Mummy_TryRoute_defeat(u16 *flags, u32 mask, void *route,
                                        struct ContactPosition *from, struct ContactPosition *to)
 {
@@ -1326,7 +1293,7 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
 u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
 {
     struct MummyStimulusGroup *group;
-    struct MummyStimulusContext *body;
+    struct Mummy *body;
     s8 tag;
     u32 started;
     u16 *motionFlags;
@@ -1348,7 +1315,7 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
         SceneActorChase_SetBehavior(a, 11);
         {
             u32 mask = 0x4000;
-            body->flags = mask | (body->flags);
+            body->flags6F2 = mask | (body->flags6F2);
         }
         started = 1;
     }
@@ -1358,7 +1325,7 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     SceneActorPosition_ResolveTaggedPosition(&group->stimulus, &a->base.body.id, group->route, tag);
     if (SceneActor_TryTrackNearbyPlayer(a, &group->target, group->cell))
         goto success;
-    Chase_SnapToRoute(group->destination, (u8 *)&group->link);
+    SceneActorChase_SnapToRoute(group->destination, (void *)&group->link);
     (group->destination)->y = a->base.body.position.y;
     (group->destination)->pad = 0;
     SceneGrid_SnapPositionToCellCenter(&group->target, group->cell);
@@ -1371,11 +1338,8 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     SceneActorChase_SetActorFlags(a, 16);
     a->base.field2C2 = Div(64, 3);
     SceneActorChase_ClearActorFlags(a, 0x800000);
-    body->phase[0] = 4;
-    {
-        u32 mask = 0x200;
-        *motionFlags = mask | *motionFlags;
-    }
+    body->interactionFrames = 4;
+    SceneActorChase_SetFlagComponent((void *)motionFlags, 0x200);
     {
         u32 mask = 0x1000000;
         a->base.statusFlags |= mask;
@@ -2558,26 +2522,6 @@ void Mummy_InitProfile(struct SInitProfile *s)
 
 void Collider_SetAttackProperties(struct ContactCollider *, u32, u32, u32, u32, u32);
 
-static inline u8 Unavailable(struct ChaseActor *actor)
-{
-
-    u32 mask;
-    if (!actor)
-        goto no;
-    mask = 0x40;
-    if (actor->base.motionFlags & mask)
-        goto yes;
-    mask = 0x20000;
-    if (actor->base.statusFlags & mask)
-        goto yes;
-    if (actor->base.health > 0)
-        goto no;
-yes:
-    return 1;
-no:
-    return 0;
-}
-
 struct BoundsBits {
     u32 x : 16;
     u32 y : 16;
@@ -2618,7 +2562,7 @@ void Mummy_UpdateAttackCollider(struct ChaseActor *actor)
     u32 flags;
     u32 attackBit;
 
-    if (Unavailable(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     if (actor->base.colliderA.responseValue)
         return;
@@ -2814,28 +2758,6 @@ static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void 
     actor->base.pendingControl = 0;
 }
 
-static inline u8 Blocked(struct ChaseActor *s)
-{
-    if (!s)
-        goto zero;
-    {
-        u32 mask = 0x40;
-        if (s->base.motionFlags & mask)
-            goto one;
-    }
-    {
-        u32 mask = 0x20000;
-        if (s->base.statusFlags & mask)
-            goto one;
-    }
-    if (s->base.health > 0)
-        goto zero;
-one:
-    return 1;
-zero:
-    return 0;
-}
-
 static inline s32 LocalPlayer(void)
 {
     if (!gLinkSession)
@@ -2900,7 +2822,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     u32 kind;
     s32 i;
     u32 *damageFlags;
-    if (Blocked(actor))
+    if (SceneActor_ActionsBlocked(actor))
         return;
     if (!burn->timer)
         return;
