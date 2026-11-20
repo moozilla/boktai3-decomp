@@ -414,22 +414,17 @@ s32 DirectionalController_ScriptCreate(void)
                 p->distance = distance * distance;
             }
             if (Script_SeekToKeyword('a')) {
-                s16 *base = p->arguments;
-                s16 *out = *(&base);
-                do {
-                    s32 value = Script_GetPc();
-                    if (value) {
-                        *(&value) = Script_GetValue();
-                    }
-                    *out++ = value;
-                } while ((s32)out <= (s32)(base + 3));
+                s32 argument;
+                for (argument = 0; argument < 4; argument++) {
+                    if (Script_GetPc())
+                        p->arguments[argument] = Script_GetValue();
+                    else
+                        p->arguments[argument] = 0;
+                }
             } else {
-                s16 *base = p->arguments;
-                s32 zero = 0;
-                s16 *out = p->arguments + 3;
-                do {
-                    *out-- = zero;
-                } while ((s32)out >= (s32)base);
+                s32 argument;
+                for (argument = 0; argument < 4; argument++)
+                    p->arguments[argument] = 0;
             }
             if (Script_SeekToKeyword('p')) {
                 position.x = Script_GetValue();
