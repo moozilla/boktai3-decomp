@@ -449,6 +449,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.timed("POST", self.post)
 
     def get(self):
+        from experiments.http import routes
+        if routes(self, "GET"):
+            return
         import forge
         if forge.route(self, "GET"):
             return
@@ -664,6 +667,9 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send(404, {"error": "not found"})
 
     def post(self):
+        from experiments.http import routes
+        if routes(self, "POST"):
+            return
         import forge
         if forge.route(self, "POST"):
             return

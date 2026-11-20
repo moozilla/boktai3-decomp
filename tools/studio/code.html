@@ -522,6 +522,8 @@ async function functionPage(q) {
         : f.state === 'draft' ? `<span class="badge warn" title="a NONMATCHING draft; the build uses the INCLUDE_ASM branch">not matched yet${f.pct ? ' · draft at ' + fmtPct(f.pct) : ''}</span>`
         : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}<span class="badge" id="fnhist" data-addr="${d.addr}" hidden></span></div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
+    <p><a href="/experiments?probe=${encodeURIComponent(d.name)}">Probe this function in an experiment</a></p>
+    <section id="experiment-links" data-addr="${d.addr}" hidden></section>
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
     ${d.c ? `<p><a class="badge" href="/forge#${d.addr}">Edit in Forge → compile, play, export a patch</a></p>` : ''}
     <div class="panes">${cPane}${asmPane}</div>
@@ -642,6 +644,18 @@ function typeList() {
 }
 const notFound = msg => `<div class="page"><div class="empty">${esc(msg)}</div></div>`;
 
+async function fillExperimentLinks() {
+  const panel = $('experiment-links');
+  if (!panel) return;
+  const rows = await fetch('/api/experiments/by-function/' + panel.dataset.addr)
+    .then(r => r.ok ? r.json() : []).catch(() => []);
+  if (!panel.isConnected || !rows.length) return;
+  panel.innerHTML = '<h3>Observed in experiments</h3><div class="refs">' + rows.map(row =>
+    `<a class="chip" href="${esc(row.url)}" title="${esc(row.title)}">${esc(row.trial)} <small>${row.count} ${esc(row.kind)}</small></a>`
+  ).join('') + '</div>';
+  panel.hidden = false;
+}
+
 // ---------- routing ----------
 async function route() {
   const h = decodeURIComponent(location.hash.slice(1));
@@ -668,7 +682,7 @@ async function route() {
   v.scrollTop = 0;
   renderTree();
   if (!h) { drawHistory(); drawChanges(); }
-  fillFnHistory(); fillSince();
+  fillFnHistory(); fillSince(); fillExperimentLinks();
 }
 $('view').addEventListener('click', e => {
   const tr = e.target.closest('tr.link');

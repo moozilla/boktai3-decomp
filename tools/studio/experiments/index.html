@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boktai 3 Experiments</title>
+  <link rel="stylesheet" href="/static/common.css">
+  <link rel="stylesheet" href="/experiments/app.css">
+  <script defer src="/static/common.js"></script>
+  <script defer src="/experiments/app.js"></script>
+  <script defer src="/experiments/sweeps.js"></script>
+  <script defer src="/experiments/recharge.js"></script>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="notebook">
+    <header class="notebook-head">
+      <div>
+        <a class="section-name" href="/experiments">Experiments</a>
+        <h1 id="title">Ask the running game.</h1>
+        <p id="question-context">Replay the same starting frame with different inputs. Follow the answer into the code that ran.</p>
+        <a id="parent-run" hidden>Open the parent frame</a>
+      </div>
+      <div class="toolbar">
+        <select id="examples" aria-label="Open an example question"><option>Example questions and recordings</option></select>
+        <a id="recharge-link" href="#recharge" hidden>SUN recharge study</a>
+        <button id="edit" type="button">Edit recipe</button>
+        <button id="sweep-open" type="button" title="Run the same recipe across several saves" disabled>Run across saves</button>
+        <button id="run" class="primary" type="button" disabled>Run experiment</button>
+      </div>
+    </header>
+    <div id="status-line" role="status" aria-live="polite"></div>
+    <section id="recharge-study" class="sweep-results" aria-label="SUN recharge study" hidden>
+      <div class="section-head">
+        <div><h2 id="recharge-finding">Energy gained over 240 frames</h2>
+          <p id="recharge-progress" class="muted" role="status"></p></div>
+        <div class="toolbar">
+          <a href="#example/recharge">Edit one SUN-level recipe</a>
+          <button class="primary" id="recharge-run" type="button">Run all 11 SUN levels</button>
+        </div>
+      </div>
+      <div id="recharge-ledger"></div>
+      <p id="recharge-links"></p>
+    </section>
+    <section id="preview" aria-label="Trial inputs"></section>
+    <section id="results" aria-label="Experiment result" hidden>
+      <div id="claims" aria-label="Tested statements"></div>
+      <section id="players" aria-label="Synchronized trial frames">
+        <div id="screens"></div>
+        <div class="transport">
+          <button id="play" type="button" aria-label="Play trial frames">Play</button>
+          <button id="previous" type="button" aria-label="Previous sampled frame">‹</button>
+          <button id="next" type="button" aria-label="Next sampled frame">›</button>
+          <input id="scrub" type="range" min="0" value="0" aria-label="Sampled frame">
+          <output id="frame" for="scrub"></output>
+          <button id="fork-frame" type="button" title="Start a new experiment from the selected trial and frame">Fork frame</button>
+        </div>
+      </section>
+      <section id="sprite-evidence" class="sprite-evidence" aria-labelledby="sprite-heading" hidden>
+        <div class="section-head">
+          <div><h2 id="sprite-heading">Inspect a sprite</h2>
+            <p class="muted">Click a pixel in a trial frame to follow its sprite into the game code.</p></div>
+          <form id="pixel-query" aria-label="Pixel coordinates">
+            <label>X <input id="pixel-x" type="number" min="0" max="239" value="117" required></label>
+            <label>Y <input id="pixel-y" type="number" min="0" max="159" value="88" required></label>
+            <button type="submit">Inspect</button>
+          </form>
+        </div>
+        <div id="pixel-results" aria-live="polite"></div>
+      </section>
+      <div class="inspection">
+        <section class="measurements" aria-labelledby="measure-heading">
+          <div class="section-head">
+            <h2 id="measure-heading">Frame evidence</h2>
+            <div class="tabs" aria-label="Evidence view">
+              <button id="fields-tab" type="button" aria-pressed="true">RAM fields</button>
+              <button id="calls-tab" type="button" aria-pressed="false">Function entries</button>
+            </div>
+          </div>
+          <div id="matrix"></div>
+          <form id="snapshot-query" class="snapshot-query">
+            <label for="snapshot-field">Read another field from this frame</label>
+            <div>
+              <input id="snapshot-field" type="text" maxlength="128" spellcheck="false" autocomplete="off"
+                     placeholder="gGameState-&gt;life" list="sample-fields" required>
+              <button type="submit">Read</button>
+              <button type="submit" id="trace-field" title="Replay these exact inputs with an additional watch">Trace writes</button>
+            </div>
+            <datalist id="sample-fields">
+              <option value="gGameState->life"><option value="gPlayers[0]->position.x">
+              <option value="gPlayers[0]->position.z"><option value="gPlayers[0]->currentStatB">
+              <option value="gEnginePauseFlags"><option value="gTaskLists[6].pauseMask">
+            </datalist>
+            <output id="snapshot-value" role="status" aria-live="polite"></output>
+          </form>
+        </section>
+        <aside class="evidence" id="evidence" aria-label="Selected evidence"></aside>
+      </div>
+      <section id="compare-panel" class="compare-panel" hidden>
+        <div class="section-head">
+          <h2>Compare runs</h2>
+          <select id="compare" aria-label="Compare with an earlier run"></select>
+        </div>
+        <div id="comparison"></div>
+      </section>
+    </section>
+    <section id="sweep-results" class="sweep-results" aria-labelledby="sweep-heading" hidden>
+      <div class="section-head"><div>
+        <h2 id="sweep-heading">Checkpoint results</h2>
+        <p class="muted" id="sweep-progress" role="status"></p>
+      </div><div class="sweep-links">
+        <a id="sweep-contact" target="_blank" rel="noopener" hidden>Starting frames</a>
+        <a id="sweep-export">Download TSV</a>
+      </div></div>
+      <div id="sweep-ledger"></div>
+    </section>
+    <footer class="notebook-footer">
+      <label for="history-select">Saved runs</label>
+      <select id="history-select"><option value="">Choose a run</option></select>
+      <label for="sweep-history" id="sweep-history-label" hidden>Saved sweeps</label>
+      <select id="sweep-history" aria-label="Saved sweeps" hidden></select>
+      <div id="artifacts"></div>
+    </footer>
+  </main>
+  <dialog id="sweep-dialog" aria-labelledby="sweep-title">
+    <form id="sweep-form">
+      <header class="dialog-head">
+        <div><h2 id="sweep-title">Run across saves</h2><p id="sweep-question"></p></div>
+        <button id="sweep-close" type="button" aria-label="Close checkpoint selection">×</button>
+      </header>
+      <div class="dialog-body">
+        <div class="section-head">
+          <h3>Checkpoints</h3>
+          <div class="form-actions">
+            <button id="sweep-all" type="button">Select story bank</button>
+            <button id="sweep-clear" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="sweep-choices"></div>
+        <p id="sweep-error" role="alert"></p>
+      </div>
+      <footer class="dialog-foot">
+        <button id="sweep-submit" class="primary" type="submit">Run selected checkpoints</button>
+      </footer>
+    </form>
+  </dialog>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="recipe-form">
+      <header class="dialog-head">
+        <div><h2 id="editor-title">Edit recipe</h2><p>The next run saves a new copy of these inputs.</p></div>
+        <button id="close-editor" type="button" aria-label="Close recipe editor">×</button>
+      </header>
+      <div class="dialog-body">
+        <label>Question <input id="recipe-title" type="text" maxlength="120" required></label>
+        <p id="fork-origin" hidden></p>
+        <div class="form-row">
+          <label>Starting checkpoint <select id="checkpoint"></select></label>
+          <label>Trial length <input id="duration" type="number" min="1" max="1800" required></label>
+          <label>Sample every <input id="interval" type="number" min="1" max="1800" required></label>
+        </div>
+        <label class="checkbox"><input id="resume-save" type="checkbox"> Try the reference Continue sequence before forking</label>
+        <details>
+          <summary>Setup before the trials</summary>
+          <label>Shared controller input <textarea id="prep" rows="3" spellcheck="false" placeholder="wait 60"></textarea></label>
+        </details>
+        <div class="section-head"><h3>Trials</h3><button type="button" id="add-trial">Add trial</button></div>
+        <p class="help">Use <code>hold UP 60</code>, <code>tap START</code>, <code>wait 15</code>, or <code>lux 80</code>.</p>
+        <div id="trial-editor"></div>
+        <label class="checkbox"><input id="sprite-trace" type="checkbox"> Capture sprite rendering evidence</label>
+        <label>Watch fields <textarea id="observe" rows="3" spellcheck="false" placeholder="gPlayers[0]->position.x"></textarea></label>
+        <label>Probe function entries <textarea id="probe" rows="2" spellcheck="false" placeholder="Player_Update"></textarea></label>
+        <details>
+          <summary>Falsifiable checks and full JSON</summary>
+          <label>Checks (JSON) <textarea id="checks" rows="7" spellcheck="false"></textarea></label>
+          <div class="form-actions">
+            <button id="export-json" type="button">Copy recipe to JSON editor</button>
+            <button id="apply-json" type="button">Load JSON into form</button>
+          </div>
+          <label>Recipe JSON <textarea id="json-editor" rows="8" spellcheck="false"></textarea></label>
+        </details>
+        <p id="editor-error" role="alert"></p>
+      </div>
+      <footer class="dialog-foot">
+        <button id="cancel-editor" type="button">Cancel</button>
+        <button class="primary" type="submit">Run edited recipe</button>
+      </footer>
+    </form>
+  </dialog>
+</body>
+</html>

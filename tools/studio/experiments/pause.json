@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "title": "What does the pause menu actually stop?",
+  "checkpoint": "test-save",
+  "continue": true,
+  "duration": 120,
+  "sample_every": 15,
+  "sprite_trace": true,
+  "prepare": "",
+  "observe": [
+    "gPlayers[0]->position.x",
+    "gPlayers[0]->position.z",
+    "gPlayers[0]->task.list",
+    "gEnginePauseFlags",
+    "gTaskLists[6].pauseMask",
+    "gTaskLists[11].pauseMask"
+  ],
+  "probe": [
+    "Player_Update",
+    "Terrain_SampleSurface",
+    "SceneHud_UpdatePageInput",
+    "TaskSystem_RunFrame",
+    "Hud_BeginSavedBlend"
+  ],
+  "trials": [
+    {
+      "id": "field",
+      "label": "Up in the field",
+      "input": "wait 60\nhold UP 60"
+    },
+    {
+      "id": "menu",
+      "label": "Up in the pause menu",
+      "input": "tap START\nwait 50\nhold UP 60"
+    },
+    {
+      "id": "idle",
+      "label": "No input",
+      "input": "wait 120"
+    }
+  ],
+  "checks": [
+    {
+      "statement": "Up moves Django in the field.",
+      "trial": "field",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "ne",
+      "value": 0,
+      "when": [
+        {
+          "trial": "field",
+          "function": "Player_Update",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "statement": "With the menu open, Up leaves Django in place.",
+      "trial": "menu",
+      "field": "gPlayers[0]->position.z",
+      "from": 60,
+      "to": 120,
+      "compare": "eq",
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "statement": "The menu keeps processing input after Django's update stops.",
+      "trial": "menu",
+      "function": "SceneHud_UpdatePageInput",
+      "from": 60,
+      "to": 120,
+      "compare": "gt",
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        },
+        {
+          "trial": "menu",
+          "function": "Player_Update",
+          "from": 60,
+          "to": 120,
+          "compare": "eq",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "statement": "Django's update is skipped while the menu is open.",
+      "trial": "menu",
+      "function": "Player_Update",
+      "from": 60,
+      "to": 120,
+      "compare": "eq",
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "statement": "Opening the menu sets bit 2 of the engine pause mask.",
+      "trial": "menu",
+      "to": 60,
+      "field": "gEnginePauseFlags",
+      "compare": "eq",
+      "value": 4,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ],
+      "mask": 4
+    }
+  ]
+}
