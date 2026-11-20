@@ -1,7 +1,7 @@
 #ifndef GUARD_WIRELESS_CONTROLLER_H
 #define GUARD_WIRELESS_CONTROLLER_H
 
-#include "task.h"
+#include "runtime.h"
 
 struct WirelessPeerRoster {
     u8 pending, sent, slots, count;
@@ -35,7 +35,7 @@ enum WirelessInputFlags {
 /* The RFU controller task. Field names inferred from the session handlers
  * are tentative. The Engine tag is also used by the singleton declaration. */
 typedef struct Engine {
-    struct Task task;
+    struct RuntimeTask task;
     u8 managerReady, connectedSlots, previousConnectedSlots, refreshRequested;
     u8 operationStage, shutdownRequested, unknown1E;
     s8 localPeerIndex;

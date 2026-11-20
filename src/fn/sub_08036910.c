@@ -1,73 +1,34 @@
 #include "engine.h"
-#include "global.h"
-struct Engine {
-    struct Task task;
-    u8 pad18, bits, pad1a, entered, flag, pad1d, state, flag1f, mode, index;
-    u16 mask;
-    s8 scroll;
-    u8 selected, allowed, count, ids[8], active, flag31, pending, flag33, phase, flag35, flag36,
-        pad37;
-    u16 operation, value;
-    u8 flag3c, flag3d, flag3e, flag3f;
-    u16 timer;
-    u8 flag42, flag43;
-    u32 ticks;
-    void *pointer;
-    u8 pad4c[0x58];
-    u32 number;
-    u8 work[16];
-    u8 padb8[0x34];
-    u16 flags, backup, history[5];
-    u8 changed, padfb[5];
-    u16 diff[5];
-    u8 pad10a[2];
-    u32 key;
-    u16 input[5];
-    u8 pad11a[0x1A];
-    u8 scratch[64];
-    u8 message[0x204];
-    void *head, *tail;
-};
-#include "rfu_compat.h"
+#include "wireless_controller.h"
 #include "ram.h"
 #include "engine_globals.h"
-static inline void setOperation(struct Engine *p, int op, int zero)
-{
-    p->flag = zero;
-    p->operation = op;
-    p->ticks = zero;
-    p->pending = 1;
-}
 void Solar_PauseMeasurement(void);
-int Wireless_InitControllerFromScript(struct Engine *);
-void Heap_Free(void *);
-struct Engine *Wireless_CreateController(void)
+void Task_LinkToPriorityList(struct RuntimeTask *);
+int Wireless_InitControllerFromScript(WirelessController *);
+WirelessController *Wireless_CreateController(void)
 {
-    struct Engine **singleton = &gWirelessController;
-    struct Engine *existing = *singleton;
-    struct Engine *p;
-    int size;
+    WirelessController **singleton = &gWirelessController;
+    WirelessController *existing = *singleton;
+    WirelessController *p;
     int random;
     if (existing)
         return existing;
     Solar_PauseMeasurement();
-    size = 0x38C;
-    p = Heap_Alloc(size);
+    p = Heap_Alloc(sizeof(*p));
     if (!p)
         return 0;
-    Memory_Clear(p, size);
+    Memory_Clear(p, sizeof(*p));
     random = SunClock_GetSecond();
     {
         u32 *position = &gRandomIndex;
         u32 index = *position + 1;
-        u32 mask = 1023;
         const u16 *table;
         int term;
         const u8 *saltAddress;
-        int byteMask;
         int salt;
+        int byteMask;
         u16 *destination;
-        index &= mask;
+        index &= 0x3ff;
         *position = index;
         index <<= 1;
         table = gRandomTable;
@@ -79,7 +40,7 @@ struct Engine *Wireless_CreateController(void)
         random &= byteMask;
         random <<= 8;
         salt |= random;
-        destination = (u16 *)((u8 *)p + 0x6C);
+        destination = &p->gameId;
         *destination = salt;
     }
     if (Wireless_InitControllerFromScript(p) < 0) {
@@ -88,10 +49,10 @@ struct Engine *Wireless_CreateController(void)
     }
     {
         Task_SetCallbacks(p, 0, 0);
-        p->task.list = 1;
-        ((u8 *)p)[0x16] = 1;
+        p->task.priority = 1;
+        p->task.unk16 = 1;
         p->task.id = 0;
-        Task_LinkToPriorityList(p);
+        Task_LinkToPriorityList(&p->task);
         gClockSynced = 1;
         *singleton = p;
         return p;
