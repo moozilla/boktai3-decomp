@@ -1,4 +1,6 @@
 #include "scene_actors.h"
+#include "hit_spark_random.h"
+#include "player.h"
 
 void SceneActors_Register(struct StateActor *actor, u32 slot)
 {
@@ -58,25 +60,20 @@ int SceneActors_ApplyDamage(struct ContactCollider *contact, int kind, int amoun
     return alive;
 }
 
-int SceneActors_Initialize(struct StateActor *actor, int id, int slot, void *position,
-                           int facingArg)
+int SceneActors_Initialize(struct StateActor *actor, int id, int slot, void *position, int facing)
 {
-    int firstId = id;
-    int facing = facingArg;
     struct SceneActorVector offset;
-    u8 *dst = &actor->registrySlot;
-    int zero = 0;
-    *dst = slot;
-    SceneBody_Init(SceneActors_Body(actor), firstId, position, (u8)facing, 5, actor);
+    actor->registrySlot = slot;
+    SceneBody_Init(SceneActors_Body(actor), id, position, (u8)facing, 5, actor);
     offset.x = 0;
     offset.y = 256;
     offset.z = 0;
     SceneBody_SetPositionOffset(SceneActors_Body(actor), &offset);
     SceneActors_SetFacing(actor, facing);
     actor->savedFacing = facing;
-    actor->damageKind = zero;
-    actor->defense = zero;
-    actor->damageCallback = zero;
+    actor->damageKind = 0;
+    actor->defense = 0;
+    actor->damageCallback = NULL;
     SceneMessages_RegisterReceiver(actor->receiver2, id, 4);
     return 0;
 }
@@ -208,28 +205,19 @@ void SceneActors_StartDirectionalAnimation(struct StateActor *actor,
 }
 
 void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
-                                              struct SceneInputWidget *animation,
-                                              int resource, int sequence, int speed, int offset,
-                                              int flags)
+                                              struct SceneInputWidget *animation, int resource,
+                                              int sequence, int speed, int offset, int flags)
 {
-    int savedFlags = flags;
-    flags = savedFlags;
     {
         int direction = actor->animationFacing8;
         if (((u8)(direction - 5)) <= 2) {
-            {
-                int value = 8 - direction;
-                actor->animationOffset = value;
-            }
+            actor->animationOffset = 8 - direction;
             actor->animationMirrored = 1;
         } else {
-            u8 *dst = &actor->animationOffset;
-            int zero = 0;
-            *dst = direction;
-            actor->animationMirrored = zero;
+            actor->animationOffset = direction;
+            actor->animationMirrored = 0;
         }
     }
-    savedFlags = 0;
     {
         int selected = actor->animationOffset + sequence;
         actor->animationSequence = selected;
@@ -238,7 +226,7 @@ void SceneActors_StartEightDirectionAnimation(struct StateActor *actor,
                       (u16)flags);
     flags &= 1;
     if (!flags) {
-        actor->animationCompletions = savedFlags;
+        actor->animationCompletions = 0;
     }
     if (actor->animationMirrored) {
         animation->flags |= 4;
@@ -301,9 +289,31 @@ void SceneActors_UpdateTargetMetrics(struct StateActor *actor)
         actor->lowHealth = 0;
 }
 
+enum SceneActorEffectState { SCENE_ACTOR_REQUEST_EFFECT = 0x10, SCENE_ACTOR_DISABLE_DAMAGE = 0x40 };
+
+enum SceneActorDamageEffectFlags { SCENE_ACTOR_DAMAGE_EFFECT_ACTIVE = 1 };
+
+static inline void SceneActors_SetActionFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags |= flags;
+}
+
+static inline u32 SceneActors_TestActionFlags(const struct StateActor *actor, u32 flags)
+{
+    return flags & actor->actionFlags;
+}
+
+static inline void SceneActors_SetDamageEffectFlags(struct StateActorDamageEffect *effect,
+                                                    u32 flags, bool8 enabled)
+{
+    if (enabled)
+        effect->flags |= flags;
+    else
+        effect->flags &= ~flags;
+}
+
 void SceneActors_UpdateEffects(struct StateActor *actor)
 {
-    struct StateActorDamageEffect *damage;
     if (actor->health > 0)
         gGameState->unk618 = actor->health;
     else
@@ -314,29 +324,17 @@ void SceneActors_UpdateEffects(struct StateActor *actor)
     }
     if (actor->ambientParticle && (actor->effectTimer & 3) == 0)
         SceneActors_SpawnAmbientParticle(actor);
-    if (actor->intermittentEffect && (actor->effectTimer & 3) <= 1) {
-        u32 effectFlag = 0x10;
-        actor->actionFlags = effectFlag | actor->actionFlags;
-    }
-    if (actor->continuousEffect) {
-        u32 effectFlag = 0x10;
-        actor->actionFlags = effectFlag | actor->actionFlags;
-    }
-    {
-        u32 disableDamage = 0x40;
-        if (disableDamage & actor->actionFlags) {
-            damage = &actor->damageEffect;
-            {
-                u32 clear = ~1;
-                damage->flags = clear & damage->flags;
-            }
-        } else {
-            damage = &actor->damageEffect;
-            {
-                u32 set = 1;
-                damage->flags = set | damage->flags;
-            }
-        }
+    if (actor->intermittentEffect && (actor->effectTimer & 3) <= 1)
+        SceneActors_SetActionFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
+    if (actor->continuousEffect)
+        SceneActors_SetActionFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
+
+    if (SceneActors_TestActionFlags(actor, SCENE_ACTOR_DISABLE_DAMAGE)) {
+        SceneActors_SetDamageEffectFlags(&actor->damageEffect, SCENE_ACTOR_DAMAGE_EFFECT_ACTIVE,
+                                         FALSE);
+    } else {
+        SceneActors_SetDamageEffectFlags(&actor->damageEffect, SCENE_ACTOR_DAMAGE_EFFECT_ACTIVE,
+                                         TRUE);
     }
 }
 
@@ -356,76 +354,39 @@ void SceneActors_SetEventScripts(struct StateActor *actor, u32 first, u32 second
     actor->secondEventScript = second;
 }
 
-void SceneActors_RunFirstEventScript(struct StateActor *actor, s16 *position)
+static inline u32 SceneActors_TestPlayerStatus(u32 flags)
+{
+    return flags & gPlayerSlotStatus[0];
+}
+
+static inline void SceneActors_RunEventScript(struct StateActor *actor, s16 *position, u32 script)
 {
     int args[8];
     struct ScriptUtilityArguments call;
-    u32 script = actor->firstEventScript;
     if (script) {
         int id = script;
-        int mask = 4;
-        if (!(gUnk_02000560 & mask)) {
-            int *in, *out, i;
-            struct ScriptUtilityArguments *packet;
+        if (!SceneActors_TestPlayerStatus(4)) {
+            int i;
             args[0] = position[0];
             args[1] = position[1];
             args[2] = position[2];
-            packet = &call;
-            in = actor->eventArguments;
-            out = args + 3;
-            i = 3;
-            do {
-                *out++ = *in++;
-                i--;
-            } while (i >= 0);
-            {
-                u32 mask = 0xffff0000;
-                u32 header;
-                header = *(u32 *)&call;
-                header &= mask;
-                header |= 7;
-                *(u32 *)&call = header;
-            }
-            packet->values = args;
-            Script_Call(id, packet);
+            for (i = 0; i < 4; i++)
+                args[i + 3] = actor->eventArguments[i];
+            call.count = 7;
+            call.values = args;
+            Script_Call(id, &call);
         }
     }
 }
 
+void SceneActors_RunFirstEventScript(struct StateActor *actor, s16 *position)
+{
+    SceneActors_RunEventScript(actor, position, actor->firstEventScript);
+}
+
 void SceneActors_RunSecondEventScript(struct StateActor *actor, s16 *position)
 {
-    int args[8];
-    struct ScriptUtilityArguments call;
-    u32 script = actor->secondEventScript;
-    if (script) {
-        int id = script;
-        int mask = 4;
-        if (!(gUnk_02000560 & mask)) {
-            int *in, *out, i;
-            struct ScriptUtilityArguments *packet;
-            args[0] = position[0];
-            args[1] = position[1];
-            args[2] = position[2];
-            packet = &call;
-            in = actor->eventArguments;
-            out = args + 3;
-            i = 3;
-            do {
-                *out++ = *in++;
-                i--;
-            } while (i >= 0);
-            {
-                u32 mask = 0xffff0000;
-                u32 header;
-                header = *(u32 *)&call;
-                header &= mask;
-                header |= 7;
-                *(u32 *)&call = header;
-            }
-            packet->values = args;
-            Script_Call(id, packet);
-        }
-    }
+    SceneActors_RunEventScript(actor, position, actor->secondEventScript);
 }
 
 int SceneActors_CopyAvailablePosition(int *out)
@@ -476,23 +437,19 @@ void SceneActors_ConfigureEffect(struct StateActor *actor, unsigned mode, int fi
             Sound_PlaySong(0x1ed);
             break;
         case 4: {
-            u16 *out = &actor->effectParameter;
-            int zero = 0;
-            *out = first;
+            actor->effectParameter = first;
             actor->effectDuration = second;
             actor->attachmentEffect = ActorAttachment_UpdateFromDescriptor(
-                actor->attachmentEffect, (struct SceneActorBody *)&actor->bodyId, 1, zero, out,
-                actor->effectDuration, zero, 100);
+                actor->attachmentEffect, (struct SceneActorBody *)&actor->bodyId, 1, 0,
+                &actor->effectParameter, actor->effectDuration, 0, 100);
             break;
         }
         case 5: {
-            u16 *out = &actor->effectParameter;
-            int zero = 0;
-            *out = first;
+            actor->effectParameter = first;
             actor->effectDuration = second;
             actor->attachmentEffect = ActorAttachment_UpdateFromDescriptor(
-                actor->attachmentEffect, (struct SceneActorBody *)&actor->bodyId, 3, zero, out,
-                actor->effectDuration, zero, 100);
+                actor->attachmentEffect, (struct SceneActorBody *)&actor->bodyId, 3, 0,
+                &actor->effectParameter, actor->effectDuration, 0, 100);
             break;
         }
         case 6:
@@ -513,31 +470,31 @@ void SceneActors_ConfigureEffect(struct StateActor *actor, unsigned mode, int fi
 
 void SceneActors_SpawnAmbientParticle(struct StateActor *actor)
 {
-    s32 horizontalMask;
     struct SceneActorVector position;
-    int r;
-    int cursor;
-    u16 *table = gRandomTable;
-    *(&cursor) = gRandomIndex + 1;
+    int horizontalSample;
+    u16 cursor;
+    u16 heightSample;
+    const u16 *table = gRandomTable;
+    cursor = gRandomIndex + 1;
     cursor &= 0x3ff;
-    r = table[cursor] & (horizontalMask = 0x7f);
-    position.x = actor->target.x + r;
-    cursor = (cursor + 1) & 0x3ff;
+    horizontalSample = HitSpark_Sample((u32)table, cursor) & 0x7f;
+    position.x = actor->target.x + horizontalSample;
+    cursor = HitSpark_NextIndex(cursor, 0x3ff);
     gRandomIndex = cursor;
-    cursor = table[cursor];
+    heightSample = HitSpark_Sample((u32)table, cursor);
     {
         u16 *y = (u16 *)&actor->target.y;
-        cursor &= 0x1f;
+        heightSample &= 0x1f;
         {
             int height = *y;
-            cursor += height;
+            heightSample += height;
         }
-        position.y = cursor;
+        position.y = heightSample;
     }
     {
         u16 *z = (u16 *)&actor->target.z;
-        r -= 0x7f;
-        position.z = *z - r;
+        horizontalSample -= 0x7f;
+        position.z = *z - horizontalSample;
     }
     AnimatedParticles_EmitBurst(&position, 1, 0, 0x40, 12, 12, 4, 4);
 }
