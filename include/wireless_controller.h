@@ -28,6 +28,10 @@ enum WirelessOperation {
     WIRELESS_OP_REQUEST_ADAPTER_STOP = 30,
 };
 
+enum WirelessInputFlags {
+    WIRELESS_INPUT_VALID = 0x2000,
+};
+
 /* The RFU controller task. Field names inferred from the session handlers
  * are tentative. The Engine tag is also used by the singleton declaration. */
 typedef struct Engine {
@@ -71,6 +75,8 @@ typedef struct Engine {
     void *onSend, *onReceive, *onSendFailure, *onReceiveFailure;
     void *gameNameScript;
 } WirelessController;
+
+u32 WirelessController_SetLocalInput(WirelessController *, u32 input);
 
 static inline void WirelessController_SetOperation(WirelessController *controller, u16 operation)
 {
