@@ -205,16 +205,15 @@ static inline void Ghost_SelectDirectionalAnimation(struct RoomActor *actor, u32
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }
@@ -244,13 +243,8 @@ void Ghost_UpdateEnergyDrainAnimation(struct RoomActor *actor)
     s32 delta;
     u8 *elapsed;
     if (SceneActorControl_TakeFlag(&actor->field2B2)) {
-        {
-            u32 value = gPlayers[0]->facingChangeEffects;
-            u8 *p = &body->drainStart;
-            u32 zero = 0;
-            *p = value;
-            body->drainCounter = zero;
-        }
+        body->drainStart = gPlayers[0]->facingChangeEffects;
+        body->drainCounter = 0;
         ((struct ChaseActor *)actor)->base.field2C2 = 16;
     }
     Ghost_GetDirectionalFrame(actor->body.direction, &variant, &flags);
@@ -983,14 +977,6 @@ static inline void Ghost_SetColliderFlags(struct ContactCollider *c, u32 bits)
     c->flags |= bits;
 }
 
-inline static void Ghost_DisableCollider(struct ContactCollider *c)
-{
-    {
-        u8 mask = 4;
-        c->flags &= ~mask;
-    }
-}
-
 static inline u8 Ghost_TestRouteFlags(struct Ghost *route, u32 mask)
 {
     u32 flags = route->flags;
@@ -1070,7 +1056,7 @@ void Ghost_AdvanceApproachRoute(struct ChaseActor *actor)
     }
     Ghost_SubtractPosition(&delta, &actor->base.body.position, &route->points[route->index]);
     if (!Ghost_TestRouteFlags(route, 4))
-        Ghost_DisableCollider(&actor->base.colliderB);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderB, ~4);
     Ghost_EmitAfterimage(actor);
     if ((Ghost_LengthSquared(&delta)) > 1024) {
         actor->base.body.direction =
@@ -2263,14 +2249,6 @@ static inline void Ghost_SavePlayerPosition(struct ContactPosition *out, struct 
 
 /* Follow the drained player's displacement until the drain finishes. */
 
-static inline void Ghost_ClearDrainCollider(struct ContactCollider *c)
-{
-    {
-        u8 mask = 4;
-        c->flags &= ~mask;
-    }
-}
-
 static inline u16 *Ghost_BeginPlayerFollow(struct ChaseActor *actor, struct Ghost *context)
 {
     u8 taken = Ghost_TakeStateEntry(&actor->base.field2B1);
@@ -2307,7 +2285,7 @@ void Ghost_FollowDrainedPlayer(struct ChaseActor *actor)
         Sound_PlaySong(0x3CC);
         Ghost_SetBehavior(actor, 3);
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0x10);
-        Ghost_ClearDrainCollider(&actor->base.colliderA);
+        MonsterInit_MaskColliderFlags(&actor->base.colliderA, ~4);
     } else {
         ++actor->base.counter2AC;
     }
@@ -2920,9 +2898,8 @@ static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection
         }
         Ghost_SetAnimationIndex(actor, selection);
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -2930,7 +2907,7 @@ static inline void Ghost_SelectAnimation(struct ChaseActor *actor, u32 selection
                 &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile,
                 actor->base.drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }
