@@ -59,7 +59,6 @@ void Player_NotifyFirstSelectedSlot(s32, u32);
 void LinkPlayer_ResetToIdleState(struct LP *p)
 {
     s32 i;
-    u16 zero;
     u8 *q;
     if (p->actionMode == 4) {
         p->actionMode = 1;
@@ -92,9 +91,8 @@ void LinkPlayer_ResetToIdleState(struct LP *p)
     p->active = 0;
     p->unk4E1 = 0;
     p->movementVelocityLocked = 0;
-    zero = 0;
-    for (i = 1; i >= 0; i--)
-        p->scriptStatus[i] = zero;
+    for (i = 0; i < 2; i++)
+        p->scriptStatus[i] = 0;
     p->catalogSavedOption = p->actionConfig[0x14 / 2];
     if (p->actionMode != 6) {
         q = &p->unk549;
