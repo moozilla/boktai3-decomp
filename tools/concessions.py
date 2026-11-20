@@ -11,8 +11,8 @@ Scored kinds, in two groups:
   `asm("" ::: "memory")`).
 * Judgment calls: `debug-nop` (DEBUG_NOP()), `empty-loop` (`do { } while (0)`), `empty-if`
   (an `if` with nothing in its body), `single-use-macro` (a statement macro used at one site,
-  tools/statement_macros.py), `volatile` (a volatile local, including the `vu32`/`vs16`
-  family of typedefs, a `T *volatile` or a
+  tools/statement_macros.py), `volatile` (a volatile local or by-value parameter, including the
+  `vu32`/`vs16` family of typedefs, a `T *volatile` or a
   `(volatile T *)&x` cast), `alias` (an `extern ... asm("Symbol")` declaration that gives a
   function a second prototype), `cflags` (a `// CFLAGS:` line other than the default flags,
   outside src/lib) and `raw-offset` (`*(u16 *)((u8 *)p + 0x172)`: a constant byte offset where
@@ -38,6 +38,9 @@ its spelling, so each one is a question, not a verdict:
 * `dead-code`: a call, store or branch the compiler deleted as unreachable after working out a
   condition the C left open (`x < 0` on a value that came from an unsigned halfword). People do
   write dead code by accident; an arm that looks like a real gap in the algorithm can be excused.
+  One source check supplements the compiler: an assignment guarded by `(s32)x < 0` where `x` was
+  just narrowed with `(u8)` or `(u16)`, which the compiler deletes as a register copy and so
+  does not report.
 * `proved-zero`: an operation an accepted compiler transformation proved is always zero
   (`(u16)x >> 16`, `(x & 31) >> 5`); rejected speculative combinations do not count.
   These two come from the compiler, not from spelling (tools/deadcode.py; they need scope's
@@ -49,17 +52,26 @@ its spelling, so each one is a question, not a verdict:
 * `stmt-expr`: a `({ ... })` outside a macro, or an expression macro that wraps a single
   assignment in a one-pass loop before returning the assigned temporary.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
-  only holds that constant. A `goto` label or `return` operand is not a declaration.
+  only holds that constant, alone or in a grouped declaration (`u32 kind, zero;`), with or
+  without `register`. A `goto` label, a `return` operand or a struct member is not one.
 * `literal-local`: any other local that is initialized to a literal and never changed
-  (`u32 mask = 0x17;` then `if (mask & flags)`). A person does name a constant now and then, so
+  (`u32 mask = 0x17;` then `if (mask & flags)`), in any declarator of a declaration
+  (`int i = 0, limit = 8;`). Also a local whose first use is a separate literal assignment in the
+  declaration's own block (`u32 mask; ... mask = 0x17;`, reported at the assignment), and a local
+  whose only use is a literal assignment inside an expression (`x & (mask = 0x7f)`). A person
+  does name a constant now and then, so
   this is the weakest kind: write the literal where it is used when that matches, and leave
-  the rest for the owner to rule on. A loop counter or anything reassigned is not one.
+  the rest for the owner to rule on. A loop counter or anything reassigned is not one; a write to
+  a member of the same name (`p->state = 1`) or to an inner local that shadows it is not a change.
 * `addr-deref`: `*(&x)` in place of `x`.
+* `subtract-negative`: `x - -y` or `x - (-y)` in place of an addition.
+* `duplicate-branches`: the same statements in both arms of an `if`/`else`, or in every arm of a
+  `switch` that has a default. The test decides nothing.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
-* `local-union`: a union defined inside a function. Two views of one value are ordinary C; two
-  unrelated values sharing storage are not.
+* `local-union`: a union defined inside a function (not a union member of a file-scope struct).
+  Two views of one value are ordinary C; two unrelated values sharing storage are not.
 
 Warnings don't lower a score. The order of work is errors to zero, then warnings to zero, adding
 none. A warning is silenced the way a linter's is, by a `concession-ok(kind): reason` comment, and
@@ -78,7 +90,8 @@ EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatil
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
-        "placeholder-name", "volatile-view", "local-union", "dead-local-update")
+        "subtract-negative", "duplicate-branches", "placeholder-name", "volatile-view", "local-union",
+        "dead-local-update")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -100,7 +113,8 @@ _REGEX = {
     # an if with nothing in its body; one whose body is DEBUG_PRINT() (include/debug.h) is ordinary C
     "empty-if": re.compile(r"\bif\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)\s*(?:\{\s*\}|;)"),
     "volatile": re.compile(
-        r"(?<![(*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+\s+(?:const\s+)?\w+\s*[=;,\[]"
+        r"(?<![*\w])volatile\s+(?:const\s+)?(?:unsigned\s+|signed\s+|struct\s+)?\w+"
+        r"\s+(?:const\s+)?(?!(?:const|volatile|restrict)\b)\w+\s*[=;,\[)]"
         r"|\*\s*volatile\b"
         r"|\(\s*(?:volatile\s+(?:const\s+)?\w+|v[us](?:8|16|32))\s*\*\s*\)\s*&\s*(?!REG_)"),
     "goto": re.compile(r"\bgoto\b"),
@@ -113,14 +127,19 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
               r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
-_LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+# A local declaration: its first declarator follows the type; _local_declarations walks the rest.
+_DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,;\[])")
+_DECL_PUNCT = re.compile(r"[][(){},;]")
+_DECLARATOR = re.compile(r"\s*\*?\s*([A-Za-z_]\w*)\s*")
+_LITERAL_INIT = re.compile(r"=\s*" + _LITERAL + r"\s*")
+_LITERAL_ASSIGNMENT = re.compile(r"\s*=\s*" + _LITERAL + r"\s*;")
+_LITERAL_ASSIGNED = re.compile(r"\b([A-Za-z_]\w*)\s*=\s*" + _LITERAL + r"\s*[;)]")
+_LOCAL_CHANGE = (r"\b{0}\s*(?:[-+*/|&^%]|<<|>>)?=(?!=)|\b{0}\s*(?:\+\+|--)|(?:\+\+|--)\s*{0}\b"
+                 r"|(?:[(,=?:]|\breturn)\s*&\s*{0}\b")
+_MEMBER_ACCESS = re.compile(r"(?:->|\.)\s*[A-Za-z_]\w*")
+_RECORD_HEAD = re.compile(r"\b(?:struct|union)\s*(?:[A-Za-z_]\w*\s*)?\{")
+_QUOTED = re.compile(r'"(?:\\.|[^"\\\n])*"' r"|'(?:\\.|[^'\\\n])*'")
 _INTEGER_SCALAR = r"[us](?:8|16|32|64)"
-_SCALAR_DECLARATOR = rf"\w+(?:\s*=\s*{_LITERAL})?"
-_SCALAR_DECLARATION_GROUP = re.compile(
-    rf"(?m)^[ \t]+(?:const[ \t]+)?{_INTEGER_SCALAR}[ \t]+"
-    rf"(?P<declarations>{_SCALAR_DECLARATOR}(?:\s*,\s*{_SCALAR_DECLARATOR})+)\s*;"
-)
-_NUMBER_DECLARATOR = re.compile(rf"{_NUMBER_NAME}(?:\s*=\s*{_LITERAL})?")
 _DEAD_LOCAL_BLOCK = re.compile(
     rf"(?m)^[ \t]*\{{\s*{_INTEGER_SCALAR}\s+(?P<name>[A-Za-z_]\w*)\s*=\s*"
     rf"(?:\(\s*{_INTEGER_SCALAR}\s*\)\s*)?(?:[A-Za-z_]\w*|{_LITERAL})\s*;"
@@ -128,15 +147,21 @@ _DEAD_LOCAL_BLOCK = re.compile(
 )
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
-    "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
     "addr-deref": re.compile(r"\*\s*\(\s*&\s*\w+\s*\)"),
+    "subtract-negative": re.compile(r"(?:[)\]]|\b(?!(?:return|case|sizeof|_Alignof)\b)\w+)"
+                                    r"\s*-(?:\s+|\s*\(\s*)-\s*(?=[A-Za-z_])"),
     "placeholder-name": re.compile(r"(?m)^[ \t]+[\w \t]*?\w[ \t]+\**\s*(?:new_var\w*|dummy\w*|fake\w*)\s*[=;,\[]"),
     "volatile-view": re.compile(
         r"\(\s*(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\)\s*(?!&|REG_|0x0?4[0-9A-Fa-f]{6}\b)[\w(*]"
         r"|(?m:^[ \t]+(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\w+\s*[=;])"),
-    "local-union": re.compile(r"(?m)^[ \t]+union\b[^;{}()]*\{"),
 }
+_LOCAL_UNION = re.compile(r"(?m)^[ \t]*union\b[^;{}()]*\{")
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
+_IF_ELSE = re.compile(r"\bif\s*\([^{};]*?\)\s*\{(?P<yes>[^{}]*)\}"
+                      r"\s*else\s*\{(?P<no>[^{}]*)\}")
+_SWITCH = re.compile(r"\bswitch\s*\([^{};]*?\)\s*\{(?P<body>[^{}]*)\}")
+_SWITCH_LABEL = re.compile(r"\b(?:case\s+[^:;\n]+|(?P<default>default))\s*:")
+_SWITCH_EXIT = re.compile(r"(?:^|;)\s*(?:break|return\b[^;]*|goto\s+\w+)\s*;\s*$")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
 _WRAPPED_EXPR_MACRO = re.compile(
     r"[ \t]*#[ \t]*define[ \t]+\w+\([^()\n]*\)\s*\(\s*\{"
@@ -149,9 +174,20 @@ _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
 _COMMENTS = re.compile(r'"(?:\\.|[^"\\\n])*"|/\*.*?\*/|//[^\n]*', re.S)
 _VOLATILE_TYPEDEF = re.compile(
-    r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?[A-Za-z_]\w*\s*[=;,\[]")
+    r"\bv(?:[us](?:8|16|32|64)|bool(?:8|16|32))\s+(?:const\s+)?"
+    r"(?!(?:const|volatile|restrict)\b)[A-Za-z_]\w*\s*[=;,\[)]")
 _FUNCTION_BODY = re.compile(r"[A-Za-z_][\w\s\*]*?\b\w+\s*\([^;{]*\)\s*\{", re.S)
 _FUNCTION_MACRO = re.compile(r"#\s*define\s+\w+\(")
+# A value narrowed to unsigned just before `(s32)x < 0` can't be negative, so the guarded
+# assignment is dead. Only the simple case: a change to the local or arithmetic after the cast
+# could invalidate the range.
+_NARROW_NEGATIVE_ASSIGNMENT = re.compile(
+    r"(?m)^[ \t]+(?:const\s+)?[us]32\s+(?P<local>[A-Za-z_]\w*)\s*=\s*"
+    r"\(\s*u(?:8|16)\s*\)\s*(?:\(\s*[us]32\s*\)\s*)?"
+    r"[A-Za-z_]\w*(?:\s*(?:->|\.)\s*[A-Za-z_]\w*)*\s*;\s*"
+    r"if\s*\(\s*\(\s*s32\s*\)\s*(?P=local)\s*<\s*0\s*\)\s*"
+    r"(?:\{\s*)?(?P<assignment>[A-Za-z_]\w*\s*=(?!=)[^;{}]+;)"
+)
 
 
 @dataclass(frozen=True)
@@ -205,26 +241,172 @@ def asm_kind(rest: str) -> str:
     return "barrier"
 
 
-def _volatile_typedef_locals(code: str):
-    """Offsets of scalar volatile-typedef declarations in functions and macros.
+def _blank(m) -> str:
+    return re.sub(r"[^\n]", " ", m.group(0))
 
-    Top-level register layouts, globals and typedefs are not automatic locals.
-    Pointer declarations are intentionally excluded, just as for volatile T *reg.
-    """
-    if not _VOLATILE_TYPEDEF.search(code):
-        return
+
+def _function_items(code: str, *, include_macros=False):
+    """(offset, text) of each function definition in CODE, and of each function-like macro on request."""
     from merge_unit import items
 
     offset = 0
     for item in items(code):
         start = code.find(item, offset)
         offset = start + len(item)
-        if not (_FUNCTION_BODY.match(item.lstrip()) or _FUNCTION_MACRO.match(item.lstrip())):
-            continue
+        declaration = item.lstrip()
+        if _FUNCTION_BODY.match(declaration) or (include_macros and _FUNCTION_MACRO.match(declaration)):
+            yield start, item
+
+
+def _volatile_typedef_locals(code: str):
+    """Offsets of scalar volatile-typedef declarations (locals and by-value parameters) in
+    functions and macros.
+
+    Top-level register layouts, globals and typedefs are not automatic locals.
+    Pointer declarations are intentionally excluded, just as for volatile T *reg.
+    """
+    if not _VOLATILE_TYPEDEF.search(code):
+        return
+    for start, item in _function_items(code, include_macros=True):
         # String contents are data even when they spell a declaration.
-        declarations = _COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m[0]), item)
+        declarations = _COMMENTS.sub(_blank, item)
         for match in _VOLATILE_TYPEDEF.finditer(declarations):
             yield start + match.start()
+
+
+def _scope_end(code: str, start: int) -> int:
+    """Offset of the `}` that closes the block START is in (len(CODE) when there is none)."""
+    depth = 0
+    for token in _DECL_PUNCT.finditer(code, start):
+        if token[0] == "{":
+            depth += 1
+        elif token[0] == "}":
+            if not depth:
+                return token.start()
+            depth -= 1
+    return len(code)
+
+
+def _record_bodies(code: str):
+    """(start, end) of each struct or union body: what is declared there is a member, not a local."""
+    for head in _RECORD_HEAD.finditer(code):
+        end = _scope_end(code, head.end())
+        if end < len(code):
+            yield head.end(), end
+
+
+def _local_declarations(code: str):
+    """Each indented declaration as [(name, offset, end, init), ...], one entry per declarator
+    (`u32 a = 1, b, c = f(x, y);` has three). END is the offset after the declarator's `,` or `;`.
+    INIT is None without an initializer, True for an integer literal, False for anything else.
+    Commas inside calls, subscripts and braces do not start a declarator."""
+    for declaration in _DECL_START.finditer(code):
+        start = declaration.start("first")
+        depth, found = 0, []
+        for token in _DECL_PUNCT.finditer(code, start):
+            char = token[0]
+            if char in "([{":
+                depth += 1
+            elif char in ")]}":
+                if not depth:
+                    break  # a parameter list or an expression, not a declaration
+                depth -= 1
+            elif not depth:
+                item = _DECLARATOR.match(code, start, token.start())
+                if not item:
+                    break
+                init = None if item.end() == token.start() else \
+                    bool(_LITERAL_INIT.fullmatch(code, item.end(), token.start()))
+                found.append((item[1], item.start(1), token.end(), init))
+                if char == ";":
+                    yield found
+                    break
+                start = token.end()
+
+
+def _constant_locals(code: str):
+    """(offset, kind) for const-local and literal-local in CODE (macros and strings blanked)."""
+    # A write to actor->state or sprite.state cannot modify a local named state.
+    masked = _MEMBER_ACCESS.sub(lambda m: "@" * len(m[0]), code)
+    declarators = [d for declaration in _local_declarations(code) for d in declaration]
+    bindings: dict[str, list[int]] = {}
+    for name, pos, _, _ in declarators:
+        bindings.setdefault(name, []).append(pos)
+    assigned = {m[1] for m in _LITERAL_ASSIGNED.finditer(masked)}
+    records = None
+    for name, pos, end, init in declarators:
+        if init is False:
+            continue
+        if re.fullmatch(_NUMBER_NAME, name):
+            if records is None:
+                records = list(_record_bodies(code))
+            if not any(start <= pos < stop for start, stop in records):
+                yield pos, "const-local"
+            continue
+        if init is None and name not in assigned:
+            continue
+        # The rest of the declaration's block, less the blocks of inner locals of the same name:
+        # a write before an inner binding or after its block still changes this one.
+        limit = _scope_end(code, end)
+        body = masked[end:limit]
+        for shadow in bindings[name]:
+            if end <= shadow < limit:
+                stop = _scope_end(code, shadow)
+                body = body[:shadow - end] + " " * (stop - shadow) + body[stop - end:]
+        n = re.escape(name)
+        if init is None:
+            first = re.search(rf"\b{n}\b", body)
+            if not first:
+                continue
+            before = body[:first.start()].rstrip()
+            assignment = _LITERAL_ASSIGNMENT.match(body, first.end())
+            # Only a statement of the declaration's own block counts as its first assignment: a
+            # nested, conditional or labeled write, or one a goto can skip, depends on control flow.
+            if assignment and before.count("{") == before.count("}") and before[-1:] in ("", ";", "}") \
+                    and not re.search(r"\bgoto\b", before):
+                pos = end + first.start()
+                body = body[assignment.end():]
+            else:
+                # `sample & (mask = 0x7f)` where mask is never read: the local only carries the literal
+                inside = re.search(rf"\(\s*({n})\s*=\s*{_LITERAL}\s*\)", body)
+                if inside and len(re.findall(rf"\b{n}\b", body)) == 1:
+                    yield end + inside.start(1), "literal-local"
+                continue
+        if not re.search(_LOCAL_CHANGE.format(n), body):
+            yield pos, "literal-local"
+
+
+def _statements(source: str, start: int, end: int) -> str:
+    """SOURCE[start:end] with spacing normalized, except inside quotes, for comparing two arms."""
+    out, last = [], start
+    for quoted in _QUOTED.finditer(source, start, end):
+        out += [re.sub(r"\s+", "", re.sub(r"\b\s+\b", "\0", source[last:quoted.start()])), quoted[0]]
+        last = quoted.end()
+    out.append(re.sub(r"\s+", "", re.sub(r"\b\s+\b", "\0", source[last:end])))
+    return "".join(out).replace("\0", " ")
+
+
+def _duplicate_branches(code: str, source: str):
+    """Offsets of an if/else or a switch whose arms all hold the same statements. CODE is SOURCE
+    with quoted text blanked: the structure comes from CODE, the comparison from SOURCE, so
+    arms that differ only in a string are different."""
+    for match in _IF_ELSE.finditer(code):
+        yes = _statements(source, *match.span("yes"))
+        if yes and yes == _statements(source, *match.span("no")):
+            yield match.start()
+    for match in _SWITCH.finditer(code):
+        body_start, body_end = match.span("body")
+        labels = list(_SWITCH_LABEL.finditer(code, body_start, body_end))
+        if not any(label["default"] for label in labels):
+            continue
+        ends = [label.start() for label in labels[1:]] + [body_end]
+        arms = [_statements(source, label.end(), end) for label, end in zip(labels, ends)]
+        if not arms[-1]:
+            continue
+        # Consecutive labels without statements already share a single arm.
+        arms = [arm for arm in arms if arm]
+        if len(arms) > 1 and _SWITCH_EXIT.search(arms[0]) and all(arm == arms[0] for arm in arms[1:]):
+            yield match.start()
 
 
 def _warn_sites(code: str):
@@ -232,42 +414,24 @@ def _warn_sites(code: str):
     for macro in _MACRO_DEF.finditer(code):
         if _WRAPPED_EXPR_MACRO.fullmatch(macro.group(0).replace("\\\n", " ")):
             yield macro.start(), "stmt-expr"
-    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
+    source = _MACRO_DEF.sub(_blank, code)  # otherwise a macro's body is its own business
+    code = _QUOTED.sub(_blank, source)  # and quoted text is data
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
-    for m in _SCALAR_DECLARATION_GROUP.finditer(code):
-        for declaration in m["declarations"].split(","):
-            if _NUMBER_DECLARATOR.fullmatch(declaration.strip()):
-                yield m.start(), "const-local"
-                break
+    if _LOCAL_UNION.search(code):
+        for start, item in _function_items(code):
+            for m in _LOCAL_UNION.finditer(item):
+                yield start + m.start(), "local-union"
     for m in _DEAD_LOCAL_BLOCK.finditer(code):
         updates = m["updates"]
         name = re.escape(m["name"])
         operators = re.sub(rf"(?<!\w)(?:{name}|{_LITERAL})(?!\w)", "", updates)
         if re.fullmatch(r"[\s()+\-*/%&|^~<>=!;]+", operators):
             yield m.start("updates") + len(updates) - len(updates.lstrip()), "dead-local-update"
-    for m in _LITERAL_LOCAL.finditer(code):
-        name = m.group(1)
-        if re.fullmatch(_NUMBER_NAME, name):
-            continue  # const-local has it
-        # the rest of the block the declaration is in
-        depth, i = 0, m.end()
-        while i < len(code):
-            if code[i] == "{":
-                depth += 1
-            elif code[i] == "}":
-                if depth == 0:
-                    break
-                depth -= 1
-            i += 1
-        n = re.escape(name)
-        scope = code[m.end():i]
-        writes = re.finditer(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), scope)
-        # Assigning p->state or record.state does not change a local named state.
-        if all(scope[:write.start()].rstrip().endswith(("->", ".")) for write in writes):
-            yield m.start(), "literal-local"
+    yield from _constant_locals(code)
+    for offset in _duplicate_branches(code, source):
+        yield offset, "duplicate-branches"
     for m in _ONCE_END.finditer(code):
         depth, i = 0, m.start()
         while i >= 0:
@@ -344,7 +508,11 @@ def cflags(text: str, path=None) -> Site | None:
 
 def compiler_sites(path, text=None) -> list[Site]:
     """The dead-code and proved-zero sites on PATH's own lines (a unit under src/), from the
-    instrumented compiler. Empty for headers and when the compiler isn't built."""
+    instrumented compiler. Empty for headers and when the compiler isn't built.
+
+    The compiler's report leaves out register-only deletions because most are incidental. An
+    assignment under a guard that an explicit narrowing makes impossible is recovered from the
+    source (_NARROW_NEGATIVE_ASSIGNMENT)."""
     import deadcode
     rel = str(path).replace("\\", "/")
     if not rel.endswith(".c") or is_library(rel) or not deadcode.available():
@@ -353,6 +521,9 @@ def compiler_sites(path, text=None) -> list[Site]:
         text = open(os.path.join(deadcode.ROOT, rel), errors="replace").read()
     ok = allows(text)
     seen = {(line, kind) for kind, file, line, _, _ in deadcode.unit(rel) if file == rel}
+    code = strip(text)
+    for guard in _NARROW_NEGATIVE_ASSIGNMENT.finditer(code):
+        seen.add((_line(code, guard.start("assignment")), "dead-code"))
     return [Site(line, kind, kind in ok.get(line, {})) for line, kind in sorted(seen)]
 
 

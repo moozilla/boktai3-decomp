@@ -3,6 +3,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -59,6 +60,13 @@ class Kinds(unittest.TestCase):
                                 f"volatile {alias} zero = 0;"):
                 with self.subTest(declaration=declaration):
                     self.assertEqual(kinds(f"void f(void) {{ {declaration} }}"), ["volatile"])
+
+    def test_volatile_value_parameters(self):
+        self.assertEqual(kinds("void f(volatile int value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(u8 *out, volatile s32 value) { use(out, value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(vu16 value) { use(value); }"), ["volatile"])
+        self.assertEqual(kinds("void f(volatile u16 *reg) { use(*reg); }"), [])
+        self.assertEqual(kinds("int f(int value) { return (volatile u32 const)value; }"), [])
 
     def test_volatile_typedef_hardware_and_noncode(self):
         source = '''typedef vu32 HardwareWord;
@@ -204,6 +212,80 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
 
+    def test_expression_macro_with_one_wrapped_assignment(self):
+        macro = " \\\n".join((
+            "#define SAMPLE(table, i) ({",
+            "    const u16 *sample;",
+            "    do { sample = &(table)[i]; } while (0);",
+            "    sample;",
+            "})",
+        )) + "\n"
+        text = "\n" + macro + "void f(void) {\n    use(SAMPLE(table, 1), SAMPLE(table, 2));\n}\n"
+        self.assertEqual(c.warnings(c.sites(text)), [c.Site(2, "stmt-expr")])
+        # An ordinary expression macro can capture an argument for repeated reads.
+        capture = "#define SQUARE(x) ({ int value = (x); value * value; })\n"
+        self.assertEqual(warns(capture), [])
+        # A loop with additional statements may do work beyond assigning the result.
+        checked = macro.replace("sample = &(table)[i];", "checkIndex(i); sample = &(table)[i];")
+        self.assertEqual(warns(checked), [])
+
+    def test_subtracting_a_negated_variable(self):
+        for expression in ("rows[z] - -x", "rows[z] - (-x)"):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"),
+                                 ["subtract-negative"])
+        for expression in ("x - -1", "x-- - y", "x + y", "-(-value >> shift)", 'g("x - -y")'):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"), [])
+
+    def test_duplicate_branches_preserve_literal_differences(self):
+        text = """void f(u32 flag) {
+    if (flag) {
+        use("yes");
+    } else {
+        use("yes");
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace('} else {\n        use("yes");', '} else {\n        use("no");')), [])
+        self.assertEqual(warns(text.replace('} else {', '} else if (flag > 1) {')), [])
+
+    def test_duplicate_switch_arms_require_a_default(self):
+        text = """void f(int mode) {
+    switch (mode) {
+        case 0:
+            load(3);
+            break;
+        default:
+            load(3);
+            break;
+    }
+}
+"""
+        self.assertEqual(warns(text), ["duplicate-branches"])
+        self.assertEqual(warns(text.replace("default:", "case 1:")), [])
+        self.assertEqual(warns(text.replace("case 0:\n            load(3);\n            break;", "case 0:")), [])
+        self.assertEqual(warns(text.replace("            break;\n", "")), [])
+
+    def test_duplicate_branches_match_the_same_field_update(self):
+        # spacing and comments do not make two arms different
+        source = """void f(struct Actor *p, int tick, u32 mask)
+{
+    if (tick) {
+        p->flags |= mask;
+    } else {
+        p->flags /* same value */ |= mask;
+    }
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("duplicate-branches",)), [c.Site(3, "duplicate-branches")])
+        self.assertEqual(warns(source.replace("flags /* same value */", "effectFlags")), [])
+        self.assertEqual(warns(source.replace("/* same value */ |= mask", "&= mask")), [])
+        # a condition with a side effect still decides nothing between two equal arms
+        self.assertEqual(warns(source.replace("if (tick)", "if (AdvanceTimer())")), ["duplicate-branches"])
+        self.assertEqual(warns('Print("if (tick) { p->flags |= mask; } else { p->flags |= mask; }");'), [])
+
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
             with self.subTest(statement=statement):
@@ -290,6 +372,78 @@ void clear(void) {
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_register_storage_does_not_hide_constant_locals(self):
+        source = ("void f(void) {\n    register u32 zero;\n    const register u32 mask = 4;\n"
+                  "    register int index = 0;\n    while (index < 4)\n        g(index++);\n"
+                  "    zero = 0;\n    g(zero, mask);\n}\n")
+        self.assertEqual(warns(source), ["const-local", "literal-local"])
+
+    def test_literal_local_with_separate_assignment(self):
+        source = """void f(void)
+{
+    int layer;
+    Prepare();
+    layer = 0;
+    Draw(layer, layer);
+}
+"""
+        # reported where the literal is
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(5, "literal-local")])
+
+    def test_separate_literal_assignment_can_change_or_be_conditional(self):
+        for body in (
+            "    layer = 0;\n    layer++;\n    Draw(layer);\n",
+            "    layer = 0;\n    Read(&layer);\n    Draw(layer);\n",
+            "    if (visible)\n        layer = 0;\n",
+            "    if (visible) {\n        layer = 0;\n        Draw(layer);\n    }\n",
+            "    if (visible)\n        layer = 1;\n    else\n        layer = 0;\n    Draw(layer);\n",
+            "    goto draw;\n    layer = 0;\ndraw:\n    Draw(layer);\n",
+        ):
+            with self.subTest(body=body):
+                source = "void f(int visible) {\n    int layer;\n" + body + "}\n"
+                self.assertEqual(c.sites(source, kinds=("literal-local",)), [])
+        # an inner local of the same name is its own local: the outer one is not reported
+        source = ("void f(int visible) {\n    int layer;\n    {\n        int layer;\n        layer = 0;\n"
+                  "        Draw(layer);\n    }\n    Draw(layer);\n}\n")
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(5, "literal-local")])
+
+    def test_literal_local_catches_a_separate_assignment(self):
+        text = """void f(void) {
+    u32 blueMask;
+    g("blueMask }");
+    blueMask = 0x7C00;
+    h(blueMask);
+}
+"""
+        self.assertEqual(
+            [site.line for site in c.sites(text) if site.kind == "literal-local"], [4]
+        )
+
+    def test_literal_local_ignores_mutable_or_conditional_assignments(self):
+        for body in (
+            "    mask = 0x7C00;\n    mask &= a;\n    g(mask);\n",
+            "    mask = 0x7C00;\n    h(&mask);\n    g(mask);\n",
+            "    if (a)\n        mask = 0x7C00;\n    else\n        mask = a;\n    g(mask);\n",
+            "    if (a) {\n        u32 mask = a;\n        g(mask);\n    }\n    mask = a;\n    g(mask);\n",
+            "    h(&mask);\n    mask = 0x7C00;\n    g(mask);\n",
+        ):
+            with self.subTest(body=body):
+                self.assertEqual(warns("void f(u32 a) {\n    u32 mask;\n" + body + "}\n"), [])
+
+    def test_literal_assignment_expression_requires_an_unread_local(self):
+        source = """u32 f(u32 sample)
+{
+    u32 horizontalMask;
+    u32 spread = sample & (horizontalMask = 0x7f);
+    return spread;
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(4, "literal-local")])
+        self.assertEqual(warns(source.replace("return spread;", "return spread + horizontalMask;")), [])
+        self.assertEqual(warns(source.replace("    u32 horizontalMask;\n", "extern u32 horizontalMask;\n")), [])
+        self.assertEqual(warns(source.replace("sample & (horizontalMask = 0x7f)",
+                                              'Lookup("(horizontalMask = 0x7f)")')), [])
+
     def test_same_named_member_does_not_change_literal_local(self):
         for store in ("p->state = state;", "record. state += state;", "p-> state++;"):
             with self.subTest(store=store):
@@ -359,6 +513,29 @@ class Compiler(unittest.TestCase):
 
     def test_unreachable_arm_on_a_narrow_value(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gHalf;\n    if ((s32)raw < 0) {\n        g(raw);\n        return;\n    }\n    g(1);\n}\n"), ["dead-code"])
+
+    def test_explicit_narrow_guard_recovers_a_dead_register_assignment(self):
+        path = "src/sample.c"
+        body = ("void f(void *resource) {\n"
+                "    u32 raw = (u8)(u32)resource;\n"
+                "    if ((s32)raw < 0)\n"
+                "        resource = 0;\n"
+                "}\n")
+        compiler_reports = ([], [("dead-code", path, 4, "f", "store")])
+        for reports in compiler_reports:
+            with self.subTest(reports=reports), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=reports):
+                self.assertEqual(c.compiler_sites(path, body), [c.Site(4, "dead-code")])
+
+    def test_narrow_guard_requires_the_value_to_stay_bounded(self):
+        path = "src/sample.c"
+        for setup in ("    u32 raw = (s8)value;",
+                      "    u32 raw = (u8)value + delta;",
+                      "    u32 raw = (u8)value;\n    raw = delta;"):
+            with self.subTest(setup=setup), patch("deadcode.available", return_value=True), \
+                    patch("deadcode.unit", return_value=[]):
+                body = f"void f(void) {{\n{setup}\n    if ((s32)raw < 0)\n        value = 0;\n}}\n"
+                self.assertEqual(c.compiler_sites(path, body), [])
 
     def test_respelling_the_guard_does_not_hide_it(self):
         self.assertEqual(self.kinds_of("void f(void) {\n    u32 raw = gByte;\n    if (raw & 0x100) {\n        gWord = raw;\n    }\n    g(1);\n}\n"), ["dead-code", "proved-zero"])
