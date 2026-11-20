@@ -1,9 +1,11 @@
 #ifndef GUARD_WIRELESS_TRADE_MENU_H
 #define GUARD_WIRELESS_TRADE_MENU_H
 
-#include "task.h"
+#include "runtime.h"
 
 struct WirelessGameDisplay;
+
+enum { WIRELESS_ROUND_FRAMES = 720 };
 
 enum WirelessGameMenuState {
     WIRELESS_MENU_IDLE = 0,
@@ -42,7 +44,7 @@ struct WirelessGamePeerStats {
 /* Fields used by the trade menu, packet callbacks and wireless game display.
  * The meanings of the entry and request latches are tentative. */
 struct WirelessGameExchange {
-    struct Task task;
+    struct RuntimeTask task;
     u32 unk18;
     u16 roundTimeLeft, roundCount;
     u32 exchangeFlags, timer;
@@ -66,7 +68,6 @@ struct WirelessGameExchange {
     u8 unkED[3];
     u32 selectionRequested;
     u8 peerEntries[2][16];
-    u8 unk114[8];
 };
 
 struct WirelessGameExchange *WirelessExchange_Get(void);
