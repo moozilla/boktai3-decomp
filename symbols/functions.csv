@@ -5606,6 +5606,7 @@ addr,name,mode,confidence,source,notes
 08145B18,Player_UpdateDefeatSlide,thumb,low,src-alias,
 08145DA0,Player_UpdateDefeatRecoil,thumb,low,src-alias,
 081460F4,Player_UpdateDeathSequence,thumb,low,src-alias,Sequences animation sounds screen transition and health clearing before setting completion; death interpretation is tentative
+081462DC,Player_UpdateTimedScreenTransition,thumb,low,src-alias,Advances timed animation phases and requests the screen transition.
 08146478,Player_UpdateTimedCuePhase,thumb,low,src-alias,
 08146574,Player_UpdateInputCadenceCue,thumb,low,src-alias,
 08146870,Player_UpdateBriefAction,thumb,low,src-alias,

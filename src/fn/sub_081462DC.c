@@ -3,7 +3,6 @@
 #include "engine.h"
 
 // confidence=low: timed animation and screen-transition sequence; gameplay trigger is unknown.
-#define Player_UpdateTimedScreenTransition sub_081462DC
 #define B(n)                               (*(u8 *)(p + (n)))
 #define H(n)                               (*(u16 *)(p + (n)))
 void Player_AddControlFlags(void *, u32);
