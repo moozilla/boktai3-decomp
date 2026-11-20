@@ -537,16 +537,21 @@ static inline u8 Unavailable(struct ChaseActor *a)
     return 0;
 }
 
+static inline void Golem_MarkContactPlacement(struct SceneActorChasePlacement *placement, u32 flags)
+{
+    placement->flags = flags | placement->flags;
+}
+
 void Golem_UpdateAttackProperties(struct ChaseActor *a)
 {
-    u8 *state = a->base.context;
-    u8 *group = (u8 *)&a->group.common;
+    struct GolemChargeContext *state = a->base.context;
+    struct SceneActorRegistryControlGroup *group = &a->group.common;
     if (Unavailable(a))
         return;
-    if (Flag(a, 0xA027, 0x2D4))
+    if (SceneActorChase_QueryMotionFlags(a, 0xA027))
         return;
-    if (Flag(a, 0x10, 0x2D4)) {
-        struct ContactCollider *c = (void *)((u8 *)a + 0x188);
+    if (SceneActorChase_QueryMotionFlags(a, 0x10)) {
+        struct ContactCollider *c = &a->base.colliderB;
         c->contactFlags = 0x20;
         c->flags = 0x2001;
         {
@@ -557,8 +562,8 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
             Collider_SetAttackProperties(c, power, response, 0, reaction, value);
         }
         goto active;
-    } else if (Flag(a, 0x100, 0x2D4)) {
-        s32 speed = *(s16 *)(state + 0x682);
+    } else if (SceneActorChase_QueryMotionFlags(a, 0x100)) {
+        s32 speed = state->charge.speed;
         s32 scale;
         s32 power, response;
         struct ContactCollider *c;
@@ -573,7 +578,7 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
             scale = 10;
         power = Div(a->base.attacks.first[1] * scale, 10);
         response = Div(a->base.attacks.second[1] * (scale >> 1), 10);
-        c = (void *)((u8 *)a + 0x188);
+        c = &a->base.colliderB;
         {
             u32 flags = 0x2301;
             c->flags = flags;
@@ -584,22 +589,11 @@ void Golem_UpdateAttackProperties(struct ChaseActor *a)
             u16 value = a->base.attacks.parameter[1];
             Collider_SetAttackProperties(c, power, response, 0x400, reaction, value);
         }
-        {
-            struct Group {
-                u32 a, flags;
-            };
-            struct Group *g = (void *)(group + 0x30);
-            {
-                u32 mask = 1;
-                g->flags = mask | g->flags;
-            }
-        }
-    active: {
-        u32 mask = 0x4000;
-        a->base.reactionFlags = mask | a->base.reactionFlags;
-    }
+        Golem_MarkContactPlacement(&group->placement, 1);
+    active:
+        SceneActorChase_SetReactionFlags(a, 0x4000);
     } else {
-        struct ContactCollider *c = (void *)((u8 *)a + 0x188);
+        struct ContactCollider *c = &a->base.colliderB;
         c->flags = 0x2001;
         c->contactFlags = 0x10;
         {
