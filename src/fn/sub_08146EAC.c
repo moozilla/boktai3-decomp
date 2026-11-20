@@ -1,5 +1,5 @@
 #include "contact_swarm.h"
-#include "player.h"
+#include "player_status_flags.h"
 #include "engine.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
@@ -68,10 +68,7 @@ void Player_UpdateAlternateFormCue(struct Player *p)
     }
     if (gEngineFlags & 0x1000)
         Player_AddControlFlags(p, 8);
-    {
-        u32 mask = 0x100000;
-        p->statusFlags = mask | p->statusFlags;
-    }
+    Player_AddStatusFlags(p, 0x100000);
     p->statusValue = 4000;
     if (V->done)
         Anim_SetSequence(&V->sequence, V->resource, 21, 0, 0);
