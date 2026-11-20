@@ -11,6 +11,7 @@
 #include "script_utility.h"
 #include "engine.h"
 #include "scene_actor_part_burst.h"
+#include "ghoul.h"
 #include "scene_actor_init_actor.h"
 
 void ActorShadow_Enable(void *);
@@ -571,47 +572,28 @@ void Bat_UpdateRecoilRecovery(struct ChaseActor *actor, s32 frame)
 
 // confidence=low: reacts to the context probe flag and enters behavior 15 after clearing it.
 
-void Ghoul_SelectRetreatRoutePoint(struct ChaseActor *);
-
-static inline u8 TakeEntry(struct ChaseActor *a)
+static inline u8 Bat_TestProbeFlags(struct Ghoul *context, u32 mask,
+                                    struct SceneActorChaseFlags16 **out)
 {
-    if (a->base.field2B2) {
-        a->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
-struct Bits16 {
-    s16 bits : 16;
-};
-
-static inline u8 Test(u8 *context, u32 mask, struct Bits16 **out)
-{
-    struct Bits16 *p = (void *)(context + 0x628);
-    u32 value = *(u16 *)p & mask;
+    struct SceneActorChaseFlags16 *p = (void *)&context->discFlags;
+    u32 value = p->value & mask;
     *out = p;
     if (value)
         return 1;
     return 0;
 }
 
-static inline void Clear(struct Bits16 *p, s32 mask)
-{
-    p->bits = mask & p->bits;
-}
-
 void Bat_UpdateProbeReaction(struct ChaseActor *a)
 {
-    u8 *context = a->base.context;
-    struct Bits16 *flags;
-    if (TakeEntry(a))
+    struct Ghoul *context = a->base.context;
+    struct SceneActorChaseFlags16 *flags;
+    if (SceneActorReaction_TakePrepared(a))
         return;
-    if (Test(context, 2, &flags)) {
+    if (Bat_TestProbeFlags(context, 2, &flags)) {
         if (a->base.tracking.distance > 0xFFFF)
             SceneActorAnimation_SelectDirectionalEntry(a, 0);
         Ghoul_SelectRetreatRoutePoint(a);
-        Clear(flags, ~2);
+        SceneActorChase_ClearFlagComponent(flags, 2);
         Chase_SetBehavior(a, 15);
     } else
         SceneActorAnimation_SelectDirectionalEntry(a, 1);
