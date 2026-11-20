@@ -1,3 +1,4 @@
+#include "player.h"
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #include "player_cue_sequence.h"
@@ -74,18 +75,10 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
         off270 = 0x270;
         q270 = (u16 *)((u8 *)p + off270);
         if (*q270 != 0) {
-            u32 o479 = 0x479;
-            u8 *a479;
-            a479 = (u8 *)p + o479;
-            if (*a479 != 0) {
-                u32 o47c = 0x47C;
-                u8 *a47c;
-                s16 *target;
-                s32 dx, dz;
-                a47c = (u8 *)p + o47c;
-                target = *(s16 **)a47c;
-                dx = target[0] - p->position.x;
-                dz = target[2] - p->position.z;
+            struct Player *player = (struct Player *)p;
+            if (player->terrainClampBlocked) {
+                s32 dx = player->terrainTarget->x - p->position.x;
+                s32 dz = player->terrainTarget->z - p->position.z;
                 H(0x38) = Scale3(dx);
                 H(0x3C) = Scale3(dz);
                 {
