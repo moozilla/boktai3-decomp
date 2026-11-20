@@ -1,15 +1,5 @@
 #include "actor_state_commands.h"
 
-static inline u8 ActorState_ConsumeTrigger(struct ActorState *actor)
-{
-    if (actor->triggered) {
-        actor->triggered = 0;
-        actor->pending = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneVolume_BeginPhase(struct ActorState *volume, s32 phase)
 {
     volume->requestedVariant = volume->variant;
@@ -30,8 +20,7 @@ static inline void update_facing(struct ActorState *actor, u8 *facingDirection)
     actor->facing8 = mask;
 }
 
-s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 period,
-                         s32 mode)
+s32 ActorEffect_StepTurn(struct ActorState *actor, s32 frame, s32 start, s32 period, s32 mode)
 {
     s32 elapsed = frame - start;
     s32 step = elapsed / period;
@@ -124,7 +113,7 @@ s32 ActorState_BeginDepletedState(struct ActorState *actor)
 void ActorState_UpdateDepletedState(struct ActorStateOwner *owner)
 {
     struct ActorState *actor = &owner->actor;
-    if (ActorState_ConsumeTrigger(&owner->actor)) {
+    if (ActorState_TakeEntryTrigger(&owner->actor)) {
         u32 state = 1;
         owner->actor.state = state;
     }
@@ -133,9 +122,7 @@ void ActorState_UpdateDepletedState(struct ActorStateOwner *owner)
     else if (SceneVolume_GetActivityState(&owner->actor))
         SceneVolume_BeginPhase(&owner->actor, 2);
     else if (owner->actor.timer > 60) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
@@ -153,7 +140,7 @@ void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
     struct ActorState *actor = &owner->actor;
     s32 duration;
     s32 result;
-    if (ActorState_ConsumeTrigger(actor)) {
+    if (ActorState_TakeEntryTrigger(actor)) {
         actor->animationIndex = (RandomValue() >> 8) & 3;
         if (Path_PickRandomPoint(&actor->movementTarget, actor->animationIndex) >= 0)
             actor->animationState = 3;
@@ -174,9 +161,7 @@ void ActorState_UpdateRandomAnimation(struct ActorStateOwner *owner)
     else
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, duration, duration, 0);
     if (result) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
@@ -185,11 +170,9 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *actor = &owner->actor;
     s32 result;
-    if (ActorState_ConsumeTrigger(&owner->actor)) {
+    if (ActorState_TakeEntryTrigger(&owner->actor)) {
         if (!ActorPosition_TestPath(actor, &actor->savedPosition)) {
-            owner->actor.requestedVariant = owner->actor.variant;
-            owner->actor.request = 1;
-            owner->actor.requestPhase = 0;
+            SceneVolume_RequestRestart(&owner->actor);
             owner->actor.state = 1;
             return;
         }
@@ -211,9 +194,7 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
     else
         result = ActorEffect_StepTurn(&owner->actor, owner->actor.timer, 30, 10, 0);
     if (result) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
     }
     owner->actor.timer++;
 }
@@ -221,7 +202,7 @@ void ActorState_UpdateSelectedAnimation(struct ActorStateOwner *owner)
 void ActorState_BeginReverseAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *actor = &owner->actor;
-    if (ActorState_ConsumeTrigger(&owner->actor)) {
+    if (ActorState_TakeEntryTrigger(&owner->actor)) {
         actor->animationState = 3;
         ActorImpact_FindNearbyPoint(actor, &actor->movementTarget, (actor->direction + 128) & 255);
         {
@@ -230,14 +211,10 @@ void ActorState_BeginReverseAnimation(struct ActorStateOwner *owner)
         }
     }
     if (SceneVolume_ConsumePendingEvent(actor)) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
         owner->actor.state = 1;
     } else if (owner->actor.pending) {
-        owner->actor.requestedVariant = owner->actor.variant;
-        owner->actor.request = 1;
-        owner->actor.requestPhase = 0;
+        SceneVolume_RequestRestart(&owner->actor);
         owner->actor.state = 1;
     }
 }
@@ -246,7 +223,7 @@ void ActorState_UpdateRestartableAnimation(struct ActorStateOwner *owner)
 {
     struct ActorState *actor = &owner->actor;
     u32 nextState;
-    if (ActorState_ConsumeTrigger(&owner->actor)) {
+    if (ActorState_TakeEntryTrigger(&owner->actor)) {
         actor->animationState = 3;
         ActorVariation_SelectRandomPair(actor, &actor->movementTarget);
         actor->animationPhase = 0;
