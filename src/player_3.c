@@ -1,23 +1,17 @@
+#include "game_state_flags.h"
 #include "player_3.h"
 #include "ram.h"
 #include "scene_consumable_definition.h"
 
 /* Tentative role: select an effect flag from actor and global state. */
 
-static inline u8 global_mode(void)
-{
-    u32 mask = 2;
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
 
 s32 Player_GetVisualEffectFlags(struct Player *s)
 {
     s32 result = 0;
     if (s->actionMode == 2)
         return 0;
-    if (!global_mode()) {
+    if (!GameState_TestWorldFlags(2)) {
         if (s->statusFlags & 16)
             result = 8;
     } else {
