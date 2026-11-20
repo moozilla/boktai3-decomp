@@ -211,6 +211,8 @@ def routes(handler, method):
                 handler.send(200, sweep.readback(directory))
             elif parts == ["answers.tsv"]:
                 handler.send(200, (directory / "answers.tsv").read_bytes(), "text/tab-separated-values")
+            elif parts == ["checkpoints.png"]:
+                handler.send(200, (directory / "checkpoints.png").read_bytes(), "image/png")
             else:
                 raise FileNotFoundError("No such sweep artifact")
         elif path == API + "/runs":

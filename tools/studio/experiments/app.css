@@ -162,3 +162,5 @@ code, pre { font-family: var(--mono); }
 @media (max-width: 850px) {
   .toolbar { justify-content: start; }
 }
+
+.sweep-links { display: flex; flex-wrap: wrap; gap: 8px; }

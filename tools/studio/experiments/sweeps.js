@@ -69,11 +69,14 @@ function drawSweep(report, id) {
       cells = `<td><a href="${url}">Open recorded evidence</a></td>`;
     } else {
       cells = checkpoint.checks.map(check => {
-        const {kind, index} = check.evidence;
-        const target = `${url}/${check.to}/${check.trial}/${kind}/${index}`;
+        const condition = unmetRequirement(check);
+        const evidence = condition || check;
+        const {kind, index} = evidence.evidence;
+        const target = `${url}/${evidence.to}/${evidence.trial}/${kind}/${index}`;
         return `<td><a class="sweep-verdict" href="${target}">
           <span class="claim-mark ${esc(check.state)}">${sweepMarks[check.state]}</span>
-          ${esc(check.state)}<span class="claim-math">${showValue(check.measurement)} ${esc(check.sign)} ${showValue(check.value)}</span>
+          ${esc(check.state)}<span class="claim-math">${condition
+            ? esc(describeRequirement(condition)) : showValue(check.measurement) + ' ' + esc(check.sign) + ' ' + showValue(check.value)}</span>
         </a></td>`;
       }).join('');
     }
@@ -84,6 +87,8 @@ function drawSweep(report, id) {
   const completed = checkpoints.length;
   $('sweep-progress').textContent = `${completed} of ${report.choices.length} checkpoints · ${status.message}`;
   $('sweep-export').href = sweepAPI + '/' + id + '/answers.tsv';
+  $('sweep-contact').hidden = status.state !== 'complete';
+  if (status.state === 'complete') $('sweep-contact').href = sweepAPI + '/' + id + '/checkpoints.png';
   $('sweep-ledger').innerHTML = `<table><thead><tr><th scope="col">Starting frame</th><th scope="col">Checkpoint</th>
     ${header}</tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -100,6 +105,7 @@ async function openSweep() {
   $('sweep-progress').textContent = 'Opening checkpoint results…';
   $('sweep-ledger').innerHTML = '';
   $('sweep-export').removeAttribute('href');
+  $('sweep-contact').hidden = true;
   $('artifacts').innerHTML = '';
   try {
     for (;;) {

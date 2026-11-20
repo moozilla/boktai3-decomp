@@ -159,6 +159,15 @@ async function openRun(route) {
   }
 }
 
+function unmetRequirement(check) {
+  return check.prerequisites?.find(condition => !condition.meets);
+}
+
+function describeRequirement(condition) {
+  const name = condition.field || condition.function + ' entries';
+  return `${name} · ${condition.trial}, frame ${condition.to} · wanted ${condition.sign} ${showValue(condition.value)} · observed ${showValue(condition.measurement)}`;
+}
+
 function showResult(result, route) {
   $('sweep-results').hidden = true;
   primary = result;
@@ -185,9 +194,12 @@ function showResult(result, route) {
   </article>`).join('');
   $('claims').innerHTML = (result.checks || []).map((item, i) => {
     const mark = { confirmed: '✓', contradicted: '×', unresolved: '?' }[item.state];
-    return `<button type="button" data-claim="${i}" aria-label="${esc(item.state + '. ' + item.statement)}">
+    const requirement = unmetRequirement(item);
+    const explanation = requirement ? describeRequirement(requirement) : '';
+    return `<button type="button" data-claim="${i}" aria-label="${esc(item.state + '. ' + item.statement + (explanation ? '. Requires ' + explanation : ''))}">
       <span class="claim-mark ${item.state}">${mark}</span>
-      <span>${esc(item.statement)}<span class="claim-math">${showValue(item.measurement)} ${esc(item.sign)} ${showValue(item.value)}</span></span>
+      <span>${esc(item.statement)}<span class="claim-math">${explanation
+        ? 'Requires ' + esc(explanation) : showValue(item.measurement) + ' ' + esc(item.sign) + ' ' + showValue(item.value)}</span></span>
     </button>`;
   }).join('');
   $('artifacts').innerHTML = [
@@ -425,9 +437,10 @@ function chooseFrame(index) {
 function chooseClaim(index) {
   const claim = primary.checks?.[index];
   if (!claim) return;
-  selected = { trial: primary.trials.findIndex(t => t.id === claim.trial),
-    kind: claim.evidence.kind, index: claim.evidence.index };
-  chooseFrame(primary.trials[0].snapshots.findIndex(s => s.relative === claim.to));
+  const target = unmetRequirement(claim) || claim;
+  selected = { trial: primary.trials.findIndex(t => t.id === target.trial),
+    kind: target.evidence.kind, index: target.evidence.index };
+  chooseFrame(primary.trials[0].snapshots.findIndex(s => s.relative === target.to));
 }
 
 function stopPlayback() {

@@ -47,7 +47,17 @@
       "from": 60,
       "to": 120,
       "compare": "ne",
-      "value": 0
+      "value": 0,
+      "when": [
+        {
+          "trial": "field",
+          "function": "Player_Update",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
     },
     {
       "statement": "With the menu open, Up leaves Django in place.",
@@ -56,7 +66,17 @@
       "from": 60,
       "to": 120,
       "compare": "eq",
-      "value": 0
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
     },
     {
       "statement": "The menu keeps processing input after Django's update stops.",
@@ -65,7 +85,25 @@
       "from": 60,
       "to": 120,
       "compare": "gt",
-      "value": 0
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        },
+        {
+          "trial": "menu",
+          "function": "Player_Update",
+          "from": 60,
+          "to": 120,
+          "compare": "eq",
+          "value": 0
+        }
+      ]
     },
     {
       "statement": "Django's update is skipped while the menu is open.",
@@ -74,7 +112,17 @@
       "from": 60,
       "to": 120,
       "compare": "eq",
-      "value": 0
+      "value": 0,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ]
     },
     {
       "statement": "Opening the menu sets bit 2 of the engine pause mask.",
@@ -82,7 +130,18 @@
       "to": 60,
       "field": "gEnginePauseFlags",
       "compare": "eq",
-      "value": 4
+      "value": 4,
+      "when": [
+        {
+          "trial": "menu",
+          "function": "SceneHud_UpdatePageInput",
+          "from": 0,
+          "to": 60,
+          "compare": "gt",
+          "value": 0
+        }
+      ],
+      "mask": 4
     }
   ]
 }

@@ -79,6 +79,10 @@ build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments
   `function`. The comparison uses the field delta or the number of entries
   in the half-open frame interval. Operators are `eq`, `ne`, `lt`, `le`, `gt`
   and `ge`. A changed pointer binding leaves the field delta unresolved.
+  Add `when` with one to four conditions using the same comparison syntax
+  and any trial. For example, confirm a pause claim only if the menu input
+  function ran before the measurement. A failed or unbound prerequisite
+  leaves the verdict unresolved and links to the failed condition's evidence.
 - A `fork` has the form `{"run": "RUN_ID", "trial": "TRIAL_ID", "frame": 60}`.
   Use a capture from the same ROM that mGBA can restore. The playback preserves the recorded sensor threshold when starting a new fork.
 
@@ -86,7 +90,7 @@ Use **Run across saves** to try the current recipe at several checkpoints.
 The ledger shows the actual starting screenshot for each trial and links each
 verdict to the exact trial, frame, and measurement. It preserves contradicted
 and unresolved checks alongside confirmed ones. Open it again from **Saved
-sweeps**, or download its TSV. Pass `--all-story` to use the available story bank.
+sweeps**, or download its TSV and the starting-frame contact sheet. Pass `--all-story` to use the available story bank.
 
 ## Bring in a play session
 
@@ -112,7 +116,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | GET `/api/experiments/example` | Get a complete runnable recipe to adapt. |
 | GET `/api/experiments/examples` | List built-in example IDs. Append an ID to the example route. |
 | POST `/api/experiments/sweeps` | Submit `{"recipe": {...}, "checkpoints": ["bank-0004", "bank-0064"]}` or use `"all_story": true`. |
-| GET `/api/experiments/sweeps/ID` | Poll progress and read linked checkpoint results. Append `/answers.tsv` for the ledger. |
+| GET `/api/experiments/sweeps/ID` | Poll progress and read linked checkpoint results. Append `/answers.tsv` for the ledger or `/checkpoints.png` for starting frames. |
 | POST `/api/experiments/fields` | Resolve a JSON array of named paths to their target ABI layouts. |
 | GET `/api/codemap/fn/NAME` | Read a function's C, disassembly and cross-references. |
 | GET `/api/experiments/by-function/ADDRESS` | Find recent recorded stores and entry probes by function address. |

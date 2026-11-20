@@ -396,6 +396,9 @@ def build_proof_artifacts(directory, result):
     for check in result["checks"]:
         estimate = check["measurement"] if check["measurement"] is not None else "unknown"
         lines.append(f"{check['state'].upper()}: {check['statement']} ({estimate} {check['sign']} {check['value']})")
+        for condition in check.get("prerequisites", []):
+            outcome = "met" if condition["meets"] else "unresolved" if condition["meets"] is None else "unmet"
+            lines.append(f"  Requires {checks.expression(condition)} [{outcome}]")
     lines.append("")
     for trial in trials:
         lines.append(trial["label"])

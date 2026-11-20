@@ -209,6 +209,28 @@ sample\t6\t26\t0\tf0006\t02008012\t00000009\t-\t-
         self.assertEqual(checks.evaluate([check], result)[0]["state"], "confirmed")
 
 
+    def test_masked_absolute_check_retains_failed_precondition_evidence(self):
+        definition = {"statement": "Pause bit set", "trial": "later", "field": "flags", "frame": 10,
+                      "mask": 4, "compare": "eq", "value": 4,
+                      "when": [{"trial": "later", "function": "Menu", "from": 0, "to": 10,
+                                "compare": "gt", "value": 0}]}
+        valid = checks.validate_checks([definition], {"later"}, ["flags"], ["Menu"], {0, 10})
+        self.assertEqual(checks.validate_checks(valid, {"later"}, ["flags"], ["Menu"], {0, 10}), valid)
+        trial = {"id": "later", "snapshots": [{"relative": 10, "fields": [{"value": 12}]}],
+                 "probes": [{"name": "Menu", "frames": {"10": 7}}]}
+        report = {"fields": [{"path": "flags"}], "trials": [trial]}
+        unresolved = checks.evaluate(valid, report)[0]
+        self.assertEqual(unresolved["measurement"], 4)
+        self.assertEqual(unresolved["evidence"]["value"], 12)
+        self.assertEqual(unresolved["state"], "unresolved")
+        self.assertEqual(unresolved["reason"], "prerequisite")
+        self.assertEqual(unresolved["prerequisites"][0]["measurement"], 0)
+        trial["probes"][0]["frames"]["9"] = 1
+        self.assertEqual(checks.evaluate(valid, report)[0]["state"], "confirmed")
+        trial["snapshots"][0]["fields"][0]["value"] = 8
+        self.assertEqual(checks.evaluate(valid, report)[0]["state"], "contradicted")
+
+
 class HTTPTests(unittest.TestCase):
     def request(self, method, path, payload=None, **headers):
         class Socket:
@@ -316,6 +338,7 @@ class HTTPTests(unittest.TestCase):
                 self.assertEqual([row["id"] for row in report["checkpoints"]], ["boot", "test-save"])
                 self.assertTrue(all(row["state"] == "complete" for row in report["checkpoints"]))
                 self.assertIn(b"test-save", self.request("GET", endpoint + "/answers.tsv")[1])
+                self.assertEqual(self.request("GET", endpoint + "/checkpoints.png")[1][:8], b"\x89PNG\r\n\x1a\n")
                 self.assertEqual(json.loads(self.request("GET", "/api/experiments/runs")[1]), [])
                 child = report["checkpoints"][1]["run"]
                 result = json.loads(self.request("GET", f"/api/experiments/runs/{child}/result")[1])
