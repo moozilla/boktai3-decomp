@@ -126,6 +126,7 @@ addr,name,mode,confidence,source,notes
 08005830,SceneObjects_CreateObject,thumb,low,src-alias,
 08005B8C,SceneObjects_CreateFromScript,thumb,low,src-alias,
 08005D30,SceneObjects_SwitchPaletteFromScript,thumb,low,src-alias,
+08005E10,TerrainModifiers_ClearGlobal,thumb,low,src-alias,Clear the terrain modifier manager pointer.
 08005E1C,TerrainModifiers_AddToList,thumb,low,src-alias,Prepends a TerrainModifier node onto the manager's linked list (gUnk_02000028->head); called by TerrainModifiers_Create
 08005E40,TerrainModifiers_RemoveFromList,thumb,low,src-alias,"Unlinks a TerrainModifier node from the manager's linked list, patching neighbor pointers; called when destroying a node"
 08005E64,TerrainModifiers_Create,thumb,low,src-alias,
