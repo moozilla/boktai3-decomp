@@ -18,6 +18,7 @@
 #include "display_sequence.h"
 #include "scene_actor_animation.h"
 #include "scene_object.h"
+#include "golem.h"
 #include "golem_charge.h"
 #include "monster_particle_random.h"
 #include "scene_actor_delayed_response.h"
@@ -613,11 +614,7 @@ static inline void RecordContact(struct ChaseActor *a, struct ContactCollider *o
 {
     if (!Unavailable(a) && (other->contactFlags & 15)) {
         a->base.counter304 = other->collisionId;
-        {
-            u32 *p = &a->base.statusFlags;
-            s32 mask = 0xFEFFFFFF;
-            *p &= mask;
-        }
+        SceneActorChase_ClearWordFlags(&a->base.statusFlags, ROOM_ACTOR_STATUS_INTERACTING);
     }
 }
 
@@ -625,9 +622,8 @@ static inline u8 IsFrontal(u8 direction, struct ContactCollider *other)
 {
     s32 a, b, delta;
     {
-        u8 *owner = other->owner;
-        u32 mask = 8;
-        if (!(*(u32 *)(owner + 0x20) & mask))
+        struct Player *owner = other->owner;
+        if (!SceneActorChase_Bits32(&owner->statusFlags, 8))
             return 1;
     }
     a = (direction + 0x20) & 255;
@@ -642,11 +638,6 @@ static inline u8 IsFrontal(u8 direction, struct ContactCollider *other)
     return 0;
 }
 
-static inline u32 PlayerFlag(u8 *p, u32 mask)
-{
-    return *(u32 *)(p + 0x20) & mask;
-}
-
 static inline u8 Coop(void)
 {
     if (gEngineFlags & 0x4800)
@@ -654,9 +645,9 @@ static inline u8 Coop(void)
     return 0;
 }
 
-static inline void AddImpact(u8 *state)
+static inline void AddImpact(struct Golem *state)
 {
-    u16 *p = (void *)(state + 0x688);
+    u16 *p = &state->charge688;
     *p += 200;
     if (*p > 400)
         *p = 400;
@@ -674,46 +665,40 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
                              struct ChaseActor *a)
 {
     struct ChaseActor *base = a;
-    u8 *state = a->base.context;
-    union {
-        struct ContactPackedVector packed;
-        struct ContactPosition pos;
-    } origin;
+    struct Golem *state = a->base.context;
+    struct ContactPosition origin;
     struct ContactPosition delta;
     if (Unavailable(a))
         return;
-    origin.pos = *(struct ContactPosition *)&self->x;
+    origin = *(struct ContactPosition *)&self->x;
     switch ((s32)((base->base.body.direction + 0x20) & 255) >> 6) {
         case 0:
-            origin.packed.x -= 256;
+            origin.x -= 256;
             break;
         case 1:
-            origin.packed.z -= 256;
+            origin.z -= 256;
             break;
         case 2:
-            origin.packed.x += 256;
+            origin.x += 256;
             break;
         case 3:
-            origin.packed.z += 256;
+            origin.z += 256;
             break;
     }
-    Delta(&delta, &origin.pos, (void *)&other->x);
+    Delta(&delta, &origin, (void *)&other->x);
     self->direction = Math_Atan2(delta.x, delta.z);
     if (other->contactFlags & 15) {
         if (Flag(base, 0x100, 0x2D4)) {
             if (base->base.controlKind == 0x29 || IsFrontal(base->base.body.direction, other)) {
                 RecordContact(a, other);
                 AddImpact(state);
-                {
-                    u32 mask = 1;
-                    other->responseFlags = mask | other->responseFlags;
-                }
+                other->responseFlags |= 1;
                 {
                     u16 id = other->collisionId;
-                    *(u16 *)(state + 0x634) = id;
+                    state->pendingEvent = id;
                 }
             } else {
-                u8 *player;
+                struct Player *player;
                 if (Coop()) {
                     s32 index;
                     if (other->contactFlags & 1)
@@ -727,10 +712,8 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
                     player = gPlayers[index];
                 } else
                     player = gPlayers[0];
-                if (!PlayerFlag(player, 0x20000)) {
-                    u16 *p = (void *)(state + 0x688);
-                    u32 value = 400;
-                    *p = value;
+                if (!SceneActorChase_Bits32(&player->statusFlags, 0x20000)) {
+                    state->charge688 = 400;
                 }
             }
         } else {
