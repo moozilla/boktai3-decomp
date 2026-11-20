@@ -62,12 +62,11 @@ void LinkPlayer_ResetToIdleState(struct LP *p)
     u16 zero;
     u8 *q;
     if (p->actionMode == 4) {
-        u32 z = 0;
         p->actionMode = 1;
         p->updateCallback = Player_UpdateLinkKind;
-        p->unk419 = z;
+        p->unk419 = 0;
         p->unk54 = (u8 *)p + 0x8c;
-        p->unk50 = z;
+        p->unk50 = 0;
         p->unk5C0 = (u8 *)p + 0xac;
         p->unkAC4 = 0xFFFF;
     }
