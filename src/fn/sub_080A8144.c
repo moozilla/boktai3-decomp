@@ -1,3 +1,5 @@
+#include "scene_actor_chase_reaction.h"
+#include "scene_actor_init_actor.h"
 #include "scene_actor_chase_shared.h"
 #include "scene_actor_reset.h"
 
@@ -15,15 +17,10 @@ void SceneActorPlacement_UpdateFlaggedResponse(struct ChaseActor *p)
 {
     if (TakeQueuedFlag(&p->base.field2B1)) {
         SceneActorChase_SetControl(p, TentacleBody_UpdateSpreadWindup, 38);
-        {
-            u32 mask = 0x100000;
-            u32 *flags = &p->base.statusFlags;
-            *flags |= mask;
-        }
+        MonsterInit_SetStatusFlags(p, 0x100000);
         Sound_PlaySong(0x19B);
     }
-    if (p->base.controlKind == 39 &&
-        (u8)Callback_InvokeActor(p, p->base.contactQuery.opaque)) {
+    if (p->base.controlKind == 39 && (u8)Callback_InvokeActor(p, p->base.contactQuery.opaque)) {
         u32 two = 2;
         u8 *field = &p->base.state2A8;
         u32 zero = 0;
