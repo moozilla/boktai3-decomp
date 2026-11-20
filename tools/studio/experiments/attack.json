@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "title": "When does a held attack become active?",
+  "checkpoint": "test-save",
+  "continue": true,
+  "duration": 120,
+  "sample_every": 6,
+  "observe": [
+    "gPlayers[0]->currentStatB",
+    "gPlayers[0]->tetherMode",
+    "gPlayers[0]->tetherPhase",
+    "gPlayers[0]->tetherFrame",
+    "gPlayers[0]->statModifierContext.contactTimer"
+  ],
+  "probe": [
+    "Player_InitializeActionContact",
+    "Player_GetAttackPower",
+    "Player_UpdateSelectedAttackCharge",
+    "Player_SubtractStatB",
+    "Player_UpdateAttackColliderMotion",
+    "Player_SetActionPhase"
+  ],
+  "trials": [
+    {"id": "tap", "label": "Tap B", "input": "tap B"},
+    {"id": "hold", "label": "Hold B for 72 frames", "input": "hold B 72"},
+    {"id": "idle", "label": "No input", "input": ""}
+  ],
+  "checks": [
+    {"statement": "A tap initializes attack contact in the first six frames.", "trial": "tap", "to": 6,
+     "function": "Player_InitializeActionContact", "compare": "eq", "value": 1},
+    {"statement": "Holding B postpones attack contact until release.", "trial": "hold", "to": 72,
+     "function": "Player_InitializeActionContact", "compare": "eq", "value": 0},
+    {"statement": "The held attack initializes contact when B is released.", "trial": "hold", "from": 72, "to": 78,
+     "function": "Player_InitializeActionContact", "compare": "eq", "value": 1},
+    {"statement": "In this loadout the held attack leaves the sampled energy stat unchanged.", "trial": "hold",
+     "field": "gPlayers[0]->currentStatB", "compare": "eq", "value": 0}
+  ]
+}

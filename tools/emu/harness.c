@@ -60,6 +60,8 @@ typedef mColor color_t;
 #include <stdint.h>
 #include <ctype.h>
 
+#include "../studio/experiments/observe.h"
+
 #define ROM_SIZE 0x1000000
 
 static struct mCore* core;
@@ -125,10 +127,12 @@ static void add_probe(const char* name, const char* address) {
 	if (pc > probe_hi) probe_hi = pc;
 }
 
-static void note_probes(uint32_t pc) {
-	if (pc < probe_lo || pc > probe_hi) return;
+static bool note_probes(uint32_t pc) {
+	if (pc < probe_lo || pc > probe_hi) return false;
+	bool entered = false;
 	for (unsigned i = 0; i < nprobes; ++i) {
 		if (pc != probes[i].pc) continue;
+		entered = true;
 		// Fail explicitly instead of silently delivering a truncated trace.
 		if (probe_count == 100000) {
 			fprintf(stderr, "probe trace exceeded 100000 records; narrow the replay\n");
@@ -140,6 +144,7 @@ static void note_probes(uint32_t pc) {
 		for (int r = 0; r < 16; ++r) fprintf(probe_file, "\t%08X", (uint32_t)cpu->gprs[r]);
 		fputc('\n', probe_file);
 	}
+	return entered;
 }
 
 static uint8_t lux = 0xE8;
@@ -212,19 +217,35 @@ static void note_store(uint32_t a, uint32_t v, int w) {
 	if (a + w > watch_lo && a < watch_hi)
 		fprintf(stderr, "[watch] frame %u pc %08X store%d [%08X] = %08X\n", core->frameCounter(core), cur_pc(), w * 8, a, v);
 }
-static void h_store32(struct ARMCore* c, uint32_t a, int32_t v, int* cc) { note_store(a & ~3u, v, 4); orig.store32(c, a, v, cc); }
-static void h_store16(struct ARMCore* c, uint32_t a, int16_t v, int* cc) { note_store(a & ~1u, (uint16_t) v, 2); orig.store16(c, a, v, cc); }
-static void h_store8(struct ARMCore* c, uint32_t a, int8_t v, int* cc) { note_store(a, (uint8_t) v, 1); orig.store8(c, a, v, cc); }
+static void h_store32(struct ARMCore* c, uint32_t a, int32_t v, int* cc) {
+	bool observe = observe_before_store(a & ~3u, 4);
+	note_store(a & ~3u, v, 4);
+	orig.store32(c, a, v, cc);
+	if (observe) observe_after_store(cur_pc());
+}
+static void h_store16(struct ARMCore* c, uint32_t a, int16_t v, int* cc) {
+	bool observe = observe_before_store(a & ~1u, 2);
+	note_store(a & ~1u, (uint16_t)v, 2);
+	orig.store16(c, a, v, cc);
+	if (observe) observe_after_store(cur_pc());
+}
+static void h_store8(struct ARMCore* c, uint32_t a, int8_t v, int* cc) {
+	bool observe = observe_before_store(a, 1);
+	note_store(a, (uint8_t)v, 1);
+	orig.store8(c, a, v, cc);
+	if (observe) observe_after_store(cur_pc());
+}
 static uint32_t h_storeMultiple(struct ARMCore* c, uint32_t base, int mask, enum LSMDirection dir, int* cc) {
-	if (watch_hi) {
-		int n = __builtin_popcount(mask & 0xFFFF);
-		uint32_t start = base;
-		if (dir & LSM_D) start = base - 4 * n + ((dir & LSM_B) ? 0 : 4);
-		else if (dir & LSM_B) start = base + 4;
-		if (start < watch_hi && start + 4 * n > watch_lo)
-			fprintf(stderr, "[watch] frame %u pc %08X stm [%08X..+%d]\n", core->frameCounter(core), cur_pc(), start, 4 * n);
-	}
-	return orig.storeMultiple(c, base, mask, dir, cc);
+	int n = __builtin_popcount(mask & 0xFFFF);
+	uint32_t start = base;
+	if (dir & LSM_D) start = base - 4 * n + ((dir & LSM_B) ? 0 : 4);
+	else if (dir & LSM_B) start = base + 4;
+	bool observe = observe_before_store(start & ~3u, 4 * n);
+	if (watch_hi && start < watch_hi && start + 4 * n > watch_lo)
+		fprintf(stderr, "[watch] frame %u pc %08X stm [%08X..+%d]\n", core->frameCounter(core), cur_pc(), start, 4 * n);
+	uint32_t result = orig.storeMultiple(c, base, mask, dir, cc);
+	if (observe) observe_after_store(cur_pc());
+	return result;
 }
 
 static void note_exec(uint32_t pc) {
@@ -269,7 +290,10 @@ static void run_frames(int n) {
 			// cur_pc() is instead for in-instruction memory hooks.
 			uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
 			if (tracing) note_exec(pc);
-			if (nprobes) note_probes(pc);
+			if (nprobes) {
+				observe_instruction(pc, cpu->gprs[ARM_SP], cpu->gprs[ARM_LR],
+				                    cpu->privilegeMode, note_probes(pc));
+			}
 			if (until_pc && pc == until_pc && (int32_t)cpu->gprs[0] >= until_lo && (int32_t)cpu->gprs[0] <= until_hi)
 				until_hit = 1;
 			core->step(core);
@@ -392,6 +416,14 @@ int main(int argc, char** argv) {
 	cpu->memory.load16 = h_load16;
 	cpu->memory.load8 = h_load8;
 	cpu->memory.loadMultiple = h_loadMultiple;
+#ifdef STUDIO_EXPERIMENTS
+	cpu->memory.store32 = h_store32;
+	cpu->memory.store16 = h_store16;
+	cpu->memory.store8 = h_store8;
+	cpu->memory.storeMultiple = h_storeMultiple;
+	observe_attach(core, outdir);
+#endif
+
 
 	rom_reader = calloc(ROM_SIZE, 4);
 	rom_exec = calloc(ROM_SIZE / 2, 1);
@@ -485,14 +517,21 @@ int main(int argc, char** argv) {
 			memset(seg_exec, 0, ROM_SIZE / 2);
 			strncpy(seg_name, a1, sizeof(seg_name) - 1);
 		}
-		else { fprintf(stderr, "unknown command %s\n", cmd); return 1; }
+		else if (!observe_command(line)) { fprintf(stderr, "unknown command %s\n", cmd); return 1; }
 		fprintf(stderr, "[frame %u] %s %s %s\n", core->frameCounter(core), cmd, a1, a2);
 	}
 	end_segment();
+	observe_close();
 #ifdef USE_FFMPEG
 	stop_recording();
 #endif
 	if (probe_file && fclose(probe_file)) { perror("probes.tsv"); return 1; }
+#ifdef STUDIO_EXPERIMENTS
+	if (getenv("BOKTAI3_OBSERVATIONS_ONLY")) {
+		core->deinit(core);
+		return 0;
+	}
+#endif
 	write_cov("total", rom_reader, rom_exec);
 	char path[1024];
 	snprintf(path, sizeof(path), "%s/total.word32", outdir);
