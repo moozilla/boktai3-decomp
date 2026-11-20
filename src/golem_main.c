@@ -122,42 +122,9 @@ static inline u32 TestFlags(u16 *flags, u32 mask)
     return *flags & mask;
 }
 
-static inline u8 MotionActive(struct SceneActorReactionMotion *motion)
-{
-    u32 mask = 8;
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline void SetState(struct ChaseActor *actor, u32 zero)
-{
-    u32 phase = 1;
-    actor->base.state2A8 = zero;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = zero;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = phase;
-}
-
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
-
 void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
 {
-    u32 active = MotionActive((void *)&actor->base.tracking.target);
+    u32 active = SceneActorChase_TrackingFlags(&actor->base.tracking, 8);
     if (active) {
         {
             u16 *flags = &actor->group.common.gate.flags;
@@ -178,15 +145,15 @@ void SceneActorControl_RefreshMotionRoute(struct ChaseActor *actor)
             return;
         Golem_ResetIdleControl(actor);
     } else {
-        SetState(actor, active);
-        SetControl(actor, (void *)SceneActorControl_OnIdle, 16, active);
+        Chase_SetState(actor, 0, 1, 0);
+        Chase_SetCtl(actor, SceneActorControl_OnIdle, 16);
     }
     {
-        struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
+        struct SceneActorChaseTracking *tracking = &actor->base.tracking;
         u32 mask = 8;
-        u32 value = motion->flags;
+        u32 value = tracking->flags;
         mask |= value;
-        motion->flags = mask;
+        tracking->flags = mask;
     }
 }
 
@@ -1600,8 +1567,7 @@ void Golem_UpdateChargeWindup(struct ChaseActor *actor, u32 frame)
         count =
             (ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR) & 1) +
             2;
-        SceneParticleBurst_CreateWithPause(&body->position, &velocity, &size, 2, count,
-                                           4);
+        SceneParticleBurst_CreateWithPause(&body->position, &velocity, &size, 2, count, 4);
     }
     speed = &context->charge.speed;
     if (*speed <= 383)
@@ -2131,8 +2097,7 @@ static inline u8 Golem_ArriveAfterDelay(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
@@ -2312,8 +2277,7 @@ static inline u8 Golem_Arrive(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
