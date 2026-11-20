@@ -14,15 +14,29 @@ struct TentacleBody {
     struct RoomActor base;
     struct TentacleAnimationSegment segments[4];
     u8 unknown874, spin;
-    u8 unknown876[0x5A];
+    u8 unknown876[3];
+    u8 blockedFrameCount;
+    u16 returnCell;
+    u8 unknown87C[0x54];
     u16 attackFlags;
-    u8 unknown8D2[8];
+    u8 unknown8D2[2];
+    s8 oscillationDirection;
+    u8 unknown8D5;
+    s16 hitReactionTimer;
+    s16 oscillationPhase;
     s16 segmentCount;
-    u8 unknown8DC[10];
+    u8 unknown8DC[8];
+    u16 routeMotionTimer;
     u16 releaseFrame;
-    u8 unknown8E8[2];
-    u8 spreadStage;
-    u8 unknown8EB[0x934 - 0x8EB];
+    u8 wanderAttempts, wanderDirection, spreadStage;
+    u8 unknown8EB;
+    s32 pendingImpulse;
+    struct TentacleAnimationSegment *impulseSegment;
+    u16 unknown8F4;
+    u8 unknown8F6[0xE];
+    struct ContactPosition waypoint;
+    u8 unknown90C[0x18];
+    struct ContactPosition returnCenter, savedPosition;
 };
 void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactView *,
                                              struct SceneActorBehaviorContactView *,
