@@ -75,4 +75,10 @@ struct ActorStats {
     u8 unknown5ED;
     u8 damageFlags;
 };
+
+static inline void ActorStats_SetDamageFlags(u8 bits, u8 *flags)
+{
+    *flags = bits | *flags;
+}
+
 #endif
