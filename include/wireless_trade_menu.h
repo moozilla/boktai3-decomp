@@ -17,7 +17,7 @@ enum WirelessGameMenuState {
     WIRELESS_MENU_ROUND_RESULT_EXCHANGE = 8,
     WIRELESS_MENU_OUTCOME_EXCHANGE = 9,
     WIRELESS_MENU_RESULTS_DELAY = 10,
-    WIRELESS_MENU_RESULTS_SCRIPT = 11,
+    WIRELESS_MENU_RESULTS_IDLE = 11,
     WIRELESS_MENU_RESULTS_PANEL = 12,
     WIRELESS_MENU_SAVE_RESULT = 13,
     WIRELESS_MENU_EXIT = 14,
@@ -73,5 +73,13 @@ struct WirelessGameExchange {
 };
 
 struct WirelessGameExchange *WirelessExchange_Get(void);
+
+static inline void WirelessGameMenu_EnterState(struct WirelessGameExchange *menu,
+                                               enum WirelessGameMenuState state)
+{
+    menu->state = state;
+    menu->entered = 1;
+    menu->timer = 0;
+}
 
 #endif
