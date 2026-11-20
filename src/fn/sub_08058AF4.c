@@ -1,4 +1,5 @@
 #include "scene_panel.h"
+#include "gba/io_reg.h"
 void ScenePanel_InitOverlay(struct ScenePanel *panel)
 {
     struct OverlayResource {
@@ -10,11 +11,7 @@ void ScenePanel_InitOverlay(struct ScenePanel *panel)
     resource.pointers[0] += (u32)original;
     resource.pointers[1] += (u32)original;
     resource.pointers[2] += (u32)original;
-    {
-        u32 mask = 0x800;
-        u16 *shadow = &gDispCntShadow;
-        *shadow = mask | *shadow;
-    }
+    Bg_EnableDisplay(DISPCNT_BG3_ON);
     Bg_SetPriority(3, 1);
     panel->overlayPalette = (u8 *)ScriptProc_Start(0x92B3, 0xE2BA) + 0x114;
     {
