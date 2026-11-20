@@ -18,18 +18,30 @@ class Localizer:
         self.looked_up = {}
         self.seen = set()
         self.dialogue_id = None
+        self.bookmarks = False
+        self.line = None
+        self.source_preview = None
         self.graphics = None
         from backgrounds import MapTranslator
         self.backgrounds = MapTranslator()
 
     def record(self, key, **fields):
         identity = (key, fields.get("event"), fields.get("scene"), fields.get("kind"),
-                    fields.get("caller_pc"), fields.get("result"))
+                    fields.get("caller_pc"), fields.get("english"), fields.get("digest"), fields.get("reason"))
         if identity in self.seen:
             return
         self.seen.add(identity)
         self.transcript.write(json.dumps(dict(key=key, **fields), ensure_ascii=False)+"\n")
         self.transcript.flush()
+
+    def current_line(self, game):
+        if not self.line or self.line["id"] != self.dialogue_id:
+            return None
+        scene = int.from_bytes(game.read(0x030039F0, 2), "little")
+        window = int.from_bytes(game.read(0x020000DC, 4), "little")
+        if self.line["context"]["scene"] == scene and self.line["window"] == window:
+            return self.line
+        return None
 
     def __call__(self, game, hook, arg, ptr, aux, lr, scene, proc, frame):
         if not self.catalog:
@@ -53,7 +65,10 @@ class Localizer:
                 self.looked_up[source] = sid
                 return 0
             kind = "dialogue" if lr == 0x080313DE else "window"
-            if kind=="dialogue": self.dialogue_id=sid
+            if kind == "dialogue":
+                self.dialogue_id = sid
+                if sid != self.source_preview:
+                    self.source_preview = None
             key = f"text/{sid}"
         else:
             sid = c.ids.get(ptr, self.pointers.get(ptr))
@@ -81,9 +96,15 @@ class Localizer:
             # explicitly approved spellings in the local glossary.
             if source not in self.memory.glossary():
                 return 0
+        if self.bookmarks and kind == "dialogue" and ctx.get("lines", 0) > 1:
+            if game.core.lt_bookmark():
+                self.line = {"key": key, "id": sid, "source": source, "context": ctx, "frame": frame,
+                             "window": int.from_bytes(game.read(0x020000DC, 4), "little")}
+        enabled = self.enabled and not (self.source_preview is not None and
+                                        (sid == self.source_preview or kind == "name"))
         word = origin = rendered = None
         try:
-            if self.enabled:
+            if enabled:
                 word,origin,event = self.memory.choose(key,source,ctx)
             else:
                 event = "japanese"
@@ -95,6 +116,8 @@ class Localizer:
             return 0
         self.record(key,event=event,source=source,english=word,rendered=rendered,
                     provenance=origin,frame=frame,**ctx)
+        if self.line and self.line["key"] == key:
+            self.line.update(english=word, provenance=origin)
         if rendered is None:
             return 0
         try:

@@ -6,7 +6,7 @@
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
-static SDL_Texture *texture;
+static SDL_Texture *texture, *editor;
 static SDL_AudioDeviceID audio;
 static unsigned hz;
 static int paused;
@@ -72,6 +72,7 @@ static unsigned keymask(SDL_Keycode key)
 int lt_input(void)
 {
     SDL_Event event;
+    int actions = 0;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
         case SDL_QUIT: return -1;
@@ -81,13 +82,76 @@ int lt_input(void)
         case SDL_KEYDOWN:
             if (event.key.keysym.sym==SDLK_ESCAPE) return -1;
             if (!event.key.repeat && event.key.keysym.sym==SDLK_SPACE) paused=!paused;
+            if (!event.key.repeat && event.key.keysym.sym==SDLK_F1) actions |= 2048;
+            if (!event.key.repeat && event.key.keysym.sym==SDLK_F2) actions |= 4096;
             keys |= keymask(event.key.keysym.sym);
             break;
         case SDL_KEYUP: keys &= ~keymask(event.key.keysym.sym); break;
         }
     }
-    return (int)keys | (paused ? 1024 : 0);
+    return (int)keys | (paused ? 1024 : 0) | actions;
 }
+int lt_begin_edit(void)
+{
+    editor = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, 900, 600);
+    if (!editor) return 0;
+    SDL_RenderSetLogicalSize(renderer, 900, 600);
+    if (audio) SDL_ClearQueuedAudio(audio);
+    keys = 0;
+    SDL_StartTextInput();
+    return 1;
+}
+void lt_draw_edit(const uint8_t *rgba)
+{
+    SDL_UpdateTexture(editor, NULL, rgba, 900*4);
+    SDL_RenderClear(renderer);
+    SDL_RenderCopy(renderer, editor, NULL, NULL);
+    SDL_RenderPresent(renderer);
+}
+void lt_end_edit(void)
+{
+    SDL_StopTextInput();
+    SDL_DestroyTexture(editor);
+    editor = NULL;
+    SDL_RenderSetLogicalSize(renderer, 240, 160);
+    keys = 0;
+}
+enum EditKey { TEXT=1, BACKSPACE, DELETE_CHAR, LEFT, RIGHT, HOME_KEY, END_KEY, ALL,
+               SUBMIT, CANCEL, CLOSE, COPY, REDRAW };
+int lt_edit_event(char *text, int size)
+{
+    SDL_Event e;
+    if (!SDL_WaitEventTimeout(&e, 50)) return 0;
+    if (e.type == SDL_QUIT) return CLOSE;
+    if (e.type == SDL_WINDOWEVENT) return REDRAW;
+    if (e.type == SDL_TEXTINPUT) { SDL_strlcpy(text, e.text.text, size); return TEXT; }
+    if (e.type != SDL_KEYDOWN) return 0;
+    SDL_Keymod mod = e.key.keysym.mod;
+    SDL_Keycode key = e.key.keysym.sym;
+    if (mod & (KMOD_CTRL | KMOD_GUI)) {
+        if (key == SDLK_a) return ALL;
+        if (key == SDLK_c) return COPY;
+        if (key == SDLK_v) {
+            char *s = SDL_GetClipboardText();
+            if (s) { SDL_strlcpy(text, s, size); SDL_free(s); }
+            return TEXT;
+        }
+    }
+    switch (key) {
+    case SDLK_BACKSPACE: return BACKSPACE;
+    case SDLK_DELETE: return DELETE_CHAR;
+    case SDLK_LEFT: return LEFT;
+    case SDLK_RIGHT: return RIGHT;
+    case SDLK_HOME: return HOME_KEY;
+    case SDLK_END: return END_KEY;
+    case SDLK_ESCAPE: return CANCEL;
+    case SDLK_RETURN: case SDLK_KP_ENTER:
+        if (mod & KMOD_SHIFT) { SDL_strlcpy(text, "\n", size); return TEXT; }
+        return SUBMIT;
+    default: return 0;
+    }
+}
+void lt_copy_edit(const char *s) { SDL_SetClipboardText(s); }
 void lt_quit_window(void)
 {
     if (audio) SDL_CloseAudioDevice(audio);

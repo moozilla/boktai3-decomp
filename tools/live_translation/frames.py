@@ -41,6 +41,8 @@ def foreground(region):
     opaque = [color for color in counts if color[3] and color != bg]
     if not opaque:
         return bg, (255, 255, 255, 255)
+    if not bg[3]:
+        return bg, max(opaque, key=counts.get)
     def contrast(color):
         distance = sum((a-b)**2 for a,b in zip(color, bg))
         return distance * min(1, counts[color] / max(2, region.width/4))
@@ -214,7 +216,7 @@ class ArtTranslator:
                     choices.append((region, english))
             if not choices:
                 return 0
-            signature = [5, ctx["rom_sha256"], asset, choices, font(16).getname()]
+            signature = [6, ctx["rom_sha256"], asset, choices, font(16).getname()]
             digest = sha256(json.dumps(signature, sort_keys=True).encode()).hexdigest()
             path = OUT / "compiled" / (digest+".cb05")
             if path.exists():

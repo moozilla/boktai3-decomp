@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT, HUD_LAYER };
@@ -23,6 +24,27 @@ static struct ARMCore *cpu;
 static uint32_t pixels[240 * 160];
 static Resolver resolve;
 static uint32_t text_window, string_id, resource_type, resource_key, resource_caller, last_proc;
+/* A rewind point inside the text lookup, before its return register changes.
+ * Cartridge scratch is immutable across loads, just like the original ROM. */
+static void *line_state;
+static unsigned line_id, line_proc, line_window;
+int lt_bookmark(void)
+{
+    if (!line_state) line_state = malloc(core->stateSize(core));
+    if (!line_state || !core->saveState(core, line_state)) return 0;
+    line_id = string_id;
+    line_proc = last_proc;
+    line_window = text_window;
+    return 1;
+}
+int lt_rewind_line(void)
+{
+    if (!line_state || !core->loadState(core, line_state)) return -1;
+    string_id = line_id;
+    last_proc = line_proc;
+    text_window = line_window;
+    return (int)core->frameCounter(core);
+}
 static void logger_fn(struct mLogger *l, int c, enum mLogLevel level, const char *fmt, va_list a)
 {
     if (level & (mLOG_FATAL | mLOG_ERROR)) { vfprintf(stderr, fmt, a); fputc('\n', stderr); }
@@ -70,7 +92,11 @@ int lt_open(const char *rom, const char *battery, Resolver callback)
     return 1;
 }
 
-void lt_close(void) { if (core) core->deinit(core); core = NULL; }
+void lt_close(void) {
+    free(line_state); line_state = NULL;
+    if (core) core->deinit(core);
+    core = NULL;
+}
 void lt_read(uint32_t addr, uint8_t *out, unsigned length)
 {
     for (unsigned i = 0; i < length; i++) out[i] = core->rawRead8(core, addr + i, -1);

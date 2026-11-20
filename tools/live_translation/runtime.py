@@ -73,6 +73,12 @@ class Game:
         if self.error:
             raise self.error
 
+    def rewind_line(self):
+        frame = self.core.lt_rewind_line()
+        if frame < 0:
+            raise ValueError("No dialogue rewind point is available")
+        self.frame = frame
+
     def tap(self, key):
         self.step(2, KEYS[key])
         self.step(8)

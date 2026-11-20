@@ -2,7 +2,9 @@
 from contextlib import closing
 import json
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
+from player import BOOT
+from translator import Memory
 
 from frames import ArtTranslator
 from localize import Localizer
@@ -18,13 +20,10 @@ ROWS = {
     "06-config": "System settings",
     "07-items": "Item name and scrolling description",
 }
-BOOT = [(300, "START"), (60, "A"), (150, "START"), (120, "A"), (120, "START"),
-        (300, "START"), (120, "START"), (120, "A"), (150, "A")]
-
-
-def session(memory, directory, save, english, stream):
+def session(memory, save, english, stream):
     loc = Localizer(memory, stream, enabled=english)
     loc.graphics = ArtTranslator()
+    loc.bookmarks = english
     return closing(Game(loc, save))
 
 
@@ -32,7 +31,48 @@ def capture(game, directory, label):
     game.image().save(directory / (label + ".png"))
 
 
-def prison(game, directory):
+def correction(game, directory):
+    """Replay one captured fetch three ways at exactly the same emulated time."""
+    where = directory / "correction"
+    where.mkdir(exist_ok=True)
+    loc = game.resolver
+    original_memory = loc.memory
+    private = Memory(":memory:")
+    original_memory.db.backup(private.db)
+    loc.memory = private
+    key = loc.line["key"]
+    try:
+        def retake(name):
+            game.rewind_line()
+            game.step(260)
+            image = game.image()
+            image.save(where / (name+".png"))
+            return image
+        english = retake("01-english")
+        loc.source_preview = loc.line["id"]
+        japanese = retake("02-japanese")
+        loc.source_preview = None
+        replacement = "That vampire blood kept you alive."
+        row = private.db.execute("SELECT english FROM entries WHERE key=?", (key,)).fetchone()
+        if row and row["english"] == replacement:
+            replacement = "Your vampire blood saved your life."
+        private.correct(key, replacement, author="scripted proof correction")
+        changed = retake("03-corrected")
+        for other in (japanese, changed):
+            bounds = ImageChops.difference(english, other).getbbox()
+            if not bounds or bounds[1] < 100:
+                raise RuntimeError(f"Unexpected change outside the dialogue window: {bounds}")
+        if loc.line.get("english") != replacement:
+            raise RuntimeError("The corrected line did not reach the renderer")
+        from editor import render
+        page = render(changed, loc.line, replacement, len(replacement), False, "scripted proof correction", "")
+        Image.frombytes("RGBA", (900,600), page).save(where / "04-editor.png")
+    finally:
+        loc.memory = original_memory
+        private.db.close()
+
+
+def prison(game, directory, corrections=False):
     for index, (delay, key) in enumerate(BOOT):
         game.step(delay)
         if index == 2:
@@ -48,6 +88,8 @@ def prison(game, directory):
             game.step(140)  # Finish the native typewriter, including inserted names.
             capture(game, directory, label)
         if not wanted:
+            if corrections:
+                correction(game, directory)
             return
         game.tap("A")
     raise RuntimeError(f"Prison replay missed dialogue IDs {sorted(wanted)}")
@@ -103,8 +145,11 @@ def run(memory):
             for route, save in ((prison, prison_save()), (inventory, saves.TEMPLATE)):
                 log_path = dest / (route.__name__ + ".jsonl")
                 with log_path.open("w") as stream:
-                    with session(memory, dest, save, mode == "english", stream) as game:
-                        route(game, dest)
+                    with session(memory, save, mode == "english", stream) as game:
+                        if route is prison:
+                            prison(game, dest, corrections=mode=="english")
+                        else:
+                            inventory(game, dest)
                 for line in log_path.read_text().splitlines():
                     event = dict(run=mode, route=route.__name__, **json.loads(line))
                     transcript.write(json.dumps(event, ensure_ascii=False) + "\n")

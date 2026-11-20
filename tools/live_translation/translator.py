@@ -149,11 +149,11 @@ class Memory:
         self.db.commit()
         return english, origin, "first" if english is not None else "miss"
 
-    def correct(self, key, english):
+    def correct(self, key, english, author="human correction"):
         row = self.db.execute("SELECT * FROM entries WHERE key=?", (key,)).fetchone()
         if not row:
             raise ValueError("Play or replay this encounter before editing it.")
         fit(row["source"], english, json.loads(row["context"]))
         with self.db:
             self.db.execute("INSERT INTO edits(key,previous,english) VALUES (?,?,?)", (key, row["english"], english))
-            self.db.execute("UPDATE entries SET english=?,origin='human correction',updated=CURRENT_TIMESTAMP WHERE key=?", (english, key))
+            self.db.execute("UPDATE entries SET english=?,origin=?,updated=CURRENT_TIMESTAMP WHERE key=?", (english, author, key))

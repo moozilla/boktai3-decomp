@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from runtime import Game, OUT, ROOT, prison_save, saves
+from runtime import Game, OUT, prison_save, saves
 from frames import ArtTranslator
 from graphics import REGIONS
 from localize import Localizer
@@ -25,7 +25,9 @@ def arguments():
     source = live.add_mutually_exclusive_group()
     source.add_argument("--save", type=Path, help="A battery save or a VBA .sgm checkpoint")
     source.add_argument("--new", action="store_true", help="Start without an existing save")
-    live.add_argument("--from-boot", action="store_true", help="Show the entire startup")
+    landing = live.add_mutually_exclusive_group()
+    landing.add_argument("--from-boot", action="store_true", help="Show the entire startup")
+    landing.add_argument("--title", action="store_true", help="Start on the translated title screen")
     sub.add_parser("proof", help="Capture paired Japanese and English game frames")
     sub.add_parser("replay", help="Capture the opening in the selected language")
     sub.add_parser("review", help="Show original, English and provenance").add_argument("key", nargs="?")
@@ -125,7 +127,12 @@ def dispatch(args, memory):
                 print(target)
             else:
                 from player import play
-                play(game, quick=not getattr(args, "from_boot", False))
+                start = "opening"
+                if getattr(args, "from_boot", False) or getattr(args, "new", False):
+                    start = "boot"
+                elif getattr(args, "save", None) or getattr(args, "title", False):
+                    start = "title"
+                play(game, start=start)
 
 
 def main():
