@@ -1,31 +1,30 @@
-#include "global.h"
+#include "particle_group.h"
 #include "ram.h"
-void Effect_Remove(u8 *);
+void Effect_Remove(void *);
 
 void sub_08014C28(void)
 {
-    u8 *p = gParticleGroupManager;
-    if (p != 0) {
+    struct ParticleGroupManager *manager = gParticleGroupManager;
+    if (manager != 0) {
         s32 i = 0;
-        u32 z = 0;
         do {
-            u8 *e = p + 0x24 + i * 0x1c4;
-            u32 t = e[0];
+            struct ParticleGroup *group = &manager->groups[i];
+            u32 t = group->active;
             s32 next = i + 1;
             if (t != 0) {
-                u8 *b = e + 4;
-                u8 *a = e + 0x14;
+                struct ParticleGroupParticle *particle = group->particles;
+                u32 *sprite = &group->particles[0].flags;
                 s32 k = 7;
                 do {
-                    if (*b != 0) {
-                        Effect_Remove(a);
-                        *b = z;
+                    if (particle->active) {
+                        Effect_Remove(sprite);
+                        particle->active = 0;
                     }
-                    b += 0x38;
-                    a += 0x38;
+                    particle++;
+                    sprite = (void *)((u8 *)sprite + sizeof(*particle));
                     k--;
                 } while (k >= 0);
-                e[0] = z;
+                group->active = 0;
             }
             i = next;
         } while (i <= 5);
