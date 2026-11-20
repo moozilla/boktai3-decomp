@@ -252,15 +252,15 @@ bool observe_command(const char *line)
             stop("the intervention's named field is unbound at this frame");
         if (watch->width < 4 && value >= (1u << (8 * watch->width)))
             stop("the intervention value does not fit its field");
-        // The memory callbacks see this store just like CPU stores. Mark it
-        // as authored input so the current PC is never reported as its writer.
+        // Write the precise little-endian field bytes, including packed
+        // members. A CPU halfword or word store could align the address down.
+        const uint32_t address = watch->address;
+        if (!observe_before_store(address, watch->width))
+            stop("the named intervention could not be observed");
+        for (unsigned i = 0; i < watch->width; ++i)
+            core->rawWrite8(core, address + i, -1, value >> (8 * i));
         intervention_field = index;
-        if (watch->width == 1)
-            core->busWrite8(core, watch->address, value);
-        else if (watch->width == 2)
-            core->busWrite16(core, watch->address, value);
-        else
-            core->busWrite32(core, watch->address, value);
+        observe_after_store(0);
         intervention_field = MAX_FIELDS;
         return true;
     }

@@ -88,18 +88,18 @@ async function refreshHistory() {
   $('compare').value = comparison?.id || '';
 }
 
-async function submit(spec) {
+async function submit(body, endpoint = API + '/runs', target = null) {
   const token = ++loadToken;
   running = true;
   stopPlayback();
   header();
   setStatus('Submitting the recipe…');
   try {
-    const job = await json(API + '/runs', spec);
+    const job = await json(endpoint, body);
     if (token !== loadToken) return;
     $('editor').close();
     history.replaceState(null, '', '#run/' + job.id);
-    await waitForRun(job.id, null, token);
+    await waitForRun(job.id, target, token);
   } catch (error) {
     if (token !== loadToken) return;
     setStatus(error.message, true);
@@ -597,13 +597,26 @@ $('previous').onclick = () => { stopPlayback(); chooseFrame(sample - 1); };
 $('snapshot-query').onsubmit = async event => {
   event.preventDefault();
   stopPlayback();
-  const key = readbackKey, token = ++queryToken;
+  const path = $('snapshot-field').value.trim();
   const { trial, snap } = atSelected();
   const output = $('snapshot-value');
+  if (event.submitter?.id === 'trace-field') {
+    const existing = primary.fields.findIndex(field => field.path === path);
+    if (existing >= 0) {
+      selected.kind = 'field';
+      selected.index = existing;
+      renderFrame();
+      return;
+    }
+    const route = { trial: trial.id, frame: snap.relative, kind: 'field', index: primary.fields.length };
+    submit([path], resultPath(primary.id) + '/rewatch', route);
+    return;
+  }
+  const key = readbackKey, token = ++queryToken;
   output.value = 'Restoring the captured frame…';
   try {
     const url = resultPath(primary.id) + '/snapshot/' + trial.id + '/' + snap.relative;
-    const { fields: rows, game_frame: gameFrame } = await json(url, [$('snapshot-field').value.trim()]);
+    const { fields: rows, game_frame: gameFrame } = await json(url, [path]);
     if (key !== readbackKey || token !== queryToken) return;
     const row = rows[0];
     output.value = row.resolved_address

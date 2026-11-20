@@ -207,6 +207,13 @@ def prepare_fork(spec, directory, rom_id):
     if not fork:
         return None, None
     result, trial, point, image, data = captured_frame(fork, rom_id)
+    if fork.get("seed") == "start":
+        # A trial starts by loading this exact byte stream. Loading a later
+        # f0000 serialization can normalize emulator IO state during restore.
+        seed = run_dir(fork["run"]) / "prepare/fork.ss"
+        data = seed.read_bytes()
+        if hashlib.sha256(data).hexdigest() != result["identity"]["fork"]:
+            raise ValueError("The original starting state changed on disk")
     (directory / "parent.ss").write_bytes(data)
     checkpoint = {**result["checkpoint"], "kind": "fork",
                   "label": f"{trial['label']} at frame {point['relative']}",
@@ -234,6 +241,22 @@ def inspect_frame(reference, paths):
             "game_frame": point["frame"], "state_sha256": point["state_sha256"],
             "fields": [{**field.to_dict(), "value": row["value"], "resolved_address": row["address"]}
                        for field, row in zip(observed, snaps[0]["fields"])]}
+
+
+def rewatch_recipe(directory, paths):
+    """Repeat all inputs from the original captured start with extra observers."""
+    paths = recipe.strings(paths, recipe.MAX_FIELDS, "Additional fields")
+    result = read_json(directory / "result.json")
+    spec = result["recipe"]
+    requested = [path for path in paths if path not in spec["observe"]]
+    if not requested:
+        raise ValueError("Name at least one field this experiment did not watch")
+    title = spec["title"]
+    if not title.startswith("Replay with additional watches"):
+        title = ("Replay with additional watches · " + title)[:120]
+    return recipe.validate({**spec, "title": title, "observe": spec["observe"] + requested,
+                            "fork": {"run": result["id"], "trial": result["trials"][0]["id"], "frame": 0, "seed": "start"},
+                            "continue": False, "prepare": ""})
 
 
 def light_at_sample(commands, starting_lux):
@@ -461,9 +484,13 @@ def execute(directory, spec, trans=None):
             if checkpoint["kind"] in {"bookmark", "recording"}:
                 external, seed_picture = centaur.stage(checkpoint, prefix)
         boot_commands = initial_commands(spec, starting_lux, bool(parent), bool(external))
-        run_harness(binary, prefix, boot_commands, spec["rtc"], battery)
+        prepared = recipe.compile_steps(spec["prepare"], recipe.MAX_PREPARE)
+        if parent and spec["fork"].get("seed") == "start" and not prepared:
+            (prefix / "parent.ss").rename(prefix / "fork.ss")
+        else:
+            run_harness(binary, prefix, boot_commands, spec["rtc"], battery)
         _, starting_lux = light_at_sample(boot_commands, starting_lux)
-        if seed_picture and not any(step[0] for step in recipe.compile_steps(spec["prepare"], recipe.MAX_PREPARE)):
+        if seed_picture and not any(step[0] for step in prepared):
             from PIL import Image
             with Image.open(seed_picture) as image:
                 image.save(prefix / "fork.ppm")

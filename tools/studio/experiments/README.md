@@ -27,6 +27,9 @@ frame** starts an editable experiment from the selected trial and frame. Code's
 click Django's coat in the field trial or enter coordinates 117, 88. The sprite
 evidence links the hardware slot to its native renderer, drawable address,
 typed owner, watched fields, and the art archive containing the tile source.
+Read any additional field from a captured frame. **Trace writes** replays the
+original starting state and input sequence with that field added to the
+observer, so you can find its writer even if the original recipe omitted it.
 **Replay without this sprite** runs the same trial twice. The control must
 reproduce the stored screenshot and emulator state. The second replay hides
 that hardware slot for one rendered frame and must reach the same serialized
@@ -45,6 +48,7 @@ build/venv/bin/python -m tools.studio.experiments show RUN_ID
 build/venv/bin/python -m tools.studio.experiments pixel RUN_ID field 60 117 88
 build/venv/bin/python -m tools.studio.experiments pixel-check RUN_ID field 60 117 88 7
 build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGameState->life'
+build/venv/bin/python -m tools.studio.experiments rewatch RUN_ID 'gGameState->life'
 build/venv/bin/python -m tools.studio.experiments sweep tools/studio/experiments/pause.json \
   --checkpoint bank-0004 --checkpoint bank-0064
 ```
@@ -132,6 +136,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | GET `/api/experiments/runs/ID` | Poll job state. |
 | GET `/api/experiments/runs/ID/result` | Read frame values, environment fingerprints, checked claims and attributed stores. |
 | POST `/api/experiments/runs/ID/snapshot/TRIAL/FRAME` | Read a JSON array of named fields from the restored frame. |
+| POST `/api/experiments/runs/ID/rewatch` | Submit a replay from the captured start. Send a JSON array of additional observed fields. |
 | GET `/api/experiments/runs/ID/pixel/TRIAL/FRAME/X/Y` | Read matching OBJ fragments and their native queue, source, actor, and art evidence. |
 | POST `/api/experiments/runs/ID/pixel-check/TRIAL/FRAME/X/Y/SLOT` | Send an empty JSON object to replay with one matching slot hidden and return a saved comparison. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/writes.json` | Read the value-changing CPU stores and optional authored interventions for one trial. |

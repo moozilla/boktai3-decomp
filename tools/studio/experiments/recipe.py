@@ -96,8 +96,13 @@ def validate(value):
             raise ValueError("A fork requires a valid run ID")
         if not isinstance(trial_id, str) or not TRIAL_ID.fullmatch(trial_id):
             raise ValueError("A fork requires a valid trial ID")
-        fork = {"run": run_id, "trial": trial_id,
-                "frame": bounded_int(fork.get("frame"), 0, MAX_FRAMES, "Fork frame")}
+        frame = bounded_int(fork.get("frame"), 0, MAX_FRAMES, "Fork frame")
+        seed = fork.get("seed", "sample")
+        if seed not in ("sample", "start") or (seed == "start" and frame != 0):
+            raise ValueError("Use the original starting state only for frame zero")
+        fork = {"run": run_id, "trial": trial_id, "frame": frame}
+        if seed == "start":
+            fork["seed"] = seed
     can_continue = checkpoint != "boot" and not checkpoint.startswith(CAPTURE_PREFIXES) and fork is None
     resume = value.get("continue", can_continue)
     if type(resume) is not bool or (resume and not can_continue):

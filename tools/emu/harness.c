@@ -356,7 +356,8 @@ static void savestate(const char* name, int load) {
 	char path[1024];
 	snprintf(path, sizeof(path), "%s/%s.ss", outdir, name);
 	size_t size = core->stateSize(core);
-	void* state = malloc(size);
+	// mGBA leaves unscheduled event fields and reserved bytes unwritten.
+	void* state = load ? malloc(size) : calloc(1, size);
 	if (!state) { fprintf(stderr, "cannot allocate savestate buffer\n"); exit(1); }
 	FILE* f = fopen(path, load ? "rb" : "wb");
 	if (!f) { perror(path); exit(1); }

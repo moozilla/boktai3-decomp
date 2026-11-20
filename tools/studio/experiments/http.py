@@ -93,8 +93,7 @@ def execute_and_release(directory, spec, trans):
         SLOTS.release()
 
 
-def post_run(handler):
-    spec = recipe.validate(body(handler))
+def queue_run(handler, spec):
     if not SLOTS.acquire(blocking=False):
         handler.send(429, {"error": "The experiment queue is full"})
         return
@@ -151,6 +150,10 @@ def catalog(handler):
 
 def post_frame_query(handler, path):
     identifier, *parts = path.removeprefix(API + "/runs/").split("/")
+    if parts == ["rewatch"]:
+        directory = runner.run_dir(identifier)
+        queue_run(handler, runner.rewatch_recipe(directory, body(handler)))
+        return
     readback = len(parts) == 3 and parts[0] == "snapshot"
     isolation = len(parts) == 6 and parts[0] == "pixel-check"
     if not (readback or isolation) or not all(re.fullmatch(r"[0-9]{1,4}", value) for value in parts[2:]):
@@ -217,7 +220,7 @@ def routes(handler, method):
                 raise FileNotFoundError("No such sweep artifact")
         elif path == API + "/runs":
             if method == "POST":
-                post_run(handler)
+                queue_run(handler, recipe.validate(body(handler)))
             else:
                 handler.send(200, recent())
         elif method == "POST" and path == API + "/fields":

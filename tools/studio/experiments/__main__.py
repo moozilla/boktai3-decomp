@@ -116,6 +116,9 @@ def main():
     isolate.add_argument("x", type=int)
     isolate.add_argument("y", type=int)
     isolate.add_argument("slot", type=int)
+    rewatch = commands.add_parser("rewatch", help="Replay the original captured start with additional watches")
+    rewatch.add_argument("id")
+    rewatch.add_argument("paths", nargs="+")
     import_live = commands.add_parser("import-live", help="Turn a Centaur recording into a replay recipe")
     import_live.add_argument("id")
     args = parser.parse_args()
@@ -141,8 +144,13 @@ def main():
                     data = graphics.inspect(directory, original, args.trial, args.frame, args.x, args.y, runner.ROM)
             case "snapshot":
                 data = runner.inspect_frame({"run": args.id, "trial": args.trial, "frame": args.frame}, args.paths)
-            case "proof" | "run":
-                spec = runner.sample_recipe() if args.command == "proof" else recipe.validate(runner.read_json(args.recipe))
+            case "proof" | "run" | "rewatch":
+                if args.command == "proof":
+                    spec = runner.sample_recipe()
+                elif args.command == "rewatch":
+                    spec = runner.rewatch_recipe(runner.run_dir(args.id), args.paths)
+                else:
+                    spec = recipe.validate(runner.read_json(args.recipe))
                 directory = runner.init_run(spec)
                 result = runner.execute(directory, spec, getattr(args, "trans", None))
                 if args.command == "proof":

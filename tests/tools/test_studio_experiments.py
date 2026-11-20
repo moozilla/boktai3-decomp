@@ -75,6 +75,9 @@ class RecipeTests(unittest.TestCase):
             spec["fork"]["run"] = bad
             with self.assertRaisesRegex(ValueError, "run ID"):
                 recipe.validate(spec)
+        spec["fork"] = {"run": "0" * 32, "trial": "menu", "frame": 15, "seed": "start"}
+        with self.assertRaisesRegex(ValueError, "frame zero"):
+            recipe.validate(spec)
 
     def test_outside_luminance_follows_setup_and_sample_order(self):
         commands = ["lux 86", *recipe.timeline(recipe.compile_steps("wait 5\nlux 12"), 10, 5, save_states=True)]
@@ -329,6 +332,24 @@ class HTTPTests(unittest.TestCase):
 
     @unittest.skipUnless(os.getenv("STUDIO_EXPERIMENT_ROM_TESTS") == "1" and runner.ROM.is_file(),
                          "Local ROM and explicit integration opt-in required")
+    def test_named_store_writes_an_unaligned_field_without_cpu_attribution(self):
+        watch = fields.Field("sample", "sample", 0x02000001, (0,), 2, False, "include/test.h")
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary)
+            binary = runner.build_harness()
+            commands = ["trace off", watch.command(), "sample before", "setfield 0 6A25", "sample after",
+                        "dump boundary 02000000:4"]
+            runner.run_harness(binary, path, commands, recipe.DEFAULT_RTC)
+            snapshots, events = runner.parse_events(path / "observations.tsv", [watch], fields.function_index())
+            self.assertEqual(len(events), 1)
+            self.assertEqual(snapshots[1]["fields"][0]["value"], 0x6A25)
+            self.assertEqual((path / "boundary.bin").read_bytes(), b"\x00\x25\x6A\x00")
+            self.assertEqual(events[0]["kind"], "intervention")
+            self.assertIsNone(events[0]["function"])
+            self.assertIsNone(events[0]["pc"])
+
+    @unittest.skipUnless(os.getenv("STUDIO_EXPERIMENT_ROM_TESTS") == "1" and runner.ROM.is_file(),
+                         "Local ROM and explicit integration opt-in required")
     def test_checkpoint_sweep_keeps_links_and_separate_history(self):
         with tempfile.TemporaryDirectory() as temp:
             folder = Path(temp)
@@ -364,8 +385,8 @@ class HTTPTests(unittest.TestCase):
                          "Local ROM and explicit integration opt-in required")
     def test_actual_run_and_snapshot_fork_through_http(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(runner, "JOBS", Path(temp)):
-            def run(spec):
-                code, data = self.request("POST", "/api/experiments/runs", spec,
+            def run(spec, endpoint="/api/experiments/runs"):
+                code, data = self.request("POST", endpoint, spec,
                                           **{"Content-Type": "application/json"})
                 self.assertEqual(code, 202)
                 job = json.loads(data)["id"]
@@ -430,6 +451,15 @@ class HTTPTests(unittest.TestCase):
             child = run(proof_branch(parent))
             self.assertTrue(all(c["state"] == "confirmed" for c in child["checks"]))
             self.assertEqual(child["checkpoint"]["fork"]["run"], parent["id"])
+            requested = ["gGameState->life", "gPlayers[0]->velocityZ"]
+            replay = run(requested, f"/api/experiments/runs/{parent['id']}/rewatch")
+            self.assertEqual(replay["identity"]["fork"], parent["identity"]["fork"])
+            self.assertEqual(replay["recipe"]["observe"][-2:], requested)
+            for old, new in zip(parent["trials"], replay["trials"]):
+                self.assertEqual([s["state_sha256"] for s in old["snapshots"]],
+                                 [s["state_sha256"] for s in new["snapshots"]])
+            velocity = replay["trials"][0]["snapshots"][-1]["fields"][-1]
+            self.assertEqual(velocity["last_write"]["function"]["name"], "Obj_StepPosition")
             cause = run(runner.sample_recipe("pause-cause"))
             self.assertTrue(all(claim["state"] == "confirmed" for claim in cause["checks"]))
             field, flag, menu, allow = (trial["snapshots"][-1]["fields"] for trial in cause["trials"])
