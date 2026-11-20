@@ -17,11 +17,7 @@ void NumericDisplay_DrawPair(void *unused, int left, int right)
     int *values;
     digits[0] = left > 9;
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 6, 11);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 6, 11);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;
@@ -63,11 +59,7 @@ void NumericDisplay_DrawStatusValues(struct StatusScreen *unused)
     int left = SunClock_GetBaseHour(), right = SunClock_GetBaseMinute();
     digits[0] = Div(left, 10);
     digits[1] = left - digits[0] * 10;
-    dst = (s16 *)StatusScreen_GetTilePtr(0, 16, 11);
-    do {
-        row = 0;
-        values = digits;
-    } while (0);
+    STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, row, values, digits, 16, 11);
     for (; row < 2; row++) {
         int shift = row << 4;
         int *digit = values;

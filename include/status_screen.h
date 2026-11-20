@@ -58,6 +58,14 @@ struct StatusGameState {
 extern struct StatusGameState gSunClock;
 
 u16 *StatusScreen_GetTilePtr(u32 bg, u32 x, s32 y); // address of a tile in the background's tilemap
+
+#define STATUS_SCREEN_BEGIN_DIGIT_GRID(dst, digitRow, digitValues, digits, x, y) \
+    do { \
+        (dst) = (s16 *)StatusScreen_GetTilePtr(0, (x), (y)); \
+        (digitRow) = 0; \
+        (digitValues) = (digits); \
+    } while (0)
+
 void NumericDisplay_DrawPair(void *unused, int left, int right);
 void NumericDisplay_DrawStatusValues(struct StatusScreen *);
 void StatusScreen_DrawClock(struct StatusScreen *);
