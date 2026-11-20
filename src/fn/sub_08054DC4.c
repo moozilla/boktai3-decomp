@@ -11,25 +11,19 @@ void DisplayTrack_SetSequenceFromScript(void)
             if (Script_SeekToKeyword('r')) {
                 u32 variant;
                 u32 event;
-                void *state;
                 track->mirror = Script_GetValue();
-                do {
-                    variant = 0;
-                    if (Script_SeekToKeyword('E')) {
-                        variant = Script_GetValue();
-                    }
-                } while (0);
+                variant = 0;
+                if (Script_SeekToKeyword('E'))
+                    variant = Script_GetValue();
                 if (variant) {
-                    state = &track->sequenceState;
-                    Anim_RestartSequence(state, track->sequenceResource, track->sequenceId,
-                                         track->sequenceRow, track->mirror);
+                    Anim_RestartSequence(&track->sequenceState, track->sequenceResource,
+                                         track->sequenceId, track->sequenceRow, track->mirror);
                 } else {
-                    state = &track->sequenceState;
-                    Anim_SetSequence(state, (void *)track->sequenceResource, track->sequenceId,
-                                     track->sequenceRow, track->mirror);
+                    Anim_SetSequence(&track->sequenceState, (void *)track->sequenceResource,
+                                     track->sequenceId, track->sequenceRow, track->mirror);
                 }
                 if (Script_SeekToKeyword('P')) {
-                    Anim_SetDurationScale(state, (u16)Script_GetValue());
+                    Anim_SetDurationScale(&track->sequenceState, (u16)Script_GetValue());
                 }
                 event = Script_SeekToKeyword('o');
                 if (event) {

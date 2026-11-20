@@ -1,6 +1,7 @@
 #ifndef EFFECT_EMITTER_H
 #define EFFECT_EMITTER_H
 #include "global.h"
+#include "contact_collider.h"
 #include "scene_object.h"
 #include "task.h"
 
@@ -18,13 +19,6 @@ struct EmitterSprite {
     u8 pad12[10];
     struct EmitterVec position;
     u8 tail[8];
-};
-
-// Collider contact data of the thing that hit us (callback argument).
-struct EmitterAttack {
-    u8 pad0[0x38];
-    u32 flags; // bit 6: strong attack
-    u16 pad3C, damage;
 };
 
 struct EffectEmitter {
@@ -46,7 +40,7 @@ struct EffectEmitter {
 
 extern u16 gUnk_08604AB4[];
 
-void EffectEmitter_ReceiveHit(struct EmitterAttack *, void *, struct EffectEmitter *);
+void EffectEmitter_ReceiveHit(struct ContactCollider *, struct ContactCollider *, struct EffectEmitter *);
 s32 EffectEmitter_Update(struct EffectEmitter *);
 u32 EffectEmitter_Destroy(struct EffectEmitter *);
 s32 EffectEmitter_Initialize(struct EffectEmitter *, u32, u32);

@@ -28,12 +28,13 @@ int FadingParticleGroup_Update(struct FadingParticleGroup *g)
                 const u16 *entry;
                 const struct SpriteEffectTileResource *resource;
                 u32 frame;
+                u16 verticalSpeed;
                 alive++;
                 p->sprite.position.x += scale(p->velocity.x, *speed);
                 p->sprite.position.y += p->velocity.y;
                 p->sprite.position.z += scale(p->velocity.z, *speed);
-                p = (struct FadingParticleMotion *)((u32)p + (p->anim.flags >> 8));
-                p->velocity.y -= 2;
+                verticalSpeed = p->velocity.y;
+                p->velocity.y = verticalSpeed - 2;
                 Anim_SetDurationScale(anim, 16);
                 resource = ((struct FadingParticleManager *)gFadingParticleManager)->graphics;
                 a = anim;
@@ -108,10 +109,10 @@ int FadingParticleGroup_Update(struct FadingParticleGroup *g)
                 }
             } else
                 p->sprite.flags |= 1;
-            life += 68;
-            anim = (void *)((u8 *)anim + 68);
-            speed = (void *)((u8 *)speed + 68);
-            p = (void *)((u8 *)p + 68);
+            life += sizeof(struct FadingParticle);
+            anim = (void *)((u8 *)anim + sizeof(struct FadingParticle));
+            speed = (void *)((u8 *)speed + sizeof(struct FadingParticle));
+            p = (void *)((u8 *)p + sizeof(struct FadingParticle));
             i++;
         } while (i < g->count);
     }

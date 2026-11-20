@@ -1,4 +1,5 @@
 #include "blend_transition.h"
+#include "array_fill.h"
 
 int BlendTransition_Update(struct BlendTransition *transition)
 {
@@ -21,20 +22,6 @@ int BlendTransition_Update(struct BlendTransition *transition)
 u32 BlendTransition_Destroy(void)
 {
     return 0;
-}
-
-/* Clear in reverse order and return the cursor after the final store. */
-
-static inline u8 *BlendFade_ClearCoefficients(u8 *first)
-{
-    s32 zero = 0;
-    u8 *cursor = first + 1;
-    do {
-        *cursor = zero;
-        cursor--;
-    } while ((s32)cursor >= (s32)first);
-    first = cursor;
-    return first;
 }
 
 // confidence=low: reads a blend fade from the script: mode 'm', start coefficients 'i', their
@@ -62,9 +49,11 @@ s32 BlendTransition_InitializeFromScript(struct BlendTransition *transition)
         if ((s32)s <= (s32)(start + 1))
             goto read_start;
     } else {
+        u8 *out;
         start = transition->initial;
         delta = transition->delta;
-        s = BlendFade_ClearCoefficients(start);
+        out = start;
+        Array_FillDescending(out[0], out[1], 0);
     }
     if (Script_SeekToKeyword('a')) {
         i = 0;
@@ -80,7 +69,8 @@ s32 BlendTransition_InitializeFromScript(struct BlendTransition *transition)
             i++;
         } while (i <= 1);
     } else {
-        s = BlendFade_ClearCoefficients(delta);
+        u8 *out = delta;
+        Array_FillDescending(out[0], out[1], 0);
     }
     transition->source = Script_GetKeywordValue('s', 0);
     transition->destination = Script_GetKeywordValue('d', 0);

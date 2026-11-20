@@ -2,35 +2,12 @@
 #include "engine.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
-struct SequenceDrawable {
-    u32 flags;
-    u8 active, unknown5[2], priority;
-    u8 unknown8[4];
-    void *graphics;
-    u16 frame;
-    u8 unknown12[0xa];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 resource[0x1c];
-};
-struct TileDrawable {
-    u32 flags;
-    u8 active;
-    u8 unknown5[3];
-    u16 tile;
-    u8 width, height;
-    u8 biasX, biasY, unknownE, priority;
-    u8 unknown10[8];
-    struct ContactPosition position;
-    u8 unknown20[8];
-    void *graphics;
-};
+#include "player.h"
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);
 void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *, s32, u32);
-void ParticleSprite_Initialize(void *, void *, s32);
+void ParticleSprite_Initialize(void *, const void *, s32);
 void Effect_SetOrigin(void *, s32, s32);
 void Effect_SetPalette(void *, s32);
-extern u32 gUnk_02000560;
 struct SpriteEffectController *
 SpriteEffectController_Create(const struct ContactPosition *position,
                               const struct ContactPosition *velocity, s32 graphicsId, u32 context,
@@ -52,7 +29,7 @@ SpriteEffectController_Create(const struct ContactPosition *position,
         if ((gEngineFlags | gScenePauseFlags) & mask)
             return 0;
     }
-    if (gUnk_02000560 & 4)
+    if (gPlayerSlotStatus[0] & 4)
         return 0;
     slot = SpriteEffectController_AllocateSlot(p);
     if (!slot)
@@ -65,30 +42,31 @@ SpriteEffectController_Create(const struct ContactPosition *position,
         slot->flags |= 0x80;
     slot->lifetime = lifetime;
     if (slot->flags & 8) {
-        struct SequenceDrawable *sprite;
-        slot->drawable = Heap_Alloc(0x48);
-        Memory_Clear(slot->drawable, 0x48);
+        struct SpriteEffectSequenceDrawable *sprite;
+        slot->drawable = Heap_Alloc(sizeof(*sprite));
+        Memory_Clear(slot->drawable, sizeof(*sprite));
         sprite = slot->drawable;
         sprite->position = *position;
         resource = SpriteEffectController_LoadSpriteResources(slot, graphicsId, context);
-        Sprite_Init(sprite, (u8 *)slot->drawable + 0x2c, 0);
+        Sprite_Init(sprite, &((struct SpriteEffectSequenceDrawable *)slot->drawable)->resource, 0);
         Anim_SetSequence(&slot->sequence, resource, (u16)sequence, (u8)variant, (u8)animationFlags);
         AnimData_SelectPaletteBank(sprite->graphics, palette);
         PlayerCue_StepSequence((struct ContactSwarmSprite *)sprite, &slot->sequence);
         sprite->flags |= 1 | drawableFlags;
         sprite->priority = priority;
     } else if (slot->flags & 0x10) {
-        struct TileDrawable *sprite;
-        slot->drawable = Heap_Alloc(0x2c);
-        Memory_Clear(slot->drawable, 0x2c);
+        struct SpriteEffectTileDrawable *sprite;
+        slot->drawable = Heap_Alloc(sizeof(*sprite));
+        Memory_Clear(slot->drawable, sizeof(*sprite));
         sprite = slot->drawable;
         sprite->position = *position;
         {
-            struct TileDrawable *graphicsOwner = slot->drawable;
+            struct SpriteEffectTileDrawable *graphicsOwner = slot->drawable;
             graphicsOwner->graphics = AnimData_FindEntry((u16)graphicsId);
         }
         resource = ScriptProc_Start(0x922e, context);
-        ParticleSprite_Initialize(sprite, ((struct TileDrawable *)slot->drawable)->graphics, 0);
+        ParticleSprite_Initialize(sprite,
+                                  ((struct SpriteEffectTileDrawable *)slot->drawable)->graphics, 0);
         Effect_SetOrigin(sprite, -biasX, -biasY);
         Anim_SetSequence(&slot->sequence, resource, (u16)sequence, (u8)variant, (u8)animationFlags);
         Effect_SetPalette(sprite, palette);

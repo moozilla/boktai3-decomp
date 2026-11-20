@@ -1,4 +1,5 @@
 #include "palette_level_transitions.h"
+#include "array_fill.h"
 #include "ram.h"
 
 void Mosaic_SetParameters(u16, u8, u8);
@@ -127,56 +128,43 @@ int PaletteLevels_Configure(int mode, int first, int count, u8 *initial, u8 *tar
 
 s32 PaletteLevels_ConfigureFromScript(void)
 {
-    u8 c[4];
-    u8 a[4];
-    u16 iv[4];
-    s32 m, f, t, k;
-    u8 *pa;
-    u16 *pi;
-    m = Script_GetKeywordValue('m', 0);
-    f = Script_GetKeywordValue('f', 0);
-    t = Script_GetKeywordValue('t', 0);
+    u8 initial[4];
+    u8 target[4];
+    u16 periods[4];
+    s32 mode, firstChannel, channelCount, i;
+    u8 *targetValues;
+    u16 *periodValues;
+    mode = Script_GetKeywordValue('m', 0);
+    firstChannel = Script_GetKeywordValue('f', 0);
+    channelCount = Script_GetKeywordValue('t', 0);
     if (Script_SeekToKeyword('c')) {
-        k = 0;
-        pa = a;
-        pi = iv;
-        for (; k <= 3; k++)
-            c[k] = Script_GetValue();
+        i = 0;
+        targetValues = target;
+        periodValues = periods;
+        for (; i <= 3; i++)
+            initial[i] = Script_GetValue();
     } else {
-        s32 zero;
-        u8 *out;
-        pa = a;
-        pi = iv;
-        zero = 0;
-        out = c + 3;
-        do {
-            *out-- = zero;
-        } while ((s32)out >= (s32)c);
+        targetValues = target;
+        periodValues = periods;
+        Array_FillDescending(initial[0], initial[3], 0);
     }
     if (Script_SeekToKeyword('a')) {
-        for (k = 0; k <= 3; k++)
-            pa[k] = Script_GetValue();
+        for (i = 0; i <= 3; i++)
+            targetValues[i] = Script_GetValue();
     } else {
-        u8 *base = pa;
-        s32 zero = 0;
-        u8 *out = pa + 3;
-        do {
-            *out-- = zero;
-        } while ((s32)out >= (s32)base);
+        u8 *out = targetValues;
+        Array_FillDescending(out[0], out[3], 0);
     }
     if (Script_SeekToKeyword('i')) {
-        u16 *out = pi;
-        for (k = 0; k <= 3; k++)
+        u16 *out = periodValues;
+        for (i = 0; i <= 3; i++)
             *out++ = Script_GetValue();
     } else {
-        u16 *base = pi;
-        s32 zero = 0;
-        u16 *out = pi + 3;
-        do {
-            *out-- = zero;
-        } while ((s32)out >= (s32)base);
+        u16 *out = periodValues;
+        Array_FillDescending(out[0], out[3], 0);
     }
-    return PaletteLevels_Configure(m, f, t, c, pa, pi);
+    return PaletteLevels_Configure(mode, firstChannel, channelCount, initial, targetValues,
+                                   periodValues);
 }
 
 void PaletteLevels_Reset(void)

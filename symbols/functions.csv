@@ -12,9 +12,11 @@ addr,name,mode,confidence,source,notes
 08001EB4,Background_FindMapId,thumb,low,src-alias,
 08001EE0,Background_LoadMapsFromScript,thumb,low,src-alias,
 08002024,Background_LoadMapFromScript,thumb,low,src-alias,
+080020BC,Background_LoadLayerMap,thumb,low,src-alias,Selects a map by index or layer name hash and installs it on a background layer
 0800211C,Background_LoadTilesFromScript,thumb,low,src-alias,
 080021DC,Background_QueueCommand,thumb,low,src-alias,
 08002234,Background_QueueCommandFromScript,thumb,low,src-alias,"Reads keyword values and an argument list from the script stream, then calls Background_QueueCommand; mirrors ScrollingBackground's script-to-queue wr"
+08002284,ScrollingBackground_ClearSlots,thumb,low,src-alias,Clears the four scrolling background controller pointers
 080022A0,ScrollingBackground_ApplyCommands,thumb,low,src-alias,
 08002408,ScrollingBackground_Update,thumb,low,src-alias,
 08002658,ScrollingBackground_Destroy,thumb,low,src-alias,Clears the layer's single slot in gUnk_02000010; set as the destroy callback via Task_SetCallbacks alongside ScrollingBackground_Update in sub_0800284
@@ -464,6 +466,7 @@ addr,name,mode,confidence,source,notes
 0801450C,ParticleManager_Kill,thumb,low,src-alias,Task kill callback for the particle manager: removes active effects from each of the 6 particle groups' 8 slots and clears the gUnk_02000060 singleton
 08014568,ParticleManager_Initialize,thumb,low,src-alias,
 080145E4,ParticleManager_Create,thumb,low,src-alias,Singleton accessor/creator called by 08014634 and 080148CC: returns the existing manager via gUnk_02000060 or creates the task with ParticleManager_Up
+08014C28,ParticleManager_ClearActiveGroups,thumb,low,src-alias,
 08014F64,FragmentGroup_Update,thumb,low,src-alias,
 08015040,FragmentManager_Update,thumb,low,src-alias,"Task update callback for the FragmentManager: updates FragmentGroup_Update for each of 4 active entries, matching the ParticleManager_Update/AnimatedP"
 08015074,FragmentManager_Destroy,thumb,low,src-alias,"Task destroy callback (2nd arg to Task_SetCallbacks) for the FragmentManager: removes sprites of all active fragment pieces and zeroes gUnk_02000064, "
@@ -1807,6 +1810,7 @@ addr,name,mode,confidence,source,notes
 08047424,TransientSpriteEffects_Initialize,thumb,low,src-alias,
 080474A0,TransientSpriteEffects_Create,thumb,low,src-alias,
 080474E4,TransientSpriteEffects_Spawn,thumb,low,src-alias,
+080475F8,TransientSpriteEffects_SpawnFromScript,thumb,low,src-alias,
 080476F4,BackgroundFlash_SetState,thumb,low,src-alias,
 08047700,BackgroundFlash_TakeEntryFlag,thumb,low,src-alias,
 08047718,BackgroundFlash_EmitEffect,thumb,low,src-alias,

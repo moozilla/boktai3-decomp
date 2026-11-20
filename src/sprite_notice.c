@@ -76,7 +76,7 @@ s32 SpriteNotice_Create(const struct ContactPosition *position, u32 mode)
     struct SpriteNotice *slot;
     if (!position)
         return -1;
-    manager = (void *)gSpriteNoticeManager;
+    manager = gSpriteNoticeManager;
     if (!manager) {
         manager = SceneTrailEffect_EnsurePool();
         if (!manager)
@@ -86,8 +86,8 @@ s32 SpriteNotice_Create(const struct ContactPosition *position, u32 mode)
     if (!slot)
         return -1;
     slot->sprite.position = *position;
-    ParticleSprite_Initialize(slot, manager->spriteData, 0);
-    Effect_SetOrigin(slot, -8, -8);
+    ParticleSprite_Initialize(&slot->sprite, manager->spriteData, 0);
+    Effect_SetOrigin(&slot->sprite, -8, -8);
     {
         u32 zero = 0;
         Anim_SetSequence(&slot->animation, manager->animationData, zero, 0, zero);
@@ -143,17 +143,12 @@ static inline u8 SpriteNotice_TestSlot(u32 *m, s32 i)
 
 u32 SceneAnimatedEffect_OnTaskDestroy(struct SpriteNoticeManager *manager)
 {
-    s32 index = 0;
-    u32 *occupied = &manager->occupied;
-    struct SpriteNotice *notice = manager->slots;
-    for (; index < 32; notice++, index++) {
-        if (SpriteNotice_TestSlot(occupied, index))
-            Effect_Remove(notice);
+    s32 index;
+    for (index = 0; index < 32; index++) {
+        if (SpriteNotice_TestSlot(&manager->occupied, index))
+            Effect_Remove(&manager->slots[index].sprite);
     }
-    {
-        u32 z = 0;
-        gSpriteNoticeManager = z;
-    }
+    gSpriteNoticeManager = NULL;
     return 0;
 }
 
@@ -166,7 +161,7 @@ void SceneAnimatedEffect_LoadResources(struct SpriteNoticeManager *manager)
 s32 SceneTrailEffect_InitPool(struct SpriteNoticeManager *manager)
 {
     SceneAnimatedEffect_LoadResources(manager);
-    gSpriteNoticeManager = (u32)manager;
+    gSpriteNoticeManager = manager;
     return 0;
 }
 
@@ -174,7 +169,7 @@ struct SpriteNoticeManager *SceneTrailEffect_EnsurePool(void)
 {
     struct SpriteNoticeManager *manager;
     if (gSpriteNoticeManager != 0)
-        return (void *)gSpriteNoticeManager;
+        return gSpriteNoticeManager;
     manager = Task_Create(0xa, sizeof(*manager));
     if (manager != 0) {
         Task_SetCallbacks(manager, (void (*)(void *))SpriteNotice_TickManager,

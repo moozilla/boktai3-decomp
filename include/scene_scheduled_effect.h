@@ -14,7 +14,7 @@ struct SceneScheduledEffect {
     struct ContactCollider collider;
     u16 variant, animationIndex, active;
     s16 lifetime, delay, state, timer;
-    u16 slot;
+    s16 slot; /* -1 until allocated from the four-slot pool */
     u16 flags, unknown142;
 };
 struct SceneScheduledEffectPool {

@@ -18,7 +18,9 @@ struct SpriteEffectTileDrawable {
     u8 active, unknown5[3];
     u16 tile;
     u8 width, height;
-    u8 unknownC[8];
+    s8 biasX, biasY;
+    u8 unknownE, priority;
+    u8 unknown10[4];
     u32 attributes; /* 0x14: packed OAM shape/size and color mode */
     struct ContactPosition position;
     u8 unknown20[8];
@@ -26,10 +28,14 @@ struct SpriteEffectTileDrawable {
 };
 struct SpriteEffectSequenceDrawable {
     u32 flags;
-    u8 active, unknown5[0xB];
+    u8 active, unknown5[2], priority;
+    u8 unknown8[4];
+    struct SpriteRenderResource *graphics;
     u16 frame;
     u8 unknown12[0xA];
     struct ContactPosition position;
+    struct DisplaySequenceSprite *previous, *next;
+    struct SpriteRenderResource resource;
 };
 struct SpriteEffectController {
     void *drawable;

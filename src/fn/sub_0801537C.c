@@ -1,21 +1,19 @@
-#include "global.h"
+#include "animated_particle.h"
 #include "ram.h"
-void Sprite_Remove(u8 *);
-u32 AnimatedParticleManager_Destroy(u8 *s)
+#include "task_manager.h"
+void Sprite_Remove(void *);
+u32 AnimatedParticleManager_Destroy(struct AnimatedParticleManager *manager)
 {
-    u8 *a = s + 0x60;
-    u8 *b = s + 0x24;
+    struct DisplaySequenceSprite *sprite = &manager->pieces[0].sprite;
+    struct AnimatedParticle *particle = manager->pieces;
     s32 i = 0x1f;
     do {
-        if (*b != 0)
-            Sprite_Remove(a);
-        a += 0x78;
-        b += 0x78;
+        if (particle->active)
+            Sprite_Remove(sprite);
+        sprite = (void *)((u8 *)sprite + sizeof(*particle));
+        particle++;
         i--;
     } while (i >= 0);
-    {
-        u32 z = 0;
-        gAnimatedParticleManager = z;
-    }
+    Task_SetManager(NULL, &gAnimatedParticleManager);
     return 0;
 }

@@ -1,4 +1,5 @@
 #include "repeated_effect.h"
+#include "word_flags.h"
 void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *contact,
                                   struct RepeatedEffectCollider *other,
                                   struct RepeatedEffect *effect)
@@ -7,19 +8,16 @@ void RepeatedEffect_HandleContact(struct RepeatedEffectCollider *contact,
     struct RepeatedEffect *saved = initial;
     u16 *cooldown = &other->cooldown;
     if (!*cooldown) {
-        u32 mask = 4;
-        u32 flags;
-        if (!(contact->responseFlags & mask))
+        if (!(Flags_MaskedWord(4, &contact->responseFlags)))
             return;
-        flags = contact->contactFlags;
-        if (flags & mask) {
+        if (Flags_MaskedWord(4, &contact->contactFlags)) {
             u8 state = initial->state;
             if (state == 0)
                 RepeatedEffect_SetState(initial, 2, RepeatedEffect_TickUpperTransition);
             else if (state == 1)
                 RepeatedEffect_SetState(initial, 0, RepeatedEffect_TickLowerRecovery);
             other->cooldown = 30;
-        } else if (flags & 8) {
+        } else if (contact->contactFlags & 8) {
             if (initial->state == 0)
                 RepeatedEffect_SetState(initial, 1, RepeatedEffect_TickLowerTransition);
             *cooldown = 30;

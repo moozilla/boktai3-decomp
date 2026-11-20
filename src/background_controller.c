@@ -1,10 +1,8 @@
 #include "global.h"
 #include "render.h"
 #include "background_controller.h"
-/* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
-#define Background_LoadLayerMap sub_080020BC
-/* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gScrollingBackgrounds, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
-#define ScrollingBackground_ClearSlots sub_08002284
+#include "background_layers.h"
+#include "array_fill.h"
 
 s32 Background_ApplyQueuedCommands(struct Background *p)
 {
@@ -374,17 +372,13 @@ void *Background_CreateFromScript(u32 id)
     return Background_Create(id, &c);
 }
 
-s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
+s32 Background_FindMapId(struct BgMapResource *resource, u16 id)
 {
-    struct BackgroundMapEntry *entry = (struct BackgroundMapEntry *)resource->maps;
+    const struct BgMapEntry *entries = (const struct BgMapEntry *)resource->maps;
     s32 i;
-    for (i = 0; i < resource->count; i++) {
-        if (entry->id == id) {
+    for (i = 0; i < resource->mapCount; i++) {
+        if ((u16)entries[i].nameHash == id)
             return i;
-        }
-        do {
-            entry++;
-        } while (0);
     }
     return 0;
 }
@@ -392,10 +386,10 @@ s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 s32 Background_LoadMapsFromScript(void)
 {
     s32 indices[4];
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
     s32 target, x, y, n, explicitIndices, i;
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -448,11 +442,11 @@ s32 Background_LoadMapsFromScript(void)
 
 s32 Background_LoadMapFromScript(void)
 {
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u16 layer = Script_GetKeywordValue('p', 0);
     u16 index;
     u8 *base = sub_08216E54(Script_GetKeywordValue('d', 0));
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -474,11 +468,11 @@ s32 Background_LoadMapFromScript(void)
     return index;
 }
 
-s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
+s32 Background_LoadLayerMap(s32 layer, u16 resourceId, s32 useIndex, u16 index)
 {
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u8 *base = sub_08216E54(resourceId);
-    resource = *(struct BackgroundResource *)base;
+    resource = *(struct BgMapResource *)base;
     resource.maps += (u32)base;
     resource.tiles += (u32)base;
     resource.extra += (u32)base;
@@ -491,10 +485,10 @@ s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
 s32 Background_LoadTilesFromScript(void)
 {
     u16 entries[64];
-    struct BackgroundResource resource;
+    struct BgMapResource resource;
     u16 layer = Script_GetKeywordValue('t', 0);
     u16 data = Script_GetKeywordValue('d', 0);
-    u16 size = Script_GetKeywordValue('s', 0);
+    u16 startTile = Script_GetKeywordValue('s', 0);
     void *base = ScriptProc_Start(0xCEEF, data);
     s32 count = 0;
     if (Script_SeekToKeyword('c')) {
@@ -514,21 +508,15 @@ s32 Background_LoadTilesFromScript(void)
             out++;
         }
     } else {
-        s32 zero = 0;
-        u16 *out = entries + 63;
-        do {
-            *out = zero;
-            out--;
-        } while ((s32)out >= (s32)entries);
+        Array_FillDescending(entries[0], entries[63], 0);
     }
 done:
     if (Script_SeekToKeyword('m')) {
-        struct BackgroundResource *loaded =
-            (struct BackgroundResource *)sub_08216E54(Script_GetValue());
+        struct BgMapResource *loaded = (struct BgMapResource *)sub_08216E54(Script_GetValue());
         resource = *loaded;
-        size = resource.size;
+        startTile = resource.tileCount;
     }
-    sub_08215D40(layer, base, count, entries, size);
+    sub_08215D40(layer, base, count, entries, startTile);
     return 0;
 }
 
@@ -560,18 +548,10 @@ void Background_QueueCommandFromScript(void)
     Background_QueueCommand(a, b, n, buf);
 }
 
-/* Clears the four ScrollingBackground slots in gScrollingBackgrounds. Not listed in
- * symbols/functions.csv; it sits between two units as raw bytes in gen/code.s,
- * so it is decompiled here to keep the subsystem contiguous. */
-
-void sub_08002284(void)
+void ScrollingBackground_ClearSlots(void)
 {
-    u32 *base = (u32 *)gScrollingBackgrounds;
-    u32 zero = 0;
-    u32 *p = base + 3;
-    do {
-        *p-- = zero;
-    } while ((s32)p >= (s32)base);
+    struct ScrollingBackground **slots = gScrollingBackgrounds;
+    Array_FillDescending(slots[0], slots[3], NULL);
 }
 
 static inline s32 fixed4(s32 v)

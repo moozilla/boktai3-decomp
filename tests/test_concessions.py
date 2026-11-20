@@ -222,6 +222,60 @@ class Warnings(unittest.TestCase):
             with self.subTest(decl=decl):
                 self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
 
+    def test_grouped_literal_initializers(self):
+        body = """void draw(void) {
+    u32 redBlue = 0x7c1f, product = 0xf83e0;
+    int i = 0, limit = 8;
+    int mutable = 3, value = update(&mutable);
+    int nested = consume('(', pair(i, value = 7)), one = 1;
+    u32 scales[] = {4, 8}, mask = 31;
+    i++;
+}
+"""
+        sites = c.warnings(c.sites(body))
+        self.assertEqual([(s.line, s.kind) for s in sites],
+                         [(2, "literal-local"), (3, "literal-local"), (5, "const-local"),
+                          (6, "literal-local")])
+
+    def test_shadowed_flag_writes_do_not_change_the_outer_local(self):
+        body = """void tick(void) {
+    u32 mask = 0x400;
+    if (enabled) {
+        use(mask);
+        u32 index, mask;
+        mask = 4;
+        change(&mask);
+    }
+    use(mask);
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+        self.assertEqual(warns(body.replace("    use(mask);\n}", "    mask++;\n}")), [])
+        self.assertEqual(warns(body.replace("        use(mask);", "        mask++;")), [])
+
+    def test_member_write_does_not_modify_a_same_named_local(self):
+        body = """void update(struct Actor *actor, struct Sprite sprite) {
+    int state = 4;
+    actor -> state = state;
+    sprite.state++;
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+
+    def test_number_named_record_members_are_not_locals(self):
+        body = """struct Header {
+    int one;
+};
+void clear(void) {
+    struct {
+        struct { int value; } inner;
+        u32 zero;
+    } scratch;
+    u32 zero = 0;
+}
+"""
+        self.assertEqual(warns(body), ["const-local"])
+
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])

@@ -1,3 +1,4 @@
+#include "sprite_projectile.h"
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
@@ -5,38 +6,6 @@
 #include "monster_particle_random.h"
 // confidence=low: creates a pooled projectile with optional spin and collider.
 #define SpriteProjectile_Create sub_08127590
-struct ParticleVector {
-    u16 x, y, z, unused;
-};
-struct Projectile {
-    u32 flags;
-    u8 unknown4[2], angle, priority;
-    u8 unknown8[4];
-    u32 paletteResource;
-    u16 frame;
-    u8 unknown12[10];
-    struct ParticleVector position;
-    u8 unknown24[8];
-    struct DisplaySequenceState sequence;
-    u8 graphics[0x1C];
-    u8 collider[0x54];
-    void *sequenceResource;
-    struct ParticleVector velocity;
-    u8 unknownB8;
-    s8 spin;
-    u8 spinScale, colliderFlags;
-    u16 timer, state;
-    u8 active;
-    s8 slot;
-    u8 unknownC2[2];
-    u32 resourceId;
-    u8 enter, soundDelay;
-    u16 lifetime, cell;
-};
-struct ProjectilePool {
-    u8 unknown0[0x860];
-    u32 allocated;
-};
 void *SpriteProjectile_EnsurePool(void);
 struct Projectile *SpritePool10_AllocateSlot(void *);
 extern u32 gUnk_02000560;
@@ -44,7 +13,7 @@ void AnimData_Load(void *, u32);
 void *ScriptProc_Start(u32, u16);
 void Sprite_Init(void *, void *, s32);
 void Anim_SetSequence(void *, void *, u16, u8, u8);
-void AnimData_SelectPaletteBank(u32, s32);
+void AnimData_SelectPaletteBank(const void *, s32);
 void sub_081274F4(void *, s32, s32, s32, s32);
 static inline u32 Busy(u32 mask)
 {
@@ -67,19 +36,18 @@ static inline void SpriteProjectile_StepPlayback(struct Projectile *sprite,
         table = base->sequence.commands;
         command = (const u16 *)(((u32)table) + offset);
     }
-    base->frame = (*command) >> 6;
+    base->sprite.frame = (*command) >> 6;
     {
         union DisplaySequenceControl control;
         u32 first;
-        u32 maskBit = 1;
         control.raw = state->flags;
-        bit = maskBit;
+        bit = 1;
 
         first = (u8)(control.raw & bit);
         if (first != ((((*command) & 0x30) >> 4) & bit))
-            base->flags |= 4;
+            base->sprite.flags |= 4;
         else
-            base->flags &= ~4;
+            base->sprite.flags &= ~4;
     }
     {
         union DisplaySequenceControl control;
@@ -91,9 +59,9 @@ static inline void SpriteProjectile_StepPlayback(struct Projectile *sprite,
         first = (u8)(control.raw & bit);
 
         if (first != ((((*command) & 0x30) >> 4) & bit))
-            sprite->flags |= 8;
+            sprite->sprite.flags |= 8;
         else
-            sprite->flags &= ~8;
+            sprite->sprite.flags &= ~8;
     }
     if (++state->elapsed >= state->duration) {
         state->elapsed = 0;
@@ -140,8 +108,8 @@ static inline void SpriteProjectile_StepPlayback(struct Projectile *sprite,
     }
 }
 
-struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
-                                           struct ParticleVector *velocity, u32 resource,
+struct Projectile *SpriteProjectile_Create(struct ContactPosition *position,
+                                           struct ContactPosition *velocity, u32 resource,
                                            u32 script, u32 sequence, u32 lifetime, u32 flags,
                                            u32 colliderFlags, s32 palette, u32 flip, u32 speed,
                                            s32 colliderKind, s32 sizeX, s32 sizeY, s32 sizeZ)
@@ -174,30 +142,25 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
     p->soundDelay = 0;
     if (!p->colliderFlags) {
         p->active = 1;
-
     } else {
         p->active = 2;
     }
     sprite = p;
-    {
-        struct ParticleVector *src = position;
-
-        p->position = *src;
-    }
-    AnimData_Load(p->graphics, resource);
+    p->sprite.position = *position;
+    AnimData_Load(&p->graphics, resource);
     p->sequenceResource = ScriptProc_Start(0x922E, script);
-    Sprite_Init(p, p->graphics, 0);
+    Sprite_Init(&p->sprite, &p->graphics, 0);
     playback.sequence = &p->sequence;
     Anim_SetSequence(playback.sequence, p->sequenceResource, sequence, flip, speed);
-    AnimData_SelectPaletteBank(p->paletteResource, palette);
+    AnimData_SelectPaletteBank(p->sprite.resource, palette);
     SpriteProjectile_StepPlayback(sprite, playback.sequence, p);
     {
-        u32 attributes = sprite->flags;
+        u32 attributes = sprite->sprite.flags;
         playback.active = 1;
         attributes |= playback.active;
-        sprite->priority = playback.active;
+        sprite->sprite.priority = playback.active;
         attributes |= flags;
-        sprite->flags = attributes;
+        sprite->sprite.flags = attributes;
     }
     if (flags & 2) {
         u32 origin;
@@ -205,7 +168,7 @@ struct Projectile *SpriteProjectile_Create(struct ParticleVector *position,
         s32 spinSample;
         PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         table = (const u16 *)RANDOM_TABLE_ADDR;
-        sprite->angle = ParticleRandom_ReadDirectSample(table);
+        sprite->sprite.attribute = ParticleRandom_ReadDirectSample(table);
         spinSample = ParticleRandom_ReadDirectSample(table);
         spinSample &= 255;
         if (spinSample <= 127)
