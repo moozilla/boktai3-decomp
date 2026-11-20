@@ -77,11 +77,6 @@ static inline u8 stateMode(void)
     }
     return 0;
 }
-static inline u32 Trigger_PlayerActionFlags(const u32 *actionFlags, u32 mask)
-{
-    return *actionFlags & mask;
-}
-
 static inline s32 globalMode(void)
 {
     u32 active = gPlayerPassageState;
@@ -561,7 +556,7 @@ s32 TriggerManager_Update(struct TriggerManager *input)
                                 available = stateMode();
                             else {
                                 if (gPlayers[0]) {
-                                    if (Trigger_PlayerActionFlags(&gPlayers[0]->actionFlags, 16))
+                                    if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
                                         goto available;
                                 }
                                 available = globalMode();
@@ -904,7 +899,7 @@ s32 Trigger_CreateContainer(struct SceneVec *position, s32 id, s32 kind, s32 fli
             if (gWeatherCollisionTimer > 0)
                 goto reveal;
             if (gPlayers[0]) {
-                if (Trigger_PlayerActionFlags(&gPlayers[0]->actionFlags, 16))
+                if (Player_ReadStatusBits(&gPlayers[0]->actionFlags, 16))
                     goto reveal;
             }
             available = globalMode();
