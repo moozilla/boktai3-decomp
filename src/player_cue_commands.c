@@ -697,20 +697,22 @@ void PlayerCue_Motion17Variant2(struct Player *player, s32 unused)
     player->triggerAnimationCallback = Player_UpdateThreePhaseBaseAnimationAction;
 }
 
-void PlayerCue_Windblown(struct Player *player, s32 backSide, u32 parameter)
+static inline void PlayerCue_SetWindFacing(struct Player *player, u32 backSide)
 {
-    if (backSide != 0) {
-        u8 *facing = &player->facing;
-        u8 zero;
-        zero = 0;
-        *facing = 5;
-        player->heading = zero;
+    if (backSide) {
+        player->facing = 5;
+        player->heading = 0;
         player->side = 1;
     } else {
         player->facing = 3;
-        player->heading = backSide;
-        player->side = backSide;
+        player->heading = 0;
+        player->side = 0;
     }
+}
+
+void PlayerCue_Windblown(struct Player *player, s32 backSide, u32 parameter)
+{
+    PlayerCue_SetWindFacing(player, backSide);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 0, 0);
@@ -719,18 +721,7 @@ void PlayerCue_Windblown(struct Player *player, s32 backSide, u32 parameter)
 
 void PlayerCue_WindblownVariant3(struct Player *player, s32 backSide, u32 parameter)
 {
-    if (backSide != 0) {
-        u8 *facing = &player->facing;
-        u8 zero;
-        zero = 0;
-        *facing = 5;
-        player->heading = zero;
-        player->side = 1;
-    } else {
-        player->facing = 3;
-        player->heading = backSide;
-        player->side = backSide;
-    }
+    PlayerCue_SetWindFacing(player, backSide);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 0, 3);
@@ -739,18 +730,7 @@ void PlayerCue_WindblownVariant3(struct Player *player, s32 backSide, u32 parame
 
 void PlayerCue_WindblownVariant4(struct Player *player, s32 backSide, u32 parameter)
 {
-    if (backSide != 0) {
-        u8 *facing = &player->facing;
-        u8 zero;
-        zero = 0;
-        *facing = 5;
-        player->heading = zero;
-        player->side = 1;
-    } else {
-        player->facing = 3;
-        player->heading = backSide;
-        player->side = backSide;
-    }
+    PlayerCue_SetWindFacing(player, backSide);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 0, 4);
@@ -759,18 +739,7 @@ void PlayerCue_WindblownVariant4(struct Player *player, s32 backSide, u32 parame
 
 void PlayerCue_WindblownVariant2(struct Player *player, s32 backSide, u32 parameter)
 {
-    if (backSide != 0) {
-        u8 *facing = &player->facing;
-        u8 zero;
-        zero = 0;
-        *facing = 5;
-        player->heading = zero;
-        player->side = 1;
-    } else {
-        player->facing = 3;
-        player->heading = backSide;
-        player->side = backSide;
-    }
+    PlayerCue_SetWindFacing(player, backSide);
     player->cueParameter = parameter;
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 0, 2);
@@ -804,18 +773,7 @@ void PlayerCue_StandDiagonalB(struct Player *player, s32 facing, u32 parameter)
 
 void PlayerCue_FaceSide(struct Player *player, u32 backSide)
 {
-    if (backSide) {
-        u32 zero;
-        u8 *facing = &player->facing;
-        zero = 0;
-        *facing = 5;
-        player->heading = zero;
-        player->side = 1;
-    } else {
-        player->facing = 3;
-        player->heading = backSide;
-        player->side = backSide;
-    }
+    PlayerCue_SetWindFacing(player, backSide);
     Player_EnterKindTwo(player);
     ActorSequence_Begin(player, 0, 0);
     player->triggerAnimationCallback = PlayerCue_UpdateFaceSide;
