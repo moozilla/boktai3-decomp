@@ -3,6 +3,7 @@
 import argparse
 import json
 import struct
+import zlib
 from pathlib import Path
 
 from PIL import Image
@@ -23,7 +24,7 @@ direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase en
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
 shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise
 world_x world_x_hi world_y world_y_hi camera_x_hi camera_y_hi projected_h projected_h_hi
-camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter note_index note_lang note_count""".split()
+camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter note_index note_lang note_count save_slot save_generation""".split()
 
 
 def direction_table():
@@ -45,6 +46,7 @@ def build(source, out, scenes=None, song=None):
     rooms = {n: (convert(source, n), i) for i, n in enumerate(scenes, 1)}
     journal = Journal(source, len(rooms) + 3)
     notes = {n: journal.room(room, rooms) for n, (room, _) in rooms.items()}
+    saved_offset, resume_offset = journal.system_pages()
     poses, markers = objects(source)
     obj = b"".join(poses)
     directions = direction_table()
@@ -67,7 +69,14 @@ def build(source, out, scenes=None, song=None):
         pr_raw_lo pr_raw_hi pr_ink_lo pr_ink_hi pr_run pr_repeat pr_bad pr_status
         pr_size_lo pr_size_hi pr_total_lo pr_total_hi pr_packet_lo pr_packet_hi pr_busy
         photo_ready photo_level pr_byte pr_received_lo pr_palette""".split())})
-    reloc = {"journal_ptrs": 0, "pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
+    save_fields = "bank player_x player_z health energy sun_level sun_source shadow_choice note_lang".split()
+    signature = zlib.crc32(b"DMG-CHECKPOINT-1" + b"".join(struct.pack("<H", n) for n in scenes))
+    source_asm = (HERE / "save.asm").read_text()
+    asm += source_asm + "\nsave_tag:\n db " + ",".join(str(v) for v in signature.to_bytes(4, "little"))
+    asm += "\nsave_fields:\n db " + ",".join(str(symbols[k] & 255) for k in save_fields) + "\n"
+    symbols.update(room_count=len(rooms), save_field_count=len(save_fields),
+                   save_body_bytes=5+len(save_fields)+len(rooms))
+    reloc = {"saved_page": 0, "continue_page": 0, "journal_ptrs": 0, "pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
     code, _ = assemble(asm, {**symbols, **reloc})
     fixed_end = 0x150 + len(code)
     table_addr = fixed_end + len(directions)
@@ -76,6 +85,7 @@ def build(source, out, scenes=None, song=None):
     reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=first_pose + len(obj),
                  wave_pattern=first_pose + len(obj) + len(markers))
     reloc["journal_ptrs"] = reloc["wave_pattern"] + len(wave)
+    reloc.update(saved_page=reloc["journal_ptrs"]+saved_offset, continue_page=reloc["journal_ptrs"]+resume_offset)
     code, symbols = assemble(asm, {**symbols, **reloc})
     info, banks = [], []
     for room, _ in rooms.values():

@@ -13,14 +13,16 @@ from PIL import Image
 class DMG:
     Z, N, H, C = 128, 64, 32, 16
 
-    def __init__(self, rom):
+    def __init__(self, rom, sram=None):
         if sum(rom[0x134:0x14E]) + 25 & 255:
             raise ValueError("header checksum")
         if (sum(rom[:0x14E]) + sum(rom[0x150:])) & 65535 != int.from_bytes(rom[0x14E:0x150], "big"):
             raise ValueError("global checksum")
-        if len(rom) != 32768 << rom[0x148] or rom[0x147] != 0x19 or rom[0x143] != 0:
+        if len(rom) != 32768 << rom[0x148] or rom[0x147] != 0x1b or rom[0x149] != 2 or rom[0x143] != 0:
             raise ValueError("expected a DMG-only MBC5 ROM")
         self.rom = rom
+        self.sram = bytearray([255])*8192 if sram is None else bytearray(sram)
+        self.sram_enabled = False
         self.bank = 1
         self.mem = bytearray(65536)
         self.mem[0xFF40] = 0x91
@@ -60,6 +62,8 @@ class DMG:
             return self.rom[addr]
         if addr < 0x8000:
             return self.rom[self.bank * 0x4000 + addr - 0x4000]
+        if 0xA000 <= addr < 0xC000:
+            return self.sram[addr-0xA000] if self.sram_enabled else 255
         if addr == 0xFF44:
             return self.dot // 456
         if addr == 0xFF00:
@@ -71,6 +75,16 @@ class DMG:
     def write(self, addr, value):
         if self.cycles < self.dma_until and not 0xFF80 <= addr <= 0xFFFE:
             raise RuntimeError(f"DMG bus write during DMA at {addr:04x}")
+        if addr < 0x2000:
+            self.sram_enabled = value & 15 == 10
+            return
+        if 0x4000 <= addr < 0x6000 and value == 0:
+            return
+        if 0xa000 <= addr < 0xc000:
+            if not self.sram_enabled:
+                raise RuntimeError("unarmed cartridge save write")
+            self.sram[addr-0xa000] = value
+            return
         if 0x2000 <= addr < 0x3000:
             if value * 0x4000 >= len(self.rom):
                 raise ValueError(f"missing ROM bank {value}")

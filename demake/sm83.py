@@ -5,7 +5,6 @@ Numbers accept decimal and Python-style hex. No macro or host code evaluation.
 """
 import re
 import struct
-from pathlib import Path
 
 R = "b c d e h l [hl] a".split()
 RR = "bc de hl sp".split()
@@ -146,7 +145,8 @@ def cartridge(code, banks):
     rom[0x100:0x104] = bytes.fromhex("00 c3 50 01")
     rom[0x104:0x134] = BOOT_FIELD
     rom[0x134:0x13E] = b"BOKTAI DMG"
-    rom[0x147] = 0x19  # MBC5, ROM only
+    rom[0x147] = 0x1B  # MBC5 with battery-backed SRAM
+    rom[0x149] = 2     # one 8 KiB RAM bank
     rom[0x148] = count.bit_length() - 2
     rom[0x14A] = 1
     rom[0x14D] = (-sum(rom[0x134:0x14D]) - 25) & 255

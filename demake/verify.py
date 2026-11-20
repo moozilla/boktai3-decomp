@@ -123,6 +123,21 @@ class Replay:
         path.write_bytes(bytes(v for pair in zip(incoming, replies) for v in pair))
         self.trace.append(["wire", path.name])
 
+    def power(self):
+        self.model = DMG(self.model.rom, self.model.sram)
+        self._ram = np.frombuffer(self.model.mem, dtype=np.uint8)
+        self.trace.append(["power"])
+        self.run(0)
+
+    def cut_save(self):
+        # Interrupt the actual SM83 writer after its twelfth payload byte.
+        target = self.meta["engine"]["save_copy_byte"]
+        self.model.keys = SELECT
+        for _ in range(13):
+            self.model.until(target)
+        self.trace.append(["at", target, 13, SELECT])
+        self.power()
+
     def record(self, name, caption):
         frame = self.model.render()
         check(self.model.peak_line <= 10 and self.model.peak_oam <= 40, "OAM hardware budget")
@@ -203,6 +218,10 @@ class Replay:
         for event in self.trace:
             if event[0] == "tick":
                 commands.append(f"tick {self.loop:x} {event[1]} {event[2]}")
+            elif event[0] == "power":
+                commands.append("power")
+            elif event[0] == "at":
+                commands.append(f"tick {event[1]:x} {event[2]} {event[3]}")
             elif event[0] == "wire":
                 commands.append(f"wire {self.loop:x} {event[1]}")
             else:
@@ -381,6 +400,45 @@ def sunlight(r):
     check(r.state("sun_level") == 3 and r.state("sun_source") == 2, "use measured exposure")
 
 
+def checkpoint(r):
+    def save_here():
+        r.run(START)
+        r.run(0)
+        r.run(SELECT)
+        check(r.state("mode") == 6, "save confirmation")
+        r.run(START)
+        r.run(0)
+
+    def resume(expected_bank, point):
+        r.run(START)
+        r.run(0)
+        check(r.model.bank == expected_bank and r.pos() == point, "checkpoint restored wrong location")
+        check(r.model.mem[r.meta["state"]["pickups"]] & 1, "checkpoint lost fruit flag")
+
+    r.run(START)
+    r.run(0)
+    r.event(2)
+    first = r.pos()
+    save_here()
+    check(r.state("save_slot") == 0xa0, "first battery record")
+    r.power()
+    r.record("continue", "Battery SRAM   /   Cold boot")
+    resume(1, first)
+    r.door(2)
+    second = r.pos()
+    r.run(START)
+    r.run(0)
+    r.cut_save()
+    resume(1, first)
+    r.door(2)
+    check(r.pos() == second, "second checkpoint location")
+    save_here()
+    check(r.state("save_slot") == 0xa1 and r.state("save_generation") == 2, "alternate committed record")
+    r.power()
+    resume(2, second)
+    r.record("restored", "2705   /   Checkpoint restored")
+
+
 def verify_audio(out, host):
     """Capture real APU output, including the first percussion entry."""
     import wave
@@ -407,7 +465,7 @@ def verify(out, manifest):
     host = playback(out)
     snapshots = []
     checks = []
-    for name, script in (("campaign", campaign), ("patrol", patrol), ("sunlight", sunlight), ("prison", prison_tour)):
+    for name, script in (("campaign", campaign), ("patrol", patrol), ("sunlight", sunlight), ("prison", prison_tour), ("checkpoint", checkpoint)):
         replay = Replay(out, manifest, name)
         script(replay)
         replay.verify_native(host)

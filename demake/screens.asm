@@ -19,8 +19,13 @@ static_page:
     ret
 
 title_screen:
+    call save_find
     ld a,1
     ld [mode],a
+    ld a,[save_slot]
+    and a
+    ld hl,continue_page
+    jp nz,show_journal_page
     ld hl,0x4000
     jp static_page
 open_meter:
@@ -57,6 +62,12 @@ static_tick:
     ld a,[pressed]
     and 9
     jr z,.idle
+    bit 3,a
+    jr z,.start
+    ld a,[save_slot]
+    and a
+    call nz,save_restore
+.start:
     xor a
     ld [mode],a
     call load_room

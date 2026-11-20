@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw
 from art import ROOT, encode_tile, fit_tiles, unpack_4bpp
 from pack import ROOM_NAMES
 from rooms import room_events, walkable
-from screens import Lettering, stamp
+from screens import Lettering, stamp, title
 import text as game_text
 
 
@@ -182,11 +182,27 @@ class Journal:
         self.font.text(page, (108, 101), "YOU", fill=170)
         d.polygon(((105,101),(105,107),(100,104)),fill=255)
         d.line((7, 119, 153, 119), fill=85)
-        self.font.text(page, (7, 128), ("A  READ       " if has_text else "") + "START  RETURN")
+        self.font.text(page, (7, 128), ("A READ   " if has_text else "") + "SELECT SAVE   B BACK")
         # Hardware pointer tile is centered on Django's actual X/Z sample.
         xs = bytes(min(255, left + x*unit//8 + 5) for x in range(256))
         ys = bytes(min(255, top + z*unit//8 + 5) for z in range(256))
         return page, xs+ys
+
+    def system_pages(self):
+        saved = Image.new("L", (160, 144))
+        stamp(saved, self.otenko, (62, 11, 36, 36))
+        self.font.text(saved, (80, 54), "CHECKPOINT SAVED", center=True, height=12)
+        self.font.text(saved, (80, 79), "Press Start at the title", center=True)
+        self.font.text(saved, (80, 92), "to return to this spot.", center=True)
+        self.font.text(saved, (80, 124), "A  MAP     START  RETURN", center=True, fill=170)
+        saved_offset = len(self.directory)
+        self.append(saved)
+        resume = title(self.source, self.font)
+        ImageDraw.Draw(resume).rectangle((0, 119, 159, 143), fill=0)
+        self.font.text(resume, (80, 127), "START  CONTINUE     A  NEW", center=True)
+        resume_offset = len(self.directory)
+        self.append(resume)
+        return saved_offset, resume_offset
 
     def room(self, room, rooms):
         index = len(self.directory)

@@ -13,9 +13,18 @@ journal_tick:
     bit 3,a
     jp nz,journal_close
     ld a,[mode]
+    cp 6
+    jr nz,.which
+    ld a,[pressed]
+    and 3
+    jr nz,.map
+    jr .idle
+.which:
     cp 4
     jr nz,.text
     ld a,[pressed]
+    bit 2,a
+    jr nz,.save
     bit 1,a
     jp nz,journal_close
     bit 0,a
@@ -26,6 +35,14 @@ journal_tick:
     ld a,5
     ld [mode],a
     jr .draw
+.save:
+    call save_store
+    call lcd_off
+    ld a,6
+    ld [mode],a
+    ld hl,saved_page
+    call show_journal_page
+    jp loop
 .text:
     ld a,[pressed]
     bit 1,a
@@ -110,7 +127,7 @@ draw_journal:
     add hl,de
     add hl,de
     add hl,de
-    jr .page
+    jp show_journal_page
 .map:
     push hl
     ld hl,0xc000
@@ -132,7 +149,7 @@ draw_journal:
     ld [oam_count],a
     call 0xff80
     pop hl
-.page:
+show_journal_page:
     ld a,[hl+]
     ld [0x2000],a
     ld a,[hl+]

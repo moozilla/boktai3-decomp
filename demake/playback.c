@@ -78,6 +78,9 @@ int main(int argc, char** argv) {
         if (!strcmp(command, "step") && sscanf(line, "%*s %u %u", &n, &mask) == 2) {
             core->setKeys(core, mask);
             while (n--) core->runFrame(core);
+        } else if (!strcmp(command, "power")) {
+            core->setKeys(core, 0);
+            core->reset(core);
         } else if (!strcmp(command, "audio") && sscanf(line, "%*s %u %959[^\n]", &n, path) == 2) {
             pcm = fopen(path, "wb");
             if (!pcm) return 13;
