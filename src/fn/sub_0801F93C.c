@@ -46,7 +46,7 @@ static inline u8 Obj1F_SceneMatches(u16 *scene)
     return 0;
 }
 // confidence=low: SceneObjects per-frame update; handles queued activation messages, then classifies each object by its pose kind into the activate list, then diffs the two id lists.
-s32 sub_0801F93C(struct SceneObjPool *self)
+s32 SceneObjects_UpdateController(struct SceneObjPool *self)
 {
     s32 n;
     s32 i;

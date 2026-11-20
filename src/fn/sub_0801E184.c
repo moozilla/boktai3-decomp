@@ -1,6 +1,6 @@
 #include "scene_object_controller.h"
 int Region_FindContaining(void *);
-void sub_0801F058(struct SceneObjPool *, struct SceneObjSlot *);
+void SceneObject_InitLiftPlacement(struct SceneObjPool *, struct SceneObjSlot *);
 void SceneObject_InitSlotPlacement(struct SceneObjPool *, struct SceneObjSlot *);
 void SceneObject_InitPlacement(struct SceneObjPool *, struct SceneObjSlot *);
 int SceneObjects_Append(struct SceneObjPool *p, u16 id, struct Pair *position, int animationIndex,
@@ -34,7 +34,7 @@ int SceneObjects_Append(struct SceneObjPool *p, u16 id, struct Pair *position, i
     Memory_Clear(slot->terrain, sizeof(*slot->terrain));
     switch (slot->type) {
         case 1:
-            sub_0801F058(p, slot);
+            SceneObject_InitLiftPlacement(p, slot);
             break;
         case 2:
             slot->paletteBank = paletteBank;

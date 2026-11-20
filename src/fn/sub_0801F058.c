@@ -5,7 +5,7 @@ void SceneObject_UpdateRaised(struct SceneObjSlot *);
 void SceneObject_UpdateLowered(struct SceneObjSlot *);
 void *SceneParticleBurst_EnsureSingleton(u32, u32);
 // confidence=low: places a raisable scene object (blocks/gates with 10 facings) on its terrain cell.
-void sub_0801F058(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
+void SceneObject_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;

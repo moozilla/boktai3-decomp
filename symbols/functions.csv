@@ -734,6 +734,8 @@ addr,name,mode,confidence,source,notes
 0801E998,SceneObjects_ScriptLower,thumb,low,src-alias,
 0801EA70,SceneObjects_ScriptPromote,thumb,low,src-alias,
 0801EB08,SceneObjects_ScriptReadPosition,thumb,low,src-alias,
+0801EBBC,SceneObjects_ScriptSetSelection,thumb,low,src-alias,Reads a script id and stores it as the controller selection.
+0801EBE4,SceneObjects_ClearSelection,thumb,low,src-alias,Clears the controller selection.
 0801EC00,SceneObjects_HasTypeTwoResource,thumb,low,src-alias,
 0801EC4C,SceneObject_InitPlacement,thumb,low,src-alias,
 0801EF28,SceneObjects_AddPrimaryId,thumb,low,src-alias,
@@ -741,6 +743,7 @@ addr,name,mode,confidence,source,notes
 0801EF5C,SceneObject_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SceneObjects_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
 0801EF60,SceneObject_AnimateInactive,thumb,low,src-alias,
 0801EFDC,SceneObject_AnimateActive,thumb,low,src-alias,
+0801F058,SceneObject_InitLiftPlacement,thumb,low,src-alias,Places a lift on its terrain cells and initializes the raised or lowered pose.
 0801F3A0,SceneObject_BeginRaising,thumb,low,src-alias,
 0801F3CC,SceneObject_BeginLowering,thumb,low,src-alias,
 0801F430,SceneObject_UpdateRaising,thumb,low,src-alias,
@@ -750,8 +753,10 @@ addr,name,mode,confidence,source,notes
 0801F5EC,SceneObject_InitSlotPlacement,thumb,low,src-alias,
 0801F934,SceneObject_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SceneObjects_Append for several object kinds; distinct from EF58/EF5C's idl
 0801F938,SceneObject_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
+0801F93C,SceneObjects_UpdateController,thumb,low,src-alias,Processes activation messages and updates proximity ids and per-slot callbacks.
 080203D4,SceneObjects_Destroy,thumb,low,src-alias,
 0802048C,SceneObjects_Init,thumb,low,src-alias,
+0802091C,SceneObjects_CreateController,thumb,low,src-alias,Creates the scene object task and initializes its animation banks and slot pool.
 08020964,SceneMessages_FindReceiver,thumb,low,src-alias,Finds the registered receiver matching both message ID and category.
 08020990,SceneMessages_LinkReceiver,thumb,low,src-alias,Prepends a receiver to the controller's doubly linked receiver list.
 080209AC,SceneMessages_UnlinkReceiver,thumb,low,src-alias,Removes a receiver from the controller's doubly linked receiver list.
