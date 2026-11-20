@@ -1441,107 +1441,93 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
 
 // confidence=low: inferred from the three movement phases and neighboring Golem controls.
 
-struct Unk080C75B8Motion {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-    s16 x, unknown16, z;
-};
-
 void Golem_UpdateRecoil(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
-    struct Unk080C75B8Motion *motion = (struct Unk080C75B8Motion *)((u8 *)actor + 0x50);
+    struct GolemChargeContext *context = actor->base.context;
+    struct SceneActorBody *motion = &actor->base.body;
     s16 *speed;
 
     if (TakeFlag(&actor->base.field2B2)) {
         actor->base.restart = 0;
-        body[0x68D] = 0;
+        context->charge.phase = 0;
         {
-            u32 angle = (body[0x68E] + 0x60) >> 6;
+            u32 angle = (context->charge.routeDirection + 0x60) >> 6;
             u32 quadrant = 3;
             quadrant &= angle;
-            body[0x68C] = quadrant;
+            context->charge.quadrant = quadrant;
         }
-        *(struct ContactPosition *)(body + 0x69C) = motion->position;
-        Golem_CenterPositionInCell((struct ContactPosition *)(body + 0x69C));
+        context->charge.stopPosition = motion->position;
+        Golem_CenterPositionInCell(&context->charge.stopPosition);
     }
     Golem_SetMotionFlags(actor, 0x100);
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags |= mask;
-    }
+    SceneActorChase_SetActorFlags(actor, 0x2000);
     {
         u8 directionVariant, mirror;
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 8, directionVariant, Golem_MirrorFlags(mirror));
     }
-    if (body[0x68D] == 0) {
+    if (context->charge.phase == 0) {
         switch (actor->base.paletteOffset) {
             case 1:
             case 3:
             case 5:
-                *(s16 *)(body + 0x682) -= 0xC0;
+                context->charge.speed -= 0xC0;
                 break;
             case 0:
-                *(s16 *)(body + 0x682) -= 0x40;
+                context->charge.speed -= 0x40;
                 break;
             default:
-                *(s16 *)(body + 0x682) -= 0x80;
+                context->charge.speed -= 0x80;
                 break;
         }
-        speed = (s16 *)(body + 0x682);
+        speed = &context->charge.speed;
         if (*speed < 0) {
-            u8 *phase = body + 0x68D;
-            u32 zero = 0;
-            *phase = 1;
-            *speed = zero;
+            context->charge.phase = 1;
+            *speed = 0;
             return;
         }
-        actor->base.body.motion.x += (*speed * gUnk_086149C4[(body[0x68E] + 0x40) & 0xFF]) >> 16;
-        actor->base.body.motion.z += (*speed * gUnk_086149C4[body[0x68E]]) >> 16;
-    } else if (body[0x68D] == 1) {
+        actor->base.body.motion.x +=
+            (*speed * gUnk_086149C4[(context->charge.routeDirection + 0x40) & 0xFF]) >> 16;
+        actor->base.body.motion.z += (*speed * gUnk_086149C4[context->charge.routeDirection]) >> 16;
+    } else if (context->charge.phase == 1) {
         struct ContactPosition delta;
-        Delta(&delta, &motion->position, (struct ContactPosition *)(body + 0x69C));
-        switch (body[0x691] >> 6) {
+        Delta(&delta, &motion->position, &context->charge.stopPosition);
+        switch (context->charge.motionDirection >> 6) {
             case 0:
             case 2:
                 delta.z = 0;
                 if (delta.x > 8)
-                    motion->x = 8;
+                    motion->motion.x = 8;
                 else if (delta.x < -8)
-                    motion->x = -8;
+                    motion->motion.x = -8;
                 else
-                    motion->x = delta.x;
+                    motion->motion.x = delta.x;
                 break;
             case 1:
             case 3:
                 delta.x = 0;
                 if (delta.z > 8)
-                    motion->z = 8;
+                    motion->motion.z = 8;
                 else if (delta.z < -8)
-                    motion->z = -8;
+                    motion->motion.z = -8;
                 else
-                    motion->z = delta.z;
+                    motion->motion.z = delta.z;
                 break;
         }
         if (delta.x + delta.z == 0) {
-            body[0x68D] = 2;
-            body[0x68F] = 0;
+            context->charge.phase = 2;
+            context->charge.settleFrames = 0;
             return;
         }
     } else {
-        u8 *counter = body + 0x68F;
-        u32 value = *counter + 1;
-        u32 zero = 0;
-        *counter = value;
-        if ((u8)value > 7) {
+        if (++context->charge.settleFrames > 7) {
             actor->base.stepDone = 1;
-            *counter = zero;
-            *(u16 *)(body + 0x682) = zero;
+            context->charge.settleFrames = 0;
+            context->charge.speed = 0;
             return;
         }
     }
-    actor->base.field2C2 = 0x40 >> (*(u16 *)(body + 0x684) >> 7);
+    actor->base.field2C2 = 0x40 >> (context->charge.durationSpeed >> 7);
     Golem_ApplyDuration(actor);
 }
 
