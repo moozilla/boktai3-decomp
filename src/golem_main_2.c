@@ -30,15 +30,6 @@ void Golem_AlignChargeTarget(void *);
 
 s32 Math_Atan2(s32, s32);
 
-struct GolemRoutePoint {
-    s16 x, z;
-};
-
-struct GolemRouteLink {
-    u8 unknown0[8];
-    struct GolemRoutePoint *point;
-};
-
 static inline u8 TakeFlag2B1(struct ChaseActor *actor)
 {
     if (actor->base.field2B1) {
@@ -63,45 +54,10 @@ static inline void SetControl(struct ChaseActor *actor, u32 kind, void *control)
     actor->base.pendingControl = 0;
 }
 
-static inline u32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
-static inline u32 CellHeight(struct ContactPosition *position, u32 cell)
-{
-    u32 shape, height;
-    u8 *data = TerrainModifiers_FindCellOverride(cell, 1);
-    if (data)
-        data += 4;
-    else {
-        struct EngineMap *map = gTerrainMap;
-        u32 offset = cell * 4 + 12;
-        data = map->cells + offset;
-    }
-    shape = *data >> 4;
-    height = (*data & 15) << 8;
-    if (shape == 1)
-        goto slopeZ;
-    if (shape == 2)
-        goto slopeX;
-    goto done;
-slopeZ:
-    height -= *((u8 *)position + 4);
-    goto done;
-slopeX:
-    height -= *(u8 *)position;
-done:
-    return height;
-}
-
 void Golem_ReturnHome(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
-    u8 *body = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct Golem *body = actor->base.context;
     struct ContactPosition center;
     struct ContactPosition diff;
     if (TakeFlag2B1(actor)) {
@@ -109,23 +65,21 @@ void Golem_ReturnHome(struct ChaseActor *actor)
         SetControl(actor, 0x25, target);
         actor->base.body.direction = actor->base.tracking.heading;
         actor->base.stepDone = 0;
-        *(u16 *)(body + 0x688) = 0;
+        body->charge688 = 0;
     }
     if (Golem_InvokeEnabledBehavior(actor))
         return;
     if (actor->base.stepDone) {
-        struct ContactPosition *dest = *(struct ContactPosition **)(group + 0x200);
-        struct GolemRouteLink *link = (struct GolemRouteLink *)(group + 0x74);
-        dest->x = link->point->x;
-        dest->z = link->point->z;
-        dest->y = CellHeight(dest, CellIndex(dest));
-        (*(struct ContactPosition **)(group + 0x200))->pad = 0;
-        body[0x68D] = 0;
-        *(u16 *)(body + 0x680) = 0x78;
-        *(u16 *)(body + 0x686) = 0;
-        *(u16 *)(body + 0x684) = 2;
-        *(u16 *)(body + 0x682) = 0;
-        *(struct ContactPosition *)(body + 0x69C) = *(struct ContactPosition *)(body + 0x694);
+        struct ContactPosition *dest = group->destination;
+        struct SceneActorRegistryRoute *link = &group->homeRoute;
+        SceneActorChase_SnapToRoute(dest, link);
+        (group->destination)->pad = 0;
+        body->field68D = 0;
+        body->routeDelay = 0x78;
+        body->counter686 = 0;
+        body->field684 = 2;
+        body->pushSpeed = 0;
+        body->target69C = body->home694;
         SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
         Golem_CenterPositionInCell(&center);
         SceneActorTerrain_Subtract(&diff, &actor->base.body.position, &center);
@@ -133,24 +87,17 @@ void Golem_ReturnHome(struct ChaseActor *actor)
             Golem_AlignChargeTarget(body);
         else {
             u8 angle;
-            *(struct ContactPosition *)(*(u8 **)(group + 0x1FC) + 0x1C) = center;
+            ((struct ChaseRouteProbe *)group->route)->destination = center;
             SceneActorTerrain_Subtract(&diff, &center, &actor->base.body.position);
             angle = ((Math_Atan2(diff.x, diff.z) + 0x20) & 0xFF) >> 6 << 6;
             actor->base.body.direction = angle;
-            body[0x68E] = angle;
+            body->direction68E = angle;
         }
         {
             void *target = Golem_UpdateRouteMotion;
             SetControl(actor, 0x23, target);
         }
-        {
-            u32 phase = 2;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = 1;
-        }
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
 }
@@ -918,8 +865,7 @@ static inline u8 Golem_ArriveAndRestoreRoute(void *obj)
         player = 0;
     }
     if (cell != actor->base.terrainCell &&
-        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags,
-                                0x20000))
+        !SceneActorChase_Bits32(&gPlayers[player]->statusFlags, 0x20000))
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
