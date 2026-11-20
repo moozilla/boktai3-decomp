@@ -641,10 +641,7 @@ static inline u8 Golem_Arrive_ResumeDelayedRoute(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         Golem_SetBehavior(actor, 12);
@@ -681,17 +678,15 @@ success:
 void Golem_ResumeDelayedRoute(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u32 zero;
     SceneActorControl_TakeStateEntry(actor);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
-    zero = (u8)sub_0812F3CC(actor);
-    if (zero)
+    if ((u8)sub_0812F3CC(actor))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
     SceneActorAttachment_ReplaceResponseSlot((u8 *)actor, 0, 2, actor->base.category);
-    Golem_SetState(actor, 3, 1, zero);
+    Golem_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
