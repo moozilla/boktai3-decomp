@@ -1398,246 +1398,67 @@ void SceneActorState_DispatchPhaseHandler(struct StateActor *p)
     Callback_InvokeActor(p, gUnk_08604E44[p->actionPhase]);
 }
 
-/* Raw offsets throughout: the state()/action() helpers each write several
- * adjacent fields together (callback+state+timer+changed+reset+pending, or
- * active+actionReset+action+actionTimer+entered); going through
- * struct StateActor's named fields for those clusters breaks the match
- * (see SceneActorState_Resume). */
-
-struct Common {
-    u8 pad0[0x90];
-    u32 timer;
-    s16 health, maxHealth;
-    u8 pad98[2];
-    u8 healthCheck, pad9b;
-    u32 flags;
-    u8 padA0[2];
-    u8 reset;
-    u8 padA3;
-    u32 pending;
-    u8 facing, facing8, requested, state;
-    u8 active, actionReset, action, finished, entered, changed;
-    u8 padB2[0x12];
-    u32 actionTimer;
-    u8 padC8[0x38];
-    void (*callback)(void *);
-};
-
-static inline void state(struct Common *p, void (*fn)(void *), int id)
+int SceneActorState_TryStartDeathOrFlaggedAction(struct StateActor *p)
 {
-    p->state = id;
-    p->callback = fn;
-    p->timer = 0;
-    p->changed = 1;
-    p->reset = 0;
-    p->pending = 0;
-}
-
-int GridAttack_SelectNextAction(void *);
-
-void sub_08027214(void *);
-
-static inline u8 chk_08023D78(struct Common *p)
-{
-    if (p->entered) {
-        p->entered = 0;
-        p->finished = 0;
+    if (p->health <= 0 && p->vulnerable) {
+        SceneActorState_SetFlags(p, 2);
+        reactionState((struct ReactionActor *)p, sub_08027214, 25);
+    }
+    p->vulnerable = 0;
+    if (SceneActorState_TestFlags(p, 2)) {
+        SceneActorState_StartAction(p, 1, 0, 3);
+        return 1;
+    } else if (p->actionFlags & 1) {
+        SceneActorState_StartAction(p, 1, 0, 2);
         return 1;
     }
     return 0;
 }
 
-static inline void action(struct Common *p, int one, int id, int zero)
+void SceneActorState_WaitForDelayedAction(struct StateActor *p)
 {
-    p->active = one;
-    p->actionReset = zero;
-    p->action = id;
-    p->actionTimer = zero;
-    p->entered = one;
-}
-
-int SceneActorState_TryStartDeathOrFlaggedAction(struct Common *p)
-{
-    if (p->health <= 0 && p->healthCheck) {
-        u32 mask = 2;
-        p->flags |= mask;
-        state(p, sub_08027214, 25);
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    p->vulnerable = 1;
+    if (TakeFlag(p) == TRUE) {
+        if (actor->variant == 0)
+            p->actionAnimation = 1;
+        else
+            SceneActorState_SetAnimation(p, 2);
     }
-    p->healthCheck = 0;
-    {
-        u32 mask = 2;
-        if (p->flags & mask) {
-            action(p, 1, 3, 0);
-            return 1;
-        } else if (p->flags & 1) {
-            action(p, 1, 2, 0);
-            return 1;
-        }
-    }
-    return 0;
-}
-
-/* Raw offsets: the ending phase/elapsed/enter_08023E24 triplet write breaks the match
- * when routed through struct StateActor's named fields (see SceneActorState_Resume). */
-
-typedef struct State_08023E24 {
-    u8 pad0[0x90];
-    u32 tick;
-    s16 hp, maxHp;
-    u16 extra;
-    u8 vulnerable, kind;
-    u32 flags;
-    u8 unknownA0[2];
-    u8 unknownA2, unknownA3;
-    u32 unknownA4;
-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023E24, changed;
-    u8 padB2[0x12];
-    u32 elapsed;
-    u8 padC8[0x38];
-    void (*callback)(void *, int);
-} State_08023E24;
-
-typedef struct Actor_08023E24 {
-    State_08023E24 base;
-    u8 pad104[0x23f];
-    u8 variant;
-    u8 pad344[0x12];
-    u16 delay;
-} Actor_08023E24;
-
-static inline u8 enter_08023E24(State_08023E24 *p)
-{
-    if (p->enter_08023E24) {
-        p->enter_08023E24 = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void sub_08022EA4(u8 *, struct SnapVector *);
-
-void SceneActorState_WaitForDelayedAction(Actor_08023E24 *p)
-{
-    State_08023E24 *s = &p->base;
-    s->vulnerable = 1;
-    if (enter_08023E24(s) == 1) {
-        if (p->variant == 0)
-            s->animation = 1;
-        else {
-            u32 k = 2;
-            s->animation = k;
-        }
-    }
-    if (s->elapsed > p->delay && SceneActorState_StepTableByKind(p)) {
-        sub_08022EA4(p, (u8 *)p + 0x9c4);
-        {
-            u32 one = 1;
-            s->phase = one;
-            s->elapsed = 0;
-            s->enter_08023E24 = one;
-        }
+    if (p->actionTimer > actor->graphics.recoveryTimer && SceneActorState_StepTableByKind(actor)) {
+        SceneActorState_SnapReactionPosition((u8 *)actor,
+                                             (struct SnapVector *)actor->graphics.unk9C4);
+        SceneActorState_EnterPhase(p, 1);
     } else
-        s->elapsed++;
+        p->actionTimer++;
 }
 
-typedef struct State_08023EC0 {
-    u8 pad0[0x90];
-    u32 tick;
-    s16 hp, maxHp;
-    u16 extra;
-    u8 vulnerable, kind;
-    u32 flags;
-    u8 unknownA0[2];
-    u8 unknownA2, unknownA3;
-    u32 unknownA4;
-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023EC0, changed;
-    u8 padB2[0x12];
-    u32 elapsed;
-    u8 padC8[0x38];
-    void (*callback)(void *, int);
-} State_08023EC0;
-
-typedef struct Actor_08023EC0 {
-    State_08023EC0 base;
-    u8 pad104[0x23f];
-    u8 variant;
-    u8 pad344[0x12];
-    u16 delay;
-} Actor_08023EC0;
-
-static inline u8 enter_08023EC0(State_08023EC0 *p)
+void SceneActorState_UpdateVariantActionPlayback(struct SceneGraphicsActor *actor)
 {
-    if (p->enter_08023EC0) {
-        p->enter_08023EC0 = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void sub_08022DBC(u8 *);
-
-void SceneActorState_UpdateVariantActionPlayback(Actor_08023EC0 *p)
-{
-    State_08023EC0 *s = &p->base;
-    s->vulnerable = 1;
-    if (enter_08023EC0(s))
-        SceneActorState_SetValueClampedWhenInactive(p, 4);
-    if (s->finished) {
-        if (p->base.state != 3) {
-            sub_08022DBC(p);
-            p->delay = 60;
+    struct StateActor *p = (struct StateActor *)actor;
+    p->vulnerable = 1;
+    if (TakeFlag(p))
+        SceneActorState_SetValueClampedWhenInactive(actor, 4);
+    if (p->actionFinished) {
+        if (((struct StateActor *)actor)->actionState != 3) {
+            SceneActorState_SelectReactionPhase((u8 *)actor);
+            actor->graphics.recoveryTimer = 60;
             return;
-        } else {
-            u32 k = 4;
-            p->base.animation = k;
-        }
+        } else
+            SceneActorState_SetAnimation((struct StateActor *)actor, 4);
     }
-    s->elapsed++;
+    p->actionTimer++;
 }
 
-typedef struct State_08023F34 {
-    u8 pad0[0x90];
-    u32 tick;
-    s16 hp, maxHp;
-    u16 extra;
-    u8 vulnerable, kind;
-    u32 flags;
-    u8 unknownA0[2];
-    u8 unknownA2, unknownA3;
-    u32 unknownA4;
-    u8 facing, facing8, animation, state, mode, submode, phase, finished, enter_08023F34, changed;
-    u8 padB2[0x12];
-    u32 elapsed;
-    u8 padC8[0x38];
-    void (*callback)(void *, int);
-} State_08023F34;
-
-static inline u8 enter_08023F34(State_08023F34 *p)
-{
-    if (p->enter_08023F34) {
-        p->enter_08023F34 = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SceneActorState_PlayAnimation5ThenAdvance(State_08023F34 *p)
+void SceneActorState_PlayAnimation5ThenAdvance(struct StateActor *p)
 {
     p->vulnerable = 1;
-    if (enter_08023F34(p)) {
-        u32 k = 5;
-        p->animation = k;
-    }
-    if (p->finished) {
-        u32 next = 3;
-        p->phase = next;
-        p->elapsed = 0;
-        p->enter_08023F34 = 1;
-    } else
-        p->elapsed++;
+    if (TakeFlag(p))
+        SceneActorState_SetAnimation(p, 5);
+    if (p->actionFinished)
+        SceneActorState_EnterPhase(p, 3);
+    else
+        p->actionTimer++;
 }
 
 typedef struct State_08023F98 {
