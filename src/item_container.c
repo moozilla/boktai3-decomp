@@ -3,8 +3,7 @@
 #include "ram.h"
 #include "display_sequence_inline.h"
 #include "player_cue_sequence.h"
-
-extern u32 gUnk_02000560[];
+#include "player_slot_status.h"
 
 void ScaledShadow_Destroy(void *);
 s32 sub_0822D490(s32, s32);
@@ -116,10 +115,6 @@ static inline u8 sameRegion(struct Trigger *p)
     return 0;
 }
 
-static inline u32 Trigger_PlayerStatus(s32 index, u32 mask)
-{
-    return gUnk_02000560[index] & mask;
-}
 s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
 {
     u16 script = scriptInput;
@@ -128,7 +123,7 @@ s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
     s32 actor, i;
     u32 busy;
     if (!script || p->actor == -1 ||
-        (busy = Trigger_PlayerStatus(p->actor, 12), actor = p->actor, busy))
+        (busy = PlayerSlot_ReadStatus(p->actor, 12), actor = p->actor, busy))
         return -1;
     if (p->type == 1) {
         values[0] = p->position->x;
@@ -261,7 +256,7 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
         s16 *o = box;
         if (!actor)
             continue;
-        if (Trigger_PlayerStatus(i, 12))
+        if (PlayerSlot_ReadStatus(i, 12))
             continue;
         v = p->position;
         proj = (struct SceneVec *)(i * 8 + (u32)manager);
