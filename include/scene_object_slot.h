@@ -77,6 +77,11 @@ static inline u8 SceneObjSlot_LiftVariant(enum SceneObjLiftPosition position)
     return position == SCENE_OBJ_LIFT_LOWERED;
 }
 
+static inline u8 SceneObjSlot_LiftMotionVariant(enum SceneObjLiftPosition target)
+{
+    return target == SCENE_OBJ_LIFT_RAISED ? SCENE_OBJ_ACTIVATING : SCENE_OBJ_DEACTIVATING;
+}
+
 /* Start a sprite pose at the first frame of its animation. */
 static inline void SceneObjSlot_SetAnimation(struct SceneObjSlot *slot,
                                              enum SceneObjActivationState state,
