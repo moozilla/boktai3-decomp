@@ -32,19 +32,25 @@ def split_source(text, func_names):
     None when the text has no such definition or contains the marker byte."""
     if MARK in text:
         return None
-    m = None
+    first_definition = None
+    body_start = re.compile(r"\s*\{")
     ends = []
     for name in func_names:
-        # a definition's head has no braces, parentheses or operators before the name: this keeps
-        # `} else if (!FUNC(a, b)) {` (a call in a later function) from counting as one
-        for m2 in re.finditer(r"^[^\n;#{}()=!&|]*\b" + re.escape(name) + r"\s*\([^;{]*\)\s*\{", text, re.M):
-            if m is None:
-                m = m2
-            ends.append(body_end(text, m2.end() - 1))
-    if not m:
+        head = r"^[^\n;#{}()=!&|]*\b" + re.escape(name) + r"\s*\("
+        for match in re.finditer(head, text, re.M):
+            parameters_end = delimiter_end(text, match.end() - 1, "(", ")")
+            # A call on the continuation line of an if condition has an extra
+            # closing parenthesis before the opening brace.
+            body = body_start.match(text, parameters_end)
+            if body is None:
+                continue
+            if first_definition is None:
+                first_definition = match.start()
+            ends.append(body_end(text, body.end() - 1))
+    if first_definition is None:
         return None
     # start at the line holding the definition, so line numbers stay the same
-    start = text.rfind("\n", 0, m.start()) + 1
+    start = first_definition
     # Cut instead where the last #include ends (cpp's `# N "file" 2` return marker) when what follows is
     # small: the unit's own structs and inline helpers then go with each request, so a variant that edits
     # a helper reuses the server instead of parsing every header again. A long stretch (earlier
@@ -62,7 +68,12 @@ def split_source(text, func_names):
 
 def body_end(text, brace):
     """Index just past the } closing the { at BRACE, skipping strings, chars and comments."""
-    depth, i, n = 0, brace, len(text)
+    return delimiter_end(text, brace, "{", "}")
+
+
+def delimiter_end(text, start, opening, closing):
+    """Index just past the delimiter paired with TEXT[START], or the end of TEXT."""
+    depth, i, n = 0, start, len(text)
     while i < n:
         c = text[i]
         if c in "\"'":
@@ -77,9 +88,9 @@ def body_end(text, brace):
         if text.startswith("//", i):
             i = text.find("\n", i) + 1 or n
             continue
-        if c == "{":
+        if c == opening:
             depth += 1
-        elif c == "}":
+        elif c == closing:
             depth -= 1
             if depth == 0:
                 return i + 1

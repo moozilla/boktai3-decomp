@@ -29,6 +29,25 @@ class SplitSource(unittest.TestCase):
         self.assertTrue(body.rstrip().endswith("return a + b;\n}"))
         self.assertNotIn("Later", body)
 
+    def test_a_call_on_a_continuation_line_does_not_start_the_cut(self):
+        source = """void Earlier(int value, int (*callback)(int))
+{
+    if (value &&
+        Target(value, callback)) {
+        callback(value);
+    }
+}
+
+int Target(int value, int (*callback)(int))
+{
+    return callback(value);
+}
+"""
+        prefix, body = fast.split_source(source, ["Target"])
+        self.assertIn("callback(value);", prefix)
+        self.assertTrue(body.startswith("int Target("))
+        self.assertIn("return callback(value);", body)
+
 
 if __name__ == "__main__":
     unittest.main()
