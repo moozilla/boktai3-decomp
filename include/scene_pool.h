@@ -38,6 +38,14 @@ struct ScenePoolEntry {
     u32 history[0x40]; /* per-state workspace; temporal history is not established */
     s32 settingA, delayA, settingB, delayB;
 };
+static inline void ScenePool_EnterStateAndClearHistory(struct ScenePoolEntry *entry, u32 state)
+{
+    entry->state = state;
+    entry->stateFrame = 0;
+    entry->stateEntered = 1;
+    Memory_Clear(entry->history, sizeof(entry->history));
+}
+
 /* Drain dispatch prefix at +0xB0; accumulator shares forwardBias at +0xC0. */
 struct ActorDrainState {
     u32 (*callback)(void *);
