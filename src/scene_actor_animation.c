@@ -1443,29 +1443,6 @@ static inline s32 Scale(s32 value)
     return -((-value) >> 12);
 }
 
-static inline void Facing(struct SceneActor *actor, u16 angle)
-{
-    s32 value = angle;
-    s32 shifted = value + 112;
-    s32 facing8;
-    s32 facing4;
-    shifted >>= 5;
-    facing8 = 7;
-    facing8 &= shifted;
-    actor->facing8 = facing8;
-    value = (value + 96) >> 6;
-    facing4 = 3;
-    facing4 &= value;
-    actor->facing4 = facing4;
-}
-
-static inline void Polar(struct ContactPosition *v, s32 angle, s32 speed)
-{
-    v->x = Scale(speed * gUnk_086149C4[(angle + 64) & 255]);
-    v->y = 0;
-    v->z = Scale(speed * gUnk_086149C4[angle]);
-}
-
 // confidence=low: advances a navigation probe toward its target at animation frame boundaries.
 
 void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
@@ -1521,8 +1498,9 @@ void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
                 targetX -= motion->position.x;
                 angle = Math_Atan2(targetX, TargetZ(probe) - PositionZ(savedPos));
                 actor->body.direction = angle;
-                Facing(actor, angle);
-                Polar(&step, motion->direction, speed);
+                actor->facing8 = SceneFacing_EightWay(angle);
+                actor->facing4 = SceneFacing_FourWay(angle);
+                SceneActor_SetChargeOffset(motion->direction, &step, speed);
                 motion->position.x += step.x;
                 motion->position.z += step.z;
             }
@@ -1602,22 +1580,6 @@ static inline void RouteWalk_Polar(struct ContactPosition *step, s32 angle, s32 
     step->z = RouteWalk_Scale12(speed * gUnk_086149C4[angle]);
 }
 
-static inline void RouteWalk_SetFacing(struct SceneActor *actor, u16 angle)
-{
-    s32 value = angle;
-    s32 shifted = value + 112;
-    s32 facing8;
-    s32 facing4;
-    shifted >>= 5;
-    facing8 = 7;
-    facing8 &= shifted;
-    actor->facing8 = facing8;
-    value = (value + 96) >> 6;
-    facing4 = 3;
-    facing4 &= value;
-    actor->facing4 = facing4;
-}
-
 void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
 {
     struct SceneActorBody *motion = &actor->body;
@@ -1640,7 +1602,8 @@ void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
         target = &actor->probe.target;
         angle = Math_Atan2(probe->target.x - motion->position.x, target->z - pos->z);
         actor->body.direction = angle;
-        RouteWalk_SetFacing(actor, angle);
+        actor->facing8 = SceneFacing_EightWay(angle);
+        actor->facing4 = SceneFacing_FourWay(angle);
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
     }
     {
@@ -1668,7 +1631,8 @@ void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
                 s32 speed;
                 struct ContactPosition step;
                 actor->body.direction = angle;
-                RouteWalk_SetFacing(actor, angle);
+                actor->facing8 = SceneFacing_EightWay(angle);
+                actor->facing4 = SceneFacing_FourWay(angle);
                 speed = (anim->frame & 1) ? 24 : 48;
                 RouteWalk_Polar(&step, motion->direction, speed);
                 motion->position.x += step.x;
