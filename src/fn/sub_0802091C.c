@@ -1,20 +1,19 @@
-#include "global.h"
-void *Task_Create(s32, s32);
-void Task_SetCallbacks(void *, void *, void *);
-s32 SceneObjects_Init(void *, void *, void *);
-void Task_Kill(void *);
-void sub_0801F93C(void);
-void SceneObjects_Destroy(void);
-void *sub_0802091C(void *a, void *b)
+#include "scene_object_controller.h"
+
+s32 SceneObjects_Init(struct SceneObjPool *, s32, s32);
+s32 sub_0801F93C(struct SceneObjPool *);
+s32 SceneObjects_Destroy(struct SceneObjPool *);
+
+struct SceneObjPool *sub_0802091C(s32 messageId, s32 argument)
 {
-    void *obj;
-    obj = Task_Create(9, 0x434);
-    if (obj != 0) {
-        Task_SetCallbacks(obj, sub_0801F93C, SceneObjects_Destroy);
-        if (SceneObjects_Init(obj, a, b) < 0) {
-            Task_Kill(obj);
-            return 0;
+    struct SceneObjPool *pool = Task_Create(9, sizeof(*pool));
+    if (pool) {
+        Task_SetCallbacks(pool, (void (*)(void *))sub_0801F93C,
+                          (void (*)(void *))SceneObjects_Destroy);
+        if (SceneObjects_Init(pool, messageId, argument) < 0) {
+            Task_Kill(pool);
+            return NULL;
         }
     }
-    return obj;
+    return pool;
 }
