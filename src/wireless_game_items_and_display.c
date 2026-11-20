@@ -145,20 +145,18 @@ u32 WirelessGame_IsItemToggleEnabled(void)
     return p->enabled;
 }
 
-// MATCHING_CONCESSION: register-pinning
 int WirelessGame_ToggleItemMode(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
-    u8 *v;
+    struct WirelessGamePeerStats *peer;
     if (!p)
         return 0;
     if (!p->enabled)
         return 0;
-    /* Byte 6 past the four-element counts array is itemMode. */
-    v = (u8 *)p + (u32) & ((struct WirelessGameExchange *)0)->local.counts;
-    v[6] = 1 - v[6];
+    peer = &p->local;
+    peer->itemMode = 1 - peer->itemMode;
     Sound_PlaySong(267);
-    return v[6];
+    return peer->itemMode;
 }
 
 u32 WirelessGame_GetRoundCount(void)
@@ -236,32 +234,17 @@ void WirelessGame_InitDisplayAndLinkCallbacks(struct WirelessGameExchange *p)
 void WirelessGame_RestartSession(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
-    u8 *alias2;
-    struct WirelessGameExchange *alias;
     if (p) {
-        int one = 1;
-        u8 *state = alias2 = &p->state;
-        int zero = 0;
-        *state = one;
-        state++;
-        *state = one;
-        p->timer = zero;
-        alias = p;
-        WirelessGame_InitDisplayAndLinkCallbacks(alias);
+        WirelessGameMenu_EnterState(p, WIRELESS_MENU_STARTUP_DELAY);
+        WirelessGame_InitDisplayAndLinkCallbacks(p);
     }
 }
 
 void WirelessGame_BeginResults(void)
 {
     struct WirelessGameExchange *p = WirelessExchange_Get();
-    if (p) {
-        int state = 12;
-        u8 *dest = &p->state;
-        int zero = 0;
-        *dest = state;
-        p->entered = 1;
-        p->timer = zero;
-    }
+    if (p)
+        WirelessGameMenu_EnterState(p, WIRELESS_MENU_RESULTS_PANEL);
 }
 
 u32 WirelessGame_GetSelectedEquipmentEffect(void)
@@ -299,18 +282,16 @@ void WirelessGameItem_SetRandomArcVelocity(struct WirelessGameItem *arg, int bas
     int base = baseArg;
     u16 *table = gRandomTable;
     u32 *state = &gRandomIndex;
-    u32 limit;
     u32 index;
     int random;
     index = (*state) + 1;
-    limit = 1023;
-    index &= limit;
+    index &= 1023;
     random = index * 2;
     random = *((u16 *)(random + ((u32)table)));
     random &= mask;
     base += random;
     index = index + 1;
-    index = index & limit;
+    index = index & 1023;
     *state = index;
     {
         int sign = *((u8 *)(&table[index]));
@@ -369,7 +350,6 @@ void WirelessGameItems_UpdateHiddenItem(struct WirelessGameItems *p, struct Wire
 
 extern const u16 gUnk_0824DE7C[];
 
-// MATCHING_CONCESSION: register-pinning
 extern const u16 gUnk_0824DE8C[];
 
 static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct WirelessGameItem *p,
@@ -597,7 +577,6 @@ static inline void WirelessGameItem_ResetOutgoing(struct WirelessGameItem *p, u8
     p->pendingFlag = ticks;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
                                           struct WirelessGameItem *p, int index)
 {
@@ -1299,7 +1278,6 @@ void WirelessGameDisplay_UpdateStaticNotice(struct WirelessGameDisplay *p)
         p->timer++;
 }
 
-// MATCHING_CONCESSION: register-pinning
 void WirelessGameDisplay_UpdateAlternatingNotice(struct WirelessGameDisplay *p)
 {
     struct WirelessGameDrawing *drawing;
