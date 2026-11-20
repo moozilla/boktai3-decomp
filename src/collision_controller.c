@@ -1,13 +1,19 @@
 #include "collision_controller.h"
 #include "scene_actor_status.h"
 #include "display_sequence.h"
+#include "player_slot_status.h"
 /* CollisionController_ClearGlobal: Zeroes gCollisionManager; matches the ClearGlobal pattern already used by EffectManager_ClearGlobal and is hinted by the file's own #define. */
 #define CollisionController_ClearGlobal sub_08009E30
 
 #define CollisionController_ClearGlobal sub_08009E30
+static inline void CollisionController_SetManager(struct CollisionManager *manager)
+{
+    gCollisionManager = manager;
+}
+
 void CollisionController_ClearGlobal(void)
 {
-    gCollisionManager = 0;
+    gCollisionManager = NULL;
 }
 
 struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *manager)
@@ -24,18 +30,21 @@ struct CollisionSlot *CollisionController_FindFreeSlot(struct CollisionManager *
     return 0;
 }
 
+static inline void CollisionController_SetMode(struct CollisionSlot *slot, u32 mode)
+{
+    slot->mode = mode;
+    slot->timer = 0;
+    slot->entered = 1;
+}
+
 void CollisionController_ReceiveHit(struct SceneCollider *collider, struct CollisionOther *other,
                                     struct CollisionSlot *slot)
 {
-    u32 m = 0x4000;
-    if ((collider->contactFlags2 & m) == 0) {
-        u32 m2 = 0xe00;
-        u32 x = collider->contactFlags & m2;
-        if (x == 0) {
+    if (SceneCollider_ReadReactionFlags(collider, 0x4000) == 0) {
+        u32 attackBits = SceneCollider_ReadContactFlags(collider, 0xe00);
+        if (attackBits == 0) {
             other->hit = 1;
-            slot->mode = 1;
-            slot->timer = x;
-            slot->entered = 1;
+            CollisionController_SetMode(slot, 1);
             slot->collider.state |= 4;
         }
     }
@@ -128,10 +137,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
     }
     {
         u32 flags = p->sprite.flags;
-        u32 low = 1;
-        u32 firstMask;
-        firstMask = low;
-        if (flags & low) {
+        if (flags & 1) {
             if (p->timer++ > p->delay) {
                 p->timer = 0;
                 p->delay = randomDelay();
@@ -155,7 +161,7 @@ void CollisionController_UpdateIdleAnimation(struct CollisionManager *manager,
                 union DisplaySequenceControl control;
                 u32 bit, first;
                 control.raw = a->flags;
-                bit = firstMask;
+                bit = 1;
                 first = (u8)(control.raw & bit);
                 if (first != (((*entry & 0x30) >> 4) & bit))
                     o->flags |= 4;
@@ -218,10 +224,7 @@ void CollisionController_UpdateHitDelayAnimation(u32 x, struct CollisionSlot *sl
         slot->entered = 0;
     n = slot->timer++;
     if (n > 0x1e) {
-        u32 t = 2;
-        slot->mode = t;
-        slot->timer = 0;
-        slot->entered = 1;
+        CollisionController_SetMode(slot, 2);
     }
 }
 
@@ -338,18 +341,14 @@ s32 CollisionController_UpdateAll(struct CollisionManager *manager)
             for (i = 0; i < 16; i++) {
                 struct CollisionSlot *slot = &manager->slots[i];
                 if (slot->mode == 0) {
-                    slot->mode = 0;
-                    slot->timer = 0;
-                    slot->entered = 1;
+                    CollisionController_SetMode(slot, 0);
                 }
             }
     } else if (manager->paused == 1)
         for (i = 0; i < 16; i++) {
             struct CollisionSlot *slot = &manager->slots[i];
             if (slot->mode == 0) {
-                slot->mode = 0;
-                slot->timer = 0;
-                slot->entered = 1;
+                CollisionController_SetMode(slot, 0);
             }
         }
     manager->paused = paused;
@@ -376,10 +375,7 @@ s32 CollisionController_DestroyManager(struct CollisionManager *manager)
             CollisionController_RemoveSlot(manager, slot);
         slot++;
     }
-    {
-        u32 z = 0;
-        gCollisionManager = (struct CollisionManager *)z;
-    }
+    CollisionController_SetManager(NULL);
     return 0;
 }
 
@@ -387,7 +383,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
 {
     u32 mode;
     u8 available;
-    gCollisionManager = manager;
+    CollisionController_SetManager(manager);
     mode = gSunClock.mode;
     if ((((u8)(mode - 4)) <= 1) || (mode == 0)) {
         goto pause;
@@ -401,9 +397,7 @@ s32 CollisionController_InitManager(struct CollisionManager *manager, void *owne
         }
         actor = gPlayers[0];
         if (actor) {
-            u32 *address = &actor->actionFlags;
-            u32 mask = 16;
-            if ((*address) & mask) {
+            if (Player_ReadStatusBits(&actor->actionFlags, 16)) {
                 goto pause;
             }
         }
