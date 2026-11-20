@@ -165,15 +165,8 @@ u32 MessageWindow_SetDisplayModeFromScript(void)
 int MessageWindow_Clear(void)
 {
     struct MessageWindow *window = (void *)gMessageWindow;
-    int result;
-    if (window) {
-        goto run;
-    }
-    result = 0;
-done:
-    return result;
-
-run:
+    if (!window)
+        return 0;
     TextWindow_BlankRect(window->x, window->y, window->width, window->height);
     {
         void *fn = MessageWindow_ClearTextCompletion;
@@ -200,22 +193,12 @@ int MessageWindow_SetMessageTable(void *script)
     struct MessageWindow *window = (void *)gMessageWindow;
     if (window && script) {
         struct MessagePlaybackState *state = &window->state;
-        int zero;
         window->messageTable = script;
-        {
-            u16 *index = &window->messageIndex;
-            zero = 0;
-            *index = zero;
-        }
-        state->pc = MessageWindow_GetStringAtOffset(window, zero);
-        window->messageFrame = zero;
-        {
-            u16 *count = &window->messageCount;
-            int one;
-            one = 1;
-            *count = one;
-        }
-        window->queuedMessage = zero;
+        window->messageIndex = 0;
+        state->pc = MessageWindow_GetStringAtOffset(window, 0);
+        window->messageFrame = 0;
+        window->messageCount = 1;
+        window->queuedMessage = 0;
         TextState_Reset(state);
         window->widget.flags |= 1;
     }
@@ -461,15 +444,10 @@ int MessageWindow_SetAutoAdvance(int mode, int step, int flags)
     struct MessageWindow *window = (void *)gMessageWindow;
     if (!window)
         return 0;
-    {
-        u8 *dst = &window->autoAdvance;
-        int zero;
-        zero = 0;
-        *dst = mode;
-        window->autoAdvanceStep = step;
-        window->autoAdvanceCounter = zero;
-        window->skipFlags = flags;
-    }
+    window->autoAdvance = mode;
+    window->autoAdvanceStep = step;
+    window->autoAdvanceCounter = 0;
+    window->skipFlags = flags;
 }
 
 int MessageWindow_SetAutoAdvanceFromScript(void)
