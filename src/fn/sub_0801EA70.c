@@ -12,7 +12,7 @@ void SceneObjects_ScriptPromote(void)
     for (i = 0; i < pool->count; i++) {
         struct SceneObjSlot *slot = &pool->slots[i];
         if (slot->id == id) {
-            slot->b41 = 1;
+            slot->autoActivate = 1;
             pool->primary[pool->primaryCount] = slot->id;
             pool->primaryCount++;
             SceneObjSlot_ApplyActivation(slot, SCENE_OBJ_ACTIVATING);

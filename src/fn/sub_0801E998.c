@@ -21,13 +21,13 @@ int SceneObjects_ScriptLower(void)
             s->timer = 0;
             s->variant = SceneObjSlot_LiftVariant(SCENE_OBJ_LIFT_LOWERED);
             s->callback = fn;
-            s->b39 = *(u8 *)&s->loweredPose;
-            s->b3a = 0;
-            s->block->w6 &= (u16)~2;
-            s->block->w6 |= 3;
-            s->block->b4 = (s->block->b4 & 0xf0) | (s->b3b + 1);
+            s->pose = *(u8 *)&s->loweredPose;
+            s->poseFrame = 0;
+            s->terrain->cell.flags &= (u16)~2;
+            s->terrain->cell.flags |= 3;
+            s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | (s->cellHeight + 1);
             s->lift = 0;
-            s->spritePos.position.y = s->q0.position.y;
+            s->sprite.position.y = s->q0.position.y;
             found = 1;
         }
     }

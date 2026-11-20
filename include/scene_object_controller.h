@@ -28,8 +28,8 @@ void SceneObject_UpdateInactiveIdle(struct SceneObjSlot *);
 
 static inline void SceneObjSlot_ResetPose(struct SceneObjSlot *slot, u8 pose)
 {
-    slot->b39 = pose;
-    slot->b3a = 0;
+    slot->pose = pose;
+    slot->poseFrame = 0;
 }
 
 static inline void SceneObjSlot_EnterIdle(struct SceneObjSlot *slot,

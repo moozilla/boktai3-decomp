@@ -87,18 +87,18 @@ s32 sub_0801F93C(struct SceneObjPool *self)
     Obj1F_GetCellDistanceFromOrigin(&camera);
     for (i = 0; i < self->count; i++) {
         struct SceneObjSlot *o = &self->slots[i];
-        ((struct DisplaySequenceSprite *)o)->frame = o->b39;
-        if (o->b44) {
+        o->sprite.frame = o->pose;
+        if (o->hideOutsideRegion) {
             if (Obj1F_SceneMatches(&o->region))
-                ((struct DisplaySequenceSprite *)o)->flags &= ~1;
+                o->sprite.flags &= ~1;
             else
-                ((struct DisplaySequenceSprite *)o)->flags |= 1;
+                o->sprite.flags |= 1;
         }
         switch (o->type) {
             case 0: {
                 struct Obj1FPos delta;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -140,7 +140,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                 struct Obj1FPos delta;
                 struct Obj1FScriptArgs args;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseC((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -149,13 +149,13 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                 delta.z -= gGameState->positionZ;
                 if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                     Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
-                    if (!o->b41) {
+                    if (!o->autoActivate) {
                         if ((gPadState[1] & 1) &&
                             !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
-                            o->hasArgs) {
+                            o->interactionScript) {
                             args.kind = 4;
                             args.data = (u8 *)&o->args;
-                            Script_Call(o->hasArgs, &args);
+                            Script_Call(o->interactionScript, &args);
                         }
                     } else {
                         self->primary[self->primaryCount] = o->id;
@@ -170,7 +170,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                     delta.z -= (&tether)->z;
                     if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                         Obj1F_Abs(delta.y) <= 0xFE &&
-                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->b41) {
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->autoActivate) {
                         self->primary[self->primaryCount] = o->id;
                         self->primaryCount++;
                     }
@@ -180,7 +180,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
             case 4: {
                 struct Obj1FPos delta;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -211,7 +211,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
             case 5: {
                 struct Obj1FPos delta;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -242,7 +242,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
             case 6: {
                 struct Obj1FPos delta;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseA((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -271,7 +271,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
             }
             case 3:
             case 7:
-                if (!(o->kind & 1))
+                if (!(o->activationFlags & 1))
                     SceneObject_UpdatePoseA((u8 *)o);
                 break;
             case 15: {
@@ -294,7 +294,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                 struct Obj1FPos delta;
                 struct Obj1FScriptArgs args;
                 struct Obj1FPos tether;
-                if (o->kind & 1)
+                if (o->activationFlags & 1)
                     break;
                 SceneObject_UpdatePoseC((u8 *)o);
                 delta = *(struct Obj1FPos *)&o->pos;
@@ -303,13 +303,13 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                 delta.z -= gGameState->positionZ;
                 if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                     Obj1F_Abs(delta.y) <= 0xFE && !SceneObjects_HasPrimaryId((u8 *)self, o->id)) {
-                    if (!o->b41) {
+                    if (!o->autoActivate) {
                         if ((gPadState[1] & 1) &&
                             !SceneObject_CheckActorCompatibility((u8 *)self, (u8 *)o) &&
-                            o->hasArgs) {
+                            o->interactionScript) {
                             args.kind = 4;
                             args.data = (u8 *)&o->args;
-                            Script_Call(o->hasArgs, &args);
+                            Script_Call(o->interactionScript, &args);
                         }
                     } else {
                         self->primary[self->primaryCount] = o->id;
@@ -324,7 +324,7 @@ s32 sub_0801F93C(struct SceneObjPool *self)
                     delta.z -= (&tether)->z;
                     if (delta.x * delta.x + delta.z * delta.z <= 0x12CC7 &&
                         Obj1F_Abs(delta.y) <= 0xFE &&
-                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->b41) {
+                        !SceneObjects_HasPrimaryId((u8 *)self, o->id) && o->autoActivate) {
                         self->primary[self->primaryCount] = o->id;
                         self->primaryCount++;
                     }
