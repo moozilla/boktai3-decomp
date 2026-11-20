@@ -122,7 +122,8 @@ s32 Trigger_RunScript(struct Trigger *p, u32 scriptInput, s32 event)
     struct TriggerScriptArgs args;
     s32 actor, i;
     u32 busy;
-    if (!script || p->actor == -1 || (busy = Trigger_PlayerStatus(p->actor, 12), actor = p->actor, busy))
+    if (!script || p->actor == -1 ||
+        (busy = Trigger_PlayerStatus(p->actor, 12), actor = p->actor, busy))
         return -1;
     if (p->type == 1) {
         values[0] = p->position->x;
@@ -255,11 +256,8 @@ s32 Trigger_UpdateProximity(struct TriggerManager *manager, struct Trigger *p)
         s16 *o = box;
         if (!actor)
             continue;
-        {
-            u32 mask = 12;
-            if (gUnk_02000560[i] & mask)
-                continue;
-        }
+        if (Trigger_PlayerStatus(i, 12))
+            continue;
         v = p->position;
         proj = (struct SceneVec *)(i * 8 + (u32)manager);
         proj = (struct SceneVec *)((u8 *)proj + 60);
