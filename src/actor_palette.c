@@ -1,6 +1,7 @@
 #include "actor_palette.h"
 
-void ArmorPalette_CopyKindBanks(struct ArmorPaletteController *controller, void *data, u32 first, u32 extra)
+void ArmorPalette_CopyKindBanks(struct ArmorPaletteController *controller, void *data, u32 first,
+                                u32 extra)
 {
     u16 *from;
     u16 *to;
@@ -23,9 +24,12 @@ void ArmorPalette_CopyKindBanks(struct ArmorPaletteController *controller, void 
 void ActorPalette_RestoreSelectedBanks(struct ArmorPaletteController *controller)
 {
     Palette_CopyBank(controller->working[controller->bank], controller->palettes[controller->bank]);
-    Palette_CopyBank(controller->working[controller->bank + 1], controller->palettes[controller->bank + 1]);
-    Palette_CopyBank(controller->working[controller->bank + 2], controller->palettes[controller->bank + 2]);
-    Palette_CopyBank(controller->working[controller->otherBank], controller->palettes[controller->otherBank]);
+    Palette_CopyBank(controller->working[controller->bank + 1],
+                     controller->palettes[controller->bank + 1]);
+    Palette_CopyBank(controller->working[controller->bank + 2],
+                     controller->palettes[controller->bank + 2]);
+    Palette_CopyBank(controller->working[controller->otherBank],
+                     controller->palettes[controller->otherBank]);
 }
 
 void ActorPalette_LoadScriptBanks(struct SceneCombatActor *actor)
@@ -143,13 +147,17 @@ void ActorPalette_FadeWhiteFast(struct ArmorPaletteController *controller)
     if (controller->timer <= 8) {
         void *source;
         source = controller->palettes[controller->bank];
-        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer, 3);
+        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer,
+                          3);
         source = controller->palettes[controller->bank + 1];
-        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF, controller->timer, 3);
+        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF,
+                          controller->timer, 3);
         source = controller->palettes[controller->bank + 2];
-        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF, controller->timer, 3);
+        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF,
+                          controller->timer, 3);
         source = controller->palettes[controller->otherBank];
-        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF, controller->timer, 3);
+        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF,
+                          controller->timer, 3);
     } else {
         controller->update = 0;
         if (controller->finish) {
@@ -163,11 +171,7 @@ void ActorPalette_FadeWhiteFast(struct ArmorPaletteController *controller)
 void Armor_StartFastWhiteFade(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *controller = &actor->paletteController;
-    void (*f)(struct ArmorPaletteController *) = ActorPalette_FadeWhiteFast;
-    u32 z = 0;
-    controller->update = f;
-    controller->finish = z;
-    actor->paletteController.timer = z;
+    ArmorPalette_BeginEffect(controller, ActorPalette_FadeWhiteFast, NULL);
 }
 
 void ActorPalette_FadeWhite(struct ArmorPaletteController *controller)
@@ -175,13 +179,17 @@ void ActorPalette_FadeWhite(struct ArmorPaletteController *controller)
     if (controller->timer <= 16) {
         void *source;
         source = controller->palettes[controller->bank];
-        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer, 4);
+        Palette_BlendBank(controller->working[controller->bank], source, 0x7FFF, controller->timer,
+                          4);
         source = controller->palettes[controller->bank + 1];
-        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF, controller->timer, 4);
+        Palette_BlendBank(controller->working[controller->bank + 1], source, 0x7FFF,
+                          controller->timer, 4);
         source = controller->palettes[controller->bank + 2];
-        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF, controller->timer, 4);
+        Palette_BlendBank(controller->working[controller->bank + 2], source, 0x7FFF,
+                          controller->timer, 4);
         source = controller->palettes[controller->otherBank];
-        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF, controller->timer, 4);
+        Palette_BlendBank(controller->working[controller->otherBank], source, 0x7FFF,
+                          controller->timer, 4);
     } else {
         controller->update = 0;
         if (controller->finish) {
@@ -195,11 +203,7 @@ void ActorPalette_FadeWhite(struct ArmorPaletteController *controller)
 void Armor_StartSlowWhiteFade(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *controller = &actor->paletteController;
-    void (*f)(struct ArmorPaletteController *) = ActorPalette_FadeWhite;
-    u32 z = 0;
-    controller->update = f;
-    controller->finish = z;
-    actor->paletteController.timer = z;
+    ArmorPalette_BeginEffect(controller, ActorPalette_FadeWhite, NULL);
 }
 
 void ActorPalette_BlendSavedBanks(struct ArmorPaletteController *controller)
@@ -209,13 +213,16 @@ void ActorPalette_BlendSavedBanks(struct ArmorPaletteController *controller)
         void *saved;
         saved = controller->saved[0];
         source = controller->palettes[controller->bank];
-        Palette_InterpolateBanks(controller->working[controller->bank], saved, source, controller->timer, 4);
+        Palette_InterpolateBanks(controller->working[controller->bank], saved, source,
+                                 controller->timer, 4);
         saved = controller->saved[1];
         source = controller->palettes[controller->bank + 1];
-        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source, controller->timer, 4);
+        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source,
+                                 controller->timer, 4);
         saved = controller->saved[2];
         source = controller->palettes[controller->bank + 2];
-        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source, controller->timer, 4);
+        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source,
+                                 controller->timer, 4);
         saved = controller->saved[3];
         source = controller->palettes[controller->otherBank];
         Palette_InterpolateBanks(controller->working[controller->otherBank], saved, source,
@@ -237,13 +244,16 @@ void ActorPalette_BlendSavedBanksSlow(struct ArmorPaletteController *controller)
         void *saved;
         saved = controller->saved[0];
         source = controller->palettes[controller->bank];
-        Palette_InterpolateBanks(controller->working[controller->bank], saved, source, controller->timer, 5);
+        Palette_InterpolateBanks(controller->working[controller->bank], saved, source,
+                                 controller->timer, 5);
         saved = controller->saved[1];
         source = controller->palettes[controller->bank + 1];
-        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source, controller->timer, 5);
+        Palette_InterpolateBanks(controller->working[controller->bank + 1], saved, source,
+                                 controller->timer, 5);
         saved = controller->saved[2];
         source = controller->palettes[controller->bank + 2];
-        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source, controller->timer, 5);
+        Palette_InterpolateBanks(controller->working[controller->bank + 2], saved, source,
+                                 controller->timer, 5);
         saved = controller->saved[3];
         source = controller->palettes[controller->otherBank];
         Palette_InterpolateBanks(controller->working[controller->otherBank], saved, source,
@@ -263,7 +273,7 @@ void Armor_StartPaletteTransition(struct SceneCombatActor *actor)
     struct ArmorPaletteController *callbacks = &actor->paletteController;
     void (*update)(struct ArmorPaletteController *) = ActorPalette_BlendSavedBanks;
     void (*complete)(struct ArmorPaletteController *) = ActorPalette_RestoreSelectedBanks;
-        u16 *source;
+    u16 *source;
     callbacks->update = update;
     callbacks->finish = complete;
     source = actor->paletteController.working[actor->paletteController.bank];
@@ -341,11 +351,8 @@ void ActorPalette_PulseBlendSaved(struct ArmorPaletteController *controller)
 void ActorPalette_BeginTransition(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *palettes = &actor->paletteController;
-    void (*update)(struct ArmorPaletteController *) = ActorPalette_PulseBlendSaved;
-    void (*cleanup)(struct ArmorPaletteController *) = ActorPalette_RestoreSelectedBanks;
-    palettes->update = update;
-    palettes->finish = cleanup;
-    actor->paletteController.timer = 0;
+    ArmorPalette_BeginEffect(palettes, ActorPalette_PulseBlendSaved,
+                             ActorPalette_RestoreSelectedBanks);
 }
 
 void Palette_UpdatePulseFade(struct ArmorPaletteController *controller)
@@ -403,9 +410,7 @@ void Armor_StartAccentPaletteFade(struct SceneCombatActor *actor)
         case 0xd:
         case 0xf:
             if (palette->update == 0) {
-                palette->update = Palette_UpdatePulseFade;
-                palette->finish = 0;
-                palette->timer = 0;
+                ArmorPalette_BeginEffect(palette, Palette_UpdatePulseFade, NULL);
             }
             break;
         default:
@@ -421,15 +426,14 @@ void Armor_CopyScenePalette(void *a)
 void Armor_UpdatePaletteRestoreDelay(struct ArmorPaletteController *controller)
 {
     s32 c = (u16)controller->timer + 1;
-    u32 z = 0;
     controller->timer = c;
     if ((s16)c > 7) {
         void (*q)(struct ArmorPaletteController *);
-        controller->update = z;
+        controller->update = 0;
         q = controller->finish;
         if (q) {
             Callback_InvokeActor(controller, q);
-            controller->finish = z;
+            controller->finish = 0;
         }
     }
 }
@@ -437,33 +441,23 @@ void Armor_UpdatePaletteRestoreDelay(struct ArmorPaletteController *controller)
 void Armor_StartFullPaletteRestoreDelay(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *palette = &actor->paletteController;
-    void (*update)(struct ArmorPaletteController *);
-    void (*completion)(struct ArmorPaletteController *);
 
     ActorPalette_RestoreSelectedBanks(palette);
     Armor_CopyScenePalette(palette->working[palette->bank]);
     Armor_CopyScenePalette(palette->working[palette->bank + 1]);
     Armor_CopyScenePalette(palette->working[palette->bank + 2]);
     Armor_CopyScenePalette(palette->working[palette->otherBank]);
-    update = Armor_UpdatePaletteRestoreDelay;
-    completion = ActorPalette_RestoreSelectedBanks;
-    palette->update = update;
-    palette->finish = completion;
-    palette->timer = 0;
+    ArmorPalette_BeginEffect(palette, Armor_UpdatePaletteRestoreDelay,
+                             ActorPalette_RestoreSelectedBanks);
 }
 
 void Armor_StartPaletteRestoreDelay(struct SceneCombatActor *actor)
 {
     struct ArmorPaletteController *controller = &actor->paletteController;
-    void (*update)(struct ArmorPaletteController *);
-    void (*finish)(struct ArmorPaletteController *);
     ActorPalette_RestoreSelectedBanks(controller);
     Armor_CopyScenePalette(controller->working[actor->paletteController.bank + 2]);
-    update = Armor_UpdatePaletteRestoreDelay;
-    finish = ActorPalette_RestoreSelectedBanks;
-    controller->update = update;
-    controller->finish = finish;
-    actor->paletteController.timer = 0;
+    ArmorPalette_BeginEffect(controller, Armor_UpdatePaletteRestoreDelay,
+                             ActorPalette_RestoreSelectedBanks);
 }
 
 void Armor_InitPaletteBanks(struct SceneCombatActor *actor)
