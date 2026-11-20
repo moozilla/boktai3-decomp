@@ -1,7 +1,5 @@
 #include "scene_object_controller.h"
 
-void SceneObject_AnimateActive(struct SceneObjSlot *);
-
 void SceneObjects_BeginActivation(struct SceneObjPool *pool, u16 id)
 {
     int i;
@@ -11,7 +9,7 @@ void SceneObjects_BeginActivation(struct SceneObjPool *pool, u16 id)
             (slot->variant == SCENE_OBJ_INACTIVE || slot->variant == SCENE_OBJ_DEACTIVATING) &&
             !(slot->kind & 1)) {
             slot->b41 = 1;
-            SceneObjSlot_SetAnimation(slot, SCENE_OBJ_ACTIVATING, SceneObject_AnimateActive, 0);
+            SceneObjSlot_ApplyActivation(slot, SCENE_OBJ_ACTIVATING);
         }
     }
 }
