@@ -5330,6 +5330,7 @@ addr,name,mode,confidence,source,notes
 08136C4C,SceneActorScript_ApplyRouteStartCommand,thumb,low,src-alias,Starts the actor route from three command arguments when its signed active field is positive
 08136C74,SceneActorScript_ApplyTargetResetCommand,thumb,low,src-alias,
 08136C80,SceneActorPlacement_HideActor,thumb,low,src-alias,
+08136D40,SceneActorPlacement_ResumeResetControl,thumb,low,src-alias,Tentative: resumes the drawable and shadow before restoring the reset control
 08136DFC,SceneActorPlacement_ShowActor,thumb,low,src-alias,
 08136EB0,SceneActorControl_RestoreInactiveDefaults,thumb,low,src-alias,
 08136F1C,SceneActorScript_OnCommand,thumb,low,src-alias,Shared enemy command callback dispatches through the actor command table using the first command halfword
