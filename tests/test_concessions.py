@@ -227,6 +227,12 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_register_storage_does_not_hide_constant_locals(self):
+        source = ("void f(void) {\n    register u32 zero;\n    const register u32 mask = 4;\n"
+                  "    register int index = 0;\n    while (index < 4)\n        g(index++);\n"
+                  "    zero = 0;\n    g(zero, mask);\n}\n")
+        self.assertEqual(warns(source), ["const-local", "literal-local"])
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])

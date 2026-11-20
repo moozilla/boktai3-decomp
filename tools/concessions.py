@@ -109,7 +109,8 @@ _REGEX = {
 _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixteen|minusOne|negOne|allOnes)"
                 r"(?:[A-Z_0-9]\w*)?")
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
-_DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
+_DECL_TYPE = (r"(?:(?:register|const)\s+){0,2}(?:unsigned\s+|signed\s+)?"
+              r"(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b|register\b|const\b)\w+\s+\*?")
 _LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
