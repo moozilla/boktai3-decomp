@@ -1,65 +1,41 @@
+#include "wireless_trade_menu.h"
 #include "global.h"
 #include "input.h"
-struct P {
-    u8 pad[0x24];
-    u32 timer;
-    u8 state, entered;
-    u8 pad2[7];
-    u8 countdown, retries, ready;
-    u8 pad3[14];
-    u8 cancel;
-    u8 pad4[0xa7];
-    u8 wait;
-    u8 pad5[5];
-    u32 requested;
-};
-void WirelessGameMenu_InitItemChoices(struct P *);
-void WirelessGameMenu_InitEquipmentChoices(struct P *);
+void WirelessGameMenu_InitItemChoices(struct WirelessGameExchange *);
+void WirelessGameMenu_InitEquipmentChoices(struct WirelessGameExchange *);
 void SceneHud_EnterOptionControls(void);
 void StatusPanel_BeginRefresh(void);
-void WirelessGameMenu_SetStatusPanelState(struct P *, int);
-void WirelessGameMenu_SignalStatusPanel(struct P *);
+void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
+void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 void Sound_PlaySong(int);
-static inline u32 test(u16 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-void WirelessGameMenu_UpdateSelection(struct P *p)
+void WirelessGameMenu_UpdateSelection(struct WirelessGameExchange *p)
 {
     if (p->entered) {
         p->entered = 0;
         WirelessGameMenu_InitItemChoices(p);
         WirelessGameMenu_InitEquipmentChoices(p);
-        p->requested = 0;
+        p->selectionRequested = 0;
         SceneHud_EnterOptionControls();
-        p->ready = 1;
-        p->countdown = 8;
-        p->wait = 6;
+        p->selectionReady = 1;
+        p->selectionCountdown = 8;
+        p->choice = 6;
         WirelessGameMenu_SetStatusPanelState(p, 2);
     }
     if (gPadState[1] & 8) {
-        p->requested = 1;
-        p->countdown = 8;
+        p->selectionRequested = 1;
+        p->selectionCountdown = 8;
     }
-    if (p->ready && p->timer > 16 && p->requested) {
-        u32 value = p->countdown;
-        short countdown = value; /* s16 copy steers register allocation */
-        if (countdown == 0) {
-            u32 four;
-            u8 *state;
+    if (p->selectionReady && p->timer > 16 && p->selectionRequested) {
+        if (!p->selectionCountdown) {
             Sound_PlaySong(0xdd);
-            four = 4;
-            state = &p->state;
-            *state = four;
-            p->entered = 1;
-            p->timer = countdown;
+            WirelessGameMenu_EnterState(p, WIRELESS_MENU_SELECTION_EXCHANGE);
             StatusPanel_BeginRefresh();
             WirelessGameMenu_SignalStatusPanel(p);
-            if (p->cancel && p->retries)
-                p->retries--;
+            if (p->itemMode && p->enabled)
+                p->enabled--;
             return;
         }
-        p->countdown = value - 1;
+        p->selectionCountdown--;
     }
     p->timer++;
 }
