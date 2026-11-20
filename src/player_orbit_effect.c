@@ -1,4 +1,5 @@
 #include "player_orbit_effect.h"
+#include "word_flags.h"
 #include "monster_particle_random.h"
 
 void PlayerBurst_SetStateCallback(struct PlayerOrbitEffect *effect,
@@ -142,8 +143,7 @@ void PlayerOrbitEffect_UpdateIntro(struct PlayerOrbitEffect *effect)
 {
     struct Player *player;
     if (effect->phaseFrame == 0) {
-        u32 mask = 4;
-        gEnginePauseFlags |= mask;
+        WordFlags_Set(4, &gEnginePauseFlags);
         Sound_PlaySong(0x302);
         Sound_PlaySong(0x1FA);
     }
