@@ -37,32 +37,53 @@ class TileMap:
                         out[x0+x, y0+y] = (tile >> 12)*16 + nibble
         return image
 
-    def replace(self, index, original, rendered):
-        """Copy on write only changed tiles/metatiles; preserve all other users."""
+    def replace(self, index, original, rendered, *, private_layer=False, limit=1024):
+        """Copy on write. A private HUD upload may reuse an exclusively edited slot."""
         w, h, _, grid = self.layers[index]
         if original.size != rendered.size or original.size != (w*16, h*16):
             raise ValueError("Map dimensions must be preserved")
-        tile_ids = {value: i + self.tile_base for i, value in enumerate(self.tiles)}
-        meta_ids = {value: i for i, value in enumerate(self.metas)}
+        changes = {}
+        demand = {}
+        for i, mid in enumerate(grid):
+            for q, entry in enumerate(self.metas[mid]):
+                slot = (entry & 1023) - self.tile_base
+                x, y = (i%w)*16 + (q%2)*8, (i//w)*16 + (q//2)*8
+                box = (x, y, x+8, y+8)
+                tile = rendered.crop(box)
+                pixels = tile.tobytes()
+                if pixels == original.crop(box).tobytes():
+                    desired = self.tiles[slot]
+                else:
+                    if len({p >> 4 for p in pixels}) != 1:
+                        raise ValueError("A BG tile must use one palette bank")
+                    if entry & 1024:
+                        tile = tile.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+                    if entry & 2048:
+                        tile = tile.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+                    pixels = tile.tobytes()
+                    desired = bytes((a & 15) | ((b & 15) << 4)
+                                    for a, b in zip(pixels[::2], pixels[1::2]))
+                    changes[i,q] = desired
+                if private_layer:
+                    demand.setdefault(slot, set()).add(desired)
+        for slot, desired in demand.items():
+            if self.tiles[slot] not in desired:
+                self.tiles[slot] = min(desired)
+        tile_ids = {tile: i+self.tile_base for i,tile in enumerate(self.tiles)}
+        meta_ids = {m: i for i,m in enumerate(self.metas)}
         for i, mid in enumerate(grid):
             entries = list(self.metas[mid])
-            for q in range(4):
-                x = (i%w)*16 + (q%2)*8
-                y = (i//w)*16 + (q//2)*8
-                box = (x, y, x+8, y+8)
-                pixels = rendered.crop(box).tobytes()
-                if pixels == original.crop(box).tobytes():
+            for q, entry in enumerate(entries):
+                desired = changes.get((i,q))
+                if desired is None:
                     continue
-                banks = {p >> 4 for p in pixels}
-                if len(banks) != 1:
-                    raise ValueError("A BG tile must use one original palette bank")
-                packed = bytes((a & 15) | ((b & 15) << 4) for a, b in zip(pixels[::2], pixels[1::2]))
-                if packed not in tile_ids:
-                    tile_ids[packed] = len(self.tiles) + self.tile_base
-                    if tile_ids[packed] >= 1024:
-                        raise ValueError("Replacement exceeds the GBA tile index limit")
-                    self.tiles.append(packed)
-                entries[q] = (banks.pop() << 12) | tile_ids[packed]
+                if desired not in tile_ids:
+                    new_id = len(self.tiles) + self.tile_base
+                    if new_id >= limit:
+                        raise ValueError(f"Replacement exceeds the loader's {limit}-tile budget")
+                    self.tiles.append(desired)
+                    tile_ids[desired] = new_id
+                entries[q] = (entry & ~1023) | tile_ids[desired]
             encoded = tuple(entries)
             if encoded not in meta_ids:
                 meta_ids[encoded] = len(self.metas)
@@ -103,7 +124,7 @@ def typeset(image, box, colors, text, size, line_gap=3):
         raise ValueError("The lettering region crosses palette banks")
     old_colors = set(crop.tobytes())
     fg = max(old_colors, key=lambda i: sum((colors[3*i+k]-colors[3*bg+k])**2 for k in range(3)))
-    for height in range(size, 6, -1):
+    for height in range(size, min(6, size-1), -1):
         face = font(height)
         lines = []
         for paragraph in text.splitlines():

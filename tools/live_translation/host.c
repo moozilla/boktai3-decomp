@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT };
+enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT, HUD_LAYER };
 typedef uint32_t (*Resolver)(unsigned hook, unsigned id, unsigned ptr, unsigned arg,
                              unsigned caller, unsigned scene, unsigned proc, unsigned frame);
 /* Cache the immutable frame table, never the temporary address of a relocated
@@ -135,6 +135,10 @@ void lt_step(unsigned frames, unsigned keys)
                 }
                 break;
             }
+            case 0x08163F14: /* Hud_SetupBackgroundLayer(hud, map, offset, layer, palette) */
+                cpu->gprs[1] = request(HUD_LAYER, cpu->gprs[3], cpu->gprs[1],
+                    core->rawRead32(core, cpu->gprs[13], -1), cpu->gprs[14]);
+                break;
             case 0x082161B4: { /* Bg_SetupLayers(mode, id, map, x, y, count, maps) */
                 uint32_t sp = cpu->gprs[13];
                 uint32_t count = core->rawRead32(core, sp+4, -1);
@@ -143,9 +147,6 @@ void lt_step(unsigned frames, unsigned keys)
                 cpu->gprs[2] = request(BG_LAYER, layer, cpu->gprs[2], cpu->gprs[0], cpu->gprs[14]);
                 break;
             }
-            case 0x082164AC: /* Bg_SetLayerMap(bg, map, index) */
-                cpu->gprs[1] = request(BG_LAYER, cpu->gprs[2], cpu->gprs[1], cpu->gprs[0], cpu->gprs[14]);
-                break;
             case 0x0821A520: /* ScriptProc_Start(type, hash) */
                 resource_type = (uint16_t)cpu->gprs[0];
                 resource_key = (uint16_t)cpu->gprs[1];

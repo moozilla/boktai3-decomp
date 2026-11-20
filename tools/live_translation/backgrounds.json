@@ -3,8 +3,300 @@
     "2": {
       "palette": "D985",
       "regions": [
-        {"id": "heading", "box": [108, 25, 219, 49], "font": 18, "source": "注意", "english": "Caution"},
-        {"id": "body", "box": [24, 55, 221, 140], "font": 13, "source": "外で遊ぶときは強い日差しや気温の変化に注意して遊びましょう。", "english": "When playing outdoors, watch out for strong sunlight and changes in temperature."}
+        {
+          "id": "heading",
+          "box": [
+            108,
+            25,
+            219,
+            49
+          ],
+          "font": 18,
+          "source": "注意",
+          "english": "Caution"
+        },
+        {
+          "id": "body",
+          "box": [
+            24,
+            55,
+            221,
+            140
+          ],
+          "font": 13,
+          "source": "外で遊ぶときは強い日差しや気温の変化に注意して遊びましょう。",
+          "english": "When playing outdoors, watch out for strong sunlight and changes in temperature."
+        }
+      ]
+    }
+  },
+  "A597": {
+    "6": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        },
+        {
+          "id": "body",
+          "box": [
+            48,
+            48,
+            72,
+            56
+          ],
+          "source": "カラダ",
+          "english": "Body",
+          "font": 7
+        },
+        {
+          "id": "spirit",
+          "box": [
+            48,
+            56,
+            72,
+            64
+          ],
+          "source": "ココロ",
+          "english": "Spirit",
+          "font": 7
+        },
+        {
+          "id": "power",
+          "box": [
+            48,
+            64,
+            72,
+            72
+          ],
+          "source": "チカラ",
+          "english": "Power",
+          "font": 7
+        }
+      ]
+    },
+    "7": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "8": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        },
+        {
+          "id": "body",
+          "box": [
+            48,
+            48,
+            72,
+            56
+          ],
+          "source": "カラダ",
+          "english": "Body",
+          "font": 7
+        },
+        {
+          "id": "spirit",
+          "box": [
+            48,
+            56,
+            72,
+            64
+          ],
+          "source": "ココロ",
+          "english": "Spirit",
+          "font": 7
+        },
+        {
+          "id": "power",
+          "box": [
+            48,
+            64,
+            72,
+            72
+          ],
+          "source": "チカラ",
+          "english": "Power",
+          "font": 7
+        }
+      ]
+    },
+    "9": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "12": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "13": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
+      ]
+    },
+    "16": {
+      "regions": [
+        {
+          "id": "time",
+          "box": [
+            152,
+            0,
+            184,
+            8
+          ],
+          "source": "ジカン",
+          "english": "Time",
+          "font": 7
+        },
+        {
+          "id": "stand",
+          "box": [
+            152,
+            8,
+            184,
+            16
+          ],
+          "source": "スタンド",
+          "english": "Stand",
+          "font": 7
+        }
       ]
     }
   }

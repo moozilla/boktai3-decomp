@@ -1,0 +1,18 @@
+{
+  "graphic/530D/75": [
+    {"id": "yes", "box": [11, 2, 55, 14], "source": "はい", "english": "Yes"},
+    {"id": "no", "box": [65, 1, 112, 15], "source": "いいえ", "english": "No"}
+  ],
+  "graphic/530D/125": [
+    {"id": "assign", "box": [9, 0, 48, 8], "source": "ふりわけ", "english": "Assign"}
+  ],
+  "graphic/530D/131": [
+    {"id": "swap", "box": [9, 0, 48, 8], "source": "いれかえ", "english": "Swap"}
+  ],
+  "graphic/530D/132": [
+    {"id": "tidy", "box": [9, 0, 48, 8], "source": "せいとん", "english": "Sort"}
+  ],
+  "graphic/530D/114": [
+    {"id": "map", "box": [5, 2, 64, 12], "source": "マップきりかえ", "english": "Switch map"}
+  ]
+}

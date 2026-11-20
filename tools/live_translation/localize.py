@@ -19,7 +19,7 @@ class Localizer:
         self.seen = set()
         self.dialogue_id = None
         self.graphics = None
-        from graphics import MapTranslator
+        from backgrounds import MapTranslator
         self.backgrounds = MapTranslator()
 
     def record(self, key, **fields):
@@ -37,8 +37,8 @@ class Localizer:
         c = self.catalog
         if hook == 7:
             return self.graphics.select(self, game, arg, ptr, aux, lr, scene, proc, frame) if self.graphics else 0
-        if hook == 6:
-            return self.backgrounds(self, game, arg, ptr, aux, lr, scene, proc, frame)
+        if hook in (6, 10):
+            return self.backgrounds.select(self, game, arg, ptr, aux, lr, scene, proc, frame, hud=hook==10)
         if hook == 3:
             return 0
         if hook == 1:

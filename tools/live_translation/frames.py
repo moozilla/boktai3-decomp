@@ -11,9 +11,11 @@ from PIL import Image
 import archive
 import sprites
 from graphics import BASE, REGIONS, SIZES, font, letter_mask, lettering, palette_pool, quantize, rectangles
-from runtime import OUT, ROOT
+from runtime import HERE, OUT, ROOT
 from translator import PROVIDER
 from vision import ArtIndex
+
+MARKED = json.loads((HERE / "regions.json").read_text())
 
 
 def write_cache(path, data):
@@ -189,7 +191,9 @@ class ArtTranslator:
                             "origin": PROVIDER, "box": [0, 0, image.width, image.height]}]
             else:
                 state = self.index.status(asset)["state"]
-                if state == "unexamined" and resolver.memory.model:
+                if state == "unexamined" and asset in MARKED:
+                    self.index.mark(asset, MARKED[asset], PROVIDER)
+                elif state == "unexamined" and resolver.memory.model:
                     guesses = resolver.memory.model.locate(ctx, resolver.memory.glossary(), png(image))
                     self.index.mark(asset, guesses, resolver.memory.model.model)
                 regions = self.index.regions(asset)
