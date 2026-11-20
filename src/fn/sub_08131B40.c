@@ -3,8 +3,7 @@
 #include "scene_actor_behavior.h"
 extern u32 gUnk_02000560;
 
-#define SceneActorBehavior_DispatchTable284OrEnterState2 sub_08131B40
-void SceneActorBehavior_DispatchTable284OrEnterState2(struct ChaseActor *actor)
+void SceneActorBehavior_DispatchPrimaryOrEnterState2(struct ChaseActor *actor)
 {
     if (SceneActorBehavior_GlobalPauseBits(0x400) ||
         SceneActorBehavior_OverrideBits(4, &gUnk_02000560)) {

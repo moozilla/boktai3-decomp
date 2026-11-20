@@ -5307,6 +5307,7 @@ addr,name,mode,confidence,source,notes
 081312F4,SceneActorRoute_UpdateReturnEntry,thumb,low,src-alias,Chooses a route return phase from motion and route flags
 081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
 08131820,SceneActorControl_UpdateRouteApproach,thumb,low,src-alias,
+08131B40,SceneActorBehavior_DispatchPrimaryOrEnterState2,thumb,low,src-alias,Tentative: runs the primary behavior callback or enters state two while paused
 08131BC4,SceneActorBehavior_DispatchOrEnterState2,thumb,low,src-alias,
 08131C48,SceneActorBehavior_DispatchAlternateOrEnterState2,thumb,low,src-alias,
 08131CCC,SceneActorBehavior_InstallCallbackTables,thumb,low,src-alias,
