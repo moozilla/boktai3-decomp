@@ -1,64 +1,21 @@
-#include "global.h"
-#include "engine_globals.h"
 #include "ram.h"
-#include "display_sequence_inline.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Obj {
-    u32 flags;
-    u8 pad[12];
-    u16 frame;
-    u8 pad12[10];
-    struct Vec position;
-    u8 tail[8];
-};
-struct Anim {
-    const u16 *data;
-    u8 flags, count, factor, rate;
-    u16 frame, unused, scale, timer;
-};
-struct Piece {
-    u8 active, pad1;
-    u16 timer;
-    s16 verticalScale, horizontalScale;
-    u16 verticalStart, verticalDecay, horizontalStart, horizontalDecay;
-    struct Vec direction, velocity;
-    u8 resource[28];
-    struct Obj sprite;
-    struct Anim anim;
-};
-struct Manager {
-    u8 pad[24];
-    void *resources[2];
-    u32 timer;
-    struct Piece pieces[32];
-};
-void Sprite_Remove(void *);
-extern u16 gUnk_08604C54[];
-void *ScriptProc_Start(int, int);
-int AnimData_Load(void *, int);
-void Sprite_InitUnlinked(void *, void *, int);
-void Anim_SetSequence(void *, void *, int, int, int);
-extern s16 gUnk_086149C4[];
-struct Config {
+#include "animated_particle.h"
+#include "monster_particle_random.h"
+#include "display_sequence_sprite.h"
+
+struct AnimatedParticleSpawnParams {
     u16 type, flags, pad, speed;
     s16 vertical, verticalRange, horizontal, horizontalRange;
     u16 pitch, pitchRange, yaw, yawRange, verticalStart, verticalStartRange, verticalDecay,
         verticalDecayRange, horizontalStart, horizontalStartRange, horizontalDecay,
         horizontalDecayRange;
 };
-struct Manager *AnimatedParticleManager_Create(int, int);
+struct AnimatedParticleManager *AnimatedParticleManager_Create(int, int);
 int Mod(int, int);
-void AnimData_SelectPaletteBank(void *, int);
+
 int AnimatedParticle_PriorityFromFlags(int);
 void Anim_SetDurationScale(void *, int);
 void Sprite_LinkToList(void *, int);
-static inline int rnd(void)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return gRandomTable[gRandomIndex];
-}
 static inline int scale12(int a, int b)
 {
     int x = a * b;
@@ -66,71 +23,59 @@ static inline int scale12(int a, int b)
         return x >> 12;
     return -((-x) >> 12);
 }
-static inline void setFrame(struct Obj *o, int f)
+static inline void AnimatedParticle_SetFrame(struct DisplaySequenceSprite *o, int f)
 {
     o->frame = f;
 }
-static inline u32 frame_factor(u16 v)
-{
-    return DisplaySequence_MaskCommand(v, 15);
-}
-int AnimatedParticles_Create(int count, struct Vec *pos, struct Config *c)
+int AnimatedParticles_Create(int count, struct ContactPosition *pos,
+                             struct AnimatedParticleSpawnParams *c)
 {
     int i, emitted;
-    u16 *table;
-    u32 *index;
-    if ((*(struct Manager **)&gAnimatedParticleManager))
-        goto start;
-    if (AnimatedParticleManager_Create(0, 0))
-        goto start;
-    goto failure;
-success:
-    return 0;
-start:
+    if (!gAnimatedParticleManager && !AnimatedParticleManager_Create(0, 0))
+        return -1;
     emitted = 0;
     i = 0;
-    table = gRandomTable;
-    index = &gRandomIndex;
     for (; i <= 31; i++) {
-        struct Piece *p = &(*(struct Manager **)&gAnimatedParticleManager)->pieces[i];
-        struct Obj *o = &p->sprite;
+        struct AnimatedParticle *p =
+            &((struct AnimatedParticleManager *)gAnimatedParticleManager)->pieces[i];
+        struct DisplaySequenceSprite *o = &p->sprite;
         if (!p->active) {
             int pitch, yaw;
-            struct Anim *a;
-            struct Anim *saved;
-            const u16 *entry;
-            int done;
             p->active = 1;
-            p->pad1 = c->type;
+            p->type = c->type;
             p->timer = 0;
             if (!c->verticalRange)
                 p->verticalScale = c->vertical;
             else
-                p->verticalScale =
-                    c->vertical + Mod(table[ *index = (*index + 1) & 1023], c->verticalRange);
+                p->verticalScale = c->vertical + Mod(ParticleRandom_ReadDirectSample(gRandomTable),
+                                                     c->verticalRange);
             if (!c->horizontalRange)
                 p->horizontalScale = c->horizontal;
             else
                 p->horizontalScale =
-                    c->horizontal + Mod(table[ *index = (*index + 1) & 1023], c->horizontalRange);
+                    c->horizontal +
+                    Mod(ParticleRandom_ReadDirectSample(gRandomTable), c->horizontalRange);
             if (!c->pitchRange)
                 pitch = c->pitch;
             else
-                pitch = c->pitch + Mod(table[ *index = (*index + 1) & 1023], c->pitchRange);
+                pitch =
+                    c->pitch + Mod(ParticleRandom_ReadDirectSample(gRandomTable), c->pitchRange);
             if (!c->yawRange)
                 yaw = c->yaw;
             else
-                yaw = c->yaw + Mod(table[ *index = (*index + 1) & 1023], c->yawRange);
+                yaw = c->yaw + Mod(ParticleRandom_ReadDirectSample(gRandomTable), c->yawRange);
             if (!c->verticalStartRange)
                 p->verticalStart = c->verticalStart;
             else
-                p->verticalStart = c->verticalStart +
-                                   Mod(table[ *index = (*index + 1) & 1023], c->verticalStartRange);
+                p->verticalStart =
+                    c->verticalStart +
+                    Mod(ParticleRandom_ReadDirectSample(gRandomTable), c->verticalStartRange);
             if (!c->horizontalStartRange)
                 p->horizontalStart = c->horizontalStart;
             else
-                p->horizontalStart = c->horizontalStart + Mod(table[ *index = (*index + 1) & 1023],
-                                                              c->horizontalStartRange);
+                p->horizontalStart =
+                    c->horizontalStart +
+                    Mod(ParticleRandom_ReadDirectSample(gRandomTable), c->horizontalStartRange);
             if (c->flags & 1)
                 o->flags |= 512;
             else {
@@ -147,113 +92,46 @@ start:
             p->velocity.x = scale12(p->direction.x, p->horizontalScale);
             p->velocity.y = scale12(p->direction.y, p->verticalScale);
             p->velocity.z = scale12(p->direction.z, p->horizontalScale);
-            if (p->pad1 == 5) {
-                struct Anim *first;
-                AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectPaletteBank(p->resource, 0x29f);
-                setFrame(&p->sprite, 32);
-                first = &p->anim;
+            if (p->type == 5) {
+                AnimData_Load(&p->resource, 0x61f9);
+                AnimData_SelectPaletteBank(&p->resource, 0x29f);
+                AnimatedParticle_SetFrame(&p->sprite, 32);
                 Anim_SetSequence(
-                    first, (*(struct Manager **)&gAnimatedParticleManager)->resources[1], 6, 0, 0);
-                saved = first;
-                goto stepAnimation;
-            } else if (p->pad1 == 6) {
-                AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectPaletteBank(p->resource, 0x2a7);
-                setFrame(&p->sprite, 32);
-                {
-                    union {
-                        struct Anim *ptr;
-                        u8 parts[4];
-                    } handle;
-                    u32 raw;
-                    handle.ptr = &p->anim;
-                    Anim_SetSequence(handle.ptr,
-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
-                                     6, 0, 0);
-                    raw = handle.parts[0];
-                    if ((s32)raw < 0)
-                        handle.parts[0] = 0;
-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 8));
-                    done = handle.parts[0];
-                }
-                goto saveAnimation;
-            } else if (p->pad1 == 7) {
-                AnimData_Load(p->resource, 0x61f9);
-                AnimData_SelectPaletteBank(p->resource, 0x2a6);
-                setFrame(&p->sprite, 45);
-                {
-                    union {
-                        struct Anim *ptr;
-                        u16 parts[2];
-                    } handle;
-                    u32 raw;
-                    handle.ptr = &p->anim;
-                    Anim_SetSequence(handle.ptr,
-                                     (*(struct Manager **)&gAnimatedParticleManager)->resources[1],
-                                     8, 0, 0);
-                    raw = handle.parts[0];
-                    if ((s32)raw < 0)
-                        handle.parts[0] = 0;
-                    a = (struct Anim *)((u8 *)handle.ptr + (handle.parts[0] >> 16) +
-                                        ((u8)handle.parts[1] >> 8));
-                    done = handle.parts[0];
-                }
-                goto saveAnimation;
+                    &p->anim,
+                    ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 6,
+                    0, 0);
+            } else if (p->type == 6) {
+                AnimData_Load(&p->resource, 0x61f9);
+                AnimData_SelectPaletteBank(&p->resource, 0x2a7);
+                AnimatedParticle_SetFrame(&p->sprite, 32);
+                Anim_SetSequence(
+                    &p->anim,
+                    ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 6,
+                    0, 0);
+            } else if (p->type == 7) {
+                AnimData_Load(&p->resource, 0x61f9);
+                AnimData_SelectPaletteBank(&p->resource, 0x2a6);
+                AnimatedParticle_SetFrame(&p->sprite, 45);
+                Anim_SetSequence(
+                    &p->anim,
+                    ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 8,
+                    0, 0);
             } else {
-                AnimData_Load(p->resource, 0x4384);
-                AnimData_SelectPaletteBank(p->resource, p->pad1 + 182);
-                a = &p->anim;
-                Anim_SetSequence(a, (*(struct Manager **)&gAnimatedParticleManager)->resources[0],
-                                 0, 0, 0);
+                AnimData_Load(&p->resource, 0x4384);
+                AnimData_SelectPaletteBank(&p->resource, p->type + 182);
+                Anim_SetSequence(
+                    &p->anim,
+                    ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[0], 0,
+                    0, 0);
             }
-        saveAnimation:
-            saved = a;
-        stepAnimation:
-            a = saved;
-            entry = p->anim.data + a->frame;
-            DisplaySequence_ApplyFrame((void *)o, (void *)a, entry);
-            if (++a->timer >= a->rate) {
-                a->timer = 0;
-                if (a->flags & 4) {
-                    if (a->frame == 0) {
-                        if (a->flags & 8) {
-                            a->timer = a->rate;
-                        } else {
-                            a->frame = a->count - 1;
-                        }
-                        done = 1;
-                    } else {
-                        a->frame--;
-                        done = 0;
-                    }
-                } else {
-                    if (++a->frame >= a->count) {
-                        if ((u8)(a->flags & 8)) {
-                            a->timer = a->rate;
-                            a->frame = a->count - 1;
-                        } else {
-                            a->frame = 0;
-                        }
-                        done = 1;
-                    } else
-                        done = 0;
-                }
-                entry = a->data + a->frame;
-                a->factor = frame_factor(*entry);
-                a->rate = (a->factor * a->scale) >> 6;
-                if (!a->rate)
-                    a->rate = 1;
-            } else
-                done = 0;
+            DisplaySequence_StepSprite(o, &p->anim);
             o->position = *pos;
-            *((u8 *)o + 7) = AnimatedParticle_PriorityFromFlags(c->flags);
-            Anim_SetDurationScale(saved, c->speed);
+            o->priority = AnimatedParticle_PriorityFromFlags(c->flags);
+            Anim_SetDurationScale(&p->anim, c->speed);
             Sprite_LinkToList(o, 0);
             if (emitted++ >= count)
-                goto success;
+                return 0;
         }
     }
-failure:
     return -1;
 }
