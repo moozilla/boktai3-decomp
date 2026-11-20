@@ -1,130 +1,59 @@
-#include "global.h"
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing;
-    u8 facing8;
-    u8 padAA[5];
-    u8 finished;
-    u8 enter;
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    u8 (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    s16 scale;
-    s16 minScale;
-    s16 maxScale;
-    s16 scaleStep;
-    u8 pad34C[0x60];
-    u32 mode;
-} ActorAnimation;
+#include "scene_actors.h"
+#include "scene_actor_charge_offset.h"
+#include "scene_graphics_actor.h"
 
-static inline void setFacing(ActorAnimation *p, int angle)
-{
-    u32 value;
-    int shifted;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
-    shifted >>= 6;
-    value = 3 & shifted;
-    p->facing = value;
-    shifted = p->angle + 0x70;
-    shifted >>= 5;
-    value = 7 & shifted;
-    p->facing8 = value;
-}
-void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
-void Sound_PlaySongChecked(int);
-int Math_Atan2(int, int);
-extern s16 gUnk_086149C4[];
-static inline int choose(u32 mode, int normal, int alternate)
-{
-    int test = mode & 1;
-    int result;
-    result = normal;
-    if (test)
-        result = alternate;
-    return result;
-}
-static inline int trunc12(int x)
-{
-    return x >= 0 ? x >> 12 : -(-x >> 12);
-}
 typedef struct {
     u32 a;
     u32 b;
 } Point;
-void SceneActors_UpdateContractingShake(ActorAnimation *p, int time)
+void SceneActors_UpdateContractingShake(struct StateActor *p, int time)
 {
     int tick = time;
-    ActorAnimation *p2 = p;
+    struct StateActor *p2 = p;
     u8 *position = ((u8 *)p) + 0x48;
-    if (p->changed) {
+    if (p->actionChanged) {
         int sequence;
-        p->changed = 0;
+        p->actionChanged = 0;
         {
-            int test = p->mode;
+            int test = ((struct SceneGraphicsActor *)p)->graphics.animationFlags;
             test &= 1;
             sequence = 43;
             if (test) {
                 sequence = 5;
             }
         }
-        {
-            int offset = 0x240;
-            SceneActors_StartDirectionalAnimation(p, ((u8 *)p) + offset, ((u8 *)p) + 0x220,
-                                                  sequence, 1, 1, 4);
-        }
+        SceneActors_StartDirectionalAnimation(
+            p, &((struct SceneGraphicsActor *)p)->animation,
+            (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 4);
         {
             u32 mask = 16;
-            p->flags |= mask;
+            p->actionFlags |= mask;
         }
         *((Point *)(((u8 *)p) + 0xd0)) = *((Point *)(position + 12));
     }
-    *((u32 *)(((u8 *)p2) + 0x33c)) = 0;
-    *(((u8 *)p2) + 0x340) = 0;
+    SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
     {
         u32 mask = 0x1000c;
         /* both arms are the same; the split keeps agbcc's original block layout */
         if (tick) {
-            p->flags |= mask;
+            p->actionFlags |= mask;
         } else {
-            p->flags |= mask;
+            p->actionFlags |= mask;
         }
     }
-    if (!p->reset(p)) {
+    if (!p->actionReset(p)) {
         *((Point *)(position + 12)) = *((Point *)(((u8 *)p) + 0xd0));
         if (tick > 31) {
-            p->finished = 1;
+            p->actionFinished = 1;
         } else {
             int dir = 3 & (~tick);
             int rate = 32 - tick;
-            s16 *velocity = (s16 *)(position + 20);
+            struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
             u32 angle;
             int speed;
             angle = dir << 6;
             speed = rate << 3;
-            {
-                int x = trunc12(gUnk_086149C4[(angle + 64) & 255] * speed);
-                int zero = 0;
-                velocity[0] = x;
-                velocity[1] = zero;
-            }
-            {
-                s16 *entry = &gUnk_086149C4[angle];
-                velocity[2] = trunc12((*entry) * speed);
-            }
+            SceneActor_SetChargeOffset(angle, velocity, speed);
         }
     }
 }

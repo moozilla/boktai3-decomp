@@ -29,17 +29,12 @@ void ContactActor_ApplyHealthContact(struct ContactCollider *sourceInput,
     u32 directionMask;
     struct ContactPosition *position;
     u32 mode;
-    u32 direction;
     struct SceneGraphicsActor *actor;
     directionMask = 0x100;
-    if (source->flags & directionMask) {
-        direction = source->direction;
-    } else {
-        direction = Math_Atan2(other->x - source->x, other->z - source->z);
-    }
-    do {
-        owner->direction = direction;
-    } while (0);
+    if (source->flags & directionMask)
+        owner->direction = source->direction;
+    else
+        owner->direction = Math_Atan2(other->x - source->x, other->z - source->z);
     mode = 0;
     if (owner->targetIndex >= 0) {
         owner->retargetTimer = 250;

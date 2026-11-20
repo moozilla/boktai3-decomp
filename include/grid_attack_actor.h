@@ -17,14 +17,6 @@ struct GridAttackPacked {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };
 
-struct GridAttackPacket {
-    u16 id;
-    u8 kind, zero;
-    u16 reserved;
-    u8 command, count;
-    u16 args[1];
-};
-
 struct GridAttackTransform {
     u8 unknown0[9];
     u8 angle;
@@ -154,7 +146,7 @@ struct GridAttackActor {
     void *orbitContact;             /* 0x908 */
     void *contactBurst;             /* 0x90C */
     s32 linkedActorId;              /* 0x910 */
-    struct GridAttackPacket packet; /* 0x914 */
+    struct SceneEventCommand packet; /* 0x914 */
     u8 unknown920[0x4];
 };
 

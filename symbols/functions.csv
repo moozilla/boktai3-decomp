@@ -758,6 +758,8 @@ addr,name,mode,confidence,source,notes
 0801E998,SceneObjects_ScriptLower,thumb,low,src-alias,
 0801EA70,SceneObjects_ScriptPromote,thumb,low,src-alias,
 0801EB08,SceneObjects_ScriptReadPosition,thumb,low,src-alias,
+0801EBBC,SceneObjects_ScriptSetSelection,thumb,low,src-alias,Reads a script id and stores it as the controller selection.
+0801EBE4,SceneObjects_ClearSelection,thumb,low,src-alias,Clears the controller selection.
 0801EC00,SceneObjects_HasTypeTwoResource,thumb,low,src-alias,
 0801EC4C,SceneObject_InitPlacement,thumb,low,src-alias,
 0801EF28,SceneObjects_AddPrimaryId,thumb,low,src-alias,
@@ -765,6 +767,7 @@ addr,name,mode,confidence,source,notes
 0801EF5C,SceneObject_UpdateActiveIdle,thumb,low,src-alias,"Empty per-object animate callback installed by SceneObjects_SetActive/AnimateActive once the active blink sequence finishes; terminal no-op state, sym"
 0801EF60,SceneObject_AnimateInactive,thumb,low,src-alias,
 0801EFDC,SceneObject_AnimateActive,thumb,low,src-alias,
+0801F058,SceneObject_InitLiftPlacement,thumb,low,src-alias,Places a lift on its terrain cells and initializes the raised or lowered pose.
 0801F3A0,SceneObject_BeginRaising,thumb,low,src-alias,
 0801F3CC,SceneObject_BeginLowering,thumb,low,src-alias,
 0801F430,SceneObject_UpdateRaising,thumb,low,src-alias,
@@ -774,8 +777,10 @@ addr,name,mode,confidence,source,notes
 0801F5EC,SceneObject_InitSlotPlacement,thumb,low,src-alias,
 0801F934,SceneObject_UpdateIdleA,thumb,low,src-alias,Empty animate-update callback assigned via the unnamed sub_0801F5EC during SceneObjects_Append for several object kinds; distinct from EF58/EF5C's idl
 0801F938,SceneObject_UpdateIdleB,thumb,low,src-alias,Second empty animate-update callback assigned via sub_0801F5EC alongside UpdateIdleA; counterpart no-op state for a different object kind/variant
+0801F93C,SceneObjects_UpdateController,thumb,low,src-alias,Processes activation messages and updates proximity ids and per-slot callbacks.
 080203D4,SceneObjects_Destroy,thumb,low,src-alias,
 0802048C,SceneObjects_Init,thumb,low,src-alias,
+0802091C,SceneObjects_CreateController,thumb,low,src-alias,Creates the scene object task and initializes its animation banks and slot pool.
 08020964,SceneMessages_FindReceiver,thumb,low,src-alias,Finds the registered receiver matching both message ID and category.
 08020990,SceneMessages_LinkReceiver,thumb,low,src-alias,Prepends a receiver to the controller's doubly linked receiver list.
 080209AC,SceneMessages_UnlinkReceiver,thumb,low,src-alias,Removes a receiver from the controller's doubly linked receiver list.
@@ -918,9 +923,11 @@ addr,name,mode,confidence,source,notes
 08025550,SceneActorAnimation_UpdateHomingLunge,thumb,low,src-alias,"Drives a constant-speed approach toward the locked dest, snapping to it and finishing early if within range, else timing out at tick 159."
 08025714,SceneActorAnimation_UpdateRecoilSlide,thumb,low,src-alias,"Minimal tick-only handler that decelerates a short forward slide over 10 ticks with no animation/sound setup, the lightweight half of the shared decel"
 080257D0,SceneActorAnimation_UpdateChargeSlide,thumb,low,src-alias,"Starts a directional charge anim, decelerates over 20 ticks, and periodically spawns trailing pool frames until finishing at tick 60."
+0802592C,SceneActorAnimation_UpdatePlayerGrab,thumb,low,src-alias,Tentative: holds the tracked player; applies periodic health changes; and finishes after enough player facing changes
 08025CD4,SceneActorAnimation_UpdateSwingLight,thumb,low,src-alias,Plays a plain (non-directional) animation variant and finishes once the animation-done flag at +0x25d is set; pairs with the adjacent heavier swing ha
 08025D60,SceneActorAnimation_UpdateSwingHeavy,thumb,low,src-alias,"Same structure as the adjacent light-swing handler but selects the next sequence pair (61/23), finishing on the same animation-done flag."
 08025DEC,SceneActorAnimation_UpdateChargeShotRelease,thumb,low,src-alias,"Plays the charge animation then periodically spawns a ContactSwarm projectile with randomized spread direction, finishing after tick 40."
+08025FFC,SceneActorAnimation_UpdateImpactHazard,thumb,low,src-alias,Tentative: plays the impact cues and spawns a hazard on the source terrain level
 08026248,SceneActorAnimation_UpdateImpactFinish,thumb,low,src-alias,"Plays the hit animation with an effect/sound pair, clears per-action counters, and on completion resets scale and variant to end the action."
 0802634C,SceneActorAnimation_ResetActionState,thumb,low,src-alias,"No-tick cleanup entry that clears the action's counters and flag bits and calls reset(), used to drop back to a neutral state."
 08026398,SceneActorAnimation_UpdateImpactRelease,thumb,low,src-alias,"Variant of the impact finisher with no tick param: resets scale/variant up front, spawns its effect, and finishes once the animation-done flag is set."
@@ -932,6 +939,7 @@ addr,name,mode,confidence,source,notes
 08026C38,SceneActors_UpdateTravelProjectileAttack,thumb,low,src-alias,Plays an attack animation and repeatedly launches steering travel actors toward the requested angle
 08026DE0,SceneActors_UpdateShrinkingReaction,thumb,low,src-alias,Reaction callback that selects directional graphics and reduces both scale bounds toward zero
 08026EB4,SceneActors_UpdateKnockbackReaction,thumb,low,src-alias,Reaction callback that reduces scale bounds and applies brief directional movement before finishing
+08026FF0,Vampire_UpdateSwayReaction,thumb,low,src-alias,Tentative: applies a timed hit sway and restores the directional callback
 080277B8,SceneActors_UpdateStationaryReaction,thumb,low,src-alias,Reaction callback that clears movement fields and resets scale bounds and variant
 08027824,SceneActors_UpdateDirectionalTurn,thumb,low,src-alias,Turns toward the saved angle in eight-unit steps while maintaining a directional animation
 0802797C,SceneActors_UpdateEightDirectionTurn,thumb,low,src-alias,Turns toward the saved angle while maintaining an eight-direction animation
@@ -950,6 +958,7 @@ addr,name,mode,confidence,source,notes
 08028414,SceneActors_SpawnDestructionParticles,thumb,low,src-alias,Emits two randomized particle bursts from the actor drawable; destruction role follows its surrounding controller
 080284FC,Vampire_ApplyPendingDamage,thumb,low,src-alias,
 080287DC,Vampire_UpdateFrame,thumb,low,src-alias,
+080289FC,Vampire_UpdatePresentation,thumb,low,src-alias,Tentative: updates colliders; palette blending; visibility; camera tracking and ambient effects
 08028DDC,Vampire_DecrementBarrierCount,thumb,low,src-alias,Called from breakable_barrier's timer-expiry path to tick down a per-vampire counter at the shared actor's offset 0x384
 08028E18,Vampire_TriggerBackgroundFlash,thumb,low,src-alias,Reads two script keywords to pick immediately between three BackgroundFlash_* effects on the vampire's handle
 08028E6C,Vampire_TryQueueCommand,thumb,low,src-alias,"Queues command 1 with a caller-supplied argument on the idle vampire task, gated by a frame-rate throttle; returns success"

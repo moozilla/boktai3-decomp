@@ -2,6 +2,7 @@
 #define GUARD_SCENE_GRAPHICS_ACTOR_H
 
 #include "global.h"
+#include "scene_input_widget.h"
 
 struct ContactActorPool;
 struct BackgroundFlashController;
@@ -14,7 +15,8 @@ struct BackgroundFlashController;
  * (confidence=low). */
 struct SceneActorGraphics {
     s16 scale, scaleMin, scaleMax, scaleStep; /* 0x344: SceneActorGraphics_OscillateScale. */
-    u8 unk34C[0x354 - 0x34C];
+    u8 unk34C[0x352 - 0x34C];
+    s16 recoveryGroundHeight; /* 0x352: compared with the forward terrain probe. */
     u16 approachFrames; /* 0x354: duration passed to the polar interpolator. */
     u16 recoveryTimer;  /* 0x356: frames of recovery set by the *ThenRecover handlers. */
     s32 stepTableKind;  /* 0x358: selects one of the gUnk_08604DC4 family tables. */
@@ -25,18 +27,24 @@ struct SceneActorGraphics {
     u8 unk36E[0x378 - 0x36E];
     s16 routeProjectileAmount, routeProjectileKind;
     s16 travelColliderA, travelColliderB;
-    u8 unk380[0x38C - 0x380];
+    u8 unk380[3];
+    u8 trackedPlayerEscaped; /* 0x383: set after enough facing changes in the grab. */
+    u8 unk384[4];
+    u32 reactionScript; /* 0x388: called after the special hit reaction. */
     u8 effectScale; /* 0x38C: SceneActorGraphics_SelectResource / SceneActors_DispatchCommands. */
     u8 unk38D;
     u8 effectMode;     /* 0x38E */
     u8 effectDuration; /* 0x38F */
     u32 resourceId;    /* 0x390 */
     u8 particleFlag;   /* 0x394: cleared by SceneActorState_AdvanceToState06. */
-    u8 unk395[0x39C - 0x395];
+    s8 trackedPlayer; /* 0x395: player slot selected by the contact box. */
+    u8 unk396[5];
+    u8 reactionDelay; /* 0x39B: set by the anchored and death reactions. */
     s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
     s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
     s32 healthCostBaseline;      /* 0x3A4: snapshot of health at contact-pool start. */
-    u8 unk3A8[0x3B0 - 0x3A8];
+    u8 unk3A8[4];
+    u32 animationFlags; /* 0x3AC: bit 0 selects alternate animation sequences. */
     u8 stepTableRow;                     /* 0x3B0 */
     u8 stepTableCol;                     /* 0x3B1 */
     u16 stepTableValue;                  /* 0x3B2 */
@@ -55,11 +63,14 @@ struct SceneActorGraphics {
 
 /* Actor-relative view used by contact, animation and palette handlers. */
 struct SceneGraphicsActor {
-    u8 unk0[0x254];
-    u16 animationField254;
-    u8 unk256[0x33C - 0x256];
+    u8 unk0[0x220];
+    struct SceneInputResource animationResource; /* 0x220: keyframe resource. */
+    struct SceneInputWidget animation; /* 0x240: body animation playback. */
+    u8 unk2A0[0x33C - 0x2A0];
     s32 pendingDamage;
-    u8 damagePending, unk341, hitAngle, variant;
+    u8 damagePending;
+    u8 specialReaction; /* 0x341: sound, sparks and script on reaction completion. */
+    u8 hitAngle, variant;
     struct SceneActorGraphics graphics; /* 0x344 */
 };
 

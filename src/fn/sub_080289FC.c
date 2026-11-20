@@ -24,16 +24,12 @@ struct FrameSprite {
     u8 direction;
     u8 padA[0x42];
 };
-union FrameFlags {
-    u32 value;
-    u8 bytes[4];
-};
 struct FrameBase {
     u8 pad0[0x48];
     struct FrameSprite sprite;
     s16 health;
     u8 pad96[6];
-    union FrameFlags flags;
+    u32 flags;
     u8 padA0[0x13];
     u8 ambientMode;
     u8 padB4[8];
@@ -57,21 +53,12 @@ struct FrameCamera {
     u8 pad0[0x20];
     u32 flags;
 };
+/* The first byte is the signed interpolation amount when used in arithmetic. */
 struct FrameBlendState {
-    union {
-        struct {
-            u32 amount : 8;
-            u32 descending : 8;
-            u32 mode : 8;
-            u32 shift : 8;
-        } fields;
-        struct {
-            u8 amount;
-            u8 descending;
-            u8 mode;
-            u8 shift;
-        } bytes;
-    } control;
+    u32 amount : 8;
+    u32 descending : 8;
+    u32 mode : 8;
+    u32 shift : 8;
     s32 resource;
 };
 struct VampireFrame {
@@ -108,11 +95,11 @@ struct VampireFrame {
 
 static inline void Frame_AddFlags(struct FrameBase *p, u32 mask)
 {
-    p->flags.value |= mask;
+    p->flags |= mask;
 }
 static inline u32 Frame_TestFlags(struct FrameBase *p, u32 mask)
 {
-    return p->flags.value & mask;
+    return p->flags & mask;
 }
 #define Frame_SetColliderFlags(collider, mask) ((collider)->flags |= (mask))
 static inline void Frame_ClearColliderFlags(struct FrameCollider *collider, u32 mask)
@@ -143,10 +130,10 @@ static inline void Frame_ClearCameraFlags(struct FrameCamera *camera, u32 mask)
 
 static inline u8 Frame_ReadBlendAmount(struct FrameBlendState *blend)
 {
-    return blend->control.fields.amount;
+    return blend->amount;
 }
 
-void sub_080289FC(void *arg0)
+void Vampire_UpdatePresentation(void *arg0)
 {
     struct FrameBase *base = arg0;
     struct VampireFrame *p = arg0;
@@ -225,61 +212,60 @@ void sub_080289FC(void *arg0)
         int zero = 0;
         s32 def = SceneActorGraphics_GetDefaultResourceId(p);
         s32 res = p->blend.resource;
-        if (p->blend.control.fields.mode == 1) {
+        if (p->blend.mode == 1) {
             int amount;
             void *dst;
-            u8 *dur;
-            u8 *effScale = &p->blend.control.bytes.amount;
-            amount = (s8)*effScale;
-            dur = &p->blend.control.bytes.shift;
-            if (amount < (1 << *dur)) {
+            u8 *amountByte = (u8 *)&p->blend;
+            amount = (s8)*amountByte;
+            if (amount < (1 << p->blend.shift)) {
                 u8 *a;
                 u8 *b;
-                *effScale += 1;
+                *amountByte += 1;
                 a = gPaletteBankData + (def << 5);
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
                 Palette_InterpolateBanks(
-                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)effScale), *dur);
+                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)amountByte),
+                    p->blend.shift);
                 p->palette = dst;
             }
-        } else if (p->blend.control.fields.mode == 2) {
+        } else if (p->blend.mode == 2) {
             void *dst;
-            u8 *effScale = &p->blend.control.bytes.amount;
-            if ((s8)*effScale > 0) {
+            u8 *amountByte = (u8 *)&p->blend;
+            if ((s8)*amountByte > 0) {
                 u8 *a;
                 u8 *b;
-                *effScale -= 1;
+                *amountByte -= 1;
                 a = gPaletteBankData + (def << 5);
                 b = gPaletteBankData + (res << 5);
                 dst = p->paletteDefault;
                 Palette_InterpolateBanks(
-                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)effScale),
-                    p->blend.control.fields.shift);
+                    dst, a, b, (s8)Frame_ReadBlendAmount((struct FrameBlendState *)amountByte),
+                    p->blend.shift);
                 p->palette = dst;
             } else {
                 SceneActorGraphics_SelectResource(p);
             }
-        } else if (p->blend.control.fields.mode == 3) {
+        } else if (p->blend.mode == 3) {
             void *dst;
-            u8 *effScale;
+            u8 *amountByte;
             u8 *a = gPaletteBankData + (def << 5);
             u8 *b = gPaletteBankData + (res << 5);
             dst = p->paletteDefault;
-            effScale = &p->blend.control.bytes.amount;
-            Palette_InterpolateBanks(dst, a, b, (s8)*effScale, p->blend.control.fields.shift);
+            amountByte = (u8 *)&p->blend;
+            Palette_InterpolateBanks(dst, a, b, (s8)*amountByte, p->blend.shift);
             p->palette = dst;
-            if (p->blend.control.fields.descending == 0) {
-                *effScale += 1;
-                if ((s8)*effScale > 0x1f) {
-                    *effScale = 0x20;
-                    p->blend.control.fields.descending = 1;
+            if (p->blend.descending == 0) {
+                *amountByte += 1;
+                if ((s8)*amountByte > 0x1f) {
+                    *amountByte = 0x20;
+                    p->blend.descending = 1;
                 }
             } else {
-                *effScale -= 1;
-                if ((s8)*effScale <= 0) {
-                    *effScale = zero;
-                    p->blend.control.fields.descending = zero;
+                *amountByte -= 1;
+                if ((s8)*amountByte <= 0) {
+                    *amountByte = zero;
+                    p->blend.descending = zero;
                 }
             }
         }

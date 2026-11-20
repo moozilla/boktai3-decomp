@@ -15,12 +15,12 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.matchsearch import worker
-from tools.matchsearch.__main__ import main
+from tools.matchsearch.__main__ import SocketBindDenied, main, request
 from tools.matchsearch.store import Store
 
 
@@ -264,6 +264,38 @@ class TextInterface(unittest.TestCase):
             self.assertTrue(note['debug_changes_code'])
             self.assertIn('withheld', note['authority'])
 
+
+class ResidentStartup(unittest.TestCase):
+    def test_socket_bind_denial_exits_with_distinct_status(self):
+        with patch('tools.matchsearch.__main__.serve', side_effect=SocketBindDenied('bind denied')):
+            with contextlib.redirect_stderr(io.StringIO()) as errors:
+                self.assertEqual(main(['serve', '.']), os.EX_NOPERM)
+            self.assertIn('bind denied', errors.getvalue())
+
+    def test_denied_bind_falls_back_but_other_startup_failures_are_reported(self):
+        with tempfile.TemporaryDirectory() as td:
+            directory = Path(td)
+            payload = {'id': 7, 'op': 'status'}
+            client = Mock()
+            client.connect.side_effect = FileNotFoundError
+            with patch('tools.matchsearch.__main__._socket_path', return_value=directory / 'server.sock'), \
+                    patch('tools.matchsearch.__main__.socket.socket', return_value=client), \
+                    patch('tools.matchsearch.__main__.subprocess.Popen') as spawn, \
+                    patch('tools.matchsearch.session.Session') as session:
+                spawn.return_value.poll.return_value = os.EX_NOPERM
+                session.return_value.__enter__.return_value.dispatch.return_value = {'ready': True}
+                result = request(directory, payload)
+                self.assertEqual(result['result'], {'ready': True})
+                self.assertEqual(result['id'], 7)
+                self.assertIn('socket bind denied', result['transport'])
+                session.assert_called_once_with(directory)
+
+                session.reset_mock()
+                spawn.return_value.poll.return_value = 1
+                (directory / 'server.log').write_text('context changed')
+                with self.assertRaisesRegex(RuntimeError, 'context changed'):
+                    request(directory, payload)
+                session.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

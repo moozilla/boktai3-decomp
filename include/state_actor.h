@@ -93,9 +93,10 @@ struct StateActor {
     u8 registrySlot;
     u32 actionFlags; /* 0x9C: per-frame bits; meaning differs by caller (busy/pending/variant). */
     u8 lowHealth;
-    u8 unkA1[2];
+    u8 unkA1;
+    u8 reactionPhase; /* 0xA2: death and hit reaction substate. */
     u8 animationCompletions;
-    u8 unkA4[4];
+    u32 reactionTimer; /* 0xA4: elapsed frames in the reaction substate. */
     u8 animationFacing4, animationFacing8;
     u8 actionAnimation; /* 0xAA: requested sub-animation id for the recovery pipeline. */
     u8 actionState;     /* 0xAB: checked for value 3 by the variant-recovery handlers. */
@@ -124,7 +125,7 @@ struct StateActor {
     s32 eventArguments[4];
     void (*actionCallback)(void *, int);
     u8 (*actionTryUpdate)(void *); /* 0x104 */
-    void (*actionReset)(void *);   /* 0x108 */
+    u8 (*actionReset)(void *);     /* 0x108: nonzero completes the update early. */
     u8 unk10C[8];
     s8 savedFacing;
     u8 unk115[3];
@@ -161,6 +162,34 @@ struct StateActor {
     u8 groundEffect[1]; /* 0x344: embedded projection object, full extent unknown; see
                           * include/actor_graphics_and_basic_states.h for what this unit learned. */
 };
+
+static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)
+{
+    int shifted;
+    u32 direction;
+    actor->bodyDirection = angle;
+    shifted = actor->bodyDirection + 0x60;
+    shifted >>= 6;
+    direction = 3;
+    direction &= shifted;
+    actor->animationFacing4 = direction;
+    shifted = actor->bodyDirection + 0x70;
+    shifted >>= 5;
+    direction = 7;
+    direction &= shifted;
+    actor->animationFacing8 = direction;
+}
+
+static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags |= flags;
+}
+
+static inline void SceneActorState_EnterReactionPhase(struct StateActor *actor, u32 phase)
+{
+    actor->reactionPhase = phase;
+    actor->reactionTimer = 0;
+}
 
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 

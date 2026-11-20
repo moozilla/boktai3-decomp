@@ -10,5 +10,5 @@ void SceneObject_UpdateRaised(struct SceneObjSlot *s)
         Script_Call(s->raisedScript, 0);
         s->raisedScript = timer;
     }
-    s->pad0[7] = 2;
+    s->sprite.priority = 2;
 }

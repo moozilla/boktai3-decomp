@@ -9,10 +9,10 @@ void SceneObject_UpdateRaising(struct SceneObjSlot *s)
         Sound_PlaySong(0x154);
         s->timer = 30;
         s->variant = 0;
-        s->block->w6 &= ~3;
-        s->block->w6 |= 2;
-        s->block->b4 = (s->block->b4 & 0xf0) | s->b3b;
-        s->block->flags |= 1;
+        s->terrain->cell.flags &= ~3;
+        s->terrain->cell.flags |= 2;
+        s->terrain->cell.shapeAndHeight = (s->terrain->cell.shapeAndHeight & 0xf0) | s->cellHeight;
+        s->terrain->flags |= 1;
         s->callback = SceneObject_UpdateRaised;
     }
     {

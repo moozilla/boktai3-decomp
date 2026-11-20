@@ -1,14 +1,11 @@
-#include "global.h"
-void Sound_PlaySong(int);
-void SceneObject_UpdateRaising(void);
-void SceneObject_BeginRaising(u8 *s)
+#include "scene_object_controller.h"
+
+void SceneObject_UpdateRaising(struct SceneObjSlot *);
+
+void SceneObject_BeginRaising(struct SceneObjSlot *slot)
 {
     Sound_PlaySong(0x152);
-    s[0x39] = 0;
-    s[0x3a] = 0;
-    {
-        int two = 2;
-        s[0x37] = two;
-    }
-    *(void **)(s + 0x30) = SceneObject_UpdateRaising;
+    SceneObjSlot_ResetPose(slot, 0);
+    slot->variant = SceneObjSlot_LiftMotionVariant(SCENE_OBJ_LIFT_RAISED);
+    slot->callback = SceneObject_UpdateRaising;
 }

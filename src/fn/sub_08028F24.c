@@ -3,13 +3,13 @@
 void Vampire_UpdateFrame(void);
 void SceneActorState_UpdateActionController(void *);
 void SceneActors_RunUnpausedState(void *);
-void sub_080289FC(void *);
+void Vampire_UpdatePresentation(void *);
 
 s32 Vampire_Init(void *p)
 {
     Vampire_UpdateFrame();
     SceneActorState_UpdateActionController(p);
     SceneActors_RunUnpausedState(p);
-    sub_080289FC(p);
+    Vampire_UpdatePresentation(p);
     return 0;
 }

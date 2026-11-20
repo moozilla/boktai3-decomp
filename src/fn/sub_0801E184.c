@@ -1,73 +1,71 @@
-#include "global.h"
-#include "scene_object_slot.h"
-void *Heap_Alloc(int);
-void Memory_Clear(void *, int);
+#include "scene_object_controller.h"
 int Region_FindContaining(void *);
-void sub_0801F058(void *, void *);
-void SceneObject_InitSlotPlacement(void *, void *);
-void SceneObject_InitPlacement(void *, void *);
-int SceneObjects_Append(u8 *p, u16 id, struct Pair *position, int value, u8 kind, u8 variant,
-                        u8 orientation, int type, int maxLift, int hasArgs, int b41, s32 *args,
-                        u8 b44, int b45)
+void SceneObject_InitLiftPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SceneObject_InitSlotPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SceneObject_InitPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+int SceneObjects_Append(struct SceneObjPool *p, u16 id, struct Pair *position, int animationIndex,
+                        u8 activationFlags, u8 variant, u8 orientation, int type, int maxLift,
+                        int interactionScript, int autoActivate, s32 *args, u8 hideOutsideRegion,
+                        int paletteBank)
 {
     struct SceneObjSlot *slot;
     int i;
-    if (*(u16 *)(p + 0x1a) >= *(int *)(p + 0x30))
+    if (p->count >= p->capacity)
         return -1;
-    slot = *(struct SceneObjSlot **)(p + 0x42c) + *(u16 *)(p + 0x1a);
+    slot = &p->slots[p->count];
     slot->id = id;
     slot->pos.words = *position;
     slot->r0.words = *position;
-    slot->kind = kind;
+    slot->activationFlags = activationFlags;
     slot->variant = variant;
     slot->dir = orientation;
-    slot->b3a = 0;
+    slot->poseFrame = 0;
     slot->type = type;
     slot->maxLift = maxLift;
-    slot->hasArgs = hasArgs;
-    slot->b41 = b41;
-    slot->value = value;
+    slot->interactionScript = interactionScript;
+    slot->autoActivate = autoActivate;
+    slot->animationIndex = animationIndex;
     slot->lift = 0;
     slot->region = Region_FindContaining(position);
-    slot->b44 = b44;
-    slot->block = Heap_Alloc(16);
-    if (!slot->block)
+    slot->hideOutsideRegion = hideOutsideRegion;
+    slot->terrain = Heap_Alloc(sizeof(*slot->terrain));
+    if (!slot->terrain)
         return -1;
-    Memory_Clear(slot->block, 16);
+    Memory_Clear(slot->terrain, sizeof(*slot->terrain));
     switch (slot->type) {
         case 1:
-            sub_0801F058(p, slot);
+            SceneObject_InitLiftPlacement(p, slot);
             break;
         case 2:
-            slot->b45 = b45;
+            slot->paletteBank = paletteBank;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 8:
-            slot->b45 = 1;
+            slot->paletteBank = 1;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 9:
-            slot->b45 = 2;
+            slot->paletteBank = 2;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 10:
-            slot->b45 = 3;
+            slot->paletteBank = 3;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 11:
-            slot->b45 = 4;
+            slot->paletteBank = 4;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 12:
-            slot->b45 = 5;
+            slot->paletteBank = 5;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 13:
-            slot->b45 = 6;
+            slot->paletteBank = 6;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 14:
-            slot->b45 = 7;
+            slot->paletteBank = 7;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 0:
@@ -83,10 +81,10 @@ int SceneObjects_Append(u8 *p, u16 id, struct Pair *position, int value, u8 kind
             SceneObject_InitSlotPlacement(p, slot);
             break;
     }
-    if (slot->hasArgs) {
+    if (slot->interactionScript) {
         for (i = 0; i < 4; i++)
             slot->args.words[i] = args[i];
     } else
         slot->args.words[0] = 0;
-    ++*(u16 *)(p + 0x1a);
+    ++p->count;
 }

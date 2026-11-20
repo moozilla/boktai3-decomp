@@ -2,6 +2,7 @@
 #include "grid_attack_actor.h"
 #include "player_cue_sequence.h"
 #include "player.h"
+#include "scene_messages.h"
 #include "contact_burst.h"
 #include "projected_display.h"
 
@@ -26,8 +27,6 @@ int sub_08249350(int, int);
 void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 
 void SparkParticle_Spawn(void *, int, void *, int, int, int, int, int);
-
-void SceneMessages_Send(void *);
 
 void OrbitContactActor_BeginExpansion(void *);
 
@@ -143,13 +142,13 @@ void GridAttackActor_InitDamageCollider(struct GridAttackActor *p, int mode)
 
 void GridAttackActor_GetGridPosition(s16 *p, int x, int z)
 {
+    struct SceneVec *position = (struct SceneVec *)p;
     if (x != 1 || z) {
-        p[0] = (x << 8) + 0xa80;
+        position->x = (x << 8) + 0xa80;
         {
-            int height = 256;
-            p[1] = height;
+            position->y = 256;
         }
-        p[2] = (z << 8) + 0xa80;
+        position->z = (z << 8) + 0xa80;
     }
 }
 
@@ -203,14 +202,13 @@ static inline void GridAttack_SetState(struct GridAttackActor *p, void (*fn)(voi
     p->pending = 0;
 }
 
-static inline void GridAttack_StartAction(struct GridAttackActor *p, int id, int zero)
+static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
 {
-    int one = 1;
-    p->active = one;
+    p->active = mode;
     p->actionReset = zero;
     p->action = id;
     p->actionTimer = zero;
-    p->entered = one;
+    p->entered = 1;
 }
 
 void *BouncingObject_Spawn(void *, void *, void *, s32, s32, s32, s32);
@@ -267,11 +265,11 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 DamageNumberDisplay_Show(&p->damageCollider, damage, 0, &position->coordinates,
                                          &size, 1);
             }
-            GridAttack_StartAction(p, 0, 0);
+            GridAttack_StartActionMode(p, 1, 0, 0);
             GridAttack_SetState(p, GridAttackActor_UpdateDamageHold, 5);
             break;
         case 2:
-            GridAttack_StartAction(p, 1, 0);
+            GridAttack_StartActionMode(p, 1, 0, 1);
             GridAttack_SetState(p, GridAttackActor_UpdateDamageRecovery, 6);
             {
                 int angle = position->angle;
@@ -287,7 +285,7 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
                 u32 mask = 2;
                 p->flags |= mask;
             }
-            GridAttack_StartAction(p, 3, zero);
+            GridAttack_StartActionMode(p, 1, zero, 3);
             GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
         } break;
     }
@@ -361,33 +359,31 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
 
 void GridAttackActor_RequestLinkedActorState(struct GridAttackActor *p)
 {
-    struct GridAttackPacket *packet = (void *)&p->packet;
+    struct SceneEventCommand *packet = &p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 0) {
-        int zero = 0;
-        p->linkedActorPhase = zero;
+        p->linkedActorPhase = 0;
         packet->id = p->linkedActorId;
-        packet->kind = 5;
-        packet->zero = 0;
-        packet->reserved = zero;
-        packet->command = 1;
-        packet->count = 1;
-        packet->args[0] = 3;
+        packet->receiverKind = 5;
+        packet->trigger = 0;
+        packet->unknown4 = 0;
+        packet->kind = 1;
+        packet->argumentCount = 1;
+        packet->value = 3;
         SceneMessages_Send(packet);
     }
 }
 
 void GridAttackActor_NotifyLinkedActorLatePhase(struct GridAttackActor *p)
 {
-    struct GridAttackPacket *packet = (void *)&p->packet;
+    struct SceneEventCommand *packet = &p->packet;
     if (p->linkedActorId && p->linkedActorPhase != 1) {
-        int zero = 0;
         p->linkedActorPhase = 1;
         packet->id = p->linkedActorId;
-        packet->kind = 5;
-        packet->zero = 0;
-        packet->reserved = zero;
-        packet->command = 92;
-        packet->count = 0;
+        packet->receiverKind = 5;
+        packet->trigger = 0;
+        packet->unknown4 = 0;
+        packet->kind = 92;
+        packet->argumentCount = 0;
         SceneMessages_Send(packet);
     }
 }
@@ -606,13 +602,9 @@ void GridAttack_UpdateStaggerState(struct GridAttackActor *p)
         ContactSequencePool_BeginAllDeaths(p->contactPool);
         Sound_PlaySongChecked(1359);
     }
-    {
-        u8 *dst = &p->reactionCooldown;
-        int zero = 0;
-        *dst = 6;
-        p->damage = zero;
-        p->special = zero;
-    }
+    p->reactionCooldown = 6;
+    p->damage = 0;
+    p->special = 0;
     {
         u32 mask = 12;
         p->flags |= mask;
@@ -925,8 +917,7 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
         }
         if (react) {
             {
-                u32 mask = 1;
-                base->flags |= mask;
+                base->flags |= 1;
             }
             GridAttack_SetState(base, GridAttack_UpdateStaggerState, 7);
             return 1;
@@ -984,13 +975,10 @@ static inline u8 GridAttack_TakeActionEntry(struct GridAttackActor *p)
     return FALSE;
 }
 
-static inline void GridAttack_StartActionMode(struct GridAttackActor *p, int mode, int zero, int id)
+static inline void GridAttack_BeginIdleWait(struct GridAttackActor *actor, u16 duration)
 {
-    p->active = mode;
-    p->actionReset = zero;
-    p->action = id;
-    p->actionTimer = zero;
-    p->entered = 1;
+    GridAttack_StartActionMode(actor, 0, 0, 0);
+    actor->actionDuration = duration;
 }
 
 void SceneActors_ConfigureEffect(void *, s32, s32, s32);
@@ -1247,13 +1235,7 @@ void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p)
         p->requested = k;
     }
     if (p->finished) {
-        u32 two = 2;
-        u32 z = 0;
-        p->active = two;
-        p->actionReset = z;
-        p->action = z;
-        p->actionTimer = z;
-        p->entered = 1;
+        GridAttack_StartActionMode(p, 2, 0, 0);
         Trigger_ConsumePending(&p->receiver, 1);
     } else
         p->actionTimer++;
@@ -1318,13 +1300,7 @@ void GridAttack_UpdateActionTwo(struct GridAttackActor *p)
         p->requested = id;
     }
     if (p->finished) {
-        int duration = 60, zero = 0;
-        base->active = zero;
-        base->actionReset = zero;
-        base->action = zero;
-        base->actionTimer = zero;
-        base->entered = 1;
-        base->actionDuration = duration;
+        GridAttack_BeginIdleWait(base, 60);
     } else
         p->actionTimer++;
 }
@@ -1338,13 +1314,7 @@ void GridAttack_UpdateDeathAction(struct GridAttackActor *p)
         p->requested = id;
     }
     if (p->finished) {
-        int duration = 60, zero = 0;
-        base->active = zero;
-        base->actionReset = zero;
-        base->action = zero;
-        base->actionTimer = zero;
-        base->entered = 1;
-        base->actionDuration = duration;
+        GridAttack_BeginIdleWait(base, 60);
     } else
         p->actionTimer++;
 }
@@ -1358,19 +1328,13 @@ void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
         p->requested = id;
     }
     if (p->finished) {
-        int duration, zero;
+        int duration;
         int value = p->attackRange;
         if (value < 64)
             duration = base->farAttackDelay;
         else
             duration = base->nearAttackDelay;
-        zero = 0;
-        base->active = zero;
-        base->actionReset = zero;
-        base->action = zero;
-        base->actionTimer = zero;
-        base->entered = 1;
-        base->actionDuration = duration;
+        GridAttack_BeginIdleWait(base, duration);
     } else
         p->actionTimer++;
 }
@@ -1392,13 +1356,7 @@ void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p)
         p->requested = id;
     }
     if (p->finished) {
-        int duration = 30, zero = 0;
-        base->active = zero;
-        base->actionReset = zero;
-        base->action = zero;
-        base->actionTimer = zero;
-        base->entered = 1;
-        base->actionDuration = duration;
+        GridAttack_BeginIdleWait(base, 30);
     }
     p->actionTimer++;
 }
@@ -1414,13 +1372,7 @@ void GridAttack_UpdateDamageAction(struct GridAttackActor *p)
     {
         u32 mask = 1;
         if (!(p->flags & mask)) {
-            int duration = 30, zero = 0;
-            base->active = zero;
-            base->actionReset = zero;
-            base->action = zero;
-            base->actionTimer = zero;
-            base->entered = 1;
-            base->actionDuration = duration;
+            GridAttack_BeginIdleWait(base, 30);
         } else
             p->actionTimer++;
     }
@@ -1892,9 +1844,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
                 break;
         }
     } else {
-        u16 duration = 90;
-        GridAttack_StartActionMode(p, 0, 0, 0);
-        p->actionDuration = duration;
+        GridAttack_BeginIdleWait(p, 90);
         GridAttack_SetState(actor, (void *)GridAttackActor_UpdateIdle, 1);
     }
 

@@ -1,13 +1,11 @@
-#include "global.h"
-
-#include "scene_object_slot.h"
+#include "scene_object_controller.h"
 #include "scene_actor_terrain.h"
 void TerrainModifiers_RegisterCell(void *, u32, u32, u32, u32, u32);
-void SceneObject_UpdateRaised(void);
-void SceneObject_UpdateLowered(void);
+void SceneObject_UpdateRaised(struct SceneObjSlot *);
+void SceneObject_UpdateLowered(struct SceneObjSlot *);
 void *SceneParticleBurst_EnsureSingleton(u32, u32);
 // confidence=low: places a raisable scene object (blocks/gates with 10 facings) on its terrain cell.
-void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
+void SceneObject_InitLiftPlacement(struct SceneObjPool *mgr, struct SceneObjSlot *obj)
 {
     s32 cell = cellIndexAt(&obj->pos.position);
     u8 *dir;
@@ -23,7 +21,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             obj->loweredPose = 1;
             break;
         case 1:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 1;
@@ -36,7 +34,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 3:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 2;
             break;
@@ -47,7 +45,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             obj->loweredPose = 0;
             break;
         case 5:
-            obj->cellA = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellA = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->cellB = cell;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 0;
@@ -60,7 +58,7 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 7:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 1;
             break;
@@ -72,25 +70,25 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
             break;
         case 9:
             obj->cellA = cell;
-            obj->cellB = cell - *(u16 *)(gTerrainMap->cells + 4);
+            obj->cellB = cell - (u16)((struct TerrainGrid *)gTerrainMap->cells)->width;
             obj->pos.position.x += 0x80;
             obj->loweredPose = 0;
             break;
     }
-    obj->b3b = *SceneActorTerrain_GetCell(obj->cellA) & 15;
-    TerrainModifiers_RegisterCell(obj->block, obj->cellA, 0, obj->b3b, 0xff, 0);
-    obj->b39 = *(u8 *)&obj->loweredPose;
-    obj->b3a = 0;
+    obj->cellHeight = *SceneActorTerrain_GetCell(obj->cellA) & 15;
+    TerrainModifiers_RegisterCell(obj->terrain, obj->cellA, 0, obj->cellHeight, 0xff, 0);
+    obj->pose = *(u8 *)&obj->loweredPose;
+    obj->poseFrame = 0;
     sprite = obj;
-    Sprite_Init(sprite, mgr + (obj->value * 28 + 0xc8), 0);
-    obj->spritePos.words = obj->r0.words;
+    Sprite_Init(sprite, &mgr->animationData[1][obj->animationIndex], 0);
+    obj->sprite.position = obj->r0.signedPosition;
     if (!(*dir & 1)) {
-        obj->spritePos.position.z += 0x80;
+        obj->sprite.position.z += 0x80;
     } else {
-        obj->spritePos.position.x += 0x80;
-        *(u32 *)obj |= 4;
+        obj->sprite.position.x += 0x80;
+        obj->sprite.flags |= 4;
     }
-    obj->q0.words = sprite->spritePos.words;
+    obj->q0.signedPosition = sprite->sprite.position;
     if (obj->variant == 0)
         obj->callback = SceneObject_UpdateLowered;
     else if (obj->variant == 1)
@@ -101,12 +99,13 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
         obj->timer = 0;
         obj->variant = 1;
         obj->callback = SceneObject_UpdateLowered;
-        obj->b39 = *(u8 *)&obj->loweredPose;
-        obj->b3a = 0;
-        obj->block->w6 &= 0xfffd;
-        obj->block->w6 |= 3;
-        obj->block->flags &= 0xfffe;
-        obj->block->b4 = (obj->block->b4 & 0xf0) | (obj->b3b + 1);
+        obj->pose = *(u8 *)&obj->loweredPose;
+        obj->poseFrame = 0;
+        obj->terrain->cell.flags &= 0xfffd;
+        obj->terrain->cell.flags |= 3;
+        obj->terrain->flags &= 0xfffe;
+        obj->terrain->cell.shapeAndHeight =
+            (obj->terrain->cell.shapeAndHeight & 0xf0) | (obj->cellHeight + 1);
         obj->lift = 0;
         {
             u16 t = obj->r0.position.y;
@@ -116,12 +115,13 @@ void sub_0801F058(u8 *mgr, struct SceneObjSlot *obj)
         obj->timer = 0;
         obj->variant = 0;
         obj->callback = SceneObject_UpdateRaised;
-        obj->b39 = 0;
-        obj->b3a = 0;
-        obj->block->w6 &= 0xfffc;
-        obj->block->w6 |= 2;
-        obj->block->flags |= 1;
-        obj->block->b4 = (obj->block->b4 & 0xf0) | obj->b3b;
+        obj->pose = 0;
+        obj->poseFrame = 0;
+        obj->terrain->cell.flags &= 0xfffc;
+        obj->terrain->cell.flags |= 2;
+        obj->terrain->flags |= 1;
+        obj->terrain->cell.shapeAndHeight =
+            (obj->terrain->cell.shapeAndHeight & 0xf0) | obj->cellHeight;
         {
             u16 t = obj->maxLift;
             obj->lift = t;
