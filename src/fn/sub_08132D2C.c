@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "runtime.h"
@@ -39,7 +40,7 @@ static inline s32 clamp(s32 v)
     }
 #define CASE_BODY(n)                                                                               \
     {                                                                                              \
-        u32 flags = *(u32 *)(hit + 0x38);                                                          \
+        u32 flags = hit->reactionFlags;                                                            \
         STAT_INC(n);                                                                               \
         KILL_KIND(flags);                                                                          \
     }
@@ -76,27 +77,13 @@ static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
     u32 mask = maskInput;
     return actor->base.statusFlags & mask;
 }
-static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     u16 *flags2C0;
     u8 *category;
-    u8 *collider;
-    u8 *hit;
+    struct ContactCollider *collider;
+    struct ContactCollider *hit;
     u32 kind;
     {
         u32 mask = 0x1000;
@@ -128,16 +115,9 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
         }
         {
             void *control = actor->base.onDefeat;
-            Reaction_SetControl(actor, 17, control);
+            SceneActorTerrain_InstallControl(actor, control, 17);
         }
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         if (Test(gEngineFlags, 0x4800)) {
             Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
             goto done;
@@ -148,13 +128,13 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             kind = *address;
             owner = actor->base.hitOwners & 1;
             category = address;
-            collider = (u8 *)&actor->base.colliderA;
+            collider = &actor->base.colliderA;
             if (!owner)
                 goto record;
         }
         {
             u8 blocked = Test(Mask(flags2C0, 0x80), ~0);
-            collider = (u8 *)&actor->base.colliderA;
+            collider = &actor->base.colliderA;
             if (blocked)
                 goto record;
         }
@@ -163,12 +143,7 @@ u32 SceneActorReaction_DefeatRecordStats(struct ChaseActor *actor)
             if (kind != 5 && kind != 7 && kind != 6) {
                 STAT_INC(0x87C);
                 STAT_INC(0x538);
-                {
-                    u32 offset = 0x134;
-                    u8 *pinned;
-                    pinned = (u8 *)actor + offset;
-                    hit = pinned;
-                }
+                hit = &actor->base.colliderA;
                 {
                     u32 index = *category - 1; /* category 1..25 */
                     collider = hit;
