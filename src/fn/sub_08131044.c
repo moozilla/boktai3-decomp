@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_control_motion.h"
@@ -9,46 +10,12 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
 #define SceneActorRoute_UpdateRouteCompletion sub_08131044
 
-static inline void BeginControlZero(struct ChaseActor *actor, void *control, u32 kind)
-{
-    u32 offset;
-    {
-        u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = 0;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
 {
     a->base.state2A8 = state;
     a->base.phase2A9 = phase;
     a->base.behavior2AA = behavior;
     a->base.counter2AC = zero;
-    a->base.field2B1 = 1;
-}
-static inline void TurnState(struct ChaseActor *a, u32 behavior)
-{
-    u8 *field = &a->base.state2A8;
-    u32 zero = 0;
-    *field = zero;
-    a->base.phase2A9 = zero;
-    a->base.behavior2AA = behavior;
-    {
-        u32 *counter = &a->base.counter2AC;
-        *counter = zero;
-    }
     a->base.field2B1 = 1;
 }
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
@@ -113,7 +80,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
         event = NavMesh_ConsumeProbeEvent(*descriptor);
         if (event) {
             if (SceneActorBehavior_RequestDescriptorTurn(actor, *descriptor, 32, 32, speed)) {
-                TurnState(actor, 6);
+                SceneActorTerrain_EnterState(actor, 0, 0, 6);
                 Control(actor, actor->base.onStanding, 0);
             }
         } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, *descriptor, 32, 32,
