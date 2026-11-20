@@ -47,7 +47,6 @@ s32 ResultGame_InitializeDisplay(Ctx *p)
     const struct SpriteEffectTileResource *entry;
     s32 i;
     s32 y;
-    s32 off;
 
     tbl = gUnk_0824DB28 + 5;
     switch (tbl[p->diff]) {
@@ -140,10 +139,9 @@ s32 ResultGame_InitializeDisplay(Ctx *p)
     g->attribute1A = layer;
 
     entry = AnimData_FindEntry(0x1c1a);
-    off = -8;
     for (i = 0; i < 4; i++) {
         struct SpriteDrawable *q = &p->marker[i];
-        Effect_SetOrigin(q, off, off);
+        Effect_SetOrigin(q, -8, -8);
         SpriteDrawable_SelectTileFrame(q, entry, 0x33);
         q->priority = 0;
         ZeroFill8(&q->position);
