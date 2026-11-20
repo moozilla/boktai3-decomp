@@ -173,8 +173,7 @@ void StatusScreen_UpdateScanlineNoise(struct StatusScreen *p)
 
 void StatusScreen_ClearScanlineNoise(struct StatusScreen *p)
 {
-    u32 zero = 0;
-    CpuSet(&zero, p->rows, 0x05000091);
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
@@ -200,8 +199,7 @@ int StatusScreen_Update(struct StatusScreen *p)
 
 int StatusScreen_Destroy(struct StatusScreen *p)
 {
-    u32 zero = 0;
-    CpuSet(&zero, p->rows, 0x05000091);
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     gScanlineDmaSource = p->rows[p->active];
     gScanlineDmaTarget = (void *)0x0400004C;
     gScanlineDmaCount = 1;
@@ -261,10 +259,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
         Bg_SetupLayer(p->bg, 0, map, 0, 0, 0, 0, dst);
     }
     p->source = (u16 *)(palette + 0x1B4);
-    {
-        u32 zero = 0;
-        CpuSet(&zero, p->buffer, 0x05000018);
-    }
+    CpuFill32(0, p->buffer, 3 * 16 * sizeof(*p->buffer));
     *(volatile u16 *)0x04000008 |= 0x40;
     p->delay = Script_GetKeywordValue('w', 0);
     {
@@ -278,10 +273,7 @@ int StatusScreen_Initialize(struct StatusScreen *p, u16 id)
     p->fade = 0;
     p->fadeStep = 1;
     p->effect = 0;
-    {
-        u32 zero = 0;
-        CpuSet(&zero, p->rows, 0x05000091);
-    }
+    CpuFill32(0, p->rows, 0x91 * sizeof(u32));
     p->active = 0;
     p->amplitude = 1024;
     p->delta = 1;
