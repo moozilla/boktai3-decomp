@@ -522,6 +522,7 @@ async function functionPage(q) {
         : f.state === 'draft' ? `<span class="badge warn" title="a NONMATCHING draft; the build uses the INCLUDE_ASM branch">not matched yet${f.pct ? ' · draft at ' + fmtPct(f.pct) : ''}</span>`
         : '<span class="badge ok">matches</span>' + status(d.kinds)}${d.confidence === 'low' ? '<span class="badge" title="symbols/functions.csv marks this name as a guess">provisional name</span>' : ''}<span class="badge" id="fnhist" data-addr="${d.addr}" hidden></span></div>
     ${d.notes ? `<p class="lede" style="font-size:14px">${esc(d.notes)}</p>` : ''}
+    <p><a href="/experiments?probe=${encodeURIComponent(d.name)}">Probe this function in an experiment</a></p>
     ${u ? strip(u.functions.map(x => FN[x[1]]), d.addr) : ''}
     ${d.c ? `<p><a class="badge" href="/forge#${d.addr}">Edit in Forge → compile, play, export a patch</a></p>` : ''}
     <div class="panes">${cPane}${asmPane}</div>

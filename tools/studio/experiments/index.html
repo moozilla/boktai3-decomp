@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boktai 3 Experiments</title>
+  <link rel="stylesheet" href="/static/common.css">
+  <link rel="stylesheet" href="/experiments/app.css">
+  <script defer src="/static/common.js"></script>
+  <script defer src="/experiments/app.js"></script>
+</head>
+<body>
+  <header id="top"></header>
+  <main class="notebook">
+    <header class="notebook-head">
+      <div>
+        <a class="section-name" href="/experiments">Experiments</a>
+        <h1 id="title">Ask the running game.</h1>
+        <p id="question-context">Replay the same starting frame with different inputs. Follow the answer into the code that ran.</p>
+      </div>
+      <div class="toolbar">
+        <select id="examples" aria-label="Open an example question"><option>Example questions</option></select>
+        <button id="edit" type="button">Edit recipe</button>
+        <button id="run" class="primary" type="button" disabled>Run experiment</button>
+      </div>
+    </header>
+    <div id="status-line" role="status" aria-live="polite"></div>
+    <section id="preview" aria-label="Trial inputs"></section>
+    <section id="results" aria-label="Experiment result" hidden>
+      <div id="claims" aria-label="Tested statements"></div>
+      <section id="players" aria-label="Synchronized trial frames">
+        <div id="screens"></div>
+        <div class="transport">
+          <button id="play" type="button" aria-label="Play trial frames">Play</button>
+          <button id="previous" type="button" aria-label="Previous sampled frame">‹</button>
+          <button id="next" type="button" aria-label="Next sampled frame">›</button>
+          <input id="scrub" type="range" min="0" value="0" aria-label="Sampled frame">
+          <output id="frame" for="scrub"></output>
+          <button id="fork-frame" type="button" title="Start a new experiment from the selected trial and frame">Fork frame</button>
+        </div>
+      </section>
+      <div class="inspection">
+        <section class="measurements" aria-labelledby="measure-heading">
+          <div class="section-head">
+            <h2 id="measure-heading">Frame evidence</h2>
+            <div class="tabs" aria-label="Evidence view">
+              <button id="fields-tab" type="button" aria-pressed="true">RAM fields</button>
+              <button id="calls-tab" type="button" aria-pressed="false">Function entries</button>
+            </div>
+          </div>
+          <div id="matrix"></div>
+        </section>
+        <aside class="evidence" id="evidence" aria-label="Selected evidence"></aside>
+      </div>
+      <section id="compare-panel" class="compare-panel" hidden>
+        <div class="section-head">
+          <h2>Compare runs</h2>
+          <select id="compare" aria-label="Compare with an earlier run"></select>
+        </div>
+        <div id="comparison"></div>
+      </section>
+    </section>
+    <footer class="notebook-footer">
+      <label for="history-select">Saved runs</label>
+      <select id="history-select"><option value="">Choose a run</option></select>
+      <div id="artifacts"></div>
+    </footer>
+  </main>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="recipe-form">
+      <header class="dialog-head">
+        <div><h2 id="editor-title">Edit recipe</h2><p>The next run saves a new copy of these inputs.</p></div>
+        <button id="close-editor" type="button" aria-label="Close recipe editor">×</button>
+      </header>
+      <div class="dialog-body">
+        <label>Question <input id="recipe-title" type="text" maxlength="120" required></label>
+        <p id="fork-origin" hidden></p>
+        <div class="form-row">
+          <label>Starting checkpoint <select id="checkpoint"></select></label>
+          <label>Trial length <input id="duration" type="number" min="1" max="1800" required></label>
+          <label>Sample every <input id="interval" type="number" min="1" max="1800" required></label>
+        </div>
+        <label class="checkbox"><input id="resume-save" type="checkbox"> Try the reference Continue sequence before forking</label>
+        <details>
+          <summary>Setup before the trials</summary>
+          <label>Shared controller input <textarea id="prep" rows="3" spellcheck="false" placeholder="wait 60"></textarea></label>
+        </details>
+        <div class="section-head"><h3>Trials</h3><button type="button" id="add-trial">Add trial</button></div>
+        <p class="help">Use <code>hold UP 60</code>, <code>tap START</code>, <code>wait 15</code>, or <code>lux 80</code>.</p>
+        <div id="trial-editor"></div>
+        <label>Watch fields <textarea id="observe" rows="3" spellcheck="false" placeholder="gPlayers[0]->position.x"></textarea></label>
+        <label>Probe function entries <textarea id="probe" rows="2" spellcheck="false" placeholder="Player_Update"></textarea></label>
+        <details>
+          <summary>Falsifiable checks and full JSON</summary>
+          <label>Checks (JSON) <textarea id="checks" rows="7" spellcheck="false"></textarea></label>
+          <div class="form-actions">
+            <button id="export-json" type="button">Copy recipe to JSON editor</button>
+            <button id="apply-json" type="button">Load JSON into form</button>
+          </div>
+          <label>Recipe JSON <textarea id="json-editor" rows="8" spellcheck="false"></textarea></label>
+        </details>
+        <p id="editor-error" role="alert"></p>
+      </div>
+      <footer class="dialog-foot">
+        <button id="cancel-editor" type="button">Cancel</button>
+        <button class="primary" type="submit">Run edited recipe</button>
+      </footer>
+    </form>
+  </dialog>
+</body>
+</html>
