@@ -40,8 +40,10 @@ u32 TerrainModifiers_RemoveFromList(struct TerrainModifier *p)
 static inline s32 heightLevel(s32 value)
 {
     if (value >= 0)
-        return value >> 8;
-    return -((-value) >> 8);
+        value >>= 8;
+    else
+        value = -((-value) >> 8);
+    return value;
 }
 
 static inline s32 cellIndex(struct TerrainVec *pos)
@@ -240,10 +242,7 @@ s32 TerrainModifiers_ChangeFromScript(void)
         position.y = Script_GetValue();
         position.z = Script_GetValue();
         cell = cellIndex((struct TerrainVec *)&position);
-        height = ({
-            s32 value = heightLevel(((struct TerrainVec *)&position)->y);
-            value;
-        });
+        height = heightLevel(((struct TerrainVec *)&position)->y);
     } else {
         height = -1;
         cell = height;
