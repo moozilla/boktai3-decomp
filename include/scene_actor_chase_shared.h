@@ -317,6 +317,11 @@ static inline void SceneActorChase_GroupSetFlags(struct SceneActorChaseGroup *ow
     SceneActorChase_HalfwordFlagsSet((u16 *)&owner->common.gate.flags, bits);
 }
 
+static inline void SceneActorChase_GroupClearFlags(struct SceneActorChaseGroup *owner, u32 bits)
+{
+    owner->common.gate.flags &= ~bits;
+}
+
 static inline void SceneActorChase_SetTypedControl(struct ChaseActor *actor, void *control,
                                                    u32 kind)
 {
