@@ -14,7 +14,7 @@ from gallery import contact
 from reference import DMG
 
 RIGHT, LEFT, UP, DOWN = 16, 32, 64, 128
-A, B, START = 1, 2, 8
+A, B, SELECT, START = 1, 2, 4, 8
 PAD = {RIGHT: (1, -1), LEFT: (-1, 1), UP: (-1, -1), DOWN: (1, 1),
        RIGHT | UP: (0, -1), RIGHT | DOWN: (1, 0), LEFT | UP: (-1, 0), LEFT | DOWN: (0, 1)}
 
@@ -94,6 +94,8 @@ class Replay:
     def check_scroll(self):
         # Compare every tile the LCD might fetch, including partial edge tiles.
         # Both emulators could agree while the game itself loaded a wrong column.
+        if self.state("mode"):
+            return
         origin_x = (self.state("camera_x") + 256 * self.state("camera_x_hi")) // 8
         origin_y = (self.state("camera_y") + 256 * self.state("camera_y_hi")) // 8
         x, y = self._window_x + origin_x, self._window_y + origin_y
@@ -103,13 +105,31 @@ class Replay:
         actual = hw[0x9800 + (y % 32) * 32 + x % 32]
         check(np.array_equal(expected, actual), f"BG stream differs from full map at camera tile {origin_x},{origin_y}")
 
+    def wire(self, name, packets):
+        incoming = b"".join(data for data, _ in packets)
+        self.model.keys = 0
+        self.model.serial_queue = deque(incoming)
+        self.model.serial_replies = []
+        self.model.serial_next = self.model.cycles + 4096
+        while self.model.serial_queue:
+            self.model.until(self.loop)
+        replies = self.model.serial_replies
+        offset = 0
+        for data, status in packets:
+            offset += len(data)
+            check(replies[offset - 2:offset] == [0x81, status],
+                  f"printer reply {replies[offset-2:offset]} expected identity and status {status}")
+        path = self.out / (name + ".wire")
+        path.write_bytes(bytes(v for pair in zip(incoming, replies) for v in pair))
+        self.trace.append(["wire", path.name])
+
     def record(self, name, caption):
         frame = self.model.render()
         check(self.model.peak_line <= 10 and self.model.peak_oam <= 40, "OAM hardware budget")
         pixels = np.array(frame)
         check(len(np.unique(pixels)) == 4, f"{name} must render four distinct shades")
         frame.save(self.out / f"ref-{name}.png")
-        raw = self.model.mem[0xC100:0xC130].hex()
+        raw = self.model.mem[0xC100:0xC180].hex()
         self.snaps.append(dict(name=name, caption=caption, state=raw, tick=self.ticks, bank=self.model.bank))
         self.trace.append(["frame", name])
 
@@ -179,9 +199,11 @@ class Replay:
         for event in self.trace:
             if event[0] == "tick":
                 commands.append(f"tick {self.loop:x} {event[1]} {event[2]}")
+            elif event[0] == "wire":
+                commands.append(f"wire {self.loop:x} {event[1]}")
             else:
                 name = event[1]
-                commands.extend([f"frame {name}.ppm", "read c100 48"])
+                commands.extend([f"frame {name}.ppm", "read c100 128"])
         (self.out / f"{self.name}.replay").write_text("\n".join(commands) + "\n")
         if not host:
             return
@@ -205,6 +227,8 @@ class Replay:
 
 
 def campaign(r):
+    r.record("title", "Title   /   Original logo and flame")
+    r.run(START)
     r.run(0, 2)
     r.record("opening", "2698   /   Opening cell")
     r.run(START)
@@ -212,6 +236,12 @@ def campaign(r):
     r.record("notes", "2698   /   Otenko's message")
     r.run(START)
     r.run(0)
+    r.run(SELECT)
+    r.run(RIGHT)
+    r.record("sun-meter", "Sun meter   /   Thumb shadow")
+    r.run(A)
+    r.run(0)
+    check(r.state("sun_level") == 3 and r.state("sun_source") == 1, "manual exposure")
     # Approach from the left of HP route point 0, aim along positive world X.
     r.walk(lambda x, z: (x, z) == (32, 76))
     r.run(RIGHT | DOWN, 2)
@@ -242,7 +272,14 @@ def campaign(r):
     r.run(0, 30)
     before = r.state("energy")
     check(before < 6, "need an empty pip to check the skylight")
-    r.run(B, 96)
+    captured = False
+    for _ in range(96):
+        r.run(B)
+        for slot in (0xC320, 0xC330):
+            if r.model.mem[slot+2] == 3 and not captured:
+                r.record("lunge", "2712   /   Skeleton lunge")
+                captured = True
+    check(captured, "the real skeleton route must reach a lunge")
     check(r.state("energy") == 6, "skylight failed to refill energy")
     r.record("skylight", "2712   /   Sunlight stored")
     r.door(2)
@@ -253,16 +290,50 @@ def campaign(r):
 
 
 def patrol(r):
+    r.run(START)
+    r.run(0)
     original = r.state("enemy_x"), r.state("enemy_z")
     r.run(0, 160)
     check((r.state("enemy_x"), r.state("enemy_z")) != original, "ghoul must move along the route")
     r.record("patrol", "2698   /   Ghoul on patrol")
 
 
+def printer_packet(command, payload=b"", compressed=False, bad=False):
+    body = bytes([command, int(compressed)]) + len(payload).to_bytes(2, "little") + payload
+    checksum = (sum(body) + int(bad)) & 65535
+    return b"\x88\x33" + body + checksum.to_bytes(2, "little") + b"\0\0"
+
+
+def sunlight(r):
+    r.run(START)
+    r.run(0)
+    r.run(SELECT)
+    r.run(0)
+    r.run(START)
+    check(r.state("mode") == 3, "camera link page")
+    init = printer_packet(1)
+    print_page = printer_packet(2, bytes([1, 0, 0xe4, 0x40]))
+    bad = printer_packet(4, bytes(640), bad=True)
+    # Both raw and run-length encoded strips are normal Printer DATA.
+    # The corrupt white strip must not dilute the prior black exposure.
+    dark = printer_packet(4, bytes([0xff]) * 640)
+    r.wire("dark-print", [(init, 0), (dark, 8), (bad, 1), (print_page, 6)])
+    check(r.model.mem[r.meta["engine"]["photo_level"]] == 0, "dark photo must yield zero sunlight")
+    bright = printer_packet(4, bytes([0xfd, 0]) * 5 + bytes([0x83, 0]), compressed=True)
+    # 5*127 + 5 = 640 raw zero bytes; PRINT checksums cover the compressed wire data.
+    r.wire("bright-print", [(init, 0), (bright, 8), (printer_packet(4), 8), (print_page, 6),
+                            (printer_packet(15), 6), (printer_packet(15), 0)])
+    check(r.model.mem[r.meta["engine"]["photo_level"]] == 3, "bright photo must yield full sunlight")
+    r.run(0)
+    r.record("sun-print", "Camera link   /   Bright print received")
+    r.run(A)
+    check(r.state("sun_level") == 3 and r.state("sun_source") == 2, "use measured exposure")
+
+
 def verify_audio(out, host):
     """Capture real APU output, including the first percussion entry."""
     import wave
-    proc = subprocess.run([host, "boktai.gb"], cwd=out, input="step 16 0\naudio 1080 score.pcm\n",
+    proc = subprocess.run([host, "boktai.gb"], cwd=out, input="step 16 0\nstep 4 8\nstep 1 0\naudio 1080 score.pcm\n",
                           capture_output=True, text=True, check=True)
     _, rate, size = proc.stdout.strip().split()
     path = out / "score.pcm"
@@ -285,7 +356,7 @@ def verify(out, manifest):
     host = playback(out)
     snapshots = []
     checks = []
-    for name, script in (("campaign", campaign), ("patrol", patrol)):
+    for name, script in (("campaign", campaign), ("patrol", patrol), ("sunlight", sunlight)):
         replay = Replay(out, manifest, name)
         script(replay)
         replay.verify_native(host)

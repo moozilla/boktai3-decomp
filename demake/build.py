@@ -11,6 +11,7 @@ from gallery import actor_gallery, room_gallery
 from music import compile_song
 from pack import SCENES, LAYOUT, objects, pack_room, enemy_constants
 from rooms import convert, place_skylight, terrain_overlay
+from screens import screen_bank
 from sm83 import assemble, cartridge
 
 HERE = Path(__file__).resolve().parent
@@ -20,7 +21,7 @@ direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase en
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
 shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise
 world_x world_x_hi world_y world_y_hi camera_x_hi camera_y_hi projected_h projected_h_hi
-camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x""".split()
+camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter""".split()
 
 
 def direction_table():
@@ -53,8 +54,13 @@ def build(source, out):
         "sk_x sk_z sk_phase sk_timer sk_point sk_dx sk_dz sk_speed sk_frac sk_facing".split())})
     bgm = next(int(t.split()[1], 0) for _, t in source.walker.text(2712) if t.startswith("proc_1048 "))
     score, wave, music_info = compile_song(bgm)
-    symbols.update(music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
-    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text() + (HERE / "skeleton.asm").read_text()
+    symbols.update(screen_bank=len(rooms) + 2, music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
+    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text() + (HERE / "skeleton.asm").read_text() + (HERE / "screens.asm").read_text() + (HERE / "printer.asm").read_text()
+    symbols.update({name: 0xc700 + i for i, name in enumerate("""
+        pr_state pr_command pr_compress pr_length_lo pr_length_hi pr_checksum_lo pr_checksum_hi
+        pr_raw_lo pr_raw_hi pr_ink_lo pr_ink_hi pr_run pr_repeat pr_bad pr_status
+        pr_size_lo pr_size_hi pr_total_lo pr_total_hi pr_packet_lo pr_packet_hi pr_busy
+        photo_ready photo_level pr_byte pr_received_lo pr_palette""".split())})
     reloc = {"pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
     code, _ = assemble(asm, {**symbols, **reloc})
     fixed_end = 0x150 + len(code)
@@ -71,7 +77,7 @@ def build(source, out):
         info.append(meta)
         banks.append(data)
         screen_image(display).save(out / f"room-{meta['scene']}.png")
-    rom = cartridge(code + directions + ptrs + obj + markers + wave, [*banks, score])
+    rom = cartridge(code + directions + ptrs + obj + markers + wave, [*banks, score, screen_bank(source)])
     path = out / "boktai.gb"
     path.write_bytes(rom)
     manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_pose_count=len(poses), obj_tiles_per_pose=12, obj_marker_tiles=len(markers) // 16,

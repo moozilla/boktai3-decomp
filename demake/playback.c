@@ -86,6 +86,29 @@ int main(int argc, char** argv) {
             if (fclose(pcm)) return 13;
             pcm = NULL;
             printf("audio %u %u\n", pcm_rate, pcm_frames);
+        } else if (!strcmp(command, "wire") && sscanf(line, "%*s %x %959[^\n]", &mask, path) == 2) {
+            /* Model the peer's byte-complete event on SB/SC. All parsing and
+             * replies execute on the cartridge CPU. A physical cable clocks bits. */
+            FILE* input = fopen(path, "rb");
+            if (!input) return 14;
+            core->setKeys(core, 0);
+            int incoming, expected;
+            while ((incoming = fgetc(input)) != EOF) {
+                expected = fgetc(input);
+                if (expected == EOF || (core->busRead8(core, 0xff02) & 0x81) != 0x80 ||
+                    core->busRead8(core, 0xff01) != (unsigned)expected) return 15;
+                core->busWrite8(core, 0xff01, incoming);
+                core->busWrite8(core, 0xff02, 0);
+                unsigned budget = 10000;
+                while (!(core->busRead8(core, 0xff02) & 0x80) && budget--) core->step(core);
+                if (!(core->busRead8(core, 0xff02) & 0x80)) return 16;
+            }
+            fclose(input);
+            unsigned pc = 0, budget = 300000;
+            do {
+                core->step(core);
+                if (!budget-- || !core->readRegister(core, "pc", &pc)) return 17;
+            } while (pc != mask);
         } else if (!strcmp(command, "tick")) {
             unsigned target;
             if (sscanf(line, "%*s %x %u %u", &target, &n, &mask) != 3) return 9;

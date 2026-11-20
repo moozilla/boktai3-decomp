@@ -30,11 +30,22 @@ class DMG:
         self.keys = 0
         self.cycles = self.dot = self.frames = self.dma_until = 0
         self.lowest_sp = self.sp
+        self.serial_queue = None
+        self.serial_replies = []
+        self.serial_next = 0
         self.vblank_writes = 0
         self.peak_line = self.peak_oam = 0
 
     def advance(self, cycles):
         self.cycles += cycles
+        if self.serial_queue and self.cycles >= self.serial_next:
+            if self.mem[0xFF02] & 0x81 != 0x80:
+                raise RuntimeError("external serial byte arrived before receiver rearmed")
+            self.serial_replies.append(self.mem[0xFF01])
+            self.mem[0xFF01] = self.serial_queue.popleft()
+            self.mem[0xFF02] &= 0x7F
+            self.mem[0xFF0F] |= 8
+            self.serial_next += 4096  # 8192 Hz external clock, eight bits per byte
         if self.mem[0xFF40] & 128:
             # Crossing line 144 requests VBlank, including across frame wrap.
             if (self.dot + cycles - 65664) // 70224 > (self.dot - 65664) // 70224:

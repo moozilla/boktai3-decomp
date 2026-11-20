@@ -42,12 +42,22 @@ boot:
     ld [player_x],a
     ld a,[header+5]
     ld [player_z],a
-    call load_room
+    ld a,1
+    ld [shadow_choice],a
+    call title_screen
 
 loop:
+    ld a,[mode]
+    and a
+    jp nz,static_tick
     call music_tick
     call input
     ld a,[pressed]
+    bit 2,a
+    jr z,.pause
+    call open_meter
+    jp loop
+.pause:
     bit 3,a
     jr z,.menu_set
     ld a,[menu]
@@ -61,6 +71,14 @@ loop:
     inc [hl]
     call move_player
     call interactions
+    ld a,[need_meter]
+    and a
+    jr z,.door
+    xor a
+    ld [need_meter],a
+    call open_meter
+    jp loop
+.door:
     ld a,[next_bank]
     and a
     jr z,.stay
@@ -146,14 +164,17 @@ clear:
     jr nz,clear
     ret
 
-load_room:
-    call lcd_off
+room_vram:
     ld a,[bank]
     ld [0x2000],a
     ld hl,patterns
     ld de,0x8800
     ld bc,0x1800
     call copy
+    ret
+load_room:
+    call lcd_off
+    call room_vram
     ; Patterns and both 32x32 maps occupy consecutive VRAM addresses.
     xor a
     ld [next_bank],a
@@ -191,6 +212,7 @@ load_room:
     ld [camera_snap],a
     call reset_poses
     call sk_init
+show_field:
     call draw
     call limit_oam
     call sort_oam
@@ -214,6 +236,12 @@ input:
     ld a,0x20
     ldh [0],a
     call read_matrix
+    ld b,a
+    ld a,[direction]
+    cpl
+    and b
+    ld [pressed_dir],a
+    ld a,b
     ld [direction],a
     ld a,0x10
     ldh [0],a
@@ -381,23 +409,23 @@ interactions:
     ld d,a
     ld a,[player_x]
     cp [hl]
-    jr c,.next
+    jp c,.next
     inc hl
     ld a,[player_z]
     cp [hl]
-    jr c,.next
+    jp c,.next
     inc hl
     ld a,[player_x]
     ld e,[hl]
     inc e
     cp e
-    jr nc,.next
+    jp nc,.next
     inc hl
     ld a,[player_z]
     ld e,[hl]
     inc e
     cp e
-    jr nc,.next
+    jp nc,.next
     inc hl
     ld a,d
     cp 2
@@ -406,7 +434,7 @@ interactions:
     jr z,.light
     ld a,[pressed]
     bit 0,a
-    jr z,.next
+    jp z,.next
     ld a,[hl+]
     ld [next_bank],a
     ld a,[hl+]
@@ -422,7 +450,7 @@ interactions:
     ld a,[hl]
     call fruit_bit
     and [hl]
-    jr nz,.next
+    jp nz,.next
     ld a,c
     or [hl]
     ld [hl],a
@@ -438,14 +466,32 @@ interactions:
 .light:
     ld a,[buttons]
     bit 1,a
-    jr z,.next
+    jp z,.next
+    ld a,[sun_source]
+    and a
+    jr nz,.exposure
+    ld a,1
+    ld [need_meter],a
+    jr .next
+.exposure:
+    ld a,[sun_level]
+    and a
+    jp z,.next
+    cp 1
+    ld e,31
+    jr z,.rate
+    cp 2
+    ld e,15
+    jr z,.rate
+    ld e,7
+.rate:
     ld a,[tick]
-    and 15
-    jr nz,.next
+    and e
+    jp nz,.next
     ld hl,energy
     ld a,[hl]
     cp 6
-    jr nc,.next
+    jp nc,.next
     inc [hl]
     call chime
 .next:
