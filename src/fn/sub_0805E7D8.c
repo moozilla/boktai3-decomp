@@ -1,27 +1,20 @@
 #include "scene_input_navigation.h"
 u32 SceneInput_GetNavigationKeys(struct SceneInputGridView *grid)
 {
-    const volatile u16 *keys = gPadState;
-    u32 value = keys[1];
-    u32 mask = 0xF0;
-    u32 pressed;
-    pressed = mask;
-    pressed &= value;
+    u32 pressed = gPadState[1] & 0xF0;
     if (pressed) {
         grid->repeat = 0;
-        return keys[1];
+        return gPadState[1];
     } else {
-        do {
-            mask &= keys[0];
-        } while (0);
-        if (mask) {
+        u32 held = gPadState[0] & 0xF0;
+        if (held) {
             grid->repeat++;
             if (grid->repeat > 9) {
-                grid->repeat = pressed;
-                return keys[0];
+                grid->repeat = 0;
+                return gPadState[0];
             }
         } else {
-            grid->repeat = mask;
+            grid->repeat = 0;
         }
         return 0;
     }
