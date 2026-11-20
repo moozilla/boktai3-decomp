@@ -7,6 +7,14 @@
 #include "display_sequence.h"
 #include "palette_resource.h"
 
+/* Parsed markup argument and scratch space for formatting substitutions. */
+struct MessageTagScratch {
+    s32 hasValue, length;
+    u8 value[64];
+    u8 unknown78[4];
+    u8 number[12];
+};
+
 /* Shared text interpreter storage embedded in the message-window task. */
 struct MessagePlaybackState {
     u8 x, y, left, top, width, height, palette, stream;
@@ -16,7 +24,7 @@ struct MessagePlaybackState {
     u8 instant, wrap;
     u32 frame;
     const u8 *pc, *streams[4];
-    u8 unknown30[0x58];
+    struct MessageTagScratch tag;
     u32 numbers[16], choices[16];
     u8 depth, styles[7];
     const u8 *strings[16];
