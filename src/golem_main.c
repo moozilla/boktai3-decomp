@@ -1535,11 +1535,6 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
 
 extern const u16 gUnk_08606130[];
 
-struct Unk080C79A8Motion {
-    u8 unknown0[0x14];
-    s16 x, unknown16, z;
-};
-
 static inline s32 Scale16(s32 n)
 {
     return n >= 0 ? n >> 16 : -((-n) >> 16);
@@ -1547,10 +1542,9 @@ static inline s32 Scale16(s32 n)
 
 void SceneActorReaction_SlideBack(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
-    struct Unk080C79A8Motion *motion = (struct Unk080C79A8Motion *)((u8 *)actor + 0x50);
+    struct GolemChargeContext *context = actor->base.context;
+    struct SceneActorBody *body = &actor->base.body;
     s32 dx, dz;
-    s16 *speed;
 
     if (TakeFlag(&actor->base.field2B2)) {
         u8 *direction = &actor->base.body.direction;
@@ -1563,7 +1557,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
         u32 force;
         u8 *restart;
 
-        *direction = body[0x691];
+        *direction = context->charge.motionDirection;
         variantPointer = &directionVariant;
         {
             u8 *mirrorAddress = &mirror;
@@ -1617,9 +1611,8 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
             }
             *savedSelection = selection;
             {
-                u32 mask = 4;
                 u32 mode;
-                if (flags & mask) {
+                if (flags & 4) {
                     mode = 6;
                 } else {
                     mode = 4;
@@ -1629,7 +1622,7 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
                     actor->base.drawable, (u16)selection, 2, (u16)mode);
                 flags &= 1;
                 if (flags) {
-                    tile->flags |= mask;
+                    tile->flags |= 4;
                 } else {
                     tile->flags &= ~4;
                 }
@@ -1638,33 +1631,26 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
         *restart = 0;
     done:
         actor->base.restart = 0;
-        body[0x68F] = 0;
+        context->charge.settleFrames = 0;
     }
-    {
-        u32 mask = 0x100;
-        actor->base.motionFlags |= mask;
-    }
-    {
-        u32 mask = 0x2000;
-        actor->base.behaviorFlags |= mask;
-    }
-    dx = Scale16(gUnk_086149C4[(body[0x691] + 0x40) & 0xFF] * *(s16 *)(body + 0x682));
-    dz = Scale16(gUnk_086149C4[body[0x691]] * *(s16 *)(body + 0x682));
+    Golem_SetMotionFlags(actor, 0x100);
+    SceneActorChase_SetActorFlags(actor, 0x2000);
+    dx = Scale16(gUnk_086149C4[(context->charge.motionDirection + 0x40) & 0xFF] *
+                 context->charge.speed);
+    dz = Scale16(gUnk_086149C4[context->charge.motionDirection] * context->charge.speed);
     if (((dx < 0) ? (-dx) : (dx)) < ((dz < 0) ? (-dz) : (dz))) {
-        motion->z = dz;
+        body->motion.z = dz;
     } else {
-        motion->x = dx;
+        body->motion.x = dx;
     }
-    speed = (s16 *)(body + 0x682);
-    if (*speed <= 0) {
-        s16 zero = 0;
-        *speed = zero;
-        if (++body[0x68F] > 11) {
+    if (context->charge.speed <= 0) {
+        context->charge.speed = 0;
+        if (++context->charge.settleFrames > 11) {
             actor->base.stepDone = 1;
-            *speed = zero;
+            context->charge.speed = 0;
         }
     } else {
-        *speed -= 0x10;
+        context->charge.speed -= 0x10;
     }
 }
 
