@@ -36,20 +36,18 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
     if (--*timer == 0) {
 
         u32 *cursor;
-        u32 mask;
         u16 index;
         s32 step;
         work.randomTable = gRandomTable;
         cursor = &gRandomIndex;
         index = *cursor + 1;
-        mask = 1023;
-        index &= mask;
+        index &= 1023;
         step = (readWord(work.randomTable, index) & 7) + 12;
         rig->turnRate = step;
-        *cursor = index = (index + 1) & mask;
+        *cursor = index = (index + 1) & 1023;
         if (readWord(work.randomTable, index) & 1)
             rig->turnRate = -step;
-        *cursor = (*cursor + 1) & mask;
+        *cursor = (*cursor + 1) & 1023;
         *timer = (readWord(work.randomTable, *cursor) & 63) + 32;
     }
     rig->angle = (rig->angle + 4095 + (u16)rig->turnStep) & 4095;
@@ -58,13 +56,11 @@ void ScenePanelRig_TickWandering(struct ScenePanelRig *rig)
     if (--*timer == 0) {
         const u16 *table = gRandomTable;
         u32 *cursor = &gRandomIndex;
-        u32 mask;
         u16 index;
         index = *cursor + 1;
-        mask = 1023;
-        index &= mask;
+        index &= 1023;
         rig->speed = *(const u8 *)((u32)table + index * 2) + 192;
-        *cursor = index = (index + 1) & mask;
+        *cursor = index = (index + 1) & 1023;
         *timer = (readWord(table, index) & 63) + 64;
     }
     {
