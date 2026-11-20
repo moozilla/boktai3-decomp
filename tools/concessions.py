@@ -44,7 +44,8 @@ its spelling, so each one is a question, not a verdict:
   instrumented agbcc, tools/scope/build_agbcc.sh), so respelling the C does not hide them.
 * `once-loop`: a `do { ... } while (0)` with a body, outside a macro. Usually the expansion of a
   macro of the original's: give the macro a name in a header and the warning goes.
-* `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
+* `stmt-expr`: a `({ ... })` outside a macro, or an expression macro that wraps a single
+  assignment in a one-pass loop before returning the assigned temporary.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant. A `goto` label or `return` operand is not a declaration.
 * `literal-local`: any other local that is initialized to a literal and never changed
@@ -122,6 +123,12 @@ _WARN_REGEX = {
 }
 _ONCE_END = re.compile(r"\}\s*while\s*\(\s*0\s*\)")
 _MACRO_DEF = re.compile(r"(?m)^[ \t]*#[ \t]*define(?:.*\\\n)*.*$")
+_WRAPPED_EXPR_MACRO = re.compile(
+    r"[ \t]*#[ \t]*define[ \t]+\w+\([^()\n]*\)\s*\(\s*\{"
+    r"\s*(?:[A-Za-z_]\w*\s+)+(?:\*\s*)*(?P<temporary>[A-Za-z_]\w*)\s*;"
+    r"\s*do\s*\{\s*(?P=temporary)\s*=(?!=)[^;{}]+;\s*\}\s*while\s*\(\s*0\s*\)\s*;"
+    r"\s*(?P=temporary)\s*;\s*\}\s*\)\s*"
+)
 _ALIAS = re.compile(r'^[^\n#]*\b(\w+)\s*\([^;{}]*\)\s*(?:asm|__asm__)\s*\(\s*"[A-Za-z_]\w*"\s*\)\s*;', re.M)
 _CFLAGS = re.compile(r"^// CFLAGS: (.*)$", re.M)
 _ALLOW = re.compile(r"concession-ok\(([\w,\s-]*)\)\s*:?\s*(.*?)\s*(?:\*/|$)", re.M)
@@ -207,7 +214,10 @@ def _volatile_typedef_locals(code: str):
 
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
-    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
+    for macro in _MACRO_DEF.finditer(code):
+        if _WRAPPED_EXPR_MACRO.fullmatch(macro.group(0).replace("\\\n", " ")):
+            yield macro.start(), "stmt-expr"
+    code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind

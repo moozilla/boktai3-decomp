@@ -174,6 +174,23 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("#define SET(x) do { x = 0; } while (0)\nvoid f(void) {\n    SET(a);\n}\n"), [])
         self.assertEqual(kinds("void f(void) {\n    do { } while (0);\n}\n"), ["empty-loop"])
 
+    def test_expression_macro_with_one_wrapped_assignment(self):
+        macro = " \\\n".join((
+            "#define SAMPLE(table, i) ({",
+            "    const u16 *sample;",
+            "    do { sample = &(table)[i]; } while (0);",
+            "    sample;",
+            "})",
+        )) + "\n"
+        text = "\n" + macro + "void f(void) {\n    use(SAMPLE(table, 1), SAMPLE(table, 2));\n}\n"
+        self.assertEqual(c.warnings(c.sites(text)), [c.Site(2, "stmt-expr")])
+        # An ordinary expression macro can capture an argument for repeated reads.
+        capture = "#define SQUARE(x) ({ int value = (x); value * value; })\n"
+        self.assertEqual(warns(capture), [])
+        # A loop with additional statements may do work beyond assigning the result.
+        checked = macro.replace("sample = &(table)[i];", "checkIndex(i); sample = &(table)[i];")
+        self.assertEqual(warns(checked), [])
+
     def test_small_forms(self):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
