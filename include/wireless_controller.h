@@ -80,4 +80,21 @@ static inline void WirelessController_SetOperation(WirelessController *controlle
     controller->operationEntered = 1;
 }
 
+/* Both the manager event and the send-completion callback report parent acknowledgements. */
+#define WIRELESS_RECORD_PARENT_ACK(controller, flags, expectedSlots)                               \
+    do {                                                                                           \
+        u8 *seen = &(controller)->acknowledgedSlots;                                               \
+        int bits = ((flags) << 1) | *seen;                                                         \
+        int expected;                                                                              \
+        (controller)->acknowledgedSlots = bits;                                                    \
+        expected = (expectedSlots);                                                                \
+        if ((bits & expected) == expected) {                                                       \
+            (controller)->waitingForAck = 0;                                                       \
+            (controller)->sendReady = 0;                                                           \
+        } else {                                                                                   \
+            (controller)->waitingForAck = 1;                                                       \
+            (controller)->ackWaitFrames++;                                                         \
+        }                                                                                          \
+    } while (0)
+
 #endif
