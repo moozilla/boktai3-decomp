@@ -24,12 +24,6 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void SetChargeParameter(struct Player *p)
-{
-    u16 *target = &p->actionEighteenParameter;
-    u32 value = 0x16E;
-    *target = value;
-}
 static inline void FireCharge(struct Player *p)
 {
     if (Player_SpawnSelectedAttackProjectile(p))
@@ -62,19 +56,15 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
     u16 *t;
     u16 *r;
     if (Player_ConsumeStateEntry(p)) {
-        u16 *first = &p->statModifierContext.contactTimer;
-        s32 zero = 0;
-        *first = zero;
-        p->statModifierContext.attachedEntry = --zero;
+        p->statModifierContext.contactTimer = 0;
+        p->statModifierContext.attachedEntry = -1;
         Player_SetPendingCallback(p, Player_ReleaseActionEffectOnExit);
     }
     switch (p->tetherPhase) {
         case 0:
             if (ANIMATE(0x26)) {
-                u16 *duration = &p->statModifierContext.chargeDuration;
-                u32 zero = 0;
-                *duration = 60;
-                p->contactCounted = zero;
+                p->statModifierContext.chargeDuration = 60;
+                p->contactCounted = 0;
                 Player_SetActionPhase(p, 1);
             }
             break;
@@ -121,7 +111,7 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
                         *chargeTier = 1;
                     }
                     p->contactMagnitude = 30;
-                    SetChargeParameter(p);
+                    p->actionEighteenParameter = 0x16E;
                     p->actionEighteenDuration = 36;
                     Player_SetActionPhase(p, 3);
                 }
@@ -139,7 +129,7 @@ void Player_UpdateAttachedAttackCharge(struct Player *p)
                         *chargeTier = 1;
                     }
                     p->contactMagnitude = 30;
-                    SetChargeParameter(p);
+                    p->actionEighteenParameter = 0x16E;
                     p->actionEighteenDuration = 36;
                     Sound_PlaySong(0x1F5);
                     Player_SetActionPhase(p, 4);
