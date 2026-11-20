@@ -43,7 +43,9 @@ def render(frame, line, buffer, cursor, selected, origin, error):
     d = ImageDraw.Draw(im)
     dark, dim, accent = "#252321", "#675f55", "#913e35"
     d.text((20,12), "Edit translation", font=face(24,bold=True), fill=dark)
-    key = f'{line["key"]}   /   {ctx["columns"]} columns, {ctx["lines"]} lines'
+    geometry = (f'{ctx["width_px"]} x {ctx["height_px"]} pixels' if ctx["kind"] == "graphic"
+                else f'{ctx["columns"]} columns, {ctx["lines"]} lines')
+    key = f'{line["key"]}   /   {geometry}'
     d.text((880,19), key, anchor="rt", font=face(16), fill=dim)
     im.paste(frame.resize((480,320), Image.Resampling.NEAREST), (20,58))
     x = 520
@@ -56,6 +58,12 @@ def render(frame, line, buffer, cursor, selected, origin, error):
     jp = face(18,japanese=True)
     for i,(a,b) in enumerate(wrap(source, jp, 355)[:6]):
         d.text((x,151+i*25), source[a:b], font=jp, fill=dark)
+    if "preview" in line:
+        with Image.open(line["preview"]) as source_art:
+            crop = source_art.crop(ctx["region"]).convert("RGBA")
+        zoom = min(3, 350/crop.width, 110/crop.height)
+        crop = crop.resize((max(1,int(crop.width*zoom)),max(1,int(crop.height*zoom))), Image.Resampling.NEAREST)
+        im.paste(crop, (x,202), crop)
     script = ctx.get("script") or {}
     provenance = origin or "Awaiting translation"
     d.text((x,326), provenance, font=face(15), fill=dim)
@@ -85,7 +93,7 @@ def render(frame, line, buffer, cursor, selected, origin, error):
 
 def edit(ui, game):
     resolver = game.resolver
-    line = resolver.current_line(game)
+    line = resolver.current_choice(game)
     if not line:
         return True
     row = resolver.memory.db.execute("SELECT english, origin FROM entries WHERE key=?", (line["key"],)).fetchone()
@@ -120,7 +128,8 @@ def edit(ui, game):
                     error = str(exc)
                     continue
                 resolver.source_preview = None
-                game.rewind_line()
+                resolver.original_art = None
+                game.rewind_line(line.get("slot",0))
                 return True
             error = ""
             if event == 8:

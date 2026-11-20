@@ -81,7 +81,7 @@ class ActorArt:
             image = self.library.render(frame, colors)
             ctx.update(width_px=image.width, height_px=image.height)
             path = OUT / "graphics" / f"OBJ-{code}-{index}-ja.png"
-            choices = self.index.translate(resolver, asset, image, ctx, path, MARKED.get(asset,[]), tick)
+            choices = self.index.translate(resolver, game, asset, image, ctx, path, MARKED.get(asset,[]), tick)
             if not choices:
                 return 0
             sig = [1, ctx["rom_sha256"], asset, colors, choices]

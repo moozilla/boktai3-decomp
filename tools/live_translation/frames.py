@@ -166,10 +166,10 @@ class ArtTranslator:
                 source, style, suggestion = recipe
                 recipes = [{"id": "", "style": style, "source": source, "english": suggestion,
                             "box": [0, 0, image.width, image.height]}]
-            choices = self.index.translate(resolver, asset, image, ctx, path, recipes, frame)
+            choices = self.index.translate(resolver, game, asset, image, ctx, path, recipes, frame)
             if not choices:
                 return 0
-            signature = [6, ctx["rom_sha256"], asset, choices, font(16).getname()]
+            signature = [7, ctx["rom_sha256"], asset, choices, font(16).getname()]
             digest = sha256(json.dumps(signature, sort_keys=True).encode()).hexdigest()
             path = OUT / "compiled" / (digest+".cb05")
             if path.exists():
@@ -191,9 +191,13 @@ class ArtTranslator:
                 event = "typeset"
             localized = sprites.Package(blob)
             preview = gallery / f"{code}-{index}-en.png"
-            if event == "typeset" or not preview.exists():
+            exact_preview = path.with_suffix(".png")
+            if not exact_preview.exists():
                 preview_image = localized.render(next(localized.frames()), palettes)
-                write_cache(preview, png(preview_image))
+                write_cache(exact_preview, png(preview_image))
+            pixels = exact_preview.read_bytes()
+            if not preview.exists() or preview.read_bytes() != pixels:
+                write_cache(preview, pixels)
             base = game.install(blob)
             # The original function expects a relocated header. Its only lookup
             # uses index zero in this private one-frame resource.
@@ -201,7 +205,7 @@ class ArtTranslator:
             struct.pack_into("<5I", relocated, 12, *(base+off for off in localized.offs))
             address = game.install(bytes(relocated))
             self.loaded[key,index] = address
-            resolver.record(asset, event=event, digest=digest, frame=frame, **ctx)
+            resolver.record(asset, event=event, digest=digest, preview=str(exact_preview.relative_to(ROOT)), frame=frame, **ctx)
             return address
         except (ValueError, OSError, IndexError, struct.error) as exc:
             self.index.error(asset, str(exc))

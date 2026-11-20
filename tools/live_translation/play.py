@@ -25,6 +25,7 @@ def arguments():
     source = live.add_mutually_exclusive_group()
     source.add_argument("--save", type=Path, help="A battery save or a VBA .sgm checkpoint")
     source.add_argument("--new", action="store_true", help="Start without an existing save")
+    live.add_argument("--inspect", metavar="ART-KEY", help="Enable F1/F2 on this graphic when encountered")
     landing = live.add_mutually_exclusive_group()
     landing.add_argument("--from-boot", action="store_true", help="Show the entire startup")
     landing.add_argument("--title", action="store_true", help="Start on the translated title screen")
@@ -130,6 +131,9 @@ def dispatch(args, memory):
     with (target / "transcript.jsonl").open("w") as log:
         resolver = Localizer(memory, log, enabled=not args.japanese)
         resolver.graphics = ArtTranslator()
+        resolver.inspect_art = getattr(args, "inspect", None)
+        if getattr(args, "title", False) and not resolver.inspect_art:
+            resolver.inspect_art = "graphic/731D/1"
         with closing(Game(resolver, battery(args))) as game:
             if args.cmd == "replay":
                 if route:

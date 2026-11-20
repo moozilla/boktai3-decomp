@@ -46,7 +46,7 @@ def play(game, *, start="title", limit=None):
     game.resolver.bookmarks = True
     try:
         print("Arrows move. X confirms, Z cancels, Enter opens Start. A/S are L/R.\n"
-              "F1 replays the current line in Japanese or English. F2 edits it. Space pauses. Esc exits.", flush=True)
+              "F1 compares Japanese and English. F2 edits the current encounter. Space pauses. Esc exits.", flush=True)
         if start != "boot" and not entrance(game, ui, start):
             return
         game.core.lt_sound(1)
@@ -57,10 +57,9 @@ def play(game, *, start="title", limit=None):
             keys = ui.lt_input()
             if keys < 0:
                 return
-            line = game.resolver.current_line(game)
+            line = game.resolver.current_choice(game)
             if line and keys & 2048:
-                game.resolver.source_preview = None if game.resolver.source_preview is not None else line["id"]
-                game.rewind_line()
+                game.resolver.compare(game, line)
             if line and keys & 4096:
                 from editor import edit
                 if not edit(ui, game):

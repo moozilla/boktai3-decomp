@@ -21,6 +21,9 @@ class Localizer:
         self.bookmarks = False
         self.line = None
         self.source_preview = None
+        self.inspect_art = None
+        self.art_line = None
+        self.original_art = None
         self.graphics = None
         self.actor_art = None
         from backgrounds import MapTranslator
@@ -34,6 +37,24 @@ class Localizer:
         self.seen.add(identity)
         self.transcript.write(json.dumps(dict(key=key, **fields), ensure_ascii=False)+"\n")
         self.transcript.flush()
+
+    def bookmark_art(self, game, key, source, ctx, frame, preview):
+        if key == self.inspect_art and game.core.lt_bookmark(1):
+            self.art_line = {"key": key, "source": source, "context": ctx, "frame": frame,
+                             "preview": preview, "slot": 1}
+
+    def current_choice(self, game):
+        scene = int.from_bytes(game.read(0x030039F0, 2), "little")
+        if self.art_line and self.art_line["context"]["scene"] == scene:
+            return self.art_line
+        return self.current_line(game)
+
+    def compare(self, game, choice):
+        if choice.get("slot") == 1:
+            self.original_art = None if self.original_art else choice["key"]
+        else:
+            self.source_preview = None if self.source_preview is not None else choice["id"]
+        game.rewind_line(choice.get("slot", 0))
 
     def current_line(self, game):
         if not self.line or self.line["id"] != self.dialogue_id:
@@ -95,18 +116,22 @@ class Localizer:
             kind = {2:"menu",4:"name",5:"ticker",8:"substitution",9:"direct-playback"}[hook]
         if not source or not source.strip() or not re.search(r"[^\x00-\x7f]",CONTROLS.sub("",source)):
             return 0
-        ctx = c.context(game,scene,proc,lr,kind,source,sid,arg if hook==2 else 0,aux if hook==2 else None)
+        ctx = c.context(game,scene,proc,lr,kind,source,sid,arg if hook==2 else 0,(aux & 255) if hook==2 else None)
+        if hook == 2 and aux >> 8:
+            w, h = (aux >> 8) & 255, (aux >> 16) & 255
+            ctx.update(window=[arg,aux & 255,w,h], columns=w, lines=max(1,h//2),
+                       layout_basis="Menu_EraseRect at the draw origin")
         if hook==1 and 0x02000000<=aux<0x02040000:
             x,y,w,h=game.read(aux+4,4)
             if 1<=w<=30 and 1<=h<=20:
                 ctx.update(window=[x,y,w,h],columns=w,lines=max(1,h//2))
-        if kind == "name" or (kind == "menu" and ctx["caller"] == "GameStart_DrawSaveInfo" and (arg, aux) == (8, 7)):
+        if kind == "name" or (kind == "menu" and ctx["caller"] == "GameStart_DrawSaveInfo" and (arg, aux & 255) == (8, 7)):
             # A custom save's player name belongs to the player; render only
             # explicitly approved spellings in the local glossary.
             if source.strip() not in self.memory.glossary():
                 return 0
         if self.bookmarks and kind == "dialogue" and ctx.get("lines", 0) > 1:
-            if game.core.lt_bookmark():
+            if game.core.lt_bookmark(0):
                 self.line = {"key": key, "id": sid, "source": source, "context": ctx, "frame": frame,
                              "window": int.from_bytes(game.read(0x020000DC, 4), "little")}
         enabled = self.enabled and not (self.source_preview is not None and

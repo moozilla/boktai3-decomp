@@ -92,6 +92,7 @@ class Catalog:
                 label = re.search(r"<LABEL=([^>]+)>",text)
                 if label:
                     ctx["speaker_label"] = label[1]
+                    ctx["speaker_label_text_id"] = sid
                     break
             ctx["next_bank_lines"] = [self.text(i) for i in range(key+1,min(key+3,len(self.words)))]
         return ctx

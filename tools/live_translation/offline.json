@@ -270,6 +270,10 @@
     "text/9693": "Kanagawa",
     "text/9694": "Ogasawara",
     "text/9343": "No save data",
-    "text/9345": "Enter a password from Boktai 2?"
+    "text/9345": "Enter a password from Boktai 2?",
+    "text/1205": "Sealed Prison [B1F]",
+    "text/1206": "Sealed Prison [B2F]",
+    "text/1207": "Sealed Prison [B3F]",
+    "text/1208": "Sealed Prison [B4F]"
   }
 }

@@ -135,7 +135,7 @@ class MapTranslator:
             variant = "-"+("+".join(active_sets)) if active_sets else ""
             stem = f"MP-{code}-{index}{variant}-{palette_name.replace(' ', '-')}"
             path = gallery / (stem+"-ja.png")
-            selected = self.index.translate(resolver, asset, image, ctx, path, spec.get("regions", []), frame)
+            selected = self.index.translate(resolver, game, asset, image, ctx, path, spec.get("regions", []), frame)
             choices = [(r["box"], word, r.get("font") or min(15,r["box"][3]-r["box"][1])) for r,word in selected]
             if not choices:
                 return 0

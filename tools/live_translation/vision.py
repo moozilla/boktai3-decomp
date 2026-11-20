@@ -80,7 +80,7 @@ class ArtIndex:
             self.db.execute("UPDATE artwork SET state=?,origin=?,note=NULL WHERE asset=?",
                             ("lettering" if regions else "no lettering", origin, asset))
 
-    def translate(self, resolver, asset, image, ctx, preview, recipes, frame):
+    def translate(self, resolver, game, asset, image, ctx, preview, recipes, frame):
         from runtime import ROOT
         from translator import PROVIDER
         if not preview.exists():
@@ -93,7 +93,7 @@ class ArtIndex:
                 resolver.record(key, event="japanese", source=r["source"], frame=frame, **ctx)
             return []
         state = self.status(asset)["state"]
-        if state == "unexamined":
+        if state == "unexamined" or (state == "review" and not self.regions(asset)):
             if recipes:
                 self.mark(asset, recipes, PROVIDER)
             elif resolver.memory.model:
@@ -109,6 +109,10 @@ class ArtIndex:
             region.update({k:v for k,v in authored.get(rid, {}).items() if k in ("font", "style")})
             layout = dict(ctx, region=box, width_px=crop.width, height_px=crop.height,
                           typography=region.get("style", "sampled"))
+            resolver.bookmark_art(game, key, region["source"], layout, frame, preview)
+            if resolver.original_art == key:
+                resolver.record(key, source=region["source"], event="japanese", frame=frame, **layout)
+                continue
             english, origin, event = resolver.memory.choose(key, region["source"], layout, png(crop),
                                                             region["english"], region["origin"])
             resolver.record(key, source=region["source"], english=english, provenance=origin,

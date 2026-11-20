@@ -74,7 +74,14 @@ def lettering(source, english, style):
                 if m.getpixel((x,y)):
                     cols=blue if x < .20*m.width else bands
                     out.putpixel((x0+x,y0+y),tuple(round(a+(b-a)*mix) for a,b in zip(cols[index],cols[index+1]))+(255,))
-        return out
+        # The widget extends past x=240. Keep the translated ink inside the
+        # original wordmark's ink bounds, including the outline and extrusion.
+        left, top, right, bottom = source.getbbox()
+        ink = out.crop(out.getbbox())
+        ink.thumbnail((right-left, bottom-top), Image.Resampling.NEAREST)
+        aligned = Image.new("RGBA", out.size)
+        aligned.paste(ink, (left+(right-left-ink.width)//2, top+(bottom-top-ink.height)//2))
+        return aligned
     if style=="subtitle":
         # Its separate rule and glint are part of the design, not lettering.
         out.paste(source.crop((0,h-3,w,h)),(0,h-3))

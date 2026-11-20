@@ -70,15 +70,21 @@ class Game:
         return self.installed[data]
 
     def step(self, n=1, keys=0):
+        if n < 0:
+            raise ValueError("Frame count must be nonnegative")
         self.core.lt_step(n, keys)
         self.frame += n
         if self.error:
             raise self.error
 
-    def rewind_line(self):
-        frame = self.core.lt_rewind_line()
+    def rewind_line(self, slot=0):
+        if slot == 1:
+            for renderer in (self.resolver.graphics, self.resolver.backgrounds, self.resolver.actor_art):
+                if renderer:
+                    renderer.loaded.clear()
+        frame = self.core.lt_rewind(slot)
         if frame < 0:
-            raise ValueError("No dialogue rewind point is available")
+            raise ValueError("This encounter has no rewind point")
         self.frame = frame
 
     def tap(self, key):
@@ -93,18 +99,28 @@ class Game:
         self.tmp.cleanup()
 
 
-def prison_save():
-    """Original opening cutscene, reached via the documented scene entrance."""
+def checkpoint(number, scene, story, entrance):
+    """Use the matching story checkpoint or synthesize its scene entrance."""
+    for directory in (Path(saves.BANK), Path.home() / "git/boktai3trans/saves"):
+        checkpoint = next(directory.glob(f"{number:04d} *.sgm"), None)
+        if checkpoint:
+            return checkpoint
     OUT.mkdir(parents=True, exist_ok=True)
     import struct
     regs = saves.current(saves.load(saves.TEMPLATE))
     v, g = bytearray(regs["vars"]), bytearray(regs["game"])
-    struct.pack_into("<h", v, 0x3C, 2)
-    struct.pack_into("<h", v, 0x70, 1)
-    struct.pack_into("<I", g, 0x5A4, 2698)
-    path = OUT / "prison.sav"
+    struct.pack_into("<h", v, 0x3C, story)
+    struct.pack_into("<h", v, 0x70, entrance)
+    struct.pack_into("<I", g, 0x5A4, scene)
+    if number == 2:
+        struct.pack_into("<HH", g, 0x5AC, 0, 0)  # File-menu sequence: opening cell, B4F.
+    path = OUT / f"checkpoint-{number:04d}.sav"
     with tempfile.TemporaryDirectory(dir=OUT) as tmp:
         staged = Path(tmp) / "prison.sav"
         saves.write_sav(dict(regs, vars=v, game=g), staged)
         staged.replace(path)
     return path
+
+
+def prison_save():
+    return checkpoint(2, 2698, 2, 1)
