@@ -376,14 +376,19 @@ static inline void setFacing(ActorAnimation *p, int angle)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
+static inline void SceneActorState_EnterPhase(struct StateActor *actor, u32 phase)
+{
+    actor->actionPhase = phase;
+    actor->actionTimer = 0;
+    actor->actionEnter = 1;
+}
+
 static inline void SceneActorState_StartAction(struct StateActor *actor, u32 mode, u32 index,
                                                u32 phase)
 {
     actor->actionMode = mode;
     actor->actionIndex = index;
-    actor->actionPhase = phase;
-    actor->actionTimer = 0;
-    actor->actionEnter = 1;
+    SceneActorState_EnterPhase(actor, phase);
 }
 
 void SceneActors_StartDisappearEffect(u32 *position)
@@ -820,68 +825,60 @@ fail:
 
 // confidence=low: chooses the next action phase from the reaction kind and flash state.
 #define SceneActorState_SelectReactionPhase sub_08022DBC
-static inline s32 phaseValue(u8 *p)
+static inline s32 SceneActorState_GetHealthRatio(const struct StateActor *actor)
 {
-    s32 value = *p;
-    return value;
+    s32 ratio = actor->healthRatio;
+    return ratio;
 }
-static inline void enterPhase(u8 *p, u32 phase)
-{
-    u8 *field = p + 0xae;
-    u32 zero = 0;
-    *field = phase;
-    *(u32 *)(p + 0xc4) = zero;
-    p[0xb0] = 1;
-}
+
 void SceneActorState_SelectReactionPhase(u8 *p)
 {
-    u8 *actor = p;
-    if (*(u32 *)(p + 0x358) == 3) {
-        if (p[0x3b9]) {
-            enterPhase(p, 14);
+    struct StateActor *state = (struct StateActor *)p;
+    struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
+    if (actor->graphics.stepTableKind == 3) {
+        if (actor->graphics.flashPhase) {
+            SceneActorState_EnterPhase(state, 14);
             return;
         }
     } else {
-        if (p[0x3b9] == 3)
+        if (actor->graphics.flashPhase == 3)
             SceneActors_StopBackgroundFlash(p);
-        else if (p[0x3b9]) {
-            enterPhase(p, 14);
+        else if (actor->graphics.flashPhase) {
+            SceneActorState_EnterPhase(state, 14);
             return;
         }
     }
-    switch (*(u16 *)(actor + 0x3b2)) {
+    switch (actor->graphics.stepTableValue) {
         case 0:
-            enterPhase(p, 9);
+            SceneActorState_EnterPhase(state, 9);
             return;
         case 1:
-            enterPhase(p, 10);
+            SceneActorState_EnterPhase(state, 10);
             return;
         case 2:
-            if (*(u32 *)(actor + 0x358) != 3 && phaseValue(p + 0xe1) <= 63) {
-                u8 *flag = actor + 0x394;
-                *flag = 1;
+            if (actor->graphics.stepTableKind != 3 && SceneActorState_GetHealthRatio(state) <= 63) {
+                actor->graphics.particleFlag = 1;
             } else {
-                u8 *flag = actor + 0x394;
-                *flag = 0;
+                actor->graphics.particleFlag = 0;
             }
-            enterPhase(p, 2);
+            SceneActorState_EnterPhase(state, 2);
             return;
         case 3:
-            enterPhase(p, 11);
+            SceneActorState_EnterPhase(state, 11);
             return;
         case 4:
-            if (phaseValue(p + 0xe1) <= 63) {
-                enterPhase(p, 14);
+            if (SceneActorState_GetHealthRatio(state) <= 63) {
+                SceneActorState_EnterPhase(state, 14);
                 return;
             } else {
-                enterPhase(p, 11);
+                SceneActorState_EnterPhase(state, 11);
                 return;
             }
         case 5:
-            enterPhase(p, 15);
+            SceneActorState_EnterPhase(state, 15);
             return;
         case 6:
-            enterPhase(p, 16);
+            SceneActorState_EnterPhase(state, 16);
             return;
     }
 }
