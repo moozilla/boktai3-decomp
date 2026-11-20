@@ -72,12 +72,7 @@ void ActorStatus_UpdatePlayerApproach(struct VanargandAttackPair *boss,
     if (p->entered) {
         p->entered = 0;
         SetAnimation(p, (void *)owner->effectResource, 11, 0);
-        {
-            u32 zero = 0;
-            p->actionCounters[0] = zero;
-            p->actionCounters[1] = zero;
-        }
-        p->actionEntered = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     switch (p->actionCounters[0]) {
         case 0: {
