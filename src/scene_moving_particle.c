@@ -254,17 +254,12 @@ u32 SceneMovingParticle_UpdatePool(struct MovingParticlePool *pool)
 
 u32 SceneMovingParticle_OnPoolDestroy(struct MovingParticlePool *pool)
 {
-    s32 i = 0;
-    u32 *occupied = &pool->occupied;
-    struct MovingParticleEntry *particle = pool->entries;
-    for (; i < 26; particle++, i++) {
-        if (MovingParticle_IsOccupied(occupied, i))
-            Effect_Remove(particle);
+    s32 i;
+    for (i = 0; i < 26; i++) {
+        if (MovingParticle_IsOccupied(&pool->occupied, i))
+            Effect_Remove(&pool->entries[i].sprite);
     }
-    {
-        u32 z = 0;
-        gSpriteBurstManager = z;
-    }
+    gSpriteBurstManager = 0;
     return 0;
 }
 
