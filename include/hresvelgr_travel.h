@@ -10,9 +10,11 @@ struct HresvelgrTravelActor {
     u8 facing;
     u8 pad52[2];
     struct SceneVec position, velocity;
-    u8 pad64[0x38];
+    u8 pad64[0x9A - 0x64];
+    u8 vulnerable;
+    u8 pad9B;
     u32 flags;
-    u8 padA0[2];
+    u8 padA0, behaviorFlags;
     u8 phase, animationCompletions;
     u32 phaseFrame;
     u8 facing4, facing8, requestedAnimation, currentAnimation;
@@ -22,7 +24,8 @@ struct HresvelgrTravelActor {
     u8 targetHeading;
     u8 padCD[0x104 - 0xCD];
     void *callback;
-    u8 pad108[8];
+    u8 pad108[4];
+    struct Player *player;
     struct SceneVec *origin;
     s8 savedHeading;
     u8 pad115[0x5F];
@@ -38,7 +41,8 @@ struct HresvelgrTravelActor {
     u8 side;
     u8 pad32C[4];
     u16 chargeCount;
-    u8 pad332[6];
+    u8 pad332[4];
+    u16 burstCount;
     struct SceneVec shotOffsets[3];
     u8 pad350[0x383 - 0x350];
     u8 behaviorFinished;
@@ -52,6 +56,17 @@ struct HresvelgrTravelActor {
     u8 pad624[0x704 - 0x624];
     u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
 };
+
+static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *actor)
+{
+    actor->vulnerable = 1;
+    if (actor->actionEnter) {
+        actor->actionEnter = 0;
+        actor->finished = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
 
 s32 Hresvelgr_RefreshTarget(struct HresvelgrTravelActor *);
 
