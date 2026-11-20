@@ -5545,6 +5545,7 @@ addr,name,mode,confidence,source,notes
 08140748,Player_BeginTerrainFacingAction,thumb,low,src-alias,
 08140834,Player_RequestNearbyEffectTarget,thumb,low,src-alias,Requests a nearby repeated effect and initializes its target to the current grid cell center when available
 081408AC,Player_BeginTerrainRecovery_081408AC,thumb,low,src-alias,
+081409BC,Player_IsTurnTerrainBlocked,thumb,low,src-alias,Tentative: tests candidate height and terrain occupancy during locked turning
 08140AC8,Player_SelectLockedTurnDirection,thumb,low,src-alias,
 08140CC4,Player_UpdateLockedMovement,thumb,low,src-alias,
 08140F40,Player_GetForceDirection,thumb,low,src-alias,
