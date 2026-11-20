@@ -376,15 +376,11 @@ void *Background_CreateFromScript(u32 id)
 
 s32 Background_FindMapId(struct BackgroundResource *resource, u16 id)
 {
-    struct BackgroundMapEntry *entry = (struct BackgroundMapEntry *)resource->maps;
+    const struct BackgroundMapEntry *entries = (const struct BackgroundMapEntry *)resource->maps;
     s32 i;
     for (i = 0; i < resource->count; i++) {
-        if (entry->id == id) {
+        if (entries[i].id == id)
             return i;
-        }
-        do {
-            entry++;
-        } while (0);
     }
     return 0;
 }
