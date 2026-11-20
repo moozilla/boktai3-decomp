@@ -358,6 +358,7 @@ addr,name,mode,confidence,source,notes
 0801150C,Text_CopyWithoutTags,thumb,low,src-alias,
 08011578,GlyphTable_FindPair,thumb,low,src-alias,
 080115A4,Password_EncodeSymbols,thumb,low,src-alias,
+080115DC,Password_ValidateNameGlyphs,thumb,low,src-alias,Checks decoded name bytes against both glyph pages and substitutes the fallback glyph
 08011660,NameEntry_DecodeAndValidate,thumb,low,src-alias,
 08011714,Password_ApplyDecoded,thumb,low,src-alias,
 08011794,Password_DecodeEntry,thumb,low,src-alias,"Allocates a PasswordEntry, copies/encodes the input text, then decodes and validates it before applying the result to output; the per-entry decode wra"

@@ -68,7 +68,7 @@ s32 Password_EncodeSymbols(struct PasswordEntry *s)
     return 0;
 }
 
-int sub_080115DC(struct PasswordEntry *e)
+int Password_ValidateNameGlyphs(struct PasswordEntry *e)
 {
     int i;
     for (i = 0; i < 5; i++) {
@@ -107,7 +107,7 @@ int NameEntry_DecodeAndValidate(struct PasswordEntry *m)
     EncodedRecord_DecodeAlternateFields(decoded, m, m->key);
     if (m->version != 1)
         return -2;
-    if (!m->name[0] || sub_080115DC(m))
+    if (!m->name[0] || Password_ValidateNameGlyphs(m))
         return -3;
     return 0;
 }
