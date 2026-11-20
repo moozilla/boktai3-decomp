@@ -1,22 +1,17 @@
-#include "global.h"
-void SceneObject_AnimateActive(void);
-void SceneObjects_BeginActivation(u8 *p, u16 id)
+#include "scene_object_controller.h"
+
+void SceneObject_AnimateActive(struct SceneObjSlot *);
+
+void SceneObjects_BeginActivation(struct SceneObjPool *pool, u16 id)
 {
-    int i = 0;
-    if (i < *(u16 *)(p + 0x1a)) {
-        u8 **base = (u8 **)(p + 0x42c);
-        int two;
-        two = 2;
-        do {
-            u8 *s = *base + 140 * i;
-            if (*(u16 *)(s + 0x34) == id && (s[0x37] == 0 || s[0x37] == 3) && !(s[0x36] & 1)) {
-                s[0x41] = 1;
-                s[0x37] = two;
-                *(void **)(s + 0x30) = SceneObject_AnimateActive;
-                s[0x39] = 0;
-                s[0x3a] = 0;
-            }
-            i++;
-        } while (i < *(u16 *)(p + 0x1a));
+    int i;
+    for (i = 0; i < pool->count; i++) {
+        struct SceneObjSlot *slot = &pool->slots[i];
+        if (slot->id == id &&
+            (slot->variant == SCENE_OBJ_INACTIVE || slot->variant == SCENE_OBJ_DEACTIVATING) &&
+            !(slot->kind & 1)) {
+            slot->b41 = 1;
+            SceneObjSlot_SetAnimation(slot, SCENE_OBJ_ACTIVATING, SceneObject_AnimateActive, 0);
+        }
     }
 }
