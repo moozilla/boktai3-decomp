@@ -10,16 +10,12 @@ void ActorController_UpdateRetreatMotion(struct SceneCombatActor *actor)
     u8 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             ActorController_SetAnimation(actor, &gUnk_0824EED0[((actor->heading + 0x60) >> 6) & 3],
                                          2);
             (*phase)++;
             actor->actionReady = initialPhase;
             actor->animationDuration = 12;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 ActorController_ClearMotionFlags(&actor->colliderGroup.motion, 1);
             }
@@ -44,14 +40,10 @@ void ActorController_UpdateTimedMotion(struct SceneCombatActor *actor)
     u8 initialPhase = *phase;
     switch (initialPhase) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, &gUnk_0824EEE0[((actor->heading + 0x60) >> 6) & 3]);
             (*phase)++;
             actor->actionReady = initialPhase;
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[2], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[1], four);
-            ActorController_ClearColliderFlags(&actor->colliderGroup.colliders[3], four);
-            ActorController_SetColliderFlags(&actor->colliderGroup.colliders[0], four);
+            ActorController_SelectDefenseColliders(actor);
             {
                 struct ActorControllerMotion *motion = &actor->colliderGroup.motion;
                 u32 one = 1;
