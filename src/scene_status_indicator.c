@@ -1,3 +1,4 @@
+#include "contact_position.h"
 #include "global.h"
 #include "ram.h"
 #include "scene_status_indicator.h"
@@ -6,9 +7,7 @@
 #include "scene_vec.h"
 #include "engine_globals.h"
 
-
 /* ScriptedParticle_ResetSingleton: Clears the global pool pointer without removing sprites */
-
 
 void ScriptedParticle_ResetSingleton(void)
 {
@@ -16,7 +15,6 @@ void ScriptedParticle_ResetSingleton(void)
 }
 
 /* ScriptedParticle_RunIdleHook: Empty hook beside the pool lifecycle functions; intended role is tentative */
-
 
 void ScriptedParticle_RunIdleHook(void)
 {
@@ -82,7 +80,6 @@ static inline u32 TestMask(u32 *p, u32 mask)
 }
 
 // confidence=low: blinks an indicator for the selected player's active mode.
-
 
 void SceneStatusIndicator_UpdateBlink(void *owner, struct StatusSlot *input)
 {
@@ -169,7 +166,6 @@ SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
 {
     struct SceneStatusIndicatorManager *manager = gSceneStatusIndicatorManager;
     struct SceneStatusIndicator *entry;
-    u32 one;
     if (!manager) {
         manager = (struct SceneStatusIndicatorManager *)BlinkingEffect_EnsurePool();
         if (!manager)
@@ -181,15 +177,14 @@ SceneStatusIndicator_Create(struct SceneStatusIndicatorPosition *position)
     entry->active = 1;
     entry->state = 0;
     entry->blinkTimer = 0;
-    one = 1;
-    entry->reset = one;
+    entry->reset = 1;
     *(struct SceneStatusIndicatorPosition *)&entry->position = *position;
     entry->position.vector.y += 30;
     ParticleSprite_Initialize(entry, manager->resource, 0);
     Effect_SetOrigin(entry, -8, -8);
     SpriteDrawable_SelectTileFrame(entry, manager->resource, 52);
     entry->flags |= 1;
-    entry->mode = one;
+    entry->mode = 1;
     return entry;
 }
 
@@ -241,17 +236,12 @@ static inline u8 SceneStatusIndicator_TestMask(u32 *mask, s32 index)
 
 u32 BlinkingEffect_DestroyPool(struct SceneStatusIndicatorManager *manager)
 {
-    s32 i = 0;
-    u32 *allocated = &manager->allocated;
-    struct SceneStatusIndicator *entry = manager->entries;
-    for (; i < 12; entry++, i++) {
-        if (SceneStatusIndicator_TestMask(allocated, i))
-            Effect_Remove(entry);
+    s32 i;
+    for (i = 0; i < 12; i++) {
+        if (SceneStatusIndicator_TestMask(&manager->allocated, i))
+            Effect_Remove(&manager->entries[i]);
     }
-    {
-        u32 z = 0;
-        gSceneStatusIndicatorManager = z;
-    }
+    gSceneStatusIndicatorManager = 0;
     return 0;
 }
 
@@ -292,7 +282,6 @@ void BlinkingEffect_ResetSingleton(void)
 
 /* BlinkingEffect_RunIdleHook: Empty hook beside the effect pool lifecycle functions; intended role is tentative */
 
-
 void BlinkingEffect_RunIdleHook(void)
 {
 }
@@ -301,29 +290,37 @@ void BlinkingEffect_RunIdleHook(void)
 
 #define BouncingParticle_HideSprite Sprite_UnlinkFromList
 
-struct BouncingParticle {
+struct BurstSpark {
     u32 flags;
-    u8 queued, unknown5[11];
+    u8 queued, pad5[2], priority;
+    u8 pad8[4];
+    void *animation;
     u16 frame;
-    u8 unknown12[10];
-    u16 x, y, z;
-    u8 unknown22[10];
-    u16 velocityX, velocityY, velocityZ, unknown32;
-    u8 unknown34;
-    u8 delay;
+    u8 pad12[0xA];
+    struct ContactPosition position;
+    u8 pad24[8];
+    struct ContactPosition velocity;
+    u8 direction, delay;
     u16 stepInterval, age;
-    u8 unknown3A[2], state, frameShift;
+    u8 pad3A[2], state, frameShift, slotIndex, allocated;
+};
+
+struct BurstSparkPool {
+    u8 pad0[0x18];
+    u8 animation[0x1C];
+    u8 unknown34[4];
+    struct BurstSpark entries[128];
 };
 
 s32 Mod(s32, s32);
 
-void Sprite_LinkToList(struct BouncingParticle *, s32);
+void Sprite_LinkToList(struct BurstSpark *, s32);
 
-void Sprite_UnlinkFromList(struct BouncingParticle *, u32);
+void Sprite_UnlinkFromList(struct BurstSpark *, u32);
 
-void BouncingParticle_Update(void *unused, struct BouncingParticle *particle)
+void BouncingParticle_Update(void *unused, struct BurstSpark *particle)
 {
-    struct BouncingParticle *sprite = particle;
+    struct BurstSpark *sprite = particle;
     s32 frame;
     if ((s8)particle->delay > 0) {
         particle->delay--;
@@ -340,77 +337,41 @@ void BouncingParticle_Update(void *unused, struct BouncingParticle *particle)
         } else {
             if (!particle->queued)
                 Sprite_LinkToList(particle, 0);
-            sprite->x += sprite->velocityX;
-            sprite->y += sprite->velocityY;
-            sprite->z += sprite->velocityZ;
-            sprite->velocityX = (s16)sprite->velocityX >> 1;
-            sprite->velocityZ = (s16)sprite->velocityZ >> 1;
+            sprite->position.x += sprite->velocity.x;
+            sprite->position.y += sprite->velocity.y;
+            sprite->position.z += sprite->velocity.z;
+            sprite->velocity.x = (s16)sprite->velocity.x >> 1;
+            sprite->velocity.z = (s16)sprite->velocity.z >> 1;
             sprite->frame = frame;
         }
     }
 }
 
-void BurstSpark_ReleaseSlot(u32 a, u8 *p)
+void BurstSpark_ReleaseSlot(u32 unused, struct BurstSpark *p)
 {
-    if (p[4] != 0)
+    if (p->queued)
         Sprite_Remove(p);
-    p[0x3c] = 0;
-    Memory_Clear(p, 0x40);
+    p->state = 0;
+    Memory_Clear(p, sizeof(*p));
 }
 
-u8 *BurstSpark_AllocateSlot(u8 *p)
+struct BurstSpark *BurstSpark_AllocateSlot(struct BurstSparkPool *pool)
 {
-    s32 i = 0;
-    u32 one = 1;
-    u8 *res;
-    u8 *r = p + 0x76;
-    u8 *q = p + 0x38;
-    do {
-        if (r[1] == 1) {
-            r += 0x40;
-            q += 0x40;
-            i++;
-            continue;
+    s32 i;
+    for (i = 0; i < 128; i++) {
+        struct BurstSpark *entry = &pool->entries[i];
+        if (entry->allocated != 1) {
+            entry->slotIndex = i;
+            entry->allocated = 1;
+            return entry;
         }
-        r[0] = i;
-        r[1] = one;
-        res = q;
-        goto end;
-    } while (i <= 0x7f);
-    res = 0;
-end:
-    return res;
+    }
+    return NULL;
 }
-
-struct SparkPosition {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
-
-struct BurstSpark {
-    u32 flags;
-    u8 pad4[3], priority;
-    u8 pad8[4];
-    void *animation;
-    u16 frame;
-    u8 pad12[0xA];
-    struct SparkPosition position;
-    u8 pad24[8];
-    struct SparkPosition velocity;
-    u8 direction, delay;
-    u16 speed, timer;
-    u8 pad3A[2], active, mode, pad3E[2];
-};
-
-struct BurstSparkPool {
-    u8 pad0[0x18];
-    u8 animation[0x1C];
-};
 
 extern const s16 gUnk_086149C4[];
 
 u8 *BurstSpark_EnsurePool(void);
-
-u8 *BurstSpark_AllocateSlot(u8 *);
 
 void Sprite_InitUnlinked(void *, void *, s32);
 
@@ -448,14 +409,13 @@ static inline s32 Scaled(s32 value, s32 speed)
 
 // confidence=low: creates a randomized radial spark with optional palette selection.
 
-
-s32 BurstSpark_Create(const struct SparkPosition *position, s32 priority, s32 delay, s32 direction,
-                      s32 speed, s32 mode, s32 palette)
+s32 BurstSpark_Create(const struct ContactPosition *position, s32 priority, s32 delay,
+                      s32 direction, s32 speed, s32 mode, s32 palette)
 {
     struct BurstSparkPool *pool;
     struct BurstSpark *p, *sprite;
     const u16 *table;
-    struct SparkPosition *velocity;
+    struct ContactPosition *velocity;
     if (!position)
         return 0;
     pool = gBurstSparkPool;
@@ -464,7 +424,7 @@ s32 BurstSpark_Create(const struct SparkPosition *position, s32 priority, s32 de
         if (!pool)
             return 0;
     }
-    p = (struct BurstSpark *)BurstSpark_AllocateSlot((u8 *)pool);
+    p = BurstSpark_AllocateSlot(pool);
     if (!p)
         return 0;
     sprite = p;
@@ -473,18 +433,18 @@ s32 BurstSpark_Create(const struct SparkPosition *position, s32 priority, s32 de
     sprite->flags &= ~1;
     sprite->priority = priority;
     sprite->position = *position;
-    sprite->active = 1;
-    sprite->timer = 0;
+    sprite->state = 1;
+    sprite->age = 0;
     sprite->direction = direction;
     table = (const u16 *)RANDOM_TABLE_ADDR;
     sprite->delay = (RandomValue(table) & 7) + delay;
-    sprite->speed = (RandomValue(table) & 7) + 1;
+    sprite->stepInterval = (RandomValue(table) & 7) + 1;
     velocity = &sprite->velocity;
     velocity->x = Scaled(gUnk_086149C4[(direction + 64) & 255], speed);
     velocity->y = 0;
     velocity->z = Scaled(gUnk_086149C4[direction & 255], speed);
     p->velocity.y = LastRandom() & 31;
-    p->mode = mode;
+    p->frameShift = mode;
     {
         s32 test = palette;
         if (test > 0) {
@@ -498,27 +458,15 @@ s32 BurstSpark_Create(const struct SparkPosition *position, s32 priority, s32 de
 
 #define gEffectPoolUpdateCallbacks gUnk_08610764
 
-struct BurstSparkEntry {
-    u8 unknown[0x3C];
-    u8 kind;
-    u8 unknown3D[2];
-    u8 active;
-};
-
-struct BurstSparkManager {
-    u8 unknown[0x38];
-    struct BurstSparkEntry effects[128];
-};
-
 extern void *gUnk_08610764[];
 
 s32 sub_08249240(void *, void *, void *);
 
-s32 EffectPool_UpdateActive(struct BurstSparkManager *pool)
+s32 EffectPool_UpdateActive(struct BurstSparkPool *pool)
 {
     void **callbacks = gUnk_08610764;
-    struct BurstSparkEntry *effect = pool->effects;
-    u8 *state = &effect->kind;
+    struct BurstSpark *effect = pool->entries;
+    u8 *state = &effect->state;
     s32 i = 127;
     do {
         if (state[3] == 1)
@@ -529,19 +477,18 @@ s32 EffectPool_UpdateActive(struct BurstSparkManager *pool)
     return 0;
 }
 
-u32 BurstSpark_DestroyPool(u8 *p)
+u32 BurstSpark_DestroyPool(struct BurstSparkPool *pool)
 {
-    u8 *q = p + 0x38;
-    u8 *r = p + 0x77;
-    s32 n = 0x7f;
+    struct BurstSpark *entry = pool->entries;
+    u8 *allocated = &entry->allocated;
+    s32 i = 127;
     u32 z;
     do {
-        if (*r == 1 && q[4] != 0)
-            Sprite_Remove(q);
-        q += 0x40;
-        r += 0x40;
-        n--;
-    } while (n >= 0);
+        if (*allocated == 1 && entry->queued)
+            Sprite_Remove(entry);
+        entry++;
+        allocated += sizeof(*entry);
+    } while (--i >= 0);
     z = 0;
     gBurstSparkPool = z;
     return z;
@@ -556,9 +503,9 @@ s32 BurstSpark_InitPool(u8 *p)
 
 s32 BurstSpark_InitPool(u8 *);
 
-s32 EffectPool_UpdateActive(struct BurstSparkManager *);
+s32 EffectPool_UpdateActive(struct BurstSparkPool *);
 
-u32 BurstSpark_DestroyPool(u8 *);
+u32 BurstSpark_DestroyPool(struct BurstSparkPool *);
 
 u8 *BurstSpark_EnsurePool(void)
 {
