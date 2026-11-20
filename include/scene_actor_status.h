@@ -1,6 +1,7 @@
 #ifndef GUARD_SCENE_ACTOR_STATUS_H
 #define GUARD_SCENE_ACTOR_STATUS_H
 #include "scene_actor_chase_reaction.h"
+#include "scene_actor_drawable_flags.h"
 #include "player.h"
 #include "global.h"
 #include "render.h"
@@ -111,41 +112,6 @@ static inline u8 ActorStatus_IsDown(void *object)
         ActorStatus_HasStatusFlags(actor, 0x20000) || actor->base.health <= 0)
         return 1;
     return 0;
-}
-
-static inline void ActorStatus_SetDrawableFlags(struct ChaseActor *actor, u32 bits)
-{
-    if (actor->base.drawableKind == 0)
-        ((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags |= bits;
-    else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-        tile->flags |= bits;
-    }
-}
-
-static inline void ActorStatus_ClearTileFlags(struct SceneInputWidget *tile, u32 bits)
-{
-    u32 keep = ~bits;
-    tile->flags &= keep;
-}
-
-static inline void ActorStatus_ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
-{
-    if (actor->base.drawableKind == 0)
-        SceneActorChase_ClearWordFlags(
-            &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
-    else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-        ActorStatus_ClearTileFlags(tile, bits);
-    }
-}
-
-static inline void ActorStatus_SetBodyBit(struct ChaseActor *actor, u32 on)
-{
-    if (on)
-        ActorStatus_SetDrawableFlags(actor, 1);
-    else
-        ActorStatus_ClearDrawableFlags(actor, 1);
 }
 
 static inline void ActorStatus_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
