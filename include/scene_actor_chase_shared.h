@@ -266,6 +266,23 @@ static inline u16 SceneActorChase_QueryMotionFlagComponent(struct ChaseActor *ac
         (struct SceneActorChaseFlags16 *)&actor->base.motionFlags, mask);
 }
 
+static inline u16 *SceneActorChase_PrepareAnimationScale(struct ChaseActor *actor, u16 motionMask)
+{
+    u16 *scale;
+    if (SceneActorChase_QueryMotionFlagComponent(actor, motionMask)) {
+        u16 *field = &actor->base.field2C2;
+        *field = 0x40;
+        scale = field;
+    } else {
+        u16 *field = &actor->base.field2C2;
+        u16 durationScale = *field;
+        scale = field;
+        if (durationScale == 0)
+            *scale = 0x40;
+    }
+    return scale;
+}
+
 static inline void SceneActorChase_ClearMotionFlags(struct ChaseActor *actor, u32 bits)
 {
     u32 mask = ~bits;
