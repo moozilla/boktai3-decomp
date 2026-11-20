@@ -8,7 +8,6 @@ s32 NavMesh_ConsumeProbeEvent(void *);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, u32);
 u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, u32);
 // confidence=low: selects control behavior after a route descriptor completes.
-#define SceneActorRoute_UpdateRouteCompletion sub_08131044
 
 static inline void State(struct ChaseActor *a, u32 state, u32 phase, u32 behavior, u32 zero)
 {
