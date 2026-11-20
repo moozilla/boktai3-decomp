@@ -36,10 +36,12 @@ struct ResultMenu {
     s8 gaugeBrightness;
     u8 step, alpha, prompt, layer;
     u8 hideLevel, hideTimer;
-    u8 unknownBA[5], lastTimingGrade;
+    u8 equipmentSlot, consumableSlot, wideTimingWindow;
+    u8 unknownBD[2], lastTimingGrade;
     u8 pressScore;
-    u8 unknownC1[3], finishState;
-    u8 unknownC5[0x1F];
+    u8 revealPose, unknownC2[2], finishState;
+    u8 unknownC5[0x13];
+    s32 preciseCount, closeCount, missedCount;
     u16 meterPalette[16];
     struct SceneInputResource primaryResource, secondaryResource;
     struct SceneInputWidget widgets[15];
