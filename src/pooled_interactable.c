@@ -1,7 +1,6 @@
 #include "pooled_interactable.h"
 #include "scene_actor_terrain.h"
 /* Breakable_NullCallback: Empty no-op function used as a placeholder/gap callback entry. */
-#define Breakable_NullCallback sub_08008C18
 
 struct PooledInteractable *Breakable_FindFreeSlot(struct PooledInteractableManager *manager)
 {
@@ -93,7 +92,7 @@ void Breakable_RunScript(struct PooledInteractable *slot)
 }
 
 /* Empty callback slot (gap function). */
-void sub_08008C18(void)
+void Breakable_NullCallback(void)
 {
 }
 
@@ -135,7 +134,7 @@ void Breakable_React(struct PooledInteractableManager *manager, struct PooledInt
         Breakable_EnterState(slot, 2);
 }
 
-/* Local adaptation: this function only matches when the position is read as packed bitfields. */
+/* Particle emission uses packed coordinate fields. */
 #define POSITION (*(struct SceneExtent *)&slot->drawable.position)
 
 void Breakable_Activate(struct PooledInteractableManager *manager, struct PooledInteractable *slot)
@@ -182,7 +181,7 @@ void Breakable_UpdateRouteMotion(struct PooledInteractable *s)
     if (s->delay != 0) {
         s->delay--;
     } else {
-        struct SceneVec *r = &s->drawable.position;
+        struct ContactPosition *r = &s->drawable.position;
         struct SceneExtent *op;
         struct {
             u32 w;
@@ -201,7 +200,7 @@ void Breakable_UpdateRouteMotion(struct PooledInteractable *s)
 /* Motion 2: copies the follow target's position, plus the height offset. */
 void Breakable_UpdateFollowMotion(struct PooledInteractable *s)
 {
-    struct SceneVec *r = s->target;
+    struct ContactPosition *r = s->target;
     if (r != 0) {
         s->drawable.position.x = r->x;
         s->drawable.position.y = r->y + s->offset;
@@ -264,7 +263,7 @@ s32 Breakable_InitManager(struct PooledInteractableManager *manager)
     struct PooledInteractable *slot;
     gPooledInteractableManager = manager;
     for (i = 0; i < 3; i++) {
-        struct PooledResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
+        struct SceneInputResource *resource = ScriptProc_Start(0xcb05, gUnk_086049C8[i]);
         if (!resource)
             return -1;
         manager->resources[i] = *resource;
@@ -284,7 +283,7 @@ void *Breakable_GetOrCreateManager(void)
     void *p;
     if (gPooledInteractableManager != 0)
         return (void *)gPooledInteractableManager;
-    p = Task_Create(10, 0x80);
+    p = Task_Create(10, sizeof(struct PooledInteractableManager));
     if (p != 0) {
         Task_SetCallbacks(p, (void (*)(void))Breakable_UpdateAll,
                           (void (*)(void))Breakable_DestroyManager);
@@ -296,15 +295,14 @@ void *Breakable_GetOrCreateManager(void)
     return p;
 }
 
-static inline s32 groundHeight(struct SceneVec *position)
+static inline s32 groundHeight(const struct ContactPosition *position)
 {
-    const struct ContactPosition *p = (const struct ContactPosition *)position;
-    return SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(p), p);
+    return SceneActorTerrain_GetHeight(SceneActorTerrain_GetCellIndex(position), position);
 }
 
 s32 Breakable_ScriptCreate(void)
 {
-    struct SceneVec position;
+    struct ContactPosition position;
     struct PooledInteractableManager *manager = gPooledInteractableManager;
     struct PooledInteractable *slot;
     s32 placed;

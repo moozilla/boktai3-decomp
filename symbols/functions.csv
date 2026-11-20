@@ -193,6 +193,7 @@ addr,name,mode,confidence,source,notes
 08008ABC,Breakable_OnHit,thumb,low,src-alias,Collider callback registered via Breakable_InitSlot; moves the slot to state 3 or 4 when hit by the attack kind matching its current state.
 08008AF4,Breakable_InitSlot,thumb,low,src-alias,
 08008BD0,Breakable_RunScript,thumb,low,src-alias,"Builds a 3-arg packed-args block (id, state-derived flag, arg) and dispatches it to the slot's script via Script_Call."
+08008C18,Breakable_NullCallback,thumb,low,src-alias,Empty callback in the breakable state unit.
 08008C1C,Breakable_UpdateAnimation,thumb,low,src-alias,Runs once when a state is freshly entered (via Breakable_ConsumeEnteredFlag) to set the drawable's keyframes and palette bank from per-kind tables.
 08008C84,Breakable_Idle,thumb,low,src-alias,
 08008CF0,Breakable_React,thumb,low,src-alias,
