@@ -212,23 +212,24 @@ void SceneActorRoute_CommitReachableDestination(struct ChaseActor *actor)
     }
 }
 
+static inline void SceneActorRoute_SetContextFlags(struct SceneActorRouteContext *context,
+                                                   u32 flags)
+{
+    context->flags628 |= flags;
+}
+
 void SceneActorRoute_SetReachableDestination(struct ChaseActor *actor,
                                              struct ContactPosition *destination)
 {
     struct SceneActorRouteContext *context = actor->base.context;
-    u8 *group = (u8 *)actor + 0x3D4;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 cell = SceneActorTerrain_GetCellIndex(destination);
-    u32 flags = *(u16 *)(SceneActorTerrain_GetCell(cell) + 2);
-    u32 mask = 0x43;
-    if (!(flags & mask)) {
-        if (Nav_IsPositionInMesh(*(void **)(group + 0x1FC), &actor->base.body.position,
-                                 destination)) {
+    u32 flags = SceneActor_CellAttributes(cell);
+    if (!(flags & 0x43)) {
+        if (Nav_IsPositionInMesh(group->route, &actor->base.body.position, destination)) {
             context->destination = *destination;
             Golem_CenterPositionInCell(&context->destination);
-            {
-                u32 mask = 0x80000;
-                context->flags628 |= mask;
-            }
+            SceneActorRoute_SetContextFlags(context, 0x80000);
         }
     }
 }
