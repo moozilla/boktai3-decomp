@@ -3,7 +3,6 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: hides the drawable and moves the actor above the active field.
-#define SceneActorControl_HideOffscreen sub_081304C8
 static inline u8 TakeReset(struct ChaseActor *a)
 {
     if (a->base.field2B1) {

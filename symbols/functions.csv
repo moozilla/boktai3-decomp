@@ -5285,6 +5285,7 @@ addr,name,mode,confidence,source,notes
 081301C4,SceneActorReaction_UpdateRouteRecovery,thumb,low,src-alias,
 0813042C,SceneActorControl_EnterTimedState,thumb,low,src-alias,
 08130490,SceneActorControl_AdvancePhaseIfFlagged,thumb,low,src-alias,Clears the phase entry byte and increments the phase counter when flag 2 at offset 2D4 is set
+081304C8,SceneActorControl_HideOffscreen,thumb,low,src-alias,Moves the actor and drawable above the active field and disables collision
 081305D0,SceneActorControl_AdvancePhase,thumb,low,src-alias,Clears the phase entry byte and unconditionally increments the counter at offset 2AC
 081305F8,SceneActorControl_BeginIdleControl,thumb,low,src-alias,
 0813067C,SceneActorControl_UpdateSavedControlPhase,thumb,low,src-alias,
