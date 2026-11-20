@@ -42,7 +42,7 @@ static inline void copy32(const void *source, void *dest, s32 size)
 void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amount, s32 first,
                         s32 end)
 {
-    s32 k2 = 0x7C1F;
+    s32 redBlueMask = 0x7C1F;
     s32 count;
     u32 inverse;
     amount >>= 1;
@@ -59,26 +59,22 @@ void Palette_BlendRange(u16 *dest, const u16 *source, const u16 *target, u32 amo
             s32 i;
             dest += first;
             out = dest;
-            if (count > 0) {
-                u32 greenMask = 0x03E0;
-                i = count;
-                do {
-                    u32 from = *a;
-                    u32 fromRB;
-                    u32 fromG;
-                    u32 to;
-                    fromRB = k2 & from;
-                    PALETTE_EXTRACT_CHANNEL(fromG, from, greenMask);
-                    to = *b;
-                    {
-                        u32 rb = (((to & 0x7C1F) * amount) + (inverse * fromRB)) & 0xF83E0;
-                        u32 g = (((to & greenMask) * amount) + (inverse * fromG)) & 0x7C00;
-                        *out = (rb | g) >> 5;
-                    }
-                    a++;
-                    b++;
-                    out++;
-                } while (--i);
+            for (i = 0; i < count; i++) {
+                u32 from = *a;
+                u32 fromRB;
+                u32 fromG;
+                u32 to;
+                fromRB = redBlueMask & from;
+                PALETTE_EXTRACT_CHANNEL(fromG, from, 0x03E0);
+                to = *b;
+                {
+                    u32 rb = (((to & redBlueMask) * amount) + (inverse * fromRB)) & 0xF83E0;
+                    u32 g = (((to & 0x03E0) * amount) + (inverse * fromG)) & 0x7C00;
+                    *out = (rb | g) >> 5;
+                }
+                a++;
+                b++;
+                out++;
             }
         }
     }
@@ -654,7 +650,6 @@ void Palette_SetBrightnessFromScript(void)
         u32 query = Script_SeekToKeyword('q');
         u32 immediate = ((0 - query) | query) >> 31;
         s32 callback = Script_GetKeywordValue('p', 0);
-        u32 mode;
         p->transition.callback = 0;
         if (!(p->flags & 16)) {
             p->flags |= 16;
@@ -671,13 +666,15 @@ void Palette_SetBrightnessFromScript(void)
                 goto complete;
             }
             if (t->mode == 1) {
-                goto waiting;
+                t->callback = callback;
+                return;
             }
             if (t->mode == 2) {
                 goto complete;
             }
-            mode = 1;
-            goto setMode;
+            t->mode = 1;
+            t->callback = callback;
+            return;
         } else {
             if (!immediate) {
                 if (t->mode == 0) {
@@ -699,14 +696,9 @@ void Palette_SetBrightnessFromScript(void)
 
         return;
     fadeOut:
-        mode = 3;
-
-        do {
-        setMode:
-            t->mode = mode;
-        waiting:
-            t->callback = callback;
-        } while (0);
+        t->mode = 3;
+    waiting:
+        t->callback = callback;
     }
 }
 
