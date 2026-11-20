@@ -2,6 +2,23 @@
 #include "global.h"
 #include "game_state.h"
 
+enum StagedEffectState {
+    STAGED_EFFECT_WAIT_FOR_SCRIPT,
+    STAGED_EFFECT_CONTRACT_SPREAD,
+    STAGED_EFFECT_SHAKE_AND_REVEAL,
+    STAGED_EFFECT_CONTRACT_BURST,
+    STAGED_EFFECT_BLEND_AND_SHAKE,
+    STAGED_EFFECT_WAIT_BETWEEN_SHAKES,
+    STAGED_EFFECT_PLAY_SHAKE_SEQUENCE,
+    STAGED_EFFECT_RELEASE_SCRIPT
+};
+
+static inline void StagedEffect_SetState(struct StagedEffect *effect, u32 state)
+{
+    effect->state = state;
+    effect->frame = 0;
+}
+
 void StagedEffect_BlendPalette(struct StagedEffect *effect, s32 first, s32 second, s32 blend)
 {
     const u16 *a = (u16 *)gPaletteBankData + (first + 0x283) * 16;
@@ -39,26 +56,24 @@ void StagedEffect_BlendPalette(struct StagedEffect *effect, s32 first, s32 secon
     }
 }
 
-void StagedEffect_MarkOuterSprites(struct StagedEffect *effect)
+static inline void StagedEffect_AddOuterSpriteFlags(struct StagedEffect *effect, u32 flags)
 {
-    u32 mask = 1;
-    s32 remaining;
     struct DisplaySequenceSprite *sprite = &effect->sprites[1];
+    s32 remaining;
     for (remaining = 3; remaining >= 0; remaining--) {
-        sprite->flags |= mask;
+        sprite->flags |= flags;
         sprite++;
     }
 }
 
+void StagedEffect_MarkOuterSprites(struct StagedEffect *effect)
+{
+    StagedEffect_AddOuterSpriteFlags(effect, 1);
+}
+
 void StagedEffect_MarkOuterSpritesAlternate(struct StagedEffect *effect)
 {
-    u32 mask = 1;
-    s32 remaining;
-    struct DisplaySequenceSprite *sprite = &effect->sprites[1];
-    for (remaining = 3; remaining >= 0; remaining--) {
-        sprite->flags |= mask;
-        sprite++;
-    }
+    StagedEffect_AddOuterSpriteFlags(effect, 1);
 }
 
 s32 StagedEffect_CheckScriptCompletion(struct StagedEffect *effect)
@@ -78,8 +93,6 @@ s32 StagedEffect_CheckScriptCompletion(struct StagedEffect *effect)
     return 0;
 }
 
-s32 StagedEffect_CheckScriptCompletion(struct StagedEffect *);
-
 void StagedEffect_WaitForScript(struct StagedEffect *effect)
 {
     if (StagedEffect_CheckScriptCompletion(effect)) {
@@ -92,7 +105,7 @@ void StagedEffect_WaitForScript(struct StagedEffect *effect)
         } while ((s32)sprite <= (s32)&effect->sprites[4]);
         {
             u32 zero = 0;
-            *state = 1;
+            *state = STAGED_EFFECT_CONTRACT_SPREAD;
             effect->frame = zero;
         }
         Sound_PlaySong(0x1C6);
@@ -101,22 +114,18 @@ void StagedEffect_WaitForScript(struct StagedEffect *effect)
 
 void StagedEffect_ContractSpread(struct StagedEffect *effect)
 {
-    u16 *q = (u16 *)&effect->spread;
-    u32 v = *q - 0x46;
-    u32 z = 0;
-    *q = v;
-    if ((s32)(v << 16) <= 0) {
-        u32 two;
-        *q = z;
-        two = 2;
-        q = &effect->state;
-        *q = two;
-        effect->frame = z;
-    } else {
-        effect->frame += 1;
-    }
+    effect->spread -= 70;
+    if (effect->spread <= 0) {
+        effect->spread = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_SHAKE_AND_REVEAL);
+    } else
+        effect->frame++;
 }
 
+static inline s16 StagedEffect_ShakeOffset(u16 sample)
+{
+    return (sample & 31) - 16;
+}
 void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
 {
     u32 phase;
@@ -125,19 +134,13 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         u32 *indexCursor;
         u32 index = (gRandomIndex + 1) & 0x3FF;
         u16 sample;
-        u32 mask;
         indexCursor = &index;
         sample = random[*indexCursor];
-        mask = 31;
-        sample &= mask;
-        sample -= 16;
-        effect->shakeX = sample;
+        effect->shakeX = StagedEffect_ShakeOffset(sample);
         index = (index + 1) & 0x3FF;
         gRandomIndex = index;
         sample = random[index];
-        sample &= mask;
-        sample -= 16;
-        effect->shakeZ = sample;
+        effect->shakeZ = StagedEffect_ShakeOffset(sample);
     }
     phase = effect->frame & 3;
     if (phase == 0)
@@ -146,11 +149,7 @@ void StagedEffect_ShakeAndReveal(struct StagedEffect *effect)
         StagedEffect_MarkOuterSprites(effect);
     if (effect->frame > 15) {
         effect->sprites[0].flags &= ~1;
-        {
-            u32 state = 3;
-            effect->state = state;
-        }
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_CONTRACT_BURST);
     } else
         effect->frame++;
 }
@@ -160,28 +159,17 @@ void AnimatedParticles_EmitRing(void *, u32, u32, u32, u32, u32, u32, u32);
 void StagedEffect_ContractBurst(struct StagedEffect *effect)
 {
     u32 phase;
-    u16 *travel;
-    u32 value;
-    u32 zero;
     effect->scale = Div(effect->travel * 1008, effect->initialTravel) + 1024;
     phase = effect->frame & 3;
     if (phase == 0)
         StagedEffect_MarkOuterSpritesAlternate(effect);
     else if (phase == 2)
         StagedEffect_MarkOuterSprites(effect);
-    travel = (u16 *)&effect->travel;
-    value = *travel - 70;
-    zero = 0;
-    *travel = value;
-    if ((s32)(value << 16) <= 0) {
-        *travel = zero;
+    effect->travel -= 70;
+    if (effect->travel <= 0) {
+        effect->travel = 0;
         effect->scale = 1024;
-        {
-            u32 state = 4;
-            u16 *destination = &effect->state;
-            *destination = state;
-        }
-        effect->frame = zero;
+        StagedEffect_SetState(effect, STAGED_EFFECT_BLEND_AND_SHAKE);
         Sound_PlaySong(0x1C4);
         StagedEffect_MarkOuterSprites(effect);
         AnimatedParticles_EmitRing(&effect->sprites[0].position, 8, 1, 1, 64, 12, 40, 250);
@@ -199,17 +187,12 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
     u32 *indexCursor;
     u32 index = (gRandomIndex + 1) & 0x3FF;
     u16 sample = random[index];
-    u32 mask = 31;
-    sample &= mask;
-    sample -= 16;
-    effect->shakeX = sample;
+    effect->shakeX = StagedEffect_ShakeOffset(sample);
     index = (index + 1) & 0x3FF;
     gRandomIndex = index;
     indexCursor = &index;
     sample = random[*indexCursor];
-    sample &= mask;
-    sample -= 16;
-    effect->shakeZ = sample;
+    effect->shakeZ = StagedEffect_ShakeOffset(sample);
     {
         u32 frame = effect->frame;
         if (frame <= 3) {
@@ -221,12 +204,7 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
     if (effect->frame > 7) {
         effect->shakeX = 0;
         effect->shakeZ = 0;
-        {
-            u32 state = 5;
-            u16 *destination = &effect->state;
-            *destination = state;
-        }
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_WAIT_BETWEEN_SHAKES);
     } else
         effect->frame++;
 }
@@ -234,9 +212,7 @@ void StagedEffect_BlendAndShake(struct StagedEffect *effect)
 void StagedEffect_WaitBetweenShakes(struct StagedEffect *effect)
 {
     if (effect->frame > 89) {
-        u32 state = 6;
-        effect->state = state;
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_PLAY_SHAKE_SEQUENCE);
     } else
         effect->frame++;
 }
@@ -249,19 +225,13 @@ void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
         u32 *indexCursor;
         u32 index = (gRandomIndex + 1) & 0x3FF;
         u16 sample;
-        u32 mask;
         indexCursor = &index;
         sample = random[*indexCursor];
-        mask = 31;
-        sample &= mask;
-        sample -= 16;
-        effect->shakeX = sample;
+        effect->shakeX = StagedEffect_ShakeOffset(sample);
         index = (index + 1) & 0x3FF;
         gRandomIndex = index;
         sample = random[index];
-        sample &= mask;
-        sample -= 16;
-        effect->shakeZ = sample;
+        effect->shakeZ = StagedEffect_ShakeOffset(sample);
     } else {
         effect->shakeX = 0;
         effect->shakeZ = 0;
@@ -269,9 +239,7 @@ void StagedEffect_PlayShakeSequence(struct StagedEffect *effect)
     if (effect->frame == 10 || effect->frame == 20 || effect->frame == 60 || effect->frame == 70)
         Sound_PlaySong(0xD3);
     if (effect->frame > 89) {
-        u32 state = 7;
-        effect->state = state;
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_RELEASE_SCRIPT);
     } else
         effect->frame++;
 }
@@ -293,7 +261,7 @@ s32 StagedEffect_Tick(struct StagedEffect *effect)
 {
     s32 i;
     gUnk_08605A58[effect->state](effect);
-    if (effect->state != 0) {
+    if (effect->state != STAGED_EFFECT_WAIT_FOR_SCRIPT) {
         i = 0;
         do {
             struct DisplaySequenceSprite *sprite = &effect->sprites[i];
@@ -370,18 +338,10 @@ s32 StagedEffect_Initialize(struct StagedEffect *effect, u32 script)
         effect->hasScript = hasScript;
     if (effect->hasScript) {
         SceneMessages_RegisterReceiver(&effect->receiver, script, 10);
-        {
-            u32 state = 0;
-            u16 *destination = &effect->state;
-            *destination = state;
-        }
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_WAIT_FOR_SCRIPT);
         hide = 1;
     } else {
-        u32 state = 1;
-        u16 *destination = &effect->state;
-        *destination = state;
-        effect->frame = 0;
+        StagedEffect_SetState(effect, STAGED_EFFECT_CONTRACT_SPREAD);
         hide = 0;
         Sound_PlaySong(0x1C6);
     }
