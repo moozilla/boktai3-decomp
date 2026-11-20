@@ -1,3 +1,4 @@
+#include "player_cue.h"
 #include "game_state_flags.h"
 #include "game_state.h"
 #include "contact_swarm.h"
@@ -8,51 +9,47 @@ u32 Anim_SetSequence(void *anim, void *data, u32 sequence, u32 row, u32 flags);
 s32 RepeatedEffect_RequestNearby(void *);
 void Sound_PlaySong(u32 song);
 void Player_UpdateFacingSide(void *);
-u32 Player_ConsumeStateEntry(u8 *p);
+u32 Player_ConsumeStateEntry(struct Player *p);
 u8 Player_GetSmoothedDirection(void *);
 s32 Player_GetWalkSpeed(void *p);
 void Player_SetDirectionalVelocity(void *, s32);
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
 
-void Player_UpdateWalkFootsteps(u8 *p)
+void Player_UpdateWalkFootsteps(struct Player *p)
 {
     struct DisplaySequenceState *seq;
 
     if (Player_ConsumeStateEntry(p))
-        p[0x46a] = 0;
-    *(u32 *)(p + 0x20) &= ~1;
-    p[0x3a4] = Player_GetSmoothedDirection(p);
+        p->footstepSide = 0;
+    p->statusFlags &= ~1;
+    p->facing = Player_GetSmoothedDirection(p);
     Player_SetDirectionalVelocity(p, Player_GetWalkSpeed(p));
     Player_UpdateFacingSide(p);
-    seq = (struct DisplaySequenceState *)(p + 0x3fc);
-    Anim_SetSequence(seq, *(void **)(p + 0x410), 1, p[0x3a2], p[0x3a3]);
-    PlayerCue_StepSequence((struct ContactSwarmSprite *)(p + 0x14C),
-                           (struct DisplaySequenceState *)(p + 0x3FC));
+    seq = &p->cueCollider.sequence;
+    Anim_SetSequence(seq, p->cueCollider.sideResource, 1, p->heading, p->side);
+    PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);
     {
-        u32 offset = 0x404;
-        u16 *frame;
-        frame = (u16 *)(p + offset);
-        if (*frame == 2) {
-            u32 z = *(u16 *)(p + 0x40a);
+        if (p->cueCollider.sequence.index == 2) {
+            u32 z = p->cueCollider.sequence.elapsed;
             if (z == 0) {
-                if (RepeatedEffect_RequestNearby(p + 0x30)) {
-                    if (p[0x46a]) {
-                        p[0x46a] = z;
-                        Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, z, 0x163);
+                if (RepeatedEffect_RequestNearby(&p->position)) {
+                    if (p->footstepSide) {
+                        p->footstepSide = z;
+                        Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, z, 0x163);
                     } else {
-                        p[0x46a] = 1;
-                        Player_PlayPositionEffect(p, p + 0x30, 1, 1, p + 0x30, 0, 0x162);
+                        p->footstepSide = 1;
+                        Player_PlayPositionEffect(p, &p->position, 1, 1, &p->position, 0, 0x162);
                     }
                 } else {
-                    if (p[0x46a]) {
-                        p[0x46a] = 0;
+                    if (p->footstepSide) {
+                        p->footstepSide = 0;
                         Sound_PlaySong(0xc7);
                     } else {
-                        p[0x46a] = 1;
+                        p->footstepSide = 1;
                         Sound_PlaySong(0xc8);
                     }
                     if (GameState_TestWorldFlags(1))
-                        Player_PlayPositionEffect(p, p + 0x30, 1, 2, 0, 0, 0);
+                        Player_PlayPositionEffect(p, &p->position, 1, 2, 0, 0, 0);
                 }
             }
         }
