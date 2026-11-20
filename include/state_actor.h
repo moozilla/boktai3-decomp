@@ -124,7 +124,7 @@ struct StateActor {
     s32 eventArguments[4];
     void (*actionCallback)(void *, int);
     u8 (*actionTryUpdate)(void *); /* 0x104 */
-    void (*actionReset)(void *);   /* 0x108 */
+    u8 (*actionReset)(void *);     /* 0x108: nonzero completes the update early. */
     u8 unk10C[8];
     s8 savedFacing;
     u8 unk115[3];
@@ -177,6 +177,11 @@ static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)
     direction = 7;
     direction &= shifted;
     actor->animationFacing8 = direction;
+}
+
+static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags |= flags;
 }
 
 u32 Trigger_ConsumePending(void *receiver, u32 count);

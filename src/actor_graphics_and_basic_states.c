@@ -672,11 +672,6 @@ static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), in
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
 // (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
-static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
-{
-    actor->actionFlags |= flags;
-}
-
 s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
 {
     u8 *actor = (u8 *)p;

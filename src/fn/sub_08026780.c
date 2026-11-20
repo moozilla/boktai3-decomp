@@ -82,7 +82,7 @@ void SceneActorAnimation_UpdateFlashAlternating(ActorAnimation *p, int tick)
         draw = (u8 *)p + 0x240;
         resource = (u8 *)p + 0x220;
         SceneActors_StartDirectionalAnimation(p, draw, resource, sequence, 2, 1, 0);
-        graphicsActor->animationField254 = 2;
+        graphicsActor->animation.frameIndex = 2;
         SceneActors_UpdateAnimation(p, draw, resource);
         BackgroundFlash_BeginAlternating(*(void **)((u8 *)p + 0x9dc));
         if (graphicsActor->graphics.stepTableKind == 1)
