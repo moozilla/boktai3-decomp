@@ -1,45 +1,43 @@
-#include "global.h"
-#include "scene_object_slot.h"
-void *Heap_Alloc(int);
-void Memory_Clear(void *, int);
+#include "scene_object_controller.h"
 int Region_FindContaining(void *);
-void sub_0801F058(void *, void *);
-void SceneObject_InitSlotPlacement(void *, void *);
-void SceneObject_InitPlacement(void *, void *);
-int SceneObjects_Append(u8 *p, u16 id, struct Pair *position, int value, u8 kind, u8 variant,
-                        u8 orientation, int type, int maxLift, int hasArgs, int b41, s32 *args,
-                        u8 b44, int b45)
+void sub_0801F058(struct SceneObjPool *, struct SceneObjSlot *);
+void SceneObject_InitSlotPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+void SceneObject_InitPlacement(struct SceneObjPool *, struct SceneObjSlot *);
+int SceneObjects_Append(struct SceneObjPool *p, u16 id, struct Pair *position, int animationIndex,
+                        u8 activationFlags, u8 variant, u8 orientation, int type, int maxLift,
+                        int interactionScript, int autoActivate, s32 *args, u8 hideOutsideRegion,
+                        int paletteBank)
 {
     struct SceneObjSlot *slot;
     int i;
-    if (*(u16 *)(p + 0x1a) >= *(int *)(p + 0x30))
+    if (p->count >= p->capacity)
         return -1;
-    slot = *(struct SceneObjSlot **)(p + 0x42c) + *(u16 *)(p + 0x1a);
+    slot = &p->slots[p->count];
     slot->id = id;
     slot->pos.words = *position;
     slot->r0.words = *position;
-    slot->activationFlags = kind;
+    slot->activationFlags = activationFlags;
     slot->variant = variant;
     slot->dir = orientation;
     slot->poseFrame = 0;
     slot->type = type;
     slot->maxLift = maxLift;
-    slot->interactionScript = hasArgs;
-    slot->autoActivate = b41;
-    slot->animationIndex = value;
+    slot->interactionScript = interactionScript;
+    slot->autoActivate = autoActivate;
+    slot->animationIndex = animationIndex;
     slot->lift = 0;
     slot->region = Region_FindContaining(position);
-    slot->hideOutsideRegion = b44;
-    slot->terrain = Heap_Alloc(16);
+    slot->hideOutsideRegion = hideOutsideRegion;
+    slot->terrain = Heap_Alloc(sizeof(*slot->terrain));
     if (!slot->terrain)
         return -1;
-    Memory_Clear(slot->terrain, 16);
+    Memory_Clear(slot->terrain, sizeof(*slot->terrain));
     switch (slot->type) {
         case 1:
             sub_0801F058(p, slot);
             break;
         case 2:
-            slot->paletteBank = b45;
+            slot->paletteBank = paletteBank;
             SceneObject_InitSlotPlacement(p, slot);
             break;
         case 8:
@@ -88,5 +86,5 @@ int SceneObjects_Append(u8 *p, u16 id, struct Pair *position, int value, u8 kind
             slot->args.words[i] = args[i];
     } else
         slot->args.words[0] = 0;
-    ++*(u16 *)(p + 0x1a);
+    ++p->count;
 }
