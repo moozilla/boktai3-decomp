@@ -28,6 +28,8 @@
 
 #include "scene_actor_reset.h"
 
+#include "scene_actor_reaction.h"
+
 #include "scene_actor_state.h"
 
 #include "scene_actor_collision.h"
@@ -604,17 +606,13 @@ void Bee_ResetRoute(struct ChaseActor *actor)
     s32 height, slope;
     u8 *c;
     u32 cellIndex;
-    u8 zero8;
-    u8 *first;
-    first = &context->routeReset;
-    zero8 = 0;
-    *first = 0;
+    context->routeReset = 0;
     context->curveTime = 0;
-    context->flightPhase = zero8;
+    context->flightPhase = 0;
     context->curveActive = 1;
     context->curve = 0;
-    context->curveDirection = zero8;
-    context->curveMode = zero8;
+    context->curveDirection = 0;
+    context->curveMode = 0;
     context->flags = 0;
     source = &context->initialPosition;
     actor->base.body.position = *source;
@@ -674,11 +672,11 @@ static inline u8 Bee_FlightUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline u8 Bee_TestFlightFlags(u32 value, u32 mask)
+static inline u8 Bee_HasRouteFlag(const struct Bee *state, u32 bits)
 {
-    if (value & mask)
-        return 1;
-    return 0;
+    if (state->flags & bits)
+        return TRUE;
+    return FALSE;
 }
 
 static inline s32 Bee_ScaleSine(s32 value, u32 shift)
@@ -710,8 +708,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
     }
     if ((s16)actor->base.heightOffset <= 259) {
         {
-            u32 mask = 1;
-            if (Bee_TestFlightFlags(state->flags, mask)) {
+            if (Bee_HasRouteFlag(state, 1)) {
                 actor->base.body.position.y = actor->base.groundHeight;
                 return;
             }
@@ -776,13 +773,6 @@ static inline s32 Bee_QuantizeCurveTime(s32 value)
     return -((-value) >> 7);
 }
 
-static inline u8 Bee_TestMovementFlags(u32 flags, u32 mask)
-{
-    if (flags & mask)
-        return TRUE;
-    return FALSE;
-}
-
 static inline u32 Bee_ReadMovementCode(const u32 *t, u32 i)
 {
     return t[i];
@@ -800,9 +790,7 @@ u32 Bee_GetMovementAnimationCode(struct ChaseActor *actor)
     if (index > 7)
         index = 7;
     {
-        u32 mask = 4;
-        u32 flags = state->flags;
-        if (Bee_TestMovementFlags(flags, mask))
+        if (Bee_HasRouteFlag(state, 4))
             return Bee_ReadMovementCode(gUnk_08605D68, index) + 6;
         return Bee_ReadMovementCode(gUnk_08605D68, index);
     }
@@ -1045,8 +1033,7 @@ one: {
 void Slime_SetStateFlag(struct ChaseActor *actor)
 {
     struct SceneActorChaseTracking *tracking = &actor->base.tracking;
-    u8 m = 8;
-    tracking->flags = m | tracking->flags;
+    MonsterInit_SetTargetingFlags(tracking, 8);
 }
 
 u32 Bee_GetMovementVariant(struct ChaseActor *actor)
@@ -1097,14 +1084,6 @@ static inline u8 Bee_TakeEntryFlag(u8 *p)
         *p = 0;
         return 1;
     }
-    return 0;
-}
-
-static inline u8 Bee_TestRouteFlags(struct Bee *body, u32 mask)
-{
-    u32 flags = body->flags;
-    if (flags & mask)
-        return 1;
     return 0;
 }
 
@@ -1180,14 +1159,9 @@ void Bee_FollowWanderRoute(struct ChaseActor *actor)
     if (Bee_TakeEntryFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         body->index = 0;
-        if (Bee_TestRouteFlags(body, 8)) {
-            {
-                u8 reverseBias = 128;
-                Bee_MakePolarVector(
-                    &dest,
-                    (actor->base.tracking.heading + ((Bee_NextRandom() & 63) + reverseBias)) & 255,
-                    320);
-            }
+        if (Bee_HasRouteFlag(body, 8)) {
+            Bee_MakePolarVector(
+                &dest, (actor->base.tracking.heading + 128 + (Bee_NextRandom() & 63)) & 255, 320);
             Bee_ClearRouteFlags(body, 8);
             {
                 s32 variant = Bee_GetMovementVariant(actor);
@@ -1328,10 +1302,7 @@ void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
             u32 value = body->behaviorDelay;
             body->behaviorCooldown = value;
         }
-        {
-            u32 mask = 0x100;
-            actor->base.motionFlags = mask | actor->base.motionFlags;
-        }
+        SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         Sound_PlaySong(0x3C8);
     }
     saved = &body->curveSubject;
