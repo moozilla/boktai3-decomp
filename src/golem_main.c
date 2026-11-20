@@ -6,6 +6,7 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_adjacent_cell.h"
 #include "player.h"
 #include "scene_actor_restoration.h"
 #include "scene_actor_control_motion.h"
@@ -198,17 +199,14 @@ void Golem_CenterPositionInCell(void *ptr);
 void SceneActorRoute_CommitReachableDestination(struct ChaseActor *actor)
 {
     struct SceneActorRouteContext *context = actor->base.context;
-    u8 *group = (u8 *)actor + 0x3D4;
-    struct SceneActorRouteDestination *target = (void *)actor->base.tracking.target;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorChaseTarget *target = actor->base.tracking.target;
     s32 cell = SceneActorTerrain_GetCellIndex(&target->position);
-    u32 flags = *(u16 *)(SceneActorTerrain_GetCell(cell) + 2);
-    u32 mask = 0x43;
-    if (!(flags & mask)) {
-        if (Nav_IsPositionInMesh(
-                *(void **)(group + 0x1FC), &actor->base.body.position,
-                &((struct SceneActorRouteDestination *)actor->base.tracking.target)->position)) {
-            context->destination =
-                ((struct SceneActorRouteDestination *)actor->base.tracking.target)->position;
+    u32 flags = SceneActor_CellAttributes(cell);
+    if (!(flags & 0x43)) {
+        if (Nav_IsPositionInMesh(group->route, &actor->base.body.position,
+                                 &actor->base.tracking.target->position)) {
+            context->destination = actor->base.tracking.target->position;
             Golem_CenterPositionInCell(&context->destination);
         }
     }
