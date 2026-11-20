@@ -899,6 +899,7 @@ addr,name,mode,confidence,source,notes
 08025550,SceneActorAnimation_UpdateHomingLunge,thumb,low,src-alias,"Drives a constant-speed approach toward the locked dest, snapping to it and finishing early if within range, else timing out at tick 159."
 08025714,SceneActorAnimation_UpdateRecoilSlide,thumb,low,src-alias,"Minimal tick-only handler that decelerates a short forward slide over 10 ticks with no animation/sound setup, the lightweight half of the shared decel"
 080257D0,SceneActorAnimation_UpdateChargeSlide,thumb,low,src-alias,"Starts a directional charge anim, decelerates over 20 ticks, and periodically spawns trailing pool frames until finishing at tick 60."
+0802592C,SceneActorAnimation_UpdatePlayerGrab,thumb,low,src-alias,Tentative: holds the tracked player; applies periodic health changes; and finishes after enough player facing changes
 08025CD4,SceneActorAnimation_UpdateSwingLight,thumb,low,src-alias,Plays a plain (non-directional) animation variant and finishes once the animation-done flag at +0x25d is set; pairs with the adjacent heavier swing ha
 08025D60,SceneActorAnimation_UpdateSwingHeavy,thumb,low,src-alias,"Same structure as the adjacent light-swing handler but selects the next sequence pair (61/23), finishing on the same animation-done flag."
 08025DEC,SceneActorAnimation_UpdateChargeShotRelease,thumb,low,src-alias,"Plays the charge animation then periodically spawns a ContactSwarm projectile with randomized spread direction, finishing after tick 40."
