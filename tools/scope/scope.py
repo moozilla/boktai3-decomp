@@ -7031,11 +7031,14 @@ def cmd_hoist(src, func, env):
 
 def hoist_levers(src, func, env, passes, names, lines, base, info):
     """For each named variable loop.c hoisted, write the variant that stores it again (dead) just
-    before its loop's closing brace and score it: the second set in a later block makes it
+    before the closing brace of its block in the loop and score it: the second set makes it
     may_not_optimize, and flow deletes the dead store (EffectManager_SpawnParticles and
     EffectManager_SpawnParticlesAt matched this way)."""
-    text = open(os.path.join(ROOT, src)).read()
+    with open(os.path.join(ROOT, src)) as source:
+        text = source.read()
     rows = text.split("\n")
+    code_rows = re.sub(r"""/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'""",
+                       lambda m: re.sub(r"[^\n]", " ", m[0]), text, flags=re.S).split("\n")
     locations = uid_locations(info["wd"])
     tried = set()
     for ps in passes:
@@ -7050,17 +7053,29 @@ def hoist_levers(src, func, env, passes, names, lines, base, info):
                 tried.add(name)
                 m = re.search(rf"\b{name}\s*=\s*([^;=][^;]*);", rows[ln - 1])
                 head = next((i for i in range(ln - 1, -1, -1)
-                             if re.search(r"\b(for|while)\s*\(|\bdo\b", rows[i])), None)
+                             if re.search(r"\b(for|while)\s*\(|\bdo\b", code_rows[i])), None)
                 if not m or head is None:
                     continue
                 depth, close = 0, None
                 for i in range(head, len(rows)):
-                    for ch in rows[i]:
+                    for ch in code_rows[i]:
                         depth += (ch == "{") - (ch == "}")
-                    if depth == 0 and "{" in "".join(rows[head:i + 1]) and i > head:
+                    if depth == 0 and "{" in "".join(code_rows[head:i + 1]) and i > head:
                         close = i
                         break
                 if close is None or close < ln:
+                    continue
+                # A loop-local assignment can sit in a nested block whose variables expire
+                # earlier. Keep the probe in that block, even when a closing brace opens an else.
+                block = "\n".join(code_rows[ln - 1:close + 1])
+                depth = 0
+                for brace in re.finditer(r"[{}]", block[m.end():]):
+                    depth += 1 if brace[0] == "{" else -1
+                    if depth < 0:
+                        pos = m.end() + brace.start()
+                        close = ln - 1 + block.count("\n", 0, pos)
+                        break
+                if close < ln or not code_rows[close].lstrip().startswith("}"):
                     continue
                 indent = re.match(r"\s*", rows[close]).group(0) + "    "
                 out = rows[:close] + [f"{indent}{name} = {m.group(1).strip()}; /* dead: keeps loop.c from hoisting {name} */"] + rows[close:]

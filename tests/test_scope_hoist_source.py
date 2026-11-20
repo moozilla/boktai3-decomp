@@ -41,6 +41,32 @@ class HoistSource(unittest.TestCase):
     def test_header_line_overlaps_caller_assignment(self):
         self.check_header_site(2)
 
+    def test_reset_stays_inside_nested_declaration_scope(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "caller.c").write_text(
+                'void Update(void) {\n'
+                '    for (;;) {\n'
+                '        if (active) {\n'
+                '            const u16 *table = gRandomTable;\n'
+                '            use(table, "}"); /* } */\n'
+                '        } else {\n'
+                '            finish();\n'
+                '        }\n'
+                '    }\n'
+                '}\n')
+            passes = [{1: {42: {"reg": 22, "move": (True,)}}}]
+            with patch.object(self.scope, "ROOT", directory), \
+                 patch.object(self.scope, "WORK", str(root / "build")), \
+                 patch.object(self.scope, "uid_locations", return_value={42: ("caller.c", 4)}), \
+                 patch.object(self.scope, "score", return_value=(1, {})):
+                self.scope.hoist_levers("caller.c", "Update", {}, passes,
+                                        {22: "table"}, {42: 4}, 1, {"wd": directory})
+            rows = (root / "build/work/caller.lever-table.c").read_text().splitlines()
+            self.assertIn('table = gRandomTable;', rows[5])
+            self.assertEqual(rows[6], '        } else {')
+            self.assertEqual(rows[5][:12], ' ' * 12)
+
 
 if __name__ == "__main__":
     unittest.main()
