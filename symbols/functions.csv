@@ -1810,6 +1810,7 @@ addr,name,mode,confidence,source,notes
 08047424,TransientSpriteEffects_Initialize,thumb,low,src-alias,
 080474A0,TransientSpriteEffects_Create,thumb,low,src-alias,
 080474E4,TransientSpriteEffects_Spawn,thumb,low,src-alias,
+080475F8,TransientSpriteEffects_SpawnFromScript,thumb,low,src-alias,
 080476F4,BackgroundFlash_SetState,thumb,low,src-alias,
 08047700,BackgroundFlash_TakeEntryFlag,thumb,low,src-alias,
 08047718,BackgroundFlash_EmitEffect,thumb,low,src-alias,
