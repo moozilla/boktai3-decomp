@@ -3,10 +3,6 @@
 #include "background_controller.h"
 #include "background_layers.h"
 #include "array_fill.h"
-/* Background_LoadLayerMap: Resolves a background resource via sub_08216E54, optionally finds the map id with Background_FindMapId, then calls Bg_SetLayerMap; matches docs' descr */
-#define Background_LoadLayerMap sub_080020BC
-/* ScrollingBackground_ClearSlots: Zeroes all four ScrollingBackground slots in gScrollingBackgrounds, unlike the single-slot clear done by the destroy callback ScrollingBackground_Destroy */
-#define ScrollingBackground_ClearSlots sub_08002284
 
 s32 Background_ApplyQueuedCommands(struct Background *p)
 {
@@ -472,7 +468,7 @@ s32 Background_LoadMapFromScript(void)
     return index;
 }
 
-s32 sub_080020BC(s32 layer, u16 resourceId, s32 useIndex, u16 index)
+s32 Background_LoadLayerMap(s32 layer, u16 resourceId, s32 useIndex, u16 index)
 {
     struct BgMapResource resource;
     u8 *base = sub_08216E54(resourceId);
@@ -552,11 +548,7 @@ void Background_QueueCommandFromScript(void)
     Background_QueueCommand(a, b, n, buf);
 }
 
-/* Clears the four ScrollingBackground slots in gScrollingBackgrounds. Not listed in
- * symbols/functions.csv; it sits between two units as raw bytes in gen/code.s,
- * so it is decompiled here to keep the subsystem contiguous. */
-
-void sub_08002284(void)
+void ScrollingBackground_ClearSlots(void)
 {
     struct ScrollingBackground **slots = gScrollingBackgrounds;
     Array_FillDescending(slots[0], slots[3], NULL);

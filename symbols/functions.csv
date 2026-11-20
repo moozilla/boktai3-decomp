@@ -12,9 +12,11 @@ addr,name,mode,confidence,source,notes
 08001EB4,Background_FindMapId,thumb,low,src-alias,
 08001EE0,Background_LoadMapsFromScript,thumb,low,src-alias,
 08002024,Background_LoadMapFromScript,thumb,low,src-alias,
+080020BC,Background_LoadLayerMap,thumb,low,src-alias,Selects a map by index or layer name hash and installs it on a background layer
 0800211C,Background_LoadTilesFromScript,thumb,low,src-alias,
 080021DC,Background_QueueCommand,thumb,low,src-alias,
 08002234,Background_QueueCommandFromScript,thumb,low,src-alias,"Reads keyword values and an argument list from the script stream, then calls Background_QueueCommand; mirrors ScrollingBackground's script-to-queue wr"
+08002284,ScrollingBackground_ClearSlots,thumb,low,src-alias,Clears the four scrolling background controller pointers
 080022A0,ScrollingBackground_ApplyCommands,thumb,low,src-alias,
 08002408,ScrollingBackground_Update,thumb,low,src-alias,
 08002658,ScrollingBackground_Destroy,thumb,low,src-alias,Clears the layer's single slot in gUnk_02000010; set as the destroy callback via Task_SetCallbacks alongside ScrollingBackground_Update in sub_0800284
