@@ -28,12 +28,6 @@ static inline int scale(int n)
     return n >= 0 ? n >> 12 : -((-n) >> 12);
 }
 
-static inline void SetChargeParameter(u8 *p)
-{
-    u16 *target = (u16 *)(p + 0xAD6);
-    u32 value = 0x16E;
-    *target = value;
-}
 void Player_UpdateSelectedAttackCharge(u8 *p)
 {
     struct ContactPackedVector origin;
@@ -45,10 +39,8 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
     switch (BYTE(0x458)) {
         case 0:
             if (ANIMATE(0x23)) {
-                u16 *duration = (u16 *)(p + 0xC10);
-                u32 zero = 0;
-                *duration = 60;
-                BYTE(0x53A) = zero;
+                ((struct Player *)p)->statModifierContext.chargeDuration = 60;
+                ((struct Player *)p)->contactCounted = 0;
                 Player_SetActionPhase(p, 1);
             }
             break;
@@ -95,7 +87,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             if (++*t >= HALF(0xC10)) {
                 BYTE(0xC0F) = 1;
                 HALF(0x4D2) = 30;
-                SetChargeParameter(p);
+                ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F9);
                 Player_SetActionPhase(p, 4);
@@ -111,7 +103,7 @@ void Player_UpdateSelectedAttackCharge(u8 *p)
             if (++HALF(0x45A) >= HALF(0xC10)) {
                 BYTE(0xC0F) = 2;
                 HALF(0x4D2) = 60;
-                SetChargeParameter(p);
+                ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 HALF(0xAD8) = 36;
                 Sound_PlaySong(0x1F9);
                 Player_SetActionPhase(p, 4);
