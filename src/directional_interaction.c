@@ -1,4 +1,5 @@
 #include "directional_interaction.h"
+#include "player_slot_status.h"
 
 /* Sets the controller's state and flags it as newly entered. */
 u32 DirectionalController_SetState(struct DirectionalController *p, u32 state)
@@ -115,17 +116,18 @@ void LevelController_Update(struct DirectionalManager *manager, struct Direction
     }
 }
 
+static inline u32 Directional_ReadPlayerStatus(const u32 *status, u32 mask)
+{
+    return *status & mask;
+}
+
 s32 Actor_CanInteractWithController(struct DirectionalManager *manager,
                                     struct DirectionalController *p)
 {
     struct Player *actor = manager->actor;
-    u32 mask = 0x186c;
-    u32 flags;
-    flags = actor->statusFlags;
-    if (flags & mask)
+    if (Directional_ReadPlayerStatus(&actor->statusFlags, 0x186c))
         return 0;
-    flags &= 0x100000;
-    if (!flags && manager->selected < 0)
+    if (!(actor->statusFlags & 0x100000) && manager->selected < 0)
         return 1;
     return 0;
 }
@@ -171,13 +173,9 @@ s32 DirectionalController_CheckApproach(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto done;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto done;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
@@ -211,13 +209,9 @@ s32 DirectionalController_CheckInput(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto failed;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto failed;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
@@ -260,13 +254,9 @@ s32 DirectionalController_CheckRemaining(struct DirectionalManager *manager,
 {
     DirectionalController_ConsumeEntered(p);
     if (manager->actor) {
-        u32 mask = 6;
-        u32 flags;
-        flags = gUnk_02000560;
-        if (flags & mask)
+        if (PlayerSlot_ReadStatus(0, 6))
             goto done;
-        flags &= 1;
-        if (!flags)
+        if (!(gPlayerSlotStatus[0] & 1))
             goto done;
         {
             s32 dx = p->position.x - manager->position.x, dz = p->position.z - manager->position.z;
