@@ -238,6 +238,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [docs/history/2026-11-15.md](../docs/history/2026-11-15.md) | 2026-11-15 |  | 11 |
 | [docs/history/2026-11-16.md](../docs/history/2026-11-16.md) | 2026-11-16 | #cleanup #compiler #concessions #depin #matching #object-model #round13 #round14 #tooling | 18 |
 | [docs/history/2026-11-17.md](../docs/history/2026-11-17.md) | 2026-11-17 | #compiler #depin #matching #phase3 #round13 #round15 #structs | 3 |
+| [docs/history/2026-11-20.md](../docs/history/2026-11-20.md) | 2026-11-20 | #matching #phase3 #scene-actors | 0 |
 | [docs/history/HANDOFF_2026-10-23.md](../docs/history/HANDOFF_2026-10-23.md) | Handoff: current state and how to continue | #process | 14 |
 | [docs/history/MANAGER_HANDOFF_2026-10-19.md](../docs/history/MANAGER_HANDOFF_2026-10-19.md) | Manager handoff (2026-10-19) | #process #tooling | 6 |
 | [docs/history/README.md](../docs/history/README.md) | Handoff history |  | 17 |
@@ -596,6 +597,7 @@ Addresses are their own tags: write them as 8-digit hex, ranges as `A–B`.
 | [notes/scene-actor-retreat-route.md](../notes/scene-actor-retreat-route.md) | Scene actor retreat route | #scene-actors #terrain #matching | 0 |
 | [notes/scene-actor-timed-burst_2026-11-01.md](../notes/scene-actor-timed-burst_2026-11-01.md) | Timed reaction burst | #scene-actor #matching #compiler | 1 |
 | [notes/scene-actor-twenty_2026-10-12.md](../notes/scene-actor-twenty_2026-10-12.md) | Scene actors and dialogue: reaching 20% | *#actors #scene* | 3 |
+| [notes/scene-actor-warning-cleanup_2026-11-20.md](../notes/scene-actor-warning-cleanup_2026-11-20.md) | Scene actor warning cleanup checkpoint | #scene-actors #phase3 #matching #0801E000 #080297E8 | 1 |
 | [notes/scene-arc-effects_2026-10-13.md](../notes/scene-arc-effects_2026-10-13.md) | Scene arc slots and projected ground effects (tentative) | *#scene* | 4 |
 | [notes/scene-contact-pool-start_2026-11-01.md](../notes/scene-contact-pool-start_2026-11-01.md) | scene-contact-pool-start_2026-11-01.md | *#scene #assets* | 0 |
 | [notes/scene-departure-display_2026-11-01.md](../notes/scene-departure-display_2026-11-01.md) | Scene departure display | *#scene* | 1 |
