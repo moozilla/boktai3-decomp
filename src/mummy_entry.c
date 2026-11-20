@@ -1172,8 +1172,8 @@ static inline u8 TakeControlEntry(struct ChaseActor *actor)
 
 void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
 {
-    u8 *body = actor->base.context;
-    u8 *group = (u8 *)(&actor->group.common);
+    struct Mummy *body = actor->base.context;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (TakeControlEntry(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
@@ -1187,20 +1187,19 @@ void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
     else if (actor->base.behavior2AA == 18)
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     actor->base.field2C2 = 32;
-    if (!(*((u16 *)(body + 0x6d6)))) {
-        actor->base.tracking.target = ((u32)gPlayers[0]) + 0x24;
+    if (!body->savedTick) {
+        SceneActorChase_TrackPlayer(actor);
         {
-            u32 mask = 4;
-            SetHalf((u16 *)(group + 0x40), mask);
+            SetHalf((u16 *)&group->common.gate.flags, 4);
         }
         actor->base.statusFlags = ClearWordValue(&actor->base.statusFlags, 4);
         {
-            struct ChaseFlags40 *field = (void *)(body + 0x6f2);
+            struct ChaseFlags40 *field = (void *)&body->flags6F2;
             s32 mask = ~0x1400;
             field->bits = mask & field->bits;
         }
         if (Arrive(actor)) {
-            Chase_SetCtl(actor, *((void **)(group + 0x48)), 0x25);
+            Chase_SetCtl(actor, group->common.gate.control, 0x25);
             Chase_SetBehavior(actor, 12);
         }
     } else
@@ -1345,8 +1344,8 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
         goto failed;
     if (!((struct MummyStimulusGroup *)&a->group.common)->stimulus.timer) {
         ((struct MummyStimulusGroup *)&a->group.common)->stimulus.timer = 180;
-        Chase_SetCtl(a, group->control, 9);
-        Chase_SetBehavior(a, 11);
+        SceneActorChase_SetControl(a, group->control, 9);
+        SceneActorChase_SetBehavior(a, 11);
         {
             u32 mask = 0x4000;
             body->flags = mask | (body->flags);
@@ -1369,15 +1368,9 @@ u32 Mummy_TryStimulusRoute(struct ChaseActor *a)
     success:
         return 1;
     }
-    {
-        u32 mask = 16;
-        a->base.behaviorFlags |= mask;
-    }
+    SceneActorChase_SetActorFlags(a, 16);
     a->base.field2C2 = Div(64, 3);
-    {
-        u32 mask = 0xFF7FFFFF;
-        a->base.behaviorFlags = mask & a->base.behaviorFlags;
-    }
+    SceneActorChase_ClearActorFlags(a, 0x800000);
     body->phase[0] = 4;
     {
         u32 mask = 0x200;
@@ -1505,15 +1498,13 @@ void Mummy_UpdateScriptedAction(struct SUpdateScriptedAction *obj)
 void Mummy_UpdateDelayedPursuit(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *group = &actor->group;
-    u32 zero;
     SceneActorControl_TakeStateEntry(actor);
-    zero = (u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
-    if (zero)
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((s32)actor->base.counter2AC <= 60)
         goto waiting;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-    SceneActorChase_SetState(actor, 3, 1, zero);
+    SceneActorChase_SetState(actor, 3, 1, 0);
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetActorFlags(actor, 0x80);
@@ -1724,10 +1715,7 @@ static inline u8 Mummy_Arrive_pursuit(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -1778,7 +1766,7 @@ void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
     if ((s32)actor->base.counter2AC > 60) {
-        SceneActorChase_ClearFlagComponent(&group->common.gate.flags, 6);
+        SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 6);
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
         SceneActorDelay_Prepare((void *)&group->saved, group->common.gate.control, 12, 30);
         SceneActorChase_SetState(actor, 3, 1, 0);
@@ -1805,46 +1793,23 @@ static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
 
 void Mummy_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
-    u8 *group = (u8 *)&a->group.common;
+    struct SceneActorChaseGroup *group = &a->group;
     s32 motion;
     s32 event;
     if (a->base.field2B1)
         a->base.field2B1 = 0;
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
         return;
-    motion = Callback_InvokeActor(a, *(void **)((u8 *)a + 0x260));
-    {
-        u16 *rate;
-        if (TestFlags(a, 0xA02F)) {
-            u16 *p = &a->base.field2C2;
-            *p = 64;
-            rate = p;
-        } else {
-            u16 *p = &a->base.field2C2;
-            u16 value = *p;
-            rate = p;
-            if (!value)
-                *rate = 64;
-        }
-        if (!a->base.drawableKind)
-            Anim_SetDurationScale((u8 *)a->base.drawable + 0x48, *rate);
-        else
-            Anim_SetFrameDurationScale((u8 *)a->base.drawable + 0x20, *rate);
-    }
-    event = NavMesh_ConsumeProbeEvent(*(void **)(group + 0x1FC));
+    motion = Callback_InvokeActor(a, a->base.animationQuery.opaque);
+    Mummy_ApplyDuration(a);
+    event = NavMesh_ConsumeProbeEvent(group->route);
     if (!event) {
-        if (SceneActorBehavior_AccelerateTowardDescriptor(a, *(void **)(group + 0x1FC), 32, 32,
-                                                          motion)) {
-            u32 state = 0x12;
-            a->base.state2A8 = event;
-            a->base.phase2A9 = event;
-            a->base.behavior2AA = state;
-            a->base.counter2AC = event;
-            a->base.field2B1 = 1;
+        if (SceneActorBehavior_AccelerateTowardDescriptor(a, group->route, 32, 32, motion)) {
+            SceneActorChase_SetBehavior(a, 0x12);
             return;
         }
     } else {
-        if (SceneActorBehavior_RequestDescriptorTurn(a, *(void **)(group + 0x1FC), 32, 32, motion))
+        if (SceneActorBehavior_RequestDescriptorTurn(a, group->route, 32, 32, motion))
             Chase_SetBehavior(a, 0x11);
     }
     a->base.counter2AC++;
@@ -1854,52 +1819,19 @@ s32 Callback_InvokeActor(void *, void *);
 
 void Mummy_UpdatePlayerRoute(struct ChaseActor *actor);
 
-static inline u8 TakePrepared(u8 *field)
-{
-    if (*field) {
-        *field = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    u8 *prepared = &actor->base.field2B2;
-    u32 zero = 0;
-    *prepared = 1;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
-
 void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
 {
     u8 busy;
-    if (TakePrepared(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         void *control = actor->base.onEntry;
-        SetControl(actor, control, 2);
+        SceneActorChase_SetControl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
         if (actor->base.stepDone) {
             SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-            {
-                u32 state = 0x10;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = 0;
-                actor->base.behavior2AA = state;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
-            SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
+            SceneActorChase_SetBehavior(actor, 0x10);
+            SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 0x27);
         } else
             actor->base.counter2AC++;
     }
@@ -1910,20 +1842,7 @@ void SceneActor_WaitForControlCompletion(struct ChaseActor *actor)
 void SceneActorControl_UpdatePersistentPhase_080D622C(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = (void *)Mummy_UpdatePlayerRoute;
-        u32 kind;
-        kind = 39;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = control;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 39);
     }
     if (!(u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)))
         ++actor->base.counter2AC;
@@ -2058,61 +1977,13 @@ void Mummy_EnterIdleControl(struct ChaseActor *actor)
 {
     struct Mummy *context = actor->base.context;
     if (actor->base.tracking.distance < context->limit) {
-        void *fn = SceneActorControl_OnIdle;
-        u8 code = 0x10;
-        u32 zero;
-        u8 one;
-        u8 zero8;
-        u32 two;
-        u8 *taken = &actor->base.field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = code;
-        actor->base.target = fn;
-        zero8 = 0;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-        two = 2;
-        actor->base.state2A8 = zero8;
-        actor->base.phase2A9 = two;
-        actor->base.behavior2AA = zero8;
-        actor->base.counter2AC = zero;
-        actor->base.field2B1 = one;
+        SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SelectState(actor, 0, 2, 0);
+        SceneActorChase_ResetStateEntry(actor);
     } else {
-        void *fn = SceneActorControl_OnIdle;
-        u8 code = 0x10;
-        u32 zero;
-        u8 one;
-        u8 zero8;
-        u32 two;
-        u8 *taken = &actor->base.field2B2;
-        zero = 0;
-        one = 1;
-        *taken = one;
-        actor->base.stepDone = zero;
-        actor->base.controlKind = code;
-        actor->base.target = fn;
-        zero8 = 0;
-        actor->base.field2C8 = zero;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = -2;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = zero;
-        two = 2;
-        actor->base.state2A8 = zero8;
-        actor->base.phase2A9 = two;
-        actor->base.behavior2AA = one;
-        actor->base.counter2AC = zero;
-        actor->base.field2B1 = one;
+        SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 0x10);
+        SceneActorChase_SelectState(actor, 0, 2, 1);
+        SceneActorChase_ResetStateEntry(actor);
     }
 }
 
@@ -2149,10 +2020,7 @@ static inline u8 Mummy_ArriveWithDirectFallback(void *obj)
         goto reroute;
     if (SceneActorChase_MotionFlags(actor, 0x400))
         return 0;
-    {
-        u32 bits = 4;
-        group->common.gate.flags &= ~bits;
-    }
+    SceneActorChase_ClearFlagComponent((void *)&group->common.gate.flags, 4);
     if (SceneActorChase_MotionFlags(actor, 0x80)) {
         SceneActorChase_SetControl(actor, group->common.gate.control, 0x1A);
         SceneActorChase_SetBehavior(actor, 12);
@@ -2325,53 +2193,27 @@ u8 SceneActorPath_FaceAndCheckStraightPath(struct Unk080D6DF8Actor *actor)
 
 bool32 Mummy_IsPlayerFlag8Set(void)
 {
-    u8 *player = gPlayers[0];
+    struct Player *player = gPlayers[0];
     u32 mask = 8;
-    if (*(u32 *)(player + 0x20) & mask)
+    if (player->statusFlags & mask)
         return TRUE;
     return FALSE;
 }
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl_RequestStraightRoute(struct ChaseActor *actor)
-{
-    void *callback = SceneActorControl_OnIdle;
-    u8 kind = 0;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
-static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 // confidence=low: scans to the last open cell in the current facing and starts a route.
 
 u8 Mummy_RequestStraightRoute(struct ChaseActor *actor)
 {
-    u8 *state = actor->base.context;
-    u8 *nav = (u8 *)actor + 0x3D4;
+    struct Mummy *state = actor->base.context;
+    struct SceneActorChaseGroup *nav = &actor->group;
     s32 dest;
     s32 dir;
     struct ContactPosition pos;
     u32 result;
 
-    if (FIELD(state, 0x6D2, u16))
+    if (state->pursuitDelay)
         return 0;
     dir = ((actor->base.body.direction + 0x20) >> 6) & 3;
     dest = SceneActorTerrain_LastOpenCell(actor, dir);
@@ -2379,14 +2221,13 @@ u8 Mummy_RequestStraightRoute(struct ChaseActor *actor)
         return 0;
     SceneActorTerrain_GetCenter(dest, &pos);
     pos.y = actor->base.body.position.y;
-    result = SceneActorTerrain_RequestPath(actor, FIELD(nav, 0x1FC, void *),
-                                           &actor->base.body.position, &pos);
+    result = SceneActorTerrain_RequestPath(actor, nav->route, &actor->base.body.position, &pos);
     if (!result) {
-        SetControl_RequestStraightRoute(actor);
-        SetAnimation(actor, 3, 0, 0);
+        SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 0);
+        SceneActorChase_SetState(actor, 3, 0, 0);
         return 0;
     }
-    FIELD(state, 0x6D2, u16) = 0xF0;
+    state->pursuitDelay = 0xF0;
     return 1;
 }
 
