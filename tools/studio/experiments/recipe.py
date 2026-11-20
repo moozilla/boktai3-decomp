@@ -12,7 +12,8 @@ MAX_SAMPLES = 61
 DEFAULT_RTC = 1128150000
 IDENTIFIER = re.compile(r"[A-Za-z_]\w*", re.ASCII)
 TRIAL_ID = re.compile(r"[a-z][a-z0-9_-]{0,23}")
-CHECKPOINT_ID = re.compile(r"(?:boot|test-save|bank-[0-9]{4})")
+CHECKPOINT_ID = re.compile(r"(?:boot|test-save|bank-[0-9]{4}|(?:bookmark|recording)-[A-Za-z0-9_-]{1,40})")
+CAPTURE_PREFIXES = ("bookmark-", "recording-")
 RUN_ID = re.compile(r"[0-9a-f]{32}")
 KEYS = {"A", "B", "L", "R", "START", "SELECT", "UP", "DOWN", "LEFT", "RIGHT"}
 
@@ -97,8 +98,9 @@ def validate(value):
             raise ValueError("A fork requires a valid trial ID")
         fork = {"run": run_id, "trial": trial_id,
                 "frame": bounded_int(fork.get("frame"), 0, MAX_FRAMES, "Fork frame")}
-    resume = value.get("continue", checkpoint != "boot" and fork is None)
-    if type(resume) is not bool or (resume and (checkpoint == "boot" or fork is not None)):
+    can_continue = checkpoint != "boot" and not checkpoint.startswith(CAPTURE_PREFIXES) and fork is None
+    resume = value.get("continue", can_continue)
+    if type(resume) is not bool or (resume and not can_continue):
         raise ValueError("Continue is available for battery saves")
     fields = strings(value.get("observe", []), MAX_FIELDS, "Observed fields")
     functions = strings(value.get("probe", []), MAX_PROBES, "Probed functions")

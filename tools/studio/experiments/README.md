@@ -38,8 +38,9 @@ build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGame
 ```
 
 - `checkpoint` selects power-on, the reference save, or an available story-bank
-  save. Use `--trans PATH` on CLI runs for a translation checkout outside the
-  usual locations. The `continue` option tries the reference title-screen
+  save. Captured mGBA bookmarks from Centaur are also available when present.
+  Use `--trans PATH` on CLI runs for a translation checkout outside the usual
+  locations. The `continue` option tries the reference title-screen
   sequence. A checkpoint may need extra `prepare` input, which runs once before
   the branches split. The first image shows where the recipe actually starts.
 - `duration` and `sample_every` count emulated VBlanks. All trials share the
@@ -62,6 +63,20 @@ build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGame
   and `ge`. A changed pointer binding leaves the field delta unresolved.
 - A `fork` has the form `{"run": "RUN_ID", "trial": "TRIAL_ID", "frame": 60}`.
   Use a capture from the same ROM that mGBA can restore. The playback preserves the recorded sensor threshold when starting a new fork.
+
+## Bring in a play session
+
+Use **Record from here** in Studio Live with Centaur connected. Stop the
+recording, then select it from **Example questions and recordings** in
+Experiments. The saved recording and a no-input control replay from the
+same captured state. You can edit the trials or select other named fields
+before running. The importer uses up to 1,800 controller frames and accepts
+continuous recordings. Each trial uses the recipe's RTC and cartridge settings.
+
+```sh
+build/venv/bin/python -m tools.studio.experiments import-live recording-NAME > build/recording-recipe.json
+build/venv/bin/python -m tools.studio.experiments run build/recording-recipe.json
+```
 
 ## Tool API
 

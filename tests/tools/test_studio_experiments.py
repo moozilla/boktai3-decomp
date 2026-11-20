@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/studio"))
-from experiments import annotations, checks, fields, http, recipe, runner
+from experiments import annotations, centaur, checks, fields, http, recipe, runner
 
 
 class RecipeTests(unittest.TestCase):
@@ -65,6 +65,26 @@ class RecipeTests(unittest.TestCase):
         self.assertEqual(values, {"f0000": 86, "f0005": 86, "f0010": 12})
         self.assertIn("save f0005", commands)
         self.assertEqual(end, 12)
+
+
+class RecordingTests(unittest.TestCase):
+    def test_imports_only_continuous_controller_input_from_the_named_capture(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(centaur, "ROOT_CAPTURE", Path(temp)):
+            text = Path(temp) / "day-one.txt"
+            state = text.with_suffix(".ss")
+            state.write_bytes(b"local state")
+            text.write_text("# Comment\nloadstate day-one.ss\nwait 2\nhold UP 4000\n")
+            spec = centaur.import_recording("recording-day-one")
+            self.assertEqual(spec["checkpoint"], "recording-day-one")
+            self.assertEqual(spec["duration"], recipe.MAX_FRAMES)
+            self.assertEqual(spec["trials"][0]["input"], "wait 2\nhold UP 1798")
+            self.assertFalse(spec["continue"])
+            text.write_text("loadstate day-one.ss\nwait 2\nloadstate ../outside.ss\n")
+            with self.assertRaisesRegex(ValueError, "continuous recording"):
+                centaur.import_recording("recording-day-one")
+            text.write_text("loadstate ../outside.ss\nwait 2\n")
+            with self.assertRaises(FileNotFoundError):
+                centaur.import_recording("recording-day-one")
 
 
 class FieldTests(unittest.TestCase):

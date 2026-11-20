@@ -14,6 +14,7 @@ const resultPath = id => API + '/runs/' + id;
 const artifact = (path, id = primary.id) => resultPath(id) + '/artifact/' + path;
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 const unsignedHex = value => '0x' + value;
+const savedGame = id => id !== 'boot' && !/^(bookmark|recording)-/.test(id);
 
 async function json(url, body) {
   const options = body === undefined ? {} : {
@@ -427,7 +428,7 @@ function setForm(spec) {
   $('duration').value = spec.duration;
   $('interval').value = spec.sample_every;
   $('resume-save').checked = spec.continue;
-  $('resume-save').disabled = spec.checkpoint === 'boot' || Boolean(spec.fork);
+  $('resume-save').disabled = !savedGame(spec.checkpoint) || Boolean(spec.fork);
   $('prep').value = spec.prepare;
   $('observe').value = spec.observe.join('\n');
   $('probe').value = spec.probe.join('\n');
@@ -528,7 +529,7 @@ $('history-select').onchange = event => {
 };
 $('compare').onchange = event => compareRun(event.target.value);
 $('checkpoint').onchange = () => {
-  $('resume-save').disabled = $('checkpoint').value === 'boot';
+  $('resume-save').disabled = !savedGame($('checkpoint').value);
   $('resume-save').checked = !$('resume-save').disabled;
 };
 $('recipe-form').onsubmit = event => {
@@ -603,7 +604,7 @@ async function start() {
     [example, catalog, examples] = await Promise.all([
       json(API + '/example'), json(API + '/catalog'), json(API + '/examples'),
     ]);
-    $('examples').innerHTML = '<option value="">Example questions</option>' + examples.map(item =>
+    $('examples').innerHTML = '<option value="">Example questions and recordings</option>' + examples.map(item =>
       `<option value="${esc(item.id)}">${esc(item.label)}</option>`).join('');
     $('checkpoint').innerHTML = catalog.checkpoints.map(c =>
       `<option value="${esc(c.id)}">${esc(c.label)}${c.scene == null ? '' : ' · scene ' + c.scene}</option>`).join('');

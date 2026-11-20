@@ -111,6 +111,8 @@ code, pre { font-family: var(--mono); }
   .inspection { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
+  .toolbar, .transport { flex-wrap: wrap; }
+  .toolbar select { max-width: 100%; }
   #screens { grid-template-columns: 1fr; }
   .screen:not(.active) img { display: none; }
   .form-row { grid-template-columns: 1fr 1fr; }

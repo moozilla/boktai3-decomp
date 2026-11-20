@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import fields, recipe, runner
+from . import centaur, fields, recipe, runner
 
 
 def proof_branch(parent):
@@ -52,6 +52,8 @@ def main():
     inspect.add_argument("trial")
     inspect.add_argument("frame", type=int)
     inspect.add_argument("paths", nargs="+")
+    import_live = commands.add_parser("import-live", help="Turn a Centaur recording into a replay recipe")
+    import_live.add_argument("id")
     args = parser.parse_args()
     try:
         match args.command:
@@ -61,6 +63,8 @@ def main():
                 data = runner.checkpoints()
             case "fields":
                 data = [fields.measure(path).to_dict() for path in args.paths]
+            case "import-live":
+                data = centaur.import_recording(args.id)
             case "snapshot":
                 data = runner.inspect_frame({"run": args.id, "trial": args.trial, "frame": args.frame}, args.paths)
             case "proof" | "run":

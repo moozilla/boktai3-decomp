@@ -13,7 +13,7 @@ import threading
 import time
 from uuid import uuid4
 
-from . import annotations, checks, fields, recipe
+from . import annotations, centaur, checks, fields, recipe
 
 ROOT = fields.ROOT
 HERE = Path(__file__).resolve().parent
@@ -102,6 +102,8 @@ def checkpoint_paths(trans=None):
     yield {"id": "boot", "label": "Power on", "kind": "boot"}
     if REFERENCE.is_file():
         yield {"id": "test-save", "label": "Reference save", "kind": "save", "path": REFERENCE}
+    yield from centaur.bookmarks()
+    yield from centaur.recordings()
     if trans is None:
         candidates = (ROOT.parent / "boktai3trans", ROOT.parent.parent / "boktai3trans")
         trans = next((path for path in candidates if (path / "saves").is_dir()), None)
@@ -147,10 +149,12 @@ def run_harness(binary, directory, lines, rtc, battery=None):
         raise RuntimeError("mGBA: " + public_path(log.read_text(errors="replace")[-1600:]))
 
 
-def initial_commands(spec, starting_lux, forked):
+def initial_commands(spec, starting_lux, forked, starting_capture):
     result = ["trace off"]
     if forked:
         result.append("load parent")
+    if starting_capture:
+        result.append("loadstate captured.ss")
     result.extend((f"lux {starting_lux}", f"rtc {spec['rtc']}"))
     if spec["continue"]:
         # Keep the known reference boot inputs shared with the harness tests.
@@ -428,7 +432,8 @@ def execute(directory, spec, trans=None):
         prefix = directory / "prepare"
         prefix.mkdir()
         rom_id, harness_id = fingerprint(ROM), fingerprint(binary)
-        parent, parent_screen = prepare_fork(spec, prefix, rom_id)
+        parent, seed_picture = prepare_fork(spec, prefix, rom_id)
+        external = None
         if parent:
             checkpoint = parent["checkpoint"]
             battery = None
@@ -439,12 +444,14 @@ def execute(directory, spec, trans=None):
                 raise ValueError("The selected checkpoint is unavailable")
             battery = prepare_battery(checkpoint, prefix)
             starting_lux = 232
-        boot_commands = initial_commands(spec, starting_lux, bool(parent))
+            if checkpoint["kind"] in {"bookmark", "recording"}:
+                external, seed_picture = centaur.stage(checkpoint, prefix)
+        boot_commands = initial_commands(spec, starting_lux, bool(parent), bool(external))
         run_harness(binary, prefix, boot_commands, spec["rtc"], battery)
         _, starting_lux = light_at_sample(boot_commands, starting_lux)
-        if parent and not any(step[0] for step in recipe.compile_steps(spec["prepare"], recipe.MAX_PREPARE)):
+        if seed_picture and not any(step[0] for step in recipe.compile_steps(spec["prepare"], recipe.MAX_PREPARE)):
             from PIL import Image
-            with Image.open(parent_screen) as image:
+            with Image.open(seed_picture) as image:
                 image.save(prefix / "fork.ppm")
         fork = prefix / "fork.ss"
         identity = {"rom": rom_id, "fork": fingerprint(fork), "harness": harness_id,
@@ -453,6 +460,8 @@ def execute(directory, spec, trans=None):
                     "extents": fingerprint(ROOT / "PROGRESS.json")}
         if battery:
             identity["battery"] = fingerprint(battery)
+        if external:
+            identity["live_state"] = fingerprint(external)
         head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, capture_output=True, check=False)
         identity["source_revision"] = head.stdout.strip() if head.returncode == 0 else None
         result = {"id": directory.name, "recipe": spec, "identity": identity,

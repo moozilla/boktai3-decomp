@@ -5,7 +5,7 @@ import re
 import threading
 import urllib.parse
 
-from . import fields, recipe, runner
+from . import centaur, fields, recipe, runner
 
 API = "/api/experiments"
 PAGE = "/experiments"
@@ -114,10 +114,13 @@ def routes(handler, method):
             file, mime = ASSETS[path]
             handler.send(200, (runner.HERE / file).read_bytes(), mime)
         elif method == "GET" and path == API + "/examples":
-            handler.send(200, [{"id": name, "label": label} for name, label in runner.EXAMPLES.items()])
+            library = [{"id": name, "label": label} for name, label in runner.EXAMPLES.items()]
+            library.extend({"id": c["id"], "label": c["label"]} for c in centaur.recordings())
+            handler.send(200, library)
         elif method == "GET" and (path == API + "/example" or path.startswith(API + "/example/")):
             name = path.removeprefix(API + "/example").removeprefix("/") or "pause"
-            handler.send(200, runner.sample_recipe(name))
+            spec = centaur.import_recording(name) if name.startswith("recording-") else runner.sample_recipe(name)
+            handler.send(200, spec)
         elif method == "GET" and path == API + "/catalog":
             catalog(handler)
         elif path == API + "/runs":
