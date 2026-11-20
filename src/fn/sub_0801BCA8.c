@@ -1,13 +1,12 @@
 #include "result_tutorial.h"
+#include "sprite_drawable_api.h"
 void Widget_InitLinked(void *, void *, int, int, int, int, int, void *);
-void *AnimData_FindEntry(int);
-void ParticleSprite_Initialize(void *, void *, int);
 int ResultMenu_CreateGraphics(struct ResultMenu *p)
 {
     struct ContactPosition position;
     struct ContactPosition *pos = &position;
     struct SceneInputWidget *widget;
-    struct ResultTutorialMarker *marker;
+    struct SpriteDrawable *marker;
     int i;
     struct ContactPosition *saved;
     int clear;
@@ -22,7 +21,7 @@ int ResultMenu_CreateGraphics(struct ResultMenu *p)
         i--;
     } while (i >= 0);
     {
-        void *resource = AnimData_FindEntry(0x1c1a);
+        const struct SpriteEffectTileResource *resource = AnimData_FindEntry(0x1c1a);
         u8 *a = &p->hideLevel;
         u8 *b = &p->hideTimer;
         marker = p->markers;
