@@ -89,6 +89,21 @@ static inline void f(void)
     def test_comments_are_not_code(self):
         self.assertEqual(kinds('void f(void) { /* asm("") */ g(); } // DEBUG_NOP()'), [])
 
+    def test_dead_local_updates_discard_only_their_own_scalar(self):
+        source = """void f(s32 frame)
+{
+    {
+        u32 folded = (u32)frame;
+        folded += folded >> 3;
+        folded += folded >> 5;
+    }
+}
+"""
+        self.assertEqual(c.sites(source), [c.Site(5, "dead-local-update")])
+        self.assertEqual(kinds(source.replace("folded >> 5;", "folded >> 5;\n        emit(folded);")), [])
+        self.assertEqual(kinds(source.replace("folded >> 5", "ReadSample()")), [])
+        self.assertEqual(kinds(source.replace("(u32)frame;", "Publish(&folded);")), [])
+
     def test_tracked_kinds_are_not_counted(self):
         text = "void f(u8 *p) { again: g(); goto again; }"
         self.assertEqual(kinds(text), [])
