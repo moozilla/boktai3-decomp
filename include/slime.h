@@ -21,20 +21,6 @@ struct Slime {
     u16 splitScript, splitParameter, waitTimer, flags;
 };
 
-struct SlimeDrawable {
-    u32 flags;
-    u8 unknown4[4];
-    u8 scaleX;
-    s8 scaleY;
-    u8 unknownA[6];
-    u16 frame;
-    u8 unknown12[0xA];
-    struct ContactPosition position;
-    u8 unknown24[8];
-    u8 animation[0x1C];
-    struct DisplaySequenceState sequence;
-    const void *resource;
-};
 struct SlimeHalfFlags {
     s16 bits : 16;
 };
