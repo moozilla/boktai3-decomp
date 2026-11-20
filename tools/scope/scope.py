@@ -993,11 +993,9 @@ def report(src, func, rom_code, addr, mine, info, t_compile):
              + ("" if only_targets else ": they follow from the others") + ")" if nb else "")
           + f"; shape {shape_distance(rom, dr)} (register-blind distance, what try ranks by)"
           + f"; {shifted} offset-only shifts hidden.  full listing: {rel}/diff.txt (json: diff.json)")
-    mv = moved_rows(rows_json)
-    if mv:
-        ex = next(i for i in sorted(mv) if rows_json[i]["tag"] == "+")
-        print(f"{len(mv) // 2} of the differing insns are the same instruction at another position (an order"
-              f" difference, not a missing one): `why {rows_json[ex]['uid']}` names what reads each copy")
+    moved = moved_rows_note(rows_json)
+    if moved:
+        print(moved)
     for i, ln, tied, shared in and_tie_hints(rows_json):
         if shared:
             print(f"line {ln}: the ROM's `{rows_json[i]['rom']}` writes a constant of its own, the draft's"
@@ -2082,6 +2080,17 @@ def moved_rows(rows, window=8):
                 out[i], out[j] = j, i
                 break
     return out
+
+
+def moved_rows_note(rows):
+    moved = moved_rows(rows)
+    if not moved:
+        return ""
+    uid = next((rows[i]["uid"] for i in sorted(moved)
+                if rows[i]["tag"] == "+" and rows[i].get("uid") is not None), None)
+    detail = f"`why {uid}` names what reads each copy" if uid is not None else "see the full listing"
+    return (f"{len(moved) // 2} of the differing insns are the same instruction at another position"
+            f" (an order difference, not a missing one): {detail}")
 
 
 def constant_def(texts, i, reg, window=8):

@@ -14,6 +14,18 @@ class InsertedOperandCopy(unittest.TestCase):
     def setUp(self):
         self.scope, _ = _load_scope(Path(__file__).resolve().parents[1])
 
+    def test_moved_rows_only_suggest_why_for_attributed_instructions(self):
+        rows = [
+            {"tag": "+", "draft": ".word 0x100", "uid": None},
+            {"tag": "-", "rom": ".word 0x100"},
+        ]
+        self.assertIn("see the full listing", self.scope.moved_rows_note(rows))
+        rows.extend([
+            {"tag": "+", "draft": "movs r0, #1", "uid": 91},
+            {"tag": "-", "rom": "movs r0, #1"},
+        ])
+        self.assertIn("`why 91`", self.scope.moved_rows_note(rows))
+
     def fixture(self, wd, *, existing=False, boundary=False, wrong_source=False):
         copy = "(insn 201 20 27 (set (reg/v:SI 30) (reg/v:SI %d)) -1 (nil) (nil))\n" % (
             29 if wrong_source else 26)
