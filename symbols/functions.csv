@@ -1889,6 +1889,7 @@ addr,name,mode,confidence,source,notes
 080492F0,TetherActor_SelectInteractionState,thumb,low,src-alias,
 08049364,TetherActor_BeginAuxiliaryState,thumb,low,src-alias,
 0804945C,TetherActor_AdjustSlopeMovement,thumb,low,src-alias,
+080497E4,TetherActor_ClearInstance,thumb,low,src-alias,Clears the global tether pointer.
 080497F0,TetherActor_ClearExternalStatus,thumb,low,src-alias,
 08049818,TetherActor_TestMatchingStatus,thumb,low,src-alias,
 08049840,TetherActor_TestNearbyInteraction,thumb,low,src-alias,
@@ -1908,6 +1909,7 @@ addr,name,mode,confidence,source,notes
 08049EBC,TetherActor_BeginDisplayPositionState,thumb,low,src-alias,
 08049F08,TetherActor_GetStatusFlags,thumb,low,src-alias,
 08049F28,TetherActor_TestStatusFlags,thumb,low,src-alias,
+08049F54,TetherActor_GetStatusTag,thumb,low,src-alias,Returns the status tag when a tether exists.
 08049F78,TetherActor_AddStatusFlags,thumb,low,src-alias,
 08049FA8,TetherActor_RemoveStatusFlags,thumb,low,src-alias,
 08049FD8,TetherActor_CopyPosition,thumb,low,src-alias,
@@ -1922,6 +1924,7 @@ addr,name,mode,confidence,source,notes
 0804A294,TetherActor_SetTransformFromScript,thumb,low,src-alias,
 0804A3AC,TetherActor_RequestPositionSample,thumb,low,src-alias,
 0804A3CC,TetherActor_StartAuxiliaryState,thumb,low,src-alias,
+0804A400,TetherActor_GetSavedKind,thumb,low,src-alias,Reads the signed saved tether kind.
 0804A418,TetherActor_GetConfiguredKind,thumb,low,src-alias,Returns the same saved kind as a signed word for initialization when script parameter k is absent
 0804A430,TetherActor_InitKindFromScript,thumb,low,src-alias,
 0804A4C8,TetherActor_InitInteractionFromScript,thumb,low,src-alias,

@@ -4,11 +4,8 @@
 #include "monster_particle_random.h"
 #include "armor_decision_ops.h"
 
-#define TetherActor_GetStatusTag sub_08049F54
 
-#define TetherActor_GetSavedKind sub_0804A400
 
-#define TetherActor_ClearInstance sub_080497E4
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 
@@ -1238,9 +1235,8 @@ void TetherActor_ClearExternalStatus(void)
 {
     Inventory_AddItem(43, 0);
     {
-        const s8 cleared = -1;
-        s16 *status = &gGameState->unk5AA;
-        *status = cleared;
+        s16 *savedKind = &gGameState->unk5AA;
+        *savedKind = -1;
     }
 }
 
@@ -2943,19 +2939,15 @@ void TetherActor_UpdateWanderingState(struct TetherActor *actor)
         }
     } else if (actor->roamFrame > 90) {
         u32 angle;
-        const s16 *table;
         struct ContactPackedVector delta;
         struct ContactPosition *position;
         {
             u32 value = (actor->heading + 5) & 7;
             angle = value << 5;
         }
-        do {
-            table = gUnk_086149C4;
-        } while (0);
-        delta.x = scale(table[(angle + 64) & 255] * 3);
+        delta.x = scale(gUnk_086149C4[(angle + 64) & 255] * 3);
         delta.y = 0;
-        delta.z = scale(table[angle] * 3);
+        delta.z = scale(gUnk_086149C4[angle] * 3);
         position = &actor->position;
         if (TetherActor_TestStepDelta((struct ContactPackedVector *)position, &delta, 0x843)) {
             position->x += delta.x;
