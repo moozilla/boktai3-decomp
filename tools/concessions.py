@@ -230,11 +230,31 @@ def _literal_initializers(code: str):
                 start = token.end()
 
 
+def _record_bodies(code: str):
+    """Members declared inside a structure or union are not automatic variables."""
+    for head in re.finditer(r"\b(?:struct|union)\s*(?:[A-Za-z_]\w*\s*)?\{", code):
+        depth = 1
+        for token in _DECL_PUNCT.finditer(code, head.end()):
+            if token[0] == "{":
+                depth += 1
+            elif token[0] == "}":
+                depth -= 1
+                if not depth:
+                    yield head.end(), token.start()
+                    break
+
+
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
+    records = None
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
+            if kind == "const-local":
+                if records is None:
+                    records = list(_record_bodies(code))
+                if any(start <= m.start() < end for start, end in records):
+                    continue
             yield m.start(), kind
     # A write to actor->state or sprite.state cannot modify a local named state.
     locals_only = re.sub(r"(?:->|\.)\s*[A-Za-z_]\w*", lambda m: "@" * len(m[0]), code)

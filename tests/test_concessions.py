@@ -220,6 +220,20 @@ class Warnings(unittest.TestCase):
 """
         self.assertEqual(warns(body), ["literal-local"])
 
+    def test_number_named_record_members_are_not_locals(self):
+        body = """struct Header {
+    int one;
+};
+void clear(void) {
+    struct {
+        struct { int value; } inner;
+        u32 zero;
+    } scratch;
+    u32 zero = 0;
+}
+"""
+        self.assertEqual(warns(body), ["const-local"])
+
     def test_literal_local_is_never_changed(self):
         self.assertEqual(warns("void f(u32 a) {\n    u32 mask = 0x17;\n    if (mask & a)\n        g();\n}\n"),
                          ["literal-local"])
