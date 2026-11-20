@@ -1258,13 +1258,19 @@ static inline void GhoulInit_InitializePaletteRange(struct ChaseActor *actor, u3
     actor->base.paletteBank = MonsterInit_GetPaletteBase(actor) + current;
 }
 
+static inline struct ChaseActor *Ghoul_AllocateDrawable(struct ChaseActor *actor, u32 size)
+{
+    actor->base.drawable = Heap_Alloc(size);
+    Memory_Clear(actor->base.drawable, size);
+    return actor;
+}
+
 s32 Ghoul_Init(void *object)
 {
     struct Ghoul *rootActor = object;
     struct ChaseActor *actor = object;
     struct SceneActorChaseGroup *group = &rootActor->chase.group;
     struct SceneActorBody *body = &rootActor->chase.base.body;
-    u32 zero;
     struct ContactPosition origin;
     u32 flag;
     s32 mode;
@@ -1277,23 +1283,19 @@ s32 Ghoul_Init(void *object)
 
     if (MonsterInit_GetDrawableKind(actor) == 0) {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x5C);
-        Memory_Clear(actor->base.drawable, 0x5C);
-        heap = MonsterInit_Drawable(actor);
+        heap = MonsterInit_Drawable(Ghoul_AllocateDrawable(actor, 0x5C));
         MonsterInit_InitializeSprite(heap, 0x9247, 0x1DF8);
         if (MonsterInit_GetCategory(actor) == 0x11 || MonsterInit_GetCategory(actor) == 0x17)
             heap[7] = 1;
         actor->base.body.direction = 0;
     } else {
         u8 *heap;
-        actor->base.drawable = Heap_Alloc(0x80);
-        Memory_Clear(actor->base.drawable, 0x80);
-        heap = MonsterInit_Drawable(actor);
-        MonsterInit_ClearPosition(&zero, &origin);
+        heap = MonsterInit_Drawable(Ghoul_AllocateDrawable(actor, 0x80));
+        ZeroFill8(&origin);
         MonsterInit_InitializeWidget(heap, 0xCB05, 0x9247, &origin);
         actor->base.animationIndex = 0xFF;
     }
-    MonsterInit_InitializePursuitBody(rootActor, &zero);
+    MonsterInit_LoadPursuitBody(rootActor);
     if (Script_SeekToKeyword('P')) {
         rootActor->discKind = MonsterInit_ReadByte(0x78);
         rootActor->recoveryDelay = MonsterInit_ReadHalfword(0x78);
