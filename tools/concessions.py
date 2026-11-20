@@ -52,6 +52,7 @@ its spelling, so each one is a question, not a verdict:
   this is the weakest kind: write the literal where it is used when that matches, and leave
   the rest for the owner to rule on. A loop counter or anything reassigned is not one.
 * `addr-deref`: `*(&x)` in place of `x`.
+* `subtract-negative`: `x - -y` in place of addition, often to preserve operand order.
 * `placeholder-name`: a local named `new_var`, `dummy...` or `fake...`.
 * `volatile-view`: a pointer to volatile that isn't a hardware register (the `volatile` kind only
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
@@ -75,7 +76,7 @@ EXCUSABLE = ("debug-nop", "empty-loop", "empty-if", "single-use-macro", "volatil
 SCORED = HARD + EXCUSABLE
 COMPILER = ("dead-code", "proved-zero")  # found by tools/deadcode.py, not by sites()
 WARN = COMPILER + ("once-loop", "stmt-expr", "const-local", "literal-local", "addr-deref",
-        "placeholder-name", "volatile-view", "local-union")
+        "subtract-negative", "placeholder-name", "volatile-view", "local-union")
 TRACKED = ("goto",)
 # words that make a concession-ok reason an admission of steering rather than a claim about the original
 ADMISSION = re.compile(
@@ -117,6 +118,8 @@ _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
     "addr-deref": re.compile(r"\*\s*\(\s*&\s*\w+\s*\)"),
+    "subtract-negative": re.compile(r"(?:[)\]]|\b(?!(?:return|case|sizeof|_Alignof)\b)\w+)"
+                                    r"\s*-(?:\s+|\s*\(\s*)-\s*(?=[A-Za-z_])"),
     "placeholder-name": re.compile(r"(?m)^[ \t]+[\w \t]*?\w[ \t]+\**\s*(?:new_var\w*|dummy\w*|fake\w*)\s*[=;,\[]"),
     "volatile-view": re.compile(
         r"\(\s*(?:const\s+)?volatile\s+(?:const\s+)?\w+\s*\*\s*\)\s*(?!&|REG_|0x0?4[0-9A-Fa-f]{6}\b)[\w(*]"
@@ -210,7 +213,6 @@ def _volatile_typedef_locals(code: str):
 
 def _literal_locals(code: str):
     """Offsets of locals that receive a literal once, at or after declaration."""
-    code = _QUOTED.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
     for m in _LITERAL_LOCAL.finditer(code):
         name = m["name"]
         if re.fullmatch(_NUMBER_NAME, name):
@@ -251,6 +253,7 @@ def _literal_locals(code: str):
 def _warn_sites(code: str):
     """(offset, kind) for the warning kinds in CODE (comments already blanked)."""
     code = _MACRO_DEF.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)  # a macro's body is its own business
+    code = _QUOTED.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), code)
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind

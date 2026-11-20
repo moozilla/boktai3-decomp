@@ -178,6 +178,15 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(void) {\n    int zero = 0;\n    a = ({ int v = t; v; });\n    *(&z) = 1;\n    u32 *new_var;\n}\n"),
                          ["const-local", "stmt-expr", "addr-deref", "placeholder-name"])
 
+    def test_subtracting_a_negated_variable(self):
+        for expression in ("rows[z] - -x", "rows[z] - (-x)"):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"),
+                                 ["subtract-negative"])
+        for expression in ("x - -1", "x-- - y", "x + y", "-(-value >> shift)", 'g("x - -y")'):
+            with self.subTest(expression=expression):
+                self.assertEqual(warns("int f(void) { return " + expression + "; }\n"), [])
+
     def test_const_local_requires_a_declaration_not_a_jump_or_return(self):
         for statement in ("goto zero;", "goto one;", "return zero;", "return one;", "return *zero;"):
             with self.subTest(statement=statement):
