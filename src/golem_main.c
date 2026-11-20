@@ -6,6 +6,7 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_route.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_status.h"
 #include "scene_actor_adjacent_cell.h"
 #include "player.h"
 #include "scene_actor_restoration.h"
@@ -882,55 +883,33 @@ static inline u8 take6030(u8 *flag, u8 **held)
     return 0;
 }
 
-struct Obj6030 {
-    u32 flags;
-    u8 pad[0x1C];
-};
-
-struct Part6030 {
-    u8 pad[8];
-    u32 flags;
-};
-
-void Golem_UpdateRevivalReturn(u8 *s, s32 arg, u32 unused)
+void Golem_UpdateRevivalReturn(struct ChaseActor *actor, s32 arg, u32 unused)
 {
     u32 queued;
     u8 *flag;
-    {
-        u32 mask = 1;
-        if (s[8] == 0) {
-            struct Obj6030 *obj = *(struct Obj6030 **)(s + 4);
-            u32 value = obj->flags;
-            obj->flags = value | mask;
-        } else {
-            struct Obj6030 *obj = *(struct Obj6030 **)(s + 4);
-            struct Part6030 *part = (struct Part6030 *)((u8 *)obj + 0x20);
-            u32 value = part->flags;
-            part->flags = value | mask;
-        }
-    }
-    queued = take6030(s + 0x2B2, &flag);
+    ActorStatus_SetDrawableFlags(actor, 1);
+    queued = take6030(&actor->base.field2B2, &flag);
     if (queued) {
-        ActorShadow_Disable(s + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
     } else if (arg > 0x1A) {
         void (*fn)(void);
         u32 code;
         u32 *flags;
         u32 mask;
-        SceneActorAnimation_SelectDirectionalEntry(s, 7);
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 7);
         fn = Golem_UpdateRevival;
         code = 0xD;
         *flag = 1;
-        s[0x2B0] = queued;
-        s[0x2B5] = code;
-        *(void (**)(void))(s + 0x21C) = fn;
-        *(u16 *)(s + 0x2C8) = queued;
-        flags = (u32 *)(s + 0x114);
+        actor->base.stepDone = queued;
+        actor->base.controlKind = code;
+        actor->base.target = fn;
+        actor->base.field2C8 = queued;
+        flags = &actor->base.pendingControlFlags;
         mask = ~1;
         *flags &= mask;
-        *(u32 *)(s + 0x104) = queued;
+        actor->base.pendingControl = queued;
     } else {
-        s[0x2B3] = queued;
+        actor->base.restart = queued;
     }
 }
 
