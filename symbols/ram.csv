@@ -65,8 +65,8 @@ addr,name,size,kind,decl,header,confidence,notes
 02000134,gSceneParticleEmitterPool,4,object,extern struct SceneParticlePool *gSceneParticleEmitterPool;,include/ram.h,low,provisional: scene particle emitter pool singleton
 02000138,gSpriteGroup,4,object,extern struct SpriteParticlePool *gSpriteGroup;,include/ram.h,low,
 0200013C,gSpriteEffectPool,4,object,extern struct SpriteEffectPool *gSpriteEffectPool;,include/ram.h,low,
-02000140,gAnimatedBodyPool,4,object,extern u8 *gAnimatedBodyPool;,include/ram.h,low,
-02000144,gSpriteNoticeManager,4,object,extern u32 gSpriteNoticeManager;,include/ram.h,low,
+02000140,gAnimatedBodyPool,4,object,extern struct SceneScheduledEffectPool *gAnimatedBodyPool;,include/ram.h,low,
+02000144,gSpriteNoticeManager,4,object,extern struct SpriteNoticeManager *gSpriteNoticeManager;,include/ram.h,low,
 02000148,gPairSlotPool,4,object,extern struct PairSlotPool *gPairSlotPool;,include/ram.h,low,
 0200014C,gBouncingPool,4,object,extern struct BouncingPool *gBouncingPool;,include/bouncing_object.h,low,
 02000150,gSpriteBurstManager,4,object,extern u32 gSpriteBurstManager;,include/ram.h,low,

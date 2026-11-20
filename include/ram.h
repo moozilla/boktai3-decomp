@@ -149,11 +149,11 @@ extern u16 gSceneHudMode;
 /* 0x02000558 */
 extern u16 gForceDirectionMode;
 /* 0x02000140 */
-extern u8 *gAnimatedBodyPool;
+extern struct SceneScheduledEffectPool *gAnimatedBodyPool;
 /* 0x020004A0 */
 extern u32 gRisingSpritePool;
 /* 0x02000144 */
-extern u32 gSpriteNoticeManager;
+extern struct SpriteNoticeManager *gSpriteNoticeManager;
 /* 0x03001688 */
 extern u8 *gColliderManager;
 /* 0x02000250 */
