@@ -8,28 +8,28 @@
 
 void StatusScreen_FadeAndExit(struct StatusScreen *p)
 {
-    int factor = 32 - p->timer, bank, i;
+    int factor = 32 - p->timer;
+    int bank, i;
     int blueMask;
     u16 *buffer;
+
     bank = 0;
-    *(&buffer) = p->buffer;
-    blueMask = 31744;
+    buffer = p->buffer;
+    blueMask = 0x7C00;
     for (; bank < 2; bank++) {
         for (i = 0; i < 16; i++) {
-            {
-                u16 *out = &buffer[bank * 16 + i];
-                int color = *out;
-                int r, g, blue, red, green;
-                PALETTE_EXTRACT_CHANNEL(red, color, 31);
-                r = (red * factor) & 0x7C0;
-                PALETTE_EXTRACT_CHANNEL(green, color, 992);
-                g = (green * factor) & 0xF800;
-                PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
-                {
-                    int b = (blue * factor) & 0x1F0000;
-                    *out = (r | g | b) >> 6;
-                }
-            }
+            int entry = bank * 16 + i;
+            int color = buffer[entry];
+            int r, g, b;
+            int red, green, blue;
+
+            PALETTE_EXTRACT_CHANNEL(red, color, 0x001F);
+            r = (red * factor) & 0x7C0;
+            PALETTE_EXTRACT_CHANNEL(green, color, 0x03E0);
+            g = (green * factor) & 0xF800;
+            PALETTE_EXTRACT_CHANNEL(blue, color, blueMask);
+            b = (blue * factor) & 0x1F0000;
+            buffer[entry] = (r | g | b) >> 6;
         }
     }
 
