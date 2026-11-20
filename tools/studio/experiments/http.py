@@ -2,10 +2,11 @@
 from concurrent.futures import ThreadPoolExecutor
 import json
 import re
+import subprocess
 import threading
 import urllib.parse
 
-from . import centaur, fields, graphics, recipe, references, runner
+from . import centaur, fields, graphics, pixel_proof, recipe, references, runner
 
 API = "/api/experiments"
 PAGE = "/experiments"
@@ -59,6 +60,10 @@ def recent():
 
 
 def artifact(directory, parts):
+    if (len(parts) == 3 and parts[0] == "pixel-proofs" and recipe.RUN_ID.fullmatch(parts[1]) and
+            parts[2] in {"contact.png", "evidence.json"}):
+        mime = "image/png" if parts[2] == "contact.png" else "application/json"
+        return directory.joinpath(*parts), mime
     if len(parts) == 1 and parts[0] in FIXED_ARTIFACTS:
         return directory / parts[0], FIXED_ARTIFACTS[parts[0]]
     if len(parts) == 2:
@@ -105,6 +110,31 @@ def catalog(handler):
                                   "frames": recipe.MAX_FRAMES, "samples": recipe.MAX_SAMPLES}})
 
 
+def post_frame_query(handler, path):
+    identifier, *parts = path.removeprefix(API + "/runs/").split("/")
+    readback = len(parts) == 3 and parts[0] == "snapshot"
+    isolation = len(parts) == 6 and parts[0] == "pixel-check"
+    if not (readback or isolation) or not all(re.fullmatch(r"[0-9]{1,4}", value) for value in parts[2:]):
+        raise FileNotFoundError("No such frame query")
+    arguments = body(handler)
+    if not SLOTS.acquire(blocking=False):
+        handler.send(429, {"error": "The emulator queue is full"})
+        return
+    try:
+        if readback:
+            reference = {"run": identifier, "trial": parts[1], "frame": int(parts[2])}
+            result = runner.inspect_frame(reference, arguments)
+        else:
+            if arguments != {}:
+                raise ValueError("Send an empty object to replay the selected sprite")
+            directory = runner.run_dir(identifier)
+            original = runner.read_json(directory / "result.json")
+            result = pixel_proof.execute(directory, original, parts[1], *map(int, parts[2:]))
+        handler.send(200, result)
+    finally:
+        SLOTS.release()
+
+
 def routes(handler, method):
     path = handler.path
     if path not in (PAGE, PAGE + ".html") and path not in ASSETS and not path.startswith(API + "/"):
@@ -141,18 +171,7 @@ def routes(handler, method):
                 raise ValueError("Send an array of 1–16 named fields")
             handler.send(200, [fields.measure(path).to_dict() for path in paths])
         elif method == "POST" and path.startswith(API + "/runs/"):
-            identifier, *parts = path.removeprefix(API + "/runs/").split("/")
-            if len(parts) != 3 or parts[0] != "snapshot" or not re.fullmatch(r"[0-9]{1,4}", parts[2]):
-                raise FileNotFoundError("No such readback route")
-            paths = body(handler)
-            if not SLOTS.acquire(blocking=False):
-                handler.send(429, {"error": "The emulator queue is full"})
-                return True
-            try:
-                reference = {"run": identifier, "trial": parts[1], "frame": int(parts[2])}
-                handler.send(200, runner.inspect_frame(reference, paths))
-            finally:
-                SLOTS.release()
+            post_frame_query(handler, path)
         elif method == "GET" and path.startswith(API + "/runs/"):
             identifier, *parts = path.removeprefix(API + "/runs/").split("/")
             directory = runner.run_dir(identifier)
@@ -175,6 +194,6 @@ def routes(handler, method):
         handler.send(404, {"error": "Experiment, result, or artifact not found"})
     except (ValueError, UnicodeError) as error:
         handler.send(400, {"error": runner.public_path(str(error))})
-    except (OSError, RuntimeError) as error:
+    except (OSError, RuntimeError, subprocess.SubprocessError) as error:
         handler.send(500, {"error": runner.public_path(str(error))})
     return True

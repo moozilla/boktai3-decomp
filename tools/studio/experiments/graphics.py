@@ -47,13 +47,17 @@ def measured_layout():
     return layout(tuple(path.stat().st_mtime_ns for path in paths))
 
 
+def trace_command():
+    offsets, _, _ = measured_layout()
+    return "drawtrace " + " ".join(f"{value:X}" for value in offsets)
+
+
 def expand_commands(commands):
-    offsets, players, _ = measured_layout()
+    _, players, _ = measured_layout()
     buffers = {**MEMORY, "players": players}
-    command = "drawtrace " + " ".join(f"{value:X}" for value in offsets)
     first = next(index for index, line in enumerate(commands) if line.startswith("sample "))
     yield from commands[:first]
-    yield command
+    yield trace_command()
     for line in commands[first:]:
         yield line
         if line.startswith("shot "):

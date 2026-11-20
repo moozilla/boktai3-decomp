@@ -137,3 +137,9 @@ code, pre { font-family: var(--mono); }
 .pixel-source a + code { margin: 0 6px; }
 .pixel-fields { display: flex; flex-wrap: wrap; gap: 5px; margin: 4px 0; }
 .notebook .pixel-fields button { font-size: 11px; min-height: 25px; padding: 3px 6px; }
+
+.pixel-candidate { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.notebook .pixel-candidate button { font-size: 11px; min-height: 27px; padding: 4px 7px; }
+.pixel-replay { margin-top: 8px; }
+.pixel-replay:empty { display: none; }
+.pixel-replay img { display: block; height: auto; width: min(100%, 760px); margin: 5px 0; border-radius: 5px; }

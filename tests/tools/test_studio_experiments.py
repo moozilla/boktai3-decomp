@@ -343,6 +343,16 @@ class HTTPTests(unittest.TestCase):
             self.assertEqual(draw["asset"]["hash"], "DE23")
             self.assertEqual(draw["actor"]["member"], "gPlayers[0]->animation")
             self.assertEqual(draw["actor"]["fields"][1]["value"], 2694)
+            slot = pixel["objects"][0]["slot"]
+            code, payload = self.request("POST", f"/api/experiments/runs/{parent['id']}/pixel-check/field/60/117/88/{slot}",
+                                         {}, **{"Content-Type": "application/json"})
+            proof = json.loads(payload)
+            self.assertEqual(code, 200, proof)
+            self.assertTrue(proof["changed"])
+            self.assertEqual(proof["before"], [247, 0, 49])
+            self.assertEqual(proof["after"], [0, 0, 0])
+            self.assertEqual(proof["matching_final_state_sha256"], parent["trials"][0]["snapshots"][4]["state_sha256"])
+            self.assertEqual(self.request("GET", proof["contact_sheet"])[1][:8], b"\x89PNG\r\n\x1a\n")
             bad = f"/api/experiments/runs/{parent['id']}/pixel/field/60/240/88"
             self.assertEqual(self.request("GET", bad)[0], 400)
             from experiments.__main__ import proof_branch

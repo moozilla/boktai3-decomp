@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from . import centaur, fields, graphics, recipe, runner, sweep
+from . import centaur, fields, graphics, pixel_proof, recipe, runner, sweep
 
 
 def proof_branch(parent):
@@ -35,7 +35,7 @@ def artifact_paths(directory):
             (("result", "result.json"), ("transcript", "transcript.txt"), ("contact_sheet", "contact.png"))}
 
 
-def pixel_proof(directory, result):
+def build_pixel_proof(directory, result):
     from PIL import Image, ImageDraw
 
     x, y = 117, 88
@@ -46,6 +46,11 @@ def pixel_proof(directory, result):
     if (submission["runtime_pc"] != "030000E0" or submission["actor"]["member"] != "gPlayers[0]->animation" or
             submission["asset"]["hash"] != "DE23"):
         raise RuntimeError("The sprite proof did not recover Django's renderer, typed owner and ROM art")
+    slot = evidence["objects"][0]["slot"]
+    rendered = pixel_proof.execute(directory, result, "field", 60, x, y, slot)
+    if not rendered["changed"]:
+        raise RuntimeError("Hiding Django's hardware slot did not change the selected pixel")
+    evidence["render_check"] = rendered
     runner.atomic_json(directory / "pixel.json", evidence)
     lines = [
         f"Field frame 60, pixel ({x}, {y})",
@@ -53,6 +58,9 @@ def pixel_proof(directory, result):
         f"{submission['runtime_pc']} {submission['function']['name']} in {submission['function']['source']}",
         f"{submission['actor']['member']} at {submission['drawable']}",
         f"{submission['asset']['archive']}/{submission['asset']['hash']} from {submission['asset']['tile_source']}",
+        f"Hiding just OBJ {slot} changed RGB {rendered['before']} -> {rendered['after']}.",
+        f"The control reproduced the original image. Both replays have state SHA-256 "
+        f"{rendered['matching_final_state_sha256']}.",
     ]
     with Image.open(directory / "field/f0060.png") as image:
         panel = Image.new("RGB", (540, 368), "#181b25")
@@ -69,7 +77,8 @@ def pixel_proof(directory, result):
         log.write("\nSprite provenance\n" + "\n".join(lines) + "\n")
     return {"evidence": str((directory / "pixel.json").relative_to(runner.ROOT)),
             "frame": str((directory / "pixel.png").relative_to(runner.ROOT)),
-            "pixel": [x, y]}
+            "pixel": [x, y],
+            "isolation_contact_sheet": str((directory / "pixel-proofs" / rendered["id"] / "contact.png").relative_to(runner.ROOT))}
 
 
 def main():
@@ -100,6 +109,13 @@ def main():
     pixel.add_argument("frame", type=int)
     pixel.add_argument("x", type=int)
     pixel.add_argument("y", type=int)
+    isolate = commands.add_parser("pixel-check", help="Replay the frame with one OBJ slot hidden")
+    isolate.add_argument("id")
+    isolate.add_argument("trial")
+    isolate.add_argument("frame", type=int)
+    isolate.add_argument("x", type=int)
+    isolate.add_argument("y", type=int)
+    isolate.add_argument("slot", type=int)
     import_live = commands.add_parser("import-live", help="Turn a Centaur recording into a replay recipe")
     import_live.add_argument("id")
     args = parser.parse_args()
@@ -116,10 +132,13 @@ def main():
                 data = [fields.measure(path).to_dict() for path in args.paths]
             case "import-live":
                 data = centaur.import_recording(args.id)
-            case "pixel":
+            case "pixel" | "pixel-check":
                 directory = runner.run_dir(args.id)
-                data = graphics.inspect(directory, runner.read_json(directory / "result.json"),
-                                        args.trial, args.frame, args.x, args.y, runner.ROM)
+                original = runner.read_json(directory / "result.json")
+                if args.command == "pixel-check":
+                    data = pixel_proof.execute(directory, original, args.trial, args.frame, args.x, args.y, args.slot)
+                else:
+                    data = graphics.inspect(directory, original, args.trial, args.frame, args.x, args.y, runner.ROM)
             case "snapshot":
                 data = runner.inspect_frame({"run": args.id, "trial": args.trial, "frame": args.frame}, args.paths)
             case "proof" | "run":
@@ -137,7 +156,7 @@ def main():
                         raise RuntimeError("Proof did not distinguish the field, menu and idle trials")
                 data = {"id": result["id"], **artifact_paths(directory)}
                 if args.command == "proof":
-                    data["pixel"] = pixel_proof(directory, result)
+                    data["pixel"] = build_pixel_proof(directory, result)
                     branch = proof_branch(result)
                     branch_path = runner.init_run(branch)
                     forked = runner.execute(branch_path, branch)

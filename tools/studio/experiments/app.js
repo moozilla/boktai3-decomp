@@ -281,14 +281,42 @@ async function inspectPixel(trialIndex, x, y) {
       · RGB ${evidence.rgb.join(', ')}
       ${evidence.upload ? `· <a href="${esc(evidence.upload.function?.url || '#')}" data-peek>OAM upload</a>` : ''}</p>`;
     const source = evidence.objects.map(object => `<article>
-      <h3>Matching sprite · hardware slot ${object.slot}</h3>
+      <div class="pixel-candidate">
+        <h3>Matching sprite · hardware slot ${object.slot}</h3>
+        ${point.relative ? `<button type="button" data-verify-slot="${object.slot}" data-x="${x}" data-y="${y}">Replay without this sprite</button>` : ''}
+      </div>
       <p class="muted">VRAM tile ${object.tile} · OBJ palette index ${object.palette_index}</p>
       ${object.submissions.length ? object.submissions.map(spriteSubmission).join('') :
         '<p>This frame has hardware sprite data and no traced submission for this slot.</p>'}
+      <div class="pixel-replay" role="status" id="pixel-replay-${object.slot}"></div>
     </article>`).join('');
     pane.innerHTML = header + (source || '<p>No unblended sprite fragment matched this pixel.</p>');
   } catch (error) {
     if (token === pixelToken) pane.textContent = error.message;
+  }
+}
+
+async function testSprite(button) {
+  const token = pixelToken;
+  const {trial, snap} = atSelected();
+  const {verifySlot: slot, x, y} = button.dataset;
+  const pane = $('pixel-replay-' + slot);
+  button.disabled = true;
+  pane.textContent = 'Replaying twice from the same starting state…';
+  try {
+    const url = `${resultPath(primary.id)}/pixel-check/${trial.id}/${snap.relative}/${x}/${y}/${slot}`;
+    const proof = await json(url, {});
+    if (token !== pixelToken) return;
+    const measured = proof.changed
+      ? `The pixel changed from RGB ${proof.before.join(', ')} to ${proof.after.join(', ')}.`
+      : 'The pixel kept the same color with this slot hidden.';
+    pane.innerHTML = `<p><b>${measured}</b> Both replays reached the exact same emulator state.</p>
+      <a href="${esc(proof.contact_sheet)}" target="_blank" rel="noopener"><img
+        src="${esc(proof.contact_sheet)}" width="760" height="210" alt="Original frame, control crop, and crop with the selected sprite slot hidden"></a>`;
+  } catch (error) {
+    if (token === pixelToken) pane.textContent = error.message;
+  } finally {
+    button.disabled = false;
   }
 }
 
@@ -584,6 +612,8 @@ $('pixel-query').onsubmit = event => {
   inspectPixel(selected.trial, Number($('pixel-x').value), Number($('pixel-y').value));
 };
 $('pixel-results').onclick = event => {
+  const replay = event.target.closest('[data-verify-slot]');
+  if (replay) { testSprite(replay); return; }
   const field = event.target.closest('[data-pixel-field]');
   if (!field) return;
   selected = { trial: selected.trial, kind: 'field', index: Number(field.dataset.pixelField) };

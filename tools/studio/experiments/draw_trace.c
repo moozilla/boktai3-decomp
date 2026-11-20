@@ -2,6 +2,7 @@
 #include "draw_trace.h"
 
 #include <mgba/core/core.h>
+#include <mgba/internal/gba/gba.h>
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -40,6 +41,9 @@ struct Call {
 };
 
 static struct mCore *core;
+static struct mCore *isolation_core;
+static void (*native_scanline)(struct GBAVideoRenderer *, int);
+static unsigned isolated_slot, isolated_frame;
 static FILE *queues, *sources, *uploads;
 static unsigned generation, tile_offset;
 static uint32_t dma_source, dma_destination;
@@ -63,8 +67,39 @@ static FILE *output(const char *directory, const char *file, const char *mode)
     return out;
 }
 
+static void isolated_scanline(struct GBAVideoRenderer *renderer, int y)
+{
+    if (isolation_core->frameCounter(isolation_core) != isolated_frame - 1) {
+        native_scanline(renderer, y);
+        return;
+    }
+
+    // Temporarily hide one entry only for rendering. The game sees its original
+    // OAM and can still use the fourth halfword as an affine matrix parameter.
+    uint16_t saved;
+    void *oam = renderer->oam;
+    unsigned offset = isolated_slot * ENTRY_BYTES;
+    LOAD_16LE(saved, offset, oam);
+    STORE_16LE(0x0200, offset, oam);
+    renderer->writeOAM(renderer, offset);
+    native_scanline(renderer, y);
+    STORE_16LE(saved, offset, oam);
+    renderer->writeOAM(renderer, offset);
+}
+
 bool draw_trace_command(struct mCore *attached, const char *directory, const char *line)
 {
+    if (!strncmp(line, "hideobj ", 8)) {
+        if (isolation_core || sscanf(line + 8, "%u %u", &isolated_slot, &isolated_frame) != 2 ||
+            isolated_slot >= ENTRIES || isolated_frame <= attached->frameCounter(attached))
+            fail("invalid sprite isolation");
+        struct GBA *gba = attached->board;
+        struct GBAVideoRenderer *renderer = gba->video.renderer;
+        isolation_core = attached;
+        native_scanline = renderer->drawScanline;
+        renderer->drawScanline = isolated_scanline;
+        return true;
+    }
     if (strncmp(line, "drawtrace ", 10))
         return false;
     unsigned direct_count, direct_buffer, pending_count, pending_buffer;
@@ -217,6 +252,10 @@ void draw_trace_dma(uint32_t address, uint32_t value, uint32_t pc)
 
 void draw_trace_close(void)
 {
+    if (isolation_core) {
+        struct GBA *gba = isolation_core->board;
+        gba->video.renderer->drawScanline = native_scanline;
+    }
     if (!core)
         return;
     int a = fclose(queues), b = fclose(sources), c = fclose(uploads);
