@@ -10600,6 +10600,7 @@ addr,name,mode,confidence,source,notes
 0823F928,Player_UpdateChargedSpinAttack,thumb,low,src-alias,
 0823FE60,Player_RunConfiguredActionHandler,thumb,low,src-alias,Enters state three and invokes the configured callback stored at offset 0xC88
 0823FE94,Player_UpdateSolarBombCharge,thumb,low,src-alias,
+0824000C,Player_UpdateLinkedScreenTransition,thumb,low,src-alias,Updates the linked camera and timed animation during a screen transition.
 08240200,Player_UpdateTetherRecoil,thumb,low,src-alias,
 08240408,Player_UpdateKnockback,thumb,low,src-alias,
 08240708,Player_UpdateRecoil,thumb,low,src-alias,

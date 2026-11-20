@@ -14,7 +14,6 @@ u32 ActorVariant_GetTableValue(u32, u32);
 void Player_SetAnimationIndex(void *, u32, u32);
 void Player_SetTetherMode(void *, u32, u32);
 // confidence=low: linked action camera, screen fade and timed animation phases.
-#define Player_UpdateLinkedScreenTransition sub_0824000C
 void Player_UpdateLinkedScreenTransition(u8 *p)
 {
     struct TransitionPosition position;
