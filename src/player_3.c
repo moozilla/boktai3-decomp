@@ -1594,7 +1594,7 @@ void sub_0814A9D4(void);
 
 void sub_0814EEE0(void);
 
-void sub_0814E990(void);
+void Player_UpdateAttachedChargeTiers(void);
 
 void Player_UpdateSelectedAttackCharge(void);
 
@@ -1620,7 +1620,7 @@ void Player_BeginIndexedAction(struct Player *p, s32 action)
     else if (p->statModifierContext.actionKind == 11)
         p->actionCallback = sub_0814EEE0;
     else if (p->statModifierContext.actionKind == 8)
-        p->actionCallback = sub_0814E990;
+        p->actionCallback = Player_UpdateAttachedChargeTiers;
     else
         p->actionCallback = Player_UpdateSelectedAttackCharge;
     Player_ConfigureActionCollider(p);

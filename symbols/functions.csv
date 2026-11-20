@@ -5666,6 +5666,7 @@ addr,name,mode,confidence,source,notes
 0814E3A0,Player_UpdateAttachedEntryPosition,thumb,low,src-alias,
 0814E3D8,Player_UpdateSelectedAttackCharge,thumb,low,src-alias,
 0814E978,Player_OnChargedAttackExit,thumb,low,src-alias,Releases the active managed attack handle when the charging attack motion exits
+0814E990,Player_UpdateAttachedChargeTiers,thumb,low,src-alias,Advances the attached action through its charge tiers.
 0814EED4,Player_StopActionSongOnExit,thumb,low,src-alias,Action exit callback that stops song 0xCC
 0814F310,Player_ReleaseActionEffectOnExit,thumb,low,src-alias,Action exit callback that releases the effect handle at 0xC74 when valid; effect ownership is tentative
 0814F328,Player_UpdateAttachedAttackCharge,thumb,low,src-alias,

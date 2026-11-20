@@ -33,7 +33,6 @@ void Player_SetPendingCallback(void *, void (*)(void *));
 s32 Task4E01_GetKind7Value(s32);
 void Player_UpdateAttachedEntryPosition(void *);
 // confidence=low: attached task charge values choose tiers before recoil and buffered restart.
-#define Player_UpdateAttachedChargeTiers sub_0814E990
 void Player_UpdateAttachedChargeTiers(u8 *p)
 {
     struct ContactPackedVector origin;
