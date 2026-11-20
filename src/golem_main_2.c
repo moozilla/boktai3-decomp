@@ -426,34 +426,30 @@ static inline s32 PlayerSlot(u8 *actor)
 /* Charge up while the target player is not dazzled (flag 0x20000): the target is the partner's
  * player slot in co-op modes, else player 0. The charge grows faster the closer the body. */
 
-static inline void Golem_Charge(void *ctx)
+static inline void Golem_Charge(void *context)
 {
-    u8 *body = ctx;
-    u8 *player;
+    struct Golem *body = context;
+    struct Player *player;
     if (Test(gEngineFlags, 0x4800)) {
-        u8 *partner = *(u8 **)(body + 0xDC);
+        struct SceneActorChaseTarget *partner = body->chase.base.tracking.target;
         s32 index;
         if (!partner)
             goto charge;
-        index = PlayerSlot(partner);
+        index = SceneActorChase_PlayerSlot(partner);
         if (index < 0)
             goto charge;
         player = gPlayers[index];
     } else
         player = gPlayers[0];
-    {
-        u32 mask = 0x20000;
-        if (*(u32 *)(player + 0x20) & mask)
-            return;
-    }
+    if (IsDazzled(player))
+        return;
 charge: {
-    u32 mask = 0x80;
-    if (*(u16 *)(body + 0x2D4) & mask) {
-        s32 gain = 0x400000 - *(u32 *)(body + 0xF0);
+    if (SceneActorChase_QueryMotionFlags((struct ChaseActor *)body, 0x80)) {
+        s32 gain = 0x400000 - body->chase.base.tracking.distance;
         u16 *charge;
         if (gain < 0)
             gain = 0;
-        charge = (u16 *)((u8 *)ctx + 0x688);
+        charge = &((struct Golem *)context)->charge688;
         *charge += gain >> 16;
         if (*charge > 400)
             *charge = 400;
@@ -494,28 +490,14 @@ void Golem_ChargeOrApproach(struct ChaseActor *actor)
         if (CanCharge(body)) {
             void *target = Golem_UpdateChargeWindup;
             SetControl(actor, 0x28, target);
-            {
-                u32 phase = 2, behavior = 4;
-                actor->base.state2A8 = 0;
-                actor->base.phase2A9 = phase;
-                actor->base.behavior2AA = behavior;
-                actor->base.counter2AC = 0;
-                actor->base.field2B1 = 1;
-            }
+            SceneActorChase_SetPhase(actor, 2, 4);
             return;
         }
         {
             void *target = Golem_UpdateRouteMotion;
             SetControl(actor, 0x23, target);
         }
-        {
-            u32 phase = 2;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = 1;
-        }
-        actor->base.counter2AC = 0;
-        actor->base.field2B1 = 1;
+        SceneActorChase_SetPhase(actor, 2, 1);
     } else
         actor->base.counter2AC++;
 }
