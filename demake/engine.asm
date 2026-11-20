@@ -7,7 +7,7 @@ boot:
     ld [0xffff],a
     call lcd_off
     ld hl,0xc000
-    ld bc,512
+    ld bc,768
     call clear
     ld hl,dma_code
     ld de,0xff80
@@ -31,6 +31,7 @@ boot:
     ldh [0x24],a
     ld a,0xff
     ldh [0x25],a
+    call music_init
     ld a,3
     ld [energy],a
     ld [health],a
@@ -44,6 +45,7 @@ boot:
     call load_room
 
 loop:
+    call music_tick
     call input
     ld a,[pressed]
     bit 3,a
@@ -489,6 +491,8 @@ interactions:
     ld [shot_dz],a
     ld a,28
     ld [projectile],a
+    ld a,12
+    ld [sfx_pulse],a
     ld a,0x80
     ldh [0x16],a
     ld a,0x92
@@ -718,6 +722,8 @@ damage:
     ret
 
 chime:
+    ld a,12
+    ld [sfx_pulse],a
     ld a,0x80
     ldh [0x16],a
     ld a,0x83
@@ -728,6 +734,8 @@ chime:
     ldh [0x19],a
     ret
 hit_sound:
+    ld a,12
+    ld [sfx_noise],a
     ld a,0x93
     ldh [0x21],a
     ld a,0x35

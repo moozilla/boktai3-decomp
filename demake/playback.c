@@ -27,6 +27,25 @@ static void quiet(struct mLogger* log, int category, enum mLogLevel level,
     }
 }
 
+static FILE* pcm;
+static unsigned pcm_rate;
+static unsigned pcm_frames;
+
+static void audio_rate(struct mAVStream* stream, unsigned rate) {
+    (void)stream;
+    pcm_rate = rate;
+}
+
+static void audio_sample(struct mAVStream* stream, int16_t left, int16_t right) {
+    (void)stream;
+    if (!pcm) return;
+    const uint8_t sample[4] = {(uint8_t)left, (uint16_t)left >> 8, (uint8_t)right, (uint16_t)right >> 8};
+    if (fwrite(sample, 1, sizeof(sample), pcm) != sizeof(sample)) exit(13);
+    ++pcm_frames;
+}
+
+static struct mAVStream audio = {.audioRateChanged = audio_rate, .postAudioFrame = audio_sample};
+
 static unsigned channel(unsigned color, unsigned mask) {
     unsigned low = mask & -mask;
     return ((color & mask) / low) * 255 / (mask / low);
@@ -42,10 +61,12 @@ int main(int argc, char** argv) {
     mCoreConfigSetValue(&core->config, "gb.model", "DMG");
     mCoreConfigSetIntValue(&core->config, "gb.colors", 0);
     mCoreConfigSetIntValue(&core->config, "useBios", 0);
+    core->opts.volume = 0x100;
     core->loadConfig(core, &core->config);
     if (!mCoreLoadFile(core, argv[1])) return 4;
     color_t pixels[160 * 144] = {0};
     core->setVideoBuffer(core, pixels, 160);
+    core->setAVStream(core, &audio);
     core->reset(core);
     unsigned width, height;
     core->desiredVideoDimensions(core, &width, &height);
@@ -57,6 +78,14 @@ int main(int argc, char** argv) {
         if (!strcmp(command, "step") && sscanf(line, "%*s %u %u", &n, &mask) == 2) {
             core->setKeys(core, mask);
             while (n--) core->runFrame(core);
+        } else if (!strcmp(command, "audio") && sscanf(line, "%*s %u %959[^\n]", &n, path) == 2) {
+            pcm = fopen(path, "wb");
+            if (!pcm) return 13;
+            pcm_frames = 0;
+            while (n--) core->runFrame(core);
+            if (fclose(pcm)) return 13;
+            pcm = NULL;
+            printf("audio %u %u\n", pcm_rate, pcm_frames);
         } else if (!strcmp(command, "tick")) {
             unsigned target;
             if (sscanf(line, "%*s %x %u %u", &target, &n, &mask) != 3) return 9;

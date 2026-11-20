@@ -8,6 +8,7 @@ from PIL import Image
 
 from art import ROOT, Source, actor_pose, encode_tile, fit_tiles, pose_tiles, screen_image
 from gallery import actor_gallery, room_gallery
+from music import compile_song
 from pack import SCENES, LAYOUT, objects, pack_room, enemy_constants
 from rooms import convert, place_skylight, terrain_overlay
 from sm83 import assemble, cartridge
@@ -17,7 +18,7 @@ OUT = ROOT / "build/demake"
 STATE = """bank next_bank player_x player_z player_h camera_x camera_y health energy tick
 direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase enemy_x
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
-shot_x shot_z shot_dx shot_dz oam_count pose attr pickups""".split()
+shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise""".split()
 
 
 def direction_table():
@@ -40,21 +41,26 @@ def build(source, out):
     directions = direction_table()
     symbols = {name: 0xC100 + i for i, name in enumerate(STATE)}
     symbols.update(LAYOUT, **enemy_constants(), obj_bytes=len(obj))
-    asm = (HERE / "engine.asm").read_text()
-    code, _ = assemble(asm, {**symbols, "obj_patterns": 0, "directions": 0})
+    symbols["pickups"] = 0xC200
+    bgm = next(int(t.split()[1], 0) for _, t in source.walker.text(2712) if t.startswith("proc_1048 "))
+    score, wave, music_info = compile_song(bgm)
+    symbols.update(music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
+    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text()
+    code, _ = assemble(asm, {**symbols, "obj_patterns": 0, "directions": 0, "wave_pattern": 0})
     fixed_end = 0x150 + len(code)
-    code, symbols = assemble(asm, {**symbols, "directions": fixed_end, "obj_patterns": fixed_end + len(directions)})
+    code, symbols = assemble(asm, {**symbols, "directions": fixed_end, "obj_patterns": fixed_end + len(directions),
+                                   "wave_pattern": fixed_end + len(directions) + len(obj)})
     info, banks = [], []
     for room, _ in rooms.values():
         data, meta, display = pack_room(source, room, rooms)
         info.append(meta)
         banks.append(data)
         screen_image(display).save(out / f"room-{meta['scene']}.png")
-    rom = cartridge(code + directions + obj, banks)
+    rom = cartridge(code + directions + obj + wave, [*banks, score])
     path = out / "boktai.gb"
     path.write_bytes(rom)
     manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_tiles=len(obj) // 16,
-                    state={name: symbols[name] for name in STATE}, engine=symbols)
+                    music=music_info, state={name: symbols[name] for name in [*STATE, "pickups"]}, engine=symbols)
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"{path.relative_to(ROOT)}  {len(rom)//1024} KiB MBC5  {len(banks)} rooms  {len(code)} bytes SM83")
     return rooms, manifest
@@ -71,10 +77,23 @@ def main():
     actor.add_argument("hash", type=lambda k: int(k, 16))
     actor.add_argument("--frames", default="0", help="comma-separated frame indices, or all")
     actor.add_argument("--palette", type=int, help="first OBJ pool bank, decimal")
+    music = cmds.add_parser("music", help="reduce an MP2K song to four DMG channels")
+    music.add_argument("song", type=int)
+    music.add_argument("--frames", type=int, default=14400, help="maximum source video frames")
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     source = Source()
-    if args.cmd == "room":
+    if args.cmd == "music":
+        if not 1 <= args.frames <= 36000:
+            ap.error("--frames must be between 1 and 36000")
+        data, wave, meta = compile_song(args.song, args.frames)
+        dest = OUT / f"song-{args.song}"
+        dest.mkdir(exist_ok=True)
+        (dest / "score.bin").write_bytes(data)
+        (dest / "wave.bin").write_bytes(wave)
+        (dest / "score.json").write_text(json.dumps(meta, indent=2) + "\n")
+        print(dest.relative_to(ROOT))
+    elif args.cmd == "room":
         r = convert(source, args.scene, args.palette)
         dest = OUT / f"scene-{args.scene}"
         dest.mkdir(exist_ok=True)

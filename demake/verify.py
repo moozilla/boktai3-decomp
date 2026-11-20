@@ -233,6 +233,28 @@ def patrol(r):
     r.record("patrol", "2698   /   Ghoul on patrol")
 
 
+def verify_audio(out, host):
+    """Capture real APU output, including the first percussion entry."""
+    import wave
+    proc = subprocess.run([host, "boktai.gb"], cwd=out, input="step 16 0\naudio 1080 score.pcm\n",
+                          capture_output=True, text=True, check=True)
+    _, rate, size = proc.stdout.strip().split()
+    path = out / "score.pcm"
+    samples = np.fromfile(path, dtype="<i2").reshape(-1, 2)
+    check(len(samples) == int(size), "incomplete mGBA audio capture")
+    check(np.std(samples[:int(rate) * 2]) > 32 and np.std(samples[-int(rate):]) > 32,
+          "the cartridge produced silent audio")
+    # Average four adjacent samples before decimating the 131072 Hz DMG stream.
+    stride = 4 if int(rate) % 4 == 0 else 1
+    audio = samples[:len(samples) // stride * stride].reshape(-1, stride, 2).mean(axis=1).astype("<i2")
+    with wave.open(str(out / "prison.wav"), "wb") as wav:
+        wav.setparams((2, 2, int(rate) // stride, len(audio), "NONE", "not compressed"))
+        wav.writeframes(audio.tobytes())
+    path.unlink()
+    return {"rate": int(rate) // stride, "seconds": round(len(samples)/int(rate), 2),
+            "rms": round(float(np.sqrt(np.mean(samples.astype(float)**2))), 2)}
+
+
 def verify(out, manifest):
     host = playback(out)
     snapshots = []
@@ -256,6 +278,8 @@ def verify(out, manifest):
     contact(rows, out / "contact.png")
     results = dict(native="libmgba" if host else None, checked=checks,
                    frames=[{k: v for k, v in s.items() if k != "state"} for s in snapshots])
+    if host:
+        results["audio"] = verify_audio(out, host)
     (out / "checks.json").write_text(json.dumps(results, indent=2) + "\n")
     print(f"{len(snapshots)} frames  {sum(s['ticks'] for s in checks)} game ticks  " +
           ("mGBA and reference pixels + WRAM agree" if host else "reference CPU and PPU verified"))
