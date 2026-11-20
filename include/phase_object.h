@@ -37,43 +37,81 @@ struct PhaseObject {
     struct PhaseTarget *target;
     s16 offsetX, unknown66, offsetZ, unknown6A;
     u16 scatterStepX, unknown6E, scatterStepZ;
-    u8 unknown72[0x1B];
+    u8 unknown72[0xC];
+    s16 health;
+    u8 unknown80[0xD];
     struct PhaseObjectMode groupMode;
-    u8 unknown94[0x14];
+    u8 unknown94[8];
+    u16 flashTimer;
+    u8 unknown9E[4];
+    u8 entryReset;
+    u8 unknownA3[5];
     struct PhaseEntry entries[4];
     u8 unknown158[0x70];
     struct ContactCollider memberCollidersA[4], memberCollidersB[4];
     struct ContactPosition saved[4], goal, delta, start;
-    u8 unknown4A0[0x10];
+    s32 orbitAngles[4];
     s8 turnSpeed;
     u8 targetAngle;
     u8 unknown4B2[2];
     u16 turnFrames;
     u8 unknown4B6[2];
     s32 countdown;
-    u8 unknown4BC[0xB54 - 0x4BC];
+    u8 unknown4BC[0xB4C - 0x4BC];
+    u16 launchInterval, launchDelay;
+    u16 memberCount, countdownLimit;
     u16 countdownStep;
     u8 unknownB56[0xB68 - 0xB56];
     u32 drawableFlags;
     u8 unknownB6C[2];
     u8 rotation;
-    u8 unknownB6F[0xB84 - 0xB6F];
+    u8 unknownB6F[5];
+    void *damageAnimation;
+    u8 unknownB78[0xC];
     struct ContactPosition position;
     u8 unknownB8C[0xC1C - 0xB8C];
     struct ContactCollider colliderA, colliderB;
     u8 unknownCC4[4];
     void (*update)(struct PhaseObject *);
-    u8 unknownCCC[0xC];
+    u8 unknownCCC[8];
+    void (*retarget)(struct PhaseObject *);
     void (*transition)(struct PhaseObject *);
     void (*secondaryTransition)(struct PhaseObject *);
     void (*scatterTransition)(struct PhaseObject *);
-    u8 unknownCE4[0x10];
+    void (*launchUpdate)(struct PhaseObject *);
+    void (*attackUpdate)(struct PhaseObject *);
+    u8 unknownCEC[4];
+    void (*phaseUpdate)(struct PhaseObject *);
     s32 scatterDelay;
-    u8 unknownCF8[0xD5A - 0xCF8];
+    u32 bobbingTimer;
+    u32 fieldCFC;
+    u32 landingHeight;
+    u8 unknownD04[0x24];
+    u16 launchFrames, attackFrames;
+    u8 launchCount, attackHeading;
+    u8 unknownD2E[0x25];
+    s8 actionCompletions;
+    u8 unknownD54;
+    u8 attackMode;
+    u8 unknownD56[2];
+    u16 damagePalette;
     s16 rotationTimer;
-    u8 unknownD5C[0xD80 - 0xD5C];
+    u8 unknownD5C[4];
+    u32 hitResponseD60, hitResponseD64, hitResponseD68;
+    u8 unknownD6C[0xC];
+    u16 damage, damageKind;
+    u8 unknownD7C[4];
     u32 frame;
+    u16 orbitFrames;
+    u8 unknownD86[0x12];
+    struct ContactPosition previousPosition;
+    s32 hitFrames;
 };
+
+static inline void PhaseObject_SetFlags(u8 bits, struct PhaseObject *object)
+{
+    object->groupMode.flags = bits | object->groupMode.flags;
+}
 
 /* Changing group mode queues its entry action. The active byte is the
  * enable value that the other group states test before dispatch.
@@ -82,7 +120,20 @@ static inline void PhaseObject_EnterMode(struct PhaseObject *object, u8 active, 
 {
     object->groupMode.active = active;
     object->groupMode.mode = mode;
-    object->groupMode.flags = active | object->groupMode.flags;
+    PhaseObject_SetFlags(active, object);
+}
+
+static inline u8 PhaseObject_TakeEntry(struct PhaseObject *object, u32 mask)
+{
+    u32 flags = object->groupMode.flags;
+    if (mask & flags) {
+        u32 remaining = ~mask;
+        remaining &= flags;
+        object->groupMode.flags = remaining;
+        object->entryReset = 0;
+        return 1;
+    }
+    return 0;
 }
 
 #endif
