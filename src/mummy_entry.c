@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_actor_drawable_flags.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_availability.h"
 #include "scene_actor_animation.h"
@@ -185,14 +186,7 @@ void Mummy_UpdateRevival(void *);
 void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame)
 {
     u32 queued;
-    u32 mask = 1;
-    if (!actor->base.drawableKind) {
-        u32 *flags = actor->base.drawable;
-        *flags |= mask;
-    } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
-        tile->flags |= mask;
-    }
+    ActorStatus_SetDrawableFlags(actor, 1);
     queued = SceneActorReaction_TakePrepared(actor);
     if (queued) {
         ActorShadow_Disable(actor->base.shadow);
@@ -805,11 +799,6 @@ static inline u32 Mummy_HalfFlags(u16 *field, u32 mask)
     return *field & mask;
 }
 
-static inline void ShowTile(struct SceneInputWidget *tile, u32 mask)
-{
-    tile->flags |= mask;
-}
-
 static inline void HideTile(struct SceneInputWidget *tile)
 {
     u32 mask = ~1;
@@ -953,10 +942,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorChase_SelectState(actor, 1, 0, 2);
         SceneActorChase_ResetStateEntry(actor);
     }
-    if (!actor->base.drawableKind)
-        *((u32 *)actor->base.drawable) |= 1;
-    else
-        ShowTile(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, 1);
+    ActorStatus_SetDrawableFlags(actor, 1);
     ActorShadow_Disable(actor->base.shadow);
 }
 
