@@ -55,10 +55,7 @@ void SceneInput_BeginPairTransition(struct SceneInputPair *pair, const u32 *enab
             widgetOffset = step;
         }
         enabled++;
-        {
-            u32 step = 1;
-            i += step;
-        }
+        i++;
         {
             s32 value = i;
             compare = value;
