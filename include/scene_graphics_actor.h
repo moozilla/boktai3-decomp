@@ -29,7 +29,8 @@ struct SceneActorGraphics {
     s16 travelColliderA, travelColliderB;
     u8 unk380[3];
     u8 trackedPlayerEscaped; /* 0x383: set after enough facing changes in the grab. */
-    u8 unk384[0x38C - 0x384];
+    u8 unk384[4];
+    u32 reactionScript; /* 0x388: called after the special hit reaction. */
     u8 effectScale; /* 0x38C: SceneActorGraphics_SelectResource / SceneActors_DispatchCommands. */
     u8 unk38D;
     u8 effectMode;     /* 0x38E */
@@ -37,7 +38,8 @@ struct SceneActorGraphics {
     u32 resourceId;    /* 0x390 */
     u8 particleFlag;   /* 0x394: cleared by SceneActorState_AdvanceToState06. */
     s8 trackedPlayer; /* 0x395: player slot selected by the contact box. */
-    u8 unk396[0x39C - 0x396];
+    u8 unk396[5];
+    u8 reactionDelay; /* 0x39B: set by the anchored and death reactions. */
     s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
     s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
     s32 healthCostBaseline;      /* 0x3A4: snapshot of health at contact-pool start. */
@@ -66,7 +68,9 @@ struct SceneGraphicsActor {
     struct SceneInputWidget animation; /* 0x240: body animation playback. */
     u8 unk2A0[0x33C - 0x2A0];
     s32 pendingDamage;
-    u8 damagePending, unk341, hitAngle, variant;
+    u8 damagePending;
+    u8 specialReaction; /* 0x341: sound, sparks and script on reaction completion. */
+    u8 hitAngle, variant;
     struct SceneActorGraphics graphics; /* 0x344 */
 };
 

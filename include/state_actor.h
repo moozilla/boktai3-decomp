@@ -93,9 +93,10 @@ struct StateActor {
     u8 registrySlot;
     u32 actionFlags; /* 0x9C: per-frame bits; meaning differs by caller (busy/pending/variant). */
     u8 lowHealth;
-    u8 unkA1[2];
+    u8 unkA1;
+    u8 reactionPhase; /* 0xA2: death and hit reaction substate. */
     u8 animationCompletions;
-    u8 unkA4[4];
+    u32 reactionTimer; /* 0xA4: elapsed frames in the reaction substate. */
     u8 animationFacing4, animationFacing8;
     u8 actionAnimation; /* 0xAA: requested sub-animation id for the recovery pipeline. */
     u8 actionState;     /* 0xAB: checked for value 3 by the variant-recovery handlers. */
