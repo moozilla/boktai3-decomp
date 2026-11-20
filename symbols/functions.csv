@@ -5300,6 +5300,7 @@ addr,name,mode,confidence,source,notes
 08130B7C,SceneActorState_DispatchTable290State,thumb,low,src-alias,Invokes the callback selected by byte 0x2A9 from table 0x290; table role remains tentative
 08130BA0,SceneActor_DispatchActivePhase,thumb,low,src-alias,
 08130BD4,SceneActorRoute_UpdateTimedPhase,thumb,low,src-alias,
+08130CAC,SceneActorRoute_UpdateAdvancePhase,thumb,low,src-alias,Chooses idle or turn behavior after advancing a route descriptor
 08130E60,SceneActorRoute_UpdateWaitPhase,thumb,low,src-alias,
 08130F60,SceneActorRoute_UpdateTriggeredWaitPhase,thumb,low,src-alias,Tentative: advances a timed route after its entry control completes
 081314E8,SceneActorRoute_UpdateContactRecovery,thumb,low,src-alias,Tentative: selects contact-recovery route phases and reinstalls the entry controller
