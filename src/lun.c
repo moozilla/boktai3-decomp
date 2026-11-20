@@ -420,11 +420,11 @@ void sub_0813D834(void *, u32, u32);
 
 void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
 {
-    u8 *motion = ((u8 *)actor) + 0x50;
-    u8 *sequence;
+    struct SceneActorBody *motion = &actor->base.body;
+    struct DisplaySequenceState *sequence;
     if (Take(&actor->base.field2B2)) {
         s32 current = ((((s32)actor->base.body.direction) + 0x70) >> 5) & 7;
-        u8 desired = *(((u8 *)actor) + 0x3CD);
+        u8 desired = actor->base.nextDirection;
         s32 target = ((((s32)desired) + 0x70) >> 5) & 7;
         if (current == target) {
             actor->base.body.direction = desired;
@@ -444,7 +444,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
             }
         }
     }
-    sequence = (*((u8 **)(((u8 *)actor) + 4))) + 0x48;
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     {
         u32 mask = 0xA02F;
         u16 *scale;
@@ -458,10 +458,13 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
             if (!value)
                 *scale = 64;
         }
-        if (!(*(((u8 *)actor) + 8)))
-            Anim_SetDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x48, *scale);
+        if (!actor->base.drawableKind)
+            Anim_SetDurationScale(
+                &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence,
+                *scale);
         else
-            Anim_SetFrameDurationScale((*((u8 **)(((u8 *)actor) + 4))) + 0x20, *scale);
+            Anim_SetFrameDurationScale(
+                &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, *scale);
     }
     if (actor->base.frameCounter & 4) {
         u32 variant;
@@ -471,11 +474,11 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
             actor->base.profileId, actor->base.profileMode, 1);
         Control(actor, actor->base.onEntry, 2);
         if (Bits(actor, 0x10000))
-            motion[9] += 32;
+            motion->direction += 32;
         else
-            motion[9] -= 32;
-        Lun_GetDirectionalFrame(motion[9], &variant, &flags);
-        sequence[5] = 0;
+            motion->direction -= 32;
+        Lun_GetDirectionalFrame(motion->direction, &variant, &flags);
+        sequence->frameCount = 0;
         selection = entry->value;
         Lun_SelectDirectionalAnimation((void *)actor, selection, variant, flags);
     }
@@ -801,12 +804,10 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
             arguments.values = values;
             Script_Call(script, &arguments);
         }
-        {
-            u32 m = 0x4000;
-            if (!(actor->base.motionFlags & m) && (u32)(actor->base.category - 11) > 2)
-                Bestiary_UnlockEntry(
-                    Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-        }
+        if (!SceneActorChase_QueryMotionFlagComponent(actor, 0x4000) &&
+            (u32)(actor->base.category - 11) > 2)
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
         SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
         SetState_UpdateDefeat(actor, 1, 0, 2);
     }
@@ -847,20 +848,6 @@ static inline void Add(struct ContactPosition *out, const struct ContactPosition
     out->y = out->y + from->y;
     out->z = from->z + out->z;
 }
-
-static inline void State(struct ChaseActor *a)
-{
-    u32 behavior = 8;
-    a->base.state2A8 = 0;
-    a->base.phase2A9 = 0;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
-struct SavedPair {
-    u32 x, z;
-};
 
 struct SavedMotion {
     u8 pad[12];
@@ -1019,13 +1006,7 @@ void Lun_DecayRouteMotion(struct ChaseActor *a)
         ctx->routeMotion.z >>= 1;
     }
     if (a->base.stepDone) {
-        u32 mask = 0x100;
-        u16 *p = &a->base.motionFlags;
-        u16 flags;
-        {
-            u32 raw = *p & mask;
-            flags = (u16)raw;
-        }
+        u16 flags = SceneActorChase_QueryMotionFlagComponent(a, 0x100);
         if (flags)
             SetState_DecayRouteMotion(a, 2, 1, 0);
         else
@@ -1271,22 +1252,10 @@ void Lun_InitMotionPreset(u8 *p)
 
 /* SceneActor_BeginLinkedIdleReaction_0809C834: SceneActor_BeginLinkedIdleReaction variant with other offsets/flags and without the collider flag clear (provisional name) */
 
-struct LinkedReactionContext {
-    u8 unknown0[0x3D4];
-    u32 flags;
-    u8 unknown55C[0x5BB - 0x55C];
-    u8 phase;
-};
-
-struct LinkedReactionCommand {
-    u8 unknown0[10];
-    u16 kind;
-};
-
-static inline u8 LinkedFlag(struct LinkedReactionContext *p)
+static inline u8 LinkedFlag(struct Lun *p)
 {
     u32 mask = 0x2;
-    if (p->flags & mask)
+    if (p->flags3D4 & mask)
         return 1;
     return 0;
 }
@@ -1824,11 +1793,10 @@ void SceneActorControl_ConsumeLiftFlagPenalty(struct ChaseActor *input)
     if (!LiftFlag((void *)SceneActorControl_GetMotionState(actor)))
         return;
     if (actor->base.paletteOffset == 0) {
-        u8 *p = (*(u8 **)gPlayers) + 0x4F6;
-        *p = *p - 1;
+        gPlayers[0]->movementSpeedReduction--;
     }
     {
-        u32 *flags = (void *)((u8 *)SceneActorControl_GetMotionState(actor) + 0x3D4);
+        u32 *flags = &SceneActorControl_GetMotionState(actor)->flags3D4;
         u32 clearMask = ~2;
         *flags &= clearMask;
     }
@@ -1920,18 +1888,17 @@ static inline void SetState_FollowParticipantDisplacement(struct ChaseActor *a, 
 
 void Lun_FollowParticipantDisplacement(struct ChaseActor *a)
 {
-    u8 *ctx = a->base.context;
+    struct Lun *ctx = a->base.context;
     struct ContactPosition delta;
     if (TakeFlag(&a->base.field2B1)) {
         SetControl_FollowParticipantDisplacement(a, ActorBehavior_TickParticipantProgress, 0x23);
-        *(struct ContactPosition *)(ctx + 0x414) =
-            *(struct ContactPosition *)&gPlayers[0]->position;
+        ctx->curveStart = *(struct ContactPosition *)&gPlayers[0]->position;
         SceneActorControl_ResetTargetFlags(a);
     }
-    Delta(&delta, (void *)(ctx + 0x414), (void *)&gPlayers[0]->position);
+    Delta(&delta, &ctx->curveStart, (void *)&gPlayers[0]->position);
     a->base.body.motion.x += delta.x;
     a->base.body.motion.z += delta.z;
-    *(struct ContactPosition *)(ctx + 0x414) = *(struct ContactPosition *)&gPlayers[0]->position;
+    ctx->curveStart = *(struct ContactPosition *)&gPlayers[0]->position;
     if (a->base.stepDone) {
         SetState_FollowParticipantDisplacement(a, 0, 3, 0);
         SetControl_FollowParticipantDisplacement(a, SceneActorControl_OnIdle, 0x10);
@@ -2110,41 +2077,33 @@ static inline u8 tst(u16 *a, u32 m)
     return 0;
 }
 
-struct SDestroy {
-    u8 f0[4];
-    u8 *p4;
-    u8 b8;
-    u8 f1[0x2b7];
-    u16 h2c0;
-};
-
-u32 Lun_Destroy(struct SDestroy *s)
+u32 Lun_Destroy(struct ChaseActor *s)
 {
-    u8 *p = s->p4;
+    u8 *p = s->base.drawable;
     u8 *q;
     u32 m;
     u32 v;
-    if (s->b8 == 0)
+    if (s->base.drawableKind == 0)
         Sprite_Remove(p);
     else
-        Anim_Remove(p + 0x20);
+        Anim_Remove(&((struct SceneActorAnimationTileDrawable *)p)->tile);
     Heap_Free(p);
     m = 0x100;
-    if (tst((u16 *)((u8 *)s + 0x2c0), m))
-        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+    if (tst(&s->base.placementFlags, m))
+        SceneMessages_UnregisterReceiver(&s->base.unknown9[3]);
     {
-        u8 *r = (u8 *)s + 0x320;
+        u8 *r = s->base.shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.statusFlags & m;
-    q = (u8 *)s + 0x50;
+    v = s->base.statusFlags & m;
+    q = (void *)&s->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove((u8 *)s + 0x134);
+    Collider_Remove(&s->base.colliderA);
     SceneActorRegistry_UnlinkActor(s);
     return 0;
 }
@@ -2193,7 +2152,7 @@ void SceneActorScript_OnCommand(void *actor, const u16 *command);
 
 u32 Lun_OnPlayerTargetInit(u8 *p);
 
-u32 Lun_Destroy(struct SDestroy *s);
+u32 Lun_Destroy(struct ChaseActor *s);
 
 void AnimData_SelectPaletteBank(void *, s32);
 
