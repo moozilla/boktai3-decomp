@@ -293,20 +293,17 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
 {
     u8 *text = Text_LookupString(Script_ParseStringRef(window) + p->stringBase);
     s32 i;
-    u8 *row, *rowStart, *rowEnd;
-    s32 zero;
+    u8 *rowStart, *rowEnd;
     p->count = 0;
     p->width = 0;
-    zero = 0;
-    rowStart = p->rowStart;
-    rowEnd = p->rowEnd;
-    row = rowStart;
-    for (i = 7; i >= 0; i--) {
-        row[0] = zero;
-        row[8] = zero;
-        row[16] = zero;
-        row++;
-    }
+    i = 0;
+    do {
+        p->rowStart[i] = 0;
+        p->rowEnd[i] = 0;
+        p->rowCount[i] = 0;
+        rowStart = p->rowStart;
+        rowEnd = p->rowEnd;
+    } while (++i < 8);
     p->rows = 0;
     for (;;) {
         if ((s8)*text < 0)
