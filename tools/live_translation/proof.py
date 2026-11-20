@@ -9,6 +9,7 @@ from localize import Localizer
 from runtime import Game, OUT, ROOT, prison_save, saves
 
 ROWS = {
+    "00-sunlight": "Cartridge sunlight advisory / baked background",
     "01-title": "Title logo and subtitle",
     "02-file": "File selection and button legends",
     "03-prison": "Sealed Prison / first voice",
@@ -34,6 +35,8 @@ def capture(game, directory, label):
 def prison(game, directory):
     for index, (delay, key) in enumerate(BOOT):
         game.step(delay)
+        if index == 2:
+            capture(game, directory, "00-sunlight")
         if index in (6, 7):
             capture(game, directory, "01-title" if index == 6 else "02-file")
         game.tap(key)
@@ -107,7 +110,7 @@ def run(memory):
             print(f"Captured {len(ROWS)} {mode} frames", flush=True)
     events = [json.loads(line) for line in (directory / "transcript.jsonl").read_text().splitlines()]
     keys = {e["key"] for e in events if e["run"] == "english" and e.get("english")}
-    required = {"graphic/731D/1", "graphic/530D/138", "text/5599", "text/5601", "text/1009", "text/1064"}
+    required = {"background/52AE/2/body", "graphic/731D/1", "graphic/530D/138", "text/5599", "text/5601", "text/1009", "text/1064"}
     if required - keys:
         raise RuntimeError(f"Missing proof encounters {sorted(required-keys)}")
     for key in ROWS:

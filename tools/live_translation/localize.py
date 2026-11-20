@@ -18,6 +18,8 @@ class Localizer:
         self.seen = set()
         self.dialogue_id = None
         self.graphics = None
+        from graphics import MapTranslator
+        self.backgrounds = MapTranslator()
 
     def record(self, key, **fields):
         identity = (key, fields.get("event"), fields.get("scene"), fields.get("kind"),
@@ -32,6 +34,8 @@ class Localizer:
         if not self.catalog:
             self.catalog = Catalog(game.rom)
         c = self.catalog
+        if hook == 6:
+            return self.backgrounds(self, game, arg, ptr, aux, lr, scene, proc, frame)
         if hook == 3:
             if self.graphics:
                 return self.graphics(self, game, arg, ptr, aux, lr, scene, proc, frame)

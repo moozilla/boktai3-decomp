@@ -17,6 +17,9 @@ class Catalog:
         self.cmap = text_bank.charmap()
         self.words = struct.unpack_from(f"<{(BANK-TABLE)//4}I", rom, TABLE-BASE)
         self.ids = {BANK+(word & 0x7fffffff): i for i, word in enumerate(self.words) if word >> 31}
+        self.rom_digest = hashlib.sha256(rom).hexdigest()
+        with (ROOT / "data/labels/scenes.csv").open() as f:
+            self.scenes = {int(r["scene"]): r for r in csv.DictReader(f)}
         self.script = gcx.Image(rom)
         self.procs = sorted((BASE+self.script.proc_address(i), i+1) for i,v in enumerate(self.script.procs) if v)
         with (ROOT / "symbols/functions.csv").open() as f:
@@ -64,9 +67,10 @@ class Catalog:
         return None
 
     def context(self, game, scene, recent_proc, lr, kind, source, key, col=0, row=None):
-        ctx = dict(kind=kind, scene=scene, scene_name=self.names.get(scene), caller=self.caller(lr),
+        ctx = dict(kind=kind, scene=scene, scene_name=self.scenes.get(scene, {}).get("place") or self.names.get(scene), caller=self.caller(lr),
                    caller_pc=f"{lr:08X}", last_called_proc=recent_proc,
                    columns=30, lines=3, name_cells=8)
+        ctx["rom_sha256"] = self.rom_digest
         pc = int.from_bytes(game.read(0x02000610,4),"little")
         ctx["script_cursor"] = f"{pc:08X}"
         ctx["script"] = self.script_context(pc-1)

@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER };
+enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER };
 typedef uint32_t (*Resolver)(unsigned hook, unsigned id, unsigned ptr, unsigned arg,
                              unsigned caller, unsigned scene, unsigned proc, unsigned frame);
 static struct mCore *core;
@@ -106,6 +106,17 @@ void lt_step(unsigned frames, unsigned keys)
                 break;
             case 0x081DC054: /* Menu_DrawText(column, row, final string) */
                 cpu->gprs[2] = request(MENU, cpu->gprs[0], cpu->gprs[2], cpu->gprs[1], cpu->gprs[14]);
+                break;
+            case 0x082161B4: { /* Bg_SetupLayers(mode, id, map, x, y, count, maps) */
+                uint32_t sp = cpu->gprs[13];
+                uint32_t count = core->rawRead32(core, sp+4, -1);
+                uint32_t maps = core->rawRead32(core, sp+8, -1);
+                uint32_t layer = count && maps ? core->rawRead32(core, maps, -1) : 0;
+                cpu->gprs[2] = request(BG_LAYER, layer, cpu->gprs[2], cpu->gprs[0], cpu->gprs[14]);
+                break;
+            }
+            case 0x082164AC: /* Bg_SetLayerMap(bg, map, index) */
+                cpu->gprs[1] = request(BG_LAYER, cpu->gprs[2], cpu->gprs[1], cpu->gprs[0], cpu->gprs[14]);
                 break;
             case 0x0821A520: /* ScriptProc_Start(type, hash) */
                 resource_type = (uint16_t)cpu->gprs[0];

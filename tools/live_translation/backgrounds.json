@@ -1,0 +1,11 @@
+{
+  "52AE": {
+    "2": {
+      "palette": "D985",
+      "regions": [
+        {"id": "heading", "box": [108, 25, 219, 49], "font": 18, "source": "注意", "english": "Caution"},
+        {"id": "body", "box": [24, 55, 221, 140], "font": 13, "source": "外で遊ぶときは強い日差しや気温の変化に注意して遊びましょう。", "english": "When playing outdoors, watch out for strong sunlight and changes in temperature."}
+      ]
+    }
+  }
+}
