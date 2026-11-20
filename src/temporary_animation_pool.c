@@ -36,9 +36,9 @@ s32 Widget_InitCleared(void *, void *, u32, u32, u32, u32, u32, void *);
 
 static inline s32 initializeAnimation(struct SceneInputWidget *animation,
                                       struct SceneInputResource *resource,
-                                      struct ContactPosition *position, u32 zero)
+                                      struct ContactPosition *position)
 {
-    s32 value = Widget_InitCleared(animation, resource, 0, 0, 2, zero, 60, position);
+    s32 value = Widget_InitCleared(animation, resource, 0, 0, 2, 0, 60, position);
     s32 result = 0;
     if (value < 0)
         result = -1;
@@ -50,14 +50,9 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
     const struct SceneInputResource *resource;
     struct TemporaryAnimationSlot *slot;
     struct SceneInputResource *relocated;
-    struct {
-        u32 zero;
-        struct ContactPosition position;
-    } scratch;
+    struct ContactPosition position;
     s32 index;
     s32 result;
-    u32 fillZero;
-    struct ContactPosition *point;
     struct SceneInputResource *savedResource;
     gTemporaryAnimationPool = pool;
     resource = ScriptProc_Start(0xCB05, 0xDE23);
@@ -71,12 +66,9 @@ s32 TemporaryAnimationPool_Initialize(struct TemporaryAnimationPool *pool)
     slot = pool->slots;
     index = 0;
     savedResource = relocated;
-    point = &scratch.position;
-    fillZero = 0;
     do {
-        scratch.zero = fillZero;
-        CpuSet(&scratch.zero, point, 0x05000002);
-        if (initializeAnimation(&slot->animation, savedResource, point, fillZero) < 0) {
+        ZeroFill8(&position);
+        if (initializeAnimation(&slot->animation, savedResource, &position) < 0) {
             result = -1;
             goto done;
         }
