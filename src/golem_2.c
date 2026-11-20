@@ -60,26 +60,12 @@ static inline u32 Flags32At(struct ChaseActor *a, u32 mask)
     return a->base.behaviorFlags & mask;
 }
 
-union HitSparkTable {
-    const u16 *table;
-    struct {
-        u16 offset;
-        u8 page;
-        u8 region;
-    } encoded;
-};
-
-static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
-{
-    return r->table;
-}
-
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
 
 void Golem_UpdateDefeat(struct ChaseActor *actor)
 {
     s32 values[8];
-    struct ContactPackedVector rangeB;
+    struct ContactPosition spread;
     struct ScriptUtilityArguments arguments;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u16 script;
@@ -132,21 +118,17 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
     if (!Flags32At(actor, 0x400)) {
         u8 category;
-        rangeB.x = 80;
-        rangeB.y = 60;
-        rangeB.z = 60;
+        spread.x = 80;
+        spread.y = 60;
+        spread.z = 60;
         {
-            union HitSparkTable source = {0};
-            const u16 *table;
-            source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
-            source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
-            source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
-            table = ReadSparkTable(&source);
-            {
-                u8 firstCount = SceneActorEffects_NextSparkCount(table);
-                SceneActorEffects_SpawnDefeatSparks(actor, (const struct ContactPosition *)&rangeB,
-                                                    table, firstCount);
-            }
+            const u16 *table = gRandomTable;
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 32);
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 64);
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 94);
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 128);
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 196);
+            SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(actor, &spread, table, 240);
         }
         category = actor->base.category;
         if (category == 4 || category == 1 || category == 5 || category == 7 || category == 6 ||
@@ -157,20 +139,13 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
     SceneActorChase_SelectState(actor, 1, 0, 2);
     SceneActorChase_ResetStateEntry(actor);
     ActorShadow_Disable(actor->base.shadow);
-    if (!*((u8 *)actor + 8))
-        **(u32 **)((u8 *)actor + 4) |= 1;
-    else {
-        struct DefeatOwnerGroup {
-            u32 unknown[2];
-            u32 flags;
-        };
-        struct DefeatOwner {
-            u8 unknown[0x20];
-            struct DefeatOwnerGroup group;
-        };
-        struct DefeatOwner *owner = *(void **)((u8 *)actor + 4);
-        struct DefeatOwnerGroup *ownerGroup = &owner->group;
-        ownerGroup->flags |= 1;
+    if (!actor->base.drawableKind) {
+        struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
+        drawable->flags |= 1;
+    } else {
+        struct SceneActorAnimationTileDrawable *drawable = actor->base.drawable;
+        struct SceneInputWidget *tile = &drawable->tile;
+        tile->flags |= 1;
     }
     ActorParticles_SpawnWideBurst(actor);
     SceneActorPlacement_PlayCategoryEventSound(actor);
