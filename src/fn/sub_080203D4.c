@@ -1,29 +1,27 @@
-#include "global.h"
-void TerrainModifiers_UnregisterCell(void *);
-void Heap_Free(void *);
-void Sprite_Remove(void *);
+#include "scene_object_controller.h"
+void TerrainModifiers_UnregisterCell(struct TerrainCellOverride *);
 void ResourceRegistry_UnregisterResource(int);
-int SceneObjects_Destroy(u8 *p)
+int SceneObjects_Destroy(struct SceneObjPool *p)
 {
     int i;
-    for (i = 0; i < *(u16 *)(p + 0x1a); i++) {
-        u8 *s = *(u8 **)(p + 0x42c) + i * 140;
-        if (*(void **)(s + 0x2c)) {
-            TerrainModifiers_UnregisterCell(*(void **)(s + 0x2c));
-            Heap_Free(*(void **)(s + 0x2c));
+    for (i = 0; i < p->count; i++) {
+        struct SceneObjSlot *slot = &p->slots[i];
+        if (slot->terrain) {
+            TerrainModifiers_UnregisterCell(slot->terrain);
+            Heap_Free(slot->terrain);
         }
-        Sprite_Remove(s);
+        Sprite_Remove(&slot->sprite);
     }
-    if (*(int *)(p + 0x34)) {
-        Heap_Free(*(void **)(p + 0x410));
-        Heap_Free(*(void **)(p + 0x414));
-        Heap_Free(*(void **)(p + 0x418));
-        Heap_Free(*(void **)(p + 0x41c));
-        Heap_Free(*(void **)(p + 0x420));
-        Heap_Free(*(void **)(p + 0x424));
-        Heap_Free(*(void **)(p + 0x428));
+    if (p->separatePalettes) {
+        Heap_Free(p->paletteAnimationData[0]);
+        Heap_Free(p->paletteAnimationData[1]);
+        Heap_Free(p->paletteAnimationData[2]);
+        Heap_Free(p->paletteAnimationData[3]);
+        Heap_Free(p->paletteAnimationData[4]);
+        Heap_Free(p->paletteAnimationData[5]);
+        Heap_Free(p->paletteAnimationData[6]);
     }
-    Heap_Free(*(void **)(p + 0x42c));
+    Heap_Free(p->slots);
     ResourceRegistry_UnregisterResource(0x85e6);
     return 0;
 }
