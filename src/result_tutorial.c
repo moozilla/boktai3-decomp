@@ -76,16 +76,13 @@ int ResultTutorial_ShowPrompt(struct ResultMenu *tutorial)
 
 int ResultTutorial_HidePrompt(struct ResultMenu *tutorial)
 {
-    u8 *state = &tutorial->phase;
-    switch (*state) {
+    switch (tutorial->phase) {
         case 0: {
-            int one = 1;
-            *state = one;
+            struct SceneInputWidget *promptWidget;
+            tutorial->phase = 1;
             tutorial->timer = 0;
-            {
-                struct SceneInputWidget *promptWidget = &tutorial->widgets[14];
-                promptWidget->flags |= one;
-            }
+            promptWidget = &tutorial->widgets[14];
+            promptWidget->flags |= 1;
         }
         case 1:
             if (ResultTutorial_FadeOut(tutorial))
