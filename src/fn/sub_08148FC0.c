@@ -1,3 +1,4 @@
+#include "game_state_flags.h"
 #include "game_state.h"
 #include "contact_swarm.h"
 #include "player_cue_sequence.h"
@@ -12,14 +13,6 @@ u8 Player_GetSmoothedDirection(void *);
 s32 Player_GetWalkSpeed(void *p);
 void Player_SetDirectionalVelocity(void *, s32);
 void Player_PlayPositionEffect(void *, void *, u32, u32, void *, u32, u32);
-
-static inline u8 global_bit(void)
-{
-    u32 mask = 1;
-    if (gGameState->flags868 & mask)
-        return TRUE;
-    return FALSE;
-}
 
 void Player_UpdateWalkFootsteps(u8 *p)
 {
@@ -58,7 +51,7 @@ void Player_UpdateWalkFootsteps(u8 *p)
                         p[0x46a] = 1;
                         Sound_PlaySong(0xc8);
                     }
-                    if (global_bit())
+                    if (GameState_TestWorldFlags(1))
                         Player_PlayPositionEffect(p, p + 0x30, 1, 2, 0, 0, 0);
                 }
             }
