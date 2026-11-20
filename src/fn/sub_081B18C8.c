@@ -1,45 +1,24 @@
+#include "paired_scene_actor.h"
 #include "global.h"
 
 // confidence=low: rises, waits for a countdown, then returns vertically
 #include "display_animation.h"
 #include "display_sequence_inline.h"
 #include "motion_track.h"
-struct ActorStatusOwner {
-    u8 unknown0[0x4D0];
-    void *sequenceResource;
-};
-struct ActorStatusPart {
-    u32 spriteFlags;
-    u8 unknown4[0xc];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct MotionTrackVector position;
-    u8 unknown24[0x24];
-    struct DisplaySequenceState sequence;
-    struct MotionTrack motion;
-    struct MotionTrackVector *anchor;
-    u8 unknown94[8];
-    struct MotionTrackVector offset;
-    u8 unknownA4[0xb8];
-    u32 variant, flags, state, timer;
-    u8 action, previousAction, reset, enter, finished;
-    u8 unknown171[0x2b];
-    u32 countdown;
-};
 void MotionTrack_Update(void *);
 void Sound_PlaySong(u32);
-static inline void StepSequence(struct ActorStatusPart *owner)
+static inline void StepSequence(struct PairedSceneHalf *owner)
 {
     struct DisplaySequenceState *state;
     const u16 *command;
-    state = &owner->sequence;
+    state = &owner->graphics.sequence;
     {
         u32 offset = DisplaySequence_GetIndex(state) << 1;
         const u16 *table;
-        table = owner->sequence.commands;
+        table = owner->graphics.sequence.commands;
         command = (const u16 *)((u32)table + offset);
     }
-    owner->frame = *command >> 6;
+    owner->sprite.frame = *command >> 6;
     {
         union DisplaySequenceControl control;
         u32 bit, first;
@@ -47,9 +26,9 @@ static inline void StepSequence(struct ActorStatusPart *owner)
         bit = 1;
         first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->spriteFlags |= 4;
+            owner->sprite.flags |= 4;
         else
-            owner->spriteFlags &= ~4;
+            owner->sprite.flags &= ~4;
     }
     {
         union DisplaySequenceControl control;
@@ -58,9 +37,9 @@ static inline void StepSequence(struct ActorStatusPart *owner)
         bit = 2;
         first = (u8)(control.raw & bit);
         if (first != (((*command & 0x30) >> 4) & bit))
-            owner->spriteFlags |= 8;
+            owner->sprite.flags |= 8;
         else
-            owner->spriteFlags &= ~8;
+            owner->sprite.flags &= ~8;
     }
     if (++state->elapsed >= state->duration) {
         state->elapsed = 0;
@@ -91,15 +70,15 @@ static inline void StepSequence(struct ActorStatusPart *owner)
     }
 }
 
-static inline void SetAnimation(struct ActorStatusPart *p, struct ActorStatusOwner *boss, u32 id,
+static inline void SetAnimation(struct PairedSceneHalf *p, struct VanargandAttackPair *boss, u32 id,
                                 u32 options)
 {
-    void *data = boss->sequenceResource;
+    void *data = (void *)boss->effectResource;
     struct DisplaySequenceState *seq;
     u32 playbackOptions;
     playbackOptions = options;
-    seq = &p->sequence;
-    Anim_SetSequence(seq, data, id, (u8)p->variant, playbackOptions);
+    seq = &p->graphics.sequence;
+    Anim_SetSequence(seq, data, id, (u8)p->mode, playbackOptions);
     StepSequence(p);
 }
 
@@ -116,19 +95,19 @@ static inline void AddOffset(struct MotionTrackVector *out, struct MotionTrackVe
     out->y = (u16)a->y + (u16)b->y;
     out->z = (u16)b->z + (u16)a->z;
 }
-static inline u8 MotionEnded(struct ActorStatusPart *p)
+static inline u8 MotionEnded(struct PairedSceneHalf *p)
 {
     u8 result = 0;
     if (p->motion.active == 2)
         result = 1;
     return result;
 }
-static inline void SetState(struct ActorStatusPart *p, u32 state)
+static inline void SetState(struct PairedSceneHalf *p, u32 state)
 {
-    p->state = state;
-    p->timer = 0;
+    p->actionCounters[0] = state;
+    p->actionCounters[1] = 0;
 }
-void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorStatusPart *p)
+void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
     struct MotionTrackVector *targetPosition;
     struct MotionTrackVector rise;
@@ -137,24 +116,19 @@ void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorS
     u8 *enter;
     struct MotionTrack *motion;
     u32 mask = 0x20;
-    p->flags |= mask;
-    if (p->reset) {
-        p->reset = 0;
+    p->actionFlags |= mask;
+    if (p->entered) {
+        p->entered = 0;
         SetAnimation(p, boss, 8, 4);
-        {
-            u32 zero = 0;
-            p->state = zero;
-            p->timer = zero;
-        }
-        p->enter = 1;
+        PairedSceneHalf_BeginActionPhase(p, 0);
     }
     {
-        u32 currentState = p->state;
+        u32 currentState = p->actionCounters[0];
         switch (currentState) {
             case 0: {
                 u32 entered;
                 {
-                    u8 *address = &p->enter;
+                    u8 *address = &p->actionEntered;
                     entered = *address;
                     enter = address;
                 }
@@ -164,16 +138,15 @@ void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorS
                     *enter = zero;
                     SetVector(&rise, zero, 512, zero);
                     {
-                        struct MotionTrackVector *origin = &p->offset;
+                        struct MotionTrackVector *origin = (void *)&p->offset;
                         AddOffset(&rise, origin, &rise);
                         MotionTrack_Initialize(motion, origin, &rise, 0, 4);
                     }
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    u32 next = 1;
-                    SetState(p, next);
-                    *enter = next;
+                    SetState(p, 1);
+                    *enter = 1;
                 }
                 break;
             }
@@ -181,23 +154,17 @@ void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorS
             case 1: {
                 u32 entered;
                 {
-                    u8 *address = &p->enter;
+                    u8 *address = &p->actionEntered;
                     entered = *address;
                     enter = address;
                 }
                 if (entered) {
-                    {
-                        u8 k2 = 0;
-                        *enter = k2;
-                    }
+                    *enter = 0;
                     Sound_PlaySong(0x596);
-                    p->countdown = 60;
+                    p->shake = 60;
                 }
-                if (!p->countdown) {
-                    {
-                        u8 k1 = 2;
-                        SetState(p, k1);
-                    }
+                if (!p->shake) {
+                    SetState(p, 2);
                     *enter = currentState;
                 }
                 break;
@@ -206,7 +173,7 @@ void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorS
             case 2: {
                 u32 entered;
                 {
-                    u8 *address = &p->enter;
+                    u8 *address = &p->actionEntered;
                     entered = *address;
                     enter = address;
                 }
@@ -215,17 +182,14 @@ void ActorStatus_UpdateRisingStrike(struct ActorStatusOwner *boss, struct ActorS
                     u32 zero = 0;
                     *enter = zero;
                     targetPosition = &target;
-                    target = p->offset;
-                    targetPosition->y = -p->anchor->y;
+                    target = *(struct MotionTrackVector *)&p->offset;
+                    targetPosition->y = -p->origin->y;
                     SetVector(&speed, zero, 64, zero);
                     MotionTrack_Initialize(motion, &p->offset, targetPosition, &speed, 1);
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    {
-                        u32 next = 3;
-                        SetState(p, next);
-                    }
+                    SetState(p, 3);
                     *enter = 1;
                 }
                 break;
