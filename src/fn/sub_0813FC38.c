@@ -32,12 +32,8 @@ s32 Player_InitActionMode(struct Player *p)
     Player_RecalculateDerivedStats(p);
     if (gEngineFlags & 0x1000) {
         void (*update)(struct Player *) = Player_UpdateLinkModeMovement;
-        u16 *base = gPlayerInitialSlotValues;
-        s32 index = sizeof(gPlayerInitialSlotValues) / sizeof(*base) - 1;
-        do {
-            base[index] = 0;
-            index--;
-        } while ((s32)base + index * (s32)sizeof(*base) >= (s32)base);
+        for (i = 0; i < 2; i++)
+            gPlayerInitialSlotValues[i] = 0;
         p->updateCallback = update;
     } else {
         p->updateCallback = gUnk_08610964[p->actionMode];
