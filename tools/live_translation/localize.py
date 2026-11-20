@@ -2,7 +2,7 @@ import hashlib
 import json
 import re
 from urllib.error import URLError
-from context import Catalog, BANK, BASE
+from context import Catalog, BASE
 from runtime import text_bank
 from translator import CONTROLS, fit
 
@@ -15,6 +15,7 @@ class Localizer:
         self.enabled = enabled
         self.catalog = None
         self.pointers = {}
+        self.looked_up = {}
         self.seen = set()
         self.dialogue_id = None
         self.graphics = None
@@ -34,18 +35,24 @@ class Localizer:
         if not self.catalog:
             self.catalog = Catalog(game.rom)
         c = self.catalog
+        if hook == 7:
+            return self.graphics.select(self, game, arg, ptr, aux, lr, scene, proc, frame) if self.graphics else 0
         if hook == 6:
             return self.backgrounds(self, game, arg, ptr, aux, lr, scene, proc, frame)
         if hook == 3:
-            if self.graphics:
-                return self.graphics(self, game, arg, ptr, aux, lr, scene, proc, frame)
             return 0
         if hook == 1:
             sid = arg
             source = c.text(sid)
             if source is None:
                 return 0
-            kind = "dialogue" if lr == 0x080313DE else "text"
+            # The bank also supplies save names, password alphabets, and small
+            # temporary copy buffers. Remember their IDs; translate only when
+            # a native display consumer is requesting the pointer.
+            if lr not in (0x080313DE, 0x08033604):
+                self.looked_up[source] = sid
+                return 0
+            kind = "dialogue" if lr == 0x080313DE else "window"
             if kind=="dialogue": self.dialogue_id=sid
             key = f"text/{sid}"
         else:
@@ -59,16 +66,17 @@ class Localizer:
                 if len(raw)==384:
                     return 0
                 source = c.decode(raw)
-                key = "literal/"+hashlib.sha256(raw).hexdigest()[:16]
-            kind = {2:"menu",4:"name",5:"ticker"}[hook]
-        if not source or not re.search(r"[^\x00-\x7f]",CONTROLS.sub("",source)):
+                sid = self.looked_up.get(source)
+                key = f"text/{sid}" if sid is not None else "literal/"+hashlib.sha256(raw).hexdigest()[:16]
+            kind = {2:"menu",4:"name",5:"ticker",8:"substitution",9:"direct-playback"}[hook]
+        if not source or not source.strip() or not re.search(r"[^\x00-\x7f]",CONTROLS.sub("",source)):
             return 0
         ctx = c.context(game,scene,proc,lr,kind,source,sid,arg if hook==2 else 0,aux if hook==2 else None)
         if hook==1 and 0x02000000<=aux<0x02040000:
             x,y,w,h=game.read(aux+4,4)
             if 1<=w<=30 and 1<=h<=20:
                 ctx.update(window=[x,y,w,h],columns=w,lines=max(1,h//2))
-        if kind=="name":
+        if kind == "name" or (kind == "menu" and ctx["caller"] == "GameStart_DrawSaveInfo" and (arg, aux) == (8, 7)):
             # A custom save's player name belongs to the player; render only
             # explicitly approved spellings in the local glossary.
             if source not in self.memory.glossary():
@@ -89,7 +97,11 @@ class Localizer:
                     provenance=origin,frame=frame,**ctx)
         if rendered is None:
             return 0
-        address = game.install(text_bank.encode_string(rendered,{})+b'\0')
+        try:
+            address = game.install(text_bank.encode_string(rendered,{})+b'\0')
+        except ValueError as error:
+            self.record(key,event="needs-review",reason=str(error),source=source,frame=frame,**ctx)
+            return 0
         if sid is not None:
             self.pointers[address]=sid
         return address

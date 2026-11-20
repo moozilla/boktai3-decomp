@@ -4,7 +4,7 @@ import json
 
 from PIL import Image, ImageDraw, ImageFont
 
-from graphics import ArtTranslator
+from frames import ArtTranslator
 from localize import Localizer
 from runtime import Game, OUT, ROOT, prison_save, saves
 
@@ -45,6 +45,7 @@ def prison(game, directory):
         game.step(180)
         label = wanted.pop(game.resolver.dialogue_id, None)
         if label:
+            game.step(140)  # Finish the native typewriter, including inserted names.
             capture(game, directory, label)
         if not wanted:
             return

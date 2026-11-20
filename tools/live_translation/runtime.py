@@ -1,6 +1,5 @@
 """A private running Japanese cartridge and a per-encounter translation callback."""
 import ctypes as C
-import inspect
 from pathlib import Path
 import shutil
 import subprocess
@@ -12,7 +11,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 OUT = ROOT / "build/live_translation"
 sys.path[:0] = [str(ROOT / "tools"), str(ROOT / "tools/assets")]
-from romlib import load_rom
+from romlib import baserom_path, load_rom
 from datafmt import text_bank
 import saves
 
@@ -40,7 +39,7 @@ class Game:
         if save:
             shutil.copyfile(save, battery)
         self.callback = CALLBACK(self.encounter)
-        ok = self.core.lt_open(bytes(ROOT / "baserom.gba"), bytes(battery) if save else None, self.callback)
+        ok = self.core.lt_open(bytes(Path(baserom_path())), bytes(battery) if save else None, self.callback)
         if not ok:
             raise RuntimeError("Could not initialize mGBA.")
         self.frame = 0

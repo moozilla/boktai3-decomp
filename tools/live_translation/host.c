@@ -11,9 +11,13 @@
 #include <stdio.h>
 #include <string.h>
 
-enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER };
+enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT };
 typedef uint32_t (*Resolver)(unsigned hook, unsigned id, unsigned ptr, unsigned arg,
                              unsigned caller, unsigned scene, unsigned proc, unsigned frame);
+/* Cache the immutable frame table, never the temporary address of a relocated
+ * header. A game's widget can reuse that header storage for a different asset. */
+struct FrameChoice { uint32_t glyphs, index, replacement; };
+static struct FrameChoice frame_cache[2048];
 static struct mCore *core;
 static struct ARMCore *cpu;
 static uint32_t pixels[240 * 160];
@@ -62,6 +66,7 @@ int lt_open(const char *rom, const char *battery, Resolver callback)
     cpu = core->cpu;
     resolve = callback;
     last_proc = 0;
+    memset(frame_cache, 0, sizeof(frame_cache));
     return 1;
 }
 
@@ -92,6 +97,12 @@ void lt_step(unsigned frames, unsigned keys)
             while (cpu->cycles >= cpu->nextEvent) cpu->irqh.processEvents(cpu);
             uint32_t pc = cpu->gprs[15] - (cpu->executionMode == MODE_THUMB ? 2 : 4);
             switch (pc) {
+            case 0x08032CD4: /* TextState_SetString(state, index, string) */
+                if (cpu->gprs[2]) cpu->gprs[2] = request(SUBSTITUTION, cpu->gprs[1], cpu->gprs[2], 0, cpu->gprs[14]);
+                break;
+            case 0x08030EDC: /* MessageWindow_SetTextCursor(string) */
+                if (cpu->gprs[0]) cpu->gprs[0] = request(DIRECT_TEXT, 0, cpu->gprs[0], 0, cpu->gprs[14]);
+                break;
             case 0x080335F4: text_window=cpu->gprs[0]; break; /* TextWindow_ResolveString */
             case 0x0803343C:
                 if (cpu->gprs[0]) cpu->gprs[0]=request(TICKER,0,cpu->gprs[0],0,cpu->gprs[14]);
@@ -107,6 +118,23 @@ void lt_step(unsigned frames, unsigned keys)
             case 0x081DC054: /* Menu_DrawText(column, row, final string) */
                 cpu->gprs[2] = request(MENU, cpu->gprs[0], cpu->gprs[2], cpu->gprs[1], cpu->gprs[14]);
                 break;
+            case 0x08219728: { /* Anim_SelectWidgetGlyph(widget, header, frame) */
+                uint32_t header = cpu->gprs[1], index = (uint16_t)cpu->gprs[2];
+                uint32_t glyphs = core->rawRead32(core, header + 12, -1);
+                struct FrameChoice *slot = &frame_cache[((glyphs >> 3) ^ index) % 2048];
+                if (glyphs < 0x08000000 || glyphs >= 0x09000000) break;
+                if (slot->glyphs != glyphs || slot->index != index) {
+                    slot->glyphs = glyphs;
+                    slot->index = index;
+                    slot->replacement = request(OBJ_FRAME, index, header, glyphs, cpu->gprs[14]);
+                    if (slot->replacement == header) slot->replacement = 0;
+                }
+                if (slot->replacement) {
+                    cpu->gprs[1] = slot->replacement;
+                    cpu->gprs[2] = 0; /* Transient resource contains the selected frame only. */
+                }
+                break;
+            }
             case 0x082161B4: { /* Bg_SetupLayers(mode, id, map, x, y, count, maps) */
                 uint32_t sp = cpu->gprs[13];
                 uint32_t count = core->rawRead32(core, sp+4, -1);
