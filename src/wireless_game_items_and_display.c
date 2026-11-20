@@ -6,7 +6,7 @@ void WirelessGame_AddItem(void *p, int index)
 {
     struct WirelessGameExchange *q = WirelessExchange_Get();
     if (q) {
-        u8 *counts = q->counts;
+        u8 *counts = q->local.counts;
         if (counts[index] <= 4) {
             int total = 0, i = 0;
             do {
@@ -57,7 +57,7 @@ int WirelessGame_TryAddCyclingItem(void *owner)
                         break;
                 }
             }
-            counts = p->counts;
+            counts = p->local.counts;
             if (counts[index] <= 4) {
                 int total = 0, i = 0;
                 do {
@@ -105,7 +105,7 @@ u32 sub_08039708(void)
     return 1;
 }
 
-static inline u8 GetPlayerHealth(struct WirelessGameRemoteStats *q)
+static inline u8 GetPlayerHealth(struct WirelessGamePeerStats *q)
 {
     return q->playerHealthPercent;
 }
@@ -121,7 +121,7 @@ u32 WirelessGame_GetRemotePlayerHealthPercent(void)
     return r;
 }
 
-static inline u8 GetOpponentHealth(struct WirelessGameRemoteStats *q)
+static inline u8 GetOpponentHealth(struct WirelessGamePeerStats *q)
 {
     return q->opponentHealthPercent;
 }
@@ -155,7 +155,7 @@ int WirelessGame_ToggleItemMode(void)
     if (!p->enabled)
         return 0;
     /* Byte 6 past the four-element counts array is itemMode. */
-    v = (u8 *)p + (u32) & ((struct WirelessGameExchange *)0)->counts;
+    v = (u8 *)p + (u32) & ((struct WirelessGameExchange *)0)->local.counts;
     v[6] = 1 - v[6];
     Sound_PlaySong(267);
     return v[6];

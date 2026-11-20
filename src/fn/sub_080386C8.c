@@ -23,7 +23,7 @@ void WirelessGameMenu_UpdateRoundHandshake(struct WirelessGameExchange *p)
         WirelessExchange_SendPacket(p, 1, &data, 1);
         set(4);
         WirelessGameMenu_SetStatusPanelState(p, 1);
-        p->itemMode = 0;
+        p->local.itemMode = 0;
         WirelessGameItems_StartOutgoingItems();
     }
     bits = 128;

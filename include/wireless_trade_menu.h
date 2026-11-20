@@ -32,7 +32,7 @@ enum WirelessExchangeFlag {
     WIRELESS_EXCHANGE_OUTCOME = 0x300,
 };
 
-struct WirelessGameRemoteStats {
+struct WirelessGamePeerStats {
     u8 counts[4];
     u8 playerHealthPercent, opponentHealthPercent;
     u8 itemMode, result;
@@ -51,10 +51,7 @@ struct WirelessGameExchange {
     u8 pendingEvent, selectionCountdown, enabled, selectionReady;
     u8 resultPanelClosed, saveRetries, saveResult, roundActive;
     u8 queuedCounts[4];
-    u8 counts[4];
-    u8 playerHealthPercent, opponentHealthPercent, itemMode, result;
-    u32 elapsed;
-    struct WirelessGameRemoteStats remote;
+    struct WirelessGamePeerStats local, remote;
     u8 sendPacket[12];
     struct WirelessGameDisplay *display;
     u32 itemCount, unk68, extraItemCount;

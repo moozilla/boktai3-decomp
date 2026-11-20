@@ -31,7 +31,7 @@ void WirelessGameMenu_UpdateSelection(struct WirelessGameExchange *p)
             WirelessGameMenu_EnterState(p, WIRELESS_MENU_SELECTION_EXCHANGE);
             StatusPanel_BeginRefresh();
             WirelessGameMenu_SignalStatusPanel(p);
-            if (p->itemMode && p->enabled)
+            if (p->local.itemMode && p->enabled)
                 p->enabled--;
             return;
         }
