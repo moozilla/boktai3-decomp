@@ -8,36 +8,47 @@
  * Position and velocity use five fractional bits. Identities are tentative. */
 struct ResultTutorialMarker {
     u32 flags;
-    u8 unknown04[0x14];
-    s16 x, y, z;
-    u8 unknown1E[0xA];
+    u8 unknown04[0xB];
+    u8 priority;
+    u8 unknown10[8];
+    struct ContactPosition position;
+    u8 unknown20[8];
+};
+
+struct ResultMarkerFeedback {
+    u16 phase, elapsed;
 };
 
 struct ResultMenu {
     struct Task task;
-    u8 unknown18[0x2E];
+    u8 unknown18[0x28];
+    s16 targetLeft, targetRight, targetCenter;
     u16 lastPressScore;
-    u8 unknown48[8];
+    u8 markerAnimationState, unknown49, nextFeedbackSlot;
+    u8 unknown4B[5];
     s32 level;
     u8 unknown54[0x20];
     void *messageTable, *owner;
     u8 unknown7C[0x10];
     s32 playerPosition, playerVelocity;
     s32 targetMinimum, targetMaximum, targetPosition;
-    u8 unknownA0[8];
+    u16 trackingScore, trackingSamples, pressScoreTotal, pressSamples;
     s16 elapsed, timer;
     u16 countdown;
     u8 difficulty, phase;
     u8 pressState, pressed, accelerationDelay, unknownB3;
     u8 step, alpha, prompt, layer;
     u8 hideLevel, hideTimer;
-    u8 unknownBA[6];
+    u8 unknownBA[5], lastTimingGrade;
     u8 pressScore;
-    u8 unknownC1[0x43];
+    u8 unknownC1[3], finishState;
+    u8 unknownC5[0x3F];
     struct SceneInputResource primaryResource, secondaryResource;
     struct SceneInputWidget widgets[15];
     struct ResultTutorialMarker markers[4];
-    u8 unknown784[0x1C];
+    u8 callbackPending;
+    u8 unknown785[7];
+    struct ResultMarkerFeedback markerFeedback[5];
     u16 completionScript;
     u8 unknown7A2[2];
     void *update;
