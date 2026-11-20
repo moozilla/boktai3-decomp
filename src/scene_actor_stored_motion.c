@@ -7,6 +7,7 @@
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_visibility.h"
 #include "scene_actor_state.h"
+#include "scene_actor_placement.h"
 #include "scene_actor_status.h"
 
 /* SceneActorControl_ReturnSuccess: Returns constant 1; provisional success stub with no known callers */
@@ -333,13 +334,7 @@ void SceneActorControl_RequestVisibility(struct ChaseActor *input, const u16 *in
         return;
     if (!SceneActor_MaskedHalfword(0x4000, &actor->base.motionFlags))
         return;
-    {
-        u32 mask = 0x800;
-        u16 *flags;
-        flags = &actor->base.placementFlags;
-        mask |= *flags;
-        *flags = mask;
-    }
+    SceneActorPlacement_SetFlags(0x800, &actor->base);
     {
         u32 requested = request[1];
         if (requested == 0) {
@@ -412,11 +407,6 @@ struct WanderMotionState {
     struct ContactPosition scratch;
 };
 
-static inline void SetWanderFlags(struct ChaseActor *actor, u32 bit)
-{
-    actor->base.placementFlags = bit | actor->base.placementFlags;
-}
-
 // confidence=low: homes on a stored point, then consumes a pending trigger and restarts.
 
 void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
@@ -429,7 +419,7 @@ void SceneActorControl_UpdateWanderTarget(struct ChaseActor *actor)
         SceneActorControl_StartStoredCurve(actor);
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
         ZeroFill8(&context->scratch);
-        SetWanderFlags(actor, 0x800);
+        SceneActorPlacement_SetFlags(0x800, &actor->base);
     }
     SceneActorControl_TickSway(actor);
     {
@@ -450,13 +440,7 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
         Trigger_ConsumePending((void *)((u8 *)actor + 0xC), 1);
-        {
-            u32 mask = 0x800;
-            u16 *flags;
-            flags = &actor->base.placementFlags;
-            mask |= *flags;
-            *flags = mask;
-        }
+        SceneActorPlacement_SetFlags(0x800, &actor->base);
     }
     actor->base.counter2AC++;
 }
