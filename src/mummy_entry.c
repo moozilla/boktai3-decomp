@@ -435,10 +435,7 @@ void Mummy_ResumeRouteAfterRecovery(struct ChaseActor *actor, s32 frame)
         SceneActorChase_SetState(actor, 3, 1, 0);
         SceneActorChase_SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 0xE);
         SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 0x28);
-        {
-            u32 mask = 0x10;
-            actor->base.behaviorFlags |= mask;
-        }
+        SceneActorChase_SetActorFlags(actor, 0x10);
         Mummy_SnapToRoute(actor->group.destination, &actor->group.homeRoute);
         if (!SceneActorChase_TryRoute(actor, group->route, &actor->base.body.position,
                                       group->destination)) {
@@ -811,97 +808,22 @@ void SceneActorBehavior_CallTerrainScript(void *);
 
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 
-union HitSparkTable {
-    const u16 *table;
-    struct {
-        u16 offset;
-        u8 page;
-        u8 region;
-    } encoded;
-};
-
-static inline const u16 *ReadSparkTable(const union HitSparkTable *r)
-{
-    return r->table;
-}
-
-struct MummyDefeatControl {
-    u8 unknown0[8];
-    u16 timer;
-    u8 unknownA[10];
-    u16 flags14;
-    u8 unknown16[2];
-    u32 counter;
-};
-
-struct MummyDefeatGroup {
-    u8 unknown0[0x4C];
-    struct MummyDefeatControl control;
-};
-
-struct MummyDefeatActor {
-    void *object, *drawable;
-    u8 drawableKind, unknown9[0x47];
-    u32 id;
-    u8 unknown54[5], direction, unknown5A[2];
-    struct ContactPosition position;
-    u8 unknown64[0x34];
-    u8 category, unknown99[0x11];
-    u16 fieldAA;
-    u8 unknownAC[0x58];
-    u32 word104;
-    u8 unknown108[12];
-    u32 flags114;
-    u8 unknown118[0x1C];
-    struct ContactCollider colliderA, colliderB;
-    u8 unknown1DC[10];
-    u16 paletteOffset, field1E8, field1EA;
-    u8 unknown1EC[12];
-    u16 defeatScript, unknown1FA;
-    s32 scriptValues[3];
-    u8 unknown208[0x14];
-    void *target;
-    u8 unknown220[0x88];
-    u8 state2A8, phase2A9, behavior2AA, unknown2AB;
-    u32 counter2AC;
-    u8 field2B0, field2B1, field2B2, field2B3;
-    u8 enabled, field2B5, unknown2B6[0x12];
-    u16 field2C8, unknown2CA;
-    u32 flags2CC, flags2D0;
-    u16 flags2D4, flags2D6;
-    u32 field2D8, field2DC, field2E0;
-    u8 unknown2E4[0x3C];
-    u8 shadow[0xB4];
-    struct MummyDefeatGroup group;
-};
-
-struct MummyDefeatAnimation {
-    u8 unknown0[0xE];
-    u16 frame;
-};
-
-struct MummyDefeatDrawable {
-    u32 flags;
-    u8 unknown4[0x44];
-    struct MummyDefeatAnimation anim;
-};
-
-static inline u32 Mummy_MotionFlags(struct MummyDefeatActor *actor, u32 maskInput)
+static inline u32 Mummy_MotionFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2D4 & mask;
+    return actor->base.motionFlags & mask;
 }
 
-static inline u32 Mummy_ActorFlags(struct MummyDefeatActor *actor, u32 maskInput)
+static inline u32 Mummy_ActorFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2CC & mask;
+    return actor->base.behaviorFlags & mask;
 }
 
-static inline u32 Mummy_DisplayFlags(struct MummyDefeatActor *actor, u32 maskInput)
+static inline u32 Mummy_DisplayFlags(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
-    return actor->flags2D0 & mask;
+    return actor->base.statusFlags & mask;
 }
 
 static inline u32 Mummy_HalfFlags(u16 *field, u32 mask)
@@ -931,50 +853,50 @@ static inline u32 Random4(void)
     return v + 1;
 }
 
-static inline void StoreSpeed(struct MummyDefeatActor *a, u32 v)
+static inline void StoreSpeed(struct ChaseActor *a, u32 v)
 {
-    a->field1EA = v;
+    a->base.paletteTimer = v;
 }
 
-void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
+void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
     struct ContactPackedVector rangeA;
     struct ContactPackedVector rangeB;
     struct ScriptUtilityArguments arguments;
-    struct MummyDefeatDrawable *drawable = actor->drawable;
-    struct MummyDefeatAnimation *anim = &drawable->anim;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
+    struct DisplaySequenceState *anim = &drawable->sequence;
     u16 script;
     u16 *motionFlags;
     struct ContactCollider *collider;
     if (SceneActorReaction_TakePrepared((void *)actor)) {
-        struct MummyDefeatGroup *group = &actor->group;
+        struct SceneActorChaseGroup *group = &actor->group;
         if (!Mummy_DisplayFlags(actor, 0x20000)) {
-            if (!actor->drawableKind) {
-                u32 *flags = actor->drawable;
+            if (!actor->base.drawableKind) {
+                u32 *flags = actor->base.drawable;
                 s32 mask = ~1;
                 *flags = mask & (*flags);
             } else
-                HideTile(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile);
+                HideTile(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile);
         }
         {
-            struct MummyDefeatControl *control = &group->control;
-            u32 *flags = &actor->flags2CC;
+            struct SceneActorRegistryControl *control = &group->common.control;
+            u32 *flags = &actor->base.behaviorFlags;
             u32 mask = ~0x141C0;
             *flags &= mask;
             control->counter = 0;
-            control->flags14 = 0;
+            control->field14 = 0;
             control->timer = 0;
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
-        actor->field2B3 = 0;
+        actor->base.restart = 0;
         StoreSpeed(actor, 0x20);
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(actor, 3, 127, 0);
         SceneActorEffects_AdvanceSteps(actor, 4);
-        collider = &actor->colliderA;
-        actor->colliderA.responseValue = 0;
+        collider = &actor->base.colliderA;
+        actor->base.colliderA.responseValue = 0;
         SceneActorPlacement_PlayCategoryEventSound(actor);
         if (Mummy_MotionFlags(actor, 8))
             Sound_PlaySong(0x12A);
@@ -986,43 +908,46 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
         rangeA.x = 60;
         rangeA.y = 60;
         rangeA.z = 40;
-        SparkParticle_Spawn(&actor->position, Random4(), &rangeA, actor->direction + 128, 10, 8, 2,
-                            2);
+        SparkParticle_Spawn(&actor->base.body.position, Random4(),
+                            (const struct ContactPosition *)&rangeA,
+                            actor->base.body.direction + 128, 10, 8, 2, 2);
     }
     if (frame <= 0x22)
-        anim->frame = 0;
+        anim->elapsed = 0;
     SceneActorMovement_UpdateAirborne(actor);
     SceneActorMovement_UpdateHeight(actor);
-    if (!actor->field2B3)
+    if (!actor->base.restart)
         return;
-    actor->field2B0 = 1;
+    actor->base.stepDone = 1;
     {
         u32 test = Mummy_ActorFlags(actor, 0x400);
-        motionFlags = &actor->flags2D4;
+        motionFlags = &actor->base.motionFlags;
         if (!test) {
             u8 category;
             if (!Mummy_HalfFlags(motionFlags, 0xA007)) {
                 SceneEffect_EmitPositionPattern(actor);
-                SceneStimulus_AddUntagged(actor->position.x, actor->position.z, 0x400, 0, 1);
+                SceneStimulus_AddUntagged(actor->base.body.position.x, actor->base.body.position.z,
+                                          0x400, 0, 1);
             } else {
                 rangeB.x = 80;
                 rangeB.y = 60;
                 rangeB.z = 60;
                 {
-                    union HitSparkTable source = {0};
-                    const u16 *table;
-                    source.encoded.offset = (u16)RANDOM_TABLE_ADDR;
-                    source.encoded.page = (u8)(RANDOM_TABLE_ADDR >> 16);
-                    source.encoded.region = (u8)(RANDOM_TABLE_ADDR >> 24);
-                    table = ReadSparkTable(&source);
-                    {
-                        u8 firstCount = SceneActorEffects_NextSparkCount(table);
-                        SceneActorEffects_SpawnDefeatSparks((void *)actor,
-                                                            (const struct ContactPosition *)&rangeB,
-                                                            table, firstCount);
-                    }
+                    const u16 *table = gRandomTable;
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 32);
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 64);
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 94);
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 128);
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 196);
+                    SCENE_ACTOR_SPAWN_DEFEAT_SPARK_RING(
+                        actor, (const struct ContactPosition *)&rangeB, table, 240);
                 }
-                category = actor->category;
+                category = actor->base.category;
                 if (category == 4 || category == 1 || category == 5 || category == 7 ||
                     category == 6 || category == 0x18 || category == 0x19)
                     Sound_PlaySong(0xE5);
@@ -1030,55 +955,35 @@ void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame)
         }
     }
     SceneActorBehavior_CallTerrainScript(actor);
-    script = actor->defeatScript;
+    script = actor->base.script1F8;
     if (script) {
-        values[0] = actor->position.x;
-        values[1] = actor->position.y;
-        values[2] = actor->position.z;
-        values[3] = actor->scriptValues[0];
-        values[4] = actor->scriptValues[1];
-        values[5] = actor->scriptValues[2];
-        values[6] = actor->field2E0;
-        values[7] = actor->id;
+        values[0] = actor->base.body.position.x;
+        values[1] = actor->base.body.position.y;
+        values[2] = actor->base.body.position.z;
+        values[3] = actor->base.parameters1FC[0];
+        values[4] = actor->base.parameters1FC[1];
+        values[5] = actor->base.parameters1FC[2];
+        values[6] = actor->base.hitOwners;
+        values[7] = actor->base.body.id;
         arguments.count = 8;
         arguments.values = values;
         Script_Call(script, &arguments);
     }
     {
-        u32 mask = 0x4000;
-        u32 test = (*motionFlags) & mask;
-        if (!test && (u32)(actor->category - 11) > 2)
-            Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->category, actor->paletteOffset));
-        actor->fieldAA = 0;
-        {
-            void *callback = (void *)SceneActorControl_OnIdle;
-            u32 kind = 16;
-            actor->field2B2 = 1;
-            actor->field2B0 = 0;
-            actor->field2B5 = kind;
-            actor->target = callback;
-            actor->field2C8 = 0;
-            {
-                u32 *field = &actor->flags114;
-                s32 clear = ~1;
-                *field &= clear;
-            }
-            actor->word104 = 0;
-            {
-                u32 behavior = 2;
-                actor->state2A8 = 1;
-                actor->phase2A9 = 0;
-                actor->behavior2AA = behavior;
-                actor->counter2AC = 0;
-                actor->field2B1 = 1;
-            }
-        }
+        if (!SceneActorChase_FlagComponentBits((void *)motionFlags, 0x4000) &&
+            (u32)(actor->base.category - 11) > 2)
+            Bestiary_UnlockEntry(
+                Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
+        actor->base.attachmentTimer = 0;
+        SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
+        SceneActorChase_SelectState(actor, 1, 0, 2);
+        SceneActorChase_ResetStateEntry(actor);
     }
-    if (!actor->drawableKind)
-        *((u32 *)actor->drawable) |= 1;
+    if (!actor->base.drawableKind)
+        *((u32 *)actor->base.drawable) |= 1;
     else
-        ShowTile(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile, 1);
-    ActorShadow_Disable(actor->shadow);
+        ShowTile(&((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile, 1);
+    ActorShadow_Disable(actor->base.shadow);
 }
 
 // confidence=low: control reacquires a player route once the context delay clears.
@@ -4418,8 +4323,6 @@ void Mummy_UpdateWalking(void *);
 void Mummy_UpdateIdle(void *);
 
 void Mummy_UpdateDisplacementRecovery(struct ChaseActor *actor, s32 frame);
-
-void Mummy_UpdateDefeat(struct MummyDefeatActor *actor, s32 frame);
 
 void Mummy_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame);
 
