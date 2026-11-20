@@ -9,22 +9,25 @@ void SceneActorReaction_SetMotionMode(void);
 u32 Route_GetCurrentPointFacing(void *);
 s32 TargetRegistry_RegisterActor(void *, void *, void *);
 
-/* Shared script-driven body, health, pursuit route and movement-probe setup. */
-static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
+/* Read the initial actor flags and placement before loading the rest of the body. */
+static inline void MonsterInit_InitializePursuitFields(struct ChaseActor *arg0)
 {
-    struct ChaseActor *arg0 = object;
-    struct SceneActorChaseGroup *group = &arg0->group;
-    struct SceneActorBody *body = &arg0->base.body;
-    struct ContactPosition origin;
-    s32 mode, secondLimit, firstLimit, gateDuration, identity;
-    struct SceneActorRegistryRoute *rt;
     arg0->base.behaviorFlags = 0;
     arg0->base.statusFlags = 0;
     arg0->base.enabled = 0;
     arg0->base.field2E8 = 8;
     arg0->base.placementFlags = Script_GetKeywordValue('M', 0);
     arg0->base.field2C2 = 0x40;
-    MonsterInit_ClearPosition(fill, &origin);
+}
+
+/* Load the script parameters and route using the supplied local origin. */
+static inline void MonsterInit_ReadPursuitBody(struct ChaseActor *arg0,
+                                              struct SceneActorChaseGroup *group,
+                                              struct SceneActorBody *body,
+                                              const struct ContactPosition *origin)
+{
+    s32 mode, secondLimit, firstLimit, gateDuration, identity;
+    struct SceneActorRegistryRoute *rt;
     mode = Script_GetKeywordValue('N', 0);
 
     MonsterInit_ReadAttacks(arg0);
@@ -72,7 +75,7 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
     if (Script_GetKeywordValue('L', 0))
         MonsterInit_SetStatusFlags(arg0, 0x8000);
 
-    SceneBody_Init(body, mode, &origin, 0, 4, arg0);
+    SceneBody_Init(body, mode, origin, 0, 4, arg0);
     rt = &group->homeRoute;
     if (MonsterInit_ReadRoute(arg0, group, rt)) {
         MonsterInit_SnapToRoute(&arg0->base.body.position, rt);
@@ -91,6 +94,28 @@ static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
 
     group->common.bodyId = arg0->base.body.id;
     group->common.bodyPosition = &arg0->base.body.position;
+}
+
+static inline void MonsterInit_InitializePursuitBody(void *object, u32 *fill)
+{
+    struct ChaseActor *actor = object;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorBody *body = &actor->base.body;
+    struct ContactPosition origin;
+    MonsterInit_InitializePursuitFields(actor);
+    MonsterInit_ClearPosition(fill, &origin);
+    MonsterInit_ReadPursuitBody(actor, group, body, &origin);
+}
+
+static inline void MonsterInit_LoadPursuitBody(void *object)
+{
+    struct ChaseActor *actor = object;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorBody *body = &actor->base.body;
+    struct ContactPosition origin;
+    MonsterInit_InitializePursuitFields(actor);
+    ZeroFill8(&origin);
+    MonsterInit_ReadPursuitBody(actor, group, body, &origin);
 }
 
 #endif
