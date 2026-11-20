@@ -2083,13 +2083,17 @@ def moved_rows(rows, window=8):
 
 
 def moved_rows_note(rows):
+    """One line for report() about the moved_rows pairs, or "". It suggests `why UID` only for a
+    moved draft row that has an RTL uid (pool data and other unattributed rows have none)."""
     moved = moved_rows(rows)
     if not moved:
         return ""
     uid = next((rows[i]["uid"] for i in sorted(moved)
                 if rows[i]["tag"] == "+" and rows[i].get("uid") is not None), None)
-    detail = f"`why {uid}` names what reads each copy" if uid is not None else "see the full listing"
-    return (f"{len(moved) // 2} of the differing insns are the same instruction at another position"
+    detail = (f"`why {uid}` names what reads each copy" if uid is not None else
+              "the moved rows have no RTL UIDs, see the full listing")
+    count = len(moved) // 2
+    return (f"The listings share {count} instruction{'s' if count != 1 else ''} at different positions"
             f" (an order difference, not a missing one): {detail}")
 
 

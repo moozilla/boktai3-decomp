@@ -14,8 +14,9 @@ class MovedRowsNote(unittest.TestCase):
         ]
 
     def test_moved_data_has_no_why_command(self):
-        self.assertEqual(self.scope.moved_rows_note(self.rows),
-                         "Moved instruction pairs (1)")
+        note = self.scope.moved_rows_note(self.rows)
+        self.assertIn("1 instruction at different positions", note)
+        self.assertNotIn("why", note)
 
     def test_uses_the_first_annotated_move(self):
         rows = self.rows + [

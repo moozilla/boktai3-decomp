@@ -15,7 +15,7 @@ class MovedRowsSummary(unittest.TestCase):
             {"tag": "-", "rom": ".word 0x1234"},
             {"tag": "+", "draft": ".word 0x1234", "uid": None},
         ]
-        summary = self.scope.moved_rows_summary(rows)
+        summary = self.scope.moved_rows_note(rows)
         self.assertIn("1 instruction at different positions", summary)
         self.assertIn("no RTL UIDs", summary)
         self.assertNotIn("why None", summary)
@@ -27,12 +27,12 @@ class MovedRowsSummary(unittest.TestCase):
             {"tag": "-", "rom": "movs r0, #3"},
             {"tag": "+", "draft": "movs r0, #3", "uid": 27},
         ]
-        summary = self.scope.moved_rows_summary(rows)
+        summary = self.scope.moved_rows_note(rows)
         self.assertIn("2 instructions at different positions", summary)
         self.assertIn("why 27", summary)
 
     def test_no_move_has_no_hint(self):
-        self.assertEqual(self.scope.moved_rows_summary([]), "")
+        self.assertEqual(self.scope.moved_rows_note([]), "")
 
 
 if __name__ == "__main__":
