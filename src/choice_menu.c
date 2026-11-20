@@ -1,11 +1,7 @@
 #include "choice_menu.h"
 #include "input.h"
-
-struct Args {
-    u32 count : 16;
-    u32 unused : 16;
-    u32 *values;
-};
+#include "scene_input.h"
+#include "script_utility.h"
 
 static inline u32 selectionScript(struct ChoiceMenu *p)
 {
@@ -14,8 +10,8 @@ static inline u32 selectionScript(struct ChoiceMenu *p)
 
 void ChoiceMenu_DispatchSelection(struct ChoiceMenu *p, s32 selection)
 {
-    u32 values[5];
-    struct Args args;
+    s32 values[5];
+    struct ScriptUtilityArguments args;
     if (p->useScript) {
         s32 i;
         u32 script;
@@ -41,18 +37,18 @@ void ChoiceMenu_Select(struct ChoiceMenu *p, s32 selection)
         choice = &p->choices[selection];
         p->leftCursor.flags &= ~512;
         p->rightCursor.flags &= ~512;
-        p->leftCursor.x = choice->x - 7;
-        p->leftCursor.y = choice->y;
-        p->rightCursor.x = choice->x + 1 + (choice->width << 3);
-        p->rightCursor.y = choice->y;
+        p->leftCursor.position.x = choice->x - 7;
+        p->leftCursor.position.y = choice->y;
+        p->rightCursor.position.x = choice->x + 1 + (choice->width << 3);
+        p->rightCursor.position.y = choice->y;
     } else {
         choice = &p->choices[p->initial];
         p->leftCursor.flags |= 512;
         p->rightCursor.flags |= 512;
-        p->leftCursor.x = choice->x - 7;
-        p->leftCursor.y = choice->y;
-        p->rightCursor.x = choice->x + 1 + (choice->width << 3);
-        p->rightCursor.y = choice->y;
+        p->leftCursor.position.x = choice->x - 7;
+        p->leftCursor.position.y = choice->y;
+        p->rightCursor.position.x = choice->x + 1 + (choice->width << 3);
+        p->rightCursor.position.y = choice->y;
     }
     if (selection != p->selected)
         Sound_PlaySong(220);
@@ -357,21 +353,12 @@ void ChoiceMenu_LayoutText(struct ChoiceMenu *p, void *window)
         rowEnd[p->rows] = p->count ? p->count - 1 : 0;
 }
 
-struct Dimensions {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
-
-void Widget_InitLinked(void *, struct ChoiceResource *, s32, s32, s32, s32, s32,
-                       struct Dimensions *);
-
 s32 MessageWindow_GetSoundMode(void);
 
 s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s32 *options)
 {
-    struct ChoiceResource *resource;
-    struct Dimensions dimensions;
+    struct SceneInputResource *resource;
+    struct SceneInputPackedPosition position;
     s32 initial;
     u16 *palette;
     gChoiceMenu = p;
@@ -395,17 +382,17 @@ s32 ChoiceMenu_Initialize(struct ChoiceMenu *p, void *window, s32 stringBase, s3
     p->allowCancel = options[2];
     p->wakeDelay = 10;
     p->repeatDelay = 0;
-    p->held = (*(struct ChoiceKeys *)gPadState).held;
+    p->held = gPadState[0];
     p->left = options[3];
     p->top = options[4];
     p->maxWidth = options[5];
     p->maxRows = options[6];
     p->delay = 2;
-    dimensions.x = 1;
-    dimensions.y = 0;
-    dimensions.z = 0;
-    Widget_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &dimensions);
-    Widget_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &dimensions);
+    position.x = 1;
+    position.y = 0;
+    position.z = 0;
+    Widget_InitLinked(&p->leftCursor, &p->resource, 73, 17, 0, 0, 60, &position);
+    Widget_InitLinked(&p->rightCursor, &p->resource, 74, 17, 0, 0, 60, &position);
     palette = p->palette;
     Memory_Copy(palette, p->leftCursor.palette, 32);
     p->leftCursor.palette = palette;

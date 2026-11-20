@@ -2,21 +2,11 @@
 #define GUARD_CHOICE_MENU_H
 
 #include "engine.h"
+#include "scene_input_widget.h"
 
 /* One selectable entry; x/y are pixel positions, width in characters. */
 struct Choice {
     u8 x, y, width, row;
-};
-
-/* 8-byte-header sprite object used for the left/right cursor arrows (0x60 bytes). */
-struct ChoiceCursor {
-    u8 head[8];
-    u32 flags; // bit 0 hide, bit 9 hidden/idle
-    u8 pad0C[20];
-    s16 x, y;
-    u8 pad24[36];
-    u16 *palette;
-    u8 pad4C[20];
 };
 
 struct ChoiceResource {
@@ -32,21 +22,17 @@ struct ChoiceMenu {
     u8 maxWidth, maxRows;
     u8 width, textX, allowCancel, wakeDelay, repeatDelay, explicitWidth;
     u32 held;
-    u32 arguments[4];
+    s32 arguments[4];
     u32 script;
     void *callback, *window;
     u32 stringBase;
     struct Choice choices[16];
     u8 scratch[64];
-    struct ChoiceResource resource;
-    struct ChoiceCursor leftCursor;
-    struct ChoiceCursor rightCursor;
+    struct SceneInputResource resource;
+    struct SceneInputWidget leftCursor;
+    struct SceneInputWidget rightCursor;
     u32 colorIndex;
     u16 palette[16];
-};
-
-struct ChoiceKeys {
-    u16 held, pressed;
 };
 
 /* 0x0200002C */
