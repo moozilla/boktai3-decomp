@@ -290,6 +290,13 @@ void WirelessPeerMenu_UpdateDismissibleNotice(struct WirelessPeerMenu *menu)
     menu->timer++;
 }
 
+static inline struct SceneInputWidget *WirelessPeerPanel_GetDigit(struct WirelessPeerPanel *panel,
+                                                                  int index)
+{
+    u8 *row = (u8 *)panel + index * sizeof(panel->digits[0]);
+    return (void *)(row + offsetof(struct WirelessPeerPanel, digits));
+}
+
 void WirelessPeerMenu_UpdatePeerConfirmation(struct WirelessPeerMenu *menu)
 {
     u8 alias;
@@ -333,16 +340,8 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct WirelessPeerMenu *menu)
                     int value = packet[11] | (packet[12] << 8);
                     Anim_DrawDecimalDigits(draw, &menu->digitResource, value, 5, 0, 136, 70, 8, 0);
                 }
-                {
-                    u32 mask = ~1;
-                    /* Keep the panel-relative digit field while advancing one widget. */
-                    struct WirelessPeerPanel *row = remote;
-                    i = 0;
-                    do {
-                        row->digits[0].flags &= mask;
-                        row = (struct WirelessPeerPanel *)((u8 *)row +
-                                                           sizeof(struct SceneInputWidget));
-                    } while (++i < 5);
+                for (i = 0; i < 5; i++) {
+                    WirelessPeerPanel_GetDigit(remote, i)->flags &= ~1;
                 }
                 TextWindow_SetString(menu->windows[2], 2, remote->confirmationName);
                 Sound_PlaySong(495);
@@ -350,15 +349,8 @@ void WirelessPeerMenu_UpdatePeerConfirmation(struct WirelessPeerMenu *menu)
             TextWindow_Refresh(menu->windows[2], 8);
         } else {
             TextWindow_Refresh(menu->windows[2], 7);
-            {
-                u32 mask = 1;
-                /* Keep the panel-relative digit field while advancing one widget. */
-                struct WirelessPeerPanel *row = remote;
-                i = 0;
-                do {
-                    row->digits[0].flags |= mask;
-                    row = (struct WirelessPeerPanel *)((u8 *)row + sizeof(struct SceneInputWidget));
-                } while (++i < 5);
+            for (i = 0; i < 5; i++) {
+                WirelessPeerPanel_GetDigit(remote, i)->flags |= 1;
             }
         }
         menu->previousSlots = connected;
@@ -393,18 +385,12 @@ void WirelessPeerMenu_UpdatePeerUnavailable(struct WirelessPeerMenu *menu)
     if (menu->entered) {
         struct WirelessPeerPanel *remote;
         int i;
-        u32 mask;
-        struct WirelessPeerPanel *row;
         menu->entered = 0;
         remote = &menu->panels[1];
         TextWindow_Refresh(menu->windows[2], 6);
-        mask = 1;
-        row = remote;
-        i = 0;
-        do {
-            row->digits[0].flags |= mask;
-            row = (struct WirelessPeerPanel *)((u8 *)row + sizeof(struct SceneInputWidget));
-        } while (++i < 5);
+        for (i = 0; i < 5; i++) {
+            WirelessPeerPanel_GetDigit(remote, i)->flags |= 1;
+        }
     }
     menu->timer++;
 }
@@ -446,6 +432,13 @@ void WirelessPeerMenu_UpdateExit(struct WirelessPeerMenu *menu)
     menu->timer++;
 }
 
+static inline void WirelessPeerMenu_SetState(struct WirelessPeerMenu *menu, u8 state)
+{
+    menu->state = state;
+    menu->entered = 1;
+    menu->timer = 0;
+}
+
 void WirelessPeerMenu_UpdateConnectionState(struct WirelessPeerMenu *menu)
 {
     s32 r = Wireless_GetOperation();
@@ -453,14 +446,9 @@ void WirelessPeerMenu_UpdateConnectionState(struct WirelessPeerMenu *menu)
     if (menu->state != 7) {
         if (r != menu->operation) {
             switch (r) {
-                case 27: {
-                    u32 one = 1;
-                    u32 z = 0;
-                    menu->state = one;
-                    menu->entered = one;
-                    menu->timer = z;
+                case 27:
+                    WirelessPeerMenu_SetState(menu, 1);
                     break;
-                }
                 case 7:
                     v = 2;
                     goto s1;
@@ -476,9 +464,7 @@ void WirelessPeerMenu_UpdateConnectionState(struct WirelessPeerMenu *menu)
                 case 29:
                     v = 6;
                 s1:
-                    menu->state = v;
-                    menu->entered = 1;
-                    menu->timer = 0;
+                    WirelessPeerMenu_SetState(menu, v);
                     break;
                 default:
                     break;
