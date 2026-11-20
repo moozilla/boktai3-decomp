@@ -125,12 +125,6 @@ static inline void Death_SetState(struct DeathState *out, struct DeathState stat
     *out = state;
 }
 
-static inline void SceneActorState_EnterDeathPhase(struct StateActor *actor, u32 phase)
-{
-    actor->reactionPhase = phase;
-    actor->reactionTimer = 0;
-}
-
 void sub_08027214(struct DeathActor *base, s32 tick)
 {
     struct DeathActor *p = base;
@@ -171,10 +165,10 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             base->maximumScale = 0;
             base->variant = 0;
             if (base->mode & 1) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 1);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 1);
                 Sound_PlaySongChecked(0x1C5);
             } else {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 0);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 0);
                 Sound_PlaySongChecked(0x359);
             }
         }
@@ -220,7 +214,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
         case 0:
             p->delay = 8;
             if (base->frame > 4) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 2);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 2);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
                                                      2, 0);
                 Sound_PlaySongChecked(0x350);
@@ -232,7 +226,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             }
             p->delay = 8;
             if (base->frame > 4) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 2);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 2);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
                                                      2, 0);
                 p->mode &= ~1;
@@ -244,7 +238,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                 Sound_PlaySongChecked(0x350);
             }
             if (p->animationFlags & 2) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 3);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 3);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x22,
                                                      2, 0);
                 sub_08022878((u8 *)p + 0x260);
@@ -252,7 +246,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             break;
         case 3:
             if (p->animationFlags & 2) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 4);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 4);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x23,
                                                      2, 0);
             }
@@ -262,14 +256,14 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                 Sound_PlaySongChecked(0x354);
             }
             if (p->animationFlags & 2) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 5);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 5);
                 SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x24,
                                                      2, 0);
             }
             break;
         case 5:
             if (p->animationFlags & 2) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 6);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 6);
                 Bestiary_UnlockEntry(0x4D);
                 SceneActors_RunSecondEventScript(base, (u8 *)p + 0x260);
             }
@@ -279,7 +273,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
         case 7:
             p->delay = 8;
             if (base->elapsed > 0xEF) {
-                SceneActorState_EnterDeathPhase((struct StateActor *)base, 5);
+                SceneActorState_EnterReactionPhase((struct StateActor *)base, 5);
             }
             break;
         default:

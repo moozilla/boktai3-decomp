@@ -185,6 +185,12 @@ static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
     actor->actionFlags |= flags;
 }
 
+static inline void SceneActorState_EnterReactionPhase(struct StateActor *actor, u32 phase)
+{
+    actor->reactionPhase = phase;
+    actor->reactionTimer = 0;
+}
+
 u32 Trigger_ConsumePending(void *receiver, u32 count);
 
 /* On entry select the next state, then consume a message once done. */

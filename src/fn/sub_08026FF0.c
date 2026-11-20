@@ -85,8 +85,7 @@ void sub_08026FF0(struct StateActor *base, int time)
         base->actionCallback = (void (*)(void *, int))callback;
         base->callbackFrame = stateZero;
         base->actionChanged = one;
-        base->reactionPhase = stateZero;
-        base->reactionTimer = stateZero;
+        SceneActorState_EnterReactionPhase(base, 0);
         if (((struct SceneGraphicsActor *)p)->specialReaction) {
             ((struct SceneGraphicsActor *)p)->graphics.animationFlags &= ~1;
             ((struct SceneGraphicsActor *)p)->specialReaction = 0;

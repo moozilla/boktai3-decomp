@@ -666,8 +666,7 @@ static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), in
     p->callback = fn;
     p->timer = 0;
     p->changed = 1;
-    p->reset = 0;
-    p->pending = 0;
+    SceneActorState_EnterReactionPhase((struct StateActor *)p, 0);
 }
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
