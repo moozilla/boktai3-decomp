@@ -1,6 +1,13 @@
 #include "directional_force.h"
 #include "monster_particle_random.h"
 
+/* Smoothed angles use four fractional bits over an eight-bit turn. */
+enum {
+    DIRECTIONAL_FORCE_FULL_TURN = 4096,
+    DIRECTIONAL_FORCE_HALF_TURN = DIRECTIONAL_FORCE_FULL_TURN / 2,
+    DIRECTIONAL_FORCE_ANGLE_MASK = DIRECTIONAL_FORCE_FULL_TURN - 1,
+};
+
 static inline u32 Random_Next(void)
 {
     u32 offset;
@@ -35,22 +42,19 @@ s32 DirectionalForce_Tick(struct DirectionalForce *force)
     {
         s32 target = force->targetAngle << 4;
         s32 current = force->angle;
-        s32 difference = current - 4096;
-        u32 mask;
+        s32 difference = current - DIRECTIONAL_FORCE_FULL_TURN;
         s32 next;
         difference = target - difference;
-        mask = 4095;
-        difference &= mask;
-        if (difference > 2048) {
-            s32 full = 4096;
-            difference = full - difference;
-            next = current + full;
+        difference &= DIRECTIONAL_FORCE_ANGLE_MASK;
+        if (difference > DIRECTIONAL_FORCE_HALF_TURN) {
+            difference = DIRECTIONAL_FORCE_FULL_TURN - difference;
+            next = current + DIRECTIONAL_FORCE_FULL_TURN;
             difference >>= 4;
             next -= difference;
-            force->angle = next & mask;
+            force->angle = next & DIRECTIONAL_FORCE_ANGLE_MASK;
         } else {
             next = current + (difference >> 4);
-            force->angle = next & mask;
+            force->angle = next & DIRECTIONAL_FORCE_ANGLE_MASK;
         }
     }
     gPlayerBackgroundState = force->magnitude >> 4;
