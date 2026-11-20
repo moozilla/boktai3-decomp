@@ -110,7 +110,7 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
 # Commas in calls, array subscripts, and quoted literals do not start new declarators.
-_DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,\[])")
+_DECL_START = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<first>[A-Za-z_]\w*)(?=\s*[=,;\[])")
 _DECL_PUNCT = re.compile(r""""(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[][(){},;]""")
 _LITERAL_INIT = re.compile(r"\s*\*?\s*([A-Za-z_]\w*)\s*=\s*" + _LITERAL + r"\s*")
 _WARN_REGEX = {
@@ -208,8 +208,8 @@ def _volatile_typedef_locals(code: str):
             yield start + match.start()
 
 
-def _literal_initializers(code: str):
-    """Yield (name, source position, end of initializer) for integer-literal locals."""
+def _local_declarators(code: str):
+    """Yield each simple declarator, including nonliteral bindings that shadow outer locals."""
     for declaration in _DECL_START.finditer(code):
         start = declaration.start("first")
         depth = 0
@@ -222,12 +222,26 @@ def _literal_initializers(code: str):
                     break
                 depth -= 1
             elif not depth and char in (",", ";"):
-                item = _LITERAL_INIT.fullmatch(code, start, token.start())
+                item = re.match(r"\s*\*?\s*([A-Za-z_]\w*)", code[start:token.start()])
                 if item:
-                    yield item[1], item.start(1), token.end()
+                    yield (item[1], start + item.start(1), token.end(),
+                           bool(_LITERAL_INIT.fullmatch(code, start, token.start())))
                 if char == ";":
                     break
                 start = token.end()
+
+
+def _scope_end(code: str, start: int) -> int:
+    """End of the current block, ignoring braces in character and string literals."""
+    depth = 0
+    for token in _DECL_PUNCT.finditer(code, start):
+        if token[0] == "{":
+            depth += 1
+        elif token[0] == "}":
+            if not depth:
+                return token.start()
+            depth -= 1
+    return len(code)
 
 
 def _record_bodies(code: str):
@@ -258,23 +272,28 @@ def _warn_sites(code: str):
             yield m.start(), kind
     # A write to actor->state or sprite.state cannot modify a local named state.
     locals_only = re.sub(r"(?:->|\.)\s*[A-Za-z_]\w*", lambda m: "@" * len(m[0]), code)
-    for name, pos, end in _literal_initializers(code):
+    declarators = list(_local_declarators(code))
+    bindings = {}
+    for name, pos, _, _ in declarators:
+        bindings.setdefault(name, []).append(pos)
+    for name, pos, end, literal in declarators:
+        if not literal:
+            continue
         if re.fullmatch(_NUMBER_NAME, name):
             yield pos, "const-local"
             continue
-        # the rest of the block the declaration is in
-        depth, i = 0, end
-        while i < len(code):
-            if code[i] == "{":
-                depth += 1
-            elif code[i] == "}":
-                if depth == 0:
-                    break
-                depth -= 1
-            i += 1
+        limit = _scope_end(code, end)
+        # Writes before an inner binding and after its block still affect the outer local.
+        spans = []
+        start = end
+        for shadow in bindings[name]:
+            if start <= shadow < limit:
+                spans.append(locals_only[start:shadow])
+                start = _scope_end(code, shadow)
+        spans.append(locals_only[start:limit])
         n = re.escape(name)
         changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), locals_only[end:i])
+                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), "\n".join(spans))
         if not changed:
             yield pos, "literal-local"
     for m in _ONCE_END.finditer(code):

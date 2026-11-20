@@ -211,6 +211,22 @@ class Warnings(unittest.TestCase):
                          [(2, "literal-local"), (3, "literal-local"), (5, "const-local"),
                           (6, "literal-local")])
 
+    def test_shadowed_flag_writes_do_not_change_the_outer_local(self):
+        body = """void tick(void) {
+    u32 mask = 0x400;
+    if (enabled) {
+        use(mask);
+        u32 index, mask;
+        mask = 4;
+        change(&mask);
+    }
+    use(mask);
+}
+"""
+        self.assertEqual(warns(body), ["literal-local"])
+        self.assertEqual(warns(body.replace("    use(mask);\n}", "    mask++;\n}")), [])
+        self.assertEqual(warns(body.replace("        use(mask);", "        mask++;")), [])
+
     def test_member_write_does_not_modify_a_same_named_local(self):
         body = """void update(struct Actor *actor, struct Sprite sprite) {
     int state = 4;
