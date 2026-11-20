@@ -47,7 +47,8 @@ its spelling, so each one is a question, not a verdict:
 * `stmt-expr`: a `({ ... })` outside a macro. As above: usually a macro or inline to name.
 * `const-local`: a local named for a number (`zero`, `one`, `two`, `zeroX`, `four`, ...), which
   only holds that constant. A `goto` label or `return` operand is not a declaration.
-* `literal-local`: any other local that is initialized to a literal and never changed
+* `literal-local`: any other local that is initialized to a literal and never changed,
+  including a separate first assignment in the declaration's block
   (`u32 mask = 0x17;` then `if (mask & flags)`). A person does name a constant now and then, so
   this is the weakest kind: write the literal where it is used when that matches, and leave
   the rest for the owner to rule on. A loop counter or anything reassigned is not one.
@@ -109,7 +110,12 @@ _NUMBER_NAME = (r"(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|sixte
                 r"(?:[A-Z_0-9]\w*)?")
 _LITERAL = r"-?(?:0[xX][0-9A-Fa-f]+|\d+)[uUlL]*"
 _DECL_TYPE = r"(?:const\s+)?(?:unsigned\s+|signed\s+)?(?!v[us]\d|volatile\b|goto\b|return\b|static\b|else\b|case\b)\w+\s+\*?"
-_LITERAL_LOCAL = re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + r"(\w+)\s*=\s*" + _LITERAL + r"\s*;")
+_LITERAL_LOCAL = re.compile(
+    r"(?m)^[ \t]+" + _DECL_TYPE + r"(?P<name>\w+)(?:\s*=\s*(?P<literal>" + _LITERAL + r"))?\s*;"
+)
+_LITERAL_ASSIGNMENT = re.compile(r"(?m)^[ \t]+(\w+)[ \t]*=[ \t]*" + _LITERAL + r"[ \t]*;")
+_LOCAL_CHANGE = r"\b{0}\s*(?:[-+*/|&^%]|<<|>>)?=(?!=)|\b{0}\s*(?:\+\+|--)|(?:\+\+|--)\s*{0}\b"
+_LOCAL_ESCAPE = r"(?:[(,=?:]|\breturn)\s*&\s*{0}\b"
 _WARN_REGEX = {
     "stmt-expr": re.compile(r"\(\s*\{"),
     "const-local": re.compile(r"(?m)^[ \t]+" + _DECL_TYPE + _NUMBER_NAME + r"\s*(?:=\s*" + _LITERAL + r"\s*)?;"),
@@ -211,10 +217,14 @@ def _warn_sites(code: str):
     for kind, rx in _WARN_REGEX.items():
         for m in rx.finditer(code):
             yield m.start(), kind
+    assigned_literals = {m.group(1) for m in _LITERAL_ASSIGNMENT.finditer(code)}
     for m in _LITERAL_LOCAL.finditer(code):
-        name = m.group(1)
+        name = m["name"]
         if re.fullmatch(_NUMBER_NAME, name):
             continue  # const-local has it
+        late = m["literal"] is None
+        if late and name not in assigned_literals:
+            continue
         # the rest of the block the declaration is in
         depth, i = 0, m.end()
         while i < len(code):
@@ -225,9 +235,21 @@ def _warn_sites(code: str):
                     break
                 depth -= 1
             i += 1
+        body = code[m.end():i]
         n = re.escape(name)
-        changed = re.search(r"\b%s\s*(?:[-+*/|&^%%]|<<|>>)?=(?!=)|\b%s\s*(?:\+\+|--)|(?:\+\+|--)\s*%s\b"
-                            r"|(?:[(,=?:]|\breturn)\s*&\s*%s\b" % (n, n, n, n), code[m.end():i])
+        if late:
+            assignment = next((site for site in _LITERAL_ASSIGNMENT.finditer(body) if site[1] == name), None)
+            if assignment is None:
+                continue
+            before = body[:assignment.start()].rstrip()
+            # Only a standalone assignment in the declaration's block. A
+            # conditional, nested or labeled write may depend on control flow.
+            if (before and not before.endswith((";", "}"))) or before.count("{") != before.count("}"):
+                continue
+            if re.search(r"\b(?:goto|" + n + r")\b", before):
+                continue
+            body = body[assignment.end():]
+        changed = re.search(_LOCAL_CHANGE.format(n) + "|" + _LOCAL_ESCAPE.format(n), body)
         if not changed:
             yield m.start(), "literal-local"
     for m in _ONCE_END.finditer(code):

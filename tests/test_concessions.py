@@ -210,6 +210,31 @@ class Warnings(unittest.TestCase):
         self.assertEqual(warns("void f(u32 a) {\n    {\n        u32 bit = 8;\n        g(bit);\n    }\n    {\n        u32 bit;\n        bit = a;\n        g(bit);\n    }\n}\n"),
                          ["literal-local"])
 
+    def test_literal_local_with_separate_assignment(self):
+        source = """void f(void)
+{
+    int layer;
+    Prepare();
+    layer = 0;
+    Draw(layer, layer);
+}
+"""
+        self.assertEqual(c.sites(source, kinds=("literal-local",)), [c.Site(3, "literal-local")])
+
+    def test_separate_literal_assignment_can_change_or_be_conditional(self):
+        for body in (
+            "    layer = 0;\n    layer++;\n    Draw(layer);\n",
+            "    layer = 0;\n    Read(&layer);\n    Draw(layer);\n",
+            "    if (visible)\n        layer = 0;\n",
+            "    if (visible) {\n        layer = 0;\n        Draw(layer);\n    }\n",
+            "    if (visible)\n        layer = 1;\n    else\n        layer = 0;\n    Draw(layer);\n",
+            "    {\n        int layer;\n        layer = 0;\n        Draw(layer);\n    }\n    Draw(layer);\n",
+        ):
+            with self.subTest(body=body):
+                source = "void f(int visible) {\n    int layer;\n" + body + "}\n"
+                sites = c.sites(source, kinds=("literal-local",))
+                self.assertNotIn(c.Site(2, "literal-local"), sites)
+
     def test_volatile_view_not_hardware(self):
         self.assertEqual(warns("void f(u16 *p) {\n    u32 a = *(volatile u16 *)p;\n}\n"), ["volatile-view"])
         self.assertEqual(warns("void f(void) {\n    u32 a = *(volatile u16 *)REG_ADDR_IE;\n    u32 b = *(volatile u16 *)0x04000200;\n}\n"), [])
