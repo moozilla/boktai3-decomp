@@ -260,6 +260,10 @@ class DMG:
             value = self.reg(i)
             if 0x40 <= op < 0x80:
                 self.f = self.H | (self.f & self.C) | (0 if value & (1 << bit) else self.Z)
+            elif op >> 3 == 6:
+                v = (value << 4) | (value >> 4)
+                self.set_reg(i, v)
+                self.flags(v)
             elif op >> 3 in (4, 7):
                 v = value << 1 if bit == 4 else value >> 1
                 self.set_reg(i, v)

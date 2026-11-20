@@ -139,7 +139,11 @@ def pack_room(source, room, rooms):
 
 def objects(source):
     _, django = source.actor(0xDE23)
-    _, ghoul = source.actor(0x9247)
+    ghoul_code = (ROOT / "src/ghoul.c").read_text()
+    base = int(re.search(r"MonsterInit_ReadPalette\(actor, (0x[0-9A-Fa-f]+)", ghoul_code)[1], 16)
+    spawn = next(t for _, t in source.walker.text(1496) if t.startswith("command 0x5a5 "))
+    variant = int(re.search(r" C: (\d+)", spawn)[1])
+    _, ghoul = source.actor(0x9247, base + variant)
     # Five direction families. The mirror bit provides the other three.
     # Take a key from each of the first five walking sequences in DE23.
     import sprites
@@ -149,23 +153,21 @@ def objects(source):
     for i in range(5):
         for seq, key in ((i, 0), (5 + i, 2)):
             frame, _ = anim[seq]["keys"][key]
-            poses.append(pose_tiles(actor_pose(django(frame))))
+            poses.append(pose_tiles(actor_pose(django(frame), size=(24, 32), scale=.85)))
     for frame in (0, 2, 5, 7):
-        poses.append(pose_tiles(actor_pose(ghoul(frame), True)))
+        poses.append(pose_tiles(actor_pose(ghoul(frame), True, size=(24, 32), scale=.85)))
     # Custom interface sprites for dropped fruit, skylight and solar shot.
     markers = [
         "00000000 00011000 00013000 00333300 03111130 03112130 00333300 00000000",
         "00010000 01010100 00333000 01111100 03111310 00333000 01010100 00010000",
         "00000000 00001000 00013100 00111110 00013100 00001000 00000000 00000000",
     ]
+    marker_tiles = bytearray()
     for rows in markers:
         tile = np.zeros((16, 8), np.uint8)
         tile[-8:] = icon(rows)
-        poses.append(pose_tiles(tile))
-    data = b"".join(poses)
-    if len(data) > 0x800:
-        raise ValueError("OBJ tiles overlap the signed BG bank")
-    return data
+        marker_tiles.extend(pose_tiles(tile))
+    return poses, bytes(marker_tiles)
 
 
 def enemy_constants():

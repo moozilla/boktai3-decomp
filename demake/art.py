@@ -154,6 +154,17 @@ def room_ramp(indices, palette):
             local = np.clip((light[bank] - levels.min()) / max(.25, np.ptp(levels)), 0, 1)
             ramp[bank] = .76 * overall[bank] + .24 * local
     ramp[0] = overall[0]
+    border = np.concatenate((indices[0], indices[-1], indices[:, 0], indices[:, -1]))
+    backdrop = np.bincount(border, minlength=256).argmax()
+    # Reserve the dark surround. Lift shadow detail only in low-key rooms.
+    same_color = np.all(palette == palette[backdrop], axis=1)
+    active = (counts > 0) & ~same_color
+    if np.any(active):
+        scene_mean = np.average(ramp[active], weights=counts[active])
+        gamma = np.clip(.73 + 2.8 * (scene_mean - .415), .73, 1.0)
+        ramp = ramp ** gamma
+    if np.count_nonzero(border == backdrop) > border.size * .60:
+        ramp[same_color] = 0
     return ramp
 
 
@@ -164,7 +175,7 @@ def quantize_bg(values):
     padded = np.pad(v, 1, mode="edge")
     neighbors = [padded[1:-1, :-2], padded[1:-1, 2:], padded[:-2, 1:-1], padded[2:, 1:-1]]
     edge = np.maximum.reduce([np.abs(v - other) for other in neighbors])
-    strength = np.clip(1 - 3 * edge, 0, 1) * .72
+    strength = np.clip(1 - 3 * edge, 0, 1) * .42
     return np.clip(np.floor((1 - v) * 3 + .5 + strength * BAYER[y % 4, x % 4]), 0, 3).astype(np.uint8)
 
 

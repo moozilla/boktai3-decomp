@@ -39,29 +39,38 @@ def build(source, out):
     rooms = {n: (convert(source, n), i) for i, n in enumerate(SCENES, 1)}
     for room, _ in rooms.values():
         place_skylight(source, room)
-    obj = objects(source)
+    poses, markers = objects(source)
+    obj = b"".join(poses)
     directions = direction_table()
     symbols = {name: 0xC100 + i for i, name in enumerate(STATE)}
-    symbols.update(LAYOUT, **enemy_constants(), obj_bytes=len(obj))
-    symbols["pickups"] = 0xC200
+    symbols.update(LAYOUT, **enemy_constants(), marker_bytes=len(markers))
+    symbols.update(pickups=0xC200, want_pose=0xC2A0, live_pose=0xC2A4, live_tile=0xC2A8, spare_tile=0xC2AC)
+    symbols.update({name: 0xC2B0 + i for i, name in enumerate(
+        "upload_left upload_slot upload_pose upload_src_lo upload_src_hi upload_dest_lo upload_dest_hi".split())})
     bgm = next(int(t.split()[1], 0) for _, t in source.walker.text(2712) if t.startswith("proc_1048 "))
     score, wave, music_info = compile_song(bgm)
     symbols.update(music_bank=len(rooms) + 1, music_loop=0x4000 + music_info["loop_offset"])
-    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text()
-    code, _ = assemble(asm, {**symbols, "obj_patterns": 0, "directions": 0, "wave_pattern": 0})
+    asm = (HERE / "engine.asm").read_text() + (HERE / "audio.asm").read_text() + (HERE / "scroll.asm").read_text() + (HERE / "poses.asm").read_text()
+    reloc = {"pose_ptrs": 0, "directions": 0, "wave_pattern": 0, "obj_markers": 0}
+    code, _ = assemble(asm, {**symbols, **reloc})
     fixed_end = 0x150 + len(code)
-    code, symbols = assemble(asm, {**symbols, "directions": fixed_end, "obj_patterns": fixed_end + len(directions),
-                                   "wave_pattern": fixed_end + len(directions) + len(obj)})
+    table_addr = fixed_end + len(directions)
+    first_pose = table_addr + 2 * len(poses)
+    import struct
+    ptrs = b"".join(struct.pack("<H", first_pose + 192 * i) for i in range(len(poses)))
+    reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=first_pose + len(obj),
+                 wave_pattern=first_pose + len(obj) + len(markers))
+    code, symbols = assemble(asm, {**symbols, **reloc})
     info, banks = [], []
     for room, _ in rooms.values():
         data, meta, display = pack_room(source, room, rooms)
         info.append(meta)
         banks.append(data)
         screen_image(display).save(out / f"room-{meta['scene']}.png")
-    rom = cartridge(code + directions + obj + wave, [*banks, score])
+    rom = cartridge(code + directions + ptrs + obj + markers + wave, [*banks, score])
     path = out / "boktai.gb"
     path.write_bytes(rom)
-    manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_tiles=len(obj) // 16,
+    manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_pose_count=len(poses), obj_tiles_per_pose=12, obj_marker_tiles=len(markers) // 16,
                     music=music_info, state={name: symbols[name] for name in [*STATE, "pickups"]}, engine=symbols)
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"{path.relative_to(ROOT)}  {len(rom)//1024} KiB MBC5  {len(banks)} rooms  {len(code)} bytes SM83")

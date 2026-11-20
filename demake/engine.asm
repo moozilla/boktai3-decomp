@@ -13,9 +13,9 @@ boot:
     ld de,0xff80
     ld bc,10
     call copy
-    ld hl,obj_patterns
-    ld de,0x8000
-    ld bc,obj_bytes
+    ld hl,obj_markers
+    ld de,0x8700
+    ld bc,marker_bytes
     call copy
     ld a,0xe4
     ldh [0x47],a
@@ -75,6 +75,7 @@ loop:
     call draw
     call sort_oam
     call prepare_map
+    call prepare_pose
     call vblank
     ld a,[camera_x]
     ldh [0x43],a
@@ -88,6 +89,7 @@ loop:
 .window:
     ldh [0x4a],a
     call 0xff80
+    call flush_pose
     call flush_map
     call hud
     jp loop
@@ -178,6 +180,7 @@ load_room:
     ld c,a
     call surface
     ld [player_h],a
+    call reset_poses
     call draw
     call sort_oam
     call initial_map
@@ -766,9 +769,8 @@ draw:
     inc b
 .player_pose:
     ld a,b
-    add a
-    add a
-    add a
+    ld [want_pose],a
+    ld a,[live_tile]
     ld [pose],a
     ld a,[mirror]
     ld [attr],a
@@ -786,15 +788,17 @@ draw:
     and 4
     jr nz,.markers
 .fallen:
-    ld a,104
+    ld a,13
     jr .ghoul
 .normal:
     ld a,[tick]
     and 16
-    ld a,80
+    ld a,10
     jr z,.ghoul
-    ld a,88
+    ld a,11
 .ghoul:
+    ld [want_pose+1],a
+    ld a,[live_tile+1]
     ld [pose],a
     ld a,0x10
     ld [attr],a
@@ -878,43 +882,47 @@ actor_oam:
     ld b,a
     ld a,[attr]
     ld c,a
-    call pair_oam
+    call row_oam
     ld a,e
     add 16
     ld e,a
-    call pair_oam
+    call row_oam
     ld a,l
     ld [oam_count],a
     ret
-pair_oam:
+row_oam:
+    push de
+    ld a,d
+    sub 4
+    bit 5,c
+    jr z,.start
+    add 16
+.start:
+    ld d,a
+    ld a,3
+.loop:
+    push af
     ld a,e
     ld [hl+],a
     ld a,d
-    bit 5,c
-    jr z,.left
-    add 8
-.left:
     ld [hl+],a
-    ld a,b
-    ld [hl+],a
-    ld a,c
-    ld [hl+],a
-    ld a,e
-    ld [hl+],a
-    ld a,d
-    bit 5,c
-    jr nz,.right
-    add 8
-.right:
-    ld [hl+],a
-    inc b
-    inc b
     ld a,b
     ld [hl+],a
     inc b
     inc b
     ld a,c
     ld [hl+],a
+    ld a,d
+    add 8
+    bit 5,c
+    jr z,.advance
+    sub 16
+.advance:
+    ld d,a
+    pop af
+    dec a
+    jr nz,.loop
+    pop de
     ret
 marker_oam:
     ld [pose],a
