@@ -20,6 +20,14 @@ struct WirelessChildInputPacket {
     u16 input;
 };
 
+enum WirelessOperation {
+    WIRELESS_OP_PEER_HANDSHAKE = 7,
+    WIRELESS_OP_WAIT_PARENT_TRANSFER = 9,
+    WIRELESS_OP_RESET_AFTER_ERROR = 28,
+    WIRELESS_OP_HANDLE_SEND_ERROR = 29,
+    WIRELESS_OP_REQUEST_ADAPTER_STOP = 30,
+};
+
 /* The RFU controller task. Field names inferred from the session handlers
  * are tentative. The Engine tag is also used by the singleton declaration. */
 typedef struct Engine {
@@ -63,5 +71,13 @@ typedef struct Engine {
     void *onSend, *onReceive, *onSendFailure, *onReceiveFailure;
     void *gameNameScript;
 } WirelessController;
+
+static inline void WirelessController_SetOperation(WirelessController *controller, u16 operation)
+{
+    controller->operationStage = 0;
+    controller->operation = operation;
+    controller->operationFrame = 0;
+    controller->operationEntered = 1;
+}
 
 #endif
