@@ -146,10 +146,14 @@ struct GolemChargeBounds {
     struct ContactPosition home;
 };
 
+static inline u8 Golem_HasRouteFlag(const struct Golem *body, u32 flag)
+{
+    return SceneActorChase_Test(body->flags628, flag);
+}
+
 static inline u32 IsDazzled(struct Player *player)
 {
-    u32 mask = 0x20000;
-    return player->statusFlags & mask;
+    return SceneActorChase_Bits32(&player->statusFlags, 0x20000);
 }
 
 static inline s32 Wrap(s32 d)
@@ -265,16 +269,14 @@ void Golem_UpdateChargePursuit(struct ChaseActor *actor)
         if (index < 0)
             goto route;
         if (IsDazzled(gPlayers[index])) {
-            u32 mask = 0x80000;
-            u8 held = SceneActorChase_Test(body->flags628, mask);
+            u8 held = Golem_HasRouteFlag(body, 0x80000);
             if (!held) {
                 Golem_Recover(body);
                 return;
             }
         }
     } else if (IsDazzled(gPlayers[0])) {
-        u32 mask = 0x80000;
-        u8 held = SceneActorChase_Test(body->flags628, mask);
+        u8 held = Golem_HasRouteFlag(body, 0x80000);
         if (!held) {
             Golem_Recover(body);
             return;
@@ -383,10 +385,7 @@ route:
         actor->base.field2C2 = 0x20;
         goto advance;
     } else {
-        {
-            u32 mask = 0x10;
-            actor->base.behaviorFlags |= mask;
-        }
+        SceneActorChase_SetActorFlags(actor, 0x10);
         actor->base.field2C2 = 0x40;
         SetCommand((void *)&group->saved, actor->base.onAlternateEntry, 7, 60);
         SceneActorChase_SnapToRoute(group->destination, &group->homeRoute);
