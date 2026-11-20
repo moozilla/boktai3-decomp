@@ -72,22 +72,22 @@ int Password_ValidateNameGlyphs(struct PasswordEntry *e)
 {
     int i;
     for (i = 0; i < 5; i++) {
-        if (e->name[i] != 0) {
+        if (e->decoded.name[i] != 0) {
             int found = 0;
             int t;
             for (t = 0; t < 2; t++) {
                 u8 *glyphs = Text_LookupString(Script_ParseStringRef((void *)e->script) + t);
                 for (; *glyphs; glyphs += 2) {
-                    if (glyphs[1] == e->name[i]) {
+                    if (glyphs[1] == e->decoded.name[i]) {
                         found = 1;
                         break;
                     }
                 }
             }
             if (found == 0) {
-                if (e->name[i] != 0xFF)
+                if (e->decoded.name[i] != 0xFF)
                     return 1;
-                e->name[i] = 0xF0;
+                e->decoded.name[i] = 0xF0;
             }
         }
     }
@@ -96,26 +96,26 @@ int Password_ValidateNameGlyphs(struct PasswordEntry *e)
 
 int NameEntry_DecodeAndValidate(struct PasswordEntry *m)
 {
-    u8 *decoded = m->decoded;
-    int pos = 0;
-    m->checksum = EncodedRecord_ReadBits(m, &pos, 16, 6);
-    EncodedRecord_ReadBits(m, &pos, 2, 6);
-    m->version = EncodedRecord_ReadBits(m, &pos, 3, 6);
-    m->key = EncodedRecord_ReadBits(m, &pos, 3, 6);
+    struct EncodedAlternateRecordFields *decoded = &m->decoded;
+    u32 pos = 0;
+    m->checksum = EncodedRecord_ReadBits(m->codes, &pos, 16, 6);
+    EncodedRecord_ReadBits(m->codes, &pos, 2, 6);
+    m->version = EncodedRecord_ReadBits(m->codes, &pos, 3, 6);
+    m->key = EncodedRecord_ReadBits(m->codes, &pos, 3, 6);
     if ((Crc_ComputeCcitt16(m, 3, 24) & 65535) != m->checksum)
         return -1;
-    EncodedRecord_DecodeAlternateFields(decoded, m, m->key);
+    EncodedRecord_DecodeAlternateFields(decoded, m->codes, m->key);
     if (m->version != 1)
         return -2;
-    if (!m->name[0] || Password_ValidateNameGlyphs(m))
+    if (!m->decoded.name[0] || Password_ValidateNameGlyphs(m))
         return -3;
     return 0;
 }
 
 void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
 {
-    u32 *decoded = (u32 *)m->decoded;
-    u8 *name = m->name;
+    struct EncodedAlternateRecordFields *decoded = &m->decoded;
+    u8 *name = m->decoded.name;
     u8 *out = output;
     int i = 0;
     while (i < 5 && *name) {
@@ -137,11 +137,11 @@ void Password_ApplyDecoded(struct PasswordEntry *m, u8 *output)
         field = &gGameState->values08[0];
         *field = 1;
         field = &gGameState->values08[1];
-        *field = decoded[0];
+        *field = decoded->sessionValue;
         field = &gGameState->values08[2];
-        *field = decoded[1];
+        *field = decoded->value660;
         field = &gGameState->values08[3];
-        *field = decoded[10];
+        *field = decoded->value536;
     }
 }
 
