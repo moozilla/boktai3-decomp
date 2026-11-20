@@ -1,5 +1,8 @@
 #include "modifier_list.h"
 #include "ram.h"
+#include "background_controller.h"
+#include "gba/macro.h"
+#include "gba/syscall.h"
 
 s32 Modifier_CollectSources(struct ModifierSelection *, struct ModifierSelection *,
                             struct ModifierRecord *, u32);
@@ -335,8 +338,7 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
             }
             break;
         }
-        case 1:
-        {
+        case 1: {
             s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
             id = category * 6 + index;
@@ -344,14 +346,12 @@ void ModifierMenu_SelectPendingSource(struct ModifierMenu *menu)
         }
             Modifier_LoadSecondSource(pending, &menu->current);
             break;
-        case 2:
-        {
+        case 2: {
             s32 category = menu->choice.cursor.category;
             s32 index = menu->choice.cursor.index;
             id = category * 6 + index;
             pending->secondaryId = id;
-        }
-            break;
+        } break;
     }
 }
 
@@ -813,21 +813,15 @@ void ModifierMenu_DrawFourthSourceStats(struct ModifierMenu *menu)
     }
 }
 
-void Bg_SetupLayers(u32, u32, u8 *, u32, u32, u32, u32 *);
-
-void CpuSet(const void *, void *, u32);
-
 u32 ModifierMenu_LoadBackground(struct ModifierMenu *p, u32 x)
 {
     u32 v;
-    u32 z;
     v = x;
     p->backgroundResource = ScriptProc_Start(0xC091, 0xCE15);
-    z = 0;
-    Bg_SetupLayers(1, 0, p->backgroundResource, 0, z, 1, &v);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, z);
+    Bg_SetupLayers(1, 0, p->backgroundResource, 0, 0, 1, &v);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     p->tilemap = (u8 *)ScriptProc_Start(0x92B3, 0xA2F6) + 0x14;
-    CpuSet(p->tilemap, (void *)0x03004FC0, 0x100);
+    CpuCopy16(p->tilemap, gBgPaletteBuffer, 0x200);
     return 0;
 }
 
@@ -852,8 +846,6 @@ void ModifierMenu_ResetBackground(struct ModifierMenu *menu)
     Bg_ResetScale(0);
     BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
 }
-
-void Bg_SetLayerMap(u32, void *, u32);
 
 void ModifierMenu_DrawBackground(struct ModifierMenu *menu)
 {
