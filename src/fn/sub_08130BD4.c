@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #define SceneActorRoute_GetStepDuration Route_GetCurrentPointNodeId
 #include "global.h"
 #include "scene_actor_control_phase.h"
@@ -12,19 +13,7 @@ void SceneActorRoute_UpdateTimedPhase(struct ChaseActor *actor)
     u8 *block = (u8 *)actor + 0x3D4;
     void *route = actor->base.body.currentRoute;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *control = *(void **)(block + 0x220);
-        u32 kind = 5;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = control;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorTerrain_InstallControl(actor, *(void **)(block + 0x220), 5);
         *(s16 *)(block + 0x1F2) = SceneActorRoute_GetStepDuration(route);
     }
     if (*(s16 *)(block + 0x1F2) > 0)
