@@ -14,7 +14,8 @@ struct BackgroundFlashController;
  * (confidence=low). */
 struct SceneActorGraphics {
     s16 scale, scaleMin, scaleMax, scaleStep; /* 0x344: SceneActorGraphics_OscillateScale. */
-    u8 unk34C[0x354 - 0x34C];
+    u8 unk34C[0x352 - 0x34C];
+    s16 recoveryGroundHeight; /* 0x352: compared with the forward terrain probe. */
     u16 approachFrames; /* 0x354: duration passed to the polar interpolator. */
     u16 recoveryTimer;  /* 0x356: frames of recovery set by the *ThenRecover handlers. */
     s32 stepTableKind;  /* 0x358: selects one of the gUnk_08604DC4 family tables. */
@@ -25,18 +26,22 @@ struct SceneActorGraphics {
     u8 unk36E[0x378 - 0x36E];
     s16 routeProjectileAmount, routeProjectileKind;
     s16 travelColliderA, travelColliderB;
-    u8 unk380[0x38C - 0x380];
+    u8 unk380[3];
+    u8 trackedPlayerEscaped; /* 0x383: set after enough facing changes in the grab. */
+    u8 unk384[0x38C - 0x384];
     u8 effectScale; /* 0x38C: SceneActorGraphics_SelectResource / SceneActors_DispatchCommands. */
     u8 unk38D;
     u8 effectMode;     /* 0x38E */
     u8 effectDuration; /* 0x38F */
     u32 resourceId;    /* 0x390 */
     u8 particleFlag;   /* 0x394: cleared by SceneActorState_AdvanceToState06. */
-    u8 unk395[0x39C - 0x395];
+    s8 trackedPlayer; /* 0x395: player slot selected by the contact box. */
+    u8 unk396[0x39C - 0x396];
     s32 resourceCostAccumulator; /* 0x39C: SceneActors_AddResourceCost. */
     s32 healthCostAccumulator;   /* 0x3A0: SceneActors_AddHealthCost. */
     s32 healthCostBaseline;      /* 0x3A4: snapshot of health at contact-pool start. */
-    u8 unk3A8[0x3B0 - 0x3A8];
+    u8 unk3A8[4];
+    u32 animationFlags; /* 0x3AC: bit 0 selects alternate animation sequences. */
     u8 stepTableRow;                     /* 0x3B0 */
     u8 stepTableCol;                     /* 0x3B1 */
     u16 stepTableValue;                  /* 0x3B2 */
