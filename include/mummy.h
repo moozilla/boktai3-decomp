@@ -17,7 +17,8 @@ struct Mummy {
     u32 field6DC;
     u8 unknown6E0[8];
     u16 field6E8;
-    u8 unknown6EA[4];
+    u8 interactionFrames; /* While nonzero, retains the active stimulus interaction. */
+    u8 unknown6EB[3];
     u16 counter6EE;
     u8 unknown6F0[2];
     u16 flags6F2;
