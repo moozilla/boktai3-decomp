@@ -67,6 +67,7 @@ s32 SceneParticle_CreateAnchoredRanges(const struct ContactPosition *position,
                     p->velocity.y = 0;
                     p->velocity.z = 0;
                 } else {
+                    // concession-ok(local-union): SpriteEffectVector likewise stores signed coordinates over two words; the Z clear preserves the padding halfword.
                     union {
                         struct ContactPosition position;
                         struct {
