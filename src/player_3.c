@@ -1731,11 +1731,8 @@ void PlayerAction_RefreshFlagState(struct Player *p, struct EquipmentFlagState *
     s32 i;
     struct SceneValueConsumableDefinition *override;
     state->special = 0;
-    {
-        u16 zero = 0;
-        for (i = 2; i >= 0; i--)
-            state->bonus[i] = zero;
-    }
+    for (i = 0; i < 3; i++)
+        state->bonus[i] = 0;
     if (p) {
         s32 bit;
         for (bit = 7; bit <= 67; bit++)
