@@ -52,14 +52,14 @@ void WirelessStatusMenu_UpdateIdleState(struct WirelessStatusMenu *menu)
     menu->timer++;
 }
 
+static inline void WirelessStatusMenu_AddPauseFlags(u32 mask)
+{
+    gEnginePauseFlags |= mask;
+}
+
 void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
 {
-    {
-        int bits = 4;
-        u32 *flags;
-        flags = &gEnginePauseFlags;
-        *flags |= bits;
-    }
+    WirelessStatusMenu_AddPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Wireless_RequestDisconnectMode();
@@ -82,12 +82,7 @@ void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
 
 void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu *menu)
 {
-    {
-        int bits = 4;
-        u32 *flags;
-        flags = &gEnginePauseFlags;
-        *flags |= bits;
-    }
+    WirelessStatusMenu_AddPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Sound_FadeOutChannel10(1);
@@ -117,9 +112,8 @@ void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu 
 void WirelessStatusMenu_UpdateExitState(struct WirelessStatusMenu *menu)
 {
     if (menu->entered != 0) {
-        u32 z = 0;
-        menu->entered = z;
-        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, z);
+        menu->entered = 0;
+        ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xFFFF, 0);
         Sound_PlaySong(0xde);
         Wireless_RequestResetConnection();
     }
@@ -180,9 +174,7 @@ int WirelessStatusMenu_InitFromScript(struct WirelessStatusMenu *menu)
     ResourceHeader_Relocate(blob, resource);
     {
         void *drawable = &menu->widget;
-        int flags;
-        flags = 0x2011;
-        Widget_InitLinked(drawable, blob, 3, flags, 0, 0, 60, 0);
+        Widget_InitLinked(drawable, blob, 3, 0x2011, 0, 0, 60, 0);
     }
     menu->completionProcedure = Script_GetKeywordValue('r', 0);
     menu->window = -1;
