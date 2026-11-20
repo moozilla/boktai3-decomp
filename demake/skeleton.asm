@@ -16,15 +16,31 @@ sk_path:
 sk_get:
     call sk_address
     ld de,sk_base
-    ld bc,16
-    jp copy
+    jr sk_copy
 sk_put:
     call sk_address
     ld d,h
     ld e,l
     ld hl,sk_base
-    ld bc,16
-    jp copy
+sk_copy:
+    ; All actor records and their working copy lie in one WRAM page.
+    ld b,4
+.loop:
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    dec b
+    jr nz,.loop
+    ret
 sk_next:
     ld hl,sk_slot
     inc [hl]
@@ -51,25 +67,23 @@ sk_init:
     ld a,[hl]
     ld [sk_timer],a
     call sk_put
-    ld a,14
-    call pose_source
     ld a,[sk_slot]
     and a
     ld de,0x8180
     jr z,.copy
     ld de,0x8300
 .copy:
-    ld bc,192
-    call copy
+    ld a,skeleton_pose
+    call load_pose
     ld a,[sk_slot]
     ld e,a
     ld d,0
     ld hl,live_pose+1
     add hl,de
-    ld [hl],14
+    ld [hl],skeleton_pose
     ld hl,want_pose+1
     add hl,de
-    ld [hl],14
+    ld [hl],skeleton_pose
     call sk_next
     jr nz,.loop
     ret
@@ -331,13 +345,13 @@ sk_draw:
     jr nz,.striking
     ld a,[tick]
     and 16
-    ld a,14
+    ld a,skeleton_pose
     jr z,.pose
     inc a
     jr .pose
 .striking:
     cp 1
-    ld a,16
+    ld a,skeleton_pose+2
     jr z,.pose
     inc a
 .pose:

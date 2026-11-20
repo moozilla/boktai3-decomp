@@ -9,6 +9,9 @@ boot:
     ld hl,0xc000
     ld bc,768
     call clear
+    ld hl,0xc900
+    ld bc,160
+    call clear
     ld hl,dma_code
     ld de,0xff80
     ld bc,10
@@ -95,6 +98,7 @@ loop:
 .render:
     call draw
     call limit_oam
+    call sort_oam
     call prepare_map
     call prepare_pose
     call vblank
@@ -105,9 +109,9 @@ loop:
     ld a,136
     ldh [0x4a],a
     call 0xff80
-    call flush_pose
     call flush_map
     call hud
+    call flush_pose
     jp loop
 
 vblank:
@@ -129,7 +133,7 @@ lcd_off:
     ret
 
 dma_code:
-    ld a,0xc0
+    ld a,0xc9
     ldh [0x46],a
     ld a,40
 .spin:
@@ -169,11 +173,12 @@ load_room:
     ; Patterns and both 32x32 maps occupy consecutive VRAM addresses.
     xor a
     ld [next_bank],a
-    ld [menu],a
     ld [projectile],a
     ld [enemy_phase],a
     ld [point_index],a
     ld [walking],a
+    ld [anim_wait],a
+    ld [shot_pose_timer],a
     ; draw clears the previous room's emitted slots as well.
     ld a,4
     ld [facing],a
@@ -208,6 +213,7 @@ show_field:
     ldh [0x25],a
     call draw
     call limit_oam
+    call sort_oam
     call initial_map
     xor a
     ld [camera_snap],a
@@ -218,6 +224,9 @@ show_field:
     ld a,136
     ldh [0x4a],a
     call 0xff80
+    ld a,255
+    ld [hud_energy],a
+    ld [hud_health],a
     call hud
     ld a,0xe7
     ldh [0x40],a
@@ -330,11 +339,12 @@ enemy_surface:
     ret
 
 move_player:
-    xor a
-    ld [walking],a
     ld a,[direction]
     and a
-    ret z
+    jr nz,.direction
+    ld [walking],a
+    ret
+.direction:
     add a
     add a
     ld e,a
@@ -352,6 +362,8 @@ move_player:
     ld a,[tick]
     and 1
     ret nz
+    xor a
+    ld [walking],a
     ; Test the two components separately. Sliding along the wall also
     ; prevents a diagonal step from cutting across a blocked corner.
     ld a,[dx]
@@ -547,6 +559,8 @@ interactions:
 .dir:
     ld a,b
     ld [shot_dz],a
+    ld a,15
+    ld [shot_pose_timer],a
     ld a,28
     ld [projectile],a
     ld a,12
@@ -806,19 +820,6 @@ hit_sound:
     ret
 
 draw:
-    ; Hide exactly the sprites emitted last frame, including their unused
-    ; scanlines. Every metasprite below uses at most three slots per scanline.
-    ld a,[oam_count]
-    and a
-    jr z,.cleared
-    ld b,a
-    ld hl,0xc000
-.clear:
-    xor a
-    ld [hl+],a
-    dec b
-    jr nz,.clear
-.cleared:
     xor a
     ld [oam_count],a
     ld a,[player_x]
@@ -827,25 +828,10 @@ draw:
     ld c,a
     call project
     call camera
-    ld a,[menu]
-    and a
-    ret nz
+    call player_pose
     ld a,[grace]
     and 4
     jr nz,.enemy
-    ld a,[facing]
-    add a
-    ld b,a
-    ld a,[direction]
-    and a
-    jr z,.player_pose
-    ld a,[tick]
-    and 8
-    jr z,.player_pose
-    inc b
-.player_pose:
-    ld a,b
-    ld [want_pose],a
     ld a,[live_tile]
     ld [pose],a
     ld a,[mirror]
@@ -864,14 +850,14 @@ draw:
     and 4
     jr nz,.markers
 .fallen:
-    ld a,13
+    ld a,ghoul_pose+3
     jr .ghoul
 .normal:
     ld a,[tick]
     and 16
-    ld a,10
+    ld a,ghoul_pose
     jr z,.ghoul
-    ld a,11
+    ld a,ghoul_pose+1
 .ghoul:
     ld [want_pose+1],a
     ld a,[live_tile+1]
@@ -1022,8 +1008,12 @@ marker_oam:
     ret
 
 hud:
-    ld hl,0x9c02
+    ld hl,hud_energy
     ld a,[energy]
+    cp [hl]
+    jr z,.health
+    ld [hl],a
+    ld hl,0x9c02
     ld c,a
     ld b,6
     ld a,[header+8]
@@ -1031,8 +1021,13 @@ hud:
     ld a,[header+9]
     ld e,a
     call meter
-    ld hl,0x9c0a
+.health:
+    ld hl,hud_health
     ld a,[health]
+    cp [hl]
+    ret z
+    ld [hl],a
+    ld hl,0x9c0a
     ld c,a
     ld b,3
     ld a,[header+10]

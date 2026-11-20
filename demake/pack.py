@@ -127,21 +127,33 @@ def ghoul_palette(source):
 def objects(source):
     _, django = source.actor(0xDE23)
     _, ghoul = source.actor(0x9247, ghoul_palette(source))
-    # Five direction families. The mirror bit provides the other three.
-    # Take a key from each of the first five walking sequences in DE23.
+    # Use the source package's actual (frame, duration) keys. Directional
+    # groups have five stored views; OBJ horizontal flip supplies the rest.
     import sprites
-    pkg = sprites.Package(source.entry("tCB05", 0xDE23))
-    anim = list(pkg.animations())
-    poses = []
-    for i in range(5):
-        for seq, key in ((i, 0), (5 + i, 2)):
-            frame, _ = anim[seq]["keys"][key]
-            poses.append(pose_tiles(actor_pose(django(frame), size=(24, 32), scale=.85)))
+    animations = list(sprites.Package(source.entry("tCB05", 0xDE23)).animations())
+    poses, frames, player = [], [], {}
+    def add(render, key, frame):
+        poses.append(pose_tiles(actor_pose(render(frame))))
+        frames.append(dict(actor=f"{key:04X}", frame=frame))
+        return len(poses)-1
+    def player_pose(frame):
+        if frame not in player:
+            player[frame] = add(django, 0xDE23, frame)
+        return player[frame]
+
+    idle = [player_pose(animations[i]["keys"][0][0]) for i in range(5)]
+    walks = [[(player_pose(frame), duration) for frame, duration in animations[5+i]["keys"]] for i in range(5)]
+    # DE23 groups 64, 69 and 74 are the gun held forward, recoil and
+    # recovery poses, respectively, observed in the source package sheets.
+    gun = [[player_pose(animations[group+i]["keys"][0][0]) for i in range(5)] for group in (64,69,74)]
+    ghoul_base = len(poses)
     for frame in (0, 2, 5, 7):
-        poses.append(pose_tiles(actor_pose(ghoul(frame), size=(24, 32), scale=.85)))
+        add(ghoul, 0x9247, frame)
     _, skeleton = source.actor(0xAE52)
+    skeleton_base = len(poses)
     for frame in (0, 3, 5, 7):
-        poses.append(pose_tiles(actor_pose(skeleton(frame), size=(24, 32), scale=.85)))
+        add(skeleton, 0xAE52, frame)
+    anim = dict(idle=idle, walk=walks, gun=gun, ghoul=ghoul_base, skeleton=skeleton_base, frames=frames)
     # Custom interface sprites for dropped fruit, skylight and solar shot.
     markers = [
         "00000000 00011000 00013000 00333300 03111130 03112130 00333300 00000000",
@@ -154,7 +166,7 @@ def objects(source):
         tile = np.zeros((16, 8), np.uint8)
         tile[-8:] = icon(rows)
         marker_tiles.extend(pose_tiles(tile))
-    return poses, bytes(marker_tiles)
+    return poses, bytes(marker_tiles), anim
 
 
 def enemy_constants():

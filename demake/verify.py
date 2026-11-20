@@ -218,6 +218,8 @@ class Replay:
         for event in self.trace:
             if event[0] == "tick":
                 commands.append(f"tick {self.loop:x} {event[1]} {event[2]}")
+            elif event[0] == "video":
+                commands.append(f"frame walk-{event[1]:04d}.ppm")
             elif event[0] == "power":
                 commands.append("power")
             elif event[0] == "at":
@@ -495,6 +497,8 @@ def verify(out, manifest):
     contact(rows, out / "prison-atlas.png")
     results = dict(native="libmgba" if host else None, checked=checks,
                    frames=[{k: v for k, v in s.items() if k != "state"} for s in snapshots])
+    from film import film
+    results["film"] = film(out, manifest, host)
     if host:
         results["audio"] = verify_audio(out, host)
     (out / "checks.json").write_text(json.dumps(results, indent=2) + "\n")

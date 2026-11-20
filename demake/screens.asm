@@ -44,7 +44,6 @@ restore_field:
     call lcd_off
     xor a
     ld [mode],a
-    ld [menu],a
     call room_vram
     ld a,1
     ld [camera_snap],a

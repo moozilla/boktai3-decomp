@@ -130,23 +130,23 @@ draw_journal:
     jp show_journal_page
 .map:
     push hl
-    ld hl,0xc000
+    ld hl,0xc900
     ld bc,160
     call clear
     ld a,[player_z]
     ld l,a
     ld h,0x73
     ld a,[hl]
-    ld [0xc000],a
+    ld [0xc900],a
     ld a,[player_x]
     ld l,a
     ld h,0x72
     ld a,[hl]
-    ld [0xc001],a
+    ld [0xc901],a
     ld a,118
-    ld [0xc002],a
+    ld [0xc902],a
     ld a,4
-    ld [oam_count],a
+    ld [dma_count],a
     call 0xff80
     pop hl
 show_journal_page:

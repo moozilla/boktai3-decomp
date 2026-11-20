@@ -2,14 +2,29 @@
 ; It stays visible while its next pose is assembled in the spare region over
 ; VBlanks. Tile pairs remain even for the original DMG's 8x16 OBJ mode.
 pose_source:
-    add a
     ld e,a
     ld d,0
     ld hl,pose_ptrs
     add hl,de
+    add hl,de
+    add hl,de
+    ld a,[hl+]
+    ld b,a
     ld a,[hl+]
     ld h,[hl]
     ld l,a
+    ld a,b
+    ret
+load_pose:
+    ; Room setup runs with the LCD off. Preserve the destination across lookup.
+    push de
+    call pose_source
+    ld [0x2000],a
+    pop de
+    ld bc,192
+    call copy
+    ld a,[bank]
+    ld [0x2000],a
     ret
 tile_address:
     ; DE = $8000 + tile * 16.
@@ -38,20 +53,16 @@ reset_poses:
     ld [live_tile+2],a
     ld a,60
     ld [spare_tile+2],a
-    ld a,8
+    ld a,4
     ld [want_pose],a
     ld [live_pose],a
-    call pose_source
     ld de,0x8000
-    ld bc,192
-    call copy
-    ld a,10
+    call load_pose
+    ld a,ghoul_pose
     ld [want_pose+1],a
     ld [live_pose+1],a
-    call pose_source
     ld de,0x8180
-    ld bc,192
-    call copy
+    call load_pose
     ld a,255
     ld [want_pose+2],a
     ld [live_pose+2],a
@@ -89,6 +100,7 @@ prepare_pose:
     ld [upload_pose],a
     push de
     call pose_source
+    ld [upload_bank],a
     ld a,h
     ld [upload_src_hi],a
     ld a,l
@@ -109,15 +121,18 @@ prepare_pose:
     ret
 
 flush_pose:
-    ; A diagonal map refill takes both row and column slots this VBlank.
-    ; Leave the pose transfer for the following tick in that case.
-    ld a,[row_pending]
-    ld hl,col_pending
-    and [hl]
-    ret nz
+    ; OAM, map and HUD have already been committed. Leave three whole
+    ; scanlines for each bounded 32-byte transfer and its pointer update.
     ld a,[upload_left]
     and a
     ret z
+    ldh a,[0x44]
+    cp 144
+    ret c
+    cp 151
+    ret nc
+    ld a,[upload_bank]
+    ld [0x2000],a
     ld a,[upload_src_hi]
     ld h,a
     ld a,[upload_src_lo]
@@ -126,6 +141,7 @@ flush_pose:
     ld d,a
     ld a,[upload_dest_lo]
     ld e,a
+.chunk:
     ld b,8
 .copy:
     ld a,[hl+]
@@ -142,6 +158,16 @@ flush_pose:
     inc de
     dec b
     jr nz,.copy
+    ld a,[upload_left]
+    dec a
+    ld [upload_left],a
+    jr z,.ready
+    ldh a,[0x44]
+    cp 144
+    jr c,.pause
+    cp 151
+    jr c,.chunk
+.pause:
     ld a,h
     ld [upload_src_hi],a
     ld a,l
@@ -150,9 +176,12 @@ flush_pose:
     ld [upload_dest_hi],a
     ld a,e
     ld [upload_dest_lo],a
-    ld hl,upload_left
-    dec [hl]
-    ret nz
+    ld a,[bank]
+    ld [0x2000],a
+    ret
+.ready:
+    ld a,[bank]
+    ld [0x2000],a
     ld a,[upload_slot]
     ld e,a
     ld d,0
@@ -232,4 +261,98 @@ limit_oam:
     ld hl,oam_count
     cp [hl]
     jr c,.loop
+    ret
+
+; Equal-X ties retain emission priority. Sort record indices first so a
+; crossing between two metasprites moves one-byte indices, then gather once.
+; This also gives renderers using OAM priority the original DMG X ordering.
+sort_oam:
+    ld de,0xc900
+    ld a,[oam_count]
+    and a
+    jr z,.tail
+    ld de,0xc000
+    ld c,0
+.record:
+    inc e
+    ld a,[de]
+    ld b,a
+    dec e
+    push de
+    ld a,c
+    add 0xa0
+    ld l,a
+    ld h,0xc6
+.shift:
+    ld a,l
+    cp 0xa0
+    jr z,.insert
+    dec l
+    ld e,[hl]
+    inc e
+    ld a,[de]
+    cp b
+    jr c,.after
+    jr z,.after
+    ld a,[hl+]
+    ld [hl-],a
+    jr .shift
+.after:
+    inc l
+.insert:
+    pop de
+    ld [hl],e
+    inc c
+    ld a,e
+    add 4
+    ld e,a
+    ld a,[oam_count]
+    cp e
+    jr nz,.record
+    ld hl,0xc6a0
+    ld de,0xc900
+    ld b,c
+.gather:
+    ld a,[hl+]
+    push hl
+    ld h,0xc0
+    ld l,a
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl+]
+    ld [de],a
+    inc e
+    ld a,[hl]
+    ld [de],a
+    inc e
+    pop hl
+    dec b
+    jr nz,.gather
+.tail:
+    ; Hide only trailing Y coordinates from the preceding DMA image.
+    ld a,[dma_count]
+    cp e
+    jr c,.done
+    jr z,.done
+    sub e
+    ld b,a
+    xor a
+.hide:
+    ld [de],a
+    inc e
+    inc e
+    inc e
+    inc e
+    dec b
+    dec b
+    dec b
+    dec b
+    jr nz,.hide
+.done:
+    ld a,[oam_count]
+    ld [dma_count],a
     ret

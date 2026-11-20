@@ -24,7 +24,7 @@ direction buttons pressed menu facing mirror walking dx dz used_a enemy_phase en
 enemy_z enemy_timer point_index goal_x goal_z route_wait rng death_flag grace projectile
 shot_x shot_z shot_dx shot_dz oam_count pose attr music_lo music_hi music_wait sfx_pulse sfx_noise
 world_x world_x_hi world_y world_y_hi camera_x_hi camera_y_hi projected_h projected_h_hi
-camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter note_index note_lang note_count save_slot save_generation""".split()
+camera_snap tile_x tile_y cached_x cached_y row_pending col_pending row_lo row_hi col_x mode sun_level sun_source shadow_choice pressed_dir need_meter note_index note_lang note_count save_slot save_generation anim_dir anim_key anim_wait shot_pose_timer hud_energy hud_health dma_count""".split()
 
 
 def direction_table():
@@ -47,14 +47,14 @@ def build(source, out, scenes=None, song=None):
     journal = Journal(source, len(rooms) + 3)
     notes = {n: journal.room(room, rooms) for n, (room, _) in rooms.items()}
     saved_offset, resume_offset = journal.system_pages()
-    poses, markers = objects(source)
-    obj = b"".join(poses)
+    poses, markers, anim = objects(source)
     directions = direction_table()
     symbols = {name: 0xC100 + i for i, name in enumerate(STATE)}
     symbols.update(LAYOUT, **enemy_constants(), marker_bytes=len(markers))
     symbols.update(pickups=0xC200, want_pose=0xC2A0, live_pose=0xC2A4, live_tile=0xC2A8, spare_tile=0xC2AC)
     symbols.update({name: 0xC2B0 + i for i, name in enumerate(
-        "upload_left upload_slot upload_pose upload_src_lo upload_src_hi upload_dest_lo upload_dest_hi".split())})
+        "upload_left upload_slot upload_pose upload_src_lo upload_src_hi upload_dest_lo upload_dest_hi upload_bank".split())})
+    symbols.update(ghoul_pose=anim["ghoul"], skeleton_pose=anim["skeleton"])
     symbols["lunge_period_mask"] = symbols["lunge_period"] - 1
     symbols.update(sk_records=0xC320, sk_base=0xC300, sk_slot=0xC310)
     symbols.update({name: 0xC300 + i for i, name in enumerate(
@@ -71,6 +71,13 @@ def build(source, out, scenes=None, song=None):
         photo_ready photo_level pr_byte pr_received_lo pr_palette""".split())})
     save_fields = "bank player_x player_z health energy sun_level sun_source shadow_choice note_lang".split()
     signature = zlib.crc32(b"DMG-CHECKPOINT-1" + b"".join(struct.pack("<H", n) for n in scenes))
+    asm += (HERE / "animation.asm").read_text()
+    asm += "\nidle_poses:\n db " + ",".join(map(str, anim["idle"])) + "\n"
+    asm += "gun_poses:\n db " + ",".join(str(v) for group in anim["gun"] for v in group) + "\n"
+    # A source sequence is (pose, duration) pairs and a 255 loop marker.
+    asm += "walk_ptrs:\n dw " + ",".join(f"walk_dir_{i}" for i in range(5)) + "\n"
+    for i, seq in enumerate(anim["walk"]):
+        asm += f"walk_dir_{i}:\n db " + ",".join(str(v) for pair in seq for v in pair) + ",255\n"
     source_asm = (HERE / "save.asm").read_text()
     asm += source_asm + "\nsave_tag:\n db " + ",".join(str(v) for v in signature.to_bytes(4, "little"))
     asm += "\nsave_fields:\n db " + ",".join(str(symbols[k] & 255) for k in save_fields) + "\n"
@@ -80,10 +87,18 @@ def build(source, out, scenes=None, song=None):
     code, _ = assemble(asm, {**symbols, **reloc})
     fixed_end = 0x150 + len(code)
     table_addr = fixed_end + len(directions)
-    first_pose = table_addr + 2 * len(poses)
-    ptrs = b"".join(struct.pack("<H", first_pose + 192 * i) for i in range(len(poses)))
-    reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=first_pose + len(obj),
-                 wave_pattern=first_pose + len(obj) + len(markers))
+    # Each 24x32 pose lives wholly within one switch bank. Its three-byte
+    # directory entry is visible regardless of which room or score is mapped.
+    pose_banks, pointers = [], bytearray()
+    first_pose_bank = journal.first_bank + len(journal.banks)
+    for pose in poses:
+        if not pose_banks or len(pose_banks[-1]) + len(pose) > 0x4000:
+            pose_banks.append(bytearray())
+        data = pose_banks[-1]
+        pointers.extend(struct.pack("<BH", first_pose_bank + len(pose_banks)-1, 0x4000 + len(data)))
+        data.extend(pose)
+    reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=table_addr+len(pointers),
+                 wave_pattern=table_addr+len(pointers)+len(markers))
     reloc["journal_ptrs"] = reloc["wave_pattern"] + len(wave)
     reloc.update(saved_page=reloc["journal_ptrs"]+saved_offset, continue_page=reloc["journal_ptrs"]+resume_offset)
     code, symbols = assemble(asm, {**symbols, **reloc})
@@ -93,10 +108,11 @@ def build(source, out, scenes=None, song=None):
         info.append(meta)
         banks.append(data)
         screen_image(display).save(out / f"room-{meta['scene']}.png")
-    rom = cartridge(code + directions + ptrs + obj + markers + wave + journal.directory, [*banks, score, screen_bank(source), *journal.banks])
+    rom = cartridge(code + directions + pointers + markers + wave + journal.directory, [*banks, score, screen_bank(source), *journal.banks, *pose_banks])
     path = out / "boktai.gb"
     path.write_bytes(rom)
     manifest = dict(rooms=info, rom_bytes=len(rom), code_bytes=len(code), obj_pose_count=len(poses), obj_tiles_per_pose=12, obj_marker_tiles=len(markers) // 16,
+                    actor_animation=anim, actor_banks=list(range(first_pose_bank, first_pose_bank+len(pose_banks))),
                     journal_pages=len(journal.directory) // 3, music=music_info, state={name: symbols[name] for name in [*STATE, "pickups"]}, engine=symbols)
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print(f"{path.relative_to(ROOT)}  {len(rom)//1024} KiB MBC5  {len(banks)} rooms  {len(code)} bytes SM83")
