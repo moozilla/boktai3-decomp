@@ -1,4 +1,3 @@
-// MATCHING_CONCESSION: register-pinning
 #include "group_objects.h"
 #include "display_sequence_inline.h"
 #include "monster_particle_random.h"
@@ -445,7 +444,12 @@ static inline struct GroupVec *addPositionN(struct GroupVec *d, struct GroupVec 
     return dst;
 }
 
-// MATCHING_CONCESSION: register-pinning
+static inline void BoardPiece_SetState(struct GroupPiece *piece, u32 state)
+{
+    piece->state = state;
+    piece->active = 1;
+    piece->timer = 0;
+}
 
 void BoardPiece_Launch(struct GroupObjects *m, struct GroupPiece *p, int delay)
 {
@@ -500,10 +504,7 @@ void BoardPiece_Wander(struct GroupObjects *m, struct GroupPiece *p, int index)
     }
     BoardPiece_SetFacingAnim(m, p, 0);
     if (p->timer > 0x5F) {
-        u32 t = 1;
-        p->state = t;
-        p->active = 1;
-        p->timer = 0;
+        BoardPiece_SetState(p, 1);
     }
     p->timer++;
 }
@@ -530,10 +531,7 @@ void BoardPiece_ApproachTarget(struct GroupObjects *m, struct GroupPiece *p, int
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        u32 t = 2;
-        p->state = t;
-        p->active = 1;
-        p->timer = 0;
+        BoardPiece_SetState(p, 2);
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -576,10 +574,7 @@ void BoardPiece_ConvergeOnTarget(struct GroupObjects *m, struct GroupPiece *p, i
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        u32 t = 8;
-        p->state = t;
-        p->active = 1;
-        p->timer = 0;
+        BoardPiece_SetState(p, 8);
     } else {
         if (p->speed == 0) {
             const u16 *table;
@@ -640,10 +635,7 @@ void BoardPiece_ChasePlayer(struct GroupObjects *m, struct GroupPiece *p, int in
     dx = p->target.x - p->position.x;
     dz = target->z - position->z;
     if (dx * dx + dz * dz <= 0xFFF) {
-        u32 t = 4;
-        p->state = t;
-        p->active = 1;
-        p->timer = 0;
+        BoardPiece_SetState(p, 4);
     } else {
         polar(&delta, p->direction, p->duration);
         {
@@ -732,10 +724,7 @@ void BoardPiece_HomeToTarget(struct GroupObjects *m, struct GroupPiece *p, int i
     dx = p->target.x - p->position.x;
     dz = p->target.z - position->z;
     if (dx * dx + dz * dz <= 0x9C3F) {
-        u32 t = 2;
-        p->state = t;
-        p->active = 1;
-        p->timer = 0;
+        BoardPiece_SetState(p, 2);
     } else {
         if (p->speed == 0) {
             const u16 *table;
