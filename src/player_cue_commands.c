@@ -1,4 +1,5 @@
 #include "player_cue_commands.h"
+#include "player_status_flags.h"
 
 /* Enable the first player's stat gauge. */
 
@@ -63,10 +64,7 @@ void Player_EnterKindTwo(struct Player *player)
     if (player->cameraOffsetActive != 0)
         Player_RestoreCameraFollow(player);
     Player_AddControlFlags(player, 8);
-    {
-        u32 flag = 0x40000;
-        player->statusFlags |= flag;
-    }
+    Player_AddStatusFlags(player, 0x40000);
 }
 
 void PlayerCue_OverlaySet(struct Player *player, s32 parameter)
