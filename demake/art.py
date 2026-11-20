@@ -1,6 +1,5 @@
 """ROM assets to original Game Boy tiles. All intermediate images are generated."""
 import csv
-import math
 import struct
 import sys
 from pathlib import Path
@@ -212,23 +211,31 @@ def fit_tiles(screen, budget):
     return patterns, mapping.astype(np.uint8), display, len(unique)
 
 
-def actor_pose(frame, enemy=False, size=(16, 32), scale=.62):
-    """Fit a frame to its metasprite, retaining a solid silhouette and transparent holes."""
+def actor_pose(frame, size=(24, 32), scale=.85):
+    """Keep the silhouette and small features when fitting the three opaque OBJ inks."""
     dest = np.zeros((size[1], size[0]), np.uint8)
     if frame is None or frame.getbbox() is None:
         return dest
     frame = frame.crop(frame.getbbox())
     ratio = min(scale, size[0] / frame.width, size[1] / frame.height)
     new_size = (max(1, round(frame.width * ratio)), max(1, round(frame.height * ratio)))
-    frame = frame.resize(new_size, Image.Resampling.LANCZOS)
-    pixels = np.asarray(frame)
-    opaque = pixels[:, :, 3] >= 116
+    filtered = np.asarray(frame.resize(new_size, Image.Resampling.LANCZOS), dtype=float)
+    opaque = filtered[:, :, 3] >= 116
     if not np.any(opaque):
         return dest
-    light = lightness(pixels[:, :, :3])
-    lo, hi = np.percentile(light[opaque], [8, 90])
+    # Filter silhouette coverage. Within it, retain the source texel's
+    # contribution so a one-pixel eye or rib survives the smaller scale.
+    nearest = np.asarray(frame.resize(new_size, Image.Resampling.NEAREST), dtype=float)
+    mix = np.where(nearest[:, :, 3:] >= 128, .70 * nearest + .30 * filtered, filtered)
+    rgb = mix[:, :, :3]
+    light = lightness(rgb)
+    # Red cloth and brown leather lie close in L*. Deep red receives the
+    # darker ink, leaving Django's face and scarf visibly separate.
+    red = np.clip((rgb[:, :, 0] - np.maximum(rgb[:, :, 1], rgb[:, :, 2])) / 175, 0, 1)
+    light -= .18 * red * (rgb[:, :, 1] < 100)
+    lo, hi = np.percentile(light[opaque], [6, 94])
     tone = (light - lo) / max(hi - lo, .15)
-    inks = np.where(tone < .26, 3, np.where(tone < .63, 2, 1))
+    inks = np.where(tone < .30, 3, np.where(tone < .77, 2, 1))
     # Eight-neighbor silhouette would overwhelm narrow limbs. Ink only the
     # dark boundary samples and preserve bright headgear and weapon highlights.
     mask = np.pad(opaque, 1)

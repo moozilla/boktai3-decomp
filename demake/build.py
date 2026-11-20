@@ -2,6 +2,7 @@
 """Build a playable MBC5 cartridge or convert an individual stage or actor."""
 import argparse
 import json
+import struct
 from pathlib import Path
 
 from PIL import Image
@@ -9,7 +10,7 @@ from PIL import Image
 from art import ROOT, Source, actor_pose, encode_tile, fit_tiles, pose_tiles, screen_image
 from gallery import actor_gallery, room_gallery
 from music import compile_song
-from pack import SCENES, LAYOUT, objects, pack_room, enemy_constants
+from pack import SCENES, LAYOUT, objects, pack_room, enemy_constants, ghoul_palette
 from rooms import convert, place_skylight, terrain_overlay
 from screens import screen_bank
 from sm83 import assemble, cartridge
@@ -66,7 +67,6 @@ def build(source, out):
     fixed_end = 0x150 + len(code)
     table_addr = fixed_end + len(directions)
     first_pose = table_addr + 2 * len(poses)
-    import struct
     ptrs = b"".join(struct.pack("<H", first_pose + 192 * i) for i in range(len(poses)))
     reloc.update(directions=fixed_end, pose_ptrs=table_addr, obj_markers=first_pose + len(obj),
                  wave_pattern=first_pose + len(obj) + len(markers))
@@ -98,6 +98,9 @@ def main():
     actor.add_argument("hash", type=lambda k: int(k, 16))
     actor.add_argument("--frames", default="0", help="comma-separated frame indices, or all")
     actor.add_argument("--palette", type=int, help="first OBJ pool bank, decimal")
+    actor.add_argument("--size", type=int, nargs=2, default=(24, 32), metavar=("WIDTH", "HEIGHT"))
+    actor.add_argument("--scale", type=float, default=.85, help="maximum conversion scale")
+    actor.add_argument("--obp", type=int, choices=(0, 1), help="hardware OBJ palette")
     music = cmds.add_parser("music", help="reduce an MP2K song to four DMG channels")
     music.add_argument("song", type=int)
     music.add_argument("--frames", type=int, default=14400, help="maximum source video frames")
@@ -123,7 +126,7 @@ def main():
         (dest / "bg.map").write_bytes((ids ^ 128).tobytes())
         (dest / "stage.json").write_text(json.dumps(dict(stage=r.stage, terrain=r.terrain,
             scale=r.scale, crop=[r.left, r.top], palette=r.palette), indent=2) + "\n")
-        room_gallery([r], dest / "contact.png", 256)
+        room_gallery([r], dest / "contact.png", [256])
         print(dest.relative_to(ROOT))
     elif args.cmd == "actor":
         count, render = source.actor(args.hash, args.palette)
@@ -132,17 +135,26 @@ def main():
             ap.error(f"select frames in 0..{count - 1}")
         dest = OUT / f"actor-{args.hash:04X}"
         dest.mkdir(exist_ok=True)
-        (dest / "poses.2bpp").write_bytes(b"".join(pose_tiles(actor_pose(render(i))) for i in seq))
-        (dest / "poses.json").write_text(json.dumps(dict(frames=seq, width=16, height=32, bytes_per_pose=128,
-            oam=[[0, 0, 0], [8, 0, 2], [0, 16, 4], [8, 16, 6]], obp=1 if args.hash in source.big_ids else 0)))
-        actor_gallery(source, args.hash, seq[:16], dest / "contact.png", args.palette)
+        w, h = args.size
+        if w <= 0 or h <= 0 or w % 8 or h % 16 or w > 80 or w*h > 40*128 or not 0 < args.scale <= 4:
+            ap.error("use 8x16 cells, at most 40 total and ten per row, and a scale in (0, 4]")
+        enemy = args.hash in source.big_ids if args.obp is None else bool(args.obp)
+        (dest / "poses.2bpp").write_bytes(b"".join(pose_tiles(actor_pose(render(i), size=(w, h), scale=args.scale)) for i in seq))
+        cells = [(x, y) for y in range(0, h, 16) for x in range(0, w, 8)]
+        (dest / "poses.json").write_text(json.dumps(dict(frames=seq, width=w, height=h, bytes_per_pose=w*h//4,
+            oam=[[x, y, i * 2] for i, (x, y) in enumerate(cells)], obp=int(enemy)), indent=2) + "\n")
+        for page in range(0, len(seq), 16):
+            path = dest / ("contact.png" if page == 0 else f"contact-{page//16+1}.png")
+            actor_gallery(source, args.hash, seq[page:page+16], path, args.palette, (w, h), args.scale, enemy=enemy)
         print(dest.relative_to(ROOT))
     else:
         rooms, meta = build(source, OUT)
         if args.cmd is None:
-            room_gallery([r for r, _ in rooms.values()], OUT / "rooms.png")
-            actor_gallery(source, 0xDE23, [0, 2, 4, 23], OUT / "django.png")
-            actor_gallery(source, 0x9247, [0, 2, 5, 7], OUT / "ghoul.png")
+            room_gallery([rooms[n][0] for n in SCENES[:3]], OUT / "rooms.png", [r["bg_tiles"] for r in meta["rooms"][:3]])
+            floor = Image.open(OUT / "room-2698.png")
+            actor_gallery(source, 0xDE23, [0, 2, 4, 23], OUT / "django.png", floor=floor)
+            actor_gallery(source, 0x9247, [0, 2, 5, 7], OUT / "ghoul.png", ghoul_palette(source), floor=floor)
+            actor_gallery(source, 0xAE52, [0, 3, 5, 7], OUT / "skeleton.png", floor=Image.open(OUT / "room-2712.png"))
             from verify import verify
             verify(OUT, meta)
 

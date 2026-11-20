@@ -152,13 +152,17 @@ def pack_room(source, room, rooms):
     return bytes(buf), info, display
 
 
-def objects(source):
-    _, django = source.actor(0xDE23)
+def ghoul_palette(source):
     ghoul_code = (ROOT / "src/ghoul.c").read_text()
     base = int(re.search(r"MonsterInit_ReadPalette\(actor, (0x[0-9A-Fa-f]+)", ghoul_code)[1], 16)
     spawn = next(t for _, t in source.walker.text(1496) if t.startswith("command 0x5a5 "))
     variant = int(re.search(r" C: (\d+)", spawn)[1])
-    _, ghoul = source.actor(0x9247, base + variant)
+    return base + variant
+
+
+def objects(source):
+    _, django = source.actor(0xDE23)
+    _, ghoul = source.actor(0x9247, ghoul_palette(source))
     # Five direction families. The mirror bit provides the other three.
     # Take a key from each of the first five walking sequences in DE23.
     import sprites
@@ -170,10 +174,10 @@ def objects(source):
             frame, _ = anim[seq]["keys"][key]
             poses.append(pose_tiles(actor_pose(django(frame), size=(24, 32), scale=.85)))
     for frame in (0, 2, 5, 7):
-        poses.append(pose_tiles(actor_pose(ghoul(frame), True, size=(24, 32), scale=.85)))
+        poses.append(pose_tiles(actor_pose(ghoul(frame), size=(24, 32), scale=.85)))
     _, skeleton = source.actor(0xAE52)
     for frame in (0, 3, 5, 7):
-        poses.append(pose_tiles(actor_pose(skeleton(frame), True, size=(24, 32), scale=.85)))
+        poses.append(pose_tiles(actor_pose(skeleton(frame), size=(24, 32), scale=.85)))
     # Custom interface sprites for dropped fruit, skylight and solar shot.
     markers = [
         "00000000 00011000 00013000 00333300 03111130 03112130 00333300 00000000",
