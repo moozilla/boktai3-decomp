@@ -1,8 +1,6 @@
-#include "global.h"
+#include "menu_prompt.h"
 #include "render.h"
 #include "game_state.h"
-u32 Hud_GetScaledRetryCount(void);
-void Hud_InitRetryPanel(void *);
 void Hud_BeginRetryPanel(u8 *s)
 {
     s[0x48E6] = Hud_GetScaledRetryCount();

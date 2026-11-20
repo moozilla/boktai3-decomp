@@ -1,34 +1,37 @@
 #ifndef GUARD_SPIRAL_BURST_H
 #define GUARD_SPIRAL_BURST_H
-#include "level_advance_display.h"
+#include "engine.h"
+#include "sprite_drawable_api.h"
 
-/* Each burst owns eight 0x30-byte particles. Their frame and motion data begin
- * at offsets 0x10 and 0x18 within the particle. */
+/* Each burst owns eight 0x30-byte particles. The first 0x28 bytes are the
+ * SpriteDrawable renderer record; the final eight bytes hold orbit parameters.
+ * The existing frame/motion subdivision of that prefix remains provisional. */
 struct SpiralParticleMotion {
-    union LevelAdvancePosition position;
-    struct SpiralParticle *previous, *next;
+    struct ContactPosition position;
+    struct SpriteDrawable *previous, *next;
     u8 angle, riseRate, riseDelay, animationFrame, angularSpeed, lifetime;
     u16 radius;
 };
 
 struct SpiralParticleFrame {
-    u8 status, listIndex, unknown12[2];
-    u32 frameState;
+    s8 depthOffset;
+    u8 listIndex, unknown12[2];
+    u32 attributes;
     struct SpiralParticleMotion motion;
 };
 
 struct SpiralParticle {
     u32 flags;
-    u8 unknown4[11], renderMode;
+    u8 unknown4[11], priority;
     struct SpiralParticleFrame frame;
 };
 
 struct SpiralBurst {
     u8 unknown0[0x1c];
-    struct SceneVec origin;
+    struct ContactPosition origin;
     u8 collider[0x54];
     struct SpiralParticle particles[8];
-    void *resource;
+    const struct SpriteEffectTileResource *resource;
     u8 unknown1fc[6];
     u16 timer;
 };

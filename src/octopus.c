@@ -230,7 +230,7 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
         if (!actor->base.drawableKind)
             *(u32 *)actor->base.drawable |= 1;
         else {
-            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             tile->flags |= 1;
         }
     }
@@ -1848,7 +1848,7 @@ void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
         if (!actor->base.drawableKind)
             *(u32 *)actor->base.drawable |= mask;
         else {
-            struct SceneActorAnimationTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
+            struct SceneInputWidget *tile = (void *)((u8 *)actor->base.drawable + 0x20);
             tile->flags |= mask;
         }
         ResetState(actor, 3);

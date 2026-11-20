@@ -1,21 +1,18 @@
 #include "display_sequence_sprite.h"
 #include "global.h"
 #include "ram.h"
-struct Blob {
-    u32 words[8];
-};
-struct Drawing {
-    u8 bytes[0x60];
-};
+#include "scene_input_widget.h"
+#include "sprite.h"
+#include "task.h"
 struct ResultMenu {
-    u8 task[0x18];
+    struct Task task;
     u32 timer;
     u8 state, entered;
     u8 pad1e[0x12];
-    struct Blob primary, secondary;
+    struct SceneInputResource primary, secondary;
     struct DisplaySequenceSprite sprite;
-    u8 glyph[0x1c];
-    struct Drawing draws[22];
+    struct SpriteRenderResource glyph;
+    struct SceneInputWidget draws[22];
     void *onClose, *resource;
     int windows[4];
     u8 left[16], right[16];
@@ -28,27 +25,17 @@ void *WirelessExchange_GetPeerEntry(int);
 int WirelessResultPanel_Init(struct ResultMenu *arg)
 {
     struct ResultMenu *p = arg;
-    struct Blob *res;
-    struct Blob *first;
+    struct SceneInputResource *res;
+    struct SceneInputResource *first;
     int pack;
-    struct Blob *primary;
-    struct Blob *secondary;
+    struct SceneInputResource *primary;
+    struct SceneInputResource *secondary;
     void *resource;
     void *glyph;
-    struct Saved {
-        struct DisplaySequenceState animation;
-        u8 *visible;
-    } saved;
+    struct DisplaySequenceState animation;
+    u8 *priority;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceSprite *savedSprite;
-    struct ByteView {
-        u8 value;
-    };
-    union {
-        u8 *visible;
-        struct ByteView *byte;
-        struct ResultMenu *write;
-    } value;
     gResultMenu = p;
     if (Script_SeekToKeyword(115)) {
         void *value = Script_GetTextSourcePc();
@@ -64,6 +51,7 @@ initialize:
     res = ScriptProc_Start(pack, 0x530D);
     if (!res)
         goto failed;
+    /* Both bounded resource guards remain unresolved allocation-only forms. */
     {
         u32 raw = (u8)(u32)res;
         if ((s32)raw < 0)
@@ -85,24 +73,15 @@ initialize:
     secondary = &p->secondary;
     ResourceHeader_Relocate(secondary, res);
     {
-        struct Drawing *draw = p->draws;
+        struct SceneInputWidget *draw = p->draws;
         u32 drawFlags = 0x2011;
         Widget_InitLinked(draw, secondary, 30, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 1;
         Widget_InitLinked(draw, secondary, 2, drawFlags, 0, 0, 60, 0);
         draw = p->draws + 2;
-        glyph = p->glyph;
+        glyph = &p->glyph;
         savedSprite = &p->sprite;
-        {
-            u32 raw = p->state;
-            if ((s32)raw < 0) {
-                value.byte = (void *)p->left;
-                value.byte->value = 255;
-                p->state = 255;
-            }
-        }
-        value.visible = &p->sprite.priority;
-        saved.visible = value.visible;
+        priority = &p->sprite.priority;
         {
             int count;
             int zero = 0;
@@ -113,16 +92,15 @@ initialize:
                 draw++;
             } while (count >= 0);
         }
-        resource = value.visible;
     }
     resource = ScriptProc_Start(0x922E, 0x4BBF);
     AnimData_Load(glyph, 0x593A);
     AnimData_SelectPaletteBank(glyph, 503);
     Sprite_Init(savedSprite, glyph, 0x2011);
-    Anim_RestartSequence(&saved.animation, resource, 0, 0, 0);
+    Anim_RestartSequence(&animation, resource, 0, 0, 0);
     sprite = savedSprite;
     {
-        struct DisplaySequenceState *state = &saved.animation;
+        struct DisplaySequenceState *state = &animation;
         const u16 *command;
         u32 ended;
         command = state->commands + state->index;
@@ -183,22 +161,14 @@ initialize:
     {
         int zero = 0;
         {
-            u8 *visible = saved.visible;
+            u8 *visible = priority;
             *visible = zero;
         }
         Memory_Copy(p->left, WirelessExchange_GetPeerEntry(0), 16);
         Memory_Copy(p->right, WirelessExchange_GetPeerEntry(1), 16);
-        {
-            value.write = (struct ResultMenu *)((u8 *)p + (p->entered >> 8));
-            value.write->state = zero;
-            value.write->entered = 1;
-            value.write->timer = zero;
-            {
-                u32 raw = p->entered;
-                if ((s32)raw < 0)
-                    value.write->state = 255;
-            }
-        }
+        p->state = zero;
+        p->entered = 1;
+        p->timer = zero;
         {
             void **callback = &p->onClose;
             *callback = (void *)zero;

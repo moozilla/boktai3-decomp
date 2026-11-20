@@ -1,4 +1,5 @@
 #include "dark_loan_screen.h"
+#include "palette_pulse.h"
 
 void MessageWindow_SetPalette(u32);
 
@@ -21,8 +22,6 @@ void Bg_SetupLayers(int, int, void *, int, int, int, void *);
 void StatGauge_Draw(s32, s32, s32, s32, s32, s32);
 
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
-
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
 
 void sub_082157EC(void);
 

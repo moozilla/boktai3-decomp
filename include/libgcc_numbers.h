@@ -2,14 +2,13 @@
 #define GUARD_LIBGCC_NUMBERS_H
 
 /* RAM number layouts from FSF fp-bit-base.c; license/exception in src/lib/libgcc_*.c. */
-typedef enum {
-    CLASS_SNAN, CLASS_QNAN, CLASS_ZERO, CLASS_NUMBER, CLASS_INFINITY
-} fp_class_type;
+typedef enum { CLASS_SNAN, CLASS_QNAN, CLASS_ZERO, CLASS_NUMBER, CLASS_INFINITY } fp_class_type;
 
 struct SoftDoubleNumber {
     fp_class_type class;
     unsigned int sign;
     int normal_exp;
+    // concession-ok(local-union): Original fp-bit-base.c double fraction uses a 64-bit word and two 32-bit halves.
     union {
         unsigned long long ll;
         unsigned int l[2];
@@ -20,6 +19,7 @@ struct SoftSingleNumber {
     fp_class_type class;
     unsigned int sign;
     int normal_exp;
+    // concession-ok(local-union): Original fp-bit-base.c float fraction uses a 32-bit word and two 16-bit halves.
     union {
         unsigned int ll;
         unsigned short l[2];

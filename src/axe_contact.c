@@ -345,10 +345,11 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
                   Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
     p->base.body.position.z =
         data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
-    data->spriteX = data->center.x +
-                    Axe_ScaleTowardZero(
-                        gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
-    data->spriteZ =
+    data->auxiliarySprite.position.x =
+        data->center.x +
+        Axe_ScaleTowardZero(
+            gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
+    data->auxiliarySprite.position.z =
         data->center.z +
         Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
@@ -401,10 +402,10 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             struct DisplaySequenceSprite *sprite = p->base.drawable;
             u32 previous;
             sprite->flags |= 2;
-            data->spriteFlags |= 2;
+            data->auxiliarySprite.flags |= 2;
             previous = sprite->attribute;
             sprite->attribute = previous - 6;
-            data->spriteAngle += 6;
+            data->auxiliarySprite.attribute += 6;
             if ((s32)previous < ((struct DisplaySequenceSprite *)p->base.drawable)->attribute)
                 Sound_PlaySong(0x169);
             if (data->flagsCAB & 4) {

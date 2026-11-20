@@ -824,7 +824,10 @@ class Evaluator:
                 result.concessions['asm_barriers'] += len(_single_use_macros(
                     source, getattr(self, "source_path", None), getattr(self, "repo", _REPO)))
             resolved = knobs
-            if any(re.search(r"(^|,)[A-Za-z_]", knobs.get(k, "")) for k in ("AGBCC_PRI", "AGBCC_FORCE")):
+            # Scope owns the supported pseudo selectors and register aliases.
+            # Numeric knobs take its cheap path; named knobs need a baseline
+            # trace before the compiler (whose selector parser is numeric).
+            if knobs:
                 self._input.write_text(source)
                 trace_work = self.workdir / "traces" / _sha(source)[:16]
                 sink = io.StringIO()

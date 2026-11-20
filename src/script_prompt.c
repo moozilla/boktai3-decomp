@@ -1,4 +1,5 @@
 #include "script_prompt.h"
+#include "palette_pulse.h"
 #include "ram.h"
 #include "input.h"
 #include "render.h"

@@ -2,6 +2,9 @@
 #include "render.h"
 #include "player.h"
 #include "motion_track.h"
+#include "positioned_effect_coordinates.h"
+#include "scene_input_widget.h"
+#include "vanargand_stage_colors.h"
 
 typedef void (*VanargandStateCallback)(void *);
 typedef s32 (*VanargandUpdateCallback)(void *);
@@ -42,15 +45,14 @@ struct Vanargand {
     struct Player *targetPlayer;            /* 0x10C */
     struct SceneVec *targetPosition;        /* 0x110 */
     u8 unknown114[0x60];
-    u8 backdrop[8];            /* 0x174 */
-    u8 partController[8];      /* 0x17C */
-    u8 spriteAnchor[8];        /* 0x184 */
-    u8 animation[0x60];        /* 0x18C */
-    u8 drawable[0x28];         /* 0x1EC */
-    u8 spriteParameter[8];     /* 0x214 */
-    u8 actionSequence[0xb4];   /* 0x21C */
-    u8 spriteGroup[0x12c];     /* 0x2D0 */
-    struct VanargandPart part; /* 0x3FC */
+    struct PositionedEffectCoordinates coordinates; /* 0x174 */
+    struct SceneInputWidget animation;              /* 0x18C */
+    struct SceneInputResource drawable;             /* 0x1EC */
+    struct ContactPosition effectOrigin;            /* 0x20C */
+    u8 spriteParameter[8];                          /* 0x214 */
+    u8 actionSequence[0xb4];                        /* 0x21C */
+    u8 spriteGroup[0x12c];                          /* 0x2D0 */
+    struct VanargandPart part;                      /* 0x3FC */
     u8 unknown410[0x8];
     struct SceneVec partPosition; /* 0x418 */
     u8 unknown420[0xE0];
@@ -92,10 +94,10 @@ struct Vanargand {
     u8 phase5C6;          /* 0x5C6 */
     u8 healthBand;        /* 0x5C7 */
     u8 unknown5C8[0x150];
-    u8 palette[0x200];   /* 0x718 */
-    u8 fadeA[0x200];     /* 0x918 */
-    u8 fadeB[0x200];     /* 0xB18 */
-    u8 fadeC[0x200];     /* 0xD18 */
+    u16 palette[16][16]; /* 0x718 */
+    u16 fadeA[16][16];   /* 0x918 */
+    u16 fadeB[16][16];   /* 0xB18 */
+    u16 fadeC[16][16];   /* 0xD18 */
     s32 paletteFrame;    /* 0xF18 */
     u32 paletteSelector; /* 0xF1C */
     u16 paletteMode;     /* 0xF20 */
@@ -112,45 +114,9 @@ s32 __divsi3(s32, s32);
 void Vanargand_ResetPaletteTransition(struct Vanargand *);
 void CpuSet(const void *, void *, u32);
 
-static inline s32 InterpolatePaletteChannel(s32 start, s32 end, s32 frame, s32 duration)
-{
-    s32 value;
-    if (frame <= 0)
-        return start;
-    if (frame >= duration)
-        return end;
-    value = ((end - start) << 8) * frame / duration;
-    if (value >= 0)
-        value >>= 8;
-    else
-        value = -(-value >> 8);
-    return start + value;
-}
-
 void Vanargand_StopActionSequence(void *);
-static inline void SetStagePaletteColors(s32 stage)
-{
-    s32 red, green, blue;
-    u16 color;
-    red = InterpolatePaletteChannel(7, 19, stage, 3);
-    green = InterpolatePaletteChannel(0, 18, stage, 3);
-    blue = InterpolatePaletteChannel(0, 19, stage, 3);
-    color = red | (green << 5) | (blue << 10);
-    gBgPaletteBuffer[0x56 / 2] = color;
-    gBgPaletteBuffer[0x10c / 2] = color;
-    {
-        s32 red, green, blue;
-        u16 nextColor;
-        red = InterpolatePaletteChannel(21, 24, stage, 3);
-        green = InterpolatePaletteChannel(0, 29, stage, 3);
-        blue = InterpolatePaletteChannel(0, 31, stage, 3);
-        nextColor = red | (green << 5) | (blue << 10);
-        gBgPaletteBuffer[0x5a / 2] = nextColor;
-        gBgPaletteBuffer[0x10e / 2] = nextColor;
-    }
-}
 
-/* A stored preset is resolved by reference; dynamic restoration already has a bank value. */
+/* TODO: recover the palette-selection API; this one-word preset remains an allocation concession. */
 struct VanargandPaletteSelection {
     s32 bank;
 };
@@ -160,7 +126,7 @@ static inline void ApplyPaletteBank(struct Vanargand *p, struct Vanargand *self,
         case 0x6F: {
             CpuSet(gPaletteBankData + 0xDE0, p->palette, 0x04000020);
             CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
-            SetStagePaletteColors(p->transition);
+            Vanargand_SetStageColors(p->transition);
             break;
         }
         case 0x82:
@@ -238,9 +204,6 @@ s32 Vanargand_ApplyPendingDamage(void *);
 s32 Vanargand_ApplyRequestedMode(void *);
 void *VanargandProjectilePool_Create(s32, s32);
 void *VanargandAfterimagePool_Create(void);
-struct InitPosition {
-    s32 x : 16, y : 16, z : 16;
-};
 static inline void SetMode(struct Vanargand *p, s32 mode, s32 step, s32 phase)
 {
     p->mode = mode;
@@ -260,7 +223,7 @@ static inline void SetPosition(struct SceneVec *position, s32 x, s32 y, s32 z)
 s32 Vanargand_Init(struct Vanargand *p, void *arg)
 {
     struct Vanargand *self = p;
-    struct InitPosition position;
+    struct SceneVec position;
     s32 healthParameter;
     s32 type = Script_GetKeywordValue('t', 5);
     s32 health;
@@ -381,9 +344,9 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
     CpuSet(ScriptProc_Start(0x92B3, 0x454B) + 0x14, p->fadeA, 0x04000080);
     CpuSet(ScriptProc_Start(0x92B3, 0xEEE9) + 0x14, p->fadeB, 0x04000080);
     CpuSet(ScriptProc_Start(0x92B3, 0xF392) + 0x14, p->fadeC, 0x04000080);
-    SceneBackdrop_Initialize(p, (void *)&p->backdrop);
-    Vanargand_InitAnimatedAttachment(p, (void *)&p->animation);
-    Vanargand_InitSpriteGroup(p, (void *)&p->spriteGroup, (void *)&p->spriteAnchor,
+    SceneBackdrop_Initialize(p, &p->coordinates);
+    Vanargand_InitAnimatedAttachment(p, &p->animation);
+    Vanargand_InitSpriteGroup(p, (void *)&p->spriteGroup, &p->coordinates.shifted,
                               (void *)&p->spriteParameter);
     if (p->variant)
         Vanargand_InitPart(p, (void *)&p->part);
@@ -391,8 +354,7 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         SetPosition(&p->partPosition, 0x33B, 0x100, 0x33B);
     }
     RestorePalette(p, p);
-    SceneActors_StartUnmirroredAnimation(self, (void *)&p->animation, (void *)&p->drawable, 2, 1,
-                                         0);
+    SceneActors_StartUnmirroredAnimation(self, &p->animation, &p->drawable, 2, 1, 0);
     SceneActors_SetHealthLimits(self, health, health, healthParameter);
     PositionedEffect_InitAttackCollider(p);
     PositionedEffect_InitRadialAttackColliders(p);
@@ -401,29 +363,25 @@ s32 Vanargand_Init(struct Vanargand *p, void *arg)
         case 0:
             SetMode(self, 0, 0, 0);
             ChangeState(self, 1, ActorSoundPhase_StartFlaggedAnimation);
-            p->attachment =
-                Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
+            p->attachment = Vanargand_CreatePartController(&p->coordinates.position, p->palette, 1);
             break;
         case 1:
             SetMode(self, 2, 0, 1);
             ChangeState(self, 26, Vanargand_OnPrimaryStopState);
-            p->attachment =
-                Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
+            p->attachment = Vanargand_CreatePartController(&p->coordinates.position, p->palette, 0);
             SetPosition(&self->position, 0x33B, 0x100, 0x33B);
             p->presentationMode = 1;
             break;
         case 2:
             SetMode(self, 2, 0, 0);
             ChangeState(self, 1, ActorSoundPhase_StartFlaggedAnimation);
-            p->attachment =
-                Vanargand_CreatePartController((void *)&p->partController, p->palette, 1);
+            p->attachment = Vanargand_CreatePartController(&p->coordinates.position, p->palette, 1);
             p->presentationMode = 0;
             break;
         case 3:
             SetMode(self, 2, 0, 9);
             ChangeState(self, 29, Vanargand_OnAlternateStopState);
-            p->attachment =
-                Vanargand_CreatePartController((void *)&p->partController, p->palette, 0);
+            p->attachment = Vanargand_CreatePartController(&p->coordinates.position, p->palette, 0);
             {
                 struct VanargandPaletteSelection selection;
                 selection.bank = 0x82;

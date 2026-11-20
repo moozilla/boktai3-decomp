@@ -1,6 +1,8 @@
 #include "global.h"
 #include "menu_prompt.h"
 #include "game_state.h"
+#include "player.h"
+#include "dark_loan_screen.h"
 #include "input.h"
 #include "render.h"
 
@@ -10,14 +12,9 @@ void Hud_InitSelectionBounds(s32, s32);
 s32 Anim_Step(void *, void *);
 void SceneHud_FadeOutPage(void *);
 void Hud_SetupBackgroundLayer(void *, u32, s32, s32, u32);
-void Anim_SetKeyframes(void *, void *, s32, s32, s32);
 s32 Anim_LoadKeyframe(void *, void *, u32, u32);
-void MenuPrompt_UpdateSelectionSprites(struct MenuPrompt *);
-void ScenePanel_BeginAccountMenu(struct MenuPromptPanel *);
 
 void PauseMenu_HideAllSprites(void *);
-
-void MenuPrompt_PulseDisplay(struct MenuPrompt *);
 
 void MenuPrompt_BeginPulseDisplay(u8 *hud)
 {
@@ -32,31 +29,27 @@ void MenuPrompt_BeginPulseDisplay(u8 *hud)
     Hud_SetUpdateCallback(hud, MenuPrompt_PulseDisplay);
 }
 
-void MenuPrompt_UpdateChoice(struct MenuPrompt *);
-
-void MenuPrompt_RampDisplay(struct MenuPrompt *p)
+void MenuPrompt_RampDisplay(struct SceneHudState *p)
 {
-    if (p->view.ramp.timer <= 15)
-        Hud_InitSelectionBounds(p->view.ramp.timer * 4, 0);
+    if (p->pageFadeTimer <= 15)
+        Hud_InitSelectionBounds(p->pageFadeTimer * 4, 0);
     else
         Hud_InitSelectionBounds(64, 0);
-    Anim_Step(p->view.ramp.animation, p->view.ramp.animationData);
-    if (p->view.ramp.timer++ > 15)
+    Anim_Step(&p->accountAnimation, &p->accountResource);
+    if (p->pageFadeTimer++ > 15)
         Hud_SetUpdateCallback(p, MenuPrompt_UpdateChoice);
 }
 
-int PauseMenu_UpdateBinaryChoice(struct MenuPrompt *);
+int PauseMenu_UpdateBinaryChoice(struct SceneHudState *);
 
 void Sound_PlaySong(u32);
 
-void MenuPrompt_FadeChoice(struct MenuPrompt *);
+void ScenePanel_BeginDetail(struct SceneHudState *);
 
-void ScenePanel_BeginDetail(struct MenuPrompt *);
-
-void MenuPrompt_UpdateChoice(struct MenuPrompt *p)
+void MenuPrompt_UpdateChoice(struct SceneHudState *p)
 {
     int choice;
-    Anim_Step(p->view.ramp.animation, p->view.ramp.animationData);
+    Anim_Step(&p->accountAnimation, &p->accountResource);
     choice = PauseMenu_UpdateBinaryChoice(p);
     if (choice == 0) {
         Sound_PlaySong(0xDE);
@@ -67,14 +60,14 @@ void MenuPrompt_UpdateChoice(struct MenuPrompt *p)
     }
 }
 
-void MenuPrompt_FadeChoice(struct MenuPrompt *p)
+void MenuPrompt_FadeChoice(struct SceneHudState *p)
 {
-    if (p->view.ramp.timer <= 15)
-        Hud_InitSelectionBounds((16 - p->view.ramp.timer) * 4, 0);
+    if (p->pageFadeTimer <= 15)
+        Hud_InitSelectionBounds((16 - p->pageFadeTimer) * 4, 0);
     else
         Hud_InitSelectionBounds(0, 0);
-    Anim_Step(p->view.ramp.animation, p->view.ramp.animationData);
-    if (p->view.ramp.timer++ > 15)
+    Anim_Step(&p->accountAnimation, &p->accountResource);
+    if (p->pageFadeTimer++ > 15)
         ScenePanel_BeginAccountMenu(p);
 }
 
@@ -84,22 +77,22 @@ void ScenePanel_BeginSelection(void *);
 
 void PauseMenu_UpdateQuantityInput(void *);
 
-void ScenePanel_UpdateDetail(struct MenuPromptPanel *p)
+void ScenePanel_UpdateDetail(struct SceneHudState *p)
 {
-    Anim_Step(&p->mainSprite, p->keyframes);
+    Anim_Step(&p->accountAnimation, &p->accountResource);
     if (gPadState[1] & 1) {
-        if (p->timer == 0)
+        if (p->valueRate == 0)
             Sound_PlaySong(0xDE);
         else {
             s32 *total;
             s32 value;
-            p->account->amount += p->timer;
+            p->actionOwner->currentStatB += p->valueRate;
             {
                 s32 *balance = &gGameState->menuRewardBalance;
-                *balance += p->timer * p->iconIndex;
+                *balance += p->valueRate * p->selectedQuantity;
             }
             total = &gGameState->unk51C;
-            value = *total + p->timer * p->iconIndex;
+            value = *total + p->valueRate * p->selectedQuantity;
             if (value < 0)
                 value = 0x7FFFFFFF;
             *total = value;
@@ -115,18 +108,14 @@ void ScenePanel_UpdateDetail(struct MenuPromptPanel *p)
 
 int MessageWindow_SetNumberArgument(int, int);
 
-void Script_Call(u32, void *);
-
-void Hud_UpdateFirstPostScriptWait(u8 *);
-
-void MenuPrompt_FinishDelayedChoice(struct MenuPrompt *p)
+void MenuPrompt_FinishDelayedChoice(struct SceneHudState *p)
 {
-    Anim_Step(p->view.delayed.animation, p->view.delayed.animationData);
-    if (++p->view.delayed.timer > 150) {
-        if (p->view.delayed.result) {
+    Anim_Step(&p->accountAnimation, &p->accountResource);
+    if (++p->pageFadeTimer > 150) {
+        if (p->valueRate) {
             MessageWindow_ShowMessage(5);
-            if (p->view.delayed.script)
-                Script_Call(p->view.delayed.script, 0);
+            if (p->accountCompletionScript)
+                Script_Call(p->accountCompletionScript, 0);
             else
                 MessageWindow_SetNumberArgument(0, 3);
             Hud_SetUpdateCallback(p, Hud_UpdateFirstPostScriptWait);
@@ -166,13 +155,11 @@ void MenuPrompt_UpdatePageExit(u8 *hud)
     }
 }
 
-s32 ScriptPanel_IsCallbackActive(void *);
-
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
-void MenuPrompt_WaitForChildPhase(struct MenuPrompt *p)
+void MenuPrompt_WaitForChildPhase(struct SceneHudState *p)
 {
-    if (ScriptPanel_IsCallbackActive(p->view.child.child)) {
+    if (ScriptPanel_IsCallbackActive(p->loanDisplay)) {
         ScreenTransition_SendCommand(2, 4, 4, 4, 4, 65535, 0);
         ScenePanel_BeginAccountMenu(p);
     }
@@ -186,16 +173,16 @@ void Hud_UpdateFirstPostScriptWait(u8 *s)
         Hud_SetUpdateCallback(s, SceneHud_FadeOutPage);
 }
 
-void MenuPrompt_PulseDisplay(struct MenuPrompt *p)
+void MenuPrompt_PulseDisplay(struct SceneHudState *p)
 {
-    Anim_Step(p->view.ramp.animation, p->view.ramp.animationData);
-    if (p->view.ramp.timer <= 15)
-        Hud_InitSelectionBounds(p->view.ramp.timer * 4, 0);
-    else if (p->view.ramp.timer <= 133)
+    Anim_Step(&p->accountAnimation, &p->accountResource);
+    if (p->pageFadeTimer <= 15)
+        Hud_InitSelectionBounds(p->pageFadeTimer * 4, 0);
+    else if (p->pageFadeTimer <= 133)
         Hud_InitSelectionBounds(64, 0);
     else
-        Hud_InitSelectionBounds((150 - p->view.ramp.timer) * 4, 0);
-    if (p->view.ramp.timer++ > 149)
+        Hud_InitSelectionBounds((150 - p->pageFadeTimer) * 4, 0);
+    if (p->pageFadeTimer++ > 149)
         ScenePanel_BeginAccountMenu(p);
 }
 
@@ -218,30 +205,26 @@ u32 ScrollingDialogue_ClearScript(void);
 
 void PauseMenu_HideAllSprites(void *);
 
-void DarkLoan_OpenDisplay(void *);
-
-void MenuPrompt_WaitForChildPhase(struct MenuPrompt *);
-
-void MenuPrompt_ResumeChild(struct MenuPrompt *p)
+void MenuPrompt_ResumeChild(struct SceneHudState *p)
 {
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();
-    if (ScriptPanel_IsCallbackActive(p->view.child.child)) {
+    if (ScriptPanel_IsCallbackActive(p->loanDisplay)) {
         PauseMenu_HideAllSprites(p);
-        DarkLoan_OpenDisplay(p->view.child.child);
+        DarkLoan_OpenDisplay(p->loanDisplay);
         Hud_SetUpdateCallback(p, MenuPrompt_WaitForChildPhase);
     }
 }
 
-void MenuPrompt_UpdateSelectionSprites(struct MenuPrompt *p)
+void MenuPrompt_UpdateSelectionSprites(struct SceneHudState *p)
 {
-    Anim_LoadKeyframe(p->view.selection.firstSprite, p->view.selection.animationData,
-                      p->view.selection.selection + 25, 1);
-    Anim_LoadKeyframe(p->view.selection.secondSprite, p->view.selection.animationData,
-                      (u16)(28 - p->view.selection.selection), 1);
-    p->view.selection.selectionX = 0;
-    p->view.selection.selectionY = p->view.selection.selection << 5;
+    Anim_LoadKeyframe(&p->accountChoices[0], &p->accountResource,
+                      p->accountSelection + 25, 1);
+    Anim_LoadKeyframe(&p->accountChoices[1], &p->accountResource,
+                      (u16)(28 - p->accountSelection), 1);
+    p->accountCursor.position.x = 0;
+    p->accountCursor.position.y = p->accountSelection << 5;
 }
 
 void ScenePanel_UpdateAccountIntro(void);
@@ -286,35 +269,35 @@ s32 MessageWindow_SetDisplayMode(s32);
 
 void SceneSequence_UpdateRamp64(void);
 
-void ScenePanel_BeginAccountMenu(struct MenuPromptPanel *p)
+void ScenePanel_BeginAccountMenu(struct SceneHudState *p)
 {
     u32 zero;
-    u16 *coord;
-    struct MenuPromptSprite *anim;
+    s16 *coord;
+    struct SceneInputWidget *anim;
     MessageWindow_Clear();
     ScrollingDialogue_ClearScript();
     ScrollingDialogue_RequestHide();
     MessageWindow_SetBounds(1, 1, 28, 6);
-    MessageWindow_SetMessageTable(p->text);
+    MessageWindow_SetMessageTable(p->optionLScript);
     MessageWindow_SetDisplayMode(1);
-    Hud_SetupBackgroundLayer(p, p->resource, 0, 2, p->mapResource);
+    Hud_SetupBackgroundLayer(p, p->panelResource, 0, 2, p->panelConfig);
     PauseMenu_HideAllSprites(p);
-    p->mainSprite.flags &= ~1;
-    coord = &p->mainSprite.x;
+    p->accountAnimation.flags &= ~1;
+    coord = &p->accountAnimation.position.x;
     zero = 0;
     {
         u32 v = 0xFFE4;
         *coord = v;
     }
-    p->mainSprite.y = 32;
-    Anim_SetKeyframes(&p->mainSprite, p->keyframes, 7, 2, zero);
-    p->secondary[0].flags &= ~1;
-    if (p->account->kind != 6)
-        p->secondary[1].flags &= ~1;
-    p->detailSprite.flags &= ~1;
-    anim = &p->detailSprite;
-    Anim_LoadKeyframe(anim, p->keyframes, 0x1D, 1);
-    Anim_SetKeyframes(anim, p->keyframes, 10, 1, zero);
+    p->accountAnimation.position.y = 32;
+    Anim_SetKeyframes(&p->accountAnimation, &p->accountResource, 7, 2, zero);
+    p->accountChoices[0].flags &= ~1;
+    if (p->actionOwner->actionMode != 6)
+        p->accountChoices[1].flags &= ~1;
+    p->accountCursor.flags &= ~1;
+    anim = &p->accountCursor;
+    Anim_LoadKeyframe(anim, &p->accountResource, 0x1D, 1);
+    Anim_SetKeyframes(anim, &p->accountResource, 10, 1, zero);
     MenuPrompt_UpdateSelectionSprites(p);
     MessageWindow_ShowMessage(7);
     Hud_SetUpdateCallback(p, SceneSequence_UpdateRamp64);

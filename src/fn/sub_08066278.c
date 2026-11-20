@@ -51,7 +51,7 @@ static inline void ActorAttachment_SetupPart(struct ActorAttachmentManagerView *
     }
     part->unknownC[4] = 127;
     part->unknownC[3] = one;
-    slot->sequences[0].unknownA = 255;
+    slot->sequences[0].sequenceId = 255;
     switch (slot->kind) {
         case 0:
             sequence = ((struct ActorAttachmentManagerResources *)manager)->sequenceA;

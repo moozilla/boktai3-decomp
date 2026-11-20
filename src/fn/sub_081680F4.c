@@ -1,4 +1,5 @@
 #include "global.h"
+#include "palette_pulse.h"
 #include "render.h"
 
 struct Hud {
@@ -10,7 +11,6 @@ struct Hud {
 extern const u16 gUnk_08610E78[];
 u16 *Hud_GetTilemapCell(s32, s32, s32);
 s32 PauseMenu_IsEquipmentSelectionEnabled(struct Hud *);
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void Hud_LoadConditionalPaletteRows(struct Hud *hud)
 {
     const u16 *source = gUnk_08610E78;

@@ -1,6 +1,7 @@
 #include "global.h"
+#include "ratatosk_particle.h"
 
-u32 Ratatosk_OnAnimatedParticleUpdate(void)
+s32 Ratatosk_OnAnimatedParticleUpdate(struct RatatoskParticle *particle, s32 slot)
 {
     return 0;
 }

@@ -13,11 +13,11 @@ static inline void SceneActorAnimation_ApplyDirectionalSelection(struct RoomActo
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
         selection += variant;

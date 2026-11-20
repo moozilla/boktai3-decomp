@@ -1,4 +1,5 @@
 #include "menu_display.h"
+#include "palette_pulse.h"
 
 s32 Inventory_GetEquipmentId(u32);
 

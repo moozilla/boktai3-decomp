@@ -437,7 +437,7 @@ static inline u16 *Bat_PrepareLanding(struct ChaseActor *actor, s32 frame)
     SceneActorChase_SetReactionFlags(actor, 0x10);
     reactionFlags = &actor->base.reactionFlags;
     if (frame <= 17) {
-        animation = ((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+        animation = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if (animation->index == 0 && animation->elapsed == (animation->duration != 0) &&
             animation->duration != 1)
             animation->elapsed = 0;
@@ -649,9 +649,7 @@ static inline u8 Bat_DisplacementStopped(s32 x, s32 z)
 void Bat_UpdateRecoilRecovery(struct ChaseActor *actor, s32 frame)
 {
     struct DisplaySequenceState *animation =
-        (struct DisplaySequenceState *)((struct SceneActorAnimationSequenceDrawable *)
-                                            actor->base.drawable)
-            ->sequence;
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
     struct ContactPackedVector range;
     struct SceneActorChaseGroup *group = &actor->group;
     s16 *x, *z;

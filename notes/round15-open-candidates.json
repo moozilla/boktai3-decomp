@@ -1,0 +1,690 @@
+{
+  "format": "round15-open-source-patch-v1",
+  "accepted_source_base": "821f3a25ca31e2cabc70239420524dff6f4cdb23",
+  "policy": "Apply selected source-file sections only in an isolated checkout. These proposals do not match; some deliberately isolate priority forms while retaining other inherited debt. No diagnostic controls appear in this patch. Whole-unit metrics include length differences and shifted later functions.",
+  "patch_sha256": "241927a62562c8f9bb39523d04bd8a0f51e474a2ca30a371b718b87caa63eb5e",
+  "records": [
+    {
+      "name": "fragment",
+      "source_path": "src/fn/sub_08014CA4.c",
+      "accepted_source_blob": "d4edc82a6d8af62a0723edb77a3835c78d8d2893",
+      "accepted_source_sha256": "4121cbc44ae61473a33d22184105ac377c83a73eb6955aeea7d9897ad71fdd8f",
+      "candidate_source_sha256": "6eca50f2c7d19d9e1523267e9ffb65ec2fd23771d3124c2b018605da3870aed1",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134302884,
+        "candidate_bytes": 704,
+        "target_bytes": 704,
+        "size_delta": 0,
+        "different_byte_count": 531,
+        "original_sha256": "1bf3f497cecf39d17395b5eeac7b182b2daceacf2d3d7cc52f69a26f9df63757",
+        "candidate_sha256": "d92d620e4a215823008662ec12119af580278db15b35b6dfa2b40a59dbafe8bb"
+      },
+      "accepted_unit_bytes": 704,
+      "accepted_unit_sha256": "1bf3f497cecf39d17395b5eeac7b182b2daceacf2d3d7cc52f69a26f9df63757",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing the three zero address adjustments; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The parallel g/base owners and separately strided speed, lifetime, resource and byte cursors remain; their original iteration operation is unrecovered.",
+        "Private Random/RandomByte helpers and the byte-cursor velocity write remain outside this three-expression deletion."
+      ]
+    },
+    {
+      "name": "animated",
+      "source_path": "src/fn/sub_080154EC.c",
+      "accepted_source_blob": "b07ba60071980b1ad79bd3cd4361bba0a59fc75f",
+      "accepted_source_sha256": "0be1edbaa9d3c3bb999713401b8e0150540052088710c7bf273d0954e930252d",
+      "candidate_source_sha256": "55383a404c2ffea7244acdad0d2f3eb8c80b9b3b5476b584c615e0b6daa008e7",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134305004,
+        "candidate_bytes": 1164,
+        "target_bytes": 1176,
+        "size_delta": -12,
+        "different_byte_count": 509,
+        "original_sha256": "387b29c28fd37818b40320488f111d67d5e48829db59ad8ce447ccbcd67476ed",
+        "candidate_sha256": "d4af78058483f74d6dd6e60c07a60a44ca8ef72231c68d2ac9df3dab47f9ab8e"
+      },
+      "accepted_unit_bytes": 1176,
+      "accepted_unit_sha256": "387b29c28fd37818b40320488f111d67d5e48829db59ad8ce447ccbcd67476ed",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing the type-6/type-7 animation handle constructions and impossible guards; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "Private Obj/Anim/Piece/Manager layouts and reinterpretation of gAnimatedParticleManager remain instead of a completed shared owner/API migration.",
+        "The saved/first/a animation-pointer roles, separate goto call tails and expanded playback body remain; the real operation that distinguishes the ROM call tails is unresolved."
+      ]
+    },
+    {
+      "name": "fading",
+      "source_path": "src/fn/sub_08016118.c",
+      "accepted_source_blob": "785b65961999d46b4d3271b79a20e403f1738e18",
+      "accepted_source_sha256": "bdc347e8519fb21f2ad89b732792c24a8c8ac711f33e3f8b65c69fbbd9149af7",
+      "candidate_source_sha256": "5ba0c95e3041663bd42c7f8481a6e2a45d9e663f2f8d7954fd6fc4b08d13d065",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134308120,
+        "candidate_bytes": 540,
+        "target_bytes": 540,
+        "size_delta": 0,
+        "different_byte_count": 122,
+        "original_sha256": "6d0f5efd78ed1caefe920f27e5d6025b3b35f16b76b9b797d5f43b7001216590",
+        "candidate_sha256": "d5b9beda57ed59988b497ad74d71c6ba72f794510fe63ff7f86167d4cf0c10e2"
+      },
+      "accepted_unit_bytes": 540,
+      "accepted_unit_sha256": "6d0f5efd78ed1caefe920f27e5d6025b3b35f16b76b9b797d5f43b7001216590",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing the flags-derived zero adjustment of the motion pointer; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The independent lifetime guard still tests (s32)raw < 0 after raw is loaded from the byte-sized lifetime.",
+        "Expanded sequence playback with DisplaySequenceControl views and separate 68-byte component cursors remains unrecovered by this candidate."
+      ]
+    },
+    {
+      "name": "equipment",
+      "source_path": "src/fn/sub_08038448.c",
+      "accepted_source_blob": "2140576b6b91cafdb1c40d074d747ddde5801aae",
+      "accepted_source_sha256": "a92a04ca7db2041f06aacfd4680b59c7444441efef8cacf2794cda4e0c50315e",
+      "candidate_source_sha256": "d401cdf991f97551f0c540c2218fd479b245fcb0fe2a45df6eb32fe0915b862d",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134448200,
+        "candidate_bytes": 408,
+        "target_bytes": 408,
+        "size_delta": 0,
+        "different_byte_count": 277,
+        "original_sha256": "40cf395da64319253d9ad68bb4e9f70c8e78b767e42d30a75b5f932bb8c74203",
+        "candidate_sha256": "1a2588009c8f2c83d5b648f304858edddfaf5c55121f42492c07b3a2eba78a2d"
+      },
+      "accepted_unit_bytes": 408,
+      "accepted_unit_sha256": "40cf395da64319253d9ad68bb4e9f70c8e78b767e42d30a75b5f932bb8c74203",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Dead-guard deletion and shared GameState owner hypothesis for equipment selection; the complete source operation is not comprehensively certified.",
+      "retained_debt": [
+        "WirelessEquipmentMenu remains a tentative private padded owner rather than a recovered shared menu record.",
+        "The explicit RNG-index/table access and selection-mask traversal remain in their inherited form; this candidate does not establish their original shared operation."
+      ]
+    },
+    {
+      "name": "result-panel",
+      "source_path": "src/fn/sub_0803B40C.c",
+      "accepted_source_blob": "1a18e381c1840235b9a58ec3371abb333cd05915",
+      "accepted_source_sha256": "f8ee4a281e397bebf4d575063c5920f626b964728391bc2d80ff0afb6b810e69",
+      "candidate_source_sha256": "d323226d1923bd10568d0aa2a6ecdf11627dcc588d8e0320d47fdf4493e2faba",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134460428,
+        "candidate_bytes": 680,
+        "target_bytes": 684,
+        "size_delta": -4,
+        "different_byte_count": 565,
+        "original_sha256": "1d862a2a24579dc80dd37d65af0ac6def5c9d373d3126a47ae6b6f34c8f7e9a6",
+        "candidate_sha256": "1470df227a5fd49fe0acb562562cd4c92f09538fe2c83a440a992289e22e260e"
+      },
+      "accepted_unit_bytes": 684,
+      "accepted_unit_sha256": "1d862a2a24579dc80dd37d65af0ac6def5c9d373d3126a47ae6b6f34c8f7e9a6",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Resource-copy guard removal on top of the accepted result-panel owner/state recovery; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The two zero locals and the drawFlags literal local remain.",
+        "The expanded sequence-playback body, its control views and saved sprite/resource pointer roles remain; no complete shared-playback recovery is claimed."
+      ]
+    },
+    {
+      "name": "retreat",
+      "source_path": "src/fn/sub_0804373C.c",
+      "accepted_source_blob": "de7289d6a15f9c7a4043fdea742b9b00adc0c138",
+      "accepted_source_sha256": "937e2d023f1931ed15c065f198108af81dd523b2c717fb86d0a31834ac269186",
+      "candidate_source_sha256": "9bc87fb3893c6cd17af65ac98c6ae26fb8b7139198e75f84c4216c178bb4b5bf",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134494012,
+        "candidate_bytes": 776,
+        "target_bytes": 788,
+        "size_delta": -12,
+        "different_byte_count": 675,
+        "original_sha256": "f5e5fe69272978fc60d0846018e039ff6ad312805072a43430112cbd156bf6b6",
+        "candidate_sha256": "bebc85bf81e5df1084033a22b535407516374f271d38c270b55cc94fda597ba4"
+      },
+      "accepted_unit_bytes": 788,
+      "accepted_unit_sha256": "f5e5fe69272978fc60d0846018e039ff6ad312805072a43430112cbd156bf6b6",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing the synthetic random-origin capture and zero contribution; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The random union still reuses storage for a mask and an RNG cursor pointer.",
+        "The do/while(0) forms around the mask, radius reduction and nextRandomFrom cursor update remain.",
+        "Separate earlyTable/table and destination/position aliases remain; their full sampling and movement operation is unrecovered."
+      ]
+    },
+    {
+      "name": "tether",
+      "source_path": "src/tether_actor.c",
+      "accepted_source_blob": "3cfc284ff16f5c687905823b6f4dbcdfcb8b55ec",
+      "accepted_source_sha256": "b913a4f6723b554cfc2c9c9c338157ffd346d83fa65832ba1a717d4dd8375682",
+      "candidate_source_sha256": "2efe310080315ff3886434103e14123cba24f6f62ea0682984aedb6757a8c9f7",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134514172,
+        "candidate_bytes": 20504,
+        "target_bytes": 20516,
+        "size_delta": -12,
+        "different_byte_count": 2436,
+        "original_sha256": "c74a7ae1ad9fc621e52411d3ccef5a868e7011e6db1e2b53ed03e15f6493e1f3",
+        "candidate_sha256": "c924ee767357d33e926a797a45d5ba093d15f8d31b2a08811b189f83775e924d"
+      },
+      "accepted_unit_bytes": 20516,
+      "accepted_unit_sha256": "c74a7ae1ad9fc621e52411d3ccef5a868e7011e6db1e2b53ed03e15f6493e1f3",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Single-expression bounce-return experiment replacing the stateFrame-derived zero table offset; the rest of the merged unit and its helpers are not comprehensively certified.",
+      "retained_debt": [
+        "The wider RNG and bounce operation was not comprehensively audited by this single-expression candidate; it is not certified as recovered original source.",
+        "Existing source forms elsewhere in tether_actor.c are unchanged and outside this single-function trial; no whole-unit concession-free claim is made."
+      ]
+    },
+    {
+      "name": "rig",
+      "source_path": "src/fn/sub_0805B0F0.c",
+      "accepted_source_blob": "df7fe20963469eab7ac220301c119d999f34dc35",
+      "accepted_source_sha256": "f52bcb66e12c2b0bea70de122f82854bbc79c393709d59c8e855eab327b44076",
+      "candidate_source_sha256": "0fd347e6f187069675f9eccdf7b61918ed2cb5340eedfafdf08d224cfded328a",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134590704,
+        "candidate_bytes": 412,
+        "target_bytes": 412,
+        "size_delta": 0,
+        "different_byte_count": 12,
+        "original_sha256": "875e72eddc7c0a40051267f43913fb935893deba9883a794661846fda9316044",
+        "candidate_sha256": "1b2eb86aa7362dab7701196b962ac9eed671babc582d2783b6ffcd145386ef78"
+      },
+      "accepted_unit_bytes": 412,
+      "accepted_unit_sha256": "875e72eddc7c0a40051267f43913fb935893deba9883a794661846fda9316044",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial replacing the state-derived zero table offset with gRandomTable; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The input/panel alias and explicit table/seed/mask temporaries, including mask = 1023, remain.",
+        "The inherited sampling and rig-initialization helper structure is not recovered or certified by this one-expression change."
+      ]
+    },
+    {
+      "name": "choice",
+      "source_path": "src/fn/sub_0805E1D0.c",
+      "accepted_source_blob": "6fb0271c036183439d0418e6db7abc1e39e94b94",
+      "accepted_source_sha256": "276b6e0fa4ea38f4903a42311a0546b18154bbc3def5d85fbb920cb9be510a36",
+      "candidate_source_sha256": "9c248aa6b69ddb1a5f4d4b70cd26e25ba86183e4cdf06d51aa1fc2bb01abe88f",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134603216,
+        "candidate_bytes": 160,
+        "target_bytes": 160,
+        "size_delta": 0,
+        "different_byte_count": 2,
+        "original_sha256": "91eae26d5e7b013095db942b261c36870c4d8f4d8b96cc3947e6dafa4a279bbf",
+        "candidate_sha256": "7eb678eae017bbb733e64ba5e120f5e545edb8c506fcbd882e7785bf232b27a3"
+      },
+      "accepted_unit_bytes": 160,
+      "accepted_unit_sha256": "91eae26d5e7b013095db942b261c36870c4d8f4d8b96cc3947e6dafa4a279bbf",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": "Preserves the accepted palette_pulse.h declaration.",
+      "candidate_scope": "Priority-expression experiment separating the key value from the resource pointer while preserving palette_pulse.h; remaining source forms are not comprehensively certified.",
+      "retained_debt": [
+        "savedResource/savedSelection/savedBlink aliases, confirm = 1 and the pressed-mask locals remain.",
+        "The explicit accepted/confirm AND and narrowed key-mask normalization remain in the frontier; the original operation producing the ROM operand order is unresolved."
+      ]
+    },
+    {
+      "name": "slime",
+      "source_path": "src/slime.c",
+      "accepted_source_blob": "17268dbe9109274c64dd8592baeb78d1b59e14c6",
+      "accepted_source_sha256": "7869035f616adb4363ab6d86b586546ec5f2fb598ed318f3a85235a5c6faa985",
+      "candidate_source_sha256": "5dde640c615006756dde57da768aff3e14f4e9b498a38a6ee145d5fc31547999",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134799880,
+        "candidate_bytes": 15436,
+        "target_bytes": 15436,
+        "size_delta": 0,
+        "different_byte_count": 177,
+        "original_sha256": "02f588fc9f29894eeee59c7f9f4cb0b4b0706b5520320f4f3ccc35a7ff8e1f49",
+        "candidate_sha256": "936e7266ae38d14eadebc77394b0d5bc408a8197ead3fc031eaed50a101ec8ac"
+      },
+      "accepted_unit_bytes": 15436,
+      "accepted_unit_sha256": "02f588fc9f29894eeee59c7f9f4cb0b4b0706b5520320f4f3ccc35a7ff8e1f49",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Shared animation-operation experiment in Slime_UpdateRandomWait; remaining source, shared helpers and the merged unit are not comprehensively certified.",
+      "retained_debt": [
+        "The family-specific SlimeDrawable sequence view, including its byte-array animation resource, and the existing sequence/keyframe interface assumptions remain.",
+        "The rest of slime.c is unchanged; replacing this private helper does not certify its other allocation-oriented source forms."
+      ]
+    },
+    {
+      "name": "spider",
+      "source_path": "src/spider.c",
+      "accepted_source_blob": "9d4a15ff4c7bd972805665184b78eb0d3ea53e19",
+      "accepted_source_sha256": "c4fc71638cadad5ca40982f54262aa60e246bb4ebb3508b3f753422987216686",
+      "candidate_source_sha256": "e604c7b1cbf279d4ca01682530c8024ffe0eb327757983e70ec2d9a3eb216692",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134881352,
+        "candidate_bytes": 15180,
+        "target_bytes": 15172,
+        "size_delta": 8,
+        "different_byte_count": 6383,
+        "original_sha256": "48020aaa049185e6aa936494b7dc212be3d8fefaf9160077581f4e83c10051e8",
+        "candidate_sha256": "9c2c5a698a8c87e8b62a4631f8543383d0e675ce4fbca000f0cca7df6a0813b8"
+      },
+      "accepted_unit_bytes": 15172,
+      "accepted_unit_sha256": "48020aaa049185e6aa936494b7dc212be3d8fefaf9160077581f4e83c10051e8",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing zero-derived table, index-address, mask and flag adjustments in the wander function; remaining source and the merged unit are not comprehensively certified.",
+      "retained_debt": [
+        "The u8 pointer field still aliases the RNG-index address and is later reused for the body-direction address.",
+        "The mask = 1023 local and other named constant temporaries remain.",
+        "The route result still passes through the s16 moved local; the original route-result width and complete call/store operation remain unresolved."
+      ]
+    },
+    {
+      "name": "vorn",
+      "source_path": "src/fn/sub_080AEE08.c",
+      "accepted_source_blob": "890db10c44a54b08e42e0895c78319ced98b6f7e",
+      "accepted_source_sha256": "a4e15dffce4efee186f46906d593303988eabd9d8f8404f36ac73140a791bc73",
+      "candidate_source_sha256": "95ac080c66713524f8e5001e581fd49a43c5757f04bfa6bfe877fc7afd5f93c4",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134934024,
+        "candidate_bytes": 988,
+        "target_bytes": 984,
+        "size_delta": 4,
+        "different_byte_count": 15,
+        "original_sha256": "49a8d351adbf1451e49c34a05a6ac8b6afbca13c48ad6bf4b2361699268945bf",
+        "candidate_sha256": "ec88609f7b212e3c20a4d6bf0728d72222f159fe6d2fa845238949467478be62"
+      },
+      "accepted_unit_bytes": 984,
+      "accepted_unit_sha256": "49a8d351adbf1451e49c34a05a6ac8b6afbca13c48ad6bf4b2361699268945bf",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing zero terms and recovering the spark range fields; this is not the separately preserved broader rewrite, and remaining source is not comprehensively certified.",
+      "retained_debt": [
+        "completedState is still an early constant-one local reused across the final control/state operations.",
+        "Vorn_RandomSparkCount still uses the PARTICLE_RANDOM_READ_SAMPLE weighting macro.",
+        "Private state/control wrappers and the final mask local remain outside the priority-only recovery."
+      ]
+    },
+    {
+      "name": "skeleton",
+      "source_path": "src/fn/sub_080BD1F0.c",
+      "accepted_source_blob": "f583812fd6d81ac87401d1d162fb0ce23cb114e7",
+      "accepted_source_sha256": "1bccd087072a590d00f77d60f0eb1cf3814bee09ffd83439d3b1170617655392",
+      "candidate_source_sha256": "3a6dbd96db29b3e45e982a49a848d4048c6643e2e8ce3107afcde15f95a79479",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 134992368,
+        "candidate_bytes": 7924,
+        "target_bytes": 7924,
+        "size_delta": 0,
+        "different_byte_count": 370,
+        "original_sha256": "5de9cd2d933ecf20a73ddda444f5aeccd8803efd78ab142110ca32fbc92fba7f",
+        "candidate_sha256": "8f9f541fdcef7c21f65ae87338f7193275ee7fdb67e7e0a82c399842757e6a7a"
+      },
+      "accepted_unit_bytes": 7924,
+      "accepted_unit_sha256": "5de9cd2d933ecf20a73ddda444f5aeccd8803efd78ab142110ca32fbc92fba7f",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing two dead table-exit arms and the zero sound-ID term; this is not the separately preserved broader rewrite, and remaining source is not comprehensively certified.",
+      "retained_debt": [
+        "The state union still overlays the Skeleton context pointer with the spark-priority one value.",
+        "The response union still overlays the motion-flags pointer with a later one value.",
+        "Named wrap/bits/count/life/size locals and inherited helper/alias structure remain; removing the priority arms does not authenticate them."
+      ]
+    },
+    {
+      "name": "registry",
+      "source_path": "src/fn/sub_0815F5B4.c",
+      "accepted_source_blob": "cf2f936540e48492cc7a1f6ddd8166524c65e0cd",
+      "accepted_source_sha256": "a5c6996c56ec7bb46265ebe74b777eb7d5936f5a13aed423ee4e401acd1fe072",
+      "candidate_source_sha256": "f96451a656715ccb10825f8498cb38ea760ae607bc06ed7643ae278d520ced5d",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135656884,
+        "candidate_bytes": 68,
+        "target_bytes": 68,
+        "size_delta": 0,
+        "different_byte_count": 32,
+        "original_sha256": "d29e07895cf6cb2c54520208ebba4dc22200c046b4c5bc74af509e59e12094f0",
+        "candidate_sha256": "8e699f2189aeef88d4b151820033524fdc4716319fa00f7611ed144e336a2838"
+      },
+      "accepted_unit_bytes": 68,
+      "accepted_unit_sha256": "d29e07895cf6cb2c54520208ebba4dc22200c046b4c5bc74af509e59e12094f0",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Lookup experiment removing the zero singleton adjustment and impossible ID guard while preserving the original non-advancing mismatch behavior; remaining owner/API forms are not comprehensively certified.",
+      "retained_debt": [
+        "MotionTarget and MotionTargets remain private layouts, including a byte-array task prefix and actor/collider target union.",
+        "The shared registry owner and callback contract are not migrated by this candidate; the target union is retained without a new representation exemption."
+      ]
+    },
+    {
+      "name": "registry-actor",
+      "source_path": "src/fn/sub_0815F6A8.c",
+      "accepted_source_blob": "1290ebf8599de6578915c471bf7a375a2908dc15",
+      "accepted_source_sha256": "0b532cc43d15a8326918087dd19085d3bc7820068c80a04121d82d9e0f80482d",
+      "candidate_source_sha256": "f37e49887318c7393e1706b683487a70baff9b2c0bd00aad0f5623a95fa22ac3",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135657128,
+        "candidate_bytes": 72,
+        "target_bytes": 72,
+        "size_delta": 0,
+        "different_byte_count": 25,
+        "original_sha256": "0ee5823511f9a7a4cc29657a6c256bbaca8284265a66dd91eca70758422f6f3e",
+        "candidate_sha256": "ad6a4f11bd756d3758a0dab154e3f162eac5a2977a9e13e383d12848cb27e647"
+      },
+      "accepted_unit_bytes": 72,
+      "accepted_unit_sha256": "0ee5823511f9a7a4cc29657a6c256bbaca8284265a66dd91eca70758422f6f3e",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Nonvolatile singleton and native-task-prefix hypothesis for actor insertion; the local owner and wider interface migration are not comprehensively certified.",
+      "retained_debt": [
+        "TargetRegistryEntry/TargetRegistry and the singleton declaration remain local duplicates rather than a shared owner contract.",
+        "The object and callback remain void pointers; their wider caller and registry declarations are not migrated by this isolated candidate."
+      ]
+    },
+    {
+      "name": "registry-collider",
+      "source_path": "src/fn/sub_0815F6F0.c",
+      "accepted_source_blob": "d1a67ab6a7896387ddb631ab4554aca830fac591",
+      "accepted_source_sha256": "bd9cdccb7b42ed94f60543064d6bfba51b65077bdcbce0a05164d619aad07501",
+      "candidate_source_sha256": "28749a4d85f27c9792e22c992198ba015d8b905c62bb8cba0d71485914b349f3",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135657200,
+        "candidate_bytes": 68,
+        "target_bytes": 72,
+        "size_delta": -4,
+        "different_byte_count": 25,
+        "original_sha256": "88449a5ca947fdd663c11905cd9c5b51605d2e243253fe452204a3ca68cf4494",
+        "candidate_sha256": "8720d0b032f3b3e95d56c9144752982e995a997dfa17ee9d2a4fdbff12d750f9"
+      },
+      "accepted_unit_bytes": 72,
+      "accepted_unit_sha256": "88449a5ca947fdd663c11905cd9c5b51605d2e243253fe452204a3ca68cf4494",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Nonvolatile singleton and native-task-prefix hypothesis for scene-actor insertion; the local owner and wider interface migration are not comprehensively certified.",
+      "retained_debt": [
+        "TargetRegistryEntry/TargetRegistry and the singleton declaration remain local duplicates rather than a shared owner contract.",
+        "The object and callback remain void pointers; their wider caller and registry declarations are not migrated by this isolated candidate."
+      ]
+    },
+    {
+      "name": "action-icon",
+      "source_path": "src/fn/sub_0816E570.c",
+      "accepted_source_blob": "2e404a14727fefedca4a5ba971952d40f925b3b4",
+      "accepted_source_sha256": "2abb2a788cb4db46f9f783cbb1ce131c85db9328ba0e0589b0dde9e680edbeaf",
+      "candidate_source_sha256": "cde5e588bd4992e3d57e79fc2e31faa4eaa55e21876e072b9a6fc9f235d5848a",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135718256,
+        "candidate_bytes": 376,
+        "target_bytes": 384,
+        "size_delta": -8,
+        "different_byte_count": 347,
+        "original_sha256": "7fd93c2ba38d5f8fad67620863b156be57bdb08aa76ac0937d74fb6a48bde8d1",
+        "candidate_sha256": "c199993122faa67e73a9015c2c724bad3c34df43b8ce4be31bf65df2e6ca352c"
+      },
+      "accepted_unit_bytes": 384,
+      "accepted_unit_sha256": "7fd93c2ba38d5f8fad67620863b156be57bdb08aa76ac0937d74fb6a48bde8d1",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial replacing the artificial RNG address constructor with gRandomTable; remaining motion-owner and source forms are not comprehensively certified.",
+      "retained_debt": [
+        "The spin write still reaches widgetMotions[0].timer through an s16 pointer cast; a native motion-field owner has not been recovered here.",
+        "The u16 speed temporary and its negation remain in the inherited motion setup; this candidate does not establish the original scalar/API structure."
+      ]
+    },
+    {
+      "name": "impact",
+      "source_path": "src/fn/sub_0817AEC8.c",
+      "accepted_source_blob": "b5e93de333248f0664b88dbb1461e0f995df51e3",
+      "accepted_source_sha256": "f4c263090a1700be632120b87049bc5491ff2e8c4891f4896841c672d938a003",
+      "candidate_source_sha256": "4d39827ceb7bc8b5255f15e80104bc41dfc316ed6be5d3de525f818a185f3861",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135769800,
+        "candidate_bytes": 296,
+        "target_bytes": 288,
+        "size_delta": 8,
+        "different_byte_count": 138,
+        "original_sha256": "a9144a99fdf21d1d62cfcaf89c56f9e83db1ac7e8e6d507670598024351946c9",
+        "candidate_sha256": "bf394124eab4ade54b6495fac59f4acb0bdd4cf03b52402ce23e67e1b51f6f53"
+      },
+      "accepted_unit_bytes": 288,
+      "accepted_unit_sha256": "a9144a99fdf21d1d62cfcaf89c56f9e83db1ac7e8e6d507670598024351946c9",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial replacing the synthetic sine pointer and impossible radius guard with a polar-vector operation; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "ParticleRandomTableSource remains a union, and the fixed RNG table address is still constructed through its two halfwords.",
+        "The mask = 1023 local and separate RNG cursor remain.",
+        "BossScatterEmitter remains a private padded owner; the new polar helper does not recover the complete emitter/RNG operation."
+      ]
+    },
+    {
+      "name": "barrage",
+      "source_path": "src/fn/sub_081A0BC8.c",
+      "accepted_source_blob": "b07104972b5c6635416bd7830770c964903f9951",
+      "accepted_source_sha256": "5a156b8e46b0a867e41101eb7c4f776fcd4aa8f83c7d78e32bc53428bd5defed",
+      "candidate_source_sha256": "eb472344bfcdd6b08a50df8eb51936230d9349853aa0ecfcbcfcb0cfddf15511",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135924680,
+        "candidate_bytes": 732,
+        "target_bytes": 732,
+        "size_delta": 0,
+        "different_byte_count": 2,
+        "original_sha256": "943559abc19a1cf6cdcdb8c98660b76c0963b94b8a88813d75533e21991bd6d7",
+        "candidate_sha256": "ce24359bd986991ac74eceddc410cac027b159d5b3df3e55327374af86a19f5c"
+      },
+      "accepted_unit_bytes": 732,
+      "accepted_unit_sha256": "943559abc19a1cf6cdcdb8c98660b76c0963b94b8a88813d75533e21991bd6d7",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Broader nonmatching owner/sampling/terrain hypothesis that removes the priority zero and expanded remainder; the complete original operation is not comprehensively certified.",
+      "retained_debt": [
+        "ScatterOffset returning s16 fits the coordinate domain, but that original helper API and return type remain inferred.",
+        "The Hresvelgr and Action records and local void-pointer external declarations remain scoped to this candidate; no wider canonical owner/API migration is claimed."
+      ]
+    },
+    {
+      "name": "hresvelgr",
+      "source_path": "src/fn/sub_081A14FC.c",
+      "accepted_source_blob": "ba1971bad7672ce4ca22615172170547130872f6",
+      "accepted_source_sha256": "c75503bfb9186d3ec9ebdb95d3ea1519ad8c66d96ba6f0fdbf30b96b9643282c",
+      "candidate_source_sha256": "114eb7479142e7a9e6454080636d11f9fbd4a3ae82e69294ae9baa7d4e7d3a45",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135927036,
+        "candidate_bytes": 1764,
+        "target_bytes": 1764,
+        "size_delta": 0,
+        "different_byte_count": 177,
+        "original_sha256": "410e314f9a9280ee655eb7ad207ccda8e3df189ec04bbf4e27fe99f83cdcd196",
+        "candidate_sha256": "2044dcf9255581805f98cf068568cee670fc1ad28e33bfdc4533731fbfd55a9e"
+      },
+      "accepted_unit_bytes": 1764,
+      "accepted_unit_sha256": "410e314f9a9280ee655eb7ad207ccda8e3df189ec04bbf4e27fe99f83cdcd196",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial for the spray sampling and translation path; this is not a whole-function ordinary-source recovery, and remaining source is not comprehensively certified.",
+      "retained_debt": [
+        "The independent case-2 RandomTableView union and its table.samples access remain.",
+        "The local Hresvelgr/Action ownership and external action-call declarations are not canonicalized across the family by this candidate."
+      ]
+    },
+    {
+      "name": "vanargand",
+      "source_path": "src/fn/sub_081AE0C0.c",
+      "accepted_source_blob": "4ea7d2b3158197cc0381671a91360eea1df4a9cf",
+      "accepted_source_sha256": "718f7ba1cf5fbbe70c87b2c3512ca3328c9aa978ba04e25a5d3a48185076b8d0",
+      "candidate_source_sha256": "c800dd3f6a0b7aab541b2004402e78cd6238ba205d23cff33810136f10d8cc38",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 135979200,
+        "candidate_bytes": 5048,
+        "target_bytes": 5064,
+        "size_delta": -16,
+        "different_byte_count": 1847,
+        "original_sha256": "dbc25a363b92843b4fd070e2ef128a30060a649656786fb3dd59186dc05a03d6",
+        "candidate_sha256": "8bc1968a51c86750ef40195e8dcb2acedc1f9a4eb9a221406e1753b1d811acc6"
+      },
+      "accepted_unit_bytes": 5064,
+      "accepted_unit_sha256": "dbc25a363b92843b4fd070e2ef128a30060a649656786fb3dd59186dc05a03d6",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Nonmatching removal of the one-word palette-selection preset on top of the accepted owner recovery; remaining source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "ApplyPaletteBank still contains the default palette-copy arm that the known selections in this unit cannot reach.",
+        "Duplicate p/self owner bindings, callback-copy temporaries and the inherited literal locals remain unproven source shapes."
+      ]
+    },
+    {
+      "name": "sprite-trail",
+      "source_path": "src/fn/sub_081F2404.c",
+      "accepted_source_blob": "d9b6bc2e43910ce3ece7ba4db51966bae704776e",
+      "accepted_source_sha256": "a19af5117081e96daea04f77b2b7dd87cb6583e26b3e23e3f7f8d4a6381b1f4c",
+      "candidate_source_sha256": "013ae5a913101c503221431fd0b6bb5b7ca759c35e6ee7081952ff57108d09b6",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 136258564,
+        "candidate_bytes": 320,
+        "target_bytes": 304,
+        "size_delta": 16,
+        "different_byte_count": 294,
+        "original_sha256": "c5e97df57ede66373243a7f10bc471a20c379c578deb0867e8dc900c77217183",
+        "candidate_sha256": "f83670fc0408bc652f3dc9d48458a05214756937afcc15de51b24a669374e9b2"
+      },
+      "accepted_unit_bytes": 304,
+      "accepted_unit_sha256": "c5e97df57ede66373243a7f10bc471a20c379c578deb0867e8dc900c77217183",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Nonvolatile native-camera hypothesis on top of the accepted SpriteTrail owner; remaining local dataflow and shared interfaces are not comprehensively certified.",
+      "retained_debt": [
+        "The history element is still formed with integer offset arithmetic and a null-owner member-offset expression.",
+        "The flags/savedFlags aliases and separate head/tail/next cursors remain; this candidate does not recover their complete projection/update operation."
+      ]
+    },
+    {
+      "name": "ratatosk",
+      "source_path": "src/fn/sub_081FC26C.c",
+      "accepted_source_blob": "d2e3675623c97db2c814e93ff73a5b96e4778a05",
+      "accepted_source_sha256": "f8a8d00c5fa3839baffe3e0f5b14fe11a85feab7fc1f471e3954cd7c44d70163",
+      "candidate_source_sha256": "2835473a93065d481fb20f242b80001a2c6b838da399d0635dfa1df9620ba983",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 136299116,
+        "candidate_bytes": 948,
+        "target_bytes": 940,
+        "size_delta": 8,
+        "different_byte_count": 678,
+        "original_sha256": "faa31969e4f8fa06ec85dd062ee7e1a48953b450647f224bfe8f4708f9a2bfb8",
+        "candidate_sha256": "9f03f22398f3d98afe8bb7fc5343dbbc672934e461aa18937649d4b1c65dbbcf"
+      },
+      "accepted_unit_bytes": 940,
+      "accepted_unit_sha256": "faa31969e4f8fa06ec85dd062ee7e1a48953b450647f224bfe8f4708f9a2bfb8",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Appearance-guard removal and real field-store normalization using the accepted pool/native playback owners; the full function and inherited helpers are not comprehensively certified.",
+      "retained_debt": [
+        "The shared DisplaySequence_StepSprite helper at the accepted source base still contains its explicitly allocation-oriented state = frames alias; this candidate does not repair that shared helper.",
+        "The behavior table remains unsized, with only two targets established by the owner investigation; this candidate does not infer a larger extent."
+      ]
+    },
+    {
+      "name": "palette",
+      "source_path": "src/fn/sub_08217430.c",
+      "accepted_source_blob": "f29a499b436417315a6f22367248a27b5dd28681",
+      "accepted_source_sha256": "08d2950a87a1ceeab951e774cefa0732b2b057af2ac2b019e47294b45bba0108",
+      "candidate_source_sha256": "52dfa75380ac9fd3e348a2ae2488bbc4587bdebca42158ee50081cf125c0f3d4",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 136410160,
+        "candidate_bytes": 1324,
+        "target_bytes": 1328,
+        "size_delta": -4,
+        "different_byte_count": 1154,
+        "original_sha256": "ce69e9febd142c6478f676f9a9aa5206e940f708ab9e831c9d156ac50ff0bb83",
+        "candidate_sha256": "ea4039ab6d5a2fd87345b7a1c6e4570ccda628c3936b8033b664c8b7225696d6"
+      },
+      "accepted_unit_bytes": 1328,
+      "accepted_unit_sha256": "ce69e9febd142c6478f676f9a9aa5206e940f708ab9e831c9d156ac50ff0bb83",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Nonmatching removal of the bounded copy fallback and black-fade once-loop; remaining copy/traversal source and helper forms are not comprehensively certified.",
+      "retained_debt": [
+        "The separate basePtr/keys/bank copy cursors and byte-oriented source-bank address construction remain.",
+        "The native bank-copy/cursor operation and the rest of the packed-color traversal have not been recovered or certified by these two deletions."
+      ]
+    },
+    {
+      "name": "game-state",
+      "source_path": "src/script_virtual_machine.c",
+      "accepted_source_blob": "bad5fd7135271d6dfec0ae7f5969c46a24788de7",
+      "accepted_source_sha256": "37370f0916729448c57be5dcb297a78f9e48d3627136847bf755d7ae6505eec4",
+      "candidate_source_sha256": "e192646ebbe1901d56fe078270af3429150045acb2f1b88a8d41938cb08ba544",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 136422484,
+        "candidate_bytes": 5800,
+        "target_bytes": 5800,
+        "size_delta": 0,
+        "different_byte_count": 1,
+        "original_sha256": "8f7fba5c64f352f9e1b827cc2ce724fa5fc4e4691a7b5907f8e46880eca2ddfd",
+        "candidate_sha256": "9d48aa7eae51efadb110b75af96df19aa1f8644ad2de688c3d32d3d489adf8db"
+      },
+      "accepted_unit_bytes": 5800,
+      "accepted_unit_sha256": "8f7fba5c64f352f9e1b827cc2ce724fa5fc4e4691a7b5907f8e46880eca2ddfd",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Single-expression removal of the timer-derived zero mask, retaining the genuine hardware timer read and accepted script-load call; the complete storage model and merged unit are not comprehensively certified.",
+      "retained_debt": [
+        "The five regions are still based on an unsized gGameStateStorage byte arena and hard-coded offsets; total arena extent and a complete region owner remain unresolved.",
+        "The rest of script_virtual_machine.c is unchanged and outside this base-selection trial; no whole-unit concession-free claim is made."
+      ]
+    },
+    {
+      "name": "spiral",
+      "source_path": "src/fn/sub_08234540.c",
+      "accepted_source_blob": "5785b20d056fc19a2f27fdc6e942aaa23a63510f",
+      "accepted_source_sha256": "bd6c1ae929c464454a5536ec9f06e3bddeca04f2bfd5ee90e79f9e5bcab2fa97",
+      "candidate_source_sha256": "217984179f96973a67c8688b3d1747d079aa9fbbdae2daf1c7bb1b9879485848",
+      "whole_translation_unit": {
+        "status": "mismatch",
+        "address": 136529216,
+        "candidate_bytes": 420,
+        "target_bytes": 428,
+        "size_delta": -8,
+        "different_byte_count": 210,
+        "original_sha256": "11320f8d7526ce4b5009f2538fd843b321133f538333b0adde52b01e5cb01ba3",
+        "candidate_sha256": "76026c74522656d676bb49f7a915ac12d8162d1a1269b112b21f2f4ef327fad0"
+      },
+      "accepted_unit_bytes": 428,
+      "accepted_unit_sha256": "11320f8d7526ce4b5009f2538fd843b321133f538333b0adde52b01e5cb01ba3",
+      "status": "nonmatching experimental source; not adopted",
+      "reconciliation": null,
+      "candidate_scope": "Priority-only partial removing three zero table adjustments; remaining owner, projection and sampling source forms are not comprehensively certified.",
+      "retained_debt": [
+        "The wave union still reuses storage for the sine-table pointer and a halfword sample.",
+        "The void sprite cursor and separate strided frame cursor still use the provisional SpiralParticleFrame/motion split.",
+        "The mask = 1023 local and private SpiralBurst_Random address arithmetic remain; the complete constructor/owner operation is unresolved."
+      ]
+    }
+  ]
+}

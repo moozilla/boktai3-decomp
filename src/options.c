@@ -1,4 +1,5 @@
 #include "options.h"
+#include "palette_pulse.h"
 
 void Options_UpdateScreen(struct OptionsScreen *p)
 {
@@ -153,8 +154,7 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     resource = ScriptProc_Start(0xCB05, 0xE2AB);
     backgroundGraphics = &screen->background.graphics;
     ResourceHeader_Relocate(backgroundGraphics, resource);
-    Widget_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, 0, 0, 0,
-                      0);
+    Widget_InitLinked(&screen->background.sprite, backgroundGraphics, 0x3A, 0x10, 0, 0, 0, 0);
     resource = ScriptProc_Start(0xCB05, 0x530D);
     menuGraphics = &screen->menu.graphics;
     ResourceHeader_Relocate(menuGraphics, resource);

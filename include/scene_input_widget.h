@@ -7,8 +7,23 @@ struct SceneWidgetPlayback {
     u8 priority, mode;
 };
 
+struct WidgetGlyphEntry;
+struct AnimationKeyframe {
+    u16 key, duration;
+};
+struct AnimationKeyframeSequence {
+    u16 unknown0, frameCount;
+    u32 offset;
+};
+/* The relocatable 32-byte glyph/keyframe resource header. */
 struct SceneInputResource {
-    u32 words[8];
+    u16 paletteIndex, glyphCount, sequenceCount, unknown6;
+    u32 unknown8;
+    struct WidgetGlyphEntry *glyphs;
+    struct AnimationKeyframeSequence *sequences;
+    u8 *tileBase;
+    u8 *frameData;
+    u8 *extraData;
 };
 
 struct SceneInputWidget {
@@ -17,9 +32,9 @@ struct SceneInputWidget {
     u8 active, unknown5; /* active: linked to an animation list */
     u16 value6;
     u32 flags;
-    u16 fieldC, attributeE, scale;
-    u16 frame, frameTimer, frameDuration, value18;
-    u8 attribute1A, attribute1B;
+    u16 elapsed, duration, durationScale; /* durationScale has six fractional bits (0x40 = 1x). */
+    u16 sequenceId, frameIndex, frameCount, playbackFlags;
+    u8 attribute1A, mode;
     u8 list, status;
     u16 unknown1E;
     struct ContactPosition position;
@@ -32,7 +47,7 @@ struct SceneInputWidget {
     s32 cachedFrame, cachedPalette;
     u16 *palette;
     u8 *tileData, *extraData;
-    u32 renderData;
+    struct AnimationKeyframe *frames; /* sequence frame table at +0x54 */
     struct SceneInputWidget *previous, *next;
 };
 

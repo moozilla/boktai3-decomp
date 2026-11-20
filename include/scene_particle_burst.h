@@ -1,5 +1,6 @@
 #ifndef GUARD_SCENE_PARTICLE_BURST_H
 #define GUARD_SCENE_PARTICLE_BURST_H
+#include "scene_particle_burst_api.h"
 #include "scene_particle_pool.h"
 #include "task.h"
 /* Tentative burst-particle pool: independent positions damp velocity by 7/10. */

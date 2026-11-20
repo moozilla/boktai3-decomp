@@ -78,10 +78,10 @@ static inline void TentacleBody_SelectAnimation(struct RoomActor *actor, u32 sel
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         selection += variant;
         if (!force && actor->animationIndex == selection && !actor->restart) {

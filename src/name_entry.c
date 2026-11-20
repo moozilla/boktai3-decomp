@@ -1,4 +1,5 @@
 #include "name_entry.h"
+#include "palette_pulse.h"
 #include "game_state.h"
 #include "global.h"
 #include "engine.h"
@@ -510,8 +511,6 @@ void NameEntry_ToggleCharacterPage(struct NameEntryTask *);
 u32 NameEntry_AppendChar(struct NameEntryTask *);
 
 void Menu_StartFadeOut(s32);
-
-void Palette_UpdateHighlightPulse(void *, void *);
 
 void NameEntry_Update(struct NameEntryTask *p)
 {

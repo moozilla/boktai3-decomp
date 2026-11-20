@@ -1,4 +1,5 @@
 #include "game_over.h"
+#include "palette_pulse.h"
 #include "player.h"
 #include "message_window.h"
 #include "runtime.h"

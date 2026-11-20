@@ -1,4 +1,5 @@
 #include "challenge_menu.h"
+#include "palette_pulse.h"
 
 s32 ChallengeMenu_GetStoredRank(s32 group, s32 choice)
 {

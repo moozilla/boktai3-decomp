@@ -18,11 +18,11 @@ void SceneActorAnimation_SelectEntryFlags(struct RoomActor *actor, s32 index, u3
         struct SceneActorAnimationSequenceDrawable *drawable;
         actor->animationIndex = selection;
         drawable = actor->drawable;
-        Anim_SetSequence(drawable->sequence, (void *)drawable->resource, (u16)selection,
+        Anim_SetSequence(&drawable->sequence, (void *)drawable->resource, (u16)selection,
                          (u8)variant, (u8)flags);
         restart = &actor->restart;
     } else {
-        struct SceneActorAnimationTile *tile =
+        struct SceneInputWidget *tile =
             &((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile;
         u8 *savedSelection;
 

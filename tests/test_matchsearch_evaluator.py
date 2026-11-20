@@ -13,7 +13,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -31,9 +31,12 @@ def fake_evaluator(code: bytes, target: bytes) -> Evaluator:
     evaluator.own_names = ("Target",)
     evaluator.scope = SimpleNamespace(
         function_lines=lambda *_: range(0), needs_g=lambda knobs: "AGBCC_NOTIE" in knobs,
+        resolve_knobs=lambda _src, _func, knobs: dict(knobs),
         decode=lambda *args: [(0, 2, "movs r0, #2", "movs r0, #2", None)],
         align=lambda *args: ([(0, 0, "=")], {}), shape_distance=lambda *args: 0)
-    evaluator._scope_context = contextlib.nullcontext
+    evaluator.workdir = Path("worker")
+    evaluator._input = Mock(spec=Path)
+    evaluator._scope_context = lambda **kwargs: contextlib.nullcontext()
     evaluator.validate_environment = lambda: None
     evaluator._compiler = lambda debug: SimpleNamespace(bytes=lambda *args: (code, ""), data=[])
     return evaluator
@@ -62,6 +65,68 @@ class EvaluatorBoundaryTests(unittest.TestCase):
         result = e.evaluate("source", preprocessed=True, diagnostic_knobs={"AGBCC_NOTIE": "72"})
         self.assertFalse(result.exact)
         self.assertTrue(result.diagnostic_match)
+
+    def test_named_pseudo_diagnostics_reach_the_same_compiler_as_numeric_selectors(self):
+        scope, _ = _load_scope(ROOT)
+        selectors = {
+            "AGBCC_NOEQUIV": ("table", "28"),
+            "AGBCC_COMBKEEP": ("table,33", "28,33"),
+            "AGBCC_NOREG": ("table", "28"),
+            "CSE_KEEP": ("table", "28"),
+            "CSE_NOCANON": ("table", "28"),
+            "AGBCC_PRI": ("table:+100", "28:+100"),
+            "AGBCC_FORCE": ("table:r6", "28:6"),
+        }
+        for key, (name, number) in selectors.items():
+            with self.subTest(key=key), patch.dict(os.environ, {}, clear=True), \
+                    patch.object(scope, "compile_draft") as baseline, \
+                    patch.object(scope, "workdir", return_value="scratch"), \
+                    patch.object(scope, "pseudo_names", return_value={28: "table"}), \
+                    patch.object(scope, "local_quantity_owners", return_value={}):
+                e = fake_evaluator(b"wrong", b"same")
+                e.scope.resolve_knobs = scope.resolve_knobs
+                received = []
+
+                def compile_one(_source, _names, knobs):
+                    received.append(knobs)
+                    return (b"same" if knobs == {key: number} else b"wrong"), ""
+
+                e._compiler = lambda _debug: SimpleNamespace(bytes=compile_one, data=[])
+                named = e.evaluate("source", preprocessed=True, diagnostic_knobs={key: name})
+                numeric = e.evaluate("source", preprocessed=True, diagnostic_knobs={key: number})
+                self.assertEqual(received, [{key: number}, {key: number}])
+                self.assertEqual(named.resolved_diagnostic_knobs, numeric.resolved_diagnostic_knobs)
+                self.assertEqual(named.code, numeric.code)
+                self.assertTrue(named.diagnostic_match)
+                self.assertFalse(named.exact)
+                baseline.assert_called_once()  # the numeric selector needs no trace
+
+    def test_numeric_pseudo_with_register_alias_also_uses_scope_resolution(self):
+        scope, _ = _load_scope(ROOT)
+        e = fake_evaluator(b"same", b"same")
+        e.scope.resolve_knobs = scope.resolve_knobs
+        with patch.dict(os.environ, {}, clear=True), patch.object(scope, "compile_draft") as baseline:
+            result = e.evaluate("source", preprocessed=True, diagnostic_knobs={"AGBCC_FORCE": "28:ip"})
+        self.assertEqual(result.resolved_diagnostic_knobs, {"AGBCC_FORCE": "28:12"})
+        baseline.assert_not_called()
+
+    def test_unknown_named_equivalence_selector_is_an_error(self):
+        scope, _ = _load_scope(ROOT)
+        e = fake_evaluator(b"same", b"same")
+        e.scope.resolve_knobs = scope.resolve_knobs
+        with patch.dict(os.environ, {}, clear=True), patch.object(scope, "compile_draft"), \
+                patch.object(scope, "workdir", return_value="scratch"), \
+                patch.object(scope, "pseudo_names", return_value={28: "table"}), \
+                patch.object(scope, "local_quantity_owners", return_value={}):
+            result = e.evaluate("source", preprocessed=True, diagnostic_knobs={"AGBCC_NOEQUIV": "missing"})
+        self.assertIn("no pseudo by that name", result.error)
+        self.assertFalse(result.diagnostic_match)
+
+    def test_ordinary_build_does_not_resolve_diagnostic_knobs(self):
+        e = fake_evaluator(b"same", b"same")
+        with patch.object(e.scope, "resolve_knobs") as resolve:
+            self.assertTrue(e.evaluate("source", preprocessed=True).exact)
+        resolve.assert_not_called()
 
     def test_clean_environment_preserves_access_and_removes_experiments(self):
         env = {"HTTPS_PROXY": "proxy", "PATH": "bin", "AGBCC_FORCE": "21:0", "CSE_KEEP": "42",

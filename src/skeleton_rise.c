@@ -32,15 +32,15 @@ Skeleton_SequenceDrawable(struct ChaseActor *a)
 
 static inline void *Skeleton_Sequence(struct SceneActorAnimationSequenceDrawable *d)
 {
-    return d->sequence;
+    return &d->sequence;
 }
 
-static inline struct SceneActorAnimationTile *Skeleton_TileOf(struct ChaseActor *a)
+static inline struct SceneInputWidget *Skeleton_TileOf(struct ChaseActor *a)
 {
     return &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile;
 }
 
-static inline u32 Skeleton_TileMirror(struct SceneActorAnimationTile *tile)
+static inline u32 Skeleton_TileMirror(struct SceneInputWidget *tile)
 {
     return tile->flags & 4;
 }
@@ -50,7 +50,7 @@ static inline struct RoomActor *Skeleton_Playback(struct ChaseActor *a)
     return (void *)a;
 }
 
-static inline u32 *Skeleton_SpriteBits(struct SceneActorAnimationTile *t)
+static inline u32 *Skeleton_SpriteBits(struct SceneInputWidget *t)
 {
     return &t->flags;
 }
@@ -78,7 +78,7 @@ static inline void Skeleton_LaunchSequence(void *object, u32 selection, u8 varia
     *restartOut = &Skeleton_Playback(actor)->restart;
 }
 
-static inline void Skeleton_CommitTile(void *obj, struct SceneActorAnimationTile *tile,
+static inline void Skeleton_CommitTile(void *obj, struct SceneInputWidget *tile,
                                        u8 *savedSelection, u32 selection, u32 flags)
 {
     struct ChaseActor *actor = obj;
@@ -147,7 +147,7 @@ static inline u32 Skeleton_ReadFrame(u32 value, u32 *selectedFrame, u8 *variantR
                                                                                                    \
         } else {                                                                                   \
                                                                                                    \
-            struct SceneActorAnimationTile *tile = Skeleton_TileOf(actor);                         \
+            struct SceneInputWidget *tile = Skeleton_TileOf(actor);                         \
                                                                                                    \
             selection = selection + variant;                                                       \
             savedSelection = &actor->base.animationIndex;                                          \

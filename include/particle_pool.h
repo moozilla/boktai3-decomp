@@ -1,6 +1,7 @@
 #ifndef GUARD_PARTICLE_POOL_H
 #define GUARD_PARTICLE_POOL_H
 #include "engine.h"
+#include "palette_pulse.h"
 #include "scene_vec.h"
 #include "engine_globals.h"
 #include "monster_particle_random.h"
@@ -40,7 +41,6 @@ struct ParticlePoolVolumeVector {
     u32 x : 16, y : 16, z : 16;
 };
 void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void SpiralParticles_UpdateParticle(struct ParticlePool *, struct PoolParticle *);
 void ParticlePool_UpdateLinearParticle(struct ParticlePool *, struct PoolParticle *);
 void ParticlePool_SpawnJitteredParticle(struct ParticlePool *, struct SceneVec *, s32, u32);

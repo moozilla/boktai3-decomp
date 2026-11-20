@@ -17,6 +17,7 @@ void Armor_UpdatePositiveTurn(struct SceneCombatActor *, s32);
 void Armor_UpdateNegativeTurn(struct SceneCombatActor *, s32);
 void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Armor_StartFullPaletteRestoreDelay(struct SceneCombatActor *);
+void ArmorActor_UpdateFixedSpeedMotion(struct SceneCombatActor *);
 void ActorController_UpdateResetMotionTransition(struct SceneCombatActor *, s32);
 union ActorControllerPosition {
     struct ContactPosition position;
@@ -36,6 +37,21 @@ static inline void ActorController_SetColliderFlags(struct ContactCollider *coll
 static inline void ActorController_ClearMotionFlags(struct ActorControllerMotion *motion, u32 flags)
 {
     motion->flags &= ~flags;
+}
+
+static inline s32 ActorController_TruncateMotion(s32 value)
+{
+    if (value >= 0)
+        return value >> 12;
+    return -((-value) >> 12);
+}
+
+static inline void ActorController_SetMotion(struct ActorControllerVelocity *velocity, s32 angle,
+                                             s32 speed)
+{
+    velocity->x = ActorController_TruncateMotion(gUnk_086149C4[(angle + 64) & 255] * speed);
+    velocity->y = 0;
+    velocity->z = ActorController_TruncateMotion(gUnk_086149C4[angle] * speed);
 }
 
 #endif

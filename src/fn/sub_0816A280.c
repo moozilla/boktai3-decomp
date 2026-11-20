@@ -10,13 +10,6 @@ s32 StatusPanel_GetDirectionAxis(u8);
 s32 MessageWindow_ShowMessage(s32);
 void AnimData_SelectPaletteBank(void *, int);
 
-/* SceneHudState viewed as one widget array from 0x1420 (indices 75 and 76 are valueWidgets). */
-struct SceneHudWidgetTable {
-    u8 unknown0[0x1420];
-    struct SceneInputWidget widgets[0x80];
-};
-#define WIDGET(p, n) (((struct SceneHudWidgetTable *)(p))->widgets[n])
-
 void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
 {
     u8 *timer;
@@ -68,10 +61,10 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
             MessageWindow_ShowMessage(4);
             p->balanceLimitShown = 0;
         } else {
-            WIDGET(p, 117).flags |= 1;
+            p->accountRateIcon.flags |= 1;
             for (i = 0; i <= 3; i++) {
-                WIDGET(p, i + 113).flags |= 1;
-                WIDGET(p, i + 118).flags |= 1;
+                p->accountValueDigits[i].flags |= 1;
+                p->accountTotalDigits[i].flags |= 1;
             }
             if (!p->balanceLimitShown) {
                 MessageWindow_ShowMessage(6);
@@ -79,6 +72,6 @@ void PauseMenu_UpdateQuantityInput(struct SceneHudState *p)
             }
         }
     }
-    Anim_LoadKeyframe((u8 *)p + 0x3D00, p->unknownC4, (u16)frame, 1);
+    Anim_LoadKeyframe(&p->accountCursor, &p->accountResource, (u16)frame, 1);
     AnimData_SelectPaletteBank((u8 *)p + 0xC54, bank + 0x1B4);
 }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_particle_burst_api.h"
 #include "player.h"
 // confidence=low: charge phases and orbiting attack collider identify a spinning attack.
 #define B(o) (*(u8 *)(p + (o)))
@@ -23,7 +24,6 @@ void Collider_Refresh(void *);
 void Player_SetDirectionalVelocity_08238300(void *, u32);
 void sub_08238238(void *);
 void DirectionalEffect_PlaceSprite(void *, u32, void *);
-void SceneParticleBurst_CreateWithPause(void *, void *, void *, u32, u32, u32);
 static inline s32 scale(s32 v)
 {
     if (v >= 0)
@@ -122,7 +122,8 @@ void Player_UpdateChargedSpinAttack(u8 *p)
             }
             break;
         case 8: {
-            struct AttackVec offset, size, pos;
+            struct ContactPosition offset, size;
+            struct AttackVec pos;
             s32 angle;
             *((u8 *)(p + 0x4B9)) = 0;
             if (Player_UpdateFacingFromInputHistory(p)) {
@@ -135,7 +136,9 @@ void Player_UpdateChargedSpinAttack(u8 *p)
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                SceneParticleBurst_CreateWithPause(p + 0x30, &offset, &size, 1, 2, 4);
+                SceneParticleBurst_CreateWithPause(
+                    (const struct ContactPosition *)&((struct Player *)p)->position, &offset, &size,
+                    1, 2, 4);
             }
             ((struct Player *)p)->statModifierContext.contactTimer =
                 (((struct Player *)p)->statModifierContext.contactTimer + 16) & 255;

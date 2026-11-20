@@ -1,7 +1,8 @@
 #include "sprite_effect_controller.h"
+#include "sprite_drawable_api.h"
 #define gSpriteShapeDimensions gUnk_086140EC
 extern const u16 gUnk_086140EC[];
-void SpriteDrawable_SelectTileFrame(struct SpriteEffectTileDrawable *sprite,
+void SpriteDrawable_SelectTileFrame(struct SpriteDrawable *sprite,
                                     const struct SpriteEffectTileResource *resource, u32 frame)
 {
     sprite->width = gUnk_086140EC[resource->shape];

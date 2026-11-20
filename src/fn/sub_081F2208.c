@@ -1,27 +1,5 @@
-#include "global.h"
+#include "sprite_trail.h"
 
-struct TrailVector {
-    s32 x, y, z, pad;
-};
-struct TrailSprite {
-    u32 flags;
-    u8 unk_04[3];
-    u8 enabled;
-    u8 unk_08[8];
-    u16 order;
-    u8 unk_12[10];
-    s16 x, y, z, pad;
-    u8 unk_24[8];
-};
-struct SpriteTrail {
-    u8 entered, state;
-    u8 unk_02[2];
-    struct TrailVector position, history[4], velocity, target;
-    u32 style, collisionArg0, collisionArg1, age, frame;
-    u8 collider[0x40], renderCollider[0x40];
-    struct TrailSprite head[4], tail[3];
-    u8 animation[0x1c];
-};
 struct PackedCoordinate {
     u32 lo : 16, hi : 16;
 };
@@ -41,7 +19,7 @@ void SingletonSlot7_OnEffectMotionComplete(void *);
 
 s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
 {
-    struct TrailSprite *sprite;
+    struct DisplaySequenceSprite *sprite;
     s32 i;
     struct PackedVector position, size, offset;
     void *collider;
@@ -49,21 +27,21 @@ s32 SpriteTrail_InitializeEntry(void *pool, struct SpriteTrail *p, s32 index)
     p->state = 0;
     p->entered = 1;
     p->frame = 0;
-    AnimData_Load(p->animation, 0x89CB);
-    AnimData_SelectPaletteBank(p->animation, 0x1DA);
+    AnimData_Load(&p->graphics, 0x89CB);
+    AnimData_SelectPaletteBank(&p->graphics, 0x1DA);
     sprite = p->head;
     for (i = 0; i <= 3; i++, sprite++) {
-        Sprite_InitUnlinked(sprite, p->animation, 0x11);
-        sprite->order = 0x26 - (4 - i) * 2;
-        sprite->enabled = 1;
-        ZeroFill8(&sprite->x);
+        Sprite_InitUnlinked(sprite, &p->graphics, 0x11);
+        sprite->frame = 0x26 - (4 - i) * 2;
+        sprite->priority = 1;
+        ZeroFill8(&sprite->position);
     }
     sprite = p->tail;
     for (i = 0; i <= 2; i++, sprite++) {
-        Sprite_InitUnlinked(sprite, p->animation, 0x11);
-        sprite->order = 0x25 - (3 - i) * 2;
-        sprite->enabled = 1;
-        ZeroFill8(&sprite->x);
+        Sprite_InitUnlinked(sprite, &p->graphics, 0x11);
+        sprite->frame = 0x25 - (3 - i) * 2;
+        sprite->priority = 1;
+        ZeroFill8(&sprite->position);
     }
     collider = p->renderCollider;
     Position_GetHeightAdjustedCoordinates(&p->position, 0, &position);

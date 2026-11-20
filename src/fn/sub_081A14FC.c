@@ -1,17 +1,16 @@
 #include "global.h"
 #include "engine.h"
-struct Vec {
-    s16 x, y, z, pad;
-} __attribute__((aligned(4)));
+#include "scene_input_widget.h"
+#include "terrain_sampling.h"
 struct Action {
-    u8 state, pad[3];
-    u32 frame;
+    u8 state, substate, step, pad3;
+    u32 frame, substateFrame, stepFrame;
 };
 struct Hresvelgr {
     u8 pad0[0x51];
     u8 heading;
     u8 pad52[2];
-    struct Vec position, velocity;
+    struct ContactPosition position, velocity;
     u8 pad64[0x38];
     u32 flags;
     u8 padA0[8];
@@ -21,16 +20,16 @@ struct Hresvelgr {
     u8 padB3[0x19];
     u8 targetHeading;
     u8 padCD[0xa7];
-    u8 animationData[0x20], animation[0x20];
-    struct Vec renderPosition;
-    u8 pad1BC[0x134];
+    struct SceneInputResource animationData;
+    struct SceneInputWidget animation;
+    u8 pad1F4[0xfc];
     struct Action action;
-    u8 pad2F8[0x24];
+    u8 pad300[0x1c];
     s16 motionX, motionY, motionZ, motionW;
     u8 pad324[7];
     u8 side;
     u8 pad32C[0x70];
-    struct Vec target, delta;
+    struct ContactPosition target, delta;
 };
 void ActionState_Reset(void *);
 void ActionState_AdvanceState(void *);
@@ -47,10 +46,10 @@ void MotionEntry_CreateWithDelta(void *, void *, s32, u32);
 s32 sub_08249420(u32, u32);
 s32 sub_08249498(u32, u32);
 s32 ScalarApproach_StepQuarter(s32, s32);
-u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void Sound_PlaySong(u32);
 
-static inline void AddVector(struct Vec *out, struct Vec *a, struct Vec *b)
+static inline void AddVector(struct ContactPosition *out, struct ContactPosition *a,
+                             struct ContactPosition *b)
 {
     out->x = a->x + b->x;
     out->y = a->y + b->y;
@@ -72,40 +71,11 @@ static inline s32 RandomValue(const u16 *table)
     gRandomIndex = (gRandomIndex + 1) & 1023;
     return table[gRandomIndex];
 }
-static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
+static inline void SetVector(struct ContactPosition *p, s32 x, s32 y, s32 z)
 {
     p->x = x;
     p->y = y;
     p->z = z;
-}
-static inline s32 CellIndex(struct Vec *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-static inline u8 *CellProperties(s32 cell)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
-    if (p)
-        return p + 4;
-    return (cell * 4 + 12) + gTerrainMap->cells;
-}
-static inline s32 Height(struct Vec *p)
-{
-    u8 *cell = CellProperties(CellIndex(p));
-    u32 shape = *cell >> 4;
-    s32 height = (*cell & 15) << 8;
-    switch (shape) {
-        case 1:
-            height -= *(u8 *)&p->z;
-            break;
-        case 2:
-            height -= *(u8 *)&p->x;
-            break;
-    }
-    return height;
 }
 void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
 {
@@ -120,13 +90,14 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
     switch (action->state) {
         case 0:
             if (!action->frame) {
-                Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 15, 1, 0);
+                Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData, 15, 1, 0);
                 action->frame++;
                 Sound_PlaySong(0x4cf);
             } else if (saved->padA0[3] > 8) {
                 if (!Player_IsSlotInActionTwelveOrThirtyEight(0)) {
-                    SceneActors_RunFirstEventScript(saved, &actor->renderPosition);
-                    Hresvelgr_SetAnimation(actor, actor->animation, actor->animationData, 20, 1, 0);
+                    SceneActors_RunFirstEventScript(saved, &actor->animation.position);
+                    Hresvelgr_SetAnimation(actor, &actor->animation, &actor->animationData, 20, 1,
+                                           0);
                     Sound_PlaySong(0x3e2);
                     ActionState_AdvanceState(action);
                 }
@@ -137,7 +108,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
             s32 step = sub_08249420(frame, 30);
             if (step == 8) {
                 ActionState_AdvanceState(action);
-                Anim_SetFrameDurationScale(actor->animation, 64);
+                Anim_SetFrameDurationScale(&actor->animation, 64);
             } else {
                 s32 remainder = sub_08249498(frame, 30);
                 if (!remainder) {
@@ -149,9 +120,10 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                     dy = 60 / (step + 1);
                     dz = (actor->target.z - saved->position.z) / 30;
                     SetVector(&actor->delta, dx, dy, dz);
-                    Anim_SetFrameDurationScale(actor->animation, (step + 1) * 24 + 64);
+                    Anim_SetFrameDurationScale(&actor->animation, (step + 1) * 24 + 64);
                     if (step == 7)
-                        Anim_SetKeyframes(actor->animation, actor->animationData, 20, 3, remainder);
+                        Anim_SetKeyframes(&actor->animation, &actor->animationData, 20, 3,
+                                          remainder);
                 } else {
                     saved->velocity = actor->delta;
                     if (actor->delta.y > 0)
@@ -162,7 +134,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                 {
                     s32 period = (step + 1) * 4;
                     if (!sub_08249498(action->frame, period)) {
-                        struct Vec delta, position;
+                        struct ContactPosition delta, position;
                         union RandomTableView view = {gRandomTable};
                         const u16 *table = view.samples;
                         s32 ox, px, oy, py, oz, pz;
@@ -173,7 +145,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                                   (RandomValue(table) >> 3) % 32 - 16);
                         sampleX = RandomValue(table) >> 3;
                         ox = sampleX - (sampleX / 256) * 256;
-                        px = actor->renderPosition.x;
+                        px = actor->animation.position.x;
                         rawY = RandomValue(table);
                         sampleY = rawY >> 3;
                         /* Allocation-only: preserve the table and raw-sample lifetimes. */
@@ -188,10 +160,10 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                             }
                         }
                         oy = sampleY - (sampleY / 128) * 128;
-                        py = actor->renderPosition.y;
+                        py = actor->animation.position.y;
                         sampleZ = RandomValue(table) >> 3;
                         oz = sampleZ - (sampleZ / 256) * 256;
-                        pz = actor->renderPosition.z;
+                        pz = actor->animation.position.z;
                         SetVector(&position, px + ox - 128, py + oy, pz + oz - 128);
                         MotionEntry_CreateWithDelta(&position, &delta,
                                                     (RandomValue(table) >> 3) % 4, 64);
@@ -206,16 +178,16 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
         }
         case 2: {
             if (!action->frame) {
-                SceneActors_StartUnmirroredAnimation(saved, actor->animation, actor->animationData,
-                                                     21, 1, 0);
+                SceneActors_StartUnmirroredAnimation(saved, &actor->animation,
+                                                     &actor->animationData, 21, 1, 0);
                 action->frame++;
                 Sound_PlaySong(0x3dd);
             }
-            height = Height(&saved->position);
+            height = Terrain_SampleHeight(&saved->position);
             if (saved->position.y < height) {
                 Sound_PlaySong(0x3df);
                 for (i = 0; i < 2; i++) {
-                    struct Vec position;
+                    struct ContactPosition position;
                     union RandomTableView table = {gRandomTable};
                     SetVector(&position, (RandomValue(table.samples) >> 3) % 1024 - 512, 0,
                               -((RandomValue(table.samples) >> 3) % 256));
@@ -223,8 +195,8 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                     AnimatedParticles_EmitBurst(&position, 7, 0, 64, 4, 4, 4, 4);
                 }
                 if (action->frame == 1)
-                    SceneActors_StartUnmirroredAnimation(saved, actor->animation,
-                                                         actor->animationData, 22, 2, 0);
+                    SceneActors_StartUnmirroredAnimation(saved, &actor->animation,
+                                                         &actor->animationData, 22, 2, 0);
                 saved->position.y = height;
                 if (action->frame > 3) {
                     saved->position.y = height;
@@ -247,7 +219,7 @@ void sub_081A14FC(struct Hresvelgr *saved, u32 tick)
                 Bestiary_UnlockEntry(0);
                 Bestiary_UnlockEntry(3);
                 Bestiary_UnlockEntry(78);
-                SceneActors_RunSecondEventScript(saved, &saved->renderPosition);
+                SceneActors_RunSecondEventScript(saved, &saved->animation.position);
             }
             break;
         case 4:

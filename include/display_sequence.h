@@ -8,7 +8,7 @@
 struct DisplaySequenceState {
     const u16 *commands;
     u8 flags, frameCount, frameWeight, duration;
-    u16 index, unknownA, speed, elapsed;
+    u16 index, sequenceId, speed, elapsed;
 };
 
 /* Sequence state embedded at +0x48 in the actor's sprite drawable. */

@@ -1,15 +1,9 @@
 #include "global.h"
+#include "scene_particle_burst_api.h"
 #include "engine.h"
 #include "scene_actor_reset.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
-struct BurstExtent {
-    u32 x : 16;
-    u32 y : 16;
-    u32 z : 16;
-};
-void SceneParticleBurst_CreateWithPause(struct ContactPosition *, struct ContactPosition *,
-                                        struct BurstExtent *, s32, s32, s32);
 static inline s32 motionSquared(struct ContactPosition *motion)
 {
     return motion->x * motion->x + motion->y * motion->y + motion->z * motion->z;
@@ -34,8 +28,8 @@ s32 SceneActorMovement_UpdateAirborne(struct ChaseActor *actor)
     const struct ContactPosition *local;
     u8 *cell;
     s32 height, kind;
-    struct BurstExtent extent;
-    struct BurstExtent *burst;
+    struct ContactPosition extent;
+    struct ContactPosition *burst;
     if (motionSquared(&actor->base.secondaryMotion) == 0 &&
         *(s16 *)&actor->base.heightOffset == 0) {
         u32 *clear = &actor->base.statusFlags;

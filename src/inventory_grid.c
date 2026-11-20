@@ -1,5 +1,7 @@
 #include "global.h"
 #include "inventory_grid.h"
+#include "scene_hud_display.h"
+#include "sprite_drawable_api.h"
 
 s32 PauseMenu_TickPaletteBlend(void *);
 
@@ -7,19 +9,19 @@ void SceneHud_BeginRandomActionReturn(void);
 
 void Hud_SetInteractionCallback(void *, void (*)(void), int);
 
-void InventoryGrid_UpdateNumberPhase(struct InventoryGrid *s)
+void InventoryGrid_UpdateNumberPhase(struct SceneHudState *s)
 {
-    if (s->view.state.phaseCounter <= 31) {
-        if (++s->view.state.phaseCounter == 32) {
+    if (s->actionTransferDelay <= 31) {
+        if (++s->actionTransferDelay == 32) {
             u32 mask = 1;
-            struct InventoryNumberDigit *p = s->view.state.digits;
+            struct SpriteDrawable *p = s->numberDigits;
             s32 i = 3;
             do {
                 p->flags |= mask;
                 p++;
             } while (--i >= 0);
-        } else if (s->view.state.phaseCounter <= 8) {
-            u16 *p = &s->view.state.digits[0].position.y;
+        } else if (s->actionTransferDelay <= 8) {
+            s16 *p = &s->numberDigits[0].position.y;
             s32 i = 3;
             do {
                 (*p)--;
@@ -39,29 +41,25 @@ void PauseMenu_StartPaletteTransition(void *, u32, u32, s32);
 
 void PauseMenu_ApplyItemSlot(void *, u32);
 
-void InventoryGrid_ShowNumber(struct InventoryGrid *, s32, struct InventoryGridVector *);
-
-void InventoryGrid_UpdateNumberPhase(struct InventoryGrid *);
-
 void Sound_PlaySong(u32);
 
-static inline void SetVector(struct InventoryGridVector *v, s32 x, s32 y, s32 z)
+static inline void SetVector(struct ContactPosition *v, s32 x, s32 y, s32 z)
 {
     v->x = x;
     v->y = y;
     v->z = z;
 }
 
-void InventoryGrid_BeginNumberPhase(struct InventoryGrid *s)
+void InventoryGrid_BeginNumberPhase(struct SceneHudState *s)
 {
-    struct InventoryGridVector vec;
+    struct ContactPosition vec;
     if (PauseMenu_UpdateSpriteMotion(s, 0)) {
-        if (++s->view.state.phaseCounter > 7) {
-            s->view.state.motionFlags |= 1;
-            PauseMenu_ApplyItemSlot(s, s->view.state.selectedItemSlot);
+        if (++s->actionTransferDelay > 7) {
+            s->motionWidgets[0].flags |= 1;
+            PauseMenu_ApplyItemSlot(s, s->actionSelection);
             PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
             SetVector(&vec, 32, 48, 0);
-            InventoryGrid_ShowNumber(s, s->view.state.appliedValue, &vec);
+            InventoryGrid_ShowNumber(s, s->appliedStatB, &vec);
             Sound_PlaySong(0x10D);
             Hud_SetInteractionCallback(s, InventoryGrid_UpdateNumberPhase, 1);
         }
@@ -76,32 +74,30 @@ u32 Selection_GetDisplayFrame(s32);
 
 void PauseMenu_BeginSpriteMotion(void *, u32, s32, u32, void *, void *, u32, u32);
 
-void InventoryGrid_BeginNumberPhaseAlternate(struct InventoryGrid *);
-
-void InventoryGrid_BeginIconTransfer(struct InventoryGrid *s)
+void InventoryGrid_BeginIconTransfer(struct SceneHudState *s)
 {
-    struct InventoryGridVector from, to;
+    struct ContactPosition from, to;
     u8 *kind;
     u32 index;
     u32 later;
     u32 *flags;
     s32 result;
-    kind = &s->view.state.selectedItemSlot;
+    kind = &s->actionSelection;
     index = *kind + 10;
     {
-        u32 off = index * sizeof(struct InventoryGridElement);
-        u8 *base = (u8 *)s->view.elementView.elements;
+        u32 off = index * sizeof(struct SceneInputWidget);
+        u8 *base = (u8 *)&s->categoryWidgets[0].flags;
         flags = (u32 *)(base + off);
     }
     *flags |= 1;
-    SceneHud_GetActionIconPosition(&from, s->view.state.selectedSlot);
+    SceneHud_GetActionIconPosition(&from, s->actionCursor);
     to.x = 16;
     to.y = 48;
     to.z = 0;
     result = Selection_GetDisplayFrame(
-        Inventory_GetQuantityByStorage(s->view.state.itemStorage, *kind));
+        Inventory_GetQuantityByStorage(s->actionCategory, *kind));
     later = *kind + 10;
-    PauseMenu_BeginSpriteMotion(s, 0, result, s->view.elementView.elements[later].value, &from, &to,
+    PauseMenu_BeginSpriteMotion(s, 0, result, s->categoryWidgets[later].paletteBank, &from, &to,
                              24, 16);
     Sound_PlaySong(0x38A);
     Hud_SetInteractionCallback(s, InventoryGrid_BeginNumberPhaseAlternate, 1);
@@ -109,15 +105,13 @@ void InventoryGrid_BeginIconTransfer(struct InventoryGrid *s)
 
 s32 Div(s32, s32);
 
-void SpriteDrawable_SelectTileFrame(void *, void *, u32);
-
-void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
-                              struct InventoryGridVector *origin)
+void InventoryGrid_ShowNumber(struct SceneHudState *s, s32 value,
+                              const struct ContactPosition *origin)
 {
     s32 digits[4];
     s32 first, i, remainder;
-    struct InventoryGridVector position;
-    struct InventoryNumberDigit *digit;
+    struct ContactPosition position;
+    struct SpriteDrawable *digit;
     s32 *number;
     if (value > 0) {
         if (value > 9999)
@@ -142,13 +136,14 @@ void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
         position.y -= 4;
         i = 0;
         number = digits;
-        digit = s->view.state.digits;
+        digit = s->numberDigits;
         do {
             if (i < first)
                 digit->flags |= 1;
             else {
                 digit->flags &= ~1;
-                SpriteDrawable_SelectTileFrame(&s->view.state.digits[i], s->view.state.digitResource, *number + 42);
+                SpriteDrawable_SelectTileFrame(&s->numberDigits[i], s->numberDigitResource,
+                                               *number + 42);
                 digit->position = position;
                 position.x += 5;
             }
@@ -158,18 +153,16 @@ void InventoryGrid_ShowNumber(struct InventoryGrid *s, s32 value,
     }
 }
 
-void InventoryGrid_FinishNumberPhase(struct InventoryGrid *);
-
-void InventoryGrid_BeginNumberPhaseAlternate(struct InventoryGrid *s)
+void InventoryGrid_BeginNumberPhaseAlternate(struct SceneHudState *s)
 {
-    struct InventoryGridVector vec;
+    struct ContactPosition vec;
     if (PauseMenu_UpdateSpriteMotion(s, 0)) {
-        if (++s->view.state.phaseCounter > 7) {
-            s->view.state.motionFlags |= 1;
-            PauseMenu_ApplyItemSlot(s, s->view.state.selectedItemSlot);
+        if (++s->actionTransferDelay > 7) {
+            s->motionWidgets[0].flags |= 1;
+            PauseMenu_ApplyItemSlot(s, s->actionSelection);
             PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
             SetVector(&vec, 32, 48, 0);
-            InventoryGrid_ShowNumber(s, s->view.state.appliedValue, &vec);
+            InventoryGrid_ShowNumber(s, s->appliedStatB, &vec);
             Sound_PlaySong(0x10D);
             Hud_SetInteractionCallback(s, InventoryGrid_FinishNumberPhase, 1);
         }
@@ -194,19 +187,19 @@ void SceneHud_ShowActionPreview(void *);
 
 void SceneHud_RefreshActionIcons(void *);
 
-void InventoryGrid_FinishNumberPhase(struct InventoryGrid *s)
+void InventoryGrid_FinishNumberPhase(struct SceneHudState *s)
 {
-    if (s->view.state.phaseCounter <= 31) {
-        if (++s->view.state.phaseCounter == 32) {
+    if (s->actionTransferDelay <= 31) {
+        if (++s->actionTransferDelay == 32) {
             u32 mask = 1;
-            struct InventoryNumberDigit *p = s->view.state.digits;
+            struct SpriteDrawable *p = s->numberDigits;
             s32 i = 3;
             do {
                 p->flags |= mask;
                 p++;
             } while (--i >= 0);
-        } else if (s->view.state.phaseCounter <= 8) {
-            u16 *p = &s->view.state.digits[0].position.y;
+        } else if (s->actionTransferDelay <= 8) {
+            s16 *p = &s->numberDigits[0].position.y;
             s32 i = 3;
             do {
                 (*p)--;
@@ -217,9 +210,9 @@ void InventoryGrid_FinishNumberPhase(struct InventoryGrid *s)
         void *selection;
         SceneHud_RefreshActionIcons(s);
         Hud_SetInteractionCallback(s, SceneHud_UpdateActionSelection, 1);
-        selection = s->view.state.selectionState;
+        selection = s->actionInput;
         Inventory_InitializeSelectionGrid(selection, 1, 0);
-        SceneHud_GetActionIconPosition(s->view.state.slotPosition, s->view.state.selectedSlot);
+        SceneHud_GetActionIconPosition(&s->categoryWidgets[5].position, s->actionCursor);
         SceneHud_ShowActionPreview(s);
         Hud_SaveGridSelection(selection);
         InventoryPanel_ShowStatusIcons(s);

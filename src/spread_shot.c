@@ -233,6 +233,7 @@ u8 SpreadShot_ResolveTerrain(struct SpreadShot *shot, s32 angle, u32 next)
                     }
                     target = cell - 1;
                     {
+                        /* concession-ok(dead-code): Shared bidirectional Seek uses its backward arm for cell - 1; the cell + 1 calls use its forward arm. */
                         u8 found = Seek(position, cell, target);
                         redirectDirection = 2;
                         if (found)

@@ -99,7 +99,7 @@ void SceneActorRegistry_DefeatActorsFromScript(void)
                         value |= mask;
                         drawable->flags = value;
                     } else {
-                        struct SceneActorAnimationTile *drawable =
+                        struct SceneInputWidget *drawable =
                             &((struct SceneActorAnimationTileDrawable *)actor->base.drawable)->tile;
                         u32 value = drawable->flags;
                         value |= mask;

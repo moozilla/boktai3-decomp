@@ -3,12 +3,11 @@
 #include "scene_actor_behavior.h"
 #include "script_utility.h"
 #include "spark_particle.h"
+#include "bestiary.h"
 #include "monster_particle_random.h"
 
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
-void *Bestiary_GetEntryForActor(u32, u32);
-void Bestiary_UnlockEntry(void *);
 void SceneActor_CallContextScriptB(void *);
 void Vorn_SendMessage(void *);
 void SceneActorPlacement_PlayCategoryEventSound(void *);
@@ -44,7 +43,7 @@ static inline void Vorn_ClearRoute(struct ChaseActor *actor,
     control->timer = cleared;
 }
 
-static inline void Vorn_SetTileFlags(struct SceneActorAnimationTile *tile, u32 bits)
+static inline void Vorn_SetTileFlags(struct SceneInputWidget *tile, u32 bits)
 {
     tile->flags |= bits;
 }

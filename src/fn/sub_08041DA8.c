@@ -1,6 +1,6 @@
 #include "modifier_list.h"
+#include "palette_pulse.h"
 #include "render.h"
-void Palette_UpdateHighlightPulse(u16 *, u8 *);
 void PaletteFade_CycleMenuColors(void *);
 void CharacterModel_UpdatePairedAnimations(void *, s32);
 void ModifierMenu_UpdatePreviewAppearance(struct ModifierMenu *menu)
