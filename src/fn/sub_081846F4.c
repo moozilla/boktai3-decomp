@@ -1,38 +1,16 @@
-#include "global.h"
+#include "scene_combat_actor.h"
+#include "game_state.h"
+
+extern struct GameState *gGameState;
 
 /* tentative: 4-state charge attack with fade, collider arm and camera shake */
 
-struct ActorAnimationLayer {
-    u16 unknown[3];
-    u16 flags;
-};
-struct ActorRenderFlags {
-    u32 unknown, flags;
-};
-struct Vec8 {
-    u32 a, b;
-};
-struct Collider {
-    u8 pad[0x14];
-    struct Vec8 v14;
-    struct Vec8 v1c;
-    u8 pad2[0x14];
-    u32 flags38;
-};
-struct PlayerPos {
-    u8 pad[0x30];
-    s16 x;
-    u16 pad2;
-    s16 z;
-};
-
 extern u32 gUnk_0824EE80[];
 extern u32 gUnk_0824EE90[];
-extern const struct Vec8 gUnk_0824EEA0;
-extern const struct Vec8 gUnk_0824EEA8;
+extern const struct ContactPosition gUnk_0824EEA0;
+extern const struct ContactPosition gUnk_0824EEA8;
 extern u32 gUnk_0824EEB0[];
-extern struct PlayerPos *gGameState;
-void Armor_SetAnimationFromStart(u32 a, u32 b);
+void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Sound_PlaySongChecked(u32 a);
 void Armor_StartFastWhiteFade(void *);
 void Armor_StartPaletteTransition(void *);
@@ -41,23 +19,24 @@ void Collider_SetAttackPowerAndForce(void *, s32, s32);
 void Camera_RequestShake(s32);
 s32 Math_Atan2(s32, s32);
 
-void ActorController_UpdateChargeAttackTransition(u8 *p)
+void ActorController_UpdateChargeAttackTransition(struct SceneCombatActor *actor)
 {
-    u8 *s = p + 0xB40;
+    u8 *p = (void *)actor;
+    u8 *s = &actor->actionPhase;
     u8 st = *s;
 
     switch (st) {
         case 0: {
             u32 four = 4;
-            Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EE80[((p[0xB39] + 0x60) >> 6) & 3]);
+            Armor_SetAnimationFromStart(actor, &gUnk_0824EE80[((actor->heading + 0x60) >> 6) & 3]);
             (*s)++;
-            p[0xB41] = st;
-            ((struct ActorAnimationLayer *)(p + 0x238))->flags |= four;
-            ((struct ActorAnimationLayer *)(p + 0x1E4))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x28C))->flags &= ~four;
-            ((struct ActorAnimationLayer *)(p + 0x190))->flags |= four;
+            actor->actionReady = st;
+            ((struct ContactCollider *)(p + 0x238))->flags |= four;
+            ((struct ContactCollider *)(p + 0x1E4))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x28C))->flags &= ~four;
+            ((struct ContactCollider *)(p + 0x190))->flags |= four;
             {
-                struct ActorRenderFlags *render = (void *)(p + 0x180);
+                struct ActorControllerMotion *render = (void *)(p + 0x180);
                 u32 one = 1;
                 render->flags |= one;
             }
@@ -66,42 +45,42 @@ void ActorController_UpdateChargeAttackTransition(u8 *p)
             break;
         }
         case 1:
-            if (p[0xB43] != 0) {
-                struct Collider *c;
-                Armor_SetAnimationFromStart((u32)p,
-                                            (u32)&gUnk_0824EE90[((p[0xB39] + 0x60) >> 6) & 3]);
+            if (actor->animationComplete != 0) {
+                struct ContactCollider *c;
+                Armor_SetAnimationFromStart(actor,
+                                            &gUnk_0824EE90[((actor->heading + 0x60) >> 6) & 3]);
                 {
                     u32 next = *s + 1;
                     u32 zero = 0;
                     *s = next;
-                    p[0xB41] = zero;
-                    p[0xB42] = zero;
+                    actor->actionReady = zero;
+                    actor->actionCounter = zero;
                 }
                 Armor_StartFastWhiteFade(p);
-                p[0xB44] = 20;
+                actor->shakeStrength = 20;
                 *(u16 *)(p + 0x196) &= ~4;
-                c = (struct Collider *)(p + 0x190);
+                c = (struct ContactCollider *)(p + 0x190);
                 {
                     u32 mask = 0x40000;
-                    c->flags38 |= mask;
+                    c->reactionFlags |= mask;
                 }
                 Collider_SetAttackPowerAndForce(c, 0, 0x50);
-                c->v1c = gUnk_0824EEA8;
-                c->v14 = gUnk_0824EEA0;
-                p[0x1D2] = Math_Atan2(gGameState->x - *(s16 *)(p + 0x48),
-                                      gGameState->z - *(s16 *)(p + 0x4C));
+                c->bounds = gUnk_0824EEA8;
+                c->offset = gUnk_0824EEA0;
+                p[0x1D2] = Math_Atan2(gGameState->positionX - *(s16 *)(p + 0x48),
+                                      gGameState->positionZ - *(s16 *)(p + 0x4C));
                 Sound_PlaySongChecked(0x1BA);
             }
             break;
         case 2:
-            if (p[0xB42] > 7) {
-                Armor_SetAnimationFromStart((u32)p,
-                                            (u32)&gUnk_0824EEB0[((p[0xB39] + 0x60) >> 6) & 3]);
+            if (actor->actionCounter > 7) {
+                Armor_SetAnimationFromStart(actor,
+                                            &gUnk_0824EEB0[((actor->heading + 0x60) >> 6) & 3]);
                 {
                     u32 next = *s + 1;
                     u32 zero = 0;
                     *s = next;
-                    p[0xB41] = zero;
+                    actor->actionReady = zero;
                 }
                 Armor_StartPaletteTransition(p);
                 {
@@ -114,15 +93,15 @@ void ActorController_UpdateChargeAttackTransition(u8 *p)
             }
             break;
         case 3:
-            if (p[0xB43] != 0) {
+            if (actor->animationComplete != 0) {
                 *s = 0xFF;
-                p[0xB41] = 1;
+                actor->actionReady = 1;
                 ActorPalette_Reset(p);
             }
             break;
     }
-    if (p[0xB44] != 0) {
+    if (actor->shakeStrength != 0) {
         Camera_RequestShake(0x80);
-        p[0xB44]--;
+        actor->shakeStrength--;
     }
 }
