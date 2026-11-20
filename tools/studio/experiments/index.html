@@ -49,6 +49,20 @@
             </div>
           </div>
           <div id="matrix"></div>
+          <form id="snapshot-query" class="snapshot-query">
+            <label for="snapshot-field">Read another field from this frame</label>
+            <div>
+              <input id="snapshot-field" type="text" maxlength="128" spellcheck="false" autocomplete="off"
+                     placeholder="gGameState-&gt;life" list="sample-fields" required>
+              <button type="submit">Read</button>
+            </div>
+            <datalist id="sample-fields">
+              <option value="gGameState->life"><option value="gPlayers[0]->position.x">
+              <option value="gPlayers[0]->position.z"><option value="gPlayers[0]->currentStatB">
+              <option value="gEnginePauseFlags"><option value="gTaskLists[6].pauseMask">
+            </datalist>
+            <output id="snapshot-value" role="status" aria-live="polite"></output>
+          </form>
         </section>
         <aside class="evidence" id="evidence" aria-label="Selected evidence"></aside>
       </div>

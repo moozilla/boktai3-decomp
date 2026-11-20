@@ -70,6 +70,14 @@ tbody th code { font-size: 11px; font-weight: 550; overflow-wrap: anywhere; }
 .evidence pre b { display: block; color: var(--accent); }
 .evidence .meta { font: 11px/1.5 var(--mono); overflow-wrap: anywhere; }
 .evidence .link-row { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; }
+.snapshot-query { margin: 10px 14px 14px; padding-top: 11px; border-top: 1px solid var(--line); display: grid; gap: 5px; }
+.snapshot-query label { color: var(--muted); font-size: 12px; }
+.snapshot-query > div { display: flex; gap: 6px; }
+.snapshot-query input { min-width: 0; flex: 1; background: var(--bg); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 8px; font: 12px var(--mono); }
+.snapshot-query button { min-height: 30px; padding: 4px 8px; }
+.snapshot-query output { overflow-wrap: anywhere; font-size: 12px; }
+.snapshot-query output:empty { display: none; }
 .compare-panel { margin-top: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 11px; }
 .notebook-footer { margin-top: 19px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--muted); font-size: 12px; }
 .notebook select { max-width: 360px; padding: 5px 8px; }

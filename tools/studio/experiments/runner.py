@@ -7,8 +7,10 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 import sys
 import threading
+import time
 from uuid import uuid4
 
 from . import annotations, checks, fields, recipe
@@ -64,8 +66,26 @@ def init_run(spec):
 
 
 def status(directory, state, message, **info):
-    data = dict(id=directory.name, state=state, message=message, **info)
+    data = dict(id=directory.name, state=state, message=message, pid=os.getpid(), updated=time.time(), **info)
     atomic_json(directory / "status.json", data)
+    return data
+
+
+def read_status(directory):
+    data = read_json(directory / "status.json")
+    pid = data.pop("pid", None)
+    updated = data.pop("updated", None)
+    if data["state"] in {"queued", "running"}:
+        active = True
+        if pid and pid != os.getpid():
+            try:
+                os.kill(pid, 0)
+            except ProcessLookupError:
+                active = False
+            except PermissionError:
+                pass
+        if not active or (updated is not None and time.time() - updated > 360):
+            data.update(state="interrupted", message="The recording stopped before completing. Rerun its saved recipe.")
     return data
 
 
@@ -154,28 +174,59 @@ def prepare_battery(checkpoint, directory):
     return None
 
 
-def prepare_fork(spec, directory, rom_id, harness_id):
+def captured_frame(reference, rom_id):
+    """Resolve a validated local run, trial and sample to a checked savestate."""
+    identifier, trial_id, frame = reference["run"], reference["trial"], reference["frame"]
+    if not isinstance(trial_id, str) or not recipe.TRIAL_ID.fullmatch(trial_id) or type(frame) is not int:
+        raise ValueError("Invalid captured frame")
+    directory = run_dir(identifier)
+    result = read_json(directory / "result.json")
+    if result["identity"]["rom"] != rom_id:
+        raise ValueError("The frame was recorded with a different ROM")
+    trial = next((row for row in result["trials"] if row["id"] == trial_id), None)
+    point = next((row for row in trial["snapshots"] if row["relative"] == frame), None) if trial else None
+    if not point or not point.get("state_sha256"):
+        raise ValueError("Choose a captured sample that has a saved state")
+    image = directory / trial_id / f"f{frame:04d}.png"
+    data = gzip.decompress(image.with_suffix(".ss.gz").read_bytes())
+    if hashlib.sha256(data).hexdigest() != point["state_sha256"]:
+        raise ValueError("The saved frame changed on disk")
+    return result, trial, point, image, data
+
+
+def prepare_fork(spec, directory, rom_id):
     """Restore only a captured sample of a completed local run."""
     fork = spec["fork"]
     if not fork:
         return None, None
-    original = run_dir(fork["run"])
-    result = read_json(original / "result.json")
-    if (result["identity"]["rom"], result["identity"]["harness"]) != (rom_id, harness_id):
-        raise ValueError("The fork was recorded with different ROM or emulator code")
-    trial = next((row for row in result["trials"] if row["id"] == fork["trial"]), None)
-    point = next((row for row in trial["snapshots"] if row["relative"] == fork["frame"]), None) if trial else None
-    if not point or not point.get("state_sha256"):
-        raise ValueError("Choose a captured sample that has a saved state")
-    stem = original / trial["id"] / point["label"]
-    data = gzip.decompress(stem.with_suffix(".ss.gz").read_bytes())
-    if hashlib.sha256(data).hexdigest() != point["state_sha256"]:
-        raise ValueError("The saved frame changed on disk")
+    result, trial, point, image, data = captured_frame(fork, rom_id)
     (directory / "parent.ss").write_bytes(data)
     checkpoint = {**result["checkpoint"], "kind": "fork",
                   "label": f"{trial['label']} at frame {point['relative']}",
                   "fork": {**fork, "state_sha256": point["state_sha256"]}}
-    return {"checkpoint": checkpoint, "point": point}, stem.with_suffix(".png")
+    return {"checkpoint": checkpoint, "point": point}, image
+
+
+def inspect_frame(reference, paths):
+    """Read newly selected fields from a frame without advancing it."""
+    paths = recipe.strings(paths, recipe.MAX_FIELDS, "Observed fields")
+    if not paths:
+        raise ValueError("Observe at least one typed field")
+    result, trial, point, _, state = captured_frame(reference, fingerprint(ROM))
+    observed = [fields.measure(path) for path in paths]
+    binary = build_harness()
+    with tempfile.TemporaryDirectory(prefix="inspect-", dir=HARNESS.parent) as temporary:
+        directory = Path(temporary)
+        (directory / "frame.ss").write_bytes(state)
+        commands = ["trace off", "load frame", *(f.command() for f in observed), "sample frame"]
+        run_harness(binary, directory, commands, result["recipe"]["rtc"])
+        snaps, _ = parse_events(directory / "observations.tsv", observed, fields.function_index())
+    if len(snaps) != 1 or snaps[0]["frame"] != point["frame"]:
+        raise RuntimeError("The readback did not restore the requested frame")
+    return {"run": reference["run"], "trial": trial["id"], "frame": point["relative"],
+            "game_frame": point["frame"], "state_sha256": point["state_sha256"],
+            "fields": [{**field.to_dict(), "value": row["value"], "resolved_address": row["address"]}
+                       for field, row in zip(observed, snaps[0]["fields"])]}
 
 
 def light_at_sample(commands, starting_lux):
@@ -377,7 +428,7 @@ def execute(directory, spec, trans=None):
         prefix = directory / "prepare"
         prefix.mkdir()
         rom_id, harness_id = fingerprint(ROM), fingerprint(binary)
-        parent, parent_screen = prepare_fork(spec, prefix, rom_id, harness_id)
+        parent, parent_screen = prepare_fork(spec, prefix, rom_id)
         if parent:
             checkpoint = parent["checkpoint"]
             battery = None

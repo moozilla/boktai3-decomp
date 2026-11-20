@@ -350,19 +350,22 @@ static void end_segment(void) {
 static void savestate(const char* name, int load) {
 	char path[1024];
 	snprintf(path, sizeof(path), "%s/%s.ss", outdir, name);
-	size_t sz = core->stateSize(core);
-	void* buf = malloc(sz);
+	size_t size = core->stateSize(core);
+	void* state = malloc(size);
+	if (!state) { fprintf(stderr, "cannot allocate savestate buffer\n"); exit(1); }
+	FILE* f = fopen(path, load ? "rb" : "wb");
+	if (!f) { perror(path); exit(1); }
 	if (load) {
-		FILE* f = fopen(path, "rb");
-		if (!f) { fprintf(stderr, "no state %s\n", path); exit(1); }
-		if (fread(buf, 1, sz, f) != sz) { fprintf(stderr, "short state\n"); exit(1); }
-		fclose(f);
-		core->loadState(core, buf);
-	} else {
-		core->saveState(core, buf);
-		FILE* f = fopen(path, "wb"); fwrite(buf, 1, sz, f); fclose(f);
+		if (fread(state, 1, size, f) != size || fgetc(f) != EOF || !core->loadState(core, state)) {
+			fprintf(stderr, "incompatible savestate %s\n", path);
+			exit(1);
+		}
+	} else if (!core->saveState(core, state) || fwrite(state, 1, size, f) != size) {
+		fprintf(stderr, "cannot write savestate %s\n", path);
+		exit(1);
 	}
-	free(buf);
+	if (fclose(f)) { perror(path); exit(1); }
+	free(state);
 }
 
 static char scriptdir[1024] = ".";

@@ -4,6 +4,7 @@ const API = '/api/experiments';
 let example, catalog, historyRows = [], draft, primary, comparison;
 let selected = { trial: 0, kind: 'field', index: 0 };
 let sample = 0, timer, loadToken = 0, compareToken = 0, running = false;
+let readbackKey = '', queryToken = 0;
 const requestProbe = new URLSearchParams(location.search).get('probe');
 
 const pad = n => String(n).padStart(4, '0');
@@ -104,7 +105,20 @@ async function waitForRun(id, target, token) {
   for (;;) {
     const state = await json(resultPath(id));
     if (token !== loadToken) return;
-    if (state.state === 'failed') throw new Error(state.message);
+    if (state.state === 'failed' || state.state === 'interrupted') {
+      const saved = await json(artifact('recipe.json', id));
+      if (token !== loadToken) return;
+      primary = null;
+      comparison = null;
+      example = saved;
+      $('results').hidden = true;
+      $('preview').hidden = false;
+      $('artifacts').innerHTML = '';
+      drawPreview(saved);
+      await refreshHistory();
+      setStatus(state.message, true);
+      return;
+    }
     if (state.state === 'complete') break;
     setStatus(state.message + '…');
     await pause(450);
@@ -196,7 +210,16 @@ function renderFrame() {
   $('scrub').setAttribute('aria-valuetext', `Frame ${snap.relative} of ${primary.recipe.duration}`);
   $('previous').disabled = sample === 0;
   $('next').disabled = sample === trialFrames.length - 1;
-  $('fork-frame').disabled = !primary.trials[selected.trial].snapshots[sample].state_sha256;
+  const selectedTrial = primary.trials[selected.trial];
+  const selectedPoint = selectedTrial.snapshots[sample];
+  $('fork-frame').disabled = !selectedPoint.state_sha256;
+  $('snapshot-query').hidden = !selectedPoint.state_sha256;
+  const key = `${primary.id}/${selectedTrial.id}/${selectedPoint.relative}`;
+  if (key !== readbackKey) {
+    readbackKey = key;
+    $('snapshot-value').value = '';
+    ++queryToken;
+  }
   primary.trials.forEach((t, i) => {
     const image = $('image-' + i);
     const url = artifact(`${t.id}/${t.snapshots[sample].label}.png`);
@@ -447,6 +470,26 @@ $('edit').onclick = () => openEditor();
 $('play').onclick = playback;
 $('scrub').oninput = event => { stopPlayback(); chooseFrame(event.target.value); };
 $('previous').onclick = () => { stopPlayback(); chooseFrame(sample - 1); };
+$('snapshot-query').onsubmit = async event => {
+  event.preventDefault();
+  stopPlayback();
+  const key = readbackKey, token = ++queryToken;
+  const { trial, snap } = atSelected();
+  const output = $('snapshot-value');
+  output.value = 'Restoring the captured frame…';
+  try {
+    const url = resultPath(primary.id) + '/snapshot/' + trial.id + '/' + snap.relative;
+    const { fields: rows, game_frame: gameFrame } = await json(url, [$('snapshot-field').value.trim()]);
+    if (key !== readbackKey || token !== queryToken) return;
+    const row = rows[0];
+    output.value = row.resolved_address
+      ? `${row.path} = ${showValue(row.value)} · RAM 0x${row.resolved_address} · game frame ${gameFrame}`
+      : `${row.path} has no bound value at game frame ${gameFrame}`;
+  } catch (error) {
+    if (key === readbackKey && token === queryToken) output.value = error.message;
+  }
+};
+
 $('fork-frame').onclick = () => {
   stopPlayback();
   const { trial, snap } = atSelected();

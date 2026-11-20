@@ -48,7 +48,7 @@ def recent():
     output = []
     for directory in directories[:30]:
         try:
-            state = runner.read_json(directory / "status.json")
+            state = runner.read_status(directory)
             spec = runner.read_json(directory / "recipe.json")
         except FileNotFoundError:
             continue
@@ -130,11 +130,24 @@ def routes(handler, method):
             if not isinstance(paths, list) or not 1 <= len(paths) <= recipe.MAX_FIELDS:
                 raise ValueError("Send an array of 1–16 named fields")
             handler.send(200, [fields.measure(path).to_dict() for path in paths])
+        elif method == "POST" and path.startswith(API + "/runs/"):
+            identifier, *parts = path.removeprefix(API + "/runs/").split("/")
+            if len(parts) != 3 or parts[0] != "snapshot" or not re.fullmatch(r"[0-9]{1,4}", parts[2]):
+                raise FileNotFoundError("No such readback route")
+            paths = body(handler)
+            if not SLOTS.acquire(blocking=False):
+                handler.send(429, {"error": "The emulator queue is full"})
+                return True
+            try:
+                reference = {"run": identifier, "trial": parts[1], "frame": int(parts[2])}
+                handler.send(200, runner.inspect_frame(reference, paths))
+            finally:
+                SLOTS.release()
         elif method == "GET" and path.startswith(API + "/runs/"):
             identifier, *parts = path.removeprefix(API + "/runs/").split("/")
             directory = runner.run_dir(identifier)
             if not parts:
-                handler.send(200, runner.read_json(directory / "status.json"))
+                handler.send(200, runner.read_status(directory))
             elif parts == ["result"]:
                 handler.send(200, runner.read_json(directory / "result.json"))
             elif parts[0] == "artifact":

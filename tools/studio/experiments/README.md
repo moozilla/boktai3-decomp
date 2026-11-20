@@ -34,6 +34,7 @@ build/venv/bin/python -m tools.studio.experiments checkpoints
 build/venv/bin/python -m tools.studio.experiments fields 'gPlayers[0]->position.x' 'gGameState->life'
 build/venv/bin/python -m tools.studio.experiments run ./my-experiment.json
 build/venv/bin/python -m tools.studio.experiments show RUN_ID
+build/venv/bin/python -m tools.studio.experiments snapshot RUN_ID menu 60 'gGameState->life'
 ```
 
 - `checkpoint` selects power-on, the reference save, or an available story-bank
@@ -60,8 +61,7 @@ build/venv/bin/python -m tools.studio.experiments show RUN_ID
   in the half-open frame interval. Operators are `eq`, `ne`, `lt`, `le`, `gt`
   and `ge`. A changed pointer binding leaves the field delta unresolved.
 - A `fork` has the form `{"run": "RUN_ID", "trial": "TRIAL_ID", "frame": 60}`.
-  Use a captured frame from a run made with the same ROM and harness. The
-  playback preserves the recorded sensor threshold when starting a new fork.
+  Use a capture from the same ROM that mGBA can restore. The playback preserves the recorded sensor threshold when starting a new fork.
 
 ## Tool API
 
@@ -77,6 +77,7 @@ All requests use the local Studio server. Supply JSON for POST requests.
 | POST `/api/experiments/runs` | Submit a recipe. The response identifies the persisted run. |
 | GET `/api/experiments/runs/ID` | Poll job state. |
 | GET `/api/experiments/runs/ID/result` | Read frame values, environment fingerprints, checked claims and attributed stores. |
+| POST `/api/experiments/runs/ID/snapshot/TRIAL/FRAME` | Read a JSON array of named fields from the restored frame. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/writes.json` | Read the value-changing CPU stores for one trial. |
 | GET `/api/experiments/runs/ID/artifact/TRIAL/probes.tsv` | Read the raw function entry and register trace. |
 

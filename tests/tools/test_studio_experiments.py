@@ -201,6 +201,17 @@ class HTTPTests(unittest.TestCase):
                 code, _ = self.request("POST", "/api/experiments/runs", runner.sample_recipe(), **headers)
                 self.assertEqual(code, 400)
 
+    def test_dead_worker_does_not_leave_a_permanent_running_state(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(runner, "JOBS", Path(temp)):
+            directory = runner.init_run(runner.sample_recipe())
+            running = runner.read_json(directory / "status.json")
+            running.update(state="running", pid=os.getpid() + 10000)
+            runner.atomic_json(directory / "status.json", running)
+            with patch.object(runner.os, "kill", side_effect=ProcessLookupError):
+                code, body = self.request("GET", f"/api/experiments/runs/{directory.name}")
+            self.assertEqual(code, 200)
+            self.assertEqual(json.loads(body)["state"], "interrupted")
+
     def test_submit_publishes_normalized_recipe_and_hides_private_files(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(runner, "JOBS", Path(temp)):
             with patch.object(http.POOL, "submit") as dispatch, patch.object(http.SLOTS, "acquire", return_value=True):
@@ -247,6 +258,13 @@ class HTTPTests(unittest.TestCase):
             self.assertIn("Player_Update", [entry["function"]["name"] for entry in field["last_write"]["context"]])
             image = f"/api/experiments/runs/{parent['id']}/artifact/menu/f0060.png"
             self.assertEqual(self.request("GET", image)[1][:8], b"\x89PNG\r\n\x1a\n")
+            code, payload = self.request("POST", f"/api/experiments/runs/{parent['id']}/snapshot/menu/60",
+                                         ["gGameState->life", "gPlayers[0]->position.z"],
+                                         **{"Content-Type": "application/json"})
+            self.assertEqual(code, 200)
+            result = json.loads(payload)
+            self.assertEqual(result["game_frame"], parent["trials"][1]["snapshots"][4]["frame"])
+            self.assertEqual([row["value"] for row in result["fields"]], [616, 2694])
             from experiments.__main__ import proof_branch
             child = run(proof_branch(parent))
             self.assertTrue(all(c["state"] == "confirmed" for c in child["checks"]))

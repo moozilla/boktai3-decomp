@@ -47,6 +47,11 @@ def main():
     commands.add_parser("checkpoints", help="List available starting saves")
     measure = commands.add_parser("fields", help="Resolve scalar fields from the target headers")
     measure.add_argument("paths", nargs="+")
+    inspect = commands.add_parser("snapshot", help="Read additional named fields from a captured frame")
+    inspect.add_argument("id")
+    inspect.add_argument("trial")
+    inspect.add_argument("frame", type=int)
+    inspect.add_argument("paths", nargs="+")
     args = parser.parse_args()
     try:
         match args.command:
@@ -56,6 +61,8 @@ def main():
                 data = runner.checkpoints()
             case "fields":
                 data = [fields.measure(path).to_dict() for path in args.paths]
+            case "snapshot":
+                data = runner.inspect_frame({"run": args.id, "trial": args.trial, "frame": args.frame}, args.paths)
             case "proof" | "run":
                 spec = runner.sample_recipe() if args.command == "proof" else recipe.validate(runner.read_json(args.recipe))
                 directory = runner.init_run(spec)
