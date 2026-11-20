@@ -12,13 +12,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT, HUD_LAYER };
+enum Hook { BANK = 1, MENU, RESOURCE, PLAYER_NAME, TICKER, BG_LAYER, OBJ_FRAME, SUBSTITUTION, DIRECT_TEXT, HUD_LAYER, PATTERN_SET, ACTOR_TILES };
 typedef uint32_t (*Resolver)(unsigned hook, unsigned id, unsigned ptr, unsigned arg,
                              unsigned caller, unsigned scene, unsigned proc, unsigned frame);
 /* Cache the immutable frame table, never the temporary address of a relocated
  * header. A game's widget can reuse that header storage for a different asset. */
 struct FrameChoice { uint32_t glyphs, index, replacement; };
-static struct FrameChoice frame_cache[2048];
+static struct FrameChoice frame_cache[2048], actor_cache[2048];
+static uint32_t actor_frame, actor_palette;
 static struct mCore *core;
 static struct ARMCore *cpu;
 static uint32_t pixels[240 * 160];
@@ -89,6 +90,7 @@ int lt_open(const char *rom, const char *battery, Resolver callback)
     resolve = callback;
     last_proc = 0;
     memset(frame_cache, 0, sizeof(frame_cache));
+    memset(actor_cache, 0, sizeof(actor_cache));
     return 1;
 }
 
@@ -144,6 +146,25 @@ void lt_step(unsigned frames, unsigned keys)
             case 0x081DC054: /* Menu_DrawText(column, row, final string) */
                 cpu->gprs[2] = request(MENU, cpu->gprs[0], cpu->gprs[2], cpu->gprs[1], cpu->gprs[14]);
                 break;
+            case 0x08214600: { /* Sprite_QueueFramePieces(sprite, x, y, z) */
+                uint32_t p = cpu->gprs[0];
+                uint32_t resource = core->rawRead32(core, p+12, -1);
+                int index = (int16_t)core->rawRead16(core, p+16, -1);
+                actor_frame = core->rawRead32(core, resource+20, -1) + index*12;
+                actor_palette = core->rawRead32(core, resource+12, -1);
+                break;
+            }
+            case 0x082152E4: { /* ObjGfx_AllocateTileSlot(src, count), after on-screen culling */
+                uint32_t original = cpu->gprs[0];
+                struct FrameChoice *slot = &actor_cache[((actor_frame >> 2) ^ (actor_palette >> 5)) % 2048];
+                if (slot->glyphs != actor_frame || slot->index != actor_palette) {
+                    slot->glyphs = actor_frame;
+                    slot->index = actor_palette;
+                    slot->replacement = request(ACTOR_TILES, actor_frame, original, actor_palette, cpu->gprs[14]);
+                }
+                cpu->gprs[0] = slot->replacement;
+                break;
+            }
             case 0x08219728: { /* Anim_SelectWidgetGlyph(widget, header, frame) */
                 uint32_t header = cpu->gprs[1], index = (uint16_t)cpu->gprs[2];
                 uint32_t glyphs = core->rawRead32(core, header + 12, -1);
@@ -158,6 +179,15 @@ void lt_step(unsigned frames, unsigned keys)
                 if (slot->replacement) {
                     cpu->gprs[1] = slot->replacement;
                     cpu->gprs[2] = 0; /* Transient resource contains the selected frame only. */
+                }
+                break;
+            }
+            case 0x08215D40: { /* Bg_UploadTileEntries(layer, ptn, count, ids, first) */
+                unsigned count = cpu->gprs[2];
+                if (count && count <= 64) {
+                    unsigned first = core->rawRead32(core, cpu->gprs[13], -1) & 1023;
+                    unsigned packed = (count << 16) | (first << 2) | (cpu->gprs[0] & 3);
+                    request(PATTERN_SET, packed, cpu->gprs[1], cpu->gprs[3], cpu->gprs[14]);
                 }
                 break;
             }

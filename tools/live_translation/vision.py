@@ -1,6 +1,23 @@
 """Persistent index of artwork actually selected by the game and its lettering."""
+from io import BytesIO
 import json
+import re
+import tempfile
 from pathlib import Path
+
+
+def write_cache(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as f:
+        f.write(data)
+        tmp = Path(f.name)
+    tmp.replace(path)
+
+
+def png(image):
+    out = BytesIO()
+    image.save(out, format="PNG")
+    return out.getvalue()
 
 
 class ArtIndex:
@@ -35,6 +52,8 @@ class ArtIndex:
         context = json.loads(row["context"])
         w, h = context["width_px"], context["height_px"]
         for r in regions:
+            if not isinstance(r.get("id"), str) or not re.fullmatch(r"[A-Za-z0-9_-]{0,48}",r["id"]):
+                raise ValueError("A graphic region needs a short identifier")
             box = r.get("box")
             if (not isinstance(box, list) or len(box) != 4 or any(type(n) is not int for n in box)
                     or not (0 <= box[0] < box[2] <= w and 0 <= box[1] < box[3] <= h)):
@@ -50,8 +69,53 @@ class ArtIndex:
                     ON CONFLICT(asset,id) DO UPDATE SET box=excluded.box,source=excluded.source,
                     english=excluded.english,origin=excluded.origin""",
                     (asset, r["id"], json.dumps(r["box"]), r["source"], r.get("english"), origin))
+                if origin == "human correction":
+                    key = asset + ("/"+r["id"] if r["id"] else "")
+                    prev = self.db.execute("SELECT english FROM entries WHERE key=?", (key,)).fetchone()
+                    if prev:
+                        self.db.execute("INSERT INTO edits(key,previous,english) VALUES (?,?,?)",
+                                        (key, prev["english"], r.get("english")))
+                        self.db.execute("UPDATE entries SET source=?,english=?,origin=? WHERE key=?",
+                                        (r["source"], r.get("english"), origin, key))
             self.db.execute("UPDATE artwork SET state=?,origin=?,note=NULL WHERE asset=?",
                             ("lettering" if regions else "no lettering", origin, asset))
+
+    def translate(self, resolver, asset, image, ctx, preview, recipes, frame):
+        from runtime import ROOT
+        from translator import PROVIDER
+        if not preview.exists():
+            write_cache(preview, png(image))
+        self.encounter(asset, ctx, str(preview.relative_to(ROOT)))
+        resolver.record(asset, event="selected", frame=frame, **ctx)
+        if not resolver.enabled:
+            for r in recipes:
+                key = asset + ("/"+r["id"] if r["id"] else "")
+                resolver.record(key, event="japanese", source=r["source"], frame=frame, **ctx)
+            return []
+        state = self.status(asset)["state"]
+        if state == "unexamined":
+            if recipes:
+                self.mark(asset, recipes, PROVIDER)
+            elif resolver.memory.model:
+                found = resolver.memory.model.locate(ctx, resolver.memory.glossary(), png(image))
+                self.mark(asset, found, resolver.memory.model.model)
+        authored = {r["id"]: r for r in recipes}
+        choices = []
+        for region in self.regions(asset):
+            rid = region["id"]
+            key = asset + ("/"+rid if rid else "")
+            box = region["box"]
+            crop = image.crop(box)
+            region.update({k:v for k,v in authored.get(rid, {}).items() if k in ("font", "style")})
+            layout = dict(ctx, region=box, width_px=crop.width, height_px=crop.height,
+                          typography=region.get("style", "sampled"))
+            english, origin, event = resolver.memory.choose(key, region["source"], layout, png(crop),
+                                                            region["english"], region["origin"])
+            resolver.record(key, source=region["source"], english=english, provenance=origin,
+                            event=event, frame=frame, **layout)
+            if english:
+                choices.append((region, english))
+        return choices
 
     def error(self, asset, message):
         with self.db:

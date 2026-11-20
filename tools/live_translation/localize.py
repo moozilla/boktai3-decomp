@@ -22,6 +22,7 @@ class Localizer:
         self.line = None
         self.source_preview = None
         self.graphics = None
+        self.actor_art = None
         from backgrounds import MapTranslator
         self.backgrounds = MapTranslator()
 
@@ -47,8 +48,16 @@ class Localizer:
         if not self.catalog:
             self.catalog = Catalog(game.rom)
         c = self.catalog
+        if hook == 12:
+            from objects import ActorArt
+            if self.actor_art is None:
+                self.actor_art = ActorArt(game, self.memory)
+            return self.actor_art.select(self, game, arg, ptr, aux, lr, scene, proc, frame)
         if hook == 7:
             return self.graphics.select(self, game, arg, ptr, aux, lr, scene, proc, frame) if self.graphics else 0
+        if hook == 11:
+            self.backgrounds.pattern(self, game, arg, ptr, aux)
+            return 0
         if hook in (6, 10):
             return self.backgrounds.select(self, game, arg, ptr, aux, lr, scene, proc, frame, hud=hook==10)
         if hook == 3:
@@ -94,7 +103,7 @@ class Localizer:
         if kind == "name" or (kind == "menu" and ctx["caller"] == "GameStart_DrawSaveInfo" and (arg, aux) == (8, 7)):
             # A custom save's player name belongs to the player; render only
             # explicitly approved spellings in the local glossary.
-            if source not in self.memory.glossary():
+            if source.strip() not in self.memory.glossary():
                 return 0
         if self.bookmarks and kind == "dialogue" and ctx.get("lines", 0) > 1:
             if game.core.lt_bookmark():
@@ -112,6 +121,7 @@ class Localizer:
                 rendered = fit(source,word,ctx)
         except (ValueError, OSError, URLError) as error:
             event = "needs-review"
+            self.memory.remember_issue(key,str(error))
             self.record(key,event=event,reason=str(error),source=source,frame=frame,**ctx)
             return 0
         self.record(key,event=event,source=source,english=word,rendered=rendered,

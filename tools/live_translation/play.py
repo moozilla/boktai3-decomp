@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import sys
 
-from runtime import Game, OUT, prison_save, saves
+from runtime import Game, OUT, prison_save
 from frames import ArtTranslator
 from graphics import REGIONS
 from localize import Localizer
@@ -29,14 +29,18 @@ def arguments():
     landing.add_argument("--from-boot", action="store_true", help="Show the entire startup")
     landing.add_argument("--title", action="store_true", help="Start on the translated title screen")
     sub.add_parser("proof", help="Capture paired Japanese and English game frames")
-    sub.add_parser("replay", help="Capture the opening in the selected language")
+    replay = sub.add_parser("replay", help="Capture the prison or replay a harness input file")
+    replay.add_argument("--inputs", type=Path, help="Controller route, e.g. tests/prologue.txt")
+    source = replay.add_mutually_exclusive_group()
+    source.add_argument("--save", type=Path, help="Battery save or VBA .sgm checkpoint")
+    source.add_argument("--new", action="store_true", help="Boot the input route with a blank save")
     sub.add_parser("review", help="Show original, English and provenance").add_argument("key", nargs="?")
     edit = sub.add_parser("correct", help="Change a previously encountered translation")
     edit.add_argument("key")
     edit.add_argument("english")
     term = sub.add_parser("term", help="Add or change a glossary term")
-    term.add_argument("japanese")
-    term.add_argument("english")
+    term.add_argument("japanese", nargs="?")
+    term.add_argument("english", nargs="?")
     art = sub.add_parser("art", help="List selected graphics or inspect one original crop")
     art.add_argument("asset", nargs="?")
     mark = sub.add_parser("mark", help="Teach an encountered graphic a new lettering region")
@@ -55,6 +59,9 @@ def review(memory, key):
         found = True
         print(f'{row["key"]}  [{row["origin"]}]\n{row["source"]}\n{row["english"] or "(awaiting translation)"}')
         if key:
+            issue = memory.db.execute("SELECT reason FROM issues WHERE key=?", (key,)).fetchone()
+            if issue:
+                print("Review needed:", issue[0])
             print(json.dumps(json.loads(row["context"]), ensure_ascii=False, indent=2))
     if key and not found:
         raise ValueError(f"No encounter for {key} in this memory")
@@ -82,10 +89,6 @@ def artwork(memory, key):
 
 def battery(args):
     source = getattr(args, "save", None)
-    if source and source.suffix.lower() == ".sgm":
-        path = OUT / "checkpoint.sav"
-        saves.write_sav(saves.current(saves.read_sgm(str(source))), path)
-        return path
     if getattr(args, "new", False):
         return None
     return source or prison_save()
@@ -110,20 +113,31 @@ def dispatch(args, memory):
         print("Marked", args.asset, args.region)
         return
     if args.cmd == "term":
-        with memory.db:
-            memory.db.execute("""INSERT INTO glossary VALUES (?,?)
-                ON CONFLICT(japanese) DO UPDATE SET english=excluded.english""", (args.japanese, args.english))
-        print("Glossary updated")
+        if args.japanese is None:
+            for row in memory.db.execute("SELECT g.japanese,g.english,o.origin FROM glossary g LEFT JOIN term_origins o USING(japanese) ORDER BY 1"):
+                print(f'{row[0]}   {row[1]}   [{row[2] or "local"}]')
+        elif args.english is None:
+            raise ValueError("Specify an English spelling for this term")
+        else:
+            memory.add_term(args.japanese, args.english)
+            print("Glossary updated")
         return
     target = OUT / ("japanese" if args.japanese else "english")
-    target.mkdir(exist_ok=True)
+    route = getattr(args, "inputs", None)
+    if route:
+        target = OUT / "routes" / route.stem / target.name
+    target.mkdir(parents=True, exist_ok=True)
     with (target / "transcript.jsonl").open("w") as log:
         resolver = Localizer(memory, log, enabled=not args.japanese)
         resolver.graphics = ArtTranslator()
         with closing(Game(resolver, battery(args))) as game:
             if args.cmd == "replay":
-                from proof import prison
-                prison(game, target)
+                if route:
+                    from routes import run
+                    run(game, route, target)
+                else:
+                    from proof import prison
+                    prison(game, target)
                 print(target)
             else:
                 from player import play

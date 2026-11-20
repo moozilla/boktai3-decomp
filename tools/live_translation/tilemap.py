@@ -4,21 +4,36 @@ from PIL import Image
 
 
 class TileMap:
-    def __init__(self, data):
+    def __init__(self, data, patterns=None):
         if data[:2] != b"MP":
             raise ValueError("Expected an uncompressed MP map")
         count, ntiles, nmeta, self.tile_base = struct.unpack_from("<4H", data, 4)
         table, pixels, defs = struct.unpack_from("<3I", data, 12)
-        if not pixels or not ntiles:
-            raise ValueError("This map uses an external pattern table")
+        if not ntiles or (not pixels and patterns is None):
+            raise ValueError("This map requires an external pattern table")
         self.header = data[:24]
-        self.tiles = [data[pixels + i*32:pixels + (i+1)*32] for i in range(ntiles)]
+        sheet = data[pixels:pixels+ntiles*32] if pixels else patterns
+        if len(sheet) < ntiles*32:
+            raise ValueError("The active pattern set does not cover the map")
+        self.tiles = [sheet[i*32:(i+1)*32] for i in range(ntiles)]
         self.metas = [struct.unpack_from("<4H", data, defs + i*8) for i in range(nmeta)]
         self.layers = []
         for i in range(count):
             w, h, tag, offset = struct.unpack_from("<HHII", data, table + i*12)
-            grid = list(struct.unpack_from(f"<{w*h}H", data, offset))
+            if w*h > 65536:
+                raise ValueError("Invalid native map dimensions")
+            stored = struct.unpack_from(f"<{w*h}H", data, offset)
+            order = self.grid_order(w, h)
+            grid = [stored[slot] for slot in order]
             self.layers.append((w, h, tag, grid))
+
+    @staticmethod
+    def grid_order(w, h):
+        # Each 16x16 chunk is contiguous in ROM, even on a wide world map.
+        if w % 16 or h % 16:
+            return range(w*h)
+        return [((y//16)*(w//16)+x//16)*256 + (y%16)*16 + x%16
+                for y in range(h) for x in range(w)]
 
     def render(self, index):
         """Return native 8-bit palette indices, including each tile's palette bank."""
@@ -27,7 +42,10 @@ class TileMap:
         out = image.load()
         for i, meta in enumerate(grid):
             for q, tile in enumerate(self.metas[meta]):
-                data = self.tiles[(tile & 1023) - self.tile_base]
+                slot = (tile & 1023) - self.tile_base
+                if not 0 <= slot < len(self.tiles):
+                    raise ValueError("A layer references tiles outside its decoded sheet")
+                data = self.tiles[slot]
                 x0, y0 = (i%w)*16 + (q%2)*8, (i//w)*16 + (q//2)*8
                 for y in range(8):
                     for x in range(8):
@@ -37,7 +55,7 @@ class TileMap:
                         out[x0+x, y0+y] = (tile >> 12)*16 + nibble
         return image
 
-    def replace(self, index, original, rendered, *, private_layer=False, limit=1024):
+    def replace(self, index, original, rendered, *, private_layer=False, preserve_other_layers=False, limit=1024):
         """Copy on write. A private HUD upload may reuse an exclusively edited slot."""
         w, h, _, grid = self.layers[index]
         if original.size != rendered.size or original.size != (w*16, h*16):
@@ -66,6 +84,15 @@ class TileMap:
                     changes[i,q] = desired
                 if private_layer:
                     demand.setdefault(slot, set()).add(desired)
+        if preserve_other_layers:
+            for other, (_, _, _, cells) in enumerate(self.layers):
+                if other == index:
+                    continue
+                for mid in set(cells):
+                    for entry in self.metas[mid]:
+                        slot = (entry & 1023) - self.tile_base
+                        if slot in demand:
+                            demand[slot].add(self.tiles[slot])
         for slot, desired in demand.items():
             if self.tiles[slot] not in desired:
                 self.tiles[slot] = min(desired)
@@ -101,7 +128,10 @@ class TileMap:
         struct.pack_into("<3I", header, 12, len(header), pos, pos+len(tiles))
         for w, h, tag, grid in self.layers:
             table.extend(struct.pack("<HHII", w, h, tag, pos+len(tiles)+len(metas)+len(grids)))
-            grids.extend(struct.pack(f"<{len(grid)}H", *grid))
+            stored = [0]*len(grid)
+            for cell, slot in enumerate(self.grid_order(w, h)):
+                stored[slot] = grid[cell]
+            grids.extend(struct.pack(f"<{len(grid)}H", *stored))
         return bytes(header+table+tiles+metas+grids)
 
 

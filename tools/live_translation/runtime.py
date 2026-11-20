@@ -36,7 +36,9 @@ class Game:
         self.error = None
         self.tmp = tempfile.TemporaryDirectory(dir=OUT)
         battery = Path(self.tmp.name) / "game.sav"
-        if save:
+        if save and Path(save).suffix.lower() == ".sgm":
+            saves.write_sav(saves.current(saves.read_sgm(str(save))), battery)
+        elif save:
             shutil.copyfile(save, battery)
         self.callback = CALLBACK(self.encounter)
         ok = self.core.lt_open(bytes(Path(baserom_path())), bytes(battery) if save else None, self.callback)
@@ -101,5 +103,8 @@ def prison_save():
     struct.pack_into("<h", v, 0x70, 1)
     struct.pack_into("<I", g, 0x5A4, 2698)
     path = OUT / "prison.sav"
-    saves.write_sav(dict(regs, vars=v, game=g), path)
+    with tempfile.TemporaryDirectory(dir=OUT) as tmp:
+        staged = Path(tmp) / "prison.sav"
+        saves.write_sav(dict(regs, vars=v, game=g), staged)
+        staged.replace(path)
     return path

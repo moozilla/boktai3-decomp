@@ -1,35 +1,17 @@
 """Resolve a specific sprite frame as the engine selects it for a widget."""
 from collections import Counter
 from hashlib import sha256
-from io import BytesIO
 import json
-from pathlib import Path
 import struct
-import tempfile
 
 from PIL import Image
 import archive
 import sprites
 from graphics import BASE, REGIONS, SIZES, font, letter_mask, lettering, palette_pool, quantize, rectangles
 from runtime import HERE, OUT, ROOT
-from translator import PROVIDER
-from vision import ArtIndex
+from vision import ArtIndex, png, write_cache
 
 MARKED = json.loads((HERE / "regions.json").read_text())
-
-
-def write_cache(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as f:
-        f.write(data)
-        tmp = Path(f.name)
-    tmp.replace(path)
-
-
-def png(image):
-    out = BytesIO()
-    image.save(out, format="PNG")
-    return out.getvalue()
 
 
 def foreground(region):
@@ -179,41 +161,12 @@ class ArtTranslator:
         try:
             image = pkg.render(frames[index], palettes)
             ctx.update(width_px=image.width, height_px=image.height)
-            if not path.exists():
-                write_cache(path, png(image))
-            self.index.encounter(asset, ctx, str(path.relative_to(ROOT)))
-            resolver.record(asset, event="selected", frame=frame, **ctx)
-            if not resolver.enabled:
-                if recipe:
-                    resolver.record(asset, event="japanese", source=recipe[0], frame=frame, **ctx)
-                return 0
+            recipes = MARKED.get(asset, [])
             if recipe:
                 source, style, suggestion = recipe
-                regions = [{"id": "", "style": style, "source": source, "english": suggestion,
-                            "origin": PROVIDER, "box": [0, 0, image.width, image.height]}]
-            else:
-                state = self.index.status(asset)["state"]
-                if state == "unexamined" and asset in MARKED:
-                    self.index.mark(asset, MARKED[asset], PROVIDER)
-                elif state == "unexamined" and resolver.memory.model:
-                    guesses = resolver.memory.model.locate(ctx, resolver.memory.glossary(), png(image))
-                    self.index.mark(asset, guesses, resolver.memory.model.model)
-                regions = self.index.regions(asset)
-            if not regions:
-                return 0
-            choices = []
-            for region in regions:
-                rid = region["id"]
-                entry = asset + ("/"+rid if rid else "")
-                box = region["box"]
-                layout = dict(ctx, region=box, width_px=box[2]-box[0], height_px=box[3]-box[1],
-                              typography=region.get("style", "sampled"))
-                english, origin, event = resolver.memory.choose(entry, region["source"], layout,
-                    png(image.crop(box)), region.get("english"), region["origin"])
-                resolver.record(entry, source=region["source"], english=english, provenance=origin,
-                                event=event, frame=frame, **layout)
-                if english:
-                    choices.append((region, english))
+                recipes = [{"id": "", "style": style, "source": source, "english": suggestion,
+                            "box": [0, 0, image.width, image.height]}]
+            choices = self.index.translate(resolver, asset, image, ctx, path, recipes, frame)
             if not choices:
                 return 0
             signature = [6, ctx["rom_sha256"], asset, choices, font(16).getname()]
@@ -223,16 +176,16 @@ class ArtTranslator:
                 blob = path.read_bytes()
                 event = "tile-cache"
             else:
-                if recipe:
-                    region, english = choices[0]
-                    result = lettering(image, english, region["style"])
-                    boxes = None
-                else:
-                    result = image.copy()
-                    boxes = []
-                    for region, english in choices:
+                result = image.copy()
+                boxes = []
+                for region, english in choices:
+                    if region.get("style"):
+                        result = lettering(result, english, region["style"])
+                        boxes = None
+                    else:
                         paint_region(result, region["box"], english)
-                        boxes.append(region["box"])
+                        if boxes is not None:
+                            boxes.append(region["box"])
                 blob = FrameEncoder(pkg, index, palettes).encode(result, boxes)
                 write_cache(path, blob)
                 event = "typeset"
