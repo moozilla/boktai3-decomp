@@ -71,20 +71,8 @@ void Player_UpdateChargedTetherStrike(u8 *p)
                 break;
             *(u8 *)(p + 0xC0F) = 1;
             *(u16 *)(p + 0x4D2) = 0x1E;
-            {
-                u32 off = 0xAD6;
-                u8 *q;
-                u32 v;
-                q = p + off;
-                v = 0x16E;
-                *(u16 *)q = v;
-            }
-            {
-                u32 off2 = 0xAD8;
-                u8 *q2;
-                q2 = p + off2;
-                *(u16 *)q2 = 0x24;
-            }
+            ((struct Player *)p)->actionEighteenParameter = 0x16E;
+            ((struct Player *)p)->actionEighteenDuration = 0x24;
             Player_PlayLocalSong(*(s32 *)(p + 0x18), 0x1F9);
             Player_SetTetherMode(p, 3, 4);
             break;
