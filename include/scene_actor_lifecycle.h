@@ -142,6 +142,18 @@ struct SceneActor {
     struct SceneActor *next, *previous;
     u8 unknown2F0[0x94];
 };
+
+/* Actor flags (0x100 hides the drawable, 0x200 drops the shadow, 0x1000 marks a navigation
+ * step taken this frame, 0x2000 blocks attachment effects). */
+static inline void SceneActor_SetFlags(struct SceneActor *actor, u32 mask)
+{
+    actor->flags |= mask;
+}
+
+static inline u32 SceneActor_TestFlags(struct SceneActor *actor, u32 mask)
+{
+    return actor->flags & mask;
+}
 struct SceneActorManager {
     struct Task task;
     u32 ticks;

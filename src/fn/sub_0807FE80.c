@@ -27,10 +27,9 @@ void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 fra
         owner->base.target = control;
         owner->base.field2C8 = zero;
         {
-            u32 offset = 0x114;
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)owner + offset);
+            field = &owner->base.pendingControlFlags;
             mask = ~1;
             *field &= mask;
             {

@@ -6,7 +6,8 @@ static inline u8 ActorAttachment_IsAlternateMode(void)
         return TRUE;
     return FALSE;
 }
-static inline void *ActorAttachment_GetSpriteGraphics(struct ActorAttachmentManagerView *manager, s32 kind)
+static inline void *ActorAttachment_GetSpriteGraphics(struct ActorAttachmentManagerView *manager,
+                                                      s32 kind)
 {
     switch (kind) {
         case 0:
@@ -19,7 +20,8 @@ static inline void *ActorAttachment_GetSpriteGraphics(struct ActorAttachmentMana
             return NULL;
     }
 }
-static inline struct ActorAttachmentFollowView *ActorAttachment_GetFollow(struct ActorAttachmentSlotView *slot)
+static inline struct ActorAttachmentFollowView *
+ActorAttachment_GetFollow(struct ActorAttachmentSlotView *slot)
 {
     return slot->followActor;
 }
@@ -76,9 +78,10 @@ ActorAttachment_CreateSpriteSlot(u32 frame, struct ContactPosition *anchor, void
     if (slot->action == 255) {
         slot->offset = ActorAttachment_GetFollow(slot)->offset;
     } else {
-        ActorAttachment_GetActionOffset(slot->resourceKind, slot->action,
-                                        ((struct ActorAttachmentFollowView *)slot->followActor)->direction,
-                                        &xOffset, &zOffset, slot->source);
+        ActorAttachment_GetActionOffset(
+            slot->resourceKind, slot->action,
+            ((struct ActorAttachmentFollowView *)slot->followActor)->direction, &xOffset, &zOffset,
+            slot->source);
         slot->offset.x = xOffset;
         slot->offset.y = 0;
         slot->offset.z = zOffset;

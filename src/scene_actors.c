@@ -1,6 +1,7 @@
 #include "scene_actors.h"
 #include "hit_spark_random.h"
 #include "player.h"
+#include "player_slot_status.h"
 
 void SceneActors_Register(struct StateActor *actor, u32 slot)
 {
@@ -293,16 +294,6 @@ enum SceneActorEffectState { SCENE_ACTOR_REQUEST_EFFECT = 0x10, SCENE_ACTOR_DISA
 
 enum SceneActorDamageEffectFlags { SCENE_ACTOR_DAMAGE_EFFECT_ACTIVE = 1 };
 
-static inline void SceneActors_SetActionFlags(struct StateActor *actor, u32 flags)
-{
-    actor->actionFlags |= flags;
-}
-
-static inline u32 SceneActors_TestActionFlags(const struct StateActor *actor, u32 flags)
-{
-    return flags & actor->actionFlags;
-}
-
 static inline void SceneActors_SetDamageEffectFlags(struct StateActorDamageEffect *effect,
                                                     u32 flags, bool8 enabled)
 {
@@ -325,11 +316,11 @@ void SceneActors_UpdateEffects(struct StateActor *actor)
     if (actor->ambientParticle && (actor->effectTimer & 3) == 0)
         SceneActors_SpawnAmbientParticle(actor);
     if (actor->intermittentEffect && (actor->effectTimer & 3) <= 1)
-        SceneActors_SetActionFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
+        SceneActorState_SetFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
     if (actor->continuousEffect)
-        SceneActors_SetActionFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
+        SceneActorState_SetFlags(actor, SCENE_ACTOR_REQUEST_EFFECT);
 
-    if (SceneActors_TestActionFlags(actor, SCENE_ACTOR_DISABLE_DAMAGE)) {
+    if (SceneActorState_TestFlags(actor, SCENE_ACTOR_DISABLE_DAMAGE)) {
         SceneActors_SetDamageEffectFlags(&actor->damageEffect, SCENE_ACTOR_DAMAGE_EFFECT_ACTIVE,
                                          FALSE);
     } else {
@@ -354,18 +345,13 @@ void SceneActors_SetEventScripts(struct StateActor *actor, u32 first, u32 second
     actor->secondEventScript = second;
 }
 
-static inline u32 SceneActors_TestPlayerStatus(u32 flags)
-{
-    return flags & gPlayerSlotStatus[0];
-}
-
 static inline void SceneActors_RunEventScript(struct StateActor *actor, s16 *position, u32 script)
 {
     int args[8];
     struct ScriptUtilityArguments call;
     if (script) {
         int id = script;
-        if (!SceneActors_TestPlayerStatus(4)) {
+        if (!PlayerSlot_ReadStatus(0, 4)) {
             int i;
             args[0] = position[0];
             args[1] = position[1];

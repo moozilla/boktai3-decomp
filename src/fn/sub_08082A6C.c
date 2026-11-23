@@ -9,9 +9,8 @@ static inline s32 SceneActorControl_TicksSince(s32 now, s32 start)
 {
     s32 elapsed;
     if (now < start) {
-        s32 wrap = -256;
         {
-            s32 adjusted = start + wrap;
+            s32 adjusted = start + (-256);
             elapsed = now - adjusted;
         }
     } else

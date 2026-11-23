@@ -499,10 +499,9 @@ s32 ContactSequencePool_SpawnActor(struct ContactSequenceOwner *pool,
         struct DisplaySequenceState *state = &actor->sequence;
         void *resource = (void *)owner->sequenceResource;
         const struct ContactSequenceFrame *frames = gUnk_08605974;
-        u32 one = 1;
-        Anim_SetSequence(state, resource, frames[savedVariant & one].frame, 0, 8);
+        Anim_SetSequence(state, resource, frames[savedVariant & 1].frame, 0, 8);
         actor->cooldown = 0;
-        actor->active = one;
+        actor->active = 1;
     }
     return 0;
 }

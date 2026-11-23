@@ -2,20 +2,12 @@
 #include "scene_actor_chase.h"
 #include "engine.h"
 #include "scene_actor_delayed_response.h"
+#include "scene_actor_chase_shared.h"
 
-static inline void Reaction_ClearWord(u32 *field, u32 bits)
-{
-    u32 mask = ~bits;
-    *field &= mask;
-}
 static inline void Reaction_ClearHalf(struct ChaseFlags40 *field, u32 bits)
 {
     s32 mask = ~bits;
     field->bits &= mask;
-}
-static inline void Reaction_SetActorFlags(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
 }
 static inline void Reaction_Show(struct ChaseActor *actor)
 {
@@ -36,15 +28,6 @@ static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
         *((u8 *)actor->base.drawable + 7) = mode;
     else
         *((u8 *)actor->base.drawable + 0x3A) = mode;
-}
-static inline void SetDeathFlag(struct ChaseActor *actor, u16 bit)
-{
-    actor->base.motionFlags = bit | actor->base.motionFlags;
-}
-static inline void ClearActorBits(struct ChaseActor *actor, u32 bits)
-{
-    u32 mask = ~bits;
-    actor->base.behaviorFlags &= mask;
 }
 static inline u32 AnyMotion(u32 mask, u32 *flags)
 {
@@ -71,7 +54,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
     if (prepared) {
         {
             struct SceneActorRegistryControl *control = &group->common.control;
-            Reaction_ClearWord(Reaction_ControlFlags(actor), 0x141C0);
+            SceneActorChase_ClearWordFlags(Reaction_ControlFlags(actor), 0x141C0);
             control->counter = 0;
             control->field14 = 0;
             control->timer = 0;
@@ -83,22 +66,22 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
         actor->base.attachmentTimer = 0;
         Reaction_SetDrawMode(actor, 2);
         ActorShadow_Enable(actor->base.shadow);
-        Reaction_ClearWord(&actor->base.statusFlags, 0x80000);
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x80000);
         Reaction_ClearHalf((void *)&actor->base.placementFlags, 0x20);
-        ClearActorBits(actor, 0x400000);
+        SceneActorChase_ClearBehaviorFlags(actor, 0x400000);
         motion = &actor->base.statusFlags;
     }
     if (AnyMotion(0x10, motion)) {
         if (actor->base.health <= 1) {
             s32 zero = 0;
             actor->base.health = zero;
-            SetDeathFlag(actor, 8);
+            SceneActorChase_SetMotionFlags(actor, 8);
             Chase_SetCtl(actor, actor->base.onDefeat, 0x11);
             Chase_SetState(actor, 3, 0, 0);
         } else {
             struct ContactPosition *destination;
-            Reaction_SetActorFlags(actor, 0x400000);
-            Reaction_ClearWord(motion, 4);
+            SceneActorChase_SetBehaviorFlags(actor, 0x400000);
+            SceneActorChase_ClearWordFlags(motion, 4);
             ApplyColliderMask(&collider->flags, (u16)~4);
             destination = group->destination;
             Chase_SnapToRoute(destination, (u8 *)&group->homeRoute);
@@ -110,7 +93,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
                 group->destination->pad = 1;
                 Chase_SetState(actor, 3, 1, 0);
                 Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
-                Reaction_SetActorFlags(actor, 0x10);
+                SceneActorChase_SetBehaviorFlags(actor, 0x10);
                 actor->base.field2C2 = 0x40;
                 SceneActorDelay_Prepare((void *)&group->saved, actor->base.onAlternateEntry, 7, 30);
             }

@@ -22,12 +22,10 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
         u32 required;
         u32 excluded;
         u32 invalidMask;
-        u32 clearMask;
         disabled = 0x40;
         excluded = 0x20000;
         required = 0x1000;
         invalidMask = 3;
-        clearMask = 0xFD;
         do {
             if ((node->flags & 1) && (node->flags & 2)) {
                 struct ChaseActor *actor = node->owner;
@@ -37,7 +35,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
                 if (Unavailable(actor, &state, disabled, excluded) ||
                     (actor->base.behaviorFlags & invalidMask)) {
                 invalid:
-                    node->flags &= clearMask;
+                    node->flags &= 0xFD;
                     node->owner = 0;
                     node->cooldown = 120;
                     continue;
@@ -45,7 +43,7 @@ void SceneActorContacts_ReleaseInvalidOwners(void)
                 {
                     u32 value = *state & required;
                     if (!(u16)value) {
-                        node->flags &= clearMask;
+                        node->flags &= 0xFD;
                         node->owner = 0;
                         value = 120;
                         node->cooldown = value;

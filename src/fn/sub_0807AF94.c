@@ -24,12 +24,10 @@ static inline u32 RecoveryRoute_NewHeading(u32 current, const u16 *randomSamples
         const struct SceneActorChaseRandomTable *view = &table;
         const u16 *samples = view->samples;
         u32 *cursor = &gRandomIndex;
-        u32 wrap = 1023;
-        u32 mask = 3;
-        u16 index = RecoveryRoute_AdvanceRandomCursor(cursor, wrap);
+        u16 index = RecoveryRoute_AdvanceRandomCursor(cursor, 1023);
         u16 sample;
         sample = samples[index];
-        sample &= mask;
+        sample &= 3;
         direction = sample << 6;
         if (direction != current)
             return direction;

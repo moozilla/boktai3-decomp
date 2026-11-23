@@ -44,10 +44,7 @@ void SceneActors_UpdateEightDirectionTurn(struct StateActor *p)
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 1);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        p2->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p2, 12);
     if (!p2->actionReset(p2)) {
         int delta = (s8)(position[9] - (u8)p2->savedFacing), distance = delta;
         if (distance < 0)

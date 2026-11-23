@@ -45,13 +45,12 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                 i++;
             } while (i <= 2);
             {
-                u32 clear = 0;
                 u32 bit;
-                slot->unknown24 = clear;
-                slot->unknown4C = clear;
+                slot->unknown24 = 0;
+                slot->unknown4C = 0;
                 {
                     u8 *low = flags;
-                    *low = clear;
+                    *low = 0;
                 }
                 {
                     struct ContactSwarmSprite *low = sprite;
@@ -69,9 +68,7 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                     {
                         struct ActorAttachmentOwner *recovered = owner;
                         u32 *occupied;
-                        u32 offset;
-                        offset = 0xA1C;
-                        occupied = (u32 *)((u8 *)recovered + offset);
+                        occupied = (u32 *)((u8 *)recovered + 0xA1C);
                         bit <<= id;
                         *occupied &= ~bit;
                     }
@@ -79,13 +76,12 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                 Sprite_Remove(sprite);
                 {
                     u8 *low = active;
-                    *low = clear;
+                    *low = 0;
                 }
                 {
-                    u32 invalid = 255;
                     u8 *idLow;
                     idLow = (u8 *)slotId;
-                    *idLow = invalid;
+                    *idLow = 255;
                 }
                 return 1;
             }

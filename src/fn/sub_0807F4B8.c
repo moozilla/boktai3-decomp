@@ -5,6 +5,7 @@ extern const u8 gUnk_0824E114[];
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 void SceneActorControl_OnIdle(u8 *);
 #include "scene_actor_contact_list.h"
+#include "scene_actor_chase_shared.h"
 struct SceneActorBehaviorPlayerSlot {
     u8 unknown0[8];
     u8 slot;
@@ -30,10 +31,6 @@ static inline void IncrementFirst(u16 *input)
     } else
         *counter = 9999;
 }
-static inline void ClearBits(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero, u8 byteZero)
 {
     a->base.field2B2 = 1;
@@ -41,7 +38,7 @@ static inline void SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
     a->base.controlKind = kind;
     a->base.target = p;
     a->base.field2C8 = zero;
-    ClearBits(&a->base.pendingControlFlags, ~1);
+    SceneActorChase_AndWordFlags(&a->base.pendingControlFlags, ~1);
     a->base.pendingControl = zero;
 }
 void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
@@ -71,7 +68,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
     }
     {
         struct SceneActorRegistryControl *control = &group->control;
-        ClearBits(&a->base.behaviorFlags, 0xFFFEBE3F);
+        SceneActorChase_AndWordFlags(&a->base.behaviorFlags, 0xFFFEBE3F);
         control->counter = zero;
         byteZero = 0;
         control->field14 = zero;
@@ -124,8 +121,7 @@ void SceneActorTarget_ResetContactResponse(struct RoomActor *inputActor)
         return;
     {
         u32 mask = 0x8000;
-        u32 offset = 0x2D0;
-        if (*(u32 *)((u32)actor + offset) & mask)
+        if (actor->statusFlags & mask)
             return;
     }
     {

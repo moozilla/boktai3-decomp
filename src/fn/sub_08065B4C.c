@@ -33,9 +33,8 @@ void ActorAttachment_UpdateFollowingOffset(struct ActorAttachmentSlotView *slot)
                 }
             } else {
                 s32 copyX = x;
-                s32 y = 0;
                 slot->offset.x = copyX;
-                slot->offset.y = y;
+                slot->offset.y = 0;
                 slot->offset.z = z;
             }
         }

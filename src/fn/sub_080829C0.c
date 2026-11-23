@@ -22,14 +22,12 @@ void SceneActorControl_ApplyContactPowerFloor(struct SceneActorBehaviorContactVi
         union RandomTableView table = {(const u16 *)RANDOM_TABLE_ADDR};
         u32 *cursor = &gRandomIndex;
         u32 next = *cursor + 1;
-        u32 mask = 1023;
-        *cursor = next & mask;
+        *cursor = next & 1023;
         sample = table.samples[*cursor];
     }
     {
         s32 old = destination->power;
-        u32 mask = 15;
-        power = old - (sample & mask);
+        power = old - (sample & 15);
     }
     power = power < 20 ? 20 : power;
     destination->power = power;

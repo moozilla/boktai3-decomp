@@ -42,10 +42,9 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
         *field &= mask;
     }
     {
-        u32 offset = 0x2D4;
         u16 *field;
         u32 mask;
-        field = (void *)((u32)early + offset);
+        field = &early->motionFlags;
         mask = ~1;
         mask &= *field;
         *field = mask;
@@ -56,8 +55,7 @@ void SceneActorBehavior_RecordDefeat(struct RoomActor *inputActor)
         return;
     {
         u32 mask = 0x8000;
-        u32 offset = 0x2D0;
-        if (*(u32 *)((u32)actor + offset) & mask)
+        if (actor->statusFlags & mask)
             return;
     }
     slot = ((struct SceneActorBehaviorPlayerSlot *)actor->tracking.target)->slot;

@@ -1,6 +1,7 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_record.h"
 #include "runtime.h"
+#include "word_flags.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 struct ChaseActor *SceneActorRegistry_FindById(u32);
 u8 SceneActorRecord_CanRecordPair(u32, u32);
@@ -34,8 +35,7 @@ u8 SceneActorRegistry_LinkActor(struct ChaseActor *actor)
     gSceneActorRegistryNode = node;
     SceneActorRegistry_MarkCategoryOne(actor->base.category);
     {
-        u32 mask = 0x02000000;
-        if (!(actor->base.statusFlags & mask))
+        if (!Flags_MaskedWord(0x02000000, &actor->base.statusFlags))
             TerrainOverlay_QueueAddActor(&actor->base.body.id);
     }
     SceneActorRegistry_EnsureActorSubsystems(manager, actor);

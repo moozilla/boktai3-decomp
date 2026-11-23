@@ -22,9 +22,7 @@ static inline u8 Test(u32 value, u32 mask)
 static inline u8 LiftFlag(struct SceneActorControlMotionState *state)
 {
     u32 mask = 2;
-    u32 offset;
-    offset = 0x3D4;
-    return Test(*(u32 *)((u8 *)state + offset), mask);
+    return Test(state->flags3D4, mask);
 }
 struct LiftHalfBits {
     u16 bits : 16;

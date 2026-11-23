@@ -1,6 +1,7 @@
 #include "scene_actor_availability.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -24,10 +25,6 @@ static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 beh
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
-static inline void ClearBits(u16 *field, u32 bits)
-{
-    *field &= ~bits;
-}
 s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
 {
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
@@ -36,7 +33,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
         struct SceneActorChaseGroup *group = &actor->group;
         u16 *flags;
         if (SceneActor_TestPendingFlag((void *)actor, 4, &flags)) {
-            ClearBits(flags, 0x987);
+            SceneActorChase_ClearBits(flags, 0x987);
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 2)) {
@@ -46,30 +43,30 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
                 s32 value = actor->base.attachmentRestart;
                 actor->base.attachmentTimer = value;
             }
-            ClearBits(flags, 0x983);
+            SceneActorChase_ClearBits(flags, 0x983);
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 0x800)) {
             SceneActorAttachment_BeginReturnResponse((void *)self);
-            ClearBits(flags, 0x981);
+            SceneActorChase_ClearBits(flags, 0x981);
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 1)) {
-            ClearBits(flags, 0x181);
+            SceneActorChase_ClearBits(flags, 0x181);
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 0x80)) {
             void *callback = actor->base.reactionGate;
             if (callback)
                 Callback_InvokeActor(actor, callback);
-            ClearBits(flags, 0x180);
+            SceneActorChase_ClearBits(flags, 0x180);
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 0x100)) {
             void *callback = actor->group.routeRestoreCallback;
             if (callback)
                 Callback_InvokeActor(actor, callback);
-            ClearBits(flags, 0x180);
+            SceneActorChase_ClearBits(flags, 0x180);
             return 1;
         }
     }

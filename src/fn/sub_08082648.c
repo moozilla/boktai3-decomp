@@ -6,6 +6,8 @@
 #include "area_effect_link.h"
 #include "engine.h"
 #include "scene_actor_damage_visibility.h"
+#include "scene_actor_chase_shared.h"
+#include "scene_actor_contact_response.h"
 static inline u8 Test(u32 value, u32 mask)
 {
     if (value & mask)
@@ -49,10 +51,6 @@ static inline void Set32(struct SceneActorControlState *state, u32 mask)
 {
     *ControlFlags(state) |= mask;
 }
-static inline void Clear32(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 static inline u8 TestMotion(struct SceneActorReactionMotion *motion, u32 mask)
 {
     if (motion->flags & mask)
@@ -65,18 +63,11 @@ static inline void SetMotion(struct SceneActorReactionMotion *motion, u32 mask)
     value |= motion->flags;
     motion->flags = value;
 }
-static inline u32 Flag16(struct ChaseActor *p, u32 mask)
-{
-    return p->base.motionFlags & mask;
-}
-static inline u32 Flag32(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
 static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a) {
-        if (Flag16(a, 0x40) || Flag32(a, 0x20000) || a->base.health <= 0)
+        if (SceneActorContact_MotionFlags(a, 0x40) || SceneActorChase_StatusFlags(a, 0x20000) ||
+            a->base.health <= 0)
             return 1;
     }
     return 0;
@@ -102,10 +93,6 @@ static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
     a->base.behavior2AA = behavior;
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
-}
-static inline void SetStatus(struct ChaseActor *a, u32 mask)
-{
-    a->base.motionFlags = mask | a->base.motionFlags;
 }
 static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 counter)
 {
@@ -146,7 +133,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
         return;
     if ((!Unavailable(input)) && (contact.collider->kind & 15)) {
         input->base.counter304 = ((struct RecoveryContactIdentity *)contact.collider)->identity;
-        Clear32(&input->base.statusFlags, ~0x1000000);
+        SceneActorChase_AndWordFlags(&input->base.statusFlags, ~0x1000000);
     }
     Collision_CalculateDamageResponse(source, contact.collider);
     {
@@ -208,7 +195,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
     }
     {
         struct SceneActorControlState *control = LocalState(a);
-        Clear32(ControlFlags(control), ~8);
+        SceneActorChase_AndWordFlags(ControlFlags(control), ~8);
         zero = TestFlags(LocalState(a), 4);
         if (zero)
             return;
@@ -222,7 +209,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
               4);
     } else {
         SetMotion(motion, 8);
-        SetStatus(a, 0x100);
+        SceneActorChase_SetMotionFlags(a, 0x100);
         Phase(a, 0, 3, zero);
         SceneActorControl_ResetCollisionPhase(a);
     }

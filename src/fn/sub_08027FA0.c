@@ -27,10 +27,7 @@ void SceneActors_UpdateAnchoredReaction(struct StateActor *p)
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        p2->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p2, 12);
     if (!p2->actionReset(p2))
         ((struct SceneGraphicsActor *)p)->graphics.reactionDelay = 6;
 }

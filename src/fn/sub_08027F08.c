@@ -10,9 +10,6 @@ void SceneActors_UpdateSpecialPose(struct StateActor *p)
         SceneActors_StartAnimation(p, &actor->animation, (int)&actor->animationResource, 71, 2, 4);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 12);
     p->actionReset(p);
 }

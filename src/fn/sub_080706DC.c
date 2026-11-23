@@ -1,4 +1,5 @@
 #include "scene_actor_registry.h"
+#include "word_flags.h"
 struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void);
 static inline u8 IsUnavailable(struct ChaseActor *actor, u32 disabled, u32 excluded)
 {
@@ -24,7 +25,6 @@ void SceneActorRegistry_ResetCategoryControl(void)
         u32 zero = 0;
         u32 one = 1;
         u32 three = 3;
-        u32 status = 0x1000;
         do {
             u32 unavailable = IsUnavailable(actor, disabled, excluded);
             if (!unavailable) {
@@ -50,7 +50,7 @@ void SceneActorRegistry_ResetCategoryControl(void)
                     actor->base.behavior2AA = three;
                     actor->base.counter2AC = zero;
                     actor->base.field2B1 = one;
-                    actor->base.statusFlags |= status;
+                    WordFlags_Set(0x1000, &actor->base.statusFlags);
                 }
             }
             node = node->next;

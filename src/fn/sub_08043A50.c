@@ -11,10 +11,7 @@ void ContactActor_UpdateAwaitHide(struct ContactActorPool *pool, struct ContactA
     }
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (pool->hideRequested) {
-        u32 state = 8;
-        slot->state = state;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 8);
     } else
         slot->stateFrame++;
 }

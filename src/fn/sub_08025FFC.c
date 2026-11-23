@@ -76,10 +76,7 @@ void SceneActorAnimation_UpdateImpactHazard(struct StateActor *p, s32 arg)
     }
     if ((u8)Callback_InvokeActor(p, (void *)p->actionTryUpdate))
         return;
-    {
-        u32 mask = 0x40;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 0x40);
     if ((u8)Callback_InvokeActor(p, (void *)p->actionReset))
         return;
     if (arg == 0x10)

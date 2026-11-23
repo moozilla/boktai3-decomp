@@ -47,9 +47,7 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
     }
     ContactActor_SetDirectionalSequence(pool, slot, 1);
     if (slot->stateFrame > 19) {
-        slot->state = 1;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 1);
         slot->sprite.flags &= ~1;
     } else {
         if (slot->stateFrame == 6) {

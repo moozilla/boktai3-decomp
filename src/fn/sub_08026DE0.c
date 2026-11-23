@@ -34,13 +34,8 @@ void SceneActors_UpdateShrinkingReaction(struct StateActor *p)
         SceneActorGraphics_SelectResource(p);
     }
     SceneGraphicsActor_ClearPendingDamage(actor);
-    {
-        u32 value;
-        u32 mask = 12;
-        value = p2->actionFlags | mask;
-        value |= 64;
-        p2->actionFlags = value;
-    }
+    SceneActorState_SetFlags(p2, 12);
+    SceneActorState_SetFlags(p2, 64);
     if (actor->graphics.scaleMin > 23)
         actor->graphics.scaleMin -= 24;
     else

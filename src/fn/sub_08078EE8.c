@@ -1,4 +1,5 @@
 #include "scene_actor_status.h"
+#include "scene_actor_placement.h"
 
 typedef char
     Check_attachmentLimit[(u32) & ((struct ChaseActor *)0)->base.attachmentLimit == 0xA6 ? 1 : -1];
@@ -16,8 +17,9 @@ typedef char
 typedef char Check_route[(u32) & ((struct ChaseActor *)0)->group.homeRoute == 0x448 ? 1 : -1];
 typedef char
     Check_contactNode[(u32) & ((struct ChaseActor *)0)->group.contactNode == 0x45C ? 1 : -1];
-typedef char
-    Check_contactCooldown[(u32) & ((struct ChaseActor *)0)->group.contactCooldown == 0x5C8 ? 1 : -1];
+typedef char Check_contactCooldown[(u32) & ((struct ChaseActor *)0)->group.contactCooldown == 0x5C8
+                                       ? 1
+                                       : -1];
 typedef char Check_effect5CC[(u32) & ((struct ChaseActor *)0)->group.effect == 0x5CC ? 1 : -1];
 typedef char
     Check_behaviorControl[(u32) & ((struct ChaseActor *)0)->group.contactControl == 0x5DC ? 1 : -1];
@@ -41,11 +43,6 @@ static inline void ActorStatus_StoreRestoration(struct UpdateRestorationCommand 
     command->state = state;
     command->phase = phase;
     command->behavior = behavior;
-}
-
-static inline void ActorStatus_MaskHalfword(u16 *field, u32 mask)
-{
-    *field &= mask;
 }
 
 void SceneActorRecord_RecordPair(u32, u32);
@@ -397,8 +394,8 @@ static inline void ActorStatus_RecoverAndRelease(void *object)
                 (void *)&((struct ChaseActor *)object)->group.saved.control,
                 ((struct ChaseActor *)object)->base.onAlternateEntry, 0, 0, 7, 60);
             ActorStatus_SetWord(&((struct ChaseActor *)object)->base.behaviorFlags, 0x10);
-            ActorStatus_MaskHalfword(&((struct ChaseActor *)object)->base.reactionFlags,
-                                     (u32)(s16)0xF636);
+            SceneActorPlacement_ClearFlags(&((struct ChaseActor *)object)->base.reactionFlags,
+                                           (u32)(s16)0xF636);
 
             SceneActorChase_SnapToRoute(&targetPosition,
                                         (void *)&((struct ChaseActor *)object)->group.homeRoute);

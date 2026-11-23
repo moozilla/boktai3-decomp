@@ -2,6 +2,7 @@
 #include "grid_attack_actor.h"
 #include "player_cue_sequence.h"
 #include "player.h"
+#include "player_slot_status.h"
 #include "scene_messages.h"
 #include "contact_burst.h"
 #include "projected_display.h"
@@ -74,10 +75,6 @@ void GridAttackActor_SetAnimation(struct GridAttackActor *p, int sequence, int s
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(struct ContactCollider *, struct ContactCollider *, s32);
 
-static inline u32 testFlags(u16 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
                                        struct ContactCollider *other, struct GridAttackActor *p)
 {
@@ -85,7 +82,7 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
     Collision_CalculateDamageResponse(source, other);
     PlayerStats_AddContactHundredths(source, other, p->contactReward);
     p->damage = other->cost;
-    if (testFlags(&source->flags, 0x100))
+    if (ContactCollider_TestFlags(source, 0x100))
         p->damageAngle = source->direction;
     else
         p->damageAngle = Math_Atan2(other->x - source->x, other->z - source->z);
@@ -96,11 +93,8 @@ void GridAttackActor_OnDamageCollision(struct ContactCollider *source,
         base->contactFlags = value;
     }
     PlayerStats_AddContactHundredths(source, other, base->contactRewardParameter);
-    {
-        u32 mask = 4;
-        if (source->reactionFlags & mask)
-            p->special = 1;
-    }
+    if (ContactCollider_TestReactionFlags(source, 4))
+        p->special = 1;
 }
 
 void GridAttackActor_OnBodyCollision(void)
@@ -281,10 +275,7 @@ int GridAttackActor_OnDamage(struct GridAttackActor *p, int kind, int damage)
             u8 *dst = &p->damageAngle;
             int zero = 0;
             *dst = angle;
-            {
-                u32 mask = 2;
-                p->flags |= mask;
-            }
+            GridAttack_AddFlags(p, 2);
             GridAttack_StartActionMode(p, 1, zero, 3);
             GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
         } break;
@@ -414,8 +405,7 @@ void GridAttackActor_UpdateIdle(struct GridAttackActor *p)
         GridAttackActor_SetAnimation(p, 2, 1, 0);
     }
     if (!p->tryUpdate(p)) {
-        u32 mask = 64;
-        p->flags |= mask;
+        GridAttack_AddFlags(p, 64);
         p->reset(p);
     }
 }
@@ -431,10 +421,7 @@ void GridAttackActor_UpdateGridAttack(struct GridAttackActor *p, int tick)
     }
     if (p->tryUpdate(p))
         return;
-    {
-        u32 mask = 64;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 64);
     if (p->reset(p))
         return;
     if (tick == 8)
@@ -461,10 +448,7 @@ void GridAttackActor_UpdateElevatedGridAttack(struct GridAttackActor *p)
     p->phaseTimer = 240;
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (p->reset(p))
         return;
     switch (p->stage) {
@@ -550,10 +534,7 @@ void GridAttackActor_UpdateTargetedAttack(struct GridAttackActor *p, int tick)
     }
     if (p->tryUpdate(p))
         return;
-    {
-        u32 mask = 64;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 64);
     if (p->reset(p))
         return;
     if (tick == 8)
@@ -571,11 +552,8 @@ void GridAttackActor_UpdateDamageHold(struct GridAttackActor *p)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        u32 flags = p->flags | mask;
-        p->flags = flags | 64;
-    }
+    GridAttack_AddFlags(p, 12);
+    GridAttack_AddFlags(p, 64);
 }
 
 void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
@@ -586,10 +564,7 @@ void GridAttackActor_UpdateDamageRecovery(struct GridAttackActor *p, int tick)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && tick > 19)
         p->finished = 1;
 }
@@ -605,10 +580,7 @@ void GridAttack_UpdateStaggerState(struct GridAttackActor *p)
     p->reactionCooldown = 6;
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (p->animationEnded)
         GridAttack_SetState((void *)p, GridAttackActor_UpdateIdle, 1);
     else
@@ -646,10 +618,7 @@ void GridAttack_UpdateDeathState(struct GridAttackActor *p)
         SceneActors_RunSecondEventScript(p, &base->drawable.position);
         base->stage++;
     }
-    {
-        u32 mask = 13;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 13);
 }
 
 void GridAttack_UpdateHiddenState(struct GridAttackActor *p)
@@ -658,10 +627,7 @@ void GridAttack_UpdateHiddenState(struct GridAttackActor *p)
         p->changed = 0;
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 28;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 28);
     p->reset(p);
 }
 
@@ -676,11 +642,7 @@ void GridAttack_UpdateIdleState(struct GridAttackActor *s)
         *p = 0;
         s->special = 0;
     }
-    {
-        u32 mask = 12;
-        u32 *flags = (u32 *)&s->flags;
-        *flags |= mask;
-    }
+    GridAttack_AddFlags(s, 12);
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
@@ -695,10 +657,7 @@ void GridAttack_UpdateAnimationNineState(struct GridAttackActor *p)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p)) {
         p->reactionCooldown = 6;
         if (p->animationEnded)
@@ -717,11 +676,7 @@ void GridAttack_UpdateAnimationElevenState(struct GridAttackActor *s)
         *p = 0;
         s->special = 0;
     }
-    {
-        u32 mask = 12;
-        u32 *flags = (u32 *)&s->flags;
-        *flags |= mask;
-    }
+    GridAttack_AddFlags(s, 12);
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
@@ -736,11 +691,7 @@ void GridAttack_UpdateAlternateIdleState(struct GridAttackActor *s)
         *p = 0;
         s->special = 0;
     }
-    {
-        u32 mask = 12;
-        u32 *flags = (u32 *)&s->flags;
-        *flags |= mask;
-    }
+    GridAttack_AddFlags(s, 12);
     Callback_InvokeActor(s, (void *)s->reset);
 }
 
@@ -753,10 +704,7 @@ void GridAttack_UpdateRandomAnimationState(struct GridAttackActor *p, int tick)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && p->animationEnded) {
         GridAttackActor_SetAnimation(p, GridAttackActor_SelectAttackAnimation(p), 1, 8);
         if (tick > 31)
@@ -772,10 +720,7 @@ void GridAttack_UpdateAnimationThreeState(struct GridAttackActor *p)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && p->animationEnded)
         p->finished = 1;
 }
@@ -788,10 +733,7 @@ void GridAttack_UpdateFastAnimationThreeState(struct GridAttackActor *p)
     }
     p->damage = 0;
     p->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && p->animationEnded)
         p->finished = 1;
 }
@@ -809,18 +751,13 @@ void GridAttack_UpdateTimedHideState(struct GridAttackActor *p, int tick)
     }
     done = 0;
     if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
-        u32 mask = 16;
-        p->flags |= mask;
+        GridAttack_AddFlags(p, 16);
     } else if (done) {
-        u32 mask = 16;
-        p->flags |= mask;
+        GridAttack_AddFlags(p, 16);
     }
     base->damage = 0;
     base->special = 0;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    GridAttack_AddFlags(p, 12);
     if (!p->reset(p) && tick > 59)
         p->finished = 1;
 }
@@ -829,8 +766,7 @@ extern u32 gUnk_02000560;
 
 void GridAttack_RunStateIfUnpaused(u32 a)
 {
-    u32 m = 4;
-    if ((gUnk_02000560 & m) == 0)
+    if (!PlayerSlot_ReadStatus(0, 4))
         SceneActors_RunStateCallback(a);
 }
 
@@ -904,16 +840,12 @@ int GridAttack_ApplyPendingDamage(struct GridAttackActor *p)
         DamageNumberDisplay_Show(collider, damage, 0, &position->coordinates, &size, 1);
         if (base->health <= 0) {
             base->health = 0;
-            {
-                u32 mask = 2;
-                base->flags |= mask;
-            }
+            GridAttack_AddFlags(base, 2);
             GridAttack_SetState(base, GridAttack_UpdateDeathState, 8);
             return 1;
         }
         if (special) {
-            u32 mask = 0x80000;
-            base->flags |= mask;
+            GridAttack_AddFlags(base, 0x80000);
         }
         if (react) {
             {
@@ -1114,8 +1046,7 @@ void GridAttack_ProcessMessages(struct GridAttackActor *p)
 void GridAttack_UpdateStateNineAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntry(p)) {
-        u32 v = 9;
-        p->requested = v;
+        GridAttack_RequestAnimation(p, 9);
         Trigger_ConsumePending(&p->receiver, 1);
     }
     p->actionTimer++;
@@ -1156,8 +1087,7 @@ static inline u8 GridAttack_TakeActionEntryBool(struct GridAttackActor *p)
 void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 11;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 11);
     }
     if (p->finished) {
         GridAttack_StartActionMode(p, 2, 0, 4);
@@ -1169,8 +1099,7 @@ void GridAttack_UpdateStateElevenAction(struct GridAttackActor *p)
 void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 0xC;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 0xC);
     }
     if (p->finished)
         Trigger_ConsumePending(&p->receiver, 1);
@@ -1181,8 +1110,7 @@ void GridAttack_UpdateStateTwelveAction(struct GridAttackActor *p)
 void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 0xD;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 0xD);
     }
     if (p->finished)
         Trigger_ConsumePending(&p->receiver, 1);
@@ -1193,8 +1121,7 @@ void GridAttack_UpdateStateThirteenAction(struct GridAttackActor *p)
 void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 14;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 14);
     }
     if (p->finished) {
         GridAttack_StartActionMode(p, 2, 0, 4);
@@ -1206,8 +1133,7 @@ void GridAttack_UpdateAnimationFourteen(struct GridAttackActor *p)
 void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 0xF;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 0xF);
     }
     if (p->finished)
         Trigger_ConsumePending(&p->receiver, 1);
@@ -1218,8 +1144,7 @@ void GridAttack_UpdateAnimationFifteen(struct GridAttackActor *p)
 void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 16;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 16);
     }
     if (p->finished) {
         GridAttack_StartActionMode(p, 2, 0, 4);
@@ -1231,8 +1156,7 @@ void GridAttack_UpdateAnimationSixteen(struct GridAttackActor *p)
 void GridAttack_UpdateAnimationSeventeen(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 k = 0x11;
-        p->requested = k;
+        GridAttack_RequestAnimation(p, 0x11);
     }
     if (p->finished) {
         GridAttack_StartActionMode(p, 2, 0, 0);
@@ -1260,14 +1184,12 @@ static inline void GridAttack_StartReaction(struct GridAttackActor *p, int one, 
 int GridAttack_TryStartDamageReaction(struct GridAttackActor *p)
 {
     if (p->health <= 0 && p->healthCheck) {
-        u32 mask = 2;
-        p->flags |= mask;
+        GridAttack_AddFlags(p, 2);
         GridAttack_SetState(p, GridAttack_UpdateDeathState, 8);
     }
     p->healthCheck = 0;
     {
-        u32 mask = 2;
-        if (p->flags & mask) {
+        if (GridAttack_TestFlags(p, 2)) {
             GridAttack_StartReaction(p, 1, 3, 0);
             return 1;
         } else if (p->flags & 1) {
@@ -1296,8 +1218,7 @@ void GridAttack_UpdateActionTwo(struct GridAttackActor *p)
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 id = 2;
-        p->requested = id;
+        GridAttack_RequestAnimation(p, 2);
     }
     if (p->finished) {
         GridAttack_BeginIdleWait(base, 60);
@@ -1310,8 +1231,7 @@ void GridAttack_UpdateDeathAction(struct GridAttackActor *p)
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 id = 3;
-        p->requested = id;
+        GridAttack_RequestAnimation(p, 3);
     }
     if (p->finished) {
         GridAttack_BeginIdleWait(base, 60);
@@ -1324,8 +1244,7 @@ void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
     struct GridAttackActor *base = p;
     p->healthCheck = 1;
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 id = 4;
-        p->requested = id;
+        GridAttack_RequestAnimation(p, 4);
     }
     if (p->finished) {
         int duration;
@@ -1342,8 +1261,7 @@ void GridAttack_UpdateAttackAction(struct GridAttackActor *p)
 void GridAttack_UpdateAnimationFive(struct GridAttackActor *p)
 {
     if (GridAttack_TakeActionEntry(p)) {
-        u32 v = 5;
-        p->requested = v;
+        GridAttack_RequestAnimation(p, 5);
     }
     p->actionTimer++;
 }
@@ -1352,8 +1270,7 @@ void GridAttack_UpdateRecoveryAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (GridAttack_TakeActionEntryBool(p)) {
-        u32 id = 6;
-        p->requested = id;
+        GridAttack_RequestAnimation(p, 6);
     }
     if (p->finished) {
         GridAttack_BeginIdleWait(base, 30);
@@ -1365,13 +1282,11 @@ void GridAttack_UpdateDamageAction(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
     if (GridAttack_TakeActionEntryBool(p) == 1) {
-        u32 id = 7;
-        p->requested = id;
+        GridAttack_RequestAnimation(p, 7);
         base->forceAction = 1;
     }
     {
-        u32 mask = 1;
-        if (!(p->flags & mask)) {
+        if (!GridAttack_TestFlags(p, 1)) {
             GridAttack_BeginIdleWait(base, 30);
         } else
             p->actionTimer++;
@@ -1407,8 +1322,7 @@ extern const u32 gUnk_08605034[];
 
 void GridAttack_UpdateNormalActions(struct GridAttackActor *p)
 {
-    u32 m = 4;
-    if (!(gUnk_02000560 & m)) {
+    if (!PlayerSlot_ReadStatus(0, 4)) {
         if (GridAttack_TryStartDamageReaction(p) == 0) {
             Callback_InvokeActor(p, (void *)gUnk_08605034[p->actionReset]);
         }
@@ -1441,11 +1355,6 @@ void SceneActors_UpdateTargetMetrics(void *);
 static inline s32 GridAttack_Truncate12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
-}
-
-static inline u32 GridAttack_TestFlags(struct GridAttackActor *actor, u32 mask)
-{
-    return actor->flags & mask;
 }
 
 void GridAttack_UpdateAnimationAndTargets(struct GridAttackActor *p)
@@ -1510,31 +1419,6 @@ static inline void GridAttack_CopyPalette(const void *source, void *dest)
 {
     CpuSet(source, dest, 0x04000008);
 }
-static inline void GridAttack_AddFlags(struct GridAttackActor *p, u32 mask)
-{
-    p->flags |= mask;
-}
-static inline void GridAttack_ClearFlags(struct GridAttackActor *p, u32 mask)
-{
-    p->flags &= ~mask;
-}
-static inline void GridAttack_SetColliderFlags(struct ContactCollider *c, u32 mask)
-{
-    c->flags |= mask;
-}
-static inline void GridAttack_ClearColliderFlags(struct ContactCollider *c, u32 mask)
-{
-    u32 keep = ~mask;
-    c->flags = keep & c->flags;
-}
-static inline void GridAttack_SetCameraFlags(struct CameraTracking *camera, u32 mask)
-{
-    camera->requests |= mask;
-}
-static inline void GridAttack_ClearCameraFlags(struct CameraTracking *camera, u32 mask)
-{
-    camera->requests &= ~mask;
-}
 void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
 {
     struct GridAttackActor *base = p;
@@ -1564,7 +1448,7 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
     if (GridAttack_TestFlags(p, 4))
         collider->flags |= 4;
     else {
-        GridAttack_ClearColliderFlags(collider, 4);
+        ContactCollider_ClearFlags(collider, 4);
         Collider_SetPosition(collider, &base->drawable.position, 0);
         collider->direction = transform->angle;
     }
@@ -1576,18 +1460,18 @@ void GridAttack_UpdateCollidersAndPalette(struct GridAttackActor *p)
     }
     if (GridAttack_TestFlags(p, 16)) {
         base->drawable.flags |= 1;
-        GridAttack_ClearCameraFlags(&base->camera, 1);
-        GridAttack_ClearColliderFlags(&base->damageCollider, 8);
+        CameraTracking_ClearRequests(&base->camera, 1);
+        ContactCollider_ClearFlags(&base->damageCollider, 8);
     } else {
         base->drawable.flags &= ~1;
         if (p->locked)
-            GridAttack_ClearCameraFlags(&base->camera, 1);
+            CameraTracking_ClearRequests(&base->camera, 1);
         else
-            GridAttack_SetCameraFlags(&base->camera, 1);
+            CameraTracking_SetRequests(&base->camera, 1);
         if (GridAttack_TestFlags(p, 32))
-            GridAttack_SetColliderFlags(&base->damageCollider, 8);
+            ContactCollider_SetFlags(&base->damageCollider, 8);
         else
-            GridAttack_ClearColliderFlags(&base->damageCollider, 8);
+            ContactCollider_ClearFlags(&base->damageCollider, 8);
     }
     if (base->shake) {
         base->shake--;

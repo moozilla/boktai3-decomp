@@ -7,10 +7,7 @@ void SceneActors_UpdateStationaryReaction(struct StateActor *p)
     if (p->actionChanged)
         p->actionChanged = 0;
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 28;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 28);
     {
         u8 result = p->actionReset(p);
         if (!result) {

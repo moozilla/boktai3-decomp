@@ -5,10 +5,6 @@ extern const struct ScenePoolSpeedBounds gUnk_086058B4[];
 s32 Player_GetHorizontalVelocity(s32);
 void NativeEffect_CreateFromProfile(struct ScenePoolVec32 *, s32, struct ScenePoolVec32 *, void *,
                                     s32, s32, s32, s32);
-static inline void Or(u32 mask, u32 *flags)
-{
-    *flags |= mask;
-}
 s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
                               struct ScenePoolEntry *entry)
 {
@@ -55,7 +51,7 @@ s32 ScenePool_StateEmitBursts(void *manager, struct ScenePoolActor *actor,
             else
                 actor->controlFlags |= 0x40;
         }
-        Or(0x10, &actor->stateFlags);
+        ScenePoolActor_SetStateFlags(actor, 0x10);
     }
     if (fire) {
         switch (*kindAddress) {

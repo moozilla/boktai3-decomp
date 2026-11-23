@@ -7,17 +7,11 @@
 #include "scene_actor_behavior.h"
 #include "script_utility.h"
 #include "runtime.h"
+#include "scene_actor_control_helpers.h"
 void SceneActorPlacement_PlayCategoryEventSound(void *);
 void ActorParticles_SpawnWideBurst(void *);
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
-
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 
 static inline u32 Flag(struct ChaseActor *actor, u32 maskInput, u32 off)
 {
@@ -114,10 +108,8 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
         {
             struct ContactCollider *collider;
 
-            u32 bit;
             collider = &actor->base.colliderA;
-            bit = 4;
-            collider->flags = bit | collider->flags;
+            collider->flags = 4 | collider->flags;
             {
                 u16 *field = &collider->responseValue;
                 *field = 0;
@@ -192,7 +184,7 @@ void SceneActorReaction_BeginDefeatBurst(struct ChaseActor *actor)
     InstallIdleControl(actor, SceneActorControl_OnIdle, 16, completedState);
     SelectState(actor, completedState, 0, 2);
     ResetStateEntry(actor, completedState);
-    if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if (!SceneActorControl_TestFlags(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
     ActorShadow_Disable(actor->base.shadow);
 }

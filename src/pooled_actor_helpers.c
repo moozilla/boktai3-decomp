@@ -2,8 +2,7 @@
 
 void Actor_RequestRemoval(struct PooledActor *actor)
 {
-    u32 m = 1;
-    actor->flags |= m;
+    PooledActor_SetFlags(actor, 1);
 }
 
 void Actor_InitEntity(struct PooledActor *actor, u32 id, u32 direction,
@@ -72,32 +71,24 @@ void Actor_ClearPendingHit(struct PooledActor *actor)
 void Actor_InitHitSensor(struct PooledActor *actor, void *a, void *b, void *fn)
 {
     struct ContactCollider *q = &actor->hitSensor;
-    u32 flags = 0x2001;
-    Collider_Init(q, 0, flags, 0, 16, a, b);
+    Collider_Init(q, 0, 0x2001, 0, 16, a, b);
     Collider_SetPosition(q, &actor->body.position, 0);
     Collider_SetCallback(q, fn, actor);
     Collider_SetAttackProperties(q, actor->attackProperty0, actor->attackProperty1,
                                  actor->attackProperty3, actor->attackProperty4,
                                  actor->attackProperty2);
-    {
-        u32 mask = 4;
-        actor->flags |= mask;
-    }
+    PooledActor_SetFlags(actor, 4);
 }
 
 void Actor_InitBodyCollider(struct PooledActor *actor, void *a, void *b, void *fn)
 {
     struct ContactCollider *q = &actor->bodyCollider;
-    u32 flags = 0x4001;
-    Collider_Init(q, 0, flags, 0, 16, a, b);
+    Collider_Init(q, 0, 0x4001, 0, 16, a, b);
     Collider_SetPosition(q, &actor->body.position, 0);
     Collider_SetCallback(q, fn, actor);
     Collider_SetBodyProperties(q, actor->bodyProperty, actor->bodyProperty1, actor->bodyProperty2);
     Collider_Refresh(q);
-    {
-        u32 mask = 8;
-        actor->flags |= mask;
-    }
+    PooledActor_SetFlags(actor, 8);
 }
 
 struct SceneActorBody *Actor_GetPartyTarget(u32 slot)

@@ -2,6 +2,8 @@
 #include "scene_actor_control_phase.h"
 #include "player.h"
 #include "scene_actor_reaction.h"
+#include "scene_actor_chase_shared.h"
+#include "word_flags.h"
 void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
 static inline s32 Quarter(s32 v)
 {
@@ -21,25 +23,11 @@ static inline u8 AtRest(s32 x, s32 z)
         return 1;
     return 0;
 }
-static inline void AndWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
-static inline void OrWordFlags(u32 mask, u32 *flags)
-{
-    *flags |= mask;
-}
 static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
     u32 mask = bits;
     mask |= tracking->flags;
     tracking->flags = mask;
-}
-static inline u8 TrackingHas(struct SceneActorChaseTracking *tracking, u32 mask)
-{
-    if (tracking->flags & mask)
-        return 1;
-    return 0;
 }
 static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
 {
@@ -66,7 +54,7 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
             collider->flags |= 4;
         }
     }
-    OrWordFlags(0x100000, &actor->base.statusFlags);
+    WordFlags_Set(0x100000, &actor->base.statusFlags);
     {
         s32 current = actor->base.reactionStart.x;
         s16 *field = &actor->base.reactionEnd.x;
@@ -99,10 +87,10 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
             tracked = 0;
             *flags = mask;
         }
-        AndWordFlags(&actor->base.behaviorFlags, ~0x80);
+        SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
         state->phase = tracked;
         tracking = &actor->base.tracking;
-        tracked = TrackingHas(tracking, 8);
+        tracked = SceneActorChase_TrackingFlags(tracking, 8);
         if (tracked) {
             SceneActorReaction_EnableMotionFlags(0x100, flags);
             SceneActorControl_StartPositionCurve(actor, &gPlayers[0]->position);

@@ -33,14 +33,12 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
             delay = count - 1;
         } else if (count <= 9) {
             {
-                s32 value = 2;
-                quota = value;
+                quota = 2;
             }
             delay = Div(count + 1, 2) - 1;
         } else {
             {
-                s32 value = 4;
-                quota = value;
+                quota = 4;
             }
             delay = Div(count + 3, 4) - 1;
         }
@@ -50,17 +48,14 @@ void SceneActorRegistry_ScheduleAvailableActors(void)
             u32 zero;
             u32 request;
             {
-                u32 low = 3;
-                blocked = low;
+                blocked = 3;
             }
             tickOffset = (u32) & ((struct SceneActorScheduleView *)0)->ticks;
             {
-                u32 low = 0;
-                zero = low;
+                zero = 0;
             }
             {
-                u32 low = 0x4000;
-                request = low;
+                request = 0x4000;
             }
             do {
                 if (Inactive(actor) || actor->base.behaviorFlags & blocked) {

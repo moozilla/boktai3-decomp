@@ -33,8 +33,7 @@ void SceneSteeringActor_EmitRandomParticle(struct ContactPosition *input)
         gRandomIndex = nextIndex;
         {
             s32 raw = *(const u16 *)(nextIndex * 2 + (u32)table);
-            s32 bitmask = 31;
-            raw &= bitmask;
+            raw &= 31;
 
             magnitude = raw;
         }
