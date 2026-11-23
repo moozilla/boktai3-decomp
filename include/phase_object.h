@@ -37,7 +37,9 @@ struct PhaseObject {
     struct PhaseTarget *target;
     s16 offsetX, unknown66, offsetZ, unknown6A;
     u16 scatterStepX, unknown6E, scatterStepZ;
-    u8 unknown72[0xC];
+    u8 unknown72[2];
+    s16 driftX, unknown76, driftZ; /* added to the anchor approach, halved each frame */
+    u8 unknown7A[4];
     s16 health;
     u8 unknown80[0xD];
     struct PhaseObjectMode groupMode;
