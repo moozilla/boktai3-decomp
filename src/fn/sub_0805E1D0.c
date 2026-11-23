@@ -2,47 +2,32 @@
 #include "palette_pulse.h"
 s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *selection, u8 *blink)
 {
-    void *savedResource = resource;
-    u8 *savedSelection = selection;
-    u8 *savedBlink = blink;
     u32 change;
-    u32 confirm;
-    u32 accepted;
-    resource = (void *)(u32)gPadState[1];
-    confirm = 1 + ((u32)resource >> 16);
-    accepted = confirm;
-    accepted &= (u32)resource;
-    if (accepted) {
-        widget->flags |= confirm;
-        return *savedSelection;
+    if (gPadState[1] & A_BUTTON) {
+        widget->flags |= 1;
+        return *selection;
     }
-    if ((u32)resource & 2) {
-        widget->flags |= confirm;
+    if (gPadState[1] & B_BUTTON) {
+        widget->flags |= 1;
         return 0;
     }
     change = 0;
-    if (*savedSelection) {
-        u32 pressed = 0x10;
-        pressed &= (u32)resource;
-        /* Normalize the narrowed key mask to 0 or 1. */
-        change = (u32)(-(s32)(u16)pressed) >> 31;
+    if (*selection) {
+        if ((u16)(gPadState[1] & DPAD_RIGHT))
+            change = 1;
     } else {
-        u32 pressed = 0x20;
-        pressed &= (u32)resource;
-        if (pressed)
+        if (gPadState[1] & DPAD_LEFT)
             change = 1;
     }
     if (change) {
-        u32 value;
         Sound_PlaySong(0xDC);
-        value = 1 - *savedSelection;
-        *savedSelection = value;
-        if ((u8)value)
-            Anim_SelectWidgetGlyph(widget, savedResource, 0x4B);
+        *selection = 1 - *selection;
+        if (*selection)
+            Anim_SelectWidgetGlyph(widget, resource, 0x4B);
         else
-            Anim_SelectWidgetGlyph(widget, savedResource, 0x4C);
+            Anim_SelectWidgetGlyph(widget, resource, 0x4C);
     }
-    if (savedBlink)
-        Palette_UpdateHighlightPulse(widget->palette + 12, savedBlink);
+    if (blink)
+        Palette_UpdateHighlightPulse(widget->palette + 12, blink);
     return -1;
 }
