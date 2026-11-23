@@ -57,6 +57,11 @@ struct SceneVolumeActor {
     u8 pathPosition[8];
 };
 
+static inline void SceneVolume_SetFlags(struct SceneVolumeActor *actor, u32 flags)
+{
+    actor->flags |= flags;
+}
+
 void ActorEffect_InitializeOffset(struct SceneVolumeActor *);
 void ActorEffect_UpdateTimedSequence(struct SceneVolumeActor *);
 void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *);
