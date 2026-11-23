@@ -21,7 +21,7 @@ const names = fs.readFileSync(path.join(ROOT, 'symbols/functions.csv'), 'utf8').
 let ticks = 0, calls = 0, ring = [];
 const flush = (why) => fs.writeFileSync(outPath, `${why}: tick ${ticks - 1}, ${calls} calls since tick ${FROM}\n${ring.join('\n')}\n`);
 const s = await openSession({
-  movie: run.movie, save: run.save || undefined, print: () => {},
+  movie: run.movie, save: run.save || undefined, solarLog: run.solar, print: () => {},
   onBoot: (g) => g.on('Input_UpdatePadStates', () => {
     ticks++;
     if (ticks - 1 > FROM) { flush('tick'); ring = []; }

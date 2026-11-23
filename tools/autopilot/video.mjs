@@ -71,7 +71,7 @@ const describe = (e) => {
 
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '240x160', '-r', String(fps), '-i', '-',
   '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
-const s = await openSession({ save: run.save || undefined, render: true, print: () => {}, lib: [path.join(ROOT, 'port/agent/lib')] });
+const s = await openSession({ save: run.save || undefined, solarLog: run.solar, render: true, print: () => {}, lib: [path.join(ROOT, 'port/agent/lib')] });
 let ei = 0, caption = 'power on', route = null, routeScene = null;
 const pending = [];
 s.run(function* (g) {

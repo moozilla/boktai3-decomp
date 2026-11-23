@@ -13,7 +13,7 @@ const run = JSON.parse(fs.readFileSync(path.join(dir, 'movie.json'), 'utf8'));
 const TICK = +tickArg;
 let ticks = 0, result;
 const s = await openSession({
-  movie: run.movie.slice(0, run.readFrames[TICK] + 1), save: run.save || undefined, print: () => {},
+  movie: run.movie.slice(0, run.readFrames[TICK] + 1), save: run.save || undefined, solarLog: run.solar, print: () => {},
   lib: [path.join(ROOT, 'port/agent/lib'), path.join(ROOT, 'tools/autopilot/lib')],
   onBoot: (g) => g.on('Input_UpdatePadStates', () => {
     if (ticks++ === TICK) {
