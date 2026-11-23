@@ -117,15 +117,6 @@ s32 Math_Atan2(s32, s32);
 
 void SceneActorControl_SettleRotation(struct RoomActor *actor, s32 elapsed);
 
-static inline u8 Take(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -181,7 +172,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
 {
     struct AxeTrail *trail = p->trail;
     u32 previous;
-    if (Take(&p->entered)) {
+    if (SceneActorControl_TakeFlag(&p->entered)) {
         *(u32 *)p->sprite |= 2;
         Velocity(&trail->velocity, p->facing, 12);
         trail->heading = p->facing;
@@ -629,30 +620,21 @@ void SceneActorAnimation_SelectProfileEntry(struct RoomActor *, s32);
 
 // the second test; an int result gets jump-threaded away.
 
-static inline u8 TakeFlag(u8 *flag)
+void Axe_OnAnimationReset(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void Axe_OnAnimationReset(u8 *p)
-{
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectProfileEntry(p, 1);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
+        SceneActorAnimation_SelectProfileEntry(actor, 1);
 }
 
 // A bool8 (u8) result from an inline helper keeps the materialised 0/1 and
 
 // the second test; an int result gets jump-threaded away.
 
-void Axe_BeginProfileEntry(u8 *p)
+void Axe_BeginProfileEntry(struct ChaseActor *actor)
 {
-    if (TakeFlag(p + 0x2B2)) {
-        *(u16 *)(p + 0x2C2) = 1;
-        SceneActorAnimation_SelectProfileEntry(p, 0);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
+        actor->base.field2C2 = 1;
+        SceneActorAnimation_SelectProfileEntry(actor, 0);
     }
 }
 
@@ -734,7 +716,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
     u8 *direction = (u8 *)&actor->body;
     struct DisplaySequenceState *sequence;
-    if (Take(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
@@ -4265,11 +4247,11 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
     ++actor->base.counter2AC;
 }
 
-extern u8 gUnk_08606468[];
+extern void *gUnk_08606468[];
 
-void Axe_InitActionCallbacks(u8 *p)
+void Axe_InitActionCallbacks(struct ChaseActor *actor)
 {
-    *(u8 **)(p + 0x28c) = gUnk_08606468;
+    actor->base.behaviorCallbacks = gUnk_08606468;
 }
 
 void Axe_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
@@ -4283,7 +4265,7 @@ static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    if (TakeFlag(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *callback = Axe_UpdateWaitingAnimation;
         u32 kind = 10;
         actor->base.field2B2 = 1;
@@ -4492,9 +4474,9 @@ s32 Axe_GetActorCategory(void);
 
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events);
 
-void Axe_OnAnimationReset(u8 *p);
+void Axe_OnAnimationReset(struct ChaseActor *actor);
 
-void Axe_BeginProfileEntry(u8 *p);
+void Axe_BeginProfileEntry(struct ChaseActor *actor);
 
 void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor);
 
@@ -4518,7 +4500,7 @@ void SceneActorBehavior_InitializeShadow(void *);
 
 void Axe_InitMotionTable(struct S080FA744 *s);
 
-void Axe_InitActionCallbacks(u8 *p);
+void Axe_InitActionCallbacks(struct ChaseActor *actor);
 
 void Axe_InitEventCallbacks(struct ChaseActor *p);
 
