@@ -56,8 +56,8 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
         if (result)
             goto fail;
     }
-    if (*(u8 **)((u8 *)a + 0x45C)) {
-        u32 attachmentFlags = (*(u8 **)((u8 *)a + 0x45C))[5];
+    if (((u8 *)a->group.contactNode)) {
+        u32 attachmentFlags = (((u8 *)a->group.contactNode))[5];
         if (attachmentFlags & 1)
             goto fail;
         {
