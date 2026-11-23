@@ -464,6 +464,21 @@ exports.chooseHub = function* (index, opts = {}) {
 exports.facilities = () => { const b = g.u32(g.types.globals.gGameVariables.addr); if (!b) return []; const v = g.u16(b + 0x19a) | (g.u8(b + 0x19c) << 16); const out = []; for (let i = 0; i < 16; i++) if (v & (1 << i)) out.push(i); return out; };
 exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
 
+// People in a town (src/scene_actor_lifecycle.c SceneActorManager: head, then each
+// actor's previous; body.id is the character's id as place_character gives it).
+exports.people = () => {
+  const t = exports.tasks().find((x) => !x.dead && x.update === 'SceneActorManager_Update');
+  if (!t) return [];
+  const mgr = g.at(Number(t.task), 'struct SceneActorManager'), out = [];
+  let a = mgr.head ? Number(mgr.head.$addr ?? mgr.head) : 0;
+  for (let n = 0; a && n < 64; n++) {
+    const v = g.at(a, 'struct SceneActor');
+    if (v.active) out.push({ addr: a, id: v.body.id, x: v.body.position.x, z: v.body.position.z, enabled: v.enabled });
+    a = v.previous ? Number(v.previous.$addr ?? v.previous) : 0;
+  }
+  return out;
+};
+
 // Push planning: a breadth-first search over block states with the game's rules
 // (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
 // (a block raises its cell to its top). A push from P into direction d moves the
