@@ -1,6 +1,7 @@
 #include "global.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_pause_flags.h"
 
 struct SceneSelection {
     u8 pad0[0x1a];
@@ -39,10 +40,8 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
         gObjFadeLevel = 0x40;
         Sound_FadeOutChannel10(1);
     }
-    if (p->timer == 1) {
-        u32 mask = 4;
-        gEnginePauseFlags |= mask;
-    }
+    if (p->timer == 1)
+        Engine_SetPauseFlags(4);
     if (Registry1745_CheckSessionReady(p) < 0) {
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
@@ -52,24 +51,17 @@ s32 SceneSelection_WaitForSlotTransition(struct SceneSelection *p)
     length = p->slotCount;
     if (i < length) {
         unsigned short mask = 0x3c00;
-        if (1) {
-            do {
-                if (IsTransitionSlot(GetSlot(p, i) & mask))
-                    count++;
-                i++;
-            } while (i < length);
-        }
+        do {
+            if (IsTransitionSlot(GetSlot(p, i) & mask))
+                count++;
+            i++;
+        } while (i < length);
     }
     if (count == length)
         Registry1745_SetState(p, 16, SessionMenu_CreateStageIconDisplay);
     else if (p->timer > 9) {
         p->command = 0x2000;
-        count = 4;
-        {
-            u32 *flags = &gEnginePauseFlags;
-            u32 mask = ~count;
-            *flags &= mask;
-        }
+        Engine_ClearPauseFlags(4);
     }
     return 0;
 }
