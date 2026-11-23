@@ -1975,9 +1975,7 @@ static inline u8 Ghost_IsGlobalRevealActive(void)
 
 static inline u32 Ghost_ReadPlayerRevealFlag(struct Player *p)
 {
-    u32 *flags = &p->actionFlags;
-    u32 mask = 0x10;
-    return *flags & mask;
+    return WordFlags_Test(&p->actionFlags, 0x10);
 }
 
 u32 Ghost_UpdateVisibility(struct ChaseActor *actor)
