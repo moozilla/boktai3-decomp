@@ -748,42 +748,9 @@ void SceneActorPhase_TryBeginSpecialMotion(struct ChaseActor *p)
         !MaskedFlags(p, 0xE3BF)) {
         u16 *flags;
         if (!TestContext(base, 0xC, &flags) && SceneActorChase_TestField(flags, 2)) {
-            u32 state = 0x18;
-            u8 *field = &p->base.state2A8;
-            u32 zero = 0;
-            *field = zero;
-            p->base.phase2A9 = zero;
-            p->base.behavior2AA = state;
-            p->base.counter2AC = zero;
-            {
-                u8 *ready = &p->base.field2B1;
-                u32 one = 1;
-                void *control;
-                u32 *motionFlags;
-                *ready = one;
-                control = p->base.onStanding;
-                p->base.field2B2 = one;
-                p->base.stepDone = zero;
-                p->base.controlKind = zero;
-                p->base.target = control;
-                p->base.field2C8 = zero;
-                motionFlags = &p->base.pendingControlFlags;
-                {
-                    s32 mask = -2;
-                    *motionFlags &= mask;
-                }
-                {
-                    u32 duration;
-                    u32 *slot = &p->base.pendingControl;
-                    u32 callback = (u32)Vorn_UpdateScriptedAnimation;
-                    duration = 0x29;
-                    *slot = callback;
-                    p->base.pendingControlData = zero;
-                    p->base.pendingControlRelease = zero;
-                    p->base.pendingControlKind = duration;
-                    *motionFlags = one;
-                }
-            }
+            Chase_SetBehavior(p, 0x18);
+            Chase_SetCtl(p, p->base.onStanding, 0);
+            MonsterInit_SetMotionControl(p, Vorn_UpdateScriptedAnimation, 0x29);
         }
     }
 }
