@@ -16,11 +16,6 @@ u8 SceneActorTarget_CanReplaceByDistance(void *, struct ContactPosition *, u32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetWordFlags(u32 *flags, u32 input)
-{
-    u32 mask = input;
-    *flags |= mask;
-}
 
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
