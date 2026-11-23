@@ -127,6 +127,16 @@ const GOALS = {
         if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
       }
       const here = L.where().scene;
+      // healing: below a third of the life bar with something in the item bag, find the
+      // use of an item in the pause menu that raises life (menuSearch; once per room)
+      {
+        const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
+        if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
+          const life0 = p.currentStatA;
+          const r = yield* L.menuSearch(() => life() > life0, { max: 300 });
+          event({ skill: 'heal', from: life0, to: life(), ...r });
+        }
+      }
       // floor switches (stages.json: a trap on an HP box that runs a script once, e.g. a
       // chest appears): step on each once
       for (const sw of (stageOf(here).switches || []).filter((sw) => !TRIED.has(`${here}:switch:${sw.box}`))) {
@@ -147,7 +157,13 @@ const GOALS = {
           const ways = means(need.flag, L.bags()), way = ways.find((w) => w.owned && w.kind === 'lens');
           if (!way) { event({ skill: 'needs', name: h.name, state: live.state, flag: need.flag, means: ways.map((w) => `${w.kind} ${w.name}`) }); continue; }
           TRIED.add(`${here}:break:${h.name}`);
-          const qc = yield* L.quickChange({ gun: true, lens: way.id });
+          // a lens not on the Quick Change list is put there in the pause menu (Solar Gun page)
+          let qc = yield* L.quickChange({ gun: true, lens: way.id });
+          if (!qc.done) {
+            const m = yield* L.menuSearch(() => L.weapon().lens === way.id, { max: 300 });
+            event({ skill: 'menu', goal: `lens ${way.name}`, ...m });
+            qc = yield* L.quickChange({ gun: true, lens: way.id });
+          }
           const ch = yield* L.chargeEnergy(6, { lux: 0, restore: 232 });
           event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
           const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };

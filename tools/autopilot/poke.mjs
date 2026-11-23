@@ -26,12 +26,12 @@ try { s.run(function* (g) {
     if (cmd === 'wait') yield g.press(0, +rest[0]);
     else if (cmd === 'hold') yield g.press(rest[0], +rest[1]);
     else if (cmd === 'shot') { yield 1; fs.writeFileSync(`${prefix}_${rest[0]}.png`, png(s.pixels())); console.log('shot', rest[0]); }
-    else if (cmd === 'trace') {  // 'trace OUT': from here, the last calls (enter/exit) go to OUT every 200 calls
+    else if (cmd === 'trace') {  // 'trace OUT': from here, the last calls (enter/exit) go to OUT every 50 calls
       const names = fs.readFileSync(path.join(ROOT, 'symbols/functions.csv'), 'utf8').split('\n').slice(1)
         .map((l) => l.split(',')).filter((c) => /^08[0-9A-F]{6}$/.test(c[0])).map((c) => c[1]);
       let ring = [], calls = 0;
       for (const n of names) for (const exit of [false, true]) {
-        try { g.on(n, (a, info) => { ring.push(`${' '.repeat(Math.min(info.depth, 60))}${exit ? '<' : '>'} ${n} ${exit ? (a[0] >>> 0).toString(16) : a.map((x) => (x >>> 0).toString(16)).join(',')}`); if (ring.length > 3000) ring.splice(0, 1000); if (++calls % 1 === 0) fs.writeFileSync(rest[0], ring.join('\n')); }, { exit }); } catch {}
+        try { g.on(n, (a, info) => { ring.push(`${' '.repeat(Math.min(info.depth, 60))}${exit ? '<' : '>'} ${n} ${exit ? (a[0] >>> 0).toString(16) : a.map((x) => (x >>> 0).toString(16)).join(',')}`); if (ring.length > 3000) ring.splice(0, 1000); if (++calls % 50 === 0) fs.writeFileSync(rest[0], ring.join('\n')); }, { exit }); } catch {}
       }
     } else if (cmd === 'do') {  // a skill: 'do lib.quickChange({ gun: true })'
       let r; try { r = yield* eval(rest.join(' ')); } catch (e) { r = String(e.stack || e); }
