@@ -132,13 +132,6 @@ void Ivy_EnterDisabledState(struct ChaseActor *actor)
     }
 }
 
-struct IvyTarget {
-    u8 unk0[8];
-    u8 kind;
-    u8 unk9[0x3C - 9];
-    struct ChaseActor *actor;
-};
-
 struct Player;
 
 s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct SceneVec *, s32, s32,
@@ -207,7 +200,7 @@ static inline struct IvyFrameIndex Ivy_ReadFrame(struct DisplaySequenceState *se
 void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *anim;
-    struct IvyTarget *target;
+    struct SceneActorBody *target;
     struct ContactPosition pos;
     u8 quadrant, flip;
     u32 started;
@@ -232,11 +225,11 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
             pos.y = actor->base.body.position.y + gUnk_08606384[flip][anim->index].y;
             pos.z = actor->base.body.position.z + gUnk_08606384[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
-            if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gPlayers[target->kind], (void *)&pos, 0, 0,
+            if (target->mode <= 3) {
+                Player_BeginPositionRequest((void *)gPlayers[target->mode], (void *)&pos, 0, 0,
                                             flip, 0, 0, 0, 0);
-            } else if (target->kind == 4) {
-                struct ChaseActor *t = target->actor;
+            } else if (target->mode == 4) {
+                struct ChaseActor *t = target->owner;
                 t->base.colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
@@ -302,13 +295,6 @@ void DamageNumberDisplay_Show(void *, u32, s32, void *, void *, u32);
 u32 Ivy_GetAnimationStatus(struct ChaseActor *);
 
 extern s16 *gLinkSession;
-
-struct IvyTargetUpdateHold {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    void *player;
-};
 
 struct IvyDrawable {
     u8 unknown0[7];
@@ -474,7 +460,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     struct Ivy *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
-    struct IvyTargetUpdateHold *target;
+    struct SceneActorBody *target;
     u8 quadrant, flip;
     struct ContactPosition position;
     s32 index;
@@ -496,7 +482,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     }
     target = (void *)actor->base.tracking.target;
     Facing(actor, &quadrant, &flip);
-    if (target->kind <= 3) {
+    if (target->mode <= 3) {
         if (sequence->elapsed + 1 >= sequence->duration) {
             index = sequence->index + 1;
             if (index >= sequence->frameCount)
@@ -508,10 +494,10 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     position.x = actor->base.body.position.x + gUnk_08606384[flip][index].x;
     position.y = actor->base.body.position.y + gUnk_08606384[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_08606384[flip][index].z;
-    if (target->kind == 4) {
+    if (target->mode == 4) {
         struct ChaseActor *victim;
         ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
-        victim = target->player;
+        victim = target->owner;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
         if (frame <= 0x8C)
             goto animate;
@@ -528,12 +514,12 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
         actor->base.stepDone = 1;
         return;
     }
-    if (target->kind > 3)
+    if (target->mode > 3)
         goto animate;
     {
         struct Player *player;
         ((struct IvyDrawable *)actor->base.drawable)->mode = 1;
-        player = target->player;
+        player = target->owner;
         if (Mod(frame, context->interval) == 0) {
             s32 start, cur, elapsed;
             if (IsIdle(player))
@@ -576,13 +562,6 @@ animate:
         actor->base.stepDone = 1;
 }
 
-struct IvyTargetBeginRelease {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    struct Player *player;
-};
-
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
  * clears context flag 2. */
@@ -606,7 +585,7 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
-            struct IvyTargetBeginRelease *target = (void *)actor->base.tracking.target;
+            struct SceneActorBody *target = (void *)actor->base.tracking.target;
             struct SceneVec position;
             u8 angle;
             CellCenter(&position, actor->base.terrainCell);
@@ -615,8 +594,8 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
                 s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
                 angle = quadrant << 6;
             }
-            if (target->kind <= 3)
-                Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
+            if (target->mode <= 3)
+                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
         }
         ((u8 *)actor->base.drawable)[7] = 2;
         {
@@ -1402,13 +1381,6 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
     return result;
 }
 
-struct IvyTargetReleaseCapturedPlayer {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    struct Player *player;
-};
-
 static inline u8 TestFlags_ReleaseCapturedPlayer(struct Ivy *context, u32 maskInput)
 {
     u32 mask = maskInput;
@@ -1434,9 +1406,9 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
         }
         {
-            struct IvyTargetReleaseCapturedPlayer *target = (void *)actor->base.tracking.target;
-            if (target->kind <= 3) {
-                Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
+            struct SceneActorBody *target = (void *)actor->base.tracking.target;
+            if (target->mode <= 3) {
+                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
                 Sound_PlaySong(0xE6);
             }
         }
@@ -1621,11 +1593,6 @@ void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
 /* What a target reference points at: an actor's block at +0x50 (position at +0x5C), or the
  * player record SceneActor_FindNearbyPlayerTarget returns. */
 
-struct IvyTargetRef {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor);
 
 struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
@@ -1642,7 +1609,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 
 #define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
 
-static inline struct IvyTargetRef *Keep(struct ChaseActor *actor, struct IvyTargetRef *target)
+static inline struct SceneActorBody *Keep(struct ChaseActor *actor, struct SceneActorBody *target)
 {
     actor->base.tracking.target = (u32)target;
     return target;
@@ -1665,7 +1632,7 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
 {
     s32 best = actor->base.tracking.limit;
     struct ChaseActor *other;
-    struct IvyTargetRef *target = SceneActor_FindNearbyPlayerTarget(actor);
+    struct SceneActorBody *target = SceneActor_FindNearbyPlayerTarget(actor);
     struct ContactPosition delta;
     u32 cell;
     if (target && actor->base.body.position.y == target->position.y) {
