@@ -22,12 +22,11 @@ void ChallengeMenu_SetStoredRank(s32 group, s32 choice, u32 rank)
     s32 byteIndex = index / 2;
     s32 odd = index & 1;
     u8 *packedRanks;
-    u32 nibbleMask = 0xf;
-    rank &= nibbleMask;
+    rank &= 0xf;
     packedRanks = (gGameState->unk654 + 4) + byteIndex;
     if (odd) {
         rank <<= 4;
-        *packedRanks &= nibbleMask;
+        *packedRanks &= 0xf;
     } else {
         *packedRanks &= 0xf0;
     }
@@ -356,8 +355,7 @@ void ChallengeMenu_InitializeKeyframes(struct ChallengeMenu *menu)
 
 void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
 {
-    u32 key = 0xCB05;
-    struct SceneInputResource *resource = ScriptProc_Start(key, 0xA2DB);
+    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     struct SceneInputResource *first, *last;
     u32 zero, duration, initialState;
     u16 bits;
@@ -367,10 +365,10 @@ void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
     menu->resources[2] = *resource;
     first = &menu->resources[2];
     ResourceHeader_Relocate(first, resource);
-    resource = ScriptProc_Start(key, 0x1289);
+    resource = ScriptProc_Start(0xCB05, 0x1289);
     menu->resources[1] = *resource;
     ResourceHeader_Relocate(&menu->resources[1], resource);
-    resource = ScriptProc_Start(key, 0x530D);
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     menu->resources[0] = *resource;
     last = &menu->resources[0];
     ResourceHeader_Relocate(last, resource);
