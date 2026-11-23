@@ -318,23 +318,6 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void ResetState(struct ChaseActor *actor, u32 s)
 {
     actor->base.state2A8 = s;
@@ -511,7 +494,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
         }
         ReportDrain(victim);
         ResetState(victim, 3);
-        SetCtl(victim, *(void **)((u8 *)group + 0x22C), 0x1E);
+        SceneActorChase_SetControl(victim, *(void **)((u8 *)group + 0x22C), 0x1E);
         ClearHeld(context);
         actor->base.stepDone = 1;
         return;
@@ -541,7 +524,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
                                             0x3C, 0, 0, 0);
                 ClearHeld(context);
                 SetState(actor, 0, 0, 2);
-                SetCtl(actor, (void *)Ivy_UpdateActiveState, 0x22);
+                SceneActorChase_SetControl(actor, (void *)Ivy_UpdateActiveState, 0x22);
                 return;
             }
             {
