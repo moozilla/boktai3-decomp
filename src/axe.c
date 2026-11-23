@@ -838,11 +838,6 @@ static inline void SetFlags(struct ChaseActor *a, u32 m)
     a->base.motionFlags = v;
 }
 
-static inline void SetContext(u8 *p, u32 m)
-{
-    *(u32 *)(p + 0xE4C) = m | *(u32 *)(p + 0xE4C);
-}
-
 static inline void RestoreHistory(struct ChaseActor *a, u16 v)
 {
     a->group.common.gate.counter = v;
@@ -859,7 +854,7 @@ static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
 
 void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     s32 x, z;
     s16 *priorX, *priorZ;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
@@ -906,7 +901,7 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
         }
         SceneActorChase_SetStatusFlags(actor, 0x100000);
         Axe_ResetMovementFlags(actor);
-        SetContext(context, 0x10);
+        WordFlags_Set(0x10, &context->flagsE4C);
         RestoreHistory(actor, actor->group.common.gate.duration);
         SetState(actor, 0, 2, 9);
     }
