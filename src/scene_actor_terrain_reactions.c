@@ -5,6 +5,7 @@
 #include "scene_actor_registry.h"
 #include "engine.h"
 #include "scene_actor_components.h"
+#include "scene_actor_control_helpers.h"
 
 void SceneActorRegistry_ApplyTerrainReactions(void)
 {
@@ -72,18 +73,11 @@ struct SceneActorRegistryManager *SceneActorRegistry_GetManager(void)
 
 void EffectQuad_StartRemoteEntry(u32, const void *);
 
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-
 void SceneActorScript_DispatchKindPayload(void *input)
 {
     struct SceneActorBody *descriptor = input;
     u32 kind;
-    if (!Test(gEngineFlags, 0x4800))
+    if (!SceneActorControl_TestFlags(gEngineFlags, 0x4800))
         return;
     switch (descriptor->mode) {
         case 0:
