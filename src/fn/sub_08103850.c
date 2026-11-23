@@ -48,7 +48,6 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
         return 0;
     {
         u32 mask = 0x400;
-        s32 mask2 = 4;
         if ((mask & (gEngineFlags | gScenePauseFlags)) || testMask()) {
             Sound_StopSong(0x158);
             Sound_StopSong(0x261);
