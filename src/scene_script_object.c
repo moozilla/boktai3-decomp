@@ -8,6 +8,7 @@
 #include "contact_actor.h"
 #include "player_cue_sequence.h"
 #include "engine.h"
+#include "vanargand_projectiles.h"
 
 /* Tentative scene script object; coordinates and five script arguments are observed here. */
 
@@ -46,13 +47,6 @@ static inline void ClearFlags(struct ContactCollider *w, s32 mask)
     w->flags &= mask;
 }
 
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-
 static inline s32 PaletteIndex(s32 state, s32 parameter)
 {
     if (state <= 1) {
@@ -88,7 +82,7 @@ void SceneScriptObject_UpdateFade(struct SceneScriptObject *object)
     }
     switch (object->state) {
         case 12:
-            object->sprite.position.y += Scale(gUnk_086149C4[*(u8 *)&object->counter] * 2);
+            object->sprite.position.y += VanargandProjectile_Scale(gUnk_086149C4[*(u8 *)&object->counter] * 2);
             break;
         case 14:
             if (object->fadeTimer == 0) {

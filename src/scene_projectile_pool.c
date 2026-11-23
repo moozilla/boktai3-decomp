@@ -1,6 +1,7 @@
 #include "scene_projectile_pool.h"
 #include "player.h"
 #include "display_sequence_inline.h"
+#include "terrain_sampling.h"
 
 u32 SceneProjectile_ConsumeHitEvent(void)
 {
@@ -266,14 +267,6 @@ static inline void Polar(struct ContactPosition *out, struct SceneProjectilePara
     out->z = Truncate(speed * gUnk_086149C4[angle & 255]);
 }
 
-static inline s32 CellIndex(struct ContactPosition *v)
-{
-    s32 x = v->x >> 8, z = v->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 static inline u8 *Cell(s32 i)
 {
     u8 *cell = TerrainModifiers_FindCellOverride(i, 1);
@@ -448,8 +441,9 @@ s32 SceneProjectile_UpdatePool(struct SceneProjectilePool *pool)
                 if (control->trackingEnabled) {
                     s32 dx = control->target->x - sprite->position.x,
                         dz = control->target->z - sprite->position.z;
-                    if (dx * dx + dz * dz <= 1023 || (u32)((*Cell(CellIndex(terrainPosition)) & 15)
-                                                           << 8) > (u32)sprite->position.y) {
+                    if (dx * dx + dz * dz <= 1023 ||
+                        (u32)((*Cell(Terrain_GetCellIndex(terrainPosition)) & 15) << 8) >
+                            (u32)sprite->position.y) {
                         SceneProjectile_ReleaseSlot(pool, projectile, i);
                         continue;
                     }

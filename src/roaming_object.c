@@ -1,5 +1,6 @@
 #include "roaming_object.h"
 #include "roaming_object_playback.h"
+#include "vanargand_projectiles.h"
 
 extern const struct RoamingStateTable gUnk_0824DF8C;
 
@@ -82,25 +83,19 @@ void RoamingObject_FlashPalette(struct RoamingObject *owner)
     owner->flashCount++;
 }
 
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-
 void RoamingObject_ApplyImpulse(struct RoamingObject *owner)
 {
     owner->animation = 2;
     if (owner->impulse) {
         s32 x = owner->impulse;
         const s16 *table = gUnk_086149C4;
-        x = Scale(table[(owner->body.direction + 64) & 255] * x);
+        x = VanargandProjectile_Scale(table[(owner->body.direction + 64) & 255] * x);
 
         owner->body.motion.x += x;
         {
             s32 y = owner->impulse;
-            owner->body.motion.z += Scale(y * gUnk_086149C4[owner->body.direction]);
+            owner->body.motion.z +=
+                VanargandProjectile_Scale(y * gUnk_086149C4[owner->body.direction]);
         }
         owner->impulse = (owner->impulse * 3) >> 2;
     } else {
@@ -353,12 +348,13 @@ void RoamingObjectB_ApplyImpulse(struct RoamingObject *owner)
     if (owner->impulse) {
         s32 x = owner->impulse;
         const s16 *table = gUnk_086149C4;
-        x = Scale(table[(owner->body.direction + 64) & 255] * x);
+        x = VanargandProjectile_Scale(table[(owner->body.direction + 64) & 255] * x);
 
         owner->body.motion.x += x;
         {
             s32 y = owner->impulse;
-            owner->body.motion.z += Scale(y * gUnk_086149C4[owner->body.direction]);
+            owner->body.motion.z +=
+                VanargandProjectile_Scale(y * gUnk_086149C4[owner->body.direction]);
         }
         owner->impulse = (owner->impulse * 3) >> 2;
     } else {
