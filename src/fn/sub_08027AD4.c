@@ -25,10 +25,7 @@ void SceneActors_UpdateContractingShake(struct StateActor *p, int time)
         SceneActors_StartDirectionalAnimation(
             p, &((struct SceneGraphicsActor *)p)->animation,
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 4);
-        {
-            u32 mask = 16;
-            p->actionFlags |= mask;
-        }
+        SceneActorState_SetFlags(p, 16);
         *((Point *)(((u8 *)p) + 0xd0)) = *((Point *)(position + 12));
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);

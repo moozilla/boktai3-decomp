@@ -33,10 +33,7 @@ void SceneActors_UpdateKnockbackReaction(struct StateActor *base, int time)
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 2, 1, 4);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        base->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(base, 12);
     if (((struct SceneGraphicsActor *)p)->graphics.scaleMin > 23)
         ((struct SceneGraphicsActor *)p)->graphics.scaleMin -= 24;
     else
@@ -44,23 +41,12 @@ void SceneActors_UpdateKnockbackReaction(struct StateActor *base, int time)
     decay(&((struct SceneGraphicsActor *)p)->graphics.scaleMax);
     if (!base->actionReset(base)) {
         if (tick <= 9) {
-            u8 *anglePtr = &((struct SceneGraphicsActor *)p)->hitAngle;
             struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
-            u32 angle;
-            int speed;
-            {
-                u32 value = *anglePtr;
-                angle = value;
-            }
-            speed = 24;
-            SceneActor_SetChargeOffset(angle, velocity, speed);
+            SceneActor_SetChargeOffset(((struct SceneGraphicsActor *)p)->hitAngle, velocity, 24);
         }
         if (tick > 19) {
-            u32 z;
-            u8 *dst = &base->actionFinished;
-            z = 0;
-            *dst = 1;
-            ((struct SceneGraphicsActor *)p)->variant = z;
+            base->actionFinished = 1;
+            ((struct SceneGraphicsActor *)p)->variant = 0;
         }
     }
 }

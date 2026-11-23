@@ -27,17 +27,12 @@ void SceneActors_UpdateBlinkReaction(struct StateActor *p, int tick)
     }
     done = 0;
     if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
-        u32 mask = 16;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 16);
     } else if (done) {
-        u32 mask = 16;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 16);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
-    {
-        u32 mask = 12;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 12);
     if (!p->actionReset(p) && tick > 59)
         p->actionFinished = 1;
 }

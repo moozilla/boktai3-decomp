@@ -280,8 +280,5 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             break;
     }
     base->elapsed += 1;
-    {
-        u32 mask = 0xD;
-        base->flags |= mask;
-    }
+    SceneActorState_SetFlags((struct StateActor *)base, 0xD);
 }

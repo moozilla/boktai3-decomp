@@ -11,10 +11,7 @@ void SceneActors_UpdateReleasePose(struct StateActor *p)
                                               72, 2, 1, 4);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 12);
     if (p->animationFinished) {
         SceneActors_StartDirectionalAnimation(p, &actor->animation, (int)&actor->animationResource,
                                               5, 2, 1, 0);

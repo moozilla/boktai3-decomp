@@ -30,10 +30,7 @@ void SceneActors_UpdateExpandingShake(struct StateActor *p, int time)
         *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
-    {
-        u32 mask = 0x1000c;
-        p->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(p, 0x1000c);
     if (!p->actionReset(p)) {
         *(Point *)(position + 12) = *(Point *)((u8 *)p + 0xd0);
         {
