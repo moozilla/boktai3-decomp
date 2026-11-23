@@ -9,14 +9,14 @@ s32 PauseMenu_GetEquipmentRowY(struct SceneHudState *, s32, s32, s32, s32);
 void SceneHud_UpdateTertiaryWidgets(struct SceneHudState *p)
 {
     s32 i;
-    struct SceneInputWidget *w;
-    s8 *selection;
     if (PauseMenu_IsEquipmentSelectionEnabled(p) == 1) {
         for (i = 0; i < 3; i++)
             p->tertiaryWidgets[i].flags |= 1;
     }
     for (i = 0; i <= 2; i++) {
-        PauseMenu_LoadStatusIconFrame(p, &p->tertiaryWidgets[i], p->tertiaryOptions[p->tertiarySelection].icon);
-        p->tertiaryWidgets[i].position.y = PauseMenu_GetEquipmentRowY(p, i, p->tertiarySelection, 3, 0);
+        PauseMenu_LoadStatusIconFrame(p, &p->tertiaryWidgets[i],
+                                      p->tertiaryOptions[p->tertiarySelection].icon);
+        p->tertiaryWidgets[i].position.y =
+            PauseMenu_GetEquipmentRowY(p, i, p->tertiarySelection, 3, 0);
     }
 }
