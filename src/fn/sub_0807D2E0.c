@@ -10,6 +10,7 @@
 #include "runtime.h"
 #include "ram.h"
 #include "scene_actor_turn.h"
+#include "scene_actor_chase_shared.h"
 
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
@@ -55,10 +56,6 @@ static inline void MarkHitFlag(s16 bit, struct HitMotionFlags *flags)
 static inline u32 *StatusFlags(struct ChaseActor *actor)
 {
     return &actor->base.statusFlags;
-}
-static inline u32 ReadStatus(struct ChaseActor *actor, u32 bits)
-{
-    return actor->base.statusFlags & bits;
 }
 static inline void SelectAnimationState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
@@ -229,7 +226,8 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 ResetEntry(a, 1);
                 if (SceneActorDamage_ShouldShow(a))
                     ShowDamage(a);
-                if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !ReadStatus(a, 0x800))
+                if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) &&
+                    !SceneActorChase_StatusFlags(a, 0x800))
                     SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->base.body.id);
                 if (category == 4 || category == 1) {
                     union SceneActorRegistryPackedPosition range;
