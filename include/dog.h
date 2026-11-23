@@ -11,7 +11,7 @@ struct Dog {
     /* Squared distances to the tracking target (tracking.distance) that pick the action. */
     u32 nearRangeSquared;    /* the near attack */
     u32 farRangeSquared;     /* the far attack (palette 1 and 3) */
-    u32 rangeSquared;        /* keyword 'Y' */
+    u32 leapRangeSquared;    /* keyword 'Y': the bite leaps within it */
     u32 retreatRangeSquared; /* within it the dog retreats */
     u32 chaseRangeSquared;   /* beyond it the dog chases */
     u16 actionTimer; /* counts down to the next queued action (flag 1) */

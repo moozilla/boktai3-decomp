@@ -2468,7 +2468,7 @@ u8 sub_0812F3CC(struct ChaseActor *);
 
 void Dog_ChasePlayer(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
     struct ContactPosition target;
     if (Chase_TakeArrived(actor))
@@ -2481,16 +2481,15 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
         struct DisplaySequenceState *anim;
         s32 distance;
         Chase_Delta(&target, &actor->base.body.position,
-                    (struct ContactPosition *)((u8 *)gPlayers[0] + 0x30));
+                    &((struct SceneActorChasePlayer *)gPlayers[0])->target.position);
         distance = target.x * target.x + target.z * target.z;
         anim = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
         if ((anim->index == 6 || anim->index == 0xC || anim->index == 0x13 ||
              anim->index == 0x19) &&
-            anim->elapsed == anim->duration - 1 && (u32)distance < *(u32 *)(context + 0x684)) {
+            anim->elapsed == anim->duration - 1 && (u32)distance < context->leapRangeSquared) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
             Chase_SetBehavior(actor, 0x10);
-            *(struct ContactPosition *)(context + 0x6D8) =
-                *(struct ContactPosition *)((u8 *)gPlayers[0] + 0x30);
+            context->leapTarget = ((struct SceneActorChasePlayer *)gPlayers[0])->target.position;
             {
                 u32 chasing = 0x80;
                 if (actor->base.motionFlags & chasing) {
@@ -2507,12 +2506,7 @@ void Dog_ChasePlayer(struct ChaseActor *actor)
         if (SceneActorChase_QueryMotionFlags(actor, 0x80)) {
             Chase_SetBehavior(actor, 0xC);
             Chase_SetCtl(actor, group->common.gate.control, 0x1A);
-            {
-                u16 *field = (u16 *)&group->common.gate.flags;
-                u32 mask = 4;
-                mask |= *field;
-                *field = mask;
-            }
+            SceneActorChase_GroupSetFlags(group, 4);
             return;
         }
         Chase_SnapToRoute(&target, (u8 *)&group->homeRoute);
@@ -2537,8 +2531,8 @@ static inline u32 Dog_SetMotionBits(struct ChaseActor *actor, s32 mask)
 
 void Dog_ResumeRoute(struct ChaseActor *a)
 {
-    u8 *group = (u8 *)&a->group.common;
-    u8 *context = a->base.context;
+    struct SceneActorChaseGroup *group = &a->group;
+    struct Dog *context = a->base.context;
     if (Chase_TakeArrived(a))
         Chase_SetCtl(a, Dog_UpdateArrivalAnimation, 10);
     if ((u8)Callback_InvokeActor(a, a->base.contactQuery.opaque))
@@ -2546,24 +2540,17 @@ void Dog_ResumeRoute(struct ChaseActor *a)
     if (sub_0812F3CC(a))
         return;
     if (a->base.stepDone) {
-        if (!Chase_TryRoute(a, *(void **)(group + 0x1FC), &a->base.body.position,
-                            (struct ContactPosition *)(context + 0x6D8))) {
-            Callback_InvokeActor(a, *(void **)(group + 0x224));
+        if (!Chase_TryRoute(a, group->route, &a->base.body.position, &context->leapTarget)) {
+            Callback_InvokeActor(a, group->fallback);
             return;
         }
         if (Dog_SetMotionBits(a, 0x200)) {
             Chase_SetBehavior(a, 12);
-            Chase_SetCtl(a, *(void **)(group + 0x48), 0x1A);
-            {
-                u16 *flags = (u16 *)(group + 0x40);
-                u32 mask = 4;
-                mask |= *flags;
-                *flags = mask;
-            }
+            Chase_SetCtl(a, group->common.gate.control, 0x1A);
+            SceneActorChase_GroupSetFlags(group, 4);
         } else {
-            struct ContactPosition *p = *(struct ContactPosition **)(group + 0x200);
-            Chase_SnapToRoute(p, group + 0x74);
-            (*(struct ContactPosition **)(group + 0x200))->pad = 0;
+            Chase_SnapToRoute(group->destination, (u8 *)&group->homeRoute);
+            group->destination->pad = 0;
             SceneActorChase_SetActorFlags(a, 0x10);
             Chase_SetCtl(a, a->base.onAlternateEntry, 1);
             Chase_SetBehavior(a, 7);
@@ -3010,8 +2997,8 @@ s32 Dog_Init(void *object)
         dog->farDistance = (Script_GetPc() ? Script_GetValue() : 320);
     }
     if (Script_SeekToKeyword('Y')) {
-        MonsterInit_ReadScriptWord(&dog->rangeSquared, 0);
-        dog->rangeSquared *= dog->rangeSquared;
+        MonsterInit_ReadScriptWord(&dog->leapRangeSquared, 0);
+        dog->leapRangeSquared *= dog->leapRangeSquared;
         dog->actionDelay = (Script_GetPc() ? Script_GetValue() : 640);
         dog->alternateActionDelay = (Script_GetPc() ? Script_GetValue() : 640);
     }
