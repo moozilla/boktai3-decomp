@@ -1,3 +1,4 @@
+#include "gba/io_reg.h"
 #include "scene_input.h"
 #include "palette_pulse.h"
 s32 SceneInput_TickChoice(struct SceneInputWidget *widget, void *resource, u8 *selection, u8 *blink)
