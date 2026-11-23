@@ -1,10 +1,6 @@
 #include "global.h"
+#include "contact_collider.h"
 #include "game_state.h"
-
-struct ArmorPart {
-    u8 pad[0x38];
-    u32 flags;
-};
 
 struct ArmorChargeActor {
     u8 pad0[0x18];
@@ -12,10 +8,9 @@ struct ArmorChargeActor {
     u8 pad1a[0x48 - 0x1a];
     s16 x, y, z;
     u8 pad4e[0x190 - 0x4e];
-    struct ArmorPart body;
-    u8 pad1cc[0x1e4 - 0x1cc];
-    struct ArmorPart attack;
-    u8 pad220[0x274 - 0x220];
+    struct ContactCollider body;
+    struct ContactCollider attack;
+    u8 pad238[0x274 - 0x238];
     u16 damage274;
     u8 pad276[0xb26 - 0x276];
     u16 savedB26;
@@ -49,10 +44,10 @@ void ActorController_SetBehaviorIfFinished(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 
-static inline void Armor_ClearPart(struct ArmorPart *part, u32 bits)
+static inline void Armor_ClearPart(struct ContactCollider *part, u32 bits)
 {
     u32 mask = ~bits;
-    part->flags &= mask;
+    part->reactionFlags &= mask;
 }
 
 /* Prepare a charge and clear the body and attack-part flags. */
