@@ -1290,20 +1290,20 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
 
 void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         SetControl(actor, actor->base.onStanding, 0);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque) && Axe_PickAttack(actor))
         return;
-    if (actor->base.health <= *(s32 *)(context + 0xE48)) {
+    if (actor->base.health <= context->healthThreshold) {
         speed = 8;
         if ((s32)actor->base.counter2AC > 400) {
             SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
             SetState(actor, 0, 0, 4);
             return;
         }
-    } else if (actor->base.health <= *(u16 *)(context + 0xEB4)) {
+    } else if (actor->base.health <= context->lowHealthThreshold) {
         speed = 6;
         if ((s32)actor->base.counter2AC > 500) {
             SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
@@ -1853,15 +1853,6 @@ void Axe_TickCooldowns(struct ChaseActor *actor)
     } while (--i >= 0);
 }
 
-struct QPickAttack {
-    u8 filler[0xe48];
-    s32 low;
-    u8 filler2[0xeb4 - 0xe4c];
-    u16 mid;
-    u16 pad;
-    u16 b[4];
-};
-
 static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 {
     actor->base.state2A8 = s;
@@ -1874,12 +1865,12 @@ static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
 u8 Axe_PickAttack(void *actorIn)
 {
     struct ChaseActor *actor = (struct ChaseActor *)actorIn;
-    struct QPickAttack *q = actor->base.context;
-    if (actor->base.health <= q->low && q->b[3] == 0) {
+    struct Axe *q = actor->base.context;
+    if (actor->base.health <= q->healthThreshold && q->attackCooldowns[3] == 0) {
         Go(actor, 0, 2, 8);
         return 1;
     }
-    if (q->b[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
+    if (q->attackCooldowns[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
         s32 a = actor->base.tracking.heading;
         s32 d = a - 0xa0;
         s32 e;
@@ -1896,12 +1887,12 @@ u8 Axe_PickAttack(void *actorIn)
             Go(actor, 0, 2, 2);
         return 1;
     }
-    if (q->mid >= actor->base.health) {
-        if (q->b[1] == 0) {
+    if (q->lowHealthThreshold >= actor->base.health) {
+        if (q->attackCooldowns[1] == 0) {
             Go(actor, 0, 2, 4);
             return 1;
         }
-        if (q->b[2] == 0) {
+        if (q->attackCooldowns[2] == 0) {
             Go(actor, 0, 2, 6);
             return 1;
         }
