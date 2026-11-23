@@ -36,7 +36,7 @@ static inline void SetControl(struct ChaseActor *actor)
     {
         /* Preserve the short-lived halfword-clear address. */
         {
-            u16 *field = (void *)((u8 *)actor + 0x2C8);
+            u16 *field = &actor->base.field2C8;
             *field = 0;
         }
     }
@@ -68,7 +68,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
             struct SceneActorRegistryControl *control = &actor->group.common.control;
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)actor + 0x2CC);
+            field = &actor->base.behaviorFlags;
             mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
