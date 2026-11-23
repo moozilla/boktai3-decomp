@@ -19,7 +19,6 @@ void MenuDisplay_SnapshotValues(void *);
 void InventoryPanel_UpdateSelectedUnlock(void *, int, int, int, int);
 void PauseInventory_InitEquipmentSelectionPage(u8 *p)
 {
-    int z;
     PauseMenu_CloseTextWindows(p);
     Hud_SetupBackgroundLayer(p, *(u32 *)(p + 0x18), 0, 7, *(u32 *)(p + 0x2c));
     PauseMenu_HideAllSprites(p);
@@ -40,9 +39,8 @@ void PauseInventory_InitEquipmentSelectionPage(u8 *p)
         MenuDisplay_UpdateActionPrompt(p, b);
     }
     Hud_SetInteractionCallback(p, SceneHud_UpdateSecondaryActionSelection, 0);
-    z = 0;
-    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
+    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, 0);
     ScrollingDialogue_HideImmediately();
     MenuDisplay_SnapshotValues(p);
-    InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, z);
+    InventoryPanel_UpdateSelectedUnlock(p, 3, 14, 0, 0);
 }
