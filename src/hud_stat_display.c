@@ -35,12 +35,10 @@ u16 *Hud_GetTilemapCell(s32 layer, u32 x, u32 y)
 {
     struct BackgroundLayer *background;
     u16 *cell;
-    u32 coordinateMask;
     background = &gBgRecords[layer];
     cell = background->map;
-    coordinateMask = 0x1f;
-    cell += x & coordinateMask;
-    cell = (u16 *)((u8 *)cell + ((y & coordinateMask) << 6));
+    cell += x & 0x1f;
+    cell = (u16 *)((u8 *)cell + ((y & 0x1f) << 6));
     return cell;
 }
 
@@ -146,9 +144,7 @@ void Hud_DrawPlayerValue(struct SceneHudState *hud, s32 style, s32 x, s32 y)
             s32 maximum = Div(4000, 4);
             Hud_DrawStatRatio(hud, style, 1000, 4, current, maximum, x, y);
         } else {
-            s32 divisor = 1000;
-            Hud_DrawStatRatio(hud, style, divisor, 4, hud->actionOwner->statHundredths, divisor, x,
-                              y);
+            Hud_DrawStatRatio(hud, style, 1000, 4, hud->actionOwner->statHundredths, 1000, x, y);
         }
     }
 }
