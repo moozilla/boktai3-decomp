@@ -241,27 +241,17 @@ void TimeResult_InitCategoryDisplay(struct ChallengeTimeResult *result)
 
 void TimeResult_InitAnimations(struct ChallengeTimeResult *result)
 {
-    u32 bank = 0xCB05, zero, duration;
-    struct SceneInputResource *resource = ScriptProc_Start(bank, 0x1289), *first;
-    struct SceneInputWidget *digit;
+    struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0x1289);
     s32 i;
     result->categoryGraphics = *resource;
-    first = &result->categoryGraphics;
-    ResourceHeader_Relocate(first, resource);
-    resource = ScriptProc_Start(bank, 0xE2AB);
+    ResourceHeader_Relocate(&result->categoryGraphics, resource);
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
     result->digitGraphics = *resource;
     ResourceHeader_Relocate(&result->digitGraphics, resource);
-    Widget_InitLinked(&result->category, first, 0, 0x10, 1, zero = 0, duration = 0x3C, 0);
-    Widget_InitLinked(&result->label, first, 0, 0x10, 2, zero, duration, zero);
-    {
-        u32 initialState = 0;
-        digit = &result->digits[0];
-        for (i = 5; i >= 0; i--) {
-            Widget_InitLinked(digit, &result->digitGraphics, 0, 0x31, 2, initialState, 0x3C,
-                              initialState);
-            digit++;
-        }
-    }
+    Widget_InitLinked(&result->category, &result->categoryGraphics, 0, 0x10, 1, 0, 0x3C, 0);
+    Widget_InitLinked(&result->label, &result->categoryGraphics, 0, 0x10, 2, 0, 0x3C, 0);
+    for (i = 0; i < 6; i++)
+        Widget_InitLinked(&result->digits[i], &result->digitGraphics, 0, 0x31, 2, 0, 0x3C, 0);
     TimeResult_InitCategoryDisplay(result);
     TimeResult_SetElapsedDigits(result);
     result->category.flags |= 1;
