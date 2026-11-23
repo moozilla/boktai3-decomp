@@ -3,18 +3,7 @@
 #include "player.h"
 #include "ram.h"
 #include "named_object_flags.h"
-struct NamedObject {
-    u8 pad0[0x58];
-    struct SceneVec offset;
-    u8 pad60[0x58];
-    s16 flags;
-    u8 padBA[0x22];
-    u32 name;
-};
-struct NamedObjectManager {
-    u8 pad0[0x1370];
-    u32 playerName;
-};
+#include "named_object.h"
 void NamedObject_ResolveAttachmentPosition(struct SceneVec *, struct SceneVec *,
                                            struct NamedObject *);
 void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
@@ -22,7 +11,7 @@ void NamedObject_MoveAttachedPlayer(struct NamedObject *object)
 {
     struct SceneVec target;
     struct NamedObjectManager *manager = gNamedActorManager;
-    if (gPlayers[0] && object->name == manager->playerName) {
+    if (gPlayers[0] && object->name == manager->followName) {
         if (!NamedObjectFlags_Has(0x100, &object->flags)) {
             target.x = gPlayers[0]->position.x + object->offset.x;
             target.y = gPlayers[0]->position.y + object->offset.y;

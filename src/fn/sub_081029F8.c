@@ -2,39 +2,20 @@
 #include "player.h"
 #include "ram.h"
 #include "named_object_flags.h"
-struct NamedObjectVector {
-    s16 x, y, z, pad;
-};
-struct NamedObject {
-    u8 pad0[0x58];
-    struct SceneVec offset;
-    u8 pad60[0x58];
-    s16 flags;
-    u8 padBA[0x22];
-    u32 name;
-    u32 field_E0;
-    u8 padE4[0xF3 - 0xE4];
-    u8 kind;
-    u8 padF4[0x10C - 0xF4];
-    struct SceneVec position;
-};
-struct NamedObjectManager {
-    u8 pad0[0x1370];
-    u32 playerName;
-};
-extern const struct NamedObjectVector gUnk_086064B4;
-extern const struct NamedObjectVector gUnk_086064BC;
+#include "named_object.h"
+extern const struct ContactPosition gUnk_086064B4;
+extern const struct ContactPosition gUnk_086064BC;
 void NamedObject_ClearAttachmentFlag(u32, s32);
 void NamedObject_UpdatePlayerFollowFlags(struct NamedObject *);
 void Player_ClearAttachmentFlags(struct Player *, u32);
-static inline void subtractVector(struct NamedObjectVector *d, struct NamedObjectVector *a,
+static inline void subtractVector(struct ContactPosition *d, struct ContactPosition *a,
                                   struct SceneVec *b)
 {
     d->x = a->x - b->x;
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-static inline void addVector(struct NamedObjectVector *d, struct SceneVec *a, struct SceneVec *b)
+static inline void addVector(struct ContactPosition *d, struct SceneVec *a, struct SceneVec *b)
 {
     d->x = a->x + b->x;
     d->y = a->y + b->y;
@@ -45,18 +26,18 @@ static inline void addVector(struct NamedObjectVector *d, struct SceneVec *a, st
      delta.z <= (b).z && delta.z >= -(b).z)
 void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
 {
-    struct NamedObjectVector target, delta;
+    struct ContactPosition target, delta;
     struct NamedObjectManager *manager;
     struct Player *player = gPlayers[0];
     target.x = player->position.x + object->offset.x;
     target.y = player->position.y + object->offset.y;
     target.z = player->position.z + object->offset.z;
-    subtractVector(&delta, &target, &object->position);
+    subtractVector(&delta, &target, &object->body.position);
     manager = gNamedActorManager;
     if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x && delta.y <= gUnk_086064B4.y &&
         delta.y >= -gUnk_086064B4.y && delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
-        NamedObject_ClearAttachmentFlag(manager->playerName, 0);
-        manager->playerName = object->name;
+        NamedObject_ClearAttachmentFlag(manager->followName, 0);
+        manager->followName = object->name;
         NamedObject_UpdatePlayerFollowFlags(object);
         {
             s16 mask = 8;
@@ -72,7 +53,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             } while (0);
             *p = v;
         }
-    } else if (manager->playerName == object->name) {
+    } else if (manager->followName == object->name) {
         if (object->kind == 1 && !(object->field_E0 & 8)) {
             if (IN_BOUNDS(gUnk_086064BC)) {
                 NamedObject_UpdatePlayerFollowFlags(object);
@@ -83,7 +64,7 @@ void NamedObject_UpdatePlayerAttachment(struct NamedObject *object)
             return;
         }
         {
-            manager->playerName = 0;
+            manager->followName = 0;
             gPlayers[0]->followTarget = &gPlayers[0]->movementContactFlags;
             Player_ClearAttachmentFlags(gPlayers[0], 5);
             NamedObjectFlags_Remove(8, &object->flags);
