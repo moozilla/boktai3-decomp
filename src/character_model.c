@@ -1,4 +1,6 @@
 #include "character_model.h"
+#include "engine_pause.h"
+#include "game_state_flags.h"
 
 void ActorStats_ApplyPendingIncrement(struct ActorStats *actor)
 {
@@ -31,8 +33,7 @@ s32 ActorResource_SelectElementResource(s32 index)
 {
     u32 kind;
     s32 count, selected;
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         struct AreaEffectLinkState *link = gLinkSession;
         struct AreaEffectLinkResourceSlot *slot;
         if (!link || link->unavailable != 1 || !ValidIndex(index))
@@ -128,23 +129,16 @@ void CharacterModel_InitPalettes(struct CharacterPreviewModel *model, s32 appear
 {
     u8 *primary, *secondary;
     u16 *palette;
-    struct ModifierDisplayObject *part;
     s32 partIndex;
-    u32 tile;
     primary = gPaletteBankData + (CharacterModel_GetPrimaryPaletteIndex(model) << 5);
     secondary = gPaletteBankData + ((appearance + 0x379) << 5);
     palette = model->activePalette;
     CpuSet(primary, palette, 0x10);
     CpuSet(secondary, model->normalPalette, 0x10);
-    part = model->view.parts;
-    tile = 0xa000;
-    partIndex = 4;
-    do {
-        part->palette = palette;
-        part->tile = tile;
-        part++;
-        partIndex--;
-    } while (partIndex >= 0);
+    for (partIndex = 0; partIndex < 5; partIndex++) {
+        model->view.parts[partIndex].palette = palette;
+        model->view.parts[partIndex].tile = 0xa000;
+    }
 }
 
 void CharacterPreview_InitializePalette(struct CharacterPreviewPalette *paletteState,
@@ -329,22 +323,9 @@ void CharacterPreview_PositionParts(void *resource, struct ModifierDisplayObject
     }
 }
 
-static inline u8 HasPaletteRefreshFlag(void)
-{
-    u32 mask = 0x100;
-    if (gGameState->flags868 & mask)
-        return TRUE;
-    return FALSE;
-}
-
-static inline u32 TestPaletteModeFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-
 void ScenePalette_RefreshOnFlags(struct ScenePoolActor *actor, struct CharacterPreviewModel *model)
 {
-    if (HasPaletteRefreshFlag() || TestPaletteModeFlags(0x800)) {
+    if (GameState_TestWorldFlags(0x100) || Engine_PauseBits(0x800)) {
         if (actor->paletteState == 11)
             actor->paletteMode = 3;
         else
@@ -579,14 +560,6 @@ void SceneMotion_PlayKindSound(struct ScenePoolActor *actor)
         Sound_PlaySong(0x91);
 }
 
-static inline u8 HasPendingDamage(struct ActorStats *actor)
-{
-    u32 mask = 1;
-    if (actor->damageFlags & mask)
-        return 1;
-    return 0;
-}
-
 static inline u32 ClearDamageFlag(u8 *flags, u32 mask)
 {
     u32 value = ~mask;
@@ -594,21 +567,9 @@ static inline u32 ClearDamageFlag(u8 *flags, u32 mask)
     return value;
 }
 
-static inline u32 ReadDamageFlags(u8 *flags)
-{
-    return *flags;
-}
-
-static inline void SetDamageFlag(u8 *flags, u32 mask)
-{
-    u32 value = mask;
-    value |= ReadDamageFlags(flags);
-    *flags = value;
-}
-
 void ActorStats_ApplyPendingDamage(struct ActorStats *actor)
 {
-    if (HasPendingDamage(actor)) {
+    if (ActorStats_TestDamageFlags(actor, 1)) {
         u32 cleared = ClearDamageFlag(&actor->damageFlags, 1);
         actor->damageFlags = cleared;
         PaletteFlash_SelectPalette((void *)&actor->pendingDamage, 1);
@@ -617,7 +578,7 @@ void ActorStats_ApplyPendingDamage(struct ActorStats *actor)
         actor->pendingDamage = 0;
         Character_SetLowResourceColorEffect(actor->state44, actor->state48);
         if (actor->amount <= 0)
-            SetDamageFlag(&actor->damageFlags, 2);
+            ActorStats_SetDamageFlags(2, &actor->damageFlags);
     }
 }
 
@@ -686,14 +647,12 @@ void GameState_SetNameFromScript(void)
 
 void GameState_EnableAlternateHud(void)
 {
-    u32 mask = 0x80;
-    gGameState->flags868 |= mask;
+    GameState_SetWorldFlags(0x80);
 }
 
 void GameState_SetRuntimeFlag100(void)
 {
-    u32 mask = 0x100;
-    gGameState->flags868 |= mask;
+    GameState_SetWorldFlags(0x100);
 }
 
 u8 *Video_GetWrappedBackgroundMapEntry(u32 layerIndex, u32 x, u32 y)
@@ -797,19 +756,12 @@ void SceneActorStyle_Initialize(struct SceneActorStyle *style, s32 body, s32 fac
                                 s32 initialHalfword, u32 initialWord)
 {
     s32 i;
-    u8 *entry;
     style->adjustedA = body + 12;
     style->adjustedB = face + 6;
     style->adjustedC = accessory + 18;
     style->parameterE = paletteMode;
-    {
-        u32 zero = 0;
-        i = 3;
-        entry = &style->entries[3];
-        do {
-            *entry-- = zero;
-        } while (--i >= 0);
-    }
+    for (i = 0; i < 4; i++)
+        style->entries[i] = 0;
     style->count = 0;
     style->parameterD = paletteState;
     style->parameterB = face;

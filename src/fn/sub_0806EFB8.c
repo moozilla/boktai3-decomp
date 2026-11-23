@@ -1,24 +1,7 @@
 #include "scene_actor_registry.h"
+#include "scene_actor_status.h"
 /* SceneActorQuery_FindInRectangle: Advances the actor ID cursor through up to twenty candidates and returns an eligible living actor within inclusive X/Z bounds */
-#define SceneActorQuery_FindInRectangle sub_0806EFB8
-#define SceneActorQuery_FindInRectangle sub_0806EFB8
 struct ChaseActor *SceneActorRegistry_FindAvailableAfterId(u32);
-static inline u8 Inactive(struct ChaseActor *a)
-{
-    {
-        u32 mask = 0x40;
-        if (a->base.motionFlags & mask)
-            return 1;
-    }
-    {
-        u32 mask = 0x20000;
-        if (a->base.statusFlags & mask)
-            return 1;
-    }
-    if (a->base.health <= 0)
-        return 1;
-    return 0;
-}
 struct ChaseActor *SceneActorQuery_FindInRectangle(const struct ContactPosition *minimum,
                                                    const struct ContactPosition *size, u32 *cursor)
 {
@@ -29,12 +12,12 @@ struct ChaseActor *SceneActorQuery_FindInRectangle(const struct ContactPosition 
             return 0;
         *cursor = a->base.body.id;
         {
-            u8 *base = (u8 *)a + 0x50;
-            if (Inactive(a))
+            struct SceneActorBody *body = &a->base.body;
+            if (ActorStatus_IsDown(a))
                 continue;
-            if (minimum->x > *(s16 *)(base + 12) || minimum->x + size->x < *(s16 *)(base + 12))
+            if (minimum->x > body->position.x || minimum->x + size->x < body->position.x)
                 continue;
-            if (minimum->z > *(s16 *)(base + 16) || minimum->z + size->z < *(s16 *)(base + 16))
+            if (minimum->z > body->position.z || minimum->z + size->z < body->position.z)
                 continue;
             return a;
         }

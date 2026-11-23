@@ -69,10 +69,7 @@ void Vampire_UpdateSwayReaction(struct StateActor *base, int time)
     }
     ((struct SceneGraphicsActor *)p)->graphics.reactionDelay = 8;
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p);
-    {
-        u32 mask = 12;
-        base->actionFlags |= mask;
-    }
+    SceneActorState_SetFlags(base, 12);
     if (((struct SceneGraphicsActor *)p)->specialReaction && (time & 3) == 0)
         sub_08022790(p, 0);
     if (((struct SceneGraphicsActor *)p)->animation.status & 2) {
@@ -101,7 +98,6 @@ void Vampire_UpdateSwayReaction(struct StateActor *base, int time)
             ((struct SceneGraphicsActor *)p)->variant = variant;
         }
     } else {
-        u32 bit = 1;
-        base->actionFlags |= bit;
+        SceneActorState_SetFlags(base, 1);
     }
 }

@@ -1,4 +1,5 @@
 #include "scene_actor_effects.h"
+#include "scene_actor_chase_shared.h"
 void SceneMessages_UnregisterReceiver(void *);
 void Shadow_Destroy(void *);
 void SceneActorEffects_DestroyGroup(void *);
@@ -6,12 +7,6 @@ void TerrainOverlay_QueueRemoveActor(void *);
 void SceneLink_RemoveNode(void *);
 void SceneBody_Unregister(void *);
 void SceneActorRegistry_UnlinkActor(struct ChaseActor *);
-static inline u8 TestFlag(u16 *flags, u32 mask)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
 static inline u8 TestValue(u32 value)
 {
     if (value)
@@ -40,9 +35,8 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
             SceneMessages_UnregisterReceiver((u8 *)actor + 0xC);
     }
     {
-        u32 offset = 0x320;
         u8 *shadow;
-        shadow = (u8 *)actor + offset;
+        shadow = (u8 *)actor + 0x320;
         if (*shadow)
             Shadow_Destroy(shadow);
     }
@@ -56,7 +50,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
         if (!flags)
             TerrainOverlay_QueueRemoveActor(identity);
     }
-    if (TestFlag(flags, 0x200))
+    if (SceneActorChase_TestField(flags, 0x200))
         SceneLink_RemoveNode(control + 0x30);
     SceneBody_Unregister(identity);
     Collider_Remove((u8 *)actor + 0x134);

@@ -180,15 +180,39 @@ static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)
     actor->animationFacing8 = direction;
 }
 
+/* The per-frame action flags at 0x9C. One accessor family serves the common controller and every
+ * kind's handlers; each loads its mask before the flags word wherever it is used. */
 static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
 {
     actor->actionFlags |= flags;
+}
+
+static inline void SceneActorState_ClearFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags &= ~flags;
+}
+
+static inline u32 SceneActorState_TestFlags(const struct StateActor *actor, u32 mask)
+{
+    return actor->actionFlags & mask;
 }
 
 static inline void SceneActorState_EnterReactionPhase(struct StateActor *actor, u32 phase)
 {
     actor->reactionPhase = phase;
     actor->reactionTimer = 0;
+}
+
+/* Enter an action state: install its per-frame callback, restart the callback's frame count, mark
+ * the change for the callback's first frame and restart the reaction substate. */
+static inline void SceneActorState_EnterAction(struct StateActor *actor,
+                                               void (*callback)(void *, int), u32 state)
+{
+    actor->actionState = state;
+    actor->actionCallback = callback;
+    actor->callbackFrame = 0;
+    actor->actionChanged = 1;
+    SceneActorState_EnterReactionPhase(actor, 0);
 }
 
 u32 Trigger_ConsumePending(void *receiver, u32 count);

@@ -175,13 +175,13 @@ void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
 void RegistrySelection_BlendPaletteBanks(u8 *output, u8 *from, u8 *to, int amount, int shift,
                                          int bankCount)
 {
-    u16 (*outputBank)[16] = (u16 (*)[16])output;
-    u16 (*firstBank)[16] = (u16 (*)[16])from;
-    u16 (*secondBank)[16] = (u16 (*)[16])to;
+    u16(*outputBank)[16] = (u16(*)[16])output;
+    u16(*firstBank)[16] = (u16(*)[16])from;
+    u16(*secondBank)[16] = (u16(*)[16])to;
     int bank;
     for (bank = 0; bank < bankCount; bank++) {
-        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank],
-                                 amount, shift);
+        Palette_InterpolateBanks(outputBank[bank], firstBank[bank], secondBank[bank], amount,
+                                 shift);
     }
 }
 
@@ -190,8 +190,7 @@ void RegistrySelection_ApplyPalettePhase(struct RegistrySelectionMenu *menu, u32
     u8 *base = menu->palettes;
     u8 *extra;
     u32 flags = menu->availableEntries;
-    u32 mask = 0x80;
-    if (flags & mask)
+    if (flags & 0x80)
         extra = base + 0x120;
     else
         extra = 0;

@@ -1,15 +1,11 @@
-#include "global.h"
+#include "scene_pool.h"
 
-u32 ScenePool_StateBrake(u32 a, u8 *b, u8 *e)
+u32 ScenePool_StateBrake(void *manager, struct ScenePoolActor *actor, struct ScenePoolEntry *entry)
 {
-    u32 m;
-    u32 *p;
-    if (e[0x64] != 0)
-        e[0x64] = 0;
-    *(u32 *)(b + 0x858) |= 0x20;
-    m = 0x10;
-    p = (u32 *)(b + 0x5fc);
-    *p |= m;
-    (*(u32 *)(e + 0x44))++;
+    if (entry->stateEntered)
+        entry->stateEntered = 0;
+    actor->controlFlags |= 0x20;
+    ScenePoolActor_SetStateFlags(actor, 0x10);
+    entry->stateFrame++;
     return 0;
 }

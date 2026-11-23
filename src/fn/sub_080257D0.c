@@ -29,8 +29,7 @@ void SceneActorAnimation_UpdateChargeSlide(struct StateActor *p, int tick)
         }
     }
     if (!p->actionTryUpdate(p)) {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p)) {
             if (tick <= 19) {
                 struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);
@@ -45,11 +44,9 @@ void SceneActorAnimation_UpdateChargeSlide(struct StateActor *p, int tick)
                     u8 *data = gPaletteBankData + id * 32;
                     TemporaryAnimationPool_CreateEntry(&actor->animation, 8, 0x200, 0x9000, data);
                 } else {
-                    int offset;
                     u8 *data;
                     data = gPaletteBankData;
-                    offset = 0x6740;
-                    data += offset;
+                    data += 0x6740;
                     {
 
                         TemporaryAnimationPool_CreateEntry(&actor->animation, 8, 0x200, 0x9000,

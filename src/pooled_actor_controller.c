@@ -81,11 +81,8 @@ void Actor_UpdateDrawable(struct PooledActor *actor)
     Actor_RefreshTarget(actor);
     drawable = &actor->drawable;
     DisplayAnimation_SetPosition(drawable, (const struct DisplayPosition *)&actor->body.position);
-    {
-        u32 mask = 2;
-        if (actor->flags & mask)
-            DisplayAnimation_UpdatePlayback(drawable);
-    }
+    if (PooledActor_TestFlags(actor, 2))
+        DisplayAnimation_UpdatePlayback(drawable);
 }
 
 void Actor_PrepareStateUpdate(struct PooledActor *actor)
@@ -125,13 +122,11 @@ void Actor_UpdateCollisionAndEffectTimers(struct PooledActor *actor)
     if (manager->updateSlot == actor->updateSlot)
         selected = 1;
     if (selected) {
-        u32 mask = 4;
-        if (actor->flags & mask)
+        if (PooledActor_TestFlags(actor, 4))
             Collider_Refresh(&actor->hitSensor);
     }
     if (!actor->reaction) {
-        u32 mask = 8;
-        if (actor->flags & mask)
+        if (PooledActor_TestFlags(actor, 8))
             ActorController_EnableBodyContact(actor);
         else
             ActorController_DisableBodyContact(actor);
@@ -410,10 +405,7 @@ int Actor_InitializeControllerFromScript(struct PooledActor *actor)
     DisplayAnimation_InitializeSequence(&actor->drawable, 0xd495, 0xaf44, 0,
                                         (const struct DisplayPosition *)&actor->body.position);
     Actor_SetFacingAnimationEntry(actor, 1, 0, 1, 0, 0);
-    {
-        u32 mask = 2;
-        actor->flags |= mask;
-    }
+    PooledActor_SetFlags(actor, 2);
     size.x = 32;
     size.y = 128;
     size.z = 32;

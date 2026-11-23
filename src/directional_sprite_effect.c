@@ -2,8 +2,8 @@
 
 void DirectionalSpriteEffect_Activate(struct Player *player)
 {
-    player->directionalEffect[0].spriteResource = player->spriteResource;
-    player->directionalEffect[0].variantResource = player->actionVariantResource;
+    player->directionalEffect[0].spriteResource = player->animation.paletteBank;
+    player->directionalEffect[0].variantResource = player->animation.palette;
     player->directionalEffect[0].sprite.flags &= ~1;
     player->directionalEffect[0].active = 1;
 }

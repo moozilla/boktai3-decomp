@@ -1,30 +1,20 @@
 #include "global.h"
-
-struct R {
-    u32 a, b;
-};
-struct Q {
-    u8 f00[0x20];
-    struct R r;
-};
-
+#include "frame_display.h"
 void AnimData_Load(void *, s32);
 void Sprite_Init(void *, void *, s32);
-
-s32 ActorDebris_Init(u8 *p, struct Q *q, u32 a, u32 b)
+s32 ActorDebris_Init(struct FrameDisplay *display, struct SceneInputWidget *animation, u8 *heading,
+                     u8 *flip)
 {
-    u8 *s18 = p + 0x18;
-    u8 *s34 = p + 0x34;
-    u32 z;
-    AnimData_Load(s18, 0xB250);
-    Sprite_Init(s34, s18, 1);
-    z = 0;
-    *(u16 *)(s34 + 0x10) = z;
-    *(struct R *)(s34 + 0x1c) = q->r;
-    *(u32 *)(p + 0x68) = z;
-    *(u32 *)(p + 0x64) = z;
-    *(struct Q **)(p + 0x74) = q;
-    *(u32 *)(p + 0x6c) = a;
-    *(u32 *)(p + 0x70) = b;
+    u8 *data = display->animationData;
+    struct ContactSwarmSprite *sprite = &display->sprite;
+    AnimData_Load(data, 0xB250);
+    Sprite_Init(sprite, data, 1);
+    sprite->frame = 0;
+    sprite->position = animation->position;
+    display->frameCounter = 0;
+    display->compactFrame = 0;
+    display->animation = animation;
+    display->heading = heading;
+    display->flip = flip;
     return 0;
 }

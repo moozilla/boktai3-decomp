@@ -1,9 +1,7 @@
 #include "global.h"
 #include "runtime.h"
+#include "gba/io_reg.h"
 /* Hardware startup, subsystem initialization, then the task scheduler loop. */
-struct Dma {
-    vu32 source, dest, control;
-};
 void RegisterRamReset(u32);
 void Rtc_Initialize(void);
 void Clock_ClearState(void);
@@ -28,7 +26,7 @@ void TaskSystem_RunFrame(void);
 extern u8 Palette_CacheObjectBankArm[], AgbMain__addr[];
 void AgbMain(void)
 {
-    u32 saved0, saved1, zero;
+    u32 saved0, saved1;
     u32 *cookie0, *cookie1;
     *(vu16 *)0x04000204 = 0x4014;
     {
@@ -43,17 +41,8 @@ void AgbMain(void)
     RegisterRamReset(1);
     *cookie0 = saved0;
     *cookie1 = saved1;
-    {
-        struct Dma *dma;
-        zero = 0;
-        dma = (struct Dma *)0x040000d4;
-        dma->source = (u32)&zero;
-        dma->dest = 0x03000000;
-        dma->control = 0x85001f40;
-        dma->control;
-        while (dma->control & 0x80000000)
-            ;
-    }
+    DmaFill32(3, 0, (void *)IWRAM_START, 0x7d00);
+    DmaWait(3);
     Rtc_Initialize();
     Clock_ClearState();
     Clock_CheckRtcDate();

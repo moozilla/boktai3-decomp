@@ -4,12 +4,14 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "player.h"
+#include "player_slot_status.h"
 #include "ram.h"
 #include "debug.h"
 #include "hit_spark_random.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
+    // concession-ok(duplicate-branches): every lock state names resource 0x335; the ROM still loads it
     switch (p->locked) {
         case 0:
             return 0x335;
@@ -86,15 +88,6 @@ void WirelessGame_AddItem(void *, s32);
 struct ContactVector {
     s16 x, y, z;
 };
-static inline u32 TestContactFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-
-static inline u32 TestColliderFlags(const struct ContactCollider *collider, u32 mask)
-{
-    return collider->flags & mask;
-}
 
 void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
 {
@@ -125,7 +118,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
                                  &size, 1);
     }
     {
-        if (TestColliderFlags((struct ContactCollider *)source, 0x100)) {
+        if (ContactCollider_TestFlags((struct ContactCollider *)source, 0x100)) {
             u8 angle = ((struct ContactCollider *)source)->direction;
             ((struct SceneGraphicsActor *)p)->hitAngle = angle;
         } else
@@ -143,7 +136,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     *((u16 *)(p + 0x34e)) = responseValue;
     PlayerStats_AddContactHundredths(source, contact, actor[0xe2]);
     if ((((struct SceneGraphicsActor *)p)->pendingDamage > 0) &&
-        TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 1))
+        ContactCollider_TestReactionFlags((struct ContactCollider *)source, 1))
         ((struct SceneGraphicsActor *)p)->damagePending = 1;
     if (!(gEngineFlags & 0x1000))
         return;
@@ -156,7 +149,7 @@ void SceneActorGraphics_OnDamageContact(u8 *source, u8 *contact, u8 *p)
     }
     if (((struct ContactCollider *)contact)->costFlags & 8)
         WirelessGame_AddItem(contact + 0xc, 0);
-    if (!TestContactFlags(&((struct ContactCollider *)source)->reactionFlags, 0x800000))
+    if (!ContactCollider_TestReactionFlags((struct ContactCollider *)source, 0x800000))
         return;
     {
         u8 *stats = (u8 *)gGameState;
@@ -250,11 +243,6 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_SetCallback(drawable, sub_08021F4C, p);
     Collider_SetBodyProperties(drawable, resource, 0x802, 1);
     Collider_Refresh(drawable);
-}
-
-static inline u32 SceneActorState_TestFlags(const struct StateActor *actor, u32 mask)
-{
-    return actor->actionFlags & mask;
 }
 
 void SceneActorGraphics_UpdateVariant(struct StateActor *p)
@@ -513,7 +501,6 @@ void sub_08022790(u8 *p, s32 big)
     s32 angle, count, speed;
     u16 index;
     u32 *indexPtr;
-    u32 mask;
     int smallMask;
     const u16 *table;
     pos = *(struct ContactPosition *)(p + 0x260);
@@ -538,14 +525,13 @@ void sub_08022790(u8 *p, s32 big)
     table = gRandomTable;
     indexPtr = &gRandomIndex;
     index = *indexPtr + 1;
-    mask = 1023;
-    index &= mask;
+    index &= 1023;
     angle = (u8)table[index];
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     count = table[index];
     smallMask = 3;
     count = (count & smallMask) + 2;
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     *indexPtr = index;
     speed = (table[index] & smallMask) + 20;
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
@@ -609,24 +595,20 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         u32 angle, count;
         u32 index;
         u32 *indexPtr;
-        u32 mask;
-        u32 smallMask;
         u32 value;
         u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
-        mask = 1023;
-        smallMask = 3;
         value = (u32)gRandomTable;
-        index = HitSpark_NextIndex(*indexPtr, mask);
+        index = HitSpark_NextIndex(*indexPtr, 1023);
         angle = (u8)HitSpark_Sample(value, index);
-        index = HitSpark_NextIndex(index, mask);
-        count = (HitSpark_Sample(value, index) & smallMask) + 2;
-        index = HitSpark_NextIndex(index, mask);
+        index = HitSpark_NextIndex(index, 1023);
+        count = (HitSpark_Sample(value, index) & 3) + 2;
+        index = HitSpark_NextIndex(index, 1023);
         *indexPtr = index;
-        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        speed = (HitSpark_Sample(value, index) & 3) + 20;
         value = 3;
         SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), value, &size, angle, count,
                             speed, 2, 2);
@@ -655,19 +637,10 @@ struct ReactionActor {
     u8 padC8[0x38];
     void (*callback)(void *);
 };
-void SceneActors_UpdateShrinkingReaction(void *);
-void SceneActors_UpdateKnockbackReaction(void *);
-void sub_08027214(void *);
+void SceneActors_UpdateShrinkingReaction(void *, int);
+void SceneActors_UpdateKnockbackReaction(void *, int);
+void sub_08027214(void *, int);
 void WirelessGame_AddItem(void *, s32);
-
-static inline void reactionState(struct ReactionActor *p, void (*fn)(void *), int id)
-{
-    p->state = id;
-    p->callback = fn;
-    p->timer = 0;
-    p->changed = 1;
-    SceneActorState_EnterReactionPhase((struct StateActor *)p, 0);
-}
 
 // confidence=low: damage handler: 0 shows the damage number and starts the shrinking reaction
 // (wireless games may award an item when hit from the front), 2 starts a knockback, 1 a death.
@@ -696,7 +669,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                     SceneActors_StopBackgroundFlash((struct StateActor *)actor);
             }
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 0);
-            reactionState(p, SceneActors_UpdateShrinkingReaction, 0x16);
+            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateShrinkingReaction,
+                                        0x16);
             if (gEngineFlags & 0x1000) {
                 u8 *position = sprite + 0xc;
                 if (WirelessGame_TryAddCyclingItem(position)) {
@@ -713,7 +687,8 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
         }
         case 2:
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 1);
-            reactionState(p, SceneActors_UpdateKnockbackReaction, 0x17);
+            SceneActorState_EnterAction((struct StateActor *)p, SceneActors_UpdateKnockbackReaction,
+                                        0x17);
             {
                 u8 v = sprite[9] + 0x80;
                 ((struct SceneGraphicsActor *)p)->hitAngle = v;
@@ -728,7 +703,7 @@ s32 sub_08022B18(struct ReactionActor *p, s32 kind, s32 damage)
                 SceneActorState_SetFlags((struct StateActor *)p, 2);
             }
             SceneActorState_StartAction((struct StateActor *)p, 1, 0, 3);
-            reactionState(p, sub_08027214, 0x19);
+            SceneActorState_EnterAction((struct StateActor *)p, sub_08027214, 0x19);
             break;
         }
     }
@@ -1362,7 +1337,7 @@ int SceneActorState_TryStartDeathOrFlaggedAction(struct StateActor *p)
 {
     if (p->health <= 0 && p->vulnerable) {
         SceneActorState_SetFlags(p, 2);
-        reactionState((struct ReactionActor *)p, sub_08027214, 25);
+        SceneActorState_EnterAction(p, sub_08027214, 25);
     }
     p->vulnerable = 0;
     if (SceneActorState_TestFlags(p, 2)) {
@@ -1419,11 +1394,6 @@ void SceneActorState_PlayAnimation5ThenAdvance(struct StateActor *p)
         SceneActorState_EnterPhase(p, 3);
     else
         p->actionTimer++;
-}
-
-static inline void SceneActorState_ClearFlags(struct StateActor *actor, u32 flags)
-{
-    actor->actionFlags &= ~flags;
 }
 
 void SceneActorState_EnterPhase6AndResetAnimation(struct StateActor *p)
@@ -1832,14 +1802,9 @@ extern u32 gUnk_02000560;
 
 extern const u32 gUnk_08604EF0[];
 
-static inline u32 SceneActorState_TestDispatchFlags(u32 flags)
-{
-    return gUnk_02000560 & flags;
-}
-
 void SceneActorState_UpdateActiveActions(struct StateActor *p)
 {
-    if (!SceneActorState_TestDispatchFlags(4)) {
+    if (!PlayerSlot_ReadStatus(0, 4)) {
         if (SceneActorState_TryStartDeathOrFlaggedAction(p) == 0) {
             Callback_InvokeActor(p, gUnk_08604EF0[p->actionIndex]);
         }

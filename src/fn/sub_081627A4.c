@@ -1,109 +1,100 @@
 #include "global.h"
 #include "terrain_cell_probe.h"
 #include "ram.h"
-
-struct BarrierSpr {
-    u32 flags;
-    u32 pad[3];
-    u16 h;
-};
-#define SPR ((struct BarrierSpr *)(b + 0xF4))
-
-struct BarrierGame {
-    u8 f00[0x77C];
-    s32 duration;
-};
+#include "game_state.h"
+#include "scene_marker.h"
 
 void AnimData_SelectPaletteBank(void *, s32);
 s32 Collider_Refresh(void *);
 void PlayerBarrier_DecrementDuration(void *);
 
-s32 PlayerBarrier_Update(u8 *b)
+s32 PlayerBarrier_Update(struct SceneMarker *b)
 {
     s32 st;
     s32 *pst, *q;
     if ((gSceneEffectPalettePhase & 3) == 0) {
-        if (TerrainModifiers_FindCellOverride(cellIndexAt((struct Pos16 *)(b + 0x70)), 0))
-            *(s32 *)(b + 0xB8) = 0;
+        if (TerrainModifiers_FindCellOverride(cellIndexAt((struct Pos16 *)&b->collider.position),
+                                              0))
+            b->colliderState = 0;
     }
-    pst = (s32 *)(b + 0xB8);
+    pst = &b->colliderState;
     st = *pst;
     q = pst;
     if (st == 3) {
         u32 *cnt;
-        AnimData_SelectPaletteBank(pst + 1, 0x64);
-        AnimData_SelectPaletteBank(b + 0xD8, 0x223);
-        SPR->h = 5;
-        cnt = (u32 *)(b + 0x14C);
+        AnimData_SelectPaletteBank(&b->secondaryData, 0x64);
+        AnimData_SelectPaletteBank(&b->primaryData, 0x223);
+        SceneMarkerSprite_SetFrame(&b->primary, 5);
+        cnt = &b->state;
         if (*cnt > 5) {
-            *(u32 *)(b + 0x120) &= ~1;
-            Collider_Refresh(b + 0x64);
+            b->secondary.flags &= ~1;
+            Collider_Refresh(&b->collider);
         }
         PlayerBarrier_DecrementDuration(b);
-        if (((struct BarrierGame *)gGameState)->duration <= 0)
+        if (gGameState->unk77C <= 0)
             *q = 2;
         (*cnt)++;
     } else if (st == 1) {
         u32 c;
         u32 off = 0x14C;
-        c = ++*(u32 *)(b + off);
+        c = ++*(u32 *)((u8 *)b + off);
         if (c <= 29) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x222);
-            SPR->h = 0;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x222);
+            SceneMarkerSprite_SetFrame(&b->primary, 0);
         } else if (c <= 59) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x222);
-            SPR->h = st;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x222);
+            SceneMarkerSprite_SetFrame(&b->primary, st);
         } else if (c <= 65) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x221);
-            SPR->h = st;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x221);
+            SceneMarkerSprite_SetFrame(&b->primary, st);
         } else if (c <= 71) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x220);
-            SPR->h = st;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x220);
+            SceneMarkerSprite_SetFrame(&b->primary, st);
         } else if (c <= 91) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
-            SPR->h = st;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
+            SceneMarkerSprite_SetFrame(&b->primary, st);
         } else if (c <= 97) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
-            SPR->h = 2;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
+            SceneMarkerSprite_SetFrame(&b->primary, 2);
         } else if (c <= 103) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
-            SPR->h = 3;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
+            SceneMarkerSprite_SetFrame(&b->primary, 3);
         } else if (c <= 109) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
-            SPR->h = 4;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
+            SceneMarkerSprite_SetFrame(&b->primary, 4);
         } else if (c <= 129) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
-            SPR->h = 5;
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
+            SceneMarkerSprite_SetFrame(&b->primary, 5);
         } else {
-            *(s32 *)(b + off) = 0;
+            *(s32 *)((u8 *)b + off) = 0;
             *q = 2;
         }
-        *(u32 *)(b + 0x120) |= 1;
-        SPR->flags &= ~1;
+        b->secondary.flags |= 1;
+        b->primary.flags &= ~1;
     } else if (st == 2) {
         u32 c;
-        u32 *cnt = (u32 *)(b + 0x14C);
+        u32 *cnt = &b->state;
         c = ++*cnt;
         if (c <= 19) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x21F);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x21F);
         } else if (c <= 39) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x220);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x220);
         } else if (c <= 59) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x221);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x221);
         } else if (c <= 79) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x222);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x222);
         } else if (c <= 99) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x221);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x221);
         } else if (c <= 119) {
-            AnimData_SelectPaletteBank(b + 0xD8, 0x220);
+            AnimData_SelectPaletteBank(&b->primaryData, 0x220);
         } else {
             *cnt = 0;
         }
-        SPR->h = 5;
-        *(u32 *)(b + 0x120) |= 1;
+        SceneMarkerSprite_SetFrame(&b->primary, 5);
+        b->secondary.flags |= 1;
     } else {
-        *(s32 *)(b + 0x14C) = 0;
-        *(u32 *)(b + 0x120) |= 1;
+        b->state = 0;
+        b->secondary.flags |= 1;
     }
     return 0;
 }

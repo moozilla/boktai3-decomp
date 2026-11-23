@@ -59,7 +59,7 @@ void Player_UpdateDefeatSlide(struct Player *p)
                 Player_SetActionPhase(p, 1);
             break;
         case 1:
-            if (p->actionCueFlags == 3 && !p->actionCueCounter)
+            if (p->animation.frameIndex == 3 && !p->animation.elapsed)
                 Sound_PlaySong(0xD1);
             if (Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x2E), 64, 1)) {
                 if (!(gEngineFlags & 0x1000))

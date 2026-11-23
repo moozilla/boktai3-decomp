@@ -15,6 +15,11 @@ static inline u8 Ghoul_TestDiscFlags(struct Ghoul *context, u32 mask)
     return 0;
 }
 
+static inline void Ghoul_SetDiscFlags(struct Ghoul *context, u16 mask)
+{
+    context->discFlags |= mask;
+}
+
 static inline void Ghoul_ClearDiscFlags(struct Ghoul *context, u32 mask)
 {
     context->discFlags &= ~mask;

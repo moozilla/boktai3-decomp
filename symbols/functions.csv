@@ -2834,6 +2834,7 @@ addr,name,mode,confidence,source,notes
 0806E7CC,SceneGrid_ScanColumns,thumb,low,src-alias,
 0806E900,SceneGrid_ScanTerrainDirection,thumb,low,src-alias,
 0806EF04,SceneLifecycle_ResetSubsystems,thumb,low,src-alias,
+0806EFB8,SceneActorQuery_FindInRectangle,thumb,low,src-alias,advances the actor cursor through up to 20 candidates; returns a living actor inside an X/Z rectangle
 0806F140,SceneActorQuery_FindPlayerInBounds,thumb,low,src-alias,
 0806F218,SceneState_IncrementCounters,thumb,low,src-alias,
 0806F2CC,SceneState_ResetRuntimeFields,thumb,low,src-alias,

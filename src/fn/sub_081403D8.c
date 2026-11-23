@@ -1,15 +1,9 @@
 #include "global.h"
-extern u8 *gGameState;
-static inline u8 chk(u32 m)
-{
-    if (*(u32 *)(gGameState + 0x868) & m)
-        return 1;
-    return 0;
-}
+#include "game_state_flags.h"
 u32 Player_IsStatusBit3ActionActive(u32 x)
 {
     if (x & 0x80) {
-        if (chk(8))
+        if (GameState_TestWorldFlags(8))
             return 1;
     }
     return 0;

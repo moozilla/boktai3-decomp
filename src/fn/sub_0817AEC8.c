@@ -31,9 +31,8 @@ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
     for (; i < 6; i++) {
         struct ContactPosition *v = &offset;
         u32 *cursor = &gRandomIndex;
-        u32 mask = 1023;
-        int angle = ((s32)ParticleRandom_NextSample(table, cursor, mask) >> 4) & 63;
-        int radius = ((s32)ParticleRandom_NextSample(table, cursor, mask) >> 4) & 31;
+        int angle = ((s32)ParticleRandom_NextSample(table, cursor, 1023) >> 4) & 63;
+        int radius = ((s32)ParticleRandom_NextSample(table, cursor, 1023) >> 4) & 31;
         int life;
         int spread;
         int speed;
@@ -50,7 +49,7 @@ void sub_0817AEC8(struct BossScatterEmitter *p, int direction)
         v->x = Scale((sine[((heading + 64) & 255)]) * speed);
         v->y = 0;
         v->z = Scale((sine[(heading & 255)]) * speed);
-        life = (((s32)ParticleRandom_NextSample(table, cursor, mask) >> 4) & 15) + 16;
+        life = (((s32)ParticleRandom_NextSample(table, cursor, 1023) >> 4) & 15) + 16;
         SpriteEffectController_Create(&p->position, &offset, 0x1C1E, 0xD43F, 0, 0, 0x11, 1, 1, 2, 0,
                                       life, 0, 0, 0, 0, -4, -4);
     }

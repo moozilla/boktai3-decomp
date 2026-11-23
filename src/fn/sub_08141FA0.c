@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 // confidence=low: spends shared resource to enter a timed fast movement phase.
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
@@ -16,10 +17,6 @@ void Player_EmitMovementEffects(void *, s32);
 void Player_UpdateFacingSide(void *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
-static inline u32 Mask(u32 *f, u32 m)
-{
-    return *f & m;
-}
 static inline void SetByte(u8 *a, u32 v)
 {
     *a = v;
@@ -32,7 +29,7 @@ static inline u32 HasDashFlag(u8 *p)
 {
     if (!p)
         return 0;
-    return Mask((u32 *)(p + 0x448), 0x20);
+    return Player_ReadStatusBits((u32 *)(p + 0x448), 0x20);
 }
 void Player_UpdateResourceDash(u8 *p)
 {

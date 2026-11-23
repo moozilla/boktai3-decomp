@@ -1,5 +1,6 @@
 #include "global.h"
 #include "engine.h"
+#include "player_slot_status.h"
 
 // confidence=low: action phases push neighboring scene objects and emit position effects.
 
@@ -100,10 +101,6 @@ static inline int heightAt(struct PackedVec *const v, int i)
     return height;
 }
 
-static inline void orFlags(u32 *a, u32 m)
-{
-    *a |= m;
-}
 static inline int isTwo(struct PlayerPushState *p)
 {
     int r;
@@ -137,7 +134,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
     state = p->state;
     switch (state) {
         case 0:
-            orFlags(&p->flags, 4);
+            Player_SetStatusBits(&p->flags, 4);
             animation = ActorVariant_GetTableValue(p->type, 2);
             if (p->a3a0 != animation) {
                 Sound_PlaySong(0xd0);
@@ -161,7 +158,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
             int nextDirection;
             s32 height;
             int nextHeight;
-            orFlags(&p->flags, 8);
+            Player_SetStatusBits(&p->flags, 8);
             p->a4a4 = state;
             t = p->target;
             previousDirection = (p->dir + 7) & 7;
@@ -241,7 +238,7 @@ void Player_UpdateObjectPush(struct PlayerPushState *p)
 
         case 2: {
             int d;
-            orFlags(&p->flags, 8);
+            Player_SetStatusBits(&p->flags, 8);
             p->a7c8 = 1;
             if (!Player_SetAnimation(p, ActorVariant_GetTableValue(p->type, 5), 0x40, 1))
                 return;

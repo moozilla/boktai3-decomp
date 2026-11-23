@@ -31,16 +31,15 @@ static inline void SceneActorAnimation_ApplyDirectionalSelection(struct RoomActo
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
             Anim_SetKeyframes(&((struct SceneActorAnimationTileDrawable *)actor->drawable)->tile,
                               actor->drawable, (u16)selection, 2, (u16)mode);
             if (flags & 1)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }

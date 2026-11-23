@@ -1,3 +1,4 @@
+#include "game_state_flags.h"
 #include "tether_actor.h"
 #include "engine.h"
 #include "ram.h"
@@ -79,13 +80,6 @@ static inline s32 absolute_08049840(s32 value)
     return value;
 }
 
-static inline u8 flaggedCellHandlingEnabled(void)
-{
-    u32 mask = 0x2000;
-    if (gGameState->flags868 & mask)
-        return TRUE;
-    return FALSE;
-}
 
 static inline s32 cellIndex_0804AF80(s32 x, s32 z)
 {
@@ -186,13 +180,6 @@ static inline s32 absolute_0804BB30(s32 value)
     return value;
 }
 
-static inline u8 flaggedTerrainEnabled(void)
-{
-    u32 mask = 16;
-    if (gGameState->flags868 & mask)
-        return TRUE;
-    return FALSE;
-}
 
 static inline s32 scale(s32 value)
 {
@@ -545,17 +532,14 @@ struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b);
 void TetherActor_InitializeSegments(struct TetherActor *actor)
 {
     struct SpriteDrawable *segment = actor->segments;
-    s32 offset = -4;
-    s32 remaining = 6;
-    do {
+    s32 i;
+    for (i = 0; i < 7; i++, segment++) {
         void *resource = AnimData_FindEntry(0x1C1C);
         ParticleSprite_Initialize(segment, resource, 0);
-        Effect_SetOrigin(segment, offset, offset);
+        Effect_SetOrigin(segment, -4, -4);
         segment->depthOffset = -1;
         segment->flags |= 1;
-        --remaining;
-        ++segment;
-    } while (remaining >= 0);
+    }
 }
 
 static inline s32 scaleOffsetR(s32 value)
@@ -2305,7 +2289,7 @@ void TetherActor_HandleFlaggedCell(struct TetherActor *actor)
         if (!attributes)
             return;
     }
-    if (!flaggedCellHandlingEnabled())
+    if (!GameState_TestWorldFlags(0x2000))
         return;
     {
         s32 column = Mod(actor->movementProbeStorage.previousCell, ((s16 *)gTerrainMap->cells)[2]);
@@ -2802,7 +2786,7 @@ u32 TetherActor_TestStepPosition(struct ContactPosition *origin, struct ContactP
     s32 difference;
     if (mask & attributes)
         return 0;
-    if ((attributes & 128) && flaggedTerrainEnabled())
+    if ((attributes & 128) && GameState_TestWorldFlags(16))
         return 0;
     difference = origin->y - surfaceHeight(candidate);
     if (difference < 0)

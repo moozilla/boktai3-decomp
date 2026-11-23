@@ -19,13 +19,13 @@ s32 Player_IsActionCueReady(struct Player *p)
     record = (const u8 *)((u32)record + offset);
     entry = *record;
     if (entry == 1) {
-        if (p->actionCueFlags == 3 && p->actionCueCounter > 2)
+        if (p->animation.frameIndex == 3 && p->animation.elapsed > 2)
             return 1;
     } else if (entry == 2) {
-        if (p->actionCueFlags == 2 && p->actionCueCounter > 4)
+        if (p->animation.frameIndex == 2 && p->animation.elapsed > 4)
             return 1;
     } else if (entry == 3) {
-        if (p->actionCueFlags > 4 && p->actionCueCounter > 7)
+        if (p->animation.frameIndex > 4 && p->animation.elapsed > 7)
             return 1;
     }
     return 0;

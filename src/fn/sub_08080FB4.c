@@ -2,6 +2,7 @@
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
 #include "runtime.h"
+#include "scene_actor_control_helpers.h"
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorEffects_AdvanceSteps(void *, u32);
 void *Bestiary_GetEntryForActor(u32, u32);
@@ -10,12 +11,6 @@ void SceneActorRecord_RecordPair(u16, u16);
 static inline u8 IsPrimary(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
-        return 1;
-    return 0;
-}
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
         return 1;
     return 0;
 }
@@ -35,9 +30,8 @@ static inline void SetControl(struct ChaseActor *actor)
     actor->base.target = callback;
     {
         /* Preserve the short-lived halfword-clear address. */
-        u32 off = 0x2C8;
         {
-            u16 *field = (void *)((u8 *)actor + off);
+            u16 *field = &actor->base.field2C8;
             *field = 0;
         }
     }
@@ -67,10 +61,9 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     if (IsPrimary(actor)) {
         {
             struct SceneActorRegistryControl *control = &actor->group.common.control;
-            u32 fieldOffset = 0x2CC;
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)actor + fieldOffset);
+            field = &actor->base.behaviorFlags;
             mask = ~0x141C0;
             *field &= mask;
             control->counter = 0;
@@ -119,7 +112,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     actor->base.attachmentTimer = 0;
     SetControl(actor);
     SetAnimation(actor, 1, 0, 2);
-    if ((!Test(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
+    if ((!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     }
     ActorShadow_Disable((u8 *)actor + 0x320);

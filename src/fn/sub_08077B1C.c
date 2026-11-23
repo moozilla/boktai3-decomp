@@ -10,8 +10,7 @@ void SceneActorPlacement_PlayCategoryResponseSound(struct ChaseActor *argument)
     }
     {
         unsigned long long soundFlags = actor->field2E6;
-        u32 soundMask = 4;
-        if (SceneActorPlacement_TestMask(soundMask, soundFlags)) {
+        if (SceneActorPlacement_TestMask(4, soundFlags)) {
             return;
         }
     }

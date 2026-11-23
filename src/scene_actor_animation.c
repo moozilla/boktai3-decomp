@@ -1,3 +1,4 @@
+#include "player_slot_status.h"
 #include "scene_actor_actions.h"
 
 struct ContactPosition *TetherActor_GetPosition(void);
@@ -24,6 +25,7 @@ struct ContactPosition *TetherActor_GetPosition(void);
 #include "scene_actor_charge_offset.h"
 
 #include "display_keyframe.h"
+#include "scene_actor_chase_shared.h"
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
 
@@ -43,8 +45,7 @@ int Actor_UpdateMovementAnimationAndEffects(void *unused, struct SceneActor *act
     void *drawable = &actor->drawable.common.kind;
     Obj_StepPosition(body);
     {
-        u32 mask = 0x400;
-        if (!(actor->flags & mask)) {
+        if (!SceneActor_TestFlags(actor, 0x400)) {
             struct ContactPosition *pos = &body->position;
             int x = pos->x >> 8, z = pos->z >> 8, index, SceneActor_TerrainHeight, slope;
             u8 *c;
@@ -106,21 +107,15 @@ int Actor_UpdateVisibilityAndShadow(void *unused, struct SceneActor *actor)
     actor->positionLink.id = actor->body.id;
     actor->positionLink.position = &actor->body.position;
     sub_0821DE30(&actor->positionLink.id);
-    {
-        u32 mask = 0x100;
-        if (actor->flags & mask) {
-            DisplayAnimation_SetFlags(&actor->drawable.common.kind, 1);
+    if (SceneActor_TestFlags(actor, 0x100)) {
+        DisplayAnimation_SetFlags(&actor->drawable.common.kind, 1);
+        result = Actor_DisableShadow(actor);
+    } else {
+        DisplayAnimation_ClearFlags(&actor->drawable.common.kind, 1);
+        if (SceneActor_TestFlags(actor, 0x200))
             result = Actor_DisableShadow(actor);
-        } else {
-            DisplayAnimation_ClearFlags(&actor->drawable.common.kind, 1);
-            {
-                u32 mask = 0x200;
-                if (actor->flags & mask)
-                    result = Actor_DisableShadow(actor);
-                else
-                    result = Actor_EnableShadow(actor);
-            }
-        }
+        else
+            result = Actor_EnableShadow(actor);
     }
     return result;
 }
@@ -386,11 +381,6 @@ static inline void Subtract(struct ContactPosition *out, struct ContactPosition 
     out->z = a->z - b->z;
 }
 
-static inline u32 SceneActor_TestFlags(u16 *field, u32 mask)
-{
-    return *field & mask;
-}
-
 // confidence=low: emits toward flagged nearby actors using an outward radial offset.
 
 static inline void Add(struct ContactPosition *out, struct ContactPosition *a,
@@ -413,7 +403,7 @@ void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
         return;
     table = gUnk_086149C4;
     do {
-        if (SceneActor_TestFlags(&actor->flags, 0x1000)) {
+        if (SceneActor_TestFlags(actor, 0x1000)) {
             struct ContactPosition *position = &actor->body.position;
             struct ContactPosition *origin = &emitter->position;
             s32 distance;
@@ -436,11 +426,6 @@ void Actor_EmitTowardNearbyActors(struct SceneActorBody *emitter)
 
 s32 Scene_CanOpenMenu(void);
 
-static inline u32 Flag(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 static inline s32 PlayerKind(void)
 {
     return gPlayers[0]->tetherMode;
@@ -459,7 +444,7 @@ static inline s32 TargetAllowsInteraction(struct Player *p)
 {
     if ((u8)(p->actionMode - 3) <= 2)
         return 0;
-    if (Flag(&p->statusFlags, 0x100000))
+    if (SceneActorChase_Bits32(&p->statusFlags, 0x100000))
         return 0;
     if (p->active && (u16)(p->sceneMode - 5) <= 1)
         return 0;
@@ -805,10 +790,8 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->rateB = Script_GetValue();
     } else {
         int *dst = &actor->rateC;
-        int rate;
-        rate = 256;
-        *dst = rate;
-        actor->rateA = rate;
+        *dst = 256;
+        actor->rateA = 256;
         actor->rateB = 512;
     }
     if (Script_SeekToKeyword(0x48)) {
@@ -874,10 +857,7 @@ void Actor_OnHiddenIdleUpdate(void *unused, struct SceneActor *actor)
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
     }
-    {
-        u32 mask = 256;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 256);
     actor->query(actor);
 }
 
@@ -888,10 +868,7 @@ void Actor_OnIdleUpdate(void *unused, struct SceneActor *actor)
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
     }
-    {
-        u32 mask = 4096;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 4096);
     actor->query(actor);
 }
 
@@ -987,10 +964,7 @@ void Actor_UpdateTurnToAngle(void *unused, struct SceneActor *actor)
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, 2, 1, 0, 4);
     }
-    {
-        u32 mask = 0x1000;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 0x1000);
     if (((u8)actor->query(actor)) != 1) {
         s8 *angle = (s8 *)&actor->body.direction;
         s8 current = *angle;
@@ -1136,8 +1110,7 @@ void Actor_OnRisingFadeUpdate(void *unused, struct SceneActor *actor, int ticks)
                 dq = (struct ContactPosition *)actor->drawable.common.position;
                 dq->y = h + b;
                 if (ticks > 7) {
-                    u32 mask = 256;
-                    actor->flags |= mask;
+                    SceneActor_SetFlags(actor, 256);
                     actor->animationPhase++;
                 }
                 break;
@@ -1180,10 +1153,7 @@ void Actor_OnConfiguredAnimationUpdate(void *unused, struct SceneActor *actor)
         actor->finished = 0;
         Actor_PlayAnimationEntry(actor, actor->modeA, actor->modeB, 0, 4);
     }
-    {
-        u32 mask = 4096;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 4096);
     actor->query(actor);
 }
 
@@ -1214,10 +1184,7 @@ void Actor_OnPathFollowUpdate(void *unused, struct SceneActor *actor)
         actor->routeProgress = 0;
         actor->routeStepFinished = 0;
     }
-    {
-        u32 mask = 4096;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 4096);
     if ((u8)actor->query(actor) != 1) {
         if (actor->routeStepFinished == 0) {
             if (anim->common.kind == 2) {
@@ -1261,8 +1228,7 @@ static inline s32 SceneActor_Absolute(s32 x)
 
 static inline u32 AttachmentFlag(void)
 {
-    u32 mask = 4;
-    return gUnk_02000560 & mask;
+    return PlayerSlot_ReadStatus(0, 4);
 }
 
 // confidence=low: tracks a target facing and enables contact response when positions and angles agree.
@@ -1338,10 +1304,7 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
         }
     } else
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 1);
-    {
-        u32 mask = 0x1000;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 0x1000);
     if (((u8)actor->query(actor)) != 1) {
         struct ContactPosition *target = ctx->target;
         s32 radius = actor->rateC;
@@ -1359,11 +1322,8 @@ void Actor_UpdateTargetFacing(struct SceneActorManager *ctx, struct SceneActor *
             s32 oppositeFacing = (actor->body.direction) + 128;
             u8 opposite;
             opposite = facing - oppositeFacing;
-            if ((SceneActor_Absolute((s8)delta) <= 63) &&
-                (SceneActor_Absolute((s8)opposite) <= 31)) {
-                u32 mask = 0x800;
-                actor->flags |= mask;
-            }
+            if ((SceneActor_Absolute((s8)delta) <= 63) && (SceneActor_Absolute((s8)opposite) <= 31))
+                SceneActor_SetFlags(actor, 0x800);
         }
     }
 }
@@ -1376,10 +1336,7 @@ void Actor_OnTimedIdleUpdate(void *unused, struct SceneActor *actor, int ticks)
         Actor_PlayAnimationEntry(actor, 0, 1, 0, 4);
         actor->routeProgress = 1;
     }
-    {
-        u32 mask = 4096;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 4096);
     if ((u8)actor->query(actor) != 1 && ticks > 7)
         actor->finished = 1;
 }
@@ -1462,10 +1419,7 @@ void Actor_UpdateNavigationWalk(void *unused, struct SceneActor *actor)
         ClearCounter(actor, 0);
         Actor_SetAttachmentEffect(actor, 0, 0, 0);
     }
-    {
-        u32 mask = 0x1000;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 0x1000);
     if ((u8)Callback(actor) != 1) {
         struct ContactPosition *pos = (void *)&actor->body.position;
         struct ContactPosition *probePos = ProbePosition(actor);
@@ -1536,10 +1490,7 @@ void Actor_UpdateNavigationStep(void *unused, struct SceneActor *actor)
         Terrain_ApplyBlocked(probe, pos, &actor->destination);
         actor->probeReady = 1;
     }
-    {
-        u32 mask = 0x1000;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 0x1000);
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
         struct ContactPosition *probePos = &actor->probe.current;
@@ -1606,10 +1557,7 @@ void SceneActorAnimation_UpdateRouteWalk(void *unused, struct SceneActor *actor)
         actor->facing4 = SceneFacing_FourWay(angle);
         Actor_PlayAnimationEntry(actor, 1, 1, 0, 4);
     }
-    {
-        u32 mask = 0x1000;
-        actor->flags |= mask;
-    }
+    SceneActor_SetFlags(actor, 0x1000);
     if ((u8)actor->query(actor) != 1) {
         struct ContactPosition *pos = &actor->body.position;
         struct ContactPosition *probePos = &actor->probe.current;

@@ -2,25 +2,15 @@
 #include "player.h"
 #include "engine.h"
 #include "ram.h"
+#include "target_registry.h"
+#include "scene_object.h"
+#include "contact_collider.h"
 #include "render.h"
 
 // confidence=low: chooses the nearest visible list entry within a fixed squared-distance limit.
 #define Player_FindNearestVisibleTarget sub_0814C248
 struct TargetPosition {
     s16 x, y, z;
-};
-struct TargetBody {
-    u8 unknown[12];
-    struct TargetPosition pos;
-};
-struct MotionTarget {
-    struct TargetBody *body;
-    u32 flags, unknown8;
-    struct MotionTarget *next;
-};
-struct MotionTargets {
-    u8 unknown[0x18];
-    struct MotionTarget *first;
 };
 static inline s32 ProjectScale(s32 value)
 {
@@ -65,15 +55,12 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                 s32 x;
                 s32 z;
                 s32 square;
-                struct TargetBody *body;
-                if (flags & 16) {
-                    body = entry->body;
-                    x = body->pos.x - p->position.x;
-                    z = body->pos.z - p->position.z;
+                if (flags & MOTION_TARGET_COLLIDER) {
+                    x = entry->target.collider->position.x - p->position.x;
+                    z = entry->target.collider->position.z - p->position.z;
                 } else {
-                    body = entry->body;
-                    x = body->pos.x - p->position.x;
-                    z = body->pos.z - p->position.z;
+                    x = entry->target.actor->position.x - p->position.x;
+                    z = entry->target.actor->position.z - p->position.z;
                 }
                 square = (x * x) + (z * z);
                 if (square < distance) {
@@ -83,10 +70,11 @@ struct MotionTarget *Player_FindNearestVisibleTarget(struct Player *arg)
                     } else {
                         struct TargetPosition screen;
                         const struct TargetPosition *world;
-                        if (flags & 16)
-                            world = &entry->body->pos;
+                        if (flags & MOTION_TARGET_COLLIDER)
+                            world =
+                                (const struct TargetPosition *)&entry->target.collider->position;
                         else
-                            world = &entry->body->pos;
+                            world = (const struct TargetPosition *)&entry->target.actor->position;
                         ProjectPosition(&screen, world);
                         if ((((u16)(screen.x - 1)) <= 238) && (((u16)(screen.y - 1)) <= 158)) {
                             distance = square;

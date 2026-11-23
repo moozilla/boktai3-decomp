@@ -6,10 +6,6 @@ s32 ScenePool_SelectStateAtPositionLimit(struct ScenePoolEntry *);
 void ScenePool_ApplyScheduledSpeedControl(struct ScenePoolActor *, struct ScenePoolEntry *);
 void ScenePool_UpdateLateralControlPulse(struct ScenePoolActor *, struct ScenePoolEntry *);
 void ScenePool_ScheduleSpeedControl(struct ScenePoolEntry *);
-static inline void Or(u32 mask, u32 *flags)
-{
-    *flags |= mask;
-}
 static inline s32 RandomByte(const u16 *table)
 {
     s32 value;
@@ -29,7 +25,7 @@ s32 ScenePool_StateScheduleMotion(void *manager, struct ScenePoolActor *actor,
     }
     if (ScenePool_SelectStateAtPositionLimit(entry))
         return 0;
-    Or(0x10, &actor->stateFlags);
+    ScenePoolActor_SetStateFlags(actor, 0x10);
     if (!entry->delayA) {
         ScenePool_ScheduleSpeedControl(entry);
         /* The shared sampler (monster_particle_random.h) weights the table register as the ROM

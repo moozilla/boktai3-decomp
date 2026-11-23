@@ -42,8 +42,7 @@ void SceneActorAnimation_UpdateFlashPulse(struct StateActor *p, int tick)
         SceneActors_StopBackgroundFlash(actor);
     }
     if (!p->actionTryUpdate(p)) {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p) && tick > 30)
             p->actionFinished = 1;
     }

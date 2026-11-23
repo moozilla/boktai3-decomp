@@ -29,22 +29,16 @@ void SpriteOam_ResetQueue(s32);
 void Sprite_InitSystem(void)
 {
     s32 i;
-    u32 zero;
-    void **spriteHeads, **effectHeads, **widgetHeads;
     gCamera.position.x = 0;
     gCamera.position.y = 0;
     gCamera.position.z = 0;
     gCamera.unk0C = 1;
     gCamera.unk10 = 0;
     gRenderListIndex = 0;
-    zero = 0;
-    widgetHeads = gMainSpriteListHeads;
-    effectHeads = gDrawableListHeads;
-    spriteHeads = gSpriteListHeads;
-    for (i = 1; i >= 0; i--) {
-        *spriteHeads++ = zero;
-        *effectHeads++ = zero;
-        *widgetHeads++ = zero;
+    for (i = 0; i < 2; i++) {
+        gSpriteListHeads[i] = NULL;
+        gDrawableListHeads[i] = NULL;
+        gMainSpriteListHeads[i] = NULL;
     }
     ObjGfx_ResetAllocationCounters();
     SpriteOam_ResetQueue(1);
@@ -931,29 +925,18 @@ void ObjGfx_LoadTiles(u32 start)
 
 void SpriteOam_ResetQueue(s32 clear)
 {
-    u16 *p, *base;
-    u32 *count, *affine;
+    s32 i;
     gOamCount = 0;
-    count = &gPendingOamCount;
-    affine = &gAffineRequestCount;
-    base = gOamPriorityCounts;
-    {
-        u16 zero = 0;
-        p = base + 3;
-        do {
-            *p-- = zero;
-        } while ((s32)p >= (s32)base);
-    }
-    *count = 0;
-    *affine = 0;
+    for (i = 0; i < 4; i++)
+        gOamPriorityCounts[i] = 0;
+    gPendingOamCount = 0;
+    gAffineRequestCount = 0;
     if (clear) {
         struct OamEntry *entry = gOamBuffer;
-        u32 hidden = 0x200;
-        s32 i = 127;
-        do {
-            entry->attributes = hidden;
+        for (i = 0; i < 128; i++) {
+            entry->attributes = 0x200;
             entry++;
-        } while (--i >= 0);
+        }
     }
 }
 

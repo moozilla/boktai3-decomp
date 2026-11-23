@@ -52,6 +52,6 @@ void Player_ClampPositionToStoredTerrainCell_0823B938(struct Player *p)
     else if (p->position.z > maxZ)
         p->position.z = maxZ;
     p->colliderPosition = p->position;
-    p->previousPosition = p->position;
+    p->animation.position = *(struct ContactPosition *)&p->position;
     p->terrainClampApplied = 1;
 }

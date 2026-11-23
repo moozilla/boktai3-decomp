@@ -1,13 +1,8 @@
 #include "global.h"
-
-struct P {
-    u8 f00[0xb8];
-    s32 st;
-};
-
-s32 PlayerBarrier_IsActive(struct P *p)
+#include "scene_marker.h"
+s32 PlayerBarrier_IsActive(struct SceneMarker *marker)
 {
-    if (p != 0 && p->st != 0)
+    if (marker != 0 && marker->colliderState != 0)
         return 1;
     return 0;
 }

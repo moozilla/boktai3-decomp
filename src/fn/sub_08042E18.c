@@ -18,11 +18,7 @@ void ContactActor_UpdateTracking(struct ContactActorPool *pool, struct ContactAc
         }
     }
     if (pool->clearRequested) {
-        u32 state = 6;
-        u32 frame = 0;
-        slot->state = state;
-        slot->enter = 1;
-        slot->stateFrame = frame;
+        ContactActor_EnterState(slot, 6);
         return;
     }
     if (slot->targetIndex >= 0) {
@@ -49,11 +45,7 @@ void ContactActor_UpdateTracking(struct ContactActorPool *pool, struct ContactAc
     Collider_SetPosition(&slot->healthCollider, &slot->position, 0);
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (slot->stateFrame > 63) {
-        u32 state = 4;
-        u32 frame = 0;
-        slot->state = state;
-        slot->enter = 1;
-        slot->stateFrame = frame;
+        ContactActor_EnterState(slot, 4);
     }
     if (slot->retargetTimer) {
         u32 remaining = (u8)--slot->retargetTimer;

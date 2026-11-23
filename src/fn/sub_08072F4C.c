@@ -1,6 +1,8 @@
 #include "scene_actor_init_actor.h"
 #include "scene_actor_contact_list.h"
 #include "scene_actor_adjacent_cell.h"
+#include "scene_actor_control_helpers.h"
+#include "scene_actor_chase_shared.h"
 struct SceneActorContactSample {
     u8 unknown0[8];
     u8 playerSlot, unknown9[3];
@@ -16,18 +18,6 @@ s32 sub_0821D4F0(struct ContactPosition *, struct ContactPosition *, s32, s32);
 s32 Nav_IsPositionInMesh(void *, struct ContactPosition *, struct ContactPosition *);
 void *memcpy(void *, const void *, unsigned long);
 extern u32 gUnk_02000560[];
-static inline u8 TestEngineFlags(u32 flags, u32 mask)
-{
-    if (flags & mask)
-        return 1;
-    return 0;
-}
-static inline u8 TrackFlags(struct SceneActorChaseTracking *tracking, u32 mask)
-{
-    if (tracking->flags & mask)
-        return 1;
-    return 0;
-}
 static inline s32 HalfDistance(s32 a)
 {
     if (a >= 0)
@@ -100,11 +90,11 @@ static inline u8 EvaluateSample(struct ChaseActor *base, struct SceneActorContac
         return 0;
 
     if (kind == 2) {
-        if (TestEngineFlags(gEngineFlags, 0x4800)) {
+        if (SceneActorControl_TestFlags(gEngineFlags, 0x4800)) {
             if (!SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000))
                 goto plain;
             limit = HalfDistance((s32)self->base.tracking.limit);
-            if (TrackFlags(TrackingOf(self), 4))
+            if (SceneActorChase_TrackingFlags(TrackingOf(self), 4))
                 threshold = limit;
             else
                 threshold = Div(limit * 7, 10);
@@ -112,7 +102,7 @@ static inline u8 EvaluateSample(struct ChaseActor *base, struct SceneActorContac
             if (SceneActorContacts_TestPlayerCondition(sample, 1, 0x10000) ||
                 !(MonsterInit_TestWorldFlags(0x20))) {
                 limit = HalfDistance((s32)self->base.tracking.limit);
-                if (TrackFlags(TrackingOf(self), 4))
+                if (SceneActorChase_TrackingFlags(TrackingOf(self), 4))
                     threshold = limit;
                 else
                     threshold = Div(limit * 7, 10);
@@ -121,11 +111,11 @@ static inline u8 EvaluateSample(struct ChaseActor *base, struct SceneActorContac
             }
         }
     } else {
-        if (TestEngineFlags(gEngineFlags, 0x4800))
+        if (SceneActorControl_TestFlags(gEngineFlags, 0x4800))
             return 0;
         if (!MonsterInit_TestWorldFlags(0x20)) {
             limit = HalfDistance((s32)self->base.tracking.limit);
-            if (TrackFlags(TrackingOf(self), 4))
+            if (SceneActorChase_TrackingFlags(TrackingOf(self), 4))
                 threshold = limit;
             else
                 threshold = Div(limit * 7, 10);
@@ -145,7 +135,7 @@ gate:
         return 0;
     cell = SceneActorTerrain_GetCellIndex(&sample->position);
     if (SceneActor_IsAdjacentCellOpen(self, cell)) {
-        if (!TrackFlags(TrackingOf(self), 4)) {
+        if (!SceneActorChase_TrackingFlags(TrackingOf(self), 4)) {
             if (!Nav_IsPositionInMesh(group->route, &self->base.body.position, &sample->position))
                 return 0;
         }
@@ -155,7 +145,7 @@ gate:
         return 1;
     }
     if (transition != 2) {
-        if (TrackFlags(TrackingOf(self), 0x20)) {
+        if (SceneActorChase_TrackingFlags(TrackingOf(self), 0x20)) {
             if (!(u8)sub_0821D4F0(&self->base.tracking.destination, &sample->position, 10, 0x100))
                 return 0;
         } else if (!(u8)sub_0821D4F0(&self->base.body.position, &sample->position, 10, 0x100))
@@ -189,10 +179,10 @@ u8 SceneActorContacts_EvaluateCandidate(struct SceneActorContactNode *node, stru
             }
             break;
         case 2:
-            if (!TrackFlags(&base->base.tracking, 2))
+            if (!SceneActorChase_TrackingFlags(&base->base.tracking, 2))
                 break;
             {
-                u32 mode = TestEngineFlags(gEngineFlags, 0x4800);
+                u32 mode = SceneActorControl_TestFlags(gEngineFlags, 0x4800);
                 struct SceneActorContactSample *candidate = node->object;
                 if (mode) {
                     if (!candidate)

@@ -28,8 +28,7 @@ void SceneActorPlacement_PlayVariantEventSound(struct RoomActor *actor, u32 even
                 Sound_PlaySong(529);
             } else {
                 unsigned long long soundFlags = actor->field2E6;
-                u32 soundMask = 4;
-                if (!SceneActorPlacement_TestMask(soundMask, soundFlags)) {
+                if (!SceneActorPlacement_TestMask(4, soundFlags)) {
                     switch ((s32)actor->paletteOffset) {
                         case 0:
                         case 1:

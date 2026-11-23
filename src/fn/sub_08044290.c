@@ -52,7 +52,6 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             u32 direction;
             u32 randomIndex;
             u32 jitter;
-            u32 mask;
             target = (void *)((u8 *)pool + offset);
             dx = target->x;
             current = sprite;
@@ -66,8 +65,7 @@ void ContactSwarm_UpdateTracking(struct ContactSwarm *pool, struct ContactSwarmS
             randomTable = (const u16 *)RANDOM_TABLE_ADDR;
             randomOffset += (u32)randomTable;
             jitter = *(const u16 *)randomOffset;
-            mask = 15;
-            jitter &= mask;
+            jitter &= 15;
             {
                 u32 newDirection = direction + jitter - 8;
                 slot->direction = newDirection;

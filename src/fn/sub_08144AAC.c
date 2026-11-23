@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 #define B(n) (*(u8 *)(p + (n)))
 #define H(n) (*(u16 *)(p + (n)))
 #define W(n) (*(u32 *)(p + (n)))
@@ -16,10 +17,6 @@ void Player_OnRecoveryActionEnd(void *);
 void Player_SetPendingCallback(void *, void (*)(void *));
 s32 PlayerBarrier_TryActivate(void *);
 void PlayerBarrier_BeginRecovery(void *);
-static inline void OrFlags(u32 *a, u32 mask)
-{
-    *a |= mask;
-}
 static inline void SetByte(u8 *a, u32 value)
 {
     *a = value;
@@ -83,7 +80,7 @@ void Player_UpdateBarrierRecovery(u8 *p)
                 if (++H(0x4F8) > 19)
                     Sound_PlaySong(0xF5);
             }
-            OrFlags((u32 *)(p + 0x20), 0x80);
+            Player_SetStatusBits((u32 *)(p + 0x20), 0x80);
             Player_SetAnimation(p, ActorVariant_GetTableValue(B(0x418), 10), 64, 1);
             H(0x6fc) = 30;
             if (!(*(*(u16 **)(p + 0x348)) & 1)) {

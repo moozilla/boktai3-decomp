@@ -322,6 +322,56 @@ static inline void SceneActorChase_OrHalfFlags(u16 *flags, u32 input)
     *flags |= mask;
 }
 
+/* The u16 mask (loaded before the field's address) matters to agbcc. */
+static inline void SceneActorChase_SetMotionFlags(struct ChaseActor *actor, u16 mask)
+{
+    actor->base.motionFlags = mask | actor->base.motionFlags;
+}
+
+static inline u32 SceneActorChase_StatusFlags(struct ChaseActor *actor, u32 mask)
+{
+    return actor->base.statusFlags & mask;
+}
+
+static inline void SceneActorChase_SetBehaviorFlags(struct ChaseActor *actor, u32 mask)
+{
+    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
+}
+
+static inline void SceneActorChase_OrReactionFlags(struct ChaseActor *actor, u16 mask)
+{
+    actor->base.reactionFlags = mask | actor->base.reactionFlags;
+}
+
+static inline u8 SceneActorChase_HasPlacementFlags(struct ChaseActor *actor, u32 mask)
+{
+    if (actor->base.placementFlags & mask)
+        return 1;
+    return 0;
+}
+
+static inline void SceneActorChase_ClearBehaviorFlags(struct ChaseActor *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->base.behaviorFlags &= mask;
+}
+
+static inline void SceneActorChase_SetStatusFlags(struct ChaseActor *actor, u32 mask)
+{
+    actor->base.statusFlags = mask | actor->base.statusFlags;
+}
+
+static inline void SceneActorChase_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
+{
+    u32 mask = ~bits;
+    actor->base.statusFlags &= mask;
+}
+
+static inline void SceneActorChase_AndMotionFlags(struct ChaseActor *actor, s32 mask)
+{
+    actor->base.motionFlags &= mask;
+}
+
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 {
     u32 value = *field;

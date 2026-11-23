@@ -711,7 +711,6 @@ void Terrain_MoveFootprint(struct SurfaceTrack *track, struct ContactPosition *p
                            struct ContactPosition *delta, u16 stepX, u16 stepZ, u8 flag)
 {
     u32 mode = 0;
-    u8 clear;
     s32 tileX, tileZ, cell;
     struct TerrainProbe destination, corner;
     if (delta->x > 0)
@@ -728,13 +727,12 @@ void Terrain_MoveFootprint(struct SurfaceTrack *track, struct ContactPosition *p
         cell = 0;
     else
         cell = gTerrainMap->rows[tileZ] + tileX;
-    clear = 0;
     track->cell = cell;
     destination.x = pos->x + delta->x;
     destination.y = pos->y + delta->y;
     destination.z = pos->z + delta->z;
     destination.w = 0x10;
-    track->blocked = clear;
+    track->blocked = 0;
     switch (mode) {
         case 0:
             Terrain_SampleSurface(track, pos, &destination);

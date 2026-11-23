@@ -150,7 +150,7 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                         if (!flags) {
                             anim = ActorVariant_GetTableValue(p->actionMode, 4);
                             {
-                                s32 frame = p->actionCueFlags;
+                                s32 frame = p->animation.frameIndex;
                                 speed = 0;
                                 if (frame != 0) {
                                     speed = 3;
@@ -169,7 +169,8 @@ void Player_UpdateTerrainSidestep(struct Player *player)
                 }
             }
             Player_SetAnimationIndex(p, anim, 0x40);
-            if (p->animationIndex == 24 && p->actionCueFlags == 0 && p->actionCueCounter == 1)
+            if (p->animationIndex == 24 && p->animation.frameIndex == 0 &&
+                p->animation.elapsed == 1)
                 Player_PlayLocalSong(p->slot, 0xDB);
             break;
         case 2:

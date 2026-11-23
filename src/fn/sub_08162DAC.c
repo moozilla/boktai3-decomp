@@ -1,17 +1,10 @@
 #include "global.h"
-
-struct P {
-    u8 f00[0xb8];
-    s32 st;
-    u8 sub[1];
-};
-
+#include "scene_marker.h"
 void AnimData_SelectPaletteBank(void *, s32);
-
-void PlayerBarrier_BeginRecovery(struct P *p)
+void PlayerBarrier_BeginRecovery(struct SceneMarker *marker)
 {
-    if (p != 0) {
-        p->st = 2;
-        AnimData_SelectPaletteBank((u8 *)p + 0xbc, 0x65);
+    if (marker != 0) {
+        marker->colliderState = 2;
+        AnimData_SelectPaletteBank(&marker->secondaryData, 0x65);
     }
 }

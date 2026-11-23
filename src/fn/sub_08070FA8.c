@@ -4,6 +4,9 @@
 #include "ram.h"
 #include "scene_actor_placement.h"
 #include "game_state.h"
+#include "scene_actor_turn.h"
+#include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 void Heap_Free(void *);
 
 static inline u8 RemovalRequested(struct ChaseActor *p)
@@ -84,10 +87,6 @@ static inline void UpdateActors_SpawnContactParts(struct ChaseActor *actor)
     actor->base.hitLockTimer = 0;
 }
 
-static inline u32 ReadFlags2CC(struct ChaseActor *p, u32 mask)
-{
-    return p->base.behaviorFlags & mask;
-}
 struct UpdateActorsTile {
     u8 unknown0[8];
     u32 flags;
@@ -117,10 +116,6 @@ static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 static inline void ClearField2B8(struct ChaseActor *p)
 {
     p->base.hitLockTimer = 0;
-}
-static inline void SetFlags2CC(struct ChaseActor *p, u32 bits)
-{
-    p->base.behaviorFlags |= bits;
 }
 static inline u8 ActorCategory(struct ChaseActor *p)
 {
@@ -152,10 +147,6 @@ static inline u8 MissingObject(struct ChaseActor *p)
     return 0;
 }
 
-static inline u32 ReadActorStateFlags(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
 static inline u8 ActorUnavailable(struct ChaseActor *p, u16 *flags)
 {
     u32 mask = 0x40;
@@ -231,11 +222,11 @@ next:
         if (paused)
             goto palette;
         flagField = (void *)motion;
-        if (!MotionFlagSet(&flagField->halfword, 0x4000) && !ReadActorStateFlags(actor, 8) &&
-            actor->base.enabled && !ReadFlags2CC(actor, 2) &&
-            (RegistryCurrentGame()->flags868 & 2) && CurrentRegion(actor) &&
-            !ActorUnavailable(actor, motion) && RegistryCurrentGame()->unk876 > 0 &&
-            !PlayerActionPending()) {
+        if (!MotionFlagSet(&flagField->halfword, 0x4000) &&
+            !SceneActorChase_StatusFlags(actor, 8) && actor->base.enabled &&
+            !SceneActorTurn_ActorFlags(actor, 2) && (RegistryCurrentGame()->flags868 & 2) &&
+            CurrentRegion(actor) && !ActorUnavailable(actor, motion) &&
+            RegistryCurrentGame()->unk876 > 0 && !PlayerActionPending()) {
             actor->base.colliderA.responseValue = 0;
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
@@ -246,7 +237,7 @@ next:
             if (ReadMotionFlags(motion, partMask))
                 UpdateActors_SpawnContactParts(actor);
             *motion = ClearMaskedValue(*motion, 0x2000);
-            SetFlags2CC(actor, 0x1000);
+            MonsterInit_SetBehaviorFlags(actor, 0x1000);
         }
     palette:
 
@@ -254,7 +245,7 @@ next:
         if (!MotionFlagSet(&flagField->halfword, 0x4000) && ManagerFlagSet(manager, partMask)) {
             category = ActorCategory(actor);
             if (category == 10 || category == 23) {
-                if (!ReadFlags2CC(actor, 0x02008000)) {
+                if (!SceneActorTurn_ActorFlags(actor, 0x02008000)) {
                     if (actor->base.drawableKind == 0) {
                         draw = actor->base.drawable;
                         ((struct SceneActorPaletteSequenceView *)draw)->paletteOffset =

@@ -1,5 +1,8 @@
 #include "skeleton.h"
 #include "golem.h"
+#include "scene_actor_contact_response.h"
+#include "scene_actor_chase_shared.h"
+#include "word_flags.h"
 
 /* Resolve contact flags, animation, and pursuit routing. The normal chase
  * continuation returns zero even after installing its control. */
@@ -237,20 +240,10 @@ static inline u8 sameRegion(u16 *region)
     return 0;
 }
 
-static inline u32 flags16(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
-static inline u32 flags32(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
-
 static inline u8 unavailable(struct ChaseActor *actor)
 {
     if (actor) {
-        if (flags16(actor, 0x40) || flags32(actor, 0x20000) || actor->base.health <= 0)
+        if (SceneActorContact_MotionFlags(actor, 0x40) || SceneActorChase_StatusFlags(actor, 0x20000) || actor->base.health <= 0)
             return 1;
     }
     return 0;
@@ -364,11 +357,6 @@ static inline void SkeletonInit_InstallCompletionCallbacks(struct ChaseActor *in
     instance->base.destroy = (SceneActorResultCallback)Skeleton_Destroy;
 }
 
-static inline void SkeletonInit_SetFlagWord(u32 mask, u32 *field)
-{
-    *field |= mask;
-}
-
 s32 Skeleton_Init(void *object)
 {
     struct Skeleton *instance = object;
@@ -384,7 +372,7 @@ s32 Skeleton_Init(void *object)
     {
         MonsterInit_SetCategory(actor, Script_GetKeywordValue(0x6B, MONSTER_CATEGORY_SKELETON));
         if (MonsterInit_GetCategory(actor) == 7)
-            SkeletonInit_SetFlagWord(0x40, &instance->actionFlags);
+            WordFlags_Set(0x40, &instance->actionFlags);
     }
     SceneActor_UpdateProfileForCategory(actor);
 

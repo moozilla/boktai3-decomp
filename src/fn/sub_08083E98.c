@@ -34,8 +34,7 @@ void SceneActorControl_StartPositionCurve(struct ChaseActor *actor,
         *((u8 *)actor + 0x3CD) = Math_Atan2(difference->x, difference->z);
     }
     {
-        u32 offset = 0x42C;
-        state = (void *)((u8 *)state + offset);
+        state = (void *)((u8 *)state + 0x42C);
     }
     temporary.fill = zeroValue;
     CpuSet_2(0x05000002, state, &temporary.fill);

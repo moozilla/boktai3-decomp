@@ -32,16 +32,14 @@ void Player_SpawnMovementModifierEffects(u8 *p, u32 kind, s32 count)
     }
     {
         u16 index;
-        u32 mask;
         u32 *indexPtr;
         const u16 *table;
         table = gRandomTable;
         indexPtr = &gRandomIndex;
         index = *indexPtr + 1;
-        mask = 0x3ff;
-        index &= mask;
+        index &= 0x3ff;
         off.x = (table[index] % 16) - 7;
-        index = (index + 1) & mask;
+        index = (index + 1) & 0x3ff;
         *indexPtr = index;
         off.y = -(table[index] % 32);
         off.z = 0;

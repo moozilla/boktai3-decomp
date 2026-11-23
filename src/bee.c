@@ -1,6 +1,7 @@
 #include "bee.h"
 
 #include "global.h"
+#include "math_shift.h"
 
 #include "scene_actor_control_phase.h"
 
@@ -43,6 +44,7 @@
 #include "scene_actor_init_group.h"
 
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_chase_shared.h"
 
 void Bee_OnAttackCollision(void)
 {
@@ -328,9 +330,7 @@ void Bee_UpdateMovementStop(struct ChaseActor *actor)
             f->bits = m;
         }
         {
-            u32 *f = &actor->base.behaviorFlags;
-            s32 m = ~0x80;
-            *f &= m;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         }
         Bee_DisableMovement(actor);
         Bee_SetState(actor, 0, 2, 0);
@@ -405,13 +405,6 @@ s32 Div(s32, s32);
 
 void CpuSet(const void *, void *, u32);
 
-static inline s32 Bee_TruncateShift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
-
 static inline u32 Bee_ReturnRandom(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -441,12 +434,12 @@ void Bee_ReturnToPlayerWhenStopped(struct ChaseActor *actor)
         angle = (u8)Bee_ReturnRandom();
         {
             const s16 *table = gUnk_086149C4;
-            s32 vx = Bee_TruncateShift(table[angle], 6);
+            s32 vx = Math_ShiftTowardZero(table[angle], 6);
             actor->base.secondaryMotion.x = vx;
         }
         {
             const s16 *table = gUnk_086149C4;
-            s32 vz = Bee_TruncateShift(table[(angle + 64) & 255], 6);
+            s32 vz = Math_ShiftTowardZero(table[(angle + 64) & 255], 6);
             actor->base.secondaryMotion.z = vz;
         }
     }
@@ -501,26 +494,11 @@ static inline void Bee_FindDelta(struct ContactPosition *d, const struct Contact
 
 static inline void Bee_AnchorPolarOffset(struct ContactPosition *out, u16 angle, s32 radius)
 {
-    out->x = Bee_TruncateShift(gUnk_086149C4[(angle + 0x40) & 255] * radius, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 255] * radius, 12);
     out->y = 0;
-    out->z = Bee_TruncateShift(gUnk_086149C4[angle & 255] * radius, 12);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * radius, 12);
 }
 
-static inline void Bee_SetAnchorControl(struct ChaseActor *a, void *cb, u32 kind)
-{
-    u8 *taken = &a->base.field2B2;
-    *taken = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 
 static inline void Bee_ClearAnchorMotion(u32 *zero, void *out)
 {
@@ -585,7 +563,7 @@ void Bee_StartMoveToBody(struct ChaseActor *actor, u16 *args)
     Bee_SubVector(actor, &actor->base.body.position, &offset);
     Bee_ClearAnchorMotion(&work.fill, &body->motion);
     Bee_SetAnchorState(actor, 2, 0, 10);
-    Bee_SetAnchorControl(actor, actor->base.onAlternateEntry, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
 }
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -679,10 +657,6 @@ static inline u8 Bee_HasRouteFlag(const struct Bee *state, u32 bits)
     return FALSE;
 }
 
-static inline s32 Bee_ScaleSine(s32 value, u32 shift)
-{
-    return value >= 0 ? value >> shift : -((-value) >> shift);
-}
 
 void Bee_UpdateFlightHeight(struct ChaseActor *actor)
 {
@@ -713,7 +687,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
                 return;
             }
         }
-        actor->base.heightOffset += Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 9);
+        actor->base.heightOffset += Math_ShiftTowardZero(gUnk_086149C4[state->flightPhase], 9);
         if (state->flightPhase <= 63)
             state->flightPhase++;
         actor->base.body.position.y = actor->base.groundHeight + actor->base.heightOffset;
@@ -733,7 +707,7 @@ void Bee_UpdateFlightHeight(struct ChaseActor *actor)
     actor->base.body.position.y = actor->base.groundHeight + actor->base.heightOffset;
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
-        drawable->position.y -= Bee_ScaleSine(gUnk_086149C4[state->flightPhase], 5);
+        drawable->position.y -= Math_ShiftTowardZero(gUnk_086149C4[state->flightPhase], 5);
     }
     if (state->flightPhase > 64)
         state->flightPhase = 0;
@@ -1123,9 +1097,9 @@ static inline u16 Bee_NextRandom(void)
 
 static inline void Bee_MakePolarVector(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Bee_TruncateShift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
-    out->z = Bee_TruncateShift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
 static inline void Bee_SubtractPositions(struct ContactPosition *out,
@@ -1189,7 +1163,7 @@ void Bee_FollowWanderRoute(struct ChaseActor *actor)
         actor->base.body.direction = facing;
     }
     if ((body->remaining > 0) && (((delta.x * delta.x) + (delta.z * delta.z)) > 1024)) {
-        s32 steps = Bee_Max(Bee_TruncateShift(body->remaining, 5), 1);
+        s32 steps = Bee_Max(Math_ShiftTowardZero(body->remaining, 5), 1);
         actor->base.body.motion.x +=
             Div(body->points[body->index].x - actor->base.body.position.x, steps);
         actor->base.body.motion.z +=
@@ -1268,33 +1242,32 @@ void Bee_UpdateReactionPhase(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-static inline void Bee_SetRecoveryControl(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 
 // confidence=low: approaches a saved player position during the recovery animation.
+
+/* Like Crow_ApproachSavedPosition: push the body toward the saved point; 1 once within 32. */
+static inline u8 Bee_ApproachSavedPosition(struct SceneActorMotionSubject *saved,
+                                           struct SceneActorBody *motion, s32 speed)
+{
+    s16 dx = saved->position.x - motion->position.x;
+    s16 dz = saved->position.z - motion->position.z;
+    if ((dx < 0 ? -dx : dx) <= 32 && (dz < 0 ? -dz : dz) <= 32)
+        return 1;
+    if (dx || dz) {
+        motion->direction = Math_Atan2(dx, dz);
+        motion->motion.x +=
+            Math_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        motion->motion.z += Math_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
+    }
+    return 0;
+}
 
 void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
 {
     struct Bee *body = actor->base.context;
-    struct SceneActorBody *motion;
-    s32 speed;
-    struct SceneActorMotionSubject *saved;
-    s16 dx, dz;
     if (Bee_TakeControlEntry(&actor->base.field2B1)) {
         actor->base.body.direction = actor->base.tracking.heading;
-        Bee_SetRecoveryControl(actor, Bee_UpdateRecoveryAnimation, 0x26);
+        SceneActorChase_SetControl(actor, Bee_UpdateRecoveryAnimation, 0x26);
         *(struct BeePackedPosition *)&body->curveSubject.position =
             *(struct BeePackedPosition *)&((struct SceneActorChasePlayer *)gPlayers[0])
                  ->target.position;
@@ -1305,19 +1278,7 @@ void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
         SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
         Sound_PlaySong(0x3C8);
     }
-    saved = &body->curveSubject;
-    motion = &actor->base.body;
-    speed = 24;
-    dx = saved->position.x - motion->position.x;
-    dz = saved->position.z - motion->position.z;
-    if ((dx < 0 ? -dx : dx) > 32 || (dz < 0 ? -dz : dz) > 32) {
-        if (dx || dz) {
-            motion->direction = Math_Atan2(dx, dz);
-            motion->motion.x +=
-                Bee_TruncateShift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-            motion->motion.z += Bee_TruncateShift(gUnk_086149C4[motion->direction] * speed, 12);
-        }
-    }
+    Bee_ApproachSavedPosition(&body->curveSubject, &actor->base.body, 24);
     if (actor->base.stepDone)
         Bee_EnterState(actor, 2, 4);
     else
@@ -1330,16 +1291,11 @@ static inline u32 Bee_PauseRandom(void)
     return *(const u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR);
 }
 
-static inline u16 Bee_MaskFlags(u16 *p, u32 m)
-{
-    return *p & m;
-}
-
 static inline void Bee_PausePolarMotion(struct ContactPosition *m, u32 angle, s32 radius)
 {
-    m->x = Bee_TruncateShift(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
+    m->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius, 12);
     m->y = 0;
-    m->z = Bee_TruncateShift(gUnk_086149C4[angle] * radius, 12);
+    m->z = Math_ShiftTowardZero(gUnk_086149C4[angle] * radius, 12);
 }
 
 void Bee_UpdateWanderPause(struct ChaseActor *actor)
@@ -1359,32 +1315,18 @@ void Bee_UpdateWanderPause(struct ChaseActor *actor)
     }
     cnt = actor->base.counter2AC;
     if (cnt > 0x1E) {
-        actor->base.motionFlags = Bee_MaskFlags(&actor->base.motionFlags, ~0x100);
+        SceneActorChase_ClearMotionFlagComponent(actor, 0x100);
         Bee_SetState(actor, 0, 2, 0);
     } else {
         actor->base.counter2AC = cnt + 1;
     }
 }
 
-static inline s32 Bee_ScalePolarComponent(s32 n)
-{
-    if (n >= 0)
-        return n >> 12;
-    return -((-n) >> 12);
-}
-
-static inline s32 Bee_ScaleDuration(s32 n)
-{
-    if (n >= 0)
-        return n >> 5;
-    return -((-n) >> 5);
-}
-
 static inline void Bee_MakeAnchorVector(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Bee_ScalePolarComponent(gUnk_086149C4[(angle + 64) & 255] * speed);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
-    out->z = Bee_ScalePolarComponent(gUnk_086149C4[angle & 255] * speed);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
 static inline u16 Bee_NextAnchorRandom(void)
@@ -1444,7 +1386,7 @@ void Bee_FollowAnchorRoute(struct ChaseActor *actor)
         actor->base.body.direction = heading;
     }
     if ((s16)route->remaining > 0 && step.x * step.x + step.z * step.z > 1024) {
-        n = Bee_Max(Bee_ScaleDuration((s16)route->remaining), 1);
+        n = Bee_Max(Math_ShiftTowardZero((s16)route->remaining, 5), 1);
         actor->base.body.motion.x +=
             Div(route->points[route->index].x - actor->base.body.position.x, n);
         actor->base.body.motion.z +=

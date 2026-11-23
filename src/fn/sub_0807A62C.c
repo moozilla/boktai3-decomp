@@ -1,19 +1,13 @@
 #include "scene_actor_update.h"
+#include "scene_actor_availability.h"
+#include "word_flags.h"
 void SceneActorBehavior_UpdateColliders(struct RoomActor *);
-static inline u32 SceneActorBehavior_TestMotionFlags(u32 mask, struct RoomActor *p)
-{
-    return p->motionFlags & mask;
-}
-static inline u32 SceneActorBehavior_TestStatusFlags(u32 mask, struct RoomActor *p)
-{
-    return p->statusFlags & mask;
-}
 static inline u8 Inactive(struct RoomActor *actor)
 {
     if (!actor)
         return 0;
-    if (SceneActorBehavior_TestMotionFlags(0x40, actor) ||
-        SceneActorBehavior_TestStatusFlags(0x20000, actor) || actor->health <= 0)
+    if (SceneActor_MaskedHalfword(0x40, &actor->motionFlags) ||
+        Flags_MaskedWord(0x20000, &actor->statusFlags) || actor->health <= 0)
         return 1;
     return 0;
 }

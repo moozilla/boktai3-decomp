@@ -28,7 +28,8 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
     contactFlags = (u8 *)owner + 0xDC;
     while (node) {
         if ((node->flags & 1) && node->object && (node->kind & kindMask) &&
-            SceneActorContacts_CanSelectNode(node) && SceneActorContacts_EvaluateCandidate(node, actor, &distance)) {
+            SceneActorContacts_CanSelectNode(node) &&
+            SceneActorContacts_EvaluateCandidate(node, actor, &distance)) {
             best = node;
             selectionStatus = (s32)best;
         }
@@ -42,11 +43,10 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
                 break;
             case 2:
             case 4: {
-                u32 offset = 0x2D0;
                 u32 *flags;
                 u32 clearMask;
                 u32 value;
-                flags = (u32 *)((u8 *)owner + offset);
+                flags = &owner->base.statusFlags;
                 clearMask = ~0x1000000;
                 value = *flags;
                 value &= clearMask;
@@ -57,11 +57,11 @@ struct SceneActorContactNode *SceneActorContacts_SelectForActor(struct ChaseActo
         }
     }
     {
-u32 clearMask = ~2;
-u8 *flags = contactFlags;
-u8 result;
-result = clearMask & flags[15];
-flags[15] = result;
+        u32 clearMask = ~2;
+        u8 *flags = contactFlags;
+        u8 result;
+        result = clearMask & flags[15];
+        flags[15] = result;
     }
     return best;
 }

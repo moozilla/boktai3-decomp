@@ -10,12 +10,6 @@ void ScenePool_ReadActorBounds(s32, u32 *, u32 *, u32 *);
 s32 ScenePool_IsEntryInSpawnBand(void *, s32, struct ScenePoolEntry *);
 void *ScenePool_FindFreeActorSlot(void *);
 void sub_0803BC88(void *, struct ScenePoolEntry *, u32);
-static inline u8 PlayerHasFlag(u32 mask)
-{
-    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
-        return 1;
-    return 0;
-}
 
 void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m)
 {
@@ -25,7 +19,7 @@ void ScenePool_SpawnEntriesNearPlayers(struct ScenePoolManager *m)
     m->lastId = 0;
     for (i = 0; i < m->playerCount; i++)
         ScenePool_ReadActorBounds(i, &m->leftBounds[i], &m->rightBounds[i], regions);
-    if (m->currentConfiguration == m->configuration && PlayerHasFlag(5))
+    if (m->currentConfiguration == m->configuration && ScenePool_PlayerHasFlag(5))
         return;
     for (i = 0; i < m->playerCount; i++) {
         s32 k;

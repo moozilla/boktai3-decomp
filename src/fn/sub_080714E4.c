@@ -35,9 +35,8 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         computedCell = row + x;
     }
     {
-        u32 offset = 0x2F4;
         u16 *address;
-        address = (u16 *)((u8 *)actor + offset);
+        address = &actor->base.terrainCell;
         *address = computedCell;
         cell = *address;
     }
@@ -77,8 +76,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         address = &actor->base.heightOffset;
         *address = zero;
         {
-            u32 offset = 0x2EC;
-            Memory_Clear((u8 *)actor + offset, 8);
+            Memory_Clear((u8 *)actor + 0x2EC, 8);
         }
         Memory_Clear(&actor->base.body.motion, 8);
         control = &group->control;
@@ -111,11 +109,10 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         }
     }
     {
-        u32 fieldOffset = 0x1E0;
         const u16 *base;
         const u16 *offset;
         u32 bank;
-        base = (const u16 *)((u8 *)actor + fieldOffset);
+        base = &actor->base.basePaletteBank;
         offset = &actor->base.paletteOffset;
         bank = *base;
         bank += *offset;

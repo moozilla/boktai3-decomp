@@ -47,8 +47,7 @@ void SceneActorAnimation_UpdateChargeApproach(struct StateActor *p, int tick)
         }
     }
     if (!p->actionTryUpdate(p)) {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p)) {
             if (!(tick & 3)) {
                 int id = SceneActorGraphics_GetResourceId(actor);

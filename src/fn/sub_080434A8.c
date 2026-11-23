@@ -28,11 +28,7 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
         }
     }
     if (pool->clearRequested) {
-        u32 state = 6;
-        u32 zeroFrame = 0;
-        slot->state = state;
-        slot->enter = 1;
-        slot->stateFrame = zeroFrame;
+        ContactActor_EnterState(slot, 6);
         return;
     }
     if (slot->stateFrame <= 15)
@@ -62,9 +58,7 @@ void ContactActor_UpdateBurst(struct ContactActorPool *pool, struct ContactActor
     }
     ContactActor_SetDirectionalSequence(pool, slot, 0);
     if (slot->stateFrame > 31) {
-        slot->state = 2;
-        slot->enter = 1;
-        slot->stateFrame = 0;
+        ContactActor_EnterState(slot, 2);
     } else {
         if (slot->retargetTimer && !--slot->retargetTimer) {
             u32 mode = pool->mode;

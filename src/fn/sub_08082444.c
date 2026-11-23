@@ -1,9 +1,6 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
-static inline void Turn_SetFlags(struct ChaseActor *actor, u16 mask)
-{
-    actor->base.motionFlags = mask | actor->base.motionFlags;
-}
+#include "scene_actor_chase_shared.h"
 static inline void Turn_ResetState(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;
@@ -31,7 +28,7 @@ void SceneActorReaction_RestoreAfterTurns(struct ChaseActor *actor, s32 frame)
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Turn_SetFlags(actor, 0x400);
+        SceneActorChase_SetMotionFlags(actor, 0x400);
         actor->base.field2C2 = 32;
     }
     if (group->turn.turnsRemaining > 0) {

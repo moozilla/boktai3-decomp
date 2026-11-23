@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 
 struct P08159BB8 {
     u8 f0[0x20];
@@ -14,16 +15,12 @@ struct P08159BB8 {
     u8 f3A3[0x464 - 0x3A3];
     u8 f464;
 };
-static inline void orr(u32 *a, u32 m)
-{
-    *a |= m;
-}
 void Player_EmitQueuedEffects(void *);
 void ActorSequence_Begin(void *, u32, u32);
 
 void Player_InitState25(struct P08159BB8 *p)
 {
-    orr(&p->f20, 0x1000);
+    Player_SetStatusBits(&p->f20, 0x1000);
     p->f464 = 0;
     p->f3A2 = 0;
     Player_EmitQueuedEffects(p);

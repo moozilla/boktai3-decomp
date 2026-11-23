@@ -1,8 +1,5 @@
 #include "scene_actor_script.h"
-static inline void KeepFlags(u32 mask, u32 *field)
-{
-    *field = mask & *field;
-}
+#include "word_flags.h"
 static inline void SetFlags(u32 mask, u32 *field)
 {
     *field = mask | *field;
@@ -18,7 +15,7 @@ void SceneActorScript_SetFlagFromScript(void)
         return;
     if (!Script_GetKeywordValue('f', 0)) {
         u32 *flags = &actor->base.statusFlags;
-        KeepFlags(~0x04000000, flags);
+        WordFlags_And(~0x04000000, flags);
     } else
         SetFlags(0x04000000, &actor->base.statusFlags);
 }

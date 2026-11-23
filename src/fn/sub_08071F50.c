@@ -1,5 +1,6 @@
 #include "scene_actor_palette.h"
 #include "scene_actor_status.h"
+#include "word_flags.h"
 
 static inline u8 TestManagerFlag(struct SceneActorPaletteManagerView *manager, u32 mask)
 {
@@ -66,13 +67,11 @@ u32 SceneActorPalette_ApplyTransition(struct SceneActorPaletteManagerView *manag
         AdvancePaletteTransition(transition);
         switch (category) {
             case 23: {
-                u32 mask = 0x8000;
-                manager->flags |= mask;
+                WordFlags_Set(0x8000, &manager->flags);
                 break;
             }
             case 10: {
-                u32 mask = 0x4000;
-                manager->flags |= mask;
+                WordFlags_Set(0x4000, &manager->flags);
                 break;
             }
         }

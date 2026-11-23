@@ -1,4 +1,5 @@
 #include "scene_actor_registry.h"
+#include "word_flags.h"
 struct ChaseActor *SceneActorRegistry_FindById(u32);
 void SceneActorRegistry_RestoreScriptActorFieldAA(void)
 {
@@ -8,15 +9,7 @@ void SceneActorRegistry_RestoreScriptActorFieldAA(void)
         if (actor && actor->group.contactControl) {
             s32 value = actor->base.attachmentRestart;
             actor->base.attachmentTimer = value;
-            {
-                u32 mask = 2;
-                u32 offset;
-                u16 *field;
-                offset = 0x2d6;
-                field = (void *)((u8 *)actor + offset);
-                mask |= *field;
-                *field = mask;
-            }
+            HalfwordFlags_Set(2, &actor->base.reactionFlags);
         }
     }
 }

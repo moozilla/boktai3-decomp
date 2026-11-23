@@ -69,6 +69,7 @@ s32 SceneRangeWatch_Initialize(struct SceneRangeWatch *input)
     struct SceneRangeWatch *watch = input;
     u8 *minimum;
     u8 *maximum;
+    s32 i;
     if (Script_SeekToKeyword('p')) {
         watch->enterScript = SceneRangeWatch_ReadOptionalValue(0);
         watch->leaveScript = SceneRangeWatch_ReadOptionalValue(0);
@@ -77,28 +78,15 @@ s32 SceneRangeWatch_Initialize(struct SceneRangeWatch *input)
         watch->leaveScript = 0;
     }
     if (Script_SeekToKeyword('A')) {
-        u32 *argument;
-        s32 index;
         minimum = &watch->minimum;
         maximum = &watch->maximum;
-        argument = watch->arguments;
-        index = 1;
-        do {
-            *argument++ = SceneRangeWatch_ReadOptionalHalfword();
-        } while (--index >= 0);
+        for (i = 0; i < 2; i++)
+            watch->arguments[i] = SceneRangeWatch_ReadOptionalHalfword();
     } else {
-        u32 *start;
-        u32 *argument;
-        u32 zero;
         minimum = &watch->minimum;
         maximum = &watch->maximum;
-        start = watch->arguments;
-        zero = 0;
-        argument = &watch->arguments[1];
-        do {
-            *argument = zero;
-            argument--;
-        } while ((s32)argument >= (s32)start);
+        for (i = 0; i < 2; i++)
+            watch->arguments[i] = 0;
     }
     {
         s32 value;

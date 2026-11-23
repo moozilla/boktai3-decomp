@@ -67,11 +67,7 @@ void Player_UpdateRecoilMotion(struct Player *p)
                      p->side);
     PlayerCue_StepSequence((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC));
     {
-        u32 off270;
-        u16 *q270;
-        off270 = 0x270;
-        q270 = (u16 *)((u8 *)p + off270);
-        if (*q270) {
+        if (p->directionFrame) {
             if (p->terrainClampBlocked) {
                 Approach(p);
                 if (H(0x45A) <= 5) {

@@ -4,6 +4,7 @@
 #include "player.h"
 #include "scene_object.h"
 #include "player_cue.h"
+#include "player_slot_status.h"
 
 struct LinkRef {
     u8 unk0[0x18];
@@ -30,16 +31,6 @@ static inline u32 Busy(struct Player *p)
     return r;
 }
 
-static inline void FlagOr(u32 m, u32 *f)
-{
-    *f |= m;
-}
-
-static inline u32 FlagSet(u32 v, u32 m)
-{
-    return v & m;
-}
-
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 s32 Div(s32, s32);
 void Player_SetTetherMode(struct Player *, s32, s32);
@@ -64,7 +55,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
         data += 4;
     else
         data = gTerrainMap->cells + (cell * 4 + 12);
-    if (FlagSet(((struct SceneCell *)data)->flags, 0x40) && p->tetherStatusFlags == 0) {
+    if ((SceneCell_GetFlags((struct SceneCell *)data) & 0x40) && p->tetherStatusFlags == 0) {
         if (GameState_TestWorldFlags(0x4000))
             Player_SetTetherMode(p, 0x22, 0);
         else
@@ -83,7 +74,7 @@ s32 Player_ApplyTerrainDamage(struct Player *p)
     if (p->positionResetValue == 0 && p->movementModifierKind == 1 && p->movementModifierActive) {
         u16 *c;
         u16 n;
-        FlagOr(0x200, &p->statusFlags);
+        Player_SetStatusBits(&p->statusFlags, 0x200);
         c = &p->terrainDamageTimer;
         n = ++*c;
         if (n >= Div(0x3c, p->movementModifierActive)) {

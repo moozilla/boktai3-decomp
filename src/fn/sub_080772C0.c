@@ -1,5 +1,6 @@
 #include "scene_actor_reset.h"
 #include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 struct MotionFlags {
     s16 bits : 16;
 };
@@ -21,11 +22,6 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
         *flags &= mask;
     }
     actor->base.pendingControl = 0;
-}
-static inline void ClearFlags(u32 *flags, u32 bits)
-{
-    u32 mask = ~bits;
-    *flags &= mask;
 }
 static inline u8 IsDown(struct ChaseActor *actor, u16 *motion)
 {
@@ -56,7 +52,7 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
             if (!(actor->base.behaviorFlags & bit))
                 return;
         }
-            ClearFlags(&actor->base.behaviorFlags, 3);
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRouteAndColliders((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
             SetControl(actor, actor->base.onHidden, 12);
@@ -64,7 +60,7 @@ void SceneActorPlacement_ResetActorState(struct ChaseActor *actor, const u16 *ar
         case 1:
             if (IsDown(actor, flags))
                 return;
-            ClearFlags(&actor->base.behaviorFlags, 3);
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 3);
             SceneActorRegistry_ResetRoute((void *)actor);
             MonsterInit_SetState(actor, 3, 0, 0);
             SetControl(actor, actor->base.onHidden, 12);

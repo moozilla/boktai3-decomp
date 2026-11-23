@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "player.h"
+#include "player_slot_status.h"
 /* Per-update handler for the player in link-play kinds one, two and eight (tentative). */
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 struct LinkRefs {
@@ -33,10 +34,6 @@ static inline s32 Scale(int x)
     if (x >= 0)
         return x >> 12;
     return -(-x >> 12);
-}
-static inline void FlagOr(u32 m, u32 *f)
-{
-    *f |= m;
 }
 static inline u8 Charge(s32 slot)
 {
@@ -82,7 +79,7 @@ static inline u32 GroundHeight(struct FloorPoint *position)
 void Player_UpdateLinkKind(struct Player *p)
 {
     s32 idx;
-    FlagOr(0x4000, &p->statusFlags);
+    Player_SetStatusBits(&p->statusFlags, 0x4000);
     switch (p->kind) {
         case 1: {
             s32 cond;

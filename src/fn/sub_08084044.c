@@ -1,22 +1,14 @@
 #include "scene_actor_control_helpers.h"
 #include "player.h"
 #include "scene_actor_reaction.h"
-
-static inline void AndWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
+#include "scene_actor_chase_shared.h"
+#include "word_flags.h"
 
 static inline void OrTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
     u32 mask = bits;
     mask |= tracking->flags;
     tracking->flags = mask;
-}
-
-static inline void OrWordFlags(u32 mask, u32 *flags)
-{
-    *flags |= mask;
 }
 
 static inline void SelectState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
@@ -32,9 +24,9 @@ void SceneActorControl_RestartPositionCurve(struct ChaseActor *actor)
 
     state->phase = 0;
     ZeroFill8(&actor->base.secondaryMotion);
-    AndWordFlags(&state->flags3D4, ~7);
+    SceneActorChase_AndWordFlags(&state->flags3D4, ~7);
     OrTrackingFlags(&actor->base.tracking, 8);
-    OrWordFlags(0x100000, &actor->base.statusFlags);
+    WordFlags_Set(0x100000, &actor->base.statusFlags);
     SceneActorReaction_EnableMotionFlags(0x100, &actor->base.motionFlags);
     SelectState(actor, 0, 2, 0);
     actor->base.counter2AC = 0;

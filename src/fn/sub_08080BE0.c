@@ -1,26 +1,21 @@
 #include "global.h"
 #include "scene_actor_chase.h"
+#include "scene_actor_chase_shared.h"
+#include "scene_actor_contact_response.h"
+#include "word_flags.h"
 
 struct ReactionOwner {
     u8 unknown0[0x3C];
     struct ChaseActor *actor;
 };
 extern const s16 gUnk_086149C4[];
-static inline u32 Reaction_MotionTest(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-static inline u32 Reaction_WordTest(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
 static inline u8 Reaction_IsBlocked(struct ChaseActor *actor)
 {
     if (!actor)
         return 0;
-    if (Reaction_MotionTest(actor, 0x40))
+    if (SceneActorContact_MotionFlags(actor, 0x40))
         return 1;
-    if (Reaction_WordTest(actor, 0x20000))
+    if (SceneActorChase_StatusFlags(actor, 0x20000))
         return 1;
     if (actor->base.health <= 0)
         return 1;
@@ -32,31 +27,17 @@ static inline u8 Reaction_IsBlockedFlags(struct ChaseActor *actor, u32 flags)
         return 0;
     if (flags & 0x40)
         return 1;
-    if (Reaction_WordTest(actor, 0x20000))
+    if (SceneActorChase_StatusFlags(actor, 0x20000))
         return 1;
     if (actor->base.health <= 0)
         return 1;
     return 0;
-}
-static inline void Reaction_ClearHalf(u16 *field, s32 mask)
-{
-    *field &= mask;
-}
-static inline void Reaction_ClearWord(u32 *field, u32 bits)
-{
-    u32 mask = ~bits;
-    *field &= mask;
 }
 static inline s32 Reaction_ScaleMotion(s32 value)
 {
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
-}
-
-static inline void Reaction_SetHalf(struct ChaseActor *actor, u16 mask)
-{
-    actor->base.reactionFlags = mask | actor->base.reactionFlags;
 }
 
 u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 amplitude)
@@ -86,7 +67,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                             u32 zero = 0;
                             *motion = 0x40;
                             actor->base.field2E6 = zero;
-                            Reaction_ClearHalf(&actor->base.reactionFlags, ~0x980);
+                            HalfwordFlags_And(&actor->base.reactionFlags, ~0x980);
                         } else {
                             u32 statusMask = 0x803E;
                             u32 flags = *motion;
@@ -105,7 +86,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                                     value = mask.field.bits & flags;
                                     *motion = value;
                                 }
-                                Reaction_ClearWord(&actor->base.behaviorFlags, 0x4000);
+                                SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x4000);
                                 {
                                     struct SceneActorReactionMotion *tracking =
                                         (void *)&actor->base.tracking.target;
@@ -115,20 +96,20 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                                 {
                                     u32 test = 0x20;
                                     if (!(test & *motion))
-                                        Reaction_ClearWord(&actor->base.behaviorFlags, 0x80);
+                                        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags,
+                                                                       0x80);
                                 }
-                                Reaction_ClearWord(&actor->base.statusFlags, 0x100004);
-                                Reaction_SetHalf(actor, 0x400);
+                                SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100004);
+                                SceneActorChase_OrReactionFlags(actor, 0x400);
                                 actor->base.field2E6 = 0;
                                 {
-                                    u32 mask = 0x2000;
-                                    actor->base.behaviorFlags |= mask;
+                                    WordFlags_Set(0x2000, &actor->base.behaviorFlags);
                                 }
                             } else
-                                Reaction_ClearWord(&actor->base.behaviorFlags, 0x2000);
+                                SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000);
                         }
                     } else
-                        Reaction_ClearWord(&actor->base.behaviorFlags, 0x2000);
+                        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000);
                 }
             }
             actor->base.secondaryMotion.x = 0;
@@ -141,7 +122,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                 actor->base.hitOwners = 1;
                 actor->base.hitReactionFlags = 2;
                 actor->base.hitAttributes = 1;
-                Reaction_SetHalf(actor, 0x20);
+                SceneActorChase_OrReactionFlags(actor, 0x20);
             } else {
                 actor->base.reactionSoundVariant = 0;
                 actor->base.field2E6 = 0;
@@ -153,9 +134,9 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
         }
 
         case 1:
-            Reaction_ClearHalf(&second->flags, ~4);
-            Reaction_ClearHalf(&first->flags, ~4);
-            Reaction_ClearHalf(&actor->base.motionFlags, ~0x8000);
+            HalfwordFlags_And(&second->flags, ~4);
+            HalfwordFlags_And(&first->flags, ~4);
+            HalfwordFlags_And(&actor->base.motionFlags, ~0x8000);
             {
                 u8 *dir = &actor->base.body.direction;
                 struct ContactPosition *motion = &actor->base.secondaryMotion;

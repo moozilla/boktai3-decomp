@@ -10,6 +10,8 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_delayed_response.h"
+#include "scene_actor_contact_response.h"
+#include "scene_actor_turn.h"
 
 void SceneActorReaction_PlayAnimationBUntilComplete(void);
 
@@ -26,11 +28,6 @@ inline static u8 TakeFlag(u8 *p)
         return 1;
     }
     return 0;
-}
-
-static inline u32 Flags16(struct ChaseActor *a, u32 m)
-{
-    return a->base.motionFlags & m;
 }
 
 void SceneActorEffects_AdvanceSteps(void *, u32);
@@ -55,11 +52,6 @@ void Golem_OnUnusedState(void)
 {
 }
 
-static inline u32 Flags32At(struct ChaseActor *a, u32 mask)
-{
-    return a->base.behaviorFlags & mask;
-}
-
 /* Releases the defeated golem, runs its script, and emits the defeat burst. */
 
 void Golem_UpdateDefeat(struct ChaseActor *actor)
@@ -78,9 +70,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         SceneActorEffects_AdvanceSteps(actor, 4);
         {
             struct SceneActorRegistryControl *control = &group->control;
-            u32 *field = &actor->base.behaviorFlags;
-            u32 mask = ~0x141C0;
-            *field &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
             control->counter = 0;
             control->field14 = 0;
             control->timer = 0;
@@ -113,10 +103,10 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
         arguments.values = values;
         Script_Call(script, &arguments);
     }
-    if (!Flags16(actor, 0x4000) && (u32)(actor->base.category - 11) > 2)
+    if (!SceneActorContact_MotionFlags(actor, 0x4000) && (u32)(actor->base.category - 11) > 2)
         Bestiary_UnlockEntry(
             Bestiary_GetEntryForActor(actor->base.category, actor->base.paletteOffset));
-    if (!Flags32At(actor, 0x400)) {
+    if (!SceneActorTurn_ActorFlags(actor, 0x400)) {
         u8 category;
         spread.x = 80;
         spread.y = 60;
@@ -691,15 +681,10 @@ void Skeleton_ClearPendingFlag(void *);
 
 void Golem_UpdateAttackProperties(void *);
 
-static inline u32 Flags32(struct Golem *a, u32 m)
-{
-    return a->chase.base.statusFlags & m;
-}
-
 static inline u8 Unavailable(struct Golem *a)
 {
     if (a) {
-        if (Flags16(&a->chase, 0x40) || Flags32(a, 0x20000) || a->chase.base.health <= 0)
+        if (SceneActorContact_MotionFlags(&a->chase, 0x40) || SceneActorChase_StatusFlags(&a->chase, 0x20000) || a->chase.base.health <= 0)
             return 1;
     }
     return 0;

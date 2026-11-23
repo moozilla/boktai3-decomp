@@ -70,12 +70,8 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
     Anim_SetSequence(&p->seq, p->resource, 2, p->facing, p->flip);
     PlayerCue_StepSequence(&p->sprite, &p->seq);
     {
-        u32 off270;
-        u16 *q270;
-        off270 = 0x270;
-        q270 = (u16 *)((u8 *)p + off270);
-        if (*q270 != 0) {
-            struct Player *player = (struct Player *)p;
+        struct Player *player = (struct Player *)p;
+        if (player->directionFrame != 0) {
             if (player->terrainClampBlocked) {
                 s32 dx = player->terrainTarget->x - p->position.x;
                 s32 dz = player->terrainTarget->z - p->position.z;

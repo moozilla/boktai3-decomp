@@ -1,23 +1,24 @@
-#include "global.h"
+#include "scene_pool.h"
+#include "ram.h"
 
-void ScenePool_DestroyActorSlot(u8 *, u8 *);
-void HashTable_Destroy(u8 *);
-void Heap_Free(u32);
+void ScenePool_DestroyActorSlot(struct ScenePoolManager *, struct ScenePoolActor *);
+void HashTable_Destroy(u32 *);
+void Heap_Free(void *);
 
-u32 ScenePool_DestroyManager(u8 *p)
+u32 ScenePool_DestroyManager(struct ScenePoolManager *manager)
 {
-    u8 *e = p + 0x44;
+    struct ScenePoolActor *actor = manager->actors;
     s32 i = 3;
-    u32 z;
+    u32 zero;
     do {
-        ScenePool_DestroyActorSlot(p, e);
-        e += 0x8b0;
+        ScenePool_DestroyActorSlot(manager, actor);
+        actor++;
         i--;
     } while (i >= 0);
-    z = 0;
-    HashTable_Destroy(p + 0x2354);
-    Heap_Free(*(u32 *)(p + 0x20));
-    *(u32 *)(p + 0x20) = z;
-    *(u32 *)0x02000108 = z;
+    zero = 0;
+    HashTable_Destroy(manager->registry);
+    Heap_Free(manager->entries);
+    manager->entries = (void *)zero;
+    gScenePool = zero;
     return 0;
 }

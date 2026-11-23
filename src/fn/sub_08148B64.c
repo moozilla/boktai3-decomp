@@ -37,7 +37,7 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
         }
     } else {
         Player_AddControlFlags(p, 0x41);
-        p->previousPosition = p->position;
+        p->animation.position = *(struct ContactPosition *)&p->position;
         if (p->facing > 4) {
             p->heading = 8 - p->facing;
             p->side = 1;
@@ -47,8 +47,8 @@ void Player_UpdateSpiralDisorientation(struct Player *p)
         }
     }
     Player_SetAnimation(p, 0x9A, 64, 1);
-    p->spriteResource = 0x16F;
-    p->actionVariantResource = (u32)(gPaletteBankData + (p->spriteResource << 5));
+    p->animation.paletteBank = 0x16F;
+    p->animation.palette = (u16 *)(gPaletteBankData + (p->animation.paletteBank << 5));
     Anim_SetSequence(&p->cueCollider.sequence, p->cueCollider.setupResource, 0, p->heading,
                      p->side);
     PlayerCue_StepSequence(&PlayerCue_Graphics(p)->sprite, &p->cueCollider.sequence);

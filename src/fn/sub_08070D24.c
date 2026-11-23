@@ -5,20 +5,18 @@ static inline s16 IsUnavailable(struct ChaseActor *input, u32 disabledInput, u32
     u32 disabled = disabledInput;
     u32 excluded = excludedInput;
     if (actor) {
-        u32 offset = 0x2d4;
         u32 mask;
         u16 *first;
         u32 value;
-        first = (void *)((u8 *)actor + offset);
+        first = &actor->base.motionFlags;
         value = *first;
         mask = disabled;
         value &= mask;
         if (value)
             goto one;
         {
-            u32 secondOffset = 0x2d0;
             u32 *second;
-            second = (void *)((u8 *)actor + secondOffset);
+            second = &actor->base.statusFlags;
             value = *second;
             mask = excluded;
             value &= mask;

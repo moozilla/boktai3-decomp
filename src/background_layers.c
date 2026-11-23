@@ -116,22 +116,20 @@ void Bg_UpdateScrollShadow(void)
 {
     u16 *dst = gBgScrollShadow;
     struct BackgroundLayer *src = gBgRecords;
-    u32 mask;
     dst[0] = ((u16)src[0].x) & 0xff;
-    mask = 0xff;
-    dst[1] = mask & ((u16)src[0].y);
-    dst[2] = mask & ((u16)src[1].x);
-    dst[3] = mask & ((u16)src[1].y);
+    dst[1] = 0xff & ((u16)src[0].y);
+    dst[2] = 0xff & ((u16)src[1].x);
+    dst[3] = 0xff & ((u16)src[1].y);
     if (!gBgAffineMode) {
-        dst[4] = mask & ((u16)src[2].x);
-        dst[5] = mask & ((u16)src[2].y);
+        dst[4] = 0xff & ((u16)src[2].x);
+        dst[5] = 0xff & ((u16)src[2].y);
         {
             u16 *scroll = (u16 *)&src[3].x;
-            dst[6] = mask & (u16)*scroll;
+            dst[6] = 0xff & (u16)*scroll;
         }
         {
             u16 *scroll = (u16 *)&src[3].y;
-            dst[7] = mask & (u16)*scroll;
+            dst[7] = 0xff & (u16)*scroll;
         }
     } else {
         u16 *a = gBgAffineMatrixBuffer, *b = gBgAffineMatrix;

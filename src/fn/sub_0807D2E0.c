@@ -9,6 +9,8 @@
 #include "scene_actor_damage_visibility.h"
 #include "runtime.h"
 #include "ram.h"
+#include "scene_actor_turn.h"
+#include "scene_actor_chase_shared.h"
 
 void SceneActorRecord_RecordPair(u32, u32);
 void SceneActorAttachment_ReplaceResponseSlot(struct ChaseActor *, u32, u32, u32);
@@ -55,10 +57,6 @@ static inline u32 *StatusFlags(struct ChaseActor *actor)
 {
     return &actor->base.statusFlags;
 }
-static inline u32 ReadStatus(struct ChaseActor *actor, u32 bits)
-{
-    return actor->base.statusFlags & bits;
-}
 static inline void SelectAnimationState(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
 {
     a->base.state2A8 = state;
@@ -73,10 +71,6 @@ static inline void ResetEntry(struct ChaseActor *a, u32 ready)
 static inline void MaskContactFlags(u32 *dst, u32 mask)
 {
     *dst = mask & *dst;
-}
-static inline u32 ReadControlFlag(struct ChaseActor *a, u32 mask)
-{
-    return a->base.behaviorFlags & mask;
 }
 union HitSparkTable {
     const u16 *table;
@@ -158,7 +152,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
             }
 
             control = &state->group.common.control;
-            if (ReadControlFlag(victim, 0x200000)) {
+            if (SceneActorTurn_ActorFlags(victim, 0x200000)) {
                 {
                     u32 *status = StatusFlags(victim);
                     u32 mask = ~0x1000000;
@@ -232,7 +226,8 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
                 ResetEntry(a, 1);
                 if (SceneActorDamage_ShouldShow(a))
                     ShowDamage(a);
-                if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !ReadStatus(a, 0x800))
+                if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) &&
+                    !SceneActorChase_StatusFlags(a, 0x800))
                     SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)a->base.body.id);
                 if (category == 4 || category == 1) {
                     union SceneActorRegistryPackedPosition range;

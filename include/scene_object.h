@@ -30,6 +30,11 @@ struct SceneCell {
     u16 flags; /* bit 0 occupied by an object, bit 3 blocks entry, 0x20 (guess) */
 };
 
+static inline u16 SceneCell_GetFlags(const struct SceneCell *cell)
+{
+    return cell->flags;
+}
+
 /* Position and velocity block, shared with the generic entity code (SceneBody_Init etc.). */
 struct SceneBody {
     u32 id; /* script id (the 'n' parameter) */

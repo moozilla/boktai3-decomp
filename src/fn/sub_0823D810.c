@@ -1,42 +1,31 @@
 #include "global.h"
 #include "player.h"
+#include "contact_collider.h"
 
-u32 Collision_CalculateElementalResponse(struct Player *, void *);
-s32 sub_08249244(void *, struct Player *, void *, void *);
+u32 Collision_CalculateElementalResponse(struct ContactCollider *, struct ContactCollider *);
+s32 sub_08249244(void *, struct ContactCollider *, struct ContactCollider *, void *);
 s32 PlayerLink_IsActionModeAllowed(void *);
 
-struct ContactCostTarget {
-    u8 unk0[6];
-    u16 flags6;
-    u8 unk8[2];
-    u16 flagsA;
-    u8 unkC[0x32];
-    u16 cost;
-    u8 unk40[3];
-    u8 flags43;
-};
-
-void Player_ApplyContactCosts(struct Player *p, struct ContactCostTarget *t)
+void Player_ApplyContactCosts(struct ContactCollider *source, struct ContactCollider *target)
 {
-    struct Player *m;
+    struct Player *player;
     s32 i;
-    s32 mask = 0x1F;
-    if ((t->flagsA & mask) != 0) {
-        m = *(struct Player **)((u8 *)p + 0x50);
-        Collision_CalculateElementalResponse(p, t);
+    if (ContactCollider_TestContactFlags(target, 0x1F) != 0) {
+        player = source->owner;
+        Collision_CalculateElementalResponse(source, target);
         i = 0;
         do {
-            void *cb = m->contactCostCallbacks[i];
+            void *cb = player->contactCostCallbacks[i];
             if (cb)
-                t->cost += sub_08249244(m, p, t, cb);
+                target->cost += sub_08249244(player, source, target, cb);
             i++;
         } while (i <= 2);
-        if (m->actionMode == 1 && m->statModifierContext.savedActionIndex == 1 &&
-            PlayerLink_IsActionModeAllowed(m) != 0) {
-            if (!(t->flags43 & 8)) {
-                t->cost >>= 2;
-                if (t->flags6 & 0x100)
-                    t->flags43 |= 8;
+        if (player->actionMode == 1 && player->statModifierContext.savedActionIndex == 1 &&
+            PlayerLink_IsActionModeAllowed(player) != 0) {
+            if (!(target->costFlags & 8)) {
+                target->cost >>= 2;
+                if (target->flags & 0x100)
+                    target->costFlags |= 8;
             }
         }
     }

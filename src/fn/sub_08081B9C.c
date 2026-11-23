@@ -1,5 +1,6 @@
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_reaction.h"
+#include "word_flags.h"
 
 void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *actor, s32 unusedFrame)
 {
@@ -17,8 +18,7 @@ void SceneActorReaction_ResumeAfterAnimation(struct ChaseActor *actor, s32 unuse
         actor->base.attachmentTimer = 0;
         actor->base.stepDone = 1;
         {
-            u32 mask = 16;
-            actor->base.behaviorFlags |= mask;
+            WordFlags_Set(16, &actor->base.behaviorFlags);
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         SceneActorTerrain_EnterState(actor, 3, 1, 0);

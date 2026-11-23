@@ -48,8 +48,7 @@ void SceneActorAnimation_UpdateFlashAlternatingRepeat(struct StateActor *p, int 
         if (tick <= 32)
             effect((u8 *)actor, 2, 826, 5);
     } else {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p)) {
             if (tick == 32)
                 effect((u8 *)actor, 2, 826, 5);

@@ -23,4 +23,10 @@ struct SpatialEntry {
     SpatialContactCallback callback; /* 0x3C: contact handler */
 };
 
+/* Bit 0 marks an entry with updates suspended, bit 1 one skipped this frame. */
+static inline u32 SpatialEntry_TestFlags(struct SpatialEntry *entry, u32 mask)
+{
+    return entry->flags & mask;
+}
+
 #endif

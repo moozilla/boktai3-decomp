@@ -1,6 +1,7 @@
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_actor_position_search.h"
+#include "scene_actor_chase_shared.h"
 
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
@@ -137,18 +138,6 @@ static inline u8 MoveToSource(struct ChaseActor *owner, struct ChaseActor *actor
     return 0;
 }
 
-static inline void SetResponseWordFlag(struct ChaseActor *actor, u32 mask)
-{
-    u32 *flags = &actor->base.behaviorFlags;
-    *flags = mask | *flags;
-}
-
-static inline void SetResponseHalfFlag(struct ChaseActor *actor, u32 mask)
-{
-    u16 *flags = &actor->base.motionFlags;
-    *flags = mask | *flags;
-}
-
 void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
 {
     struct ChaseActor *owner = actor;
@@ -174,8 +163,8 @@ void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *actor)
         SetControl(actor, (void *)SceneActorReaction_RestoreAfterDelay, 14);
         command = &group->command;
         ArmCommand(command, actor->base.onAlternateEntry, 7, 30);
-        SetResponseWordFlag(actor, 0x10);
-        SetResponseHalfFlag(actor, 0x1000);
+        SceneActorChase_SetBehaviorFlags(actor, 0x10);
+        SceneActorChase_SetMotionFlags(actor, 0x1000);
         group->destination->pad = 0;
     }
 }

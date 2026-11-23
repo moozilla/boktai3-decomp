@@ -47,7 +47,6 @@ static inline s32 ScreenBlock(s32 tile)
 
 void BgGfx_LoadTilemap(u32 layer, s32 tileX, s32 tileY, s32 screenX, s32 screenY, u16 *map)
 {
-    const s16 lastTile = 31;
     struct BackgroundLayer *record = &gBgRecords[layer];
     s32 deltaX, deltaY, width, height, right, bottom, pitch, column, rowOffset;
     u16 *window;
@@ -179,13 +178,13 @@ void BgGfx_LoadTilemap(u32 layer, s32 tileX, s32 tileY, s32 screenX, s32 screenY
                             for (column = 0; column < 32; column++) {
                                 columnX = tileX + column;
                                 if (columnX < 0 || columnX >= width) {
-                                    columnX &= lastTile;
+                                    columnX &= 31;
                                     window[columnX + row] = fill;
                                     window[columnX + nextRow] = fill;
                                 } else {
                                     blockX = columnX >> 5;
                                     block = (blockX + blockRow) << 8;
-                                    columnX &= lastTile;
+                                    columnX &= 31;
                                     WRITE_METATILE_COLUMN(window, tiles,
                                                           map[block + (columnX >> 1) + metatileRow],
                                                           columnX, row, nextRow);

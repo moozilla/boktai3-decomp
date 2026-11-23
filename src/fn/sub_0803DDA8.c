@@ -7,16 +7,6 @@ s32 ScenePool_SelectInitialDirection(struct ScenePoolActor *, struct ScenePoolEn
 s32 ScenePool_SelectRepeatOrExit(struct ScenePoolActor *, struct ScenePoolEntry *);
 s32 ScenePool_SelectRepeatedDirection(struct ScenePoolActor *, struct ScenePoolEntry *);
 s32 ScenePool_SelectDirectionOrRepeat(struct ScenePoolActor *, struct ScenePoolEntry *);
-static inline void Or(u32 mask, u32 *flags)
-{
-    *flags |= mask;
-}
-static inline u8 PlayerHasFlag(u32 mask)
-{
-    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
-        return 1;
-    return 0;
-}
 static inline s32 Within(s32 value, s32 limit)
 {
     if (value > limit)
@@ -88,8 +78,8 @@ s32 ScenePool_StateCruise(void *manager, struct ScenePoolActor *actor, struct Sc
         return 0;
     if (ScenePool_ResumeAfterIdle(actor, entry))
         return 0;
-    Or(0x10, &actor->stateFlags);
-    if (!PlayerHasFlag(2)) {
+    ScenePoolActor_SetStateFlags(actor, 0x10);
+    if (!ScenePool_PlayerHasFlag(2)) {
         switch (entry->kind) {
             case 0:
                 ScenePool_SelectInitialDirection(actor, entry);

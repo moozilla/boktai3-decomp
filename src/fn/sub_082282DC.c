@@ -26,9 +26,8 @@ void DelayedScript_Update(struct Task082282DC *t)
     struct Msg082282DC *m = t->msgs;
     k--;
     if (n > 0) {
-        u32 sent = 0xFFFF;
         do {
-            if (*m->b == sent)
+            if (*m->b == 0xFFFF)
                 goto kill;
             m++;
         } while (k-- > 0);

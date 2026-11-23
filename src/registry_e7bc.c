@@ -17,11 +17,6 @@ separated:
     return -1;
 }
 
-static inline u32 SpatialIndex_TestFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
-
 void Collision_DispatchOverlaps(struct SpatialEntry *body, struct SpatialLink *link)
 {
     struct BoundsPosition position, otherPosition;
@@ -33,7 +28,7 @@ void Collision_DispatchOverlaps(struct SpatialEntry *body, struct SpatialLink *l
     position.z = body->position.z + body->offset.z;
     while (link) {
         other = link->entry;
-        if (SpatialIndex_TestFlags(&other->flags, 3) || other == body ||
+        if (SpatialEntry_TestFlags(other, 3) || other == body ||
             other->mask == body->mask || other->hit == 1) {
             link = link->next;
             continue;

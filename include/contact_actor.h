@@ -28,6 +28,13 @@ struct ContactActor {
     u8 graphics[0x1C];
     u8 shadow[0x40];
 };
+
+static inline void ContactActor_EnterState(struct ContactActor *slot, u32 state)
+{
+    slot->state = state;
+    slot->enter = 1;
+    slot->stateFrame = 0;
+}
 /* Task allocation is 0x1720 bytes; the final 32 bytes hold the blend buffer. */
 struct ContactActorPool {
     struct Task task;

@@ -58,8 +58,7 @@ void SceneActorAnimation_UpdateFlashWindup(struct StateActor *p, int tick)
         Sound_PlaySongChecked(887);
     }
     if (actor->graphics.stepTableKind != 3) {
-        u32 mask = 0x100000;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 0x100000);
     }
     if (U8(actor, 0x382)) {
         {
@@ -83,8 +82,7 @@ void SceneActorAnimation_UpdateFlashWindup(struct StateActor *p, int tick)
         effect2((u8 *)actor, 2, 826, 5);
         SceneActors_StopBackgroundFlash(actor);
     } else {
-        u32 mask = 64;
-        p->actionFlags |= mask;
+        SceneActorState_SetFlags(p, 64);
         if (!p->actionReset(p)) {
             if (tick == 10)
                 BackgroundFlash_BeginAppearance(actor->graphics.backgroundFlash);
