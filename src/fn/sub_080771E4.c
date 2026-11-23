@@ -1,18 +1,13 @@
 #include "scene_actor_terrain.h"
+#include "scene_actor_control_helpers.h"
 void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u32 ReadMasked(const u32 *flags, u32 mask)
 {
     return *flags & mask;
 }
-static inline u8 TestFlags(u32 flags, u32 mask)
-{
-    if (flags & mask)
-        return 1;
-    return 0;
-}
 static inline u8 IsDisposable(struct RoomActor *actor)
 {
-    if (!TestFlags(gEngineFlags, 0x4800)) {
+    if (!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) {
         u32 category = actor->category;
         if (category == 2 || category == 18 || category == 19 || category == 9 || category == 17 ||
             category == 20 || category == 14 || category == 10 || category == 23 || category == 22)
