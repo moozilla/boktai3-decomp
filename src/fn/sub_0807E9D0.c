@@ -6,6 +6,7 @@
 #include "scene_actor_chase_types.h"
 #include "player.h"
 #include "scene_actor_turn.h"
+#include "scene_actor_chase_shared.h"
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
 void Collision_CalculateElementalResponse(void *, void *);
@@ -24,10 +25,6 @@ static inline u8 TestControl(struct ChaseActor *actor, u32 mask)
     if (actor->base.placementFlags & mask)
         return 1;
     return 0;
-}
-static inline void MarkContact(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
 }
 static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
 {
@@ -260,5 +257,5 @@ void SceneActorReaction_HandleColliderContact(struct SceneActorBehaviorContactVi
         SpawnContactParts((void *)actor);
     actor->base.reactionSoundVariant = destination->remaining;
     PlayerStats_AddContactHundredths(source, destination, actor->base.contactReward);
-    MarkContact(actor, 0x2000);
+    SceneActorChase_SetBehaviorFlags(actor, 0x2000);
 }
