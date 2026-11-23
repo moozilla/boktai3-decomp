@@ -35,4 +35,9 @@ s32 ModifierMenu_CreateTextWindows(u8 *p)
         i++;
     } while (i <= 7);
     ModifierMenu_RefreshTextLabels(p);
+#ifdef UBFIX
+    // falls off the end; r0 is left over from the label drawing (0x08041453 on hardware,
+    // a ROM address), and the caller only tests < 0
+    return 0;
+#endif
 }
