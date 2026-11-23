@@ -4,6 +4,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
+#include "engine_pause.h"
 
 struct GloveMotion {
     u8 pad0[4];
@@ -113,10 +114,6 @@ void Character_SetLowResourceColorEffect(void *, void *);
 
 // confidence=low: restores appearance and resources after defeat recovery.
 #define Glove_UpdateRecoveryFlash sub_08117F6C
-static inline u32 LinkMode(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 union GloveResourceHalfword {
     u16 bits;
     s16 value;
@@ -139,7 +136,7 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
     u16 *flags;
     s32 *vy, *py, *pvz, *bias;
     if (p->active) {
-        if (!LinkMode(0x800))
+        if (!Engine_PauseBits(0x800))
             GameState_AddActionCount894(1);
         CharacterModel_ClearAnimationFlags(&p->model, 1);
         p->active = 0;
