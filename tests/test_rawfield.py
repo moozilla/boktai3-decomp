@@ -71,10 +71,22 @@ class Members(unittest.TestCase):
     def test_candidates_outermost_first(self):
         self.assertEqual([p for p, _ in rf.candidates(LEAVES, 4)], ["pos", "pos.x"])
         self.assertEqual([p for p, _ in rf.candidates(LEAVES, 16)], ["items[0]", "items[0].a"])
-        self.assertEqual([p for p, _ in rf.candidates(LEAVES, 11)], ["shadow[3]"])
+        self.assertEqual(rf.candidates(LEAVES, 11), [])  # a byte buffer's element: an offset in disguise
+        halves = [{"name": "inventory", "off": 0, "size": 16, "width": 2, "signed": True, "base": "int",
+                   "array": True, "esize": 2, "bits": None}]
+        self.assertEqual([p for p, _ in rf.candidates(halves, 6)], ["inventory[3]"])
         self.assertEqual([p for p, _ in rf.candidates(LEAVES, 6)], ["pos.y"])
         self.assertEqual(rf.candidates(LEAVES, 5), [])
         self.assertEqual([p for p, _ in rf.candidates(LEAVES, 56)], [])  # a bitfield has no address
+
+    def test_padding_arrays_and_byte_buffers_do_not_count(self):
+        leaves = [{"name": "pad10", "off": 0, "size": 16, "width": 1, "signed": False, "base": "int", "array": True,
+                   "esize": 1, "bits": None},
+                  {"name": "field10", "off": 16, "size": 2, "width": 2, "signed": False, "base": "int",
+                   "array": False, "bits": None}]
+        self.assertEqual(rf.candidates(leaves, 0), [])
+        self.assertEqual(rf.candidates(leaves, 4), [])
+        self.assertEqual([p for p, _ in rf.candidates(leaves, 16)], ["field10"])
 
     def test_scalar_width_and_signedness(self):
         x = dict(LEAVES[1])

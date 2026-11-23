@@ -17,13 +17,16 @@ declared `struct T *p` (or through a typedef) in the same function, or a global 
 unit or its headers (`&g` for an object, `g` for a pointer). Its layout comes from the compiler
 (tools/layoutmerge.py's probe, the one tools/struct_views.py uses), so packing and nested
 members are exact. A member qualifies when it starts at exactly that offset (a nested member or
-an element of a scalar array counts) and its type agrees with the cast:
+an element of an array of halfwords, words or pointers counts; a byte buffer's element past the
+first, or an element of a padding array, `pad115[267]`, is the same offset in disguise and does
+not; a scalar member named for its offset, `field2E6`, does) and its type agrees with the cast:
 
 * an integer cast needs a member of the same width and signedness, not a bitfield;
 * any other cast (a pointer, a struct, a typedef) needs agbcc to accept `T *x = &member`
   without a warning, checked in one probe compile per unit;
-* `(void *)` and a bare `(u8 *)p + K` passed on take the outermost member there (a `u8 *`
-  destination wants a u8 member, which the warning check enforces).
+* `(void *)` and a bare `(u8 *)p + K` passed on try the outermost member there first; one
+  assigned to a variable (`u8 *x = (u8 *)p + K`) tries a byte member first. A destination of
+  another pointer type rejects the wrong one through the warning check.
 
 Each rewrite stays only when tools/check.py still reports MATCH with no new compiler warning
 (tools/keepcheck.py). Code inside `#ifdef NONMATCHING` is never touched (check.py does not
@@ -65,6 +68,7 @@ INTS = {"u8": (1, False), "s8": (1, True), "u16": (2, False), "s16": (2, True), 
         "s32": (4, True), "vu8": (1, False), "vs8": (1, True), "vu16": (2, False), "vs16": (2, True),
         "vu32": (4, False), "vs32": (4, True), "bool8": (1, False), "bool16": (2, False),
         "bool32": (4, False), "int": (4, True), "unsigned": (4, False), "short": (2, True), "char": (1, False)}
+PAD = re.compile(r"(unknown|unk|pad|reserved|_)[0-9A-Fa-fx_]*$")  # struct_views.is_pad's rule
 SCALARS = set(INTS) | {"void", "u64", "s64", "long", "float", "double", "signed"}
 
 
@@ -181,11 +185,19 @@ def candidates(leaves, off):
             if lf.get("bits") is None and lf["name"] not in seen:
                 seen.add(lf["name"])
                 out.append((lf["name"] + ("[0]" if lf.get("array") else ""), lf))
-        elif lf.get("array") and lf.get("esize") and lf["off"] < off < lf["off"] + lf["size"] \
+        elif lf.get("array") and lf.get("esize", 1) > 1 and lf["off"] < off < lf["off"] + lf["size"] \
                 and (off - lf["off"]) % lf["esize"] == 0 and lf["base"] in ("int", "ptr"):
             out.append((f"{lf['name']}[{(off - lf['off']) // lf['esize']}]", lf))
+    out = [c for c in out if not padded(c[0])]
     out.sort(key=lambda c: len(components(c[0])))
     return out
+
+
+def padded(path):
+    """Whether PATH indexes a padding array (`pad115[267]`, `unknown60[20]`): an offset in disguise.
+    A scalar member named for its offset (`field2E6`) is a real member and counts."""
+    parts = components(path)
+    return any(PAD.match(p) for p, q in zip(parts, parts[1:]) if q.startswith("["))
 
 
 def scalar_ok(ctype, lf):
@@ -282,7 +294,7 @@ def plan(rel, text):
         if not good:
             rows.append(f"{rel}:{line}: {raw} -- no {s.ctype} member of {spell} at {s.off:#x}")
             continue
-        if s.form == "bare":
+        if s.form == "bare" and code[:s.start].rstrip().endswith("="):  # u8 *x = ...: a u8 member first
             good.sort(key=lambda c: not (c[1] and c[1]["base"] == "int" and c[1].get("esize", c[1].get("width")) == 1))
         out.append((s, [spelled(s, p) for p, _ in good], f"{rel}:{line}: {raw}"))
     return out, rows
