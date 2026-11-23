@@ -6,9 +6,8 @@ void RouteSpriteActor_FinishAnimation(struct RouteSpritePool *pool, struct Route
         actor->entered = 0;
     }
     if (RouteSpriteActor_StepPlayback(actor)) {
-        u32 offset = 0x153;
         s8 *indexPointer;
-        indexPointer = (s8 *)((u32)actor + offset);
+        indexPointer = (s8 *)((u32)actor + 0x153);
         pool->occupiedMask &= ~(1 << *indexPointer);
         actor->state = 0;
         if (actor->sprite.unknown4[0])
