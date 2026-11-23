@@ -1,4 +1,4 @@
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 
 /* tentative: state machine on 0xB40 starting armor animation, playing songs by armor type */
 
