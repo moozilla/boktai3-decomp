@@ -129,7 +129,7 @@ void Dog_UpdateTargetGate(struct ChaseActor *p)
     u8 active;
     u32 v;
     u16 *f;
-    context->timer690 = context->limitX;
+    context->actionTimer = context->actionDelay;
     active = SceneActorChase_TrackingFlags(&p->base.tracking, 8);
     if (active) {
         SceneActorChase_GroupSetFlags(&p->group, 4);
@@ -344,7 +344,7 @@ void Dog_ResetActionState(struct ChaseActor *actor)
 {
     struct Dog *context = actor->base.context;
     context->flags = 0;
-    context->timer690 = 0;
+    context->actionTimer = 0;
     context->destinationCell = 0xFFFF;
     context->timer6A4 = 0;
     context->state6A6 = 0;
@@ -649,16 +649,9 @@ void Dog_UpdateActionCooldown(struct ChaseActor *actor)
         *p = *p - 1;
 }
 
-struct SceneActorActionCooldown {
-    u8 unknown0[0x678];
-    u32 flags;
-    u8 unknown67C[0x14];
-    u16 remaining, normalDelay, alternateDelay;
-};
-
 static inline u8 HasPending(void **slot)
 {
-    if (((struct SceneActorActionCooldown *)*slot)->flags & 1)
+    if (((struct Dog *)*slot)->flags & 1)
         return 1;
     return 0;
 }
@@ -669,7 +662,7 @@ static inline void QueueAction(struct ChaseActor *actor)
     {
         u32 *flags;
         s32 mask;
-        struct SceneActorActionCooldown *ctx;
+        struct Dog *ctx;
         ctx = actor->base.context;
         flags = &ctx->flags;
         mask = -2;
@@ -679,7 +672,7 @@ static inline void QueueAction(struct ChaseActor *actor)
 
 void SceneActorControl_TickActionCooldown(struct ChaseActor *actor)
 {
-    struct SceneActorActionCooldown *cooldown = actor->base.context;
+    struct Dog *cooldown = actor->base.context;
     u32 flags;
     if (SceneActor_ActionsBlocked(actor))
         return;
@@ -693,14 +686,14 @@ void SceneActorControl_TickActionCooldown(struct ChaseActor *actor)
         return;
     if (actor->base.controlKind > 1)
         return;
-    if (cooldown->remaining) {
-        cooldown->remaining--;
+    if (cooldown->actionTimer) {
+        cooldown->actionTimer--;
         return;
     }
     if (flags & 0x80)
-        cooldown->remaining = cooldown->alternateDelay;
+        cooldown->actionTimer = cooldown->alternateActionDelay;
     else
-        cooldown->remaining = cooldown->normalDelay;
+        cooldown->actionTimer = cooldown->actionDelay;
     {
         u32 one = 1;
         u32 *p = &cooldown->flags;
@@ -3251,8 +3244,8 @@ s32 Dog_Init(void *object)
     if (Script_SeekToKeyword('Y')) {
         MonsterInit_ReadScriptWord(&dog->rangeSquared, 0);
         dog->rangeSquared *= dog->rangeSquared;
-        dog->limitX = (Script_GetPc() ? Script_GetValue() : 640);
-        dog->limitZ = (Script_GetPc() ? Script_GetValue() : 640);
+        dog->actionDelay = (Script_GetPc() ? Script_GetValue() : 640);
+        dog->alternateActionDelay = (Script_GetPc() ? Script_GetValue() : 640);
     }
     dog->interval = Script_GetKeywordValue('d', 50);
     if (!dog->interval)

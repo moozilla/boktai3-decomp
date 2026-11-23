@@ -13,8 +13,8 @@ struct Dog {
     u32 rangeSquared;
     u32 lastCell;
     u32 currentSpeed;
-    u16 timer690;
-    u16 limitX, limitZ;
+    u16 actionTimer; /* counts down to the next queued action (flag 1) */
+    u16 actionDelay, alternateActionDelay; /* keyword 'Y'; the alternate when motion flag 0x80 */
     u16 actionCooldown; /* Counts down beside the near and far attack timers. */
     u16 nearTimer;
     u16 farTimer;
