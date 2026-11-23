@@ -4,6 +4,9 @@
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_chase_types.h"
 #include "player_cue_sequence.h"
+#include "scene_actor_turn.h"
+#include "scene_actor_status.h"
+#include "scene_actor_chase_shared.h"
 void SceneActorMovement_UpdateAirborne(struct SceneActorMotionView *);
 void SceneActorMovement_UpdateHeight(struct ChaseActor *);
 void Obj_StepPosition(void *);
@@ -12,19 +15,9 @@ s32 RepeatedEffect_RequestNearby(struct RepeatedEffectPosition *);
 void NavMesh_UpdateProbe(void *, void *);
 void sub_0821DE30(void *);
 
-static inline u32 SceneActorMotion_BehaviorBits(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
 static inline u32 SceneActorMotion_TestStatus(u32 *flags, u32 bits)
 {
     return *flags & bits;
-}
-static inline u8 SceneActorMotion_HasBodyFlags(struct ChaseActor *actor, u32 mask)
-{
-    if (actor->base.placementFlags & mask)
-        return 1;
-    return 0;
 }
 static inline void SceneActorMotion_SetFlags(struct ChaseActor *actor, u32 bits)
 {
@@ -76,11 +69,6 @@ static inline void SceneActorMotion_SetPending(u16 *field, u32 bits)
     mask |= *field;
     *field = mask;
 }
-static inline void SceneActorMotion_ClearStatus(u32 *f, u32 bit)
-{
-    u32 mask = ~bit;
-    *f &= mask;
-}
 
 static inline void SceneActorMotion_SetStatus(u32 *f, u32 bit)
 {
@@ -110,7 +98,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         enabledBit = 1;
         *enabled = enabledBit;
     }
-    if (SceneActorMotion_BehaviorBits(actor, 1))
+    if (SceneActorTurn_ActorFlags(actor, 1))
         SceneActorMotion_SetFlags(actor, 0x40);
     if (actor->base.restart != 1) {
         if (!actor->base.drawableKind) {
@@ -134,7 +122,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         u32 *field = &actor->base.behaviorFlags;
         u32 moving = *field & mask;
         behavior = field;
-        if (moving && !SceneActorMotion_HasBodyFlags(actor, 0x20))
+        if (moving && !ActorStatus_BodyFlags(actor, 0x20))
             actor->base.body.movementProbe = (u8 *)actor + 0x40;
         else
             actor->base.body.movementProbe = 0;
@@ -210,7 +198,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
             u32 *status = &actor->base.statusFlags;
             if (SceneActorMotion_TestStatus(status, mask)) {
                 RepeatedEffect_RequestNearby((void *)position);
-                SceneActorMotion_ClearStatus(status, 0x10000);
+                SceneActorChase_ClearWordFlags(status, 0x10000);
             }
         }
     }
