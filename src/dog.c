@@ -2835,16 +2835,11 @@ void SceneActorControl_UpdateEntryRecoveryPhase_080E55AC(struct ChaseActor *acto
         ++actor->base.counter2AC;
 }
 
-extern const u8 gUnk_08606214[];
+extern void *gUnk_08606214[];
 
-struct Sapproach {
-    u8 filler[644];
-    const u8 *p;
-};
-
-void Dog_SetControlPreset(struct Sapproach *s)
+void Dog_SetControlPreset(struct ChaseActor *actor)
 {
-    s->p = gUnk_08606214;
+    actor->base.callbacks284 = gUnk_08606214;
 }
 
 s32 Dog_PrepareFrame(void *p);
@@ -2853,24 +2848,15 @@ void SceneActorControl_DispatchControl(void *);
 
 s32 Dog_FinishFrame(void *p);
 
-struct SUpdate {
-    u8 filler[0x27c];
-    u32 *tbl;
-    u8 filler2[0x2a8 - 0x280];
-    u8 idx;
-    u8 filler3[0x2b8 - 0x2a9];
-    u16 h2b8;
-};
-
-s32 Dog_Update(struct SUpdate *s)
+s32 Dog_Update(struct ChaseActor *actor)
 {
-    struct SUpdate *s2 = s;
-    Dog_PrepareFrame(s);
-    if (s->h2b8 == 0) {
-        Callback_InvokeActor(s, s->tbl[s->idx]);
-        SceneActorControl_DispatchControl(s);
+    struct ChaseActor *self = actor;
+    Dog_PrepareFrame(actor);
+    if (actor->base.hitLockTimer == 0) {
+        Callback_InvokeActor(actor, actor->base.stateCallbacks[actor->base.state2A8]);
+        SceneActorControl_DispatchControl(actor);
     }
-    Dog_FinishFrame(s2);
+    Dog_FinishFrame(self);
     return 1;
 }
 
@@ -2922,7 +2908,7 @@ u32 SceneActorReaction_OnEnemyDefault(void);
 
 void SceneActorReaction_ResolvePlacementDamage(void);
 
-s32 Dog_Update(struct SUpdate *s);
+s32 Dog_Update(struct ChaseActor *actor);
 
 u16 Dog_UpdateItemDrop(struct ChaseActor *actor);
 
@@ -2960,7 +2946,7 @@ void Dog_RestoreRoute(struct ChaseActor *actor);
 
 void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame);
 
-void Dog_SetControlPreset(struct Sapproach *s);
+void Dog_SetControlPreset(struct ChaseActor *actor);
 
 void Dog_SetPrimaryBehaviorPreset(struct ChaseActor *actor);
 
