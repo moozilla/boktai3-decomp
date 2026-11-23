@@ -1324,7 +1324,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     }
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     Chase_SetState_1(actor, 3, 1);
-    Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
+    Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 duration = (((u16)Vorn_GetRandomBits(0xFFFF)) & 15) + 30;
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
