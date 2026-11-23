@@ -84,6 +84,17 @@ struct VanargandPairAttack {
     void *afterimages;
 };
 
+static inline void VanargandPairAttack_SetFlags(struct VanargandPairAttack *owner, u32 flags)
+{
+    owner->flags |= flags;
+}
+
+static inline void VanargandPairAttack_EnterPhase(struct VanargandPairAttack *owner, u32 phase)
+{
+    owner->phase = phase;
+    owner->timer = 0;
+}
+
 static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct VanargandPairAttack *owner)
 {
     return owner->pair;

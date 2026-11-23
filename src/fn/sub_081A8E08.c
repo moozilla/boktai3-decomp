@@ -32,8 +32,7 @@ void Vanargand_UpdateCaptureSetup(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *q = p;
     struct SceneVec position;
-    u32 mask = 4;
-    p->flags |= mask;
+    VanargandPairAttack_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 0);
     if (p->pending) {
         void *animation;
