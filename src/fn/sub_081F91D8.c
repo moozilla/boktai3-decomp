@@ -1,23 +1,15 @@
 #include "global.h"
 #include "ratatosk.h"
-void Ratatosk_UpdateFlagWaitState18(struct Ratatosk *p)
+#include "state_actor_action_entry.h"
+
+void Ratatosk_UpdateFlagWaitState18(struct StateActor *actor)
 {
-    u32 m;
-    u32 t;
-    u8 *q = (u8 *)p;
-    if (Ratatosk_ConsumeActionEntry(p)) {
-        u32 v = 0x12;
-        p->actionAnimation = v;
-    }
-    m = 1;
-    t = p->flags & m;
-    if (t == 0) {
-        *(u32 *)(q + 0xF04) = m;
-        p->actionMode = t;
-        p->actionIndex = t;
-        p->actionPhase = m;
-        p->actionTimer = t;
-        p->actionEnter = m;
+    struct Ratatosk *p = (struct Ratatosk *)actor;
+    if (StateActor_ConsumeActionEntry(actor))
+        SceneActorState_SetAnimation(actor, 0x12);
+    if (!SceneActorState_TestFlags(actor, 1)) {
+        p->interval = 1;
+        SceneActorState_StartAction(actor, 0, 0, 1);
     } else
-        p->actionTimer++;
+        actor->actionTimer++;
 }

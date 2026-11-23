@@ -1,21 +1,16 @@
 #include "global.h"
 #include "ratatosk.h"
+#include "state_actor_action_entry.h"
 
-void Trigger_ConsumePending(void *, u32);
-
-void SceneActor_UpdateState24AndConditionalReturnCommand(struct Ratatosk *p)
+void SceneActor_UpdateState24AndConditionalReturnCommand(struct StateActor *actor)
 {
-    u8 *q = (u8 *)p;
-    if (Ratatosk_ConsumeActionEntry(p)) {
-        u32 v = 0x18;
-        p->actionAnimation = v;
-    }
-    if (p->actionFinished) {
-        if (*(s16 *)(q + 0xE94) == 0) {
-            u32 w = 1;
-            p->actionAnimation = w;
-        }
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    struct Ratatosk *p = (struct Ratatosk *)actor;
+    if (StateActor_ConsumeActionEntry(actor))
+        SceneActorState_SetAnimation(actor, 0x18);
+    if (actor->actionFinished) {
+        if (p->stateParameter == 0)
+            SceneActorState_SetAnimation(actor, 1);
+        Trigger_ConsumePending(actor->receiver2, 1);
     } else
-        p->actionTimer++;
+        actor->actionTimer++;
 }

@@ -148,7 +148,7 @@ struct Ratatosk {
     s16 pattern;
     s16 choice;
     s16 previousOrb;
-    u16 stateParameter; /* 0xE94 */
+    s16 stateParameter; /* 0xE94 */
     s16 healthPhase;    /* 0xE96 */
     u32 lastAttack;
     s16 bodyAttack[3];       /* 0xE9C: attack, damage and kind of the body and outer colliders. */
