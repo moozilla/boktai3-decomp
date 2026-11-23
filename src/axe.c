@@ -37,6 +37,8 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
 #include "scene_actor_turn.h"
+#include "movement_curve.h"
+#include "scene_actor_displacement.h"
 
 struct AxeTrailSprite {
     u32 flags;
@@ -255,18 +257,9 @@ struct AxeFadeSprite {
     u8 field6;
 };
 
-static inline u8 TakeEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame)
 {
-    u8 entered = TakeEntry(actor);
+    u8 entered = SceneActorReaction_TakePrepared(actor);
     struct AxeFadeSprite *sprite = actor->base.drawable;
     s32 previous;
     if (entered)
@@ -771,11 +764,6 @@ void Axe_ClearForcedMovement(struct ChaseActor *s);
 
 void Axe_ResetMovementFlags(struct ChaseActor *actor);
 
-static inline s32 Quarter(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
-
 static inline s32 Clamp(s32 v)
 {
     if (v > 200)
@@ -829,14 +817,14 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
         s16 *field = &actor->base.reactionEnd.x;
         s32 difference = current - *field;
         priorX = field;
-        x = Quarter(difference);
+        x = SceneActorDisplacement_Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
         s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
-        z = Quarter(difference);
+        z = SceneActorDisplacement_Quarter(difference);
     }
     x = Clamp(x);
     z = Clamp(z);
@@ -1248,22 +1236,13 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-static inline u8 TakePending(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 struct AxeFlags16 {
     u16 bits : 16;
 };
 
 void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 {
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
         {
             u32 flag = 0x1800;
@@ -1431,14 +1410,6 @@ static inline s32 Shift10(s32 value)
     return value >= 0 ? value >> 10 : -((-value) >> 10);
 }
 
-static inline void Subtract(struct ContactPosition *out, struct ContactPosition *a,
-                            struct ContactPosition *b)
-{
-    out->x = b->x - a->x;
-    out->y = b->y - a->y;
-    out->z = b->z - a->z;
-}
-
 static inline void Interpolate(struct ContactPosition *out, struct ContactPosition *start,
                                struct ContactPosition *end, s32 initialScale, s32 t, s32 finalScale,
                                s32 speed)
@@ -1446,7 +1417,7 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     struct ContactPosition delta, tangent;
     s32 square, cube, twiceCube, thriceSquare, sway, final;
     s32 scaled, value;
-    Subtract(&delta, start, end);
+    MovementCurve_SubtractPositions(&delta, start, end);
     ZeroFill8(&tangent);
     square = Shift10(t * t);
     cube = Shift10(square * t);
@@ -3302,7 +3273,7 @@ void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame);
 void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
 {
     struct Axe *group = actor->base.context;
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Axe_UpdateFadeOut, 0x22);
         {
             u32 flag = 0x100;
@@ -3367,7 +3338,7 @@ void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed);
 void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
 {
     struct Axe *group = actor->base.context;
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, SceneActorControl_TiltRotation, 0x31);
         {
             u32 flag = 0x100;
@@ -3448,7 +3419,7 @@ void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame);
 void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
 {
     struct Axe *group = actor->base.context;
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Axe_UpdateTrailFadeIn, 0x27);
         {
             u32 flag = 0x100;
@@ -3534,14 +3505,6 @@ struct AxeRoute {
     struct ContactPosition motion;
 };
 
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 static inline u32 RandomFirst(u32 bits)
 {
     u32 index, value;
@@ -3587,7 +3550,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
         SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         Polar(&route->motion,
               Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
                      &actor->base.tracking.heading) &
@@ -3595,7 +3558,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
               32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->base.body.position, &route->points[route->index]);
+    Chase_Delta(&delta, &actor->base.body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->base.body.direction =
@@ -3606,7 +3569,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
         actor->base.body.motion.z += delta.z;
         route->motion = actor->base.body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->base.body.position, &route->points[8]);
+        Chase_Delta(&route->motion, &actor->base.body.position, &route->points[8]);
         route->motion.y = 0;
         actor->base.body.position.x = route->points[8].x;
         actor->base.body.position.z = route->points[8].z;
@@ -3616,7 +3579,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
               512);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         route->speed >>= 1;
         return;
     }
@@ -3648,7 +3611,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
         SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         Polar(&route->motion,
               Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
                      &actor->base.tracking.heading) &
@@ -3656,7 +3619,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
               32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->base.body.position, &route->points[route->index]);
+    Chase_Delta(&delta, &actor->base.body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->base.body.direction =
@@ -3667,7 +3630,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
         actor->base.body.motion.z += delta.z;
         route->motion = actor->base.body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->base.body.position, &route->points[8]);
+        Chase_Delta(&route->motion, &actor->base.body.position, &route->points[8]);
         route->motion.y = 0;
         actor->base.body.position.x = route->points[8].x;
         actor->base.body.position.z = route->points[8].z;
@@ -3677,7 +3640,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
               256);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         return;
     }
     if (Mod(actor->base.counter2AC, 16) == 0 && route->speed <= 17)
