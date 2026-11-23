@@ -6,9 +6,6 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-typedef struct {
-    u32 a, b;
-} Point;
 void SceneActors_UpdateExpandingShake(struct StateActor *p, int time)
 {
     int tick = time;
@@ -27,12 +24,12 @@ void SceneActors_UpdateExpandingShake(struct StateActor *p, int time)
         SceneActors_StartDirectionalAnimation(
             p, &((struct SceneGraphicsActor *)p)->animation,
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 1, 4);
-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+        p->targetPosition = *(struct StateActorPos *)(position + 12);
     }
     SceneGraphicsActor_ClearPendingDamage((struct SceneGraphicsActor *)p2);
     SceneActorState_SetFlags(p, 0x1000c);
     if (!p->actionReset(p)) {
-        *(Point *)(position + 12) = *(Point *)((u8 *)p + 0xd0);
+        *(struct StateActorPos *)(position + 12) = p->targetPosition;
         {
             int dir = tick & 3;
             struct ContactPosition *velocity = (struct ContactPosition *)(position + 20);

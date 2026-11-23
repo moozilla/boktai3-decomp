@@ -2,9 +2,6 @@
 #include "scene_graphics_actor.h"
 
 u8 Sprite_BlinkUntilExpired(int *, int, int, int);
-typedef struct {
-    u32 a, b;
-} Point;
 void SceneActors_UpdateBlinkReaction(struct StateActor *p, int tick)
 {
     struct StateActor *p2 = p;
@@ -23,7 +20,7 @@ void SceneActors_UpdateBlinkReaction(struct StateActor *p, int tick)
         SceneActors_StartUnmirroredAnimation(
             p, &((struct SceneGraphicsActor *)p)->animation,
             (int)&((struct SceneGraphicsActor *)p)->animationResource, sequence, 1, 4);
-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+        p->targetPosition = *(struct StateActorPos *)(position + 12);
     }
     done = 0;
     if (Sprite_BlinkUntilExpired(&done, tick, 10, 30)) {
