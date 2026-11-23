@@ -341,25 +341,37 @@ exports.interact = function* (x, z, opts = {}) {
   exports.message();
   const grid = exports.grid(), p = $.gPlayers[0];
   if (!grid || !p) return { done: false, reason: 'no field' };
-  const [tx, tz] = exports.cellOf(x, z), here = exports.cellOf(p.position.x, p.position.z);
-  const goals = new Set();
-  for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1]]) { const c = grid.at(tx + dx, tz + dz); if (c && c.open) goals.add(`${tx + dx},${tz + dz}`); }
-  // across a counter: two cells away in a straight line, the cell between blocked
-  if (opts.across !== false) for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1]]) {
-    const mid = grid.at(tx + dx, tz + dz), c = grid.at(tx + 2 * dx, tz + 2 * dz);
-    if (mid && !mid.open && c && c.open) goals.add(`${tx + 2 * dx},${tz + 2 * dz}`);
+  const [tx, tz] = exports.cellOf(x, z);
+  // next to it first; then across a counter (two cells away in a straight line, the cell
+  // between blocked: a shopkeeper behind the counter)
+  const near = new Set(), across = new Set();
+  for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1]]) {
+    const c = grid.at(tx + dx, tz + dz), mid = c, far = grid.at(tx + 2 * dx, tz + 2 * dz);
+    if (c && c.open) near.add(`${tx + dx},${tz + dz}`);
+    else if (opts.across !== false && mid && far && far.open) across.add(`${tx + 2 * dx},${tz + 2 * dz}`);
   }
-  const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals);
-  if (!path) return { done: false, reason: 'no path' };
-  const [sx, sz] = path[path.length - 1];
-  const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], opts);
-  if (!r.reached) return { done: false, reason: 'could not get there: ' + r.reason };
-  yield* exports.walkTo(x, z, { tolerance: 8, patience: 20, frames: 60 });  // face it
-  const seen = new Map();
-  yield g.tap('a');
-  yield g.until(() => exports.message().open, 90);
-  const any = yield* exports.clearInterruptions({ ...opts, seen });
-  return { done: any, lines: [...seen.keys()] };
+  let last = { done: false, reason: 'no path' };
+  for (const goals of [near, across]) {
+    const tried = new Set();
+    for (let attempt = 0; attempt < 2 && goals.size > tried.size; attempt++) {
+      const here = exports.cellOf(p.position.x, p.position.z);
+      const left = new Set([...goals].filter((k) => !tried.has(k)));
+      const path = left.has(here.join(',')) ? [here] : exports.findPath(grid, here, left);
+      if (!path) break;
+      const [sx, sz] = path[path.length - 1];
+      tried.add(`${sx},${sz}`);
+      const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], opts);
+      if (!r.reached) { last = { done: false, reason: 'could not get there: ' + r.reason }; continue; }
+      yield* exports.walkTo(x, z, { tolerance: 8, patience: 20, frames: 60 });  // face it
+      const seen = new Map();
+      yield g.tap('a');
+      yield g.until(() => exports.message().open, 90);
+      const any = yield* exports.clearInterruptions({ ...opts, seen });
+      last = { done: any, lines: [...seen.keys()] };
+      if (any) return last;
+    }
+  }
+  return last;
 };
 
 // The player's bags (docs/ASSETS.md, Items): items GameState+0xA0 (u16 per slot),

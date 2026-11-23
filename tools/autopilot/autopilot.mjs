@@ -39,6 +39,7 @@ const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
+const VISITS = new Map();  // room visits this run: least visited doors first
 const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
 const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
 const event = (what) => {
@@ -136,15 +137,16 @@ const GOALS = {
           : (stageOf(here).talk || []).filter((t) => t.kind === 'character').map((t) => ({ key: String(t.id), x: t.x, z: t.z }));
         // twice each (a second talk can say more: San Miguel's flag r708[0x19c.4][6] is set
         // on the second talk in 2370), again when the story counter moved
-        const tkey = (t, n) => `${here}:talk:${t.key}:${L.story()}:${n}`;
-        for (const t of targets.filter((t) => !TRIED.has(tkey(t, 2)))) {
-          TRIED.add(TRIED.has(tkey(t, 1)) ? tkey(t, 2) : tkey(t, 1));
+        const tkey = (t) => `${here}:talk:${t.key}:${L.story()}`;
+        for (const t0 of targets.filter((t) => !TRIED.has(tkey(t)))) for (let round = 0; round < 2; round++) {
+          const t = t0;
+          if (round === 0) TRIED.add(tkey(t));
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
           // a shop or service menu the talk opened: back out of it
           for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
-          event({ skill: 'talk', id: t.key, x: t.x, z: t.z, done: r.done, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
-          if (L.where().scene !== here) break;
+          event({ skill: 'talk', id: t.key, round, x: t.x, z: t.z, done: r.done, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0, facilities: L.facilities() });
+          if (L.where().scene !== here || !r.done) break;
         }
       }
       // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
@@ -161,8 +163,9 @@ const GOALS = {
       // over the door graph (stages.json); then unvisited scenes
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
       const dist = routeDistances(+opt('--goal', -1));
+      VISITS.set(here, (VISITS.get(here) || 0) + 1);
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
-        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene));
+        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || (VISITS.get(a.scene) || 0) - (VISITS.get(b.scene) || 0));
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.hub !== undefined ? 'hub' + d.hub : d.box}->${d.scene}`) });
       let moved = false;
       // a room can still be playing its arrival event (a dialogue that starts late, the
