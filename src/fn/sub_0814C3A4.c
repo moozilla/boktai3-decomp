@@ -3,6 +3,8 @@
 #include "engine_globals.h"
 #include "player.h"
 #include "scene_object.h"
+#include "player_status_flags.h"
+#include "player_slot_status.h"
 
 struct PlayerGrabHalf {
     u16 value : 16;
@@ -154,14 +156,6 @@ static inline void PlayerGrab_ClearAnimation(struct SceneInputWidget *animation)
     animation->flags &= ~1;
 }
 
-static inline void PlayerGrab_SetFlags(struct Player *p, u32 flags)
-{
-    p->statusFlags |= flags;
-}
-static inline void PlayerGrab_SetModeFlags(struct Player *p, u32 mask)
-{
-    p->statusFlags = (p->statusFlags & mask) | 0x60000;
-}
 static inline u32 PlayerGrab_Mask(u32 value, u32 mask)
 {
     mask &= value;
@@ -201,7 +195,7 @@ void Player_UpdateGrabMotion(struct Player *p)
         Player_NotifyActionCategories(p);
     }
     Player_AddControlFlags(p, 9);
-    PlayerGrab_SetModeFlags(p, ~0x4000);
+    p->statusFlags = Player_ReadStatusBits(&p->statusFlags, ~0x4000) | 0x60000;
     switch (p->tetherPhase) {
         case 0: {
             u16 v = p->tetherFrame;
@@ -217,7 +211,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             PlayerGrab_CopyPosition(p);
             (*(struct PlayerGrabTarget **)&gPlayerPendingActor) = sub_0814C248(p);
             if ((*(struct PlayerGrabTarget **)&gPlayerPendingActor) == 0) {
-                PlayerGrab_SetFlags(p, 0x4000);
+                Player_AddStatusFlags(p, 0x4000);
             } else {
                 Player_SetActionPhase(p, 1);
                 Sound_PlaySong(0x53C);
@@ -449,7 +443,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             if (p->tetherFrame > 0x1F)
                 ActorSequence_Begin(p, 0, 0);
             PlayerGrab_CopyPosition(p);
-            PlayerGrab_SetFlags(p, 0x4000);
+            Player_AddStatusFlags(p, 0x4000);
             return;
         case 6: {
             s32 angle;

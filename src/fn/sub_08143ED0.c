@@ -2,6 +2,7 @@
 #include "player.h"
 #include "game_state.h"
 #include "player_slot_status.h"
+#include "game_state_flags.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
 struct PlayerMovementCueFields {
@@ -60,16 +61,6 @@ static inline u32 FlagMovement(struct PlayerRef ref)
     if (!p)
         return 0;
     return Player_ReadStatusBits(&p->actionFlags, 0x20000);
-}
-static inline u32 GlobalMask(u32 mask)
-{
-    return gGameState->flags868 & mask;
-}
-static inline u8 HasGlobalFlag(void)
-{
-    if (GlobalMask(1))
-        return 1;
-    return 0;
 }
 void Player_UpdateTetherMovement(struct Player *p)
 {
@@ -158,7 +149,7 @@ void Player_UpdateTetherMovement(struct Player *p)
                 else
                     Sound_PlaySong(0x28D);
             }
-            if (HasGlobalFlag())
+            if (GameState_TestWorldFlags(1))
                 Player_PlayPositionEffect(p, &p->position, 1, 2, 0, 0, 0);
         }
     }

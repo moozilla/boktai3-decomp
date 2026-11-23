@@ -3,6 +3,7 @@
 #include "global.h"
 
 #include "player_status_flags.h"
+#include "player_slot_status.h"
 
 #include "scene_vec.h"
 
@@ -2786,11 +2787,6 @@ static inline void ClearAnimationFlags(struct SceneInputWidget *animation, u32 m
     animation->flags = flags;
 }
 
-static inline u32 ClearStatusFlags(u32 *flags, u32 clear)
-{
-    return *flags & ~clear;
-}
-
 static inline u32 TargetDash_ReadParticleRandom(void)
 {
     return ParticleRandom_ReadDirectSample(gRandomTable);
@@ -2904,7 +2900,7 @@ void PlayerCue_UpdateTargetDash(struct Player *player)
     player->secondaryAnimation.paletteBank = player->animation.paletteBank;
     player->secondaryAnimation.palette = player->animation.palette;
     Player_AddControlFlags(player, 9);
-    player->statusFlags = ClearStatusFlags(&player->statusFlags, 0x4000) | 0x60000;
+    player->statusFlags = Player_ReadStatusBits(&player->statusFlags, ~0x4000) | 0x60000;
 
     switch (player->tetherPhase) {
         case 0: {

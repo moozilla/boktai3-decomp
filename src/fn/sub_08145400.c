@@ -1,5 +1,6 @@
 #include "global.h"
 #include "player.h"
+#include "player_status_flags.h"
 
 #define Player_ConsumePhaseEntry     Player_ConsumeStateEntry
 #define Player_SetSequenceCallback   Player_SetPendingCallback
@@ -10,10 +11,6 @@ void Player_OnFadeMotionExit(struct Player *);
 void Player_AddControlFlags(struct Player *, s32);
 void Player_SetActionPhase(struct Player *, u8);
 void ActorSequence_Begin(struct Player *, s32, s32);
-static inline void SetStatusFlags(struct Player *p, u32 mask)
-{
-    p->statusFlags |= mask;
-}
 void Player_UpdateScaleTransition(struct Player *p)
 {
     struct SceneInputWidget *animation;
@@ -21,7 +18,7 @@ void Player_UpdateScaleTransition(struct Player *p)
         Player_SetPendingCallback(p, Player_OnFadeMotionExit);
     animation = &p->animation;
     animation->flags |= 2;
-    SetStatusFlags(p, 0x40000);
+    Player_AddStatusFlags(p, 0x40000);
     p->statusFlags |= 0x1100;
     Player_AddControlFlags(p, 28);
     switch (p->tetherPhase) {

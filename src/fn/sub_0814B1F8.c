@@ -7,6 +7,8 @@
 #include "heap.h"
 #include "resource_registry.h"
 #include "monster_particle_random.h"
+#include "player_status_flags.h"
+#include "player_slot_status.h"
 
 /* Additional fields used by the detached target-motion action (tentative names). */
 struct PlayerTargetMotionView {
@@ -171,11 +173,6 @@ static inline u32 PlayerMotion_ReadRandomSample(void)
     return *(const u16 *)(RANDOM_TABLE_ADDR + index * 2);
 }
 
-static inline void PlayerMotion_SetModeFlags(struct Player *p, u32 mask)
-{
-    p->statusFlags = (p->statusFlags & mask) | 0x60000;
-}
-
 union PlayerMotionPosition {
     struct ContactPosition value;
     s16 coordinates[3];
@@ -183,11 +180,6 @@ union PlayerMotionPosition {
 struct PlayerMotionCounter {
     u16 value : 16;
 };
-
-static inline void PlayerMotion_SetFlags(struct Player *p, u32 flags)
-{
-    p->statusFlags |= flags;
-}
 
 static inline s32 PlayerMotion_OrbitAngle(u8 direction)
 {
@@ -219,7 +211,7 @@ void Player_UpdateTargetMotion(struct Player *p)
     p->secondaryAnimation.paletteBank = p->animation.paletteBank;
     p->secondaryAnimation.palette = p->animation.palette;
     Player_AddControlFlags(p, 9);
-    PlayerMotion_SetModeFlags(p, ~0x4000);
+    p->statusFlags = Player_ReadStatusBits(&p->statusFlags, ~0x4000) | 0x60000;
 
     switch (p->tetherPhase) {
         case 0: {
@@ -505,7 +497,7 @@ void Player_UpdateTargetMotion(struct Player *p)
             if (p->tetherFrame > 0x1F)
                 ActorSequence_Begin(p, 0, 0);
             p->secondaryAnimation.position = *(struct ContactPosition *)&p->position;
-            PlayerMotion_SetFlags(p, 0x4000);
+            Player_AddStatusFlags(p, 0x4000);
             break;
         }
         case 6: {
