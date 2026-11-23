@@ -1,3 +1,4 @@
+#include "terrain_sampling.h"
 #define Path_SelectPoint                    sub_0821F0C4
 #define Path_GetPointNodeIdById             sub_0821E840
 #define Path_GetPointFacingById             sub_0821E820
@@ -364,25 +365,9 @@ s32 Path_SnapToFarthestPoint(struct Pos16 *out, struct Pos16 *ref, u32 pathId, s
     return best;
 }
 
-static inline s32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
-static inline u8 *CellData(s32 i)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(i, 1);
-    if (p)
-        return (u8 *)&((struct TerrainCellOverride *)p)->cell;
-    return (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[i];
-}
-
 static inline s32 Height(struct ContactPosition *p)
 {
-    u8 *data = CellData(CellIndex(p));
+    u8 *data = cellProps(Terrain_GetCellIndex(p));
     s32 shape = *data >> 4, h = (*data & 15) << 8;
     switch (shape) {
         case 1:
