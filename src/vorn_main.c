@@ -1324,7 +1324,7 @@ void Vorn_TryUphillRoute(struct ChaseActor *actor)
     }
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     Chase_SetState_1(actor, 3, 1);
-    Chase_SetCtl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 duration = (((u16)Vorn_GetRandomBits(0xFFFF)) & 15) + 30;
         struct SceneActorReactionCommand *command = (void *)(group + 0x8C);
@@ -2315,10 +2315,6 @@ static inline s32 RandomByte(void)
     return *(const u8 *)(gRandomTable + gRandomIndex);
 }
 
-static inline void Clear(u32 *p, u32 mask)
-{
-    *p &= ~mask;
-}
 
 inline static s32 RandomByte_TrySoloAction(void)
 {
@@ -2606,22 +2602,6 @@ done:
 }
 
 
-static inline void Vorn_SetControl(struct Vorn *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->chase.base.field2B2 = 1;
-    actor->chase.base.stepDone = 0;
-    actor->chase.base.controlKind = kind;
-    actor->chase.base.target = callback;
-    actor->chase.base.field2C8 = 0;
-    {
-        u32 *field = &actor->chase.base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->chase.base.pendingControl = 0;
-}
 
 /* Restores the saved route after a context response; interpretation is tentative. */
 
@@ -2698,7 +2678,7 @@ static inline void Vorn_Resume(struct Vorn *input, struct SceneActorChaseGroup *
     actor->chase.group.turn.turnsRemaining = 255;
     SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, 0x19);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-    Vorn_SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u8 k1 = 3;
         actor->chase.base.state2A8 = k1;
