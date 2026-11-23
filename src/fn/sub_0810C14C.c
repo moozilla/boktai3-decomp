@@ -1,13 +1,10 @@
 #include "global.h"
+#include "link_panel.h"
 
-void RegistryF246_HideAnimations(u8 *p)
+void RegistryF246_HideAnimations(struct LinkPanel *panel)
 {
-    u32 flag = 1;
-    u8 *q = p + 0x28;
     s32 i;
 
-    for (i = 6; i >= 0; i--) {
-        *(u32 *)q |= flag;
-        q += 0x60;
-    }
+    for (i = 0; i < 7; i++)
+        panel->animations[i].flags |= 1;
 }
