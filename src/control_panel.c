@@ -166,11 +166,9 @@ void ControlPanel_ApplyMultiplierMode(struct ControlPanel *panel)
     s32 mode = panel->multiplier;
 
     if (mode == 1) {
-        u16 v = 0x30;
-        s32 i = 5;
-        do {
-            panel->markers[i].position.y = v;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 6; i++)
+            panel->markers[i].position.y = 0x30;
         panel->multiplierTimer = 4;
         return;
     }
@@ -516,37 +514,16 @@ u32 ControlPanel_OnTaskUpdate(struct ControlPanel *panel)
 s32 ControlPanel_Destroy(struct ControlPanel *panel)
 {
     s32 i;
-    struct SceneInputWidget *anim;
-    struct ContactSwarmSprite *segments;
-    struct ContactSwarmSprite *markers;
     Sprite_Remove(&panel->display[0].sprite);
     Sprite_Remove(&panel->display[1].sprite);
     Sprite_Remove(&panel->thirdSprite);
-    anim = panel->widgets;
-    i = 4;
-    do {
-        Anim_Remove(anim);
-        anim++;
-        i--;
-    } while (i >= 0);
-    segments = panel->segments;
-    i = 6;
-    do {
-        Sprite_Remove(segments);
-        segments++;
-        i--;
-    } while (i >= 0);
-    markers = panel->markers;
-    i = 5;
-    do {
-        Sprite_Remove(markers);
-        markers++;
-        i--;
-    } while (i >= 0);
-    {
-        u32 zero = 0;
-        gSegmentDisplay = zero;
-    }
+    for (i = 0; i < 5; i++)
+        Anim_Remove(&panel->widgets[i]);
+    for (i = 0; i < 7; i++)
+        Sprite_Remove(&panel->segments[i]);
+    for (i = 0; i < 6; i++)
+        Sprite_Remove(&panel->markers[i]);
+    gSegmentDisplay = 0;
     Sound_StopSong(0x23e);
     return 0;
 }
