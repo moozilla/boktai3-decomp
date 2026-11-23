@@ -131,23 +131,15 @@ void ControlPanel_ShowRewardBalanceDigits(struct ControlPanel *panel)
 void ControlPanel_ShowValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = ~1;
-    u32 *flags = &panel->widgets[0].flags;
-    for (i = 4; i >= 0; i--) {
-        *flags &= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
+    for (i = 0; i < 5; i++)
+        panel->widgets[i].flags &= ~1;
 }
 
 void ControlPanel_HideValueDisplay(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    u32 *flags = &panel->widgets[0].flags;
-    for (i = 4; i >= 0; i--) {
-        *flags |= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
+    for (i = 0; i < 5; i++)
+        panel->widgets[i].flags |= 1;
 }
 
 void ControlPanel_UpdateSustainedInputTimer(struct ControlPanel *panel)
@@ -240,12 +232,8 @@ void ControlPanel_TickMultiplierTimer(struct ControlPanel *panel)
 void ControlPanel_HideMultiplierSprites(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    struct ContactSwarmSprite *e = panel->markers;
-    for (i = 5; i >= 0; i--) {
-        e->flags |= m;
-        e++;
-    }
+    for (i = 0; i < 6; i++)
+        panel->markers[i].flags |= 1;
 }
 
 static inline void ControlPanel_SetSegmentFrame(struct ContactSwarmSprite *sprite, u16 frame)
@@ -277,23 +265,15 @@ void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
 void ControlPanel_ShowInputGauge(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = ~1;
-    struct ContactSwarmSprite *e = panel->segments;
-    for (i = 6; i >= 0; i--) {
-        e->flags &= m;
-        e++;
-    }
+    for (i = 0; i < 7; i++)
+        panel->segments[i].flags &= ~1;
 }
 
 void ControlPanel_HideInputGauge(struct ControlPanel *panel)
 {
     s32 i;
-    u32 m = 1;
-    struct ContactSwarmSprite *e = panel->segments;
-    for (i = 6; i >= 0; i--) {
-        e->flags |= m;
-        e++;
-    }
+    for (i = 0; i < 7; i++)
+        panel->segments[i].flags |= 1;
 }
 
 void ControlPanel_ShowInteractionDisplay(struct ControlPanel *panel)
