@@ -26,7 +26,6 @@ s32 ScaledShadowManager_RemoveShadow(struct ScaledShadowManager *manager,
 {
     struct ScaledShadow *previous = shadow->previous;
     struct ScaledShadow *next = shadow->next;
-    s32 result;
     if (shadow->active == 0) {
         return -1;
     }
@@ -38,9 +37,8 @@ s32 ScaledShadowManager_RemoveShadow(struct ScaledShadowManager *manager,
     if (next) {
         next->previous = previous;
     }
-    result = 0;
-    shadow->active = result;
-    return result;
+    shadow->active = 0;
+    return 0;
 }
 
 void ScaledShadow_Enable(struct ScaledShadow *shadow)
