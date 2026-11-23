@@ -1231,34 +1231,24 @@ void SceneActorReaction_AwaitTargetControl(struct ChaseActor *actor)
     }
 }
 
-struct AdjacentWaitContext {
-    u8 pad[0x634];
-    s16 missed, limit;
-};
-
-struct AdjacentWaitTarget {
-    u8 pad[0xC];
-    struct ContactPosition position;
-};
-
 s32 Math_Atan2(s32, s32);
 
 void SceneActorReaction_WaitForAdjacentTarget(struct ChaseActor *a)
 {
-    struct AdjacentWaitContext *ctx = a->base.context;
-    struct AdjacentWaitTarget *target = (void *)a->base.tracking.target;
+    struct Octopus *ctx = a->base.context;
+    struct SceneActorBody *target = (void *)a->base.tracking.target;
     s32 found;
     if (SceneActorControl_TakeFlag(&a->base.field2B1))
-        ctx->missed = 0;
+        ctx->targetMissFrames = 0;
     found = SceneActorReaction_FindAdjacentTarget(a, 1);
     if (!found) {
-        if (ctx->missed > ctx->limit)
+        if (ctx->targetMissFrames > ctx->targetMissLimit)
             ResetState(a, found);
         else
-            ctx->missed++;
+            ctx->targetMissFrames++;
     } else
-        ctx->missed = 0;
-    if ((s32)a->base.counter2AC > 30 && ctx->missed == 0) {
+        ctx->targetMissFrames = 0;
+    if ((s32)a->base.counter2AC > 30 && ctx->targetMissFrames == 0) {
         struct ContactPosition *position = &a->base.body.position;
         a->base.body.direction =
             Math_Atan2(target->position.x - position->x, target->position.z - position->z);
@@ -1485,17 +1475,6 @@ void Octopus_InitProfileId(struct SInitProfileId *s)
 
 /* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
 
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[4];
-    u16 field634;
-};
-
-struct IvyPlacement {
-    u32 xy, z;
-};
-
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
  * display sequence. */
@@ -1503,18 +1482,17 @@ struct IvyPlacement {
 void SceneActorControl_UpdateMotionPhase_080EBD0C(struct ChaseActor *actor)
 {
     {
-        struct IvyContext *context = actor->base.context;
-        context->flags = 0;
-        context->field634 = 0;
+        struct Octopus *context = actor->base.context;
+        context->captureFlags = 0;
+        context->targetMissFrames = 0;
     }
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;
     if (!actor->base.drawableKind)
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x1C) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        ((struct DisplaySequenceSprite *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x40) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = actor->base.body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
         struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
@@ -2094,7 +2072,7 @@ s32 Octopus_Init(void *object)
     }
     OctopusInit_InitializeBody(actor, &zero);
     if (Script_SeekToKeyword('P')) {
-        ((struct Octopus *)arg0)->field636 = MonsterInit_ReadHalfword(0);
+        ((struct Octopus *)arg0)->targetMissLimit = MonsterInit_ReadHalfword(0);
         ((struct Octopus *)arg0)->interval = MonsterInit_ReadByte(0);
         ((struct Octopus *)arg0)->holdTicks = MonsterInit_ReadByte(0);
     }
