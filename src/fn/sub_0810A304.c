@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link_selection_mode.h"
 #include "area_effect_link.h"
 u8 Registry1745_ConsumeStateEntry(void *);
 void Registry1745_ClearParticipantCounters(void *);
@@ -11,12 +12,6 @@ u8 ByteSequence_AdvanceEncodedValue(void *, void *, s32);
 u8 LinkSession_ReceiveSelectionByte(void *, void *, s32, s32);
 void ScriptPanel_OpenTextWindow(void);
 void SessionMenu_WaitForSelection(void);
-static inline u8 IsSelectionReady(u32 value, u32 mask)
-{
-    if ((value & mask) == 0x1800)
-        return 1;
-    return 0;
-}
 s32 sub_0810A304(struct AreaEffectLinkState *p)
 {
     u8 *session = p->sessionData;
@@ -31,7 +26,7 @@ s32 sub_0810A304(struct AreaEffectLinkState *p)
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    if (IsSelectionReady(*p->selection, 0x3c00)) {
+    if (LinkSelection_IsSelected(*p->selection, 0x3c00)) {
         Registry1745_SetState(p, 6, SessionMenu_WaitForSelection);
         return 0;
     }

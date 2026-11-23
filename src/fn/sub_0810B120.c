@@ -1,4 +1,5 @@
 #define gLinkMenuFlags gEnginePauseFlags
+#include "link_selection_mode.h"
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
@@ -19,12 +20,6 @@ static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
     if (i < 0)
         return -1;
     return p->selection[i];
-}
-static inline u8 IsReadySlot(u32 value, u32 mask)
-{
-    if ((value & mask) == 0x1000)
-        return 1;
-    return 0;
 }
 /* The waiting path preserves r0 from the validity check; no explicit return in the original. */
 s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
@@ -56,16 +51,10 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
         return -1;
     }
     count = 0;
-    i = 0;
-    length = p->participantCount;
-    if (i < length) {
-        u32 mask = 0x3c00;
-        do {
-            u16 slot = GetSlot(p, i);
-            if (IsReadySlot(slot, mask) && (slot & 0x3f) == 0)
-                count++;
-            i++;
-        } while (i < length);
+    for (i = 0, length = p->participantCount; i < length; i++) {
+        u16 slot = GetSlot(p, i);
+        if (LinkSelection_IsReady(slot, 0x3c00) && (slot & 0x3f) == 0)
+            count++;
     }
     if (count == length) {
         Registry1745_SetState(p, 20, LinkSelection_WaitForParticipantChoices);

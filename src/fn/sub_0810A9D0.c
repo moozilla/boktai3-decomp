@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link_selection_mode.h"
 #include "area_effect_link.h"
 #include "ram.h"
 
@@ -19,12 +20,6 @@ static inline u16 GetSlot(struct AreaEffectLinkState *p, s32 i)
         return -1;
     return p->selection[i];
 }
-static inline u8 IsItemSlot(u32 value, u32 mask)
-{
-    if ((value & mask) == 0x1000)
-        return 1;
-    return 0;
-}
 s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
 {
     u8 *extra = p->sessionData;
@@ -44,7 +39,7 @@ s32 LinkSelection_WaitForEmptySlots(struct AreaEffectLinkState *p)
     length = p->participantCount;
     while (i < length) {
         u16 slot = GetSlot(p, i);
-        if (IsItemSlot(slot, 0x3c00) && (slot & 0xff) == 0x23)
+        if (LinkSelection_IsReady(slot, 0x3c00) && (slot & 0xff) == 0x23)
             count++;
         i++;
     }
