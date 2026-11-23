@@ -611,11 +611,11 @@ void f(struct P *p) {
         self.assertEqual(self.found({"include/word_flags.h": self.HEADER,
                                      "src/a.c": "static inline u32 WordFlags_Test(const u32 *flags, u32 mask);\n"}), {})
 
-    def test_a_longer_body_is_quiet(self):
+    def test_a_longer_body_that_calls_something_is_quiet(self):
         longer = """static inline u32 Test(struct P *p, u32 mask)
 {
     u32 *flags = &p->flags;
-    u32 value = *flags;
+    u32 value = Read(flags);
     return value & mask;
 }
 void f(struct P *p) {
@@ -623,8 +623,32 @@ void f(struct P *p) {
 }
 """
         self.assertEqual(self.found({"src/a.c": longer}), {})
-        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = *flags;\n", "").replace("value", "*flags")}),
+        self.assertEqual(self.found({"src/a.c": longer.replace("    u32 value = Read(flags);\n", "").replace("value", "*flags")}),
                          {"src/a.c": [(1, "literal-param")]})
+
+    def test_a_longer_body_that_only_moves_bits_counts(self):
+        # out-parameter mask helpers: the field's address goes back to the caller beside the bits
+        out = """static inline u16 ReadFlags(struct P *p, u16 mask, u16 **field)
+{
+    u16 *flags = &p->flags;
+    u16 value = *flags & mask;
+    *field = flags;
+    return value;
+}
+static inline u8 HasFlags(struct P *p, u32 mask)
+{
+    u8 found = 0;
+    if (p->flags & mask)
+        found = 1;
+    return found;
+}
+void f(struct P *p) {
+    u16 *field;
+    ReadFlags(p, 8, &field);
+    HasFlags(p, 0x40);
+}
+"""
+        self.assertEqual(self.found({"src/a.c": out}), {"src/a.c": [(1, "literal-param"), (8, "literal-param")]})
 
     def test_other_uses_of_the_parameter_are_quiet(self):
         for body in ("return *flags + mask;", "return flags[mask];", "return *flags == mask;",

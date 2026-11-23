@@ -74,7 +74,8 @@ its spelling, so each one is a question, not a verdict:
   covers objects and `&x` casts). A global an interrupt writes is volatile in its header instead.
 * `local-union`: a union defined inside a function (not a union member of a file-scope struct).
   Two views of one value are ordinary C; two unrelated values sharing storage are not.
-* `literal-param`: a `static inline` of at most two statements with an integer parameter that
+* `literal-param`: a `static inline` of at most two statements, or of any length when it calls
+  nothing (`u32 v = *p & mask; *out = p; return v;`), with an integer parameter that
   is only an operand of bitwise operations (`&`, `|`, `^`, `~`, shifts and their compound
   assignments, as in `*flags & mask` or `*flags |= mask`) and that gets a literal or an ALL_CAPS
   constant at every call in the tree (`WordFlags_Test(&p->flags, 1)`). To the compiler the
@@ -611,8 +612,8 @@ def _inline_definitions(code: str):
         stop = _scope_end(code, m.end())
         body = _SCALAR_CAST.sub("", _QUOTED.sub(_blank, code[m.end():stop]))
         body = _MEMBER_ACCESS.sub(lambda access: "@" * len(access[0]), body)  # p->mask is not the parameter mask
-        if body.count(";") > 2:
-            continue
+        if body.count(";") > 2 and any(word not in _NOT_CALLS for word in _CALLED.findall(body)):
+            continue  # a longer helper that does more than move bits (it calls something)
         params = {}
         for index, param in enumerate(m["params"].split(",")):
             scalar = _SCALAR_PARAM.fullmatch(param)
@@ -646,6 +647,7 @@ def _arguments(code: str, start: int):
 
 
 _CALLED = re.compile(r"\b([A-Za-z_]\w*)\s*\(")
+_NOT_CALLS = frozenset(("if", "while", "for", "switch", "return", "sizeof"))
 
 
 def _file_calls(text: str, names, called=None):
