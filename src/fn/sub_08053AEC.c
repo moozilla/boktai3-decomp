@@ -14,8 +14,6 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     u8 *primaryPriority;
     struct ContactSwarmGraphics *graphics;
     struct ContactSwarmSprite *secondary;
-    u32 frame;
-    u32 priority;
     u16 *paletteBase;
     u32 keyword;
     s32 i;
@@ -118,22 +116,20 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     *paletteBase = 0xA9;
     AnimData_Load(graphics, 0xBA8);
     Sprite_Init(primary, graphics, 0);
-    frame = 7;
     {
         struct ContactSwarmSprite *write = primary;
-        write->frame = frame;
+        write->frame = 7;
     }
     AnimData_SelectPaletteBank(graphics, *paletteBase);
     marker->primary.sprite.flags |= 0x200;
-    priority = 3;
     {
         u8 *write = primaryPriority;
-        *write = priority;
+        *write = 3;
     }
     *primaryPosition = *position;
     AnimData_Load(secondaryGraphics, 0xBA8);
     Sprite_Init(secondary, secondaryGraphics, 0);
-    secondary->frame = frame;
+    secondary->frame = 7;
     {
         u32 tile = *paletteBase;
         AnimData_SelectPaletteBank(secondaryGraphics, tile);
@@ -149,7 +145,7 @@ s32 InteractionMarker_InitializeFromScript(struct InteractionMarker *marker, u32
     }
     {
         u8 *write = secondaryPriority;
-        *write = priority;
+        *write = 3;
     }
     *secondaryPosition = *position;
     InteractionMarker_SetState(marker, InteractionMarker_TickIdle);
