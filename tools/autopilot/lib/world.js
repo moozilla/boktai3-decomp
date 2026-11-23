@@ -70,7 +70,11 @@ exports.findPath = (grid, start, goals, blocked = new Set(), loose = false) => {
   const open = (x, z) => { const c = grid.at(x, z); return c && c.open && !blocked.has(key(x, z)); };
   // a step between cells: the same level, or through a slope at most one level apart
   // (the player cannot walk off an edge: the game stops it there, measured in 2776)
-  const step = (a, b) => a.level === b.level || ((a.slope || b.slope) && Math.abs(a.level - b.level) <= 1);
+  // a slope only connects along its axis: kind 1 runs along z, kind 2 along x (2993's
+  // stair (2,4)-(2,6) is kind 1; 2724's ramp (5,5)-(7,5) kind 2); off its side is a drop
+  const along = (c, dx, dz) => !c.slope || (c.kind === 1 ? dx === 0 : c.kind === 2 ? dz === 0 : true);
+  const step = (a, b, dx = 0, dz = 0) => a.level === b.level ||
+    ((a.slope || b.slope) && Math.abs(a.level - b.level) <= 1 && along(a, dx, dz) && along(b, dx, dz));
   const gx = [...goals].map((k) => k.split(',').map(Number));
   const hfn = (x, z) => Math.min(...gx.map(([a, b]) => Math.max(Math.abs(a - x), Math.abs(b - z))));
   const came = new Map(), cost = new Map([[key(...start), 0]]), frontier = [[hfn(...start), ...start]];
@@ -86,10 +90,10 @@ exports.findPath = (grid, start, goals, blocked = new Set(), loose = false) => {
       const nx = x + dx, nz = z + dz;
       if (!open(nx, nz) && !goals.has(key(nx, nz))) continue;
       const from = grid.at(x, z), to = grid.at(nx, nz);
-      if (to && to.open && !step(from, to)) continue;
+      if (to && to.open && !step(from, to, dx, dz)) continue;
       // a diagonal needs both sides open; loose: one side is enough (squeezing past a
       // person or a piece of furniture that blocks the other)
-      const side = (cx, cz) => open(cx, cz) && step(from, grid.at(cx, cz));
+      const side = (cx, cz) => open(cx, cz) && step(from, grid.at(cx, cz), cx - x, cz - z);
       if (dx && dz && !(loose ? side(x + dx, z) || side(x, z + dz) : side(x + dx, z) && side(x, z + dz))) continue;
       const nk = key(nx, nz), c = cost.get(k) + (dx && dz ? 1.414 : 1);
       if (c < (cost.get(nk) ?? Infinity)) { cost.set(nk, c); came.set(nk, k); frontier.push([c + hfn(nx, nz), nx, nz]); }
