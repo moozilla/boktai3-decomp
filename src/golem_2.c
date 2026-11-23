@@ -681,15 +681,10 @@ void Skeleton_ClearPendingFlag(void *);
 
 void Golem_UpdateAttackProperties(void *);
 
-static inline u32 Flags32(struct Golem *a, u32 m)
-{
-    return a->chase.base.statusFlags & m;
-}
-
 static inline u8 Unavailable(struct Golem *a)
 {
     if (a) {
-        if (SceneActorContact_MotionFlags(&a->chase, 0x40) || Flags32(a, 0x20000) || a->chase.base.health <= 0)
+        if (SceneActorContact_MotionFlags(&a->chase, 0x40) || SceneActorChase_StatusFlags(&a->chase, 0x20000) || a->chase.base.health <= 0)
             return 1;
     }
     return 0;
