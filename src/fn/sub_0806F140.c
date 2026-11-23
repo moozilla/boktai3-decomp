@@ -1,26 +1,12 @@
 #include "player.h"
+#include "player_slot_status.h"
 struct Player *SceneActorQuery_FindPlayerInBounds(const struct SceneVec *center,
                                                   const struct SceneVec *radius, s32 slot)
 {
     struct Player *p = gPlayers[slot];
-    if (!p)
-        goto absent;
-    {
-        u32 mask = 8;
-        u32 *flags = &gPlayerSlotStatus[slot];
-        if (*flags & mask)
-            goto absent;
-    }
-    {
-        u32 mask = 0x4000;
-        if (!(p->statusFlags & mask))
-            goto absent;
-    }
-    if (center->x - radius->x > p->position.x || center->x + radius->x < p->position.x)
-        goto absent;
-    if (center->z - radius->z > p->position.z || center->z + radius->z < p->position.z)
-        goto absent;
-    return p;
-absent:
+    if (p && !PlayerSlot_ReadStatus(slot, 8) && Player_ReadStatusBits(&p->statusFlags, 0x4000) &&
+        center->x - radius->x <= p->position.x && center->x + radius->x >= p->position.x &&
+        center->z - radius->z <= p->position.z && center->z + radius->z >= p->position.z)
+        return p;
     return 0;
 }

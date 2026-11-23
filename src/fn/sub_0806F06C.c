@@ -1,22 +1,7 @@
 #include "scene_actor_registry.h"
+#include "scene_actor_status.h"
 #include "scene_actor_components.h"
 struct ChaseActor *SceneActorRegistry_FindAvailableAfterId(u32);
-static inline u8 Inactive(struct ChaseActor *a)
-{
-    {
-        u32 mask = 0x40;
-        if (a->base.motionFlags & mask)
-            return 1;
-    }
-    {
-        u32 mask = 0x20000;
-        if (a->base.statusFlags & mask)
-            return 1;
-    }
-    if (a->base.health <= 0)
-        return 1;
-    return 0;
-}
 struct ChaseActor *sub_0806F06C(const struct ContactPosition *center,
                                 const struct ContactPosition *radius, u32 *cursor)
 {
@@ -28,15 +13,14 @@ struct ChaseActor *sub_0806F06C(const struct ContactPosition *center,
             return 0;
         }
         {
-            u32 mask = 0x400;
-            if (a->base.statusFlags & mask) {
+            if (ActorStatus_HasStatusFlags(a, 0x400)) {
                 continue;
             }
         }
         *cursor = a->base.body.id;
         {
-            struct SceneActorBody *body = (struct SceneActorBody *)&a->base.body.id;
-            if (Inactive(a)) {
+            struct SceneActorBody *body = &a->base.body;
+            if (ActorStatus_IsDown(a)) {
                 continue;
             }
             if (center->x - radius->x > body->position.x ||
