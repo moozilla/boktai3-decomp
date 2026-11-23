@@ -4,16 +4,16 @@ Tags: #process #phase3
 
 An overnight run of Opus 5.5 workers by subsystem on the linter's warnings, with one Fable 5.2
 attempt at the hard sites and two side projects, integrated in four batches (PRs 1056, 1058, 1059,
-1060) plus the mechanical cleanup tools (PR 1057). Every batch built the combined ROM
+1060) plus the mechanical cleanup tools (PR 1057) and a last tree-wide tool pass (PR 1061). Every batch built the combined ROM
 (`build/boktai3.gba: OK`).
 
 ## Numbers
 
-| | Before (50126e814) | After (2bee3f16d) |
+| | Before (50126e814) | After (PR 1061) |
 |---|---|---|
 | Errors | 4 | 3 |
 | Warnings, linter as it was before the run | 4,698 | not measured at the end |
-| Warnings, linter as extended during the run | 5,359 | 3,677 |
+| Warnings, linter as extended during the run | 5,359 | 3,607 |
 
 The linter got stricter during the run (`~N` counts as a parked literal, number-named inline
 parameters count as const-local, literal-param covers longer call-free helpers), which added 661

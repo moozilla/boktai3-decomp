@@ -15,21 +15,21 @@ Without concessions: **100.000%**. With concessions (register pins, asm barriers
 | Warnings (`python3 tools/concessions.py`; not scored) | |
 |---|---:|
 | `dead-code` | 13 (+1 excused) |
-| `proved-zero` | 18 |
+| `proved-zero` | 17 |
 | `once-loop` | 77 (+1 excused) |
 | `stmt-expr` | 1 |
-| `const-local` | 717 (+9 excused) |
-| `literal-local` | 2,182 |
+| `const-local` | 708 (+9 excused) |
+| `literal-local` | 2,133 |
 | `addr-deref` | 21 |
 | `subtract-negative` | 13 |
 | `duplicate-branches` | 18 (+6 excused) |
 | `placeholder-name` | 5 |
 | `volatile-view` | 2 |
 | `local-union` | 71 (+2 excused) |
-| `literal-param` | 540 (+3 excused) |
-| total | 3,678 |
+| `literal-param` | 528 (+3 excused) |
+| total | 3,607 |
 
-Source files with no warning: **4,790** of 6,041.
+Source files with no warning: **4,801** of 6,041.
 
 Nonmatching drafts (`#ifdef NONMATCHING`, not counted above): **0 functions**, 0.000% of code, mean fuzzy match 0.0%.
 
