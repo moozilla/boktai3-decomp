@@ -40,9 +40,8 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
             SceneMessages_UnregisterReceiver((u8 *)actor + 0xC);
     }
     {
-        u32 offset = 0x320;
         u8 *shadow;
-        shadow = (u8 *)actor + offset;
+        shadow = (u8 *)actor + 0x320;
         if (*shadow)
             Shadow_Destroy(shadow);
     }
