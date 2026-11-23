@@ -366,14 +366,16 @@ exports.collect = function* (x, z, opts = {}) {
   return { done: JSON.stringify(after) !== before, lines: i.lines, reason: i.reason, bags: after };
 };
 
-// Break a block (a wooden crate: SceneObject with health) with the weapon: stand on a
-// neighboring cell at its floor level, face it and attack (B) until it is gone.
-exports.breakBlock = function* (block, opts = {}) {
-  const grid = exports.grid(), p = $.gPlayers[0];
+// Attack the thing in cell (tx, tz) with the weapon: stand on a neighboring open cell at
+// `level` (default: the target cell's floor), face it and attack (B) until done() holds
+// or `hits` attacks. A crate (SceneObject with health), a lever switch (a hittable whose
+// script runs when struck).
+exports.hitAt = function* (tx, tz, opts = {}) {
+  const grid = exports.grid(), p = $.gPlayers[0], level = opts.level ?? (grid.at(tx, tz) || {}).level;
   const goals = new Set();
   for (const [dx, dz] of DIRS) {
-    const c = grid.at(block.x - dx, block.z - dz);
-    if (c && c.open && c.level === block.top - 1) goals.add(`${block.x - dx},${block.z - dz}`);
+    const c = grid.at(tx - dx, tz - dz);
+    if (c && c.open && c.level === level) goals.add(`${tx - dx},${tz - dz}`);
   }
   const here = exports.cellOf(p.position.x, p.position.z);
   const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals);
@@ -381,17 +383,24 @@ exports.breakBlock = function* (block, opts = {}) {
   const [sx, sz] = path[path.length - 1];
   const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], { ...opts, noBreak: true, frames: 1800 });
   if (!r.reached) return { done: false, reason: 'could not get next to it: ' + r.reason };
-  const key = exports.DIR_KEYS[DIRS.findIndex(([dx, dz]) => sx + dx === block.x && sz + dz === block.z)];
-  const alive = () => exports.blocks().some((b) => b.slot === block.slot && b.health > 0);
-  let hits = 0;
-  for (let t = 0; t < 40 && alive(); t++) {
+  const key = exports.DIR_KEYS[DIRS.findIndex(([dx, dz]) => sx + dx === tx && sz + dz === tz)];
+  const done = opts.done || (() => false);
+  let hits = 0, lines = [];
+  for (; hits < (opts.hits ?? 40) && !done(); hits++) {
     yield g.press(key, 4);  // face it
     yield g.press(key + '+b', 2);
     yield g.press(0, 16);
-    hits++;
-    yield* exports.clearInterruptions(opts);
+    const seen = new Map();
+    if (yield* exports.clearInterruptions({ ...opts, seen })) { lines.push(...seen.keys()); if (opts.stopOnEvent) { hits++; break; } }
   }
-  return { done: !alive(), hits, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
+  return { done: done(), hits, lines };
+};
+
+// Break a block (a wooden crate: SceneObject with health).
+exports.breakBlock = function* (block, opts = {}) {
+  const alive = () => exports.blocks().some((b) => b.slot === block.slot && b.health > 0);
+  const r = yield* exports.hitAt(block.x, block.z, { ...opts, level: block.top - 1, done: () => !alive() });
+  return { ...r, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
 };
 
 // Push planning: a breadth-first search over block states with the game's rules

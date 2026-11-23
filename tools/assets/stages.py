@@ -30,6 +30,9 @@ use library procedures, decoded here by argument position:
   switch    proc_1087(track, box, flag, value, tile, priority, proc): a floor switch on an
             HP box; stepping on it (the player or a pushed block) runs proc once, whose
             items are listed with the condition `floor switch BOX` (2759: the sword chest)
+  hittable  proc_1225/1226: a WoodenCrate-family object (a crate, or a lever switch
+            with crateflags 9/10) at (x + 128, z + 128); attacking it runs its script
+            (2782: the lever that opens the shutter on CD23)
   enemy     spawner procedures 1490-1700 that create an actor family by
             registry key (cmd 0xB745 KEY `N: name r: path ...`); the path is an
             index into the HP patrol paths (tentative)
@@ -141,7 +144,7 @@ class Walker:
     # ---- the walk ------------------------------------------------------------
     def scene(self, pid):
         self.out = {"scene": pid, "stage": None, "palette": None, "entrances": [], "doors": [], "items": [],
-                    "enemies": [], "switches": [], "calls": []}
+                    "enemies": [], "switches": [], "hittables": [], "calls": []}
         self.visited = set()
         self.call(pid, [], [], None, 0, None)
         return self.out
@@ -170,6 +173,13 @@ class Walker:
             flags, flag = (a(6), a(7)) if pid == 1118 else (a(8), a(9))
             o["items"].append(dict(rec, category=num(a(1)), item=num(a(2)), x=num(a(3)), z=num(a(4)),
                                    chest=chest, flags=flags, flag=num(flag)))
+            return
+        if pid in (1225, 1226):
+            # a hittable object (the WoodenCrate family: crates and lever switches):
+            # proc_1225(name, x, z, flags, sequence, script) wraps proc_1226(name, x, y, z,
+            # sequence, flags, palette, priority, script, ...); hitting it runs script
+            x, z, flags, script = (a(2), a(3), a(5), a(6)) if pid == 1225 else (a(2), a(4), a(6), a(9))
+            o["hittables"].append(dict(rec, name=a(1), x=num(x), z=num(z), flags=num(flags), script=num(script)))
             return
         if pid == 1087 and len(ops) >= 7:
             # floor switch: proc_1087(track, box, flag, value, tile, priority, proc); a trap on
@@ -309,6 +319,10 @@ def resolve(scene, hps, names):
             rec.setdefault("y", bx["y0"])
     for e in scene["entrances"] + scene["doors"] + scene["switches"]:
         box(e)
+    for h in scene["hittables"]:
+        if h["x"] is not None and h["z"] is not None:
+            h["x"] += 128
+            h["z"] += 128
     for it in scene["items"]:
         if it["category"] == 0 and it["item"] is not None:
             it["name"] = names.get(CONSUMABLE_NAMES + it["item"])
@@ -321,7 +335,7 @@ def resolve(scene, hps, names):
             en["route"] = [[q["x"], q["z"]] for q in hpd["paths"][p]]
             en["x"], en["z"] = en["route"][0]
     scene["enemies"] = [en for en in scene["enemies"] if en["families"]]
-    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"] + scene["switches"]:
+    for rec in scene["entrances"] + scene["doors"] + scene["items"] + scene["enemies"] + scene["switches"] + scene["hittables"]:
         conds = []
         for c in rec["cond"]:
             for raw, nice in PRETTY:
