@@ -55,7 +55,8 @@ struct VanargandPairAttack {
     u8 (*callback)(struct VanargandPairAttack *);
     u8 pad108[4];
     struct Player *player;
-    u8 pad110[0x118 - 0x110];
+    struct SceneVec *destination; /* 0x110 */
+    u8 pad114[0x118 - 0x114];
     u8 trigger[0x10]; /* 0x118: scene message receiver (StateActor receiver2). */
     u8 pad128[0x174 - 0x128];
     struct PositionedEffectCoordinates coordinates;
@@ -132,6 +133,12 @@ static inline u8 Vanargand_ConsumeActionEntry(struct VanargandPairAttack *owner)
 
 /* Enter action animation ANIMATION: stop the running action sequence, then request the
  * animation. Some forty of the body's action states begin this way. */
+/* SceneActorState_SetAnimation on the body. */
+static inline void Vanargand_SetActionAnimation(struct VanargandPairAttack *owner, u32 animation)
+{
+    owner->requestedAnimation = animation;
+}
+
 static inline void Vanargand_EnterAction(struct VanargandPairAttack *owner, u32 animation)
 {
     Vanargand_StopActionSequence(&owner->actionSequence);
