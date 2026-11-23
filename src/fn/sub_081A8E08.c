@@ -2,7 +2,6 @@
 #include "player.h"
 
 /* Copy the selected player palette and complete the capture position request. */
-#define Vanargand_UpdateCaptureSetup sub_081A8E08
 void Vanargand_SetPendingCue(void *, u16);
 void SceneActors_StartUnmirroredAnimation(void *, void *, void *, s32, s32, s32);
 u32 Player_GetCollisionData(void);
@@ -32,8 +31,7 @@ void Vanargand_UpdateCaptureSetup(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *q = p;
     struct SceneVec position;
-    u32 mask = 4;
-    p->flags |= mask;
+    VanargandPairAttack_SetFlags(p, 4);
     Vanargand_SetPendingCue(p, 0);
     if (p->pending) {
         void *animation;

@@ -34,10 +34,7 @@ void Hresvelgr_UpdateRecoilBurstPhase(struct HresvelgrTravelActor *actor, s32 fr
                                sequences.ids[actor->side], 2, 4);
         Sound_PlaySong(0x4D2);
     }
-    {
-        u32 mask = 0x600040;
-        actor->flags |= mask;
-    }
+    Hresvelgr_SetFlags(actor, 0x600040);
     if (frame == 16)
         Sound_PlaySong(0x3E2);
     step = frame - 16;

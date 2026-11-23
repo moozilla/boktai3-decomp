@@ -1,41 +1,16 @@
 #include "global.h"
+#include "ratatosk.h"
 
-typedef struct ActorAnimation {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[0x4a];
-    u32 flags;
-    u8 padA0[8];
-    u8 facing, facing8;
-    u8 padAA[5];
-    u8 finished, enter;
-    u8 changed;
-    u8 padB2;
-    u8 locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x37];
-    u8 (*tryUpdate)(void *);
-    u8 (*reset)(void *);
-    u8 pad10C[8];
-    s8 savedAngle;
-    u8 pad115[0x22e];
-    u8 variant;
-    s16 scale, minScale, maxScale, scaleStep;
-    u8 pad34C[0x60];
-    u32 mode;
-} ActorAnimation;
-
-static inline void setFacing(ActorAnimation *p, int angle)
+static inline void setFacing(struct Ratatosk *p, int angle)
 {
     u32 value;
     int shifted;
-    p->angle = angle;
-    shifted = p->angle + 0x60;
+    p->body.direction = angle;
+    shifted = p->body.direction + 0x60;
     shifted >>= 6;
     value = 3 & shifted;
     p->facing = value;
-    shifted = p->angle + 0x70;
+    shifted = p->body.direction + 0x70;
     shifted >>= 5;
     value = 7 & shifted;
     p->facing8 = value;
@@ -58,28 +33,24 @@ static inline int trunc12(int x)
 {
     return x >= 0 ? x >> 12 : -(-x >> 12);
 }
-typedef struct {
-    u32 a, b;
-} Point;
-void SceneActors_UpdateSpawnShake(ActorAnimation *p, int time)
+void SceneActors_UpdateSpawnShake(struct Ratatosk *p, int time)
 {
     int tick = time;
-    ActorAnimation *p2 = p;
-    u8 *position = (u8 *)p + 0x48;
-    if (p->changed) {
-        p->changed = 0;
-        *(Point *)((u8 *)p + 0xd0) = *(Point *)(position + 12);
+    struct Ratatosk *p2 = p;
+    struct SceneActorBody *body = &p->body;
+    if (p->actionChanged) {
+        p->actionChanged = 0;
+        p->targetPosition = body->position;
         Sound_PlaySong(0x567);
     }
     {
-        u32 mask = 0x0200000C;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x0200000C);
     }
-    if (!(u8)Callback_InvokeActor(p2, p->reset)) {
-        *(Point *)(position + 12) = *(Point *)((u8 *)p + 0xd0);
+    if (!(u8)Callback_InvokeActor(p2, p->actionReset)) {
+        body->position = p->targetPosition;
         {
             int dir = tick & 3;
-            s16 *velocity = (s16 *)(position + 20);
+            s16 *velocity = &body->motion.x;
             u32 angle;
             int speed;
             angle = dir << 6;
@@ -96,6 +67,6 @@ void SceneActors_UpdateSpawnShake(ActorAnimation *p, int time)
             }
         }
         if (tick > 31)
-            p->finished = 1;
+            p->actionFinished = 1;
     }
 }

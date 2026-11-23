@@ -204,6 +204,12 @@ def strip_bodies(t):
                 last = "}"
             i = k
             continue
+        if c == "[":  # an array bound (`[sizeof(T) == 8 ? 1 : -1]`) holds no initializer
+            k = _skip_balanced(t, i, "[", "]")
+            out.append(t[i:k])
+            last = "]"
+            i = k
+            continue
         if c == "=":  # an initializer: skip to the next , or ; at this level
             j, depth = i + 1, 0
             while j < n:

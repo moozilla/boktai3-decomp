@@ -26,8 +26,7 @@ s32 Ratatosk_UpdateParticleFallAndWander(struct RatatoskParticle *particle, s32 
             gRandomTableIndex = (gRandomTableIndex + 1) & 0x3FF;
             {
                 u32 sample = gUnk_086141BC[gRandomTableIndex];
-                u32 mask = 3;
-                params->speed = sample & mask;
+                params->speed = sample & 3;
             }
             gRandomTableIndex = (gRandomTableIndex + 1) & 0x3FF;
             params->angle = gUnk_086141BC[gRandomTableIndex];

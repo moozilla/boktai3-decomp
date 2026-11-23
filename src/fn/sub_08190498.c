@@ -1,3 +1,4 @@
+#include "contact_collider.h"
 #include "global.h"
 #include "ram.h"
 struct NidhoggrEffectVector {
@@ -85,10 +86,7 @@ void Nidhoggr_CreateDistanceLimitedEffect(void *owner, struct NidhoggrEffectVect
         collider = (u8 *)effect + 0xcc;
         *(struct NidhoggrEffectPair *)(collider + 0x1c) = gUnk_0824F29C;
         *(struct NidhoggrEffectPair *)(collider + 0x14) = gUnk_0824F2A4;
-        {
-            u32 mask = 4;
-            ((struct NidhoggrEffectCollider *)collider)->flags &= ~mask;
-        }
+        ContactCollider_ClearFlags((struct ContactCollider *)collider, 4);
         Collider_SetAttackProperties(collider, attack, 0, 0x1000, 0x8000, 4);
     }
     Collider_SetCallback(collider, 0, 0);

@@ -1,17 +1,12 @@
 #include "global.h"
+#include "player_slot_status.h"
+#include "state_actor.h"
 
-extern u32 gUnk_02000560;
-struct A {
-    u8 f[0xaf];
-    u8 a;
-};
 void SceneActors_RunStateCallback(void *);
 
-void BossSlot2_RunUnpausedStateCallback(struct A *p)
+void BossSlot2_RunUnpausedStateCallback(struct StateActor *p)
 {
-    u32 m;
-    p->a = 0;
-    m = 4;
-    if ((m & gUnk_02000560) == 0)
+    p->actionFinished = 0;
+    if (!PlayerSlot_ReadStatus(0, 4))
         SceneActors_RunStateCallback(p);
 }

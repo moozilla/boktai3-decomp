@@ -17,14 +17,10 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
 {
     struct VanargandPairAttack *self = p;
     u8 result;
-    {
-        u32 mask = 0x40;
-        p->flags |= mask;
-    }
+    VanargandPairAttack_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 0);
     if (p->mode == 1) {
-        u32 mask = 0x40000;
-        p->flags |= mask;
+        VanargandPairAttack_SetFlags(p, 0x40000);
     }
     result = Callback_InvokeActor(p, p->callback);
     if (result)
@@ -42,11 +38,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 3);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                {
-                    u8 next = 1;
-                    p->phase = next;
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 1);
             }
             break;
         case 1:
@@ -54,11 +46,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 4);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                {
-                    u8 next = 2;
-                    p->phase = next;
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 2);
             }
             break;
         case 2:
@@ -92,11 +80,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
                 PairedSceneActor_ApplyToSelectedHalves(self->pair, 3, 3);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                {
-                    u8 next = 2;
-                    p->phase = next;
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 2);
             }
             break;
         case 4:
@@ -108,11 +92,7 @@ void Vanargand_UpdateSynchronizedPairAttack(struct VanargandPairAttack *p)
                 Vanargand_SetPairedMotionParameter(self->pair, self->parameter584);
                 p->timer++;
             } else if (PairedSceneActor_AreSelectedHalvesFinished(self->pair)) {
-                {
-                    u8 next = 5;
-                    p->phase = next;
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 5);
             }
             break;
         case 5:

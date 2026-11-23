@@ -18,13 +18,9 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
     struct VanargandPairAttack *self = p;
     u8 result;
     if (p->mode == 1) {
-        u32 mask = 0x40000;
-        p->flags |= mask;
+        VanargandPairAttack_SetFlags(p, 0x40000);
     }
-    {
-        u32 mask = 0x40;
-        p->flags |= mask;
-    }
+    VanargandPairAttack_SetFlags(p, 0x40);
     Vanargand_SetPendingCue(p, 1);
     result = Callback_InvokeActor(p, p->callback);
     if (result)
@@ -75,11 +71,7 @@ void Vanargand_UpdateChargedPairAttack(struct VanargandPairAttack *p)
                 if (ScenePair_CountPositiveCounters(pair) == 2 && firstState == 0xC &&
                     secondState == 0xC)
                     self->flash = 60;
-                {
-                    u8 next = 3;
-                    p->phase = next;
-                    p->timer = 0;
-                }
+                VanargandPairAttack_EnterPhase(p, 3);
             }
             break;
         case 3:

@@ -1,49 +1,10 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "ratatosk_particle.h"
 #include "ratatosk_facing.h"
 #include "ram.h"
 #include "scene_actor_components.h"
 
-struct Actor {
-    u8 pad0[0x51];
-    u8 angle;
-    u8 pad52[2];
-    struct ContactPosition position, velocity;
-    u8 pad64[0x2c];
-    u32 timer;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[2];
-    u8 mode, padA3;
-    u32 modeTime;
-    u8 facing, facing8, padAA, animationId, state, nextState, active, finished, padB0, changed,
-        padB2, locked;
-    u8 padB4[0x18];
-    u8 requestedAngle;
-    u8 padCD[0x33];
-    void (*update)(void);
-    void *callback;
-    u8 pad108[0xc];
-    s8 savedAngle;
-    u8 pad115[0x67];
-    u32 phase;
-    u8 pad180[0x1ac];
-    u8 animation[0x20];
-    u8 animationData[0x20];
-    struct ContactPosition anchor;
-    u8 pad374[0x58];
-    struct ContactPosition home;
-    u8 pad3D4[0xa78];
-    s16 selectedPoint, selectedTarget;
-    u16 padE50;
-    u16 scaleX, scaleZ;
-    u16 padE56, scaleStep;
-    u8 padE5A[0x14];
-    u16 motion;
-    u8 motionFlag, padE71, targetAngle, phaseTimer;
-    s16 hitTimer, terrainTimer;
-};
 extern const u16 gUnk_086141BC[];
 extern const s16 gUnk_086149C4[];
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, s32, s32, s32, s32);
@@ -67,28 +28,19 @@ static inline void polar(struct ContactPosition *v, s32 angle, s32 radius)
 
 void Ratatosk_UpdateDirectionalAnimation(void);
 void Ratatosk_UpdateDefeatSequence(void);
-static inline void setState(struct Actor *p, void (*update)(void), u8 state)
-{
-    p->animationId = state;
-    p->update = update;
-    p->timer = 0;
-    p->changed = 1;
-    p->mode = 0;
-    p->modeTime = 0;
-}
 // confidence=low: recovers from knockback, choosing defeat when health is depleted.
 #define Ratatosk_UpdateKnockbackRecovery sub_081F5290
-void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
+void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
 {
     struct RatatoskParticleConfig params;
     struct ContactPosition spawn;
-    struct Actor *p2 = p;
+    struct Ratatosk *p2 = p;
     struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
     u16 *scaleX;
     u16 *scaleZ;
-    if (p->changed) {
+    if (p->actionChanged) {
         s32 angle;
-        p->changed = 0;
+        p->actionChanged = 0;
         if (p->locked)
             angle = p->savedAngle;
         else
@@ -124,20 +76,19 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
             *scaleZ = 0;
     }
     p2->phaseTimer = 8;
-    p2->motion = 0;
+    p2->frameDamage = 0;
     {
-        u32 mask = 12;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 12);
     }
     if (tick > 29) {
         *scaleX = 0;
         *scaleZ = 0;
-        p2->scaleStep = 0;
+        p2->scaleMode = 0;
         if (p->health <= 0 && !p->locked) {
-            setState(p, Ratatosk_UpdateDefeatSequence, 15);
+            Ratatosk_StartReaction(p, Ratatosk_UpdateDefeatSequence, 15);
         } else {
-            setState(p, Ratatosk_UpdateDirectionalAnimation, 1);
-            p->finished = 1;
+            Ratatosk_StartReaction(p, Ratatosk_UpdateDirectionalAnimation, 1);
+            p->actionFinished = 1;
         }
     } else {
         if (tick & 1) {
@@ -151,7 +102,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
             angle = (u8)randomA();
             drift = randomA() & 15;
             position = &spawn;
-            spawn = p->position;
+            spawn = p->body.position;
             position->x -= 128;
             position->y += 128;
             /* Sign-symmetric fixed-point conversions. The samples are never negative,
@@ -170,8 +121,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Actor *p, s32 tick)
             sub_081FC26C(&params, &spawn);
         }
         {
-            u32 bit = 1;
-            p->flags |= bit;
+            Ratatosk_SetFlags(p, 1);
         }
     }
 }

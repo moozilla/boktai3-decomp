@@ -45,10 +45,7 @@ void Vanargand_UpdatePlayerDrain(struct VanargandPairAttack *p)
     struct SceneVec initial;
     struct SceneVec position;
     struct SceneVec *initialBase;
-    {
-        u32 mask = 12;
-        p->flags |= mask;
-    }
+    VanargandPairAttack_SetFlags(p, 12);
     Vanargand_SetPendingCue(p, 1);
     if (p->pending) {
         u32 one;

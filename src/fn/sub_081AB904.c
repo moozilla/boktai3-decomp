@@ -2,7 +2,6 @@
 #include "input.h"
 
 // confidence=low: cycles five auxiliary-animation debug modes on a key press.
-#define Vanargand_UpdatePartDebugControls sub_081AB904
 struct DebugPart {
     u8 pad0[0x10];
     u16 mode;

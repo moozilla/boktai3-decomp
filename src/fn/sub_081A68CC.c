@@ -1,15 +1,10 @@
-#include "global.h"
+#include "vanargand_pair_attack.h"
 
-struct A {
-    u8 f[0x15];
-    u8 a;
-    u16 b;
-};
 void Sound_StopSong(s32);
 
-void Vanargand_StopActionSequence(struct A *p)
+void Vanargand_StopActionSequence(struct VanargandActionSequence *sequence)
 {
-    p->b = 0;
-    p->a = 0;
+    sequence->timer = 0;
+    sequence->step = 0;
     Sound_StopSong(0x583);
 }

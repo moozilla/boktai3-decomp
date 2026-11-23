@@ -2,7 +2,6 @@
 
 // Remaining differences: temporary registers for field offsets and target coordinate loads.
 // confidence=low: advances presentation and caches bearings and planar target distances.
-#define Vanargand_UpdateAnimationAndTargets sub_081AD3E8
 struct TargetVec {
     s16 x, y, z, pad;
 };
@@ -73,9 +72,8 @@ void Vanargand_UpdateAnimationAndTargets(struct VanargandTargets *p)
     {
         u32 offset;
         s16 z = sprite->position.z;
-        offset = 0x210;
         {
-            s16 *out = (s16 *)((u8 *)actor + offset);
+            s16 *out = (s16 *)((u8 *)actor + 0x210);
             *out = z;
         }
     }

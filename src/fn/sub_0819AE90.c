@@ -1,12 +1,9 @@
-#include "global.h"
+#include "boss_action_state.h"
 
-void sub_0819AE90(u8 *p)
+void ActionState_AdvanceSubstate(struct BossActionState *p)
 {
-    u32 z;
-    u8 v = p[1] + 1;
-    z = 0;
-    p[1] = v;
-    p[2] = z;
-    *(u32 *)(p + 0xc) = z;
-    *(u32 *)(p + 8) = z;
+    p->substate++;
+    p->step = 0;
+    p->stepFrame = 0;
+    p->substateFrame = 0;
 }

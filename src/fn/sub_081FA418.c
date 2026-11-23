@@ -1,13 +1,10 @@
 #include "global.h"
+#include "ratatosk.h"
 #include "player.h"
 // confidence=low: slot checks gate a two-stage transfer of the player to a sun-orb position.
 struct Target {
     u32 distance;
     u8 pad[20];
-};
-struct Ratatosk {
-    u8 pad[0xe00];
-    struct Target targets[9];
 };
 #define H(o) (*(s16 *)(p + (o)))
 #define U(o) (*(u16 *)(p + (o)))

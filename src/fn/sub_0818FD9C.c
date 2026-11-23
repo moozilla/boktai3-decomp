@@ -1,3 +1,5 @@
+#include "player_slot_status.h"
+#include "scene_pause.h"
 #include "global.h"
 #include "ram.h"
 #include "engine_globals.h"
@@ -27,7 +29,6 @@ struct NidhoggrAttachedEffect {
     struct NidhoggrEffectVector *anchor;
     struct NidhoggrEffectVector offset;
 };
-extern u32 gUnk_02000560;
 extern const struct NidhoggrEffectPair gUnk_0824F264, gUnk_0824F26C;
 struct NidhoggrAttachedEffect *SceneEffectPool_AllocateSlot(void *);
 void SceneEffect_ResetState(void *);
@@ -48,14 +49,10 @@ void Nidhoggr_CreateAttachedAttackEffect(u8 *owner, struct NidhoggrEffectVector 
     struct NidhoggrAttachedEffect *effect;
     u8 *animation;
     u8 *collider;
-    u32 mask = 0x400;
-    if ((gEngineFlags | gScenePauseFlags) & mask)
+    if (Scene_TestPauseFlags(0x400))
         return;
-    {
-        u32 mask = 4;
-        if (gUnk_02000560 & mask)
-            return;
-    }
+    if (PlayerSlot_ReadStatus(0, 4))
+        return;
     effect = SceneEffectPool_AllocateSlot(owner);
     if (!effect)
         return;

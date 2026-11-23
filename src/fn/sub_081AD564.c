@@ -5,7 +5,6 @@
 #include "engine_globals.h"
 
 // confidence=low: applies camera, collision, palette and shake presentation effects.
-#define Vanargand_UpdatePresentation sub_081AD564
 #define RANDOM_TABLE_ADDR            0x0203B400
 struct PresentationVec {
     s16 x, y, z, pad;

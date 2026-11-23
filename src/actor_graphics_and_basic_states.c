@@ -331,21 +331,6 @@ void SceneActorState_SetValueClampedWhenActive(struct StateActor *p, u32 v)
 
 void SceneActors_StartDirectionalAnimation(void *, void *, void *, int, int, int, int);
 
-static inline void SceneActorState_EnterPhase(struct StateActor *actor, u32 phase)
-{
-    actor->actionPhase = phase;
-    actor->actionTimer = 0;
-    actor->actionEnter = 1;
-}
-
-static inline void SceneActorState_StartAction(struct StateActor *actor, u32 mode, u32 index,
-                                               u32 phase)
-{
-    actor->actionMode = mode;
-    actor->actionIndex = index;
-    SceneActorState_EnterPhase(actor, phase);
-}
-
 void SceneActors_StartDisappearEffect(u32 *position)
 {
     struct StateActor *p = SceneActors_GetBySlot(0);
@@ -1081,11 +1066,6 @@ void SceneActors_DispatchCommands(struct S *s)
             }
             i++;
         } while (i < entry->count[gSceneEventDispatchState[0x24]]);
-}
-
-static inline void SceneActorState_SetAnimation(struct StateActor *actor, u32 animation)
-{
-    actor->actionAnimation = animation;
 }
 
 void SceneActorState_AdvanceToState1A(struct StateActor *p)
