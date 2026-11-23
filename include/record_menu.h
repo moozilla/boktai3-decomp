@@ -40,4 +40,14 @@ struct RecordMenu {
     u8 pad1500[2];
     u16 exitScript;
 };
+
+/* Switch the menu to UPDATE, redrawing its page; LEAVING says how the page is left. */
+static inline void RecordMenu_Begin(struct RecordMenu *menu, void (*update)(struct RecordMenu *),
+                                    u32 leaving)
+{
+    menu->update = update;
+    menu->redraw = 1;
+    menu->leaving = leaving;
+}
+
 #endif
