@@ -39,6 +39,7 @@
 #include "scene_actor_turn.h"
 #include "movement_curve.h"
 #include "scene_actor_displacement.h"
+#include "scene_actor_terrain_reaction.h"
 
 struct AxeTrailSprite {
     u32 flags;
@@ -792,15 +793,6 @@ static inline void RestoreHistory(struct ChaseActor *a, u16 v)
     a->group.common.gate.counter = v;
 }
 
-static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
-{
-    a->base.state2A8 = s;
-    a->base.phase2A9 = p;
-    a->base.behavior2AA = b;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
 void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
@@ -852,7 +844,7 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
         Axe_ResetMovementFlags(actor);
         WordFlags_Set(0x10, &context->flagsE4C);
         RestoreHistory(actor, actor->group.common.gate.duration);
-        SetState(actor, 0, 2, 9);
+        SceneActorTerrain_EnterState(actor, 0, 2, 9);
     }
 }
 
@@ -886,7 +878,7 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
         Sound_PlaySong(318);
         actor->base.colliderA.responseValue = 0;
         ActorStatus_ClearDrawableFlags(actor, 1);
-        SetState(actor, 3, 0, 0);
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         if (HasAuxiliary(state)) {
             u32 *flags = &state->auxiliarySprite.flags;
@@ -954,15 +946,6 @@ static inline s32 Scale_UpdateDefeat(s32 x)
     else
         result = -(-x >> 12);
     return result;
-}
-
-static inline void SetAnimation(struct ChaseActor *a, u8 s, u8 p, u8 b)
-{
-    a->base.state2A8 = s;
-    a->base.phase2A9 = p;
-    a->base.behavior2AA = b;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
 }
 
 void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
@@ -1063,7 +1046,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->base.category, context->variant));
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
-    SetAnimation(actor, 1, 0, 2);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
 }
 
 static inline s32 Normalize(s32 a)
@@ -1215,20 +1198,20 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
         speed = 8;
         if ((s32)actor->base.counter2AC > 400) {
             SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
-            SetState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     } else if (actor->base.health <= context->lowHealthThreshold) {
         speed = 6;
         if ((s32)actor->base.counter2AC > 500) {
             SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
-            SetState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     } else {
         speed = 4;
         if ((s32)actor->base.counter2AC > 600) {
-            SetState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     }
@@ -1653,7 +1636,7 @@ void Axe_UpdateRouteWander(struct ChaseActor *actor)
     Axe_BeginMoveToPosition(actor, &targetStorage);
     Axe_ClearForcedMovement(actor);
     Axe_ResetMovementFlags(actor);
-    SetState(actor, 0, 0, 2);
+    SceneActorTerrain_EnterState(actor, 0, 0, 2);
 }
 
 // confidence=low: initializes scripted cooldown lengths and the health threshold.
@@ -1700,21 +1683,12 @@ void Axe_TickCooldowns(struct ChaseActor *actor)
     } while (--i >= 0);
 }
 
-static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 u8 Axe_PickAttack(void *actorIn)
 {
     struct ChaseActor *actor = (struct ChaseActor *)actorIn;
     struct Axe *q = actor->base.context;
     if (actor->base.health <= q->healthThreshold && q->attackCooldowns[3] == 0) {
-        Go(actor, 0, 2, 8);
+        SceneActorTerrain_EnterState(actor, 0, 2, 8);
         return 1;
     }
     if (q->attackCooldowns[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
@@ -1729,18 +1703,18 @@ u8 Axe_PickAttack(void *actorIn)
         if (e < 0)
             e = -e;
         if (e <= 0x29)
-            Go(actor, 0, 2, 0);
+            SceneActorTerrain_EnterState(actor, 0, 2, 0);
         else
-            Go(actor, 0, 2, 2);
+            SceneActorTerrain_EnterState(actor, 0, 2, 2);
         return 1;
     }
     if (q->lowHealthThreshold >= actor->base.health) {
         if (q->attackCooldowns[1] == 0) {
-            Go(actor, 0, 2, 4);
+            SceneActorTerrain_EnterState(actor, 0, 2, 4);
             return 1;
         }
         if (q->attackCooldowns[2] == 0) {
-            Go(actor, 0, 2, 6);
+            SceneActorTerrain_EnterState(actor, 0, 2, 6);
             return 1;
         }
     }
