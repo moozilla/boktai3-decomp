@@ -5,8 +5,7 @@
 void sub_0817C318(struct StateActor *p)
 {
     if (StateActor_ConsumeActionEntry(p) && p->actionState != 13) {
-        u32 v = 13;
-        p->actionAnimation = v;
+        SceneActorState_SetAnimation(p, 13);
     }
     p->actionTimer++;
 }
