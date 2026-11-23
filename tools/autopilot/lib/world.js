@@ -392,3 +392,73 @@ exports.push = function* (step, opts = {}) {
   yield g.until(() => exports.blocks().every((b) => b.kind === 0), 120);
   return { done: moved(), reason: moved() ? 'pushed' : 'did not move' };
 };
+
+// Enemies: the scene-actor registry list (gSceneActorRegistryNode: {next, actor},
+// ending at a node with a NULL actor). Living as SceneActorRegistry_CountLiving
+// counts them: health > 0 and status bit 0x20000 clear. src/fn/sub_080703A8.c.
+exports.enemies = () => {
+  const out = [];
+  let node = g.u32(g.types.globals.gSceneActorRegistryNode.addr);
+  for (let n = 0; node && n < 64; n++) {
+    const actor = g.u32(node + 4);
+    if (!actor) break;
+    const a = g.at(actor, 'struct RoomActor');
+    const pos = a.body.position;
+    out.push({ addr: actor, category: a.category, health: a.health, alive: a.health > 0 && !(a.statusFlags & 0x20000),
+      x: pos.x, y: pos.y, z: pos.z, state: a.state2A8, view: a });
+    node = g.u32(node);
+  }
+  return out;
+};
+
+// Fight the room's living enemies (exports.enemies). Each step tries a few short
+// tactics from a snapshot (move 12 frames in each of the 8 directions, attack with
+// B, step toward the target and attack), rolls each forward `look` frames, and keeps
+// the best by damage dealt minus lost life (life costs more: opts.lifeCost); the
+// distance to the target breaks ties. B is the weapon (measured: it kills the first
+// skeletons; A and the shoulder buttons do nothing in a fight).
+exports.fight = function* (opts = {}) {
+  const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
+  const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
+  // a target that takes no damage for 40 steps is not a fight (a scripted thief,
+  // an invulnerable actor): leave it alone
+  const ignored = exports.fightIgnored || (exports.fightIgnored = new Set()), progress = new Map();
+  const living = () => exports.enemies().filter((e) => e.alive && !ignored.has(e.addr));
+  const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health), 0);
+  const toward = (e) => {
+    const dx = e.x - p.position.x, dz = e.z - p.position.z;
+    const sx = Math.abs(dx) > 40 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 40 ? Math.sign(dz) : 0;
+    return KEY8[`${sx},${sz}`];
+  };
+  const life = () => exports.where().life ?? 0;
+  let steps = 0;
+  while (living().length && g.frameNo - start < (opts.frames ?? 6000) && exports.where().scene === scene) {
+    if (yield* exports.clearInterruptions(opts)) continue;
+    const target = living().sort((a, b) => Math.hypot(a.x - p.position.x, a.z - p.position.z) - Math.hypot(b.x - p.position.x, b.z - p.position.z))[0];
+    const tk = toward(target);
+    const tactics = [...DIRS8.map((k) => [[k, 12]]), [['b', 2], [0, 10]], ...(tk ? [[[tk, 6], ['b', 2], [0, 4]]] : [])];
+    const root = S.snapshot(), hp0 = hpSum(), life0 = life();
+    let best = null;
+    for (const t of tactics) {
+      S.restore(root);
+      for (const [k, n] of t) yield g.press(k, n);
+      if (exports.where().scene !== scene) continue;  // walked out through a door
+      const mid = S.snapshot();
+      yield g.press(0, opts.look ?? 20);
+      if (exports.where().scene !== scene) continue;
+      const dealt = hp0 - hpSum(), lost = life0 - life();
+      const e = living()[0], dist = e ? Math.hypot(e.x - p.position.x, e.z - p.position.z) : 0;
+      const score = dealt - (opts.lifeCost ?? 3) * lost - dist / 400;
+      if (!best || score > best.score) best = { score, t, mid };
+    }
+    if (!best) { S.restore(root); break; }
+    S.restore(best.mid);
+    steps++;
+    const pr = progress.get(target.addr) || { hp: target.health, since: steps };
+    if (target.health < pr.hp) { pr.hp = target.health; pr.since = steps; }
+    progress.set(target.addr, pr);
+    if (steps - pr.since > 40) { ignored.add(target.addr); if (opts.trace) opts.trace({ ignore: target.addr, category: target.category }); }
+    if (opts.trace && steps % 10 === 0) opts.trace({ fight: steps, hp: hpSum(), life: life(), enemies: living().length });
+  }
+  return { won: !living().length, life: life(), frames: g.frameNo - start, steps };
+};
