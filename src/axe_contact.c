@@ -11,6 +11,7 @@
 #include "player.h"
 #include "contact_swarm.h"
 #include "movement_curve.h"
+#include "vanargand_parts.h"
 
 void Axe_OnSecondaryColliderContact(void)
 {
@@ -131,15 +132,6 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame);
 
 s32 Div(s32, s32);
 
-static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *out,
-                                                       struct ContactPosition *a,
-                                                       struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
 {
     struct SceneActorApproachContext *context = p->base.context;
@@ -158,7 +150,7 @@ void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
     current = &context->current;
     ActorPhase_EmitTrailSprite(p, current, context->motionMode);
     Axe_UpdateTrailColliders(p);
-    SceneActor_SubtractApproachPosition(&difference, &context->destination, current);
+    Vanargand_Difference(&difference, &context->destination, current);
     current->x += Div(difference.x, context->remaining);
     context->remaining--;
     if (!context->remaining) {

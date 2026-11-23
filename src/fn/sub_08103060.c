@@ -1,3 +1,4 @@
+#include "vanargand_parts.h"
 #define gNamedObjectTetherBounds gUnk_086064B4
 #include "global.h"
 #include "named_object.h"
@@ -6,20 +7,13 @@ u32 TetherActor_CopyPosition(struct ContactPosition *);
 void TetherActor_SetPosition(struct ContactPosition *);
 void TetherActor_AddStatusFlags(u32, u32);
 void NamedObject_ClearAttachmentFlag(u32, s32);
-static inline void subtractVector(struct ContactPosition *d, struct ContactPosition *a,
-                                  struct ContactPosition *b)
-{
-    d->x = a->x - b->x;
-    d->y = a->y - b->y;
-    d->z = a->z - b->z;
-}
 void NamedObject_SnapTetherToPlatform(struct NamedObjectManager *manager,
                                       struct NamedObject *object)
 {
     struct ContactPosition target, delta;
     if (object->kind == 2) {
         TetherActor_CopyPosition(&target);
-        subtractVector(&delta, &target, &object->body.position);
+        Vanargand_Difference(&delta, &target, &object->body.position);
         if (delta.x <= gUnk_086064B4.x && delta.x >= -gUnk_086064B4.x &&
             delta.z <= gUnk_086064B4.z && delta.z >= -gUnk_086064B4.z) {
             TetherActor_SetPosition(&object->body.position);

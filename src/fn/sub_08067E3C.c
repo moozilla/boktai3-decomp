@@ -1,6 +1,7 @@
 #include "scene_particle_burst.h"
 #include "engine.h"
 #include "ram.h"
+#include "game_state_flags.h"
 // confidence=low: spawns pooled particles with optional velocity ranges and position jitter.
 #define SceneParticleBurst_CreateWithRanges sub_08067E3C
 struct SceneParticleBurstPool *SceneParticleBurst_EnsureSingleton(u32, u32);
@@ -9,12 +10,6 @@ s32 Mod(s32, s32);
 void ParticleSprite_Initialize(void *, const void *, u32);
 void Effect_SetOrigin(void *, s32, s32);
 #include "monster_particle_random.h"
-static inline u8 SceneHasFlag(u32 mask)
-{
-    if (gGameState->flags868 & mask)
-        return 1;
-    return 0;
-}
 s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
                                         const struct ContactPosition *velocity0,
                                         const struct ContactPosition *jitter0, s32 count0,
@@ -74,7 +69,7 @@ s32 SceneParticleBurst_CreateWithRanges(const struct ContactPosition *position,
             p->delay = Mod(ParticleRandom_ReadSample(table), 16);
             ParticleSprite_Initialize(effect, pool->graphicsResource, 0);
             Effect_SetOrigin(effect, -8, -8);
-            sequence = SceneHasFlag(8) ? (14) : (13);
+            sequence = GameState_TestWorldFlags(8) ? (14) : (13);
             Anim_SetSequence(&pool->sequences[p->index], pool->sequenceResource, sequence, 0,
                              (u8)(Mod(ParticleRandom_ReadSample(table), 2) | flip));
             effect->flags |= 0x201;

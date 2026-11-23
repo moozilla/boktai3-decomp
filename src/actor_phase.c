@@ -159,11 +159,6 @@ void ActorPhase_WaitBeforeRelocation(struct ChaseActor *actor, s32 frame)
     }
 }
 
-static inline void clearCollision(struct ContactCollider *p, u32 mask)
-{
-    p->flags &= ~mask;
-}
-
 static inline void clearFlags16(u16 *p, u32 mask)
 {
     *p &= ~mask;
@@ -175,8 +170,8 @@ void ActorPhase_UpdateSpriteRestore(struct ChaseActor *actor)
     if (SceneActorReaction_TakePrepared(actor)) {
         ActorPhase_GetDrawable(actor)->flags = (ActorPhase_GetDrawable(actor)->flags | 2) & ~1;
         ActorPhase_GetDrawable(actor)->angle = 0;
-        clearCollision(&actor->base.colliderB, 4);
-        clearCollision(&actor->base.colliderA, 4);
+        ContactCollider_ClearFlags(&actor->base.colliderB, 4);
+        ContactCollider_ClearFlags(&actor->base.colliderA, 4);
         Sound_PlaySong(0x16c);
     }
     if ((s8)ActorPhase_GetDrawable(actor)->scaleY > 112) {

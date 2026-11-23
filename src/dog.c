@@ -42,6 +42,7 @@
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
 #include "scene_actor_init_actor.h"
+#include "ghoul_disc.h"
 
 s32 Div(s32, s32);
 
@@ -330,12 +331,6 @@ extern const u16 gUnk_086061E4[][8];
 void SpriteEffectController_Create(void *, const void *, s32, u32, u32, u32, u32, u32, u32, u32,
                                    u32, u32, s32, s32, s32, s32, s32, s32);
 
-static inline u32 NextRandomSample(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
-
 static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
                                const struct ContactPosition *b)
 {
@@ -374,15 +369,16 @@ u16 Dog_UpdateItemDrop(struct ChaseActor *actor)
         paletteOffset = &actor->base.paletteOffset;
         if (palette == 3 || palette == 1) {
             if (sequence->index == 7 || sequence->index == 5 || sequence->index == 1) {
-                position.packed.x = (NextRandomSample(gRandomTable) & 63) - 48;
-                position.packed.z = (NextRandomSample(gRandomTable) & 63) - 48;
+                position.packed.x = (ParticleRandom_ReadDirectSample(gRandomTable) & 63) - 48;
+                position.packed.z = (ParticleRandom_ReadDirectSample(gRandomTable) & 63) - 48;
                 AddPosition(&position.position, &position.position, &actor->base.body.position);
                 SetDirectionOffset(&offset, (actor->base.body.direction + 0x80) & 0xFF, 0x50);
                 AddPosition(&position.position, &position.position, &offset);
                 position.position.y = actor->base.body.position.y;
                 ZeroFill8(&velocity);
                 if (*paletteOffset == 3) {
-                    s32 lifetime = (NextRandomSample((const u16 *)RANDOM_TABLE_ADDR) & 63) + 20;
+                    s32 lifetime =
+                        (ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 63) + 20;
                     SpriteEffectController_Create(&position, &velocity, 0x1C1A, 0xD1B8, 3, 0, 0x31,
                                                   0, 1, 0, 0, lifetime, 4, 1, 0x200004, 30, 8, 8);
                 } else {
@@ -694,11 +690,6 @@ static inline u32 CellShape(struct EngineMap **terrain, u32 cell)
     return *data >> 4;
 }
 
-static inline s32 MapWidth(struct EngineMap **terrain)
-{
-    return ((struct SceneActorChaseTerrainGrid *)(*terrain)->cells)->width;
-}
-
 static inline u8 TryRoute(struct ChaseActor *actor, void *route, struct ContactPosition *position,
                           struct ContactPosition *destination)
 {
@@ -761,16 +752,16 @@ static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s3
                     chosen = next - 1;
                     goto scanDone;
                 case 1:
-                    next = cell + MapWidth(terrain);
+                    next = cell + Ghoul_MapWidth(terrain);
                     i = 0;
                     completion = (struct EngineMap **)0x030052F4;
                     do {
                         if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                             goto finishSouth;
-                        next += MapWidth(terrain);
+                        next += Ghoul_MapWidth(terrain);
                         i++;
                     } while (i < steps);
-                    chosen = next - MapWidth(completion);
+                    chosen = next - Ghoul_MapWidth(completion);
                     goto scanDone;
                 case 2:
                     next = cell - 1;
@@ -784,22 +775,22 @@ static inline u32 SelectRetreat(struct ChaseActor *actor, u32 priorDirection, s3
                     chosen = next + 1;
                     goto scanDone;
                 case 3:
-                    next = cell - MapWidth(terrain);
+                    next = cell - Ghoul_MapWidth(terrain);
                     i = 0;
                     completion = (struct EngineMap **)0x030052F4;
                     do {
                         if (!SceneActorTerrain_CanTraverseCell(cell, next, height, shape))
                             goto finishNorth;
-                        next -= MapWidth(terrain);
+                        next -= Ghoul_MapWidth(terrain);
                         i++;
                     } while (i < steps);
-                    chosen = next + MapWidth(completion);
+                    chosen = next + Ghoul_MapWidth(completion);
                     goto scanDone;
                 finishSouth:
-                    chosen = next - MapWidth(terrain);
+                    chosen = next - Ghoul_MapWidth(terrain);
                     goto scanDone;
                 finishNorth:
-                    chosen = next + MapWidth(terrain);
+                    chosen = next + Ghoul_MapWidth(terrain);
                     goto scanDone;
                 default:
                     chosen = actor->base.terrainCell;
@@ -1088,12 +1079,6 @@ void Dog_OnItemContact(void *unused, struct ContactCollider *contact, struct Cha
 
 u32 SceneMovingParticle_CreateWithOptions(void *, void *, s32, s32, s32);
 
-static inline u32 DogTrail_NextSample(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
-
 void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
 {
     struct ContactPackedVector velocity;
@@ -1109,9 +1094,9 @@ void SceneActorAnimation_SpawnTrailAtPosition(void *position, u32 palette)
     randomOrigin = (u32)&gHeapHead + RESOURCE_REGISTRY_ENTRIES_ADDR;
     earlyTable = (const u16 *)RANDOM_TABLE_ADDR;
     mask = 255;
-    heading = DogTrail_NextSample(earlyTable) & mask;
+    heading = ParticleRandom_ReadDirectSample(earlyTable) & mask;
     {
-        s32 raw = DogTrail_NextSample(earlyTable);
+        s32 raw = ParticleRandom_ReadDirectSample(earlyTable);
         s32 speedMask = 31;
         planar = &velocity;
         raw &= speedMask;
