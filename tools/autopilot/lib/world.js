@@ -404,6 +404,38 @@ exports.breakBlock = function* (block, opts = {}) {
   return { ...r, health: (exports.blocks().find((b) => b.slot === block.slot) || {}).health };
 };
 
+// A town map (src/registry_choice_menu.c, registry key 3F74): a cursor (src/menu_cursor.c)
+// moved freely with the D-pad over 11 entries; A on an entry runs its script (stages.json
+// doors with "hub": index). hub() is the live menu or null.
+exports.hub = () => {
+  const t = exports.tasks().find((x) => !x.dead && x.update === 'Registry3F74_OnUpdate');
+  if (!t) return null;
+  const menu = g.at(Number(t.task), 'struct RegistryChoiceMenu');
+  const cursor = menu.cursor ? g.at(Number(menu.cursor.$addr ?? menu.cursor), 'struct MenuCursor') : null;
+  return { menu, cursor, state: menu.update ? g.name(menu.update) : '-' };
+};
+
+exports.chooseHub = function* (index, opts = {}) {
+  const start = g.frameNo, scene = exports.where().scene;
+  for (let t = 0; t < (opts.frames ?? 1200); t++) {
+    const h = exports.hub();
+    if (!h || exports.where().scene !== scene) return { done: true, frames: g.frameNo - start };
+    if (h.state !== 'Registry3F74_UpdateSelection' || !h.cursor) { yield 1; continue; }
+    const c = h.cursor, e = c.entries[index], b = e.bounds;
+    if (c.selectedIndex === index) {
+      yield g.press('a', 2);
+      yield g.press(0, 4);
+      yield g.until(() => !exports.hub() || exports.hub().state !== 'Registry3F74_UpdateSelection', 120);
+      continue;
+    }
+    const tx = (b.left + b.right) >> 1, ty = (b.top + b.bottom) >> 1;
+    const dx = tx - c.position.x, dy = ty - c.position.y;
+    const keys = [dx < -1 ? 'left' : dx > 1 ? 'right' : null, dy < -1 ? 'up' : dy > 1 ? 'down' : null].filter(Boolean);
+    yield g.press(keys.length ? keys.join('+') + (Math.max(Math.abs(dx), Math.abs(dy)) > 8 ? '+b' : '') : 0, 1);
+  }
+  return { done: false, reason: 'out of frames' };
+};
+
 // Push planning: a breadth-first search over block states with the game's rules
 // (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
 // (a block raises its cell to its top). A push from P into direction d moves the

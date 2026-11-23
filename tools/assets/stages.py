@@ -30,6 +30,8 @@ use library procedures, decoded here by argument position:
   switch    proc_1087(track, box, flag, value, tile, priority, proc): a floor switch on an
             HP box; stepping on it (the player or a pushed block) runs proc once, whose
             items are listed with the condition `floor switch BOX` (2759: the sword chest)
+  hub       a town map (registry key 3F74): its entry scripts' transitions are doors
+            with "hub": entry index and no box (2553, San Miguel)
   hittable  proc_1225/1226: a WoodenCrate-family object (a crate, or a lever switch
             with crateflags 9/10) at (x + 128, z + 128); attacking it runs its script
             (2782: the lever that opens the shutter on CD23)
@@ -166,7 +168,10 @@ class Walker:
             return
         if pid in DOORS:
             bx, sc, en = DOORS[pid]
-            o["doors"].append(dict(rec, box=a(bx) if bx else trap, scene=num(a(sc)), entrance=num(a(en))))
+            door = dict(rec, box=a(bx) if bx else trap, scene=num(a(sc)), entrance=num(a(en)))
+            if getattr(self, "hub_index", None) is not None:
+                door["hub"] = self.hub_index
+            o["doors"].append(door)
             return
         if pid in (1118, 1119):
             chest = pid == 1119 and num(a(6)) == 1
@@ -284,6 +289,16 @@ class Walker:
                     self.block(*blk, None, conds, box, depth, spawner)
             return
         key = num(ops[0]) if ops and (cid == 0xB745 or name == "chara") else None
+        if key == 0x3F74:
+            # a town map (Registry3F74, src/registry_choice_menu.c): keyword p lists the
+            # script each of its 11 cursor entries runs; their transitions are doors with
+            # hub = the entry index (no box)
+            k = dict((x, v) for x, v, _ in kw)
+            for i, v in enumerate(k.get("p") or []):
+                if num(v) is not None and not any(d.get("hub") == i for d in self.out["doors"]):
+                    self.hub_index = i
+                    self.call(num(v), [], conds, None, depth + 1, spawner)
+                    self.hub_index = None
         if spawner is not None and key in FAMILIES:
             if FAMILIES[key] not in spawner["families"]:
                 spawner["families"].append(FAMILIES[key])

@@ -101,7 +101,8 @@ const GOALS = {
     const visited = VISITED, limit = +(opt('--scenes', 8));
     let prev;
     for (let rooms = 0; rooms < limit; rooms++) {
-      const doorsHere = () => stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box));
+      const doorsHere = () => (L.hub() ? stageOf(L.where().scene).doors.filter((d) => d.hub !== undefined)
+        : stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box)));
       if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
       // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
       if (L.enemies().some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)))) {
@@ -142,7 +143,7 @@ const GOALS = {
       const dist = routeDistances(+opt('--goal', -1));
       const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
         (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene));
-      event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.box}->${d.scene}`) });
+      event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.hub !== undefined ? 'hub' + d.hub : d.box}->${d.scene}`) });
       let moved = false;
       // a room can still be playing its arrival event (a dialogue that starts late, the
       // map changing under the player): let it run and try the doors again
@@ -153,6 +154,13 @@ const GOALS = {
         }
         for (const d of doors) {
           prev = here;
+          if (d.hub !== undefined) {
+            const r = yield* L.chooseHub(d.hub);
+            event({ skill: 'hub', entry: d.hub, to: d.scene, ...r });
+            yield g.until(() => L.where().scene !== here, 600);
+            if (L.where().scene !== here) { moved = true; break; }
+            continue;
+          }
           if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
           if (L.where().scene !== here) { moved = true; break; }
         }
@@ -256,7 +264,7 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     if (step) { event({ skill: 'menu', ...step }); calm = 0; continue; }
     if (msg.open) { yield* L.advanceText(600); event({ skill: 'dialogue', string: msg.id, scene: L.where().scene }); calm = 0; continue; }
     yield 1;
-    const field = $player(g);
+    const field = $player(g) || (L.hub() && L.hub().state === 'Registry3F74_UpdateSelection');
     calm = field && ready() ? calm + 1 : 0;
     if (calm >= quiet) return true;
   }
