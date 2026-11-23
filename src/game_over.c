@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "game_over.h"
 #include "palette_pulse.h"
 #include "player.h"
@@ -255,8 +256,7 @@ void GameOver_StartFromScript(void)
 
 void GameOver_TryBeginClose(struct GameOver *panel)
 {
-    u32 mask = 0x400;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x400)) {
         GameOver_ShowGraphics(panel);
         Hud_SetMode(7);
         if ((u8)(gPlayers[0]->tetherMode - 0x21) <= 1) {
