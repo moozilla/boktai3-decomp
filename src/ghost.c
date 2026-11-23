@@ -115,11 +115,7 @@ void Ghost_BeginContactReaction(void *unused, struct ContactCollider *contact,
             SceneActorChase_SetState(s, 0, 2, 0);
             Ghost_EnableCollider(&s->base.colliderB);
             Ghost_EnableCollider(&s->base.colliderA);
-            {
-                u16 *f = &s->base.reactionFlags;
-                u32 mask = ~0x180;
-                *f &= mask;
-            }
+            SceneActorChase_ClearBits(&s->base.reactionFlags, 0x180);
             /* The linked flag is read here, but the result goes unused. */
             linked = Ghost_TestFlags(p, 0x80);
             {
@@ -317,9 +313,7 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = &actor->base.behaviorFlags;
-                u32 mask = ~0x10000;
-                *p &= mask;
+                SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
             } else {
                 SceneActorChase_SetActorFlags(actor, 0x10000);
             }
@@ -507,11 +501,7 @@ void Ghost_UpdateHitStagger(struct ChaseActor *actor, s32 tick)
             m &= (u16)flags->bits;
             flags->bits = m;
         }
-        {
-            u32 *flags = &actor->base.behaviorFlags;
-            s32 mask = ~0x80;
-            *flags &= mask;
-        }
+        SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         MonsterInit_SetStatusFlags(actor, 0x100000);
         SceneActor_EndLinkedReaction(actor);
         Ghost_SetFlags(ctx, 0x10);
