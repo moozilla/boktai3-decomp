@@ -436,9 +436,7 @@ void Lun_TurnTowardSavedDirection(struct ChaseActor *actor)
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = &actor->base.behaviorFlags;
-                u32 mask = ~0x10000;
-                *p &= mask;
+                SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
             } else {
                 SceneActorChase_SetActorFlags(actor, 0x10000);
             }
@@ -716,9 +714,7 @@ void Lun_ApproachMovementTarget(struct ChaseActor *a, s32 frame)
         a->base.stepDone = 1;
         ClearFlag((struct LunFlagWord *)&a->base.motionFlags, ~0x120);
         {
-            u32 *p = &a->base.behaviorFlags;
-            u32 mask = ~0x80;
-            *p &= mask;
+            SceneActorChase_ClearWordFlags(&a->base.behaviorFlags, 0x80);
         }
         SetMotionFlags(a, 0x100000);
         ctx->hoverPhase = 0;
@@ -772,9 +768,7 @@ void Lun_UpdateDefeat(struct ChaseActor *actor)
         SceneActorAnimation_SelectProfileEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound(actor);
         {
-            u32 *p = &actor->base.statusFlags;
-            u32 m = ~0x100000;
-            *p &= m;
+            SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x100000);
         }
         {
             struct ContactCollider *c = &actor->base.colliderB;
