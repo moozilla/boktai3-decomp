@@ -8,10 +8,9 @@ void Sound_StopSong(u32);
 u32 SpriteComponent_Suspend(struct SpriteComponent *component)
 {
     u32 flags = component->flags;
-    u32 mask = 1;
-    u32 active = flags & mask;
+    u32 active = flags & 1;
     if (!active)
         Sound_StopSong(0x202);
-    component->flags |= mask;
+    component->flags |= 1;
     /* Callers ignore the unspecified ABI result. */
 }
