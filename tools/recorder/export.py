@@ -10,8 +10,9 @@ Tables
   objects(frame, addr, size, type, label)                      typed objects at each snapshot frame
   fields(type, off, size, path)                                scalar leaves of every type used above
 Views
+  addr_names(snap, addr, name)                                  each written address named at each snapshot
   typed_writes: each write named `object.path` through the latest snapshot's objects and the
-  globals (falls back to the raw address). DuckDB only (it needs range joins to be fast).
+  globals (falls back to the raw address). DuckDB only.
 
   duckdb build/recorder/sessions/field/history.duckdb \\
     "select frame, name, value, function, line from typed_writes where name like 'Player#%.position.x' limit 5"
@@ -132,23 +133,36 @@ def export(session, db=None, sqlite=False, log=print):
                 con.execute(f'CREATE TABLE {name} ({cols})')
                 con.execute(f"INSERT INTO {name} SELECT * FROM read_csv('{tmp / (name + '.csv')}', header=false, "
                             f"columns={{{', '.join(repr(c.split()[0]) + ': ' + repr(c.split()[1]) for c in cols.split(', '))}}})")
+            # names once per (snapshot, address) actually written, then an equality join
+            con.execute('''CREATE TABLE snaps AS SELECT DISTINCT frame FROM objects ORDER BY frame''')
+            con.execute('''
+                CREATE TABLE addr_names AS
+                WITH wa AS (
+                  SELECT DISTINCT s.frame AS snap, w.addr
+                  FROM writes w ASOF JOIN snaps s ON w.frame >= s.frame),
+                named AS (
+                  SELECT wa.snap, wa.addr,
+                         CASE WHEN o.label LIKE '%->' THEN o.label || ltrim(coalesce(f.path, ''), '.')
+                              ELSE o.label || coalesce(f.path, '') END
+                         || CASE WHEN f.off IS NULL THEN printf('+0x%X', wa.addr - o.addr) ELSE '' END AS name,
+                         o.size AS osize
+                  FROM wa JOIN objects o ON o.frame = wa.snap AND wa.addr >= o.addr AND wa.addr < o.addr + o.size
+                  LEFT JOIN fields f ON f.type = o.type AND wa.addr - o.addr >= f.off AND wa.addr - o.addr < f.off + f.size
+                  UNION ALL
+                  SELECT wa.snap, wa.addr,
+                         g.name || coalesce(f.path, '') || CASE WHEN f.off IS NULL THEN printf('+0x%X', wa.addr - g.addr) ELSE '' END,
+                         1 << 30
+                  FROM wa JOIN globals g ON wa.addr >= g.addr AND wa.addr < g.addr + g.size
+                  LEFT JOIN fields f ON f.type = g.type AND wa.addr - g.addr >= f.off AND wa.addr - g.addr < f.off + f.size)
+                SELECT snap, addr, arg_min(name, osize) AS name FROM named GROUP BY snap, addr
+            ''')
             con.execute('''
                 CREATE VIEW typed_writes AS
-                WITH snap AS (SELECT DISTINCT frame FROM objects),
-                w AS (SELECT w.*, (SELECT max(frame) FROM snap WHERE snap.frame <= w.frame) AS snap FROM writes w),
-                named AS (
-                  SELECT w.seq, o.label || CASE WHEN f.off IS NULL THEN printf('+0x%X', w.addr - o.addr) ELSE coalesce(f.path, '') END AS name, o.size AS osize
-                  FROM w JOIN objects o ON o.frame = w.snap AND w.addr >= o.addr AND w.addr < o.addr + o.size
-                  LEFT JOIN fields f ON f.type = o.type AND w.addr - o.addr >= f.off AND w.addr - o.addr < f.off + f.size
-                  UNION ALL
-                  SELECT w.seq, g.name || CASE WHEN f.off IS NULL THEN printf('+0x%X', w.addr - g.addr) ELSE coalesce(f.path, '') END, 1 << 30
-                  FROM w JOIN globals g ON w.addr >= g.addr AND w.addr < g.addr + g.size
-                  LEFT JOIN fields f ON f.type = g.type AND w.addr - g.addr >= f.off AND w.addr - g.addr < f.off + f.size
-                ),
-                best AS (SELECT seq, arg_min(name, osize) AS name FROM named GROUP BY seq)
-                SELECT w.seq, w.frame, coalesce(b.name, printf('0x%08X', w.addr)) AS name, w.addr, w.width, w.value,
+                SELECT w.seq, w.frame, coalesce(n.name, printf('0x%08X', w.addr)) AS name, w.addr, w.width, w.value,
                        s.function, s.file || ':' || s.line AS line, s.text
-                FROM writes w LEFT JOIN best b USING (seq) LEFT JOIN sites s USING (site)
+                FROM writes w ASOF LEFT JOIN snaps sn ON w.frame >= sn.frame
+                LEFT JOIN addr_names n ON n.snap = sn.frame AND n.addr = w.addr
+                LEFT JOIN sites s ON s.site = w.site
             ''')
             con.close()
     finally:
