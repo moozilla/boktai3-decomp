@@ -68,6 +68,8 @@ struct SceneVolumeActor {
     u8 pad50C[0xF4];
     u8 sequenceBuffer[0x620];
     u8 pathPosition[8];
+    u8 padC28[0x38];
+    u32 scripts[1]; /* indexed by decisionMode; extends past the shared layout */
 };
 
 static inline void SceneVolume_SetFlags(struct SceneVolumeActor *actor, u32 flags)
