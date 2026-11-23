@@ -3,6 +3,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
 struct NamedObjectPosition {
     u32 xy, zp;
 };
@@ -47,8 +48,7 @@ u32 NamedObject_UpdatePool(struct NamedObjectManager *manager)
     if (!manager->activeMask)
         return 0;
     {
-        u32 mask = 0x400;
-        if ((mask & (gEngineFlags | gScenePauseFlags)) || testMask()) {
+        if (Engine_PauseBits(0x400) || testMask()) {
             Sound_StopSong(0x158);
             Sound_StopSong(0x261);
             Sound_StopSong(0x289);

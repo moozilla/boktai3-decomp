@@ -1,4 +1,5 @@
 #include "particle_emitter.h"
+#include "engine_pause.h"
 
 void TimedSpriteEffect_RequestStop(u32 slot)
 {
@@ -133,16 +134,11 @@ static inline void GetOffset(struct ScenePoolVec32 *out, s32 index)
     }
 }
 
-static inline u32 TestMode(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-
 void ParticleEmitter_UpdateFlight(struct ParticleEmitter *p)
 {
     struct ScenePoolVec32 pos, offset;
     if (p->entered) {
-        if (TestMode(0x800)) {
+        if (Engine_PauseBits(0x800)) {
             GetPosition(&pos, 1 - p->owner);
             GetOffset(&offset, 1 - p->owner);
         } else {

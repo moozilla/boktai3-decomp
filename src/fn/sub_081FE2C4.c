@@ -4,6 +4,7 @@
 #include "word_flags.h"
 
 #include "sun_orb_effect.h"
+#include "engine_pause.h"
 
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
@@ -55,8 +56,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
             struct OrbitEffectSprite *sprite = &effect->sprite;
             struct OrbitEffectParams *params = &effect->params;
             struct ContactCollider *collider;
-            u32 mask = 0x400;
-            if ((gEngineFlags | gScenePauseFlags) & mask)
+            if (Engine_PauseBits(0x400))
                 continue;
             {
                 u32 pause = 4;

@@ -3,6 +3,7 @@
 #include "ram.h"
 #include "player_cue_sequence.h"
 #include "player.h"
+#include "engine_pause.h"
 struct SpriteEffectControllerPool *SpriteEffectController_EnsurePool(void);
 void *SpriteEffectController_LoadSpriteResources(struct SpriteEffectController *, s32, u32);
 void ParticleSprite_Initialize(void *, const void *, s32);
@@ -25,8 +26,7 @@ SpriteEffectController_Create(const struct ContactPosition *position,
             return 0;
     }
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return 0;
     }
     if (gPlayerSlotStatus[0] & 4)

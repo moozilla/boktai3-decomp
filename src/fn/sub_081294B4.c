@@ -2,6 +2,7 @@
 #include "player_cue_sequence.h"
 #include "ram.h"
 #include "engine_globals.h"
+#include "engine_pause.h"
 struct Vec {
     s16 x, y, z, pad;
 };
@@ -53,10 +54,9 @@ static inline u32 FeatherBlockedSlots(u32 mask)
 }
 static inline u32 FeatherCreationBlockFlags(void)
 {
-    u32 mask = 0x400;
-    u32 blocked = (gEngineFlags | gScenePauseFlags) & mask;
+    u32 blocked = Engine_PauseBits(0x400);
     if (blocked)
-        return mask;
+        return 0x400;
     blocked = FeatherBlockedSlots(4);
     return blocked;
 }

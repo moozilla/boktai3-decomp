@@ -1,4 +1,5 @@
 #include "following_sprite_effect.h"
+#include "engine_pause.h"
 
 void ParticleBurstEffect_ResetManager(void)
 {
@@ -518,7 +519,7 @@ s32 ScreenMote_UpdateManager(struct ScreenMoteManager *manager)
     remaining = 31;
     do {
         if (control->active) {
-            if (((gEngineFlags | gScenePauseFlags) & pauseMask) ||
+            if (Engine_PauseBits(pauseMask) ||
                 ((gEngineFlags & 0x800) && (gEnginePauseFlags & 7))) {
                 if (control->options & 1)
                     goto next;

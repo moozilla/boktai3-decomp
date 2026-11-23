@@ -1,4 +1,5 @@
 #include "bouncing_object.h"
+#include "engine_pause.h"
 static inline u8 Occupied(const u32 *mask, u32 bit)
 {
     if (*mask & bit)
@@ -22,8 +23,7 @@ s32 BouncingObject_UpdatePool(struct BouncingPool *input)
         stopping = (void *)((u32)pool + stoppingOffset);
         *stopping = 1;
     } else {
-        u32 mask = 0x400;
-        if (!((gEngineFlags | gScenePauseFlags) & mask)) {
+        if (!Engine_PauseBits(0x400)) {
             u32 blockedMask = 4;
             u32 blocked;
             blocked = gUnk_02000560 & blockedMask;

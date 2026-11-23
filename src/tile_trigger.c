@@ -7,6 +7,7 @@
 #include "display_animation.h"
 #include "display_sprite_playback.h"
 #include "display_sequence_inline.h"
+#include "engine_pause.h"
 
 /* Tentative trigger payload view, established by the two script-call paths. */
 
@@ -740,16 +741,11 @@ static inline u8 Used(u32 *mask, s32 i)
     return FALSE;
 }
 
-static inline u32 TestPair(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-
 s32 TileTrigger_TickManager(struct TileTriggerManager *manager)
 {
     struct TileTrigger **tiles = manager->tiles;
     s32 i;
-    if (TestPair(0x400))
+    if (Engine_PauseBits(0x400))
         return 0;
     {
         u32 mask = 4;
