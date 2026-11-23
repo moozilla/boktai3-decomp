@@ -30,15 +30,10 @@ void TimeResult_BeginFadeOut(struct ChallengeTimeResult *result)
 
 void TimeResult_BeginDigitReveal(struct ChallengeTimeResult *result)
 {
-    void (*f)(struct ChallengeTimeResult *) = TimeResult_UpdateDigitReveal;
-    s32 m = ~1;
-    u32 *flags = &result->digits[0].flags;
     s32 i;
-    for (i = 5; i >= 0; i--) {
-        *flags &= m;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-    }
-    TimeResult_SetState(result, f);
+    for (i = 0; i < 6; i++)
+        result->digits[i].flags &= ~1;
+    TimeResult_SetState(result, TimeResult_UpdateDigitReveal);
 }
 
 s32 TimeResult_HandleInput(struct ChallengeTimeResult *result)
