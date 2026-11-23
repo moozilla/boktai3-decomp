@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_stimulus.h"
@@ -5,18 +6,12 @@
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void SceneActorAttachment_RetargetNearestPlayer(void *, struct ContactPosition *);
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 s8 SceneStimulus_FindOverlapFromIndex(s32, s32, u32, u8, u16, s32);
 u32 sub_081376B4(void *, struct ContactPosition *, s32);
 u8 SceneActorTarget_CanReplaceByDistance(void *, struct ContactPosition *, u32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 
 static inline void OrWord(u32 *flags, u32 mask)
 {
@@ -185,7 +180,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
     timer = &GROUP_FIELD(group, 0x54, u16);
     if (*timer == 0) {
         control = (struct SceneActorRegistryControl *)(group + 0x4C);
-        ClearWordFlags(&actor->base.behaviorFlags, 0xFFFEBE3F);
+        SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, 0xFFFEBE3F);
         control->counter = 0;
         FIELD(control, 0x14, u16) = 0;
         control->timer = 0;

@@ -1,11 +1,10 @@
+#include "scene_actor_chase_shared.h"
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
 #include "area_effect_link.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
 
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 
 static inline u32 TestSlot(s32 i)
 {

@@ -1,9 +1,8 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_reset.h"
 s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 
 static inline u8 ConsumeEntry(struct ChaseActor *actor)
 {
@@ -40,10 +39,6 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
-static inline void ClearWordFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 
 static inline void ClearHalfFlags(u16 *flags, u32 mask)
 {
@@ -74,8 +69,8 @@ void sub_08136F58(struct ChaseActor *actor)
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (ConsumeEntry(actor)) {
         SetControl(actor, actor->base.onStanding, 0);
-        ClearWordFlags(&actor->base.behaviorFlags, ~0x80);
-        ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+        SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
+        SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
         ClearHalfFlags(&actor->base.motionFlags, ~0x200);
         actor->base.field2C2 = 0x40;
     }
@@ -101,7 +96,7 @@ void sub_08136F58(struct ChaseActor *actor)
                 struct SceneActorRegistryControl *control = &group->control;
                 u32 mask = 0x200000;
                 if (actor->base.behaviorFlags & mask) {
-                    ClearWordFlags(&actor->base.statusFlags, ~0x1000000);
+                    SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
                     {
                         u16 k1 = 0x200;
                         actor->base.motionFlags &= ~k1;
