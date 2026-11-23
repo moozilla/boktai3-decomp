@@ -288,6 +288,7 @@ exports.navigate = function* (target, opts = {}) {
     if (!path) return done(false, 'no path');
     let interrupted = false;
     for (const [cx, cz] of path.slice(1)) {
+      if (opts.stopIf && opts.stopIf()) return done(false, 'stopped');
       const r = yield* exports.safeStep(cx, cz, opts);
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (opts.trace) opts.trace({ to: [cx, cz], ...r });
@@ -498,13 +499,40 @@ exports.enemies = () => {
 // the best by damage dealt minus lost life (life costs more: opts.lifeCost); the
 // distance to the target breaks ties. B is the weapon (measured: it kills the first
 // skeletons; A and the shoulder buttons do nothing in a fight).
+// Targets the game itself tracks for lock-on (src/fn/sub_0815F5F8.c TargetRegistry:
+// gSceneLinkList->first, entries {body, flags, callback, next}, flag 1 enabled): every
+// hittable enemy, including the ones outside the scene actor registry (the Bronze Armor
+// of 2803). body is a SceneActorBody (position at +12, owner at +60). Health by layout:
+// flag 0x10 a RoomActor (health +0x9C); Armor_ReceiveTargetEvent the armor
+// (src/fn/sub_0818B7AC.c ArmorContactOwner: health +0xB1C, max +0xB1E).
+exports.targets = () => {
+  const reg = g.u32(g.types.globals.gSceneLinkList.addr), out = [];
+  if (!reg) return out;
+  for (let e = g.u32(reg + 0x18), n = 0; e && n < 64; e = g.u32(e + 12), n++) {
+    const body = g.u32(e), flags = g.u32(e + 4), cb = g.u32(e + 8);
+    if (!body) continue;
+    const owner = g.u32(body + 60), fn = cb ? g.name(cb) : '';
+    let health = null;
+    if (flags & 0x10) health = g.s16(owner + 0x9c);
+    else if (/^Armor_ReceiveTargetEvent/.test(fn)) health = g.s16(owner + 0xb1c);
+    out.push({ addr: owner, entry: e, enabled: !!(flags & 1), callback: fn, x: g.s16(body + 12), y: g.s16(body + 14), z: g.s16(body + 16),
+      health, alive: health === null ? !!(flags & 1) : health > 0 });
+  }
+  return out;
+};
+
 exports.fight = function* (opts = {}) {
   const S = exports.session, p = $.gPlayers[0], start = g.frameNo, scene = exports.where().scene;
   const DIRS8 = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
   // a target that takes no damage for 40 steps is not a fight (a scripted thief,
   // an invulnerable actor): leave it alone
   const ignored = exports.fightIgnored || (exports.fightIgnored = new Set()), progress = new Map();
-  const living = () => exports.enemies().filter((e) => e.alive && !ignored.has(e.addr));
+  // registry enemies, plus lock-on targets outside the registry (bosses, armors)
+  const living = () => {
+    const reg = exports.enemies().filter((e) => e.alive && !ignored.has(e.addr));
+    const more = exports.targets().filter((t) => t.alive && t.health !== null && !reg.some((e) => e.addr === t.addr) && !ignored.has(t.addr));
+    return reg.concat(more);
+  };
   const hpSum = () => living().reduce((s, e) => s + Math.max(0, e.health), 0);
   const toward = (e) => {
     const dx = e.x - p.position.x, dz = e.z - p.position.z;

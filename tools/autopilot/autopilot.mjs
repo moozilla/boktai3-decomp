@@ -202,11 +202,20 @@ function routeDistances(goal) {
 // the room's chests and items (the usual ask), then try again.
 function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
+  let fights = 0;
   for (let attempt = 0; attempt < 6; attempt++) {
     const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
-    const r = yield* L.navigate(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
+    // enemies that appear on the way (a scripted ambush, a boss after its banner): fight
+    const foes = () => L.enemies().concat(L.targets().filter((t) => t.health !== null)).some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)));
+    const r = yield* L.navigate(box, { avoid, stopIf: foes, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
+    if (r.reason === 'stopped' && fights++ < 5) {
+      const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
+      event({ skill: 'fought', ...f, scene: L.where().scene });
+      attempt--;
+      continue;
+    }
     if (r.reason !== 'gated') return false;
     const item = stageOf(scene).items.find((it) => !tried.has(`${it.x},${it.z}`));
     if (!item) return false;
