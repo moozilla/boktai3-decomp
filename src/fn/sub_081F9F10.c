@@ -54,8 +54,7 @@ s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
             u32 zero = 0;
             *dest = direction;
             {
-                u32 flags = 2;
-                p->flags |= flags;
+                Ratatosk_SetFlags(p, 2);
             }
             setState(p, 1, zero, 1);
             setCallback(p, Ratatosk_UpdateDefeatSequence, 15);

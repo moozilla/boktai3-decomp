@@ -24,8 +24,7 @@ static inline u32 TestFlag(u32 mask, u32 *flags)
 s32 Ratatosk_ProcessDefeatState(struct Ratatosk *p)
 {
     if (p->health <= 0 && p->vulnerable) {
-        u32 mask = 2;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 2);
         SetState(p, (void (*)(void))Ratatosk_UpdateDefeatSequence, 15);
     }
     p->vulnerable = 0;

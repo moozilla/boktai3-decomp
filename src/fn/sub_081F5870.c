@@ -29,8 +29,7 @@ void SceneActor_BeginTimedAnimation(struct Ratatosk *p, s32 elapsed)
         p->interval = 60;
     }
     {
-        u32 mask = 0x40000;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x40000);
     }
     if (elapsed >= self->interval)
         p->actionFinished = 1;

@@ -69,8 +69,7 @@ void Ratatosk_UpdateRetreatSequence(u8 *p)
             u32 zero = 0;
             *duration = 16;
             {
-                u32 animation = 4;
-                actor->animation = animation;
+                actor->animation = 4;
             }
             W(0x180) = zero;
         }

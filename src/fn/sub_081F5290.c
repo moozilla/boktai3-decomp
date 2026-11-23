@@ -87,8 +87,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
     p2->phaseTimer = 8;
     p2->frameDamage = 0;
     {
-        u32 mask = 12;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 12);
     }
     if (tick > 29) {
         *scaleX = 0;
@@ -131,8 +130,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
             sub_081FC26C(&params, &spawn);
         }
         {
-            u32 bit = 1;
-            p->flags |= bit;
+            Ratatosk_SetFlags(p, 1);
         }
     }
 }

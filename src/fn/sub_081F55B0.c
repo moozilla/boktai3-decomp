@@ -62,8 +62,7 @@ void Ratatosk_UpdateOrbitingParticlePose(struct Ratatosk *p)
     Ratatosk_ConfigureParticle(params, 20, 0, 0, 2, 0);
     SceneParticles_SpawnAtPosition(params, &spawn);
     if (*savedTimer > 5) {
-        u32 mask = 0x800000;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x800000);
     }
     if (*savedTimer > 120) {
         Sound_StopSong(0x56b);

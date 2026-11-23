@@ -30,8 +30,7 @@ void Ratatosk_UpdateFadeIn(struct Ratatosk *p, s32 timer)
     if (p->locked)
         p->anchor.y += 0x80;
     {
-        u32 mask = 0x8000c;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x8000c);
     }
     SlotController_SetSlotFlag2(Ratatosk_GetSelectedPointIndex());
     if (timer > 299 || p->fade > 63) {

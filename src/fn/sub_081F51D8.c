@@ -13,9 +13,8 @@ void Ratatosk_UpdateDirectionalRecovery(struct Ratatosk *p, s32 timer)
         angle = p->targetAngle + 0x80;
         Ratatosk_SetFacing(p, angle);
         {
-            u16 mode = 0;
-            SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 0x1d, mode,
-                                                  1, 4);
+            SceneActors_StartDirectionalAnimation(p, p2->animationData, p2->animation, 0x1d, 0, 1,
+                                                  4);
         }
         Sound_PlaySongChecked(0x55f);
     }

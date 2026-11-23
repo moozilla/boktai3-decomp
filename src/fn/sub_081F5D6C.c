@@ -34,15 +34,13 @@ void SceneActor_UpdateAnimation0Timer(struct Ratatosk *p, s32 elapsed)
     self->scaleZ = 0;
     self->scaleMode = 0;
     {
-        u32 mask = 0x100000;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x100000);
     }
     if (!(u8)Callback_InvokeWithArgument(p, p->actionTryUpdate)) {
         if (elapsed >= self->interval && !p->locked)
             p->actionFinished = 1;
         {
-            u32 mask = 0x10;
-            p->flags |= mask;
+            Ratatosk_SetFlags(p, 0x10);
         }
     }
 }

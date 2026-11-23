@@ -204,7 +204,6 @@ void Ratatosk_UpdateRadialSummonAttack(struct Ratatosk *p, s32 tick)
         p->actionFinished = 1;
     }
     if (!Callback_InvokeActor(p, p->actionTryUpdate)) {
-        u32 mask = 0x80000;
-        p->flags |= mask;
+        Ratatosk_SetFlags(p, 0x80000);
     }
 }
