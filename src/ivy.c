@@ -1444,21 +1444,7 @@ void SceneActor_BeginReaction22(struct ChaseActor *actor)
     actor->base.behavior2AA = 0;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
-    {
-        void *callback = Ivy_UpdateActiveState;
-        u8 reaction = 0x22;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = reaction;
-        actor->base.target = callback;
-    }
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
+    SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
 }
 
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
