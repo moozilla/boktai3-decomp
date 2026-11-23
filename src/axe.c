@@ -3206,20 +3206,6 @@ void Axe_UpdateBodyColliders(struct ChaseActor *actor)
     }
 }
 
-struct AxeAttackContext {
-    u8 unk_00[0xCEC];
-    struct ContactCollider attackColliders[2];
-    u8 unk_D94[0xE4C - 0xD94];
-    u32 flags;
-};
-
-static inline u8 Axe_TestFlag(u32 mask, const u32 *flags)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-
 static inline u8 Axe_TestMaskedFlags(u32 value)
 {
     if (value)
@@ -3233,7 +3219,7 @@ struct AxeAttackSelection {
 
 static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelection *selection)
 {
-    return Axe_TestFlag(mask, selection->flags);
+    return WordFlags_Has(mask, selection->flags);
 }
 
 #define Axe_ApplyAttack(collider, actor, index)                                                    \
@@ -3249,16 +3235,16 @@ static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelectio
 
 void Axe_FireAttack(struct ChaseActor *actor)
 {
-    struct AxeAttackContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     struct AxeAttackSelection selection;
 
-    if (Axe_TestFlag(0x200, &context->flags)) {
+    if (WordFlags_Has(0x200, &context->flagsE4C)) {
         Axe_ApplyAttack(&actor->base.colliderB, actor, 2);
-        Axe_ApplyAttack(&context->attackColliders[0], actor, 2);
-        Axe_ApplyAttack(&context->attackColliders[1], actor, 2);
+        Axe_ApplyAttack(&context->extraAttack[0], actor, 2);
+        Axe_ApplyAttack(&context->extraAttack[1], actor, 2);
     } else {
-        u32 value = Flags_MaskedWord(0x800, &context->flags);
-        selection.flags = &context->flags;
+        u32 value = Flags_MaskedWord(0x800, &context->flagsE4C);
+        selection.flags = &context->flagsE4C;
         if (Axe_TestMaskedFlags(value)) {
             s32 power = actor->base.attacks.first[2] * 2;
             s32 force = actor->base.attacks.second[2] * 2;
@@ -3271,27 +3257,27 @@ void Axe_FireAttack(struct ChaseActor *actor)
             {
                 u32 reactionFlags = actor->base.attacks.flags[2];
                 u16 duration = actor->base.attacks.parameter[2];
-                Collider_SetAttackProperties(&context->attackColliders[0], power, force, 0,
+                Collider_SetAttackProperties(&context->extraAttack[0], power, force, 0,
                                              reactionFlags, duration);
             }
             {
                 u32 reactionFlags = actor->base.attacks.flags[2];
                 u16 duration = actor->base.attacks.parameter[2];
-                Collider_SetAttackProperties(&context->attackColliders[1], power, force, 0,
+                Collider_SetAttackProperties(&context->extraAttack[1], power, force, 0,
                                              reactionFlags, duration);
             }
         } else if (Axe_TestSelectionFlags(0x400, &selection)) {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 1);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 1);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 1);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 1);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 1);
         } else if (Axe_TestSelectionFlags(0x1000, &selection)) {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 0);
         } else {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 0);
         }
     }
 }
