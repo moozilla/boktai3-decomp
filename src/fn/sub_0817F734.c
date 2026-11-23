@@ -2,10 +2,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "state_actor_action_entry.h"
+#include "scene_indicator.h"
 // confidence=low: BossSlot2 per-frame update: animation, shake, cached target bearings.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u8 pad0[12];
     struct Vec position;

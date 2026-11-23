@@ -5,10 +5,6 @@
 // confidence=low: repeats charges until terrain or the attempt limit ends them.
 
 
-static inline void Request(struct HresvelgrTravelActor *p, u32 kind)
-{
-    p->requestedAnimation = kind;
-}
 s32 Hresvelgr_HasCellOverride(void *);
 static inline s32 FacesBoundary(struct HresvelgrTravelActor *p)
 {
@@ -41,7 +37,7 @@ void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *p)
     switch (a->state) {
         case 0:
             if (!a->frame) {
-                Request(q, 24);
+                Hresvelgr_SetActionAnimation(q, 24);
                 a->frame++;
             } else if (q->finished)
                 ActionState_AdvanceState(a);
@@ -52,7 +48,7 @@ void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *p)
                     ActionState_SetState(a, 3);
                     break;
                 }
-                Request(q, 26);
+                Hresvelgr_SetActionAnimation(q, 26);
                 (p->chargeCount)++;
                 a->frame++;
             } else if (q->finished) {
@@ -66,21 +62,21 @@ void Hresvelgr_UpdateRepeatedCharge(struct HresvelgrTravelActor *p)
             break;
         case 2:
             if (!a->frame) {
-                Request(q, 2);
+                Hresvelgr_SetActionAnimation(q, 2);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 1);
             break;
         case 3:
             if (!a->frame) {
-                Request(q, 25);
+                Hresvelgr_SetActionAnimation(q, 25);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 1);
             break;
         case 4:
             if (!a->frame) {
-                Request(q, 12);
+                Hresvelgr_SetActionAnimation(q, 12);
                 a->frame++;
             } else if (q->finished)
                 ActionState_SetState(a, 5);

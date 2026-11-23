@@ -5,6 +5,7 @@
 #include "engine_globals.h"
 #include "area_effect_link.h"
 #include "engine_pause.h"
+#include "vanargand_projectiles.h"
 
 struct GloveModel;
 union GloveAnimationKey {
@@ -144,12 +145,6 @@ void ActorMarkerPool_ShowMarker(s32);
 s32 ModifierStats_ApplyKind11(void *, s32);
 s32 ModifierStats_ApplyKinds2And5(void *, s32);
 s32 Div(s32, s32);
-static inline s32 Scale(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -(-v >> 12);
-}
 static inline u32 Glove_ReadFlags(struct Glove *p)
 {
     return p->flags;
@@ -241,9 +236,9 @@ void Glove_UpdatePostState(struct Glove *p)
             struct Vec16 *o = &off;
             s32 angle = (s16)self->angle;
             s32 radius = 20;
-            o->x = Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
+            o->x = VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * radius);
             o->y = 0;
-            o->z = Scale(gUnk_086149C4[angle & 255] * radius);
+            o->z = VanargandProjectile_Scale(gUnk_086149C4[angle & 255] * radius);
             SpatialIndex_SetPosition(self->contactIndex, pos.x + off.x, pos.y, pos.z + off.z);
         }
         if (self->spatialTimer) {

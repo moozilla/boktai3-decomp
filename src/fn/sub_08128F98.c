@@ -2,6 +2,8 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_actor_registry.h"
+#include "vanargand_projectiles.h"
+#include "ghoul_disc.h"
 struct Feather {
     u32 flags;
     u8 unknown4[3], priority;
@@ -56,12 +58,6 @@ static inline u8 *CellData(s32 index)
     }
     return p;
 }
-static inline s32 Scale(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
-}
 void SpriteEffectController_Create(struct ContactPosition *, struct ContactPosition *, s32, u32,
                                    u32, u32, u32, u32, u32, u32, u32, u32, s32, s32, s32, s32, s32,
                                    s32);
@@ -69,16 +65,10 @@ u8 FeatherEffectPool_ClipScatterPath(struct Feather *, struct ContactPosition *,
 // confidence=low: scatters terrain-constrained sprite effects ahead of the feather animation.
 static inline void SetVelocity(struct ContactPosition *v, s32 angle, s32 speed)
 {
-    s32 x = Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+    s32 x = VanargandProjectile_Scale(gUnk_086149C4[(angle + 64) & 255] * speed);
     v->x = x;
     v->y = 0;
-    v->z = Scale(gUnk_086149C4[angle & 255] * speed);
-}
-static inline s32 Divide64(s32 n)
-{
-    if (n >= 0)
-        return n >> 6;
-    return -(-n >> 6);
+    v->z = VanargandProjectile_Scale(gUnk_086149C4[angle & 255] * speed);
 }
 static inline void Add(struct ContactPosition *out, struct ContactPosition *a,
                        struct ContactPosition *b)
@@ -102,7 +92,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     struct ContactPosition velocity;
     union SceneActorRegistryPackedPosition spot;
     s32 sourceCell;
-    s32 direction = Divide64((p->angle + 0x20) & 255) * 64;
+    s32 direction = Ghoul_QuarterDirection((p->angle + 0x20) & 255) * 64;
     s32 cell;
     SetVelocity(&center, direction, 512);
     Add(&center, &p->position, &center);
@@ -123,7 +113,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             Add(ScatterCursor(&scatter), &center, ScatterCursor(&scatter));
             cell = Terrain_GetCellIndex(ScatterCursor(&scatter));
             if (FeatherEffectPool_ClipScatterPath(p, scatter, sourceCell, cell,
-                                                  Divide64(direction)))
+                                                  Ghoul_QuarterDirection(direction)))
                 goto next;
             data = CellData(cell);
             if ((*(const u8 *)data) >> 4)

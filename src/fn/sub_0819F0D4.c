@@ -6,6 +6,7 @@
 
 #include "hresvelgr_travel.h"
 #include "scene_vec_polar.h"
+#include "group_objects.h"
 
 struct ReactionIds {
     u32 a, b;
@@ -23,13 +24,6 @@ static inline void add(struct SceneVec *dst, struct SceneVec *a, struct SceneVec
     dst->x = b->x + a->x;
     dst->y = b->y + a->y;
     dst->z = b->z + a->z;
-}
-static inline int randomValue(void)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)gRandomTable);
 }
 void Hresvelgr_UpdateRandomBurstPhase(struct HresvelgrTravelActor *actor, s32 frame)
 {

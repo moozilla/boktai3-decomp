@@ -40,10 +40,6 @@ static inline u32 NextRandomSample(void)
     gRandomIndex = index;
     return *(const u16 *)((u32)table + index * 2);
 }
-static inline u32 ActorStatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
 static inline u32 GetReactionFlags(u32 **out, struct ChaseActor *actor, u32 mask)
 {
     u32 *p = &actor->base.behaviorFlags;
@@ -69,7 +65,7 @@ u8 SceneActorReaction_ApplyLinkedAreaDamage(struct ChaseActor *actor)
     struct ContactCollider *collider;
     u32 *flags2D8;
     s32 gain;
-    if ((ActorStatusFlags(actor, 8) || (actor->base.enabled != 1)) ||
+    if ((SceneActorChase_StatusFlags(actor, 8) || (actor->base.enabled != 1)) ||
         GetReactionFlags(&flags2CC, actor, 2))
         goto fail;
     collider = GetDamageCollider(actor);
