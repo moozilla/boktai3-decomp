@@ -1,43 +1,21 @@
 #include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
-struct Ratatosk {
-    u8 pad0[0xaa];
-    u8 animation;
-    u8 padAB[4];
-    u8 finished, active;
-    u8 padB1[0x13];
-    u32 timer;
-};
-struct Vec *Player_GetEffectivePosition(u32);
-struct Vec *Ratatosk_FindPointFarthestFromPosition(void *, void *);
-struct Vec *Ratatosk_GetRandomMovementPoint(void *);
-static inline u8 consume(struct Ratatosk *p)
-{
-    if (p->active) {
-        p->active = 0;
-        p->finished = 0;
-        return 1;
-    }
-    return 0;
-}
-#define W(o) (*(s32 *)(p + (o)))
-#define H(o) (*(s16 *)(p + (o)))
-#define V(o) (*(struct Vec *)(p + (o)))
+#include "ratatosk.h"
+struct ContactPosition *Player_GetEffectivePosition(u32);
+struct ContactPosition *Ratatosk_FindPointFarthestFromPosition(void *, void *);
+struct ContactPosition *Ratatosk_GetRandomMovementPoint(void *);
 // confidence=low: animation sequence moves away from the player before selecting a distant point.
-void Ratatosk_UpdateRetreatSequence(u8 *p)
+void Ratatosk_UpdateRetreatSequence(struct Ratatosk *p)
 {
-    struct Ratatosk *actor = (struct Ratatosk *)p;
-    if (consume(actor)) {
+    struct Ratatosk *actor = p;
+    if (Ratatosk_ConsumeActionEntry(actor)) {
         {
-            struct Vec candidate, best;
+            struct ContactPosition candidate, best;
             s32 maximum = 0;
             s16 i;
             for (i = -1; i <= 1; i += 2) {
                 s32 dx, dz, distance;
-                struct Vec *v = &candidate;
-                struct Vec *self = (struct Vec *)(p + 0x36c);
+                struct ContactPosition *v = &candidate;
+                struct ContactPosition *self = &p->anchor;
                 *v = *Player_GetEffectivePosition(0);
                 v->x = v->x + i * 512;
                 dx = (&candidate)->x - self->x;
@@ -50,8 +28,8 @@ void Ratatosk_UpdateRetreatSequence(u8 *p)
             }
             for (i = -1; i <= 1; i += 2) {
                 s32 dx, dz, distance;
-                struct Vec *v = &candidate;
-                struct Vec *self = (struct Vec *)(p + 0x36c);
+                struct ContactPosition *v = &candidate;
+                struct ContactPosition *self = &p->anchor;
                 *v = *Player_GetEffectivePosition(0);
                 v->z = v->z + i * 512;
                 dx = (&candidate)->x - self->x;
@@ -62,56 +40,41 @@ void Ratatosk_UpdateRetreatSequence(u8 *p)
                     best = candidate;
                 }
             }
-            V(0xe5c) = best;
+            p->destination = best;
         }
-        {
-            s16 *duration = (s16 *)(p + 0xe6c);
-            u32 zero = 0;
-            *duration = 16;
-            {
-                actor->animation = 4;
-            }
-            W(0x180) = zero;
-        }
+        p->duration = 16;
+        Ratatosk_SetAnimation(actor, 4);
+        p->sequence = 0;
     }
-    switch (W(0x180)) {
+    switch (p->sequence) {
         case 0:
-            if (actor->finished) {
-                W(0xf04) = 30;
-                {
-                    u32 animation = 1;
-                    actor->animation = animation;
-                }
-                W(0x180) = 1;
+            if (actor->actionFinished) {
+                p->interval = 30;
+                Ratatosk_SetAnimation(actor, 1);
+                p->sequence = 1;
             }
             break;
         case 1:
-            if (actor->finished) {
-                {
-                    u32 animation = 7;
-                    actor->animation = animation;
-                }
-                W(0x180) = 2;
+            if (actor->actionFinished) {
+                Ratatosk_SetAnimation(actor, 7);
+                p->sequence = 2;
             }
             break;
         case 2:
-            if (actor->finished) {
-                struct Vec *point =
+            if (actor->actionFinished) {
+                struct ContactPosition *point =
                     Ratatosk_FindPointFarthestFromPosition(p, Player_GetEffectivePosition(0));
                 if (point) {
-                    V(0xe5c) = *point;
-                    H(0xe6c) = 64;
+                    p->destination = *point;
+                    p->duration = 64;
                 }
-                {
-                    u32 animation = 4;
-                    actor->animation = animation;
-                }
-                W(0x180) = 3;
+                Ratatosk_SetAnimation(actor, 4);
+                p->sequence = 3;
             }
             break;
         case 3:
-            if (actor->finished)
-                W(0x184) = 1;
+            if (actor->actionFinished)
+                p->sequenceDone = 1;
             break;
     }
 }
