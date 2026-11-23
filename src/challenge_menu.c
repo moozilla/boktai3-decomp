@@ -357,7 +357,7 @@ void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
 {
     struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
     struct SceneInputResource *first, *last;
-    u32 zero, duration, initialState;
+    u32 duration, initialState;
     u16 bits;
     u16 *dst;
     s32 i;
@@ -372,11 +372,11 @@ void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
     menu->resources[0] = *resource;
     last = &menu->resources[0];
     ResourceHeader_Relocate(last, resource);
-    Widget_InitLinked(&menu->widgets[5], last, 0x8A, 0x10, zero = 0, 0, duration = 0x3C, 0);
+    Widget_InitLinked(&menu->widgets[5], last, 0x8A, 0x10, 0, 0, duration = 0x3C, 0);
     dst = (u16 *)&menu->widgets[5].position.y;
     bits = 0xFFE8;
     *dst = bits;
-    Widget_InitLinked(&menu->widgets[4], first, 0, 0x10, 3, zero, duration, zero);
+    Widget_InitLinked(&menu->widgets[4], first, 0, 0x10, 3, 0, duration, 0);
     initialState = 0;
     entry = &menu->widgets[0];
     i = 3;
