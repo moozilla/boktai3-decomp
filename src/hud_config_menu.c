@@ -22,30 +22,20 @@ void PauseMenu_SetConfirmationIndicator(void *, s32);
 int PauseMenu_UpdateBinaryChoice(void *);
 void Power_EnterSleep(void);
 
-static inline void SelectionPanel_HideWidget(struct SceneInputWidget *widget)
-{
-    widget->flags |= 1;
-}
-
-static inline void SelectionPanel_ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
 void SelectionPanel_UpdateCursor(struct SceneHudState *menu, s32 visible)
 {
     if (visible == 0) {
-        SelectionPanel_HideWidget(&menu->categoryWidgets[5]);
-        SelectionPanel_HideWidget(&menu->settingsArrows[0]);
-        SelectionPanel_HideWidget(&menu->settingsArrows[1]);
+        SceneInputWidget_Hide(&menu->categoryWidgets[5]);
+        SceneInputWidget_Hide(&menu->settingsArrows[0]);
+        SceneInputWidget_Hide(&menu->settingsArrows[1]);
     } else {
         u8 *row;
         menu->categoryWidgets[5].flags &= ~1;
         menu->categoryWidgets[5].position.x = 0;
         row = &menu->settingsRow;
         menu->categoryWidgets[5].position.y = *row * 16 + 0x18;
-        SelectionPanel_ShowWidget(&menu->settingsArrows[0]);
-        SelectionPanel_ShowWidget(&menu->settingsArrows[1]);
+        SceneInputWidget_Show(&menu->settingsArrows[0]);
+        SceneInputWidget_Show(&menu->settingsArrows[1]);
         menu->settingsArrows[0].position.x = 0x80;
         menu->settingsArrows[1].position.x = 0xd8;
         {
