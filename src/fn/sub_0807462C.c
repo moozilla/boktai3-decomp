@@ -1,4 +1,5 @@
 #include "scene_actor_registry.h"
+#include "word_flags.h"
 s32 SceneMessages_RegisterReceiver(u8 *, s32, s32);
 static inline u8 IsScenePaused(void)
 {
@@ -14,14 +15,6 @@ void SceneActorRegistry_RegisterCategoryReceiver(struct ChaseActor *actor)
         (category == 4 || category == 5 || category == 7 || category == 6 || category == 8 ||
          category == 21 || category == 25 || category == 23 || category == 18)) {
         SceneMessages_RegisterReceiver((u8 *)actor + 0xc, actor->base.body.id, 3);
-        {
-            u32 mask = 0x100;
-            u16 *field;
-            u32 value;
-            field = (void *)((u8 *)actor + 0x2c0);
-            value = *field;
-            mask |= value;
-            *field = mask;
-        }
+        HalfwordFlags_Set(0x100, &actor->base.placementFlags);
     }
 }

@@ -18,4 +18,10 @@ static inline void WordFlags_Set(u32 mask, u32 *flags)
     *flags |= mask;
 }
 
+/* The halfword form takes a u16 mask: agbcc then loads the mask before the field's address. */
+static inline void HalfwordFlags_Set(u16 mask, u16 *flags)
+{
+    *flags |= mask;
+}
+
 #endif
