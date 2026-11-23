@@ -9,17 +9,11 @@ s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
 
-
-
-
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
-
-
-static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryControlGroup *group,
-                        u32 blocked)
+static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *group, u32 blocked)
 {
-    void *shape = GROUP_FIELD(group, 0x1fc, void *);
+    void *shape = group->route;
     struct ContactPosition *position = &actor->base.body.position;
     void *destination = GROUP_FIELD(group, blocked, void *);
     if (Nav_IsPositionInMesh(shape, position, destination)) {
@@ -37,7 +31,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryContr
 // confidence=low: scene actor wait state: on entry clears mode flags; after 60 idle frames walks to the state5D4 destination.
 void sub_08136F58(struct ChaseActor *actor)
 {
-    struct SceneActorRegistryControlGroup *group = &actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorControl_Begin(actor, actor->base.onStanding, 0, 0);
         SceneActorContact_ResetEntry(actor);
@@ -46,7 +40,7 @@ void sub_08136F58(struct ChaseActor *actor)
         u32 *counter = &actor->base.counter2AC;
         if ((*counter) == 30) {
             SceneActorAttachment_ReplaceResponseSlot(actor, 0, 2, actor->base.category);
-            sub_08136F48(actor, &group->control);
+            sub_08136F48(actor, &group->common.control);
         }
         if (((s32)(*counter)) > 60) {
             u32 bit;
@@ -59,9 +53,9 @@ void sub_08136F58(struct ChaseActor *actor)
             } while (0);
             (*((struct ContactPosition **)(((u8 *)group) + bit)))->pad = 1;
             if (!MoveTo(actor, group, bit)) {
-                Callback_InvokeActor(actor, *((void **)(((u8 *)group) + 0x224)));
+                Callback_InvokeActor(actor, group->fallback);
             } else {
-                struct SceneActorRegistryControl *control = &group->control;
+                struct SceneActorRegistryControl *control = &group->common.control;
                 u32 mask = 0x200000;
                 if (actor->base.behaviorFlags & mask) {
                     SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
