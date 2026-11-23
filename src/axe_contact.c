@@ -9,6 +9,7 @@
 #include "ram.h"
 #include "player.h"
 #include "contact_swarm.h"
+#include "movement_curve.h"
 
 void Axe_OnSecondaryColliderContact(void)
 {
@@ -129,15 +130,6 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame);
 
 s32 Div(s32, s32);
 
-static inline u8 SceneActor_TakeApproachEntry(struct ChaseActor *p)
-{
-    if (p->base.field2B2) {
-        p->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *out,
                                                        struct ContactPosition *a,
                                                        struct ContactPosition *b)
@@ -167,7 +159,7 @@ void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
     struct SceneActorApproachContext *context = p->base.context;
     struct ContactPosition difference;
     struct ContactPosition *current, *destination;
-    if (SceneActor_TakeApproachEntry(p)) {
+    if (SceneActorReaction_TakePrepared(p)) {
         context->stateED2 = 0;
         context->destination = p->base.body.position;
         context->destination.x -= 256;
@@ -279,23 +271,6 @@ void Axe_UpdateAttackColliderPositions(void *);
 
 void ActorPhase_UpdateAcceleratingTrail(void);
 
-static inline u8 Axe_TakeEntry(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void Axe_Difference(struct ContactPosition *v, struct ContactPosition *b,
-                                  struct ContactPosition *a)
-{
-    v->x = a->x - b->x;
-    v->y = a->y - b->y;
-    v->z = a->z - b->z;
-}
-
 static inline void Axe_AddPositions(struct ContactPosition *out, struct ContactPosition *a,
                                     struct ContactPosition *b)
 {
@@ -327,7 +302,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
     struct ContactPosition *position;
     u8 entered;
     s32 difference, absolute;
-    entered = Axe_TakeEntry(&p->base.field2B2);
+    entered = SceneActorControl_TakeFlag(&p->base.field2B2);
     position = &p->base.body.position;
     if (entered) {
         data->flagsCAB |= 2;
@@ -336,7 +311,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         data->speed = 4;
         data->direction = 1;
         data->center = data->origin;
-        Axe_Difference(&delta, &data->center, position);
+        MovementCurve_SubtractPositions(&delta, &data->center, position);
         delta.x = Axe_ScaleTowardZero(delta.x, 1);
         delta.z = Axe_ScaleTowardZero(delta.z, 1);
         Axe_AddPositions(&data->center, &data->center, &delta);
@@ -347,8 +322,8 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
     data->auxiliarySprite.position.x =
         data->center.x +
-        Axe_ScaleTowardZero(
-            gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
+        Axe_ScaleTowardZero(gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius,
+                            12);
     data->auxiliarySprite.position.z =
         data->center.z +
         Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
@@ -365,7 +340,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
                 Sound_PlaySong(0x169);
             }
         }
-        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
+        MovementCurve_SubtractPositions(&delta, &data->center, (void *)&gPlayers[0]->position);
         data->heading = Math_Atan2(delta.x, delta.z);
         data->reactionCount = 0;
     } else {
@@ -381,7 +356,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
                 data->flagsCAB |= 4;
             }
         }
-        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
+        MovementCurve_SubtractPositions(&delta, &data->center, (void *)&gPlayers[0]->position);
         difference = Math_Atan2(delta.x, delta.z) - data->heading;
         if (difference > 128)
             difference -= 256;
