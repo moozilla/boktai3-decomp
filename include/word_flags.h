@@ -24,4 +24,27 @@ static inline void HalfwordFlags_Set(u16 mask, u16 *flags)
     *flags |= mask;
 }
 
+static inline u8 WordFlags_Has(u32 mask, u32 *flags)
+{
+    if (*flags & mask)
+        return 1;
+    return 0;
+}
+
+static inline void WordFlags_And(u32 mask, u32 *flags)
+{
+    *flags = mask & *flags;
+}
+
+static inline void HalfwordFlags_Clear(u16 *flags, u32 mask)
+{
+    u32 keep = ~mask;
+    *flags = keep & *flags;
+}
+
+static inline void HalfwordFlags_And(u16 *flags, s32 mask)
+{
+    *flags &= mask;
+}
+
 #endif

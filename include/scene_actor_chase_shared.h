@@ -328,6 +328,21 @@ static inline void SceneActorChase_SetMotionFlags(struct ChaseActor *actor, u16 
     actor->base.motionFlags = mask | actor->base.motionFlags;
 }
 
+static inline u32 SceneActorChase_StatusFlags(struct ChaseActor *actor, u32 mask)
+{
+    return actor->base.statusFlags & mask;
+}
+
+static inline void SceneActorChase_SetBehaviorFlags(struct ChaseActor *actor, u32 mask)
+{
+    actor->base.behaviorFlags = mask | actor->base.behaviorFlags;
+}
+
+static inline void SceneActorChase_OrReactionFlags(struct ChaseActor *actor, u16 mask)
+{
+    actor->base.reactionFlags = mask | actor->base.reactionFlags;
+}
+
 static inline void SceneActorChase_HalfwordFlagsSet(u16 *field, u32 bits)
 {
     u32 value = *field;
