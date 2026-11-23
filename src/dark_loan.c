@@ -1,4 +1,5 @@
 #include "dark_loan_screen.h"
+#include "gba/io_reg.h"
 #include "palette_pulse.h"
 #include "vanargand_parts.h"
 
@@ -543,19 +544,13 @@ void DarkLoan_CloseAfterDelay(struct DarkLoanScreen *panel)
 {
     if (++panel->timer > 31) {
         if (panel->exitScript == 0) {
-            u16 *flags = &gDispCntShadow;
-            u32 mask = ~0x100;
-            *flags = mask & *flags;
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
             DarkLoan_HideDisplay(panel);
         } else {
             Script_Call(panel->exitScript, 0);
             Task_Kill(panel);
             sub_082157EC();
-            {
-                u16 *flags = &gDispCntShadow;
-                u32 mask = ~0x100;
-                *flags = mask & *flags;
-            }
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
         }
     }
 }
@@ -567,9 +562,7 @@ void DarkLoan_UpdateClosing(struct DarkLoanScreen *panel)
         ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xe000, 0);
     if (++panel->timer > 181) {
         if (panel->exitScript == 0) {
-            u16 *flags = &gDispCntShadow;
-            u32 mask = ~0x100;
-            *flags = mask & *flags;
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
             DarkLoan_HideDisplay(panel);
         } else {
             Script_Call(panel->exitScript, 0);
@@ -599,9 +592,7 @@ s32 DarkLoan_OnDestroy(struct DarkLoanScreen *panel)
 
 void DarkLoan_StartDisplayScript(struct DarkLoanScreen *panel)
 {
-    u16 *r = &gDispCntShadow;
-    u32 m = ~0x100;
-    *r = m & *r;
+    Bg_DisableDisplay(DISPCNT_BG0_ON);
     panel->map = ScriptProc_Start(0xC091, 0x8544);
 }
 
