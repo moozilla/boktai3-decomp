@@ -94,36 +94,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
                 value = mask.field.bits & flags;
                 *flags2D4 = value;
             }
-            {
-                u32 mask = ~0x4000;
-                *flags2CC &= mask;
-            }
-            {
-                struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
-                s32 mask = ~0x10;
-                motion->flags &= mask;
-            }
-            {
-                u32 test = 0x20;
-                if (!(*flags2D4 & test)) {
-                    u32 mask = ~0x80;
-                    *flags2CC &= mask;
-                }
-            }
-            {
-                u32 *flags2D0 = &actor->base.statusFlags;
-                u32 mask = 0xFFEFFFFB;
-                *flags2D0 &= mask;
-            }
-            {
-                u32 bit = 0x400;
-                actor->base.reactionFlags |= bit;
-            }
-            actor->base.field2E6 = down;
-            {
-                u32 bit = 0x2000;
-                *flags2CC |= bit;
-            }
+            SceneActorDamage_AcceptHit(actor, flags2D4, flags2CC, down);
             return;
         }
     }
@@ -184,37 +155,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                             *flags2D4 = value;
                         }
                         flags2CC = &actor->base.behaviorFlags;
-                        {
-                            u32 mask = ~0x4000;
-                            *flags2CC &= mask;
-                        }
-                        {
-                            struct SceneActorReactionMotion *motion =
-                                (void *)&actor->base.tracking.target;
-                            s32 mask = ~0x10;
-                            motion->flags &= mask;
-                        }
-                        {
-                            u32 test = 0x20;
-                            if (!(*flags2D4 & test)) {
-                                u32 mask = ~0x80;
-                                *flags2CC &= mask;
-                            }
-                        }
-                        {
-                            u32 *flags2D0 = &actor->base.statusFlags;
-                            u32 mask = 0xFFEFFFFB;
-                            *flags2D0 &= mask;
-                        }
-                        {
-                            u32 bit = 0x400;
-                            actor->base.reactionFlags |= bit;
-                        }
-                        actor->base.field2E6 = down;
-                        {
-                            u32 bit = 0x2000;
-                            *flags2CC |= bit;
-                        }
+                        SceneActorDamage_AcceptHit(actor, flags2D4, flags2CC, down);
                     } else {
                         u32 *flags2CC = &actor->base.behaviorFlags;
                         u32 mask = ~0x2000;

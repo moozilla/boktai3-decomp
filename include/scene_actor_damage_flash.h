@@ -2,6 +2,7 @@
 #define GUARD_SCENE_ACTOR_DAMAGE_FLASH_H
 
 #include "scene_actor_palette.h"
+#include "scene_actor_state.h"
 
 void AnimData_SelectPaletteBank(void *, s32);
 
@@ -33,6 +34,43 @@ static inline void SceneActorDamage_ClearHitReaction(struct ChaseActor *actor)
     u16 *flags = &actor->base.reactionFlags;
     u32 mask = ~0x980;
     *flags = mask & *flags;
+}
+
+/* A hit that is not fatal: drop the guard and tracking bits, keep 0x80 only for hits that carry
+   0x20, clear the stagger status, mark the reaction and record the hit as pending. */
+static inline void SceneActorDamage_AcceptHit(struct ChaseActor *actor, u16 *flags2D4,
+                                              u32 *flags2CC, u32 down)
+{
+    {
+        u32 mask = ~0x4000;
+        *flags2CC &= mask;
+    }
+    {
+        struct SceneActorChaseTracking *tracking = &actor->base.tracking;
+        s32 mask = ~0x10;
+        tracking->flags &= mask;
+    }
+    {
+        u32 test = 0x20;
+        if (!(*flags2D4 & test)) {
+            u32 mask = ~0x80;
+            *flags2CC &= mask;
+        }
+    }
+    {
+        u32 *flags2D0 = &actor->base.statusFlags;
+        u32 mask = 0xFFEFFFFB;
+        *flags2D0 &= mask;
+    }
+    {
+        u32 bit = 0x400;
+        actor->base.reactionFlags |= bit;
+    }
+    actor->base.field2E6 = down;
+    {
+        u32 bit = 0x2000;
+        *flags2CC |= bit;
+    }
 }
 
 #endif
