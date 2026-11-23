@@ -84,6 +84,13 @@ class Replay:
     def poke(self, addr, size, value):
         return self.cmd(op='poke', addr=int(addr), size=int(size), value=int(value))
 
+    def perturb(self, site, nth, xor):
+        """After the NTH execution (counted from now) of store SITE, xor the stored bytes with XOR."""
+        return self.cmd(op='perturb', site=int(site), nth=int(nth), xor=str(int(xor)))
+
+    def perturb_left(self):
+        return self.cmd(op='perturbed')['left']
+
     def read(self, addr, length):
         return bytes.fromhex(self.cmd(op='read', addr=int(addr), len=int(length))['hex'])
 

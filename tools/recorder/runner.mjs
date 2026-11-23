@@ -22,6 +22,7 @@
 //   {"op":"run","frames":N,"trace":DIR?}    run on (trace mode writes DIR/fNNNNNNNN.bin)
 //   {"op":"solar","level":N} / {"op":"keys","mask":M} / {"op":"poke","addr":A,"size":S,"value":V}
 //                                            perturb (the hash check then reports divergence)
+//   {"op":"perturb","site":S,"nth":N,"xor":X} xor the bytes stored by the Nth execution of store site S
 //   {"op":"read","addr":A,"len":L}          bytes (hex)
 //   {"op":"ram","file":PATH}                EWRAM + IWRAM to a file
 //   {"op":"shot","file":PATH}               PNG of the current frame
@@ -403,6 +404,7 @@ async function serve(args) {
   const jump = (s) => {
     restore(machine, decodeSnapshot(fs.readFileSync(path.join(dir, 'snap', String(s).padStart(8, '0') + '.gz'))));
     current = s; restoredFrom = s;
+    new DataView(machine.memory.buffer).setUint32(machine.rec + 28, 0, true);   // no perturbation armed
     setMode(machine, 0);   // the snapshot's own mode word is the recording's (REC)
     drain(machine, () => {});
   };
@@ -519,6 +521,20 @@ async function serve(args) {
           }
           case 'solar': override.solar = cmd.level === null ? null : Number(cmd.level); perturbed = true; reply({ ok: true }); continue;
           case 'keys': override.keys = cmd.mask === null ? null : Number(cmd.mask); perturbed = true; reply({ ok: true }); continue;
+          case 'perturb': {
+            // xor the value stored by the Nth execution of SITE from now (rec_rt.c perturb)
+            const dv = new DataView(machine.memory.buffer), st = machine.rec;
+            const x = BigInt(cmd.xor);
+            dv.setUint32(st + 24, cmd.site >>> 0, true);
+            dv.setUint32(st + 28, cmd.nth >>> 0, true);
+            dv.setUint32(st + 32, Number(x & 0xffffffffn), true);
+            dv.setUint32(st + 36, Number((x >> 32n) & 0xffffffffn), true);
+            perturbed = true; reply({ ok: true }); continue;
+          }
+          case 'perturbed': {
+            const dv = new DataView(machine.memory.buffer);
+            reply({ left: dv.getUint32(machine.rec + 28, true) }); continue;
+          }
           case 'poke': {
             const dv = new DataView(machine.memory.buffer);
             if (cmd.size === 1) dv.setUint8(cmd.addr, cmd.value);

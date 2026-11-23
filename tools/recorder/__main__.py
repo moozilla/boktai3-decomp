@@ -330,8 +330,12 @@ def check_slice(s, sl, place, frame, describe):
             print(f"  {describe(n.addr, w)} at the end of frame {n.frame} ({now} -> {now ^ flip}): target {base} -> {results[-1]}  "
                   + ('confirmed' if ok else 'NOT confirmed (masked or overwritten)'))
         # runs (counters, positions): the value the run had at a frame boundary before the target
-        for a, site, count, first, last in {(x[0], x[1], x[2], x[3], x[4]) for x in sl.summaries}:
+        seen_runs = set()
+        for a, site, count, first, last in sorted(set(sl.summaries), key=lambda x: -x[4]):
             f = min(last, frame - 1)
+            if (a, f) in seen_runs:
+                continue
+            seen_runs.add((a, f))
             if not (0x02000000 <= a < 0x02040000 or 0x03000000 <= a < 0x03008000) or f < 0:
                 continue
             w = min(place.width, 4) if a == place.addr else 4
@@ -342,8 +346,38 @@ def check_slice(s, sl, place, frame, describe):
             v = target(r)
             print(f"  {describe(a, w)} (the run) at the end of frame {f} ({now} -> {now ^ 1}): target {base} -> {v}  "
                   + ('confirmed' if v != base else 'NOT confirmed (masked or overwritten)'))
-        same = sum(1 for n in sl.nodes if n.frame == frame)
-        print(f"  ({same} links inside frame {frame} are not checked: a replay can only be perturbed at frame boundaries)")
+        # stores inside the target frame: replay the frame with the value stored by that very
+        # execution of the statement flipped (rec_rt.c perturb), and compare
+        ft = sl.traces.get(frame)
+        done, inframe = set(), 0
+        stores = [n for n in sl.nodes if n.frame == frame and n.role == 'store' and n.inst.site is not None]
+        final = max((n.pos for n in stores if n.addr is not None and n.addr <= place.addr < n.addr + (n.width or 1)), default=None)
+        for n in sorted(stores, key=lambda n: -n.pos):
+            if n.pos == final or n.pos in done or inframe >= 12 or ft is None:
+                continue
+            done.add(n.pos)
+            site = n.inst.site
+            nth = int(np.count_nonzero(ft.rows['site'][:n.pos + 1] == site))
+            w = min(n.width or 4, 8)
+            results = []
+            for flip in (1, 1 << (8 * w - 1)):
+                r.seek(frame - 1)
+                r.perturb(site, nth, flip)
+                r.run(1)
+                left = r.perturb_left()
+                v = target(r)
+                results.append(v)
+                if v != base or left:
+                    break
+            inframe += 1
+            fn, loc, text, lv = statement(sl.facts, site)
+            if left:
+                verdict = 'not reached (execution count differs)'
+            else:
+                verdict = 'confirmed' if any(v != base for v in results) else 'NOT confirmed (masked)'
+            print(f"  in frame {frame}: `{text or loc}` (execution {nth}) stored value ^ 0x{flip:X}: target {base} -> {results[-1]}  {verdict}")
+        rest = sum(1 for n in sl.nodes if n.frame == frame and n.role != 'store')
+        print(f"  ({rest} loads, computations and branches inside frame {frame} are covered through the stores they feed)")
 
 
 def main(argv=None):

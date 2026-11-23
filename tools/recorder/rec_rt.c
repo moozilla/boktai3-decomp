@@ -30,9 +30,24 @@ struct RecState {
     uint32_t overflow; /* flushes requested by a full ring */
     uint32_t ring;
     uint32_t lost;     /* events dropped because the host did not drain */
+    /* perturbation (in-frame validation): right after the Nth execution of the store at
+     * SITE (counted from when the host armed it), xor the stored bytes with XOR */
+    uint32_t perturb_site;
+    uint32_t perturb_left;
+    uint32_t perturb_xor_lo;
+    uint32_t perturb_xor_hi;
 };
 
-static struct RecState state = {0, 0, RING_WORDS, 0, RING_BASE, 0};
+static struct RecState state = {0, 0, RING_WORDS, 0, RING_BASE, 0, 0, 0, 0, 0};
+
+static void perturb(uint32_t site, void *address, uint32_t bytes)
+{
+    uint8_t *p = (uint8_t *)address;
+    uint32_t i;
+    if (site != state.perturb_site || !state.perturb_left || --state.perturb_left) return;
+    for (i = 0; i < bytes && i < 8; i++)
+        p[i] ^= (uint8_t)((i < 4 ? state.perturb_xor_lo >> (8 * i) : state.perturb_xor_hi >> (8 * (i - 4))) & 0xFF);
+}
 
 __attribute__((import_module("env"), import_name("rec_flush"))) void rec_host_flush(void);
 
@@ -111,6 +126,7 @@ void __rec_ld(uint32_t site, const void *address, uint32_t value, uint32_t wcode
 void __rec_st(uint32_t site, void *address, uint32_t value, uint32_t wcode)
 {
     uint32_t *e;
+    if (state.perturb_left) perturb(site, address, 1u << wcode);
     if (!state.mode) return;
     if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, 1u << wcode)) return;
     if ((e = reserve(3))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)address | wcode << 28; e[2] = value; }
@@ -126,6 +142,7 @@ void __rec_ld64(uint32_t site, const void *address, uint64_t value)
 void __rec_st64(uint32_t site, void *address, uint64_t value)
 {
     uint32_t *e;
+    if (state.perturb_left) perturb(site, address, 8);
     if (!state.mode) return;
     if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, 8)) return;
     if ((e = reserve(4))) {
@@ -180,6 +197,7 @@ void __rec_agg(uint32_t site, void *address, uint32_t size)
 
 void __rec_aggst(uint32_t site, void *address, uint32_t size)
 {
+    if (state.perturb_left) perturb(site, address, size);
     if (!state.mode) return;
     if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, size)) return;
     aggregate(site, address, size, 1);
