@@ -17,18 +17,10 @@ void ActorController_UpdateArmorAnimationTransition(struct SceneCombatActor *act
 
     switch (st) {
         case 0: {
-            u32 four = 4;
             Armor_SetAnimationFromStart(actor, &gUnk_0824EF00[((p[0xB39] + 0x60) >> 6) & 3]);
             (*s)++;
             p[0xB41] = st;
-            ((struct ContactCollider *)(p + 0x238))->flags &= ~four;
-            ((struct ContactCollider *)(p + 0x1E4))->flags &= ~four;
-            ((struct ContactCollider *)(p + 0x28C))->flags &= ~four;
-            ((struct ContactCollider *)(p + 0x190))->flags |= four;
-            {
-                u32 one = 1;
-                ((struct ActorControllerMotion *)(p + 0x180))->flags &= ~one;
-            }
+            SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
             *(u16 *)(p + 0xB32) &= ~0x20;
             switch (p[0xB38]) {
                 case 3:
