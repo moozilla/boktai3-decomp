@@ -170,10 +170,9 @@ void SceneCharacter_UpdateCommands(void *ctx, struct StateActor *p)
     SceneCharacter_DispatchCommandState(ctx, p);
 }
 
-s32 SceneCharacter_OnCommandUpdate(struct StateActor *p)
+s32 SceneCharacter_OnCommandUpdate(void *ctx, struct StateActor *p)
 {
-    /* called with the actor only; ctx is left in r1 */
-    ((void (*)(struct StateActor *))SceneCharacter_UpdateCommands)(p);
+    SceneCharacter_UpdateCommands(ctx, p);
     return 0;
 }
 
