@@ -1,4 +1,5 @@
 #include "scene_actor_registry.h"
+#include "word_flags.h"
 /* SceneActorRegistry_FindAvailableCategoryActorAfterId: Finds the next actor after an ID with flag 2CC bit 0 clear and category in a fixed whitelist; zero starts at the head */
 #define SceneActorRegistry_FindAvailableCategoryActorAfterId sub_08070E44
 #define SceneActorRegistry_FindAvailableFilteredAfterId      sub_08070E44
@@ -9,13 +10,12 @@ struct ChaseActor *SceneActorRegistry_FindAvailableFilteredAfterId(u32 inputId)
     struct SceneActorRegistryNode *node = gSceneActorRegistryNode;
     struct ChaseActor *actor = node->actor;
     if (actor) {
-        u32 mask = 1;
         u32 offset;
         do {
             u32 *field;
             offset = 0x2cc;
             field = (void *)((u8 *)actor + offset);
-            if (!(*field & mask) && !id) {
+            if (!Flags_MaskedWord(1, field) && !id) {
                 u32 category = actor->base.category;
                 if (category == 4 || category == 1 || category == 3 || category == 5 ||
                     category == 7 || category == 6 || category == 8 || category == 0x19 ||

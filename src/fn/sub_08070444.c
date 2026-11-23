@@ -1,4 +1,5 @@
 #include "scene_actor_registry.h"
+#include "word_flags.h"
 /* SceneActorRegistry_CountLivingByCategoryAndField1E6: Counts living actors matching category and halfword 1E6 while excluding status flag 0x20000; field meaning remains tentative */
 #define SceneActorRegistry_CountLivingByCategoryAndField1E6 sub_08070444
 #define SceneActorRegistry_CountLivingByCategoryAndField    sub_08070444
@@ -18,13 +19,12 @@ s32 SceneActorRegistry_CountLivingByCategoryAndField(s32 inputCategory, s32 inpu
     actor = node->actor;
     count = 0;
     if (actor) {
-        u32 mask = 0x20000;
         do {
             if (actor->base.health > 0) {
                 u32 offset = 0x2d0;
                 u32 *flags;
                 flags = (void *)((u8 *)actor + offset);
-                if (!(*flags & mask) && actor->base.category == category) {
+                if (!Flags_MaskedWord(0x20000, flags) && actor->base.category == category) {
                     offset -= 0xea;
                     {
                         u16 *criterion = (void *)(((u8 *)actor) - (-offset));
