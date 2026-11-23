@@ -1,4 +1,4 @@
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 #include "game_state.h"
 
 extern struct GameState *gGameState;
