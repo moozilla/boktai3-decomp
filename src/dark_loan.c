@@ -283,14 +283,12 @@ void DarkLoan_BeginAdjustment(struct DarkLoanScreen *panel)
 
 void DarkLoan_BeginClosing(struct DarkLoanScreen *panel)
 {
-    int z;
     Bg_SetLayerMap(0, panel->map, 5);
-    z = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, z);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(panel);
     Sound_PlaySong(0x2c1);
     panel->widgets[DARK_LOAN_BACKGROUND].flags &= ~1;
-    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, z);
+    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, 0);
     MessageWindow_ShowMessage(3);
     DarkLoan_SetState(panel, DarkLoan_WaitBeforeConfirmation);
 }
