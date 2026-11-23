@@ -2,6 +2,7 @@
 #include "scene_actor_reset.h"
 #include "ivy_phase.h"
 #include "ivy.h"
+#include "word_flags.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -32,6 +33,7 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_color_cycle.h"
+#include "scene_actor_init_actor.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
@@ -50,13 +52,6 @@ static inline u8 IsUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-
 static inline u32 ContextFlag(struct IvyCaptureState *context, u32 input)
 {
     return context->captureFlags & input;
@@ -66,7 +61,7 @@ void Ivy_OnPrimaryContact(void *source, void *target, struct ChaseActor *actor)
 {
     if (IsUnavailable(actor))
         return;
-    if (Test(ContextFlag(actor->base.context, 1), ~0))
+    if (SceneActorChase_Test(ContextFlag(actor->base.context, 1), ~0))
         return;
     SceneActorBehavior_ApplyContactReaction(source, target, actor);
 }
@@ -77,28 +72,14 @@ void Ivy_OnSecondaryContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-static inline u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-static inline void Clr(u16 *q, u32 m)
-{
-    *q = m & *q;
-}
-
 void Ivy_UpdateActiveState(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2)) {
+    if (SceneActorControl_TakeFlag(p + 0x2B2)) {
         u16 *q;
         *(u8 *)(*(u8 **)(p + 4) + 7) = 2;
         q = (u16 *)(p + 0x13A);
         *q = (*q & 0xFFFB) | 8;
-        Clr((u16 *)(p + 0x2C0), 0xFFFFF7FF);
+        HalfwordFlags_Clear((u16 *)(p + 0x2C0), 0x800);
     }
     SceneActorAnimation_SelectDirectionalFlags(p, 0xE);
 }
@@ -147,11 +128,6 @@ static inline u8 Consume(u8 *flag)
     return FALSE;
 }
 
-static inline void Or(u16 m, u16 *f)
-{
-    *f |= m;
-}
-
 void Ivy_EnterDisabledState(u8 *p)
 {
     if (Consume(p + 0x2b2)) {
@@ -160,7 +136,7 @@ void Ivy_EnterDisabledState(u8 *p)
             u16 v = 4 | *(u16 *)(p + 0x13a);
             *(u16 *)(p + 0x13a) = v & 0xfff7;
         }
-        Or(0x800, (u16 *)(p + 0x2c0));
+        HalfwordFlags_Set(0x800, (u16 *)(p + 0x2c0));
         SceneActorAnimation_SelectDirectionalFlags(p, 20);
     }
 }
@@ -209,11 +185,6 @@ static inline void Ivy_EnableCollider(struct ContactCollider *collider)
     collider->flags &= 0xFFF7;
 }
 
-static inline void Ivy_SetContactFlag(struct ChaseActor *actor, u32 bits)
-{
-    actor->base.placementFlags = bits | actor->base.placementFlags;
-}
-
 static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
 {
     return sequence->elapsed;
@@ -260,7 +231,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
     if (Ivy_ReadFrame(anim).index == 3 && Ivy_GetElapsed(anim) > 6) {
         actor->base.colliderA.flags |= 4;
         actor->base.colliderA.flags &= 0xFFF7;
-        Ivy_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
         if (Ivy_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Ivy_UpdateHold, 0x25);
             SceneActorChase_SetState(actor, 0, 2, 1);
@@ -291,7 +262,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
         Ivy_DisableContact(actor);
     } else {
         Ivy_EnableCollider(&actor->base.colliderA);
-        Ivy_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
     }
 
     if (actor->base.restart) {
@@ -352,13 +323,6 @@ struct IvyDrawable {
     u8 unknown0[7];
     u8 mode : 8;
 };
-
-static inline u8 TestFlags(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
@@ -457,7 +421,7 @@ static inline s32 HudMode(void)
 
 static inline u8 MayCount(struct ChaseActor *victim)
 {
-    if (TestFlags(gEngineFlags, 0x4800)) {
+    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         u32 value = victim->base.hitOwners;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {
@@ -788,7 +752,7 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 
 void Ivy_UpdateRestartFlags(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2))
+    if (SceneActorControl_TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalFlags(p, 0x10);
     if (*(u8 *)(p + 0x2B3)) {
         ActorStatus_SetDrawableFlags((void *)p, 1);
@@ -1183,7 +1147,7 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     RecordKill(actor, categoryp);
     sub_08159164(actor->base.experience);
     Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
-    if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
 }
 
