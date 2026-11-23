@@ -4,11 +4,8 @@
 #include "scene_actor_reaction.h"
 #include "scene_actor_chase_shared.h"
 #include "word_flags.h"
+#include "scene_actor_displacement.h"
 void SceneActorControl_ResetCollisionPhase(struct ChaseActor *);
-static inline s32 Quarter(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
 static inline s32 Clamp(s32 v)
 {
     if (v > 200)
@@ -60,14 +57,14 @@ void SceneActorControl_ConvergeSavedMotion(struct ChaseActor *actor)
         s16 *field = &actor->base.reactionEnd.x;
         s32 difference = current - *field;
         priorX = field;
-        x = Quarter(difference);
+        x = SceneActorDisplacement_Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
         s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
-        z = Quarter(difference);
+        z = SceneActorDisplacement_Quarter(difference);
     }
     x = Clamp(x);
     z = Clamp(z);

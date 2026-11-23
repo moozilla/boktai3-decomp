@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "player.h"
 #include "ram.h"
+#include "scene_actor_chase.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -42,13 +43,6 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->x = Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
     out->z = Shift(gUnk_086149C4[angle & 255] * speed, 12);
-}
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 static inline void Add(struct ContactPosition *out, const struct ContactPosition *from)
 {
@@ -127,7 +121,7 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
         *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);

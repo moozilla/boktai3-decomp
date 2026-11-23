@@ -10,12 +10,6 @@ static inline u32 Unavailable(struct RoomActor *actor)
 {
     return SceneActorPlacement_IsUnavailable(actor);
 }
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
 {
     u32 mask = inputMask;
@@ -76,7 +70,8 @@ void SceneActorBehavior_ApplyContactReaction(struct SceneActorBehaviorContactVie
     }
     {
         u32 mask = 0x800;
-        if (Test(gGameState->flags868, mask) || (ReadReactionFlags(0x40, source))) {
+        if (SceneActorPlacement_TestMask(gGameState->flags868, mask) ||
+            (ReadReactionFlags(0x40, source))) {
             destination->remaining = 0;
             destination->power = 0;
             actor->reactionSoundVariant = 0;

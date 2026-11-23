@@ -2,19 +2,12 @@
 #include "scene_actor_control_phase.h"
 #include "scene_actor_reaction.h"
 #include "script_utility.h"
+#include "scene_actor_terrain_reaction.h"
 void *Bestiary_GetEntryForActor(u32, u32);
 void Bestiary_UnlockEntry(void *);
 void SceneActorBehavior_CallTerrainScript(struct RoomActor *);
 void SceneActorPlacement_PlayCategoryEventSound(struct ChaseActor *);
 u8 Sprite_BlinkUntilExpired(void *, s32, s32, s32);
-static inline void SetAnimation(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 void SceneActorControl_CompleteScriptedResponse(struct ChaseActor *actor, s32 frame)
 {
     s32 values[8];
@@ -73,6 +66,6 @@ void SceneActorControl_CompleteScriptedResponse(struct ChaseActor *actor, s32 fr
         }
         actor->base.pendingControl = 0;
     }
-    SetAnimation(actor, 1, 0, 2);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
     ActorShadow_Disable((u8 *)actor + 0x320);
 }

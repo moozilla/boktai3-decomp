@@ -1,18 +1,12 @@
 #include "global.h"
 #include "scene_actor_control_phase.h"
+#include "movement_curve.h"
 // confidence=low: animate contact release, then resume the saved actor callback.
 #define SceneActorControl_UpdateContactRelease sub_0807FCA8
 s32 Math_Atan2(s32, s32);
 void SceneActorEffect_PlayCategorySound(u32, u32, u32);
 void TetherActor_StartInteractionEffect(void);
 void SceneActorContacts_ReleaseNode(void *);
-static inline void Delta(struct ContactPosition *v, struct ContactPosition *b,
-                         struct ContactPosition *a)
-{
-    v->x = a->x - b->x;
-    v->y = a->y - b->y;
-    v->z = a->z - b->z;
-}
 static inline s32 Angle(s32 angle)
 {
     if (angle > 128)
@@ -41,8 +35,8 @@ void SceneActorControl_UpdateContactRelease(struct ChaseActor *input, s32 frame)
     if (SceneActorControl_TakeFlag(&input->base.field2B2))
         SceneActorAnimation_SelectDirectionalEntry(input, 0);
     node = (void **)(group + 0x88);
-    Delta(&delta, &input->base.body.position,
-          (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
+    MovementCurve_SubtractPositions(&delta, &input->base.body.position,
+                                    (void *)((*((u8 **)(*((void **)(group + 0x88))))) + 12));
     RelativeAngle(delta.x, delta.z, input->base.body.direction);
     if (frame > 59) {
         if (frame <= 119) {

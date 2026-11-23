@@ -1,6 +1,7 @@
 #include "scene_actor_registry.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
+#include "scene_actor_terrain_reaction.h"
 void SparkParticle_Spawn(const void *, s32, const void *, s32, s32, s32, s32, s32);
 static inline u8 IsControlled(struct ChaseActor *a)
 {
@@ -17,28 +18,6 @@ static inline void ClearRoute(struct ChaseActor *a, u8 *group)
     route->counter = 0;
     route->field14 = 0;
     route->timer = 0;
-}
-static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = cb;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
 }
 void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
 {
@@ -106,11 +85,11 @@ void SceneActorReaction_PlayStaggerBurst(struct ChaseActor *actor, s32 frame)
         u16 masked = actor->base.motionFlags;
         masked &= mask;
         if (masked) {
-            SetState(actor, 3, 0, 0);
-            SetControl(actor, group->contactControl, 7);
+            SceneActorTerrain_EnterState(actor, 3, 0, 0);
+            SceneActorTerrain_InstallControl(actor, group->contactControl, 7);
         } else {
-            SetControl(actor, actor->base.onReaction, 18);
-            SetState(actor, 3, 0, 0);
+            SceneActorTerrain_InstallControl(actor, actor->base.onReaction, 18);
+            SceneActorTerrain_EnterState(actor, 3, 0, 0);
         }
     }
 }
