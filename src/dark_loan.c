@@ -579,13 +579,9 @@ s32 DarkLoan_OnUpdate(struct DarkLoanScreen *panel)
 
 s32 DarkLoan_OnDestroy(struct DarkLoanScreen *panel)
 {
-    struct SceneInputWidget *widget = panel->widgets;
-    s32 i = 0x15;
-    do {
-        Anim_Remove(widget);
-        widget++;
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 22; i++)
+        Anim_Remove(&panel->widgets[i]);
     Sprite_Remove(&panel->sprite);
     return 0;
 }
