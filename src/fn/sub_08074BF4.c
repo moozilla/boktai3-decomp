@@ -7,8 +7,7 @@ void SceneActorCollision_InitBody(struct ChaseActor *actor, void *inputSize, voi
     void *callback = inputCallback;
     struct ContactCollider *collider;
     {
-        u32 colliderOffset = 0x134;
-        collider = (void *)((u8 *)actor + colliderOffset);
+        collider = (void *)((u8 *)actor + 0x134);
     }
     Collider_Init(collider, (u16)actor->base.body.id, 0x5109, 0, 16, size, offset);
     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),

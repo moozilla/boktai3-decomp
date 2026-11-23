@@ -16,10 +16,9 @@ void SceneActorRegistry_RegisterCategoryReceiver(struct ChaseActor *actor)
         SceneMessages_RegisterReceiver((u8 *)actor + 0xc, actor->base.body.id, 3);
         {
             u32 mask = 0x100;
-            u32 offset = 0x2c0;
             u16 *field;
             u32 value;
-            field = (void *)((u8 *)actor + offset);
+            field = (void *)((u8 *)actor + 0x2c0);
             value = *field;
             mask |= value;
             *field = mask;
