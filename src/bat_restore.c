@@ -115,11 +115,6 @@ void Bat_UpdateAnimationRequest(struct ChaseActor *actor)
 
 void SceneActor_SetPositionXZ(void *, s32, s32);
 
-static inline u32 Bat_MaskFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -132,7 +127,7 @@ void Bat_ResumeSavedTarget(struct ChaseActor *actor, s32 frame)
         if (!actor->base.restart)
             return;
         actor->base.stepDone = 1;
-        blocked = Bat_MaskFlags(actor, 128);
+        blocked = SceneActorChase_QueryMotionFlags(actor, 0x80);
         if (blocked) {
             void *target;
             SceneActor_SetPositionXZ(&actor->base.body.id,
