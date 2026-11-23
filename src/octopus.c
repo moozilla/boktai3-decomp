@@ -90,13 +90,6 @@ void Octopus_UpdateIdleState(void)
 {
 }
 
-struct DamageTarget {
-    u8 pad[8];
-    u8 kind;
-    u8 rest[0x33];
-    void *owner;
-};
-
 void SpriteParticle_SpawnBatch(void *, s32, s32, s32, s32);
 
 void SpriteEffect_SpawnTowardObject(void *, void *, u32, u32, u32, u32);
@@ -138,13 +131,13 @@ static inline void ShowCollider(struct ChaseActor *actor)
 void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        struct DamageTarget *target = (void *)actor->base.tracking.target;
-        if (target->kind == 4) {
+        struct SceneActorBody *target = (void *)actor->base.tracking.target;
+        if (target->mode == 4) {
             SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
             SceneActorChase_SetBehavior(actor, 1);
             return;
         }
-        if (target->kind <= 3) {
+        if (target->mode <= 3) {
             u8 *player = target->owner;
             u32 a3, a4, a5, a6;
             SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 2, 0, 0x154);
@@ -190,13 +183,6 @@ void SceneActor_EndReactionAnimation(struct ChaseActor *actor)
         }
     }
 }
-
-struct OctopusCaptureTarget {
-    u8 unk0[8];
-    u8 kind;
-    u8 unk9[0x3C - 9];
-    struct ChaseActor *actor;
-};
 
 struct Player;
 
@@ -258,7 +244,7 @@ static inline struct OctopusFrameIndex Octopus_ReadFrame(struct DisplaySequenceS
 void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *anim;
-    struct OctopusCaptureTarget *target;
+    struct SceneActorBody *target;
     struct ContactPosition pos;
     u8 quadrant, flip;
     u32 started;
@@ -294,11 +280,11 @@ void Octopus_UpdateCaptureAttack(struct ChaseActor *actor)
             pos.y = actor->base.body.position.y + gUnk_086062B0[flip][anim->index].y;
             pos.z = actor->base.body.position.z + gUnk_086062B0[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
-            if (target->kind <= 3) {
-                Player_BeginPositionRequest(gPlayers[target->kind], (void *)&pos, 0, 0, flip, 0, 0,
+            if (target->mode <= 3) {
+                Player_BeginPositionRequest(gPlayers[target->mode], (void *)&pos, 0, 0, flip, 0, 0,
                                             0, 0);
-            } else if (target->kind == 4) {
-                struct ChaseActor *t = target->actor;
+            } else if (target->mode == 4) {
+                struct ChaseActor *t = target->owner;
                 t->base.colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
@@ -351,13 +337,6 @@ u32 Octopus_GetAnimationStatus(struct ChaseActor *);
 void Octopus_UpdateActiveState(void);
 
 extern s16 *gLinkSession;
-
-struct OctopusTarget {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    void *player;
-};
 
 struct OctopusDrawable {
     u8 unknown0[7];
@@ -504,7 +483,7 @@ void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
     struct Octopus *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
-    struct OctopusTarget *target;
+    struct SceneActorBody *target;
     u8 quadrant, flip;
     struct ContactPosition position;
     s32 index;
@@ -526,7 +505,7 @@ void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
     }
     target = (void *)actor->base.tracking.target;
     Facing(actor, &quadrant, &flip);
-    if (target->kind <= 3) {
+    if (target->mode <= 3) {
         if (sequence->elapsed + 1 >= sequence->duration) {
             index = sequence->index + 1;
             if (index >= sequence->frameCount)
@@ -538,19 +517,19 @@ void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
     position.x = actor->base.body.position.x + gUnk_086062B0[flip][index].x;
     position.y = actor->base.body.position.y + gUnk_086062B0[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_086062B0[flip][index].z;
-    if (target->kind == 4) {
+    if (target->mode == 4) {
         struct ChaseActor *victim;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
-        victim = target->player;
+        victim = target->owner;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
         goto animate;
     }
-    if (target->kind > 3)
+    if (target->mode > 3)
         goto animate;
     {
         struct Player *player;
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 1;
-        player = target->player;
+        player = target->owner;
         if (Mod(frame, context->interval) == 0) {
             s32 start, cur, elapsed;
             if (IsIdle(player))
@@ -606,7 +585,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *sequence =
         &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
-    struct OctopusTarget *target;
+    struct SceneActorBody *target;
     s32 index;
     u8 quadrant, flip;
     struct ContactPosition position;
@@ -628,7 +607,7 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
         }
     }
     target = (void *)actor->base.tracking.target;
-    if (target->kind <= 3 && sequence->elapsed + 1 >= sequence->duration) {
+    if (target->mode <= 3 && sequence->elapsed + 1 >= sequence->duration) {
         index = sequence->index + 1;
         if (index >= sequence->frameCount)
             index = 0;
@@ -638,11 +617,11 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
     position.x = actor->base.body.position.x + gUnk_08606300[flip][index].x;
     position.y = actor->base.body.position.y + gUnk_08606300[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_08606300[flip][index].z;
-    if (target->kind & 4) {
-        who = target->player;
+    if (target->mode & 4) {
+        who = target->owner;
         SceneActorReaction_ApplyHitResponse(who, 1, &position, 0, flip, 0);
-    } else if (target->kind <= 3) {
-        player = target->player;
+    } else if (target->mode <= 3) {
+        player = target->owner;
         Player_BeginPositionRequest(player, (void *)&position, 0, 3, flip, 0, 0, 0, 0);
     }
     if (actor->base.restart) {
@@ -650,12 +629,12 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
         ((struct OctopusDrawable *)actor->base.drawable)->mode = 2;
         ActorStatus_SetDrawableFlags(actor, 1);
         Sound_PlaySong(0x1E0);
-        if (target->kind & 4) {
+        if (target->mode & 4) {
             who = SceneActorRegistry_FindById(*(u32 *)target);
             SceneActorReaction_ApplyHitResponse(who, 2, &position, 0, 0, 0);
             SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 2, 0, 0x154);
-        } else if (target->kind <= 3) {
-            player = target->player;
+        } else if (target->mode <= 3) {
+            player = target->owner;
             Player_BeginPositionRequest(player, (void *)&position, 0, 3, flip, 0, 1, 0, 0);
             SpriteParticle_SpawnBatch(&actor->base.body.position, 1, 1, 0, 0x154);
         }
@@ -741,7 +720,7 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
 {
     u8 *group;
     u8 *drawable = actor->base.drawable;
-    struct OctopusTarget *target;
+    struct SceneActorBody *target;
     struct ContactPosition position;
     struct Player *player;
     void *victim;
@@ -767,16 +746,16 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
             actor->base.flashTimer = eight;
         }
         SceneActorChase_SetActorFlags(actor, 0x8000);
-        if (target->kind <= 3) {
+        if (target->mode <= 3) {
             u32 request, option;
-            player = target->player;
+            player = target->owner;
             request = actor->base.attacks.first[2];
             option = actor->base.attacks.flags[2];
             Player_BeginPositionRequest(player, (void *)&actor->base.body.position, 0, 0, 0, 0, 1,
                                         request, option);
             Sound_PlaySong(0xE6);
-        } else if (target->kind & 4) {
-            victim = target->player;
+        } else if (target->mode & 4) {
+            victim = target->owner;
             SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0, 0);
             SceneActorBehavior_PlayReactionSound(victim);
         }
@@ -788,12 +767,12 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
         Camera_RequestShake(40);
     if (frame > 120) {
         ActorStatus_SetDrawableFlags(actor, 1);
-        if (target->kind & 4) {
-            victim = target->player;
+        if (target->mode & 4) {
+            victim = target->owner;
             SceneActorReaction_ApplyHitResponse(victim, 2, &position, 0, 0x40, 0);
-        } else if (target->kind <= 3) {
+        } else if (target->mode <= 3) {
             s32 turn, angle;
-            player = target->player;
+            player = target->owner;
             turn = (actor->base.body.direction + 0x20) & 0xFF;
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
             CellCenter((void *)&position, actor->base.terrainCell);
