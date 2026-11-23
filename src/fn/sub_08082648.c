@@ -63,14 +63,11 @@ static inline void SetMotion(struct SceneActorReactionMotion *motion, u32 mask)
     value |= motion->flags;
     motion->flags = value;
 }
-static inline u32 Flag32(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
 static inline u8 Unavailable(struct ChaseActor *a)
 {
     if (a) {
-        if (SceneActorContact_MotionFlags(a, 0x40) || Flag32(a, 0x20000) || a->base.health <= 0)
+        if (SceneActorContact_MotionFlags(a, 0x40) || SceneActorChase_StatusFlags(a, 0x20000) ||
+            a->base.health <= 0)
             return 1;
     }
     return 0;
