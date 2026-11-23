@@ -32,6 +32,7 @@
 #include "scene_actor_init_actor.h"
 #include "scene_actor_placement.h"
 #include "movement_curve.h"
+#include "scene_actor_terrain_reaction.h"
 
 void SceneActorBehavior_ApplyContactReaction(void);
 
@@ -1042,15 +1043,6 @@ s32 Octopus_UpdateBodyColliderPosition(struct ChaseActor *actor)
 
 void SceneActor_BeginReactionAnimation(struct ChaseActor *actor);
 
-static inline void State(struct ChaseActor *a, u8 state, u8 phase, u8 behavior)
-{
-    a->base.state2A8 = state;
-    a->base.phase2A9 = phase;
-    a->base.behavior2AA = behavior;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
 // confidence=low: hides the actor and waits for an adjacent target; one starts the reaction
 
 // animation, otherwise after 60 frames it moves on to phase 2, behavior 5.
@@ -1076,11 +1068,11 @@ void SceneActorReaction_WaitHiddenForAdjacentTarget(struct ChaseActor *a)
     }
     if (SceneActorReaction_FindAdjacentTarget(a, 1) == 0) {
         if ((s32)a->base.counter2AC > 60)
-            State(a, 0, 2, 5);
+            SceneActorTerrain_EnterState(a, 0, 2, 5);
         else
             a->base.counter2AC++;
     } else {
-        State(a, 0, 0, 2);
+        SceneActorTerrain_EnterState(a, 0, 0, 2);
         SceneActorChase_SetControl(a, (void *)SceneActor_BeginReactionAnimation, 41);
     }
 }
