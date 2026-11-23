@@ -2653,7 +2653,7 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 void Dog_UpdateProbeApproach(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
-    u8 *control = (u8 *)SceneActorControl_GetState(actor);
+    struct Dog *control = actor->base.context;
     s32 speed;
     u32 event;
 
@@ -2661,7 +2661,7 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, SceneActorMotion_UpdateTargetTransition, 0x2A);
         {
             u32 bit = 8;
-            u32 *flags = (u32 *)(control + 0x678);
+            u32 *flags = &control->flags;
             *flags |= bit;
         }
     }
@@ -2678,7 +2678,7 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
         SceneActorChase_SetState(actor, 3, 1, 0);
         {
             u32 bit = 4;
-            u32 *flags = (u32 *)(control + 0x678);
+            u32 *flags = &control->flags;
             *flags |= bit;
         }
         return;
