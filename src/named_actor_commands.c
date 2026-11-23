@@ -224,9 +224,8 @@ void NamedActor_SetRangeFromScript(void)
     if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         if (actor) {
-            s32 none = -1;
-            s32 h = Script_GetKeywordValue('h', none);
-            s32 l = Script_GetKeywordValue('l', none);
+            s32 h = Script_GetKeywordValue('h', -1);
+            s32 l = Script_GetKeywordValue('l', -1);
             if (h > 0)
                 actor->upperHeight = h;
             if (l > 0)
