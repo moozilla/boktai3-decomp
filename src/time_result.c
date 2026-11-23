@@ -312,47 +312,11 @@ struct ChallengeTimeResult *TimeResult_Create(void)
     return p;
 }
 
-void Actor_UpdateStateTwo(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 2;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_GO(Actor_UpdateStateTwo, 2)
 
-void Actor_UpdateStateThree(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 3;
-    }
-    if (actor->done != 0) {
-        u32 ready = 1;
-        actor->state = ready;
-        actor->timer = 0;
-        actor->enterCommand = ready;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_RESTART(Actor_UpdateStateThree, 3)
 
-void Actor_UpdateStateFour(u32 context, struct StateActor *actor)
-{
-    if (actor->enterCommand != 0) {
-        actor->enterCommand = 0;
-        actor->done = 0;
-        actor->nextState = 4;
-    }
-    if (actor->done != 0) {
-        u32 ready = 1;
-        actor->state = ready;
-        actor->timer = 0;
-        actor->enterCommand = ready;
-        Trigger_ConsumePending(actor->receiver, 1);
-    }
-}
+STATE_COMMAND_RESTART(Actor_UpdateStateFour, 4)
 
 void Actor_DispatchPrimaryState(u32 context, struct StateActor *actor)
 {
