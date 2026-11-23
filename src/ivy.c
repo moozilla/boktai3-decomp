@@ -1366,10 +1366,11 @@ void SceneActorControl_HideAndDisableCollision(struct ChaseActor *actor)
         {
             u32 state = 3;
             u8 *field = &actor->base.state2A8;
+            u32 zero = 0;
             *field = state;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = 0;
-            actor->base.counter2AC = 0;
+            actor->base.phase2A9 = zero;
+            actor->base.behavior2AA = zero;
+            actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
         SceneActorTerrain_DisableCollision(actor);
