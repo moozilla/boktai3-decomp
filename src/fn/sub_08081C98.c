@@ -48,10 +48,6 @@ static inline void Reaction_ClearRoute(u32 *flags, struct SceneActorRegistryCont
     control->field14 = 0;
     control->timer = 0;
 }
-static inline void Reaction_ClearMotionBits(struct ChaseActor *actor, s32 mask)
-{
-    actor->base.motionFlags &= mask;
-}
 static inline void Reaction_SpawnPart(u8 *group)
 {
     struct ContactPosition velocity, scale, position;
@@ -141,7 +137,7 @@ void SceneActorReaction_UpdateTimedBurst(struct ChaseActor *actor)
         collider->flags = mask | collider->flags;
         if (Reaction_HasFlags(SceneActorContact_MotionFlags(actor, 0x2000)))
             SceneActorEffects_SpawnContactParts((void *)actor);
-        Reaction_ClearMotionBits(actor, ~0x2000);
+        SceneActorChase_AndMotionFlags(actor, ~0x2000);
         Chase_SetState(actor, 3, 1, 0);
         Chase_SetCtl(actor, *(void **)(group + 0x210), 15);
         actor->base.reactionDirection =

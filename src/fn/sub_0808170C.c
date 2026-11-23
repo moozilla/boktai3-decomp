@@ -23,15 +23,6 @@ static inline u8 Reaction_MotionStopped(s32 x, s32 z)
     return 0;
 }
 
-static inline void Recovery_ClearStatusFlags(struct ChaseActor *actor, u32 bits)
-{
-    u32 mask = ~bits;
-    actor->base.statusFlags &= mask;
-}
-static inline void Recovery_SetStatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    actor->base.statusFlags = mask | actor->base.statusFlags;
-}
 static inline void Recovery_ClearTrackingFlags(struct SceneActorChaseTracking *tracking, u32 bits)
 {
     u32 mask = ~bits;
@@ -67,10 +58,10 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         if (!SceneActorChase_StatusFlags(actor, 2)) {
             if (SceneActorChase_StatusFlags(actor, 1)) {
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 2, category);
-                Recovery_ClearStatusFlags(actor, 1);
+                SceneActorChase_ClearStatusFlags(actor, 1);
             } else
                 SceneActorAttachment_ReplaceResponseSlot(actor, 3, 0, category);
-            Recovery_SetStatusFlags(actor, 2);
+            SceneActorChase_SetStatusFlags(actor, 2);
             switch (category) {
                 case 4:
                     Sound_PlaySong(237);
@@ -114,7 +105,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
             Recovery_ClearTrackingFlags(&actor->base.tracking, 0x18);
             control = &actor->group.common.control;
             if (SceneActorTurn_ActorFlags(actor, 0x200000)) {
-                Recovery_ClearStatusFlags(actor, 0x1000000);
+                SceneActorChase_ClearStatusFlags(actor, 0x1000000);
                 SceneActorChase_ClearFlagComponent(motion, 0x200);
                 control->mode = 0;
                 control->counter = 0;
@@ -126,7 +117,7 @@ void SceneActorReaction_SettleDisplacement(struct ChaseActor *actor)
         SceneActorChase_ClearActorFlags(actor, 0x80);
         actor->base.field2C2 = 64;
         Recovery_ClearTrackingFlags(&actor->base.tracking, 0x18);
-        Recovery_ClearStatusFlags(actor, 0x1000000);
+        SceneActorChase_ClearStatusFlags(actor, 0x1000000);
         Recovery_ClearRoute(actor, &group->common.control);
     }
     if (!actor->base.drawableKind) {

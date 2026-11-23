@@ -29,11 +29,6 @@ static inline void Reaction_SetDrawMode(struct ChaseActor *actor, u32 mode)
     else
         *((u8 *)actor->base.drawable + 0x3A) = mode;
 }
-static inline void ClearActorBits(struct ChaseActor *actor, u32 bits)
-{
-    u32 mask = ~bits;
-    actor->base.behaviorFlags &= mask;
-}
 static inline u32 AnyMotion(u32 mask, u32 *flags)
 {
     return mask & *flags;
@@ -73,7 +68,7 @@ void SceneActorReaction_UpdateContactRouteRecovery(struct ChaseActor *actor)
         ActorShadow_Enable(actor->base.shadow);
         SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 0x80000);
         Reaction_ClearHalf((void *)&actor->base.placementFlags, 0x20);
-        ClearActorBits(actor, 0x400000);
+        SceneActorChase_ClearBehaviorFlags(actor, 0x400000);
         motion = &actor->base.statusFlags;
     }
     if (AnyMotion(0x10, motion)) {
