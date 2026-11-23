@@ -5,10 +5,6 @@ static inline u8 Occupied(const u32 *mask, u32 bit)
         return TRUE;
     return FALSE;
 }
-static inline u32 Flags(const u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 s32 BouncingObject_UpdatePool(struct BouncingPool *input)
 {
     struct BouncingPool *pool = input;
