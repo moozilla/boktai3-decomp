@@ -1,45 +1,15 @@
 #include "global.h"
-void Trigger_ConsumePending(void *, u32);
-struct S {
-    u8 f0[0xaa];
-    u8 aa;
-    u8 f1;
-    u8 ac;
-    u8 ad;
-    u8 ae;
-    u8 af;
-    u8 b0;
-    u8 f2[0x13];
-    u32 c4;
-};
+#include "state_actor_action_entry.h"
 
-static inline u8 chk(struct S *p)
+void SceneActor_UpdateState30AndRestartCommand(struct StateActor *p)
 {
-    if (p->b0) {
-        p->b0 = 0;
-        p->af = 0;
-        return 1;
+    if (StateActor_ConsumeActionEntry(p)) {
+        SceneActorState_SetAnimation(p, 0x1E);
+        Trigger_ConsumePending(p->receiver2, 1);
     }
-    return 0;
-}
-
-void SceneActor_UpdateState30AndRestartCommand(struct S *p)
-{
-    if (chk(p)) {
-        u32 k = 0x1E;
-        p->aa = k;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
-    }
-    if (p->af) {
-        u32 two = 2;
-        u32 z = 0;
-        u32 one = 1;
-        p->ac = two;
-        p->ad = z;
-        p->ae = one;
-        p->c4 = z;
-        p->b0 = one;
-        Trigger_ConsumePending((u8 *)p + 0x118, 1);
+    if (p->actionFinished) {
+        SceneActorState_StartAction(p, 2, 0, 1);
+        Trigger_ConsumePending(p->receiver2, 1);
     } else
-        p->c4++;
+        p->actionTimer++;
 }
