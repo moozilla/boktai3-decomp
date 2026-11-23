@@ -15,6 +15,6 @@ u8 *Player_GetEffectivePosition(u32 i)
     if (o == 0)
         return 0;
     if (o->c57 == 0x26 || o->c57 == 0xc)
-        return (u8 *)o + 0x10C;
-    return (u8 *)o + 0x30;
+        return o->b;
+    return o->a;
 }

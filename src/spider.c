@@ -30,6 +30,7 @@
 #include "scene_actor_init_group.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
+#include "vanargand_projectiles.h"
 
 inline static u8 blocked2048(u8 *c)
 {
@@ -273,11 +274,6 @@ struct RecoveryPacket {
     void *callback;
 };
 
-static inline void SetCollider(struct ContactCollider *c)
-{
-    c->flags |= 4;
-}
-
 static inline void ClearCollider(struct ContactCollider *c)
 {
     u32 mask = ~4;
@@ -310,8 +306,8 @@ void Spider_UpdateHiddenRecovery(struct ChaseActor *a)
             u32 mask = 0x800;
             a->base.placementFlags = mask | a->base.placementFlags;
         }
-        SetCollider(&a->base.colliderB);
-        SetCollider(&a->base.colliderA);
+        EffectCollision_Disable(&a->base.colliderB);
+        EffectCollision_Disable(&a->base.colliderA);
     }
     {
         u32 mask = 0x10;
@@ -603,14 +599,12 @@ void Spider_UpdateDefeat(struct ChaseActor *actor, s32 frame)
             index *= 2;
             {
                 const u16 *table = (const u16 *)0x0203B400;
-                u32 off;
                 {
                     const u16 *entry = (void *)(index + (u32)table);
                     value = *entry;
                 }
-                off = 0x2BA;
                 {
-                    u8 *field = (u8 *)actor + off;
+                    u8 *field = (u8 *)actor + 0x2BA;
                     *field = value;
                 }
             }
@@ -1091,11 +1085,6 @@ static inline u8 HasFlag_BeginPlayerPursuit(struct PursuitContext *c, u32 mask)
     return 0;
 }
 
-static inline void SetFlags(struct ChaseActor *a, u32 mask)
-{
-    a->base.behaviorFlags = mask | a->base.behaviorFlags;
-}
-
 void Spider_BeginPlayerPursuit(struct ChaseActor *a)
 {
     struct PursuitContext *ctx;
@@ -1139,7 +1128,7 @@ void Spider_BeginPlayerPursuit(struct ChaseActor *a)
             a->base.motionFlags &= ~motionMask;
         }
     }
-    SetFlags(a, 0x4010);
+    SceneActorChase_SetBehaviorFlags(a, 0x4010);
     a->base.field2C2 = Div(64, 3);
     ctx->flags |= 2;
     ctx->timer = 0;
@@ -1213,20 +1202,10 @@ static inline void State_TriggerTetherAction(struct ChaseActor *a, u32 k, u32 z)
     a->base.field2B1 = 1;
 }
 
-static inline u32 Actor16(struct ChaseActor *a, u32 m)
-{
-    return a->base.motionFlags & m;
-}
-
-static inline u32 Actor32(struct ChaseActor *a, u32 m)
-{
-    return a->base.statusFlags & m;
-}
-
 static inline u8 Disabled(struct ChaseActor *a)
 {
     if (a) {
-        if (Actor16(a, 64) || Actor32(a, 0x20000) || F(a, 0x9c, s16) <= 0)
+        if (SceneActorContact_MotionFlags(a, 64) || SceneActorChase_StatusFlags(a, 0x20000) || F(a, 0x9c, s16) <= 0)
             return 1;
     }
     return 0;
@@ -1333,7 +1312,7 @@ static inline u16 Actor16_UpdateMovementSlowdown(struct ChaseActor *a, u32 m)
 static inline u8 Disabled_UpdateMovementSlowdown(struct ChaseActor *a)
 {
     if (a) {
-        if (Actor16_UpdateMovementSlowdown(a, 64) || Actor32(a, 0x20000) || a->base.health <= 0)
+        if (Actor16_UpdateMovementSlowdown(a, 64) || SceneActorChase_StatusFlags(a, 0x20000) || a->base.health <= 0)
             return 1;
     }
     return 0;

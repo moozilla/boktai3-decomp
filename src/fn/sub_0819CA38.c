@@ -1,5 +1,6 @@
 #include "hresvelgr_travel.h"
 #include "scene_facing.h"
+#include "vanargand_projectiles.h"
 
 struct HresvelgrAngles {
     s32 a[2];
@@ -7,17 +8,11 @@ struct HresvelgrAngles {
 extern const struct HresvelgrAngles gUnk_0824F724;
 extern const s16 gUnk_086149C4[];
 u16 Sqrt(u32);
-static inline s32 Scale(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -(-v >> 12);
-}
 static inline void Polar(struct SceneVec *out, s32 angle, s32 radius)
 {
-    out->x = Scale(gUnk_086149C4[(angle + 0x40) & 255] * radius);
+    out->x = VanargandProjectile_Scale(gUnk_086149C4[(angle + 0x40) & 255] * radius);
     out->y = 0;
-    out->z = Scale(gUnk_086149C4[angle & 255] * radius);
+    out->z = VanargandProjectile_Scale(gUnk_086149C4[angle & 255] * radius);
 }
 static inline void Add(struct SceneVec *a, struct SceneVec *b)
 {

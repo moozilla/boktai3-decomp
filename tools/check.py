@@ -10,6 +10,9 @@ build/boktai3.elf), and compares the bytes with baserom.gba. Prints a
 compact aligned disassembly hunks (or --full), with differences marked '!'. Exit status 0 on
 a match. A full `tools/build.py` run is still needed before committing (it
 checks the layout of the whole ROM); this is the fast inner loop.
+
+The scratch folder (build/check/run-*: object, ELF, comparison.json, full.diff)
+is removed on exit; pass --keep to leave it for tools/anchordiff.py.
 """
 import argparse
 import csv
@@ -18,6 +21,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 import tempfile
 
@@ -263,6 +267,8 @@ def main():
                     help="compile #ifdef NONMATCHING drafts; compare against the functions' full size")
     ap.add_argument("--record", action="store_true",
                     help="with --nonmatching: write the fuzzy score into the draft's source")
+    ap.add_argument("--keep", action="store_true",
+                    help="keep the build/check/run-* scratch folder (removed on exit otherwise)")
     a = ap.parse_args()
     if a.nonmatching:
         build.DEFINES.append("-DNONMATCHING")
@@ -275,6 +281,14 @@ def main():
     parent = os.path.join(ROOT, "build", "check")
     os.makedirs(parent, exist_ok=True)
     work = os.path.relpath(tempfile.mkdtemp(prefix="run-", dir=parent), ROOT)
+    try:
+        run(a, src, work)
+    finally:
+        if not a.keep:
+            shutil.rmtree(os.path.join(ROOT, work), ignore_errors=True)
+
+
+def run(a, src, work):
     base = os.path.join(work, os.path.basename(src)[:-2])
     obj = base + ".o"
     build.build_c(src, obj)
@@ -310,10 +324,11 @@ def main():
     if not a.quiet and (not ok or a.full):
         print(render_diff(result, context=a.context, full=a.full))
     print(f"{result['different_byte_count']} differing bytes; fuzzy {result['fuzzy_match_percent']:.1f}%; "
-          f"extent={result['extent_basis']}; artifacts: {work}")
+          f"extent={result['extent_basis']}" + (f"; artifacts: {work}" if a.keep else ""))
     if not ok:
+        hint = f"tools/anchordiff.py {work}" if a.keep else "rerun with --keep for tools/anchordiff.py"
         print(f"realigned: {result['anchordiff']['total']} differing insns, "
-              f"{result['anchordiff']['structural']} ignoring registers (tools/anchordiff.py {work})")
+              f"{result['anchordiff']['structural']} ignoring registers ({hint})")
     names = ", ".join(defined)
     print(f"{names}: {'MATCH' if ok else 'MISMATCH'} ({len(mine)} bytes at 0x{addr:08X})")
     sys.exit(0 if ok else 1)

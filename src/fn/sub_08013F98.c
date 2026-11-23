@@ -1,7 +1,5 @@
 #include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Particle {
     u8 active, pad, timer, lifetime;
     u16 pad4;

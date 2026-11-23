@@ -1,6 +1,7 @@
 #include "global.h"
 
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
 struct TentacleImpulseSegment {
     u8 unknown0[0x1C];
     struct ContactPosition position;
@@ -16,15 +17,12 @@ struct TentacleImpulseTrail {
     u8 unknown874[0x8DA - 0x874];
     s16 count;
 };
-static inline u32 Tentacle_StatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
 static inline u8 Tentacle_IsInactive(struct ChaseActor *p)
 {
     if (p) {
         u32 mask = 0x40;
-        if ((p->base.motionFlags & mask) || Tentacle_StatusFlags(p, 0x20000) || p->base.health <= 0)
+        if ((p->base.motionFlags & mask) || SceneActorChase_StatusFlags(p, 0x20000) ||
+            p->base.health <= 0)
             return 1;
     }
     return 0;

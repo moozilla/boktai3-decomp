@@ -1,4 +1,5 @@
 #include "scene_actor_control_motion.h"
+#include "vanargand_parts.h"
 static inline u32 ActorFlag(struct ChaseActor *actor, u32 input, u32 offset)
 {
     u32 mask = input;
@@ -17,11 +18,6 @@ static inline u8 Test(u32 value, u32 mask)
     if (value & mask)
         return 1;
     return 0;
-}
-static inline s32 TruncateSine(s32 value, u32 shift)
-{
-    /* Both callers pass signed halfword samples; negation stays within s32. */
-    return value >= 0 ? value >> shift : -((-value) >> shift);
 }
 void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
 {
@@ -57,7 +53,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
                     return;
                 }
             }
-            actor->base.heightOffset += TruncateSine(gUnk_086149C4[state->phase], 9);
+            actor->base.heightOffset += Vanargand_TruncateShift(gUnk_086149C4[state->phase], 9);
             if (state->phase <= 63) {
                 state->phase++;
             }
@@ -91,7 +87,7 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *actor)
     } while (0);
     {
         struct SceneActorRegistrySequenceDrawable *drawable = actor->base.drawable;
-        drawable->position.y -= TruncateSine(gUnk_086149C4[state->phase], 5);
+        drawable->position.y -= Vanargand_TruncateShift(gUnk_086149C4[state->phase], 5);
     }
     if (state->phase > 64) {
         state->phase = 0;

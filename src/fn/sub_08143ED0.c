@@ -3,6 +3,7 @@
 #include "game_state.h"
 #include "player_slot_status.h"
 #include "game_state_flags.h"
+#include "orbit_motion.h"
 
 // confidence=low: updates movement and step cues while constraining the tether target.
 struct PlayerMovementCueFields {
@@ -26,12 +27,6 @@ void Player_PlayPositionEffect(void *, void *, s32, u32, void *, u32, u32);
 void Sound_PlaySong(u32);
 s32 Player_SetAnimation(void *, s32, s32, s32);
 void Player_ConstrainTetherTarget(void *, s32, s32, s32);
-static inline s32 scale12(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -((-v) >> 12);
-}
 static inline s32 scale6(s32 v)
 {
     if (v >= 0)

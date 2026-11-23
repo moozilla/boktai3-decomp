@@ -39,7 +39,7 @@ void AnimatedMarker_BeginReveal(struct AnimatedMarker *marker)
     struct AnimatedMarkerCollider *collider;
     marker->flags &= ~0x200;
     marker->animationTimer = 0;
-    *((u8 *)marker + 0x102) = 0;
+    marker->state = 0;
     marker->mode = 3;
     TerrainModifiers_UnregisterCell(marker->cellRef);
     GrowthHazard_RegisterCellEffect(marker);

@@ -6,10 +6,6 @@ void Player_InitState25(struct Player *);
 s32 ActorVariant_GetTableValue(u32, s32);
 s32 Player_SetAnimation(struct Player *, s32, s32, s32);
 s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
-static inline void enableAnimation(struct SceneInputWidget *a)
-{
-    a->flags &= ~1;
-}
 s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destination, s32 duration,
                                      struct SceneVec *target, u32 unused, s32 request, u32 option)
 {
@@ -21,7 +17,7 @@ s32 Player_BeginInterpolatedMovement(struct Player *p, struct SceneVec *destinat
     p->movementDestination = *destination;
     p->movementDuration = duration;
     p->movementStart = p->position;
-    enableAnimation(&p->animation);
+    SceneInputWidget_Show(&p->animation);
     Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 0x31), 0x40, 1);
     p->actionEighteenParameter = 500;
     p->movementRequestScale = 0x40;

@@ -105,7 +105,7 @@ s32 SceneActorMovement_UpdateAnimationAndTerrain(struct ChaseActor *object)
     if (ActorStatus_BodyFlags(actor, 0x20))
         actor->base.body.movementProbe = 0;
     else if (SceneActorTurn_ActorFlags(actor, 0x2000))
-        actor->base.body.movementProbe = (u8 *)actor + 0x40;
+        actor->base.body.movementProbe = actor->base.movementProbe;
     else
         actor->base.body.movementProbe = 0;
     {

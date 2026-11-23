@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "player.h"
 #include "ram.h"
+#include "scene_actor_chase.h"
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 s32 Div(s32, s32);
@@ -42,13 +43,6 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->x = Shift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
     out->z = Shift(gUnk_086149C4[angle & 255] * speed, 12);
-}
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 static inline void Add(struct ContactPosition *out, const struct ContactPosition *from)
 {
@@ -114,7 +108,7 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         TentacleActor_ResetOscillation(actor);
         {
-            u32 direction = (((*((u8 *)actor + 0xE9)) + 128) & 255) >> 6;
+            u32 direction = (((actor->base.tracking.heading) + 128) & 255) >> 6;
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
@@ -123,12 +117,12 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
 
     if (*(s16 *)(body + 0x8D6) <= 0)
         *(s16 *)(body + 0x8D6) = 1;
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
+        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);
     {

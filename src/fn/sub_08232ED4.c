@@ -16,7 +16,7 @@ u32 ScreenOrbitEffect_Init(struct S *s)
     struct Slot *p;
     int i;
     gEffectQuad = s;
-    *(void **)((u8 *)s + 0x100) = AnimData_FindEntry(0x1c1a);
+    s->res = AnimData_FindEntry(0x1c1a);
     s->x = 0x78;
     s->y = 0x50;
     s->z = 0;

@@ -37,10 +37,6 @@ static inline void ShowDamage(struct ChaseActor *a)
                                  &a->base.body.position, buffer, 1);
 }
 
-static inline u16 *MotionFlags(struct ChaseActor *a)
-{
-    return &a->base.motionFlags;
-}
 static inline struct ContactCollider *PrimaryCollider(struct ChaseActor *a)
 {
     return &a->base.colliderA;
@@ -114,7 +110,7 @@ void SceneActorReaction_ApplyHitResponse(void *victim, u32 mode, struct ContactP
     if (HitResponse_Test(a->base.motionFlags & partFlag))
         SceneActorEffects_SpawnContactParts((void *)a);
     {
-        struct HitMotionFlags *field = (void *)MotionFlags(a);
+        struct HitMotionFlags *field = (void *)SceneActorChase_MotionFlagsOf(a);
         s32 bits = ~0x2000;
         field->bits &= bits;
         motion = field;

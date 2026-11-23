@@ -29,7 +29,7 @@ void SceneActorAnimation_UpdateLungeAttack(struct StateActor *p, int tick)
         int sequence;
         p->actionChanged = 0;
         if (p->locked) {
-            s16 *here = (s16 *)((u8 *)p + 0x54);
+            s16 *here = &p->target.x;
             s16 *dest;
             dest = (s16 *)((u8 *)p + 0x9c4);
             p->savedFacing = Math_Atan2(dest[0] - *(s16 *)(position + 12), dest[2] - here[2]);

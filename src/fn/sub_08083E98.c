@@ -31,7 +31,7 @@ void SceneActorControl_StartPositionCurve(struct ChaseActor *actor,
         difference->x = target->x - position->x;
         difference->y = target->y - position->y;
         difference->z = target->z - position->z;
-        *((u8 *)actor + 0x3CD) = Math_Atan2(difference->x, difference->z);
+        actor->base.nextDirection = Math_Atan2(difference->x, difference->z);
     }
     {
         state = (void *)((u8 *)state + 0x42C);

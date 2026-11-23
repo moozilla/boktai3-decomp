@@ -41,6 +41,9 @@
 #include "scene_actor_init_body.h"
 #include "scene_actor_contact_response.h"
 #include "word_flags.h"
+#include "movement_curve.h"
+#include "scene_actor_damage_visibility.h"
+#include "vanargand_parts.h"
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
@@ -1109,20 +1112,11 @@ moved:
 
 u8 BouncingObject_RefreshNearbyHeading(struct ChaseActor *);
 
-static inline u8 TakeControlEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Mummy_UpdatePlayerRoute(struct ChaseActor *actor)
 {
     struct Mummy *body = actor->base.context;
     struct SceneActorChaseGroup *group = &actor->group;
-    if (TakeControlEntry(actor)) {
+    if (SceneActorReaction_TakePrepared(actor)) {
         u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
         mask = 4;
@@ -1796,14 +1790,6 @@ static inline s32 Scale(s32 value)
     return -(-value >> 12);
 }
 
-static inline void Subtract(struct ContactPosition *out, struct ContactPosition *from,
-                            struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 static inline s32 Abs(s32 value)
 {
     return value < 0 ? -value : value;
@@ -1833,7 +1819,7 @@ void Mummy_FireAcceleratingVolley(struct ChaseActor *actor)
         divisor = 27;
     else
         divisor = 34;
-    Subtract(&delta, &actor->base.body.position, &actor->base.tracking.target->position);
+    MovementCurve_SubtractPositions(&delta, &actor->base.body.position, &actor->base.tracking.target->position);
     {
         s32 x = delta.x, z;
         s32 ax = Abs(x), az;
@@ -2034,40 +2020,30 @@ struct Unk080D6DF8Delta {
     s16 x, y, z;
 };
 
-static inline s32 GridWidth(void)
-{
-    return *(s16 *)(gTerrainMap->cells + 4);
-}
-
-static inline s32 GridHeight(void)
-{
-    return *(s16 *)(gTerrainMap->cells + 6);
-}
-
 static inline u8 CanReach(s32 cell, s32 goal, s32 y, u32 kind, s32 total)
 {
     s32 i, col;
     if (cell < goal) {
         i = cell + 1;
-        for (col = Mod(i, GridWidth());
-             col < GridWidth() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
+        for (col = Mod(i, SceneActorTerrain_Width());
+             col < SceneActorTerrain_Width() && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i++, col++) {
             if (i == goal)
                 return 1;
         }
-        for (i = cell + GridWidth();
-             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += GridWidth()) {
+        for (i = cell + SceneActorTerrain_Width();
+             total > i && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i += SceneActorTerrain_Width()) {
             if (i == goal)
                 return 1;
         }
     } else {
         i = cell - 1;
-        for (col = Mod(i, GridWidth());
+        for (col = Mod(i, SceneActorTerrain_Width());
              col >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind); i--, col--) {
             if (i == goal)
                 return 1;
         }
-        for (i = cell - GridWidth(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
-             i -= GridWidth()) {
+        for (i = cell - SceneActorTerrain_Width(); i >= 0 && SceneActorTerrain_CanTraverseCell(cell, i, y, kind);
+             i -= SceneActorTerrain_Width()) {
             if (i == goal)
                 return 1;
         }
@@ -2080,7 +2056,7 @@ static inline u8 FindPath_FaceAndCheckStraightPath(struct Unk080D6DF8Actor *acto
     s32 cell = actor->terrainCell;
     s32 y = actor->position.y;
     u32 kind = *SceneActorTerrain_GetCell(cell) >> 4;
-    s32 total = GridWidth() * GridHeight();
+    s32 total = SceneActorTerrain_Width() * SceneActorTerrain_Height();
     return CanReach(cell, goal, y, kind, total);
 }
 
@@ -2700,19 +2676,12 @@ static inline void Reaction_SetControl(struct ChaseActor *actor, u32 kind, void 
     actor->base.pendingControl = 0;
 }
 
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-
 static inline u8 ShouldShowDamage(struct ChaseActor *actor)
 {
     if (Test(gEngineFlags, 0x4800)) {
         u32 mask = actor->base.hitOwners;
         if (!(mask & 0x20) && mask) {
-            switch (LocalPlayer()) {
+            switch (SceneActorDamage_LocalPlayer()) {
                 case 0:
                     if (actor->base.hitOwners != 1)
                         return 0;
@@ -3181,14 +3150,6 @@ static inline u8 IsPlayerTracked(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void SubtractPosition(struct ContactPosition *out, struct ContactPosition *a,
-                                    struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosition *input,
                                    u32 playerId)
 {
@@ -3207,7 +3168,7 @@ u8 SceneActor_TryTrackNearbyPlayer(struct ChaseActor *actor, struct ContactPosit
             goto fail;
     }
     deltaPointer = &delta;
-    SubtractPosition(deltaPointer, input, &actor->base.body.position);
+    Vanargand_Difference(deltaPointer, input, &actor->base.body.position);
     distance = delta.x * delta.x + deltaPointer->z * deltaPointer->z;
     {
         u32 range = group->common.control.radiusSquared;

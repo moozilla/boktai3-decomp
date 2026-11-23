@@ -8,6 +8,7 @@
 #include "ram.h"
 #include "debug.h"
 #include "hit_spark_random.h"
+#include "state_actor_action_entry.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
@@ -1082,16 +1083,6 @@ void SceneActors_DispatchCommands(struct S *s)
         } while (i < entry->count[gSceneEventDispatchState[0x24]]);
 }
 
-static inline u8 TakeFlag(struct StateActor *p)
-{
-    if (p->actionEnter) {
-        p->actionEnter = 0;
-        p->actionFinished = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
 static inline void SceneActorState_SetAnimation(struct StateActor *actor, u32 animation)
 {
     actor->actionAnimation = animation;
@@ -1099,7 +1090,7 @@ static inline void SceneActorState_SetAnimation(struct StateActor *actor, u32 an
 
 void SceneActorState_AdvanceToState1A(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 0x1a);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1108,7 +1099,7 @@ void SceneActorState_AdvanceToState1A(struct StateActor *p)
 
 void SceneActorState_AdvanceToState01(struct StateActor *p)
 {
-    u8 entered = TakeFlag(p);
+    u8 entered = StateActor_ConsumeActionEntry(p);
     if (entered == TRUE) {
         p->actionAnimation = entered;
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1118,7 +1109,7 @@ void SceneActorState_AdvanceToState01(struct StateActor *p)
 
 void SceneActorState_AdvanceToState02(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 2);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1127,7 +1118,7 @@ void SceneActorState_AdvanceToState02(struct StateActor *p)
 
 void SceneActorState_Acknowledge(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 3);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1139,7 +1130,7 @@ void SceneActorState_Acknowledge(struct StateActor *p)
 
 void SceneActorState_AdvanceToState1B(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x1b);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1149,7 +1140,7 @@ void SceneActorState_AdvanceToState1B(struct StateActor *p)
 
 void SceneActorState_AdvanceToState1C(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x1C);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1159,7 +1150,7 @@ void SceneActorState_AdvanceToState1C(struct StateActor *p)
 
 void SceneActorState_Resume(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 0x1d);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1172,7 +1163,7 @@ void SceneActorState_Resume(struct StateActor *p)
 
 void SceneActorState_AdvanceToState1E(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x1e);
     if (p->actionFinished) {
         SceneActorState_StartAction(p, 2, 0, 0);
@@ -1183,7 +1174,7 @@ void SceneActorState_AdvanceToState1E(struct StateActor *p)
 
 void SceneActorState_AdvanceToState23(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x23);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1193,7 +1184,7 @@ void SceneActorState_AdvanceToState23(struct StateActor *p)
 
 void SceneActorState_AdvanceToState24(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x24);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1204,7 +1195,7 @@ void SceneActorState_AdvanceToState24(struct StateActor *p)
 void SceneActorState_AdvanceToState06(struct StateActor *p)
 {
     struct SceneGraphicsActor *graphicsActor = (struct SceneGraphicsActor *)p;
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 6);
         graphicsActor->graphics.particleFlag = 0;
     }
@@ -1216,7 +1207,7 @@ void SceneActorState_AdvanceToState06(struct StateActor *p)
 
 void SceneActorState_AdvanceToState20(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x20);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1226,7 +1217,7 @@ void SceneActorState_AdvanceToState20(struct StateActor *p)
 
 void SceneActorState_AdvanceToState21(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x21);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1236,7 +1227,7 @@ void SceneActorState_AdvanceToState21(struct StateActor *p)
 
 void SceneActorState_Hold(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 0x22);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1246,7 +1237,7 @@ void SceneActorState_Hold(struct StateActor *p)
 
 void SceneActorState_PlayAnimation17AndConsumeTrigger(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x11);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1256,7 +1247,7 @@ void SceneActorState_PlayAnimation17AndConsumeTrigger(struct StateActor *p)
 
 void SceneActorState_PlayAnimation19AndConsumeTrigger(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x13);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1266,7 +1257,7 @@ void SceneActorState_PlayAnimation19AndConsumeTrigger(struct StateActor *p)
 
 void SceneActorState_PlayAnimation14ThenAdvance(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0xe);
     if (p->actionFinished) {
         SceneActorState_EnterPhase(p, 0x11);
@@ -1277,7 +1268,7 @@ void SceneActorState_PlayAnimation14ThenAdvance(struct StateActor *p)
 
 void SceneActorState_PlayAnimation15AndConsumeTrigger(struct StateActor *p)
 {
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         SceneActorState_SetAnimation(p, 0xf);
         Trigger_ConsumePending(p->receiver2, 1);
     }
@@ -1286,7 +1277,7 @@ void SceneActorState_PlayAnimation15AndConsumeTrigger(struct StateActor *p)
 
 void SceneActorState_ResumeAfterAction(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x10);
     if (p->actionFinished) {
         SceneActorState_StartAction(p, 2, 0, 1);
@@ -1297,7 +1288,7 @@ void SceneActorState_ResumeAfterAction(struct StateActor *p)
 
 void SceneActorState_PlayAnimation31AndConsumeTrigger(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x1F);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1307,7 +1298,7 @@ void SceneActorState_PlayAnimation31AndConsumeTrigger(struct StateActor *p)
 
 void SceneActorState_PlayAnimation37ThenResume(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x25);
     if (p->actionFinished) {
         SceneActorState_StartAction(p, 2, 0, 0);
@@ -1318,7 +1309,7 @@ void SceneActorState_PlayAnimation37ThenResume(struct StateActor *p)
 
 void SceneActorState_PlayAnimation39AndConsumeTrigger(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 0x27);
     if (p->actionFinished)
         Trigger_ConsumePending(p->receiver2, 1);
@@ -1354,7 +1345,7 @@ void SceneActorState_WaitForDelayedAction(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     p->vulnerable = 1;
-    if (TakeFlag(p) == TRUE) {
+    if (StateActor_ConsumeActionEntry(p) == TRUE) {
         if (actor->variant == 0)
             p->actionAnimation = 1;
         else
@@ -1372,7 +1363,7 @@ void SceneActorState_UpdateVariantActionPlayback(struct SceneGraphicsActor *acto
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetValueClampedWhenInactive(actor, 4);
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState != 3) {
@@ -1388,7 +1379,7 @@ void SceneActorState_UpdateVariantActionPlayback(struct SceneGraphicsActor *acto
 void SceneActorState_PlayAnimation5ThenAdvance(struct StateActor *p)
 {
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 5);
     if (p->actionFinished)
         SceneActorState_EnterPhase(p, 3);
@@ -1498,7 +1489,7 @@ void sub_08023FE8(struct StateActor *p)
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     struct ProbePos *sprite = (struct ProbePos *)((u8 *)p + 0x48);
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 6);
     if (actor->graphics.particleFlag == 1) {
         struct ProbePos off, min, max;
@@ -1541,7 +1532,7 @@ void SceneActorState_PlayAnimation7ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 7);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 90);
@@ -1553,7 +1544,7 @@ void SceneActorState_PlayAnimation8ThenRecover(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 8);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 30);
@@ -1565,7 +1556,7 @@ void sub_080243CC(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
     p->vulnerable = 1;
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         DEBUG_PRINT();
     }
     if (p->actionFinished) {
@@ -1582,7 +1573,7 @@ void SceneActorState_PlayAnimation10ThenRecover(struct SceneGraphicsActor *actor
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 10);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 30);
@@ -1594,7 +1585,7 @@ void SceneActorState_PlayAnimation11ThenRecover(struct SceneGraphicsActor *actor
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 11);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 30);
@@ -1606,7 +1597,7 @@ void SceneActorState_PlayVariantAnimation12ThenRecover(struct SceneGraphicsActor
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetValueClampedWhenActive(actor, 12);
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
@@ -1625,7 +1616,7 @@ void SceneActorState_PlayVariantAnimation13ThenRecover(struct SceneGraphicsActor
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetValueClampedWhenActive(actor, 13);
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
@@ -1648,7 +1639,7 @@ void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
     struct ContactPosition pos2;
     u8 *src = (u8 *)p + 0x48;
 
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 14);
     if (p->actionFinished) {
         struct ContactPosition *pp = &pos;
@@ -1670,14 +1661,14 @@ void SceneActorState_StartContactPool(struct SceneGraphicsActor *actor)
 
 void SceneActorState_HoldAnimation15(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 15);
     p->actionTimer++;
 }
 void SceneActorState_UpdateLongRecovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 16);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 90);
@@ -1689,7 +1680,7 @@ void SceneActorState_UpdateLongRecovery(struct SceneGraphicsActor *actor)
 void SceneActorState_UpdateVariantRecovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
-    if (TakeFlag(p)) {
+    if (StateActor_ConsumeActionEntry(p)) {
         if (actor->graphics.stepTableKind == 3 && actor->graphics.flashPhase)
             SceneActorState_SetValueClampedWhenActive(actor, 38);
         else
@@ -1718,7 +1709,7 @@ void SceneActorState_UpdateAction20Recovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetValueClampedWhenActive(actor, 20);
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
@@ -1737,7 +1728,7 @@ void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
     p->vulnerable = 1;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetValueClampedWhenActive(actor, 21);
     if (p->actionFinished) {
         if (((struct StateActor *)actor)->actionState == 3) {
@@ -1754,14 +1745,14 @@ void SceneActorState_UpdateAction21Recovery(struct SceneGraphicsActor *actor)
 
 void SceneActorState_UpdateAction22(struct StateActor *p)
 {
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 22);
     p->actionTimer++;
 }
 void SceneActorState_UpdateShortRecovery(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 23);
     if (p->actionFinished)
         SceneActorState_StartRecovery(actor, 30);
@@ -1770,7 +1761,7 @@ void SceneActorState_UpdateShortRecovery(struct SceneGraphicsActor *actor)
 void SceneActorState_WaitForFlagRelease(struct SceneGraphicsActor *actor)
 {
     struct StateActor *p = (struct StateActor *)actor;
-    if (TakeFlag(p))
+    if (StateActor_ConsumeActionEntry(p))
         SceneActorState_SetAnimation(p, 24);
     if (!SceneActorState_TestFlags(p, 1))
         SceneActorState_StartRecovery(actor, 30);
@@ -1780,7 +1771,7 @@ void SceneActorState_WaitForFlagRelease(struct SceneGraphicsActor *actor)
 
 void SceneActorState_UpdatePassiveAction(struct StateActor *p)
 {
-    TakeFlag(p);
+    StateActor_ConsumeActionEntry(p);
     p->actionTimer++;
 }
 

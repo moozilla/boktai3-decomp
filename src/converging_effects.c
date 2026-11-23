@@ -1,17 +1,11 @@
 #include "converging_effects.h"
+#include "ghoul_disc.h"
 
 extern const s16 gUnk_086149C4[];
 
 s32 Math_Atan2(s32, s32);
 
 void SpriteDrawable_SelectTileFrame(struct ConvergingParticle *, void *, s32);
-
-static inline s32 magnitude(s32 v)
-{
-    if (v < 0)
-        return -v;
-    return v;
-}
 
 static inline s32 scale(s32 v)
 {
@@ -30,7 +24,7 @@ void ConvergingEffects_UpdateParticles(struct Player *player)
         struct ConvergingParticle *e = &player->convergingEffects.particles[i];
         if (e->active) {
             struct ConvergingParticle *draw = e;
-            if (magnitude(draw->offsetX) <= 15 && magnitude(draw->offsetZ) <= 15) {
+            if (Ghoul_Abs(draw->offsetX) <= 15 && Ghoul_Abs(draw->offsetZ) <= 15) {
                 draw->flags |= 1;
                 e->active = 0;
             } else {

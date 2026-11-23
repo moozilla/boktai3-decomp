@@ -15,7 +15,7 @@ static inline u8 TestValue(u32 value)
 }
 void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
 {
-    u8 *control = (u8 *)actor + 0x3D4;
+    u8 *control = actor->control;
     u8 *drawable = actor->drawable;
     u16 *flags;
     void *identity;
@@ -36,7 +36,7 @@ void SceneActorEffects_ReleaseResources(struct SceneActorEffectsView *actor)
     }
     {
         u8 *shadow;
-        shadow = (u8 *)actor + 0x320;
+        shadow = actor->shadow;
         if (*shadow)
             Shadow_Destroy(shadow);
     }

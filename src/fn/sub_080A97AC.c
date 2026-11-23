@@ -1,5 +1,6 @@
 #include "chase_actor.h"
 #include "global.h"
+#include "scene_actor_chase_shared.h"
 struct Pos080A97AC {
     u32 v[2];
 };
@@ -28,12 +29,6 @@ inline static u8 TestMask(struct Entry080A97AC *e, char mask)
         return 1;
     return 0;
 }
-inline static u8 TestMask16(u16 *flags, u32 mask)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
 
 void TentacleActor_TargetMarkedSegment(struct ChaseActor *actor)
 {
@@ -48,7 +43,7 @@ void TentacleActor_TargetMarkedSegment(struct ChaseActor *actor)
     }
     if (found != 0xff) {
         u32 mask = 1;
-        if (TestMask16(&g->state, mask)) {
+        if (SceneActorChase_TestField(&g->state, mask)) {
             g->savedPos = g->entries[found].pos;
             g->target = &g->entries[found];
         }

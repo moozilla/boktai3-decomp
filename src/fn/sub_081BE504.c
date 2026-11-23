@@ -20,11 +20,6 @@ s32 Storage_FindEquippedItemSlot(struct StorageCategoryWidgets *, s32);
 void SceneHud_SetKeyframePaletteBank(void *, u32);
 void Storage_GetSlotPosition(void *, s32);
 
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
 #define STORAGE_MEMBER_OFFSET(member) ((u32) & ((struct StorageCategoryWidgets *)0)->member)
 
 static inline void Storage_ClearOffset(u32 *offset)
@@ -66,7 +61,7 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
             id = Inventory_GetEquipmentId(p->slots[index]);
             if (id != 255) {
                 struct SceneInputWidget *widget;
-                ShowWidget(&cellBase->carried[0][0]);
+                SceneInputWidget_Show(&cellBase->carried[0][0]);
                 {
                     u32 offset = widgetOffset + STORAGE_MEMBER_OFFSET(carried);
                     widget = (void *)((u32)p + offset);
@@ -75,7 +70,7 @@ void Storage_RefreshEquipmentSlots(struct StorageCategoryWidgets *p)
                 if (Storage_FindEquippedItemSlot(p, p->slots[index]) >= 0) {
                     struct SceneInputWidget *mark;
                     SceneHud_SetKeyframePaletteBank(widget, 0x374);
-                    ShowWidget(&markerBase->markers[0]);
+                    SceneInputWidget_Show(&markerBase->markers[0]);
                     {
                         u32 offset = STORAGE_MEMBER_OFFSET(markers) + markerOffset;
                         mark = (void *)((u32)p + offset);

@@ -1,5 +1,6 @@
 #include "player_core.h"
 #include "player_slot_status.h"
+#include "ghoul_disc.h"
 
 void ScreenMote_ResetManager(void)
 {
@@ -76,13 +77,6 @@ static inline s32 scale12(s32 v)
     return -(-v >> 12);
 }
 
-static inline s32 scale6(s32 v)
-{
-    if (v >= 0)
-        return v >> 6;
-    return -(-v >> 6);
-}
-
 void Player_SetDirectionalVelocity(struct Player *player, s32 speed)
 {
     s32 angle = ((player->facing + 5) & 7) << 5;
@@ -90,14 +84,14 @@ void Player_SetDirectionalVelocity(struct Player *player, s32 speed)
     player->velocityZ = scale12(gUnk_086149C4[angle] * speed);
     if (player->velocityScaleAxis == 1) {
         if (player->velocityZ < 0)
-            player->velocityZ = scale6(player->velocityZ * 40);
+            player->velocityZ = Ghoul_QuarterDirection(player->velocityZ * 40);
         else
-            player->velocityZ = scale6(player->velocityZ * 52);
+            player->velocityZ = Ghoul_QuarterDirection(player->velocityZ * 52);
     } else if (player->velocityScaleAxis == 2) {
         if (player->velocityX < 0)
-            player->velocityX = scale6(player->velocityX * 40);
+            player->velocityX = Ghoul_QuarterDirection(player->velocityX * 40);
         else
-            player->velocityX = scale6(player->velocityX * 52);
+            player->velocityX = Ghoul_QuarterDirection(player->velocityX * 52);
     }
 }
 

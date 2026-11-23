@@ -36,7 +36,7 @@ void TaggedSceneNpc_UpdateAnimationSequence(void *context, struct StateActor *p)
             t->field6 = 0;
             if (entered)
                 TaggedSceneNpc_PlayTaggedAnimation(p, 2, 2, 0, 4);
-            if (DisplayAnimation_TestFinished((u8 *)p + 0xd4)) {
+            if (DisplayAnimation_TestFinished(&p->targetPosition.z)) {
                 t->field4 = 1;
                 t->field6 = 1;
                 t->state.word = 0;
@@ -59,7 +59,7 @@ void TaggedSceneNpc_UpdateAnimationSequence(void *context, struct StateActor *p)
             t->field6 = 0;
             if (entered)
                 TaggedSceneNpc_PlayTaggedAnimation(p, 4, 2, 0, 4);
-            if (DisplayAnimation_TestFinished((u8 *)p + 0xd4)) {
+            if (DisplayAnimation_TestFinished(&p->targetPosition.z)) {
                 t->field4 = 3;
                 t->field6 = 1;
                 t->state.word = 0;

@@ -30,16 +30,6 @@ extern const struct MenuCursorEntry gUnk_0824F7E8[9];
 
 void *memcpy(void *, const void *, u32);
 
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
-static inline void HideIndicator(struct SceneInputWidget *widget)
-{
-    widget->flags |= 1;
-}
-
 static inline u32 Test(struct MenuCursor *cursor, u32 mask)
 {
     return cursor->stateFlags & mask;
@@ -75,15 +65,15 @@ void RegistrySelection_SetUpdate(struct RegistrySelectionMenu *menu,
 void RegistrySelection_ShowIndicators(struct RegistrySelectionMenu *menu)
 {
     menu->animations[1].flags &= ~1;
-    ShowWidget(&menu->animations[2]);
-    ShowWidget(&menu->animations[3]);
-    ShowWidget(&menu->animations[4]);
-    ShowWidget(&menu->animations[5]);
-    ShowWidget(&menu->animations[8]);
+    SceneInputWidget_Show(&menu->animations[2]);
+    SceneInputWidget_Show(&menu->animations[3]);
+    SceneInputWidget_Show(&menu->animations[4]);
+    SceneInputWidget_Show(&menu->animations[5]);
+    SceneInputWidget_Show(&menu->animations[8]);
     menu->animations[0].flags &= ~1;
-    ShowWidget(&menu->animations[10]);
-    ShowWidget(&menu->animations[9]);
-    ShowWidget(&menu->animations[11]);
+    SceneInputWidget_Show(&menu->animations[10]);
+    SceneInputWidget_Show(&menu->animations[9]);
+    SceneInputWidget_Show(&menu->animations[11]);
 }
 
 void RegistrySelection_UpdateIndicators(struct RegistrySelectionMenu *menu)
@@ -236,8 +226,7 @@ void RegistrySelection_BlendTimedPalettes(struct RegistrySelectionMenu *menu)
     u8 *base = menu->palettes;
     u8 *extra;
     u32 flags = menu->availableEntries;
-    u32 mask = 0x80;
-    if (flags & mask)
+    if (flags & 0x80)
         extra = base + 0x120;
     else
         extra = 0;
@@ -375,8 +364,8 @@ void RegistrySelection_StartTimedEffect(struct RegistrySelectionMenu *menu, s32 
     menu->mode = mode;
     menu->inputDisabled = one = 1;
     MenuCursor_Hide(menu->selectionCursor);
-    HideIndicator(&menu->animations[11]);
-    HideIndicator(&menu->animations[12]);
+    SceneInputWidget_Hide(&menu->animations[11]);
+    SceneInputWidget_Hide(&menu->animations[12]);
     RegistrySelection_SetUpdate(menu, RegistrySelection_UpdateTimedEffect);
 }
 

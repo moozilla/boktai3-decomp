@@ -2,12 +2,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
-static inline u8 TestSegment(struct TentacleAnimationSegment *segment, u32 mask)
-{
-    if (segment->animation.status & mask)
-        return 1;
-    return 0;
-}
+#include "ghoul_disc.h"
 static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
     return mask & p->base.statusFlags;
@@ -31,12 +26,6 @@ static inline s32 Height(s32 cell, struct ContactPosition *position)
     }
     return height;
 }
-static inline s32 Abs(s32 n)
-{
-    if (n < 0)
-        return -n;
-    return n;
-}
 void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
 {
     struct TentacleBody *trail;
@@ -50,7 +39,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
     for (i = 0; i < trail->segmentCount; i++) {
         struct TentacleAnimationSegment *segment = &trail->segments[i];
         struct ContactPosition *position = &segment->position;
-        if (TestSegment(segment, 2) && (!TestSegment(segment, 1))) {
+        if (TentacleSpread_Test(segment, 2) && (!TentacleSpread_Test(segment, 1))) {
             s32 rawHeight = Height(SceneActorTerrain_GetCellIndex(position), position);
             s32 height = rawHeight;
             s16 y;
@@ -58,10 +47,10 @@ void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
             if (y != height) {
                 if (y < height) {
                     s32 delta = height - y;
-                    if (Abs(delta) > 255)
+                    if (Ghoul_Abs(delta) > 255)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TentacleAnimationSegment))) +
                                   positionY)) = actor->base.body.position.y;
-                    else if (Abs(delta) > 255)
+                    else if (Ghoul_Abs(delta) > 255)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TentacleAnimationSegment))) +
                                   positionY)) = actor->base.body.position.y;
                     else
@@ -71,7 +60,7 @@ void TentacleActor_AlignSegmentsToTerrain(struct ChaseActor *actor)
                     s32 delta;
                     height = rawHeight - y;
                     delta = height;
-                    if (Abs(delta) > 256)
+                    if (Ghoul_Abs(delta) > 256)
                         *((s16 *)((((u8 *)trail) + (i * sizeof(struct TentacleAnimationSegment))) +
                                   positionY)) = actor->base.body.position.y;
                     else

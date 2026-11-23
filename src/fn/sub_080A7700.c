@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -25,14 +26,6 @@ static inline s32 Shift(s32 n, u32 bits)
     return -((-n) >> bits);
 }
 
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
 {
     a->base.field2B2 = 1;
@@ -42,8 +35,7 @@ static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
     a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
+        *flags &= ~1;
     }
     a->base.pendingControl = 0;
 }
@@ -136,14 +128,14 @@ void TentacleBody_ApproachWaypoint(struct ChaseActor *actor)
         State7(actor);
         return;
     }
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         s32 angle;
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
-        angle = *((u8 *)actor + 0x3CD) - actor->base.body.direction;
+        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
+        angle = actor->base.nextDirection - actor->base.body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)

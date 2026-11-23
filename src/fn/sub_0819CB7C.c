@@ -1,7 +1,5 @@
 #include "global.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Actor {
     u8 pad[0x51];
     u8 heading;

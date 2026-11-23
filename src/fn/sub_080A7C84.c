@@ -2,6 +2,7 @@
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_chase.h"
 
 extern const s16 gUnk_086149C4[];
 
@@ -23,14 +24,6 @@ static inline s32 Shift(s32 n, u32 bits)
     if (n >= 0)
         return n >> bits;
     return -((-n) >> bits);
-}
-
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 
 static inline void State0(struct ChaseActor *a)
@@ -119,7 +112,7 @@ void TentacleBody_UpdatePursuit(struct ChaseActor *actor)
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
-        Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
+        Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
         *(((u8 *)actor) + 0x3CD) = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);

@@ -18,7 +18,7 @@ void Player_UpdatePoseRecovery(struct Player *p)
 {
     u32 phase;
     Player_AddControlFlags(p, 8);
-    phase = *((u8 *)p + 0x458);
+    phase = p->tetherPhase;
     switch (phase) {
         case 0:
             p->facing |= 1;
@@ -29,20 +29,20 @@ void Player_UpdatePoseRecovery(struct Player *p)
                 p->heading = p->facing >> 1;
                 p->side = 0;
             }
-            Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 2, p->heading,
+            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 2, p->heading,
                              p->side);
-            Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), 1, 1);
+            Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, 1, 1);
             if (p->actionCountdown <= 30) {
                 p->actionCountdown = 0;
                 Sound_PlaySong(0x1B0);
-                *((u8 *)p + 0x458) = 1;
+                p->tetherPhase = 1;
             } else
                 p->actionCountdown -= 30;
             break;
         case 1:
-            Anim_SetSequence((void *)((u8 *)p + 0x3FC), *(void **)((u8 *)p + 0x410), 3, p->heading,
+            Anim_SetSequence(&p->cueCollider.sequence, *(void **)((u8 *)p + 0x410), 3, p->heading,
                              p->side);
-            if (Step((void *)((u8 *)p + 0x14C), (void *)((u8 *)p + 0x3FC), phase, 2)) {
+            if (Step((void *)((u8 *)p + 0x14C), &p->cueCollider.sequence, phase, 2)) {
                 Player_UpdateFacingSide(p);
                 ActorSequence_Begin(p, 0, 0);
             }

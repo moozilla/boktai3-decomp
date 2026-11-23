@@ -56,7 +56,7 @@ void ContactActor_UpdateReaction(struct ContactActorPool *pool, struct ContactAc
                 void *argument = graphics;
                 AnimData_SelectPaletteBank(argument, k2);
             }
-            graphics->tileData = (u8 *)pool + 0x1700;
+            graphics->tileData = pool->tileData;
         }
         if ((slot->stateFrame >> 2) & 1) {
             slot->sprite.flags &= ~1;

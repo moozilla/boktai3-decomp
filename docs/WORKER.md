@@ -239,6 +239,32 @@ If you find a steering form the linter does not report, add a kind (its own comm
 with the legitimate look-alike, counts before and after). Prefer detection from what the
 compiler does (`tools/deadcode.py`) over a regex.
 
+### Mechanical cleanups
+
+Three tools make the edits that need no judgment, each keeping a change only when
+`tools/check.py` still reports MATCH, agbcc prints no new warning and the unit's NONMATCHING
+drafts still compile (`tools/keepcheck.py`); anything else is put back. Each takes units or
+directories (default `src/`), skips `src/lib` and the paths in `--skip FILE` (default
+`build/skip_files.txt`), never edits a header or a NONMATCHING draft, has `--dry-run`, and
+prints a review list (`--report FILE` appends it to a file). Run them on the units you are about
+to clean, before reading warnings by hand, in this order:
+
+* `tools/inline_twins.py`: a private `static inline` helper, or a struct, that is an exact copy
+  of one in `include/` gives way to the shared one (calls renamed, header included). Run it
+  first, and again after you add a helper to a header. Near twins (same body, another parameter
+  order or type) and structs with the same members under another name are listed, not changed:
+  decide those by reading them.
+* `tools/rawfield.py`: `*(u16 *)((u8 *)actor + 0x2D0)`, `(u8 *)p + 0x120` passed to a call and
+  the like become member accesses when the base's declared type has a member of that type at
+  that offset (layouts from the compiler, as `tools/struct_views.py` reads them). Run it after
+  a header gains members. The "no member at" rows say where a struct is still missing one.
+* `tools/fold_literals.py`: a `literal-local` or `const-local` read exactly once is written in
+  place (`u32 mask = 0x40; f & mask` becomes `f & 0x40`). A local read more than once is left
+  for you.
+
+Moving a parked constant into a helper's argument instead is steering under another name; no
+tool does it and neither should you.
+
 ## Recording what you learned
 
 * Per function: what `why` said and which C change it led to; what still differs and

@@ -40,6 +40,7 @@ import concurrent.futures
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -103,7 +104,7 @@ def apply(src, edits):
 
 
 def check(path, nonmatching, rng):
-    cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), path, '--json', '--quiet']
+    cmd = [sys.executable, os.path.join(ROOT, 'tools', 'check.py'), path, '--json', '--quiet', '--keep']
     if nonmatching:
         cmd.append('--nonmatching')
     r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
@@ -111,9 +112,13 @@ def check(path, nonmatching, rng):
     if not lines:
         return None, (r.stderr.strip().splitlines() or ['compile failed'])[-1]
     res = json.loads(lines[-1])
-    if res['status'] == 'match':
-        return (0, 0, 0), 'MATCH'
-    s, t = anchordiff.score(os.path.join(ROOT, res['artifacts']), rng)
+    run = os.path.join(ROOT, res['artifacts'])
+    try:
+        if res['status'] == 'match':
+            return (0, 0, 0), 'MATCH'
+        s, t = anchordiff.score(run, rng)
+    finally:
+        shutil.rmtree(run, ignore_errors=True)
     return (s, t, res['different_byte_count']), f"fuzzy {res['fuzzy_match_percent']:.1f}%"
 
 

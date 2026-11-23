@@ -259,11 +259,6 @@ static inline void dispatch(void **callback, void *context)
     Callback_InvokeActor(context, *callback);
 }
 
-static inline u32 engineFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-
 static inline u8 pending(struct Skeleton *actor)
 {
     u32 mask = 0x10;
@@ -276,7 +271,7 @@ s32 Skeleton_UpdateBehaviorCallbacks(struct ChaseActor *actor)
 {
     struct Skeleton *state = (void *)actor;
     struct SceneActorRegistryControlGroup *block = &state->chase.group.common;
-    if (engineFlags(0x400))
+    if (SceneActorBehavior_GlobalPauseBits(0x400))
         return 0;
     if (test(4, gUnk_02000560))
         return 0;
@@ -587,8 +582,7 @@ s32 SceneActorTerrain_CompareNeighborHeight(s32 cell, s32 height, s32 direction)
     kind = *SceneActorTerrain_GetCell(cell) >> 4;
     {
         u32 flags = ((struct SceneActorChaseTerrainCell *)SceneActorTerrain_GetCell(cell))->flags;
-        u32 mask = 3;
-        if (flags & mask) {
+        if (flags & 3) {
             if (nextHeight >= height)
                 return 1;
             return 2;

@@ -2,10 +2,6 @@
 #include "scene_actor_control_helpers.h"
 #include "word_flags.h"
 void SceneActorPalette_ClearCompletedTransitions(void);
-static inline u32 ReadMasked(const u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 IsDisposable(struct RoomActor *actor)
 {
     if (!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) {
@@ -25,7 +21,7 @@ void SceneActorTerrain_DisableCollision(struct RoomActor *actor)
     SceneActorPalette_ClearCompletedTransitions();
     {
         u32 queryMask = 0x800;
-        if (ReadMasked(&actor->statusFlags, queryMask) && IsDisposable(actor)) {
+        if (WordFlags_Test(&actor->statusFlags, queryMask) && IsDisposable(actor)) {
             u32 removalMask = 0x1000;
             actor->reactionFlags = removalMask | actor->reactionFlags;
         }

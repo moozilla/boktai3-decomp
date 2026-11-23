@@ -2,6 +2,7 @@
 #include "scene_actor_placement.h"
 #include "scene_actor_init_actor.h"
 #include "scene_actor_chase_shared.h"
+#include "scene_actor_terrain_reaction.h"
 void SceneActorAttachment_BeginReturnResponse(struct ChaseActor *);
 static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -17,14 +18,6 @@ static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
     }
     actor->base.pendingControl = 0;
 }
-static inline void SetState(struct ChaseActor *actor, u8 state, u8 phase, u8 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
 {
     u32 unavailable = SceneActor_ActionsBlocked((void *)actor);
@@ -37,7 +30,7 @@ s32 SceneActorBehavior_DispatchPendingFlags(struct ChaseActor *actor)
             return 1;
         }
         if (SceneActorPlacement_TestFlags(flags, 2)) {
-            SetState(actor, 3, 0, 0);
+            SceneActorTerrain_EnterState(actor, 3, 0, 0);
             SetControl(actor, group->contactControl, 7);
             {
                 s32 value = actor->base.attachmentRestart;

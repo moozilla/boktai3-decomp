@@ -134,7 +134,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0)
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 }
 
 static inline void MonsterInit_ReadBatPalette(struct ChaseActor *actor, u16 base, u16 alternate)
@@ -310,7 +310,7 @@ s32 Bat_Init(void *object)
         SceneActorControl_RestartPositionCurve(actor);
     } else {
         bat->flags3D4 |= 2;
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
     }
     MonsterInit_SaveControl(MonsterInit_SavedControlOf(actor), actor);
     Bat_InstallCompletionCallbacks(actor);

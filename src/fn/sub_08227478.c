@@ -79,7 +79,7 @@ s32 Camera_Initialize(struct Camera *c, u32 id)
     c->f98 = 0;
     updateScroll();
     if (!(gEngineFlags & 0x800))
-        SceneMessages_RegisterReceiver((u8 *)c + 0x20, c->id, 6);
+        SceneMessages_RegisterReceiver(c->receiver, c->id, 6);
     gActiveCamera = c;
     return 0;
 }

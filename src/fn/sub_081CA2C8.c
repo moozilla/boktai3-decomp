@@ -118,10 +118,10 @@ void StateActor_StartKind5Animation9AndAttach(struct Context *ctx, struct StateA
     mask = a2 & 0x3f;
     if (mask == 0) {
         void **slot = (void **)((u8 *)p + 0x2c0);
-        *slot = ActorAttachment_UpdateFromDescriptor(*slot, (u8 *)p + 0x5c, 2, 0, mask, mask, 0xfa,
-                                                     0xfa);
+        *slot =
+            ActorAttachment_UpdateFromDescriptor(*slot, p->motion, 2, 0, mask, mask, 0xfa, 0xfa);
     }
 
-    if (DisplayAnimation_TestFinished((u8 *)p + 0xd4))
+    if (DisplayAnimation_TestFinished(&p->targetPosition.z))
         p->done = 1;
 }

@@ -1,4 +1,5 @@
 #include "contact_actor.h"
+#include "scene_actor_part_burst.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 static inline s32 truncateShift12(s32 value)
 {
@@ -11,12 +12,6 @@ static inline u32 nextRandom(void)
     u32 index = (gRandomIndex + 1) & 1023;
     gRandomIndex = index;
     return ((const u16 *)RANDOM_TABLE_ADDR)[index];
-}
-static inline u32 nextSample(const u16 *table)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return table[index];
 }
 static inline u32 headingTo(const struct ContactPosition *to, const struct ContactPosition *from)
 {
@@ -61,9 +56,9 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
         slot->direction = headingTo(&slot->destination, &slot->position);
         {
             const u16 *table = gRandomTable;
-            s32 jitter = (nextSample(table) & 63) - 32;
+            s32 jitter = (SceneActorEffects_NextSample(table) & 63) - 32;
             slot->direction += jitter;
-            slot->steeringTimer = (nextSample(table) & 15) + 16;
+            slot->steeringTimer = (SceneActorEffects_NextSample(table) & 15) + 16;
         }
         {
             s32 mask;
@@ -80,10 +75,10 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
     if (!slot->steeringTimer) {
         s32 roll;
         work = (void *)gRandomTable;
-        roll = nextSample((const u16 *)work) & 255;
+        roll = SceneActorEffects_NextSample((const u16 *)work) & 255;
         if (roll <= 191) {
             if (slot->targetIndex >= 0) {
-                polarOffset(&delta, nextSample((const u16 *)work) & 255, 256);
+                polarOffset(&delta, SceneActorEffects_NextSample((const u16 *)work) & 255, 256);
                 addPosition(&slot->destination, pool->targets[slot->targetIndex], &delta);
             }
             slot->direction = headingTo(&slot->destination, &slot->position);
@@ -92,7 +87,7 @@ void ContactActor_UpdateRoaming(struct ContactActorPool *pool, struct ContactAct
                 slot->direction += jitter;
             }
         } else
-            slot->direction = nextSample((const u16 *)work);
+            slot->direction = SceneActorEffects_NextSample((const u16 *)work);
         slot->steeringTimer = (nextRandom() & 15) + 16;
     } else
         slot->steeringTimer--;

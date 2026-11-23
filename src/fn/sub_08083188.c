@@ -18,8 +18,8 @@ void SceneActorControl_UpdatePersistentPhase(struct ChaseActor *actor)
             *flags &= mask;
         }
         actor->base.pendingControl = 0;
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
     }
-    if (!((u8(*)(struct ChaseActor *)) * (void **)((u8 *)actor + 0x270))(actor))
+    if (!((u8(*)(struct ChaseActor *))actor->base.contactQuery.opaque)(actor))
         ++actor->base.counter2AC;
 }

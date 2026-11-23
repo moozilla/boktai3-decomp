@@ -646,14 +646,6 @@ static inline void AddImpact(struct Golem *state)
         *p = 400;
 }
 
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *b,
-                         const struct ContactPosition *a)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollider *other,
                              struct ChaseActor *a)
 {
@@ -678,7 +670,7 @@ void Golem_OnAttackCollision(struct ContactCollider *self, struct ContactCollide
             origin.z += 256;
             break;
     }
-    Delta(&delta, &origin, (void *)&other->x);
+    Chase_Delta(&delta, &origin, (void *)&other->x);
     self->direction = Math_Atan2(delta.x, delta.z);
     if (other->contactFlags & 15) {
         if (Flag(base, 0x100, 0x2D4)) {
@@ -971,20 +963,11 @@ void SceneActorAttachment_ReplaceResponseSlot(u8 *, s32, s32, u32);
 
 void Golem_UpdateDeath(struct ChaseActor *actor, s32 frame);
 
-inline static u8 TakeFlag(u8 *flag)
-{
-    if (*flag) {
-        *flag = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Golem_UpdateDying(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorChaseGroup *group = &actor->group;
     u32 mask;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u32 test;
         u16 *flags;
         u32 value;
@@ -1024,7 +1007,7 @@ void Skeleton_ClearDirectionalEntryFlag(struct RoomActor *s)
 {
     struct Seq *seq = (struct Seq *)((u8 *)s->drawable + 0x48);
 
-    if (TakeFlag(&s->field2B2)) {
+    if (SceneActorControl_TakeFlag(&s->field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(s, 0xE);
         s->restart = 0;
     }
@@ -1087,7 +1070,7 @@ static inline s32 WaitTime(struct GolemWaitContext *context, u32 mask, s32 shift
 void Golem_UpdateChargeBuildup(struct ChaseActor *actor, s32 frame)
 {
     u8 *body = actor->base.context;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         struct GolemWaitContext *context = actor->base.context;
         s32 duration;
         switch (actor->base.paletteOffset) {
@@ -1129,7 +1112,7 @@ void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
 {
     u8 *body = actor->base.context;
     struct SceneActorBody *motion = &actor->base.body;
-    if (TakeFlag(&actor->base.field2B2))
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
         actor->base.restart = 0;
     Golem_SetMotionFlags(actor, 0x100);
     {
@@ -1161,7 +1144,7 @@ void Golem_UpdateRouteMotion(struct ChaseActor *actor, u32 frame)
 
 void Golem_UpdateChargeStop(struct ChaseActor *actor)
 {
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 directionVariant, mirror;
         Golem_GetDirectionVariant(actor, &directionVariant, &mirror);
         Golem_SelectAnimation(actor, 7, directionVariant, mirror | 4);
@@ -1344,12 +1327,6 @@ struct GolemSlideContext {
     u16 impactDelay, colliderDelay;
 };
 
-static inline u32 GolemSlide_Random(const u16 *table)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return table[gRandomIndex];
-}
-
 static inline s32 GolemSlide_Quarter(s16 value)
 {
     if (value >= 0)
@@ -1401,7 +1378,7 @@ void Golem_UpdateSlideImpact(struct ChaseActor *actor, u32 frame)
         velocity.x = GolemSlide_Quarter(body->motion.z);
         /* The recovered origin cancels when a later sample address becomes a table offset. */
         PARTICLE_RANDOM_CAPTURE_ORIGIN(randomOrigin);
-        velocity.y = GolemSlide_Random((const u16 *)RANDOM_TABLE_ADDR) & 7;
+        velocity.y = ParticleRandom_ReadDirectSample((const u16 *)RANDOM_TABLE_ADDR) & 7;
         velocity.z = GolemSlide_Quarter(body->motion.x);
         spread.x = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 3) + 15;
         spread.y = (ParticleRandom_ReadRelativeSample(randomOrigin, gRandomTable) & 7) + 15;
@@ -1434,7 +1411,7 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
     struct SceneActorBody *motion = &actor->base.body;
     s16 *speed;
 
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         actor->base.restart = 0;
         context->charge.phase = 0;
         {
@@ -1478,7 +1455,7 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
         actor->base.body.motion.z += (*speed * gUnk_086149C4[context->charge.routeDirection]) >> 16;
     } else if (context->charge.phase == 1) {
         struct ContactPosition delta;
-        Delta(&delta, &motion->position, &context->charge.stopPosition);
+        Chase_Delta(&delta, &motion->position, &context->charge.stopPosition);
         switch (context->charge.motionDirection >> 6) {
             case 0:
             case 2:
@@ -1522,18 +1499,13 @@ void Golem_UpdateRecoil(struct ChaseActor *actor)
 
 extern const u16 gUnk_08606130[];
 
-static inline s32 Scale16(s32 n)
-{
-    return n >= 0 ? n >> 16 : -((-n) >> 16);
-}
-
 void SceneActorReaction_SlideBack(struct ChaseActor *actor)
 {
     struct GolemChargeContext *context = actor->base.context;
     struct SceneActorBody *body = &actor->base.body;
     s32 dx, dz;
 
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u8 *direction = &actor->base.body.direction;
         u8 saved = *direction;
         u8 directionVariant, mirror;
@@ -1622,9 +1594,9 @@ void SceneActorReaction_SlideBack(struct ChaseActor *actor)
     }
     Golem_SetMotionFlags(actor, 0x100);
     SceneActorChase_SetActorFlags(actor, 0x2000);
-    dx = Scale16(gUnk_086149C4[(context->charge.motionDirection + 0x40) & 0xFF] *
-                 context->charge.speed);
-    dz = Scale16(gUnk_086149C4[context->charge.motionDirection] * context->charge.speed);
+    dx = Chase_Scale16(gUnk_086149C4[(context->charge.motionDirection + 0x40) & 0xFF] *
+                       context->charge.speed);
+    dz = Chase_Scale16(gUnk_086149C4[context->charge.motionDirection] * context->charge.speed);
     if (((dx < 0) ? (-dx) : (dx)) < ((dz < 0) ? (-dz) : (dz))) {
         body->motion.z = dz;
     } else {
@@ -1833,16 +1805,9 @@ void Golem_UpdateReactionRecovery(struct ChaseActor *actor, s32 frame)
 /* The Golem's chase step looks cells up from scalar axes, reads the map width at full width and
  * saves the control directly; otherwise it is SceneActorChase_Arrive. */
 
-static inline s32 Golem_CellIndex(s32 x, s32 z)
-{
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return SceneActorChase_MapRowStart(SceneActorChase_CurrentMap(), z) + x;
-}
-
 static inline s32 Golem_CellAt(struct ContactPosition *position)
 {
-    return Golem_CellIndex(position->x >> 8, position->z >> 8);
+    return SceneActorChase_CellIndex(position->x >> 8, position->z >> 8);
 }
 
 static inline u32 Golem_Height(struct ContactPosition *position)
@@ -1929,7 +1894,7 @@ static inline u8 Golem_Arrive(void *obj)
         cell = ((struct SceneActorChasePlayer *)gPlayers[player])->cell->index;
     } else {
         struct SceneActorChaseTarget *t = tracking->target;
-        cell = Golem_CellIndex(t->position.x >> 8, t->position.z >> 8);
+        cell = SceneActorChase_CellIndex(t->position.x >> 8, t->position.z >> 8);
         player = 0;
     }
     if (cell != actor->base.terrainCell &&

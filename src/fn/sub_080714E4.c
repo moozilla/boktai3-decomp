@@ -76,7 +76,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         address = &actor->base.heightOffset;
         *address = zero;
         {
-            Memory_Clear((u8 *)actor + 0x2EC, 8);
+            Memory_Clear(&actor->base.secondaryMotion, 8);
         }
         Memory_Clear(&actor->base.body.motion, 8);
         control = &group->control;

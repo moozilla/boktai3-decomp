@@ -1016,14 +1016,6 @@ s32 Terrain_HasHigherCorner(struct ContactPosition *p, s32 threshold)
 
 // confidence=low: returns higher-cell flags used by SceneIndicator_CreateFromScript.
 
-static inline u8 *CellData(s32 index)
-{
-    u8 *p = TerrainModifiers_FindCellOverride(index, 1);
-    if (p)
-        return (u8 *)&((struct TerrainCellOverride *)p)->cell;
-    return (u8 *)&((struct TerrainGrid *)gTerrainMap->cells)->cells[index];
-}
-
 u32 Terrain_GetHigherNeighborMask(struct ContactPosition *p)
 {
     struct TerrainProbe center, sample;
@@ -1032,31 +1024,31 @@ u32 Terrain_GetHigherNeighborMask(struct ContactPosition *p)
     center.x = (p->x & ~255) | 128;
     center.y = p->y & ~255;
     center.z = (p->z & ~255) + 128;
-    height = *CellData(Terrain_GetCellIndex((struct ContactPosition *)&center)) & 15;
+    height = *cellProps(Terrain_GetCellIndex((struct ContactPosition *)&center)) & 15;
     sample.x = center.x - 256;
     sample.y = center.y;
     sample.z = center.z + 256;
-    if ((*CellData(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
+    if ((*cellProps(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
         result |= 1;
     sample.x = center.x + 0;
     sample.y = center.y;
     sample.z = center.z + 256;
-    if ((*CellData(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
+    if ((*cellProps(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
         result |= 2;
     sample.x = center.x + 256;
     sample.y = center.y;
     sample.z = center.z + 256;
-    if ((*CellData(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
+    if ((*cellProps(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
         result |= 4;
     sample.x = center.x + 256;
     sample.y = center.y;
     sample.z = center.z + 0;
-    if ((*CellData(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
+    if ((*cellProps(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
         result |= 8;
     sample.x = center.x + 256;
     sample.y = center.y;
     sample.z = center.z - 256;
-    if ((*CellData(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
+    if ((*cellProps(Terrain_GetCellIndex((struct ContactPosition *)&sample)) & 15u) > height)
         result |= 16;
     return result;
 }

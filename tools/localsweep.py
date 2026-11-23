@@ -24,6 +24,7 @@ import argparse
 import glob
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -99,7 +100,7 @@ def substitute(body, name, expr):
 def score(src, func, tmpdir):
     path = os.path.join(tmpdir, 'sweep.c')
     open(path, 'w').write(src)
-    r = subprocess.run([PY, os.path.join(ROOT, 'tools/check.py'), path, '--full'],
+    r = subprocess.run([PY, os.path.join(ROOT, 'tools/check.py'), path, '--full', '--keep'],
                        capture_output=True, text=True, cwd=ROOT)
     out = r.stdout + r.stderr
     if re.search(r'\bMATCH \(', out) and 'MISMATCH' not in out:
@@ -112,6 +113,7 @@ def score(src, func, tmpdir):
         glob.glob(os.path.join(ROOT, 'build/check/run-*')), key=os.path.getmtime)
     a = subprocess.run([PY, os.path.join(ROOT, 'tools/anchordiff.py'), run],
                        capture_output=True, text=True, cwd=ROOT).stdout.strip().splitlines()
+    shutil.rmtree(run, ignore_errors=True)
     n = int(a[-1].split()[-1]) if a and a[-1].startswith('TOTAL') else 10 ** 6
     return (0, -n, float(fz.group(1)))
 

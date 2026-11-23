@@ -9,7 +9,7 @@ s32 PauseMenu_GetEquipmentRowY(struct SceneHudState *, s32, s32, s32, s32);
 void SceneHud_UpdateSecondaryWidgets(struct SceneHudState *p)
 {
     s32 i = 0;
-    struct SceneInputWidget *w = (struct SceneInputWidget *)((u8 *)p + 0xE28);
+    struct SceneInputWidget *w = p->secondaryWidgets;
     for (; i <= 2; w++, i++) {
         s32 index = i + p->selection;
         struct SceneHudState *entry;

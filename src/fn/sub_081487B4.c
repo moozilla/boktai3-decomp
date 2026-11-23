@@ -8,7 +8,7 @@ void Player_UpdateTimedMovementRecovery(struct Player *p)
 {
     u8 *timer;
     Player_ConsumeStateEntry(p);
-    timer = (u8 *)p + 0x466;
+    timer = &p->colliderHeightOffset;
     if (*timer > 59)
         *timer -= 60;
     else {

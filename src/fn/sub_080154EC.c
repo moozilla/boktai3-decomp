@@ -2,6 +2,7 @@
 #include "animated_particle.h"
 #include "monster_particle_random.h"
 #include "display_sequence_sprite.h"
+#include "scene_indicator.h"
 
 struct AnimatedParticleSpawnParams {
     u16 type, flags, pad, speed;
@@ -22,10 +23,6 @@ static inline int scale12(int a, int b)
     if (x >= 0)
         return x >> 12;
     return -((-x) >> 12);
-}
-static inline void AnimatedParticle_SetFrame(struct DisplaySequenceSprite *o, int f)
-{
-    o->frame = f;
 }
 int AnimatedParticles_Create(int count, struct ContactPosition *pos,
                              struct AnimatedParticleSpawnParams *c)
@@ -95,7 +92,7 @@ int AnimatedParticles_Create(int count, struct ContactPosition *pos,
             if (p->type == 5) {
                 AnimData_Load(&p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(&p->resource, 0x29f);
-                AnimatedParticle_SetFrame(&p->sprite, 32);
+                IndicatorSprite_SetFrame(&p->sprite, 32);
                 Anim_SetSequence(
                     &p->anim,
                     ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 6,
@@ -103,7 +100,7 @@ int AnimatedParticles_Create(int count, struct ContactPosition *pos,
             } else if (p->type == 6) {
                 AnimData_Load(&p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(&p->resource, 0x2a7);
-                AnimatedParticle_SetFrame(&p->sprite, 32);
+                IndicatorSprite_SetFrame(&p->sprite, 32);
                 Anim_SetSequence(
                     &p->anim,
                     ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 6,
@@ -111,7 +108,7 @@ int AnimatedParticles_Create(int count, struct ContactPosition *pos,
             } else if (p->type == 7) {
                 AnimData_Load(&p->resource, 0x61f9);
                 AnimData_SelectPaletteBank(&p->resource, 0x2a6);
-                AnimatedParticle_SetFrame(&p->sprite, 45);
+                IndicatorSprite_SetFrame(&p->sprite, 45);
                 Anim_SetSequence(
                     &p->anim,
                     ((struct AnimatedParticleManager *)gAnimatedParticleManager)->resources[1], 8,

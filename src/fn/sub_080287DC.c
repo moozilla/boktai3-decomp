@@ -1,10 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "state_actor.h"
+#include "scene_indicator.h"
 // confidence=low: Vampire per-frame update: animation, scale wobble, shake, cached target bearings.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u8 pad0[12];
     struct Vec position;

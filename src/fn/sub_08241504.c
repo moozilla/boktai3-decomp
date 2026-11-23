@@ -1,6 +1,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #include "player_cue_sequence.h"
+#include "vanargand_projectiles.h"
 
 struct P {
     u8 pad0[0x14C];
@@ -29,12 +30,6 @@ struct PackedVec {
     s32 y : 16;
     u32 z : 16, pad : 16;
 };
-static inline s32 Scale(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
-}
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 #define W(o) (*(u32 *)((u8 *)p + (o)))
@@ -46,9 +41,9 @@ void PlayerCue_UpdateOffsetBurst(struct P *p)
         u32 ang;
         pt = *(struct PackedVec *)((u8 *)p + 0x30);
         ang = ((p->dir + 5) & 7) << 5;
-        pt.x += Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * 64);
+        pt.x += VanargandProjectile_Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * 64);
         pt.y += 0x40;
-        pt.z += Scale(gUnk_086149C4[ang] * 64);
+        pt.z += VanargandProjectile_Scale(gUnk_086149C4[ang] * 64);
         Player_SetTetherMode(p, 4, 0);
         Player_EmitPositionEffect(p, (u8 *)p + 0x30, 1, 1, &pt, 0, 0x3A1);
     }

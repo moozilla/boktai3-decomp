@@ -2,9 +2,7 @@
 #include "engine_globals.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Sprite {
     u32 flags;
     u8 visible, unknown5, palette, unknown7;

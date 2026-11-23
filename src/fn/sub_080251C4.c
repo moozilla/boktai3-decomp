@@ -26,7 +26,7 @@ void SceneActorAnimation_UpdateChargeApproach(struct StateActor *p, int tick)
             SceneActors_StartEightDirectionAnimation(
                 p, &actor->animation, (int)&actor->animationResource, sequence, 1, 1, 4);
         }
-        PolarInterpolation_SetCurrentFromPoint((u8 *)p + 0x30c, (u8 *)p + 0x54);
+        PolarInterpolation_SetCurrentFromPoint((u8 *)p + 0x30c, &p->target);
         sub_082222BC((u8 *)p + 0x30c, (u8 *)p + 0x9c4, actor->graphics.approachFrames);
         if (actor->graphics.approachFrames <= 64)
             Sound_PlaySongChecked(840);

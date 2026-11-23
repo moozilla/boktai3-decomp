@@ -1,6 +1,8 @@
 #include "engine.h"
 #include "player_clone.h"
 #include "ram.h"
+#include "vanargand_parts.h"
+#include "word_flags.h"
 
 u32 PlayerClone_GetActiveCount(void)
 {
@@ -117,14 +119,6 @@ static inline void Clone_AddVectors(struct ContactPosition *d, struct ContactPos
     d->z = b->z + a->z;
 }
 
-static inline void Clone_SubtractVectors(struct ContactPosition *d, struct ContactPosition *a,
-                                         struct ContactPosition *b)
-{
-    d->x = a->x - b->x;
-    d->y = a->y - b->y;
-    d->z = a->z - b->z;
-}
-
 static inline s32 Clone_NextRandomByte(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -137,16 +131,6 @@ static inline u16 Clone_NextRandomAngle(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-static inline void Clone_EnableHiddenFlag(struct SceneInputWidget *animation)
-{
-    animation->flags |= 1;
-}
-
-static inline void Clone_DisableHiddenFlag(struct SceneInputWidget *animation)
-{
-    animation->flags &= ~1;
-}
-
 static inline void Clone_EnableRiseFlag(struct SceneInputWidget *animation)
 {
     animation->flags |= 0x400;
@@ -155,11 +139,6 @@ static inline void Clone_EnableRiseFlag(struct SceneInputWidget *animation)
 static inline void Clone_DisableRiseFlag(struct SceneInputWidget *animation)
 {
     animation->flags &= ~0x400;
-}
-
-static inline void Clone_SetFlags(u32 mask, u32 *flags)
-{
-    *flags |= mask;
 }
 
 static inline struct SceneInputWidget *Clone_GetAnimation(struct PlayerCloneSlot *clone)
@@ -213,7 +192,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
             struct ContactPosition *initialPosition;
             CLONE_DISABLE_COLLIDER(body);
             ScaledShadow_Enable(clone->shadow);
-            Clone_EnableHiddenFlag(&clone->animation);
+            SceneInputWidget_Hide(&clone->animation);
             direction = params->angle;
             Clone_CreateAngleVector(&offset, direction + 0x80, Div(clone->timer << 9, 30));
             {
@@ -222,7 +201,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 Clone_AddVectors(destination, &offset, initialPosition);
             }
             if (clone->timer > 30) {
-                Clone_DisableHiddenFlag(&clone->animation);
+                SceneInputWidget_Show(&clone->animation);
                 Clone_MaskColliderFlags(~4, body);
                 clone->behaviorPhase = 1;
                 clone->flags &= ~1;
@@ -262,7 +241,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
         case 3:
             if (Mod(clone->timer, 120) == 0) {
                 params->angle = Clone_NextRandomAngle();
-                Clone_SetFlags(1, &clone->flags);
+                WordFlags_Set(1, &clone->flags);
                 clone->animationIndex = 5;
                 Anim_LoadKeyframe(&clone->animation, &clone->resource, 5, 1);
             }
@@ -278,7 +257,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 clone->position.z = (u16)clone->animation.position.z;
                 clone->behaviorPhase = 5;
                 params->speed = z;
-                Clone_SetFlags(1, &clone->flags);
+                WordFlags_Set(1, &clone->flags);
                 {
                     struct ContactCollider *body = &clone->collider;
                     CLONE_DISABLE_COLLIDER(body);
@@ -299,7 +278,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                     s32 z = 0;
                     *timer = z;
                     params->speed = z;
-                    Clone_SetFlags(1, &clone->flags);
+                    WordFlags_Set(1, &clone->flags);
                     {
                         struct ContactPosition *target = Player_GetEffectivePosition(0);
                         params->angle = Math_Atan2(target->x - pos->x, target->z - pos->z);
@@ -331,8 +310,8 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                     if (clone->particleCount == 0)
                         break;
                     r = Mod(clone->timer, 0x20);
-                    Clone_SubtractVectors(&delta, Ratatosk_GetPosition(),
-                                          &clone->animation.position);
+                    Vanargand_Difference(&delta, Ratatosk_GetPosition(),
+                                         &clone->animation.position);
                     if (r == 0) {
                         work.fillWord = r;
                         Clone_ClearVector((void *)(&work.fillWord), &delta, 0x05000002);
@@ -361,7 +340,7 @@ s32 PlayerClone_UpdateBehavior(struct PlayerCloneSlot *clone, s32 index)
                 clone->behaviorPhase = 3;
                 params->angle = Clone_NextRandomAngle();
                 params->speed = clone->speed;
-                Clone_SetFlags(1, &clone->flags);
+                WordFlags_Set(1, &clone->flags);
                 clone->animationIndex = 5;
                 Anim_LoadKeyframe(&clone->animation, &clone->resource, 5, 1);
             }

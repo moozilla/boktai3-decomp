@@ -40,7 +40,7 @@ void sub_08144F40(struct Player *p)
             if (++p->tetherFrame > 5) {
                 ActorSequence_Begin(p, 0x1B, 2);
                 p->terrainRecoveryCounter = 0;
-                *((u8 *)p + 0x153) = phase;
+                p->secondaryPriority = phase;
                 Sound_PlaySong(0x1AE);
             }
             break;

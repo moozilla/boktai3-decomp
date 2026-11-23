@@ -1,6 +1,7 @@
 #include "global.h"
 #include "scene_actor_reset.h"
 #include "scene_actor_terrain.h"
+#include "scene_actor_chase.h"
 static inline u32 WordFlag(struct ChaseActor *p, u32 mask)
 {
     return mask & p->base.statusFlags;
@@ -13,13 +14,6 @@ static inline u8 IsInactive(struct ChaseActor *actor)
             return 1;
     }
     return 0;
-}
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
 }
 static inline s32 Height(s32 cell, struct ContactPosition *p)
 {
@@ -78,9 +72,9 @@ void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
             s32 difference;
             trail[0x8e9] = (trail[0x8e9] + 1) & 3;
             TentacleActor_SelectWanderRoute(actor);
-            Delta(&target, &actor->base.body.position, (void *)(trail + 0x904));
-            *((u8 *)actor + 0x3cd) = Math_Atan2(target.x, target.z);
-            difference = *((u8 *)actor + 0x3cd) - actor->base.body.direction;
+            Chase_Delta(&target, &actor->base.body.position, (void *)(trail + 0x904));
+            actor->base.nextDirection = Math_Atan2(target.x, target.z);
+            difference = actor->base.nextDirection - actor->base.body.direction;
             if (difference > 128)
                 difference += -256;
             else if (difference < -128)

@@ -1,12 +1,10 @@
 #include "global.h"
+#include "scene_indicator.h"
 
 #define FIELD_OFFSET(type, member) ((u32) & ((type *)0)->member)
 #define SEGMENT_POSITION(group, index)                                                             \
     ((struct Vec *)((u8 *)(group) + (index) * (s32)sizeof(struct Segment) +                        \
                     FIELD_OFFSET(struct Group, segments[0].position)))
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Position {
     u32 xy, z;
 };

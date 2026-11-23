@@ -1,3 +1,4 @@
+#include "scene_actor_damage_visibility.h"
 #define MenuSprite_LoadPalettePair CharacterModel_InitPalettes
 #include "global.h"
 #include "area_effect_link.h"
@@ -16,12 +17,6 @@ void CharacterPreview_PositionParts(void *, void *, void *, s32);
 void CharacterModel_SetAnimationFlags(void *, s32);
 void CharacterModel_SetComponentRenderMode(void *, s32);
 void CharacterModel_InitPalettes(void *, s32);
-static inline s32 localPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 static inline u8 validSelection(s32 i)
 {
     if (i < 0)
@@ -48,7 +43,7 @@ void LinkMenu_LoadSelectionSprite(struct LinkMenu *menu)
             menu->variant = payload[1];
             menu->extra = payload[4];
             menu->palette = payload[3];
-            sprite[0x84A] = localPlayer();
+            sprite[0x84A] = SceneActorDamage_LocalPlayer();
             pos.x = 0x30;
             pos.y = 0x50;
             pos.z = 0;

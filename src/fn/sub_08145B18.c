@@ -76,7 +76,7 @@ void Player_UpdateDefeatSlide(struct Player *p)
             break;
         case 3:
             if (++p->tetherFrame > 15)
-                *((u8 *)p + 0xA6) = 1;
+                p->animation.attribute1A = 1;
             break;
         case 4:
             if ((p->tetherFrame & 7) >= 7 - (p->tetherFrame >> 3))

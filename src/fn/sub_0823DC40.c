@@ -32,7 +32,7 @@ void Player_UpdateThrowAction(struct Player *p)
         case 4:
             p->cameraInputProcessed = 0;
             if (p->inputKeys[1] & 2)
-                *((u8 *)p + 0xBF6) = 1;
+                p->statModifierContext.bufferedAttack = 1;
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x17), 0x40);
             {
                 if (p->actionMode == 1 && p->animation.frameIndex == 2 && p->animation.elapsed == 0)
@@ -44,14 +44,14 @@ void Player_UpdateThrowAction(struct Player *p)
         case 6:
             p->cameraInputProcessed = 0;
             if (p->inputKeys[1] & 2)
-                *((u8 *)p + 0xBF6) = 1;
-            if (*((u8 *)p + 0xBF6)) {
-                *((u8 *)p + 0xBF6) = 0;
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->statModifierContext.bufferedAttack) {
+                p->statModifierContext.bufferedAttack = 0;
                 p->tetherPhase = 0;
             } else {
                 p->tetherFrame++;
                 if (p->tetherFrame >= p->statModifierContext.windupFrames) {
-                    *((u8 *)p + 0xBF6) = 0;
+                    p->statModifierContext.bufferedAttack = 0;
                     Player_SetTetherMode(p, 0, 0);
                 }
             }

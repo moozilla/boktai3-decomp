@@ -2,9 +2,7 @@
 #include "ram.h"
 #include "render.h"
 #include "player.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Circle {
     u8 pad[24];
     s16 radius;

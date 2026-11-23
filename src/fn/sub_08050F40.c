@@ -1,10 +1,5 @@
 #include "orbit_background.h"
-static inline s32 scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
+#include "vanargand_projectiles.h"
 s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 player, u32 enabled)
 {
     background->id = id;
@@ -14,13 +9,13 @@ s32 OrbitBackground_Initialize(struct OrbitBackground *background, u32 id, u32 p
     OrbitBackground_ResetOrbit(background);
     background->position.x =
         gPlayers[background->playerIndex]->position.x -
-        scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
+        VanargandProjectile_Scale(gUnk_086149C4[(background->angle + 64) & 255] * background->radius);
     {
         struct Player *actor = gPlayers[background->playerIndex];
         background->position.y = (((128 - actor->visualSlowdownTimer) * 150) >> 7) + (u16)actor->position.y;
     }
     background->position.z = gPlayers[background->playerIndex]->position.z -
-                             scale(gUnk_086149C4[background->angle & 255] * background->radius);
+                             VanargandProjectile_Scale(gUnk_086149C4[background->angle & 255] * background->radius);
     OrbitBackground_Tick(background);
     gOrbitBackground = background;
     return 0;

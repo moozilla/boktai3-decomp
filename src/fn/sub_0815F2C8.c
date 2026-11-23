@@ -42,7 +42,7 @@ s32 Player_InitializeFromScript(struct Player *p, s32 slot)
     resource = (void **)((u8 *)p + 0x22C);
     sprite = (struct ContactSwarmSprite *)p->auxiliarySprite;
     Sprite_Init(sprite, data, 1);
-    state = (struct DisplaySequenceState *)((u8 *)p + 0x218);
+    state = &p->auxiliarySequence;
     Anim_SetSequence(state, *resource, 1, 0, 0);
     StepPlayback(sprite, state);
     Player_InitSlotFromScript(p);

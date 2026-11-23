@@ -5,6 +5,7 @@
 #include "scene_object.h"
 #include "player_status_flags.h"
 #include "player_slot_status.h"
+#include "display_sequence_inline.h"
 
 struct PlayerGrabHalf {
     u16 value : 16;
@@ -151,16 +152,6 @@ static inline struct PlayerGrabPos *PlayerGrab_TargetPosition(struct PlayerGrabT
     else
         return &target->body->pos;
 }
-static inline void PlayerGrab_ClearAnimation(struct SceneInputWidget *animation)
-{
-    animation->flags &= ~1;
-}
-
-static inline u32 PlayerGrab_Mask(u32 value, u32 mask)
-{
-    mask &= value;
-    return mask;
-}
 
 // confidence=low: Player grab/throw action update; entry setup, then an 8-phase switch (reach, pull, throw, release, ...).
 #define Player_UpdateGrabMotion sub_0814C3A4
@@ -178,7 +169,7 @@ void Player_UpdateGrabMotion(struct Player *p)
         p->actionEighteenParameter = 0x16F;
         p->actionEighteenDuration = 0x20;
         Sound_PlaySong(0x39E);
-        PlayerGrab_ClearAnimation(&p->secondaryAnimation);
+        SceneInputWidget_Show(&p->secondaryAnimation);
         p->secondaryAnimation.position = p->animation.position;
         {
             u16 resource = p->animation.paletteBank;
@@ -202,7 +193,7 @@ void Player_UpdateGrabMotion(struct Player *p)
             struct PlayerGrabHalf mask;
             s32 low;
             mask.value = 7;
-            low = PlayerGrab_Mask(v, mask.value);
+            low = DisplaySequence_MaskCommand(v, mask.value);
             if (low < mask.value - (v >> 3))
                 PlayerAnimation_SelectSecondaryKeyframes(
                     p, ActorVariant_GetTableValue(p->actionMode, 0), 0x40);

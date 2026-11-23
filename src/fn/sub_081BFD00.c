@@ -38,25 +38,16 @@ void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 void SceneInputPanel_TickHighlight(void *);
 void BgGfx_LoadTilemapAtPosition(u32, u32, u32);
 
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags |= 1;
-}
-static inline void HideWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
 void Storage_UpdateBrowse(struct StorageMenu *p)
 {
     if (p->active) {
         p->blinkCounter++;
         if ((p->blinkCounter >> 5) & 1) {
             p->primaryFlags |= 1;
-            ShowWidget(&p->blinkWidget);
+            SceneInputWidget_Hide(&p->blinkWidget);
         } else {
             p->primaryFlags &= ~1;
-            HideWidget(&p->blinkWidget);
+            SceneInputWidget_Show(&p->blinkWidget);
         }
         if (Storage_TickCategorySelection(p)) {
             s32 category;
@@ -80,7 +71,7 @@ void Storage_UpdateBrowse(struct StorageMenu *p)
         }
     } else {
         p->primaryFlags |= 1;
-        ShowWidget(&p->blinkWidget);
+        SceneInputWidget_Hide(&p->blinkWidget);
         p->blinkCounter = 0;
     }
     SceneInputPanel_TickHighlight(p->highlight);

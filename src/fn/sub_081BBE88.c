@@ -1,5 +1,6 @@
 #include "scene_input.h"
 #include "sun_clock.h"
+#include "vanargand_parts.h"
 
 struct BankAnim {
     u8 b[0x1C];
@@ -22,13 +23,6 @@ struct SolarBankDisplay {
     u8 unknown6E8[0x28];
     u16 promptPalette[16];
 };
-
-static inline void Pos_Set(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
-}
 
 s32 Mod(s32, s32);
 s32 Div(s32, s32);
@@ -123,7 +117,7 @@ void SolarBank_InitWidgets(struct SolarBankDisplay *p)
     }
 
     Widget_InitLinked(&p->transferLabel, bankResource, 0x21, 0x30, 0, 0, 0x3C, (void *)0);
-    Pos_Set(&pos, -0x85, -0x18, 0);
+    Vanargand_SetVector(&pos, -0x85, -0x18, 0);
     Widget_InitLinked(&p->firstMarker, commonResource, 0x7E, 0x30, 0, 0, 0x3C, &pos);
     Widget_InitLinked(&p->secondMarker, commonResource, 0x7F, 0x30, 0, 0, 0x3C, &pos);
 }

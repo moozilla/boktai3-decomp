@@ -11,7 +11,7 @@ void SceneActorMovement_ProjectProbe(struct ChaseActor *input, u32 xScale, u32 z
         u16 *source = (void *)&actor->base.body.position.x;
         s32 value;
         sine = gUnk_086149C4;
-        direction = (u8 *)actor + 0x2b6;
+        direction = &actor->base.reactionDirection;
         value = *source + ((s32)((u32)sine[(*direction + 64) & 255] * xScale) >> 12);
         actor->base.reactionStart.x = value;
     }
@@ -26,7 +26,7 @@ void SceneActorMovement_ProjectProbe(struct ChaseActor *input, u32 xScale, u32 z
         actor->base.reactionStart.z = value;
     }
     {
-        struct ContactPosition *destination = (void *)((u8 *)actor + 0x318);
+        struct ContactPosition *destination = &actor->base.reactionEnd;
         struct ChaseActor *source;
         source = actor;
         *destination = source->base.body.position;

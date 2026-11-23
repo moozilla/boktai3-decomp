@@ -4,6 +4,7 @@
 // The `goto done` on the from==to path (not `return 1`) lets cross-jumping merge
 // the `*out = center` store into it, as in the ROM.
 #include "contact_actor.h"
+#include "scene_actor_terrain.h"
 s32 Div(s32, s32);
 s32 Mod(s32, s32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
@@ -13,14 +14,6 @@ s32 SceneGrid_ScanRows(s32, s32, s32, s32, s32);
 s32 SceneGrid_ScanColumns(s32, s32, s32, s32, s32);
 s32 SceneGrid_ResolveEndpoint(struct ContactPosition *, struct ContactPosition *, s32, s32);
 s32 SceneGrid_ScanTerrainDirection(s32, s32);
-static inline s32 CellIndex(const struct ContactPosition *p)
-{
-    s32 x = p->x >> 8;
-    s32 z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 static inline u8 *Properties(s32 index)
 {
     u8 *p = TerrainModifiers_FindCellOverride(index, 1);
@@ -49,8 +42,8 @@ s32 sub_0806EB70(struct ContactPosition *out, const struct ContactPosition *from
     struct ContactPosition center, delta;
     if (!gTerrainMap)
         return 0;
-    fromIndex = CellIndex(from);
-    toIndex = CellIndex(to);
+    fromIndex = SceneActorTerrain_GetCellIndex(from);
+    toIndex = SceneActorTerrain_GetCellIndex(to);
     height = *Properties(fromIndex) & 15;
     if (height * 256 != to->y)
         return 0;
