@@ -1,8 +1,10 @@
+#include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
 #include "scene_actor_reset.h"
 #include "area_effect_link.h"
 #include "render.h"
+#include "scene_actor_behavior.h"
 void SceneActor_ClearReactionFlags(void *);
 u32 SceneActorBehavior_DispatchFlaggedCategory(struct ChaseActor *);
 void SceneActorMovement_ProjectProbe(void *, u32, u32);
@@ -168,14 +170,6 @@ static inline void ResetMotion(struct SceneActorRegistryControl *control)
     control->timer = 0;
 }
 
-static inline u32 WordBits(u32 *field, u32 mask)
-{
-    return *field & mask;
-}
-static inline u32 HitFlag(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
 static inline u8 HasPendingHitSave(struct ChaseActor *actor, u16 **out)
 {
     u16 *address = &actor->base.field2E6;
@@ -228,7 +222,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
     u32 *flags2D8;
     u32 mode;
     struct ContactCollider *collider;
-    if (HitFlag(actor, 0x4000)) {
+    if (SceneActorBehavior_MotionBits(0x4000, actor)) {
     fail:
         return 0;
     }
@@ -356,7 +350,7 @@ u8 SceneActorReaction_ResolvePlacementDamage(struct ChaseActor *actor)
     {
         u32 test = 0x10;
         u32 flags = *flags2D4;
-        if ((test & flags) || WordBits(flags2CC, 0x200))
+        if ((test & flags) || SceneActorChase_Bits32(flags2CC, 0x200))
             actor->base.attachmentTimer = 0;
         else if (flags & 6) {
             s16 *currentField = (s16 *)&actor->base.attachmentTimer;
