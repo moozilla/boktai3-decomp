@@ -376,21 +376,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
     actor->base.state2A8 = state;
@@ -402,15 +387,6 @@ static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u3
         offset += 8;
         *((u8 *)actor + offset) = 1;
     }
-}
-
-static inline void SetState(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
 }
 
 static inline void SetMotion(struct ChaseActor *actor, void *cb, u32 kind)
@@ -460,8 +436,8 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     if (event == 0) {
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(group, 0x1fc, void *), 32,
                                                           32, speed)) {
-            SetState(actor, 18);
-            SetControl(actor, actor->base.onStanding, 0);
+            Chase_SetBehavior(actor, 18);
+            Chase_SetCtl(actor, actor->base.onStanding, 0);
             SetMotion(actor, SceneActorReaction_BeginSideStep, 38);
             actor->base.field2C2 = 64;
             *(u16 *)(group + 0x54) = 0;
@@ -469,8 +445,8 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
         }
     } else if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(group, 0x1fc, void *), 32, 32,
                                                         speed)) {
-        SetState(actor, 20);
-        SetControl(actor, actor->base.onStanding, 0);
+        Chase_SetBehavior(actor, 20);
+        Chase_SetCtl(actor, actor->base.onStanding, 0);
     }
     actor->base.counter2AC++;
 }
@@ -516,7 +492,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
     u8 zero;
     if (TakePrepared(&actor->base.field2B1)) {
         void *control = actor->base.onEntry;
-        SetControl(actor, control, 2);
+        Chase_SetCtl(actor, control, 2);
     }
     busy = Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
     if (!busy) {
@@ -557,7 +533,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
     u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetControl(actor, SceneActorPhase_SelectLinkedAnimation, 0x27);
+        Chase_SetCtl(actor, SceneActorPhase_SelectLinkedAnimation, 0x27);
         {
             u32 bit = 0x20;
             u16 *flags = (u16 *)(control + 0x6D4);
@@ -599,7 +575,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
         if (SceneActorBehavior_RequestDescriptorTurn(actor, FIELD(nav, 0x1FC, void *), 0x20, 0x20,
                                                      speed)) {
             SetState_UpdateProbeApproach_080B04F4(actor);
-            SetControl(actor, actor->base.onStanding, 0);
+            Chase_SetCtl(actor, actor->base.onStanding, 0);
             return;
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
@@ -1707,7 +1683,7 @@ void Vorn_BeginTargetPursuit(struct Vorn *actor)
         actor->chase.base.counter2AC = 0;
         actor->chase.base.field2B1 = 1;
     }
-    SetControl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
+    Chase_SetCtl(&actor->chase, SceneActorReaction_RestoreAfterDelay, 14);
     {
         u32 mask = 16;
         u32 *p = &actor->chase.base.behaviorFlags;
@@ -2102,8 +2078,8 @@ u8 Vorn_BeginPursuitRoute(struct Vorn *actor, u32 reset)
         s32 mask = ~16;
         *field &= mask;
     }
-    SetState(&actor->chase, 15);
-    SetControl(&actor->chase, actor->chase.base.onStanding, 0);
+    Chase_SetBehavior(&actor->chase, 15);
+    Chase_SetCtl(&actor->chase, actor->chase.base.onStanding, 0);
     SetMotion(&actor->chase, Vorn_UpdatePursuitDistance, 37);
     {
         u16 bit = 4;
