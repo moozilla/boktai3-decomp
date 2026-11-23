@@ -1,5 +1,6 @@
 #include "scene_actor_terrain.h"
 #include "scene_actor_control_helpers.h"
+#include "word_flags.h"
 void SceneActorPalette_ClearCompletedTransitions(void);
 static inline u32 ReadMasked(const u32 *flags, u32 mask)
 {
@@ -18,8 +19,7 @@ static inline u8 IsDisposable(struct RoomActor *actor)
 void SceneActorTerrain_DisableCollision(struct RoomActor *actor)
 {
     struct ContactCollider *collider;
-    u32 mask = 3;
-    actor->behaviorFlags |= mask;
+    WordFlags_Set(3, &actor->behaviorFlags);
     collider = &actor->colliderA;
     collider->flags |= 4;
     SceneActorPalette_ClearCompletedTransitions();
