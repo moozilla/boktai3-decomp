@@ -36,6 +36,18 @@ const s = await openSession({
 });
 // Script-derived stage data (doors, entrances, items, enemies): tools/assets/stages.py json.
 const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'build/assets/stages.json'), 'utf8')); } catch { return []; } })();
+// What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
+// lens table, weapon modifiers, read from the source and the ROM's weapon records).
+const BREAKERS = (() => {
+  const f = path.join(ROOT, 'build/autopilot/breakers.json');
+  if (!fs.existsSync(f)) spawnSync('python3', [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
+  try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return { targets: { Breakable: {} }, lens: [], weapons: [] }; }
+})();
+// means(flag, bags): the lenses and swords that carry the flag, owned first
+const means = (flag, bags) => [
+  ...BREAKERS.lens.filter((l) => l.flags & flag).map((l) => ({ kind: 'lens', id: l.id, name: l.name, owned: bags.lenses.includes(l.id) })),
+  ...BREAKERS.weapons.filter((w) => w.flags & flag).map((w) => ({ kind: 'sword', id: w.id, name: w.name, owned: bags.swords.includes(w.id) })),
+].sort((a, b) => b.owned - a.owned);
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
@@ -125,7 +137,31 @@ const GOALS = {
         if (L.where().scene !== here) break;
       }
       // hittables with a script (lever switches): strike each once
-      for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:hit:${h.name}`))) {
+      for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:${h.breakable ? 'break' : 'hit'}:${h.name}`))) {
+        if (h.breakable) {
+          // a Breakable answers only an attack carrying the flag its state needs (a
+          // candlestick: Flame); the means: a lens or sword with that flag
+          const live = L.breakables().find((b) => b.id === parseInt(h.name, 16));
+          const need = live && BREAKERS.targets.Breakable[live.state];
+          if (!need) { TRIED.add(`${here}:break:${h.name}`); continue; }
+          const ways = means(need.flag, L.bags()), way = ways.find((w) => w.owned && w.kind === 'lens');
+          if (!way) { event({ skill: 'needs', name: h.name, state: live.state, flag: need.flag, means: ways.map((w) => `${w.kind} ${w.name}`) }); continue; }
+          TRIED.add(`${here}:break:${h.name}`);
+          const qc = yield* L.quickChange({ gun: true, lens: way.id });
+          const ch = yield* L.chargeEnergy(6, { lux: 0, restore: 232 });
+          event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
+          const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };
+          let r = { done: false };
+          for (const dist of [2, 1, 3]) {
+            r = yield* L.hitAt(h.x >> 8, h.z >> 8, { dist, hits: 4, done: changed, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+            if (changed() || L.where().scene !== here) break;
+          }
+          event({ skill: 'hit', name: h.name, x: h.x, z: h.z, with: `${way.kind} ${way.name}`, lit: changed(), ...r });
+          yield* untilControl(g, L, () => true, 60, 3000);
+          if (L.where().scene === here) yield* L.quickChange({ gun: false });
+          if (L.where().scene !== here) break;
+          continue;
+        }
         TRIED.add(`${here}:hit:${h.name}`);
         const r = yield* L.hitAt(h.x >> 8, h.z >> 8, { hits: h.breakable ? 12 : 3, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'hit', name: h.name, x: h.x, z: h.z, ...r });
