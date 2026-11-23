@@ -110,8 +110,17 @@ const GOALS = {
         if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
       }
       const here = L.where().scene;
-      // items on the floor: pick them up on the way (a sword, fruit, potions)
-      for (const it of stageOf(here).items.filter((it) => !it.chest && !TRIED.has(`${here}:${it.x},${it.z}`))) {
+      // floor switches (stages.json: a trap on an HP box that runs a script once, e.g. a
+      // chest appears): step on each once
+      for (const sw of (stageOf(here).switches || []).filter((sw) => !TRIED.has(`${here}:switch:${sw.box}`))) {
+        TRIED.add(`${here}:switch:${sw.box}`);
+        const r = yield* L.navigate([sw.x, sw.z], { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        yield* L.clearInterruptions({});
+        event({ skill: 'switch', box: sw.box, reached: r.reached, reason: r.reason });
+        if (L.where().scene !== here) break;
+      }
+      // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
+      for (const it of stageOf(here).items.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
         TRIED.add(`${here}:${it.x},${it.z}`);
         const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
@@ -120,9 +129,12 @@ const GOALS = {
       if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
-      // --toward SCENE: a door there first; then unvisited scenes
+      // --toward SCENE: a door there first; --goal SCENE: the door on the shortest route
+      // over the door graph (stages.json); then unvisited scenes
       const toward = rooms === 0 ? +opt('--toward', -1) : -1;
-      const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) || visited.has(a.scene) - visited.has(b.scene));
+      const dist = routeDistances(+opt('--goal', -1));
+      const doors = doorsHere().sort((a, b) => (b.scene === toward) - (a.scene === toward) ||
+        (dist.get(a.scene) ?? 1e9) - (dist.get(b.scene) ?? 1e9) || visited.has(a.scene) - visited.has(b.scene));
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.box}->${d.scene}`) });
       let moved = false;
       for (const d of doors) {
@@ -163,6 +175,21 @@ const GOALS = {
     return true;
   },
 };
+
+// Door-graph distances to GOAL (breadth first over stages.json doors, walked backwards):
+// scene -> number of doors to the goal. Empty without a goal.
+function routeDistances(goal) {
+  const d = new Map();
+  if (goal < 0) return d;
+  d.set(goal, 0);
+  for (let frontier = [goal]; frontier.length;) {
+    const next = [];
+    for (const st of STAGES) for (const door of st.doors)
+      if (frontier.includes(door.scene) && !d.has(st.scene)) { d.set(st.scene, d.get(door.scene) + 1); next.push(st.scene); }
+    frontier = next;
+  }
+  return d;
+}
 
 // Through door box BOX: navigate; when a scripted gate turns the player back, open
 // the room's chests and items (the usual ask), then try again.
