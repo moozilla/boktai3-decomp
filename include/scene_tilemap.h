@@ -28,7 +28,7 @@ void SceneTilemap_SetScrollSource(struct TilemapScrollSource *);
 void SceneTilemap_CopyScrollSourceState(struct TilemapScrollSource *);
 s32 SceneTilemap_GetScrollLimit(void);
 
-void LinkScorePanel_HideSprites(void);
+void LinkScorePanel_HideSprites(void *);
 void ScrollingDialogue_ClearScript(void);
 void sub_08115AC8(s32, s32, s32, s32);
 void sub_081160CC(s32, s32, s32);

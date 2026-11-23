@@ -8,7 +8,7 @@ void SaveMenu_ClearSingleton(void)
 void SaveMenu_Close(void)
 {
     if (gSaveMenu) {
-        LinkScorePanel_HideSprites();
+        LinkScorePanel_HideSprites(gSaveMenu);
         Bg_ClearTilemap(0);
         Bg_ClearTilemap(1);
         Bg_ClearTilemap(2);
