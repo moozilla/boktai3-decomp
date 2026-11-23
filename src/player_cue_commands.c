@@ -1,5 +1,6 @@
 #include "player_cue_commands.h"
 #include "player_status_flags.h"
+#include "group_objects.h"
 
 /* Enable the first player's stat gauge. */
 
@@ -861,32 +862,24 @@ u32 PlayerCue_StateMotion(struct Player *player, u32 parameter)
     return 1;
 }
 
-static inline int NextRandomValue(const u16 *table)
-{
-    u32 offset;
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    offset = gRandomIndex * 2;
-    return *(const u16 *)(offset + (u32)table);
-}
-
 void PlayerCue_ShakeEffect(struct Player *player, s32 effectKind)
 {
     struct SceneVec offset;
 
     if (player->actionMode == 3) {
         const u16 *randomTable = gRandomTable;
-        offset.x = (NextRandomValue(randomTable) & 7) - 3;
-        offset.y = (NextRandomValue(randomTable) & 7) - 5;
+        offset.x = (randomWith(randomTable) & 7) - 3;
+        offset.y = (randomWith(randomTable) & 7) - 5;
         offset.z = 0;
     } else if (player->actionMode == 4) {
         const u16 *randomTable = gRandomTable;
-        offset.x = (NextRandomValue(randomTable) & 7) - 3;
-        offset.y = (NextRandomValue(randomTable) & 7) - 3;
+        offset.x = (randomWith(randomTable) & 7) - 3;
+        offset.y = (randomWith(randomTable) & 7) - 3;
         offset.z = 0;
     } else {
         const u16 *randomTable = gRandomTable;
-        offset.x = (NextRandomValue(randomTable) & 15) - 7;
-        offset.y = -(NextRandomValue(randomTable) & 31);
+        offset.x = (randomWith(randomTable) & 15) - 7;
+        offset.y = -(randomWith(randomTable) & 31);
         offset.z = 0;
     }
     if (EffectGroup_Spawn(&player->effectGroup, effectKind, 0xE10, &offset) >= 0) {
