@@ -3620,35 +3620,8 @@ static inline void Or16(u32 m, u16 *p)
 
 static inline void Restart(struct ChaseActor *actor)
 {
-    void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
-    u32 kind = 0x23;
-    u8 zero8;
-    u8 one;
-    u32 zero;
-    u8 *taken = &actor->base.field2B2;
-    zero = 0;
-    one = 1;
-    *taken = one;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    zero8 = 0;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-    {
-        u32 phase = 2;
-        u32 behavior = 5;
-        actor->base.state2A8 = zero8;
-        actor->base.phase2A9 = phase;
-        actor->base.behavior2AA = behavior;
-        actor->base.counter2AC = zero;
-        actor->base.field2B1 = one;
-    }
+    SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
+    Chase_SetState(actor, 0, 2, 5);
 }
 
 void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
