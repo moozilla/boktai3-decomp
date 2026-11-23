@@ -51,7 +51,8 @@ struct HresvelgrTravelActor {
     s16 travel;
     u8 pad38C[0x10];
     struct SceneVec target, delta;
-    u8 pad3AC[0x424 - 0x3AC];
+    u8 pad3AC[0x420 - 0x3AC];
+    void *hazards; /* 0x420: growth hazard list visited by Hresvelgr_UpdateHazardVisit. */
     u16 normalPalette[16][16]; /* 0x424: copied from bank 0x2F0 at initialization. */
     u8 pad624[0x704 - 0x624];
     u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
@@ -71,6 +72,12 @@ static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *
 static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 flags)
 {
     actor->flags |= flags;
+}
+
+static inline void Hresvelgr_EnterPhase(struct HresvelgrTravelActor *actor, u32 phase)
+{
+    actor->phase = phase;
+    actor->phaseFrame = 0;
 }
 
 s32 Hresvelgr_RefreshTarget(struct HresvelgrTravelActor *);
