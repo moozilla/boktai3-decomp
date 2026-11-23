@@ -914,13 +914,9 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
 
 void ActorShadow_Disable(void *);
 
-struct S080FC7F4;
+void Axe_UpdateAttackColliderPositions(struct ChaseActor *actor);
 
-void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s);
-
-struct S080FC844;
-
-void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s);
+void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor);
 
 static inline u8 HasAuxiliary(const struct Axe *state)
 {
@@ -3133,51 +3129,40 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     ActorShadow_Disable(d->auxiliaryShadow);
 }
 
-struct S080FC7F4 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
 void Collider_SetPosition(void *, void *, u32);
 
 s32 Collider_Refresh(void *);
 
-void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s)
+void Axe_UpdateAttackColliderPositions(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i = 0;
-    u8 *k = q + 0xa54;
+    struct ContactPosition *k = &q->auxiliarySprite.position;
     for (; i < 3; i++) {
-        u8 *e;
-        s32 o = i * 0x54;
-        Collider_SetPosition(q + (o + 0xb8c), k, 0);
-        e = q + (o + 0xa90);
+        struct ContactCollider *e;
+        Collider_SetPosition(&q->body[i], k, 0);
+        e = &q->attack[i];
         Collider_SetPosition(e, k, 0);
         Collider_Refresh(e);
     }
 }
 
-struct S080FC844 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
 void Collider_Remove(void *);
 
 void Shadow_Destroy(u8 *);
 
-void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
+void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
-    if (q[0xa3c]) {
-        u8 *p = q + 0xb8c;
+    struct Axe *q = actor->base.context;
+    if (q->auxiliarySprite.unknown4[0]) {
+        struct ContactCollider *p = q->body;
         s32 i = 2;
         do {
             Collider_Remove(p);
-            p += 0x54;
+            p++;
         } while (--i >= 0);
-        Shadow_Destroy(q + 0xcac);
-        Sprite_Remove(q + 0xa38);
+        Shadow_Destroy(q->auxiliaryShadow);
+        Sprite_Remove(&q->auxiliarySprite);
     }
 }
 
