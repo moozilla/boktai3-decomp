@@ -1,6 +1,6 @@
 #define gActorStopAnimations gUnk_0824EEF0
 // Names describe observed behavior; the action interpretation is tentative.
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 
 extern u32 gUnk_0824EEF0[];
 void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
