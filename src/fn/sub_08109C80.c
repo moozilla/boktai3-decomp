@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "render.h"
+#include "gba/io_reg.h"
 #include "ram.h"
 #include "runtime.h"
 #include "engine_pause_flags.h"
@@ -63,11 +64,7 @@ s32 ScriptPanel_OpenTextWindow(struct ScriptPanel *p)
         TextWindow_SetScript(p->window, p->script);
         TextWindow_Refresh(p->window, 1);
         TextWindow_StartPlayback(p->window);
-        {
-            u16 *flags = &gDispCntShadow;
-            u32 mask = ~0xE00;
-            *flags = mask & *flags;
-        }
+        Bg_DisableDisplay(DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
         SpriteOam_ResetQueue(1);
     }
     if (p->counter <= 29)
