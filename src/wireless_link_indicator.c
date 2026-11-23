@@ -87,22 +87,13 @@ void WirelessLinkIndicator_UpdateLinkStatus(struct WirelessLinkIndicator *indica
                 strength = gRfuLinkStatus->strength[slot];
                 WirelessLinkIndicator_SelectStrengthFrame(indicator, strength);
             } else {
-                s32 index = 0;
-                s32 slots;
-                u8 *values;
-                u32 connected;
-                slots = status->connSlotFlag;
-                connected = 1;
-                values = status->strength;
-                do {
-                    if ((slots >> index) & connected) {
-                        s32 current = values[index];
-                        if (strength > current) {
-                            strength = current;
-                        }
+                s32 index;
+                for (index = 0; index <= 3; index++) {
+                    if ((status->connSlotFlag >> index) & 1) {
+                        if (strength > status->strength[index])
+                            strength = status->strength[index];
                     }
-                    ++index;
-                } while (index <= 3);
+                }
                 if (!gRfuLinkStatus->connSlotFlag) {
                     WirelessLinkIndicator_SelectStrengthFrame(indicator, 0);
                 } else {
