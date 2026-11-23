@@ -329,9 +329,7 @@ void Bee_UpdateMovementStop(struct ChaseActor *actor)
             f->bits = m;
         }
         {
-            u32 *f = &actor->base.behaviorFlags;
-            s32 m = ~0x80;
-            *f &= m;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         }
         Bee_DisableMovement(actor);
         Bee_SetState(actor, 0, 2, 0);
