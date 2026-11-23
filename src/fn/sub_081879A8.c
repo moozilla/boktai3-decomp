@@ -1,4 +1,5 @@
 #include "global.h"
+#include "contact_collider.h"
 
 #include "engine.h"
 #include "game_state.h"
@@ -11,11 +12,8 @@ struct ArmorChaseActor {
     u8 unk0[0x48];
     s16 x, y, z;
     u8 unk4E[0x28C - 0x4E];
-    struct ArmorCollision {
-        u8 pad[6];
-        s16 flags;
-    } collision;
-    u8 unk294[0xB32 - 0x294];
+    struct ContactCollider collision;
+    u8 unk2E0[0xB32 - 0x2E0];
     u16 flags;
     u8 unkB34[0xB39 - 0xB34];
     u8 facing;
@@ -31,16 +29,6 @@ struct ArmorChaseActor {
     u16 collisionCooldown;
     u16 modeTimer;
 };
-
-static inline void Armor_ClearCollision(struct ArmorCollision *collision, u32 bits)
-{
-    u32 mask = ~bits;
-    collision->flags &= mask;
-}
-static inline void Armor_SetCollision(struct ArmorCollision *collision)
-{
-    collision->flags |= 4;
-}
 
 static inline u8 Armor_FacingValue(struct ArmorChaseActor *actor)
 {
@@ -96,10 +84,10 @@ void sub_081879A8(struct ArmorChaseActor *actor)
             goto setCollision;
     }
     if (!(actor->flags & 1))
-        Armor_ClearCollision(&actor->collision, 4);
+        ContactCollider_ClearFlags(&actor->collision, 4);
     else {
     setCollision:
-        Armor_SetCollision(&actor->collision);
+        ContactCollider_SetFlags(&actor->collision, 4);
     }
     if ((s16)--actor->modeTimer <= 0 && !(actor->flags & 1)) {
         actor->fastMode = !actor->fastMode;
