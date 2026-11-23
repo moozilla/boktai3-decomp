@@ -1510,108 +1510,9 @@ void Dog_SelectAnimationZero(struct SSelectAnimationZero *s)
     SceneActorAnimation_SelectDirectionalEntry(s, 0);
 }
 
-struct DogTurnMotion {
-    u8 unknown0[9];
-    u8 direction;
-    u8 unknownA[0x1E];
-    void *route;
-};
-
-struct DogTurnBody {
-    u8 unknown0[0x21C];
-    void *resumeControl;
-};
-
-struct DogTurnState {
-    void *object;
-    void *drawable;
-    u8 drawableKind;
-    u8 unknown9[0x47];
-    struct DogTurnMotion motion;
-    u8 unknown7C[0x88];
-    u32 motionCounter;
-    u8 unknown108[0xC];
-    u32 motionFlags;
-    u8 unknown118[0x104];
-    void *control;
-    u8 unknown220[4];
-    void *turnControl;
-    u8 unknown228[0x80];
-    u8 state, phase, behavior, unknown2AB;
-    u32 counter;
-    u8 ready, phaseReady, prepared, restart;
-    u8 unknown2B4, controlKind, unknown2B6, selection;
-    u8 unknown2B8[0xA];
-    u16 duration;
-    u32 profileMode;
-    u16 controlTimer, unknown2CA;
-    u32 flags;
-    u32 unknown2D0;
-    u16 flags2D4;
-    u8 unknown2D6[0xF7];
-    u8 targetDirection;
-    u8 unknown3CE[6];
-    struct DogTurnBody body;
-};
-
 u32 Route_GetCurrentPointFacing(void *);
 
-void Anim_SetDurationScale(void *, u32);
-
-void Anim_SetFrameDurationScale(void *, u32);
-
-static inline s32 DogTurn_Cardinal(u8 direction)
-{
-    return ((direction + 0x60) >> 6) & 3;
-}
-
-struct DogTurnSequence {
-    u8 unknown0[0xE];
-    u16 elapsed;
-};
-
-static inline u16 DogTurn_Elapsed(void *sequence)
-{
-    return ((struct DogTurnSequence *)sequence)->elapsed;
-}
-
-static inline u32 DogTurn_ActorFlags(struct DogTurnState *a, u32 mask)
-{
-    return a->flags & mask;
-}
-
-static inline void DogTurn_ApplyDuration(struct DogTurnState *a, u16 *motionFlags)
-{
-    u16 *scale;
-    u32 mask = 0xA02F;
-    if (*motionFlags & mask) {
-        u16 *p = &a->duration;
-        *p = 64;
-        scale = p;
-    } else {
-        u16 *q = &a->duration;
-        u16 value = *q;
-        scale = q;
-        if (!value)
-            *scale = 64;
-    }
-    if (!a->drawableKind)
-        Anim_SetDurationScale(
-            &((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence, *scale);
-    else
-        Anim_SetFrameDurationScale(&((struct SceneActorAnimationTileDrawable *)a->drawable)->tile,
-                                   *scale);
-}
-
-static inline u8 DogTurn_TakePrepared(struct DogTurnState *a)
-{
-    if (a->prepared) {
-        a->prepared = 0;
-        return 1;
-    }
-    return 0;
-}
-
+/* Half of a facing octant, rounded toward zero. */
 static inline s32 DogTurn_Half(s32 value)
 {
     if (value >= 0)
@@ -1619,142 +1520,106 @@ static inline s32 DogTurn_Half(s32 value)
     return -((-value) >> 1);
 }
 
-static inline u32 DogTurn_Flags(u16 *field, u32 mask)
+void Dog_UpdateCardinalTurn(struct ChaseActor *actor)
 {
-    return *field & mask;
-}
-
-static inline void DogTurn_SetBits(u32 bits, u32 *field)
-{
-    *field |= bits;
-}
-
-static inline void DogTurn_ClearBits(u32 *field, u32 bits)
-{
-    *field &= ~bits;
-}
-
-static inline void DogTurn_SetState(struct DogTurnState *a, u32 state, u32 phase, u32 behavior)
-{
-    a->state = state;
-    a->phase = phase;
-    a->behavior = behavior;
-    a->counter = 0;
-    a->phaseReady = 1;
-}
-
-static inline void DogTurn_SetControl(struct DogTurnState *a, void *control, u32 kind)
-{
-    a->prepared = 1;
-    a->ready = 0;
-    a->controlKind = kind;
-    a->control = control;
-    a->controlTimer = 0;
-    {
-        u32 *field = &a->motionFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    a->motionCounter = 0;
-}
-
-void Dog_UpdateCardinalTurn(struct DogTurnState *a)
-{
-    struct DogTurnBody *body = &a->body;
-    struct DogTurnMotion *motion = &a->motion;
+    struct SceneActorChaseGroup *group = &actor->group;
+    struct SceneActorBody *motion = &actor->base.body;
+    struct DisplaySequenceState *sequence;
     u16 *motionFlags;
-    u8 prepared = DogTurn_TakePrepared(a);
+    u8 prepared = SceneActorReaction_TakePrepared(actor);
     s32 direction, target, delta;
     u32 oldDuration;
 
-    motionFlags = &a->flags2D4;
+    motionFlags = &actor->base.motionFlags;
     if (prepared) {
-        a->motion.direction = (DogTurn_Cardinal(a->motion.direction) << 6) - 0x40;
-        direction = DogTurn_Cardinal(a->motion.direction);
-        if (a->behavior != 6 && !(DogTurn_Flags(motionFlags, 0x480))) {
-            target = (((u16)Route_GetCurrentPointFacing(motion->route) + 0x70) >> 5) & 7;
-            a->targetDirection = target;
+        actor->base.body.direction =
+            (SceneActorTurn_Cardinal(actor->base.body.direction) << 6) - 0x40;
+        direction = SceneActorTurn_Cardinal(actor->base.body.direction);
+        if (actor->base.behavior2AA != 6 && !SceneActorTurn_Flags(motionFlags, 0x480)) {
+            target = (((u16)Route_GetCurrentPointFacing(motion->currentRoute) + 0x70) >> 5) & 7;
+            actor->base.nextDirection = target;
         } else {
-            target = a->targetDirection;
+            target = actor->base.nextDirection;
         }
         if (direction == DogTurn_Half(target)) {
-            a->ready = 1;
-            if (DogTurn_Flags(motionFlags, 0x400)) {
-                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-                DogTurn_SetState(a, 3, 1, 0);
-                DogTurn_SetControl(a, body->resumeControl, 0x1B);
+            actor->base.stepDone = 1;
+            if (SceneActorTurn_Flags(motionFlags, 0x400)) {
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+                SceneActorChase_SetState(actor, 3, 1, 0);
+                SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
             } else {
-                SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
+                SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
             }
             return;
         }
         switch (direction) {
             case 0:
                 if ((u32)(target - 2) <= 3) {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 0);
-                    DogTurn_SetBits(0x10000, &a->flags);
+                    SceneActorTurn_SelectAnimation(actor, 13, 1, 0);
+                    SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 1);
-                    DogTurn_ClearBits(&a->flags, 0x10000);
+                    SceneActorTurn_SelectAnimation(actor, 13, 0, 1);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 1:
                 if ((u32)(target - 4) <= 3) {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 0);
-                    DogTurn_SetBits(0x10000, &a->flags);
+                    SceneActorTurn_SelectAnimation(actor, 13, 2, 0);
+                    SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 0);
-                    DogTurn_ClearBits(&a->flags, 0x10000);
+                    SceneActorTurn_SelectAnimation(actor, 13, 3, 0);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 2:
                 if ((u32)(target - 1) > 4) {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 3, 1);
-                    DogTurn_SetBits(0x10000, &a->flags);
+                    SceneActorTurn_SelectAnimation(actor, 13, 3, 1);
+                    SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 2, 1);
-                    DogTurn_ClearBits(&a->flags, 0x10000);
+                    SceneActorTurn_SelectAnimation(actor, 13, 2, 1);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
             case 3:
                 if ((u32)target <= 3) {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 0, 0);
-                    DogTurn_SetBits(0x10000, &a->flags);
+                    SceneActorTurn_SelectAnimation(actor, 13, 0, 0);
+                    SceneActorChase_SetActorFlags(actor, 0x10000);
                 } else {
-                    SceneActorTurn_SelectAnimation((void *)a, 13, 1, 1);
-                    DogTurn_ClearBits(&a->flags, 0x10000);
+                    SceneActorTurn_SelectAnimation(actor, 13, 1, 1);
+                    SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x10000);
                 }
                 break;
         }
-        a->restart = 0;
+        actor->base.restart = 0;
     }
-    if (DogTurn_Elapsed(&((struct SceneActorAnimationSequenceDrawable *)a->drawable)->sequence) ==
-        1) {
-        if (DogTurn_ActorFlags(a, 0x10000))
+    sequence = &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    if (sequence->elapsed == 1) {
+        if (SceneActorTurn_ActorFlags(actor, 0x10000))
             motion->direction += 0x20;
         else
             motion->direction -= 0x20;
     }
-    oldDuration = a->duration;
-    if (DogTurn_Flags(motionFlags, 0x80))
-        a->duration = Div(0x40, 3);
-    DogTurn_ApplyDuration(a, motionFlags);
-    a->duration = oldDuration;
-    if (a->restart) {
-        s32 current = ((a->motion.direction + 0x70) >> 5) & 7;
-        delta = a->targetDirection - current;
+    oldDuration = actor->base.field2C2;
+    if (SceneActorTurn_Flags(motionFlags, 0x80))
+        actor->base.field2C2 = Div(0x40, 3);
+    SceneActorTurn_ApplyDuration(actor, motionFlags);
+    actor->base.field2C2 = oldDuration;
+    if (actor->base.restart) {
+        s32 current = ((actor->base.body.direction + 0x70) >> 5) & 7;
+        delta = actor->base.nextDirection - current;
         if (delta < 0)
             delta = -delta;
         if (delta <= 0) {
-            a->ready = 1;
-            a->motion.direction = (DogTurn_Cardinal(a->motion.direction) << 6) - 0x40;
-            SceneActorAnimation_SelectDirectionalEntry((void *)a, 0);
-            if (DogTurn_Flags(motionFlags, 0x400)) {
-                DogTurn_SetState(a, 3, 1, 0);
-                DogTurn_SetControl(a, body->resumeControl, 0x1B);
+            actor->base.stepDone = 1;
+            actor->base.body.direction =
+                (SceneActorTurn_Cardinal(actor->base.body.direction) << 6) - 0x40;
+            SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
+            if (SceneActorTurn_Flags(motionFlags, 0x400)) {
+                SceneActorChase_SetState(actor, 3, 1, 0);
+                SceneActorChase_SetControl(actor, group->turnControl, 0x1B);
             }
         } else {
-            DogTurn_SetControl(a, a->turnControl, 2);
+            SceneActorChase_SetControl(actor, actor->base.onEntry, 2);
         }
     }
 }
@@ -3529,7 +3394,7 @@ s32 Dog_Update(struct SUpdate *s);
 
 u16 Dog_UpdateItemDrop(struct ChaseActor *actor);
 
-void Dog_UpdateCardinalTurn(struct DogTurnState *a);
+void Dog_UpdateCardinalTurn(struct ChaseActor *actor);
 
 void Dog_UpdateContactRecovery(struct ChaseActor *actor);
 
