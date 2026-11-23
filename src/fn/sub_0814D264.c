@@ -34,11 +34,6 @@ static inline s32 Scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline void EnableExtendedContact(struct ContactCollider *collider)
-{
-    u32 mask = 0x800000;
-    collider->reactionFlags |= mask;
-}
 struct AttackMotionPlayerFields {
     u8 unknown0[0x9C];
     u16 animationDuration;
@@ -154,7 +149,7 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
     Collider_SetContactMode(&((struct AttackMotionPlayerFields *)p)->collider,
                             Player_ComputeActionScale(p, &q->collider));
     if (q->extendedFlags == 1)
-        EnableExtendedContact((struct ContactCollider *)&q->collider);
+        ContactCollider_SetReactionFlags(&q->collider, 0x800000);
     {
         u8 heading = q->heading;
         q->collider.direction = heading;
