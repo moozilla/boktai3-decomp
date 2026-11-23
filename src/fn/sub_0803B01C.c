@@ -56,6 +56,7 @@ void WirelessResultPanel_UpdateOutcomeReveal(struct P *p)
             else if (count < 0)
                 count = 0;
             *(u16 *)(gSessionState + 0x16) = count;
+            // concession-ok(duplicate-branches): the ROM keeps the result-1 test and both calls, so the original had separate arms for the two non-win results that play the same jingle
         } else if (*result == 1) {
             Sound_PlayTrackedSong(0xB1);
         } else {
