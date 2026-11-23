@@ -1,22 +1,10 @@
-#include "global.h"
-// Tentative SceneVolume family: ownership and field semantics remain provisional.
-struct SceneVolume {
-    u8 pad0[0x314];
-    void *sequence;
-    u8 pad318[0x1EC];
-    u8 sequenceState;
-    u8 pad505;
-    u8 pendingReset;
-    u8 pad507;
-    u32 sequenceLength;
-    u8 pad50C[0xF4];
-    u8 sequenceBuffer[1];
-};
-void SceneVolume_ResetPendingSequence(struct SceneVolume *volume)
+#include "scene_volume.h"
+
+void SceneVolume_ResetPendingSequence(struct SceneVolumeActor *volume)
 {
-    if (volume->pendingReset) {
-        volume->sequenceState = 0;
-        volume->pendingReset = 0;
+    if (volume->sequenceMode) {
+        volume->sequenceTimer = 0;
+        volume->sequenceMode = 0;
         volume->sequenceLength = 0x34;
         volume->sequence = volume->sequenceBuffer;
     }

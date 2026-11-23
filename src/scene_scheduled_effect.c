@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
+#include "engine_pause.h"
 
 u8 SceneActor14_UpdateAnimState(struct SceneScheduledEffect *);
 
@@ -237,8 +238,7 @@ struct SceneScheduledEffect *SceneScheduledEffect_Create(const struct ContactPos
     struct SceneActorBody *body;
     struct ContactSwarmSprite *sprite;
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return 0;
     }
     {

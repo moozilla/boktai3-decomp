@@ -7,11 +7,6 @@ void NamedObject_ResetManager(void)
     gNamedActorManager = 0;
 }
 
-static inline void orFlags(u16 mask, u16 *flags)
-{
-    *flags |= mask;
-}
-
 void NamedActor_SetFlag20FromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
@@ -19,7 +14,7 @@ void NamedActor_SetFlag20FromScript(void)
     if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         if (actor)
-            orFlags(0x20, (u16 *)&actor->flags);
+            NamedObject_EnableFlags(0x20, actor);
     }
 }
 
@@ -103,11 +98,6 @@ static inline u8 MemberHasBit(struct NamedObject *m, u32 mask)
     return 0;
 }
 
-static inline void ClearFlags(struct NamedObject *m, u32 mask)
-{
-    m->flags &= ~mask;
-}
-
 void ActorGroup_RemoveFromScript(void)
 {
     s32 name = Script_GetKeywordValue('n', 0);
@@ -118,7 +108,7 @@ void ActorGroup_RemoveFromScript(void)
         group = gNamedActorManager;
         if (MemberHasBit(member, 1)) {
             TerrainModifiers_UnregisterCell(member->registration);
-            ClearFlags(member, 1);
+            NamedObject_DisableFlags(1, member);
         }
         ActorGroup_ReleaseMember(member);
         SceneBody_Unregister(&member->body);
@@ -191,11 +181,6 @@ void NamedActor_SetSpeedFromScript(void)
     }
 }
 
-static inline void clearBits(s16 *p, s32 mask)
-{
-    *p &= mask;
-}
-
 /* Script: undoes a named object's follow (-f in NamedObject_CreateFromScript):
    clears the manager's +0x1370, resets the player's +0x40, Player_ClearAttachmentFlags and
    clears the follow flags (tentative). */
@@ -210,7 +195,7 @@ void NamedObject_ReleaseFromScript(void)
         player->followTarget = &player->movementContactFlags;
         Player_ClearAttachmentFlags(player, 1);
     }
-    clearBits(&actor->flags, ~8);
+    NamedObject_DisableFlags(8, actor);
     gPlayers[0]->shadow[1] &= 0xFE;
 }
 
@@ -224,9 +209,8 @@ void NamedActor_SetRangeFromScript(void)
     if (gNamedActorManager && name) {
         actor = NamedObject_FindByName(name);
         if (actor) {
-            s32 none = -1;
-            s32 h = Script_GetKeywordValue('h', none);
-            s32 l = Script_GetKeywordValue('l', none);
+            s32 h = Script_GetKeywordValue('h', -1);
+            s32 l = Script_GetKeywordValue('l', -1);
             if (h > 0)
                 actor->upperHeight = h;
             if (l > 0)

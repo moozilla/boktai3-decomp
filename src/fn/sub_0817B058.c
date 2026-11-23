@@ -1,16 +1,12 @@
-#include "global.h"
-// Tentative SceneVolume family: ownership and field semantics remain provisional.
-struct SceneVolume {
-    u8 pad0[0x4E2];
-    u8 pendingEvent;
-};
-s32 SceneVolume_ConsumePendingEvent(struct SceneVolume *volume)
+#include "scene_volume.h"
+
+s32 SceneVolume_ConsumePendingEvent(struct SceneVolumeActor *volume)
 {
     s32 result;
-    if (volume->pendingEvent != 1) {
+    if (volume->reached != 1) {
         result = 0;
     } else {
-        volume->pendingEvent = 0;
+        volume->reached = 0;
         result = 1;
     }
     return result;

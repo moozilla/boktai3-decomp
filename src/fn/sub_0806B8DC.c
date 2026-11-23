@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "player.h"
+#include "engine_pause.h"
 typedef void (*SpriteEffectStateCallback)(struct SpriteEffectControllerPool *,
                                           struct SpriteEffectController *);
 extern SpriteEffectStateCallback gUnk_08605B84[];
@@ -17,8 +18,7 @@ s32 SpriteEffectController_UpdatePool(struct SpriteEffectControllerPool *input)
     struct SpriteEffectControllerPool *p = input;
     struct SpriteEffectController *slots = p->slots;
     if (p->used) {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return 0;
         {
             u32 mask = 4;

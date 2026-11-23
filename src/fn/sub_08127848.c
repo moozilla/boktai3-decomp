@@ -2,6 +2,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
 
 extern u32 gUnk_02000560;
 extern void *gUnk_08610770[];
@@ -18,8 +19,7 @@ s32 StateSlotPool_Update(struct ProjectilePool *input)
     struct Projectile *slots = pool->entries;
     s32 i;
     if (pool->allocated) {
-        u32 mask = 0x400;
-        if (!((gEngineFlags | gScenePauseFlags) & mask)) {
+        if (!Engine_PauseBits(0x400)) {
             u32 blockedMask = 4;
             u32 blocked = gUnk_02000560 & blockedMask;
             if (!blocked) {

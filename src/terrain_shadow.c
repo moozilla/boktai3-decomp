@@ -25,7 +25,6 @@ s32 ShadowList_Remove(struct TerrainShadowManager *manager, struct TerrainShadow
 {
     struct TerrainShadow *previous = shadow->previous;
     struct TerrainShadow *next = shadow->next;
-    s32 result;
     if (shadow->active == 0) {
         return -1;
     }
@@ -37,9 +36,8 @@ s32 ShadowList_Remove(struct TerrainShadowManager *manager, struct TerrainShadow
     if (next) {
         next->previous = previous;
     }
-    result = 0;
-    shadow->active = result;
-    return result;
+    shadow->active = 0;
+    return 0;
 }
 
 void ActorShadow_Enable(void *actor)

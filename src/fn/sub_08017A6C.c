@@ -5,6 +5,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "monster_particle_random.h"
+#include "engine_pause.h"
 // confidence=low: checks light, cooldown, and random volume before entering storm phase one.
 void Palette_SetBrightnessMode(s32);
 u32 Weather_TestFlags(u32, u32);
@@ -19,10 +20,6 @@ static inline void Weather_ClearStormFlag(void)
 static inline void Weather_ClearDisplayFlag(u16 *display, u32 mask)
 {
     *display = mask & *display;
-}
-static inline u32 Weather_IsPaused(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 static inline s32 *Weather_CooldownTimer(struct GameState *state)
 {
@@ -39,7 +36,7 @@ s32 Weather_UpdateStormTrigger(struct WeatherState *p)
     if (!Weather_TestFlags(p->flags, 2)) {
         s32 volume = Weather_GetStormVolume(p);
         s32 light = gGameState->unk876;
-        if (!Weather_IsPaused(0x400) && p->enabled) {
+        if (!Engine_PauseBits(0x400) && p->enabled) {
             if (light > 0) {
                 s32 *timer = Weather_CooldownTimer(gGameState);
                 *timer += light >> 2;

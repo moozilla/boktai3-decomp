@@ -19,14 +19,15 @@ struct NamedObject {
     struct ContactSwarmSprite sprite;
     u8 anim[0x1C];
     struct DisplaySequenceState sequence;
-    u8 unknown58[0x5C];
+    struct ContactPosition motion; /* this frame's movement, carried to attached actors */
+    u8 unknown60[0x54];
     s16 index;
-    u16 state;
+    s16 state;
     s16 flags;
     u8 stage, unknownBB;
     s16 timer;
     u16 speed, limit;
-    s16 offsetC2;
+    s16 verticalImpulse;
     u32 enterScript, script, exitScript;
     u16 row;
     u8 unknownD2[2];
@@ -37,7 +38,8 @@ struct NamedObject {
     struct SceneActorRouteCursor route;
     struct SceneActorBody body;
     u8 registration[0x10];
-    u8 unknown158[0x44];
+    u8 cellRegistrations[4][0x10];
+    u8 cellRegistered[4];
 };
 typedef char NamedObjectSizeCheck[(sizeof(struct NamedObject) == 0x19C) ? 1 : -1];
 struct NamedObjectManager {

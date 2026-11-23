@@ -1,37 +1,16 @@
-#include "global.h"
-struct SceneVolumeOwner {
-    u8 pad0[0x418];
-    u8 disabled;
-};
-struct SceneVolume {
-    u8 pad0[0x10C];
-    struct SceneVolumeOwner *owner;
-    u8 pad110[0x354];
-    u32 flags;
-    u8 pad468[11];
-    u8 inhibited;
-    u8 pad474[0x75];
-    u8 mode;
-    u8 pad4EA;
-    u8 phase;
-};
-s32 SceneVolume_CanActivate(struct SceneVolume *volume)
+#include "scene_volume.h"
+
+s32 SceneVolume_CanActivate(struct SceneVolumeActor *volume)
 {
-    u32 o;
-    u8 *q;
-    if (!(volume->mode == 2 || volume->mode == 10))
+    if (!(volume->previousChoice == 2 || volume->previousChoice == 10))
         return 0;
-    if (volume->phase != 4)
+    if (volume->decisionIndex != 4)
         return 0;
-    o = 0x464;
-    q = (u8 *)volume + o;
-    if (!(*(u32 *)q & 7))
+    if (!(volume->effectFlags & 7))
         return 0;
-    if (volume->owner->disabled)
+    if (volume->target->actionMode)
         return 0;
-    o = 0x473;
-    q = (u8 *)volume + o;
-    if (*q)
+    if (volume->impactCount)
         return 0;
     return 1;
 }

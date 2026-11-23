@@ -60,9 +60,8 @@ static inline void SunDisc_StepPlayback(struct Sprite *base, struct Sprite *spri
     {
         union DisplaySequenceControl control;
         u32 first;
-        u32 maskBit = 1;
         control.raw = state->flags;
-        bit = maskBit;
+        bit = 1;
 
         first = (u8)(control.raw & bit);
         if (first != ((((*command) & 0x30) >> 4) & bit))

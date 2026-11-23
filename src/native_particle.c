@@ -5,6 +5,7 @@
 #include "game_state.h"
 #include "render.h"
 #include "engine.h"
+#include "engine_pause.h"
 
 /* NativeEffect_ResetManager: Clears the native effect singleton pointer */
 
@@ -187,8 +188,7 @@ s32 EffectPool_UpdateEntries(struct ParticleManager *pool)
     s32 i = 31;
     do {
         if (state->active) {
-            if (!(((gEngineFlags | gScenePauseFlags) & mask) ||
-                  ((gEngineFlags & 0x800) && (gEnginePauseFlags & 7))) ||
+            if (!(Engine_PauseBits(mask) || ((gEngineFlags & 0x800) && (gEnginePauseFlags & 7))) ||
                 !(state->flags & 1))
                 sub_08249240(pool, entry, gUnk_086106B4[state->state]);
         }

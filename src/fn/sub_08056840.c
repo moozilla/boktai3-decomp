@@ -23,16 +23,14 @@ void TerrainEdgeMarker_AddRegionFromScript(void)
         s32 height;
         s32 direction;
         {
-            u32 mask;
             u32 value = (u16)((region->minX + region->maxX) >> 1);
-            mask = 0xFFFF0000;
-            center.words[0] = (center.words[0] & mask) | value;
+            center.words[0] = (center.words[0] & 0xFFFF0000) | value;
             {
                 u32 value = (u16)((region->minZ + region->maxZ) >> 1);
                 union TerrainMarkerPosition *builder = &center;
                 {
                     u32 word = builder->words[1];
-                    word &= mask;
+                    word &= 0xFFFF0000;
                     word |= value;
                     builder->words[1] = word;
                 }

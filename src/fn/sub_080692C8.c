@@ -2,6 +2,7 @@
 
 #include "bouncing_object.h"
 #include "engine.h"
+#include "engine_pause.h"
 struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
                                             struct ContactPosition *delta,
                                             struct ContactPosition *target, u32 shot, u32 category,
@@ -21,8 +22,7 @@ struct BouncingObject *BouncingObject_Spawn(struct ContactPosition *source,
     if (pool->stopping)
         return NULL;
     {
-        u32 mask = 0x400;
-        if ((gEngineFlags | gScenePauseFlags) & mask)
+        if (Engine_PauseBits(0x400))
             return NULL;
     }
     zero = gUnk_02000560 & 4;

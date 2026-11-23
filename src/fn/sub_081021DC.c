@@ -1,6 +1,7 @@
 #include "named_object.h"
 #include "player.h"
 #include "engine.h"
+#include "named_object_flags.h"
 extern const struct SceneVec gUnk_086064C4;
 s32 Player_TestAttachmentFlags(struct Player *, u32);
 void Player_SetPositionAndSave(struct Player *, struct SceneVec *);
@@ -12,16 +13,6 @@ static inline void Difference(struct SceneVec *d, const struct SceneVec *b,
     d->y = a->y - b->y;
     d->z = a->z - b->z;
 }
-static inline u8 HasFlag(u32 mask, s16 *flags)
-{
-    if ((u16)*flags & mask)
-        return TRUE;
-    return FALSE;
-}
-static inline void SetFlag2(u16 mask, u16 *flags)
-{
-    *flags = mask | *flags;
-}
 void NamedObject_ConstrainPlayer(struct NamedObject *o)
 {
     struct SceneVec delta;
@@ -30,7 +21,7 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
         if (gPlayers[i]) {
             if ((s16)o->state != 4 && Player_TestAttachmentFlags(gPlayers[i], 1)) {
                 s32 x, z, cell;
-                if (!HasFlag(8, &o->flags))
+                if (!NamedObjectFlags_Has(8, &o->flags))
                     return;
                 x = ((((struct SceneVec *)&o->body.position.x)->x >> 4) >> 2) >> 2;
                 z = ((struct SceneVec *)&o->body.position.x)->z >> 8;
@@ -55,7 +46,7 @@ void NamedObject_ConstrainPlayer(struct NamedObject *o)
                         delta.y = o->body.position.y;
                         delta.z = o->body.position.z + delta.z;
                         Player_SetPositionAndSave(gPlayers[i], &delta);
-                        SetFlag2(0x100, (u16 *)&o->flags);
+                        NamedObjectFlags_Add(0x100, &o->flags);
                     }
                 }
             }
