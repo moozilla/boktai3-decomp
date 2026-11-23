@@ -28,4 +28,9 @@ struct ContactCollider {
     void *owner; /* 0x50: callback owner */
 };
 
+static inline void ContactCollider_ClearFlags(struct ContactCollider *collider, u32 flags)
+{
+    collider->flags &= ~flags;
+}
+
 #endif
