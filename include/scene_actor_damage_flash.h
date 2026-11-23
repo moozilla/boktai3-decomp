@@ -36,6 +36,15 @@ static inline void SceneActorDamage_ClearHitReaction(struct ChaseActor *actor)
     *flags = mask & *flags;
 }
 
+/* A fatal hit leaves only the down bit (0x40) and no pending hit. */
+static inline void SceneActorDamage_MarkDown(struct ChaseActor *actor, u16 *flags2D4)
+{
+    u32 zero = 0;
+    *flags2D4 = 0x40;
+    actor->base.field2E6 = zero;
+    SceneActorDamage_ClearHitReaction(actor);
+}
+
 /* A hit that is not fatal: drop the guard and tracking bits, keep 0x80 only for hits that carry
    0x20, clear the stagger status, mark the reaction and record the hit as pending. */
 static inline void SceneActorDamage_AcceptHit(struct ChaseActor *actor, u16 *flags2D4,

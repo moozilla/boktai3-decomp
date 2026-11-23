@@ -67,10 +67,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
     if (flags) {
         u32 down = IsDownAtHealth(actor, flags, health);
         if (down) {
-            u32 zero = 0;
-            *flags2D4 = 0x40;
-            actor->base.field2E6 = zero;
-            SceneActorDamage_ClearHitReaction(actor);
+            SceneActorDamage_MarkDown(actor, flags2D4);
             return;
         }
         {
@@ -131,10 +128,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
             } else {
                 u32 down = IsDown(actor, flags);
                 if (down) {
-                    u32 zero = 0;
-                    *flags2D4 = 0x40;
-                    actor->base.field2E6 = zero;
-                    SceneActorDamage_ClearHitReaction(actor);
+                    SceneActorDamage_MarkDown(actor, flags2D4);
                 } else {
                     u32 mask = 0x803E;
                     flags = *flags2D4;

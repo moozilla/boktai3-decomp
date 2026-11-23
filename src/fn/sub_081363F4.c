@@ -49,10 +49,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
     if (flags) {
         u32 down = IsDown(actor, flags);
         if (down) {
-            u32 zero = 0;
-            *flags2D4 = 0x40;
-            actor->base.field2E6 = zero;
-            SceneActorDamage_ClearHitReaction(actor);
+            SceneActorDamage_MarkDown(actor, flags2D4);
             return;
         }
         {
