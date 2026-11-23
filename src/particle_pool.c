@@ -120,7 +120,6 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
 
             u32 *randomIndex;
             u32 range;
-            u32 mask;
             u32 index;
             p = &inPool->particles[i];
             p->flags &= ~1;
@@ -131,8 +130,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
             randomIndex = &gRandomIndex;
             index = *randomIndex;
             index++;
-            mask = 0x3FF;
-            index &= mask;
+            index &= 0x3FF;
             {
                 u32 random = table[index];
                 s32 x = (u16)p->tail.position.signedAxis.x;
@@ -141,7 +139,7 @@ void ParticlePool_SpawnJitteredParticle(struct ParticlePool *inPool, struct Scen
                 random &= range;
                 p->tail.position.signedAxis.x = x + random;
             }
-            index = (index + 1) & mask;
+            index = (index + 1) & 0x3FF;
             *randomIndex = index;
             {
                 u32 random = ParticleRandom_ReadCursor(table, &index);
