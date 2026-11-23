@@ -21,8 +21,7 @@ struct S {
 static inline u8 Pred(struct T *p)
 {
     u32 mask = 2;
-    u32 off = 0x8D0;
-    if (*(u16 *)((u8 *)p + off) & mask)
+    if (*(u16 *)((u8 *)p + 0x8D0) & mask)
         return 1;
     return 0;
 }

@@ -31,10 +31,9 @@ void PhaseObject_BeginEntryMotion(struct PhaseObject *p)
         struct PhaseEntry *entry = p->entries;
         u16 *height = &p->entries[0].y;
         struct PhaseEntry *end = p->entries + 3;
-        u32 mask = ~1;
         do {
             *height = *targetY;
-            entry->flags &= mask;
+            entry->flags &= ~1;
             entry++;
             height = (u16 *)((u8 *)height + 0x2c);
         } while ((s32)entry <= (s32)end);

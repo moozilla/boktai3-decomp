@@ -35,8 +35,7 @@ static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
     a->base.field2C8 = 0;
     {
         u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
+        *flags &= ~1;
     }
     a->base.pendingControl = 0;
 }
