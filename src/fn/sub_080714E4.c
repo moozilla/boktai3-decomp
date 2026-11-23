@@ -36,7 +36,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
     }
     {
         u16 *address;
-        address = (u16 *)((u8 *)actor + 0x2F4);
+        address = &actor->base.terrainCell;
         *address = computedCell;
         cell = *address;
     }
@@ -112,7 +112,7 @@ static inline void SceneActorRegistry_ResetRouteState(struct ChaseActor *actor)
         const u16 *base;
         const u16 *offset;
         u32 bank;
-        base = (const u16 *)((u8 *)actor + 0x1E0);
+        base = &actor->base.basePaletteBank;
         offset = &actor->base.paletteOffset;
         bank = *base;
         bank += *offset;
