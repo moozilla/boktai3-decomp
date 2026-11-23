@@ -1281,15 +1281,10 @@ void Octopus_StartHoldControl(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct SClearStateChangedFlag {
-    u8 filler[0x000002B1];
-    u8 f;
-};
-
-void Octopus_ClearStateChangedFlag(struct SClearStateChangedFlag *s)
+void Octopus_ClearStateChangedFlag(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
+    if (actor->base.field2B1 != 0)
+        actor->base.field2B1 = 0;
 }
 
 /* Count frames; after 60, restart the phase (the count still advances).
@@ -1401,27 +1396,17 @@ void SceneActorReaction_BeginHiddenCollisionless(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-extern const u8 gUnk_08606338[];
+extern void *gUnk_08606338[];
 
-extern const u8 gUnk_08606320[];
+extern void *gUnk_08606320[];
 
-extern const u8 gUnk_0860634C[];
+extern void *gUnk_0860634C[];
 
-struct P {
-    const u8 *a;
-    u32 pad;
-};
-
-struct SInitControlPresets {
-    u8 filler[0x284];
-    struct P p[3];
-};
-
-void Octopus_InitControlPresets(struct SInitControlPresets *s)
+void Octopus_InitControlPresets(struct ChaseActor *actor)
 {
-    s->p[0].a = gUnk_08606338;
-    s->p[1].a = gUnk_08606320;
-    s->p[2].a = gUnk_0860634C;
+    actor->base.callbacks284 = gUnk_08606338;
+    actor->base.behaviorCallbacks = gUnk_08606320;
+    actor->base.callbacks294 = gUnk_0860634C;
 }
 
 /* SceneActorControl_BeginSoundTransition_080EBC38: SceneActorControl_BeginSoundTransition with other constants (ported by relatives.py + repair.py; provisional name) */
@@ -1461,16 +1446,9 @@ s32 SceneActorControl_BeginSoundTransition_080EBC38(struct ChaseActor *actor)
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-struct SInitProfileId {
-    u8 filler[0x98];
-    u8 b;
-    u8 f2[0x308 - 0x99];
-    s32 v;
-};
-
-void Octopus_InitProfileId(struct SInitProfileId *s)
+void Octopus_InitProfileId(struct ChaseActor *actor)
 {
-    s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
 /* SceneActorControl_UpdateMotionPhase_080EBD0C: same code as SceneActorControl_UpdateMotionPhase at another address (ported by relatives.py; provisional name) */
@@ -1749,11 +1727,6 @@ fail:
     return 0;
 }
 
-struct A {
-    u8 f[8];
-    u16 v;
-};
-
 u32 Octopus_GetAnimationStatus(struct ChaseActor *actor)
 {
     struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
@@ -1773,19 +1746,12 @@ s32 Octopus_SetAnimationRefreshFlag(struct ChaseActor *actor);
 
 s32 Octopus_UpdateBodyColliderPosition(struct ChaseActor *actor);
 
-struct SUpdate {
-    u8 filler[0x27c];
-    u32 *tbl;
-    u8 filler2[0x2a8 - 0x280];
-    u8 idx;
-};
-
-s32 Octopus_Update(struct SUpdate *s)
+s32 Octopus_Update(struct ChaseActor *actor)
 {
-    Octopus_SetAnimationRefreshFlag(s);
-    Callback_InvokeActor(s, s->tbl[s->idx]);
-    SceneActorControl_DispatchControl(s);
-    Octopus_UpdateBodyColliderPosition(s);
+    Octopus_SetAnimationRefreshFlag(actor);
+    Callback_InvokeActor(actor, actor->base.stateCallbacks[actor->base.state2A8]);
+    SceneActorControl_DispatchControl(actor);
+    Octopus_UpdateBodyColliderPosition(actor);
     return 1;
 }
 
@@ -1861,9 +1827,9 @@ u32 Octopus_Destroy(struct SDestroy *s)
     return 0;
 }
 
-void Octopus_InitProfileId(struct SInitProfileId *s);
+void Octopus_InitProfileId(struct ChaseActor *actor);
 
-s32 Octopus_Update(struct SUpdate *s);
+s32 Octopus_Update(struct ChaseActor *actor);
 
 void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
@@ -1873,7 +1839,7 @@ void SceneActorControl_UpdateMotionPhase_080EBD0C(struct ChaseActor *actor);
 
 void SceneActorCollision_InitCompactBody(struct ChaseActor *actor);
 
-void Octopus_InitControlPresets(struct SInitControlPresets *s);
+void Octopus_InitControlPresets(struct ChaseActor *actor);
 
 void Octopus_BeginIdleAnimation(struct ChaseActor *actor);
 
