@@ -30,12 +30,11 @@ s32 BlinkingSprite_UpdateExpiry(struct BlinkingSpritePool *pool, struct Blinking
     }
     if (Mod(sprite->blinkAge, gUnk_086107B0[rate]) == 0) {
         u32 flags = copy->flags;
-        u32 bit = 1;
-        if (flags & bit) {
+        if (flags & 1) {
             flags &= ~1;
             copy->flags = flags;
         } else {
-            flags |= bit;
+            flags |= 1;
             copy->flags = flags;
             SparkParticleSource_Emit(sprite);
         }
