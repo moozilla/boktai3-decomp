@@ -180,9 +180,21 @@ static inline void SceneActors_SetFacing(struct StateActor *actor, int angle)
     actor->animationFacing8 = direction;
 }
 
+/* The per-frame action flags at 0x9C. One accessor family serves the common controller and every
+ * kind's handlers; each loads its mask before the flags word wherever it is used. */
 static inline void SceneActorState_SetFlags(struct StateActor *actor, u32 flags)
 {
     actor->actionFlags |= flags;
+}
+
+static inline void SceneActorState_ClearFlags(struct StateActor *actor, u32 flags)
+{
+    actor->actionFlags &= ~flags;
+}
+
+static inline u32 SceneActorState_TestFlags(const struct StateActor *actor, u32 mask)
+{
+    return actor->actionFlags & mask;
 }
 
 static inline void SceneActorState_EnterReactionPhase(struct StateActor *actor, u32 phase)

@@ -4,12 +4,14 @@
 #include "render.h"
 #include "engine_globals.h"
 #include "player.h"
+#include "player_slot_status.h"
 #include "ram.h"
 #include "debug.h"
 #include "hit_spark_random.h"
 
 int SceneActorGraphics_GetResourceId(struct StateActor *p)
 {
+    // concession-ok(duplicate-branches): every lock state names resource 0x335; the ROM still loads it
     switch (p->locked) {
         case 0:
             return 0x335;
@@ -250,11 +252,6 @@ void SceneActorGraphics_InitializeOverlay(struct StateActor *p, int resource)
     Collider_SetCallback(drawable, sub_08021F4C, p);
     Collider_SetBodyProperties(drawable, resource, 0x802, 1);
     Collider_Refresh(drawable);
-}
-
-static inline u32 SceneActorState_TestFlags(const struct StateActor *actor, u32 mask)
-{
-    return actor->actionFlags & mask;
 }
 
 void SceneActorGraphics_UpdateVariant(struct StateActor *p)
@@ -513,7 +510,6 @@ void sub_08022790(u8 *p, s32 big)
     s32 angle, count, speed;
     u16 index;
     u32 *indexPtr;
-    u32 mask;
     int smallMask;
     const u16 *table;
     pos = *(struct ContactPosition *)(p + 0x260);
@@ -538,14 +534,13 @@ void sub_08022790(u8 *p, s32 big)
     table = gRandomTable;
     indexPtr = &gRandomIndex;
     index = *indexPtr + 1;
-    mask = 1023;
-    index &= mask;
+    index &= 1023;
     angle = (u8)table[index];
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     count = table[index];
     smallMask = 3;
     count = (count & smallMask) + 2;
-    index = (index + 1) & mask;
+    index = (index + 1) & 1023;
     *indexPtr = index;
     speed = (table[index] & smallMask) + 20;
     SparkParticle_Spawn(&pos, 5, &size, angle, count, speed, 0, 2);
@@ -609,24 +604,20 @@ void SceneActors_SpawnAmbientParticlePair(struct StateActor *p)
         u32 angle, count;
         u32 index;
         u32 *indexPtr;
-        u32 mask;
-        u32 smallMask;
         u32 value;
         u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
-        mask = 1023;
-        smallMask = 3;
         value = (u32)gRandomTable;
-        index = HitSpark_NextIndex(*indexPtr, mask);
+        index = HitSpark_NextIndex(*indexPtr, 1023);
         angle = (u8)HitSpark_Sample(value, index);
-        index = HitSpark_NextIndex(index, mask);
-        count = (HitSpark_Sample(value, index) & smallMask) + 2;
-        index = HitSpark_NextIndex(index, mask);
+        index = HitSpark_NextIndex(index, 1023);
+        count = (HitSpark_Sample(value, index) & 3) + 2;
+        index = HitSpark_NextIndex(index, 1023);
         *indexPtr = index;
-        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        speed = (HitSpark_Sample(value, index) & 3) + 20;
         value = 3;
         SparkParticle_Spawn((struct ContactPosition *)(graphics + 0x20), value, &size, angle, count,
                             speed, 2, 2);
@@ -1421,11 +1412,6 @@ void SceneActorState_PlayAnimation5ThenAdvance(struct StateActor *p)
         p->actionTimer++;
 }
 
-static inline void SceneActorState_ClearFlags(struct StateActor *actor, u32 flags)
-{
-    actor->actionFlags &= ~flags;
-}
-
 void SceneActorState_EnterPhase6AndResetAnimation(struct StateActor *p)
 {
     struct SceneGraphicsActor *actor = (struct SceneGraphicsActor *)p;
@@ -1832,14 +1818,9 @@ extern u32 gUnk_02000560;
 
 extern const u32 gUnk_08604EF0[];
 
-static inline u32 SceneActorState_TestDispatchFlags(u32 flags)
-{
-    return gUnk_02000560 & flags;
-}
-
 void SceneActorState_UpdateActiveActions(struct StateActor *p)
 {
-    if (!SceneActorState_TestDispatchFlags(4)) {
+    if (!PlayerSlot_ReadStatus(0, 4)) {
         if (SceneActorState_TryStartDeathOrFlaggedAction(p) == 0) {
             Callback_InvokeActor(p, gUnk_08604EF0[p->actionIndex]);
         }
