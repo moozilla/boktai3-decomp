@@ -245,16 +245,11 @@ void ControlPanel_UpdatePlayerSegments(struct ControlPanel *panel)
     s32 i;
     if (count > 7)
         count = 7;
-    i = 0;
-    if (i < count) {
-        u16 one = 1, two = 2;
-        do {
-            if (i <= 3)
-                ControlPanel_SetSegmentFrame(&panel->segments[i], one);
-            else
-                ControlPanel_SetSegmentFrame(&panel->segments[i], two);
-            i++;
-        } while (i < count);
+    for (i = 0; i < count; i++) {
+        if (i <= 3)
+            ControlPanel_SetSegmentFrame(&panel->segments[i], 1);
+        else
+            ControlPanel_SetSegmentFrame(&panel->segments[i], 2);
     }
     for (; i < 7; i++)
         ControlPanel_SetSegmentFrame(&panel->segments[i], 0);
