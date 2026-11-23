@@ -43,9 +43,8 @@ void SceneActorControl_TickRandomMotion(struct ChaseActor *input)
             const s16 *sine = gUnk_086149C4;
             u8 *field = &control->randomMotionAngle;
             u32 angle = *field + 64;
-            u32 mask = 255;
             s32 sample;
-            angle &= mask;
+            angle &= 255;
             sample = sine[angle];
             actor->base.secondaryMotion.z = ScaleMotionSample(sample);
         }

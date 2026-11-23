@@ -4,9 +4,8 @@ void SceneActorControl_TickGroundBob(struct ChaseActor *);
 s32 SceneActorControl_TickHiddenResponse(struct ChaseActor *actor)
 {
     u32 mask = 0x4000;
-    u32 offset = 0x2D4;
     u16 *field;
-    field = (void *)((u8 *)actor + offset);
+    field = (void *)((u8 *)actor + 0x2D4);
     if (*field & mask) {
         u32 mask = 0x10;
         u32 *input;

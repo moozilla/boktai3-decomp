@@ -24,8 +24,7 @@ void SceneActorControl_CompleteScriptedResponse(struct ChaseActor *actor, s32 fr
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
-            u32 offset = 0x134;
-            struct ContactCollider *collider = (void *)((u8 *)actor + offset);
+            struct ContactCollider *collider = (void *)((u8 *)actor + 0x134);
             collider->flags |= 4;
         }
     }
