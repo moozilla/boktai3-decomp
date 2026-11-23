@@ -1,4 +1,5 @@
 #include "ghost.h"
+#include "math_shift.h"
 #include "scene_actor_stimulus.h"
 #include "game_state_flags.h"
 #include "scene_actor_reaction.h"
@@ -620,18 +621,11 @@ void Ghost_UpdateDefeat(struct ChaseActor *actor)
     }
 }
 
-static inline s32 Ghost_TruncateShift(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
-
 static inline void Ghost_MakeRouteMotion(struct ContactPosition *out, u32 angle, s32 speed)
 {
-    out->x = Ghost_TruncateShift(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
+    out->x = Math_ShiftTowardZero(gUnk_086149C4[(angle + 64) & 255] * speed, 12);
     out->y = 0;
-    out->z = Ghost_TruncateShift(gUnk_086149C4[angle & 255] * speed, 12);
+    out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * speed, 12);
 }
 
 void TentacleActor_ResetOscillation(void *);
@@ -659,9 +653,9 @@ static inline u8 Ghost_ApproachCurvePosition(struct ChaseActor *actor,
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
         *(u16 *)&motion->motion.x +=
-            Ghost_TruncateShift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+            Math_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
         *(u16 *)&motion->motion.z +=
-            Ghost_TruncateShift(gUnk_086149C4[motion->direction] * speed, 12);
+            Math_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
