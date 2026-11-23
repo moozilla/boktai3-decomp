@@ -302,8 +302,8 @@ s32 SceneActorSequence_InitFromScript(struct SceneActorSequence *p, void *script
     p->finalWaypointSpeed = 0x64;
     SceneActorSequence_BeginFadeIn(p);
 #ifdef UBFIX
-    // falls off the end with r0 left over from the SceneActorSequence_BeginFadeIn call; the creator only tests
-    // < 0, and this initializer has no failure path here
+    // falls off the end with r0 left over from the SceneActorSequence_BeginFadeIn call; the
+    // creator only tests < 0, and this initializer has no failure path here
     return 0;
 #endif
 }
