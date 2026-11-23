@@ -1,3 +1,4 @@
+#include "scene_actor_contact_entry.h"
 #include "scene_actor_control_begin.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain_reaction.h"
@@ -39,10 +40,7 @@ void sub_08136F58(struct ChaseActor *actor)
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorControl_Begin(actor, actor->base.onStanding, 0, 0);
-        SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
-        SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
-        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
-        actor->base.field2C2 = 0x40;
+        SceneActorContact_ResetEntry(actor);
     }
     if (((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) == 0) {
         u32 *counter = &actor->base.counter2AC;

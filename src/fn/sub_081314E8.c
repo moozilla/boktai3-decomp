@@ -1,3 +1,4 @@
+#include "scene_actor_contact_entry.h"
 #include "scene_actor_control_begin.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_chase_shared.h"
@@ -44,22 +45,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
     u16 *motionFlags;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        {
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = ~0x80;
-            *flags &= mask;
-        }
-        {
-            u32 *flags = &actor->base.statusFlags;
-            u32 mask = ~0x1000000;
-            *flags &= mask;
-        }
-        {
-            u16 *flags = &actor->base.motionFlags;
-            u32 mask = ~0x200;
-            *flags &= mask;
-        }
-        actor->base.field2C2 = 64;
+        SceneActorContact_ResetEntry(actor);
     }
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         return;
