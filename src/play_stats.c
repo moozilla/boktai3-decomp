@@ -107,10 +107,8 @@ static inline void PlayStats_Enter(struct PlayStatsScreen *task, s32 state)
 static inline s32 PlayStats_RandomDigit(const u16 *table, u32 *index)
 {
     u32 sample, next;
-    u32 mask;
     next = *index + 1;
-    mask = 1023;
-    next &= mask;
+    next &= 1023;
     *index = next;
     sample = table[next];
     return Mod(sample, 10);
@@ -390,11 +388,6 @@ void PlayStats_LoadPalette(struct PlayStatsScreen *screen)
     CpuSet(screen->palettes, gBgPaletteBuffer, 0x04000028);
 }
 
-static inline void PlayStats_HideWidget(struct SceneInputWidget *entry)
-{
-    entry->flags |= 1;
-}
-
 void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 {
     u8 data[8];
@@ -409,7 +402,7 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
     for (i = 0; i <= 7; i++) {
         dims.x = data[i];
         Widget_InitLinked(&screen->entries[i], &screen->resources[0], 0, 0x30, 0, 0, 0x3c, &dims);
-        PlayStats_HideWidget(&screen->entries[i]);
+        SceneInputWidget_Hide(&screen->entries[i]);
     }
 
     Widget_InitLinked(&screen->entries[8], &screen->resources[0], 0x3c, 0x30, 0, 0, 0x3c, NULL);
