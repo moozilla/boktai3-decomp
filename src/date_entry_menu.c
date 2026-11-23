@@ -402,7 +402,6 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
 {
     u32 zero;
     u32 one;
-    u32 resourceBank;
     void *resource;
     u8 *firstGraphics;
     u8 *secondGraphics;
@@ -427,8 +426,7 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
 
-    resourceBank = 0xCB05;
-    resource = ScriptProc_Start(resourceBank, 0xE2AB);
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
     firstGraphics = menu->widgets[0].resource;
     ResourceHeader_Relocate(firstGraphics, resource);
     menu->digitResource = *(struct SceneInputResource *)firstGraphics;
@@ -458,7 +456,7 @@ s32 DateMenu_Initialize(struct DateMenu *menu)
     *paletteBank = firstPaletteBank;
     paletteBank = &menu->widgets[2].paletteBank;
     *paletteBank = firstPaletteBank + 1;
-    resource = ScriptProc_Start(resourceBank, 0x530D);
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     RelocateDateCursor(menu, resource, &cursorGraphics);
     Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, zero, zero, zero, NULL);
     DateMenu_InitializeDigitWidgets(menu);
