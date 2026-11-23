@@ -1,4 +1,5 @@
 #include "challenge_menu.h"
+#include "gba/io_reg.h"
 #include "palette_pulse.h"
 
 s32 ChallengeMenu_GetStoredRank(s32 group, s32 choice)
@@ -247,8 +248,7 @@ s32 ChallengeMenu_UpdateWidgets(struct ChallengeMenu *menu)
 
 void ChallengeMenu_EnableBackground(struct ChallengeMenu *menu)
 {
-    u32 m = 0x100;
-    gDispCntShadow = m | gDispCntShadow;
+    Bg_EnableDisplay(DISPCNT_BG0_ON);
     BgGfx_LoadTilemapAtPosition(1, 0, 0);
 }
 
@@ -280,9 +280,7 @@ void ChallengeMenu_InitBackgrounds(struct ChallengeMenu *menu)
     s32 value;
     s32 i;
     void *res;
-    u16 *g = &gDispCntShadow;
-    s32 mask = 0xFFFFF0FF;
-    *g = mask & *g;
+    Bg_DisableDisplay(DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_BG2_ON | DISPCNT_BG3_ON);
     sub_082157EC();
     Hud_SetMode(7);
     res = ScriptProc_Start(0xC091, 0x3536);
@@ -356,35 +354,20 @@ void ChallengeMenu_InitializeKeyframes(struct ChallengeMenu *menu)
 void ChallengeMenu_InitAnimations(struct ChallengeMenu *menu)
 {
     struct SceneInputResource *resource = ScriptProc_Start(0xCB05, 0xA2DB);
-    struct SceneInputResource *first, *last;
-    u32 duration, initialState;
-    u16 bits;
-    u16 *dst;
     s32 i;
-    struct SceneInputWidget *entry;
     menu->resources[2] = *resource;
-    first = &menu->resources[2];
-    ResourceHeader_Relocate(first, resource);
+    ResourceHeader_Relocate(&menu->resources[2], resource);
     resource = ScriptProc_Start(0xCB05, 0x1289);
     menu->resources[1] = *resource;
     ResourceHeader_Relocate(&menu->resources[1], resource);
     resource = ScriptProc_Start(0xCB05, 0x530D);
     menu->resources[0] = *resource;
-    last = &menu->resources[0];
-    ResourceHeader_Relocate(last, resource);
-    Widget_InitLinked(&menu->widgets[5], last, 0x8A, 0x10, 0, 0, duration = 0x3C, 0);
-    dst = (u16 *)&menu->widgets[5].position.y;
-    bits = 0xFFE8;
-    *dst = bits;
-    Widget_InitLinked(&menu->widgets[4], first, 0, 0x10, 3, 0, duration, 0);
-    initialState = 0;
-    entry = &menu->widgets[0];
-    i = 3;
-    do {
-        Widget_InitLinked(entry, &menu->resources[1], 0, 0x10, initialState, initialState, 0x3C,
-                          initialState);
-        entry++;
-    } while (--i >= 0);
+    ResourceHeader_Relocate(&menu->resources[0], resource);
+    Widget_InitLinked(&menu->widgets[5], &menu->resources[0], 0x8A, 0x10, 0, 0, 0x3C, 0);
+    menu->widgets[5].position.y = -24;
+    Widget_InitLinked(&menu->widgets[4], &menu->resources[2], 0, 0x10, 3, 0, 0x3C, 0);
+    for (i = 0; i < 4; i++)
+        Widget_InitLinked(&menu->widgets[i], &menu->resources[1], 0, 0x10, 0, 0, 0x3C, 0);
     ChallengeMenu_SetGroupIcon(menu);
     ChallengeMenu_InitializeKeyframes(menu);
 }
