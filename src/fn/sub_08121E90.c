@@ -1,26 +1,25 @@
 #include "global.h"
 #include "ram.h"
-
 #include "sprite_particle_pool.h"
 
 void Sprite_Remove(void *);
-static inline u8 Occupied(u32 *used, u32 mask)
+
+static inline u8 Occupied(u32 *used, s32 index)
 {
-    if (*used & mask)
+    if (*used & (1 << index))
         return 1;
     return 0;
 }
+
 s32 SpriteGroup_RemoveSprites(struct SpriteParticlePool *pool)
 {
-    s32 i = 0;
-    u32 zero;
-    u32 *used = &pool->occupied;
-    struct SpriteParticleSlot *entry = pool->slots;
-    for (; i < 8; entry++, i++) {
-        if (Occupied(used, 1 << i))
-            Sprite_Remove(&pool->sprites[entry->index]);
+    s32 i;
+    for (i = 0; i < 8; i++) {
+        if (Occupied(&pool->occupied, i)) {
+            struct SpriteParticleSlot *slot = &pool->slots[i];
+            Sprite_Remove(&pool->sprites[slot->index]);
+        }
     }
-    zero = 0;
-    gSpriteGroup = (void *)zero;
+    gSpriteGroup = NULL;
     return 0;
 }
