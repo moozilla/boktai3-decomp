@@ -3,11 +3,14 @@
 // current skill and goal along the bottom, the planned route as dots.
 //
 //   node tools/autopilot/video.mjs RUN_DIR/movie.json OUT.mp4 [--logs DIR,DIR...] [--seconds 60]
+//        [--clips A-B:S,C-D:T,...]
 //
 // The movie is replayed on the port with the PPU on; every Nth frame (N chosen so
 // the run fits --seconds at 30 fps) is piped as raw RGB into ffmpeg, so no frame
 // files are written. Overlay text comes from the runs' log.json files (--logs:
 // the run directories whose logs cover the movie; default: the movie's own).
+// --clips: only frames A..B (S seconds of video each, the step chosen per clip), so a
+// long run can show its highlights; the PPU only renders inside the clips.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -22,7 +25,10 @@ const logDirs = opt('--logs', path.dirname(moviePath)).split(',');
 const events = logDirs.flatMap((d) => { try { return JSON.parse(fs.readFileSync(path.join(d, 'log.json'), 'utf8')); } catch { return []; } })
   .sort((a, b) => a.frame - b.frame);
 const seconds = +opt('--seconds', 60), fps = 30;
-const step = Math.max(1, Math.ceil(run.movie.length / (seconds * fps)));
+const clips = opt('--clips') ? opt('--clips').split(',').map((c) => { const [r, secs] = c.split(':'); const [a, b] = r.split('-').map(Number); return { a, b, step: Math.max(1, Math.ceil((b - a) / (+secs * fps))) }; })
+  : [{ a: 0, b: run.movie.length, step: Math.max(1, Math.ceil(run.movie.length / (seconds * fps))) }];
+const clipAt = (n) => clips.find((c) => n >= c.a && n < c.b);
+let written = 0;
 
 // 3x5 font: each glyph is 5 rows of 3 bits.
 const F = {
@@ -51,12 +57,18 @@ function dot(px, x, y, [r, g, b]) {
 
 const describe = (e) => {
   switch (e.skill) {
-    case 'menu': return `menu ${e.menu.replace(/_Update|_Handle\w*/, '')} ${e.keys.map((k) => k.key || k).join(' ')}`;
+    case 'menu': if (e.goal) return `pause menu search: ${e.goal} ${e.done ? `found ${e.keys}` : 'not found'}`;
+      return `menu ${e.menu.replace(/_Update|_Handle\w*/, '')} ${e.keys.map((k) => k.key || k).join(' ')}`;
     case 'narration': case 'dialogue': return `reading text ${e.string ?? ''}`;
     case 'goal': return `goal reached: ${e.reached}`;
     case 'room': return `room ${e.scene}: doors ${(e.doors || []).join(' ')}`;
     case 'navigate': return `door ${e.box}: ${e.reason}`;
     case 'interact': return `open ${e.item || 'object'}`;
+    case 'equip': return `equip ${e.kind} ${e.name || e.id}`;
+    case 'hit': return `hit ${e.with ? `with ${e.with}` : 'it'}: ${e.lit ? 'lit' : e.done ? 'done' : `${e.hits} hits, no effect`}`;
+    case 'collect': return e.done ? 'picked up an item' : null;
+    case 'heal': return `heal: life ${e.from} > ${e.to}`;
+    case 'talk': return 'talk';
     case 'fought': return `fight ${e.won ? 'won' : 'left'} life ${e.life}`;
     case 'nav':
       if (e.push) return `push crate ${e.push.x},${e.push.z}`;
@@ -72,10 +84,13 @@ const describe = (e) => {
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', '240x160', '-r', String(fps), '-i', '-',
   '-vf', 'scale=720:480:flags=neighbor', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '20', outPath], { stdio: ['pipe', 'inherit', 'inherit'] });
 const s = await openSession({ save: run.save || undefined, solarLog: run.solar, render: true, print: () => {}, lib: [path.join(ROOT, 'port/agent/lib')] });
+const end = Math.min(run.movie.length, Math.max(...clips.map((c) => c.b)));
 let ei = 0, caption = 'power on', route = null, routeScene = null;
 const pending = [];
 s.run(function* (g) {
-  for (let n = 0; n < run.movie.length; n++) {
+  for (let n = 0; n < end; n++) {
+    const clip = clipAt(n) || clipAt(n + 2);
+    if (s.setRender) s.setRender(!!clip);
     yield g.press(run.movie[n] | 0, 1);
     while (ei < events.length && events[ei].frame <= n) {
       const e = events[ei++], d = describe(e);
@@ -83,7 +98,9 @@ s.run(function* (g) {
       if (e.skill === 'nav' && e.path) { route = e.path; routeScene = g.lib.where().scene; }
       if (e.skill === 'room' || e.skill === 'goal') route = null;
     }
-    if (n % step) continue;
+    const c = clipAt(n);
+    if (!c || (n - c.a) % c.step) continue;
+    written++;
     const src = s.pixels(), px = Buffer.alloc(240 * 160 * 3);
     for (let i = 0; i < src.length; i++) {
       const c = src[i], r = c & 31, gg = (c >> 5) & 31, b = (c >> 10) & 31;
@@ -106,4 +123,4 @@ s.run(function* (g) {
 });
 ff.stdin.end();
 await new Promise((res) => ff.on('close', res));
-console.log(`${outPath}: ${Math.round(run.movie.length / step / fps)} s, every ${step}th frame of ${run.movie.length}`);
+console.log(`${outPath}: ${Math.round(written / fps)} s, ${clips.map((c) => `${c.a}-${c.b} every ${c.step}`).join(', ')}`);
