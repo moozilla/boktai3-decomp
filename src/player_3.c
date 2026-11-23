@@ -456,7 +456,7 @@ void SceneActor_StartRandomizedEffect(struct Player *p)
             Sound_PlaySong(0x134);
         else if (p->movementModifierKind == 3)
             Sound_PlaySong(0x134);
-        source = *(struct SceneVec **)((u8 *)p + 0x5C0);
+        source = p->visualPosition;
         position.x = source->x;
         position.y = source->y + 128;
         position.z = source->z;
@@ -715,9 +715,9 @@ s32 Player_SelectTimedVisualMode(struct Player *p, s32 mode)
                 } else if (p->scriptStatus[0]) {
                     if (p->kind & 1) {
                         p->scriptStatus[0]--;
-                        if ((*p->inputKeys & 0xF0) || *((u8 *)p + 0x457) == 2)
-                            PaletteLevels_Configure(2, 1, 30, (u8 *)p + 0xAF4, (u8 *)p + 0xAF8,
-                                                    (u8 *)p + 0xAFC);
+                        if ((*p->inputKeys & 0xF0) || p->tetherMode == 2)
+                            PaletteLevels_Configure(2, 1, 30, p->effectModes, p->effectCounters,
+                                                    p->effectLimits);
                     }
                     mode = 2;
                     p->scriptFlashTimer = 64;
@@ -1470,7 +1470,7 @@ void Player_ConfigureActionCollider(struct Player *p)
 {
     struct SceneVec size, offset;
     s32 category;
-    void *collider = (u8 *)p + 0xB8C;
+    void *collider = &p->statModifierContext.attackCollider;
     if (p->actionMode != 6) {
         switch (p->statModifierContext.statBOverrideEnabled) {
             case 0:
@@ -1494,7 +1494,7 @@ void Player_ConfigureActionCollider(struct Player *p)
                 category = 16;
                 p->statModifierContext.actionTimer = 32;
                 p->statModifierContext.contactParameter = 20;
-                *((u8 *)p + 0x33E) = 0;
+                p->actionSelectionStamp = 0;
                 break;
             default:
                 return;
