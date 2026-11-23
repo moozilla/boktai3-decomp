@@ -1,3 +1,4 @@
+#include "scene_actor_control_begin.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
@@ -16,20 +17,6 @@ static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
     u32 value = *flags & mask;
     *out = flags;
     return value;
-}
-static inline void Control(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
 void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
@@ -108,7 +95,7 @@ void SceneActorRoute_UpdateRouteCompletion(struct ChaseActor *actor)
             } else {
                 SceneActorTerrain_EnterState(actor, 0, 0, 5);
             }
-            Control(actor, actor->base.onStanding, 0);
+            SceneActorControl_Begin(actor, actor->base.onStanding, 0, 0);
             return;
         }
     }

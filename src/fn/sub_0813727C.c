@@ -1,3 +1,4 @@
+#include "scene_actor_control_begin.h"
 #include "terrain_sampling.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
@@ -40,20 +41,6 @@ static inline u32 TestSlot(s32 i)
 }
 
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 
 
@@ -228,7 +215,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     actor->base.tracking.target = 0;
     SceneActorTerrain_EnterState(actor, 3, 1, 0);
-    SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
+    SceneActorControl_Begin(actor, SceneActorReaction_RestoreAfterDelay, 14, 0);
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
     ResetControl(actor, ActorFlags(actor, 0x200000), flagsp);

@@ -1,29 +1,10 @@
+#include "scene_actor_control_begin.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_control_phase.h"
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
-static inline void BeginControl(struct ChaseActor *actor, void *control, u32 kind, u32 zero)
-{
-    u32 offset;
-    {
-        u8 *field = &actor->base.field2B2;
-        *field = 1;
-    }
-    offset = 0x2B0;
-    *((u8 *)actor + offset) = zero;
-    actor->base.controlKind = kind;
-    offset -= 0x94;
-    *(void **)((u8 *)actor + offset) = control;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-}
 #include "scene_actor_chase.h"
 #include "scene_actor_attachment.h"
 static inline u32 FlagsSave(struct ChaseActor *a, u32 mask, u16 **out)
@@ -90,7 +71,7 @@ void SceneActorRoute_UpdateContactRecovery(struct ChaseActor *actor)
         struct ChaseTarget **node = (struct ChaseTarget **)group->contactNode;
         SubtractContactNode(&delta, node, &actor->base.body.position);
         if (((u32)((delta.x * delta.x) + (delta.z * delta.z))) <= 0xFFFE) {
-            BeginControl(actor, group->contactArrivalControl, 0x19, result);
+            SceneActorControl_Begin(actor, group->contactArrivalControl, 0x19, result);
             SceneActorBehavior_WriteSelector(3, &actor->base.state2A8);
             {
                 typeof(actor->base.phase2A9) *q1 = &actor->base.phase2A9;

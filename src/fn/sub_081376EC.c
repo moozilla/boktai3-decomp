@@ -1,3 +1,4 @@
+#include "scene_actor_control_begin.h"
 #include "terrain_sampling.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_behavior.h"
@@ -25,20 +26,6 @@ static inline void SetWordFlags(u32 *flags, u32 input)
 
 
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
@@ -165,7 +152,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
         control->timer = 0;
         *timer = 180;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
-        SetControl(actor, GROUP_FIELD(group, 0x68, void *), 9);
+        SceneActorControl_Begin(actor, GROUP_FIELD(group, 0x68, void *), 9, 0);
         SceneActorTerrain_EnterState(actor, 0, 0, 11);
     }
     {

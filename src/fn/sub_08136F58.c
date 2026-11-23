@@ -1,3 +1,4 @@
+#include "scene_actor_control_begin.h"
 #include "scene_actor_control_phase.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_placement.h"
@@ -8,20 +9,6 @@ void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
 
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
@@ -51,7 +38,7 @@ void sub_08136F58(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeStateEntry(actor)) {
-        SetControl(actor, actor->base.onStanding, 0);
+        SceneActorControl_Begin(actor, actor->base.onStanding, 0, 0);
         SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
         SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
         SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
@@ -66,7 +53,7 @@ void sub_08136F58(struct ChaseActor *actor)
         if (((s32)(*counter)) > 60) {
             u32 bit;
             SceneActorTerrain_EnterState(actor, 0, 0, 7);
-            SetControl(actor, actor->base.onAlternateEntry, 1);
+            SceneActorControl_Begin(actor, actor->base.onAlternateEntry, 1, 0);
             // The loop around this assignment doubles bit's use weight in
             // global allocation, which gives it r8 ahead of group (rasolve).
             do {
