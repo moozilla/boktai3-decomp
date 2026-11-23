@@ -1121,28 +1121,18 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
 }
 
-struct T {
-    u8 f[6];
-    u16 flags;
-};
-
-struct S {
-    u8 filler[0x188];
-    struct T t;
-};
-
-s32 Ivy_SetAuxiliaryColliderFlag(struct S *s)
+s32 Ivy_SetAuxiliaryColliderFlag(struct ChaseActor *actor)
 {
-    struct T *t = &s->t;
-    t->flags = 4 | t->flags;
+    struct ContactCollider *collider = &actor->base.colliderB;
+    collider->flags = 4 | collider->flags;
     return 1;
 }
 
 void Collider_SetPosition(void *, void *, u32);
 
-s32 Ivy_UpdateColliderPosition(u8 *s)
+s32 Ivy_UpdateColliderPosition(struct ChaseActor *actor)
 {
-    Collider_SetPosition(s + 0x134, s + 0x5c, 0);
+    Collider_SetPosition(&actor->base.colliderA, &actor->base.body.position, 0);
     return 1;
 }
 
@@ -1228,15 +1218,10 @@ void Ivy_WaitForHold(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct SClearAnimationRestartFlag {
-    u8 filler[0x000002B1];
-    u8 f;
-};
-
-void Ivy_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
+void Ivy_ClearAnimationRestartFlag(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
+    if (actor->base.field2B1 != 0)
+        actor->base.field2B1 = 0;
 }
 
 /* Count frames; after 30, restart the phase (the count still advances).
@@ -1244,14 +1229,14 @@ void Ivy_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
    too: without it cse carries values across and reload picks other
    registers. */
 
-void Ivy_WaitThenResetPhase(u8 *p)
+void Ivy_WaitThenResetPhase(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(s32 *)(p + 0x2AC) > 30)
-        Ivy_ResetPhase(p);
-    (*(s32 *)(p + 0x2AC))++;
+    if ((s32)actor->base.counter2AC > 30)
+        Ivy_ResetPhase((u8 *)actor);
+    actor->base.counter2AC++;
 }
 
 void Ivy_BeginRelease(struct ChaseActor *actor);
@@ -1325,27 +1310,17 @@ void Ivy_UpdateIdle(struct ChaseActor *actor)
     }
 }
 
-extern const u8 gUnk_086063E4[];
+extern void *gUnk_086063E4[];
 
-extern const u8 gUnk_086063D4[];
+extern void *gUnk_086063D4[];
 
-extern const u8 gUnk_086063F4[];
+extern void *gUnk_086063F4[];
 
-struct P {
-    const u8 *a;
-    u32 pad;
-};
-
-struct SInitControlPresets {
-    u8 filler[0x284];
-    struct P p[3];
-};
-
-void Ivy_InitControlPresets(struct SInitControlPresets *s)
+void Ivy_InitControlPresets(struct ChaseActor *actor)
 {
-    s->p[0].a = gUnk_086063E4;
-    s->p[1].a = gUnk_086063D4;
-    s->p[2].a = gUnk_086063F4;
+    actor->base.callbacks284 = gUnk_086063E4;
+    actor->base.behaviorCallbacks = gUnk_086063D4;
+    actor->base.callbacks294 = gUnk_086063F4;
 }
 
 void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame);
@@ -1442,16 +1417,9 @@ void Ivy_NotifyGroup(void)
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-struct SInitProfileId {
-    u8 filler[0x98];
-    u8 b;
-    u8 f2[0x308 - 0x99];
-    s32 v;
-};
-
-void Ivy_InitProfileId(struct SInitProfileId *s)
+void Ivy_InitProfileId(struct ChaseActor *actor)
 {
-    s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
 struct IvyContext {
@@ -1724,23 +1692,16 @@ s32 Callback_InvokeActor(void *, void *);
 
 void SceneActorControl_DispatchControl(void *);
 
-s32 Ivy_SetAuxiliaryColliderFlag(struct S *s);
+s32 Ivy_SetAuxiliaryColliderFlag(struct ChaseActor *actor);
 
-s32 Ivy_UpdateColliderPosition(u8 *s);
+s32 Ivy_UpdateColliderPosition(struct ChaseActor *actor);
 
-struct SUpdate {
-    u8 filler[0x27c];
-    u32 *tbl;
-    u8 filler2[0x2a8 - 0x280];
-    u8 idx;
-};
-
-s32 Ivy_Update(struct SUpdate *s)
+s32 Ivy_Update(struct ChaseActor *actor)
 {
-    Ivy_SetAuxiliaryColliderFlag(s);
-    Callback_InvokeActor(s, s->tbl[s->idx]);
-    SceneActorControl_DispatchControl(s);
-    Ivy_UpdateColliderPosition(s);
+    Ivy_SetAuxiliaryColliderFlag(actor);
+    Callback_InvokeActor(actor, actor->base.stateCallbacks[actor->base.state2A8]);
+    SceneActorControl_DispatchControl(actor);
+    Ivy_UpdateColliderPosition(actor);
     return 1;
 }
 
@@ -1816,9 +1777,9 @@ u32 Ivy_Destroy(struct SDestroy *s)
     return 0;
 }
 
-void Ivy_InitProfileId(struct SInitProfileId *s);
+void Ivy_InitProfileId(struct ChaseActor *actor);
 
-s32 Ivy_Update(struct SUpdate *s);
+s32 Ivy_Update(struct ChaseActor *actor);
 
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
@@ -1828,7 +1789,7 @@ void Ivy_TickDrawable(struct ChaseActor *actor);
 
 void SceneActor_InitCollision5005(struct ChaseActor *actor);
 
-void Ivy_InitControlPresets(struct SInitControlPresets *s);
+void Ivy_InitControlPresets(struct ChaseActor *actor);
 
 void SceneActor_BeginReaction22(struct ChaseActor *actor);
 
