@@ -88,7 +88,9 @@ struct ScenePoolActor {
     u8 unknownad[3];
     struct ActorDrainState drain;
     s32 forwardBias; /* +0xc0, added to forwardSpeed (tentative) */
-    u8 unknownc4[0xc];
+    u8 unknownc4[4];
+    s32 unknownc8; /* cleared with the speeds when the removal effects start */
+    u8 unknowncc[4];
     struct StatModifier modifiers[24];
     u8 unknown2b0[4];
     u8 emissionProfile[0xc]; /* observed descriptor prefix; full extent is unknown */
