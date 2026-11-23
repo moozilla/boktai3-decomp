@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "task4e01_projectile.h"
 #include "player.h"
+#include "contact_collider.h"
 
 /* Shared attack, pursuit, impact, and landing state. Behavior names are tentative. */
 struct SceneVolumeActor {
@@ -28,17 +29,22 @@ struct SceneVolumeActor {
     void *callback;
     u8 pad108[4];
     struct Player *target;
-    u8 pad110[4];
+    void *positionSource;
     s8 alternateDirection;
-    u8 pad115[0x173];
+    u8 pad115[0x63];
+    struct ContactCollider collider;
+    u8 pad1CC[0xBC];
     u8 bounds[0x1C];
     s16 destination[4];
     u8 animationState[0x20];
     u8 animation;
-    u8 pad2CD[0x5F];
-    u8 effect[0x13C];
-    s16 height;
-    u8 pad46A[6];
+    u8 pad2CD[0x47];
+    void *sequence;
+    u8 pad318[0x14];
+    u8 effect[0x138];
+    u32 effectFlags;
+    s16 height, activityTimer;
+    u8 pad46C[4];
     u8 slowDown, impactDirection, speed, impactCount;
     u8 pad474[0x14];
     struct Task4E01Params projectileParameters;
@@ -47,13 +53,19 @@ struct SceneVolumeActor {
     u8 reached, pathId, pointId;
     u8 pad4E5[3];
     u8 transition, previousChoice, decisionMode, decisionIndex;
-    u8 pad4EC[8];
+    u8 pad4EC[4];
+    u16 activity;
+    u8 pad4F2[2];
     s16 attackFlags;
     u8 pad4F6[2];
     s16 projectilePower;
     u8 pad4FA[2];
     s16 parameter;
-    u8 pad4FE[0x722];
+    u8 pad4FE[6];
+    u8 sequenceState, pad505, pendingReset, pad507;
+    u32 sequenceLength;
+    u8 pad50C[0xF4];
+    u8 sequenceBuffer[0x620];
     u8 pathPosition[8];
 };
 
