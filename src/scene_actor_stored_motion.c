@@ -471,7 +471,7 @@ u32 Bat_Destroy(struct S *s)
         Anim_Remove(p + 0x20);
     Heap_Free(p);
     m = 0x100;
-    if (SceneActorChase_TestField((u16 *)((u8 *)s + 0x2c0), m))
+    if (SceneActorChase_TestField(&s->h2c0, m))
         SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
     {
         u8 *r = (u8 *)s + 0x320;

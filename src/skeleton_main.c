@@ -48,13 +48,13 @@ u8 Skeleton_RerouteToTarget(void *obj)
     u8 *group = (u8 *)&actor->group.common;
     struct ChaseTarget **slot = (struct ChaseTarget **)((u8 *)actor + 0xDC);
     s32 cell;
-    Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
+    Chase_SnapToRoute(actor->group.destination, (u8 *)actor + 0x448);
     {
         struct ChaseTarget *t = *slot;
         cell = Chase_CellIndex(t->position.x >> 8, t->position.z >> 8);
     }
     if (cell == actor->base.terrainCell || Chase_Bits32(&gPlayers[0]->statusFlags, 0x20000)) {
-        SceneActor_DispatchContextAction(*(void **)((u8 *)actor + 0x3D0), 0);
+        SceneActor_DispatchContextAction(actor->base.context, 0);
         goto done;
     }
     {
@@ -133,11 +133,11 @@ void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
     if (actor->base.controlKind != 0x39)
         return;
     {
-        u32 *flags = (void *)((u8 *)actor + 0x130);
+        u32 *flags = &actor->base.saved.privateFlags;
         *flags &= ~2;
     }
     {
-        u32 *flags = (void *)((u8 *)actor + 0x2CC);
+        u32 *flags = &actor->base.behaviorFlags;
         u32 mask = ~3;
         *flags &= mask;
     }
@@ -294,7 +294,7 @@ static inline u32 ReadFlags16(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u16 *flags;
-    flags = (void *)((u8 *)actor + 0x2D4);
+    flags = &actor->base.motionFlags;
     return *flags & mask;
 }
 
@@ -302,7 +302,7 @@ static inline u32 ReadFlags32(struct ChaseActor *actor, u32 inputMask)
 {
     u32 mask = inputMask;
     u32 *flags;
-    flags = (void *)((u8 *)actor + 0x2D0);
+    flags = &actor->base.statusFlags;
     return *flags & mask;
 }
 
@@ -410,7 +410,7 @@ static inline void Hide(struct ChaseActor *actor)
         tile->flags |= one;
     }
     {
-        ActorShadow_Disable((void *)((u8 *)actor + 0x320));
+        ActorShadow_Disable(actor->base.shadow);
     }
 }
 
@@ -431,7 +431,7 @@ static inline void Show(struct ChaseActor *actor)
         tile->flags &= mask;
     }
     {
-        ActorShadow_Enable((void *)((u8 *)actor + 0x320));
+        ActorShadow_Enable(actor->base.shadow);
     }
 }
 
@@ -500,7 +500,7 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
                     u32 mask = ~0x4000;
                     *flags &= mask;
                 }
-                ActorShadow_Enable((void *)((u8 *)actor + 0x320));
+                ActorShadow_Enable(actor->base.shadow);
             } else {
                 u32 one = 1;
                 if (actor->base.drawableKind == 0) {
@@ -518,7 +518,7 @@ void Skeleton_UpdateVisibilityFlicker(struct ChaseActor *actor)
                     u32 mask = ~0x8000;
                     *flags &= mask;
                 }
-                ActorShadow_Disable((void *)((u8 *)actor + 0x320));
+                ActorShadow_Disable(actor->base.shadow);
             }
         }
     }
@@ -1380,7 +1380,7 @@ void Skeleton_RestorePursuitRoute(struct ChaseActor *actor)
     }
     destination->y = CellHeight(destination, CellIndex(destination));
     {
-        (*(struct ContactPosition **)((u8 *)group + 0x200))->pad = 0;
+        (group->destination)->pad = 0;
         if (!Chase_RestorePursuitRoute(actor, group, 0x200))
             Callback_InvokeActor(actor, group->failure);
     }
@@ -1895,7 +1895,7 @@ s32 SceneActorTarget_ResolvePendingObjectSkeleton(struct ChaseActor *actor)
 {
     struct ChaseActor *owner = actor;
     struct SceneActorTargetLink *state;
-    s32 *pendingId = (void *)((u8 *)owner + 0x304);
+    s32 *pendingId = &owner->base.counter304;
     if (*pendingId > 0) {
         struct Delta {
             s16 x, y, z, pad;
@@ -2173,7 +2173,7 @@ u8 SceneActorReaction_TrySink(struct ChaseActor *actor)
         u16 cellFlags = *(u16 *)(SceneActorTerrain_GetCell(actor->base.terrainCell) + 2);
         if (cellFlags & 0x40 && actor->base.body.position.y + (s16)actor->base.heightOffset <=
                                     actor->base.groundHeight) {
-            void *sink = *(void **)((u8 *)actor + 0x238);
+            void *sink = actor->base.sinkCallback;
             if (!sink)
                 SceneActorChase_SetControl(actor, SceneActorReaction_SinkAndRemove, 0x16);
             else
@@ -2200,7 +2200,7 @@ s32 SceneActorReaction_TickHiddenResponse(struct ChaseActor *actor)
     struct ChaseActor *saved = actor;
     u32 mask = 0x4000;
     u16 *field;
-    field = (void *)((u8 *)actor + 0x2D4);
+    field = &actor->base.motionFlags;
     if (*field & mask) {
         u32 mask = 0x10000;
         u32 *input;
@@ -2400,7 +2400,7 @@ void SceneActor_TryForward(void *a, void *b, struct ChaseActor *actor)
         actor->base.context--;
         return;
     }
-    if (*((u8 *)state + 0x6D0))
+    if (state->active6D0)
         return;
     SceneActorReaction_HandleColliderContact(a, b, actor);
 }
@@ -2440,7 +2440,7 @@ void SceneActorReaction_TryStartContact(u8 *source, u16 *contact, struct ChaseAc
     if (!SceneActorControl_CanTurnTowardTarget(actor))
         return;
     SceneActorControl_BeginTimedBehavior56(actor, state);
-    *((u8 *)state + 0x6D0) = 20;
+    state->active6D0 = 20;
     actor->base.reactionDirection = actor->base.tracking.heading + 0x80;
 }
 
@@ -3523,7 +3523,7 @@ void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
             (ParticleRandom_ReadRelativeSample(origin, (const u16 *)RANDOM_TABLE_ADDR) & 0x1F) +
             0x18;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x11);
-        ActorShadow_Enable((u8 *)actor + 0x320);
+        ActorShadow_Enable(actor->base.shadow);
     } else {
         if (**(u8 **)((u8 *)actor + 0x6C) & 1) {
             actor->base.secondaryMotion.x = taken;
@@ -3560,7 +3560,7 @@ void SceneActorReaction_TickHiddenTimeout(struct ChaseActor *p, s32 elapsed)
         ((struct ContactCollider *)((u8 *)state + 0x624))->flags |= mask;
         ((struct ContactCollider *)((u8 *)state + 0x678))->flags |= mask;
         SceneActorAnimation_SelectDirectionalEntry(&p->base, 0x11);
-        ActorShadow_Disable((u8 *)p + 0x320);
+        ActorShadow_Disable(p->base.shadow);
     } else {
         if (Mod(elapsed, 10) == 0 && SceneActorReaction_TrySink(p))
             return;

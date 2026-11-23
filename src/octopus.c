@@ -139,7 +139,7 @@ void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
             a4 = actor->base.attacks.second[0];
             a5 = actor->base.attacks.flags[0];
             a6 = actor->base.attacks.parameter[0];
-            SpriteEffect_SpawnTowardObject((u8 *)actor + 0x50, player + 0x24, a3, a4, a5, a6);
+            SpriteEffect_SpawnTowardObject(&actor->base.body, player + 0x24, a3, a4, a5, a6);
             Sound_PlaySong(0x1E0);
         }
         HideCollider(actor);
@@ -451,7 +451,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
 void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct Octopus *context = actor->base.context;
-    void *group = (u8 *)actor + 0x3D4;
+    void *group = &actor->group;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct SceneActorBody *target;
     u8 quadrant, flip;
@@ -1597,7 +1597,7 @@ struct SceneActorBody *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *
                                         &other->base.body.position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
-            target = (void *)((u8 *)other + 0x50);
+            target = &other->base.body;
     }
     if (!target)
         return 0;
