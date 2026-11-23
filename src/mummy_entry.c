@@ -3886,11 +3886,11 @@ s32 Mummy_OnUpdate(struct SOnUpdate *s)
     return 1;
 }
 
-void SceneActor_UpdateBehaviorCallbacks(void);
+void SceneActor_UpdateBehaviorCallbacks(void *);
 
-s32 Mummy_OnInteractionUpdate(void)
+s32 Mummy_OnInteractionUpdate(void *actor)
 {
-    SceneActor_UpdateBehaviorCallbacks();
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
@@ -3970,7 +3970,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor);
 
 void Mummy_OnClearActivityFlag(struct SOnClearActivityFlag *s);
 
-s32 Mummy_OnInteractionUpdate(void);
+s32 Mummy_OnInteractionUpdate(void *);
 
 s32 Mummy_OnReleaseResources(u8 *);
 
