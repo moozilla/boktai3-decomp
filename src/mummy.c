@@ -7,6 +7,7 @@
 #include "scene_actor_turn.h"
 #include "display_sequence.h"
 #include "scene_actor_chase.h"
+#include "scene_actor_chase_shared.h"
 
 /* Records attack contacts and queues a timed reaction (tentative). */
 
@@ -24,11 +25,6 @@ static inline u8 Mummy_IsAttackBlocked(u8 *c)
 }
 
 void *SceneActorContacts_FindObjectById(u16);
-
-static inline u32 Mummy_TestOwnerFlag(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
 
 static inline u8 Mummy_LoadContactLatch(struct Mummy *state, u16 **saved, u32 mask)
 {
@@ -61,7 +57,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     if (kindIndex <= 7) {
         u16 *flags;
         if ((!Mummy_LoadContactLatch(state, &flags, 0x800)) &&
-            Mummy_TestOwnerFlag(&((struct Player *)obj->owner)->statusFlags, 8))
+            SceneActorChase_Bits32(&((struct Player *)obj->owner)->statusFlags, 8))
             return;
         {
             u32 mask = ~0x800;
@@ -82,7 +78,7 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
         }
         if ((!(*((u16 *)Mummy_ResponseAddress(
                 (u32) & ((struct ChaseActor *)0)->base.colliderA.responseValue, base)))) &&
-            Mummy_TestOwnerFlag(&((struct Player *)obj->owner)->statusFlags, 0x200)) {
+            SceneActorChase_Bits32(&((struct Player *)obj->owner)->statusFlags, 0x200)) {
             base->base.hitOwners = 1;
             base->base.hitReactionFlags = 4;
             base->base.hitAttributes = 0;
@@ -157,11 +153,6 @@ void Actor_InitLaunchVelocity(struct ChaseActor *);
 
 s32 Math_Atan2(s32, s32);
 
-static inline u32 ReadFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
-
 void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
 {
     struct SceneActorBody *body = &actor->base.body;
@@ -179,7 +170,7 @@ void SceneActor_UpdateDirectionalAnimation(struct ChaseActor *actor)
         if (sequence->index == 4 && sequence->elapsed == 0)
             Sound_PlaySong(0x101);
     }
-    if (ReadFlags(actor, 0x10)) {
+    if (SceneActorChase_StatusFlags(actor, 0x10)) {
         u16 *flags = &actor->base.motionFlags;
         u32 mask = ~0x100;
         mask &= *flags;
@@ -338,11 +329,6 @@ static inline void StoreHalf(struct ChaseActor *a, u32 v)
     a->base.paletteTimer = value;
 }
 
-static inline void SetHalf(struct ChaseActor *a, u16 mask)
-{
-    a->base.motionFlags = mask | a->base.motionFlags;
-}
-
 // confidence=low: waits for the recovery timer before restoring route animation.
 
 void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
@@ -353,7 +339,7 @@ void Mummy_UpdateRecoveryWait(struct ChaseActor *a)
         SceneActorAttachment_ReplaceResponseSlot(a, 0, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(a, 1, 127, 0);
         SceneActorAttachment_ReplaceResponseSlot(a, 3, 127, 0);
-        SetHalf(a, 16);
+        SceneActorChase_SetMotionFlags(a, 16);
     }
     SceneActorAnimation_SelectDirectionalEntry((void *)a, 1);
     a->base.field2C2 = Div(64, 6);
