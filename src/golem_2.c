@@ -21,15 +21,6 @@ void SceneActorBehavior_CallActionScript(u8 *);
 
 void Golem_ResetIdleControl(u8 *);
 
-inline static u8 TakeFlag(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void SceneActorEffects_AdvanceSteps(void *, u32);
 
 void SceneActorTerrain_ClearCollisionTimers(struct RoomActor *);
@@ -61,7 +52,7 @@ void Golem_UpdateDefeat(struct ChaseActor *actor)
     struct ScriptUtilityArguments arguments;
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     u16 script;
-    if (TakeFlag(&actor->base.field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 10);
         actor->base.restart = 0;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 127, 0);
@@ -497,7 +488,7 @@ s32 Golem_UpdateHitReaction(struct ChaseActor *actor)
 
 void Golem_UpdateScriptedAction(struct ChaseActor *obj)
 {
-    if (TakeFlag(((u8 *)obj) + 0x2B1)) {
+    if (SceneActorControl_TakeFlag(((u8 *)obj) + 0x2B1)) {
         u16 *h;
         u16 value;
         s32 off;
