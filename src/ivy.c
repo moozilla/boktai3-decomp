@@ -2,6 +2,7 @@
 #include "scene_actor_reset.h"
 #include "ivy_phase.h"
 #include "ivy.h"
+#include "phase_object.h"
 #include "word_flags.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
@@ -2539,86 +2540,47 @@ void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseConta
     }
 }
 
-struct SInitBobbing {
-    u8 filler[0x64];
-    u16 h64;
-    u16 h66;
-    u16 h68;
-    u16 h6a;
-    u16 h6c;
-    u16 h6e;
-    u16 h70;
-    u8 f3[0xcf8 - 0x72];
-    u32 cnt;
-};
-
-void Ivy_InitBobbing(struct SInitBobbing *s)
+void Ivy_InitBobbing(struct PhaseObject *s)
 {
-    s->h64 = 0;
-    s->h66 = 0;
-    s->h68 = 0;
-    s->h6c = 0;
-    s->h6e = 1;
-    s->h70 = 0;
-    s->cnt = 0x14;
+    s->offsetX = 0;
+    s->unknown66 = 0;
+    s->offsetZ = 0;
+    s->scatterStepX = 0;
+    s->unknown6E = 1;
+    s->scatterStepZ = 0;
+    s->bobbingTimer = 0x14;
 }
 
-struct SUpdateBobbing {
-    u8 filler[0x66];
-    u16 h66;
-    u8 f2[0x6e - 0x68];
-    u16 h6e;
-    u8 f3[0xb86 - 0x70];
-    u16 hb86;
-    u8 f4[0xcf8 - 0xb88];
-    u32 cnt;
-};
-
-void Ivy_UpdateBobbing(struct SUpdateBobbing *s)
+void Ivy_UpdateBobbing(struct PhaseObject *s)
 {
-    u32 *c = &s->cnt;
+    u32 *c = &s->bobbingTimer;
     if ((*c & 3) == 0)
-        s->h66 += s->h6e;
+        s->unknown66 += s->unknown6E;
     *c = *c - 1;
     if (*c == 0) {
-        s->h6e = -s->h6e;
+        s->unknown6E = -s->unknown6E;
         *c = 0x28;
     }
-    s->hb86 += s->h66;
+    s->position.y += s->unknown66;
 }
 
 u32 Terrain_GetHeightAt(void *);
 
-struct SUpdateGroundHeight {
-    u8 filler[0xb84];
-    u8 a[0xd00 - 0xb84];
-    u32 v;
-    u8 f2[0xd80 - 0xd04];
-    s32 n;
-};
-
-void Ivy_UpdateGroundHeight(struct SUpdateGroundHeight *s)
+void Ivy_UpdateGroundHeight(struct PhaseObject *s)
 {
-    if (s->n > 7)
-        s->v = (u16)Terrain_GetHeightAt(s->a);
+    if ((s32)s->frame > 7)
+        s->landingHeight = (u16)Terrain_GetHeightAt(&s->position);
 }
-
-struct PWaitForRetarget {
-    u8 f[0xcd4];
-    void (*cb)(void);
-    u8 g[0x1c];
-    s32 n;
-};
 
 struct IvyAnchorActor;
 
 void Ivy_UpdateAnchorApproach(struct IvyAnchorActor *actor);
 
-void Ivy_WaitForRetarget(struct PWaitForRetarget *p)
+void Ivy_WaitForRetarget(struct PhaseObject *p)
 {
-    if (--p->n == 0) {
-        p->n = 300;
-        p->cb = Ivy_UpdateAnchorApproach;
+    if (--p->scatterDelay == 0) {
+        p->scatterDelay = 300;
+        p->retarget = (void *)Ivy_UpdateAnchorApproach;
     }
 }
 
@@ -2655,7 +2617,7 @@ s32 Math_Atan2(s32, s32);
 
 void ChildGroup_UpdateOrbitingMembers(void);
 
-void Ivy_WaitForRetarget(struct PWaitForRetarget *p);
+void Ivy_WaitForRetarget(struct PhaseObject *p);
 
 static inline s32 Ivy_ScaleDirection(s32 value)
 {
@@ -2707,24 +2669,15 @@ void Ivy_UpdateAnchorApproach(struct IvyAnchorActor *actor)
 
 void ColorPulse_PrepareTargetDash(void);
 
-struct SWaitForPrimaryActionCompletion {
-    u8 filler[0xcd8];
-    void (*fp)(void);
-    u8 f2[0xcf0 - 0xcdc];
-    u32 v;
-    u8 f3[0xd53 - 0xcf4];
-    s8 b;
-};
-
-void Ivy_WaitForPrimaryActionCompletion(struct SWaitForPrimaryActionCompletion *s)
+void Ivy_WaitForPrimaryActionCompletion(struct PhaseObject *s)
 {
-    u32 v = s->v;
-    if (v != 0) {
-        if ((u8)Callback_InvokeActor(s, v) != 0)
-            s->b++;
+    void *update = s->phaseUpdate;
+    if (update != 0) {
+        if ((u8)Callback_InvokeActor(s, update) != 0)
+            s->actionCompletions++;
     }
-    if (s->b > 1) {
-        s->b = 0;
-        s->fp = ColorPulse_PrepareTargetDash;
+    if (s->actionCompletions > 1) {
+        s->actionCompletions = 0;
+        s->transition = (void *)ColorPulse_PrepareTargetDash;
     }
 }
