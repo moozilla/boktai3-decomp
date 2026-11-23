@@ -3,6 +3,7 @@
 #include "scene_actor_reaction.h"
 #include "runtime.h"
 #include "scene_actor_chase_shared.h"
+#include "scene_actor_damage_flash.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
@@ -35,11 +36,7 @@ void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *actor)
         u32 mask = ~0x2000;
         *flags = mask & *flags;
     }
-    {
-        u16 *flags = &actor->base.reactionFlags;
-        u32 mask = ~0x980;
-        *flags = mask & *flags;
-    }
+    SceneActorDamage_ClearHitReaction(actor);
     if (actor->base.health > 0)
         return;
     SceneActorTerrain_ClearCollisionTimers((void *)actor);

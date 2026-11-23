@@ -27,4 +27,12 @@ static inline void SceneActorDamage_MarkFlashing(u32 *behaviorFlags)
     *behaviorFlags |= bit;
 }
 
+/* Ending a hit clears the reaction bits 0x980. */
+static inline void SceneActorDamage_ClearHitReaction(struct ChaseActor *actor)
+{
+    u16 *flags = &actor->base.reactionFlags;
+    u32 mask = ~0x980;
+    *flags = mask & *flags;
+}
+
 #endif

@@ -59,11 +59,7 @@ void SceneActorReaction_ApplyCategoryDamage(struct ChaseActor *actor)
         actor->base.hitLockTimer = zero;
     }
     SceneActorTerrain_ClearCollisionTimers(actor);
-    {
-        u16 *flags = &actor->base.reactionFlags;
-        u32 mask = ~0x980;
-        *flags = mask & *flags;
-    }
+    SceneActorDamage_ClearHitReaction(actor);
     if (actor->base.health <= 0) {
         collider->responseValue = 0;
         ActorStatus_ClearDrawableFlags(actor, 1);

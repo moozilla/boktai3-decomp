@@ -70,11 +70,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
             u32 zero = 0;
             *flags2D4 = 0x40;
             actor->base.field2E6 = zero;
-            {
-                u16 *flags2D6 = &actor->base.reactionFlags;
-                s32 mask = ~0x980;
-                *flags2D6 &= mask;
-            }
+            SceneActorDamage_ClearHitReaction(actor);
             return;
         }
         {
@@ -167,11 +163,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                     u32 zero = 0;
                     *flags2D4 = 0x40;
                     actor->base.field2E6 = zero;
-                    {
-                        u16 *flags2D6 = &actor->base.reactionFlags;
-                        s32 mask = ~0x980;
-                        *flags2D6 &= mask;
-                    }
+                    SceneActorDamage_ClearHitReaction(actor);
                 } else {
                     u32 mask = 0x803E;
                     flags = *flags2D4;
