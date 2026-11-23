@@ -18,7 +18,8 @@ struct VanargandBodyAnimation {
 /* The body's current action sequence: Vanargand_StopActionSequence clears its step and
  * timer and stops its song. */
 struct VanargandActionSequence {
-    u8 unknown0[0x15];
+    u8 unknown0[0x14];
+    u8 playerReady; /* 0x14 (body +0x230): player action mode is 0 or 2 (tentative). */
     u8 step;
     u16 timer;
     u8 unknown18[0x1E0 - 0x18];
@@ -101,6 +102,11 @@ struct VanargandPairAttack {
     u8 unknownF3E[6];
     void *afterimages;
 };
+
+static inline u32 VanargandPairAttack_TestFlags(const struct VanargandPairAttack *owner, u32 mask)
+{
+    return owner->flags & mask;
+}
 
 static inline void VanargandPairAttack_SetFlags(struct VanargandPairAttack *owner, u32 flags)
 {
