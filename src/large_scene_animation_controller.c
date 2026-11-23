@@ -1785,20 +1785,18 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
     u8 *sprite;
     u32 h;
     u8 *collider;
-    u16 hz;
     u8 bz;
     AnimData_Load(anim, 0xc7f0);
     AnimData_SelectPaletteBank(anim, 0x1a3);
     sprite = t->suspendedSprite;
     Sprite_Init(sprite, anim, 0);
     *(u32 *)sprite |= 1;
-    hz = 0;
     bz = 0;
-    *(u16 *)(sprite + 0x10) = hz;
+    *(u16 *)(sprite + 0x10) = 0;
     *(struct Pos081944C4 *)&t->suspendedPosX = gUnk_0824F4E4;
     t->suspendedState = bz;
     t->terrainCellsRegistered = bz;
-    t->suspendedTimer = hz;
+    t->suspendedTimer = 0;
     h = t->attackPower >> 1;
     collider = t->suspendedCollider;
     Collider_Init(collider, t->actorId, 0x2001, 0, 16, (void *)gUnk_0824F4EC,
@@ -3779,9 +3777,7 @@ s32 Nidhoggr_DestroyCutscene(struct Nidhoggr *t)
 void Nidhoggr_ReadOptions(struct Nidhoggr *p)
 {
     u32 value;
-    u8 zero8;
     p->maxLife = value = Script_GetKeywordValue('l', 4000);
-    zero8 = 0;
     p->life = value;
     p->maxHp = Script_GetKeywordValue('g', 100);
     p->optionY = Script_GetKeywordValue('Y', 1000);
@@ -3793,11 +3789,11 @@ void Nidhoggr_ReadOptions(struct Nidhoggr *p)
     p->targetSourceX = 0;
     p->targetSourceY = 0;
     p->targetSourceZ = 0;
-    p->targetMode = zero8;
+    p->targetMode = 0;
     if (Script_SeekToKeyword('c')) {
         p->targetSourceX = Script_GetValue();
         p->targetSourceY = Script_GetValue();
-        p->targetMode = zero8;
+        p->targetMode = 0;
     }
     if (Script_SeekToKeyword('f')) {
         p->targetSourceX = Script_GetValue();
