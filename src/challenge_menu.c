@@ -109,18 +109,13 @@ void ChallengeMenu_StartFadeOut(struct ChallengeMenu *menu)
     ChallengeMenu_SetState(menu, ChallengeMenu_UpdateFadeOut);
 }
 
-static inline void HideWidget(struct SceneInputWidget *widget)
-{
-    widget->flags |= 1;
-}
-
 void ChallengeMenu_HideWidgets(struct ChallengeMenu *menu)
 {
     s32 i;
     for (i = 0; i < 4; i++)
-        HideWidget(&menu->widgets[i]);
-    HideWidget(&menu->widgets[4]);
-    HideWidget(&menu->widgets[5]);
+        SceneInputWidget_Hide(&menu->widgets[i]);
+    SceneInputWidget_Hide(&menu->widgets[4]);
+    SceneInputWidget_Hide(&menu->widgets[5]);
 }
 
 void ChallengeMenu_HandleInput(struct ChallengeMenu *menu)
@@ -218,11 +213,6 @@ void ChallengeMenu_UpdateSelection(struct ChallengeMenu *menu)
     ChallengeMenu_HandleInput(menu);
 }
 
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
 s32 ChallengeMenu_UpdateWidgets(struct ChallengeMenu *menu)
 {
     s32 *selection = &menu->selection;
@@ -241,17 +231,17 @@ s32 ChallengeMenu_UpdateWidgets(struct ChallengeMenu *menu)
         position->y = (*selection - 1) << 4;
     }
     Palette_UpdateHighlightPulse(menu->highlightPalette, &menu->highlightPhase);
-    ShowWidget(&menu->widgets[3]);
+    SceneInputWidget_Show(&menu->widgets[3]);
     if (menu->selection == 0) {
-        HideWidget(&menu->widgets[2]);
+        SceneInputWidget_Hide(&menu->widgets[2]);
     } else if (menu->selection <= 3) {
         rank = ChallengeMenu_GetRankKeyframe(
             ChallengeMenu_GetStoredRank(menu->group, menu->selection - 1));
         if (rank >= 0) {
             Anim_LoadKeyframe(&menu->widgets[2], &menu->resources[1], (u16)rank, 0);
-            ShowWidget(&menu->widgets[2]);
+            SceneInputWidget_Show(&menu->widgets[2]);
         } else {
-            HideWidget(&menu->widgets[2]);
+            SceneInputWidget_Hide(&menu->widgets[2]);
         }
     }
 }
