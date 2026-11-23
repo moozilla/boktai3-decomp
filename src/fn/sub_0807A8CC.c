@@ -118,7 +118,7 @@ s32 SceneActorMotion_Update(struct ChaseActor *object)
         u32 moving = *field & mask;
         behavior = field;
         if (moving && !ActorStatus_BodyFlags(actor, 0x20))
-            actor->base.body.movementProbe = (u8 *)actor + 0x40;
+            actor->base.body.movementProbe = actor->base.movementProbe;
         else
             actor->base.body.movementProbe = 0;
     }

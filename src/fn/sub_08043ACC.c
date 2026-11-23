@@ -35,7 +35,7 @@ u32 ContactActorPool_Update(struct ContactActorPool *poolInput)
         if (pool->fadeMode >= 0) {
             void *first = gPaletteBankData + 0x5A60;
             void *second = gPaletteBankData + 0x5AA0;
-            Palette_InterpolateBanks((u8 *)pool + 0x1700, first, second, pool->fadeLevel, 6);
+            Palette_InterpolateBanks(pool->tileData, first, second, pool->fadeLevel, 6);
         }
         if (pool->hideRequested) {
             ContactActorPool_HideSlots(pool);

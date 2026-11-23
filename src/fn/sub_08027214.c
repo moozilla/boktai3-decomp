@@ -132,7 +132,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
 
     if (base->entered) {
         base->entered = 0;
-        SceneActors_RunFirstEventScript(base, (u8 *)base + 0x260);
+        SceneActors_RunFirstEventScript(base, base->scriptContext);
         if (base->entryMode == 1) {
             s32 angle = base->heading + 0x80;
             struct DeathState state;
@@ -151,16 +151,15 @@ void sub_08027214(struct DeathActor *base, s32 tick)
                 base->facing8 = direction;
             }
             sequence = (base->mode & 1) ? 0xB : 0x31;
-            SceneActors_StartDirectionalAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
-                                                  sequence, 2, 1, 4);
+            SceneActors_StartDirectionalAnimation(base, base->body, base->overlay, sequence, 2, 1,
+                                                  4);
             Death_SetState(&base->state, state);
             base->elapsed = 0;
             Sound_PlaySongChecked(0x359);
         } else {
             u32 flash = Death_GetMode(base) & 1;
             s32 sequence = flash ? 0x20 : 0x46;
-            SceneActors_StartUnmirroredAnimation(base, (u8 *)base + 0x240, (u8 *)base + 0x220,
-                                                 sequence, 1, 0);
+            SceneActors_StartUnmirroredAnimation(base, base->body, base->overlay, sequence, 1, 0);
             base->minimumScale = 0;
             base->maximumScale = 0;
             base->variant = 0;
@@ -202,7 +201,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
     if (p->retreatTimer) {
         p->retreatTimer--;
         {
-            s16 *origin = (s16 *)((u8 *)p + 0x32c);
+            s16 *origin = &p->origin.x;
             s32 dx = origin[0] - *(s16 *)(pos + 0);
             s32 dy = origin[2] - *(s16 *)(pos + 4);
             s32 angle = Math_Atan2(dx, dy);
@@ -215,8 +214,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             p->delay = 8;
             if (base->frame > 4) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 2);
-                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
-                                                     2, 0);
+                SceneActors_StartUnmirroredAnimation(base, p->body, p->overlay, 0x21, 2, 0);
                 Sound_PlaySongChecked(0x350);
             }
             break;
@@ -227,8 +225,7 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             p->delay = 8;
             if (base->frame > 4) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 2);
-                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x21,
-                                                     2, 0);
+                SceneActors_StartUnmirroredAnimation(base, p->body, p->overlay, 0x21, 2, 0);
                 p->mode &= ~1;
                 Sound_PlaySongChecked(0x359);
             }
@@ -239,16 +236,14 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             }
             if (p->animationFlags & 2) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 3);
-                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x22,
-                                                     2, 0);
-                sub_08022878((u8 *)p + 0x260);
+                SceneActors_StartUnmirroredAnimation(base, p->body, p->overlay, 0x22, 2, 0);
+                sub_08022878(p->scriptContext);
             }
             break;
         case 3:
             if (p->animationFlags & 2) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 4);
-                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x23,
-                                                     2, 0);
+                SceneActors_StartUnmirroredAnimation(base, p->body, p->overlay, 0x23, 2, 0);
             }
             break;
         case 4:
@@ -257,15 +252,14 @@ void sub_08027214(struct DeathActor *base, s32 tick)
             }
             if (p->animationFlags & 2) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 5);
-                SceneActors_StartUnmirroredAnimation(base, (u8 *)p + 0x240, (u8 *)p + 0x220, 0x24,
-                                                     2, 0);
+                SceneActors_StartUnmirroredAnimation(base, p->body, p->overlay, 0x24, 2, 0);
             }
             break;
         case 5:
             if (p->animationFlags & 2) {
                 SceneActorState_EnterReactionPhase((struct StateActor *)base, 6);
                 Bestiary_UnlockEntry(0x4D);
-                SceneActors_RunSecondEventScript(base, (u8 *)p + 0x260);
+                SceneActors_RunSecondEventScript(base, p->scriptContext);
             }
             break;
         case 6:

@@ -43,11 +43,11 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
             u32 zero;
             u8 *first;
             state = 3;
-            first = (u8 *)actor + 0x2A8;
+            first = &actor->base.state2A8;
             zero = 0;
             *first = state;
-            *((u8 *)actor + 0x2A9) = zero;
-            *((u8 *)actor + 0x2AA) = zero;
+            actor->base.phase2A9 = zero;
+            actor->base.behavior2AA = zero;
             actor->base.counter2AC = zero;
             actor->base.field2B1 = 1;
         }
@@ -62,6 +62,6 @@ void SceneActorReaction_BeginFadedState(struct ChaseActor *actor)
             field = &actor->base.statusFlags;
             *field |= mask;
         }
-        ActorShadow_Disable((u8 *)actor + 0x320);
+        ActorShadow_Disable(actor->base.shadow);
     }
 }

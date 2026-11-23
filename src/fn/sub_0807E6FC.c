@@ -15,6 +15,6 @@ void SceneActorEffects_EmitRandomOffsets(struct ChaseActor *actor, s32 count, u3
         gRandomIndex = (gRandomIndex + 1) & 0x3FF;
         random = table.samples[gRandomIndex];
         offset.y = -Mod(random >> 3, spanY) - 6;
-        EffectGroup_Spawn((u8 *)actor + 0x47C, mode, value, &offset);
+        EffectGroup_Spawn(actor->group.effectConfig, mode, value, &offset);
     }
 }

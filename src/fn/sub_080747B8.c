@@ -105,8 +105,8 @@ done:;
                 category != 0xe && category != 0xc)
                 SceneParticleBurst_CreateWithPause(position, &actor->base.secondaryMotion, burst, 6,
                                                    2, 4);
-            if (*(void **)((u8 *)actor + 0x240))
-                Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x240));
+            if (actor->base.field240)
+                Callback_InvokeActor(actor, actor->base.field240);
             actor->base.heightOffset = 0;
         }
     }

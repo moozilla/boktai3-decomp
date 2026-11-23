@@ -68,7 +68,7 @@ u8 ActorAttachment_TickRemoval(void *owner, void *slotInput)
                     {
                         struct ActorAttachmentOwner *recovered = owner;
                         u32 *occupied;
-                        occupied = (u32 *)((u8 *)recovered + 0xA1C);
+                        occupied = &recovered->occupiedSlots;
                         bit <<= id;
                         *occupied &= ~bit;
                     }
