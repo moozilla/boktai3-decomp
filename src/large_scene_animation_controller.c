@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_pause.h"
 
 void SceneAnimation_UpdateSlotAnimation10(struct Nidhoggr *p, s32 i)
 {
@@ -1068,10 +1069,6 @@ void Nidhoggr_InitBackgrounds(struct Nidhoggr *t)
     t->bgMode = 0;
 }
 
-struct Vec081935B8 {
-    s16 x, y, z;
-};
-
 void BgGfx_LoadTilemapAtPosition(u32, s32, s32);
 
 static inline s32 Shift5(s32 x)
@@ -1084,7 +1081,7 @@ static inline s32 Shift5(s32 x)
     return r;
 }
 
-static inline void Project(struct Vec081935B8 *out, struct Vec081935B8 *v)
+static inline void Project(struct SceneVec *out, struct SceneVec *v)
 {
     s32 s, h;
     s32 x, z;
@@ -1099,8 +1096,8 @@ static inline void Project(struct Vec081935B8 *out, struct Vec081935B8 *v)
 
 void Nidhoggr_UpdateBackgroundScroll(struct Nidhoggr *t)
 {
-    struct Vec081935B8 d;
-    Project(&d, (struct Vec081935B8 *)&t->pos);
+    struct SceneVec d;
+    Project(&d, &t->pos);
     d.x = gCameraOrigin[0] - d.x;
     d.y = gCameraOrigin[1] + 10 - d.y;
     d.z = d.z - gCameraOrigin[2];
@@ -1134,11 +1131,7 @@ void Nidhoggr_SetBackgroundMode(struct Nidhoggr *t, u32 mode)
     }
 }
 
-struct Vec081936F8 {
-    s16 x, y, z, w;
-};
-
-extern const struct Vec081936F8 gUnk_0824F478[];
+extern const struct SceneVec gUnk_0824F478[];
 
 void TerrainModifiers_RegisterCell(void *, u32, u32, s32, u32, u32);
 
@@ -1710,11 +1703,7 @@ void Nidhoggr_DestroyParts(struct Nidhoggr *p)
     } while (i <= 0x19);
 }
 
-struct Pos081944C4 {
-    u32 a, b;
-};
-
-extern const struct Pos081944C4 gUnk_0824F4E4;
+extern const struct ContactPosition gUnk_0824F4E4;
 
 extern const u8 gUnk_0824F4EC[], gUnk_0824F4F4[];
 
@@ -1734,7 +1723,7 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
     *(u32 *)sprite |= 1;
     bz = 0;
     *(u16 *)(sprite + 0x10) = 0;
-    *(struct Pos081944C4 *)&t->suspendedPosX = gUnk_0824F4E4;
+    t->suspendedPos = gUnk_0824F4E4;
     t->suspendedState = bz;
     t->terrainCellsRegistered = bz;
     t->suspendedTimer = 0;
@@ -1810,19 +1799,8 @@ u32 Nidhoggr_IsSuspendedObjectHidden(struct Nidhoggr *p)
  * pointer directly in a register and indexes the jitter pair through it rather than via
  * a separate pointer variable, which this draft did not reproduce. confidence=low. */
 
-struct SuspendedJitter {
-    s16 x, y, z;
-};
-
-struct SuspendedOffset {
-    s16 x;
-    s16 pad;
-    s16 z;
-    s16 pad2;
-};
-
 extern const u8 gUnk_0824F4FC[];
-extern const struct SuspendedOffset gUnk_0824F504[];
+extern const struct ContactPosition gUnk_0824F504[];
 void Nidhoggr_CreateThreePointBurst(const void *);
 
 void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
@@ -1837,17 +1815,17 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             sp = t->suspendedSprite;
             *(u32 *)sp &= ~1;
             *(u16 *)(sp + 0x10) = 1;
-            t->suspendedPosX = 0xdc0;
-            t->suspendedPosY = 0xfcc0;
-            t->suspendedPosZ = 0xa80;
+            t->suspendedPos.x = 0xdc0;
+            t->suspendedPos.y = 0xfcc0;
+            t->suspendedPos.z = 0xa80;
             t->suspendedState++;
             t->suspendedTimer = 0x14;
             Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
             break;
         case 2:
-            t->suspendedPosY += 0x33;
-            if (t->suspendedPosY > -0x140)
-                t->suspendedPosY = 0xfec0;
+            t->suspendedPos.y += 0x33;
+            if (t->suspendedPos.y > -0x140)
+                t->suspendedPos.y = 0xfec0;
             if ((s16)--t->suspendedTimer <= 0)
                 t->suspendedState++;
             break;
@@ -1856,7 +1834,7 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             *(u16 *)(sp2 + 0x10) = 0;
         }
             Collider_Refresh(&t->suspendedCollider);
-            Collider_SetPosition(&t->suspendedCollider, &t->suspendedPosX, 0);
+            Collider_SetPosition(&t->suspendedCollider, &t->suspendedPos, 0);
             t->suspendedState++;
             Sound_PlaySongChecked(0x1be);
             break;
@@ -1869,11 +1847,11 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
         case 6: {
             u16 *tm = &t->suspendedTimer;
             u32 i = *tm & 7;
-            const struct SuspendedOffset *tab = gUnk_0824F504;
-            const struct SuspendedOffset *e;
+            const struct ContactPosition *tab = gUnk_0824F504;
+            const struct ContactPosition *e;
             e = tab + i;
-            t->suspendedPosX = 0xdc0 + e->x;
-            t->suspendedPosZ = 0xa80 + e->z;
+            t->suspendedPos.x = 0xdc0 + e->x;
+            t->suspendedPos.z = 0xa80 + e->z;
             (*tm)++;
             break;
         }
@@ -1884,13 +1862,13 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             t->suspendedState++;
             break;
         case 8:
-            t->suspendedPosY -= 0x33;
-            if (t->suspendedPosY < -0x340) {
+            t->suspendedPos.y -= 0x33;
+            if (t->suspendedPos.y < -0x340) {
                 {
                     u8 *sp = t->suspendedSprite;
                     *(u32 *)sp |= 1;
                 }
-                t->suspendedPosY = 0xfcc0;
+                t->suspendedPos.y = 0xfcc0;
                 t->suspendedState = 0;
                 Nidhoggr_CreateThreePointBurst(gUnk_0824F4FC);
             }
@@ -2078,10 +2056,6 @@ void Nidhoggr_SetPart23SpecialAnimation(u32 a)
     Nidhoggr_ChangeCompletedPartState(a, 0x17, 0x32);
 }
 
-struct Vec08194CB8 {
-    s16 x, y, z, w;
-};
-
 void Sound_PlaySongChecked(u32);
 
 static inline s32 Random2(void)
@@ -2090,9 +2064,9 @@ static inline s32 Random2(void)
     return gUnk_086141BC[gEffectRandomTableIndex];
 }
 
-void Nidhoggr_PlayNearbyRandomSound(struct Vec08194CB8 *pos)
+void Nidhoggr_PlayNearbyRandomSound(struct SceneVec *pos)
 {
-    struct Vec08194CB8 d;
+    struct SceneVec d;
     d.x = pos->x - gGameState->positionX;
     d.z = pos->z - gGameState->positionZ;
     if (d.x < 0)
@@ -2171,7 +2145,7 @@ void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
                     t->flags[5]--;
                 } else {
                     Nidhoggr_SelectRandomPart22Animation(t);
-                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x66FC));
+                    Nidhoggr_PlayNearbyRandomSound((struct SceneVec *)((u8 *)t + 0x66FC));
                     t->flags[5] = gUnk_0824F584[t->flags[3]];
                 }
                 break;
@@ -2200,7 +2174,7 @@ void Nidhoggr_UpdateDamageFlashAndPartAnimations(struct Nidhoggr *t)
                     t->flags[6]--;
                 } else {
                     Nidhoggr_SelectRandomPart23Animation(t);
-                    Nidhoggr_PlayNearbyRandomSound((struct Vec08194CB8 *)((u8 *)t + 0x6750));
+                    Nidhoggr_PlayNearbyRandomSound((struct SceneVec *)((u8 *)t + 0x6750));
                     t->flags[6] = gUnk_0824F584[t->flags[4]];
                 }
                 break;
@@ -3023,11 +2997,6 @@ void SceneAnimation_InitTimedCollider(void *);
 
 void Sound_StopSong(u32);
 
-static inline u32 Tst2(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-
 static inline u32 Tst32(u32 mask, u32 *p)
 {
     return *p & mask;
@@ -3106,7 +3075,7 @@ void Nidhoggr_UpdateTimedAttackSequence(struct Nidhoggr *t)
             break;
         case 7:
             if (!t->flags[1]) {
-                if (!Tst2(0x400, &gEngineFlags, &gScenePauseFlags) && !Tst32(4, &gUnk_02000560))
+                if (!Engine_PauseBits(0x400) && !Tst32(4, &gUnk_02000560))
                     SceneAnimation_InitTimedCollider(t);
                 else {
                     Nidhoggr_UnregisterTerrainCells(t);
@@ -3565,7 +3534,7 @@ s32 Nidhoggr_Update(struct Nidhoggr *t)
 {
     Nidhoggr_CheckActivationTriggers(t);
     Nidhoggr_UpdateState(t);
-    if (Tst2(0x400, &gEngineFlags, &gScenePauseFlags) || Tst32(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Tst32(4, &gUnk_02000560))
         t->flags[0] = 0;
     if (t->flags[0]) {
         Collider_Refresh(&t->timedCollider);
