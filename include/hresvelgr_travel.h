@@ -61,6 +61,7 @@ struct HresvelgrTravelActor {
     u16 normalPalette[16][16]; /* 0x424: copied from bank 0x2F0 at initialization. */
     u8 pad624[0x704 - 0x624];
     u16 flashPalette[7][16]; /* 0x704: initialized to RGB555 gray. */
+    void *linked; /* 0x7E4: actor notified by Hresvelgr_BeginLinkedAnimation. */
 };
 
 /* StateActor_ConsumeActionEntry on this type. */

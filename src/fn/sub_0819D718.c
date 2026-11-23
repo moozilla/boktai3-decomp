@@ -4,9 +4,7 @@ void Hresvelgr_UpdateActionTwoRequest(struct HresvelgrTravelActor *p)
 {
     struct HresvelgrTravelActor *q = p;
     if (Hresvelgr_EnterVulnerableBehavior(q)) {
-        s32 kind = 2;
-        u8 *field = &p->requestedAnimation;
-        *field = kind;
+        Hresvelgr_SetActionAnimation(p, 2);
     }
     if (p->finished)
         q->behaviorFinished = 1;

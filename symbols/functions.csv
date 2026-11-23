@@ -7304,6 +7304,7 @@ addr,name,mode,confidence,source,notes
 0819E25C,ActorAction_FinishRecoveryAnimation,thumb,low,src-alias,
 0819E2D4,ActorState_Hold35,thumb,low,src-alias,
 0819E344,ActorState_Restart,thumb,low,src-alias,
+0819E3B4,Hresvelgr_BeginLinkedAnimation,thumb,low,src-alias,Requests animation 38 unless already playing and notifies the linked actor on entry
 0819E408,Hresvelgr_SelectNextBehavior,thumb,low,src-alias,
 0819E5EC,Hresvelgr_UpdatePrimaryBehavior,thumb,low,src-alias,Clears the advance flag and dispatches the primary behavior phase before evaluating behavior transitions
 0819E620,Hresvelgr_UpdateSecondaryBehavior,thumb,low,src-alias,Clears the advance flag and dispatches the secondary behavior phase
