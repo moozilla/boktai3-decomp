@@ -1264,16 +1264,16 @@ void Ivy_WaitThenResumeActive(struct ChaseActor *actor)
    block there, so cse does not carry `sub` across it: the ROM keeps sub in
    a register instead of folding sub + 0x42 into p + 0x416. */
 
-void Ivy_WaitLimitThenResetPhase(u8 *p)
+void Ivy_WaitLimitThenResetPhase(struct ChaseActor *actor)
 {
-    u8 *sub = p + 0x3D4;
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(u16 *)(sub + 0x42) <= *(s32 *)(p + 0x2AC))
-        Ivy_ResetPhase(p);
+    if (group->common.gate.duration <= (s32)actor->base.counter2AC)
+        Ivy_ResetPhase((u8 *)actor);
     else
-        (*(s32 *)(p + 0x2AC))++;
+        actor->base.counter2AC++;
 }
 
 void SceneActorTerrain_DisableCollision(void *);
