@@ -134,8 +134,11 @@ const GOALS = {
         const live = L.people();
         const targets = live.length ? live.map((q) => ({ key: q.id.toString(16), x: q.x, z: q.z, addr: q.addr }))
           : (stageOf(here).talk || []).filter((t) => t.kind === 'character').map((t) => ({ key: String(t.id), x: t.x, z: t.z }));
-        for (const t of targets.filter((t) => !TRIED.has(`${here}:talk:${t.key}`))) {
-          TRIED.add(`${here}:talk:${t.key}`);
+        // twice each (a second talk can say more: San Miguel's flag r708[0x19c.4][6] is set
+        // on the second talk in 2370), again when the story counter moved
+        const tkey = (t, n) => `${here}:talk:${t.key}:${L.story()}:${n}`;
+        for (const t of targets.filter((t) => !TRIED.has(tkey(t, 2)))) {
+          TRIED.add(TRIED.has(tkey(t, 1)) ? tkey(t, 2) : tkey(t, 1));
           const story0 = L.story(), now = t.addr ? L.people().find((q) => q.addr === t.addr) : null;
           const r = yield* L.interact(now ? now.x : t.x, now ? now.z : t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
           // a shop or service menu the talk opened: back out of it
