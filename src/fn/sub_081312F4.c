@@ -6,14 +6,9 @@
 u8 sub_0812F3CC(struct ChaseActor *);
 // confidence=low: selects a route return phase from motion and route flags.
 
-static inline void *SavedControl(u8 *group)
-{
-    void **field = (void *)(group + 0x214);
-    return *field;
-}
 void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     u8 result;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         SceneActorTerrain_InstallControl(actor, actor->base.onEntry, 2);
@@ -28,7 +23,7 @@ void SceneActorRoute_UpdateReturnEntry(struct ChaseActor *actor)
             u16 flags = SceneActorContact_MotionFlags(actor, 0x10);
             if (flags) {
                 SceneActorTerrain_EnterState(actor, 0, 0, 8);
-                SceneActorControl_Begin(actor, SavedControl(group), 0x13, result);
+                SceneActorControl_Begin(actor, group->routeChoiceControl, 0x13, result);
             } else {
                 u32 bits = actor->base.behaviorFlags & 0x10;
                 if (bits)

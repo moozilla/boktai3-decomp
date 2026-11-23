@@ -50,9 +50,9 @@ static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
     return best;
 }
 
-static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slot)
+static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *group, struct Player **slot)
 {
-    void *shape = *(void **)(group + 0x1fc);
+    void *shape = group->route;
     struct ContactPosition *position = &actor->base.body.position;
     void *destination = &(*slot)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
@@ -70,7 +70,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slo
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
 u32 sub_08137AFC(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 best = FindNearestEligiblePlayer(actor);
 
     if (best < 0)
