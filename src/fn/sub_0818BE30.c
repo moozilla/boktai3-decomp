@@ -1,6 +1,6 @@
 #include "global.h"
 #include "contact_collider.h"
-struct ContactColliderOwner {
+struct ArmorColliderOwner {
     u8 pad0[0xD4];
     u8 position[8];
     u8 padDC[0x190 - 0xDC];
@@ -21,10 +21,10 @@ static inline void addCategory(struct ContactCollider *p, u32 mask)
 {
     p->statRewardFlags |= mask;
 }
-void Armor_InitCombatColliders(struct ContactColliderOwner *input, u32 inputId)
+void Armor_InitCombatColliders(struct ArmorColliderOwner *input, u32 inputId)
 {
     struct ContactCollider *c_2;
-    struct ContactColliderOwner *p = input;
+    struct ArmorColliderOwner *p = input;
     u32 id = inputId;
     s32 value, power;
     s32 defense;
