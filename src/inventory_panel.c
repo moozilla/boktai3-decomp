@@ -7,6 +7,7 @@
 #include "monster_particle_random.h"
 #include "engine.h"
 #include "ram.h"
+#include "vanargand_projectiles.h"
 
 /* Tentative inventory display family, inferred from slot and item consumers. */
 
@@ -349,13 +350,6 @@ extern const s16 gUnk_086149C4[];
 
 void *AnimData_FindEntry(s32);
 
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
-}
-
 static inline u32 Arg1(u32 k_, s32 angle)
 {
     return angle + k_;
@@ -390,8 +384,8 @@ void InventoryPanel_StartCallbackBurst(struct InventoryPanel *panel, s32 index, 
             Effect_SetPalette(sprite, 0);
             angle = ((i * 32) + (((s32)ParticleRandom_ReadSample(table) >> 3) & 0xf)) - 8;
             scale = (((s32)ParticleRandom_ReadDirectSample(table) >> 3) & 1) + 3;
-            entry->velocityX = Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
-            entry->velocityY = Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
+            entry->velocityX = VanargandProjectile_Scale(gUnk_086149C4[Arg1(0x40, angle) & 0xff] * scale);
+            entry->velocityY = VanargandProjectile_Scale(gUnk_086149C4[angle & 0xff] * scale) - 2;
             entry->sprite.position.x = entry->velocityX + x;
             entry->sprite.position.y = entry->velocityY + y;
             state->active = 1;
