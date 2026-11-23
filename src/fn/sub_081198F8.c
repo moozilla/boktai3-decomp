@@ -105,6 +105,6 @@ void Glove_UpdateRestingMotion(struct Glove *p)
     }
 
     CharacterModel_UpdateAccessoryAnimations(&p->model);
-    ActorParticles_UpdateEmitter(self, (u8 *)self + 0x44, U32(self, 0x5C));
+    ActorParticles_UpdateEmitter(self, &self->emitter, U32(self, 0x5C));
     p->timer++;
 }

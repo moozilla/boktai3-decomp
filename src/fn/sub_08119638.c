@@ -104,9 +104,9 @@ void Glove_UpdateStaggerReturn(struct Glove *p)
     }
 
     CharacterModel_UpdateAccessoryAnimations(&p->model);
-    ActorParticles_UpdateEmitter(self, (u8 *)self + 0x44, U32(self, 0x5C));
+    ActorParticles_UpdateEmitter(self, &self->emitter, U32(self, 0x5C));
     if (complete == 1) {
-        Trigger_ConsumePending((u8 *)p + 0x870, 1);
+        Trigger_ConsumePending(&p->queue, 1);
         {
             void (*callback)(void *) = Glove_UpdateStaggerRecoil;
             u8 *active = &p->active;
