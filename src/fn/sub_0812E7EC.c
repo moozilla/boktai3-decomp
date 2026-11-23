@@ -1,6 +1,7 @@
 #include "scene_event_dispatch.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_chase_reaction.h"
+#include "scene_actor_status.h"
 struct ActorCommand {
     u8 unknown0[6];
     u8 command, unknown7;
@@ -51,12 +52,6 @@ static inline void Command_SetMotionFlag(u32 bits, struct SceneActorChaseFlags16
     field->value = bits | field->value;
 }
 
-static inline u8 HasFlag(struct ChaseActor *actor, u32 mask)
-{
-    if (actor->base.placementFlags & mask)
-        return 1;
-    return 0;
-}
 static inline u8 HasGroup(struct ChaseActor *actor)
 {
     if (actor->base.object == (void *)1)
@@ -85,7 +80,7 @@ s32 SceneActorReaction_DispatchPendingCommands(struct ChaseActor *input)
     union CommandWorkspace workspace;
     u32 category;
     s32 i;
-    if (!HasFlag(actor, 0x100))
+    if (!ActorStatus_BodyFlags(actor, 0x100))
         return 0;
     if (HasGroup(actor))
         group = &actor->group;
