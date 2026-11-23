@@ -1,5 +1,5 @@
 #define gActorLayeredEndAnimations gUnk_0824EDE8
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 extern const u32 gActorLayeredEndAnimations[];
 void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void ActorController_UpdateLayeredEnd(struct SceneCombatActor *actor)
