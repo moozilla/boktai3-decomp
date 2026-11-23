@@ -1,52 +1,25 @@
 #include "global.h"
-struct Slot {
-    u8 pad[0x854];
-    s32 id;
-    u8 pad2[0x58];
-};
-struct P {
-    u8 pad[0x44];
-    struct Slot slots[4];
-    u8 pad2[0x40];
-    u32 count;
-};
-struct Slot *ScenePool_FindFreeActorSlot(struct P *p)
+#include "scene_pool.h"
+
+struct ScenePoolActor *ScenePool_FindFreeActorSlot(struct ScenePoolManager *p)
 {
-    struct Slot *slot = p->slots;
-    u32 i = 0;
-    u32 total = p->count;
-    if (i < total) {
-        u32 offset = 0x854;
-        s32 empty = -1;
-        u32 stride = 0x8b0;
-        u32 count;
-        count = total;
-        do {
-            if (*(s32 *)((u8 *)slot + offset) == empty)
-                return slot;
-            i++;
-            slot = (struct Slot *)((u8 *)slot + stride);
-        } while (i < count);
+    struct ScenePoolActor *slot = p->actors;
+    u32 i;
+
+    for (i = 0; i < p->configuration; i++, slot++) {
+        if (slot->entryIndex == -1)
+            return slot;
     }
     return 0;
 }
 void Actor_UpdateShadowSpriteParts(void *, void *);
-void ScenePool_UpdateActorDrawablePosition(u8 *p)
+void ScenePool_UpdateActorDrawablePosition(struct ScenePoolActor *p)
 {
-    Actor_UpdateShadowSpriteParts(p, p + 0x600);
+    Actor_UpdateShadowSpriteParts(p, p->model);
 }
-struct TailData {
-    u8 pad[12];
-    u16 timer;
-    u8 flag;
-};
-struct Tail {
-    u8 pad[0x860];
-    struct TailData data;
-};
-void ScenePool_ResetProximityContact(struct Tail *p)
+void ScenePool_ResetProximityContact(struct ScenePoolActor *p)
 {
-    struct TailData *data = &p->data;
-    data->flag = 0;
-    data->timer = 0;
+    struct SpatialEntry *collider = &p->proximityCollider;
+    collider->hit = 0;
+    collider->kind = 0;
 }

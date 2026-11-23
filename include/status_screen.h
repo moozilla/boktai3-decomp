@@ -47,6 +47,12 @@ struct StatusScreen {
     u32 script; // script called when the screen closes (keyword 'e')
 };
 
+static inline void StatusScreen_SetState(struct StatusScreen *p, StatusScreenFn state)
+{
+    p->state = state;
+    p->timer = 0;
+}
+
 // Game state counters shown by the numeric displays (only the fields used here).
 struct StatusGameState {
     u8 pad0[14];

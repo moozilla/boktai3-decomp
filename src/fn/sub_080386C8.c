@@ -1,16 +1,13 @@
 #include "wireless_trade_menu.h"
 #include "global.h"
 #include "render.h"
+#include "engine_pause_flags.h"
 void PaletteLevels_Reset(void);
 int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
 void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
 void WirelessGameMenu_SignalStatusPanel(struct WirelessGameExchange *);
 void WirelessGameItems_StartOutgoingItems(void);
 void Hud_ClearTimer(void);
-static inline void set(u32 mask)
-{
-    gEnginePauseFlags |= mask;
-}
 void WirelessGameMenu_UpdateRoundHandshake(struct WirelessGameExchange *p)
 {
     u32 data;
@@ -21,7 +18,7 @@ void WirelessGameMenu_UpdateRoundHandshake(struct WirelessGameExchange *p)
         PaletteLevels_Reset();
         data = 0;
         WirelessExchange_SendPacket(p, 1, &data, 1);
-        set(4);
+        Engine_SetPauseFlags(4);
         WirelessGameMenu_SetStatusPanelState(p, 1);
         p->local.itemMode = 0;
         WirelessGameItems_StartOutgoingItems();

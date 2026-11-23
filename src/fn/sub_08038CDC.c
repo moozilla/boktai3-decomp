@@ -1,5 +1,6 @@
 #include "wireless_trade_menu.h"
 #include "global.h"
+#include "word_flags.h"
 #include "player.h"
 void PaletteLevels_Reset(void);
 void WirelessExchange_CaptureLocalResult(struct WirelessGameExchange *);
@@ -7,10 +8,6 @@ int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *,
 void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
 void Sound_FadeOutChannel10(int);
 void PlayerCue_Stand(struct Player *, s32);
-static inline u32 test(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 void WirelessGameMenu_UpdateRoundResultExchange(struct WirelessGameExchange *p)
 {
     u32 data;
@@ -31,7 +28,7 @@ void WirelessGameMenu_UpdateRoundResultExchange(struct WirelessGameExchange *p)
                 PlayerCue_Stand(gPlayers[0], -1);
         }
     }
-    if (p->timer > 29 && test(&p->exchangeFlags, 0xc0) == 0xc0) {
+    if (p->timer > 29 && WordFlags_Test(&p->exchangeFlags, WIRELESS_EXCHANGE_ROUND_RESULT) == WIRELESS_EXCHANGE_ROUND_RESULT) {
         p->exchangeFlags &= ~WIRELESS_EXCHANGE_ROUND_RESULT;
         WirelessGameMenu_EnterState(p, WIRELESS_MENU_OUTCOME_EXCHANGE);
     } else

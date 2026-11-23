@@ -4,6 +4,7 @@
 #include "game_state.h"
 #include "render.h"
 #include "ram.h"
+#include "engine_pause_flags.h"
 u8 Registry1745_ConsumeStateEntry(struct AreaEffectLinkState *);
 s32 Registry1745_CheckSessionReady(struct AreaEffectLinkState *);
 void Registry1745_BeginShutdown(struct AreaEffectLinkState *, void (*)(void));
@@ -31,11 +32,10 @@ s32 LinkSelection_WaitForReadyParticipants(struct AreaEffectLinkState *p)
     struct AreaEffectLinkState *session = p;
     s32 count, i, length, result;
     if (Registry1745_ConsumeStateEntry(p)) {
-        u32 mask = 4;
         s16 *counter;
         u16 value;
         s32 increment;
-        gEnginePauseFlags |= mask;
+        Engine_SetPauseFlags(4);
         PaletteLevels_Reset();
         Sound_FadeOutChannel10(6);
         gLinkMenuActive = 0;

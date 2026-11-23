@@ -2,6 +2,7 @@
 #include "render.h"
 #include "display_sequence_inline.h"
 #include "script_utility.h"
+#include "engine_pause_flags.h"
 
 void ActionRecord_CopyFromEntry(u8 *, void *);
 void Presentation_ApplyGraphicData(void *, void *);
@@ -901,29 +902,21 @@ void SelectionMenu_Close(struct SelectionMenu *p)
     if (SelectionMenu_ConsumeCallbackFlag(p))
         ScreenTransition_SendCommand(3, 4, 4, 4, 4, 0xffff, 0);
     if (p->frame == 20) {
-        {
-            u32 *state = &gEnginePauseFlags;
-            int mask;
-            mask = ~4;
-            *state &= mask;
-        }
+        Engine_ClearPauseFlags(4);
         if (p->cancelScript)
             Script_Call(p->cancelScript, 0);
     } else
         (p->frame)++;
 }
 
-void SelectionMenu_Hide(struct SelectionMenu *arg)
+void SelectionMenu_Hide(struct SelectionMenu *p)
 {
-    struct SelectionMenu *p = arg;
-    int i;
-    u32 *state;
     struct SceneInputWidget *g;
+    int i;
     g = &p->panels[0];
     g->flags |= 1;
     g = &p->panels[1];
     g->flags |= 1;
-    state = &gEnginePauseFlags;
     for (i = 0; i < 19; i++)
         p->icons[i].flags |= 1;
     for (i = 0; i < 3; i++)
@@ -932,10 +925,7 @@ void SelectionMenu_Hide(struct SelectionMenu *arg)
         p->markers[i].flags |= 1;
     g = &p->highlight;
     g->flags |= 1;
-    {
-        int clear = ~4;
-        *state &= clear;
-    }
+    Engine_ClearPauseFlags(4);
 }
 
 void SelectionMenu_Confirm(struct SelectionMenu *p)
@@ -1008,10 +998,7 @@ configure:
     SelectionMenu_OpenActorPage(p);
     SelectionMenu_SetCallback(p, SelectionMenu_Choose);
     ScrollingDialogue_RequestShow();
-    {
-        int mask = 4;
-        gEnginePauseFlags |= mask;
-    }
+    Engine_SetPauseFlags(4);
     return 0;
 }
 

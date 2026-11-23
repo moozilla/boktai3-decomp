@@ -2,6 +2,7 @@
 #include "scene_hud_display.h"
 #include "player.h"
 #include "render.h"
+#include "word_flags.h"
 #define SceneHud_GetTilemapCell Hud_GetTilemapCell
 struct SceneHudSlotCounts {
     u8 unknown0[0x5C];
@@ -9,10 +10,6 @@ struct SceneHudSlotCounts {
 };
 extern struct SceneHudSlotCounts *gLinkSession;
 u16 *SceneHud_GetTilemapCell(s32, u32, u32);
-static inline u32 testFlags(const u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 slotCount(s32 slot)
 {
     if (!gLinkSession || slot < 0)
@@ -26,7 +23,7 @@ void SceneHud_DrawSlotMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
     s32 count, i;
     if (mode == 1)
         pulse = 0x29F;
-    else if (testFlags(&hud->actionOwner->statusFlags, 0x10)) {
+    else if (WordFlags_Test(&hud->actionOwner->statusFlags, 0x10)) {
         u32 frame = hud->meterPulseFrame;
         pulse = 0x29F;
         if (frame > 0x24) {

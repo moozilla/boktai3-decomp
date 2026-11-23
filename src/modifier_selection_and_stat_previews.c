@@ -1,5 +1,6 @@
 #include "modifier_list.h"
 #include "ram.h"
+#include "engine_pause.h"
 #include "background_controller.h"
 #include "gba/macro.h"
 #include "gba/syscall.h"
@@ -486,10 +487,6 @@ s32 ModifierMenu_CommitSecondarySource(struct ModifierMenu *p)
 
 void Registry1745_SetMenuRequest(u32);
 
-static inline u32 TestFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 
 void ModifierMenu_CloseScript(struct ModifierMenu *menu)
 {
@@ -498,7 +495,7 @@ void ModifierMenu_CloseScript(struct ModifierMenu *menu)
         Script_Call(*script, 0);
         *script = 0;
     }
-    if (TestFlags(0x800))
+    if (Engine_PauseBits(0x800))
         Registry1745_SetMenuRequest(1);
 }
 

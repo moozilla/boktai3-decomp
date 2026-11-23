@@ -1,5 +1,6 @@
 #include "scene_pool.h"
 #include "spatial_index.h"
+#include "scene_vec_polar.h"
 void ScenePool_InitActorAppearance(void *, struct ScenePoolEntry *, u32, u32);
 void Terrain_ResolveActorMotion(void *);
 void Character_GetHeightAdjustedPosition(void *, struct ContactPosition *);
@@ -107,13 +108,8 @@ void sub_0803BC88(struct ScenePoolActor *a, struct ScenePoolEntry *e, u32 index)
             SpatialIndex_SetPosition(&a->hitCollider, pos.x, pos.y, pos.z);
             contact = &a->hitCollider;
         } else {
-            struct ContactPosition off;
-            struct ContactPosition *o = &off;
-            s32 angle = (s16)*ph;
-            s32 radius = 20;
-            o->x = Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius);
-            o->y = 0;
-            o->z = Scale(gUnk_086149C4[angle & 0xFF] * radius);
+            struct SceneVec off;
+            SceneVec_SetPolarXZ(&off, (s16)*ph, 20);
             SpatialIndex_SetPosition(&a->hitCollider, pos.x + off.x, pos.y, pos.z + off.z);
             contact = &a->hitCollider;
         }

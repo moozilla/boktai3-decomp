@@ -1,4 +1,5 @@
 #include "global.h"
+#include "scene_vec_polar.h"
 // Open: motion-pointer lifetimes, initial control layout and register allocation differ.
 
 struct WirelessSceneActor {
@@ -291,13 +292,8 @@ void ScenePool_UpdateOccupiedActor(u8 *pool, u8 *slot, u8 *item, u32 index)
         if (heading < 0) {
             SpatialIndex_SetPosition((u8 *)actor + 0x52C, pos.x, pos.y, pos.z);
         } else {
-            struct ShortVector off;
-            struct ShortVector *o = &off;
-            s32 angle = (s16)*ph;
-            s32 radius = 20;
-            o->x = Scale(gUnk_086149C4[(angle + 0x40) & 0xFF] * radius);
-            o->y = 0;
-            o->z = Scale(gUnk_086149C4[angle & 0xFF] * radius);
+            struct SceneVec off;
+            SceneVec_SetPolarXZ(&off, (s16)*ph, 20);
             SpatialIndex_SetPosition((u8 *)actor + 0x52C, pos.x + off.x, pos.y, pos.z + off.z);
         }
     }
