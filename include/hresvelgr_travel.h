@@ -10,7 +10,9 @@ struct HresvelgrTravelActor {
     u8 facing;
     u8 pad52[2];
     struct SceneVec position, velocity;
-    u8 pad64[0x9A - 0x64];
+    u8 pad64[0x90 - 0x64];
+    u32 tick; /* 0x90: frames in the current behavior (read by the travel phases). */
+    u8 pad94[0x9A - 0x94];
     u8 vulnerable;
     u8 pad9B;
     u32 flags;
