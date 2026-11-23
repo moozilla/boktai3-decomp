@@ -10,4 +10,9 @@ static inline u8 GameState_TestWorldFlags(u32 mask)
     return 0;
 }
 
+static inline void GameState_SetWorldFlags(u32 mask)
+{
+    gGameState->flags868 |= mask;
+}
+
 #endif

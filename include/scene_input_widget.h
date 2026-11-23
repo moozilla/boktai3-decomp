@@ -51,4 +51,15 @@ struct SceneInputWidget {
     struct SceneInputWidget *previous, *next;
 };
 
+/* flags bit 0 hides the widget's sprite. */
+static inline void SceneInputWidget_Hide(struct SceneInputWidget *widget)
+{
+    widget->flags |= 1;
+}
+
+static inline void SceneInputWidget_Show(struct SceneInputWidget *widget)
+{
+    widget->flags &= ~1;
+}
+
 #endif

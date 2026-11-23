@@ -1,11 +1,8 @@
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 void Sound_PlaySong(u32);
 s32 PlayerContact_ApplySyntheticContact(struct Player *, s32, u32, u32, u32, u32);
-static inline void lockPositionRequests(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
 s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 resetValue,
                              s32 request, u32 option)
 {
@@ -28,7 +25,7 @@ s32 Player_ApplyForcedFacing(struct Player *p, s32 frame, u32 direction, s32 res
         Sound_PlaySong(0xE6);
     if (p->positionResetTimer)
         p->positionResetTimer = 0;
-    lockPositionRequests(&p->statusFlags, 0x40000);
+    Player_SetStatusBits(&p->statusFlags, 0x40000);
     if (request > 0)
         goto startRequest;
 noRequest:

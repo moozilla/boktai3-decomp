@@ -43,10 +43,10 @@ void Player_UpdateInputCadenceCue(struct Player *p)
                     p->indicatorUpdateRate = 16;
                 Player_SetAnimation(p, ActorVariant_GetTableValue(p->actionMode, 1),
                                     p->indicatorUpdateRate, 1);
-                if (!p->actionCueCounter) {
-                    if (!p->actionCueFlags)
+                if (!p->animation.elapsed) {
+                    if (!p->animation.frameIndex)
                         Sound_PlaySong(0x28E);
-                    else if (p->actionCueFlags == 3)
+                    else if (p->animation.frameIndex == 3)
                         Sound_PlaySong(0x28D);
                 }
             } else {

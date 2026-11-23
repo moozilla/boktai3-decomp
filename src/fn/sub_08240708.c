@@ -72,7 +72,7 @@ void Player_UpdateRecoil(struct Player *p)
             break;
         }
         case 1:
-            if (p->actionCueFlags == 3 && p->actionCueCounter == 0) {
+            if (p->animation.frameIndex == 3 && p->animation.elapsed == 0) {
                 Player_PlayLocalSong(p->slot, 0xD1);
                 SelectionSlots_ClearValue(&p->position, p->slot);
             }

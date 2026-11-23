@@ -9,7 +9,7 @@ struct AnimationHeader {
 void sub_0813FE30(struct Player *p)
 {
     struct AnimationHeader *source = ScriptProc_Start(0xCB05, 0xDE23);
-    struct PlayerAnimation *c1;
+    struct SceneInputWidget *c1;
     if (source) {
         *((struct AnimationHeader *)p->animationData) = *source;
         ResourceHeader_Relocate(p->animationData, source);

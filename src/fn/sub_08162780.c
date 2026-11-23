@@ -1,13 +1,9 @@
 #include "global.h"
-struct S {
-    u8 f[0x77c];
-    s32 x;
-};
-extern struct S *gGameState;
+#include "game_state.h"
 void PlayerBarrier_DecrementDuration(void)
 {
-    if (gGameState->x <= 1)
-        gGameState->x = 0;
+    if (gGameState->unk77C <= 1)
+        gGameState->unk77C = 0;
     else
-        gGameState->x--;
+        gGameState->unk77C--;
 }

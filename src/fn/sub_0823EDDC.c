@@ -1,31 +1,19 @@
 #include "global.h"
-struct PairED {
-    u32 a, b;
-};
-u32 Player_GetConfiguredActionPower(u8 *);
+#include "player.h"
+u32 Player_GetConfiguredActionPower(struct Player *);
 void AnimData_SelectPaletteBank(u8 *, u32);
-void Collider_SetAttackProperties(u8 *, u32, u32, u32, u32, u32);
-void sub_0823EDDC(u8 *p)
+void Collider_SetAttackProperties(void *, u32, u32, u32, u32, u32);
+void sub_0823EDDC(struct Player *p)
 {
-    u32 resource, zero;
-    u8 *angle, *tmp;
-    u32 saved;
-    *(struct PairED *)(p + 0xbe8) = *(struct PairED *)(p + 0x30);
-    {
-        u32 y = *(u16 *)(p + 0xbea) + 230;
-        zero = 0;
-        *(u16 *)(p + 0xbea) = y;
-    }
-    {
-        u32 direction = ((p[0x3a4] + 5) & 7) << 5;
-        angle = p + 0xc0c;
-        *(tmp = angle) = direction;
-    }
+    u32 resource;
+    p->statModifierContext.contactOrigin = p->position;
+    p->statModifierContext.contactOrigin.y += 230;
+    p->statModifierContext.contactHeading = ((p->facing + 5) & 7) << 5;
     resource = Player_GetConfiguredActionPower(p);
-    AnimData_SelectPaletteBank(p + 0xb70, 76);
-    Collider_SetAttackProperties(p + 0xb8c, resource, *(u16 *)(p + 0xbfc), 0x2000, zero,
-                                 *(u16 *)(p + 0xbfe));
-    saved = *tmp;
-    p[0xbce] = saved;
-    *(u16 *)(p + 0xc0a) = zero;
+    AnimData_SelectPaletteBank(p->statModifierContext.actionPalette, 76);
+    Collider_SetAttackProperties(&p->statModifierContext.attackCollider, resource,
+                                 p->statModifierContext.actionTimer, 0x2000, 0,
+                                 p->statModifierContext.contactParameter);
+    p->statModifierContext.attackCollider.direction = p->statModifierContext.contactHeading;
+    p->statModifierContext.contactTimer = 0;
 }

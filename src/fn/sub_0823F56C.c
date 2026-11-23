@@ -30,12 +30,11 @@ static inline s32 scale(s32 v)
         return v >> 12;
     return -((-v) >> 12);
 }
-void Player_UpdateChargedDashAttack(u8 *p)
+void Player_UpdateChargedDashAttack(struct Player *p)
 {
-    s32 k2 = 0;
-    switch (*((u8 *)(p + 0x458))) {
+    switch (p->tetherPhase) {
         case 0:
-            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x26),
+            if (Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x26),
                                          0x40)) {
                 Player_SetTetherMode(p, 3, 1);
             }
@@ -43,15 +42,14 @@ void Player_UpdateChargedDashAttack(u8 *p)
 
         case 1:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x27),
-                                     0x40);
-            if ((++(*((u16 *)(p + 0x45A)))) > 6) {
-                *((u8 *)(p + 0xC0F)) = 0;
-                *((u16 *)(p + 0x4D2)) = 0;
-                if ((*((u16 *)(p + 0x428))) <= 2) {
-                    Player_PlayLocalSong(*((u32 *)(p + 0x18)), 0xD5);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 0x40);
+            if ((++(p->tetherFrame)) > 6) {
+                p->statModifierContext.chargeTier = 0;
+                p->contactMagnitude = 0;
+                if ((p->currentStatB) <= 2) {
+                    Player_PlayLocalSong(p->slot, 0xD5);
                     Player_SetTetherMode(p, 3, 5);
-                } else if ((*(*((u16 **)(p + 0x348)))) & 2) {
+                } else if ((*p->inputKeys) & 2) {
                     Player_SetTetherMode(p, 3, 4);
                 } else {
                     goto release;
@@ -61,37 +59,37 @@ void Player_UpdateChargedDashAttack(u8 *p)
 
         case 2:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
-            if (H(0x45A) == 6)
-                Player_PlayLocalSong(W(0x18), 0x1F4);
-            if (!(**(u16 **)(p + 0x348) & 2)) {
-                Player_PlayLocalSong(W(0x18), 0x1F6);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 0x40);
+            if (p->tetherFrame == 6)
+                Player_PlayLocalSong(p->slot, 0x1F4);
+            if (!(*p->inputKeys & 2)) {
+                Player_PlayLocalSong(p->slot, 0x1F6);
                 Player_SetTetherMode(p, 3, 5);
-            } else if (++H(0x45A) > 59) {
-                B(0xC0F) = 1;
-                H(0x4D2) = 30;
+            } else if (++p->tetherFrame > 59) {
+                p->statModifierContext.chargeTier = 1;
+                p->contactMagnitude = 30;
                 ((struct Player *)p)->actionEighteenParameter = 0x16E;
                 ((struct Player *)p)->actionEighteenDuration = 0x24;
-                Player_PlayLocalSong(W(0x18), 0x1F5);
+                Player_PlayLocalSong(p->slot, 0x1F5);
                 Player_SetTetherMode(p, 3, 4);
             }
             break;
         case 4:
             Player_UpdateFacingFromInputHistory(p);
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
-            if (!(**(u16 **)(p + 0x348) & 2)) {
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 0x40);
+            if (!(*p->inputKeys & 2)) {
             release:
-                Player_PlayLocalSong(W(0x18), 0x1F6);
+                Player_PlayLocalSong(p->slot, 0x1F6);
                 Player_SetTetherMode(p, 3, 5);
             }
             break;
         case 5:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x28), 0x40);
-            if ((*(u16 **)(p + 0x348))[1] & 2)
-                B(0xBF6) = 1;
-            if (H(0x4D2)) {
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x28), 0x40);
+            if ((p->inputKeys)[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            if (p->contactMagnitude) {
                 s32 angle, speed;
-                if (H(0x4D2) > 5) {
+                if (p->contactMagnitude > 5) {
                     struct AttackVec offset, size;
                     offset.x = 0;
                     offset.y = 0;
@@ -99,42 +97,41 @@ void Player_UpdateChargedDashAttack(u8 *p)
                     size.x = 32;
                     size.y = 32;
                     size.z = 32;
-                    SceneParticleBurst_CreateWhilePaused(p + 0x30, &offset, &size, 1, 3, 4);
+                    SceneParticleBurst_CreateWhilePaused(&p->position, &offset, &size, 1, 3, 4);
                 }
-                angle = ((B(0x3A4) + 5) & 7) << 5;
-                speed = H(0x4D2);
-                H(0x38) = -scale(gUnk_086149C4[(angle + 64) & 255] * speed);
+                angle = ((p->facing + 5) & 7) << 5;
+                speed = p->contactMagnitude;
+                p->velocityX = -scale(gUnk_086149C4[(angle + 64) & 255] * speed);
                 {
-                    s32 zSpeed = H(0x4D2);
-                    H(0x3C) = -scale(gUnk_086149C4[angle] * zSpeed);
+                    s32 zSpeed = p->contactMagnitude;
+                    p->velocityZ = -scale(gUnk_086149C4[angle] * zSpeed);
                 }
-                *((u16 *)(p + 0x4D2)) = ((*((u16 *)(p + 0x4D2))) * 3) >> 2;
-            } else if ((++(*((u16 *)(p + 0x45A)))) > 4) {
+                p->contactMagnitude = ((p->contactMagnitude) * 3) >> 2;
+            } else if ((++(p->tetherFrame)) > 4) {
                 Player_SetTetherMode(p, 3, 6);
             }
             break;
         case 6: {
             u32 pending;
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(B(0x418), 0x27), 0x40);
-            if ((*(u16 **)(p + 0x348))[1] & 2)
-                B(0xBF6) = 1;
-            pending = B(0xBF6);
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x27), 0x40);
+            if ((p->inputKeys)[1] & 2)
+                p->statModifierContext.bufferedAttack = 1;
+            pending = p->statModifierContext.bufferedAttack;
             if (pending) {
-                B(0xBF6) = 0;
-                B(0x458) = 1;
-            } else if (++H(0x45A) > 14) {
-                *((u8 *)(p + 0xBF6)) = k2;
+                p->statModifierContext.bufferedAttack = 0;
+                p->tetherPhase = 1;
+            } else if (++p->tetherFrame > 14) {
+                p->statModifierContext.bufferedAttack = 0;
                 Player_SetTetherMode(p, 3, 7);
             }
             break;
         }
         case 7:
-            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(*((u8 *)(p + 0x418)), 0x26),
-                                     0x40);
-            if ((++(*((u16 *)(p + 0x45A)))) > 4) {
+            Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 0x26), 0x40);
+            if ((++(p->tetherFrame)) > 4) {
                 Player_SetTetherMode(p, 0, 0);
             }
             break;
     }
-    B(0xAC9) = 4;
+    p->actionVariant = 4;
 }

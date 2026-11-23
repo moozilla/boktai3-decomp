@@ -1,30 +1,17 @@
 #include "global.h"
 #include "player.h"
 #include "contact_actor.h"
+#include "player_slot_status.h"
 #define Player_CheckContactReduction Player_IsActionBlocked
-struct PlayerContactSource {
-    u8 unknown0[0x50];
-    struct Player *owner;
-};
-
 void Collision_CalculateDamageResponse(void *, void *);
 s32 Player_IsActionBlocked(struct Player *);
 s32 sub_08249244(void *, void *, void *, void *);
 void Sound_PlaySong(u32);
-static inline u32 Test16(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-static inline u32 Test32(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
-void Player_AccumulateContactCost(struct PlayerContactSource *source,
-                                  struct ContactCollider *contact)
+void Player_AccumulateContactCost(struct ContactCollider *source, struct ContactCollider *contact)
 {
     struct Player *p;
     s32 i;
-    if (Test16(&contact->contactFlags, 0x10)) {
+    if (ContactCollider_TestContactFlags(contact, 0x10)) {
         p = source->owner;
         Collision_CalculateDamageResponse(source, contact);
         if (p->actionMode == 1) {
@@ -34,7 +21,7 @@ void Player_AccumulateContactCost(struct PlayerContactSource *source,
                 if (contact->flags & 0x100)
                     contact->costFlags |= 8;
             }
-            if ((Test32(&contact->reactionFlags, 0xF80)) && !p->contactCounted) {
+            if ((Player_ReadStatusBits(&contact->reactionFlags, 0xF80)) && !p->contactCounted) {
                 s32 total, count, threshold;
                 s32 *counter;
                 {

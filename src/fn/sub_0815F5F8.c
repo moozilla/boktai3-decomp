@@ -1,23 +1,9 @@
 #include "global.h"
 #include "ram.h"
+#include "target_registry.h"
+#include "scene_object.h"
+#include "contact_collider.h"
 
-struct TargetPosition {
-    s16 x, y, z;
-};
-struct TargetBody {
-    u8 unk_00[0xC];
-    struct TargetPosition position;
-};
-struct TargetEntry {
-    struct TargetBody *body;
-    u32 flags;
-    u32 unk_08;
-    struct TargetEntry *next;
-};
-struct TargetRegistry {
-    u8 unk_00[0x18];
-    struct TargetEntry *first;
-};
 s32 Math_Atan2(s32, s32);
 
 static inline s32 AngleDifference(const s32 angle, const s32 direction)
@@ -26,16 +12,16 @@ static inline s32 AngleDifference(const s32 angle, const s32 direction)
     return (angle - base) & 0xFF;
 }
 
-struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *position, s32 direction, s32 range,
-                                 s32 halfAngle)
+struct MotionTarget *TargetRegistry_FindNearestInCone(struct SceneVec *position, s32 direction,
+                                                      s32 range, s32 halfAngle)
 {
-    struct TargetEntry *entry;
-    struct TargetEntry *best;
+    struct MotionTarget *entry;
+    struct MotionTarget *best;
     s32 distance;
     s32 otherAngle;
-    if (!((struct TargetRegistry *)gSceneLinkList))
+    if (!gSceneLinkList)
         return 0;
-    entry = ((struct TargetRegistry *)gSceneLinkList)->first;
+    entry = gSceneLinkList->first;
     best = 0;
     distance = range * range;
     if (entry) {
@@ -47,13 +33,12 @@ struct TargetEntry *TargetRegistry_FindNearestInCone(struct TargetPosition *posi
                 s32 z;
                 s32 angle;
                 s32 square;
-                /* Both registered body layouts place their coordinates at the same offsets. */
-                if (flags & 0x10) {
-                    x = entry->body->position.x - position->x;
-                    z = entry->body->position.z - position->z;
+                if (flags & MOTION_TARGET_COLLIDER) {
+                    x = entry->target.collider->position.x - position->x;
+                    z = entry->target.collider->position.z - position->z;
                 } else {
-                    x = entry->body->position.x - position->x;
-                    z = entry->body->position.z - position->z;
+                    x = entry->target.actor->position.x - position->x;
+                    z = entry->target.actor->position.z - position->z;
                 }
                 angle = AngleDifference(Math_Atan2(x, z), direction);
                 if (angle <= halfAngle || angle >= otherAngle) {

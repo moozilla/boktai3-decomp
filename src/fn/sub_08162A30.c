@@ -1,10 +1,8 @@
 #include "global.h"
-
-s32 Sprite_Remove(u8 *);
-
-s32 PlayerBarrier_Destroy(u8 *p)
+#include "scene_marker.h"
+s32 PlayerBarrier_Destroy(struct SceneMarker *marker)
 {
-    Sprite_Remove(p + 0xf4);
-    Sprite_Remove(p + 0x120);
+    Sprite_Remove(&marker->primary);
+    Sprite_Remove(&marker->secondary);
     return 0;
 }

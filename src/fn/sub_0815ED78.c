@@ -22,7 +22,7 @@ static inline void ApplyActionMode(struct Player *p, u32 mode, u32 resource)
     p->unk419 = 0;
     p->activeAnimation = &p->animation;
     p->visualState = 0;
-    p->visualPosition = &p->previousPosition;
+    p->visualPosition = &p->animation.position;
 }
 void Player_ApplyLatchedActionMode(struct Player *p)
 {
@@ -43,7 +43,7 @@ void Player_ApplyLatchedActionMode(struct Player *p)
         enchantment = Player_GetUsableEnchantment(p) + 1;
         p->actionVariant = enchantment;
         p->baseActionVariant = enchantment + 1;
-        p->spriteResource = p->baseSpriteResource;
+        p->animation.paletteBank = p->baseSpriteResource;
         p->actionEnabled = Player_IsEnchantmentAvailable(p, *(s8 *)&p->thresholdMode);
         p->actionLatch464 = 0;
     }

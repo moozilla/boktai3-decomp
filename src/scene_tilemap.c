@@ -1,4 +1,5 @@
 #include "scene_tilemap.h"
+#include "gba/io_reg.h"
 
 void SaveMenu_ClearSingleton(void)
 {
@@ -308,11 +309,8 @@ s32 TilemapPanel_Initialize(struct TilemapPanel *panel)
             break;
     }
     Bg_SetPriority(2, 3);
-    *(vu16 *)0x04000018 = 0;
-    {
-        u32 mask = 0x400;
-        gDispCntShadow = mask | gDispCntShadow;
-    }
+    REG_BG2HOFS = 0;
+    Bg_EnableDisplay(DISPCNT_BG2_ON);
     gBgRecords[2].y = 0;
     TilemapPanel_DrawRegion(panel, 0, 0, 0, 0, 8, 1, 4, 20, 0, 0);
     panel->drawnX = 0x100;

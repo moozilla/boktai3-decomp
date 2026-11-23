@@ -1,17 +1,14 @@
 #include "global.h"
 #include "player.h"
+#include "player_slot_status.h"
 
 s32 Div(s32, s32);
 
-static inline u32 MaskFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline u8 HasFixedDelayFlag(struct Player *p)
 {
     u8 result;
     if (p) {
-        u32 flags = MaskFlags(&p->actionFlags, 0x40);
+        u32 flags = Player_ReadStatusBits(&p->actionFlags, 0x40);
         result = 1;
         if (flags)
             goto done;

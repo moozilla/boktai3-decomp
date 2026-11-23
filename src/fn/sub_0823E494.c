@@ -38,13 +38,13 @@ void Player_UpdateSlashAction(struct Player *p)
                 p, ActorVariant_GetTableValue(*mode, *(kind = (u16 *)((u8 *)p + 0xC02))), speed);
             if (*mode == 1) {
                 if (*kind == 0x1C) {
-                    if (p->actionCueFlags == 1 && p->actionCueCounter == 0)
+                    if (p->animation.frameIndex == 1 && p->animation.elapsed == 0)
                         sub_08238CE0(p, p->facing, &p->position, 0);
                 } else if (*kind == 0x1B) {
-                    if (p->actionCueFlags == 1 && p->actionCueCounter == 0)
+                    if (p->animation.frameIndex == 1 && p->animation.elapsed == 0)
                         sub_08238CE0(p, p->facing, &p->position, 1);
                 } else if (*kind == 0x1A) {
-                    if (p->actionCueFlags == 0 && p->actionCueCounter == 1)
+                    if (p->animation.frameIndex == 0 && p->animation.elapsed == 1)
                         sub_08238CE0(p, p->facing, &p->position, 2);
                 }
             }

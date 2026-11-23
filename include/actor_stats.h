@@ -81,4 +81,11 @@ static inline void ActorStats_SetDamageFlags(u8 bits, u8 *flags)
     *flags = bits | *flags;
 }
 
+static inline u8 ActorStats_TestDamageFlags(struct ActorStats *stats, u32 mask)
+{
+    if (stats->damageFlags & mask)
+        return TRUE;
+    return FALSE;
+}
+
 #endif

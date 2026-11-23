@@ -1,4 +1,5 @@
 #include "global.h"
+#include "player_slot_status.h"
 
 struct P08142C1C {
     u8 f0[0x20];
@@ -7,14 +8,10 @@ struct P08142C1C {
     u16 f428;
     u16 f42A;
 };
-static inline u32 tst(u32 *a, u32 m)
-{
-    return *a & m;
-}
 
 s32 Player_CanRecoverResourceWhileFlagged(struct P08142C1C *p)
 {
-    if (tst(&p->f20, 0x10) != 0 && p->f428 < p->f42A)
+    if (Player_ReadStatusBits(&p->f20, 0x10) != 0 && p->f428 < p->f42A)
         return 1;
     return 0;
 }

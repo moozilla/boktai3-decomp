@@ -4,20 +4,6 @@
 
 // confidence=low: selects sweep, vertical-arc or radial reach from the active attack animation.
 #define Player_UpdateAttackColliderMotion sub_0814D264
-struct AttackMotionContext {
-    u8 unknown0[0x48];
-    struct ContactCollider collider;
-    struct SceneVec dest, origin;
-    u8 unknownAC[0xC];
-    u16 attackParameter;
-    u8 unknownBA[2];
-    u16 speed;
-    u8 unknownBE[2];
-    u16 phase1, phase2, unknownC4, timer;
-    u8 heading;
-    u8 unknownC9[0xC];
-    u8 extendedFlags;
-};
 extern const s16 gUnk_086149C4[];
 u32 ActorFlags_GetResponseBits(void *);
 s32 ActorFlags_SelectResponse(void *);
@@ -34,22 +20,9 @@ static inline s32 Scale12(s32 value)
 {
     return value >= 0 ? value >> 12 : -((-value) >> 12);
 }
-static inline void EnableExtendedContact(struct ContactCollider *collider)
-{
-    u32 mask = 0x800000;
-    collider->reactionFlags |= mask;
-}
-struct AttackMotionPlayerFields {
-    u8 unknown0[0x9C];
-    u16 animationDuration;
-    u8 unknown9E[0xB8C - 0x9E];
-    struct ContactCollider collider;
-    u8 unknownBE0[0xC1A - 0xBE0];
-    s16 previousAnimation;
-};
 void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
 {
-    struct AttackMotionContext *q = (struct AttackMotionContext *)&p->statModifierContext;
+    struct PlayerStatModifierContext *q = &p->statModifierContext;
     u32 flags = ActorFlags_GetResponseBits(p);
     s32 power;
     s32 animation;
@@ -67,30 +40,31 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
         case 0x54: {
             s32 angle;
             PlayerAttackEffect_SetEmissionState(1);
-            q->speed = Div(512, ((struct AttackMotionPlayerFields *)p)->animationDuration);
-            q->phase1 = 8;
-            if (((u16)(p->actionCueFlags - 1)) > 1) {
-                ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
+            q->motionSpeed = Div(512, p->animation.durationScale);
+            q->swingFrames = 8;
+            if (((u16)(p->animation.frameIndex - 1)) > 1) {
+                p->statModifierContext.previousAnimation = -1;
                 return;
             }
-            if (((struct AttackMotionPlayerFields *)p)->previousAnimation != 0x54)
+            if (p->statModifierContext.previousAnimation != 0x54)
                 Sound_PlaySong(0x38C);
-            ((struct AttackMotionPlayerFields *)p)->previousAnimation = animation;
-            ++q->timer;
+            p->statModifierContext.previousAnimation = animation;
+            ++q->contactTimer;
             if (p->side) {
-                u8 *heading = &q->heading;
-                angle = ((*heading) - (q->timer * q->speed)) + 0x120;
+                u8 *heading = &q->contactHeading;
+                angle = ((*heading) - (q->contactTimer * q->motionSpeed)) + 0x120;
                 angle &= 255;
             } else {
-                u8 *heading = &q->heading;
-                s32 sum = (q->timer * q->speed) + 0x100;
+                u8 *heading = &q->contactHeading;
+                s32 sum = (q->contactTimer * q->motionSpeed) + 0x100;
                 sum += *heading;
                 angle = sum - 0x20;
                 angle &= 255;
             }
-            q->dest.x = q->origin.x + Scale12(gUnk_086149C4[(angle + 64) & 255] * 160);
-            q->dest.y = q->origin.y;
-            q->dest.z = q->origin.z + Scale12(gUnk_086149C4[angle] * 160);
+            q->contactDestination.x =
+                q->contactOrigin.x + Scale12(gUnk_086149C4[(angle + 64) & 255] * 160);
+            q->contactDestination.y = q->contactOrigin.y;
+            q->contactDestination.z = q->contactOrigin.z + Scale12(gUnk_086149C4[angle] * 160);
             break;
         }
 
@@ -98,65 +72,73 @@ void Player_UpdateAttackColliderMotion(struct Player *p, s32 forced)
             s32 angle;
             s32 radius;
             PlayerAttackEffect_SetEmissionState(2);
-            q->speed = Div(1216, ((struct AttackMotionPlayerFields *)p)->animationDuration);
-            if (p->actionCueFlags <= 1) {
-                ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
+            q->motionSpeed = Div(1216, p->animation.durationScale);
+            if (p->animation.frameIndex <= 1) {
+                p->statModifierContext.previousAnimation = -1;
                 return;
             }
-            if (p->actionCueFlags > 3)
+            if (p->animation.frameIndex > 3)
                 break;
-            if (((struct AttackMotionPlayerFields *)p)->previousAnimation != 0x81)
+            if (p->statModifierContext.previousAnimation != 0x81)
                 Sound_PlaySong(0x386);
-            ((struct AttackMotionPlayerFields *)p)->previousAnimation = animation;
-            ++q->timer;
-            angle = (0x150 - (q->timer * q->speed)) & 255;
-            q->dest.y = q->origin.y + Scale12(gUnk_086149C4[angle & 255] * 250);
+            p->statModifierContext.previousAnimation = animation;
+            ++q->contactTimer;
+            angle = (0x150 - (q->contactTimer * q->motionSpeed)) & 255;
+            q->contactDestination.y =
+                q->contactOrigin.y + Scale12(gUnk_086149C4[angle & 255] * 250);
             radius = Scale12(gUnk_086149C4[(angle + 64) & 255] * 250);
-            q->dest.x = q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radius);
-            q->dest.z = q->origin.z + Scale12(radius * gUnk_086149C4[q->heading]);
+            q->contactDestination.x =
+                q->contactOrigin.x +
+                Scale12(gUnk_086149C4[(q->contactHeading + 64) & 255] * radius);
+            q->contactDestination.z =
+                q->contactOrigin.z + Scale12(radius * gUnk_086149C4[q->contactHeading]);
             break;
         }
 
         case 0x72:
             PlayerAttackEffect_SetEmissionState(3);
-            q->speed = Div(3584, ((struct AttackMotionPlayerFields *)p)->animationDuration);
-            q->phase1 = 0;
-            q->phase2 = 3;
-            ++q->timer;
-            if (q->timer < q->phase1) {
-                ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
-                radialRadius = (q->speed * q->timer) + 0xCC;
-                q->dest.x =
-                    q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radialRadius);
-                q->dest.y = q->origin.y;
-                q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radialRadius);
-            } else if (q->timer < (q->phase1 + q->phase2)) {
-                if (((struct AttackMotionPlayerFields *)p)->previousAnimation != 0x72)
+            q->motionSpeed = Div(3584, p->animation.durationScale);
+            q->swingFrames = 0;
+            q->holdFrames = 3;
+            ++q->contactTimer;
+            if (q->contactTimer < q->swingFrames) {
+                p->statModifierContext.previousAnimation = -1;
+                radialRadius = (q->motionSpeed * q->contactTimer) + 0xCC;
+                q->contactDestination.x =
+                    q->contactOrigin.x +
+                    Scale12(gUnk_086149C4[(q->contactHeading + 64) & 255] * radialRadius);
+                q->contactDestination.y = q->contactOrigin.y;
+                q->contactDestination.z =
+                    q->contactOrigin.z + Scale12(gUnk_086149C4[q->contactHeading] * radialRadius);
+            } else if (q->contactTimer < (q->swingFrames + q->holdFrames)) {
+                if (p->statModifierContext.previousAnimation != 0x72)
                     Sound_PlaySong(0x385);
-                ((struct AttackMotionPlayerFields *)p)->previousAnimation = animation;
-                radialRadius = (q->speed * q->phase1) + 0xCC;
-                q->dest.x =
-                    q->origin.x + Scale12(gUnk_086149C4[(q->heading + 64) & 255] * radialRadius);
-                q->dest.y = q->origin.y;
-                q->dest.z = q->origin.z + Scale12(gUnk_086149C4[q->heading] * radialRadius);
+                p->statModifierContext.previousAnimation = animation;
+                radialRadius = (q->motionSpeed * q->swingFrames) + 0xCC;
+                q->contactDestination.x =
+                    q->contactOrigin.x +
+                    Scale12(gUnk_086149C4[(q->contactHeading + 64) & 255] * radialRadius);
+                q->contactDestination.y = q->contactOrigin.y;
+                q->contactDestination.z =
+                    q->contactOrigin.z + Scale12(gUnk_086149C4[q->contactHeading] * radialRadius);
             }
             break;
 
         default:
-            ((struct AttackMotionPlayerFields *)p)->previousAnimation = -1;
+            p->statModifierContext.previousAnimation = -1;
             break;
     }
 
-    Collider_SetPosition(&q->collider, &q->dest, 0);
-    Collider_Refresh(&q->collider);
-    Collider_SetAttackProperties(&q->collider, power, q->attackParameter, 1, flags,
+    Collider_SetPosition(&q->attackCollider, &q->contactDestination, 0);
+    Collider_Refresh(&q->attackCollider);
+    Collider_SetAttackProperties(&q->attackCollider, power, q->actionTimer, 1, flags,
                                  p->statModifierContext.contactParameter);
-    Collider_SetContactMode(&((struct AttackMotionPlayerFields *)p)->collider,
-                            Player_ComputeActionScale(p, &q->collider));
-    if (q->extendedFlags == 1)
-        EnableExtendedContact((struct ContactCollider *)&q->collider);
+    Collider_SetContactMode(&p->statModifierContext.attackCollider,
+                            Player_ComputeActionScale(p, &q->attackCollider));
+    if (q->thresholdSatisfied == 1)
+        ContactCollider_SetReactionFlags(&q->attackCollider, 0x800000);
     {
-        u8 heading = q->heading;
-        q->collider.direction = heading;
+        u8 heading = q->contactHeading;
+        q->attackCollider.direction = heading;
     }
 }

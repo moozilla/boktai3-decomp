@@ -3,12 +3,6 @@
 #include "engine_globals.h"
 #include "ram.h"
 
-struct Drawable {
-    u32 a, b, flags;
-};
-#define H(o) (*(u16 *)(p + (o)))
-#define W(o) (*(u32 *)(p + (o)))
-#define B(o) (*(u8 *)(p + (o)))
 s32 Player_GetControlFlags(void *, u32);
 void CellObject_Init(void *, void *);
 void Obj_StepPosition(void *);
@@ -20,73 +14,61 @@ void ActorDebris_Show(void *);
 void ActorDebris_Hide(void *);
 void PlayerEffect_SetPaletteSource(void *, u32, u32);
 
-static inline u8 *offsetR1(u8 *p, u32 off)
+void Player_ApplyControlPresentation(struct Player *p)
 {
-    u32 offset = off;
-    return p + offset;
-}
-static inline u8 *offsetR2(u8 *p, u32 off)
-{
-    u32 offset = off;
-    return p + offset;
-}
-void Player_ApplyControlPresentation(u8 *p)
-{
-
-    u32 value = H(0x474);
+    u32 value = p->tetherStatusFlags;
     if (value == 0) {
         if (Player_GetControlFlags(p, 16))
-            W(0x40) = value;
-        else if (!W(0x40)) {
-            void *position = p + 0x284;
-            CellObject_Init(position, p + 0x30);
-            W(0x40) = (u32)position;
+            p->followTarget = (void *)value;
+        else if (!p->followTarget) {
+            void *position = &p->movementContactFlags;
+            CellObject_Init(position, &p->position);
+            p->followTarget = position;
         }
     }
-    Obj_StepPosition(p + 0x24);
-    Actor_EmitTowardNearbyActors(p + 0x24);
+    Obj_StepPosition(&p->positionalEffectGroup);
+    Actor_EmitTowardNearbyActors(&p->positionalEffectGroup);
     if (Player_GetControlFlags(p, 8)) {
-        ((struct Player *)p)->collider.flags |= 4;
+        p->collider.flags |= 4;
     } else {
-        ((struct Player *)p)->collider.flags &= ~4;
-        Collider_SetPosition(&((struct Player *)p)->collider, &((struct Player *)p)->position, 0);
+        p->collider.flags &= ~4;
+        Collider_SetPosition(&p->collider, &p->position, 0);
     }
     if (Player_GetControlFlags(p, 1))
-        ((struct Drawable *)(p + 0x8C))->flags |= 1;
+        SceneInputWidget_Hide(&p->animation);
     else
-        ((struct Drawable *)(p + 0x8C))->flags &= ~1;
+        SceneInputWidget_Show(&p->animation);
     if (Player_GetControlFlags(p, 2))
-        W(0x94) |= 0x200;
+        p->animation.flags |= 0x200;
     else
-        W(0x94) &= ~0x200;
+        p->animation.flags &= ~0x200;
     if (Player_GetControlFlags(p, 64))
-        *(u32 *)offsetR1(p, 0x14C) &= ~1;
+        p->secondaryDrawFlags &= ~1;
     else
-        *(u32 *)offsetR2(p, 0x14C) |= 1;
-    if (Player_GetControlFlags(p, 4) || !*offsetR1(p, 0x740))
-        ActorShadow_Disable(offsetR2(p, 0x700));
+        p->secondaryDrawFlags |= 1;
+    if (Player_GetControlFlags(p, 4) || !p->resetState740)
+        ActorShadow_Disable(p->shadow);
     else
-        ActorShadow_Enable(offsetR1(p, 0x700));
+        ActorShadow_Enable(p->shadow);
     if (Player_GetControlFlags(p, 256) && !Player_GetControlFlags(p, 1)) {
-        ActorDebris_Show((void *)W(0xC84));
-        PlayerEffect_SetPaletteSource((void *)W(0xC84), H(0xC6), W(0xD4));
+        ActorDebris_Show(p->actionDisplay);
+        PlayerEffect_SetPaletteSource(p->actionDisplay, p->animation.paletteBank,
+                                      (u32)p->animation.palette);
     } else
-        ActorDebris_Hide((void *)W(0xC84));
-    H(0x32) += H(0x4EC);
-    *(u64 *)(p + 0xAC) = *(u64 *)(p + 0x30);
-    H(0xAC) += H(0x4E6);
-    H(0xAE) += H(0x4E8);
-    H(0xB0) += H(0x4EA);
-    if (B(0x53D)) {
+        ActorDebris_Hide(p->actionDisplay);
+    p->position.y += p->actionCountdown;
+    p->animation.position = *(struct ContactPosition *)&p->position;
+    p->animation.position.x += p->formCueParameterA;
+    p->animation.position.y += p->terrainRecoveryCounter;
+    p->animation.position.z += p->formCueParameterB;
+    if (p->contactCueDuration) {
         s32 jitter;
         u32 random;
-        u32 mask;
         gRandomIndex = (gRandomIndex + 1) & 1023;
         random = *(const u16 *)((gRandomIndex << 1) + (u32)gRandomTable);
-        mask = 15;
-        jitter = (random & mask) - 7;
-        H(0xAC) += jitter;
-        H(0xB0) -= jitter;
-        B(0x53D)--;
+        jitter = (random & 15) - 7;
+        p->animation.position.x += jitter;
+        p->animation.position.z -= jitter;
+        p->contactCueDuration--;
     }
 }

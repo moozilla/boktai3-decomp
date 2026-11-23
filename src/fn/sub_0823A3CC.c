@@ -24,8 +24,8 @@ static inline s32 LocalPlayer(void)
 void LinkPlayer_InitializeActor(struct Player *p)
 {
     s32 local;
-    sub_08232264(&p->effectGroup, &p->previousPosition, 0, 0, 1);
-    *(struct SceneVec *)p->effectPosition = p->previousPosition;
+    sub_08232264(&p->effectGroup, &p->animation.position, 0, 0, 1);
+    *(struct ContactPosition *)p->effectPosition = p->animation.position;
     p->resetValue6F8 = 0;
     p->resetValue6FA = 0;
     p->resetValue6FC = 0;

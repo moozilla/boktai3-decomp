@@ -1,6 +1,7 @@
 #include "global.h"
 #include "player.h"
 #include "engine_globals.h"
+#include "player_slot_status.h"
 // confidence=low: descriptor meanings remain tentative; creates the selected attack display projectile.
 extern u8 *gGameState;
 s32 Player_GetSelectedSlotActionScale(void);
@@ -17,10 +18,6 @@ s32 Projectile_Spawn(void *, struct SceneVec *);
 void Player_SubtractStatB(struct Player *, s32);
 void Sound_PlaySong(u32);
 s32 Div(s32, s32);
-static inline u32 testFlags(u32 *f, u32 mask)
-{
-    return *f & mask;
-}
 static inline s32 truncate4(s32 n)
 {
     s32 result;
@@ -71,7 +68,7 @@ s32 Player_SpawnSelectedAttackProjectile(struct Player *p)
                 special = 1;
         } else {
             if ((!p->statModifierContext.statBOverrideEnabled && p &&
-                 testFlags(&p->statBonusFlags, 0x10000000)) ||
+                 Player_ReadStatusBits(&p->statBonusFlags, 0x10000000)) ||
                 Player_GetSpecialAttackDescriptor(p->statModifierContext.actionKind)[0] == 8) {
                 if (p->statModifierContext.attachedEntry < 0)
                     cost = 0;
@@ -145,7 +142,7 @@ powerReady:
                                    power, 50, 20);
     }
     if (((!p->statModifierContext.statBOverrideEnabled && p &&
-          testFlags(&p->statBonusFlags, 0x10000000)) ||
+          Player_ReadStatusBits(&p->statBonusFlags, 0x10000000)) ||
          p->statModifierContext.actionKind == 8) &&
         cost > 0)
         p->statModifierContext.attachedEntry = -1;

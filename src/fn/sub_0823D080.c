@@ -56,7 +56,6 @@ void Player_UpdateChargeAction(struct Player *p)
             }
             break;
         case 2: {
-            u8 z;
             Player_AddStatusFlags(p, 0xA0);
             if (p->chargeCounter <= 4) {
                 p->chargeCounter++;
@@ -68,17 +67,16 @@ void Player_UpdateChargeAction(struct Player *p)
                 }
             }
             Player_SetAnimationIndex(p, ActorVariant_GetTableValue(p->actionMode, 9), 0x40);
-            z = 0;
             p->resetValue6FC = 30;
             Player_SetActionOrigin_0823D00C(p);
             sub_082392E8(p, &p->actionOrigin);
             if (!(p->inputKeys[0] & 1)) {
                 Player_StopLocalSong(p->slot, 0xD8);
-                p->chargeSoundActive = z;
+                p->chargeSoundActive = 0;
                 Player_SetTetherMode(p, 7, 4);
             } else if (!Player_IsFlaggedBelowResourceLimit(p)) {
                 Player_StopLocalSong(p->slot, 0xD8);
-                p->chargeSoundActive = z;
+                p->chargeSoundActive = 0;
                 Player_SetTetherMode(p, 7, 3);
             }
             break;

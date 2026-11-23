@@ -6,10 +6,10 @@ void Clock_WaitCycles(s32);
 void SunClock_SetDateTime(s32, s32, s32, s32, s32, s32, s32);
 void Clock_CheckRtcDate(void)
 {
-    s32 status = 0, i = 0, error = -1;
+    s32 status = 0, i = 0;
     while (i <= 4) {
         status = Clock_CheckRtcStatus();
-        if (status != error)
+        if (status != -1)
             break;
         Clock_WaitCycles(200);
         i++;

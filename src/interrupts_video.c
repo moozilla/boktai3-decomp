@@ -83,13 +83,12 @@ void Task_LinkToPriorityList(void *);
 
 void InterruptsAndVideo_InitRuntime(void)
 {
-    u32 fill, zero = 0;
-    u8 byteZero, byteOne;
+    u32 fill;
     struct VideoDmaRegisters *dma;
     u32 mask;
     struct RuntimeTask *a;
     struct RuntimeTask *b;
-    fill = zero;
+    fill = 0;
     dma = (struct VideoDmaRegisters *)REG_ADDR_DMA3SAD;
     dma->source = (u32)&fill;
     dma->destination = 0x06000000;
@@ -100,18 +99,16 @@ void InterruptsAndVideo_InitRuntime(void)
     dma->destination = 0x07000000;
     dma->control = 0x85000100;
     (void)dma->control;
-    fill = zero;
+    fill = 0;
     dma->source = (u32)&fill;
     dma->destination = 0x05000000;
     dma->control = 0x85000100;
     (void)dma->control;
-    byteZero = 0;
-    REG_IME = zero;
+    REG_IME = 0;
     (void)REG_IE;
-    REG_IE = zero;
+    REG_IE = 0;
     gVideoInterruptsEnabled = 1;
-    gVideoIrqPhase = zero;
-    byteOne = 1;
+    gVideoIrqPhase = 0;
     gVideoTransferControl = 1;
     mask = 0x2000;
     REG_IE = mask;
@@ -123,15 +120,15 @@ void InterruptsAndVideo_InitRuntime(void)
     REG_DISPSTAT |= 0x20;
     REG_DISPSTAT = (REG_DISPSTAT & 0xff) | 0x4000;
     REG_IME = 1;
-    REG_KEYCNT = zero;
-    gSpriteAttrFlags = zero;
+    REG_KEYCNT = 0;
+    gSpriteAttrFlags = 0;
     Mosaic_Initialize();
     sub_082156D8(0);
     Video_SetWindowBounds(0, 0, 0, 240, 160);
     Video_SetWindowBounds(1, 0, 0, 240, 160);
     Video_SetWindowLayerMasks(0x3f, 1, 0, 0);
-    gQueuedObjSlotCount = zero;
-    gSceneEntryActive = zero;
+    gQueuedObjSlotCount = 0;
+    gSceneEntryActive = 0;
     Sprite_InitSystem();
     ObjShape_InitTables();
     Anim_ResetDefaultFlags();
@@ -139,18 +136,18 @@ void InterruptsAndVideo_InitRuntime(void)
     Text_LoadFontResource();
     Video_SetRenderCallbacks(0, SpriteOam_QueueProjectedSprites, Sprite_RenderScaledList,
                              sub_08219624);
-    gSceneEffectPalettePhase = zero;
-    gVBlankFrameCounter = zero;
+    gSceneEffectPalettePhase = 0;
+    gVBlankFrameCounter = 0;
     a = &gVideoUploadTask;
     Task_SetCallbacks(a, InterruptsAndVideo_OnVideoUploadTask, 0);
     b = &gGraphicsUpdateTask;
     Task_SetCallbacks(b, InterruptsAndVideo_OnGraphicsUpdateTask, 0);
-    a->priority = byteZero;
-    a->unk16 = byteOne;
-    a->id = zero;
+    a->priority = 0;
+    a->unk16 = 1;
+    a->id = 0;
     b->priority = 13;
-    b->unk16 = byteOne;
-    b->id = zero;
+    b->unk16 = 1;
+    b->id = 0;
     Task_LinkToPriorityList(a);
     Task_LinkToPriorityList(b);
 }

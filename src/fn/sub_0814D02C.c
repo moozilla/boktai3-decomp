@@ -29,5 +29,5 @@ void Player_SelectActionVariant(struct Player *p)
         PlayerAttackEffect_SetElementMode(0);
         p->actionVariant = (u8)p->statModifierContext.savedActionIndex;
     }
-    PlayerAttackEffect_SetDefaultPaletteSource(p->actionVariantResource);
+    PlayerAttackEffect_SetDefaultPaletteSource(p->animation.palette);
 }

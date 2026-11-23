@@ -1,12 +1,11 @@
 #include "spatial_index.h"
+#include "engine_pause.h"
 
 void Collider_ScheduleUpdates(void *unused, struct SpatialBucket *bucket, s32 bucketIndex)
 {
     struct SpatialLink *link;
     s32 enabled, quota, count, divisor, delay;
-    u32 one;
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask)
+    if (Engine_PauseBits(0x800))
         return;
     count = bucket->passiveCount;
     if (count <= 0)
@@ -31,10 +30,9 @@ void Collider_ScheduleUpdates(void *unused, struct SpatialBucket *bucket, s32 bu
         delay = count - 1;
     } while (0);
     if (link) {
-        one = 1;
         do {
             struct SpatialEntry *collider = link->entry;
-            if (collider->flags & one) {
+            if (SpatialEntry_TestFlags(collider, 1)) {
                 collider->flags |= 2;
                 collider->updateDelay = 0;
             } else if (enabled >= quota) {

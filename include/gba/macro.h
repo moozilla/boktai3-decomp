@@ -100,6 +100,14 @@
 #define DMA_FILL(dmaNum, value, dest, size, bit) DMA_FILL_UNCHECKED(dmaNum, value, dest, size, bit)
 #endif
 
+// AGB SDK AgbMacro.h DmaWait: spin until the channel's enable bit clears.
+#define DmaWait(dmaNum)                                 \
+{                                                       \
+    vu32 *dmaRegs = (vu32 *)REG_ADDR_DMA##dmaNum;       \
+    while (dmaRegs[2] & (DMA_ENABLE << 16))             \
+        ;                                               \
+}
+
 #define DmaFill16(dmaNum, value, dest, size) DMA_FILL(dmaNum, value, dest, size, 16)
 #define DmaFill32(dmaNum, value, dest, size) DMA_FILL(dmaNum, value, dest, size, 32)
 

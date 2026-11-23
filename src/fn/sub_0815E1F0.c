@@ -1,4 +1,5 @@
 #include "global.h"
+#include "contact_collider.h"
 #include "engine.h"
 #include "player.h"
 #include "contact_actor.h"
@@ -49,11 +50,6 @@ static inline s32 contactPower(struct ContactCollider *c)
 {
     return c->unknown3C;
 }
-static inline u32 contactFlag(struct ContactCollider *c, u32 mask)
-{
-    u32 *flags = &c->reactionFlags;
-    return *flags & mask;
-}
 // The capped duration is computed and then unused: the reset always gets power + 60.
 static inline u32 resetDuration(u32 power)
 {
@@ -100,13 +96,13 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
             p->active = 0;
             p->secondaryDrawFlags &= ~0x400;
         }
-        if ((contactFlag(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
+        if ((ContactCollider_TestReactionFlags(source, 0x80000)) && !(playerFlag(p, 0x20000000))) {
             Player_RequestTimedReset(p, resetDuration(source->unknown3C));
             p->positionResetCounter = 1;
         }
         if (!p->positionResetRequested && p->positionResetTimer)
             p->positionResetTimer = 0;
-        if (p->tetherMode == 0x16 && !(contactFlag(source, 0x4000))) {
+        if (p->tetherMode == 0x16 && !(ContactCollider_TestReactionFlags(source, 0x4000))) {
             Player_EmitQueuedEffects(p);
             shift++;
         }
@@ -117,35 +113,36 @@ s32 PlayerContact_ApplyResponse(struct Player *p, struct ContactCollider *source
     if (specialState(p, 3)) {
         target->cost = 0;
         damage = 0;
-        if (contactFlag(source, 0x40000))
+        if (ContactCollider_TestReactionFlags(source, 0x40000))
             Player_EmitQueuedEffects(p);
         goto done;
     }
     if ((specialState(p, 5)) || p->tetherMode == 2 || p->actionMode == 3 || p->actionMode == 4)
         shift++;
-    if (contactFlag(source, 0x200000)) {
+    if (ContactCollider_TestReactionFlags(source, 0x200000)) {
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x191;
             Player_QueueStatusEffect(p, 1);
         }
-    } else if (contactFlag(source, 0x400000)) {
+    } else if (ContactCollider_TestReactionFlags(source, 0x400000)) {
         if (!(target->costFlags & 2)) {
             if (!p->contactSpecial)
                 p->contactActionTag = 0x133;
             Player_QueueStatusEffect(p, 2);
         }
-    } else if (contactFlag(source, 0x4000)) {
+    } else if (ContactCollider_TestReactionFlags(source, 0x4000)) {
         p->contactActionTag = 0x133;
         Player_QueueStatusEffect(p, 3);
         p->contactSpecial = 0;
-    } else if (contactFlag(source, 0x40000))
+    } else if (ContactCollider_TestReactionFlags(source, 0x40000))
         Player_EmitQueuedEffects(p);
-    if ((contactFlag(source, 0x8000)) && !(playerFlag(p, 0x100)) && !(playerFlag(p, 0x20000000)))
+    if ((ContactCollider_TestReactionFlags(source, 0x8000)) && !(playerFlag(p, 0x100)) &&
+        !(playerFlag(p, 0x20000000)))
         sub_0813D834(p, 0, 1800);
-    if ((contactFlag(source, 0x100000)) && !(playerFlag(p, 0x20000000)))
+    if ((ContactCollider_TestReactionFlags(source, 0x100000)) && !(playerFlag(p, 0x20000000)))
         sub_0813D834(p, 1, 900);
-    if (contactFlag(source, 0x20000)) {
+    if (ContactCollider_TestReactionFlags(source, 0x20000)) {
         s32 angle = ((p->facing + 5) & 7) << 5;
         velocity.words.x = scale(gUnk_086149C4[(angle + 64) & 255] * 80);
         velocity.words.y = 200;

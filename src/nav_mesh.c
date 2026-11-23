@@ -61,7 +61,7 @@ u32 Nav_IsPositionInMesh(struct NavMeshQuery *q, void *unused, struct ContactPos
     s32 z = (s16)pos->z >> 8;
     s32 cell;
     u8 *props;
-    u32 mask, flags;
+    u32 flags;
     s32 meshIndex;
     if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
         cell = 0;
@@ -76,8 +76,7 @@ u32 Nav_IsPositionInMesh(struct NavMeshQuery *q, void *unused, struct ContactPos
         props = map->cells + offset;
     }
     flags = *(u16 *)(props + 2);
-    mask = 2;
-    if (flags & mask)
+    if (flags & 2)
         return 0;
     for (meshIndex = 0; meshIndex < resource->count; meshIndex++) {
         struct NavMeshGraph *mesh = GetMesh(resource, meshIndex);
@@ -324,9 +323,7 @@ int Terrain_ApplyBlocked(u16 *out, void *arg, struct ContactPosition *pos)
     return NavMesh_FindRoute(out, arg, pos);
 }
 
-
 /* NavMesh_ClearProbeFlags: Clears the navigation probe's flag word */
-
 
 void NavMesh_ClearProbeFlags(u16 *p)
 {
@@ -511,8 +508,8 @@ s32 Actor_MoveAlongAngle(struct NavSteeringPosition *pos, u32 angle, s32 dist)
 
 // or `target` cannot move along `angle`, snaps to a 4-way direction and sets flag 2.
 
-s32 NavMesh_SteerCardinal(struct NavSteeringProbe *probe, struct NavSteeringPosition *target, s32 angle,
-                 s32 dist)
+s32 NavMesh_SteerCardinal(struct NavSteeringProbe *probe, struct NavSteeringPosition *target,
+                          s32 angle, s32 dist)
 {
     struct NavSteeringPosition d;
     s32 a, diff, ret;
@@ -542,8 +539,8 @@ s32 NavMesh_SteerCardinal(struct NavSteeringProbe *probe, struct NavSteeringPosi
 
 // (relative to `target`), or `target` cannot move along `angle`, snaps to an 8-way direction and sets flag 2.
 
-s32 NavMesh_SteerOctant(struct NavSteeringProbe *probe, struct NavSteeringPosition *target, s32 angle,
-                 s32 dist)
+s32 NavMesh_SteerOctant(struct NavSteeringProbe *probe, struct NavSteeringPosition *target,
+                        s32 angle, s32 dist)
 {
     struct NavSteeringPosition d;
     s32 a, diff, ret;
