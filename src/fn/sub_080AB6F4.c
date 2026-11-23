@@ -31,7 +31,7 @@ void Tentacle_FireSecondaryAttack(struct ChaseActor *actor)
             return;
         mask = 0x100;
         if (flags & mask) {
-            struct ContactCollider *collider = (struct ContactCollider *)((u8 *)actor + 0x188);
+            struct ContactCollider *collider = &actor->base.colliderB;
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags &= ~mask;
@@ -43,7 +43,7 @@ void Tentacle_FireSecondaryAttack(struct ChaseActor *actor)
             return;
         }
         {
-            struct ContactCollider *collider = (struct ContactCollider *)((u8 *)actor + 0x188);
+            struct ContactCollider *collider = &actor->base.colliderB;
             u16 field3C, field40, field44;
             u32 reactionFlags;
             collider->flags |= mask;

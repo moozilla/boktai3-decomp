@@ -108,7 +108,7 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         TentacleActor_ResetOscillation(actor);
         {
-            u32 direction = (((*((u8 *)actor + 0xE9)) + 128) & 255) >> 6;
+            u32 direction = (((actor->base.tracking.heading) + 128) & 255) >> 6;
             body[0x8E9] = direction;
         }
         body[0x8E8] = 0;
@@ -117,12 +117,12 @@ void TentacleBody_UpdateRetreat(struct ChaseActor *actor)
 
     if (*(s16 *)(body + 0x8D6) <= 0)
         *(s16 *)(body + 0x8D6) = 1;
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         TentacleActor_SelectWanderRoute(actor);
         Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
     }
     TentacleActor_AdvanceMotionPhase(actor, speed);
     {

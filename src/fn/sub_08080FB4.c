@@ -108,7 +108,7 @@ void SceneActorReaction_BeginHiddenDefeat(struct ChaseActor *actor)
     if ((!SceneActorControl_TestFlags(gEngineFlags, 0x4800)) && (!Flag(actor, 0x800, 0x2D0))) {
         SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     }
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
     switch (actor->base.category) {
         case 4:
             Sound_PlaySong(212);

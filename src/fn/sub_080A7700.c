@@ -129,14 +129,14 @@ void TentacleBody_ApproachWaypoint(struct ChaseActor *actor)
         State7(actor);
         return;
     }
-    speed = Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x260));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     Scale(actor);
     if (Approach(actor, (void *)(body + 0x8F8), speed)) {
         s32 angle;
         TentacleActor_SelectWanderRoute(actor);
         Chase_Delta(&delta, &actor->base.body.position, (void *)(body + 0x904));
-        *((u8 *)actor + 0x3CD) = Math_Atan2(delta.x, delta.z);
-        angle = *((u8 *)actor + 0x3CD) - actor->base.body.direction;
+        actor->base.nextDirection = Math_Atan2(delta.x, delta.z);
+        angle = actor->base.nextDirection - actor->base.body.direction;
         if (angle > 128)
             angle -= 256;
         else if (angle < -128)

@@ -5,6 +5,6 @@ void SceneActorControl_UpdateShadowReturn(struct ChaseActor *actor)
         SceneActorAnimation_SelectDirectionFlagsVariant((void *)actor, 17, 0);
     if (actor->base.restart) {
         actor->base.stepDone = 1;
-        ActorShadow_Enable((u8 *)actor + 0x320);
+        ActorShadow_Enable(actor->base.shadow);
     }
 }

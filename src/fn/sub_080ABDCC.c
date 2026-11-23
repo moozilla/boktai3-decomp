@@ -113,7 +113,7 @@ static inline void MonsterInit_InitializeBody(struct ChaseActor *arg0, u32 *fill
 
     SceneBody_Init(body, mode, &origin, 0, 4, arg0);
     SceneBody_SetSprite(body, arg0->base.drawableKind ? 0 : arg0->base.drawable);
-    SceneBody_SetMovementProbe(body, (u8 *)arg0 + 0x40, 0x40, 0x40);
+    SceneBody_SetMovementProbe(body, arg0->base.movementProbe, 0x40, 0x40);
 }
 static inline void Tentacle_ReadPalette(struct ChaseActor *actor, u16 base, u16 alternate)
 {

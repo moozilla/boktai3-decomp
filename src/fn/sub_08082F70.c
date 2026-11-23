@@ -67,5 +67,5 @@ void SceneActorControl_CompleteScriptedResponse(struct ChaseActor *actor, s32 fr
         actor->base.pendingControl = 0;
     }
     SceneActorTerrain_EnterState(actor, 1, 0, 2);
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
 }

@@ -90,7 +90,7 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         actor->base.restart = 0;
         SceneActorPlacement_PlayCategoryEventSound((void *)actor);
         {
-            struct ContactCollider *c = (void *)((u8 *)actor + 0x134);
+            struct ContactCollider *c = &actor->base.colliderA;
             c->flags |= 4;
         }
     }
@@ -132,5 +132,5 @@ void TentacleBody_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetControl(actor, SceneActorControl_OnIdle, 16);
     SceneActorTerrain_EnterState(actor, 1, 0, 2);
-    ActorShadow_Disable((u8 *)actor + 0x320);
+    ActorShadow_Disable(actor->base.shadow);
 }

@@ -73,8 +73,8 @@ void TentacleActor_ResolveBlockedMovement(struct ChaseActor *actor)
             trail[0x8e9] = (trail[0x8e9] + 1) & 3;
             TentacleActor_SelectWanderRoute(actor);
             Chase_Delta(&target, &actor->base.body.position, (void *)(trail + 0x904));
-            *((u8 *)actor + 0x3cd) = Math_Atan2(target.x, target.z);
-            difference = *((u8 *)actor + 0x3cd) - actor->base.body.direction;
+            actor->base.nextDirection = Math_Atan2(target.x, target.z);
+            difference = actor->base.nextDirection - actor->base.body.direction;
             if (difference > 128)
                 difference += -256;
             else if (difference < -128)
