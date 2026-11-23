@@ -668,21 +668,19 @@ s32 ControlPanel_InitializeFromScript(struct ControlPanel *panel)
     else
         panel->start = value;
     {
-        s32 firstZero;
         anim = panel->display[0].graphics;
         AnimData_Load(anim, 0xC046);
         sprite = &panel->display[0].sprite;
         Sprite_Init(sprite, anim, 0);
-        firstZero = 0;
-        sprite->frame = firstZero;
+        sprite->frame = 0;
         panel->display[0].sprite.position.x = 0x380;
-        panel->display[0].sprite.position.y = firstZero;
+        panel->display[0].sprite.position.y = 0;
         panel->display[0].sprite.position.z = 0x52C;
         middleGraphics = panel->display[1].graphics;
         AnimData_Load(middleGraphics, 0xC046);
         middleSprite = &panel->display[1].sprite;
         Sprite_Init(middleSprite, middleGraphics, 0);
-        middleSprite->frame = firstZero;
+        middleSprite->frame = 0;
         panel->display[1].sprite.position = panel->display[0].sprite.position;
         panel->display[1].sprite.position.z += 0x300;
     }
