@@ -50,7 +50,7 @@ exports.blocks = () => {
 
 exports.boxes = () => {
   const map = $.gTerrainMap;
-  if (!map) return [];
+  if (!map || !map.boxes) return [];
   const base = Number(map.boxes.$addr ?? map.boxes), n = g.u32(base), out = [];
   for (let i = 0; i < n && i < 256; i++) {
     const b = base + 4 + 12 * i;
