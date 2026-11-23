@@ -305,6 +305,11 @@ s32 SceneFade_Initialize(struct SceneFade *fade)
     fade->secondDuration = 0x80;
     fade->finalDuration = 0x80;
     SceneFade_BeginSoundFade(fade);
+#ifdef UBFIX
+    // falls off the end with r0 left over from the SceneFade_BeginSoundFade call; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 void *RegistryC281_Create(void)
