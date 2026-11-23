@@ -6,9 +6,7 @@ void Sound_PlaySong(u32);
 s32 Hresvelgr_UpdateTravel(struct HresvelgrTravelActor *);
 void Hresvelgr_UpdateAlternatingMotion(struct HresvelgrTravelActor *actor, s32 ticks)
 {
-    u32 mask = 0x600048;
-    u32 *flags = &actor->flags;
-    *flags |= mask;
+    Hresvelgr_SetFlags(actor, 0x600048);
     if (actor->changed) {
         actor->changed = 0;
         SceneActors_StartUnmirroredAnimation(actor, &actor->animation, &actor->animationData, 1, 1,
@@ -16,10 +14,7 @@ void Hresvelgr_UpdateAlternatingMotion(struct HresvelgrTravelActor *actor, s32 t
         actor->side = (actor->side + 1) & 1;
         Hresvelgr_RefreshTarget(actor);
     }
-    {
-        u32 mask = 0x200000;
-        *flags |= mask;
-    }
+    Hresvelgr_SetFlags(actor, 0x200000);
     if (actor->pulse)
         Sound_PlaySong(0x3d9);
     if (!(u8)Callback_InvokeActor(actor, actor->callback)) {
