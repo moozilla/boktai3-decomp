@@ -2357,25 +2357,8 @@ void SceneActor_TrySoloAction(struct Vorn *p)
             return;
         if (!q->field688)
             return;
-        {
-            u32 state = 3;
-            p->chase.base.state2A8 = state;
-        }
-        p->chase.base.phase2A9 = zero;
-        p->chase.base.behavior2AA = zero;
-        p->chase.base.counter2AC = zero;
-        p->chase.base.field2B1 = 1;
-        {
-            void *callback = SceneActorReaction_UpdateFacingAttack;
-            u32 mode = 0x2A;
-            p->chase.base.field2B2 = 1;
-            p->chase.base.stepDone = zero;
-            p->chase.base.controlKind = mode;
-            p->chase.base.target = callback;
-        }
-        p->chase.base.field2C8 = zero;
-        Clear(&p->chase.base.pendingControlFlags, 1);
-        p->chase.base.pendingControl = zero;
+        Chase_SetState(&p->chase, 3, 0, 0);
+        Chase_SetCtl(&p->chase, SceneActorReaction_UpdateFacingAttack, 0x2A);
     }
 }
 
@@ -2971,29 +2954,8 @@ u8 Vorn_SelectHitRecovery(struct ChaseActor *actor)
         return 0;
     }
     if (actor->base.hitReactionFlags & 0xC0000) {
-        void *control = actor->base.onReaction;
-        u32 kind = 0x12;
-        u8 zero8;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = blocked;
-        actor->base.controlKind = kind;
-        actor->base.target = control;
-        zero8 = 0;
-        actor->base.field2C8 = blocked;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            s32 mask = -2;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = blocked;
-        {
-            u32 state = 3;
-            actor->base.state2A8 = state;
-        }
-        actor->base.phase2A9 = zero8;
-        actor->base.behavior2AA = zero8;
-        actor->base.counter2AC = blocked;
-        actor->base.field2B1 = 1;
+        Chase_SetCtl(actor, actor->base.onReaction, 0x12);
+        Chase_SetState(actor, 3, 0, 0);
         {
             u32 *flags = &actor->base.statusFlags;
             u32 mask = ~0x1000000;
