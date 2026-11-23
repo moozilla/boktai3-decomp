@@ -157,7 +157,6 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             int count;
             const u16 *table;
             u32 *indexPtr;
-            u32 mask;
             u32 smallMask;
             u32 index;
             size.x = 164;
@@ -167,22 +166,21 @@ void BreakableBarrier_Update(struct BreakableBarrierManager *m, struct Breakable
             indexPtr = &gRandomIndex;
             index = *indexPtr;
             index++;
-            mask = 1023;
-            index &= mask;
+            index &= 1023;
             angle = (u8)table[index];
-            index = (index + 1) & mask;
+            index = (index + 1) & 1023;
             count = table[index];
             smallMask = 3;
             count = (count & smallMask) + 2;
-            index = (index + 1) & mask;
+            index = (index + 1) & 1023;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
             SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
             BreakableBarrier_NextRandomIndex(*indexPtr, &index);
             angle = (u8)table[index];
-            index = (index + 1) & mask;
+            index = (index + 1) & 1023;
             count = (table[index] & smallMask) + 2;
-            index = (index + 1) & mask;
+            index = (index + 1) & 1023;
             *indexPtr = index;
             speed = (table[index] & smallMask) + 20;
             SparkParticle_Spawn(&p->sprite.position, 3, &size, angle, count, speed, 2, 2);
@@ -222,7 +220,6 @@ void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct Bre
         const u16 *table;
         u32 *indexPtr;
         u32 index;
-        u32 mask;
         size.x = 164;
         size.y = 16;
         size.z = 164;
@@ -230,16 +227,15 @@ void BreakableBarrier_UpdateBroken(struct BreakableBarrierManager *m, struct Bre
         indexPtr = &gRandomIndex;
         index = *indexPtr;
         index++;
-        mask = 1023;
-        index &= mask;
+        index &= 1023;
         angle = (u8)table[index];
-        index_2 = (index + 1) & mask;
+        index_2 = (index + 1) & 1023;
         {
             u32 sample = table[index_2];
             sample &= 3;
             count = sample + 2;
         }
-        index_3 = (index_2 + 1) & mask;
+        index_3 = (index_2 + 1) & 1023;
         *indexPtr = index_3;
         {
             u32 sample = table[index_3];
