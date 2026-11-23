@@ -3121,47 +3121,6 @@ void Axe_RemoveSecondaryColliders(struct ChaseActor *actor)
     } while (--i >= 0);
 }
 
-struct AxeDirection {
-    u8 unk_00[6];
-    u8 angle;
-};
-
-struct AxeCollisionContext {
-    u8 unk_00[0xcec];
-    struct ContactCollider attack[2];
-    struct ContactCollider body[2];
-    u8 unk_E3C[0x10];
-    u32 flags;
-};
-
-struct AxeCollisionActor {
-    void *object;
-    struct AxeDirection *drawable;
-    u8 unk_08[0x54];
-    struct ContactPosition position;
-    u8 unk_64[0xd0];
-    struct ContactCollider body;
-    struct ContactCollider attack;
-    u8 unk_1DC[0xe4];
-    u16 flags;
-    u8 unk_2C2[0x10e];
-    struct AxeCollisionContext *context;
-};
-
-static inline u8 HasContextFlag(struct AxeCollisionContext *context, u32 mask)
-{
-    if (context->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 HasActorFlag(struct AxeCollisionActor *actor, u32 mask)
-{
-    if (actor->flags & mask)
-        return 1;
-    return 0;
-}
-
 static inline void SetCollider(struct ContactCollider *collider, u32 mask)
 {
     collider->flags |= mask;
@@ -3182,12 +3141,12 @@ static inline s32 Scale_UpdateBodyColliders(s32 value)
     return result;
 }
 
-void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
+void Axe_UpdateBodyColliders(struct ChaseActor *actor)
 {
-    struct AxeCollisionContext *context = actor->context;
-    struct AxeDirection *drawable = actor->drawable;
+    struct Axe *context = actor->base.context;
+    struct DisplaySequenceSprite *drawable = actor->base.drawable;
     s32 index = 0;
-    struct ContactCollider *attack = &actor->attack;
+    struct ContactCollider *attack = &actor->base.colliderB;
     struct {
         u32 zero;
         u32 values[0];
@@ -3197,23 +3156,24 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
     s32 i, x, z;
 
     for (index = 0; index < 3; index++) {
-        if (HasContextFlag(context, 0x40) || HasActorFlag(actor, 0x800)) {
+        if (WordFlags_Has(0x40, &context->flagsE4C) ||
+            SceneActorChase_HasPlacementFlags(actor, 0x800)) {
             SetCollider(attack, 4);
-            SetCollider(&actor->body, 4);
+            SetCollider(&actor->base.colliderA, 4);
             for (i = 0; i < 2; i++) {
-                SetCollider(&context->body[i], 4);
-                SetCollider(&context->attack[i], 4);
+                SetCollider(&context->extraBody[i], 4);
+                SetCollider(&context->extraAttack[i], 4);
             }
             break;
         }
         ClearCollider(attack, 4);
-        ClearCollider(&actor->body, 4);
+        ClearCollider(&actor->base.colliderA, 4);
         for (i = 0; i < 2; i++) {
-            ClearCollider(&context->body[i], 4);
-            ClearCollider(&context->attack[i], 4);
+            ClearCollider(&context->extraBody[i], 4);
+            ClearCollider(&context->extraAttack[i], 4);
         }
         MonsterInit_ClearPosition(&buf.zero, &offset);
-        position = actor->position;
+        position = actor->base.body.position;
         switch (index) {
             case 0:
                 offset.x = -120;
@@ -3228,20 +3188,20 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale_UpdateBodyColliders(offset.x * gUnk_086149C4[(drawable->angle + 64) & 255]);
-        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[drawable->angle]);
+        x = Scale_UpdateBodyColliders(offset.x * gUnk_086149C4[(drawable->attribute + 64) & 255]);
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[drawable->attribute]);
         position.x = x + z + position.x;
-        x = Scale_UpdateBodyColliders(-(offset.x * gUnk_086149C4[drawable->angle]));
-        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[(drawable->angle + 64) & 255]);
+        x = Scale_UpdateBodyColliders(-(offset.x * gUnk_086149C4[drawable->attribute]));
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[(drawable->attribute + 64) & 255]);
         position.z = x + z + position.z;
         if (index == 0) {
-            Collider_SetPosition(&actor->body, &position, 0);
+            Collider_SetPosition(&actor->base.colliderA, &position, 0);
             Collider_SetPosition(attack, &position, 0);
             Collider_Refresh(attack);
         } else {
-            Collider_SetPosition(&context->body[index - 1], &position, 0);
-            Collider_SetPosition(&context->attack[index - 1], &position, 0);
-            Collider_Refresh(&context->attack[index - 1]);
+            Collider_SetPosition(&context->extraBody[index - 1], &position, 0);
+            Collider_SetPosition(&context->extraAttack[index - 1], &position, 0);
+            Collider_Refresh(&context->extraAttack[index - 1]);
         }
     }
 }
@@ -3386,7 +3346,7 @@ struct ChaseActor;
 
 u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
 
-void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor);
+void Axe_UpdateBodyColliders(struct ChaseActor *actor);
 
 void Axe_TickCooldowns(struct ChaseActor *actor);
 
