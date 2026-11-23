@@ -2,6 +2,7 @@
 #include "scene_actor_chase.h"
 #include "scene_actor_straight_route.h"
 #include "scene_actor_attachment.h"
+#include "scene_actor_terrain_reaction.h"
 u8 SceneActorAttachment_TestPositionWindow(struct ChaseActor *, const struct ContactPosition *, u32,
                                            u32);
 /* The local player's position, as gPlayers[0] holds it. */
@@ -9,28 +10,6 @@ struct MovementModePlayer {
     u8 unknown0[0x30];
     struct ContactPosition position;
 };
-static inline void SetState(struct ChaseActor *actor, u8 s, u8 p, u8 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-static inline void SetControl(struct ChaseActor *actor, void *cb, u8 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = cb;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
 {
     struct SceneActorChaseGroup *group = &actor->group;
@@ -77,16 +56,16 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
                     u32 mask = ~0xc0;
                     *flags &= mask;
                 }
-                SetState(actor, 0, 0, 7);
-                SetControl(actor, actor->base.onAlternateEntry, 1);
+                SceneActorTerrain_EnterState(actor, 0, 0, 7);
+                SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
             } else {
                 {
                     u32 *flags = savedFlags;
                     u32 mask = ~0xd0;
                     *flags &= mask;
                 }
-                SetState(actor, 0, 0, 0);
-                SetControl(actor, actor->base.onStanding, 0);
+                SceneActorTerrain_EnterState(actor, 0, 0, 0);
+                SceneActorTerrain_InstallControl(actor, actor->base.onStanding, 0);
             }
             actor->base.field2C2 = 64;
             break;
@@ -123,8 +102,8 @@ void SceneActorRegistry_SetMovementMode(struct ChaseActor *actor, s32 mode)
                 mask &= *motionFlags;
                 *motionFlags = mask;
             }
-            SetState(actor, 0, 0, 12);
-            SetControl(actor, group->common.gate.control, 26);
+            SceneActorTerrain_EnterState(actor, 0, 0, 12);
+            SceneActorTerrain_InstallControl(actor, group->common.gate.control, 26);
             break;
         }
     }

@@ -1,8 +1,6 @@
 #include "global.h"
 #include "display_sequence_sprite.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct Piece {
     u8 active, pad1;
     u16 timer;

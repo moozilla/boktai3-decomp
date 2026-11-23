@@ -3,6 +3,7 @@
 #include "scene_steering_actor.h"
 #include "scene_actor_terrain.h"
 #include "player_cue_sequence.h"
+#include "scene_actor_chase.h"
 
 // confidence=low: steers an actor toward its target, advances its frame sequence, and checks the terrain cell it moves into.
 s32 Mod(s32, s32);
@@ -16,14 +17,6 @@ static inline s32 Sub0806C3A0_Truncate(s32 v)
     if (v >= 0)
         return v >> 12;
     return -((-v) >> 12);
-}
-
-static inline void SubtractPosition(struct ContactPosition *out, const struct ContactPosition *b,
-                                    const struct ContactPosition *a)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
 }
 
 static inline void AddPosition(struct ContactPosition *out, const struct ContactPosition *a,
@@ -49,7 +42,7 @@ void sub_0806C3A0(void *unused, struct SceneSteeringActor *p)
     }
     p->unknown5[1] = -p->direction;
 
-    SubtractPosition(&delta, &p->position, &p->target);
+    Chase_Delta(&delta, &p->position, &p->target);
     dist2 = delta.x * delta.x + delta.z * delta.z;
     SceneSteeringActor_TurnTowardTarget(p);
 

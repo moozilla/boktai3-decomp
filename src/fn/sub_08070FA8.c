@@ -93,11 +93,6 @@ struct UpdateActorsTile {
     u8 unknown0C[0x2E];
     u16 paletteOffset;
 };
-static inline void ClearWordFlags(u32 *flags, u32 bits)
-{
-    u32 mask = ~bits;
-    *flags &= mask;
-}
 static inline void ClearTileFlags(struct UpdateActorsTile *tile, u32 bits)
 {
     u32 keep = ~bits;
@@ -106,8 +101,8 @@ static inline void ClearTileFlags(struct UpdateActorsTile *tile, u32 bits)
 static inline void ClearDrawableFlags(struct ChaseActor *actor, u32 bits)
 {
     if (actor->base.drawableKind == 0)
-        ClearWordFlags(&((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags,
-                       bits);
+        SceneActorChase_ClearWordFlags(
+            &((struct SceneActorRegistrySequenceDrawable *)actor->base.drawable)->flags, bits);
     else {
         struct UpdateActorsTile *tile = (void *)((u8 *)actor->base.drawable + 0x20);
         ClearTileFlags(tile, bits);
@@ -129,10 +124,6 @@ static inline u32 DefaultPalette(struct ChaseActor *actor)
     return *base + *offset;
 }
 
-static inline u32 ReadMotionFlags(u16 *motion, u32 mask)
-{
-    return *motion & mask;
-}
 static inline u8 MotionFlagSet(const u16 *flags, u32 mask)
 {
     u8 found = 0;
@@ -234,7 +225,7 @@ next:
                 s16 zero = 0;
                 actor->base.health = zero;
             }
-            if (ReadMotionFlags(motion, partMask))
+            if (SceneActorTurn_Flags(motion, partMask))
                 UpdateActors_SpawnContactParts(actor);
             *motion = ClearMaskedValue(*motion, 0x2000);
             MonsterInit_SetBehaviorFlags(actor, 0x1000);
@@ -262,7 +253,7 @@ next:
                         u32 bank;
                         manager->flags &= 0xFFFDDFFF;
                         flagField = (void *)&actor->base.statusFlags;
-                        ClearWordFlags(&flagField->word, 0x200000);
+                        SceneActorChase_ClearWordFlags(&flagField->word, 0x200000);
                         bank = DefaultPalette(actor);
                         if (actor->base.drawableKind == 0)
                             AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
@@ -278,7 +269,7 @@ next:
                             u16 bank = actor->base.paletteBank;
                             SceneActorPalette_BeginTransition(bank, DefaultPalette(actor), 0,
                                                               category, 0);
-                            ClearWordFlags(&flagField->word, 0x200000);
+                            SceneActorChase_ClearWordFlags(&flagField->word, 0x200000);
                         } else {
                             SceneActorPalette_BeginTransition(
                                 DefaultPalette(actor), actor->base.paletteBank, 0, category, 0);

@@ -1,9 +1,7 @@
 #include "global.h"
+#include "scene_indicator.h"
 struct Config {
     u16 v[20];
-};
-struct Vec {
-    s16 x, y, z, pad;
 };
 int Script_GetKeywordValue(int, int);
 int Script_SeekToKeyword(int);

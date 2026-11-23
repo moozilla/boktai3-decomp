@@ -2,6 +2,7 @@
 #include "display_animation.h"
 #include "engine.h"
 #include "player_cue_sequence.h"
+#include "movement_curve.h"
 s32 Div(s32, s32);
 void RouteSpriteActor_PlanWanderPath(struct RouteSpriteActor *);
 static inline s32 Truncate12(s32 value)
@@ -21,13 +22,6 @@ static inline void Polar(struct ContactPosition *v, s32 angle, s32 radius)
     v->x = Truncate12(gUnk_086149C4[(angle + 64) & 255] * radius);
     v->y = 0;
     v->z = Truncate12(gUnk_086149C4[angle & 255] * radius);
-}
-static inline void SubVec(struct ContactPosition *out, struct ContactPosition *b,
-                          struct ContactPosition *a)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
 }
 /* Copy of RouteSpriteActor_StepPlayback taking the sequence separately; the
  * hint in the reverse-hold branch keeps flags live so reload picks r2 there. */
@@ -58,7 +52,8 @@ void RouteSpriteActor_TickWandering(struct RouteSpritePool *pool, struct RouteSp
         actor->waypointIndex = 0;
         RouteSpriteActor_PlanWanderPath(actor);
     }
-    SubVec(&delta, &actor->sprite.position, &actor->waypoints[actor->waypointIndex]);
+    MovementCurve_SubtractPositions(&delta, &actor->sprite.position,
+                                    &actor->waypoints[actor->waypointIndex]);
     if (actor->moveTimer > 0 && delta.x * delta.x + delta.z * delta.z > 0) {
         s32 speed = Truncate6(actor->moveTimer);
         speed = speed >= 1 ? speed : 1;

@@ -1,6 +1,7 @@
 #include "contact_actor.h"
 #include "monster_particle_random.h"
 #include "terrain_sampling.h"
+#include "scene_actor_part_burst.h"
 void ContactActor_SetDirectionalSequence(struct ContactActorPool *, struct ContactActor *, u32);
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline s32 truncateShift12(s32 value)
@@ -8,12 +9,6 @@ static inline s32 truncateShift12(s32 value)
     if (value >= 0)
         return value >> 12;
     return -((-value) >> 12);
-}
-static inline u32 nextRandom(const u16 *table)
-{
-    u32 index = (gRandomIndex + 1) & 1023;
-    gRandomIndex = index;
-    return table[index];
 }
 static inline u32 nextRandomFrom(const u16 *table, u32 *cursor)
 {
@@ -61,12 +56,12 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         pool->retreatCenter.y = Terrain_SampleHeight(center);
         PARTICLE_RANDOM_CAPTURE_ORIGIN(origin);
         earlyTable = (const u16 *)0x0203B400;
-        angle = nextRandom(earlyTable);
+        angle = SceneActorEffects_NextSample(earlyTable);
         do {
             random.mask = 255;
         } while (0);
         angle &= random.mask;
-        radiusBits = nextRandom(earlyTable);
+        radiusBits = SceneActorEffects_NextSample(earlyTable);
         do {
             radiusBits &= 127;
         } while (0);
@@ -99,9 +94,9 @@ void ContactActor_UpdateRetreat(struct ContactActorPool *pool, struct ContactAct
         slot->direction = Math_Atan2(slot->destination.x - slot->position.x,
                                      steeringDestination->z - position->z);
         table = gRandomTable;
-        jitter = (nextRandom(table) & 3) - 1;
+        jitter = (SceneActorEffects_NextSample(table) & 3) - 1;
         slot->direction += jitter;
-        slot->steeringTimer = (nextRandom(table) & 7) + 8;
+        slot->steeringTimer = (SceneActorEffects_NextSample(table) & 7) + 8;
         destination = steeringDestination;
     } else {
         slot->steeringTimer--;
