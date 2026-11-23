@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct ScriptCombatActor {
     u8 unknown0[0x1c];
     struct Vec origin;

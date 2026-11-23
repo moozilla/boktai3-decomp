@@ -1,9 +1,6 @@
 #include "sprite_trail.h"
 #include "background_controller.h"
-struct Camera {
-    u8 unknown0[0x44];
-    s32 x;
-};
+#include "native_effect.h"
 void Vector3_CopyComponents(struct TrailVector *, struct TrailVector *);
 s32 Sprite_LinkToList(void *, u32);
 void AnimData_SelectPaletteBank(void *, int);

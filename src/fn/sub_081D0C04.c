@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "task_manager.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -86,10 +87,6 @@ void Actor_OnHiddenIdleUpdate(void);
 void SceneNpc_FollowSceneTarget(void);
 void SceneNpc_PlayAnimation12(void);
 void Actor_OnConfiguredAnimationUpdate(void);
-static inline void setHandler(void *fn, void **slot)
-{
-    *slot = fn;
-}
 
 static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
 {
@@ -179,12 +176,12 @@ void SceneNpc_CreateFromScript(void)
             npc->facing4 = m;
         }
     }
-    setHandler(SceneNpc_OnStateChange, &npc->callbacks[5]);
-    setHandler(sub_081D0864, &npc->callbacks[0]);
-    setHandler(SceneNpc_OnModeUpdate, &npc->callbacks[1]);
-    setHandler(SceneNpc_OnStateUpdate, &npc->callbacks[2]);
-    setHandler(SceneNpc_OnStateEffectUpdate, &npc->callbacks[3]);
-    setHandler(SceneNpc_OnDestroy, &npc->callbacks[4]);
+    Task_SetManager(SceneNpc_OnStateChange, &npc->callbacks[5]);
+    Task_SetManager(sub_081D0864, &npc->callbacks[0]);
+    Task_SetManager(SceneNpc_OnModeUpdate, &npc->callbacks[1]);
+    Task_SetManager(SceneNpc_OnStateUpdate, &npc->callbacks[2]);
+    Task_SetManager(SceneNpc_OnStateEffectUpdate, &npc->callbacks[3]);
+    Task_SetManager(SceneNpc_OnDestroy, &npc->callbacks[4]);
     Actor_InitResources(manager, npc, model, 0);
     Actor_LinkToManager(manager, npc);
     Actor_InitBehaviorFromScript(manager, npc);

@@ -5,6 +5,7 @@
 
 #include "sun_orb_effect.h"
 #include "engine_pause.h"
+#include "scene_actor_chase_shared.h"
 
 extern u32 gUnk_02000560;
 extern const s16 gUnk_086149C4[];
@@ -28,10 +29,6 @@ static inline void Polar(struct OrbitEffectPosition *out, struct OrbitEffectPara
     out->x = Truncate(speed * gUnk_086149C4[(angle + 64) & 255]);
     out->y = 0;
     out->z = Truncate(speed * gUnk_086149C4[angle & 255]);
-}
-static inline void ClearFlags(u32 *flags, u32 mask)
-{
-    *flags &= mask;
 }
 static inline void AddPosition(struct OrbitEffectPosition *out, struct OrbitEffectPosition *in)
 {
@@ -69,7 +66,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
             }
             if (effect->flags & 1) {
                 Polar(&effect->velocity, params);
-                ClearFlags(&effect->flags, ~1);
+                SceneActorChase_AndWordFlags(&effect->flags, ~1);
             }
             if (effect->params.targetSource && !WordFlags_Test(&effect->flags, 2)) {
                 AddPosition(&sprite->position, &effect->velocity);
@@ -127,7 +124,7 @@ s32 OrbitEffect_UpdateManager(struct OrbitEffectManager *manager)
                     OrbitEffect_HideTrailSprites(effect);
                 }
             }
-            ClearFlags(&effect->flags, ~2);
+            SceneActorChase_AndWordFlags(&effect->flags, ~2);
             effect->frame++;
         }
     }

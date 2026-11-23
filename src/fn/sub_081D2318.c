@@ -2,9 +2,8 @@
 #include "scene_facing.h"
 #include "player.h"
 #include "engine.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "ghoul_disc.h"
+#include "scene_indicator.h"
 struct Npc {
     u8 unk_00[7];
     u8 done;
@@ -35,21 +34,11 @@ struct Context {
 s32 Math_Atan2(s32, s32);
 void TaggedSceneNpc_PlayTaggedAnimation(void *, s32, s32, s32, s32);
 void Actor_SetAttachmentEffect(void *, s32, s32, s32);
-static inline s32 Abs(s32 x)
-{
-    if (x < 0)
-        return -x;
-    return x;
-}
-static inline u32 Flag(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
 static inline s32 AllowsFacing(struct Player *p)
 {
     if ((u8)(p->actionMode - 3) <= 2)
         return 0;
-    if (Flag(&p->statusFlags, 0x100000))
+    if (SceneActorChase_Bits32(&p->statusFlags, 0x100000))
         return 0;
     if (p->active && (u16)(p->sceneMode - 5) <= 1)
         return 0;
@@ -112,8 +101,8 @@ void TaggedSceneNpc_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
         struct Vec *target = ctx->target;
         s32 radius = p->interactionRadius;
         u8 near;
-        if (((Abs(target->x - pos->x) < radius) && (Abs(target->y - pos->y) <= 255)) &&
-            (Abs(target->z - pos->z) < radius))
+        if (((Ghoul_Abs(target->x - pos->x) < radius) && (Ghoul_Abs(target->y - pos->y) <= 255)) &&
+            (Ghoul_Abs(target->z - pos->z) < radius))
             near = 1;
         else
             near = 0;
@@ -124,7 +113,7 @@ void TaggedSceneNpc_UpdateTargetFacing(struct Context *ctx, struct Npc *p)
             s32 oppositeFacing = (p->angle) + 128;
             u8 opposite;
             opposite = facing - oppositeFacing;
-            if ((Abs((s8)delta) <= 63) && (Abs((s8)opposite) <= 31)) {
+            if ((Ghoul_Abs((s8)delta) <= 63) && (Ghoul_Abs((s8)opposite) <= 31)) {
                 u32 mask = 0x800;
                 p->displayFlags |= mask;
             }

@@ -1,9 +1,7 @@
 #include "global.h"
 #include "ratatosk.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct HitResponse {
     u8 pad0[0x3e];
     u16 motion;

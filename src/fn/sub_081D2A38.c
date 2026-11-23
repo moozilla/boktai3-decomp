@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "task_manager.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -102,10 +103,6 @@ void TaggedSceneNpc_DispatchReceiverCallback(void);
 void sub_081D1A44(void);
 void TaggedSceneNpc_UpdateState17AnimationA(void);
 u8 SceneCharacter_GetPathNodeState(struct SceneNpc *);
-static inline void setHandler(void *fn, void **slot)
-{
-    *slot = fn;
-}
 
 static inline void setBox(struct SceneNpc *npc, s32 width, s32 height)
 {
@@ -191,12 +188,12 @@ void TaggedSceneNpc_Create(u32 tag)
             npc->facing4 = m;
         }
     }
-    setHandler(SceneNpc_EnterRequestedState, &npc->callbacks[5]);
-    setHandler(TaggedSceneNpc_OnFrameUpdate, &npc->callbacks[0]);
-    setHandler(TaggedSceneNpc_OnBehaviorUpdate, &npc->callbacks[1]);
-    setHandler(SceneNpc_TickStateAndPalette, &npc->callbacks[2]);
-    setHandler(TaggedSceneNpc_OnVisibilityUpdate, &npc->callbacks[3]);
-    setHandler(TaggedSceneNpc_DispatchReceiverCallback, &npc->callbacks[4]);
+    Task_SetManager(SceneNpc_EnterRequestedState, &npc->callbacks[5]);
+    Task_SetManager(TaggedSceneNpc_OnFrameUpdate, &npc->callbacks[0]);
+    Task_SetManager(TaggedSceneNpc_OnBehaviorUpdate, &npc->callbacks[1]);
+    Task_SetManager(SceneNpc_TickStateAndPalette, &npc->callbacks[2]);
+    Task_SetManager(TaggedSceneNpc_OnVisibilityUpdate, &npc->callbacks[3]);
+    Task_SetManager(TaggedSceneNpc_DispatchReceiverCallback, &npc->callbacks[4]);
     npc->field1B = angle;
     Actor_InitResources(manager, npc, model, 0);
     Actor_LinkToManager(manager, npc);
