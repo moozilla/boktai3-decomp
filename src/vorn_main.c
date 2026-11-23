@@ -376,18 +376,6 @@ void Anim_SetFrameDurationScale(void *, u32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline void ResetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    {
-        u16 offset = 0x2A9;
-        offset += 8;
-        *((u8 *)actor + offset) = 1;
-    }
-}
 
 
 void SceneActorReaction_BeginSideStep(void);
@@ -443,14 +431,6 @@ void Vorn_UpdateRouteApproach(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-static inline u8 TakePrepared(u8 *field)
-{
-    if (*field) {
-        *field = 0;
-        return 1;
-    }
-    return 0;
-}
 
 static inline void SetControlWords(struct ChaseActor *actor, void *control, u32 kind)
 {
@@ -482,7 +462,7 @@ void SceneActorControl_WaitForRouteResult(struct ChaseActor *actor)
 {
     u8 busy;
     u8 zero;
-    if (TakePrepared(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         void *control = actor->base.onEntry;
         Chase_SetCtl(actor, control, 2);
     }
@@ -572,7 +552,7 @@ void SceneActorControl_UpdateProbeApproach_080B04F4(struct ChaseActor *actor)
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, FIELD(nav, 0x1FC, void *), 0x20,
                                                              0x20, speed)) {
-        ResetState(actor, 3, 1, 0);
+        Chase_SetState(actor, 3, 1, 0);
         {
             u32 bit = 0x40;
             u16 *flags = (u16 *)(control + 0x6D4);
