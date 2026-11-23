@@ -1,3 +1,4 @@
+#include "player_slot_status.h"
 #include "homing_effect.h"
 #include "display_sequence_inline.h"
 /* EffectManager_ClearGlobal: sets the global EffectManager pointer to 0; matches an existing vetted proposal and the body's single store */
@@ -595,15 +596,6 @@ static inline void project(struct EffectVec *out, struct EffectVec *in)
     out->y = h - y;
     out->z = h + y;
 }
-static inline u32 PlayerSlot_HasStatus(u32 mask)
-{
-    return gPlayerSlotStatus[0] & mask;
-}
-
-static inline u32 PlayerHasStatus(struct Player *actor, u32 mask)
-{
-    return actor->statusFlags & mask;
-}
 void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct Effect *effect,
                                            s32 index, s32 phase, u32 phaseMask,
                                            struct EffectContext *ctx)
@@ -652,13 +644,13 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
         project(&projected, &p->sprite.position);
         {
             u32 paused;
-            paused = PlayerSlot_HasStatus(4);
+            paused = PlayerSlot_ReadStatus(0, 4);
             if (!paused && ctx->actorLower.x <= projected.x && ctx->actorUpper.x >= projected.x &&
                 ctx->actorLower.y <= projected.y && ctx->actorUpper.y >= projected.y) {
                 p->state = 4;
                 Anim_SetSequence(&p->anim, manager->animation,
                                  gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
-                if (!(PlayerSlot_HasStatus(4))) {
+                if (!(PlayerSlot_ReadStatus(0, 4))) {
                     Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
@@ -734,7 +726,7 @@ void EffectParticle_UpdateDriftAroundActor(struct EffectManager *manager, struct
         entry = a->data + a->frame;
         a->rate = ((*entry & 15) * a->scale) >> 6;
     }
-    if (!effect->timer && PlayerHasStatus(manager->actor, 128)) {
+    if (!effect->timer && Player_ReadStatusBits(&manager->actor->statusFlags, 128)) {
         p->state = 2;
         p->speed = 18;
     }
@@ -793,13 +785,13 @@ void EffectParticle_UpdateDriftBeforeHoming(struct EffectManager *manager, struc
         project(&projected, &p->sprite.position);
         {
             u32 paused;
-            paused = PlayerSlot_HasStatus(4);
+            paused = PlayerSlot_ReadStatus(0, 4);
             if (!paused && ctx->lower.x <= projected.x && ctx->upper.x >= projected.x &&
                 ctx->lower.y <= projected.y && ctx->upper.y >= projected.y) {
                 p->state = 4;
                 Anim_SetSequence(&p->anim, manager->animation,
                                  gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
-                if (!(PlayerSlot_HasStatus(4))) {
+                if (!(PlayerSlot_ReadStatus(0, 4))) {
                     Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
@@ -892,7 +884,7 @@ static inline u32 randomValueDirect(void)
 }
 static inline u32 pausedMode(void)
 {
-    return PlayerSlot_HasStatus(4);
+    return PlayerSlot_ReadStatus(0, 4);
 }
 void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effect *effect,
                                      s32 index, s32 phase, u32 phaseMask, struct EffectContext *ctx)
@@ -910,12 +902,12 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
         {
-            if (!(PlayerSlot_HasStatus(4)) && !effect->timer && (dy < 0 ? -dy : dy) <= 179 &&
+            if (!(PlayerSlot_ReadStatus(0, 4)) && !effect->timer && (dy < 0 ? -dy : dy) <= 179 &&
                 dx * dx + dz * dz < 400) {
                 p->state = 4;
                 Anim_SetSequence(&p->anim, manager->animation,
                                  gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
-                if (!(PlayerSlot_HasStatus(4))) {
+                if (!(PlayerSlot_ReadStatus(0, 4))) {
                     Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
@@ -991,7 +983,7 @@ void EffectParticle_UpdateHomingWide(struct EffectManager *manager, struct Effec
         entry = a->data + a->frame;
         a->rate = ((*entry & 15) * a->scale) >> 6;
     }
-    if (!PlayerHasStatus(manager->actor, 128) || pausedMode()) {
+    if (!Player_ReadStatusBits(&manager->actor->statusFlags, 128) || pausedMode()) {
         p->state = 1;
         p->speed = (randomValueDirect() & 3) + 4;
         p->angle = randomValueDirect();
@@ -1019,12 +1011,12 @@ void EffectParticle_UpdateHoming(struct EffectManager *manager, struct Effect *e
         p->velocity.x = (gUnk_086149C4[(p->angle + 64) & 255] * p->speed) >> 12;
         p->velocity.z = (gUnk_086149C4[p->angle] * p->speed) >> 12;
         {
-            if (!(PlayerSlot_HasStatus(4)) && !effect->timer && (dy < 0 ? -dy : dy) <= 129 &&
+            if (!(PlayerSlot_ReadStatus(0, 4)) && !effect->timer && (dy < 0 ? -dy : dy) <= 129 &&
                 dx * dx + dz * dz < 400) {
                 p->state = 4;
                 Anim_SetSequence(&p->anim, manager->animation,
                                  gUnk_08604A30[manager->mode][effect->type].id, 0, 0);
-                if (!(PlayerSlot_HasStatus(4))) {
+                if (!(PlayerSlot_ReadStatus(0, 4))) {
                     Sound_PlaySongChecked(gUnk_08604A60[effect->type]);
                     gUnk_08604A54[effect->type](manager->actor, effect->kind);
                 }
