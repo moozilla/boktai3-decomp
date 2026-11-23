@@ -14,20 +14,13 @@ void InventoryGrid_UpdateNumberPhase(struct SceneHudState *s)
 {
     if (s->actionTransferDelay <= 31) {
         if (++s->actionTransferDelay == 32) {
-            u32 mask = 1;
-            struct SpriteDrawable *p = s->numberDigits;
-            s32 i = 3;
-            do {
-                p->flags |= mask;
-                p++;
-            } while (--i >= 0);
+            s32 i;
+            for (i = 0; i < 4; i++)
+                s->numberDigits[i].flags |= 1;
         } else if (s->actionTransferDelay <= 8) {
-            s16 *p = &s->numberDigits[0].position.y;
-            s32 i = 3;
-            do {
-                (*p)--;
-                p += 0x14;
-            } while (--i >= 0);
+            s32 i;
+            for (i = 0; i < 4; i++)
+                s->numberDigits[i].position.y--;
         }
     } else if (PauseMenu_TickPaletteBlend(s)) {
         Hud_SetInteractionCallback(s, SceneHud_BeginRandomActionReturn, 1);
@@ -185,20 +178,13 @@ void InventoryGrid_FinishNumberPhase(struct SceneHudState *s)
 {
     if (s->actionTransferDelay <= 31) {
         if (++s->actionTransferDelay == 32) {
-            u32 mask = 1;
-            struct SpriteDrawable *p = s->numberDigits;
-            s32 i = 3;
-            do {
-                p->flags |= mask;
-                p++;
-            } while (--i >= 0);
+            s32 i;
+            for (i = 0; i < 4; i++)
+                s->numberDigits[i].flags |= 1;
         } else if (s->actionTransferDelay <= 8) {
-            s16 *p = &s->numberDigits[0].position.y;
-            s32 i = 3;
-            do {
-                (*p)--;
-                p += 0x14;
-            } while (--i >= 0);
+            s32 i;
+            for (i = 0; i < 4; i++)
+                s->numberDigits[i].position.y--;
         }
     } else if (PauseMenu_TickPaletteBlend(s)) {
         void *selection;
