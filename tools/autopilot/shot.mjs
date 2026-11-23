@@ -8,7 +8,7 @@ import { openSession, png } from '../../port/agent/session.mjs';
 const [dir, prefix, ...frames] = process.argv.slice(2);
 const run = JSON.parse(fs.readFileSync(path.join(dir, 'movie.json'), 'utf8'));
 const want = frames.map(Number).sort((a, b) => a - b), first = want[0];
-const s = await openSession({ movie: run.movie.slice(0, Math.min(first - 2, run.movie.length)), save: run.save || undefined, print: () => {} });
+const s = await openSession({ movie: run.movie.slice(0, Math.min(first - 2, run.movie.length)), save: run.save || undefined, solarLog: run.solar, print: () => {} });
 s.run(function* (g) {
   s.setRender(true);
   for (const f of want) {
