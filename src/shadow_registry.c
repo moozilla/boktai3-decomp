@@ -44,7 +44,6 @@ s32 ShadowRegistry_UnlinkEntry(struct ShadowRegistry *registry, struct ShadowReg
 {
     struct ShadowRegistryEntry *previous = entry->previous;
     struct ShadowRegistryEntry *next = entry->next;
-    s32 result;
     if (entry->mode == 0) {
         return -1;
     }
@@ -56,9 +55,8 @@ s32 ShadowRegistry_UnlinkEntry(struct ShadowRegistry *registry, struct ShadowReg
     if (next) {
         next->previous = previous;
     }
-    result = 0;
-    entry->mode = result;
-    return result;
+    entry->mode = 0;
+    return 0;
 }
 
 u32 ShadowRegistry_OnUpdate(void)
