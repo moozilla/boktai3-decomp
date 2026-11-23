@@ -3,6 +3,7 @@
 #include "scene_vec.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
+#include "engine_pause.h"
 struct CannonEmitter {
     u8 pad0[0x18];
     struct SceneVec initialPosition;
@@ -24,17 +25,13 @@ void SceneBody_SetSprite(void *, void *);
 void TerrainOverlay_QueueAddActor(void *);
 void ProximitySequence_TestPlayerDistance(void);
 extern u32 gUnk_02000560;
-static inline u32 CannonEmitter_TestPause(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline u32 CannonEmitter_TestMode(u32 mask)
 {
     return gUnk_02000560 & mask;
 }
 s32 CannonEmitter_UpdateAnimation(struct CannonEmitter *p)
 {
-    if (CannonEmitter_TestPause(0x400) || CannonEmitter_TestMode(4))
+    if (Engine_PauseBits(0x400) || CannonEmitter_TestMode(4))
         return 0;
     Callback_InvokeActor(p, p->state);
     p->sprite.flags &= ~1;
