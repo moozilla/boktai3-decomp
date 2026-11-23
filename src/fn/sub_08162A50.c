@@ -1,29 +1,8 @@
 #include "global.h"
-#include "scene_object.h"
+#include "scene_marker.h"
 #define TerrainOverlay_RegisterBody TerrainOverlay_QueueAddActor
 struct SceneMarkerVector {
     u32 x : 16, y : 16, z : 16;
-};
-struct SceneMarkerSprite {
-    u8 unknown0[7];
-    u8 mode;
-    u8 unknown8[8];
-    u16 frame;
-    u8 unknown12[0xa];
-    struct SceneVec position;
-    u8 unknown24[8];
-};
-struct SceneMarker {
-    u8 task[0x18];
-    struct SceneBody body;
-    u32 source;
-    u8 collider[0x54];
-    u32 colliderState;
-    u8 secondaryData[0x1c];
-    u8 primaryData[0x1c];
-    struct SceneMarkerSprite primary;
-    struct SceneMarkerSprite secondary;
-    u32 state;
 };
 void PlayerBarrier_OnCollision(void);
 void Collider_Init(void *, u16, u32, u32, u32, void *, void *);
@@ -32,17 +11,13 @@ void Collider_SetPosition(void *, void *, u32);
 void Collider_SetAttackProperties(void *, s32, s32, s32, s32, s32);
 void SceneBody_Init(struct SceneBody *, u32, struct SceneVec *, s32, s32, void *);
 u32 TerrainOverlay_QueueAddActor(void *);
-static inline void SetFrame(struct SceneMarkerSprite *sprite, u16 frame)
-{
-    sprite->frame = frame;
-}
 s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
 {
     struct SceneVec position;
     struct SceneMarkerVector size, offset;
     void *collider;
     ZeroFill8(&position);
-    collider = p->collider;
+    collider = &p->collider;
     size.x = 128;
     size.y = 128;
     size.z = 128;
@@ -53,15 +28,15 @@ s32 SceneMarker_InitSprites(struct SceneMarker *p, u32 source)
     Collider_SetPosition(collider, &position, 0);
     Collider_SetCallback(collider, PlayerBarrier_OnCollision, p);
     Collider_SetAttackProperties(collider, 100, 0, 0x100000, 1, 30);
-    AnimData_Load(p->primaryData, 0xdc7a);
-    Sprite_Init(&p->primary, p->primaryData, 1);
-    SetFrame(&p->primary, 0);
+    AnimData_Load(&p->primaryData, 0xdc7a);
+    Sprite_Init(&p->primary, &p->primaryData, 1);
+    SceneMarkerSprite_SetFrame(&p->primary, 0);
     p->primary.mode = 3;
-    AnimData_Load(p->secondaryData, 0xa680);
-    Sprite_Init(&p->secondary, p->secondaryData, 0x201);
-    SetFrame(&p->secondary, 11);
+    AnimData_Load(&p->secondaryData, 0xa680);
+    Sprite_Init(&p->secondary, &p->secondaryData, 0x201);
+    SceneMarkerSprite_SetFrame(&p->secondary, 11);
     p->secondary.mode = 1;
-    AnimData_SelectPaletteBank(p->secondaryData, 100);
+    AnimData_SelectPaletteBank(&p->secondaryData, 100);
     p->source = source;
     SceneBody_Init(&p->body, source, &p->primary.position, 0, 7, p);
     TerrainOverlay_RegisterBody(&p->body);
