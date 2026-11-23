@@ -98,3 +98,55 @@ ordinary use of 0x2F0 after the draws was found (later `&actor->action` uses bec
 ### Not started
 
 `WirelessResultPanel_Init` and the other dead-code sites.
+
+## Second attempt (same day): the three `volatile` globals
+
+None fell. The diagnosis above was incomplete; the missing condition rules out every declaration
+of a symbol global, so no header was changed.
+
+### New compiler fact (lldb on `build/scope/agbcc/gcc/agbcc`, breakpoints on `true_dependence` / `base_alias_check`)
+
+`init_alias_analysis` gives r0 the base value `(address:SI (reg r0))`: the argument-register entry
+(`ADDRESS VOIDmode`) is overwritten by the `struct_value_incoming_rtx` entry, which is r0 on ARM and is
+Pmode. `base_alias_check` treats a Pmode ADDRESS as a stack reference and returns 0 against any other
+known base. So **a store through a pointer derived from the first argument never conflicts with a
+load whose address is a known symbol**, whatever the alias sets and MEM_IN_STRUCT flags are. r1 to r3
+keep the VOIDmode entry and do conflict.
+
+Both families store through first-argument pointers: `n` in the two list insertions; `head`, `tail`,
+`next` in `SpriteTrail_UpdatePositions` (the arrays are embedded in `p`, so they are `p + const`).
+In the camera unit `volatile` buys the load staying in the loop: without it loop.c finds the load
+invariant (all six `true_dependence` calls return 0 at the base check) and hoists it (31/39 off).
+
+### Ruled out (scope, on the units)
+
+* `TargetRegistry_RegisterActor`: head global as a struct member, a union member (alias set 0,
+  in-struct), an array element: all 4 ROM / 4 draft, the reload missing. Toy check of the same body:
+  union and same-pointer-type struct member reload only when `n`'s base is unknown (`n` assigned a second
+  time from memory); with `n` a plain first parameter nothing reloads, including the node-typed
+  member (`struct { struct N *p; }`, same alias set as `n->next`).
+* A local `struct L **pp = &global` and an inline `push(&global, n)`: no reload.
+* `SpriteTrail_UpdatePositions`: camera global as struct member or union member: unchanged, 31/39.
+
+### What does produce the reload
+
+The load's address must have no known base: `base_alias_check` returns 1 as soon as one side is
+unknown. An integer address does that (`find_base_term (const_int)` is 0):
+
+* `#define gSceneCamera (((struct EG *)0x02000000)->camera)` (member at 0x4B8): the loop reloads,
+  304 B / 304 B, 11 insns differ by register only (ROM keeps the address and the 0x124 constant in
+  r4 in the first block, the draft has r1 and r0).
+* `(((struct EG *)0x02000000)->list)` (member at 0x598) in the list insertion: the reload after
+  `n->next = ...` appears, but the address is re-read from the pool where the ROM keeps it in r5
+  (10/9 off). A struct placed at 0x02000598 with the member at offset 0 does not reload; neither
+  does a local pointer to it.
+
+Not landed: a raw address is itself a concession and not relocatable. The ROM keeps the address in
+a register across blocks in both functions, as a symbol does, so the original is more likely a
+symbol whose address pseudo alias analysis does not know: `reg_known_value` needs a REG_EQUAL note
+and REG_N_SETS == 1, so an address pseudo with two sets (PRE inserting it on two edges, or a pointer
+local assigned on two paths) has an unknown base and also "varies". The other way is `n` (or `p`)
+not being a single copy of r0. Next attempt: find C that gives either, starting with the camera
+unit (already register-only with the integer form).
+
+`WirelessResultPanel_Init`: not started.
