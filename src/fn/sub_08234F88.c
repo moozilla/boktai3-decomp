@@ -22,7 +22,7 @@ void HealthRestoreEffect_InitParticlePool(struct Owner *p)
 {
     u32 resource = AnimData_FindEntry(0x1c1e);
     u32 zero = 0;
-    struct Elem *e = (struct Elem *)((u8 *)p + 0x8c);
+    struct Elem *e = p->elems;
     s32 i;
     for (i = 0; i < 8; e++, i++) {
         p->elems[i].data = resource;

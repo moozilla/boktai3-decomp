@@ -1041,7 +1041,7 @@ static inline u8 Arrive(void *obj)
     s32 cell;
     s32 player;
     const u16 *randomSamples = gRandomTable;
-    Chase_SnapToRoute(*(struct ContactPosition **)((u8 *)actor + 0x5D4), (u8 *)actor + 0x448);
+    Chase_SnapToRoute(actor->group.destination, (u8 *)actor + 0x448);
     if (Chase_Test(gEngineFlags, 0x4800)) {
         struct ChaseTarget *t = *slot;
         if (!t)
@@ -1758,7 +1758,7 @@ void SceneActorControl_UpdatePersistentPhase_080D622C(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, Mummy_UpdatePlayerRoute, 39);
     }
-    if (!(u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)))
+    if (!(u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque))
         ++actor->base.counter2AC;
 }
 
@@ -2929,7 +2929,7 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
             }
         }
         sub_08159164(actor->base.experience);
-        Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
+        Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
     }
 
 record:
