@@ -72,16 +72,16 @@ void Ivy_OnSecondaryContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-void Ivy_UpdateActiveState(u8 *p)
+void Ivy_UpdateActiveState(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(p + 0x2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u16 *q;
-        *(u8 *)(*(u8 **)(p + 4) + 7) = 2;
-        q = (u16 *)(p + 0x13A);
+        ((u8 *)actor->base.drawable)[7] = 2;
+        q = &actor->base.colliderA.flags;
         *q = (*q & 0xFFFB) | 8;
-        HalfwordFlags_Clear((u16 *)(p + 0x2C0), 0x800);
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
-    SceneActorAnimation_SelectDirectionalFlags(p, 0xE);
+    SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0xE);
 }
 
 /* Tentative name based on the observed state transition or initialization. */
@@ -119,25 +119,16 @@ void Ivy_UpdateInactiveState(void)
 
 /* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
 
-static inline u8 Consume(u8 *flag)
+void Ivy_EnterDisabledState(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void Ivy_EnterDisabledState(u8 *p)
-{
-    if (Consume(p + 0x2b2)) {
-        (*(u8 **)(p + 4))[7] = 3;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
+        ((u8 *)actor->base.drawable)[7] = 3;
         {
-            u16 v = 4 | *(u16 *)(p + 0x13a);
-            *(u16 *)(p + 0x13a) = v & 0xfff7;
+            u16 v = 4 | actor->base.colliderA.flags;
+            actor->base.colliderA.flags = v & 0xfff7;
         }
-        HalfwordFlags_Set(0x800, (u16 *)(p + 0x2c0));
-        SceneActorAnimation_SelectDirectionalFlags(p, 20);
+        HalfwordFlags_Set(0x800, &actor->base.placementFlags);
+        SceneActorAnimation_SelectDirectionalFlags(&actor->base, 20);
     }
 }
 
@@ -272,7 +263,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
     }
 }
 
-void Ivy_UpdateActiveState(u8 *p);
+void Ivy_UpdateActiveState(struct ChaseActor *actor);
 
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
