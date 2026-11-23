@@ -29,7 +29,7 @@ void SceneActorReaction_RestoreAndClearRestart(struct ChaseActor *actor, s32 fra
         {
             u32 *field;
             u32 mask;
-            field = (void *)((u8 *)owner + 0x114);
+            field = &owner->base.pendingControlFlags;
             mask = ~1;
             *field &= mask;
             {
