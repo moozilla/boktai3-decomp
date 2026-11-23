@@ -645,15 +645,6 @@ void Octopus_ThrowCapturedTarget(struct ChaseActor *actor)
 
 // player (kind <= 3) or actor (kind & 4) is released, after frame 120 it returns to idle.
 
-struct GolemRoutePoint {
-    s16 x, z;
-};
-
-struct GolemRouteLink {
-    u8 unknown0[8];
-    struct GolemRoutePoint *point;
-};
-
 static inline u32 CellIndex(struct ContactPosition *p)
 {
     s32 x = p->x >> 8, z = p->z >> 8;
@@ -718,19 +709,19 @@ static inline void Palette(struct ChaseActor *a, u32 bank)
 
 void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
 {
-    u8 *group;
+    struct SceneActorChaseGroup *group;
     u8 *drawable = actor->base.drawable;
     struct SceneActorBody *target;
     struct ContactPosition position;
     struct Player *player;
     void *victim;
-    group = (u8 *)actor + 0x3D4;
+    group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectProfileEntry(actor, 0x14);
         HideCollider(actor);
         {
             struct ContactPosition *dest = &actor->base.body.position;
-            struct GolemRouteLink *link = (void *)(group + 0x74);
+            struct SceneActorRegistryRoute *link = &group->homeRoute;
             dest->x = link->point->x;
             dest->z = link->point->z;
             dest->y = CellHeight(dest, CellIndex(dest));
@@ -782,20 +773,14 @@ void Octopus_ReleaseCapturedTarget(struct ChaseActor *actor, s32 frame)
         }
         SceneActorAnimation_SelectDirectionalFlags(actor, 0x10);
         {
-            struct Delay {
-                u8 pad[8];
-                u8 a, b, c, d;
-                u32 ticks;
-                void *cb;
-            };
-            struct Delay *delay = (void *)(group + 0x8C);
+            struct SceneActorDelayedResponse *delay = (void *)&group->saved;
             void *cb = SceneActorControl_OnIdle;
             u32 one = 1;
-            delay->ticks = 60;
-            delay->cb = cb;
-            delay->a = 0;
-            delay->b = 0;
-            delay->c = one;
+            delay->delay = 60;
+            delay->control = cb;
+            delay->state = 0;
+            delay->phase = 0;
+            delay->behavior = one;
         }
         SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
         SceneActorChase_SetState(actor, 3, 0, 0);
@@ -1576,13 +1561,6 @@ void Octopus_ReturnToRoutePoint(struct ChaseActor *actor);
 
 void SceneActorTerrain_ResumeDrawable(struct ChaseActor *);
 
-struct Delay {
-    u8 pad[8];
-    u8 a, b, c, d;
-    u32 ticks;
-    void *cb;
-};
-
 /* Octopus: settle into state 3, return to the route point after 60 ticks,
    restore the alternate pose after 14, and raise the drawable flag. */
 
@@ -1591,13 +1569,13 @@ void Octopus_BeginReturnToRoutePoint(struct ChaseActor *actor)
     SceneActorChase_SelectState(actor, 3, 0, 0);
     SceneActorChase_ResetStateEntry(actor);
     {
-        struct Delay *delay = (void *)((u8 *)actor + 0x460);
+        struct SceneActorDelayedResponse *delay = (void *)&actor->group.saved;
         void *cb = Octopus_ReturnToRoutePoint;
-        delay->ticks = 60;
-        delay->cb = cb;
-        delay->a = 3;
-        delay->b = 0;
-        delay->c = 0;
+        delay->delay = 60;
+        delay->control = cb;
+        delay->state = 3;
+        delay->phase = 0;
+        delay->behavior = 0;
     }
     SceneActorChase_SetControl(actor, SceneActorReaction_RestoreAlternateAfterDelay, 14);
     SceneActorTerrain_ResumeDrawable(actor);
