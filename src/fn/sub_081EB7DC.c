@@ -5,7 +5,7 @@ void Task_SetCallbacks(void *, void *, void *);
 s32 Params3D0_InitDisplay(void *);
 void Task_Kill(void *);
 void Params3D0_UpdateDisplay(void);
-void Params3D0_DestroyDisplay(void);
+void Params3D0_DestroyDisplay(void *);
 
 void *Params3D0_CreateDisplay(void)
 {
