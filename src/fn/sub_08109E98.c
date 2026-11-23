@@ -25,16 +25,11 @@ s32 ScriptPanel_WaitForSelectionData(struct ScriptPanel *p)
     } else {
         p->retryTimer++;
         if (p->retryTimer > 29) {
-            u8 *base, *button;
-            u32 zero;
+            s32 i;
             Registry1745_SetState(p, 2, ScriptPanel_PollSelection);
             Serial_StopCommunication();
-            base = p->buttons;
-            zero = 0;
-            button = &p->buttons[1];
-            do {
-                *button-- = zero;
-            } while ((s32)button >= (s32)base);
+            for (i = 0; i < 2; i++)
+                p->buttons[i] = 0;
         }
     }
     return 0;
