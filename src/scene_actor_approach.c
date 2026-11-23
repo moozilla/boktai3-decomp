@@ -29,11 +29,6 @@ static inline u8 TakeReady(struct ChaseActor *actor)
     return 0;
 }
 
-static inline void ClearFlags(u16 *p, u32 mask)
-{
-    *p &= mask;
-}
-
 static inline void SetCategoryControl(struct ChaseActor *actor, void *fn)
 {
     u8 code = 3;
@@ -65,7 +60,7 @@ void SceneActorApproach_RunCategoryAction(struct ChaseActor *actor)
         context->timer = context->duration;
     }
     if (actor->base.stepDone) {
-        ClearFlags(&actor->base.motionFlags, ~0x100);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -106,7 +101,7 @@ void SceneActorApproach_RunTimedAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
-        ClearFlags(&actor->base.motionFlags, ~0x100);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -147,7 +142,7 @@ void SceneActorApproach_RunAlternateTimedAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 3);
     }
     if (actor->base.stepDone) {
-        ClearFlags(&actor->base.motionFlags, ~0x100);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
@@ -193,7 +188,7 @@ void SceneActorApproach_CaptureTargetAndRunAction(struct ChaseActor *actor)
         Vorn_SpawnHazard(actor, 2);
     }
     if (actor->base.stepDone) {
-        ClearFlags(&actor->base.motionFlags, ~0x100);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x100);
         Skeleton_SelectDistanceReaction(actor);
     } else
         actor->base.counter2AC++;
