@@ -305,6 +305,18 @@ class Warnings(unittest.TestCase):
             with self.subTest(decl=decl):
                 self.assertEqual(warns("void f(void) {\n    " + decl + "\n    g();\n}\n"), [])
 
+    def test_const_local_number_named_inline_parameter(self):
+        text = ("static inline void Restore(struct A *a, void *control, u32 kind,\n                           u32 zero)\n"
+                "{\n    a->done = zero;\n    a->kind = kind;\n}\n")
+        site, = [s for s in c.sites(text) if s.kind == "const-local"]
+        self.assertEqual(site.line, 2)
+        self.assertEqual(warns(text.replace("u32 zero", "const u16 two").replace("= zero", "= two")), ["const-local"])
+        # an ordinary function's parameter, a pointer, and a name that only starts with a number word
+        for header in ("void Restore(struct A *a, u32 zero)", "static inline void Restore(u32 *zero)",
+                       "static inline void Restore(u32 oneshot)"):
+            with self.subTest(header=header):
+                self.assertEqual(warns(header + "\n{\n    g();\n}\n"), [])
+
     def test_grouped_literal_initializers(self):
         body = """void draw(void) {
     u32 redBlue = 0x7c1f, product = 0xf83e0;

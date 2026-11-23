@@ -446,6 +446,12 @@ def _warn_sites(code: str):
         if re.fullmatch(r"[\s()+\-*/%&|^~<>=!;]+", operators):
             yield m.start("updates") + len(updates) - len(updates.lstrip()), "dead-local-update"
     yield from _constant_locals(code)
+    for m in _INLINE_DEF.finditer(code):  # `u32 zero` as an inline's parameter is the same local
+        params_start = m.start("params")
+        for param in re.finditer(r"[^,]+", m["params"]):
+            scalar = _SCALAR_PARAM.fullmatch(param[0])
+            if scalar and re.fullmatch(_NUMBER_NAME, scalar[1]):
+                yield params_start + param.start() + scalar.start(1), "const-local"
     for offset in _duplicate_branches(code, source):
         yield offset, "duplicate-branches"
     for m in _ONCE_END.finditer(code):
