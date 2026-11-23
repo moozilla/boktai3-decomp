@@ -853,13 +853,12 @@ void PlayerClone_InitConfig(struct PlayerCloneConfiguration *p)
     p->speed = 0x10;
     p->angle = 0;
     {
-        u32 c = 0x1e;
-        p->operation.attack = c;
-        p->operation.element = c;
-        p->primaryPower = c;
-        p->secondaryCollider[0] = c;
+        p->operation.attack = 0x1e;
+        p->operation.element = 0x1e;
+        p->primaryPower = 0x1e;
+        p->secondaryCollider[0] = 0x1e;
         p->secondaryCollider[1] = 0xf;
-        p->secondaryCollider[2] = c;
+        p->secondaryCollider[2] = 0x1e;
     }
 }
 
