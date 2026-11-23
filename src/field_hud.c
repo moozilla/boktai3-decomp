@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "field_hud.h"
 #include "scene_actor_damage_visibility.h"
 
@@ -330,8 +331,7 @@ void FieldHud_InitializeGauge(struct FieldHudWidgets *widgets, s32 *source)
 
 void MeterDisplay_UpdateOwnerMeters(struct FieldHudWidgets *widgets)
 {
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         widgets->meterWidgets[0].position.x =
             ViewportGauge_ComputeFill(widgets, SceneActorDamage_LocalPlayer());
         widgets->meterWidgets[1].position.x =
