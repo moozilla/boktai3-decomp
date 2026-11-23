@@ -667,26 +667,9 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
     *restart = 0;
 }
 
-#define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
-
 void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
-
-static inline void Control(struct RoomActor *a, void *callback, u32 phase)
-{
-    a->field2B2 = 1;
-    a->stepDone = 0;
-    FIELD(a, 0x2B5, u8) = phase;
-    FIELD(a, 0x21C, void *) = callback;
-    FIELD(a, 0x2C8, u16) = 0;
-    {
-        u32 *flags = &FIELD(a, 0x114, u32);
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    FIELD(a, 0x104, u32) = 0;
-}
 
 // confidence=low: turns one octant toward the requested direction on animation ticks.
 
@@ -1230,21 +1213,6 @@ u8 Axe_PickAttack(void *);
 
 void ActorPhase_UpdateSpriteCollapse(void);
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 // confidence=low: speed and phase duration depend on remaining health.
 
 void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
@@ -1252,20 +1220,20 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
     struct Axe *context = actor->base.context;
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        SetControl(actor, actor->base.onStanding, 0);
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque) && Axe_PickAttack(actor))
         return;
     if (actor->base.health <= context->healthThreshold) {
         speed = 8;
         if ((s32)actor->base.counter2AC > 400) {
-            SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
+            SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
             SetState(actor, 0, 0, 4);
             return;
         }
     } else if (actor->base.health <= context->lowHealthThreshold) {
         speed = 6;
         if ((s32)actor->base.counter2AC > 500) {
-            SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
+            SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
             SetState(actor, 0, 0, 4);
             return;
         }
@@ -3936,19 +3904,7 @@ void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = Axe_UpdateWaitingAnimation;
-        u32 kind = 10;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, Axe_UpdateWaitingAnimation, 10);
         SetFlag(actor, 0x100);
         group->gate.counter = group->gate.duration;
     }
