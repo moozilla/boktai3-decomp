@@ -634,19 +634,14 @@ void SceneActorControl_TickActionCooldown(struct ChaseActor *actor)
     }
 }
 
-struct SceneActorScriptContext {
-    u8 unknown0[0x6A0];
-    s16 mode, firstParameter, secondParameter;
-};
-
 void SceneActorControl_CallContextScript(struct RoomActor *actor)
 {
     s32 values[12];
     struct ScriptUtilityArguments arguments;
-    struct SceneActorScriptContext *context;
+    struct Dog *context;
     {
         u32 mask = 0x80000;
-        u32 *field = (void *)((u32)actor + 0x2D0);
+        u32 *field = &actor->statusFlags;
         if (*field & mask)
             return;
     }
@@ -659,12 +654,12 @@ void SceneActorControl_CallContextScript(struct RoomActor *actor)
     values[3] = actor->parameters1FC[0];
     values[4] = actor->parameters1FC[1];
     values[5] = actor->parameters1FC[2];
-    if (context->mode < 0) {
+    if (context->stolenSlot < 0) {
         values[6] = -1;
         values[7] = -1;
     } else {
-        values[6] = context->firstParameter;
-        values[7] = context->secondParameter;
+        values[6] = context->stolenKind;
+        values[7] = context->stolenParameter;
     }
     values[8] = actor->category;
     values[9] = actor->paletteOffset;
