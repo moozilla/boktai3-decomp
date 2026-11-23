@@ -6,6 +6,7 @@
 #include "game_state.h"
 #include "scene_actor_turn.h"
 #include "scene_actor_init_actor.h"
+#include "scene_actor_chase_shared.h"
 void Heap_Free(void *);
 
 static inline u8 RemovalRequested(struct ChaseActor *p)
@@ -146,10 +147,6 @@ static inline u8 MissingObject(struct ChaseActor *p)
     return 0;
 }
 
-static inline u32 ReadActorStateFlags(struct ChaseActor *p, u32 mask)
-{
-    return p->base.statusFlags & mask;
-}
 static inline u8 ActorUnavailable(struct ChaseActor *p, u16 *flags)
 {
     u32 mask = 0x40;
@@ -225,11 +222,11 @@ next:
         if (paused)
             goto palette;
         flagField = (void *)motion;
-        if (!MotionFlagSet(&flagField->halfword, 0x4000) && !ReadActorStateFlags(actor, 8) &&
-            actor->base.enabled && !SceneActorTurn_ActorFlags(actor, 2) &&
-            (RegistryCurrentGame()->flags868 & 2) && CurrentRegion(actor) &&
-            !ActorUnavailable(actor, motion) && RegistryCurrentGame()->unk876 > 0 &&
-            !PlayerActionPending()) {
+        if (!MotionFlagSet(&flagField->halfword, 0x4000) &&
+            !SceneActorChase_StatusFlags(actor, 8) && actor->base.enabled &&
+            !SceneActorTurn_ActorFlags(actor, 2) && (RegistryCurrentGame()->flags868 & 2) &&
+            CurrentRegion(actor) && !ActorUnavailable(actor, motion) &&
+            RegistryCurrentGame()->unk876 > 0 && !PlayerActionPending()) {
             actor->base.colliderA.responseValue = 0;
             ClearField2B8(actor);
             ClearDrawableFlags(actor, 1);
