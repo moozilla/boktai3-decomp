@@ -156,6 +156,7 @@ class ObjectMap:
         self.ram = ram
         self.objects = []   # (addr, size, type name, label)
         self._seen = set()
+        self._tasks = set()
         self._walk_tasks()
         self._walk_roots(depth)
         self.objects.sort()
@@ -190,6 +191,7 @@ class ObjectMap:
             while t and n < 1024:
                 upd = self.ram.read(t + 8, 4)
                 tid = self.ram.read(t + 16, 2)
+                self._tasks.add(t)
                 fn = self.t.fn_by_addr.get((upd or 0) & ~1)
                 cls = self.t.params.get(fn) if fn else None
                 if cls and self.t.sizeof(cls):
@@ -213,7 +215,9 @@ class ObjectMap:
                     sname = self.t.struct_name(target)
                     if not sname:
                         continue
-                    lab = f'{label}{sub}->'
+                    if p in self._tasks:
+                        continue  # a task is named by its class (_walk_tasks)
+                    lab = (label + sub.lstrip('.') if label.endswith('->') else label + sub) + '->'
                     if self._add(p, sname, lab):
                         nxt.append((p, sname, lab))
             frontier = nxt
