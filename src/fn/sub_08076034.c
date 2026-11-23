@@ -41,9 +41,8 @@ static inline void Sel(struct RoomActor *actor, u32 selection, u32 variant, u32 
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -51,7 +50,7 @@ static inline void Sel(struct RoomActor *actor, u32 selection, u32 variant, u32 
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }

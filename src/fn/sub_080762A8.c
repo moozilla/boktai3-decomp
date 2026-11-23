@@ -65,9 +65,8 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
         }
         *savedSelection = selection;
         {
-            u32 mask = 4;
             u32 mode;
-            if (flags & mask)
+            if (flags & 4)
                 mode = 6;
             else
                 mode = 4;
@@ -75,7 +74,7 @@ void SceneActorAnimation_SelectDirectionalExtraFlags(struct RoomActor *actor, s3
                               actor->drawable, (u16)selection, 2, (u16)mode);
             flags &= 1;
             if (flags)
-                tile->flags |= mask;
+                tile->flags |= 4;
             else
                 tile->flags &= ~4;
         }
