@@ -532,17 +532,14 @@ struct TetherActor *TetherActor_CreateFromScript(u32 a, u32 b);
 void TetherActor_InitializeSegments(struct TetherActor *actor)
 {
     struct SpriteDrawable *segment = actor->segments;
-    s32 offset = -4;
-    s32 remaining = 6;
-    do {
+    s32 i;
+    for (i = 0; i < 7; i++, segment++) {
         void *resource = AnimData_FindEntry(0x1C1C);
         ParticleSprite_Initialize(segment, resource, 0);
-        Effect_SetOrigin(segment, offset, offset);
+        Effect_SetOrigin(segment, -4, -4);
         segment->depthOffset = -1;
         segment->flags |= 1;
-        --remaining;
-        ++segment;
-    } while (remaining >= 0);
+    }
 }
 
 static inline s32 scaleOffsetR(s32 value)
