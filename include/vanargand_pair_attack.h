@@ -96,7 +96,7 @@ struct VanargandPairAttack {
     u8 fadeB[0xD18 - 0xB18];
     u8 fadeC[0xF24 - 0xD18];
     u32 variant;
-    u8 unknownF28[0xF34 - 0xF28];
+    u32 stageQueued[3]; /* 0xF28: per stage (indexed by transition), tested by the queued action state. */
     s32 transition;
     u8 unknownF38[4];
     u16 flash;
@@ -151,6 +151,15 @@ static inline void Vanargand_EnterActionPhase(struct VanargandPairAttack *owner,
     owner->actionPhase = phase;
     owner->actionTimer = 0;
     owner->entered = 1;
+}
+
+/* SceneActorState_StartAction on the body. */
+static inline void Vanargand_StartAction(struct VanargandPairAttack *owner, u32 mode, u32 index,
+                                         u32 phase)
+{
+    owner->actionMode = mode;
+    owner->actionIndex = index;
+    Vanargand_EnterActionPhase(owner, phase);
 }
 
 static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct VanargandPairAttack *owner)

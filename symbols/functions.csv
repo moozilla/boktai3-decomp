@@ -7504,6 +7504,7 @@ addr,name,mode,confidence,source,notes
 081A8820,ActorSoundPhase_UpdateConditionalStop,thumb,low,src-alias,
 081A8888,Vanargand_UpdateTimedAlternateTransition,thumb,low,src-alias,
 081A8938,Vanargand_UpdateQueuedActionTransition,thumb,low,src-alias,
+081A8A0C,Vanargand_UpdateMode23Transition,thumb,low,src-alias,
 081A8A74,Vanargand_UpdateMode20,thumb,low,src-alias,
 081A8BA4,ActorSoundPhase_EnterPhase21,thumb,low,src-alias,
 081A8C00,Vanargand_DispatchSecondaryState,thumb,low,src-alias,Invokes the state callback indexed by offset 0xAE from the second state table; secondary designation is tentative
