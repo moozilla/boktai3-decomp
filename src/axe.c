@@ -1418,12 +1418,6 @@ void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
     e->q = Path_GetPointData(e->p) + (e->a << 3);
 }
 
-struct AxeColliderBlock {
-    u8 unknown0[0xCEC];
-    struct ContactCollider attack[2];
-    struct ContactCollider body[2];
-};
-
 void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
 void Axe_OnBodyContact(void);
@@ -1432,7 +1426,7 @@ void Axe_OnAttackColliderContact(void);
 
 void Axe_InitColliders(struct ChaseActor *actor)
 {
-    struct AxeColliderBlock *blk = actor->base.context;
+    struct Axe *blk = actor->base.context;
     struct ContactPackedVector bodySize, bodyOff, atkSize, atkOff;
     s32 i;
     u16 f = 0x2401;
@@ -1445,7 +1439,7 @@ void Axe_InitColliders(struct ChaseActor *actor)
     bodyOff.z = 0;
     SceneActorCollision_InitBody(actor, &bodySize, &bodyOff, Axe_OnBodyContact, actor);
     for (i = 0; i < 2; i++) {
-        struct ContactCollider *c = &blk->body[i];
+        struct ContactCollider *c = &blk->extraBody[i];
         Collider_Init(c, actor->base.body.id, 0x4001, 0, 16, &bodySize, &bodyOff);
         Collider_SetBodyProperties(c, SceneActorCollision_ReadBodyField3C(actor),
                                    SceneActorCollision_ReadBodyReactionFlags(actor),
@@ -1472,7 +1466,7 @@ void Axe_InitColliders(struct ChaseActor *actor)
     }
     k = 0x24010000;
     for (i = 0; i < 2; i++) {
-        struct ContactCollider *c = &blk->attack[i];
+        struct ContactCollider *c = &blk->extraAttack[i];
         Collider_Init(c, actor->base.body.id, k >> 16, 0, 16, &atkSize, &atkOff);
         Collider_SetAttackProperties(c, SceneActorCollision_ReadAttackField3C(actor, 0),
                                      SceneActorCollision_ReadAttackField40(actor, 0), 0,
@@ -1487,10 +1481,6 @@ s32 Axe_GetActorCategory(void)
 {
     return 4;
 }
-
-struct P {
-    u32 a, b;
-};
 
 void Axe_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *end)
 {
@@ -3254,18 +3244,13 @@ void Axe_UpdateTrailColliders(u8 *actor)
     }
 }
 
-struct S080FCB3C {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_RemoveSecondaryColliders(struct S080FCB3C *s)
+void Axe_RemoveSecondaryColliders(struct ChaseActor *actor)
 {
-    u8 *p = s->q + 0xd94;
+    struct ContactCollider *p = ((struct Axe *)actor->base.context)->extraBody;
     s32 i = 1;
     do {
         Collider_Remove(p);
-        p += 0x54;
+        p++;
     } while (--i >= 0);
 }
 
@@ -4266,9 +4251,7 @@ s32 Axe_OnRender(struct S080FE64C *s)
     return 0;
 }
 
-struct S080FCB3C;
-
-void Axe_RemoveSecondaryColliders(struct S080FCB3C *s);
+void Axe_RemoveSecondaryColliders(struct ChaseActor *actor);
 
 void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s);
 

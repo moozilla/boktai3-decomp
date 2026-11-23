@@ -34,7 +34,9 @@ struct Axe {
     u8 unknownCAA;
     u8 flagsCAB;
     u8 auxiliaryShadow[0x40];
-    u8 unknownCEC[0x152];
+    struct ContactCollider extraAttack[2]; /* the axe actor's own pairs (Axe_InitColliders) */
+    struct ContactCollider extraBody[2];
+    u8 unknownE3C[2];
     u8 delay;
     u8 turnStep;
     u8 relocationDelay;
