@@ -1327,8 +1327,7 @@ static inline s32 RandomByte(void)
     u32 offset;
     u32 *index = &gRandomIndex;
     u32 next = *index + 1;
-    u32 mask = 1023;
-    *index = next & mask;
+    *index = next & 1023;
     offset = *index * 2;
     return *(const u8 *)(offset + RANDOM_TABLE_ADDR);
 }
