@@ -5,16 +5,6 @@ s32 ScenePool_ResumeAfterIdle(void *, struct ScenePoolEntry *);
 void ScenePool_UpdateSpeedPulse(struct ScenePoolActor *, struct ScenePoolEntry *,
                                 const struct ScenePoolSpeedBounds *);
 extern const struct ScenePoolSpeedBounds gUnk_0860588C[];
-static inline void Or(u32 mask, u32 *flags)
-{
-    *flags |= mask;
-}
-static inline u8 PlayerHasFlag(u32 mask)
-{
-    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
-        return 1;
-    return 0;
-}
 static inline void Enter(struct ScenePoolEntry *entry, u32 state, u32 zero)
 {
     entry->state = state;
@@ -37,7 +27,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         return 0;
     if (ScenePool_ResumeAfterIdle(actor, entry))
         return 0;
-    Or(0x10, &actor->stateFlags);
+    ScenePoolActor_SetStateFlags(actor, 0x10);
     ScenePool_UpdateSpeedPulse(actor, entry, gUnk_0860588C);
     if (entry->speedControlActive) {
         u32 *controls = &actor->controlFlags;
@@ -74,7 +64,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         history[0]++;
     } else
         history[0] = 0;
-    flag = PlayerHasFlag(2);
+    flag = ScenePool_PlayerHasFlag(2);
     if (!flag && history[0] > 9) {
         switch (entry->kind) {
             case 0:
@@ -94,7 +84,7 @@ s32 ScenePool_StateTrackAdaptive(void *manager, struct ScenePoolActor *actor,
         return 0;
     }
     if (entry->stateFrame > 239) {
-        flag = PlayerHasFlag(2);
+        flag = ScenePool_PlayerHasFlag(2);
         if (flag) {
             s32 sample;
             gRandomIndex = (gRandomIndex + 1) & 0x3ff;

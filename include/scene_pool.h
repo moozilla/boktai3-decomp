@@ -178,4 +178,17 @@ struct ScenePoolPlayer {
 };
 /* 0x020004F0 */
 extern struct ScenePoolPlayer *gParticipantActors[2];
+
+static inline void ScenePoolActor_SetStateFlags(struct ScenePoolActor *actor, u32 mask)
+{
+    actor->stateFlags |= mask;
+}
+
+/* Whether the first participant is present with any of MASK in its flags. */
+static inline u8 ScenePool_PlayerHasFlag(u32 mask)
+{
+    if (gParticipantActors[0] && (gParticipantActors[0]->flags & mask))
+        return 1;
+    return 0;
+}
 #endif
