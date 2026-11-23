@@ -13,6 +13,14 @@ static inline u8 LinkSelection_IsReady(u32 value, u32 mask)
     return 0;
 }
 
+static inline u8 LinkSelection_IsStart(u16 value, u16 mask)
+{
+    value &= mask;
+    if (value == 0x1400)
+        return 1;
+    return 0;
+}
+
 static inline u8 LinkSelection_IsSelected(u32 value, u32 mask)
 {
     if ((value & mask) == 0x1800)
