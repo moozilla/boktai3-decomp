@@ -304,6 +304,7 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
     struct ChoiceResource *resource;
     struct ContactPosition zero;
     s32 i;
+    s32 result;
     FloatingEffect_SetManager(manager);
     resource = ScriptProc_Start(0xCB05, 0x5D04);
     if (!resource)
@@ -318,8 +319,9 @@ s32 LinkedWidgetSet_Init(struct LinkedWidgetSet *manager)
         effect->state = FLOATING_EFFECT_WAIT_AFTER_BOB;
         effect->kind = 0;
         effect->timer = 0;
-        Widget_InitLinked(&effect->sprite, &manager->resource, 0, 0x11, 1, 0, 0x3C, &zero);
+        result = Widget_InitLinked(&effect->sprite, &manager->resource, 0, 0x11, 1, 0, 0x3C, &zero);
     }
+    return result;
 }
 
 struct LinkedWidgetSet *FloatingEffectManager_Create(void)
