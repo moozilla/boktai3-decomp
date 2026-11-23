@@ -8,7 +8,7 @@ void SceneActorCollision_InitAttack(struct ChaseActor *actor, void *inputSize, v
     u32 index = inputIndex;
     struct ContactCollider *collider;
     {
-        collider = (void *)((u8 *)actor + 0x188);
+        collider = &actor->base.colliderB;
     }
     {
         u32 flags = 0x2401;

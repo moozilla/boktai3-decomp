@@ -94,7 +94,7 @@ done:;
             extent.x = 0x52;
             extent.y = 0;
             extent.z = 0x52;
-            bouncePtr = (u16 *)((u8 *)actor + 0x2e8);
+            bouncePtr = &actor->base.field2E8;
             bounce = *bouncePtr;
             burst = &extent;
             if (bounce == 0) {

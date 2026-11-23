@@ -8,7 +8,7 @@ void SceneActorCollision_InitBodyWithFlags(struct ChaseActor *actor, void *input
     void *callback = inputCallback;
     struct ContactCollider *collider;
     {
-        collider = (void *)((u8 *)actor + 0x134);
+        collider = &actor->base.colliderA;
     }
     Collider_Init(collider, (u16)actor->base.body.id, (u16)flags, 0, 16, size, offset);
     Collider_SetBodyProperties(collider, SceneActorCollision_ReadBodyField3C(actor),

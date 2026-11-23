@@ -43,7 +43,7 @@ void SceneActorMovement_UpdateHeight(struct ChaseActor *actor)
     u32 category = actor->base.category;
     if (category == 0x16) {
         u32 height = TerrainHeight(actor, actor->base.terrainCell);
-        u16 *ground = (void *)((u8 *)actor + 0x2be);
+        u16 *ground = &actor->base.groundHeight;
         if (*ground != height) {
             u16 *displacement = &actor->base.heightOffset;
             *displacement -= height - *ground;
