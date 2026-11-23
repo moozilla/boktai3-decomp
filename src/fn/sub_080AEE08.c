@@ -1,3 +1,4 @@
+#include "scene_actor_turn.h"
 #include "scene_actor_chase_reaction.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_behavior.h"
@@ -19,10 +20,6 @@ static inline u16 Vorn_GetDefeatScript(struct ChaseActor *actor)
 static inline s32 Vorn_GetScriptParameter(struct ChaseActor *actor, u32 index)
 {
     return actor->base.parameters1FC[index];
-}
-static inline u32 Vorn_ActorFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
 }
 static inline u8 Vorn_RandomSparkCount(const u16 *table, u32 *cursor)
 {
@@ -102,7 +99,7 @@ void Vorn_UpdateDefeat(struct ChaseActor *actor)
     if (!actor->base.restart)
         return;
     actor->base.stepDone = 1;
-    if (!Vorn_ActorFlags(actor, 0x400)) {
+    if (!SceneActorTurn_ActorFlags(actor, 0x400)) {
         u8 category;
         SceneActor_CallContextScriptB(actor);
         {

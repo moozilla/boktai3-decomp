@@ -1,3 +1,6 @@
+#include "scene_actor_displacement.h"
+#include "scene_actor_chase.h"
+#include "tentacle_spread.h"
 #include "slime.h"
 #include "scene_actor_turn.h"
 #include "scene_actor_visibility.h"
@@ -73,13 +76,6 @@ static inline void Slime_AddPositions(struct ContactPosition *out, struct Contac
     out->z = b->z + a->z;
 }
 
-static inline void Slime_SubtractMotion(struct ContactPosition *out, struct ContactPosition *a,
-                                        struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
 
 static inline s32 Slime_QuarterDirectionForContact(s32 angle)
 {
@@ -104,9 +100,9 @@ void Slime_ResolveBodyContact(struct ContactCollider *contact, void *other,
 
     if (contactFlags) {
         Slime_AddPositions(&next, &actor->base.body.position, &actor->base.body.motion);
-        Slime_SubtractMotion(&displacement, (void *)&contact->x, &next);
+        SceneActorTerrain_Subtract(&displacement, (void *)&contact->x, &next);
         SceneActorTerrain_GetCenter(actor->base.terrainCell, &center);
-        Slime_SubtractMotion(&fromContact, &center, (void *)&contact->x);
+        SceneActorTerrain_Subtract(&fromContact, &center, (void *)&contact->x);
         angle = Slime_QuarterDirectionForContact(Math_Atan2(fromContact.x, fromContact.z) + 32);
         switch (angle) {
             case 0:
@@ -342,18 +338,10 @@ void Slime_TickWaitTimer(struct ChaseActor *actor)
 
 void Anim_SetDurationScale(void *, u32);
 
-static inline u8 Slime_TakeEntryFlag(struct ChaseActor *p)
-{
-    if (p->base.field2B2) {
-        p->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
 
 void Slime_UpdateWalkTransition(struct ChaseActor *p)
 {
-    if (Slime_TakeEntryFlag(p)) {
+    if (Slime_TakePrepared(p)) {
         SceneActorAnimation_SelectProfileEntry((void *)p, 0xe);
         Anim_SetDurationScale(
             &((struct SceneActorAnimationSequenceDrawable *)p->base.drawable)->sequence, 0x40);
@@ -377,10 +365,6 @@ void Slime_OnUnusedControlEvent(void)
 
 // confidence=low: motion converges to saved displacement before choosing idle or the next Slime control.
 
-static inline s32 Slime_QuarterMotion(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
 
 static inline s32 Slime_ClampMotion(s32 v)
 {
@@ -430,8 +414,8 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
     u32 *actorFlags;
     u32 *t;
     if (Slime_TakePrepared(actor)) {
-        actor->base.secondaryMotion.x = Slime_QuarterMotion(actor->base.secondaryMotion.x);
-        actor->base.secondaryMotion.z = Slime_QuarterMotion(actor->base.secondaryMotion.z);
+        actor->base.secondaryMotion.x = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.x);
+        actor->base.secondaryMotion.z = SceneActorDisplacement_Quarter(actor->base.secondaryMotion.z);
         SceneActorAnimation_SelectProfileEntry((void *)actor, 3);
         {
             u16 *flags = &actor->base.motionFlags;
@@ -448,14 +432,14 @@ void Slime_ConvergeReactionMotion(struct ChaseActor *actor)
         s32 difference = current - *field;
         actorFlags = t;
         priorX = field;
-        x = Slime_QuarterMotion(difference);
+        x = SceneActorDisplacement_Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
         s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
-        z = Slime_QuarterMotion(difference);
+        z = SceneActorDisplacement_Quarter(difference);
     }
     x = Slime_ClampMotion(x);
     z = Slime_ClampMotion(z);
@@ -677,20 +661,12 @@ void Slime_RunDefeatScript(struct ChaseActor *actor, s32 frame)
 
 void SceneActorBehavior_CallActionScript(u8 *);
 
-inline static u8 Slime_TakeActionEntry(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
 
 void Slime_UpdateActionScript(struct ChaseActor *obj)
 {
     struct Slime *context = obj->base.context;
 
-    if (Slime_TakeActionEntry(&obj->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&obj->base.field2B1)) {
         obj->base.body.direction = obj->base.tracking.heading;
         SceneActorBehavior_CallActionScript((u8 *)obj);
     }
@@ -717,21 +693,7 @@ s32 Callback_InvokeActor(void *, void *);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-static inline u8 Slime_TakeApproachEntry(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
 
-static inline s32 Slime_ShiftTowardZero(s32 n, u32 bits)
-{
-    if (n >= 0)
-        return n >> bits;
-    return -((-n) >> bits);
-}
 
 static inline void Slime_SetApproachControl(struct ChaseActor *a, void *cb, u32 kind)
 {
@@ -759,8 +721,8 @@ static inline u8 Slime_ApproachWanderTarget(struct ChaseActor *actor,
     if (dx || dz) {
         motion->direction = Math_Atan2(dx, dz);
         motion->motion.x +=
-            Slime_ShiftTowardZero(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
-        motion->motion.z += Slime_ShiftTowardZero(gUnk_086149C4[motion->direction] * speed, 12);
+            TentacleSpread_Shift(gUnk_086149C4[(motion->direction + 64) & 255] * speed, 12);
+        motion->motion.z += TentacleSpread_Shift(gUnk_086149C4[motion->direction] * speed, 12);
     }
     return 0;
 }
@@ -783,7 +745,7 @@ void Slime_ApproachSavedTarget(struct ChaseActor *actor)
 {
     struct Slime *context = actor->base.context;
     s32 speed;
-    if (Slime_TakeApproachEntry(&actor->base.field2B1)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         Slime_SetApproachControl(actor, actor->base.onAlternateEntry, 1);
         Slime_SelectWanderTarget(actor, actor->base.body.direction);
         actor->base.field2C2 = 0x40;
@@ -1266,13 +1228,6 @@ static inline void Slime_TargetBurstPolarMotion(struct ContactPosition *v, s32 a
     v->z = Slime_TargetBurstFixed12(gUnk_086149C4[angle & 255] * radius);
 }
 
-static inline void Slime_TargetBurstDelta(struct ContactPosition *v, struct ContactPosition *from,
-                                          struct ContactPosition *to)
-{
-    v->x = to->x - from->x;
-    v->y = to->y - from->y;
-    v->z = to->z - from->z;
-}
 
 static inline u16 *Slime_TargetBurstPalette(struct ChaseActor *actor)
 {
@@ -1308,7 +1263,7 @@ void Slime_EmitTargetedReactionBurst(struct ChaseActor *input)
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
     s16 jitter = Slime_TargetBurstRandom() & 15;
-    Slime_TargetBurstDelta(&velocity, &actor->base.body.position,
+    Chase_Delta(&velocity, &actor->base.body.position,
                            &actor->base.tracking.target->position);
     angle = Math_Atan2(velocity.x, velocity.z);
     Slime_TargetBurstPolarMotion(&velocity, angle + jitter, (Slime_TargetBurstRandom() & 7) + 6);
@@ -1413,13 +1368,6 @@ static inline void Slime_SetPolarMotion(struct ContactPosition *v, s32 angle, s3
     v->z = Slime_TruncateFixed12(gUnk_086149C4[angle & 255] * radius);
 }
 
-static inline void Slime_SubtractPositions(struct ContactPosition *v, struct ContactPosition *from,
-                                           struct ContactPosition *to)
-{
-    v->x = to->x - from->x;
-    v->y = to->y - from->y;
-    v->z = to->z - from->z;
-}
 
 static inline u16 *Slime_PaletteBase(struct ChaseActor *actor)
 {
@@ -1465,7 +1413,7 @@ void Slime_EmitScatteredReactionBurst(struct ChaseActor *input)
     s32 angle;
     u32 variant = Slime_GetRandomVariantFlags(actor);
     s32 jitter = Slime_RandomSample() & 15;
-    Slime_SubtractPositions(&velocity, &actor->base.body.position,
+    Chase_Delta(&velocity, &actor->base.body.position,
                             &actor->base.tracking.target->position);
     angle = Slime_RandomSample() & 255;
     Slime_SetPolarMotion(&velocity, angle + jitter, (Slime_RandomSample() & 7) + 12);
@@ -1611,32 +1559,7 @@ static inline u8 Slime_TestReactionFlag(struct Slime *s, u32 mask)
     return 0;
 }
 
-static inline void Slime_SetReactionControl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 
-static inline void Slime_SetDamageState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    u32 behavior = b;
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 static inline u32 Slime_CollisionDamageFlags(struct ContactCollider *p)
 {
@@ -1690,18 +1613,18 @@ u32 Slime_ResolveDamageReaction(struct ChaseActor *actor)
     }
     if ((Slime_DamageFlags(&actor->base.hitReactionFlags) & 0x40000)) {
         Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
-        Slime_SetReactionControl(actor, actor->base.onReaction, 0x12);
-        Slime_SetDamageState(actor, 3, 0, 0);
+        Chase_SetCtl(actor, actor->base.onReaction, 0x12);
+        Chase_SetState(actor, 3, 0, 0);
     } else {
         if (Slime_MaskedMotionBits(motionFlags, 0x100))
             return 0;
         if (actor->base.health < context->halfHealth || Slime_TestReactionFlag(context, 8)) {
-            Slime_SetReactionControl(actor, SceneActorControl_OnIdle, 0x10);
-            Slime_SetDamageState(actor, 0, 0, 2);
+            Chase_SetCtl(actor, SceneActorControl_OnIdle, 0x10);
+            Chase_SetState(actor, 0, 0, 2);
             Slime_ClearReactionBits(&actor->base.reactionFlags, ~0x980);
         } else if ((*(u32 *)&actor->base.state2A8 & 0xffffff) != 0) {
-            Slime_SetReactionControl(actor, actor->base.onStanding, 0);
-            Slime_SetDamageState(actor, 0, 0, 0);
+            Chase_SetCtl(actor, actor->base.onStanding, 0);
+            Chase_SetState(actor, 0, 0, 0);
         }
     }
     return 1;

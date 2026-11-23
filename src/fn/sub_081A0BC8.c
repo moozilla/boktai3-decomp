@@ -1,3 +1,4 @@
+#include "terrain_sampling.h"
 #include "global.h"
 
 #include "engine.h"
@@ -81,13 +82,6 @@ static inline void SetVector(struct Vec *p, s32 x, s32 y, s32 z)
     p->y = y;
     p->z = z;
 }
-static inline s32 CellIndex(struct Vec *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 static inline u8 *CellProperties(s32 cell)
 {
     u8 *p = TerrainModifiers_FindCellOverride(cell, 1);
@@ -97,7 +91,7 @@ static inline u8 *CellProperties(s32 cell)
 }
 static inline s32 Height(struct Vec *p)
 {
-    u8 *cell = CellProperties(CellIndex(p));
+    u8 *cell = CellProperties(Terrain_GetCellIndex(p));
     u32 shape = *cell >> 4;
     s32 height = (*cell & 15) << 8;
     switch (shape) {

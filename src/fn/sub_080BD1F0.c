@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_behavior.h"
 #include "skeleton.h"
 #include "scene_actor_reaction.h"
@@ -46,12 +47,6 @@ static inline s32 Clamp(s32 v)
 static inline s32 Scale(s32 n)
 {
     return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
 }
 static inline u32 Masked16(u16 *p, u32 maskInput)
 {
@@ -376,7 +371,7 @@ notHidden:
         u32 *f = &state.context->actionFlags;
         u32 v = *f & m;
         ctxFlags = f;
-        blocked = Test(v, ~0);
+        blocked = SceneActorChase_Test(v, ~0);
     }
     if (!blocked) {
         SceneActorChase_SetControl(actor, SceneActorReaction_TickHiddenTimeout, 0x39);
@@ -385,7 +380,7 @@ notHidden:
         {
             u32 bit = 0x40;
             *response.flags &= ~bit;
-            if (Test(*ctxFlags, bit)) {
+            if (SceneActorChase_Test(*ctxFlags, bit)) {
                 u32 c = 7;
                 actor->base.category = c;
                 Skeleton_InitializeCategoryProfile(actor);
@@ -486,7 +481,7 @@ notHidden:
                 category == 0x18 || category == 0x19)
                 Sound_PlaySong(0xE5);
         }
-        if (!Test(gEngineFlags, 0x4800) && !Skeleton_StatusFlags(actor, 0x800))
+        if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Skeleton_StatusFlags(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
     }
     ActorShadow_Disable(actor->base.shadow);
