@@ -534,13 +534,6 @@ void SceneActorCollision_InitGateColliders(struct ChaseActor *actor)
 
 void Collider_SetPosition(void *, void *, u32);
 
-static inline u8 Test(u32 *field, u32 mask)
-{
-    if (*field & mask)
-        return 1;
-    return 0;
-}
-
 static inline u8 TestContext(struct Dog *context, u32 mask, u32 **out)
 {
     u32 *field = &context->flags;
@@ -578,7 +571,7 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
     switch (Math_ShiftTowardZero(heading, 6)) {
         case 0:
         case 2:
-            if (Test(flags, 2)) {
+            if (WordFlags_Has(2, flags)) {
                 wide.packed.x = 240;
                 wide.packed.z = 128;
             }
@@ -587,7 +580,7 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
             break;
         case 1:
         case 3:
-            if (Test(flags, 2)) {
+            if (WordFlags_Has(2, flags)) {
                 wide.packed.x = 128;
                 wide.packed.z = 240;
             }
@@ -606,7 +599,7 @@ void Dog_UpdateCollisionBounds(struct ChaseActor *a)
         c->bounds = *(struct ContactPosition *)&narrow;
         Collider_SetPosition(c, &position, 0);
     }
-    if (Test(flags, 2)) {
+    if (WordFlags_Has(2, flags)) {
         struct ContactCollider *c = &context->collider;
         c->bounds = *(struct ContactPosition *)&wide;
     } else {
@@ -2062,11 +2055,6 @@ void Dog_UpdateAnimationFourteenReaction(u8 *p)
         *(u8 *)(p + 0x2B0) = 1;
 }
 
-static inline void Dog_SetTurnFlags(struct ChaseActor *actor, u16 mask)
-{
-    actor->base.motionFlags = mask | actor->base.motionFlags;
-}
-
 static inline void Dog_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase)
 {
     actor->base.state2A8 = state;
@@ -2096,7 +2084,7 @@ void Dog_UpdateTurnSequence(struct ChaseActor *actor, s32 frame)
     struct SceneActorChaseGroup *group = &actor->group;
     if (SceneActorReaction_TakePrepared(actor)) {
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
-        Dog_SetTurnFlags(actor, 0x400);
+        SceneActorChase_SetMotionFlags(actor, 0x400);
         actor->base.field2C2 = 32;
     }
     if (group->turn.turnsRemaining > 0) {
