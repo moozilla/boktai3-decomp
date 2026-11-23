@@ -36,7 +36,8 @@ struct HresvelgrTravelActor {
     u8 pad115[0x5F];
     struct SceneInputResource animationData;
     struct SceneInputWidget animation;
-    u8 pad1F4[0x2F0 - 0x1F4];
+    u8 pad1F4[0x248 - 0x1F4];
+    u8 damageNumberSource[0x2F0 - 0x248]; /* 0x248: passed to DamageNumberDisplay_Show. */
     struct BossActionState action, behavior; /* 0x2F0, 0x300 */
     u8 pad310[8];
     u16 recoveryFrames;
@@ -102,6 +103,20 @@ static inline void Hresvelgr_StartAction(struct HresvelgrTravelActor *actor, u32
     actor->actionPhase = phase;
     actor->actionTimer = 0;
     actor->actionEnter = 1;
+}
+
+/* SceneActorState_StartReaction on this type: hand the actor to a reaction callback
+ * as reaction state STATE (tick, currentAnimation, phase and phaseFrame are the
+ * StateActor's callbackFrame, actionState, reactionPhase and reactionTimer). */
+static inline void Hresvelgr_StartReaction(struct HresvelgrTravelActor *actor,
+                                           void (*callback)(void *), int state)
+{
+    actor->currentAnimation = state;
+    actor->actionCallback = callback;
+    actor->tick = 0;
+    actor->changed = 1;
+    actor->phase = 0;
+    actor->phaseFrame = 0;
 }
 
 static inline void Hresvelgr_EnterPhase(struct HresvelgrTravelActor *actor, u32 phase)
