@@ -186,6 +186,8 @@ const GOALS = {
         for (const d of doors) {
           prev = here;
           if (d.hub !== undefined) {
+            VISITS.set(d.scene, (VISITS.get(d.scene) || 0) + 1);
+            visited.add(d.scene);
             const r = yield* L.chooseHub(d.hub);
             event({ skill: 'hub', entry: d.hub, to: d.scene, ...r });
             yield g.until(() => L.where().scene !== here, 600);
