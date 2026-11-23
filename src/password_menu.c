@@ -627,7 +627,6 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
     void *palette;
     void *graphics;
     void *firstResource;
-    u32 resourceBank;
     s32 offA;
     s32 offB;
     u32 *verticalRepeat;
@@ -671,8 +670,7 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
     palette = ((struct PasswordMenuPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
     CpuSet(palette, gBgPaletteBuffer, size = 0x100);
-    resourceBank = 0xCB05;
-    resource = ScriptProc_Start(resourceBank, 0xE2AB);
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
     firstResource = &s->widgets[0].resource;
     ResourceHeader_Relocate(firstResource, resource);
     Widget_InitLinked(&s->widgets[0].sprite, firstResource, 0x39, 0x10, zero, zero, zero, zero);
@@ -704,7 +702,7 @@ s32 PasswordMenu_Initialize(struct PasswordMenu *s)
         u32 palette = 0xE002;
         *keyPaletteBank = palette;
     }
-    resource = ScriptProc_Start(resourceBank, 0x530D);
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     offA = (u32) & ((struct PasswordMenu *)0)->widgets[4].resource;
     graphics = (u8 *)s + offA;
     ResourceHeader_Relocate(graphics, resource);
