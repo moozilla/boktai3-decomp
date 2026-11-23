@@ -160,7 +160,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     gParticipantActors[p->participant] = (struct ScenePoolPlayer *)p;
     Glove_RegisterMessageReceiver(p);
     p->input = gPadState + p->participant * 4;
-    p->participantIndex = p->participant;
-    Memory_Clear(p->pending, 8);
+    p->attachmentDesc.resource = p->participant;
+    Memory_Clear(&p->offsetX, 8);
     return 0;
 }

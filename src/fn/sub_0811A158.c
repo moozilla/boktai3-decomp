@@ -136,7 +136,7 @@ void Glove_UpdatePostState(struct Glove *p)
             ActorStats_ApplyPendingDamage(self);
         Character_UpdateTimedEffect(&self->pendingDamage);
         if ((!Inactive(p)) && (!(p && ((Glove_ReadFlags(p)) & 0x10))))
-            ActorParticles_UpdateEmitter(self, self->color, self->style.initialWord);
+            ActorParticles_UpdateEmitter(self, &self->emitter, self->style.initialWord);
         if (Glove_ActorFlags(p, 1)) {
             p->resourceFraction = 0;
             p->motion.recoveryTimer = 0;

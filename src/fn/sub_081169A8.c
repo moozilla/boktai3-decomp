@@ -93,5 +93,5 @@ void Glove_InitializeStyleModifiers(struct Glove *p)
     Modifier_InitDrainState(self->drain, p->model.parts[0].drainSource, 120, 1);
     Modifier_InitFourthSourceEffect(self, p);
     self->fourthValue = sub_0811EAB8(self, self->fourthValue);
-    Character_SetLowResourceColorEffect(self->color, &self->style);
+    Character_SetLowResourceColorEffect(&self->emitter, &self->style);
 }

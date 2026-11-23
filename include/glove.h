@@ -5,7 +5,7 @@
 #include "scene_actor_style.h"
 #include "spatial_entry.h"
 
-/* The Glove controller (0811697C-0811A9xx): the player's glove actor, a 0x958-byte
+/* The Glove controller (0811697C-0811A9xx): the player's glove actor, a 0x968-byte
  * object whose movement body sits at +0x18 and whose sprite model follows it.
  * Merged from the per-unit declarations of the units that drive it. Names are
  * tentative (confidence=low) unless a sibling confirms them. */
@@ -17,6 +17,12 @@ struct Glove;
 union GloveAnimationKey {
     u32 word;
     u16 half[2];
+};
+
+/* The particle emitter request at motion+0x44: a recoil command sets the kind
+ * and type and raises `enter`; the low-resource color effect reads it too. */
+struct GloveEmitter {
+    u8 kind, unknown1, type, enter;
 };
 
 /* The movement body, 0x5F8 bytes at Glove+0x18. */
@@ -31,7 +37,7 @@ struct GloveMotion {
     s32 unk38;
     s32 unk3C;
     u32 flags40;
-    u8 color[4];
+    struct GloveEmitter emitter; /* 0x44 */
     struct SceneActorStyle style; /* 0x48 */
     u8 pad64[4];
     u32 pendingDamage; /* 0x68 */
@@ -114,10 +120,36 @@ struct GloveModel {
     u8 palette[0x40];
 };
 
-/* The draw record at Glove+0x8C8. */
+/* A queued scene command for the glove (kind in `type`). */
+struct GloveCommand {
+    u8 unknown0[6], type, unknown7;
+    s16 x, y;
+    u16 c, d, e, f;
+};
+
+/* The command queue at Glove+0x870, double-buffered by the dispatch bank. */
+struct GloveQueue {
+    u8 unknown0[6], count[2];
+    struct GloveCommand *commands[2][4];
+};
+
+/* The recoil record at Glove+0x8C8 (bit 0 of flags: the glove is active). A
+ * recoil command writes its target here. confidence=low */
 struct GloveDraw {
-    u8 pad0[0x16];
+    s32 x, y, z;
+    u8 unknownC[4];
+    u8 b, d, a, c;
+    u8 unknown14[2];
     u16 flags;
+};
+
+/* The attachment descriptor at Glove+0x91C; its resource is the participant index. */
+struct GloveAttachment {
+    u32 resource, flags, unknown8;
+};
+
+struct GlovePosition {
+    s16 x, y, z;
 };
 
 struct Glove {
@@ -131,7 +163,8 @@ struct Glove {
     u8 active;  /* 0x868 */
     u8 pad869[3];
     void (*update)(void *); /* 0x86C */
-    u8 pad870[0x8A4 - 0x870];
+    struct GloveQueue queue; /* 0x870 */
+    u8 pad898[0x8A4 - 0x898];
     struct ScenePoolVec32 origin, scroll; /* 0x8A4 */
     u16 *input;                           /* 0x8C4 */
     struct GloveDraw draw;                /* 0x8C8 */
@@ -148,13 +181,16 @@ struct Glove {
     s32 launchSpeed; /* 0x914 */
     u8 launchPhase;  /* 0x918 */
     u8 pad919[3];
-    u32 participantIndex; /* 0x91C */
-    u8 pad920[0x30];
-    u32 pending[2]; /* 0x950 */
+    struct GloveAttachment attachmentDesc; /* 0x91C */
+    struct GlovePosition screenPosition;   /* 0x928 */
+    u8 pad930[0x950 - 0x930];
+    s16 offsetX, offsetY; /* 0x950 */
+    u8 pad954[0x964 - 0x954];
+    void *attachment; /* 0x964 */
 };
 
 typedef char GloveMotionSizeCheck[sizeof(struct GloveMotion) == 0x5F8 ? 1 : -1];
 typedef char GloveModelSizeCheck[sizeof(struct GloveModel) == 0x250 ? 1 : -1];
-typedef char GloveSizeCheck[sizeof(struct Glove) == 0x958 ? 1 : -1];
+typedef char GloveSizeCheck[sizeof(struct Glove) == 0x968 ? 1 : -1];
 
 #endif

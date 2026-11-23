@@ -177,7 +177,7 @@ void Glove_UpdateRecoveryFlash(struct Glove *p)
                 s32 mask = ~1;
                 *flags &= mask;
             }
-            Character_SetLowResourceColorEffect(self->color, &self->style);
+            Character_SetLowResourceColorEffect(&self->emitter, &self->style);
         } else
             p->timer++;
     }
