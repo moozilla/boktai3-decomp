@@ -94,10 +94,6 @@ static inline void PhaseStart(struct ChaseActor *a, u32 phase, u32 behavior)
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
 }
-static inline void SetStatus(struct ChaseActor *a, u32 mask)
-{
-    a->base.motionFlags = mask | a->base.motionFlags;
-}
 static inline void Phase(struct ChaseActor *a, u32 phase, u32 behavior, u32 counter)
 {
     a->base.state2A8 = 0;
@@ -213,7 +209,7 @@ void SceneActorControl_ApplyRecoveryContact(struct SceneActorBehaviorContactView
               4);
     } else {
         SetMotion(motion, 8);
-        SetStatus(a, 0x100);
+        SceneActorChase_SetMotionFlags(a, 0x100);
         Phase(a, 0, 3, zero);
         SceneActorControl_ResetCollisionPhase(a);
     }
