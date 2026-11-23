@@ -241,9 +241,8 @@ void SceneProcParticles_SubmitBounds(struct BurstEntry *entry,
 
 static inline u32 SpritePool_MakeKey(u32 counter, u32 id)
 {
-    u32 mask = 0xff;
-    id &= mask;
-    counter &= mask;
+    id &= 0xff;
+    counter &= 0xff;
     counter <<= 8;
     id |= counter;
     return id;
