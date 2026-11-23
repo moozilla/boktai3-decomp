@@ -234,11 +234,6 @@ static inline s32 TruncateQ6(s32 n)
     return n >= 0 ? n >> 6 : -((-n) >> 6);
 }
 
-static inline u32 ReadFlagBits(u32 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 static inline u8 IsMovementSlowed(struct Player *player)
 {
     s32 active = player->active;
@@ -310,7 +305,7 @@ void Player_AdvanceScriptDestination(struct Player *player)
         }
         if ((!((player->animation.frameIndex) & 3)) && (!(player->animation.elapsed))) {
             if ((!((player && (player->active)) && (!(player->sceneMode)))) &&
-                (!(player && ((u8)ReadFlagBits(&player->actionFlags, 4))))) {
+                (!(player && ((u8)Player_ReadStatusBits(&player->actionFlags, 4))))) {
                 if (PlayerCue_ResolveReference(player) && IsMovementSlowed(player)) {
                     if (!(player->animation.frameIndex))
                         Sound_PlaySong(0xC8);
@@ -2226,28 +2221,13 @@ void PlayerCue_UpdateSpiralRecovery(struct Player *player)
         player->animation.position = (*(struct ContactPosition *)&player->position);
     }
     Player_SetAnimation(player, 0x9A, 0x40, 1);
-    {
-        u16 *target = &player->animation.paletteBank;
-        u32 resource;
-        resource = 0x16F;
-        *target = resource;
-        player->animation.palette = (u16 *)(gPaletteBankData + (resource << 5));
-    }
-    {
-        struct DisplaySequenceState *seq;
-        seq = &player->cueCollider.sequence;
-        Anim_SetSequence(seq, player->cueCollider.sideResource, 0, player->heading, player->side);
-        {
-            PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags, seq);
-        }
-    }
-    {
-        u16 *target;
-        u32 resource;
-        target = &player->actionEighteenParameter;
-        resource = 0x16F;
-        *target = resource;
-    }
+    player->animation.paletteBank = 0x16F;
+    player->animation.palette = (u16 *)(gPaletteBankData + player->animation.paletteBank * 32);
+    Anim_SetSequence(&player->cueCollider.sequence, player->cueCollider.sideResource, 0,
+                     player->heading, player->side);
+    PlayerCue_StepSequence((struct ContactSwarmSprite *)&player->secondaryDrawFlags,
+                           &player->cueCollider.sequence);
+    player->actionEighteenParameter = 0x16F;
     PlayerCue_AdvanceRecoveryCounters(player, 32, 31);
 }
 
@@ -2434,11 +2414,6 @@ void Player_UpdateStateMotionCue(struct Player *player)
 
 // confidence=low: timed held-action phases, animation and completion script.
 
-static inline u32 HasStatusFlag(struct Player *player, u32 mask)
-{
-    return player->statusFlags & mask;
-}
-
 void Player_UpdateTimedChargeAction(struct Player *actor)
 {
     struct Player *player = actor;
@@ -2468,7 +2443,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
                 ActorSequence_Begin(player, 7, 4);
                 break;
             }
-            if (HasStatusFlag(player, 16)) {
+            if (Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_PlaySong(216);
                 player->chargeSoundActive = 1;
                 player->chargeCounter = 0;
@@ -2501,7 +2476,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
                     break;
                 }
             }
-            if (!HasStatusFlag(player, 16)) {
+            if (!Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_StopSong(216);
                 player->chargeSoundActive = 0;
 
@@ -2544,7 +2519,7 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
 
                 break;
             }
-            if (HasStatusFlag(player, 16)) {
+            if (Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_PlaySong(216);
                 player->chargeSoundActive = 1;
                 player->chargeCounter = 0;
@@ -2593,16 +2568,6 @@ void Player_UpdateTimedChargeAction(struct Player *actor)
 
 // confidence=low: timed held-action phases, animation and completion script.
 
-static inline void AddStatusFlags(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
-
-static inline u32 TestStatusFlags(struct Player *player, u32 mask)
-{
-    return player->statusFlags & mask;
-}
-
 // confidence=low: sibling of timed charge action with reversed hold gating and a pulsing overlay.
 
 void PlayerCue_UpdateTimedChargePulse(struct Player *player)
@@ -2633,7 +2598,7 @@ void PlayerCue_UpdateTimedChargePulse(struct Player *player)
                 ActorSequence_Begin(player, 7, 4);
                 break;
             }
-            if (!TestStatusFlags(player, 16)) {
+            if (!Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_PlaySong(0x2E4);
                 player->chargeSoundActive = 1;
                 player->chargeCounter = 0;
@@ -2649,7 +2614,7 @@ void PlayerCue_UpdateTimedChargePulse(struct Player *player)
 
         case 2: {
             u16 *count;
-            AddStatusFlags(&player->statusFlags, 0xA0);
+            Player_SetStatusBits(&player->statusFlags, 0xA0);
             count = &player->chargeCounter;
             if ((*count) <= 4) {
                 if ((++(*count)) == 5)
@@ -2673,7 +2638,7 @@ void PlayerCue_UpdateTimedChargePulse(struct Player *player)
                     break;
                 }
             }
-            if (TestStatusFlags(player, 16)) {
+            if (Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_StopSong(0x239);
                 player->chargeSoundActive = 0;
 
@@ -2704,7 +2669,7 @@ void PlayerCue_UpdateTimedChargePulse(struct Player *player)
         }
 
         case 3:
-            AddStatusFlags(&player->statusFlags, 0x80);
+            Player_SetStatusBits(&player->statusFlags, 0x80);
             Player_SetAnimation(player, ActorVariant_GetTableValue(player->actionMode, 10), 64, 1);
             player->resetValue6FC = 30;
             if (!(player->inputKeys[0] & 1)) {
@@ -2713,7 +2678,7 @@ void PlayerCue_UpdateTimedChargePulse(struct Player *player)
 
                 break;
             }
-            if (!TestStatusFlags(player, 16)) {
+            if (!Player_ReadStatusBits(&player->statusFlags, 16)) {
                 Sound_PlaySong(0x239);
                 player->chargeSoundActive = 1;
                 player->chargeCounter = 0;
