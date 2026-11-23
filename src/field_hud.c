@@ -1,17 +1,11 @@
 #include "field_hud.h"
+#include "scene_actor_damage_visibility.h"
 
 s32 Div(s32, s32);
 void CpuSet(const void *, void *, u32);
 void PaletteFade_SetScrollPosition(s32, s32);
 struct SceneHudState *Hud_GetManager(void);
 void Hud_SetValueSource(void *, u32);
-
-static inline s32 FieldHud_GetLocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 
 void FieldHud_OnUnusedUpdate(void)
 {
@@ -339,9 +333,9 @@ void MeterDisplay_UpdateOwnerMeters(struct FieldHudWidgets *widgets)
     u32 mask = 0x800;
     if ((gEngineFlags | gScenePauseFlags) & mask) {
         widgets->meterWidgets[0].position.x =
-            ViewportGauge_ComputeFill(widgets, FieldHud_GetLocalPlayer());
+            ViewportGauge_ComputeFill(widgets, SceneActorDamage_LocalPlayer());
         widgets->meterWidgets[1].position.x =
-            ViewportGauge_ComputeFill(widgets, FieldHud_GetLocalPlayer() ^ 1);
+            ViewportGauge_ComputeFill(widgets, SceneActorDamage_LocalPlayer() ^ 1);
     } else {
         widgets->meterWidgets[0].position.x = ViewportGauge_ComputeFill(widgets, 0);
         widgets->meterWidgets[1].flags |= 1;
