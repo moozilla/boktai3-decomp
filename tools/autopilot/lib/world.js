@@ -23,7 +23,7 @@ exports.grid = () => {
       // (pushed blocks, raised bridges)
       const over = g.fn.TerrainModifiers_FindCellOverride(row + x, 1);
       const a = over ? over + 4 : base + 12 + 4 * (row + x), hb = g.u8(a), flags = g.u16(a + 2);
-      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, open: !(flags & 0x400) && (flags & 3) !== 3 });
+      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, open: !(flags & 1) });  // Player_IsTurnTerrainBlocked: bit 0 blocks (walls 0x040B/0x040F, outside 0x0003)
     }
   }
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
