@@ -45,8 +45,7 @@ static inline u32 NextRandom(void)
 {
     u32 *seed = &gRandomIndex;
     u16 index = *seed + 1;
-    u32 mask = 1023;
-    index &= mask;
+    index &= 1023;
     *seed = index;
     return *(const u16 *)(index * 2 + RANDOM_TABLE_ADDR);
 }
@@ -82,14 +81,12 @@ void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPositi
             const s16 *sine;
             u32 *seed;
             u16 index;
-            u32 mask;
             const u16 *random;
             bank.random = (const u16 *)RANDOM_TABLE_ADDR;
             random = bank.random;
             seed = &gRandomIndex;
             index = *seed + 1;
-            mask = 1023;
-            index &= mask;
+            index &= 1023;
             {
                 u32 jitterMask;
                 u16 raw;
@@ -98,7 +95,7 @@ void RadialBurstEffect_StartBurst(struct RadialBurst *owner, struct RadialPositi
                 jitterMask &= raw;
                 raw = jitterMask;
                 state->angle = raw + angle - 9;
-                index = (index + 1) & mask;
+                index = (index + 1) & 1023;
                 *seed = index;
                 raw = random[index];
                 raw &= 15;
