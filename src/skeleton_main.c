@@ -122,8 +122,7 @@ void SceneActorControl_RestartBehavior57(struct ChaseActor *actor)
     if (Unavailable(actor))
         return;
     {
-        u32 mask = 0x800;
-        if (actor->base.motionFlags & mask)
+        if (SceneActorContact_MotionFlags(actor, 0x800))
             return;
     }
     if (actor->base.controlKind != 0x39)
@@ -1145,9 +1144,8 @@ void SceneActorControl_SelectBehaviorByTargetAngle(struct ChaseActor *s)
     struct SceneActorTimedBehaviorContext *context;
     struct SceneActorTargetDelta delta;
     s32 angle;
-    u32 m = 0x100;
 
-    if (!(s->base.motionFlags & m)) {
+    if (!(SceneActorContact_MotionFlags(s, 0x100))) {
         context = s->base.context;
         if (s->base.tracking.distance < s->base.tracking.range) {
             struct SceneActorTargetDelta *difference = &delta;
@@ -2176,13 +2174,11 @@ static inline u8 Blocked(struct ChaseActor *actor)
     if (!actor)
         goto zero;
     {
-        u32 mask = 0x40;
-        if (actor->base.motionFlags & mask)
+        if (SceneActorContact_MotionFlags(actor, 0x40))
             goto one;
     }
     {
-        u32 mask = 0x20000;
-        if (actor->base.statusFlags & mask)
+        if (SceneActorChase_StatusFlags(actor, 0x20000))
             goto one;
     }
     if (actor->base.health > 0)
@@ -3600,8 +3596,7 @@ void Skeleton_BeginKnockedFlight(struct ChaseActor *input)
             actor->base.secondaryMotion.z = taken;
         }
         {
-            u32 mask = 0x10;
-            if (actor->base.statusFlags & mask) {
+            if (SceneActorChase_StatusFlags(actor, 0x10)) {
                 u16 argument;
                 if (WordFlags_Has(0x800, (u32 *)(context + 0x6DC)))
                     Sound_PlaySong(0x3AD);
