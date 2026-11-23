@@ -1,3 +1,4 @@
+#include "math_shift.h"
 #include "global.h"
 #include "axe.h"
 #include "scene_actor_control_phase.h"
@@ -209,11 +210,6 @@ static inline u8 consumeEntry(struct PhaseActor *s)
     return 0;
 }
 
-static inline void clearFlags(u32 *p, u32 mask)
-{
-    *p &= ~mask;
-}
-
 void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
@@ -228,15 +224,7 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
         Sound_PlaySong(0x16f);
     }
     if (ActorPhase_UpdateFlicker(&flags, frame, 10, 30)) {
-        void (*next)(void) = Axe_UpdateOrbitAttack;
-        u32 id = 0x2c;
-        s->entered = 1;
-        s->phaseState = 0;
-        s->phaseId = id;
-        s->phase = next;
-        s->timer = 0;
-        clearFlags(&s->flags114, 1);
-        s->f104 = 0;
+        SceneActorChase_SetControl(s, Axe_UpdateOrbitAttack, 0x2c);
         Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
         Sound_PlaySong(0x16d);
     } else if (flags & 1) {
@@ -262,13 +250,6 @@ static inline void Axe_AddPositions(struct ContactPosition *out, struct ContactP
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
-}
-
-static inline s32 Axe_ScaleTowardZero(s32 value, s32 bits)
-{
-    if (value >= 0)
-        return value >> bits;
-    return -(-value >> bits);
 }
 
 static inline s32 Axe_RandomByte(void)
@@ -297,21 +278,21 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         data->direction = 1;
         data->center = data->origin;
         MovementCurve_SubtractPositions(&delta, &data->center, position);
-        delta.x = Axe_ScaleTowardZero(delta.x, 1);
-        delta.z = Axe_ScaleTowardZero(delta.z, 1);
+        delta.x = Math_ShiftTowardZero(delta.x, 1);
+        delta.z = Math_ShiftTowardZero(delta.z, 1);
         Axe_AddPositions(&data->center, &data->center, &delta);
     }
     position->x = data->center.x +
-                  Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
+                  Math_ShiftTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
     p->base.body.position.z =
-        data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
+        data->center.z + Math_ShiftTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
     data->auxiliarySprite.position.x =
         data->center.x +
-        Axe_ScaleTowardZero(gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius,
-                            12);
+        Math_ShiftTowardZero(gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius,
+                             12);
     data->auxiliarySprite.position.z =
         data->center.z +
-        Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
+        Math_ShiftTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
         data->speed += 2;
         data->reactionCount = 0;
@@ -356,8 +337,8 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             else
                 data->heading -= 4;
         }
-        data->center.x += Axe_ScaleTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
-        data->center.z += Axe_ScaleTowardZero(gUnk_086149C4[data->heading] * 2, 12);
+        data->center.x += Math_ShiftTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
+        data->center.z += Math_ShiftTowardZero(gUnk_086149C4[data->heading] * 2, 12);
         if (data->flagsCAB & 4) {
             struct DisplaySequenceSprite *sprite = p->base.drawable;
             u32 previous;
@@ -382,7 +363,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             }
         }
     }
-    data->angle += Axe_ScaleTowardZero(data->speed * (s8)data->direction, 4);
+    data->angle += Math_ShiftTowardZero(data->speed * (s8)data->direction, 4);
     Axe_UpdateAttackColliderPositions(p);
     if (data->flagsCAB & 1) {
         SceneActorChase_SetControl(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);
