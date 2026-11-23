@@ -266,9 +266,8 @@ s32 Registry3F74_InitFromScript(struct RegistryChoiceMenu *menu, void *arg)
             *entry++ = Script_GetValue();
         } while (--i >= 0);
     } else {
-        s32 zero = 0;
-        for (i = 10; i >= 0; i--)
-            menu->entryScripts[i] = zero;
+        for (i = 0; i <= 10; i++)
+            menu->entryScripts[i] = 0;
     }
     if (Script_SeekToKeyword('P'))
         menu->initialSelection = Script_GetValue();
