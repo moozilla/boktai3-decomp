@@ -15,12 +15,23 @@ struct VanargandBodyAnimation {
     u8 unknown28[0x60 - 0x28];
 };
 
+/* The body's current action sequence: Vanargand_StopActionSequence clears its step and
+ * timer and stops its song. */
+struct VanargandActionSequence {
+    u8 unknown0[0x15];
+    u8 step;
+    u16 timer;
+    u8 unknown18[0x1E0 - 0x18];
+};
+
+void Vanargand_StopActionSequence(struct VanargandActionSequence *sequence);
+
 struct VanargandPairAttack {
     u8 pad0[0x48];
     u32 bodyHeader[3]; /* SceneBody header preceding the world position. */
     struct SceneVec position;
     u8 pad5C[0x90 - 0x5C];
-    u32 actionTimer;
+    u32 callbackFrame; /* 0x90: StateActor callbackFrame. */
     s16 health;
     u8 pad96[6];
     u32 flags;
@@ -28,23 +39,30 @@ struct VanargandPairAttack {
     u8 phase;
     u8 action;
     u32 timer;
-    u8 padA8[3], state, padAC[3];
+    u8 padA8[2];
+    u8 requestedAnimation; /* 0xAA: StateActor actionAnimation. */
+    u8 state;
+    u8 actionMode, actionIndex, actionPhase; /* 0xAC */
     u8 finished;
     u8 entered;
     u8 pending;
     u8 animationEvent;
-    u8 padB3[0x100 - 0xB3];
+    u8 padB3[0xC4 - 0xB3];
+    u32 actionTimer; /* 0xC4: frames in the current action phase. */
+    u8 padC8[0x100 - 0xC8];
     void (*stateCallback)(void *, s32);
     u8 (*callback)(struct VanargandPairAttack *);
     u8 pad108[4];
     struct Player *player;
-    u8 pad110[0x174 - 0x110];
+    u8 pad110[0x118 - 0x110];
+    u8 trigger[0x10]; /* 0x118: scene message receiver (StateActor receiver2). */
+    u8 pad128[0x174 - 0x128];
     struct PositionedEffectCoordinates coordinates;
     struct VanargandBodyAnimation animation;
     u8 drawable[0x20C - 0x1EC];
     struct ContactPosition effectOrigin;
     u8 unknown214[8];
-    u8 actionSequence[0x3FC - 0x21C];
+    struct VanargandActionSequence actionSequence; /* 0x21C */
     struct VanargandDamagePart part;
     struct MotionTrack track;
     struct VanargandAttackPair *pair;
@@ -93,6 +111,25 @@ static inline void VanargandPairAttack_EnterPhase(struct VanargandPairAttack *ow
 {
     owner->phase = phase;
     owner->timer = 0;
+}
+
+/* StateActor_ConsumeActionEntry on the body. */
+static inline u8 Vanargand_ConsumeActionEntry(struct VanargandPairAttack *owner)
+{
+    if (owner->entered) {
+        owner->entered = 0;
+        owner->finished = 0;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* Enter action animation ANIMATION: stop the running action sequence, then request the
+ * animation. Some forty of the body's action states begin this way. */
+static inline void Vanargand_EnterAction(struct VanargandPairAttack *owner, u32 animation)
+{
+    Vanargand_StopActionSequence(&owner->actionSequence);
+    owner->requestedAnimation = animation;
 }
 
 static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct VanargandPairAttack *owner)

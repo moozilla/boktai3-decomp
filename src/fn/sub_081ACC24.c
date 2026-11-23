@@ -5,7 +5,6 @@ void Sound_PlaySong(u32);
 void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 void CpuSet(const void *, void *, u32);
 
-void Vanargand_StopActionSequence(void *);
 
 static inline void restorePalette(struct VanargandPairAttack *p, struct VanargandPairAttack *self)
 {
@@ -33,7 +32,7 @@ static inline void restorePalette(struct VanargandPairAttack *p, struct Vanargan
             break;
     }
     Vanargand_ResetPaletteTransition(self);
-    Vanargand_StopActionSequence(self->actionSequence);
+    Vanargand_StopActionSequence(&self->actionSequence);
 }
 static inline void changeState(struct VanargandPairAttack *p, s32 state,
                                void (*callback)(void *, s32))
@@ -45,7 +44,7 @@ static inline void changeState(struct VanargandPairAttack *p, s32 state,
     {
         p->state = state;
         p->stateCallback = callback;
-        p->actionTimer = 0;
+        p->callbackFrame = 0;
         p->pending = 1;
         p->phase = 0;
         p->timer = 0;
