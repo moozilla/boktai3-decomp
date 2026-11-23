@@ -992,7 +992,8 @@ void Nidhoggr_UpdatePartMotion(struct Nidhoggr *t)
             t->rowCounter[i]++;
         }
     }
-    for (i = 0, p21 = &t->rows[21].position, p20 = &t->rows[20].position, pa = &t->pos; i <= 1; i++) {
+    for (i = 0, p21 = &t->rows[21].position, p20 = &t->rows[20].position, pa = &t->pos; i <= 1;
+         i++) {
         t->rows[i].position.x = pa->x + gUnk_0824F344->x;
         t->rows[i].position.y = pa->y + gUnk_0824F344->y;
         t->rows[i].position.z = pa->z + gUnk_0824F344->z;
@@ -1196,17 +1197,6 @@ struct NidhoggrGroupHealth {
     s16 hp[2];
 };
 
-struct NidhoggrContactCollider {
-    u8 unk_00[0x3E];
-    u16 damage;
-    u8 unk_40[0x43 - 0x40];
-    u8 flags;
-    u8 unk_44[0x54 - 0x44];
-};
-struct NidhoggrAttackCollider {
-    u8 unk_00[0x44];
-    u16 cooldown;
-};
 void Collision_CalculateDamageResponse(void *, void *);
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 s32 sub_08249420(s32, s32);
@@ -1221,8 +1211,7 @@ static inline u8 *GetGroupStages(struct Nidhoggr *p)
     return ((struct NidhoggrGroupHealth *)p)->state;
 }
 
-void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
-                                 struct Nidhoggr *input)
+void Nidhoggr_ReceivePartContact(void *src, struct ContactCollider *c, struct Nidhoggr *input)
 {
     struct Nidhoggr *t;
     u32 part;
@@ -1234,13 +1223,13 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
 
     t = input;
     Collision_CalculateDamageResponse(src, c);
-    dmg = c->damage;
+    dmg = c->cost;
     PlayerStats_AddContactHundredths(src, c, (s16)t->optionS);
     part = (u32)c - (u32)&t->colliders[0];
     part /= sizeof(t->colliders[0]);
     if (t->rowBlink[part] != 0)
         return;
-    t->rowBlink[part] = ((struct NidhoggrAttackCollider *)src)->cooldown;
+    t->rowBlink[part] = ((struct ContactCollider *)src)->responseValue;
 
     total = t->groupHpA + t->groupHpB;
     if ((u32)part <= 1) {
@@ -1273,7 +1262,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
         }
         gGameState->unk618 = t->life;
         if (dmg >= 0) {
-            DamageNumberDisplay_Show(c, dmg, 0, (u8 *)c + 0xC, (u8 *)c + 0x14, 1);
+            DamageNumberDisplay_Show(c, dmg, 0, &c->position, &c->offset, 1);
             PaletteEffect_StartSpriteOverride(&t->rows[part], 8, 1);
         }
         if (((struct NidhoggrGroupHealth *)t)->hp[slot] > 0) {
@@ -1285,7 +1274,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
                 Sound_PlaySong(0x211);
             else
                 Sound_PlaySongChecked(0x13E);
-            if (c->flags & 4)
+            if (c->costFlags & 4)
                 Nidhoggr_EmitSparks((u32)c + 0x24);
         } else {
             if (slot)
@@ -1293,7 +1282,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
             else
                 t->flags[2] |= 4;
             Sound_PlaySongChecked(0x1BB);
-            Nidhoggr_CreateBurstEffects(&t->effectPool, (u8 *)c + 0x24);
+            Nidhoggr_CreateBurstEffects(&t->effectPool, &c->x);
         }
         if (((struct NidhoggrGroupHealth *)t)->hp[slot] > threeQuarters) {
             if (GetGroupStages(t)[slot] != 0)
@@ -1370,7 +1359,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
             Sound_PlaySong(0x211);
         else
             Sound_PlaySongChecked(0x13E);
-        if (c->flags & 4)
+        if (c->costFlags & 4)
             Nidhoggr_EmitSparks((u32)c + 0x24);
     }
     t->life -= dmg;
@@ -1384,7 +1373,7 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
     }
     gGameState->unk618 = t->life;
     if (dmg >= 0) {
-        DamageNumberDisplay_Show(c, dmg, 0, (u8 *)c + 0xC, (u8 *)c + 0x14, 1);
+        DamageNumberDisplay_Show(c, dmg, 0, &c->position, &c->offset, 1);
         PaletteEffect_StartSpriteOverride(&t->rows[part], 8, 2);
     }
 }
@@ -1396,17 +1385,10 @@ void Nidhoggr_ReceivePartContact(void *src, struct NidhoggrContactCollider *c,
 
 /* Applies collider damage to Nidhoggr's two health groups or nine independent parts.
  * Damage is clamped against part and total health before displaying the hit. */
-struct NidhoggrDamageCollider {
-    u8 unk_00[0xC];
-    struct SceneVec position;
-    struct SceneVec displayOffset;
-    u8 unk_1C[0x50 - 0x1C];
-    struct Nidhoggr *owner;
-};
 
 void PaletteEffect_StartSpriteOverride(void *, s32, s32);
 
-s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, s32 amount)
+s32 Nidhoggr_ApplyPartDamage(struct ContactCollider *collider, s32 kind, s32 amount)
 {
     struct Nidhoggr *p;
     u32 slot;
@@ -1447,8 +1429,8 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
         }
         gGameState->unk618 = p->life;
         if (damage > 0) {
-            DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
-                                     &collider->displayOffset, 1);
+            DamageNumberDisplay_Show(collider, damage, 0, &collider->position, &collider->offset,
+                                     1);
             PaletteEffect_StartSpriteOverride(&p->rows[slot], 8, 1);
         }
         if (((struct NidhoggrGroupHealth *)p)->hp[part] > 0) {
@@ -1545,8 +1527,8 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
         }
         gGameState->unk618 = p->life;
         if (damage > 0) {
-            DamageNumberDisplay_Show(collider, damage, 0, &collider->position,
-                                     &collider->displayOffset, 1);
+            DamageNumberDisplay_Show(collider, damage, 0, &collider->position, &collider->offset,
+                                     1);
             PaletteEffect_StartSpriteOverride(&p->rows[slot], 8, 2);
         }
     }
@@ -1556,16 +1538,6 @@ s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, 
 /* Initialize Nidhoggr's part animations, attack/body colliders, target records,
  * and the time-dependent palette used by part 21. */
 
-struct NidhoggrPartVector {
-    u32 words[2];
-};
-struct NidhoggrPartCollider {
-    u8 unk_00[6];
-    u16 flags;
-    u8 unk_08[12];
-    struct NidhoggrPartVector offset, bounds;
-    u8 unk_24[0x54 - 0x24];
-};
 struct NidhoggrTargetRecord {
     void *collider;
     u32 flags;
@@ -1574,21 +1546,21 @@ struct NidhoggrTargetRecord {
 };
 extern const u8 gUnk_0824F490[];
 extern u8 gUnk_0824F4AC[];
-extern struct NidhoggrPartVector gUnk_0824F4B4, gUnk_0824F4BC;
-extern struct NidhoggrPartVector gUnk_0824F4C4, gUnk_0824F4CC;
-extern struct NidhoggrPartVector gUnk_0824F4D4, gUnk_0824F4DC;
+extern struct ContactPosition gUnk_0824F4B4, gUnk_0824F4BC;
+extern struct ContactPosition gUnk_0824F4C4, gUnk_0824F4CC;
+extern struct ContactPosition gUnk_0824F4D4, gUnk_0824F4DC;
 void Widget_InitLinked(void *, void *, u32, u32, u32, u32, s32, const void *);
 void TargetRegistry_RegisterSceneActor(void *, void *, void *);
 void Collider_SetBodyProperties(void *, u32, u32, u32);
 void Collider_SetAttackProperties(void *, s32, s32, u32, u32, s32);
 void TimePalette_InitTransition(void *, void *, void *, void *);
-s32 Nidhoggr_ApplyPartDamage(struct NidhoggrDamageCollider *collider, s32 kind, s32 amount);
+s32 Nidhoggr_ApplyPartDamage(struct ContactCollider *collider, s32 kind, s32 amount);
 
-static inline void Nidhoggr_MaskPartFlags(struct NidhoggrPartCollider *p, u32 mask)
+static inline void Nidhoggr_MaskPartFlags(struct ContactCollider *p, u32 mask)
 {
     p->flags &= mask;
 }
-static inline void Nidhoggr_OrPartFlags(struct NidhoggrPartCollider *p, u32 mask)
+static inline void Nidhoggr_OrPartFlags(struct ContactCollider *p, u32 mask)
 {
     p->flags |= mask;
 }
@@ -1603,9 +1575,9 @@ struct NidhoggrPartInit {
     u8 unk_50[0x541c - 0x50];
     struct SceneInputResource animHdr;
     struct SceneInputWidget rows[26];
-    struct NidhoggrPartCollider timedCollider;
-    struct NidhoggrPartCollider attackColliders[26];
-    struct NidhoggrPartCollider colliders[26];
+    struct ContactCollider timedCollider;
+    struct ContactCollider attackColliders[26];
+    struct ContactCollider colliders[26];
     struct NidhoggrTargetRecord partExtra[26];
     u8 unk_7100[0x722a - 0x7100];
     u8 rowBlink[26];
@@ -1622,10 +1594,10 @@ void Nidhoggr_InitParts(void *arg0)
     s32 i;
     struct SceneInputWidget *row;
     struct NidhoggrTargetRecord *target;
-    struct NidhoggrPartCollider *collider;
+    struct ContactCollider *collider;
     u32 damage;
     u32 partAttributes = 0x120;
-    void (*receiveContact)(void *, struct NidhoggrContactCollider *, struct Nidhoggr *) =
+    void (*receiveContact)(void *, struct ContactCollider *, struct Nidhoggr *) =
         Nidhoggr_ReceivePartContact;
     src = ScriptProc_Start(0xcb05, 0x546b);
     t->animHdr = *src;
@@ -1657,7 +1629,7 @@ void Nidhoggr_InitParts(void *arg0)
         u32 attackOffset;
         damage = t->optionD >> 1;
         {
-            struct NidhoggrPartCollider *collider;
+            struct ContactCollider *collider;
             bodyOffset = (u32)&t->colliders[0];
             bodyOffset -= (u32)t;
             collider = (void *)((u8 *)t + bodyOffset);
@@ -1668,7 +1640,7 @@ void Nidhoggr_InitParts(void *arg0)
             Collider_SetCallback(collider, Nidhoggr_ReceivePartContact, t);
         }
         {
-            struct NidhoggrPartCollider *collider;
+            struct ContactCollider *collider;
             attackOffset = (u32)&t->attackColliders[0];
             attackOffset -= (u32)t;
             collider = (void *)((u8 *)t + attackOffset);
@@ -1679,7 +1651,7 @@ void Nidhoggr_InitParts(void *arg0)
             Collider_SetCallback(collider, 0, 0);
         }
         {
-            struct NidhoggrPartCollider *collider;
+            struct ContactCollider *collider;
             collider = &t->colliders[1];
             collider->bounds = gUnk_0824F4DC;
             collider->offset = gUnk_0824F4D4;
@@ -1690,7 +1662,7 @@ void Nidhoggr_InitParts(void *arg0)
             Collider_SetCallback((void *)bodyOffset, Nidhoggr_ReceivePartContact, t);
         }
         {
-            struct NidhoggrPartCollider *collider;
+            struct ContactCollider *collider;
             collider = &t->attackColliders[1];
             collider->bounds = gUnk_0824F4DC;
             collider->offset = gUnk_0824F4D4;
@@ -1706,7 +1678,7 @@ void Nidhoggr_InitParts(void *arg0)
     }
     damage = t->optionD;
     {
-        struct NidhoggrPartCollider *collider = &t->colliders[2];
+        struct ContactCollider *collider = &t->colliders[2];
         u32 flags = 0x1008;
         for (i = 7; i >= 0; collider++, i--) {
             collider->bounds = gUnk_0824F4BC;
@@ -1717,7 +1689,7 @@ void Nidhoggr_InitParts(void *arg0)
         }
     }
     {
-        struct NidhoggrPartCollider *collider = &t->colliders[10];
+        struct ContactCollider *collider = &t->colliders[10];
         u32 flags = 0x1008;
         for (i = 7; i >= 0; collider++, i--) {
             collider->bounds = gUnk_0824F4BC;
@@ -1728,7 +1700,7 @@ void Nidhoggr_InitParts(void *arg0)
         }
     }
     {
-        struct NidhoggrPartCollider *collider = &t->colliders[18];
+        struct ContactCollider *collider = &t->colliders[18];
         u32 flags = 0x1008;
         for (i = 1; i >= 0;) {
             collider->bounds = gUnk_0824F4BC;
@@ -1798,7 +1770,7 @@ void Nidhoggr_InitSuspendedObject(struct Nidhoggr *t)
     t->terrainCellsRegistered = bz;
     t->suspendedTimer = 0;
     h = t->attackPower >> 1;
-    collider = t->suspendedCollider;
+    collider = &t->suspendedCollider;
     Collider_Init(collider, t->actorId, 0x2001, 0, 16, (void *)gUnk_0824F4EC,
                   (void *)gUnk_0824F4F4);
     Collider_SetAttackProperties(collider, h, 10, 0, 0x40000, 30);
@@ -1914,8 +1886,8 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
             u8 *sp2 = t->suspendedSprite;
             *(u16 *)(sp2 + 0x10) = 0;
         }
-            Collider_Refresh(t->suspendedCollider);
-            Collider_SetPosition(t->suspendedCollider, &t->suspendedPosX, 0);
+            Collider_Refresh(&t->suspendedCollider);
+            Collider_SetPosition(&t->suspendedCollider, &t->suspendedPosX, 0);
             t->suspendedState++;
             Sound_PlaySongChecked(0x1be);
             break;
@@ -1968,98 +1940,85 @@ void Nidhoggr_UpdateSuspendedObject(struct Nidhoggr *t)
         (collider)->offset = *(offsetOut);                                                         \
     } while (0)
 
-struct PartExtraView {
-    u32 pad, flags;
-};
-extern const struct NidhoggrPartVector gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
-static inline void SetExtra(struct PartExtraView *p, u32 mask)
+extern const struct ContactPosition gUnk_0824F544, gUnk_0824F54C, gUnk_0824F554, gUnk_0824F55C;
+static inline void Nidhoggr_DisablePartCollider(struct ContactCollider *collider)
 {
-    p->flags |= mask;
+    collider->flags |= 4;
+}
+
+static inline void Nidhoggr_SetPartExtraFlags(struct NidhoggrPartExtra *extra, u32 mask)
+{
+    extra->flags |= mask;
 }
 // confidence=low: restores first-part collider ranges after the completion state.
 #define Nidhoggr_RestoreFirstPartRanges sub_08194858
 void Nidhoggr_RestoreFirstPartRanges(struct Nidhoggr *p)
 {
-    struct NidhoggrPartCollider *collider;
-    const struct NidhoggrPartVector *bounds, *offset;
+    struct ContactCollider *collider;
+    const struct ContactPosition *bounds, *offset;
     if (p->bgMode) {
         if (Nidhoggr_ChangeCompletedPartState(p, 0, 0x37)) {
-            collider = (void *)&p->colliders[1];
+            collider = &p->colliders[1];
             NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F54C, gUnk_0824F544);
-            collider = (void *)&p->altColliders[2];
+            collider = &p->altColliders[2];
             goto copy;
         }
     } else {
         if (Nidhoggr_ChangeCompletedPartState(p, 0, 0x12)) {
-            collider = (void *)&p->colliders[0];
+            collider = &p->colliders[0];
             NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F55C, gUnk_0824F554);
-            collider = (void *)&p->altColliders[1];
+            collider = &p->altColliders[1];
         copy:
             collider->bounds = *bounds;
             collider->offset = *offset;
         }
     }
     if (p->active) {
-        ((struct NidhoggrPartCollider *)&p->colliders[0])->flags |= 4;
-        ((struct NidhoggrPartCollider *)&p->altColliders[1])->flags |= 4;
-        SetExtra((void *)&p->partExtra[0], 1);
+        Nidhoggr_DisablePartCollider(&p->colliders[0]);
+        Nidhoggr_DisablePartCollider(&p->altColliders[1]);
+        Nidhoggr_SetPartExtraFlags(&p->partExtra[0], 1);
     } else {
-        struct NidhoggrPartCollider *first = (void *)&p->colliders[0];
+        struct ContactCollider *first = &p->colliders[0];
         s32 mask = ~4;
         first->flags &= mask;
-        ((struct NidhoggrPartCollider *)&p->altColliders[1])->flags &= mask;
+        Nidhoggr_MaskPartFlags(&p->altColliders[1], mask);
     }
 }
 
-extern const struct NidhoggrPartVector gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
+extern const struct ContactPosition gUnk_0824F564, gUnk_0824F56C, gUnk_0824F574, gUnk_0824F57C;
 // confidence=low: restores second-part collider ranges after the completion state.
 #define Nidhoggr_RestoreSecondPartRanges sub_0819494C
 void Nidhoggr_RestoreSecondPartRanges(struct Nidhoggr *p)
 {
-    struct NidhoggrPartCollider *collider;
-    const struct NidhoggrPartVector *bounds, *offset;
+    struct ContactCollider *collider;
+    const struct ContactPosition *bounds, *offset;
     if (p->bgMode) {
         if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x35)) {
-            collider = (void *)&p->colliders[0];
+            collider = &p->colliders[0];
             NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F56C, gUnk_0824F564);
-            collider = (void *)&p->altColliders[1];
+            collider = &p->altColliders[1];
             goto copy;
         }
     } else {
         if (Nidhoggr_ChangeCompletedPartState(p, 1, 0x14)) {
-            collider = (void *)&p->colliders[1];
+            collider = &p->colliders[1];
             NIDHOGGR_LOAD_PART_RANGES(collider, bounds, offset, gUnk_0824F57C, gUnk_0824F574);
-            collider = (void *)&p->altColliders[2];
+            collider = &p->altColliders[2];
         copy:
             collider->bounds = *bounds;
             collider->offset = *offset;
         }
     }
     if (p->active) {
-        ((struct NidhoggrPartCollider *)&p->colliders[1])->flags |= 4;
-        ((struct NidhoggrPartCollider *)&p->altColliders[2])->flags |= 4;
-        SetExtra((void *)&p->partExtra[1], 1);
+        Nidhoggr_DisablePartCollider(&p->colliders[1]);
+        Nidhoggr_DisablePartCollider(&p->altColliders[2]);
+        Nidhoggr_SetPartExtraFlags(&p->partExtra[1], 1);
     } else {
-        struct NidhoggrPartCollider *first = (void *)&p->colliders[1];
+        struct ContactCollider *first = &p->colliders[1];
         s32 mask = ~4;
         first->flags &= mask;
-        ((struct NidhoggrPartCollider *)&p->altColliders[2])->flags &= mask;
+        Nidhoggr_MaskPartFlags(&p->altColliders[2], mask);
     }
-}
-
-struct H {
-    u8 f[6];
-    u16 v;
-};
-
-struct W {
-    u32 a;
-    u32 v;
-};
-
-static inline void orr(struct W *a, u32 m)
-{
-    a->v |= m;
 }
 
 void Nidhoggr_StartFirstPartAction(struct Nidhoggr *p)
@@ -2068,17 +2027,10 @@ void Nidhoggr_StartFirstPartAction(struct Nidhoggr *p)
         Nidhoggr_ChangeCompletedPartState(p, 0, 0x38);
     else
         Nidhoggr_ChangeCompletedPartState(p, 0, 0x13);
-    /* 0x66DE and 0x5E56: unidentified flag bits near colliders[0] and the anim-row gap */
-    ((struct H *)p)[3291].v |= 4;
-    ((struct H *)p)[3018].v |= 4;
-    orr(&((struct W *)p)[3564], 1);
+    Nidhoggr_DisablePartCollider(&p->colliders[0]);
+    Nidhoggr_DisablePartCollider(&p->altColliders[1]);
+    Nidhoggr_SetPartExtraFlags(&p->partExtra[0], 1);
 }
-
-struct H2 {
-    u8 f[6];
-    u16 v;
-    u8 g[4];
-};
 
 void Nidhoggr_StartSecondPartAction(struct Nidhoggr *p)
 {
@@ -2086,10 +2038,9 @@ void Nidhoggr_StartSecondPartAction(struct Nidhoggr *p)
         Nidhoggr_ChangeCompletedPartState(p, 1, 0x36);
     else
         Nidhoggr_ChangeCompletedPartState(p, 1, 0x15);
-    /* unidentified flag bits, near colliders[] and the anim-row gap (see StartFirstPartAction) */
-    ((struct H2 *)p)[2201].v |= 4;
-    ((struct H2 *)p)[2019].v |= 4;
-    orr(&((struct W *)p)[3566], 1);
+    Nidhoggr_DisablePartCollider(&p->colliders[1]);
+    Nidhoggr_DisablePartCollider(&p->altColliders[2]);
+    Nidhoggr_SetPartExtraFlags(&p->partExtra[1], 1);
 }
 
 void Nidhoggr_ResetPart22Animation(u32 a)
@@ -3334,60 +3285,21 @@ void Nidhoggr_UpdateEffectAttack(struct Nidhoggr *t)
 /* Tentative: disable the part colliders and retreat left before selecting the
  * offscreen pose behavior. The alternate collider range begins at slot one. */
 
-struct RetreatCollider {
-    u8 unk_00[6];
-    u16 flags;
-    u8 unk_08[0x54 - 8];
-};
-
-struct RetreatPartExtra {
-    u32 unk_00;
-    u32 flags;
-    u8 unk_08[8];
-};
-
-struct RetreatColliderCursor {
-    s32 firstPart;
-    u32 altFlagsOffset;
-};
-
 void Nidhoggr_UpdateLeftwardRetreat(struct Nidhoggr *t)
 {
     switch (t->state) {
         case 0: {
             s32 i;
-            u16 *altFlags;
-            struct RetreatColliderCursor cursor;
-            s32 stride, extraMask;
-            s32 colliderMask;
             s32 value;
-            u32 flags, altValue;
             u16 x;
             struct SceneVec *base;
 
             t->active = 1;
-            cursor = (struct RetreatColliderCursor){0};
-            i = cursor.firstPart;
-            stride = sizeof(struct RetreatCollider);
-            value = 4;
-            colliderMask = value;
-            extraMask = 1;
-            cursor.altFlagsOffset =
-                (u8 *)&((struct RetreatCollider *)&t->altColliders[1])->flags - (u8 *)t;
-            altFlags = (u16 *)((u8 *)t + cursor.altFlagsOffset);
-
-        disablePart:
-            altValue = *altFlags;
-            altValue |= colliderMask;
-            *altFlags = altValue;
-            flags = ((struct RetreatCollider *)((u8 *)t->colliders + i * stride))->flags;
-            flags |= colliderMask;
-            ((struct RetreatCollider *)((u8 *)t->colliders + i * stride))->flags = flags;
-            ((struct RetreatPartExtra *)t->partExtra)[i].flags |= extraMask;
-            altFlags = (u16 *)((u8 *)altFlags + stride);
-            i++;
-            if (i < 26)
-                goto disablePart;
+            for (i = 0; i < 26; i++) {
+                Nidhoggr_DisablePartCollider(&t->altColliders[i + 1]);
+                Nidhoggr_DisablePartCollider(&t->colliders[i]);
+                Nidhoggr_SetPartExtraFlags(&t->partExtra[i], 1);
+            }
 
             x = t->pos.x - 0x800;
             base = &t->basePos;

@@ -28,7 +28,7 @@ void Nidhoggr_HidePartWithExplosion(struct Nidhoggr *boss, s32 index)
     u8 phase = boss->rowInitFlag[index];
     if (phase == 0) {
         boss->rows[index].flags |= 1;
-        ((struct NidhoggrCollider *)((u8 *)boss + index * 0x54 + 0x66D8))->flags |= 4;
+        ((struct ContactCollider *)((u8 *)boss + index * 0x54 + 0x66D8))->flags |= 4;
         ((struct NidhoggrPartExtra *)((u8 *)boss + index * 0x10 + 0x6F60))->flags |= 1;
         effect.x = 0x100;
         effect.y = 0x80;

@@ -3,6 +3,7 @@
 #include "global.h"
 #include "engine.h"
 #include "scene_vec.h"
+#include "contact_collider.h"
 #include "scene_input_widget.h"
 #include "scene_event_dispatch.h"
 
@@ -14,12 +15,6 @@
  * is the sub-state within whichever behavior is active. Field names are provisional
  * (confidence=low); several short byte/word fields, and most of the suspended-object
  * and terrain-cell sub-regions, are still guesses. */
-
-struct NidhoggrCollider {
-    u8 unknown0[6];
-    u16 flags; /* 0x06: bit 2 disables the part's collider */
-    u8 unknown8[0x54 - 8];
-};
 
 struct NidhoggrPartExtra {
     u32 unknown0;
@@ -48,11 +43,11 @@ struct Nidhoggr {
     u8 unknown541A[0x541C - 0x541A];
     struct SceneInputResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
     struct SceneInputWidget rows[26]; /* 0x543C: one per body segment */
-    struct NidhoggrCollider
-        altColliders[26]; /* 0x5DFC: a second collider per part; [0] is refreshed
-                                                * each frame in Update while flags[0] counts down */
-    u8 unknown6684[0x66D8 - 0x6684];
-    struct NidhoggrCollider colliders[26];  /* 0x66D8 */
+    struct ContactCollider
+        altColliders[27]; /* 0x5DFC: a second collider per part, offset by one ([i + 1] pairs
+                           * with colliders[i]); [0] is refreshed each frame in Update while
+                           * flags[0] counts down */
+    struct ContactCollider colliders[26];  /* 0x66D8 */
     struct NidhoggrPartExtra partExtra[26]; /* 0x6F60 */
     struct NidhoggrTerrainCell
         terrainCells[2];      /* 0x7100: registered via TerrainModifiers_RegisterCell */
@@ -60,7 +55,7 @@ struct Nidhoggr {
     u8 suspendedSprite[0x1C]; /* 0x713C */
     s16 suspendedPosX, suspendedPosY, suspendedPosZ, suspendedPosW; /* 0x7158 */
     u8 unknown7160[0x7168 - 0x7160];
-    u8 suspendedCollider[0x54]; /* 0x7168 */
+    struct ContactCollider suspendedCollider; /* 0x7168 */
     u8 suspendedState;          /* 0x71BC: descent/retraction/shake sub-state */
     u8 terrainCellsRegistered;  /* 0x71BD */
     u8 attackActive;            /* 0x71BE: timed-attack collider active latch */
