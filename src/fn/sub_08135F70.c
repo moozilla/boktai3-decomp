@@ -24,23 +24,6 @@ static inline u8 HasPendingHit(struct ChaseActor *actor)
         return 0;
     return 1;
 }
-static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
-{
-    if (actor) {
-        {
-            if (0x40 & flags)
-                return 1;
-        }
-        {
-            u32 mask = 0x20000;
-            if (actor->base.statusFlags & mask)
-                return 1;
-        }
-        if (actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
 
 static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *health)
 {
@@ -113,7 +96,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                 u32 mask = ~0x2000;
                 *flags2CC &= mask;
             } else {
-                u32 down = IsDown(actor, flags);
+                u32 down = SceneActorDamage_IsDown(actor, flags);
                 if (down) {
                     SceneActorDamage_MarkDown(actor, flags2D4);
                 } else {

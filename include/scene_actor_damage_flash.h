@@ -36,6 +36,25 @@ static inline void SceneActorDamage_ClearHitReaction(struct ChaseActor *actor)
     *flags = mask & *flags;
 }
 
+/* An actor is down when its hit flags carry 0x40, its status 0x20000, or its health is spent. */
+static inline u8 SceneActorDamage_IsDown(struct ChaseActor *actor, u16 flags)
+{
+    if (actor) {
+        {
+            if (0x40 & flags)
+                return 1;
+        }
+        {
+            u32 mask = 0x20000;
+            if (actor->base.statusFlags & mask)
+                return 1;
+        }
+        if (actor->base.health <= 0)
+            return 1;
+    }
+    return 0;
+}
+
 /* A fatal hit leaves only the down bit (0x40) and no pending hit. */
 static inline void SceneActorDamage_MarkDown(struct ChaseActor *actor, u16 *flags2D4)
 {

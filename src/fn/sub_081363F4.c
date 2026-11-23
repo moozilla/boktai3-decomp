@@ -18,23 +18,6 @@ s32 DamageNumberDisplay_Show(struct DamageNumberSource *, u32, u32, const struct
                              const struct ContactPosition *, s32);
 void AnimData_SelectPaletteBank(void *, s32);
 
-static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
-{
-    if (actor) {
-        {
-            if (0x40 & flags)
-                return 1;
-        }
-        {
-            u32 mask = 0x20000;
-            if (actor->base.statusFlags & mask)
-                return 1;
-        }
-        if (actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
-}
 union PlacementHitFlags {
     u32 packed;
     struct {
@@ -47,7 +30,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
     union PlacementHitFlags *pair = (void *)flags2D4;
     u32 flags = pair->packed & 0xFFFF;
     if (flags) {
-        u32 down = IsDown(actor, flags);
+        u32 down = SceneActorDamage_IsDown(actor, flags);
         if (down) {
             SceneActorDamage_MarkDown(actor, flags2D4);
             return;
