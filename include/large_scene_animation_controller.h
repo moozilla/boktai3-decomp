@@ -16,10 +16,12 @@
  * (confidence=low); several short byte/word fields, and most of the suspended-object
  * and terrain-cell sub-regions, are still guesses. */
 
+/* A part's registration with the scene target registry. */
 struct NidhoggrPartExtra {
-    u32 unknown0;
+    void *collider;
     u32 flags; /* 0x04: bit 0 set when the part is hidden */
-    u8 unknown8[0x10 - 8];
+    void *callback;
+    void *next;
 };
 
 struct NidhoggrTerrainCell {
@@ -43,10 +45,9 @@ struct Nidhoggr {
     u8 unknown541A[0x541C - 0x541A];
     struct SceneInputResource animHdr;                /* 0x541C: shared keyframe/resource header for all part rows */
     struct SceneInputWidget rows[26]; /* 0x543C: one per body segment */
-    struct ContactCollider
-        altColliders[27]; /* 0x5DFC: a second collider per part, offset by one ([i + 1] pairs
-                           * with colliders[i]); [0] is refreshed each frame in Update while
-                           * flags[0] counts down */
+    struct ContactCollider timedCollider;       /* 0x5DFC: refreshed each frame in Update while
+                                                 * flags[0] counts down */
+    struct ContactCollider attackColliders[26]; /* 0x5E50: one per part */
     struct ContactCollider colliders[26];  /* 0x66D8 */
     struct NidhoggrPartExtra partExtra[26]; /* 0x6F60 */
     struct NidhoggrTerrainCell
@@ -104,8 +105,19 @@ struct Nidhoggr {
     s32 swayXVelocity;      /* 0x72B8 */
     s32 posOffsetZVelocity; /* 0x72BC */
     u32 script;             /* 0x72C0: option -e; a script key to call when a cutscene departs */
-    u8 unknown72C4[0x72FC - 0x72C4];
+    u8 paletteTransition[0x38]; /* 0x72C4 */
 };
+
+/* Bit 2 of a part collider's flags disables it. */
+static inline void Nidhoggr_DisablePartCollider(struct ContactCollider *collider)
+{
+    collider->flags |= 4;
+}
+
+static inline void Nidhoggr_SetPartExtraFlags(struct NidhoggrPartExtra *extra, u32 mask)
+{
+    extra->flags |= mask;
+}
 
 /* Defined outside this unit's range; callers disagree on its exact signature. */
 s32 Nidhoggr_ChangeCompletedPartState(void *, s32, s32);
