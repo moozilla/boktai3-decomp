@@ -33,7 +33,6 @@
 #include "engine_globals.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
-#include "scene_actor_color_cycle.h"
 #include "scene_actor_init_actor.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
@@ -2060,181 +2059,130 @@ void Ivy_Create(void)
     }
 }
 
-struct PInitColorTransition {
-    u8 f[0xcc5];
-    u8 a;
-    u8 b;
-    u8 g[0xcf0 - 0xcc7];
-    void (*cb)(void);
-    u8 h[0xd32 - 0xcf4];
-    u16 v;
-};
+s32 SceneActor_RampColorRed(struct PhaseObject *actor);
 
-s32 SceneActor_RampColorRed(struct SceneActorColorCycle *actor);
-
-s32 Ivy_InitColorTransition(struct PInitColorTransition *p)
+s32 Ivy_InitColorTransition(struct PhaseObject *p)
 {
-    u16 *s = &p->v;
-    p->a = (*s >> 5) & 0x1f;
-    p->b = (*s >> 10) & 0x1f;
-    p->cb = SceneActor_RampColorRed;
+    u16 *s = &p->color;
+    p->green = (*s >> 5) & 0x1f;
+    p->blue = (*s >> 10) & 0x1f;
+    p->phaseUpdate = (void *)SceneActor_RampColorRed;
 }
 
-s32 SceneActor_RampColorRedHigh(struct SceneActorColorCycle *);
+s32 SceneActor_RampColorRedHigh(struct PhaseObject *);
 
-s32 SceneActor_RampColorRed(struct SceneActorColorCycle *actor)
+s32 SceneActor_RampColorRed(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer << 4, actor->duration);
-    if (actor->timer++ == actor->duration) {
-        actor->update = SceneActor_RampColorRedHigh;
-        actor->timer = 0;
+    actor->red = Div(actor->pulseTimer << 4, actor->pulseDuration);
+    if (actor->pulseTimer++ == actor->pulseDuration) {
+        actor->phaseUpdate = (void *)SceneActor_RampColorRedHigh;
+        actor->pulseTimer = 0;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct Obj;
+s32 Ivy_UpdateRedBrightening(struct PhaseObject *p);
 
-s32 Ivy_UpdateRedBrightening(struct Obj *p);
-
-s32 SceneActor_RampColorRedHigh(struct SceneActorColorCycle *actor)
+s32 SceneActor_RampColorRedHigh(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer << 3, actor->duration) + 0x10;
-    if (actor->timer++ == actor->duration) {
-        actor->update = Ivy_UpdateRedBrightening;
-        actor->timer = 0;
+    actor->red = Div(actor->pulseTimer << 3, actor->pulseDuration) + 0x10;
+    if (actor->pulseTimer++ == actor->pulseDuration) {
+        actor->phaseUpdate = (void *)Ivy_UpdateRedBrightening;
+        actor->pulseTimer = 0;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct Obj {
-    u8 pad0[0xcc4];
-    s8 red, green, blue;
-    u8 padCC7[0x29];
-    void (*callback)(struct Obj *);
-    u8 padCF4[8];
-    s32 counter;
-    u8 padD00[0x32];
-    u16 color;
-    u8 padD34[0x1e];
-    s8 duration;
-    u8 padD53, mode;
-};
-
-static inline u16 color(struct Obj *p)
+static inline u16 color(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor);
+s32 SceneActor_LowerColorRedPeak(struct PhaseObject *actor);
 
-struct SWaitForColorRelease;
+s32 Ivy_WaitForColorRelease(struct PhaseObject *s);
 
-s32 Ivy_WaitForColorRelease(struct SWaitForColorRelease *s);
-
-s32 Ivy_UpdateRedBrightening(struct Obj *p)
+s32 Ivy_UpdateRedBrightening(struct PhaseObject *p)
 {
-    p->red = Div((u32)p->counter * 7, p->duration) + 24;
-    if (p->counter++ == p->duration) {
-        if (p->mode == 0)
-            p->callback = SceneActor_LowerColorRedPeak;
+    p->red = Div((u32)p->pulseTimer * 7, p->pulseDuration) + 24;
+    if (p->pulseTimer++ == p->pulseDuration) {
+        if (p->pulseMode == 0)
+            p->phaseUpdate = (void *)SceneActor_LowerColorRedPeak;
         else
-            p->callback = Ivy_WaitForColorRelease;
-        p->counter = p->duration;
+            p->phaseUpdate = (void *)Ivy_WaitForColorRelease;
+        p->pulseTimer = p->pulseDuration;
     }
     p->color = color(p);
     return 0;
 }
 
-struct ColorPulse;
+s32 ColorPulse_FadeRed(struct PhaseObject *p);
 
-s32 ColorPulse_FadeRed(struct ColorPulse *p);
-
-s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor)
+s32 SceneActor_LowerColorRedPeak(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer * 7, actor->duration) + 24;
-    if (--actor->timer == -1) {
-        actor->update = ColorPulse_FadeRed;
-        actor->timer = actor->duration;
+    actor->red = Div(actor->pulseTimer * 7, actor->pulseDuration) + 24;
+    if (--actor->pulseTimer == -1) {
+        actor->phaseUpdate = (void *)ColorPulse_FadeRed;
+        actor->pulseTimer = actor->pulseDuration;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct ColorPulse {
-    u8 pad0[0xcc4];
-    s8 red, green, blue;
-    u8 padCC7[0x29];
-    void (*callback)(struct ColorPulse *);
-    u8 padCF4[8];
-    s32 counter;
-    u8 padD00[0x32];
-    u16 color;
-    u8 padD34[0x1e];
-    s8 duration;
-    u8 padD53, mode;
-};
-
-static inline u16 color_FadeRed(struct ColorPulse *p)
+static inline u16 color_FadeRed(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 ColorPulse_FinishRedFade(struct ColorPulse *p);
+s32 ColorPulse_FinishRedFade(struct PhaseObject *p);
 
-s32 ColorPulse_FadeRed(struct ColorPulse *p)
+s32 ColorPulse_FadeRed(struct PhaseObject *p)
 {
-    s32 value = Div((u32)p->counter * 8, p->duration) + 16;
+    s32 value = Div((u32)p->pulseTimer * 8, p->pulseDuration) + 16;
     s8 *red = &p->red;
     *red = value;
-    if (--p->counter == -1) {
-        p->callback = ColorPulse_FinishRedFade;
-        p->counter = p->duration;
+    if (--p->pulseTimer == -1) {
+        p->phaseUpdate = (void *)ColorPulse_FinishRedFade;
+        p->pulseTimer = p->pulseDuration;
     }
     p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
     return 0;
 }
 
-static inline u16 color_FinishRedFade(struct ColorPulse *p)
+static inline u16 color_FinishRedFade(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 Ivy_InitColorTransition(struct PInitColorTransition *p);
+s32 Ivy_InitColorTransition(struct PhaseObject *p);
 
-s32 ColorPulse_FinishRedFade(struct ColorPulse *p)
+s32 ColorPulse_FinishRedFade(struct PhaseObject *p)
 {
     s32 result;
-    s32 value = Div((u32)p->counter * 16, p->duration);
+    s32 value = Div((u32)p->pulseTimer * 16, p->pulseDuration);
     s8 *red = &p->red;
     *red = value;
-    if (--p->counter != -1) {
+    if (--p->pulseTimer != -1) {
         p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
         result = 0;
     } else {
-        p->callback = Ivy_InitColorTransition;
-        p->counter = 0;
+        p->phaseUpdate = (void *)Ivy_InitColorTransition;
+        p->pulseTimer = 0;
         p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
         result = 1;
     }
     return result;
 }
 
-struct SWaitForColorRelease {
-    u8 filler[0xcf0];
-    void (*fp)(void);
-    u8 f2[0xd54 - 0xcf4];
-    u8 b;
-};
-
-s32 Ivy_WaitForColorRelease(struct SWaitForColorRelease *s)
+s32 Ivy_WaitForColorRelease(struct PhaseObject *s)
 {
     s32 r;
-    if (s->b != 0)
+    if (s->pulseMode != 0)
         r = 1;
     else {
-        s->fp = SceneActor_LowerColorRedPeak;
+        s->phaseUpdate = (void *)SceneActor_LowerColorRedPeak;
         r = 0;
     }
     return r;

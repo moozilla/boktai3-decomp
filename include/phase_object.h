@@ -71,7 +71,8 @@ struct PhaseObject {
     struct ContactPosition position;
     u8 unknownB8C[0xC1C - 0xB8C];
     struct ContactCollider colliderA, colliderB;
-    u8 unknownCC4[4];
+    s8 red, green, blue; /* the color pulse's current offsets */
+    u8 unknownCC7;
     void (*update)(struct PhaseObject *);
     u8 unknownCCC[8];
     void (*retarget)(struct PhaseObject *);
@@ -84,14 +85,17 @@ struct PhaseObject {
     void (*phaseUpdate)(struct PhaseObject *);
     s32 scatterDelay;
     u32 bobbingTimer;
-    u32 fieldCFC;
+    s32 pulseTimer; /* frames into the color pulse step */
     u32 landingHeight;
     u8 unknownD04[0x24];
     u16 launchFrames, attackFrames;
     u8 launchCount, attackHeading;
-    u8 unknownD2E[0x25];
+    u8 unknownD2E[4];
+    u16 color; /* the palette color the pulse fades from */
+    u8 unknownD34[0x1E];
+    s8 pulseDuration;
     s8 actionCompletions;
-    u8 unknownD54;
+    u8 pulseMode;
     u8 attackMode;
     u8 unknownD56[2];
     u16 damagePalette;
