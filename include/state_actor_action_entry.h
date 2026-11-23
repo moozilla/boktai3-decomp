@@ -41,4 +41,15 @@ static inline void SceneActorState_StartAction(struct StateActor *actor, u32 mod
     SceneActorState_EnterPhase(actor, phase);
 }
 
+/* Hand the actor to a reaction callback (hurt, knockback, removal) as reaction state STATE. */
+static inline void SceneActorState_StartReaction(struct StateActor *actor, void (*callback)(void *),
+                                                 int state)
+{
+    actor->actionState = state;
+    actor->actionCallback = (void (*)(void *, int))callback;
+    actor->callbackFrame = 0;
+    actor->actionChanged = 1;
+    SceneActorState_EnterReactionPhase(actor, 0);
+}
+
 #endif

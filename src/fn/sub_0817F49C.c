@@ -1,4 +1,5 @@
 #include "global.h"
+#include "state_actor_action_entry.h"
 // confidence=low: BossSlot2 pending-damage handler: applies damage, shows numbers, picks hurt/knockback/death state.
 #define H(o) (*(s16 *)(q + (o)))
 #define B(o) (*(u8 *)(q + (o)))
@@ -17,46 +18,9 @@ void DamageNumberDisplay_Show(void *, int, int, void *, void *, int);
 void SceneEventActor_UpdateRemovalSequence(void *);
 void SceneVolume_UpdateKnockbackLanding(void *);
 
-struct FlagsHolder {
-    u8 pad[0x9c];
-    u32 flags;
-};
-static inline void SetFlags(struct FlagsHolder *f, u32 mask)
-{
-    f->flags |= mask;
-}
-static inline u32 TestFlags(struct FlagsHolder *f, u32 mask)
-{
-    return f->flags & mask;
-}
-
-struct DamageActor {
-    u8 pad00[0x90];
-    u32 stateValue;
-    s16 health;
-    u8 pad96[6];
-    u32 flags;
-    u8 padA0[2];
-    u8 phase;
-    u8 padA3;
-    u32 timer;
-    u8 padA8[3];
-    u8 state;
-    u8 reaction;
-    u8 reactionPhase;
-    u8 reactionMode;
-    u8 padAF;
-    u8 active;
-    u8 stateReady;
-    u8 padB2[0x12];
-    u32 reactionTimer;
-    u8 padC8[0x38];
-    u32 callback;
-};
-
 int BossSlot2_ApplyPendingDamage(u8 *p)
 {
-    struct DamageActor *base = (struct DamageActor *)p;
+    struct StateActor *base = (struct StateActor *)p;
     u8 *q = p;
     u32 special;
     u8 *position = p + 0x48;
@@ -74,7 +38,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
     flags = *(u32 *)(q + off);
     ActorExtension_ResetState(base);
     *specialPtr = 0;
-    off = TestFlags((struct FlagsHolder *)base, 0x100000);
+    off = SceneActorState_TestFlags(base, 0x100000);
     if (off) {
         damage = damage >= 0 ? damage >> 1 : -(-damage >> 1);
     }
@@ -92,7 +56,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
                 sound = 0x12a;
                 Sound_PlaySong(0x57a);
                 *hitstun = 60;
-                SetFlags((struct FlagsHolder *)base, 1);
+                SceneActorState_SetFlags(base, 1);
             }
         } else
             (*hitstun)--;
@@ -104,7 +68,7 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
         base->health -= damage;
         Sound_PlaySong(sound);
         health = &base->health;
-        if (damage > 0 && base->state != 0xb) {
+        if (damage > 0 && base->actionState != 0xb) {
             B(0x475) = 0;
             B(0x474)++;
         }
@@ -132,38 +96,21 @@ int BossSlot2_ApplyPendingDamage(u8 *p)
             clearedHealth[0] = 0;
             zero = 0;
             *health = clearedHealth[0];
-            SetFlags((struct FlagsHolder *)base, 2);
+            SceneActorState_SetFlags(base, 2);
             callback = (u32)SceneEventActor_UpdateRemovalSequence;
             state = 0xd;
-            base->state = state;
-            base->callback = callback;
-            base->stateValue = 0;
-            base->stateReady = 1;
-            base->phase = zero;
-            base->timer = 0;
+            base->actionState = state;
+            base->actionCallback = (void *)callback;
+            base->callbackFrame = 0;
+            base->actionChanged = 1;
+            base->reactionPhase = zero;
+            base->reactionTimer = 0;
             return 1;
         }
         if (knockback) {
-            int zero;
-            int mode;
-            u32 callback;
-            int state;
-            SetFlags((struct FlagsHolder *)base, 1);
-            zero = 0;
-            mode = 2;
-            base->reaction = 1;
-            base->reactionPhase = zero;
-            base->reactionMode = mode;
-            base->reactionTimer = zero;
-            base->active = 1;
-            callback = (u32)SceneVolume_UpdateKnockbackLanding;
-            state = 0xc;
-            base->state = state;
-            base->callback = callback;
-            base->stateValue = zero;
-            base->stateReady = 1;
-            base->phase = zero;
-            base->timer = zero;
+            SceneActorState_SetFlags(base, 1);
+            SceneActorState_StartAction(base, 1, 0, 2);
+            SceneActorState_StartReaction(base, SceneVolume_UpdateKnockbackLanding, 0xc);
             return 1;
         }
     }
