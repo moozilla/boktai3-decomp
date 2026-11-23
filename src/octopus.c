@@ -115,8 +115,7 @@ static inline void ShowCollider(struct ChaseActor *actor)
 {
     actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
     {
-        u32 m = ~0x800;
-        actor->base.placementFlags = m & actor->base.placementFlags;
+        actor->base.placementFlags = ~0x800 & actor->base.placementFlags;
     }
 }
 
@@ -386,8 +385,7 @@ static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
 static inline void ClearHeld(struct Octopus *context)
 {
     u32 *flags = &context->flags628;
-    u32 mask = ~2;
-    *flags &= mask;
+    *flags &= ~2;
 }
 
 static inline u8 IsIdle(struct Player *player)

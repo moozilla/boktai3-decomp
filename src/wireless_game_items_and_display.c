@@ -598,8 +598,7 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     *(struct WirelessGamePair *)&sprite->x = drawing->position.words;
     if (p->timer > 31) {
         u8 state = 1;
-        u16 ticks = 0;
-        WirelessGameItem_ResetOutgoing(p, state, ticks);
+        WirelessGameItem_ResetOutgoing(p, state, 0);
     }
     p->timer++;
 }

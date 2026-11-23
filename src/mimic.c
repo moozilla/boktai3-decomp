@@ -70,10 +70,8 @@ void Mimic_UpdateHitRecovery(struct ChaseActor *actor)
         motion->target = NULL;
         {
             u16 *h;
-            u32 v;
             h = &actor->base.field2C2;
-            v = 0x40;
-            *h = v;
+            *h = 0x40;
         }
         {
             u16 *field;

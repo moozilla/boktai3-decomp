@@ -129,9 +129,8 @@ void SceneVolume_UpdateRepeatedShot(struct SceneVolumeActor *actor)
             SceneActors_StartEightDirectionAnimation(actor, &volume->animation,
                                                      volume->animationState, 0x134, 1, 1, 1);
             if (actor->finished) {
-                u32 zero = 0;
                 actor->phase = 1;
-                actor->timer = zero;
+                actor->timer = 0;
             }
             break;
         case 1:

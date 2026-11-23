@@ -8,14 +8,13 @@ typedef void (*ActorStateCallback)(u8 *, u8 *, u32);
 s32 Actor_TickCallbacks(u8 *a, u8 *b)
 {
     s16 result;
-    u8 zero8 = 0;
     u32 frame;
     ActorStateCallback cb;
     s16 zero = 0;
     result = zero;
 
     *(u16 *)(b + 0xe) = 0;
-    b[7] = zero8;
+    b[7] = 0;
     frame = (*(u32 *)(b + 0x10))++;
     (*(ActorUpdate *)(b + 0x2e4))(b);
     cb = *(ActorStateCallback *)(b + 0x2cc);
