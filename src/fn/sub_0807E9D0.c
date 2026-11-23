@@ -20,12 +20,6 @@ static inline u8 Test(u32 value, u32 mask)
         return 1;
     return 0;
 }
-static inline u8 TestControl(struct ChaseActor *actor, u32 mask)
-{
-    if (actor->base.placementFlags & mask)
-        return 1;
-    return 0;
-}
 static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorContactView *source)
 {
     u32 mask = inputMask;
@@ -34,7 +28,7 @@ static inline u32 ReadReactionFlags(u32 inputMask, struct SceneActorBehaviorCont
 static inline void AimAtContactTarget(struct ChaseActor *actor)
 {
     struct SceneActorChaseTarget *target;
-    if (TestControl(actor, 2))
+    if (SceneActorChase_HasPlacementFlags(actor, 2))
         actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
     else if (actor->base.tracking.target == 0)
         return;
