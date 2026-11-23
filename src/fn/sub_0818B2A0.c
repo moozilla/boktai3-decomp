@@ -1,6 +1,7 @@
 #include "global.h"
 #include "contact_collider.h"
 #include "ram.h"
+#include "scene_combat_colliders.h"
 
 struct Obj {
     u8 pad0[0x190];
@@ -27,11 +28,6 @@ struct Obj {
 extern u16 gUnk_086141BC[];
 extern void Armor_UpdateContactBoost(struct Obj *, s32, u32);
 extern void Armor_UpdateAccumulatedBehavior(struct Obj *, s32, u32);
-
-static inline void clearFlags(struct ContactCollider *p, u32 mask)
-{
-    p->reactionFlags &= ~mask;
-}
 
 void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 flag)
 {
@@ -164,8 +160,8 @@ void Armor_UpdateBehaviorAfterContact(struct Obj *p, s32 delta, u32 flags, s32 f
                 p->acc = 420;
                 p->h112A = 0;
                 p->hB26 = p->h112C;
-                clearFlags(&p->sub[1], 0x400008);
-                clearFlags(&p->sub[0], 0x400008);
+                ContactCollider_ClearReactionFlags(&p->sub[1], 0x400008);
+                ContactCollider_ClearReactionFlags(&p->sub[0], 0x400008);
             } else {
                 goto b178;
             }
