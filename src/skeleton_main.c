@@ -2455,7 +2455,7 @@ void Skeleton_OnContactEvent(u8 *unused, u8 *obj, u8 *ctx)
 
 /* Tentative: passes the call through unless the actor is unavailable or flagged. */
 
-void SceneActorReaction_HandleColliderContact(void *, void *);
+void SceneActorReaction_HandleColliderContact(void *, void *, struct ChaseActor *);
 
 static inline u8 IsUnavailable_TryForward(struct ChaseActor *actor)
 {
@@ -2482,7 +2482,7 @@ void SceneActor_TryForward(void *a, void *b, struct ChaseActor *actor)
     }
     if (*((u8 *)state + 0x6D0))
         return;
-    SceneActorReaction_HandleColliderContact(a, b);
+    SceneActorReaction_HandleColliderContact(a, b, actor);
 }
 
 /* Tentative reaction name, based on the observed fields and calls. */
