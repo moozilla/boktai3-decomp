@@ -96,7 +96,7 @@ struct GloveMotion {
     u8 pad5E0[0x5EC - 0x5E0];
     s8 steps; /* 0x5EC */
     u8 pad5ED;
-    s8 damageFlags;
+    u8 damageFlags;
     u8 pad5EF;
     u16 angle; /* 0x5F0 */
     u8 pad5F2[2];

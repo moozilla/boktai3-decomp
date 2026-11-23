@@ -46,7 +46,7 @@ static inline struct GloveMotion *Glove_MotionFromBinding(struct GloveMotionBind
 {
     return binding.field;
 }
-static inline void Glove_ClearDamageFlag(s8 *p, s32 mask)
+static inline void Glove_ClearDamageFlag(u8 *p, s32 mask)
 {
     *p &= mask;
 }
