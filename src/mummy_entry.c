@@ -844,9 +844,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         }
         {
             struct SceneActorRegistryControl *control = &group->common.control;
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = ~0x141C0;
-            *flags &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x141C0);
             control->counter = 0;
             control->field14 = 0;
             control->timer = 0;
@@ -3611,9 +3609,7 @@ u8 Mummy_SelectMovementResponse(struct ChaseActor *actor)
     else
         Sound_PlaySong(0xFD);
     {
-        u32 *word = &actor->base.statusFlags;
-        s32 mask = ~4;
-        *word &= mask;
+        SceneActorChase_ClearWordFlags(&actor->base.statusFlags, 4);
     }
     if (SceneActorChase_QueryMotionFlags(actor, 0x10)) {
         SceneActorChase_ChooseRoute(actor);
