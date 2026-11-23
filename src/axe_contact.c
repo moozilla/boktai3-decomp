@@ -139,21 +139,6 @@ static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *o
     out->z = a->z - b->z;
 }
 
-static inline void SceneActor_SetApproachControl(struct ChaseActor *p, void *control, u32 kind)
-{
-    p->base.field2B2 = 1;
-    p->base.stepDone = 0;
-    p->base.controlKind = kind;
-    p->base.target = control;
-    p->base.field2C8 = 0;
-    {
-        u32 *flags = &p->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    p->base.pendingControl = 0;
-}
-
 void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
 {
     struct SceneActorApproachContext *context = p->base.context;
@@ -176,7 +161,7 @@ void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
     current->x += Div(difference.x, context->remaining);
     context->remaining--;
     if (!context->remaining) {
-        SceneActor_SetApproachControl(p, ActorPhase_UpdateTimedFlicker, 43);
+        SceneActorChase_SetControl(p, ActorPhase_UpdateTimedFlicker, 43);
     }
 }
 
