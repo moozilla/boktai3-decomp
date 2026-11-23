@@ -576,7 +576,7 @@ export function createGame(env) {
     hex: (a, n = 64) => { mem(); const s = addr(a); return Array.from(bytes.slice(s, s + n), (b) => b.toString(16).padStart(2, '0')).join(' '); },
     cstr: (a, max = 256) => { mem(); const s = addr(a); let e = s; while (bytes[e] && e - s < max) e++; return String.fromCharCode(...bytes.slice(s, e)); },
     show: (v, depth = 1) => format(v, depth),
-    on, off, hooks: hookList, dispatch, armFlags, hasHooks: () => hooks.size > 0 || tasks.some((t) => t.wait && t.wait.call !== undefined),
+    on, off, hooks: hookList, dispatch, armFlags, refresh, hasHooks: () => hooks.size > 0 || tasks.some((t) => t.wait && t.wait.call !== undefined),
     press, tap, until, untilCall, spawn, frame, currentKeys, tasks,
     get keys() { return heldKeys; }, set keys(k) { heldKeys = keyMask(k); },
     get frameNo() { return frameNo; },

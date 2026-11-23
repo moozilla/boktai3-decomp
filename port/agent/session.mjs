@@ -96,7 +96,7 @@ export async function openSession(opts = {}) {
     ex.port_game_set_time(time);
     ex.port_game_set_solar(solar);
     if (ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0);
-    g = createGame({ memory, exports: ex, types, print: out, refresh: () => g && g.armFlags() });
+    g = createGame({ memory, exports: ex, types, print: out });
     g.loadLib(libSources);
     if (save) new Uint8Array(memory.buffer, ex.port_game_save_stage(), save.length).set(save);
     return save ? save.length : 0;
@@ -146,7 +146,7 @@ export async function openSession(opts = {}) {
       movie.length = snap.movie;
       frameNo = snap.frame;
       if (snap.solar !== solar) session.setSolar(snap.solar);
-      g.armFlags();
+      g.refresh();  // hooks set since the snapshot
     },
     setRender(on) { render = !!on; if (ex && ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0); },
     setSolar(v) { solar = v; ex.port_game_set_solar(v); solarLog.push([frameNo, v]); },
