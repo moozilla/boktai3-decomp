@@ -30,6 +30,7 @@ import numpy as np  # noqa: E402
 
 from facts import Facts, Function, Block, KIND_NAMES, kind_of, lvalue_text  # noqa: E402
 from lift import Types, ObjectMap, join  # noqa: E402
+from heap import Namer  # noqa: E402
 from session import Session, SESSIONS, ROOT  # noqa: E402
 
 
@@ -178,7 +179,7 @@ def cmd_verify(args):
 def cmd_history(args):
     s, facts, types = open_session(args.name), Facts(), Types()
     last = args.to if args.to is not None else len(s) - 1
-    place = resolve_place(args.where, types, lambda: ObjectMap(types, s.ram_at(last)))
+    place = resolve_place(args.where, types, lambda: Namer(s, facts, types, last))
     print(f'{place}  frames {args.frm}..{last}')
     rows = writes_to(s, place, args.frm, last)
     ram = s.ram_at(args.frm - 1) if args.frm > 0 else None
@@ -218,7 +219,7 @@ def cmd_history(args):
 
 def cmd_who_wrote(args):
     s, facts, types = open_session(args.name), Facts(), Types()
-    place = resolve_place(args.where, types, lambda: ObjectMap(types, s.ram_at(args.frame)))
+    place = resolve_place(args.where, types, lambda: Namer(s, facts, types, args.frame))
     rows = writes_to(s, place, 0, args.frame)
     ram = s.ram_at(args.frame)
     v = value_after(s, ram, place)
@@ -249,37 +250,29 @@ def cmd_who_wrote(args):
 def cmd_at(args):
     s, types = open_session(args.name), Types()
     frame = args.frame if args.frame is not None else len(s) - 1
-    om = ObjectMap(types, s.ram_at(frame))
+    om = Namer(s, Facts(), types, frame)
     label, path, leaf, base = om.at(int(args.addr, 0))
+    om.close()
     print(join(label, path), f'({types.name(leaf)})' if leaf is not None else '', f'object at 0x{base:08X}' if base else '')
 
 
 def cmd_why(args):
     from slicer import Slicer, render
     s, facts, types = open_session(args.name), Facts(), Types()
-    ram = s.ram_at(args.frame)
-    om = ObjectMap(types, ram)
+    sl = Slicer(s, facts, max_nodes=args.nodes, max_frames=args.frames,
+                log=(lambda m: print(m, file=sys.stderr)) if args.verbose else None)
+    om = Namer(s, facts, types, args.frame, slicer=sl)
+    ram = om.ram
     place = resolve_place(args.where, types, lambda: om)
     v = ram.read(place.addr, min(place.width, 8))
     print(f'why {place} = {fmt_value(v, place.width, place.signed)} at the end of frame {args.frame}')
     print()
-    sl = Slicer(s, facts, max_nodes=args.nodes, max_frames=args.frames,
-                log=(lambda m: print(m, file=sys.stderr)) if args.verbose else None)
     try:
         sl.why(place.addr, place.width, args.frame)
+        describe = lambda a, w: om.describe(a, w or 1)  # noqa: E731
+        print(render(sl, describe))
     finally:
         sl.close()
-
-    heap = s.meta.get('heapBase', 0)
-
-    def describe(a, w):
-        if a is None:
-            return '?'
-        if a < heap:
-            return f'stack/port 0x{a:X}'
-        label, path, leaf, _ = om.at(a, w or 1)
-        return join(label, path)
-    print(render(sl, describe))
     if args.check:
         print()
         check_slice(s, sl, place, args.frame, describe)

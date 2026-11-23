@@ -45,10 +45,14 @@ class App:
         self.maps = OrderedDict()
 
     def objmap(self, frame):
-        from lift import ObjectMap
+        from heap import Namer, HeapNamer
+        from slicer import Slicer
+        if not hasattr(self, 'heap'):
+            self.slicer = Slicer(self.session, self.facts)
+            self.heap = HeapNamer(self.session, self.facts, self.types, self.slicer)
         om = self.maps.get(frame)
         if om is None:
-            om = self.maps[frame] = ObjectMap(self.types, self.session.ram_at(frame))
+            om = self.maps[frame] = Namer(self.session, self.facts, self.types, frame, slicer=self.slicer, heap=self.heap)
             while len(self.maps) > 8:
                 self.maps.popitem(last=False)
         return om
@@ -105,7 +109,7 @@ class App:
 
 
 def _cli():
-    import importlib
+    import importlib.util
     import sys
     if 'recorder_cli' in sys.modules:
         return sys.modules['recorder_cli']
