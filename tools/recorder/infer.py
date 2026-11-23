@@ -581,6 +581,73 @@ class Inferer:
         conf = min(conf, 1.0)
         return name, round(conf, 2), reasons, pat, info
 
+    def embeddings(self, min_agree=3):
+        """Structs that another struct embeds without declaring it: for each owner, the member
+        names other code uses for its placeholder bytes (aliases) are matched against every
+        struct type's members; a type whose members land at one consistent base offset for at
+        least MIN_AGREE aliases is reported, with the owner's existing names it overlaps."""
+        by_owner = defaultdict(list)     # owner -> [(offset in owner, alias name)]
+        for key, fld in self.fields.items():
+            owner_t = self.types.resolve('struct ' + fld.owner)
+            if not owner_t or owner_t.get('k') != 'struct':
+                continue
+            off = self.offset_in('struct ' + fld.owner, fld.path)
+            if off is None:
+                continue
+            for (kind, name), c in fld.sources.items():
+                if kind == 'alias':
+                    by_owner[fld.owner].append((off, name))
+        members = {}
+        for tname, d in self.types.types.items():
+            if isinstance(d, dict) and d.get('k') == 'struct' and d.get('fields'):
+                members[tname] = {f['name']: f['off'] for f in d['fields']}
+        out = []
+        for owner, aliases in by_owner.items():
+            names = {n for _, n in aliases}
+            for tname, mem in members.items():
+                if tname == 'struct ' + owner or len(names & mem.keys()) < min_agree:
+                    continue
+                bases = Counter(off - mem[n] for off, n in aliases if n in mem)
+                base, agree = bases.most_common(1)[0]
+                if base < 0:
+                    continue
+                hits = sorted({(off, n) for off, n in aliases if n in mem and off - mem[n] == base})
+                if len({n for _, n in hits}) < min_agree:
+                    continue
+                size = self.types.sizeof(tname)
+                od = self.types.resolve('struct ' + owner)
+                overlap = [(f['off'], f['name']) for f in od['fields'] if base <= f['off'] < base + size]
+                renames = []
+                inv = {o: n for n, o in mem.items()}
+                for o, n in overlap:
+                    if not is_placeholder(n) and (o - base) in inv and inv[o - base] != n:
+                        renames.append((o, n, inv[o - base]))
+                out.append({'owner': owner, 'type': tname, 'base': base, 'size': size,
+                            'agree': [(o, n) for o, n in hits], 'distinct': len({n for _, n in hits}),
+                            'existing': [(o, n) for o, n in overlap], 'renames': renames})
+        out.sort(key=lambda r: -r['distinct'])
+        return out
+
+    def offset_in(self, tname, path):
+        off, t = 0, tname
+        for m in re.finditer(r'\.(\w+)|\[(\d+)\]', path):
+            d = self.types.resolve(t)
+            if d is None:
+                return None
+            if m[2] is not None:
+                if d.get('k') != 'array':
+                    return None
+                es = self.types.sizeof(d['of'])
+                off += int(m[2]) * es
+                t = d['of']
+            else:
+                f = next((f for f in d.get('fields', []) if f['name'] == m[1]), None)
+                if f is None:
+                    return None
+                off += f['off']
+                t = f['type']
+        return off
+
     @staticmethod
     def merge_ranges(rows):
         """Consecutive elements of one placeholder array with the same proposal become one row
@@ -654,4 +721,21 @@ class Inferer:
             ev = '; '.join(r['reasons'][:3]) + ('<br>writers: ' + '; '.join(r['writers'][:2]) if r['writers'] else '')
             md.append(f"| `{r['owner']}{'.' + r['field'] if r['field'] else ''}` | `{r['proposal']}` | {r['confidence']} | {r['pattern'] or ''} | {ev.replace('|', '/')} |")
         (out / 'proposals.md').write_text('\n'.join(md) + '\n')
+        emb = self.embeddings()
+        lines = ['# Embedded structs found from recorded behavior', '',
+                 'Each entry: a struct whose placeholder bytes other code accesses through another struct type, '
+                 'with the member names landing at one consistent base offset. "Existing names to check" are '
+                 'named members of the owner that the embedded type names differently.', '']
+        for e in emb:
+            lines.append(f"## {e['owner']} embeds `{e['type']}` at 0x{e['base']:X} (0x{e['size']:X} bytes): "
+                         f"{e['distinct']} member names agree")
+            lines.append('* agreeing: ' + ', '.join(f"0x{o:X} `{n}`" for o, n in e['agree']))
+            if e['renames']:
+                lines.append('* existing names to check: ' + ', '.join(f"0x{o:X} `{n}` (the embedded type calls it `{m}`)"
+                                                                       for o, n, m in e['renames']))
+            lines.append('* owner members overlapped: ' + ', '.join(f"0x{o:X} {n}" for o, n in e['existing']))
+            lines.append('')
+        (out / 'layout.md').write_text('\n'.join(lines) + '\n')
+        (out / 'layout.json').write_text(json.dumps(emb, indent=1))
+        self.embedded = emb
         return rows

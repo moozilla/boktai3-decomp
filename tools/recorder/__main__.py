@@ -377,6 +377,9 @@ def cmd_infer(args):
     inf.run()
     rows = inf.report(Path(args.out) if args.out else OUT)
     named = [r for r in rows if r['proposal']]
+    for e in getattr(inf, 'embedded', [])[:10]:
+        print(f"  layout: {e['owner']} embeds {e['type']} at 0x{e['base']:X} ({e['distinct']} member names agree"
+              + (f"; existing names to check: {', '.join(n + ' -> ' + m for _, n, m in e['renames'])}" if e['renames'] else '') + ')')
     print(f'{len(rows)} placeholder fields observed, {len(named)} with proposals -> {args.out or OUT}')
     for r in named[:args.show]:
         print(f"  {r['owner']}{'.' + r['field'] if r['field'] else ''} -> {r['proposal']}  ({r['confidence']}, {r['pattern']})")
