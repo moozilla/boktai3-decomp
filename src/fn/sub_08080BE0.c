@@ -103,8 +103,7 @@ u32 SceneActorReaction_SetMotionMode(struct ReactionOwner *owner, s32 mode, s32 
                                 SceneActorChase_OrReactionFlags(actor, 0x400);
                                 actor->base.field2E6 = 0;
                                 {
-                                    u32 mask = 0x2000;
-                                    actor->base.behaviorFlags |= mask;
+                                    WordFlags_Set(0x2000, &actor->base.behaviorFlags);
                                 }
                             } else
                                 SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x2000);
