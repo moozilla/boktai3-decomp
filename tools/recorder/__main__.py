@@ -8,6 +8,9 @@
   who-wrote NAME WHERE FRAME       the last write to WHERE at or before FRAME
   at NAME ADDR [FRAME]             what typed object ADDR is at FRAME
   diff RUN_A RUN_B [--both]        first typed divergence of two sessions of one movie, and its slice
+  infer SESSION... [--trace-frames N]
+                                   evidence and name proposals for placeholder fields
+                                   (build/recorder/infer/: proposals.tsv, proposals.md, evidence.json)
   serve NAME [--port 8765]         the Recorder page: screens timeline, typed writes, history, why
   why NAME WHERE FRAME [--nodes N] [--frames N] [--check]
                                    dynamic backward slice: the C statements, with their runtime
@@ -366,6 +369,21 @@ def cmd_diff(args):
     return 0
 
 
+def cmd_infer(args):
+    from infer import Inferer, OUT
+    inf = Inferer([open_session(n) for n in args.names], trace_frames=args.trace_frames,
+                  log=lambda m: print(m, file=sys.stderr))
+    inf.run()
+    rows = inf.report(Path(args.out) if args.out else OUT)
+    named = [r for r in rows if r['proposal']]
+    print(f'{len(rows)} placeholder fields observed, {len(named)} with proposals -> {args.out or OUT}')
+    for r in named[:args.show]:
+        print(f"  {r['owner']}.{r['field']} -> {r['proposal']}  ({r['confidence']}, {r['pattern']})")
+        for why in r['reasons'][:4]:
+            print(f'      {why}')
+    return 0
+
+
 def check_slice(s, sl, place, frame, describe):
     """Perturb the slice's inputs and cross-frame links in a replay; does the target change?"""
     from emu import Replay
@@ -483,6 +501,8 @@ def main(argv=None):
     p = sub.add_parser('diff'); p.add_argument('a'); p.add_argument('b')
     p.add_argument('--fields', type=int, default=20); p.add_argument('--nodes', type=int, default=200)
     p.add_argument('--both', action='store_true', help='slice the divergent write in both runs')
+    p = sub.add_parser('infer'); p.add_argument('names', nargs='+')
+    p.add_argument('--trace-frames', type=int, default=6); p.add_argument('--out'); p.add_argument('--show', type=int, default=20)
     p = sub.add_parser('serve'); p.add_argument('name'); p.add_argument('--port', type=int, default=8765)
     p = sub.add_parser('why'); p.add_argument('name'); p.add_argument('where'); p.add_argument('frame', type=int)
     p.add_argument('--nodes', type=int, default=400); p.add_argument('--frames', type=int, default=24)
@@ -496,7 +516,7 @@ def main(argv=None):
         return serve(args.name, args.port)
     if extra:
         ap.error('unrecognized arguments: ' + ' '.join(extra))
-    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why, 'diff': cmd_diff}[args.cmd](args) or 0
+    return {'verify': cmd_verify, 'history': cmd_history, 'who-wrote': cmd_who_wrote, 'at': cmd_at, 'why': cmd_why, 'diff': cmd_diff, 'infer': cmd_infer}[args.cmd](args) or 0
 
 
 if __name__ == '__main__':

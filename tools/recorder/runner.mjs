@@ -3,7 +3,8 @@
 // (build/port/game-rec/game.wasm; tools/recorder/README.md).
 //
 //   node tools/recorder/runner.mjs record OUT [--save F.sav] [--time ISO] [--solar N]
-//        [--script FILE.js | --code 'JS'] [--frames N] [--every 60] [--screens 30]
+//        [--script FILE.js | --code 'JS' | --movie movie.json] [--frames N] [--every 60] [--screens 30]
+//        (--movie: an autopilot input movie, tools/autopilot on claude/cl-side-almanac)
 //   node tools/recorder/runner.mjs serve SESSION     JSON commands on stdin, one per line
 //
 // record runs the game from power-on (or a battery save) under a script in the
@@ -283,7 +284,15 @@ async function record(args) {
     script: args.script ? path.relative(ROOT, path.resolve(args.script)) : (args.code || null),
     wasm: path.relative(ROOT, WASM), wasmSize: fs.statSync(WASM).size, frameRow: 32 };
   const code = args.script ? fs.readFileSync(args.script, 'utf8') : (args.code || '');
-  const maxFrames = Number(args.frames || 0);
+  // an input movie (tools/autopilot movie.json: {save, frames, movie: [key mask per frame]})
+  const movie = args.movie ? JSON.parse(fs.readFileSync(args.movie, 'utf8')) : null;
+  if (movie) {
+    meta.movie = path.relative(ROOT, path.resolve(args.movie));
+    meta.movieGoal = movie.goal ?? null;
+    meta.movieEnd = movie.end ?? null;
+    if (!args.save && movie.save) { args.save = path.resolve(ROOT, movie.save); meta.save = movie.save; }
+  }
+  const maxFrames = Number(args.frames || (movie ? movie.frames || movie.movie.length : 0));
   const framesFd = fs.openSync(path.join(out, 'frames.bin'), 'w');
   const writesFd = fs.openSync(path.join(out, 'writes.bin'), 'w');
   const edits = [], sigs = {};
@@ -307,7 +316,8 @@ async function record(args) {
     const before = ramHash(machine.memory);
     const snapRam = Buffer.from(new Uint8Array(machine.memory.buffer, 0x02000000, 0x40000));
     const snapIw = Buffer.from(new Uint8Array(machine.memory.buffer, 0x03000000, 0x8000));
-    const keys = g.frame(n + 1) & 0x3ff;
+    // movie[n] is what the frame import returned at the end of frame n (port/agent/session.mjs)
+    const keys = movie ? (movie.movie[n] | 0) & 0x3ff : g.frame(n + 1) & 0x3ff;
     let flags = 0;
     const after = ramHash(machine.memory);
     if (before[0] !== after[0] || before[1] !== after[1]) {
@@ -332,7 +342,7 @@ async function record(args) {
     }
     if (screens && n % screens === 0)
       fs.writeFileSync(path.join(out, 'screens', String(n).padStart(8, '0') + '.rgb'), Buffer.from(new Uint8Array(machine.memory.buffer, ptr, 240 * 160 * 2)));
-    const done = (task && task.done) || (maxFrames && n + 1 >= maxFrames) || (!code && !maxFrames);
+    const done = (task && task.done) || (maxFrames && n + 1 >= maxFrames) || (!code && !movie && !maxFrames);
     if (done) {
       if (task && task.error) process.stderr.write('script error: ' + (task.error.stack || task.error) + '\n');
       meta.frames = n + 1;
