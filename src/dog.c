@@ -708,15 +708,7 @@ static inline u32 MaskFlags(u32 value, u32 *p)
 
 static inline void QueueAction(struct ChaseActor *actor)
 {
-    u32 behavior = 15;
-    u32 zero;
-    u8 *q = &actor->base.state2A8;
-    zero = 0;
-    *q = zero;
-    actor->base.phase2A9 = zero;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = zero;
-    actor->base.field2B1 = 1;
+    Chase_SetBehavior(actor, 15);
     {
         u32 *flags;
         s32 mask;
@@ -3329,16 +3321,6 @@ u8 SceneActorBehavior_RequestDescriptorTurn(void *, void *, u32, u32, s32);
 
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetState(struct ChaseActor *actor)
-{
-    u32 behavior = 18;
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 // confidence=low: approaches the navigation probe and selects the next dog state.
 
 void Dog_UpdateProbeApproach(struct ChaseActor *actor)
@@ -3381,7 +3363,7 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
-            SetState(actor);
+            Chase_SetBehavior(actor, 18);
         }
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
                                                              speed)) {
@@ -3418,14 +3400,9 @@ void Dog_UpdateActionPhase(struct ChaseActor *p)
         if (sub_0812F3CC(p))
             return;
     }
-    if (p->base.stepDone) {
-        u32 phase = 0x11;
-        p->base.state2A8 = 0;
-        p->base.phase2A9 = 0;
-        p->base.behavior2AA = phase;
-        p->base.counter2AC = 0;
-        p->base.field2B1 = 1;
-    } else
+    if (p->base.stepDone)
+        Chase_SetBehavior(p, 0x11);
+    else
         ++p->base.counter2AC;
 }
 
@@ -3850,19 +3827,10 @@ void SceneActor_UpdateAlternateEntryPhase(struct ChaseActor *actor)
     if (SceneActorControl_TakeStateEntry(actor)) {
         SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
     }
-    if (actor->base.stepDone) {
-        u32 behavior = 15;
-        u32 zero;
-        u8 *state = &actor->base.state2A8;
-        zero = 0;
-        *state = zero;
-        actor->base.phase2A9 = zero;
-        actor->base.behavior2AA = behavior;
-        actor->base.counter2AC = zero;
-        actor->base.field2B1 = 1;
-    } else {
+    if (actor->base.stepDone)
+        Chase_SetBehavior(actor, 15);
+    else
         Callback_InvokeActor(actor, actor->base.contactQuery.opaque);
-    }
 }
 
 void SceneActor_WaitForCategoryAttachment(void);
