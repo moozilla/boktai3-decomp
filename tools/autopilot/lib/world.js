@@ -69,7 +69,7 @@ exports.findPath = (grid, start, goals, blocked = new Set()) => {
   const key = (x, z) => x + ',' + z;
   const open = (x, z) => { const c = grid.at(x, z); return c && c.open && !blocked.has(key(x, z)); };
   // a step between cells: the same level, or through a slope at most one level apart
-  // (no drops: a pit can trap the player)
+  // (the player cannot walk off an edge: the game stops it there, measured in 2776)
   const step = (a, b) => a.level === b.level || ((a.slope || b.slope) && Math.abs(a.level - b.level) <= 1);
   const gx = [...goals].map((k) => k.split(',').map(Number));
   const hfn = (x, z) => Math.min(...gx.map(([a, b]) => Math.max(Math.abs(a - x), Math.abs(b - z))));
@@ -320,6 +320,31 @@ exports.interact = function* (x, z, opts = {}) {
   yield g.until(() => exports.message().open, 90);
   const any = yield* exports.clearInterruptions({ ...opts, seen });
   return { done: any, lines: [...seen.keys()] };
+};
+
+// The player's bags (docs/ASSETS.md, Items): items GameState+0xA0 (u16 per slot),
+// accessories +0x160 (u16), swords +0x1C0 (16-byte records, ID first), valuables +0x838.
+// 0xFFFF / 0xFF mark empty slots.
+exports.bags = () => {
+  const gs = g.u32(g.types.globals.gGameState.addr);
+  const read = (off, n, stride, size) => { const out = []; for (let i = 0; i < n; i++) { const v = size === 2 ? g.u16(gs + off + i * stride) : g.u8(gs + off + i * stride); if (v !== (size === 2 ? 0xffff : 0xff)) out.push(v); } return out; };
+  return { items: read(0xa0, 16, 2, 2), accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1) };
+};
+
+// Pick up a floor item (stages.json proc_1118: it sits in the middle of its cell): walk
+// onto it, then let the pickup message play out. Returns what the bags gained.
+exports.collect = function* (x, z, opts = {}) {
+  const before = JSON.stringify(exports.bags());
+  // an item actor (proc_1119/1120, chest or not) opens with A from a neighboring cell;
+  // a plain floor pickup is taken by walking onto it
+  const i = yield* exports.interact(x, z, opts);
+  if (JSON.stringify(exports.bags()) === before && i.reason !== 'no path') {
+    yield* exports.walkTo(x, z, { tolerance: 16, patience: 30, frames: 90 });
+    yield g.until(() => exports.message().open, 40);
+    yield* exports.clearInterruptions(opts);
+  }
+  const after = exports.bags();
+  return { done: JSON.stringify(after) !== before, lines: i.lines, reason: i.reason, bags: after };
 };
 
 // Push planning: a breadth-first search over block states with the game's rules

@@ -39,7 +39,8 @@ const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
-const VISITED = new Set(from && from.visited ? from.visited : []);
+const TRIED = new Set(from && from.tried ? from.tried : []);  // floor items already gone for
+const VISITED = new Set(from ? [...(from.visited || []), ...(from.rooms || []).map((r) => r.scene)] : []);
 const event = (what) => {
   const e = { frame: s.frame, ...what };
   log.push(e);
@@ -101,14 +102,22 @@ const GOALS = {
     let prev;
     for (let rooms = 0; rooms < limit; rooms++) {
       const doorsHere = () => stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box));
-      if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, g.frameNo + 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
+      if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
       // enemies in the room: fight them first (the "defeat all" rooms lock the doors)
       if (L.enemies().some((e) => e.alive && !(L.fightIgnored && L.fightIgnored.has(e.addr)))) {
         const f = yield* L.fight({ trace: (e) => event({ skill: 'fight', ...e }) });
         event({ skill: 'fought', ...f, scene: L.where().scene });
-        if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, g.frameNo + 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
+        if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
       }
       const here = L.where().scene;
+      // items on the floor: pick them up on the way (a sword, fruit, potions)
+      for (const it of stageOf(here).items.filter((it) => !it.chest && !TRIED.has(`${here}:${it.x},${it.z}`))) {
+        TRIED.add(`${here}:${it.x},${it.z}`);
+        const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
+        if (L.where().scene !== here) break;
+      }
+      if (L.where().scene !== here) { rooms--; continue; }
       visited.add(here);
       if (prev !== undefined) visited.add(prev);
       // --toward SCENE: a door there first; then unvisited scenes
@@ -187,10 +196,11 @@ function* settle(g) {
 }
 
 // Advance dialogue (and menus) until the player stands in a room with no message
-// open for `quiet` frames (and `ready()` holds, e.g. the room has a given box).
+// open for `quiet` frames (and `ready()` holds, e.g. the room has a given box); at
+// most `limit` frames.
 function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
-  const msg = L.message();
-  for (let calm = 0; g.frameNo < limit;) {
+  const msg = L.message(), end = s.frame + limit;
+  for (let calm = 0; s.frame < end;) {
     const step = yield* L.menuStep({});
     if (step) { event({ skill: 'menu', ...step }); calm = 0; continue; }
     if (msg.open) { yield* L.advanceText(600); event({ skill: 'dialogue', string: msg.id, scene: L.where().scene }); calm = 0; continue; }
@@ -230,7 +240,7 @@ const reads = readFrames.map((n) => movie[n]);
 // a savestate on the ROM at each room the run entered: the input read index there
 const allEvents = [...(from && from.rooms ? from.rooms : []), ...log.filter((e) => e.skill === 'room' || e.skill === 'goal').map((e) => ({ frame: e.frame, scene: e.scene }))];
 const saves = allEvents.map((e) => ({ at: readFrames.filter((n) => n < e.frame).length, name: `scene_${e.scene}_f${e.frame}` }));
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], rooms: allEvents, readFrames, movie }));
+fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], rooms: allEvents, readFrames, movie }));
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
