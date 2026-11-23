@@ -29,7 +29,7 @@ struct Dog {
     u8 unknown6AA[2];
     struct ChaseRouteProbe routeProbe;
     struct ContactPosition destination;
-    u8 slots[8];
+    struct ContactPosition leapTarget; /* where the leap lands: the player when it starts */
 };
 
 #endif // GUARD_DOG_H

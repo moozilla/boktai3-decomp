@@ -306,7 +306,7 @@ void Dog_ResetActionState(struct ChaseActor *actor)
     context->stolenParameter = 0;
     context->turnClockwise = 0;
     context->retreatCount = 0;
-    Memory_Clear(context->slots, 8);
+    Memory_Clear(&context->leapTarget, 8);
     SceneActorMovement_ResolveRoutePosition(actor);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
@@ -1841,10 +1841,10 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor);
 
 void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         SceneActorAnimation_SelectDirectionalEntry(actor, 0xF);
-        *(struct ContactPosition *)(context + 0x6D8) = actor->base.tracking.target->position;
+        context->leapTarget = actor->base.tracking.target->position;
     }
     if (actor->base.restart)
         SceneActorChase_SetControl(actor, Dog_LeapTowardTarget, 0x23);
@@ -1852,7 +1852,7 @@ void Dog_UpdateLeapWindup(struct ChaseActor *actor)
 
 /* Dog_LeapTowardTarget: on entry turns the leap velocity toward the context's target position (snapping to it within 16, else turning 16 at a time) and plays sound 0x3A4; halves the velocity while the motion's bit 0 is set, and hands over to the landing reaction (kind 0x24) when flags2D0 & 0x10 (provisional name) */
 
-void Dog_UpdateAnimationSixteenReaction(u8 *p);
+void Dog_UpdateAnimationSixteenReaction(struct ChaseActor *actor);
 
 static inline s32 Scale12(s32 n)
 {
@@ -1877,13 +1877,12 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
 
 void Dog_LeapTowardTarget(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Dog *context = actor->base.context;
     struct ContactPosition velocity;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         s32 angle, facing, turn;
         context = actor->base.context;
-        Chase_Delta(&velocity, &actor->base.body.position,
-                    (struct ContactPosition *)(context + 0x6D8));
+        Chase_Delta(&velocity, &actor->base.body.position, &context->leapTarget);
         angle = Math_Atan2(velocity.x, velocity.z);
         facing = ((actor->base.body.direction + 0x20) & 0xFF) >> 6 << 6;
         turn = angle - facing;
@@ -1902,8 +1901,8 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor)
         actor->base.secondaryMotion.z = velocity.z;
         Sound_PlaySong(0x3A4);
     }
-    Collider_Refresh(context + 0x624);
-    if (**(u8 **)((u8 *)actor + 0x6C) & 1) {
+    Collider_Refresh(&context->collider);
+    if (*(u8 *)actor->base.body.movementProbe & 1) {
         actor->base.secondaryMotion.x = Half(actor->base.secondaryMotion.x);
         actor->base.secondaryMotion.z = Half(actor->base.secondaryMotion.z);
     }
@@ -1917,20 +1916,20 @@ void Dog_LeapTowardTarget(struct ChaseActor *actor)
     }
 }
 
-void Dog_UpdateAnimationSixteenReaction(u8 *p)
+void Dog_UpdateAnimationSixteenReaction(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0x10);
-    if (*(u8 *)(p + 0x2B3))
-        *(u8 *)(p + 0x2B0) = 1;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0x10);
+    if (actor->base.restart)
+        actor->base.stepDone = 1;
 }
 
-void Dog_UpdateAnimationFourteenReaction(u8 *p)
+void Dog_UpdateAnimationFourteenReaction(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectDirectionalEntry(p, 0xE);
-    if (*(u8 *)(p + 0x2B3))
-        *(u8 *)(p + 0x2B0) = 1;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
+        SceneActorAnimation_SelectDirectionalEntry(&actor->base, 0xE);
+    if (actor->base.restart)
+        actor->base.stepDone = 1;
 }
 
 static inline void Dog_ResetAnimation(struct ChaseActor *actor, u32 state, u32 phase)
@@ -2565,7 +2564,7 @@ void Dog_SetSecondaryBehaviorPreset(struct SSetSecondaryBehaviorPreset *s)
 
 /* Dog_ChasePlayer: on entry starts the chase animation (kind 0x28); bites when a bite frame of the run cycle ends with player 0 in range (records the player's position, extends the chase timer), otherwise once the control finishes either follows the group's chase (flags2D4 & 0x80) or routes back to its route point (provisional name) */
 
-void Dog_UpdateAnimationFourteenReaction(u8 *p);
+void Dog_UpdateAnimationFourteenReaction(struct ChaseActor *actor);
 
 u8 sub_0812F3CC(struct ChaseActor *);
 
