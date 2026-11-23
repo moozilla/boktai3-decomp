@@ -35,7 +35,7 @@ void Ratatosk_UpdateKnockbackRecovery(struct Ratatosk *p, s32 tick)
     struct RatatoskParticleConfig params;
     struct ContactPosition spawn;
     struct Ratatosk *p2 = p;
-    struct SceneActorBody *body = (struct SceneActorBody *)((u8 *)p + 0x48);
+    struct SceneActorBody *body = &p->body;
     u16 *scaleX;
     u16 *scaleZ;
     if (p->actionChanged) {

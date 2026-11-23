@@ -119,7 +119,7 @@ s32 SpriteParticle_Emit(struct Params *params, struct Pos *pos)
     o->flags &= ~1;
     Sprite_LinkToList(o, 0);
     {
-        u8 *q = (u8 *)e + 0x8f;
+        u8 *q = &e->sprite.priority;
         one = 1;
         *q = one;
     }

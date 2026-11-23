@@ -35,12 +35,12 @@ void SceneActor_BeginConditionalAnimation8(struct Ratatosk *p)
         p->actionChanged = 0;
         if (p->locked)
             setFacing(p, p->savedAngle);
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 8, 1, 3, 4);
+        SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
         if (p->paletteToggle) {
-            SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 8, 1, 3, 4);
+            SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 1, 3, 4);
             setTimedMode(p, 500, 4, 5);
         } else {
-            SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 8, 0, 3, 4);
+            SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 8, 0, 3, 4);
         }
         p->scaleX = 0;
         p->scaleZ = 0;

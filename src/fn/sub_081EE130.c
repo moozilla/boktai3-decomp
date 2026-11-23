@@ -46,12 +46,12 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
     u32 one;
     {
         u32 random = RandomBits(0xFFFFFFFF);
-        s32 *destination = (s32 *)((u8 *)input + 0x288);
+        s32 *destination = &input->jitter;
         one = 1;
         *destination = random & one;
     }
     {
-        u8 *entry = (u8 *)input + 0xb1;
+        u8 *entry = &input->entered;
         if (*entry) {
             struct DepartureDrawable *foreground;
             u32 zero = 0;
@@ -115,7 +115,7 @@ void SceneActors_UpdatePeriodicEffectAction(struct DepartureActor *arg, s32 tick
             Update(input, time);
             if (W(0x300)) {
                 p->foreground.sequence.flags &= ~4;
-                *((u8 *)input + 0xaf) = 1;
+                input->finished = 1;
             }
             break;
     }

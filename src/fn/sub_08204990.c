@@ -77,7 +77,7 @@ void EnemyD459_ApplyHitReaction(struct Source *sourceInput, struct Hit *input,
             target->flash = 8;
             Sound_PlaySong(0x211);
             DamageNumberDisplay_Show(target->collider, target->damage, 0, &target->displayPosition,
-                                     (u8 *)target + 0x80, 1);
+                                     target->p80, 1);
             hud = target->hud;
             health = target->health;
             a = target->hudA;

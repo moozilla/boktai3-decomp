@@ -84,8 +84,8 @@ s32 Ratatosk_ApplyQueuedDamage(struct Ratatosk *p)
             return 1;
         }
         if (damage > 0)
-            DamageNumberDisplay_Show((u8 *)p2 + 0x188, damage, 0, (u8 *)p2 + 0x194,
-                                     (u8 *)p2 + 0x19c, 1);
+            DamageNumberDisplay_Show(&p2->hurtCollider, damage, 0, &p2->hurtCollider.position,
+                                     &p2->hurtCollider.offset, 1);
         if (particles) {
             s32 i;
             u8 *angle;
