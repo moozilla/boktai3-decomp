@@ -39,6 +39,8 @@
 #include "scene_actor_init_dispatch.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
+#include "scene_actor_contact_response.h"
+#include "word_flags.h"
 
 void SceneActorAnimation_SelectDirectionalEntry(struct RoomActor *, s32);
 
@@ -794,11 +796,6 @@ static inline u32 Mummy_DisplayFlags(struct ChaseActor *actor, u32 maskInput)
     return actor->base.statusFlags & mask;
 }
 
-static inline u32 Mummy_HalfFlags(u16 *field, u32 mask)
-{
-    return *field & mask;
-}
-
 static inline void HideTile(struct SceneInputWidget *tile)
 {
     u32 mask = ~1;
@@ -885,7 +882,7 @@ void Mummy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
         motionFlags = &actor->base.motionFlags;
         if (!test) {
             u8 category;
-            if (!Mummy_HalfFlags(motionFlags, 0xA007)) {
+            if (!SceneActorTurn_Flags(motionFlags, 0xA007)) {
                 SceneEffect_EmitPositionPattern(actor);
                 SceneStimulus_AddUntagged(actor->base.body.position.x, actor->base.body.position.z,
                                           0x400, 0, 1);
@@ -965,13 +962,6 @@ static inline u16 MotionFlags(struct ChaseActor *actor, u32 mask)
     return value & mask;
 }
 
-static inline u8 Test16(u16 *p, u32 mask)
-{
-    if (*p & mask)
-        return 1;
-    return 0;
-}
-
 struct MummyRandomTable {
     const u16 *samples;
 };
@@ -1014,7 +1004,7 @@ static inline void Turn(u8 saved, void *ctx, const u16 *randomSamples)
         if (((struct ChaseActor *)ctx)->base.motionFlags & mask)
             return;
     }
-    if (Test16((u16 *)((u8 *)ctx + 0x414), 4))
+    if (SceneActorChase_TestField((u16 *)((u8 *)ctx + 0x414), 4))
         return;
     ((struct MummyTurnBytes *)(group + 0x204))->direction =
         PickTurn(actor->base.body.direction, randomSamples);
@@ -1231,11 +1221,6 @@ static inline u8 Mummy_TestContactFlags(struct SceneActorReactionMotion *motion,
     return 0;
 }
 
-static inline u32 ActorWordBits(struct ChaseActor *a, u32 mask)
-{
-    return a->base.behaviorFlags & mask;
-}
-
 static inline u16 ActorHalfBits(struct ChaseActor *a, u32 mask)
 {
     u16 value = a->base.motionFlags;
@@ -1256,11 +1241,11 @@ static inline u8 Mummy_ShouldSkipStimulus(u8 *object)
     struct ChaseActor *a = (void *)object;
     u32 motion;
     motion = ClearActivity(&a->base.statusFlags, 0xFEFFFFFF);
-    if (!ActorWordBits(a, 0x200000))
+    if (!SceneActorTurn_ActorFlags(a, 0x200000))
         return 1;
     if (motion & 4)
         return 1;
-    if (ActorWordBits(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
+    if (SceneActorTurn_ActorFlags(a, 0x100) || ActorHalfBits(a, 0xE13F) ||
         Mummy_TestContactFlags((void *)&a->base.tracking.target, 16))
         return 1;
     if (((struct ChaseActor *)object)->base.hitLockTimer)
@@ -1521,11 +1506,6 @@ u8 SceneActorRoute_TryRecoveryDetour(void *);
 
 u8 Mummy_RequestStraightRoute(struct ChaseActor *actor);
 
-static inline u32 Mummy_MotionBits(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 static inline void Mummy_ApplyDuration(struct ChaseActor *a)
 {
     u16 *scale;
@@ -1566,7 +1546,7 @@ static inline void Mummy_BeginProbeTurn(void *object, u32 saved, const u16 *rand
     struct ChaseActor *actor = object;
     struct MummyProbeGroup owner = Mummy_ProbeGroup(object);
     struct SceneActorChaseGroup *group = owner.group;
-    if (!Mummy_MotionBits(actor, 0x400) &&
+    if (!SceneActorContact_MotionFlags(actor, 0x400) &&
         !SceneActorChase_TestField((u16 *)&actor->group.common.gate.flags, 4)) {
         group->turn.direction =
             SceneActorChase_RandomDirectionExcept(actor->base.body.direction, randomSamples);
@@ -1731,11 +1711,6 @@ void Mummy_ResumeDelayedRoute(struct ChaseActor *actor)
 }
 
 // confidence=low: follows a navigation descriptor, switching between acceleration and turning.
-
-static inline u32 TestFlags(struct ChaseActor *a, u32 mask)
-{
-    return a->base.motionFlags & mask;
-}
 
 void Mummy_UpdateDescriptorPursuit(struct ChaseActor *a)
 {
@@ -2288,24 +2263,9 @@ static inline u8 Mummy_TestContextOwned(struct Mummy *context, u32 mask,
     return 0;
 }
 
-static inline u32 Mummy_MotionFlags_TryEngageTarget(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.motionFlags & mask;
-}
-
 static inline void Mummy_SetTrackingFlags(struct SceneActorChaseTracking *tracking, u8 bits)
 {
     tracking->flags |= bits;
-}
-
-static inline u32 Mummy_StatusFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.statusFlags & mask;
-}
-
-static inline u32 Mummy_ActorFlags_TryEngageTarget(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
 }
 
 static inline u8 Mummy_Arrive_path(void *obj, struct SceneActorChaseTracking *tracking)
@@ -2384,15 +2344,15 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
     struct SceneActorContactNode *contact;
     u16 cell;
     struct SceneActorChaseFlags16 *contextFlags;
-    if (Mummy_MotionFlags_TryEngageTarget(actor, 0x10))
+    if (SceneActorContact_MotionFlags(actor, 0x10))
         return 0;
     if ((u8)Callback_InvokeActor(actor, actor->base.targetQuery))
         return 1;
-    if (Mummy_MotionFlags_TryEngageTarget(actor, 0x100))
+    if (SceneActorContact_MotionFlags(actor, 0x100))
         return 0;
-    if (!Mummy_MotionFlags_TryEngageTarget(actor, 0x200))
+    if (!SceneActorContact_MotionFlags(actor, 0x200))
         return 0;
-    if (!Mummy_StatusFlags(actor, 0x1000000))
+    if (!SceneActorChase_StatusFlags(actor, 0x1000000))
         return 0;
     if (group->common.control.counter != gTrackedPlayerId[0])
         return 0;
@@ -2437,8 +2397,8 @@ u8 Mummy_TryEngageTarget(struct ChaseActor *actor)
         Mummy_SetTrackingFlags((void *)target, 0x10);
         return 1;
     }
-    if (Mummy_ActorFlags_TryEngageTarget(actor, 0x80) &&
-        (!Mummy_MotionFlags_TryEngageTarget(actor, 0x400)))
+    if (SceneActorTurn_ActorFlags(actor, 0x80) &&
+        (!SceneActorContact_MotionFlags(actor, 0x400)))
         goto restore;
     if (Mummy_TestContext(context, 0x1400))
         goto restore;
@@ -2789,11 +2749,6 @@ static inline s32 CurrentHealth(struct ChaseActor *actor)
     return *health;
 }
 
-static inline void OrStatus(u16 status, u16 *flags)
-{
-    *flags |= status;
-}
-
 // confidence=low: timer-driven damage and defeat recording; the status is tentatively burn.
 
 void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
@@ -2827,12 +2782,12 @@ void Mummy_UpdateBurnDamage(struct ChaseActor *actor)
     if (burn->intensity > 2) {
         if (Mod(burn->timer, 16) == 0) {
             Sound_PlaySong(0x121);
-            OrStatus(0x10, &actor->base.reactionFlags);
+            HalfwordFlags_Set(0x10, &actor->base.reactionFlags);
         }
     } else {
         if (Mod(burn->timer, 48) == 0) {
             Sound_PlaySong(0x121);
-            OrStatus(0x20, &actor->base.reactionFlags);
+            HalfwordFlags_Set(0x20, &actor->base.reactionFlags);
         }
     }
     if (burn->count) {
