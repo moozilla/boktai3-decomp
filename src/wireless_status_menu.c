@@ -1,5 +1,6 @@
 #include "wireless_status_menu.h"
 #include "input.h"
+#include "engine_pause_flags.h"
 
 struct WirelessStatusMenu *WirelessStatusMenu_Get(void)
 {
@@ -52,14 +53,10 @@ void WirelessStatusMenu_UpdateIdleState(struct WirelessStatusMenu *menu)
     menu->timer++;
 }
 
-static inline void WirelessStatusMenu_AddPauseFlags(u32 mask)
-{
-    gEnginePauseFlags |= mask;
-}
 
 void WirelessStatusMenu_UpdateDisconnectState(struct WirelessStatusMenu *menu)
 {
-    WirelessStatusMenu_AddPauseFlags(4);
+    Engine_SetPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Wireless_RequestDisconnectMode();
@@ -89,7 +86,7 @@ static inline void WirelessStatusMenu_SetState(struct WirelessStatusMenu *menu, 
 
 void WirelessStatusMenu_UpdateDismissibleMessageState(struct WirelessStatusMenu *menu)
 {
-    WirelessStatusMenu_AddPauseFlags(4);
+    Engine_SetPauseFlags(4);
     if (menu->entered) {
         menu->entered = 0;
         Sound_FadeOutChannel10(1);
