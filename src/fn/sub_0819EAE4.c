@@ -11,10 +11,7 @@ void ActorAction_UpdateDirectionalAnimation(struct HresvelgrTravelActor *p)
     p->facing = p->targetHeading;
     p->facing4 = SceneFacing_FourWay(p->facing);
     p->facing8 = SceneFacing_EightWay(p->facing);
-    {
-        u32 mask = 0x200040;
-        p->flags |= mask;
-    }
+    Hresvelgr_SetFlags(p, 0x200040);
     if (p->changed) {
         p->changed = 0;
         Hresvelgr_SetAnimation(p, &p->animation, &p->animationData, 0x10, 1, 4);

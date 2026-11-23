@@ -68,6 +68,11 @@ static inline u8 Hresvelgr_EnterVulnerableBehavior(struct HresvelgrTravelActor *
     return FALSE;
 }
 
+static inline void Hresvelgr_SetFlags(struct HresvelgrTravelActor *actor, u32 flags)
+{
+    actor->flags |= flags;
+}
+
 s32 Hresvelgr_RefreshTarget(struct HresvelgrTravelActor *);
 
 #endif

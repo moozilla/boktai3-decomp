@@ -47,10 +47,7 @@ void Hresvelgr_UpdateRandomBurstPhase(struct HresvelgrTravelActor *actor, s32 fr
         actor->burstCount = sub_08249350(randomValue() >> 3, 7) + 3;
         Sound_PlaySong(0x4D2);
     }
-    {
-        u32 mask = 0x600000;
-        actor->flags |= mask;
-    }
+    Hresvelgr_SetFlags(actor, 0x600000);
     if (frame == 16)
         Sound_PlaySong(0x3E2);
     if (frame > 15 && frame < actor->burstCount + 16) {

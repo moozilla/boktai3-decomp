@@ -13,10 +13,7 @@ void Hresvelgr_UpdateRecoveryPhase(struct HresvelgrTravelActor *actor)
         actor->phase = 0;
         actor->phaseFrame = 0;
     }
-    {
-        u32 mask = 0x200040;
-        actor->flags |= mask;
-    }
+    Hresvelgr_SetFlags(actor, 0x200040);
     if ((u8)Callback_InvokeActor(actor, actor->callback) == 0) {
         switch (actor->phase) {
             case 0:
