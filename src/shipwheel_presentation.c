@@ -306,8 +306,8 @@ s32 SceneFade_Initialize(struct SceneFade *fade)
     fade->finalDuration = 0x80;
     SceneFade_BeginSoundFade(fade);
 #ifdef UBFIX
-    // falls off the end with r0 left over from the SceneFade_BeginSoundFade call; the creator only tests
-    // < 0, and this initializer has no failure path here
+    // falls off the end with r0 left over from the SceneFade_BeginSoundFade call; the creator only
+    // tests < 0, and this initializer has no failure path here
     return 0;
 #endif
 }
@@ -533,8 +533,8 @@ s32 FallingSceneSprite_Initialize(struct FallingSceneSprite *actor, u32 id)
     SceneMessages_RegisterReceiver(&actor->receiver, id, 10);
     Registry1909_EnterHiddenState(actor);
 #ifdef UBFIX
-    // falls off the end with r0 left over from the Registry1909_EnterHiddenState call; the creator only tests
-    // < 0, and this initializer has no failure path here
+    // falls off the end with r0 left over from the Registry1909_EnterHiddenState call; the creator
+    // only tests < 0, and this initializer has no failure path here
     return 0;
 #endif
 }
