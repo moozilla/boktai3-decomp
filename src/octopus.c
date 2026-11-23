@@ -192,9 +192,7 @@ s32 Player_BeginPositionRequest(struct Player *, struct SceneVec *, struct Scene
 
 void SceneActorReaction_ApplyHitResponse(void *, u32, struct ContactPosition *, u32, u32, u32);
 
-struct IvyTargetRef;
-
-struct IvyTargetRef *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
+struct SceneActorBody *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *, s32);
 
 void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame);
 
@@ -1627,11 +1625,6 @@ void *SceneActorTarget_FindNearbyPlayer(struct ChaseActor *actor)
 /* What a target reference points at: an actor's block at +0x50 (position at +0x5C), or the
  * player record SceneActorTarget_FindNearbyPlayer returns. */
 
-struct IvyTargetRef {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
 struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
 
 static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
@@ -1646,7 +1639,7 @@ static inline void Delta(struct ContactPosition *out, const struct ContactPositi
 
 #define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
 
-static inline struct IvyTargetRef *Keep(struct ChaseActor *actor, struct IvyTargetRef *target)
+static inline struct SceneActorBody *Keep(struct ChaseActor *actor, struct SceneActorBody *target)
 {
     actor->base.tracking.target = (u32)target;
     return target;
@@ -1657,11 +1650,11 @@ static inline struct IvyTargetRef *Keep(struct ChaseActor *actor, struct IvyTarg
  * cell next to the actor (mode 1: any side, turning to face it; otherwise the side it faces).
  * Stores the result at +0xDC. */
 
-struct IvyTargetRef *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
+struct SceneActorBody *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
 {
     s32 best = actor->base.tracking.limit;
     struct ChaseActor *other;
-    struct IvyTargetRef *target = SceneActorTarget_FindNearbyPlayer(actor);
+    struct SceneActorBody *target = SceneActorTarget_FindNearbyPlayer(actor);
     struct ContactPosition delta;
     u32 cell;
     if (target && actor->base.body.position.y == target->position.y) {
