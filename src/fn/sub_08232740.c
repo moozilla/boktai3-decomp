@@ -11,9 +11,8 @@ void TimedHazard_UpdateActivationDelay(struct S *s)
 {
     if (s->h++ > s->g) {
         u32 o = 1;
-        u32 z = 0;
         s->b2 = o;
-        s->h = z;
+        s->h = 0;
         s->b1 = o;
     }
 }
