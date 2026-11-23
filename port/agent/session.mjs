@@ -140,13 +140,15 @@ export async function openSession(opts = {}) {
       const s = sp();
       const parts = [[s, new Uint8Array(memory.buffer.slice(s, STACK_TOP))], [d0, new Uint8Array(memory.buffer.slice(d0, d1))]];
       for (const [a, n] of REGIONS) parts.push([a, new Uint8Array(memory.buffer.slice(a, a + n))]);
-      return { frame: frameNo, sp: s, parts, movie: movie.length, solar };
+      // the movie itself, not just its length: another branch may have overwritten it
+      return { frame: frameNo, sp: s, parts, movie: movie.length, keys: movie.slice(), solar };
     },
     restore(snap) {
       if (snap.sp !== sp()) throw new Error(`restore at a different stack depth (sp ${sp()} vs ${snap.sp})`);
       const m = new Uint8Array(memory.buffer);
       for (const [a, bytes] of snap.parts) m.set(bytes, a);
-      movie.length = snap.movie;
+      movie.length = 0;
+      for (let i = 0; i < snap.movie; i++) movie.push(snap.keys[i]);
       frameNo = snap.frame;
       if (snap.solar !== solar) session.setSolar(snap.solar);
       g.refresh();  // hooks set since the snapshot

@@ -197,8 +197,9 @@ const t0 = performance.now();
 // readAt[n]: frame n ran an input read (truncated with the movie on a restore).
 const readAt = [];
 if (from && from.readFrames) for (const n of from.readFrames) readAt[n] = 1;
-const restore = s.restore;
-s.restore = (snap) => { restore(snap); readAt.length = Math.min(readAt.length, snap.movie); };
+const snapshot = s.snapshot, restore = s.restore;
+s.snapshot = () => ({ ...snapshot(), readAt: readAt.slice() });
+s.restore = (snap) => { restore(snap); readAt.length = 0; for (let i = 0; i < snap.movie; i++) readAt[i] = snap.readAt[i]; };
 const ok = s.run(function* (g) {
   g.lib.session = s;
   g.on('Input_UpdatePadStates', () => { readAt[s.frame] = 1; });
