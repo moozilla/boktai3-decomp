@@ -98,14 +98,6 @@ static inline void *Armor_MovementProbe(struct SceneActorBody *body)
 {
     return body->movementProbe;
 }
-static inline void Armor_SubtractPosition(struct ContactPosition *out,
-                                          const struct ContactPosition *a,
-                                          const struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
 static inline void Armor_InvokeSlot(struct ArmorCallbackSlot *slot)
 {
     if (slot->callback != NULL)
@@ -122,7 +114,7 @@ static inline void Armor_ResolveMotion(void *probe, struct ContactPosition *posi
     candidate.packed.z = position->z + motion->z;
     candidate.packed.padding = 16;
     if (sub_0821C254(probe, position, &candidate.position, actor->body.mode)) {
-        Armor_SubtractPosition(motion, &candidate.position, position);
+        SceneActorTerrain_Subtract(motion, &candidate.position, position);
     }
 }
 

@@ -84,7 +84,7 @@ void ActorPhase_UpdateReverseFlicker(struct ChaseActor *actor, s32 frame)
         goto visible;
     } else if (flags & 1) {
     visible:
-        Axe_SetAuxiliarySpriteParameters(actor, (const u16 *)&axe->position, 0x13c);
+        Axe_SetAuxiliarySpriteParameters(actor, axe->blackPalette, 0x13c);
     } else {
         Axe_SetAuxiliarySpriteParameters(actor, axe->originalEffectPalette, 0x13f);
     }

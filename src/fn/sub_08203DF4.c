@@ -4,6 +4,8 @@
 #include "engine_globals.h"
 /* Tentative species identity: applies damage, starts defeat effects, and advances animation. */
 #include "display_sequence_inline.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 struct EnemyF426Collider {
     u8 pad[6];
     u16 flags;
@@ -75,15 +77,6 @@ s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void EnemyF426_UpdateDeath(void);
-static inline u32 EnemyF426_TestEitherFlags(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-static inline u32 EnemyF426_TestFlag(u32 mask, u32 *p)
-{
-    return (*p) & mask;
-}
-
 static inline u32 EnemyF426_NextSample(const u16 *samples)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -164,8 +157,7 @@ static inline u32 EnemyF426_StepSequence(struct EnemyF426Sprite *owner,
 u32 EnemyF426_UpdateDamageState(struct EnemyF426Actor *p)
 {
     struct EnemyF426Collider *collider;
-    if (EnemyF426_TestEitherFlags(0x400, &gEngineFlags, &gScenePauseFlags) ||
-        EnemyF426_TestFlag(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->fn);
     p->spr.flags &= ~1;

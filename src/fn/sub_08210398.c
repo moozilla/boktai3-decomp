@@ -1,26 +1,19 @@
+#include "word_flags.h"
 #include "global.h"
 #include "pink_spine_playback.h"
 #include "ram.h"
 #include "contact_collider.h"
 #include "player_cue_sequence.h"
+#include "engine_pause.h"
 /* Species identity is tentative. The update callback increments age after animation. */
 extern u32 gUnk_02000560;
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void ProjectileEmitter_UpdateAttack(void);
-static inline u32 PauseFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-static inline u32 TestFlags(u32 bits)
-{
-    return gUnk_02000560 & bits;
-}
-
 s32 PinkSpine_UpdateDamageAnimation(struct PinkSpineState *p)
 {
     struct ContactCollider *collider;
 
-    if (PauseFlags(0x400) || TestFlags(4))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;

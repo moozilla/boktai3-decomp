@@ -4,6 +4,7 @@
 #include "scene_vec.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
 extern u32 gUnk_02000560;
 s32 Mod(s32, s32);
 void Sound_PlaySong(u32);
@@ -14,18 +15,10 @@ void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void sub_082086B8(void);
 void CannonTurret_FireAimedVolley(void);
 void Anim_SetDurationScale(void *, u16);
-static inline void CopyPosition(struct SceneVec *out, const struct SceneVec *in)
-{
-    *out = *in;
-}
 static inline u32 RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
     return table[gRandomIndex];
-}
-static inline u32 Paused(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
 }
 struct ColliderView {
     u8 pad[6];
@@ -170,7 +163,7 @@ s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
     struct EffectVector size;
     struct ColliderView *collider;
     u32 ended;
-    if (Paused(0x400))
+    if (Engine_PauseBits(0x400))
         goto paused;
     {
         u32 mask = 4;
@@ -208,7 +201,7 @@ s32 CannonTurret_UpdateCombat(struct CannonTurretCombat *p)
             s32 count;
             p->defeated = 1;
             CannonTurret_ClearBlink(&p->invulnerability);
-            CopyPosition(&position, &p->sprite.coordinates.position);
+            SceneVec_Copy(&position, &p->sprite.coordinates.position);
             {
                 struct SceneVec *v = &position;
                 v->y += 200;

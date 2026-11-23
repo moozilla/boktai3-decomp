@@ -28,11 +28,6 @@ void ActorController_SetBehavior(void *, s32);
 s32 Armor_IsSequenceIncomplete(void *);
 s32 Math_Atan2(s32, s32);
 
-static inline void Armor_ClearCollision(struct ContactCollider *collision, u32 bits)
-{
-    u32 mask = ~bits;
-    collision->flags &= mask;
-}
 static inline void Armor_SetCollision(struct ContactCollider *collision)
 {
     collision->flags |= 4;
@@ -72,7 +67,7 @@ void Armor_UpdateModeAttackDecision(struct ArmorDecisionActor *p)
             goto setCollision;
     }
     if (p->flags & 1)
-        Armor_ClearCollision(&p->collision, 4);
+        ContactCollider_ClearFlags(&p->collision, 4);
     else {
     setCollision:
         Armor_SetCollision(&p->collision);

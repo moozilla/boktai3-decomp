@@ -356,7 +356,7 @@ void ChildGroup_UpdateTransitionJitter(struct PhaseObject *p)
         p->position.z = ChildGroup_Jitter(ChildGroup_RandomValue(), &p->previousPosition.z);
         p->hitFrames--;
     }
-    p->fieldCFC = 0;
+    p->pulseTimer = 0;
     if (p->phaseUpdate != 0) {
         Callback_InvokeActor(p, p->phaseUpdate);
     }

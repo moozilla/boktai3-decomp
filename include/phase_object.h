@@ -37,9 +37,13 @@ struct PhaseObject {
     struct PhaseTarget *target;
     s16 offsetX, unknown66, offsetZ, unknown6A;
     u16 scatterStepX, unknown6E, scatterStepZ;
-    u8 unknown72[0xC];
+    u8 unknown72[2];
+    s16 driftX, unknown76, driftZ; /* added to the anchor approach, halved each frame */
+    u8 unknown7A[4];
     s16 health;
-    u8 unknown80[0xD];
+    u8 unknown80[4];
+    s16 contactReward; /* passed to PlayerStats_AddContactHundredths on a hit */
+    u8 unknown86[7];
     struct PhaseObjectMode groupMode;
     u8 unknown94[8];
     u16 flashTimer;
@@ -53,7 +57,8 @@ struct PhaseObject {
     s32 orbitAngles[4];
     s8 turnSpeed;
     u8 targetAngle;
-    u8 unknown4B2[2];
+    u8 orbitAngle; /* the member colliders orbit at this angle (28 - rotation) */
+    u8 unknown4B3;
     u16 turnFrames;
     u8 unknown4B6[2];
     s32 countdown;
@@ -71,7 +76,8 @@ struct PhaseObject {
     struct ContactPosition position;
     u8 unknownB8C[0xC1C - 0xB8C];
     struct ContactCollider colliderA, colliderB;
-    u8 unknownCC4[4];
+    s8 red, green, blue; /* the color pulse's current offsets */
+    u8 unknownCC7;
     void (*update)(struct PhaseObject *);
     u8 unknownCCC[8];
     void (*retarget)(struct PhaseObject *);
@@ -80,18 +86,21 @@ struct PhaseObject {
     void (*scatterTransition)(struct PhaseObject *);
     void (*launchUpdate)(struct PhaseObject *);
     void (*attackUpdate)(struct PhaseObject *);
-    u8 unknownCEC[4];
+    void (*hitUpdate)(struct PhaseObject *); /* the hit flash, set on a damaging contact */
     void (*phaseUpdate)(struct PhaseObject *);
     s32 scatterDelay;
     u32 bobbingTimer;
-    u32 fieldCFC;
+    s32 pulseTimer; /* frames into the color pulse step */
     u32 landingHeight;
     u8 unknownD04[0x24];
     u16 launchFrames, attackFrames;
     u8 launchCount, attackHeading;
-    u8 unknownD2E[0x25];
+    u8 unknownD2E[4];
+    u16 color; /* the palette color the pulse fades from */
+    u8 unknownD34[0x1E];
+    s8 pulseDuration;
     s8 actionCompletions;
-    u8 unknownD54;
+    u8 pulseMode;
     u8 attackMode;
     u8 unknownD56[2];
     u16 damagePalette;

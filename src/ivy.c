@@ -2,6 +2,9 @@
 #include "scene_actor_reset.h"
 #include "ivy_phase.h"
 #include "ivy.h"
+#include "math_shift.h"
+#include "phase_object.h"
+#include "word_flags.h"
 #include "scene_actor_reaction.h"
 #include "engine.h"
 #include "scene_vec.h"
@@ -31,7 +34,9 @@
 #include "engine_globals.h"
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
-#include "scene_actor_color_cycle.h"
+#include "scene_actor_init_actor.h"
+#include "scene_actor_placement.h"
+#include "movement_curve.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
@@ -50,13 +55,6 @@ static inline u8 IsUnavailable(struct ChaseActor *actor)
     return 0;
 }
 
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
-
 static inline u32 ContextFlag(struct IvyCaptureState *context, u32 input)
 {
     return context->captureFlags & input;
@@ -66,7 +64,7 @@ void Ivy_OnPrimaryContact(void *source, void *target, struct ChaseActor *actor)
 {
     if (IsUnavailable(actor))
         return;
-    if (Test(ContextFlag(actor->base.context, 1), ~0))
+    if (SceneActorChase_Test(ContextFlag(actor->base.context, 1), ~0))
         return;
     SceneActorBehavior_ApplyContactReaction(source, target, actor);
 }
@@ -77,30 +75,16 @@ void Ivy_OnSecondaryContact(void)
 
 void SceneActorAnimation_SelectDirectionalFlags(struct RoomActor *, s32);
 
-static inline u8 TakeFlag(u8 *flag)
+void Ivy_UpdateActiveState(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-static inline void Clr(u16 *q, u32 m)
-{
-    *q = m & *q;
-}
-
-void Ivy_UpdateActiveState(u8 *p)
-{
-    if (TakeFlag(p + 0x2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
         u16 *q;
-        *(u8 *)(*(u8 **)(p + 4) + 7) = 2;
-        q = (u16 *)(p + 0x13A);
+        ((u8 *)actor->base.drawable)[7] = 2;
+        q = &actor->base.colliderA.flags;
         *q = (*q & 0xFFFB) | 8;
-        Clr((u16 *)(p + 0x2C0), 0xFFFFF7FF);
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
-    SceneActorAnimation_SelectDirectionalFlags(p, 0xE);
+    SceneActorAnimation_SelectDirectionalFlags(&actor->base, 0xE);
 }
 
 /* Tentative name based on the observed state transition or initialization. */
@@ -138,39 +122,18 @@ void Ivy_UpdateInactiveState(void)
 
 /* Ivy_EnterDisabledState: Consumes the entry flag and switches drawable and collision flags to directional animation 20; disabled role tentative */
 
-static inline u8 Consume(u8 *flag)
+void Ivy_EnterDisabledState(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-static inline void Or(u16 m, u16 *f)
-{
-    *f |= m;
-}
-
-void Ivy_EnterDisabledState(u8 *p)
-{
-    if (Consume(p + 0x2b2)) {
-        (*(u8 **)(p + 4))[7] = 3;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
+        ((u8 *)actor->base.drawable)[7] = 3;
         {
-            u16 v = 4 | *(u16 *)(p + 0x13a);
-            *(u16 *)(p + 0x13a) = v & 0xfff7;
+            u16 v = 4 | actor->base.colliderA.flags;
+            actor->base.colliderA.flags = v & 0xfff7;
         }
-        Or(0x800, (u16 *)(p + 0x2c0));
-        SceneActorAnimation_SelectDirectionalFlags(p, 20);
+        HalfwordFlags_Set(0x800, &actor->base.placementFlags);
+        SceneActorAnimation_SelectDirectionalFlags(&actor->base, 20);
     }
 }
-
-struct IvyTarget {
-    u8 unk0[8];
-    u8 kind;
-    u8 unk9[0x3C - 9];
-    struct ChaseActor *actor;
-};
 
 struct Player;
 
@@ -209,11 +172,6 @@ static inline void Ivy_EnableCollider(struct ContactCollider *collider)
     collider->flags &= 0xFFF7;
 }
 
-static inline void Ivy_SetContactFlag(struct ChaseActor *actor, u32 bits)
-{
-    actor->base.placementFlags = bits | actor->base.placementFlags;
-}
-
 static inline s32 Ivy_GetElapsed(struct DisplaySequenceState *sequence)
 {
     return sequence->elapsed;
@@ -245,7 +203,7 @@ static inline struct IvyFrameIndex Ivy_ReadFrame(struct DisplaySequenceState *se
 void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
 {
     struct DisplaySequenceState *anim;
-    struct IvyTarget *target;
+    struct SceneActorBody *target;
     struct ContactPosition pos;
     u8 quadrant, flip;
     u32 started;
@@ -260,7 +218,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
     if (Ivy_ReadFrame(anim).index == 3 && Ivy_GetElapsed(anim) > 6) {
         actor->base.colliderA.flags |= 4;
         actor->base.colliderA.flags &= 0xFFF7;
-        Ivy_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
         if (Ivy_FindAdjacentTarget(actor, 0)) {
             SceneActorChase_SetControl(actor, Ivy_UpdateHold, 0x25);
             SceneActorChase_SetState(actor, 0, 2, 1);
@@ -270,11 +228,11 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
             pos.y = actor->base.body.position.y + gUnk_08606384[flip][anim->index].y;
             pos.z = actor->base.body.position.z + gUnk_08606384[flip][anim->index].z;
             target = (void *)actor->base.tracking.target;
-            if (target->kind <= 3) {
-                Player_BeginPositionRequest((void *)gPlayers[target->kind], (void *)&pos, 0, 0,
+            if (target->mode <= 3) {
+                Player_BeginPositionRequest((void *)gPlayers[target->mode], (void *)&pos, 0, 0,
                                             flip, 0, 0, 0, 0);
-            } else if (target->kind == 4) {
-                struct ChaseActor *t = target->actor;
+            } else if (target->mode == 4) {
+                struct ChaseActor *t = target->owner;
                 t->base.colliderA.responseValue = 0;
                 SceneActorTerrain_ClearCollisionTimers((void *)t);
                 SceneActorChase_ClearMotionFlagComponent(t, 0x20);
@@ -291,7 +249,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
         Ivy_DisableContact(actor);
     } else {
         Ivy_EnableCollider(&actor->base.colliderA);
-        Ivy_SetContactFlag(actor, 0x800);
+        MonsterInit_SetMotionFlags(actor, 0x800);
     }
 
     if (actor->base.restart) {
@@ -301,7 +259,7 @@ void Ivy_UpdateGrabAttack(struct ChaseActor *actor)
     }
 }
 
-void Ivy_UpdateActiveState(u8 *p);
+void Ivy_UpdateActiveState(struct ChaseActor *actor);
 
 void SceneActorReaction_FinishAnimation17(struct ChaseActor *actor)
 {
@@ -341,24 +299,10 @@ u32 Ivy_GetAnimationStatus(struct ChaseActor *);
 
 extern s16 *gLinkSession;
 
-struct IvyTargetUpdateHold {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    void *player;
-};
-
 struct IvyDrawable {
     u8 unknown0[7];
     u8 mode : 8;
 };
-
-static inline u8 TestFlags(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 
 static inline void CellCenter(struct SceneVec *out, u32 cell)
 {
@@ -375,37 +319,11 @@ static inline void CellCenter(struct SceneVec *out, u32 cell)
     out->z = (z << 8) + 0x80;
 }
 
-static inline void SetCtl(struct ChaseActor *actor, void *cb, u32 k)
-{
-    void *callback = cb;
-    u32 kind = k;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *field = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *field &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 static inline void ResetState(struct ChaseActor *actor, u32 s)
 {
     actor->base.state2A8 = s;
     actor->base.phase2A9 = 0;
     actor->base.behavior2AA = 0;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
-static inline void SetState(struct ChaseActor *actor, u32 s, u32 p, u32 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
 }
@@ -457,7 +375,7 @@ static inline s32 HudMode(void)
 
 static inline u8 MayCount(struct ChaseActor *victim)
 {
-    if (TestFlags(gEngineFlags, 0x4800)) {
+    if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         u32 value = victim->base.hitOwners;
         if (!(value & 0x20) && value) {
             switch (HudMode()) {
@@ -483,11 +401,6 @@ static inline u8 MayCount(struct ChaseActor *victim)
     return 1;
 }
 
-static inline void ClearVector(void *dest)
-{
-    CpuFill32(0, dest, 8);
-}
-
 static inline void ReportDrain(struct ChaseActor *victim)
 {
     struct ContactPackedVector range;
@@ -497,7 +410,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
         s32 kind = (s16)victim->base.hudKind;
         s32 parameter = (s16)victim->base.hudLabel;
         SceneHud_SetTimedState(victim->base.body.id, health, max, kind, 0, parameter);
-        ClearVector(&range);
+        ZeroFill8(&range);
         if (victim->base.reactionSoundVariant || !(victim->base.hitAttributes & 0x20000))
             DamageNumberDisplay_Show(&victim->base.colliderA, victim->base.reactionSoundVariant, 0,
                                      &victim->base.body.position, &range, 1);
@@ -519,7 +432,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     struct Ivy *context = actor->base.context;
     void *group = (u8 *)actor + 0x3D4;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
-    struct IvyTargetUpdateHold *target;
+    struct SceneActorBody *target;
     u8 quadrant, flip;
     struct ContactPosition position;
     s32 index;
@@ -541,7 +454,7 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     }
     target = (void *)actor->base.tracking.target;
     Facing(actor, &quadrant, &flip);
-    if (target->kind <= 3) {
+    if (target->mode <= 3) {
         if (sequence->elapsed + 1 >= sequence->duration) {
             index = sequence->index + 1;
             if (index >= sequence->frameCount)
@@ -553,10 +466,10 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
     position.x = actor->base.body.position.x + gUnk_08606384[flip][index].x;
     position.y = actor->base.body.position.y + gUnk_08606384[flip][index].y;
     position.z = actor->base.body.position.z + gUnk_08606384[flip][index].z;
-    if (target->kind == 4) {
+    if (target->mode == 4) {
         struct ChaseActor *victim;
         ((struct IvyDrawable *)actor->base.drawable)->mode = 2;
-        victim = target->player;
+        victim = target->owner;
         SceneActorReaction_ApplyHitResponse(victim, 0, &position, 0, flip, 0);
         if (frame <= 0x8C)
             goto animate;
@@ -568,17 +481,17 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
         }
         ReportDrain(victim);
         ResetState(victim, 3);
-        SetCtl(victim, *(void **)((u8 *)group + 0x22C), 0x1E);
+        SceneActorChase_SetControl(victim, *(void **)((u8 *)group + 0x22C), 0x1E);
         ClearHeld(context);
         actor->base.stepDone = 1;
         return;
     }
-    if (target->kind > 3)
+    if (target->mode > 3)
         goto animate;
     {
         struct Player *player;
         ((struct IvyDrawable *)actor->base.drawable)->mode = 1;
-        player = target->player;
+        player = target->owner;
         if (Mod(frame, context->interval) == 0) {
             s32 start, cur, elapsed;
             if (IsIdle(player))
@@ -597,8 +510,8 @@ void Ivy_UpdateHold(struct ChaseActor *actor, s32 frame)
                 Player_ApplyPositionRequest(player, (struct SceneVec *)&position, 0x40, quadrant,
                                             0x3C, 0, 0, 0);
                 ClearHeld(context);
-                SetState(actor, 0, 0, 2);
-                SetCtl(actor, (void *)Ivy_UpdateActiveState, 0x22);
+                MonsterInit_SetState(actor, 0, 0, 2);
+                SceneActorChase_SetControl(actor, (void *)Ivy_UpdateActiveState, 0x22);
                 return;
             }
             {
@@ -620,13 +533,6 @@ animate:
     if (frame > 0xB4)
         actor->base.stepDone = 1;
 }
-
-struct IvyTargetBeginRelease {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    struct Player *player;
-};
 
 /* Ivy release start (tentative): on entry disables the main collider, plays directional
  * animation 0x15 and puts a held player back on the centre of the actor's terrain cell; then
@@ -651,7 +557,7 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
         }
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0x15);
         {
-            struct IvyTargetBeginRelease *target = (void *)actor->base.tracking.target;
+            struct SceneActorBody *target = (void *)actor->base.tracking.target;
             struct SceneVec position;
             u8 angle;
             CellCenter(&position, actor->base.terrainCell);
@@ -660,8 +566,8 @@ void Ivy_BeginRelease(struct ChaseActor *actor)
                 s32 quadrant = turn >= 0 ? turn >> 6 : -(-turn >> 6);
                 angle = quadrant << 6;
             }
-            if (target->kind <= 3)
-                Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
+            if (target->mode <= 3)
+                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
         }
         ((u8 *)actor->base.drawable)[7] = 2;
         {
@@ -788,7 +694,7 @@ void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame)
 
 void Ivy_UpdateRestartFlags(u8 *p)
 {
-    if (TakeFlag(p + 0x2B2))
+    if (SceneActorControl_TakeFlag(p + 0x2B2))
         SceneActorAnimation_SelectDirectionalFlags(p, 0x10);
     if (*(u8 *)(p + 0x2B3)) {
         ActorStatus_SetDrawableFlags((void *)p, 1);
@@ -1048,11 +954,6 @@ static inline u16 Rand(void)
     return *(const u16 *)(index + RANDOM_TABLE_ADDR);
 }
 
-struct DefeatContext {
-    u8 unknown0[0x638];
-    u16 script;
-};
-
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
 {
     struct {
@@ -1183,41 +1084,26 @@ void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     RecordKill(actor, categoryp);
     sub_08159164(actor->base.experience);
     Player_RefreshLifeState(actor->base.hitAttributes, *((u8 *)actor + 0xA1));
-    if (!Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
+    if (!SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag(actor, 0x800, 0x2D0))
         SceneActorRecord_RecordPair(gScriptEntryProcedure, (u16)actor->base.body.id);
 }
 
-struct T {
-    u8 f[6];
-    u16 flags;
-};
-
-struct S {
-    u8 filler[0x188];
-    struct T t;
-};
-
-s32 Ivy_SetAuxiliaryColliderFlag(struct S *s)
+s32 Ivy_SetAuxiliaryColliderFlag(struct ChaseActor *actor)
 {
-    struct T *t = &s->t;
-    t->flags = 4 | t->flags;
+    struct ContactCollider *collider = &actor->base.colliderB;
+    collider->flags = 4 | collider->flags;
     return 1;
 }
 
 void Collider_SetPosition(void *, void *, u32);
 
-s32 Ivy_UpdateColliderPosition(u8 *s)
+s32 Ivy_UpdateColliderPosition(struct ChaseActor *actor)
 {
-    Collider_SetPosition(s + 0x134, s + 0x5c, 0);
+    Collider_SetPosition(&actor->base.colliderA, &actor->base.body.position, 0);
     return 1;
 }
 
 void Ivy_UpdateGrabAttack(struct ChaseActor *actor);
-
-static inline void ClearFlags(u16 *p, u32 mask)
-{
-    *p = mask & *p;
-}
 
 static inline void SetCollider(struct ContactCollider *collider)
 {
@@ -1233,7 +1119,7 @@ void SceneActorControl_WaitForTarget(struct ChaseActor *input)
     struct Ivy *state = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SetCollider(&actor->base.colliderA);
-        ClearFlags(&actor->base.placementFlags, ~0x800);
+        HalfwordFlags_Clear(&actor->base.placementFlags, 0x800);
     }
     if (!Ivy_FindAdjacentTarget(actor, 1))
         state->targetMissFrames++;
@@ -1294,15 +1180,10 @@ void Ivy_WaitForHold(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct SClearAnimationRestartFlag {
-    u8 filler[0x000002B1];
-    u8 f;
-};
-
-void Ivy_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
+void Ivy_ClearAnimationRestartFlag(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
+    if (actor->base.field2B1 != 0)
+        actor->base.field2B1 = 0;
 }
 
 /* Count frames; after 30, restart the phase (the count still advances).
@@ -1310,14 +1191,14 @@ void Ivy_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
    too: without it cse carries values across and reload picks other
    registers. */
 
-void Ivy_WaitThenResetPhase(u8 *p)
+void Ivy_WaitThenResetPhase(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(s32 *)(p + 0x2AC) > 30)
-        Ivy_ResetPhase(p);
-    (*(s32 *)(p + 0x2AC))++;
+    if ((s32)actor->base.counter2AC > 30)
+        Ivy_ResetPhase((u8 *)actor);
+    actor->base.counter2AC++;
 }
 
 void Ivy_BeginRelease(struct ChaseActor *actor);
@@ -1345,16 +1226,16 @@ void Ivy_WaitThenResumeActive(struct ChaseActor *actor)
    block there, so cse does not carry `sub` across it: the ROM keeps sub in
    a register instead of folding sub + 0x42 into p + 0x416. */
 
-void Ivy_WaitLimitThenResetPhase(u8 *p)
+void Ivy_WaitLimitThenResetPhase(struct ChaseActor *actor)
 {
-    u8 *sub = p + 0x3D4;
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(u16 *)(sub + 0x42) <= *(s32 *)(p + 0x2AC))
-        Ivy_ResetPhase(p);
+    if (group->common.gate.duration <= (s32)actor->base.counter2AC)
+        Ivy_ResetPhase((u8 *)actor);
     else
-        (*(s32 *)(p + 0x2AC))++;
+        actor->base.counter2AC++;
 }
 
 void SceneActorTerrain_DisableCollision(void *);
@@ -1391,27 +1272,17 @@ void Ivy_UpdateIdle(struct ChaseActor *actor)
     }
 }
 
-extern const u8 gUnk_086063E4[];
+extern void *gUnk_086063E4[];
 
-extern const u8 gUnk_086063D4[];
+extern void *gUnk_086063D4[];
 
-extern const u8 gUnk_086063F4[];
+extern void *gUnk_086063F4[];
 
-struct P {
-    const u8 *a;
-    u32 pad;
-};
-
-struct SInitControlPresets {
-    u8 filler[0x284];
-    struct P p[3];
-};
-
-void Ivy_InitControlPresets(struct SInitControlPresets *s)
+void Ivy_InitControlPresets(struct ChaseActor *actor)
 {
-    s->p[0].a = gUnk_086063E4;
-    s->p[1].a = gUnk_086063D4;
-    s->p[2].a = gUnk_086063F4;
+    actor->base.callbacks284 = gUnk_086063E4;
+    actor->base.behaviorCallbacks = gUnk_086063D4;
+    actor->base.callbacks294 = gUnk_086063F4;
 }
 
 void SceneActorControl_UpdateAnimationTransition(u8 *p, s32 frame);
@@ -1447,13 +1318,6 @@ s32 SceneActorControl_BeginSoundTransition(struct ChaseActor *actor)
     return result;
 }
 
-struct IvyTargetReleaseCapturedPlayer {
-    u8 unknown0[8];
-    u8 kind;
-    u8 unknown9[0x33];
-    struct Player *player;
-};
-
 static inline u8 TestFlags_ReleaseCapturedPlayer(struct Ivy *context, u32 maskInput)
 {
     u32 mask = maskInput;
@@ -1479,9 +1343,9 @@ void Ivy_ReleaseCapturedPlayer(struct ChaseActor *actor)
             angle = (turn >= 0 ? turn >> 6 : -(-turn >> 6)) << 6;
         }
         {
-            struct IvyTargetReleaseCapturedPlayer *target = (void *)actor->base.tracking.target;
-            if (target->kind <= 3) {
-                Player_ApplyPositionRequest(target->player, &position, 0x40, angle, 0x3C, 0, 0, 0);
+            struct SceneActorBody *target = (void *)actor->base.tracking.target;
+            if (target->mode <= 3) {
+                Player_ApplyPositionRequest(target->owner, &position, 0x40, angle, 0x3C, 0, 0, 0);
                 Sound_PlaySong(0xE6);
             }
         }
@@ -1515,28 +1379,10 @@ void Ivy_NotifyGroup(void)
 
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-struct SInitProfileId {
-    u8 filler[0x98];
-    u8 b;
-    u8 f2[0x308 - 0x99];
-    s32 v;
-};
-
-void Ivy_InitProfileId(struct SInitProfileId *s)
+void Ivy_InitProfileId(struct ChaseActor *actor)
 {
-    s->v = SceneActorProfiles_FindOrAdd(s->b, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
-
-struct IvyContext {
-    u8 unknown0[0x62C];
-    u32 flags;
-    u8 unknown630[4];
-    u16 field634;
-};
-
-struct IvyPlacement {
-    u32 xy, z;
-};
 
 /* Ivy drawable reset (tentative): clears the context's capture flags, moves the actor by 0x20
  * on x and z, copies the position to the drawable, selects directional entry 0 and steps the
@@ -1545,18 +1391,17 @@ struct IvyPlacement {
 void Ivy_TickDrawable(struct ChaseActor *actor)
 {
     {
-        struct IvyContext *context = actor->base.context;
-        context->flags = 0;
-        context->field634 = 0;
+        struct Ivy *context = actor->base.context;
+        context->captureFlags = 0;
+        context->targetMissFrames = 0;
     }
     actor->base.body.position.x += 0x20;
     actor->base.body.position.z += 0x20;
     if (!actor->base.drawableKind)
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x1C) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        ((struct DisplaySequenceSprite *)actor->base.drawable)->position =
+            actor->base.body.position;
     else
-        *(struct IvyPlacement *)((u8 *)actor->base.drawable + 0x40) =
-            *(struct IvyPlacement *)&actor->base.body.position;
+        *(struct ContactPosition *)((u8 *)actor->base.drawable + 0x40) = actor->base.body.position;
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
     {
         struct SceneActorControlMotionDrawable *drawable = actor->base.drawable;
@@ -1599,21 +1444,7 @@ void SceneActor_BeginReaction22(struct ChaseActor *actor)
     actor->base.behavior2AA = 0;
     actor->base.counter2AC = 0;
     actor->base.field2B1 = 1;
-    {
-        void *callback = Ivy_UpdateActiveState;
-        u8 reaction = 0x22;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = reaction;
-        actor->base.target = callback;
-    }
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = -2;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
+    SceneActorChase_SetControl(actor, Ivy_UpdateActiveState, 0x22);
 }
 
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
@@ -1666,28 +1497,15 @@ void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor)
 /* What a target reference points at: an actor's block at +0x50 (position at +0x5C), or the
  * player record SceneActor_FindNearbyPlayerTarget returns. */
 
-struct IvyTargetRef {
-    u8 unknown0[0xC];
-    struct ContactPosition position;
-};
-
 void *SceneActor_FindNearbyPlayerTarget(struct ChaseActor *actor);
 
 struct ChaseActor *SceneActorRegistry_FindNearestCategoryActor(const struct ContactPosition *);
-
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
 
 /* Row stride of the current terrain map, in cells. */
 
 #define MAP_WIDTH (*(s16 *)(gTerrainMap->cells + 4))
 
-static inline struct IvyTargetRef *Keep(struct ChaseActor *actor, struct IvyTargetRef *target)
+static inline struct SceneActorBody *Keep(struct ChaseActor *actor, struct SceneActorBody *target)
 {
     actor->base.tracking.target = (u32)target;
     return target;
@@ -1710,12 +1528,12 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
 {
     s32 best = actor->base.tracking.limit;
     struct ChaseActor *other;
-    struct IvyTargetRef *target = SceneActor_FindNearbyPlayerTarget(actor);
+    struct SceneActorBody *target = SceneActor_FindNearbyPlayerTarget(actor);
     struct ContactPosition delta;
     u32 cell;
     if (target && actor->base.body.position.y == target->position.y) {
         s32 distance;
-        Delta(&delta, &actor->base.body.position, &target->position);
+        MovementCurve_SubtractPositions(&delta, &actor->base.body.position, &target->position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
             best = distance;
@@ -1725,7 +1543,8 @@ s32 Ivy_FindAdjacentTarget(struct ChaseActor *actor, s32 mode)
     other = SceneActorRegistry_FindNearestCategoryActor(&actor->base.body.position);
     if (other && actor->base.body.position.y == other->base.body.position.y) {
         s32 distance;
-        Delta(&delta, &actor->base.body.position, &other->base.body.position);
+        MovementCurve_SubtractPositions(&delta, &actor->base.body.position,
+                                        &other->base.body.position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
             target = (void *)((u8 *)other + 0x50);
@@ -1777,48 +1596,31 @@ fail:
     return 0;
 }
 
-struct R {
-    u8 f[8];
-    u16 v;
-};
-
-struct PGetAnimationStatus {
-    u8 f[4];
-    u8 *q;
-};
-
-u32 Ivy_GetAnimationStatus(struct ChaseActor *pIn)
+u32 Ivy_GetAnimationStatus(struct ChaseActor *actor)
 {
-    struct PGetAnimationStatus *p = (struct PGetAnimationStatus *)pIn;
-    struct R *r = (struct R *)(p->q + 0x48);
-    if (r->v == 3)
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    if (sequence->index == 3)
         return 1;
-    if (r->v == 4)
+    if (sequence->index == 4)
         return 0;
-    return r->v;
+    return sequence->index;
 }
 
 s32 Callback_InvokeActor(void *, void *);
 
 void SceneActorControl_DispatchControl(void *);
 
-s32 Ivy_SetAuxiliaryColliderFlag(struct S *s);
+s32 Ivy_SetAuxiliaryColliderFlag(struct ChaseActor *actor);
 
-s32 Ivy_UpdateColliderPosition(u8 *s);
+s32 Ivy_UpdateColliderPosition(struct ChaseActor *actor);
 
-struct SUpdate {
-    u8 filler[0x27c];
-    u32 *tbl;
-    u8 filler2[0x2a8 - 0x280];
-    u8 idx;
-};
-
-s32 Ivy_Update(struct SUpdate *s)
+s32 Ivy_Update(struct ChaseActor *actor)
 {
-    Ivy_SetAuxiliaryColliderFlag(s);
-    Callback_InvokeActor(s, s->tbl[s->idx]);
-    SceneActorControl_DispatchControl(s);
-    Ivy_UpdateColliderPosition(s);
+    Ivy_SetAuxiliaryColliderFlag(actor);
+    Callback_InvokeActor(actor, actor->base.stateCallbacks[actor->base.state2A8]);
+    SceneActorControl_DispatchControl(actor);
+    Ivy_UpdateColliderPosition(actor);
     return 1;
 }
 
@@ -1848,55 +1650,40 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-static inline u8 tst(u16 *a, u32 m)
+u32 Ivy_Destroy(struct ChaseActor *s)
 {
-    if (*a & m)
-        return 1;
-    return 0;
-}
-
-struct SDestroy {
-    u8 f0[4];
-    u8 *p4;
-    u8 b8;
-    u8 f1[0x2b7];
-    u16 h2c0;
-};
-
-u32 Ivy_Destroy(struct SDestroy *s)
-{
-    u8 *p = s->p4;
+    u8 *p = s->base.drawable;
     u8 *q;
     u32 m;
     u32 v;
-    if (s->b8 == 0)
+    if (s->base.drawableKind == 0)
         Sprite_Remove(p);
     else
         Anim_Remove(p + 0x20);
     Heap_Free(p);
     m = 0x100;
-    if (tst((u16 *)((u8 *)s + 0x2c0), m))
+    if (SceneActorPlacement_TestFlags(&s->base.placementFlags, m))
         SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
     {
-        u8 *r = (u8 *)s + 0x320;
+        u8 *r = s->base.shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.statusFlags & m;
-    q = (u8 *)s + 0x50;
+    v = s->base.statusFlags & m;
+    q = (u8 *)&s->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove((u8 *)s + 0x134);
+    Collider_Remove(&s->base.colliderA);
     SceneActorRegistry_UnlinkActor(s);
     return 0;
 }
 
-void Ivy_InitProfileId(struct SInitProfileId *s);
+void Ivy_InitProfileId(struct ChaseActor *actor);
 
-s32 Ivy_Update(struct SUpdate *s);
+s32 Ivy_Update(struct ChaseActor *actor);
 
 void Ivy_UpdateDefeat(struct ChaseActor *actor, s32 frame);
 
@@ -1906,13 +1693,13 @@ void Ivy_TickDrawable(struct ChaseActor *actor);
 
 void SceneActor_InitCollision5005(struct ChaseActor *actor);
 
-void Ivy_InitControlPresets(struct SInitControlPresets *s);
+void Ivy_InitControlPresets(struct ChaseActor *actor);
 
 void SceneActor_BeginReaction22(struct ChaseActor *actor);
 
 s32 Ivy_UpdateInteraction(void *);
 
-u32 Ivy_Destroy(struct SDestroy *s);
+u32 Ivy_Destroy(struct ChaseActor *s);
 
 extern const u8 gUnk_08606400[];
 
@@ -2176,181 +1963,130 @@ void Ivy_Create(void)
     }
 }
 
-struct PInitColorTransition {
-    u8 f[0xcc5];
-    u8 a;
-    u8 b;
-    u8 g[0xcf0 - 0xcc7];
-    void (*cb)(void);
-    u8 h[0xd32 - 0xcf4];
-    u16 v;
-};
+s32 SceneActor_RampColorRed(struct PhaseObject *actor);
 
-s32 SceneActor_RampColorRed(struct SceneActorColorCycle *actor);
-
-s32 Ivy_InitColorTransition(struct PInitColorTransition *p)
+s32 Ivy_InitColorTransition(struct PhaseObject *p)
 {
-    u16 *s = &p->v;
-    p->a = (*s >> 5) & 0x1f;
-    p->b = (*s >> 10) & 0x1f;
-    p->cb = SceneActor_RampColorRed;
+    u16 *s = &p->color;
+    p->green = (*s >> 5) & 0x1f;
+    p->blue = (*s >> 10) & 0x1f;
+    p->phaseUpdate = (void *)SceneActor_RampColorRed;
 }
 
-s32 SceneActor_RampColorRedHigh(struct SceneActorColorCycle *);
+s32 SceneActor_RampColorRedHigh(struct PhaseObject *);
 
-s32 SceneActor_RampColorRed(struct SceneActorColorCycle *actor)
+s32 SceneActor_RampColorRed(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer << 4, actor->duration);
-    if (actor->timer++ == actor->duration) {
-        actor->update = SceneActor_RampColorRedHigh;
-        actor->timer = 0;
+    actor->red = Div(actor->pulseTimer << 4, actor->pulseDuration);
+    if (actor->pulseTimer++ == actor->pulseDuration) {
+        actor->phaseUpdate = (void *)SceneActor_RampColorRedHigh;
+        actor->pulseTimer = 0;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct Obj;
+s32 Ivy_UpdateRedBrightening(struct PhaseObject *p);
 
-s32 Ivy_UpdateRedBrightening(struct Obj *p);
-
-s32 SceneActor_RampColorRedHigh(struct SceneActorColorCycle *actor)
+s32 SceneActor_RampColorRedHigh(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer << 3, actor->duration) + 0x10;
-    if (actor->timer++ == actor->duration) {
-        actor->update = Ivy_UpdateRedBrightening;
-        actor->timer = 0;
+    actor->red = Div(actor->pulseTimer << 3, actor->pulseDuration) + 0x10;
+    if (actor->pulseTimer++ == actor->pulseDuration) {
+        actor->phaseUpdate = (void *)Ivy_UpdateRedBrightening;
+        actor->pulseTimer = 0;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct Obj {
-    u8 pad0[0xcc4];
-    s8 red, green, blue;
-    u8 padCC7[0x29];
-    void (*callback)(struct Obj *);
-    u8 padCF4[8];
-    s32 counter;
-    u8 padD00[0x32];
-    u16 color;
-    u8 padD34[0x1e];
-    s8 duration;
-    u8 padD53, mode;
-};
-
-static inline u16 color(struct Obj *p)
+static inline u16 color(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor);
+s32 SceneActor_LowerColorRedPeak(struct PhaseObject *actor);
 
-struct SWaitForColorRelease;
+s32 Ivy_WaitForColorRelease(struct PhaseObject *s);
 
-s32 Ivy_WaitForColorRelease(struct SWaitForColorRelease *s);
-
-s32 Ivy_UpdateRedBrightening(struct Obj *p)
+s32 Ivy_UpdateRedBrightening(struct PhaseObject *p)
 {
-    p->red = Div((u32)p->counter * 7, p->duration) + 24;
-    if (p->counter++ == p->duration) {
-        if (p->mode == 0)
-            p->callback = SceneActor_LowerColorRedPeak;
+    p->red = Div((u32)p->pulseTimer * 7, p->pulseDuration) + 24;
+    if (p->pulseTimer++ == p->pulseDuration) {
+        if (p->pulseMode == 0)
+            p->phaseUpdate = (void *)SceneActor_LowerColorRedPeak;
         else
-            p->callback = Ivy_WaitForColorRelease;
-        p->counter = p->duration;
+            p->phaseUpdate = (void *)Ivy_WaitForColorRelease;
+        p->pulseTimer = p->pulseDuration;
     }
     p->color = color(p);
     return 0;
 }
 
-struct ColorPulse;
+s32 ColorPulse_FadeRed(struct PhaseObject *p);
 
-s32 ColorPulse_FadeRed(struct ColorPulse *p);
-
-s32 SceneActor_LowerColorRedPeak(struct SceneActorColorCycle *actor)
+s32 SceneActor_LowerColorRedPeak(struct PhaseObject *actor)
 {
-    actor->red = Div(actor->timer * 7, actor->duration) + 24;
-    if (--actor->timer == -1) {
-        actor->update = ColorPulse_FadeRed;
-        actor->timer = actor->duration;
+    actor->red = Div(actor->pulseTimer * 7, actor->pulseDuration) + 24;
+    if (--actor->pulseTimer == -1) {
+        actor->phaseUpdate = (void *)ColorPulse_FadeRed;
+        actor->pulseTimer = actor->pulseDuration;
     }
     actor->color = (actor->blue << 10) | (actor->green << 5) | actor->red;
     return 0;
 }
 
-struct ColorPulse {
-    u8 pad0[0xcc4];
-    s8 red, green, blue;
-    u8 padCC7[0x29];
-    void (*callback)(struct ColorPulse *);
-    u8 padCF4[8];
-    s32 counter;
-    u8 padD00[0x32];
-    u16 color;
-    u8 padD34[0x1e];
-    s8 duration;
-    u8 padD53, mode;
-};
-
-static inline u16 color_FadeRed(struct ColorPulse *p)
+static inline u16 color_FadeRed(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 ColorPulse_FinishRedFade(struct ColorPulse *p);
+s32 ColorPulse_FinishRedFade(struct PhaseObject *p);
 
-s32 ColorPulse_FadeRed(struct ColorPulse *p)
+s32 ColorPulse_FadeRed(struct PhaseObject *p)
 {
-    s32 value = Div((u32)p->counter * 8, p->duration) + 16;
+    s32 value = Div((u32)p->pulseTimer * 8, p->pulseDuration) + 16;
     s8 *red = &p->red;
     *red = value;
-    if (--p->counter == -1) {
-        p->callback = ColorPulse_FinishRedFade;
-        p->counter = p->duration;
+    if (--p->pulseTimer == -1) {
+        p->phaseUpdate = (void *)ColorPulse_FinishRedFade;
+        p->pulseTimer = p->pulseDuration;
     }
     p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
     return 0;
 }
 
-static inline u16 color_FinishRedFade(struct ColorPulse *p)
+static inline u16 color_FinishRedFade(struct PhaseObject *p)
 {
     return ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)p->red;
 }
 
-s32 Ivy_InitColorTransition(struct PInitColorTransition *p);
+s32 Ivy_InitColorTransition(struct PhaseObject *p);
 
-s32 ColorPulse_FinishRedFade(struct ColorPulse *p)
+s32 ColorPulse_FinishRedFade(struct PhaseObject *p)
 {
     s32 result;
-    s32 value = Div((u32)p->counter * 16, p->duration);
+    s32 value = Div((u32)p->pulseTimer * 16, p->pulseDuration);
     s8 *red = &p->red;
     *red = value;
-    if (--p->counter != -1) {
+    if (--p->pulseTimer != -1) {
         p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
         result = 0;
     } else {
-        p->callback = Ivy_InitColorTransition;
-        p->counter = 0;
+        p->phaseUpdate = (void *)Ivy_InitColorTransition;
+        p->pulseTimer = 0;
         p->color = ((u32)p->blue << 10) | ((u32)p->green << 5) | (u32)*red;
         result = 1;
     }
     return result;
 }
 
-struct SWaitForColorRelease {
-    u8 filler[0xcf0];
-    void (*fp)(void);
-    u8 f2[0xd54 - 0xcf4];
-    u8 b;
-};
-
-s32 Ivy_WaitForColorRelease(struct SWaitForColorRelease *s)
+s32 Ivy_WaitForColorRelease(struct PhaseObject *s)
 {
     s32 r;
-    if (s->b != 0)
+    if (s->pulseMode != 0)
         r = 1;
     else {
-        s->fp = SceneActor_LowerColorRedPeak;
+        s->phaseUpdate = (void *)SceneActor_LowerColorRedPeak;
         r = 0;
     }
     return r;
@@ -2372,98 +2108,31 @@ u32 ColorPulse_UnpackColor(u8 *p)
     p[0xCC6] = r;
 }
 
-struct Sub080F2028Position {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
-
-struct Sub080F2028Scene {
-    u8 unknown0[0x32];
-    u16 height;
-};
-
-struct Sub080F2028Actor {
-    u8 unknown0[0x60];
-    struct Sub080F2028Scene *scene;
-    u8 unknown64[0xB84 - 0x64];
-    u16 x;
-    u16 unknownB86;
-    u16 z;
-    u8 unknownB8A[0xC70 - 0xB8A];
-    u8 primary[0xD80 - 0xC70];
-    s32 frame;
-};
-
 extern const s32 gUnk_0860641C[];
 
 // scope shape 2 (differences once low registers are set aside)
 
 // confidence=low: places the primary collider at the actor position offset by a table value.
 
-void Armor_PlacePrimaryCollider(struct Sub080F2028Actor *actor)
+void Armor_PlacePrimaryCollider(struct PhaseObject *actor)
 {
-    struct Sub080F2028Position position;
-    u16 *xp;
+    struct ContactPackedVector position;
+    s16 *xp;
     const s32 *radius;
     s32 slot;
     const s32 *table;
 
     slot = Mod(actor->frame, 3);
-    xp = &actor->x;
+    xp = &actor->position.x;
     table = gUnk_0860641C;
     radius = table + slot;
     position.x = *xp + *radius;
-    position.y = actor->scene->height + 220;
-    position.z = actor->z + *radius;
-    Collider_SetPosition(actor->primary, &position, 0);
+    position.y = actor->target->position.y + 220;
+    position.z = actor->position.z + *radius;
+    Collider_SetPosition(&actor->colliderB, &position, 0);
 }
 
 // confidence=low: trigonometric offsets position the main and four paired part colliders.
-
-struct ArmorPosition {
-    s32 x : 16;
-    s32 y : 16;
-    s32 z : 16;
-};
-
-struct ArmorScene {
-    u8 unknown0[0x32];
-    u16 height;
-};
-
-struct ArmorSourcePart {
-    u8 unknown0[0x1C];
-    u16 x, y, z;
-    u8 unknown22[0xA];
-};
-
-struct ArmorCollider {
-    u8 unknown0[6];
-    u16 flags;
-    u8 unknown8[0x4C];
-};
-
-struct ArmorOrbitActor {
-    u8 unknown0[0x60];
-    struct ArmorScene *scene;
-    u8 unknown64[0x44];
-    struct ArmorSourcePart parts[4];
-    u8 unknown158[0x70];
-    struct ArmorCollider inner[4], outer[4];
-    u8 unknown468[0x4A];
-    u8 angle;
-    u8 unknown4B3[0x6BB];
-    u8 heading;
-    u8 unknownB6F[0x15];
-    u16 x;
-    u16 unknownB86;
-    u16 z;
-    u8 unknownB8A[0x92];
-    struct ArmorCollider primary, secondary;
-    u8 unknownCC4[0xBC];
-    s32 frame;
-};
 
 extern const s16 gUnk_086149C4[];
 
@@ -2476,40 +2145,41 @@ static inline void Armor_CopyRadius(const s32 **out, const s32 *radius)
     *out = radius;
 }
 
-void Armor_UpdateOrbitingColliders(struct ArmorOrbitActor *actor)
+void Armor_UpdateOrbitingColliders(struct PhaseObject *actor)
 {
-    struct ArmorPosition position;
+    struct ContactPackedVector position;
     const s32 *radius;
     s32 i;
     s32 slot;
     s32 cosine;
     const s32 *table;
-    actor->angle = 28 - actor->heading;
+    actor->orbitAngle = 28 - actor->rotation;
     slot = Mod(actor->frame, 3);
-    cosine = gUnk_086149C4[(actor->angle + 64) & 255];
+    cosine = gUnk_086149C4[(actor->orbitAngle + 64) & 255];
     table = gUnk_08606428;
     radius = table + slot;
-    position.x = ((cosine * *radius) >> 12) + actor->x;
-    position.y = actor->scene->height + 220;
-    position.z = ((*radius * gUnk_086149C4[actor->angle]) >> 12) + actor->z;
-    Collider_SetPosition(&actor->primary, &position, 0);
-    Collider_SetPosition(&actor->secondary, &position, 0);
-    if (!(actor->primary.flags & 4))
-        Collider_Refresh(&actor->primary);
+    position.x = ((cosine * *radius) >> 12) + actor->position.x;
+    position.y = actor->target->position.y + 220;
+    position.z = ((*radius * gUnk_086149C4[actor->orbitAngle]) >> 12) + actor->position.z;
+    Collider_SetPosition(&actor->colliderA, &position, 0);
+    Collider_SetPosition(&actor->colliderB, &position, 0);
+    if (!(actor->colliderA.flags & 4))
+        Collider_Refresh(&actor->colliderA);
     for (i = 0; i <= 3; i++) {
         const s32 *loopRadius;
-        u8 *angle = &actor->angle;
+        u8 *angle = &actor->orbitAngle;
         const s16 *trig = gUnk_086149C4;
         u16 *point;
         Armor_CopyRadius(&loopRadius, radius);
         point = (void *)&position;
-        point[0] = actor->parts[i].x + Div(trig[(*angle + 64) & 255] * *loopRadius, 4096);
-        point[1] = actor->scene->height + 220;
-        point[2] = actor->parts[i].z + Div(trig[*angle] * *loopRadius, 4096);
-        Collider_SetPosition(&actor->outer[i], &position, 0);
-        if (!(actor->inner[i].flags & 4)) {
-            Collider_Refresh(&actor->inner[i]);
-            Collider_SetPosition(&actor->inner[i], &position, 0);
+        point[0] =
+            actor->entries[i].presentation.x + Div(trig[(*angle + 64) & 255] * *loopRadius, 4096);
+        point[1] = actor->target->position.y + 220;
+        point[2] = actor->entries[i].presentation.z + Div(trig[*angle] * *loopRadius, 4096);
+        Collider_SetPosition(&actor->memberCollidersB[i], &position, 0);
+        if (!(actor->memberCollidersA[i].flags & 4)) {
+            Collider_Refresh(&actor->memberCollidersA[i]);
+            Collider_SetPosition(&actor->memberCollidersA[i], &position, 0);
         }
     }
 }
@@ -2562,49 +2232,6 @@ void Ivy_OnDestroy(void)
 
 #define ColorPulse_UpdateHitFlash Sword_UpdateBodyPaletteRestore
 
-struct ColorPulseContact {
-    u8 pad0[0xa];
-    u16 kind;
-    u8 padC[0x28];
-    u32 source, flags;
-    u8 pad3C[2];
-    u16 damage;
-    u8 pad40[3];
-    u8 effect;
-    u16 value;
-};
-
-struct ColorPulseApplyContact {
-    u8 pad0[0x64];
-    u16 velocityX;
-    u8 pad66[2];
-    u16 velocityZ;
-    u8 pad6A[0xa];
-    u16 impulseX;
-    u8 pad76[2];
-    u16 impulseZ;
-    u8 pad7A[0xa];
-    s16 hitValue;
-    u8 pad86[0xd];
-    u8 mode;
-    u8 pad94[8];
-    u16 colliderState;
-    u8 pad9E[0xb74 - 0x9e];
-    void *animation;
-    u8 padB78[0xcb4 - 0xb78];
-    u16 disabled;
-    u8 padCB6[0x12];
-    void (*callback)(void);
-    u8 padCCC[0x20];
-    void (*hitCallback)(void);
-    u8 padCF0[0x68];
-    u16 palette;
-    u8 padD5A[6];
-    u32 hitSource, hitFlags, hitKind;
-    u8 padD6C[0xc];
-    u16 damage, effect;
-};
-
 void Ivy_UpdateDefeatBurst(void);
 
 void Sword_UpdateBodyPaletteRestore(void);
@@ -2613,235 +2240,136 @@ void Collision_CalculateDamageResponse(void *, void *);
 
 void PlayerStats_AddContactHundredths(void *, void *, s32);
 
-void ColorPulse_ApplyContact(struct ColorPulseContact *a, struct ColorPulseContact *b,
-                             struct ColorPulseApplyContact *p)
+void ColorPulse_ApplyContact(struct ContactCollider *a, struct ContactCollider *b,
+                             struct PhaseObject *p)
 {
-    if (p->callback == Ivy_UpdateDefeatBurst)
+    if (p->update == (void *)Ivy_UpdateDefeatBurst)
         return;
-    if (p->disabled) {
-        if (p->effect) {
-            b->damage = 0;
-            b->effect = 0;
+    if (p->colliderB.responseValue) {
+        if (p->damageKind) {
+            b->cost = 0;
+            b->costFlags = 0;
         }
     } else {
         Collision_CalculateDamageResponse(a, b);
-        b->value = a->value;
-        if (!p->hitCallback) {
-            u32 damage = b->damage;
-            u32 flags = a->flags;
+        b->responseValue = a->responseValue;
+        if (!p->hitUpdate) {
+            u32 damage = b->cost;
+            u32 flags = a->reactionFlags;
             if (damage || (flags & 0x40)) {
-                u32 source = a->source;
-                p->hitSource = source;
-                p->hitFlags = flags;
-                p->hitKind = a->kind;
-                p->colliderState = 8;
-                p->hitCallback = Sword_UpdateBodyPaletteRestore;
-                AnimData_SelectPaletteBank(p->animation, p->palette);
-                PlayerStats_AddContactHundredths(a, b, p->hitValue);
+                u32 source = a->statRewardFlags;
+                p->hitResponseD60 = source;
+                p->hitResponseD64 = flags;
+                p->hitResponseD68 = a->contactFlags;
+                p->flashTimer = 8;
+                p->hitUpdate = (void *)Sword_UpdateBodyPaletteRestore;
+                AnimData_SelectPaletteBank(p->damageAnimation, p->damagePalette);
+                PlayerStats_AddContactHundredths(a, b, p->contactReward);
             }
         }
-        if (b->damage)
+        if (b->cost)
             Sound_PlaySong(318);
         else
             Sound_PlaySong(400);
         {
-            u16 *velocity = &p->velocityX;
-            if (p->mode == 1) {
-                p->impulseX = -*velocity * 4;
-                p->impulseZ = -p->velocityZ * 4;
+            u16 *velocity = (u16 *)&p->offsetX;
+            if (p->groupMode.mode == 1) {
+                p->driftX = -*velocity * 4;
+                p->driftZ = -(u16)p->offsetZ * 4;
             }
         }
-        p->damage = b->damage;
-        p->effect = b->effect;
+        p->damage = b->cost;
+        p->damageKind = b->costFlags;
     }
 }
 
-struct SInitBobbing {
-    u8 filler[0x64];
-    u16 h64;
-    u16 h66;
-    u16 h68;
-    u16 h6a;
-    u16 h6c;
-    u16 h6e;
-    u16 h70;
-    u8 f3[0xcf8 - 0x72];
-    u32 cnt;
-};
-
-void Ivy_InitBobbing(struct SInitBobbing *s)
+void Ivy_InitBobbing(struct PhaseObject *s)
 {
-    s->h64 = 0;
-    s->h66 = 0;
-    s->h68 = 0;
-    s->h6c = 0;
-    s->h6e = 1;
-    s->h70 = 0;
-    s->cnt = 0x14;
+    s->offsetX = 0;
+    s->unknown66 = 0;
+    s->offsetZ = 0;
+    s->scatterStepX = 0;
+    s->unknown6E = 1;
+    s->scatterStepZ = 0;
+    s->bobbingTimer = 0x14;
 }
 
-struct SUpdateBobbing {
-    u8 filler[0x66];
-    u16 h66;
-    u8 f2[0x6e - 0x68];
-    u16 h6e;
-    u8 f3[0xb86 - 0x70];
-    u16 hb86;
-    u8 f4[0xcf8 - 0xb88];
-    u32 cnt;
-};
-
-void Ivy_UpdateBobbing(struct SUpdateBobbing *s)
+void Ivy_UpdateBobbing(struct PhaseObject *s)
 {
-    u32 *c = &s->cnt;
+    u32 *c = &s->bobbingTimer;
     if ((*c & 3) == 0)
-        s->h66 += s->h6e;
+        s->unknown66 += s->unknown6E;
     *c = *c - 1;
     if (*c == 0) {
-        s->h6e = -s->h6e;
+        s->unknown6E = -s->unknown6E;
         *c = 0x28;
     }
-    s->hb86 += s->h66;
+    s->position.y += s->unknown66;
 }
 
 u32 Terrain_GetHeightAt(void *);
 
-struct SUpdateGroundHeight {
-    u8 filler[0xb84];
-    u8 a[0xd00 - 0xb84];
-    u32 v;
-    u8 f2[0xd80 - 0xd04];
-    s32 n;
-};
-
-void Ivy_UpdateGroundHeight(struct SUpdateGroundHeight *s)
+void Ivy_UpdateGroundHeight(struct PhaseObject *s)
 {
-    if (s->n > 7)
-        s->v = (u16)Terrain_GetHeightAt(s->a);
+    if ((s32)s->frame > 7)
+        s->landingHeight = (u16)Terrain_GetHeightAt(&s->position);
 }
 
-struct PWaitForRetarget {
-    u8 f[0xcd4];
-    void (*cb)(void);
-    u8 g[0x1c];
-    s32 n;
-};
+void Ivy_UpdateAnchorApproach(struct PhaseObject *actor);
 
-struct IvyAnchorActor;
-
-void Ivy_UpdateAnchorApproach(struct IvyAnchorActor *actor);
-
-void Ivy_WaitForRetarget(struct PWaitForRetarget *p)
+void Ivy_WaitForRetarget(struct PhaseObject *p)
 {
-    if (--p->n == 0) {
-        p->n = 300;
-        p->cb = Ivy_UpdateAnchorApproach;
+    if (--p->scatterDelay == 0) {
+        p->scatterDelay = 300;
+        p->retarget = (void *)Ivy_UpdateAnchorApproach;
     }
 }
 
 // confidence=low: approaches the scene anchor, then restores retarget control on expiry.
 
-struct IvyAnchorScene {
-    u8 unknown0[0x30];
-    u16 x, y, z;
-};
-
-struct IvyAnchorActor {
-    u8 unknown0[0x60];
-    struct IvyAnchorScene *scene;
-    u16 motionX, unknown66, motionZ;
-    u8 unknown6A[0xA];
-    s16 driftX, unknown76, driftZ;
-    u8 unknown7A[0x13];
-    u8 flags8D, unknown8E[4];
-    u8 state, phase, unknown94[0x3F4];
-    u16 targetX, targetY, targetZ, unknown48E;
-    s16 deltaX, deltaY, deltaZ;
-    u8 unknown496[0x1B], direction;
-    u8 unknown4B2[0x6D2];
-    u16 x, y, z;
-    u8 unknownB8A[0x13E];
-    void (*memberUpdate)(void);
-    u8 unknownCCC[8];
-    void (*control)(void);
-    u8 unknownCD8[0x1C];
-    u32 timer;
-};
-
 s32 Math_Atan2(s32, s32);
 
 void ChildGroup_UpdateOrbitingMembers(void);
 
-void Ivy_WaitForRetarget(struct PWaitForRetarget *p);
+void Ivy_WaitForRetarget(struct PhaseObject *p);
 
-static inline s32 Ivy_ScaleDirection(s32 value)
-{
-    if (value >= 0)
-        return value >> 10;
-    return -((-value) >> 10);
-}
-
-static inline s32 Ivy_Halve(s32 value)
-{
-    if (value >= 0)
-        return value >> 1;
-    return -((-value) >> 1);
-}
-
-static inline void Ivy_SetMode(struct IvyAnchorActor *actor, u8 state, u8 phase)
-{
-    actor->state = state;
-    actor->phase = phase;
-    state |= actor->flags8D;
-    actor->flags8D = state;
-}
-
-void Ivy_UpdateAnchorApproach(struct IvyAnchorActor *actor)
+void Ivy_UpdateAnchorApproach(struct PhaseObject *actor)
 {
     s32 x, z;
-    actor->targetX = actor->scene->x;
-    actor->targetY = actor->scene->y;
-    actor->targetZ = actor->scene->z;
-    actor->deltaX = actor->targetX - actor->x;
-    actor->deltaY = actor->targetY - actor->y;
-    actor->deltaZ = actor->targetZ - actor->z;
-    actor->direction = Math_Atan2(actor->deltaX, actor->deltaZ);
-    x = gUnk_086149C4[(actor->direction + 64) & 255];
-    z = gUnk_086149C4[actor->direction];
-    actor->motionX = Ivy_ScaleDirection(x);
-    actor->motionZ = Ivy_ScaleDirection(z);
-    actor->x += actor->motionX + actor->driftX;
-    actor->z += actor->motionZ + actor->driftX;
-    actor->driftX = Ivy_Halve(actor->driftX);
-    actor->driftZ = Ivy_Halve(actor->driftZ);
-    if (--actor->timer == 0) {
-        actor->timer = 300;
-        Ivy_SetMode(actor, 1, 3);
-        actor->memberUpdate = ChildGroup_UpdateOrbitingMembers;
-        actor->control = Ivy_WaitForRetarget;
+    actor->goal.x = actor->target->position.x;
+    actor->goal.y = actor->target->position.y;
+    actor->goal.z = actor->target->position.z;
+    actor->delta.x = actor->goal.x - actor->position.x;
+    actor->delta.y = actor->goal.y - actor->position.y;
+    actor->delta.z = actor->goal.z - actor->position.z;
+    actor->targetAngle = Math_Atan2(actor->delta.x, actor->delta.z);
+    x = gUnk_086149C4[(actor->targetAngle + 64) & 255];
+    z = gUnk_086149C4[actor->targetAngle];
+    actor->offsetX = Math_ShiftTowardZero(x, 10);
+    actor->offsetZ = Math_ShiftTowardZero(z, 10);
+    actor->position.x += actor->offsetX + actor->driftX;
+    actor->position.z += actor->offsetZ + actor->driftX;
+    actor->driftX = Math_ShiftTowardZero(actor->driftX, 1);
+    actor->driftZ = Math_ShiftTowardZero(actor->driftZ, 1);
+    if (--actor->scatterDelay == 0) {
+        actor->scatterDelay = 300;
+        PhaseObject_EnterMode(actor, 1, 3);
+        actor->update = (void *)ChildGroup_UpdateOrbitingMembers;
+        actor->retarget = Ivy_WaitForRetarget;
     }
 }
 
 void ColorPulse_PrepareTargetDash(void);
 
-struct SWaitForPrimaryActionCompletion {
-    u8 filler[0xcd8];
-    void (*fp)(void);
-    u8 f2[0xcf0 - 0xcdc];
-    u32 v;
-    u8 f3[0xd53 - 0xcf4];
-    s8 b;
-};
-
-void Ivy_WaitForPrimaryActionCompletion(struct SWaitForPrimaryActionCompletion *s)
+void Ivy_WaitForPrimaryActionCompletion(struct PhaseObject *s)
 {
-    u32 v = s->v;
-    if (v != 0) {
-        if ((u8)Callback_InvokeActor(s, v) != 0)
-            s->b++;
+    void *update = s->phaseUpdate;
+    if (update != 0) {
+        if ((u8)Callback_InvokeActor(s, update) != 0)
+            s->actionCompletions++;
     }
-    if (s->b > 1) {
-        s->b = 0;
-        s->fp = ColorPulse_PrepareTargetDash;
+    if (s->actionCompletions > 1) {
+        s->actionCompletions = 0;
+        s->transition = (void *)ColorPulse_PrepareTargetDash;
     }
 }

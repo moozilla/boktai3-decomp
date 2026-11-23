@@ -1,3 +1,4 @@
+#include "scene_combat_colliders.h"
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
@@ -25,7 +26,6 @@ struct ArmorAnimationRequest {
 extern const u8 gUnk_0824EB60[];
 
 extern const u16 gUnk_0824E920[][2][36];
-
 
 void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationRequest *request,
                                   u32 flags)
@@ -67,7 +67,6 @@ void ActorController_SetAnimation(struct ArmorActor *s, struct ArmorAnimationReq
     s->flags &= ~0x20;
 }
 
-
 void Armor_SetAnimationFromStart(u32 a, u32 b)
 {
     ActorController_SetAnimation(a, b, 0);
@@ -81,7 +80,6 @@ struct ArmorEffectActor {
 };
 
 extern const s32 gUnk_0824EB74[];
-
 
 void Armor_SpawnScatterEffect(struct ArmorEffectActor *s)
 {
@@ -102,7 +100,6 @@ struct SceneEffectActor {
 struct SpriteEffectController;
 
 extern const struct ContactPosition gUnk_0824EB7C;
-
 
 void SceneActor_SpawnSpriteEffect(struct SceneEffectActor *p)
 {
@@ -153,25 +150,17 @@ void Armor_EnterFacingAnimation(struct ArmorFacingActor *actor)
     u8 *p = (u8 *)actor;
     u8 *state = p + 0xb40;
     if (*state == 0) {
-        u32 four = 4;
         Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EB84[((p[0xb39] + 0x60) >> 6) & 3]);
         *state = 0xff;
         p[0xb41] = 1;
-        ((struct ArmorCollider *)(p + 0x238))->flags &= ~four;
-        ((struct ArmorCollider *)(p + 0x1e4))->flags &= ~four;
-        ((struct ArmorCollider *)(p + 0x28c))->flags &= ~four;
-        ((struct ArmorCollider *)(p + 0x190))->flags |= four;
-        {
-            u32 one = 1;
-            ((struct ArmorCollisionGate *)(p + 0x180))->flags &= ~one;
-        }
+        SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
         *(u16 *)(p + 0xb32) &= ~0x20;
     }
 }
 
 #define gArmorWalkAnimations gUnk_0824EB94
 
-#define gSineTable           gUnk_086149C4
+#define gSineTable gUnk_086149C4
 
 // Tentative Armor family: on the first frame start the walk animation for the
 
@@ -217,7 +206,6 @@ struct ArmorWalkController {
 
 extern const u32 gArmorWalkAnimations[];
 
-
 void Sound_PlaySongChecked(u32);
 
 static inline void ClearControlFlags(struct ArmorControlState *c, s32 mask)
@@ -243,17 +231,12 @@ void Armor_UpdateWalk(struct ArmorWalkController *p, s32 speed, s32 duration)
 {
     u8 *s = &p->walkState;
     if (*s == 0) {
-        u32 four = 4;
         Armor_SetAnimationFromStart((u32)p,
                                     (u32)&gArmorWalkAnimations[((p->facing + 0x60) >> 6) & 3]);
         (*s)++;
         p->walkComplete = 1;
         p->animationDuration = duration;
-        ((struct ArmorSpriteState *)((u8 *)p + 0x238))->flags &= ~four;
-        ((struct ArmorSpriteState *)((u8 *)p + 0x1E4))->flags &= ~four;
-        ((struct ArmorSpriteState *)((u8 *)p + 0x28C))->flags &= ~four;
-        ((struct ArmorSpriteState *)((u8 *)p + 0x190))->flags |= four;
-        ClearControlFlags((struct ArmorControlState *)((u8 *)p + 0x180), ~1);
+        SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
         p->flagsB32 &= ~0x20;
     }
     SetMotion((struct ArmorMotionVector *)&p->motionX, p->facing, speed);
@@ -286,7 +269,6 @@ void Armor_UpdateWalk(struct ArmorWalkController *p, s32 speed, s32 duration)
     }
 }
 
-
 void Armor_UpdateWalkNormal(u32 a)
 {
     Armor_UpdateWalk(a, 0xA, 0x40);
@@ -310,15 +292,12 @@ void Armor_UpdateWalkFaster(u32 a)
     Armor_UpdateWalk(a, 0x12, 0x23);
 }
 
-
-
 void Armor_UpdateWalkNormalWithScatterEffect(u8 *p)
 {
     Armor_UpdateWalk(p, 10, 0x40);
     if ((p[0xB42] & 0x1f) == 0)
         Armor_SpawnScatterEffect(p);
 }
-
 
 void Armor_UpdateWalkFastWithTrailEffect(u8 *p)
 {
@@ -331,17 +310,8 @@ void Armor_UpdateWalkFastWithTrailEffect(u8 *p)
 
 /* tentative: picks a directional animation and moves along the facing with a nudge near the cell edge */
 
-struct ActorAnimationFlags {
-    u16 unk0, unk2, unk4;
-    u32 flags : 16;
-};
-
 struct ActorStateFlags {
     u32 flags : 16;
-};
-
-struct ActorMotionFlags {
-    u32 unk0, flags;
 };
 
 struct ActorMotionVector {
@@ -350,7 +320,6 @@ struct ActorMotionVector {
 
 extern u32 gUnk_0824EBA4[];
 
-
 void Armor_UpdateRunMotion(u8 *p, s32 speed, u32 timer)
 {
     u8 *s = p + 0xB40;
@@ -358,21 +327,11 @@ void Armor_UpdateRunMotion(u8 *p, s32 speed, u32 timer)
     struct ActorMotionVector *v;
 
     if (*s == 0) {
-        u32 four = 4;
         Armor_SetAnimationFromStart((u32)p, (u32)&gUnk_0824EBA4[((p[0xB39] + 0x60) >> 6) & 3]);
         (*s)++;
         p[0xB41] = 1;
         *(u16 *)(p + 0xC4) = timer;
-        ((struct ActorAnimationFlags *)(p + 0x238))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x1E4))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x28C))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x190))->flags =
-            four | ((struct ActorAnimationFlags *)(p + 0x190))->flags;
-        {
-            struct ActorMotionFlags *m = (void *)(p + 0x180);
-            u32 one = ~1;
-            m->flags &= one;
-        }
+        SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
         ((struct ActorStateFlags *)(p + 0xB32))->flags |= 0x20;
     }
     {
@@ -415,12 +374,10 @@ void Armor_UpdateRunMotion(u8 *p, s32 speed, u32 timer)
     }
 }
 
-
 void Armor_UpdateRun(u32 a)
 {
     Armor_UpdateRunMotion(a, 0x14, 0x20);
 }
-
 
 void Armor_UpdateRunWithScatterEffect(u8 *p)
 {
@@ -448,7 +405,6 @@ void Armor_UpdateStrafeMotion(u8 *p, s32 speed, u32 timer)
     struct ActorMotionVector *v;
 
     if (*s == 0) {
-        u32 four = 4;
         u8 a = p[0xB39];
         u32 dir = ((a + 0x60) >> 6) & 3;
         u32 mode;
@@ -460,16 +416,7 @@ void Armor_UpdateStrafeMotion(u8 *p, s32 speed, u32 timer)
         (*s)++;
         p[0xB41] = 1;
         *(u16 *)(p + 0xC4) = timer;
-        ((struct ActorAnimationFlags *)(p + 0x238))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x1E4))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x28C))->flags &= ~four;
-        ((struct ActorAnimationFlags *)(p + 0x190))->flags =
-            four | ((struct ActorAnimationFlags *)(p + 0x190))->flags;
-        {
-            struct ActorMotionFlags *m = (void *)(p + 0x180);
-            u32 one = ~1;
-            m->flags &= one;
-        }
+        SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
         ((struct ActorStateFlags *)(p + 0xB32))->flags |= 0x20;
     }
     {
@@ -498,7 +445,6 @@ void Armor_UpdateStrafeMotion(u8 *p, s32 speed, u32 timer)
     }
 }
 
-
 void Armor_UpdateStrafeNormal(u32 a)
 {
     Armor_UpdateStrafeMotion(a, 0x7, 0x40);
@@ -513,7 +459,6 @@ void Armor_UpdateStrafeFaster(u32 a)
 {
     Armor_UpdateStrafeMotion(a, 0xD, 0x23);
 }
-
 
 void Armor_UpdateStrafeNormalWithScatterEffect(u8 *p)
 {
@@ -561,7 +506,6 @@ void Armor_UpdatePositiveTurn(struct ArmorTurnController *p, s32 duration)
     u8 state = *s;
     switch (state) {
         case 0: {
-            u32 four = 4;
             if (p->facing == p->targetFacing) {
                 *s = 0xFF;
                 p->turnComplete = 1;
@@ -572,14 +516,7 @@ void Armor_UpdatePositiveTurn(struct ArmorTurnController *p, s32 duration)
             (*s)++;
             p->turnComplete = state;
             p->turnDuration = duration;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x238))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x1E4))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x28C))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x190))->flags |= four;
-            {
-                u32 one = 1;
-                ((struct ArmorControlState *)((u8 *)p + 0x180))->flags &= ~one;
-            }
+            SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
             p->flagsB32 &= ~0x20;
             break;
         }
@@ -611,7 +548,6 @@ void Armor_UpdateNegativeTurn(struct ArmorTurnController *p, s32 duration)
     u8 state = *s;
     switch (state) {
         case 0: {
-            u32 four = 4;
             if (p->facing == p->targetFacing) {
                 *s = 0xFF;
                 p->turnComplete = 1;
@@ -622,14 +558,7 @@ void Armor_UpdateNegativeTurn(struct ArmorTurnController *p, s32 duration)
             (*s)++;
             p->turnComplete = state;
             p->turnDuration = duration;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x238))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x1E4))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x28C))->flags &= ~four;
-            ((struct ArmorSpriteState *)((u8 *)p + 0x190))->flags |= four;
-            {
-                u32 one = 1;
-                ((struct ArmorControlState *)((u8 *)p + 0x180))->flags &= ~one;
-            }
+            SceneCombatActor_SelectFirstCollider((struct SceneCombatActor *)p);
             p->flagsB32 &= ~0x20;
             break;
         }
@@ -647,24 +576,20 @@ void Armor_UpdateNegativeTurn(struct ArmorTurnController *p, s32 duration)
     }
 }
 
-
 void Armor_UpdatePositiveTurnNormal(u8 *p)
 {
     Armor_UpdatePositiveTurn(p, 64);
 }
-
 
 void Armor_UpdateNegativeTurnNormal(u8 *p)
 {
     Armor_UpdateNegativeTurn(p, 64);
 }
 
-
 void Armor_UpdatePositiveTurnFast(s32 a)
 {
     Armor_UpdatePositiveTurn(a, 0x2a);
 }
-
 
 void Armor_UpdateNegativeTurnFast(s32 a)
 {

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "word_flags.h"
 
 struct GrowthHazardAnimationEvent {
     u8 unk0[4];
@@ -28,15 +29,6 @@ struct GrowthHazardManager {
 };
 u32 Hresvelgr_GetAnimationIdentifier(void);
 
-static inline u32 TestWord(u32 *value, u32 mask)
-{
-    return *value & mask;
-}
-static inline u32 TestHalf(u16 *value, u32 mask)
-{
-    return *value & mask;
-}
-
 void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, u32 unused,
                                       struct GrowthHazardEntry *entry)
 {
@@ -44,7 +36,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, 
     if (identifier != Hresvelgr_GetAnimationIdentifier()) {
         switch (entry->state) {
             case 0:
-                if (entry->cooldown == 0 && TestWord(&event->flags38, 0x20)) {
+                if (entry->cooldown == 0 && WordFlags_Test(&event->flags38, 0x20)) {
                     entry->eventCount++;
                     entry->cooldown = event->cooldown;
                     entry->mode = 0;
@@ -52,7 +44,7 @@ void GrowthHazard_ApplyAnimationEvent(struct GrowthHazardAnimationEvent *event, 
                 }
                 break;
             case 2:
-                if (TestHalf(&event->flagsA, 0x10) && entry->cooldown == 0 &&
+                if (HalfwordFlags_Test(0x10, &event->flagsA) && entry->cooldown == 0 &&
                     entry->remaining > 0) {
                     if (--entry->remaining > 0) {
                         entry->cooldown = 0x20;

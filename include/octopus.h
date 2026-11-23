@@ -9,8 +9,9 @@ struct Octopus {
     u8 unknown624[4];
     u32 flags628;
     u32 captureFlags;
-    u8 unknown630[6];
-    u16 field636;
+    u8 unknown630[4];
+    s16 targetMissFrames; /* frames the tracked target stayed out of reach */
+    s16 targetMissLimit;  /* script halfword */
     u8 startTick;
     u8 holdTicks;
     u8 interval;
