@@ -532,6 +532,11 @@ s32 FallingSceneSprite_Initialize(struct FallingSceneSprite *actor, u32 id)
     actor->id = id;
     SceneMessages_RegisterReceiver(&actor->receiver, id, 10);
     Registry1909_EnterHiddenState(actor);
+#ifdef UBFIX
+    // falls off the end with r0 left over from the Registry1909_EnterHiddenState call; the creator only tests
+    // < 0, and this initializer has no failure path here
+    return 0;
+#endif
 }
 
 void *SceneMessageSprite_Create(void *a)
