@@ -263,9 +263,7 @@ void Crow_RecoverFromDisplacement(struct ChaseActor *actor, s32 elapsed)
             ((struct CrowSignedFlags *)field)->bits &= mask;
         }
         {
-            u32 *flags = &actor->base.behaviorFlags;
-            u32 mask = ~0x80;
-            *flags &= mask;
+            SceneActorChase_ClearWordFlags(&actor->base.behaviorFlags, 0x80);
         }
         state->bobPhase = 0;
         Crow_DisableAttackCollision(actor);
