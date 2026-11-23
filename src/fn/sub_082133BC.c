@@ -45,8 +45,8 @@ void ForgingBook_SetupPageBackground(u8 *p)
         row = next;
     } while (row <= 1);
     {
-        s32 zero = 0, two = 2;
-        sub_08215EB4(3, 0, 0, 2, two, two, zero, zero);
-        sub_08215EB4(3, 28, 0, 2, two, two, zero, zero);
+        s32 zero = 0;
+        sub_08215EB4(3, 0, 0, 2, 2, 2, zero, zero);
+        sub_08215EB4(3, 28, 0, 2, 2, 2, zero, zero);
     }
 }
