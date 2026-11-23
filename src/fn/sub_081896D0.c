@@ -2,12 +2,7 @@
 #include "contact_collider.h"
 #include "armor_decision_ops.h"
 #include "game_state.h"
-
-static inline void Armor_ClearPart(struct ContactCollider *part, u32 bits)
-{
-    u32 mask = ~bits;
-    part->reactionFlags &= mask;
-}
+#include "scene_combat_colliders.h"
 
 void ActorController_SetBehavior(void *, s32);
 s32 Math_Atan2(s32, s32);
@@ -66,8 +61,8 @@ void Armor_UpdateFacingDecision(struct ArmorFacingActor *actor)
             actor->timer = 0x12C;
             actor->attackPower = actor->initialAttack;
             actor->contacts = 0;
-            Armor_ClearPart(&actor->attack, 0x400008);
-            Armor_ClearPart(&actor->body, 0x400008);
+            ContactCollider_ClearReactionFlags(&actor->attack, 0x400008);
+            ContactCollider_ClearReactionFlags(&actor->body, 0x400008);
         }
     }
     if (actor->delay > 0) {
