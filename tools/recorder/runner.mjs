@@ -196,6 +196,19 @@ function ramHash(memory) {
   return [a >>> 0, b >>> 0];
 }
 
+// A snapshot restores memory, not the wasm call stack (locals, return addresses), so
+// replay restores one only where the live stack matches the one it was taken at:
+// the wasm frames of a JS stack trace taken inside the frame import.
+Error.stackTraceLimit = 256;
+function stackSig() {
+  const out = [];
+  for (const line of new Error().stack.split('\n')) {
+    const m = line.match(/wasm-function\[(\d+)\]:(0x[0-9a-f]+)/);
+    if (m) out.push(m[1] + ':' + m[2]);
+  }
+  return out.join(' ');
+}
+
 function snapshotBuffers(machine) {
   const parts = [[0, machine.heapBase], ...REGIONS];
   return parts.map(([a, n]) => [a, Buffer.from(new Uint8Array(machine.memory.buffer, a, n))]);
@@ -272,7 +285,7 @@ async function record(args) {
   const maxFrames = Number(args.frames || 0);
   const framesFd = fs.openSync(path.join(out, 'frames.bin'), 'w');
   const writesFd = fs.openSync(path.join(out, 'writes.bin'), 'w');
-  const edits = [];
+  const edits = [], sigs = {};
   let machine, g = null, task = null, solar = meta.solar, prevRam = null, writeWords = 0, started = Date.now();
   const pending = [];
   const flush = () => drain(machine, (b) => pending.push(b));
@@ -312,6 +325,7 @@ async function record(args) {
     row.writeUInt32LE(lo, 16); row.writeUInt32LE(hi, 20); row.writeUInt32LE(total, 24); row.writeUInt32LE(0, 28);
     fs.writeSync(framesFd, row);
     if (n % every === 0 || flags) {
+      sigs[n] = stackSig();
       fs.writeFileSync(path.join(out, 'snap', String(n).padStart(8, '0') + '.gz'),
         encodeSnapshot(snapshotBuffers(machine), machine.stackPointer()));
     }
@@ -338,6 +352,8 @@ async function record(args) {
   meta.seconds = (Date.now() - started) / 1000;
   meta.heapBase = machine.heapBase;
   fs.writeFileSync(path.join(out, 'edits.json'), JSON.stringify(edits));
+  fs.writeFileSync(path.join(out, 'snap', 'stacks.json'), JSON.stringify(sigs));
+  meta.stacks = new Set(Object.values(sigs)).size;
   fs.writeFileSync(path.join(out, 'meta.json'), JSON.stringify(meta, null, 1));
   process.stdout.write(JSON.stringify({ session: out, frames: meta.frames, writeWords, seconds: meta.seconds }) + '\n');
 }
@@ -373,7 +389,21 @@ async function serve(args) {
   const meta = JSON.parse(fs.readFileSync(path.join(dir, 'meta.json'), 'utf8'));
   const rows = readFrames(dir);
   const edits = new Map(JSON.parse(fs.readFileSync(path.join(dir, 'edits.json'), 'utf8')).map((e) => [e.frame, e.bytes]));
-  const snaps = fs.readdirSync(path.join(dir, 'snap')).map((f) => Number(f.slice(0, 8))).sort((a, b) => a - b);
+  const snaps = fs.readdirSync(path.join(dir, 'snap')).filter((f) => f.endsWith('.gz')).map((f) => Number(f.slice(0, 8))).sort((a, b) => a - b);
+  const sigFile = path.join(dir, 'snap', 'stacks.json');
+  const sigs = fs.existsSync(sigFile) ? JSON.parse(fs.readFileSync(sigFile, 'utf8')) : {};
+  const bad = new Set();   // snapshots whose restore drifted (a local differed)
+  let restoredFrom = -1;
+  // the latest snapshot in (after, upto] taken at the live call stack
+  const jumpTarget = (after, upto, sig) => {
+    let best = -1;
+    for (const x of snaps) if (x > after && x <= upto && !bad.has(x) && sigs[x] === sig) best = x;
+    return best;
+  };
+  const jump = (s) => {
+    restore(machine, decodeSnapshot(fs.readFileSync(path.join(dir, 'snap', String(s).padStart(8, '0') + '.gz'))));
+    current = s; restoredFrom = s;
+  };
   const read = lineReader();
   const reply = (o) => process.stdout.write(JSON.stringify(o) + '\n');
   let machine, current = -1, lastPixels = 0;
@@ -408,7 +438,7 @@ async function serve(args) {
     traceBufs = [];
   }
   function status() { return { frame: current, perturbed, divergence }; }
-  function go(left, answer, trace) {
+  function go(left, answer, trace, target) {
     // run frames from the current boundary: left more boundaries after the next one
     if (trace) {
       traceDir = path.resolve(trace);
@@ -417,7 +447,7 @@ async function serve(args) {
       tracer = makeTracer();
       setMode(machine, MODE_TRACE);
     } else setMode(machine, 0);
-    plan = { left, answer };
+    plan = { left, answer, target };
     applyBoundary(current);
     return keysAfter(current);
   }
@@ -428,11 +458,17 @@ async function serve(args) {
       endTrace(n);
       try { check(n); } catch (e) {
         current = n; plan = null; traceDir = null; setMode(machine, 0);
-        reply({ error: String(e.message) });
+        if (restoredFrom >= 0) bad.add(restoredFrom);
+        reply({ error: String(e.message), restart: restoredFrom >= 0, badSnapshots: [...bad] });
         return commands();
       }
     }
     current = n;
+    if (plan && plan.target !== undefined && plan.left > 0 && !perturbed) {
+      const s = jumpTarget(n, plan.target, stackSig());
+      if (s >= 0) { jump(s); n = s; plan.left = plan.target - s; }
+      if (plan.left === 0) { const p = plan; plan = null; reply({ ...p.answer, ...status() }); return commands(); }
+    }
     if (plan && plan.left > 0) {
       plan.left--;
       applyBoundary(n);
@@ -458,16 +494,21 @@ async function serve(args) {
           case 'quit': reply({ ok: true }); throw new Stop();
           case 'seek': {
             const want = Number(cmd.frame);
-            let s = -1;
-            for (const x of snaps) if (x <= want) s = x;
-            if (s < 0) throw new Error('no snapshot at or before frame ' + want);
-            if (!(current >= s && current <= want && !perturbed)) {
-              restore(machine, decodeSnapshot(fs.readFileSync(path.join(dir, 'snap', String(s).padStart(8, '0') + '.gz'))));
-              current = s;
+            if (want >= rows.length) throw new Error('frame ' + want + ' is past the end of the recording');
+            for (const b of cmd.bad || []) bad.add(b);
+            const sig = stackSig();
+            if (perturbed || current > want) {
+              // back in time (or off the recording): only a snapshot at this call stack can help
+              const s = jumpTarget(-1, want, sig);
+              if (s < 0) { reply({ error: 'no snapshot at or before frame ' + want + ' matches the live call stack', restart: true, badSnapshots: [...bad] }); continue; }
+              jump(s);
               perturbed = false; divergence = null; override = { solar: null, keys: null };
+            } else {
+              const s = jumpTarget(current, want, sig);
+              if (s >= 0) jump(s);
             }
             if (current === want) { reply({ seek: want, ...status() }); continue; }
-            return go(want - current - 1, { seek: want });
+            return go(want - current - 1, { seek: want }, null, want);
           }
           case 'run': {
             const frames = Math.max(1, Number(cmd.frames || 1));

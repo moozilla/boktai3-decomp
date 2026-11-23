@@ -50,6 +50,16 @@ static uint8_t static_units[8192 / 8];
 
 uint8_t *rec_static_units(void) { return static_units; }
 
+static int game_unit(uint32_t site)
+{
+    uint32_t unit = (site >> 16) & 0x1FFFu;
+    return static_units[unit >> 3] >> (unit & 7) & 1;
+}
+
+/* Trace mode logs everything game-side; from the hardware units only what record
+ * mode logs (their RAM writes), so DMA still shows up as data flow. */
+static int traced(uint32_t site) { return (state.mode & MODE_TRACE) && game_unit(site); }
+
 static int watched_site(uint32_t site, uint32_t address, uint32_t length)
 {
     uint32_t end = address + (length ? length : 1), unit = (site >> 16) & 0x1FFFu;
@@ -80,21 +90,21 @@ static uint32_t *reserve(uint32_t words)
 void __rec_bb(uint32_t site)
 {
     uint32_t *e;
-    if (!(state.mode & MODE_TRACE)) return;
+    if (!traced(site)) return;
     if ((e = reserve(1))) e[0] = site;
 }
 
 void __rec_fn(uint32_t site, uint32_t exit)
 {
     uint32_t *e;
-    if (!(state.mode & MODE_TRACE)) return;
+    if (!traced(site)) return;
     if ((e = reserve(2))) { e[0] = site; e[1] = exit; }
 }
 
 void __rec_ld(uint32_t site, const void *address, uint32_t value, uint32_t wcode)
 {
     uint32_t *e;
-    if (!(state.mode & MODE_TRACE)) return;
+    if (!traced(site)) return;
     if ((e = reserve(3))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)address | wcode << 28; e[2] = value; }
 }
 
@@ -102,14 +112,14 @@ void __rec_st(uint32_t site, void *address, uint32_t value, uint32_t wcode)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, 1u << wcode)) return;
+    if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, 1u << wcode)) return;
     if ((e = reserve(3))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)address | wcode << 28; e[2] = value; }
 }
 
 void __rec_ld64(uint32_t site, const void *address, uint64_t value)
 {
     uint32_t *e;
-    if (!(state.mode & MODE_TRACE)) return;
+    if (!traced(site)) return;
     if ((e = reserve(4))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)address | 3u << 28; e[2] = (uint32_t)value; e[3] = (uint32_t)(value >> 32); }
 }
 
@@ -117,7 +127,7 @@ void __rec_st64(uint32_t site, void *address, uint64_t value)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, 8)) return;
+    if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, 8)) return;
     if ((e = reserve(4))) {
         e[0] = site; e[1] = (uint32_t)(uintptr_t)address | 3u << 28 | 1u << 31;
         e[2] = (uint32_t)value; e[3] = (uint32_t)(value >> 32);
@@ -135,7 +145,7 @@ void __rec_cpy(uint32_t site, void *dst, const void *src, uint32_t length)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
+    if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
     if (length > 0x100000u) length = 0x100000u;
     if ((e = reserve(4u + (length + 3u) / 4u))) {
         e[0] = site; e[1] = (uint32_t)(uintptr_t)dst; e[2] = (uint32_t)(uintptr_t)src; e[3] = length;
@@ -147,7 +157,7 @@ void __rec_set(uint32_t site, void *dst, uint32_t byte, uint32_t length)
 {
     uint32_t *e;
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
+    if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)dst, length)) return;
     if ((e = reserve(4))) { e[0] = site; e[1] = (uint32_t)(uintptr_t)dst; e[2] = byte & 0xffu; e[3] = length; }
 }
 
@@ -165,12 +175,12 @@ static void aggregate(uint32_t site, void *address, uint32_t size, uint32_t stor
 
 void __rec_agg(uint32_t site, void *address, uint32_t size)
 {
-    if (state.mode & MODE_TRACE) aggregate(site, address, size, 0);
+    if (traced(site)) aggregate(site, address, size, 0);
 }
 
 void __rec_aggst(uint32_t site, void *address, uint32_t size)
 {
     if (!state.mode) return;
-    if (!(state.mode & MODE_TRACE) && !watched_site(site, (uint32_t)(uintptr_t)address, size)) return;
+    if (!traced(site) && !watched_site(site, (uint32_t)(uintptr_t)address, size)) return;
     aggregate(site, address, size, 1);
 }

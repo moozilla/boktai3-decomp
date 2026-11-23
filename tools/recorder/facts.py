@@ -86,12 +86,12 @@ class Unit:
         self.functions = [Function(self, f) for f in raw['functions']]
         self.sites = {}
         for fn in self.functions:
-            self.sites[fn.site & 0xFFFF] = fn
             for b in fn.blocks:
                 self.sites[b.site & 0xFFFF] = b
                 for inst in b.insts:
                     if inst.site is not None:
                         self.sites[inst.site & 0xFFFF] = inst
+            self.sites[fn.site & 0xFFFF] = fn   # the entry block shares it; FN events mean the function
 
 
 class Facts:

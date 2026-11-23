@@ -24,6 +24,11 @@ class ReplayError(RuntimeError):
 class Replay:
     def __init__(self, session_path):
         self.session = Path(session_path)
+        self.bad = []          # snapshots whose restore drifted
+        self.restarts = 0
+        self._start()
+
+    def _start(self):
         self.proc = subprocess.Popen(['node', str(RUNNER), 'serve', str(self.session)], cwd=ROOT,
                                      stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
         first = self._read()
@@ -42,13 +47,27 @@ class Replay:
         self.proc.stdin.flush()
         r = self._read()
         if 'error' in r:
-            raise ReplayError(r['error'])
+            self.bad = r.get('badSnapshots', self.bad)
+            raise ReplayError(r['error'], r)
         if 'fatal' in r:
             raise ReplayError(r['fatal'])
         return r
 
     def seek(self, frame):
-        return self.cmd(op='seek', frame=int(frame))
+        """Machine at the end of FRAME. A snapshot only restores where the live wasm call
+        stack matches the one it was taken at; otherwise the runner restarts from power-on
+        (and skips ahead through matching snapshots)."""
+        for _ in range(4):
+            try:
+                return self.cmd(op='seek', frame=int(frame), bad=self.bad)
+            except ReplayError as e:
+                info = e.args[1] if len(e.args) > 1 else {}
+                if not info.get('restart'):
+                    raise
+                self.close()
+                self.restarts += 1
+                self._start()
+        raise ReplayError(f'could not reach frame {frame}')
 
     def run(self, frames=1, trace=None):
         kw = {'op': 'run', 'frames': int(frames)}
