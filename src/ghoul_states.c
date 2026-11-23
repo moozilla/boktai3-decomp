@@ -277,12 +277,8 @@ void Ghoul_UpdateDyingState(struct ChaseActor *actor, s32 frame)
 void Ghoul_UpdateDeathAnimation(struct ChaseActor *actor, s32 frame)
 {
     if (SceneActorReaction_TakePrepared(actor)) {
-        s32 mask;
-        u16 *motionFlags;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 7);
-        motionFlags = &actor->base.motionFlags;
-        mask = -2;
-        *motionFlags = mask & *motionFlags;
+        SceneActorChase_ClearMotionFlagComponent(actor, 1);
     }
     if (frame == 0x28)
         SceneActorChase_SetReactionFlags(actor, 0x10);
@@ -299,22 +295,8 @@ void Ghoul_UpdateHiddenRecovery(struct ChaseActor *actor, s32 frame, u32 unused)
         ActorStatus_SetDrawableFlags(actor, 1);
         ActorShadow_Disable(actor->base.shadow);
     } else if (frame > 0x1A) {
-        void *control;
-        u32 code;
-        u32 *flags;
-        u32 mask;
         SceneActorAnimation_SelectDirectionalEntry((void *)actor, 9);
-        control = Bat_RestoreSavedState;
-        code = 0xD;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = queued;
-        actor->base.controlKind = code;
-        actor->base.target = control;
-        actor->base.field2C8 = queued;
-        flags = &actor->base.pendingControlFlags;
-        mask = ~1;
-        *flags &= mask;
-        actor->base.pendingControl = queued;
+        SceneActorChase_SetControl(actor, Bat_RestoreSavedState, 0xD);
     } else {
         actor->base.restart = queued;
     }
