@@ -1,12 +1,9 @@
 #include "wireless_trade_menu.h"
 #include "global.h"
 #include "render.h"
+#include "engine_pause_flags.h"
 int WirelessExchange_ResolveOutcome(struct WirelessGameExchange *);
 int WirelessExchange_SendPacket(struct WirelessGameExchange *, int, const u32 *, int);
-static inline void set(u32 mask)
-{
-    gEnginePauseFlags |= mask;
-}
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
@@ -19,7 +16,7 @@ void WirelessGameMenu_UpdateOutcomeExchange(struct WirelessGameExchange *p)
         p->outcome = WirelessExchange_ResolveOutcome(p);
         data = p->outcome;
         WirelessExchange_SendPacket(p, 5, &data, 1);
-        set(4);
+        Engine_SetPauseFlags(4);
     }
     if (test(&p->exchangeFlags, 0x300) == 0x300) {
         p->exchangeFlags &= ~WIRELESS_EXCHANGE_OUTCOME;

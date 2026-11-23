@@ -5,6 +5,7 @@
 #include "engine_globals.h"
 #include "player.h"
 #include "ram.h"
+#include "engine_pause_flags.h"
 void Hud_RegisterTimer(u16 *);
 void WirelessGameMenu_SetStatusPanelState(struct WirelessGameExchange *, int);
 void Sound_PlayTrackedSong(int);
@@ -20,10 +21,6 @@ void Sound_PlaySong(int);
 static inline u32 test(u32 *flags, u32 mask)
 {
     return *flags & mask;
-}
-static inline void set(u32 mask)
-{
-    gEnginePauseFlags |= mask;
 }
 void WirelessGameMenu_UpdateActiveRound(struct WirelessGameExchange *p)
 {
@@ -123,7 +120,7 @@ void WirelessGameMenu_UpdateActiveRound(struct WirelessGameExchange *p)
         Hud_ClearTimer();
         Sound_PlaySong(0x372);
         WirelessGameMenu_EnterState(p, WIRELESS_MENU_ROUND_HANDSHAKE);
-        set(4);
+        Engine_SetPauseFlags(4);
         p->roundActive = 0;
     } else {
         p->timer++;
