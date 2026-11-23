@@ -230,6 +230,7 @@ exports.navigate = function* (target, opts = {}) {
     for (let cz = b.z0 >> 8; cz <= (b.z1 - 1) >> 8; cz++) for (let cx = b.x0 >> 8; cx <= (b.x1 - 1) >> 8; cx++) avoid.add(`${cx},${cz}`);
   let plans = 0, pushes = 0;
   const tried = new Set();  // blocks a break attempt failed on
+  const searched = new Set();  // cells a search already tried to get around an obstacle
   exports.message();  // installs the message window hooks before anything opens
   const done = (reached, reason, extra) => ({ reached, reason, scene: exports.where().scene, frames: g.frameNo - start, plans, ...extra });
   while (g.frameNo - start < budget) {
@@ -302,7 +303,17 @@ exports.navigate = function* (target, opts = {}) {
         // a scripted event can hold the player and talk only later
         yield g.until(() => exports.message().open, opts.eventWait ?? 600);
         if (yield* exports.clearInterruptions(opts)) { interrupted = true; break; }
-        blocked.add(`${cx},${cz}`);
+        // something the grid does not show (a person, furniture): search for inputs
+        // that get into the cell anyway, once per cell
+        const k = `${cx},${cz}`;
+        if (exports.session && !searched.has(k)) {
+          searched.add(k);
+          const s2 = yield* exports.searchTo(cx, cz, opts);
+          if (opts.trace) opts.trace({ around: [cx, cz], ...s2 });
+          if (exports.where().scene !== scene0) return done(true, 'scene changed');
+          if (s2.reached) continue;
+        }
+        blocked.add(k);
         break;
       }
     }
