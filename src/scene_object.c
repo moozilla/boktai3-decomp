@@ -86,6 +86,7 @@ success:
 
 void Scene_PlayNeighborStepSound(u32 type)
 {
+    // concession-ok(duplicate-branches): the ROM at 0800435C tests type 5 and keeps one Sound_PlaySong(0x151) per arm; the original chose a per-type step sound whose IDs coincide
     if (type == 5) {
         Sound_PlaySong(0x151);
     } else {
@@ -146,6 +147,7 @@ u8 Scene_IsObjectSurrounded(struct SceneObject *object)
 
 void Scene_PlayMovementEffect(struct SceneObject *object)
 {
+    // concession-ok(duplicate-branches): the ROM at 08004450 dispatches cases 0, 1 and 2-6 apart from the default and keeps two Sound_PlaySong(0x143) calls; the original chose a per-type push sound whose IDs coincide
     switch (object->type) {
         case 0:
             Sound_PlaySong(0x143);
