@@ -3194,7 +3194,6 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
     u8 *control = (u8 *)SceneActorControl_GetState(actor);
     s32 speed;
     u32 event;
-    u16 *scale;
 
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, SceneActorMotion_UpdateTargetTransition, 0x2A);
@@ -3204,27 +3203,9 @@ void Dog_UpdateProbeApproach(struct ChaseActor *actor)
             *flags |= bit;
         }
     }
-    speed = Callback_InvokeActor(*(&actor), *((void **)(((u8 *)actor) + 0x260)));
+    speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
     actor->base.field2C2 = 0x20;
-    {
-        u32 mask = 0xA02F;
-        if (actor->base.motionFlags & mask) {
-            u16 *p = &actor->base.field2C2;
-            *p = 0x40;
-            scale = p;
-        } else {
-            u16 *q = &actor->base.field2C2;
-            u16 v = *q;
-            scale = q;
-            if (v == 0) {
-                *scale = 0x40;
-            }
-        }
-    }
-    if (actor->base.drawableKind == 0)
-        Anim_SetDurationScale((u8 *)actor->base.drawable + 0x48, *scale);
-    else
-        Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
+    SceneActorTurn_ApplyActorDuration(actor);
     event = NavMesh_ConsumeProbeEvent(nav->route);
     if (event) {
         if (SceneActorBehavior_RequestDescriptorTurn(actor, nav->route, 0x20, 0x20, speed)) {
