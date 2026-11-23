@@ -33,11 +33,12 @@ void Ghoul_OnAttackCollision(struct ContactCollider *unused, struct ContactColli
     }
 }
 
-void SceneActorReaction_HandleColliderContact(void);
+void SceneActorReaction_HandleColliderContact(void *, void *, void *);
 
-void Ghoul_OnBodyCollision(void)
+void Ghoul_OnBodyCollision(struct ContactCollider *source, struct ContactCollider *destination,
+                           struct ChaseActor *actor)
 {
-    SceneActorReaction_HandleColliderContact();
+    SceneActorReaction_HandleColliderContact(source, destination, actor);
 }
 
 u8 SceneActorTerrain_CanTraverseCell(u32, u32, u32, u32);

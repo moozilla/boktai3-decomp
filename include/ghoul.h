@@ -39,7 +39,7 @@ struct GhoulCollisionVector {
 
 void Ghoul_OnAttackCollision(struct ContactCollider *, struct ContactCollider *,
                              struct ChaseActor *);
-void Ghoul_OnBodyCollision(void);
+void Ghoul_OnBodyCollision(struct ContactCollider *, struct ContactCollider *, struct ChaseActor *);
 void Ghoul_UpdateAimedDiscThrow(struct ChaseActor *);
 void Ghoul_UpdateIdleState(struct ChaseActor *);
 void Ghoul_UpdateStandingState(struct ChaseActor *);
