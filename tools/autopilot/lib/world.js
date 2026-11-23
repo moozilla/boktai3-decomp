@@ -487,7 +487,9 @@ exports.menuState = () => {
   const h = exports.hudTask();
   if (!h) return null;
   const cb = g.u32(h + 0xa50);
-  return { callback: cb ? g.name(cb) : null, page: g.u8(h + 0x1414), grid: [...g.bytes(h + 0x4384, 12)], extra: [g.u8(h + 0x43b3), g.u8(h + 0xa58)] };
+  // +0xA54: the page's own step (item chosen, use prompt, confirm), another callback
+  const sub = g.u32(h + 0xa54);
+  return { callback: cb ? g.name(cb) : null, sub: sub ? (g.name(sub) || sub.toString(16)) : null, page: g.u8(h + 0x1414), grid: [...g.bytes(h + 0x4384, 12)], extra: [g.u8(h + 0x43b3), g.u8(h + 0xa58)] };
 };
 // Reach a goal inside the pause menu by search: open it, breadth-first over menu keys from
 // snapshots (a node = the menu state above), until goal() holds, then back out to the field.
@@ -495,9 +497,9 @@ exports.menuState = () => {
 exports.menuSearch = function* (goal, opts = {}) {
   const S = exports.session, start = g.frameNo, fieldCb = exports.menuState() && exports.menuState().callback;
   const KEYS = opts.keys || ['down', 'right', 'up', 'left', 'a', 'r', 'l', 'b'];
-  // the node: callback, page, the live cursor (grid bytes 0-3) and the prompt flag; the
+  // the node: callback, its step (+0xA54), page, the live cursor (grid bytes 0-3) and the prompt flag; the
   // remembered cursors of other grids are left out (they multiply states, not choices)
-  const keyOf = () => { const m = exports.menuState(); return m ? [m.callback, m.page, ...m.grid.slice(0, 4), m.extra[1]].join(',') : ''; };
+  const keyOf = () => { const m = exports.menuState(); return m ? [m.callback, m.sub, m.page, ...m.grid.slice(0, 4), m.extra[1]].join(',') : ''; };
   yield g.press('start', 2); yield g.press(0, 60);
   // the menu opens on the page it was left on: L/R to the page asked for (1 items, 3 Solar Gun)
   for (let i = 0; i < 8 && opts.page !== undefined && exports.menuState() && exports.menuState().page !== opts.page; i++) {
@@ -516,7 +518,9 @@ exports.menuSearch = function* (goal, opts = {}) {
       const path = [...node, k];
       if (opts.tryTrace) opts.tryTrace(path.join(' '));
       yield* play(path);
-      if (goal()) { found = path; break search; }
+      // an effect that plays out over frames (life refilling after an item is used):
+      // after A, judge again once opts.settle more frames have run
+      if (goal() || (k === 'a' && opts.settle && (yield g.press(0, opts.settle), goal()))) { found = path; break search; }
       const st = exports.menuState();
       if (!st || st.callback === fieldCb) continue;  // closed the menu
       const key = keyOf();

@@ -132,8 +132,12 @@ const GOALS = {
       {
         const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
         if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
-          const life0 = p.currentStatA;
-          const r = yield* L.menuSearch(() => life() > life0, { max: 300 });
+          const life0 = p.currentStatA, items0 = JSON.stringify(L.bags().items);
+          // items page only (L/R over the other pages crashed the port); the life bar fills
+          // over many frames, so a used item is judged by the bag changing as well
+          const r = yield* L.menuSearch(() => life() > life0 || JSON.stringify(L.bags().items) !== items0,
+            { max: 300, page: 1, keys: ['down', 'right', 'up', 'left', 'a', 'b'], settle: 90 });
+          if (r.done) yield g.press(0, 120);
           event({ skill: 'heal', from: life0, to: life(), ...r });
         }
       }
@@ -423,6 +427,9 @@ s.restore = (snap) => { restore(snap); readAt.length = 0; for (let i = 0; i < sn
 const ok = s.run(function* (g) {
   g.lib.session = s;
   g.on('Input_UpdatePadStates', () => { readAt[s.frame] = 1; });
+  // --life N: set the player's life to N before the goal (a port-only test aid, e.g. of
+  // healing; such a run cannot be verified on the ROM)
+  if (opt('--life') && g.$.gPlayers[0]) g.$.gPlayers[0].currentStatA = +opt('--life');
   const reached = yield* GOALS[goal](g, g.lib);
   yield* settle(g);
   return reached;
@@ -443,7 +450,8 @@ fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `aut
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
 let verified = true;
-if (args.includes('--verify')) verified = verify(end);
+if (args.includes('--verify') && opt('--life')) console.log('--verify skipped: --life changed the port\'s memory');
+else if (args.includes('--verify')) verified = verify(end);
 process.exit(ok && verified ? 0 : 1);
 
 // The run as a tools/emu/harness script for the original ROM: `holdt KEYS N` holds
