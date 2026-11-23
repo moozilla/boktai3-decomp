@@ -886,11 +886,11 @@ s32 Golem_OnSharedActorUpdate(void *actor)
     return 0;
 }
 
-void SceneActorEffects_ReleaseResources(void);
+void SceneActorEffects_ReleaseResources(void *);
 
-s32 Golem_OnDestroy(u8 *unused)
+s32 Golem_OnDestroy(u8 *actor)
 {
-    SceneActorEffects_ReleaseResources();
+    SceneActorEffects_ReleaseResources(actor);
     return 0;
 }
 
