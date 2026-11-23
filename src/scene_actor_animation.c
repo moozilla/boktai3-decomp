@@ -805,10 +805,8 @@ int Actor_InitBehaviorFromScript(void *unused, struct SceneActor *actor)
         actor->rateB = Script_GetValue();
     } else {
         int *dst = &actor->rateC;
-        int rate;
-        rate = 256;
-        *dst = rate;
-        actor->rateA = rate;
+        *dst = 256;
+        actor->rateA = 256;
         actor->rateB = 512;
     }
     if (Script_SeekToKeyword(0x48)) {
