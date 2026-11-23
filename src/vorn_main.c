@@ -926,13 +926,8 @@ void SceneActor_CallContextScriptB(struct RoomActor *actor)
     s32 values[12];
     struct ScriptUtilityArguments arguments;
     struct SceneActorScriptContext *context;
-    {
-        u32 mask = 0x80000;
-        u32 offset = 0x2D0;
-        u32 *field = (void *)((u32)actor + offset);
-        if (*field & mask)
-            return;
-    }
+    if (SceneActorPlacement_ReadFlags32(actor, 0x80000))
+        return;
     context = ((struct ChaseActor *)actor)->base.context;
     if (!(u16)actor->script1F4)
         return;
