@@ -9,27 +9,13 @@ void Anim_SetDurationScale(void *, u32);
 void Anim_SetFrameDurationScale(void *, u32);
 u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
-static inline void SetControl(struct ChaseActor *actor, void *control, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
 void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
 {
     u8 *group = (u8 *)&actor->group.common;
     s32 speed;
     u16 *scale;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        SetControl(actor, actor->base.onAlternateEntry, 1);
+        SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
     } else {
         SceneActorAnimation_SelectDirectionalEntry(actor, 1);
         speed = Callback_InvokeActor(actor, actor->base.animationQuery.opaque);
@@ -54,7 +40,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
                                                           speed)) {
             Trigger_ConsumePending((u8 *)actor + 0xc, 1);
             SceneActorTerrain_EnterState(actor, 2, 0, 2);
-            SetControl(actor, actor->base.onStanding, 0);
+            SceneActorTerrain_InstallControl(actor, actor->base.onStanding, 0);
         } else {
             actor->base.counter2AC++;
         }

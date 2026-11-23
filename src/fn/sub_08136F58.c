@@ -1,3 +1,5 @@
+#include "scene_actor_control_phase.h"
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_chase_shared.h"
 #include "scene_actor_reset.h"
@@ -5,14 +7,6 @@ s32 Callback_InvokeActor(void *, void *);
 void SceneActorAttachment_ReplaceResponseSlot(void *, u32, u32, u32);
 void sub_08136F48(void *, struct SceneActorRegistryControl *);
 
-static inline u8 ConsumeEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
 
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
@@ -29,14 +23,6 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     actor->base.pendingControl = 0;
 }
 
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
@@ -64,7 +50,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryContr
 void sub_08136F58(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    if (ConsumeEntry(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
         SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
@@ -79,7 +65,7 @@ void sub_08136F58(struct ChaseActor *actor)
         }
         if (((s32)(*counter)) > 60) {
             u32 bit;
-            SetState(actor, 0, 0, 7);
+            SceneActorTerrain_EnterState(actor, 0, 0, 7);
             SetControl(actor, actor->base.onAlternateEntry, 1);
             // The loop around this assignment doubles bit's use weight in
             // global allocation, which gives it r8 ahead of group (rasolve).

@@ -1,3 +1,5 @@
+#include "terrain_sampling.h"
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_behavior.h"
 #include "scene_actor_chase_shared.h"
 #include "global.h"
@@ -22,14 +24,6 @@ static inline void SetWordFlags(u32 *flags, u32 input)
 }
 
 
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
@@ -46,13 +40,6 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     actor->base.pendingControl = 0;
 }
 
-static inline u32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 
 static inline u32 CellHeight(u32 cell, struct ContactPosition *position)
 {
@@ -179,7 +166,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
         *timer = 180;
         SceneActorAttachment_ReplaceResponseSlot(actor, 0, 1, actor->base.category);
         SetControl(actor, GROUP_FIELD(group, 0x68, void *), 9);
-        SetState(actor, 0, 0, 11);
+        SceneActorTerrain_EnterState(actor, 0, 0, 11);
     }
     {
         u32 mask = 0x80;
@@ -200,7 +187,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
         struct RouteLink *link = (void *)(group + 0x74);
         dest->x = link->point->x;
         dest->z = link->point->z;
-        dest->y = CellHeight(CellIndex(dest), dest);
+        dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
     bit = 0x200;
     GROUP_FIELD(group, bit, struct ContactPosition *)->y = actor->base.body.position.y;

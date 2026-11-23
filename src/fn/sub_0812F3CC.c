@@ -16,12 +16,6 @@ static inline void SceneActorReaction_SetBits(u16 *p, u32 mask)
 {
     *p |= mask;
 }
-static inline u8 SceneActorReaction_HasContact(struct SceneActorReactionMotion *motion, u32 mask)
-{
-    if (motion->flags & mask)
-        return 1;
-    return 0;
-}
 static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
                                                  u8 byteZero)
 {
@@ -47,8 +41,7 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
         goto fail;
     if (!SceneActorReaction_ReadFlags(a, 0x1000000, &flags))
         goto fail;
-    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->base.tracking.target,
-                                       1))
+    if (!SceneActorChase_TrackingFlags(&a->base.tracking, 1))
         goto fail;
     {
         u32 mask = 0x80;

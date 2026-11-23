@@ -1,16 +1,9 @@
+#include "scene_actor_control_phase.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_terrain.h"
 // confidence=low: hides the drawable and moves the actor above the active field.
-static inline u8 TakeReset(struct ChaseActor *a)
-{
-    if (a->base.field2B1) {
-        a->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
 static inline void SetFlags(struct ChaseActor *actor, u32 mask)
 {
     u16 value = mask;
@@ -31,7 +24,7 @@ static inline void SceneActorControl_SetDrawableFlags(u32 bits, struct ChaseActo
 
 void SceneActorControl_HideOffscreen(struct ChaseActor *actor)
 {
-    if (TakeReset(actor)) {
+    if (SceneActorControl_TakeStateEntry(actor)) {
         struct ContactPosition *position;
         if (actor->base.drawableKind == 0)
             position =

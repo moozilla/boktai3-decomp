@@ -1,3 +1,5 @@
+#include "terrain_sampling.h"
+#include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
@@ -37,14 +39,6 @@ static inline u32 TestSlot(s32 i)
     return flags[i] & mask;
 }
 
-static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
 
 static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
 {
@@ -61,13 +55,6 @@ static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind
     actor->base.pendingControl = 0;
 }
 
-static inline u32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
 
 
 struct FlagHalfword {
@@ -240,7 +227,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
     actor->base.field2C2 = 0x40;
     SceneActorAnimation_SelectDirectionalEntry(actor, 0);
     actor->base.tracking.target = 0;
-    SetState(actor, 3, 1, 0);
+    SceneActorTerrain_EnterState(actor, 3, 1, 0);
     SetControl(actor, SceneActorReaction_RestoreAfterDelay, 14);
     SetFlags(actor, 0x10);
     SaveControl(&group->saved, actor->base.onAlternateEntry, 7);
@@ -251,7 +238,7 @@ u32 sub_0813727C(struct ChaseActor *actor)
         struct RouteLink *link = &group->route;
         dest->x = link->point->x;
         dest->z = link->point->z;
-        dest->y = CellHeight(CellIndex(dest), dest);
+        dest->y = CellHeight(Terrain_GetCellIndex(dest), dest);
     }
     bit = 0x200;
     group->destination->pad = 1;
