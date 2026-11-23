@@ -44,6 +44,7 @@
 #include "scene_actor_init_group.h"
 
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_chase_shared.h"
 
 void Bee_OnAttackCollision(void)
 {
@@ -498,21 +499,6 @@ static inline void Bee_AnchorPolarOffset(struct ContactPosition *out, u16 angle,
     out->z = Math_ShiftTowardZero(gUnk_086149C4[angle & 255] * radius, 12);
 }
 
-static inline void Bee_SetAnchorControl(struct ChaseActor *a, void *cb, u32 kind)
-{
-    u8 *taken = &a->base.field2B2;
-    *taken = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 
 static inline void Bee_ClearAnchorMotion(u32 *zero, void *out)
 {
@@ -577,7 +563,7 @@ void Bee_StartMoveToBody(struct ChaseActor *actor, u16 *args)
     Bee_SubVector(actor, &actor->base.body.position, &offset);
     Bee_ClearAnchorMotion(&work.fill, &body->motion);
     Bee_SetAnchorState(actor, 2, 0, 10);
-    Bee_SetAnchorControl(actor, actor->base.onAlternateEntry, 1);
+    SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
 }
 
 u8 *TerrainModifiers_FindCellOverride(int, int);
@@ -1256,20 +1242,6 @@ void Bee_UpdateReactionPhase(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-static inline void Bee_SetRecoveryControl(struct ChaseActor *a, void *cb, u32 kind)
-{
-    a->base.field2B2 = 1;
-    a->base.stepDone = 0;
-    a->base.controlKind = kind;
-    a->base.target = cb;
-    a->base.field2C8 = 0;
-    {
-        u32 *flags = &a->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    a->base.pendingControl = 0;
-}
 
 // confidence=low: approaches a saved player position during the recovery animation.
 
@@ -1295,7 +1267,7 @@ void Bee_ApproachSavedPlayerPosition(struct ChaseActor *actor)
     struct Bee *body = actor->base.context;
     if (Bee_TakeControlEntry(&actor->base.field2B1)) {
         actor->base.body.direction = actor->base.tracking.heading;
-        Bee_SetRecoveryControl(actor, Bee_UpdateRecoveryAnimation, 0x26);
+        SceneActorChase_SetControl(actor, Bee_UpdateRecoveryAnimation, 0x26);
         *(struct BeePackedPosition *)&body->curveSubject.position =
             *(struct BeePackedPosition *)&((struct SceneActorChasePlayer *)gPlayers[0])
                  ->target.position;
