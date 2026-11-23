@@ -2,6 +2,7 @@
 #include "scene_actor_registry.h"
 #include "player.h"
 #include "scene_actor_status.h"
+#include "word_flags.h"
 u8 *TerrainModifiers_FindCellOverride(s32, s32);
 static inline u32 TerrainHeight(struct ChaseActor *actor, u32 index)
 {
@@ -45,8 +46,8 @@ void SceneActorMovement_UpdateHeight(struct ChaseActor *actor)
         }
         *ground = height;
     } else {
-        u32 mask = 0x4000;
-        if (!(actor->base.motionFlags & mask) && IsPlayerRelativeCategory(category)) {
+        if (!HalfwordFlags_Test(0x4000, &actor->base.motionFlags) &&
+            IsPlayerRelativeCategory(category)) {
             u32 height = (u16)gPlayers[0]->position.y;
             actor->base.groundHeight = height;
         } else {
