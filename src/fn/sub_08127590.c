@@ -1,3 +1,4 @@
+#include "word_flags.h"
 #include "sprite_projectile.h"
 #include "global.h"
 #include "ram.h"
@@ -18,10 +19,6 @@ void sub_081274F4(void *, s32, s32, s32, s32);
 static inline u32 Busy(u32 mask)
 {
     return (gEngineFlags | gScenePauseFlags) & mask;
-}
-static inline u32 TestFlags(u32 mask, u32 *value)
-{
-    return *value & mask;
 }
 static inline void SpriteProjectile_StepPlayback(struct Projectile *sprite,
                                                  struct DisplaySequenceState *state,
@@ -128,7 +125,7 @@ struct Projectile *SpriteProjectile_Create(struct ContactPosition *position,
     }
     if (Busy(0x400))
         return 0;
-    if (TestFlags(4, &gUnk_02000560))
+    if (Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     p = SpritePool10_AllocateSlot(pool);
     if (!p)
