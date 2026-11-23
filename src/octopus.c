@@ -1322,14 +1322,14 @@ void Octopus_ClearStateChangedFlag(struct SClearStateChangedFlag *s)
    too: without it cse carries values across and reload picks other
    registers. */
 
-void Octopus_WaitThenResetPhase(u8 *p)
+void Octopus_WaitThenResetPhase(struct ChaseActor *actor)
 {
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(s32 *)(p + 0x2AC) > 60)
-        Ivy_ResetPhase(p);
-    (*(s32 *)(p + 0x2AC))++;
+    if ((s32)actor->base.counter2AC > 60)
+        Ivy_ResetPhase((u8 *)actor);
+    actor->base.counter2AC++;
 }
 
 void Octopus_ThrowCapturedTarget(struct ChaseActor *actor);
@@ -1354,15 +1354,10 @@ void Octopus_EnterReleasePhase(struct ChaseActor *actor)
     }
 }
 
-struct SClearAnimationRestartFlag {
-    u8 filler[0x000002B1];
-    u8 f;
-};
-
-void Octopus_ClearAnimationRestartFlag(struct SClearAnimationRestartFlag *s)
+void Octopus_ClearAnimationRestartFlag(struct ChaseActor *actor)
 {
-    if (s->f != 0)
-        s->f = 0;
+    if (actor->base.field2B1 != 0)
+        actor->base.field2B1 = 0;
 }
 
 /* Like Ivy_ResetPhase, but the phase's behaviour byte restarts at 1. */
@@ -1382,16 +1377,16 @@ static inline void Ivy_ResetPhaseActive(u8 *p)
 /* Count frames until the limit at sub + 0x42, then restart the phase
    (see Ivy_WaitLimitThenResetPhase for the empty test of the taken flag). */
 
-void Octopus_WaitLimitThenResetPhase(u8 *p)
+void Octopus_WaitLimitThenResetPhase(struct ChaseActor *actor)
 {
-    u8 *sub = p + 0x3D4;
-    if (SceneActorControl_TakeFlag(&p[0x2B1])) {
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         DEBUG_PRINT();
     }
-    if (*(u16 *)(sub + 0x42) <= *(s32 *)(p + 0x2AC))
-        Ivy_ResetPhaseActive(p);
+    if (group->common.gate.duration <= (s32)actor->base.counter2AC)
+        Ivy_ResetPhaseActive((u8 *)actor);
     else
-        (*(s32 *)(p + 0x2AC))++;
+        actor->base.counter2AC++;
 }
 
 static inline void ResetState_ReturnToIdle(struct ChaseActor *actor)
