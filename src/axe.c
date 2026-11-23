@@ -3361,7 +3361,7 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
             flag |= actor->base.motionFlags;
             actor->base.motionFlags = flag;
         }
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13C);
+        Axe_SetAuxiliarySpriteRenderState(actor, group->blackPalette, 0x13C);
         {
             u32 flag = 0x400;
             group->flagsE4C |= flag;
@@ -3414,22 +3414,11 @@ void ActorGroup_ResetActivePhase(struct ChaseActor *actor)
     }
 }
 
-struct ActorGroupMotionState {
-    u8 unknown0[0x888];
-    struct ContactPosition position;
-    u8 unknown890[0x5bc];
-    u32 flags;
-    u8 unknownE50[0x68];
-    u16 timer;
-    u8 unknownEBA[6];
-    u16 duration;
-};
-
 void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed);
 
 void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionState *group = actor->base.context;
+    struct Axe *group = actor->base.context;
     if (TakePending(actor)) {
         SceneActorChase_SetControl(actor, SceneActorControl_TiltRotation, 0x31);
         {
@@ -3439,10 +3428,10 @@ void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
         }
         {
             u32 flag = 0x200;
-            group->flags |= flag;
+            group->flagsE4C |= flag;
         }
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13c);
-        group->timer = group->duration;
+        Axe_SetAuxiliarySpriteRenderState(actor, group->blackPalette, 0x13c);
+        group->attackCooldowns[0] = group->attackDelays[0];
     }
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
@@ -3506,24 +3495,11 @@ void Axe_UpdateRecoverTimer2(struct ChaseActor *actor)
         actor->base.counter2AC++;
 }
 
-struct ActorGroupMotionStateBeginExtendedMotion {
-    u8 unknown0[0x8A8];
-    struct ContactPosition position;
-    u8 unknown890[0x59c];
-    u32 flags;
-    u8 unknownE50[0x6C];
-    u16 timer;
-    u8 unknownEBE[6];
-    u16 duration;
-    u8 unknownEC6[10];
-    u8 active;
-};
-
 void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame);
 
 void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionStateBeginExtendedMotion *group = actor->base.context;
+    struct Axe *group = actor->base.context;
     if (TakePending(actor)) {
         SceneActorChase_SetControl(actor, Axe_UpdateTrailFadeIn, 0x27);
         {
@@ -3533,10 +3509,10 @@ void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
         }
         {
             u32 flag = 0x1000;
-            group->flags |= flag;
+            group->flagsE4C |= flag;
         }
-        group->timer = group->duration;
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13D);
+        group->attackCooldowns[2] = group->attackDelays[2];
+        Axe_SetAuxiliarySpriteRenderState(actor, group->redPalette, 0x13D);
         group->active = 1;
         Sound_PlaySong(0x16F);
     }
@@ -3559,7 +3535,7 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         context->lungeQueued = 1;
     if (actor->base.stepDone) {
-        Axe_SetAuxiliarySpriteRenderState(actor, &context->position, 0x13C);
+        Axe_SetAuxiliarySpriteRenderState(actor, context->blackPalette, 0x13C);
         actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
         {
             u32 *flags = &context->flagsE4C;

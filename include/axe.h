@@ -20,8 +20,11 @@ struct Axe {
     struct ChaseActor chase;
     u8 unknown624[0xE4];
     struct AxeTrailSlot trail[4];
-    struct ContactPosition position; /* Legacy name for the start of the black effect palette. */
-    u8 unknown890[0x78];
+    /* Effect palettes (Axe_InitEffectPalettes): all black, red (two halves: red, blue) and
+     * white; the white one is followed by the original palette it fades back to. */
+    u16 blackPalette[16];
+    u16 redPalette[32];
+    u16 whitePalette[16];
     u16 originalEffectPalette[16];
     struct ContactCollider auxiliaryAttack[3];
     struct ContactPosition trailPosition, trailVelocity;
