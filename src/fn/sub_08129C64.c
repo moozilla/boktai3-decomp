@@ -1,3 +1,4 @@
+#include "display_sequence_inline.h"
 #include "global.h"
 #include "engine_globals.h"
 #include "display_sequence.h"
@@ -113,21 +114,8 @@ static inline void Subtract(struct SceneVec *out, struct SceneVec *a, struct Sce
     out->z = a->z - b->z;
 }
 
-static inline u16 DisplaySequence_GetIndex(struct DisplaySequenceState *state)
-{
-    return state->index;
-}
 
-static inline u32 DisplaySequence_ReadCommand(const u16 *command)
-{
-    return *command;
-}
 
-static inline u32 DisplaySequence_MaskCommand(u32 command, u32 mask)
-{
-    mask &= command;
-    return mask;
-}
 
 /* Apply the current frame and flips, then advance the stored playback state.
  * The duration calculation uses the newly selected command's low four bits. */
