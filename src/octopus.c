@@ -1071,28 +1071,18 @@ void Octopus_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     }
 }
 
-struct T {
-    u8 f[6];
-    u16 flags;
-};
-
-struct S {
-    u8 filler[0x188];
-    struct T t;
-};
-
-s32 Octopus_SetAnimationRefreshFlag(struct S *s)
+s32 Octopus_SetAnimationRefreshFlag(struct ChaseActor *actor)
 {
-    struct T *t = &s->t;
-    t->flags = 4 | t->flags;
+    struct ContactCollider *collider = &actor->base.colliderB;
+    collider->flags = 4 | collider->flags;
     return 1;
 }
 
 void Collider_SetPosition(void *, void *, u32);
 
-s32 Octopus_UpdateBodyColliderPosition(u8 *s)
+s32 Octopus_UpdateBodyColliderPosition(struct ChaseActor *actor)
 {
-    Collider_SetPosition(s + 0x134, s + 0x5c, 0);
+    Collider_SetPosition(&actor->base.colliderA, &actor->base.body.position, 0);
     return 1;
 }
 
@@ -1828,9 +1818,9 @@ s32 Callback_InvokeActor(void *, void *);
 
 void SceneActorControl_DispatchControl(void *);
 
-s32 Octopus_SetAnimationRefreshFlag(struct S *s);
+s32 Octopus_SetAnimationRefreshFlag(struct ChaseActor *actor);
 
-s32 Octopus_UpdateBodyColliderPosition(u8 *s);
+s32 Octopus_UpdateBodyColliderPosition(struct ChaseActor *actor);
 
 struct SUpdate {
     u8 filler[0x27c];
