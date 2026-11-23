@@ -97,7 +97,7 @@ void ScreenMessage_Destroy(struct ScreenMessage *p)
 
 s32 ScreenMessage_Initialize(struct ScreenMessage *s)
 {
-    u32 zero, one, value;
+    u32 value;
     void *a, *p, *resource;
     struct SceneInputResource *obj;
     struct SceneInputResource *obj2;
@@ -108,15 +108,14 @@ s32 ScreenMessage_Initialize(struct ScreenMessage *s)
     u32 *sound;
     u32 result;
     Bg_ClearTilemap(0);
-    zero = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
     a = ScriptProc_Start(0xC091, 0xA597);
     value = 3;
-    Bg_SetupLayers(2, 0, a, 0, zero, one = 1, &value);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    Bg_SetupLayers(2, 0, a, 0, 0, 1, &value);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     p = ((struct ScreenMessagePalette *)ScriptProc_Start(0x92B3, 0x81B))->colors;
     CpuSet(p, gBgPaletteBuffer, 0x100);
     global = &gScreenParams;
@@ -125,17 +124,17 @@ s32 ScreenMessage_Initialize(struct ScreenMessage *s)
         resource = ScriptProc_Start(0xCB05, 0x530D);
         obj = &s->choices[0].graphics;
         ResourceHeader_Relocate(obj, resource);
-        Widget_InitLinked(&s->choices[0].sprite, obj, 0x4B, 0x10, zero, zero, zero, zero);
+        Widget_InitLinked(&s->choices[0].sprite, obj, 0x4B, 0x10, 0, 0, 0, 0);
         obj2 = &s->choices[1].graphics;
         ResourceHeader_Relocate(obj2, resource);
-        Widget_InitLinked(&s->choices[1].sprite, obj2, 0x4C, 0x10, zero, zero, zero, zero);
+        Widget_InitLinked(&s->choices[1].sprite, obj2, 0x4C, 0x10, 0, 0, 0, 0);
         x = 0xFFF8;
         *(u16 *)&s->choices[0].sprite.position.x = x;
         *(u16 *)&s->choices[0].sprite.position.y = y = 0xFFC0;
         *(u16 *)&s->choices[1].sprite.position.x = x;
         *(u16 *)&s->choices[1].sprite.position.y = y;
-        s->choices[0].sprite.flags |= one;
-        s->choices[1].sprite.flags |= one;
+        s->choices[0].sprite.flags |= 1;
+        s->choices[1].sprite.flags |= 1;
         save = (u32 *)&s->originalPalette;
         old = (u32)s->choices[0].sprite.palette;
         *save = old;
@@ -150,9 +149,9 @@ s32 ScreenMessage_Initialize(struct ScreenMessage *s)
     TextWindow_SetScript(result, global->script);
     TextWindow_Refresh(*sound, global->message);
     TextWindow_StartPlayback(*sound);
-    s->fadeSpeed = zero;
+    s->fadeSpeed = 0;
     Menu_StartFadeIn(0);
-    s->selection = one;
+    s->selection = 1;
     Palette_SetBackdropColor(0x73FF);
     return 0;
 }

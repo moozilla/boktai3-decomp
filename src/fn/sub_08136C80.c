@@ -2,11 +2,8 @@
 #include "scene_input_widget.h"
 #include "global.h"
 #include "scene_actor_placement.h"
+#include "scene_actor_chase_shared.h"
 void ActorShadow_Disable(void *);
-static inline void ClearWord(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 static inline void ClearTile(struct SceneInputWidget *p, u32 mask)
 {
     p->flags &= mask;
@@ -25,7 +22,7 @@ void SceneActorPlacement_HideActor(struct RoomActor *s)
             s->behaviorFlags = flags | bit;
             if (s->drawableKind == 0) {
                 u32 *p = s->drawable;
-                ClearWord(p, ~2);
+                SceneActorChase_AndWordFlags(p, ~2);
                 drawable = p;
             } else {
                 struct SceneInputWidget *p;

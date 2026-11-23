@@ -1,11 +1,10 @@
+#include "scene_actor_placement.h"
+#include "scene_actor_chase_shared.h"
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
 #include "area_effect_link.h"
 #include "scene_actor_terrain.h"
 #include "scene_actor_reset.h"
-
-u32 Nav_IsPositionInMesh(void *, struct ContactPosition *, void *);
-s32 Terrain_ApplyBlocked(void *, struct ContactPosition *, void *);
 
 static inline u32 TestSlot(s32 i)
 {
@@ -50,13 +49,10 @@ static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
     return best;
 }
 
-static inline void ClearHalfFlags(u16 *flags, u32 mask)
+static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorChaseGroup *group,
+                        struct Player **slot)
 {
-    *flags &= mask;
-}
-static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slot)
-{
-    void *shape = *(void **)(group + 0x1fc);
+    void *shape = group->route;
     struct ContactPosition *position = &actor->base.body.position;
     void *destination = &(*slot)->position;
     if (Nav_IsPositionInMesh(shape, position, destination)) {
@@ -67,14 +63,14 @@ static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slo
             return 1;
         }
     }
-    ClearHalfFlags(&actor->base.motionFlags, ~0x200);
+    SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
     return 0;
 }
 
 // confidence=low: heads for the nearest eligible link player; FALSE when there is none.
 u32 sub_08137AFC(struct ChaseActor *actor)
 {
-    u8 *group = (u8 *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     s32 best = FindNearestEligiblePlayer(actor);
 
     if (best < 0)

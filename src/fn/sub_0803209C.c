@@ -1,6 +1,6 @@
 #include "global.h"
 int Text_ExtractDecimalDigit(int *, int);
-void Text_FormatDecimal(u8 *buffer, volatile int value)
+void Text_FormatDecimal(u8 *buffer, int value)
 {
     int started = 0;
     u8 *out = buffer;
@@ -45,10 +45,8 @@ void Text_FormatDecimal(u8 *buffer, volatile int value)
     {
         int v;
         int next;
-        u8 *end;
         digit = 0;
         v = value;
-        end = out + 1;
         if (v > 0) {
             do {
                 digit++;
@@ -57,7 +55,7 @@ void Text_FormatDecimal(u8 *buffer, volatile int value)
             } while (next > 0);
             value = next;
         }
-        *out = digit + '0';
-        *end = 0;
+        *out++ = digit + '0';
+        *out = 0;
     }
 }

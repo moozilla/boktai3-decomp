@@ -17,11 +17,11 @@ void Hud_UpdateInventorySwapAnimation(u8 *p)
         MenuDisplay_InterpolateActivePairPositions(p, n);
     } else {
         u32 *q = (u32 *)(p + 0x2aa8);
-        u32 v = *q, m = 1;
-        *q = v | m;
-        *(u32 *)(p + 0x2b08) |= m;
-        *(u32 *)(p + 0x41e8) |= m;
-        *(u32 *)(p + 0x4248) |= m;
+        u32 v = *q;
+        *q = v | 1;
+        *(u32 *)(p + 0x2b08) |= 1;
+        *(u32 *)(p + 0x41e8) |= 1;
+        *(u32 *)(p + 0x4248) |= 1;
         Inventory_SwapEquipmentEntries(p[0x438a], p[0x4387]);
         PauseInventory_BeginItemSwapSelection(p, 0);
     }

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link_selection_mode.h"
 #include "input.h"
 #include "area_effect_link.h"
 
@@ -49,14 +50,6 @@ static inline u16 LinkReady_GetSelection(struct LinkReadyState *p, s32 i)
         return -1;
     return p->selection[i];
 }
-static inline u8 LinkReady_IsStartRequested(u16 value, u16 mask)
-{
-    value &= mask;
-    if (value == 0x1400)
-        return 1;
-    return 0;
-}
-
 static inline u8 LinkReady_HasMode(u32 value, u32 mask, u32 expected)
 {
     value &= mask;
@@ -198,7 +191,7 @@ s32 LinkMenu_WaitForReadyPeers(struct LinkReadyState *p)
                 p->ready[i] = 0;
             }
 
-        if (LinkReady_IsStartRequested(*p->selection, 0x3c00)) {
+        if (LinkSelection_IsStart(*p->selection, 0x3c00)) {
             if (gLinkSession)
                 ((struct LinkReadySessionFlags *)gLinkSession)->startRequested = 1;
             if (p->countdown) {

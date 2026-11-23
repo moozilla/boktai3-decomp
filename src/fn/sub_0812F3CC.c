@@ -1,6 +1,7 @@
 #include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_reset.h"
+#include "scene_actor_chase_shared.h"
 
 void *SceneActorContacts_SelectForActor(void *, u32);
 void SceneActorControl_OnIdle(void);
@@ -11,19 +12,9 @@ static inline u32 SceneActorReaction_ReadFlags(struct ChaseActor *a, u32 mask, u
     *out = f;
     return bits;
 }
-static inline void SceneActorReaction_ClearBits(u32 *p, u32 mask)
-{
-    *p &= mask;
-}
 static inline void SceneActorReaction_SetBits(u16 *p, u32 mask)
 {
     *p |= mask;
-}
-static inline u8 SceneActorReaction_HasContact(struct SceneActorReactionMotion *motion, u32 mask)
-{
-    if (motion->flags & mask)
-        return 1;
-    return 0;
 }
 static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, u32 kind, u32 zero,
                                                  u8 byteZero)
@@ -33,7 +24,7 @@ static inline void SceneActorReaction_SetControl(struct ChaseActor *a, void *p, 
     a->base.controlKind = kind;
     a->base.target = p;
     a->base.field2C8 = zero;
-    SceneActorReaction_ClearBits(&a->base.pendingControlFlags, ~1);
+    SceneActorChase_AndWordFlags(&a->base.pendingControlFlags, ~1);
     a->base.pendingControl = zero;
 }
 // confidence=low: begins a contact reaction after filtering actor and contact flags.
@@ -50,8 +41,7 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
         goto fail;
     if (!SceneActorReaction_ReadFlags(a, 0x1000000, &flags))
         goto fail;
-    if (!SceneActorReaction_HasContact((struct SceneActorReactionMotion *)&a->base.tracking.target,
-                                       1))
+    if (!SceneActorChase_TrackingFlags(&a->base.tracking, 1))
         goto fail;
     {
         u32 mask = 0x80;
@@ -59,8 +49,8 @@ u8 SceneActorReaction_BeginContactResponse(struct ChaseActor *a)
         if (result)
             goto fail;
     }
-    if (*(u8 **)((u8 *)a + 0x45C)) {
-        u32 attachmentFlags = (*(u8 **)((u8 *)a + 0x45C))[5];
+    if (((u8 *)a->group.contactNode)) {
+        u32 attachmentFlags = (((u8 *)a->group.contactNode))[5];
         if (attachmentFlags & 1)
             goto fail;
         {
@@ -81,7 +71,7 @@ fail:
 
 success: {
     struct SceneActorRegistryControl *control = &group->common.control;
-    SceneActorReaction_ClearBits(flags, 0xFFFEBE3F);
+    SceneActorChase_AndWordFlags(flags, 0xFFFEBE3F);
     control->counter = 0;
     byteZero = 0;
     control->field14 = 0;
@@ -95,7 +85,7 @@ success: {
     a->base.behavior2AA = byteZero;
     a->base.counter2AC = 0;
     a->base.field2B1 = 1;
-    SceneActorReaction_ClearBits(flags, ~0x10);
+    SceneActorChase_AndWordFlags(flags, ~0x10);
     reactionMask = 0x800;
     SceneActorReaction_SetBits(&a->base.reactionFlags, reactionMask);
     return 1;

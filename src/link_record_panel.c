@@ -96,6 +96,14 @@ static inline void PanelSequence_SetUpdate(struct LinkRecordPanel *panel,
     panel->update = update;
 }
 
+static inline void PanelSequence_Begin(struct LinkRecordPanel *panel,
+                                       void (*update)(struct LinkRecordPanel *), u32 transition)
+{
+    panel->update = update;
+    panel->entering = 1;
+    panel->transition = transition;
+}
+
 static inline u8 PanelSequence_ClampSelectionCount(u8 value, s32 min, s32 max)
 {
     if (value > max)
@@ -208,23 +216,16 @@ void LinkRecordPanel_InitializeEntryValues(struct LinkRecordPanel *owner)
 
 void LinkRecordPanel_InitializeWidgets(struct LinkRecordPanel *owner)
 {
-    struct SceneInputWidget *sprite;
     int i;
     void *script;
-    int zero;
     script = ScriptProc_Start(0xCB05, 0x1289);
     owner->widgetScript = script;
     ResourceHeader_Relocate(&owner->widgetResource, script);
-    i = 0;
-    zero = 0;
-    sprite = owner->widgets;
-    do {
-        Widget_InitLinked(sprite, &owner->widgetResource, owner->entryValues[i], 0x10, zero, zero,
-                          zero, (void *)zero);
+    for (i = 0; i < 7; i++) {
+        Widget_InitLinked(&owner->widgets[i], &owner->widgetResource, owner->entryValues[i], 0x10, 0, 0,
+                          0, 0);
         owner->previousValues[i] = 0xFFFF;
-        sprite++;
-        i++;
-    } while (i < 7);
+    }
 }
 
 void LinkRecordPanel_PositionWidgets(struct LinkRecordPanel *owner)
@@ -302,20 +303,12 @@ void LinkRecordPanel_InitializePreviews(struct LinkRecordPanel *panel)
 
 void LinkRecordPanel_HideDisplay(struct LinkRecordPanel *owner)
 {
-    u32 flag = 1;
-    u32 *q = &owner->widgets[0].flags;
-    struct CharacterPreviewModel *r;
     s32 i;
 
-    for (i = 6; i >= 0; i--) {
-        *q |= flag;
-        q += sizeof(owner->widgets[0]) / sizeof(*q);
-    }
-    r = &owner->previews[0].model;
-    for (i = 1; i >= 0; i--) {
-        CharacterModel_SetAnimationFlags(r, 1);
-        r = (struct CharacterPreviewModel *)((u8 *)r + sizeof(owner->previews[0]));
-    }
+    for (i = 0; i < 7; i++)
+        owner->widgets[i].flags |= 1;
+    for (i = 0; i < 2; i++)
+        CharacterModel_SetAnimationFlags(&owner->previews[i].model, 1);
 }
 
 void LinkRecordPanel_RemoveWidgets(struct LinkRecordPanel *owner)
@@ -400,11 +393,7 @@ void LinkRecordPanel_UpdateDelay(struct LinkRecordPanel *owner)
     if (owner->timer < 240) {
         owner->timer++;
     } else {
-        void (*next)(struct LinkRecordPanel *) = LinkRecordPanel_UpdateExit;
-        u32 one = 1;
-        owner->update = next;
-        owner->entering = one;
-        owner->transition = one;
+        PanelSequence_Begin(owner, LinkRecordPanel_UpdateExit, 1);
     }
 }
 
@@ -423,18 +412,10 @@ s32 LinkRecordPanel_Update(struct LinkRecordPanel *owner)
 s32 LinkRecordPanel_Destroy(struct LinkRecordPanel *owner)
 {
     s32 i;
-    u32 z;
-    struct CharacterPreviewModel *preview;
     LinkRecordPanel_RemoveWidgets(owner);
-    preview = &owner->previews[0].model;
-    i = 1;
-    do {
-        CharacterModel_RemoveAnimations(preview);
-        preview = (struct CharacterPreviewModel *)((u8 *)preview + sizeof(owner->previews[0]));
-        i--;
-    } while (i >= 0);
-    z = 0;
-    gPanelSequence = z;
+    for (i = 0; i < 2; i++)
+        CharacterModel_RemoveAnimations(&owner->previews[i].model);
+    gPanelSequence = 0;
     return 1;
 }
 

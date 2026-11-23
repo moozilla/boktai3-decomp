@@ -3,6 +3,7 @@
 #include "scene_vec.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
 struct EffectVector {
     s32 x : 16;
     u32 y : 16;
@@ -67,10 +68,6 @@ void SceneHud_SetTimedState(void *, s32, s32, s32, u32, s32);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void Anim_RestartSequence(void *, void *, u32, u32, u32);
 void DragonPuppy_UpdateAttackWindup(void);
-static inline u32 Paused(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline u32 RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -83,7 +80,7 @@ s32 DragonPuppy_UpdateCombat(u8 *p)
     struct EffectVector velocity;
     struct EffectVector size;
     struct ColliderView *collider;
-    if (Paused(0x400))
+    if (Engine_PauseBits(0x400))
         goto paused;
     {
         u32 mask = 4;

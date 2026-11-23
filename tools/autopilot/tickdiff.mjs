@@ -38,7 +38,7 @@ if (r.status) { console.error(r.stderr); process.exit(1); }
 const fd = fs.openSync(path.join(out, 'port.bin'), 'w');
 let ticks = 0, s;
 s = await openSession({
-  movie: run.movie.slice(0, run.readFrames[Math.min(TO, run.readFrames.length - 1)] + 2), save: run.save || undefined, print: () => {},
+  movie: run.movie.slice(0, run.readFrames[Math.min(TO, run.readFrames.length - 1)] + 2), save: run.save || undefined, solarLog: run.solar, print: () => {},
   onBoot: (g) => g.on('Input_UpdatePadStates', () => {
     if (ticks >= FROM && ticks < TO) for (const [a, n] of REG) fs.writeSync(fd, new Uint8Array(s.memory.buffer, a, n));
     ticks++;

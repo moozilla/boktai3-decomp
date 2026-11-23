@@ -128,7 +128,6 @@ void ScriptPrompt_Destroy(struct ScriptPromptScreen *p)
 s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
 {
     u32 layer;
-    u32 resourceBank;
     void *background;
     void *palette;
     void *resource;
@@ -150,12 +149,11 @@ s32 ScriptPrompt_Initialize(struct ScriptPromptScreen *s)
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     palette = ((struct ScriptPromptPalette *)ScriptProc_Start(0x92B3, 0x204))->colors;
     CpuSet(palette, gBgPaletteBuffer, 0x100);
-    resourceBank = 0xCB05;
-    resource = ScriptProc_Start(resourceBank, 0xE2AB);
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
     frameResource = &s->widgets[0].resource;
     ResourceHeader_Relocate(frameResource, resource);
     Widget_InitLinked(&s->widgets[0], frameResource, 0x37, 0x10, 0, 0, 0, 0);
-    resource = ScriptProc_Start(resourceBank, 0x530D);
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     acceptResource = &s->widgets[1].resource;
     ResourceHeader_Relocate(acceptResource, resource);
     Widget_InitLinked(&s->widgets[1], acceptResource, 0x4B, 0x10, 0, 0, 0, 0);

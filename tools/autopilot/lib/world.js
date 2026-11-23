@@ -379,12 +379,16 @@ exports.interact = function* (x, z, opts = {}) {
 };
 
 // The player's bags (docs/ASSETS.md, Items): items GameState+0xA0 (u16 per slot),
-// accessories +0x160 (u16), swords +0x1C0 (16-byte records, ID first), valuables +0x838.
+// accessories +0x160 (u16), swords +0x1C0 (16-byte records, ID first), valuables +0x838,
 // 0xFFFF / 0xFF mark empty slots.
 exports.bags = () => {
   const gs = g.u32(g.types.globals.gGameState.addr);
   const read = (off, n, stride, size) => { const out = []; for (let i = 0; i < n; i++) { const v = size === 2 ? g.u16(gs + off + i * stride) : g.u8(gs + off + i * stride); if (v !== (size === 2 ? 0xffff : 0xff)) out.push(v); } return out; };
-  return { items: read(0xa0, 16, 2, 2), accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1) };
+  // gun lenses +0x828 (u16 lens id = the gun's element mode, SolarFruit_GetInventorySlot),
+  // gun frames +0x4C0 (index + 1 into gUnk_08E60F4C, 0 empty: GameState_GetUnlockEntry)
+  const frames = []; for (let i = 0; i < 16; i++) { const v = g.u16(gs + 0x4c0 + i * 2); if (v) frames.push(v - 1); }
+  return { items: read(0xa0, 16, 2, 2), accessories: read(0x160, 16, 2, 2), swords: read(0x1c0, 8, 16, 1),
+    lenses: read(0x828, 8, 2, 2), frames };
 };
 
 // Pick up a floor item (stages.json proc_1118: it sits in the middle of its cell): walk
@@ -410,9 +414,10 @@ exports.collect = function* (x, z, opts = {}) {
 exports.hitAt = function* (tx, tz, opts = {}) {
   const grid = exports.grid(), p = $.gPlayers[0], level = opts.level ?? (grid.at(tx, tz) || {}).level;
   const goals = new Set();
+  const dist = opts.dist ?? 1;
   for (const [dx, dz] of DIRS) {
-    const c = grid.at(tx - dx, tz - dz);
-    if (c && c.open && c.level === level) goals.add(`${tx - dx},${tz - dz}`);
+    const c = grid.at(tx - dx * dist, tz - dz * dist);
+    if (c && c.open && c.level === level) goals.add(`${tx - dx * dist},${tz - dz * dist}`);
   }
   const here = exports.cellOf(p.position.x, p.position.z);
   const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals);
@@ -420,7 +425,7 @@ exports.hitAt = function* (tx, tz, opts = {}) {
   const [sx, sz] = path[path.length - 1];
   const r = yield* exports.navigate([sx * 256 + 128, sz * 256 + 128], { ...opts, noBreak: true, frames: 1800 });
   if (!r.reached) return { done: false, reason: 'could not get next to it: ' + r.reason };
-  const key = exports.DIR_KEYS[DIRS.findIndex(([dx, dz]) => sx + dx === tx && sz + dz === tz)];
+  const key = exports.DIR_KEYS[DIRS.findIndex(([dx, dz]) => sx + dx * dist === tx && sz + dz * dist === tz)];
   const done = opts.done || (() => false);
   let hits = 0, lines = [];
   for (; hits < (opts.hits ?? 40) && !done(); hits++) {
@@ -431,6 +436,114 @@ exports.hitAt = function* (tx, tz, opts = {}) {
     if (yield* exports.clearInterruptions({ ...opts, seen })) { lines.push(...seen.keys()); if (opts.stopOnEvent) { hits++; break; } }
   }
   return { done: done(), hits, lines };
+};
+
+// The weapon in hand (src/fn/sub_081401A0.c Player_RefreshActionEquipment): GameState+0x50
+// is the selected slot of the equip list at +0x68 (0-7 swords, 8-15 the Gun Del Sol with a
+// frame); the gun's lens is lenses[slots88[4 + actionAuxiliarySlot]] (+0x828, +0x90, +0x54),
+// whose id is the element mode Player_GetAttackAttributeFlags maps to reaction flags.
+// Energy is the player's currentStatB (+0x428); a gun shot costs 3 with no frame special.
+exports.weapon = () => {
+  const gs = g.u32(g.types.globals.gGameState.addr), s16 = (o) => g.u16(gs + o) << 16 >> 16;
+  const slot = s16(0x50), aux = s16(0x54), li = s16(0x90 + aux * 2);
+  const p = $.gPlayers[0];
+  return { slot, gun: slot > 7, lens: li >= 0 ? s16(0x828 + li * 2) : -1, energy: p ? p.currentStatB : 0, energyMax: p ? p.maximumStatB : 0 };
+};
+
+// Quick Change (Otenko 8759/8893: hold SELECT and press R to swap the sword and the gun,
+// SELECT + B to swap the lens) until the weapon matches: { gun: bool, lens: id }.
+exports.quickChange = function* (want) {
+  for (let i = 0; i < 12; i++) {
+    const w = exports.weapon();
+    const key = want.gun !== undefined && w.gun !== want.gun ? 'r' : want.lens !== undefined && w.gun && w.lens !== want.lens ? 'b' : null;
+    if (!key) return { done: true, ...w };
+    yield g.press('select', 6);
+    yield g.press('select+' + key, 4);
+    yield g.press('select', 6);
+    yield g.press(0, 20);
+  }
+  return { done: false, ...exports.weapon() };
+};
+
+// Wait for energy in sunlight (src/fn/sub_0804E618.c: the area effect adds gGameState->unk876,
+// the sun level, per frame; 120 make one energy). The light is the solar sensor (session
+// setSolar: 0 bright .. 255 dark), written into the ROM script as `lux` lines.
+exports.chargeEnergy = function* (need, opts = {}) {
+  const session = exports.session, before = exports.weapon().energy;
+  if (before >= need) return { done: true, energy: before };
+  if (session && opts.lux !== undefined) session.setSolar(opts.lux);
+  let t = 0;
+  for (; t < (opts.frames ?? 3600) && exports.weapon().energy < need; t += 30) yield g.press(0, 30);
+  if (session && opts.restore !== undefined) session.setSolar(opts.restore);
+  return { done: exports.weapon().energy >= need, energy: exports.weapon().energy, before, frames: t };
+};
+
+// The pause menu (START) lives in the field HUD task (Hud_UpdateWithCallback,
+// src/fn/sub_08178B98.c): its state is the callback at +0xA50 (SceneHud_UpdatePageInput,
+// PauseMenu_UpdateItemActions, ...), the page at +0x1414 (1 items, 2 valuables, ...), the
+// grid cursor at +0x4384 (Inventory_InitializeSelectionGrid; +0x4387 the cell id).
+exports.hudTask = () => { const t = exports.tasks().find((x) => !x.dead && x.update === 'Hud_UpdateWithCallback'); return t ? Number(t.task) : 0; };
+exports.menuState = () => {
+  const h = exports.hudTask();
+  if (!h) return null;
+  const cb = g.u32(h + 0xa50);
+  return { callback: cb ? g.name(cb) : null, page: g.u8(h + 0x1414), grid: [...g.bytes(h + 0x4384, 12)], extra: [g.u8(h + 0x43b3), g.u8(h + 0xa58)] };
+};
+// Reach a goal inside the pause menu by search: open it, breadth-first over menu keys from
+// snapshots (a node = the menu state above), until goal() holds, then back out to the field.
+// The menu's own state decides what each key did; nothing about the layout is assumed.
+exports.menuSearch = function* (goal, opts = {}) {
+  const S = exports.session, start = g.frameNo, fieldCb = exports.menuState() && exports.menuState().callback;
+  const KEYS = opts.keys || ['down', 'right', 'up', 'left', 'a', 'r', 'l', 'b'];
+  // the node: callback, page, the live cursor (grid bytes 0-3) and the prompt flag; the
+  // remembered cursors of other grids are left out (they multiply states, not choices)
+  const keyOf = () => { const m = exports.menuState(); return m ? [m.callback, m.page, ...m.grid.slice(0, 4), m.extra[1]].join(',') : ''; };
+  yield g.press('start', 2); yield g.press(0, 60);
+  // the menu opens on the page it was left on: L/R to the page asked for (1 items, 3 Solar Gun)
+  for (let i = 0; i < 8 && opts.page !== undefined && exports.menuState() && exports.menuState().page !== opts.page; i++) {
+    yield g.press(exports.menuState().page > opts.page ? 'l' : 'r', 2); yield g.press(0, 40);
+  }
+  let found = null, expanded = 0;
+  const seen = new Set([keyOf()]), root = S.snapshot();
+  // nodes are key paths replayed from the opened menu (a snapshot each would not fit)
+  const wait = (k) => (['l', 'r', 'a', 'b'].includes(k) ? 40 : 14);
+  const play = function* (path) { S.restore(root); for (const k of path) { yield g.press(k, 2); yield g.press(0, wait(k)); } };
+  let queue = [[]];
+  search: while (queue.length && expanded < (opts.max ?? 400)) {
+    const node = queue.shift();
+    expanded++;
+    for (const k of KEYS) {
+      const path = [...node, k];
+      if (opts.tryTrace) opts.tryTrace(path.join(' '));
+      yield* play(path);
+      if (goal()) { found = path; break search; }
+      const st = exports.menuState();
+      if (!st || st.callback === fieldCb) continue;  // closed the menu
+      const key = keyOf();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      if (opts.trace) opts.trace({ path: path.join(' '), state: st });
+      queue.push(path);
+    }
+  }
+  if (!found) yield* play([]);
+  // back to the field: B until the HUD runs its field callback again
+  for (let i = 0; i < 12 && exports.menuState() && exports.menuState().callback !== fieldCb; i++) { yield g.press('b', 2); yield g.press(0, 30); }
+  if (exports.menuState() && exports.menuState().callback !== fieldCb) { yield g.press('start', 2); yield g.press(0, 40); }
+  return { done: !!found, keys: found ? found.join(' ') : null, states: seen.size, expanded, frames: g.frameNo - start, closed: !exports.menuState() || exports.menuState().callback === fieldCb };
+};
+
+// Live Breakables (src/pooled_interactable.c: gPooledInteractableManager slots): script id
+// and state (1 unlit / 2 lit for a candlestick; Breakable_OnHit moves them on).
+exports.breakables = () => {
+  const m = $.gPooledInteractableManager;
+  if (!m || !m.slots) return [];
+  const first = typeof m.slots === 'object' ? m.slots : g.at(Number(m.slots), 'struct PooledInteractable'), out = [];
+  for (let i = 0; i < m.count; i++) {
+    const sl = first.$at(i);
+    if (sl.active) out.push({ index: i, id: sl.id, state: sl.state, kind: sl.kind });
+  }
+  return out;
 };
 
 // Break a block (a wooden crate: SceneObject with health).

@@ -40,6 +40,30 @@ static inline void SceneActorTurn_ApplyDuration(struct ChaseActor *a, u16 *motio
             &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
 }
 
+/* The same, testing the actor's own motion flags. */
+static inline void SceneActorTurn_ApplyActorDuration(struct ChaseActor *a)
+{
+    u16 *scale;
+    u32 mask = 0xA02F;
+    if (a->base.motionFlags & mask) {
+        u16 *p = &a->base.field2C2;
+        *p = 64;
+        scale = p;
+    } else {
+        u16 *q = &a->base.field2C2;
+        u16 value = *q;
+        scale = q;
+        if (!value)
+            *scale = 64;
+    }
+    if (!a->base.drawableKind)
+        Anim_SetDurationScale(
+            &((struct SceneActorAnimationSequenceDrawable *)a->base.drawable)->sequence, *scale);
+    else
+        Anim_SetFrameDurationScale(
+            &((struct SceneActorAnimationTileDrawable *)a->base.drawable)->tile, *scale);
+}
+
 static inline u32 SceneActorTurn_Flags(u16 *field, u32 mask)
 {
     return *field & mask;

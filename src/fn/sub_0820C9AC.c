@@ -2,6 +2,7 @@
 #include "screamer_state.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "engine_pause.h"
 extern u32 gUnk_02000560;
 extern u8 gUnk_0203B000[];
 void SceneDrawablePair_SetFlags(void);
@@ -19,10 +20,6 @@ void EnemyParticle_Emit(void *, void *);
 struct ScreamerParticleParameters {
     u32 data[14];
 };
-static inline u32 PauseFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline u32 TestFlags(s16 mask, u32 *flags)
 {
     return *flags & mask;
@@ -38,7 +35,7 @@ s32 Screamer_UpdateDamageParticles(struct ScreamerState *p)
     s32 emitted;
     void *dataOwner;
     u16 *blink;
-    if (PauseFlags(0x400) || TestFlags(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || TestFlags(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     if ((p->f1DC > 0) && (!p->f1E0)) {

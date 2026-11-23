@@ -28,12 +28,6 @@ void RecordMenu_UpdateRecords(struct RecordMenu *menu)
         menu->inputDelay++;
     else if (gPadState[1] & 11) {
         Sound_PlaySong(0xdd);
-        {
-            void (*next)(struct RecordMenu *) = RecordMenu_UpdateSelection;
-            u8 one = 1;
-            menu->update = next;
-            menu->redraw = one;
-            menu->leaving = one;
-        }
+        RecordMenu_Begin(menu, RecordMenu_UpdateSelection, 1);
     }
 }

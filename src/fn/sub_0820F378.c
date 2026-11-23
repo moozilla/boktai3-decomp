@@ -7,6 +7,8 @@
 #include "render.h"
 #include "engine.h"
 #include "ram.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 // confidence=low: handles collision damage, defeat effects, palette flashing and animation.
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
@@ -24,14 +26,6 @@ struct OrangeSpineEffectPair {
 struct OrangeSpineEffectVector {
     struct OrangeSpineEffectPair a, b;
 };
-static inline u32 OrangeSpine_TestEitherFlags(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-static inline u32 OrangeSpine_TestFlag(u32 mask, u32 *p)
-{
-    return *p & mask;
-}
 static inline u32 OrangeSpine_RandomSample(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -121,8 +115,7 @@ static inline void OrangeSpine_BeginDefeat(s16 *state, u16 *blink)
 s32 OrangeSpine_UpdateDamageState(struct OrangeSpineActor *p)
 {
     struct ContactCollider *collider;
-    if (OrangeSpine_TestEitherFlags(0x400, &gEngineFlags, &gScenePauseFlags) ||
-        OrangeSpine_TestFlag(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.display.flags &= ~1;

@@ -13,8 +13,6 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
     s32 primaryValue, secondaryValue;
     void *reference;
     s32 value, i, comparison;
-    struct SceneInputWidget *widget;
-    struct SceneInputMovingWidget *flags;
     primaryValue = 0;
     secondaryValue = 0;
     if (referenceIndex < 0)
@@ -46,53 +44,29 @@ void SceneInputPanel_ShowItemComparison(struct SceneInputWidget *primary,
     }
     if (primaryValue > 0 || candidate) {
         s32 offset;
-        s32 *digit;
         SceneHud_FillTile001(primary->position.x >> 3, primary->position.y >> 3, 3);
         offset = comparison * 10;
-        digit = digits;
-        flags = (void *)&primary->flags;
-        for (i = 2; i >= 0; i--) {
-            flags->flags &= ~1;
-            Anim_LoadKeyframe(primary, resource, (u16)(*digit++ + offset), 1);
-            flags++;
-            primary++;
+        for (i = 0; i < 3; i++) {
+            primary[i].flags &= ~1;
+            Anim_LoadKeyframe(&primary[i], resource, (u16)(digits[i] + offset), 1);
         }
     } else {
-        struct SceneInputMovingWidget *hidden;
-        u32 mask;
         SceneHud_FillTile020(primary->position.x >> 3, primary->position.y >> 3, 3);
-        mask = 1;
-        hidden = (void *)&primary->flags;
-        for (i = 2; i >= 0; i--) {
-            hidden->flags |= mask;
-            hidden++;
-        }
+        for (i = 0; i < 3; i++)
+            primary[i].flags |= 1;
     }
     SceneInputPanel_SplitThreeDigits(secondaryValue, digits);
     if (secondaryValue > 0 && !candidate) {
         s32 offset;
-        s32 *digit;
         SceneHud_FillTile001(secondary->position.x >> 3, secondary->position.y >> 3, 3);
         offset = 0;
-        digit = digits;
-        flags = (void *)&secondary->flags;
-        widget = secondary;
-        for (i = 2; i >= 0; i--) {
-            flags->flags &= ~1;
-            Anim_LoadKeyframe(widget, resource, (u16)(*digit++ + offset), 1);
-            flags++;
-            widget++;
+        for (i = 0; i < 3; i++) {
+            secondary[i].flags &= ~1;
+            Anim_LoadKeyframe(&secondary[i], resource, (u16)(digits[i] + offset), 1);
         }
     } else {
-        struct SceneInputMovingWidget *hidden;
-        u32 mask;
         SceneHud_FillTile020(secondary->position.x >> 3, secondary->position.y >> 3, 3);
-        mask = 1;
-        widget = secondary;
-        hidden = (void *)&widget->flags;
-        for (i = 2; i >= 0; i--) {
-            hidden->flags |= mask;
-            hidden++;
-        }
+        for (i = 0; i < 3; i++)
+            secondary[i].flags |= 1;
     }
 }

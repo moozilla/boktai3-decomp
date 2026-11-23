@@ -18,7 +18,6 @@ void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_ReturnToConsumableActions(u8 *p)
 {
     u8 *q;
-    int z;
     sub_08170D78(p);
     q = p + 0x4384;
     Hud_RestoreSecondaryGridSelection(q);
@@ -28,13 +27,12 @@ void PauseInventory_ReturnToConsumableActions(u8 *p)
     PauseMenu_AddSpriteFlags(p, 5, 1);
     MenuDisplay_SnapshotValues(p);
     MenuDisplay_DrawStatComparison(p, 10, 6);
-    z = 0;
-    InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, z);
-    InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, z);
+    InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, 0);
     InventoryPanel_ShowStatusIcons(p);
     Hud_SetInteractionCallback(p, PauseInventory_UpdateConsumableActions, 0);
     MessageWindow_Clear();
-    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
+    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, 0);
     sub_08170F54(p);
     MenuDisplay_UpdateActionPrompt(p, 3);
 }

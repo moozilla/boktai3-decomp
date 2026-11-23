@@ -1,3 +1,4 @@
+#include "scene_actor_chase.h"
 #include "global.h"
 #include "scene_actor_placement.h"
 #include "scene_actor_chase.h"

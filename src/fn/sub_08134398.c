@@ -1,3 +1,4 @@
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_reaction.h"
@@ -58,12 +59,6 @@ static inline void Count(s16 *p)
     else
         *p = 9999;
 }
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u32 Mask(u16 *flags, u32 maskInput)
 {
     u32 mask = maskInput;
@@ -101,7 +96,7 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
             SceneActorTerrain_InstallControl(actor, control, 17);
         }
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
-        if (Test(gEngineFlags, 0x4800)) {
+        if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
             Player_NotifyFirstSelectedSlot(actor->base.hitOwners, actor->base.hitAttributes);
             goto done;
         }
@@ -119,7 +114,7 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
         {
             u8 blocked;
             flags2C0 = &actor->base.placementFlags;
-            blocked = Test(Mask(flags2C0, 0x80), ~0);
+            blocked = SceneActorChase_Test(Mask(flags2C0, 0x80), ~0);
             collider = &actor->base.colliderA;
             if (blocked)
                 goto record;
@@ -198,8 +193,8 @@ u32 SceneActorReaction_RecordDefeat(struct ChaseActor *actor)
             Player_RefreshLifeState(actor->base.hitAttributes, actor->base.fieldA1);
         }
     record:
-        if (!Test(Mask(flags2C0, 0x80), ~0) && !Test(gEngineFlags, 0x4800) &&
-            !Flag2D0(actor, 0x800))
+        if (!SceneActorChase_Test(Mask(flags2C0, 0x80), ~0) &&
+            !SceneActorChase_Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
         ((struct ContactCollider *)collider)->flags |= 4;
     done:

@@ -1,18 +1,12 @@
 #include "global.h"
+#include "scene_actor_terrain_reaction.h"
 
-struct SceneActorTimedValue {
-    u8 unknown0[0x60];
-    u16 timer;
-    u8 unknown62[2];
-    u32 value;
-};
-
-// confidence=low: counts down a timer at +0x434 and clears the word at +0x438 once it has expired.
-void sub_08137ADC(u8 *actor)
+// confidence=low: counts down control.field14, then clears control.counter once it has expired.
+void sub_08137ADC(struct ChaseActor *actor)
 {
-    struct SceneActorTimedValue *t = (struct SceneActorTimedValue *)(actor + 0x3d4);
-    if (t->timer)
-        t->timer--;
+    struct SceneActorChaseGroup *group = &actor->group;
+    if (group->common.control.field14)
+        group->common.control.field14--;
     else
-        t->value = 0;
+        group->common.control.counter = 0;
 }

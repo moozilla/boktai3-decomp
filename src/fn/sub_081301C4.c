@@ -1,3 +1,4 @@
+#include "scene_actor_terrain_reaction.h"
 #include "scene_actor_behavior.h"
 #include "global.h"
 #include "scene_actor_chase.h"

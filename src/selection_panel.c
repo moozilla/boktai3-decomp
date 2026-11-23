@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "selection_panel.h"
 #include "palette_pulse.h"
 #include "area_effect_link.h"
@@ -64,8 +65,7 @@ static inline u8 SelectionPanel_IsEntryUnlocked(struct SelectionPanel *panel)
 
 static inline u32 SelectionPanel_GetLinkModeFlag(void)
 {
-    u32 mask = 0x800;
-    return (gEngineFlags | gScenePauseFlags) & mask;
+    return Engine_PauseBits(0x800);
 }
 
 static inline void SelectionPanel_RefreshBackgroundOnEntry(struct SelectionPanel *panel)

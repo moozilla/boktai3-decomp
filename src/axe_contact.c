@@ -1,3 +1,4 @@
+#include "math_shift.h"
 #include "global.h"
 #include "axe.h"
 #include "scene_actor_control_phase.h"
@@ -9,6 +10,7 @@
 #include "ram.h"
 #include "player.h"
 #include "contact_swarm.h"
+#include "movement_curve.h"
 
 void Axe_OnSecondaryColliderContact(void)
 {
@@ -85,7 +87,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
         actor->base.field2E6 = destination->mode;
         actor->base.colliderA.responseValue = Axe_ContactResponse(destination);
     }
-    if ((context->flagsCAB & 2) && context->timerEB0 > 2) {
+    if ((context->flagsCAB & 2) && context->reactionCount > 2) {
         s32 i;
         u32 stride = sizeof(struct ContactCollider);
         i = 0;
@@ -102,7 +104,7 @@ void Axe_OnBodyContact(struct SceneActorBehaviorContactView *source,
             ++i;
         } while (Axe_ContactIndex(i) <= 2);
         SceneActorChase_SetControl(actor, (void *)ActorPhase_UpdateReverseFlicker, 0x2F);
-        context->timerEB0 = 0;
+        context->reactionCount = 0;
     }
 }
 
@@ -129,15 +131,6 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame);
 
 s32 Div(s32, s32);
 
-static inline u8 SceneActor_TakeApproachEntry(struct ChaseActor *p)
-{
-    if (p->base.field2B2) {
-        p->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *out,
                                                        struct ContactPosition *a,
                                                        struct ContactPosition *b)
@@ -147,27 +140,12 @@ static inline void SceneActor_SubtractApproachPosition(struct ContactPosition *o
     out->z = a->z - b->z;
 }
 
-static inline void SceneActor_SetApproachControl(struct ChaseActor *p, void *control, u32 kind)
-{
-    p->base.field2B2 = 1;
-    p->base.stepDone = 0;
-    p->base.controlKind = kind;
-    p->base.target = control;
-    p->base.field2C8 = 0;
-    {
-        u32 *flags = &p->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    p->base.pendingControl = 0;
-}
-
 void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
 {
     struct SceneActorApproachContext *context = p->base.context;
     struct ContactPosition difference;
     struct ContactPosition *current, *destination;
-    if (SceneActor_TakeApproachEntry(p)) {
+    if (SceneActorReaction_TakePrepared(p)) {
         context->stateED2 = 0;
         context->destination = p->base.body.position;
         context->destination.x -= 256;
@@ -184,7 +162,7 @@ void SceneActor_AdvanceOffsetApproach(struct ChaseActor *p)
     current->x += Div(difference.x, context->remaining);
     context->remaining--;
     if (!context->remaining) {
-        SceneActor_SetApproachControl(p, ActorPhase_UpdateTimedFlicker, 43);
+        SceneActorChase_SetControl(p, ActorPhase_UpdateTimedFlicker, 43);
     }
 }
 
@@ -232,11 +210,6 @@ static inline u8 consumeEntry(struct PhaseActor *s)
     return 0;
 }
 
-static inline void clearFlags(u32 *p, u32 mask)
-{
-    *p &= ~mask;
-}
-
 void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
 {
     u8 *data = s->data;
@@ -251,15 +224,7 @@ void ActorPhase_UpdateTimedFlicker(struct PhaseActor *s, s32 frame)
         Sound_PlaySong(0x16f);
     }
     if (ActorPhase_UpdateFlicker(&flags, frame, 10, 30)) {
-        void (*next)(void) = Axe_UpdateOrbitAttack;
-        u32 id = 0x2c;
-        s->entered = 1;
-        s->phaseState = 0;
-        s->phaseId = id;
-        s->phase = next;
-        s->timer = 0;
-        clearFlags(&s->flags114, 1);
-        s->f104 = 0;
+        SceneActorChase_SetControl(s, Axe_UpdateOrbitAttack, 0x2c);
         Axe_SetAuxiliarySpriteParameters(s, data + 0x908, 0x13f);
         Sound_PlaySong(0x16d);
     } else if (flags & 1) {
@@ -279,36 +244,12 @@ void Axe_UpdateAttackColliderPositions(void *);
 
 void ActorPhase_UpdateAcceleratingTrail(void);
 
-static inline u8 Axe_TakeEntry(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-
-static inline void Axe_Difference(struct ContactPosition *v, struct ContactPosition *b,
-                                  struct ContactPosition *a)
-{
-    v->x = a->x - b->x;
-    v->y = a->y - b->y;
-    v->z = a->z - b->z;
-}
-
 static inline void Axe_AddPositions(struct ContactPosition *out, struct ContactPosition *a,
                                     struct ContactPosition *b)
 {
     out->x = b->x + a->x;
     out->y = b->y + a->y;
     out->z = b->z + a->z;
-}
-
-static inline s32 Axe_ScaleTowardZero(s32 value, s32 bits)
-{
-    if (value >= 0)
-        return value >> bits;
-    return -(-value >> bits);
 }
 
 static inline s32 Axe_RandomByte(void)
@@ -327,7 +268,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
     struct ContactPosition *position;
     u8 entered;
     s32 difference, absolute;
-    entered = Axe_TakeEntry(&p->base.field2B2);
+    entered = SceneActorControl_TakeFlag(&p->base.field2B2);
     position = &p->base.body.position;
     if (entered) {
         data->flagsCAB |= 2;
@@ -336,25 +277,25 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
         data->speed = 4;
         data->direction = 1;
         data->center = data->origin;
-        Axe_Difference(&delta, &data->center, position);
-        delta.x = Axe_ScaleTowardZero(delta.x, 1);
-        delta.z = Axe_ScaleTowardZero(delta.z, 1);
+        MovementCurve_SubtractPositions(&delta, &data->center, position);
+        delta.x = Math_ShiftTowardZero(delta.x, 1);
+        delta.z = Math_ShiftTowardZero(delta.z, 1);
         Axe_AddPositions(&data->center, &data->center, &delta);
     }
     position->x = data->center.x +
-                  Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
+                  Math_ShiftTowardZero(gUnk_086149C4[(data->angle + 64) & 255] * data->radius, 12);
     p->base.body.position.z =
-        data->center.z + Axe_ScaleTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
+        data->center.z + Math_ShiftTowardZero(gUnk_086149C4[data->angle] * data->radius, 12);
     data->auxiliarySprite.position.x =
         data->center.x +
-        Axe_ScaleTowardZero(
-            gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius, 12);
+        Math_ShiftTowardZero(gUnk_086149C4[(((data->angle + 128) & 255) + 64) & 255] * data->radius,
+                             12);
     data->auxiliarySprite.position.z =
         data->center.z +
-        Axe_ScaleTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
+        Math_ShiftTowardZero(gUnk_086149C4[(data->angle + 128) & 255] * data->radius, 12);
     if (frame < 60) {
         data->speed += 2;
-        data->timerEB0 = 0;
+        data->reactionCount = 0;
     } else if (frame < 180) {
         if (Mod(frame, 4) == 0) {
             if (Axe_RandomByte() <= 19) {
@@ -365,9 +306,9 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
                 Sound_PlaySong(0x169);
             }
         }
-        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
+        MovementCurve_SubtractPositions(&delta, &data->center, (void *)&gPlayers[0]->position);
         data->heading = Math_Atan2(delta.x, delta.z);
-        data->timerEB0 = 0;
+        data->reactionCount = 0;
     } else {
         if (!(data->flagsCAB & 4)) {
             if (data->radius < 512) {
@@ -381,7 +322,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
                 data->flagsCAB |= 4;
             }
         }
-        Axe_Difference(&delta, &data->center, (void *)&gPlayers[0]->position);
+        MovementCurve_SubtractPositions(&delta, &data->center, (void *)&gPlayers[0]->position);
         difference = Math_Atan2(delta.x, delta.z) - data->heading;
         if (difference > 128)
             difference -= 256;
@@ -396,8 +337,8 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             else
                 data->heading -= 4;
         }
-        data->center.x += Axe_ScaleTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
-        data->center.z += Axe_ScaleTowardZero(gUnk_086149C4[data->heading] * 2, 12);
+        data->center.x += Math_ShiftTowardZero(gUnk_086149C4[(data->heading + 64) & 255] * 2, 12);
+        data->center.z += Math_ShiftTowardZero(gUnk_086149C4[data->heading] * 2, 12);
         if (data->flagsCAB & 4) {
             struct DisplaySequenceSprite *sprite = p->base.drawable;
             u32 previous;
@@ -422,7 +363,7 @@ void Axe_UpdateOrbitAttack(struct ChaseActor *p, s32 frame)
             }
         }
     }
-    data->angle += Axe_ScaleTowardZero(data->speed * (s8)data->direction, 4);
+    data->angle += Math_ShiftTowardZero(data->speed * (s8)data->direction, 4);
     Axe_UpdateAttackColliderPositions(p);
     if (data->flagsCAB & 1) {
         SceneActorChase_SetControl(p, ActorPhase_UpdateAcceleratingTrail, 0x2E);

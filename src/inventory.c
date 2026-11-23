@@ -69,7 +69,14 @@ u32 Inventory_GetItemCategory(s32 i)
 
 u32 Inventory_GetItemUseCondition(u32 index)
 {
+#ifdef UBFIX
+    // the pause menu asks about an empty item slot with index -1; on hardware the address
+    // wraps to the halfword 16 bytes before the table, the port (wasm, no wrap past 4 GB
+    // in a load offset) traps: compute the same wrapped address in 32 bits
+    return (*(const u16 *)((u32)gUnk_08E61280 + index * 16) & 0xF0) >> 4;
+#else
     return (gUnk_08E61280[index * 8] & 0xF0) >> 4;
+#endif
 }
 
 u32 Inventory_GetKeyItemId(u32);

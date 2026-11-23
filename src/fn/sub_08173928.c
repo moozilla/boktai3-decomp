@@ -11,18 +11,16 @@ void InventoryPanel_DrawStatComparison(void *, int, int, int, int, int);
 void MenuDisplay_UpdateActionPrompt(void *, int);
 void PauseInventory_BeginItemUseSelection(u8 *p, int flag)
 {
-    int z;
     u8 *a;
     SceneHud_RefreshEquipmentIcons(p, 0);
     Hud_SetInteractionCallback(p, SceneHud_TickEquipmentToggle, 1);
     Inventory_InitializeSelectionGrid(p + 0x4384, 1, 0);
-    z = 0;
-    MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, z);
+    MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
     if (flag)
         PauseMenu_ResetItemCursor(p);
     a = p + 0x1620;
     SceneHud_GetActionIconPosition(a, p[0x4387]);
     SceneHud_ShowEquipmentDetails(p);
-    InventoryPanel_DrawStatComparison(p, 0, 1, 0, z, z);
+    InventoryPanel_DrawStatComparison(p, 0, 1, 0, 0, 0);
     MenuDisplay_UpdateActionPrompt(p, 2);
 }

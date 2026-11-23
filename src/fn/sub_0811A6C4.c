@@ -6,6 +6,8 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
+#include "engine_pause.h"
+#include "scene_actor_damage_visibility.h"
 
 struct GloveModel;
 struct Glove;
@@ -148,16 +150,6 @@ void CharacterPreview_InitializePalette(void *, void *, u32);
 void ActorRecoil_InitCollisionVolumes(void *);
 void SceneTilemap_SetScrollSource(void *);
 void Glove_RegisterMessageReceiver(void *);
-static inline u32 Glove_ModeMask(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
-static inline s32 Glove_LinkParticipant(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
 static inline void Glove_SetCallback(struct Glove *p, void (*fn)(void *), s32 zero)
 {
     p->active = 1;
@@ -198,7 +190,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     p->entryScript = Script_GetKeywordValue('G', 0);
     p->eventScript = Script_GetKeywordValue('e', 0);
     p->nextScript = Script_GetKeywordValue('n', 0);
-    if (!Glove_ModeMask(0x800))
+    if (!Engine_PauseBits(0x800))
         p->localScript = Script_GetKeywordValue('g', 0);
     Glove_InitializeStyleModifiers(p);
     ActorSprite_InitPartDrawings(self, &p->model, 0x3d99);
@@ -257,7 +249,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     }
     Glove_ReadMode(&mode, 0x800);
     if (mode) {
-        if (p->participant == Glove_LinkParticipant()) {
+        if (p->participant == SceneActorDamage_LocalPlayer()) {
             struct AreaEffectLinkState *ref = gLinkSession;
             void *optional;
             if (ref) {

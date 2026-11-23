@@ -1,15 +1,12 @@
+#include "scene_actor_turn.h"
 #include "global.h"
 #include "scene_actor_reset.h"
 void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *);
 void SceneActorReaction_ApplyCategoryDamage(struct ChaseActor *);
 void SceneActorReaction_EndHitCheckDefeat(struct ChaseActor *);
-static inline u32 TestFlags(struct ChaseActor *actor, u32 mask)
-{
-    return actor->base.behaviorFlags & mask;
-}
 u32 SceneActorBehavior_DispatchFlaggedCategory(struct ChaseActor *actor)
 {
-    if (actor->base.enabled == 1 && !TestFlags(actor, 2) &&
+    if (actor->base.enabled == 1 && !SceneActorTurn_ActorFlags(actor, 2) &&
         (actor->base.hitAttributes & 0x100000)) {
         switch ((s32)actor->base.category) {
             case 11:

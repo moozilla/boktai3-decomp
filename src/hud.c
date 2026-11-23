@@ -3,6 +3,7 @@
 #include "link_session_state.h"
 #include "engine_pause.h"
 #include "word_flags.h"
+#include "scene_actor_damage_visibility.h"
 
 extern u16 gUnk_03005178;
 
@@ -271,13 +272,6 @@ void Hud_DrawPlayerGauge(struct SceneHudState *hud, s32 x, s32 y)
     }
 }
 
-static inline s32 OwnerIndex(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-
 static inline u8 SlotCount(s32 slot)
 {
     if (!gLinkSession || slot < 0)
@@ -361,7 +355,7 @@ void Hud_DrawWarningMeter(struct SceneHudState *hud, s32 mode, u32 x, u32 y)
         if (gBgPaletteBank13Color10 != pulse)
             gBgPaletteBank13Color10 = pulse;
         if (Engine_PauseBits(0x800))
-            count = SlotCount(OwnerIndex());
+            count = SlotCount(SceneActorDamage_LocalPlayer());
         else
             count = gGameState->unk876;
         *tiles++ = 0xD45F;
@@ -682,11 +676,6 @@ static inline void SetDigitVisibility(struct SceneHudState *hud, u32 mask, s32 h
     }
 }
 
-static inline void HideCountdownDigit(struct SceneInputWidget *digit)
-{
-    digit->flags |= 1;
-}
-
 void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
 {
     s32 value, hundreds, tens, ones, base;
@@ -715,7 +704,7 @@ void Hud_UpdateCountdownDigits(struct SceneHudState *hud)
                     ones = 0;
                 }
                 if ((gEngineFlags & 0x1000) || (*&gGameState->flags868 & 0x400)) {
-                    HideCountdownDigit(&hud->countdownDigits[2]);
+                    SceneInputWidget_Hide(&hud->countdownDigits[2]);
                     if (hundreds == 0 && tens == 0) {
                         Anim_LoadKeyframe(&hud->countdownDigits[0], resource, (u16)(0x33), 1);
                         Anim_LoadKeyframe(&hud->countdownDigits[1], resource, (u16)(ones + 0x33),

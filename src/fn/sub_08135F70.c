@@ -4,6 +4,8 @@
 #include "scene_actor_palette.h"
 #include "area_effect_link.h"
 #include "render.h"
+#include "scene_actor_damage_visibility.h"
+#include "scene_actor_damage_flash.h"
 u8 SceneActorReaction_ApplyAreaDamage(void *);
 void SceneActor_ClearReactionFlags(void *);
 u8 SceneActorBehavior_DispatchFlaggedCategory(void *);
@@ -16,72 +18,11 @@ void CpuSet(const void *, void *, u32);
 void DamageNumberDisplay_Show(void *, s32, u32, void *, void *, u32);
 void AnimData_SelectPaletteBank(void *, s32);
 
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u8 HasPendingHit(struct ChaseActor *actor)
 {
     if (actor->base.field2E6 == 0)
         return 0;
     return 1;
-}
-static inline s32 LocalPlayer(void)
-{
-    if (!gLinkSession)
-        return -1;
-    return gLinkSession->localPlayer;
-}
-static inline u16 OwnershipFlagBits(u32 value, u32 mask)
-{
-    return value & mask;
-}
-static inline u8 ShouldShowDamage(struct ChaseActor *actor)
-{
-    if (Test(gEngineFlags, 0x4800)) {
-        u32 *owner = &actor->base.hitOwners;
-        u32 mask = *owner;
-        if (!OwnershipFlagBits(mask, 0x20) && mask) {
-            switch (LocalPlayer()) {
-                case 0:
-                    if (*owner != 1)
-                        return 0;
-                    break;
-                case 1:
-                    if (*owner != 2)
-                        return 0;
-                    break;
-                case 2:
-                    if (*owner != 4)
-                        return 0;
-                    break;
-                case 3:
-                    if (*owner != 8)
-                        return 0;
-                    break;
-            }
-        }
-    }
-    return 1;
-}
-static inline u8 IsDown(struct ChaseActor *actor, u16 flags)
-{
-    if (actor) {
-        {
-            if (0x40 & flags)
-                return 1;
-        }
-        {
-            u32 mask = 0x20000;
-            if (actor->base.statusFlags & mask)
-                return 1;
-        }
-        if (actor->base.health <= 0)
-            return 1;
-    }
-    return 0;
 }
 
 static inline u8 IsDownAtHealth(struct ChaseActor *actor, u16 flags, const s16 *health)
@@ -109,14 +50,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
     if (flags) {
         u32 down = IsDownAtHealth(actor, flags, health);
         if (down) {
-            u32 zero = 0;
-            *flags2D4 = 0x40;
-            actor->base.field2E6 = zero;
-            {
-                u16 *flags2D6 = &actor->base.reactionFlags;
-                s32 mask = ~0x980;
-                *flags2D6 &= mask;
-            }
+            SceneActorDamage_MarkDown(actor, flags2D4);
             return;
         }
         {
@@ -126,50 +60,8 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
                 goto clearShared;
         }
         {
-            {
-                union {
-                    u32 raw;
-                    struct {
-                        s32 bits : 16;
-                        u32 upper : 16;
-                    } field;
-                } mask;
-                u32 value;
-                mask.raw = flags;
-                mask.field.bits = ~0x201;
-                value = mask.field.bits & flags;
-                *flags2D4 = value;
-            }
-            {
-                u32 mask = ~0x4000;
-                *flags2CC &= mask;
-            }
-            {
-                struct SceneActorReactionMotion *motion = (void *)&actor->base.tracking.target;
-                s32 mask = ~0x10;
-                motion->flags &= mask;
-            }
-            {
-                u32 test = 0x20;
-                if (!(*flags2D4 & test)) {
-                    u32 mask = ~0x80;
-                    *flags2CC &= mask;
-                }
-            }
-            {
-                u32 *flags2D0 = &actor->base.statusFlags;
-                u32 mask = 0xFFEFFFFB;
-                *flags2D0 &= mask;
-            }
-            {
-                u32 bit = 0x400;
-                actor->base.reactionFlags |= bit;
-            }
-            actor->base.field2E6 = down;
-            {
-                u32 bit = 0x2000;
-                *flags2CC |= bit;
-            }
+            SceneActorDamage_ClearHitStart(flags2D4, flags);
+            SceneActorDamage_AcceptHit(actor, flags2D4, flags2CC, down);
             return;
         }
     }
@@ -204,67 +96,17 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                 u32 mask = ~0x2000;
                 *flags2CC &= mask;
             } else {
-                u32 down = IsDown(actor, flags);
+                u32 down = SceneActorDamage_IsDown(actor, flags);
                 if (down) {
-                    u32 zero = 0;
-                    *flags2D4 = 0x40;
-                    actor->base.field2E6 = zero;
-                    {
-                        u16 *flags2D6 = &actor->base.reactionFlags;
-                        s32 mask = ~0x980;
-                        *flags2D6 &= mask;
-                    }
+                    SceneActorDamage_MarkDown(actor, flags2D4);
                 } else {
                     u32 mask = 0x803E;
                     flags = *flags2D4;
                     if (mask & flags) {
                         u32 *flags2CC;
-                        {
-                            union {
-                                u32 raw;
-                                struct {
-                                    s32 bits : 16;
-                                    u32 upper : 16;
-                                } field;
-                            } mask;
-                            u32 value;
-                            mask.raw = flags;
-                            mask.field.bits = ~0x201;
-                            value = mask.field.bits & flags;
-                            *flags2D4 = value;
-                        }
+                        SceneActorDamage_ClearHitStart(flags2D4, flags);
                         flags2CC = &actor->base.behaviorFlags;
-                        {
-                            u32 mask = ~0x4000;
-                            *flags2CC &= mask;
-                        }
-                        {
-                            struct SceneActorReactionMotion *motion =
-                                (void *)&actor->base.tracking.target;
-                            s32 mask = ~0x10;
-                            motion->flags &= mask;
-                        }
-                        {
-                            u32 test = 0x20;
-                            if (!(*flags2D4 & test)) {
-                                u32 mask = ~0x80;
-                                *flags2CC &= mask;
-                            }
-                        }
-                        {
-                            u32 *flags2D0 = &actor->base.statusFlags;
-                            u32 mask = 0xFFEFFFFB;
-                            *flags2D0 &= mask;
-                        }
-                        {
-                            u32 bit = 0x400;
-                            actor->base.reactionFlags |= bit;
-                        }
-                        actor->base.field2E6 = down;
-                        {
-                            u32 bit = 0x2000;
-                            *flags2CC |= bit;
-                        }
+                        SceneActorDamage_AcceptHit(actor, flags2D4, flags2CC, down);
                     } else {
                         u32 *flags2CC = &actor->base.behaviorFlags;
                         u32 mask = ~0x2000;
@@ -322,34 +164,13 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
         }
         flags2CC = &actor->base.behaviorFlags;
         if (mode) {
-            {
-                u16 bank = actor->base.paletteAlternateBank;
-                if (actor->base.drawableKind == 0)
-                    AnimData_SelectPaletteBank(((u8 *)actor->base.drawable) + 0x2C, bank);
-                else
-                    ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
-                        (const u16 *)(gPaletteBankData + bank * 32);
-            }
-            {
-                u32 eight = 8;
-                actor->base.flashTimer = eight;
-            }
+            SceneActorDamage_Flash(actor);
             strong = mode & 4;
             flags2CC = &actor->base.behaviorFlags;
             if (strong && (actor->base.category == 0x19)) {
-                {
-                    u32 bit = 0x2000000;
-                    *flags2CC |= bit;
-                }
-                {
-                    u32 v = 0x41;
-                    actor->base.paletteTimer = v;
-                }
+                SceneActorDamage_StartStrongPalette(actor, flags2CC);
             }
-            {
-                u32 bit = 0x8000;
-                *flags2CC |= bit;
-            }
+            SceneActorDamage_MarkFlashing(flags2CC);
             {
                 union {
                     u32 raw;
@@ -357,7 +178,7 @@ u8 SceneActorReaction_ResolveDamage(struct ChaseActor *actor)
                         s32 value : 16;
                     } part;
                 } decision;
-                decision.raw = ShouldShowDamage(actor);
+                decision.raw = SceneActorDamage_ShouldShow(actor);
                 if (decision.part.value) {
                     struct ContactPosition offset;
                     s32 h = *savedHealth;

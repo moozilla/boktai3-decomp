@@ -7,13 +7,9 @@
 
 void DateMenu_HideAnimations(struct DateMenu *p)
 {
-    u32 one = 1;
-    u32 *entry = &p->digits[0].flags;
-    s32 i = 11;
-    do {
-        *entry |= one;
-        entry += sizeof(struct SceneInputWidget) / sizeof(*entry);
-    } while (--i >= 0);
+    s32 i;
+    for (i = 0; i < 12; i++)
+        p->digits[i].flags |= 1;
     p->widgets[3].flags |= 1;
     p->widgets[2].flags |= 1;
     p->widgets[1].flags |= 1;
@@ -400,75 +396,53 @@ static inline void RelocateDateCursor(struct DateMenu *menu, void *source, u8 **
 
 s32 DateMenu_Initialize(struct DateMenu *menu)
 {
-    u32 zero;
-    u32 one;
-    u32 resourceBank;
     void *resource;
-    u8 *firstGraphics;
-    u8 *secondGraphics;
     u8 *cursorGraphics;
     u32 layer;
     void *bg;
-    u16 **firstPalette;
-    u16 *colors;
-    u16 firstPaletteBank;
-    u16 *paletteBank;
-    menu->state = zero = 0;
-    menu->selection = zero;
+    menu->state = 0;
+    menu->selection = 0;
     Bg_ClearTilemap(0);
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     Bg_ClearTilemap(2);
-    BgGfx_LoadTilemapSimple(2, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(2, 0, 0, 0, 0);
     Bg_ClearTilemap(3);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     bg = ScriptProc_Start(0xC091, 0x3536);
     layer = 2;
-    Bg_SetupLayers(2, 0, bg, 0, zero, one = 1, &layer);
-    BgGfx_LoadTilemapSimple(3, 0, 0, 0, zero);
+    Bg_SetupLayers(2, 0, bg, 0, 0, 1, &layer);
+    BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     CpuSet((u8 *)ScriptProc_Start(0x92B3, 0x204) + 0x14, gBgPaletteBuffer, 0x100);
 
-    resourceBank = 0xCB05;
-    resource = ScriptProc_Start(resourceBank, 0xE2AB);
-    firstGraphics = menu->widgets[0].resource;
-    ResourceHeader_Relocate(firstGraphics, resource);
-    menu->digitResource = *(struct SceneInputResource *)firstGraphics;
-    Widget_InitLinked((u8 *)&menu->widgets[0], firstGraphics, 0x34, 0x10, zero, zero, zero, NULL);
-    secondGraphics = menu->widgets[1].resource;
-    ResourceHeader_Relocate(secondGraphics, resource);
-    Widget_InitLinked((u8 *)&menu->widgets[1], secondGraphics, 0x26, 0x10, zero, zero, zero, NULL);
-
+    resource = ScriptProc_Start(0xCB05, 0xE2AB);
+    ResourceHeader_Relocate(menu->widgets[0].resource, resource);
+    menu->digitResource = *(struct SceneInputResource *)menu->widgets[0].resource;
+    Widget_InitLinked((u8 *)&menu->widgets[0], menu->widgets[0].resource, 0x34, 0x10, 0, 0, 0,
+                      NULL);
+    ResourceHeader_Relocate(menu->widgets[1].resource, resource);
+    Widget_InitLinked((u8 *)&menu->widgets[1], menu->widgets[1].resource, 0x26, 0x10, 0, 0, 0,
+                      NULL);
     ResourceHeader_Relocate(menu->widgets[2].resource, resource);
-    Widget_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, zero, zero,
-                      zero, NULL);
-    menu->widgets[1].flags |= one;
-    menu->widgets[2].flags |= one;
-    {
-        u16 **savedPalette = &menu->savedPalette;
-        u16 *sourcePalette;
-        firstPalette = &menu->widgets[1].palette;
-        sourcePalette = *firstPalette;
-        *savedPalette = sourcePalette;
-        colors = menu->colors;
-        CpuSet(sourcePalette, colors, 0x10);
-        *firstPalette = colors;
-    }
-    menu->widgets[2].palette = colors;
-    paletteBank = &menu->widgets[1].paletteBank;
-    firstPaletteBank = 0xE000;
-    *paletteBank = firstPaletteBank;
-    paletteBank = &menu->widgets[2].paletteBank;
-    *paletteBank = firstPaletteBank + 1;
-    resource = ScriptProc_Start(resourceBank, 0x530D);
+    Widget_InitLinked((u8 *)&menu->widgets[2], menu->widgets[2].resource, 0x27, 0x10, 0, 0, 0,
+                      NULL);
+    menu->widgets[1].flags |= 1;
+    menu->widgets[2].flags |= 1;
+    menu->savedPalette = menu->widgets[1].palette;
+    CpuSet(menu->savedPalette, menu->colors, 0x10);
+    menu->widgets[1].palette = menu->colors;
+    menu->widgets[2].palette = menu->colors;
+    menu->widgets[1].paletteBank = 0xE000;
+    menu->widgets[2].paletteBank = 0xE001;
+    resource = ScriptProc_Start(0xCB05, 0x530D);
     RelocateDateCursor(menu, resource, &cursorGraphics);
-    Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, zero, zero, zero, NULL);
+    Widget_InitLinked((u8 *)&menu->widgets[3], cursorGraphics, 0x80, 0x10, 0, 0, 0, NULL);
     DateMenu_InitializeDigitWidgets(menu);
     DateMenu_LoadCurrentDate(menu);
     DateMenu_UpdateDigits(menu);
-    if (gDateMenuParameters.flag == 1) {
-        menu->fadeShift = zero;
-    } else {
+    if (gDateMenuParameters.flag == 1)
+        menu->fadeShift = 0;
+    else
         menu->fadeShift = 3;
-    }
     Menu_StartFadeIn(menu->fadeShift);
     return 0;
 }

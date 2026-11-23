@@ -25,13 +25,9 @@ u32 ForgingBook_RefreshEntrySprites(struct FbBook *p)
     s32 offset = ForgingBook_GetCategoryEntryOffset(p->category);
     s32 count = ForgingBook_GetCategoryEntryCount(p->category);
     s32 i;
-    u32 hidden = 1;
 
-    struct FbFlags *fl = p->slot;
-    for (i = 17; i >= 0; i--) {
-        fl->flags |= hidden;
-        fl++;
-    }
+    for (i = 0; i < 18; i++)
+        p->slot[i].flags |= 1;
     if (p->category <= 5) {
         for (i = 0; i < count; i++) {
             u8 *e;

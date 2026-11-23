@@ -4,6 +4,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 
 struct PoisonHandSprite {
     u32 flags;
@@ -75,14 +77,6 @@ void EnemyParticle_EnableShadow(void *);
 void EnemyParticle_AddFlags(void *, u32);
 void EnemyParticle_Emit(void *, void *);
 
-static inline u32 TestPair(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-static inline u32 TestFlag(u32 mask, u32 *p)
-{
-    return *p & mask;
-}
 static inline u32 PoisonHand_StepSequence(struct PoisonHandSprite *owner,
                                           struct DisplaySequenceState *state)
 {
@@ -159,7 +153,7 @@ s32 PoisonHand_Update(struct PoisonHand *p)
     struct PoisonHandCollider *collider;
     /* The loop bank and final age update share the current data owner. */
     void *dataOwner;
-    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, p->update);
     p->sprite.flags &= ~1;

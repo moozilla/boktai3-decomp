@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "global.h"
 #include "player.h"
 #include "scene_hud_display.h"
@@ -10,8 +11,7 @@ u32 SceneHud_CanOpenFromStart(struct SceneHudState *p)
         player = p->actionOwner;
         if (player && player->kind == 1 && player->actionMode != 6 && !(player->statusFlags & 1) &&
             p->controlMode <= 2) {
-            u32 mask = 0x201;
-            if ((gEngineFlags | gScenePauseFlags) & mask)
+            if (Engine_PauseBits(0x201))
                 return 0;
             if (player->historyDirectionMode != 1)
                 return 1;

@@ -42,6 +42,10 @@ EFFECTS = ("call", "store")
 _OPERATOR = re.compile(r">>|<<|\s[&/%]=?\s")
 _DIVIDE = re.compile(r"\s[/%]=?\s")
 SIGN_SHIFT = ":31"  # a shift by the word size less one
+# an and with a literal zero: the mask store_bit_field makes when a store replaces a whole halfword
+# bit-field (`(old & 0) | new`). C's `x & 0` folds in the front end, and a zero the C did prove
+# (`f &= (u8)x >> 8`) is reported at the operation that produced it.
+OWN_MASK = "and:0"
 
 
 def _sign_correction(detail: str, statement: str) -> bool:
@@ -93,7 +97,7 @@ def compile_unit(src: str) -> list[tuple[str, str, int, str, str]]:
                     except OSError:
                         sources[file] = []
                 statement = _statement(sources[file], int(ln))
-                if not _OPERATOR.search(statement) or _sign_correction(detail, statement):
+                if detail == OWN_MASK or not _OPERATOR.search(statement) or _sign_correction(detail, statement):
                     continue
             found.add((KIND[kind], file, int(ln), func, detail))
     if r.returncode:

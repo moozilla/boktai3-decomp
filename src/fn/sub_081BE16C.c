@@ -87,12 +87,8 @@ void Storage_RefreshItemSlots(struct StorageItems *p)
         row = nextRow;
     }
     {
-        u32 mask = 1;
-        u32 *flags = &p->markers[0].flags;
-        s32 i = 7;
-        do {
-            *flags |= mask;
-            flags += 0x18;
-        } while (--i >= 0);
+        s32 i;
+        for (i = 0; i < 8; i++)
+            p->markers[i].flags |= 1;
     }
 }

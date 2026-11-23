@@ -1,3 +1,4 @@
+#include "terrain_sampling.h"
 #include "global.h"
 #include "engine.h"
 #include "scene_actor_registry.h"
@@ -43,14 +44,6 @@ static inline u32 ScatterRandomByte(const u16 *table, u32 *rng)
     operand.sample = table[index];
     return operand.sample & 255;
 }
-static inline s32 CellIndex(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-u8 *TerrainModifiers_FindCellOverride(u32, u32);
 static inline u8 *CellData(s32 index)
 {
     u8 *p = TerrainModifiers_FindCellOverride(index, 1);
@@ -113,7 +106,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
     s32 cell;
     SetVelocity(&center, direction, 512);
     Add(&center, &p->position, &center);
-    sourceCell = CellIndex(&p->position);
+    sourceCell = Terrain_GetCellIndex(&p->position);
     ZeroFill8(&velocity);
     {
         s32 i;
@@ -128,7 +121,7 @@ void FeatherEffectPool_SpawnGroundScatter(struct Feather *p, s32 count)
             spot.packed.z = ScatterRandomByte((const u16 *)data, rng) - 128;
             scatter = &spot.position;
             Add(ScatterCursor(&scatter), &center, ScatterCursor(&scatter));
-            cell = CellIndex(ScatterCursor(&scatter));
+            cell = Terrain_GetCellIndex(ScatterCursor(&scatter));
             if (FeatherEffectPool_ClipScatterPath(p, scatter, sourceCell, cell,
                                                   Divide64(direction)))
                 goto next;

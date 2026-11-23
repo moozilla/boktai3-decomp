@@ -28,9 +28,8 @@ void Storage_BeginEquipmentSpecialMove(struct StoragePanel *panel)
     ((struct SceneInputWidget *)((u8 *)&display->widgets[panel->selection] + 0x318))->flags |= 1;
     frames[0] = Inventory_GetEquipmentId(panel->items[panel->selection]) + 0xF0;
     {
-        u32 attribute = 0x373;
-        savedAttribute = attribute;
-        attributes[0] = attribute;
+        savedAttribute = 0x373;
+        attributes[0] = 0x373;
     }
     Storage_GetSlotPosition(starts, panel->selection);
     target = targets;

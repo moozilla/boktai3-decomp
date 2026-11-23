@@ -14,20 +14,9 @@ void AnimData_SelectPaletteBank(void *, s32);
 
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
-static inline u8 Pick(u8 *nav)
-{
-    u8 *choices = nav + 0x81;
-    u32 i = 1 ^ nav[0x83];
-    return choices[i];
-}
-struct NavRoute {
-    u8 unknown0[0x81];
-    u8 choices[2];
-    u8 current;
-};
 u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
 {
-    u8 *nav = (u8 *)actor + 0x3D4;
+    struct SceneActorChaseGroup *group = &actor->group;
     if (actor->base.category == 1 && (actor->base.hitReactionFlags & 4)) {
         u32 test = 0x2000;
         u16 *flags2D4 = &actor->base.motionFlags;
@@ -61,7 +50,7 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                 count = &actor->group.field5C0;
                 {
                     u32 idx = *count * 2;
-                    u8 *arr = (u8 *)actor + 0x5B8;
+                    u8 *arr = (u8 *)&actor->group.motion5B8;
                     {
                         u16 *slot = (u16 *)(arr + idx);
                         u32 v = 0x244;
@@ -92,15 +81,13 @@ u8 SceneActorReaction_ApplyEscalatingHit(struct ChaseActor *actor)
                                              &actor->base.body.position, &offset, 1);
             }
             SceneBody_StartRoute(
-                (u8 *)actor + 0x50, nav + 0x74,
-                ((struct NavRoute *)nav)->choices[1 ^ ((struct NavRoute *)nav)->current], 0, 0);
+                &actor->base.body, &group->homeRoute,
+                group->homeRoute.branches[1 ^ group->homeRoute.activeBranch], 0, 0);
             {
-                u16 *t = (u16 *)(nav + 0x1F0);
-                u32 v = 600;
-                *t = v;
+                group->field5C4 = 600;
             }
             {
-                u16 bank = FIELD(actor, 0x1E4, u16);
+                u16 bank = actor->base.alternateOffset;
                 if (actor->base.drawableKind == 0)
                     AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
                 else

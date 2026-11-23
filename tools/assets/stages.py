@@ -21,6 +21,7 @@ use library procedures, decoded here by argument position:
             and are found inside `trap box` event blocks; proc_946(..., box,
             scene, entrance) is a door behind a lock
   item      proc_1118(category, item, x, z, facing, flags, flag) on the floor
+            (also proc_1131, a random item from a table at x, z: category -1)
             and proc_1119(category, item, x, z, facing, chest, ?, flags, flag,
             proc); chest = 1 puts it in a chest (proc_1120 creates actor 0x430D
             whose event spawns the pickup, cmd 0xDDCF `I: category item`).
@@ -183,6 +184,13 @@ class Walker:
             flags, flag = (a(6), a(7)) if pid == 1118 else (a(8), a(9))
             o["items"].append(dict(rec, category=num(a(1)), item=num(a(2)), x=num(a(3)), z=num(a(4)),
                                    chest=chest, flags=flags, flag=num(flag)))
+            return
+        if pid == 1131 and len(ops) >= 9:
+            # place_random_items(table, count, start, x, z, facing, chest, a, proc): one item
+            # rolled from a text-bank table (proc_1132), not yet taken, at (x, z); its pickup
+            # runs proc (2999: the Flame lens and Otenko's lesson)
+            o["items"].append(dict(rec, category=-1, item=-1, x=num(a(4)), z=num(a(5)),
+                                   chest=num(a(7)) == 1, random=True, table=a(1), run=num(a(9))))
             return
         if pid in (8796, 1155, 1677, 1030, 1771) and len(ops) >= 3:
             # people to talk to: place_character (8796; 1155 and 1677 wrap it) and talk

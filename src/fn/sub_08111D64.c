@@ -6,8 +6,6 @@ struct S {
 void StageResults_InitAnimationIds(struct S *s)
 {
     s32 i;
-    u16 *p;
-    u16 v;
     s->a[0] = 0x34;
     s->a[1] = 0x39;
     s->a[2] = 0x3a;
@@ -16,11 +14,6 @@ void StageResults_InitAnimationIds(struct S *s)
     s->a[4] = 0x21;
     s->a[5] = 0x22;
     s->a[7] = 0x3c;
-    v = 0x3e;
-    p = &s->a[8];
-    i = 0xe;
-    do {
-        *p = v;
-        p++;
-    } while (--i >= 0);
+    for (i = 8; i < 23; i++)
+        s->a[i] = 0x3e;
 }

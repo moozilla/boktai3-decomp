@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "global.h"
 #include "area_effect_link.h"
 #include "game_state.h"
@@ -62,7 +63,6 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
     u16 keys;
     u32 flags;
     s32 i;
-    u32 mask;
     gLinkMenuActive = 1;
     if (Registry1745_ConsumeStateEntry(p)) {
         p->receiveBits = (u16)gGameState->unk874 >> 2;
@@ -77,8 +77,7 @@ s32 LinkSelection_ExchangeParticipantInput(struct AreaEffectLinkState *p)
         Registry1745_BeginShutdown(p, ScriptPanel_OpenTextWindow);
         return -1;
     }
-    mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         s32 best = 0, bestIndex = -1, j;
         for (j = 0; j <= 1; j++) {
             if (((u8 **)gParticipantActors)[j]) {

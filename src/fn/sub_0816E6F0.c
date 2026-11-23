@@ -21,16 +21,14 @@ static inline void RandomSpin_0816E6F0(s16 *spin)
 {
     u16 *table = gRandomTable;
     u32 *index = &gRandomIndex;
-    u32 mask;
     u32 i;
     s32 v;
     i = (*index) + 1;
-    mask = 0x3FF;
-    i &= mask;
+    i &= 0x3FF;
     *index = i;
     v = Mod(table[i], 10) + 5;
     *spin = v;
-    i = ((*index) + 1) & mask;
+    i = ((*index) + 1) & 0x3FF;
     *index = i;
     {
         u16 sample = table[i];

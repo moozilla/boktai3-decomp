@@ -333,10 +333,8 @@ void PursuingActor_UpdateRecoil(struct PursuingActorManager *pool, struct Pursui
     if (p->entered) {
         p->timer = 0;
         {
-            u32 mask;
             angle = Math_Atan2(p->velocity.x, p->velocity.z) + 128;
-            mask = 255;
-            angle &= mask;
+            angle &= 255;
         }
         velocity = &p->velocity;
         magnitude = 12;

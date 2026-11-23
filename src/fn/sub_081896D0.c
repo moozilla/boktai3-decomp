@@ -1,16 +1,8 @@
 #include "global.h"
+#include "contact_collider.h"
 #include "armor_decision_ops.h"
 #include "game_state.h"
-
-struct ArmorPart {
-    u8 pad[0x38];
-    u32 flags;
-};
-static inline void Armor_ClearPart(struct ArmorPart *part, u32 bits)
-{
-    u32 mask = ~bits;
-    part->flags &= mask;
-}
+#include "scene_combat_colliders.h"
 
 void ActorController_SetBehavior(void *, s32);
 s32 Math_Atan2(s32, s32);
@@ -21,10 +13,9 @@ struct ArmorFacingActor {
     u8 unknown4A[2];
     s16 z;
     u8 unknown4E[0x190 - 0x4E];
-    struct ArmorPart body;
-    u8 unknown1CC[0x1E4 - 0x1CC];
-    struct ArmorPart attack;
-    u8 unknown220[0xB26 - 0x220];
+    struct ContactCollider body;
+    struct ContactCollider attack;
+    u8 pad238[0xB26 - 0x238];
     u16 attackPower;
     u8 unknownB28[0xB32 - 0xB28];
     u16 flags;
@@ -70,8 +61,8 @@ void Armor_UpdateFacingDecision(struct ArmorFacingActor *actor)
             actor->timer = 0x12C;
             actor->attackPower = actor->initialAttack;
             actor->contacts = 0;
-            Armor_ClearPart(&actor->attack, 0x400008);
-            Armor_ClearPart(&actor->body, 0x400008);
+            ContactCollider_ClearReactionFlags(&actor->attack, 0x400008);
+            ContactCollider_ClearReactionFlags(&actor->body, 0x400008);
         }
     }
     if (actor->delay > 0) {

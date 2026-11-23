@@ -1,8 +1,10 @@
+#include "engine_pause.h"
 #include "game_over.h"
 #include "palette_pulse.h"
 #include "player.h"
 #include "message_window.h"
 #include "runtime.h"
+#include "scene_actor_chase_shared.h"
 
 void Sound_StopAllTrackedSongs(void);
 
@@ -40,11 +42,6 @@ static inline s32 AddScaledLetterSpacing(s32 spread, struct GameOver *panel)
 {
     s32 scale = panel->extentX;
     return spread + (scale >> 2);
-}
-
-static inline void andm(u32 *flags, u32 mask)
-{
-    *flags &= mask;
 }
 
 void GameOver_InitExpansion(struct GameOver *panel)
@@ -118,23 +115,13 @@ void GameOver_UpdateOpening(struct GameOver *panel)
         panel->extentX += 5;
         panel->extentY -= 5;
         if (panel->extentX > 127) {
-            struct GameOverSprite *sprite;
             s32 i;
             panel->extentX = 1;
             panel->extentY = 1;
-            {
-                u32 mask = 1;
-                sprite = panel->sprites;
-                for (i = 7; i >= 0; i--) {
-                    sprite->flags |= mask;
-                    sprite++;
-                }
-            }
-            {
-                u32 zero = 0;
-                panel->animationState = 7;
-                panel->timer = zero;
-            }
+            for (i = 0; i < 8; i++)
+                panel->sprites[i].flags |= 1;
+            panel->animationState = 7;
+            panel->timer = 0;
         }
     }
 }
@@ -175,7 +162,7 @@ void GameOver_UpdateLetterTransforms(struct GameOver *panel)
 
 void GameOver_StopPresentation(void)
 {
-    andm(&gEngineFlags, ~0x400);
+    SceneActorChase_AndWordFlags(&gEngineFlags, ~0x400);
     Sound_StopSong(2);
     SceneLifecycle_RequestRestart(0);
 }
@@ -259,8 +246,7 @@ void GameOver_StartFromScript(void)
 
 void GameOver_TryBeginClose(struct GameOver *panel)
 {
-    u32 mask = 0x400;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x400)) {
         GameOver_ShowGraphics(panel);
         Hud_SetMode(7);
         if ((u8)(gPlayers[0]->tetherMode - 0x21) <= 1) {
@@ -278,13 +264,9 @@ void GameOver_FinishDelay(struct GameOver *panel)
         void *a = SpriteOam_QueueFlaggedProjectedSprites;
         void *b = Sprite_RenderFlipAwareList;
         void *c = sub_08219674;
-        u32 mask = ~1;
-        struct GameOverSprite *entry = panel->sprites;
-        int i = 7;
-        do {
-            entry->flags &= mask;
-            entry++;
-        } while (--i >= 0);
+        int i;
+        for (i = 0; i < 8; i++)
+            panel->sprites[i].flags &= ~1;
         Video_SetRenderCallbacks(0, a, b, c);
         panel->closeState = 2;
     }
@@ -322,29 +304,21 @@ void GameOver_UpdateCostSelection(struct GameOver *panel)
         Sound_PlaySong(222);
     }
     if (decision == 0) {
-        u32 mask;
         panel->overlay.flags |= 1;
-        mask = 1;
         MessageWindow_Clear();
         Hud_SetMode(7);
         Player_AdvanceTetherPhase(gPlayers[0]);
         Sound_FadeOutChannel10(2);
-        panel->timer = decision;
-        panel->choice = mask;
+        panel->timer = 0;
+        panel->choice = 1;
         panel->animationState = 6;
         panel->closeState = 4;
     } else if (decision == 1) {
-        struct GameOverSprite *sprite;
         s32 i;
-        u32 mask;
         Sound_FadeOutChannel10(2);
         panel->overlay.flags |= decision;
-        mask = 1;
-        sprite = panel->sprites;
-        for (i = 7; i >= 0; i--) {
-            sprite->flags |= mask;
-            sprite++;
-        }
+        for (i = 0; i < 8; i++)
+            panel->sprites[i].flags |= 1;
         MessageWindow_Clear();
         Hud_SetMode(7);
         if (panel->procedure) {
@@ -378,7 +352,7 @@ void GameOver_UpdateExit(struct GameOver *panel)
 {
     GameOver_UpdateLetterAnimation(panel);
     if (panel->animationState == 8) {
-        andm(&gEngineFlags, ~0x400);
+        SceneActorChase_AndWordFlags(&gEngineFlags, ~0x400);
         gPlayTimeCounterEnabled = 0;
         SceneLifecycle_RequestRestart(panel->choice);
         Task_Kill(panel);

@@ -6,20 +6,15 @@ s32 Div(s32, s32);
 void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
 {
     s32 digits[4];
-    s32 value, remaining;
+    s32 value, remaining, i;
     s32 *digit;
     struct SolarBankDigit *anim;
     void *data;
     value = panel->transferAmount;
     if (value == 0) {
         data = panel->animData;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -39,13 +34,8 @@ void SolarBank_RefreshAmountDigits(struct SolarBankPanel *panel)
     } while (remaining >= 0);
     value = panel->balance;
     if (value == 0) {
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;

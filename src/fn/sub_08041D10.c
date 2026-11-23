@@ -5,10 +5,8 @@ static inline void drawCapacity(struct ModifierSelection *current)
 {
     s32 count = current->count;
     s32 capacity;
-    s32 width;
     capacity = current->capacity;
-    width = 16;
-    ModifierMenu_DrawCapacity(count, capacity, capacity, 8, width);
+    ModifierMenu_DrawCapacity(count, capacity, capacity, 8, 16);
 }
 void ModifierMenu_UpdateCapacityFlash(struct ModifierMenu *menu)
 {

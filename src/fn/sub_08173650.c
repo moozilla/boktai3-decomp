@@ -33,7 +33,7 @@ void SceneHud_LayoutEquipmentGrid(struct SceneHudState *p)
     }
     SceneHud_RefreshEquipmentIcons(p, 0);
     {
-        struct SceneInputWidget *a = (void *)((u8 *)p + 0x2560);
+        struct SceneInputWidget *a = p->actionPanelWidgets;
         a->flags &= ~1;
         {
             struct SceneInputWidget *b = (void *)((u8 *)p + 0x25c0);

@@ -1,5 +1,5 @@
 #define gActorLayeredMidRestoreAnimations gUnk_0824EE20
-#include "scene_combat_actor.h"
+#include "scene_combat_colliders.h"
 extern const u32 gActorLayeredMidRestoreAnimations[];
 void Armor_SetAnimationFromStart(struct SceneCombatActor *, const void *);
 void Armor_StartPaletteRestoreDelay(void *);

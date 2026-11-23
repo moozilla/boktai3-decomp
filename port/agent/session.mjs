@@ -43,20 +43,24 @@ export async function openSession(opts = {}) {
   const libDir = opts.lib === undefined ? [path.join(ROOT, 'port/agent/lib')] : [].concat(opts.lib || []);
   const save = opts.save ? fs.readFileSync(opts.save) : null;
   const time = Math.floor(Date.parse(opts.time || '2025-11-13T12:00:00Z') / 1000);
-  let solar = opts.solar ?? 232;
+  const solar0 = opts.solar ?? 232;
+  let solar = solar0;
+  // solar sensor changes by frame ([frame, value]): opts.solarLog replays an earlier run's;
+  // setSolar adds to it. Applied at the frame boundary, in replays too.
+  const solarAt = new Map((opts.solarLog || []).map(([f, v]) => [f, v]));
   let render = !!opts.render;
   const out = opts.print || ((s) => process.stderr.write(s + '\n'));
 
   let ex = null, memory = null, g = null, frameNo = 0, lastPixels = 0;
   let script = null, replay = null, stopped = null, pending = null;
   const movie = (opts.movie || []).slice();  // movie[n] = keys returned for frame n; opts.movie replays first
-  const solarLog = [];   // [frame, value] changes
   const session = {};
 
   const imports = { env: {
     frame(ptr, n) {
       frameNo = n;
       lastPixels = ptr;
+      if (solarAt.has(n) && solarAt.get(n) !== solar) { solar = solarAt.get(n); ex.port_game_set_solar(solar); }
       let keys;
       if (replay && n < replay.length) {
         keys = replay[n] | 0;
@@ -98,6 +102,7 @@ export async function openSession(opts = {}) {
     new Uint8Array(memory.buffer, 0x08000000, rom.length).set(rom);
     if (ex.port_load_rom(0x08000000, rom.length) !== 0) throw new Error('ROM load failed');
     ex.port_game_set_time(time);
+    solar = solarAt.has(0) ? solarAt.get(0) : solar0;
     ex.port_game_set_solar(solar);
     if (ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0);
     g = createGame({ memory, exports: ex, types, print: out });
@@ -115,7 +120,8 @@ export async function openSession(opts = {}) {
 
   Object.defineProperties(session, {
     g: { get: () => g }, frame: { get: () => frameNo }, movie: { get: () => movie },
-    exports: { get: () => ex }, memory: { get: () => memory }, solarLog: { get: () => solarLog },
+    exports: { get: () => ex }, memory: { get: () => memory },
+    solarLog: { get: () => [...solarAt].sort((a, b) => a[0] - b[0]).filter(([f]) => f < movie.length) },
   });
   Object.assign(session, {
     types,
@@ -152,11 +158,12 @@ export async function openSession(opts = {}) {
       movie.length = 0;
       for (let i = 0; i < snap.movie; i++) movie.push(snap.keys[i]);
       frameNo = snap.frame;
+      for (const f of [...solarAt.keys()]) if (f > snap.frame) solarAt.delete(f);
       if (snap.solar !== solar) session.setSolar(snap.solar);
       g.refresh();  // hooks set since the snapshot
     },
     setRender(on) { render = !!on; if (ex && ex.port_video_set_enabled) ex.port_video_set_enabled(render ? 1 : 0); },
-    setSolar(v) { solar = v; ex.port_game_set_solar(v); solarLog.push([frameNo, v]); },
+    setSolar(v) { solar = v; ex.port_game_set_solar(v); solarAt.set(frameNo, v); },
     pixels() { return new Uint16Array(memory.buffer, lastPixels, 240 * 160).slice(); },
     keyMask,
   });

@@ -8,6 +8,8 @@
 #include "rotation_phase.h"
 #include "scene_actor_reset.h"
 #include "axe.h"
+#include "math_shift.h"
+#include "word_flags.h"
 #include "scene_actor_animation.h"
 #include "scene_actor_state.h"
 #include "scene_actor_behavior.h"
@@ -34,6 +36,10 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_body.h"
+#include "scene_actor_turn.h"
+#include "movement_curve.h"
+#include "scene_actor_displacement.h"
+#include "scene_actor_terrain_reaction.h"
 
 struct AxeTrailSprite {
     u32 flags;
@@ -114,15 +120,6 @@ s32 Math_Atan2(s32, s32);
 
 void SceneActorControl_SettleRotation(struct RoomActor *actor, s32 elapsed);
 
-static inline u8 Take(u8 *p)
-{
-    if (*p) {
-        *p = 0;
-        return 1;
-    }
-    return 0;
-}
-
 static inline s32 Scale(s32 value)
 {
     if (value >= 0)
@@ -174,16 +171,11 @@ static inline s32 Absolute(s32 value)
     return value;
 }
 
-static inline void ClearFlags(u32 *p, u32 mask)
-{
-    *p &= ~mask;
-}
-
 void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
 {
     struct AxeTrail *trail = p->trail;
     u32 previous;
-    if (Take(&p->entered)) {
+    if (SceneActorControl_TakeFlag(&p->entered)) {
         *(u32 *)p->sprite |= 2;
         Velocity(&trail->velocity, p->facing, 12);
         trail->heading = p->facing;
@@ -227,17 +219,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         Velocity(&trail->velocity, trail->heading, 8);
         if (LengthSquared(&delta) <= 1023 || frame > 600) {
             trail->position = p->position;
-            {
-                void *callback = SceneActorControl_SettleRotation;
-                u32 phase = 0x29;
-                p->entered = 1;
-                p->state = 0;
-                p->phase = phase;
-                p->callback = callback;
-                p->timer = 0;
-                ClearFlags(&p->flags114, 1);
-                p->word104 = 0;
-            }
+            SceneActorChase_SetControl(p, SceneActorControl_SettleRotation, 0x29);
         }
     }
 }
@@ -276,18 +258,9 @@ struct AxeFadeSprite {
     u8 field6;
 };
 
-static inline u8 TakeEntry(struct ChaseActor *actor)
-{
-    if (actor->base.field2B2) {
-        actor->base.field2B2 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame)
 {
-    u8 entered = TakeEntry(actor);
+    u8 entered = SceneActorReaction_TakePrepared(actor);
     struct AxeFadeSprite *sprite = actor->base.drawable;
     s32 previous;
     if (entered)
@@ -458,19 +431,7 @@ void Axe_UpdateTargetWindup(struct ChaseActor *actor, s32 elapsed)
         else
             delay = state->delay;
         if (elapsed > delay) {
-            void *callback = Axe_UpdateTargetLunge;
-            u32 phase = 0x36;
-            actor->base.field2B2 = 1;
-            actor->base.stepDone = 0;
-            actor->base.controlKind = phase;
-            actor->base.target = callback;
-            actor->base.field2C8 = 0;
-            {
-                u32 *flags = &actor->base.pendingControlFlags;
-                u32 mask = ~1;
-                *flags &= mask;
-            }
-            actor->base.pendingControl = 0;
+            SceneActorChase_SetControl(actor, Axe_UpdateTargetLunge, 0x36);
         }
     } else {
         s32 step, turn;
@@ -494,16 +455,11 @@ s32 Div(s32, s32);
 
 struct S080FB958;
 
-void Axe_SetAuxiliarySpriteRenderState(struct S080FB958 *s, u32 x, u32 y);
+void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *actor, const void *palette, u32 index);
 
 static inline s32 Axe_ShiftSigned(s32 v)
 {
     return v >= 0 ? v >> 6 : -(-v >> 6);
-}
-
-static inline u32 Axe_TestFlags(u32 k_, u32 *flags)
-{
-    return (*flags) & k_;
 }
 
 struct AxeLungePlayer {
@@ -586,7 +542,7 @@ void Axe_UpdateTargetLunge(struct ChaseActor *a, s32 frame)
         else
             state->angularSpeed = 0;
     }
-    if (Axe_TestFlags(0x10, flags)) {
+    if (Flags_MaskedWord(0x10, flags)) {
         state->queued = 1;
         RotationPhase_Change(a, SceneActorControl_FinishRotation, 0x33);
         {
@@ -636,30 +592,21 @@ void SceneActorAnimation_SelectProfileEntry(struct RoomActor *, s32);
 
 // the second test; an int result gets jump-threaded away.
 
-static inline u8 TakeFlag(u8 *flag)
+void Axe_OnAnimationReset(struct ChaseActor *actor)
 {
-    if (*flag) {
-        *flag = 0;
-        return TRUE;
-    }
-    return FALSE;
-}
-
-void Axe_OnAnimationReset(u8 *p)
-{
-    if (TakeFlag(p + 0x2B2))
-        SceneActorAnimation_SelectProfileEntry(p, 1);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2))
+        SceneActorAnimation_SelectProfileEntry(actor, 1);
 }
 
 // A bool8 (u8) result from an inline helper keeps the materialised 0/1 and
 
 // the second test; an int result gets jump-threaded away.
 
-void Axe_BeginProfileEntry(u8 *p)
+void Axe_BeginProfileEntry(struct ChaseActor *actor)
 {
-    if (TakeFlag(p + 0x2B2)) {
-        *(u16 *)(p + 0x2C2) = 1;
-        SceneActorAnimation_SelectProfileEntry(p, 0);
+    if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
+        actor->base.field2C2 = 1;
+        SceneActorAnimation_SelectProfileEntry(actor, 0);
     }
 }
 
@@ -714,49 +661,22 @@ static inline void Select(struct RoomActor *actor, u32 selection, u32 variant, u
     *restart = 0;
 }
 
-#define FIELD(p, o, t) (*(t *)((u8 *)(p) + (o)))
-
 void Anim_SetDurationScale(void *, u32);
 
 void Anim_SetFrameDurationScale(void *, u32);
 
-static inline void Control(struct RoomActor *a, void *callback, u32 phase)
-{
-    a->field2B2 = 1;
-    a->stepDone = 0;
-    FIELD(a, 0x2B5, u8) = phase;
-    FIELD(a, 0x21C, void *) = callback;
-    FIELD(a, 0x2C8, u16) = 0;
-    {
-        u32 *flags = &FIELD(a, 0x114, u32);
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    FIELD(a, 0x104, u32) = 0;
-}
-
 // confidence=low: turns one octant toward the requested direction on animation ticks.
-
-static inline u32 Arg1(u32 k_, struct RoomActor *actor)
-{
-    return (*((u16 *)(((u8 *)actor) + 0x2D4))) & k_;
-}
-
-static inline u32 Arg2(u32 k_, struct RoomActor *actor)
-{
-    return (*((u32 *)(((u8 *)actor) + 0x2CC))) & k_;
-}
 
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 {
-    u8 *direction = ((u8 *)actor) + 0x50;
+    u8 *direction = (u8 *)&actor->body;
     struct DisplaySequenceState *sequence;
-    if (Take(&actor->field2B2)) {
+    if (SceneActorControl_TakeFlag(&actor->field2B2)) {
         s32 current = ((actor->body.direction + 0x70) >> 5) & 7;
         s32 target = ((actor->nextDirection + 0x70) >> 5) & 7;
         if (current == target) {
             actor->body.direction = actor->nextDirection;
-            SceneActorChase_SetControl(actor, *((void **)(((u8 *)actor) + 0x22C)), 0);
+            SceneActorChase_SetControl(actor, actor->onStanding, 0);
             actor->stepDone = 1;
             return;
         }
@@ -764,12 +684,12 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         {
             s32 k1 = 4;
             if (((u8)((current - target) & 7)) <= k1) {
-                u32 *p = (u32 *)(((u8 *)actor) + 0x2CC);
+                u32 *p = &actor->behaviorFlags;
                 u32 mask = ~0x10000;
                 *p &= mask;
             } else {
                 u32 mask = 0x10000;
-                *((u32 *)(((u8 *)actor) + 0x2CC)) |= mask;
+                actor->behaviorFlags |= mask;
             }
         }
     }
@@ -803,8 +723,8 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
         u32 variant;
         u32 flags;
         u32 selection;
-        SceneActorChase_SetControl(actor, *((void **)(((u8 *)actor) + 0x224)), 2);
-        if (Arg2(0x10000, actor))
+        SceneActorChase_SetControl(actor, actor->onEntry, 2);
+        if (Flags_MaskedWord(0x10000, &actor->behaviorFlags))
             direction[9] += 32;
         else
             direction[9] -= 32;
@@ -817,7 +737,7 @@ void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events)
 
 static inline u16 Flag(struct RoomActor *actor, u16 mask)
 {
-    u16 *p = (void *)((u8 *)actor + 0x2D6);
+    u16 *p = &actor->reactionFlags;
     return *p = mask | *p;
 }
 
@@ -841,18 +761,9 @@ void Axe_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame)
 
 // confidence=low: converges saved motion, then enables the axe recovery behavior.
 
-struct S080FAE08;
+void Axe_ClearForcedMovement(struct ChaseActor *s);
 
-void Axe_ClearForcedMovement(struct S080FAE08 *s);
-
-struct S080FACFC;
-
-void Axe_ResetMovementFlags(struct S080FACFC *s);
-
-static inline s32 Quarter(s32 v)
-{
-    return v >= 0 ? v >> 2 : -(-v >> 2);
-}
+void Axe_ResetMovementFlags(struct ChaseActor *actor);
 
 static inline s32 Clamp(s32 v)
 {
@@ -877,33 +788,14 @@ static inline void SetFlags(struct ChaseActor *a, u32 m)
     a->base.motionFlags = v;
 }
 
-static inline void SetForced(struct ChaseActor *a, u32 m)
-{
-    a->base.statusFlags = m | a->base.statusFlags;
-}
-
-static inline void SetContext(u8 *p, u32 m)
-{
-    *(u32 *)(p + 0xE4C) = m | *(u32 *)(p + 0xE4C);
-}
-
 static inline void RestoreHistory(struct ChaseActor *a, u16 v)
 {
     a->group.common.gate.counter = v;
 }
 
-static inline void SetState(struct ChaseActor *a, u8 s, u8 p, u8 b)
-{
-    a->base.state2A8 = s;
-    a->base.phase2A9 = p;
-    a->base.behavior2AA = b;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
-}
-
 void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     s32 x, z;
     s16 *priorX, *priorZ;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
@@ -914,17 +806,17 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
     }
     {
         s32 current = actor->base.reactionStart.x;
-        s16 *field = (void *)((u8 *)actor + 0x318);
+        s16 *field = &actor->base.reactionEnd.x;
         s32 difference = current - *field;
         priorX = field;
-        x = Quarter(difference);
+        x = SceneActorDisplacement_Quarter(difference);
     }
     {
         s32 current = actor->base.reactionStart.z;
-        s16 *field = (void *)((u8 *)actor + 0x31C);
+        s16 *field = &actor->base.reactionEnd.z;
         s32 difference = current - *field;
         priorZ = field;
-        z = Quarter(difference);
+        z = SceneActorDisplacement_Quarter(difference);
     }
     x = Clamp(x);
     z = Clamp(z);
@@ -948,32 +840,23 @@ void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor)
             s32 m = ~0x80;
             *f &= m;
         }
-        SetForced(actor, 0x100000);
+        SceneActorChase_SetStatusFlags(actor, 0x100000);
         Axe_ResetMovementFlags(actor);
-        SetContext(context, 0x10);
+        WordFlags_Set(0x10, &context->flagsE4C);
         RestoreHistory(actor, actor->group.common.gate.duration);
-        SetState(actor, 0, 2, 9);
+        SceneActorTerrain_EnterState(actor, 0, 2, 9);
     }
 }
 
 void ActorShadow_Disable(void *);
 
-struct S080FC7F4;
+void Axe_UpdateAttackColliderPositions(struct ChaseActor *actor);
 
-void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s);
+void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor);
 
-struct S080FC844;
-
-void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s);
-
-static inline void OrStatus(u16 status, u16 *flags)
+static inline u8 HasAuxiliary(const struct Axe *state)
 {
-    *flags |= status;
-}
-
-static inline u8 HasAuxiliary(const u8 *state)
-{
-    return state[0xA3C] != 0;
+    return state->auxiliarySprite.unknown4[0] != 0;
 }
 
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
@@ -981,9 +864,9 @@ static inline u8 HasAuxiliary(const u8 *state)
 void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        u8 *state = actor->base.context;
+        struct Axe *state = actor->base.context;
         struct SceneActorRegistryControl *control = &group->control;
         u32 *field = &actor->base.behaviorFlags;
         u32 mask = ~0x141C0;
@@ -995,38 +878,38 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
         Sound_PlaySong(318);
         actor->base.colliderA.responseValue = 0;
         ActorStatus_ClearDrawableFlags(actor, 1);
-        SetState(actor, 3, 0, 0);
+        SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         if (HasAuxiliary(state)) {
-            u32 *flags = (void *)(state + 0xA38);
+            u32 *flags = &state->auxiliarySprite.flags;
             *flags |= 2;
-            state[0xCAB] = 0;
-            state[0xA35] = 0;
-            *(struct ContactPosition *)(state + 0xA24) = *(struct ContactPosition *)(state + 0xA54);
+            state->flagsCAB = 0;
+            state->trailHeading = 0;
+            state->trailPosition = state->auxiliarySprite.position;
             {
-                u32 angle = state[0xCA8];
-                state[0xA34] = angle;
+                u32 angle = state->trailStartAngle;
+                state->trailAngle = angle;
             }
-            state[0xA36] = 4;
-            ActorShadow_Disable(state + 0xCAC);
+            state->trailSpinRate = 4;
+            ActorShadow_Disable(state->auxiliaryShadow);
             *flags = 1;
         }
-        state[0xED6] = 1;
-        *(u16 *)(state + 0xED4) = 0;
+        state->damageSpinStarted = 1;
+        state->reactionHoldTimer = 0;
     }
-    if (*(u16 *)(context + 0xED4)) {
-        --*(u16 *)(context + 0xED4);
-        OrStatus(0x20, &actor->base.reactionFlags);
+    if (context->reactionHoldTimer) {
+        --context->reactionHoldTimer;
+        HalfwordFlags_Set(0x20, &actor->base.reactionFlags);
     }
-    if (context[0xA3C]) {
-        u32 previous = context[0xA34];
-        s32 next = previous - context[0xA36];
-        context[0xA34] = next;
+    if (context->auxiliarySprite.unknown4[0]) {
+        u32 previous = context->trailAngle;
+        s32 next = previous - context->trailSpinRate;
+        context->trailAngle = next;
         if ((s32)previous < next)
             Sound_PlaySong(361);
-        if ((frame & 1) && context[0xA36] <= 19)
-            context[0xA36]++;
-        ActorPhase_EmitTrailSprite(actor, context + 0xA24, context[0xA34]);
+        if ((frame & 1) && context->trailSpinRate <= 19)
+            context->trailSpinRate++;
+        ActorPhase_EmitTrailSprite(actor, &context->trailPosition, context->trailAngle);
         Axe_UpdateTrailColliders(actor);
         Axe_UpdateAttackColliderPositions(actor);
         if (frame > 30)
@@ -1063,15 +946,6 @@ static inline s32 Scale_UpdateDefeat(s32 x)
     else
         result = -(-x >> 12);
     return result;
-}
-
-static inline void SetAnimation(struct ChaseActor *a, u8 s, u8 p, u8 b)
-{
-    a->base.state2A8 = s;
-    a->base.phase2A9 = p;
-    a->base.behavior2AA = b;
-    a->base.counter2AC = 0;
-    a->base.field2B1 = 1;
 }
 
 void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
@@ -1172,7 +1046,7 @@ void Axe_UpdateDefeat(struct ChaseActor *actor, s32 frame)
     Bestiary_UnlockEntry(Bestiary_GetEntryForActor(actor->base.category, context->variant));
     actor->base.attachmentTimer = 0;
     SceneActorChase_SetTypedControl(actor, SceneActorControl_OnIdle, 16);
-    SetAnimation(actor, 1, 0, 2);
+    SceneActorTerrain_EnterState(actor, 1, 0, 2);
 }
 
 static inline s32 Normalize(s32 a)
@@ -1300,17 +1174,7 @@ void SceneActorControl_ApplyDampedMotion(struct ChaseActor *actor)
         state->z >>= 1;
     }
     if (actor->base.stepDone) {
-        u32 offset = 0x2A8;
-        u8 *field = ((u8 *)actor) + offset;
-        *field = 0;
-        offset = 0x2A9;
-        *(((u8 *)actor) + offset) = 0;
-        offset = 0x2AA;
-        *(((u8 *)actor) + offset) = 0;
-        offset = 0x2AC;
-        *((u32 *)(((u8 *)actor) - (-offset))) = 0;
-        offset = 0x2B1;
-        *(((u8 *)actor) + offset) = 1;
+        Chase_SetBehavior(actor, 0);
     } else {
         ++actor->base.counter2AC;
     }
@@ -1320,49 +1184,34 @@ u8 Axe_PickAttack(void *);
 
 void ActorPhase_UpdateSpriteCollapse(void);
 
-static inline void SetControl(struct ChaseActor *actor, void *callback, u32 kind)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
-}
-
 // confidence=low: speed and phase duration depend on remaining health.
 
 void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     s32 speed;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
-        SetControl(actor, actor->base.onStanding, 0);
-    if ((u8)Callback_InvokeActor(actor, *(void **)((u8 *)actor + 0x270)) && Axe_PickAttack(actor))
+        SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
+    if ((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque) && Axe_PickAttack(actor))
         return;
-    if (actor->base.health <= *(s32 *)(context + 0xE48)) {
+    if (actor->base.health <= context->healthThreshold) {
         speed = 8;
         if ((s32)actor->base.counter2AC > 400) {
-            SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
-            SetState(actor, 0, 0, 4);
+            SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
-    } else if (actor->base.health <= *(u16 *)(context + 0xEB4)) {
+    } else if (actor->base.health <= context->lowHealthThreshold) {
         speed = 6;
         if ((s32)actor->base.counter2AC > 500) {
-            SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
-            SetState(actor, 0, 0, 4);
+            SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 35);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     } else {
         speed = 4;
         if ((s32)actor->base.counter2AC > 600) {
-            SetState(actor, 0, 0, 4);
+            SceneActorTerrain_EnterState(actor, 0, 0, 4);
             return;
         }
     }
@@ -1370,31 +1219,13 @@ void Axe_UpdateHealthPacedMotion(struct ChaseActor *actor)
     actor->base.counter2AC++;
 }
 
-static inline u8 TakePending(struct ChaseActor *actor)
-{
-    if (actor->base.field2B1) {
-        actor->base.field2B1 = 0;
-        return 1;
-    }
-    return 0;
-}
-
 struct AxeFlags16 {
     u16 bits : 16;
 };
 
-static inline void SetBehavior(struct ChaseActor *actor, u32 behavior)
-{
-    actor->base.state2A8 = 0;
-    actor->base.phase2A9 = 0;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 {
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
         {
             u32 flag = 0x1800;
@@ -1407,7 +1238,7 @@ void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
         u32 mask = ~0x1800;
         flags->bits &= mask;
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        SetBehavior(actor, 3);
+        Chase_SetBehavior(actor, 3);
     } else {
         actor->base.counter2AC++;
     }
@@ -1415,50 +1246,39 @@ void Axe_UpdateCollapsePhase(struct ChaseActor *actor)
 
 void SceneActorControl_UpdatePausePhase(struct ChaseActor *actor)
 {
-    u8 *control = actor->base.context;
+    struct Axe *control = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
-        control[0xEAA] = 0;
+        control->hoverPhase = 0;
     }
     {
-        s32 *c = (s32 *)(((u8 *)(*(&actor))) + 0x2AC);
-        if (*c > 60) {
-            u32 kind = 3;
-            actor->base.state2A8 = 0;
-            actor->base.phase2A9 = 0;
-            actor->base.behavior2AA = kind;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        s32 *c = (s32 *)&actor->base.counter2AC;
+        if (*c > 60)
+            Chase_SetBehavior(actor, 3);
         ++*c;
     }
 }
 
-struct S080FA744 {
-    u8 filler[0x284];
-    const u8 *p;
-};
+extern void *gUnk_08606444[];
 
-extern const u8 gUnk_08606444[];
-
-void Axe_InitMotionTable(struct S080FA744 *s)
+void Axe_InitMotionTable(struct ChaseActor *actor)
 {
-    s->p = gUnk_08606444;
+    actor->base.callbacks284 = gUnk_08606444;
 }
 
 #define gHoverSineTable gUnk_086149C4
 
 void SceneActorControl_UpdateHoverHeight(struct ChaseActor *actor)
 {
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (!(SceneActorChase_QueryMotionFlags(actor, 0x8000))) {
-        s32 height = Scale(gHoverSineTable[context[0xEAA]] << 5);
+        s32 height = Scale(gHoverSineTable[context->hoverPhase] << 5);
         struct Player *player = gPlayers[0];
         u32 y = height + 220;
         y += (u16)player->position.y;
         actor->base.body.position.y = y;
-        *(u16 *)(context + 0xA56) = y;
-        context[0xEAA] += 2;
+        context->auxiliarySprite.position.y = y;
+        context->hoverPhase += 2;
     }
 }
 
@@ -1491,12 +1311,6 @@ void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s)
     e->q = Path_GetPointData(e->p) + (e->a << 3);
 }
 
-struct AxeColliderBlock {
-    u8 unknown0[0xCEC];
-    struct ContactCollider attack[2];
-    struct ContactCollider body[2];
-};
-
 void SceneActorCollision_InitBody(struct ChaseActor *, void *, void *, void *, void *);
 
 void Axe_OnBodyContact(void);
@@ -1505,7 +1319,7 @@ void Axe_OnAttackColliderContact(void);
 
 void Axe_InitColliders(struct ChaseActor *actor)
 {
-    struct AxeColliderBlock *blk = actor->base.context;
+    struct Axe *blk = actor->base.context;
     struct ContactPackedVector bodySize, bodyOff, atkSize, atkOff;
     s32 i;
     u16 f = 0x2401;
@@ -1518,7 +1332,7 @@ void Axe_InitColliders(struct ChaseActor *actor)
     bodyOff.z = 0;
     SceneActorCollision_InitBody(actor, &bodySize, &bodyOff, Axe_OnBodyContact, actor);
     for (i = 0; i < 2; i++) {
-        struct ContactCollider *c = &blk->body[i];
+        struct ContactCollider *c = &blk->extraBody[i];
         Collider_Init(c, actor->base.body.id, 0x4001, 0, 16, &bodySize, &bodyOff);
         Collider_SetBodyProperties(c, SceneActorCollision_ReadBodyField3C(actor),
                                    SceneActorCollision_ReadBodyReactionFlags(actor),
@@ -1545,7 +1359,7 @@ void Axe_InitColliders(struct ChaseActor *actor)
     }
     k = 0x24010000;
     for (i = 0; i < 2; i++) {
-        struct ContactCollider *c = &blk->attack[i];
+        struct ContactCollider *c = &blk->extraAttack[i];
         Collider_Init(c, actor->base.body.id, k >> 16, 0, 16, &atkSize, &atkOff);
         Collider_SetAttackProperties(c, SceneActorCollision_ReadAttackField3C(actor, 0),
                                      SceneActorCollision_ReadAttackField40(actor, 0), 0,
@@ -1561,51 +1375,18 @@ s32 Axe_GetActorCategory(void)
     return 4;
 }
 
-struct P {
-    u32 a, b;
-};
-
-struct S080FAA20 {
-    u8 filler0[0x5c];
-    struct P p;
-    u8 filler1[0xf4 * 4 - 0x64];
-    u8 *q;
-};
-
-void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d)
+void Axe_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *end)
 {
-    u8 *q = s->q;
-    *(struct P *)(q + 0xf04) = s->p;
-    *(struct P *)(q + 0xf0c) = *d;
-    *(u16 *)(q + 0xea8) = 0;
+    struct Axe *context = actor->base.context;
+    context->curveStart = actor->base.body.position;
+    context->curveEnd = *end;
+    context->curveTime = 0;
 }
-
-struct AxeCurveContext {
-    u8 unknown0[0xEA8];
-    u16 time;
-    u8 unknownEAA[2];
-    s16 curve;
-    u8 unknownEAE[0xF04 - 0xEAE];
-    struct ContactPosition start, end;
-};
 
 struct AxeMoveNode {
     u8 unknown0[12];
     struct ContactPosition position;
 };
-
-static inline s32 Shift10(s32 value)
-{
-    return value >= 0 ? value >> 10 : -((-value) >> 10);
-}
-
-static inline void Subtract(struct ContactPosition *out, struct ContactPosition *a,
-                            struct ContactPosition *b)
-{
-    out->x = b->x - a->x;
-    out->y = b->y - a->y;
-    out->z = b->z - a->z;
-}
 
 static inline void Interpolate(struct ContactPosition *out, struct ContactPosition *start,
                                struct ContactPosition *end, s32 initialScale, s32 t, s32 finalScale,
@@ -1614,10 +1395,10 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     struct ContactPosition delta, tangent;
     s32 square, cube, twiceCube, thriceSquare, sway, final;
     s32 scaled, value;
-    Subtract(&delta, start, end);
+    MovementCurve_SubtractPositions(&delta, start, end);
     ZeroFill8(&tangent);
-    square = Shift10(t * t);
-    cube = Shift10(square * t);
+    square = MovementCurve_TruncateFixed10(t * t);
+    cube = MovementCurve_TruncateFixed10(square * t);
     twiceCube = cube * 2;
     thriceSquare = square * 3;
     sway = (cube - 2 * square + t) * speed;
@@ -1625,45 +1406,38 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
     value = (thriceSquare - twiceCube) * delta.x;
     value = scaled + value + sway + final;
-    out->x = start->x + Shift10(value);
+    out->x = start->x + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
     value = (-twiceCube + thriceSquare) * delta.y;
     value = scaled + value + sway + final;
-    out->y = start->y + Shift10(value);
+    out->y = start->y + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
     value = (-twiceCube + thriceSquare) * delta.z;
     value = scaled + value + sway + final;
-    out->z = start->z + Shift10(value);
+    out->z = start->z + MovementCurve_TruncateFixed10(value);
 }
 
 u8 Axe_StepCurveMotion(struct ChaseActor *actor)
 {
-    struct AxeCurveContext *ctx = actor->base.context;
+    struct Axe *ctx = actor->base.context;
     struct ContactPosition start, end;
-    start = ctx->start;
+    start = ctx->curveStart;
     start.y = 0;
-    end = ctx->end;
+    end = ctx->curveEnd;
     end.y = 0;
-    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1, ctx->time,
-                0, ctx->curve);
-    if (ctx->time > 1023)
+    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1,
+                ctx->curveTime, 0, ctx->curve);
+    if (ctx->curveTime > 1023)
         return 1;
-    ctx->time += 128;
+    ctx->curveTime += 128;
     return 0;
 }
 
-struct S080FAC14 {
-    u8 filler[0x98];
-    u8 a;
-    u8 filler2[0x308 - 0x99];
-    u32 b;
-};
-
 s32 SceneActorProfiles_FindOrAdd(u32, u32);
 
-void Axe_InitProfile(struct S080FAC14 *s)
+void Axe_InitProfile(struct ChaseActor *actor)
 {
-    s->b = SceneActorProfiles_FindOrAdd(s->a, 0);
+    actor->base.profileId = SceneActorProfiles_FindOrAdd(actor->base.category, 0);
 }
 
 #define gHoverAnimationData gUnk_0824E318
@@ -1672,62 +1446,37 @@ extern const u8 gUnk_0824E318[];
 
 void SceneActorReaction_ResetResponseState(void *, const void *, u32);
 
-struct HoverControlContext {
-    u8 unknown0[0xE4C];
-    u32 savedFlags;
-    u8 unknownE50[0x58];
-    u16 timer;
-    u8 angle, enabled;
-    u16 counter;
-    u8 unknownEAE[0x56];
-    struct ContactPosition vectorF04, vectorF0C, vectorF14, savedPosition;
-};
-
 void SceneActorControl_InitializeHoverState(struct ChaseActor *actor)
 {
-    struct HoverControlContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     // concession-ok(const-local): The CpuSet position clears use the same fixed source word.
     u32 zero;
-    context->timer = 0;
-    context->angle = 0;
-    context->enabled = 1;
-    context->counter = 0;
-    context->savedFlags = actor->base.saved.privateFlags;
-    context->savedPosition = *(struct ContactPosition *)&gPlayers[0]->position;
-    MonsterInit_ClearPosition(&zero, &context->vectorF04);
-    MonsterInit_ClearPosition(&zero, &context->vectorF0C);
-    MonsterInit_ClearPosition(&zero, &context->vectorF14);
+    context->curveTime = 0;
+    context->hoverPhase = 0;
+    context->hoverEnabled = 1;
+    context->curve = 0;
+    context->flagsE4C = actor->base.saved.privateFlags;
+    context->target = *(struct ContactPosition *)&gPlayers[0]->position;
+    MonsterInit_ClearPosition(&zero, &context->curveStart);
+    MonsterInit_ClearPosition(&zero, &context->curveEnd);
+    MonsterInit_ClearPosition(&zero, (struct ContactPosition *)context->clearF14);
     Memory_Clear(actor->group.destination, 8);
     SceneActorReaction_ResetResponseState(&actor->group.saved.control, gHoverAnimationData, 0xD4);
     SceneActorAnimation_SelectDirectionalEntry((void *)actor, 0);
 }
 
-struct Q {
-    u8 filler[0xe4c];
-    u32 f;
-};
-
-struct S080FACFC {
-    u8 filler0[0x13a];
-    u16 h;
-    u8 filler1[0x2d0 - 0x13c];
-    u32 f;
-    u8 filler2[0x3d0 - 0x2d4];
-    struct Q *q;
-};
-
-void Axe_ResetMovementFlags(struct S080FACFC *s)
+void Axe_ResetMovementFlags(struct ChaseActor *actor)
 {
-    struct Q *q = s->q;
+    struct Axe *context = actor->base.context;
     u32 m = 0x100000;
-    u32 *p = &s->f;
+    u32 *p = &actor->base.statusFlags;
     u32 *p2;
     u32 m2;
     *p = *p | m;
-    p2 = &q->f;
+    p2 = &context->flagsE4C;
     m2 = ~0x11;
     *p2 = *p2 & m2;
-    s->h &= ~4;
+    actor->base.colliderA.flags &= ~4;
 }
 
 void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b)
@@ -1744,7 +1493,7 @@ void Axe_GetDirectionalFrame(u16 x, s32 *a, s32 *b)
     *b = r;
 }
 
-void Axe_SetMovementEndpoints(struct S080FAA20 *s, struct P *d);
+void Axe_SetMovementEndpoints(struct ChaseActor *actor, struct ContactPosition *end);
 
 u8 Axe_StepCurveMotion(struct ChaseActor *actor);
 
@@ -1754,90 +1503,48 @@ static inline void Fill_BeginMoveToPosition(void *dst, u32 *tmp, u32 v)
     CpuSet(tmp, dst, 0x05000002);
 }
 
-void Axe_BeginMoveToPosition(u8 *s, s16 *v)
+void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target)
 {
-    u8 *p = *(u8 **)(s + 0x3d0);
+    struct Axe *context = actor->base.context;
     u32 stack[3];
-    s16 *a;
-    s16 *b;
-    Axe_SetMovementEndpoints(s, v);
-    Axe_StepCurveMotion(s);
-    {
-        u32 one = 1;
-        u8 *q = s + 0x2a8;
-        u32 zero = 0;
-        *q = zero;
-        {
-            s[0x2a9] = zero;
-            s[0x2aa] = one;
-            *(u32 *)(s + 0x2a9 + 3) = zero;
-        }
-        s[0x2b1] = one;
-        b = (s16 *)(stack + 1);
-        a = (s16 *)(s + 0x5c);
-        b[0] = v[0] - a[0];
-        b[1] = v[1] - a[1];
-        b[2] = v[2] - a[2];
-        s[0x3cd] = Math_Atan2(b[0], b[2]);
-        Fill_BeginMoveToPosition(p + 0xf14, stack, zero);
-    }
+    struct ContactPosition *delta;
+    Axe_SetMovementEndpoints(actor, target);
+    Axe_StepCurveMotion(actor);
+    Chase_SetBehavior(actor, 1);
+    delta = (struct ContactPosition *)(stack + 1);
+    Chase_Delta(delta, &actor->base.body.position, target);
+    actor->base.nextDirection = Math_Atan2(delta->x, delta->z);
+    Fill_BeginMoveToPosition(context->clearF14, stack, 0);
 }
 
-struct B {
-    u8 pad[0xf];
-    u8 b;
-};
-
-struct S080FAE08 {
-    u8 filler0[0xdc];
-    struct B bb;
-    u8 filler1[0x2d4 - 0xec];
-    u16 h;
-    u8 filler2[0x3d0 - 0x2d6];
-    struct Q *q;
-    u8 filler3[0x418 - 0x3d4];
-    u16 z;
-};
-
-void Axe_ClearForcedMovement(struct S080FAE08 *s)
+void Axe_ClearForcedMovement(struct ChaseActor *s)
 {
-    u16 *hp = &s->h;
+    u16 *hp = &s->base.motionFlags;
     u32 hm = 0xFFFFFEFF;
     u32 *p;
     u32 m;
-    struct B *t;
+    struct SceneActorChaseTracking *t;
     u32 bm;
     u16 zero;
     u16 hv;
     hv = *hp & hm;
     zero = 0;
     *hp = hv;
-    t = &s->bb;
+    t = &s->base.tracking;
     bm = ~8;
-    t->b = t->b & bm;
-    p = &s->q->f;
+    t->flags = t->flags & bm;
+    p = &((struct Axe *)s->base.context)->flagsE4C;
     m = ~0x10;
     *p = *p & m;
-    s->z = zero;
+    s->group.common.gate.counter = zero;
 }
 
 void Axe_SelectRandomRoutePoint(struct S080FA7D0 *s);
 
-void Axe_BeginMoveToPosition(u8 *s, s16 *v);
+void Axe_BeginMoveToPosition(struct ChaseActor *actor, struct ContactPosition *target);
 
 struct AxeVec {
     s16 x, y, z;
-};
-
-struct AxeRoutePoint {
-    s16 x, z;
-};
-
-struct AxeGroup {
-    u8 unknown0[0x44];
-    u16 field44;
-    u8 unknown46[0x36];
-    struct AxeRoutePoint *point;
 };
 
 static inline u32 CellIndex(struct AxeVec *p)
@@ -1899,54 +1606,39 @@ static inline u8 HasMark(struct Axe *context)
 void Axe_UpdateRouteWander(struct ChaseActor *actor)
 {
     struct Axe *context = actor->base.context;
-    struct AxeGroup *group = (void *)&actor->group.common;
+    struct SceneActorChaseGroup *group = &actor->group;
     struct AxeVec targetStorage;
     struct AxeVec *target;
-    struct AxeRoutePoint *point;
+    struct SceneActorChaseRoutePoint *point;
     if (IsDown(actor))
         return;
     if (Flag_UpdateRouteWander(actor, 0x100, 0x2D4))
         return;
     if (!HasMark(context)) {
-        group->field44 = 0;
+        group->common.gate.counter = 0;
         return;
     }
-    if (group->field44 != 0) {
-        group->field44--;
+    if (group->common.gate.counter != 0) {
+        group->common.gate.counter--;
         return;
     }
     Axe_SelectRandomRoutePoint(actor);
     target = &targetStorage;
-    point = group->point;
+    point = group->homeRoute.point;
     targetStorage.x = point->x;
     target->z = point->z;
     target->y = CellHeight(target, CellIndex(&targetStorage));
     Axe_BeginMoveToPosition(actor, &targetStorage);
     Axe_ClearForcedMovement(actor);
     Axe_ResetMovementFlags(actor);
-    SetState(actor, 0, 0, 2);
+    SceneActorTerrain_EnterState(actor, 0, 0, 2);
 }
 
 // confidence=low: initializes scripted cooldown lengths and the health threshold.
 
-struct AxeCooldownState {
-    u8 filler[0xeb4];
-    u16 healthThreshold;
-    u16 pad;
-    u16 timers[4];
-    u16 lengths[4];
-};
-
-struct AxeCooldownActor {
-    u8 filler[0x9c];
-    s16 health;
-    u8 filler2[0x3d0 - 0x9e];
-    struct AxeCooldownState *state;
-};
-
-void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
+void Axe_InitAttackCooldowns(struct ChaseActor *actor)
 {
-    struct AxeCooldownState *state = actor->state;
+    struct Axe *state = actor->base.context;
     s32 i;
     s32 health, quarter;
     s16 value;
@@ -1954,10 +1646,10 @@ void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
     s32 zero;
     if (Script_SeekToKeyword(0x50) != 0) {
         for (i = 0; i <= 3; i++) {
-            state->lengths[i] = Script_GetPc() ? Script_GetValue() : 0;
+            state->attackDelays[i] = Script_GetPc() ? Script_GetValue() : 0;
         }
     }
-    healthField = &actor->health;
+    healthField = &actor->base.health;
     zero = 0;
     for (i = 3;; --i) {
         if (i < 0) {
@@ -1965,29 +1657,19 @@ void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor)
             health = quarter;
             break;
         }
-        state->timers[i] = zero;
+        state->attackCooldowns[i] = zero;
     }
     value = quarter;
     if (value >= 0)
         quarter = value >> 2;
     else
         quarter = -(-value >> 2);
-    state->healthThreshold = health - quarter;
+    state->lowHealthThreshold = health - quarter;
 }
 
-struct QTickCooldowns {
-    u8 filler[0xeb8];
-    u16 v[4];
-};
-
-struct S080FB050 {
-    u8 filler[0x3d0];
-    struct QTickCooldowns *q;
-};
-
-void Axe_TickCooldowns(struct S080FB050 *s)
+void Axe_TickCooldowns(struct ChaseActor *actor)
 {
-    u16 *p = s->q->v;
+    u16 *p = ((struct Axe *)actor->base.context)->attackCooldowns;
     s32 i = 3;
     do {
         if (*p)
@@ -1996,33 +1678,15 @@ void Axe_TickCooldowns(struct S080FB050 *s)
     } while (--i >= 0);
 }
 
-struct QPickAttack {
-    u8 filler[0xe48];
-    s32 low;
-    u8 filler2[0xeb4 - 0xe4c];
-    u16 mid;
-    u16 pad;
-    u16 b[4];
-};
-
-static inline void Go(struct ChaseActor *actor, u8 s, u8 p, u8 b)
-{
-    actor->base.state2A8 = s;
-    actor->base.phase2A9 = p;
-    actor->base.behavior2AA = b;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 u8 Axe_PickAttack(void *actorIn)
 {
     struct ChaseActor *actor = (struct ChaseActor *)actorIn;
-    struct QPickAttack *q = actor->base.context;
-    if (actor->base.health <= q->low && q->b[3] == 0) {
-        Go(actor, 0, 2, 8);
+    struct Axe *q = actor->base.context;
+    if (actor->base.health <= q->healthThreshold && q->attackCooldowns[3] == 0) {
+        SceneActorTerrain_EnterState(actor, 0, 2, 8);
         return 1;
     }
-    if (q->b[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
+    if (q->attackCooldowns[0] == 0 && actor->base.tracking.distance <= 0xFFFE) {
         s32 a = actor->base.tracking.heading;
         s32 d = a - 0xa0;
         s32 e;
@@ -2034,81 +1698,48 @@ u8 Axe_PickAttack(void *actorIn)
         if (e < 0)
             e = -e;
         if (e <= 0x29)
-            Go(actor, 0, 2, 0);
+            SceneActorTerrain_EnterState(actor, 0, 2, 0);
         else
-            Go(actor, 0, 2, 2);
+            SceneActorTerrain_EnterState(actor, 0, 2, 2);
         return 1;
     }
-    if (q->mid >= actor->base.health) {
-        if (q->b[1] == 0) {
-            Go(actor, 0, 2, 4);
+    if (q->lowHealthThreshold >= actor->base.health) {
+        if (q->attackCooldowns[1] == 0) {
+            SceneActorTerrain_EnterState(actor, 0, 2, 4);
             return 1;
         }
-        if (q->b[2] == 0) {
-            Go(actor, 0, 2, 6);
+        if (q->attackCooldowns[2] == 0) {
+            SceneActorTerrain_EnterState(actor, 0, 2, 6);
             return 1;
         }
     }
     return 0;
 }
 
-struct QInitRoutePointHistory {
-    u8 filler[0xec8];
-    u8 v[3];
-    u8 w;
-};
-
-struct S080FB1DC {
-    u8 filler[0x3d0];
-    struct QInitRoutePointHistory *q;
-};
-
-void Axe_InitRoutePointHistory(struct S080FB1DC *s)
+void Axe_InitRoutePointHistory(struct ChaseActor *actor)
 {
-    struct QInitRoutePointHistory *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i;
     for (i = 0; i < 3; i++)
-        q->v[i] |= 0xff;
-    q->w = 0;
+        q->recentRoutePoints[i] |= 0xff;
+    q->recentRoutePointIndex = 0;
 }
 
-struct QRecordRoutePoint {
-    u8 filler[0xec8];
-    u8 v[3];
-    u8 idx;
-};
-
-struct S080FB214 {
-    u8 filler[0x3d0];
-    struct QRecordRoutePoint *q;
-};
-
-void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x)
+void Axe_RecordRoutePoint(struct ChaseActor *actor, u32 x)
 {
-    struct QRecordRoutePoint *q = s->q;
-    q->v[q->idx] = x;
-    q->idx++;
-    if (q->idx > 2)
-        q->idx = 0;
+    struct Axe *q = actor->base.context;
+    q->recentRoutePoints[q->recentRoutePointIndex] = x;
+    q->recentRoutePointIndex++;
+    if (q->recentRoutePointIndex > 2)
+        q->recentRoutePointIndex = 0;
 }
 
-struct QIsRoutePointRecent {
-    u8 filler[0xec8];
-    s8 v[3];
-};
-
-struct S080FB248 {
-    u8 filler[0x3d0];
-    struct QIsRoutePointRecent *q;
-};
-
-u8 Axe_IsRoutePointRecent(struct ChaseActor *sIn, s32 x)
+u8 Axe_IsRoutePointRecent(struct ChaseActor *actor, s32 x)
 {
-    struct S080FB248 *s = (struct S080FB248 *)sIn;
-    struct QIsRoutePointRecent *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i;
     for (i = 0; i < 3; i++) {
-        if (q->v[i] == x)
+        if ((s8)q->recentRoutePoints[i] == x)
             return 1;
     }
     return 0;
@@ -2180,13 +1811,6 @@ struct AxeFlashDrawable {
     struct DisplayTrackGraphics graphics;
 };
 
-static inline u8 TestFlag(const u32 *flags, u32 mask)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-
 /* Fade the attack palette, then restore the actor palette when the level reaches zero. */
 
 void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
@@ -2234,7 +1858,7 @@ void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
         state->reset = 0;
     }
     {
-        if (TestFlag(flags, 0x180)) {
+        if (WordFlags_Has(0x180, flags)) {
             ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.defaultPalette = 0x13F;
             ((struct AxeFlashDrawable *)actor->base.drawable)->graphics.palette = state->palette;
             switch (state->level) {
@@ -2252,7 +1876,7 @@ void Axe_UpdateAttackFlashFade(struct ChaseActor *actor)
                     break;
             }
             if (++state->timer > 9) {
-                if (!TestFlag(flags, 0x80)) {
+                if (!WordFlags_Has(0x80, flags)) {
                     if (--state->level <= 0) {
                         void *drawable =
                             &((struct AxeFlashDrawable *)actor->base.drawable)->graphics;
@@ -2417,19 +2041,7 @@ void Axe_BeginPaletteTransition(void *object, s32 destinationBank, s32 sourceBan
 
 struct S080FB938;
 
-void Axe_SetAuxiliarySpriteResource(struct S080FB938 *s, u32 x);
-
-static inline u32 Axe_ReadMaskedFlags(u32 mask, const u32 *field)
-{
-    return *field & mask;
-}
-
-static inline u8 Axe_TestFlags_UpdatePaletteTransition(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
+void Axe_SetAuxiliarySpriteResource(struct ChaseActor *actor, const void *palette);
 
 static inline s32 Axe_ChannelValue(s32 value)
 {
@@ -2476,11 +2088,11 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
     if (SceneActorPlacement_IsUnavailable((void *)actor))
         return 0;
     context = actor->base.context;
-    if (!Axe_TestFlags_UpdatePaletteTransition(Axe_ReadMaskedFlags(2, &context->flags), ~0))
+    if (!SceneActorChase_Test(Flags_MaskedWord(2, &context->flags), ~0))
         return 0;
     p = &context->transition;
     if (!p->remaining) {
-        if (!Axe_ReadMaskedFlags(0x02008000, &actor->base.behaviorFlags))
+        if (!Flags_MaskedWord(0x02008000, &actor->base.behaviorFlags))
             Axe_BindPalette(actor, p);
         return 1;
     }
@@ -2504,92 +2116,57 @@ u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor)
     return 0;
 }
 
-struct AxePalette {
-    u16 colors[16];
-};
-
-struct AxePalettePair {
-    u16 colors[32];
-};
-
-struct AxePaletteData {
-    u8 pad[0x888];
-    struct AxePalette black;
-    struct AxePalettePair red, white;
-};
-
-struct AxePaletteDrawable {
-    u8 pad[0x38];
-    const u16 *palette;
-};
-
-struct AxePaletteActor {
-    u32 unused;
-    struct AxePaletteDrawable *drawable;
-    u8 pad[0x3d0 - 8];
-    struct AxePaletteData *data;
-};
-
-void Axe_InitEffectPalettes(struct AxePaletteActor *s)
+void Axe_InitEffectPalettes(struct ChaseActor *actor)
 {
-    struct AxePaletteData *d = s->data;
-    struct AxePaletteDrawable *drawable = s->drawable;
+    struct Axe *d = actor->base.context;
+    struct SceneActorAnimationSequenceDrawable *drawable = actor->base.drawable;
     s32 i = 0;
-    const u16 *src = drawable->palette;
-    struct AxePalettePair *red = &d->red;
-    struct AxePalette *black = &d->black;
+    const u16 *src = drawable->graphics.palette;
+    u16 *red = d->redPalette;
+    u16 *black = d->blackPalette;
     u32 zero = 0;
     u32 full = 0x7fff;
-    struct AxePalettePair *white = &d->white;
+    u16 *white = d->whitePalette;
 
 loop: {
     u32 color;
-    black->colors[0] = zero;
+    black[0] = zero;
     color = 0x1f;
-    red->colors[0] = color;
+    red[0] = color;
     color = 0x7c00;
-    red->colors[16] = color;
-    white->colors[0] = full;
-    white->colors[16] = *src++;
-    red = (void *)((u8 *)red + 2);
-    black = (void *)((u8 *)black + 2);
-    white = (void *)((u8 *)white + 2);
+    red[16] = color;
+    white[0] = full;
+    white[16] = *src++;
+    red++;
+    black++;
+    white++;
 }
     if (++i < 16)
         goto loop;
 }
 
-struct S080FB938 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_SetAuxiliarySpriteResource(struct S080FB938 *s, u32 x)
+void Axe_SetAuxiliarySpriteResource(struct ChaseActor *actor, const void *palette)
 {
-    u8 *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i = 3;
-    u8 *p = q + 0x860;
+    const void **p = &q->trail[3].graphics.paletteData;
     do {
-        *(u32 *)p = x;
-        p -= 0x60;
+        *p = palette;
+        p = (const void **)((u8 *)p - sizeof(struct AxeTrailSlot));
     } while (--i >= 0);
 }
 
-struct S080FB958 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_SetAuxiliarySpriteRenderState(struct S080FB958 *s, u32 x, u32 y)
+void Axe_SetAuxiliarySpriteRenderState(struct ChaseActor *actor, const void *palette, u32 index)
 {
-    u8 *a = s->q + 0x740;
-    u8 *b = s->q + 0x73a;
+    struct Axe *q = actor->base.context;
+    const void **a = &q->trail[0].graphics.paletteData;
+    u16 *b = &q->trail[0].graphics.paletteIndex;
     s32 i = 3;
     do {
-        *(u16 *)b = y;
-        *(u32 *)a = x;
-        a += 0x60;
-        b += 0x60;
+        *b = index;
+        *a = palette;
+        a = (const void **)((u8 *)a + sizeof(struct AxeTrailSlot));
+        b = (u16 *)((u8 *)b + sizeof(struct AxeTrailSlot));
     } while (--i >= 0);
 }
 
@@ -2669,7 +2246,7 @@ struct TrailSprite {
     struct ContactPosition position;
 };
 
-struct AxeTrailSlot {
+struct AxeTrailSpriteSlot {
     struct TrailSprite sprite;
     u8 unknown24[0x24];
     struct DisplaySequenceState sequence;
@@ -2680,7 +2257,7 @@ struct AxeTrailSlot {
 
 struct AxeTrailContext {
     u8 unknown0[0x708];
-    struct AxeTrailSlot slots[4];
+    struct AxeTrailSpriteSlot slots[4];
     u8 unknown888[0x5BC];
     u16 nextSlot, interval;
     u8 unknownE48[0x8F];
@@ -2726,7 +2303,7 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             struct DisplaySequenceState *source = &drawable->sequence;
             u16 sequence = source->sequenceId;
             {
-                u32 offset = trail->nextSlot * sizeof(struct AxeTrailSlot);
+                u32 offset = trail->nextSlot * sizeof(struct AxeTrailSpriteSlot);
                 u8 *destination = context + (offset + 0x708);
                 u8 *sequenceState = destination + 0x48;
                 u32 sequenceOffset = 0x760;
@@ -2736,73 +2313,56 @@ void Axe_EmitMotionTrail(struct ChaseActor *actor)
             }
         }
     }
-    sprite = (void *)((trail->nextSlot * sizeof(struct AxeTrailSlot)) + (u32)context);
+    sprite = (void *)((trail->nextSlot * sizeof(struct AxeTrailSpriteSlot)) + (u32)context);
     sprite = (void *)((u8 *)sprite + 0x708);
     PlayerCue_StepSequence((void *)sprite, &trail->slots[trail->nextSlot].sequence);
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset =
+            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slot = context + offset;
         *((struct ContactPosition *)(slot + 0x724)) = actor->base.body.position;
     }
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset =
+            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slots = context + 0x708;
         *((u32 *)(slots + offset)) &= ~1;
-        slots += ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        slots += ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         *((u32 *)slots) |= 2;
     }
     {
-        u32 offset = ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSlot);
+        u32 offset =
+            ((struct AxeTrailContext *)context)->nextSlot * sizeof(struct AxeTrailSpriteSlot);
         u8 *slot = context + offset;
         *((u16 *)(slot + 0x764)) = 8;
     }
     sourceDrawable = actor->base.drawable;
-    slotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+    slotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
+                          sizeof(struct AxeTrailSpriteSlot));
     CopyAngle(sourceDrawable, slotBase);
     scaleDrawable = actor->base.drawable;
-    scaleSlotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+    scaleSlotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
+                               sizeof(struct AxeTrailSpriteSlot));
     CopyScaleX(scaleDrawable, scaleSlotBase);
     sourceDrawable = actor->base.drawable;
-    slotBase =
-        context + ((((struct AxeTrailContext *)context)->nextSlot) * sizeof(struct AxeTrailSlot));
+    slotBase = context + ((((struct AxeTrailContext *)context)->nextSlot) *
+                          sizeof(struct AxeTrailSpriteSlot));
     CopyScaleY(sourceDrawable, slotBase);
     if ((++(((struct AxeTrailContext *)context)->nextSlot)) > 3)
         ((struct AxeTrailContext *)context)->nextSlot = 0;
 }
 
-struct AxeTrailSlotEmitTrailSprite {
-    struct DisplaySequenceSprite sprite;
-    struct ContactSwarmGraphics graphics;
-    struct DisplaySequenceState sequence;
-    const void *resource;
-    u16 lifetime, unknown5E;
-};
-
-struct AxeTrailContextEmitTrailSprite {
-    u8 unknown0[0x708];
-    struct AxeTrailSlotEmitTrailSprite trail[4];
-    u8 unknown888[0xE44 - 0x888];
-    u16 nextTrail, spacing;
-    u8 unknownE48[0xED7 - 0xE48];
-    u8 variant;
-};
-
-static inline const void *Axe_TrailResource(struct AxeTrailContextEmitTrailSprite *context,
-                                            u32 index)
+static inline const void *Axe_TrailResource(struct Axe *context, u32 index)
 {
     return context->trail[index].resource;
 }
 
-static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source,
-                                       struct AxeTrailContextEmitTrailSprite *row)
+static inline void Axe_CopyTrailScaleX(struct DisplaySequenceSprite *source, struct Axe *row)
 {
     row->trail[0].sprite.palette = source->palette;
 }
 
-static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source,
-                                       struct AxeTrailContextEmitTrailSprite *row)
+static inline void Axe_CopyTrailScaleY(struct DisplaySequenceSprite *source, struct Axe *row)
 {
     row->trail[0].sprite.paletteVariant = source->paletteVariant;
 }
@@ -2881,42 +2441,38 @@ static inline u32 Axe_StepSequence(struct DisplaySequenceSprite *owner,
 void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPosition *position,
                                 u32 angle)
 {
-    struct AxeTrailContextEmitTrailSprite *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     struct DisplaySequenceSprite *sprite;
     struct DisplaySequenceState *state;
     u32 spriteOffset;
     if (((struct DisplaySequenceSprite *)actor->base.drawable)->flags & 1)
         return;
     {
-        s32 zero = Mod(actor->base.frameCounter, context->spacing);
+        s32 zero = Mod(actor->base.frameCounter, context->trailSpacing);
         if (zero)
             return;
         {
             struct DisplaySequenceState *source =
                 &((struct SceneActorControlMotionDrawable *)actor->base.drawable)->sequence;
             u16 selection = source->sequenceId;
-            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite);
-            struct AxeTrailSlotEmitTrailSprite *slot;
+            u32 indexOffset = context->nextTrail * sizeof(struct AxeTrailSlot);
+            struct AxeTrailSlot *slot;
             struct DisplaySequenceState *destination;
             const void *resource;
-            spriteOffset = (u32) & ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0];
-            slot = (struct AxeTrailSlotEmitTrailSprite *)((u8 *)context +
-                                                          (indexOffset + spriteOffset));
+            spriteOffset = (u32) & ((struct Axe *)0)->trail[0];
+            slot = (struct AxeTrailSlot *)((u8 *)context + (indexOffset + spriteOffset));
             destination = &slot->sequence;
             resource = Axe_TrailResource(context, context->nextTrail);
             Anim_SetSequence(destination, resource, selection, context->variant, zero);
         }
     }
-    sprite = (struct DisplaySequenceSprite *)(context->nextTrail *
-                                                  sizeof(struct AxeTrailSlotEmitTrailSprite) +
+    sprite = (struct DisplaySequenceSprite *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
                                               (u32)context);
     sprite = (struct DisplaySequenceSprite *)((u8 *)sprite + spriteOffset);
-    state = (struct DisplaySequenceState *)(context->nextTrail *
-                                                sizeof(struct AxeTrailSlotEmitTrailSprite) +
+    state = (struct DisplaySequenceState *)(context->nextTrail * sizeof(struct AxeTrailSlot) +
                                             (u32)context);
-    state = (struct DisplaySequenceState
-                 *)((u8 *)state + (u32) &
-                    ((struct AxeTrailContextEmitTrailSprite *)0)->trail[0].sequence);
+    state =
+        (struct DisplaySequenceState *)((u8 *)state + (u32) & ((struct Axe *)0)->trail[0].sequence);
     Axe_StepSequence(sprite, state);
     context->trail[context->nextTrail].sprite.position = *position;
     context->trail[context->nextTrail].sprite.flags &= ~1;
@@ -2925,33 +2481,26 @@ void ActorPhase_EmitTrailSprite(struct ChaseActor *actor, const struct ContactPo
     context->trail[context->nextTrail].sprite.attribute = angle;
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
-        struct AxeTrailContextEmitTrailSprite *row =
-            (void *)((u8 *)context +
-                     context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite));
+        struct Axe *row =
+            (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleX(source, row);
     }
     {
         struct DisplaySequenceSprite *source = actor->base.drawable;
-        struct AxeTrailContextEmitTrailSprite *row =
-            (void *)((u8 *)context +
-                     context->nextTrail * sizeof(struct AxeTrailSlotEmitTrailSprite));
+        struct Axe *row =
+            (void *)((u8 *)context + context->nextTrail * sizeof(struct AxeTrailSlot));
         Axe_CopyTrailScaleY(source, row);
     }
     if (++context->nextTrail > 3)
         context->nextTrail = 0;
 }
 
-struct S080FBEDC {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s)
+void Axe_TickAuxiliarySpriteTimers(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
-    u32 *flags = (u32 *)(q + 0x708);
+    u8 *q = actor->base.context;
+    u32 *flags = &((struct Axe *)q)->trail[0].sprite.flags;
     u8 *p = q;
-    u32 off = 0x764;
+    u32 off = (u32) & ((struct Axe *)0)->trail[0].lifetime;
     s32 i = 3;
     u32 one = 1;
     do {
@@ -2965,26 +2514,21 @@ void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s)
                 }
             }
         }
-        flags = (u32 *)((u8 *)flags + 0x60);
-        p += 0x60;
+        flags = (u32 *)((u8 *)flags + sizeof(struct AxeTrailSlot));
+        p += sizeof(struct AxeTrailSlot);
     } while (--i >= 0);
 }
 
-struct S080FBF20 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
 void Sprite_Remove(void *);
 
-void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s)
+void Axe_RemoveAuxiliarySprites(struct ChaseActor *actor)
 {
-    u8 *p = s->q + 0x708;
+    struct AxeTrailSlot *p = ((struct Axe *)actor->base.context)->trail;
     s32 i = 3;
     do {
-        if (p[4])
-            Sprite_Remove(p);
-        p += 0x60;
+        if (p->sprite.unknown4[0])
+            Sprite_Remove(&p->sprite);
+        p++;
     } while (--i >= 0);
 }
 
@@ -3008,7 +2552,7 @@ struct RouteSelectionPosition {
 
 extern u32 gRandomTableIndex;
 
-void Axe_RecordRoutePoint(struct S080FB214 *s, u32 x);
+void Axe_RecordRoutePoint(struct ChaseActor *actor, u32 x);
 
 u8 Axe_IsRoutePointRecent(struct ChaseActor *, s32);
 
@@ -3044,7 +2588,7 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     unsigned long long wide;
     u16 *entry;
     s32 bestIndex;
-    Route_Start((void *)(&route), *((s16 *)(((u8 *)actor->base.context) + 0xeb6)), 0, 0);
+    Route_Start((void *)(&route), ((struct Axe *)actor->base.context)->routeId, 0, 0);
     bestDistance = 0;
     bestIndex = -1;
     for (i = 0; i < (*route.data); i++) {
@@ -3188,23 +2732,16 @@ void Axe_SpawnSparks(struct ChaseActor *actor, struct ContactPosition *origin, s
     }
 }
 
-struct S080FC3F8 {
-    u8 filler[0x2d4];
-    u16 h;
-    u8 filler2[0x3d0 - 0x2d6];
-    u8 *q;
-};
-
 void Camera_RequestShake(u8);
 
-void Axe_UpdateScreenShake(struct S080FC3F8 *s)
+void Axe_UpdateScreenShake(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
+    struct Axe *q = actor->base.context;
     u32 m = 0x40;
-    if (!(s->h & m)) {
-        u8 *p = q + 0xeb1;
+    if (!(actor->base.motionFlags & m)) {
+        u8 *p = &q->shakeFrames;
         if (*p) {
-            Camera_RequestShake(q[0xeb2]);
+            Camera_RequestShake(q->parameterEB2);
             *p = *p - 1;
         }
     }
@@ -3337,51 +2874,40 @@ void Axe_InitAttackTrail(struct ChaseActor *s)
     ActorShadow_Disable(d->auxiliaryShadow);
 }
 
-struct S080FC7F4 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
 void Collider_SetPosition(void *, void *, u32);
 
 s32 Collider_Refresh(void *);
 
-void Axe_UpdateAttackColliderPositions(struct S080FC7F4 *s)
+void Axe_UpdateAttackColliderPositions(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
+    struct Axe *q = actor->base.context;
     s32 i = 0;
-    u8 *k = q + 0xa54;
+    struct ContactPosition *k = &q->auxiliarySprite.position;
     for (; i < 3; i++) {
-        u8 *e;
-        s32 o = i * 0x54;
-        Collider_SetPosition(q + (o + 0xb8c), k, 0);
-        e = q + (o + 0xa90);
+        struct ContactCollider *e;
+        Collider_SetPosition(&q->body[i], k, 0);
+        e = &q->attack[i];
         Collider_SetPosition(e, k, 0);
         Collider_Refresh(e);
     }
 }
 
-struct S080FC844 {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
 void Collider_Remove(void *);
 
 void Shadow_Destroy(u8 *);
 
-void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s)
+void Axe_ReleaseAuxiliarySprite(struct ChaseActor *actor)
 {
-    u8 *q = s->q;
-    if (q[0xa3c]) {
-        u8 *p = q + 0xb8c;
+    struct Axe *q = actor->base.context;
+    if (q->auxiliarySprite.unknown4[0]) {
+        struct ContactCollider *p = q->body;
         s32 i = 2;
         do {
             Collider_Remove(p);
-            p += 0x54;
+            p++;
         } while (--i >= 0);
-        Shadow_Destroy(q + 0xcac);
-        Sprite_Remove(q + 0xa38);
+        Shadow_Destroy(q->auxiliaryShadow);
+        Sprite_Remove(&q->auxiliarySprite);
     }
 }
 
@@ -3403,14 +2929,9 @@ void Axe_SetAuxiliarySpriteParameters(struct S080FC8B0 *s, u32 a, u32 b)
     *(u32 *)(q + 0xa70) = a;
 }
 
-struct AuxiliaryAttackGroup {
-    u8 unknown0[0x928];
-    struct ContactCollider colliders[3];
-};
-
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
 {
-    struct AuxiliaryAttackGroup *group = actor->base.context;
+    struct Axe *group = actor->base.context;
     struct ContactPackedVector size, offset;
     s32 i;
     size.x = 24;
@@ -3420,7 +2941,7 @@ void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor)
     offset.y = 0;
     offset.z = 0;
     for (i = 0; i < 3; i++) {
-        struct ContactCollider *collider = &group->colliders[i];
+        struct ContactCollider *collider = &group->auxiliaryAttack[i];
         Collider_Init(collider, actor->base.body.id, 0x2401, 0, 16, &size, &offset);
         Collider_SetAttackProperties(collider, SceneActorCollision_ReadAttackField3C(actor, 3),
                                      SceneActorCollision_ReadAttackField40(actor, 3), 0,
@@ -3488,70 +3009,14 @@ void Axe_UpdateTrailColliders(u8 *actor)
     }
 }
 
-struct S080FCB3C {
-    u8 filler[0x3d0];
-    u8 *q;
-};
-
-void Axe_RemoveSecondaryColliders(struct S080FCB3C *s)
+void Axe_RemoveSecondaryColliders(struct ChaseActor *actor)
 {
-    u8 *p = s->q + 0xd94;
+    struct ContactCollider *p = ((struct Axe *)actor->base.context)->extraBody;
     s32 i = 1;
     do {
         Collider_Remove(p);
-        p += 0x54;
+        p++;
     } while (--i >= 0);
-}
-
-struct AxeDirection {
-    u8 unk_00[6];
-    u8 angle;
-};
-
-struct AxeCollisionContext {
-    u8 unk_00[0xcec];
-    struct ContactCollider attack[2];
-    struct ContactCollider body[2];
-    u8 unk_E3C[0x10];
-    u32 flags;
-};
-
-struct AxeCollisionActor {
-    void *object;
-    struct AxeDirection *drawable;
-    u8 unk_08[0x54];
-    struct ContactPosition position;
-    u8 unk_64[0xd0];
-    struct ContactCollider body;
-    struct ContactCollider attack;
-    u8 unk_1DC[0xe4];
-    u16 flags;
-    u8 unk_2C2[0x10e];
-    struct AxeCollisionContext *context;
-};
-
-static inline u8 HasContextFlag(struct AxeCollisionContext *context, u32 mask)
-{
-    if (context->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u8 HasActorFlag(struct AxeCollisionActor *actor, u32 mask)
-{
-    if (actor->flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline void SetCollider(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags |= mask;
-}
-
-static inline void ClearCollider(struct ContactCollider *collider, u32 mask)
-{
-    collider->flags &= ~mask;
 }
 
 static inline s32 Scale_UpdateBodyColliders(s32 value)
@@ -3564,12 +3029,12 @@ static inline s32 Scale_UpdateBodyColliders(s32 value)
     return result;
 }
 
-void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
+void Axe_UpdateBodyColliders(struct ChaseActor *actor)
 {
-    struct AxeCollisionContext *context = actor->context;
-    struct AxeDirection *drawable = actor->drawable;
+    struct Axe *context = actor->base.context;
+    struct DisplaySequenceSprite *drawable = actor->base.drawable;
     s32 index = 0;
-    struct ContactCollider *attack = &actor->attack;
+    struct ContactCollider *attack = &actor->base.colliderB;
     struct {
         u32 zero;
         u32 values[0];
@@ -3579,23 +3044,24 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
     s32 i, x, z;
 
     for (index = 0; index < 3; index++) {
-        if (HasContextFlag(context, 0x40) || HasActorFlag(actor, 0x800)) {
-            SetCollider(attack, 4);
-            SetCollider(&actor->body, 4);
+        if (WordFlags_Has(0x40, &context->flagsE4C) ||
+            SceneActorChase_HasPlacementFlags(actor, 0x800)) {
+            ContactCollider_SetFlags(attack, 4);
+            ContactCollider_SetFlags(&actor->base.colliderA, 4);
             for (i = 0; i < 2; i++) {
-                SetCollider(&context->body[i], 4);
-                SetCollider(&context->attack[i], 4);
+                ContactCollider_SetFlags(&context->extraBody[i], 4);
+                ContactCollider_SetFlags(&context->extraAttack[i], 4);
             }
             break;
         }
-        ClearCollider(attack, 4);
-        ClearCollider(&actor->body, 4);
+        ContactCollider_ClearFlags(attack, 4);
+        ContactCollider_ClearFlags(&actor->base.colliderA, 4);
         for (i = 0; i < 2; i++) {
-            ClearCollider(&context->body[i], 4);
-            ClearCollider(&context->attack[i], 4);
+            ContactCollider_ClearFlags(&context->extraBody[i], 4);
+            ContactCollider_ClearFlags(&context->extraAttack[i], 4);
         }
         MonsterInit_ClearPosition(&buf.zero, &offset);
-        position = actor->position;
+        position = actor->base.body.position;
         switch (index) {
             case 0:
                 offset.x = -120;
@@ -3610,36 +3076,22 @@ void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor)
                 offset.z = 60;
                 break;
         }
-        x = Scale_UpdateBodyColliders(offset.x * gUnk_086149C4[(drawable->angle + 64) & 255]);
-        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[drawable->angle]);
+        x = Scale_UpdateBodyColliders(offset.x * gUnk_086149C4[(drawable->attribute + 64) & 255]);
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[drawable->attribute]);
         position.x = x + z + position.x;
-        x = Scale_UpdateBodyColliders(-(offset.x * gUnk_086149C4[drawable->angle]));
-        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[(drawable->angle + 64) & 255]);
+        x = Scale_UpdateBodyColliders(-(offset.x * gUnk_086149C4[drawable->attribute]));
+        z = Scale_UpdateBodyColliders(offset.z * gUnk_086149C4[(drawable->attribute + 64) & 255]);
         position.z = x + z + position.z;
         if (index == 0) {
-            Collider_SetPosition(&actor->body, &position, 0);
+            Collider_SetPosition(&actor->base.colliderA, &position, 0);
             Collider_SetPosition(attack, &position, 0);
             Collider_Refresh(attack);
         } else {
-            Collider_SetPosition(&context->body[index - 1], &position, 0);
-            Collider_SetPosition(&context->attack[index - 1], &position, 0);
-            Collider_Refresh(&context->attack[index - 1]);
+            Collider_SetPosition(&context->extraBody[index - 1], &position, 0);
+            Collider_SetPosition(&context->extraAttack[index - 1], &position, 0);
+            Collider_Refresh(&context->extraAttack[index - 1]);
         }
     }
-}
-
-struct AxeAttackContext {
-    u8 unk_00[0xCEC];
-    struct ContactCollider attackColliders[2];
-    u8 unk_D94[0xE4C - 0xD94];
-    u32 flags;
-};
-
-static inline u8 Axe_TestFlag(u32 mask, const u32 *flags)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
 }
 
 static inline u8 Axe_TestMaskedFlags(u32 value)
@@ -3655,7 +3107,7 @@ struct AxeAttackSelection {
 
 static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelection *selection)
 {
-    return Axe_TestFlag(mask, selection->flags);
+    return WordFlags_Has(mask, selection->flags);
 }
 
 #define Axe_ApplyAttack(collider, actor, index)                                                    \
@@ -3671,16 +3123,16 @@ static inline u8 Axe_TestSelectionFlags(u32 mask, const struct AxeAttackSelectio
 
 void Axe_FireAttack(struct ChaseActor *actor)
 {
-    struct AxeAttackContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     struct AxeAttackSelection selection;
 
-    if (Axe_TestFlag(0x200, &context->flags)) {
+    if (WordFlags_Has(0x200, &context->flagsE4C)) {
         Axe_ApplyAttack(&actor->base.colliderB, actor, 2);
-        Axe_ApplyAttack(&context->attackColliders[0], actor, 2);
-        Axe_ApplyAttack(&context->attackColliders[1], actor, 2);
+        Axe_ApplyAttack(&context->extraAttack[0], actor, 2);
+        Axe_ApplyAttack(&context->extraAttack[1], actor, 2);
     } else {
-        u32 value = Axe_ReadMaskedFlags(0x800, &context->flags);
-        selection.flags = &context->flags;
+        u32 value = Flags_MaskedWord(0x800, &context->flagsE4C);
+        selection.flags = &context->flagsE4C;
         if (Axe_TestMaskedFlags(value)) {
             s32 power = actor->base.attacks.first[2] * 2;
             s32 force = actor->base.attacks.second[2] * 2;
@@ -3693,27 +3145,27 @@ void Axe_FireAttack(struct ChaseActor *actor)
             {
                 u32 reactionFlags = actor->base.attacks.flags[2];
                 u16 duration = actor->base.attacks.parameter[2];
-                Collider_SetAttackProperties(&context->attackColliders[0], power, force, 0,
+                Collider_SetAttackProperties(&context->extraAttack[0], power, force, 0,
                                              reactionFlags, duration);
             }
             {
                 u32 reactionFlags = actor->base.attacks.flags[2];
                 u16 duration = actor->base.attacks.parameter[2];
-                Collider_SetAttackProperties(&context->attackColliders[1], power, force, 0,
+                Collider_SetAttackProperties(&context->extraAttack[1], power, force, 0,
                                              reactionFlags, duration);
             }
         } else if (Axe_TestSelectionFlags(0x400, &selection)) {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 1);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 1);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 1);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 1);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 1);
         } else if (Axe_TestSelectionFlags(0x1000, &selection)) {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 0);
         } else {
             Axe_ApplyAttack(&actor->base.colliderB, actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[0], actor, 0);
-            Axe_ApplyAttack(&context->attackColliders[1], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[0], actor, 0);
+            Axe_ApplyAttack(&context->extraAttack[1], actor, 0);
         }
     }
 }
@@ -3760,17 +3212,17 @@ s32 Axe_PrepareUpdate(void *p)
     return 1;
 }
 
-void Axe_UpdateScreenShake(struct S080FC3F8 *s);
+void Axe_UpdateScreenShake(struct ChaseActor *actor);
 
-void Axe_TickAuxiliarySpriteTimers(struct S080FBEDC *s);
+void Axe_TickAuxiliarySpriteTimers(struct ChaseActor *actor);
 
 struct ChaseActor;
 
 u32 Axe_UpdatePaletteTransition(struct ChaseActor *actor);
 
-void Axe_UpdateBodyColliders(struct AxeCollisionActor *actor);
+void Axe_UpdateBodyColliders(struct ChaseActor *actor);
 
-void Axe_TickCooldowns(struct S080FB050 *s);
+void Axe_TickCooldowns(struct ChaseActor *actor);
 
 void Axe_FireAttack(struct ChaseActor *actor);
 
@@ -3787,26 +3239,17 @@ s32 Axe_UpdateEffects(void *s)
 
 void Axe_UpdateFadeOut(struct ChaseActor *actor, s32 frame);
 
-static inline void SetPhase(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
-{
-    actor->base.state2A8 = state;
-    actor->base.phase2A9 = phase;
-    actor->base.behavior2AA = behavior;
-    actor->base.counter2AC = 0;
-    actor->base.field2B1 = 1;
-}
-
 void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
 {
     struct Axe *group = actor->base.context;
-    if (TakePending(actor)) {
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Axe_UpdateFadeOut, 0x22);
         {
             u32 flag = 0x100;
             flag |= actor->base.motionFlags;
             actor->base.motionFlags = flag;
         }
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13C);
+        Axe_SetAuxiliarySpriteRenderState(actor, group->blackPalette, 0x13C);
         {
             u32 flag = 0x400;
             group->flagsE4C |= flag;
@@ -3815,7 +3258,7 @@ void Axe_UpdateFadeOutPhase(struct ChaseActor *actor)
     Axe_EmitMotionTrail(actor);
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 1);
+        Chase_SetState(actor, 0, 2, 1);
     } else {
         actor->base.counter2AC++;
     }
@@ -3859,23 +3302,12 @@ void ActorGroup_ResetActivePhase(struct ChaseActor *actor)
     }
 }
 
-struct ActorGroupMotionState {
-    u8 unknown0[0x888];
-    struct ContactPosition position;
-    u8 unknown890[0x5bc];
-    u32 flags;
-    u8 unknownE50[0x68];
-    u16 timer;
-    u8 unknownEBA[6];
-    u16 duration;
-};
-
 void SceneActorControl_TiltRotation(struct ChaseActor *actor, s32 elapsed);
 
 void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionState *group = actor->base.context;
-    if (TakePending(actor)) {
+    struct Axe *group = actor->base.context;
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, SceneActorControl_TiltRotation, 0x31);
         {
             u32 flag = 0x100;
@@ -3884,14 +3316,14 @@ void ActorGroup_BeginMotionPhase(struct ChaseActor *actor)
         }
         {
             u32 flag = 0x200;
-            group->flags |= flag;
+            group->flagsE4C |= flag;
         }
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13c);
-        group->timer = group->duration;
+        Axe_SetAuxiliarySpriteRenderState(actor, group->blackPalette, 0x13c);
+        group->attackCooldowns[0] = group->attackDelays[0];
     }
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 3);
+        Chase_SetState(actor, 0, 2, 3);
     } else {
         actor->base.counter2AC++;
     }
@@ -3904,7 +3336,7 @@ void Axe_UpdateRecoverTimer(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u32 mask = 0x100;
         actor->base.motionFlags = actor->base.motionFlags & ~mask;
-        SetPhase(actor, 0, 0, 3);
+        Chase_SetState(actor, 0, 0, 3);
     } else
         actor->base.counter2AC++;
 }
@@ -3916,42 +3348,10 @@ static inline void Or16(u32 m, u16 *p)
     *p = m | *p;
 }
 
-static inline void Or32(u32 m, u32 *p)
-{
-    *p |= m;
-}
-
 static inline void Restart(struct ChaseActor *actor)
 {
-    void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
-    u32 kind = 0x23;
-    u8 zero8;
-    u8 one;
-    u32 zero;
-    u8 *taken = &actor->base.field2B2;
-    zero = 0;
-    one = 1;
-    *taken = one;
-    actor->base.stepDone = zero;
-    actor->base.controlKind = kind;
-    actor->base.target = callback;
-    zero8 = 0;
-    actor->base.field2C8 = zero;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        u32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = zero;
-    {
-        u32 phase = 2;
-        u32 behavior = 5;
-        actor->base.state2A8 = zero8;
-        actor->base.phase2A9 = phase;
-        actor->base.behavior2AA = behavior;
-        actor->base.counter2AC = zero;
-        actor->base.field2B1 = one;
-    }
+    SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
+    Chase_SetState(actor, 0, 2, 5);
 }
 
 void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
@@ -3960,8 +3360,8 @@ void SceneActorControl_UpdateControl35Phase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorChase_SetControl(actor, Axe_UpdateTargetWindup, 0x35);
         Or16(0x100, &actor->base.motionFlags);
-        Or32(0x800, &context->flagsE4C);
-        context->fieldEBA = context->fieldEC2;
+        WordFlags_Set(0x800, &context->flagsE4C);
+        context->attackCooldowns[1] = context->attackDelays[1];
         Or16(0x1000, &actor->base.placementFlags);
     }
     if (actor->base.stepDone) {
@@ -3978,30 +3378,17 @@ void Axe_UpdateRecoverTimer2(struct ChaseActor *actor)
     if (actor->base.stepDone) {
         u32 mask = 0x100;
         actor->base.motionFlags = actor->base.motionFlags & ~mask;
-        SetPhase(actor, 0, 0, 3);
+        Chase_SetState(actor, 0, 0, 3);
     } else
         actor->base.counter2AC++;
 }
-
-struct ActorGroupMotionStateBeginExtendedMotion {
-    u8 unknown0[0x8A8];
-    struct ContactPosition position;
-    u8 unknown890[0x59c];
-    u32 flags;
-    u8 unknownE50[0x6C];
-    u16 timer;
-    u8 unknownEBE[6];
-    u16 duration;
-    u8 unknownEC6[10];
-    u8 active;
-};
 
 void Axe_UpdateTrailFadeIn(struct ChaseActor *actor, s32 frame);
 
 void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
 {
-    struct ActorGroupMotionStateBeginExtendedMotion *group = actor->base.context;
-    if (TakePending(actor)) {
+    struct Axe *group = actor->base.context;
+    if (Chase_TakeArrived(actor)) {
         SceneActorChase_SetControl(actor, Axe_UpdateTrailFadeIn, 0x27);
         {
             u32 flag = 0x100;
@@ -4010,16 +3397,16 @@ void ActorGroup_BeginExtendedMotion(struct ChaseActor *actor)
         }
         {
             u32 flag = 0x1000;
-            group->flags |= flag;
+            group->flagsE4C |= flag;
         }
-        group->timer = group->duration;
-        Axe_SetAuxiliarySpriteRenderState(actor, &group->position, 0x13D);
+        group->attackCooldowns[2] = group->attackDelays[2];
+        Axe_SetAuxiliarySpriteRenderState(actor, group->redPalette, 0x13D);
         group->active = 1;
         Sound_PlaySong(0x16F);
     }
     if (actor->base.stepDone) {
         SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
-        SetPhase(actor, 0, 2, 7);
+        Chase_SetState(actor, 0, 2, 7);
     } else {
         actor->base.counter2AC++;
     }
@@ -4036,23 +3423,14 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1))
         context->lungeQueued = 1;
     if (actor->base.stepDone) {
-        u8 zero8;
-        Axe_SetAuxiliarySpriteRenderState(actor, &context->position, 0x13C);
+        Axe_SetAuxiliarySpriteRenderState(actor, context->blackPalette, 0x13C);
         actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
-        zero8 = 0;
         {
             u32 *flags = &context->flagsE4C;
             u32 mask = ~0x1000;
             *flags &= mask;
         }
-        {
-            u32 behavior = 3;
-            actor->base.state2A8 = zero8;
-            actor->base.phase2A9 = zero8;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = 1;
-        }
+        Chase_SetBehavior(actor, 3);
     } else {
         ++actor->base.counter2AC;
     }
@@ -4060,65 +3438,20 @@ void SceneActorControl_EndExtendedPhase(struct ChaseActor *actor)
 
 void SceneActor_AdvanceOffsetApproach(void);
 
-struct SceneActorControl2AContext {
-    u8 unknown0[0xEBE];
-    u16 fieldEBE;
-    u8 unknownEC0[6];
-    u16 fieldEC6;
-};
-
 static inline void Restart_UpdateControl2APhase(struct ChaseActor *actor)
 {
-    u8 zero8;
     actor->base.motionFlags = Mask16(&actor->base.motionFlags, ~0x100);
-    zero8 = 0;
-    {
-        void *callback = (void *)ActorPhase_UpdateSpriteCollapse;
-        u32 kind = 0x23;
-        u8 one;
-        u8 *taken = &actor->base.field2B2;
-        one = 1;
-        *taken = one;
-        actor->base.stepDone = zero8;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
-        {
-            u32 behavior = 4;
-            actor->base.state2A8 = zero8;
-            actor->base.phase2A9 = zero8;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = 0;
-            actor->base.field2B1 = one;
-        }
-    }
+    SceneActorChase_SetControl(actor, ActorPhase_UpdateSpriteCollapse, 0x23);
+    Chase_SetBehavior(actor, 4);
 }
 
 void SceneActorControl_UpdateControl2APhase(struct ChaseActor *actor)
 {
-    struct SceneActorControl2AContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
-        void *callback = (void *)SceneActor_AdvanceOffsetApproach;
-        u32 kind = 0x2A;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, SceneActor_AdvanceOffsetApproach, 0x2A);
         Or16(0x100, &actor->base.motionFlags);
-        context->fieldEBE = context->fieldEC6;
+        context->attackCooldowns[3] = context->attackDelays[3];
     }
     if (actor->base.stepDone) {
         Restart_UpdateControl2APhase(actor);
@@ -4140,14 +3473,6 @@ struct AxeRoute {
     u8 padEA5[0xF14 - 0xEA5];
     struct ContactPosition motion;
 };
-
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
 
 static inline u32 RandomFirst(u32 bits)
 {
@@ -4186,19 +3511,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.onAlternateEntry;
-        u32 one = 1;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = 1;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -4206,7 +3519,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
         SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         Polar(&route->motion,
               Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
                      &actor->base.tracking.heading) &
@@ -4214,7 +3527,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
               32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->base.body.position, &route->points[route->index]);
+    Chase_Delta(&delta, &actor->base.body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->base.body.direction =
@@ -4225,7 +3538,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
         actor->base.body.motion.z += delta.z;
         route->motion = actor->base.body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->base.body.position, &route->points[8]);
+        Chase_Delta(&route->motion, &actor->base.body.position, &route->points[8]);
         route->motion.y = 0;
         actor->base.body.position.x = route->points[8].x;
         actor->base.body.position.z = route->points[8].z;
@@ -4235,7 +3548,7 @@ void Axe_FollowDeceleratingRoute(struct ChaseActor *actor)
               512);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         route->speed >>= 1;
         return;
     }
@@ -4259,19 +3572,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         u32 origin, savedOrigin;
         u32 angle;
-        void *callback = actor->base.onAlternateEntry;
-        u32 one = 1;
-        actor->base.field2B2 = one;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = 1;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+        SceneActorChase_SetControl(actor, actor->base.onAlternateEntry, 1);
         route->index = 0;
         target = (*(struct AxePlayer **)gPlayers)->position;
         origin = (u32)gRandomTable + (PARTICLE_RANDOM_SAMPLE_ORIGIN - RANDOM_TABLE_ADDR);
@@ -4279,7 +3580,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
         SceneRoute_ProjectRandomOffset(&delta, angle, 512, origin, &savedOrigin);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         Polar(&route->motion,
               Facing(ParticleRandom_ReadRelativeSample(savedOrigin, (const u16 *)RANDOM_TABLE_ADDR),
                      &actor->base.tracking.heading) &
@@ -4287,7 +3588,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
               32);
         route->speed = 1;
     }
-    Delta(&delta, &actor->base.body.position, &route->points[route->index]);
+    Chase_Delta(&delta, &actor->base.body.position, &route->points[route->index]);
     Axe_EmitMotionTrail(actor);
     if (delta.x * delta.x + delta.z * delta.z > 1024) {
         actor->base.body.direction =
@@ -4298,7 +3599,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
         actor->base.body.motion.z += delta.z;
         route->motion = actor->base.body.motion;
     } else if (++route->index > 8) {
-        Delta(&route->motion, &actor->base.body.position, &route->points[8]);
+        Chase_Delta(&route->motion, &actor->base.body.position, &route->points[8]);
         route->motion.y = 0;
         actor->base.body.position.x = route->points[8].x;
         actor->base.body.position.z = route->points[8].z;
@@ -4308,7 +3609,7 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
               256);
         target.x += delta.x;
         target.z += delta.z;
-        Delta(&delta, &actor->base.body.position, &target);
+        Chase_Delta(&delta, &actor->base.body.position, &target);
         return;
     }
     if (Mod(actor->base.counter2AC, 16) == 0 && route->speed <= 17)
@@ -4316,11 +3617,11 @@ void Axe_FollowAcceleratingRoute(struct ChaseActor *actor)
     ++actor->base.counter2AC;
 }
 
-extern u8 gUnk_08606468[];
+extern void *gUnk_08606468[];
 
-void Axe_InitActionCallbacks(u8 *p)
+void Axe_InitActionCallbacks(struct ChaseActor *actor)
 {
-    *(u8 **)(p + 0x28c) = gUnk_08606468;
+    actor->base.behaviorCallbacks = gUnk_08606468;
 }
 
 void Axe_UpdateWaitingAnimation(struct RoomActor *actor, s32 frame);
@@ -4334,20 +3635,8 @@ static inline u16 SetFlag(struct ChaseActor *actor, u32 mask)
 void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    if (TakeFlag(&actor->base.field2B1)) {
-        void *callback = Axe_UpdateWaitingAnimation;
-        u32 kind = 10;
-        actor->base.field2B2 = 1;
-        actor->base.stepDone = 0;
-        actor->base.controlKind = kind;
-        actor->base.target = callback;
-        actor->base.field2C8 = 0;
-        {
-            u32 *flags = &actor->base.pendingControlFlags;
-            u32 mask = ~1;
-            *flags &= mask;
-        }
-        actor->base.pendingControl = 0;
+    if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
+        SceneActorChase_SetControl(actor, Axe_UpdateWaitingAnimation, 10);
         SetFlag(actor, 0x100);
         group->gate.counter = group->gate.duration;
     }
@@ -4358,11 +3647,6 @@ void Axe_UpdatePlayerDestinationPhase(struct ChaseActor *actor)
 }
 
 // confidence=low: after the wait, selects a route point and starts the stored movement spline.
-
-struct AxeLink {
-    u8 unknown0[8];
-    struct AxeRoutePoint *point;
-};
 
 static inline u32 CellIndex_UpdateRouteDestinationPhase(s32 x, s32 z)
 {
@@ -4387,8 +3671,8 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
     struct AxeVec targetStorage;
     struct AxeVec *target;
     struct AxeVec *copy;
-    struct AxeRoutePoint *point;
-    struct AxeLink *link;
+    struct SceneActorChaseRoutePoint *point;
+    struct SceneActorRegistryRoute *link;
     s16 deltaX;
     s16 deltaZ;
     if (actor->base.field2B1)
@@ -4398,7 +3682,7 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
     if (((s32)actor->base.counter2AC) > 60) {
         Axe_SelectRandomRoutePoint(actor);
         target = &targetStorage;
-        link = (struct AxeLink *)(((u8 *)actor) + 0x448);
+        link = &actor->group.homeRoute;
         point = link->point;
         target->x = point->x;
         target->z = point->z;
@@ -4419,7 +3703,7 @@ void Axe_UpdateRouteDestinationPhase(struct ChaseActor *actor)
         }
         deltaZ = copy->z;
         deltaX = target->x;
-        *(((u8 *)actor) + 0x3cd) = Math_Atan2(deltaX, deltaZ);
+        actor->base.nextDirection = Math_Atan2(deltaX, deltaZ);
         ZeroFill8(context->clearF14);
     } else
         actor->base.counter2AC++;
@@ -4432,30 +3716,9 @@ void Axe_InitEventCallbacks(struct ChaseActor *p)
     p->base.alternateBehaviorCallbacks = gUnk_08606494;
 }
 
-struct SceneActorReactionCountContext {
-    u8 unknown0[0xE4C];
-    u32 flagsE4C;
-    u8 unknownE50[0x60];
-    u8 reactionCount;
-    u8 unknownEB1[0x23];
-    u16 fieldED4;
-};
-
-static inline u8 TestFlag_AdvanceReactionCount(u32 mask, u32 *flags)
-{
-    if (*flags & mask)
-        return 1;
-    return 0;
-}
-
-static inline u32 MaskFlags(u16 *p, u32 mask)
-{
-    return *p & mask;
-}
-
 s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
 {
-    struct SceneActorReactionCountContext *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     u16 *flags;
     u32 mask;
     if (actor->base.reactionSoundVariant == 0)
@@ -4466,20 +3729,14 @@ s32 SceneActorControl_AdvanceReactionCount(struct ChaseActor *actor)
     mask = ~0x20;
     *flags = mask & *flags;
     if (*flags & 0x8000)
-        context->fieldED4 = 8;
+        context->reactionHoldTimer = 8;
     if (context->reactionCount <= 2)
         ++context->reactionCount;
-    if (!MaskFlags(flags, 0x8100)) {
-        u32 blocked = TestFlag_AdvanceReactionCount(4, &context->flagsE4C);
+    if (!SceneActorTurn_Flags(flags, 0x8100)) {
+        u32 blocked = WordFlags_Has(4, &context->flagsE4C);
         if (!blocked && context->reactionCount > 2) {
-            u32 phase = 2;
-            u32 behavior = 6;
-            actor->base.state2A8 = blocked;
-            actor->base.phase2A9 = phase;
-            actor->base.behavior2AA = behavior;
-            actor->base.counter2AC = blocked;
-            actor->base.field2B1 = 1;
-            context->reactionCount = blocked;
+            Chase_SetState(actor, 0, 2, 6);
+            context->reactionCount = 0;
             return 1;
         }
     }
@@ -4508,25 +3765,18 @@ s32 Axe_OnUpdate(struct ChaseActor *p)
     return 1;
 }
 
-struct S080FE64C {
-    u8 filler[0xdc];
-    u8 *p;
-};
+void SceneActor_UpdateBehaviorCallbacks(struct ChaseActor *);
 
-void SceneActor_UpdateBehaviorCallbacks(struct S080FE64C *);
-
-s32 Axe_OnRender(struct S080FE64C *s)
+s32 Axe_OnRender(struct ChaseActor *actor)
 {
-    s->p = (*(u8 **)gPlayers) + 0x24;
-    SceneActor_UpdateBehaviorCallbacks(s);
+    actor->base.tracking.target = &((struct SceneActorChasePlayer *)gPlayers[0])->target;
+    SceneActor_UpdateBehaviorCallbacks(actor);
     return 0;
 }
 
-struct S080FCB3C;
+void Axe_RemoveSecondaryColliders(struct ChaseActor *actor);
 
-void Axe_RemoveSecondaryColliders(struct S080FCB3C *s);
-
-void Axe_RemoveAuxiliarySprites(struct S080FBF20 *s);
+void Axe_RemoveAuxiliarySprites(struct ChaseActor *actor);
 
 void SceneActorEffects_ReleaseResources(void *);
 
@@ -4539,13 +3789,13 @@ s32 Axe_ReleaseResources(void *p)
     return 0;
 }
 
-void Axe_InitProfile(struct S080FAC14 *s);
+void Axe_InitProfile(struct ChaseActor *actor);
 
-void Axe_InitAttackCooldowns(struct AxeCooldownActor *actor);
+void Axe_InitAttackCooldowns(struct ChaseActor *actor);
 
 void ActorGroup_ReadScriptOptions(struct ChaseActor *actor);
 
-void Axe_InitEffectPalettes(struct AxePaletteActor *s);
+void Axe_InitEffectPalettes(struct ChaseActor *actor);
 
 void Axe_InitColliders(struct ChaseActor *actor);
 
@@ -4555,9 +3805,9 @@ s32 Axe_GetActorCategory(void);
 
 void Axe_UpdateTurnAnimation(struct RoomActor *actor, u32 events);
 
-void Axe_OnAnimationReset(u8 *p);
+void Axe_OnAnimationReset(struct ChaseActor *actor);
 
-void Axe_BeginProfileEntry(u8 *p);
+void Axe_BeginProfileEntry(struct ChaseActor *actor);
 
 void Axe_ConvergeRecoveryMotion(struct ChaseActor *actor);
 
@@ -4579,19 +3829,19 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame);
 
 void SceneActorBehavior_InitializeShadow(void *);
 
-void Axe_InitMotionTable(struct S080FA744 *s);
+void Axe_InitMotionTable(struct ChaseActor *actor);
 
-void Axe_InitActionCallbacks(u8 *p);
+void Axe_InitActionCallbacks(struct ChaseActor *actor);
 
 void Axe_InitEventCallbacks(struct ChaseActor *p);
 
 void SpriteGroup_InitAnimatedSprites(struct ChaseActor *owner);
 
-void Axe_InitRoutePointHistory(struct S080FB1DC *s);
+void Axe_InitRoutePointHistory(struct ChaseActor *actor);
 
 void ActorCollision_InitThreeAuxiliaryAttacks(struct ChaseActor *actor);
 
-s32 Axe_OnRender(struct S080FE64C *s);
+s32 Axe_OnRender(struct ChaseActor *actor);
 
 s32 Axe_ReleaseResources(void *p);
 

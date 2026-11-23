@@ -18,31 +18,10 @@ u8 SceneActorBehavior_AccelerateTowardDescriptor(void *, void *, u32, u32, s32);
 
 static inline void BeginRouteSelection(struct ChaseActor *actor, struct SceneActorChaseGroup *nav)
 {
-    void *control;
-    u32 kind;
     SceneActorTerrain_EnterState(actor, 0, 0, 8);
-    /* The route callback is installed after the reset fields. */
-    control = nav->routeChoiceControl;
-    kind = 0x13;
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    {
-        u32 *flags = &actor->base.pendingControlFlags;
-        s32 mask = ~1;
-        *flags &= mask;
-    }
-    actor->base.pendingControl = 0;
+    SceneActorTerrain_InstallControl(actor, nav->routeChoiceControl, 0x13);
 }
 void SceneActorMovement_ResolveRoutePosition(void *);
-static inline u8 InLinkMode(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
 {
     struct SceneActorChaseGroup *nav = &actor->group;
@@ -80,7 +59,7 @@ void SceneActorControl_UpdateRouteApproach(struct ChaseActor *actor)
     } else if (SceneActorBehavior_AccelerateTowardDescriptor(actor, nav->route, 0x20, 0x20,
                                                              speed)) {
         BeginRouteSelection(actor, nav);
-        if (!InLinkMode(gEngineFlags, 0x4800)) {
+        if (!SceneActorChase_Test(gEngineFlags, 0x4800)) {
             SceneActorChase_ChooseRoute(actor);
             SceneActorMovement_ResolveRoutePosition(actor);
         }

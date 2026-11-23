@@ -1,15 +1,11 @@
 #include "global.h"
+#include "contact_collider.h"
 
-struct ArmorPart {
-    u8 pad[0x38];
-    u32 flags;
-};
 struct ArmorActor {
     u8 pad0[0x190];
-    struct ArmorPart part0;
-    u8 pad1[0x1e4 - 0x1cc];
-    struct ArmorPart part1;
-    u8 pad2[0x274 - 0x220];
+    struct ContactCollider part0;
+    struct ContactCollider part1;
+    u8 pad238[0x274 - 0x238];
     s16 contactPower;
     u8 pad3[0xb26 - 0x276];
     s16 attack;
@@ -28,10 +24,6 @@ struct ArmorActor {
     s16 initialDefense;
 };
 void ActorController_SetBehavior(struct ArmorActor *, s32);
-static inline void setPartFlags(struct ArmorPart *p, u32 mask)
-{
-    p->flags |= mask;
-}
 // confidence=low: accumulated contacts drive a temporary attack and defense increase.
 void Armor_UpdateContactBoost(struct ArmorActor *p, s32 amount, u32 flags)
 {
@@ -79,8 +71,8 @@ void Armor_UpdateContactBoost(struct ArmorActor *p, s32 amount, u32 flags)
                     p->defense = scaled;
                 }
                 p->contactPower = p->defense;
-                setPartFlags(&p->part1, 0x200004);
-                setPartFlags(&p->part0, 0x200004);
+                ContactCollider_SetReactionFlags(&p->part1, 0x200004);
+                ContactCollider_SetReactionFlags(&p->part0, 0x200004);
             }
             break;
         case 3:

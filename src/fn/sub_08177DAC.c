@@ -14,16 +14,8 @@ void Hud_HideAuxiliaryElements(struct HudManager *p)
 {
     struct HudElement *e;
     s32 i;
-    e = p->pair;
-    {
-        u32 mask = 1;
-        for (i = 1; i >= 0; e++, i--)
-            e->flags |= mask;
-    }
-    e = p->group;
-    {
-        u32 mask = 1;
-        for (i = 5; i >= 0; e++, i--)
-            e->flags |= mask;
-    }
+    for (i = 0, e = p->pair; i < 2; i++)
+        e++->flags |= 1;
+    for (i = 0, e = p->group; i < 6; i++)
+        e++->flags |= 1;
 }

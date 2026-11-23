@@ -27,7 +27,6 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
 {
     u8 text[32];
     u8 *q;
-    int z;
     if (p->actionTransferDelay == 0) {
         MessageWindow_Clear();
         MessageWindow_SetBounds(0, 18, 30, 2);
@@ -44,20 +43,19 @@ void SceneHud_UpdateTimedMessage(struct SceneHudState *p)
         MessageWindow_ShowMessage(120);
     }
     p->actionTransferDelay++;
-    z = 0;
     if (p->actionTransferDelay > 89 || (p->actionTransferDelay > 15 && (gPadState[1] & 1))) {
         TextWindow_Clear(p->timedMessageWindow);
         MessageWindow_SetBounds(0, 16, 30, 2);
         SceneHud_RefreshActionIcons(p);
         Hud_SetInteractionCallback(p, SceneHud_UpdateActionSelection, 1);
-        q = (u8 *)p + 0x4384;
+        q = p->actionInput;
         Inventory_InitializeSelectionGrid(q, 1, 0);
         SceneHud_GetActionIconPosition((u8 *)p + 0x1620, ((u8 *)p)[0x4387]);
         SceneHud_ShowActionPreview(p);
         Hud_SaveGridSelection(q);
         InventoryPanel_ShowStatusIcons(p);
         MenuDisplay_UpdateActionPrompt(p, 4);
-        InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, z);
-        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, z);
+        InventoryPanel_DrawStatComparison(p, 0, 0, 0, 1, 0);
+        MenuDisplay_SetPaletteOverrides(p, 1, 0, 0, 0);
     }
 }

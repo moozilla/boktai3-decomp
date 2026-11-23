@@ -135,7 +135,6 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     s32 layer;
     struct OptionsScreen *state;
     struct OptionsTextRect rect;
-    u32 one;
     void *background;
     void *palette;
     void *resource;
@@ -147,7 +146,7 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     Bg_ClearTilemap(3);
     background = ScriptProc_Start(0xC091, 0x3536);
     layer = 9;
-    Bg_SetupLayers(2, 0, background, 0, 0, one = 1, &layer);
+    Bg_SetupLayers(2, 0, background, 0, 0, 1, &layer);
     BgGfx_LoadTilemapSimple(3, 0, 0, 0, 0);
     palette = ScriptProc_Start(0x92B3, 0x204);
     CpuSet(((struct OptionsPalette *)palette)->colors, gBgPaletteBuffer, 0x100);
@@ -177,9 +176,9 @@ s32 Options_InitScreen(struct OptionsScreen *screen)
     rect.y = 0x60;
     rect.width = 0;
     Menu_SetTextRect(rightArrow, &rect);
-    screen->cursor.sprite.flags |= one;
-    screen->leftArrow.sprite.flags |= one;
-    screen->rightArrow.sprite.flags |= one;
+    screen->cursor.sprite.flags |= 1;
+    screen->leftArrow.sprite.flags |= 1;
+    screen->rightArrow.sprite.flags |= 1;
     originalPalette = screen->originalPalette = screen->cursor.sprite.palette;
     highlightPalette = screen->highlightPalette;
     CpuSet(originalPalette, highlightPalette, 0x10);

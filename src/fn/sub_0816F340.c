@@ -12,7 +12,6 @@ void SceneHud_TickActionResult(void);
 void SceneHud_AnimateActionResult(struct SceneHudState *s)
 {
     short index;
-    u16 k2 = 1;
     s32 mode;
     u32 palette;
     struct SceneInputWidget *widget;
@@ -22,8 +21,7 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
         return;
     s->motionWidgets[0].flags |= 1;
     {
-        u16 basePalette = 0x16E;
-        PauseMenu_StartPaletteTransition(s, basePalette, PauseMenu_GetPlayerStatusValue(s), 16);
+        PauseMenu_StartPaletteTransition(s, 0x16E, PauseMenu_GetPlayerStatusValue(s), 16);
     }
     if (!s->actionTransferBonus) {
         index = 13;
@@ -31,7 +29,7 @@ void SceneHud_AnimateActionResult(struct SceneHudState *s)
         palette = 0x3A8;
     } else {
         index = 13;
-        mode = k2;
+        mode = 1;
         palette = 0x3A9;
     }
     widget = &s->motionWidgets[14];

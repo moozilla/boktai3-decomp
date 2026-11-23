@@ -1,4 +1,5 @@
 #include "global.h"
+#include "link_selection_mode.h"
 #define SceneMenu_SetState Registry1745_SetState
 struct SceneMenu {
     u8 pad0[0x1A];
@@ -22,12 +23,6 @@ static inline u16 ReadInput(struct SceneMenu *p, s32 i)
         return 0xFFFF;
     return p->input[i];
 }
-static inline u8 IsAcknowledgement(u32 v, u32 mask)
-{
-    if ((v & mask) == 0x1000)
-        return 1;
-    return 0;
-}
 s32 SceneMenu_WaitForConfirmation(struct SceneMenu *p)
 {
     s32 completed, i;
@@ -35,7 +30,7 @@ s32 SceneMenu_WaitForConfirmation(struct SceneMenu *p)
     completed = 0;
     for (i = 0; i < p->count; i++) {
         u16 v = ReadInput(p, i);
-        if (IsAcknowledgement(v, 0x3C00) && (v & 0x3F) == 2)
+        if (LinkSelection_IsReady(v, 0x3c00) && (v & 0x3F) == 2)
             completed++;
     }
     if (completed == p->count)

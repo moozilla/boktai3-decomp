@@ -1,14 +1,11 @@
 #include "scene_actor_route.h"
+#include "scene_actor_chase_shared.h"
 #include "scene_actor_terrain_reaction.h"
 #include "scene_actor_control_phase.h"
 s32 Callback_InvokeActor(void *arg, void *function);
 s32 Route_GetCurrentPointNodeId(void *);
 u8 sub_0812F3CC(void *);
 void SceneActorRoute_AdvanceActorPoint(void *, void *);
-static inline u32 tst(u32 *a, u32 m)
-{
-    return *a & m;
-}
 void SceneActorRoute_UpdateTriggeredWaitPhase(struct ChaseActor *actor)
 {
 
@@ -22,7 +19,7 @@ void SceneActorRoute_UpdateTriggeredWaitPhase(struct ChaseActor *actor)
             u32 *flags = &actor->base.statusFlags;
             if (finished)
                 SceneActorBehavior_SetWordFlags(flags, 0x20);
-            if (tst(flags, 0x20)) {
+            if (SceneActorChase_Bits32(flags, 0x20)) {
                 if (route->unknown3++ >= Route_GetCurrentPointNodeId(route)) {
                     SceneActorRoute_AdvanceActorPoint(actor, route);
                     return;

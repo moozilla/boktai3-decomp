@@ -8,7 +8,9 @@ constant (`u32 mask = 0x40;` ... `if (flags & mask)`), often left over from stee
 compiler. When the local is read exactly once, this writes the literal at that read and drops the
 declaration (`if (flags & 0x40)`), and keeps the change only when tools/check.py still reports
 MATCH with no new compiler warning (tools/keepcheck.py). A local read more than once keeps its
-name: a named constant used twice is ordinary C, and the owner rules on those.
+name (a named constant used twice is ordinary C, and the owner rules on those) unless
+`--every-read` is given: then the literal is written at every read, as long as no read is a
+write (`x++`, `x = ...`), and the same MATCH rule decides.
 
 Two shapes are folded, each with its declaration alone on its line:
 
@@ -77,8 +79,9 @@ def address_or_size(before):
     return re.search(r"(?:^|[(,=?:;{}]|\breturn)\s*&$", before) is not None
 
 
-def candidates(text, rel=None):
-    """[(new text, description)] for each single-use literal local the linter warns about."""
+def candidates(text, rel=None, every=False):
+    """[(new text, description)] for each single-use literal local the linter warns about (EVERY:
+    also a local read more than once, the literal written at every read)."""
     code = keepcheck.blank_comments(text)
     drafts = keepcheck.draft_ranges(text)
     warned = {s.line for s in concessions.sites(text, rel, kinds=("literal-local", "const-local")) if not s.excused}
@@ -90,7 +93,7 @@ def candidates(text, rel=None):
             indent, dtype, base, name, lit = d.groups()
             if base in ("return", "goto", "case", "else") or dtype.split()[-1] == name:
                 continue
-            line = text.count("\n", 0, d.start()) + 1
+            line = decl_line = text.count("\n", 0, d.start()) + 1
             body_end = concessions._scope_end(code, d.end())
             cut = [(d.start(), d.end())]
             if lit is None:  # u32 mask; ... mask = 0x40;
@@ -106,35 +109,48 @@ def candidates(text, rel=None):
                 lo = a.end()
             else:
                 lo = d.end()
-            if line not in warned:
+            if line not in warned and decl_line not in warned:  # const-local warns at the declaration
                 continue
             uses = reads(code, name, lo, body_end)
-            if len(uses) != 1 or len(reads(code, name, d.end(), body_end)) != len(uses) + (len(cut) - 1):
+            if not uses or (len(uses) != 1 and not every) \
+                    or len(reads(code, name, d.end(), body_end)) != len(uses) + (len(cut) - 1):
                 continue
             if re.search(r"\b(?:\w+\s+)+\**\s*%s\s*[=;,\[)]" % re.escape(name), code[fstart:fend].replace(
                     code[d.start():d.end()], "", 1)):
                 continue  # declared again (shadowed) or a parameter of the same name
-            use = uses[0]
-            before = code[:use].rstrip()
-            after = code[use + len(name):].lstrip()
             v = value(lit)
             rng = type_range(dtype)
             if rng is None:
                 continue
             negative = lit.lstrip().startswith(("-", "~"))
-            if not rng[0] <= v <= rng[1]:
-                bitwise = re.search(r"(?:[&|^]=?)$", before) and not before.endswith(("&&", "||")) \
-                    or re.match(r"[&|^](?![&|])", after)
-                if not (negative and rng[0] == 0 and bitwise):
-                    continue
-            if address_or_size(before):
+            ok = True
+            for use in uses:
+                before = code[:use].rstrip()
+                after = code[use + len(name):].lstrip()
+                if re.match(r"(?:[-+*/%&|^]|<<|>>)?=(?!=)|\+\+|--", after) or re.search(r"(?:\+\+|--)$", before):
+                    ok = False  # written again: not a parked constant
+                    break
+                if not rng[0] <= v <= rng[1]:
+                    bitwise = re.search(r"(?:[&|^]=?)$", before) and not before.endswith(("&&", "||")) \
+                        or re.match(r"[&|^](?![&|])", after)
+                    if not (negative and rng[0] == 0 and bitwise):
+                        ok = False
+                        break
+                if address_or_size(before):
+                    ok = False
+                    break
+                if negative and lit.lstrip().startswith("-") and before[-1:] in ("-", "+"):
+                    ok = False
+                    break
+            if not ok:
                 continue
-            if negative and lit.lstrip().startswith("-") and before[-1:] in ("-", "+"):
-                continue
-            new = text[:use] + re.sub(r"\s+", "", lit) + text[use + len(name):]
+            new = text
+            for use in sorted(uses, reverse=True):
+                new = new[:use] + re.sub(r"\s+", "", lit) + new[use + len(name):]
             for a, b in sorted(cut, reverse=True):
                 new = new[:a] + new[b:]
-            out.append((new, f"{rel}:{line}: {name} = {lit} folded into its one use in {fname}"))
+            where = "its one use" if len(uses) == 1 else f"its {len(uses)} uses"
+            out.append((new, f"{rel}:{line}: {name} = {lit} folded into {where} in {fname}"))
     return out
 
 
@@ -148,14 +164,14 @@ def adds_concession(old, new, rel):
     return bool(count(new) - count(old))
 
 
-def process(rel, dry=False, log=print):
+def process(rel, dry=False, log=print, every=False):
     unit = keepcheck.Unit(rel)
     applied = tried = 0
     rows = []
     failed = set()
     while True:
         progress = False
-        for new, what in candidates(unit.text, rel):
+        for new, what in candidates(unit.text, rel, every):
             if what in failed:
                 continue
             tried += 1
@@ -188,11 +204,13 @@ def main(argv=None):
                     help="file of paths to leave alone (default: build/skip_files.txt, if present)")
     ap.add_argument("--dry-run", action="store_true", help="list the folds without editing")
     ap.add_argument("--report", help="append the review rows to this file")
+    ap.add_argument("--every-read", action="store_true",
+                    help="also fold a local read more than once, writing the literal at every read")
     a = ap.parse_args(argv)
     applied = tried = 0
     rows = []
     for rel in keepcheck.src_files(a.paths, keepcheck.read_skip(a.skip)):
-        n, t, r = process(rel, a.dry_run)
+        n, t, r = process(rel, a.dry_run, every=a.every_read)
         applied, tried, rows = applied + n, tried + t, rows + r
     for r in rows:
         print(r)

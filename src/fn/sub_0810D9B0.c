@@ -1,3 +1,4 @@
+#include "engine_pause.h"
 #include "global.h"
 #include "game_state.h"
 #include "engine.h"
@@ -36,8 +37,7 @@ static inline struct PanelNameRecord *GetNameRecord(void)
 void RecordPanel_ShowName(struct RecordPanel *p)
 {
     u8 *name;
-    u32 mask = 0x800;
-    if ((gEngineFlags | gScenePauseFlags) & mask) {
+    if (Engine_PauseBits(0x800)) {
         struct PanelNameRecord *record = GetNameRecord();
         if (!record)
             return;

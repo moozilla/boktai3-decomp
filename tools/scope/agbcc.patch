@@ -2150,7 +2150,7 @@
    combine_successes++;
  
    /* Clear this here, so that subsequent get_last_value calls are not
-@@ -3318,6 +3390,20 @@
+@@ -3318,6 +3390,26 @@
    enum machine_mode mode = GET_MODE (x);
    rtx temp;
    int i;
@@ -2166,7 +2166,13 @@
 +      agbcc_zero_record (subst_insn, code,
 +			 ((code == ASHIFTRT || code == LSHIFTRT || code == ASHIFT)
 +			  && GET_CODE (XEXP (x, 1)) == CONST_INT)
-+			 ? (int) INTVAL (XEXP (x, 1)) : -1);
++			 ? (int) INTVAL (XEXP (x, 1))
++			 /* An and with a literal zero ("and:0") is the compiler's own: the
++			    mask that keeps none of the old value when a store replaces a
++			    whole halfword bit-field (store_bit_field), reaching combine when
++			    a zero pseudo is substituted.  C's `x & 0' folds in the front end.  */
++			 : (code == AND && (XEXP (x, 0) == const0_rtx
++					    || XEXP (x, 1) == const0_rtx)) ? 0 : -1);
 +  }
  
    /* If this is a commutative operation, put a constant last and a complex

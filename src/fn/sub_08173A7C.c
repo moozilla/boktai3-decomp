@@ -20,7 +20,6 @@ void sub_08173450(void *);
 void SceneHud_BeginEquipmentSelection(struct SceneHudState *p)
 {
     void *q;
-    int z;
     SceneHud_RefreshEquipmentIcons(p, 0);
     q = p->actionInput;
     Hud_RestoreSecondaryGridSelection(q);
@@ -33,9 +32,8 @@ void SceneHud_BeginEquipmentSelection(struct SceneHudState *p)
     MenuDisplay_DrawStatComparison(p, 10, 6);
     PauseMenu_RefreshEquipmentPanel(p);
     Hud_SetInteractionCallback(p, Hud_UpdateInventoryMenuInput, 0);
-    z = 0;
-    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, z);
-    InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, z);
-    InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, z);
+    MenuDisplay_SetPaletteOverrides(p, 0, 1, 0, 0);
+    InventoryPanel_UpdateSelectedUnlock(p, 8, 3, 0, 0);
+    InventoryPanel_UpdateSelectedEquipment(p, 8, 4, 0, 0);
     sub_08173450(p);
 }

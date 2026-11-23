@@ -4,6 +4,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
+#include "engine_pause.h"
 
 struct GloveModel;
 union GloveAnimationKey {
@@ -149,10 +150,6 @@ static inline s32 Scale(s32 v)
         return v >> 12;
     return -(-v >> 12);
 }
-static inline u32 LinkMode(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline u32 Glove_ReadFlags(struct Glove *p)
 {
     return p->flags;
@@ -193,7 +190,7 @@ static inline u8 ParticipantStatIndexed(s32 slot)
 static inline void Glove_UpdateLocalPresentation(struct Glove *p)
 {
     struct GloveMotion *view = &p->motion;
-    if (LinkMode(0x800)) {
+    if (Engine_PauseBits(0x800)) {
         if ((p->participant) == LocalParticipant()) {
             gUnk_020004E0[0] = ((view->positionX) - (view->x)) >> 12;
             gUnk_020004E0[2] = (view->z) >> 12;
@@ -267,7 +264,7 @@ void Glove_UpdatePostState(struct Glove *p)
             p->resourceFraction = 0;
             p->motion.recoveryTimer = 0;
         } else if (Glove_ActorFlags(p, 2)) {
-            if (LinkMode(0x800)) {
+            if (Engine_PauseBits(0x800)) {
                 if ((p->participant) == LocalParticipant()) {
                     CharacterModel_SetAnimationFlags(&p->model, 0x200);
                 } else {
@@ -287,7 +284,7 @@ void Glove_UpdatePostState(struct Glove *p)
                 s32 *accumulator;
                 s16 *resource;
                 s32 balance;
-                if (LinkMode(0x800)) {
+                if (Engine_PauseBits(0x800)) {
                     s32 participant = p->participant;
                     accumulator = Glove_AccumulateResource(
                         p, ModifierStats_ApplyKind11(view, ParticipantStatIndexed(participant)));

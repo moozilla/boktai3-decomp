@@ -16,10 +16,8 @@ void SceneHud_AnimateActionResult(void);
 static inline s32 Panel_RandomPercent(void)
 {
     u32 next = gRandomIndex + 1;
-    u16 mask;
 
-    mask = 0x3FF;
-    gRandomIndex = next & mask;
+    gRandomIndex = next & 0x3FF;
     return Mod(*(u16 *)((gRandomIndex << 1) + RANDOM_TABLE_ADDR), 100);
 }
 void ScenePanel_BeginRandomTransition(u8 *s)

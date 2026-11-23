@@ -1,6 +1,8 @@
 #include "scene_actor_terrain_reaction.h"
 #include "global.h"
 #include "scene_actor_damage_visibility.h"
+#include "scene_actor_damage_flash.h"
+#include "scene_actor_drawable_flags.h"
 #include "scene_actor_reaction.h"
 #include "scene_actor_palette.h"
 #include "area_effect_link.h"
@@ -8,28 +10,10 @@
 #include "runtime.h"
 /* Clears hit timers; at zero health hands control to the defeat target and records the defeat. */
 void SceneActorRecord_RecordPair(u16, u16);
-static inline u8 Test(u32 value, u32 mask)
-{
-    if (value & mask)
-        return 1;
-    return 0;
-}
 static inline u32 Flag2D0(struct ChaseActor *actor, u32 maskInput)
 {
     u32 mask = maskInput;
     return actor->base.statusFlags & mask;
-}
-static inline void Hide(struct ChaseActor *a)
-{
-    if (!a->base.drawableKind) {
-        u32 *flags = a->base.drawable;
-        u32 mask = ~1;
-        *flags &= mask;
-    } else {
-        struct SceneInputWidget *tile = (void *)((u8 *)a->base.drawable + 0x20);
-        u32 mask = ~1;
-        tile->flags &= mask;
-    }
 }
 
 void AnimData_SelectPaletteBank(void *, s32);
@@ -58,16 +42,7 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
         actor->base.health -= damage;
     }
     if (!(actor->base.hitAttributes & 0x20000)) {
-        u16 bank = actor->base.paletteAlternateBank;
-        if (actor->base.drawableKind == 0)
-            AnimData_SelectPaletteBank((u8 *)actor->base.drawable + 0x2C, bank);
-        else
-            ((struct SceneActorPaletteTileView *)actor->base.drawable)->palette =
-                (const u16 *)(gPaletteBankData + bank * 32);
-        {
-            u32 eight = 8;
-            actor->base.flashTimer = eight;
-        }
+        SceneActorDamage_Flash(actor);
         {
             u32 bit = 0x8000;
             actor->base.behaviorFlags |= bit;
@@ -92,21 +67,17 @@ void SceneActorReaction_ApplyStaggerDamage(struct ChaseActor *actor)
         actor->base.hitLockTimer = 0;
     }
     SceneActorTerrain_ClearCollisionTimers(actor);
-    {
-        u16 *flags = &actor->base.reactionFlags;
-        u32 mask = ~0x980;
-        *flags = mask & *flags;
-    }
+    SceneActorDamage_ClearHitReaction(actor);
     if (actor->base.health <= 0) {
         collider->responseValue = 0;
-        Hide(actor);
+        ActorStatus_ClearDrawableFlags(actor, 1);
         {
             void *control = actor->base.onDefeat;
             SceneActorTerrain_InstallControl(actor, control, 17);
         }
         SceneActorTerrain_EnterState(actor, 3, 0, 0);
         actor->base.hitOwners = 32;
-        if (!Test(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
+        if (!SceneActorDamage_TestFlags(gEngineFlags, 0x4800) && !Flag2D0(actor, 0x800))
             SceneActorRecord_RecordPair(gScriptEntryProcedure, actor->base.body.id);
     } else {
         SetHit(0x20, (void *)&actor->base.motionFlags);

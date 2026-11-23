@@ -2,6 +2,7 @@
 #include "ram.h"
 #include "engine_globals.h"
 #include "area_effect_link.h"
+#include "engine_pause.h"
 
 struct Position {
     s32 x, y, z;
@@ -110,10 +111,6 @@ static inline s32 LinkParticipant(void)
         return -1;
     return ((struct LinkMenu *)gLinkSession)->participant;
 }
-static inline u32 LinkFlags(u32 mask)
-{
-    return (gEngineFlags | gScenePauseFlags) & mask;
-}
 static inline void SetCallback(struct Glove *p, void (*callback)(void *), u32 zero)
 {
     p->entered = 1;
@@ -136,7 +133,7 @@ void sub_08116E44(struct Glove *p)
     s32 *bias, *forward, *vertical, *offset, *impulseY, *impulseZ;
     s32 *previousX, *previousZ, *lateral;
     if (p->entered) {
-        if (LinkFlags(0x800)) {
+        if (Engine_PauseBits(0x800)) {
             values[0] = Glove_Participant(p);
             values[1] = *LinkResult();
             if (Glove_Participant(p) == LinkParticipant())
@@ -156,7 +153,7 @@ void sub_08116E44(struct Glove *p)
             Sound_StopSong(0x8A);
             Sound_StopSong(0x8B);
             Sound_StopSong(0x93);
-            if (!LinkFlags(0x800)) {
+            if (!Engine_PauseBits(0x800)) {
                 Sound_StopTrackedSong(0x32);
                 Sound_StopTrackedSong(0x34);
                 Sound_StopTrackedSong(0x37);
@@ -258,7 +255,7 @@ void sub_08116E44(struct Glove *p)
         if (self->collision & 1)
             *vertical = 0;
     } else {
-        u32 flags = LinkFlags(0x800);
+        u32 flags = Engine_PauseBits(0x800);
         if (flags)
             SetCallback(p, MotionActor_RunPendingScript, 0);
         else

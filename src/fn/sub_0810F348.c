@@ -43,11 +43,6 @@ struct RecordMenuSelectionView {
     u16 inputDelay;
 };
 
-static inline void RecordMenu_SetRedraw(struct RecordMenu *menu, u16 offset)
-{
-    *((u8 *)menu + offset) = 1;
-}
-
 // confidence=low: record menu cursor input, confirm/cancel and redraw handling
 static inline void RecordMenu_PlayChoiceChange(struct RecordMenuSelectionView *view, u16 *glyph)
 {
@@ -104,13 +99,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         if (gPadState[1] & 1) {
             view->cursor.flags |= 1;
             Registry1745_SetSelectionResponse(view->choice);
-            {
-                void (*callback)(struct RecordMenu *) = SceneTask_UpdateTextDelay;
-                u32 leaving = 2;
-                menu->update = callback;
-                RecordMenu_SetRedraw(menu, (u32) & ((struct RecordMenuSelectionView *)0)->redraw);
-                view->leaving = leaving;
-            }
+            RecordMenu_Begin(menu, SceneTask_UpdateTextDelay, 2);
             if (view->choice != 0)
                 Sound_PlaySong(0xDD);
             else
@@ -120,13 +109,7 @@ void RecordMenu_UpdateSelection(struct RecordMenu *menu)
         if (gPadState[1] & 2) {
             view->cursor.flags |= 1;
             Registry1745_SetSelectionResponse(0);
-            {
-                void (*callback)(struct RecordMenu *) = SceneTask_UpdateTextDelay;
-                u32 leaving = 2;
-                menu->update = callback;
-                RecordMenu_SetRedraw(menu, (u32) & ((struct RecordMenuSelectionView *)0)->redraw);
-                view->leaving = leaving;
-            }
+            RecordMenu_Begin(menu, SceneTask_UpdateTextDelay, 2);
             Sound_PlaySong(0xDE);
         }
     done:;

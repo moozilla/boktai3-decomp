@@ -1,3 +1,4 @@
+#include "word_flags.h"
 #include "global.h"
 struct LinkedEffectCollider {
     u8 unknown[6];
@@ -19,10 +20,6 @@ struct EffectVariantSource {
     u8 variant;
 };
 void LinkedEffect_SetVariant(void *, u32);
-static inline u32 TestFlags(u32 *flags, u32 mask)
-{
-    return *flags & mask;
-}
 static inline void MarkCollider(struct LinkedEffectCollider *sprite)
 {
     sprite->flags |= 4;
@@ -30,7 +27,7 @@ static inline void MarkCollider(struct LinkedEffectCollider *sprite)
 void LinkedEffect_ApplyVariant(struct EffectVariantSource *source, void *unused,
                                struct LinkedEffect *effect)
 {
-    if (TestFlags(&source->flags, 0x20)) {
+    if (WordFlags_Test(&source->flags, 0x20)) {
         u8 *sprite = (u8 *)effect + 0x1C;
         LinkedEffect_SetVariant(sprite, source->variant);
         LinkedEffect_SetVariant(sprite, source->variant);

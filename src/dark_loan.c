@@ -1,5 +1,7 @@
 #include "dark_loan_screen.h"
+#include "gba/io_reg.h"
 #include "palette_pulse.h"
+#include "vanargand_parts.h"
 
 void MessageWindow_SetPalette(u32);
 
@@ -24,18 +26,6 @@ void StatGauge_Draw(s32, s32, s32, s32, s32, s32);
 void ScreenTransition_SendCommand(s32, s32, s32, s32, s32, s32, s32);
 
 void sub_082157EC(void);
-
-static inline void ShowWidget(struct SceneInputWidget *widget)
-{
-    widget->flags &= ~1;
-}
-
-static inline void Position_Set(struct ContactPosition *p, s32 x, s32 y, s32 z)
-{
-    p->x = x;
-    p->y = y;
-    p->z = z;
-}
 
 void DarkLoan_RelocateMapHeaderCopy(struct DarkLoanScreen *panel)
 {
@@ -88,13 +78,8 @@ void DarkLoan_UpdateBalanceDigits(struct DarkLoanScreen *panel)
     value = gGameState->menuRewardBalance + panel->adjustment * panel->rate;
     if (value == 0) {
         resource = &panel->secondaryResource;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -127,13 +112,8 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     if (value == 0) {
         base = &display->widgets[DARK_LOAN_BACKGROUND].flags;
         data = &display->resource;
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -157,13 +137,8 @@ void DarkLoan_UpdateAdjustmentDigits(struct DarkLoanScreen *display)
     display->widgets[DARK_LOAN_LOWER_RATE].flags &= ~1;
     value = display->adjustment * display->rate;
     if (value == 0) {
-        {
-            s32 zero = 0;
-            s32 *clear = &digits[3];
-            do {
-                *clear-- = zero;
-            } while ((s32)clear >= (s32)digits);
-        }
+        for (i = 0; i < 4; i++)
+            digits[i] = 0;
     } else {
         digits[0] = Div(value, 1000);
         value -= digits[0] * 1000;
@@ -199,14 +174,9 @@ void DarkLoan_DrawPreview(struct DarkLoanScreen *panel)
 
 void DarkLoan_HideSprites(struct DarkLoanScreen *panel)
 {
-    u32 one = 1;
-    u32 *flags = &panel->widgets[DARK_LOAN_BACKGROUND].flags;
-    s32 i = 0x15;
-    do {
-        *flags |= one;
-        flags = (void *)((u8 *)flags + sizeof(struct SceneInputWidget));
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 22; i++)
+        panel->widgets[i].flags |= 1;
     panel->sprite.flags |= 1;
 }
 
@@ -278,11 +248,11 @@ void DarkLoan_BeginAdjustment(struct DarkLoanScreen *panel)
     DarkLoan_UpdateAdjustmentDigits(panel);
     panel->warningTimer = 0;
     panel->warningShowing = 0;
-    ShowWidget(&panel->widgets[DARK_LOAN_LABEL]);
+    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_LABEL]);
     panel->sprite.flags &= ~1;
     AnimData_SelectPaletteBank(panel->animation, 0x1B4);
-    ShowWidget(&panel->widgets[DARK_LOAN_DECORATIONS]);
-    ShowWidget(&panel->widgets[21]);
+    SceneInputWidget_Show(&panel->widgets[DARK_LOAN_DECORATIONS]);
+    SceneInputWidget_Show(&panel->widgets[21]);
     MessageWindow_ShowMessage(4);
     panel->adjustmentState[1] = 0;
     panel->adjustmentState[2] = 0;
@@ -294,14 +264,12 @@ void DarkLoan_BeginAdjustment(struct DarkLoanScreen *panel)
 
 void DarkLoan_BeginClosing(struct DarkLoanScreen *panel)
 {
-    int z;
     Bg_SetLayerMap(0, panel->map, 5);
-    z = 0;
-    BgGfx_LoadTilemapSimple(0, 0, 0, 0, z);
+    BgGfx_LoadTilemapSimple(0, 0, 0, 0, 0);
     DarkLoan_HideSprites(panel);
     Sound_PlaySong(0x2c1);
     panel->widgets[DARK_LOAN_BACKGROUND].flags &= ~1;
-    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, z);
+    Anim_SetKeyframes(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource, 6, 2, 0);
     MessageWindow_ShowMessage(3);
     DarkLoan_SetState(panel, DarkLoan_WaitBeforeConfirmation);
 }
@@ -433,7 +401,6 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
     u16 *balance, *limit;
     u32 group;
     s32 total;
-    u32 *p, *q;
     s32 i;
     Anim_Step(&panel->widgets[DARK_LOAN_BACKGROUND], &panel->resource);
     if (!panel->exitScript) {
@@ -514,18 +481,11 @@ void DarkLoan_UpdateAdjustment(struct DarkLoanScreen *panel)
             MessageWindow_ShowMessage(4);
             panel->warningShowing = 0;
         } else {
-            u32 mask;
             panel->widgets[DARK_LOAN_LOWER_RATE].flags |= 1;
-            mask = 1;
-            q = (u32 *)(&panel->widgets[DARK_LOAN_AMOUNT_DIGITS].flags);
-            p = (u32 *)(&panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS].flags);
-            i = 3;
-            do {
-                *p |= mask;
-                *q |= mask;
-                q = (void *)((u8 *)q + sizeof(struct SceneInputWidget));
-                p = (void *)((u8 *)p + sizeof(struct SceneInputWidget));
-            } while (--i >= 0);
+            for (i = 0; i < 4; i++) {
+                panel->widgets[DARK_LOAN_ADJUSTMENT_DIGITS + i].flags |= 1;
+                panel->widgets[DARK_LOAN_AMOUNT_DIGITS + i].flags |= 1;
+            }
             if (!panel->warningShowing) {
                 MessageWindow_ShowMessage(6);
                 panel->warningShowing = 1;
@@ -576,19 +536,13 @@ void DarkLoan_CloseAfterDelay(struct DarkLoanScreen *panel)
 {
     if (++panel->timer > 31) {
         if (panel->exitScript == 0) {
-            u16 *flags = &gDispCntShadow;
-            u32 mask = ~0x100;
-            *flags = mask & *flags;
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
             DarkLoan_HideDisplay(panel);
         } else {
             Script_Call(panel->exitScript, 0);
             Task_Kill(panel);
             sub_082157EC();
-            {
-                u16 *flags = &gDispCntShadow;
-                u32 mask = ~0x100;
-                *flags = mask & *flags;
-            }
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
         }
     }
 }
@@ -600,9 +554,7 @@ void DarkLoan_UpdateClosing(struct DarkLoanScreen *panel)
         ScreenTransition_SendCommand(3, 5, 4, 4, 4, 0xe000, 0);
     if (++panel->timer > 181) {
         if (panel->exitScript == 0) {
-            u16 *flags = &gDispCntShadow;
-            u32 mask = ~0x100;
-            *flags = mask & *flags;
+            Bg_DisableDisplay(DISPCNT_BG0_ON);
             DarkLoan_HideDisplay(panel);
         } else {
             Script_Call(panel->exitScript, 0);
@@ -619,22 +571,16 @@ s32 DarkLoan_OnUpdate(struct DarkLoanScreen *panel)
 
 s32 DarkLoan_OnDestroy(struct DarkLoanScreen *panel)
 {
-    struct SceneInputWidget *widget = panel->widgets;
-    s32 i = 0x15;
-    do {
-        Anim_Remove(widget);
-        widget++;
-        i--;
-    } while (i >= 0);
+    s32 i;
+    for (i = 0; i < 22; i++)
+        Anim_Remove(&panel->widgets[i]);
     Sprite_Remove(&panel->sprite);
     return 0;
 }
 
 void DarkLoan_StartDisplayScript(struct DarkLoanScreen *panel)
 {
-    u16 *r = &gDispCntShadow;
-    u32 m = ~0x100;
-    *r = m & *r;
+    Bg_DisableDisplay(DISPCNT_BG0_ON);
     panel->map = ScriptProc_Start(0xC091, 0x8544);
 }
 
@@ -709,7 +655,7 @@ void DarkLoan_BuildDisplay(struct DarkLoanScreen *panel, s32 alternate)
         pos.x += 8;
     }
     Widget_InitLinked(&panel->widgets[DARK_LOAN_LABEL], primary, 0x22, flags, 0, 0, 0x3C, 0);
-    Position_Set(&pos, -0x85, -0x18, 0);
+    Vanargand_SetVector(&pos, -0x85, -0x18, 0);
     Widget_InitLinked(&panel->widgets[DARK_LOAN_DECORATIONS], secondary, 0x7E, flags, 0, 0, 0x3C,
                       &pos);
     Widget_InitLinked(&panel->widgets[21], secondary, 0x7F, flags, 0, 0, 0x3C, &pos);

@@ -54,8 +54,8 @@ void TimeResult_InitCategoryDisplay(struct ChallengeTimeResult *p);
 void TimeResult_InitAnimations(struct ChallengeTimeResult *s);
 s32 TimeResult_InitializeFromScript(struct ChallengeTimeResult *p);
 struct ChallengeTimeResult *TimeResult_Create(void);
-void Actor_UpdateStateTwo(u32 a, struct StateActor *p);
-void Actor_UpdateStateThree(u32 a, struct StateActor *p);
-void Actor_UpdateStateFour(u32 a, struct StateActor *p);
+void Actor_UpdateStateTwo(void *ctx, struct StateActor *p);
+void Actor_UpdateStateThree(void *ctx, struct StateActor *p);
+void Actor_UpdateStateFour(void *ctx, struct StateActor *p);
 void Actor_DispatchPrimaryState(u32 a, struct StateActor *b);
 #endif

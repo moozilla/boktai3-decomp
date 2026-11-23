@@ -10,11 +10,11 @@ void SceneHud_LayoutAlternateActionGrid(struct SceneHudState *s)
 
     {
         struct ContactPosition *v = (void *)&pos;
-        u16 x = 112, y = 32, zero = 0;
+        u16 x = 112, y = 32;
         v->x = x;
         v->y = y;
-        v->z = zero;
-        v->pad = zero;
+        v->z = 0;
+        v->pad = 0;
     }
     for (i = 0; i < 16; i++) {
         s->categoryWidgets[i + 10].position = *(struct ContactPosition *)&pos;

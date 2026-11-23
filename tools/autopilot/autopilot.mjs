@@ -30,12 +30,24 @@ if (shots) fs.mkdirSync(path.join(out, 'shots'), { recursive: true });
 // --from DIR/movie.json: start where an earlier run ended (its movie is replayed).
 const from = opt('--from') ? JSON.parse(fs.readFileSync(opt('--from'), 'utf8')) : null;
 const s = await openSession({
-  movie: from ? from.movie : undefined,
+  movie: from ? from.movie : undefined, solarLog: from ? from.solar : undefined,
   save: opt('--save') || (from && from.save) || undefined, render: shots, print: () => {},
   lib: [path.join(ROOT, 'port/agent/lib'), path.join(ROOT, 'tools/autopilot/lib')],
 });
 // Script-derived stage data (doors, entrances, items, enemies): tools/assets/stages.py json.
 const STAGES = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'build/assets/stages.json'), 'utf8')); } catch { return []; } })();
+// What carries which reaction flag (tools/autopilot/breakers.py: Breakable_OnHit, the gun's
+// lens table, weapon modifiers, read from the source and the ROM's weapon records).
+const BREAKERS = (() => {
+  const f = path.join(ROOT, 'build/autopilot/breakers.json');
+  if (!fs.existsSync(f)) spawnSync('python3', [path.join(ROOT, 'tools/autopilot/breakers.py'), f]);
+  try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return { targets: { Breakable: {} }, lens: [], weapons: [] }; }
+})();
+// means(flag, bags): the lenses and swords that carry the flag, owned first
+const means = (flag, bags) => [
+  ...BREAKERS.lens.filter((l) => l.flags & flag).map((l) => ({ kind: 'lens', id: l.id, name: l.name, owned: bags.lenses.includes(l.id) })),
+  ...BREAKERS.weapons.filter((w) => w.flags & flag).map((w) => ({ kind: 'sword', id: w.id, name: w.name, owned: bags.swords.includes(w.id) })),
+].sort((a, b) => b.owned - a.owned);
 const stageOf = (scene) => STAGES.find((x) => x.scene === scene) || { items: [], doors: [], entrances: [] };
 const log = [];
 // scenes the run has been in (carried over from --from), for door choice
@@ -115,6 +127,16 @@ const GOALS = {
         if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 60, 30000))) { event({ skill: 'stop', why: 'no control after the fight', ...L.where() }); return rooms > 0; }
       }
       const here = L.where().scene;
+      // healing: below a third of the life bar with something in the item bag, find the
+      // use of an item in the pause menu that raises life (menuSearch; once per room)
+      {
+        const p = $player(g) && g.$.gPlayers[0], life = () => g.$.gPlayers[0] ? g.$.gPlayers[0].currentStatA : 0;
+        if (p && p.maximumStatA && p.currentStatA * 3 < p.maximumStatA && L.bags().items.length) {
+          const life0 = p.currentStatA;
+          const r = yield* L.menuSearch(() => life() > life0, { max: 300 });
+          event({ skill: 'heal', from: life0, to: life(), ...r });
+        }
+      }
       // floor switches (stages.json: a trap on an HP box that runs a script once, e.g. a
       // chest appears): step on each once
       for (const sw of (stageOf(here).switches || []).filter((sw) => !TRIED.has(`${here}:switch:${sw.box}`))) {
@@ -125,7 +147,37 @@ const GOALS = {
         if (L.where().scene !== here) break;
       }
       // hittables with a script (lever switches): strike each once
-      for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:hit:${h.name}`))) {
+      for (const h of (stageOf(here).hittables || []).filter((h) => h.flags === 9 && !TRIED.has(`${here}:${h.breakable ? 'break' : 'hit'}:${h.name}`))) {
+        if (h.breakable) {
+          // a Breakable answers only an attack carrying the flag its state needs (a
+          // candlestick: Flame); the means: a lens or sword with that flag
+          const live = L.breakables().find((b) => b.id === parseInt(h.name, 16));
+          const need = live && BREAKERS.targets.Breakable[live.state];
+          if (!need) { TRIED.add(`${here}:break:${h.name}`); continue; }
+          const ways = means(need.flag, L.bags()), way = ways.find((w) => w.owned && w.kind === 'lens');
+          if (!way) { event({ skill: 'needs', name: h.name, state: live.state, flag: need.flag, means: ways.map((w) => `${w.kind} ${w.name}`) }); continue; }
+          TRIED.add(`${here}:break:${h.name}`);
+          // a lens not on the Quick Change list is put there in the pause menu (Solar Gun page)
+          let qc = yield* L.quickChange({ gun: true, lens: way.id });
+          if (!qc.done) {
+            const m = yield* L.menuSearch(() => L.weapon().lens === way.id, { max: 300 });
+            event({ skill: 'menu', goal: `lens ${way.name}`, ...m });
+            qc = yield* L.quickChange({ gun: true, lens: way.id });
+          }
+          const ch = yield* L.chargeEnergy(6, { lux: 0, restore: 232 });
+          event({ skill: 'equip', ...way, quickChange: qc, charge: ch });
+          const changed = () => { const b = L.breakables().find((x) => x.id === live.id); return !b || b.state !== live.state; };
+          let r = { done: false };
+          for (const dist of [2, 1, 3]) {
+            r = yield* L.hitAt(h.x >> 8, h.z >> 8, { dist, hits: 4, done: changed, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+            if (changed() || L.where().scene !== here) break;
+          }
+          event({ skill: 'hit', name: h.name, x: h.x, z: h.z, with: `${way.kind} ${way.name}`, lit: changed(), ...r });
+          yield* untilControl(g, L, () => true, 60, 3000);
+          if (L.where().scene === here) yield* L.quickChange({ gun: false });
+          if (L.where().scene !== here) break;
+          continue;
+        }
         TRIED.add(`${here}:hit:${h.name}`);
         const r = yield* L.hitAt(h.x >> 8, h.z >> 8, { hits: h.breakable ? 12 : 3, stopOnEvent: true, avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'hit', name: h.name, x: h.x, z: h.z, ...r });
@@ -162,6 +214,7 @@ const GOALS = {
         TRIED.add(`${here}:${it.x},${it.z}`);
         const c = yield* L.collect(it.x, it.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
         event({ skill: 'collect', item: it.name || `${it.category}:${it.item}`, x: it.x, z: it.z, ...c });
+        if (c.reason === 'no path') TRIED.delete(`${here}:${it.x},${it.z}`);  // another part of the room: next visit
         if (L.where().scene !== here) break;
       }
       if (L.where().scene !== here) { rooms--; continue; }
@@ -381,10 +434,11 @@ const movie = s.movie.map((k) => k | 0);
 const readFrames = [];
 for (let n = 0; n < movie.length; n++) if (readAt[n]) readFrames.push(n);
 const reads = readFrames.map((n) => movie[n]);
+function readFramesOf() { return readFrames; }
 // a savestate on the ROM at each room the run entered: the input read index there
 const allEvents = [...(from && from.rooms ? from.rooms : []), ...log.filter((e) => e.skill === 'room' || e.skill === 'goal').map((e) => ({ frame: e.frame, scene: e.scene }))];
 const saves = allEvents.map((e) => ({ at: readFrames.filter((n) => n < e.frame).length, name: `scene_${e.scene}_f${e.frame}` }));
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE], rooms: allEvents, readFrames, movie }));
+fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, visited: [...VISITED], tried: [...TRIED], unreachable: [...UNREACHABLE], rooms: allEvents, solar: s.solarLog, readFrames, movie }));
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, saves, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);
@@ -403,9 +457,11 @@ function harnessScript(reads, saves, title) {
   const time = Math.floor(Date.parse('2025-11-13T12:00:00Z') / 1000);
   const lines = [`# ${title}`, '# generated by tools/autopilot/autopilot.mjs (inputs keyed to game ticks)',
     args.includes('--coverage') ? 'trace on' : 'trace off', `rtc ${time}`, 'lux 232', `tick ${tick.toString(16).toUpperCase()}`];
-  const marks = saves.slice().sort((a, b) => a.at - b.at);
+  // sensor changes (session solar log, by frame) as `lux` lines before the first tick at or after them
+  const lux = s.solarLog.map(([f, v]) => ({ at: readFramesOf().filter((n) => n < f).length, lux: v }));
+  const marks = [...saves, ...lux].sort((a, b) => a.at - b.at);
   for (let i = 0, m = 0; i < reads.length;) {
-    while (m < marks.length && marks[m].at <= i) lines.push(`save ${marks[m++].name}`);
+    while (m < marks.length && marks[m].at <= i) { const k = marks[m++]; lines.push(k.lux !== undefined ? `lux ${k.lux}` : `save ${k.name}`); }
     let j = i;
     const stop = m < marks.length ? marks[m].at : Infinity;
     while (j < reads.length && reads[j] === reads[i] && j < stop) j++;

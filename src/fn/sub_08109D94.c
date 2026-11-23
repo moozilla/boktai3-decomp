@@ -19,16 +19,10 @@ void ScriptPanel_PollSelection(void);
 s32 ScriptPanel_ConfirmSelection(struct ScriptPanel *p)
 {
     if (Registry1745_ConsumeStateEntry(p)) {
-        u8 *button;
-        u8 *base;
-        u32 zero;
+        s32 i;
         p->selection = 0;
-        base = p->buttons;
-        zero = 0;
-        button = &p->buttons[3];
-        do {
-            *button-- = zero;
-        } while ((s32)button >= (s32)base);
+        for (i = 0; i < 4; i++)
+            p->buttons[i] = 0;
     }
     if (p->counter > 10)
         Registry1745_SetMenuRequest(3);

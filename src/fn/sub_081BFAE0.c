@@ -26,13 +26,9 @@ void Storage_RefreshConsumableSlots(struct StorageCategoryWidgets *);
 void Storage_UpdateSwapSelection(struct StorageCategoryWidgets *);
 void Storage_RefreshCategoryWidgets(struct StorageCategoryWidgets *p)
 {
-    u32 hide = 1;
     s32 i;
-    struct StorageSlotFlags *widget = p->slots;
-    for (i = 7; i >= 0; i--) {
-        widget->flags |= hide;
-        widget++;
-    }
+    for (i = 0; i < 8; i++)
+        p->slots[i].flags |= 1;
     switch (p->categoryKinds[p->category] >> 1) {
         case 0:
             Storage_RefreshItemSlots(p);

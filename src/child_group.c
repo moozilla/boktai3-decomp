@@ -356,7 +356,7 @@ void ChildGroup_UpdateTransitionJitter(struct PhaseObject *p)
         p->position.z = ChildGroup_Jitter(ChildGroup_RandomValue(), &p->previousPosition.z);
         p->hitFrames--;
     }
-    p->fieldCFC = 0;
+    p->pulseTimer = 0;
     if (p->phaseUpdate != 0) {
         Callback_InvokeActor(p, p->phaseUpdate);
     }
@@ -442,6 +442,7 @@ void Ivy_WaitForSecondaryActionCompletion(struct PhaseObject *);
 
 s32 Div(s32, s32);
 
+// concession-ok(literal-param): truncating shift helper; the width written in place in its body gives the same code
 static inline s32 truncateShift(s32 value, s32 shift)
 {
     if (value >= 0)

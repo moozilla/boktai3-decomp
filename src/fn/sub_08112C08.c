@@ -10,12 +10,10 @@ void ActorMarkerPool_RemoveMarker(u32 i)
         if (q[0x38] != 0) {
             u8 *r = g + (off + 0x18);
             u8 *t;
-            u32 z;
             Sprite_Remove(r + 0x1c);
             t = g + 0x74;
             t = t + off;
-            z = 0;
-            *(u32 *)t = z;
+            *(u32 *)t = 0;
         }
     }
 }
