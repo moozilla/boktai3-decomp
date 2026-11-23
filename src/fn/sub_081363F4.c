@@ -59,20 +59,7 @@ static inline void UpdateHitFlagsShared(struct ChaseActor *actor, u16 *flags2D4,
                 goto clearShared;
         }
         {
-            {
-                union {
-                    u32 raw;
-                    struct {
-                        s32 bits : 16;
-                        u32 upper : 16;
-                    } field;
-                } mask;
-                u32 value;
-                mask.raw = flags;
-                mask.field.bits = ~0x201;
-                value = mask.field.bits & flags;
-                *flags2D4 = value;
-            }
+            SceneActorDamage_ClearHitStart(flags2D4, flags);
             SceneActorDamage_AcceptHit(actor, flags2D4, flags2CC, down);
             return;
         }

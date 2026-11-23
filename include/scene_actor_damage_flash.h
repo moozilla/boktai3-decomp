@@ -45,6 +45,24 @@ static inline void SceneActorDamage_MarkDown(struct ChaseActor *actor, u16 *flag
     SceneActorDamage_ClearHitReaction(actor);
 }
 
+/* Clears 0x201 from the hit flags just read; the mask lives in the low half of a word whose upper
+   half still holds the flags. */
+static inline void SceneActorDamage_ClearHitStart(u16 *flags2D4, u32 flags)
+{
+    union {
+        u32 raw;
+        struct {
+            s32 bits : 16;
+            u32 upper : 16;
+        } field;
+    } mask;
+    u32 value;
+    mask.raw = flags;
+    mask.field.bits = ~0x201;
+    value = mask.field.bits & flags;
+    *flags2D4 = value;
+}
+
 /* A hit that is not fatal: drop the guard and tracking bits, keep 0x80 only for hits that carry
    0x20, clear the stagger status, mark the reaction and record the hit as pending. */
 static inline void SceneActorDamage_AcceptHit(struct ChaseActor *actor, u16 *flags2D4,
