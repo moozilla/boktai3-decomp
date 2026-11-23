@@ -37,7 +37,7 @@ struct HresvelgrTravelActor {
     struct SceneInputResource animationData;
     struct SceneInputWidget animation;
     u8 pad1F4[0x248 - 0x1F4];
-    u8 damageNumberSource[0x2F0 - 0x248]; /* 0x248: passed to DamageNumberDisplay_Show. */
+    u8 bodyCollider[0x2F0 - 0x248]; /* 0x248: set up by ColliderActor_InitBodyCollider. */
     struct BossActionState action, behavior; /* 0x2F0, 0x300 */
     u8 pad310[8];
     u16 recoveryFrames;
@@ -55,7 +55,8 @@ struct HresvelgrTravelActor {
     void *savedCallback;
     u8 savedPhase, savedAnimation;
     s16 travel;
-    u8 pad38C[0x10];
+    struct SceneVec bodyOffset; /* 0x38C */
+    struct SceneVec bodyRotation; /* 0x394 */
     struct SceneVec target, delta;
     u8 pad3AC[0x420 - 0x3AC];
     void *hazards; /* 0x420: growth hazard list visited by Hresvelgr_UpdateHazardVisit. */

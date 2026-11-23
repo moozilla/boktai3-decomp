@@ -14,7 +14,7 @@ int Hresvelgr_BeginDamageReaction(struct HresvelgrTravelActor *p, int kind, int 
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                DamageNumberDisplay_Show(p->damageNumberSource, damage, 0, &p->position, &size, 1);
+                DamageNumberDisplay_Show(p->bodyCollider, damage, 0, &p->position, &size, 1);
             }
             p->savedPhase = p->actionPhase;
             Hresvelgr_StartAction(p, 1, 0, 3);
