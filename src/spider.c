@@ -842,16 +842,6 @@ void Spider_UpdateProbeNavigation(struct ChaseActor *actor)
 
 
 
-static inline void EntryControl(struct ChaseActor *actor, u32 kind, void *control)
-{
-    actor->base.field2B2 = 1;
-    actor->base.stepDone = 0;
-    actor->base.controlKind = kind;
-    actor->base.target = control;
-    actor->base.field2C8 = 0;
-    SceneActorChase_AndWordFlags(&actor->base.pendingControlFlags, ~1);
-    actor->base.pendingControl = 0;
-}
 
 void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
 {
@@ -862,7 +852,7 @@ void SceneActorControl_UpdateEntryWait(struct ChaseActor *s)
         if (result == 0) {
             if (s->base.stepDone) {
                 SceneActorChase_SetState(s, 0, 0, 7);
-                EntryControl(s, 1, s->base.onAlternateEntry);
+                Chase_SetCtl(s, s->base.onAlternateEntry, 1);
             } else {
                 s->base.counter2AC++;
             }
