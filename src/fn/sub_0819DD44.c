@@ -2,9 +2,6 @@
 
 #include "ram.h"
 
-void ActionState_Reset(void *);
-void ActionState_SetState(void *, u32);
-void ActionState_AdvanceState(void *);
 
 static inline void Request(struct HresvelgrTravelActor *p, u32 kind)
 {

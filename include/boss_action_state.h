@@ -10,4 +10,10 @@ struct BossActionState {
     u32 frame, substateFrame, stepFrame;
 };
 
+void ActionState_Reset(struct BossActionState *);
+void ActionState_SetState(struct BossActionState *, u32 state);
+void ActionState_AdvanceState(struct BossActionState *);
+void ActionState_AdvanceSubstate(struct BossActionState *);
+void ActionState_AdvanceStep(struct BossActionState *);
+
 #endif

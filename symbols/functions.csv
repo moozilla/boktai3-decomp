@@ -7255,6 +7255,8 @@ addr,name,mode,confidence,source,notes
 0819AE44,ActionState_Reset,thumb,low,src-alias,Clears the action state index and all counters and scratch words
 0819AE54,ActionState_SetState,thumb,low,src-alias,Sets an action state index and clears its counters and scratch words
 0819AE64,ActionState_AdvanceState,thumb,low,src-alias,Increments the action state index and clears its counters and scratch words
+0819AE90,ActionState_AdvanceSubstate,thumb,low,src-alias,Increments the action substate and clears the substate and step levels
+0819AEB0,ActionState_AdvanceStep,thumb,low,src-alias,Increments the action step and clears its frame counter
 0819AF14,Math_ApproachEighth,thumb,low,src-alias,Moves toward the target by one eighth of the difference with a minimum step of one
 0819AFF0,Math_StepTowardTarget,thumb,low,src-alias,Moves a signed value toward its target by a fixed step without overshooting
 0819B930,Hresvelgr_GetEnvironmentalLevel,thumb,low,src-alias,Returns override level four or the global level when the boss position lies inside an active region; interpretation tentative
