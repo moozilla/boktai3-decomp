@@ -19,7 +19,7 @@ void SceneActorControl_ReflectTerrainProbe(struct ChaseActor *actor)
         height = SceneActorTerrain_GetHeight(cell, &target);
         if (actor->base.groundHeight < height) {
             s32 zero;
-            s16 *x = (s16 *)((u8 *)actor + 0x2EC);
+            s16 *x = &actor->base.secondaryMotion;
             s32 value = -*x;
             zero = 0;
             *x = value;

@@ -5,7 +5,7 @@ s32 SceneActorControl_TickHiddenResponse(struct ChaseActor *actor)
 {
     u32 mask = 0x4000;
     u16 *field;
-    field = (void *)((u8 *)actor + 0x2D4);
+    field = &actor->base.motionFlags;
     if (*field & mask) {
         u32 mask = 0x10;
         u32 *input;
