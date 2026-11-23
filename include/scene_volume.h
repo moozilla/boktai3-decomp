@@ -31,7 +31,8 @@ struct SceneVolumeActor {
     struct Player *target;
     void *positionSource;
     s8 alternateDirection;
-    u8 pad115[0x63];
+    u8 pad115[3];
+    u8 trigger[0x60];
     struct ContactCollider collider;
     u8 pad1CC[0xBC];
     u8 bounds[0x1C];
@@ -72,6 +73,17 @@ struct SceneVolumeActor {
 static inline void SceneVolume_SetFlags(struct SceneVolumeActor *actor, u32 flags)
 {
     actor->flags |= flags;
+}
+
+/* Takes a queued transition request: clears it and the pending trigger, 1 if there was one. */
+static inline u8 SceneVolume_TakeQueued(struct SceneVolumeActor *actor)
+{
+    if (actor->queued) {
+        actor->queued = 0;
+        actor->pending = 0;
+        return 1;
+    }
+    return 0;
 }
 
 void ActorEffect_InitializeOffset(struct SceneVolumeActor *);

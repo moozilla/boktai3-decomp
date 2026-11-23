@@ -1,21 +1,12 @@
-#include "global.h"
-void Trigger_ConsumePending(void *, int);
-static inline u8 test(u8 *p)
+#include "scene_volume.h"
+
+void SceneActors_UpdateTransitionToState15(struct SceneVolumeActor *actor)
 {
-    if (p[0xb0]) {
-        p[0xb0] = 0;
-        p[0xaf] = 0;
-        return 1;
+    if (SceneVolume_TakeQueued(actor)) {
+        u32 state = 0xF;
+        actor->state = state;
     }
-    return 0;
-}
-void SceneActors_UpdateTransitionToState15(u8 *p)
-{
-    if (test(p)) {
-        u32 x = 0xF;
-        p[0xaa] = x;
-    }
-    if (p[0xaf])
-        Trigger_ConsumePending(p + 0x118, 1);
-    (*(u32 *)(p + 0xc4))++;
+    if (actor->pending)
+        Trigger_ConsumePending(actor->trigger, 1);
+    actor->actionTimer++;
 }
