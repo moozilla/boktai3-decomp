@@ -1,6 +1,8 @@
 #include "mimic.h"
 #include "scene_actor_visibility.h"
 #include "scene_actor_turn.h"
+#include "scene_actor_terrain.h"
+#include "movement_curve.h"
 
 static inline void SaveControl(struct MimicDeferredResponse *packet, void *control, u8 behavior)
 {
@@ -195,18 +197,11 @@ static inline void Polar(struct ContactPosition *out, u32 angle, s32 speed)
     out->z = Scale12(gUnk_086149C4[angle & 0xFF] * speed);
 }
 
-static inline void Delta(struct ContactPosition *out, const struct ContactPosition *from,
-                         const struct ContactPosition *to)
-{
-    out->x = to->x - from->x;
-    out->y = to->y - from->y;
-    out->z = to->z - from->z;
-}
-
 static inline void RouteDelta(struct ContactPosition *out, struct ContactPosition *from,
                               struct SceneActorChaseGroup *group)
 {
-    Delta(out, from, &((struct ChaseRouteProbe *)group->route)->destination);
+    MovementCurve_SubtractPositions(out, from,
+                                    &((struct ChaseRouteProbe *)group->route)->destination);
 }
 
 static inline u8 HasMode(struct Mimic *p)
@@ -241,7 +236,7 @@ void SceneActor_LeapTowardTarget(struct ChaseActor *actor)
         } else if (!Mimic_TryPursuitRoute(actor->base.context))
             return;
         CellCenter(&point, actor->base.terrainCell);
-        Delta(&point, &actor->base.body.position, &point);
+        MovementCurve_SubtractPositions(&point, &actor->base.body.position, &point);
         {
             s32 quadrant = ((actor->base.body.direction + 0x20) & 0xFF) >> 6;
             correcting = 0;
@@ -265,7 +260,7 @@ void SceneActor_LeapTowardTarget(struct ChaseActor *actor)
             }
         }
         if (correcting) {
-            Delta(&delta, &actor->base.body.position, &point);
+            MovementCurve_SubtractPositions(&delta, &actor->base.body.position, &point);
             speed = 4;
         } else {
             RouteDelta(&delta, &actor->base.body.position, group);
@@ -477,7 +472,8 @@ void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
         tracking = &actor->base.tracking;
         if (tracking->target) {
             struct ContactPosition d;
-            Delta(&d, &actor->base.body.position, &tracking->target->position);
+            MovementCurve_SubtractPositions(&d, &actor->base.body.position,
+                                            &tracking->target->position);
             actor->base.body.direction = actor->base.tracking.heading = Math_Atan2(d.x, d.z);
             SetFlags(&actor->group.common.gate.flags, 4);
             SetFlags(flags, 0x80);
@@ -495,14 +491,6 @@ void Mimic_ConvergeAndTurn(struct ChaseActor *actor)
     SceneActorChase_SetActorFlags(actor, 0x2000);
 }
 
-static inline u32 Cell(struct ContactPosition *p)
-{
-    s32 x = p->x >> 8, z = p->z >> 8;
-    if (x < 0 || z < 0 || (u32)x >= gTerrainWidth || (u32)z >= gTerrainHeight)
-        return 0;
-    return gTerrainMap->rows[z] + x;
-}
-
 // confidence=low: resets Mimic pursuit state and advances its idle drawable.
 
 void Mimic_ResetPursuitDrawable(struct ChaseActor *actor)
@@ -512,7 +500,7 @@ void Mimic_ResetPursuitDrawable(struct ChaseActor *actor)
     context->reactionFlags = 0;
     if (SceneActorChase_Test(gEngineFlags, 0x4800)) {
         context->origin = actor->base.body.position;
-        context->originCell = Cell(&actor->base.body.position);
+        context->originCell = SceneActorTerrain_GetCellIndex(&actor->base.body.position);
     }
     SceneActorAnimation_SelectEntryFlags((void *)actor, 0,
                                          SceneActor_GetDirectionFlags(actor->base.body.direction));
