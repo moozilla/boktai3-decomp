@@ -16,8 +16,9 @@ The base must be a plain variable whose declared type is a struct or union: a pa
 declared `struct T *p` (or through a typedef) in the same function, or a global declared in the
 unit or its headers (`&g` for an object, `g` for a pointer). Its layout comes from the compiler
 (tools/layoutmerge.py's probe, the one tools/struct_views.py uses), so packing and nested
-members are exact. A member qualifies when it starts at exactly that offset (a nested member or
-an element of an array of halfwords, words or pointers counts; a byte buffer's element past the
+members are exact. A member qualifies when it starts at exactly that offset (a nested member, a
+member of any element of an array of structs, `widgets[5].position`, or an element of an array
+of halfwords, words or pointers counts; a byte buffer's element past the
 first, or an element of a padding array, `pad115[267]`, is the same offset in disguise and does
 not; a scalar member named for its offset, `field2E6`, does) and its type agrees with the cast:
 
@@ -154,8 +155,42 @@ def layouts(rel, spells):
     for d in res["decls"]:
         st = res["structs"].get(d.get("struct"))
         if st and d["global"] in names:
-            out[names[d["global"]]] = [lf for lf in st["leaves"] if lf.get("off") is not None]
+            leaves = [lf for lf in st["leaves"] if lf.get("off") is not None]
+            out[names[d["global"]]] = leaves + element_leaves(leaves, st.get("containers", []))
     return out
+
+
+ELEMENT_LEAF_CAP = 50000
+
+
+def element_leaves(leaves, containers):
+    """The leaves of every later element of an array of structs (`widgets[5].position`).
+
+    The probe places the members of element 0 only; element k is the same members k element
+    sizes further on. Each struct array a leaf sits in is one entry of its `encl` (outermost
+    first), matching the leaf name's `[0]` indexes in order. One index changes at a time."""
+    extra = []
+    for lf in leaves:
+        encl = lf.get("encl") or []
+        if not encl:
+            continue
+        zeros = [m.start() for m in re.finditer(r"\[0\]", lf["name"])]
+        for depth, cid in enumerate(encl):
+            if depth >= len(zeros) or cid >= len(containers):
+                break
+            c = containers[cid]
+            size, elem = c.get("size"), c.get("elem")
+            if not isinstance(size, int) or not isinstance(elem, int) or elem <= 0:
+                continue
+            at = zeros[depth]
+            for k in range(1, size // elem):
+                if len(extra) >= ELEMENT_LEAF_CAP:
+                    return extra
+                v = dict(lf)
+                v["off"] = lf["off"] + k * elem
+                v["name"] = lf["name"][:at] + f"[{k}]" + lf["name"][at + 3:]
+                extra.append(v)
+    return extra
 
 
 def components(name):

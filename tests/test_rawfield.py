@@ -79,6 +79,17 @@ class Members(unittest.TestCase):
         self.assertEqual(rf.candidates(LEAVES, 5), [])
         self.assertEqual([p for p, _ in rf.candidates(LEAVES, 56)], [])  # a bitfield has no address
 
+    def test_later_elements_of_a_struct_array(self):
+        leaves = [{"name": "widgets[0].kind", "off": 8, "size": 2, "width": 2, "signed": False, "base": "int",
+                   "array": False, "bits": None, "encl": [0]},
+                  {"name": "widgets[0].position.x", "off": 12, "size": 4, "width": 4, "signed": True,
+                   "base": "int", "array": False, "bits": None, "encl": [0]}]
+        containers = [{"size": 48, "elem": 16}]
+        allv = leaves + rf.element_leaves(leaves, containers)
+        self.assertEqual([p for p, _ in rf.candidates(allv, 44)], ["widgets[2].position", "widgets[2].position.x"])
+        self.assertEqual([p for p, _ in rf.candidates(allv, 24)], ["widgets[1]", "widgets[1].kind"])
+        self.assertEqual(rf.candidates(allv, 56), [])  # past the last element
+
     def test_padding_arrays_and_byte_buffers_do_not_count(self):
         leaves = [{"name": "pad10", "off": 0, "size": 16, "width": 1, "signed": False, "base": "int", "array": True,
                    "esize": 1, "bits": None},
