@@ -69,6 +69,7 @@
 #include "scene_actor_init_group.h"
 
 #include "scene_actor_init_graphics.h"
+#include "scene_actor_contact_response.h"
 
 /* The Ghost context flag word. */
 static inline u8 Ghost_TestFlags(struct Ghost *a, u32 mask)
@@ -321,9 +322,8 @@ void Ghost_TurnTowardHeading(struct ChaseActor *actor)
     }
     sequence = &((struct GhostVisual *)actor->base.drawable)->sequence.anim;
     {
-        u32 mask = 0xA02F;
         u16 *scale;
-        if (actor->base.motionFlags & mask) {
+        if (SceneActorContact_MotionFlags(actor, 0xA02F)) {
             actor->base.field2C2 = 64;
             scale = &actor->base.field2C2;
         } else {
