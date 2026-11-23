@@ -415,11 +415,10 @@ void PlayStats_InitializeWidgets(struct PlayStatsScreen *screen)
 void PlayStats_LoadResources(struct PlayStatsScreen *screen)
 {
     struct SceneInputResource *r;
-    u32 id = 0xCB05;
-    r = ScriptProc_Start(id, 0xE2AB);
+    r = ScriptProc_Start(0xCB05, 0xE2AB);
     screen->resources[0] = *r;
     ResourceHeader_Relocate(&screen->resources[0], r);
-    r = ScriptProc_Start(id, 0x530D);
+    r = ScriptProc_Start(0xCB05, 0x530D);
     screen->resources[1] = *r;
     ResourceHeader_Relocate(&screen->resources[1], r);
     PlayStats_InitializeWidgets(screen);
