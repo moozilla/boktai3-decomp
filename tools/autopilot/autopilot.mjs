@@ -276,6 +276,7 @@ function* settle(g) {
 // most `limit` frames.
 function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
   const msg = L.message(), end = s.frame + limit;
+  let stuck = 0;
   for (let calm = 0; s.frame < end;) {
     const step = yield* L.menuStep({});
     if (step) { event({ skill: 'menu', ...step }); calm = 0; continue; }
@@ -284,6 +285,15 @@ function* untilControl(g, L, ready = () => true, quiet = 120, limit = 60000) {
     const field = $player(g) || (L.hub() && L.hub().state === 'Registry3F74_UpdateSelection');
     calm = field && ready() ? calm + 1 : 0;
     if (calm >= quiet) return true;
+    // an unknown menu holds the screen (no player, no message, no known menu): back out
+    // with B, or START (the bike parts menu closes on START when it was opened from a
+    // story scene: ModifierMenu_HandleOverviewInput), now and then confirm with A
+    stuck = field ? 0 : stuck + 1;
+    if (stuck && stuck % 180 === 0) {
+      const key = ['b', 'start', 'b', 'start', 'a'][(stuck / 180) % 5];
+      event({ skill: 'unstick', key, frames: stuck, tasks: [...new Set(L.tasks().filter((t) => !t.dead).map((t) => t.update))].filter((n) => !BORING.test(n)).slice(0, 8) });
+      yield g.press(key, 2);
+    }
   }
   return false;
 }
