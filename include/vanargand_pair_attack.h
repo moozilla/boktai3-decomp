@@ -5,6 +5,7 @@
 #include "scene_vec.h"
 #include "positioned_effect_coordinates.h"
 #include "vanargand_damage_part.h"
+#include "vanargand_stage_colors.h"
 
 struct Player;
 struct VanargandBodyAnimation {
@@ -171,6 +172,58 @@ static inline struct VanargandAttackPair *Vanargand_GetAttackPair(struct Vanarga
 static inline u32 Vanargand_HalfState(const struct VanargandAttackPair *pair, u32 half)
 {
     return half ? pair->halves[1].requestedState : pair->halves[0].requestedState;
+}
+
+void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
+
+/* Leaving reaction state 3 (the flash): restore the stage palette for the variant and stop
+ * the action sequence. */
+static inline void Vanargand_RestoreStagePalette(struct VanargandPairAttack *p, 
+                                                struct VanargandPairAttack *self)
+{
+    s32 kind = 0x6F;
+    if (!p->variant)
+        kind = 0x7F;
+    switch (kind) {
+        case 0x6F: {
+
+            CpuSet(gPaletteBankData + 0xDE0, p->palettes, 0x04000020);
+            CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
+            Vanargand_SetStageColors(p->transition);
+            break;
+        }
+        case 0x82:
+            CpuSet(gPaletteBankData + 0x1040, p->palettes, 0x04000020);
+            CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
+            break;
+        case 0x7F:
+            CpuSet(gPaletteBankData + 0xFE0, p->palettes, 0x04000018);
+            CpuSet(p->fadeC, gBgPaletteBuffer, 0x04000068);
+            break;
+        default:
+            CpuSet(gPaletteBankData + 0x3240, self->palettes, 0x04000008);
+            break;
+    }
+    Vanargand_ResetPaletteTransition(self);
+    Vanargand_StopActionSequence(&self->actionSequence);
+}
+
+/* SceneActorState_StartReaction on the body, restoring the palette when it leaves state 3. */
+static inline void Vanargand_StartReaction(struct VanargandPairAttack *p, s32 state,
+                               void (*callback)(void *, s32))
+{
+    struct VanargandPairAttack *self = p;
+    // Keep the transition owner distinct from the callback installation owner.
+    if (p->state == 3)
+        Vanargand_RestoreStagePalette(p, self);
+    {
+        p->state = state;
+        p->stateCallback = callback;
+        p->callbackFrame = 0;
+        p->pending = 1;
+        p->phase = 0;
+        p->timer = 0;
+    }
 }
 
 #endif

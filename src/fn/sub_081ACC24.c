@@ -2,54 +2,9 @@
 #include "vanargand_pair_attack.h"
 #include "vanargand_stage_colors.h"
 void Sound_PlaySong(u32);
-void Vanargand_ResetPaletteTransition(struct VanargandPairAttack *);
 void CpuSet(const void *, void *, u32);
 
 
-static inline void restorePalette(struct VanargandPairAttack *p, struct VanargandPairAttack *self)
-{
-    s32 kind = 0x6F;
-    if (!p->variant)
-        kind = 0x7F;
-    switch (kind) {
-        case 0x6F: {
-
-            CpuSet(gPaletteBankData + 0xDE0, p->palettes, 0x04000020);
-            CpuSet(p->fadeA, gBgPaletteBuffer, 0x04000068);
-            Vanargand_SetStageColors(p->transition);
-            break;
-        }
-        case 0x82:
-            CpuSet(gPaletteBankData + 0x1040, p->palettes, 0x04000020);
-            CpuSet(p->fadeB, gBgPaletteBuffer, 0x04000068);
-            break;
-        case 0x7F:
-            CpuSet(gPaletteBankData + 0xFE0, p->palettes, 0x04000018);
-            CpuSet(p->fadeC, gBgPaletteBuffer, 0x04000068);
-            break;
-        default:
-            CpuSet(gPaletteBankData + 0x3240, self->palettes, 0x04000008);
-            break;
-    }
-    Vanargand_ResetPaletteTransition(self);
-    Vanargand_StopActionSequence(&self->actionSequence);
-}
-static inline void changeState(struct VanargandPairAttack *p, s32 state,
-                               void (*callback)(void *, s32))
-{
-    struct VanargandPairAttack *self = p;
-    // Keep the transition owner distinct from the callback installation owner.
-    if (p->state == 3)
-        restorePalette(p, self);
-    {
-        p->state = state;
-        p->stateCallback = callback;
-        p->callbackFrame = 0;
-        p->pending = 1;
-        p->phase = 0;
-        p->timer = 0;
-    }
-}
 
 static inline void setFlags(struct VanargandPairAttack *p, u32 mask)
 {
@@ -144,7 +99,7 @@ s32 Vanargand_ApplyPendingDamage(struct VanargandPairAttack *p)
         if (p->health <= 0) {
             setFlags(p, 2);
         } else if (self->part.flags & 4) {
-            changeState(p, 20, Vanargand_UpdatePaletteLeap);
+            Vanargand_StartReaction(p, 20, Vanargand_UpdatePaletteLeap);
             mask = 0x10000;
             setFlags(p, mask);
             return 1;
