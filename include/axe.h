@@ -65,7 +65,8 @@ struct Axe {
     u8 lungeQueued;
     u8 sparkStep;
     u8 savedAngle;
-    u8 unknownED4[3];
+    u16 reactionHoldTimer; /* while set, reactionFlags 0x20 is held (Axe_UpdateDamageSpin) */
+    u8 damageSpinStarted;
     u8 variant;
     u8 unknownED8[0x2C];
     struct ContactPosition curveStart, curveEnd; /* the movement curve's endpoints */

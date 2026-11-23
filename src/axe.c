@@ -922,9 +922,9 @@ struct S080FC844;
 
 void Axe_ReleaseAuxiliarySprite(struct S080FC844 *s);
 
-static inline u8 HasAuxiliary(const u8 *state)
+static inline u8 HasAuxiliary(const struct Axe *state)
 {
-    return state[0xA3C] != 0;
+    return state->auxiliarySprite.unknown4[0] != 0;
 }
 
 // confidence=low: spins the auxiliary axe after damage and releases it after 30 frames.
@@ -932,9 +932,9 @@ static inline u8 HasAuxiliary(const u8 *state)
 void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
 {
     struct SceneActorRegistryControlGroup *group = &actor->group.common;
-    u8 *context = actor->base.context;
+    struct Axe *context = actor->base.context;
     if (SceneActorControl_TakeFlag(&actor->base.field2B2)) {
-        u8 *state = actor->base.context;
+        struct Axe *state = actor->base.context;
         struct SceneActorRegistryControl *control = &group->control;
         u32 *field = &actor->base.behaviorFlags;
         u32 mask = ~0x141C0;
@@ -949,35 +949,35 @@ void Axe_UpdateDamageSpin(struct ChaseActor *actor, s32 frame)
         SetState(actor, 3, 0, 0);
         actor->base.attachmentTimer = 0;
         if (HasAuxiliary(state)) {
-            u32 *flags = (void *)(state + 0xA38);
+            u32 *flags = &state->auxiliarySprite.flags;
             *flags |= 2;
-            state[0xCAB] = 0;
-            state[0xA35] = 0;
-            *(struct ContactPosition *)(state + 0xA24) = *(struct ContactPosition *)(state + 0xA54);
+            state->flagsCAB = 0;
+            state->trailHeading = 0;
+            state->trailPosition = state->auxiliarySprite.position;
             {
-                u32 angle = state[0xCA8];
-                state[0xA34] = angle;
+                u32 angle = state->trailStartAngle;
+                state->trailAngle = angle;
             }
-            state[0xA36] = 4;
-            ActorShadow_Disable(state + 0xCAC);
+            state->trailSpinRate = 4;
+            ActorShadow_Disable(state->auxiliaryShadow);
             *flags = 1;
         }
-        state[0xED6] = 1;
-        *(u16 *)(state + 0xED4) = 0;
+        state->damageSpinStarted = 1;
+        state->reactionHoldTimer = 0;
     }
-    if (*(u16 *)(context + 0xED4)) {
-        --*(u16 *)(context + 0xED4);
+    if (context->reactionHoldTimer) {
+        --context->reactionHoldTimer;
         HalfwordFlags_Set(0x20, &actor->base.reactionFlags);
     }
-    if (context[0xA3C]) {
-        u32 previous = context[0xA34];
-        s32 next = previous - context[0xA36];
-        context[0xA34] = next;
+    if (context->auxiliarySprite.unknown4[0]) {
+        u32 previous = context->trailAngle;
+        s32 next = previous - context->trailSpinRate;
+        context->trailAngle = next;
         if ((s32)previous < next)
             Sound_PlaySong(361);
-        if ((frame & 1) && context[0xA36] <= 19)
-            context[0xA36]++;
-        ActorPhase_EmitTrailSprite(actor, context + 0xA24, context[0xA34]);
+        if ((frame & 1) && context->trailSpinRate <= 19)
+            context->trailSpinRate++;
+        ActorPhase_EmitTrailSprite(actor, &context->trailPosition, context->trailAngle);
         Axe_UpdateTrailColliders(actor);
         Axe_UpdateAttackColliderPositions(actor);
         if (frame > 30)
