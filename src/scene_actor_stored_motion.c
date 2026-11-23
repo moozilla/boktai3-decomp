@@ -395,7 +395,7 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
-        Trigger_ConsumePending((void *)((u8 *)actor + 0xC), 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorPlacement_SetFlags(0x800, &actor->base);
     }
     actor->base.counter2AC++;

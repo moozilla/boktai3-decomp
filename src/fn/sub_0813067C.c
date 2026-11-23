@@ -8,7 +8,7 @@ void SceneActorControl_UpdateSavedControlPhase(struct ChaseActor *actor)
         SceneActorChase_SetControl(actor, actor->base.onStanding, 0);
     } else {
         if (!actor->base.counter2AC)
-            Trigger_ConsumePending((u8 *)actor + 0xC, 1);
+            Trigger_ConsumePending(actor->base.receiver, 1);
         ++actor->base.counter2AC;
     }
 }
