@@ -323,24 +323,20 @@ void GridAttackActor_EmitSpriteParticles(struct GridAttackActor *p)
         u32 angle, count;
         u32 index;
         u32 *indexPtr;
-        u32 mask;
-        u32 smallMask;
         u32 value;
         u32 speed;
         size.x = 164;
         size.y = 16;
         size.z = 164;
         indexPtr = &gRandomIndex;
-        mask = 1023;
-        smallMask = 3;
         value = (u32)gRandomTable;
-        index = HitSpark_NextIndex(*indexPtr, mask);
+        index = HitSpark_NextIndex(*indexPtr, 1023);
         angle = (u8)HitSpark_Sample(value, index);
-        index = HitSpark_NextIndex(index, mask);
-        count = (HitSpark_Sample(value, index) & smallMask) + 2;
-        index = HitSpark_NextIndex(index, mask);
+        index = HitSpark_NextIndex(index, 1023);
+        count = (HitSpark_Sample(value, index) & 3) + 2;
+        index = HitSpark_NextIndex(index, 1023);
         *indexPtr = index;
-        speed = (HitSpark_Sample(value, index) & smallMask) + 20;
+        speed = (HitSpark_Sample(value, index) & 3) + 20;
         value = 3;
         SparkParticle_Spawn(&graphics->position, value, &size, angle, count, speed, 2, 2);
     }
@@ -1588,11 +1584,6 @@ void CameraFollow_Initialize(void *, void *, void *, u32);
 void *ContactSequencePool_Create(s32, u32, s32, u32, u32);
 void *OrbitContactActor_Create(const struct ContactPosition *, u32);
 
-static inline void GridAttack_SetCameraLimits(struct CameraTracking *camera, s32 min, s32 max)
-{
-    camera->minimum = min;
-    camera->maximum = max;
-}
 s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 {
     struct GridAttackActor *actor = p;
@@ -1793,7 +1784,7 @@ s32 GridAttackActor_Initialize(struct GridAttackActor *p, u32 ctx)
 
     p->shadowPosition = p->drawable.position;
     CameraFollow_Initialize(&p->camera, positions[0], &p->shadowPosition, 1);
-    GridAttack_SetCameraLimits(&p->camera, 0, 0x8C);
+    CameraTracking_SetRange(&p->camera, 0, 0x8C);
 
     SceneActors_SetDamageCallback(actor, &p->damageCollider, (void *)GridAttackActor_OnDamage, 0);
     if (Script_GetKeywordValue(0x43, 1) != 0)

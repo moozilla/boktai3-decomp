@@ -90,11 +90,10 @@ void sub_081D1A8C(void *unused, struct Actor *arg)
         int dx = target->x - pos->x;
         int dz = target->z - pos->z;
         int distance = dx * dx + dz * dz;
-        int limit = 100;
         struct Vec *savedPos = pos;
         struct Vec *savedTarget = target;
 
-        if (distance <= limit) {
+        if (distance <= 100) {
             p->pos = p->target;
             p->done = 1;
         } else {

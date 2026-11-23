@@ -32,7 +32,7 @@ stronger model), comes only after the extreme effort [WORKER.md](WORKER.md) "Sta
 until it matches" describes. Measure progress by exact matches and removed concessions,
 not by fuzzy scores. Blind spelling sweeps don't count.
 
-## Where things stand (2026-11-17)
+## Where things stand (2026-11-23)
 
 Numbers live only in [PROGRESS.md](../PROGRESS.md) (regenerated at batch integration) and
 the README badges. Use `python3 tools/progress.py` for the current figures and
@@ -43,13 +43,21 @@ the README badges. Use `python3 tools/progress.py` for the current figures and
 | Build | `make` rebuilds the ROM byte-identical (`build/boktai3.gba: OK`, SHA-1 `2651c5e6…`) |
 | Phase 1 | complete: every function has C |
 | Phase 2 | complete: every function matches; no `#ifdef NONMATCHING` drafts are left |
-| Phase 3 | Round 15 recovers ordinary priority forms and native actor, sprite, inventory and HUD owners while preserving the exact stock ROM. Its reported priority/error queue has been investigated; unresolved guards, zero expressions and registry/camera volatility remain source debt. Actual source removals, detector behavior and original-library justifications are accounted for separately in the [round-15 report](../notes/round15-priority-recovery.md). The [union review](../notes/round15-union-review.md) continues the next tier with an immutable classified inventory. A drained investigation queue or an old clean score is not evidence of plausible original source. |
+| Phase 3 | 3b in progress: 3 linter errors (volatile: the two scene link-list insertions and the scene camera global) and about 3,700 warnings. The 2026-11-22 run recovered boss, Player, monster and menu types by subsystem and cleared two hard sites; its [report](../notes/claude-warning-run_2026-11-22.md) says what worked (type recovery first, plain loops), what the count hides (constants moved into accessor arguments) and the leads not taken. Hard sites: [hard-sites_2026-11-23.md](../notes/hard-sites_2026-11-23.md). Earlier: the [round-15 report](../notes/round15-priority-recovery.md) and [union review](../notes/round15-union-review.md). A falling count is not evidence of plausible original source. |
 | Phase 4 | the object model: [OBJECT_MODEL.md](OBJECT_MODEL.md) describes tasks, the registry actor and pool slots. Monsters derive from `struct RoomActor` (`include/room_actor.h`) or `struct ChaseActor` (`include/chase_actor.h`), with named and typed method slots and `enum MonsterCategory`; the per-header views and the `SCENE_ACTOR_CHASE_*` selector macros are gone. The eleven registry classes (Spider, Octopus, Ivy, Lun, Bat, Axe, Dog, Mummy, Vorn, Golem, Skeleton) are class units in `src/`; the functions that match only alone are explained in [notes/unit-context-sensitivity_2026-11-16.md](../notes/unit-context-sensitivity_2026-11-16.md) |
 | Data | fully relocatable; `make shifttest` compares 35 emulator screenshots after moving data. decomp.dev's data measure is ROM data that round-trips through an editable form (`tools/data_roundtrip.py`), by kind ([DATA_TRACKING.md](DATA_TRACKING.md)); RAM is tracked in PROGRESS.md |
 | Report | every function in one of ~490 subsystem units under 11 categories plus Libraries ([REPORT_SUBSYSTEMS.md](REPORT_SUBSYSTEMS.md)); main-only CI publishes to decomp.dev |
 
 Recent (details in [docs/history/](history/README.md) and the notes they link):
 
+* **2026-11-22 to 23, Claude warning run** (PRs 1056 to 1060): subsystem workers recover
+  types (`struct Ratatosk`, Hresvelgr and Vanargand bodies, Player's embedded animation
+  channels, Dog, Axe, link panel), the mechanical tools `tools/inline_twins.py`,
+  `tools/rawfield.py` and `tools/fold_literals.py` land, two hard sites fall, and running the
+  port against the ROM finds 97 short calls and 28 missing returns (the `UBFIX` rule in
+  `CLAUDE.md`). New: `tools/recorder/` (a flight recorder with source-level `why`) and
+  `tools/autopilot/` (the game plays itself on the port, verified against the ROM). See the
+  [run report](../notes/claude-warning-run_2026-11-22.md).
 * **2026-11-17, round 15 extended continuation**: ordinary priority recoveries,
   shared sequence/sprite APIs, native actor and HUD ownership, and three diagnostic
   tool fixes preserve the exact ROM. The remaining priority/error proposals have

@@ -8,129 +8,8 @@
 #include "area_effect_link.h"
 #include "engine_pause.h"
 #include "scene_actor_damage_visibility.h"
+#include "glove.h"
 
-struct GloveModel;
-struct Glove;
-union GloveAnimationKey {
-    u32 word;
-    u16 half[2];
-};
-
-struct GloveMotion {
-    u8 pad0[4];
-    u32 unk4;
-    u32 unk8;
-    u32 boundsFlags;
-    struct ScenePoolVec32 position;
-    s32 outX, outY, outZ; /* 0x20 */
-    u8 pad2C[0x38 - 0x2C];
-    s32 unk38;
-    s32 unk3C;
-    u32 flags40;
-    u8 color[4];
-    struct SceneActorStyle style;
-    u8 pad64[4];
-    u32 pendingDamage;
-    u8 pad6C[0x7E - 0x6C];
-    u16 recoveryValue;
-    struct GloveModel *parts;
-    u8 pad84[0xC0 - 0x84];
-    s32 unkC0;
-    u8 padC4[4];
-    u32 secondaryBias;
-    u8 padCC[0x2B0 - 0xCC];
-    u32 primaryCallback;
-    u8 pad2B4, primaryKind;
-    u8 pad2B6[8];
-    u16 primaryCharge;
-    u8 pad2C0[0x305 - 0x2C0];
-    u8 primarySpriteRefresh, primaryLatched;
-    u8 actionActive;
-    u16 actionCooldown;
-    u8 pad30A[4];
-    u16 primaryKeyframes;
-    u8 pad310[4];
-    u32 secondaryCallback;
-    u8 pad318;
-    u8 actionKind;
-    u8 pad31A[0x324 - 0x31A];
-    u8 secondaryEnabled;
-    s8 secondarySpriteSlot;
-    u16 recoveryTimer, cooldown;
-    u8 secondaryRelease, secondaryLatched;
-    u8 pad32C[0x524 - 0x32C];
-    union GloveAnimationKey animation;
-    u8 pad528[4];
-    u8 contactIndex[0x40];
-    u32 motionFlags;
-    u8 pad570[10];
-    u8 damageTimer;
-    u8 pad57B[0x59E - 0x57B];
-    u16 spatialTimer;
-    u8 pad5A0[0x5AC - 0x5A0];
-    s32 vy; /* 0x5AC */
-    s32 y;  /* 0x5B0 */
-    s32 vz; /* 0x5B4 */
-    u8 pad5B8[4];
-    struct ScenePoolVec32 previousPosition;
-    s32 dx; /* 0x5CC */
-    s32 dy; /* 0x5D0 */
-    s32 dz; /* 0x5D4 */
-    u8 pad5D8[4];
-    s32 x; /* 0x5DC */
-    u8 pad5E0[0x5EC - 0x5E0];
-    s8 steps; /* 0x5EC */
-    u8 pad5ED;
-    s8 damageFlags;
-    u8 pad5EF;
-    u16 angle; /* 0x5F0 */
-    u8 pad5F2[2];
-    struct Glove *owner;
-};
-
-struct GloveModelPart {
-    u8 pad0[8];
-    u32 flags;
-    u8 padC[0x48 - 0xC];
-    void *palette;
-    u8 pad4C[0x60 - 0x4C];
-};
-struct GloveModel {
-    struct GloveModelPart parts[5];
-    u8 primaryAnimation[0x30];
-    u8 palette[0x40];
-};
-
-struct Glove {
-    u8 pad0[0x18];
-    struct GloveMotion motion;
-    struct GloveModel model;
-    s8 marker, markerSlot;
-    u8 pad862[2];
-    u32 timer;
-    u8 active;
-    u8 pad869[3];
-    void (*update)(void *);
-    u8 pad870[0x8A4 - 0x870];
-    struct ScenePoolVec32 origin, scroll;
-    u16 *input;
-    u8 pad8C8[0x8E4 - 0x8C8];
-    u32 previousInput;
-    s32 height;
-    u8 pad8EC[8];
-    u16 flags, blinkTimer;
-    s8 participant;
-    u8 pad8F9[3];
-    s32 resourceFraction;
-    u32 activeFrames;
-    u32 localScript, entryScript, eventScript, nextScript;
-    s32 launchSpeed;
-    u8 launchPhase;
-    u8 pad919[3];
-    u32 participantIndex;
-    u8 pad920[0x30];
-    u32 pending[2];
-};
 s32 Div(s32, s32);
 s32 Math_Atan2(s32, s32);
 void Terrain_ResolveActorMotion(struct GloveMotion *);
@@ -281,7 +160,7 @@ s32 Glove_InitFromScript(struct Glove *p)
     gParticipantActors[p->participant] = (struct ScenePoolPlayer *)p;
     Glove_RegisterMessageReceiver(p);
     p->input = gPadState + p->participant * 4;
-    p->participantIndex = p->participant;
-    Memory_Clear(p->pending, 8);
+    p->attachmentDesc.resource = p->participant;
+    Memory_Clear(&p->offsetX, 8);
     return 0;
 }

@@ -40,6 +40,7 @@
 #include "movement_curve.h"
 #include "scene_actor_displacement.h"
 #include "scene_actor_terrain_reaction.h"
+#include "vanargand_parts.h"
 
 struct AxeTrailSprite {
     u32 flags;
@@ -134,14 +135,6 @@ static inline void Velocity(struct ContactPosition *out, u8 angle, s32 speed)
     out->z = Scale(speed * gUnk_086149C4[angle]);
 }
 
-static inline void Difference(struct ContactPosition *out, struct ContactPosition *a,
-                              struct ContactPosition *b)
-{
-    out->x = a->x - b->x;
-    out->y = a->y - b->y;
-    out->z = a->z - b->z;
-}
-
 static inline void Advance(struct ContactPosition *a, struct ContactPosition *b)
 {
     a->x = b->x + a->x;
@@ -200,7 +193,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
             u8 **gp = &gPlayers;
             struct ContactPosition *d;
             d = &delta;
-            Difference(d, (void *)(*gp + 0x30), &trail->position);
+            Vanargand_Difference(d, (void *)(*gp + 0x30), &trail->position);
         }
         difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->heading);
         if (Absolute(difference) > 32)
@@ -212,7 +205,7 @@ void Axe_UpdateReturningTrail(struct AxeActor *p, s32 frame)
         ActorPhase_EmitTrailSprite(p, &trail->position, trail->angle);
         Advance(&trail->position, &trail->velocity);
         trail->angle -= 6;
-        Difference(&delta, &p->position, &trail->position);
+        Vanargand_Difference(&delta, &p->position, &trail->position);
         difference = AngleDifference(Math_Atan2(delta.x, delta.z), trail->heading);
         if (Absolute(difference) > 12)
             trail->heading += 6;
@@ -1388,35 +1381,6 @@ struct AxeMoveNode {
     struct ContactPosition position;
 };
 
-static inline void Interpolate(struct ContactPosition *out, struct ContactPosition *start,
-                               struct ContactPosition *end, s32 initialScale, s32 t, s32 finalScale,
-                               s32 speed)
-{
-    struct ContactPosition delta, tangent;
-    s32 square, cube, twiceCube, thriceSquare, sway, final;
-    s32 scaled, value;
-    MovementCurve_SubtractPositions(&delta, start, end);
-    ZeroFill8(&tangent);
-    square = MovementCurve_TruncateFixed10(t * t);
-    cube = MovementCurve_TruncateFixed10(square * t);
-    twiceCube = cube * 2;
-    thriceSquare = square * 3;
-    sway = (cube - 2 * square + t) * speed;
-    final = (cube - square) * finalScale;
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
-    value = (thriceSquare - twiceCube) * delta.x;
-    value = scaled + value + sway + final;
-    out->x = start->x + MovementCurve_TruncateFixed10(value);
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
-    value = (-twiceCube + thriceSquare) * delta.y;
-    value = scaled + value + sway + final;
-    out->y = start->y + MovementCurve_TruncateFixed10(value);
-    scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
-    value = (-twiceCube + thriceSquare) * delta.z;
-    value = scaled + value + sway + final;
-    out->z = start->z + MovementCurve_TruncateFixed10(value);
-}
-
 u8 Axe_StepCurveMotion(struct ChaseActor *actor)
 {
     struct Axe *ctx = actor->base.context;
@@ -1425,8 +1389,8 @@ u8 Axe_StepCurveMotion(struct ChaseActor *actor)
     start.y = 0;
     end = ctx->curveEnd;
     end.y = 0;
-    Interpolate(&((struct AxeMoveNode *)actor->group.route)->position, &start, &end, 1,
-                ctx->curveTime, 0, ctx->curve);
+    MovementCurve_InterpolatePosition(&((struct AxeMoveNode *)actor->group.route)->position, &start,
+                                      &end, 1, ctx->curveTime, 0, ctx->curve);
     if (ctx->curveTime > 1023)
         return 1;
     ctx->curveTime += 128;
@@ -2613,9 +2577,8 @@ void ActorPhase_SelectDistantWaypoint(struct ChaseActor *actor, struct ContactPo
     Axe_RecordRoutePoint(actor, bestIndex);
     {
         struct RoutePointSelection *dst = &route;
-        u32 mode = 0;
         dst->index = bestIndex;
-        dst->mode = mode;
+        dst->mode = 0;
     }
     route.entry = (u16 *)Path_GetPointData(route.data);
     route.entry = (u16 *)(((u8 *)route.entry) + (route.index * 8));

@@ -2,6 +2,7 @@
 #include "engine.h"
 #include "ram.h"
 #include "monster_particle_random.h"
+#include "vanargand_projectiles.h"
 
 struct FlickerParticle {
     u32 flags;
@@ -33,12 +34,6 @@ static inline s32 NextRandom(const u16 *table, s32 mask)
     gRandomIndex = (gRandomIndex + 1) & mask;
     PARTICLE_RANDOM_READ_SAMPLE(sample, table, gRandomIndex);
     return sample;
-}
-static inline s32 Scale(s32 value)
-{
-    if (value >= 0)
-        return value >> 12;
-    return -(-value >> 12);
 }
 
 void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
@@ -72,9 +67,9 @@ void FlickerParticle_StartSecondaryBurst(struct FlickerParticlePool *s)
             FLICKER_CAPTURE_LOOKUP(polar.phaseMask, 255);
             cosineAngle &= polar.phaseMask;
             polar.amplitude = sine[cosineAngle];
-            cursor->particles[0].velocityX = Scale(polar.amplitude * radius);
+            cursor->particles[0].velocityX = VanargandProjectile_Scale(polar.amplitude * radius);
         }
-        cursor->particles[0].velocityY = Scale(sine[angle & 255] * radius);
+        cursor->particles[0].velocityY = VanargandProjectile_Scale(sine[angle & 255] * radius);
         {
             u8 *base = (u8 *)s->particles;
             struct FlickerParticle *particle;

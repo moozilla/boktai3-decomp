@@ -20,13 +20,11 @@ void GrowthHazard_UpdateCooldown(void);
 void GrowthHazard_BeginCooldown(struct O *p)
 {
     u32 a = 2;
-    u32 z = 0;
-    u32 b = 2;
     void (*f)(void);
     p->h10 = a;
     p->hfc = p->hfe;
     f = GrowthHazard_UpdateCooldown;
     p->cb = f;
-    ((struct O2 *)p)->hf4 = z;
-    p->b102 = b;
+    ((struct O2 *)p)->hf4 = 0;
+    p->b102 = 2;
 }

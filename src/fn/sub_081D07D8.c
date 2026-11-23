@@ -1,9 +1,7 @@
 #include "global.h"
 #include "background_controller.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Projection {
     u8 pad[0x10];
     s32 x, y, z;

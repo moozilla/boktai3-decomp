@@ -115,8 +115,7 @@ static inline void ShowCollider(struct ChaseActor *actor)
 {
     actor->base.colliderA.flags = (actor->base.colliderA.flags & 0xFFFB) | 8;
     {
-        u32 m = ~0x800;
-        actor->base.placementFlags = m & actor->base.placementFlags;
+        actor->base.placementFlags = ~0x800 & actor->base.placementFlags;
     }
 }
 
@@ -139,7 +138,7 @@ void Ivy_ApplyHeldTargetDamage(struct ChaseActor *actor, s32 frame)
             a4 = actor->base.attacks.second[0];
             a5 = actor->base.attacks.flags[0];
             a6 = actor->base.attacks.parameter[0];
-            SpriteEffect_SpawnTowardObject((u8 *)actor + 0x50, player + 0x24, a3, a4, a5, a6);
+            SpriteEffect_SpawnTowardObject(&actor->base.body, player + 0x24, a3, a4, a5, a6);
             Sound_PlaySong(0x1E0);
         }
         HideCollider(actor);
@@ -386,8 +385,7 @@ static inline void FacingAngle(struct ChaseActor *actor, u8 *angle)
 static inline void ClearHeld(struct Octopus *context)
 {
     u32 *flags = &context->flags628;
-    u32 mask = ~2;
-    *flags &= mask;
+    *flags &= ~2;
 }
 
 static inline u8 IsIdle(struct Player *player)
@@ -451,7 +449,7 @@ static inline void ReportDrain(struct ChaseActor *victim)
 void Octopus_UpdateHold(struct ChaseActor *actor, s32 frame)
 {
     struct Octopus *context = actor->base.context;
-    void *group = (u8 *)actor + 0x3D4;
+    void *group = &actor->group;
     struct DisplaySequenceState *sequence = (void *)((u8 *)actor->base.drawable + 0x48);
     struct SceneActorBody *target;
     u8 quadrant, flip;
@@ -1597,7 +1595,7 @@ struct SceneActorBody *SceneActorReaction_FindAdjacentTarget(struct ChaseActor *
                                         &other->base.body.position);
         distance = delta.x * delta.x + delta.z * delta.z;
         if (best > distance)
-            target = (void *)((u8 *)other + 0x50);
+            target = &other->base.body;
     }
     if (!target)
         return 0;
@@ -1713,7 +1711,7 @@ u32 Octopus_Destroy(struct ChaseActor *s)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorPlacement_TestFlags(&s->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
+        SceneMessages_UnregisterReceiver(s->base.receiver);
     {
         u8 *r = s->base.shadow;
         if (*r == 1)

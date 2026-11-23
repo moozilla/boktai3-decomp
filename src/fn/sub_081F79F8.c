@@ -1,8 +1,6 @@
 #include "global.h"
 #include "ratatosk.h"
-struct Vec {
-    s16 x, y, z, pad;
-};
+#include "scene_indicator.h"
 struct PackedVec {
     s32 x : 16, y : 16, z : 16, pad : 16;
 };

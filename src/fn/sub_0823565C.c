@@ -1,5 +1,6 @@
 #include "global.h"
 #include "render.h"
+#include "scene_actor_chase_shared.h"
 struct Elem {
     u32 flags;
     u8 pad[40];
@@ -7,10 +8,6 @@ struct Elem {
 void HealthBurstEffect_StartBurst(u8 *);
 void HealthBurstEffect_UpdateBurstSprites(u8 *);
 void HealthBurstEffect_UpdateFadeOut(u8 *);
-static inline void clear(u32 *dst, u32 mask)
-{
-    *dst &= mask;
-}
 #define H(o) (*(u16 *)(p + (o)))
 void HealthBurstEffect_UpdateBursts(u8 *p)
 {
@@ -30,7 +27,7 @@ void HealthBurstEffect_UpdateBursts(u8 *p)
             addr += 44;
         } while (addr <= end);
         zero = 0;
-        clear(flags, ~4);
+        SceneActorChase_AndWordFlags(flags, ~4);
         *(void (**)(u8 *))(p + 0x350) = next;
         H(0x34e) = zero;
     }

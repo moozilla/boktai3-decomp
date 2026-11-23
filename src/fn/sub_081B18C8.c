@@ -5,6 +5,7 @@
 #include "display_animation.h"
 #include "display_sequence_inline.h"
 #include "motion_track.h"
+#include "vanargand_parts.h"
 void MotionTrack_Update(void *);
 void Sound_PlaySong(u32);
 static inline void StepSequence(struct PairedSceneHalf *owner)
@@ -102,11 +103,6 @@ static inline u8 MotionEnded(struct PairedSceneHalf *p)
         result = 1;
     return result;
 }
-static inline void SetState(struct PairedSceneHalf *p, u32 state)
-{
-    p->actionCounters[0] = state;
-    p->actionCounters[1] = 0;
-}
 void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct PairedSceneHalf *p)
 {
     struct MotionTrackVector *targetPosition;
@@ -145,7 +141,7 @@ void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct Pai
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    SetState(p, 1);
+                    Vanargand_SetState(p, 1);
                     *enter = 1;
                 }
                 break;
@@ -164,7 +160,7 @@ void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct Pai
                     p->shake = 60;
                 }
                 if (!p->shake) {
-                    SetState(p, 2);
+                    Vanargand_SetState(p, 2);
                     *enter = currentState;
                 }
                 break;
@@ -189,7 +185,7 @@ void ActorStatus_UpdateRisingStrike(struct VanargandAttackPair *boss, struct Pai
                 }
                 MotionTrack_Update(motion);
                 if (MotionEnded(p)) {
-                    SetState(p, 3);
+                    Vanargand_SetState(p, 3);
                     *enter = 1;
                 }
                 break;

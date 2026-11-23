@@ -18,7 +18,7 @@ s32 Ratatosk_ApplyDamageReaction(struct Ratatosk *p, s32 kind, s32 damage)
                 size.x = 32;
                 size.y = 0;
                 size.z = 32;
-                DamageNumberDisplay_Show((u8 *)p + 0x188, damage, 0, (u8 *)p + 0x54, &size, 1);
+                DamageNumberDisplay_Show(&p->hurtCollider, damage, 0, &p->body.position, &size, 1);
             }
             Ratatosk_StartAction(p, 1, 0, 2);
             Ratatosk_StartReaction(p, Ratatosk_BeginDirectionalReaction, 16);

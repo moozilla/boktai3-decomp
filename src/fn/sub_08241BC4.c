@@ -77,7 +77,7 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
                     if (*t <= 5) {
                         if ((*t & 1) == 0) {
                             Player_PlayLocalSong(W(0x18), 0x191);
-                            RisingSprite_Spawn((u8 *)p + 0x30);
+                            RisingSprite_Spawn(&p->position);
                         }
                         (*t)++;
                     }

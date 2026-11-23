@@ -1,5 +1,6 @@
 #include "global.h"
 #include "ram.h"
+#include "vanargand_projectiles.h"
 extern const s16 gUnk_086149C4[];
 struct XZ {
     u32 x, z;
@@ -24,12 +25,6 @@ struct ShotG {
 struct ShotE *Hresvelgr_FindInactiveShot(void);
 void EffectVariant_SetProperties(struct ShotE *, u32);
 
-static inline s32 shift12(s32 v)
-{
-    if (v >= 0)
-        return v >> 12;
-    return -(-v >> 12);
-}
 void DirectionBurst_EmitConfigured(const struct XZ *origin, u32 angle, u32 speed, u32 a3, s32 a4,
                                    u32 a5, u32 param, u32 a7)
 {
@@ -46,7 +41,7 @@ void DirectionBurst_EmitConfigured(const struct XZ *origin, u32 angle, u32 speed
             s32 sp = e->speed;
             {
                 s32 t0;
-                t0 = shift12(gUnk_086149C4[(angle + 0x40) & 0xff] * sp);
+                t0 = VanargandProjectile_Scale(gUnk_086149C4[(angle + 0x40) & 0xff] * sp);
                 {
                     s32 z = 0;
                     v[0] = t0;
@@ -56,7 +51,7 @@ void DirectionBurst_EmitConfigured(const struct XZ *origin, u32 angle, u32 speed
             {
                 s32 t2;
                 s32 z1;
-                t2 = shift12(gUnk_086149C4[angle & 0xff] * sp);
+                t2 = VanargandProjectile_Scale(gUnk_086149C4[angle & 0xff] * sp);
                 z1 = 0;
                 v[2] = t2;
                 e->flag88 = a7;

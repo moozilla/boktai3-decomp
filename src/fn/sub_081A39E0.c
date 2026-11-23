@@ -2,14 +2,12 @@
 #include "player_cue_sequence.h"
 #include "engine_globals.h"
 #include "ram.h"
+#include "scene_indicator.h"
 
 // confidence=low: updates homing effect entries, animation, trails and lifetime.
 
 struct Types {
     u32 values[4];
-};
-struct Vec {
-    s16 x, y, z, pad;
 };
 struct Entry {
     u32 flags;

@@ -36,7 +36,7 @@ void SceneHud_LayoutEquipmentGrid(struct SceneHudState *p)
         struct SceneInputWidget *a = p->actionPanelWidgets;
         a->flags &= ~1;
         {
-            struct SceneInputWidget *b = (void *)((u8 *)p + 0x25c0);
+            struct SceneInputWidget *b = &p->actionPanelWidgets[1];
             b->flags &= ~1;
         }
         {
@@ -45,7 +45,7 @@ void SceneHud_LayoutEquipmentGrid(struct SceneHudState *p)
             PauseMenu_SetSpritePalette(c, 0x373);
         }
         {
-            struct SceneInputWidget *d = (void *)((u8 *)p + 0x2620);
+            struct SceneInputWidget *d = &p->actionPanelWidgets[2];
             d->flags &= ~1;
             if (p->actionInput[0] & 0x40)
                 PauseMenu_SetSpritePalette(d, 0x373);

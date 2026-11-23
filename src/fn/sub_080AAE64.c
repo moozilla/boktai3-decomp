@@ -59,10 +59,9 @@ void TentacleActor_InitSegmentColliders(u8 *p)
     }
     {
         u32 zero = 0;
-        u32 width = 64;
-        ((u16 *)&size)[0] = width;
+        ((u16 *)&size)[0] = 64;
         ((u16 *)&size)[1] = 100;
-        ((u16 *)&size)[2] = width;
+        ((u16 *)&size)[2] = 64;
         ((u16 *)&offset)[0] = zero;
         ((u16 *)&offset)[1] = 128;
         ((u16 *)&offset)[2] = zero;

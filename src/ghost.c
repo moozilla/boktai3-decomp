@@ -2294,7 +2294,7 @@ void Ghost_UpdateTriggerControl(struct ChaseActor *actor)
     } else {
         MonsterInit_SetMotionFlags(actor, 0x800);
         if (actor->base.counter2AC == 0)
-            Trigger_ConsumePending(&actor->base.unknown9[3], 1);
+            Trigger_ConsumePending(actor->base.receiver, 1);
         actor->base.counter2AC++;
     }
 }
@@ -2359,7 +2359,7 @@ u32 Ghost_Destroy(struct ChaseActor *actor)
     Heap_Free(p);
     m = 0x100;
     if (SceneActorChase_TestField(&actor->base.placementFlags, m))
-        SceneMessages_UnregisterReceiver(&actor->base.unknown9[3]);
+        SceneMessages_UnregisterReceiver(actor->base.receiver);
     {
         u8 *r = actor->base.shadow;
         if (*r == 1)

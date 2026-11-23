@@ -96,7 +96,7 @@ void Player_UpdateInteractionMovement(struct Player *p)
                 Player_RunPendingCallback(p);
             Callback_InvokeActor(p, gUnk_08610C0C[p->tetherMode]);
             if (p->movementVelocityLocked)
-                *(struct SceneVec *)&p->velocityX = *(struct SceneVec *)((u8 *)p + 0x490);
+                *(struct SceneVec *)&p->velocityX = p->lockedVelocity;
             else
                 Player_ApplyDirectionalForce(p);
             Player_ApplyControlPresentation(p);

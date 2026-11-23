@@ -1,8 +1,5 @@
 #include "scene_npc_transition_palette.h"
-
-struct Pair {
-    u32 a, b;
-};
+#include "scene_object_slot.h"
 
 void *SceneNpc_CreateTransitionEffect(struct SceneNpcTransitionPosition *);
 s32 SceneNpc_IsTransitionEffectFinished(void *);

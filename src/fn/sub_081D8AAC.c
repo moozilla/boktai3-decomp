@@ -20,7 +20,7 @@ struct TimedSprite {
 };
 s32 Task4E01_UpdateTimedSprite(struct TimedSprite *p)
 {
-    struct TimedSpriteConfig *config = (struct TimedSpriteConfig *)((u8 *)p + 0x18);
+    struct TimedSpriteConfig *config = &p->config;
     struct TimedSpriteSprite *sprite = &p->sprite;
     s32 t;
     sprite->flags &= ~1;

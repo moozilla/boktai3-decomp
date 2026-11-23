@@ -43,13 +43,13 @@ void SceneHud_FinishActionSlide(struct SceneHudState *s)
             u8 *b;
             u8 *in;
             u8 *pp;
-            in = (u8 *)s + 0x4384;
+            in = s->actionInput;
             Inventory_InitializeSelectionGrid(in, 1, 0);
             {
                 pp = (u8 *)s + 0x1620;
             }
             {
-                b = (u8 *)s + 0x4387;
+                b = &s->actionCursor;
             }
             SceneHud_GetActionIconPosition(pp, *b);
         }

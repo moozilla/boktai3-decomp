@@ -1540,10 +1540,6 @@ static inline void Nidhoggr_MaskPartFlags(struct ContactCollider *p, u32 mask)
 {
     p->flags &= mask;
 }
-static inline void Nidhoggr_OrPartFlags(struct ContactCollider *p, u32 mask)
-{
-    p->flags |= mask;
-}
 static inline void Nidhoggr_AddTargetFlags(u32 *p, u32 mask)
 {
     *p |= mask;
@@ -1645,7 +1641,7 @@ void Nidhoggr_InitParts(void *arg0)
         for (i = 7; i >= 0; collider++, i--) {
             collider->bounds = gUnk_0824F4BC;
             collider->offset = gUnk_0824F4B4;
-            Nidhoggr_OrPartFlags(collider, flags);
+            ContactCollider_SetFlags(collider, flags);
             Collider_SetBodyProperties(collider, damage, partAttributes, 16);
             Collider_SetCallback(collider, receiveContact, t);
         }
@@ -1658,7 +1654,7 @@ void Nidhoggr_InitParts(void *arg0)
             collider->offset = gUnk_0824F4B4;
             Collider_SetBodyProperties(collider, damage, partAttributes, 16);
             Collider_SetCallback(collider, receiveContact, t);
-            Nidhoggr_OrPartFlags(collider, flags);
+            ContactCollider_SetFlags(collider, flags);
         }
     }
     {
@@ -1669,7 +1665,7 @@ void Nidhoggr_InitParts(void *arg0)
             collider->offset = gUnk_0824F4B4;
             Collider_SetBodyProperties(collider, damage, partAttributes, 16);
             Collider_SetCallback(collider, receiveContact, t);
-            Nidhoggr_OrPartFlags(collider, flags);
+            ContactCollider_SetFlags(collider, flags);
             collider++;
             if (--i < 0) {
                 TimePalette_InitTransition(t->paletteTransition, gPaletteBankData + 0x3500,

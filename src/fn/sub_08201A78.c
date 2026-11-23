@@ -1,9 +1,7 @@
 #include "global.h"
 #include "engine.h"
+#include "scene_indicator.h"
 
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct ScriptCombatActor {
     u8 unknown0[0x1c];
     struct Vec origin;
@@ -94,14 +92,12 @@ u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
         const u16 *table;
         u32 *cursor;
         u32 range;
-        u32 mask;
         u32 index;
         table = (const u16 *)RANDOM_TABLE_ADDR;
         cursor = &gRandomIndex;
         index = *cursor;
         index++;
-        mask = 1023;
-        index &= mask;
+        index &= 1023;
         {
             u32 sample = table[*(&index)];
             s32 x = (u16)p->origin.x;
@@ -111,7 +107,7 @@ u32 ScriptCombatActor_UpdateProjectileAttack(struct ScriptCombatActor *p)
             p->position.x = x + sample;
         }
         p->position.y = p->origin.y;
-        index = (index + 1) & mask;
+        index = (index + 1) & 1023;
         *cursor = index;
         {
             u32 sample = table[index];

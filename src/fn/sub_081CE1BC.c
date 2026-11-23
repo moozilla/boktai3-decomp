@@ -1,6 +1,7 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "task_manager.h"
 struct PackedVec {
     u32 x : 16;
     u32 y : 16;
@@ -98,10 +99,6 @@ void sub_081CC1B4(void);
 void StateActor_StartAnimStep(void);
 void StateActor_StartKind5Animation9AndAttach(void);
 void StateActor_StartAndMaybeFinishAnim(void);
-static inline void setHandler(void *fn, void **slot)
-{
-    *slot = fn;
-}
 /* Registry routine 8EA3 (GCL place_character): creates a scene character
    named -n of kind -k (default 9) at -p x y z facing -d. -C gives two
    values for kind 29 (a tag and a sound choice). The model, palette
@@ -222,12 +219,12 @@ void SceneCharacter_PlaceFromScript(void)
             npc->facing4 = m;
         }
     }
-    setHandler(SceneCharacter_OnStateChange, &npc->callbacks[5]);
-    setHandler(SceneNpc_UpdateCommands, &npc->callbacks[0]);
-    setHandler(SceneCharacter_OnCommandUpdate, &npc->callbacks[1]);
-    setHandler(Actor_TickCallbacks, &npc->callbacks[2]);
-    setHandler(SceneCharacter_UpdateDisplay, &npc->callbacks[3]);
-    setHandler(SceneCharacter_OnDestroy, &npc->callbacks[4]);
+    Task_SetManager(SceneCharacter_OnStateChange, &npc->callbacks[5]);
+    Task_SetManager(SceneNpc_UpdateCommands, &npc->callbacks[0]);
+    Task_SetManager(SceneCharacter_OnCommandUpdate, &npc->callbacks[1]);
+    Task_SetManager(Actor_TickCallbacks, &npc->callbacks[2]);
+    Task_SetManager(SceneCharacter_UpdateDisplay, &npc->callbacks[3]);
+    Task_SetManager(SceneCharacter_OnDestroy, &npc->callbacks[4]);
     Actor_InitResources(manager, npc, model, extra);
     Actor_LinkToManager(manager, npc);
     Actor_InitBehaviorFromScript(manager, npc);

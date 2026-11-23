@@ -395,7 +395,7 @@ void SceneActorControl_ConsumePendingEntry(struct ChaseActor *actor)
 {
     if (SceneActorControl_TakeFlag(&actor->base.field2B1)) {
         SceneActorTerrain_InstallControl(actor, actor->base.onAlternateEntry, 1);
-        Trigger_ConsumePending((void *)((u8 *)actor + 0xC), 1);
+        Trigger_ConsumePending(actor->base.receiver, 1);
         SceneActorPlacement_SetFlags(0x800, &actor->base);
     }
     actor->base.counter2AC++;
@@ -451,13 +451,6 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-static inline u8 tst(u16 *a, u32 m)
-{
-    if (*a & m)
-        return 1;
-    return 0;
-}
-
 struct S {
     u8 f0[4];
     u8 *p4;
@@ -478,7 +471,7 @@ u32 Bat_Destroy(struct S *s)
         Anim_Remove(p + 0x20);
     Heap_Free(p);
     m = 0x100;
-    if (tst((u16 *)((u8 *)s + 0x2c0), m))
+    if (SceneActorChase_TestField(&s->h2c0, m))
         SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
     {
         u8 *r = (u8 *)s + 0x320;

@@ -310,7 +310,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     }
 
     SceneActors_InitConvergingParticles((u8 *)boss);
-    Shadow_Initialize(boss->shadow, (u8 *)boss + 0x2EC, 0);
+    Shadow_Initialize(boss->shadow, boss->widget.shadowPart, 0);
     ProximityVolume_InitializeCallbacks(boss->volume);
     ProximityVolume_SetParameter(boss->volume, boss->volumeParameter);
     boss->volumeEnabled = 1;
@@ -357,7 +357,7 @@ s32 sub_0817FDE0(struct BossInit *boss, u32 arg1)
     boss->effectState = zero;
     boss->effectCount = 5;
     boss->effectEnabled = 1;
-    CameraFollow_Initialize(&boss->camera, *cameraTarget, (u8 *)boss + 0x2EC, 1);
+    CameraFollow_Initialize(&boss->camera, *cameraTarget, boss->widget.shadowPart, 1);
     CameraTracking_SetRange(&boss->camera, zero, 0x8C);
     SceneActors_SetDamageCallback((u8 *)actor, boss->attackCollider, ActorPosition_BeginReaction, boss->damage);
     ProximityVolume_TranslateBounds(boss->bounds, volumePosition);

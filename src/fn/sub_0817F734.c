@@ -2,10 +2,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "state_actor_action_entry.h"
+#include "scene_indicator.h"
 // confidence=low: BossSlot2 per-frame update: animation, shake, cached target bearings.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u8 pad0[12];
     struct Vec position;
@@ -61,11 +59,11 @@ void BossSlot2_UpdateFrame(struct BossSlot2Tick *p)
     if (SceneActorState_TestFlags((struct StateActor *)actor, 0x80000))
         actor->cell = 0;
     else if (!actor->cell) {
-        CellObject_Init(actor->cellObject, (u8 *)actor + 0x54);
+        CellObject_Init(actor->cellObject, &actor->sprite.position);
         actor->cell = actor->cellObject;
     }
     Obj_StepPosition(sprite);
-    NavMesh_UpdateProbe(actor->probe, (u8 *)sprite + 0xc);
+    NavMesh_UpdateProbe(actor->probe, &sprite->position);
     SceneActors_UpdateAnimation(owner, actor->animation, actor->animationState);
     actor->renderPosition.x = sprite->position.x;
     actor->renderPosition.y = sprite->position.y;

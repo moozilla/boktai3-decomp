@@ -386,14 +386,13 @@ void BossSlot2_UpdateSummonSpinSequence(struct ActorState *eventActor)
             if (!zero) {
                 BossSlot2_SetDirection(eventActor, 32);
                 {
-                    u32 paletteMode = 3;
                     SceneActors_StartEightDirectionAnimation(eventActor, &boss->graphics.id,
                                                              boss->animationData, 0xF4, 1, 1, 4);
                     Sound_PlaySong(0x2E4);
                     Sound_PlaySong(0x1A8);
                     {
                         u8 paletteShift = 5;
-                        boss->paletteMode = paletteMode;
+                        boss->paletteMode = 3;
                         boss->paletteShift = paletteShift;
                     }
                     boss->paletteTimer = zero;

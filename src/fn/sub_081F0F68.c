@@ -39,7 +39,6 @@ void SingletonSlot7_InitDisplaySprites(struct DepartureActor *p)
     }
     {
         struct ContactSwarmGraphics *animB = &p->accentGraphics;
-        u32 accentPriority;
         struct DisplaySequenceState *accentState;
         AnimData_Load(animB, p->effectResource);
         AnimData_SelectPaletteBank(animB, 2);
@@ -49,12 +48,11 @@ void SingletonSlot7_InitDisplaySprites(struct DepartureActor *p)
             *palB = p->accentPalette;
         }
         Sprite_Init(accent, animB, 0x11);
-        accentPriority = 1;
-        accent->sprite.priority = accentPriority;
+        accent->sprite.priority = 1;
         accent->sequenceId = 4;
         accentState = &accent->sequence;
         Anim_SetSequence(accentState, p->sequenceResource, 4, 0, zero);
-        StepPlayback(accent, accentState, accentPriority);
+        StepPlayback(accent, accentState, 1);
         {
             accent->sprite.position.x = 0;
             accent->sprite.position.y = 0;

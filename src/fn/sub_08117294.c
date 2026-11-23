@@ -1,18 +1,12 @@
 #include "global.h"
-struct S {
-    u8 f[0x864];
-    u32 c;
-    u8 on;
-    u8 p[3];
-    void (*cb)(void);
-};
-void Glove_UpdateStopping(void);
-void Glove_BeginStopping(struct S *s)
+#include "glove.h"
+void Glove_UpdateStopping(struct Glove *);
+void Glove_BeginStopping(struct Glove *s)
 {
-    void (*f)(void) = Glove_UpdateStopping;
-    u8 *p = &s->on;
+    void (*f)(void *) = (void (*)(void *))Glove_UpdateStopping;
+    u8 *p = &s->active;
     u32 z = 0;
     *p = 1;
-    s->cb = f;
-    s->c = z;
+    s->update = f;
+    s->timer = z;
 }

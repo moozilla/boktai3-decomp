@@ -6,6 +6,7 @@
 #include "display_sequence_inline.h"
 #include "engine_pause.h"
 #include "word_flags.h"
+#include "monster_particle_random.h"
 struct EnemyF426Collider {
     u8 pad[6];
     u16 flags;
@@ -77,11 +78,6 @@ s32 Callback_InvokeActor(void *arg, void *function);
 void SceneHud_SetTimedState(void *, int, int, int, int, int);
 void sub_08014634(s32, s32, void *, void *, void *, s32, s32);
 void EnemyF426_UpdateDeath(void);
-static inline u32 EnemyF426_NextSample(const u16 *samples)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return samples[gRandomIndex];
-}
 
 static inline u32 EnemyF426_StepSequence(struct EnemyF426Sprite *owner,
                                          struct DisplaySequenceState *state)
@@ -200,14 +196,14 @@ u32 EnemyF426_UpdateDamageState(struct EnemyF426Actor *p)
                 }
                 velocity.a.lo = -4;
                 table = gRandomTable;
-                sample = EnemyF426_NextSample(table);
+                sample = ParticleRandom_ReadDirectSample(table);
                 velocity.a.hi = sample & 7;
                 velocity.b.lo = -4;
                 spread.a.lo = 0x18;
-                sample = EnemyF426_NextSample(table);
+                sample = ParticleRandom_ReadDirectSample(table);
                 spread.a.hi = (sample & 7) + 3;
                 spread.b.lo = 0x18;
-                sample = EnemyF426_NextSample(table);
+                sample = ParticleRandom_ReadDirectSample(table);
                 sub_08014634((sample & 3) + 4, 3, &center, &velocity, &spread, 15, 15);
                 Anim_RestartSequence(&p->seq, p->resource, 1, p->facing, 0);
                 AnimData_SelectPaletteBank(p->anim, 0x1b7);

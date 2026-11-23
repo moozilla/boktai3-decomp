@@ -38,7 +38,7 @@ void SceneActorControl_UpdateTriggerApproach(struct ChaseActor *actor)
             Anim_SetFrameDurationScale((u8 *)actor->base.drawable + 0x20, *scale);
         if (SceneActorBehavior_AccelerateTowardDescriptor(actor, group->route, 32, 32,
                                                           speed)) {
-            Trigger_ConsumePending((u8 *)actor + 0xc, 1);
+            Trigger_ConsumePending(actor->base.receiver, 1);
             SceneActorTerrain_EnterState(actor, 2, 0, 2);
             SceneActorTerrain_InstallControl(actor, actor->base.onStanding, 0);
         } else {

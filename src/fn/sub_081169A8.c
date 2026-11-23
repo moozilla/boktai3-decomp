@@ -3,31 +3,8 @@
 #include "scene_actor_style.h"
 #include "engine.h"
 #include "ram.h"
+#include "glove.h"
 
-struct GloveMotion {
-    u8 unk_00[0x44];
-    u8 colorState[4];
-    struct SceneActorStyle style;
-    u8 unk_64[0xB0 - 0x64];
-    u8 drain[0x10];
-    u8 unk_C0[0x2B0 - 0xC0];
-    u8 actionSource[5];
-    u8 actionMode;
-    u8 unk_2B6[4];
-    u16 actionValue;
-    u8 unk_2BC[0x31E - 0x2BC];
-    u16 fourthValue;
-    u8 unk_320[0x5F8 - 0x320];
-};
-struct Glove {
-    u8 unk_00[0x18];
-    struct GloveMotion motion;
-    u8 effectSource[0x20];
-    u8 drainSource[0x862 - 0x630];
-    u8 stylePlayer;
-    u8 unk_863[0x8F8 - 0x863];
-    s8 participant;
-};
 struct LinkStylePayload {
     struct SceneActorStyle style;
     u8 unk_1C[8];
@@ -109,12 +86,12 @@ void Glove_InitializeStyleModifiers(struct Glove *p)
     Actor_RecomputeScriptedValue(self);
     ActorStats_ConfigureScaledParameters(self, 0x1000, 0x3000, -0x2000, 0x2000, 0, 0x1000);
     ActorAction_InitializeMode(self, p, 0);
-    self->actionValue = sub_0811EAB8(self, self->actionValue);
-    if (self->actionMode == 5)
-        ActorEffect_EmitOffsetPair(self, p->effectSource, self->actionSource,
+    self->primaryValue = sub_0811EAB8(self, self->primaryValue);
+    if (self->primaryKind == 5)
+        ActorEffect_EmitOffsetPair(self, &p->model, &self->primaryCallback,
                                    Character_OnActionSoundCue, p->participant + 1);
-    Modifier_InitDrainState(self->drain, p->drainSource, 120, 1);
+    Modifier_InitDrainState(self->drain, p->model.parts[0].drainSource, 120, 1);
     Modifier_InitFourthSourceEffect(self, p);
     self->fourthValue = sub_0811EAB8(self, self->fourthValue);
-    Character_SetLowResourceColorEffect(self->colorState, &self->style);
+    Character_SetLowResourceColorEffect(&self->emitter, &self->style);
 }

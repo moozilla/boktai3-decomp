@@ -25,7 +25,7 @@ void SceneHud_UpdateActionSelection(struct SceneHudState *p)
     input = p->actionInput;
     result = SceneInput_NavigateGridKeys(input, 240);
     if (result) {
-        SceneHud_GetActionIconPosition((u8 *)p + 0x1620, p->actionCursor);
+        SceneHud_GetActionIconPosition(&p->categoryWidgets[5].position, p->actionCursor);
         SceneHud_ShowActionPreview(p);
         Hud_SaveGridSelection(input);
         MenuDisplay_UpdateActionPrompt(p, 4);

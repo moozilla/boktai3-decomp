@@ -63,7 +63,6 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
     struct SceneNpcEffect *npc = (void *)p;
     struct SceneNpcEffectState *fx = &npc->effect;
     if (effectData[0xd] != 0) {
-        s32 zero = 0;
         s32 *pos;
         struct ContactPosition *dst;
         s32 height;
@@ -83,7 +82,7 @@ s32 SceneNpc_OnStateEffectUpdate(u32 context, u8 *actor)
             *w = height;
         }
         npc->position = *npc->displayPosition;
-        npc->position.z = zero;
+        npc->position.z = 0;
         {
             u32 m = 0x200;
             npc->displayFlags = m | npc->displayFlags;

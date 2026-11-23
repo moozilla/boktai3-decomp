@@ -70,8 +70,7 @@ static inline u8 IsSceneHidden(void)
 {
     if (gParticipantActors[0]) {
         u32 flags = gParticipantActors[0]->flags;
-        u32 mask = 1;
-        if (flags & mask)
+        if (flags & 1)
             return 1;
     }
     return 0;

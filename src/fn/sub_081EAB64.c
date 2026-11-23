@@ -7,8 +7,10 @@
 // confidence=low: menu ownership follows Params3D0_CreateDisplay; option meanings remain tentative.
 struct Display {
     u8 task[0x18];
-    struct TextEntryWidget widgets[6];
-    u8 unknown348[0x724 - 0x348];
+    struct TextEntryWidget widgets[9];
+    u8 keyframes[0x20]; /* 0x4E0: the widgets' keyframe resource (size a guess, confidence=low) */
+    u16 palettes[17][16]; /* 0x500: palette banks; 0 is widget 1's, 16 the blend output (confidence=low) */
+    u8 unknown720[4];
     s32 selection, count;
     u32 state;
     s32 result, counter, fadeShift, idleTimer, unused740, unused744, stateTimer;
@@ -39,7 +41,6 @@ void Anim_LoadKeyframe(void *, void *, u16, s32);
 void TimeDisplay_HideAnimatedObjects(void *);
 void Script_Call(void *, void *);
 void Task_Kill(void *);
-#define FLAGS(off) (*(u32 *)((u8 *)p + (off)))
 void Params3D0_UpdateDisplay(struct Display *p)
 {
     u8 *source_3;
@@ -132,10 +133,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 Sound_PlaySong(0x2BC);
                 p->musicTimer = p->timer;
                 ScreenTransition_SendCommand(0, 5, 31, 31, 31, 0xFFFF, 0);
-                *((u32 *)(((u8 *)p) + 0x20)) &= ~1;
-                *((u32 *)(((u8 *)p) + 0x350)) &= ~1;
-                *((u32 *)(((u8 *)p) + 0x3D8)) &= ~1;
-                *((u32 *)(((u8 *)p) + 0x460)) &= ~1;
+                p->widgets[0].flags &= ~1;
+                p->widgets[6].flags &= ~1;
+                p->widgets[7].flags &= ~1;
+                p->widgets[8].flags &= ~1;
             } else if (p->stateTimer > 35) {
                 p->state = 4;
             }
@@ -157,15 +158,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 u8 *input;
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
-                    *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
+                    p->widgets[1].flags &= ~1;
                     source_2 = gPaletteBankData + 0x6240;
-                    input = (u8 *)p + 0x520;
-                    output = (u8 *)p + 0x700;
+                    input = (u8 *)p->palettes[1];
+                    output = (u8 *)p->palettes[16];
                     Palette_InterpolateBanks(input, output, source_2, p->paletteStep, p->unused760);
                     source = gPaletteBankData + 0x6260;
-                    Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
+                    Palette_InterpolateBanks(p->palettes[2], output, source, p->paletteStep,
                                              p->unused760);
-                    *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
+                    p->widgets[1].palette = p->palettes[0];
                     p->paletteStep++;
                 }
             }
@@ -176,7 +177,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 6:
             if ((gPadState[1] & 1) || (gPadState[1] & 8)) {
                 if (p->timer > (1 << p->fadeShift)) {
-                    FLAGS(0x130) &= ~1;
+                    p->widgets[2].flags &= ~1;
                     p->state = 7;
                     Sound_PlaySong(0xE0);
                     p->idleTimer = 0;
@@ -188,37 +189,37 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 u8 *input;
                 u8 *output;
                 if (p->paletteStep <= (1 << p->unused760)) {
-                    *((u32 *)(((u8 *)p) + 0xA8)) &= ~1;
+                    p->widgets[1].flags &= ~1;
                     source_3 = gPaletteBankData + 0x6240;
-                    input = (u8 *)p + 0x520;
-                    output = (u8 *)p + 0x700;
+                    input = (u8 *)p->palettes[1];
+                    output = (u8 *)p->palettes[16];
                     Palette_InterpolateBanks(input, output, source_3, p->paletteStep, p->unused760);
                     source = gPaletteBankData + 0x6260;
-                    Palette_InterpolateBanks((u8 *)p + 0x540, output, source, p->paletteStep,
+                    Palette_InterpolateBanks(p->palettes[2], output, source, p->paletteStep,
                                              p->unused760);
-                    *(void **)((u8 *)p + 0xE8) = (u8 *)p + 0x500;
+                    p->widgets[1].palette = p->palettes[0];
                     p->paletteStep++;
                 }
             }
             if (Mod(p->stateTimer, 30) == 0) {
-                if (FLAGS(0x130) & 1)
-                    FLAGS(0x130) &= ~1;
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
                 else
-                    FLAGS(0x130) |= 1;
+                    p->widgets[2].flags |= 1;
             }
             p->idleTimer++;
             break;
         case 7:
             if (p->stateTimer > 124) {
                 p->state = 8;
-                FLAGS(0x130) &= ~1;
+                p->widgets[2].flags &= ~1;
                 TimeDisplay_SetSelectionKeyframe(p);
                 Actor_HideAuxiliarySprites(p);
             } else if (Mod(p->stateTimer, 4) == 0) {
-                if (FLAGS(0x130) & 1)
-                    FLAGS(0x130) &= ~1;
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
                 else
-                    FLAGS(0x130) |= 1;
+                    p->widgets[2].flags |= 1;
             }
             break;
         case 8:
@@ -270,8 +271,8 @@ void Params3D0_UpdateDisplay(struct Display *p)
             p->idleTimer++;
             break;
         case 9:
-            Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
-            FLAGS(0x1B8) &= ~1;
+            Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
+            p->widgets[3].flags &= ~1;
             {
                 s16 *destination = &p->widgets[3].x;
                 s32 zero = 0;
@@ -283,7 +284,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 10:
             Actor_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
-                Anim_LoadKeyframe((u8 *)p + 0x2C0, (u8 *)p + 0x4E0, 6, 0);
+                Anim_LoadKeyframe(&p->widgets[5], p->keyframes, 6, 0);
             }
             p->velocity -= 2;
             position = p->widgets[3].x + p->velocity;
@@ -293,15 +294,15 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 p->widgets[2].x = y;
             }
             if ((s16)position <= 0) {
-                Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+                Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
-                FLAGS(0x1B8) |= 1;
+                p->widgets[3].flags |= 1;
                 p->state = 8;
             }
             break;
         case 11:
-            Anim_LoadKeyframe((u8 *)p + 0x1B0, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
-            FLAGS(0x1B8) &= ~1;
+            Anim_LoadKeyframe(&p->widgets[3], p->keyframes, (u16)(p->selection + 12), 0);
+            p->widgets[3].flags &= ~1;
             {
                 u16 *destination = (u16 *)&p->widgets[3].x;
                 s32 zero = 0;
@@ -316,7 +317,7 @@ void Params3D0_UpdateDisplay(struct Display *p)
         case 12:
             Actor_UpdatePairedSpriteAnimation(p);
             if (p->stateTimer <= 4) {
-                Anim_LoadKeyframe((u8 *)p + 0x238, (u8 *)p + 0x4E0, 10, 0);
+                Anim_LoadKeyframe(&p->widgets[4], p->keyframes, 10, 0);
             }
             p->velocity += 2;
             position = p->widgets[3].x + p->velocity;
@@ -326,9 +327,9 @@ void Params3D0_UpdateDisplay(struct Display *p)
                 p->widgets[2].x = y;
             }
             if ((s16)position >= 0) {
-                Anim_LoadKeyframe((u8 *)p + 0x128, (u8 *)p + 0x4E0, (u16)(p->selection + 12), 0);
+                Anim_LoadKeyframe(&p->widgets[2], p->keyframes, (u16)(p->selection + 12), 0);
                 p->widgets[2].x = 0;
-                FLAGS(0x1B8) |= 1;
+                p->widgets[3].flags |= 1;
                 p->state = 8;
             }
             break;
@@ -336,10 +337,10 @@ void Params3D0_UpdateDisplay(struct Display *p)
             break;
         case 13:
             if ((u32)(p->result - 1) <= 3 && Mod(p->stateTimer, 4) == 0) {
-                if (FLAGS(0x130) & 1)
-                    FLAGS(0x130) &= ~1;
+                if (p->widgets[2].flags & 1)
+                    p->widgets[2].flags &= ~1;
                 else
-                    FLAGS(0x130) |= 1;
+                    p->widgets[2].flags |= 1;
             }
             if (p->counter > (1 << p->fadeShift) || p->fadeShift == 0) {
                 TimeDisplay_HideAnimatedObjects(p);

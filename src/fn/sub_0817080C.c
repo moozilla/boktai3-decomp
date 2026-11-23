@@ -22,8 +22,8 @@ void SceneHud_InitializeActionInput(struct SceneHudState *s)
     v = s->widgetResource;
     Anim_LoadKeyframe(a, v, 0x4d, 0);
     PauseMenu_AddSpriteFlags(s, 6, 1);
-    Anim_LoadKeyframe((u8 *)s + 0x1660, v, 0x4e, 0);
+    Anim_LoadKeyframe(&s->categoryWidgets[6], v, 0x4e, 0);
     PauseMenu_ClearSpriteFlags(s, 4, 1);
-    SceneHud_GetActionIconPosition((u8 *)s + 0x1620, *r);
+    SceneHud_GetActionIconPosition(&s->categoryWidgets[5].position, *r);
     MenuDisplay_SetPaletteOverrides(s, 0, 1, 0, 0);
 }

@@ -1,6 +1,7 @@
 #include "monster_particle_random.h"
 #include "wireless_game_items_and_display.h"
 #include "render.h"
+#include "group_objects.h"
 
 void WirelessGame_AddItem(void *p, int index)
 {
@@ -358,12 +359,6 @@ static inline void Item_LoadFrame(struct WirelessGameItems *owner, struct Wirele
     p->drawing.flags &= ~1;
 }
 
-static inline u32 Item_NextRandom(const u16 *t)
-{
-    gRandomIndex = (gRandomIndex + 1) & 1023;
-    return t[gRandomIndex];
-}
-
 static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSprite *sprite,
                               struct WirelessGameDrawing *drawing, int index)
 {
@@ -377,12 +372,12 @@ static inline void Item_Place(struct WirelessGameItem *p, struct WirelessGameSpr
     if (p->shakeTicks) {
         u32 r;
         const u16 *table = (const u16 *)(RANDOM_TABLE_ADDR + (p->shakeTicks >> 8));
-        r = Item_NextRandom(table);
+        r = ParticleRandom_ReadDirectSample(table);
         {
             s32 v = drawing->position.coords.x - 1;
             drawing->position.coords.x = v + (r & 3);
         }
-        r = Item_NextRandom(table);
+        r = ParticleRandom_ReadDirectSample(table);
         {
             s32 v = drawing->position.coords.y - 1;
             drawing->position.coords.y = v + (r & 3);
@@ -603,8 +598,7 @@ void WirelessGameItems_UpdateOutgoingItem(struct WirelessGameItems *owner,
     *(struct WirelessGamePair *)&sprite->x = drawing->position.words;
     if (p->timer > 31) {
         u8 state = 1;
-        u16 ticks = 0;
-        WirelessGameItem_ResetOutgoing(p, state, ticks);
+        WirelessGameItem_ResetOutgoing(p, state, 0);
     }
     p->timer++;
 }
@@ -712,11 +706,6 @@ void WirelessGameItems_UpdateIncomingItem(struct WirelessGameItems *owner,
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 
-static inline int ScaleSine(int n)
-{
-    return n >= 0 ? n >> 12 : -((-n) >> 12);
-}
-
 static inline u32 WirelessGame_Random(void)
 {
     gRandomIndex = (gRandomIndex + 1) & 1023;
@@ -726,8 +715,8 @@ static inline u32 WirelessGame_Random(void)
 static inline void WirelessGameItem_SetDrift(struct ContactPosition *drift, int angle)
 {
     int k = 8;
-    drift->x = ScaleSine(gUnk_086149C4[(angle + 64) & 255] * 8);
-    drift->y = ScaleSine(gUnk_086149C4[angle & 255] * k);
+    drift->x = scale(gUnk_086149C4[(angle + 64) & 255] * 8);
+    drift->y = scale(gUnk_086149C4[angle & 255] * k);
     drift->z = 0;
 }
 

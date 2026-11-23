@@ -1,10 +1,8 @@
 #include "global.h"
 #include "engine.h"
 #include "ram.h"
+#include "scene_indicator.h"
 // confidence=low: updates render shake and cached bearings/distances to tracked positions.
-struct Vec {
-    s16 x, y, z, pad;
-};
 struct Sprite {
     u8 pad0[12];
     struct Vec position;

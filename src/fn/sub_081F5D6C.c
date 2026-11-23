@@ -26,9 +26,9 @@ void SceneActor_UpdateAnimation0Timer(struct Ratatosk *p, s32 elapsed)
     if (p->actionChanged) {
         p->actionChanged = 0;
         setFacing(p, p->savedAngle);
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 0, 1, 1, 4);
+        SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 0, 1, 1, 4);
     } else {
-        SceneActors_StartDirectionalAnimation(p, (u8 *)p + 0x34c, (u8 *)p + 0x32c, 0, 1, 1, 1);
+        SceneActors_StartDirectionalAnimation(p, p->animationData, p->animation, 0, 1, 1, 1);
     }
     self->scaleX = 0;
     self->scaleZ = 0;

@@ -6,6 +6,7 @@
 #include "render.h"
 #include "engine.h"
 #include "engine_pause.h"
+#include "effect_part.h"
 
 /* NativeEffect_ResetManager: Clears the native effect singleton pointer */
 
@@ -20,12 +21,6 @@ void NativeEffect_IgnoreUpdate(void)
 {
 }
 
-static inline u32 NativeParticle_StepSprite(struct SceneParticleEffect *sprite, const u16 *graphics,
-                                            struct DisplaySequenceState *state)
-{
-    return SceneParticle_StepSprite(state, sprite, graphics);
-}
-
 void NativeParticle_UpdateAnimatedMotion(struct ParticleManager *manager,
                                          struct NativeParticle *particle)
 {
@@ -34,8 +29,8 @@ void NativeParticle_UpdateAnimatedMotion(struct ParticleManager *manager,
     particle->position.x += particle->velocity.x;
     particle->position.y += particle->velocity.y;
     sprite->position = particle->position;
-    if (NativeParticle_StepSprite(sprite, manager->graphics,
-                                  &manager->sequences[particle->control.index])) {
+    if (EffectPart_StepSequence(sprite, manager->graphics,
+                                &manager->sequences[particle->control.index])) {
         particle->control.state = 2;
     }
     particle->control.timer++;

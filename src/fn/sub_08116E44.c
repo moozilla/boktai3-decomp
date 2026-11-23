@@ -3,66 +3,8 @@
 #include "engine_globals.h"
 #include "area_effect_link.h"
 #include "engine_pause.h"
+#include "glove.h"
 
-struct Position {
-    s32 x, y, z;
-    u32 unused;
-};
-struct Motion {
-    u8 unk_00[4];
-    u32 terrain, previousTerrain;
-    u8 unk_0C[4];
-    struct Position position;
-    s32 outX, outY, outZ;
-    u8 unk_2C[0x38 - 0x2C];
-    s32 heightA, heightB;
-    u32 collision;
-    u8 unk_44[0x68 - 0x44];
-    u32 pending;
-    u8 unk_6C[0xC0 - 0x6C];
-    s32 bias;
-    u8 unk_C4[0x52C - 0xC4];
-    u32 flags52C;
-    u8 unk_530[0x56C - 0x530];
-    u32 flags56C;
-    u8 unk_570[10];
-    u8 mode;
-    u8 unk_57B[0x5AC - 0x57B];
-    s32 forward, vertical, lateral;
-    u32 unk_5B8;
-    s32 previousX, previousY, previousZ;
-    u32 unk_5C8;
-    s32 impulseX, impulseY, impulseZ, impulseW;
-    s32 offsetX;
-    u8 unk_5E0[12];
-    s8 decay;
-    u8 unk_5ED;
-    u8 flags;
-    u8 unk_5EF;
-    u16 angle;
-    u8 unk_5F2[6];
-};
-struct Glove {
-    u8 unk_00[0x18];
-    struct Motion motion;
-    u8 model[0x864 - 0x610];
-    u32 timer;
-    u8 entered;
-    u8 unk_869[3];
-    void (*callback)(void *);
-    u8 unk_870[0x8A4 - 0x870];
-    struct Position origin;
-    u8 unk_8B4[0x8E8 - 0x8B4];
-    s32 height;
-    u8 unk_8EC[8];
-    u16 flags;
-    u8 unk_8F6[2];
-    s8 participant;
-    u8 unk_8F9[7];
-    u32 result;
-    u32 unk_904;
-    u32 script;
-};
 struct LinkMenu {
     u8 unk_00[0x18];
     s16 participant;
@@ -78,17 +20,15 @@ struct ScriptArgs {
 };
 void Registry1745_SetMenuRequest(u32);
 s32 GameState_GetResultIndex(void);
-void Script_Call(u32, void *);
 u8 LinkParticipant_IsLocallySelected(struct Glove *);
 void Sound_StopSong(u32);
 void Sound_StopTrackedSong(u32);
-void ScenePool_ClampMotionSpeeds(struct Motion *);
-void Actor_ClampMovementSpeed(struct Motion *);
+void ScenePool_ClampMotionSpeeds(struct GloveMotion *);
+void Actor_ClampMovementSpeed(struct GloveMotion *);
 s32 Div(s32, s32);
-void Memory_Clear(void *, u32);
 s32 Math_Atan2(s32, s32);
-void Terrain_ResolveActorMotion(struct Motion *);
-void Actor_UpdateShadowSpriteParts(struct Motion *, void *);
+void Terrain_ResolveActorMotion(struct GloveMotion *);
+void Actor_UpdateShadowSpriteParts(struct GloveMotion *, void *);
 void CharacterModel_UpdateAccessoryAnimations(void *);
 void MotionActor_RunPendingScript(void *);
 void MotionActor_RunDelayedScript(void *);
@@ -113,8 +53,8 @@ static inline s32 LinkParticipant(void)
 }
 static inline void SetCallback(struct Glove *p, void (*callback)(void *), u32 zero)
 {
-    p->entered = 1;
-    p->callback = callback;
+    p->active = 1;
+    p->update = callback;
     p->timer = zero;
 }
 // confidence=low: per-frame glove update: runs its entry script, steps the motion, or switches to a delayed callback when far from its origin.
@@ -125,14 +65,14 @@ static inline s32 Glove_Participant(struct Glove *actor)
 
 void sub_08116E44(struct Glove *p)
 {
-    struct Motion *self = &p->motion;
+    struct GloveMotion *self = &p->motion;
     s32 values[2];
     struct ScriptArgs args;
     s32 h, dx, dz;
     u32 a, b;
     s32 *bias, *forward, *vertical, *offset, *impulseY, *impulseZ;
     s32 *previousX, *previousZ, *lateral;
-    if (p->entered) {
+    if (p->active) {
         if (Engine_PauseBits(0x800)) {
             values[0] = Glove_Participant(p);
             values[1] = *LinkResult();
@@ -140,12 +80,12 @@ void sub_08116E44(struct Glove *p)
                 Registry1745_SetMenuRequest(4);
         } else {
             values[0] = GameState_GetResultIndex();
-            values[1] = p->result;
+            values[1] = p->activeFrames;
         }
         args.count = 2;
         args.values = values;
-        Script_Call(p->script, &args);
-        p->script = 0;
+        Script_Call(p->entryScript, &args);
+        p->entryScript = 0;
         if (LinkParticipant_IsLocallySelected(p)) {
             Sound_StopSong(0x87);
             Sound_StopSong(0x88);
@@ -161,24 +101,24 @@ void sub_08116E44(struct Glove *p)
             }
         }
         p->origin = self->position;
-        p->entered = 0;
+        p->active = 0;
     }
     {
-        u32 *flags = &self->flags52C;
+        u32 *flags = &self->contact.flags;
         u32 bit = 1;
         *flags = bit | *flags;
-        flags = &self->flags56C;
+        flags = &self->motionFlags;
         *flags = bit | *flags;
     }
     {
-        u8 *flags = &self->flags;
+        u8 *flags = &self->damageFlags;
         s32 mask = ~1;
         u32 zero;
         mask &= *flags;
         zero = 0;
         *flags = mask;
-        self->mode = zero;
-        self->pending = zero;
+        self->damageTimer = zero;
+        self->pendingDamage = zero;
     }
     {
         u32 mask = 4;
@@ -187,45 +127,45 @@ void sub_08116E44(struct Glove *p)
     }
     if (((self->position.x - p->origin.x) >> 12) <= 127) {
         ScenePool_ClampMotionSpeeds(self);
-        h = self->forward + self->bias;
+        h = self->vy + self->unkC0;
         {
             s32 limit = 0xF000;
-            forward = &self->forward;
-            bias = &self->bias;
+            forward = &self->vy;
+            bias = &self->unkC0;
             if (h > limit)
                 h = limit;
         }
-        self->vertical += 0x200;
+        self->y += 0x200;
         {
-            s32 decay = self->decay;
-            vertical = &self->vertical;
+            s32 decay = self->steps;
+            vertical = &self->y;
             if (decay > 0) {
-                self->offsetX += self->impulseX;
-                self->impulseX += Div(-self->impulseX, self->decay);
-                self->impulseY += Div(-self->impulseY, self->decay);
-                self->impulseZ += Div(-self->impulseZ, self->decay);
-                self->decay--;
-                offset = &self->offsetX;
-                impulseY = &self->impulseY;
-                impulseZ = &self->impulseZ;
+                self->x += self->dx;
+                self->dx += Div(-self->dx, self->steps);
+                self->dy += Div(-self->dy, self->steps);
+                self->dz += Div(-self->dz, self->steps);
+                self->steps--;
+                offset = &self->x;
+                impulseY = &self->dy;
+                impulseZ = &self->dz;
             } else {
-                Memory_Clear(&self->impulseX, 16);
-                offset = &self->offsetX;
-                impulseY = &self->impulseY;
-                impulseZ = &self->impulseZ;
+                Memory_Clear(&self->dx, 16);
+                offset = &self->x;
+                impulseY = &self->dy;
+                impulseZ = &self->dz;
             }
         }
         Actor_ClampMovementSpeed(self);
-        self->outX = *offset + h - self->previousX;
+        self->outX = *offset + h - self->previousPosition.x;
         self->outY = *vertical + *impulseY;
-        self->outZ = self->lateral + *impulseZ;
-        dx = (*offset - self->previousX) >> 12;
-        dz = (self->position.z - self->previousZ) >> 12;
+        self->outZ = self->vz + *impulseZ;
+        dx = (*offset - self->previousPosition.x) >> 12;
+        dz = (self->position.z - self->previousPosition.z) >> 12;
         {
             s32 limit = 0x3000;
-            previousX = &self->previousX;
-            lateral = &self->lateral;
-            previousZ = &self->previousZ;
+            previousX = &self->previousPosition.x;
+            lateral = &self->vz;
+            previousZ = &self->previousPosition.z;
             if (h > limit)
                 dx = 0x80;
         }
@@ -236,23 +176,23 @@ void sub_08116E44(struct Glove *p)
         *previousX = *offset;
         *previousZ = self->position.z;
         Terrain_ResolveActorMotion(self);
-        a = (u32) ~(self->heightB >> 12) >> 31;
-        b = (u32) ~(self->heightA >> 12) >> 31;
-        if (self->terrain != self->previousTerrain && (self->terrain & 0x1000) &&
-            !(self->previousTerrain & 0xF000) && b <= 1 && a == 1) {
+        a = (u32) ~(self->unk3C >> 12) >> 31;
+        b = (u32) ~(self->unk38 >> 12) >> 31;
+        if (self->unk4 != self->unk8 && (self->unk4 & 0x1000) &&
+            !(self->unk8 & 0xF000) && b <= 1 && a == 1) {
             s32 v = ((*forward >> 10) + (*bias >> 8)) >> 1;
             if (v < 4)
                 v = 4;
             if (v > 18)
                 v = 18;
             *vertical -= v << 9;
-            self->collision &= ~1;
+            self->flags40 &= ~1;
         }
         p->height = h;
-        Actor_UpdateShadowSpriteParts(self, p->model);
-        if (self->collision & 2)
+        Actor_UpdateShadowSpriteParts(self, &p->model);
+        if (self->flags40 & 2)
             *lateral = 0;
-        if (self->collision & 1)
+        if (self->flags40 & 1)
             *vertical = 0;
     } else {
         u32 flags = Engine_PauseBits(0x800);
@@ -262,6 +202,6 @@ void sub_08116E44(struct Glove *p)
             SetCallback(p, MotionActor_RunDelayedScript, flags);
         return;
     }
-    CharacterModel_UpdateAccessoryAnimations(p->model);
+    CharacterModel_UpdateAccessoryAnimations(&p->model);
     p->timer++;
 }
