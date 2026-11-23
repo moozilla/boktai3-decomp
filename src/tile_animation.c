@@ -19,8 +19,8 @@ void TileAnimation_Advance(struct TileAnimation *animation, struct TileAnimation
 int TileAnimation_Update(struct TileAnimation *animation)
 {
     struct TileAnimationChannel *channel = animation->channels;
-    int index = 7;
-    do {
+    int index;
+    for (index = 0; index < 8; index++, channel++) {
         if (channel->active) {
             if (channel->removePending) {
                 channel->active = 0;
@@ -28,9 +28,7 @@ int TileAnimation_Update(struct TileAnimation *animation)
             } else if (channel->ignorePause || !gEnginePauseFlags)
                 TileAnimation_Advance(animation, channel);
         }
-        index--;
-        channel++;
-    } while (index >= 0);
+    }
     return 0;
 }
 
@@ -54,17 +52,11 @@ int TileAnimation_Initialize(struct TileAnimation *animation)
     if (animation->tiles) {
         Memory_Clear(animation->tiles, animation->tileCount * 32);
         channel = animation->channels;
-        {
-            int zero = 0;
-            index = 7;
-            do {
-                channel->active = zero;
-                channel->removePending = zero;
-                channel->tileCount = zero;
-                channel->id = zero;
-                index--;
-                channel++;
-            } while (index >= 0);
+        for (index = 0; index < 8; index++, channel++) {
+            channel->active = 0;
+            channel->removePending = 0;
+            channel->tileCount = 0;
+            channel->id = 0;
         }
         resource = Script_GetKeywordValue('p', 0);
         mode = Script_GetKeywordValue('m', 0);
