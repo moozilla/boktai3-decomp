@@ -96,15 +96,18 @@ const GOALS = {
   *story(g, L) {
     if (!from && !(yield* GOALS.m1(g, L))) return false;
     const visited = new Set(), limit = +(opt('--scenes', 8));
+    let prev;
     for (let rooms = 0; rooms < limit; rooms++) {
       const doorsHere = () => stageOf(L.where().scene).doors.filter((d) => L.boxes().some((b) => b.name === d.box));
       if (!(yield* untilControl(g, L, () => doorsHere().length > 0, 120, g.frameNo + 30000))) { event({ skill: 'stop', why: 'no control with a door in 30000 frames', ...L.where() }); return rooms > 0; }
       const here = L.where().scene;
       visited.add(here);
+      if (prev !== undefined) visited.add(prev);
       const doors = doorsHere().sort((a, b) => visited.has(a.scene) - visited.has(b.scene));
       event({ skill: 'room', ...L.where(), doors: doors.map((d) => `${d.box}->${d.scene}`) });
       let moved = false;
       for (const d of doors) {
+        prev = here;
         if (yield* throughDoor(g, L, d.box)) { moved = true; break; }
         if (L.where().scene !== here) { moved = true; break; }
       }
@@ -144,7 +147,8 @@ const GOALS = {
 function* throughDoor(g, L, box) {
   const scene = L.where().scene, tried = new Set();
   for (let attempt = 0; attempt < 6; attempt++) {
-    const r = yield* L.navigate(box, { trace: (e) => event({ skill: 'nav', ...e }) });
+    const avoid = stageOf(scene).doors.map((d) => d.box).filter((b) => b !== box);
+    const r = yield* L.navigate(box, { avoid, trace: (e) => event({ skill: 'nav', ...e }) });
     event({ skill: 'navigate', box, ...r, from: scene });
     if (r.reached) return true;
     if (r.reason !== 'gated') return false;
@@ -190,9 +194,14 @@ if (!GOALS[goal]) { console.error(`unknown goal ${goal} (${Object.keys(GOALS).jo
 const t0 = performance.now();
 // The keys each input read saw (Input_UpdatePadStates runs once per game tick; the
 // port has no lag frames, the hardware does, so replays key inputs to these reads).
-const reads = from && from.reads ? from.reads.slice() : [];
+// readAt[n]: frame n ran an input read (truncated with the movie on a restore).
+const readAt = [];
+if (from && from.readFrames) for (const n of from.readFrames) readAt[n] = 1;
+const restore = s.restore;
+s.restore = (snap) => { restore(snap); readAt.length = Math.min(readAt.length, snap.movie); };
 const ok = s.run(function* (g) {
-  g.on('Input_UpdatePadStates', () => { reads.push(s.movie[s.frame] | 0); });
+  g.lib.session = s;
+  g.on('Input_UpdatePadStates', () => { readAt[s.frame] = 1; });
   const reached = yield* GOALS[goal](g, g.lib);
   yield* settle(g);
   return reached;
@@ -201,7 +210,10 @@ const secs = (performance.now() - t0) / 1000;
 const end = s.run(function* (g) { const w = g.lib.where(); return { scene: w.scene, x: w.x, y: w.y, z: w.z }; });
 
 const movie = s.movie.map((k) => k | 0);
-fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, reads, movie }));
+const readFrames = [];
+for (let n = 0; n < movie.length; n++) if (readAt[n]) readFrames.push(n);
+const reads = readFrames.map((n) => movie[n]);
+fs.writeFileSync(path.join(out, 'movie.json'), JSON.stringify({ goal, save: opt('--save') || (from && from.save) || null, frames: movie.length, end, readFrames, movie }));
 fs.writeFileSync(path.join(out, 'harness.txt'), harnessScript(reads, s.exports, `autopilot ${goal}: ${ok ? 'reached' : 'NOT reached'}; port end ${JSON.stringify(end)}`));
 fs.writeFileSync(path.join(out, 'log.json'), JSON.stringify(log, null, 1));
 console.log(`${goal}: ${ok ? 'reached' : 'NOT reached'} at frame ${s.frame} (${secs.toFixed(1)} s), end ${JSON.stringify(end)} -> ${path.relative(ROOT, out)}`);

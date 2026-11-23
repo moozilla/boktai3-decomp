@@ -19,11 +19,33 @@ exports.grid = () => {
   for (let z = 0; z < h; z++) {
     const row = map.rows[z];
     for (let x = 0; x < w; x++) {
-      const a = base + 12 + 4 * (row + x), hb = g.u8(a), flags = g.u16(a + 2);
-      cells.push({ x, z, level: hb & 15, slope: hb >> 4 === 1, flags, open: !(flags & 0x400) && (flags & 3) !== 3 });
+      // getCell (scene_object.c): a terrain modifier's override wins over the map
+      // (pushed blocks, raised bridges)
+      const over = g.fn.TerrainModifiers_FindCellOverride(row + x, 1);
+      const a = over ? over + 4 : base + 12 + 4 * (row + x), hb = g.u8(a), flags = g.u16(a + 2);
+      cells.push({ x, z, index: row + x, level: hb & 15, slope: hb >> 4 !== 0, kind: hb >> 4, flags, open: !(flags & 0x400) && (flags & 3) !== 3 });
     }
   }
   return { w, h, cells, at: (x, z) => (x < 0 || z < 0 || x >= w || z >= h ? null : cells[z * w + x]) };
+};
+
+// Scene objects (src/scene_object.c, gSceneObjectManager->objects): blocks and
+// crates. An idle one (kind 0) can be pushed (SceneObjects_TryPushNeighbor) from a
+// cell one level below its top; type 1 movable block, 5 limited pushes.
+exports.blocks = () => {
+  const mgr = $.gSceneObjectManager;
+  if (!mgr) return [];
+  const T = g.types.types, sz = T['struct SceneObject'].size;
+  const base = g.u32(mgr.$addr + T['struct SceneObjectManager'].fields.find((f) => f.name === 'objects').off);
+  const w = exports.grid().w, out = [];
+  for (let i = 0; i < mgr.count; i++) {
+    const o = g.at(base + i * sz, 'struct SceneObject');
+    if (!o.active || o.mode === 2 || o.mode === 3) continue;
+    const idx = o.cellRef.index;
+    out.push({ slot: i, type: o.type, kind: o.kind, x: idx % w, z: Math.floor(idx / w), top: o.cellRef.cell.height & 15,
+      health: o.health, pushes: o.pushLimited ? o.pushesLeft : Infinity, view: o });
+  }
+  return out;
 };
 
 exports.boxes = () => {
@@ -86,6 +108,92 @@ function simplify(path) {
   return out;
 }
 
+// Walk into the neighboring cell (cx, cz) and to its middle, with the grid-axis keys
+// (an isometric screen: up+right is -z, down+right +x, down+left +z, up+left -x;
+// the diagonals are the plain directions), correcting sideways drift so narrow
+// bridges are safe. Returns { reached, reason }.
+const KEY8 = { '0,-1': 'up+right', '1,0': 'down+right', '0,1': 'down+left', '-1,0': 'up+left',
+  '1,1': 'down', '-1,-1': 'up', '1,-1': 'right', '-1,1': 'left' };
+exports.stepTo = function* (cx, cz, opts = {}) {
+  const p = $.gPlayers[0], tx = cx * CELL + 128, tz = cz * CELL + 128, scene = exports.where().scene;
+  let best = Infinity, since = 0;
+  for (let t = 0; t < (opts.frames ?? 240); t += 2) {
+    const dx = tx - p.position.x, dz = tz - p.position.z, dist = Math.max(Math.abs(dx), Math.abs(dz));
+    if (dist <= (opts.tolerance ?? 40)) return { reached: true, x: p.position.x, z: p.position.z };
+    if (exports.where().scene !== scene) return { reached: false, reason: 'scene changed' };
+    if (dist < best - 2) { best = dist; since = 0; } else if ((since += 2) > (opts.patience ?? 60)) return { reached: false, reason: `blocked ${best} away`, x: p.position.x, z: p.position.z };
+    // move on each axis whose offset is big enough; small offsets are left alone
+    const sx = Math.abs(dx) > 24 ? Math.sign(dx) : 0, sz = Math.abs(dz) > 24 ? Math.sign(dz) : 0;
+    const key = KEY8[`${sx},${sz}`];
+    if (!key) return { reached: true, x: p.position.x, z: p.position.z };
+    yield g.press(key, 2);
+  }
+  return { reached: false, reason: 'out of frames' };
+};
+
+// stepTo with a fall guard: snapshot, step, and if the player dropped a level (or
+// the cell is a narrow ledge, flags 0x800) fall back to searchTo. Needs
+// exports.session (the autopilot sets it).
+exports.safeStep = function* (cx, cz, opts = {}) {
+  const S = exports.session, p = $.gPlayers[0], y0 = p.position.y, grid = exports.grid();
+  const here = grid.at(p.position.x >> 8, p.position.z >> 8), to = grid.at(cx, cz);
+  const narrow = (c) => c && (c.flags & 0x800);
+  if (S && (narrow(to) || narrow(here))) return yield* exports.searchTo(cx, cz, opts);
+  const snap = S ? S.snapshot() : null;
+  const r = yield* exports.stepTo(cx, cz, opts);
+  if (snap && p.position.y < y0 - 64 && !(to && to.level < here.level)) {
+    S.restore(snap);
+    if (opts.trace) opts.trace({ fell: [cx, cz], searching: true });
+    return yield* exports.searchTo(cx, cz, opts);
+  }
+  return r;
+};
+
+// Snapshot beam search for inputs that bring the player into cell (cx, cz) without
+// dropping height or leaving the scene: macro actions are the 8 directions held for
+// 8 frames; score is the distance to the cell's middle. For moves the model does not
+// cover (sidling along a ledge while clinging to the wall, ice, conveyors).
+exports.searchTo = function* (cx, cz, opts = {}) {
+  const S = exports.session, p = $.gPlayers[0], scene = exports.where().scene;
+  const tx = cx * 256 + 128, tz = cz * 256 + 128, y0 = p.position.y, life0 = exports.where().life;
+  const KEYS = ['up', 'down', 'left', 'right', 'up+left', 'up+right', 'down+left', 'down+right'];
+  // distance to the cell (0 inside it): clinging to a wall keeps the player off the middle
+  const dist = () => Math.max(Math.max(0, Math.abs(tx - p.position.x) - 127), Math.max(0, Math.abs(tz - p.position.z) - 127));
+  let beam = [{ snap: S.snapshot(), d: dist(), keys: [] }];
+  const seen = new Set();
+  for (let depth = 0; depth < (opts.depth ?? 24); depth++) {
+    const next = [];
+    for (const node of beam) {
+      for (const [k, n] of KEYS.flatMap((k) => [[k, 8], [k, 32]])) {
+        S.restore(node.snap);
+        yield g.press(k, n);
+        const w = exports.where();
+        if (w.scene !== scene || p.position.y < y0 - 64 || (w.life ?? 0) < (life0 ?? 0)) continue;
+        // still standing a few frames later with the same key? (a step off an edge
+        // looks fine on its first frame)
+        { const look = S.snapshot(); yield g.press(k, 6); const fell = p.position.y < y0 - 64; S.restore(look); if (fell) continue; }
+        const key = `${p.position.x >> 4},${p.position.z >> 4},${p.statusFlags & 0xff}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const d = dist(), keys = [...node.keys, `${k}:${n}`];
+        if (d === 0) { if (opts.trace) opts.trace({ searched: [cx, cz], keys: keys.join(' ') }); return { reached: true, x: p.position.x, z: p.position.z, searched: keys.length }; }
+        next.push({ snap: S.snapshot(), d, keys, mode: p.statusFlags & 0xff });
+      }
+    }
+    // the closest nodes, plus the closest two of each player mode (clinging, ...):
+    // a mode change can be the way forward without getting closer at first
+    next.sort((a, b) => a.d - b.d);
+    const keep = new Set(next.slice(0, opts.beam ?? 6)), perMode = {};
+    for (const n of next) if ((perMode[n.mode] = (perMode[n.mode] || 0) + 1) <= 2) keep.add(n);
+    beam = [...keep];
+    if (opts.debug) opts.debug({ depth, nodes: next.length, beam: beam.map((n) => `${n.d}/${n.mode}:${n.keys.slice(-2).join(',')}`) });
+    if (!beam.length) break;
+  }
+  // no route: go back to where the search started
+  S.restore(beam.length ? beam[0].snap : S.snapshot());
+  return { reached: false, reason: 'search failed' };
+};
+
 // Read any message the game opened (A until it closes) and drive any menu that came
 // up; true when there was something.
 exports.clearInterruptions = function* (opts = {}) {
@@ -113,6 +221,10 @@ exports.clearInterruptions = function* (opts = {}) {
 // not enter and re-plans. Returns { reached, reason, scene, frames, plans }.
 exports.navigate = function* (target, opts = {}) {
   const start = g.frameNo, scene0 = exports.where().scene, blocked = new Set(), budget = opts.frames ?? 3600;
+  // never walk through another door's box on the way (opts.avoid: box names)
+  const avoid = new Set();
+  for (const b of exports.boxes()) if ((opts.avoid || []).includes(b.name) && b.name !== String(target).toUpperCase())
+    for (let cz = b.z0 >> 8; cz <= (b.z1 - 1) >> 8; cz++) for (let cx = b.x0 >> 8; cx <= (b.x1 - 1) >> 8; cx++) avoid.add(`${cx},${cz}`);
   let plans = 0, pushes = 0;
   exports.message();  // installs the message window hooks before anything opens
   const done = (reached, reason, extra) => ({ reached, reason, scene: exports.where().scene, frames: g.frameNo - start, plans, ...extra });
@@ -142,13 +254,22 @@ exports.navigate = function* (target, opts = {}) {
     // the same lines again: a scripted gate turned the player back
     if (opts.seen && [...opts.seen.values()].some((n) => n >= 2)) return done(false, 'gated', { lines: [...opts.seen.keys()] });
     const here = exports.cellOf(p.position.x, p.position.z);
-    const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, blocked);
+    const path = goals.has(here.join(',')) ? [here] : exports.findPath(grid, here, goals, new Set([...blocked, ...avoid]));
     plans++;
     if (opts.trace) opts.trace({ plan: plans, here, path: path && simplify(path), blocked: [...blocked], x: p.position.x, z: p.position.z });
+    if (!path && !opts.noPush) {
+      const plan = exports.planPushes(grid, here, goals, exports.blocks());
+      if (opts.trace) opts.trace({ pushPlan: plan && plan.map((p) => `${p.x},${p.z}>${p.dir}`) });
+      if (plan && plan.length) {
+        const r = yield* exports.push(plan[0], opts);
+        if (opts.trace) opts.trace({ push: plan[0], ...r });
+        if (r.done) { blocked.clear(); continue; }
+      }
+    }
     if (!path) return done(false, 'no path');
     let interrupted = false;
-    for (const [cx, cz] of simplify(path).slice(1)) {
-      const r = yield* exports.walkTo(cx * CELL + 128, cz * CELL + 128, { tolerance: 40, patience: 90 });
+    for (const [cx, cz] of path.slice(1)) {
+      const r = yield* exports.safeStep(cx, cz, opts);
       if (exports.where().scene !== scene0) return done(true, 'scene changed');
       if (opts.trace) opts.trace({ to: [cx, cz], ...r });
       // a trigger's dialogue stops the player: read it, then re-plan from there
@@ -199,4 +320,75 @@ exports.interact = function* (x, z, opts = {}) {
   yield g.until(() => exports.message().open, 90);
   const any = yield* exports.clearInterruptions({ ...opts, seen });
   return { done: any, lines: [...seen.keys()] };
+};
+
+// Push planning: a breadth-first search over block states with the game's rules
+// (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
+// (a block raises its cell to its top). A push from P into direction d moves the
+// block at B = P + d when level(P) + 1 == top, the cell T = B + d is flat, not
+// flagged 8, and lower than the top: one level lower -> the block slides onto T;
+// more -> it falls into T and fills it by one level. Returns the pushes
+// [{x, z, dir, from: [px, pz]}] after which a goal cell is reachable, or null.
+const DIRS = [[0, -1], [1, 0], [0, 1], [-1, 0]];  // the game's 0 north (-z), 1 east (+x), 2 south, 3 west
+exports.DIR_KEYS = ['up+right', 'down+right', 'down+left', 'up+left'];
+exports.planPushes = (grid, start, goals, blocks, maxStates = 20000) => {
+  const W = grid.w, H = grid.h;
+  const lvl0 = grid.cells.map((c) => c.level), slope = grid.cells.map((c) => c.slope), open = grid.cells.map((c) => c.open);
+  const flag8 = grid.cells.map((c) => !!(c.flags & 8));
+  const ix = (x, z) => z * W + x;
+  const reach = (lvl, bset, from) => {
+    const seen = new Set([from]), q = [from];
+    while (q.length) {
+      const c = q.pop(), x = c % W, z = (c / W) | 0;
+      for (const [dx, dz] of DIRS) {
+        const nx = x + dx, nz = z + dz;
+        if (nx < 0 || nz < 0 || nx >= W || nz >= H) continue;
+        const n = ix(nx, nz);
+        if (seen.has(n) || !open[n] || bset.has(n)) continue;
+        if (!(lvl[n] === lvl[c] || ((slope[n] || slope[c]) && Math.abs(lvl[n] - lvl[c]) <= 1))) continue;
+        seen.add(n); q.push(n);
+      }
+    }
+    return seen;
+  };
+  const goalIdx = [...goals].map((k) => { const [x, z] = k.split(',').map(Number); return ix(x, z); });
+  const s0 = { lvl: lvl0.slice(), blocks: blocks.filter((b) => b.kind === 0).map((b) => ({ c: ix(b.x, b.z), pushes: b.pushes })), player: ix(...start), path: [] };
+  const key = (st, region) => st.blocks.map((b) => b.c).sort((a, b) => a - b).join(',') + '|' + Math.min(...region) + '|' + st.lvl.join('');
+  const q = [s0], seen = new Set();
+  while (q.length && seen.size < maxStates) {
+    const st = q.shift(), bset = new Set(st.blocks.map((b) => b.c)), region = reach(st.lvl, bset, st.player);
+    if (goalIdx.some((c) => region.has(c))) return st.path;
+    const k = key(st, region);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    st.blocks.forEach((b, bi) => {
+      if (b.pushes <= 0) return;
+      const bx = b.c % W, bz = (b.c / W) | 0, top = st.lvl[b.c];
+      DIRS.forEach(([dx, dz], d) => {
+        const px = bx - dx, pz = bz - dz, tx = bx + dx, tz = bz + dz;
+        if (px < 0 || pz < 0 || tx < 0 || tz < 0 || px >= W || tx >= W || pz >= H || tz >= H) return;
+        const P = ix(px, pz), T = ix(tx, tz);
+        if (!region.has(P) || st.lvl[P] + 1 !== top) return;
+        if (slope[T] || flag8[T] || bset.has(T) || !(st.lvl[T] < top)) return;
+        const lvl = st.lvl.slice(), nb = st.blocks.map((x) => ({ ...x }));
+        lvl[b.c] = top - 1;
+        if (top - lvl[T] === 1) { lvl[T] = top; nb[bi].c = T; nb[bi].pushes--; }
+        else { lvl[T] += 1; nb.splice(bi, 1); }  // fell in: now floor
+        q.push({ lvl, blocks: nb, player: P, path: [...st.path, { x: bx, z: bz, dir: d, from: [px, pz] }] });
+      });
+    });
+  }
+  return null;
+};
+
+// Carry out one planned push: walk to the cell behind the block, hold toward it
+// along the grid axis until the block leaves its cell (or give up).
+exports.push = function* (step, opts = {}) {
+  const r = yield* exports.navigate([step.from[0] * 256 + 128, step.from[1] * 256 + 128], { ...opts, noPush: true });
+  if (!r.reached) return { done: false, reason: 'could not reach the push spot: ' + r.reason };
+  const key = exports.DIR_KEYS[step.dir];
+  const moved = () => !exports.blocks().some((b) => b.x === step.x && b.z === step.z && b.kind === 0);
+  for (let t = 0; t < 180 && !moved(); t += 4) yield g.press(key, 4);
+  yield g.until(() => exports.blocks().every((b) => b.kind === 0), 120);
+  return { done: moved(), reason: moved() ? 'pushed' : 'did not move' };
 };
