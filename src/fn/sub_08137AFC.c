@@ -1,3 +1,4 @@
+#include "scene_actor_placement.h"
 #include "scene_actor_chase_shared.h"
 #define gPlayerSlotFlags gUnk_02000560
 #include "global.h"
@@ -49,10 +50,6 @@ static inline s32 FindNearestEligiblePlayer(struct ChaseActor *actor)
     return best;
 }
 
-static inline void ClearHalfFlags(u16 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slot)
 {
     void *shape = *(void **)(group + 0x1fc);
@@ -66,7 +63,7 @@ static inline u8 MoveTo(struct ChaseActor *actor, u8 *group, struct Player **slo
             return 1;
         }
     }
-    ClearHalfFlags(&actor->base.motionFlags, ~0x200);
+    SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
     return 0;
 }
 

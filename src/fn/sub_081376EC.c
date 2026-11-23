@@ -1,3 +1,4 @@
+#include "scene_actor_behavior.h"
 #include "scene_actor_chase_shared.h"
 #include "global.h"
 #include "scene_actor_terrain.h"
@@ -13,10 +14,6 @@ u8 SceneActorTarget_CanReplaceByDistance(void *, struct ContactPosition *, u32);
 #define FIELD(p, off, T) (*(T *)((u8 *)(p) + (off)))
 
 
-static inline void OrWord(u32 *flags, u32 mask)
-{
-    *flags |= mask;
-}
 
 static inline void SetWordFlags(u32 *flags, u32 input)
 {
@@ -24,11 +21,6 @@ static inline void SetWordFlags(u32 *flags, u32 input)
     *flags |= mask;
 }
 
-static inline void SetHalfFlags(u16 *flags, u32 input)
-{
-    u32 mask = input;
-    *flags |= mask;
-}
 
 static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 behavior)
 {
@@ -220,7 +212,7 @@ u32 SceneActorTarget_ApproachNearestStimulus(struct ChaseActor *actor)
             u32 mask = 0x10;
             actor->base.behaviorFlags |= mask;
         }
-        SetHalfFlags(flagsp, 0x200);
+        SceneActorChase_OrHalfFlags(flagsp, 0x200);
         actor->base.field2C2 = 0x20;
         {
             u32 mask = 0x1000000;

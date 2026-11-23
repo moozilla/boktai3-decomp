@@ -1,3 +1,4 @@
+#include "scene_actor_placement.h"
 #include "scene_actor_chase_shared.h"
 #include "scene_actor_reset.h"
 s32 Callback_InvokeActor(void *, void *);
@@ -40,10 +41,6 @@ static inline void SetState(struct ChaseActor *actor, u32 state, u32 phase, u32 
 #define GROUP_FIELD(g, off, T) (*(T *)((u8 *)(g) + (off)))
 
 
-static inline void ClearHalfFlags(u16 *flags, u32 mask)
-{
-    *flags &= mask;
-}
 
 static inline u8 MoveTo(struct ChaseActor *actor, struct SceneActorRegistryControlGroup *group,
                         u32 blocked)
@@ -71,7 +68,7 @@ void sub_08136F58(struct ChaseActor *actor)
         SetControl(actor, actor->base.onStanding, 0);
         SceneActorChase_AndWordFlags(&actor->base.behaviorFlags, ~0x80);
         SceneActorChase_AndWordFlags(&actor->base.statusFlags, ~0x1000000);
-        ClearHalfFlags(&actor->base.motionFlags, ~0x200);
+        SceneActorPlacement_ClearFlags(&actor->base.motionFlags, ~0x200);
         actor->base.field2C2 = 0x40;
     }
     if (((u8)Callback_InvokeActor(actor, actor->base.contactQuery.opaque)) == 0) {
