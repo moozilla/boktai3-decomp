@@ -1388,11 +1388,6 @@ struct AxeMoveNode {
     struct ContactPosition position;
 };
 
-static inline s32 Shift10(s32 value)
-{
-    return value >= 0 ? value >> 10 : -((-value) >> 10);
-}
-
 static inline void Interpolate(struct ContactPosition *out, struct ContactPosition *start,
                                struct ContactPosition *end, s32 initialScale, s32 t, s32 finalScale,
                                s32 speed)
@@ -1402,8 +1397,8 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     s32 scaled, value;
     MovementCurve_SubtractPositions(&delta, start, end);
     ZeroFill8(&tangent);
-    square = Shift10(t * t);
-    cube = Shift10(square * t);
+    square = MovementCurve_TruncateFixed10(t * t);
+    cube = MovementCurve_TruncateFixed10(square * t);
     twiceCube = cube * 2;
     thriceSquare = square * 3;
     sway = (cube - 2 * square + t) * speed;
@@ -1411,15 +1406,15 @@ static inline void Interpolate(struct ContactPosition *out, struct ContactPositi
     scaled = ((twiceCube - thriceSquare + 1) * tangent.x) * initialScale;
     value = (thriceSquare - twiceCube) * delta.x;
     value = scaled + value + sway + final;
-    out->x = start->x + Shift10(value);
+    out->x = start->x + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceCube - thriceSquare + 1) * tangent.y) * initialScale;
     value = (-twiceCube + thriceSquare) * delta.y;
     value = scaled + value + sway + final;
-    out->y = start->y + Shift10(value);
+    out->y = start->y + MovementCurve_TruncateFixed10(value);
     scaled = ((twiceCube - thriceSquare + 1) * tangent.z) * initialScale;
     value = (-twiceCube + thriceSquare) * delta.z;
     value = scaled + value + sway + final;
-    out->z = start->z + Shift10(value);
+    out->z = start->z + MovementCurve_TruncateFixed10(value);
 }
 
 u8 Axe_StepCurveMotion(struct ChaseActor *actor)
