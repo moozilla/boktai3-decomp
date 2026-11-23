@@ -103,11 +103,11 @@ void Mummy_OnAttackCollision(u8 *unused, struct ContactCollider *obj, u8 *input)
     }
 }
 
-void SceneActorReaction_HandleColliderContact(void);
+void SceneActorReaction_HandleColliderContact(void *, void *, void *);
 
-void Mummy_OnBodyCollision(void)
+void Mummy_OnBodyCollision(void *source, void *destination, void *actor)
 {
-    SceneActorReaction_HandleColliderContact();
+    SceneActorReaction_HandleColliderContact(source, destination, actor);
 }
 
 struct SceneActorCheckpointSequence {

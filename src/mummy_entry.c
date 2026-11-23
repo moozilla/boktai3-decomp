@@ -2471,7 +2471,7 @@ void SceneActorCollision_InitBody(u8 *, struct Z *, struct Z *, void (*)(void), 
 
 void SceneActorCollision_InitAttack(u8 *, struct Z *, struct Z *, void (*)(void), u32, u8 *);
 
-void Mummy_OnBodyCollision(void);
+void Mummy_OnBodyCollision(void *, void *, void *);
 
 void Mummy_OnAttackCollision(void);
 
