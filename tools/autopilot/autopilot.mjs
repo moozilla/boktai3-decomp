@@ -127,6 +127,16 @@ const GOALS = {
         event({ skill: 'hit', name: h.name, x: h.x, z: h.z, ...r });
         if (L.where().scene !== here) break;
       }
+      // people: talk to each once (towns count who was heard before the story goes on)
+      if (!opt('--no-talk')) for (const t of (stageOf(here).talk || []).filter((t) => t.kind === 'character' && !TRIED.has(`${here}:talk:${t.id}`))) {
+        TRIED.add(`${here}:talk:${t.id}`);
+        const story0 = L.story();
+        const r = yield* L.interact(t.x, t.z, { avoid: stageOf(here).doors.map((d) => d.box), trace: (e) => event({ skill: 'nav', ...e }) });
+        // a shop or service menu the talk opened: back out of it
+        for (let i = 0; i < 8 && !$player(g); i++) { yield g.press('b', 2); yield g.press(0, 10); yield* L.clearInterruptions({}); }
+        event({ skill: 'talk', id: t.id, x: t.x, z: t.z, done: r.done, lines: (r.lines || []).slice(0, 6), story: L.story(), was: story0 });
+        if (L.where().scene !== here) break;
+      }
       // items: pick them up on the way (floor items, chests: a sword, fruit, potions)
       for (const it of stageOf(here).items.filter((it) => !TRIED.has(`${here}:${it.x},${it.z}`))) {
         TRIED.add(`${here}:${it.x},${it.z}`);

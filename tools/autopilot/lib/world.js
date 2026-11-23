@@ -436,6 +436,10 @@ exports.chooseHub = function* (index, opts = {}) {
   return { done: false, reason: 'out of frames' };
 };
 
+// The story counter: r708[0x3c], r708 = gGameVariables (src/script_virtual_machine.c
+// Script_DecodeVariableValue).
+exports.story = () => { const b = g.u32(g.types.globals.gGameVariables.addr); return b ? g.u8(b + 0x3c) : null; };
+
 // Push planning: a breadth-first search over block states with the game's rules
 // (SceneObjects_TryPushNeighbor + Scene_TryStepDown). Heights include the blocks
 // (a block raises its cell to its top). A push from P into direction d moves the
