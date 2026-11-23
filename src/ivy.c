@@ -1668,25 +1668,15 @@ fail:
     return 0;
 }
 
-struct R {
-    u8 f[8];
-    u16 v;
-};
-
-struct PGetAnimationStatus {
-    u8 f[4];
-    u8 *q;
-};
-
-u32 Ivy_GetAnimationStatus(struct ChaseActor *pIn)
+u32 Ivy_GetAnimationStatus(struct ChaseActor *actor)
 {
-    struct PGetAnimationStatus *p = (struct PGetAnimationStatus *)pIn;
-    struct R *r = (struct R *)(p->q + 0x48);
-    if (r->v == 3)
+    struct DisplaySequenceState *sequence =
+        &((struct SceneActorAnimationSequenceDrawable *)actor->base.drawable)->sequence;
+    if (sequence->index == 3)
         return 1;
-    if (r->v == 4)
+    if (sequence->index == 4)
         return 0;
-    return r->v;
+    return sequence->index;
 }
 
 s32 Callback_InvokeActor(void *, void *);
