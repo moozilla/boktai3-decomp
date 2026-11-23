@@ -1,4 +1,5 @@
 #include "global.h"
+#include "ghoul_disc.h"
 /* Tentative role: update four effects moving toward a common center. */
 typedef struct Effect {
     u32 flags;
@@ -26,12 +27,6 @@ typedef struct State {
 extern const s16 gUnk_086149C4[];
 s32 Math_Atan2(s32, s32);
 void SpriteDrawable_SelectTileFrame(Effect *, void *, s32);
-static inline s32 magnitude(s32 v)
-{
-    if (v < 0)
-        return -v;
-    return v;
-}
 static inline s32 scale(s32 v)
 {
     if (v >= 0)
@@ -48,7 +43,7 @@ void Player_UpdateConvergingParticles(State *s)
         Effect *e = &s->effects[i];
         if (e->active) {
             Effect *draw = e;
-            if (magnitude(draw->dx) <= 15 && magnitude(draw->dy) <= 15) {
+            if (Ghoul_Abs(draw->dx) <= 15 && Ghoul_Abs(draw->dy) <= 15) {
                 draw->flags |= 1;
                 e->active = 0;
             } else {

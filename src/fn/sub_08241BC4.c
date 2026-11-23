@@ -2,6 +2,7 @@
 #include "contact_swarm.h"
 #include "scene_vec.h"
 #include "player_cue_sequence.h"
+#include "vanargand_projectiles.h"
 
 struct P {
     u8 pad0[0x30];
@@ -35,12 +36,6 @@ struct PackedVec {
     s32 y : 16;
     u32 z : 16, pad : 16;
 };
-static inline s32 Scale(s32 x)
-{
-    if (x >= 0)
-        return x >> 12;
-    return -(-x >> 12);
-}
 #define B(o) (*(u8 *)((u8 *)p + (o)))
 #define H(o) (*(u16 *)((u8 *)p + (o)))
 #define W(o) (*(u32 *)((u8 *)p + (o)))
@@ -89,8 +84,8 @@ void PlayerCue_UpdateTerrainSlide(struct P *p)
                 }
             } else {
                 u32 ang = ((p->dir + 5) & 7) << 5;
-                H(0x38) = -Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * H(0x270));
-                H(0x3C) = -Scale(gUnk_086149C4[ang] * H(0x270));
+                H(0x38) = -VanargandProjectile_Scale(gUnk_086149C4[(ang + 0x40) & 0xff] * H(0x270));
+                H(0x3C) = -VanargandProjectile_Scale(gUnk_086149C4[ang] * H(0x270));
             }
             {
                 u16 *q = &H(0x270);
