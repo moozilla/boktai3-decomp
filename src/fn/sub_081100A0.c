@@ -24,9 +24,8 @@ yes:
 static inline s32 ClampScore(struct LinkScorePanel *panel)
 {
     s32 v = panel->score;
-    s32 limit = 9999;
-    if (v > limit)
-        v = limit;
+    if (v > 9999)
+        v = 9999;
     return v;
 }
 void LinkScorePanel_UpdateDisplayedScore(struct LinkScorePanel *panel)
