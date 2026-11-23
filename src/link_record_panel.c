@@ -96,6 +96,14 @@ static inline void PanelSequence_SetUpdate(struct LinkRecordPanel *panel,
     panel->update = update;
 }
 
+static inline void PanelSequence_Begin(struct LinkRecordPanel *panel,
+                                       void (*update)(struct LinkRecordPanel *), u32 transition)
+{
+    panel->update = update;
+    panel->entering = 1;
+    panel->transition = transition;
+}
+
 static inline u8 PanelSequence_ClampSelectionCount(u8 value, s32 min, s32 max)
 {
     if (value > max)
@@ -385,11 +393,7 @@ void LinkRecordPanel_UpdateDelay(struct LinkRecordPanel *owner)
     if (owner->timer < 240) {
         owner->timer++;
     } else {
-        void (*next)(struct LinkRecordPanel *) = LinkRecordPanel_UpdateExit;
-        u32 one = 1;
-        owner->update = next;
-        owner->entering = one;
-        owner->transition = one;
+        PanelSequence_Begin(owner, LinkRecordPanel_UpdateExit, 1);
     }
 }
 
@@ -408,18 +412,10 @@ s32 LinkRecordPanel_Update(struct LinkRecordPanel *owner)
 s32 LinkRecordPanel_Destroy(struct LinkRecordPanel *owner)
 {
     s32 i;
-    u32 z;
-    struct CharacterPreviewModel *preview;
     LinkRecordPanel_RemoveWidgets(owner);
-    preview = &owner->previews[0].model;
-    i = 1;
-    do {
-        CharacterModel_RemoveAnimations(preview);
-        preview = (struct CharacterPreviewModel *)((u8 *)preview + sizeof(owner->previews[0]));
-        i--;
-    } while (i >= 0);
-    z = 0;
-    gPanelSequence = z;
+    for (i = 0; i < 2; i++)
+        CharacterModel_RemoveAnimations(&owner->previews[i].model);
+    gPanelSequence = 0;
     return 1;
 }
 
