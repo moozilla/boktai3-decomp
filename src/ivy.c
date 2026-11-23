@@ -35,6 +35,7 @@
 #include "scene_actor_init_primitives.h"
 #include "scene_actor_init_graphics.h"
 #include "scene_actor_init_actor.h"
+#include "scene_actor_placement.h"
 
 void SceneActorBehavior_ApplyContactReaction(void *, void *, void *);
 
@@ -1722,48 +1723,33 @@ void Collider_Remove(void *);
 
 void SceneActorRegistry_UnlinkActor(void *);
 
-static inline u8 tst(u16 *a, u32 m)
+u32 Ivy_Destroy(struct ChaseActor *s)
 {
-    if (*a & m)
-        return 1;
-    return 0;
-}
-
-struct SDestroy {
-    u8 f0[4];
-    u8 *p4;
-    u8 b8;
-    u8 f1[0x2b7];
-    u16 h2c0;
-};
-
-u32 Ivy_Destroy(struct SDestroy *s)
-{
-    u8 *p = s->p4;
+    u8 *p = s->base.drawable;
     u8 *q;
     u32 m;
     u32 v;
-    if (s->b8 == 0)
+    if (s->base.drawableKind == 0)
         Sprite_Remove(p);
     else
         Anim_Remove(p + 0x20);
     Heap_Free(p);
     m = 0x100;
-    if (tst((u16 *)((u8 *)s + 0x2c0), m))
+    if (SceneActorPlacement_TestFlags(&s->base.placementFlags, m))
         SceneMessages_UnregisterReceiver((u8 *)s + 0xc);
     {
-        u8 *r = (u8 *)s + 0x320;
+        u8 *r = s->base.shadow;
         if (*r == 1)
             Shadow_Destroy(r);
     }
     m = 0x2000000;
-    v = ((struct ChaseActor *)s)->base.statusFlags & m;
-    q = (u8 *)s + 0x50;
+    v = s->base.statusFlags & m;
+    q = (u8 *)&s->base.body;
     if (v == 0)
         TerrainOverlay_QueueRemoveActor(q);
 
     SceneBody_Unregister(q);
-    Collider_Remove((u8 *)s + 0x134);
+    Collider_Remove(&s->base.colliderA);
     SceneActorRegistry_UnlinkActor(s);
     return 0;
 }
@@ -1786,7 +1772,7 @@ void SceneActor_BeginReaction22(struct ChaseActor *actor);
 
 s32 Ivy_UpdateInteraction(void);
 
-u32 Ivy_Destroy(struct SDestroy *s);
+u32 Ivy_Destroy(struct ChaseActor *s);
 
 extern const u8 gUnk_08606400[];
 
