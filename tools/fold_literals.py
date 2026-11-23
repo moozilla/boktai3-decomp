@@ -93,7 +93,7 @@ def candidates(text, rel=None, every=False):
             indent, dtype, base, name, lit = d.groups()
             if base in ("return", "goto", "case", "else") or dtype.split()[-1] == name:
                 continue
-            line = text.count("\n", 0, d.start()) + 1
+            line = decl_line = text.count("\n", 0, d.start()) + 1
             body_end = concessions._scope_end(code, d.end())
             cut = [(d.start(), d.end())]
             if lit is None:  # u32 mask; ... mask = 0x40;
@@ -109,7 +109,7 @@ def candidates(text, rel=None, every=False):
                 lo = a.end()
             else:
                 lo = d.end()
-            if line not in warned:
+            if line not in warned and decl_line not in warned:  # const-local warns at the declaration
                 continue
             uses = reads(code, name, lo, body_end)
             if not uses or (len(uses) != 1 and not every) \
