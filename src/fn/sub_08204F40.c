@@ -5,6 +5,8 @@
 #include "engine.h"
 #include "ram.h"
 #include "player_cue_sequence.h"
+#include "engine_pause.h"
+#include "word_flags.h"
 extern u32 gUnk_02000560;
 s32 Callback_InvokeActor(void *, void *);
 void Collider_SetPosition(void *, void *, u32);
@@ -29,14 +31,6 @@ struct EffectPair {
 struct EffectVector {
     struct EffectPair a, b;
 };
-static inline u32 TestPair(u32 mask, u32 *a, u32 *b)
-{
-    return (*a | *b) & mask;
-}
-static inline u32 TestFlag(u32 mask, u32 *p)
-{
-    return *p & mask;
-}
 static inline u32 RandomFrom(const u16 *table)
 {
     gRandomIndex = (gRandomIndex + 1) & 0x3ff;
@@ -45,7 +39,7 @@ static inline u32 RandomFrom(const u16 *table)
 s32 EnemyD459_Update(u8 *p)
 {
     struct ColliderView *collider;
-    if (TestPair(0x400, &gEngineFlags, &gScenePauseFlags) || TestFlag(4, &gUnk_02000560))
+    if (Engine_PauseBits(0x400) || Flags_MaskedWord(4, &gUnk_02000560))
         return 0;
     Callback_InvokeActor(p, *(void **)(p + 0x108));
     W(0x24) &= ~1;
